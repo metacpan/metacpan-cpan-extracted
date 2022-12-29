@@ -156,7 +156,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.158';
+our $VERSION = '0.159';
 our @EXPORT_OK = qw{
     shell
 
@@ -412,6 +412,11 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	iridium		=> {
 	    name	=> 'Iridium Next',
 	    # source	=> 'Iridium-E',
+	    rms		=> 1,
+	    match	=> 1,
+	},
+	ast		=> {
+	    name	=> 'AST Space Mobile',
 	    rms		=> 1,
 	    match	=> 1,
 	},

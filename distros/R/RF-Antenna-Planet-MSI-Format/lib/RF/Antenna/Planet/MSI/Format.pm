@@ -6,7 +6,7 @@ use Tie::IxHash qw{};
 use Path::Class qw{};
 use RF::Functions 0.04, qw{dbd_dbi dbi_dbd};
 
-our $VERSION = '0.11';
+our $VERSION = '0.14';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
@@ -58,7 +58,7 @@ Creates a new object and loads data from other sources
 
 sub new {
   my $this  = shift;
-  die("Error: new constructor requires key/value pairs") if @_ % 2;
+  die('Error: new constructor requires key/value pairs') if @_ % 2;
   my $class = ref($this) ? ref($this) : $this;
   my $self  = {};
   bless $self, $class;
@@ -78,16 +78,16 @@ sub new {
       } elsif (ref($value) eq 'ARRAY') {
         $self->header(@$value); #preserves order
       } else {
-        die("Error: header value expected to be either array reference or hash reference");
+        die('Error: header value expected to be either array reference or hash reference');
       }
     } elsif ($key eq 'horizontal') {
-      die("Error: horizontal value expected to be array reference") unless ref($value) eq 'ARRAY';
+      die('Error: horizontal value expected to be array reference') unless ref($value) eq 'ARRAY';
       $self->horizontal($value);
     } elsif ($key eq 'vertical') {
-      die("Error: vertical value expected to be array reference") unless ref($value) eq 'ARRAY';
+      die('Error: vertical value expected to be array reference') unless ref($value) eq 'ARRAY';
       $self->vertical($value);
     } else {
-      die("Error: header key/value pairs must be strings") if ref($value);
+      die('Error: header key/value pairs must be strings') if ref($value);
       push @later, $key, $value; #store for later so that we process header before header keys
     }
   }
@@ -169,20 +169,14 @@ Reads an antenna pattern file from a zipped archive and parses the data into the
 
 sub read_fromZipMember {
   my $self            = shift;
-  my $zip_filename    = shift or die("Error: zip filename required");
-  my $member_filename = shift or die("Error: zip member name requried");
+  my $zip_filename    = shift or die('Error: zip filename required');
+  my $member_filename = shift or die('Error: zip member name requried');
 
   require Archive::Zip;
-  require Archive::Zip::MemberRead;
-
   my $zip_archive = Archive::Zip->new;
-  unless ( $zip_archive->read("$zip_filename") == Archive::Zip::AZ_OK() ) {die "Error: $zip_filename read error"};
-
-  my $blob  = '';
-  my $fh    = Archive::Zip::MemberRead->new($zip_archive, "$member_filename");
-  while (defined(my $line = $fh->getline)) {$blob .= "$line$/"}; #getline chomps but preserve_line_ending does not work for foreign line endings
-  $fh->close;
-
+  unless ( $zip_archive->read("$zip_filename") == Archive::Zip::AZ_OK() ) {die qq{Error: zip file "$zip_filename" read error}};
+  my $member      = $zip_archive->memberNamed($member_filename) or die(qq{Error: zip file "$zip_filename" could not find member "$member_filename"});
+  my $blob        = $member->contents;
   return $self->read(\$blob);
 }
 
@@ -279,7 +273,7 @@ sub write {
 
 Sets and returns the file extension to use for write method when called without any parameters.
  
-  my $suffix = $antenna->file_extension('.prn');
+  my $suffix = $antenna->file_extension('.ant');
 
 Default: .msi
 
@@ -568,12 +562,29 @@ sub gain_dbi {
   return defined($dbd) ? dbi_dbd($dbd) : undef;
 }
 
+=head2 tilt
+
+Antenna tilt string as displayed in file.
+
+  my $tilt = $antenna->tilt;
+  $antenna->tilt("MECHANICAL");
+  $antenna->tilt("ELECTRICAL");
+
+=cut
+
+sub tilt {
+  my $self = shift;
+  $self->header(TILT => shift) if @_;
+  return $self->header->{'TILT'};
+}
+
+
 =head2 electrical_tilt
 
 Antenna electrical_tilt string as displayed in file.
 
   my $electrical_tilt = $antenna->electrical_tilt;
-  $antenna->electrical_tilt("MECHINICAL");
+  $antenna->electrical_tilt("4"); #4-degree downtilt
 
 =cut
 
@@ -581,6 +592,61 @@ sub electrical_tilt {
   my $self = shift;
   $self->header(ELECTRICAL_TILT => shift) if @_;
   return $self->header->{'ELECTRICAL_TILT'};
+}
+
+=head2 electrical_tilt_degrees
+
+Attempts to read and parse the header and return the electrical down tilt in degrees.
+
+  my $degrees = $antenna->electrical_tilt_degrees; #isa number
+
+Note: I recommend storing electrical downtilt in the TILT and ELECTRICAL_TILT headers like this:
+
+  TILT ELECTRICAL
+  ELECTRICAL_TILT 4
+
+However, this method attempts to read as many different formats as found in the source files.
+
+=cut
+
+sub electrical_tilt_degrees {
+  my $self    = shift;
+  my $degrees = undef;
+  my $tilt    = $self->tilt;
+  if (defined $tilt) {
+    $tilt =~ s/\A\s+//; #ltrim
+    $tilt =~ s/\s+\Z//; #rtrim
+    if ($tilt =~ m/\A(NONE|MECHANICAL)/i                    ) { #Spec:
+      $degrees = 0;
+    } elsif (Scalar::Util::looks_like_number($tilt)         ) { #number (assume electrical tilt)
+        $degrees = abs($tilt + 0);
+    } elsif ($tilt =~ m/\A-?([0-9]{1,2})[-\s]deg.*ELECTRICAL/i) { #8-Deg Electrical
+        $degrees = $1 + 0;
+    } elsif ($tilt =~ m/\A-?([0-9]{1,2})[-\s]deg.*E-TILT/i    ) { #8-Deg E-Tilt
+        $degrees = $1 + 0;
+    } elsif ($tilt =~ m/\A([0-9]{1,2})T\Z/i                 ) { #11T
+        $degrees = $1 + 0;
+    } elsif ($tilt =~ m/\AT([0-9]{1,2})\Z/i                 ) { #T11
+        $degrees = $1 + 0;
+    } elsif ($tilt =~ m/\AELECTRICAL -?([0-9]{1,2})\b/        ) { #ELECTRICAL 11...
+        $degrees = $1 + 0;
+    } elsif ($tilt =~ m/\AELECTRICAL\Z/i                    ) { #Spec: ELECTRICAL
+      my $comment         =  $self->comment;         $comment         = '' unless defined($comment);
+      my $electrical_tilt =  $self->electrical_tilt; $electrical_tilt = '' unless defined($electrical_tilt);
+      $electrical_tilt    =~ s/\A\s+//; #ltrim
+      $electrical_tilt    =~ s/\s+\Z//; #rtrim
+      if (Scalar::Util::looks_like_number($electrical_tilt)            ) { #Spec: ELECTRICAL_TILT 1.25
+        $degrees = abs($electrical_tilt + 0);
+      } elsif ($electrical_tilt =~ m/\A-?([0-9]{1,2})\b/i                ) { #ELECTRICAL_TILT 11 degrees
+        $degrees = $1 + 0;
+      } elsif ($comment         =~ m/ELECTRICAL_TILT\s+-?([0-9]{1,2})\b/i) { #COMMENT ELECTRICAL_TILT 8 | COMMENT ELECTRICAL_TILT 8 degrees
+        $degrees = $1 + 0;
+      } elsif ($comment         =~ m/E-?TILT\s+-?([0-9]{1,2})\b/i        ) { #COMMENT E-TILT 8 | COMMENT ETilt -2 deg
+        $degrees = $1 + 0;
+      }
+    }
+  }
+  return $degrees;
 }
 
 =head2 comment
@@ -608,7 +674,7 @@ Format Definition from RCC: L<https://web.archive.org/web/20080821041142/http://
 
 =head1 AUTHOR
 
-Michael R. Davis, MRDVT
+Michael R. Davis
 
 =head1 COPYRIGHT AND LICENSE
 

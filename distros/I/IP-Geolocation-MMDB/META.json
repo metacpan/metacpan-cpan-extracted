@@ -4,7 +4,7 @@
       "Andreas V\u00f6gele <voegelas@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -54,11 +54,11 @@
    "provides" : {
       "IP::Geolocation::MMDB" : {
          "file" : "lib/IP/Geolocation/MMDB.pm",
-         "version" : "1.009"
+         "version" : "1.010"
       },
       "IP::Geolocation::MMDB::Metadata" : {
          "file" : "lib/IP/Geolocation/MMDB/Metadata.pm",
-         "version" : "1.009"
+         "version" : "1.010"
       }
    },
    "release_status" : "stable",
@@ -73,9 +73,9 @@
          "web" : "https://github.com/voegelas/IP-Geolocation-MMDB"
       }
    },
-   "version" : "1.009",
-   "x_generated_by_perl" : "v5.34.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
+   "version" : "1.010",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

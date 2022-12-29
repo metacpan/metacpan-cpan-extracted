@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST/Cookie.pm
-## Version v0.2.9
-## Copyright(c) 2019-2021 DEGUEST Pte. Ltd.
+## Version v0.2.10
+## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/10/08
-## Modified 2021/09/08
+## Modified 2022/06/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,14 +16,18 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
+    use vars qw( $VERSION );
     use APR::Request ();
     use DateTime;
     use Net::API::REST::DateTime;
-    use Scalar::Util ();
     use Nice::Try;
+    use Scalar::Util ();
     use overload '""' => sub { shift->as_string() }, fallback => 1;
-    our $VERSION = 'v0.2.9';
+    our $VERSION = 'v0.2.10';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -240,7 +244,7 @@ sub _header_datetime
 }
 
 1;
-
+# NOTE: pod
 __END__
 
 =encoding utf8
@@ -269,7 +273,7 @@ Net::API::REST::Cookie - Cookie Object
 
 =head1 VERSION
 
-    v0.2.9
+    v0.2.10
 
 =head1 DESCRIPTION
 

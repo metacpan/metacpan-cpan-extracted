@@ -1,5 +1,9 @@
 Revision history for Mail::Exim::ACL::Geolocation
 
+1.004  2022-12-24 10:50:02 CET
+
+  - Minor documentation changes
+
 1.003  2022-08-05 15:20:45 CEST
 
   - Move the primary Git repository to GitHub

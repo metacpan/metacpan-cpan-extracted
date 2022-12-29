@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.34';
+our $VERSION = '0.37';
 
 use UI::Various::core;
 use UI::Various::Button;
@@ -97,6 +97,10 @@ sub _prepare($$$)
 		      'Buttonbox', -x => $column, -y => $row, -width => $width,
 		      -buttons =>
 		      [{-label => $self->text,
+			(defined $self->{align}
+			 ? ('-textalignment',
+			    (qw(right left middle))[$self->{align} % 3])
+			 : ()),
 			-onpress => sub {
 			    local $_ = $self->code;
 			    &$_($self->_toplevel, $self);

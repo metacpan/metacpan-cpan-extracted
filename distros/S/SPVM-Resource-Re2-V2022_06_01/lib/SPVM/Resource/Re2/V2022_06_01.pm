@@ -1,6 +1,6 @@
 package SPVM::Resource::Re2::V2022_06_01;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 1;
 
@@ -47,7 +47,7 @@ C<MyRe2.config>
   
   $config->use_resource('Resource::Re2::V2022_06_01');
 
-  $config->add_libs('pthread');
+  $config->add_libs('stdc++', 'pthread');
   
   $config;
 
@@ -116,6 +116,8 @@ The config of C<Resource::Re2::V2022_06_01>.
 =head1 Required Libraries
 
 =over
+
+=item * stdc++
 
 =item * pthread
 

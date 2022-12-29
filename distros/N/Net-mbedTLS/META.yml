@@ -1,0 +1,35 @@
+---
+abstract: 'L<mbedTLS|https://tls.mbed.org/> in Perl'
+author:
+  - 'Felipe Gasper (FELIPE)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Mozilla::CA: '0'
+  Test::FailWarnings: '0'
+configure_requires:
+  ExtUtils::CBuilder: '0'
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+  autodie: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-mbedTLS
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  Mozilla::CA: '0'
+requires:
+  Promise::XS: '0'
+  X::Tiny: '0.21'
+  parent: '0'
+  perl: '5.016'
+resources:
+  bugtracker: https://github.com/FGasper/p5-Net-mbedTLS/issues
+  repository: git://github.com/FGasper/p5-Net-mbedTLS.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

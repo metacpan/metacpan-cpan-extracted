@@ -29,6 +29,7 @@ Types
 UI
 UIFileFromPackageName
 WindowID
+X11
 XInput
 Zakariyya
 lib

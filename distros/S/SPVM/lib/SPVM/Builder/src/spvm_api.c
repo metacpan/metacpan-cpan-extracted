@@ -311,6 +311,9 @@ SPVM_ENV* SPVM_API_new_env_raw() {
     SPVM_API_get_field_id_static,
     SPVM_API_items,
     SPVM_API_call_instance_method_static_by_name,
+    SPVM_API_get_method_id,
+    SPVM_API_strerror_nolen,
+    SPVM_API_strerror_string_nolen,
   };
   
   SPVM_ENV* env = calloc(1, sizeof(env_init));
@@ -3228,6 +3231,34 @@ int32_t SPVM_API_get_class_var_id(SPVM_ENV* env, SPVM_VALUE* stack, const char* 
   return class_var->id;
 }
 
+int32_t SPVM_API_get_method_id(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* method_name) {
+  (void)env;
+  
+  SPVM_RUNTIME* runtime = env->runtime;
+  
+  // Method ID
+  int32_t method_id = -1;
+  
+  // Basic type
+  SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_API_RUNTIME_get_basic_type_by_name(runtime, class_name);
+  if (basic_type) {
+    
+    // Class
+    SPVM_RUNTIME_CLASS* class = SPVM_API_RUNTIME_get_class(runtime, basic_type->class_id);
+    if (class) {
+
+      // Method
+      SPVM_RUNTIME_METHOD* method = SPVM_API_RUNTIME_get_method_by_class_id_and_method_name(runtime, class->id, method_name);
+      
+      if (method) {
+        method_id = method->id;
+      }
+    }
+  }
+  
+  return method_id;
+}
+
 int32_t SPVM_API_get_class_method_id(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* method_name) {
   (void)env;
   
@@ -4002,6 +4033,7 @@ void* SPVM_API_strerror_string(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_v
   int32_t status = SPVM_STRERROR_strerror(errno_value, strerror_value, length);
   
   if (status == 0) {
+    env->shorten(env, stack, obj_strerror_value, strlen(strerror_value));
     return obj_strerror_value;
   }
   else {
@@ -4020,6 +4052,14 @@ const char* SPVM_API_strerror(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_va
   else {
     return NULL;
   }
+}
+
+void* SPVM_API_strerror_string_nolen(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_value) {
+  return SPVM_API_strerror_string(env, stack, errno_value, 0);
+}
+
+const char* SPVM_API_strerror_nolen(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_value) {
+  return SPVM_API_strerror(env, stack, errno_value, 0);
 }
 
 int32_t SPVM_API_get_args_stack_length(SPVM_ENV* env, SPVM_VALUE* stack) {

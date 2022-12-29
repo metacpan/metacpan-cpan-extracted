@@ -188,18 +188,36 @@ typedef __float128 float128;
 #define MPC_RE(x) ((x)->re)
 #define MPC_IM(x) ((x)->im)
 
-#define VOID_MPC_SET_X_Y(real_t, imag_t, z, real_value, imag_value, rnd)     \
-   {                                                                     \
-     int _inex_re, _inex_im;                                             \
+#define VOID_MPC_SET_X_Y(real_t, imag_t, z, real_value, imag_value, rnd)            \
+   {                                                                                \
+     int _inex_re, _inex_im;                                                        \
      _inex_re = (mpfr_set_ ## real_t) (MPC_RE (z), (real_value), MPC_RND_RE (rnd)); \
      _inex_im = (mpfr_set_ ## imag_t) (MPC_IM (z), (imag_value), MPC_RND_IM (rnd)); \
    }
 
-#define SV_MPC_SET_X_Y(real_t, imag_t, z, real_value, imag_value, rnd)     \
-  {                                                                     \
-    int _inex_re, _inex_im;                                             \
+#define SV_MPC_SET_X_Y(real_t, imag_t, z, real_value, imag_value, rnd)                  \
+  {                                                                                     \
+    int _inex_re, _inex_im;                                                             \
     _inex_re = (mpfr_set_ ## real_t) (mpc_realref (z), (real_value), MPC_RND_RE (rnd)); \
     _inex_im = (mpfr_set_ ## imag_t) (mpc_imagref (z), (imag_value), MPC_RND_IM (rnd)); \
-    return newSViv(MPC_INEX (_inex_re, _inex_im));                               \
+    return newSViv(MPC_INEX (_inex_re, _inex_im));                                      \
   }
+
+/*
+   If the mpc library is less than 1.3.0, we check
+   that the specified rounding mode is valid - because
+   the "round away from zero" mode is available only
+   to 1.3.0 and later.
+*/
+#if MPC_VERSION < 66304
+# define CHECK_ROUNDING_VALUE(rnd_val)   if(!_check_rounding_value((mpc_rnd_t)SvUV(rnd_val)))                                        \
+  {                                                                                                                                  \
+     croak("Illegal rounding value (%d) supplied for this version (%s) of the mpc library", (int)SvUV(rnd_val), MPC_VERSION_STRING); \
+  }
+
+#else
+# define CHECK_ROUNDING_VALUE(rnd_val)
+#endif
+
+
 

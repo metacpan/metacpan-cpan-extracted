@@ -35,6 +35,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.27",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Juerd/Net-MQTT-Simple/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Juerd/Net-MQTT-Simple.git",
+         "web" : "https://github.com/Juerd/Net-MQTT-Simple"
+      }
+   },
+   "version" : "1.28",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

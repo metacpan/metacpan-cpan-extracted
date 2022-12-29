@@ -18,3 +18,7 @@
 /podlators-*.tar.gz.asc
 /scripts/pod2man
 /scripts/pod2text
+
+# Not needed in the stand-alone podlators package, but necessary when
+# included in Perl core.
+!/Makefile.PL

@@ -92,11 +92,11 @@ SKIP: {
 	$newargs{ca_file}  = '/foo';
 	warnings_exist { $epp = Net::EPP::Registry::Nominet->new (%newargs); }
 		[qr/^No greeting returned: cannot continue/,
-		qr/^SSL_ca_file \/foo does not exist/],
+		qr/^SSL_ca_file \/foo (can't be used|does not exist)/],
 		'Expected warnings are thrown';
 	ok ((not defined $epp), 'Reconnect with duff SSL cert verification');
 	SKIP: {
-		skip "Server cert may not be valid now", 1 if time > 1610712000;
+		skip "Server cert may not be valid now", 1 if time > 1675987199;
 		$newargs{ca_file}  = 't/ca.crt';
 		$epp = Net::EPP::Registry::Nominet->new (%newargs);
 		ok (defined $epp, 'Reconnect with good SSL cert verification');

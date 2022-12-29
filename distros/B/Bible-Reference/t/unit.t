@@ -41,18 +41,20 @@ as_chapters();
 as_books();
 refs();
 as_text();
+require_chapter_match();
 set_bible_data();
 get_bible_structure();
 identify_bible();
+canonicalize();
 
 done_testing;
 
 sub attributes_and_classes {
     can_ok( $obj, $_ ) for ( qw(
-        acronyms sorting require_verse_match require_book_ucfirst minimum_book_length add_detail
-        bible new expand_ranges in clear books
-        as_array as_hash as_verses as_runs as_chapters as_books
-        refs as_text set_bible_data
+        acronyms sorting require_chapter_match require_verse_match require_book_ucfirst minimum_book_length
+        add_detail simplify
+        bible new expand_ranges in clear books as_array as_hash as_verses as_runs as_chapters as_books refs
+        as_text set_bible_data get_bible_structure identify_bible
     ) );
 }
 
@@ -688,6 +690,15 @@ sub as_text {
     );
 }
 
+sub require_chapter_match {
+    $obj->clear->require_chapter_match(1);
+    is(
+        $obj->in('This has a reference to Rom 4 and also a reference to Jam in it.')->as_text,
+        'This has a reference to Romans 4 and also a reference to Jam in it.',
+        'require_chapter_match(1)',
+    );
+}
+
 sub set_bible_data {
     like( dies { $obj->set_bible_data }, qr/^First argument/, 'set_bible_data()' );
     like( dies { $obj->set_bible_data('Special') }, qr/^Second argument/, 'set_bible_data()' );
@@ -779,5 +790,23 @@ sub identify_bible {
             },
         ],
         'identify_bible identifies correct Bible',
+    );
+}
+
+sub canonicalize {
+    $obj->acronyms(0)->sorting(1)->add_detail(1)->simplify(1);
+
+    is(
+        $obj->clear->in(
+            'James 1:1-27; 2:1-26; 3:1-18; 4:1-17; 5:1-20; Romans 1:1-32; 2:1-29; 3:1-31; 4:1-25'
+        )->refs,
+        'Romans 1-4; James',
+        'add_detail + simplify from full complex',
+    );
+
+    is(
+        $obj->clear->in('James 1-5; Romans 1-4')->refs,
+        'Romans 1-4; James',
+        'add_detail + simplify from expected human input',
     );
 }

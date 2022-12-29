@@ -141,6 +141,8 @@ typedef struct s_Package* URPM__Package;
 #define WEAK_DEPS_ARE_SUPPORTED
 #endif
 
+#define  BUF_SIZE 65536*3
+
 static ssize_t write_nocheck(int fd, const void *buf, size_t count) {
   return write(fd, buf, count);
 }
@@ -307,6 +309,73 @@ ranges_overlap(rpmsenseFlags aflags, char *sa, rpmsenseFlags bflags, char *sb) {
   }
 }
 
+struct property {
+  char *name;
+  rpmsenseFlags flags;
+  char *evr;
+};
+
+static void free_property(struct property *ps) {
+  free(ps->name);
+  ps->name = NULL;
+  ps->flags = 0;
+  free(ps->evr);
+  ps->evr = NULL;
+}
+
+// This parses things like 'ocamlx(bar)[== 42]' or 'ocaml-bar < 42'
+static int parse_property(char *s, struct property *ps) {
+  int l = strlen(s);
+  char *eon = NULL;
+
+  ps->name = NULL;
+  ps->flags = 0;
+  ps->evr = NULL;
+
+  if (l == 0) return -1;
+
+  if (s[l-1] == ']') {
+    eon = strrchr(s, '[');
+
+    if (eon == NULL || eon == s) {
+      // This is a strange one finishing with ] but without a [ before like
+      // "Provides: foo]" or something without a name before like
+      // "Provides: [foo]"
+      ps->name = strdup(s);
+      ps->evr = strdup("");
+      return 0;
+    }
+  }
+
+  /* Drop "[*]" if present at the end of the name */
+  if (eon-s > 3 && !strncmp(eon-3, "[*]", 3)) {
+    eon = eon-3;
+  }
+
+  if (eon == NULL) {
+    // This does not have [ ] at the end but could be in the form "gcc < 42"
+    eon = s;
+    while (*eon && *eon != ' ' && *eon != '<' && *eon != '>') ++eon;
+  }
+
+  ps->name = strndup(s, eon-s);
+  l = strlen(eon);
+  s = eon;
+  while (*s) {
+    if (*s == ' ' || *s == '[' || *s == '*' || *s == ']');
+    else if (*s == '<') ps->flags |= RPMSENSE_LESS;
+    else if (*s == '>') ps->flags |= RPMSENSE_GREATER;
+    else if (*s == '=') ps->flags |= RPMSENSE_EQUAL;
+    else break;
+    ++s;
+    --l;
+  }
+  ps->evr = strndup(s, l-1);
+  /* fprintf(stderr, "name=\"%s\" evr=\"%s\"\n", ps->name, ps->evr); */
+
+  return 0;
+}
+
 typedef int (*callback_list_str)(char *s, int slen, const char *name, const rpmsenseFlags flags, const char *evr, void *param);
 
 static int
@@ -337,9 +406,8 @@ callback_list_str_overlap(char *s, int slen, const char *name, rpmsenseFlags fla
   struct cb_overlap_s *os = (struct cb_overlap_s *)param;
   int result = 0;
   char *eos = NULL;
-  char *eon = NULL;
   char eosc = '\0';
-  char eonc = '\0';
+  struct property ops;
 
   /* we need to extract name, flags and evr from a full sense information, store result in local copy */
   if (s) {
@@ -348,28 +416,16 @@ callback_list_str_overlap(char *s, int slen, const char *name, rpmsenseFlags fla
       eosc = *eos;
       *eos = 0;
     }
-    name = s;
-    while (*s && *s != ' ' && *s != '[' && *s != '<' && *s != '>' && *s != '=') ++s;
-    if (*s) {
-      eon = s;
-      while (*s) {
-	if (*s == ' ' || *s == '[' || *s == '*' || *s == ']');
-	else if (*s == '<') flags |= RPMSENSE_LESS;
-	else if (*s == '>') flags |= RPMSENSE_GREATER;
-	else if (*s == '=') flags |= RPMSENSE_EQUAL;
-	else break;
-	++s;
-      }
-      evr = s;
-    } else
+    if (!parse_property(s, &ops)) {
+      name = ops.name;
+      flags = ops.flags;
+      evr = ops.evr;
+    } else {
+      name = s;
       evr = "";
+    }
   }
 
-  /* mark end of name */
-  if (eon) {
-       eonc = *eon;
-       *eon = 0;
-  }
   /* names should be equal, else it will not overlap */
   if (!strcmp(name, os->name)) {
     /* perform overlap according to direction needed, negative for left */
@@ -382,9 +438,12 @@ callback_list_str_overlap(char *s, int slen, const char *name, rpmsenseFlags fla
   /* fprintf(stderr, "cb_list_str_overlap result=%d, os->direction=%d, os->name=%s, os->evr=%s, name=%s, evr=%s\n",
      result, os->direction, os->name, os->evr, name, evr); */
 
-  /* restore s if needed */
-  if (eon) *eon = eonc;
-  if (eos) *eos = eosc;
+  if (s) {
+    free_property(&ops);
+
+    /* restore s if needed */
+    if (eos) *eos = eosc;
+  }
 
   return result;
 }
@@ -406,21 +465,29 @@ return_list_str(char *s, const Header header, rpmTag tag_name, rpmTag tag_flags,
       if (f(s, 0, NULL, 0, NULL, param))
         return -count;
     } else {
-      char *eos;
+      struct property ops;
       while(ps != NULL) {
-	*ps = 0; eos = strchr(s, '['); if (!eos) eos = strchr(s, ' ');
-	++count;
-	if (f(s, eos ? eos-s : ps-s, NULL, 0, NULL, param)) {
-          *ps = '@';
-          return -count;
+        *ps = 0;
+        if (!parse_property(s, &ops)) {
+          ++count;
+	  if (f(ops.name, strlen(ops.name), NULL, 0, NULL, param)) {
+            *ps = '@';
+            free_property(&ops);
+            return -count;
+          }
+          free_property(&ops);
         }
-	*ps = '@'; /* restore in memory modified char */
-	s = ps + 1; ps = strchr(s, '@');
+        *ps = '@'; /* restore in memory modified char */
+        s = ps + 1; ps = strchr(s, '@');
       }
-      eos = strchr(s, '['); if (!eos) eos = strchr(s, ' ');
       ++count;
-      if (f(s, eos ? eos-s : 0, NULL, 0, NULL, param))
-         return -count;
+      if (!parse_property(s, &ops)) {
+        if (f(ops.name, strlen(ops.name), NULL, 0, NULL, param)) {
+           free_property(&ops);
+           return -count;
+        }
+        free_property(&ops);
+      }
     }
   } else if (header) {
     struct rpmtd_s list, flags, list_evr;
@@ -754,7 +821,7 @@ return_problems(rpmps ps, int translate_message, int raw_message) {
 
 static char *
 pack_list(const Header header, rpmTag tag_name, rpmTag tag_flags, rpmTag tag_version) {
-  char buff[65536*2];
+  char buff[BUF_SIZE];
   char *p = buff;
 
   struct rpmtd_s td;
@@ -877,6 +944,7 @@ update_provides(const URPM__Package pkg, HV *provides) {
     }
   } else {
     char *ps, *s, *es;
+    struct property ops;
 
     if ((s = pkg->requires) != NULL && *s != 0) {
       ps = strchr(s, '@');
@@ -898,12 +966,24 @@ update_provides(const URPM__Package pkg, HV *provides) {
     if ((s = pkg->provides) != NULL && *s != 0) {
       ps = strchr(s, '@');
       while(ps != NULL) {
-	*ps = 0; es = strchr(s, '['); if (!es) es = strchr(s, ' '); *ps = '@';
-	update_hash_entry(provides, s, es != NULL ? es-s : ps-s, 1, es != NULL, pkg);
+	*ps = 0;
+	if (parse_property(s, &ops)) {
+	  /* Failed to parse, use the whole string */
+	  update_hash_entry(provides, s, ps-s, 1, 0, pkg);
+	} else {
+	  update_hash_entry(provides, s, strlen(ops.name), 1, ops.flags != 0, pkg);
+	  free_property(&ops);
+	}
+        *ps = '@';
 	s = ps + 1; ps = strchr(s, '@');
       }
-      es = strchr(s, '['); if (!es) es = strchr(s, ' ');
-      update_hash_entry(provides, s, es != NULL ? es-s : 0, 1, es != NULL, pkg);
+      if (parse_property(s, &ops)) {
+	  /* Failed to parse, use the whole string */
+	  update_hash_entry(provides, s, ps-s, 1, 0, pkg);
+	} else {
+	  update_hash_entry(provides, s, strlen(ops.name), 1, ops.flags != 0, pkg);
+	  free_property(&ops);
+	}
     }
   }
 }
@@ -923,16 +1003,28 @@ update_obsoletes(const URPM__Package pkg, HV *obsoletes) {
     char *ps, *s;
 
     if ((s = pkg->obsoletes) != NULL && *s != 0) {
-      char *es;
+      struct property ops;
 
       ps = strchr(s, '@');
       while(ps != NULL) {
-	*ps = 0; es = strchr(s, '['); if (!es) es = strchr(s, ' '); *ps = '@';
-	update_hash_entry(obsoletes, s, es != NULL ? es-s : ps-s, 1, 0, pkg);
+	*ps = 0;
+	if (parse_property(s, &ops)) {
+	  /* Failed to parse, use the whole string */
+	  update_hash_entry(obsoletes, s, ps-s, 1, 0, pkg);
+	} else {
+	  update_hash_entry(obsoletes, s, strlen(ops.name), 1, 0, pkg);
+	  free_property(&ops);
+	}
+        *ps = '@';
 	s = ps + 1; ps = strchr(s, '@');
       }
-      es = strchr(s, '['); if (!es) es = strchr(s, ' ');
-      update_hash_entry(obsoletes, s, es != NULL ? es-s : 0, 1, 0, pkg);
+      if (parse_property(s, &ops)) {
+        /* Failed to parse, use the whole string */
+        update_hash_entry(obsoletes, s, strlen(s), 1, 0, pkg);
+      } else {
+        update_hash_entry(obsoletes, s, ops.flags ? strlen(ops.name) : 0, 1, 0, pkg);
+        free_property(&ops);
+      }
     }
   }
 }
@@ -1505,7 +1597,6 @@ static int get_e_v_r(URPM__Package pkg, int *epoch, char **version, char **relea
     return 0;
 }
 
-
 MODULE = URPM            PACKAGE = URPM::Package       PREFIX = Pkg_
 
 void
@@ -1989,8 +2080,7 @@ Pkg_obsoletes_overlap(pkg, s)
      provides_overlap = 1
   PREINIT:
   struct cb_overlap_s os;
-  char *eon = NULL;
-  char eonc = '\0';
+  struct property ps;
   rpmTag tag_name;
   rpmTag tag_flags, tag_version;
   CODE:
@@ -2006,33 +2096,19 @@ Pkg_obsoletes_overlap(pkg, s)
        tag_version = RPMTAG_OBSOLETEVERSION;
        break;
   }
-  os.name = s;
-  os.flags = 0;
-  while (*s && *s != ' ' && *s != '[' && *s != '<' && *s != '>' && *s != '=') ++s;
-  if (*s) {
-    eon = s;
-    while (*s) {
-      if (*s == ' ' || *s == '[' || *s == '*' || *s == ']');
-      else if (*s == '<') os.flags |= RPMSENSE_LESS;
-      else if (*s == '>') os.flags |= RPMSENSE_GREATER;
-      else if (*s == '=') os.flags |= RPMSENSE_EQUAL;
-      else break;
-      ++s;
-    }
-    os.evr = s;
-  } else
-    os.evr = "";
-  os.direction = ix == 0 ? -1 : 1;
-  /* mark end of name */
-  if (eon) {
-    eonc = *eon;
-    *eon = 0;
+  if (parse_property(s, &ps)) {
+    fprintf(stderr, "provides_overlap: failed to parse property %s\n", s);
+    RETVAL = -1;
+  } else {
+    os.name = ps.name;
+    os.flags = ps.flags;
+    os.evr = ps.evr;
+    os.direction = ix == 0 ? -1 : 1;
+    /* return_list_str returns a negative value is the callback has returned non-zero */
+    RETVAL = return_list_str(ix == 0 ? pkg->obsoletes : pkg->provides, pkg->h, tag_name, tag_flags, tag_version,
+			     callback_list_str_overlap, &os) < 0;
+    free_property(&ps);
   }
-  /* return_list_str returns a negative value is the callback has returned non-zero */
-  RETVAL = return_list_str(ix == 0 ? pkg->obsoletes : pkg->provides, pkg->h, tag_name, tag_flags, tag_version,
-			   callback_list_str_overlap, &os) < 0;
-  /* restore end of name */
-  if (eon) *eon = eonc;
   OUTPUT:
   RETVAL
 
@@ -2177,7 +2253,7 @@ Pkg_build_info(pkg, fileno, provides_files=NULL, recommends=0)
   int recommends
   CODE:
   if (pkg->info) {
-    char buff[65536*3];
+    char buff[BUF_SIZE];
     UV size;
 
     /* info line should be the last to be written */
@@ -2937,7 +3013,7 @@ Urpm_parse_synthesis__XS(urpm, filename, ...)
     HV *obsoletes = fobsoletes && SvROK(*fobsoletes) && SvTYPE(SvRV(*fobsoletes)) == SVt_PVHV ? (HV*)SvRV(*fobsoletes) : NULL;
 
     if (depslist != NULL) {
-      char buff[65536*2];
+      char buff[BUF_SIZE];
       char *p, *eol;
       int buff_len;
       struct s_Package pkg;

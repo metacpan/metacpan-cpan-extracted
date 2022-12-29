@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Tensor;
 # ABSTRACT: A multi-dimensional array of elements of a single data type
-$AI::TensorFlow::Libtensorflow::Tensor::VERSION = '0.0.3';
+$AI::TensorFlow::Libtensorflow::Tensor::VERSION = '0.0.4';
 use strict;
 use warnings;
 use namespace::autoclean;
@@ -194,6 +194,41 @@ sub _from_array {
 				$array->[$_]->p)
 		} 0.. $array->count - 1
 	]
+}
+
+#### Data::Printer ####
+sub _data_printer {
+	my ($self, $ddp) = @_;
+
+	my @data = (
+		[ Type => $ddp->maybe_colorize( $self->Type, 'class' ), ],
+		[ Dims =>  sprintf "%s %s %s",
+				$ddp->maybe_colorize('[', 'brackets'),
+				join(" ",
+					map $ddp->maybe_colorize( $self->Dim($_), 'number' ),
+						0..$self->NumDims-1),
+				$ddp->maybe_colorize(']', 'brackets'),
+		],
+		[ NumDims => $ddp->maybe_colorize( $self->NumDims, 'number' ), ],
+		[ ElementCount => $ddp->maybe_colorize( $self->ElementCount, 'number' ), ],
+	);
+
+	my $output;
+
+	$output .= $ddp->maybe_colorize(ref $self, 'class' );
+	$output .= ' ' . $ddp->maybe_colorize('{', 'brackets');
+	$ddp->indent;
+	for my $item (@data) {
+		$output .= $ddp->newline;
+		$output .= join " ",
+			$ddp->maybe_colorize(sprintf("%-15s", $item->[0]), 'hash'),
+			$item->[1];
+	}
+	$ddp->outdent;
+	$output .= $ddp->newline;
+	$output .= $ddp->maybe_colorize('}', 'brackets');
+
+	return $output;
 }
 
 1;

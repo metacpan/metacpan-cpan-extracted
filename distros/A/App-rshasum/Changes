@@ -1,5 +1,9 @@
 Revision history for App-rshasum
 
+0.10.0      2022-12-23
+    - add the demo to the docs
+    - cleanups
+
 0.8.0       2020-08-16
     - Add [ReadmeMarkdownFromPod]
     - Add "SEE ALSO" section.

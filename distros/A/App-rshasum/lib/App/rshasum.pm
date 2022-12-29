@@ -1,5 +1,5 @@
 package App::rshasum;
-$App::rshasum::VERSION = '0.8.0';
+$App::rshasum::VERSION = '0.10.0';
 use 5.016;
 use strict;
 use warnings;
@@ -9,6 +9,13 @@ use Digest             ();
 
 use Getopt::Long qw/ GetOptions /;
 use List::Util 1.33 qw/ any /;
+
+sub _line
+{
+    my ( $d, $path ) = @_;
+
+    return $d->hexdigest . '  ' . $path . "\n";
+}
 
 sub _worker
 {
@@ -46,12 +53,12 @@ FILES:
             my $d = Digest->new($digest);
             $d->addfile($fh);
             close $fh;
-            my $s = $d->hexdigest . '  ' . $path . "\n";
+            my $s = _line( $d, $path, );
             $output_cb->( { str => $s } );
             $t->add($s);
         }
     }
-    my $s = $t->hexdigest . '  ' . "-" . "\n";
+    my $s = _line( $t, '-', );
     $output_cb->( { str => $s } );
 
     return;
@@ -100,7 +107,7 @@ App::rshasum - recursive shasum.
 
 =head1 VERSION
 
-version 0.8.0
+version 0.10.0
 
 =head1 SYNOPSIS
 
@@ -140,6 +147,27 @@ current working directory).
 =head2 run
 
 Runs the app.
+
+=head1 DEMO
+
+    ~/progs/rshasum/App-rshasum/ rshasum --digest=MD5 --start .
+    0556790e903a2fc303667096f90c6315  .tidyallrc
+    931a4f3fc883b18717e6ef03dee71d74  Changes
+    87181bcf0b5931d00583c4fa551a44d7  MANIFEST.SKIP
+    033802795280cbc3651ee7fca1ee1609  bin/rshasum
+    b1bf159fafba49e433c9daa6527889cf  dist.ini
+    7ec9c5217c0c0883c8d35718840e5ee1  inc/Test/Run/Builder.pm
+    ef6115acd4410c0a31f7cbf170b368d3  lib/App/rshasum.pm
+    ab9cbcab840eda9a13d6b0c9234cb9b0  t/argv.t
+    6f8db599de986fab7a21625b7916589c  t/data/1/0.txt
+    2dae34ccf201ecf9a998b6cbac7d0170  t/data/1/2.txt
+    d41d8cd98f00b204e9800998ecf8427e  t/data/1/foo/empty
+    d41d8cd98f00b204e9800998ecf8427e  t/data/1/zempty
+    0b79ca3f5ce0d456e864f0734edb9f93  t/run.t
+    5463d4de034510c60218c60e48096797  weaver.ini
+    b1e9362662fc9aea954284e694213352  -
+
+( B<WARNING:> do not use MD5 in production. )
 
 =head1 SEE ALSO
 
@@ -236,7 +264,7 @@ Shlomi Fish <shlomif@cpan.org>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/app-rshasum/issues>
+L<https://github.com/shlomif/rshasum/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

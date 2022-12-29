@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Infix 0.30;
+package XS::Parse::Infix 0.31;
 
 use v5.14;
 use warnings;
@@ -28,10 +28,9 @@ and subject to change. Later versions may break ABI compatibility, requiring
 changes or at least a rebuild of any module that depends on it.
 
 In addition, the places this functionality can be used are relatively small.
-No current release of perl actually supports custom infix operators, though I
-have a branch where I am currently experimenting with such support:
-
-L<https://github.com/leonerd/perl5/tree/infix-plugin>
+No current release of perl actually supports custom infix operators, though it
+has now been merged to C<blead>, the main development branch, and will be
+present in development release C<v5.37.7> onwards.
 
 In addition, the various C<XPK_INFIX_*> token types of L<XS::Parse::Keyword>
 support querying on this module, so some syntax provided by other modules may
@@ -49,8 +48,8 @@ This constant is true if built on a perl that supports the C<PL_infix_plugin>
 extension mechanism, meaning that custom infix operators registered with this
 module will actually be recognised by the perl parser.
 
-No actual production or development releases of perl yet support this feature,
-but see above for details of a branch which does.
+No actual production releases of perl yet support this feature, but see above
+for details of development versions which do.
 
 =cut
 
@@ -136,11 +135,11 @@ used at various stages of parsing.
       const char *permit_hintkey;
       bool (*permit)(pTHX_ void *hookdata);
 
-      OP *(*new_op)(pTHX_ U32 flags, OP *lhs, OP *rhs, ANY *parsedata, void *hookdata);
+      OP *(*new_op)(pTHX_ U32 flags, OP *lhs, OP *rhs, SV **parsedata, void *hookdata);
       OP *(*ppaddr)(pTHX);
 
       /* optional */
-      void (*parse)(pTHX_ U32 flags, ANY *parsedata, void *hookdata);
+      void (*parse)(pTHX_ U32 flags, SV **parsedata, void *hookdata);
    };
 
 =head2 Flags
@@ -230,9 +229,9 @@ before it attempts to consume the right-hand side term. This hook function can
 attempt further parsing, in order to implement more complex syntax such as
 hyper-operators.
 
-When invoked, it is passed a pointer to an C<ANY>-typed storage variable. It
-is free to use whichever field of this variable it desires to store a result,
-which will then later be made available to the C<new_op> function.
+When invoked, it is passed a pointer to an C<SV *>-typed storage variable. It
+is free to use this variable it desires to store a result, which will then
+later be made available to the C<new_op> function.
 
 =head2 The Op Generation Stage
 
@@ -242,12 +241,12 @@ C<ppaddr> fields explain how to create a new optree fragment.
 If C<new_op> is defined then it will be used, and is expected to return an
 optree fragment that consumes the LHS and RHS arguments to implement the
 semantics of the operator. If the optional C<parse> stage had been present
-earlier, the C<ANY> pointer passed here will point to the same storage that
+earlier, the C<SV **> pointer passed here will point to the same storage that
 C<parse> had previously had access to, so it can retrieve the results.
 
 If C<new_op> is not present, then the C<ppaddr> will be used instead to
 construct a new BINOP of the C<OP_CUSTOM> type. If an earlier C<parse> stage
-had stored additional results into the C<ANY> variable these will be lost
+had stored additional results into the C<SV *> variable these will be lost
 here.
 
 =head2 The Wrapper Function
@@ -349,7 +348,7 @@ The first registration will create the wrapper function; the subsequent one
 will skip it because it would otherwise be identical.
 
 Note that when generating an optree for a wrapper function call, the C<new_op>
-hook function will be invoked with a C<NULL> pointer for the C<ANY>-typed
+hook function will be invoked with a C<NULL> pointer for the C<SV *>-typed
 parse data storage, as there won't be an opporunity for the C<parse> hook to
 run in this case.
 

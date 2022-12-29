@@ -1,11 +1,10 @@
 #!/usr/bin/env perl
 
-use Test::Most tests => 1;
+use Test2::V0 ':DEFAULT', '!float';
 
 use lib 't/lib';
 use TF_TestQuiet;
 use TF_Utils;
-use PDL::Primitive qw(random);
 use PDL::Core;
 use AI::TensorFlow::Libtensorflow;
 use AI::TensorFlow::Libtensorflow::DataType qw(FLOAT);

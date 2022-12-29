@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use Test::Most tests => 2;
+use Test::Most;
 
 use lib 't/lib';
 use Renard::Incunabula::Devel::TestHelper;
@@ -12,7 +12,10 @@ use Intertangle::API::Gtk3::Helper ();
 my $temp = Path::Tiny->tempdir;
 # Add to XDG_DATA_DIRS early so that it is available for system data dir lookup.
 $ENV{XDG_DATA_DIRS} .= join(":", "/usr/local/share", "/usr/share", $temp);
-Gtk3::init;
+
+plan Gtk3::init_check
+	? ( tests    => 2 )
+	: ( skip_all => 'Could not init GTK' );
 
 # we can now import
 Intertangle::API::Gtk3::Helper->import;

@@ -1,5 +1,5 @@
 package Alien::OpenCV;
-
+$Alien::OpenCV::VERSION = '0.002';
 use strict;
 use warnings;
 use base qw( Alien::Base );

@@ -61,6 +61,7 @@ $main->mainloop;
 # main event-loop, note that this seems to be nondeterministic depending on
 # errors occurring):
 END {
+    print join("\n", @list, '');
     if (UI::Various::using() eq 'Curses'  and  ($? != 0  or  $@))
     {
 	print STDERR "\r\n waiting 10 seconds before screen is cleared\r\n";

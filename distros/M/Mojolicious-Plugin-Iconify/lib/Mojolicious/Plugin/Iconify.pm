@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::DOM::HTML;
 use Mojo::ByteStream;
 
-our $VERSION = '1.10';
+our $VERSION = '1.20';
 
 sub register {
 
@@ -76,8 +76,9 @@ sub _iconify_js {
 
     my ( $self, $url ) = @_;
 
-    my $iconify_version = '1.0.7';
-    my $iconify_js_url  = $url || "https://code.iconify.design/1/$iconify_version/iconify.min.js";
+    my $iconify_version = '3.0.1';
+    my $iconify_release = substr $iconify_version, 0, 1;
+    my $iconify_js_url  = $url || "https://code.iconify.design/$iconify_release/$iconify_version/iconify.min.js";
 
     return _tag( 'script', 'src' => $iconify_js_url );
 

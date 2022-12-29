@@ -16,7 +16,7 @@ eval 'package DBIx::Class::InflateColumn::Serializer; our $VERSION=-1;';
 # was created with the correct DBIC column_info.  The test is run for each
 # of the ResultDDL versions listed in @VERSIONS.
 
-my $max_ver= int($DBIx::Class::ResultDDL::VERSION // 2); # for development, since version isn't defined
+my $max_ver= int($DBIx::Class::ResultDDL::VERSION || 2); # for development, since version isn't defined
 
 my $test_n= 0;
 sub test_col_defs {

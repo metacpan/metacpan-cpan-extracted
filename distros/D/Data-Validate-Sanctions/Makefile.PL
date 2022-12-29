@@ -51,6 +51,7 @@ my %WriteMakefileArgs = (
     "Text::Trim" => 0,
     "XML::Fast" => 0,
     "YAML::XS" => 0,
+    "constant" => 0,
     "parent" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -79,7 +80,7 @@ my %WriteMakefileArgs = (
     "YAML" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.15",
+  "VERSION" => "0.16",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -130,6 +131,7 @@ my %FallbackPrereqs = (
   "XML::Fast" => 0,
   "YAML" => 0,
   "YAML::XS" => 0,
+  "constant" => 0,
   "parent" => 0,
   "strict" => 0,
   "utf8" => 0,

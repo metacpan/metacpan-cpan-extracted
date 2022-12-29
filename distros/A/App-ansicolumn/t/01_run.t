@@ -6,6 +6,9 @@ use lib './t';
 use ac;
 use Data::Section::Simple qw(get_data_section);
 
+is(ac->new()->exec(''), '', 'empty');
+is(ac->new(qw(-t))->exec(''), '', 'empty: -t');
+
 my $stdin = join '', map "$_\n", 1.. 100;
 
 for (

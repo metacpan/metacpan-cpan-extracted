@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.34';
+our $VERSION = '0.37';
 
 use UI::Various::core;
 use UI::Various::Optionmenu;
@@ -91,6 +91,7 @@ sub _prepare($$$)
 	error('_1_element_must_be_accompanied_by_parent', __PACKAGE__);
 	return 1;
     }
+    my @attributes = ($self->_attributes());
     $self->_tk(	$_->_tk
 		->Optionmenu(-options => $self->{options},
 			     # Note that -variable and -textvariable are
@@ -100,7 +101,8 @@ sub _prepare($$$)
 				 $self->{_selected} = $_[0];
 				 local $_ = $self->on_select;
 				 defined $_  and  &$_($self->{_selected});
-			     })
+			     },
+			     @attributes)
 		->grid(-row => $row, -column => $column));
     return 0;
 }

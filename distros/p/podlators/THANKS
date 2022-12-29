@@ -235,3 +235,5 @@ failed to convert the internal spaces to non-breaking.
 Julien ÉLIE, for catching a long-standing bug where bold and italics
 continued farther than they should in Pod::Man output if they were
 combined with C<> and fixed-width fonts.
+
+G. Branden Robinson, for his assistance in understanding *roff syntax.

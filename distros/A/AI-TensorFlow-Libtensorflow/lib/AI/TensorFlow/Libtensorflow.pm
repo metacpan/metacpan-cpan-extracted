@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow;
 # ABSTRACT: Bindings for Libtensorflow deep learning library
-$AI::TensorFlow::Libtensorflow::VERSION = '0.0.3';
+$AI::TensorFlow::Libtensorflow::VERSION = '0.0.4';
 use strict;
 use warnings;
 
@@ -18,6 +18,7 @@ use AI::TensorFlow::Libtensorflow::Output;
 use AI::TensorFlow::Libtensorflow::Input;
 
 use AI::TensorFlow::Libtensorflow::ApiDefMap;
+use AI::TensorFlow::Libtensorflow::TFLibrary;
 
 use AI::TensorFlow::Libtensorflow::ImportGraphDefOptions;
 use AI::TensorFlow::Libtensorflow::ImportGraphDefResults;
@@ -28,6 +29,9 @@ use AI::TensorFlow::Libtensorflow::OperationDescription;
 use AI::TensorFlow::Libtensorflow::SessionOptions;
 use AI::TensorFlow::Libtensorflow::Session;
 use AI::TensorFlow::Libtensorflow::DeviceList;
+
+use AI::TensorFlow::Libtensorflow::Eager::ContextOptions;
+use AI::TensorFlow::Libtensorflow::Eager::Context;
 
 use FFI::C;
 
@@ -42,8 +46,6 @@ sub new {
 }
 
 $ffi->attach( 'Version' => [], 'string' );#}}}
-
-$ffi->attach( 'GetAllOpList' => [], 'TF_Buffer' );
 
 1;
 
@@ -84,31 +86,6 @@ Version number for the C<libtensorflow> library.
 =back
 
 B<C API>: L<< C<TF_Version>|AI::TensorFlow::Libtensorflow::Manual::CAPI/TF_Version >>
-
-=head2 GetAllOpList
-
-=over 2
-
-C<<<
-GetAllOpList()
->>>
-
-=back
-
-  my $buf = Libtensorflow->GetAllOpList();
-  cmp_ok $buf->length, '>', 0, 'Got OpList buffer';
-
-B<Returns>
-
-=over 4
-
-=item L<TFBuffer|AI::TensorFlow::Libtensorflow::Lib::Types/TFBuffer>
-
-Contains a serialized C<OpList> proto for ops registered in this address space.
-
-=back
-
-B<C API>: L<< C<TF_GetAllOpList>|AI::TensorFlow::Libtensorflow::Manual::CAPI/TF_GetAllOpList >>
 
 =head1 AUTHOR
 

@@ -1,0 +1,318 @@
+#ifndef P5_WASM_WASMER_INSTANCE
+#define P5_WASM_WASMER_INSTANCE 1
+
+#include "p5_wasm_wasmer.h"
+
+typedef struct {
+    wasm_instance_t* instance;
+    SV* module_sv;
+
+    pid_t pid;
+
+    SV* wasi_sv;
+    bool wasi_started;
+
+    SV** import_svs;
+    unsigned import_svs_count;
+
+    wasm_extern_vec_t exports;
+} instance_holder_t;
+
+#include "wasmer_module.xsc"
+#include "wasmer_global.xsc"
+#include "wasmer_memory.xsc"
+#include "wasmer_function.xsc"
+#include "wasmer_callback.xsc"
+
+/* ---------------------------------------------------------------------- */
+
+static wasm_extern_t* _get_instance_export(pTHX_ instance_holder_t* instance_holder_p, const char* name, STRLEN name_len, wasm_exporttype_t** export_type_pp) {
+    module_holder_t* module_holder_p = svrv_to_ptr(aTHX_ instance_holder_p->module_sv);
+
+    wasm_exporttype_vec_t* export_types = &module_holder_p->export_types;
+
+    wasm_extern_vec_t* exports = &instance_holder_p->exports;
+
+    for (unsigned i = 0; i<exports->size; i++) {
+        const wasm_name_t* wasm_name = wasm_exporttype_name(export_types->data[i]);
+
+        if (name_len != wasm_name->size) continue;
+        if (!memEQ(wasm_name->data, name, name_len)) continue;
+
+        /* Yay! We found our function. */
+
+        *export_type_pp = export_types->data[i];
+        return exports->data[i];
+    }
+
+    return NULL;
+}
+
+static wasm_func_t* _get_instance_function(pTHX_ instance_holder_t* instance_holder_p, const char* funcname, STRLEN funcname_len, wasm_exporttype_t** export_type_pp) {
+
+    wasm_extern_t* export = _get_instance_export(aTHX_ instance_holder_p, funcname, funcname_len, export_type_pp);
+
+    //fprintf(stderr, "export %.*s: %p\n", (int) funcname_len, funcname, export);
+
+    if (export) {
+        if (wasm_extern_kind(export) != WASM_EXTERN_FUNC) {
+            croak(
+                "“%.*s” is a %s, not a function!",
+                (int)funcname_len, funcname,
+                get_externkind_description( wasm_extern_kind(export) )
+            );
+        }
+
+        /* Yay! We found our function. */
+
+        return wasm_extern_as_func(export);
+    }
+
+    return NULL;
+}
+
+static inline HV* get_hv_from_sv_or_croak (pTHX_ SV* sv, const char* description) {
+    if (!SvROK(sv) || SVt_PVHV != SvTYPE(SvRV(sv))) {
+        croak("%s must be a HASH reference, not `%" SVf "`", description, sv);
+    }
+
+    return (HV *) SvRV(sv);
+}
+
+static inline SV* _get_import_sv( pTHX_ HV* imports_hv, const wasm_name_t* modname, const wasm_name_t* funcname, bool is_needed ) {
+    SV** ns_hr_p = hv_fetch(imports_hv, modname->data, modname->size, 0);
+    if (!ns_hr_p) {
+        if (is_needed) {
+            croak("Required import namespace “%.*s” not given!", (int) modname->size, modname->data);
+        }
+        else {
+            return NULL;
+        }
+    }
+
+    if (!SvROK(*ns_hr_p) || SVt_PVHV != SvTYPE(SvRV(*ns_hr_p))) {
+
+        // Croak here regardless of is_needed:
+        croak("Import namespace “%.*s” must be a HASH reference, not `%" SVf "`!", (int) modname->size, modname->data, *ns_hr_p);
+    }
+
+    HV* ns_hv = (HV*) SvRV(*ns_hr_p);
+    SV** import_val_p = hv_fetch(ns_hv, funcname->data, funcname->size, 0);
+
+    if (import_val_p == NULL) {
+        if (is_needed) {
+            croak("Required import “%.*s.%.*s” not given!", (int) modname->size, modname->data, (int) funcname->size, funcname->data);
+        }
+        else {
+            return NULL;
+        }
+    }
+
+    return *import_val_p;
+}
+
+SV* instance_to_sv (pTHX_ wasm_instance_t* instance, SV* module_sv, const char* class, SV** import_svs, unsigned import_svs_count) {
+    instance_holder_t* instance_holder_p;
+
+    Newx(instance_holder_p, 1, instance_holder_t);
+
+    *instance_holder_p = (instance_holder_t) {
+        .instance = instance,
+        .pid = getpid(),
+        .module_sv = module_sv,
+        .wasi_started = false,
+        .import_svs_count = import_svs_count,
+    };
+
+    SvREFCNT_inc(module_sv);
+
+    if (import_svs_count > 0) {
+        Newx(instance_holder_p->import_svs, import_svs_count, SV*);
+        Copy(import_svs, instance_holder_p->import_svs, import_svs_count, SV*);
+
+        for (unsigned a=0; a<import_svs_count; a++) {
+            SvREFCNT_inc(import_svs[a]);
+        }
+    }
+
+    wasm_instance_exports(instance, &instance_holder_p->exports);
+
+    if (NULL == class) class = P5_WASM_WASMER_INSTANCE_CLASS;
+
+    return ptr_to_svrv(aTHX_ instance_holder_p, gv_stashpv(class, FALSE));
+}
+
+const wasm_extern_t* _get_host_import(const wasmer_named_extern_vec_t* host_imports, const wasm_name_t* modname, const wasm_name_t* name) {
+    usize i = 0;
+
+    for (; i < host_imports->size; i++) {
+        wasmer_named_extern_t* cur = host_imports->data[i];
+
+        const wasm_name_t* cur_modname = wasmer_named_extern_module(cur);
+        if (cur_modname->size != modname->size) continue;
+        if (!memEQ(cur_modname->data, modname->data, modname->size)) continue;
+
+        const wasm_name_t* cur_name = wasmer_named_extern_name(cur);
+        if (cur_name->size != name->size) continue;
+        if (!memEQ(cur_name->data, name->data, name->size)) continue;
+
+        return wasmer_named_extern_unwrap(cur);
+    }
+
+    return NULL;
+}
+
+SV* create_instance_sv (pTHX_ SV* class_sv, SV* module_sv, SV* imports_sv, wasmer_named_extern_vec_t* host_imports ) {
+    const char* class = class_sv ? SvPVbyte_nolen(class_sv) : P5_WASM_WASMER_INSTANCE_CLASS;
+
+    HV* imports_hv = NULL;
+
+    if (imports_sv) {
+        if (SvOK(imports_sv)) {
+            imports_hv = get_hv_from_sv_or_croak( aTHX_ imports_sv, "Imports" );
+        }
+    }
+
+    module_holder_t* module_holder_p = svrv_to_ptr(aTHX_ module_sv);
+
+    wasm_importtype_vec_t* import_types_p = &module_holder_p->import_types;
+
+    SV* store_sv = module_holder_p->store_sv;
+    store_holder_t* store_holder_p = svrv_to_ptr(aTHX_ store_sv);
+
+    wasm_extern_t* imports[import_types_p->size];
+
+    SV* import_svs[import_types_p->size];
+
+    unsigned sv_imports_count = 0;
+
+    for (size_t i = 0; i < import_types_p->size; ++i) {
+        wasm_importtype_t* import_type = import_types_p->data[i];
+
+        const wasm_name_t* modname = wasm_importtype_module(import_type);
+        const wasm_name_t* name = wasm_importtype_name(import_type);
+
+        if (_DEBUG) {
+            fprintf(stderr, "Import %zu: %.*s/%.*s\n", i, (int)modname->size, modname->data, (int)name->size, name->data);
+        }
+
+        const wasm_externtype_t* externtype = wasm_importtype_type(import_types_p->data[i]);
+
+        wasm_extern_t* cur_extern_p = NULL;
+
+        SV* import_sv = _get_import_sv(aTHX_ imports_hv, modname, name, false);
+        if (import_sv) {
+            import_svs[sv_imports_count++] = import_sv;
+
+            if (sv_derived_from(import_sv, EXTERN_CLASS)) {
+                extern_holder_t* holder_p = svrv_to_ptr(aTHX_ import_sv);
+
+                cur_extern_p = holder_p->extern_p;
+                assert(cur_extern_p);
+            }
+            else {
+                switch (wasm_externtype_kind(externtype)) {
+                    case WASM_EXTERN_FUNC: {
+                        if (SVt_PVCV == SvTYPE(SvRV(import_sv))) {
+                            const wasm_functype_t* functype = wasm_externtype_as_functype_const(externtype);
+
+                            wasm_func_t* func = function_from_coderef( aTHX_
+                                store_holder_p->store,
+                                (CV*) import_sv,
+                                functype,
+                                modname,
+                                name
+                            );
+
+                            cur_extern_p = wasm_func_as_extern(func);
+                        }
+                        else {
+                            croak(
+                                "Import %.*s.%.*s must be a %s instance or CODE reference, not %" SVf,
+                                (int) modname->size, modname->data,
+                                (int) name->size, name->data,
+                                EXTERN_CLASS,
+                                import_sv
+                            );
+                        }
+                    } break;
+
+                    // Would it be worthwhile to allow creation of globals
+                    // via plain numbers? Memories from strings?
+
+                    default:
+                        croak(
+                            "Import %.*s.%.*s must be a %s instance, not %" SVf,
+                            (int) modname->size, modname->data,
+                            (int) name->size, name->data,
+                            EXTERN_CLASS,
+                            import_sv
+                        );
+                }
+            }
+        }
+        else if (host_imports) {
+            cur_extern_p = (wasm_extern_t*) _get_host_import(host_imports, modname, name);
+        }
+
+        if (!cur_extern_p) {
+
+            // This will croak because of the missing import:
+            _get_import_sv(aTHX_ imports_hv, modname, name, true);
+
+            assert(0);
+        }
+
+        imports[i] = cur_extern_p;
+    }
+
+    own wasm_extern_vec_t imports_vec = WASM_ARRAY_VEC(imports);
+
+    // Wasmer’s docs name the trap argument “traps”, which suggests that
+    // wasm_instance_new() can create multiple traps, but the Rust code
+    // actually only creates 0 or 1.
+    //
+    wasm_trap_t* trap = NULL;
+
+    own wasm_instance_t* instance = wasm_instance_new(
+        store_holder_p->store,
+        module_holder_p->module,
+        &imports_vec,
+        &trap
+    );
+
+    if (!instance) {
+        _croak_if_trap(aTHX_ trap);
+        _croak_wasmer_error("Failed to instantiate WASM module");
+    }
+
+    return instance_to_sv(aTHX_ instance, module_sv, class, import_svs, sv_imports_count);
+}
+
+void destroy_instance_sv (pTHX_ SV* self_sv) {
+    instance_holder_t* instance_holder_p = svrv_to_ptr(aTHX_ self_sv);
+
+    warn_destruct_if_needed(self_sv, instance_holder_p->pid);
+
+    unsigned args_count = instance_holder_p->import_svs_count;
+
+    wasm_instance_delete(instance_holder_p->instance);
+
+    if (args_count) {
+        for (unsigned a=0; a<args_count; a++) {
+            SvREFCNT_dec( instance_holder_p->import_svs[a] );
+        }
+
+        Safefree(instance_holder_p->import_svs);
+    }
+
+    SvREFCNT_dec(instance_holder_p->module_sv);
+
+    if (instance_holder_p->wasi_sv) {
+        SvREFCNT_dec(instance_holder_p->wasi_sv);
+    }
+
+    Safefree(instance_holder_p);
+}
+
+#endif

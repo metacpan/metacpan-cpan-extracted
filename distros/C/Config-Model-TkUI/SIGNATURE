@@ -1,0 +1,83 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 b9a797cf05b5f5c508107f3d449030973559dc3d8ddf958fab8467db5d2f7140 Build.PL
+SHA256 f78744657e81c966e86e9802ebecee11263ff3cb790dc6935a5aa3ca249666a7 Changes
+SHA256 f0de0cd7339b272e8462f0fb27c36834014ea4ff1bdc31e3c264a90a240bcf87 LICENSE
+SHA256 66c007daad4b307ef883518ab550bb1e3202d4e8a699c3fc0a5cb62233efdee4 MANIFEST
+SHA256 dec5c0cafdf3703506529727c65b52191ae26092096a61c1d9fd91bc451c5e37 MANIFEST.SKIP
+SHA256 662eadff030a3d00a5e4190fe61c42810170a941c41526032ed3ccd3b0ab1c51 META.json
+SHA256 ddd79f6816f16a722d261802f39f287219758fba3d756a474dddca667a5f2eec META.yml
+SHA256 ea48a50c8a63aa26fb67f7da386cdc6756d19947778fff7d08c0685edd0fe501 README.md
+SHA256 0e67c250f6b2a2cc3c9b801f6828a3cb5e46ffa7fc02107ef3234c433561eaff examples/model.pl
+SHA256 031f4b6b266376182686122f0951732d375459a988f97080893484376d4c1331 lib/Config/Model/Tk/AnyViewer.pm
+SHA256 45bd7ebd6d5b65f933a7f85d4d7d98db3d6b5246bb9a939b1c39c64d15047280 lib/Config/Model/Tk/CheckListEditor.pm
+SHA256 8e98e0dbab9c546b9f0fe14e206f441d01a693d0f4b44b56dbded9954872daf3 lib/Config/Model/Tk/CheckListViewer.pm
+SHA256 e37c39f9704d36c0116fe4c99f1f770adcb9da708b97eddaa5d821f43217bd45 lib/Config/Model/Tk/CmeDialog.pm
+SHA256 033e6569fd4d6f077aa5cef7bf23740ad72e3158d92c700537d5fd12500d088a lib/Config/Model/Tk/Filter.pm
+SHA256 aaac6d7e4a31a777fd45eb1e9dc1ca5bf7367940261913d8147018c22fa10c60 lib/Config/Model/Tk/HashEditor.pm
+SHA256 9498283f951bd6171d5887cb3dfc7653c27cdb4dbb6e2a364b56c4d6fb3d0495 lib/Config/Model/Tk/HashViewer.pm
+SHA256 2ca6072b178eeee942ccf5bae09a3806baab8497ea5bba15a40498016384d4e5 lib/Config/Model/Tk/LeafEditor.pm
+SHA256 d11045e7a493a57444fc8222d92f8dae442924d49edbebdb59a8a0081e383322 lib/Config/Model/Tk/LeafViewer.pm
+SHA256 7f4f1e9eec73b63f26ed2230cd1e93ed45adf47c5a93f7a009f96e257f987ac7 lib/Config/Model/Tk/ListEditor.pm
+SHA256 296ecfd4a5f9b484b7e1475bd762c9954724a7317994557617993fc13b6f82d5 lib/Config/Model/Tk/ListViewer.pm
+SHA256 d5661427ac0984042d1a42669065e0000132598a5f036e22b4be63a67b8fe679 lib/Config/Model/Tk/NodeEditor.pm
+SHA256 aa417fc17de44964c396a363fe9abf67ac6cea832f86fb487c785b6cec0bf80d lib/Config/Model/Tk/NodeViewer.pm
+SHA256 9ffab946236b8e0c285235a84716dbdc22fdbf3f95ac9b8d5b9424e152814c26 lib/Config/Model/Tk/NoteEditor.pm
+SHA256 8f0a4d2c92b8510c1bef491b85c7e04ede366e621670c8d68dda4aac97602b94 lib/Config/Model/Tk/Wizard.pm
+SHA256 d423d4a9c42380adfb193b3ccc1a52deeab681b7288024bff61bf0aa036165b7 lib/Config/Model/Tk/icons/add.png
+SHA256 f1f795e47109170d72432f9d451f2446d41b9d9d2e8a55720301af006d5d9646 lib/Config/Model/Tk/icons/dbgrun.png
+SHA256 027ebd59d324f07701294ee8f414a1bec759ee9b8cdf34ce88e01103d7b75834 lib/Config/Model/Tk/icons/dialog-warning.png
+SHA256 c31bc86ba8e9507fc40ce76cdb2eff22be56edbb16a8df0a97c805873a1b6d8f lib/Config/Model/Tk/icons/down.png
+SHA256 db80f27a877705dbcc6c52672e8c54ca980bc9fd8009337ee8770ab8c490fee2 lib/Config/Model/Tk/icons/eraser.png
+SHA256 4f6d2ae6fec6a89e8d61a2a58828a32ee5afe467a1d0b0da3c396c83eab21630 lib/Config/Model/Tk/icons/fontsizeup.png
+SHA256 b4e7340296561eb9e4476b638361f6bbd71f8e94f9ef32ede75270a745bc5ac1 lib/Config/Model/Tk/icons/gnome-gtk-execute.png
+SHA256 647e5d834a687b10ccb4385bb6f005329196877d4f8554ddc86ba0fb7cee636a lib/Config/Model/Tk/icons/gnome-next.png
+SHA256 274e1a1c301bf4ee8781ae2c750b6c9b6b670e3d0f4b2e4c8ded503213255c6c lib/Config/Model/Tk/icons/gnome-previous.png
+SHA256 d154a36a76a84c71ba630a15432dfc05d465732bd285da73aeecdad99468aa67 lib/Config/Model/Tk/icons/gnome-window-close.png
+SHA256 dca19e152b2b38b7e5179fc1303e26b71a096ab534a785d630d959c10f2ddfa5 lib/Config/Model/Tk/icons/next.png
+SHA256 3eff8d0ddf56ee6fea8c79da3b52333f7d3b85b3841bd043ab1150526ce07dbe lib/Config/Model/Tk/icons/remove.png
+SHA256 07d15ed551c5f5b2d7c350494af4938c555acf0abd56ad3eb0d749e47a94fd7a lib/Config/Model/Tk/icons/rotate_cw.png
+SHA256 34d06b19ba3c83527b457f72b7a8af39912723cd3ae50d6fc543e86d4f05ef28 lib/Config/Model/Tk/icons/stop.png
+SHA256 630853582d7ee75591dfa78339213756c103ceac70736b3133b0be655615776b lib/Config/Model/Tk/icons/tools_nicu_buculei_01.png
+SHA256 40885498c4962903df16b802d9a36a1a581adc786cc93125fe9b0c20a36459f4 lib/Config/Model/Tk/icons/up.png
+SHA256 a8be0e0a688f2bf94528f7dbd386336a8feab3ae684d1fe36aab614c48d01757 lib/Config/Model/Tk/icons/viewmag.png
+SHA256 24544318afab87942896c12ad74b458e257159afc3a61e4955942def7e3ac71f lib/Config/Model/Tk/icons/wizard.png
+SHA256 d5d9886ce203ad3e8a3b9504508ca0cdd38d0ab3a4074d0ee0865f626a8ab8b4 lib/Config/Model/TkUI.pm
+SHA256 3013facd11b4c0013e2a880e5218017de92a354f064c547d9b726fdbc177999d t/author-critic.t
+SHA256 bea7494d8a8f50372fec2770932c5aa74391a86c0a3d81ee36d8ce8d0d6072ba t/config-model-ui.t
+SHA256 95337da8a0b140613e9d6019a1705253f86554792660f94775e81c6c4927ff4b t/config-model-wizard.t
+SHA256 703cfbd07512283bddd37ee36a027fd3590e4a78afa760047d18b6891ef6b4d5 t/filter-test.yml
+SHA256 9a908835cabac958738b1b10dbf7e2a6c2a4b32d327f26eb64a1e95af120ea93 t/filter.t
+SHA256 a7944e22f4cf2ccd77c30e359d11cd12421fd03b3d673a943942ead513caca67 t/lib/Config/Model/models/Master.pl
+SHA256 d55382921c0ad7528e08b79a43a5c0b0d8a1752eafb5a01ceb69a87b6b31ebab t/pod.t
+SHA256 3d3f48c1b0b04f3bc7af34538f573c761156a3ef9f33899116e22a82d13031b8 weaver.ini
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEn3I5/LZk8Qsz6dwDwx9P2UmrK2wFAmOrDxIACgkQwx9P2Umr
+K2w8ow/+KjTdR80/+famPgawonLrZcha33a3/bsPDqNrvvuKUhUVlQ7jGUttU/dT
+YY8kkEchLVWMMUEyWT/j99sg8OV7Rk0R0wE112pkDRwMcKYD/UsswfGTl5Ha3Rv7
+NjWayNgFNya+3EoXwgEy38e/giVhCSyKhiyihhauTo90mjEM69xUSZV6f/de08B0
+WjOzDMlvZ2RmfGTd4f9vkYE9psxs/Jdktc6pRYuxdsDwxkArusmL3Eb2XdW5XkoR
+n7pcwIeJz9nk+6VFhcdYUtbbGfOwDSStmSw0dLufxdbDN/k/nrsrkRXoXMl08wrp
+/NcFG8if3S6+1E0CS32WpzQsGbSgLKSd4t7+afy+93SlJCjo8ACQ67eehIHqEbKI
+VYGSltd/V9sdmBTSa5FRfUC5YSyaG4+Ujjzh3M6jGRNKPzZYKJZhRK5q5p8LHrDO
+FdWU6DtLOmTRMACmLbGegjtaP6YqdldpVGpDdhEgLmTujyIu0o78XTIywFg5+I/2
+S+13sOxs4j2anXlYi4Plufgmbo7ip+WH1GmYwLkhZwOOUU/rUDxC3r+dUI09XaAg
+mAdLbidp7xCqXlq3HCQVp8ixDvjb1wobI4Qz/jfU/NYQtzLC/Tm3MHyMXY1PgPrf
+nkFeJ1WM0J5Luu5lXOeWxnY2Tac8ymS3oxDNVY3Nd40Ah7YPtHM=
+=cE8e
+-----END PGP SIGNATURE-----

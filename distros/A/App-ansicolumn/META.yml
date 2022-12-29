@@ -29,7 +29,7 @@ no_index:
 provides:
   App::ansicolumn:
     file: lib/App/ansicolumn.pm
-    version: '1.26'
+    version: '1.2801'
   App::ansicolumn::Border:
     file: lib/App/ansicolumn/Border.pm
   App::ansicolumn::default:
@@ -47,10 +47,10 @@ requires:
   Text::ANSI::Printf: '2.01'
   perl: v5.16.0
 resources:
-  bugtracker: https://github.com/kaz-utashiro/App-ansicolumn/issues
-  homepage: https://github.com/kaz-utashiro/App-ansicolumn
-  repository: https://github.com/kaz-utashiro/App-ansicolumn.git
-version: '1.26'
+  bugtracker: https://github.com/tecolicom/App-ansicolumn/issues
+  homepage: https://github.com/tecolicom/App-ansicolumn
+  repository: https://github.com/tecolicom/App-ansicolumn.git
+version: '1.2801'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

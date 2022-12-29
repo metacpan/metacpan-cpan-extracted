@@ -40,7 +40,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.34';
+our $VERSION = '0.37';
 
 use UI::Various::core;
 
@@ -73,6 +73,61 @@ The module also provides the following common (internal) methods for all
 UI::Various::Tk UI element classes:
 
 =cut
+
+#########################################################################
+
+=head2 B<_attributes> - return common attributes of UI element
+
+    my @attributes = $self->_attributes();
+
+=head3 description:
+
+This method determines returns all defined common attributes of a UI element
+in the representation needed by L<Tk> (as key / value pairs).  It returns an
+array, that could be empty, as all common attributes are optional.
+
+Note that certain L<Tk> widgets ignore some of the L<options|Tk::options>
+returned here.
+
+=head3 returns:
+
+array of all defined common attributes in L<Tk> representation
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+my @alignment = ([],
+		 ['-justify' => 'left',   '-anchor' => 'sw'],	# 1
+		 ['-justify' => 'center', '-anchor' => 's'],	# 2
+		 ['-justify' => 'right',  '-anchor' => 'se'],	# 3
+		 ['-justify' => 'left',	  '-anchor' => 'w'],	# 4
+		 ['-justify' => 'center'],			# 5
+		 ['-justify' => 'right',  '-anchor' => 'e'],	# 6
+		 ['-justify' => 'left',	  '-anchor' => 'nw'],	# 7
+		 ['-justify' => 'center', '-anchor' => 'n'],	# 8
+		 ['-justify' => 'right',  '-anchor' => 'ne']);	# 9
+sub _attributes($)
+{
+    my ($self) = @_;
+    my @attributes = ();
+    if (defined $self->{align})
+    {   push @attributes, @{$alignment[$self->{align}]};   }
+    if (defined $self->{height})
+    {   push @attributes, '-height', $self->{height};   }
+    if (defined $self->{width})
+    {
+	push @attributes, '-width',  $self->{width};
+	if (ref($self) =~ m/::(?:Button|Check|Radio|Text)/)
+	{
+	    # FIXME: The assignment should return a reasonable value, but
+	    # something is still calculated wrong:
+	    local $_ = $self->{width} * $self->top->{_char_avg_width};
+	    push @attributes, '-wraplength', int($_ / 2);
+	}
+    }
+    return @attributes;
+}
 
 #########################################################################
 

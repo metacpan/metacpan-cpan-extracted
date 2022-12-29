@@ -2,9 +2,10 @@
 use v5.24;    # Postfix defef.
 use strict;
 use warnings;
-use Test::More tests => 34;
+use Test::More tests => 35;
 use Term::ANSIColor       qw( colorstrip );
 use File::Spec::Functions qw( catfile catdir );
+use open                  qw( :std :utf8 );
 use FindBin               qw( $RealDir );
 use lib catdir( $RealDir, "cpan" );
 
@@ -492,6 +493,29 @@ my @cases = (
             '',
             'Use --all (or -a) to see all methods.',
         ],
+    },
+
+    # Class method.
+    {
+        name            => "Module - ojo x",
+        input           => [qw( ojo x )],
+        expected_output => [
+            "",
+            "Package: ojo",
+            "Path:    <PATH>",
+            "",
+            "ojo - Fun one-liners with Mojo",
+            "",
+            "x:",
+            "",
+            "  my \$dom = x('<div>Hello!</div>');",
+            "",
+            "  Turn HTML/XML input into Mojo::DOM object.",
+            "",
+"  \$ perl -Mojo -E 'say x(f(\"test.html\")->slurp)->at(\"title\")->text'",
+            "",
+            "  [UnicodeTest: I ♥ Mojolicious!]",
+        ]
     },
 
     # --query bad

@@ -1,12 +1,18 @@
 #!/usr/bin/env perl
 
-use Test::Most tests => 2;
+use Test::Most;
 
 use Renard::Incunabula::Common::Setup;
 
 use lib 't/lib';
 
-use Intertangle::API::Gtk3::Helper;
+use Gtk3;
+plan Gtk3::init_check
+	? ( tests    => 2 )
+	: ( skip_all => 'Could not init GTK' );
+
+use Intertangle::API::Gtk3::Helper ();
+Intertangle::API::Gtk3::Helper->import;
 use Intertangle::API::Gtk3::Helper::Gtk3::Adjustment;
 
 my $adjustment = Gtk3::Adjustment->new(5, 0, 10, 1, 2, 2);

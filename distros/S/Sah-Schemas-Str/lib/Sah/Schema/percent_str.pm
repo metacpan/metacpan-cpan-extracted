@@ -5,12 +5,12 @@ use strict;
 use Regexp::Pattern::Float;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-22'; # DATE
+our $DATE = '2022-09-23'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = [str => {
-    summary => 'A number in percent form',
+    summary => 'A number in percent form, e.g. "10.5%"',
     match => qr/\A$Regexp::Pattern::Float::RE{float_decimal}{pat}%\z/,
 
     description => <<'_',
@@ -32,7 +32,7 @@ _
 }];
 
 1;
-# ABSTRACT: A number in percent form
+# ABSTRACT: A number in percent form, e.g. "10.5%"
 
 __END__
 
@@ -42,11 +42,11 @@ __END__
 
 =head1 NAME
 
-Sah::Schema::percent_str - A number in percent form
+Sah::Schema::percent_str - A number in percent form, e.g. "10.5%"
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schema::percent_str (from Perl distribution Sah-Schemas-Str), released on 2022-09-22.
+This document describes version 0.013 of Sah::Schema::percent_str (from Perl distribution Sah-Schemas-Str), released on 2022-09-23.
 
 =head1 SYNOPSIS
 
@@ -80,11 +80,11 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "1%";
+ $data = "-1.23%";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = 1;
+ $data = "1 %";
  my $errmsg = $validator->($data); # => "Must match regex pattern qr(\\A(?^:[+-]?(?:[0-9]+(?:\\.[0-9]*)?|[0-9]*\\.[0-9]+))%\\z)"
 
 Often a schema has coercion rule or default value, so after validation the
@@ -95,12 +95,12 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "1%";
- my $res = $validator->($data); # => ["","1%"]
+ $data = "-1.23%";
+ my $res = $validator->($data); # => ["","-1.23%"]
  
  # a sample invalid data
- $data = 1;
- my $res = $validator->($data); # => ["Must match regex pattern qr(\\A(?^:[+-]?(?:[0-9]+(?:\\.[0-9]*)?|[0-9]*\\.[0-9]+))%\\z)",1]
+ $data = "1 %";
+ my $res = $validator->($data); # => ["Must match regex pattern qr(\\A(?^:[+-]?(?:[0-9]+(?:\\.[0-9]*)?|[0-9]*\\.[0-9]+))%\\z)","1 %"]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like

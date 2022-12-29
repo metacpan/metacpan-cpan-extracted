@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.305';
+our $VERSION = '2.306';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -277,7 +277,7 @@ sub run {
                 $ax->print_error_message( $@ );
                 # remove database from @databases
                 $sf->{i}{login_error} = 1;
-                $dbh->disconnect() if defined $dbh || $dbh->{Active};
+                $dbh->disconnect() if defined $dbh || $dbh->{Active}; ##
                 next DATABASE if @databases              > 1;
                 next PLUGIN   if @{$sf->{o}{G}{plugins}} > 1;
                 last PLUGIN;
@@ -471,10 +471,10 @@ sub run {
                         if ( $ok ) {
                             $sf->{redo_db}     = $sf->{d}{db};
                             $sf->{redo_schema} = $sf->{d}{schema};
-                            $sf->{redo_table}  = $table; # if $table == $hidden => redo 'create_drop_or_attach'
+                            $sf->{redo_table}  = $table; # redo 'create_drop_or_attach' if $table eq $hidden
                         }
                         else {
-                            # when leaving 'create_drop_or_attach'-menu:
+                            # when leaving the 'create_drop_or_attach'-menu:
                             delete $sf->{i}{ss} if exists $sf->{i}{ss};  # deletes any existing saved books
                             delete $sf->{i}{gc} if exists $sf->{i}{gc};  # datasource file: delete menu memory
                         }
@@ -591,7 +591,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.305
+Version 2.306
 
 =head1 DESCRIPTION
 

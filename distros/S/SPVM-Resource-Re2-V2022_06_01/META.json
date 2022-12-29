@@ -1,7 +1,7 @@
 {
    "abstract" : "Resource of RE2 2022-06-01.",
    "author" : [
-      "USER_NAME<USER_MAIL>"
+      "Yuki Kimoto<kimoto.yuki@gmail.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
@@ -27,19 +27,23 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.9614"
+            "SPVM" : "0.9670"
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "SPVM" : "0.9670"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "type" : "git"
+         "type" : "git",
+         "url" : "https://github.com/yuki-kimoto/SPVM-Resource-Re2-V2022_06_01.git",
+         "web" : "https://github.com/yuki-kimoto/SPVM-Resource-Re2-V2022_06_01"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

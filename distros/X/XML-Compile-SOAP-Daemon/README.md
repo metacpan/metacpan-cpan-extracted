@@ -3,8 +3,7 @@
   * My extended documentation: <http://perl.overmeer.net/CPAN/>
   * Development via GitHub: <https://github.com/markov2/perl5-XML-Compile-SOAP-Daemon>
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
-  * Indexed from CPAN: <http://search.cpan.org/~markov/XML-Compile-SOAP-Daemon/>
-    and <https://metacpan.org/release/XML-Compile-SOAP-Daemon>
+  * Indexed from CPAN: <https://metacpan.org/release/XML-Compile-SOAP-Daemon>
 
 The XML-Compile suite is a large set of modules for various XML related
 standards.  This optional component implements a SOAP server, which can

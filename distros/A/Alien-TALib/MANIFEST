@@ -1,3 +1,4 @@
+alienfile
 Build.PL
 Changes
 lib/Alien/TALib.pm
@@ -5,6 +6,5 @@ LICENSE
 MANIFEST			This list of files
 META.json
 META.yml
-README
+README.md
 t/00_use.t
-t/01_info.t

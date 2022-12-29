@@ -5,7 +5,7 @@ use IO::Handle;
 use Mojo::File qw(path);
 use Mojo::Netdata::Util qw(logf);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has collectors       => sub ($self) { $self->_build_collectors };
 has config           => sub ($self) { $self->_build_config };
@@ -20,7 +20,10 @@ has debug_flags      => sub ($self) { $ENV{NETDATA_DEBUG_FLAGS}      || '' };
 has update_every     => sub ($self) { $ENV{NETDATA_UPDATE_EVERY}     || 1 };
 
 sub start ($self) {
-  logf(info => 'Starting %s', __PACKAGE__);
+  logf(
+    info => 'Starting %s with debug_flags=%s host_prefix=%s update_every=%s',
+    ref($self), map { $self->$_ } qw(debug_flags host_prefix update_every),
+  );
   return 0 unless @{$self->collectors};
   $_->emit_charts->recurring_update_p for @{$self->collectors};
   return int @{$self->collectors};

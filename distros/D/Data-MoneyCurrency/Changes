@@ -1,6 +1,8 @@
 Revision history for Data-MoneyCurrency
 
-
+0.25
+        - HR now uses EUR
+        
 0.24    Fr 16 Dez 2022 13:59:12 MST
         - unfortunately ruby-money no longer seems actively maintained
           so we have a forked version

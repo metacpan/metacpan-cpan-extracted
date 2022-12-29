@@ -3,9 +3,9 @@
 package Sah::Schemas::ArrayData;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-29'; # DATE
+our $DATE = '2022-09-25'; # DATE
 our $DIST = 'Sah-Schemas-ArrayData'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas related to ArrayData
@@ -22,7 +22,67 @@ Sah::Schemas::ArrayData - Sah schemas related to ArrayData
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schemas::ArrayData (from Perl distribution Sah-Schemas-ArrayData), released on 2021-09-29.
+This document describes version 0.004 of Sah::Schemas::ArrayData (from Perl distribution Sah-Schemas-ArrayData), released on 2022-09-25.
+
+=head1 SAH SCHEMAS
+
+The following schemas are included in this distribution:
+
+=over
+
+=item * L<perl::arraydata::modname|Sah::Schema::perl::arraydata::modname>
+
+Perl ArrayData::* module name without the prefix, e.g. Lingua::Word::ID::KBBI.
+
+Contains coercion rule so you can also input C<Foo-Bar>, C<Foo/Bar>, C<Foo/Bar.pm>
+or even 'Foo.Bar' and it will be normalized into C<Foo::Bar>.
+
+
+=item * L<perl::arraydata::modname_with_optional_args|Sah::Schema::perl::arraydata::modname_with_optional_args>
+
+Perl ArrayData::* module name without the prefix (e.g. Lingua::Word::ID::KBBI) with optional args (e.g. Foo::Bar=arg1,arg2).
+
+=item * L<perl::arraydata::modnames|Sah::Schema::perl::arraydata::modnames>
+
+Array of Perl ArrayData::* module names without the prefix, e.g. ["Lingua::Word::ID::KBBI", "Number::Prime::First1000"].
+
+Array of Perl ArrayData::* module names, where each element is of
+C<perl::arraydata::modname> schema, e.g. C<Word::ID::KBBI>,
+C<Number::Prime::First1000>.
+
+Contains coercion rule that expands wildcard, so you can specify:
+
+ Word::ID::*
+
+and it will be expanded to e.g.:
+
+ ["Word::ID::KBBI", "Word::ID::PERLANCAR"]
+
+The wildcard syntax supports jokers (C<?>, C<*>, C<**>), brackets (C<[abc]>), and
+braces (C<{one,two}>). See L<Module::List::Wildcard> for more details.
+
+
+=item * L<perl::arraydata::modnames_with_optional_args|Sah::Schema::perl::arraydata::modnames_with_optional_args>
+
+Array of Perl ArrayData::* module names without the prefix, with optional args, e.g. ["Lingua::Word::ID::KBBI", "WordList=wordlist,EN::Enable"].
+
+Array of Perl ArrayData::* module names without the prefix and optional args.
+Each element is of C<perl::arraydata::modname> schema, e.g.
+C<Lingua::Word::ID::KBBI>, C<WordList=wordlist,EN::Enable>.
+
+Contains coercion rule that expands wildcard, so you can specify:
+
+ Lingua::Word::ID::*
+
+and it will be expanded to e.g.:
+
+ ["Lingua::Word::ID::KBBI", "Word::ID::PERLANCAR"]
+
+The wildcard syntax supports jokers (C<?>, C<*>, C<**>), brackets (C<[abc]>), and
+braces (C<{one,two}>). See L<Module::List::Wildcard> for more details.
+
+
+=back
 
 =head1 HOMEPAGE
 
@@ -34,9 +94,9 @@ Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-ArrayDat
 
 =head1 SEE ALSO
 
-L<Sah> - specification
+L<Sah> - schema specification
 
-L<Data::Sah>
+L<Data::Sah> - Perl implementation of Sah
 
 L<ArrayData>
 
@@ -57,13 +117,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

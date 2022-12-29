@@ -5,7 +5,6 @@ examples/test-ps.pl
 examples/test-subclass.pl
 examples/test-symbols.pl
 examples/test.pl
-examples/test.ps
 examples/test4.pl
 examples/test_simple.pl
 examples/Kuramoto.pl

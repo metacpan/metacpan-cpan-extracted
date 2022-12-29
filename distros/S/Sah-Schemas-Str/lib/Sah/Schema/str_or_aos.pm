@@ -3,9 +3,9 @@ package Sah::Schema::str_or_aos;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-22'; # DATE
+our $DATE = '2022-09-23'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = [any => {
     summary => 'String or array (0+ length) of (defined) string',
@@ -41,7 +41,7 @@ Sah::Schema::str_or_aos - String or array (0+ length) of (defined) string
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schema::str_or_aos (from Perl distribution Sah-Schemas-Str), released on 2022-09-22.
+This document describes version 0.013 of Sah::Schema::str_or_aos (from Perl distribution Sah-Schemas-Str), released on 2022-09-23.
 
 =head1 SYNOPSIS
 
@@ -77,7 +77,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "a";
+ $data = ["a"];
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
@@ -92,8 +92,8 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "a";
- my $res = $validator->($data); # => ["","a"]
+ $data = ["a"];
+ my $res = $validator->($data); # => ["",["a"]]
  
  # a sample invalid data
  $data = ["a",[]];

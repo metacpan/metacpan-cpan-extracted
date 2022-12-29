@@ -1,5 +1,11 @@
 Revision history for Syntax-Operator-Equ
 
+0.05    2022-12-25
+        [CHANGES]
+         * Capture t/80in+equ.t from Syntax-Operator-In
+         * Document that PL_infix_plugin now works on development perl version
+           v5.37.7
+
 0.04    2022-10-24
         [CHANGES]
          * Updates for XS::Parse::Infix v0.26

@@ -20,28 +20,28 @@ no_index:
 provides:
   Pod::Man:
     file: lib/Pod/Man.pm
-    version: '5.00'
+    version: '5.01'
   Pod::ParseLink:
     file: lib/Pod/ParseLink.pm
-    version: '5.00'
+    version: '5.01'
   Pod::Text:
     file: lib/Pod/Text.pm
-    version: '5.00'
+    version: '5.01'
   Pod::Text::Color:
     file: lib/Pod/Text/Color.pm
-    version: '5.00'
+    version: '5.01'
   Pod::Text::Overstrike:
     file: lib/Pod/Text/Overstrike.pm
-    version: '5.00'
+    version: '5.01'
   Pod::Text::Termcap:
     file: lib/Pod/Text/Termcap.pm
-    version: '5.00'
+    version: '5.01'
 requires:
-  Pod::Simple: '3.06'
+  Pod::Simple: '3.26'
   perl: '5.010'
 resources:
-  bugtracker: https://rt.cpan.org/Dist/Display.html?Name=podlators
+  bugtracker: https://github.com/rra/podlators/issues
   homepage: https://www.eyrie.org/~eagle/software/podlators/
   repository: https://github.com/rra/podlators.git
-version: '5.00'
+version: '5.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

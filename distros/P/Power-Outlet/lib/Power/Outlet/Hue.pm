@@ -4,7 +4,7 @@ use warnings;
 use Data::Dumper qw{Dumper};
 use base qw{Power::Outlet::Common::IP::HTTP::JSON};
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 =head1 NAME
 

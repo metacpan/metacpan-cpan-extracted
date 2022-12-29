@@ -8,7 +8,6 @@ use 5.014;
 use Term::Choose       qw();
 use Term::Choose::Util qw();
 
-use App::DBBrowser::DB; ##
 use App::DBBrowser::Auxil;
 use App::DBBrowser::Table::Extensions;
 use App::DBBrowser::Table::Substatements::Operators;
@@ -53,7 +52,7 @@ sub select {
     else {
         $menu = [ @pre, @{$sql->{cols}} ];
     }
-    $sql->{select_cols} = [];
+    $sql->{selected_cols} = [];
     #$sql->{alias} = { %{$sql->{alias}} };
     my @bu;
 
@@ -68,16 +67,16 @@ sub select {
         $ax->print_sql_info( $info );
         if ( ! $idx[0] ) {
             if ( @bu ) {
-                ( $sql->{select_cols}, $sql->{alias} ) = @{pop @bu};
+                ( $sql->{selected_cols}, $sql->{alias} ) = @{pop @bu};
                 next COLUMNS;
             }
             return;
         }
-        push @bu, [ [ @{$sql->{select_cols}} ], { %{$sql->{alias}} } ];
+        push @bu, [ [ @{$sql->{selected_cols}} ], { %{$sql->{alias}} } ];
         if ( $menu->[$idx[0]] eq $sf->{i}{ok} ) {
             shift @idx;
-            push @{$sql->{select_cols}}, @{$menu}[@idx];
-            if ( ! @{$sql->{select_cols}} ) {
+            push @{$sql->{selected_cols}}, @{$menu}[@idx];
+            if ( ! @{$sql->{selected_cols}} ) {
                 return 0;
             }
             return 1;
@@ -86,7 +85,7 @@ sub select {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $complex_columns = $ext->complex_unit( $sql, $clause, 1 );
             if ( ! defined $complex_columns ) {
-                ( $sql->{select_cols}, $sql->{alias} ) = @{pop @bu};
+                ( $sql->{selected_cols}, $sql->{alias} ) = @{pop @bu};
             }
             else {
                 for my $complex_col ( @$complex_columns ) {
@@ -94,12 +93,12 @@ sub select {
                     if ( defined $alias && length $alias ) {
                         $sql->{alias}{$complex_col} = $ax->quote_col_qualified( [ $alias ] );
                     }
-                    push @{$sql->{select_cols}}, $complex_col;
+                    push @{$sql->{selected_cols}}, $complex_col;
                 }
             }
             next COLUMNS;
         }
-        push @{$sql->{select_cols}}, @{$menu}[@idx];
+        push @{$sql->{selected_cols}}, @{$menu}[@idx];
     }
 }
 
@@ -141,7 +140,7 @@ sub distinct {
 sub aggregate {
     my ( $sf, $sql ) = @_;
     $sql->{aggr_cols} = [];
-    $sql->{select_cols} = [];
+    $sql->{selected_cols} = [];
 
     AGGREGATE: while ( 1 ) {
         my $ret = $sf->__add_aggregate_substmt( $sql );
@@ -251,9 +250,6 @@ sub __add_aggregate_substmt {
             #else {
             #    return;
             #}
-            my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} ); ##
-            $sql->{aggr_cols}[$i] = $plui->concatenate( [ $sql->{aggr_cols}[$i], "';'" ] );
-            # so that a group with only one number is also treated as a string (left-justified)
         }
         else {
             $sql->{aggr_cols}[$i] .= "$qt_col)";
@@ -449,7 +445,7 @@ sub group_by {
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     $sql->{group_by_stmt} = "GROUP BY";
     $sql->{group_by_cols} = [];
-    $sql->{select_cols} = [];
+    $sql->{selected_cols} = [];
     my @pre = ( undef, $sf->{i}{ok} );
     if ( $sf->{o}{enable}{'expand_' . $clause} ) {
         push @pre, $sf->{i}{menu_addition};

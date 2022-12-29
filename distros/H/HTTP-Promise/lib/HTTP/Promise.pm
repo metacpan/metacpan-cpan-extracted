@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise.pm
-## Version v0.2.1
+## Version v0.2.3
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2022/08/24
+## Modified 2022/12/21
 ## All rights reserved.
 ## 
 ## 
@@ -59,7 +59,7 @@ BEGIN
     our $EXTENSION_VARY = 1;
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
     our $SERIALISER = $Promise::Me::SERIALISER;
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.2.3';
 };
 
 use strict;
@@ -117,6 +117,11 @@ sub init
             $self->{connection_header} = $connection_header;
         }
     }
+    else
+    {
+        $self->default_headers( HTTP::Promise::Headers->new ) ||
+            return( $self->pass_error( HTTP::Promise::Headers->error ) );
+    }
     $self->{_pool} = HTTP::Promise::Pool->new;
     return( $self );
 }
@@ -129,6 +134,17 @@ sub agent { return( shift->_set_get_scalar_as_object( 'agent', @_ ) ); }
 sub auto_switch_https { return( shift->_set_get_boolean( 'auto_switch_https', @_ ) ); }
 
 sub buffer_size { return( shift->_set_get_number( 'buffer_size', @_ ) ); }
+
+sub clone
+{
+    my $self = shift( @_ );
+    my $new = $self->SUPER::clone;
+    if( $self->{default_headers} )
+    {
+        $new->{default_headers} = $self->{default_headers}->clone;
+    }
+    return( $new );
+}
 
 sub connection_header { return( shift->_set_get_scalar_as_object( 'connection_header', @_ ) ); }
 
@@ -341,6 +357,11 @@ sub mirror
                     code => 500,
                     message => HTTP::Promise::Request->error->message
                 }) ) );
+            $self->prepare_headers( $request ) ||
+                return( $reject->( HTTP::Promise::Exception->new({
+                    code => 500,
+                    message => $self->error->message,
+                }) ) );
             $file = $self->new_file( $file ) ||
                 return( $reject->( HTTP::Promise::Exception->new({
                     code => 500,
@@ -484,6 +505,7 @@ sub mirror
                 code => 500,
                 message => HTTP::Promise::Request->error->message
             }) );
+        $self->prepare_headers( $request ) || return( $self->pass_error );
         $file = $self->new_file( $file ) || return( $self->pass_error );
         # If the file exists, add a cache-related header
         if( $file->exists )
@@ -825,7 +847,7 @@ sub request
     {
         return( $self->error( "No request object was provided." ) ) if( !$req );
         $self->use_content_file( $opts->{use_content_file} ) if( exists( $opts->{use_content_file} ) );
-        my $resp = $self->send( $req, $opts ) || return( $$self->pass_error );
+        my $resp = $self->send( $req, $opts ) || return( $self->pass_error );
         return( $resp );
     }
 }
@@ -2135,7 +2157,7 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
 
 =head1 VERSION
 
-    v0.2.1
+    v0.2.3
 
 =head1 DESCRIPTION
 

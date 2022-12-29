@@ -24,7 +24,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 12;
 use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale(LC_ALL, "C");
@@ -99,6 +99,23 @@ EOS
 
 }
 
+Marpa::R2::Test::is( $grammar->show_isys,
+    <<'EOS', 'Aycock/Horspool ISYs' );
+0: [:start]
+1: [:start][], nulling
+2: [Lex-0]
+3: S
+4: S[], nulling
+5: A
+6: A[], nulling
+7: S[R0:1]
+8: S[R0:2]
+9: S[R0:3]
+10: S[R0:4]
+11: S[R0:5]
+12: [:start][']
+EOS
+
 my ($S_sym) = grep { $grammar->symbol_name($_) eq 'S' } $grammar->symbol_ids();
 my ($target_rule) = grep { ($grammar->rule_expand($_))[0] eq $S_sym } $grammar->rule_ids();
 my $target_rule_length = -1 + scalar (() = $grammar->rule_expand($target_rule));
@@ -115,6 +132,7 @@ sub earley_set_display {
     my @data = ();
     for my $target_item (@target_items) {
         my ( $rule_id, $dot, $origin ) = @{$target_item};
+        # rule length is constant in this example
         my $cooked_dot = $dot < 0 ? $target_rule_length : $dot;
         my $desc .=
             "S:$dot " . '@'

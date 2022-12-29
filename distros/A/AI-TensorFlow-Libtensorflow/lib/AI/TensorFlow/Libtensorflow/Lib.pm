@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Lib;
 # ABSTRACT: Private class for AI::TensorFlow::Libtensorflow
-$AI::TensorFlow::Libtensorflow::Lib::VERSION = '0.0.3';
+$AI::TensorFlow::Libtensorflow::Lib::VERSION = '0.0.4';
 use strict;
 use warnings;
 
@@ -64,7 +64,7 @@ sub ffi {
 
 		$ffi->type('object(AI::TensorFlow::Libtensorflow::DeviceList)' => 'TF_DeviceList');
 
-		$ffi->type('opaque' => 'TF_Library');
+		$ffi->type('object(AI::TensorFlow::Libtensorflow::TFLibrary)' => 'TF_Library');
 
 		$ffi->type('object(AI::TensorFlow::Libtensorflow::ApiDefMap)' => 'TF_ApiDefMap');
 
@@ -113,6 +113,11 @@ sub ffi {
 		$ffi->load_custom_type('::PtrObject', 'TF_TString' => 'AI::TensorFlow::Libtensorflow::TString');
 
 
+		$ffi->type('object(AI::TensorFlow::Libtensorflow::Eager::ContextOptions)', 'TFE_ContextOptions');
+
+		$ffi->type('object(AI::TensorFlow::Libtensorflow::Eager::Context)', 'TFE_Context');
+
+
 
 		## Callbacks for deallocation
 		# For TF_Buffer
@@ -125,9 +130,14 @@ sub ffi {
 }
 
 sub mangler_default {
+	my $target = (caller)[0];
+	my $prefix = 'TF';
+	if( $target =~ /::Eager::/ ) {
+		$prefix = 'TFE';
+	}
 	sub {
 		my ($name) = @_;
-		"TF_$name";
+		"${prefix}_$name";
 	}
 }
 
@@ -256,6 +266,8 @@ L<AI::TensorFlow::Libtensorflow::DeviceList>
 
 =head3 TF_Library
 
+L<AI::TensorFlow::Libtensorflow::TFLibrary>
+
 =for TF_CAPI_DEF typedef struct TF_Library TF_Library;
 
 =head3 TF_ApiDefMap
@@ -351,6 +363,16 @@ L<AI::TensorFlow::Libtensorflow::Tensor>
 =head3 TF_TString
 
 L<AI::TensorFlow::Libtensorflow::TString>
+
+=head2 C<tensorflow/c/eager/c_api.h>
+
+=head3 TFE_ContextOptions
+
+L<AI::TensorFlow::Libtensorflow::Eager::ContextOptions>
+
+=head3 TFE_Context
+
+L<AI::TensorFlow::Libtensorflow::Eager::Context>
 
 =head1 AUTHOR
 

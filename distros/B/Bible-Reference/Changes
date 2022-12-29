@@ -1,5 +1,9 @@
 Revision history for Bible::Reference
 
+1.15      2022-12-21 13:01:27-08:00 America/Los_Angeles
+        - Add "simplify" flag and associated functionality
+        - Add "require_chapter_match" flag and associated functionality
+
 1.14      2022-11-30 17:41:13-08:00 America/Los_Angeles
         - Update Bible structure data mechanism
 

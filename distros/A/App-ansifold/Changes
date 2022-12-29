@@ -1,5 +1,9 @@
 Revision history for `ansifold' command.
 
+1.1503 2022-12-28T11:54:05Z
+
+    - Change repository URL.
+
 1.1502 2022-09-26T06:37:43Z
 
     - Require Text::ANSI::Fold@2.15 to fix a bug of word boundary with --prefix.

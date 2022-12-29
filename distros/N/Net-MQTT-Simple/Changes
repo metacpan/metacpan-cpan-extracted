@@ -3,18 +3,28 @@ Revision history for Perl extension Net::MQTT::Simple.
 Incompatible changes are marked with "!!". Incompatibility with and changes in
 "undocumented features" are not always specifically mentioned here.
 
+1.28  2022-12-28 02:37
+        - Fix: Don't hang when receiving signal during select() (Contributed by
+          Peter Sobisch via RT 134165)
+        - Doc fix: typo (Contributed by oalders via GitHub #15)
+        - New: Repository metadata (Suggested by oalders via GitHub #14)
+        - Some retroactive changes to the changelog: added some credits and
+          issue IDs.
+    !!  - Dropped support for IO::Socket::INET.
+
 1.27  2022-09-11 02:22
-        - Fix: Support messages larger than 16 kB on TLS (Reported by CRCinAU
-          via GitHub)
+        - Fix: Support messages larger than 16 kB on TLS (Contributed by
+          CRCinAU via GitHub #20/#18)
 
 1.26  2021-05-17 16:22
-        - Fix: Packet parsing timing (Contributed by Balazs Szabo via email)
+        - Fix: Packet parsing (Reported by Balazs Szabo via email and by Peter
+          Sobisch via RT 133188)
 
 1.25  2021-02-04 19:30
         - Fix: Remove callbacks on unsubscribe. (Contributed by marcbradshaw
-          via GitHub)
+          via GitHub #12)
         - Fix: Separate client ID per instance. (Contributed by hollie via
-          GitHub)
+          GitHub #13)
 
 1.24  2019-07-22 16:47
         - Fix: Unsubscribe didn't work with newer mosquitto.
@@ -27,7 +37,7 @@ Incompatible changes are marked with "!!". Incompatibility with and changes in
 1.23  2019-04-29 18:18
         - New: env variables MQTT_SIMPLE_USERNAME and MQTT_SIMPLE_PASSWORD
         - New: undocumented global $Net::MQTT::Simple::PROTOCOL_LEVEL.
-          (Contributed by mnoorenberghe via GitHub)
+          (Contributed by mnoorenberghe via GitHub #5)
         - Fix: will no longer send invalid SUBSCRIBE message with a packet
           identifier of 0. (See change note in 1.24)
     !!  - Now depends on a sane Perl installation with strict and warnings
@@ -37,7 +47,8 @@ Incompatible changes are marked with "!!". Incompatibility with and changes in
 1.22  2018-12-01 21:01
         - New: username/password authentication (login method)
         - Changelog now uses ISO dates
-        - New: last_will and disconnect (Contributed by nicramage via Github)
+        - New: last_will and disconnect (Contributed by nicramage via Github
+          #3)
         - Bug fix: connection was not restored until after the reconnect
           interval.
 
@@ -50,6 +61,8 @@ Incompatible changes are marked with "!!". Incompatibility with and changes in
           (Reported by ral in #mqtt)
         - Bug fix: Subscription topics weren't UTF8-encoded
         - Improvement: tests for topics "" and "/"
+        - New: -d/--datetime for mqtt-simple command line utility (Contributed
+          by sigio via GitHub #2)
         - Code cleanups
         - New: Support for unsubscribing
 

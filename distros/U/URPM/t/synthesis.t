@@ -2,7 +2,7 @@
 
 use strict ;
 use warnings ;
-use Test::More tests => 95;
+use Test::More tests => 116;
 use URPM;
 
 chdir 't' if -d 't';
@@ -10,10 +10,10 @@ my $file1 = 'synthesis.sample.cz';
 my $file2 = 'synthesis.sample-xz.cz';
 
 my $s = <<'EOF';
-@provides@glibc-devel == 6:2.2.4-25mdk
-@requires@/sbin/install-info@glibc == 2.2.4@kernel-headers@kernel-headers >= 2.2.1@/bin/sh@/bin/sh@/bin/sh@rpmlib(PayloadFilesHavePrefix) <= 4.0-1@rpmlib(CompressedFileNames) <= 3.0.4-1
-@conflicts@texinfo < 3.11@gcc < 2.96-0.50mdk
-@obsoletes@libc-debug@libc-headers@libc-devel@linuxthreads-devel@glibc-debug
+@provides@glibc-devel[== 6:2.2.4-25mdk]
+@requires@/sbin/install-info@glibc[== 2.2.4]@kernel-headers@kernel-headers[>= 2.2.1]@/bin/sh@/bin/sh@/bin/sh@rpmlib(PayloadFilesHavePrefix)[<= 4.0-1]@rpmlib(CompressedFileNames)[<= 3.0.4-1]
+@conflicts@texinfo[< 3.11]@gcc[< 2.96-0.50mdk]
+@obsoletes@libc-debug@libc-headers@libc-devel@linuxthreads-devel@glibc-debug[< 3]
 @info@glibc-devel-2.2.4-25mdk.i586@6@45692097@Development/C
 EOF
 
@@ -27,7 +27,25 @@ $s =~ s/-devel//g;
 print $f $s;
 close $f;
 
-END { unlink $file1, $file2 }
+$s = <<'EOF';
+@provides@python3-fonttools+ufo[== 4.18.2-4.mga9]@python3dist(fonttools[ufo])[== 4.18.2]
+@summary@Metapackage for python3-fonttools: ufo extras
+@info@python3-fonttools+ufo-4.18.2-4.mga9.noarch@0@221683@Development/Other
+@provides@config(dovecot)[== 2.3.19.1-2.mga9]
+@requires@openssl[*]@rpm-helper[*][>= 0.21]
+@summary@Secure IMAP and POP3 server
+@info@dovecot-2.3.19.1-2.mga9.x86_64@0@17815993@System/Servers
+@provides@openimageio[== 2.3.20.0-2.mga9]@font(:lang=aa)
+@summary@Library for reading and writing images
+@info@openimageio-2.3.20.0-2.mga9.x86_64@0@42@Development/Other
+EOF
+
+my $file3 = 'synthesis.squarebrackets.cz';
+open $f, "| gzip -9 >$file3";
+print $f $s;
+close $f;
+
+END { unlink $file1, $file2, $file3 }
 
 my $a = URPM->new;
 ok($a);
@@ -90,21 +108,26 @@ ok($pkg->id == 0);
 my @obsoletes = $pkg->obsoletes;
 ok(@obsoletes == 5);
 ok($obsoletes[0] eq 'libc-debug');
-ok($obsoletes[4] eq 'glibc-debug');
+ok($obsoletes[4] eq 'glibc-debug[< 3]');
+
+my @obsoletes_nosense = $pkg->obsoletes_nosense;
+ok(@obsoletes_nosense == 5);
+ok($obsoletes_nosense[0] eq 'libc-debug');
+ok($obsoletes_nosense[4] eq 'glibc-debug');
 
 my @conflicts = $pkg->conflicts;
 ok(@conflicts == 2);
-ok($conflicts[0] eq 'texinfo < 3.11');
-ok($conflicts[1] eq 'gcc < 2.96-0.50mdk');
+ok($conflicts[0] eq 'texinfo[< 3.11]');
+ok($conflicts[1] eq 'gcc[< 2.96-0.50mdk]');
 
 my @requires = $pkg->requires;
 ok(@requires == 9);
 ok($requires[0] eq '/sbin/install-info');
-ok($requires[8] eq 'rpmlib(CompressedFileNames) <= 3.0.4-1');
+ok($requires[8] eq 'rpmlib(CompressedFileNames)[<= 3.0.4-1]');
 
 my @provides = $pkg->provides;
 ok(@provides == 1);
-ok($provides[0] eq 'glibc-devel == 6:2.2.4-25mdk');
+ok($provides[0] eq 'glibc-devel[== 6:2.2.4-25mdk]');
 
 my @files = $pkg->files;
 ok(@files == 0);
@@ -161,3 +184,33 @@ ok($requires[8] eq 'rpmlib(CompressedFileNames)');
 @provides = $pkg->provides_nosense;
 ok(@provides == 1);
 ok($provides[0] eq 'glibc-devel');
+
+my $b = URPM->new;
+$b->parse_synthesis($file3);
+$pkg = $b->{depslist}[0];
+ok($pkg);
+is($pkg->name, 'python3-fonttools+ufo');
+@provides = $pkg->provides;
+is(@provides, 2);
+is($provides[1], 'python3dist(fonttools[ufo])[== 4.18.2]');
+@provides = $pkg->provides_nosense;
+is(@provides, 2);
+is($provides[1], 'python3dist(fonttools[ufo])');
+$pkg = $b->{depslist}[1];
+ok($pkg);
+is($pkg->name, 'dovecot');
+@requires = $pkg->requires;
+is(@requires, 2);
+is($requires[0], 'openssl[*]');
+is($requires[1], 'rpm-helper[*][>= 0.21]');
+@requires = $pkg->requires_nosense;
+is(@requires, 2);
+is($requires[0], 'openssl');
+is($requires[1], 'rpm-helper');
+$pkg = $b->{depslist}[2];
+ok($pkg);
+is($pkg->name, 'openimageio');
+@provides = $pkg->provides;
+is(@provides, 2);
+is($provides[1], 'font(:lang=aa)');
+

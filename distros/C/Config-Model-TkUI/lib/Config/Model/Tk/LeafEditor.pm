@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tk::LeafEditor 1.375;
+package Config::Model::Tk::LeafEditor 1.376;
 
 use strict;
 use warnings;
@@ -49,7 +49,7 @@ sub Populate {
     my $vt   = $leaf->value_type;
     $logger->info("Creating leaf editor for value_type $vt");
     $cw->{value} = $leaf->fetch( check => 'no', mode => 'user' );
-    $logger->info( "Creating leaf editor with error " . $leaf->error_msg );
+    $logger->info( "Creating leaf editor" );
 
     $cw->add_header( Edit => $leaf )->pack(@fx);
 
@@ -271,7 +271,7 @@ sub try {
 sub delete {
     my $cw = shift;
 
-    eval { $cw->{leaf}->store(undef); };
+    eval { $cw->{leaf}->clear; };
 
     if ($@) {
         $cw->CmeDialog(

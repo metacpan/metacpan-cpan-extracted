@@ -259,7 +259,7 @@ skip_or_run('test coverage', 'improve test coverage',
 		run_and_check
 		    ('test coverage', './Build testcover', 0,
 		     '# Testing UI::Various .* Perl v5\..*',
-		     '# Tk has version 804.033',
+		     '# Tk has version 804.[0-9]{3}',
 		     '# Curses::UI has version 0.9609',
 		     '# Term::ReadLine has version 1.17',
 		     't/\d\d-.*\.t \.+ ok *$+',
@@ -407,7 +407,10 @@ sub run_and_check($$$@)
 
     0 == @re_expected_output  and  @re_expected_output = ('^$');
     subtest $description => sub{
-	my @output = `$command 2>&1`;
+	my @output =
+	    # TODO: filter out temporary diagnostics of t/3?-tk-?.t:
+	    grep {!/^# UI::Various::Tk has been initialised$/}
+	    `$command 2>&1`;
 	is($?, $return_code, '"' . $command . '" runs without error');
 	unless ($? == $return_code)
 	{
@@ -415,6 +418,7 @@ sub run_and_check($$$@)
 		   ($? & 0x80) ? 'COREDUMP ' : '',
 		   'RC ', ($? >> 8 == 255 ? -1 : $? >> 8));
 	    _info @output;
+	    _error 'failing command: ', $command;
 	    return;
 	}
 	my $errors = 0;
@@ -424,7 +428,7 @@ sub run_and_check($$$@)
 	    $_ = $re_expected_output[$ie];
 	    unless (defined $_)
 	    {
-		fail('running out of expected output');
+		fail('running out of expected output of ' . $command);
 		$errors++;
 		last;
 	    }
@@ -465,6 +469,7 @@ sub run_and_check($$$@)
 	}
 	$errors == 0  and  $return = 1;
     };
+    $return  or  _error 'command failed: ', $command;
     return $return;
 }
 

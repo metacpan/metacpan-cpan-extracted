@@ -15,7 +15,7 @@ subtest logf => sub {
   logf(error    => 'some url %s',  Mojo::URL->new('https://example.com'));
   logf(fatal    => 'and fatal');
 
-  $ENV{NETDATA_DEBUG_FLAGS} = 1;
+  $ENV{NETDATA_DEBUG} = 1;
   logf(debug => 'log %s and %s', qw(this that));
 
   close $FH;

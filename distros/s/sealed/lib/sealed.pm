@@ -14,7 +14,7 @@ use version;
 use B::Generate ();
 use B::Deparse  ();
 
-our $VERSION                    = qv(4.1.9);
+our $VERSION                    = qv(4.2.1);
 our $DEBUG;
 
 my %valid_attrs                 = (sealed => 1);
@@ -124,10 +124,10 @@ sub MODIFY_CODE_ATTRIBUTES {
 	$tweaked               += eval {tweak $op, @lexical_varnames, @pads, @op_stack, $cv_obj, %processed_op};
         warn __PACKAGE__ . ": tweak() aborted: $@" if $@;
       }
-      elsif ($op->can("pmreplroot")) {
+      elsif (ref($op) eq "B::PMOP") {
         push @op_stack, $op->pmreplroot, $op->pmreplstart, $op->next;
       }
-      elsif ($op->can("first")) {
+      elsif (grep $_ eq ref($op), "B::METHOP", "B::UNOP") {
 	for (my $kid = $op->first; ref $kid and $$kid; $kid = $kid->sibling) {
 	  push @op_stack, $kid;
 	}

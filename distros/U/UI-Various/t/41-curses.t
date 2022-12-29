@@ -25,7 +25,7 @@ use Test::Output;
 BEGIN {
     eval { require Curses::UI; };
     $@  and  plan skip_all => 'Curses::UI not found';
-    plan tests => 62;
+    plan tests => 65;
 
     # define fixed environment for unit tests:
     delete $ENV{DISPLAY};
@@ -218,13 +218,13 @@ is($result, 'something:something', 'all SCALAR references changed correctly');
 # test standard behaviour with 2 windows:
 
 my ($w1, $w2);
-$text2 = UI::Various::Text->new(text => 'Bye!');
+$text2 = UI::Various::Text->new(text => 'Bye!', align => 5);
 $button2 =
-    UI::Various::Button->new(text => 'Quit',
+    UI::Various::Button->new(text => 'Quit', align => 3,
 			     code => sub {   $w1->destroy;   $w2->destroy;   });
 $text1 = UI::Various::Text->new(text => 'HI!');
 $button1 =
-    UI::Various::Button->new(text => 'Bye',
+    UI::Various::Button->new(text => 'Bye', align => 7,
 			     code => sub {
 				 $w2 = $main->window({title => 'bye',
 						      width => 10},
@@ -362,7 +362,7 @@ is(@{$main->{children}}, 0, 'main 5 no longer has children');
 ####################################
 # test standard behaviour of a dialogue:
 
-$text1 = UI::Various::Text->new(text => 'Dialogue!');
+$text1 = UI::Various::Text->new(text => 'Dialogue 1!');
 my $run_dialog = 0;
 $button1 =
     UI::Various::Button->new(text => 'Back',
@@ -373,7 +373,7 @@ $button1 =
 my $text = 'Window!';		# We need a referenced item outside of dialogue.
 $text2 = UI::Various::Text->new(text => \$text);
 $button2 =
-    UI::Various::Button->new(text => 'Dialogue',
+    UI::Various::Button->new(text => 'Dialogue 1',
 			     code => sub {
 				 $main->dialog({title => 'DIA',
 						width => 12,
@@ -389,10 +389,42 @@ $w = $main->window({title => 'WIN', width => 20}, $text1, $button2, $button3);
 combined_like
 {   $main->mainloop;   }
     # Note that we can apparently only match some parts of the window here:
-    qr/^.*\bDialogue!.*\bWIN\b.*Dialogue\b.*Quit\b.*/s,
+    qr/^.*\bDialogue 1!.*\bWIN\b.*Dialogue 1\b.*Quit\b.*/s,
     'mainloop 6 produces correct output';
-is($run_dialog, 1, 'dialogue did run');
+is($run_dialog, 1, 'dialogue 1 did run');
 is(@{$main->{children}}, 0, 'main 6 no longer has children');
+
+####################################
+# same without defined sizes:
+
+$text1 = UI::Various::Text->new(text => 'Dialogue 2!');
+$run_dialog = 0;
+$button1 =
+    UI::Various::Button->new(text => 'Back',
+			     code => sub {
+				 $_[0]->destroy;
+				 $run_dialog++;
+			     });
+$text2 = UI::Various::Text->new(text => \$text);
+$button2 =
+    UI::Various::Button->new(text => 'Dialogue 2',
+			     code => sub {
+				 $main->dialog({title => 'DIA'},
+					       $text1, $button1); });
+$button3 = UI::Various::Button->new(text => 'Quit',
+				    code => sub {   $w->destroy;   });
+$w = $main->window({title => 'WIN'}, $text1, $button2, $button3);
+
+@chars_to_read = (' ',			# select button 2 in WIN
+		  ' ',			# select button in DIA
+		  "\t", ' ');		# select button 3 in WIN
+combined_like
+{   $main->mainloop;   }
+    # Note that we can apparently only match some parts of the window here:
+    qr/^.*\bDialogue 2!.*\bWIN\b.*Dialogue 2\b.*Quit\b.*/s,
+    'mainloop 7 produces correct output';
+is($run_dialog, 1, 'dialogue 2 did run');
+is(@{$main->{children}}, 0, 'main 7 no longer has children');
 
 ####################################
 # test standard behaviour with the 1st optionmenu:
@@ -411,9 +443,9 @@ $w =  $main->window($optionmenu,
 combined_like
 {   $main->mainloop;   }
     qr/^.*Quit\b.*$/s,
-    'mainloop 7 produces correct output';
+    'mainloop 8 produces correct output';
 is($option, 42, '1st optionmenu had correct final selection');
-is(@{$main->{children}}, 0, 'main 7 no longer has children');
+is(@{$main->{children}}, 0, 'main 8 no longer has children');
 
 ####################################
 # test standard behaviour with the 2nd optionmenu:
@@ -432,10 +464,10 @@ $w =  $main->window($optionmenu2,
 combined_like
 {   $main->mainloop;   }
     qr/^.*Quit\b.*$/s,
-    'mainloop 8 produces correct output';
+    'mainloop 9 produces correct output';
 is($option, 3, '2nd optionmenu had correct final selection');
 is($option2, 3, '2nd optionmenu run its on_select');
-is(@{$main->{children}}, 0, 'main 8 no longer has children');
+is(@{$main->{children}}, 0, 'main 9 no longer has children');
 
 ####################################
 # test selection of single output file (selecting it):
@@ -459,11 +491,11 @@ $w =  $main->window($fs,
 combined_like
 {   $main->mainloop;   }
     qr/^.*functions\b.*$/s,
-    'mainloop 9 produces correct output';
+    'mainloop 10 produces correct output';
 like($selected1, qr'/t/functions/[a-z_]+\.pl$',
      'file selection returned correct file');
 like($selected1, qr"/t/functions/$selected2", 'file selection is consistent');
-is(@{$main->{children}}, 0, 'main 9 no longer has children');
+is(@{$main->{children}}, 0, 'main 10 no longer has children');
 
 ####################################
 # run some tests with aborting Curses::UI due to insufficient space (using

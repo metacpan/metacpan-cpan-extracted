@@ -286,6 +286,21 @@ test_psgi
     };
 
     subtest 'blocked' => sub {
+        my $req = POST q[/admin/?user=php://filter/convert.iconv.UTF8.CSISO2022KR];
+        my $res = $cb->($req);
+        ok is_error( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
+    };
+
+    subtest 'blocked' => sub {
+        my $req = GET "/";
+        $req->header( Referer => q[php://filter/convert.iconv.UTF8.CSISO2022KR] );
+        my $res = $cb->($req);
+        ok is_error( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
+    };
+
+    subtest 'blocked' => sub {
         my $req = GET q[?unix:|];
         my $res = $cb->($req);
         ok is_error( $res->code ), join( " ", $req->method, $req->uri );

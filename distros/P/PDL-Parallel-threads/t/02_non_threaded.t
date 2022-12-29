@@ -18,7 +18,7 @@ use PDL::Parallel::threads qw(retrieve_pdls);
 # something nontrivial across all its bits.
 my $data = (sequence(10)+1)->sqrt->share_as('Test::Set1');
 my $to_compare = $data;
-ok(all($to_compare == $data), 'A piddle exactly equals itself')
+ok(all($to_compare == $data), 'A ndarray exactly equals itself')
 	or diag("Original is $data and comparison is $to_compare;\n"
 		. "original - comparison = " . ($data - $to_compare));
 

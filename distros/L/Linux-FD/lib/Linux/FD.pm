@@ -1,8 +1,5 @@
 package Linux::FD;
-{
-  $Linux::FD::VERSION = '0.011';
-}
-
+$Linux::FD::VERSION = '0.012';
 use 5.006;
 
 use strict;
@@ -21,13 +18,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Linux::FD - Linux specific special filehandles
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 DESCRIPTION
 

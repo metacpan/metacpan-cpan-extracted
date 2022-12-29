@@ -38,9 +38,11 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
 
    A complex rounding mode is of the form MPC_RNDxy where "x" and "y"
    are one of "N" (to nearest), "Z" (towards zero), "U" (towards plus
-   infinity), "D" (towards minus infinity). The first letter refers to
-   the rounding mode for the real part, and the second one for the
-   imaginary part.
+   infinity), "D" (towards minus infinity). If building this module
+   against mpc-1.3.0 pr later, the additional option of "A" (away from
+   zero) is also available.
+   The first letter refers to the rounding mode for the real part, and
+   the second one for the imaginary part.
    For example MPC_RNDZU indicates to round the real part towards
    zero, and the imaginary part towards plus infinity.
    The default rounding mode is MPC_RNDNN, but this can be changed
@@ -424,11 +426,23 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     direction $rnd. When the return value is 0, it means the result
     is exact. Else it's unknown whether the result is exact or not.
 
-   $si = Rmpc_rootofunity ($rop, $ui1, $ui2, $rnd); # mpc-1.1.0 and
+   $si = Rmpc_rootofunity ($rop, $ui1, $ui2, $rnd); # mpc-1.1.0 &
                                                     # later only
     Set $rop to the standard primitive $ui1-th root of unity raised
     to the power $ui2, that is, exp (2 * pi * i * $ui2 / $ui1),
     rounded according to $rnd with the precision of $rop.
+
+   $si = Rmpc_agm ($rop, $op1, $op2, $rnd); # mpc-1.3.0 &
+                                            # later only
+    Set $rop to the arithmetic-geometric mean (AGM) of $op1 and $op2,
+    rounded according to $rnd with the precision of $rop. Let's call
+    the complex number 1 + (0 * i) "$one".  Concerning the branch cut,
+    the function is computed by homogeneity either as:
+    1) $op1 * AGM($one,b0) with b0=$op2/$op1 if |$op1|>=|$op2|
+       or, otherwise, as:
+    2) $op2 * AGM($one,b0) with b0=$op1/$op2.
+    Then when b0 is real and negative, AGM(1,b0) is chosen to have
+    positive imaginary part.
 
    $si = Rmpc_pow($rop, $op1, $op2, $rnd);
    $si = Rmpc_pow_d($rop, $op1, $double, $rnd);
@@ -598,6 +612,26 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    $si = Rmpc_atanh ($rop, $op, $rnd);
     Set $rop to the inverse hyperbolic tangent of $op, rounded
     according to$rnd with the precision of $rop.
+
+   ##########
+
+   MODULAR
+
+   $si = Rmpc_eta_fund ($rop, $op, $rnd); # mpc-1.3.0 &
+                                          # later only
+
+    Assuming that the argument $op lies in the fundamental domain for
+    Sl_2(Z), that is, it has real part not below -1/2 and not above
+    +1/2 and absolute value at least 1, return the value of the
+    Dedekind eta-function in $rop.  For arguments outside the
+    fundamental domain the function is expected to loop indefinitely.
+    Use the in_fund_dom function (see next) if you first want to verfiy
+    that the value is, indeed, inside the fundamental domain.
+
+   $bool = in_fund_dom($rop);
+    Returns TRUE if $rop is insided the fundamental domain (as
+    described above in the Rmpc_eta_fund documentation).
+    Else returns FALSE.
 
    ##########
 
@@ -840,6 +874,20 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
 
    ####################
 
+   RADIUS FUNCTIONS
+
+   See the Math::MPC::Radius documentation:
+     perldoc Math::MPC::Radius
+
+  ####################
+
+   BALL FUNCTIONS
+
+   See the Math::MPC::Ball documentation:
+     perldoc Math::MPC::Ball
+
+  ####################
+
 =head1 TODO
 
     For completeness, we probably should wrap mpc_realref and
@@ -860,7 +908,7 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
 
     This program is free software; you may redistribute it and/or
     modify it under the same terms as Perl itself.
-    Copyright 2006-2011, 2014, 2016, 2018, 2020 Sisyphus
+    Copyright 2006-2011, 2014, 2016, 2018, 2020, 2022 Sisyphus
 
 =head1 AUTHOR
 

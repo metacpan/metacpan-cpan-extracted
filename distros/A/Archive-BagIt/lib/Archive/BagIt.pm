@@ -11,7 +11,7 @@ use POSIX qw( strftime );
 use Moo;
 with "Archive::BagIt::Role::Portability";
 
-our $VERSION = '0.094'; # VERSION
+our $VERSION = '0.095'; # VERSION
 
 # ABSTRACT: The main module to handle bags.
 
@@ -250,7 +250,8 @@ sub get_baginfo_values_by_key {
 
 sub is_baginfo_key_reserved_as_uniq {
     my ($self, $searchkey) = @_;
-    return $searchkey =~ m/^(Bagging-Date)|(Bag-Size)|(Payload-Oxum)|(Bag-Group-Identifier)|(Bag-Count)$/i;
+    # my $rx = qr{Bag-Count|Bag-Group-Identifier|Bag-Size|Bagging-Date|Payload-Oxum};
+    return $searchkey =~ m/^(?:Bag(?:-(?:Group-Identifier|Count|Size)|ging-Date)|Payload-Oxum)$/i;
 }
 
 ###############################################
@@ -258,22 +259,23 @@ sub is_baginfo_key_reserved_as_uniq {
 
 sub is_baginfo_key_reserved {
     my ($self, $searchkey) = @_;
-    return $searchkey =~ m/^
-        (Source-Organization)|
-        (Organisation-Adress)|
-        (Contact-Name)|
-        (Contact-Phone)|
-        (Contact-Email)|
-        (External-Description)|
-        (Bagging-Date)|
-        (External-Identifier)|
-        (Bag-Size)|
-        (Payload-Oxum)|
-        (Bag-Group-Identifier)|
-        (Bag-Count)|
-        (Internal-Sender-Identifier)|
-        (Internal-Sender-Description)$/ix
-
+    # my $rx = qr/
+    #     Bag-Count|
+    #     Bag-Group-Identifier|
+    #     Bag-Size|
+    #     Bagging-Date|
+    #     Contact-Email|
+    #     Contact-Name|
+    #     Contact-Phone|
+    #     External-Description|
+    #     External-Identifier|
+    #     Internal-Sender-Description|
+    #     Internal-Sender-Identifier|
+    #     Organisation-Adress|
+    #     Payload-Oxum|
+    #     Source-Organization
+    #     /;
+    return $searchkey =~ m/^(?:Bag(?:-(?:Group-Identifier|Count|Size)|ging-Date)|Internal-Sender-(?:Description|Identifier)|External-(?:Description|Identifier)|Contact-(?:(?:Phon|Nam)e|Email)|Source-Organization|Organisation-Adress|Payload-Oxum)$/ix;
 }
 
 ###############################################
@@ -292,7 +294,7 @@ sub __case_aware_compare_for_baginfo {
 sub _find_baginfo_idx {
     my ($self, $searchkey) = @_;
     if (defined $searchkey) {
-        if ($searchkey =~ m/:/) {croak "key should not contain a colon! (searchkey='$searchkey')";}
+        if (-1 < index($searchkey, ":")) {croak "key should not contain a colon! (searchkey='$searchkey')";}
         my $info = $self->bag_info();
         my $size = scalar(@{$info});
         my $lc_flag = $self->is_baginfo_key_reserved($searchkey);
@@ -385,7 +387,7 @@ sub _replace_baginfo_by_first_match {
 sub append_baginfo_by_key {
     my ($self, $searchkey, $newvalue) = @_;
     if (defined $searchkey) {
-        if ($searchkey =~ m/:/) { croak "key should not contain a colon! (searchkey='$searchkey')"; }
+        if (-1 < index($searchkey, ":")) { croak "key should not contain a colon! (searchkey='$searchkey')"; }
         if ($self->is_baginfo_key_reserved_as_uniq($searchkey)) {
             if (defined $self->get_baginfo_values_by_key($searchkey)) {
                 # hmm, search key is marked as uniq and still exists
@@ -403,7 +405,7 @@ sub append_baginfo_by_key {
 sub add_or_replace_baginfo_by_key {
     my ($self, $searchkey, $newvalue) = @_;
     if (defined $searchkey) {
-        if ($searchkey =~ m/:/) { croak "key should not contain a colon! (searchkey='$searchkey')"; }
+        if (-1 < index($searchkey, ":")) { croak "key should not contain a colon! (searchkey='$searchkey')"; }
         if (defined $self->{bag_info}) {
             my $idx = $self->_replace_baginfo_by_first_match( $searchkey, $newvalue);
             if (defined $idx) { return $idx;}
@@ -557,9 +559,7 @@ sub __handle_nonportable_local_entry {
     my $self = shift;
     my $local_entry = shift;
     my $dir = shift;
-    my $rx_portable = qr/^[a-zA-Z0-9._-]+$/;
-    my $is_portable = $local_entry =~ m/$rx_portable/;
-    if (! $is_portable) {
+    if ($local_entry !~ m/^[a-zA-Z0-9._-]+$/) {
         my $local_entry_utf8 = decode("UTF-8", $local_entry);
         if ((!$self->has_force_utf8)) {
             my $hexdump = "0x" . unpack('H*', $local_entry);
@@ -662,7 +662,7 @@ sub _build_bag_encoding {
     my($self) = @_;
     my ($version_string, $encoding_string, $file) = $self->__build_read_bagit_txt();
     croak "Encoding line missed in '$file" unless defined $encoding_string;
-    croak "Encoding '$encoding_string' of '$file' not supported by current Archive::BagIt module!" unless ($encoding_string !~ m/^UTF-8$/);
+    croak "Encoding '$encoding_string' of '$file' not supported by current Archive::BagIt module!" unless ($encoding_string ne "UTF-8");
     return $encoding_string;
 }
 
@@ -915,7 +915,7 @@ sub create_baginfo {
     foreach my $entry (@{ $self->bag_info() }) {
         my %tmp = %{ $entry };
         my ($key, $value) = %tmp;
-        if ($key =~ m/:/) { carp "key should not contain a colon! (searchkey='$key')"; }
+        if (-1 < index($key,":")) { carp "key should not contain a colon! (searchkey='$key')"; }
         print($BAGINFO "$key: $value\n");
     }
     close($BAGINFO);
@@ -992,7 +992,7 @@ Archive::BagIt - The main module to handle bags.
 
 =head1 VERSION
 
-version 0.094
+version 0.095
 
 =head1 NAME
 

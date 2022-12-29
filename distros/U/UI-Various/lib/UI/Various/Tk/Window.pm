@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.34';
+our $VERSION = '0.37';
 
 use UI::Various::core;
 use UI::Various::Window;
@@ -76,8 +76,7 @@ sub _prepare($@)
     my ($self) = @_;
     local $_;
 
-    my @attributes = ();
-    # TODO: additional attributes added and translated in loop, when defined
+    my @attributes = ($self->_attributes());
     $self->_tk(	MainWindow->new(-title => $self->title,
 				@attributes));
 
@@ -88,7 +87,7 @@ sub _prepare($@)
 	# Note that width/height attributes apparently are ignored, so we
 	# must use the non-attribute Wm method "geometry":
 	$self->_tk->geometry
-	    (int($self->{width}  * $self->parent->{_char_width}) . 'x' .
+	    (int($self->{width}  * $self->parent->{_char_avg_width}) . 'x' .
 	     int($self->{height} * $self->parent->{_char_height}));
     }
 

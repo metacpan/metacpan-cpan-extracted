@@ -13,7 +13,6 @@ use warnings;
 
 use lib 't/lib';
 
-$::_use_log4perl_to_warn = 1;
 
 sub test_all {
     my ($mw, $delay,$test_ref) = @_ ;

@@ -1,5 +1,9 @@
 Revision history for Data-Validate-Sanctions
 
+0.16      2022-12-21 00:19:22+00:00 UTC
+        A time limit is settled to avoid loading data per request as it might take resources to process a huge sanction list
+        Improve Redis interaction to increase the performance
+
 0.15      2022-11-23 11:12:24+00:00 UTC
         Sanction data will be fetched on a single server and stored in Redis by a new module Data::Validate::Sanction::Redis
 

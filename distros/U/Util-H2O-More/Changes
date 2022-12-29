@@ -42,11 +42,32 @@
       examples for using opt2h2o with Getopt::Long
 
 0.1   Thu Dec 16 14:00:00 2022
-     - added h3o for bags of HASH refs, h3o and
-       the reverser, o3h
-     - added vmethods for ARRAY containers: all,
-       push, pop, unshift, shift, scalar
-     - updated POD, added tests for all new things
-     - specified minimum version of Perl as 5.10
-       in dist.ini and all meta data that follows
+    - added h3o for bags of HASH refs, h3o and
+      the reverser, o3h
+    - added vmethods for ARRAY containers: all,
+      push, pop, unshift, shift, scalar
+    - updated POD, added tests for all new things
+    - specified minimum version of Perl as 5.10
+      in dist.ini and all meta data that follows
 
+0.1.1 Mon Dec 19 15:00:00 2022
+    - POD updates
+
+0.1.2 Mon Dec 20 15:00:00 2022
+    - POD updates
+
+0.2.0 Thu Dec 22 15:00:01 2022
+    - found and fixed bug:
+      o3h was not working on ARRAYs
+    - updated POD, added method C<a2o> intended
+      for internal use; but some might find it
+      useful
+
+0.2.1 Fri Dec 23 15:00:02 2022
+    - renamed h3o, o3h to d2o, o2d
+
+0.2.2 Tue Dec 28 15:00:03 2022
+    - added helper methods for use with configuration
+      files: ini2o, o2ini, o2h2o
+    - added a dependency of Config::Tiny for ini2o and
+      o2ini

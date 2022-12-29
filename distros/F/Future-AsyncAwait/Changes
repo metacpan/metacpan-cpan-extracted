@@ -1,5 +1,11 @@
 Revision history for Future-AsyncAwait
 
+0.62    2022-12-20
+        [BUGFIXES]
+         * Save/restore the value of the @_ array; does not work on perls
+           before 5.24 for reasons unknown (RT130683)
+         * Updated hax/ files to avoid a build warning on current bleadperl
+
 0.61    2022-11-21
         [BUGFIXES]
          * Fix for some C compilers which get upset about variable

@@ -3,7 +3,12 @@ use strict;
 use Math::MPC qw(:mpc);
 use Math::MPFR qw(:mpfr);
 
-print "1..6\n";
+if(Math::MPC::MPC_VERSION >= 66304) {
+  print "1..9\n";
+}
+else {
+  print "1..7\n";
+}
 
 my $string = Rmpc_get_version();
 
@@ -20,7 +25,7 @@ Math::MPC::_have_Complex_h() ?
                              :
  warn "\n# Built without support for 'double _Complex' and 'long double _Complex types'\n";
 
-if($Math::MPC::VERSION eq '1.16') {print "ok 1\n"}
+if($Math::MPC::VERSION eq '1.30') {print "ok 1\n"}
 else {print "not ok 1 $Math::MPC::VERSION\n"}
 
 if(MPC_VERSION_MAJOR > 0 || MPC_VERSION_MINOR > 7) {print "ok 2\n"}
@@ -43,6 +48,27 @@ if($Math::MPC::VERSION eq $Math::MPC::Constant::VERSION) {print "ok 6\n"}
 else {
   warn "\$Math::MPC::VERSION: $Math::MPC::VERSION\n\$Math::MPC::Constant::VERSION: $Math::MPC::Constant::VERSION\n";
   print "not ok 6\n";
+}
+
+if(MPC_HEADER_V == MPC_VERSION) {print "ok 7\n" }
+else {
+  warn MPC_HEADER_V, " != ", MPC_VERSION;
+  print "not ok 7\n";
+}
+
+if(Math::MPC::MPC_VERSION >= 66304) { # else, $Math::MPC::Radius::VERSION and
+                                      # $Math::MPC::Ball::VERSION will not be visible
+  if($Math::MPC::VERSION eq $Math::MPC::Radius::VERSION) {print "ok 8\n"}
+  else {
+    warn "\$Math::MPC::VERSION: $Math::MPC::VERSION\n\$Math::MPC::Radius::VERSION: $Math::MPC::Radius::VERSION\n";
+    print "not ok 8\n";
+  }
+
+  if($Math::MPC::VERSION eq $Math::MPC::Ball::VERSION) {print "ok 9\n"}
+  else {
+    warn "\$Math::MPC::VERSION: $Math::MPC::VERSION\n\$Math::MPC::Ball::VERSION: $Math::MPC::Ball::VERSION\n";
+    print "not ok 9\n";
+  }
 }
 
 

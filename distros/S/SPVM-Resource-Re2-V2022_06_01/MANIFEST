@@ -3,9 +3,9 @@
 .github/workflows/linux-ubuntu-latest.yml
 .github/workflows/macos-latest.yml
 .github/workflows/windows-2019.yml
+.github/workflows/windows-latest.yml.disable
 .gitignore
 Changes
-cpanm
 lib/SPVM/Resource/Re2/V2022_06_01.config
 lib/SPVM/Resource/Re2/V2022_06_01.native/include/.gitkeep
 lib/SPVM/Resource/Re2/V2022_06_01.native/include/Makefile
@@ -43,12 +43,6 @@ lib/SPVM/Resource/Re2/V2022_06_01.native/include/util/util.h
 lib/SPVM/Resource/Re2/V2022_06_01.native/src/.gitignore
 lib/SPVM/Resource/Re2/V2022_06_01.native/src/.gitkeep
 lib/SPVM/Resource/Re2/V2022_06_01.native/src/AUTHORS
-lib/SPVM/Resource/Re2/V2022_06_01.native/src/benchlog/benchlog.c2
-lib/SPVM/Resource/Re2/V2022_06_01.native/src/benchlog/benchlog.mini
-lib/SPVM/Resource/Re2/V2022_06_01.native/src/benchlog/benchlog.r70
-lib/SPVM/Resource/Re2/V2022_06_01.native/src/benchlog/benchlog.wreck
-lib/SPVM/Resource/Re2/V2022_06_01.native/src/benchlog/benchplot.py
-lib/SPVM/Resource/Re2/V2022_06_01.native/src/benchlog/mktable
 lib/SPVM/Resource/Re2/V2022_06_01.native/src/BUILD
 lib/SPVM/Resource/Re2/V2022_06_01.native/src/CMakeLists.txt
 lib/SPVM/Resource/Re2/V2022_06_01.native/src/CONTRIBUTING.md

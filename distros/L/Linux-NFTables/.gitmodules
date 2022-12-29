@@ -1,0 +1,3 @@
+[submodule "easyxs"]
+	path = easyxs
+	url = https://github.com/FGasper/easyxs

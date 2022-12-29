@@ -10,7 +10,7 @@ use Capture::Tiny qw( capture_merged capture );
 use Alien::Util qw( version_cmp );
 
 # ABSTRACT: Probe for system libraries by guessing with ExtUtils::CBuilder
-our $VERSION = '2.74'; # VERSION
+our $VERSION = '2.75'; # VERSION
 
 
 has options => sub { {} };
@@ -178,7 +178,7 @@ Alien::Build::Plugin::Probe::CBuilder - Probe for system libraries by guessing w
 
 =head1 VERSION
 
-version 2.74
+version 2.75
 
 =head1 SYNOPSIS
 

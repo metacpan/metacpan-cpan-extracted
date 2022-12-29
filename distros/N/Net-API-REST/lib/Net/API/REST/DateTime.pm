@@ -1,12 +1,15 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST/DateTime.pm
-## Version v0.100.2
+## Version v0.100.3
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/12/15
-## Modified 2020/05/21
+## Modified 2022/06/29
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::REST::DateTime;
 BEGIN
@@ -15,6 +18,7 @@ BEGIN
     use warnings;
 	use common::sense;
 	use parent qw( Module::Generic );
+	use vars qw( @DoW @MoY $MoY $GMT_ZONE $VERSION );
 	use Nice::Try;
 	use Devel::Confess;
 	our @DoW = qw( Sun Mon Tue Wed Thu Fri Sat );
@@ -22,8 +26,11 @@ BEGIN
 	our $MoY = {};
 	@$MoY{ @MoY } = ( 1..12 );
 	our $GMT_ZONE = { 'GMT' => 1, 'UTC' => 1, 'UT' => 1, 'Z' => 1 };
-	our $VERSION = 'v0.100.2';
+	our $VERSION = 'v0.100.3';
 };
+
+use strict;
+use warnings;
 
 sub format_datetime
 {
@@ -346,7 +353,7 @@ sub time2str
 }
 
 1;
-
+# NOTE: pod
 __END__
 
 =encoding utf8
@@ -375,7 +382,7 @@ Net::API::REST::DateTime - HTTP DateTime Manipulation and Formatting
 
 =head1 VERSION
 
-    v0.100.2
+    v0.100.3
 
 =head1 DESCRIPTION
 

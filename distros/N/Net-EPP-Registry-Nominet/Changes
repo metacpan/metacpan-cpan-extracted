@@ -1,3 +1,20 @@
+0.07 2022-12-23
+
+    - No changes from 0.06_03
+
+0.06_03 2022-12-08
+
+    - Test suite fix for releasing domains to NOMINET
+    - Test suite fix connections with newer IO::Socket::SSL versions
+
+0.06_02 2022-11-11
+
+    - Domain check returns reason for unavailability as 3rd value
+
+0.06_01 2022-01-15
+
+    - Automatically reconnect, re-login and resend a request if no response
+
 0.06 2021-10-04
 
     - Fix hello() so it only reports the XML for Debug > 1

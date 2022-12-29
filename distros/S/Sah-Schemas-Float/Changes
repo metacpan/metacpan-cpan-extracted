@@ -1,3 +1,10 @@
+0.012   2022-09-22  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention Sah::Schema::percent_str.
+
+
 0.011   2020-06-04  Released-By: PERLANCAR; Urgency: medium
 
 	- Add schemas: int_or_inf, uint_or_posinf, posint_or_posinf.

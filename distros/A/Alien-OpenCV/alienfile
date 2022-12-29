@@ -3,17 +3,25 @@ use alienfile;
 plugin PkgConfig => 'opencv4';
 
 share {
-  start_url 'https://github.com/opencv/opencv/releases';
-
   meta->before_hook( build => sub {
           die "Share install not yet supported on MSWin32" if $^O eq 'MSWin32';
   });
 
-  plugin Download => (
-    filter  => qr/^4\.[0-9\.]+\.zip$/,
+  plugin 'Download::GitHub' => (
+    github_user => 'opencv',
+    github_repo => 'opencv',
     version => qr/([0-9\.]+)/,
+    prefer  => sub {
+      my ($self, $data) = @_;
+
+      # only want version 4.x
+      @{ $data->{list} } = grep
+        $_->{version} =~ /^4\./,
+        @{ $data->{list} };
+
+      return $data;
+    }
   );
-  plugin Extract => 'zip';
   plugin 'Build::CMake';
   build [
     ['%{cmake}',

@@ -1,5 +1,11 @@
 Revision history for Perl module HTTP::Promise
 
+v0.2.3 2022-12-21T11:17:09+0900
+    - Corrected a type in method request in HTTP::Promise
+
+v0.2.2 2022-11-12T14:21:39+0900
+    - Updated init() in HTTP::Promise to instantiate a default HTTP::Promise::Headers object to make default_header() method work.
+
 v0.2.1 2022-10-29T21:15:10+0900
     - Added object argument 'medium' and 'shared_mem_size' that are passed to Promise::Me
     - Added method httpize_datetime to ensure a given DateTime object stringifies to a valid HTTP date

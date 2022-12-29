@@ -598,8 +598,6 @@ Perl::Critic requires the following modules:
 
 [File::Which](https://metacpan.org/pod/File::Which)
 
-[IO::String](https://metacpan.org/pod/IO::String)
-
 [List::SomeUtils](https://metacpan.org/pod/List::SomeUtils)
 
 [List::Util](https://metacpan.org/pod/List::Util)
@@ -623,8 +621,6 @@ Perl::Critic requires the following modules:
 [Scalar::Util](https://metacpan.org/pod/Scalar::Util)
 
 [String::Format](https://metacpan.org/pod/String::Format)
-
-[Task::Weaken](https://metacpan.org/pod/Task::Weaken)
 
 [Term::ANSIColor](https://metacpan.org/pod/Term::ANSIColor)
 

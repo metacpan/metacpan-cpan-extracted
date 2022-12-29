@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 1.009;
+our $VERSION = 1.010;
 
 use IP::Geolocation::MMDB::Metadata;
 use Math::BigInt 1.999806;
@@ -14,48 +14,36 @@ use Math::BigInt 1.999806;
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
 
-sub new {
-  my ($class, %attrs) = @_;
-
-  my $file  = $attrs{file} or die q{The "file" parameter is mandatory};
-  my $flags = 0;
-
-  my $self = $class->_new($file, $flags);
-  bless $self, $class;
-
-  return $self;
-}
-
 sub getcc {
-  my ($self, $ip_address) = @_;
+    my ($self, $ip_address) = @_;
 
-  my $country_code;
+    my $country_code;
 
-  my $data = $self->record_for_address($ip_address);
-  if (ref $data eq 'HASH') {
-    if (exists $data->{country}) {
-      my $country = $data->{country};
-      if (exists $country->{iso_code}) {
-        $country_code = $country->{iso_code};
-      }
+    my $data = $self->record_for_address($ip_address);
+    if (ref $data eq 'HASH') {
+        if (exists $data->{country}) {
+            my $country = $data->{country};
+            if (exists $country->{iso_code}) {
+                $country_code = $country->{iso_code};
+            }
+        }
     }
-  }
 
-  return $country_code;
+    return $country_code;
 }
 
 sub metadata {
-  my ($self) = @_;
+    my ($self) = @_;
 
-  return IP::Geolocation::MMDB::Metadata->new(%{$self->_metadata});
+    return IP::Geolocation::MMDB::Metadata->new(%{$self->_metadata});
 }
 
 ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 
 sub _to_bigint {
-  my ($self, $bytes) = @_;
+    my ($self, $bytes) = @_;
 
-  return Math::BigInt->from_bytes($bytes);
+    return Math::BigInt->from_bytes($bytes);
 }
 
 1;
@@ -69,7 +57,7 @@ IP::Geolocation::MMDB - Read MaxMind DB files
 
 =head1 VERSION
 
-version 1.009
+version 1.010
 
 =head1 SYNOPSIS
 
@@ -159,6 +147,12 @@ children's node numbers.
 
 Returns an L<IP::Geolocation::MMDB::Metadata> object for the database.
 
+=head2 file
+
+  my $file = $db->file;
+
+Returns the file path passed to the constructor.
+
 =head2 libmaxminddb_version
 
   my $version = IP::Geolocation::MMDB::libmaxminddb_version;
@@ -225,11 +219,31 @@ from L<MaxMind|https://www.maxmind.com/> or L<DP-IP.com|https://db-ip.com/>.
 
 None.
 
-=head1 AUTHOR
+=head1 BUGS AND LIMITATIONS
 
-Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
+If your Perl interpreter does not support 64-bit integers,
+MMDB_DATA_TYPE_UINT64 values are put into Math::BigInt objects;
 
-=head1 CONTRIBUTORS
+MMDB_DATA_TYPE_UINT128 values are put into Math::BigInt objects;
+
+IP::Geolocation::MMDB can replace MaxMind::DB::Reader in many cases with the
+following differences:
+
+=over
+
+=item *
+
+The classes aren't Moo classes.
+
+=item *
+
+There is no replacement for MaxMind::DB::Reader::Decoder.
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to all who have contributed patches and reported bugs:
 
 =over
 
@@ -239,16 +253,13 @@ Yujuan Jiang
 
 =back
 
-=head1 BUGS AND LIMITATIONS
+=head1 AUTHOR
 
-If your Perl interpreter does not support 64-bit integers,
-MMDB_DATA_TYPE_UINT64 values are put into Math::BigInt objects;
-
-MMDB_DATA_TYPE_UINT128 values are put into Math::BigInt objects;
+Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2022 Andreas Vögele
+Copyright (C) 2022 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

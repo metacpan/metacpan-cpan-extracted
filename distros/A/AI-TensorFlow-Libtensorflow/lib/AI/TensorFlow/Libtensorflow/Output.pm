@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Output;
 # ABSTRACT: Output of operation as (operation, index) pair
-$AI::TensorFlow::Libtensorflow::Output::VERSION = '0.0.3';
+$AI::TensorFlow::Libtensorflow::Output::VERSION = '0.0.4';
 # See L<AI::TensorFlow::Libtensorflow::Input> for similar.
 # In fact, they are mostly the same, but keeping the classes separate for now
 # in case the upstream API changes.
@@ -93,6 +93,29 @@ $ffi->load_custom_type(
 		record_module => __PACKAGE__, with_size => 1,
 	),
 	=> 'TF_Output_array_sz');
+
+use overload
+	'""' => \&_op_stringify;
+
+sub _op_stringify {
+	join ":", (
+		( defined $_[0]->_oper ? $_[0]->oper->Name : '<undefined operation>' ),
+		( defined $_[0]->index ? $_[0]->index      : '<no index>'            )
+	);
+}
+
+sub _data_printer {
+	my ($self, $ddp) = @_;
+
+	my %data = (
+		oper  => $self->oper,
+		index => $self->index,
+	);
+
+	return sprintf('%s %s',
+		$ddp->maybe_colorize(ref $self, 'class' ),
+		$ddp->parse(\%data) );
+};
 
 1;
 

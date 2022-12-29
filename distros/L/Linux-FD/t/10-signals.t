@@ -19,8 +19,7 @@ $sigset->addset(SIGUSR1);
 
 sigprocmask(SIG_SETMASK, $sigset) or bailout('Can\'t set signal-mask');
 
-my $fd = signalfd($sigset);
-$fd->blocking(0);
+my $fd = signalfd($sigset, 'non-blocking');
 $selector->add($fd);
 
 ok !$selector->can_read(0), 'Can\'t read an empty signalfd';

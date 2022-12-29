@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::ApiDefMap;
 # ABSTRACT: Maps Operation to API description
-$AI::TensorFlow::Libtensorflow::ApiDefMap::VERSION = '0.0.3';
+$AI::TensorFlow::Libtensorflow::ApiDefMap::VERSION = '0.0.4';
 use strict;
 use warnings;
 use namespace::autoclean;
@@ -57,7 +57,7 @@ AI::TensorFlow::Libtensorflow::ApiDefMap - Maps Operation to API description
   use AI::TensorFlow::Libtensorflow::Status;
 
   my $map = ApiDefMap->New(
-    AI::TensorFlow::Libtensorflow->GetAllOpList,
+    AI::TensorFlow::Libtensorflow::TFLibrary->GetAllOpList,
     my $status = AI::TensorFlow::Libtensorflow::Status->New
   );
   ok $map, 'Created ApiDefMap';

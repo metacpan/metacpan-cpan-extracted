@@ -16,7 +16,7 @@ configure_requires:
   Alien::Build::MM: '0.32'
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,7 +33,7 @@ no_index:
 provides:
   Alien::SWIG4:
     file: lib/Alien/SWIG4.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Alien::Base: '0.038'
   base: '0'
@@ -42,9 +42,9 @@ requires:
   warnings: '0'
 resources:
   IRC: irc://irc.perl.org/#native
-  homepage: https://github.com/PerlAlien/Alien-SWIG
-  repository: https://github.com/PerlAlien/Alien-SWIG.git
-version: '0.04'
+  homepage: https://github.com/PerlAlien/Alien-SWIG4
+  repository: https://github.com/PerlAlien/Alien-SWIG4.git
+version: '0.05'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
@@ -53,9 +53,12 @@ x_alienfile:
       Config: '0'
       File::Which: '0'
       HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
       IO::Zlib: '0'
       Mojo::DOM: '0'
       Mojolicious: '7.00'
+      Mozilla::CA: '0'
+      Net::SSLeay: '1.49'
       Sort::Versions: '0'
       URI: '0'
       URI::Escape: '0'

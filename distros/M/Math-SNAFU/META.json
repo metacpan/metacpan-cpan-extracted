@@ -1,0 +1,79 @@
+{
+   "abstract" : "decimal to SNAFU converter",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Math-SNAFU",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter::Shiny" : "1.006000",
+            "perl" : "5.012"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Require::AuthorTesting" : "0",
+            "Test2::Require::Module" : "0",
+            "Test2::Tools::Spec" : "0",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Math::SNAFU" : {
+         "file" : "lib/Math/SNAFU.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tobyink/advent-of-code/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Math-SNAFU",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/advent-of-code.git",
+         "web" : "https://github.com/tobyink/advent-of-code"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Math-SNAFU/project"
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 4.09",
+   "x_static_install" : 1
+}

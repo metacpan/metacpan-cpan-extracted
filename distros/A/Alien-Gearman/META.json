@@ -27,11 +27,10 @@
             "Alien::Build::Plugin::Download::Negotiate" : "1.30",
             "Alien::Libevent" : "0",
             "Alien::OpenSSL" : "0",
-            "Alien::curl" : "0",
+            "Alien::gmake" : "0.11",
             "Alien::gperf" : "0",
             "Alien::libuuid" : "0",
             "Archive::Tar" : "0",
-            "Config" : "0",
             "Env::ShellWords" : "0.01",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
@@ -56,6 +55,7 @@
       "runtime" : {
          "requires" : {
             "Alien::Base" : "0.038",
+            "Alien::Boost::ProgramOptions" : "0",
             "Alien::Build" : "0.25",
             "Alien::Libevent" : "0",
             "Alien::libuuid" : "0"
@@ -76,7 +76,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "2.4",
+   "version" : "2.5",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.74",
       "requires" : {
@@ -85,11 +85,10 @@
             "Alien::Build::Plugin::Download::Negotiate" : "1.30",
             "Alien::Libevent" : "0",
             "Alien::OpenSSL" : "0",
-            "Alien::curl" : "0",
+            "Alien::gmake" : "0.11",
             "Alien::gperf" : "0",
             "Alien::libuuid" : "0",
             "Archive::Tar" : "0",
-            "Config" : "0",
             "Env::ShellWords" : "0.01",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",

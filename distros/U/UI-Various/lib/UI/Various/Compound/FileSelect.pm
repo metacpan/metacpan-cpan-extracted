@@ -57,7 +57,7 @@ use warnings 'once';
 
 use Cwd 'abs_path';
 
-our $VERSION = '0.34';
+our $VERSION = '0.37';
 
 use UI::Various::core;
 use UI::Various::Box;
@@ -329,8 +329,9 @@ sub _cd($;$)
 
 This method returns the full path(s) to the file(s) selected or entered (in
 case of C<mode =E<gt> 0>) in the file selection widget.  If there is nothing
-selected at all, the method returns C<undef> for C<mode =E<gt> 0 or 1> and
-an empty list for C<mode =E<gt> 2>.
+selected at all, the method returns the current directory with a trailing
+C</>.  (A directory selected after a regular file in C<mode =E<gt> 2> has no
+trailing C</>.)
 
 =head3 returns:
 
@@ -345,17 +346,20 @@ sub selection($)
     my ($self) = @_;
     local $_;
     my $lb = $self->{_widget}{files};
+    my $directory = $self->{directory};
+    $directory =~ s|(?<=[^/])$|/|;
     if ($self->mode == 0)
-    {   return $self->{directory} . '/' . $self->{_inputvar};   }
+    {   return $directory . $self->{_inputvar};   }
     if ($self->mode == 1)
     {
 	$_ = $lb->selected();
-	return defined $_ ? $self->{directory} . '/' . $lb->{texts}[$_] : undef;
+	return defined $_ ? $directory . $lb->{texts}[$_] : $directory;
     }
     my @selection = $lb->selected();
     @selection =
-	map { $self->{directory} . '/' . $lb->{texts}[$_] }
+	map { $directory . $lb->{texts}[$_] }
 	@selection;
+    @selection  or  @selection = ($directory);
     return @selection;
 }
 

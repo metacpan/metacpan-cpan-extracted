@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
 
-    On a suitably-patched perl:
+    On a suitable perl version:
 
        use Syntax::Operator::Equ;
     
@@ -40,15 +40,16 @@ DESCRIPTION
     operand is, or otherwise behave the same as the regular string or
     number equality tests if both operands are defined.
 
-    Current versions of perl do not directly support custom infix
-    operators. The documentation of XS::Parse::Infix describes the
-    situation, with reference to a branch experimenting with this new
-    feature. This module is therefore almost entirely useless on standard
-    perl builds. While the regular parser does not support custom infix
-    operators, they are supported via XS::Parse::Infix and hence
-    XS::Parse::Keyword, and so custom keywords which attempt to parse
-    operator syntax may be able to use it. One such module is
-    Syntax::Keyword::Match; see the SYNOPSIS example given above.
+    Current stable versions of perl do not directly support custom infix
+    operators, but the ability was added in the 5.37.x development cycle
+    and is available from perl v5.37.7 onwards. The documentation of
+    XS::Parse::Infix describes the situation in more detail. This module is
+    therefore almost entirely useless on stable perl builds. While the
+    regular parser does not support custom infix operators, they are
+    supported via XS::Parse::Infix and hence XS::Parse::Keyword, and so
+    custom keywords which attempt to parse operator syntax may be able to
+    use it. One such module is Syntax::Keyword::Match; see the SYNOPSIS
+    example given above.
 
 OPERATORS
 

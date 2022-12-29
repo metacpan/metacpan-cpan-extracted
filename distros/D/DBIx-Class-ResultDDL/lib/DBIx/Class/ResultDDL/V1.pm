@@ -45,7 +45,7 @@ DBIx::Class::ResultDDL::V1 - Back-compat for version 0 of this module
 
 =head1 VERSION
 
-version 2.00
+version 2.01
 
 =head1 DESCRIPTION
 

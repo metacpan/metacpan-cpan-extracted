@@ -1,12 +1,15 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST/JWT.pm
-## Version v0.100.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Version v0.100.2
+## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/09/01
-## Modified 2020/05/16
+## Modified 2022/06/29
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::REST::JWT;
 BEGIN
@@ -14,16 +17,17 @@ BEGIN
     use strict;
     use warnings;
     use common::sense;
+    use vars qw( %EXPORT_TAGS @EXPORT_OK @EXPORT $VERSION );
     use Exporter 'import';
     our %EXPORT_TAGS = ( all => [qw(decode_jwt encode_jwt)] );
     our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
     our @EXPORT = qw();
 
-    ## use Carp;
+    # use Carp;
     use Devel::Confess;
     use Crypt::Misc qw(decode_b64u encode_b64u);
-    ## use JSON::MaybeXS qw(decode_json encode_json);
-    ## JSON::XS does not play well with ModPerl, so luckily we can use the Pure Perl version
+    # use JSON::MaybeXS qw(decode_json encode_json);
+    # JSON::XS does not play well with ModPerl, so luckily we can use the Pure Perl version
     use JSON::PP qw( decode_json encode_json );
     use Crypt::PK::RSA;
     use Crypt::PK::ECC;
@@ -33,11 +37,14 @@ BEGIN
     use Crypt::Mac::HMAC qw(hmac);
     use Compress::Raw::Zlib;
     use Scalar::Util qw(looks_like_number);
-    ## For debugging
+    # For debugging
     use Data::Dumper;
-    ## Crypt::JWT version 0.024
-    our $VERSION = 'v0.100.1';
+    # Crypt::JWT version 0.024
+    our $VERSION = 'v0.100.2';
 };
+
+use strict;
+use warnings;
 
 # JWS: https://tools.ietf.org/html/rfc7515
 # JWE: https://tools.ietf.org/html/rfc7516
@@ -986,8 +993,7 @@ sub _decode_jws
 }
 
 1;
-
-# XXX POD
+# NOTE: pod
 #### URLs
 # https://metacpan.org/pod/JSON::WebToken
 # https://metacpan.org/pod/Mojo::JWT

@@ -27,5 +27,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/mvduin/perl-Data-Alias.git
-version: '1.27'
+version: '1.28'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,10 +1,16 @@
-0.005   2018-12-19 (PERLANCAR)
+0.006   2022-09-22  Released-By: PERLANCAR; Urgency: medium
+
+        - Avoid the use of POSIX::round because older perls don't have it
+          yet [cpantesters].
+
+
+0.005   2018-12-19  Released-By: PERLANCAR
 
 	- Avoid POSIX::round() because it requires 1.53 (perl 5.22+)
 	  [RT#128031].
 
 
-0.004   2018-12-17 (PERLANCAR)
+0.004   2018-12-17  Released-By: PERLANCAR
 
 	- Add overloads: cmp, eq, ne.
 
@@ -13,18 +19,18 @@
 	- [ux] from_hms(): Allow hh:mm in addition to hh:mm:ss.
 
 
-0.003   2018-12-16 (PERLANCAR)
+0.003   2018-12-16  Released-By: PERLANCAR
 
 	- Add compare() and overloading of <=>.
 
 
-0.002   2018-12-16 (PERLANCAR)
+0.002   2018-12-16  Released-By: PERLANCAR
 
 	- Add constructors from_hms() & from_float(). Add float().
 
 	- Some tweaks/fixes.
 
 
-0.001   2018-12-15 (PERLANCAR)
+0.001   2018-12-15  Released-By: PERLANCAR
 
          - First release.

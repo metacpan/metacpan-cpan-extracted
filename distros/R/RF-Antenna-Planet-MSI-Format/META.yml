@@ -19,7 +19,6 @@ no_index:
     - inc
 requires:
   Archive::Zip: '0'
-  Archive::Zip::MemberRead: '0'
   File::Temp: '0'
   Path::Class: '0.12'
   RF::Functions: '0.04'
@@ -31,4 +30,4 @@ resources:
   bugtracker: https://github.com/mrdvt92/perl-RF-Antenna-Planet-MSI-Format/issues
   homepage: https://github.com/mrdvt92/perl-RF-Antenna-Planet-MSI-Format
   repository: https://github.com/mrdvt92/perl-RF-Antenna-Planet-MSI-Format.git
-version: '0.11'
+version: '0.14'

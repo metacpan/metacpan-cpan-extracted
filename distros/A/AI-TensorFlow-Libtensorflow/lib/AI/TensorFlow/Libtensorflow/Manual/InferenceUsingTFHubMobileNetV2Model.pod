@@ -1,0 +1,1160 @@
+# PODNAME: InferenceUsingTFHubMobileNetV2Model
+
+
+## DO NOT EDIT. Generated from notebook/InferenceUsingTFHubMobileNetV2Model.ipynb using ./maint/process-notebook.sh.
+
+use strict;
+use warnings;
+use utf8;
+use constant IN_IPERL => !! $ENV{PERL_IPERL_RUNNING};
+no if IN_IPERL, warnings => 'redefine'; # fewer messages when re-running cells
+
+use feature qw(say state);
+use Syntax::Construct qw(each-array);
+
+use lib::projectroot qw(lib);
+use AI::TensorFlow::Libtensorflow;
+
+use URI ();
+use HTTP::Tiny ();
+use Path::Tiny qw(path);
+
+use File::Which ();
+
+use List::Util ();
+
+use Data::Printer ( output => 'stderr', return_value => 'void', filters => ['PDL'] );
+use Data::Printer::Filter::PDL ();
+use Text::Table::Tiny qw(generate_table);
+
+use Imager;
+
+my $s = AI::TensorFlow::Libtensorflow::Status->New;
+sub AssertOK {
+    die "Status $_[0]: " . $_[0]->Message
+        unless $_[0]->GetCode == AI::TensorFlow::Libtensorflow::Status::OK;
+    return;
+}
+AssertOK($s);
+
+use PDL;
+use AI::TensorFlow::Libtensorflow::DataType qw(FLOAT);
+
+use FFI::Platypus::Memory qw(memcpy);
+use FFI::Platypus::Buffer qw(scalar_to_pointer);
+
+sub FloatPDLTOTFTensor {
+    my ($p) = @_;
+    return AI::TensorFlow::Libtensorflow::Tensor->New(
+        FLOAT, [ reverse $p->dims ], $p->get_dataref, sub { undef $p }
+    );
+}
+
+sub FloatTFTensorToPDL {
+    my ($t) = @_;
+
+    my $pdl = zeros(float,reverse( map $t->Dim($_), 0..$t->NumDims-1 ) );
+
+    memcpy scalar_to_pointer( ${$pdl->get_dataref} ),
+        scalar_to_pointer( ${$t->Data} ),
+        $t->ByteSize;
+    $pdl->upd_data;
+
+    $pdl;
+}
+
+use HTML::Tiny;
+
+sub my_table {
+    my ($data, $cb) = @_;
+    my $h = HTML::Tiny->new;
+    $h->table( { style => 'width: 100%' },
+        [
+            $h->tr(
+                map {
+                    [
+                        $h->td( $cb->($_, $h) )
+                    ]
+                } @$data
+            )
+        ]
+    )
+}
+
+sub show_in_gnuplot {
+    my ($p) = @_;
+    require PDL::Graphics::Gnuplot;
+    PDL::Graphics::Gnuplot::image( square => 1, $p );
+}
+
+# image_size => [width, height] (but usually square images)
+my %model_name_to_params = (
+    mobilenet_v2_100_224 => {
+        handle     => 'https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/5',
+        image_size => [ 224, 224 ],
+    },
+    mobilenet_v2_140_224 => {
+        handle => "https://tfhub.dev/google/imagenet/mobilenet_v2_140_224/classification/5",
+        image_size => [ 224, 224 ],
+    },
+);
+
+my $model_name = 'mobilenet_v2_100_224';
+
+say "Selected model: $model_name : $model_name_to_params{$model_name}{handle}";
+
+my $model_uri = URI->new( $model_name_to_params{$model_name}{handle} );
+$model_uri->query_form( 'tf-hub-format' => 'compressed' );
+my $model_base = substr( $model_uri->path, 1 ) =~ s,/,_,gr;
+my $model_archive_path = "${model_base}.tar.gz";
+
+use constant IMAGENET_LABEL_COUNT_WITH_BG => 1001;
+my $labels_uri = URI->new('https://storage.googleapis.com/download.tensorflow.org/data/ImageNetLabels.txt');
+my $labels_path = ($labels_uri->path_segments)[-1];
+
+my $http = HTTP::Tiny->new;
+
+for my $download ( [ $model_uri  => $model_archive_path ],
+                   [ $labels_uri => $labels_path        ]) {
+    my ($uri, $path) = @$download;
+    say "Downloading $uri to $path";
+    next if -e $path;
+    $http->mirror( $uri, $path );
+}
+
+use Archive::Extract;
+my $ae = Archive::Extract->new( archive => $model_archive_path );
+die "Could not extract archive" unless $ae->extract( to => $model_base );
+
+my $saved_model = path($model_base)->child('saved_model.pb');
+say "Saved model is in $saved_model" if -f $saved_model;
+
+my @labels = path($labels_path)->lines( { chomp => 1 });
+die "Labels should have @{[ IMAGENET_LABEL_COUNT_WITH_BG ]} items"
+    unless @labels == IMAGENET_LABEL_COUNT_WITH_BG;
+say "Got labels: ", join( ", ", List::Util::head(5, @labels) ), ", etc.";
+
+my $opt = AI::TensorFlow::Libtensorflow::SessionOptions->New;
+
+my @tags = ( 'serve' );
+my $graph = AI::TensorFlow::Libtensorflow::Graph->New;
+my $session = AI::TensorFlow::Libtensorflow::Session->LoadFromSavedModel(
+    $opt, undef, $model_base, \@tags, $graph, undef, $s
+);
+AssertOK($s);
+
+if( File::Which::which('saved_model_cli')) {
+    local $ENV{TF_CPP_MIN_LOG_LEVEL} = 3; # quiet the TensorFlow logger for the following command
+    system(qw(saved_model_cli show),
+        qw(--dir)           => $model_base,
+        qw(--tag_set)       => join(',', @tags),
+        qw(--signature_def) => 'serving_default'
+    ) == 0 or die "Could not run saved_model_cli";
+} else {
+    say "Install the tensorflow Python package to get the `saved_model_cli` command.";
+}
+
+my %ops = (
+    in  => $graph->OperationByName('serving_default_inputs'),
+    out => $graph->OperationByName('StatefulPartitionedCall'),
+);
+
+die "Could not get all operations" unless List::Util::all(sub { defined }, values %ops);
+
+my %outputs = map { $_ => [ AI::TensorFlow::Libtensorflow::Output->New( { oper => $ops{$_}, index => 0 } ) ] }
+    keys %ops;
+
+p %outputs;
+
+say "Input: " , $outputs{in}[0];
+say "Output: ", $outputs{out}[0];
+
+my %images_for_test_to_uri = (
+    "tiger" => "https://upload.wikimedia.org/wikipedia/commons/b/b0/Bengal_tiger_%28Panthera_tigris_tigris%29_female_3_crop.jpg",
+    #by Charles James Sharp, CC BY-SA 4.0 <https://creativecommons.org/licenses/by-sa/4.0>, via Wikimedia Commons
+    "bus" => "https://upload.wikimedia.org/wikipedia/commons/6/63/LT_471_%28LTZ_1471%29_Arriva_London_New_Routemaster_%2819522859218%29.jpg",
+    #by Martin49 from London, England, CC BY 2.0 <https://creativecommons.org/licenses/by/2.0>, via Wikimedia Commons
+    "car" => "https://upload.wikimedia.org/wikipedia/commons/4/49/2013-2016_Toyota_Corolla_%28ZRE172R%29_SX_sedan_%282018-09-17%29_01.jpg",
+    #by EurovisionNim, CC BY-SA 4.0 <https://creativecommons.org/licenses/by-sa/4.0>, via Wikimedia Commons
+    "cat" => "https://upload.wikimedia.org/wikipedia/commons/4/4d/Cat_November_2010-1a.jpg",
+    #by Alvesgaspar, CC BY-SA 3.0 <https://creativecommons.org/licenses/by-sa/3.0>, via Wikimedia Commons
+    "dog" => "https://upload.wikimedia.org/wikipedia/commons/archive/a/a9/20090914031557%21Saluki_dog_breed.jpg",
+    #by Craig Pemberton, CC BY-SA 3.0 <https://creativecommons.org/licenses/by-sa/3.0>, via Wikimedia Commons
+    "apple" => "https://upload.wikimedia.org/wikipedia/commons/1/15/Red_Apple.jpg",
+    #by Abhijit Tembhekar from Mumbai, India, CC BY 2.0 <https://creativecommons.org/licenses/by/2.0>, via Wikimedia Commons
+    "banana" => "https://upload.wikimedia.org/wikipedia/commons/1/1c/Bananas_white_background.jpg",
+    #by fir0002  flagstaffotos [at] gmail.com		Canon 20D + Tamron 28-75mm f/2.8, GFDL 1.2 <http://www.gnu.org/licenses/old-licenses/fdl-1.2.html>, via Wikimedia Commons
+    "turtle" => "https://upload.wikimedia.org/wikipedia/commons/8/80/Turtle_golfina_escobilla_oaxaca_mexico_claudio_giovenzana_2010.jpg",
+    #by Claudio Giovenzana, CC BY-SA 3.0 <https://creativecommons.org/licenses/by-sa/3.0>, via Wikimedia Commons
+    "flamingo" => "https://upload.wikimedia.org/wikipedia/commons/b/b8/James_Flamingos_MC.jpg",
+    #by Christian Mehlführer, User:Chmehl, CC BY 3.0 <https://creativecommons.org/licenses/by/3.0>, via Wikimedia Commons
+    "piano" => "https://upload.wikimedia.org/wikipedia/commons/d/da/Steinway_%26_Sons_upright_piano%2C_model_K-132%2C_manufactured_at_Steinway%27s_factory_in_Hamburg%2C_Germany.png",
+    #by "Photo: © Copyright Steinway & Sons", CC BY-SA 3.0 <https://creativecommons.org/licenses/by-sa/3.0>, via Wikimedia Commons
+    "honeycomb" => "https://upload.wikimedia.org/wikipedia/commons/f/f7/Honey_comb.jpg",
+    #by Merdal, CC BY-SA 3.0 <http://creativecommons.org/licenses/by-sa/3.0/>, via Wikimedia Commons
+    "teapot" => "https://upload.wikimedia.org/wikipedia/commons/4/44/Black_tea_pot_cropped.jpg",
+    #by Mendhak, CC BY-SA 2.0 <https://creativecommons.org/licenses/by-sa/2.0>, via Wikimedia Commons
+);
+
+my @image_names = sort keys %images_for_test_to_uri;
+
+
+if( IN_IPERL ) {
+    IPerl->html(
+        my_table( \@image_names, sub {
+            my ($image_name, $h) = @_;
+            (
+                $h->tt($image_name),
+                $h->a( { href => $images_for_test_to_uri{$image_name} },
+                    $h->img({
+                        src => $images_for_test_to_uri{$image_name},
+                        alt => $image_name,
+                        width => '50%',
+                    })
+                ),
+            )
+        })
+    );
+}
+
+sub imager_paste_center_pad {
+    my ($inner, $padded_sz, @rest) = @_;
+
+    my $outer = Imager->new( List::Util::mesh( [qw(xsize ysize)], $padded_sz ),
+        @rest
+    );
+
+    $outer->paste(
+        left => int( ($outer->getwidth  - $inner->getwidth ) / 2 ),
+        top  => int( ($outer->getheight - $inner->getheight) / 2 ),
+        src  => $inner,
+    );
+
+    $outer;
+}
+
+sub imager_scale_to {
+    my ($img, $image_size) = @_;
+    my $rescaled = $img->scale(
+        List::Util::mesh( [qw(xpixels ypixels)], $image_size ),
+        type => 'min',
+        qtype => 'mixing', # 'mixing' seems to work better than 'normal'
+    );
+}
+
+sub load_image_to_pdl {
+    my ($uri, $image_size) = @_;
+
+    my $http = HTTP::Tiny->new;
+    my $response = $http->get( $uri );
+    die "Could not fetch image from $uri" unless $response->{success};
+    say "Downloaded $uri";
+
+    my $img = Imager->new;
+    $img->read( data => $response->{content} );
+
+    my $rescaled = imager_scale_to($img, $image_size);
+
+    say sprintf "Rescaled image from [ %d x %d ] to [ %d x %d ]",
+        $img->getwidth, $img->getheight,
+        $rescaled->getwidth, $rescaled->getheight;
+
+    my $padded = imager_paste_center_pad($rescaled, $image_size,
+        # ARGB fits in 32-bits (uint32_t)
+        channels => 4
+    );
+
+    say sprintf "Padded to [ %d x %d ]", $padded->getwidth, $padded->getheight;
+
+    # Create PDL ndarray from Imager data in-memory.
+    my $data;
+    $padded->write( data => \$data, type => 'raw' )
+        or die "could not write ". $padded->errstr;
+
+    # $data is packed as PDL->dims == [w,h] with ARGB pixels
+    #   $ PDL::howbig(ulong) # 4
+    my $pdl_raw = zeros(ulong, $padded->getwidth, $padded->getheight);
+    ${ $pdl_raw->get_dataref } = $data;
+    $pdl_raw->upd_data;
+
+    # Split uint32_t pixels into first dimension with 3 channels (R,G,B) with values 0-255.
+    my @shifts = map 8*$_, 0..2;
+    my $pdl_channels = $pdl_raw->dummy(0)
+        ->and2(ulong(map 0xFF << $_, @shifts)->slice(':,*,*') )
+        ->shiftright( ulong(@shifts)->slice(':,*,*') )
+        ->byte;
+
+    my $pdl_scaled = (
+            # Scale to [ 0, 1 ].
+            ( $pdl_channels / float(255) )
+        );
+
+    ## flip vertically to see image right way up
+    #show_in_gnuplot( $pdl_channels->slice(':,:,-1:0')         ); #DEBUG
+    #show_in_gnuplot(   $pdl_scaled->slice(':,:,-1:0') * 255.0 ); #DEBUG
+
+    $pdl_scaled;
+}
+
+my @pdl_images = map {
+    load_image_to_pdl(
+        $images_for_test_to_uri{$_},
+        $model_name_to_params{$model_name}{image_size}
+    );
+} @image_names;
+
+my $pdl_image_batched = cat(@pdl_images);
+my $t = FloatPDLTOTFTensor($pdl_image_batched);
+
+p $pdl_image_batched;
+p $t;
+
+my $RunSession = sub {
+    my ($session, $t) = @_;
+    my @outputs_t;
+
+    $session->Run(
+        undef,
+        $outputs{in}, [$t],
+        $outputs{out}, \@outputs_t,
+        undef,
+        undef,
+        $s
+    );
+    AssertOK($s);
+
+    return $outputs_t[0];
+};
+
+say "Warming up the model";
+use PDL::GSL::RNG;
+my $rng = PDL::GSL::RNG->new('default');
+my $image_size = $model_name_to_params{$model_name}{image_size};
+my $warmup_input = zeros(float, 3, @$image_size, 1 );
+$rng->get_uniform($warmup_input);
+
+p $RunSession->($session, FloatPDLTOTFTensor($warmup_input));
+
+my $output_pdl_batched = FloatTFTensorToPDL($RunSession->($session, $t));
+my $softmax = sub { ( map $_/sumover($_)->dummy(0), exp($_[0]) )[0] };
+my $probabilities_batched = $softmax->($output_pdl_batched);
+p $probabilities_batched;
+
+my $N = 5; # number to select
+
+my $top_batched = $probabilities_batched->qsorti->slice([-1, -$N]);
+
+my @top_lists   = dog($top_batched);
+
+my $includes_background_class = $probabilities_batched->dim(0) == IMAGENET_LABEL_COUNT_WITH_BG;
+
+if( IN_IPERL ) {
+    my $html = IPerl->html(
+        my_table( [0..$#image_names], sub {
+            my ($batch_idx, $h) = @_;
+            my $image_name = $image_names[$batch_idx];
+            my @top_for_image = $top_lists[$batch_idx]->list;
+            (
+                    $h->tt($image_name),
+                    $h->a( { href => $images_for_test_to_uri{$image_name} },
+                        $h->img({
+                            src => $images_for_test_to_uri{$image_name},
+                            alt => $image_name,
+                            width => '50%',
+                        })
+                    ),
+                    do {
+                        my @tr;
+                        push @tr, [ $h->th('Rank', 'Label No', 'Label', 'Prob') ];
+                        while( my ($i, $label_index) = each @top_for_image ) {
+                            my $class_index = $includes_background_class ? $label_index : $label_index + 1;
+                            push @tr, [ $h->td(
+                                    $i + 1,
+                                    $class_index,
+                                    $labels[$class_index],
+                                    $probabilities_batched->at($label_index,$batch_idx),
+                            ) ];
+
+                        }
+                        $h->table([$h->tr(@tr)])
+                    },
+                )
+        })
+    );
+    IPerl->display($html);
+} else {
+    for my $batch_idx (0..$#image_names) {
+        my $image_name = $image_names[$batch_idx];
+        my @top_for_image = $top_lists[$batch_idx]->list;
+        my @td;
+        say "Image name: `$image_name`";
+        my $header = [ ('Rank', 'Label No', 'Label', 'Prob') ];
+        my @rows;
+        while( my ($i, $label_index) = each @top_for_image ) {
+            my $class_index = $includes_background_class ? $label_index : $label_index + 1;
+            push @rows, [ (
+                    $i + 1,
+                    $class_index,
+                    $labels[$class_index],
+                    $probabilities_batched->at($label_index,$batch_idx),
+            ) ];
+        }
+        say generate_table( rows => [ $header, @rows ], header_row => 1 );
+        print "\n";
+    }
+}
+
+my $p_approx_batched = $probabilities_batched->sumover->approx(1, 1e-5);
+p $p_approx_batched;
+say "All probabilities sum up to approximately 1" if $p_approx_batched->all->sclr;
+
+my @solid_channel_uris = (
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Solid_red.svg/480px-Solid_red.svg.png',
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Green_00FF00_9x9.svg/480px-Green_00FF00_9x9.svg.png',
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Solid_blue.svg/480px-Solid_blue.svg.png',
+);
+undef;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+InferenceUsingTFHubMobileNetV2Model - Using TensorFlow to do image classification using a pre-trained model
+
+=head1 SYNOPSIS
+
+The following tutorial is based on the L<Image Classification with TensorFlow Hub notebook|https://github.com/tensorflow/hub/blob/master/examples/colab/image_classification.ipynb>. It uses a pre-trained model based on the I<MobileNet V2> architecture trained on the I<Imagenet> dataset. Running the code requires an Internet connection to download the model (from Google servers) and testing data (from Wikimedia servers).
+
+Please look at the L<SECURITY note|https://github.com/tensorflow/models/blob/master/SECURITY.md> regarding running models as models are programs. If you would like to visualise a model, you can use L<Netron|https://github.com/lutzroeder/netron> on the C<.pb> file.
+
+=head1 COLOPHON
+
+The following document is either a POD file which can additionally be run as a Perl script or a Jupyter Notebook which can be run in L<IPerl|https://p3rl.org/Devel::IPerl> (viewable online at L<nbviewer|https://nbviewer.org/github/EntropyOrg/perl-AI-TensorFlow-Libtensorflow/blob/master/notebook/InferenceUsingTFHubMobileNetV2Model.ipynb>). If you are reading this as POD, there should be a generated list of Perl dependencies in the L<CPANFILE|/CPANFILE> section.
+
+If you are running the code, you may optionally install the L<C<tensorflow> Python package|https://www.tensorflow.org/install/pip> in order to access the C<saved_model_cli> command, but this is only used for informational purposes.
+
+=head1 TUTORIAL
+
+=head2 Load the library
+
+First, we need to load the C<AI::TensorFlow::Libtensorflow> library and more helpers. We then create an C<AI::TensorFlow::Libtensorflow::Status> object and helper function to make sure that the calls to the C<libtensorflow> C library are working properly.
+
+  use strict;
+  use warnings;
+  use utf8;
+  use constant IN_IPERL => !! $ENV{PERL_IPERL_RUNNING};
+  no if IN_IPERL, warnings => 'redefine'; # fewer messages when re-running cells
+  
+  use feature qw(say state);
+  use Syntax::Construct qw(each-array);
+  
+  use lib::projectroot qw(lib);
+  use AI::TensorFlow::Libtensorflow;
+  
+  use URI ();
+  use HTTP::Tiny ();
+  use Path::Tiny qw(path);
+  
+  use File::Which ();
+  
+  use List::Util ();
+  
+  use Data::Printer ( output => 'stderr', return_value => 'void', filters => ['PDL'] );
+  use Data::Printer::Filter::PDL ();
+  use Text::Table::Tiny qw(generate_table);
+  
+  use Imager;
+  
+  my $s = AI::TensorFlow::Libtensorflow::Status->New;
+  sub AssertOK {
+      die "Status $_[0]: " . $_[0]->Message
+          unless $_[0]->GetCode == AI::TensorFlow::Libtensorflow::Status::OK;
+      return;
+  }
+  AssertOK($s);
+
+In this notebook, we will use C<PDL> to store and manipulate the ndarray data before converting it to a C<TFTensor>. The following functions help with copying the data back and forth between the two object types.
+
+An important thing to note about the dimensions used by TensorFlow's TFTensors when compared with PDL is that the dimension lists are reversed. Consider a binary raster image with width W and height H stored in L<row-major format|https://en.wikipedia.org/wiki/Row-_and_column-major_order> (meaning the pixels in the first row are stored next to each other followed by the second row and so on). With PDL, the dimension list for this will be C<[ W H ]> and for TFTensor the dimension list will be C<[ H W ]>. TensorFlow uses the same convention for the dimension list as NumPy with the faster changing dimensions at the end of the dimension list while PDL is the opposite (see L<Dima Kogan's library and talk|https://github.com/dkogan/numpysane> for more on this).
+
+This difference will be explained more concretely further in the tutorial.
+
+Future work will provide an API for more convenient wrappers which will provide an option to either copy or share the same data (if possible).
+
+  use PDL;
+  use AI::TensorFlow::Libtensorflow::DataType qw(FLOAT);
+  
+  use FFI::Platypus::Memory qw(memcpy);
+  use FFI::Platypus::Buffer qw(scalar_to_pointer);
+  
+  sub FloatPDLTOTFTensor {
+      my ($p) = @_;
+      return AI::TensorFlow::Libtensorflow::Tensor->New(
+          FLOAT, [ reverse $p->dims ], $p->get_dataref, sub { undef $p }
+      );
+  }
+  
+  sub FloatTFTensorToPDL {
+      my ($t) = @_;
+  
+      my $pdl = zeros(float,reverse( map $t->Dim($_), 0..$t->NumDims-1 ) );
+  
+      memcpy scalar_to_pointer( ${$pdl->get_dataref} ),
+          scalar_to_pointer( ${$t->Data} ),
+          $t->ByteSize;
+      $pdl->upd_data;
+  
+      $pdl;
+  }
+
+The following is just a small helper to generate an HTML C<<< <table> >>> for output in C<IPerl>.
+
+  use HTML::Tiny;
+  
+  sub my_table {
+      my ($data, $cb) = @_;
+      my $h = HTML::Tiny->new;
+      $h->table( { style => 'width: 100%' },
+          [
+              $h->tr(
+                  map {
+                      [
+                          $h->td( $cb->($_, $h) )
+                      ]
+                  } @$data
+              )
+          ]
+      )
+  }
+
+This is a helper to display images in Gnuplot for debugging, but those debugging lines are commented out.
+
+  sub show_in_gnuplot {
+      my ($p) = @_;
+      require PDL::Graphics::Gnuplot;
+      PDL::Graphics::Gnuplot::image( square => 1, $p );
+  }
+
+=head2 Fetch the model and labels
+
+We are going to use an L<image classification model|https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/5> from TensorFlow Hub based on the MobileNet V2 architecture. We download both the model and ImageNet classification labels.
+
+  # image_size => [width, height] (but usually square images)
+  my %model_name_to_params = (
+      mobilenet_v2_100_224 => {
+          handle     => 'https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/5',
+          image_size => [ 224, 224 ],
+      },
+      mobilenet_v2_140_224 => {
+          handle => "https://tfhub.dev/google/imagenet/mobilenet_v2_140_224/classification/5",
+          image_size => [ 224, 224 ],
+      },
+  );
+  
+  my $model_name = 'mobilenet_v2_100_224';
+  
+  say "Selected model: $model_name : $model_name_to_params{$model_name}{handle}";
+
+B<STREAM (STDOUT)>:
+
+  Selected model: mobilenet_v2_100_224 : https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/5
+
+B<RESULT>:
+
+  1
+
+We download the model and labels to the current directory then extract the model to a folder with the name given in C<$model_base>.
+
+  my $model_uri = URI->new( $model_name_to_params{$model_name}{handle} );
+  $model_uri->query_form( 'tf-hub-format' => 'compressed' );
+  my $model_base = substr( $model_uri->path, 1 ) =~ s,/,_,gr;
+  my $model_archive_path = "${model_base}.tar.gz";
+  
+  use constant IMAGENET_LABEL_COUNT_WITH_BG => 1001;
+  my $labels_uri = URI->new('https://storage.googleapis.com/download.tensorflow.org/data/ImageNetLabels.txt');
+  my $labels_path = ($labels_uri->path_segments)[-1];
+  
+  my $http = HTTP::Tiny->new;
+  
+  for my $download ( [ $model_uri  => $model_archive_path ],
+                     [ $labels_uri => $labels_path        ]) {
+      my ($uri, $path) = @$download;
+      say "Downloading $uri to $path";
+      next if -e $path;
+      $http->mirror( $uri, $path );
+  }
+  
+  use Archive::Extract;
+  my $ae = Archive::Extract->new( archive => $model_archive_path );
+  die "Could not extract archive" unless $ae->extract( to => $model_base );
+  
+  my $saved_model = path($model_base)->child('saved_model.pb');
+  say "Saved model is in $saved_model" if -f $saved_model;
+  
+  my @labels = path($labels_path)->lines( { chomp => 1 });
+  die "Labels should have @{[ IMAGENET_LABEL_COUNT_WITH_BG ]} items"
+      unless @labels == IMAGENET_LABEL_COUNT_WITH_BG;
+  say "Got labels: ", join( ", ", List::Util::head(5, @labels) ), ", etc.";
+
+B<STREAM (STDOUT)>:
+
+  Downloading https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/5?tf-hub-format=compressed to google_imagenet_mobilenet_v2_100_224_classification_5.tar.gz
+  Downloading https://storage.googleapis.com/download.tensorflow.org/data/ImageNetLabels.txt to ImageNetLabels.txt
+  Saved model is in google_imagenet_mobilenet_v2_100_224_classification_5/saved_model.pb
+  Got labels: background, tench, goldfish, great white shark, tiger shark, etc.
+
+B<RESULT>:
+
+  1
+
+=head2 Load the model and session
+
+Now we can load the model from that folder with the tag set C<[ 'serve' ]> by using the C<LoadFromSavedModel> constructor to create a C<::Graph> and a C<::Session> for that graph.
+
+  my $opt = AI::TensorFlow::Libtensorflow::SessionOptions->New;
+  
+  my @tags = ( 'serve' );
+  my $graph = AI::TensorFlow::Libtensorflow::Graph->New;
+  my $session = AI::TensorFlow::Libtensorflow::Session->LoadFromSavedModel(
+      $opt, undef, $model_base, \@tags, $graph, undef, $s
+  );
+  AssertOK($s);
+
+B<STREAM (STDERR)>:
+
+  2022-12-21 15:44:50.158520: I tensorflow/cc/saved_model/reader.cc:45] Reading SavedModel from: google_imagenet_mobilenet_v2_100_224_classification_5
+  2022-12-21 15:44:50.165765: I tensorflow/cc/saved_model/reader.cc:89] Reading meta graph with tags { serve }
+  2022-12-21 15:44:50.165804: I tensorflow/cc/saved_model/reader.cc:130] Reading SavedModel debug info (if present) from: google_imagenet_mobilenet_v2_100_224_classification_5
+  2022-12-21 15:44:50.166232: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F AVX512_VNNI FMA
+  To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+  2022-12-21 15:44:50.193676: I tensorflow/compiler/mlir/mlir_graph_optimization_pass.cc:357] MLIR V1 optimization pass is not enabled
+  2022-12-21 15:44:50.202488: I tensorflow/cc/saved_model/loader.cc:229] Restoring SavedModel bundle.
+  2022-12-21 15:44:50.523651: I tensorflow/cc/saved_model/loader.cc:213] Running initialization op on SavedModel bundle at path: google_imagenet_mobilenet_v2_100_224_classification_5
+  2022-12-21 15:44:50.593023: I tensorflow/cc/saved_model/loader.cc:305] SavedModel load for tags { serve }; Status: success: OK. Took 434509 microseconds.
+
+We can examine what computations are contained in the graph in terms of the names of the inputs and outputs of an operation found in the graph by running C<saved_model_cli>.
+
+  if( File::Which::which('saved_model_cli')) {
+      local $ENV{TF_CPP_MIN_LOG_LEVEL} = 3; # quiet the TensorFlow logger for the following command
+      system(qw(saved_model_cli show),
+          qw(--dir)           => $model_base,
+          qw(--tag_set)       => join(',', @tags),
+          qw(--signature_def) => 'serving_default'
+      ) == 0 or die "Could not run saved_model_cli";
+  } else {
+      say "Install the tensorflow Python package to get the `saved_model_cli` command.";
+  }
+
+B<STREAM (STDOUT)>:
+
+  The given SavedModel SignatureDef contains the following input(s):
+    inputs['inputs'] tensor_info:
+        dtype: DT_FLOAT
+        shape: (-1, 224, 224, 3)
+        name: serving_default_inputs:0
+  The given SavedModel SignatureDef contains the following output(s):
+    outputs['logits'] tensor_info:
+        dtype: DT_FLOAT
+        shape: (-1, 1001)
+        name: StatefulPartitionedCall:0
+  Method name is: tensorflow/serving/predict
+
+B<RESULT>:
+
+  1
+
+The above C<saved_model_cli> output shows that the model input is at C<serving_default_inputs:0> which means the operation named C<serving_default_inputs> at index C<0> and the output is at C<StatefulPartitionedCall:0> which means the operation named C<StatefulPartitionedCall> at index C<0>.
+
+It also shows the type and shape of the C<TFTensor>s for those inputs and outputs. Together this is known as a signature.
+
+For the C<input>, we have C<(-1, 224, 224, 3)> which is a L<common input image specification for TensorFlow Hub|https://www.tensorflow.org/hub/common_signatures/images#input>. This is known as C<channels_last> (or C<NHWC>) layout where the TensorFlow dimension list is C<[batch_size, height, width, 3]> where 3 represents the RGB channels where each element is normalised to the range C<[0, 1]>. The C<-1> in the C<batch_size> dimension represents an unknown dimension size so the model can accept any number of images. Note that the C<TFTensor> dimension list has the dimension that changes the fastest in memory at the end of the list, so the C<float32_t> channels for a single pixel as stored next to each other followed by the next pixel in the same row.
+
+For the C<output>, we have C<(-1, 1001)> which is C<[batch_size, num_classes]> where the elements are scores that the image received for that ImageNet class.
+
+So let's use those names to create our C<::Output> C<ArrayRef>s.
+
+  my %ops = (
+      in  => $graph->OperationByName('serving_default_inputs'),
+      out => $graph->OperationByName('StatefulPartitionedCall'),
+  );
+  
+  die "Could not get all operations" unless List::Util::all(sub { defined }, values %ops);
+  
+  my %outputs = map { $_ => [ AI::TensorFlow::Libtensorflow::Output->New( { oper => $ops{$_}, index => 0 } ) ] }
+      keys %ops;
+  
+  p %outputs;
+  
+  say "Input: " , $outputs{in}[0];
+  say "Output: ", $outputs{out}[0];
+
+B<STREAM (STDOUT)>:
+
+  Input: serving_default_inputs:0
+  Output: StatefulPartitionedCall:0
+
+B<STREAM (STDERR)>:
+
+=for html <span style="display:inline-block;margin-left:1em;"><pre style="display: block"><code><span style="color: #33ccff;">{</span><span style="">
+    </span><span style="color: #6666cc;">in</span><span style=""> </span><span style="color: #33ccff;">   </span><span style="color: #33ccff;">[</span><span style="">
+        </span><span style="color: #9999cc;">[0] </span><span style="color: #cc66cc;">AI::TensorFlow::Libtensorflow::Output</span><span style=""> </span><span style="color: #33ccff;">{</span><span style="">
+                </span><span style="color: #6666cc;">index</span><span style="color: #33ccff;">   </span><span style="color: #ff6633;">0</span><span style="color: #33ccff;">,</span><span style="">
+                </span><span style="color: #6666cc;">oper</span><span style=""> </span><span style="color: #33ccff;">   </span><span style="color: #cc66cc;">AI::TensorFlow::Libtensorflow::Operation</span><span style=""> </span><span style="color: #33ccff;">{</span><span style="">
+                    </span><span style="color: #6666cc;">Name</span><span style="">      </span><span style="color: #33ccff;">   </span><span style="color: #33ccff;">&quot;</span><span style="color: #669933;">serving_default_inputs</span><span style="color: #33ccff;">&quot;</span><span style="color: #33ccff;">,</span><span style="">
+                    </span><span style="color: #6666cc;">NumInputs</span><span style=""> </span><span style="color: #33ccff;">   </span><span style="color: #ff6633;">0</span><span style="color: #33ccff;">,</span><span style="">
+                    </span><span style="color: #6666cc;">NumOutputs</span><span style="color: #33ccff;">   </span><span style="color: #ff6633;">1</span><span style="color: #33ccff;">,</span><span style="">
+                    </span><span style="color: #6666cc;">OpType</span><span style="">    </span><span style="color: #33ccff;">   </span><span style="color: #33ccff;">&quot;</span><span style="color: #669933;">Placeholder</span><span style="color: #33ccff;">&quot;</span><span style="">
+                </span><span style="color: #33ccff;">}</span><span style="">
+            </span><span style="color: #33ccff;">}</span><span style="">
+    </span><span style="color: #33ccff;">]</span><span style="color: #33ccff;">,</span><span style="">
+    </span><span style="color: #6666cc;">out</span><span style="color: #33ccff;">   </span><span style="color: #33ccff;">[</span><span style="">
+        </span><span style="color: #9999cc;">[0] </span><span style="color: #cc66cc;">AI::TensorFlow::Libtensorflow::Output</span><span style=""> </span><span style="color: #33ccff;">{</span><span style="">
+                </span><span style="color: #6666cc;">index</span><span style="color: #33ccff;">   </span><span style="color: #ff6633;">0</span><span style="color: #33ccff;">,</span><span style="">
+                </span><span style="color: #6666cc;">oper</span><span style=""> </span><span style="color: #33ccff;">   </span><span style="color: #cc66cc;">AI::TensorFlow::Libtensorflow::Operation</span><span style=""> </span><span style="color: #33ccff;">{</span><span style="">
+                    </span><span style="color: #6666cc;">Name</span><span style="">      </span><span style="color: #33ccff;">   </span><span style="color: #33ccff;">&quot;</span><span style="color: #669933;">StatefulPartitionedCall</span><span style="color: #33ccff;">&quot;</span><span style="color: #33ccff;">,</span><span style="">
+                    </span><span style="color: #6666cc;">NumInputs</span><span style=""> </span><span style="color: #33ccff;">   </span><span style="color: #ff6633;">263</span><span style="color: #33ccff;">,</span><span style="">
+                    </span><span style="color: #6666cc;">NumOutputs</span><span style="color: #33ccff;">   </span><span style="color: #ff6633;">1</span><span style="color: #33ccff;">,</span><span style="">
+                    </span><span style="color: #6666cc;">OpType</span><span style="">    </span><span style="color: #33ccff;">   </span><span style="color: #33ccff;">&quot;</span><span style="color: #669933;">StatefulPartitionedCall</span><span style="color: #33ccff;">&quot;</span><span style="">
+                </span><span style="color: #33ccff;">}</span><span style="">
+            </span><span style="color: #33ccff;">}</span><span style="">
+    </span><span style="color: #33ccff;">]</span><span style="">
+</span><span style="color: #33ccff;">}</span><span style="">
+</span></code></pre></span>
+
+B<RESULT>:
+
+  1
+
+Now we can get the following testing images from Wikimedia.
+
+  my %images_for_test_to_uri = (
+      "tiger" => "https://upload.wikimedia.org/wikipedia/commons/b/b0/Bengal_tiger_%28Panthera_tigris_tigris%29_female_3_crop.jpg",
+      #by Charles James Sharp, CC BY-SA 4.0 <https://creativecommons.org/licenses/by-sa/4.0>, via Wikimedia Commons
+      "bus" => "https://upload.wikimedia.org/wikipedia/commons/6/63/LT_471_%28LTZ_1471%29_Arriva_London_New_Routemaster_%2819522859218%29.jpg",
+      #by Martin49 from London, England, CC BY 2.0 <https://creativecommons.org/licenses/by/2.0>, via Wikimedia Commons
+      "car" => "https://upload.wikimedia.org/wikipedia/commons/4/49/2013-2016_Toyota_Corolla_%28ZRE172R%29_SX_sedan_%282018-09-17%29_01.jpg",
+      #by EurovisionNim, CC BY-SA 4.0 <https://creativecommons.org/licenses/by-sa/4.0>, via Wikimedia Commons
+      "cat" => "https://upload.wikimedia.org/wikipedia/commons/4/4d/Cat_November_2010-1a.jpg",
+      #by Alvesgaspar, CC BY-SA 3.0 <https://creativecommons.org/licenses/by-sa/3.0>, via Wikimedia Commons
+      "dog" => "https://upload.wikimedia.org/wikipedia/commons/archive/a/a9/20090914031557%21Saluki_dog_breed.jpg",
+      #by Craig Pemberton, CC BY-SA 3.0 <https://creativecommons.org/licenses/by-sa/3.0>, via Wikimedia Commons
+      "apple" => "https://upload.wikimedia.org/wikipedia/commons/1/15/Red_Apple.jpg",
+      #by Abhijit Tembhekar from Mumbai, India, CC BY 2.0 <https://creativecommons.org/licenses/by/2.0>, via Wikimedia Commons
+      "banana" => "https://upload.wikimedia.org/wikipedia/commons/1/1c/Bananas_white_background.jpg",
+      #by fir0002  flagstaffotos [at] gmail.com		Canon 20D + Tamron 28-75mm f/2.8, GFDL 1.2 <http://www.gnu.org/licenses/old-licenses/fdl-1.2.html>, via Wikimedia Commons
+      "turtle" => "https://upload.wikimedia.org/wikipedia/commons/8/80/Turtle_golfina_escobilla_oaxaca_mexico_claudio_giovenzana_2010.jpg",
+      #by Claudio Giovenzana, CC BY-SA 3.0 <https://creativecommons.org/licenses/by-sa/3.0>, via Wikimedia Commons
+      "flamingo" => "https://upload.wikimedia.org/wikipedia/commons/b/b8/James_Flamingos_MC.jpg",
+      #by Christian Mehlführer, User:Chmehl, CC BY 3.0 <https://creativecommons.org/licenses/by/3.0>, via Wikimedia Commons
+      "piano" => "https://upload.wikimedia.org/wikipedia/commons/d/da/Steinway_%26_Sons_upright_piano%2C_model_K-132%2C_manufactured_at_Steinway%27s_factory_in_Hamburg%2C_Germany.png",
+      #by "Photo: © Copyright Steinway & Sons", CC BY-SA 3.0 <https://creativecommons.org/licenses/by-sa/3.0>, via Wikimedia Commons
+      "honeycomb" => "https://upload.wikimedia.org/wikipedia/commons/f/f7/Honey_comb.jpg",
+      #by Merdal, CC BY-SA 3.0 <http://creativecommons.org/licenses/by-sa/3.0/>, via Wikimedia Commons
+      "teapot" => "https://upload.wikimedia.org/wikipedia/commons/4/44/Black_tea_pot_cropped.jpg",
+      #by Mendhak, CC BY-SA 2.0 <https://creativecommons.org/licenses/by-sa/2.0>, via Wikimedia Commons
+  );
+  
+  my @image_names = sort keys %images_for_test_to_uri;
+  
+  
+  if( IN_IPERL ) {
+      IPerl->html(
+          my_table( \@image_names, sub {
+              my ($image_name, $h) = @_;
+              (
+                  $h->tt($image_name),
+                  $h->a( { href => $images_for_test_to_uri{$image_name} },
+                      $h->img({
+                          src => $images_for_test_to_uri{$image_name},
+                          alt => $image_name,
+                          width => '50%',
+                      })
+                  ),
+              )
+          })
+      );
+  }
+
+B<DISPLAY>:
+
+=for html <span style="display:inline-block;margin-left:1em;"><p><table style="width: 100%"><tr><td><tt>apple</tt></td><td><a href="https://upload.wikimedia.org/wikipedia/commons/1/15/Red_Apple.jpg"><img alt="apple" src="https://upload.wikimedia.org/wikipedia/commons/1/15/Red_Apple.jpg" width="50%" /></a></td></tr><tr><td><tt>banana</tt></td><td><a href="https://upload.wikimedia.org/wikipedia/commons/1/1c/Bananas_white_background.jpg"><img alt="banana" src="https://upload.wikimedia.org/wikipedia/commons/1/1c/Bananas_white_background.jpg" width="50%" /></a></td></tr><tr><td><tt>bus</tt></td><td><a href="https://upload.wikimedia.org/wikipedia/commons/6/63/LT_471_%28LTZ_1471%29_Arriva_London_New_Routemaster_%2819522859218%29.jpg"><img alt="bus" src="https://upload.wikimedia.org/wikipedia/commons/6/63/LT_471_%28LTZ_1471%29_Arriva_London_New_Routemaster_%2819522859218%29.jpg" width="50%" /></a></td></tr><tr><td><tt>car</tt></td><td><a href="https://upload.wikimedia.org/wikipedia/commons/4/49/2013-2016_Toyota_Corolla_%28ZRE172R%29_SX_sedan_%282018-09-17%29_01.jpg"><img alt="car" src="https://upload.wikimedia.org/wikipedia/commons/4/49/2013-2016_Toyota_Corolla_%28ZRE172R%29_SX_sedan_%282018-09-17%29_01.jpg" width="50%" /></a></td></tr><tr><td><tt>cat</tt></td><td><a href="https://upload.wikimedia.org/wikipedia/commons/4/4d/Cat_November_2010-1a.jpg"><img alt="cat" src="https://upload.wikimedia.org/wikipedia/commons/4/4d/Cat_November_2010-1a.jpg" width="50%" /></a></td></tr><tr><td><tt>dog</tt></td><td><a href="https://upload.wikimedia.org/wikipedia/commons/archive/a/a9/20090914031557%21Saluki_dog_breed.jpg"><img alt="dog" src="https://upload.wikimedia.org/wikipedia/commons/archive/a/a9/20090914031557%21Saluki_dog_breed.jpg" width="50%" /></a></td></tr><tr><td><tt>flamingo</tt></td><td><a href="https://upload.wikimedia.org/wikipedia/commons/b/b8/James_Flamingos_MC.jpg"><img alt="flamingo" src="https://upload.wikimedia.org/wikipedia/commons/b/b8/James_Flamingos_MC.jpg" width="50%" /></a></td></tr><tr><td><tt>honeycomb</tt></td><td><a href="https://upload.wikimedia.org/wikipedia/commons/f/f7/Honey_comb.jpg"><img alt="honeycomb" src="https://upload.wikimedia.org/wikipedia/commons/f/f7/Honey_comb.jpg" width="50%" /></a></td></tr><tr><td><tt>piano</tt></td><td><a href="https://upload.wikimedia.org/wikipedia/commons/d/da/Steinway_%26_Sons_upright_piano%2C_model_K-132%2C_manufactured_at_Steinway%27s_factory_in_Hamburg%2C_Germany.png"><img alt="piano" src="https://upload.wikimedia.org/wikipedia/commons/d/da/Steinway_%26_Sons_upright_piano%2C_model_K-132%2C_manufactured_at_Steinway%27s_factory_in_Hamburg%2C_Germany.png" width="50%" /></a></td></tr><tr><td><tt>teapot</tt></td><td><a href="https://upload.wikimedia.org/wikipedia/commons/4/44/Black_tea_pot_cropped.jpg"><img alt="teapot" src="https://upload.wikimedia.org/wikipedia/commons/4/44/Black_tea_pot_cropped.jpg" width="50%" /></a></td></tr><tr><td><tt>tiger</tt></td><td><a href="https://upload.wikimedia.org/wikipedia/commons/b/b0/Bengal_tiger_%28Panthera_tigris_tigris%29_female_3_crop.jpg"><img alt="tiger" src="https://upload.wikimedia.org/wikipedia/commons/b/b0/Bengal_tiger_%28Panthera_tigris_tigris%29_female_3_crop.jpg" width="50%" /></a></td></tr><tr><td><tt>turtle</tt></td><td><a href="https://upload.wikimedia.org/wikipedia/commons/8/80/Turtle_golfina_escobilla_oaxaca_mexico_claudio_giovenzana_2010.jpg"><img alt="turtle" src="https://upload.wikimedia.org/wikipedia/commons/8/80/Turtle_golfina_escobilla_oaxaca_mexico_claudio_giovenzana_2010.jpg" width="50%" /></a></td></tr></table></p></span>
+
+=head2 Download the test images and transform them into suitable input data
+
+We now fetch these images and prepare them to be the in the needed format by using C<Imager> to resize and add padding. Then we turn the C<Imager> data into a C<PDL> ndarray. Since the C<Imager> data is stored as 32-bits with 4 channels in the order C<ARGB>, we create an C<uint32_t> PDL ndarray and use bit manipulation to create a C<uint8_t> ndarray (which gives a PDL dimension list that starts with 3 for the RGB channels). Then we create a C<float32_t> ndarray by normalising the values from C<[0, 1]> as the model specifies.
+
+We then take all the PDL ndarrays and concatenate them. Again, note that the dimension lists for the PDL ndarray and the TFTensor are reversed.
+
+  sub imager_paste_center_pad {
+      my ($inner, $padded_sz, @rest) = @_;
+  
+      my $outer = Imager->new( List::Util::mesh( [qw(xsize ysize)], $padded_sz ),
+          @rest
+      );
+  
+      $outer->paste(
+          left => int( ($outer->getwidth  - $inner->getwidth ) / 2 ),
+          top  => int( ($outer->getheight - $inner->getheight) / 2 ),
+          src  => $inner,
+      );
+  
+      $outer;
+  }
+  
+  sub imager_scale_to {
+      my ($img, $image_size) = @_;
+      my $rescaled = $img->scale(
+          List::Util::mesh( [qw(xpixels ypixels)], $image_size ),
+          type => 'min',
+          qtype => 'mixing', # 'mixing' seems to work better than 'normal'
+      );
+  }
+  
+  sub load_image_to_pdl {
+      my ($uri, $image_size) = @_;
+  
+      my $http = HTTP::Tiny->new;
+      my $response = $http->get( $uri );
+      die "Could not fetch image from $uri" unless $response->{success};
+      say "Downloaded $uri";
+  
+      my $img = Imager->new;
+      $img->read( data => $response->{content} );
+  
+      my $rescaled = imager_scale_to($img, $image_size);
+  
+      say sprintf "Rescaled image from [ %d x %d ] to [ %d x %d ]",
+          $img->getwidth, $img->getheight,
+          $rescaled->getwidth, $rescaled->getheight;
+  
+      my $padded = imager_paste_center_pad($rescaled, $image_size,
+          # ARGB fits in 32-bits (uint32_t)
+          channels => 4
+      );
+  
+      say sprintf "Padded to [ %d x %d ]", $padded->getwidth, $padded->getheight;
+  
+      # Create PDL ndarray from Imager data in-memory.
+      my $data;
+      $padded->write( data => \$data, type => 'raw' )
+          or die "could not write ". $padded->errstr;
+  
+      # $data is packed as PDL->dims == [w,h] with ARGB pixels
+      #   $ PDL::howbig(ulong) # 4
+      my $pdl_raw = zeros(ulong, $padded->getwidth, $padded->getheight);
+      ${ $pdl_raw->get_dataref } = $data;
+      $pdl_raw->upd_data;
+  
+      # Split uint32_t pixels into first dimension with 3 channels (R,G,B) with values 0-255.
+      my @shifts = map 8*$_, 0..2;
+      my $pdl_channels = $pdl_raw->dummy(0)
+          ->and2(ulong(map 0xFF << $_, @shifts)->slice(':,*,*') )
+          ->shiftright( ulong(@shifts)->slice(':,*,*') )
+          ->byte;
+  
+      my $pdl_scaled = (
+              # Scale to [ 0, 1 ].
+              ( $pdl_channels / float(255) )
+          );
+  
+      ## flip vertically to see image right way up
+      #show_in_gnuplot( $pdl_channels->slice(':,:,-1:0')         ); #DEBUG
+      #show_in_gnuplot(   $pdl_scaled->slice(':,:,-1:0') * 255.0 ); #DEBUG
+  
+      $pdl_scaled;
+  }
+  
+  my @pdl_images = map {
+      load_image_to_pdl(
+          $images_for_test_to_uri{$_},
+          $model_name_to_params{$model_name}{image_size}
+      );
+  } @image_names;
+  
+  my $pdl_image_batched = cat(@pdl_images);
+  my $t = FloatPDLTOTFTensor($pdl_image_batched);
+  
+  p $pdl_image_batched;
+  p $t;
+
+B<STREAM (STDOUT)>:
+
+  Downloaded https://upload.wikimedia.org/wikipedia/commons/1/15/Red_Apple.jpg
+  Rescaled image from [ 2418 x 2192 ] to [ 224 x 203 ]
+  Padded to [ 224 x 224 ]
+  Downloaded https://upload.wikimedia.org/wikipedia/commons/1/1c/Bananas_white_background.jpg
+  Rescaled image from [ 1600 x 1067 ] to [ 224 x 149 ]
+  Padded to [ 224 x 224 ]
+  Downloaded https://upload.wikimedia.org/wikipedia/commons/6/63/LT_471_%28LTZ_1471%29_Arriva_London_New_Routemaster_%2819522859218%29.jpg
+  Rescaled image from [ 3840 x 2560 ] to [ 224 x 149 ]
+  Padded to [ 224 x 224 ]
+  Downloaded https://upload.wikimedia.org/wikipedia/commons/4/49/2013-2016_Toyota_Corolla_%28ZRE172R%29_SX_sedan_%282018-09-17%29_01.jpg
+  Rescaled image from [ 4152 x 2252 ] to [ 224 x 121 ]
+  Padded to [ 224 x 224 ]
+  Downloaded https://upload.wikimedia.org/wikipedia/commons/4/4d/Cat_November_2010-1a.jpg
+  Rescaled image from [ 1795 x 2397 ] to [ 168 x 224 ]
+  Padded to [ 224 x 224 ]
+  Downloaded https://upload.wikimedia.org/wikipedia/commons/archive/a/a9/20090914031557%21Saluki_dog_breed.jpg
+  Rescaled image from [ 543 x 523 ] to [ 224 x 216 ]
+  Padded to [ 224 x 224 ]
+  Downloaded https://upload.wikimedia.org/wikipedia/commons/b/b8/James_Flamingos_MC.jpg
+  Rescaled image from [ 3000 x 1999 ] to [ 224 x 149 ]
+  Padded to [ 224 x 224 ]
+  Downloaded https://upload.wikimedia.org/wikipedia/commons/f/f7/Honey_comb.jpg
+  Rescaled image from [ 800 x 600 ] to [ 224 x 168 ]
+  Padded to [ 224 x 224 ]
+  Downloaded https://upload.wikimedia.org/wikipedia/commons/d/da/Steinway_%26_Sons_upright_piano%2C_model_K-132%2C_manufactured_at_Steinway%27s_factory_in_Hamburg%2C_Germany.png
+  Rescaled image from [ 2059 x 2080 ] to [ 222 x 224 ]
+  Padded to [ 224 x 224 ]
+  Downloaded https://upload.wikimedia.org/wikipedia/commons/4/44/Black_tea_pot_cropped.jpg
+  Rescaled image from [ 900 x 838 ] to [ 224 x 209 ]
+  Padded to [ 224 x 224 ]
+  Downloaded https://upload.wikimedia.org/wikipedia/commons/b/b0/Bengal_tiger_%28Panthera_tigris_tigris%29_female_3_crop.jpg
+  Rescaled image from [ 4500 x 3000 ] to [ 224 x 149 ]
+  Padded to [ 224 x 224 ]
+  Downloaded https://upload.wikimedia.org/wikipedia/commons/8/80/Turtle_golfina_escobilla_oaxaca_mexico_claudio_giovenzana_2010.jpg
+  Rescaled image from [ 2000 x 1329 ] to [ 224 x 149 ]
+  Padded to [ 224 x 224 ]
+
+B<STREAM (STDERR)>:
+
+=for html <span style="display:inline-block;margin-left:1em;"><pre style="display: block"><code><span style="color: #cc66cc;">PDL</span><span style="color: #33ccff;"> {</span><span style="">
+    </span><span style="color: #6666cc;">Data    </span><span style=""> : </span><span style="color: #669933;">too long to print</span><span style="">
+    </span><span style="color: #6666cc;">Type    </span><span style=""> : </span><span style="color: #cc66cc;">float</span><span style="">
+    </span><span style="color: #6666cc;">Shape   </span><span style=""> : </span><span style="color: #33ccff;">[</span><span style="color: #9999cc;">3 224 224 12</span><span style="color: #33ccff;">]</span><span style="">
+    </span><span style="color: #6666cc;">Nelem   </span><span style=""> : </span><span style="color: #dd6;">1806336</span><span style="">
+    </span><span style="color: #6666cc;">Min     </span><span style=""> : </span><span style="color: #f66;">0</span><span style="">
+    </span><span style="color: #6666cc;">Max     </span><span style=""> : </span><span style="color: #99f;">1</span><span style="">
+    </span><span style="color: #6666cc;">Badflag </span><span style=""> : </span><span style="color: #2c2;">No</span><span style="">
+    </span><span style="color: #6666cc;">Has Bads</span><span style=""> : </span><span style="color: #2c2;">No</span><span style="">
+</span><span style="color: #33ccff;">}</span><span style="">
+</span><span style="color: #cc66cc;">AI::TensorFlow::Libtensorflow::Tensor</span><span style=""> </span><span style="color: #33ccff;">{</span><span style="">
+    </span><span style="color: #6666cc;">Type           </span><span style=""> </span><span style="color: #cc66cc;">FLOAT</span><span style="">
+    </span><span style="color: #6666cc;">Dims           </span><span style=""> </span><span style="color: #33ccff;">[</span><span style=""> </span><span style="color: #ff6633;">12</span><span style=""> </span><span style="color: #ff6633;">224</span><span style=""> </span><span style="color: #ff6633;">224</span><span style=""> </span><span style="color: #ff6633;">3</span><span style=""> </span><span style="color: #33ccff;">]</span><span style="">
+    </span><span style="color: #6666cc;">NumDims        </span><span style=""> </span><span style="color: #ff6633;">4</span><span style="">
+    </span><span style="color: #6666cc;">ElementCount   </span><span style=""> </span><span style="color: #ff6633;">1806336</span><span style="">
+</span><span style="color: #33ccff;">}</span><span style="">
+</span></code></pre></span>
+
+=head2 Run the model for inference
+
+We can use the C<Run> method to run the session and get the output C<TFTensor>.
+
+First, we send a single random input to warm up the model.
+
+  my $RunSession = sub {
+      my ($session, $t) = @_;
+      my @outputs_t;
+  
+      $session->Run(
+          undef,
+          $outputs{in}, [$t],
+          $outputs{out}, \@outputs_t,
+          undef,
+          undef,
+          $s
+      );
+      AssertOK($s);
+  
+      return $outputs_t[0];
+  };
+  
+  say "Warming up the model";
+  use PDL::GSL::RNG;
+  my $rng = PDL::GSL::RNG->new('default');
+  my $image_size = $model_name_to_params{$model_name}{image_size};
+  my $warmup_input = zeros(float, 3, @$image_size, 1 );
+  $rng->get_uniform($warmup_input);
+  
+  p $RunSession->($session, FloatPDLTOTFTensor($warmup_input));
+
+B<STREAM (STDOUT)>:
+
+  Warming up the model
+
+B<STREAM (STDERR)>:
+
+=for html <span style="display:inline-block;margin-left:1em;"><pre style="display: block"><code><span style="color: #cc66cc;">AI::TensorFlow::Libtensorflow::Tensor</span><span style=""> </span><span style="color: #33ccff;">{</span><span style="">
+    </span><span style="color: #6666cc;">Type           </span><span style=""> </span><span style="color: #cc66cc;">FLOAT</span><span style="">
+    </span><span style="color: #6666cc;">Dims           </span><span style=""> </span><span style="color: #33ccff;">[</span><span style=""> </span><span style="color: #ff6633;">1</span><span style=""> </span><span style="color: #ff6633;">1001</span><span style=""> </span><span style="color: #33ccff;">]</span><span style="">
+    </span><span style="color: #6666cc;">NumDims        </span><span style=""> </span><span style="color: #ff6633;">2</span><span style="">
+    </span><span style="color: #6666cc;">ElementCount   </span><span style=""> </span><span style="color: #ff6633;">1001</span><span style="">
+</span><span style="color: #33ccff;">}</span><span style="">
+</span></code></pre></span>
+
+Then we send the batched image data. The returned scores need to by normalised using the L<softmax function|https://en.wikipedia.org/wiki/Softmax_function> with the following formula (taken from Wikipedia):
+
+$$ {\displaystyle \sigma (\mathbf {z} )I<{i}={\frac {e^{z>{i}}}{\sum I<{j=1}^{K}e^{z>{j}}}}\ \ {\text{ for }}i=1,\dotsc ,K{\text{ and }}\mathbf {z} =(zI<{1},\dotsc ,z>{K})\in \mathbb {R} ^{K}.} $$
+
+  my $output_pdl_batched = FloatTFTensorToPDL($RunSession->($session, $t));
+  my $softmax = sub { ( map $_/sumover($_)->dummy(0), exp($_[0]) )[0] };
+  my $probabilities_batched = $softmax->($output_pdl_batched);
+  p $probabilities_batched;
+
+B<STREAM (STDERR)>:
+
+=for html <span style="display:inline-block;margin-left:1em;"><pre style="display: block"><code><span style="color: #cc66cc;">PDL</span><span style="color: #33ccff;"> {</span><span style="">
+    </span><span style="color: #6666cc;">Data    </span><span style=""> : </span><span style="color: #669933;">too long to print</span><span style="">
+    </span><span style="color: #6666cc;">Type    </span><span style=""> : </span><span style="color: #cc66cc;">float</span><span style="">
+    </span><span style="color: #6666cc;">Shape   </span><span style=""> : </span><span style="color: #33ccff;">[</span><span style="color: #9999cc;">1001 12</span><span style="color: #33ccff;">]</span><span style="">
+    </span><span style="color: #6666cc;">Nelem   </span><span style=""> : </span><span style="color: #dd6;">12012</span><span style="">
+    </span><span style="color: #6666cc;">Min     </span><span style=""> : </span><span style="color: #f66;">2.73727380317723e-07</span><span style="">
+    </span><span style="color: #6666cc;">Max     </span><span style=""> : </span><span style="color: #99f;">0.980696022510529</span><span style="">
+    </span><span style="color: #6666cc;">Badflag </span><span style=""> : </span><span style="color: #2c2;">No</span><span style="">
+    </span><span style="color: #6666cc;">Has Bads</span><span style=""> : </span><span style="color: #2c2;">No</span><span style="">
+</span><span style="color: #33ccff;">}</span><span style="">
+</span></code></pre></span>
+
+=head2 Results summary
+
+Then select the top 5 of those and find their class labels.
+
+  my $N = 5; # number to select
+  
+  my $top_batched = $probabilities_batched->qsorti->slice([-1, -$N]);
+  
+  my @top_lists   = dog($top_batched);
+  
+  my $includes_background_class = $probabilities_batched->dim(0) == IMAGENET_LABEL_COUNT_WITH_BG;
+  
+  if( IN_IPERL ) {
+      my $html = IPerl->html(
+          my_table( [0..$#image_names], sub {
+              my ($batch_idx, $h) = @_;
+              my $image_name = $image_names[$batch_idx];
+              my @top_for_image = $top_lists[$batch_idx]->list;
+              (
+                      $h->tt($image_name),
+                      $h->a( { href => $images_for_test_to_uri{$image_name} },
+                          $h->img({
+                              src => $images_for_test_to_uri{$image_name},
+                              alt => $image_name,
+                              width => '50%',
+                          })
+                      ),
+                      do {
+                          my @tr;
+                          push @tr, [ $h->th('Rank', 'Label No', 'Label', 'Prob') ];
+                          while( my ($i, $label_index) = each @top_for_image ) {
+                              my $class_index = $includes_background_class ? $label_index : $label_index + 1;
+                              push @tr, [ $h->td(
+                                      $i + 1,
+                                      $class_index,
+                                      $labels[$class_index],
+                                      $probabilities_batched->at($label_index,$batch_idx),
+                              ) ];
+  
+                          }
+                          $h->table([$h->tr(@tr)])
+                      },
+                  )
+          })
+      );
+      IPerl->display($html);
+  } else {
+      for my $batch_idx (0..$#image_names) {
+          my $image_name = $image_names[$batch_idx];
+          my @top_for_image = $top_lists[$batch_idx]->list;
+          my @td;
+          say "Image name: `$image_name`";
+          my $header = [ ('Rank', 'Label No', 'Label', 'Prob') ];
+          my @rows;
+          while( my ($i, $label_index) = each @top_for_image ) {
+              my $class_index = $includes_background_class ? $label_index : $label_index + 1;
+              push @rows, [ (
+                      $i + 1,
+                      $class_index,
+                      $labels[$class_index],
+                      $probabilities_batched->at($label_index,$batch_idx),
+              ) ];
+          }
+          say generate_table( rows => [ $header, @rows ], header_row => 1 );
+          print "\n";
+      }
+  }
+
+B<DISPLAY>:
+
+=for html <span style="display:inline-block;margin-left:1em;"><p><table style="width: 100%"><tr><td><tt>apple</tt></td><td><a href="https://upload.wikimedia.org/wikipedia/commons/1/15/Red_Apple.jpg"><img alt="apple" src="https://upload.wikimedia.org/wikipedia/commons/1/15/Red_Apple.jpg" width="50%" /></a></td><td><table><tr><th>Rank</th><th>Label No</th><th>Label</th><th>Prob</th></tr><tr><td>1</td><td>958</td><td>pomegranate</td><td>0.764890849590302</td></tr><tr><td>2</td><td>949</td><td>Granny Smith</td><td>0.0557115897536278</td></tr><tr><td>3</td><td>951</td><td>orange</td><td>0.0294644851237535</td></tr><tr><td>4</td><td>955</td><td>banana</td><td>0.0140652684494853</td></tr><tr><td>5</td><td>952</td><td>lemon</td><td>0.0104219866916537</td></tr></table></td></tr><tr><td><tt>banana</tt></td><td><a href="https://upload.wikimedia.org/wikipedia/commons/1/1c/Bananas_white_background.jpg"><img alt="banana" src="https://upload.wikimedia.org/wikipedia/commons/1/1c/Bananas_white_background.jpg" width="50%" /></a></td><td><table><tr><th>Rank</th><th>Label No</th><th>Label</th><th>Prob</th></tr><tr><td>1</td><td>955</td><td>banana</td><td>0.980696022510529</td></tr><tr><td>2</td><td>941</td><td>spaghetti squash</td><td>0.00609391508623958</td></tr><tr><td>3</td><td>940</td><td>zucchini</td><td>0.000924494117498398</td></tr><tr><td>4</td><td>942</td><td>acorn squash</td><td>0.000428267841925845</td></tr><tr><td>5</td><td>988</td><td>corn</td><td>0.000371591129805893</td></tr></table></td></tr><tr><td><tt>bus</tt></td><td><a href="https://upload.wikimedia.org/wikipedia/commons/6/63/LT_471_%28LTZ_1471%29_Arriva_London_New_Routemaster_%2819522859218%29.jpg"><img alt="bus" src="https://upload.wikimedia.org/wikipedia/commons/6/63/LT_471_%28LTZ_1471%29_Arriva_London_New_Routemaster_%2819522859218%29.jpg" width="50%" /></a></td><td><table><tr><th>Rank</th><th>Label No</th><th>Label</th><th>Prob</th></tr><tr><td>1</td><td>706</td><td>passenger car</td><td>0.503800392150879</td></tr><tr><td>2</td><td>875</td><td>trolleybus</td><td>0.334556519985199</td></tr><tr><td>3</td><td>655</td><td>minibus</td><td>0.0483399331569672</td></tr><tr><td>4</td><td>830</td><td>streetcar</td><td>0.0060268952511251</td></tr><tr><td>5</td><td>556</td><td>fire engine</td><td>0.00416999123990536</td></tr></table></td></tr><tr><td><tt>car</tt></td><td><a href="https://upload.wikimedia.org/wikipedia/commons/4/49/2013-2016_Toyota_Corolla_%28ZRE172R%29_SX_sedan_%282018-09-17%29_01.jpg"><img alt="car" src="https://upload.wikimedia.org/wikipedia/commons/4/49/2013-2016_Toyota_Corolla_%28ZRE172R%29_SX_sedan_%282018-09-17%29_01.jpg" width="50%" /></a></td><td><table><tr><th>Rank</th><th>Label No</th><th>Label</th><th>Prob</th></tr><tr><td>1</td><td>437</td><td>beach wagon</td><td>0.653993427753448</td></tr><tr><td>2</td><td>480</td><td>car wheel</td><td>0.0596377961337566</td></tr><tr><td>3</td><td>582</td><td>grille</td><td>0.0583300851285458</td></tr><tr><td>4</td><td>512</td><td>convertible</td><td>0.0284444093704224</td></tr><tr><td>5</td><td>469</td><td>cab</td><td>0.0261545460671186</td></tr></table></td></tr><tr><td><tt>cat</tt></td><td><a href="https://upload.wikimedia.org/wikipedia/commons/4/4d/Cat_November_2010-1a.jpg"><img alt="cat" src="https://upload.wikimedia.org/wikipedia/commons/4/4d/Cat_November_2010-1a.jpg" width="50%" /></a></td><td><table><tr><th>Rank</th><th>Label No</th><th>Label</th><th>Prob</th></tr><tr><td>1</td><td>283</td><td>tiger cat</td><td>0.406540781259537</td></tr><tr><td>2</td><td>286</td><td>Egyptian cat</td><td>0.217931881546974</td></tr><tr><td>3</td><td>282</td><td>tabby</td><td>0.162566006183624</td></tr><tr><td>4</td><td>288</td><td>lynx</td><td>0.0042705861851573</td></tr><tr><td>5</td><td>284</td><td>Persian cat</td><td>0.003710369579494</td></tr></table></td></tr><tr><td><tt>dog</tt></td><td><a href="https://upload.wikimedia.org/wikipedia/commons/archive/a/a9/20090914031557%21Saluki_dog_breed.jpg"><img alt="dog" src="https://upload.wikimedia.org/wikipedia/commons/archive/a/a9/20090914031557%21Saluki_dog_breed.jpg" width="50%" /></a></td><td><table><tr><th>Rank</th><th>Label No</th><th>Label</th><th>Prob</th></tr><tr><td>1</td><td>177</td><td>Saluki</td><td>0.956575691699982</td></tr><tr><td>2</td><td>215</td><td>Gordon setter</td><td>0.0140251601114869</td></tr><tr><td>3</td><td>166</td><td>black-and-tan coonhound</td><td>0.0014705111971125</td></tr><tr><td>4</td><td>170</td><td>borzoi</td><td>0.00110328639857471</td></tr><tr><td>5</td><td>159</td><td>toy terrier</td><td>0.000861090025864542</td></tr></table></td></tr><tr><td><tt>flamingo</tt></td><td><a href="https://upload.wikimedia.org/wikipedia/commons/b/b8/James_Flamingos_MC.jpg"><img alt="flamingo" src="https://upload.wikimedia.org/wikipedia/commons/b/b8/James_Flamingos_MC.jpg" width="50%" /></a></td><td><table><tr><th>Rank</th><th>Label No</th><th>Label</th><th>Prob</th></tr><tr><td>1</td><td>131</td><td>flamingo</td><td>0.959895372390747</td></tr><tr><td>2</td><td>130</td><td>spoonbill</td><td>0.0161255765706301</td></tr><tr><td>3</td><td>128</td><td>white stork</td><td>0.00166661932598799</td></tr><tr><td>4</td><td>129</td><td>black stork</td><td>0.000550497847143561</td></tr><tr><td>5</td><td>773</td><td>safety pin</td><td>0.000548230716958642</td></tr></table></td></tr><tr><td><tt>honeycomb</tt></td><td><a href="https://upload.wikimedia.org/wikipedia/commons/f/f7/Honey_comb.jpg"><img alt="honeycomb" src="https://upload.wikimedia.org/wikipedia/commons/f/f7/Honey_comb.jpg" width="50%" /></a></td><td><table><tr><th>Rank</th><th>Label No</th><th>Label</th><th>Prob</th></tr><tr><td>1</td><td>600</td><td>honeycomb</td><td>0.877344310283661</td></tr><tr><td>2</td><td>411</td><td>apiary</td><td>0.0387796945869923</td></tr><tr><td>3</td><td>62</td><td>boa constrictor</td><td>0.0105699924752116</td></tr><tr><td>4</td><td>63</td><td>rock python</td><td>0.00116742600221187</td></tr><tr><td>5</td><td>552</td><td>face powder</td><td>0.000891718140337616</td></tr></table></td></tr><tr><td><tt>piano</tt></td><td><a href="https://upload.wikimedia.org/wikipedia/commons/d/da/Steinway_%26_Sons_upright_piano%2C_model_K-132%2C_manufactured_at_Steinway%27s_factory_in_Hamburg%2C_Germany.png"><img alt="piano" src="https://upload.wikimedia.org/wikipedia/commons/d/da/Steinway_%26_Sons_upright_piano%2C_model_K-132%2C_manufactured_at_Steinway%27s_factory_in_Hamburg%2C_Germany.png" width="50%" /></a></td><td><table><tr><th>Rank</th><th>Label No</th><th>Label</th><th>Prob</th></tr><tr><td>1</td><td>882</td><td>upright</td><td>0.935266852378845</td></tr><tr><td>2</td><td>852</td><td>television</td><td>0.0038805918302387</td></tr><tr><td>3</td><td>599</td><td>home theater</td><td>0.00317473593167961</td></tr><tr><td>4</td><td>652</td><td>microwave</td><td>0.00226501375436783</td></tr><tr><td>5</td><td>528</td><td>desktop computer</td><td>0.00212761503644288</td></tr></table></td></tr><tr><td><tt>teapot</tt></td><td><a href="https://upload.wikimedia.org/wikipedia/commons/4/44/Black_tea_pot_cropped.jpg"><img alt="teapot" src="https://upload.wikimedia.org/wikipedia/commons/4/44/Black_tea_pot_cropped.jpg" width="50%" /></a></td><td><table><tr><th>Rank</th><th>Label No</th><th>Label</th><th>Prob</th></tr><tr><td>1</td><td>850</td><td>teapot</td><td>0.934735298156738</td></tr><tr><td>2</td><td>506</td><td>coffeepot</td><td>0.0514399670064449</td></tr><tr><td>3</td><td>969</td><td>cup</td><td>0.000874492223374546</td></tr><tr><td>4</td><td>551</td><td>espresso maker</td><td>0.000661507365293801</td></tr><tr><td>5</td><td>726</td><td>pitcher</td><td>0.000382225960493088</td></tr></table></td></tr><tr><td><tt>tiger</tt></td><td><a href="https://upload.wikimedia.org/wikipedia/commons/b/b0/Bengal_tiger_%28Panthera_tigris_tigris%29_female_3_crop.jpg"><img alt="tiger" src="https://upload.wikimedia.org/wikipedia/commons/b/b0/Bengal_tiger_%28Panthera_tigris_tigris%29_female_3_crop.jpg" width="50%" /></a></td><td><table><tr><th>Rank</th><th>Label No</th><th>Label</th><th>Prob</th></tr><tr><td>1</td><td>293</td><td>tiger</td><td>0.648495197296143</td></tr><tr><td>2</td><td>283</td><td>tiger cat</td><td>0.181235983967781</td></tr><tr><td>3</td><td>341</td><td>zebra</td><td>0.0170289929956198</td></tr><tr><td>4</td><td>291</td><td>jaguar</td><td>0.00196429016068578</td></tr><tr><td>5</td><td>353</td><td>impala</td><td>0.00144677574280649</td></tr></table></td></tr><tr><td><tt>turtle</tt></td><td><a href="https://upload.wikimedia.org/wikipedia/commons/8/80/Turtle_golfina_escobilla_oaxaca_mexico_claudio_giovenzana_2010.jpg"><img alt="turtle" src="https://upload.wikimedia.org/wikipedia/commons/8/80/Turtle_golfina_escobilla_oaxaca_mexico_claudio_giovenzana_2010.jpg" width="50%" /></a></td><td><table><tr><th>Rank</th><th>Label No</th><th>Label</th><th>Prob</th></tr><tr><td>1</td><td>35</td><td>leatherback turtle</td><td>0.535791635513306</td></tr><tr><td>2</td><td>347</td><td>water buffalo</td><td>0.0588447786867619</td></tr><tr><td>3</td><td>148</td><td>grey whale</td><td>0.0354104563593864</td></tr><tr><td>4</td><td>345</td><td>hippopotamus</td><td>0.0267104711383581</td></tr><tr><td>5</td><td>34</td><td>loggerhead</td><td>0.0217578746378422</td></tr></table></td></tr></table></p></span>
+
+  my $p_approx_batched = $probabilities_batched->sumover->approx(1, 1e-5);
+  p $p_approx_batched;
+  say "All probabilities sum up to approximately 1" if $p_approx_batched->all->sclr;
+
+B<STREAM (STDOUT)>:
+
+  All probabilities sum up to approximately 1
+
+B<STREAM (STDERR)>:
+
+=for html <span style="display:inline-block;margin-left:1em;"><pre style="display: block"><code><span style="color: #cc66cc;">PDL</span><span style="color: #33ccff;"> {</span><span style="">
+    </span><span style="color: #6666cc;">Data    </span><span style=""> : </span><span style="color: #33ccff;">[</span><span style="color: #ff6633;">1 1 1 1 1 1 1 1 1 1 1 1</span><span style="color: #33ccff;">]</span><span style="">
+    </span><span style="color: #6666cc;">Type    </span><span style=""> : </span><span style="color: #cc66cc;">double</span><span style="">
+    </span><span style="color: #6666cc;">Shape   </span><span style=""> : </span><span style="color: #33ccff;">[</span><span style="color: #9999cc;">12</span><span style="color: #33ccff;">]</span><span style="">
+    </span><span style="color: #6666cc;">Nelem   </span><span style=""> : </span><span style="color: #dd6;">12</span><span style="">
+    </span><span style="color: #6666cc;">Min     </span><span style=""> : </span><span style="color: #f66;">1</span><span style="">
+    </span><span style="color: #6666cc;">Max     </span><span style=""> : </span><span style="color: #99f;">1</span><span style="">
+    </span><span style="color: #6666cc;">Badflag </span><span style=""> : </span><span style="color: #2c2;">No</span><span style="">
+    </span><span style="color: #6666cc;">Has Bads</span><span style=""> : </span><span style="color: #2c2;">No</span><span style="">
+</span><span style="color: #33ccff;">}</span><span style="">
+</span></code></pre></span>
+
+B<RESULT>:
+
+  1
+
+=head1 DEBUGGING
+
+The following images can be used to test the C<load_image_to_pdl> function.
+
+  my @solid_channel_uris = (
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Solid_red.svg/480px-Solid_red.svg.png',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Green_00FF00_9x9.svg/480px-Green_00FF00_9x9.svg.png',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Solid_blue.svg/480px-Solid_blue.svg.png',
+  );
+  undef;
+
+=head1 CPANFILE
+
+  requires 'AI::TensorFlow::Libtensorflow';
+  requires 'AI::TensorFlow::Libtensorflow::DataType';
+  requires 'Archive::Extract';
+  requires 'Data::Printer';
+  requires 'Data::Printer::Filter::PDL';
+  requires 'FFI::Platypus::Buffer';
+  requires 'FFI::Platypus::Memory';
+  requires 'File::Which';
+  requires 'HTML::Tiny';
+  requires 'HTTP::Tiny';
+  requires 'Imager';
+  requires 'List::Util';
+  requires 'PDL';
+  requires 'PDL::GSL::RNG';
+  requires 'Path::Tiny';
+  requires 'Syntax::Construct';
+  requires 'Text::Table::Tiny';
+  requires 'URI';
+  requires 'constant';
+  requires 'feature';
+  requires 'lib::projectroot';
+  requires 'strict';
+  requires 'utf8';
+  requires 'warnings';
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2022 by Auto-Parallel Technologies, Inc.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut

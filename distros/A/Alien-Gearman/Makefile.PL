@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
     "Alien::Base" => "0.038",
     "Alien::libuuid" => "0",
     "Alien::Libevent" => "0",
+    "Alien::Boost::ProgramOptions" => "0",
   },
   "DISTNAME" => "Alien-Gearman",
   "LICENSE" => "perl",
@@ -42,6 +43,7 @@ my %FallbackPrereqs = (
   "Alien::Base" => "0.038",
   "Alien::libuuid" => "0",
   "Alien::Libevent" => "0",
+  "Alien::Boost::ProgramOptions" => "0",
 );
 
 my $abmm = Alien::Build::MM->new;

@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Lib::FFIType::Variant::PackableMaybeArrayRef;
 # ABSTRACT: Maybe[ArrayRef] to pack()'ed scalar argument with size argument (as int) (size is -1 if undef)
-$AI::TensorFlow::Libtensorflow::Lib::FFIType::Variant::PackableMaybeArrayRef::VERSION = '0.0.3';
+$AI::TensorFlow::Libtensorflow::Lib::FFIType::Variant::PackableMaybeArrayRef::VERSION = '0.0.4';
 use strict;
 use warnings;
 use FFI::Platypus::Buffer qw(scalar_to_buffer buffer_to_scalar);
@@ -20,6 +20,7 @@ sub make_variant {
 	my $perl_to_native = install perl_to_native => sub {
 		my ($value, $i) = @_;
 		if( defined $value ) {
+			die "Value must be an ArrayRef" unless ref $value eq 'ARRAY';
 			my $data = pack  $arguments{pack_type} . '*', @$value;
 			my $n    = scalar @$value;
 			my ($pointer, $size) = scalar_to_buffer($data);

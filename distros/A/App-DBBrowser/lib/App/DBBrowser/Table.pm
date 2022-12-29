@@ -186,7 +186,7 @@ sub __on_table {
             print clear_screen();
             print 'Computing:' . "\r" if $sf->{o}{table}{progress_bar};
             my $all_arrayref = $sf->__selected_statement_result( $sql );
-            # return $sql explicitly since after a restore backup it refers to a different hash.
+            # return $sql explicitly since after a restore-backup $sql refers to a different hash.
             return $all_arrayref, $sql;
         }
     }

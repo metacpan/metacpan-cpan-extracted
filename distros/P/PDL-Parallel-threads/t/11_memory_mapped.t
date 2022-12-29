@@ -35,7 +35,7 @@ for my $thr (threads->list) {
 
 my $expected = (sequence($N_threads) + 1)->sqrt;
 my $workspace = retrieve_pdls('workspace');
-ok(all($expected == $workspace), 'Sharing memory mapped piddles works');
+ok(all($expected == $workspace), 'Sharing memory mapped ndarrays works');
 
 END {
 	# Clean up the testing files

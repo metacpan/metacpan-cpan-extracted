@@ -17,7 +17,7 @@ subtest "Load graph" => sub {
 	my $ffi = FFI::Platypus->new( api => 1 );
 
 	my $data = $model_file->slurp_raw;
-	my $buf = AI::TensorFlow::Libtensorflow::Buffer->NewFromData($data);
+	my $buf = AI::TensorFlow::Libtensorflow::Buffer->NewFromString(\$data);
 	ok $buf;
 
 	my $graph = AI::TensorFlow::Libtensorflow::Graph->New;

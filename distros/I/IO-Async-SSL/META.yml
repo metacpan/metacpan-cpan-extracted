@@ -19,10 +19,10 @@ name: IO-Async-SSL
 provides:
   IO::Async::SSL:
     file: lib/IO/Async/SSL.pm
-    version: '0.23'
+    version: '0.24'
   IO::Async::SSLStream:
     file: lib/IO/Async/SSLStream.pm
-    version: '0.23'
+    version: '0.24'
 requires:
   Future: '0.33'
   IO::Async::Handle: '0.29'
@@ -32,5 +32,5 @@ requires:
   IO::Socket::SSL: '2.003'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.23'
+version: '0.24'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

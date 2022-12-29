@@ -16,7 +16,7 @@ SYNOPSIS
             my $self = shift( @_ );
             $self->{routes} =
             {
-            ## API version 1
+            # API version 1
             1 =>
                 {
                 'favicon.ico' => $self->curry::noop,
@@ -36,20 +36,27 @@ SYNOPSIS
                 },
                 stripe => $self->curry::stripe,
                 # Whatever method is fine. Will call the method handle in package MyAPI::Users to handle the endpoint
-                users => 'MyAPI::Users->handle'
+                users => 'MyAPI::Users->handle',
+                preferences =>
+                {
+                    _access_control => 'restricted',
+                    _delete => $self->curry::remove_preferences,
+                    _get => $self->curry::get_preferences,
+                    _post => $self->curry::update_preferences,
+                },
             };
             $self->{api_version} = 1;
             $self->{supported_api_versions} = [qw( 1 )];
-            ## By default, we support the GET and POST to access our endpoints
-            ## It may be adjusted endpoint by endpoint and if nothing is specified this default is used.
+            # By default, we support the GET and POST to access our endpoints
+            # It may be adjusted endpoint by endpoint and if nothing is specified this default is used.
             $self->{default_methods} = [qw( GET POST )];
-            ## This is ALL possible supported methods
+            # This is ALL possible supported methods
             $self->{supported_methods} = [qw( DELETE GET HEAD OPTIONS POST PUT )];
             $self->{supported_languages} = [qw( en-GB en fr-FR fr ja-JP )];
             $self->{key} = 'kAncmaDajnacSnbGmbXamn';
-            ## We want JWE (Json Web Token encrypted). This will affect jwt_encode's behaviour
+            # We want JWE (Json Web Token encrypted). This will affect jwt_encode's behaviour
             $self->{jwt_encrypt} = 1;
-            ## Because we are encrypting
+            # Because we are encrypting
             $self->{jwt_algo} = 'PBES2-HS256+A128KW';
             $self->{jwt_encoding} = 'A128GCM' unless( length( $self->{jwt_encoding} ) );
             $self->{jwt_accepted_algo} = [qw( PBES2-HS256+A128KW HS256 )];
@@ -78,13 +85,13 @@ SYNOPSIS
                 return( $self->reply({ code => Apache2::Const::HTTP_INTERNAL_SERVER_ERROR, message => $self->oops }) );
             };
     
-            ## Do an IP source check to be sure this is Stripe talking to us
+            # Do an IP source check to be sure this is Stripe talking to us
             if( !defined( my $ip_check = $stripe->webhook_validate_caller_ip({ ip => $remote_ip, ignore_ip => $ignore_ip }) ) )
             {
                 return( $self->reply({ code => $stripe->error->code, message => $stripe->error->message }) );
             }
     
-            ## Now, we make sure this is Stripe sending this by checking the signature of the payload
+            # Now, we make sure this is Stripe sending this by checking the signature of the payload
             my $check = $stripe->webhook_validate_signature({
                 secret => $signing_secret,
                 signature => $sig,
@@ -96,8 +103,8 @@ SYNOPSIS
                 return( $self->reply({code => $stripe->error->code, message => $stripe->error->message }) );
             }
     
-            ## Ok, if we are here, we passed all checks
-            ## Don't wait, reply ok back to Stripe so our request does not time out
+            # Ok, if we are here, we passed all checks
+            # Don't wait, reply ok back to Stripe so our request does not time out
             $self->response->code( Apache2::Const::HTTP_OK );
             my $json = $self->json->utf8->encode({ code => 200, success => $self->true });
             $self->response->print( $json );
@@ -110,7 +117,7 @@ SYNOPSIS
         }
 
 VERSION
-        v0.6.4
+        v0.7.0
 
 DESCRIPTION
     The purpose of this module is to provide a powerful, yet simple

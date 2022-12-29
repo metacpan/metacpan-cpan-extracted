@@ -98,6 +98,7 @@ sub new {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
+	$self->{ type } = 'OneValue';
 	return $self;
 }  
 
@@ -208,6 +209,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'type' => {
+    	datatype => 'string',
+    	base_name => 'Type',
+    	description => 'Data point type.',
+    	format => '',
+    	read_only => '',
+    		},
     'value' => {
     	datatype => 'double',
     	base_name => 'Value',
@@ -243,6 +251,7 @@ __PACKAGE__->swagger_types( {
     'effect_format' => 'EffectFormat',
     'three_d_format' => 'ThreeDFormat',
     'line_format' => 'LineFormat',
+    'type' => 'string',
     'value' => 'double',
     'value_formula' => 'string',
     'set_as_total' => 'boolean',
@@ -254,6 +263,7 @@ __PACKAGE__->attribute_map( {
     'effect_format' => 'EffectFormat',
     'three_d_format' => 'ThreeDFormat',
     'line_format' => 'LineFormat',
+    'type' => 'Type',
     'value' => 'Value',
     'value_formula' => 'ValueFormula',
     'set_as_total' => 'SetAsTotal',

@@ -58,10 +58,11 @@ ansicolumn [options] [file ...]
     --tabspace=#         tab-space width
     --tabstyle=#         tab style
     --ambiguous=#        ambiguous character width (narrow|wide)
+    --pages              split file by formfeed
 
 =head1 VERSION
 
-Version 1.26
+Version 1.2801
 
 =head1 DESCRIPTION
 
@@ -185,6 +186,10 @@ number of pane is set as a number of files.  You can use B<-C> option
 to specify number of files displayed simultaneously.
 
 You can use this option mixed with B<-D> option to see document files.
+
+If you want to show multiple parts in single data stream in parallel,
+use B<--pages> option.  It split the data by formfeed character and
+treat each part as a individual file.
 
 =item B<-C>#, B<--pane>=#
 
@@ -361,6 +366,11 @@ C<shade>.  Styles are defined in L<Text::ANSI::Fold> library.
 Specifies how to treat Unicode ambiguous width characters.  Take a
 value of 'narrow' or 'wide.  Default is 'narrow'.
 
+=item B<--pages>
+
+Split file content by formfeed character, and treat each part as a
+individual file.  Use with B<--parallel> option.
+
 =begin comment
 
 =item B<-->[B<no->]B<discard-el>
@@ -427,11 +437,11 @@ option. See `perldoc Getopt::EX` for detail.
 
 To get the latest code, use this:
 
-    $ cpanm https://github.com/kaz-utashiro/App-ansicolumn.git
+    $ cpanm https://github.com/tecolicom/App-ansicolumn.git
 
 =head1 EXAMPLES
 
-L<https://github.com/kaz-utashiro/App-ansicolumn/tree/master/images>
+L<https://github.com/tecolicom/App-ansicolumn/tree/master/images>
 
 =head1 SEE ALSO
 
@@ -439,10 +449,28 @@ L<column(1)>,
 L<https://man7.org/linux/man-pages/man1/column.1.html>
 
 L<App::ansicolumn>,
-L<https://github.com/kaz-utashiro/App-ansicolumn>
+L<https://github.com/tecolicom/App-ansicolumn>
 
 L<Text::ANSI::Printf>,
 L<https://github.com/kaz-utashiro/Text-ANSI-Printf>
+
+=head2 Articles
+
+=over 2
+
+=item *
+
+https://qiita.com/kaz-utashiro/items/345cd9abcd8e1f0d81a2
+
+=item *
+
+https://qiita.com/kaz-utashiro/items/1cdd71d44eb11f3fb36e
+
+=item *
+
+https://qiita.com/kaz-utashiro/items/32e1c2d4c42a80c42422
+
+=back
 
 =head1 AUTHOR
 
@@ -450,7 +478,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2020-2022 Kazumasa Utashiro.
+©︎ 2020-2022 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

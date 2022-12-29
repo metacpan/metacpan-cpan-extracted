@@ -1,5 +1,8 @@
 Revision history for JSON-Schema-Modern
 
+0.560     2022-12-20 20:00:05Z
+          - fix a test that depended on optional prereqs
+
 0.559     2022-12-16 04:29:55Z
           - fix regression where formats do not validate beyond a $ref (since
             v0.556)

@@ -11,8 +11,23 @@ filter 'CODE' => \&parse;
 
 sub parse {
     my ($subref, $ddp) = @_;
-    my $string = $ddp->deparse ? _deparse($subref, $ddp) : 'sub { ... }';
-    return $ddp->maybe_colorize($string, 'code');
+    my $string;
+    my $color = 'code';
+    if ($ddp->deparse) {
+        $string = _deparse($subref, $ddp);
+        if ($ddp->coderef_undefined && $string =~ /\A\s*sub\s*;\s*\z/) {
+            $string = $ddp->coderef_undefined;
+            $color = 'undef';
+        }
+    }
+    elsif ($ddp->coderef_undefined && !_subref_is_reachable($subref)) {
+        $string = $ddp->coderef_undefined;
+        $color = 'undef';
+    }
+    else {
+        $string = $ddp->coderef_stub;
+    }
+    return $ddp->maybe_colorize($string, $color);
 };
 
 #######################################
@@ -32,6 +47,13 @@ sub _deparse {
     my $pad = $ddp->newline;
     $sub    =~ s/\n/$pad/gse;
     return $sub;
+}
+
+sub _subref_is_reachable {
+    my ($subref) = @_;
+    require B;
+    my $cv = B::svref_2object($subref);
+    return !(B::class($cv->ROOT) eq 'NULL' && !${ $cv->const_sv });
 }
 
 1;

@@ -15,5 +15,6 @@ t/02equ-numeric.t
 t/10getmagic.t
 t/11func.t
 t/12deparse.t
+t/80in+equ.t
 t/80match-equ.t
 t/99pod.t

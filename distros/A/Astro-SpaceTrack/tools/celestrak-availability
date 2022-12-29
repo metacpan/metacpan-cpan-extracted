@@ -10,7 +10,7 @@ use Getopt::Long 2.33 qw{ :config auto_version };
 use LWP::UserAgent;
 use Pod::Usage;
 
-our $VERSION = '0.158';
+our $VERSION = '0.159';
 
 my %opt = (
     https	=> 1,

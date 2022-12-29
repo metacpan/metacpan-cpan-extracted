@@ -1,5 +1,5 @@
 package Alien::7zip;
-
+$Alien::7zip::VERSION = '0.02';
 use strict;
 use warnings;
 use base qw( Alien::Base );

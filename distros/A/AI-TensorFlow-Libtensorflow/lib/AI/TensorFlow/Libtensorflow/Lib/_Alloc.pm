@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Lib::_Alloc;
 # ABSTRACT: [private] Allocation utilities
-$AI::TensorFlow::Libtensorflow::Lib::_Alloc::VERSION = '0.0.3';
+$AI::TensorFlow::Libtensorflow::Lib::_Alloc::VERSION = '0.0.4';
 use strict;
 use warnings;
 use AI::TensorFlow::Libtensorflow::Lib;

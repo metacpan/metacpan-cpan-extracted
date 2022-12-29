@@ -1,0 +1,159 @@
+#ifndef WASMER_CALLBACK
+#define WASMER_CALLBACK 1
+
+typedef struct {
+#if WASM_WASMER_MUST_STORE_PERL
+    tTHX aTHX;
+#endif
+
+    CV* coderef;
+
+    wasm_store_t* store;
+
+    const wasm_name_t* modname;
+    const wasm_name_t* funcname;
+
+    const wasm_functype_t* functype;
+} callback_holder_t;
+
+#if WASM_WASMER_MUST_STORE_PERL
+#define _CALLBACK_REVIVE_THX(callback_holder_p) \
+    pTHX = callback_holder_p->aTHX;
+#else
+#define _CALLBACK_REVIVE_THX(x)
+#endif
+
+wasm_trap_t* host_func_callback( void* env, const wasm_val_vec_t* args, wasm_val_vec_t* results ) {
+    callback_holder_t* callback_holder_p = (callback_holder_t*) env;
+
+    _CALLBACK_REVIVE_THX(callback_holder_p);
+
+    dSP;
+
+    if (args->size) {
+        ENTER;
+        SAVETMPS;
+    }
+
+    PUSHMARK(SP);
+
+    if (args->size) {
+        EXTEND(SP, args->size);
+
+        for (unsigned i=0; i<args->size; i++) {
+            wasm_val_t arg = args->data[i];
+
+            SV* arg_sv = ww_val2sv(aTHX_ &arg);
+
+            mPUSHs(arg_sv);
+        }
+
+        PUTBACK;
+    }
+
+    I32 callflags = G_EVAL;
+
+    switch (results->size) {
+        case 0:
+            callflags |= G_VOID;
+            break;
+
+        case 1:
+            callflags |= G_SCALAR;
+            break;
+
+        default:
+            callflags |= G_ARRAY;
+    }
+
+    /* Don’t trap exceptions … ?? */
+    int got_count = call_sv( (SV*) callback_holder_p->coderef, callflags );
+
+    SPAGAIN;
+
+    // In Perl 5.22+ got_count is always 0 if G_VOID. Before then,
+    // if you return 1 thing, you got 1 thing, even in G_VOID; let’s
+    // treat that a bug to work around by never checking the G_VOID case:
+    if (results->size == 0) {
+        while (got_count--) (void) POPs;
+        got_count = 0;
+    }
+
+    wasm_trap_t* trap = NULL;
+
+    SV* err = ERRSV;
+    if (SvTRUE(err)) {
+        STRLEN errlen;
+        const char* errstr = SvPVbyte(err, errlen);
+
+        wasm_byte_vec_t vector;
+        wasm_byte_vec_new(&vector, errlen, errstr);
+
+        trap = wasm_trap_new(
+            callback_holder_p->store,
+            &vector
+        );
+    }
+    else if (got_count == results->size) {
+        const wasm_valtype_vec_t* expected = wasm_functype_results(callback_holder_p->functype);
+
+        for (I32 g=got_count-1; g >= 0; g--) {
+            wasm_val_t* result = &results->data[g];
+
+            wasm_valkind_t kind = wasm_valtype_kind(expected->data[g]);
+
+            *result = grok_wasm_val(aTHX_ kind, POPs);
+        }
+    }
+    else {
+        char* msg;
+
+        if (callback_holder_p->funcname) {
+            msg = form(
+                "%.*s.%.*s: expected %zu results but received %d",
+                (int) callback_holder_p->modname->size,
+                callback_holder_p->modname->data,
+                (int) callback_holder_p->funcname->size,
+                callback_holder_p->funcname->data,
+                results->size,
+                got_count
+            );
+        }
+        else {
+            msg = form(
+                "Callback expected %zu results but received %d",
+                results->size,
+                got_count
+            );
+        }
+
+        wasm_byte_vec_t vector;
+        wasm_byte_vec_new(&vector, strlen(msg), (wasm_byte_t*) msg);
+
+        trap = wasm_trap_new(
+            callback_holder_p->store,
+            &vector
+        );
+
+        while (got_count--) (void) POPs;
+    }
+
+    if (args->size) {
+        FREETMPS;
+        LEAVE;
+    }
+
+    return trap;
+}
+
+void free_callback_holder (void* env) {
+    callback_holder_t* callback_holder_p = (callback_holder_t*) env;
+
+    _CALLBACK_REVIVE_THX(callback_holder_p);
+
+    SvREFCNT_dec((SV*) callback_holder_p->coderef);
+
+    Safefree(callback_holder_p);
+}
+
+#endif

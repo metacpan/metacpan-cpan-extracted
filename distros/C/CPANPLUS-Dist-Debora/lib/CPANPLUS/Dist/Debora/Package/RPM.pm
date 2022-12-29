@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use parent qw(CPANPLUS::Dist::Debora::Package);
 
@@ -171,6 +171,19 @@ sub outputname {
     return $outputname;
 }
 
+sub license {
+    my $self = shift;
+
+    my $license = $self->SUPER::license;
+
+    # Fedora's rpmlint expects the licenses in reversed order.
+    if ($license eq 'Artistic-1.0-Perl OR GPL-1.0-or-later') {
+        $license = 'GPL-1.0-or-later OR Artistic-1.0-Perl';
+    }
+
+    return $license;
+}
+
 sub rpmdir {
     my $self = shift;
 
@@ -327,6 +340,8 @@ my $perl_vendorlib = $Config{installvendorlib};
 
 my $distdir = "$perl_vendorlib/auto/share/dist/CPANPLUS-Dist-Debora";
 
+my $has_shared_objects = (@{$package->shared_objects} > 0);
+
 my $epoch = $package->epoch;
 if ($epoch) {
     $OUT .= 'Epoch:     ' . $escape->($epoch). "\n";
@@ -373,7 +388,7 @@ if ($package->is_noarch) {
     $OUT .= "AutoReq:   0\n";
 }
 else {
-    if (@{$package->shared_objects} == 0) {
+    if (!$has_shared_objects) {
         $OUT .= "%global debug_package %{nil}\n";
     }
     $OUT .= "%global __perl_requires /bin/true\n";
@@ -382,8 +397,13 @@ else {
     $OUT .= "AutoReq:   1\n";
 }
 
-$OUT .= "%if 0%{?fedora} > 0 || 0%{?rhel} > 0 || 0%{?suse_version} > 0\n";
-$OUT .= 'Requires:  perl(:MODULE_COMPAT_' . $escape->($perl_version) . ")\n";
+$OUT .= "%if 0%{?fedora} > 0 || 0%{?rhel} > 0\n";
+if ($has_shared_objects) {
+    $OUT .= 'Requires:  perl(:MODULE_COMPAT_' . $escape->($perl_version) . ")\n";
+}
+else {
+    $OUT .= "Requires:  perl-libs\n";
+}
 $OUT .= "%endif\n";
 for my $dependency (@{$package->dependencies}) {
     if ($dependency->{is_module}) {
@@ -397,6 +417,7 @@ for my $dependency (@{$package->dependencies}) {
     }
     $OUT .= "\n";
 }
+$OUT .= "%{?perl_requires}\n";
 q{};
 %]
 %{?perl_default_filter}
@@ -555,7 +576,7 @@ CPANPLUS::Dist::Debora::Package::RPM - Create binary RPM packages
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -684,6 +705,19 @@ Requires the operating system packages "perl", "rpm-build", "gcc", "make",
 
 None.
 
+=head1 BUGS AND LIMITATIONS
+
+The date in the RPM changelog is in Coordinated Universal Time (UTC).
+
+AutoReq is enabled for architecture-dependent packages so that shared library
+dependencies are added.  Unfortunately, there are some Perl distributions with
+hardcoded dependencies on F</opt/bin/perl> that are picked up by AutoReq.
+Create an additional RPM package that provides a symbolic link from
+F</opt/bin/perl> to F</usr/bin/perl> if you need to install such Perl
+distributions.
+
+This module cannot be used in taint mode.
+
 =head1 SEE ALSO
 
 rpm(8), rpmbuild(8)
@@ -692,24 +726,9 @@ rpm(8), rpmbuild(8)
 
 Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
 
-=head1 BUGS AND LIMITATIONS
-
-The License field is populated with SPDX license expressions.
-
-The date in the RPM changelog is in Coordinated Universal Time (UTC).
-
-AutoReq is enabled for architecture-dependent packages so that shared library
-dependencies are added.  Unfortunately, there are Perl distributions with
-hardcoded dependencies on F</opt/bin/perl> that are also picked up by AutoReq.
-Create an additional RPM package that provides a symbolic link from
-F</opt/bin/perl> to F</usr/bin/perl> if you need to install such Perl
-distributions.
-
-This module cannot be used in taint mode.
-
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2022 Andreas Vögele
+Copyright (C) 2022 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

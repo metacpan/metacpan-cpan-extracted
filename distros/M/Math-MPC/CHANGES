@@ -1,5 +1,15 @@
+1.30
+ - Jump straight to version 1.30, as this module now contains a fair amount of new
+   functionality that requires version 1.3.0 (or later) of the mpc library.
+ - Fix for Makefile.PL. (It was not defining NV_IS_FLOAT128 when it should.)
+ - Handle "rounding away from zero" mode. (Becomes available in mpc-1.3.0.)
+ - Add new functions Rmpc_agm, Rmpc_eta_fund and in_fund_dom.
+ - Wrap Radius functions.
+ - Wrap Ball functions.
+
 1.16
- - Work around perl bug in https://github.com/Perl/perl5/issues/19550
+ - Work around perl bug in https://github.com/Perl/perl5/issues/19550.
+   (Affected only perl-5.35.10.)
 
 1.15
  - Fix bug re inconsistent settings of POK and NOK flag, which manifests itself as (eg):

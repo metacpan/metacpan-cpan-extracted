@@ -1,5 +1,13 @@
 Revision history for Type-TinyX-Facets
 
+1.3       2022-12-26 14:30:51-05:00 America/New_York
+
+  [DISTRIBUTION FIX]
+
+    * No functional changes.
+    * inadvertently shipped development directory to CPAN, which
+      broke builds on some platforms.
+
 1.2       2022-10-15 12:00:18-04:00 America/New_York
 
   [BUG FIX]

@@ -3,12 +3,12 @@ package Sah::Schema::latin_letter;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-22'; # DATE
+our $DATE = '2022-09-23'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = [str => {
-    summary => 'Latin letter, i.e. A-Z or a-z',
+    summary => 'A single latin letter, i.e. A-Z or a-z',
     len => 1,
     match => qr/\A[A-Za-z]\z/,
 
@@ -23,7 +23,7 @@ our $schema = [str => {
 }];
 
 1;
-# ABSTRACT: Latin letter, i.e. A-Z or a-z
+# ABSTRACT: A single latin letter, i.e. A-Z or a-z
 
 __END__
 
@@ -33,11 +33,11 @@ __END__
 
 =head1 NAME
 
-Sah::Schema::latin_letter - Latin letter, i.e. A-Z or a-z
+Sah::Schema::latin_letter - A single latin letter, i.e. A-Z or a-z
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schema::latin_letter (from Perl distribution Sah-Schemas-Str), released on 2022-09-22.
+This document describes version 0.013 of Sah::Schema::latin_letter (from Perl distribution Sah-Schemas-Str), released on 2022-09-23.
 
 =head1 SYNOPSIS
 
@@ -73,8 +73,8 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = 1;
- my $errmsg = $validator->($data); # => "Must match regex pattern qr(\\A[A-Za-z]\\z)"
+ $data = "";
+ my $errmsg = $validator->($data); # => "Length must be 1"
 
 Often a schema has coercion rule or default value, so after validation the
 validated value is different. To return the validated (set-as-default, coerced,
@@ -88,8 +88,8 @@ prefiltered) value:
  my $res = $validator->($data); # => ["","A"]
  
  # a sample invalid data
- $data = 1;
- my $res = $validator->($data); # => ["Must match regex pattern qr(\\A[A-Za-z]\\z)",1]
+ $data = "";
+ my $res = $validator->($data); # => ["Length must be 1",""]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like
@@ -159,6 +159,14 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Str>.
+
+=head1 SEE ALSO
+
+L<Sah::Schema::latin_alpha>
+
+L<Sah::Schema::latin_uppercase_letter>
+
+L<Sah::Schema::latin_lowercase_letter>
 
 =head1 AUTHOR
 

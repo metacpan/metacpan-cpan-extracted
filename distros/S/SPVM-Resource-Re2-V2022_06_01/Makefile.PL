@@ -3,12 +3,21 @@ use ExtUtils::MakeMaker;
 use strict;
 use warnings;
 use Config;
-use SPVM::Builder::Util::API;
-use SPVM::Builder::Config;
 use File::Temp();
+use Getopt::Long 'GetOptions';
+
+GetOptions(
+  'meta' => \my $meta,
+  'no-build-spvm-modules' => \my $no_build_spvm_modules,
+);
+
+if ($meta) {
+  $no_build_spvm_modules = 1;
+}
 
 # Check supported environment
-{
+unless ($meta) {
+  require SPVM::Builder::Config;
   # Need a compiler supporting c++11
   my $config = SPVM::Builder::Config->new_cpp(file_optional => 1);
   my $cc = $config->cc;
@@ -21,6 +30,7 @@ use File::Temp();
   }
 }
 
+my %spvm_requires = ('SPVM' => '0.9670');
 WriteMakefile(
   NAME              => 'SPVM::Resource::Re2::V2022_06_01',
   VERSION_FROM      => 'lib/SPVM/Resource/Re2/V2022_06_01.pm',
@@ -28,7 +38,7 @@ WriteMakefile(
   LICENSE           => 'perl_5',
   ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
     (ABSTRACT_FROM  => 'lib/SPVM/Resource/Re2/V2022_06_01.pm',
-     AUTHOR         => 'USER_NAME<USER_MAIL>') : ()),
+     AUTHOR         => 'Yuki Kimoto<kimoto.yuki@gmail.com>') : ()),
   test => {TESTS => 't/*.t'},
   clean => {FILES => ['.spvm_build', 't/.spvm_build']},
   META_MERGE => {
@@ -36,23 +46,27 @@ WriteMakefile(
     resources => {
       repository => {
         type => 'git',
-        url  => '',
-        web  => '',
+        url  => 'https://github.com/yuki-kimoto/SPVM-Resource-Re2-V2022_06_01.git',
+        web  => 'https://github.com/yuki-kimoto/SPVM-Resource-Re2-V2022_06_01',
       },
     },
   },
-  # SPVM::Builder::Util::API is needed for Makefile.PL
   CONFIGURE_REQUIRES => {
-    'SPVM'              => '0.9614',
+    %spvm_requires,
   },
+  PREREQ_PM         => {
+    %spvm_requires,
+  },
+  NORECURS => 1,
 );
 
 sub MY::postamble {
 
   my $make_rule = '';
   
-  
-  
+  unless ($no_build_spvm_modules) {
+    require SPVM::Builder::Util::API;
+  }
   
   return $make_rule;
 }

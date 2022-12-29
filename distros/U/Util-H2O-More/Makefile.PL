@@ -7,7 +7,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "provides C<baptise>, a drop-in replacement for C<bless>; like if C<bless> created accessors for you. This module also provides additional methods built using C<h2o> or C<o2h> from Util::H2O.",
+  "ABSTRACT" => "provides C<baptise>, a drop-in replacement for C<bless>; like if C<bless> created accessors for you. This module also provides additional methods built using C<h2o> or C<o2h> from Util::H2O that allow for the incremental addition of OOP into existing or small scale Perl code without having to fully commit to a Perl OOP framework or compromise one's personal Perl style.",
   "AUTHOR" => "oodler577 <oodler\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -17,13 +17,16 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Util::H2O::More",
   "PREREQ_PM" => {
+    "Config::Tiny" => 0,
     "Util::H2O" => "0.18"
   },
   "TEST_REQUIRES" => {
+    "Config::Tiny" => 0,
+    "File::Temp" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.1",
+  "VERSION" => "0.2.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -31,6 +34,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Config::Tiny" => 0,
+  "File::Temp" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
   "Util::H2O" => "0.18"

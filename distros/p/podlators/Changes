@@ -1,5 +1,27 @@
                       Revision history for podlators
 
+5.01 - 2022-12-25
+
+ - Guesswork (formatting rules based on heuristics intended for Perl
+   documentation) can now be disabled or selectively enabled in Pod::Text
+   with the guesswork option (--guesswork to pod2text).  This is similar
+   to the support added to Pod::Man in 5.00, except there is only one type
+   of guesswork currently (quoting).
+
+ - Pod::Text suppresses quote marks around some additional cases of Perl
+   code in C<> where the intent had been to suppress the quotes but there
+   were various bugs in the matching regular expressions.  This primarily
+   affects function and method calls.
+
+ - Fix an escaping issue in Pod::Man with complex lquote, rquote, and
+   quotes options containing double quotes that caused some double quotes
+   to be incorrectly duplicated.
+
+ - Pod::Man now avoids quoting macro arguments when this is unnecessary.
+
+ - Depend on Pod::Simple 3.26 or later, since Pod::Text now calls its
+   encoding() method.
+
 5.00 - 2022-11-25
 
  - Drop support for Perl 5.8.  The minimum required version is Perl 5.10.
@@ -32,7 +54,7 @@
 
  - Guesswork (formatting rules based on heuristics intended for Perl
    documentation) can now be disabled or selectively enabled in Pod::Man
-   with the guesswork option (--guessword to pod2man).  (#143668)
+   with the guesswork option (--guesswork to pod2man).  (#143668)
 
  - Pod::Text now supports an encoding option (-e or --encoding to
    pod2text) to force the output encoding, similar to Pod::Man.  The utf8

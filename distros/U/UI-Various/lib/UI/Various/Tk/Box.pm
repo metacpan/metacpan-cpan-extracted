@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.34';
+our $VERSION = '0.37';
 
 use UI::Various::core;
 use UI::Various::Box;
@@ -92,7 +92,8 @@ sub _prepare($$$)
 	return 1;
     }
     my @border = ($self->border ? (-relief => 'solid', -borderwidth => 1) : ());
-    my $grid = $_->_tk->Frame(@border)
+    my @attributes = ($self->_attributes(), @border);
+    my $grid = $_->_tk->Frame(@attributes)
 	->grid(-row => $row, -column => $column);
     my $errors = 0;
     my @tk = ();

@@ -1,5 +1,14 @@
-File-Rename version 1.31
-========================
+File-Rename version 1.99x
+=========================
+
+**** INCOMPATIBLE CHANGES IN THIS VERSION ****
+
+* rename script requires options to appear before code/files
+* new script 'unsafe-rename' allows options and other arguments
+    to be mixed
+* Build.PL does not build the new 'unsafe-rename' 
+
+RENAME COMMAND
 
 File::Rename provides an implementation of Larry Wall's eg/rename
 command.  All I have done is add some error checking and 
@@ -18,10 +27,23 @@ has similar options to the revised script.
 For Windows, the script is called file-rename to avoid clashes with
 existing rename command.
 
+RECENT CHANGES
+
 In 1.00, File::Rename::Options is a separate module, 
 and is not made visible by C<require File::Rename>. 
 
 In 1.30, the File::Rename::Unicode module was added.
+
+In 1.99, the behaviour of requiring options to appear before code or
+files was reintroduced - this requirement was dropped in version 0.30.
+
+The 'no_require_order' functionality is regarded as unsafe but is 
+available in the script unsafe-rename.
+
+Build.PL does not build unsafe-rename, and will be removed from 2.00
+
+In 1,991, added META data ExtUtils::MakeMaker => 7.36 
+to BUILD_REQUIRES and CONFIGURE_REQUIRES
 
 INSTALLATION
 
@@ -32,14 +54,13 @@ To install this module type the following:
    make test
    make install
 
-or if you have Module::Build
+or if you have Module::Build (but this does not create unsafe-rename)
 
    perl Build.PL
    perl Build
    perl Build test
    perl Build install
 
-    
 DEPENDENCIES
 
 This module requires these other modules and libraries:
@@ -77,7 +98,8 @@ upgrade filenames to unicode (encoded as utf8) by default.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2005, 2006, 2007, 2011, 2018, 2020, 2021 by Robin Barker
+Copyright (C) 2005, 2006, 2007, 2011, 2018, 2020, 2021, 2022
+by Robin Barker
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,

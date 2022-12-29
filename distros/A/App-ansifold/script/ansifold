@@ -51,13 +51,11 @@ ansifold [ options ]
     -h    --help                   Show help message
     -v    --version                Show version
 
-ansiexpand [ options ]
-
 ansicolrm [ options ]
 
 =head1 VERSION
 
-Version 1.1502
+Version 1.1503
 
 =head1 DESCRIPTION
 
@@ -282,7 +280,9 @@ See L<Getopt::EX::Module> for format.
 
 =head1 SEE ALSO
 
-L<ansifold|https://github.com/kaz-utashiro/ansifold>
+L<ansifold|https://github.com/kaz-utashiro/App-ansifold>
+
+L<ansiexpand|https://github.com/kaz-utashiro/App-ansiexpand>
 
 L<Text::ANSI::Fold|https://github.com/kaz-utashiro/Text-ANSI-Fold>
 

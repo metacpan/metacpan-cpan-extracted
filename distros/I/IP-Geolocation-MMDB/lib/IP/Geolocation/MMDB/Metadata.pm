@@ -6,68 +6,68 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 1.009;
+our $VERSION = 1.010;
 
 sub new {
-  my ($class, %attrs) = @_;
+    my ($class, %attrs) = @_;
 
-  my $self = bless \%attrs, $class;
+    my $self = bless \%attrs, $class;
 
-  return $self;
+    return $self;
 }
 
 sub binary_format_major_version {
-  my ($self) = @_;
+    my ($self) = @_;
 
-  return $self->{binary_format_major_version};
+    return $self->{binary_format_major_version};
 }
 
 sub binary_format_minor_version {
-  my ($self) = @_;
+    my ($self) = @_;
 
-  return $self->{binary_format_minor_version};
+    return $self->{binary_format_minor_version};
 }
 
 sub build_epoch {
-  my ($self) = @_;
+    my ($self) = @_;
 
-  return $self->{build_epoch};
+    return $self->{build_epoch};
 }
 
 sub database_type {
-  my ($self) = @_;
+    my ($self) = @_;
 
-  return $self->{database_type};
+    return $self->{database_type};
 }
 
 sub languages {
-  my ($self) = @_;
+    my ($self) = @_;
 
-  return $self->{languages};
+    return $self->{languages};
 }
 
 sub description {
-  my ($self) = @_;
+    my ($self) = @_;
 
-  return $self->{description};
+    return $self->{description};
 }
 
 sub ip_version {
-  my ($self) = @_;
+    my ($self) = @_;
 
-  return $self->{ip_version};
+    return $self->{ip_version};
 }
 
 sub node_count {
-  my ($self) = @_;
+    my ($self) = @_;
 
-  return $self->{node_count};
+    return $self->{node_count};
 }
 
 sub record_size {
-  my ($self) = @_;
+    my ($self) = @_;
 
-  return $self->{record_size};
+    return $self->{record_size};
 }
 
 1;
@@ -81,7 +81,7 @@ IP::Geolocation::MMDB::Metadata - Metadata from a MaxMind DB file
 
 =head1 VERSION
 
-version 1.009
+version 1.010
 
 =head1 SYNOPSIS
 
@@ -192,6 +192,10 @@ None.
 
 None.
 
+=head1 BUGS AND LIMITATIONS
+
+None known.
+
 =head1 SEE ALSO
 
 L<IP::Geolocation::MMDB>
@@ -200,13 +204,9 @@ L<IP::Geolocation::MMDB>
 
 Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
 
-=head1 BUGS AND LIMITATIONS
-
-None known.
-
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2022 Andreas Vögele
+Copyright (C) 2022 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

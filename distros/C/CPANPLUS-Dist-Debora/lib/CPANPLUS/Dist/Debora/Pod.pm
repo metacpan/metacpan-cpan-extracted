@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use parent qw(Pod::Simple);
 
@@ -302,7 +302,7 @@ CPANPLUS::Dist::Debora::Pod - Parse Pod documents
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -417,17 +417,17 @@ distributed with Perl.
 
 None.
 
-=head1 AUTHOR
-
-Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
-
 =head1 BUGS AND LIMITATIONS
 
 None known.
 
+=head1 AUTHOR
+
+Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
+
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2022 Andreas Vögele
+Copyright (C) 2022 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

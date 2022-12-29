@@ -1,8 +1,8 @@
 use ExtUtils::MakeMaker;
 
-use 5.008;
+use 5.010;
 
-my $version = '3.14';
+my $version = '3.15';
 
 my $devel   = exists $ENV{MARKOV_DEVEL};
 

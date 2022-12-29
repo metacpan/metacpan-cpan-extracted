@@ -6,7 +6,7 @@ use TF_TestQuiet;
 use aliased 'AI::TensorFlow::Libtensorflow';
 
 subtest "(CAPI, GetAllOpList)" => sub {
-	my $buf = Libtensorflow->GetAllOpList();
+	my $buf = AI::TensorFlow::Libtensorflow::TFLibrary->GetAllOpList();
 	ok $buf;
 };
 

@@ -126,7 +126,11 @@
 #define op_lvalue(o, t) mod(o, t)
 #endif
 
-#define DA_HAVE_OP_PADRANGE (PERL_COMBI_VERSION >= 5017006)
+#define DA_HAVE_OP_AELEMFAST_LEX	(PERL_COMBI_VERSION >= 5015000)
+#define DA_HAVE_OP_PADRANGE		(PERL_COMBI_VERSION >= 5017006)
+#define DA_HAVE_OP_PADSV_STORE		(PERL_COMBI_VERSION >= 5037003)
+#define DA_HAVE_OP_AELEMFASTLEX_STORE	(PERL_COMBI_VERSION >= 5037004)
+#define DA_HAVE_OP_EMPTYAVHV		(PERL_COMBI_VERSION >= 5037006)
 
 #if DA_HAVE_OP_PADRANGE
 #define IS_PUSHMARK_OR_PADRANGE(op) \
@@ -239,6 +243,10 @@ static char const msg_no_symref[] =
 
 #define MOD(op) op_lvalue((op), OP_GREPSTART)
 
+#ifndef OPpPAD_STATE
+#define OPpPAD_STATE 0
+#endif
+
 #ifndef SVs_PADBUSY
 #define SVs_PADBUSY 0
 #endif
@@ -319,7 +327,7 @@ STATIC void da_peep2(pTHX_ OP *o);
 STATIC SV *da_fetch(pTHX_ SV *a1, SV *a2) {
 	switch ((Size_t) a1) {
 	case DA_ALIAS_PAD:
-		return PL_curpad[(Size_t) a2];
+		return PAD_SVl((Size_t) a2);
 	case DA_ALIAS_RV:
 		if (SvTYPE(a2) == SVt_PVGV)
 			a2 = GvSV(a2);
@@ -386,16 +394,20 @@ STATIC void da_restore_gvcv(pTHX_ void *gv_v) {
 	SvREFCNT_dec((SV *) gv);
 }
 
-STATIC void da_alias(pTHX_ SV *a1, SV *a2, SV *value) {
+STATIC void da_alias_pad(pTHX_ PADOFFSET index, SV *value) {
+	SV *old = PAD_SVl(index);
 	PREP_ALIAS_INC(value);
-	if ((Size_t) a1 == DA_ALIAS_PAD) {
-		SV *old = PL_curpad[(Size_t) a2];
-		PL_curpad[(Size_t) a2] = value;
-		SvFLAGS(value) |= (SvFLAGS(old) & SVs_PADFLAGS);
-		if (old != &PL_sv_undef)
-			SvREFCNT_dec(old);
-		return;
-	}
+	PAD_SVl(index) = value;
+	SvFLAGS(value) |= (SvFLAGS(old) & SVs_PADFLAGS);
+	if (old != &PL_sv_undef)
+		SvREFCNT_dec(old);
+}
+
+STATIC void da_alias(pTHX_ SV *a1, SV *a2, SV *value) {
+	if ((Size_t) a1 == DA_ALIAS_PAD)
+		return da_alias_pad(aTHX_ (PADOFFSET)(Size_t)a2, value);
+
+	PREP_ALIAS_INC(value);
 	switch ((Size_t) a1) {
 		SV **svp;
 		GV *gv;
@@ -471,7 +483,7 @@ STATIC void da_alias(pTHX_ SV *a1, SV *a2, SV *value) {
 	default:
 		switch (SvTYPE(a1)) {
 		case SVt_PVAV:
-			if (!av_store((AV *) a1, (Size_t) a2, value))
+			if (!av_store((AV *) a1, (SSize_t) a2, value))
 				SvREFCNT_dec(value);
 			return;
 		case SVt_PVHV:
@@ -601,18 +613,38 @@ STATIC OP *DataAlias_pp_anonhash(pTHX) {
 STATIC OP *DataAlias_pp_aelemfast(pTHX) {
 	dSP;
 	AV *av =
-#if (PERL_COMBI_VERSION >= 5015000)
+#if DA_HAVE_OP_AELEMFAST_LEX
 		PL_op->op_type == OP_AELEMFAST_LEX ?
 #else
 		(PL_op->op_flags & OPf_SPECIAL) ?
 #endif
 			(AV *) PAD_SV(PL_op->op_targ) : GvAVn(cGVOP_gv);
 	IV index = PL_op->op_private;
+#if (PERL_COMBI_VERSION >= 5019010)
+	index = (I8)index;
+#endif
 	if (!av_fetch(av, index, TRUE))
 		DIE(aTHX_ PL_no_aelem, index);
 	XPUSHaa(av, index);
 	RETURN;
 }
+
+#if DA_HAVE_OP_AELEMFASTLEX_STORE
+STATIC OP *DataAlias_pp_aelemfastlex_store(pTHX) {
+	dSP;
+	SV *value = TOPs;
+	/* inlined simplified DataAlias_pp_aelemfast */
+	AV *av = (AV *) PAD_SV(PL_op->op_targ);
+	IV index = (I8)PL_op->op_private;
+	if (!av_fetch(av, index, TRUE))
+		DIE(aTHX_ PL_no_aelem, index);
+	/* inlined simplified DataAlias_pp_sassign */
+	PREP_ALIAS_INC(value);
+	if (!av_store(av, index, value))
+		SvREFCNT_dec(value);
+	RETURN;
+}
+#endif
 
 STATIC bool da_badmagic(pTHX_ SV *sv) {
 	MAGIC *mg = SvMAGIC(sv);
@@ -832,7 +864,7 @@ STATIC OP *DataAlias_pp_padrange_generic(pTHX_ bool is_single) {
 				default: da_type = DA_ALIAS_PAD; break;
 			}
 		}
-		if (PL_op->op_private & OPpLVAL_INTRO) {
+		if ((PL_op->op_private & (OPpLVAL_INTRO|OPpPAD_STATE)) == OPpLVAL_INTRO) {
 			if (da_type == DA_ALIAS_PAD) {
 				SAVEGENERICSV(PAD_SVl(index));
 				PAD_SVl(index) = &PL_sv_undef;
@@ -858,10 +890,23 @@ STATIC OP *DataAlias_pp_padrange_single(pTHX) {
 
 #endif
 
+#if DA_HAVE_OP_PADSV_STORE
+STATIC OP *DataAlias_pp_padsv_store(pTHX) {
+	dSP;
+	PADOFFSET index = PL_op->op_targ;
+	if ((PL_op->op_private & (OPpLVAL_INTRO|OPpPAD_STATE)) == OPpLVAL_INTRO) {
+		SAVEGENERICSV(PAD_SVl(index));
+		PAD_SVl(index) = &PL_sv_undef;
+	}
+	da_alias_pad(aTHX_ index, TOPs);
+	RETURN;
+}
+#endif
+
 STATIC OP *DataAlias_pp_padsv(pTHX) {
 	dSP;
-	IV index = PL_op->op_targ;
-	if (PL_op->op_private & OPpLVAL_INTRO) {
+	PADOFFSET index = PL_op->op_targ;
+	if ((PL_op->op_private & (OPpLVAL_INTRO|OPpPAD_STATE)) == OPpLVAL_INTRO) {
 		SAVEGENERICSV(PAD_SVl(index));
 		PAD_SVl(index) = &PL_sv_undef;
 	}
@@ -871,7 +916,7 @@ STATIC OP *DataAlias_pp_padsv(pTHX) {
 
 STATIC OP *DataAlias_pp_padav(pTHX) {
 	dSP; dTARGET;
-	if (PL_op->op_private & OPpLVAL_INTRO)
+	if ((PL_op->op_private & (OPpLVAL_INTRO|OPpPAD_STATE)) == OPpLVAL_INTRO)
 		SAVECLEARSV(PAD_SVl(PL_op->op_targ));
 	XPUSHaa(DA_ALIAS_AV, TARG);
 	RETURN;
@@ -879,7 +924,7 @@ STATIC OP *DataAlias_pp_padav(pTHX) {
 
 STATIC OP *DataAlias_pp_padhv(pTHX) {
 	dSP; dTARGET;
-	if (PL_op->op_private & OPpLVAL_INTRO)
+	if ((PL_op->op_private & (OPpLVAL_INTRO|OPpPAD_STATE)) == OPpLVAL_INTRO)
 		SAVECLEARSV(PAD_SVl(PL_op->op_targ));
 	XPUSHaa(DA_ALIAS_HV, TARG);
 	RETURN;
@@ -1616,7 +1661,7 @@ STATIC void da_lvalue(pTHX_ OP *op, int list) {
 	} break;
 #endif
 	case OP_AELEM:     op->op_ppaddr = DataAlias_pp_aelem;     break;
-#if (PERL_COMBI_VERSION >= 5015000)
+#if DA_HAVE_OP_AELEMFAST_LEX
 	case OP_AELEMFAST_LEX:
 #endif
 	case OP_AELEMFAST: op->op_ppaddr = DataAlias_pp_aelemfast; break;
@@ -1811,6 +1856,23 @@ STATIC int da_transform(pTHX_ OP *op, int sib) {
 		case OP_REFGEN:
 			op->op_ppaddr = DataAlias_pp_refgen;
 			break;
+#if DA_HAVE_OP_PADSV_STORE
+		case OP_PADSV_STORE:
+			op->op_ppaddr = DataAlias_pp_padsv_store;
+			MOD(kid);
+			ksib = FALSE;
+			if (PadnameOUTER(PadnamelistARRAY(PL_comppad_name)[op->op_targ])
+					   && ckWARN(WARN_CLOSURE))
+				   Perl_warner(aTHX_ packWARN(WARN_CLOSURE), DA_OUTER_ERR);
+			break;
+#endif
+#if DA_HAVE_OP_AELEMFASTLEX_STORE
+		case OP_AELEMFASTLEX_STORE:
+			op->op_ppaddr = DataAlias_pp_aelemfastlex_store;
+			MOD(kid);
+			ksib = FALSE;
+			break;
+#endif
 		case OP_AASSIGN:
 			op->op_ppaddr = DataAlias_pp_aassign;
 			op->op_private = 0;
@@ -1874,6 +1936,11 @@ STATIC int da_transform(pTHX_ OP *op, int sib) {
 			if (!(tmp = OpSIBLING(kid))) break; /* first elem */
 			op->op_ppaddr = DataAlias_pp_anonhash;
 		 mod:	do MOD(tmp); while ((tmp = OpSIBLING(tmp)));
+			break;
+#if DA_HAVE_OP_EMPTYAVHV
+		case OP_EMPTYAVHV:
+			break;
+#endif
 		}
 
 		if (sib && OpHAS_SIBLING(op)) {

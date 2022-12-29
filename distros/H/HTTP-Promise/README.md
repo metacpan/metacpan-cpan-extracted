@@ -18,19 +18,23 @@ SYNOPSIS
             # 8Kb
             max_headers_size => 8192,
             max_redirect => 3,
+            # For Promise::Me
+            medium => 'mmap',
             proxy => 'https://proxy.example.org:8080',
-            # Can also be cbor or storable
+            # The serialiser to use for the promise in Promise::Me
+            # Defaults to storable, but can also be cbor and sereal
             serialiser => 'sereal',
+            shared_mem_size => 1048576,
             # You can also use decimals with Time::HiRes
             timeout => 15,
             # force the use of files to store the response content
             use_content_file => 1,
-            # The serialiser to use for the promise in Promise::Me
-            # Defaults to storable, but can also be cbor and sereal
-            serialiser => 'sereal',
+            # Should we use promise?
+            # use_promise => 0,
         );
         my $prom = $p->get( 'https://www.example.org', $hash_of_query_params )->then(sub
         {
+            # Nota bene: the last value in this sub will be passed as the argument to the next 'then'
             my $resp = shift( @_ ); # get the HTTP::Promise::Response object
         })->catch(sub
         {
@@ -45,7 +49,7 @@ SYNOPSIS
 VERSION
 =======
 
-        v0.1.4
+        v0.2.3
 
 DESCRIPTION
 ===========
@@ -170,7 +174,7 @@ object whose API is similar to that of
 [HTTP::Response](https://metacpan.org/pod/HTTP::Response){.perl-module}.
 
 When an error occurs, it is caught and sent by calling [\"reject\" in
-Promise::XS](https://metacpan.org/pod/Promise::XS#reject){.perl-module}
+Promise::Me](https://metacpan.org/pod/Promise::Me#reject){.perl-module}
 with an
 [HTTP::Promise::Exception](https://metacpan.org/pod/HTTP::Promise::Exception){.perl-module}
 object.
@@ -218,8 +222,16 @@ corresponding method, so you can get or change its value later:
 
 -   `local_address`
 
-    String. An IP address or local host name to use when establishing
-    TCP/IP connections.
+    String. A local IP address or local host name to use when
+    establishing TCP/IP connections.
+
+-   `local_host`
+
+    String. Same as `local_address`
+
+-   `local_port`
+
+    Integer. A local port to use when establishing TCP/IP connections.
 
 -   `max_redirect`
 
@@ -235,6 +247,18 @@ corresponding method, so you can get or change its value later:
     returned. Default value is `undef`, i.e. no limit.
 
     See also the `threshold` option.
+
+-   `medium`
+
+    This can be either `file`, `mmap` or `memory`. This will be passed
+    on to
+    [Promise::Me](https://metacpan.org/pod/Promise::Me){.perl-module} as
+    `result_shared_mem_size` to store resulting data between processes.
+    See
+    [Promise::Me](https://metacpan.org/pod/Promise::Me){.perl-module}
+    for more details.
+
+    It defaults to `$Promise::Me::SHARE_MEDIUM`
 
 -   `no_proxy`
 
@@ -263,6 +287,16 @@ corresponding method, so you can get or change its value later:
     `$SERIALISER`, which is a copy of the `$SERIALISER` in
     [Promise::Me](https://metacpan.org/pod/Promise::Me){.perl-module},
     which should be by default `storable`
+
+-   `shared_mem_size`
+
+    Integer. This will be passed on to
+    [Promise::Me](https://metacpan.org/pod/Promise::Me){.perl-module}.
+    See
+    [Promise::Me](https://metacpan.org/pod/Promise::Me){.perl-module}
+    for more details.
+
+    It defaults to `$Promise::Me::RESULT_MEMORY_SIZE`
 
 -   `ssl_opts`
 
@@ -329,13 +363,23 @@ corresponding method, so you can get or change its value later:
     Boolean. Enables the use of a temporary local file to store the
     response content, no matter the size o the response content.
 
+-   `use_promise`
+
+    Boolean. When true, this will have
+    [HTTP::Promise](https://metacpan.org/pod/HTTP::Promise){.perl-module}
+    HTTP methods return a
+    [HTTP::Promise](https://metacpan.org/pod/promise){.perl-module}, and
+    when false, it returns directly the
+    [HTTP::Promise::Response](https://metacpan.org/pod/response object){.perl-module}.
+    Defaults to true.
+
 METHODS
 =======
 
-The following methods are available. You can also access the same
-methods implemented in
+The following methods are available. This interface provides similar
+interface as
 [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent){.perl-module}
-even if they are not listed here.
+while providing more granular control.
 
 accept\_language
 ----------------
@@ -492,6 +536,11 @@ be used to call one or more
             say( "Error code; ", $ex->code, " and message: ", $ex->message );
         });
 
+However, if [\"use\_promise\"](#use_promise){.perl-module} is set to
+false, this will return an
+[HTTP::Promise::Response](https://metacpan.org/pod/HTTP::Promise::Response){.perl-module}
+object directly.
+
 dnt
 ---
 
@@ -533,11 +582,10 @@ retrieved with this method.
 from
 ----
 
-\"the email address for the human user who controls the requesting user
-agent. The address should be machine-usable, as defined in
-[RFC2822](https://tools.ietf.org/html/rfc2822){.perl-module}. The `from`
-value is sent as the `From` header in the requests\" (Excerpt taken from
-LWP::UserAgent documentation)
+Get or set the email address for the human user who controls the
+requesting user agent. The address should be machine-usable, as defined
+in [RFC2822](https://tools.ietf.org/html/rfc2822){.perl-module}. The
+`from` value is sent as the `From` header in the requests
 
 The default value is `undef`, so no `From` field is set by default.
 
@@ -570,6 +618,11 @@ be used to call one or more
             say( "Error code; ", $ex->code, " and message: ", $ex->message );
         });
 
+However, if [\"use\_promise\"](#use_promise){.perl-module} is set to
+false, this will return an
+[HTTP::Promise::Response](https://metacpan.org/pod/HTTP::Promise::Response){.perl-module}
+object directly.
+
 head
 ----
 
@@ -596,6 +649,25 @@ be used to call one or more
             say( "Error code; ", $ex->code, " and message: ", $ex->message );
         });
 
+However, if [\"use\_promise\"](#use_promise){.perl-module} is set to
+false, this will return an
+[HTTP::Promise::Response](https://metacpan.org/pod/HTTP::Promise::Response){.perl-module}
+object directly.
+
+httpize\_datetime
+-----------------
+
+Provided with a
+[DateTime](https://metacpan.org/pod/DateTime){.perl-module} or
+[Module::Generic::DateTime](https://metacpan.org/pod/Module::Generic::DateTime){.perl-module}
+object, and this will ensure the `DateTime` object stringifies to a
+valid HTTP datetime.
+
+It returns the `DateTime` object provided upon success, or upon error,
+sets an
+[error](https://metacpan.org/pod/Module::Generic#error){.perl-module}
+and returns `undef`
+
 inactivity\_timeout
 -------------------
 
@@ -621,16 +693,28 @@ This is an alias for
 local\_address
 --------------
 
-\"Get/set the local interface to bind to for network connections. The
+Get or set the local interface to bind to for network connections. The
 interface can be specified as a hostname or an IP address. This value is
-passed as the `LocalAddr` argument to
-[IO::Socket::INET](https://metacpan.org/pod/IO::Socket::INET){.perl-module}.\"
-(Excerpt taken from LWP::UserAgent documentation)
+passed as the `LocalHost` argument to
+[IO::Socket](https://metacpan.org/pod/IO::Socket){.perl-module}.
 
 The default value is `undef`.
 
         my $p = HTTP::Promise->new( local_address => 'localhost' );
         $p->local_address( '127.0.0.1' );
+
+local\_host
+-----------
+
+This is the same as [\"local\_address\"](#local_address){.perl-module}.
+You can use either interchangeably.
+
+local\_port
+-----------
+
+Get or set the local port to use to bind to for network connections.
+This value is passed as the `LocalPort` argument to
+[IO::Socket](https://metacpan.org/pod/IO::Socket){.perl-module}
 
 max\_body\_in\_memory\_size
 ---------------------------
@@ -657,15 +741,14 @@ possible. Default is 7.
 max\_size
 ---------
 
-\"Get/set the size limit for response content. The default is `undef`,
+Get or set the size limit for response content. The default is `undef`,
 which means that there is no limit. If the returned response content is
 only partial, because the size limit was exceeded, then a
 `Client-Aborted` header will be added to the response. The content might
 end up longer than `max_size` as we abort once appending a chunk of data
 makes the length exceed the limit. The `Content-Length` header, if
 present, will indicate the length of the full content and will normally
-not be the same as `length( $resp->content )`\" (Excerpt taken from
-LWP::UserAgent documentation)
+not be the same as `length( $resp->content )`
 
         my $p = HTTP::Promise->max_size(512000); # 512kb
         $p->max_size(512000);
@@ -700,6 +783,11 @@ It can then be used to call one or more
             # An HTTP::Promise::Exception object is passed with an error code
             say( "Error code; ", $ex->code, " and message: ", $ex->message );
         });
+
+However, if [\"use\_promise\"](#use_promise){.perl-module} is set to
+false, this will return an
+[HTTP::Promise::Response](https://metacpan.org/pod/HTTP::Promise::Response){.perl-module}
+object directly.
 
 no\_proxy
 ---------
@@ -741,6 +829,11 @@ be used to call one or more
             say( "Error code; ", $ex->code, " and message: ", $ex->message );
         });
 
+However, if [\"use\_promise\"](#use_promise){.perl-module} is set to
+false, this will return an
+[HTTP::Promise::Response](https://metacpan.org/pod/HTTP::Promise::Response){.perl-module}
+object directly.
+
 patch
 -----
 
@@ -774,6 +867,11 @@ be used to call one or more
             # An HTTP::Promise::Exception object is passed with an error code
             say( "Error code; ", $ex->code, " and message: ", $ex->message );
         });
+
+However, if [\"use\_promise\"](#use_promise){.perl-module} is set to
+false, this will return an
+[HTTP::Promise::Response](https://metacpan.org/pod/HTTP::Promise::Response){.perl-module}
+object directly.
 
 post
 ----
@@ -817,6 +915,11 @@ be used to call one or more
             # An HTTP::Promise::Exception object is passed with an error code
             say( "Error code; ", $ex->code, " and message: ", $ex->message );
         });
+
+However, if [\"use\_promise\"](#use_promise){.perl-module} is set to
+false, this will return an
+[HTTP::Promise::Response](https://metacpan.org/pod/HTTP::Promise::Response){.perl-module}
+object directly.
 
 prepare\_headers
 ----------------
@@ -930,6 +1033,11 @@ be used to call one or more
             say( "Error code; ", $ex->code, " and message: ", $ex->message );
         });
 
+However, if [\"use\_promise\"](#use_promise){.perl-module} is set to
+false, this will return an
+[HTTP::Promise::Response](https://metacpan.org/pod/HTTP::Promise::Response){.perl-module}
+object directly.
+
 request
 -------
 
@@ -985,6 +1093,11 @@ For example:
             my $ex = shift( @_ );
             say "Got an error code ", $ex->code, " with message: ", $ex->message;
         });
+
+However, if [\"use\_promise\"](#use_promise){.perl-module} is set to
+false, this will return an
+[HTTP::Promise::Response](https://metacpan.org/pod/HTTP::Promise::Response){.perl-module}
+object directly.
 
 requests\_redirectable
 ----------------------
@@ -1092,6 +1205,11 @@ For example:
             my $ex = shift( @_ );
             say "Got an error code ", $ex->code, " with message: ", $ex->message;
         });
+
+However, if [\"use\_promise\"](#use_promise){.perl-module} is set to
+false, this will return an
+[HTTP::Promise::Response](https://metacpan.org/pod/HTTP::Promise::Response){.perl-module}
+object directly.
 
 ssl\_opts
 ---------
@@ -1214,10 +1332,65 @@ whose object is a
 [Module::Generic::File](https://metacpan.org/pod/Module::Generic::File){.perl-module}
 object and can be retrieved with [\"file\"](#file){.perl-module}.
 
+use\_promise
+------------
+
+Boolean. When true, this will have
+[HTTP::Promise](https://metacpan.org/pod/HTTP::Promise){.perl-module}
+HTTP methods return a
+[HTTP::Promise](https://metacpan.org/pod/promise){.perl-module}, and
+when false, it returns directly the
+[HTTP::Promise::Response](https://metacpan.org/pod/response object){.perl-module}.
+Defaults to true.
+
+CLASS FUNCTIONS
+===============
+
+fetch
+-----
+
+This method can be exported, such as:
+
+        use HTTP::Promise qw( fetch );
+        my $prom = fetch( 'http://example.com/something.json' );
+        # or
+        fetch( 'http://example.com/something.json' )->then(sub
+        {
+            my( $resolve, $reject ) = @$_;
+            my $resp = shift( @_ );
+            my $data = $resp->decoded_content;
+        })->then(sub
+        {
+            my $json = shift( @_ );
+            print( STDOUT "JSON data:\n$json\n" );
+        });
+
+You can also call it with an object, such as:
+
+        my $http = HTTP::Promise->new;
+        my $prom = $http->fetch( 'http://example.com/something.json' );
+
+`fetch` performs the same way as [\"get\"](#get){.perl-module}, by
+default, and accepts the same possible parameters. It sets an error and
+returns `undef` upon error, or return a
+[promise](https://metacpan.org/pod/Promise::Me){.perl-module}
+
+However, if [\"use\_promise\"](#use_promise){.perl-module} is set to
+false, this will return an
+[HTTP::Promise::Response](https://metacpan.org/pod/HTTP::Promise::Response){.perl-module}
+object directly.
+
+You can, however, specify, another method by providing the `method`
+option with value being an HTTP method, i.e. `DELETE`, `GET`, `HEAD`,
+`OPTIONS`, `PATCH`, `POST`, `PUT`.
+
+See also [Mozilla documentation on
+fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch){.perl-module}
+
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x55748b07a818)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x55939f09a088)"}\>
 
 CREDITS
 =======

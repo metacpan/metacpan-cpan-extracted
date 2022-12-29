@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tk::NodeEditor 1.375;
+package Config::Model::Tk::NodeEditor 1.376;
 
 use strict;
 use warnings;
@@ -196,7 +196,16 @@ sub add_accept_entry {
     my $font = $cw->{my_font}; #cget('-font');
 
     my $accepted = '';
-    $f->Label( -text => 'accept : /' . join( '/, /', @rexp ) . '/', -font => $font )->pack;
+    my $accept_label = $f->Label(
+        -text => 'accept : /' . join( '/, /', @rexp ) . '/',
+        -font => $font
+    );
+    $cw->Balloon(-state => 'balloon')->attach(
+        $accept_label,
+        -msg => qq!Add a parameter not yet known by the model and hit <Return>.\n!
+        . qq!This parameter must satisfy the Perl regexp shown after "accept:".!
+    );
+    $accept_label->pack;
 
     my $e = $f->Entry( -textvariable => \$accepted, -font => $font)->pack( qw/-side left -anchor w/, @fxe1 );
     my $sub = sub {

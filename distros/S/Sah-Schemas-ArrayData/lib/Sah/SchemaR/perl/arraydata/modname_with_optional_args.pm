@@ -1,13 +1,13 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::perl::arraydata::modname_with_optional_args;
 
-our $DATE = '2021-09-29'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2022-09-25'; # DATE
+our $VERSION = '0.004'; # VERSION
 
-our $rschema = do{my$var={base=>"any",clsets_after_base=>[{of=>[["array_from_json",{elems=>[["str",{match=>"\\A(?:[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*(?:=.*)?)\\z","x.completion"=>["perl_modname",{ns_prefix=>"ArrayData",recurse=>undef,recurse_matching=>"all-at-once"}],"x.perl.coerce_rules"=>[["From_str::normalize_perl_modname",{ns_prefix=>"ArrayData"}]]}],["any",{of=>[["array",{req=>1}],["hash",{req=>1}]],req=>1}]],max_len=>2,min_len=>1}],'$var->{clsets_after_base}[0]{of}[0][1]{elems}[0]'],"x.completion"=>["perl_modname",{ns_prefix=>"ArrayData",recurse=>undef,recurse_matching=>"all-at-once"}]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["any"],type=>"any",v=>2};$var->{clsets_after_base}[0]{of}[1]=$var->{clsets_after_base}[0]{of}[0][1]{elems}[0];$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
+our $rschema = do{my$var={base=>"any",clsets_after_base=>[{of=>[["array_from_json",{elems=>[["str",{match=>"\\A(?:[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*(?:=.*)?)\\z","x.completion"=>["perl_modname",{ns_prefix=>"ArrayData",recurse=>undef,recurse_matching=>"all-at-once"}],"x.perl.coerce_rules"=>[["From_str::normalize_perl_modname",{ns_prefix=>"ArrayData"}]]}],["any",{of=>[["array",{req=>1}],["hash",{req=>1}]],req=>1}]],max_len=>2,min_len=>1}],'$var->{clsets_after_base}[0]{of}[0][1]{elems}[0]'],summary=>"Perl ArrayData::* module name without the prefix (e.g. Lingua::Word::ID::KBBI) with optional args (e.g. Foo::Bar=arg1,arg2)","x.completion"=>["perl_modname",{ns_prefix=>"ArrayData",recurse=>undef,recurse_matching=>"all-at-once"}]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["any"],type=>"any",v=>2};$var->{clsets_after_base}[0]{of}[1]=$var->{clsets_after_base}[0]{of}[0][1]{elems}[0];$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
-# ABSTRACT: 
+# ABSTRACT: Perl ArrayData::* module name without the prefix (e.g. Lingua::Word::ID::KBBI) with optional args (e.g. Foo::Bar=arg1,arg2)
 
 __END__
 
@@ -17,11 +17,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::perl::arraydata::modname_with_optional_args -  
+Sah::SchemaR::perl::arraydata::modname_with_optional_args - Perl ArrayData::* module name without the prefix (e.g. Lingua::Word::ID::KBBI) with optional args (e.g. Foo::Bar=arg1,arg2)
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::SchemaR::perl::arraydata::modname_with_optional_args (from Perl distribution Sah-Schemas-ArrayData), released on 2021-09-29.
+This document describes version 0.004 of Sah::SchemaR::perl::arraydata::modname_with_optional_args (from Perl distribution Sah-Schemas-ArrayData), released on 2022-09-25.
 
 =head1 DESCRIPTION
 
@@ -54,13 +54,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

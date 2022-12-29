@@ -1,13 +1,13 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::perl::arraydata::modnames_with_optional_args;
 
-our $DATE = '2021-09-29'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2022-09-25'; # DATE
+our $VERSION = '0.004'; # VERSION
 
-our $rschema = do{my$var={base=>"array",clsets_after_base=>[{description=>"\nArray of Perl ArrayData::* module names without the prefix and optional args.\nEach element is of `perl::arraydata::modname` schema, e.g. `Word::ID::KBBI`, `WordList=wordlist,EN::Enable`.\n\nContains coercion rule that expands wildcard, so you can specify:\n\n    Word::ID::*\n\nand it will be expanded to e.g.:\n\n    [\"Word::ID::KBBI\", \"Word::ID::PERLANCAR\"]\n\nThe wildcard syntax supports jokers (`?`, `*`, `**`), brackets (`[abc]`), and\nbraces (`{one,two}`). See <pm:Module::List::Wildcard> for more details.\n\n",of=>["perl::arraydata::modname_with_optional_args",{req=>1},{}],summary=>"Array of Perl ArrayData::* module names without the prefix, with optional args, e.g. [\"Word::ID::KBBI\", \"WordList=wordlist,EN::Enable\"]","x.element_completion"=>["perl_modname",{ns_prefix=>"ArrayData"}],"x.perl.coerce_rules"=>[["From_str_or_array::expand_perl_modname_wildcard",{ns_prefix=>"ArrayData"}]]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["array"],type=>"array",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
+our $rschema = do{my$var={base=>"array",clsets_after_base=>[{description=>"\nArray of Perl ArrayData::* module names without the prefix and optional args.\nEach element is of `perl::arraydata::modname` schema, e.g.\n`Lingua::Word::ID::KBBI`, `WordList=wordlist,EN::Enable`.\n\nContains coercion rule that expands wildcard, so you can specify:\n\n    Lingua::Word::ID::*\n\nand it will be expanded to e.g.:\n\n    [\"Lingua::Word::ID::KBBI\", \"Word::ID::PERLANCAR\"]\n\nThe wildcard syntax supports jokers (`?`, `*`, `**`), brackets (`[abc]`), and\nbraces (`{one,two}`). See <pm:Module::List::Wildcard> for more details.\n\n",of=>["perl::arraydata::modname_with_optional_args",{req=>1},{}],summary=>"Array of Perl ArrayData::* module names without the prefix, with optional args, e.g. [\"Lingua::Word::ID::KBBI\", \"WordList=wordlist,EN::Enable\"]","x.element_completion"=>["perl_modname",{ns_prefix=>"ArrayData"}],"x.perl.coerce_rules"=>[["From_str_or_array::expand_perl_modname_wildcard",{ns_prefix=>"ArrayData"}]]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["array"],type=>"array",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
-# ABSTRACT: Array of Perl ArrayData::* module names without the prefix, with optional args, e.g. ["Word::ID::KBBI", "WordList=wordlist,EN::Enable"]
+# ABSTRACT: Array of Perl ArrayData::* module names without the prefix, with optional args, e.g. ["Lingua::Word::ID::KBBI", "WordList=wordlist,EN::Enable"]
 
 __END__
 
@@ -17,11 +17,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::perl::arraydata::modnames_with_optional_args - Array of Perl ArrayData::* module names without the prefix, with optional args, e.g. ["Word::ID::KBBI", "WordList=wordlist,EN::Enable"]
+Sah::SchemaR::perl::arraydata::modnames_with_optional_args - Array of Perl ArrayData::* module names without the prefix, with optional args, e.g. ["Lingua::Word::ID::KBBI", "WordList=wordlist,EN::Enable"]
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::SchemaR::perl::arraydata::modnames_with_optional_args (from Perl distribution Sah-Schemas-ArrayData), released on 2021-09-29.
+This document describes version 0.004 of Sah::SchemaR::perl::arraydata::modnames_with_optional_args (from Perl distribution Sah-Schemas-ArrayData), released on 2022-09-25.
 
 =head1 DESCRIPTION
 
@@ -54,13 +54,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

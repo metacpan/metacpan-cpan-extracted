@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 pp_setversion($VERSION);
 
@@ -31,10 +31,10 @@ PDL::Finance::TA - Technical Analysis Library (http://ta-lib.org) bindings for P
 TA-Lib library - L<http://ta-lib.org> - is a multi-platform tool for market analysis. TA-Lib is widely used by trading
 software developers requiring to perform technical analysis of financial market data.
 
-This module provides an L<PDL|PDL> interface for TA-Lib library. It combines rich TA-Lib functionality with excelent
-L<PDL|PDL> performance of handling huge data.
+This module provides an L<PDL> interface for TA-Lib library. It combines rich TA-Lib functionality with excellent
+L<PDL> performance of handling huge data.
 
-If you are not a L<PDL|PDL> user you might be interested in L<Finance::TA|Finance::TA> module which provides approximately
+If you are not a L<PDL> user you might be interested in L<Finance::TA|Finance::TA> module which provides approximately
 the same set of functions working with common perl data structures (which is fine if you are not about to process large
 data sets and if you generally do not worry about performace).
 

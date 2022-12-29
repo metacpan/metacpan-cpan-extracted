@@ -28,12 +28,15 @@ requires:
   Gzip::Faster: '0'
   JSON: '4.06'
   MIME::Base64: '0'
+  Net::Server::Daemonize: '0'
   POE: '0'
   POE::Wheel::FollowTail: '1.368'
   Sys::Hostname: '0'
+  Sys::Syslog: '0'
   TOML: '0.97'
+  Text::ANSITable: '0.608'
   perl: '5.006'
 resources:
-  repository: https://github.com/VVelox/Lilith
-version: v0.0.1
+  repository: https://github.com/LilithSec/Lilith
+version: v0.1.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

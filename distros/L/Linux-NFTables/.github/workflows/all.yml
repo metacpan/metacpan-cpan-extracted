@@ -1,0 +1,125 @@
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+env:
+   PERL_USE_UNSAFE_INC: 0
+   AUTHOR_TESTING: 1
+   AUTOMATED_TESTING: 1
+   RELEASE_TESTING: 1
+   PERL_CARTON_PATH: $GITHUB_WORKSPACE/local
+
+jobs:
+  ubuntu-perl:
+    runs-on: ubuntu-latest
+
+    name: Ubuntu (Perl ${{matrix.perl-version}})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        perl-version:
+          - '5.36'
+          - '5.34'
+          - '5.32'
+          - '5.30'
+          - '5.28'
+          - '5.26'
+          - '5.24'
+          - '5.22'
+          - '5.20'
+          - '5.18'
+          - '5.16'
+          - '5.14'
+          - '5.12'
+          - '5.10'
+
+    steps:
+      - uses: actions/checkout@main
+        with:
+            submodules: recursive
+
+      # As of now GitHub’s container lacks the NET_ADMIN capability,
+      # so we run everything here inside a sub-container.
+      - name: Start perl-tester container
+        run: sudo docker run --detach=true --name=perltester --rm --interactive --cap-add NET_ADMIN --mount type=bind,source=$(pwd),target=/host --workdir /host perldocker/perl-tester:${{ matrix.perl-version }}
+      - name: Install OS packages to build nftables
+        run: docker exec perltester sh -c 'apt update -y && apt install -y curl bison flex asciidoc libmnl-dev libjansson-dev'
+      - name: Clone libnftnl
+        run: docker exec perltester git clone git://git.netfilter.org/libnftnl
+      - name: Build & install libnftnl
+        run: docker exec perltester sh -c 'cd libnftnl && ./autogen.sh && ./configure && make install'
+      - name: Clone nftables
+        run: docker exec perltester git clone git://git.netfilter.org/nftables
+      - name: Build & install nftables
+        run: docker exec perltester sh -c 'cd nftables && ./autogen.sh && ./configure --with-json --without-cli && make install'
+      - run: docker exec perltester ldconfig
+      - name: Install CPAN dependencies
+        run: docker exec perltester cpanm --notest --installdeps --with-configure --with-develop .
+      - name: perl Makefile.PL
+        run: docker exec perltester perl Makefile.PL
+      - name: make
+        run: docker exec perltester make
+      - name: Run Tests
+        run: docker exec perltester prove -wlvmb t
+
+  ubuntu:
+    runs-on: ubuntu-latest
+
+    name: Ubuntu (nftables ${{ matrix.branch || 'upstream' }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        branch:
+          - v1.0.0
+
+    steps:
+      - uses: actions/checkout@main
+        with:
+            submodules: recursive
+      - run: sudo apt update && sudo apt install -y cpanminus make gcc pkg-config libnftnl-dev bison flex asciidoc libmnl-dev libjansson-dev
+      - name: Clone nftables
+        run: git clone git://git.netfilter.org/nftables
+      - name: Check out nftables branch
+        if: ${{ matrix.branch }}
+        run: cd nftables && git checkout ${{ matrix.branch }}
+      - name: Build & install nftables
+        run: cd nftables && ./autogen.sh && ./configure --with-json --without-cli && make && sudo make install
+      - run: sudo ldconfig
+      - name: Install CPAN dependencies
+        run: cpanm --sudo --notest --installdeps --with-configure --with-develop .
+      - name: perl Makefile.PL
+        run: perl Makefile.PL
+      - name: make
+        run: make
+      - name: Run Tests as user
+        run: prove -wlvmb t
+      - name: Run Tests as root
+        run: sudo prove -wlvmb t
+
+  qemu:
+    runs-on: ubuntu-latest
+
+    name: QEMU (${{ matrix.env.container }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        env:
+          - container: i386/alpine
+            setup: apk add perl-app-cpanminus perl-dev make gcc libc-dev nftables-dev
+
+    steps:
+      - uses: actions/checkout@main
+        with:
+            submodules: recursive
+      - name: Get the qemu container
+        run: docker run --rm --privileged multiarch/qemu-user-static --reset --persistent yes
+      - name: Run tests
+        run: sudo docker run --rm --interactive --cap-add NET_ADMIN --mount type=bind,source=$(pwd),target=/host ${{ matrix.env.container }} sh -c "uname -a; ${{ matrix.env.setup}}; cd /host; perl -V; cpanm --verbose --notest --installdeps --with-configure --with-develop .; perl Makefile.PL; make -j3 -j3; PERL_DL_NONLAZY=1 prove -wlvmb t"
+

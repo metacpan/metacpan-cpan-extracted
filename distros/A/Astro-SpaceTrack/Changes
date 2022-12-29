@@ -1,3 +1,8 @@
+0.159		2022-12-21	T. R. Wyant
+    Add Celestrak supplemental catalog ast (AST Space Mobile). This is
+    currently only Bluewalker 3, but I assume the Bluebirds will go here
+    too.
+
 0.158		2022-10-05	T. R. Wyant
     Implement new Celestrak API. Add options --format and --query to
     celestrak() and celestrak_supplemental(). Deprecate Space Track

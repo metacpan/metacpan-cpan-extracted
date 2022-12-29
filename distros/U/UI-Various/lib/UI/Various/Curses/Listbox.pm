@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.34';
+our $VERSION = '0.37';
 
 use UI::Various::core;
 use UI::Various::Listbox;
@@ -114,7 +114,7 @@ sub _prepare($$$)
 
 =head2 B<_add> - add new element
 
-C<PoorTerm>'s specific implementation of
+C<Curses>'s specific implementation of
 L<UI::Various::Listbox::add|UI::Various::Listbox/add - add new element>
 
 =cut
@@ -123,7 +123,7 @@ L<UI::Various::Listbox::add|UI::Various::Listbox/add - add new element>
 
 sub _add($@)
 {
-    my ($self) = shift;
+    my ($self) = @_;
     $self->_cui->intellidraw();
 }
 
@@ -131,7 +131,7 @@ sub _add($@)
 
 =head2 B<_remove> - remove element
 
-C<PoorTerm>'s specific implementation of
+C<Curses>'s specific implementation of
 L<UI::Various::Listbox::remove|UI::Various::Listbox/remove - remove element>
 
 =cut
@@ -161,7 +161,7 @@ sub _remove($$)
 
 =head2 B<_replace> - replace all elements
 
-C<PoorTerm>'s specific implementation of
+C<Curses>'s specific implementation of
 L<UI::Various::Listbox::replace|UI::Various::Listbox/replace - replace all
 elements>
 
@@ -171,7 +171,7 @@ elements>
 
 sub _replace($@)
 {
-    my ($self) = shift;
+    my ($self) = @_;
     $self->_cui->clear_selection();
     $self->_cui->values($self->{texts});
     $self->_cui->intellidraw();
@@ -181,7 +181,7 @@ sub _replace($@)
 
 =head2 B<_selected> - get current selection of listbox
 
-C<PoorTerm>'s specific implementation of
+C<Curses>'s specific implementation of
 L<UI::Various::Listbox::selected|UI::Various::Listbox/selected -get current
 selection of listbox>
 

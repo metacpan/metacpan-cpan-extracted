@@ -4,40 +4,21 @@ use File::Path qw(mkpath);
 
 my $file = shift;
 unless( -d( my $dir = dirname $file ) ) { mkpath $dir, 1 }
+my $has_warnings = eval { require warnings; };
+
 open OUT, '>'. $file or die "$0 can't open $file: $!\n";
 
-print OUT "#!perl -w\n";
+print OUT "#!perl";
+print OUT           " -w" unless $has_warnings;
+print OUT "\nuse strict;\n";
+print OUT "use warnings;\n" if $has_warnings;
+
 print OUT while <DATA>;
 close OUT or die $!;
 exit;
-__END__
-# $Revision$$Date$
-# Robin's RCS header:
-# RCSfile: rename.PL,v Revision: 1.3   Date: 2006/05/25 09:20:32 
-# Larry's RCS header:
-#  RCSfile: rename,v   Revision: 4.1   Date: 92/08/07 17:20:30 
-#
-#  Log: rename,v 
-# Revision 1.5  1998/12/18 16:16:31  rmb1
-# moved to perl/source
-# changed man documentation to POD
-#
-# Revision 1.4  1997/02/27  17:19:26  rmb1
-# corrected usage string
-#
-# Revision 1.3  1997/02/27  16:39:07  rmb1
-# added -v
-#
-# Revision 1.2  1997/02/27  16:15:40  rmb1
-# *** empty log message ***
-#
-# Revision 1.1  1997/02/27  15:48:51  rmb1
-# Initial revision
-#
 
-use strict;
-require File::Rename;
-require File::Rename::Options;
+__DATA__
+use File::Rename;   # REQUIRE_ORDER
 use Pod::Usage;
 
 main() unless caller;
@@ -112,22 +93,24 @@ via standard input.
 For example, to rename all files matching C<*.bak> to strip the extension,
 you might say
 
-	rename 's/\.bak$//' *.bak
+	rename -- 's/\.bak$//' *.bak
 
 To translate uppercase names to lower, you'd use
 
-	rename 'y/A-Z/a-z/' *
+	rename 'y/A-Z/a-z/' ./*
+
+Examples rewritten to avoid globs which could inject options.
 
 =head2 More examples (2020)
 
 You can also use rename to move files between directories, possibly at
 the same time as making other changes (but see B<--filename>)
 
-	rename 'y/A-Z/a-z/;s/^/my_new_dir\//' *.*
+	rename 'y/A-Z/a-z/;s/^/my_new_dir\//' ./*.*
 
 You can also write the statements separately (see B<-e>/B<-E>)
 
-	rename -E 'y/A-Z/a-z/' -E 's/^/my_new_dir\//' *.*
+	rename -E 'y/A-Z/a-z/' -E 's/^/my_new_dir\//' -- *.*
 
 =head1 OPTIONS
 

@@ -1,5 +1,9 @@
 Revision history for Crypt-Passphrase
 
+0.005     2022-12-26 17:56:04+01:00 Europe/Amsterdam
+          - Cache accepted hashes for crypt validators
+          - Never accept undefined hashes
+
 0.004     2021-12-29 02:25:52+01:00 Europe/Amsterdam
           - Use Crypt::URandom for randomness
 

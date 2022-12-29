@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.34';
+our $VERSION = '0.37';
 
 use UI::Various::core;
 use UI::Various::Text;
@@ -91,9 +91,11 @@ sub _prepare($$$)
 	error('_1_element_must_be_accompanied_by_parent', __PACKAGE__);
 	return 1;
     }
+    my @attributes = ($self->_attributes());
     $self->_tk(	$_->_tk
 		->Label(ref($self->{text}) eq 'SCALAR'
-			? '-textvariable' : '-text' => $self->{text})
+			? '-textvariable' : '-text' => $self->{text},
+			@attributes)
 		->grid(-row => $row, -column => $column));
     return 0;
 }

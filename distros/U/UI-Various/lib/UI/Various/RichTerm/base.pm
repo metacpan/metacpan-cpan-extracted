@@ -43,7 +43,7 @@ use Text::Wrap;
 $Text::Wrap::huge = 'overflow';
 $Text::Wrap::unexpand = 0;
 
-our $VERSION = '0.34';
+our $VERSION = '0.37';
 
 use UI::Various::core;
 
@@ -240,7 +240,8 @@ sub _format($$$$$$$$$;$)
 {
     my ($self, $prefix, $deco_before, $effect_before, $text,
 	$effect_after, $deco_after, $w, $h, $no_wrap) = @_;
-    my $alignment = 7; # TODO L8R: $self->alignment;
+    my $alignment = 7;
+    defined $self->{align}  and  $alignment = $self->{align};
 
     my $len_p = length($prefix);
     my ($len_d_bef, $len_d_aft) = (length($deco_before), length($deco_after));
@@ -269,20 +270,43 @@ sub _format($$$$$$$$$;$)
 	$text[$_] = $effect_before . $text[$_] . $effect_after;
 	if ($l < $w)
 	{
-	    # TODO: this is only the code for the alignments 1/4/7:
-	    {   $text[$_] .= ' ' x ($w - $l);   }
+	    my ($pad1, $pad2) = ('', '');
+	    # default alignments 1/4/7:
+	    if (not defined $self->{align}  or  $self->{align} % 3 == 1)
+	    {   $pad2 = ' ' x ($w - $l);    }
+	    # alignments 3/6/9:
+	    elsif ($self->{align} % 3 == 0)
+	    {   $pad1 = ' ' x ($w - $l);    }
+	    # alignments 2/5/8:
+	    else
+	    {
+		my $l2 = int(($w - $l) / 2);
+		my $l1 = $w - $l - $l2;
+		$pad1 = ' ' x $l1;
+		$pad2 = ' ' x $l2;
+	    }
+	    $text[$_] = $pad1 . $text[$_] . $pad2;
 	}
 	$text[$_] = ($_ == 0 ? $prefix : $blank_prefix)
 	    . $deco_before . $text[$_] . $deco_after;
     }
     if ($h > @text)
     {
-	my $empty = ' ' x ($len_d_bef + $w + $len_d_aft);
-	foreach (scalar(@text)..$h-1)
+	my $empty = $blank_prefix . (' ' x ($len_d_bef + $w + $len_d_aft));
+	my $l = $h - @text;
+	# default alignments 7-9:
+	if (not defined $self->{align}  or  $self->{align} >= 7)
+	{   push @text, ($empty) x $l;   }
+	# alignments 1-3:
+	elsif ($self->{align} <= 3)
+	{   unshift @text, ($empty) x $l;   }
+	# alignments 4-6:
+	else
 	{
-	    # TODO: this is only the code for the alignments 7/8/9:
-	    {   push @text, $blank_prefix . $empty;   }
-
+	    my $l2 = int($l / 2);
+	    my $l1 = $l - $l2;
+	    unshift @text, ($empty) x $l1;
+	    push @text, ($empty) x $l2;
 	}
     }
 

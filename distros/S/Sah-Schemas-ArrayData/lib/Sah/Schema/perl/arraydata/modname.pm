@@ -4,12 +4,12 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-29'; # DATE
+our $DATE = '2022-09-25'; # DATE
 our $DIST = 'Sah-Schemas-ArrayData'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our $schema = ['perl::modname' => {
-    summary => 'Perl ArrayData::* module name without the prefix, e.g. Word::ID::KBBI',
+    summary => 'Perl ArrayData::* module name without the prefix, e.g. Lingua::Word::ID::KBBI',
     description => <<'_',
 
 Contains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, `Foo/Bar.pm`
@@ -31,10 +31,10 @@ _
         {value=>'Foo bar', valid=>0},
     ],
 
-}, {}];
+}];
 
 1;
-# ABSTRACT: Perl ArrayData::* module name without the prefix, e.g. Word::ID::KBBI
+# ABSTRACT: Perl ArrayData::* module name without the prefix, e.g. Lingua::Word::ID::KBBI
 
 __END__
 
@@ -44,13 +44,23 @@ __END__
 
 =head1 NAME
 
-Sah::Schema::perl::arraydata::modname - Perl ArrayData::* module name without the prefix, e.g. Word::ID::KBBI
+Sah::Schema::perl::arraydata::modname - Perl ArrayData::* module name without the prefix, e.g. Lingua::Word::ID::KBBI
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::perl::arraydata::modname (from Perl distribution Sah-Schemas-ArrayData), released on 2021-09-29.
+This document describes version 0.004 of Sah::Schema::perl::arraydata::modname (from Perl distribution Sah-Schemas-ArrayData), released on 2022-09-25.
 
 =head1 SYNOPSIS
+
+=head2 Sample data and validation results against this schema
+
+ ""  # INVALID
+
+ "Word/ID/KBBI"  # valid, becomes "Word::ID::KBBI"
+
+ "Foo bar"  # INVALID
+
+=head2 Using with Data::Sah
 
 To check data against this schema (requires L<Data::Sah>):
 
@@ -58,10 +68,44 @@ To check data against this schema (requires L<Data::Sah>):
  my $validator = gen_validator("perl::arraydata::modname*");
  say $validator->($data) ? "valid" : "INVALID!";
 
- # Data::Sah can also create validator that returns nice error message string
- # and/or coerced value. Data::Sah can even create validator that targets other
- # language, like JavaScript. All from the same schema. See its documentation
- # for more details.
+The above schema returns a boolean result (true if data is valid, false if
+otherwise). To return an error message string instead (empty string if data is
+valid, a non-empty error message otherwise):
+
+ my $validator = gen_validator("perl::arraydata::modname", {return_type=>'str_errmsg'});
+ my $errmsg = $validator->($data);
+ 
+ # a sample valid data
+ $data = "Word/ID/KBBI";
+ my $errmsg = $validator->($data); # => ""
+ 
+ # a sample invalid data
+ $data = "";
+ my $errmsg = $validator->($data); # => "Must match regex pattern \\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\\z"
+
+Often a schema has coercion rule or default value, so after validation the
+validated value is different. To return the validated (set-as-default, coerced,
+prefiltered) value:
+
+ my $validator = gen_validator("perl::arraydata::modname", {return_type=>'str_errmsg+val'});
+ my $res = $validator->($data); # [$errmsg, $validated_val]
+ 
+ # a sample valid data
+ $data = "Word/ID/KBBI";
+ my $res = $validator->($data); # => ["","Word::ID::KBBI"]
+ 
+ # a sample invalid data
+ $data = "";
+ my $res = $validator->($data); # => ["Must match regex pattern \\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\\z",""]
+
+Data::Sah can also create validator that returns a hash of detailed error
+message. Data::Sah can even create validator that targets other language, like
+JavaScript, from the same schema. Other things Data::Sah can do: show source
+code for validator, generate a validator code with debug comments and/or log
+statements, generate human text from schema. See its documentation for more
+details.
+
+=head2 Using with Params::Sah
 
 To validate function parameters against this schema (requires L<Params::Sah>):
 
@@ -74,11 +118,14 @@ To validate function parameters against this schema (requires L<Params::Sah>):
      ...
  }
 
+=head2 Using with Perinci::CmdLine::Lite
+
 To specify schema in L<Rinci> function metadata and use the metadata with
-L<Perinci::CmdLine> to create a CLI:
+L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
 
  # in lib/MyApp.pm
- package MyApp;
+ package
+   MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
      v => 1.1,
@@ -98,9 +145,10 @@ L<Perinci::CmdLine> to create a CLI:
  1;
 
  # in myapp.pl
- package main;
+ package
+   main;
  use Perinci::CmdLine::Any;
- Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+ Perinci::CmdLine::Any->new(url=>'/MyApp/myfunc')->run;
 
  # in command-line
  % ./myapp.pl --help
@@ -110,14 +158,6 @@ L<Perinci::CmdLine> to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
-
-Sample data:
-
- ""  # INVALID
-
- "Word/ID/KBBI"  # valid, becomes "Word::ID::KBBI"
-
- "Foo bar"  # INVALID
 
 =head1 DESCRIPTION
 
@@ -149,13 +189,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

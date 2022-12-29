@@ -120,7 +120,7 @@ L<PDL::Graphics::Prima>, the plotting library built on these bindings.
 
 This bindings can be applied to B<any> object whose class is derived from
 L<Prima::Drawable>, including displayed widgets and abstract canvases such
-as L<Prima::PS::Drawable>. If you create your own derived canvas, these
+as L<Prima::PS::Printer>. If you create your own derived canvas, these
 methods should Just Work. (I wish I could take credit for this, but it's
 really due to the fact that Prima's internals are very well engineered.)
 
@@ -1196,7 +1196,7 @@ $cleanup_code_for{clipRects} = pp_line_numbers(__LINE__, q{
 
 # These do not need any special args, and the default generated code will
 # work just fine:
-$pars_args_for{lineEnds} = 'int lineEnds()';
+#$pars_args_for{lineEnds} = 'int lineEnds()';
 $pars_args_for{lineJoins} = 'int lineJoins()';
 $pars_args_for{lineWidths} = 'int lineWidths()';
 $pars_args_for{rops} = 'int rops()';
@@ -1265,49 +1265,49 @@ $cleanup_code_for{linePatterns} = pp_line_numbers(__LINE__, q{
 		}
 });
 
-# translation; the apricot function for translate uses a different name
-# and takes two arguments instead of one:
-$pars_args_for{translates} = 'int trans_x(); int trans_y()';
-$declare_args_for{translates} = 'Point curr_translate, orig_translate';
-$init_args_for{translates} = pp_line_numbers(__LINE__, q{
-		curr_translate.x = curr_translate.y = 0;
-		orig_translate = curr_translate;
-		
-		if (hv_exists(arg_hash_hv, "translates", 10)) {
-			prop_list[n_props++] = translates_prop_id;
-			curr_translate = orig_translate = my->get_translate(widget_handle);
-		}
-		if (hv_exists(arg_hash_hv, "translate", 9)) {
-			orig_translate = my->get_translate(widget_handle);
-			
-			/* Get the AV that is the current clipRect */
-			AV * tmp_tr_AV = (AV*) (*(hv_fetch(arg_hash_hv, "translate", 9, 0)));
-			if (av_len(tmp_tr_AV) != 2) {
-				croak("translate expects a two-element array reference");
-			}
-			
-			/* Unpack the values in the AV into the current translate */
-			curr_translate.x = SvIV(*(av_fetch(tmp_tr_AV, 0, 0)));
-			curr_translate.y = SvIV(*(av_fetch(tmp_tr_AV, 1, 0)));
-			
-			my->set_translate(widget_handle, curr_translate);
-		}
-});
-$set_code_for{translates} = pp_line_numbers(__LINE__, q{
-						/* Set tr and then use it to set the translate */
-						if ($trans_x() != curr_translate.x
-							|| $trans_y() != curr_translate.y
-						) {
-							curr_translate.x = $trans_x();
-							curr_translate.y = $trans_y();
-							my->set_translate(widget_handle, curr_translate);
-						}
-});
-$cleanup_code_for{translates} = pp_line_numbers(__LINE__, q{
-		if (curr_translate.x != orig_translate.x || curr_translate.y != orig_translate.y) {
-			my->set_translate(widget_handle, orig_translate);
-		}
-});
+## translation; the apricot function for translate uses a different name
+## and takes two arguments instead of one:
+#$pars_args_for{translates} = 'int trans_x(); int trans_y()';
+#$declare_args_for{translates} = 'Point curr_translate, orig_translate';
+#$init_args_for{translates} = pp_line_numbers(__LINE__, q{
+#		curr_translate.x = curr_translate.y = 0;
+#		orig_translate = curr_translate;
+#		
+#		if (hv_exists(arg_hash_hv, "translates", 10)) {
+#			prop_list[n_props++] = translates_prop_id;
+#			curr_translate = orig_translate = my->get_translate(widget_handle);
+#		}
+#		if (hv_exists(arg_hash_hv, "translate", 9)) {
+#			orig_translate = my->get_translate(widget_handle);
+#			
+#			/* Get the AV that is the current clipRect */
+#			AV * tmp_tr_AV = (AV*) (*(hv_fetch(arg_hash_hv, "translate", 9, 0)));
+#			if (av_len(tmp_tr_AV) != 2) {
+#				croak("translate expects a two-element array reference");
+#			}
+#			
+#			/* Unpack the values in the AV into the current translate */
+#			curr_translate.x = SvIV(*(av_fetch(tmp_tr_AV, 0, 0)));
+#			curr_translate.y = SvIV(*(av_fetch(tmp_tr_AV, 1, 0)));
+#			
+#			my->set_translate(widget_handle, curr_translate);
+#		}
+#});
+#$set_code_for{translates} = pp_line_numbers(__LINE__, q{
+#						/* Set tr and then use it to set the translate */
+#						if ($trans_x() != curr_translate.x
+#							|| $trans_y() != curr_translate.y
+#						) {
+#							curr_translate.x = $trans_x();
+#							curr_translate.y = $trans_y();
+#							my->set_translate(widget_handle, curr_translate);
+#						}
+#});
+#$cleanup_code_for{translates} = pp_line_numbers(__LINE__, q{
+#		if (curr_translate.x != orig_translate.x || curr_translate.y != orig_translate.y) {
+#			my->set_translate(widget_handle, orig_translate);
+#		}
+#});
 
 # Fill winding works nicely without any alteration:
 $pars_args_for{fillModes} = 'byte fillModes()';
@@ -1664,7 +1664,7 @@ my $doc_string = <<'DOC_STRING';
 Draws arcs, i.e. incomplete ellipses.
 
 Applicable properties include colors, backColors,
-lineEnds, linePatterns, lineWidths, rops, rop2s, and translates.
+linePatterns, lineWidths, rops, rop2s.
 
 The arcs go from the C<start_angle>s to the C<end_angle>s along the
 ellipses centered at the C<x>s and C<y>s, with the specified x- and
@@ -1752,7 +1752,7 @@ $doc_string = <<'DOC_STRING';
 Draws filled rectangles from corners (x1, y1) to (x2, y2).
 
 Applicable properties include colors, backColors, clipRects,
-fillPatterns, rops, rop2s, and translates.
+fillPatterns, rops, rop2s.
 
 =for example
 
@@ -1831,7 +1831,7 @@ the ends of the arc with a straight line. The angles are
 measured in degrees, not radians.
 
 Applicable properties include colors, backColors, clipRects,
-lineEnds, linePatterns, lineWidths, rops, rop2s, and translates.
+linePatterns, lineWidths, rops, rop2s.
 
 =for example
 
@@ -1920,7 +1920,7 @@ $doc_string = <<'DOC_STRING';
 
 Clears the specified rectangle(s).
 
-Applicable properties include backColors, rop2s, and translates.
+Applicable properties include backColors, rop2s.
 
 =for example
 
@@ -2000,7 +2000,7 @@ Draws ellipses centered at C<x>, C<y> with diameters C<x_diameter> and
 C<y_diameter>.
 
 Applicable properties include colors, backColors, clipRects,
-linePatterns, lineWidths, rops, rop2s, and translates.
+linePatterns, lineWidths, rops, rop2s.
 
 To draw circles, just use the same x- and y-diameter.
 
@@ -2034,7 +2034,7 @@ which does not yet have a PDL interface.
 
 DOC_STRING
 
-@properties = qw(colors backColors clipRects linePatterns lineWidths rops rop2s translates);
+@properties = qw(colors backColors clipRects linePatterns lineWidths rops rop2s );
 pp_def('prima_ellipses',
 	Pars => 'int x(); int y(); int x_diameter(); int y_diameter();'
 			. generate_pars_args_for(@properties),
@@ -2081,7 +2081,7 @@ $doc_string = <<'DOC_STRING';
 Draws filled chords (see L</pdl_chords>).
 
 Applicable properties include colors, backColors, clipRects,
-fillPatterns, rops, rop2s, and translates.
+fillPatterns, rops, rop2s.
 
 Chords are partial elipses that run from C<start_angle> to C<end_angle>
 along the ellipse centered at C<x>, C<y>, each with their specified diameters.
@@ -2150,7 +2150,7 @@ $doc_string = <<'DOC_STRING';
 Draws filled ellipses (see L</pdl_ellipses>).
 
 Applicable properties include colors, backColors, clipRects,
-fillPatterns, rops, rop2s, and translates. 
+fillPatterns, rops, rop2s. 
 
 =for example
 
@@ -2228,7 +2228,7 @@ $doc_string = <<'DOC_STRING';
 Draws and fills a polygon with (mostly) arbitrary edge vertices.
 
 Applicable properties include colors, backColors, clipRects,
-fillPatterns, fillModes, rops, rop2s, and translates.
+fillPatterns, fillModes, rops, rop2s.
 
 NOTE: there is B<no> underscore between C<fill> and C<poly>, which is
 different from the other C<fill> methods!
@@ -2395,7 +2395,7 @@ $doc_string = <<'DOC_STRING';
 Draws filled sectors, i.e. a pie-slices or Pac-Mans.
 
 Applicable properties include colors, backColors, clipRects,
-fillPatterns, rops, rop2s, and translates.
+fillPatterns, rops, rop2s.
 
 More specifically, this draws an arc from C<start_angle> to C<end_angle>
 along the ellipse centered at C<x>, C<y>, with specified x- and y-diameters.
@@ -2491,7 +2491,7 @@ version of Prima has a work-around for this problem. At any rate, it only
 effects Mac users.
 
 Applicable properties include colors, backColors, clipRects,
-fillPatterns, rops, rop2s, and translates.
+fillPatterns, rops, rop2s.
 
 Note that C<fill_color> is probably B<not> what you think it is. The
 color of the final fill is determined by your C<colors> property. What,
@@ -2578,7 +2578,7 @@ $doc_string = <<'DOC_STRING';
 Draws a line from (x1, y1) to (x2, y2).
 
 Applicable properties include colors, backColors, clipRects,
-lineEnds, lineJoins, linePatterns, lineWidths, rops, rop2s, and translates.
+lineJoins, linePatterns, lineWidths, rops, rop2s.
 
 In contrast to polylines, which are supposed to be connected, these
 lines are meant to be independent. Also note that this method does make an
@@ -2788,7 +2788,7 @@ $doc_string = <<'DOC_STRING';
 Draws a multi-segment line with the given x- and y-coordinates.
 
 Applicable properties include colors, backColors, clipRects,
-lineEnds, lineJoins, linePatterns, lineWidths, rops, rop2s, and translates.
+lineJoins, linePatterns, lineWidths, rops, rop2s.
 
 This method goes to great lengths to Do What You Mean, which is actually
 harder than you might have expected. This is the backbone for the Lines
@@ -2999,7 +2999,7 @@ $doc_string = <<'DOC_STRING';
 Draws a rectangle from corner (x1, y1) to corner (x2, y2).
 
 Applicable properties include colors, backColors, clipRects,
-linePatterns, lineWidths, rops, rop2s, and translates.
+linePatterns, lineWidths, rops, rop2s.
 
 =for example
 
@@ -3074,7 +3074,7 @@ $doc_string = <<'DOC_STRING';
 Draws the outlines of sectors, i.e. a pie-slices or Pac-Mans.
 
 Applicable properties include colors, backColors, clipRects,
-lineEnds, linePatterns, lineWidths, rops, rop2s, and translates.
+linePatterns, lineWidths, rops, rop2s.
 
 More specifically, this draws an arc from C<start_angle> to C<end_angle>
 along the ellipse centered at C<x>, C<y>, with specified x- and y-diameters.
@@ -3202,7 +3202,7 @@ $doc_string = <<'DOC_STRING';
 Draws a wide variety of symbols centered at (x, y).
 
 Applicable properties include colors, backColors, clipRects, fillPatterns,
-fillModes, lineEnds, linePatterns, lineWidths, rops, rop2s, and translates.
+fillModes, linePatterns, lineWidths, rops, rop2s.
 
 Through various combinations of C<N_points>, C<filled>, and C<skip>, you can
 generate many different regular symbols, including dashes, stars, asterisks,

@@ -13,7 +13,7 @@ use constant SVG_ROOT => '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="h
                                preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"
                                style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);"></svg>';
 
-our $VERSION = '1.10';
+our $VERSION = '1.20';
 
 sub register {
 
@@ -206,10 +206,20 @@ sub _iconify_api {
 
 sub _iconify_api_js {
 
-    my $c   = shift;
-    my $api = "Iconify.setConfig('defaultAPI', '" . $c->url_for('iconify_api') . "/{prefix}.js?icons={icons}');";
+    my $c = shift;
 
-    return _tag( 'script', type => 'text/javascript', $api )->html_unescape;
+    my $api_url    = $c->url_for('iconify_api');
+    my $api_script = <<"EOF";
+
+if (typeof Iconify.setConfig === 'function') {
+    Iconify.setConfig('defaultAPI', '$api_url/{prefix}.js?icons={icons}');
+} else {
+    Iconify.addAPIProvider('', { resources: ['$api_url'] });
+}
+
+EOF
+
+    return _tag( 'script', type => 'text/javascript', $api_script )->html_unescape;
 
 }
 
@@ -259,7 +269,6 @@ sub _iconify_svg_icon {
 sub _tag { Mojo::ByteStream->new( Mojo::DOM::HTML::tag_to_html(@_) ) }
 
 1;
-
 __END__
 
 =encoding utf8
@@ -375,3 +384,13 @@ This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.
 
 =cut
+
+__DATA__
+
+@@ iconify_api.js.ep
+
+if (typeof Iconify.setConfig === 'function') {
+    Iconify.setConfig('defaultAPI', '<%= url_for('iconify_api') %>/{prefix}.js?icons={icons}');
+} else {
+    Iconify.addAPIProvider('', { resources: ['<%= url_for('iconify_api') %>'] });
+}

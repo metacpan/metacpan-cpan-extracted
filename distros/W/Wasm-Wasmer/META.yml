@@ -1,0 +1,28 @@
+---
+abstract: 'L<WebAssembly|https://webassembly.org> in Perl via L<Wasmer|https://wasmer.io>'
+author:
+  - 'Felipe Gasper (FELIPE)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test2::Plugin::NoWarnings: '0'
+  Test2::Tools::Explain: '0'
+  Test2::V0: '0'
+  Test::Class: '0'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Wasm-Wasmer
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  bugtracker: https://github.com/cpanel/p5-Wasm-Wasmer/issues
+  repository: git://github.com/cpanel/p5-Wasm-Wasmer.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 1.003;
+our $VERSION = 1.004;
 
 use Exporter qw(import);
 use IP::Geolocation::MMDB;
@@ -15,32 +15,35 @@ use List::Util qw(first);
 our @EXPORT_OK = qw(country_code);
 
 our @DIRECTORIES = qw(
-  /var/lib/GeoIP
-  /usr/share/GeoIP
+    /var/lib/GeoIP
+    /usr/local/share/GeoIP
+    /usr/share/GeoIP
+    /opt/share/GeoIP
 );
 
 our @DATABASES = qw(
-  GeoIP2-Country.mmdb
-  GeoIP2-City.mmdb
-  dbip-country.mmdb
-  dbip-location.mmdb
-  GeoLite2-Country.mmdb
-  GeoLite2-City.mmdb
-  dbip-country-lite.mmdb
-  dbip-city-lite.mmdb
+    GeoIP2-Country.mmdb
+    GeoIP2-City.mmdb
+    dbip-country.mmdb
+    dbip-city.mmdb
+    dbip-location.mmdb
+    GeoLite2-Country.mmdb
+    GeoLite2-City.mmdb
+    dbip-country-lite.mmdb
+    dbip-city-lite.mmdb
 );
 
 our $DATABASE = $ENV{IP_GEOLOCATION_MMDB} || first {-r} map {
-  my $dir = $_;
-  map {"$dir/$_"} @DATABASES
+    my $dir = $_;
+    map {"$dir/$_"} @DATABASES
 } @DIRECTORIES;
 
 our $MMDB = eval { IP::Geolocation::MMDB->new(file => $DATABASE) };
 
 sub country_code {
-  my $ip_address = shift;
+    my $ip_address = shift;
 
-  return eval { $MMDB->getcc($ip_address) };
+    return eval { $MMDB->getcc($ip_address) };
 }
 
 1;
@@ -54,7 +57,7 @@ Mail::Exim::ACL::Geolocation - Map IP addresses to country codes
 
 =head1 VERSION
 
-version 1.003
+version 1.004
 
 =head1 SYNOPSIS
 
@@ -139,12 +142,14 @@ L<Exporter> and L<List::Util>, which are distributed with Perl.
 
 Requires an IP to country database in the MaxMind DB file format from
 L<MaxMind|https://www.maxmind.com/> or L<DP-IP.com|https://db-ip.com/>.  The
-module searches the directories F</var/lib/GeoIP> and F</usr/share/GeoIP> for
-one of the following database files:
+module searches the directories F</var/lib/GeoIP>, F</usr/local/share/GeoIP>,
+F</usr/share/GeoIP> and F</opt/share/GeoIP> for one of the following database
+files:
 
   GeoIP2-Country.mmdb
   GeoIP2-City.mmdb
   dbip-country.mmdb
+  dbip-city.mmdb
   dbip-location.mmdb
   GeoLite2-Country.mmdb
   GeoLite2-City.mmdb
@@ -155,6 +160,10 @@ one of the following database files:
 
 None.
 
+=head1 BUGS AND LIMITATIONS
+
+None known.
+
 =head1 SEE ALSO
 
 L<Mail::SpamAssassin::Conf>
@@ -163,13 +172,9 @@ L<Mail::SpamAssassin::Conf>
 
 Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
 
-=head1 BUGS AND LIMITATIONS
-
-None known.
-
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2022 Andreas Vögele
+Copyright (C) 2022 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

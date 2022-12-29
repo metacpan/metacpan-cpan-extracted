@@ -2,15 +2,17 @@ NAME
     Sah::Schemas::Str - Various string schemas
 
 VERSION
-    This document describes version 0.012 of Sah::Schemas::Str (from Perl
-    distribution Sah-Schemas-Str), released on 2022-09-22.
+    This document describes version 0.013 of Sah::Schemas::Str (from Perl
+    distribution Sah-Schemas-Str), released on 2022-09-23.
 
 SAH SCHEMAS
     The following schemas are included in this distribution:
 
     *   hexstr
 
-        String of bytes in hexadecimal.
+        String of bytes in hexadecimal notation, e.g. "ab99" or "CAFE".
+
+        Whitespace is allowed and will be removed.
 
     *   latin_alpha
 
@@ -23,16 +25,46 @@ SAH SCHEMAS
 
     *   latin_letter
 
-        Latin letter, i.e. A-Z or a-z.
+        A single latin letter, i.e. A-Z or a-z.
+
+    *   latin_lowercase_alpha
+
+        String containing only zero or more lowercases Latin letters, i.e.
+        a-z.
+
+        Uppercase letters will be coerced to lowercase.
+
+    *   latin_lowercase_letter
+
+        A single latin lowercase letter, i.e. a-z.
+
+    *   latin_uppercase_alpha
+
+        String containing only zero or more uppercase Latin letters, i.e.
+        A-Z.
+
+        Uppercase letters will be coerced to lowercase.
+
+    *   latin_uppercase_letter
+
+        A single latin uppercase letter, i.e. A-Z.
+
+    *   non_empty_str
+
+        A non-empty string (length >= 1) (alias for str1).
 
     *   percent_str
 
-        A number in percent form.
+        A number in percent form, e.g. "10.5%".
 
         This schema accepts floating number followed by percent sign. Unlike
         the "percent" schema from Sah::Schemas::Float, The percent sign will
         not be removed nor the number be converted to decimal (e.g. 50% to
         0.5).
+
+    *   str1
+
+        A non-empty string (length >= 1).
 
     *   str_or_aos
 

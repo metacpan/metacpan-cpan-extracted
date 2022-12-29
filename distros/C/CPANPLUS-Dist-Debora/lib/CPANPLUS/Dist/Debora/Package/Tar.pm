@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use parent qw(CPANPLUS::Dist::Debora::Package);
 
@@ -256,7 +256,7 @@ CPANPLUS::Dist::Debora::Package::Tar - Create tar archives
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -316,17 +316,17 @@ Requires the tar program and the Perl module L<Archive::Tar>.
 
 None.
 
-=head1 AUTHOR
-
-Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
-
 =head1 BUGS AND LIMITATIONS
 
 This module cannot be used in taint mode.
 
+=head1 AUTHOR
+
+Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
+
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2022 Andreas Vögele
+Copyright (C) 2022 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

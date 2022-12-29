@@ -1,5 +1,7 @@
 Revision history for App-pod
 
+0.32
+        2022-12-21 - Fixed unicode in pod warnings.
 0.31
         2022-11-19 - Fixed loading on ojo not into main.
         2022-11-18 - Fixed issue with missing class version.

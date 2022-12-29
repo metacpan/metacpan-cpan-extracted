@@ -1,0 +1,65 @@
+#ifndef P5_WASM_WASMER_WASI
+#define P5_WASM_WASMER_WASI 1
+
+typedef struct {
+    wasi_env_t* env;
+    SV* store_sv;
+
+    pid_t pid;
+} wasi_holder_t;
+
+wasi_holder_t* wasi_env_to_holder (pTHX_ SV* store_sv, wasi_env_t* wasienv) {
+    wasi_holder_t* wasi_holder_p;
+
+    Newx(wasi_holder_p, 1, wasi_holder_t);
+
+    wasi_holder_p->env = wasienv;
+    wasi_holder_p->store_sv = SvREFCNT_inc(store_sv);
+    wasi_holder_p->pid = getpid();
+
+    return wasi_holder_p;
+}
+
+#include "wasmer_instance.xsc"
+
+// ----------------------------------------------------------------------
+
+#define _read_wasi(wasienv, len, readfn) STMT_START {    \
+    char output[len];                           \
+                                                \
+    IV out = readfn(wasienv, output, len);      \
+                                                \
+    if (out >= 0) return newSVpvn(output, out); \
+    return &PL_sv_undef;                        \
+} STMT_END
+
+SV* wasi_holder_read_stdout (pTHX_ wasi_holder_t* holder, STRLEN len) {
+    _read_wasi(holder->env, len, wasi_env_read_stdout);
+}
+
+SV* wasi_holder_read_stderr (pTHX_ wasi_holder_t* holder, STRLEN len) {
+    _read_wasi(holder->env, len, wasi_env_read_stderr);
+}
+
+// ----------------------------------------------------------------------
+
+static inline void start_wasi_if_needed(pTHX_ instance_holder_t* instance_holder_p) {
+    if (!instance_holder_p->wasi_sv) return;
+
+    if (instance_holder_p->wasi_started) return;
+
+    instance_holder_p->wasi_started = true;
+
+    wasm_func_t* func = wasi_get_start_function(instance_holder_p->instance);
+
+    wasm_val_t args_val[] = {};
+    wasm_val_t results_val[] = {};
+    wasm_val_vec_t args = WASM_ARRAY_VEC(args_val);
+    wasm_val_vec_t results = WASM_ARRAY_VEC(results_val);
+
+    own wasm_trap_t* trap = wasm_func_call(func, &args, &results);
+
+    _croak_if_trap(aTHX_ trap);
+}
+
+#endif

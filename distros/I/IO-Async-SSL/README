@@ -44,9 +44,10 @@ DESCRIPTION
     use SSL.
 
     As an additional convenience, if the SSL_verify_mode and SSL_ca_*
-    options are omitted, the module will attempt to provide them by quering
-    the result of IO::Socket::SSL's default_ca function. Otherwise, the
-    module will print a warning and set SSL_VERIFY_NONE instead.
+    options are omitted, the module will attempt to provide them by
+    querying the result of IO::Socket::SSL's default_ca function.
+    Otherwise, the module will print a warning and set SSL_VERIFY_NONE
+    instead.
 
 LOOP METHODS
 

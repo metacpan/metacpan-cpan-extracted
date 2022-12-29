@@ -1,11 +1,11 @@
 ---
 abstract: 'Resource of RE2 2022-06-01.'
 author:
-  - USER_NAME<USER_MAIL>
+  - 'Yuki Kimoto<kimoto.yuki@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  SPVM: '0.9614'
+  SPVM: '0.9670'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -17,7 +17,9 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
-resources: {}
-version: '0.05'
+requires:
+  SPVM: '0.9670'
+resources:
+  repository: https://github.com/yuki-kimoto/SPVM-Resource-Re2-V2022_06_01.git
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

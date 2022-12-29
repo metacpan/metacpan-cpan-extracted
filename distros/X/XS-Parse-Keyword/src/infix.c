@@ -725,6 +725,30 @@ void XSParseInfix_register(pTHX_ const char *opname, const struct XSParseInfixHo
       prec = INFIX_PREC_REL;
       break;
 
+    case XPI_CLS_LOW_MISC:
+      prec = INFIX_PREC_LOW;
+      break;
+
+    case XPI_CLS_LOGICAL_OR_LOW_MISC:
+      prec = INFIX_PREC_LOGICAL_OR_LOW;
+      break;
+
+    case XPI_CLS_LOGICAL_AND_LOW_MISC:
+      prec = INFIX_PREC_LOGICAL_AND_LOW;
+      break;
+
+    case XPI_CLS_ASSIGN_MISC:
+      prec = INFIX_PREC_ASSIGN;
+      break;
+
+    case XPI_CLS_LOGICAL_OR_MISC:
+      prec = INFIX_PREC_LOGICAL_OR;
+      break;
+
+    case XPI_CLS_LOGICAL_AND_MISC:
+      prec = INFIX_PREC_LOGICAL_AND;
+      break;
+
     case XPI_CLS_ADD_MISC:
       prec = INFIX_PREC_ADD;
       break;
@@ -737,7 +761,9 @@ void XSParseInfix_register(pTHX_ const char *opname, const struct XSParseInfixHo
       prec = INFIX_PREC_POW;
       break;
 
-    /* TODO: Add classifications for the HIGH and LOW also? */
+    case XPI_CLS_HIGH_MISC:
+      prec = INFIX_PREC_HIGH;
+      break;
 
     default:
       croak("TODO: need to write code for hooks->cls == %d\n", hooks->cls);

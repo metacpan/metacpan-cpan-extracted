@@ -36,46 +36,46 @@ my $HoAoH = {
 };
 
 
-sub h3o($);
-sub h3o($) {
+sub d2o($);
+sub d2o($) {
   my $thing = shift;
   return $thing if not $thing;
   my $isa = ref $thing;
   if ($isa eq q{ARRAY}) {
      foreach my $element (@$thing) {
-         h3o($element);
+         d2o($element);
      } 
   }
   elsif ($isa eq q{HASH}) {
      foreach my $keys (keys %$thing) {
-         h3o($thing->{$keys});
+         d2o($thing->{$keys});
      } 
      h2o $thing;
   }
   return $thing; 
 }
 
-sub o3h($);
-sub o3h($) {
+sub o2d($);
+sub o2d($) {
   my $thing = shift;
   no warnings 'prototype';
   return $thing if not $thing;
   my $isa = ref $thing;
   if ($isa eq q{ARRAY}) {
      foreach my $element (@$thing) {
-         $element = o3h($element);
+         $element = o2d($element);
      } 
   }
   elsif ($isa eq q{HASH}) {
      foreach my $key (keys %$thing) {
-         $thing->{$key} = o3h($thing->{$key});
+         $thing->{$key} = o2d($thing->{$key});
      } 
      $thing = o2h $thing;
   }
   return o2h $thing; 
 }
 
-h3o $HoAoH;
+d2o $HoAoH;
 #print Data::Dumper::Dumper($HoAoH);
 
 
@@ -88,7 +88,7 @@ my $response = h2o $http->get(q{https://jsonplaceholder.typicode.com/users});
 # decode JSON from response content
 my $json_array_ref = JSON::decode_json($response->content); # $json is an ARRAY reference
 
-h3o $json_array_ref;
-o3h $json_array_ref;
+d2o $json_array_ref;
+o2d $json_array_ref;
 
 print Data::Dumper::Dumper($json_array_ref);

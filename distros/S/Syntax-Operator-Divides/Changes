@@ -1,5 +1,10 @@
 Revision history for Syntax-Operator-Divides
 
+0.03    2022-12-25
+        [CHANGES]
+         * Updates for XS::Parse::Infix v0.27
+            + Stores parsedata in an `SV *` not an `ANY`
+
 0.02    2022-10-24
         [CHANGES]
          * Add a wrapper function

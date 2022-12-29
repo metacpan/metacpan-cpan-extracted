@@ -1,3 +1,21 @@
+Version 5.224 - 19 December 2022
+
+- Add back support for "foo > 5" syntx in property2name*
+
+Version 5.223.1 - 14 November 2022
+
+- Drop a debug statement
+
+Version 5.223 - 12 November 2022
+
+- Fix detecting alpha versions of rpm
+- Remove duplication in parsing of provides/requires/obsoletes and fix it
+  when the provided name contains [] like some recent python packages.
+
+Version 5.222 - 3 December 2021
+
+- Harmonize buffer size (thus fixing "invalid line <@provides" for huge pkgs)
+
 Version 5.221 - 2 December 2021
 
 - Bump static buffer size when generating synthesys

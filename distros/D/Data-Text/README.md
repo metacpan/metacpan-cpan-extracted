@@ -4,7 +4,7 @@ Data::Text - Class to handle text in an OO way
 
 # VERSION
 
-Version 0.10
+Version 0.11
 
 # SYNOPSIS
 
@@ -22,7 +22,7 @@ Handle text in an OO way.
 
 Creates a Data::Text object.
 
-The optional parameter 'text' contains a string, or object, to initialise the object with.
+The optional parameter contains a string, or object, to initialise the object with.
 
 ## set
 

@@ -244,6 +244,9 @@ Native APIs have its IDs. These IDs are permanently same for the binary compatib
   227 get_field_id_static
   228 get_args_stack_length
   229 call_instance_method_static_by_name
+  230 get_method_id
+  231 strerror_nolen
+  232 strerror_string_nolen
 
 =head2 class_vars_heap
 
@@ -2342,6 +2345,30 @@ Examples:
     }
     output = stack[0].ival;
   }
+
+=head2 get_method_id
+
+  int32_t (*get_method_id)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* method_name);
+
+Gets a method ID by the class name and the method name. If the method does not exists, a negative value is returned.
+
+This ID is used by L<"call_method">.
+
+Examples:
+
+  int32_t method_id = env->get_method_id(env, "Foo", "get");
+
+=head2 strerror_nolen
+
+  const char* (*strerror_nolen)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_value);
+
+The same as L</"strerror"> given the length to C<0>.
+
+=head2 strerror_string_nolen
+
+  void* (*strerror_string_nolen)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_value);
+
+The same as L</"strerror_string"> given the length to C<0>.
 
 =head1 Compiler Native API
 

@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.34';
+our $VERSION = '0.37';
 
 use UI::Various::core;
 use UI::Various::Radio;
@@ -91,7 +91,9 @@ sub _prepare($$$)
 	error('_1_element_must_be_accompanied_by_parent', __PACKAGE__);
 	return 1;
     }
-    my $grid = $_->_tk->Frame->grid(-row => $row, -column => $column);
+    my @attributes = ($self->_attributes());
+    my $grid = $_->_tk->Frame(@attributes)
+	->grid(-row => $row, -column => $column);
     my @tk = ();
     foreach (0..$#{$self->{_button_values}})
     {
@@ -99,7 +101,7 @@ sub _prepare($$$)
 	    $grid->Radiobutton(	-value => $self->{_button_keys}[$_],
 				-text => $self->{_button_values}[$_],
 				-variable => $self->{var})
-	    ->grid(-row => $_, -column => 0);
+	    ->grid(-row => $_, -column => 0, -sticky => 'w');
     }
     $self->_tk(\@tk);
     return 0;

@@ -9,7 +9,6 @@ t/File-Rename-E.t
 t/File-Rename-files.t
 t/File-Rename-filename-only.t
 t/File-Rename-import.t
-t/File-Rename-no-order.t
 t/File-Rename-Options.t
 t/File-Rename-script.t
 t/File-Rename-list.t
@@ -23,10 +22,17 @@ t/rename-examples.t
 t/File-Rename-dash.t
 t/rename-ostype.t
 t/testlib.pl
+t/u/File-Rename-no-order.t
+t/u/File-Rename-E.t
+t/u/File-Rename-V.t
+t/u/File-Rename-script.t
+t/u/File-Rename-unicode.t
+t/u/rename-examples.t
 lib/File/Rename.pm
 lib/File/Rename/Options.pm
 lib/File/Rename/Unicode.pm
 rename.PL
+unsafe.PL
 examples/rename.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

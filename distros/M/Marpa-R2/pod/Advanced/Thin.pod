@@ -41,9 +41,11 @@ and is willing to go to some extra effort.
 =head1 How this document is written
 
 This document assumes that the reader is familiar with
-the other Marpa::R2 documentation,
-as well as with the Libmarpa API document.
-This means its reader will have to know some C language --
+the other Marpa::R2 documentation.
+and very familiar wth the Libmarpa API document.
+Must of the terminology in this document is adopted
+from the Libmarpa API document.
+The reader will also have to know some C language --
 at least enough to understand a discussion
 written in terms of C functions,
 their parameters and return values,
@@ -557,6 +559,146 @@ partial: 1
 
 =for Marpa::R2::Display::End
 
+=head1 Error recovery
+
+Error recovery is as in the Libmarpa API,
+with changes appropriate to adopt it to a Perl module.
+We recall the concepts of application behavior and diagnostic
+behavior from the Libmarpa API:
+Application behaviors are those that normal applications may
+expect, as specified in this and the Libmarpa API document.
+Diagnostic behaviors are a subset of the application behaviors.
+Diagnostic behaviors are those
+that diagnostic or testing code may reasonably
+attempt after an irrecoverable error.
+Informally, application behaviors are promised,
+while diagnostic behaviors are hoped for.
+For a full discussion of application and diagnostic behaviors,
+refer back to the Libmarpa API document.
+
+Analogously to the Libmarpa API,
+we call the object which caused a failure,
+the failure object.
+If the failure object is a time object,
+its base grammar object is the grammar object it was
+created from, whether directly, indirectly
+or trivially.
+A grammar object is considered to be created trivially from
+itself.
+If the failure object is a time object,
+the failure grammar is the base grammar object of
+the failure object.
+
+In the following sections,
+we adopted the definitions of library-recoverable,
+ancestry-recoverable and fully recoverable failure
+to make them
+analogous to the
+Libmarpa API's definitions of these terms.
+
+=head2 Library-recoverable failure
+
+In the thin interface, "library-recoverable failure" might be more properly be called
+"module-recoverable failure".
+We retain the term "library-recoverable failure"
+for convenience in referring back to the Libmarpa API document.
+
+When a thin wrapper corresponding to a Libmarpa method
+has a library-recoverable failure the following application behaviors are no longer
+available:
+
+=over 4
+
+=item *
+
+Thin interface mutator and constructor method calls
+on objects whose base grammar is the failure grammar.
+
+=back
+
+The following application behaviors remain available:
+
+=over 4
+
+=item *
+
+All behaviors not in the thin interface,
+including the Perl environment itself,
+and all modules other than the thin interface.
+
+=item *
+
+All thin interface static method calls.
+
+=item *
+
+All thin interface accessor method calls,
+and thin interface object destruction.
+
+=item *
+
+All thin interface constructor and mutator method calls
+for objects whose base grammar is not the failure grammar.
+
+=back
+
+For more details on library-recoverability, refer to
+the Libmarpa API document.
+
+=head2 Ancestry-recoverable failure
+
+When a thin wrapper corresponding to a Libmarpa method
+has a ancestry-recoverable failure the following application behaviors are no longer
+available:
+
+=over 4
+
+=item *
+
+Thin interface mutator and constructor method calls
+on on the failure object,
+or on one of the descendants
+of the failure object.
+
+=back
+
+The following application behaviors remain available:
+
+=over 4
+
+=item *
+
+All behaviors not in the thin interface,
+including the Perl environment itself,
+and all packages other than the thin interface.
+
+=item *
+
+All thin interface static method calls.
+
+=item *
+
+All thin interface accessor method calls,
+and thin interface object destruction.
+
+=item *
+
+All thin interface constructor and mutator method calls
+for objects that are not the failure object,
+or one of its descendants.
+
+=back
+
+For more details on ancestry-recoverability, refer to
+the Libmarpa API document.
+
+=head2 Fully recoverable failure
+
+After a fully recoverable failure,
+all application behaviors remain available.
+For more details on fully recoverable failure, refer to
+the Libmarpa API document.
+
 =head1 Error methods
 
 The thin interface to Libmarpa provides
@@ -564,6 +706,7 @@ error methods
 more appropriate to the Perl
 environment
 than Libmarpa's own.
+Calls to these methods are diagnostic behaviors.
 
 =head2 C<< $g->error() >>
 
@@ -650,6 +793,13 @@ the return value is a thin interface grammar object.
 C<new()> does not obey the throw setting --
 errors are always thrown.
 
+Most applications should call the
+C<force_valued()> method immediately after the call
+of the C<new()> constructor.
+Not doing so enables unvalued terminals,
+which is a deprecated feature both in the thin
+interface and the Libmarpa API.
+
 At present the only named argument allowed is C<if>,
 the interface number.
 This argument is required and currently is required
@@ -673,6 +823,25 @@ of the newly created grammar object
 is unspecified.
 (In fact, the interface 0 throw setting depends on an
 undocumented and deprecated global variable.)
+
+=head2 C<< $g->force_valued() >>
+
+=for Marpa::R2::Display
+name: Thin example
+partial: 1
+normalize-whitespace: 1
+
+    $grammar->force_valued();
+
+=for Marpa::R2::Display::End
+
+The C<force_valued()> follows the general pattern.
+Most applications should call the
+C<force_valued()> method immediately after the
+grammar's C<new()> constructor.
+Not doing so enables unvalued terminals,
+which is a deprecated feature both in the thin
+interface and the Libmarpa API.
 
 =head2 C<< $g->event() >>
 
@@ -838,6 +1007,14 @@ C<precompute()> also reports events.
 Events are queried using the grammar's
 C<event()> method.
 
+As in the Libmarpa API, parsing with cycles
+is deprecated.
+This mean that treating C<MARPA_ERR_GRAMMAR_HAS_CYCLE> as a
+fully recoverable failure is deprecated.
+Instead,
+C<MARPA_ERR_GRAMMAR_HAS_CYCLE> should be treated as
+as a library-recoverable failure.
+
 On success, C<precompute()> returns an event count.
 But, even when there is an error,
 C<precompute()> often reports
@@ -887,6 +1064,21 @@ The error code can be found using the L<< C<error()>
 method|C<< $g->error() >> >>.
 Applications may find it more convenient to have
 C<rule_rank_set()> always throw its errors.
+
+=head2 C<< $g->symbol_is_terminal_set() >>
+
+=for Marpa::R2::Display
+name: Thin symbol_is_terminal_set() example
+normalize-whitespace: 1
+
+    $grammar->symbol_is_terminal_set( $symbol_seq, 1 );
+
+=for Marpa::R2::Display::End
+
+The C<symbol_is_terminal_set()> method is deprecated.
+It enables the LHS terminals feature, which is deprecated
+in both the thin interface and the Libmarpa API.
+The C<symbol_is_terminal_set()> method follows the general pattern.
 
 =head2 Omitted grammar methods
 

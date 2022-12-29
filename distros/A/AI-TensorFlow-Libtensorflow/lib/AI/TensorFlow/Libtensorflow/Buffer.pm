@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Buffer;
 # ABSTRACT: Buffer that holds pointer to data with length
-$AI::TensorFlow::Libtensorflow::Buffer::VERSION = '0.0.3';
+$AI::TensorFlow::Libtensorflow::Buffer::VERSION = '0.0.4';
 use strict;
 use warnings;
 use namespace::autoclean;
@@ -54,23 +54,6 @@ $ffi->attach( [ 'NewBufferFromString' => 'NewFromString' ] => [
 	my ($xs, $class, @rest) = @_;
 	$xs->(@rest);
 });
-
-sub NewFromData { # TODO look at Python high-level API
-	my ($class, $data) = @_;
-
-	my $buf = $class->New;
-
-	my ($pointer, $size) = scalar_to_buffer $data;
-
-	$buf->data( $pointer );
-	$buf->length( $size );
-	$buf->data_deallocator(sub {
-		my ($pointer, $size) = @_;
-		free $pointer;
-	});
-
-	$buf;
-}
 
 
 $ffi->attach( [ 'DeleteBuffer' => 'DESTROY' ] => [ 'TF_Buffer' ], 'void' );

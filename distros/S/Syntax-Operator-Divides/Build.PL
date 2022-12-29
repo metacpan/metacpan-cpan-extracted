@@ -12,7 +12,7 @@ my $build = Module::Build->new(
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
-      'XS::Parse::Infix::Builder' => '0.26',
+      'XS::Parse::Infix::Builder' => '0.27',
    },
    requires => {
       'perl' => '5.016', # pad_alloc()

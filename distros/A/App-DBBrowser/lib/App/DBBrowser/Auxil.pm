@@ -201,10 +201,10 @@ sub __prepare_table_row {
 
 sub __select_cols {
     my ( $sf, $sql ) = @_;
-    my @cols = @{$sql->{select_cols}} ? @{$sql->{select_cols}} : ( @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} );
+    my @cols = @{$sql->{selected_cols}} ? @{$sql->{selected_cols}} : ( @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} );
     if ( ! @cols ) {
         if ( $sf->{i}{special_table} eq 'join' ) {
-            # join: use qualified col names in the prepare stmt (diff cols could have the same name)
+            # join: use qualified col names in the prepare stmt (different cols could have the same name)
             return ' ' . join ', ', @{$sql->{cols}};
         }
         else {
@@ -217,7 +217,7 @@ sub __select_cols {
     else {
         my @cols_alias;
         for ( @cols ) {
-            if ( exists $sql->{alias}{$_} && defined  $sql->{alias}{$_} && length $sql->{alias}{$_} ) {
+            if ( length $sql->{alias}{$_} ) {
                 push @cols_alias, $_ . " AS " . $sql->{alias}{$_};
             }
             else {
@@ -372,7 +372,7 @@ sub reset_sql {
     map { delete $sql->{$_} } keys %$sql; # not $sql = {} so $sql is still pointing to the outer $sql
     my @string = qw( distinct_stmt set_stmt where_stmt group_by_stmt having_stmt order_by_stmt limit_stmt offset_stmt );
     my @array  = qw( cols group_by_cols aggr_cols
-                     select_cols
+                     selected_cols
                      set_args where_args having_args
                      insert_into_cols insert_into_args
                      create_table_cols );

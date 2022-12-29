@@ -1,18 +1,17 @@
 package Debian::Releases::PERLANCAR;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-21'; # DATE
-our $DIST = 'Debian-Releases-PERLANCAR'; # DIST
-our $VERSION = '20200221.0'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
+use Exporter 'import';
 use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 
-use Exporter;
-our @ISA = qw(Exporter);
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-12-28'; # DATE
+our $DIST = 'Debian-Releases-PERLANCAR'; # DIST
+our $VERSION = '20221228.0'; # VERSION
+
 our @EXPORT_OK = qw(
                        list_debian_releases
                );
@@ -256,7 +255,7 @@ our $data = do {
      apache_httpd_version => "2.4.10",
      bash_version         => 4.3,
      code_name            => "jessie",
-     eoldate              => "2020-05",
+     eoldate              => "2020-07",
      linux_version        => "3.16.7",
      mariadb_version      => "10.0.16",
      mysql_version        => "5.5.43",
@@ -303,6 +302,23 @@ our $data = do {
      ruby_version         => undef,
      version              => 10,
    },
+   {
+     apache_httpd_version => "2.4.48",
+     bash_version         => 5.1,
+     code_name            => "bullseye",
+     eoldate              => undef,
+     linux_version        => "5.10.46",
+     mariadb_version      => "10.5.11",
+     mysql_version        => "--",
+     nginx_version        => undef,
+     perl_version         => "5.32.1",
+     php_version          => "7.4.21",
+     postgresql_version   => 13.3,
+     python_version       => "3.9.2",
+     reldate              => "2021-08-14",
+     ruby_version         => undef,
+     version              => 11,
+   },
  ]
 };
 
@@ -329,7 +345,7 @@ Debian::Releases::PERLANCAR - List Debian releases
 
 =head1 VERSION
 
-This document describes version 20200221.0 of Debian::Releases::PERLANCAR (from Perl distribution Debian-Releases-PERLANCAR), released on 2020-02-21.
+This document describes version 20221228.0 of Debian::Releases::PERLANCAR (from Perl distribution Debian-Releases-PERLANCAR), released on 2022-12-28.
 
 =head1 SYNOPSIS
 
@@ -350,7 +366,7 @@ contains extra data as well.
 
 Usage:
 
- list_debian_releases(%args) -> [status, msg, payload, meta]
+ list_debian_releases(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List of Debian releases.
 
@@ -896,9 +912,22 @@ Only return records where the 'python_version' field is less than specified valu
 
 Only return records where the 'python_version' field is greater than specified value.
 
-=item * B<query> => I<str>
+=item * B<queries> => I<array[str]>
 
 Search.
+
+This will search all searchable fields with one or more specified queries. Each
+query can be in the form of C<-FOO> (dash prefix notation) to require that the
+fields do not contain specified string, or C</FOO/> to use regular expression.
+All queries must match if the C<query_boolean> option is set to C<and>; only one
+query should match if the C<query_boolean> option is set to C<or>.
+
+=item * B<query_boolean> => I<str> (default: "and")
+
+Whether records must match all search queries ('and') or just one ('or').
+
+If set to C<and>, all queries must match; if set to C<or>, only one query should
+match. See the C<queries> option for more details on searching.
 
 =item * B<random> => I<bool> (default: 0)
 
@@ -1056,12 +1085,12 @@ as list/array (field value, field value, ...).
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1073,14 +1102,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Debian-Rel
 
 Source repository is at L<https://github.com/perlancar/perl-Debian-Releases-PERLANCAR>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Debian-Releases-PERLANCAR>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Ubuntu::Releases>
@@ -1091,11 +1112,37 @@ L<Debian::Releases>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020, 2019, 2017, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Debian-Releases-PERLANCAR>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

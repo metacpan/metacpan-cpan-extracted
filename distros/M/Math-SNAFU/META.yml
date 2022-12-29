@@ -1,0 +1,44 @@
+---
+abstract: 'decimal to SNAFU converter'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test2::Require::AuthorTesting: '0'
+  Test2::Require::Module: '0'
+  Test2::Tools::Spec: '0'
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-SNAFU
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Math::SNAFU:
+    file: lib/Math/SNAFU.pm
+    version: '0.001'
+requires:
+  Carp: '0'
+  Exporter::Shiny: '1.006000'
+  perl: '5.012'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Math-SNAFU/project
+  bugtracker: https://github.com/tobyink/advent-of-code/issues
+  homepage: https://metacpan.org/release/Math-SNAFU
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/advent-of-code.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

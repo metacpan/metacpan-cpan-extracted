@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Pod::Simple" : "3.06",
+            "Pod::Simple" : "3.26",
             "perl" : "5.010"
          }
       }
@@ -40,34 +40,33 @@
    "provides" : {
       "Pod::Man" : {
          "file" : "lib/Pod/Man.pm",
-         "version" : "5.00"
+         "version" : "5.01"
       },
       "Pod::ParseLink" : {
          "file" : "lib/Pod/ParseLink.pm",
-         "version" : "5.00"
+         "version" : "5.01"
       },
       "Pod::Text" : {
          "file" : "lib/Pod/Text.pm",
-         "version" : "5.00"
+         "version" : "5.01"
       },
       "Pod::Text::Color" : {
          "file" : "lib/Pod/Text/Color.pm",
-         "version" : "5.00"
+         "version" : "5.01"
       },
       "Pod::Text::Overstrike" : {
          "file" : "lib/Pod/Text/Overstrike.pm",
-         "version" : "5.00"
+         "version" : "5.01"
       },
       "Pod::Text::Termcap" : {
          "file" : "lib/Pod/Text/Termcap.pm",
-         "version" : "5.00"
+         "version" : "5.01"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-podlators@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Dist/Display.html?Name=podlators"
+         "web" : "https://github.com/rra/podlators/issues"
       },
       "homepage" : "https://www.eyrie.org/~eagle/software/podlators/",
       "repository" : {
@@ -76,6 +75,6 @@
          "web" : "https://github.com/rra/podlators"
       }
    },
-   "version" : "5.00",
+   "version" : "5.01",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

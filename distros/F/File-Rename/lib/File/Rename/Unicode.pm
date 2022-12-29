@@ -43,6 +43,8 @@ File::Rename::Unicode - Unicode wrapper for user code for File::Rename
 
 =head1 DESCRIPTION
 
+=head2 FUNCTIONS
+
 =over 4
 
 =item C<code()>

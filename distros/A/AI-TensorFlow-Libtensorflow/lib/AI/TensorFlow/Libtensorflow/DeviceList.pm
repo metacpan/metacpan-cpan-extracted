@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::DeviceList;
 # ABSTRACT: A list of devices available for the session to run on
-$AI::TensorFlow::Libtensorflow::DeviceList::VERSION = '0.0.3';
+$AI::TensorFlow::Libtensorflow::DeviceList::VERSION = '0.0.4';
 use strict;
 use warnings;
 use namespace::autoclean;

@@ -28,13 +28,14 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.012"
+            "perl" : "5.013002"
          }
       },
       "develop" : {
          "requires" : {
             "Moose" : "0",
             "Test::More" : "0.88",
+            "Test::Perl::Critic" : "0",
             "Test::Pod::LinkCheck::Lite" : "0",
             "Test::Pod::Snippets" : "0",
             "Test::Pod::Snippets::Parser" : "0"
@@ -78,7 +79,6 @@
             "Feature::Compat::Defer" : "0",
             "List::Util" : "0",
             "Module::Runtime" : "0",
-            "PDL" : "0",
             "Package::Variant" : "0",
             "Sub::Delete" : "0",
             "Sub::Quote" : "0",
@@ -94,6 +94,10 @@
             "perl" : "5.014",
             "strict" : "0",
             "warnings" : "0"
+         },
+         "suggests" : {
+            "Data::Printer" : "0",
+            "PDL" : "0"
          }
       },
       "test" : {
@@ -101,11 +105,9 @@
             "Data::Dumper" : "0",
             "PDL" : "0",
             "PDL::Core" : "0",
-            "PDL::Primitive" : "0",
             "Path::Tiny" : "0",
             "Test2::V0" : "0",
             "Test::More" : "0",
-            "Test::Most" : "0",
             "aliased" : "0",
             "lib" : "0",
             "perl" : "5.014"
@@ -121,7 +123,7 @@
          "web" : "https://github.com/EntropyOrg/perl-AI-TensorFlow-Libtensorflow"
       }
    },
-   "version" : "0.0.3",
+   "version" : "0.0.4",
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.28",
    "x_spdx_expression" : "Apache-2.0"

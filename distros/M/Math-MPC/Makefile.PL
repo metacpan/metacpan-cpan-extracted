@@ -27,8 +27,9 @@ unless ($do_complex_h) {
   $do_complex_h = $@ ? -1 : 1;
 }
 
-my $use_64_bit_int = 0; # Let perl decide whether to include 64-bit 'long long' support
-my $use_long_double = 0;# Let perl decide whether to include 'long double' support
+my $use_64_bit_int  = 0; # Let perl decide whether to include 64-bit 'long long' support
+my $use_long_double = 0; # Let perl decide whether to include 'long double' support
+my $use_quadmath    = 0; # Let perl decide whether to include '__float128' support
 
 #$use_64_bit_int = -1; # Force exclusion of 64-bit 'long long' support
 #$use_long_double = -1;# Force exclusion of 'long double' support
@@ -56,7 +57,10 @@ elsif($use_long_double == 1) {
 }
 else {
   if($Config::Config{nvsize} > 8 ) {
-    $defines .= " -DNV_IS_FLOAT128" if $Config{nvtype} eq '__float128';
+    if($Config{nvtype} eq '__float128') {
+      $defines .= " -DNV_IS_FLOAT128";
+      $use_quadmath = 1 ;
+    }
     $defines .= " -DNV_IS_LONG_DOUBLE" if $Config{nvtype} eq 'long double';
   }
 }
@@ -153,6 +157,9 @@ else { print "Not defining MPFR_PV_NV_BUG as perl version >= 5.035010\n\n" }
 
 ####################################
 
+my $libopts = '-lmpc -lmpfr -lgmp';
+$libopts    = '-lquadmath -lmpc -lmpfr -lgmp'
+  if ($^O eq 'cygwin' && $use_quadmath);
 
 my %options = (
   NAME => 'Math::MPC',
@@ -165,7 +172,7 @@ my %options = (
                },
   DEFINE   => $defines,
   LIBS => [
-    '-lmpc -lmpfr -lgmp'
+    $libopts
   ],
   LICENSE  => 'perl',
   VERSION_FROM => 'MPC.pm',

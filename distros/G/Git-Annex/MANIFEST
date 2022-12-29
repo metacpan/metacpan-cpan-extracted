@@ -8,6 +8,7 @@ META.json
 META.yml
 Makefile.PL
 README
+TODO
 bin/annex-to-annex
 bin/annex-to-annex-dropunused
 bin/annex-to-annex-reinject

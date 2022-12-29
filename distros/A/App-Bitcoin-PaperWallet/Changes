@@ -1,11 +1,20 @@
 Revision history for Perl extension App::Bitcoin::PaperWallet.
 
-1.02  Sun Oct 31 22:00:00 2021
+1.10  Wed Dec 28 2022
+	- fix unicode handling
+	- new option in paper-wallet: -o, --stdout - print to standard output
+	- new option in paper-wallet: -f, --file - specify a filename
+	- add help to paper-wallet, improve its documentation
+	- paper-wallet now also includes generation date and an identifier of the wallet
+	- improvements to test suite of the module, test the script itself in addition to the main package
+	- switch to Dist::Zilla
+
+1.02  Sun Oct 31 2021
 	- fix HD wallet compatibility
 
-1.01  Sat Sep 11 17:00:00 2021
+1.01  Sat Sep 11 2021
 	- fix minimum version of Bitcoin::Crypto
 
-1.00  Fri Sep 10 13:00:00 2021
+1.00  Fri Sep 10 2021
 	- first version
 

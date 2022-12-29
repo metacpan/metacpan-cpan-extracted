@@ -3,34 +3,36 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
-our $VERSION = 0.004;
+our $VERSION = 1.000;
 
 use Carp qw(croak);
 use IP::Geolocation::MMDB;
 
 sub register {
-  my ($self, $app, $conf) = @_;
+    my ($self, $app, $conf) = @_;
 
-  my $file = $conf->{file} or croak q{The "file" parameter is mandatory};
+    my $file = $conf->{file} or croak q{The "file" parameter is mandatory};
 
-  my $mmdb = IP::Geolocation::MMDB->new(file => $file);
+    my $mmdb = IP::Geolocation::MMDB->new(file => $file);
 
-  $app->helper(geolocation => sub {
-    my ($c, $ip_address) = @_;
+    $app->helper(
+        geolocation => sub {
+            my ($c, $ip_address) = @_;
 
-    if (!defined $ip_address) {
-      $ip_address = $c->tx->remote_address;
-    }
+            if (!defined $ip_address) {
+                $ip_address = $c->tx->remote_address;
+            }
 
-    my $data;
-    if ($ip_address) {
-      $data = $mmdb->record_for_address($ip_address);
-    }
+            my $data;
+            if ($ip_address) {
+                $data = $mmdb->record_for_address($ip_address);
+            }
 
-    return $data;
-  });
+            return $data;
+        }
+    );
 
-  return;
+    return;
 }
 
 1;
@@ -44,7 +46,7 @@ Mojolicious::Plugin::Geolocation::MMDB - Look up location information by IP addr
 
 =head1 VERSION
 
-version 0.004
+version 1.000
 
 =head1 SYNOPSIS
 
@@ -115,17 +117,17 @@ from L<MaxMind|https://www.maxmind.com/> or L<DP-IP.com|https://db-ip.com/>.
 
 None.
 
-=head1 AUTHOR
-
-Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
-
 =head1 BUGS AND LIMITATIONS
 
 None known.
 
+=head1 AUTHOR
+
+Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
+
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2022 Andreas Vögele
+Copyright (C) 2022 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

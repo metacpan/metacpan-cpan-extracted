@@ -121,63 +121,63 @@
    "provides" : {
       "Marpa::R2" : {
          "file" : "lib/Marpa/R2.pm",
-         "version" : "10.000000"
+         "version" : "12.000000"
       },
       "Marpa::R2::ASF" : {
          "file" : "lib/Marpa/R2/ASF.pm",
-         "version" : "10.000000"
+         "version" : "12.000000"
       },
       "Marpa::R2::Grammar" : {
          "file" : "lib/Marpa/R2/Grammar.pm",
-         "version" : "10.000000"
+         "version" : "12.000000"
       },
       "Marpa::R2::HTML" : {
          "file" : "html/lib/Marpa/R2/HTML.pm",
-         "version" : "10.000000"
+         "version" : "12.000000"
       },
       "Marpa::R2::HTML::Callback" : {
          "file" : "html/lib/Marpa/R2/HTML/Callback.pm",
-         "version" : "10.000000"
+         "version" : "12.000000"
       },
       "Marpa::R2::HTML::Config" : {
          "file" : "html/lib/Marpa/R2/HTML/Config.pm",
-         "version" : "10.000000"
+         "version" : "12.000000"
       },
       "Marpa::R2::HTML::Config::Compile" : {
          "file" : "html/lib/Marpa/R2/HTML/Config/Compile.pm",
-         "version" : "10.000000"
+         "version" : "12.000000"
       },
       "Marpa::R2::MetaAST" : {
          "file" : "lib/Marpa/R2/MetaAST.pm",
-         "version" : "10.000000"
+         "version" : "12.000000"
       },
       "Marpa::R2::MetaG" : {
          "file" : "lib/Marpa/R2/MetaG.pm",
-         "version" : "10.000000"
+         "version" : "12.000000"
       },
       "Marpa::R2::Recognizer" : {
          "file" : "lib/Marpa/R2/Recognizer.pm",
-         "version" : "10.000000"
+         "version" : "12.000000"
       },
       "Marpa::R2::Scanless::G" : {
          "file" : "lib/Marpa/R2/SLG.pm",
-         "version" : "10.000000"
+         "version" : "12.000000"
       },
       "Marpa::R2::Scanless::R" : {
          "file" : "lib/Marpa/R2/SLR.pm",
-         "version" : "10.000000"
+         "version" : "12.000000"
       },
       "Marpa::R2::Stuifzand" : {
          "file" : "lib/Marpa/R2/Stuifzand.pm",
-         "version" : "10.000000"
+         "version" : "12.000000"
       },
       "Marpa::R2::Thin::Trace" : {
          "file" : "lib/Marpa/R2/Thin/Trace.pm",
-         "version" : "10.000000"
+         "version" : "12.000000"
       },
       "Marpa::R2::Value" : {
          "file" : "lib/Marpa/R2/Value.pm",
-         "version" : "10.000000"
+         "version" : "12.000000"
       }
    },
    "release_status" : "stable",
@@ -194,5 +194,5 @@
          "web" : "http://webchat.freenode.net/?channels=%23marpa&uio=d4"
       }
    },
-   "version" : "10.000000"
+   "version" : "12.000000"
 }

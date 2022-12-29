@@ -1,0 +1,38 @@
+#ifndef P5_WASM_WASMER_EXTERN
+#define P5_WASM_WASMER_EXTERN 1
+
+typedef struct {
+    wasm_extern_t* extern_p;
+    SV* creator_sv;
+    pid_t pid;
+} extern_holder_t;
+
+SV* extern_to_sv (pTHX_ SV* creator_sv, wasm_extern_t* extern_p, const char* classname) {
+    HV* stash = gv_stashpv(classname, FALSE);
+    assert(stash);
+
+    extern_holder_t* holder_p;
+    Newx(holder_p, 1, extern_holder_t);
+
+    *holder_p = (extern_holder_t) {
+        .extern_p = extern_p,
+        .creator_sv = creator_sv,
+        .pid = getpid(),
+    };
+
+    SvREFCNT_inc(creator_sv);
+
+    return ptr_to_svrv( aTHX_ holder_p, stash );
+}
+
+void destroy_extern_sv (pTHX_ SV* self_sv) {
+    extern_holder_t* holder_p = svrv_to_ptr(aTHX_ self_sv);
+
+    warn_destruct_if_needed(self_sv, holder_p->pid);
+
+    SvREFCNT_dec( holder_p->creator_sv );
+
+    Safefree(holder_p);
+}
+
+#endif

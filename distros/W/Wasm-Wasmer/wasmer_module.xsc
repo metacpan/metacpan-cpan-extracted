@@ -1,0 +1,82 @@
+#ifndef P5_WASM_WASMER_MODULE
+#define P5_WASM_WASMER_MODULE 1
+
+#include "p5_wasm_wasmer.h"
+
+#include "wasmer_store.xsc"
+
+#define P5_WASM_WASMER_MODULE_CLASS "Wasm::Wasmer::Module"
+
+typedef struct {
+    wasm_module_t* module;
+    SV* store_sv;
+
+    pid_t pid;
+
+    wasm_exporttype_vec_t export_types;
+    wasm_importtype_vec_t import_types;
+} module_holder_t;
+
+#define get_store_sv_from_module_holder(holder) (holder->store_sv)
+
+SV* module_to_sv (pTHX_ wasm_module_t* module, SV* store_sv, const char* class) {
+    module_holder_t* module_holder_p;
+
+    Newx(module_holder_p, 1, module_holder_t);
+
+    module_holder_p->module = module;
+    module_holder_p->pid = getpid();
+    module_holder_p->store_sv = store_sv;
+
+    wasm_module_exports(module, &module_holder_p->export_types);
+    wasm_module_imports(module, &module_holder_p->import_types);
+
+    return ptr_to_svrv(aTHX_ module_holder_p, gv_stashpv(class, FALSE));
+}
+
+SV* create_module_sv (pTHX_ SV* class_sv, SV* wasm_sv, SV* store_sv) {
+    const char* class = class_sv ? SvPVbyte_nolen(class_sv) : P5_WASM_WASMER_MODULE_CLASS;
+
+    STRLEN wasm_len;
+    const char* wasm_bytes = SvPVbyte(wasm_sv, wasm_len);
+
+    if (store_sv == NULL) {
+        store_sv = create_store_sv(aTHX_ NULL, NULL, 0);
+    }
+    else {
+        SvREFCNT_inc(store_sv);
+    }
+
+    wasm_byte_vec_t binary;
+    wasm_byte_vec_new(&binary, wasm_len, wasm_bytes);
+
+    store_holder_t* store_holder_p = svrv_to_ptr(aTHX_ store_sv);
+
+    wasm_module_t* module = wasm_module_new(store_holder_p->store, &binary);
+
+    if (!module) {
+        SvREFCNT_dec(store_sv);
+        _croak_wasmer_error("WASM module creation failed");
+    }
+
+    wasm_byte_vec_delete(&binary);
+
+    return module_to_sv(aTHX_ module, store_sv, class);
+}
+
+void destroy_module_sv (pTHX_ SV* self_sv) {
+    module_holder_t* module_holder_p = svrv_to_ptr(aTHX_ self_sv);
+
+    warn_destruct_if_needed(self_sv, module_holder_p->pid);
+
+    wasm_exporttype_vec_delete(&module_holder_p->export_types);
+    wasm_importtype_vec_delete(&module_holder_p->import_types);
+
+    wasm_module_delete(module_holder_p->module);
+
+    SvREFCNT_dec(module_holder_p->store_sv);
+
+    Safefree(module_holder_p);
+}
+
+#endif

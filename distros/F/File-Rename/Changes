@@ -1,5 +1,46 @@
 Revision history for Perl extension File::Rename.
 
+1.992   Robin Barker 2022-12-27
+    Reinstate shebang line
+    https://rt.cpan.org/Ticket/Display.html?id=145711
+
+1.991   Robin Barker 2022-12-27
+    Add required ExtUtils::MakeMaker version to 
+        BUILD_REQUIRES and CONFIGURE_REQUIRES
+
+    Separate out TEST_REQUIRES from PREREQ_PM
+
+    Fix typos in 1.99 POD and Changes file 
+
+1.99    Robin Barker 2022-12-24
+    rename script requires options before code/files
+
+    New script unsafe-rename with no_require_order:
+        to recover the old behavior of the rename script
+
+1.90_5  Robin Barker 2022-12-24
+    Add back Build.PL for 1.99 - to be removed for 2.00
+    README and POD for 1.99
+
+1.90_4  Robin Barker 2022-12-23
+    Remove Build.PL - so testers build and test unsafe-rename
+    More globbing in rename-examples.t
+    Test for warnings in rename-examples.t
+
+1.90_3  Robin Barker 2022-12-22
+    Increase required version of ExtUtils::MakeMaker
+    Add test for unsafe script
+
+1.90_2  Robin Barker 2022-12-20
+    Add :config to use File:Rename, to mimic GetOpt::Long
+    Fix cygwin tests - cygwin is not Windows
+        See http://www.cpantesters.org/cpan/report/41cc76dd-84fd-1014-94ee-444106f7812f
+
+1.90_1  Robin Barker 2022-12-19
+    require_order in script
+    New script unsafe-rename with no_require_order
+    Rewrite examples to mark start of non-options
+
 1.31    Robin Barker 2022-05-07
     Add explicit LICENCE field
     Fix tests for perl 5.8.* and cygwin
@@ -145,4 +186,28 @@ Revision history for Perl extension File::Rename.
 0.01  Mon Dec 13 17:54:05 2004
 	- original version; created by h2xs 1.23 with options
 		-XAn File::Rename
+
+# $Revision$$Date$
+# Robin's RCS header:
+# RCSfile: rename.PL,v Revision: 1.3   Date: 2006/05/25 09:20:32 
+# Larry's RCS header:
+#  RCSfile: rename,v   Revision: 4.1   Date: 92/08/07 17:20:30 
+#
+#  Log: rename,v 
+# Revision 1.5  1998/12/18 16:16:31  rmb1
+# moved to perl/source
+# changed man documentation to POD
+#
+# Revision 1.4  1997/02/27  17:19:26  rmb1
+# corrected usage string
+#
+# Revision 1.3  1997/02/27  16:39:07  rmb1
+# added -v
+#
+# Revision 1.2  1997/02/27  16:15:40  rmb1
+# *** empty log message ***
+#
+# Revision 1.1  1997/02/27  15:48:51  rmb1
+# Initial revision
+#
 

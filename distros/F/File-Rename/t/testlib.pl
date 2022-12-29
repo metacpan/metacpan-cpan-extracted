@@ -110,10 +110,11 @@ sub diag_rename {
 
 sub options {
     local @ARGV = @_;
-    my $opt = do {
-	    require File::Rename::Options; 
+    # Test must File::Rename::Options->import
+    # using either  C<use File::Rename> 
+    # or    C<use File::Rename::Options>
+    my $opt = 
 	    File::Rename::Options::GetOptions(1);
-    };
     die "Bad options '@_'" unless $opt;
     die "Not options '@ARGV'" if @ARGV;
     return $opt;
@@ -132,5 +133,7 @@ sub is_windows {
 sub script_name {
     return +(is_windows() ? 'file-rename' : 'rename');
 }
+
+sub unsafe_script_name { return 'unsafe-rename'; }
 
 1;

@@ -17,9 +17,18 @@ enum XSParseInfixClassification {
   XPI_CLS_MATCH_MISC,  /*  ... any other match-like predicate */
   XPI_CLS_ORDERING,    /* cmp or <=> */
 
-  XPI_CLS_ADD_MISC,    /* an operator at addition-like precedence */
-  XPI_CLS_MUL_MISC,    /* an operator at multiplication-like precedence */
-  XPI_CLS_POW_MISC,    /* an operator at power exponentiation-like precedence */
+  /* Since the _MISC categories never turn up in selections, put them at high
+   * index so as to leave space for more */
+  XPI_CLS_LOW_MISC = 0x80,  /* an operator at low precedence */
+  XPI_CLS_LOGICAL_OR_LOW_MISC,
+  XPI_CLS_LOGICAL_AND_LOW_MISC,
+  XPI_CLS_ASSIGN_MISC,
+  XPI_CLS_LOGICAL_OR_MISC,
+  XPI_CLS_LOGICAL_AND_MISC,
+  XPI_CLS_ADD_MISC,         /* an operator at addition-like precedence */
+  XPI_CLS_MUL_MISC,         /* an operator at multiplication-like precedence */
+  XPI_CLS_POW_MISC,         /* an operator at power exponentiation-like precedence */
+  XPI_CLS_HIGH_MISC,        /* an operator at high precedence */
 };
 
 enum XSParseInfixSelection {

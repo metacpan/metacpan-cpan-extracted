@@ -1,9 +1,13 @@
 mpq_t *		MPQ
 mpz_t *		MPZ
-mpf_t * 	MPF
-mpfr_t *	MPFR
+mpf_t * 		MPF
+mpfr_t *		MPFR
 mpc_t *		MPC
+mpcr_t*		MPCR
+mpcb_t*		MPCB
 mpc_ptr		MPC_PTR
+mpcr_ptr		MPCR_PTR
+mpcb_ptr		MPCB_PTR
 mpc_rnd_t		MPC_RND
 intmax_t		INTMAX
 uintmax_t		UINTMAX
@@ -20,7 +24,15 @@ MPFR
             $var = INT2PTR($type, SvIVX(SvRV($arg)))
 MPC
             $var = INT2PTR($type, SvIVX(SvRV($arg)))
+MPCR
+            $var = INT2PTR($type, SvIVX(SvRV($arg)))
+MPCB
+            $var = INT2PTR($type, SvIVX(SvRV($arg)))
 MPC_PTR
+            $var = INT2PTR($type, SvIVX(SvRV($arg)))
+MPCR_PTR
+            $var = INT2PTR($type, SvIVX(SvRV($arg)))
+MPCB_PTR
             $var = INT2PTR($type, SvIVX(SvRV($arg)))
 MPC_RND
             $var = ($type)SvUV($arg)

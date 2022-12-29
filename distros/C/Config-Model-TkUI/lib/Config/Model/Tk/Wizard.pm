@@ -7,8 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-
-package Config::Model::Tk::Wizard 1.375;
+package Config::Model::Tk::Wizard 1.376;
 
 use strict;
 use warnings;
@@ -199,7 +198,6 @@ sub start_wizard {
         -font => $cw->{font},
         -command => sub {
             $cw->{keep_wiz_editor} = 0;
-            $cw->{ed_w}->store if $cw->{ed_w}->can('store');
             $cw->{wizard}->go_backward;
         } );
     $back->pack(qw/-side left -fill x -expand 1/);
@@ -228,7 +226,6 @@ sub start_wizard {
         -font => $cw->{font},
         -command => sub {
             $cw->{keep_wiz_editor} = 0;
-            $cw->{ed_w}->store if $cw->{ed_w}->can('store');
             $cw->{wizard}->go_forward;
         } );
     $forw->pack(qw/-side right -fill x -expand 1/);

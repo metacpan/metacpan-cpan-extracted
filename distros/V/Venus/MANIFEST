@@ -82,7 +82,9 @@ lib/Venus/Role/Printable.pm
 lib/Venus/Role/Proxyable.pm
 lib/Venus/Role/Reflectable.pm
 lib/Venus/Role/Rejectable.pm
+lib/Venus/Role/Serializable.pm
 lib/Venus/Role/Stashable.pm
+lib/Venus/Role/Subscribable.pm
 lib/Venus/Role/Testable.pm
 lib/Venus/Role/Throwable.pm
 lib/Venus/Role/Tryable.pm
@@ -161,7 +163,9 @@ t/Venus_Role_Printable.t
 t/Venus_Role_Proxyable.t
 t/Venus_Role_Reflectable.t
 t/Venus_Role_Rejectable.t
+t/Venus_Role_Serializable.t
 t/Venus_Role_Stashable.t
+t/Venus_Role_Subscribable.t
 t/Venus_Role_Testable.t
 t/Venus_Role_Throwable.t
 t/Venus_Role_Tryable.t

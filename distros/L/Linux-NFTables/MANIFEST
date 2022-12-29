@@ -1,0 +1,26 @@
+.github/workflows/all.yml
+.gitignore
+.gitmodules
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+NFTables.xs
+README.md
+cpanfile
+easyxs/.gitignore
+easyxs/LICENSE
+easyxs/README.md
+easyxs/easyxs.h
+easyxs/easyxs_debug.h
+easyxs/easyxs_numeric.h
+easyxs/easyxs_perlcall.h
+easyxs/easyxs_scalar.h
+easyxs/easyxs_string.h
+easyxs/easyxs_structref.h
+easyxs/init.h
+easyxs/ppport.h
+lib/Linux/NFTables.pm
+t/basic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

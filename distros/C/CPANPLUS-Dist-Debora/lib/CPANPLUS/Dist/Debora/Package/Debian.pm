@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use parent qw(CPANPLUS::Dist::Debora::Package);
 
@@ -926,7 +926,7 @@ CPANPLUS::Dist::Debora::Package::Debian - Create Debian packages
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -1054,6 +1054,10 @@ Requires the operating system packages "perl", "build-essential", "debhelper",
 
 None.
 
+=head1 BUGS AND LIMITATIONS
+
+This module cannot be used in taint mode.
+
 =head1 SEE ALSO
 
 dpkg(1), dpkg-buildpackage(1), debhelper(7)
@@ -1062,13 +1066,9 @@ dpkg(1), dpkg-buildpackage(1), debhelper(7)
 
 Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
 
-=head1 BUGS AND LIMITATIONS
-
-This module cannot be used in taint mode.
-
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2022 Andreas Vögele
+Copyright (C) 2022 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

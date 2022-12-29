@@ -5,14 +5,23 @@ BEGIN { eval { require warnings; warnings->import } }
 
 use Getopt::Long ();
 
-use vars qw($VERSION);
-$VERSION = '1.10';
+our $VERSION = 1.99;
+our $IMPORTED;
 
-eval{ Getopt::Long::Configure qw(
+sub import {
+    my $pack = shift;
+    if( $IMPORTED++ ) { 
+        require Carp;
+        Carp::cluck("$pack->import() called twice");
+    }
+    my @config = qw(
       posix_default
       no_ignore_case
-      no_require_order
-    ); 1 } or do { require Carp; Carp::carp($@) };
+    );
+    push @config, @_;
+    eval{ Getopt::Long::Configure(@config); 1; }
+        or do { require Carp; Carp::carp($@) };
+}
 
 sub GetOptions {
     my ($no_code) = @_;
@@ -84,7 +93,19 @@ File::Rename::Options - Option processing for File::Rename
     my $options = File::Rename::Options::GetOptions()
         or pod2usage;
 
+    use File::Rename::Options qw(no_require_order);
+
 =head1 DESCRIPTION
+
+=head2 CONFIGUATION
+
+The parameters to C<use File::Rename::Options> are 
+configurations settings for Getopt::Long
+
+The default configuration is posix_default and no_ignore_case;
+other settings are added to this list.
+
+=head2 FUNCTIONS
 
 =over 4
 
@@ -123,7 +144,7 @@ Returns C<undef> when there is an error in the options.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018 by Robin Barker
+Copyright (C) 2018, 2022 by Robin Barker
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8 or,

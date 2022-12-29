@@ -66,11 +66,11 @@
    "provides" : {
       "App::Music::ChordPro" : {
          "file" : "lib/App/Music/ChordPro.pm",
-         "version" : "5.990"
+         "version" : "6.000"
       },
       "chordpro" : {
          "file" : "script/chordpro",
-         "version" : "5.990"
+         "version" : "6.000"
       }
    },
    "release_status" : "stable",
@@ -86,6 +86,6 @@
          "url" : "https://github.com/sciurius/chordpro"
       }
    },
-   "version" : "5.990",
+   "version" : "6.000",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

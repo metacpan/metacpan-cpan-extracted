@@ -4,13 +4,13 @@
       "Pete Houston (cpan@openstrike.co.uk)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-EPP-Registry-Nominet",
    "no_index" : {
@@ -56,5 +56,6 @@
          "web" : "https://gitlab.com/openstrike/nominet-epp"
       }
    },
-   "version" : "0.06"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw( Alien::Base );
 
-our $VERSION = '1.7';
+our $VERSION = '1.9';
 
 =head1 NAME
 
@@ -22,7 +22,7 @@ Thibault Duponchelle E<lt>thibault.duponchelle@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2020 by Thibault Duponchelle
+Copyright 2022 by Thibault Duponchelle
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

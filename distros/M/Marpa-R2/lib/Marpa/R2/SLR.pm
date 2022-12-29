@@ -20,7 +20,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION $STRING_VERSION);
-$VERSION        = '10.000000';
+$VERSION        = '12.000000';
 $STRING_VERSION = $VERSION;
 ## no critic(BuiltinFunctions::ProhibitStringyEval)
 $VERSION = eval $VERSION;
@@ -1613,8 +1613,8 @@ sub input_range_describe {
 
 sub Marpa::R2::Scanless::R::show_progress {
     my ( $slr, $start_ordinal, $end_ordinal ) = @_;
-    my $slg = $slr->[Marpa::R2::Internal::Scanless::R::GRAMMAR];
-    my $recce = $slr->[Marpa::R2::Internal::Scanless::R::THICK_G1_RECCE];
+    my $slg       = $slr->[Marpa::R2::Internal::Scanless::R::GRAMMAR];
+    my $recce     = $slr->[Marpa::R2::Internal::Scanless::R::THICK_G1_RECCE];
     my $grammar   = $recce->[Marpa::R2::Internal::Recognizer::GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
 
@@ -1629,8 +1629,8 @@ sub Marpa::R2::Scanless::R::show_progress {
     else {
         if ( $start_ordinal < 0 or $start_ordinal > $last_ordinal ) {
             return
-                "Marpa::PP::Recognizer::show_progress start index is $start_ordinal, "
-                . "must be in range 0-$last_ordinal";
+"Marpa::PP::Recognizer::show_progress start index is $start_ordinal, "
+              . "must be in range 0-$last_ordinal";
         }
     } ## end else [ if ( $start_ordinal < 0 ) ]
 
@@ -1644,9 +1644,9 @@ sub Marpa::R2::Scanless::R::show_progress {
         }
         if ( $end_ordinal < 0 ) {
             return
-                "Marpa::PP::Recognizer::show_progress end index is $end_ordinal_argument, "
-                . sprintf ' must be in range %d-%d', -( $last_ordinal + 1 ),
-                $last_ordinal;
+"Marpa::PP::Recognizer::show_progress end index is $end_ordinal_argument, "
+              . sprintf ' must be in range %d-%d', -( $last_ordinal + 1 ),
+              $last_ordinal;
         } ## end if ( $end_ordinal < 0 )
     } ## end else [ if ( not defined $end_ordinal ) ]
 
@@ -1699,12 +1699,12 @@ sub Marpa::R2::Scanless::R::show_progress {
                         )
                     );
                     push @item_text, $input_range;
-                }  else {
+                }
+                else {
                     push @item_text, 'L0c0';
                 }
 
-                push @item_text,
-                    $slg->show_dotted_rule( $rule_id, $position );
+                push @item_text, $slg->show_dotted_rule( $rule_id, $position );
                 $text .= ( join q{ }, @item_text ) . "\n";
             } ## end for my $position ( sort { $a <=> $b } keys %{...})
         } ## end for my $rule_id ( sort { $a <=> $b } keys ...)
@@ -1915,6 +1915,12 @@ sub Marpa::R2::Scanless::R::default_g1_start_closure {
 } ## end sub Marpa::R2::Scanless::R::default_g1_start_closure
 
 # not to be documented
+sub Marpa::R2::Scanless::R::latest_earley_set {
+    my ($self) = @_;
+    return $self->[Marpa::R2::Internal::Scanless::R::THICK_G1_RECCE]
+        ->latest_earley_set();
+}
+
 sub Marpa::R2::Scanless::R::earley_set_size {
     my ($self, $set_id) = @_;
     # OK if set ID is undef, just pass it on.
@@ -1943,6 +1949,89 @@ sub Marpa::R2::Scanless::R::show_bocage {
     my $thick_g1_recce =
         $slr->[Marpa::R2::Internal::Scanless::R::THICK_G1_RECCE];
     return $thick_g1_recce->show_bocage($verbose);
+}
+
+sub Marpa::R2::Scanless::R::show_earley_sets {
+    my ( $slr, $verbose ) = @_;
+    $verbose //= 0;
+    my $thick_g1_recce =
+        $slr->[Marpa::R2::Internal::Scanless::R::THICK_G1_RECCE];
+    return $thick_g1_recce->show_earley_sets($verbose);
+}
+
+sub Marpa::R2::Scanless::R::show_leo_items {
+    my ( $slr, $ordinal ) = @_;
+    my $thick_g1_recce =
+      $slr->[Marpa::R2::Internal::Scanless::R::THICK_G1_RECCE];
+    my $grammar   = $thick_g1_recce->[Marpa::R2::Internal::Recognizer::GRAMMAR];
+    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
+    my $recce_c   = $thick_g1_recce->[Marpa::R2::Internal::Recognizer::C];
+
+    my $last_ordinal = $thick_g1_recce->latest_earley_set();
+    if ( $ordinal < 0 or $ordinal > $last_ordinal ) {
+        return
+            "Marpa::PP::Recognizer::show_leo_items start index is $ordinal, "
+          . "must be in range 0-$last_ordinal";
+    }
+    die if not defined $recce_c->_marpa_r_earley_set_trace($ordinal);
+    my @lines = ();
+  POSTDOT_ITEM:
+    for (
+        my $postdot_symbol_id = $recce_c->_marpa_r_first_postdot_item_trace() ;
+        defined $postdot_symbol_id ;
+        $postdot_symbol_id = $recce_c->_marpa_r_next_postdot_item_trace()
+      )
+    {
+
+        # If there is no base Earley item,
+        # then this is not a Leo item, so we skip it
+        my $leo_item_desc = $slr->show_leo_item();
+        next POSTDOT_ITEM if not defined $leo_item_desc;
+        push @lines, $leo_item_desc;
+    } ## end POSTDOT_ITEM: for ( my $postdot_symbol_id = $recce_c...)
+
+    return join "\n", @lines, '';
+}
+
+sub Marpa::R2::Scanless::R::show_leo_item {
+    my ($slr)        = @_;
+    my $slg = $slr->[Marpa::R2::Internal::Scanless::R::GRAMMAR];
+    my $thick_g1_recce =
+      $slr->[Marpa::R2::Internal::Scanless::R::THICK_G1_RECCE];
+    my $recce_c        = $thick_g1_recce->[Marpa::R2::Internal::Recognizer::C];
+    my $grammar        = $thick_g1_recce->[Marpa::R2::Internal::Recognizer::GRAMMAR];
+    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
+    my $tracer         = $grammar->[Marpa::R2::Internal::Grammar::TRACER];
+    my $base_ahm_id = $recce_c->_marpa_r_leo_top_ahm();
+    return if not defined $base_ahm_id;
+    my $trace_earley_set      = $recce_c->_marpa_r_trace_earley_set();
+    my $trace_earleme         = $recce_c->earleme($trace_earley_set);
+    my $postdot_symbol_id     = $recce_c->_marpa_r_postdot_item_symbol();
+    my $postdot_symbol_name   = $tracer->isy_name($postdot_symbol_id);
+    # my $predecessor_symbol_id = $recce_c->_marpa_r_leo_predecessor_symbol();
+    my $base_origin_set_id    = $recce_c->_marpa_r_leo_base_origin();
+    my $base_origin_earleme   = $recce_c->earleme($base_origin_set_id);
+
+    my $base_irl_id = $grammar_c->_marpa_g_ahm_irl($base_ahm_id);
+    my $base_rule_id = $grammar_c->_marpa_g_source_xrl($base_irl_id);
+    my $base_desc;
+    if (defined $base_rule_id) {
+        $base_desc = '[' . $slg->show_dotted_rule($base_rule_id, -2) . ']';
+    } else {
+        $base_desc = 'IRL#' . $base_irl_id;
+    }
+
+    my $text = sprintf 'L%d', $trace_earleme;
+    my @link_texts = ($base_desc, qq{"$postdot_symbol_name"}, "$base_origin_earleme");
+    $text .= ' [' . ( join '; ', @link_texts ) . ']';
+    return $text;
+}
+
+sub Marpa::R2::Scanless::R::show_parse_items {
+    my ( $slr, $ordinal ) = @_;
+    my $text = $slr->show_progress($ordinal);
+    $text .= $slr->show_leo_items($ordinal);
+    return $text;
 }
 
 1;

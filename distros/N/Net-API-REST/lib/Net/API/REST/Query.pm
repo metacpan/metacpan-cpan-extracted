@@ -1,11 +1,14 @@
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST/Query.pm
-## Version v0.1.1
+## Version v0.1.2
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@gabriel-vm>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/06/13
-## Modified 2020/10/07
+## Modified 2022/06/29
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::REST::Query;
 BEGIN
@@ -13,11 +16,15 @@ BEGIN
     use strict;
     use warnings;
     use common::sense;
-    use Encode ();
-    use utf8 ();
     use parent qw( URI::Query );
-    our $VERSION = 'v0.1.1';
+    use vars qw( $VERSION );
+    use utf8 ();
+    use Encode ();
+    our $VERSION = 'v0.1.2';
 };
+
+use strict;
+use warnings;
 
 sub _parse_qs
 {
@@ -72,7 +79,7 @@ sub _init_from_arrayref
 }
 
 1;
-
+# NOTE: pod
 __END__
 
 =encoding utf8
@@ -139,7 +146,7 @@ Net::API::REST::Query - utf8 compliant URI query string manipulation
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 DESCRIPTION
 

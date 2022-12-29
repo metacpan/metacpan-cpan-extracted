@@ -1,5 +1,5 @@
 package JSON::Path::Tokenizer;
-$JSON::Path::Tokenizer::VERSION = '1.0.2';
+$JSON::Path::Tokenizer::VERSION = '1.0.3';
 use strict;
 use warnings;
 
@@ -48,22 +48,67 @@ sub tokenize {
 sub _read_to_filter_script_close {
     my $chars = shift;
 
+    my %escaped_chars = (
+        "b"  => "\x{0008}",
+        "f"  => "\x{000C}",
+        "n"  => "\x{000A}",
+        "r"  => "\x{000D}",
+        "t"  => "\x{0009}",
+        "v"  => "\x{000B}",
+        "0"  => "\x{0000}",
+        "'"  => "\x{0027}",
+        '"'  => "\x{0022}",
+        "\\" => "\x{005C}",
+    );
+
     #print "$invocation: read to filter script close: " . join( '', @{$chars} ) . "\n";
     my $filter;
+    my $in_regex;
     my $in_quote;
+    my $escape = 0;
+
+    my @quote_chars = ($APOSTROPHE, $QUOTATION_MARK);
+    my @regex_chars = "/";
+
     while ( defined( my $char = shift @{$chars} ) ) {
-        $filter .= $char;
-        if ( $char eq $APOSTROPHE || $char eq $QUOTATION_MARK ) {
-            if ( $in_quote && $in_quote eq $char ) {
+        if ( $in_quote ) {
+            if ( $escape ) {
+                ## Replace \t by tab, \\ by \, etc
+                $char = $escaped_chars{$char} || $char;
+                $escape = 0;
+            }
+            elsif ( $char eq "\\" ) {
+                ## Don't include \ and flag so next char in sequence
+                ## is replaced correctly.
+                $escape = 1;
+                next;
+            }
+            elsif ( $char eq $in_quote ) {
                 $in_quote = '';
             }
-            else {
-                $in_quote = $char;
+        }
+        elsif ( $in_regex ) {
+            if ( $escape ) {
+                $escape = 0;
+            }
+            elsif ( $char eq "\\" ) {
+                $escape = 1;
+            }
+            elsif ( $char eq $in_regex ) {
+                $in_regex = '';
             }
         }
+        elsif (grep { $_ eq $char } @quote_chars) {
+            $in_quote = $char;
+        }
+        elsif (grep { $_ eq $char } @regex_chars) {
+            $in_regex = $char;
+        }
+
+        $filter .= $char;
 
         last unless @{$chars};
-        last if $chars->[0] eq $RIGHT_PARENTHESIS && !$in_quote;
+        last if $chars->[0] eq $RIGHT_PARENTHESIS && !$in_quote && !$in_regex;
     }
     return $filter;
 }
@@ -158,7 +203,7 @@ JSON::Path::Tokenizer - Helper class for JSON::Path::Evaluator. Do not call dire
 
 =head1 VERSION
 
-version 1.0.2
+version 1.0.3
 
 =head1 AUTHOR
 

@@ -30,7 +30,7 @@ our @EXPORT = qw(
    wordpress
 );
 
-our $VERSION = 'v0.8.2';
+our $VERSION = 'v0.8.3';
 
 
 
@@ -124,7 +124,7 @@ sub null_or_escape {
 
 
 sub protocol_in_path_or_referer {
-    my $re = qr{\b(?:file|dns|jndi|unix|ldap):};
+    my $re = qr{\b(?:file|dns|jndi|unix|ldap|php):};
     return (
         PATH_INFO    => $re,
         QUERY_STRING => $re,
@@ -196,7 +196,7 @@ Plack::Middleware::Security::Common - A simple security filter for Plack with co
 
 =head1 VERSION
 
-version v0.8.2
+version v0.8.3
 
 =head1 SYNOPSIS
 
@@ -331,7 +331,7 @@ query string.
 =head2 protocol_in_path_or_referer
 
 This blocks requests that have non-web protocols like C<file>, C<dns>,
-C<jndi>, C<unix> or C<ldap> in the path, query string or referer.
+C<jndi>, C<unix>, C<ldap> or C<php> in the path, query string or referer.
 
 Added in v0.5.1.
 

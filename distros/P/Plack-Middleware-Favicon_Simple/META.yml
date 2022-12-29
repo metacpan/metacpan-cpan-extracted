@@ -1,0 +1,27 @@
+---
+abstract: 'Perl Plack Middleware to provide favicon'
+author:
+  - 'Michael R. Davis'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-Favicon_Simple
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  MIME::Base64: '0'
+  Plack::Middleware: '0'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-Plack-Middleware-Favicon_Simple/issues
+  homepage: https://github.com/mrdvt92/perl-Plack-Middleware-Favicon_Simple
+  repository: https://github.com/mrdvt92/perl-Plack-Middleware-Favicon_Simple.git
+version: '0.01'

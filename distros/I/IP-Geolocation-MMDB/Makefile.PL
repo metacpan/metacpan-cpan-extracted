@@ -9,6 +9,19 @@ use 5.016;
 use ExtUtils::MakeMaker;
 
 use Config;
+my @defines;
+my $byteorder = $Config{byteorder};
+if (!defined $byteorder) {
+ warn "\$Config{byteorder} is undefined.\n";
+ die "OS unsupported\n";
+}
+if ($byteorder == 4321 || $byteorder == 87654321) {
+ push @defines, '-DWORDS_BIGENDIAN';
+}
+elsif (!($byteorder == 1234 || $byteorder == 12345678)) {
+ warn "Unknown byte order: $byteorder\n";
+ die "OS unsupported\n";
+}
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Read MaxMind DB files",
@@ -33,7 +46,7 @@ my %WriteMakefileArgs = (
     "File::Spec::Functions" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.009",
+  "VERSION" => "1.010",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,6 +56,7 @@ my %WriteMakefileArgs = (
     %WriteMakefileArgs,
     CCFLAGS => Alien::libmaxminddb->cflags . ' ' . $Config{ccflags},
     LIBS => [ Alien::libmaxminddb->libs ],
+    DEFINE => join(q{ }, @defines),
 );
 
 my %FallbackPrereqs = (

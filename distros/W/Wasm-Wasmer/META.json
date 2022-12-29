@@ -1,0 +1,55 @@
+{
+   "abstract" : "L<WebAssembly|https://webassembly.org> in Perl via L<Wasmer|https://wasmer.io>",
+   "author" : [
+      "Felipe Gasper (FELIPE)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Wasm-Wasmer",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker::CPANfile" : "0.09"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Plugin::NoWarnings" : "0",
+            "Test2::Tools::Explain" : "0",
+            "Test2::V0" : "0",
+            "Test::Class" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cpanel/p5-Wasm-Wasmer/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/cpanel/p5-Wasm-Wasmer.git",
+         "web" : "https://github.com/cpanel/p5-Wasm-Wasmer"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

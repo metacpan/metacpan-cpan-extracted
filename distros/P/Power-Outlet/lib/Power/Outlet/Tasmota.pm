@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use base qw{Power::Outlet::Common::IP::HTTP::JSON};
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 =head1 NAME
 
@@ -239,7 +239,8 @@ sub _call {
   my $self   = shift;
   my $arg    = shift;         #e.g. "" || ON || OFF || TOGGLE
   my $relay  = $self->_relay; #e.g. POWER0 || POWER1 || POWER2 ... (not POWER, not FriendlyName)
-  my $hash   = $self->_get(cmnd=>"$relay $arg");
+  my $cmnd   = $arg ? "$relay $arg" : $relay;
+  my $hash   = $self->_get(cmnd=>$cmnd);
   #use Data::Dumper qw{Dumper};
   #print Dumper($hash);
   my $return = $relay eq 'POWER1' ? $hash->{'POWER'} || $hash->{'POWER1'}               #SetOption26 on|off

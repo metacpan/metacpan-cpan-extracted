@@ -5,6 +5,7 @@ author:
 build_requires:
   Alien::Build::MM: '0.25'
   Archive::Tar: '0'
+  Config: '0'
   HTTP::Tiny: '0.044'
   IO::Socket::SSL: '1.56'
   Mojo::DOM: '0'
@@ -48,12 +49,13 @@ resources:
   homepage: https://metacpan.org/release/Alien-Boost-Headers
   license: http://dev.perl.org/licenses/
   repository: https://github.com/thibaultduponchelle/Alien-Boost-Headers.git
-version: '1.7'
+version: '1.9'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.74'
   requires:
     share:
       Archive::Tar: '0'
+      Config: '0'
       HTTP::Tiny: '0.044'
       IO::Socket::SSL: '1.56'
       Mojo::DOM: '0'

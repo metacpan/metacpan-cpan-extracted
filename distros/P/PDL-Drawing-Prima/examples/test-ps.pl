@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use PDL;
 use Prima;
-use Prima::PS::Drawable;
+use Prima::PS::Printer;
 use PDL::Drawing::Prima;
 use PDL::NiceSlice;
 
@@ -27,11 +27,7 @@ $colors = $colors->clump(3);
 $N_points->setbadat(20, 15);
 
 # Create the canvas:
-my $canvas = Prima::PS::Drawable-> create( onSpool => sub {
-	open F, ">> ./test.ps";
-	print F $_[1];
-	close F;
-});
+my $canvas = Prima::PS::File-> create( file => 'test.ps' );
 die "error:$@" unless $canvas-> begin_doc;
 
 # Draw the symbols:

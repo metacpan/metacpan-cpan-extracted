@@ -11,7 +11,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   Math::BigInt: '1.999806'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,10 +20,10 @@ name: IP-Geolocation-MMDB
 provides:
   IP::Geolocation::MMDB:
     file: lib/IP/Geolocation/MMDB.pm
-    version: '1.009'
+    version: '1.010'
   IP::Geolocation::MMDB::Metadata:
     file: lib/IP/Geolocation/MMDB/Metadata.pm
-    version: '1.009'
+    version: '1.010'
 requires:
   Math::BigInt: '1.999806'
   XSLoader: '0'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/voegelas/IP-Geolocation-MMDB/issues
   homepage: https://github.com/voegelas/IP-Geolocation-MMDB/wiki
   repository: https://github.com/voegelas/IP-Geolocation-MMDB.git
-version: '1.009'
-x_generated_by_perl: v5.34.1
+version: '1.010'
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

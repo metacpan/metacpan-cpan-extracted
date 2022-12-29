@@ -1,5 +1,11 @@
 Revision history for Perl extension Mojolicious::Plugin::Iconify.
 
+1.20  2022-12-22
+    - Added support for Iconify 3.x library and API
+
+1.10  2021-04-16
+    - Added Iconify API support
+
 1.02  2010-01-07
     - Added "align" attribute
     - Changed minimum Mojolicious version required (>= 7.93) in Makefile.PL

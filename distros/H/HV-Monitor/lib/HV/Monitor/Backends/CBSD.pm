@@ -10,11 +10,11 @@ HV::Monitor::Backends::CBSD - CBSD support for HV::Monitor
 
 =head1 VERSION
 
-Version 0.0.2
+Version 0.0.3
 
 =cut
 
-our $VERSION = '0.0.2';
+our $VERSION = '0.0.3';
 
 =head1 SYNOPSIS
 
@@ -223,7 +223,7 @@ sub run {
 			$vm_info->{status_int} = 1;
 			$return_hash->{totals}{on}++;
 			my $additional
-				= `ps S -o pid,etimes,%mem,cow,majflt,minflt,nice,nivcsw,nswap,nvcsw,inblk,oublk,pri,rss,systime,usertime,vsz | grep '^ *'$pid'[\ \t]'`;
+				= `ps S -o pid,etimes,%mem,cow,majflt,minflt,nice,nivcsw,nswap,nvcsw,inblk,oublk,pri,rss,systime,usertime,vsz | grep -E '^[\ \t]*'$pid'[\ \t]'`;
 
 			chomp($additional);
 			$additional =~ s/^[\ \t]*//;
@@ -247,6 +247,11 @@ sub run {
 			}
 
 			my ( $minutes, $seconds ) = split( /\:/, $vm_info->{systime} );
+			# low time VMs may lack the :, meaning $seconds will be undef
+			if (!defined($seconds)) {
+				$seconds=$minutes;
+				$minutes=0;
+			}
 			$vm_info->{systime} = ( $minutes * 60 ) + $seconds;
 
 			( $minutes, $seconds ) = split( /\:/, $vm_info->{usertime} );

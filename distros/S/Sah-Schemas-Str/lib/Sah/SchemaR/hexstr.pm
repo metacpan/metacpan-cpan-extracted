@@ -1,13 +1,13 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::hexstr;
 
-our $DATE = '2022-09-22'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2022-09-23'; # DATE
+our $VERSION = '0.013'; # VERSION
 
-our $rschema = do{my$var={base=>"str",clsets_after_base=>[{examples=>[{valid=>1,value=>""},{valid=>1,value=>"a0"},{summary=>"Uppercase digits are allowed, not coerced to lowercase",valid=>1,value=>"A0"},{summary=>"Odd number of digits (3)",valid=>0,value=>"a0f"},{valid=>1,value=>"a0ff"},{summary=>"Whitespace will be removed",valid=>1,validated_value=>"a0ff61",value=>"a0 ff 61"},{summary=>"Invalid hexdigit (g)",valid=>0,value=>"a0fg"},{valid=>1,value=>"a0ff12345678"}],match=>qr(\A(?:[0-9A-Fa-f]{2})*\z),prefilters=>["Str::remove_whitespace"],summary=>"String of bytes in hexadecimal"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
+our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nWhitespace is allowed and will be removed.\n\n",examples=>[{valid=>1,value=>""},{valid=>1,value=>"a0"},{summary=>"Uppercase digits are allowed, not coerced to lowercase",valid=>1,value=>"A0"},{summary=>"Odd number of digits (3)",valid=>0,value=>"a0f"},{valid=>1,value=>"a0ff"},{summary=>"Whitespace will be removed",valid=>1,validated_value=>"a0ff61",value=>"a0 ff 61"},{summary=>"Invalid hexdigit (g)",valid=>0,value=>"a0fg"},{valid=>1,value=>"a0ff12345678"}],match=>qr(\A(?:[0-9A-Fa-f]{2})*\z),prefilters=>["Str::remove_whitespace"],summary=>"String of bytes in hexadecimal notation, e.g. \"ab99\" or \"CAFE\""}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
-# ABSTRACT: String of bytes in hexadecimal
+# ABSTRACT: String of bytes in hexadecimal notation, e.g. "ab99" or "CAFE"
 
 __END__
 
@@ -17,11 +17,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::hexstr - String of bytes in hexadecimal
+Sah::SchemaR::hexstr - String of bytes in hexadecimal notation, e.g. "ab99" or "CAFE"
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::SchemaR::hexstr (from Perl distribution Sah-Schemas-Str), released on 2022-09-22.
+This document describes version 0.013 of Sah::SchemaR::hexstr (from Perl distribution Sah-Schemas-Str), released on 2022-09-23.
 
 =head1 DESCRIPTION
 

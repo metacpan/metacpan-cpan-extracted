@@ -16,7 +16,7 @@ sleep 5;
 
 parallelize {
 	my $tid = parallel_id;
-	my ($piddle, $mapped) = retrieve_pdls('test', 'mapped');
+	my ($pdl, $mapped) = retrieve_pdls('test', 'mapped');
 	
 	print "Thread id $tid is about to sleep for 5 seconds\n";
 	parallel_sync;

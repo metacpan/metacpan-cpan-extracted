@@ -1254,6 +1254,9 @@ class TestCase::NativeAPI {
   native static method get_basic_type_id_by_name : int ();
 
   native static method strerror_value : string ($errno_value : int);
+  native static method strerror_nolen_value : string ($errno_value : int);
+  native static method strerror_string_value : string ($errno_value : int);
+  native static method strerror_string_nolen_value : string ($errno_value : int);
   native static method new_object_array_raw : int ();
   native static method new_object_array : int ();
   native static method new_string_array : int ();
@@ -1369,6 +1372,8 @@ class TestCase::NativeAPI {
   native static method pointer_fields : int ();
   native static method get_pointer_no_need_free : int ();
   native static method get_pointer_length : int ();
+
+  native static method precompile_build_methodd_source : int ();
 
   native static method check_stdin_stdout_stderr_binary_mode : int ();
 }

@@ -1,5 +1,11 @@
 Revision history for CPANPLUS-Dist-Debora
 
+0.011  2022-12-23 07:44:45 CET
+
+  - Revise the MODULE_COMPAT code
+  - Depend on perl-libs if there are no shared objects
+  - rpmlint expects some SPDX license expressions in reversed order
+
 0.010  2022-08-19 14:54:42 CEST
 
   - Add versions to the Obsoletes tags

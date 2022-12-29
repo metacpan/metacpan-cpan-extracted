@@ -10,7 +10,7 @@ use warnings;
 use base qw( IO::Async::Stream );
 IO::Async::Stream->VERSION( '0.59' );
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 $VERSION = eval $VERSION;
 
 use IO::Async::SSL;

@@ -6,14 +6,16 @@ use 5.020;
 use exact;
 use exact::class;
 
-our $VERSION = '1.14'; # VERSION
+our $VERSION = '1.15'; # VERSION
 
-has acronyms             => 0;
-has sorting              => 1;
-has require_verse_match  => 0;
-has require_book_ucfirst => 0;
-has minimum_book_length  => 3;
-has add_detail           => 0;
+has acronyms              => 0;
+has sorting               => 1;
+has require_chapter_match => 0;
+has require_verse_match   => 0;
+has require_book_ucfirst  => 0;
+has minimum_book_length   => 3;
+has add_detail            => 0;
+has simplify              => 0;
 
 my $bibles = {
     ESV => [
@@ -609,6 +611,8 @@ sub in ( $self, @input ) {
             $pre = $pre . $space;
             push( @processed, $pre );
 
+            my $orig_ref = $ref;
+
             my $book;
             for (@$re_books) {
                 if ( $ref =~ /$_->[0]/ ) {
@@ -649,8 +653,13 @@ sub in ( $self, @input ) {
                 }
             }
 
-            push( @$ref_out, $numbers ) if (@$numbers);
-            push( @processed, $ref_out );
+            if ( @$numbers or not $self->require_chapter_match ) {
+                push( @$ref_out, $numbers ) if (@$numbers);
+                push( @processed, $ref_out );
+            }
+            else {
+                $processed[-1] .= $orig_ref;
+            }
         }
 
         push( @processed, $string );
@@ -758,6 +767,27 @@ sub as_array ( $self, $data = undef ) {
                 $_->[0] = $self->_bible_data->{book_to_acronym}{ $_->[0] };
             }
         }
+
+        $data = [ map {
+            my $book = $_->[0];
+
+            if ( my $chapters = $_->[1] ) {
+                for my $chapter (@$chapters) {
+                    pop @$chapter if (
+                        $chapter->[1] and
+                        join( ',', @{ $chapter->[1] } ) eq
+                        join( ',', 1 .. ( $self->_bible_data->{lengths}{$book}[ $chapter->[0] - 1 ] || 0 ) )
+                    );
+                }
+
+                pop @$_ if (
+                    join( ',', map { $_->[0] } grep { @$_ == 1 } @$chapters ) eq
+                    join( ',', 1 .. scalar @{ $self->_bible_data->{lengths}{$book} } )
+                );
+            }
+
+            $_;
+        } @$data ] if ( $self->simplify );
 
         $self->_cache->{data} = $data;
     }
@@ -971,7 +1001,7 @@ Bible::Reference - Simple Bible reference parser, tester, and canonicalizer
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =for markdown [![test](https://github.com/gryphonshafer/Bible-Reference/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bible-Reference/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bible-Reference/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bible-Reference)
@@ -981,11 +1011,16 @@ version 1.14
     use Bible::Reference;
 
     my $r = Bible::Reference->new;
+
     $r = Bible::Reference->new(
-        bible      => 'Protestant', # or "Orthodox" or "Catholic"
-        acronyms   => 0,            # or 1
-        sorting    => 1,            # or 0 to preserve input order
-        add_detail => 0,            # or 1 to add implied chapter and verse detail
+        bible                 => 'Protestant', # or "Orthodox" or "Catholic"
+        acronyms              => 0,            # return full book names
+        sorting               => 1,            # sort by reference
+        require_chapter_match => 0,            # don't require chapters in references for matching
+        require_verse_match   => 0,            # don't require verses in references for matching
+        require_book_ucfirst  => 0,            # don't require book names to be ucfirst for matching
+        minimum_book_length   => 3,
+        add_detail            => 0,
     );
 
     $r = $r->in('Text with I Pet 3:16 and Rom 12:13-14,17 references in it.');
@@ -1014,12 +1049,14 @@ version 1.14
     my @books  = $r->books;
     my @sorted = $r->sort( 'Romans', 'James 1:5', 'Romans 5' );
 
-    $r->bible('Orthodox');       # switch to the Orthodox Bible
-    $r->acronyms(1);             # output acronyms instead of full book names
-    $r->sorting(0);              # deactivate sorting of references
-    $r->add_detail(1);           # turn on adding chapter and verse detail
-    $r->require_verse_match(1);  # require verses in references for matching
-    $r->require_book_ucfirst(1); # require book names to be ucfirst for matching
+    $r->bible('Orthodox');        # switch to the Orthodox Bible
+    $r->acronyms(1);              # output acronyms instead of full book names
+    $r->sorting(0);               # deactivate sorting of references
+    $r->require_chapter_match(1); # require chapters in references for matching
+    $r->require_verse_match(1);   # require verses in references for matching
+    $r->require_book_ucfirst(1);  # require book names to be ucfirst for matching
+    $r->minimum_book_length(4);   # set minimum book length to 4
+    $r->add_detail(1);            # turn on adding chapter and verse detail
 
 =head1 DESCRIPTION
 
@@ -1250,10 +1287,10 @@ data will be used.
 
 =head2 expand_ranges
 
-This is a helper method you'll likely not need to use directly, but it's
-provided just in case you do. It requires 2 strings: a book name and a
-chapter/verse ranges string. It will return a string represented the "expanded"
-chapter/verse range.
+This is a helper method. It's called automatically if C<add_detail> is set to a
+true value. The method requires 2 strings: a book name and a chapter/verse
+ranges string. It will return a string represented the "expanded" chapter/verse
+range.
 
     $r->expand_ranges( 'Mark', '1:3-7' );
     # returns "1:3, 4, 5, 6, 7"
@@ -1301,10 +1338,10 @@ error. For example, consider the following text input:
 
 With this, we'd falsely match: Thessalonians 1, Numbers 7, and Judges 3.
 
-There are a couple things you can do to reduce this problem. You can optionally
-set C<require_verse_match> to a true value. This will cause the matching
-algorithm to only work on reference patterns that contain what look to be
-verses.
+There are a few things you can do to reduce this problem. You can optionally set
+C<require_chapter_match> or C<require_verse_match> to true values. These will
+cause the matching algorithm to only work on reference patterns that contain
+what look to be chapter numbers and/or verse numbers.
 
 You can optionally set C<require_book_ucfirst> to a true value. This will cause
 the matching algorithm to only work on reference patterns that contain what

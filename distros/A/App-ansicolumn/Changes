@@ -1,5 +1,13 @@
 Revision history for Perl extension App-ansicolumn
 
+1.2801 2022-12-28T03:13:24Z
+
+    - fix a bug of handling \f char
+
+1.27 2022-12-27T10:47:38Z
+
+    - introduce --pages option
+
 1.26 2022-12-14T10:58:20Z
 
     - introduce --run option to set runin/runout at once

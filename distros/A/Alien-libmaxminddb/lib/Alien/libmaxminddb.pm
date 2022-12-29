@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 1.009;
+our $VERSION = 1.010;
 
 use parent qw(Alien::Base);
 
@@ -21,7 +21,7 @@ Alien::libmaxminddb - Find or download and install libmaxminddb
 
 =head1 VERSION
 
-version 1.009
+version 1.010
 
 =head1 SYNOPSIS
 
@@ -74,14 +74,6 @@ like to use your operating system's libmaxminddb library.
 
 None.
 
-=head1 SEE ALSO
-
-L<Alien::Base>, L<IP::Geolocation::MMDB>
-
-=head1 AUTHOR
-
-Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
-
 =head1 BUGS AND LIMITATIONS
 
 If L<libmaxminddb|https://github.com/maxmind/libmaxminddb> and its development
@@ -91,9 +83,29 @@ Windows.  If Alien::Build fails to build libmaxminddb, make sure that you have
 a clean build environment with nothing but Perl and the build tools in your
 path.
 
+=head1 SEE ALSO
+
+L<Alien::Base>, L<IP::Geolocation::MMDB>
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to all who have contributed patches and reported bugs:
+
+=over
+
+=item *
+
+Alex Granovskiy
+
+=back
+
+=head1 AUTHOR
+
+Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
+
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2022 Andreas Vögele
+Copyright (C) 2022 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

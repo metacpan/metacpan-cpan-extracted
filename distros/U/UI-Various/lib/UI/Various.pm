@@ -105,7 +105,16 @@ only possible (and dirty!) workaround is setting the member of the internal
 hash directly.
 
 Boxes can not have visible borders in L<Curses::UI> as they are currently
-"faked" and do not use a proper L<Curses::UI> element.
+"faked" and do not use a proper L<Curses::UI> element.  This also sometimes
+leads to a Curses interface needing slightly more space than the equivalent
+RichTerm one.  In addition L<Curses::UI> has limitations concerning the
+alignment of the widgets.
+
+Running C<L<Main::mainloop|UI::Various::Main/mainloop - main event loop of
+an application>> more than once causes L<Tk> to abort with sporadic (about 1
+in 9) segmentation violations in Tk's internal code.  In addition there are
+sporadic core dumps when running Tk in a virtual X11 framebuffer (Xvfb).
+Finally the calculation for automatic wrapping in Tk needs improvement.
 
 Methods, member variables, etc. starting with an underscore (C<_>) are
 considered to be internal only.  Their usage and interfaces may change
@@ -126,7 +135,7 @@ use warnings 'once';
 
 use Carp;			# may only be used in import!
 
-our $VERSION = "0.34";
+our $VERSION = "0.37";
 
 BEGIN  {  require UI::Various::core;  }
 

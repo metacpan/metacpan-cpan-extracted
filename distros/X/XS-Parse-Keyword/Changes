@@ -1,5 +1,12 @@
 Revision history for XS-Parse-Keyword
 
+0.31    2022-12-25
+        [CHANGES]
+         * PL_infix_plugin now exists in 5.37.7
+         * Support the new infix operator precedence levels added by
+           perl v5.37.7
+         * Various updates to hax/ support files
+
 0.30    2022-12-03
         [CHANGES]
          * Added XPK_STAGED_ANONSUB; inspired a bit by XS::Parse::Sublike for

@@ -3,16 +3,20 @@ package Sah::Schema::hexstr;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-22'; # DATE
+our $DATE = '2022-09-23'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = [str => {
-    summary => 'String of bytes in hexadecimal',
+    summary => 'String of bytes in hexadecimal notation, e.g. "ab99" or "CAFE"',
+    prefilters => ['Str::remove_whitespace'],
     match => qr/\A(?:[0-9A-Fa-f]{2})*\z/,
 
-    prefilters => ['Str::remove_whitespace'],
+    description => <<'_',
 
+Whitespace is allowed and will be removed.
+
+_
     examples => [
         {value=>'', valid=>1},
         {value=>'a0', valid=>1},
@@ -27,7 +31,7 @@ our $schema = [str => {
 }];
 
 1;
-# ABSTRACT: String of bytes in hexadecimal
+# ABSTRACT: String of bytes in hexadecimal notation, e.g. "ab99" or "CAFE"
 
 __END__
 
@@ -37,11 +41,11 @@ __END__
 
 =head1 NAME
 
-Sah::Schema::hexstr - String of bytes in hexadecimal
+Sah::Schema::hexstr - String of bytes in hexadecimal notation, e.g. "ab99" or "CAFE"
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schema::hexstr (from Perl distribution Sah-Schemas-Str), released on 2022-09-22.
+This document describes version 0.013 of Sah::Schema::hexstr (from Perl distribution Sah-Schemas-Str), released on 2022-09-23.
 
 =head1 SYNOPSIS
 
@@ -161,6 +165,10 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
+
+=head1 DESCRIPTION
+
+Whitespace is allowed and will be removed.
 
 =head1 HOMEPAGE
 

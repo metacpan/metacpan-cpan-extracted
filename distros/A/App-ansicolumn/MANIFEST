@@ -19,6 +19,7 @@ t/App/cdif/Tmpfile.pm
 t/ac.pm
 t/sorekara-new.txt
 t/sorekara-old.txt
+t/yamanashi-pages.txt
 t/yamanashi.txt
 META.yml
 MANIFEST

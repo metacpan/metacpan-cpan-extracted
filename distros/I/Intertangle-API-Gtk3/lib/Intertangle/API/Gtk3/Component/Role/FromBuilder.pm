@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::API::Gtk3::Component::Role::FromBuilder;
 # ABSTRACT: Role that loads a Glade UI file into a Gtk3::Builder
-$Intertangle::API::Gtk3::Component::Role::FromBuilder::VERSION = '0.005';
+$Intertangle::API::Gtk3::Component::Role::FromBuilder::VERSION = '0.006';
 use Moo::Role;
 use Intertangle::API::Gtk3::Helper;
 use Renard::Incunabula::Common::Types qw(InstanceOf);
@@ -37,7 +37,7 @@ Intertangle::API::Gtk3::Component::Role::FromBuilder - Role that loads a Glade U
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 

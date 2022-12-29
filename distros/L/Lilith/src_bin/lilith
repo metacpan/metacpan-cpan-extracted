@@ -13,9 +13,10 @@ use Net::Server::Daemonize qw(daemonize);
 use MIME::Base64;
 use Gzip::Faster;
 use Data::Dumper;
+use Sys::Syslog;
 
 sub version {
-	print "lilith v. 0.0.1\n";
+	print "lilith v. 0.1.0\n";
 }
 
 sub help {
@@ -465,43 +466,75 @@ while ( defined( $toml_keys[$int] ) ) {
 }
 
 if ( $action eq 'run' ) {
-	print "Lilith starting...\n" . "dsn: ";
+	openlog( 'lilith', undef, 'daemon' );
+	my $message = "Lilith starting...";
+	syslog( 'info', $message );
+	print $message. "\n";
+
+	$message = "dsn: ";
 	if ( defined( $toml->{dsn} ) ) {
-		print $toml->{dsn} . "\n";
+		$message = $message . $toml->{dsn} . "\n";
 	}
 	else {
-		print "***undefined***\n";
+		$message = $message . "***undefined***\n";
 	}
-	print "sagan: ";
+	syslog( 'info', $message );
+	print $message. "\n";
+
+	$message = "sagan: ";
 	if ( defined( $toml->{sagan} ) ) {
-		print $toml->{sagan} . "\n";
+		$message = $message . $toml->{sagan} . "\n";
 	}
 	else {
-		print "***undefined***\n";
+		$message = $message . "***undefined***\n";
 	}
-	print "suricata: ";
+	syslog( 'info', $message );
+	print $message. "\n";
+
+	$message = "suricata: ";
 	if ( defined( $toml->{suricata} ) ) {
-		print $toml->{suricata} . "\n";
+		$message = $message . $toml->{suricata} . "\n";
 	}
 	else {
-		print "***undefined***\n";
+		$message = $message . "***undefined***\n";
 	}
-	print "user: ";
+	syslog( 'info', $message );
+	print $message. "\n";
+
+	$message = "user: ";
 	if ( defined( $toml->{user} ) ) {
-		print $toml->{user} . "\n";
+		$message = $message . $toml->{user} . "\n";
 	}
 	else {
-		print "***undefined***\n";
+		$message = $message . "***undefined***\n";
 	}
-	print "pass: ";
+	syslog( 'info', $message );
+	print $message. "\n";
+
+	$message = "pass: ";
 	if ( defined( $toml->{pass} ) ) {
-		print "***defined***\n";
+		$message = $message . "***defined***\n";
 	}
 	else {
-		print "***undefined***\n";
+		$message = $message . "***undefined***\n";
+	}
+	syslog( 'info', $message );
+	print $message. "\n\n";
+
+	$message = "Configured Instances...";
+	syslog( 'info', $message );
+	print $message. "\n";
+
+	foreach my $line ( split( /\n/, to_toml( \%files ) ) ) {
+		syslog( 'info', $line );
+		print $line. "\n";
 	}
 
-	print "\nConfigured Instances...\n" . to_toml( \%files ) . "\n\n\nCalling Lilith->run now....\n";
+	print "\n\n";
+
+	$message = "Calling Lilith->run now....";
+	syslog( 'info', $message );
+	print $message. "\n";
 
 	if ($daemonize) {
 		daemonize( $user, $group, '/var/run/lilith/pid' );

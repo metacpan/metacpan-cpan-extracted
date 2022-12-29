@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tk::NoteEditor 1.375;
+package Config::Model::Tk::NoteEditor 1.376;
 
 use strict;
 use warnings;

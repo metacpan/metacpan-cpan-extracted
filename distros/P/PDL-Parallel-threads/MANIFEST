@@ -1,15 +1,12 @@
-Build.PL
+Changes
+Makefile.PL
 examples/barrier-sync.pl
 examples/perl-barrier.pl
-examples/test-child-slice.pl
-examples/test-direct-store.pl
+examples/simple-parallelize.pl
 examples/test-memory-consumption.pl
-examples/test-undef.pl
-lib/PDL/Parallel/threads.pm
-lib/PDL/Parallel/threads.xs
-lib/PDL/Parallel/threads/SIMD.pm
+threads.pd
+SIMD.pm
 MANIFEST			This list of files
-ppport.h
 README.pod
 t/00-load.t
 t/01_ref_counting.t
@@ -17,6 +14,8 @@ t/02_non_threaded.t
 t/03_name_munging.t
 t/10_physical_piddles.t
 t/11_memory_mapped.t
-typemap
-META.yml
-META.json
+t/20_simd.t
+t/30_sharing_from_threads.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+GENERATED/PDL/Parallel/threads.pm        mod=PDL::Parallel::threads pd=threads.pd (added by pdlpp_mkgen)

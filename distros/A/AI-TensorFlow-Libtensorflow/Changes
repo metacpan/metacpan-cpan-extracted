@@ -1,3 +1,14 @@
+0.0.4 2022-12-21 15:57:53-0500
+
+  - Features
+
+      - Add Data::Printer and stringification support for several classes.
+      - Add `::TFLibrary` class. Move `GetAllOpList()` method there.
+
+  - Documentation
+
+      - Add InferenceUsingTFHubMobileNetV2Model tutorial.
+
 0.0.3 2022-12-15 10:46:52-0500
 
   - Features

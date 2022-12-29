@@ -17,6 +17,7 @@ t/009_freq.t
 t/009_freq.t.msi
 t/010_read_patches.t
 t/011_blob.t
+t/012_tilt.t
 t/anonymous.msi
 t/read_fromZipMember.zip
 lib/RF/Antenna/Planet/MSI/Format.pm

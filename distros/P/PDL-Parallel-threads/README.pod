@@ -28,36 +28,33 @@ your favorite CPAN client. For example:
 The easiest way to install the development version is to use cpanm to
 install the tarball:
 
- cpanm https://github.com/run4flat/PDL-Parallel-threads/tarball/master
+ cpanm https://github.com/PDLPorters/PDL-Parallel-threads/tarball/master
 
 You'll need to have L<App::cpanminus> in order to use C<cpanm>. If you
 don't have that, or if you want to compile the code by hand, you can
 download the distribution using git or by directly downloading the zip
 archive at
 
-  https://github.com/run4flat/PDL-Parallel-threads/zipball/master
+  https://github.com/PDLPorters/PDL-Parallel-threads/zipball/master
 
 or the tar.gz tarball at
 
-  https://github.com/run4flat/PDL-Parallel-threads/tarball/master
+  https://github.com/PDLPorters/PDL-Parallel-threads/tarball/master
 
 Unpack and navigate a command-line shell to the root directory. Then issue the
 following commands:
 
-  # Windows          Unixen (including modern Macs)
-  perl Build.PL      perl Build.PL
-  Build              ./Build
-  Build test         ./Bulld test
-  Build install      ./Build install
-                          -- or --
-                     sudo ./Build install
+  perl Makefile.PL
+  make
+  make test
+  make install # or sudo make install
 
 =head1 BUGS
 
-There are no known bugs for thist distribution. If you find any, feel free
+There are no known bugs for this distribution. If you find any, feel free
 to file bug reports on the github issue tracker:
 
-  https://github.com/run4flat/PDL-Parallel-threads/issues
+  https://github.com/PDLPorters/PDL-Parallel-threads/issues
 
 =head1 AUTHOR
 

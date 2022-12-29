@@ -19,20 +19,20 @@ name: Sah-Schemas-Binary
 provides:
   Sah::Schema::hexbuf:
     file: lib/Sah/Schema/hexbuf.pm
-    version: '0.006'
+    version: '0.007'
   Sah::SchemaR::hexbuf:
     file: lib/Sah/SchemaR/hexbuf.pm
-    version: '0.006'
+    version: '0.007'
   Sah::Schemas::Binary:
     file: lib/Sah/Schemas/Binary.pm
-    version: '0.006'
+    version: '0.007'
 requires:
   strict: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Binary
   homepage: https://metacpan.org/release/Sah-Schemas-Binary
   repository: git://github.com/perlancar/perl-Sah-Schemas-Binary.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -318,7 +318,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::PERLANCAR::Contributing
               name: '@Author::PERLANCAR/PERLANCAR/Contributing'
-              version: '0.292'
+              version: '0.293'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'

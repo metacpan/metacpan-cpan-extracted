@@ -1,5 +1,9 @@
 Revision history for Perl extension Acme::Text::Rhombus.
 
+0.24  2022-12-24  <schubiger@cpan.org>
+
+ - Minor whitespace tweak.
+
 0.23  2022-12-08  <schubiger@cpan.org>
 
  - Merged development version to stable.

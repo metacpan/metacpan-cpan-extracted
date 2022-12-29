@@ -1,0 +1,88 @@
+#ifndef P5_WASM_WASMER_GLOBAL
+#define P5_WASM_WASMER_GLOBAL 1
+
+#include "p5_wasm_wasmer.h"
+#include "wasmer_extern.xsc"
+
+// ----------------------------------------------------------------------
+
+SV* global_to_sv (pTHX_ SV* creator_sv, wasm_extern_t* export_p) {
+    return extern_to_sv(aTHX_ creator_sv, export_p, GLOBAL_CLASS);
+}
+
+wasm_mutability_t _get_mutability (extern_holder_t* holder_p) {
+    wasm_global_t* global = wasm_extern_as_global(holder_p->extern_p);
+    own wasm_globaltype_t* gtype = wasm_global_type(global);
+
+    wasm_mutability_t ret = wasm_globaltype_mutability(gtype);
+
+    wasm_globaltype_delete(gtype);
+
+    return ret;
+}
+
+SV* global_sv_mutability_sv (pTHX_ SV* self_sv) {
+    extern_holder_t* holder_p = svrv_to_ptr(aTHX_ self_sv);
+
+    return newSVuv(_get_mutability(holder_p));
+}
+
+static inline void _wasm_global_set_sv (pTHX_ wasm_global_t* global, SV* newval) {
+    wasm_val_t val;
+
+    // Simpler just to fetch the value than to trek through
+    // the export_type -> extern_type -> global_type business.
+    wasm_global_get( global, &val );
+
+    val = grok_wasm_val(aTHX_ val.kind, newval);
+
+    wasm_global_set(global, &val);
+}
+
+static inline void destroy_global_sv (pTHX_ SV* self_sv) {
+    destroy_extern_sv(aTHX_ self_sv);
+}
+
+// ----------------------------------------------------------------------
+
+static inline SV* global_holder_get_sv (pTHX_ extern_holder_t* holder_p) {
+    wasm_global_t* global = wasm_extern_as_global(holder_p->extern_p);
+
+    wasm_val_t val;
+
+    wasm_global_get( global, &val );
+
+    return ww_val2sv(aTHX_ &val);
+}
+
+static const char* mutability_descr[] = {
+    [WASM_CONST] = "constant",
+    [WASM_VAR] = "mutable",
+};
+
+static const char* kind_descr[] = {
+    [WASM_I32] = "i32",
+    [WASM_I64] = "i64",
+    [WASM_F32] = "f32",
+    [WASM_F64] = "f64",
+};
+
+static inline void global_holder_set_sv (pTHX_ extern_holder_t* holder_p, SV* newval) {
+    wasm_global_t* global = wasm_extern_as_global(holder_p->extern_p);
+
+    _wasm_global_set_sv(aTHX_ global, newval);
+
+    if (_WASMER_HAS_ERROR) {
+        const wasm_globaltype_t* gtype = wasm_global_type(global);
+        const wasm_valtype_t* vtype = wasm_globaltype_content(gtype);
+
+        _croak_wasmer_error(
+            "Failed to set %s %s global to %" SVf,
+            mutability_descr[ wasm_globaltype_mutability(gtype) ],
+            kind_descr[ wasm_valtype_kind(vtype) ],
+            newval
+        );
+    }
+}
+
+#endif

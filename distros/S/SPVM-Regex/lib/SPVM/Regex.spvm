@@ -105,7 +105,7 @@ class Regex {
     
     my $match_count = 0;
     while (1) {
-      my $result_buffer_value = $result_buffer->value;
+      my $result_buffer_value = $result_buffer->to_string;
       
       my $match = $self->match_forward($result_buffer_value, \$offset, $length);
       

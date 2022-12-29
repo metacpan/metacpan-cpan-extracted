@@ -3,19 +3,32 @@ use ExtUtils::MakeMaker;
 use strict;
 use warnings;
 use Config;
-use SPVM::Builder::Util::API;
+use Getopt::Long 'GetOptions';
 
+GetOptions(
+  'meta' => \my $meta,
+  'no-build-spvm-modules' => \my $no_build_spvm_modules,
+);
+
+if ($meta) {
+  $no_build_spvm_modules = 1;
+}
+
+unless ($meta) {
+  # Do something such as environment check
+}
+
+my %configure_and_runtime_requires = (
+  'SPVM' => '0.9670',
+  'SPVM::Resource::Re2::V2022_06_01' => '0.06',
+);
 WriteMakefile(
   NAME              => 'SPVM::Regex',
   VERSION_FROM      => 'lib/SPVM/Regex.pm',
-  PREREQ_PM         => {
-    'SPVM::Unicode' => '0.03',
-    'SPVM::Resource::Re2::V2022_06_01' => '0.05',
-  }, # e.g., Module::Name => 1.1
   LICENSE           => 'perl_5',
   ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
     (ABSTRACT_FROM  => 'lib/SPVM/Regex.pm',
-     AUTHOR         => 'USER_NAME<USER_MAIL>') : ()),
+     AUTHOR         => 'Yuki Kimoto<kimoto.yuki@gmail.com>') : ()),
   test => {TESTS => 't/*.t'},
   clean => {FILES => ['.spvm_build', 't/.spvm_build']},
   META_MERGE => {
@@ -23,23 +36,32 @@ WriteMakefile(
     resources => {
       repository => {
         type => 'git',
-        url  => '',
-        web  => '',
+        url  => 'https://github.com/yuki-kimoto/SPVM-Regex.git',
+        web  => 'https://github.com/yuki-kimoto/SPVM-Regex',
       },
     },
   },
-  # SPVM::Builder::Util::API is needed for Makefile.PL
+  NORECURS => 1,
   CONFIGURE_REQUIRES => {
-    'SPVM'              => '0.9661',
+    %configure_and_runtime_requires,
+  },
+  PREREQ_PM         => {
+    %configure_and_runtime_requires,
+    'SPVM::Unicode' => '0.03',
+  },
+  TEST_REQUIRES => {
   },
 );
 
 sub MY::postamble {
 
   my $make_rule = '';
-  
-  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Regex');
-  $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('Regex');
+
+  unless ($no_build_spvm_modules) {
+    require SPVM::Builder::Util::API;
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Regex');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('Regex');
+  }
   
   return $make_rule;
 }

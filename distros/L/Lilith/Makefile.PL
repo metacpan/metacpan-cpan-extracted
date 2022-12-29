@@ -32,7 +32,9 @@ my %WriteMakefileArgs = (
 		'Gzip::Faster'           => '0',
 		'DBD::Pg'                => '0',
 		'Data::Dumper'           => '0',
-
+		'Text::ANSITable'        => '0.608',
+		'Net::Server::Daemonize' => '0',
+		'Sys::Syslog'            => '0',
 	},
 	dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean      => { FILES    => 'Lilith-*' },
@@ -41,8 +43,8 @@ my %WriteMakefileArgs = (
 		resources   => {
 			repository => {
 				type => 'git',
-				url  => 'git@github.com:VVelox/Lilith.git',
-				web  => 'https://github.com/VVelox/Lilith',
+				url  => 'git@github.com:LilithSec/Lilith.git',
+				web  => 'https://github.com/LilithSec/Lilith',
 			},
 		},
 	}

@@ -3,9 +3,9 @@ package Sah::Schema::latin_alpha;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-22'; # DATE
+our $DATE = '2022-09-23'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = [str => {
     summary => 'String containing only zero or more Latin letters, i.e. A-Z or a-z',
@@ -34,7 +34,7 @@ Sah::Schema::latin_alpha - String containing only zero or more Latin letters, i.
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schema::latin_alpha (from Perl distribution Sah-Schemas-Str), released on 2022-09-22.
+This document describes version 0.013 of Sah::Schema::latin_alpha (from Perl distribution Sah-Schemas-Str), released on 2022-09-23.
 
 =head1 SYNOPSIS
 
@@ -152,6 +152,14 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Str>.
+
+=head1 SEE ALSO
+
+L<Sah::Schema::latin_letter>
+
+L<Sah::Schema::latin_uppercase_alpha>
+
+L<Sah::Schema::latin_lowercase_alpha>
 
 =head1 AUTHOR
 

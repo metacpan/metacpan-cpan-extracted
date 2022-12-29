@@ -15,6 +15,8 @@ require POSIX;
 
 # ATTRIBUTES
 
+attr 'init';
+attr 'path';
 attr 'args';
 attr 'data';
 attr 'logs';
@@ -46,7 +48,13 @@ sub default_data {
 
   require Venus::Data;
 
-  return Venus::Data->new($self->podfile);
+  return Venus::Data->new($self->path);
+}
+
+sub default_init {
+  my ($self) = @_;
+
+  return [@ARGV];
 }
 
 sub default_logs {
@@ -65,6 +73,15 @@ sub default_opts {
   return Venus::Opts->new(value => $self->init, specs => $self->options);
 }
 
+sub default_path {
+  my ($self) = @_;
+
+  require Venus::Path;
+  require Venus::Space;
+
+  return Venus::Path->new(Venus::Space->new(ref $self)->included || $0);
+}
+
 sub default_vars {
   my ($self) = @_;
 
@@ -80,12 +97,6 @@ sub _exit {
 }
 
 # METHODS
-
-sub init {
-  my ($self) = @_;
-
-  return [@ARGV];
-}
 
 sub arg {
   my ($self, $item) = @_;
@@ -179,22 +190,6 @@ sub options {
   return ['help|h'];
 }
 
-sub podfile {
-  my ($self) = @_;
-
-  require Venus::Space;
-
-  return Venus::Space->new(ref $self)->included;
-}
-
-sub program {
-  my ($self) = @_;
-
-  require Venus::Space;
-
-  return Venus::Space->new(ref $self)->included;
-}
-
 1;
 
 
@@ -217,9 +212,7 @@ Cli Class for Perl 5
 
   use Venus::Cli;
 
-  @ARGV = ('example', '--help');
-
-  my $cli = Venus::Cli->new;
+  my $cli = Venus::Cli->new(['example', '--help']);
 
   # $cli->program;
 
@@ -239,6 +232,170 @@ Cli Class for Perl 5
 
 This package provides a superclass and methods for providing simple yet robust
 command-line interfaces.
+
+=cut
+
+=head1 ATTRIBUTES
+
+This package has the following attributes:
+
+=cut
+
+=head2 args
+
+  args(Args $data) (Args)
+
+The args attribute holds a L<Venus::Args> object.
+
+I<Since C<1.71>>
+
+=over 4
+
+=item args example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $args = $cli->args;
+
+=back
+
+=cut
+
+=head2 data
+
+  data(Data $data) (Data)
+
+The data attribute holds a L<Venus::Data> object.
+
+I<Since C<1.71>>
+
+=over 4
+
+=item data example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $data = $cli->data;
+
+=back
+
+=cut
+
+=head2 init
+
+  init(ArrayRef $data) (ArrayRef)
+
+The init attribute holds the "initial" raw arguments provided to the CLI,
+defaulting to C<[@ARGV]>, used by L</args> and L</opts>.
+
+I<Since C<1.68>>
+
+=over 4
+
+=item init example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $init = $cli->init;
+
+  # ["example", "--help"]
+
+=back
+
+=cut
+
+=head2 logs
+
+  logs(Logs $logs) (Logs)
+
+The logs attribute holds a L<Venus::Logs> object.
+
+I<Since C<1.71>>
+
+=over 4
+
+=item logs example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $logs = $cli->logs;
+
+=back
+
+=cut
+
+=head2 opts
+
+  opts(Opts $opts) (Opts)
+
+The opts attribute holds a L<Venus::Opts> object.
+
+I<Since C<1.71>>
+
+=over 4
+
+=item opts example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $opts = $cli->opts;
+
+=back
+
+=cut
+
+=head2 path
+
+  path(Path $data) (Path)
+
+The path attribute holds a L<Venus::Path> object, meant to represent the path
+of the file where the CLI executable and POD is.
+
+I<Since C<1.71>>
+
+=over 4
+
+=item path example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $path = $cli->path;
+
+=back
+
+=cut
+
+=head2 vars
+
+  vars(Vars $vars) (Vars)
+
+The vars attribute holds a L<Venus::Vars> object.
+
+I<Since C<1.71>>
+
+=over 4
+
+=item vars example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $vars = $cli->vars;
+
+=back
 
 =cut
 
@@ -320,9 +477,7 @@ I<Since C<1.68>>
 
   use Venus::Cli;
 
-  @ARGV = ();
-
-  my $cli = Venus::Cli->new;
+  my $cli = Venus::Cli->new([]);
 
   # e.g.
 
@@ -346,9 +501,7 @@ I<Since C<1.68>>
 
   use Venus::Cli;
 
-  @ARGV = ('--help');
-
-  my $cli = Venus::Cli->new;
+  my $cli = Venus::Cli->new(['--help']);
 
   # e.g.
 
@@ -507,31 +660,6 @@ I<Since C<1.68>>
   # my $help = $cli->help('head1', 'NAME');
 
   #  "Example"
-
-=back
-
-=cut
-
-=head2 init
-
-  init() (ArrayRef)
-
-The init method returns the raw arguments provided, defaulting to C<@ARGV>,
-used by L</args> and L</opts>.
-
-I<Since C<1.68>>
-
-=over 4
-
-=item init example 1
-
-  # given: synopsis
-
-  package main;
-
-  my $init = $cli->init;
-
-  # ["example", "--help"]
 
 =back
 
@@ -789,54 +917,6 @@ I<Since C<1.68>>
   my $options = $cli->options;
 
   # ['help|h']
-
-=back
-
-=cut
-
-=head2 podfile
-
-  podfile() (Str)
-
-The podfile method returns the full path to the file where the CLI POD is.
-
-I<Since C<1.68>>
-
-=over 4
-
-=item podfile example 1
-
-  # given: synopsis
-
-  package main;
-
-  my $podfile = $cli->podfile;
-
-  # "lib/Venus/Cli.pm"
-
-=back
-
-=cut
-
-=head2 program
-
-  program() (Str)
-
-The program method returns the full path to the CLI executable.
-
-I<Since C<1.68>>
-
-=over 4
-
-=item program example 1
-
-  # given: synopsis
-
-  package main;
-
-  my $program = $cli->program;
-
-  # "lib/Venus/Cli.pm"
 
 =back
 

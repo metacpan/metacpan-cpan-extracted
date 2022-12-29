@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 
+use utf8;
+
 use Test::More;
 use JSCalendar::Duration qw(
   seconds_to_duration
@@ -31,9 +33,12 @@ my @tests = (
   '172800'   => 'P2D',
   '172801'   => 'P2DT1S',
   '172801.1' => 'P2DT1.1S',
+  '604800'   => 'P1W',
+  '604801'   => 'P7DT1S',
+  '691200'   => 'P8D', # You must not have P1W1D
 );
 
-subtest "seconds_to_duration" => sub { 
+subtest "seconds_to_duration" => sub {
   for (my $i = 0; $i < @tests; $i += 2) {
     my ($input, $expect) = ($tests[$i], $tests[$i+1]);
 
@@ -55,6 +60,19 @@ subtest "duration_to_seconds" => sub {
       sprintf("%-15s -> %-10s", $input, $expect),
     );
   }
+};
+
+subtest "non-ASCII" => sub {
+  # ๓ - U+00E53 - THAI DIGIT THREE
+  my $bogus = "P\N{THAI DIGIT THREE}D";
+  my $ok = eval {
+    duration_to_seconds($bogus);
+    1;
+  };
+
+  my $error = $@;
+  ok(!$ok, "non-ASCII duration strings are forbidden");
+  like($error, qr/ASCII/, "...and the error mentions ASCII");
 };
 
 done_testing;

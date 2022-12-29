@@ -11,7 +11,6 @@ WriteMakefile(
                        'RF::Functions'            => 0.04, #dbi_dbd dbd_dbi
                        'File::Temp'               => 0,    #write to tmp file  #optional
                        'Archive::Zip'             => 0,    #read_fromZipMember #optional
-                       'Archive::Zip::MemberRead' => 0,    #read_fromZipMember #optional
                       },
     ABSTRACT_FROM  => 'lib/RF/Antenna/Planet/MSI/Format.pm',
     AUTHOR         => 'Michael R. Davis',

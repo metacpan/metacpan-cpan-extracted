@@ -8,7 +8,7 @@ use Readonly;
 use Perl::Critic::Utils qw{ :severities };
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.144';
+our $VERSION = '1.146';
 
 #-----------------------------------------------------------------------------
 
@@ -39,6 +39,9 @@ sub applies_to        { return 'PPI::Token::Number'    }
 
 sub violates {
     my ( $self, $elem, undef ) = @_;
+
+    return if $elem->isa( 'PPI::Token::Number::Version' );  # GitHub #856
+
     my $min = $self->{_min_value};
 
     return if $elem !~ m{ \d{4} }xms;

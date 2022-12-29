@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST/Response.pm
-## Version v0.4.13
+## Version v0.4.14
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/09/01
-## Modified 2021/09/03
+## Modified 2022/06/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,6 +18,7 @@ BEGIN
     use warnings;
     use common::sense;
     use parent qw( Module::Generic );
+    use vars qw( $VERSION );
     use Devel::Confess;
     use Apache2::Request;
     use Apache2::Const;
@@ -34,8 +35,11 @@ BEGIN
     use Net::API::REST::Status;
     use Nice::Try;
     use URI::Escape ();
-    our $VERSION = 'v0.4.13';
+    our $VERSION = 'v0.4.14';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -87,7 +91,7 @@ sub connection { return( shift->_try( '_request', 'connection' ) ); }
 sub code { return( shift->_try( '_request', 'status', @_ ) ); }
 
 # <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition>
-# XXX More work to be done here like create a disposition method to parse its content
+# TODO: More work to be done here like create a disposition method to parse its content
 sub content_disposition { return( shift->_set_get_one( 'Content-Disposition', @_ ) ); }
 
 # sub content_encoding { return( shift->_request->content_encoding( @_ ) ); }
@@ -178,7 +182,7 @@ sub cookie_new_ok_but_hang_on
         $self->message( 3, "Using Apache request pool '" . $self->_request->pool . "'." );
         my $c = APR::Request::Cookie->new( $self->_request->pool, %$hash );
         $self->message( 3, "Success, returning an APR::Request::Cookie '$c' (", ref( $c ), ") object with properties: ", sub{ $self->dumper( $hash ) } );
-        return( $self->error( "Unable to create an APR::Request::Cookie object: $@ (" . APR::Request::Error . ")" ) ) if( !ref( $c ) && $@ );
+        return( $self->error( "Unable to create an APR::Request::Cookie object: $@ (" . APR::Request::Error::strerror() . ")" ) ) if( !ref( $c ) && $@ );
         return( $c );
     }
     catch( $e )
@@ -704,8 +708,7 @@ sub _try
 }
 
 1;
-
-# XXX POD
+# NOTE: pod
 __END__
 
 =encoding utf8
@@ -724,7 +727,7 @@ Net::API::REST::Response - Apache2 Outgoing Response Access and Manipulation
 
 =head1 VERSION
 
-    v0.4.13
+    v0.4.14
 
 =head1 DESCRIPTION
 

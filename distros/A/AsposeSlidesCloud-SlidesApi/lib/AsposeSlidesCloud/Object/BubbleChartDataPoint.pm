@@ -98,6 +98,7 @@ sub new {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
+	$self->{ type } = 'Bubble';
 	return $self;
 }  
 
@@ -208,6 +209,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'type' => {
+    	datatype => 'string',
+    	base_name => 'Type',
+    	description => 'Data point type.',
+    	format => '',
+    	read_only => '',
+    		},
     'x_value' => {
     	datatype => 'double',
     	base_name => 'XValue',
@@ -257,6 +265,7 @@ __PACKAGE__->swagger_types( {
     'effect_format' => 'EffectFormat',
     'three_d_format' => 'ThreeDFormat',
     'line_format' => 'LineFormat',
+    'type' => 'string',
     'x_value' => 'double',
     'y_value' => 'double',
     'x_value_formula' => 'string',
@@ -270,6 +279,7 @@ __PACKAGE__->attribute_map( {
     'effect_format' => 'EffectFormat',
     'three_d_format' => 'ThreeDFormat',
     'line_format' => 'LineFormat',
+    'type' => 'Type',
     'x_value' => 'XValue',
     'y_value' => 'YValue',
     'x_value_formula' => 'XValueFormula',

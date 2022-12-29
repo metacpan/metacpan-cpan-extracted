@@ -18,11 +18,11 @@ use Perl::Critic::Config;
 use Perl::Critic::Violation;
 use Perl::Critic::Document;
 use Perl::Critic::Statistics;
-use Perl::Critic::Utils qw< :characters hashify shebang_line >;
+#use Perl::Critic::Utils qw< :characters >;
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '1.144';
+our $VERSION = '1.146';
 
 Readonly::Array our @EXPORT_OK => qw(critique);
 
@@ -224,6 +224,7 @@ Balhatchet Paaske Tørholm Raspass Tonkin Katz Berndt Sergey Gabor Szabo
 Knop Eldridge Steinbrunner Kimmel Guillaume Aubert Anirvan Chatterjee
 Rinaldo Ollis Etheridge Brømsø Slaven Rezić Szymon Nieznański
 Oschwald Mita Amory Meltzer Grechkin Bernhard Schmalhofer TOYAMA Nao Wyant
+Tadeusz Sośnierz Isaac Gittins Novakovic
 
 =head1 NAME
 
@@ -846,8 +847,6 @@ L<File::Spec::Unix>
 
 L<File::Which>
 
-L<IO::String>
-
 L<List::SomeUtils>
 
 L<List::Util>
@@ -871,8 +870,6 @@ L<Readonly>
 L<Scalar::Util>
 
 L<String::Format>
-
-L<Task::Weaken>
 
 L<Term::ANSIColor>
 
@@ -948,6 +945,9 @@ L<http://www.perlfoundation.org/april_1_2007_new_grant_awards>
 
 Thanks also to this incomplete laundry list of folks who have contributed
 to Perl::Critic in some way:
+Chris Novakovic,
+Isaac Gittins,
+Tadeusz Sośnierz,
 Tom Wyant,
 TOYAMA Nao,
 Bernhard Schmalhofer,

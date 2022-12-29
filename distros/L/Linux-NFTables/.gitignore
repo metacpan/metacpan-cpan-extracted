@@ -1,0 +1,10 @@
+*.sw*
+blib/
+*.c
+*.bs
+*.o
+*.inc
+MYMETA.*
+Makefile
+pm_to_blib
+DNS-Unbound*.tar.gz

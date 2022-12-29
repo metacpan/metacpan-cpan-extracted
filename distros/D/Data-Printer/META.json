@@ -4,7 +4,7 @@
       "Breno G. de Oliveira <garu@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -53,6 +53,6 @@
          "url" : "https://github.com/garu/Data-Printer"
       }
    },
-   "version" : "1.000004",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "1.001000",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

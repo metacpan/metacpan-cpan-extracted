@@ -207,20 +207,29 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'type' => {
+    	datatype => 'string',
+    	base_name => 'Type',
+    	description => '',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
     'fill_format' => 'FillFormat',
     'effect_format' => 'EffectFormat',
     'three_d_format' => 'ThreeDFormat',
-    'line_format' => 'LineFormat'
+    'line_format' => 'LineFormat',
+    'type' => 'string'
 } );
 
 __PACKAGE__->attribute_map( {
     'fill_format' => 'FillFormat',
     'effect_format' => 'EffectFormat',
     'three_d_format' => 'ThreeDFormat',
-    'line_format' => 'LineFormat'
+    'line_format' => 'LineFormat',
+    'type' => 'Type'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

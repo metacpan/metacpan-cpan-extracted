@@ -9,7 +9,7 @@ plan tests => 1;
 use OpenAI::API;
 
 SKIP: {
-    skip "This test requires a OPENAI_KEY environment variable", 1 if !$ENV{OPENAI_KEY};
+    skip "This test requires a OPENAI_KEY environment variable", 1 if !$ENV{OPENAI_API_KEY};
 
     my $openai = OpenAI::API->new();
 

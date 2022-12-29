@@ -9,7 +9,6 @@ use Config::Model::Tk::Filter qw/apply_filter/;
 use strict;
 use warnings;
 
-$::_use_log4perl_to_warn = 1;
 
 my ($model, $trace, $args) = init_test('show','filter=s');
 

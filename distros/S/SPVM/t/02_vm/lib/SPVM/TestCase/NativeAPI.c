@@ -246,6 +246,9 @@ int32_t SPVM__TestCase__NativeAPI__check_native_api_indexes(SPVM_ENV* env, SPVM_
   if ((void*)&env->get_field_id_static != &env_array[227]) { stack[0].ival = 0; return 0;}
   if ((void*)&env->items != &env_array[228]) { stack[0].ival = 0; return 0;}
   if ((void*)&env->call_instance_method_static_by_name != &env_array[229]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->get_method_id != &env_array[230]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->strerror_nolen != &env_array[231]) { stack[0].ival = 0; return 0;}
+  if ((void*)&env->strerror_string_nolen != &env_array[232]) { stack[0].ival = 0; return 0;}
 
   stack[0].ival = 1;
 
@@ -1675,7 +1678,12 @@ int32_t SPVM__TestCase__NativeAPI__native_call_method(SPVM_ENV* env, SPVM_VALUE*
   if (output == 5) {
     stack[0].ival = 1;
   }
-  
+
+  int32_t method_id2 = env->get_method_id(env, stack, "TestCase::NativeAPI", "my_value");
+  if (method_id2 != method_id) {
+    return 1;
+  }
+
   return 0;
 }
 
@@ -2335,7 +2343,8 @@ int32_t SPVM__TestCase__NativeAPI__check_native_api_precompile_indexes(SPVM_ENV*
   if ((void*)&env->api->precompile->free_precompile != &env_array[1]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->api->precompile->set_runtime != &env_array[2]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->api->precompile->get_runtime != &env_array[3]) { stack[0].ival = 0; return 0; }
-  if ((void*)&env->api->precompile->create_precompile_source != &env_array[4]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->precompile->build_class_source != &env_array[4]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->precompile->build_method_source != &env_array[5]) { stack[0].ival = 0; return 0; }
 
   stack[0].ival = 1;
 
@@ -2711,6 +2720,29 @@ int32_t SPVM__TestCase__NativeAPI__strerror_string_value(SPVM_ENV* env, SPVM_VAL
   int32_t errno_value = stack[0].ival;
   
   void* strerror_string_value = env->strerror_string(env, stack, errno_value, 0);
+  
+  stack[0].oval = strerror_string_value;
+  
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__strerror_nolen_value(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t errno_value = stack[0].ival;
+  
+  const char* strerror_value = env->strerror_nolen(env, stack, errno_value);
+  void* obj_strerror_value = env->new_string(env, stack, strerror_value, strlen(strerror_value));
+  
+  stack[0].oval = obj_strerror_value;
+  
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__strerror_string_nolen_value(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t errno_value = stack[0].ival;
+  
+  void* strerror_string_value = env->strerror_string_nolen(env, stack, errno_value);
   
   stack[0].oval = strerror_string_value;
   
@@ -3151,4 +3183,46 @@ int32_t SPVM__TestCase__NativeAPI__check_stdin_stdout_stderr_binary_mode(SPVM_EN
   
   return 0;
 #endif
+}
+
+int32_t SPVM__TestCase__NativeAPI__precompile_build_methodd_source(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t success = 1;
+  
+  {
+    // New allocator
+    void* allocator = env->api->allocator->new_allocator();
+    
+    // New string buffer
+    void* string_buffer = env->api->string_buffer->new_string_buffer_tmp(allocator, 0);
+
+    void* precompile = env->api->precompile->new_precompile();
+    
+    env->api->precompile->set_runtime(precompile, env->runtime);
+    
+    env->api->precompile->build_method_source(precompile, string_buffer, "TestCase::NativeAPI", "get_class_var_byte_by_name");
+    
+    env->api->precompile->free_precompile(precompile);
+
+    const char* string_buffer_value = env->api->string_buffer->get_value(string_buffer);
+    int32_t string_buffer_length = env->api->string_buffer->get_length(string_buffer);
+    
+    if (!strstr(string_buffer_value, "TestCase::NativeAPI")) {
+      success = 0;
+    }
+
+    if (!strstr(string_buffer_value, "get_class_var_byte_by_name")) {
+      success = 0;
+    }
+    
+    // Free string buffer
+    env->api->string_buffer->free_string_buffer(string_buffer);
+
+    // Free allocator
+    env->api->allocator->free_allocator(allocator);
+  }
+  
+  stack[0].ival = success;
+  
+  return 0;
 }

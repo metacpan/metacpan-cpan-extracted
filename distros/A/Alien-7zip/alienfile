@@ -29,6 +29,9 @@ sub do_source {
   my $build_dir = 'CPP/7zip/Bundles/Alone2';
   my $output_dir = '_o';
   my $bin_name = '7zz';
+  patch [
+    '%{patch} -p1 < %{.install.patch}/0001-Add-Apple-define-for-header.patch'
+  ];
   build [
     [ '%{make}',
       qw(-C), $build_dir,

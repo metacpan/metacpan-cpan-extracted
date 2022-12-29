@@ -1,5 +1,10 @@
 Revision history for ExtUtils-Install
 
+2.22
+
+- Explicitly use File::Compare in Installapi2.t
+- Use a private directory for tests
+
 2.20
 
 - Exercise _is_prefix() method more in tests

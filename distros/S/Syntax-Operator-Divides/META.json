@@ -22,7 +22,7 @@
       "configure" : {
          "requires" : {
             "Module::Build" : "0.4004",
-            "XS::Parse::Infix::Builder" : "0.26"
+            "XS::Parse::Infix::Builder" : "0.27"
          }
       },
       "runtime" : {
@@ -39,7 +39,7 @@
    "provides" : {
       "Syntax::Operator::Divides" : {
          "file" : "lib/Syntax/Operator/Divides.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -49,6 +49,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

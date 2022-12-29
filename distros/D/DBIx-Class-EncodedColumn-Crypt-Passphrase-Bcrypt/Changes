@@ -1,0 +1,35 @@
+Revision history for DBIx-Class-EncodedColumn-Crypt-Passphrase-Bcrypt
+
+0.0109 2022-12-24 08:16:28
+    - Include SQL::Translator as a dep.
+
+0.0108 2022-12-23 09:50:21
+    - Re-fix dist.ini.
+
+0.0107 2022-12-23 09:39:23
+    - Improve documentation.
+    - Pass all encode args that Crypt::Passphrase::Bcrypt accepts.
+
+0.0106 2022-12-22 19:44:32
+    - Require EncodedColumn too!
+
+0.0105 2022-12-22 18:55:32
+    - Improve test output messages.
+    - Clean code slightly.
+
+0.0104 2022-12-21 21:46:28
+    - Improve documentation again.
+
+0.0103 2022-12-21 21:16:16
+    - Improve documentation.
+
+0.0102 2022-12-21 20:56:32
+    - Improve documentation.
+    - Factor redundant cost code into a subroutine.
+
+0.0101 2022-12-21 20:26:30
+    - Fix crucial typo.
+
+0.0100 2022-12-21 20:07:37
+    - Mint with Dist::Zilla.
+    - Adapt the DBIx::Class::EncodedColumn::Crypt::Eksblowfish::Bcrypt code.

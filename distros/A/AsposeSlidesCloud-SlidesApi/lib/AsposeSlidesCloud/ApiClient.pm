@@ -178,13 +178,12 @@ sub get_body_data {
         if (ref $body_data eq "HASH") {
             $body_data = to_json($body_data); # model to json string
         }
-        $part_count++;
     }
     if (defined $files) {
         $part_count += scalar @$files;
     }
     my $_body_data = "";
-    if ($part_count > 1) {
+    if ($part_count > 0) {
         my $boundary = "7d70fb31-0eb9-4846-9ea8-933dfb69d8f1";
         $header_params->{'Content-Type'} = "multipart/form-data; boundary=${boundary}";
         if (defined $body_data) {

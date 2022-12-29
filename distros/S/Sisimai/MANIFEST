@@ -127,6 +127,8 @@ lib/Sisimai/Rhost/GoDaddy.pm
 lib/Sisimai/Rhost/GoogleApps.pm
 lib/Sisimai/Rhost/IUA.pm
 lib/Sisimai/Rhost/KDDI.pm
+lib/Sisimai/Rhost/Mimecast.pm
+lib/Sisimai/Rhost/NTTDOCOMO.pm
 lib/Sisimai/Rhost/Spectrum.pm
 lib/Sisimai/Rhost/TencentQQ.pm
 lib/Sisimai/SMTP.pm
@@ -641,6 +643,11 @@ set-of-emails/maildir/bsd/rhost-googleapps-02.eml
 set-of-emails/maildir/bsd/rhost-iua-01.eml
 set-of-emails/maildir/bsd/rhost-kddi-01.eml
 set-of-emails/maildir/bsd/rhost-kddi-02.eml
+set-of-emails/maildir/bsd/rhost-mimecast-01.eml
+set-of-emails/maildir/bsd/rhost-mimecast-02.eml
+set-of-emails/maildir/bsd/rhost-nttdocomo-01.eml
+set-of-emails/maildir/bsd/rhost-nttdocomo-02.eml
+set-of-emails/maildir/bsd/rhost-nttdocomo-03.eml
 set-of-emails/maildir/bsd/rhost-spectrum-01.eml
 set-of-emails/maildir/bsd/rhost-tencentqq-01.eml
 set-of-emails/maildir/bsd/rhost-tencentqq-02.eml
@@ -851,6 +858,8 @@ t/306-rhost-tencentqq.t
 t/307-rhost-iua.t
 t/308-rhost-spectrum.t
 t/309-rhost-cox.t
+t/310-rhost-nttdocomo.t
+t/311-rhost-mimecast.t
 t/400-callback-base64.t
 t/500-data.t
 t/501-data-json.t

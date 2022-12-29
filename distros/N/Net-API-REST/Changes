@@ -1,5 +1,13 @@
 Revision history for Perl module Net::API::REST
 
+v0.7.0 2022-12-28T19:27:25+0900
+    - Added support for multiple HTTP methods for one endpoint with
+    - Corrected a missing check on whether an HTTP method is supported for an endpoint.
+      It was there for the OPTIONS preflight check, but not for the actual request.
+
+v0.6.4 2022-06-29T07:23:49+0900
+    - Improved quality with more strict code
+
 v0.6.3 2022-06-28T19:59:22+0900
     - Added method is_allowed() in Net::API::REST to check early on if an ip is allowed to access the REST api.
     - Added documentation and added Apache constants to Net::API::REST::Status

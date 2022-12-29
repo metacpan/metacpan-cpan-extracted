@@ -5,7 +5,7 @@ use Data::Printer::Object;
 use Data::Printer::Common;
 use Data::Printer::Config;
 
-our $VERSION = '1.000004';
+our $VERSION = '1.001000';
 $VERSION = eval $VERSION;
 
 my $rc_arguments;
@@ -45,7 +45,34 @@ sub import {
 sub _initialize {
     # potential race but worst case is we read it twice :)
     { no warnings 'redefine'; *_initialize = sub {} }
-    $rc_arguments = Data::Printer::Config::load_rc_file();
+
+    my $rc_filename = Data::Printer::Config::_get_first_rc_file_available();
+    $rc_arguments = Data::Printer::Config::load_rc_file($rc_filename);
+
+    if (
+           exists $rc_arguments->{'_'}{live_update}
+        && defined $rc_arguments->{'_'}{live_update}
+        && $rc_arguments->{'_'}{live_update} =~ /\A\d+\z/
+        && $rc_arguments->{'_'}{live_update} > 0) {
+        my $now = time;
+        my $last_mod = (stat $rc_filename)[9];
+        {
+            no warnings 'redefine';
+            *_initialize = sub {
+                if (time - $now > $rc_arguments->{'_'}{live_update}) {
+                    my $new_last_mod = (stat $rc_filename)[9];
+                    if (defined $new_last_mod && $new_last_mod > $last_mod) {
+                        $now = time;
+                        $last_mod = $new_last_mod;
+                        $rc_arguments = Data::Printer::Config::load_rc_file($rc_filename);
+                        if (!exists $rc_arguments->{'_'}{live_update} || !$rc_arguments->{'_'}{live_update}) {
+                            *_initialize = sub {};
+                        }
+                    }
+                }
+            };
+        }
+    }
 }
 
 sub np (\[@$%&];%) {
@@ -55,6 +82,7 @@ sub np (\[@$%&];%) {
 
     my $caller = caller;
     my $args_to_use = _fetch_args_with($caller, \%properties);
+    return '' if $args_to_use->{quiet};
     my $printer = Data::Printer::Object->new($args_to_use);
 
     # force color level 0 on 'auto' colors:
@@ -84,6 +112,7 @@ sub p (\[@$%&];%) {
 
     my $caller = caller;
     my $args_to_use = _fetch_args_with($caller, \%properties);
+    return if $args_to_use->{quiet};
     my $printer = Data::Printer::Object->new($args_to_use);
     my $want_value = defined wantarray;
     if ($printer->colored eq 'auto' && $printer->return_value eq 'dump' && $want_value) {
@@ -122,6 +151,7 @@ sub _p_without_prototypes  {
 
     my $caller = caller;
     my $args_to_use = _fetch_args_with($caller, \%properties);
+    return if $args_to_use->{quiet};
     my $printer = Data::Printer::Object->new($args_to_use);
 
     my $want_value = defined wantarray;
@@ -255,17 +285,16 @@ Want to see what's inside a variable in a complete, colored and human-friendly w
     p @array;
     p %hash;
 
-    # for anonymous array/hash references, use postderef (on perl 5.24 or later):
-    p [ $one, $two, $three ]->@*;
-    p { foo => $foo, bar => $bar }->%*;
+    # printing anonymous array references:
+    p [ $one, $two, $three ]->@*;    # perl 5.24 or later!
+    p @{[ $one, $two, $three ]};     # same, older perls
+    &p( [ $one, $two, $three ] );    # same, older perls
 
-    # or deref the anonymous ref:
-    p @{[ $one, $two, $three ]};
-    p %{{ foo => $foo, bar => $bar }};
+    # printing anonymous hash references:
+    p { foo => $foo, bar => $bar }->%*;   # perl 5.24 or later!
+    p %{{ foo => $foo, bar => $bar }};    # same, older perls
+    &p( { foo => $foo, bar => $bar } );   # same, older perls
 
-    # or put '&' in front of the call:
-    &p( [ $one, $two, $three ] );
-    &p( { foo => $foo, bar => $bar } );
 
 The snippets above will print the contents of the chosen variables to STDERR
 on your terminal, with colors and a few extra features to help you debug
@@ -284,7 +313,7 @@ easily too.
 
 That's pretty much it :)
 
-=for html <img alt="Data::Printer in action" src="https://raw.githubusercontent.com/garu/Data-Printer/master/examples/ddp.gif" />
+=for html <img alt="samples of Data::Printer output for several kinds of data and objects" src="https://raw.githubusercontent.com/garu/Data-Printer/master/examples/ddp.gif" />
 
 Data::Printer is L<fully customizable|/Properties Quick Reference>, even
 on a per-module basis! Once you figure out your own preferences, create a
@@ -508,10 +537,24 @@ is super simple and can be understood in the example below:
     multiline = 0
     output    = /var/log/myapp/debug.data
 
+    # use 'quiet' to silence all output from p() and np()
+    # called from the specified package.
+    [MyApp::Yet::Another]
+    quiet = 1
+
 Note that if you set custom properties as arguments to C<p()> or C<np()>, you
 should group suboptions as a hashref. So while the C<.dataprinter> file has
 "C<< class.expand = 0 >>" and "C<< class.inherited = none >>", the equivalent
 code is "C<< class => { expand => 0, inherited => 'none' } >>".
+
+=head3 live updating your .dataprinter without restarts
+
+Data::Printer 1.1 introduces a new 'live_update' flag that can be set to a
+positive integer to enable live updates. When this mode is on, Data::Printer
+will check if the C<.dataprinter> file has been updated and, if so, it will
+reload it. This way you can toggle features on and off and control output
+verbosity directly from your C<.dataprinter> file without needing to change
+or restart running code.
 
 =head2 Properties Quick Reference
 
@@ -609,6 +652,11 @@ array index you had originally.
 =item * B<fulldump> - when set to 1, disables all max string/hash/array
 values. Use this to generate complete (full) dumps of all your content,
 which is trimmed by default.
+
+=item * B<quiet> - when set to 1, disables all data parsing and returns as
+quickly as possible. Use this to disable all output from C<p()> and C<np()>
+inside a particular package, either from the 'use' call or from .dataprinter.
+(introduced in version 1.1)
 
 =back
 

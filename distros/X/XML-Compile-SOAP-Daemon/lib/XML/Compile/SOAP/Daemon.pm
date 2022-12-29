@@ -1,14 +1,14 @@
-# Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2007-2022 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
+# Pod stripped from pm file by OODoc 2.03.
 # This code is part of distribution XML-Compile-SOAP-Daemon.  Meta-POD
 # processed with OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package XML::Compile::SOAP::Daemon;
 use vars '$VERSION';
-$VERSION = '3.14';
+$VERSION = '3.15';
 
 
 use warnings;
@@ -202,14 +202,14 @@ sub process($)
 
 sub operationsFromWSDL($@)
 {   my ($self, $wsdl, %args) = @_;
-    my %callbacks  = $args{callbacks} ? %{$args{callbacks}} : ();
+    my $callbacks  = delete $args{callbacks} || {};
     my %names;
 
-    my $default_cb = $args{default_callback};
+    my $default_cb = delete $args{default_callback};
     my $wsa_input  = $self->{wsa_input};
     my $wsa_output = $self->{wsa_output};
 
-    my $ops = $args{operations};
+    my $ops = delete $args{operations};
     my @ops = $ops ? @$ops : $wsdl->operations(%args);
     @ops or return;   # none selected
 
@@ -219,20 +219,18 @@ sub operationsFromWSDL($@)
             if $names{$name}++;
 
         my $code;
-        if(my $callback = $callbacks{$name})
+        if(my $callback = $callbacks->{$name})
         {   UNIVERSAL::isa($callback, 'CODE')
                or error __x"callback {name} must provide a CODE ref"
                     , name => $name;
 
             trace __x"add handler for operation `{name}'", name => $name;
-            $code = $op->compileHandler(callback => $callback);
+            $code = $op->compileHandler(callback => $callback, %args);
         }
         else
         {   trace __x"add stub handler for operation `{name}'", name => $name;
-            my $handler = $default_cb
-              || sub { $_[0]->faultNotImplemented($name) };
-
-            $code = $op->compileHandler(callback => $handler);
+            my $handler = $default_cb || sub { $_[0]->faultNotImplemented($name) };
+            $code = $op->compileHandler(callback => $handler, %args);
         }
 
         $self->addHandler($name, $op, $code);
@@ -240,6 +238,7 @@ sub operationsFromWSDL($@)
         if($op->can('wsaAction'))
         {   my $in  = $op->wsaAction('INPUT');
             $wsa_input->{$name}  = $in if defined $in;
+
             my $out = $op->wsaAction('OUTPUT');
             $wsa_output->{$name} = $out if defined $out;
         }
@@ -248,11 +247,8 @@ sub operationsFromWSDL($@)
 
     info __x"added {nr} operations from WSDL", nr => (scalar @ops);
 
-    if(keys %names != keys %callbacks)
-    {   $names{$_}
-            or warning __x"no operation for callback handler `{name}'",name=>$_
-                for sort keys %callbacks;
-    }
+    warning __x"no operation for callback handler `{name}'", name=> $_
+        for sort grep ! $names{$_}, keys %$callbacks;
 
     $self;
 }

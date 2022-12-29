@@ -19,19 +19,23 @@ SYNOPSIS
             # 8Kb
             max_headers_size => 8192,
             max_redirect => 3,
+            # For Promise::Me
+            medium => 'mmap',
             proxy => 'https://proxy.example.org:8080',
-            # Can also be cbor or storable
+            # The serialiser to use for the promise in Promise::Me
+            # Defaults to storable, but can also be cbor and sereal
             serialiser => 'sereal',
+            shared_mem_size => 1048576,
             # You can also use decimals with Time::HiRes
             timeout => 15,
             # force the use of files to store the response content
             use_content_file => 1,
-            # The serialiser to use for the promise in Promise::Me
-            # Defaults to storable, but can also be cbor and sereal
-            serialiser => 'sereal',
+            # Should we use promise?
+            # use_promise => 0,
         );
         my $prom = $p->get( 'https://www.example.org', $hash_of_query_params )->then(sub
         {
+            # Nota bene: the last value in this sub will be passed as the argument to the next 'then'
             my $resp = shift( @_ ); # get the HTTP::Promise::Response object
         })->catch(sub
         {
@@ -44,7 +48,7 @@ SYNOPSIS
         my $prom = $p->request( $req )->then(sub{ #... })->catch(sub{ # ... });
 
 VERSION
-        v0.1.4
+        v0.2.3
 
 DESCRIPTION
     HTTP::Promise provides with a fast and powerful yet memory-friendly API
@@ -148,7 +152,7 @@ DESCRIPTION
     HTTP::Response.
 
     When an error occurs, it is caught and sent by calling "reject" in
-    Promise::XS with an HTTP::Promise::Exception object.
+    Promise::Me with an HTTP::Promise::Exception object.
 
     Cookies are automatically and transparently managed with Cookie::Jar
     which can load and store cookies to a json file you specify. You can
@@ -182,8 +186,16 @@ CONSTRUCTOR
 
     *   "local_address"
 
-        String. An IP address or local host name to use when establishing
-        TCP/IP connections.
+        String. A local IP address or local host name to use when
+        establishing TCP/IP connections.
+
+    *   "local_host"
+
+        String. Same as "local_address"
+
+    *   "local_port"
+
+        Integer. A local port to use when establishing TCP/IP connections.
 
     *   "max_redirect"
 
@@ -198,6 +210,14 @@ CONSTRUCTOR
         returned. Default value is "undef", i.e. no limit.
 
         See also the "threshold" option.
+
+    *   "medium"
+
+        This can be either "file", "mmap" or "memory". This will be passed
+        on to Promise::Me as "result_shared_mem_size" to store resulting
+        data between processes. See Promise::Me for more details.
+
+        It defaults to $Promise::Me::SHARE_MEDIUM
 
     *   "no_proxy"
 
@@ -221,6 +241,13 @@ CONSTRUCTOR
         By default it uses the value set in the global variable $SERIALISER,
         which is a copy of the $SERIALISER in Promise::Me, which should be
         by default "storable"
+
+    *   "shared_mem_size"
+
+        Integer. This will be passed on to Promise::Me. See Promise::Me for
+        more details.
+
+        It defaults to $Promise::Me::RESULT_MEMORY_SIZE
 
     *   "ssl_opts"
 
@@ -280,9 +307,15 @@ CONSTRUCTOR
         Boolean. Enables the use of a temporary local file to store the
         response content, no matter the size o the response content.
 
+    *   "use_promise"
+
+        Boolean. When true, this will have HTTP::Promise HTTP methods return
+        a HTTP::Promise, and when false, it returns directly the
+        HTTP::Promise::Response. Defaults to true.
+
 METHODS
-    The following methods are available. You can also access the same
-    methods implemented in LWP::UserAgent even if they are not listed here.
+    The following methods are available. This interface provides similar
+    interface as LWP::UserAgent while providing more granular control.
 
   accept_language
     An array of acceptable language. This will be used to set the
@@ -397,6 +430,9 @@ METHODS
             say( "Error code; ", $ex->code, " and message: ", $ex->message );
         });
 
+    However, if "use_promise" is set to false, this will return an
+    HTTP::Promise::Response object directly.
+
   dnt
     Boolean. If set to a true value, this will set the "DNT" header to 1
 
@@ -428,11 +464,10 @@ METHODS
         my $f = $p->file;
 
   from
-    "the email address for the human user who controls the requesting user
-    agent. The address should be machine-usable, as defined in RFC2822
-    <https://tools.ietf.org/html/rfc2822>. The "from" value is sent as the
-    "From" header in the requests" (Excerpt taken from LWP::UserAgent
-    documentation)
+    Get or set the email address for the human user who controls the
+    requesting user agent. The address should be machine-usable, as defined
+    in RFC2822 <https://tools.ietf.org/html/rfc2822>. The "from" value is
+    sent as the "From" header in the requests
 
     The default value is "undef", so no "From" field is set by default.
 
@@ -460,6 +495,9 @@ METHODS
             say( "Error code; ", $ex->code, " and message: ", $ex->message );
         });
 
+    However, if "use_promise" is set to false, this will return an
+    HTTP::Promise::Response object directly.
+
   head
     Provided with an "uri" and an optional hash of header name/value pairs,
     and this will issue a "HEAD" http request to the given "uri".
@@ -481,6 +519,16 @@ METHODS
             say( "Error code; ", $ex->code, " and message: ", $ex->message );
         });
 
+    However, if "use_promise" is set to false, this will return an
+    HTTP::Promise::Response object directly.
+
+  httpize_datetime
+    Provided with a DateTime or Module::Generic::DateTime object, and this
+    will ensure the "DateTime" object stringifies to a valid HTTP datetime.
+
+    It returns the "DateTime" object provided upon success, or upon error,
+    sets an error and returns "undef"
+
   inactivity_timeout
     Sets or gets the inactivity timeout in seconds. If timeout is reached,
     the connection is closed.
@@ -497,15 +545,21 @@ METHODS
     This is an alias for "accept_language"
 
   local_address
-    "Get/set the local interface to bind to for network connections. The
+    Get or set the local interface to bind to for network connections. The
     interface can be specified as a hostname or an IP address. This value is
-    passed as the "LocalAddr" argument to IO::Socket::INET." (Excerpt taken
-    from LWP::UserAgent documentation)
+    passed as the "LocalHost" argument to IO::Socket.
 
     The default value is "undef".
 
         my $p = HTTP::Promise->new( local_address => 'localhost' );
         $p->local_address( '127.0.0.1' );
+
+  local_host
+    This is the same as "local_address". You can use either interchangeably.
+
+  local_port
+    Get or set the local port to use to bind to for network connections.
+    This value is passed as the "LocalPort" argument to IO::Socket
 
   max_body_in_memory_size
     Sets or gets the maximum HTTP response body size beyond which the data
@@ -524,15 +578,14 @@ METHODS
         my $max = $p->max_redirect;
 
   max_size
-    "Get/set the size limit for response content. The default is "undef",
+    Get or set the size limit for response content. The default is "undef",
     which means that there is no limit. If the returned response content is
     only partial, because the size limit was exceeded, then a
     "Client-Aborted" header will be added to the response. The content might
     end up longer than "max_size" as we abort once appending a chunk of data
     makes the length exceed the limit. The "Content-Length" header, if
     present, will indicate the length of the full content and will normally
-    not be the same as "length( $resp->content )"" (Excerpt taken from
-    LWP::UserAgent documentation)
+    not be the same as "length( $resp->content )"
 
         my $p = HTTP::Promise->max_size(512000); # 512kb
         $p->max_size(512000);
@@ -562,6 +615,9 @@ METHODS
             # An HTTP::Promise::Exception object is passed with an error code
             say( "Error code; ", $ex->code, " and message: ", $ex->message );
         });
+
+    However, if "use_promise" is set to false, this will return an
+    HTTP::Promise::Response object directly.
 
   no_proxy
     Sets or gets a list of domain names for which the proxy will not apply.
@@ -595,6 +651,9 @@ METHODS
             say( "Error code; ", $ex->code, " and message: ", $ex->message );
         });
 
+    However, if "use_promise" is set to false, this will return an
+    HTTP::Promise::Response object directly.
+
   patch
     Provided with an "uri" and an optional hash of form data, followed by an
     hash of header name/value pairs and this will issue a "PATCH" http
@@ -623,6 +682,9 @@ METHODS
             # An HTTP::Promise::Exception object is passed with an error code
             say( "Error code; ", $ex->code, " and message: ", $ex->message );
         });
+
+    However, if "use_promise" is set to false, this will return an
+    HTTP::Promise::Response object directly.
 
   post
     Provided with an "uri" and an optional hash of form data, followed by an
@@ -661,6 +723,9 @@ METHODS
             # An HTTP::Promise::Exception object is passed with an error code
             say( "Error code; ", $ex->code, " and message: ", $ex->message );
         });
+
+    However, if "use_promise" is set to false, this will return an
+    HTTP::Promise::Response object directly.
 
   prepare_headers
     Provided with an HTTP::Promise::Request object, and this will set the
@@ -754,6 +819,9 @@ METHODS
             say( "Error code; ", $ex->code, " and message: ", $ex->message );
         });
 
+    However, if "use_promise" is set to false, this will return an
+    HTTP::Promise::Response object directly.
+
   request
     This method will issue the propre request in accordance with the request
     object provided. It will process redirects and authentication responses
@@ -798,6 +866,9 @@ METHODS
             my $ex = shift( @_ );
             say "Got an error code ", $ex->code, " with message: ", $ex->message;
         });
+
+    However, if "use_promise" is set to false, this will return an
+    HTTP::Promise::Response object directly.
 
   requests_redirectable
     Array reference. Sets or gets the list of http method that are allowed
@@ -879,6 +950,9 @@ METHODS
             my $ex = shift( @_ );
             say "Got an error code ", $ex->code, " with message: ", $ex->message;
         });
+
+    However, if "use_promise" is set to false, this will return an
+    HTTP::Promise::Response object directly.
 
   ssl_opts
     Hash reference object. Sets or gets the ssl options properties used when
@@ -969,6 +1043,48 @@ METHODS
     When true, the response content will be stored into a temporary file,
     whose object is a Module::Generic::File object and can be retrieved with
     "file".
+
+  use_promise
+    Boolean. When true, this will have HTTP::Promise HTTP methods return a
+    HTTP::Promise, and when false, it returns directly the
+    HTTP::Promise::Response. Defaults to true.
+
+CLASS FUNCTIONS
+  fetch
+    This method can be exported, such as:
+
+        use HTTP::Promise qw( fetch );
+        my $prom = fetch( 'http://example.com/something.json' );
+        # or
+        fetch( 'http://example.com/something.json' )->then(sub
+        {
+            my( $resolve, $reject ) = @$_;
+            my $resp = shift( @_ );
+            my $data = $resp->decoded_content;
+        })->then(sub
+        {
+            my $json = shift( @_ );
+            print( STDOUT "JSON data:\n$json\n" );
+        });
+
+    You can also call it with an object, such as:
+
+        my $http = HTTP::Promise->new;
+        my $prom = $http->fetch( 'http://example.com/something.json' );
+
+    "fetch" performs the same way as "get", by default, and accepts the same
+    possible parameters. It sets an error and returns "undef" upon error, or
+    return a promise
+
+    However, if "use_promise" is set to false, this will return an
+    HTTP::Promise::Response object directly.
+
+    You can, however, specify, another method by providing the "method"
+    option with value being an HTTP method, i.e. "DELETE", "GET", "HEAD",
+    "OPTIONS", "PATCH", "POST", "PUT".
+
+    See also Mozilla documentation on fetch
+    <https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch>
 
 AUTHOR
     Jacques Deguest <jack@deguest.jp>

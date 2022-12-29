@@ -1,5 +1,9 @@
 Revision history for Alien-SWIG4},
 
+0.05      2022-12-27 18:13:08-05:00 America/New_York
+  - Fix missing $VERSION.
+  - Fix link on SWIG home page to point to SourceForge via HTTPS.
+
 0.04      2022-03-16 00:15:35-04:00 America/New_York
   - Renamed from Alien-SWIG to Alien-SWIG4.
   - Set the major version of SWIG that is checked and installed to v4.

@@ -360,6 +360,14 @@ we can read it externally,
 using a method call similar to
 C<< $recce->lexeme_read($symbol_name, -7, -1, $value) >>.
 
+The above approach allows the application, essentially,
+to ignore the natural input.
+External
+scanning also allows a wide variety of alternative input models.
+Alternative input models are an advanced topic and are
+discussed in L<a separate
+document|Marpa::R2::Advanced::Input_Models>.
+
 =head1 G1 locations
 
 In addition to input stream location,
@@ -1645,9 +1653,9 @@ normalize-whitespace: 1
     sub show_last_expression {
         my ($self) = @_;
         my $recce = $self->{recce};
-        my ( $g1_start, $g1_length ) = $recce->last_completed('Expression');
+        my ( $g1_start, $g1_len ) = $recce->last_completed('Expression');
         return 'No expression was successfully parsed' if not defined $g1_start;
-        my $last_expression = $recce->substring( $g1_start, $g1_length );
+        my $last_expression = $recce->substring( $g1_start, $g1_len );
         return "Last expression successfully parsed was: $last_expression";
     } ## end sub show_last_expression
 
@@ -1658,7 +1666,7 @@ name: Scanless recognizer diagnostics
 partial: 1
 normalize-whitespace: 1
 
-    my ( $g1_start, $g1_length ) = $recce->last_completed('Expression');
+    my ( $g1_start, $g1_len ) = $recce->last_completed('Expression');
 
 =for Marpa::R2::Display::End
 
@@ -1939,7 +1947,7 @@ name: Scanless recognizer diagnostics
 partial: 1
 normalize-whitespace: 1
 
-    my $last_expression = $recce->substring( $g1_start, $g1_length );
+    my $last_expression = $recce->substring( $g1_start, $g1_len );
 
 =for Marpa::R2::Display::End
 

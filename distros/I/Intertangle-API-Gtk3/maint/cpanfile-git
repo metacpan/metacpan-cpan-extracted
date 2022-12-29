@@ -4,3 +4,6 @@ requires 'Renard::Incunabula',
 requires 'Intertangle::API::Glib',
 	git => 'https://github.com/Intertangle/p5-Intertangle-API-Glib.git',
 	branch => 'master';
+requires 'Intertangle::API::Cairo',
+	git => 'https://github.com/Intertangle/p5-Intertangle-API-Cairo.git',
+	branch => 'master';

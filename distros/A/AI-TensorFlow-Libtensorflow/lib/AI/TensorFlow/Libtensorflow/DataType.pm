@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::DataType;
 # ABSTRACT: Datatype enum
-$AI::TensorFlow::Libtensorflow::DataType::VERSION = '0.0.3';
+$AI::TensorFlow::Libtensorflow::DataType::VERSION = '0.0.4';
 use strict;
 use warnings;
 use AI::TensorFlow::Libtensorflow::Lib;

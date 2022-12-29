@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = "1.02";
+our $VERSION = "1.03";
 
 BEGIN {
     if ($0 =~ /unexpand$/) {
@@ -28,7 +28,7 @@ ansiunexpand - ANSI sequences aware tab unexpand command
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 DESCRIPTION
 

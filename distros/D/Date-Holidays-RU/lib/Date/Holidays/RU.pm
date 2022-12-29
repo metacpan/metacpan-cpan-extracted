@@ -1,5 +1,5 @@
 package Date::Holidays::RU;
-$Date::Holidays::RU::VERSION = '1.2022.1';
+$Date::Holidays::RU::VERSION = '1.2023.1';
 # ABSTRACT: Determine Russian Federation official holidays and business days.
 
 
@@ -132,6 +132,7 @@ my %HOLIDAYS_SPECIAL = (
     2020 => [ qw( 0224 0309 0504 0505 ) ],
     2021 => [ qw( 0222 0503 0510 0614 1105 1231 ) ],
     2022 => [ qw( 0307 0503 0510 0613 ) ],
+    2023 => [ qw( 0224 0508 1106 ) ],
 );
 
 my %BUSINESS_DAYS_ON_WEEKENDS = (
@@ -169,6 +170,7 @@ my %SHORT_BUSINESS_DAYS = (
     2020 => [ qw( 0430 0508 0611 1103 1231 ) ],
     2021 => [ qw( 0220 0430 0611 1103 ) ],
     2022 => [ qw( 0222 0305 1103 ) ],
+    2023 => [ qw( 0222 0307 1103 ) ],
 );
 
 
@@ -287,7 +289,7 @@ Date::Holidays::RU - Determine Russian Federation official holidays and business
 
 =head1 VERSION
 
-version 1.2022.1
+version 1.2023.1
 
 =head1 SYNOPSIS
 
@@ -342,7 +344,7 @@ Date::Holidays::RU
 
 =head1 VERSION
 
-version 1.2022.1
+version 1.2023.1
 
 =head1 AUTHOR
 
@@ -355,7 +357,7 @@ Alexander Nalobin <alexander@nalobin.ru>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Alexander Nalobin.
+This software is copyright (c) 2023 by Alexander Nalobin.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

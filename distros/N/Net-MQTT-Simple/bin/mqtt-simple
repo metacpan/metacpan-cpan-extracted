@@ -217,7 +217,7 @@ Specify a username. Overrides the environment variable C<MQTT_SIMPLE_USERNAME>.
 
 =item --pass --password I<password>
 
-Specify a password. Overrides the environment variable C<MQTT_SIMPLE_USERNAME>.
+Specify a password. Overrides the environment variable C<MQTT_SIMPLE_PASSWORD>.
 
 =back
 

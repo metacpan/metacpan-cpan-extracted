@@ -1,3 +1,8 @@
+0.010   2022-09-25  Released-By: PERLANCAR; Urgency: low
+
+        - Remove extras part.
+
+
 0.009   2021-09-29  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Follow latest Sah::Schema::perl::modname_with_optional_args

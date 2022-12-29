@@ -6,8 +6,6 @@
 use strict;
 use warnings;
 
-use lib qw(lib t);
-
 use Test::More;
 
 use MIME::Types;
@@ -34,6 +32,14 @@ is($m->type, 'image/gif');
 my $n = $a->mimeTypeOf('GIF');
 ok(defined $n);
 is($n->type, 'image/gif');
+
+my $o = $a->mimeTypeOf('im_not_really_a.zip');
+ok(defined $o);
+is($o->type, 'application/zip');
+
+my $o2 = $a->mimeTypeOf('im_not_really_a.tar');
+ok(defined $o2);
+is($o2->type, 'application/x-tar');
 
 my $p = $a->mimeTypeOf('my_image.gif');
 ok(defined $p);

@@ -1,0 +1,30 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README.md
+Restrict.xs
+easyxs/LICENSE
+easyxs/README.md
+easyxs/easyxs.h
+easyxs/easyxs_debug.h
+easyxs/easyxs_numeric.h
+easyxs/easyxs_perlcall.h
+easyxs/easyxs_scalar.h
+easyxs/easyxs_string.h
+easyxs/easyxs_structref.h
+easyxs/init.h
+easyxs/ppport.h
+lib/Filesys/Restrict.pm
+lib/Filesys/Restrict/X.pm
+lib/Filesys/Restrict/X/Base.pm
+lib/Filesys/Restrict/X/Forbidden.pm
+ppport.h
+t/do_require.t
+t/filetest.t
+t/lists.t
+t/open.t
+t/paths.t
+t/socket.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

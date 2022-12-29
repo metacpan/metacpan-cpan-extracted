@@ -20,6 +20,18 @@ use Syntax::Keyword::Match;
    is( $ret, 2, 'match/case in scalar context' );
 }
 
+{
+   sub yieldsnumber { 99 }
+
+   my $ret = do {
+      match(1 : ==) {
+         case(1) { yieldsnumber }
+         case(2) { 0 }
+      }
+   };
+   is( $ret, 99, 'match/case yields value of entersub' );
+}
+
 # in list context
 {
    my @ret = do {

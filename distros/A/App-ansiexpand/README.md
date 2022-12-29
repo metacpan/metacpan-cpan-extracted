@@ -9,6 +9,7 @@ ansiexpand \[ option \] file ...
 
 ansiunexpand \[ option \] file ...
 
+    -u  --unexpand               convert spaces to tabs
     -t# --tabstop=#              tab stop width
         --tabhead=char           tab head character
         --tabspace=char          tab space character
@@ -17,13 +18,14 @@ ansiunexpand \[ option \] file ...
 
 # VERSION
 
-Version 1.02
+Version 1.03
 
 # DESCRIPTION
 
 **ansiexpand** is an [expand(1)](http://man.he.net/man1/expand) compatible command utilizing
 [Text::ANSI::Tabs](https://metacpan.org/pod/Text%3A%3AANSI%3A%3ATabs) module, which enables to handle ANSI terminal
-sequences and Unicode wide characters.
+sequences and Unicode wide characters.  Not only expanding tabs to
+spaces, it can visualize them in various styles.
 
 This is a command line interface for [Text::ANSI::Tabs](https://metacpan.org/pod/Text%3A%3AANSI%3A%3ATabs) module, which
 uses [Text::ANSI::Fold](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold) module as a backend.  Consult them for
@@ -47,8 +49,9 @@ implementation detail.
 
 - **--tabstyle**=_style_, **--ts**=_style_
 
-    Set tab style.  Try `--tabstyle=shade` for example.  See
-    [Text::ANSI::Fold](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold) for detail.
+    Set tab style.  Try `--tabstyle=shade` for example.  My recent
+    favorite is `--tabstyle=squat-arrow,emspace`. See [Text::ANSI::Fold](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold)
+    for detail.
 
 - **--ambiguous**=`wide`|`narrow`
 
@@ -56,16 +59,17 @@ implementation detail.
 
 # INCOMPATIBILITY
 
-There is no **-a** option for **ansiunexpand** and it always convert all
+There is no `-a` option for `ansiunexpand` and it always convert all
 spaces not only leading ones.  Use normal [unexpand(1)](http://man.he.net/man1/unexpand) to convert
 just leading spaces.
 
-**ansiexpand** expands all tabs even if it is converted to single
-space without reducing data length.
+`ansiexpand -u` or `ansiunexpand` convert all spaces whenever possible
+including single space even if it does not reduce total data length.
 
 # FILES
 
-- `~/.ansiexpandrc`, `~/.ansiunexpandrc`
+- `~/.ansiunexpandrc`
+- `~/.ansiexpandrc`
 
     Start-up file.
     See [Getopt::EX::Module](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AModule) for format.

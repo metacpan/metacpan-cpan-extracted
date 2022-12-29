@@ -59,13 +59,32 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.34';
+our $VERSION = '0.37';
 
 use UI::Various::core;
 
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw();
+
+#########################################################################
+
+=item align [rw, optional]
+
+the alignment of a UI element is a digit between 1 and 9, 1 being the upper
+left corner, 2 the upper center, 3 the upper right and so on until the 9 in
+the lower right
+
+Note: Simply look at the keypad of your keyboard as mnemonic.
+
+Also note that the alignment is ignored by the PoorTerm interface.
+
+=cut
+
+sub align($;$)
+{
+    return access('align', undef, @_);
+}
 
 #########################################################################
 
@@ -128,13 +147,13 @@ sub width($;$)
     return _inherited_access('width', undef, @_);
 }
 
-# TODO: fg, bg, x, y, align (1-9, default 5, 1 is sw)
+# TODO: fg, bg, x, y
 
 #########################################################################
 #
 # internal constants and data:
 
-use constant COMMON_PARAMETERS  => qw(height width);
+use constant COMMON_PARAMETERS  => qw(align height width);
 use constant ALLOWED_PARAMETERS => qw(parent);
 use constant DEFAULT_ATTRIBUTES => (parent => undef);
 

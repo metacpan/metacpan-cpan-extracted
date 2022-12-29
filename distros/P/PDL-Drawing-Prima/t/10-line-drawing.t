@@ -1,7 +1,7 @@
+#!perl
 use strict;
 use warnings;
 use Test::More;
-
 use Prima::noX11;
 use Prima;
 use PDL::Drawing::Prima;

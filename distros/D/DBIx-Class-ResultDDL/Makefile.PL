@@ -19,15 +19,20 @@ my %WriteMakefileArgs = (
     "B::Hooks::EndOfScope" => 0,
     "Carp" => 0,
     "DBIx::Class::Core" => 0,
+    "Data::Dumper" => 0,
     "Exporter::Extensible" => "0.08",
+    "List::Util" => 0,
+    "namespace::clean" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Data::Dumper" => 0,
-    "Test2::V0" => 0
+    "DBIx::Class::Schema::Loader::DBI::SQLite" => 0,
+    "File::Temp" => 0,
+    "Test2::V0" => 0,
+    "parent" => 0
   },
-  "VERSION" => "2.00",
+  "VERSION" => "2.01",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,9 +43,14 @@ my %FallbackPrereqs = (
   "B::Hooks::EndOfScope" => 0,
   "Carp" => 0,
   "DBIx::Class::Core" => 0,
+  "DBIx::Class::Schema::Loader::DBI::SQLite" => 0,
   "Data::Dumper" => 0,
   "Exporter::Extensible" => "0.08",
+  "File::Temp" => 0,
+  "List::Util" => 0,
   "Test2::V0" => 0,
+  "namespace::clean" => 0,
+  "parent" => 0,
   "strict" => 0,
   "warnings" => 0
 );

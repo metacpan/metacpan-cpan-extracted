@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::TString;
 # ABSTRACT: A variable-capacity string type
-$AI::TensorFlow::Libtensorflow::TString::VERSION = '0.0.3';
+$AI::TensorFlow::Libtensorflow::TString::VERSION = '0.0.4';
 use strict;
 use warnings;
 use namespace::autoclean;

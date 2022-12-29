@@ -164,9 +164,12 @@ testing_loop( $loop );
 
    wait_for { $server_f->is_ready };
 
-   # Don't be too dependent on the exact wording of the message
-   like( $server_f->failure, qr/:SSL routines:SSL_CTX_use_certificate_file:/,
-      'SSL_upgrade yields correct error on failure' );
+   # Message wording changed format a lot at 1.92
+   if( eval { Net::SSLeay->VERSION( '1.92' ) } ) {
+      # Don't be too dependent on the exact wording of the message
+      like( $server_f->failure, qr/^Failed to load certificate from file /,
+         'SSL_upgrade yields correct error on failure' );
+   }
 }
 
 {

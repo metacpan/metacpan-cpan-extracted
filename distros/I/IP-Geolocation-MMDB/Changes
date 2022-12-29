@@ -1,5 +1,10 @@
 Revision history for IP::Geolocation::MMDB
 
+1.010  2022-12-24 07:15:32 CET
+
+  - Implement the file method
+  - Move the constructor to the XS source
+
 1.009  2022-08-05 14:32:53 CEST
 
   - Move the primary Git repository to GitHub

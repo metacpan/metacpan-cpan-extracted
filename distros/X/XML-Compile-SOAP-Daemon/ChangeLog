@@ -4,6 +4,15 @@
 TODO:
   . trace incoming and outgoing messages server-side
 
+version 3.15: Fri 23 Dec 11:46:13 CET 2022
+
+	Fixes:
+	- ::CGI respect nph for sending WSDLs [Immo Goltz]
+
+	Improvements:
+	- operationsFromWSDL() passes all kinds of compilation parameters
+	  to ::SOAP*::compileHandler()  GitHub #3 [MadLord]
+
 version 3.14: Fri May 11 01:04:19 CEST 2018
 
 	Improvements:

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use base qw{Power::Outlet::Common::IP::HTTP};
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
@@ -211,7 +211,7 @@ sub cycle {
 #  When time is 0 or undef the type is set to 0 which is a simple on/off capability
 #  When time is greater than 0 the the type is set to 1 which is cycle (jogging) capability
 #  This package does not support type 2 which is a relay delay switching capability
-#  The api does no support a toggle capability natively
+#  The api does not support a toggle capability natively so toggle is implemented as a query/set.
 #  
 #cut
 

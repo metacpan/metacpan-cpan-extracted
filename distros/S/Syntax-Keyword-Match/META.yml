@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4004'
   XS::Parse::Infix::Builder: '0'
-  XS::Parse::Keyword::Builder: '0.14'
+  XS::Parse::Keyword::Builder: '0.23'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -19,12 +19,12 @@ name: Syntax-Keyword-Match
 provides:
   Syntax::Keyword::Match:
     file: lib/Syntax/Keyword/Match.pm
-    version: '0.09'
+    version: '0.10'
 requires:
-  XS::Parse::Keyword: '0.14'
+  XS::Parse::Keyword: '0.23'
   perl: '5.016'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,10 @@
 Revision history for C and Perl extension of nfdump.
 
+1.31 2022-12-27
+	- updated to nfdump 1.6.25 
+	- probably last version based on nfdump 1.6.x, future version 
+	  will be based on nfdump 1.7.x
+
 1.30 2020-12-22
 	- fixed issue with building ffilter code on FreeBSD
 	- fixed issue when no exporters are configured 

@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use Carp qw(croak);
 use Config;
@@ -266,8 +266,7 @@ sub packager {
 sub vendor {
     my $self = shift;
 
-    my $vendor = $self->_read('vendor',
-        sub { $self->rpm_eval('%{?vendor}') || 'CPANPLUS' });
+    my $vendor = $self->_read('vendor', sub { $self->_get_vendor });
 
     return $vendor;
 }
@@ -660,7 +659,7 @@ sub _get_packager {
 
     if (!$name) {
         NAME:
-        for my $key (qw(DEBFULLNAME NAME)) {
+        for my $key (qw(DEBFULLNAME NAME GITLAB_USER_NAME)) {
             if ($ENV{$key}) {
                 $name = eval { decode_utf8($ENV{$key}) };
                 last NAME if $name;
@@ -668,7 +667,7 @@ sub _get_packager {
         }
     }
 
-    for my $key (qw(DEBEMAIL EMAIL)) {
+    for my $key (qw(DEBEMAIL EMAIL GITLAB_USER_EMAIL)) {
         if ($ENV{$key}) {
             my $value = eval { decode_utf8($ENV{$key}) };
             if ($value && $value =~ $EMAIL) {
@@ -721,6 +720,17 @@ sub _get_packager {
     }
 
     return "$name <$email>";
+}
+
+sub _get_vendor {
+    my $self = shift;
+
+    my $vendor = $self->rpm_eval('%{?vendor}');
+    if (!$vendor || $vendor =~ m{%}xms) {
+        $vendor = 'CPANPLUS';
+    }
+
+    return $vendor;
 }
 
 sub _get_summary_from_meta {
@@ -1207,7 +1217,7 @@ CPANPLUS::Dist::Debora::Package - Base class for package formats
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -1539,6 +1549,14 @@ Requires the module L<Software::License> from CPAN.
 
 None.
 
+=head1 BUGS AND LIMITATIONS
+
+Some operating systems numify Perl distribution versions but not consistently.
+This module sticks closely to the version string, which seems to be the most
+common approach.
+
+This module cannot be used in taint mode.
+
 =head1 SEE ALSO
 
 L<CPANPLUS::Dist::Debora::Package::Debian>,
@@ -1552,17 +1570,9 @@ L<CPANPLUS::Dist::Debora::Util>
 
 Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
 
-=head1 BUGS AND LIMITATIONS
-
-Some operating systems numify Perl distribution versions but not consistently.
-This module sticks closely to the version string, which seems to be the most
-common approach.
-
-This module cannot be used in taint mode.
-
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2022 Andreas Vögele
+Copyright (C) 2022 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

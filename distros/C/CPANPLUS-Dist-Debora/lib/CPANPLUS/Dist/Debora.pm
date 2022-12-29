@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use parent qw(CPANPLUS::Dist::Base);
 
@@ -218,7 +218,7 @@ CPANPLUS::Dist::Debora - Create Debian or RPM packages from Perl modules
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -435,16 +435,16 @@ On RPM-based systems, you might have to set the package epoch manually as
 there is no standardized database that can be queried for epochs.  On
 Debian-based systems, it is generally not necessary to set epochs manually.
 
-=head3 DEBFULLNAME, NAME
+=head3 DEBFULLNAME, NAME, GITLAB_USER_NAME
 
 The packager's name.
 
-=head3 DEBEMAIL, EMAIL
+=head3 DEBEMAIL, EMAIL, GITLAB_USER_EMAIL
 
 The packager's email address.
 
-If C<DEBFULLNAME> and C<NAME> are not set and if the email address has got the
-format "name <address>", the packager's name is taken from the email address.
+If the packager's name is unavailable and if the email address has got the
+format "name <address>", the name is taken from the email address.
 
 If the packager's name cannot be extracted from the environment, the name is
 taken from the gecos field in the password database.
@@ -475,14 +475,6 @@ On RPM-based systems, install the packages "perl", "rpm-build", "gcc", "make",
 
 None.
 
-=head1 SEE ALSO
-
-cpanp(1), cpan2dist(1), sudo(8)
-
-=head1 AUTHOR
-
-Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
-
 =head1 BUGS AND LIMITATIONS
 
 Enable C<verbose> mode if you would like to get feedback while CPANPLUS
@@ -504,9 +496,17 @@ perfect.
 
 This module cannot be used in taint mode.
 
+=head1 SEE ALSO
+
+cpanp(1), cpan2dist(1), sudo(8)
+
+=head1 AUTHOR
+
+Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
+
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2022 Andreas Vögele
+Copyright (C) 2022 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

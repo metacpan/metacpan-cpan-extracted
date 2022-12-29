@@ -60,8 +60,9 @@ filter '-class' => sub {
         if ($INC{'Role/Tiny.pm'} && exists $Role::Tiny::APPLIED_TO{$class_name}) {
             %roles = %{ $Role::Tiny::APPLIED_TO{$class_name} };
         }
+        my $is_moose = 0;
 
-        foreach my $parent (@superclasses) {
+        foreach my $parent (@$linear_ISA) {
             if ($parent eq 'Moo::Object') {
                 Data::Printer::Common::_tryme(sub {
                     my $moo_maker = 'Moo'->_constructor_maker_for($class_name);
@@ -74,6 +75,7 @@ filter '-class' => sub {
             elsif ($parent eq 'Moose::Object') {
                 Data::Printer::Common::_tryme(sub {
                     my $class_meta = $class_name->meta;
+                    $is_moose = 1;
                     %attributes = map {
                         $_->name => {
                             index => $_->insertion_order,
@@ -89,17 +91,33 @@ filter '-class' => sub {
                 });
                 last;
             }
+            elsif ($parent eq 'Object::Pad::UNIVERSAL') {
+                Data::Printer::Common::_tryme(sub {
+                    my $meta = Object::Pad::MOP::Class->for_class( $class_name );
+                    %attributes = map {
+                        $_->name . $_->value($class_name) => {
+                        }
+                    } $meta->fields;
+                    %roles = map { $_->name => 1 } $meta->direct_roles;
+                });
+            }
         }
-        if (keys %roles) {
-            $string .= $ddp->newline . 'roles (' . scalar(keys %roles) . '): '
-                    . join(', ' => map $ddp->maybe_colorize($_, 'class'), keys %roles)
-                    ;
-        }
+        if ($ddp->class->show_methods ne 'none') {
+            if (my @role_list = keys %roles) {
+                @role_list = Data::Printer::Common::_nsort(@role_list)
+                    if @role_list && $ddp->class->sort_methods;
+                $string .= $ddp->newline . 'roles (' . scalar(@role_list) . '): '
+                        . join(', ' => map $ddp->maybe_colorize($_, 'class'), @role_list)
+                        ;
+            }
 
-        if (keys %attributes) {
-            $string .= $ddp->newline . 'attributes (' . scalar(keys %attributes) . '): '
-                    . join(', ' => map $ddp->maybe_colorize($_, 'method'), keys %attributes)
-                    ;
+            if (my @attr_list = keys %attributes) {
+                @attr_list = Data::Printer::Common::_nsort(@attr_list)
+                    if @attr_list && $ddp->class->sort_methods;
+                $string .= $ddp->newline . 'attributes (' . scalar(@attr_list) . '): '
+                        . join(', ' => map $ddp->maybe_colorize($_, 'method'), @attr_list)
+                        ;
+            }
         }
 
         my $show_linear_isa = $ddp->class->linear_isa && (
@@ -113,8 +131,30 @@ filter '-class' => sub {
                     ;
         }
 
-        if ($ddp->class->show_methods && $ddp->class->show_methods ne 'none') {
+        if ($ddp->class->show_methods ne 'none') {
             $string .= _show_methods($class_name, $linear_ISA, \%attributes, $ddp);
+            if ($is_moose && $ddp->class->show_wrapped) {
+                my $modified = '';
+                my $modified_count = 0;
+                $ddp->indent;
+                for my $method ($class_name->meta->get_all_methods) {
+                    if (ref $method eq 'Class::MOP::Method::Wrapped') {
+                        foreach my $kind (qw(before around after)) {
+                            my $getter_method = $kind . '_modifiers';
+                            if (my @modlist = $method->$getter_method) {
+                                $modified .= $ddp->newline . $kind . ' ' . $method->name . ': '
+                                          . (@modlist > 1 ? $ddp->parse(\@modlist) : $ddp->parse($modlist[0]));
+                                $modified_count++;
+                            }
+                        }
+                    }
+                }
+                $ddp->outdent;
+                if ($modified_count) {
+                    $string .= $ddp->newline . 'method modifiers (' . $modified_count . '):'
+                            . $modified;
+                }
+            }
         }
 
         if ($ddp->class->show_overloads) {
@@ -139,6 +179,7 @@ filter '-class' => sub {
     if ($ddp->show_tied and my $tie = ref tied $object) {
         $string .= " (tied to $tie)";
     }
+
     return $string;
 };
 
@@ -226,7 +267,7 @@ sub _show_methods {
         if ($ddp->class->format_inheritance eq 'string') {
             my @method_list = keys %{$methods{$type}};
             @method_list = Data::Printer::Common::_nsort(@method_list)
-                if $ddp->class->sort_methods && @method_list;
+                if @method_list && $ddp->class->sort_methods;
 
             $string .= $ddp->newline . "$type methods (" . scalar(@method_list) . ')';
             if (@method_list) {
@@ -258,7 +299,7 @@ sub _show_methods {
 
             # then we print them, starting with our own methods:
             @base_methods = Data::Printer::Common::_nsort(@base_methods)
-                if $ddp->class->sort_methods && @base_methods;
+                if @base_methods && $ddp->class->sort_methods;
 
             $string .= $ddp->newline . "$type methods ($total_methods)"
                     . ($total_methods ? ':' : '')

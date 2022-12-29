@@ -3,7 +3,11 @@ Changes
 include/dispatchop.h
 lib/Syntax/Keyword/Match.pm
 lib/Syntax/Keyword/Match.xs
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01match-isa.t
 t/01match-numeq.t
@@ -19,7 +23,3 @@ t/80match-divides.t
 t/80match-equ.t
 t/95benchmark.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

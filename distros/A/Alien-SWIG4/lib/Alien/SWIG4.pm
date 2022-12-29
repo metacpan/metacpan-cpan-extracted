@@ -1,5 +1,5 @@
 package Alien::SWIG4;
-
+$Alien::SWIG4::VERSION = '0.05';
 use strict;
 use warnings;
 use base qw( Alien::Base );

@@ -1,0 +1,64 @@
+use strict;
+use warnings;
+use alienfile;
+use Path::Tiny qw(path);
+
+### let's probe by compiling the code
+plugin 'Probe::CBuilder' => (
+    lang => 'C',
+    cflags => $ENV{TALIB_INCLUDES} ? "-I$ENV{TALIB_INCLUDES}": "",
+    libs => $ENV{TALIB_LIBDIRS} ? "-L$ENV{TALIB_LIBDIRS} -lta_lib -lm" : "-lta_lib -lm",
+    program => <<'EOF');
+#include <ta-lib/ta_libc.h>
+int main(int argc, char **argv)
+{
+  TA_Initialize();
+  TA_Shutdown();
+  return 0;
+}
+EOF
+
+share {
+    my $REV = '1562';
+    start_url "https://sourceforge.net/code-snapshots/svn/t/ta/ta-lib/code/ta-lib-code-r${REV}-trunk.zip";
+    plugin 'Download';
+    meta->before_hook( download => sub {
+        # Need to request snapshot first.
+        my $response = HTTP::Tiny->new->post(
+            "https://sourceforge.net/p/ta-lib/code/$REV/tarball",
+            {
+                headers => {
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                    'Referer'      => "https://sourceforge.net/p/ta-lib/code/$REV/tree/trunk/",
+                },
+                content => 'path=%2Ftrunk',
+            },
+        );
+        die 'Could not request snapshot' unless $response->{success};
+        sleep 4; # wait a bit
+    });
+    plugin 'Extract' => 'zip';
+    plugin 'Build::CMake';
+    build [
+        # this is the default build step, if you do not specify one.
+        [ '%{cmake}',
+            @{ meta->prop->{plugin_build_cmake}->{args} },
+            # ... put extra cmake args here ...
+            '%{.install.extract}/ta-lib/'
+        ],
+        '%{make}',
+        '%{make} install',
+    ];
+    plugin 'Gather::IsolateDynamic';
+    ## lifted from alien-libdeflate
+    after gather => sub {
+        my $build = shift;
+        my $prefix = path($build->install_prop->{prefix})->absolute;
+        my $lib = $prefix->child('lib')->stringify;
+        my $include = $prefix->child('include', 'ta-lib');
+        my $dynamic = $prefix->child('lib', 'dynamic');
+        $build->runtime_prop->{cflags} = "-I$include";
+        $build->runtime_prop->{libs} = "-L$dynamic -lta_lib -lm";
+        $build->runtime_prop->{libs_static} = "-L$lib -lta_lib -lm";
+    };
+};

@@ -3,15 +3,18 @@ package File::Rename;
 use strict;
 BEGIN { eval { require warnings; warnings->import } }
 
+require Exporter;
+our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( rename );
-our $VERSION = '1.31';
+
+our $VERSION = '1.992';
 
 sub import {
-    require Exporter;
-    our @ISA = qw(Exporter);
-    my( $pack ) = @_;
-    $pack->export_to_level(1, @_);
+    my $pack = shift;
+    my($args, $config) = &_config;  # sees @_
+    $pack->export_to_level(1, $pack, @$args);
     require File::Rename::Options;
+    File::Rename::Options->import(@$config);
 }
 
 sub rename_files {
@@ -126,6 +129,21 @@ sub _default {
     $$ref = { verbose => $verbose }
 }
 
+sub _config {
+    # copied from GetOpt::Long::import
+    my @syms = ();              # symbols to import
+    my @config = ();            # configuration
+    my $dest = \@syms;          # symbols first
+    for ( @_ ) {
+        if ( $_ eq ':config' ) {
+            $dest = \@config;   # config next
+            next;
+        }
+        push(@$dest, $_);       # push
+    }
+    return (\@syms, \@config);
+}
+    
 1;
 
 __END__
@@ -142,7 +160,20 @@ File::Rename - Perl extension for renaming multiple files
   use File::Rename;
   File::Rename::rename \@ARGV, '$_ = lc';
 
+  use File::Rename qw(:config no_require_order);
+
 =head1 DESCRIPTION
+
+=head2 USE OPTIONS
+
+Parameters to C<use File::Rename> consists of
+functions to be imported and configuration options.
+
+The only exported function is C<rename()>.  The
+configuation options are preceded by :config,
+and are passed to File::Rename::Options.
+
+=head2 FUNCTIONS
 
 =over 4
 
@@ -248,7 +279,7 @@ Encoding for filenames, provided by B<-u>.
 
 =head2 EXPORT
 
-None by default.
+rename
 
 =head1 ENVIRONMENT
 
@@ -275,7 +306,8 @@ Errors from the code argument are not trapped.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2004, 2005, 2006, 2011, 2018, 2021 by Robin Barker
+Copyright (C) 2004, 2005, 2006, 2011, 2018, 2021, 2022 
+by Robin Barker
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,

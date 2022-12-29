@@ -22,7 +22,7 @@ use Perl::Critic::Utils::PPI qw< is_ppi_expression_or_generic_statement >;
 
 use Exporter 'import';
 
-our $VERSION = '1.144';
+our $VERSION = '1.146';
 
 #-----------------------------------------------------------------------------
 # Exportable symbols here.
@@ -367,7 +367,10 @@ sub is_perl_builtin {
 
 #-----------------------------------------------------------------------------
 
-Readonly::Hash my %BAREWORDS => hashify( @B::Keywords::Barewords );
+Readonly::Hash my %BAREWORDS => hashify(
+    @B::Keywords::Barewords,
+    @B::Keywords::BarewordsExtra,
+);
 
 sub is_perl_bareword {
     my $elem = shift;
@@ -704,8 +707,9 @@ sub is_hash_key {
     my $elem = shift;
     return if !$elem;
 
-    #If followed by an argument list, then its a function call, not a literal
-    return if _is_followed_by_parens($elem);
+    #If followed by an argument list, then it's a function call, not a literal.
+    my $sib = $elem->snext_sibling();
+    return if $sib && $sib->isa('PPI::Structure::List');
 
     #Check curly-brace style: $hash{foo} = bar;
     my $parent = $elem->parent();
@@ -716,21 +720,9 @@ sub is_hash_key {
 
 
     #Check declarative style: %hash = (foo => bar);
-    my $sib = $elem->snext_sibling();
-    return if !$sib;
-    return 1 if $sib->isa('PPI::Token::Operator') && $sib eq '=>';
+    return 1 if $sib && $sib->isa('PPI::Token::Operator') && $sib eq '=>';
 
     return;
-}
-
-#-----------------------------------------------------------------------------
-
-sub _is_followed_by_parens {
-    my $elem = shift;
-    return if !$elem;
-
-    my $sibling = $elem->snext_sibling() || return;
-    return $sibling->isa('PPI::Structure::List');
 }
 
 #-----------------------------------------------------------------------------

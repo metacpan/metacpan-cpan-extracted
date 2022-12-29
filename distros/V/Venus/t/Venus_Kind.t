@@ -95,6 +95,7 @@ Venus::Role::Dumpable
 Venus::Role::Matchable
 Venus::Role::Printable
 Venus::Role::Reflectable
+Venus::Role::Serializable
 Venus::Role::Testable
 Venus::Role::Throwable
 Venus::Role::Tryable
@@ -134,7 +135,8 @@ $test->for('example', 1, 'assertion', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Assert');
   ok $result->name eq 'Example';
-  ok $result->message eq 'Type assertion (%s) failed: received (%s)';
+  ok $result->message
+    eq 'Type assertion (%s) failed: received (%s), expected (%s)';
 
   $result
 });

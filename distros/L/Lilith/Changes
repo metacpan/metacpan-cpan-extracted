@@ -1,4 +1,8 @@
 Revision history for Lilith
 
+0.1.0	 2022-12-25/23:50
+		 -Log to syslog for run.
+		 -Add init/freebsd
+
 0.0.1	 2022-10-30/23:45
 		 -Initial release.

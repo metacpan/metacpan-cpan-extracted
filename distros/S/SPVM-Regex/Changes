@@ -1,3 +1,29 @@
+0.17 2022-12-26
+  [Bug Fix]
+    * Fixed unexpetedly replacement bug. This reason maybe memory, but I don't understand the detail of the reason.
+    
+    {
+      my $path = "/..";
+      $path = Regex->new("^/\.\.$")->replace($path, "/");
+      unless ($path eq "/") {
+        return 0;
+      }
+    }
+
+  [Performance Degration]
+    * For the above bug fix, performance degration occurs. This will be fixed in the future.
+    
+0.16 2022-12-26
+  [Prerequirement Bug Fix]
+    * Fixed prerequirement in Makefile.PL because 'SPVM::Resource::Re2::V2022_06_01 is needed when "perl Makefile.PL" is executed.
+0.15 2022-12-23
+  [Prerequirement Changes]
+    * SPVM 0.9670+ is needed.
+    * SPVM::Resource::Re2::V2022_06_01 0.06+ is needed.
+  [Build Process Improvement]
+    * Added --meta and --no-build-spvm-modules options to Makefile.PL.
+    * Sync Makefile.PL to the one that is generated the latest spvmdist command.
+    * Added AUTHOR and meta information to Makefile.PL.
 0.14 2022-10-01
   [Prerequirement Changes]
     * SPVM::Regex needs SPVM 0.9661+.

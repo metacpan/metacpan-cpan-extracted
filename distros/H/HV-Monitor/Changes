@@ -1,5 +1,8 @@
 Revision history for HV-Monitor
 
+0.0.5   2022-12-27/14:30
+		-Fix seconds on low VM machines for bhyve.
+
 0.0.4   2022-11-08/07:30
 		-Fix a off by 1 issue that occasionally happens with ps.
 		-Update it so make sets the path for perl in the script.

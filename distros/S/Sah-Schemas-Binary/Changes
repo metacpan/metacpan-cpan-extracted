@@ -1,3 +1,10 @@
+0.007   2022-09-25  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [ux] Tweak Abstracts (give example).
+
+
 0.006   2022-07-24  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] [schema hexbuf] Allow & remove whitespaces.

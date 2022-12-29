@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 BEGIN { push @INC, qw(blib/script blib/bin) if -d 'blib' };
 
-plan skip_all => "Not darwin", 3 unless $^O eq 'darwin';
+plan skip_all => "Not darwin" unless $^O eq 'darwin';
  
     plan tests => 3;
     ok( eval { require('rename') }, 'darwin: script is rename');

@@ -107,6 +107,7 @@ like(
 done_testing;
 
 __DATA__
+<div class="passage-col passage-col-mobile version-NIV" data-translation="NIV"><h1 class="passage-display">
 <div class="bcv"><div class="dropdown-display-text">Romans 12:1-3</div></div>
 <div class="translation"><div class="dropdown-display-text">New International Version</div></div>
 <div class="passage-text">
@@ -130,6 +131,7 @@ __DATA__
 <li id="cen-NIV-28249H"><a href="#en-NIV-28249" title="Go to Romans 12:3">Romans 12:3</a> : <a class="crossref-link" href="/passage/?search=Romans+15%3A15%2C1+Corinthians+15%3A10%2CGalatians+2%3A9%2CEphesians+3%3A7%2CEphesians+4%3A7%2C1+Peter+4%3A10%2C1+Peter+4%3A11&amp;version=NIV" data-bibleref="Romans 15:15, 1 Corinthians 15:10, Galatians 2:9, Ephesians 3:7, Ephesians 4:7, 1 Peter 4:10, 1 Peter 4:11">Ro 15:15; 1Co 15:10; Gal 2:9; Eph 3:7; 4:7; 1Pe 4:10, 11</a></li>
 
 </ol></div> <!--end of crossrefs-->
+</div>
 </div>
 </div>
 </div>

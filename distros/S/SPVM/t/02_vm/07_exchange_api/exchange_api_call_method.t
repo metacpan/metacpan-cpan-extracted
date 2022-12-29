@@ -29,6 +29,7 @@ use SPVM 'LongList';
 use SPVM 'FloatList';
 use SPVM 'DoubleList';
 use SPVM 'StringList';
+use SPVM 'Point3D';
 
 use SPVM 'TestCase::Minimal';
 
@@ -61,7 +62,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
     eval {
       SPVM::Int->new;
     };
-    like($@, qr/too few arguments/i);
+    like($@, qr/Too few arguments/);
   }
   
   # Argument general exception - too many arguments
@@ -69,7 +70,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
     eval {
       SPVM::Int->new(1, 2);
     };
-    like($@, qr/too many arguments/i);
+    like($@, qr/Too many arguments/);
   }
 }
 
@@ -1232,6 +1233,14 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
   ok($@);
   eval { SPVM::Double->new($ref) };
   ok($@);
+}
+
+# Inheritance
+{
+  my $point = SPVM::Point3D->new(1, 2);
+  
+  is($point->x, 1);
+  is($point->y, 2);
 }
 
 # All object is freed

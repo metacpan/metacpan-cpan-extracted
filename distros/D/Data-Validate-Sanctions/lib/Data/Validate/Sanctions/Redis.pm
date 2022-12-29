@@ -12,7 +12,7 @@ use JSON::MaybeUTF8 qw(encode_json_utf8 decode_json_utf8);
 use YAML::XS        qw(DumpFile);
 use Syntax::Keyword::Try;
 
-our $VERSION = '0.15';    # VERSION
+our $VERSION = '0.16';    # VERSION
 
 sub new {
     my ($class, %args) = @_;
@@ -23,8 +23,12 @@ sub new {
 
     $self->{sources} = [keys Data::Validate::Sanctions::Fetcher::config(eu_token => 'dummy')->%*];
 
-    $self->{args}      = {%args};
-    $self->{last_time} = 0;
+    $self->{args} = {%args};
+
+    $self->{last_modification} = 0;
+    $self->{last_index}        = 0;
+    $self->{last_data_load}    = 0;
+
     my $object = bless $self, ref($class) || $class;
     $object->_load_data();
 
@@ -50,26 +54,31 @@ sub get_sanctioned_info {
 sub _load_data {
     my $self = shift;
 
-    $self->{last_time}               //= 0;
+    $self->{last_modification}       //= 0;
+    $self->{last_index}              //= 0;
     $self->{_data}                   //= {};
     $self->{_sanctioned_name_tokens} //= {};
     $self->{_token_sanctioned_names} //= {};
 
-    my $last_time = $self->{last_time};
+    return $self->{_data} if $self->{_data} and $self->{last_data_load} + $self->IGNORE_OPERATION_INTERVAL > time;
+
+    my $latest_update = 0;
     for my $source ($self->{sources}->@*) {
         try {
             $self->{_data}->{$source} //= {};
 
-            my ($content, $verified, $updated, $error) = $self->{connection}->hmget("SANCTIONS::$source", qw/content verified updated error/)->@*;
+            my ($updated) = $self->{connection}->hget("SANCTIONS::$source" => 'updated');
             $updated //= 0;
             my $current_update_date = $self->{_data}->{$source}->{updated} // 0;
             next if $current_update_date && $updated <= $current_update_date;
+
+            my ($content, $verified, $error) = $self->{connection}->hmget("SANCTIONS::$source", qw/content verified error/)->@*;
 
             $self->{_data}->{$source}->{content}  = decode_json_utf8($content // '[]');
             $self->{_data}->{$source}->{verified} = $verified // 0;
             $self->{_data}->{$source}->{updated}  = $updated;
             $self->{_data}->{$source}->{error}    = $error // '';
-            $last_time                            = $updated if $updated > $last_time;
+            $latest_update                        = $updated if $updated > $latest_update;
         } catch ($e) {
             $self->{_data}->{$source}->{content}  = [];
             $self->{_data}->{$source}->{updated}  = 0;
@@ -77,7 +86,11 @@ sub _load_data {
             $self->{_data}->{$source}->{error}    = "Failed to load from Redis: $e";
         }
     }
-    $self->{last_time} = $last_time;
+
+    $self->{last_modification} = $latest_update;
+    $self->{last_data_load}    = time;
+
+    return $self->{_data} if $latest_update <= $self->{last_index};
 
     $self->_index_data();
 

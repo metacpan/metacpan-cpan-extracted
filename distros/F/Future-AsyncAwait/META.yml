@@ -22,16 +22,16 @@ name: Future-AsyncAwait
 provides:
   Future::AsyncAwait:
     file: lib/Future/AsyncAwait.pm
-    version: '0.61'
+    version: '0.62'
   Future::AsyncAwait::Awaitable:
     file: lib/Future/AsyncAwait/Awaitable.pm
-    version: '0.61'
+    version: '0.62'
   Future::AsyncAwait::ExtensionBuilder:
     file: lib/Future/AsyncAwait/ExtensionBuilder.pm
-    version: '0.61'
+    version: '0.62'
   Test::Future::AsyncAwait::Awaitable:
     file: lib/Test/Future/AsyncAwait/Awaitable.pm
-    version: '0.61'
+    version: '0.62'
 requires:
   Future: '0.48'
   XS::Parse::Keyword: '0.13'
@@ -40,5 +40,5 @@ requires:
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.61'
+version: '0.62'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

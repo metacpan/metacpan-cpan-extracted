@@ -1,0 +1,22 @@
+Revision history for DBIx-Class-EncodedColumn-Crypt-Passphrase-Argon2
+
+0.0106 2022-12-24 08:18:40
+    - Include SQL::Translator as a dep.
+
+0.0105 2022-12-23 09:50:36
+    - Re-fix dist.ini.
+
+0.0104 2022-12-23 09:40:23
+    - Improve documentation.
+
+0.0103 2022-12-22 19:41:51
+    - Require EncodedColumn too!
+
+0.0102 2022-12-22 18:59:24
+    - Cleaned code slightly.
+
+0.0101 2022-12-21 23:03:21
+    - Improve documentation.
+
+0.0100 2022-12-21 22:44:07
+    - Adapt the DBIx::Class::EncodedColumn::Crypt::Passphrase::Bcrypt code.

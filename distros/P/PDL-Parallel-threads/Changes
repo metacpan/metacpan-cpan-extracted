@@ -1,0 +1,17 @@
+2022-12-26 0.05
+- Bump minimum Perl to v5.14.0.
+- require PDL >= 2.058
+- fix longdouble test fail (#4) - thanks @andk for the report
+
+2022-02-13 0.04
+- update examples
+- fix to work with PDL >= 2.058
+
+2013-01-02 0.03
+- work on Perl without ithreads
+- remove longlong tests if system does not support it
+- fix zero-offset bug
+
+2012-12-08 0.02
+- first CPAN release
+- add PDL::Parallel::threads::SIMD

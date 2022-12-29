@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST/Request.pm
-## Version v0.9.2
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.9.3
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/09/01
-## Modified 2022/03/30
+## Modified 2022/06/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,13 +16,12 @@ BEGIN
 {
     use strict;
     use warnings;
-    use common::sense;
     use parent qw( Module::Generic );
-    use Encode ();
+    use vars qw( $ERROR $VERSION @DoW @MoY $MoY $GMT_ZONE $SERVER_VERSION );
+    use common::sense;
     use utf8 ();
-    use Devel::Confess;
+    use version;
     use Apache2::Request;
-    use Scalar::Util;
     use Apache2::Const qw( :common :http );
     use Apache2::Connection ();
     use Apache2::RequestRec ();
@@ -40,6 +39,8 @@ BEGIN
     use APR::IpSubnet ();
     use DateTime;
     # use DateTime::Format::Strptime;
+    use Devel::Confess;
+    use Encode ();
     use File::Which ();
     use HTTP::AcceptLanguage;
     use JSON;
@@ -47,18 +48,21 @@ BEGIN
     use Net::API::REST::DateTime;
     use Net::API::REST::Query;
     use Net::API::REST::Status;
+    use Scalar::Util;
     use URI;
     use URI::Escape;
     use Nice::Try;
-    use version;
-    our $VERSION = 'v0.9.2';
+    our $VERSION = 'v0.9.3';
     our @DoW = qw( Sun Mon Tue Wed Thu Fri Sat );
     our @MoY = qw( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
     our $MoY = {};
     @$MoY{ @MoY } = ( 1..12 );
     our $GMT_ZONE = { 'GMT' => 1, 'UTC' => 1, 'UT' => 1, 'Z' => 1 };
-    our( $SERVER_VERSION );
+    our( $SERVER_VERSION, $ERROR );
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -1074,7 +1078,7 @@ sub server_version
         $self->message( 3, "Found Apache version '$vers' from its description" );
     }
     
-    ## XXX to test our alternative approach
+    # NOTE: to test our alternative approach
     if( !$vers && ( my $apxs = File::Which::which( 'apxs' ) ) )
     {
         $vers = qx( $apxs -q -v HTTPD_VERSION );
@@ -1312,15 +1316,16 @@ sub _try
     }
 }
 
-# XXX package Net::API::REST::Request::Params
+# NOTE: package Net::API::REST::Request::Params
 package Net::API::REST::Request::Params;
 BEGIN
 {
     use strict;
     use warnings;
     use APR::Request::Param;
-    ## Which itself inherits from APR::Request
+    # Which itself inherits from APR::Request
     use parent qw( APR::Request::Apache2 );
+    use vars qw( $ERROR $VERSION );
     use Nice::Try;
     use Scalar::Util ();
     use version;
@@ -1387,7 +1392,7 @@ sub upload
     {
         if( $self->body_status != 0 )
         {
-            $ERROR = "APR::Request::body_status returned non-zero (" . $req->body_status . ")";
+            $ERROR = "APR::Request::body_status returned non-zero (" . $self->body_status . ")";
             return;
         }
         $body = $self->body or return;
@@ -1416,7 +1421,7 @@ sub uploads
     {
         if( $self->body_status != 0 )
         {
-            $ERROR = "APR::Request::body_status returned non-zero (" . $req->body_status . ")";
+            $ERROR = "APR::Request::body_status returned non-zero (" . $self->body_status . ")";
             return;
         }
         $body = $self->body or return;
@@ -1430,7 +1435,7 @@ sub uploads
     return( $body->uploads( $self->pool ) );
 }
 
-# XXX package Net::API::REST::Request::Upload
+# NOTE: package Net::API::REST::Request::Upload
 package Net::API::REST::Request::Upload;
 BEGIN
 {
@@ -1481,7 +1486,7 @@ sub type { return( shift->upload_type( @_ ) ); }
 
 1;
 
-# XXX POD
+# NOTE: pod
 __END__
 
 =encoding utf8
@@ -1500,7 +1505,7 @@ Net::API::REST::Request - Apache2 Incoming Request Access and Manipulation
 
 =head1 VERSION
 
-    v0.9.2
+    v0.9.3
 
 =head1 DESCRIPTION
 

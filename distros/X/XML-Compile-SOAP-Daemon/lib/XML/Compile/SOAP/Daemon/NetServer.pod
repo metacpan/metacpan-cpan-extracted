@@ -273,12 +273,12 @@ it: before the daemon is initiated. See Log::Report subroutine dispatcher.
 
 =head1 SEE ALSO
 
-This module is part of XML-Compile-SOAP-Daemon distribution version 3.14,
-built on May 11, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of XML-Compile-SOAP-Daemon distribution version 3.15,
+built on December 23, 2022. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 2007-2022 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

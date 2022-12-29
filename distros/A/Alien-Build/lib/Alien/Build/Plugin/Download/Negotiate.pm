@@ -8,7 +8,7 @@ use Alien::Build::Util qw( _has_ssl );
 use Carp ();
 
 # ABSTRACT: Download negotiation plugin
-our $VERSION = '2.74'; # VERSION
+our $VERSION = '2.75'; # VERSION
 
 
 has '+url' => undef;
@@ -82,10 +82,10 @@ sub _pick
     {
       return ('Fetch::HTTPTiny', __PACKAGE__->_pick_decoder);
     }
-    elsif(do { require Alien::Build::Plugin::Fetch::CurlCommand; Alien::Build::Plugin::Fetch::CurlCommand->protocol_ok('https') })
-    {
-      return ('Fetch::CurlCommand', __PACKAGE__->_pick_decoder);
-    }
+    #elsif(do { require Alien::Build::Plugin::Fetch::CurlCommand; Alien::Build::Plugin::Fetch::CurlCommand->protocol_ok('https') })
+    #{
+    #  return ('Fetch::CurlCommand', __PACKAGE__->_pick_decoder);
+    #}
     else
     {
       return ('Fetch::HTTPTiny', __PACKAGE__->_pick_decoder);
@@ -195,7 +195,7 @@ Alien::Build::Plugin::Download::Negotiate - Download negotiation plugin
 
 =head1 VERSION
 
-version 2.74
+version 2.75
 
 =head1 SYNOPSIS
 

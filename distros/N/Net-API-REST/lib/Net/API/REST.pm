@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST.pm
-## Version v0.6.3
+## Version v0.7.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/09/01
-## Modified 2022/03/30
+## Modified 2022/12/28
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,6 +18,7 @@ BEGIN
     use warnings;
     use common::sense;
     use parent qw( Module::Generic );
+    use vars qw( $VERSION $DEBUG $API_VERSION );
     use curry;
     use version;
     use Encode ();
@@ -38,9 +39,9 @@ BEGIN
     use Nice::Try dont_want => 1;
     use Devel::Confess;
     use Scalar::Util ();
-    ## use Crypt::JWT;
-    ## 2019-09-26
-    ## We use our own drop-in replacement because of a bug in ModPerl and JSON::XS not recognising hash reference passed
+    # use Crypt::JWT;
+    # 2019-09-26
+    # We use our own drop-in replacement because of a bug in ModPerl and JSON::XS not recognising hash reference passed
     use Net::API::REST::JWT;
     use DateTime;
     # use DateTime::Format::Strptime;
@@ -52,16 +53,15 @@ BEGIN
     use Net::API::REST::Request;
     use Net::API::REST::Response;
     use Net::API::REST::Status;
-    our( $VERSION, $DEBUG, $VERBOSE, $API_VERSION );
-    $VERSION = 'v0.6.3';
+    $VERSION = 'v0.7.0';
 };
 
-{
-    $VERBOSE = 0;
-    $DEBUG   = 0;
-    $API_VERSION = 1;
-    our @AVAILABLE_API_VERSIONS = qw( 1 );
-}
+use strict;
+use warnings;
+
+$DEBUG = 0;
+$API_VERSION = 1;
+our @AVAILABLE_API_VERSIONS = qw( 1 );
 
 sub init
 {
@@ -97,7 +97,7 @@ sub init
     }
     if( $self->{routes} )
     {
-        $self->routes( $self->{routes} ) || return( undef() );
+        $self->routes( $self->{routes} ) || return( $self->pass_error );
     }
     $self->supported_api_versions( $self->{supported_api_versions} ) if( $self->{supported_api_versions} );
     foreach my $k ( qw( jwt_encrypt jwt_algo jwt_encoding jwt_accepted_algo jwt_accepted_encoding ) )
@@ -386,12 +386,12 @@ sub gettext { return( $_[1] ); }
 ## PerlResponseHandler MyPackage::REST which would inherit from Net::API::REST
 sub handler : method
 {
-    ## my $r = shift( @_ );
-    ## https://perl.apache.org/docs/2.0/user/handlers/http.html#HTTP_Request_Handler_Skeleton
+    # https://perl.apache.org/docs/2.0/user/handlers/http.html#HTTP_Request_Handler_Skeleton
     my( $class, $r ) = @_;
     # my $handlerClass = $r->dir_config( 'Net_API_REST_Handler' ) || 'Net::API::REST' ;
+    my $debug = $r->dir_config( 'DEBUG' ) || 0;
     my $req = Net::API::REST::Request->new( $r, debug => $DEBUG );
-    ## An error has occurred
+    # An error has occurred
     if( !defined( $req ) )
     {
         return( Net::API::REST::Request->error->code || Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
@@ -399,8 +399,7 @@ sub handler : method
     my $resp = Net::API::REST::Response->new( request => $req, debug => $DEBUG );
     my $self = $class->new(
         apache_request => $r,
-        debug       => $DEBUG,
-        verbose     => $VERBOSE,
+        debug       => $debug,
         request     => $req,
         response    => $resp,
     );
@@ -411,12 +410,12 @@ sub handler : method
     # $self->apache_request( $r );
     # $r->log_error( "Received Apache request $r, object debug value is: ", $self->debug );
     $self->message( 3, "Received Apache request $r, object debug value is: ", $self->debug );
-    ## Full uri. $r->uri only returns the path
+    # Full uri. $r->uri only returns the path
     my $uri = $req->uri;
     # $self->message( 3, "Set api uri to: ", $uri->scheme . '://' . $uri->host );
     $self->api_uri( URI->new( $uri->scheme . '://' . $uri->host ) );
     $self->message( 3, "Set api uri to: ", $self->api_uri );
-    ## Response content type
+    # Response content type
     $r->content_type( 'application/json' );
     my $json = JSON->new->relaxed->utf8;
     $self->{json} = $json;
@@ -506,7 +505,7 @@ sub handler : method
     $self->request( $req );
     $self->response( $resp );
     
-    ## If there is a init_headers handler, call it to initiate the headers
+    # If there is a init_headers handler, call it to initiate the headers
     my $init_headers = $self->init_headers;
     if( $init_headers && ref( $init_headers ) eq 'CODE' )
     {
@@ -548,6 +547,10 @@ sub handler : method
         # Net::API::REST::reply will automatically set a json with an error message based on the user language
         return( $self->reply({ code => Apache2::Const::HTTP_BAD_REQUEST }) );
     }
+    elsif( !$ep->is_method_allowed( $http_meth ) )
+    {
+        return( Apache2::Const::HTTP_METHOD_NOT_ALLOWED );
+    }
     else
     {
         $self->endpoint( $ep );
@@ -559,7 +562,7 @@ sub handler : method
 #       my $deparse = B::Deparse->new( '-p', '-sC' );
 #       my $meth_body = $deparse->coderef2text( $ep->handler );
 #       $self->message( 3, "Deparsed code ref is: $meth_body" );
-        $self->noexec->messagef( 3, <<EOT, $handler, $ep->access, join( ', ', @{$ep->methods} ), $ep->path, join( ', ', @{$ep->path_info} ), $self->dumper( $ep->variables->as_hash ) );
+        my $tmpl = <<EOT;
 Endpoint information:
 Handler .......: %s
 Access type ...: %s
@@ -568,6 +571,7 @@ Path ..........: %s
 Path info .....: %s
 Variables .....: %s
 EOT
+        $self->noexec->messagef( 3, $tmpl, $handler, $ep->access, join( ', ', @{$ep->methods} ), $ep->path, join( ', ', @{$ep->path_info} ), $self->dumper( $ep->variables->as_hash ) );
         # Check access with handler
         my $ok_access = $self->is_allowed( 'access' );
         if( $ok_access && ref( $ok_access ) eq 'CODE' )
@@ -655,10 +659,10 @@ sub header_datetime
     return( $dt );
 }
 
-## Mut be overriden by sub package
+# Mut be overriden by sub package
 sub http_cors { return; }
 
-## https://www.w3.org/TR/cors/#http-access-control-allow-origin
+# https://www.w3.org/TR/cors/#http-access-control-allow-origin
 sub http_options
 {
     my $self = shift( @_ );
@@ -675,7 +679,7 @@ sub http_options
     {
         return( Apache2::Const::HTTP_NOT_FOUND );
     }
-    $self->noexec->messagef( 3, <<EOT, $ep->handler, $ep->access, join( ', ', @{$ep->methods} ), join( ', ', @{$ep->path_info} ), $self->dumper( $ep->variables->as_hash ) );
+    my $tmpl = <<EOT;
 Endpoint information:
 Handler .......: %s
 Access type ...: %s
@@ -683,6 +687,7 @@ Ok methods ....: %s
 Path info .....: %s
 Variables .....: %s
 EOT
+    $self->noexec->messagef( 3, $tmpl, $ep->handler, $ep->access, join( ', ', @{$ep->methods} ), join( ', ', @{$ep->path_info} ), $self->dumper( $ep->variables->as_hash ) );
 
     my $req_methods = [CORE::split( /\,[[:blank:]]*/, $req->headers( 'Access-Control-Request-Method' ) )];
     $self->message( 3, "Requested methods are: '", join( "', '", @$req_methods ), "'." );
@@ -1452,17 +1457,18 @@ sub route
     my $def_methods = $self->default_methods;
     # Until proven otherwise; If it is set at a certain point of the path, and nowhere after, then the path below inherit its value set before like a toll gate
     my $access = 'public';
-    local $check = sub
+    my $check;
+    $check = sub
     {
         my( $pos, $subroutes ) = @_;
         my $part = $parts->[ $pos ];
         $self->message( 3, "Checking route part '$part' at position '$pos'." );
         # reserved words cannot be used in path
-        return( '' ) if( $part =~ /^_(access_control|allowed_methods|handler|name|var)$/i );
+        return( '' ) if( $part =~ /^_(access_control|allowed_methods|handler|name|var|delete|get|head|post|put)$/i );
         if( exists( $subroutes->{ lc( $part ) } ) )
         {
             $part = lc( $part );
-            ## Code reference
+            # Code reference
             if( ref( $subroutes->{ $part } ) eq 'CODE' )
             {
                 # Do we have still more path?
@@ -1480,13 +1486,51 @@ sub route
                 $ep->path_info( [ splice( @$parts, $pos + 1 ) ] ) if( $#$parts > $pos );
                 return( $ep );
             }
-            ## path part has sub component, so we look for a key _handler in the sub hash
+            # path part has sub component, so we look for a key _handler in the sub hash
             elsif( ref( $subroutes->{ $part } ) eq 'HASH' )
             {
                 my $ref = $subroutes->{ $part };
-                return( $self->error({ code => 500, message => "Found an entry for path part \"$part\", which is a hash reference, but could not find a key \"_handler\" inside it." }) ) if( !exists( $ref->{_handler} ) );
-                return( $self->error({ code => 500, message => "Found a route for the path part \"$part\", but the handler found is not a code reference." }) ) if( ref( $ref->{_handler} ) ne 'CODE' );
-                ## We reached the end, return the handler
+                if( !exists( $ref->{_handler} ) &&
+                    !exists( $ref->{_delete} ) &&
+                    !exists( $ref->{_get} ) && 
+                    !exists( $ref->{_head} ) &&
+                    !exists( $ref->{_post} ) &&
+                    !exists( $ref->{_put} ) )
+                {
+                    return( $self->error({ code => 500, message => "Found an entry for path part \"$part\", which is a hash reference, but could not find a key \"_handler\", \"_delete\", \"_get\", \"_head\", \"_post\", or \"_put\" inside it." }) );
+                }
+                my( $handler, $method );
+                if( exists( $ref->{_delete} ) )
+                {
+                    $handler = $ref->{_delete};
+                    $method = 'delete';
+                }
+                elsif( exists( $ref->{_get} ) )
+                {
+                    $handler = $ref->{_get};
+                    $method = 'get';
+                }
+                elsif( exists( $ref->{_head} ) )
+                {
+                    $handler = $ref->{_head};
+                    $method = 'head';
+                }
+                elsif( exists( $ref->{_post} ) )
+                {
+                    $handler = $ref->{_post};
+                    $method = 'post';
+                }
+                elsif( exists( $ref->{_put} ) )
+                {
+                    $handler = $ref->{_put};
+                    $method = 'put';
+                }
+                else
+                {
+                    $handler = $ref->{_handler};
+                }
+                return( $self->error({ code => 500, message => "Found a route for the path part \"$part\", but the handler found is not a code reference." }) ) if( ref( $handler ) ne 'CODE' );
+                # We reached the end, return the handler
                 # return( $ref->{_handler} ) if( $pos == $#$parts );
                 # return( $check->( $pos + 1, $ref ) );
                 $access = $ref->{_access_control} if( $ref->{_access_control} );
@@ -1494,8 +1538,8 @@ sub route
                 {
                     $self->message( 3, "Pattern #2: found a hash defined endpoint for '$part'." );
                     my $ep = Net::API::REST::Endpoint->new(
-                        handler => $ref->{_handler},
-                        methods => ( $ref->{_allowed_methods} ? $ref->{_allowed_methods} : $def_methods ),
+                        handler => $handler,
+                        methods => ( defined( $method ) ? [$method] : $ref->{_allowed_methods} ? $ref->{_allowed_methods} : $def_methods ),
                         variables => $vars,
                         access => $access,
                         path => $uri,
@@ -1519,7 +1563,7 @@ sub route
                     $self->message( 3, "Pattern #3: Loading class '$cl' resulted in rc '$rc' with possible error: ", $self->error );
                     return( $self->error({ code => 500, message => "Unable to load class \"$cl\": " . $self->error }) ) if( !defined( $rc ) );
                     $self->message( 3, "Pattern #3: ok, class '$cl' successfully loaded." );
-                    # XXX 2021-09-05 (Jacques): This turned out to be a bad idea to check if a method exists in class, because by merely instantiating an object, it would trigger execution of code that is undesirable when running under OPTIONS, which only aims to check sanity and not actually run the query.
+                    # NOTE: 2021-09-05 (Jacques): This turned out to be a bad idea to check if a method exists in class, because by merely instantiating an object, it would trigger execution of code that is undesirable when running under OPTIONS, which only aims to check sanity and not actually run the query.
                     # As it turns out $cl->can( $meth ) works just as well.
                     # my $o = $cl->new(
                     #    apache_request => $self->apache_request,
@@ -1575,7 +1619,46 @@ sub route
             my $ref = $subroutes->{_var};
             return( $self->error({ code => 500, message => "Found a variable, and I was expecting a hash reference, but intsead got '$ref'." }) ) if( ref( $ref ) ne 'HASH' );
             return( $self->error({ code => 500, message => "Found a variable, and I was expecting a key _name to be present in the definition hash reference, but could not find one." }) ) if( !exists( $ref->{_name} ) );
-            return( $self->error({ code => 500, message => "Found a variable with name \"$ref->{_name}\" and was expecting a key _handler to be present in the definition hash reference, but could not find one." }) ) if( !exists( $ref->{_handler} ) );
+            if( !exists( $ref->{_handler} ) &&
+                !exists( $ref->{_delete} ) &&
+                !exists( $ref->{_get} ) && 
+                !exists( $ref->{_head} ) &&
+                !exists( $ref->{_post} ) &&
+                !exists( $ref->{_put} ) )
+            {
+                return( $self->error({ code => 500, message => "Found a variable with name \"$ref->{_name}\" and was expecting a key _handler to be present in the definition hash reference, but could not find one." }) );
+            }
+            my( $handler, $method );
+            if( exists( $ref->{_delete} ) )
+            {
+                $handler = $ref->{_delete};
+                $method = 'delete';
+            }
+            elsif( exists( $ref->{_get} ) )
+            {
+                $handler = $ref->{_get};
+                $method = 'get';
+            }
+            elsif( exists( $ref->{_head} ) )
+            {
+                $handler = $ref->{_head};
+                $method = 'head';
+            }
+            elsif( exists( $ref->{_post} ) )
+            {
+                $handler = $ref->{_post};
+                $method = 'post';
+            }
+            elsif( exists( $ref->{_put} ) )
+            {
+                $handler = $ref->{_put};
+                $method = 'put';
+            }
+            else
+            {
+                $handler = $ref->{_handler};
+            }
+            
             my $var_name = $ref->{_name};
             # For variable type to be array
             if( exists( $ref->{_type} ) )
@@ -1609,13 +1692,13 @@ sub route
             if( $pos == $#$parts )
             {
                 $access = $ref->{_access_control} if( $ref->{_access_control} );
-                if( ref( $ref->{_handler} ) eq 'CODE' )
+                if( ref( $handler ) eq 'CODE' )
                 {
                     $self->message( 3, "Pattern #4: found a terminal endpoint with variable '$var_name' for '$part'." );
                     # return( $ref->{_handler} );
                     my $ep = Net::API::REST::Endpoint->new(
-                        handler => $ref->{_handler},
-                        methods => ( $ref->{_allowed_methods} ? $ref->{_allowed_methods} : $def_methods ),
+                        handler => $handler,
+                        methods => ( defined( $method ) ? [$method] : $ref->{_allowed_methods} ? $ref->{_allowed_methods} : $def_methods ),
                         variables => $vars,
                         access => $access,
                         path => $uri,
@@ -1623,7 +1706,7 @@ sub route
                     $ep->access( $ref->{_access_control} ) if( $ref->{_access_control} );
                     return( $ep );
                 }
-                elsif( $ref->{_handler} =~ /^([^\-]+)\-\>(\S+)$/ )
+                elsif( $handler =~ /^([^\-]+)\-\>(\S+)$/ )
                 {
                     my( $cl, $meth ) = ( $1, $2 );
                     $self->message( 3, "Pattern #5: Found $cl->$meth pattern for part '$part'." );
@@ -1633,7 +1716,7 @@ sub route
                         # require $cl unless( defined( *{"${cl}::"} ) );
                         my $rc = eval{ $self->_load_class( $cl ); };
                         return( $self->error({ code => 500, message => "Unable to load class \"$cl\": $@" }) ) if( $@ );
-                        # XXX 2021-09-05 (Jacques): See above same comment for the same issue, i.e. we only need to use the class name to check if the method exists, otherwise creating an instance of the object would have undesirable consequences under OPTIONS
+                        # NOTE: 2021-09-05 (Jacques): See above same comment for the same issue, i.e. we only need to use the class name to check if the method exists, otherwise creating an instance of the object would have undesirable consequences under OPTIONS
                         # my $o = $cl->new(
                         #     apache_request => $self->apache_request,
                         #     debug => $self->debug,
@@ -1718,9 +1801,10 @@ sub routes
         return( $self->error({ code => 500, message => "Routes provided ($hash) is not a hash reference." }) ) if( ref( $hash ) ne 'HASH' );
         my $req = $self->request;
         my $resp = $self->response;
-        ## Walk through the hash to check everything is ok
-        ## Returns nothing if all is ok, or self returns an error description
-        local $check = sub
+        # Walk through the hash to check everything is ok
+        # Returns nothing if all is ok, or self returns an error description
+        my $check;
+        $check = sub
         {
             my $this = shift( @_ );
             foreach my $k ( sort( keys( %$this ) ) )
@@ -1728,10 +1812,15 @@ sub routes
                 my $v = $this->{ $k };
                 if( ref( $v ) eq 'HASH' )
                 {
-                    if( !CORE::exists( $v->{_handler} ) )
+                    if( !CORE::exists( $v->{_handler} ) &&
+                        !CORE::exists( $v->{_delete} ) && 
+                        !CORE::exists( $v->{_get} ) && 
+                        !CORE::exists( $v->{_head} ) && 
+                        !CORE::exists( $v->{_post} ) && 
+                        !CORE::exists( $v->{_put} ) )
                     {
                         return( "The keyword '_handlers' used is mispelled. It should be '_handler'" ) if( CORE::exists( $this->{_handlers} ) );
-                        return( "No handler was specified for the end point \"$k\". I was expecting a key \"_handler\" to be present." );
+                        return( "No handler was specified for the end point \"$k\". I was expecting a key \"_handler\", \"_delete\", \"_get\", \"_head\", \"_post\", or \"_put\" to be present." );
                     }
                     if( my $err = $check->( $v ) )
                     {
@@ -1791,17 +1880,17 @@ sub routes
                 }
                 elsif( $k =~ /^_(allowed_methods|access_control)$/ )
                 {
-                    ## Ok
+                    # Ok
                 }
-                ## If it is neither a code reference nor a package name, we raise an error
+                # If it is neither a code reference nor a package name, we raise an error
                 else
                 {
                     return( "I was expecting a code reference or a package name, but instead got '$v' for key $k" );
                 }
             }
         };
-        ## first level of keys are api version numbers, such as 1, 1.2, 2, etc...
-        ## and for each api version there is a set of route
+        # first level of keys are api version numbers, such as 1, 1.2, 2, etc...
+        # and for each api version there is a set of route
         my @api_versions = keys( %$hash );
         foreach my $vers ( @api_versions )
         {
@@ -1849,7 +1938,7 @@ sub server_version
 {
     my $self = shift( @_ );
     # $self->request->log_error( "Apache version is: " . Apache2::ServerUtil::get_server_description );
-    $self->message( 3,  "Apache version is: " . Apache2::ServerUtil::get_server_description );
+    $self->message( 3,  "Apache version is: " . Apache2::ServerUtil::get_server_description() );
     return( version->parse( '2.4.18' ) );
 }
 
@@ -1922,7 +2011,7 @@ sub _try
     }
 }
 
-# XXX Net::API::REST::Endpoint package
+# NOTE: Net::API::REST::Endpoint package
 package Net::API::REST::Endpoint;
 BEGIN
 {
@@ -1966,7 +2055,7 @@ sub path_info { return( shift->_set_get_array( 'path_info', @_ ) ); }
 
 sub variables { return( shift->_set_get_hash_as_object( 'variables', 'Net::API::REST::Endpoint::Variables', @_ ) ); }
 
-# XXX Net::API::REST::RC package
+# NOTE: Net::API::REST::RC package
 package Net::API::REST::RC;
 BEGIN
 {
@@ -1997,7 +2086,7 @@ sub message { return( shift->_set_get_scalar_as_object( 'message', @_ ) ); }
 sub TO_JSON { return( shift->{code} ); }
 
 1;
-
+# NOTE: pod
 __END__
 
 =encoding utf8
@@ -2022,7 +2111,7 @@ Net::API::REST - Framework for RESTful APIs
         my $self = shift( @_ );
         $self->{routes} =
         {
-        ## API version 1
+        # API version 1
         1 =>
             {
             'favicon.ico' => $self->curry::noop,
@@ -2042,20 +2131,27 @@ Net::API::REST - Framework for RESTful APIs
             },
             stripe => $self->curry::stripe,
             # Whatever method is fine. Will call the method handle in package MyAPI::Users to handle the endpoint
-            users => 'MyAPI::Users->handle'
+            users => 'MyAPI::Users->handle',
+            preferences =>
+            {
+                _access_control => 'restricted',
+                _delete => $self->curry::remove_preferences,
+                _get => $self->curry::get_preferences,
+                _post => $self->curry::update_preferences,
+            },
         };
         $self->{api_version} = 1;
         $self->{supported_api_versions} = [qw( 1 )];
-        ## By default, we support the GET and POST to access our endpoints
-        ## It may be adjusted endpoint by endpoint and if nothing is specified this default is used.
+        # By default, we support the GET and POST to access our endpoints
+        # It may be adjusted endpoint by endpoint and if nothing is specified this default is used.
         $self->{default_methods} = [qw( GET POST )];
-        ## This is ALL possible supported methods
+        # This is ALL possible supported methods
         $self->{supported_methods} = [qw( DELETE GET HEAD OPTIONS POST PUT )];
         $self->{supported_languages} = [qw( en-GB en fr-FR fr ja-JP )];
         $self->{key} = 'kAncmaDajnacSnbGmbXamn';
-        ## We want JWE (Json Web Token encrypted). This will affect jwt_encode's behaviour
+        # We want JWE (Json Web Token encrypted). This will affect jwt_encode's behaviour
         $self->{jwt_encrypt} = 1;
-        ## Because we are encrypting
+        # Because we are encrypting
         $self->{jwt_algo} = 'PBES2-HS256+A128KW';
         $self->{jwt_encoding} = 'A128GCM' unless( length( $self->{jwt_encoding} ) );
         $self->{jwt_accepted_algo} = [qw( PBES2-HS256+A128KW HS256 )];
@@ -2084,13 +2180,13 @@ Net::API::REST - Framework for RESTful APIs
             return( $self->reply({ code => Apache2::Const::HTTP_INTERNAL_SERVER_ERROR, message => $self->oops }) );
         };
     
-        ## Do an IP source check to be sure this is Stripe talking to us
+        # Do an IP source check to be sure this is Stripe talking to us
         if( !defined( my $ip_check = $stripe->webhook_validate_caller_ip({ ip => $remote_ip, ignore_ip => $ignore_ip }) ) )
         {
             return( $self->reply({ code => $stripe->error->code, message => $stripe->error->message }) );
         }
     
-        ## Now, we make sure this is Stripe sending this by checking the signature of the payload
+        # Now, we make sure this is Stripe sending this by checking the signature of the payload
         my $check = $stripe->webhook_validate_signature({
             secret => $signing_secret,
             signature => $sig,
@@ -2102,8 +2198,8 @@ Net::API::REST - Framework for RESTful APIs
             return( $self->reply({code => $stripe->error->code, message => $stripe->error->message }) );
         }
     
-        ## Ok, if we are here, we passed all checks
-        ## Don't wait, reply ok back to Stripe so our request does not time out
+        # Ok, if we are here, we passed all checks
+        # Don't wait, reply ok back to Stripe so our request does not time out
         $self->response->code( Apache2::Const::HTTP_OK );
         my $json = $self->json->utf8->encode({ code => 200, success => $self->true });
         $self->response->print( $json );
@@ -2117,7 +2213,7 @@ Net::API::REST - Framework for RESTful APIs
 
 =head1 VERSION
 
-    v0.6.3
+    v0.7.0
 
 =head1 DESCRIPTION
 

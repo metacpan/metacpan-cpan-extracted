@@ -1,5 +1,9 @@
 Revision history for perl distribution Mojo-Netdata
 
+0.04 2022-12-27T09:07:19
+ - Add support for NETDATA_DEBUG=1 to avoid logging too much
+ - Add support for "concurrency" in Collector::HTTP
+
 0.03 2022-01-31T11:34:51+0900
  - Add support for custom "user_agent" name
  - Add support for "via" in the HTTP collector config

@@ -17,13 +17,13 @@ License: Perl
  Artistic License.  Please see your Perl distribution for the details and
  copies of the licenses.
 
-Files: docs/docknot.yaml t/docs/changes.t t/docs/pod-spelling.t
- t/docs/pod.t t/docs/spdx-license.t t/docs/synopsis.t t/lib/Test/RRA.pm
- t/lib/Test/RRA/Config.pm t/lib/Test/RRA/ModuleVersion.pm
- t/style/minimum-version.t t/style/module-version.t
- t/style/obsolete-strings.t t/style/strict.t
+Files: docs/docknot.yaml t/data/perlcriticrc t/docs/changes.t
+ t/docs/pod-spelling.t t/docs/pod.t t/docs/spdx-license.t t/docs/synopsis.t
+ t/lib/Test/RRA.pm t/lib/Test/RRA/Config.pm t/lib/Test/RRA/ModuleVersion.pm
+ t/style/critic.t t/style/kwalitee.t t/style/minimum-version.t
+ t/style/module-version.t t/style/obsolete-strings.t t/style/strict.t
 Copyright: 1999-2010, 2012-2022 Russ Allbery <rra@cpan.org>
-  2012-2014 The Board of Trustees of the Leland Stanford Junior University
+  2011-2014 The Board of Trustees of the Leland Stanford Junior University
   2014-2016, 2018-2022 Russ Allbery <eagle@eyrie.org>
 License: Expat
  Permission is hereby granted, free of charge, to any person obtaining a
@@ -48,9 +48,11 @@ License: Expat
 Files: pod/perlpodstyle.pod t/data/basic.cap t/data/basic.clr
  t/data/basic.man t/data/basic.ovr t/data/basic.pod t/data/basic.txt
  t/data/man/encoding.groff t/data/man/encoding.pod t/data/man/encoding.roff
- t/data/man/encoding.utf8 t/data/snippets/README.md
+ t/data/man/encoding.utf8 t/data/perltidyrc t/data/snippets/README.md
 Copyright: 1999-2001, 2004, 2006, 2008, 2010, 2015-2016, 2018, 2022
     Russ Allbery <rra@cpan.org>
+  2012-2013 The Board of Trustees of the Leland Stanford Junior University
+  2021-2022 Russ Allbery <eagle@eyrie.org>
 License: all-permissive
  Copying and distribution of this file, with or without modification, are
  permitted in any medium without royalty provided the copyright notice and

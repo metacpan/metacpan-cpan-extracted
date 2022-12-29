@@ -64,8 +64,11 @@ static void nv_to_timespec(NV input, struct timespec* output) {
 typedef struct { const char* key; clockid_t value; } map[];
 
 static map clocks = {
-	{ "monotonic", CLOCK_MONOTONIC },
-	{ "realtime" , CLOCK_REALTIME  },
+	{ "monotonic"     , CLOCK_MONOTONIC },
+	{ "realtime"      , CLOCK_REALTIME  },
+	{ "boottime"      , CLOCK_BOOTTIME  },
+	{ "realtime_alarm", CLOCK_REALTIME_ALARM },
+	{ "boottime_alarm", CLOCK_BOOTTIME_ALARM },
 };
 
 static clockid_t S_get_clockid(pTHX_ const char* clock_name) {
@@ -86,78 +89,73 @@ static clockid_t S_get_clock(pTHX_ SV* ref, const char* funcname) {
 }
 #define get_clock(ref, func) S_get_clock(aTHX_ ref, func)
 
-static SV* S_io_fdopen(pTHX_ int fd, const char* classname) {
+static SV* S_io_fdopen(pTHX_ int fd, const char* classname, char type) {
 	PerlIO* pio = PerlIO_fdopen(fd, "r");
 	GV* gv = newGVgen(classname);
 	SV* ret = newRV_noinc((SV*)gv);
 	IO* io = GvIOn(gv);
 	HV* stash = gv_stashpv(classname, FALSE);
-	IoTYPE(io) = '<';
+	IoTYPE(io) = type;
 	IoIFP(io) = pio;
 	IoOFP(io) = pio;
 	sv_bless(ret, stash);
 	return ret;
 }
-#define io_fdopen(fd, classname) S_io_fdopen(aTHX_ fd, classname)
-
-#ifndef EFD_CLOEXEC
-#define EFD_CLOEXEC 0
-#endif
-
-#ifndef SFD_CLOEXEC
-#define SFD_CLOEXEC 0
-#endif
-
-#ifndef TFD_CLOEXEC
-#define TFD_CLOEXEC 0
-#endif
+#define io_fdopen(fd, classname, type) S_io_fdopen(aTHX_ fd, classname, type)
 
 #define SET_HASH_IMPL(key,value) hv_store(hash, key, sizeof key - 1, value, 0)
 #define SET_HASH_U(key) SET_HASH_IMPL(#key, newSVuv(buffer.ssi_##key))
 #define SET_HASH_I(key) SET_HASH_IMPL(#key, newSViv(buffer.ssi_##key))
 
-static map flags = {
-#ifdef EFD_NONBLOCK
-	{ "non-blocking", EFD_NONBLOCK },
-#endif
-#ifdef EFD_SEMAPHORE
-	{ "semaphore", EFD_SEMAPHORE },
-#endif
-};
-
-static UV S_get_event_flag(pTHX_ SV* flag_name) {
+static UV S_get_flag(pTHX_ map flags, size_t map_size, SV* flag_name) {
 	int i;
-	for (i = 0; i < sizeof flags / sizeof *flags; ++i)
+	for (i = 0; i < map_size / sizeof *flags; ++i)
 		if (strEQ(SvPV_nolen(flag_name), flags[i].key))
 			return flags[i].value;
 	Perl_croak(aTHX_ "No such flag '%s' known", flag_name);
 }
-#define get_event_flag(name) S_get_event_flag(aTHX_ name)
+#define get_flag(map, name) S_get_flag(aTHX_ map, sizeof(map), name)
+
+static map event_flags = {
+	{ "non-blocking"  , EFD_NONBLOCK  },
+	{ "semaphore"     , EFD_SEMAPHORE },
+};
+#define get_event_flag(name) get_flag(event_flags, name)
 
 static SV* S_new_eventfd(pTHX_ const char* classname, UV initial, int flags) {
 	int fd = eventfd(initial, flags);
 	if (fd < 0)
 		die_sys("Can't open eventfd descriptor: %s");
-	return io_fdopen(fd, classname);
+	return io_fdopen(fd, classname, '|');
 }
 #define new_eventfd(classname, initial, flags) S_new_eventfd(aTHX_ classname, initial, flags)
 
-static SV* S_new_signalfd(pTHX_ const char* classname, SV* sigmask) {
-	int fd = signalfd(-1, get_sigset(sigmask, "signalfd"), SFD_CLOEXEC);
+static map signal_flags = {
+	{ "non-blocking"  , SFD_NONBLOCK  },
+};
+#define get_signal_flag(name) get_flag(signal_flags, name)
+
+static SV* S_new_signalfd(pTHX_ const char* classname, SV* sigmask, int flags) {
+	int fd = signalfd(-1, get_sigset(sigmask, "signalfd"), flags);
 	if (fd < 0)
 		die_sys("Can't open signalfd descriptor: %s");
-	return io_fdopen(fd, classname);
+	return io_fdopen(fd, classname, '<');
 }
-#define new_signalfd(classname, sigset) S_new_signalfd(aTHX_ classname, sigset)
+#define new_signalfd(classname, sigset, flags) S_new_signalfd(aTHX_ classname, sigset, flags)
 
-static SV* S_new_timerfd(pTHX_ const char* classname, SV* clock, const char* funcname) {
+static map timer_flags = {
+	{ "non-blocking"  , TFD_NONBLOCK  },
+};
+#define get_timer_flag(name) get_flag(timer_flags, name)
+
+static SV* S_new_timerfd(pTHX_ const char* classname, SV* clock, int flags, const char* funcname) {
 	clockid_t clock_id = SvROK(clock) ? get_clock(clock, funcname) : get_clockid(SvPV_nolen(clock));
-	int fd = timerfd_create(clock_id, TFD_CLOEXEC);
+	int fd = timerfd_create(clock_id, flags);
 	if (fd < 0)
 		die_sys("Can't open timerfd descriptor: %s");
-	return io_fdopen(fd, classname);
+	return io_fdopen(fd, classname, '<');
 }
-#define new_timerfd(classname, clock, func) S_new_timerfd(aTHX_ classname, clock, func)
+#define new_timerfd(classname, clock, flags, func) S_new_timerfd(aTHX_ classname, clock, flags, func)
 
 static int S_interrupted(pTHX_ int value) {
 	if (value == -1 && errno == EINTR) {
@@ -189,18 +187,26 @@ eventfd(initial = 0, ...)
 		RETVAL
 
 SV*
-signalfd(sigmask)
+signalfd(sigmask, ...)
 	SV* sigmask;
+	PREINIT:
+		int i, flags = SFD_CLOEXEC;
 	CODE:
-	RETVAL = new_signalfd("Linux::FD::Signal", sigmask);
+	for (i = 1; i < items; i++)
+		flags |= get_signal_flag(ST(i));
+	RETVAL = new_signalfd("Linux::FD::Signal", sigmask, flags);
 	OUTPUT:
 	RETVAL
 
 SV*
-timerfd(clock)
+timerfd(clock, ...)
 	SV* clock;
+	PREINIT:
+		int i, flags = TFD_CLOEXEC;
 	CODE:
-	RETVAL = new_timerfd("Linux::FD::Timer", clock, "timerfd");
+	for (i = 1; i < items; i++)
+		flags |= get_timer_flag(ST(i));
+	RETVAL = new_timerfd("Linux::FD::Timer", clock, flags, "timerfd");
 	OUTPUT:
 	RETVAL
 
@@ -267,12 +273,15 @@ add(self, value)
 MODULE = Linux::FD				PACKAGE = Linux::FD::Signal
 
 SV*
-new(classname, sigmask)
+new(classname, sigmask, ...)
 	const char* classname;
 	SV* sigmask;
 	PREINIT:
+		int i, flags = SFD_CLOEXEC;
 	CODE:
-		RETVAL = new_signalfd(classname, sigmask);
+		for (i = 2; i < items; i++)
+			flags |= get_signal_flag(ST(i));
+		RETVAL = new_signalfd(classname, sigmask, flags);
 	OUTPUT:
 		RETVAL
 
@@ -332,8 +341,12 @@ SV*
 new(classname, clock)
 	const char* classname;
 	SV* clock;
+	PREINIT:
+		int i, flags = TFD_CLOEXEC;
 	CODE:
-		RETVAL = new_timerfd(classname, clock, "Linux::FD::Timer->new");
+		for (i = 2; i < items; i++)
+			flags |= get_timer_flag(ST(i));
+		RETVAL = new_timerfd(classname, clock, flags, "Linux::FD::Timer->new");
 	OUTPUT:
 		RETVAL
 
@@ -391,3 +404,11 @@ receive(self)
 	OUTPUT:
 		RETVAL
 
+void
+clocks(classname)
+	SV* classname;
+	INIT:
+	int i;
+	PPCODE:
+	for (i = 0; i < sizeof clocks / sizeof *clocks; ++i)
+		mXPUSHp(clocks[i].key, strlen(clocks[i].key));

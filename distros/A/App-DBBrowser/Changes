@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.306    2022-12-23
+        - Removed stringification of the output of 'group_concat'.
+
 2.305    2022-12-20
         - Firebird: 'similar to' matches only case sensitive.
         - Default alias for aggregate functions.

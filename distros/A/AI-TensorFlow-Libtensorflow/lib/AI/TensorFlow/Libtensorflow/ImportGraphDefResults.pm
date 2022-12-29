@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::ImportGraphDefResults;
 # ABSTRACT: Results from importing a graph definition
-$AI::TensorFlow::Libtensorflow::ImportGraphDefResults::VERSION = '0.0.3';
+$AI::TensorFlow::Libtensorflow::ImportGraphDefResults::VERSION = '0.0.4';
 use strict;
 use warnings;
 use namespace::autoclean;

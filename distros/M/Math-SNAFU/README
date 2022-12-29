@@ -1,0 +1,50 @@
+NAME
+    Math::SNAFU - decimal to SNAFU converter
+
+SYNOPSIS
+    Converts between decimal integers and SNAFU.
+
+DESCRIPTION
+    SNAFU is defined in <https://adventofcode.com/2022/day/25>.
+
+FUNCTIONS
+  `decimal_to_snafu( $decimal )`
+    Returns the number in SNAFU format.
+
+    Only supports non-negative integers.
+
+  `snafu_to_decimal( $snafu )`
+    Returns the number in decimal format.
+
+    Only supports non-negative integers.
+
+EXPORTS
+    Nothing is exported by default. Exports must be requested:
+
+      use Math::SNAFU -all;
+
+    Exports can be lexical:
+
+      use Math::SNAFU -all, -lexical;
+
+BUGS
+    Please report any bugs to
+    <https://github.com/tobyink/advent-of-code/issues>
+
+SEE ALSO
+    <https://adventofcode.com/2022/day/25>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2022 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

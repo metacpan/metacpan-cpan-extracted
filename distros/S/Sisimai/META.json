@@ -60,7 +60,7 @@
    "provides" : {
       "Sisimai" : {
          "file" : "lib/Sisimai.pm",
-         "version" : "v4.25.14"
+         "version" : "v4.25.15"
       },
       "Sisimai::ARF" : {
          "file" : "lib/Sisimai/ARF.pm"
@@ -401,6 +401,12 @@
       "Sisimai::Rhost::KDDI" : {
          "file" : "lib/Sisimai/Rhost/KDDI.pm"
       },
+      "Sisimai::Rhost::Mimecast" : {
+         "file" : "lib/Sisimai/Rhost/Mimecast.pm"
+      },
+      "Sisimai::Rhost::NTTDOCOMO" : {
+         "file" : "lib/Sisimai/Rhost/NTTDOCOMO.pm"
+      },
       "Sisimai::Rhost::Spectrum" : {
          "file" : "lib/Sisimai/Rhost/Spectrum.pm"
       },
@@ -437,7 +443,7 @@
          "web" : "https://github.com/sisimai/p5-sisimai"
       }
    },
-   "version" : "v4.25.14",
+   "version" : "v4.25.15",
    "x_contributors" : [
       "0xcdcdcdcd <0xcdcdcdcd@gmail.com>",
       "Adrian Yee <adrian@gt.net>",

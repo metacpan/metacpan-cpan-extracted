@@ -1,5 +1,5 @@
 package JSON::Path::Constants;
-$JSON::Path::Constants::VERSION = '1.0.2';
+$JSON::Path::Constants::VERSION = '1.0.3';
 use strict;
 use warnings;
 
@@ -16,7 +16,7 @@ our %EXPORT_TAGS = (
         '$RIGHT_SQUARE_BRACKET', '$ASTERISK',          '$COLON',          '$LEFT_PARENTHESIS',
         '$RIGHT_PARENTHESIS',    '$COMMA',             '$QUESTION_MARK',  '$EQUAL_SIGN',
         '$EXCLAMATION_MARK',     '$GREATER_THAN_SIGN', '$LESS_THAN_SIGN', '$QUOTATION_MARK',
-        '$APOSTROPHE'
+        '$APOSTROPHE',           '$TILDE_SIGN'
     ],
     operators => [
         '$TOKEN_ROOT',           '$TOKEN_CURRENT',
@@ -29,7 +29,7 @@ our %EXPORT_TAGS = (
         '$TOKEN_TRIPLE_EQUAL',   '$TOKEN_GREATER_THAN',
         '$TOKEN_LESS_THAN',      '$TOKEN_NOT_EQUAL',
         '$TOKEN_GREATER_EQUAL',  '$TOKEN_LESS_EQUAL',
-        '$TOKEN_QUOTE'
+        '$TOKEN_QUOTE',          '$TOKEN_REGEX',
     ],
 );
 our @EXPORT_OK = map @$_, values %EXPORT_TAGS;
@@ -51,6 +51,7 @@ Readonly our $EQUAL_SIGN           => '=';
 Readonly our $EXCLAMATION_MARK     => '!';
 Readonly our $GREATER_THAN_SIGN    => '>';
 Readonly our $LESS_THAN_SIGN       => '<';
+Readonly our $TILDE_SIGN           => '~';
 
 Readonly our $TOKEN_ROOT                => $DOLLAR_SIGN;
 Readonly our $TOKEN_CURRENT             => $COMMERCIAL_AT;
@@ -73,6 +74,7 @@ Readonly our $TOKEN_NOT_EQUAL           => $EXCLAMATION_MARK . $EQUAL_SIGN;
 Readonly our $TOKEN_GREATER_EQUAL       => $GREATER_THAN_SIGN . $EQUAL_SIGN;
 Readonly our $TOKEN_LESS_EQUAL          => $LESS_THAN_SIGN . $EQUAL_SIGN;
 Readonly our $TOKEN_QUOTE               => $QUOTATION_MARK;
+Readonly our $TOKEN_REGEX               => $EQUAL_SIGN . $TILDE_SIGN;
 
 1;
 
@@ -88,7 +90,7 @@ JSON::Path::Constants - Constants used in the JSON::Path distribution
 
 =head1 VERSION
 
-version 1.0.2
+version 1.0.3
 
 =head1 AUTHOR
 

@@ -227,6 +227,8 @@ Turn HTML/XML input into L<Mojo::DOM> object.
 
   $ perl -Mojo -E 'say x(f("test.html")->slurp)->at("title")->text'
 
+  [UnicodeTest: I ♥ Mojolicious!]
+
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.

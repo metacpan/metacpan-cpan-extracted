@@ -7,11 +7,14 @@ use FindBin    qw($Bin);
 use File::stat;
 use Path::Tiny;
 use YAML::XS qw(Dump);
+use Test::MockTime qw(set_fixed_time);
 
 my $sanction_file;
 my $sanction_data;
 
 BEGIN {
+    set_fixed_time(1500);
+
     $sanction_data = Dump({
             test1 => {
                 updated => time,
@@ -30,10 +33,12 @@ is(get_sanction_file(), $sanction_file, "sanction file is correct");
 ok(is_sanctioned('ABCD'),  "correct file content");
 ok(!is_sanctioned('AAAA'), "correct file content");
 
-#sleep 1 to make the mtime greater than old mtime
+#fast-forward time to make the mtime greater than old mtime
 my $last_mtime = stat($sanction_file)->mtime;
 path($sanction_file)->spew('{}');
-sleep 1;
+
+set_fixed_time(1500 + Data::Validate::Sanctions->IGNORE_OPERATION_INTERVAL);
+
 my $script = "$Bin/../bin/update_sanctions_csv";
 my $lib    = "$Bin/../lib";
 my %args   = (

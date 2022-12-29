@@ -15,7 +15,7 @@ package App::annex_to_annex;
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-$App::annex_to_annex::VERSION = '0.007';
+$App::annex_to_annex::VERSION = '0.008';
 use 5.028;
 use strict;
 use warnings;
@@ -199,7 +199,7 @@ App::annex_to_annex - use hardlinks to migrate files between git annex repos
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 FUNCTIONS
 

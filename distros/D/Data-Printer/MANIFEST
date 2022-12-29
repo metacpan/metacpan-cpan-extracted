@@ -51,6 +51,7 @@ t/010-hashes.t
 t/011-class.t
 t/011.1-attributes.t
 t/011.2-roles.t
+t/011.3-object_pad.t
 t/012-code.t
 t/013-refcount.t
 t/014-memsize.t
@@ -65,6 +66,7 @@ t/022-no_prototypes.t
 t/023-filters.t
 t/024-tied.t
 t/025-profiles.t
+t/026-caller_message.t
 t/100-filter_datetime.t
 t/101-filter_db.t
 t/102-filter_digest.t

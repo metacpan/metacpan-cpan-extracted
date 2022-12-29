@@ -21,10 +21,12 @@ use Locale::Country;
 use Text::Trim qw(trim);
 use Clone      qw(clone);
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 my $sanction_file;
 my $instance;
+
+use constant IGNORE_OPERATION_INTERVAL => 8 * 60;    # 8 minutes
 
 # for OO
 sub new {    ## no critic (RequireArgUnpacking)
@@ -40,7 +42,10 @@ sub new {    ## no critic (RequireArgUnpacking)
 
     $self->{args} = {%args};
 
-    $self->{last_time} = 0;
+    $self->{last_modification} = 0;
+    $self->{last_index}        = 0;
+    $self->{last_data_load}    = 0;
+
     return bless $self, ref($class) || $class;
 }
 
@@ -316,16 +321,23 @@ sub get_sanctioned_info {    ## no critic (RequireArgUnpacking)
 sub _load_data {
     my $self          = shift;
     my $sanction_file = $self->{sanction_file};
-    $self->{last_time}               //= 0;
+    $self->{last_modification}       //= 0;
+    $self->{last_index}              //= 0;
+    $self->{last_data_load}          //= 0;
     $self->{_data}                   //= {};
     $self->{_sanctioned_name_tokens} //= {};
     $self->{_token_sanctioned_names} //= {};
 
+    return $self->{_data} if $self->{_data} and $self->{last_data_load} + $self->IGNORE_OPERATION_INTERVAL > time;
+
     if (-e $sanction_file) {
-        return $self->{_data} if stat($sanction_file)->mtime <= $self->{last_time} && $self->{_data};
-        $self->{last_time} = stat($sanction_file)->mtime;
-        $self->{_data}     = LoadFile($sanction_file);
+        my $file_modify_time = stat($sanction_file)->mtime;
+        return $self->{_data} if $file_modify_time <= $self->{last_modification} && $self->{_data};
+        $self->{last_modification} = $file_modify_time;
+        $self->{_data}             = LoadFile($sanction_file);
+        $self->{last_data_load}    = time;
     }
+
     $self->_index_data();
 
     foreach my $sanctioned_name (keys $self->{_index}->%*) {
@@ -363,6 +375,9 @@ sub _index_data {
             }
         }
     }
+
+    $self->{last_index} = time;
+
     return;
 }
 
@@ -375,7 +390,7 @@ sub _save_data {
     DumpFile($new_sanction_file, $self->{_data});
 
     rename $new_sanction_file, $sanction_file or die "Can't rename $new_sanction_file to $sanction_file, please check it\n";
-    $self->{last_time} = stat($sanction_file)->mtime;
+    $self->{last_modification} = stat($sanction_file)->mtime;
     return;
 }
 

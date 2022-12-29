@@ -40,7 +40,7 @@ BEGIN {
     chomp $_;
     -c $_  and  -w $_
 	or  plan skip_all => 'required TTY (' . $_ . ') not available';
-    plan tests => 33;
+    plan tests => 34;
 
     # define fixed environment for unit tests:
     delete $ENV{DISPLAY};
@@ -65,6 +65,7 @@ my $text1_10 = '';
 my @short  = ();
 my @long   = ();
 my @multi  = ();
+my @big    = ();
 my @button = ();
 foreach (1..16)
 {
@@ -72,6 +73,11 @@ foreach (1..16)
     push @short,  UI::Various::Text->new(text => $_);
     push @long,   UI::Various::Text->new(text => $_ x $_);
     push @multi,  UI::Various::Text->new(text => join("\n", ($_) x $_));
+    push @big,    UI::Various::Text->new(text => $_,
+					 align => $_ + 6 - 6 * int(($_ - 1) / 3),
+					 height => 3,
+					 width => 3)
+	if $_ <= 9;
     my $str = $_ . "\n";
     push @button, UI::Various::Button->new(text => $_,
 					   code => sub { print $str; });
@@ -215,6 +221,29 @@ like($dump,
 	\ \ \ \ text:Quit\n
 	title:normal\ long\n}x,
      'dump of incomplete window is correct');
+
+####################################
+# 3x3 box with aligned texts:
+$box = UI::Various::Box->new(rows => 3, columns => 3);
+$box->add(@big);
+$win = $main->window({title => 'Big'}, $box, $quit);
+stdout_is
+{   _call_with_stdin("1\n", sub { $main->mainloop; });   }
+    join("\n",
+	 '#= Big ======<0>#',
+	 '"    1    2    3"',
+	 '"               "',
+	 '"               "',
+	 '"               "',
+	 '"    4    5    6"',
+	 '"               "',
+	 '"               "',
+	 '"               "',
+	 '"    7    8    9"',
+	 '"<1> [Quit]     "',
+	 '#===============#',
+	 $prompt),
+    'big aligned box in mainloop runs correctly';
 
 ####################################
 # 4x1 box with radio buttons, border and button inside:

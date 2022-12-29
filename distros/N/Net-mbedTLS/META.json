@@ -1,0 +1,66 @@
+{
+   "abstract" : "L<mbedTLS|https://tls.mbed.org/> in Perl",
+   "author" : [
+      "Felipe Gasper (FELIPE)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-mbedTLS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "ExtUtils::MakeMaker::CPANfile" : "0.09",
+            "autodie" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Mozilla::CA" : "0"
+         },
+         "requires" : {
+            "Promise::XS" : "0",
+            "X::Tiny" : "0.21",
+            "parent" : "0",
+            "perl" : "5.016"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Mozilla::CA" : "0",
+            "Test::FailWarnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/FGasper/p5-Net-mbedTLS/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/FGasper/p5-Net-mbedTLS.git",
+         "web" : "https://github.com/FGasper/p5-Net-mbedTLS"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

@@ -327,6 +327,9 @@ struct spvm_env {
   int32_t (*get_field_id_static)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* field_name);
   int32_t (*items)(SPVM_ENV* env, SPVM_VALUE* stack);
   int32_t (*call_instance_method_static_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* method_name, int32_t args_stack_length, const char* file, int32_t line);
+  int32_t (*get_method_id)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* method_name);
+  const char* (*strerror_nolen)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_value);
+  void* (*strerror_string_nolen)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_value);
 };
 
 struct spvm_env_runtime {
@@ -438,7 +441,8 @@ struct spvm_env_precompile {
   void (*free_precompile)(void* precompile);
   void (*set_runtime)(void* precompile, void* runtime);
   void* (*get_runtime)(void* precompile);
-  void (*create_precompile_source)(void* precompile, void* string_buffer, const char* class_name);
+  void (*build_class_source)(void* precompile, void* string_buffer, const char* class_name);
+  void (*build_method_source)(void* precompile, void* string_buffer, const char* class_name, const char* method_name);
 };
 
 SPVM_ENV* SPVM_NATIVE_new_env_raw();

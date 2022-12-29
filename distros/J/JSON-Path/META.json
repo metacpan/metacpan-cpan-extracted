@@ -42,19 +42,19 @@
    "provides" : {
       "JSON::Path" : {
          "file" : "lib/JSON/Path.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "JSON::Path::Constants" : {
          "file" : "lib/JSON/Path/Constants.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "JSON::Path::Evaluator" : {
          "file" : "lib/JSON/Path/Evaluator.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "JSON::Path::Tokenizer" : {
          "file" : "lib/JSON/Path/Tokenizer.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       }
    },
    "release_status" : "stable",
@@ -69,7 +69,7 @@
          "web" : "https://github.com/popefelix/p5-json-path"
       }
    },
-   "version" : "1.0.2",
+   "version" : "1.0.3",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

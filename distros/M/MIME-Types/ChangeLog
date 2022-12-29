@@ -6,6 +6,17 @@ Mark Overmeer.
 TODO:
 	. Add source http://www.ltsw.se/knbase/internet/mime.htp ?
 
+version 2.24: Wed 28 Dec 13:06:23 CET 2022
+
+	Fixes:
+	- vnd.gentoo officially took 'tar' and 'tbz2', but 'application/
+	  x-tar' resp 'x-gtar' prevails.  [Andreas Koenig]
+
+version 2.23: Thu 22 Dec 17:20:33 CET 2022
+
+	Changes:
+	- iana updates
+
 version 2.22: Wed 27 Oct 16:54:38 CEST 2021
 
 	Changes:

@@ -1,5 +1,31 @@
 Revision history for Perl extension Tie::Mounted.
 
+0.19  2022-12-21  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.18_02  2022-12-18  <schubiger@cpan.org>
+
+ - Add metadata repository link.
+
+0.18_01  2022-12-17  <schubiger@cpan.org>
+
+ - Major refactoring.
+
+ - Remove use of $APPROVE/@NODES.
+
+ - Skip documentation tests for non-release testing.
+
+ - Do no longer recommend Test::Pod and Test::Pod::Coverage.
+
+ - Remove the testing diagnostic.
+
+ - Use the boolean pragma for true/false values.
+
+ - Amend wording of documentation.
+
+ - Update broken license link.
+
 0.18 Tue Feb 26 21:16:18 CET 2008
 
  - Extended the "gathering-path" code for according

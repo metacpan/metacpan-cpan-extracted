@@ -1,3 +1,11 @@
+0.013   2022-09-23  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schemas: str1, non_empty_str,
+          latin_{uppercase,lowercase}_{alpha,letter}.
+
+        - [ux] Tweak summary of schemas (give example).
+
+
 0.012   2022-09-22  Released-By: PERLANCAR; Urgency: medium
 
         - Add schema: percent_str.

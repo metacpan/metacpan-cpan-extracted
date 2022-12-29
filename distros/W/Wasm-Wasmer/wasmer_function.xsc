@@ -1,0 +1,65 @@
+#ifndef P5_WASM_WASMER_FUNCTION
+#define P5_WASM_WASMER_FUNCTION 1
+
+#include <assert.h>
+
+wasm_func_t* function_from_coderef (pTHX_ wasm_store_t* store, CV* coderef, const wasm_functype_t* functype, const wasm_name_t* modname, const wasm_name_t* funcname);
+
+#include "p5_wasm_wasmer.h"
+#include "wasmer_extern.xsc"
+#include "wasmer_callback.xsc"
+#include "wasmer_instance.xsc"
+#include "wasmer_wasi.xsc"
+
+SV* function_to_sv (pTHX_ SV* creator_sv, wasm_extern_t* export_p) {
+    return extern_to_sv(aTHX_ creator_sv, export_p, FUNCTION_CLASS);
+}
+
+static inline void function_start_wasi_if_needed (pTHX_ extern_holder_t* holder_p) {
+    SV* creator_sv = holder_p->creator_sv;
+
+    if (sv_derived_from(creator_sv, P5_WASM_WASMER_INSTANCE_CLASS)) {
+        instance_holder_t* instance_holder_p = svrv_to_ptr(aTHX_ creator_sv);
+
+        start_wasi_if_needed(aTHX_ instance_holder_p);
+    }
+}
+
+wasm_func_t* function_from_coderef (pTHX_ wasm_store_t* store, CV* coderef, const wasm_functype_t* functype, const wasm_name_t* modname, const wasm_name_t* funcname) {
+    callback_holder_t* callback_holder_p;
+    Newx(callback_holder_p, 1, callback_holder_t);
+
+    *callback_holder_p = (callback_holder_t) {
+        .store = store,
+        .coderef = coderef,
+
+        .modname = modname,
+        .funcname = funcname,
+
+        .functype = functype,
+
+#if WASM_WASMER_MUST_STORE_PERL
+        .aTHX = aTHX,
+#endif
+    };
+
+    own wasm_func_t* host_func = wasm_func_new_with_env(
+        store,
+        functype,
+        host_func_callback,
+        callback_holder_p,
+        free_callback_holder
+    );
+
+    if (!host_func) {
+        Safefree(callback_holder_p);
+
+        _croak_wasmer_error("Failed to create WASM function from CODE reference");
+    }
+
+    SvREFCNT_inc( (SV*) coderef );
+
+    return host_func;
+}
+
+#endif

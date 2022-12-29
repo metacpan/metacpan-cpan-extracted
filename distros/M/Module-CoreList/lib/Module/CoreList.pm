@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20221120';
+our $VERSION = '5.20221220';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -399,6 +399,7 @@ sub changes_between {
     5.037004 => '2022-09-20',
     5.037005 => '2022-10-20',
     5.037006 => '2022-11-20',
+    5.037007 => '2022-12-20',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -19848,6 +19849,56 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.037007 => {
+        delta_from => 5.037006,
+        changed => {
+            'B::Deparse'            => '1.72',
+            'B::Op_private'         => '5.037007',
+            'Config'                => '5.037007',
+            'Cwd'                   => '3.88',
+            'ExtUtils::Miniperl'    => '1.13',
+            'ExtUtils::ParseXS'     => '3.49',
+            'ExtUtils::ParseXS::Constants'=> '3.49',
+            'ExtUtils::ParseXS::CountLines'=> '3.49',
+            'ExtUtils::ParseXS::Eval'=> '3.49',
+            'ExtUtils::ParseXS::Utilities'=> '3.49',
+            'ExtUtils::Typemaps'    => '3.49',
+            'ExtUtils::Typemaps::Cmd'=> '3.49',
+            'ExtUtils::Typemaps::InputMap'=> '3.49',
+            'ExtUtils::Typemaps::OutputMap'=> '3.49',
+            'ExtUtils::Typemaps::Type'=> '3.49',
+            'File::Glob'            => '1.39',
+            'File::Spec'            => '3.88',
+            'File::Spec::AmigaOS'   => '3.88',
+            'File::Spec::Cygwin'    => '3.88',
+            'File::Spec::Epoc'      => '3.88',
+            'File::Spec::Functions' => '3.88',
+            'File::Spec::Mac'       => '3.88',
+            'File::Spec::OS2'       => '3.88',
+            'File::Spec::Unix'      => '3.88',
+            'File::Spec::VMS'       => '3.88',
+            'File::Spec::Win32'     => '3.88',
+            'Module::CoreList'      => '5.20221220',
+            'Module::CoreList::Utils'=> '5.20221220',
+            'Opcode'                => '1.63',
+            'POSIX'                 => '2.10',
+            'Pod::Html'             => '1.34',
+            'Pod::Html::Util'       => '1.34',
+            'Pod::Man'              => '5.00',
+            'Pod::ParseLink'        => '5.00',
+            'Pod::Text'             => '5.00',
+            'Pod::Text::Color'      => '5.00',
+            'Pod::Text::Overstrike' => '5.00',
+            'Pod::Text::Termcap'    => '5.00',
+            'XS::APItest'           => '1.28',
+            'experimental'          => '0.030',
+            'feature'               => '1.78',
+            'parent'                => '0.239',
+            'threads'               => '2.33',
+        },
+        removed => {
+        }
+    },
 );
 
 sub is_core
@@ -21195,6 +21246,13 @@ sub is_core
     },
     5.037006 => {
         delta_from => 5.037005,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.037007 => {
+        delta_from => 5.037006,
         changed => {
         },
         removed => {

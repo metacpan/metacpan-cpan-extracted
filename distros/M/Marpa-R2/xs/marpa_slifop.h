@@ -29,22 +29,23 @@
 #define MARPA_OP_NOOP 6
 #define MARPA_OP_PAUSE 7
 #define MARPA_OP_PUSH_CONSTANT 8
-#define MARPA_OP_PUSH_G1_LENGTH 9
-#define MARPA_OP_PUSH_G1_START 10
-#define MARPA_OP_PUSH_LENGTH 11
-#define MARPA_OP_PUSH_ONE 12
-#define MARPA_OP_PUSH_SEQUENCE 13
-#define MARPA_OP_PUSH_START_LOCATION 14
-#define MARPA_OP_PUSH_UNDEF 15
-#define MARPA_OP_PUSH_VALUES 16
-#define MARPA_OP_RESULT_IS_ARRAY 17
-#define MARPA_OP_RESULT_IS_CONSTANT 18
-#define MARPA_OP_RESULT_IS_N_OF_SEQUENCE 19
-#define MARPA_OP_RESULT_IS_RHS_N 20
-#define MARPA_OP_RESULT_IS_TOKEN_VALUE 21
-#define MARPA_OP_RESULT_IS_UNDEF 22
-#define MARPA_OP_RETRY_OR_SET_LEXER 23
-#define MARPA_OP_SET_LEXER 24
+#define MARPA_OP_PUSH_G1_LEN 9
+#define MARPA_OP_PUSH_G1_LENGTH 10
+#define MARPA_OP_PUSH_G1_START 11
+#define MARPA_OP_PUSH_LENGTH 12
+#define MARPA_OP_PUSH_ONE 13
+#define MARPA_OP_PUSH_SEQUENCE 14
+#define MARPA_OP_PUSH_START_LOCATION 15
+#define MARPA_OP_PUSH_UNDEF 16
+#define MARPA_OP_PUSH_VALUES 17
+#define MARPA_OP_RESULT_IS_ARRAY 18
+#define MARPA_OP_RESULT_IS_CONSTANT 19
+#define MARPA_OP_RESULT_IS_N_OF_SEQUENCE 20
+#define MARPA_OP_RESULT_IS_RHS_N 21
+#define MARPA_OP_RESULT_IS_TOKEN_VALUE 22
+#define MARPA_OP_RESULT_IS_UNDEF 23
+#define MARPA_OP_RETRY_OR_SET_LEXER 24
+#define MARPA_OP_SET_LEXER 25
 
 static struct op_data_s op_by_name_object[] = {
   { "alternative", MARPA_OP_ALTERNATIVE },
@@ -56,6 +57,7 @@ static struct op_data_s op_by_name_object[] = {
   { "noop", MARPA_OP_NOOP },
   { "pause", MARPA_OP_PAUSE },
   { "push_constant", MARPA_OP_PUSH_CONSTANT },
+  { "push_g1_len", MARPA_OP_PUSH_G1_LEN },
   { "push_g1_length", MARPA_OP_PUSH_G1_LENGTH },
   { "push_g1_start", MARPA_OP_PUSH_G1_START },
   { "push_length", MARPA_OP_PUSH_LENGTH },
@@ -84,6 +86,7 @@ static const char* op_name_by_id_object[] = {
   "noop",
   "pause",
   "push_constant",
+  "push_g1_len",
   "push_g1_length",
   "push_g1_start",
   "push_length",

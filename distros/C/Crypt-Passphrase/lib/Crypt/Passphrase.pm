@@ -1,5 +1,5 @@
 package Crypt::Passphrase;
-$Crypt::Passphrase::VERSION = '0.004';
+$Crypt::Passphrase::VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -112,7 +112,7 @@ Crypt::Passphrase - A module for managing passwords in a cryptographically agile
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -121,12 +121,13 @@ version 0.004
      validators => [ 'Bcrypt' ],
  );
 
- my $hash = get_hash($user);
+ my ($hash) = $dbh->selectrow_array("SELECT password FROM users WHERE name = ?", {}, $user);
  if (!$authenticator->verify_password($password, $hash)) {
      die "Invalid password";
  }
  elsif ($authenticator->needs_rehash($hash)) {
-     update_hash($user, $authenticator->hash_password($password));
+     my $new_hash = $authenticator->hash_password($password);
+     $dbh->do("UPDATE users SET password = ? WHERE name = ?", {}, $new_hash, $user);
  }
 
 =head1 DESCRIPTION
@@ -213,11 +214,19 @@ In some situations, it may be appropriate to have different password settings fo
 
 =item * L<Crypt::Passphrase::Argon2|Crypt::Passphrase::Argon2>
 
+This is a state-of-the-art memory-hard password hashing algorithm, recommended for higher-end parameters.
+
 =item * L<Crypt::Passphrase::Bcrypt|Crypt::Passphrase::Bcrypt>
+
+And older but still safe password hashing algorithm, recommended for lower-end parameters.
 
 =item * L<Crypt::Passphrase::Scrypt|Crypt::Passphrase::Scrypt>
 
+A first-generation memory-hard algorithm.
+
 =item * L<Crypt::Passphrase::PBKDF2|Crypt::Passphrase::PBKDF2>
+
+A FIPS-standardized hashing algorithm. Only recommended when FIPS-compliance is required.
 
 =back
 

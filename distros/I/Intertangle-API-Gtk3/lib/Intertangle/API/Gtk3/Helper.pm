@@ -1,11 +1,11 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::API::Gtk3::Helper;
-$Intertangle::API::Gtk3::Helper::VERSION = '0.005';
+$Intertangle::API::Gtk3::Helper::VERSION = '0.006';
 # ABSTRACT: Collection of helper utilities for Gtk3 and Glib
 
 
 use Renard::Incunabula::Common::Types qw(Str);
-use Env qw($DISPLAY $RENARD_USE_XINPUT2);
+use Env qw($DISPLAY $INTERTANGLE_API_GTK3_USE_XINPUT2);
 use Class::Method::Modifiers;
 use Gtk3;
 use Intertangle::API::Gtk3::Helper::Gtk3::Adjustment;
@@ -80,7 +80,7 @@ fun _set_icon_theme( (Str) $icon_theme_name ) {
 }
 
 fun _setup_disable_xinput2() {
-	if( $DISPLAY && ! $RENARD_USE_XINPUT2 ) {
+	if( $DISPLAY && ! $INTERTANGLE_API_GTK3_USE_XINPUT2 ) {
 		Gtk3::Gdk::disable_multidevice();
 	}
 }
@@ -152,7 +152,7 @@ Intertangle::API::Gtk3::Helper - Collection of helper utilities for Gtk3 and Gli
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 FUNCTIONS
 
@@ -161,7 +161,7 @@ version 0.005
   fun _setup_disable_xinput2() {
 
 Checks to see if running under X11 and that the environment variable
-C<< $ENV{RENARD_USE_XINPUT2} >> is not set to a true value.
+C<< $ENV{INTERTANGLE_API_GTK3_USE_XINPUT2} >> is not set to a true value.
 If so, disables the L<XInput 2 extension|https://www.x.org/wiki/guide/extensions/#index2h2>.
 
 This is necessary because GDK has an issue with some forms of mouse scrolling

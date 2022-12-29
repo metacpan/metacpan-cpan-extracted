@@ -21,6 +21,6 @@ no_index:
 requires:
   JSON::MaybeXS: '1.004002'
   LWP::UserAgent: '6.47'
-  perl: '5.006'
-version: 0.03
+  perl: '5.100'
+version: 0.06
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

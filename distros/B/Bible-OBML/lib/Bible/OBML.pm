@@ -10,7 +10,7 @@ use Mojo::Util 'html_unescape';
 use Text::Wrap 'wrap';
 use Bible::Reference;
 
-our $VERSION = '2.05'; # VERSION
+our $VERSION = '2.06'; # VERSION
 
 has _load             => {};
 has indent_width      => 4;
@@ -18,8 +18,10 @@ has reference_acronym => 0;
 has fnxref_acronym    => 1;
 has wrap_at           => 80;
 has reference         => Bible::Reference->new(
-    bible   => 'Protestant',
-    sorting => 1,
+    bible                 => 'Protestant',
+    sorting               => 1,
+    require_chapter_match => 1,
+    require_book_ucfirst  => 1,
 );
 
 sub __ocd_tree ($node) {
@@ -117,7 +119,7 @@ sub _clean_html_to_obml ( $self, $html ) {
 
     # de-XML
     $obml =~ s|</?obml>||g;
-#    $obml =~ s|</p>| </p>|g;
+    $obml =~ s|</p>| </p>|g;
     $obml =~ s|</?p>||g;
     $obml =~ s|</?woj>|\*|g;
     $obml =~ s|</?i>|\^|g;
@@ -152,7 +154,7 @@ sub _clean_html_to_obml ( $self, $html ) {
         } split( /\n/, $obml ) ) . "\n";
     }
     $obml =~ s|<br>||g;
-#    $obml =~ s|[ ]+$||mg;
+    $obml =~ s|[ ]+$||mg;
 
     chomp $obml;
     return $obml;
@@ -336,7 +338,7 @@ Bible::OBML - Open Bible Markup Language parser and renderer
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =for markdown [![test](https://github.com/gryphonshafer/Bible-OBML/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bible-OBML/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bible-OBML/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bible-OBML)

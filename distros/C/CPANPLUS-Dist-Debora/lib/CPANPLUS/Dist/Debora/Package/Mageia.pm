@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use parent qw(CPANPLUS::Dist::Debora::Package::RPM);
 
@@ -49,7 +49,7 @@ CPANPLUS::Dist::Debora::Package::Mageia - Create binary RPM packages
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -92,17 +92,17 @@ See L<CPANPLUS::Dist::Debora::Package::RPM> for dependencies.
 
 None.
 
-=head1 AUTHOR
-
-Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
-
 =head1 BUGS AND LIMITATIONS
 
 See L<CPANPLUS::Dist::Debora::Package::RPM> for bugs and limitations.
 
+=head1 AUTHOR
+
+Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
+
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2022 Andreas Vögele
+Copyright (C) 2022 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

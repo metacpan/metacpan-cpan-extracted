@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 b20ba69d158ea4d9d6793f05a3aa851d46640607858f2f6c0b41eae3259e34f3 COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 2c78c70507117be2a76ecdf7a8c40398201b0aea396bc4a4cb9ce7e61777d30e Changes
+SHA256 5005ae4e39933f217344767f78661d3ce3294e142c3ff0da23306c329abc3ced INSTALL
+SHA256 a4f85c6f4d6e8bdd37b7ab08013e3e3bee1fe8e910e20f8f54d5025ffe40f384 LICENSE
+SHA256 c935d657a79eddf0cf5d9cafd6b6b00acfdfc51482e8294d70ecc672ba5b8c06 MANIFEST
+SHA256 6860a1e246e50788492ad42792bac6c36078a0f7f364bcf643f06db7557eeff0 META.json
+SHA256 57f65f9fd66c7620f52eb935379dbed56590d481e0dc552ae57123e541b7b77e META.yml
+SHA256 f78e72abca3128ce5180bbdd5ab5a5d8ec179d383efc94ff4a88425ec6f7538f Makefile.PL
+SHA256 94c27f301cb3d455bd990902301163fa7190d5019405cb6d50ee1e2fe0075ac8 README
+SHA256 3632b170e63153dc9fdf3bc4597c9f0b406a7195a13308c037b3d68993073973 dist.ini
+SHA256 5a3e07c0b9ca5321ca25a0fc0cf220631bc3e1464c4e5f2b19e37eee8a8456c3 doap.ttl
+SHA256 9e340a3add64b6f76fcb9a190ebe35b01ec62b8c66540bd387d599ce2bdbc723 lib/Math/SNAFU.pm
+SHA256 10caa8040c3afc0a07837d75a0336e76923762a9b8176228f13326d27c53eda6 t/00start.t
+SHA256 3f9f436af24a8949ae9248800be8955df7eb8ba04845741ff8250c8119227481 t/01basic.t
+SHA256 c10697660ae6bfa81faeb6f9eccf1fba47837ade060213a3b7911c95c2795ce2 t/integration/convert.t
+SHA256 3148118ae381bf6ed17f5b63ead0aa2319994bcb99aa9a5778efda4a6f979749 t/unit/Math/SNAFU.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCY6hO/QAKCRDOv4Eoaip9
+OQMsAKCuWk6rrQWIoAQxVbr6IKRmuQuPOACeNmenC03LR6VP6+kFMIU2k10pG+Q=
+=KDfl
+-----END PGP SIGNATURE-----

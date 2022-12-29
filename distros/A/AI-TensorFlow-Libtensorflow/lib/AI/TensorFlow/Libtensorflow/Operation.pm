@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Operation;
 # ABSTRACT: An operation
-$AI::TensorFlow::Libtensorflow::Operation::VERSION = '0.0.3';
+$AI::TensorFlow::Libtensorflow::Operation::VERSION = '0.0.4';
 use strict;
 use warnings;
 use namespace::autoclean;
@@ -115,6 +115,7 @@ $ffi->attach( [ 'OperationAllInputs' => 'AllInputs' ] => [
 ] => 'void' => sub {
 	my ($xs, $oper) = @_;
 	my $max_inputs = $oper->NumInputs;
+	return [] if $max_inputs == 0;
 	my $inputs = AI::TensorFlow::Libtensorflow::Output->_adef->create(0 + $max_inputs);
 	$xs->($oper, $inputs, $max_inputs);
 	return AI::TensorFlow::Libtensorflow::Output->_from_array($inputs);
@@ -166,6 +167,21 @@ $ffi->attach( [ 'OperationOutputConsumers'  => 'OutputConsumers' ] => [
 	my $count = $xs->($output, $consumers, $max_consumers);
 	return AI::TensorFlow::Libtensorflow::Input->_from_array( $consumers );
 });
+
+sub _data_printer {
+	my ($self, $ddp) = @_;
+
+	my %data = (
+		Name       => $self->Name,
+		OpType     => $self->OpType,
+		NumInputs  => $self->NumInputs,
+		NumOutputs => $self->NumOutputs,
+	);
+
+	return sprintf('%s %s',
+		$ddp->maybe_colorize(ref $self, 'class' ),
+		$ddp->parse(\%data) );
+}
 
 1;
 

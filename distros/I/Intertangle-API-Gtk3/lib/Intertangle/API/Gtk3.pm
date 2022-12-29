@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::API::Gtk3;
 # ABSTRACT: Provides helpers for dealing with Gtk3 code
-$Intertangle::API::Gtk3::VERSION = '0.005';
+$Intertangle::API::Gtk3::VERSION = '0.006';
 sub Inline {
 	return unless $_[-1] eq 'C';
 
@@ -40,7 +40,7 @@ Intertangle::API::Gtk3 - Provides helpers for dealing with Gtk3 code
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 METHODS
 

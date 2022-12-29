@@ -32,7 +32,7 @@ BEGIN {
     $ENV{DISPLAY}  or  plan skip_all => 'DISPLAY not found';
     eval { require Tk; };
     $@  and  plan skip_all => 'Perl/Tk not found';
-    plan tests => 39;
+    plan tests => 41;
 
     # define fixed environment for unit tests:
     delete $ENV{UI};
@@ -117,7 +117,7 @@ my $cvar = 0;
 my $check = UI::Various::Check->new(text => 'on/off', var => \$cvar);
 is(ref($check), 'UI::Various::Tk::Check',
    'type UI::Various::Tk::Check is correct');
-my $text2 = UI::Various::Text->new(text => \$ivar);
+my $text2 = UI::Various::Text->new(text => \$ivar, align => 3, width => 12);
 is(ref($text2), 'UI::Various::Tk::Text',
    'type UI::Various::Tk::Text is correct again');
 my $rvar = 'r';
@@ -180,6 +180,8 @@ $_ = $listbox->selected();
 is($_, undef, 'listbox has correct undef selection before usage');
 $listbox->add('added');
 is($listbox->{texts}[8], 'added', 'listbox adds correctly before usage');
+$listbox->modify(8, 'modified');
+is($listbox->{texts}[8], 'modified', 'listbox modifies correctly before usage');
 $listbox->remove(8);
 is_deeply($listbox->{texts}, \@text8, 'listbox removes correctly before usage');
 $listbox->replace(@text8);
@@ -199,6 +201,7 @@ $button2->code(sub { $w->destroy(); });
 my @internal_types = ();
 my $selection1 = 'not undef';
 my $selection2 = 'wrong';
+my $modified = 'nothing';
 combined_like
 {
     $main->_mainloop_prepare;
@@ -213,6 +216,8 @@ combined_like
     $listbox->_tk()->selectionSet(2);
     $listbox->_tk()->selectionSet(1);
     $selection2 = $listbox->selected();
+    $listbox->modify(7, 'modified');
+    $modified = $listbox->{texts}[7];
     # some pseudo invocations:
     &{$optionmenu ->_tk()->cget('-command')->[0]}(1);
     &{$optionmenu2->_tk()->cget('-command')->[0]}(2);
@@ -237,6 +242,7 @@ is($cvar, 1, 'checkbox variable has correct new value of 1');
 is($rvar, 'b', 'radio button variable has correct new value of "b"(lue)');
 is($selection1, undef, 'listbox has correct initial selection');
 is($selection2, 1, 'listbox has correct (invalid) final selection');
+is($modified, 'modified', 'listbox modifies correctly during usage');
 is($optionmenu->selected(), 1, 'optionmenu 1 has correct selection');
 is($optionmenu2->selected(), 2, 'optionmenu 2 has correct selection');
 is($option, 2, 'option has been modified in menu 2');

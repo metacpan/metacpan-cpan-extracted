@@ -46,7 +46,7 @@ my @examples = grep /\s+$generic\s/, $parser->data;
 # ( perldoc Test::More ) 
 # for help writing this test script.
 
-plan tests => 2 + (@examples || 1);
+plan tests => 2 + ((@examples * 2) || 1);
 like( $inc_script, qr{/ $script \z}msx,
 	"required $script is $inc_script");
 ok( scalar(@examples) > 1,
@@ -69,14 +69,20 @@ for ( @examples ) {
     chdir $dir or die $!;
     mkdir 'my_new_dir' or die $!;
 
-    if ( $args[-1] =~ /\A\*/ ) {
+    if ( $args[-1] =~ /\*/ ) {
 	my @glob = glob(pop @args);
 	push @args, @glob;
     }
 
-    my $ok = eval { main_argv( @args ); 1 }; 
-    ok( $ok, "example:$example" );
+    my $warn;
+    my $ok = eval {
+        $SIG{__WARN__} = sub { $warn .= $_[0]; };
+        main_argv( @args ); 
+        1; 
+    }; 
+    ok( $ok, "does not die: $example" );
     diag $@ unless $ok;
+    ok( !$warn, "no warning: $example" ) or diag $warn;
 
     chdir File::Spec->updir or die $!;
     File::Path::rmtree($dir) or die $!;

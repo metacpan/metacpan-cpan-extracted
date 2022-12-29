@@ -1,6 +1,28 @@
 Revision history for Perl extension UI-Various
 
-0.34 2022-12-20T13:27:32Z
+0.37 2022-12-27T12:59:46Z
+
+0.37 2022-12-27T12:58:35Z
+
+    - added method to modify element of Listbox
+    - fixed bug in Curses::Dialog occuring when dimension is missing
+    - fixed some POD errors
+    - improved alingment of Check and Radio buttons for Tk
+
+0.36 2022-12-25T16:08:48Z
+
+    - fix for FileSelect when selecting in root directory
+    - changed FileSelect's empty selection logic to support directory selection
+    - fix when adding first item(s) to empty Listbox
+    - 2nd listbox example now prints selection when exiting
+
+0.35 2022-12-23T08:31:01Z
+
+    - minor improvements in dod-check.pl
+    - added alignment attribute
+    - refactroed handling of attributes in Tk
+    - modified code for average character width in Tk
+    - minor refactoring for concise code
 
 0.34 2022-12-20T13:24:55Z
 

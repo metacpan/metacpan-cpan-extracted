@@ -266,17 +266,37 @@ ok(!-f "$build_dir/work/object/SPVM/CORE.o");
 
 # strerror
 {
-  if ($!{EAGAIN}) {
-    is(SPVM::TestCase::NativeAPI->strerror_value(Errno::EAGAIN), $! = Errno::EAGAIN);
+  if (exists $!{EAGAIN}) {
+    $! = Errno::EAGAIN;
+    is(SPVM::TestCase::NativeAPI->strerror_value(Errno::EAGAIN)->to_string, "$!");
   }
 }
 
 # strerror_string
 {
-  if ($!{EAGAIN}) {
+  if (exists $!{EAGAIN}) {
     my $strerror_string = SPVM::TestCase::NativeAPI->strerror_string_value(Errno::EAGAIN);
     ok(ref $strerror_string);
-    is("$strerror_string", $! = Errno::EAGAIN);
+    $! = Errno::EAGAIN;
+    is("$strerror_string", "$!");
+  }
+}
+
+# strerror_nolen
+{
+  if (exists $!{EAGAIN}) {
+    $! = Errno::EAGAIN;
+    is(SPVM::TestCase::NativeAPI->strerror_nolen_value(Errno::EAGAIN)->to_string, "$!");
+  }
+}
+
+# strerror_string_nolen
+{
+  if (exists $!{EAGAIN}) {
+    my $strerror_nolen_string = SPVM::TestCase::NativeAPI->strerror_string_nolen_value(Errno::EAGAIN);
+    ok(ref $strerror_nolen_string);
+    $! = Errno::EAGAIN;
+    is("$strerror_nolen_string", "$!");
   }
 }
 
@@ -311,6 +331,8 @@ ok(SPVM::TestCase::NativeAPI->pointer_fields);
 
 ok(SPVM::TestCase::NativeAPI->get_pointer_no_need_free);
 ok(SPVM::TestCase::NativeAPI->get_pointer_length);
+
+ok(SPVM::TestCase::NativeAPI->precompile_build_methodd_source);
 
 # Clear exception
 SPVM::set_exception(undef);

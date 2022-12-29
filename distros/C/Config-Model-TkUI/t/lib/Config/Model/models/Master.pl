@@ -181,6 +181,22 @@ things.
                 },
             },
 
+            [qw/compute_av compute_bv/] => {
+                type       => 'leaf',
+                class      => 'Config::Model::Value',
+                value_type => 'integer',
+            },
+            compute_int => {
+                type       => 'leaf',
+                class      => 'Config::Model::Value',
+                value_type => 'integer',
+                compute    => {
+                    formula   => '$a + $b',
+                    variables => { a => '- compute_av', b => '- compute_bv' }
+                },
+                min => -4,
+                max => 4,
+            },
             std_id => {
                 type       => 'hash',
                 index_type => 'string',
@@ -357,7 +373,7 @@ things.
                 description =>
                   "my_plain_check_list not so helpful\n even if B<long> description 😁",
             },
-           my_ref_check_list => {
+            my_ref_check_list => {
                 type     => 'check_list',
                 refer_to => '- hash_a + ! hash_b',
             },

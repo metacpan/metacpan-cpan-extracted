@@ -1,4 +1,4 @@
-requires 'Pod::Simple', '3.06';
+requires 'Pod::Simple', '3.26';
 
 on 'test' => sub {
     requires 'JSON::PP';

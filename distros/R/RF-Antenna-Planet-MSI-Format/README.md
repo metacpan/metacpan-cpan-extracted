@@ -76,7 +76,7 @@ Writes the object's data to an antenna pattern file and returns a Path::Class fi
 
 Sets and returns the file extension to use for write method when called without any parameters.
 
-    my $suffix = $antenna->file_extension('.prn');
+    my $suffix = $antenna->file_extension('.ant');
 
 Default: .msi
 
@@ -175,12 +175,33 @@ Sets and returns the antenna gain string as displayed in file (dBd is the defaul
 
 Attempts to read and parse the string header value and return the gain as a number in the requested unit of measure.
 
+## tilt
+
+Antenna tilt string as displayed in file.
+
+    my $tilt = $antenna->tilt;
+    $antenna->tilt("MECHANICAL");
+    $antenna->tilt("ELECTRICAL");
+
 ## electrical\_tilt
 
 Antenna electrical\_tilt string as displayed in file.
 
     my $electrical_tilt = $antenna->electrical_tilt;
-    $antenna->electrical_tilt("MECHINICAL");
+    $antenna->electrical_tilt("4"); #4-degree downtilt
+
+## electrical\_tilt\_degrees
+
+Attempts to read and parse the header and return the electrical down tilt in degrees.
+
+    my $degrees = $antenna->electrical_tilt_degrees; #isa number
+
+Note: I recommend storing electrical downtilt in the TILT and ELECTRICAL\_TILT headers like this:
+
+    TILT ELECTRICAL
+    ELECTRICAL_TILT 4
+
+However, this method attempts to read as many different formats as found in the source files.
 
 ## comment
 
@@ -199,7 +220,7 @@ Format Definition from RCC: [https://web.archive.org/web/20080821041142/http://w
 
 # AUTHOR
 
-Michael R. Davis, MRDVT
+Michael R. Davis
 
 # COPYRIGHT AND LICENSE
 

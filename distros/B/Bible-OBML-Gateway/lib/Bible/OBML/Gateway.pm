@@ -13,19 +13,16 @@ use Mojo::UserAgent;
 use Mojo::URL;
 use Mojo::Util 'html_unescape';
 
-our $VERSION = '2.06'; # VERSION
+our $VERSION = '2.07'; # VERSION
 
 has translation => 'NIV';
+has reference   => Bible::Reference->new( bible => 'Protestant' );
 has url         => Mojo::URL->new('https://www.biblegateway.com/passage/');
 has ua          => sub {
     my $ua = Mojo::UserAgent->new( max_redirects => 3 );
     $ua->transactor->name( __PACKAGE__ . '/' . ( __PACKAGE__->VERSION // '2.0' ) );
     return $ua;
 };
-has reference => Bible::Reference->new(
-    bible   => 'Protestant',
-    sorting => 1,
-);
 
 sub translations ($self) {
     my $translations;
@@ -64,7 +61,9 @@ sub _retag ( $tag, $retag ) {
 }
 
 sub fetch ( $self, $reference, $translation = $self->translation ) {
-    my $runs = $self->reference->require_verse_match(0)->acronyms(0)->clear->in($reference)->as_runs;
+    my $runs = $self->reference
+        ->acronyms(0)->require_chapter_match(0)->require_book_ucfirst(0)
+        ->clear->in($reference)->as_runs;
     $reference = $runs->[0] unless ( @$runs != 1 or $runs->[0] !~ /\w\s*\d/ );
 
     my $result = $self->ua->get(
@@ -87,10 +86,11 @@ sub parse ( $self, $html ) {
 
     my $ref_display = $dom->at('div.bcv div.dropdown-display-text');
     croak('source appears to be invalid; check your inputs') unless ( $ref_display and $ref_display->text );
-    my $reference = $ref_display->text;
 
-    croak('EXB (Extended Bible) translation not supported')
-        if ( $dom->at('div.translation div.dropdown-display-text')->text eq 'Expanded Bible' );
+    my $reference   = $ref_display->text;
+    my $translation = $dom->at('div.passage-col')->attr('data-translation');
+
+    croak('EXB (Extended Bible) translation not supported') if ( $translation eq 'EXB' );
 
     my $block = $dom->at('div.passage-text div.passage-content div:first-child');
     $block->find('*[data-link]')->each( sub { delete $_->attr->{'data-link'} } );
@@ -102,6 +102,7 @@ sub parse ( $self, $html ) {
     $html =~ s`(?:&lt;)(.*?)(?:&gt;|\x{2019})`\x{2018}$1\x{2019}`g;
     $html =~ s`\\\w+``g;
     $html =~ s/(?:\.\s*){2,}\./\x{2026}/;
+    $html =~ s/\x{200a}//g;
 
     $block = Mojo::DOM->new($html)->at('div');
 
@@ -123,7 +124,7 @@ sub parse ( $self, $html ) {
         $_->strip;
     } );
 
-    $self->reference->require_verse_match(1)->acronyms(1);
+    $self->reference->acronyms(1)->require_chapter_match(1)->require_book_ucfirst(1);
 
     my $footnotes = $block->at('div.footnotes');
     if ($footnotes) {
@@ -213,7 +214,33 @@ sub parse ( $self, $html ) {
         }
     } );
 
-    $block->find('footnote, crossref')->each( sub { _retag( $_, $_->tag ) } );
+    $block->find('footnote, crossref')->each( sub {
+        _retag( $_, $_->tag );
+
+        # patch for if there's an error in the source HTML where some footnotes
+        # or crossrefs should have a space but don't
+
+        my $previous = $_;
+        $previous = $previous->previous_node while (
+            $previous and $previous->tag and
+            ( $previous->tag eq 'crossref' or $previous->tag eq 'footnote' )
+        );
+        my $previous_char = substr( ( ($previous) ? $previous->all_text || $previous->content : '' ), -1 );
+
+        my $next = $_;
+        $next = $next->next_node while (
+            $next and $next->tag and
+            ( $next->tag eq 'crossref' or $next->tag eq 'footnote' )
+        );
+        my $next_char = substr( ( ($next) ? $next->all_text || $next->content : '' ), 0, 1 );
+
+        $_->append(' ') if (
+            length $previous_char and
+            length $next_char and
+            $previous_char =~ /[:;,\w\!\.\?]/ and
+            $next_char =~ /\w/
+        );
+    } );
 
     _retag( $block, 'obml' );
     $block->child_nodes->first->prepend( $block->new_tag( 'reference', $reference ) );
@@ -316,8 +343,14 @@ sub parse ( $self, $html ) {
 
     $block->find('div, span, u, sup, bk, verse, start-chapter')->each('strip');
 
+    $_->each('strip') while ( $_ = $block->find('i > i') and $_->size );
+
     $html = html_unescape( $block->to_string );
-    $html =~ s/<p>[ ]+/<p>/g;
+
+    $html =~ s/<p>[ ]+/<p>/g;          # remove spaces immediately after a "<p>"
+    $html =~ s/,([A-z]|<i>)/, $1/g;    # fix missing spaces after commas (error in source HTML)
+    $html =~ s/([A-z])(<i>)/$1 $2/g;   # fix missing spaces before <i> (error in source HTML)
+    $html =~ s/([a-z])([A-Z])/$1 $2/g; # fix missing spaces from collapsed words (error in source HTML)
 
     return $html;
 }
@@ -340,7 +373,7 @@ Bible::OBML::Gateway - Bible Gateway content conversion to Open Bible Markup Lan
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =for markdown [![test](https://github.com/gryphonshafer/Bible-OBML-Gateway/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bible-OBML-Gateway/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bible-OBML-Gateway/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bible-OBML-Gateway)

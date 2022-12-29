@@ -26,8 +26,8 @@ sub ScalarStringTensor {
 sub ReadBufferFromFile {
 	my ($path) = @_;
 	my $data = path($path)->slurp_raw;
-	my $buffer = AI::TensorFlow::Libtensorflow::Buffer->NewFromData(
-		$data
+	my $buffer = AI::TensorFlow::Libtensorflow::Buffer->NewFromString(
+		\$data
 	);
 }
 
@@ -43,7 +43,7 @@ sub LoadGraph {
 	$graph->ImportGraphDef( $buffer, $opts, $status );
 
 	if( $status->GetCode != AI::TensorFlow::Libtensorflow::Status::OK ) {
-		return undef;
+		return;
 	}
 
 	if( ! defined $checkpoint_prefix ) {

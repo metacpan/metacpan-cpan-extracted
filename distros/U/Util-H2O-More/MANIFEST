@@ -8,6 +8,7 @@ Makefile.PL
 README
 dist.ini
 examples/HoA.pl
+examples/a2o-o3h.pl
 lib/Util/H2O/More.pm
 t/01-basic.t
 t/02-basic.t
@@ -15,6 +16,8 @@ t/03-basic.t
 t/04-opt2h2o.t
 t/05-o2h.t
 t/06-h3o-o3h.t
+t/07-config-tiny.t
 t/lib/Bar.pm
 t/lib/Foo.pm
 t/release-kwalitee.t
+t/test.ini

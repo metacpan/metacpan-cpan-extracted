@@ -1,0 +1,158 @@
+#ifndef P5_WASM_WASMER_MEMORY
+#define P5_WASM_WASMER_MEMORY 1
+
+#include "p5_wasm_wasmer.h"
+#include "wasmer_extern.xsc"
+#include "wasmer_store.xsc"
+
+#define CROAK_MEMORY_STR_EXCESS(offset, len, buflen) \
+    croak( \
+        "offset %" IVdf " + length %" UVuf " = %" UVuf " (exceeds size=%" IVdf ")", \
+        offset, len, offset + len, buflen \
+    )
+
+SV* memory_to_sv (pTHX_ SV* creator_sv, wasm_extern_t* export_p) {
+    return extern_to_sv(aTHX_ creator_sv, export_p, MEMORY_CLASS);
+}
+
+wasm_limits_t memory_limits (pTHX_ extern_holder_t* holder_p) {
+    wasm_extern_t* extern_p = holder_p->extern_p;
+    wasm_memory_t* memory = wasm_extern_as_memory(extern_p);
+
+    own wasm_memorytype_t* memtype = wasm_memory_type(memory);
+    wasm_limits_t limits = *(wasm_memorytype_limits(memtype));
+    wasm_memorytype_delete(memtype);
+
+    return limits;
+}
+
+static inline void memory_set (pTHX_ extern_holder_t* holder_p, SV* replacement_sv, SV* offset_sv) {
+    wasm_extern_t* extern_p = holder_p->extern_p;
+    wasm_memory_t* memory = wasm_extern_as_memory(extern_p);
+
+    STRLEN replen;
+    char *replacement = SvPVbyte(replacement_sv, replen);
+
+    UV buflen = wasm_memory_data_size(memory);
+
+    IV offset = offset_sv && SvOK(offset_sv) ? grok_iv(aTHX_ offset_sv) : 0;
+
+    if (offset < 0) {
+        offset += buflen;
+    }
+
+    IV end_offset = offset + replen;
+
+    if (end_offset > buflen) {
+        CROAK_MEMORY_STR_EXCESS(offset, replen, buflen);
+    }
+
+    char *buf = wasm_memory_data(memory);
+
+    Copy(replacement, buf + offset, replen, void);
+}
+
+static inline void memory_grow (pTHX_ extern_holder_t* holder_p, SV* delta_sv) {
+    U32 delta = grok_u32(aTHX_ delta_sv);
+
+    wasm_extern_t* extern_p = holder_p->extern_p;
+    wasm_memory_t* memory = wasm_extern_as_memory(extern_p);
+
+    bool ok = wasm_memory_grow(memory, delta);
+
+    if (!ok) {
+        wasm_limits_t limits = memory_limits(aTHX_ holder_p);
+
+        _croak_wasmer_error("Failed to grow memory by %u (min=%u, max=%u)", delta, limits.min, limits.max);
+    }
+}
+
+static inline SV* memory_get (pTHX_ extern_holder_t* holder_p, SV* offset_sv, SV* length_sv) {
+    wasm_extern_t* extern_p = holder_p->extern_p;
+    wasm_memory_t* memory = wasm_extern_as_memory(extern_p);
+
+    char *buf = wasm_memory_data(memory);
+
+    UV buflen = wasm_memory_data_size(memory);
+
+    SV* retval;
+
+    if (offset_sv && SvOK(offset_sv)) {
+        IV offset = grok_iv(aTHX_ offset_sv);
+
+        if (offset < 0) {
+            offset += buflen;
+        }
+        else if (offset >= buflen) {
+            croak(
+                "offset %" IVdf " exceeds size=%" UVuf,
+                offset,
+                buflen
+            );
+        }
+
+        UV len;
+
+        if (length_sv) {
+            len = grok_uv(aTHX_ length_sv);
+        }
+        else {
+            len = buflen - offset;
+        }
+
+        UV end_offset = offset + len;
+
+        if (end_offset > buflen) {
+            CROAK_MEMORY_STR_EXCESS(offset, len, buflen);
+        }
+
+        retval = newSVpvn(buf + offset, len);
+    }
+    else if (length_sv) {
+        croak("Offset required if length given!");
+    }
+    else {
+        retval = newSVpvn(buf, buflen);
+    }
+
+    return retval;
+}
+
+// ----------------------------------------------------------------------
+
+SV* new_memory_import_sv(pTHX_ SV* store_sv, wasm_limits_t* limits_p) {
+    own wasm_memorytype_t* memtype = wasm_memorytype_new(limits_p);
+
+    store_holder_t* s_holder = svrv_to_ptr(aTHX_ store_sv);
+
+    wasm_memory_t* memory = wasm_memory_new(s_holder->store, memtype);
+
+    wasm_memorytype_delete(memtype);
+
+    //fprintf(stderr, "min: %u; max: %u\n", limits_p->min, limits_p->max);
+
+    if (!memory) {
+        _croak_wasmer_error(
+            "Failed to create a memory (initial=%u, maximum=%u)",
+            limits_p->min,
+            limits_p->max
+        );
+    }
+
+    return memory_to_sv(aTHX_
+        store_sv,
+        wasm_memory_as_extern(memory)
+    );
+}
+
+static inline usize memory_sv_size (pTHX_ SV* self_sv) {
+    extern_holder_t* holder_p = svrv_to_ptr(aTHX_ self_sv);
+
+    return wasm_memory_size( wasm_extern_as_memory(holder_p->extern_p) );
+}
+
+static inline void destroy_memory_sv (pTHX_ SV* self_sv) {
+    destroy_global_sv(aTHX_ self_sv);
+}
+
+#endif

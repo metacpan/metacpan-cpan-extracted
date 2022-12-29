@@ -57,8 +57,8 @@ requires:
   IO::File: '0'
   JSON: '0'
   MIME::Base64: '3.15'
-  Module::Generic: v0.23.0
-  Nice::Try: v1.2.0
+  Module::Generic: v0.29.3
+  Nice::Try: v1.3.1
   Regexp::Common: '0'
   Scalar::Util: '0'
   URI: '0'
@@ -73,5 +73,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Net-API-REST/issues
   repository: https://gitlab.com/jackdeguest/Net-API-REST
-version: v0.6.3
+version: v0.7.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

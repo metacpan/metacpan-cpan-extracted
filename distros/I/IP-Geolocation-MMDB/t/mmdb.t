@@ -19,44 +19,49 @@ my $expected_version = Alien::libmaxminddb->version;
 
 # Check if the module was linked against the wrong library version.
 if ($version ne $expected_version) {
-  plan skip_all => "Error: wrong libmaxminddb version, got $version, expected $expected_version";
+    plan skip_all => "Error: wrong libmaxminddb version, got $version, "
+        . "expected $expected_version";
 }
 
 diag 'libmaxminddb version is ' . $version;
 
 ok !eval { IP::Geolocation::MMDB->new },
-  'constructor without "file" parameter dies';
+    'constructor without "file" parameter dies';
 
 ok !eval { IP::Geolocation::MMDB->new(file => 'nonexistent') },
-  'constructor with non-existing file dies';
+    'constructor with non-existing file dies';
 
 my $file = catfile(qw(t data Test-City.mmdb));
 
 # Ensure that the module is subclassable by using an empty subclass.
-@IP::Geolocation::MMDB::Subclass::ISA = qw(IP::Geolocation::MMDB);
+@MaxMind::DB::Reader::ISA = qw(IP::Geolocation::MMDB);
 
-my $mmdb = new_ok 'IP::Geolocation::MMDB::Subclass' => [file => $file];
+my $reader = new_ok 'MaxMind::DB::Reader' => [file => $file];
 
-can_ok $mmdb, qw(getcc record_for_address iterate_search_tree metadata);
+can_ok $reader,
+    qw(getcc record_for_address iterate_search_tree metadata file);
 
-ok !eval { $mmdb->record_for_address('-1') },
-  'invalid ip address throws exception';
+is $reader->file, $file, 'file matches';
 
-ok !$mmdb->record_for_address('127.0.0.1'), 'no data for localhost';
+ok !eval { $reader->record_for_address('-1') },
+    'invalid ip address throws exception';
+
+ok !$reader->record_for_address('127.0.0.1'), 'no data for localhost';
 
 my $uint64  = Math::BigInt->new('4702394921427289928');
 my $uint128 = Math::BigInt->new('86743875649080753100636639643044826960');
 
-my $r = $mmdb->record_for_address('176.9.54.163');
+my $r = $reader->record_for_address('176.9.54.163');
 isa_ok $r, 'HASH';
-is $mmdb->getcc('176.9.54.163'), 'DE', 'IPv4 address is in Germany';
+is $reader->getcc('176.9.54.163'), 'DE', 'IPv4 address is in Germany';
 
 SKIP:
 {
-  skip 'IPv6 tests on Windows', 2 if $^O eq 'MSWin32';
+    skip 'IPv6 tests on Windows', 2 if $^O eq 'MSWin32';
 
-  isa_ok $mmdb->record_for_address('2a01:4f8:150:74ab::2'), 'HASH';
-  is $mmdb->getcc('2a01:4f8:150:74ab::2'), 'DE', 'IPv6 address is in Germany';
+    isa_ok $reader->record_for_address('2a01:4f8:150:74ab::2'), 'HASH';
+    is $reader->getcc('2a01:4f8:150:74ab::2'), 'DE',
+        'IPv6 address is in Germany';
 }
 
 is_deeply $r->{x_array}, [-1, 0, 1], 'array matches';
@@ -72,11 +77,10 @@ is $r->{x_uint64},      $uint64,        'uint64 matches';
 is $r->{x_uint128},     $uint128,       'uint128 matches';
 is $r->{x_utf8_string}, 'Фалькенштайн', 'utf8_string matches';
 
-my $m = $mmdb->metadata;
-isa_ok $m, 'IP::Geolocation::MMDB::Metadata';
+my $m = $reader->metadata;
 can_ok $m, qw(
-  binary_format_major_version binary_format_minor_version build_epoch
-  database_type languages description ip_version node_count record_size
+    binary_format_major_version binary_format_minor_version build_epoch
+    database_type languages description ip_version node_count record_size
 );
 cmp_ok $m->binary_format_major_version, '>=', 0, 'major version is set';
 cmp_ok $m->binary_format_minor_version, '>=', 0, 'minor version is set';
@@ -91,25 +95,25 @@ cmp_ok $m->record_size, '>=', 0, 'record_size is set';
 my %data_for;
 
 sub data_callback {
-  my ($numeric_ip, $prefix_length, $data) = @_;
+    my ($numeric_ip, $prefix_length, $data) = @_;
 
-  my $address = $numeric_ip->as_hex . '/' . $prefix_length;
-  $data_for{$address} = $data;
+    my $address = $numeric_ip->as_hex . '/' . $prefix_length;
+    $data_for{$address} = $data;
 
-  return;
+    return;
 }
 
 my %children_for;
 
 sub node_callback {
-  my ($node_number, $left_node_number, $right_node_number) = @_;
+    my ($node_number, $left_node_number, $right_node_number) = @_;
 
-  $children_for{$node_number} = [$left_node_number, $right_node_number];
+    $children_for{$node_number} = [$left_node_number, $right_node_number];
 
-  return;
+    return;
 }
 
-$mmdb->iterate_search_tree(\&data_callback, \&node_callback);
+$reader->iterate_search_tree(\&data_callback, \&node_callback);
 
 cmp_ok scalar keys %data_for,     '>', 0, 'data_callback was called';
 cmp_ok scalar keys %children_for, '>', 0, 'node_callback was called';

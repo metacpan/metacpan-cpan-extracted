@@ -36,7 +36,7 @@ The current scope of these packages is network attached power outlets. I started
 
 ### Home Assistant
 
-Integration with Home Assistant [https://home-assistant.io/](https://home-assistant.io/) can be acomplished by configuring a Command Line Switch. 
+Integration with Home Assistant [https://home-assistant.io/](https://home-assistant.io/) can be accomplished by configuring a Command Line Switch. 
 
     switch:
       - platform: command_line
@@ -51,9 +51,9 @@ See [https://home-assistant.io/components/switch.command\_line/](https://home-as
 
 ### Node Red
 
-Integration with Node Red [https://nodered.org/](https://nodered.org/) can be acomplished with the included JSON web API power-outlet-json.cgi.  The power-outlet-json.cgi script is a layer on top of [Power::Outlet::Config](https://metacpan.org/pod/Power::Outlet::Config) where the "name" parameter maps to the section in the /etc/power-outlet.ini INI file.
+Integration with Node Red [https://nodered.org/](https://nodered.org/) can be accomplished with the included JSON web API power-outlet-json.cgi.  The power-outlet-json.cgi script is a layer on top of [Power::Outlet::Config](https://metacpan.org/pod/Power::Outlet::Config) where the "name" parameter maps to the section in the /etc/power-outlet.ini INI file.
 
-To acces all of these devices use an http request node with a URL https://127.0.0.1/cgi-bin/power-outlet-json.cgi?name={{topic}};action={{payload}} then simply set the topic to the INI section and the action to either ON or OFF.
+To access all of these devices use an http request node with a URL https://127.0.0.1/cgi-bin/power-outlet-json.cgi?name={{topic}};action={{payload}} then simply set the topic to the INI section and the action to either ON or OFF.
 
 ## USAGE
 
@@ -187,6 +187,143 @@ This program is free software; you can redistribute it and/or modify it under th
 The full text of the license can be found in the LICENSE file included with this module.
 
 ## SEE ALSO
+
+# File: lib/Power/Outlet/Dingtian.pm
+
+## NAME
+
+Power::Outlet::Dingtian - Control and query Dingtian Relay Boards via the HTTP API
+
+## SYNOPSIS
+
+    my $outlet = Power::Outlet::Dingtian->new(host => "my_host", relay => "1");
+    print $outlet->query, "\n";
+    print $outlet->on, "\n";
+    print $outlet->off, "\n";
+
+## DESCRIPTION
+
+Power::Outlet::Dingtian is a package for controlling and querying a relay on Dingtian hardware via the HTTP API.
+
+Example commands can be executed via web (HTTP) GET requests, for example:
+
+Relay Status URL Example
+
+    http://192.168.1.100/relay_cgi_load.cgi
+
+Relay 1 on example (relays are named one-based but the api uses a zero-based index)
+
+    http://192.168.1.100/relay_cgi.cgi?type=0&relay=0&on=1&time=0&pwd=0&
+
+Relay 2 off example
+
+    http://192.168.1.100/relay_cgi.cgi?type=0&relay=1&on=0&time=0&pwd=0&
+
+Relay 2 cycle off-on-off example (note: time in 100ms increments)
+
+    http://192.168.1.100/relay_cgi.cgi?type=1&relay=1&on=1&time=100&pwd=0&
+
+I have tested this package against the Dingtian DT-R002 V3.6A with V3.1.276A firmware configured for both HTTP and HTTPS.
+
+## USAGE
+
+    use Power::Outlet::Dingtian;
+    my $relay = Power::Outlet::Dingtian->new(host=>"my_host", relay=>"1");
+    print $relay->on, "\n";
+
+## CONSTRUCTOR
+
+### new
+
+    my $outlet = Power::Outlet->new(type=>"Dingtian", host=>"my_host", relay=>"1");
+    my $outlet = Power::Outlet::Dingtian->new(host=>"my_host", relay=>"1");
+
+## PROPERTIES
+
+### relay
+
+Dingtian API supports up to 32 relays numbered 1 to 32.
+
+Default: 1
+
+Note: The relays are numbered 1-32 but the api uses a zero based index.
+
+### pwd
+
+Sets and returns the ID token used for authentication with the Dingtian hardware
+
+Default: "0"
+
+Can be set in the Relay Password property in the Other section on the Relay Connect screen.
+
+### host
+
+Sets and returns the hostname or IP address.
+
+Default: 192.168.1.100
+
+### port
+
+Sets and returns the port number.
+
+Default: 80
+
+Can be set in the HTTP Server Port property on the Setting screen.
+
+### http\_scheme
+
+Sets and returns the http scheme (i.e. protocol) (e.g. http or https).
+
+Default: http
+
+Can be set in the HTTP or HTTPS property on the Setting screen
+
+## METHODS
+
+### name
+
+Sets and returns the friendly name for this relay.
+
+### query
+
+Sends an HTTP message to the device to query the current state
+
+### on
+
+Sends a message to the device to Turn Power ON
+
+### off
+
+Sends a message to the device to Turn Power OFF
+
+### switch
+
+Sends a message to the device to toggle the power
+
+### cycle
+
+Sends messages to the device to Cycle Power (ON-OFF-ON or OFF-ON-OFF).
+
+## BUGS
+
+Please open an issue on GitHub.
+
+## AUTHOR
+
+    Michael R. Davis
+    CPAN ID: MRDVT
+
+## COPYRIGHT
+
+Copyright (c) 2020 Michael R. Davis
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the LICENSE file included with this module.
+
+## SEE ALSO
+
+[https://www.dingtian-tech.com/sdk/relay\_sdk.zip](https://www.dingtian-tech.com/sdk/relay_sdk.zip) => programming\_manual\_en.pdf page 12 "Protocol: HTTP GET CGI"
 
 # File: lib/Power/Outlet/Hue.pm
 
@@ -474,7 +611,7 @@ Power::Outlet::SonoffDiy - Control and query a Sonoff DIY device
 
 ## DESCRIPTION
 
-Power::Outlet::SonoffDiy is a package for controlling and querying Sonoff ESP8266 hardware running Sonoff firmware in DIY mode.  This package supports and has been tested on both the version 1.4 (firmware 3.3.0) and version 2.0 (firmare 3.6.0) of the API.
+Power::Outlet::SonoffDiy is a package for controlling and querying Sonoff ESP8266 hardware running Sonoff firmware in DIY mode.  This package supports and has been tested on both the version 1.4 (firmware 3.3.0) and version 2.0 (firmware 3.6.0) of the API.
 
 From: [https://github.com/itead/Sonoff\_Devices\_DIY\_Tools](https://github.com/itead/Sonoff_Devices_DIY_Tools)
 

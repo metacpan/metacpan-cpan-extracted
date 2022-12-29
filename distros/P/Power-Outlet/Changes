@@ -4,6 +4,9 @@ TODO
   - RE-write Net::UPnP interfaces as Net:UPnP is not good at error trapping or timeouts.
   - Update error handling for Power::Outlet::Hue->name
 
+0.47 2022-12-16
+  - Updated Tasmota.pm to remove trailing space on query url
+
 0.46 2022-10-06
   - Added lib/Power/Outlet/Dingtian.pm to support Dingtian Ethernet-based Relay Boards
   - Updated lib/Power/Outlet/Common/IP/HTTP.pm to add support for http_scheme to support https capability in Dingtian boards

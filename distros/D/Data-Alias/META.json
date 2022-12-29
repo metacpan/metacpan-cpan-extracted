@@ -54,6 +54,6 @@
          "web" : "https://github.com/mvduin/perl-Data-Alias"
       }
    },
-   "version" : "1.27",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "1.28",
+   "x_serialization_backend" : "JSON::PP version 4.12"
 }

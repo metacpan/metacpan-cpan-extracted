@@ -1,9 +1,14 @@
 #!/usr/bin/env perl
 
-use Test::Most tests => 1;
+use Test::Most;
 
 use Renard::Incunabula::Common::Setup;
-use Gtk3 -init;
+use Gtk3;
+
+plan Gtk3::init_check
+	? ( tests    => 1 )
+	: ( skip_all => 'Could not init GTK' );
+
 use Intertangle::API::Gtk3::WindowID;
 
 subtest "Get window ID" => fun() {

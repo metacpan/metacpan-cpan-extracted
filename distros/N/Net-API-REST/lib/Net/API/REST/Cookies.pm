@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## REST API Framework - ~/usr/local/src/perl/Net-API-REST/lib/Net/API/REST/Cookies.pm
-## Version v0.2.8
+## REST API Framework - ~/lib/Net/API/REST/Cookies.pm
+## Version v0.2.9
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/10/08
-## Modified 2020/12/17
+## Modified 2022/06/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,6 +17,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
+    use vars qw( $VERSION );
     use APR::Pool ();
     use APR::Request::Cookie;
     use APR::Request::Apache2;
@@ -24,8 +25,11 @@ BEGIN
     use Nice::Try;
     use Cookie::Baker ();
     use Scalar::Util;
-    our $VERSION = 'v0.2.8';
+    our $VERSION = 'v0.2.9';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -156,7 +160,7 @@ sub set
 sub _request { return( shift->request->request ); }
 
 1;
-
+# NOTE: pod
 __END__
 
 =encoding utf8
@@ -198,7 +202,7 @@ Net::API::REST::Cookies - Cookie Jar and cookie management
 
 =head1 VERSION
 
-    v0.2.8
+    v0.2.9
 
 =head1 DESCRIPTION
 

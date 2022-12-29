@@ -5,7 +5,7 @@ use base qw{Power::Outlet::Common::IP::SNMP};
 use List::MoreUtils qw{any all};
 use Time::HiRes qw{sleep};
 
-our $VERSION          = '0.46';
+our $VERSION          = '0.47';
 our $_oid_outletEntry = '1.3.6.1.4.1.1418.4.3.1'; #enterprises.dataprobe.iBootBarAgent.outletTable.outletEntry
 
 =head1 NAME

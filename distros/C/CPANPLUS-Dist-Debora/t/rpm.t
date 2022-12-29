@@ -17,7 +17,7 @@ if (tainted($ENV{PWD})) {
     plan skip_all => 'taint mode enabled';
 }
 else {
-    plan tests => 17;
+    plan tests => 16;
 }
 
 use lib 't/inc';
@@ -50,5 +50,3 @@ like $spec, qr{^ %license \h+ \S}xms,     '%license exists';
 like $spec, qr{^ %doc \h+ Changes}xms,    '%doc Changes exists';
 like $spec, qr{^ %doc \h+ README}xms,     '%doc README exists';
 like $spec, qr{[.]3pm[*] $}xms,           'manual page has wildcard suffix';
-like $spec, qr{^ Requires: \h* perl[(]:MODULE_COMPAT_[\d.]+[)]}xms,
-    'MODULE_COMPAT exists';

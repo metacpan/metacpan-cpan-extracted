@@ -7,17 +7,25 @@ use Test::More;
 use Test::Refcount;
 
 BEGIN {
-   plan skip_all => "Future is not available"
-      unless eval { require Future };
-   plan skip_all => "Future::AsyncAwait >= 0.40 is not available"
+   plan skip_all => "Future >= 0.49 is not available"
+      unless eval { require Future;
+                    Future->VERSION( '0.49' ) };
+   plan skip_all => "Future::AsyncAwait >= 0.45 is not available"
       unless eval { require Future::AsyncAwait;
-                    Future::AsyncAwait->VERSION( '0.40' ) };
-   plan skip_all => "Object::Pad >= 0.15 is not available"
+                    Future::AsyncAwait->VERSION( '0.45' ) };
+   plan skip_all => "Object::Pad >= 0.73 is not available"
       unless eval { require Object::Pad;
-                    Object::Pad->VERSION( '0.15' ) };
+                    Object::Pad->VERSION( '0.73' ) };
+
+   # If Future::XS is installed, then check it's at least 0.08; earlier
+   # versions will crash
+   if( eval { require Future::XS } ) {
+      plan skip_all => "Future::XS is installed but it is older than 0.08"
+         unless eval { Future::AsyncAwait->VERSION( '0.08' ); };
+   }
 
    Future::AsyncAwait->import;
-   Object::Pad->import;
+   Object::Pad->import( ':experimental(init_expr)' );
 
    diag( "Future::AsyncAwait $Future::AsyncAwait::VERSION, " .
          "Object::Pad $Object::Pad::VERSION" );
@@ -26,7 +34,7 @@ BEGIN {
 # async method
 {
    class Thunker {
-      has $_times_thunked = 0;
+      field $_times_thunked = 0;
 
       method count { $_times_thunked }
 
@@ -66,6 +74,24 @@ BEGIN {
       die "Oopsie\n";
    };
    ok( 1, "No segfault for RT133564 test" );
+}
+
+# RT137649
+{
+   my $waitf;
+
+   role Role { async method m { await $waitf = Future->new } }
+   class Class :does(Role) {}
+
+   my $obj = Class->new;
+
+   my $f1 = $obj->m;
+   $waitf->done( "first" );
+   is( await $f1, "first", 'First call OK' );
+
+   my $f2 = $obj->m;
+   $waitf->done( "second" );
+   is( await $f2, "second", 'Second call OK' );
 }
 
 done_testing;

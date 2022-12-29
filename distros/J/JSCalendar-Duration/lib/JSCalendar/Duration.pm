@@ -1,6 +1,6 @@
-package JSCalendar::Duration;
+package JSCalendar::Duration 0.003;
 # ABSTRACT: Convert seconds to JSCalendar durations and back
-$JSCalendar::Duration::VERSION = '0.002';
+
 use strict;
 use warnings;
 
@@ -25,8 +25,18 @@ sub duration_to_seconds {
 
   my $seconds = 0;
 
+  if ($toparse =~ /\P{ASCII}/) {
+    croak("Invalid duration '$input', must be entirely ASCII");
+  }
+
   unless ($toparse =~ s/^P//) {
     croak("Invalid duration '$input', must start with 'P'");
+  }
+
+  if ($toparse =~ s/^(\d+)W\z//) {
+    # Weeks must appear on their own, no day or time component.
+    $seconds += (86400 * 7 * $1);
+    return $seconds;
   }
 
   if ($toparse =~ s/^(\d+)D//) {
@@ -89,6 +99,10 @@ sub seconds_to_duration {
     $toparse -= 86400;
   }
 
+  if ($days && $days % 7 == 0 && $toparse == 0) {
+    return 'P' . ($days/7) . "W";
+  }
+
   $durday = "${days}D" if $days;
 
   my $hours = 0;
@@ -144,7 +158,7 @@ JSCalendar::Duration - Convert seconds to JSCalendar durations and back
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -192,11 +206,21 @@ The JSCalendar duration spec.
 
 Matthew Horsfall <wolfsage@gmail.com>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Mohammad S Anwar
+=for stopwords Mohammad S Anwar Ricardo Signes
+
+=over 4
+
+=item *
 
 Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

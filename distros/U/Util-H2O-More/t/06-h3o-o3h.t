@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More q//;
-use Util::H2O::More qw/h2o o2h h3o o3h/;
+use Util::H2O::More qw/h2o o2h d2o o2d/;
 
 # for included module required for testing
 use FindBin qw/$Bin/;
@@ -57,23 +57,23 @@ my $HoA2 = {
 };
 
 h2o $HoA1;
-h3o $HoA2;
+d2o $HoA2;
 
-is_deeply o2h $HoA1, o3h $HoA2, q{HASH refs cleaned inline by h2o and h3o are identical};
+is_deeply o2h $HoA1, o2d $HoA2, q{HASH refs cleaned inline by h2o and d2o are identical};
 
-# o2h/o3h returns unblessed datastructures, but doesn't
-# affect the structure by reference, lik h2o/h3o does
+# o2h/o2d returns unblessed datastructures, but doesn't
+# affect the structure by reference, lik h2o/d2o does
 # - this is for consistency with Util::H2O
 
 $HoA1 = o2h $HoA1;
-$HoA2 = o3h $HoA2;
+$HoA2 = o2d $HoA2;
 
-is_deeply $HoA1, $HoA2, q{HASH refs purified by o2h and o3h are identical};
+is_deeply $HoA1, $HoA2, q{HASH refs purified by o2h and o2d are identical};
 
 h2o $HoA1;
-h3o $HoA2;
+d2o $HoA2;
 
-is_deeply $HoA1, $HoA2, q{h2o object is identical to h3o object};
+is_deeply $HoA1, $HoA2, q{h2o object is identical to d2o object};
 
 my $HoAoH = {
     one   => [qw/1 2 3 4 5/],
@@ -98,7 +98,7 @@ my $HoAoH = {
     },
 };
 
-h3o $HoAoH;
+d2o $HoAoH;
 
 is $HoAoH->one->[0],                       1,  q{ARRAY ref by index found via accessor};
 is $HoAoH->ten->twentyone->[0]->twentytwo, 22, q{accessor deeply contained inside of ARRAY found};
@@ -204,7 +204,7 @@ my $mixed2 = [
     undef,
 ];
 
-h3o $mixed1;
+d2o $mixed1;
 
 is ref $mixed1->[3], ref $mixed2->[3], q{CODE refs have been preserved and are unaffected};
 
@@ -214,5 +214,18 @@ my $code2 = splice @$mixed2, 3, 1;
 is $code1->(), $code2->(), q{CODE refs work};
 
 is_deeply $mixed1, $mixed2, q{Mixed array, including undef and CODE ref treated properly};
+
+# testing o2d some more
+$foo = [ qw/1 2 3 4 5/, [qw/ 6 7 8 9 /], { foo => 1, code => sub { 1 } }, sub { 2 }, ];
+
+d2o $foo;
+
+like ref $foo, qr/Util::H2O::More::__a2o/, q{setting up for testing o2d};
+
+$foo2 = o2d $foo;
+
+like ref $foo, qr/Util::H2O::More::__a2o/, q{making sure o2d doesn't effect REF, consistent with o2h};
+
+is ref $foo2, q{ARRAY}, q{making sure o2d worked on an ARRAY blessed by d2o};
 
 done_testing;

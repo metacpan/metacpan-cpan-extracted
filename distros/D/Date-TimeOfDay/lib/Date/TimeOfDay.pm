@@ -1,8 +1,5 @@
 package Date::TimeOfDay;
 
-our $DATE = '2018-12-19'; # DATE
-our $VERSION = '0.005'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -19,6 +16,11 @@ use overload (
     'eq'     => '_string_equals_overload',
     'ne'     => '_string_not_equals_overload',
 );
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-09-22'; # DATE
+our $DIST = 'Date-TimeOfDay'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 sub new {
     my $class = shift;
@@ -265,7 +267,7 @@ Date::TimeOfDay - Represent time of day (hh:mm:ss)
 
 =head1 VERSION
 
-version 0.005
+This document describes version 0.006 of Date::TimeOfDay (from Perl distribution Date-TimeOfDay), released on 2022-09-22.
 
 =head1 SYNOPSIS
 
@@ -351,6 +353,14 @@ Example:
 
  $tod->compare($tod2); # -1 if $tod is less than $tod2, 0 if equal, 1 if greater than
 
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Date-TimeOfDay>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Date-TimeOfDay>.
+
 =head1 SEE ALSO
 
 L<DateTime>
@@ -359,11 +369,37 @@ L<DateTime>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Date-TimeOfDay>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

@@ -12,12 +12,13 @@ build_requires:
   Test::Alien::Diag: '0'
   Test::More: '0'
 configure_requires:
-  Alien::Build: '1.19'
+  Alien::Build: '0.32'
   Alien::Build::MM: '0.32'
   Alien::Build::Plugin::Build::CMake: '0.99'
+  Alien::Build::Plugin::Download::GitHub: '0'
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,7 +35,7 @@ no_index:
 provides:
   Alien::OpenCV:
     file: lib/Alien/OpenCV.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Alien::Base: '0.038'
   base: '0'
@@ -45,20 +46,22 @@ resources:
   IRC: irc://irc.perl.org/#native
   homepage: https://github.com/EntropyOrg/perl-Alien-OpenCV
   repository: https://github.com/EntropyOrg/perl-Alien-OpenCV.git
-version: '0.001'
+version: '0.002'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
     share:
+      Alien::Build::Plugin::Download::Negotiate: '1.30'
       Alien::cmake3: '0.02'
-      Archive::Zip: '0'
+      Archive::Tar: '0'
       Config: '0'
       HTTP::Tiny: '0.044'
       IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
       Mojo::DOM: '0'
       Mojolicious: '7.00'
+      Mozilla::CA: '0'
       Net::SSLeay: '1.49'
-      Sort::Versions: '0'
       URI: '0'
       URI::Escape: '0'
     system: {}

@@ -97,7 +97,15 @@ only possible (and dirty!) workaround is setting the member of the internal
 hash directly.
 
 Boxes can not have visible borders in [Curses::UI](https://metacpan.org/pod/Curses%3A%3AUI) as they are currently
-"faked" and do not use a proper [Curses::UI](https://metacpan.org/pod/Curses%3A%3AUI) element.
+"faked" and do not use a proper [Curses::UI](https://metacpan.org/pod/Curses%3A%3AUI) element.  This also sometimes
+leads to a Curses interface needing slightly more space than the equivalent
+RichTerm one.  In addition [Curses::UI](https://metacpan.org/pod/Curses%3A%3AUI) has limitations concerning the
+alignment of the widgets.
+
+Running `[Main::mainloop](https://metacpan.org/pod/UI%3A%3AVarious%3A%3AMain#mainloop---main-event-loop-of-an-application)` more than once causes [Tk](https://metacpan.org/pod/Tk) to abort with sporadic (about 1
+in 9) segmentation violations in Tk's internal code.  In addition there are
+sporadic core dumps when running Tk in a virtual X11 framebuffer (Xvfb).
+Finally the calculation for automatic wrapping in Tk needs improvement.
 
 Methods, member variables, etc. starting with an underscore (`_`) are
 considered to be internal only.  Their usage and interfaces may change

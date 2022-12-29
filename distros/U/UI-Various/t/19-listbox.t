@@ -19,14 +19,14 @@ no multidimensional;
 
 use Cwd 'abs_path';
 
-use Test::More tests => 52;
+use Test::More tests => 56;
 use Test::Output;
 use Test::Warn;
 
 # define fixed environment for unit tests:
 BEGIN { delete $ENV{DISPLAY}; delete $ENV{UI}; }
 
-use UI::Various({use => [], include => [qw(Main Listbox)]});
+use UI::Various({use => [], include => [qw(Main Listbox Button Window)]});
 
 use constant T_PATH => map { s|/[^/]+$||; $_ } abs_path($0);
 do(T_PATH . '/functions/call_with_stdin.pl');
@@ -78,6 +78,10 @@ eval {   UI::Various::Listbox::add(Dummy->new(), '');   };
 like($@,
      qr/^invalid object \(Dummy\) in call to .*::Listbox::add$re_msg_tail/,
      'bad access of add fails');
+eval {   UI::Various::Listbox::modify(Dummy->new(), 0, '');   };
+like($@,
+     qr/^invalid object \(Dummy\) in call to .*::Listbox::modify$re_msg_tail/,
+     'bad access of modify fails');
 eval {   UI::Various::Listbox::remove(Dummy->new(), 0);   };
 like($@,
      qr/^invalid object \(Dummy\) in call to .*::Listbox::remove$re_msg_tail/,
@@ -107,6 +111,13 @@ stdout_is
 stderr_like(sub {   $lb0->remove('x')},
 	    qr/^parameter .* integer in call to .*::Listbox::remove$re_msg_tail/,
 	    'wrong call to remove fails');
+
+stderr_like(sub {   $lb0->modify('x', '')},
+	    qr/^parameter .* integer in call to .*::Listbox::modify$re_msg_tail/,
+	    'wrong call 1 to modify fails');
+stderr_like(sub {   $lb0->modify(0)},
+	    qr/^mandatory parameter 'value' is missing$re_msg_tail/,
+	    'wrong call 2 to modify fails');
 
 ####################################
 # test list with longer content (can be scrolled up and down):
@@ -341,7 +352,27 @@ is($counter, 4, 'counter for listbox 12-2 has correct 2nd value');
 $main->remove($lb12);
 
 ####################################
-# testing replacement of content:
+# testing beginning with empty list:
+$main->add($lb8);
+my $add42 = UI::Various::Button->new(text => 'Add 42',
+				       code => sub { $lb8->add('42'); });
+my $win;
+my $quit = UI::Various::Button->new(text => 'Quit',
+				    code => sub { $win->destroy; });
+$win = $main->window({title => '0-42'}, $lb8, $add42, $quit);
+my $output_part2 =
+    "<2> [ Add 42 ]\n<3> [ Quit ]\n<0> leave window\n\n" .
+    '----- enter number to choose next step: ';
+stdout_is
+{   _call_with_stdin("2\n3\n", sub { $main->mainloop; });   }
+    "========== 0-42\n      0/0\n\n\n\n\n\n" .
+    $output_part2 . "2\n" .
+    "========== 0-42\n<1>   1-1/1\n      42\n\n\n\n\n" .
+    $output_part2 . "3\n",
+    'start with empty list prints correct output';
+
+####################################
+# testing replacement / modification of content:
 my @text_r_a = ('entry #1', 'entry #2');
 my @text_r_b = ('1st entry', '2nd entry', '3rd entry', 'on next page and long');
 my @text_r_c = ();
@@ -351,8 +382,12 @@ $lb_r = UI::Various::Listbox->new(texts => \@text_r_a,
 				  height => 3, selection => 1,
 				  on_select => sub{
 				      if ($next == 1)
-				      {   $lb_r->replace(@text_r_b);   }
+				      {   $lb_r->modify(2, 'out of range');   }
 				      elsif ($next == 2)
+				      {   $lb_r->modify(1, 'entry #-1');   }
+				      elsif ($next == 3)
+				      {   $lb_r->replace(@text_r_b);   }
+				      elsif ($next == 4)
 				      {   $lb_r->replace(@text_r_c);   }
 				      $next++;
 				  });
@@ -361,8 +396,12 @@ $main->add($lb_r);			# now we have a maximum width
 $main->width(undef);			# trigger different width computation
 
 stdout_is
-{   _call_with_stdin("1\n1\n0\n", sub { $lb_r->_process(); });   }
+{   _call_with_stdin("1\n1\n1\n1\n0\n", sub { $lb_r->_process(); });   }
     "      1-2/2\n<1>   entry #1\n<2>   entry #2\n\n" .
+    $output_select0 . "1\n" .
+    "      1-2/2\n<1> * entry #1\n<2>   entry #2\n\n" .
+    $output_select0 . "1\n" .
+    "      1-2/2\n<1>   entry #1\n<2>   entry #-1\n\n" .
     $output_select0 . "1\n" .
     "<+/-> 1-3/4\n<1>   1st entry\n<2>   2nd entry\n<3>   3rd entry\n" .
     $output_select1 . "1\n" .
@@ -370,8 +409,9 @@ stdout_is
     $output_select0 . "0\n",
     '_process 10 prints correct output for listbox R';
 
-is_deeply(\@text_r_a, ['entry #1', 'entry #2'],
-	  'original external array is not modified by replace');
+is_deeply
+    (\@text_r_a, ['entry #1', 'entry #-1'],
+     'original external array has been modified by modify and not by replace');
 
 ####################################
 # triggering remaining missing coverage in base::_cut:

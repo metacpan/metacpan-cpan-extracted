@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.34';
+our $VERSION = '0.37';
 
 use UI::Various::core;
 use UI::Various::Text;
@@ -91,10 +91,16 @@ sub _prepare($$$)
 	error('_1_element_must_be_accompanied_by_parent', __PACKAGE__);
 	return 1;
     }
+    my @attributes = (-width => $self->width);
+    if (defined $self->{align})
+    {
+	push(@attributes, '-textalignment',
+	     (qw(right left middle))[$self->{align} % 3]);
+    }
     $self->_cui($_->_cui
 		->add($self->_cid,
 		      'Label', -x => $column, -y => $row,
-		      -width => $self->width,
+		      @attributes,
 		      -text => $self->text));
     return 0;
 }

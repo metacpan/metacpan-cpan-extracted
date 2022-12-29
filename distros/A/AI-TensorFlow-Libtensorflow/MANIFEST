@@ -14,6 +14,8 @@ lib/AI/TensorFlow/Libtensorflow/ApiDefMap.pm
 lib/AI/TensorFlow/Libtensorflow/Buffer.pm
 lib/AI/TensorFlow/Libtensorflow/DataType.pm
 lib/AI/TensorFlow/Libtensorflow/DeviceList.pm
+lib/AI/TensorFlow/Libtensorflow/Eager/Context.pm
+lib/AI/TensorFlow/Libtensorflow/Eager/ContextOptions.pm
 lib/AI/TensorFlow/Libtensorflow/Graph.pm
 lib/AI/TensorFlow/Libtensorflow/ImportGraphDefOptions.pm
 lib/AI/TensorFlow/Libtensorflow/ImportGraphDefResults.pm
@@ -28,12 +30,14 @@ lib/AI/TensorFlow/Libtensorflow/Lib/FFIType/Variant/RecordArrayRef.pm
 lib/AI/TensorFlow/Libtensorflow/Lib/Types.pm
 lib/AI/TensorFlow/Libtensorflow/Lib/_Alloc.pm
 lib/AI/TensorFlow/Libtensorflow/Manual/CAPI.pod
+lib/AI/TensorFlow/Libtensorflow/Manual/InferenceUsingTFHubMobileNetV2Model.pod
 lib/AI/TensorFlow/Libtensorflow/Operation.pm
 lib/AI/TensorFlow/Libtensorflow/OperationDescription.pm
 lib/AI/TensorFlow/Libtensorflow/Output.pm
 lib/AI/TensorFlow/Libtensorflow/Session.pm
 lib/AI/TensorFlow/Libtensorflow/SessionOptions.pm
 lib/AI/TensorFlow/Libtensorflow/Status.pm
+lib/AI/TensorFlow/Libtensorflow/TFLibrary.pm
 lib/AI/TensorFlow/Libtensorflow/TString.pm
 lib/AI/TensorFlow/Libtensorflow/Tensor.pm
 lib/AI/TensorFlow/Libtensorflow/_Misc.pm
@@ -43,6 +47,8 @@ maint/inc/Pod/Elemental/Transformer/TF_CAPI.pm
 maint/inc/Pod/Elemental/Transformer/TF_Sig.pm
 maint/inc/PreloadPodWeaver.pm
 maint/process-capi.pl
+maint/process-notebook.sh
+perlcritic.rc
 t/01_hello_tf.t
 t/02_load_graph.t
 t/03_create_tftensor.t
@@ -99,5 +105,6 @@ t/upstream/tensorflow/cc/saved_model/testdata/half_plus_two/00000123/saved_model
 t/upstream/tensorflow/cc/saved_model/testdata/half_plus_two/00000123/variables/variables.data-00000-of-00001
 t/upstream/tensorflow/cc/saved_model/testdata/half_plus_two/00000123/variables/variables.index
 weaver.ini
+xt/author/critic.t
 xt/author/pod-linkcheck.t
 xt/author/pod-snippets.t

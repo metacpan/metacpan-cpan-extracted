@@ -33,15 +33,20 @@
             "B::Hooks::EndOfScope" : "0",
             "Carp" : "0",
             "DBIx::Class::Core" : "0",
+            "Data::Dumper" : "0",
             "Exporter::Extensible" : "0.08",
+            "List::Util" : "0",
+            "namespace::clean" : "0",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Data::Dumper" : "0",
-            "Test2::V0" : "0"
+            "DBIx::Class::Schema::Loader::DBI::SQLite" : "0",
+            "File::Temp" : "0",
+            "Test2::V0" : "0",
+            "parent" : "0"
          }
       }
    },
@@ -56,7 +61,7 @@
          "web" : "https://github.com/nrdvana/perl-DBIx-Class-ResultDDL"
       }
    },
-   "version" : "2.00",
+   "version" : "2.01",
    "x_contributors" : [
       "Veesh Goldman <rabbiveesh@gmail.com>"
    ],

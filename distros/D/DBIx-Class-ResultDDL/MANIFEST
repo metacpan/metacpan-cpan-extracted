@@ -6,8 +6,10 @@ META.json
 META.yml
 Makefile.PL
 README
+cpanfile
 dist.ini
 lib/DBIx/Class/ResultDDL.pm
+lib/DBIx/Class/ResultDDL/SchemaLoaderMixin.pm
 lib/DBIx/Class/ResultDDL/V0.pm
 lib/DBIx/Class/ResultDDL/V1.pm
 t/01-compile.t
@@ -17,6 +19,7 @@ t/04-relation-sugar.t
 t/05-constraint-sugar.t
 t/06-sqlt-deploy-sugar.t
 t/07-view-sugar.t
+t/10-schema-loader-mixin.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 weaver.ini

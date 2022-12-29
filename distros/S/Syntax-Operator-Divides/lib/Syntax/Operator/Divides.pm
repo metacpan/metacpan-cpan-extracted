@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
-package Syntax::Operator::Divides 0.02;
+package Syntax::Operator::Divides 0.03;
 
 use v5.14;
 use warnings;
@@ -19,7 +19,7 @@ C<Syntax::Operator::Divides> - an infix operator for division test
 
 =head1 SYNOPSIS
 
-On a suitably-patched perl:
+On a suitable perl version:
 
    use Syntax::Operator::Divides;
 
@@ -46,14 +46,14 @@ This module provides an infix operator that implements an integer divides test
 which returns true if the lefthand operand is a whole multiple of the
 righthand.
 
-Current versions of perl do not directly support custom infix operators. The
-documentation of L<XS::Parse::Infix> describes the situation, with reference
-to a branch experimenting with this new feature. This module is therefore
-I<almost> entirely useless on standard perl builds. While the regular parser
-does not support custom infix operators, they are supported via
-C<XS::Parse::Infix> and hence L<XS::Parse::Keyword>, and so custom keywords
-which attempt to parse operator syntax may be able to use it. One such module
-is L<Syntax::Keyword::Match>; see the SYNOPSIS example given above.
+Current stable versions of perl do not directly support custom infix
+operators, but the ability was added in the 5.37.x development cycle and is
+available from perl v5.37.7 onwards. The documentation of L<XS::Parse::Infix>
+describes the situation in more detail. This module is therefore I<almost>
+entirely useless on stable perl builds. While the regular parser does not
+support custom infix operators, they are supported via C<XS::Parse::Infix> and
+hence L<XS::Parse::Keyword>, and so custom keywords which attempt to parse
+operator syntax may be able to use it.
 
 =cut
 

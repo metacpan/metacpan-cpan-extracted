@@ -12,7 +12,7 @@ $inc =~ s/"//g;
 my @incs = ($inc, @{$Prima::Config::Config{incpaths}});
 
 # Explicitly set the version here; all .pm.PL files will use this:
-my $version = '0.14';
+my $version = '0.15';
 
 my $build = Module::Build->new(
 	module_name => 'PDL::Drawing::Prima',
@@ -40,18 +40,8 @@ my $build = Module::Build->new(
 	include_dirs => \@incs,
 	meta_merge => {
 		resources => {
-			repository
-				=> 'http://github.com/run4flat/PDL-Drawing-Prima',
-#				=> {
-#					web => 'http://github.com/run4flat/PDL-Drawing-Prima',
-#					url => 'git://github.com/run4flat/PDL-Drawing-Prima.git',
-#					type => 'git',
-#				},
-			bugtracker
-				=> 'http://github.com/run4flat/PDL-Drawing-Prima/issues',
-#				=> {
-#					web => 'http://github.com/run4flat/PDL-Drawing-Prima/issues',
-#				},
+			repository => 'http://github.com/dk/PDL-Drawing-Prima',
+			bugtracker => 'http://github.com/dk/PDL-Drawing-Prima/issues',
 		},
 		provides => {
 			'PDL::Drawing::Prima' => {

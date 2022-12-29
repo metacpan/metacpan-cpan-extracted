@@ -9,7 +9,7 @@
 #
 # copyright at the end of the file in the pod section
 
-package Config::Model::TkUI 1.375;
+package Config::Model::TkUI 1.376;
 
 use 5.10.1;
 use strict;
@@ -1144,10 +1144,10 @@ sub disp_leaf {
     my $tkt   = $cw->{tktree};
 
     my $img;
-    if (!!$leaf_object->error_msg) {
+    if ($leaf_object->has_error) {
         $img = $error_img;
     }
-    elsif (!!$leaf_object->warning_msg) {
+    elsif ($leaf_object->has_warning) {
         $img = $warn_img;
     }
     elsif ($leaf_object->has_data) {

@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Session;
 # ABSTRACT: Session for driving ::Graph execution
-$AI::TensorFlow::Libtensorflow::Session::VERSION = '0.0.3';
+$AI::TensorFlow::Libtensorflow::Session::VERSION = '0.0.4';
 use strict;
 use warnings;
 use namespace::autoclean;
@@ -165,7 +165,7 @@ $ffi->attach([ 'SessionPRunSetup' => 'PRunSetup' ] => [
 		$status,
 	);
 
-	return undef unless defined $handle;
+	return unless defined $handle;
 
 	window( my $handle_window, $handle );
 

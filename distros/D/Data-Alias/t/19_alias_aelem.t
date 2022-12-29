@@ -3,7 +3,7 @@
 use strict;
 use warnings qw( FATAL all NONFATAL void );
 use lib 'lib';
-use Test::More tests => 37;
+use Test::More tests => 43;
 
 use Data::Alias;
 
@@ -14,6 +14,9 @@ is \alias($x[0] = $x[1]), \$x[1];
 is \$x[0], \$x[1];
 is \alias($x[0] = $x[2]), \$x[2];
 is \$x[0], \$x[2];
+is \alias($x[-3] = $x[1]), \$x[1];
+is 0+@x, 3;
+is \$x[0], \$x[1];
 isnt \$x[1], \$x[2];
 
 is \alias($x[0] ||= $T), \$T;
@@ -37,6 +40,9 @@ is \alias($y[0] = $y[1]), \$y[1];
 is \$y[0], \$y[1];
 is \alias($y[0] = $y[2]), \$y[2];
 is \$y[0], \$y[2];
+is \alias($y[-3] = $y[1]), \$y[1];
+is 0+@y, 3;
+is \$y[0], \$y[1];
 isnt \$y[1], \$y[2];
 
 is \alias($y[0] ||= $T), \$T;

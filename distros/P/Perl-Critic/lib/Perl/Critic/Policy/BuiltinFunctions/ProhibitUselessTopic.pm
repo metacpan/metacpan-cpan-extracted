@@ -4,10 +4,10 @@ use strict;
 use warnings;
 use Readonly;
 
-use Perl::Critic::Utils qw{ :severities :classification :ppi };
+use Perl::Critic::Utils qw{ :severities :classification :ppi hashify };
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.144';
+our $VERSION = '1.146';
 
 ## no critic ( ValuesAndExpressions::RequireInterpolationOfMetachars )
 ## The numerous $_ variables make false positives.
@@ -21,10 +21,10 @@ sub default_severity     { return $SEVERITY_LOW }
 sub default_themes       { return qw( core ) }
 sub applies_to           { return 'PPI::Token::Operator', 'PPI::Token::Word' }
 
-my @filetest_operators = qw( -r -w -x -o -R -W -X -O -e -z -s -f -d -l -p -S -b -c -u -g -k -T -B -M -A -C );
-my %filetest_operators = map { ($_ => 1) } @filetest_operators;
+Readonly::Array my @FILETEST_OPERATORS => qw( -r -w -x -o -R -W -X -O -e -z -s -f -d -l -p -S -b -c -u -g -k -T -B -M -A -C );
+Readonly::Hash my %FILETEST_OPERATORS => hashify( @FILETEST_OPERATORS );
 
-my @topical_funcs = qw(
+Readonly::Array my @TOPICAL_FUNCS => qw(
     abs alarm
     chomp chop chr chroot cos
     defined
@@ -42,19 +42,19 @@ my @topical_funcs = qw(
     say sin split sqrt stat study
     uc ucfirst unlink unpack
 );
-my %topical_funcs = map { ($_ => 1) } @topical_funcs;
+Readonly::Hash my %TOPICAL_FUNCS => hashify( @TOPICAL_FUNCS );
 
-my %applies_to = ( %topical_funcs, %filetest_operators );
+Readonly::Hash my %APPLIES_TO => ( %TOPICAL_FUNCS, %FILETEST_OPERATORS );
 
 sub violates {
     my ( $self, $elem, undef ) = @_;
 
-    return if not exists $applies_to{ $elem->content };
+    return if not exists $APPLIES_TO{ $elem->content };
 
     my $content = $elem->content;
 
     # Are we looking at a filetest?
-    if ( $filetest_operators{ $content } ) {
+    if ( $FILETEST_OPERATORS{ $content } ) {
         # Is there a $_ following it?
         my $op_node = $elem->snext_sibling;
         if ( $op_node && $op_node->isa('PPI::Token::Magic') ) {
@@ -66,7 +66,7 @@ sub violates {
         return;
     }
 
-    if ( $topical_funcs{ $content } && is_perl_builtin( $elem ) ) {
+    if ( $TOPICAL_FUNCS{ $content } && is_perl_builtin( $elem ) ) {
         my $is_split = $content eq 'split';
 
         my @args = parse_arg_list( $elem );
@@ -195,7 +195,7 @@ Andy Lester <andy@petdance.com>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2013 Andy Lester <andy@petdance.com>
+Copyright (c) 2013-2022 Andy Lester <andy@petdance.com>
 
 This library is free software; you can redistribute it and/or modify it
 under the terms of the Artistic License 2.0.

@@ -1,14 +1,14 @@
-# Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2007-2022 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
+# Pod stripped from pm file by OODoc 2.03.
 # This code is part of distribution XML-Compile-SOAP-Daemon.  Meta-POD
 # processed with OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package XML::Compile::SOAP::Daemon::CGI;
 use vars '$VERSION';
-$VERSION = '3.14';
+$VERSION = '3.15';
 
 use parent 'XML::Compile::SOAP::Daemon';
 
@@ -36,6 +36,7 @@ sub runCgiRequest(@) {shift->run(@_)}
 # called by SUPER::run()
 sub _run($;$)
 {   my ($self, $args, $test_cgi) = @_;
+    my $nph    = $args->{nph};
 
     my $q      = $test_cgi || $args->{query} || CGI->new;
     my $method = $ENV{REQUEST_METHOD} || 'POST';
@@ -43,7 +44,7 @@ sub _run($;$)
     my $ct     = $ENV{CONTENT_TYPE}   || 'text/plain';
     $ct =~ s/\;\s.*//;
 
-    return $self->sendWsdl($q)
+    return $self->sendWsdl($q, $nph)
         if $method eq 'GET' && uc($qs) eq 'WSDL';
 
     my ($rc, $msg, $err, $mime, $bytes);
@@ -80,7 +81,7 @@ sub _run($;$)
       ( -status  => "$rc $msg"
       , -type    => $mime
       , -charset => 'utf-8'
-      , -nph     => ($args->{nph} ? 1 : 0)
+      , -nph     => $nph
       );
 
     if(my $pp = $args->{postprocess})
@@ -104,14 +105,14 @@ sub setWsdlResponse($;$)
     close WSDL;
 }
 
-sub sendWsdl($)
-{   my ($self, $q) = @_;
+sub sendWsdl($;$)
+{   my ($self, $q, $nph) = @_;
 
     print $q->header
       ( -status  => RC_OK.' WSDL specification'
       , -type    => $self->{wsdl_type}
       , -charset => 'utf-8'
-      , -nph     => 1
+      , -nph     => $nph
 
       , -Content_length => length($self->{wsdl_data})
       );

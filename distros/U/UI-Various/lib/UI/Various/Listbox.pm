@@ -42,7 +42,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.34';
+our $VERSION = '0.37';
 
 use UI::Various::core;
 use UI::Various::widget;
@@ -277,9 +277,61 @@ sub add($@)
 
     push @{$self->{texts}}, @_;
     push @{$self->{_selected}}, (' ') x scalar(@_);
+    0 < @_  and  $self->{first} < 0  and  $self->{first} = 0;
     # call UI-specific implementation, if applicable:
     if ($self->can('_add'))
     {   $self->_add(@_);   }
+}
+
+#########################################################################
+
+=head2 B<modify> - modify element
+
+    $listbox->modify($index, $value);
+
+=head3 example:
+
+    $self->modify(2, 'new value');
+
+=head3 parameters:
+
+    $index              the index of the element to be modified
+    $value              the new value for the element
+
+=head3 description:
+
+This method modifies an element in the listbox by replacing its value.  The
+element is identified by its index.  Indices start with 0.
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+sub modify($$$)
+{
+    my ($self, $index, $value) = (@_);
+
+    # sanity checks:
+    $self->isa(__PACKAGE__)
+	or  fatal('invalid_object__1_in_call_to__2__3',
+		  ref($self), __PACKAGE__, 'modify');
+    unless ($index =~ m/^\d+$/)
+    {
+	error('parameter__1_must_be_a_positive_integer_in_call_to__2__3',
+	      'index', __PACKAGE__, 'modify');
+	return;
+    }
+    unless (defined $value)
+    {
+	error('mandatory_parameter__1_is_missing', 'value');
+	return;
+    }
+    if ($index <= $#{$self->{texts}})
+    {
+	$self->{texts}[$index] = $value;
+	# call UI-specific implementation, if applicable:
+	if ($self->can('_modify'))
+	{   $self->_modify($index, $value);   }
+    }
 }
 
 #########################################################################

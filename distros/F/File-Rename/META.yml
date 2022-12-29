@@ -3,9 +3,11 @@ abstract: 'Perl extension for renaming multiple files'
 author:
   - 'Robin Barker <RMBarker@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '7.36'
+  File::Temp: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '7.36'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -18,8 +20,6 @@ no_index:
     - t
     - inc
 requires:
-  File::Temp: '0'
   Getopt::Long: '0'
-  Test::More: '0'
-version: '1.31'
+version: '1.992'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,3 +1,10 @@
+0.33 2022-12-26
+  [Prerequirement Bug Fix]
+    * Fixed prerequirement in Makefile.PL because SPVM::Resource::SocketUtil is needed when "perl Makefile.PL" is executed.
+  [Prerequirement Changes]
+    * SPVM 0.9670+ is needed.
+  [Test Improvement]
+    * Improve Github Action workflow for tests. It supports latest Windows and the download of cpanm.
 0.32 2022-12-20
   [Prerequirement Changes]
     * SPVM::Sys needs SPVM 0.9668+.

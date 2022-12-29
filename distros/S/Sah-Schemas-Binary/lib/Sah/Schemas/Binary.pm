@@ -3,9 +3,9 @@ package Sah::Schemas::Binary;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-24'; # DATE
+our $DATE = '2022-09-25'; # DATE
 our $DIST = 'Sah-Schemas-Binary'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas related to binary data
@@ -22,7 +22,7 @@ Sah::Schemas::Binary - Sah schemas related to binary data
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::Schemas::Binary (from Perl distribution Sah-Schemas-Binary), released on 2022-07-24.
+This document describes version 0.007 of Sah::Schemas::Binary (from Perl distribution Sah-Schemas-Binary), released on 2022-09-25.
 
 =head1 SAH SCHEMAS
 
@@ -32,7 +32,9 @@ The following schemas are included in this distribution:
 
 =item * L<hexbuf|Sah::Schema::hexbuf>
 
-Binary data encoded in hexdigits.
+Binary data encoded in hexdigits, e.g. "fafafa" or "ca fe 00".
+
+Whitespaces are allowed and will be removed.
 
 Note that this schema does not decode the hex encoding for you.
 
@@ -70,9 +72,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

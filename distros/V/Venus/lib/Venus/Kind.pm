@@ -20,6 +20,7 @@ with 'Venus::Role::Reflectable';
 with 'Venus::Role::Testable';
 with 'Venus::Role::Throwable';
 with 'Venus::Role::Assertable';
+with 'Venus::Role::Serializable';
 
 # METHODS
 
@@ -181,6 +182,8 @@ L<Venus::Role::Matchable>
 L<Venus::Role::Printable>
 
 L<Venus::Role::Reflectable>
+
+L<Venus::Role::Serializable>
 
 L<Venus::Role::Testable>
 

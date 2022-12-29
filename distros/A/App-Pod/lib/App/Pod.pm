@@ -16,6 +16,7 @@ use Mojo::JSON            qw( j );
 use Perl::OSType          qw( os_type );
 use Term::ANSIColor       qw( colored );
 use Carp                  qw( cluck );
+use open                  qw( :std :utf8 );
 use subs                  qw( _sayt uniq );
 
 # Catch eval warnings better.
@@ -32,13 +33,9 @@ $SIG{__WARN__} = sub { cluck shift };
 
 App::Pod - Quickly show available class methods and documentation.
 
-=head1 VERSION
-
-Version 0.31
-
 =cut
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 
 =head1 SYNOPSIS

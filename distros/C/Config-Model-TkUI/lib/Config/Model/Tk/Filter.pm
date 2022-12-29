@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tk::Filter 1.375;
+package Config::Model::Tk::Filter 1.376;
 
 use 5.10.1;
 use strict;

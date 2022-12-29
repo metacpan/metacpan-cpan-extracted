@@ -1,13 +1,13 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::hexbuf;
 
-our $DATE = '2022-07-24'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2022-09-25'; # DATE
+our $VERSION = '0.007'; # VERSION
 
-our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nNote that this schema does not decode the hex encoding for you.\n\n",examples=>[{valid=>1,value=>""},{summary=>"Odd number of digits",valid=>0,value=>"f"},{valid=>1,value=>"fafafa"},{summary=>"Uppercase digits are allowed, not coerced to lowercase",valid=>1,value=>"FAFAFA"},{summary=>"Whitespaces allowed, will be removed",valid=>1,validated_value=>"fafafa",value=>"fa fa  fa"},{valid=>0,value=>"fafafg"}],match=>qr(\A([0-9A-fa-f][0-9A-fa-f])*\z),prefilters=>["Str::remove_whitespace"],summary=>"Binary data encoded in hexdigits"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
+our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nWhitespaces are allowed and will be removed.\n\nNote that this schema does not decode the hex encoding for you.\n\n",examples=>[{valid=>1,value=>""},{summary=>"Odd number of digits",valid=>0,value=>"f"},{valid=>1,value=>"fafafa"},{summary=>"Uppercase digits are allowed, not coerced to lowercase",valid=>1,value=>"FAFAFA"},{summary=>"Whitespaces allowed, will be removed",valid=>1,validated_value=>"fafafa",value=>"fa fa  fa"},{valid=>0,value=>"fafafg"}],match=>qr(\A([0-9A-fa-f][0-9A-fa-f])*\z),prefilters=>["Str::remove_whitespace"],summary=>"Binary data encoded in hexdigits, e.g. \"fafafa\" or \"ca fe 00\""}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
-# ABSTRACT: Binary data encoded in hexdigits
+# ABSTRACT: Binary data encoded in hexdigits, e.g. "fafafa" or "ca fe 00"
 
 __END__
 
@@ -17,11 +17,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::hexbuf - Binary data encoded in hexdigits
+Sah::SchemaR::hexbuf - Binary data encoded in hexdigits, e.g. "fafafa" or "ca fe 00"
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::SchemaR::hexbuf (from Perl distribution Sah-Schemas-Binary), released on 2022-07-24.
+This document describes version 0.007 of Sah::SchemaR::hexbuf (from Perl distribution Sah-Schemas-Binary), released on 2022-09-25.
 
 =head1 DESCRIPTION
 
@@ -54,9 +54,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

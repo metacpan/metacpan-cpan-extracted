@@ -11,8 +11,7 @@ my $selector = IO::Select->new;
 
 alarm 2;
 
-my $fd = eventfd(0);
-$fd->blocking(0);
+my $fd = eventfd(0, 'non-blocking');
 $selector->add($fd);
 
 ok !$selector->can_read(0), "Can't read an empty eventfd";
@@ -30,10 +29,9 @@ is($fd->get, 42, 'Value of eventfd was 42');
 ok !$selector->can_read(0), "Can't read an emptied eventfd";
 
 SKIP: {
-	my $fd2 = eval { eventfd(0, 'semaphore') };
+	my $fd2 = eval { eventfd(0, 'semaphore', 'non-blocking') };
 	skip 'Semaphores not supported', 8 if not $fd2 and $@ =~ /^No such flag 'semaphore' known/;
 
-	$fd2->blocking(0);
 	$selector->add($fd2);
 
 	ok !$selector->can_read(0), "Can't read an empty eventfd";

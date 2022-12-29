@@ -34,7 +34,7 @@
          "requires" : {
             "JSON::MaybeXS" : "1.004002",
             "LWP::UserAgent" : "6.47",
-            "perl" : "5.006"
+            "perl" : "5.100"
          }
       },
       "test" : {
@@ -44,6 +44,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : 0.03,
+   "version" : 0.06,
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

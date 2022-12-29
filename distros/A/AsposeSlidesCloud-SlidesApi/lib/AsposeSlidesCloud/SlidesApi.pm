@@ -58,7 +58,7 @@ sub new {
 # @param int $slide_index Slide index. (required)
 # @param string $alignment_type Alignment type that will be applied to the shapes. (required)
 # @param boolean $align_to_slide If true, shapes will be aligned relative to the slide edges. (optional, default to false)
-# @param object $shapes Shapes indexes. (optional)
+# @param int[] $shapes Shapes indexes. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -86,7 +86,7 @@ sub new {
         required => '0',
     },
     'shapes' => {
-        data_type => 'object',
+        data_type => 'int[]',
         description => 'Shapes indexes.',
         required => '0',
     },
@@ -231,7 +231,7 @@ sub align_shapes {
 # @param string $slide_type Slide type (master, layout or notes). (required)
 # @param string $alignment_type Alignment type that will be applied to the shapes. (required)
 # @param boolean $align_to_slide If true, shapes will be aligned relative to the slide edges. (optional, default to false)
-# @param object $shapes Shapes indexes. (optional)
+# @param int[] $shapes Shapes indexes. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -264,7 +264,7 @@ sub align_shapes {
         required => '0',
     },
     'shapes' => {
-        data_type => 'object',
+        data_type => 'int[]',
         description => 'Shapes indexes.',
         required => '0',
     },
@@ -426,7 +426,7 @@ sub align_special_slide_shapes {
 # @param string $password Document password. (optional)
 # @param string $storage Document storage. (optional)
 # @param string $fonts_folder Custom fonts folder. (optional)
-# @param object $slides The indices of the slides to be converted. If not specified, all slides are converted by default. (optional)
+# @param int[] $slides The indices of the slides to be converted. If not specified, all slides are converted by default. (optional)
 # @param ExportOptions $options Export options. (optional)
 {
     my $params = {
@@ -456,7 +456,7 @@ sub align_special_slide_shapes {
         required => '0',
     },
     'slides' => {
-        data_type => 'object',
+        data_type => 'int[]',
         description => 'The indices of the slides to be converted. If not specified, all slides are converted by default.',
         required => '0',
     },
@@ -566,7 +566,7 @@ sub convert {
 # @param string $password Document password. (optional)
 # @param string $storage Document storage. (optional)
 # @param string $fonts_folder Custom fonts folder. (optional)
-# @param object $slides The indices of the slides to be converted. If not specified, all slides are converted by default. (optional)
+# @param int[] $slides The indices of the slides to be converted. If not specified, all slides are converted by default. (optional)
 # @param ExportOptions $options Export options. (optional)
 {
     my $params = {
@@ -601,7 +601,7 @@ sub convert {
         required => '0',
     },
     'slides' => {
-        data_type => 'object',
+        data_type => 'int[]',
         description => 'The indices of the slides to be converted. If not specified, all slides are converted by default.',
         required => '0',
     },
@@ -8055,7 +8055,7 @@ sub delete_paragraph {
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
 # @param int $shape_index Shape index. (required)
-# @param object $paragraphs The indices of the paragraphs to be deleted; delete all by default. (optional)
+# @param int[] $paragraphs The indices of the paragraphs to be deleted; delete all by default. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -8078,7 +8078,7 @@ sub delete_paragraph {
         required => '1',
     },
     'paragraphs' => {
-        data_type => 'object',
+        data_type => 'int[]',
         description => 'The indices of the paragraphs to be deleted; delete all by default.',
         required => '0',
     },
@@ -8393,7 +8393,7 @@ sub delete_portion {
 # @param int $slide_index Slide index. (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
-# @param object $portions The indices of the portions to be deleted; delete all by default. (optional)
+# @param int[] $portions The indices of the portions to be deleted; delete all by default. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -8421,7 +8421,7 @@ sub delete_portion {
         required => '1',
     },
     'portions' => {
-        data_type => 'object',
+        data_type => 'int[]',
         description => 'The indices of the portions to be deleted; delete all by default.',
         required => '0',
     },
@@ -8866,7 +8866,7 @@ sub delete_section {
 # Delete presentation sections.
 # 
 # @param string $name Document name. (required)
-# @param object $sections The indices of the sections to be deleted; delete all by default. (optional)
+# @param int[] $sections The indices of the sections to be deleted; delete all by default. (optional)
 # @param boolean $with_slides True to delete the slides related to the deleted sections; move them to the remaining sections otherwise. (optional, default to false)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
@@ -8879,7 +8879,7 @@ sub delete_section {
         required => '1',
     },
     'sections' => {
-        data_type => 'object',
+        data_type => 'int[]',
         description => 'The indices of the sections to be deleted; delete all by default.',
         required => '0',
     },
@@ -9132,7 +9132,7 @@ sub delete_shape {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param object $shapes The indices of the shapes to be deleted; delete all by default. (optional)
+# @param int[] $shapes The indices of the shapes to be deleted; delete all by default. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -9150,7 +9150,7 @@ sub delete_shape {
         required => '1',
     },
     'shapes' => {
-        data_type => 'object',
+        data_type => 'int[]',
         description => 'The indices of the shapes to be deleted; delete all by default.',
         required => '0',
     },
@@ -9613,7 +9613,7 @@ sub delete_slide_comments_online {
 # Delete presentation slides.
 # 
 # @param string $name Document name. (required)
-# @param object $slides The indices of the slides to be deleted; delete all by default. (optional)
+# @param int[] $slides The indices of the slides to be deleted; delete all by default. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -9625,7 +9625,7 @@ sub delete_slide_comments_online {
         required => '1',
     },
     'slides' => {
-        data_type => 'object',
+        data_type => 'int[]',
         description => 'The indices of the slides to be deleted; delete all by default.',
         required => '0',
     },
@@ -10980,7 +10980,7 @@ sub delete_special_slide_paragraph {
 # @param int $slide_index Parent slide index. (required)
 # @param string $slide_type Slide type (master, layout or notes). (required)
 # @param int $shape_index Shape index. (required)
-# @param object $paragraphs The indices of the shapes to be deleted; delete all by default. (optional)
+# @param int[] $paragraphs The indices of the shapes to be deleted; delete all by default. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -11008,7 +11008,7 @@ sub delete_special_slide_paragraph {
         required => '1',
     },
     'paragraphs' => {
-        data_type => 'object',
+        data_type => 'int[]',
         description => 'The indices of the shapes to be deleted; delete all by default.',
         required => '0',
     },
@@ -11364,7 +11364,7 @@ sub delete_special_slide_portion {
 # @param string $slide_type Slide type (master, layout or notes). (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
-# @param object $portions The indices of the shapes to be deleted; delete all by default. (optional)
+# @param int[] $portions The indices of the shapes to be deleted; delete all by default. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -11397,7 +11397,7 @@ sub delete_special_slide_portion {
         required => '1',
     },
     'portions' => {
-        data_type => 'object',
+        data_type => 'int[]',
         description => 'The indices of the shapes to be deleted; delete all by default.',
         required => '0',
     },
@@ -11727,7 +11727,7 @@ sub delete_special_slide_shape {
 # @param string $name Document name. (required)
 # @param int $slide_index Parent slide index. (required)
 # @param string $slide_type Slide type (master, layout or notes). (required)
-# @param object $shapes The indices of the shapes to be deleted; delete all by default. (optional)
+# @param int[] $shapes The indices of the shapes to be deleted; delete all by default. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -11750,7 +11750,7 @@ sub delete_special_slide_shape {
         required => '1',
     },
     'shapes' => {
-        data_type => 'object',
+        data_type => 'int[]',
         description => 'The indices of the shapes to be deleted; delete all by default.',
         required => '0',
     },
@@ -13861,7 +13861,7 @@ sub download_portion_as_math_ml {
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
 # @param string $fonts_folder Custom fonts folder. (optional)
-# @param object $slides The indices of the slides to be saved. If not specified, all slides are saved by default. (optional)
+# @param int[] $slides The indices of the slides to be saved. If not specified, all slides are saved by default. (optional)
 {
     my $params = {
     'name' => {
@@ -13900,7 +13900,7 @@ sub download_portion_as_math_ml {
         required => '0',
     },
     'slides' => {
-        data_type => 'object',
+        data_type => 'int[]',
         description => 'The indices of the slides to be saved. If not specified, all slides are saved by default.',
         required => '0',
     },
@@ -22450,7 +22450,7 @@ sub import_from_pdf {
 # @param int $y The Y coordinate of the imported group of shapes (0 is default if not specified). (optional)
 # @param int $width The width of the imported group of shapes (default is SVG image width). (optional)
 # @param int $height The height of the imported group of shapes (default is SVG image width). (optional)
-# @param object $shapes Indexes of shapes to import. All shapes are imported if not specified. (optional)
+# @param int[] $shapes Indexes of shapes to import. All shapes are imported if not specified. (optional)
 # @param boolean $group If true, the set of shapes will be imported as a one group shape. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Presentation folder. (optional)
@@ -22493,7 +22493,7 @@ sub import_from_pdf {
         required => '0',
     },
     'shapes' => {
-        data_type => 'object',
+        data_type => 'int[]',
         description => 'Indexes of shapes to import. All shapes are imported if not specified.',
         required => '0',
     },
@@ -23872,8 +23872,8 @@ sub pipeline {
 # Reorder presentation slides positions.
 # 
 # @param string $name Document name. (required)
-# @param object $old_positions A comma separated array of positions of slides to be reordered. (optional)
-# @param object $new_positions A comma separated array of new slide positions. (optional)
+# @param int[] $old_positions A comma separated array of positions of slides to be reordered. (optional)
+# @param int[] $new_positions A comma separated array of new slide positions. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -23885,12 +23885,12 @@ sub pipeline {
         required => '1',
     },
     'old_positions' => {
-        data_type => 'object',
+        data_type => 'int[]',
         description => 'A comma separated array of positions of slides to be reordered.',
         required => '0',
     },
     'new_positions' => {
-        data_type => 'object',
+        data_type => 'int[]',
         description => 'A comma separated array of new slide positions.',
         required => '0',
     },
@@ -25015,7 +25015,7 @@ sub save_portion_as_math_ml {
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
 # @param string $fonts_folder Custom fonts folder. (optional)
-# @param object $slides The indices of the slides to be saved. If not specified, all slides are saved by default. (optional)
+# @param int[] $slides The indices of the slides to be saved. If not specified, all slides are saved by default. (optional)
 {
     my $params = {
     'name' => {
@@ -25059,7 +25059,7 @@ sub save_portion_as_math_ml {
         required => '0',
     },
     'slides' => {
-        data_type => 'object',
+        data_type => 'int[]',
         description => 'The indices of the slides to be saved. If not specified, all slides are saved by default.',
         required => '0',
     },

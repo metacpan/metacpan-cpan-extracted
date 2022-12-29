@@ -8,8 +8,9 @@ configure {
 
 share {
 
+  requires 'Alien::gmake';
   plugin 'Build::SearchDep' => (
-    aliens => [qw( Alien::libuuid Alien::OpenSSL Alien::gperf Alien::Libevent Alien::curl Alien::Boost::ProgramOptions )],
+    aliens => [qw( Alien::libuuid Alien::OpenSSL Alien::gperf Alien::Libevent Alien::Boost::ProgramOptions )],
   );
 
   plugin 'Download::GitHub' => (
@@ -27,8 +28,8 @@ share {
 
   build [
     "./configure --prefix=%{.install.prefix} --disable-shared --with-boost=$BOOSTDIR",
-    '%{make} LIBS=-lstdc++',
-    '%{make} install',
+    '%{gmake} LIBS=-lstdc++',
+    '%{gmake} install',
   ];
 };
 

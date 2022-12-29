@@ -39,7 +39,10 @@ if ($meta) {
 
 # http://www.cpantesters.org/cpan/report/b26888fa-55bd-11ed-9ef0-b2246e8775ea
 
-
+my %configure_and_runtime_requires = (
+  'SPVM' => '0.9668',
+  'SPVM::Resource::SocketUtil' => '0.02',
+);
 WriteMakefile(
   NAME              => 'SPVM::Sys',
   VERSION_FROM      => 'lib/SPVM/Sys.pm',
@@ -63,10 +66,10 @@ WriteMakefile(
     },
   },
   CONFIGURE_REQUIRES => {
-    'SPVM'              => '0.9668',
+    %configure_and_runtime_requires,
   },
   PREREQ_PM         => {
-    'SPVM::Resource::SocketUtil' => '0.02',
+    %configure_and_runtime_requires,
     'SPVM::Errno' => '0.06',
   },
 );

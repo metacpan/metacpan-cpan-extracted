@@ -1,3 +1,16 @@
+0.006 2022-12-22 12:59:56-0500
+
+  Bug fixes
+
+   - Skip tests if can not init Gtk3.  This helps testers that do not have
+     `DISPLAY` set. Fixes <https://rt.cpan.org/Public/Bug/Display.html?id=144695>.
+     Thanks to SREZIC++ for the report!
+
+  Refactoring
+
+   - Change environment variable:
+       s/RENARD_USE_XINPUT2/INTERTANGLE_API_GTK3_USE_XINPUT2/
+
 0.005 2020-10-16 19:47:58-0500
 
   Renamed from Renard::Incunabula::Frontend::Gtk3 (previous version

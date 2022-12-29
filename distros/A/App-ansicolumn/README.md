@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/kaz-utashiro/App-ansicolumn/workflows/test/badge.svg)](https://github.com/kaz-utashiro/App-ansicolumn/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-ansicolumn.svg)](https://metacpan.org/release/App-ansicolumn)
+[![Actions Status](https://github.com/tecolicom/App-ansicolumn/workflows/test/badge.svg)](https://github.com/tecolicom/App-ansicolumn/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-ansicolumn.svg)](https://metacpan.org/release/App-ansicolumn)
 # NAME
 
 ansicolumn - ANSI terminal sequence aware column command
@@ -47,10 +47,11 @@ ansicolumn \[options\] \[file ...\]
     --tabspace=#         tab-space width
     --tabstyle=#         tab style
     --ambiguous=#        ambiguous character width (narrow|wide)
+    --pages              split file by formfeed
 
 # VERSION
 
-Version 1.26
+Version 1.2801
 
 # DESCRIPTION
 
@@ -168,6 +169,10 @@ default, from the standard input.
     to specify number of files displayed simultaneously.
 
     You can use this option mixed with **-D** option to see document files.
+
+    If you want to show multiple parts in single data stream in parallel,
+    use **--pages** option.  It split the data by formfeed character and
+    treat each part as a individual file.
 
 - **-C**#, **--pane**=#
 
@@ -343,6 +348,11 @@ default, from the standard input.
     Specifies how to treat Unicode ambiguous width characters.  Take a
     value of 'narrow' or 'wide.  Default is 'narrow'.
 
+- **--pages**
+
+    Split file content by formfeed character, and treat each part as a
+    individual file.  Use with **--parallel** option.
+
 # CALCULATION
 
 As for **--height**, **--width**, **--pane** and **--pane-width** options,
@@ -395,11 +405,11 @@ option. See \`perldoc Getopt::EX\` for detail.
 
 To get the latest code, use this:
 
-    $ cpanm https://github.com/kaz-utashiro/App-ansicolumn.git
+    $ cpanm https://github.com/tecolicom/App-ansicolumn.git
 
 # EXAMPLES
 
-[https://github.com/kaz-utashiro/App-ansicolumn/tree/master/images](https://github.com/kaz-utashiro/App-ansicolumn/tree/master/images)
+[https://github.com/tecolicom/App-ansicolumn/tree/master/images](https://github.com/tecolicom/App-ansicolumn/tree/master/images)
 
 # SEE ALSO
 
@@ -407,10 +417,16 @@ To get the latest code, use this:
 [https://man7.org/linux/man-pages/man1/column.1.html](https://man7.org/linux/man-pages/man1/column.1.html)
 
 [App::ansicolumn](https://metacpan.org/pod/App%3A%3Aansicolumn),
-[https://github.com/kaz-utashiro/App-ansicolumn](https://github.com/kaz-utashiro/App-ansicolumn)
+[https://github.com/tecolicom/App-ansicolumn](https://github.com/tecolicom/App-ansicolumn)
 
 [Text::ANSI::Printf](https://metacpan.org/pod/Text%3A%3AANSI%3A%3APrintf),
 [https://github.com/kaz-utashiro/Text-ANSI-Printf](https://github.com/kaz-utashiro/Text-ANSI-Printf)
+
+## Articles
+
+- https://qiita.com/kaz-utashiro/items/345cd9abcd8e1f0d81a2
+- https://qiita.com/kaz-utashiro/items/1cdd71d44eb11f3fb36e
+- https://qiita.com/kaz-utashiro/items/32e1c2d4c42a80c42422
 
 # AUTHOR
 
@@ -418,7 +434,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2020-2022 Kazumasa Utashiro.
+©︎ 2020-2022 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

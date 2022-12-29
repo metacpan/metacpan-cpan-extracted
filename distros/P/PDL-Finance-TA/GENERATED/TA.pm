@@ -1,25 +1,27 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Finance::TA;
 
-@EXPORT_OK  = qw( PDL::PP ta_bbands PDL::PP ta_dema PDL::PP ta_ema PDL::PP ta_ht_trendline PDL::PP ta_kama PDL::PP ta_ma PDL::PP ta_mama PDL::PP ta_mavp PDL::PP ta_midpoint PDL::PP ta_midprice PDL::PP ta_sar PDL::PP ta_sarext PDL::PP ta_sma PDL::PP ta_t3 PDL::PP ta_tema PDL::PP ta_trima PDL::PP ta_wma PDL::PP ta_atr PDL::PP ta_natr PDL::PP ta_trange PDL::PP ta_adx PDL::PP ta_adxr PDL::PP ta_apo PDL::PP ta_aroon PDL::PP ta_aroonosc PDL::PP ta_bop PDL::PP ta_cci PDL::PP ta_cmo PDL::PP ta_dx PDL::PP ta_macd PDL::PP ta_macdext PDL::PP ta_macdfix PDL::PP ta_mfi PDL::PP ta_minus_di PDL::PP ta_minus_dm PDL::PP ta_mom PDL::PP ta_plus_di PDL::PP ta_plus_dm PDL::PP ta_ppo PDL::PP ta_roc PDL::PP ta_rocp PDL::PP ta_rocr PDL::PP ta_rocr100 PDL::PP ta_rsi PDL::PP ta_stoch PDL::PP ta_stochf PDL::PP ta_stochrsi PDL::PP ta_trix PDL::PP ta_ultosc PDL::PP ta_willr PDL::PP ta_ht_dcperiod PDL::PP ta_ht_dcphase PDL::PP ta_ht_phasor PDL::PP ta_ht_sine PDL::PP ta_ht_trendmode PDL::PP ta_ad PDL::PP ta_adosc PDL::PP ta_obv PDL::PP ta_cdl2crows PDL::PP ta_cdl3blackcrows PDL::PP ta_cdl3inside PDL::PP ta_cdl3linestrike PDL::PP ta_cdl3outside PDL::PP ta_cdl3starsinsouth PDL::PP ta_cdl3whitesoldiers PDL::PP ta_cdlabandonedbaby PDL::PP ta_cdladvanceblock PDL::PP ta_cdlbelthold PDL::PP ta_cdlbreakaway PDL::PP ta_cdlclosingmarubozu PDL::PP ta_cdlconcealbabyswall PDL::PP ta_cdlcounterattack PDL::PP ta_cdldarkcloudcover PDL::PP ta_cdldoji PDL::PP ta_cdldojistar PDL::PP ta_cdldragonflydoji PDL::PP ta_cdlengulfing PDL::PP ta_cdleveningdojistar PDL::PP ta_cdleveningstar PDL::PP ta_cdlgapsidesidewhite PDL::PP ta_cdlgravestonedoji PDL::PP ta_cdlhammer PDL::PP ta_cdlhangingman PDL::PP ta_cdlharami PDL::PP ta_cdlharamicross PDL::PP ta_cdlhighwave PDL::PP ta_cdlhikkake PDL::PP ta_cdlhikkakemod PDL::PP ta_cdlhomingpigeon PDL::PP ta_cdlidentical3crows PDL::PP ta_cdlinneck PDL::PP ta_cdlinvertedhammer PDL::PP ta_cdlkicking PDL::PP ta_cdlkickingbylength PDL::PP ta_cdlladderbottom PDL::PP ta_cdllongleggeddoji PDL::PP ta_cdllongline PDL::PP ta_cdlmarubozu PDL::PP ta_cdlmatchinglow PDL::PP ta_cdlmathold PDL::PP ta_cdlmorningdojistar PDL::PP ta_cdlmorningstar PDL::PP ta_cdlonneck PDL::PP ta_cdlpiercing PDL::PP ta_cdlrickshawman PDL::PP ta_cdlrisefall3methods PDL::PP ta_cdlseparatinglines PDL::PP ta_cdlshootingstar PDL::PP ta_cdlshortline PDL::PP ta_cdlspinningtop PDL::PP ta_cdlstalledpattern PDL::PP ta_cdlsticksandwich PDL::PP ta_cdltakuri PDL::PP ta_cdltasukigap PDL::PP ta_cdlthrusting PDL::PP ta_cdltristar PDL::PP ta_cdlunique3river PDL::PP ta_cdlupsidegap2crows PDL::PP ta_cdlxsidegap3methods PDL::PP ta_beta PDL::PP ta_correl PDL::PP ta_linearreg PDL::PP ta_linearreg_angle PDL::PP ta_linearreg_intercept PDL::PP ta_linearreg_slope PDL::PP ta_stddev PDL::PP ta_tsf PDL::PP ta_var PDL::PP ta_avgprice PDL::PP ta_medprice PDL::PP ta_typprice PDL::PP ta_wclprice );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(ta_bbands ta_dema ta_ema ta_ht_trendline ta_kama ta_ma ta_mama ta_mavp ta_midpoint ta_midprice ta_sar ta_sarext ta_sma ta_t3 ta_tema ta_trima ta_wma ta_atr ta_natr ta_trange ta_adx ta_adxr ta_apo ta_aroon ta_aroonosc ta_bop ta_cci ta_cmo ta_dx ta_macd ta_macdext ta_macdfix ta_mfi ta_minus_di ta_minus_dm ta_mom ta_plus_di ta_plus_dm ta_ppo ta_roc ta_rocp ta_rocr ta_rocr100 ta_rsi ta_stoch ta_stochf ta_stochrsi ta_trix ta_ultosc ta_willr ta_ht_dcperiod ta_ht_dcphase ta_ht_phasor ta_ht_sine ta_ht_trendmode ta_ad ta_adosc ta_obv ta_cdl2crows ta_cdl3blackcrows ta_cdl3inside ta_cdl3linestrike ta_cdl3outside ta_cdl3starsinsouth ta_cdl3whitesoldiers ta_cdlabandonedbaby ta_cdladvanceblock ta_cdlbelthold ta_cdlbreakaway ta_cdlclosingmarubozu ta_cdlconcealbabyswall ta_cdlcounterattack ta_cdldarkcloudcover ta_cdldoji ta_cdldojistar ta_cdldragonflydoji ta_cdlengulfing ta_cdleveningdojistar ta_cdleveningstar ta_cdlgapsidesidewhite ta_cdlgravestonedoji ta_cdlhammer ta_cdlhangingman ta_cdlharami ta_cdlharamicross ta_cdlhighwave ta_cdlhikkake ta_cdlhikkakemod ta_cdlhomingpigeon ta_cdlidentical3crows ta_cdlinneck ta_cdlinvertedhammer ta_cdlkicking ta_cdlkickingbylength ta_cdlladderbottom ta_cdllongleggeddoji ta_cdllongline ta_cdlmarubozu ta_cdlmatchinglow ta_cdlmathold ta_cdlmorningdojistar ta_cdlmorningstar ta_cdlonneck ta_cdlpiercing ta_cdlrickshawman ta_cdlrisefall3methods ta_cdlseparatinglines ta_cdlshootingstar ta_cdlshortline ta_cdlspinningtop ta_cdlstalledpattern ta_cdlsticksandwich ta_cdltakuri ta_cdltasukigap ta_cdlthrusting ta_cdltristar ta_cdlunique3river ta_cdlupsidegap2crows ta_cdlxsidegap3methods ta_beta ta_correl ta_linearreg ta_linearreg_angle ta_linearreg_intercept ta_linearreg_slope ta_stddev ta_tsf ta_var ta_avgprice ta_medprice ta_typprice ta_wclprice );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
-   $PDL::Finance::TA::VERSION = 0.008;
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our $VERSION = '0.009';
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Finance::TA $VERSION;
 
 
 
+
+
+
+#line 7 "TA.pd"
 
 =head1 NAME
 
@@ -47,10 +49,10 @@ PDL::Finance::TA - Technical Analysis Library (http://ta-lib.org) bindings for P
 TA-Lib library - L<http://ta-lib.org> - is a multi-platform tool for market analysis. TA-Lib is widely used by trading
 software developers requiring to perform technical analysis of financial market data.
 
-This module provides an L<PDL|PDL> interface for TA-Lib library. It combines rich TA-Lib functionality with excelent
-L<PDL|PDL> performance of handling huge data.
+This module provides an L<PDL> interface for TA-Lib library. It combines rich TA-Lib functionality with excellent
+L<PDL> performance of handling huge data.
 
-If you are not a L<PDL|PDL> user you might be interested in L<Finance::TA|Finance::TA> module which provides approximately
+If you are not a L<PDL> user you might be interested in L<Finance::TA|Finance::TA> module which provides approximately
 the same set of functions working with common perl data structures (which is fine if you are not about to process large
 data sets and if you generally do not worry about performace).
 
@@ -109,6 +111,7 @@ All available functions handles BAD values in input piddles (BAD values at the b
   say $MA2;      # prints: [BAD BAD BAD BAD 2 3]
 
 =cut
+#line 115 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
@@ -117,12 +120,12 @@ All available functions handles BAD values in input piddles (BAD values at the b
 
 =head1 FUNCTIONS
 
-
-
 =cut
 
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -157,19 +160,22 @@ Bollinger Bands
 =for bad
 
 ta_bbands processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 168 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_bbands = \&PDL::ta_bbands;
+#line 175 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -193,19 +199,22 @@ Double Exponential Moving Average
 =for bad
 
 ta_dema processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 207 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_dema = \&PDL::ta_dema;
+#line 214 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -229,19 +238,22 @@ Exponential Moving Average
 =for bad
 
 ta_ema processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 246 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_ema = \&PDL::ta_ema;
+#line 253 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -262,19 +274,22 @@ Hilbert Transform - Instantaneous Trendline
 =for bad
 
 ta_ht_trendline processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 282 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_ht_trendline = \&PDL::ta_ht_trendline;
+#line 289 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -298,19 +313,22 @@ Kaufman Adaptive Moving Average
 =for bad
 
 ta_kama processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 321 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_kama = \&PDL::ta_kama;
+#line 328 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -337,19 +355,22 @@ Moving average
 =for bad
 
 ta_ma processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 363 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_ma = \&PDL::ta_ma;
+#line 370 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -377,19 +398,22 @@ MESA Adaptive Moving Average
 =for bad
 
 ta_mama processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 406 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_mama = \&PDL::ta_mama;
+#line 413 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -420,19 +444,22 @@ Moving average with variable period
 =for bad
 
 ta_mavp processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 452 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_mavp = \&PDL::ta_mavp;
+#line 459 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -456,19 +483,22 @@ MidPoint over period
 =for bad
 
 ta_midpoint processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 491 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_midpoint = \&PDL::ta_midpoint;
+#line 498 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -492,19 +522,22 @@ Midpoint Price over period
 =for bad
 
 ta_midprice processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 530 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_midprice = \&PDL::ta_midprice;
+#line 537 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -531,19 +564,22 @@ Parabolic SAR
 =for bad
 
 ta_sar processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 572 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_sar = \&PDL::ta_sar;
+#line 579 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -588,19 +624,22 @@ Parabolic SAR - Extended
 =for bad
 
 ta_sarext processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 632 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_sarext = \&PDL::ta_sarext;
+#line 639 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -624,19 +663,22 @@ Simple Moving Average
 =for bad
 
 ta_sma processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 671 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_sma = \&PDL::ta_sma;
+#line 678 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -663,19 +705,22 @@ Triple Exponential Moving Average (T3)
 =for bad
 
 ta_t3 processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 713 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_t3 = \&PDL::ta_t3;
+#line 720 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -699,19 +744,22 @@ Triple Exponential Moving Average
 =for bad
 
 ta_tema processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 752 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_tema = \&PDL::ta_tema;
+#line 759 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -735,19 +783,22 @@ Triangular Moving Average
 =for bad
 
 ta_trima processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 791 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_trima = \&PDL::ta_trima;
+#line 798 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -771,19 +822,22 @@ Weighted Moving Average
 =for bad
 
 ta_wma processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 830 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_wma = \&PDL::ta_wma;
+#line 837 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -807,19 +861,22 @@ Average True Range
 =for bad
 
 ta_atr processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 869 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_atr = \&PDL::ta_atr;
+#line 876 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -843,19 +900,22 @@ Normalized Average True Range
 =for bad
 
 ta_natr processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 908 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_natr = \&PDL::ta_natr;
+#line 915 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -876,19 +936,22 @@ True Range
 =for bad
 
 ta_trange processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 944 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_trange = \&PDL::ta_trange;
+#line 951 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -912,19 +975,22 @@ Average Directional Movement Index
 =for bad
 
 ta_adx processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 983 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_adx = \&PDL::ta_adx;
+#line 990 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -948,19 +1014,22 @@ Average Directional Movement Index Rating
 =for bad
 
 ta_adxr processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1022 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_adxr = \&PDL::ta_adxr;
+#line 1029 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -990,19 +1059,22 @@ Absolute Price Oscillator
 =for bad
 
 ta_apo processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1067 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_apo = \&PDL::ta_apo;
+#line 1074 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1027,19 +1099,22 @@ Aroon
 =for bad
 
 ta_aroon processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1107 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_aroon = \&PDL::ta_aroon;
+#line 1114 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1063,19 +1138,22 @@ Aroon Oscillator
 =for bad
 
 ta_aroonosc processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1146 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_aroonosc = \&PDL::ta_aroonosc;
+#line 1153 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1096,19 +1174,22 @@ Balance Of Power
 =for bad
 
 ta_bop processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1182 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_bop = \&PDL::ta_bop;
+#line 1189 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1132,19 +1213,22 @@ Commodity Channel Index
 =for bad
 
 ta_cci processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1221 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cci = \&PDL::ta_cci;
+#line 1228 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1168,19 +1252,22 @@ Chande Momentum Oscillator
 =for bad
 
 ta_cmo processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1260 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cmo = \&PDL::ta_cmo;
+#line 1267 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1204,19 +1291,22 @@ Directional Movement Index
 =for bad
 
 ta_dx processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1299 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_dx = \&PDL::ta_dx;
+#line 1306 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1248,19 +1338,22 @@ Moving Average Convergence/Divergence
 =for bad
 
 ta_macd processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1346 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_macd = \&PDL::ta_macd;
+#line 1353 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1301,19 +1394,22 @@ MACD with controllable MA type
 =for bad
 
 ta_macdext processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1402 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_macdext = \&PDL::ta_macdext;
+#line 1409 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1339,19 +1435,22 @@ Moving Average Convergence/Divergence Fix 12/26
 =for bad
 
 ta_macdfix processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1443 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_macdfix = \&PDL::ta_macdfix;
+#line 1450 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1375,19 +1474,22 @@ Money Flow Index
 =for bad
 
 ta_mfi processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1482 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_mfi = \&PDL::ta_mfi;
+#line 1489 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1411,19 +1513,22 @@ Minus Directional Indicator
 =for bad
 
 ta_minus_di processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1521 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_minus_di = \&PDL::ta_minus_di;
+#line 1528 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1447,19 +1552,22 @@ Minus Directional Movement
 =for bad
 
 ta_minus_dm processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1560 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_minus_dm = \&PDL::ta_minus_dm;
+#line 1567 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1483,19 +1591,22 @@ Momentum
 =for bad
 
 ta_mom processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1599 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_mom = \&PDL::ta_mom;
+#line 1606 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1519,19 +1630,22 @@ Plus Directional Indicator
 =for bad
 
 ta_plus_di processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1638 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_plus_di = \&PDL::ta_plus_di;
+#line 1645 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1555,19 +1669,22 @@ Plus Directional Movement
 =for bad
 
 ta_plus_dm processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1677 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_plus_dm = \&PDL::ta_plus_dm;
+#line 1684 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1597,19 +1714,22 @@ Percentage Price Oscillator
 =for bad
 
 ta_ppo processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1722 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_ppo = \&PDL::ta_ppo;
+#line 1729 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1633,19 +1753,22 @@ Rate of change : ((price/prevPrice-1)*100)
 =for bad
 
 ta_roc processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1761 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_roc = \&PDL::ta_roc;
+#line 1768 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1669,19 +1792,22 @@ Rate of change Percentage: (price-prevPrice/prevPrice)
 =for bad
 
 ta_rocp processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1800 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_rocp = \&PDL::ta_rocp;
+#line 1807 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1705,19 +1831,22 @@ Rate of change ratio: (price/prevPrice)
 =for bad
 
 ta_rocr processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1839 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_rocr = \&PDL::ta_rocr;
+#line 1846 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1741,19 +1870,22 @@ Rate of change ratio 100 scale: (price/prevPrice*100)
 =for bad
 
 ta_rocr100 processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1878 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_rocr100 = \&PDL::ta_rocr100;
+#line 1885 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1777,19 +1909,22 @@ Relative Strength Index
 =for bad
 
 ta_rsi processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1917 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_rsi = \&PDL::ta_rsi;
+#line 1924 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1826,19 +1961,22 @@ Stochastic
 =for bad
 
 ta_stoch processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1969 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_stoch = \&PDL::ta_stoch;
+#line 1976 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1869,19 +2007,22 @@ Stochastic Fast
 =for bad
 
 ta_stochf processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2015 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_stochf = \&PDL::ta_stochf;
+#line 2022 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1915,19 +2056,22 @@ Stochastic Relative Strength Index
 =for bad
 
 ta_stochrsi processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2064 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_stochrsi = \&PDL::ta_stochrsi;
+#line 2071 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1951,19 +2095,22 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 ta_trix processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2103 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_trix = \&PDL::ta_trix;
+#line 2110 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -1993,19 +2140,22 @@ Ultimate Oscillator
 =for bad
 
 ta_ultosc processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2148 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_ultosc = \&PDL::ta_ultosc;
+#line 2155 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2029,19 +2179,22 @@ Williams' %R
 =for bad
 
 ta_willr processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2187 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_willr = \&PDL::ta_willr;
+#line 2194 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2062,19 +2215,22 @@ Hilbert Transform - Dominant Cycle Period
 =for bad
 
 ta_ht_dcperiod processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2223 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_ht_dcperiod = \&PDL::ta_ht_dcperiod;
+#line 2230 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2095,19 +2251,22 @@ Hilbert Transform - Dominant Cycle Phase
 =for bad
 
 ta_ht_dcphase processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2259 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_ht_dcphase = \&PDL::ta_ht_dcphase;
+#line 2266 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2129,19 +2288,22 @@ Hilbert Transform - Phasor Components
 =for bad
 
 ta_ht_phasor processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2296 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_ht_phasor = \&PDL::ta_ht_phasor;
+#line 2303 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2163,19 +2325,22 @@ Hilbert Transform - SineWave
 =for bad
 
 ta_ht_sine processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2333 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_ht_sine = \&PDL::ta_ht_sine;
+#line 2340 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2196,19 +2361,22 @@ Hilbert Transform - Trend vs Cycle Mode
 =for bad
 
 ta_ht_trendmode processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2369 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_ht_trendmode = \&PDL::ta_ht_trendmode;
+#line 2376 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2229,19 +2397,22 @@ Chaikin A/D Line
 =for bad
 
 ta_ad processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2405 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_ad = \&PDL::ta_ad;
+#line 2412 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2268,19 +2439,22 @@ Chaikin A/D Oscillator
 =for bad
 
 ta_adosc processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2447 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_adosc = \&PDL::ta_adosc;
+#line 2454 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2302,19 +2476,22 @@ On Balance Volume
 =for bad
 
 ta_obv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2484 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_obv = \&PDL::ta_obv;
+#line 2491 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2335,19 +2512,22 @@ Two Crows
 =for bad
 
 ta_cdl2crows processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2520 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdl2crows = \&PDL::ta_cdl2crows;
+#line 2527 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2368,19 +2548,22 @@ Three Black Crows
 =for bad
 
 ta_cdl3blackcrows processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2556 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdl3blackcrows = \&PDL::ta_cdl3blackcrows;
+#line 2563 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2401,19 +2584,22 @@ Three Inside Up/Down
 =for bad
 
 ta_cdl3inside processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2592 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdl3inside = \&PDL::ta_cdl3inside;
+#line 2599 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2434,19 +2620,22 @@ Three-Line Strike
 =for bad
 
 ta_cdl3linestrike processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2628 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdl3linestrike = \&PDL::ta_cdl3linestrike;
+#line 2635 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2467,19 +2656,22 @@ Three Outside Up/Down
 =for bad
 
 ta_cdl3outside processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2664 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdl3outside = \&PDL::ta_cdl3outside;
+#line 2671 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2500,19 +2692,22 @@ Three Stars In The South
 =for bad
 
 ta_cdl3starsinsouth processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2700 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdl3starsinsouth = \&PDL::ta_cdl3starsinsouth;
+#line 2707 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2533,19 +2728,22 @@ Three Advancing White Soldiers
 =for bad
 
 ta_cdl3whitesoldiers processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2736 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdl3whitesoldiers = \&PDL::ta_cdl3whitesoldiers;
+#line 2743 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2569,19 +2767,22 @@ Abandoned Baby
 =for bad
 
 ta_cdlabandonedbaby processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2775 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlabandonedbaby = \&PDL::ta_cdlabandonedbaby;
+#line 2782 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2602,19 +2803,22 @@ Advance Block
 =for bad
 
 ta_cdladvanceblock processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2811 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdladvanceblock = \&PDL::ta_cdladvanceblock;
+#line 2818 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2635,19 +2839,22 @@ Belt-hold
 =for bad
 
 ta_cdlbelthold processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2847 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlbelthold = \&PDL::ta_cdlbelthold;
+#line 2854 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2668,19 +2875,22 @@ Breakaway
 =for bad
 
 ta_cdlbreakaway processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2883 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlbreakaway = \&PDL::ta_cdlbreakaway;
+#line 2890 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2701,19 +2911,22 @@ Closing Marubozu
 =for bad
 
 ta_cdlclosingmarubozu processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2919 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlclosingmarubozu = \&PDL::ta_cdlclosingmarubozu;
+#line 2926 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2734,19 +2947,22 @@ Concealing Baby Swallow
 =for bad
 
 ta_cdlconcealbabyswall processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2955 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlconcealbabyswall = \&PDL::ta_cdlconcealbabyswall;
+#line 2962 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2767,19 +2983,22 @@ Counterattack
 =for bad
 
 ta_cdlcounterattack processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 2991 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlcounterattack = \&PDL::ta_cdlcounterattack;
+#line 2998 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2803,19 +3022,22 @@ Dark Cloud Cover
 =for bad
 
 ta_cdldarkcloudcover processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3030 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdldarkcloudcover = \&PDL::ta_cdldarkcloudcover;
+#line 3037 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2836,19 +3058,22 @@ Doji
 =for bad
 
 ta_cdldoji processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3066 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdldoji = \&PDL::ta_cdldoji;
+#line 3073 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2869,19 +3094,22 @@ Doji Star
 =for bad
 
 ta_cdldojistar processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3102 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdldojistar = \&PDL::ta_cdldojistar;
+#line 3109 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2902,19 +3130,22 @@ Dragonfly Doji
 =for bad
 
 ta_cdldragonflydoji processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3138 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdldragonflydoji = \&PDL::ta_cdldragonflydoji;
+#line 3145 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2935,19 +3166,22 @@ Engulfing Pattern
 =for bad
 
 ta_cdlengulfing processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3174 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlengulfing = \&PDL::ta_cdlengulfing;
+#line 3181 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -2971,19 +3205,22 @@ Evening Doji Star
 =for bad
 
 ta_cdleveningdojistar processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3213 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdleveningdojistar = \&PDL::ta_cdleveningdojistar;
+#line 3220 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3007,19 +3244,22 @@ Evening Star
 =for bad
 
 ta_cdleveningstar processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3252 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdleveningstar = \&PDL::ta_cdleveningstar;
+#line 3259 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3040,19 +3280,22 @@ Up/Down-gap side-by-side white lines
 =for bad
 
 ta_cdlgapsidesidewhite processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3288 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlgapsidesidewhite = \&PDL::ta_cdlgapsidesidewhite;
+#line 3295 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3073,19 +3316,22 @@ Gravestone Doji
 =for bad
 
 ta_cdlgravestonedoji processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3324 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlgravestonedoji = \&PDL::ta_cdlgravestonedoji;
+#line 3331 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3106,19 +3352,22 @@ Hammer
 =for bad
 
 ta_cdlhammer processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3360 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlhammer = \&PDL::ta_cdlhammer;
+#line 3367 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3139,19 +3388,22 @@ Hanging Man
 =for bad
 
 ta_cdlhangingman processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3396 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlhangingman = \&PDL::ta_cdlhangingman;
+#line 3403 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3172,19 +3424,22 @@ Harami Pattern
 =for bad
 
 ta_cdlharami processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3432 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlharami = \&PDL::ta_cdlharami;
+#line 3439 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3205,19 +3460,22 @@ Harami Cross Pattern
 =for bad
 
 ta_cdlharamicross processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3468 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlharamicross = \&PDL::ta_cdlharamicross;
+#line 3475 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3238,19 +3496,22 @@ High-Wave Candle
 =for bad
 
 ta_cdlhighwave processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3504 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlhighwave = \&PDL::ta_cdlhighwave;
+#line 3511 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3271,19 +3532,22 @@ Hikkake Pattern
 =for bad
 
 ta_cdlhikkake processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3540 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlhikkake = \&PDL::ta_cdlhikkake;
+#line 3547 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3304,19 +3568,22 @@ Modified Hikkake Pattern
 =for bad
 
 ta_cdlhikkakemod processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3576 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlhikkakemod = \&PDL::ta_cdlhikkakemod;
+#line 3583 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3337,19 +3604,22 @@ Homing Pigeon
 =for bad
 
 ta_cdlhomingpigeon processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3612 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlhomingpigeon = \&PDL::ta_cdlhomingpigeon;
+#line 3619 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3370,19 +3640,22 @@ Identical Three Crows
 =for bad
 
 ta_cdlidentical3crows processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3648 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlidentical3crows = \&PDL::ta_cdlidentical3crows;
+#line 3655 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3403,19 +3676,22 @@ In-Neck Pattern
 =for bad
 
 ta_cdlinneck processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3684 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlinneck = \&PDL::ta_cdlinneck;
+#line 3691 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3436,19 +3712,22 @@ Inverted Hammer
 =for bad
 
 ta_cdlinvertedhammer processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3720 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlinvertedhammer = \&PDL::ta_cdlinvertedhammer;
+#line 3727 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3469,19 +3748,22 @@ Kicking
 =for bad
 
 ta_cdlkicking processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3756 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlkicking = \&PDL::ta_cdlkicking;
+#line 3763 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3502,19 +3784,22 @@ Kicking - bull/bear determined by the longer marubozu
 =for bad
 
 ta_cdlkickingbylength processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3792 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlkickingbylength = \&PDL::ta_cdlkickingbylength;
+#line 3799 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3535,19 +3820,22 @@ Ladder Bottom
 =for bad
 
 ta_cdlladderbottom processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3828 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlladderbottom = \&PDL::ta_cdlladderbottom;
+#line 3835 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3568,19 +3856,22 @@ Long Legged Doji
 =for bad
 
 ta_cdllongleggeddoji processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3864 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdllongleggeddoji = \&PDL::ta_cdllongleggeddoji;
+#line 3871 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3601,19 +3892,22 @@ Long Line Candle
 =for bad
 
 ta_cdllongline processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3900 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdllongline = \&PDL::ta_cdllongline;
+#line 3907 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3634,19 +3928,22 @@ Marubozu
 =for bad
 
 ta_cdlmarubozu processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3936 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlmarubozu = \&PDL::ta_cdlmarubozu;
+#line 3943 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3667,19 +3964,22 @@ Matching Low
 =for bad
 
 ta_cdlmatchinglow processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 3972 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlmatchinglow = \&PDL::ta_cdlmatchinglow;
+#line 3979 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3703,19 +4003,22 @@ Mat Hold
 =for bad
 
 ta_cdlmathold processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4011 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlmathold = \&PDL::ta_cdlmathold;
+#line 4018 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3739,19 +4042,22 @@ Morning Doji Star
 =for bad
 
 ta_cdlmorningdojistar processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4050 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlmorningdojistar = \&PDL::ta_cdlmorningdojistar;
+#line 4057 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3775,19 +4081,22 @@ Morning Star
 =for bad
 
 ta_cdlmorningstar processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4089 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlmorningstar = \&PDL::ta_cdlmorningstar;
+#line 4096 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3808,19 +4117,22 @@ On-Neck Pattern
 =for bad
 
 ta_cdlonneck processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4125 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlonneck = \&PDL::ta_cdlonneck;
+#line 4132 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3841,19 +4153,22 @@ Piercing Pattern
 =for bad
 
 ta_cdlpiercing processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4161 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlpiercing = \&PDL::ta_cdlpiercing;
+#line 4168 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3874,19 +4189,22 @@ Rickshaw Man
 =for bad
 
 ta_cdlrickshawman processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4197 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlrickshawman = \&PDL::ta_cdlrickshawman;
+#line 4204 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3907,19 +4225,22 @@ Rising/Falling Three Methods
 =for bad
 
 ta_cdlrisefall3methods processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4233 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlrisefall3methods = \&PDL::ta_cdlrisefall3methods;
+#line 4240 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3940,19 +4261,22 @@ Separating Lines
 =for bad
 
 ta_cdlseparatinglines processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4269 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlseparatinglines = \&PDL::ta_cdlseparatinglines;
+#line 4276 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -3973,19 +4297,22 @@ Shooting Star
 =for bad
 
 ta_cdlshootingstar processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4305 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlshootingstar = \&PDL::ta_cdlshootingstar;
+#line 4312 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -4006,19 +4333,22 @@ Short Line Candle
 =for bad
 
 ta_cdlshortline processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4341 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlshortline = \&PDL::ta_cdlshortline;
+#line 4348 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -4039,19 +4369,22 @@ Spinning Top
 =for bad
 
 ta_cdlspinningtop processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4377 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlspinningtop = \&PDL::ta_cdlspinningtop;
+#line 4384 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -4072,19 +4405,22 @@ Stalled Pattern
 =for bad
 
 ta_cdlstalledpattern processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4413 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlstalledpattern = \&PDL::ta_cdlstalledpattern;
+#line 4420 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -4105,19 +4441,22 @@ Stick Sandwich
 =for bad
 
 ta_cdlsticksandwich processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4449 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlsticksandwich = \&PDL::ta_cdlsticksandwich;
+#line 4456 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -4138,19 +4477,22 @@ Takuri (Dragonfly Doji with very long lower shadow)
 =for bad
 
 ta_cdltakuri processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4485 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdltakuri = \&PDL::ta_cdltakuri;
+#line 4492 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -4171,19 +4513,22 @@ Tasuki Gap
 =for bad
 
 ta_cdltasukigap processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4521 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdltasukigap = \&PDL::ta_cdltasukigap;
+#line 4528 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -4204,19 +4549,22 @@ Thrusting Pattern
 =for bad
 
 ta_cdlthrusting processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4557 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlthrusting = \&PDL::ta_cdlthrusting;
+#line 4564 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -4237,19 +4585,22 @@ Tristar Pattern
 =for bad
 
 ta_cdltristar processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4593 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdltristar = \&PDL::ta_cdltristar;
+#line 4600 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -4270,19 +4621,22 @@ Unique 3 River
 =for bad
 
 ta_cdlunique3river processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4629 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlunique3river = \&PDL::ta_cdlunique3river;
+#line 4636 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -4303,19 +4657,22 @@ Upside Gap Two Crows
 =for bad
 
 ta_cdlupsidegap2crows processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4665 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlupsidegap2crows = \&PDL::ta_cdlupsidegap2crows;
+#line 4672 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -4336,19 +4693,22 @@ Upside/Downside Gap Three Methods
 =for bad
 
 ta_cdlxsidegap3methods processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4701 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlxsidegap3methods = \&PDL::ta_cdlxsidegap3methods;
+#line 4708 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -4373,19 +4733,22 @@ Beta
 =for bad
 
 ta_beta processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4741 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_beta = \&PDL::ta_beta;
+#line 4748 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -4410,19 +4773,22 @@ Pearson's Correlation Coefficient (r)
 =for bad
 
 ta_correl processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4781 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_correl = \&PDL::ta_correl;
+#line 4788 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -4446,19 +4812,22 @@ Linear Regression
 =for bad
 
 ta_linearreg processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4820 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_linearreg = \&PDL::ta_linearreg;
+#line 4827 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -4482,19 +4851,22 @@ Linear Regression Angle
 =for bad
 
 ta_linearreg_angle processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4859 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_linearreg_angle = \&PDL::ta_linearreg_angle;
+#line 4866 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -4518,19 +4890,22 @@ Linear Regression Intercept
 =for bad
 
 ta_linearreg_intercept processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4898 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_linearreg_intercept = \&PDL::ta_linearreg_intercept;
+#line 4905 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -4554,19 +4929,22 @@ Linear Regression Slope
 =for bad
 
 ta_linearreg_slope processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4937 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_linearreg_slope = \&PDL::ta_linearreg_slope;
+#line 4944 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -4593,19 +4971,22 @@ Standard Deviation
 =for bad
 
 ta_stddev processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 4979 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_stddev = \&PDL::ta_stddev;
+#line 4986 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -4629,19 +5010,22 @@ Time Series Forecast
 =for bad
 
 ta_tsf processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 5018 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_tsf = \&PDL::ta_tsf;
+#line 5025 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -4668,19 +5052,22 @@ Variance
 =for bad
 
 ta_var processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 5060 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_var = \&PDL::ta_var;
+#line 5067 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -4701,19 +5088,22 @@ Average Price
 =for bad
 
 ta_avgprice processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 5096 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_avgprice = \&PDL::ta_avgprice;
+#line 5103 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -4734,19 +5124,22 @@ Median Price
 =for bad
 
 ta_medprice processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 5132 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_medprice = \&PDL::ta_medprice;
+#line 5139 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -4767,19 +5160,22 @@ Typical Price
 =for bad
 
 ta_typprice processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 5168 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_typprice = \&PDL::ta_typprice;
+#line 5175 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
+
+#line 949 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -4800,27 +5196,31 @@ Weighted Close Price
 =for bad
 
 ta_wclprice processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 5204 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-
-
+#line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_wclprice = \&PDL::ta_wclprice;
+#line 5211 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
-;
+
+
+#line 98 "TA.pd"
 
 =head1 LICENSE
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut
+#line 5224 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
 
 
 
@@ -4828,5 +5228,3 @@ This program is free software; you can redistribute it and/or modify it under th
 # Exit with OK status
 
 1;
-
-		   

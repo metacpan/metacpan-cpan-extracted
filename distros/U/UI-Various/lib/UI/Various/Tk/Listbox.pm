@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.34';
+our $VERSION = '0.37';
 
 use UI::Various::core;
 use UI::Various::Listbox;
@@ -91,15 +91,16 @@ sub _prepare($$$)
 	error('_1_element_must_be_accompanied_by_parent', __PACKAGE__);
 	return 1;
     }
-    my @options =
-	(-scrollbars => 'oe',
-	 ($self->width < $self->top->max_width ? (-width => $self->width) : ()),
-	 -height => $self->height, # height is mandatory, width is not!
-	 ($self->selection == 2 ? (-selectmode => 'extended') :
-	  (			   -selectmode => 'browse')),
-	 -exportselection => 0);
+    my @attributes = ($self->_attributes());
+    push @attributes,
+	-exportselection => 0,
+	-scrollbars => 'oe',
+	-height => $self->height,	# height is mandatory, width is not!
+	($self->width < $self->top->max_width ? (-width => $self->width) : ()),
+	($self->selection == 2 ? (-selectmode => 'extended') :
+	 (			   -selectmode => 'browse'));
     my $tk_listbox =
-	$_->_tk->Scrolled('Listbox', @options)
+	$_->_tk->Scrolled('Listbox', @attributes)
 	->grid(-row => $row, -column => $column);
     $self->_tk($tk_listbox);
     $tk_listbox->insert(0, @{$self->{texts}});
@@ -120,7 +121,7 @@ sub _prepare($$$)
 
 =head2 B<_add> - add new element
 
-C<PoorTerm>'s specific implementation of
+C<Tk>'s specific implementation of
 L<UI::Various::Listbox::add|UI::Various::Listbox/add - add new element>
 
 =cut
@@ -129,15 +130,37 @@ L<UI::Various::Listbox::add|UI::Various::Listbox/add - add new element>
 
 sub _add($@)
 {
-    my ($self) = shift;
+    my $self = shift;
     defined $self->_tk  and  $self->_tk->insert('end', @_);
+}
+
+#########################################################################
+
+=head2 B<_modify> - modify listbox
+
+C<Tk>'s specific implementation of
+L<UI::Various::Listbox::modify|UI::Various::Listbox/modify - modify
+element>)
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+sub _modify($$$)
+{
+    my ($self, $index, $value) = @_;
+    if (defined $self->_tk)
+    {
+	$self->_tk->insert($index, $value);
+	$self->_tk->delete($index + 1);
+    }
 }
 
 #########################################################################
 
 =head2 B<_remove> - remove element
 
-C<PoorTerm>'s specific implementation of
+C<Tk>'s specific implementation of
 L<UI::Various::Listbox::remove|UI::Various::Listbox/remove - remove element>
 
 =cut
@@ -154,7 +177,7 @@ sub _remove($$)
 
 =head2 B<_replace> - replace all elements
 
-C<PoorTerm>'s specific implementation of
+C<Tk>'s specific implementation of
 L<UI::Various::Listbox::replace|UI::Various::Listbox/replace - replace all
 elements>
 
@@ -164,7 +187,7 @@ elements>
 
 sub _replace($@)
 {
-    my ($self) = shift;
+    my $self = shift;
     if (defined $self->_tk)
     {
 	$self->_tk->delete(0, 'end');
@@ -176,7 +199,7 @@ sub _replace($@)
 
 =head2 B<_selected> - get current selection of listbox
 
-C<PoorTerm>'s specific implementation of
+C<Tk>'s specific implementation of
 L<UI::Various::Listbox::selected|UI::Various::Listbox/selected - get current
 selection of listbox>
 

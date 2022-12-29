@@ -219,7 +219,7 @@ sub alternate_server
 # NOTE: as_string() is inherited
 # NOTE: unfortunately, HTTP::XSHeaders is not dealing with as_string properly
 # It takes the given eol and replace simply any instance in-between line of \n with it,
-# thus if you have # something like: foo\r\nbar\r\n, it will end up with
+# thus if you have something like: foo\r\nbar\r\n, it will end up with
 # foo\r\r\nbar\r\n instead of foot\r\nbar\r\n
 # Bug report #10 <https://github.com/p5pclub/http-xsheaders/issues/10>
 # sub as_string { return( shift->SUPER::as_string( @_ ? @_ : ( CRLF ) ) ); }

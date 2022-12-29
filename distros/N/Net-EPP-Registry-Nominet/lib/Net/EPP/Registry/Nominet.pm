@@ -28,7 +28,7 @@ use constant EPP_XMLNS	=> 'urn:ietf:params:xml:ns:epp-1.0';
 use vars qw($Error $Code $Message);
 
 BEGIN {
-	our $VERSION = '0.06';
+	our $VERSION = '0.07';
 }
 
 # file-scoped lexicals
@@ -219,14 +219,7 @@ sub new {
 	bless($self, $class);
 
 	# Connect to server
-	eval { $self->{greeting} = $self->connect (%params); };
-	unless ($self->{greeting}) {
-		$self->{connected} = 0;
-		warn 'No greeting returned: cannot continue';
-		warn ($@) if $@;
-		return undef;
-	}
-	$self->{connected}      = 1;
+	$self->_go_connect (%params) or return;
 
 	# Login
 	unless (defined $params{login} and $params{login} == 0) {
@@ -236,6 +229,25 @@ sub new {
 	# If there was an error in the constructor, there's no point
 	# continuing - return undef just like Net::EPP::Simple
 	return $Error ? undef : $self;
+}
+
+sub _go_connect {
+	my ($self, %params) = @_;
+	if (scalar keys %params) {
+		$self->{connect_params} = \%params;
+	} else {
+		%params = %{$self->{connect_params}};
+	}
+
+	# Connect to server
+	eval { $self->{greeting} = $self->connect (%params); };
+	unless ($self->{greeting}) {
+		$self->{connected} = 0;
+		warn 'No greeting returned: cannot continue';
+		warn ($@) if $@;
+		return undef;
+	}
+	$self->{connected}      = 1;
 }
 
 =pod
@@ -323,21 +335,25 @@ sub login {
 	}
 
 	$self->{authenticated} = 1;
+	$self->{login_params} = [$user, $pass, $options];
 	return $self;
 }
 
 =head1 Availability checks
 
 The availability checks work similarly to L<Net::EPP::Simple> except
-that in list context they return an array with two elements.
+that in list context they return an array with up to three elements.
 The first element is the
 availability indicator as before (0 if provisioned, 1 if available,
-undef on error) and the second element is the abuse counter which shows
-how many more such checks you may run. This counter is only relevant
-for check_domain and will always be undef for the other check methods.
+undef on error). The second element is the abuse counter which shows
+how many more such checks you may run.
+The third element gives the reason for the lack of availability, if any.
+
+These two extra fields are only relevant for check_domain and will always
+be undef for the other check methods.
 
 	# List context
-	my ($avail, $left) = $epp->check_domain ("foo.uk");
+	my ($avail, $left, $reason) = $epp->check_domain ("foo.uk");
 	($avail) = $epp->check_contact ("ABC123");
 	($avail) = $epp->check_host ("ns0.foo.co.uk");
 
@@ -383,7 +399,11 @@ sub _check {
 	$count = $extra->getAttribute('abuse-limit') if defined $extra;
 	warn "Remaining checks = $count\n" if ($Debug and defined $count);
 
-	return ($avail, $count);
+	$extra = $response->getNode($spec[1], 'reason');
+	my $reason;
+	$reason = $extra->textContent if defined $extra;
+
+	return ($avail, $count, $reason);
 }
 
 =head1 Domain Renewal
@@ -871,7 +891,7 @@ eg:
 	my $changes = {
 		'name'         => 'foo.co.uk',
 		'add'          => {
-			secDNS => [{ 
+			secDNS => [{
 				keyTag     => 25103,
 				alg        => 5,
 				digestType => 1,
@@ -949,7 +969,7 @@ sub modify_domain {
 	# DNSSEC
 	# Nominet does not support MaxSigLife which is the only possible use
 	# for 'chg', so do not cater for it here (yet).
-	# 
+	#
 	my $exttype = 'secDNS';
 	@spec  = $self->spec ($exttype);
 	my $obj2  = $frame->addObject (@spec);
@@ -1687,6 +1707,21 @@ sub _send_frame {
 		$Code   = 0;
 		$Error  = "No response from server";
 		warn $Error;
+		$self->{connected}     = 0;
+		$self->{authenticated} = 0;
+		if ($self->{reconnect}) {
+			# Attempt to reconnect
+			for (1 .. $self->{reconnect}) {
+				$self->_go_connect and
+				$self->login (@{$self->{login_params}});
+				if ($self->{authenticated}) {
+					$frame->clTRID->firstChild->setData ('');
+					return $self->_send_frame ($frame);
+				}
+				warn "Re-connection attempt $_ of $self->{reconnect} failed.\n";
+				sleep 2;
+			}
+		}
 		return undef;
 	}
 	warn "Response = " . $response->toString . "\n" if $Debug > 1;
@@ -1731,7 +1766,7 @@ are not yet supported.
 =item * Nominet's L<EPP
 Documentation|https://registrars.nominet.uk/uk-namespace/registration-and-domain-management/registration-systems/epp/>
 
-=item * The EPP RFCs: L<RFC 5730|https://tools.ietf.org/html/rfc5730>, 
+=item * The EPP RFCs: L<RFC 5730|https://tools.ietf.org/html/rfc5730>,
 L<RFC 5731|https://tools.ietf.org/html/rfc5731>,
 L<RFC 5732|https://tools.ietf.org/html/rfc5732> and
 L<RFC 5733|https://tools.ietf.org/html/rfc5733>.
@@ -1744,7 +1779,7 @@ Pete Houston <cpan@openstrike.co.uk>
 
 =head1 Licence
 
-This software is copyright © 2013-2021 by Pete Houston. It is released
+This software is copyright © 2013-2022 by Pete Houston. It is released
 under the Artistic Licence (version 2) and the
 GNU General Public Licence (version 2).
 

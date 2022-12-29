@@ -13,6 +13,7 @@ package # hide from pause
     sub show_overloads     { $_[0]->{'show_overloads'}     }
     sub show_methods       { $_[0]->{'show_methods'}       }
     sub sort_methods       { $_[0]->{'sort_methods'}       }
+    sub show_wrapped       { $_[0]->{'show_wrapped'}       }
     sub inherited          { $_[0]->{'inherited'}          }
     sub format_inheritance { $_[0]->{'format_inheritance'} }
     sub parent_filters     { $_[0]->{'parent_filters'}     }
@@ -37,6 +38,7 @@ package # hide from pause
             'parent_filters' => Data::Printer::Common::_fetch_scalar_or_default($params, 'parent_filters', 1),
             'universal'    => Data::Printer::Common::_fetch_scalar_or_default($params, 'universal', 0),
             'sort_methods' => Data::Printer::Common::_fetch_scalar_or_default($params, 'sort_methods', 1),
+            'show_wrapped' => Data::Printer::Common::_fetch_scalar_or_default($params, 'show_wrapped', 1),
             'internals'    => Data::Printer::Common::_fetch_scalar_or_default($params, 'internals', 1),
             'parents'      => Data::Printer::Common::_fetch_scalar_or_default($params, 'parents', 1),
         };
@@ -68,7 +70,7 @@ my @method_names =qw(
     hash_preserve unicode_charnames colored theme show_weak
     max_depth index separator end_separator class_method class hash_separator
     align_hash sort_keys quote_keys deparse return_value show_dualvar show_tied
-    warnings arrows
+    warnings arrows coderef_stub coderef_undefined
 );
 foreach my $method_name (@method_names) {
     no strict 'refs';
@@ -206,6 +208,8 @@ sub _init {
     $self->{'sort_keys'} = Data::Printer::Common::_fetch_scalar_or_default($props, 'sort_keys', 1);
     $self->{'quote_keys'} = Data::Printer::Common::_fetch_scalar_or_default($props, 'quote_keys', 'auto');
     $self->{'deparse'} = Data::Printer::Common::_fetch_scalar_or_default($props, 'deparse', 0);
+    $self->{'coderef_stub'} = Data::Printer::Common::_fetch_scalar_or_default($props, 'coderef_stub', 'sub { ... }');
+    $self->{'coderef_undefined'} = Data::Printer::Common::_fetch_scalar_or_default($props, 'coderef_undefined', '<undefined coderef>');
     $self->{'return_value'} = Data::Printer::Common::_fetch_anyof(
                              $props,
                              'return_value',
@@ -572,7 +576,7 @@ sub _filters_for_data {
 # this funcionallity separated, but refcounts increase as we find
 # them again and because of that we were seeing weird refcounting.
 # So now instead we store the refcount of the variable when we
-# first saw it.
+# first see it.
 # Finally, if we have already seen the data, we return its stringified
 # position, like "var", "var{foo}[7]", etc. UNLESS $options{seen_override}
 # is set. Why seen_override? Sometimes we want to print the same data
@@ -679,10 +683,13 @@ sub parse {
         }
     }
 
+    # FIXME: because of prototypes, p(@data) becomes a ref (that we don't care about)
+    # to the data (that we do care about). So we should not show refcounts, memsize
+    # or readonly status for something guaranteed to be ephemeral.
     $parsed_string .= $self->_check_readonly($data);
     $parsed_string .= $str_weak if ref($data) ne 'REF';
-
     $parsed_string .= $self->_check_memsize($data);
+
     if ($self->show_refcount && ref($data) ne 'SCALAR' && $seen->{refcount} > 1 ) {
         $parsed_string .= ' (refcount: ' . $seen->{refcount} .')';
     }
@@ -1041,9 +1048,23 @@ setting also respects the C<ANSI_COLORS_DISABLED> environment variable.
 
 =head3 deparse
 
-If the data structure contains a subroutine reference, this options can be
-set to deparse it and print the underlying code, which hopefully resembles
-the original source code. (default: 0)
+If the data structure contains a subroutine reference (coderef), this option
+can be set to deparse it and print the underlying code, which hopefully
+resembles the original source code. (default: 0)
+
+=head3 coderef_stub
+
+If the data structure contains a subroutine reference (coderef) and the
+'L<deparse|/deparse>' option above is set to false, Data::Printer will print this
+instead. (default: 'C<< sub { ... } >>')
+
+=head3 coderef_undefined
+
+If the data structure contains a subroutine reference (coderef) that has
+not actually been defined at the time of inspection, Data::Printer will
+print this instead. Set it to '0' to disable this check, in which case
+Data::Printer will use whatever value you set on
+L<coderef_stub|/coderef_stub> above. (default: '<undefined coderef>').
 
 =head3 end_separator
 
@@ -1251,12 +1272,14 @@ This option includes a list of all overloads implemented by the object.
 =head4 show_methods
 
 Controls which of the object's direct methods to show. Can be set to 'none',
-'all', 'private' or 'public'. (default: 'all')
+'all', 'private' or 'public'. When applicable (Moo, Moose) it will also
+show attributes and roles. (default: 'all')
 
 =head4 sort_methods
 
-When listing methods, this option will order them alphabetically, rather than
-on whatever order the list of methods returned. (default: 1)
+When listing methods, attributes and roles, this option will order them
+alphabetically, rather than on whatever order the list of methods returned.
+(default: 1)
 
 =head4 inherited
 

@@ -24,6 +24,11 @@ test
     expect => "1234▒░░░90";
 
 test
+    option => "--tabstyle=squat-arrow,middle-dot",
+    stdin  => "1234\t90",
+    expect => "1234➧···90";
+
+test
     option => "--tabstyle=shade --tabstop=4",
     stdin  => "1\t567890",
     expect => "1▒░░567890";

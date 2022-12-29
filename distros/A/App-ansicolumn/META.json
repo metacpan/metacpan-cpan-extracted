@@ -67,7 +67,7 @@
    "provides" : {
       "App::ansicolumn" : {
          "file" : "lib/App/ansicolumn.pm",
-         "version" : "1.26"
+         "version" : "1.2801"
       },
       "App::ansicolumn::Border" : {
          "file" : "lib/App/ansicolumn/Border.pm"
@@ -79,16 +79,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/kaz-utashiro/App-ansicolumn/issues"
+         "web" : "https://github.com/tecolicom/App-ansicolumn/issues"
       },
-      "homepage" : "https://github.com/kaz-utashiro/App-ansicolumn",
+      "homepage" : "https://github.com/tecolicom/App-ansicolumn",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/kaz-utashiro/App-ansicolumn.git",
-         "web" : "https://github.com/kaz-utashiro/App-ansicolumn"
+         "url" : "https://github.com/tecolicom/App-ansicolumn.git",
+         "web" : "https://github.com/tecolicom/App-ansicolumn"
       }
    },
-   "version" : "1.26",
+   "version" : "1.2801",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

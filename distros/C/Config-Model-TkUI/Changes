@@ -1,3 +1,9 @@
+1.376 2022-12-27
+
+   Bug fixes:
+    * fix(Wizard): do not store value on next and previous button
+    * fix (node editor): add a pop-up ballon to accept widget
+
 1.375 2021-05-13
 
    Bug fixes:

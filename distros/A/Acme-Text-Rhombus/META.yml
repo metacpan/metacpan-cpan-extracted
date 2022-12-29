@@ -16,11 +16,11 @@ name: Acme-Text-Rhombus
 provides:
   Acme::Text::Rhombus:
     file: lib/Acme/Text/Rhombus.pm
-    version: '0.23'
+    version: '0.24'
 requires:
   Exporter: '0'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/stsc/Acme-Text-Rhombus
-version: '0.23'
+version: '0.24'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

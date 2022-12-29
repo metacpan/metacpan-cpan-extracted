@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-22'; # DATE
+our $DATE = '2022-09-23'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 sub meta {
     +{
@@ -55,7 +55,7 @@ Data::Sah::Filter::perl::Str::maybe_convert_to_re - Convert string to regex if s
 
 =head1 VERSION
 
-This document describes version 0.012 of Data::Sah::Filter::perl::Str::maybe_convert_to_re (from Perl distribution Sah-Schemas-Str), released on 2022-09-22.
+This document describes version 0.013 of Data::Sah::Filter::perl::Str::maybe_convert_to_re (from Perl distribution Sah-Schemas-Str), released on 2022-09-23.
 
 =head1 DESCRIPTION
 

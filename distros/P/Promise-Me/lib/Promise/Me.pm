@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Promise - ~/lib/Promise/Me.pm
-## Version v0.4.5
+## Version v0.4.7
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/28
-## Modified 2022/09/27
+## Modified 2022/12/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -125,7 +125,7 @@ BEGIN
     our $OBJECTS_REPO = [];
     our $EXCEPTION_CLASS = 'Module::Generic::Exception';
     our $SERIALISER = 'storable';
-    our $VERSION = 'v0.4.5';
+    our $VERSION = 'v0.4.7';
 };
 
 use strict;
@@ -928,6 +928,14 @@ sub result
     }
     else
     {
+        if( !$self->executed )
+        {
+            return( $self->error( "The promise has not yet been executed, because you have called result() without first calling then() or wait() (in void context)." ) );
+        }
+        elsif( !$shm )
+        {
+            return( $self->error( "Shared space object not set or lost!" ) );
+        }
         my $hash = $shm->read;
         $hash = {} if( ref( $hash ) ne 'HASH' );
         $self->{shared} = $hash;
@@ -1614,9 +1622,9 @@ sub _set_shared_space
     {
         my $tmpdir = $self->tmpdir;
         if( defined( $tmpdir ) && 
-            length( $tmpdir ) && 
-            -e( $tmpdir ) &&
-            -d( $tmpdir ) )
+            length( "$tmpdir" ) && 
+            -e( "$tmpdir" ) &&
+            -d( "$tmpdir" ) )
         {
             $p->{tmpdir} = $tmpdir;
         }
@@ -1675,13 +1683,14 @@ END
     for( my $i = 0; $i < $#$OBJECTS_REPO; $i++ )
     {
         my $o = $OBJECTS_REPO->[$i];
+        next unless( defined( $o ) );
         # END block called by child process typically
         my $pid = $o->pid;
         next if( $pid ne $$ );
         my $shm;
         if( (
                 $o->shared_space_destroy && 
-                ( $shm = $o->shared_mem ) &&
+                defined( $shm = $o->shared_mem ) &&
                 ( $shm->isa( 'Module::Generic::SharedMem' ) ||
                   $shm->isa( 'Module::Generic::SharedMemXS' )
                 )
@@ -2484,7 +2493,7 @@ Promise::Me - Fork Based Promise with Asynchronous Execution, Async, Await and S
 
 =head1 VERSION
 
-    v0.4.5
+    v0.4.7
 
 =head1 DESCRIPTION
 
@@ -2763,6 +2772,8 @@ If you want to set a timeout, you can use L</wait>, or L</await>
 
 This is a chain method whose purpose is to indicate that we must wait for the asynchronous process to complete.
 
+It can be used before or after a call to L</then> or L</catch>
+
     Promise::Me->new(sub
     {
         # Some operation to be run asynchronously
@@ -2773,6 +2784,36 @@ This is a chain method whose purpose is to indicate that we must wait for the as
     {
         # Cath any exceptions
     })->wait;
+
+    # or
+
+    Promise::Me->new(sub
+    {
+        # Some operation to be run asynchronously
+    })->wait->then(sub
+    {
+        # Do some processing of the result
+    });
+
+    # or even possibly
+
+    Promise::Me->new(sub
+    {
+        # Some operation to be run asynchronously
+    })->wait->catch(sub
+    {
+        my $exception = shift( @_ );
+        # Do some processing of a possible error
+    });
+
+But doing the following would not yield the expected result:
+
+    my $result = Promise::Me->new(sub
+    {
+        # Some operation to be run asynchronously
+    })->wait->result;
+
+That's because the promise has not been given a chance to be executed, and the promise is executed on the last L</then> or L</catch>
 
 =head1 CLASS FUNCTIONS
 

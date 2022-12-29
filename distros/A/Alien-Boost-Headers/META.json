@@ -31,6 +31,7 @@
          "requires" : {
             "Alien::Build::MM" : "0.25",
             "Archive::Tar" : "0",
+            "Config" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
             "Mojo::DOM" : "0",
@@ -74,12 +75,13 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.7",
+   "version" : "1.9",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.74",
       "requires" : {
          "share" : {
             "Archive::Tar" : "0",
+            "Config" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
             "Mojo::DOM" : "0",

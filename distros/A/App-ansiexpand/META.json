@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.19",
+   "generated_by" : "Minilla/v3.1.20",
    "license" : [
       "perl_5"
    ],
@@ -46,7 +46,7 @@
             "Getopt::EX::Hashed" : "1.05",
             "Getopt::EX::Long" : "0",
             "Pod::Usage" : "0",
-            "Text::ANSI::Tabs" : "1.01",
+            "Text::ANSI::Tabs" : "1.02",
             "perl" : "5.014"
          }
       },
@@ -60,7 +60,7 @@
    "provides" : {
       "App::ansiexpand" : {
          "file" : "lib/App/ansiexpand.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
@@ -75,11 +75,11 @@
          "web" : "https://github.com/kaz-utashiro/App-ansiexpand"
       }
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_serialization_backend" : "JSON::PP version 4.12",
    "x_static_install" : 0
 }

@@ -1,6 +1,6 @@
-Net::EPP::Registry::Nominet 0.06
+Net::EPP::Registry::Nominet 0.07
 
-Released: 4th October 2021
+Released: 23rd December 2022
 
 
 INSTALLATION
@@ -42,8 +42,9 @@ compatible interface to Net::EPP::Simple so far as is practical.
 NEW SINCE LAST PRODUCTION VERSION
 ---------------------------------
 
-Fix hello() so it only reports the XML for Debug > 1
-Fix and test list_tags (RT 137485)
+Test suite fixes
+Domain check returns reason for unavailability as 3rd value
+Automatically reconnect, re-login and resend a request if no response
 
 See the Changes file for a complete history.
 
@@ -64,7 +65,7 @@ to read it. Alternatively, you can view the man page with
 COPYRIGHT
 ---------
 
-This software is copyright (c) 2013-2021 by Pete Houston. It is released
+This software is copyright © 2013-2022 by Pete Houston. It is released
 under the Artistic Licence (version 2) and the GNU General Public Licence
 (version 2).
 

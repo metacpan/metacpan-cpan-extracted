@@ -1,5 +1,12 @@
 Revision history for Plack-Middleware-Security-Simple:
 
+v0.8.3    2022-12-22 14:03:34+00:00 Europe/London
+  [Enhancements]
+  - Added php: to the protocol_in_path_or_referer rule.
+
+  [Documentation]
+  - Added missing item to Changes for v0.8.2.
+
 v0.8.2    2022-12-12 16:40:09+00:00 Europe/London
   [Enhancements]
   - Added .config to the misc_extensions rule.
@@ -13,6 +20,9 @@ v0.8.2    2022-12-12 16:40:09+00:00 Europe/London
 
   [Tests]
   - Fix dependency for Test::Vars.
+
+  [Other]
+  - Added GitHub Actions to run tests.
 
 v0.8.1    2022-07-05 12:06:58+01:00 Europe/London
   [Enhancements]

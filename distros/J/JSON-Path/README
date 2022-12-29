@@ -1,5 +1,5 @@
 This archive contains the distribution JSON-Path,
-version 1.0.2:
+version 1.0.3:
 
   search nested hashref/arrayref structures using JSONPath
 

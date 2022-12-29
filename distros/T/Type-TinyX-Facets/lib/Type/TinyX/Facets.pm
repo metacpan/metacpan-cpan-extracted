@@ -5,7 +5,7 @@ package Type::TinyX::Facets;
 use strict;
 use warnings;
 
-our $VERSION = '1.2';
+our $VERSION = '1.3';
 
 use B              ();
 use Exporter::Tiny ();
@@ -231,7 +231,7 @@ Type::TinyX::Facets - Easily create a facet parameterized Type::Tiny type
 
 =head1 VERSION
 
-version 1.2
+version 1.3
 
 =head1 SYNOPSIS
 

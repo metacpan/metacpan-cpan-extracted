@@ -11,17 +11,15 @@ if ($^O ne 'linux') {
 my $builder = Module::Build->new(
 	module_name         => 'Linux::FD',
 	  'build_requires' => {
-    'IO::Handle' => '0',
     'IO::Select' => '0',
-    'IPC::Open3' => '0',
-    'Module::Build' => '0.3601',
+    'Module::Build' => '0.28',
     'POSIX' => '0',
     'Test::Exception' => '0',
     'Test::More' => '0.89',
     'Time::HiRes' => '0'
   },
   'configure_requires' => {
-    'Module::Build' => '0.3601'
+    'Module::Build' => '0.28'
   },
   'requires' => {
     'Sub::Exporter' => '0',

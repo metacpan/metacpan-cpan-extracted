@@ -40,8 +40,6 @@ my $newtag = substr ($ENV{NOMTAG}, 0, 15) . '_';
 
 my $domtogo = ("foo-openstrike.co.uk");
 
-is ($epp->release_domain($domtogo, 'NOMINET'), 0, "Release to NOMINET");
-like ($epp->get_reason (), qr/V055/, "Release to NOMINET - reason");
 is ($epp->release_domain($domtogo, $newtag), 0, "Release bad dom to $newtag");
 like ($epp->get_reason (), qr/V096/, "Release bad dom to $newtag - reason");
 is ($epp->release_domain($domtogo, 'NOTAREALTAG'), 0, "Release bad dom to wrong tag");
@@ -80,7 +78,13 @@ my $domain = {
 	}
 };
 my ($expiry) = $epp->register ($domain);
-is ($epp->release_domain($domtogo, $newtag), 1, "Release to $newtag") or
+
+# Cannot detag a domain within 30 days of registration
+is ($epp->release_domain($domtogo, 'DETAGGED'), 0, "Release $domtogo to DETAGGED");
+like ($epp->get_reason (), qr/V101/, "Release to DETAGGED - reason");
+
+# Can release it to a valid receiving tag, however
+is ($epp->release_domain($domtogo, $newtag), 1, "Release $domtogo to $newtag") or
 	diag ($epp->get_message, $epp->get_code, $epp->get_error);
 
 ok ($epp->logout(), 'Logout successful');

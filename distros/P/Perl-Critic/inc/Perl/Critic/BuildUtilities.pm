@@ -24,53 +24,48 @@ use Devel::CheckOS qw< os_is >;
 
 sub required_module_versions {
     return (
-        'B::Keywords'                   => 1.05,
+        'B::Keywords'                   => 1.23,
         'Carp'                          => 0,
         'Config::Tiny'                  => 2,
         'English'                       => 0,
         'Exception::Class'              => 1.23,
         'Exporter'                      => 5.63,
-        'Fatal'                         => 0,
         'File::Basename'                => 0,
         'File::Find'                    => 0,
         'File::Path'                    => 0,
         'File::Spec'                    => 0,
         'File::Spec::Unix'              => 0,
         'File::Temp'                    => 0,
-        'File::Which'                   => 0,
+        'File::Which'                   => 0, # Only for PodSpelling
         'Getopt::Long'                  => 0,
-        'IO::String'                    => 0,
-        'IPC::Open2'                    => 1,
         'List::SomeUtils'               => '0.55',
         'List::Util'                    => 0,
         'Module::Pluggable'             => 3.1,
-        'PPI'                           => '1.265',
-        'PPI::Document'                 => '1.265',
-        'PPI::Document::File'           => '1.265',
-        'PPI::Node'                     => '1.265',
-        'PPI::Token::Quote::Single'     => '1.265',
-        'PPI::Token::Whitespace'        => '1.265',
+        'PPI'                           => '1.271',
+        'PPI::Document'                 => '1.271',
+        'PPI::Document::File'           => '1.271',
+        'PPI::Node'                     => '1.271',
+        'PPI::Token::Quote::Single'     => '1.271',
+        'PPI::Token::Whitespace'        => '1.271',
         'PPIx::QuoteLike'               => 0,
         'PPIx::Regexp'                  => '0.027', # Literal { deprecated in re
         'PPIx::Regexp::Util'            => '0.068', # is_ppi_regexp_element()
         'PPIx::Utilities::Node'         => '1.001',
         'PPIx::Utilities::Statement'    => '1.001',
-        'Perl::Tidy'                    => 0,
-        'Pod::Parser'                   => 0,
+        'Perl::Tidy'                    => 0, # Only for RequireTidyCode
         'Pod::PlainText'                => 0,
         'Pod::Select'                   => 0,
-        'Pod::Spell'                    => 1,
+        'Pod::Spell'                    => 1, # Only for PodSpelling
         'Pod::Usage'                    => 0,
         'Readonly'                      => 2.00,
         'Scalar::Util'                  => 0,
         'String::Format'                => '1.18',
-        'Task::Weaken'                  => 0,
         'Term::ANSIColor'               => '2.02',
         'Test::Builder'                 => 0.92,
         'Text::ParseWords'              => 3,
-        'base'                          => 0,
         'charnames'                     => 0,
         'overload'                      => 0,
+        'parent'                        => 0,
         'perl'                          => 5.010001,
         'strict'                        => 0,
         'version'                       => 0.77,
@@ -182,7 +177,7 @@ Elliot Shank  C<< <perl@galumph.com> >>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2007-2021, Elliot Shank.
+Copyright (c) 2007-2022, Elliot Shank.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.  The full text of this license

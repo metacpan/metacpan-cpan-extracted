@@ -43,8 +43,6 @@ EOF
 
    my $have_pl_infix_plugin = 0;
 
-   # No released version of perl (yet) has PL_infix_plugin. This commandline
-   # argument allows it to build if patched correctly.
    $have_pl_infix_plugin = 1 if grep { $_ eq "--have-pl_infix_plugin" } @ARGV;
 
    $have_pl_infix_plugin ||= $cc->try_compile_run(
@@ -61,7 +59,7 @@ int main(void) {
    return 0;
 }
 EOF
-   ) if $] >= 5.037000; # maybe I'll start this in 5.37...
+   ) if $] >= 5.037007;
 
    if( $have_pl_infix_plugin ) {
       print "Including support for core perl PL_infix_plugin\n";

@@ -1,5 +1,8 @@
 Revision history for Bible::OBML
 
+2.06      2022-12-21 13:47:00-08:00 America/Los_Angeles
+        - Deploy use of Bible::Reference's new chapter match flag
+
 2.05      2022-12-05 10:30:43-08:00 America/Los_Angeles
         - Remove extra spacing if it exists in OBML output
 

@@ -11,7 +11,7 @@ our $STDERR    = \*STDERR;           # useful for testing
 
 sub logf ($level, $format, @args) {
   return 1 if $ENV{HARNESS_ACTIVE} and !$ENV{HARNESS_IS_VERBOSE};
-  return 1 if $level eq 'debug' and !$ENV{HARNESS_IS_VERBOSE} and !$ENV{NETDATA_DEBUG_FLAGS};
+  return 1 if $level eq 'debug'    and !($ENV{NETDATA_DEBUG} || $ENV{HARNESS_IS_VERBOSE});
 
   my $module_name = caller;
   my ($s, $m, $h, $day, $month, $year) = localtime time;

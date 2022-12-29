@@ -1,10 +1,10 @@
 {
-   "abstract" : "sharing PDL data between Perl threads",
+   "abstract" : "unknown",
    "author" : [
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -15,6 +15,8 @@
    "name" : "PDL-Parallel-threads",
    "no_index" : {
       "directory" : [
+         "t",
+         "inc",
          "examples",
          "t"
       ],
@@ -25,48 +27,40 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::CBuilder" : "0",
-            "ExtUtils::ParseXS" : "3.0",
-            "Test::Exception" : "0",
-            "Test::Warn" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.28",
-            "PDL" : "v2.4.0"
+            "ExtUtils::MakeMaker" : "7.14",
+            "PDL" : "2.058"
          }
       },
       "runtime" : {
          "requires" : {
-            "PDL" : "v2.4.10",
-            "perl" : "v5.8.0",
+            "PDL" : "2.058",
+            "perl" : "5.014000",
             "threads::shared" : "1.21"
          }
-      }
-   },
-   "provides" : {
-      "PDL::Parallel::threads" : {
-         "file" : "lib/PDL/Parallel/threads.pm",
-         "version" : "0.04"
       },
-      "PDL::Parallel::threads::SIMD" : {
-         "file" : "lib/PDL/Parallel/threads/SIMD.pm",
-         "version" : "0.02"
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::Warn" : "0"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/run4flat/PDL-Parallel-threads/issues"
+         "web" : "http://github.com/PDLPorters/PDL-Parallel-threads/issues"
       },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
       "repository" : {
-         "url" : "http://github.com/run4flat/PDL-Parallel-threads"
+         "type" : "git",
+         "url" : "git://github.com/PDLPorters/PDL-Parallel-threads.git",
+         "web" : "http://github.com/PDLPorters/PDL-Parallel-threads"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

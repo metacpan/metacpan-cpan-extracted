@@ -215,7 +215,7 @@ my %determiners = (
     'BlurImageEffect' => { 'Type' => 'Blur', },
     'BorderBoxElement' => { 'Type' => 'BorderBox', },
     'BoxElement' => { 'Type' => 'Box', },
-    'BubbleChartDataPoint' => {  },
+    'BubbleChartDataPoint' => { 'Type' => 'Bubble', },
     'BubbleSeries' => { 'DataPointType' => 'Bubble', },
     'Camera' => {  },
     'Chart' => { 'Type' => 'Chart', },
@@ -318,7 +318,7 @@ my %determiners = (
     'NotesSlideHeaderFooter' => {  },
     'ObjectExist' => {  },
     'OleObjectFrame' => { 'Type' => 'OleObjectFrame', },
-    'OneValueChartDataPoint' => {  },
+    'OneValueChartDataPoint' => { 'Type' => 'OneValue', },
     'OneValueSeries' => { 'DataPointType' => 'OneValue', },
     'OrderedMergeRequest' => {  },
     'OuterShadowEffect' => {  },
@@ -360,7 +360,7 @@ my %determiners = (
     'Save' => { 'Type' => 'Save', },
     'SaveShape' => { 'Type' => 'SaveShape', },
     'SaveSlide' => { 'Type' => 'SaveSlide', },
-    'ScatterChartDataPoint' => {  },
+    'ScatterChartDataPoint' => { 'Type' => 'Scatter', },
     'ScatterSeries' => { 'DataPointType' => 'Scatter', },
     'Section' => {  },
     'SectionZoomFrame' => { 'Type' => 'SectionZoomFrame', },
@@ -429,6 +429,11 @@ my %determiners = (
     'ZoomFrame' => { 'Type' => 'ZoomFrame', },
     'ZoomObject' => {  },
 );
+
+sub has_class {
+    my ($self, $name) = @_;
+    return exists $determiners{$name};
+}
 
 sub is_subclass {
     my ($self, $subclass, $class) = @_;

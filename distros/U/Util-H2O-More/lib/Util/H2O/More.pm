@@ -4,9 +4,9 @@ use warnings;
 package Util::H2O::More;
 use parent q/Exporter/;
 
-our $VERSION = q{0.1};
+our $VERSION = q{0.2.2};
 
-our @EXPORT_OK = (qw/baptise opt2h2o h2o o2h h3o o3h/);
+our @EXPORT_OK = (qw/baptise opt2h2o h2o o2h d2o o2d o2h2o ini2o o2ini/);
 
 use Util::H2O ();
 
@@ -59,18 +59,38 @@ sub baptise ($$@) {
 # preconditioner for use with Getopt::Long flags; returns just the flag name given
 # a list of option descriptors, e.g., qw/option1=s option2=i option3/;
 
-# flags to keys
+# Getopts to keys
 sub opt2h2o(@) {
     my @getopt_def = @_;
     my @flags_only = map { m/([^=|\s]+)/g; $1 } @getopt_def;
     return @flags_only;
 }
 
+# general form of method used to give accessors to Config::Tiny in Util::H2O's
+# POD documentation
+sub o2h2o ($) {
+   my $ref = shift;
+   return h2o -recurse, {%{ $ref }};
+}
+
+# more specific helper app that uses Config::Tiny->read and o2h2o to get a config
+# object back from an .ini; requries Config::Tiny
+sub ini2o ($) {
+   my $filename = shift;
+   require Config::Tiny;
+   return o2h2o( Config::Tiny->read($filename) );
+}
+
+# write out the INI file
+sub o2ini ($$) {
+  my ($config, $filename) = @_;
+  require Config::Tiny;
+  return Config::Tiny->new(Util::H2O::o2h $config)->write($filename);
+}
+
 # return a dereferences hash (non-recursive); reverse of `h2o'
 sub o2h($) {
-
-    # makes internal package name more generic for baptise created references
-    $Util::H2O::_PACKAGE_REGEX = qr/::_[0-9A-Fa-f]+\z/;
+    $Util::H2O::_PACKAGE_REGEX = qr/::_[0-9A-Fa-f]+\z/; # makes internal package name more generic for baptise created references
     my $ref = Util::H2O::o2h @_;
     if ( ref $ref ne q{HASH} ) {
         die qq{Could not fully remove top-level reference. Probably an issue with \$Util::H2O_PACKAGE_REGEX\n};
@@ -78,61 +98,21 @@ sub o2h($) {
     return $ref;
 }
 
-# traverses a all ARRAY and HASH references in a data structure reference,
-# looking for HASH references to bless using h2o; basically it's C<h2o -recurse>
-# on performance enhancing drugs
+sub d2o($);    # forward declaration to get rid of "too early" warning
+sub a2o($);
 
-## Notes on implementation
-# * Interface - should accept all things h2o does [what about default accessors?]
-# * All hash refs should get accessors (what about default accessors?)
-# * all arrays to get an vmethod that returns all elements in it
-# * anything not ARRAY or HASH should be untouched
-
-sub h3o($);    # forward declaration to get rid of "too early" warning
-
-sub h3o($) {
+sub d2o($) {
     my $thing = shift;
     my $isa   = ref $thing;
     if ( $isa eq q{ARRAY} ) {
-
-        # uses lexical scop of the 'if' to a bless $thing (an ARRAY ref)
-        # and assigns to it some virtual methods for making dealing with
-        # the "lists of C<HASH> references easier, as a container
-        no strict 'refs';
-        my $a2o_pkg = sprintf( qq{%s::_a2o_%d}, __PACKAGE__, int rand 100_000 );    # internal a2o
-        bless $thing, $a2o_pkg;
-
-        # add vmethod to wrap around things
-        my $GET    = sub { my ( $self, $i ) = @_; return $self->[$i]; };
-        my $ALL    = sub { my $self = shift; return @$self; };
-        my $SCALAR = sub { my $self = shift; return scalar @$self; };
-
-        # 'push' will apply "h3o" to all elements pushed
-        my $PUSH = sub { my ( $self, @i ) = @_; h3o \@i; push @$self, @i; return \@i };
-
-        # 'pop' intentionally does NOT apply "o3h" to anything pop'd
-        my $POP = sub { my $self = shift; return pop @$self };
-
-        # 'unshift' will apply "h3o" to all elements unshifted
-        my $UNSHIFT = sub { my ( $self, @i ) = @_; h3o \@i; unshift @$self, @i; return \@i };
-
-        # 'shift' intentionally does NOT apply "o3h" to anything shift'd
-        my $SHIFT = sub { my $self = shift; return shift @$self };
-        *{"${a2o_pkg}::get"}     = $GET;
-        *{"${a2o_pkg}::all"}     = $ALL;
-        *{"${a2o_pkg}::scalar"}  = $SCALAR;
-        *{"${a2o_pkg}::push"}    = $PUSH;
-        *{"${a2o_pkg}::pop"}     = $POP;
-        *{"${a2o_pkg}::unshift"} = $UNSHIFT;
-        *{"${a2o_pkg}::shift"}   = $SHIFT;
-
+        a2o $thing;
         foreach my $element (@$thing) {
-            h3o $element;
+            d2o $element;
         }
     }
     elsif ( $isa eq q{HASH} ) {
         foreach my $keys ( keys %$thing ) {
-            h3o( $thing->{$keys} );
+            d2o( $thing->{$keys} );
         }
 
         # package level wrapper, so this can be monkey patched
@@ -142,27 +122,76 @@ sub h3o($) {
     return $thing;
 }
 
+# blesses ARRAY ref as a container and gives it some virtual methods
+# useful in the context of containing HASH refs that get objectified
+# by h2o
+sub a2o($) {
+    no strict 'refs';
+
+    my $array_ref = shift;
+
+    # uses lexical scop of the 'if' to a bless $array_ref (an ARRAY ref)
+    # and assigns to it some virtual methods for making dealing with
+    # the "lists of C<HASH> references easier, as a container
+
+    my $a2o_pkg = sprintf( qq{%s::__a2o_%d::vmethods}, __PACKAGE__, int rand 100_000_000 );    # internal a2o
+
+    bless $array_ref, $a2o_pkg;
+
+    ## add vmethod to wrap around array_refs
+
+    # return item at index INDEX
+    my $GET = sub { my ( $self, $i ) = @_; return $self->[$i]; };
+    *{"${a2o_pkg}::get"} = $GET;
+
+    # return rereferenced ARRAY
+    my $ALL = sub { my $self = shift; return @$self; };
+    *{"${a2o_pkg}::all"} = $ALL;
+
+    # returns value returned by the 'scalar' keyword
+    my $SCALAR = sub { my $self = shift; return scalar @$self; };
+    *{"${a2o_pkg}::scalar"} = $SCALAR;
+
+    # 'push' will apply "d2o" to all elements pushed
+    my $PUSH = sub { my ( $self, @i ) = @_; d2o \@i; push @$self, @i; return \@i };
+    *{"${a2o_pkg}::push"} = $PUSH;
+
+    # 'pop' intentionally does NOT apply "o2d" to anyarray_ref pop'd
+    my $POP = sub { my $self = shift; return pop @$self };
+    *{"${a2o_pkg}::pop"} = $POP;
+
+    # 'unshift' will apply "d2o" to all elements unshifted
+    my $UNSHIFT = sub { my ( $self, @i ) = @_; d2o \@i; unshift @$self, @i; return \@i };
+    *{"${a2o_pkg}::unshift"} = $UNSHIFT;
+
+    # 'shift' intentionally does NOT apply "o2d" to anyarray_ref shift'd
+    my $SHIFT = sub { my $self = shift; return shift @$self };
+    *{"${a2o_pkg}::shift"} = $SHIFT;
+
+    return $array_ref;
+}
+
+
 # includes internal dereferencing so to be compatible
 # with the behavior of Util::H2O::o2h
-sub o3h($);    # forward declaration to get rid of "too early" warning
+sub o2d($);    # forward declaration to get rid of "too early" warning
 
-sub o3h($) {
+sub o2d($) {
     my $thing = shift;
-    no warnings 'prototype';
     return $thing if not $thing;
     my $isa = ref $thing;
-    if ( $isa eq q{ARRAY} ) {
+    if ( $isa =~ m/^Util::H2O::More::__a2o/ ) {
         my @_thing = @$thing;
-        foreach my $element (@_thing) {
-            $element = o3h($element);
+        $thing     = \@_thing;
+        foreach my $element (@$thing) {
+            $element = o2d $element;
         }
     }
-    elsif ( $isa eq q{HASH} ) {
-        my %_thing = %$thing;
-        foreach my $key ( keys %_thing ) {
-            $_thing{$key} = o3h( $_thing{$key} );
+    elsif ( $isa =~ m/^Util::H2O::_/ ) {
+        foreach my $key ( keys %$thing ) {
+            $thing->{$key} = o2d $thing->{$key};
         }
-        $thing = Util::H2O::o2h \%_thing;
+        $thing = Util::H2O::o2h $thing;
     }
     return Util::H2O::o2h $thing;
 }
@@ -176,9 +205,11 @@ __END__
 Util::H2O::More - provides C<baptise>, a drop-in replacement for
 C<bless>; like if C<bless> created accessors for you. This module
 also provides additional methods built using C<h2o> or C<o2h> from
-L<Util::H2O>.
+L<Util::H2O> that allow for the incremental addition of I<OOP> into
+existing or small scale Perl code without having to fully commit
+to a Perl I<OOP> framework or compromise one's personal Perl style.
 
-C<Util::H2O::More> also provides a wrapper method now, C<h3o>
+C<Util::H2O::More> now provides a wrapper method now, C<d2o>
 that will find and I<objectify> all C<HASH> refs contained in
 C<ARRAY>s at any level, no matter how deep. This ability is
 very useful for dealing with modern services that return C<ARRAY>s
@@ -253,37 +284,35 @@ The primary method, C<baptise>, essentially provides the same
 interface as the core keyword C<bless> with an additional I<slurpy>
 third parameter where one may specify a list of default accessors.
 
-=head2 Why Was This Created?
+Ultimately C<h2o> provides a very compelling approach that allows
+one to incrementally add I<OOP> into their Perl. At the very least
+it makes dealing with C<HASH> references much easier, and without
+the committment to a full Perl I<OOP> framework. Perl is meant to
+be I<multi-paradigm>, which means that it should be easy to mix the
+best of different methods into one glorious creation. L<Util::H2O>,
+and by extension, C<Util::H2O::More>; seeks to accomplish making it
+possible for I<OOP> concepts.
 
-The really short answer: because C<h2o> doesn't play nice
-inside of the traditional Perl OOP constructor (C<new>) idiom.
-This is not C<h2o>'s fault. This is my fault for wanting to use
-it to do something it was never meant to do.
+C<Util::H2O::h2o> is a deceptively powerful tool that, above all, makes
+it I<easy> and I<fun> to add accessors to I<ad hoc> C<HASH>references
+that many Perl developers like to use and that get returned,
+I<unblessed> by many popular modules. For example, L<HTTP::Tiny>,
+L<Web::Scraper>, and the more common I<select%> methods L<DBI>
+flavors implement. In particular, any L<JSON> returned by a
+L<HTTP::Tiny> web request is not just ublessed, but still serialized.
+Yet another great example is the configuration object returned by
+the very popular module, L<Config::Tiny>.
 
-Implied above is that I wanted to maintain the usage pattern of
-C<bless>, but extend it to include the generation of accessors.
-I wanted a I<better bless>.
-
-The long answer...
-
-C<h2o> is a deceptively powerful tool that, above all, makes
-it I<easy> and I<fun> to add accessors to I<ad hoc> hash references
-that many Perl developers like to use and that get emitted,
-I<unblessed> by many popular modules. For example, C<HTTP::Tiny>,
-C<Web::Scraper>, and the more common I<select%> methods C<DBI>
-flavors implement. In particular, any C<JSON> returned by a
-C<HTTP::Tiny> web request is not just ublessed, but still serialized.
-
-Still more useful utilities may be built upon C<h2o>, e.g.; C<h3o>
+Still more useful utilities may be built upon C<h2o>, e.g.; C<d2o>
 which is able to handle data structures that contain C<HASH> references
 buried or nested arbitrarily within C<ARRAY> references.
 
-For example, C<h3o> cleans things up very nicely for dealing with
+For example, C<d2o> cleans things up very nicely for dealing with
 web APIs:
 
   my $response = h2o HTTP::Tiny->get($JSON_API_URL);
   die if not $response->success; 
-  my $JSON_data_with_accessors = h3o JSON::decode_json $response->content;
+  my $JSON_data_with_accessors = d2o JSON::decode_json $response->content;
 
 Finally, and what started this module; the usage pattern of C<h2o>
 begs it to be able to support being used as a I<drop in> replacement
@@ -292,15 +321,13 @@ as the I<basis> for a I<better bless>.
 
 =head1 METHODS
 
-=over 4
-
-=item C<baptise $hash_ref, $pkg, LIST>
+=head2 C<baptise REF, PKG, LIST>
 
 Takes the same first 2 parameters as C<bless>; with the addition
 of a list that defines a set of default accessors that do not
 rely on the top level keys of the provided hash reference.
 
-=item C<baptise -recurse, $hash_ref, $pkg, LIST>
+The B<-recurse> option:
 
 Like C<baptise>, but creates accessors recursively for a nested
 hash reference. Uses C<h2o>'s C<-recurse> flag.
@@ -313,12 +340,11 @@ even if C<h2o> is passed with the C<-isa> and C<-class> flags,
 which are both utilized to achieve the effective outcome of
 C<baptise> and C<bastise -recurse>.
 
-=item C<opt2h2o LIST>
+=head2 C<opt2h2o LIST>
 
-Handy function for working with C<Getopt::Long>, which takes
-a list of options meant for C<Getopt::Long>; and extracts the
-flag names so that they may be used to create default accessors
-without having more than one list. E.g.,
+Handy function for working with C<Getopt::Long>, which takes a list of options
+meant for C<Getopt::Long>; and extracts the flag names so that they may be
+used to create default accessors without having more than one list. E.g.,
 
     use Getopt::Long qw//;
     my @opts = (qw/option1=s options2=s@ option3 option4=i o5|option5=s/);
@@ -330,9 +356,9 @@ without having more than one list. E.g.,
       do_the_thing();
     }
 
-Note: default values for options may still be placed inside
-of the anonymous hash being I<objectified> via C<h2o>. This
-will work perfectly well with C<baptise> and friends.
+Note: default values for options may still be placed inside of the anonymous
+hash being I<objectified> via C<h2o>. This will work perfectly well with
+C<baptise> and friends.
 
     use Getopt::Long qw//;
     my @opts = (qw/option1=s options2=s@ option3 option4=i o5|option5=s/);
@@ -343,7 +369,50 @@ will work perfectly well with C<baptise> and friends.
     # now $o can be used to query all possible options, even if they were
     # never passed at the commandline 
 
-=item C<o2h REF>
+=head2 C<ini2o FILENAME>
+
+Takes the name of a file, uses L<Config::Tiny> to open it, then gives it
+accessors using internally, C<o2h2o>, described below.
+
+Given some configuration file using INI:
+
+  [section1]
+  var1=foo
+  var2=bar
+  
+  [section2]
+  var3=herp
+  var4=derp
+
+We can parse it with L<Config::Tiny> and objectify it with C<h2o>:
+
+  use Util::H2O::More qw/ini2o/;
+  my $config = ini2o qq{/path/to/my/config.ini}
+  # ... $config now has accessors based Config::Tiny's read of config.ini
+
+=head2 C<o2ini REF, FILENAME>
+
+Takes and object created via C<ini2o> and writes it back out to C<FILENAME>
+in the proper I<INI> format, using L<Config::Tiny>.
+
+Given the example in C<ini2o>, we can go a step further and writ eout a new
+configuration file after reading it and modifying a value.
+
+  use Util::H2O::More qw/ini2o o2ini/;
+
+  my $config = ini2o q{/path/to/my/config.ini}
+
+  # update $config, write it out as a different file
+  $config->section1->var1("some new value");
+  o2ini $config, q{/path/to/my/other-config.ini};
+
+=head2 C<o2h2o REF>
+
+Primarily inspired by L<Util::H2O>'s example for adding accessors to an
+reference that has already been blessed by another package. The motivating
+example is one that shows how to add accessors to a L<Config::Tiny> object.
+
+=head2 C<o2h REF>
 
 Uses C<Util::H2O::o2h>, so behaves identical to it.  A new hash reference
 is returned, unlike C<h2o> or C<baptise>. See C<Util::H2O>'s POD for
@@ -373,26 +442,26 @@ a blessed reference would cause the underlying serialization routines
 to warn or C<die> without using C<o2h> to return a pure C<HASH>
 reference.
 
-=item C<h3o REF>
+=head2 C<d2o REF>
 
 This method is basically a wrapper around C<h2o> that will traverse
 an arbitrarily complex Perl data structure, applying C<h2o> to any
 C<HASH> references along the way.
 
-A common usecase where C<h3o> is useful is a web API call that returns
+A common usecase where C<d2o> is useful is a web API call that returns
 some list of C<HASH> references contained inside of an C<ARRAY> reference. 
 
 For example,
 
   my $array_of_hashes = JSON::decode_json $json;
-  h3o $array_of_hashes;
+  d2o $array_of_hashes;
   my $co = $array_of_hashes->[3]->company->name;
 
 Here, C<$array_of_hashes> is an C<ARRAY> reference that contains a set
 of elements that are C<HASH> references; a pretty common situation when
 dealing with records from an API or database call.  C<[3]>, refers the
 4th element, which is a C<HASH> reference. This C<HASH> reference has
-an accessor via C<h3o>, and this returns another C<HASH> that has an
+an accessor via C<d2o>, and this returns another C<HASH> that has an
 accessor called C<name>.
 
 The structure of C<$array_of_hashes> is based on JSON, e.g., that is of
@@ -445,114 +514,103 @@ the form:
         "bs": "synergize scalable supply-chains"
       }
     },
-    {
-      "id": 3,
-      "name": "Clementine Bauch",
-      "username": "Samantha",
-      "email": "Nathan@yesenia.net",
-      "address": {
-        "street": "Douglas Extension",
-        "suite": "Suite 847",
-        "city": "McKenziehaven",
-        "zipcode": "59590-4157",
-        "geo": {
-          "lat": "-68.6102",
-          "lng": "-47.0653"
-        }
-      },
-      "phone": "1-463-123-4447",
-      "website": "ramiro.info",
-      "company": {
-        "name": "Romaguera-Jacobson",
-        "catchPhrase": "Face to face bifurcated interface",
-        "bs": "e-enable strategic applications"
-      }
-    }
+    ...
   ]
 
   (* froms, https://jsonplaceholder.typicode.com/users)
 
+=head2 C<o2d REF>
 
+Does for data structures I<objectified> with C<d2o> what C<o2h> does
+for objects created with C<h2o>. It only removes the blessing from
+C<Util::H2O::> and C<Util::H2O::More::__a2o> references.
 
-C<ARRAY> B<vmethods>
+=head2 C<a2o REF>
+
+Used internally.
+
+Used internally to give I<virual methods> to C<ARRAY> ref containers
+potentially holding C<HASH> references.
+
+C<a2o> is not intended to be useful outside of the context of C<d2o>,
+but it's exposed in case it is, anyway.
+
+=head2 C<ARRAY> container I<vmethods>
 
 It is still somewhat inconvenient, though I<idiomatic>, to refer to C<ARRAY>
 elements directly as in the example above. However, it is still inconsistent
-with idea of C<Util::H2O>. So, C<h3o> leans into its I<heavy> nature by adding
+with idea of C<Util::H2O>. So, C<d2o> leans into its I<heavy> nature by adding
 some "virtual" methods to C<ARRAY> containers.
 
-=over 8
-
-=item C<all>
+=head3 C<all>
 
 Returns a LIST of all items in the C<ARRAY> container.
  
   my @items = $root->some-barray->all;
 
-=item C<get INDEX>
+=head3 C<get INDEX>
 
-Given an C<ARRAY> container from C<h3o>, returns the element at the given
+Given an C<ARRAY> container from C<d2o>, returns the element at the given
 index. See C<push> example below for a practical example.
 
-=item C<push LIST>
+=head3 C<push LIST>
 
 Pushes LIST onto ARRAY attached to the vmethod called; also applies the
-C<h3o> method to anything I<pushed>.
+C<d2o> method to anything I<pushed>.
 
   my @added = $root->some->barray->push({ foo => 1 }, {foo => 2});
   my $one   = $root->some->barray->get(0)->foo; # returns 1 via "get"
   my $two   = $root->some->barray->get(1)->foo; # returns 2 via "get"
 
-=item C<pop>
+Items that are C<push>'d are returned for convenient assignment.
 
-Pop's an element from C<ARRAY> container available after applying C<h3o> to
+=head3 C<pop>
+
+Pops an element from C<ARRAY> container available after applying C<d2o> to
 a structure that has C<ARRAY> refs at any level.
 
   my $item = $root->some-barray->pop;
 
-=item C<unshift LIST>
+=head3 C<unshift LIST>
 
 Similar to C<push>, just operates on the near end of the C<ARRAY>.
 
-=item C<shift>
+Items that are C<shift>'d are returned for convenient assignment.
+
+=head3 C<shift>
 
 Similar to C<pop>, just operates on the near end of the C<ARRAY>.
 
-=item C<scalar>
+=head3 C<scalar>
 
 Returns the number of items in the C<ARRAY> container, which is more
 convenient that doing,
 
   my $count = scalar @{$root->some->barray->all}; 
 
-=back
-
-=item C<o3h REF>
-
-Does for data structures I<objectified> with C<h3o> what C<o2h> does
-for objects created with C<h2o>.
-
-=back
 
 =head1 EXTERNAL METHODS
 
-=over 4
-
-=item C<h2o>
+=head2 C<h2o>
 
 Because C<Util::H2O::More> exports C<h2o> as the basis for its
 operations, C<h2o> is also available without needing to qualify
 its full name space.
 
-=back
-
 =head1 DEPENDENCIES
+
+=head2 L<Util::H2O>
 
 Requires C<Util::H2O> because this module is effectively a wrapper
 around C<h2o>.
 
 It also uses the C<state> keyword, which is only available in perls
 >= 5.10.
+
+While some methods are designed to work with external modules, e.g.,
+C<opt2h2o> is meant to work with L<Getopt::Long>; at this time there
+are no dependencies for such methods required by C<Util::H2O::More>
+itself.
 
 =head1 BUGS
 

@@ -38,6 +38,7 @@ t/13regexp.t
 t/14packagevar.t
 t/15local-errsv.t
 t/16state.t
+t/17snail.t
 t/20context-block.t
 t/21context-while.t
 t/22context-foreach.t

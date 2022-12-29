@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = "1.02";
+our $VERSION = "1.03";
 
 BEGIN {
     if ($0 =~ /unexpand$/) {
@@ -28,6 +28,7 @@ ansiexpand [ option ] file ...
 
 ansiunexpand [ option ] file ...
 
+    -u  --unexpand               convert spaces to tabs
     -t# --tabstop=#              tab stop width
         --tabhead=char           tab head character
         --tabspace=char          tab space character
@@ -36,13 +37,14 @@ ansiunexpand [ option ] file ...
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 DESCRIPTION
 
 B<ansiexpand> is an L<expand(1)> compatible command utilizing
 L<Text::ANSI::Tabs> module, which enables to handle ANSI terminal
-sequences and Unicode wide characters.
+sequences and Unicode wide characters.  Not only expanding tabs to
+spaces, it can visualize them in various styles.
 
 This is a command line interface for L<Text::ANSI::Tabs> module, which
 uses L<Text::ANSI::Fold> module as a backend.  Consult them for
@@ -69,8 +71,9 @@ character, it is considered as a Unicode name.
 
 =item B<--tabstyle>=I<style>, B<--ts>=I<style>
 
-Set tab style.  Try C<--tabstyle=shade> for example.  See
-L<Text::ANSI::Fold> for detail.
+Set tab style.  Try C<--tabstyle=shade> for example.  My recent
+favorite is C<--tabstyle=squat-arrow,emspace>. See L<Text::ANSI::Fold>
+for detail.
 
 =item B<--ambiguous>=C<wide>|C<narrow>
 
@@ -80,18 +83,20 @@ Set the width of Unicode ambiguous characters.  Default is C<narrow>.
 
 =head1 INCOMPATIBILITY
 
-There is no B<-a> option for B<ansiunexpand> and it always convert all
+There is no C<-a> option for C<ansiunexpand> and it always convert all
 spaces not only leading ones.  Use normal L<unexpand(1)> to convert
 just leading spaces.
 
-B<ansiexpand> expands all tabs even if it is converted to single
-space without reducing data length.
+C<ansiexpand -u> or C<ansiunexpand> convert all spaces whenever possible
+including single space even if it does not reduce total data length.
 
 =head1 FILES
 
 =over 4
 
-=item F<~/.ansiexpandrc>, F<~/.ansiunexpandrc>
+=item F<~/.ansiunexpandrc>
+
+=item F<~/.ansiexpandrc>
 
 Start-up file.
 See L<Getopt::EX::Module> for format.

@@ -42,7 +42,7 @@ sub device_id_issues {
 }
 
 sub git_annex_available {
-    `which git-annex`;
+    `sh -c "command -v git-annex"`;
     return !$?;
 }
 

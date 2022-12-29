@@ -1,5 +1,12 @@
 Revision history for Syntax-Keyword-Match
 
+0.10    2022-12-25
+        [CHANGES]
+         * General code neatening of internals
+         * Add a unit test that function calls work as expr (related to
+           RT143255)
+         * Use XPK_KEYWORD() from XS::Parse::Keyword v0.23
+
 0.09    2022-02-20
         [CHANGES]
          * Use sv_numeq_flags() from perl 5.35.9

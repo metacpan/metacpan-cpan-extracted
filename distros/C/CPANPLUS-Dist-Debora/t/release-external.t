@@ -29,11 +29,12 @@ else {
 
 my $tempdir = tempdir(CLEANUP => 1);
 
-local $ENV{BUILD}       = 1;
-local $ENV{DEBFULLNAME} = 'Test';
-local $ENV{DEBEMAIL}    = 'test@example.com';
-local $ENV{HOME}        = $tempdir;
-local $ENV{INSTALLDIRS} = 'vendor';
+local $ENV{BUILD}               = 1;
+local $ENV{DEBFULLNAME}         = 'Test';
+local $ENV{DEBEMAIL}            = 'test@example.com';
+local $ENV{HOME}                = $tempdir;
+local $ENV{INSTALLDIRS}         = 'vendor';
+local $ENV{DEVEL_COVER_OPTIONS} = '+ignore,File/Next';
 
 my $config = CPANPLUS::Configure->new;
 $config->set_conf(allow_build_interactivity => 0);

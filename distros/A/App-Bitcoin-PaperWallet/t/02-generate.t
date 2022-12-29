@@ -11,7 +11,11 @@ is $hash->{mnemonic}, 'ivory obscure session offer multiply chuckle follow curre
 
 # those addresses take password into account
 is $hash->{addresses}[0], '3QUyruDJ9oce8KNJELPWAxfcvcvESuGrds', 'compat address ok';
-is $hash->{addresses}[1], 'bc1qngdesm3ljdfyxsskvsxz4034vlyk9cjm7r6k5p', 'native address ok';
+is $hash->{addresses}[1], 'bc1qngdesm3ljdfyxsskvsxz4034vlyk9cjm7r6k5p', 'native address 1 ok';
+is $hash->{addresses}[2], 'bc1qp67k9ztxp5gycvt3pc8cxm0ssha226sqe338q8', 'native address 2 ok';
+is $hash->{addresses}[3], 'bc1qlz5an57pfxr4aewes8shhk8p8uglhs0x7czwuj', 'native address 3 ok';
+
+is scalar @{$hash->{addresses}}, 4, 'address count ok';
 
 # test data generated using https://iancoleman.io/bip39/
 

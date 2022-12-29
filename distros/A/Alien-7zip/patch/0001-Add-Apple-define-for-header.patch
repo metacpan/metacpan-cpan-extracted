@@ -1,0 +1,39 @@
+From 8fc4de3bbf70b844b752cb6d69d3cf973e340bdf Mon Sep 17 00:00:00 2001
+From: Zakariyya Mughal <zaki.mughal@gmail.com>
+Date: Tue, 27 Dec 2022 01:13:25 -0500
+Subject: [PATCH] Add Apple define for header
+
+---
+ CPP/7zip/Common/FileStreams.cpp       | 2 +-
+ CPP/7zip/UI/Common/UpdateCallback.cpp | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CPP/7zip/Common/FileStreams.cpp b/CPP/7zip/Common/FileStreams.cpp
+index 7d34d47..a0294ee 100755
+--- a/CPP/7zip/Common/FileStreams.cpp
++++ b/CPP/7zip/Common/FileStreams.cpp
+@@ -12,7 +12,7 @@
+ #include <pwd.h>
+ 
+ // for major()/minor():
+-#if defined(__FreeBSD__) || defined(BSD)
++#if defined(__FreeBSD__) || defined(BSD) || defined(__APPLE__)
+ #include <sys/types.h>
+ #else
+ #include <sys/sysmacros.h>
+diff --git a/CPP/7zip/UI/Common/UpdateCallback.cpp b/CPP/7zip/UI/Common/UpdateCallback.cpp
+index a518048..c05107d 100755
+--- a/CPP/7zip/UI/Common/UpdateCallback.cpp
++++ b/CPP/7zip/UI/Common/UpdateCallback.cpp
+@@ -9,7 +9,7 @@
+ // #include <pwd.h>
+ 
+ // for major()/minor():
+-#if defined(__FreeBSD__) || defined(BSD)
++#if defined(__FreeBSD__) || defined(BSD) || defined(__APPLE__)
+ #include <sys/types.h>
+ #else
+ #include <sys/sysmacros.h>
+-- 
+2.35.1
+

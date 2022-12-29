@@ -19,7 +19,7 @@ no multidimensional;
 
 use Cwd 'abs_path';
 
-use Test::More tests => 17;
+use Test::More tests => 18;
 use Test::Output;
 use Test::Warn;
 
@@ -64,7 +64,8 @@ warning_like
 # test selection of single input file:
 my $fs = UI::Various::Compound::FileSelect->new(mode => 1, directory => T_PATH);
 $main->add($fs);			# now we have a maximum width
-is($fs->selection(), undef, 'no selection returns undef');
+is($fs->selection(), T_PATH . '/',
+   'no selection in mode 0 returns current directory with trailing /');
 
 my $re_basic_output =
     "[ <1-8>*]+ 00-compile\\.t\n" .
@@ -110,6 +111,8 @@ $fs = UI::Various::Compound::FileSelect->new(mode => 2,
 					     [['all files' => '.+'],
 					      ['PL scripts' => '\.pl$']]
 					    );
+is(join("\n", $fs->selection()), T_PATH . '/',
+   'no selection in mode 2 returns current directory with trailing /');
 $main->add($fs);			# now we again have a maximum width
 $re_whole_output =
     "<1> \n<\\*> \\[ \\.\\. \\]\n    " . T_PATH . "\n    \n" .

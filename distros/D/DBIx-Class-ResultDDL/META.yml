@@ -3,8 +3,10 @@ abstract: 'Result class declaration syntactic-sugar that looks like DDL'
 author:
   - 'Michael Conrad <mconrad@intellitree.com>'
 build_requires:
-  Data::Dumper: '0'
+  DBIx::Class::Schema::Loader::DBI::SQLite: '0'
+  File::Temp: '0'
   Test2::V0: '0'
+  parent: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -19,13 +21,16 @@ requires:
   B::Hooks::EndOfScope: '0'
   Carp: '0'
   DBIx::Class::Core: '0'
+  Data::Dumper: '0'
   Exporter::Extensible: '0.08'
+  List::Util: '0'
+  namespace::clean: '0'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/nrdvana/perl-DBIx-Class-ResultDDL/issues
   repository: https://github.com/nrdvana/perl-DBIx-Class-ResultDDL.git
-version: '2.00'
+version: '2.01'
 x_contributors:
   - 'Veesh Goldman <rabbiveesh@gmail.com>'
 x_generated_by_perl: v5.36.0

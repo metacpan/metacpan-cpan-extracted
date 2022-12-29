@@ -3,7 +3,7 @@
 use Mojolicious::Lite;
 
 plugin 'Iconify';
-plugin 'Iconify::API' => { collections => 'iconify-collections-json/json' };
+plugin 'Iconify::API' => { collections => '/path-of-iconify-collections-json/json' };
 
 get '/' => 'index';
 
@@ -24,51 +24,40 @@ __DATA__
     %= iconify_js
     %= iconify_api_js
 </head>
-<body class="container-fluid p-4">
+<body class="container p-4">
 
-    <h1 class="text-center mb-5">I "<%= icon('noto:red-heart') %>" Mojolicious!</h1>
+    <h1 class="text-center mb-5">I "<%= iconify_icon('noto:red-heart') %>" Mojolicious!</h1>
 
-    <div class="row">
-    % foreach my $prefix (iconify_api_collections) {
-        % my $info = iconify_api_collection_info($prefix);
-        <div class="col-sm-3">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <div class="row">
-                        <div class="col-sm-8">
-                            <%= $info->{name} %>
-                        </div>
-                        <div class="col-sm-4 text-right">
-                            <span class="badge badge-info"><%= $info->{category} %></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="text-center">
-                        <ul class="list-inline m-0">
-                        % foreach my $sample (@{$info->{samples}}) {
-                            <li class="list-inline-item">
-                                %= iconify_icon "$prefix:$sample", size => 32
-                            </li>
-                        % }
-                        </ul>
-                    </div>
-                    <p class="card-text">
-                        <dl>
-                            <dt>Prefix</dt>
-                            <dd><%= $prefix %></dd>
-                            <dt>Total</dt>
-                            <dd><%= $info->{total} %></dd>
-                            <dt>License</dt>
-                            <dd><%= $info->{license}->{title} %></dd>
-                            <dt>Author</dt>
-                            <dd><a href="<%= $info->{author}->{link} %>"><%= $info->{author}->{name} %></a></dd>
-                        </dl>
-                    </p>
-                </div>
-            </div>
-        </div>
-    % }
-    <div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Samples</th>
+                <th>Category</th>
+                <th>Prefix</th>
+                <th>Total</th>
+                <th>License</th>
+                <th>Author</th>
+            </tr>
+        </thead>
+        <tbody>
+        % foreach my $prefix (iconify_api_collections) {
+            % my $info = iconify_api_collection_info($prefix);
+            <tr>
+                <td><%= $info->{name} %></td>
+                <td>
+                    % foreach my $sample (@{$info->{samples}}) {
+                        %= iconify_icon "$prefix:$sample", size => 24
+                    % }
+                </td>
+                <td><%= $info->{category} %></td>
+                <td><%= $prefix %></td>
+                <td><%= $info->{total} %></td>
+                <td><%= $info->{license}->{title} %></td>
+                <td><a href="<%= $info->{author}->{link} %>"><%= $info->{author}->{name} %></a></td>
+            </tr>
+        % }
+        </tbody>
+    <table>
 </body>
 </html>

@@ -21,6 +21,7 @@ examples/hello-window-and-dialog.pl
 examples/hello.pl
 examples/listbox-with-buttons.pl
 examples/listbox.pl
+examples/overview-alignments.pl
 examples/select-file.pl
 lib/UI/Various.pm
 lib/UI/Various/Box.pm

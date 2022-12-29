@@ -144,6 +144,7 @@ typedef struct {
   SV **padslots;
 
   PMOP *curpm;           /* value of PL_curpm at suspend time */
+  AV *defav;             /* value of GvAV(PL_defgv) at suspend time */
 
   HV *modhookdata;
 } SuspendedState;
@@ -377,6 +378,9 @@ static int dumpmagic_suspendedstate(pTHX_ DMDContext *ctx, const SV *sv, MAGIC *
         ret += DMD_ANNOTATE_SV(sv, state->padslots[i], "a suspended pad slot");
   }
 
+  if(state->defav)
+    ret += DMD_ANNOTATE_SV(sv, (SV *)state->defav, "the subroutine arguments AV");
+
   if(state->modhookdata)
     ret += DMD_ANNOTATE_SV(sv, (SV *)state->modhookdata, "the module hook data HV");
 
@@ -407,6 +411,7 @@ static SuspendedState *MY_suspendedstate_new(pTHX_ CV *cv)
   ret->frames = NULL;
   ret->padslots = NULL;
   ret->modhookdata = NULL;
+  ret->defav = NULL;
 
   sv_magicext((SV *)cv, NULL, PERL_MAGIC_ext, &vtbl_suspendedstate, (char *)ret, 0);
 
@@ -560,6 +565,14 @@ static int suspendedstate_free(pTHX_ SV *sv, MAGIC *mg)
     Safefree(state->padslots);
     state->padslots = NULL;
     state->padlen = 0;
+  }
+
+  if(state->defav) {
+    /* This effectively held two references; one for GvAV(PL_defgv) and one
+     * for PAD_SV(0) */
+    SvREFCNT_dec(state->defav);
+    SvREFCNT_dec(state->defav);
+    state->defav = NULL;
   }
 
   if(state->modhookdata) {
@@ -1145,6 +1158,23 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
   else
     state->curpm = NULL;
 
+#if !HAVE_PERL_VERSION(5, 24, 0)
+  /* perls before v5.24 will crash if we try to do this at all */
+  if(0)
+#elif HAVE_PERL_VERSION(5, 36, 0)
+  /* perls 5.36 onwards have CvSIGNATURE; we don't need to bother doing this
+   * inside signatured subs */
+  if(!CvSIGNATURE(cv))
+#endif
+  /* on perl versions between those, just do it unconditionally */
+  {
+    assert((AV *)PAD_SVl(0) == GvAV(PL_defgv));
+    state->defav = GvAV(PL_defgv); /* steal */
+
+    AV *av = GvAV(PL_defgv) = newAV();
+    PAD_SVl(0) = SvREFCNT_inc(av);
+  }
+
   dounwind(cxix);
 }
 
@@ -1452,6 +1482,15 @@ static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
 
   if(state->curpm)
     PL_curpm = state->curpm;
+
+  if(state->defav) {
+    SvREFCNT_dec(GvAV(PL_defgv));
+    SvREFCNT_dec(PAD_SVl(0));
+
+    GvAV(PL_defgv) = state->defav;
+    PAD_SVl(0) = (SV *)state->defav;
+    state->defav = NULL;
+  }
 }
 
 #define suspendedstate_cancel(state)  MY_suspendedstate_cancel(aTHX_ state)

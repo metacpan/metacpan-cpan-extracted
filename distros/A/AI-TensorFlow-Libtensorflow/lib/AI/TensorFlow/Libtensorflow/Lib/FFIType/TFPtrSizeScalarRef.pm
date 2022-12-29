@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Lib::FFIType::TFPtrSizeScalarRef;
 # ABSTRACT: Type to hold pointer and size in a scalar reference
-$AI::TensorFlow::Libtensorflow::Lib::FFIType::TFPtrSizeScalarRef::VERSION = '0.0.3';
+$AI::TensorFlow::Libtensorflow::Lib::FFIType::TFPtrSizeScalarRef::VERSION = '0.0.4';
 use strict;
 use warnings;
 use FFI::Platypus::Buffer qw(scalar_to_buffer);

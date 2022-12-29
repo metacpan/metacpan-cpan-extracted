@@ -1,0 +1,14 @@
+blib/
+*.bs
+*.c
+*.o
+MYMETA.*
+.*.sw?
+Makefile
+pm_to_blib
+nytprof/
+nytprof.out
+*.gc*
+cover_db/
+*.tar.gz
+mbedtls/

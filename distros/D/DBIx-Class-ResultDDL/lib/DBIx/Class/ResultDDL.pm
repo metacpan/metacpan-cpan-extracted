@@ -6,7 +6,7 @@ use B::Hooks::EndOfScope 'on_scope_end';
 use Carp;
 
 # ABSTRACT: Sugar methods for declaring DBIx::Class::Result data definitions
-our $VERSION = '2.00'; # VERSION
+our $VERSION = '2.01'; # VERSION
 
 
 our $CALLER; # can be used localized to wrap caller context into an anonymous sub
@@ -28,7 +28,9 @@ sub _inherit_dbic {
 }
 
 
+our $DISABLE_AUTOCLEAN;
 sub autoclean :Export(-) {
+	return if $DISABLE_AUTOCLEAN;
 	my $self= shift;
 	my $sref= $self->exporter_config_scope;
 	$self->exporter_config_scope($sref= \my $x) unless $sref;
@@ -94,8 +96,10 @@ sub _settings_for_package {
 sub enable_inflate_datetime :Export(-inflate_datetime) {
 	my $self= shift;
 	$self->_inherit_dbic;
-	$self->{into}->load_components('InflateColumn::DateTime')
-		unless $self->{into}->isa('DBIx::Class::InflateColumn::DateTime');
+	my $pkg= $self->{into};
+	$pkg->load_components('InflateColumn::DateTime')
+		unless $pkg->isa('DBIx::Class::InflateColumn::DateTime');
+	_settings_for_package($pkg)->{inflate_datetime}= 1;
 }
 
 sub enable_inflate_json :Export(-inflate_json) {
@@ -104,7 +108,9 @@ sub enable_inflate_json :Export(-inflate_json) {
 	my $pkg= $self->{into};
 	$pkg->load_components('InflateColumn::Serializer')
 		unless $pkg->isa('DBIx::Class::InflateColumn::Serializer');
-	_settings_for_package($pkg)->{json_defaults}{serializer_class}= 'JSON';
+	my $settings= _settings_for_package($pkg);
+	$settings->{inflate_json}= 1;
+	$settings->{json_defaults}{serializer_class}= 'JSON';
 }
 
 
@@ -145,6 +151,14 @@ sub col {
 	my $name= shift;
 	croak "Odd number of arguments for col(): (".join(',',@_).")"
 		if scalar(@_) & 1;
+	my $pkg= $CALLER || caller;
+	$pkg->add_column($name, expand_col_options($pkg, @_));
+	1;
+}
+
+
+sub expand_col_options {
+	my $pkg= shift;
 	my $opts= { is_nullable => 0 };
 	# Apply options to the hash in order, so that they get overwritten as expected
 	while (@_) {
@@ -159,13 +173,12 @@ sub col {
 		$dest= ($dest->{$_} ||= {}) for @path;
 		$dest->{$k}= $v;
 	}
-	my $pkg= $CALLER || caller;
 	$opts->{retrieve_on_insert}= 1
 		if $opts->{default_value} and !defined $opts->{retrieve_on_insert}
 			and _settings_for_package($pkg)->{retrieve_defaults};
-	$pkg->add_column($name, $opts);
-	1;
+	return $opts;
 }
+export 'expand_col_options';
 
 sub _maybe_array {
 	my @dims;
@@ -541,7 +554,7 @@ DBIx::Class::ResultDDL - Sugar methods for declaring DBIx::Class::Result data de
 
 =head1 VERSION
 
-version 2.00
+version 2.01
 
 =head1 SYNOPSIS
 
@@ -681,6 +694,14 @@ Define a column.  This calls add_column after sensibly merging all your options.
 It defaults the column to not-null for you, but you can override that by saying
 C<null> in your options.
 You will probably use many of the methods below to build the options for the column:
+
+=head2 expand_col_options
+
+This is a utility function that performs most of the work of L</col>.
+Given the list of arguments returned by the sugar functions below, it
+returns a hashref of official options for L<DBIx::Class::ResultSource/add_column>.
+
+(It is not exported as part of any tag)
 
 =head3 null
 

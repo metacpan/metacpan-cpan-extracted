@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2021 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait 0.61;
+package Future::AsyncAwait 0.62;
 
 use v5.14;
 use warnings;
@@ -634,6 +634,28 @@ keep multiple items running concurrently:
    my @results = await fmap { func( shift ) }
       foreach    => [ ITEMS ],
       concurrent => 5;
+
+=item *
+
+The default arguments array (C<@_>) is not saved and restored by an C<await>
+call on perl versions before v5.24. On such older perls, the value seen in the
+C<@_> array after an await will not be the same as it was before.
+
+L<https://rt.cpan.org/Ticket/Display.html?id=130683>
+
+As a workaround, make sure to unpack the values out of it into regular lexical
+variables early on, before the the first C<await>. The values of these
+lexicals will be saved and restored as normal.
+
+   async sub f
+   {
+      my ($vars, $go, @here) = @_;
+      # do not make further use of @_ afterwards
+
+      await thing();
+
+      # $vars, $go, @here are all fine for use
+   }
 
 =back
 

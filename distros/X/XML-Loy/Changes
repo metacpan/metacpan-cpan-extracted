@@ -1,3 +1,7 @@
+0.51 2022-12-28
+        - Update dependency due to some errors
+          from cpantestesrs.
+
 0.50 2021-02-10
         - Replaced base namespace sojolicio.us with
           sojolicious.example.

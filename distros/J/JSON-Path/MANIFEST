@@ -33,6 +33,7 @@ t/evaluator/tokenize.t
 t/evaluator/want_path.t
 t/filter_expression_and_or.t
 t/filter_expression_nested_objects.t
+t/filter_expression_regex.t
 t/hashref_not_modified.t
 t/lvalue2.pl
 t/lvalue3.pl

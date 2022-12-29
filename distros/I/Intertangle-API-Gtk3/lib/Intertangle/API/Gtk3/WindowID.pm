@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::API::Gtk3::WindowID;
 # ABSTRACT: Module to help obtain the window ID
-$Intertangle::API::Gtk3::WindowID::VERSION = '0.005';
+$Intertangle::API::Gtk3::WindowID::VERSION = '0.006';
 use Renard::Incunabula::Common::Types qw(InstanceOf);
 use Module::Load;
 
@@ -41,7 +41,7 @@ Intertangle::API::Gtk3::WindowID - Module to help obtain the window ID
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 METHODS
 

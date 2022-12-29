@@ -1,6 +1,6 @@
 # ABSTRACT: Get information for different currencies
 package Data::MoneyCurrency;
-$Data::MoneyCurrency::VERSION = '0.24';
+$Data::MoneyCurrency::VERSION = '0.25';
 use strict;
 use warnings;
 use utf8;
@@ -189,7 +189,7 @@ my $rh_currencies_for_country = {
     hk   => ['hkd'],
     hm   => ['aud'],
     hn   => ['hnl'],
-    hr   => ['hrk', 'eur'],
+    hr   => ['eur'],
     ht   => ['htg'],
     hu   => ['huf'],
     id   => ['idr'],
@@ -371,7 +371,7 @@ Data::MoneyCurrency - Get information for different currencies
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 SYNOPSIS
 

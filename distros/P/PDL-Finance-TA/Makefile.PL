@@ -10,7 +10,7 @@ eval { require Alien::TALib };
 if ( !$@ ) {
   warn "Using ta-lib via Alien::TALib\n";
   my $alien = Alien::TALib->new;
-  $libs   = $alien->libs   if !defined $libs;
+  $libs   = $alien->libs_static // $alien->libs   if !defined $libs;
   $cflags = $alien->cflags if !defined $cflags;
 }
 else {
@@ -40,7 +40,7 @@ warn "Gonna use\n",
 my $package = [qw/TA.pd TA PDL::Finance::TA/];
 my %eumm_args = pdlpp_stdargs($package);
 $eumm_args{INC} .= " $cflags";
-push @{$eumm_args{LIBS}}, $libs;
+unshift @{$eumm_args{LIBS}}, $libs;
 
 WriteMakefile(
   %eumm_args,
@@ -50,17 +50,17 @@ WriteMakefile(
   LICENSE       => 'perl',
   PREREQ_PM     => {
         'PDL' => 2.006,
-        'Alien::TALib' => 0.06,
+        'Alien::TALib' => 0.10,
   },
   BUILD_REQUIRES     => {
         'PDL' => 2.006,
         'Test::More' => 0,
-        'Test::Number::Delta' => 0,
-        'Alien::TALib' => 0.06,
+        'Test::Number::Delta' => '1.06',
+        'Alien::TALib' => 0.10,
   },
   CONFIGURE_REQUIRES => {
         'PDL' => 2.006,
-        'Alien::TALib' => 0.06,
+        'Alien::TALib' => 0.10,
   },
   META_MERGE   => {
       resources    => {
@@ -72,16 +72,17 @@ WriteMakefile(
       PREOP => '$(MKPATH) $(DISTVNAME)/GENERATED'
                . ' && $(PERL) "-MPDL::PP qw[PDL::Finance::TA PDL::Finance::TA $(DISTVNAME)/GENERATED/TA]" TA.pd'
                . ' && $(RM_F) $(DISTVNAME)/GENERATED/*.xs'
-               . ' && pod2text $(DISTVNAME)/GENERATED/TA.pm > README'
+               . ' && perldoc -u $(DISTVNAME)/GENERATED/TA.pm | pod2markdown > README.md'
+               #. ' && pod2text $(DISTVNAME)/GENERATED/TA.pm > README'
       },
 );
 
 sub MY::postamble {
         pdlpp_postamble($package) . <<'END'
 
-mypod:
+README.md:
 	$(PERL) "-MPDL::PP qw/PDL::Finance::TA PDL::Finance::TA TMP/" TA.pd
-	perldoc -u TMP.pm > README.pod
+	perldoc -u TMP.pm | pod2markdown > README.md
 	$(RM_F) TMP.pm TMP.xs
 
 END

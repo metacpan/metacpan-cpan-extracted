@@ -21,6 +21,6 @@ __END__
 AnnoCPAN
 CPAN
 CPANTS
-GPL
+GPL2
 MetaCPAN
 rtrim

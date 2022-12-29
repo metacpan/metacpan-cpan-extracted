@@ -457,17 +457,16 @@ sub generate_gitignore_file {
   my ($self) = @_;
   
   my $gitignore_content = <<'EOS';
-blib/*
-Makefile
-Makefile.old
-MYMETA.yml
-MYMETA.json
-pm_to_blib
+/blib/*
+/Makefile
+/Makefile.old
+/MYMETA.yml
+/MYMETA.json
+/pm_to_blib
+/SPVM-*
 .spvm_build
-t/.spvm_build
 core.*
 core
-SPVM-*
 *.bak
 *.BAK
 *.tmp
@@ -585,6 +584,11 @@ if (\$meta) {
   \$no_build_spvm_modules = 1;
 }
 
+unless (\$meta) {
+  # Do something such as environment check.
+}
+
+my \%configure_and_runtime_requires = ('SPVM' => '$SPVM::VERSION');
 WriteMakefile(
   NAME              => 'SPVM::$class_name',
   VERSION_FROM      => '$perl_module_rel_file',
@@ -609,10 +613,10 @@ WriteMakefile(
   },
   NORECURS => 1,
   CONFIGURE_REQUIRES => {
-    'SPVM' => '$SPVM::VERSION',
+    \%configure_and_runtime_requires,
   },
-  PREREQ_PM => {
-    
+  PREREQ_PM         => {
+    \%configure_and_runtime_requires,
   },
   TEST_REQUIRES => {
     
@@ -665,7 +669,7 @@ done_testing;
 EOS
   
   # Generate file
-  my $basic_test_rel_file = 't/use_spvm_class.t';
+  my $basic_test_rel_file = 't/basic.t';
   $self->generate_file($basic_test_rel_file, $basic_test_content);
 }
 
@@ -867,7 +871,7 @@ sub generate_dist {
     # Generate Makefile.PL file
     $self->generate_makefile_pl_file;
     
-    # Generate t/use_spvm_class.t file
+    # Generate t/basic.t file
     $self->generate_basic_test_file;
 
     # Generate basic test SPVM module file

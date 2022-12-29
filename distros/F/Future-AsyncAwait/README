@@ -566,6 +566,27 @@ KNOWN BUGS
             foreach    => [ ITEMS ],
             concurrent => 5;
 
+      * The default arguments array (@_) is not saved and restored by an
+      await call on perl versions before v5.24. On such older perls, the
+      value seen in the @_ array after an await will not be the same as it
+      was before.
+
+      https://rt.cpan.org/Ticket/Display.html?id=130683
+
+      As a workaround, make sure to unpack the values out of it into
+      regular lexical variables early on, before the the first await. The
+      values of these lexicals will be saved and restored as normal.
+
+         async sub f
+         {
+            my ($vars, $go, @here) = @_;
+            # do not make further use of @_ afterwards
+      
+            await thing();
+      
+            # $vars, $go, @here are all fine for use
+         }
+
 ACKNOWLEDGEMENTS
 
     With thanks to Zefram, ilmari and others from irc.perl.org/#p5p for

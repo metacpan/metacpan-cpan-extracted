@@ -2,7 +2,7 @@ requires 'Encode';
 requires 'Getopt::EX::Hashed', '1.05';
 requires 'Getopt::EX::Long';
 requires 'Pod::Usage';
-requires 'Text::ANSI::Tabs', '1.01';
+requires 'Text::ANSI::Tabs', '1.02';
 requires 'perl', '5.014';
 
 on configure => sub {

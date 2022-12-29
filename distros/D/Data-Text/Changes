@@ -1,5 +1,9 @@
 Revision history for Data::Text
 
+0.11	Thu Dec 22 09:34:32 EST 2022
+	Avoid assert failure in String::Clean
+	Calling new() on an object now returns a clone rather than setting the defaults in the new object
+
 0.10	Mon Aug  1 21:01:05 EDT 2022
 	set() when given a list of strings would append instead of setting
 	Carp when given a reference to an empty array

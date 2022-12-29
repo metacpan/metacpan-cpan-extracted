@@ -1,0 +1,7 @@
+0.015   2022-12-20  Released-By: PERLANCAR; Urgency: medium
+
+        - First release, split from App-BPOMUtils because App-BPOMUtils is
+          having build problems currently.
+
+        - Fixes (missing "JUMLAH PER SAJIAN" text in linear form), missing
+          "JUMLAH PER KEMASAN (... g)" for per-package ING.

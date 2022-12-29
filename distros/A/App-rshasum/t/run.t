@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More tests => 3;
 
-use Path::Tiny qw/ path tempdir tempfile cwd /;
+use Path::Tiny   qw/ path tempdir tempfile cwd /;
 use App::rshasum ();
 
 my $cwd = cwd;

@@ -1,5 +1,12 @@
 Revision history for Alien-libpcre},
 
+1.9      2022-12-27 00:14:00 -0600
+         - %{cp} -r instead %{cp} ... ... -r
+
+1.8      2022-12-26 00:14:00 -0600
+         - More portability with %{cp} -r
+         - Do not use --without-libraries
+
 1.7      2022-12-15 00:14:00 -0600
          - Only headers
 

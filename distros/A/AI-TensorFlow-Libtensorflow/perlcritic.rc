@@ -1,0 +1,12 @@
+theme = ( core + pbp + security + maintenance ) * bugs
+include = CodeLayout::ProhibitTrailingWhitespace CodeLayout::RequireConsistentNewlines
+
+[-Subroutines::ProhibitSubroutinePrototypes]
+
+# alternate that works better with dzil ::PkgVersion
+[-TestingAndDebugging::RequireUseStrict]
+[-TestingAndDebugging::RequireUseWarnings]
+[Community::StrictWarnings]
+extra_importers = Test2::V0
+
+# vim: ft=dosini

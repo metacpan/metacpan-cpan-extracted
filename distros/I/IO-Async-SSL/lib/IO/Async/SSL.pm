@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2022 -- leonerd@leonerd.org.uk
 
 package IO::Async::SSL;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 $VERSION = eval $VERSION;
 
 use Carp;
@@ -68,7 +68,7 @@ instances, and two forms of C<SSL_upgrade> to upgrade an existing TCP
 connection to use SSL.
 
 As an additional convenience, if the C<SSL_verify_mode> and C<SSL_ca_*>
-options are omitted, the module will attempt to provide them by quering the
+options are omitted, the module will attempt to provide them by querying the
 result of L<IO::Socket::SSL>'s C<default_ca> function. Otherwise, the module
 will print a warning and set C<SSL_VERIFY_NONE> instead.
 

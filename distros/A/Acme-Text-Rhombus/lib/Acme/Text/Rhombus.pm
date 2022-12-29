@@ -10,7 +10,7 @@ use constant FORWARD => 1;
 our ($VERSION, @EXPORT_OK, %EXPORT_TAGS);
 my @subs;
 
-$VERSION = '0.23';
+$VERSION = '0.24';
 @subs = qw(rhombus rhombus_letter rhombus_digit rhombus_random);
 @EXPORT_OK = @subs;
 %EXPORT_TAGS = ('all' => [ @subs ]);
@@ -104,7 +104,7 @@ sub rhombus_random
 {
     my %opts = @_;
 
-    my $lines  = $get_opt->(\%opts, 'lines',  qr/^\d+$/, LINES);
+    my $lines  = $get_opt->(\%opts, 'lines',  qr/^\d+$/,  LINES);
     my $fillup = $get_opt->(\%opts, 'fillup', qr/^\S$/,  FILLUP);
 
     return _draw_rhombus('random', $lines, undef, undef, $fillup, undef);

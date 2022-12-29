@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.34';
+our $VERSION = '0.37';
 
 use UI::Various::core;
 use UI::Various::Main;
@@ -89,15 +89,16 @@ sub _init($)
     my $char_height = abs($_->fontActual('', '-size')) - 1;
     my $rows = $screen_height / $char_height + 1;
 
-    my $char_width = 10;
+    my ($max_width, $min_width) = (8, 8);
     foreach my $c (ord('!')..ord('~'))
-    {				# find width of widest ASCII character:
+    {				# find width of smallest/widest ASCII character:
 	my $w = $_->fontMeasure('', chr($c));
-	$char_width >= $w  or  $char_width = $w;
+	$max_width >= $w  or  $max_width = $w;
+	$min_width <= $w  or  $min_width = $w;
     }
-    # heuristic: use 3/4 of widest character and round down columns:
-    $char_width *= 3 / 4;
-    my $columns = $screen_width / $char_width;
+    # heuristic: use rounded down average of smallest plus 2 widest characters:
+    my $avg_width = int(($min_width + 2 * $max_width) / 3);
+    my $columns = $screen_width / $avg_width;
 
     $_->destroy;
     $_ = undef;
@@ -106,8 +107,8 @@ sub _init($)
     $self->{max_height} = int($rows);
     $self->{max_width} = int($columns);
     # we need those to be able to calculate pixel sizes:
+    $self->{_char_avg_width} = $avg_width;
     $self->{_char_height} = $char_height;
-    $self->{_char_width} = $char_width;
     # internal flag if Tk's mainloop is currently running:
     $self->{_running} = 0;
 }

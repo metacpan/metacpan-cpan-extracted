@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 39;
+use Test::Most tests => 40;
 use Test::Carp;
 
 BEGIN {
@@ -113,6 +113,9 @@ DATA: {
 
 	$d->replace({ 'Bonjour' => 'Au revoir' });
 	is($d->as_string(), 'Au revoir tout le monde', 'Verify replace() works');
+	$d = new_ok('Data::Text');
+	# String::Clean will have an assert failure, ensure that doesn't happen
+	$d->replace({ 'Bonjour' => 'Au revoir' });
 
 	is(new_ok('Data::Text')->append(' There are some spaces here.  ')->trim()->as_string(),
 		'There are some spaces here.', 'Verify trim() works');

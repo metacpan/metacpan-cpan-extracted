@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Lib::FFIType::TFPtrSizeScalar;
 # ABSTRACT: Type to hold pointer and size in a scalar (input only)
-$AI::TensorFlow::Libtensorflow::Lib::FFIType::TFPtrSizeScalar::VERSION = '0.0.3';
+$AI::TensorFlow::Libtensorflow::Lib::FFIType::TFPtrSizeScalar::VERSION = '0.0.4';
 use strict;
 use warnings;
 use FFI::Platypus;

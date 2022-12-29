@@ -1,0 +1,50 @@
+#!/bin/sh
+
+# PROVIDE: lilith
+# REQUIRE: LOGIN
+# KEYWORD: shutdown
+#
+#
+#
+# Add the following lines to /etc/rc.conf.local or /etc/rc.conf to enable lilith:
+# lilith_enable (bool):            Set to "NO" by default.
+#                                  Set it to "YES" to enable lilith
+# lilith_flags (string):           Set to "" by default.
+# lilith_user (string):            Set to "root" by default.
+
+
+. /etc/rc.subr
+
+name=lilith
+rcvar=${name}_enable
+
+load_rc_config $name
+
+# set defaults
+: ${lilith_enable:=NO}
+: ${lilith_user:="root"}
+: ${lilith_wheel:="wheel"}
+: ${lilith_flags:=""}
+: ${lilith_facility:="daemon"}
+: ${lilith_priority:="debug"}
+
+pidfile="/var/run/${name}/pid"
+command="/usr/local/bin/${name}"
+command_interpreter="/usr/local/bin/perl"
+pidfile="/var/run/${name}/pid"
+command_args="-a run --daemonize --user ${lilith_user} --group ${lilith_group}"
+start_precmd="${name}_precmd"
+
+lilith_precmd()
+{
+    if [ ! -d "/var/run/${name}" ]; then
+        mkdir -p "/var/run/${name}"
+        chown "${lilith_user}" "/var/run/${name}"
+    else
+        # incase of user change
+        chown "${lilith_user}" "/var/run/${name}"
+    fi
+}
+
+load_rc_config $name
+run_rc_command "$1"

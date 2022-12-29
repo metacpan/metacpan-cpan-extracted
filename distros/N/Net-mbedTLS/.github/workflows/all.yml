@@ -1,0 +1,207 @@
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+env:
+   PERL_USE_UNSAFE_INC: 0
+   AUTHOR_TESTING: 1
+   AUTOMATED_TESTING: 1
+   RELEASE_TESTING: 1
+   PERL_CARTON_PATH: $GITHUB_WORKSPACE/local
+
+jobs:
+  linux-ioasync-no-anyevent:
+    runs-on: ubuntu-latest
+
+    name: Test IO::Async without AnyEvent
+
+    steps:
+      - uses: actions/checkout@main
+        with:
+            submodules: recursive
+      - run: sudo apt update && sudo apt install -y cmake cpanminus libmbedtls-dev
+      - name: Install CPAN Dependencies
+        run: cpanm --sudo --notest --installdeps --with-configure --verbose .
+      - run: cpanm --sudo --notest IO::Async
+      - run: perl Makefile.PL
+      - run: make test
+
+  linux-fail-without-mbedtls:
+    runs-on: ubuntu-latest
+
+    name: Ensure graceful failure if mbedTLS isn’t available
+
+    steps:
+      - uses: actions/checkout@main
+        with:
+            submodules: recursive
+      - run: sudo apt update && sudo apt install -y cmake cpanminus
+      - name: Install CPAN Dependencies
+        run: cpanm --sudo --notest --installdeps --with-configure --with-develop --verbose .
+      - name: Ensure failure
+        run: '! perl Makefile.PL'
+
+  linux-custom-mbedtls:
+    runs-on: ubuntu-latest
+
+    name: Linux (Upstream mbedTLS, ${{ matrix.linking }}-linked)
+
+    strategy:
+      fail-fast: false
+      matrix:
+        linking:
+          - static
+          - dynamic
+
+    steps:
+      - uses: actions/checkout@main
+        with:
+            submodules: recursive
+      - run: sudo apt update && sudo apt install -y cmake cpanminus
+      - name: Build mbedTLS
+        run: git clone https://github.com/Mbed-TLS/mbedtls && cd mbedtls && cmake -D CMAKE_C_FLAGS=-fPIC . && make
+      - name: Install CPAN Dependencies
+        run: cpanm --sudo --notest --installdeps --with-configure --with-develop --verbose .
+      - name: perl Makefile.PL
+        run: NET_MBEDTLS_MBEDTLS_BASE=mbedtls NET_MBEDTLS_LINKING=${{ matrix.linking }} perl Makefile.PL
+      - name: make
+        run: make
+      - name: Run Tests
+        run: prove -wlvmb t
+
+  linux:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        perl-version:
+          - '5.36'
+          - '5.34'
+          - '5.32'
+          - '5.30'
+          - '5.28'
+          - '5.26'
+          - '5.24'
+          - '5.22'
+          - '5.20'
+          - '5.18'
+          - '5.16'
+          #- '5.14'
+          #- '5.12'
+          #- '5.10'
+
+    container:
+      image: perldocker/perl-tester:${{ matrix.perl-version }}
+
+    steps:
+      - uses: actions/checkout@main
+        with:
+            submodules: recursive
+      - run: apt update && apt install -y libmbedtls-dev
+      - name: perl -V
+        run: perl -V
+      - name: Install CPAN Dependencies
+        run: cpanm --notest --installdeps --with-configure --with-develop --verbose .
+      - name: perl Makefile.PL
+        run: perl Makefile.PL
+      - name: make
+        run: make
+      - name: Run Tests
+        run: make test
+
+  mac:
+    runs-on: macOS-latest
+
+    steps:
+      - uses: actions/checkout@main
+        with:
+            submodules: recursive
+      - name: Install OS Dependencies
+        run: brew install cpanminus mbedtls
+      - name: perl -V
+        run: perl -V
+      - name: Install CPAN Dependencies
+        run: cpanm --verbose --notest --installdeps --with-develop --with-configure .
+      - name: perl Makefile.PL
+        run: perl Makefile.PL
+      - name: make
+        run: make
+      - name: Run tests (with coverage)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -L https://cpanmin.us | perl - --notest Devel::Cover::Report::Coveralls
+          `perl -MConfig -E'print $Config::Config{"sitebin"}'`/cover -test -report Coveralls -ignore_re easyxs
+
+#  windows:
+#    runs-on: windows-latest
+#
+#    steps:
+#      - uses: actions/checkout@main
+#        with:
+#            submodules: recursive
+#      - name: Set up Perl
+#        run: |
+#          choco install strawberryperl
+#          #echo "##[add-path]C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin"
+#          echo 'C:\strawberry\c\bin' >> $GITHUB_PATH
+#          echo 'C:\strawberry\perl\site\bin' >> $GITHUB_PATH
+#          echo 'C:\strawberry\perl\bin' >> $GITHUB_PATH
+#      - name: perl -V
+#        run: perl -V
+#      - name: Install Dependencies
+#        run: curl -L https://cpanmin.us | perl - --notest --installdeps --with-develop --with-configure --verbose .
+#      - name: perl Makefile.PL
+#        run: perl Makefile.PL
+#      - name: make
+#        run: make
+#      - name: Run Tests
+#        run: prove -wlvmb t
+
+  cygwin:
+    runs-on: windows-latest
+
+    steps:
+      - name: Set up Cygwin
+        uses: cygwin/cygwin-install-action@master
+        with:
+            packages: perl_base perl-ExtUtils-MakeMaker make gcc-g++ libcrypt-devel libnsl-devel bash mbedtls-devel
+      - uses: actions/checkout@main
+        with:
+            submodules: recursive
+      - shell: C:\cygwin\bin\bash.exe --login --norc -eo pipefail -o igncr '{0}'
+        run: |
+            perl -V
+            cpan -T App::cpanminus
+            cd $GITHUB_WORKSPACE
+            cpanm --verbose --notest --installdeps --with-configure --with-develop .
+            perl Makefile.PL
+            make
+            prove -wlvmb t
+
+  qemu-alpine:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - i386
+          - arm32v6
+          - arm32v7
+          - arm64v8
+          - s390x
+
+    steps:
+      - uses: actions/checkout@main
+        with:
+            submodules: recursive
+      - name: Get the qemu container
+        run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+      - name: Run tests on ${{ matrix.platform }}
+        run: docker run --rm --interactive --mount type=bind,source=$(pwd),target=/host ${{ matrix.platform }}/alpine sh -c "apk add wget perl-app-cpanminus perl-dev make gcc libc-dev mbedtls-dev; cd /host; perl -V; cpanm --verbose --notest --installdeps --with-configure --with-develop .; perl Makefile.PL; make -j3 -j3; PERL_DL_NONLAZY=1 prove -wlvmb t"

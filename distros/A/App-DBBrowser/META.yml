@@ -51,7 +51,7 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/App-DBBrowser.git
-version: '2.305'
+version: '2.306'
 x_bugtracker:
   web: https://github.com/kuerbis/App-DBBrowser/issues
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

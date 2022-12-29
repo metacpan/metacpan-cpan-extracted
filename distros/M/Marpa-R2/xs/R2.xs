@@ -1772,6 +1772,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
           goto NEXT_OP_CODE;
 
         case MARPA_OP_PUSH_G1_LENGTH:
+        case MARPA_OP_PUSH_G1_LEN:
           {
             int length;
             Scanless_R *slr = v_wrapper->slr;
@@ -1795,7 +1796,12 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                   Marpa_Earley_Set_ID start_earley_set =
                     marpa_v_rule_start_es_id (v);
                   Marpa_Earley_Set_ID end_earley_set = marpa_v_es_id (v);
-                  length = end_earley_set - start_earley_set + 1;
+                  /* MARPA_OP_PUSH_G1_LENGTH sets the length variable to the length
+                     plus one.  This is a mistake, which we have grandfathered in,
+                     and which we deprecate in the upper layers.
+                  */
+                  length = end_earley_set - start_earley_set +
+                      (op_code == MARPA_OP_PUSH_G1_LENGTH ? 1 : 0);
                 }
                 break;
               case MARPA_STEP_TOKEN:
@@ -1803,7 +1809,12 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                   Marpa_Earley_Set_ID start_earley_set =
                     marpa_v_token_start_es_id (v);
                   Marpa_Earley_Set_ID end_earley_set = marpa_v_es_id (v);
-                  length = end_earley_set - start_earley_set + 1;
+                  /* MARPA_OP_PUSH_G1_LENGTH sets the length variable to the length
+                     plus one.  This is a mistake, which we have grandfathered in,
+                     and which we deprecate in the upper layers.
+                  */
+                  length = end_earley_set - start_earley_set +
+                      (op_code == MARPA_OP_PUSH_G1_LENGTH ? 1 : 0);
                 }
                 break;
               default:
@@ -2781,9 +2792,9 @@ slr_es_span_to_literal_sv (Scanless_R * slr,
   return newSVpvn ("", 0);
 }
 
-#define EXPECTED_LIBMARPA_MAJOR 9
+#define EXPECTED_LIBMARPA_MAJOR 11
 #define EXPECTED_LIBMARPA_MINOR 0
-#define EXPECTED_LIBMARPA_MICRO 3
+#define EXPECTED_LIBMARPA_MICRO 2
 
 MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin
 
@@ -4825,6 +4836,20 @@ PPCODE:
           croak ("Problem in r->leo_base_state(): %s", xs_g_error(r_wrapper->base));
         }
       XPUSHs (sv_2mortal (newSViv (leo_base_state)));
+    }
+
+void
+_marpa_r_leo_top_ahm( r_wrapper )
+    R_Wrapper *r_wrapper;
+PPCODE:
+    {
+      struct marpa_r *r = r_wrapper->r;
+      int leo_top_ahm = _marpa_r_leo_top_ahm (r);
+      if (leo_top_ahm == -1) { XSRETURN_UNDEF; }
+      if (leo_top_ahm < 0) {
+          croak ("Problem in r->leo_top_ahm(): %s", xs_g_error(r_wrapper->base));
+        }
+      XPUSHs (sv_2mortal (newSViv (leo_top_ahm)));
     }
 
 void

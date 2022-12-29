@@ -4,7 +4,7 @@
       "Zakariyya Mughal <zmughal@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -73,20 +73,20 @@
    "provides" : {
       "Alien::SWIG4" : {
          "file" : "lib/Alien/SWIG4.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/PerlAlien/Alien-SWIG",
+      "homepage" : "https://github.com/PerlAlien/Alien-SWIG4",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/PerlAlien/Alien-SWIG.git",
-         "web" : "https://github.com/PerlAlien/Alien-SWIG"
+         "url" : "https://github.com/PerlAlien/Alien-SWIG4.git",
+         "web" : "https://github.com/PerlAlien/Alien-SWIG4"
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {
@@ -95,9 +95,12 @@
             "Config" : "0",
             "File::Which" : "0",
             "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
             "Mojo::DOM" : "0",
             "Mojolicious" : "7.00",
+            "Mozilla::CA" : "0",
+            "Net::SSLeay" : "1.49",
             "Sort::Versions" : "0",
             "URI" : "0",
             "URI::Escape" : "0"
@@ -106,7 +109,7 @@
       }
    },
    "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.28",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

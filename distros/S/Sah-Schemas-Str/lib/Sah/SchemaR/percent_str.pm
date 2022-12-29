@@ -1,13 +1,13 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::percent_str;
 
-our $DATE = '2022-09-22'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2022-09-23'; # DATE
+our $VERSION = '0.013'; # VERSION
 
-our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nThis schema accepts floating number followed by percent sign. Unlike the\n`percent` schema from <pm:Sah::Schemas::Float>, The percent sign will not be\nremoved nor the number be converted to decimal (e.g. 50% to 0.5).\n\n",examples=>[{summary=>"No percent sign",valid=>0,value=>""},{summary=>"No percent sign",valid=>0,value=>1},{valid=>1,value=>"1%"},{summary=>"Whitespace before percent sign is currently not allowed",valid=>0,value=>"1 %"},{valid=>1,value=>"-1.23%"},{summary=>"Percent sign only",valid=>0,value=>"%"}],match=>qr(\A(?^:[+-]?(?:[0-9]+(?:\.[0-9]*)?|[0-9]*\.[0-9]+))%\z),summary=>"A number in percent form"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
+our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nThis schema accepts floating number followed by percent sign. Unlike the\n`percent` schema from <pm:Sah::Schemas::Float>, The percent sign will not be\nremoved nor the number be converted to decimal (e.g. 50% to 0.5).\n\n",examples=>[{summary=>"No percent sign",valid=>0,value=>""},{summary=>"No percent sign",valid=>0,value=>1},{valid=>1,value=>"1%"},{summary=>"Whitespace before percent sign is currently not allowed",valid=>0,value=>"1 %"},{valid=>1,value=>"-1.23%"},{summary=>"Percent sign only",valid=>0,value=>"%"}],match=>qr(\A(?^:[+-]?(?:[0-9]+(?:\.[0-9]*)?|[0-9]*\.[0-9]+))%\z),summary=>"A number in percent form, e.g. \"10.5%\""}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
-# ABSTRACT: A number in percent form
+# ABSTRACT: A number in percent form, e.g. "10.5%"
 
 __END__
 
@@ -17,11 +17,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::percent_str - A number in percent form
+Sah::SchemaR::percent_str - A number in percent form, e.g. "10.5%"
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::SchemaR::percent_str (from Perl distribution Sah-Schemas-Str), released on 2022-09-22.
+This document describes version 0.013 of Sah::SchemaR::percent_str (from Perl distribution Sah-Schemas-Str), released on 2022-09-23.
 
 =head1 DESCRIPTION
 
