@@ -1,15 +1,35 @@
-package Color::Palette::Types;
-{
-  $Color::Palette::Types::VERSION = '0.100003';
-}
+package Color::Palette::Types 0.100004;
 use strict;
 use warnings;
 # ABSTRACT: type constraints for use with Color::Palette
 
+#pod =head1 BEAR WITH ME
+#pod
+#pod I'm not yet sure how best to document a type library.
+#pod
+#pod =head1 TYPES
+#pod
+#pod The following types are defined:
+#pod
+#pod   Color     - a Graphics::Color object
+#pod   Palette   - a Color::Palette::Color object
+#pod   ColorName - a valid color name: /\A[a-z][-a-z0-9]*\z/i
+#pod
+#pod   ColorDict - a hash mapping ColorName to Color
+#pod   RecursiveColorDict - a hash mapping ColorName to (Color | ColorName)
+#pod
+#pod   HexColorStr - a string like #000 or #ababab
+#pod   ArrayRGB    - an ArrayRef of three Bytes
+#pod   Byte        - and Int from 0 to 255
+#pod
+#pod Colors can be coerced from ArrayRGB or HexColorStr, and dicts of colors try to
+#pod coerce, too.
+#pod
+#pod =cut
 
 use Graphics::Color::RGB;
 
-use List::MoreUtils qw(all);
+use List::Util 1.33 qw(all);
 
 use MooseX::Types -declare => [ qw(
   Color Palette
@@ -94,7 +114,17 @@ Color::Palette::Types - type constraints for use with Color::Palette
 
 =head1 VERSION
 
-version 0.100003
+version 0.100004
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 BEAR WITH ME
 
@@ -120,11 +150,11 @@ coerce, too.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

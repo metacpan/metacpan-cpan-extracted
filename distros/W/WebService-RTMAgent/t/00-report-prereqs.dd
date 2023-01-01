@@ -1,11 +1,13 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '6.78'
                                       }
                       },
        'develop' => {
                       'requires' => {
+                                      'Encode' => '0',
+                                      'Test::More' => '0',
                                       'Test::Pod' => '1.41'
                                     }
                     },
@@ -17,6 +19,7 @@ do { my $x = {
                                       'LWP::UserAgent' => '0',
                                       'XML::Simple' => '0',
                                       'parent' => '0',
+                                      'perl' => '5.012',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

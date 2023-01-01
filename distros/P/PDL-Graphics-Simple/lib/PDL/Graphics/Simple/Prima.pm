@@ -30,8 +30,8 @@ our $mod = {
     synopsis => 'Prima (interactive, fast, PDL-specific)',
     pgs_version => '1.005'
 };
-PDL::Graphics::Simple::register('PDL::Graphics::Simple::Prima');
-
+eval { require PDL::Graphics::Prima; 1 } and
+  PDL::Graphics::Simple::register('PDL::Graphics::Simple::Prima');
 
 ##########
 # PDL::Graphics::Simple::Prima::check

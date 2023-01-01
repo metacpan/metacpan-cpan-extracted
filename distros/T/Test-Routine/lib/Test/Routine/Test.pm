@@ -1,6 +1,6 @@
 package Test::Routine::Test;
 # ABSTRACT: a test method in a Test::Routine role
-$Test::Routine::Test::VERSION = '0.028';
+$Test::Routine::Test::VERSION = '0.029';
 use Moose;
 extends 'Moose::Meta::Method';
 
@@ -28,7 +28,7 @@ Test::Routine::Test - a test method in a Test::Routine role
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 OVERVIEW
 
@@ -36,11 +36,12 @@ Test::Routine::Test is a very simple subclass of L<Moose::Meta::Method>, used
 primarily to identify which methods in a class are tests.  It also has
 attributes used for labeling and ordering test runs.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has the same support period as perl itself:  it supports the two
-most recent versions of perl.  (That is, if the most recently released version
-is v5.40, then this module should work on both v5.40 and v5.38.)
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
@@ -49,7 +50,7 @@ the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

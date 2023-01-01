@@ -1,5 +1,8 @@
 Revision history for Perl extension Email-MIME-Encodings
 
+1.317     2022-12-31 21:28:56-05:00 America/New_York
+        - update author contact info
+
 1.316     2022-10-22 16:10:14-04:00 America/New_York
           update packaging and metadata
 

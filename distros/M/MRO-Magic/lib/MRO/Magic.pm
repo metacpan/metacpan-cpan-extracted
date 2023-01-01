@@ -1,7 +1,4 @@
-package MRO::Magic;
-{
-  $MRO::Magic::VERSION = '0.100001';
-}
+package MRO::Magic 0.100002;
 use 5.010; # uvar magic does not work prior to version 10
 use strict;
 use warnings;
@@ -12,6 +9,70 @@ use MRO::Define;
 use Scalar::Util qw(reftype);
 use Variable::Magic qw/wizard cast/;
 
+#pod =head1 WARNING
+#pod
+#pod First off, at present (2009-05-25) this code requires a development version of
+#pod perl.  It should run on perl5 v10.1, but that isn't out yet, so be patient or
+#pod install a development perl.
+#pod
+#pod Secondly, the API is not guaranteed to change in massive ways.  This code is
+#pod the result of playing around, not of careful design.
+#pod
+#pod Finally, using MRO::Magic anywhere will impact the performance of I<all> of
+#pod your program.  Every time a method is called via MRO::Magic, the entire method
+#pod resolution class for all classes is cleared.
+#pod
+#pod B<You have been warned!>
+#pod
+#pod =head1 USAGE
+#pod
+#pod First you write a method dispatcher.
+#pod
+#pod   package MRO::Classless;
+#pod   use MRO::Magic
+#pod     metamethod => \'invoke_method',
+#pod     passthru   => [ qw(VERSION import unimport DESTROY) ];
+#pod
+#pod   sub invoke_method {
+#pod     my ($invocant, $method_name, $args) = @_;
+#pod
+#pod     ...
+#pod
+#pod     return $rv;
+#pod   }
+#pod
+#pod In a class using this dispatcher, any method not in the passthru specification
+#pod is redirected to C<invoke_method>, which can do any kind of ridiculous thing it
+#pod wants.
+#pod
+#pod Now you use the dispatcher:
+#pod
+#pod   package MyDOM;
+#pod   use MRO::Classless;
+#pod   use mro 'MRO::Classless';
+#pod   1;
+#pod
+#pod ...and...
+#pod
+#pod   use MyDOM;
+#pod
+#pod   my $dom = MyDOM->new(type => 'root');
+#pod
+#pod The C<new> call will actually result in a call to C<invoke_method> in the form:
+#pod
+#pod   invoke_method('MyDOM', 'new', [ type => 'root' ]);
+#pod
+#pod Assuming it returns an object blessed into MyDOM, then:
+#pod
+#pod   $dom->children;
+#pod
+#pod ...will redispatch to:
+#pod
+#pod   invoke_method($dom, 'children', []);
+#pod
+#pod For examples of more practical use, look at the test suite.
+#pod
+#pod =cut
 
 sub import {
   my $self = shift;
@@ -113,13 +174,23 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 MRO::Magic - write your own method dispatcher
 
 =head1 VERSION
 
-version 0.100001
+version 0.100002
+
+=head1 PERL VERSION
+
+This module is shipped with no promise about what version of perl it will
+require in the future.  In practice, this tends to mean "you need a perl from
+the last three years," but you can't rely on that.  If a new version of perl
+ship, this software B<may> begin to require it for any reason, and there is no
+promise that patches will be accepted to lower the minimum required perl.
 
 =head1 WARNING
 
@@ -186,11 +257,17 @@ For examples of more practical use, look at the test suite.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

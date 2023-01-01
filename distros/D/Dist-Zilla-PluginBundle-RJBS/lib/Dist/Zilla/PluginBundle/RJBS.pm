@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::RJBS 5.020;
+package Dist::Zilla::PluginBundle::RJBS 5.021;
 # ABSTRACT: BeLike::RJBS when you build your dists
 
 use Moose;
@@ -65,7 +65,7 @@ use Dist::Zilla::PluginBundle::Basic;
 use Dist::Zilla::PluginBundle::Filter;
 use Dist::Zilla::PluginBundle::Git;
 
-package Dist::Zilla::Plugin::RJBSMisc 5.020 {
+package Dist::Zilla::Plugin::RJBSMisc 5.021 {
   use Moose;
   with 'Dist::Zilla::Role::BeforeBuild',
        'Dist::Zilla::Role::AfterBuild',
@@ -371,7 +371,7 @@ Dist::Zilla::PluginBundle::RJBS - BeLike::RJBS when you build your dists
 
 =head1 VERSION
 
-version 5.020
+version 5.021
 
 =head1 DESCRIPTION
 
@@ -430,17 +430,27 @@ promise that patches will be accepted to lower the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge
+=for stopwords Karen Etheridge Ricardo Signes
+
+=over 4
+
+=item *
 
 Karen Etheridge <ether@cpan.org>
 
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo Signes.
+This software is copyright (c) 2022 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

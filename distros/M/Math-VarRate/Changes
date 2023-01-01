@@ -1,5 +1,9 @@
 Revision history for Math-VarRate
 
+0.100001  2022-12-31 13:27:33-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 0.100000  2013-09-28 21:51:28 America/New_York
           allow non-zero starting values
           change input validation to work with bigfloats

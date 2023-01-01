@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use boolean qw(true false);
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 sub _parse_formatted_ymd
 {
@@ -95,6 +95,7 @@ sub _parse_formatted_ymd
         day   => $day,
     );
     $self->{datetime}->truncate(to => 'day');
+    $self->_set_truncated;
     $self->_set_valid_exp;
 
     $self->_process_tokens;
@@ -142,6 +143,7 @@ sub _parse_formatted_md
         day   => $day,
     );
     $self->{datetime}->truncate(to => 'day');
+    $self->_set_truncated;
     $self->_set_valid_exp;
 
     $self->_process_tokens;
@@ -172,6 +174,7 @@ sub _process_tokens
 
     if (@{$self->{tokens}}) {
         $self->{count}{tokens}--;
+        $self->_unset_truncated;
         $self->_unset_valid_exp;
         $self->_process;
     }

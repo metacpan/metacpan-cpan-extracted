@@ -20,8 +20,8 @@ package Search::Elasticsearch::Cxn::NetCurl;
 use Moo;
 with 'Search::Elasticsearch::Role::Cxn', 'Search::Elasticsearch::Role::Is_Sync';
 
-use Search::Elasticsearch 7.00;
-our $VERSION = "7.711001";
+use Search::Elasticsearch 8.00;
+our $VERSION = '8.00';
 
 use HTTP::Parser::XS qw(HEADERS_AS_HASHREF parse_http_response);
 use Try::Tiny;
@@ -167,7 +167,7 @@ Search::Elasticsearch::Cxn::NetCurl - A Cxn implementation which uses libcurl vi
 
 =head1 VERSION
 
-version 7.711001
+version 8.00
 
 =head1 DESCRIPTION
 
@@ -397,7 +397,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Elasticsearch BV.
+This software is Copyright (c) 2022 by Elasticsearch BV.
 
 This is free software, licensed under:
 

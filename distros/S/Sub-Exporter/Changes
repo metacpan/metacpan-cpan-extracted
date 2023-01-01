@@ -1,5 +1,8 @@
 Revision history for Sub-Exporter
 
+0.989     2022-12-31 19:34:54-05:00 America/New_York
+        - update author contact info
+
 0.988     2021-06-18 23:37:47-04:00 America/New_York
         - update author contact info
         - add perl support section to docs

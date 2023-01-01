@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::Bolt;
 # ABSTRACT: Network controller for Neo4j Bolt
-$Neo4j::Driver::Net::Bolt::VERSION = '0.31';
+$Neo4j::Driver::Net::Bolt::VERSION = '0.33';
 
 # This package is not part of the public Neo4j::Driver API.
 

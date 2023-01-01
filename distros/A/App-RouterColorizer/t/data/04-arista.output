@@ -2006,3 +2006,28 @@ Port      (Celsius)  (Volts)   (mA)      (dBm)     (dBm)     Last Update
 [1;31mEt50/11    37.88      3.30      0.00     -30.00    -30.00    0:00:00 ago[0m
 [1;31mEt50/12    37.88      3.30      0.00     -30.00    -30.00    0:00:00 ago[0m
 [K[?1l>kswXX#\swXX#exit
+sw08#show spanning-tree
+VL1
+  Spanning tree enabled protocol rapid-pvst
+  Root ID    Priority    [4m4[24m097
+             Address     444c.1234.5678
+             This bridge is the root
+
+  Bridge ID  Priority     [4m4[24m097  (priority [4m4[24m096 sys-id-ext 1)
+             Address     444c.1234.5678
+             Hello Time  2.000 sec  Max Age 20 sec  Forward Delay 15 sec
+
+Interface        Role       State      Cost      Prio.Nbr Type
+---------------- ---------- ---------- --------- -------- --------------------
+[32mEt1              designated forwarding [4m2[24m000      128.1    P2p[0m
+[1;31mEt7/2            designated discarding [4m2[24m000      128.30   P2p Edge *BA_Inc[0m
+[32mEt7/3            designated forwarding [4m2[24m000      128.85   P2p Edge[0m
+[32mEt9/3            designated forwarding [4m2[24m000      128.49   P2p Edge[0m
+[32mEt9/4            designated forwarding [4m2[24m000      128.65   P2p Edge[0m
+[32mPo2              designated forwarding [4m1[24m999      128.128  P2p[0m
+[32mPo3              designated forwarding [4m1[24m999      128.129  P2p[0m
+[32mPo4              designated forwarding [4m1[24m999      128.127  P2p Edge[0m
+[32mPo5              designated forwarding [4m1[24m999      128.132  P2p[0m
+[32mPo6              designated forwarding [4m1[24m999      128.130  P2p Edge[0m
+[32mPo8              designated forwarding [4m19[24m999     128.133  P2p Edge[0m
+

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Data::OptList;
 # ABSTRACT: parse and validate simple name/value option pairs
-$Data::OptList::VERSION = '0.112';
+$Data::OptList::VERSION = '0.113';
 use List::Util ();
 use Params::Util ();
 use Sub::Install 0.921 ();
@@ -249,7 +249,7 @@ Data::OptList - parse and validate simple name/value option pairs
 
 =head1 VERSION
 
-version 0.112
+version 0.113
 
 =head1 SYNOPSIS
 
@@ -313,10 +313,10 @@ With Data::OptList, you can do this instead:
 This works by assuming that any defined scalar is a name and any reference
 following a name is its value.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has a long-term perl support period.  That means it will not
-require a version of perl released fewer than five years ago.
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
@@ -388,13 +388,23 @@ Both C<mkopt> and C<mkopt_hash> may be exported on request.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Olivier Mengué
+=for stopwords Olivier Mengué Ricardo Signes
+
+=over 4
+
+=item *
 
 Olivier Mengué <dolmen@cpan.org>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,7 +1,7 @@
 use 5.006;
 use strict;
 use warnings;
-package Email::Date::Format 1.006;
+package Email::Date::Format 1.007;
 # ABSTRACT: produce RFC 2822 date strings
 
 our @EXPORT_OK = qw[email_date email_gmdate];
@@ -12,9 +12,9 @@ use Time::Local ();
 #pod =head1 SYNOPSIS
 #pod
 #pod   use Email::Date::Format qw(email_date);
-#pod   
+#pod
 #pod   my $header = email_date($date->epoch);
-#pod   
+#pod
 #pod   Email::Simple->create(
 #pod     header => [
 #pod       Date => $header,
@@ -110,14 +110,14 @@ Email::Date::Format - produce RFC 2822 date strings
 
 =head1 VERSION
 
-version 1.006
+version 1.007
 
 =head1 SYNOPSIS
 
   use Email::Date::Format qw(email_date);
-  
+
   my $header = email_date($date->epoch);
-  
+
   Email::Simple->create(
     header => [
       Date => $header,
@@ -174,13 +174,13 @@ Casey West
 
 =item *
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =back
 
 =head1 CONTRIBUTORS
 
-=for stopwords bitcardbmw@lsmod.de Eric Sproul
+=for stopwords bitcardbmw@lsmod.de Eric Sproul Ricardo Signes
 
 =over 4
 
@@ -191,6 +191,10 @@ bitcardbmw@lsmod.de <bitcardbmw@lsmod.de>
 =item *
 
 Eric Sproul <esproul@omniti.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =back
 

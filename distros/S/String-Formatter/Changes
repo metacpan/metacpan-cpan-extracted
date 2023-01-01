@@ -1,5 +1,8 @@
 Revision history for String-Formatter
 
+1.235     2022-12-31 16:49:41-05:00 America/New_York
+        - update metadata
+
 1.234     2021-08-28 17:28:18-04:00 America/New_York
         - move bench.pl from dist root so it won't get installed to @INC
         - fix some problems with doc layout

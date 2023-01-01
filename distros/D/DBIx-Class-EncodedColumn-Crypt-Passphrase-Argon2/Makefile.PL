@@ -31,12 +31,12 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => "0.88",
-    "Test::SQLite" => 0,
+    "Test::SQLite" => "0.0410",
     "base" => 0,
     "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.0106",
+  "VERSION" => "0.0107",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +54,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "SQL::Translator" => "0.11018",
   "Test::More" => "0.88",
-  "Test::SQLite" => 0,
+  "Test::SQLite" => "0.0410",
   "base" => 0,
   "lib" => 0,
   "strict" => 0,

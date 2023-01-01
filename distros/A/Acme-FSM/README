@@ -1,0 +1,53 @@
+OVERVIEW
+
+  Acme::FSM implements something resembling Finite State Machine.  If
+  you're looking for rigor then look somewhere else.  If you're looking
+  for feature set then keep looking.
+
+  What A::F does is mechanics with zero awarness of inputs and/or
+  outputs (any or both might be missing).  Implementation is definetely
+  crude.  That stems from historical burden -- it's a fork!
+
+  If you're not demotivated yet then Acme::FSM has more.
+
+  Test-suite scores 1083 units.
+
+INSTALL
+
+      perl Build.PL
+      ./Build build
+      ./Build test
+      ./Build install
+
+  A::F doesn't need anything (even core modules).  However,
+
+  perl
+      *v5.10*, but that's not verified yet.
+
+  version
+      *v0.77*.  That's definetely contradicts perl.  I haven't dug
+      through Changes yet, can't say when The Core has switched to
+      *v0.77* though.
+
+  "Carp"
+      Whatever comes with perl, hopefully.
+
+  Module::Build
+      Whatever comes with perl.  Cut off version to be determined yet.
+
+AVAILABILITY
+
+  # TODO:202207292136:whynot: Fill me in.
+
+BUGS
+
+  # TODO:202207292141:whynot: Fill me in.
+
+COPYRIGHT AND LICENSING
+
+      Copyright 2012, 2013, 2022 Eric Pozharski <whynto@pozharski.name>
+
+      GNU LGPLv3
+
+      AS-IS, NO-WARRANTY, HOPE-TO-BE-USEFUL
+

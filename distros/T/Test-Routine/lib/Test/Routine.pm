@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Test::Routine;
 # ABSTRACT: composable units of assertion
-$Test::Routine::VERSION = '0.028';
+$Test::Routine::VERSION = '0.029';
 #pod =head1 SYNOPSIS
 #pod
 #pod   # mytest.t
@@ -328,7 +328,7 @@ Test::Routine - composable units of assertion
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 SYNOPSIS
 
@@ -533,11 +533,12 @@ When you run it:
       # No tests run!
   not ok 1 - No tests run for subtest "invalid"
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has the same support period as perl itself:  it supports the two
-most recent versions of perl.  (That is, if the most recently released version
-is v5.40, then this module should work on both v5.40 and v5.38.)
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
@@ -546,7 +547,7 @@ the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
@@ -573,6 +574,10 @@ Jesse Luehrs <doy@tozt.net>
 =item *
 
 Ricardo Signes <rjbs@cpan.org>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

@@ -1,6 +1,6 @@
 package Throwable;
 # ABSTRACT: a role for classes that can be thrown
-$Throwable::VERSION = '1.000';
+$Throwable::VERSION = '1.001';
 use Moo::Role;
 use Sub::Quote ();
 use Scalar::Util ();
@@ -80,9 +80,9 @@ sub throw {
 #pod
 #pod   die Something::Throwable->new_with_previous({ attr => $value });
 #pod
-#pod Constructs an exception object and return it, while trying to mae sure that any
-#pod values in $@ are safely stored in C<previous_exception> without being stomped
-#pod by evals in the construction process.
+#pod Constructs an exception object and return it, while trying to make sure that
+#pod any values in $@ are safely stored in C<previous_exception> without being
+#pod stomped by evals in the construction process.
 #pod
 #pod This is more reliable than calling C<new> directly, but doesn't include the
 #pod forced C<die> in C<throw>.
@@ -106,7 +106,7 @@ Throwable - a role for classes that can be thrown
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 
@@ -130,10 +130,10 @@ previous value for C<$@> and calls C<die $self>.
 Throwable is implemented with L<Moo>, so you can stick to Moo or use L<Moose>,
 as you prefer.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has a long-term perl support period.  That means it will not
-require a version of perl released fewer than five years ago.
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
@@ -164,9 +164,9 @@ If called on an object that does Throwable, the object will be rethrown.
 
   die Something::Throwable->new_with_previous({ attr => $value });
 
-Constructs an exception object and return it, while trying to mae sure that any
-values in $@ are safely stored in C<previous_exception> without being stomped
-by evals in the construction process.
+Constructs an exception object and return it, while trying to make sure that
+any values in $@ are safely stored in C<previous_exception> without being
+stomped by evals in the construction process.
 
 This is more reliable than calling C<new> directly, but doesn't include the
 forced C<die> in C<throw>.
@@ -177,7 +177,7 @@ forced C<die> in C<throw>.
 
 =item *
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =item *
 
@@ -187,7 +187,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Arthur Axel 'fREW' Schmidt Brian Manning Christian Walde Dagfinn Ilmari Mannsåker Dave Rolsky David E. Wheeler Graham Knop Jeffrey Ryan Thalhammer Justin Hunter Matt S Trout Olaf Alders Toby Inkster
+=for stopwords Arthur Axel 'fREW' Schmidt Brian Manning Christian Walde Dagfinn Ilmari Mannsåker Dave Rolsky David E. Wheeler Graham Knop Jeffrey Ryan Thalhammer Justin Hunter Matt S Trout Olaf Alders Ricardo Signes Toby Inkster
 
 =over 4
 
@@ -241,13 +241,17 @@ Olaf Alders <olaf@wundersolutions.com>
 
 =item *
 
+Ricardo Signes <rjbs@semiotic.systems>
+
+=item *
+
 Toby Inkster <mail@tobyinkster.co.uk>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

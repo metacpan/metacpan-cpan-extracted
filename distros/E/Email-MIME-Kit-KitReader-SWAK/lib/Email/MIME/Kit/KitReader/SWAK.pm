@@ -1,4 +1,4 @@
-package Email::MIME::Kit::KitReader::SWAK 1.093064;
+package Email::MIME::Kit::KitReader::SWAK 1.093065;
 # ABSTRACT: the swiss army knife of EMK kit readers
 
 use Moose;
@@ -100,7 +100,7 @@ Email::MIME::Kit::KitReader::SWAK - the swiss army knife of EMK kit readers
 
 =head1 VERSION
 
-version 1.093064
+version 1.093065
 
 =head1 DESCRIPTION
 
@@ -142,7 +142,13 @@ the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

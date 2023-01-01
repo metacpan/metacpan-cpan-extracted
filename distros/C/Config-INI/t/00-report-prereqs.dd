@@ -16,6 +16,7 @@ do { my $x = {
                                       'Carp' => '0',
                                       'Mixin::Linewise::Readers' => '0.110',
                                       'Mixin::Linewise::Writers' => '0',
+                                      'perl' => '5.012',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

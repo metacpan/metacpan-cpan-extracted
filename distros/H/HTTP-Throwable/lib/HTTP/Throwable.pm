@@ -1,6 +1,6 @@
-package HTTP::Throwable;
+package HTTP::Throwable 0.028;
 our $AUTHORITY = 'cpan:STEVAN';
-$HTTP::Throwable::VERSION = '0.027';
+
 use Types::Standard qw(Int Str ArrayRef);
 
 use Moo::Role;
@@ -101,7 +101,7 @@ HTTP::Throwable - a set of strongly-typed, PSGI-friendly HTTP 1.1 exception libr
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 SYNOPSIS
 
@@ -198,6 +198,16 @@ trace (albeit optionally). This is because more often then not you will
 not actually care about the stack trace and therefore do not the extra
 overhead. If you do find you want a stack trace though, it is as simple
 as adding the L<StackTrace::Auto> role to your exceptions.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 ATTRIBUTES
 
@@ -410,15 +420,19 @@ Stevan Little <stevan.little@iinteractive.com>
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =back
 
 =head1 CONTRIBUTORS
 
-=for stopwords Brian Cassidy Chris Prather Edward Betts Fitz Elliott Karen Etheridge
+=for stopwords Andrew Fresh Brian Cassidy Chris Prather Edward Betts Fitz Elliott Karen Etheridge Ricardo Signes
 
 =over 4
+
+=item *
+
+Andrew Fresh <andrew@afresh1.com>
 
 =item *
 
@@ -439,6 +453,10 @@ Fitz Elliott <felliott@fiskur.org>
 =item *
 
 Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =back
 

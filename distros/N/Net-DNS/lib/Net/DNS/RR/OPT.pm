@@ -2,7 +2,7 @@ package Net::DNS::RR::OPT;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: OPT.pm 1864 2022-04-14 15:18:49Z willem $)[2];
+our $VERSION = (qw$Id: OPT.pm 1891 2022-12-28 13:09:27Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -17,6 +17,8 @@ use integer;
 
 use Carp;
 use Net::DNS::Parameters qw(:rcode :ednsoption);
+
+use constant UTIL => scalar eval { require Scalar::Util; Scalar::Util->can('isdual') };
 
 use constant CLASS_TTL_RDLENGTH => length pack 'n N n', (0) x 3;
 
@@ -39,12 +41,15 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 
 	my $limit = $offset + $self->{rdlength} - 4;
 
+	my @index;
 	while ( $offset <= $limit ) {
 		my ( $code, $length ) = unpack "\@$offset nn", $$data;
 		my $value = unpack "\@$offset x4 a$length", $$data;
+		push @index, $code;
 		$self->{option}{$code} = $value;
 		$offset += $length + 4;
 	}
+	@{$self->{index}} = @index;
 	return;
 }
 
@@ -53,7 +58,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
 	my $option = $self->{option} || {};
-	return join '', map { pack( 'nna*', $_, length $option->{$_}, $option->{$_} ) } keys %$option;
+	return join '', map { pack( 'nna*', $_, length $option->{$_}, $option->{$_} ) } $self->options;
 }
 
 
@@ -61,7 +66,7 @@ sub encode {				## overide RR method
 	my $self = shift;
 
 	my $data = $self->_encode_rdata;
-	my $size = $self->size;
+	my $size = $self->UDPsize;
 	my @xttl = ( $self->rcode >> 4, $self->version, $self->flags );
 	return pack 'C n n C2n n a*', 0, OPT, $size, @xttl, length($data), $data;
 }
@@ -70,63 +75,70 @@ sub encode {				## overide RR method
 sub string {				## overide RR method
 	my $self = shift;
 
-	my $edns   = $self->version;
+	my $edns = $self->version;
+	unless ( $edns == 0 ) {
+		my $content = unpack 'H*', eval { $self->encode };
+		return <<"QQ";
+;; {	"EDNS-VERSION":	$edns,
+;;	"BASE16":	"$content"
+;;	}
+QQ
+	}
+
 	my $flags  = sprintf '%04x', $self->flags;
 	my $rcode  = $self->rcode;
-	my $size   = $self->size;
-	my @option = map { join( "\n;;\t\t\t\t", $self->_format_option($_) ) } $self->options;
-	my @format = join "\n;;\t\t", @option;
-
-	$rcode = 0 if $rcode < 16;				# weird: 1 .. 15 not EDNS codes!!
-
-	my $rc = exists( $self->{rdlength} ) && $rcode ? "$rcode + [4-bits]" : rcodebyval($rcode);
-
-	$rc = 'BADVERS' if $rcode == 16;			# code 16 unambiguous here
+	my $size   = $self->UDPsize;
+	my @format = map { join( "\n;;\t\t\t\t", $self->_format_option($_) ) } $self->options;
+	my @indent = scalar(@format) ? "\n;;\t\t" : ();
+	my @option = join ",\n;;\t\t", @format;
 
 	return <<"QQ";
-;; EDNS version $edns
-;;	flags:	$flags
-;;	rcode:	$rc
-;;	size:	$size
-;;	option: @format
+;; {	"EDNS-VERSION":	$edns,
+;;	"FLAGS":	"$flags",
+;;	"RCODE":	$rcode,
+;;	"UDPSIZE":	$size,
+;;	"OPTIONS":	[@indent@option ]
+;;	}
 QQ
 }
 
 
 sub class {				## overide RR method
 	my $self = shift;
-	$self->_deprecate(qq[please use "size()"]);
-	return $self->size(@_);
+	$self->_deprecate(qq[please use "UDPsize()"]);
+	return $self->UDPsize(@_);
 }
 
 sub ttl {				## overide RR method
 	my $self = shift;
 	$self->_deprecate(qq[please use "flags()" or "rcode()"]);
-	my @rcode = map { unpack( 'C',	 pack 'N', $_ ) } @_;
-	my @flags = map { unpack( 'x2n', pack 'N', $_ ) } @_;
-	return pack 'C2n', $self->rcode(@rcode), $self->version, $self->flags(@flags);
+	for (@_) {
+		@{$self}{qw(rcode version flags)} = unpack 'C2n', pack 'N', $_;
+		@{$self}{rcode} = @{$self}{rcode} << 4;
+	}
+	return pack 'C2n', $self->rcode >> 4, $self->version, $self->flags;
 }
 
 
 sub version {
 	my $self = shift;
-
 	$self->{version} = 0 + shift if scalar @_;
 	return $self->{version} || 0;
 }
 
 
-sub size {
+sub UDPsize {
 	my $self = shift;
 	$self->{size} = shift if scalar @_;
-	return ( $self->{size} || 0 ) > 512 ? $self->{size} : 512;
+	return ( $self->{size} || 0 ) > 512 ? $self->{size} : 0;
 }
+
+sub size { return &UDPsize; }					# uncoverable pod
 
 
 sub rcode {
 	my $self = shift;
 	return $self->{rcode} || 0 unless scalar @_;
-	delete $self->{rdlength};				# (ab)used to signal incomplete value
 	my $val = shift || 0;
 	return $self->{rcode} = $val < 16 ? 0 : $val;		# discard non-EDNS rcodes 1 .. 15
 }
@@ -142,7 +154,7 @@ sub flags {
 sub options {
 	my ($self) = @_;
 	my $option = $self->{option} || {};
-	my @option = sort { $a <=> $b } keys %$option;
+	my @option = defined( $self->{index} ) ? @{$self->{index}} : sort { $a <=> $b } keys %$option;
 	return @option;
 }
 
@@ -156,59 +168,83 @@ sub option {
 
 ########################################
 
-sub _format_option {
-	my ( $self, $number ) = @_;
-	my $option  = ednsoptionbyval($number);
-	my $options = $self->{option} || {};
-	my $payload = $options->{$number};
-	return () unless defined $payload;
-	my $package = join '::', __PACKAGE__, $option;
-	$package =~ s/-/_/g;
-	my $defined = length($payload) && $package->can('_image');
-	my @element = $defined ? eval { $package->_image($payload) } : unpack 'H*', $payload;
-	my $protect = pop(@element);
-	return Net::DNS::RR::_wrap( "$option\t=> (", map( {"$_,"} @element ), "$protect )" );
-}
-
-
 sub _get_option {
 	my ( $self, $number ) = @_;
 
 	my $options = $self->{option} || {};
 	my $payload = $options->{$number};
 	return $payload unless wantarray;
-	return ()	unless $payload;
 	my $package = join '::', __PACKAGE__, ednsoptionbyval($number);
 	$package =~ s/-/_/g;
-	return ( 'OPTION-DATA' => $payload ) unless $package->can('_decompose');
-	return eval { $package->_decompose($payload) };
+	my @structure = $package->can('_decompose') ? eval { $package->_decompose($payload) } : ();
+	return @structure if scalar(@structure);
+	return length($payload) ? {BASE16 => unpack 'H*', $payload} : '';
 }
 
 
 sub _set_option {
-	my ( $self, $number, $value, @etc ) = @_;
+	my ( $self, $number, @value ) = @_;
 
 	my $options = $self->{option} ||= {};
 	delete $options->{$number};
-	return unless defined $value;
-	if ( ref($value) || scalar(@etc) || $value !~ /\D/ ) {
-		my @arg = ( $value, @etc );
-		@arg = @$value if ref($value) eq 'ARRAY';
-		@arg = %$value if ref($value) eq 'HASH';
-		if ( $arg[0] eq 'OPTION-DATA' ) {
-			$value = $arg[1];
-		} else {
-			my $option  = ednsoptionbyval($number);
-			my $package = join '::', __PACKAGE__, $option;
-			$package =~ s/-/_/g;
-			if ( $package->can('_compose') ) {
-				$value = $package->_compose(@arg);
-			} elsif ( scalar(@etc) ) {
-				croak "unable to compose option $option";
-			}
-		}
+
+	my ($arg) = @value;
+	return unless defined $arg;
+
+	if ( ref($arg) eq 'HASH' ) {
+		my $octets = $$arg{'OPTION-DATA'};
+		my $length = $$arg{'OPTION-LENGTH'};
+		$octets = pack 'H*', $$arg{'BASE16'} if defined $$arg{'BASE16'};
+		$octets = '' if defined($length) && $length == 0;
+		return $options->{$number} = $octets if defined $octets;
 	}
-	return $options->{$number} = $value;
+
+	my $option  = ednsoptionbyval($number);
+	my $package = join '::', __PACKAGE__, $option;
+	$package =~ s/-/_/g;
+	return eval { $options->{$number} = $package->_compose(@value) } if $package->can('_compose');
+
+	croak "unable to compose option $number" if ref($arg);
+	return $options->{$number} = $arg;
+}
+
+
+sub _format_option {
+	my ( $self, $number ) = @_;
+	my $option = ednsoptionbyval($number);
+	my ($content) = $self->_get_option($number);
+	return Net::DNS::RR::_wrap( _JSONify( {$option => $content} ) );
+}
+
+
+sub _JSONify {
+	my $value = shift;
+	if ( ref($value) eq 'HASH' ) {
+		my @tags = keys %$value;
+		my $tail = pop @tags;
+		my @body = map {
+			my ( $a, @z ) = _JSONify( $$value{$_} );
+			unshift @z, qq("$_": $a);
+			$z[-1] .= ',';
+			@z;
+		} @tags;
+		my ( $a, @tail ) = _JSONify( $$value{$tail} );
+		unshift @tail, qq("$tail": $a);
+		return ( '{', @body, @tail, '}' );
+	}
+
+	if ( ref($value) eq 'ARRAY' ) {
+		my @array = @$value;
+		return qq([ ]) unless scalar @array;
+		my @tail = _JSONify( pop @array );
+		my @body = map { my @x = _JSONify($_); $x[-1] .= ','; @x } @array;
+		return ( '[', @body, @tail, ']' );
+	}
+
+	my $string = qq("$value");	## stringify, then use isdual() as discriminant
+	return $value if UTIL  && Scalar::Util::isdual($value); # native integer
+	return $value if !UTIL && $string =~ /^"\d{1,10}"$/;	# best-effort workaround
+	return $string;
 }
 
 
@@ -219,19 +255,24 @@ sub _specified {
 
 
 ## no critic ProhibitMultiplePackages
+package Net::DNS::RR::OPT::NSID;				# RFC5001
+
+sub _compose {
+	my @argument = map { ref($_) ? %$_ : $_ } @_;
+	return pack 'H*', pop @argument;
+}
+
+sub _decompose { return unpack 'H*', pop @_ }
+
+
 package Net::DNS::RR::OPT::DAU;					# RFC6975
 
 sub _compose {
-	shift;
-	return pack 'C*', @_;
+	shift @_;
+	return pack 'C*', map { ref($_) ? @$_ : $_ } @_;
 }
 
-sub _decompose {
-	my @payload = unpack 'C*', $_[1];
-	return @payload;
-}
-
-sub _image { return &_decompose; }
+sub _decompose { return [unpack 'C*', pop @_] }
 
 
 package Net::DNS::RR::OPT::DHU;					# RFC6975
@@ -243,133 +284,100 @@ our @ISA = qw(Net::DNS::RR::OPT::DAU);
 
 package Net::DNS::RR::OPT::CLIENT_SUBNET;			# RFC7871
 
-my %family = qw(0 Net::DNS::RR::AAAA	1 Net::DNS::RR::A	2 Net::DNS::RR::AAAA);
-my @field8 = qw(FAMILY SOURCE-PREFIX-LENGTH SCOPE-PREFIX-LENGTH ADDRESS);
+my %family = qw(1 Net::DNS::RR::A	2 Net::DNS::RR::AAAA);
+my @field8 = qw(FAMILY SOURCE-PREFIX SCOPE-PREFIX ADDRESS);
 
 sub _compose {
-	my ( $class, %argument ) = ( map( ( $_ => 0 ), @field8 ), @_ );
-	my $address = bless( {}, $family{$argument{FAMILY}} )->address( $argument{ADDRESS} );
-	my $bitmask = $argument{'SOURCE-PREFIX-LENGTH'};
-	return pack "a* B$bitmask", pack( 'nC2', @argument{@field8} ), unpack 'B*', $address;
+	shift @_;
+	my %argument = ( map( ( $_ => 0 ), @field8 ), map { ref($_) ? %$_ : $_ } @_ );
+	my $family   = $family{$argument{FAMILY}} || die 'unrecognised address family';
+	my $bitmask  = $argument{'SOURCE-PREFIX'};
+	my $address  = bless( {}, $family )->address( $argument{ADDRESS} );
+	return pack 'a* B*', pack( 'nC2', @argument{@field8} ), unpack "B$bitmask", $address;
 }
 
 sub _decompose {
-	my %hash;
-	@hash{@field8} = unpack 'nC2a*', $_[1];
-	$hash{ADDRESS} = bless( {address => $hash{ADDRESS}}, $family{$hash{FAMILY}} )->address;
-	my @payload = map( ( $_ => $hash{$_} ), @field8 );
-	return @payload;
-}
-
-sub _image {
-	my %hash  = &_decompose;
-	my @image = map "$_ => $hash{$_}", @field8;
-	return @image;
+	my %object;
+	@object{@field8} = unpack 'nC2a*', pop @_;
+	my ($family) = grep defined($_), $family{$object{FAMILY}}, 2;
+	$object{ADDRESS} = bless( {address => $object{ADDRESS}}, $family )->address;
+	return \%object;
 }
 
 
 package Net::DNS::RR::OPT::EXPIRE;				# RFC7314
 
 sub _compose {
-	return pack 'N', pop @_;
+	my @argument = map { ref($_) ? %$_ : $_ } @_;
+	return pack 'N', pop @argument;
 }
 
 sub _decompose {
-	my @payload = ( 'EXPIRE-TIMER' => unpack 'N', $_[1] );
-	return @payload;
+	my $argument = pop @_;
+	return length($argument) ? unpack( 'N', $argument ) : {'OPTION-LENGTH' => 0};
 }
-
-sub _image { return join ' => ', &_decompose; }
 
 
 package Net::DNS::RR::OPT::COOKIE;				# RFC7873
 
-my @field10 = qw(VERSION RESERVED TIMESTAMP HASH);
-
 sub _compose {
-	my ( $class, %argument ) = ( VERSION => 1, RESERVED => '', @_ );
-	return pack 'a8', $argument{'CLIENT-COOKIE'} if $argument{'CLIENT-COOKIE'};
-	return pack 'Ca3Na*', map $_, @argument{@field10};
+	shift @_;
+	my @argument = map { ref($_) ? @$_ : $_ } @_;
+	return pack 'a8a*', map pack( 'H*', $_ ), grep defined($_), @argument;
 }
 
-sub _decompose {
-	my ( $class, $argument ) = @_;
-	return ( 'CLIENT-COOKIE', $argument ) unless length($argument) > 8;
-	my %hash;
-	@hash{@field10} = unpack 'Ca3Na*', $argument;
-	my @payload = map( ( $_ => $hash{$_} ), @field10 );
-	return @payload;
-}
-
-sub _image {
-	my %hash = &_decompose;
-	return unpack 'H*', $hash{'CLIENT-COOKIE'} if $hash{'CLIENT-COOKIE'};
-	for (qw(RESERVED HASH)) { $hash{$_} = unpack 'H*', $hash{$_} }
-	my @image = map "$_ => $hash{$_}", @field10;
-	return @image;
-}
+sub _decompose { return [unpack 'H16H*', pop @_] }
 
 
 package Net::DNS::RR::OPT::TCP_KEEPALIVE;			# RFC7828
 
 sub _compose {
-	return pack 'n', pop @_;
+	my @argument = map { ref($_) ? %$_ : $_ } @_;
+	return pack 'n', pop @argument;
 }
 
 sub _decompose {
-	my @payload = ( 'TIMEOUT' => unpack 'n', $_[1] );
-	return @payload;
+	my $argument = pop @_;
+	return length($argument) ? unpack( 'n', $argument ) : {'OPTION-LENGTH' => 0};
 }
-
-sub _image { return join ' => ', &_decompose; }
 
 
 package Net::DNS::RR::OPT::PADDING;				# RFC7830
 
 sub _compose {
-	my $size = pop @_;
-	return pack "x$size";
+	my @argument = map { ref($_) ? %$_ : $_ } @_;
+	my $length   = pop @argument;
+	return pack "x$length";
 }
 
 sub _decompose {
-	my @payload = ( 'OPTION-LENGTH' => length( $_[1] ) );
-	return @payload;
+	my $argument = pop @_;
+	return {'OPTION-LENGTH' => length $argument} if $argument =~ /^\000*$/;
+	return {'BASE16'	=> unpack 'H*', $argument};
 }
-
-sub _image { return join ' => ', &_decompose; }
 
 
 package Net::DNS::RR::OPT::CHAIN;				# RFC7901
 
 sub _compose {
-	my ( $class, %argument ) = @_;
-	my ($trust_point) = values %argument;
-	return Net::DNS::DomainName->new($trust_point)->encode;
+	my @argument = map { ref($_) ? %$_ : $_ } @_;
+	return Net::DNS::DomainName->new( pop @argument )->encode;
 }
 
 sub _decompose {
-	my ( $class, $payload ) = @_;
-	my $fqdn    = Net::DNS::DomainName->decode( \$payload )->string;
-	my @payload = ( 'CLOSEST-TRUST-POINT' => $fqdn );
-	return @payload;
+	my $argument = pop @_;
+	return {'CLOSEST-TRUST-POINT' => Net::DNS::DomainName->decode( \$argument )->string};
 }
-
-sub _image { return join ' => ', &_decompose; }
 
 
 package Net::DNS::RR::OPT::KEY_TAG;				# RFC8145
 
 sub _compose {
-	shift;
-	return pack 'n*', @_;
+	shift @_;
+	return pack 'n*', map { ref($_) ? @$_ : $_ } @_;
 }
 
-sub _decompose {
-	my @payload = unpack 'n*', $_[1];
-	return @payload;
-}
-
-sub _image { return &_decompose; }
+sub _decompose { return [unpack 'n*', pop @_] }
 
 
 package Net::DNS::RR::OPT::EXTENDED_ERROR;			# RFC8914
@@ -377,23 +385,32 @@ package Net::DNS::RR::OPT::EXTENDED_ERROR;			# RFC8914
 my @field15 = qw(INFO-CODE EXTRA-TEXT);
 
 sub _compose {
-	my ( $class, %argument ) = ( 'INFO-CODE' => 0, 'EXTRA-TEXT' => '', @_ );
-	my ( $code,  $text )	 = @argument{@field15};
-	return pack 'na*', $code, Net::DNS::Text->new($text)->raw;
+	shift @_;
+	my %argument = map { ref($_) ? %$_ : $_ } @_;
+	my ( $code, $extra ) = map { defined($_) ? $_ : '' } @argument{@field15};
+	return pack 'na*', 0 + $code, Net::DNS::Text->new($extra)->raw;
 }
 
 sub _decompose {
-	my ( $code, $text ) = unpack 'na*', $_[1];
-	my @payload = (
-		'INFO-CODE'  => $code,
-		'EXTRA-TEXT' => Net::DNS::Text->decode( \$text, 0, length $text )->string
-		);
-	return @payload;
+	my ( $code, $extra ) = unpack 'na*', pop @_;
+	my @error = grep { defined($_) } $Net::DNS::Parameters::dnserrorbyval{$code};
+	return {'INFO-CODE'  => $code,
+		'EXTRA-TEXT' => Net::DNS::Text->decode( \$extra, 0, length $extra )->value,
+		map( ( 'DNS-ERROR' => "$_" ), @error )};
 }
 
-sub _image {
-	my %hash  = &_decompose;
-	my @image = map "$_ => $hash{$_}", @field15;
+
+package Net::DNS::RR::OPT::REPORT_CHANNEL;			# draft-ietf-dnsop-dns-error-reporting
+$Net::DNS::Parameters::ednsoptionbyval{65023} = 'REPORT-CHANNEL';	# experimental/private use
+
+sub _compose {
+	my @argument = map { ref($_) ? %$_ : $_ } @_;
+	return Net::DNS::DomainName->new( pop @argument )->encode;
+}
+
+sub _decompose {
+	my $argument = pop @_;
+	return {'AGENT-DOMAIN' => Net::DNS::DomainName->decode( \$argument )->string};
 }
 
 ########################################
@@ -406,25 +423,31 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $packet = Net::DNS::Packet->new( ... );
+    my $packet = Net::DNS::Packet->new( ... );
 
-    $packet->header->do(1);			# extended flag
+    $packet->header->do(1);		# extended header flag 
 
-    $packet->edns->size(1280);			# UDP payload size
+    $packet->edns->UDPsize(1232);	# UDP payload size
 
-    $packet->edns->option( COOKIE => 'rawbytes' );
+    $packet->edns->option( 'NSID'	    => '7261776279746573' );
+    $packet->edns->option( 'TCP-KEEPALIVE'  => 200 );
+    $packet->edns->option( 'DAU'	    => [8, 10, 13, 14, 15, 16] );
+    $packet->edns->option( 'EXTENDED-ERROR' => {'INFO-CODE' => 123} );
+    $packet->edns->option( '65023'	    => {'BASE16' => '076578616d706c6500'} );
 
     $packet->edns->print;
 
-    ;; EDNS version 0
-    ;;	    flags:  8000
-    ;;	    rcode:  NOERROR
-    ;;	    size:   1280
-    ;;	    option: COOKIE => ( 7261776279746573 )
-    ;;		    DAU	   => ( 8, 10, 13, 14, 15, 16 )
-    ;;		    DHU	   => ( 1, 2, 4 )
-    ;;		    EXTENDED-ERROR => ( INFO-CODE => 123, EXTRA-TEXT =>	 )
-
+	;; {	"EDNS-VERSION":	0,
+	;;	"FLAGS":	"8000",
+	;;	"RCODE":	0,
+	;;	"UDPSIZE":	1232,
+	;;	"OPTIONS"	: [
+	;;		{ "NSID": "7261776279746573" },
+	;;		{ "TCP-KEEPALIVE": 200 },
+	;;		{ "DAU": [ 8, 10, 13, 14, 15, 16 ] },
+	;;		{ "EXTENDED-ERROR": { "INFO-CODE": 123, "EXTRA-TEXT": "" } },
+	;;		{ "65023": { "BASE16": "076578616d706c6500" } } ]
+	;;	}
 
 =head1 DESCRIPTION
 
@@ -435,7 +458,7 @@ created, accessed or modified directly by user applications.
 
 All EDNS features are performed indirectly by operations on the objects
 returned by the $packet->header and $packet->edns creator methods.
-The underlying mechanisms are entirely hidden from the user.
+The underlying mechanisms are, or should be, entirely hidden from the user.
 
 =head1 METHODS
 
@@ -449,80 +472,75 @@ other unpredictable behaviour.
 
 =head2 version
 
-    $version = $rr->version;
-    $rr->version( $version );
+	$version = $packet->edns->version;
 
 The version of EDNS supported by this OPT record.
 
-=head2 size
+=head2 UDPsize
 
-	$size = $packet->edns->size;
-	$more = $packet->edns->size(1280);
+	$size = $packet->edns->UDPsize;
+	$packet->edns->UDPsize($size);
 
-size() advertises the maximum size (octets) of UDP packet that can be
+UDPsize() advertises the maximum size (octets) of UDP packet that can be
 reassembled in the network stack of the originating host.
 
 =head2 rcode
 
 	$extended_rcode	  = $packet->header->rcode;
-	$incomplete_rcode = $packet->edns->rcode;
 
-The 12 bit extended RCODE. The most significant 8 bits reside in the OPT
-record. The least significant 4 bits can only be obtained from the packet
+The 12 bit extended RCODE. The most significant 8 bits are obtained from
+the OPT record. The least significant 4 bits reside in the packet
 header.
 
 =head2 flags
 
-	$edns_flags = $packet->edns->flags;
-
 	$do = $packet->header->do;
 	$packet->header->do(1);
+
+	$edns_flags = $packet->edns->flags;
 
 16 bit field containing EDNS extended header flags.
 
 =head2 options, option
 
-	@option = $packet->edns->options;
-
-	$octets = $packet->edns->option($option_code);
-
-	$packet->edns->option( COOKIE => $octets );
-	$packet->edns->option( 10     => $octets );
+	my @option = $packet->edns->options;
 
 When called in a list context, options() returns a list of option codes
 found in the OPT record.
 
+	my $octets = $packet->edns->option('COOKIE');
+	my $base16 = unpack 'H*', $octets;
+
+	$packet->edns->option( 'COOKIE' => {'OPTION-DATA' => $octets} );
+	$packet->edns->option( '10'	=> {'BASE16'	  => $base16} );
+
 When called in a scalar context with a single argument,
 option() returns the uninterpreted octet string
 corresponding to the specified option.
-The method returns undef if the specified option is absent.
+The method returns undef if the option is absent.
 
 Options can be added or replaced by providing the (name => value) pair.
 The option is deleted if the value is undefined.
 
-
-When option() is called in a list context with a single argument,
-the returned values provide a structured interpretation
-appropriate to the specified option.
+When called in a list context with a single argument,
+option() returns a structured representation of the option value.
 
 For example:
 
-	@algorithms = $packet->edns->option('DAU');
+	my ($structure) = $packet->edns->option('DAU');
+	my @algorithms	= @$structure;
 
-
-For some options, a hash table is more convenient:
-
-	%hash_table = $packet->edns->option(15);
-	$info_code  = $hash_table{'INFO-CODE'};
-	$extra_text = $hash_table{'EXTRA-TEXT'};
-
+	my ($structure) = $packet->edns->option(15);
+	my $info_code	= $$structure{'INFO-CODE'};
+	my $extra_text	= $$structure{'EXTRA-TEXT'};
 
 Similar forms of array or hash syntax may be used to construct the
 option value:
 
-	$packet->edns->option( DHU => [1, 2, 4] );
+	$packet->edns->option( 'DAU' => [8, 10, 13, 14, 15, 16] );
 
-	$packet->edns->option( EXPIRE => {'EXPIRE-TIMER' => 604800} );
+	$packet->edns->option( 'EXTENDED-ERROR' => {'INFO-CODE'	 => 123,
+						    'EXTRA-TEXT' => ""} );
 
 
 =head1 COPYRIGHT
@@ -557,6 +575,6 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC6891, RFC3225
+L<perl>, L<Net::DNS>, L<Net::DNS::RR>, L<RFC6891|https://tools.ietf.org/html/rfc6891>, L<RFC3225|https://tools.ietf.org/html/rfc3225>
 
 =cut

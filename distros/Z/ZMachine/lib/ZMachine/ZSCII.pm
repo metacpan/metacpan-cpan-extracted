@@ -1,7 +1,4 @@
-package ZMachine::ZSCII;
-{
-  $ZMachine::ZSCII::VERSION = '0.004';
-}
+package ZMachine::ZSCII 0.005;
 use 5.14.0;
 use warnings;
 # ABSTRACT: an encoder/decoder for Z-Machine text
@@ -9,6 +6,40 @@ use warnings;
 use Carp ();
 use charnames ':full';
 
+#pod =head1 OVERVIEW
+#pod
+#pod ZMachine::ZSCII is a class for objects that are encoders/decoders of Z-Machine
+#pod text.  Right now, ZMachine::ZSCII only implements Version 5 (and thus 7 and 8),
+#pod and even that partially.  There is no abbreviation support yet.
+#pod
+#pod =head2 How Z-Machine Text Works
+#pod
+#pod The Z-Machine's text strings are composed of ZSCII characters.  There are 1024
+#pod ZSCII codepoints, although only bottom eight bits worth are ever used.
+#pod Codepoints 0x20 through 0x7E are identical with the same codepoints in ASCII or
+#pod Unicode.
+#pod
+#pod ZSCII codepoints are then encoded as strings of five-bit Z-characters.  The
+#pod most common ZSCII characters, the lowercase English alphabet, can be encoded
+#pod with one Z-character.  Uppercase letters, numbers, and common punctuation
+#pod ZSCII characters require two Z-characters each.  Any other ZSCII character can
+#pod be encoded with four Z-characters.
+#pod
+#pod For storage on disk or in memory, the five-bit Z-characters are packed
+#pod together, three in a word, and laid out in bytestrings.  The last word in a
+#pod string has its top bit set to mark the ending.  When a bytestring would end
+#pod with out enough Z-characters to pack a full word, it is padded.
+#pod (ZMachine::ZSCII pads with Z-character 0x05, a shift character.)
+#pod
+#pod Later versions of the Z-Machine allow the mapping of ZSCII codepoints to
+#pod Unicode codepoints to be customized.  ZMachine::ZSCII does not yet support this
+#pod feature.
+#pod
+#pod ZMachine::ZSCII I<does> allow conversion between all four relevant
+#pod representations:  Unicode text, ZSCII text, Z-character strings, and packed
+#pod Z-character bytestrings.  All four forms are represented by Perl strings.
+#pod
+#pod =cut
 
 my %DEFAULT_ZSCII = (
   chr(0x00) => "\N{NULL}",
@@ -79,6 +110,59 @@ sub _shortcuts_for {
   return \%shortcut;
 }
 
+#pod =method new
+#pod
+#pod   my $z = ZMachine::ZSCII->new;
+#pod   my $z = ZMachine::ZSCII->new(\%arg);
+#pod   my $z = ZMachine::ZSCII->new($version);
+#pod
+#pod This returns a new codec.  If the only argument is a number, it is treated as a
+#pod version specification.  If no arguments are given, a Version 5 codec is made.
+#pod
+#pod Valid named arguments are:
+#pod
+#pod =begin :list
+#pod
+#pod = version
+#pod
+#pod The number of the Z-Machine targeted; at present, only 5, 7, or 8 are permitted
+#pod values.
+#pod
+#pod = extra_characters
+#pod
+#pod This is a reference to an array of between 0 and 97 Unicode characters.  These
+#pod will be the characters to which ZSCII characters 155 through 251.  They may not
+#pod duplicate any characters represented by the default ZSCII set.  No Unicode
+#pod codepoint above U+FFFF is permitted, as it would not be representable in the
+#pod Z-Machine Unicode substitution table.
+#pod
+#pod If no extra characters are given, the default table is used.
+#pod
+#pod = alphabet
+#pod
+#pod This is a string of 78 characters, representing the three 26-character
+#pod alphabets used to encode ZSCII compactly into Z-characters.  The first 26
+#pod characters are alphabet 0, for the most common characters.  The rest of the
+#pod characters are alphabets 1 and 2.
+#pod
+#pod No character with a ZSCII value greater than 0xFF may be included in the
+#pod alphabet.  Character 52 (A2's first character) should be NUL.
+#pod
+#pod If no alphabet is given, the default alphabet is used.
+#pod
+#pod = alphabet_is_unicode
+#pod
+#pod By default, the values in the C<alphabet> are assumed to be ZSCII characters,
+#pod so that the contents of the alphabet table from the Z-Machine's memory can be
+#pod used directly.  The C<alphabet_is_unicode> option specifies that the characters
+#pod in the alphabet string are Unicode characters.  They will be converted to ZSCII
+#pod internally by the C<unicode_to_zscii> method, and if characters appear in the
+#pod alphabet that are not in the default ZSCII set or the extra characters, an
+#pod exception will be raised.
+#pod
+#pod =end :list
+#pod
+#pod =cut
 
 sub new {
   my ($class, $arg) = @_;
@@ -165,6 +249,19 @@ sub new {
   return $self;
 }
 
+#pod =method encode
+#pod
+#pod   my $packed_zchars = $z->encode( $unicode_text );
+#pod
+#pod This method takes a string of text and encodes it to a bytestring of packed
+#pod Z-characters.
+#pod
+#pod Internally, it converts the Unicode text to ZSCII, then to Z-characters, and
+#pod then packs them.  Before this processing, any native newline characters (the
+#pod value of C<\n>) are converted to C<U+000D> to match the Z-Machine's use of
+#pod character 0x00D for newline.
+#pod
+#pod =cut
 
 sub encode {
   my ($self, $string) = @_;
@@ -177,6 +274,18 @@ sub encode {
   return $self->pack_zchars($zchars);
 }
 
+#pod =method decode
+#pod
+#pod   my $text = $z->decode( $packed_zchars );
+#pod
+#pod This method takes a bytestring of packed Z-characters and returns a string of
+#pod text.
+#pod
+#pod Internally, it unpacks the Z-characters, converts them to ZSCII, and then
+#pod converts those to Unicode.  Any ZSCII characters 0x00D are converted to the
+#pod value of C<\n>.
+#pod
+#pod =cut
 
 sub decode {
   my ($self, $bytestring) = @_;
@@ -190,6 +299,17 @@ sub decode {
   return $unicode;
 }
 
+#pod =method unicode_to_zscii
+#pod
+#pod   my $zscii_string = $z->unicode_to_zscii( $unicode_string );
+#pod
+#pod This method converts a Unicode string to a ZSCII string, using the dialect of
+#pod ZSCII for the ZMachine::ZSCII's configuration.
+#pod
+#pod If the Unicode input contains any characters that cannot be mapped to ZSCII, an
+#pod exception is raised.
+#pod
+#pod =cut
 
 sub unicode_to_zscii {
   my ($self, $unicode_text) = @_;
@@ -210,6 +330,18 @@ sub unicode_to_zscii {
   return $zscii;
 }
 
+#pod =method zscii_to_unicode
+#pod
+#pod   my $unicode_string = $z->zscii_to_unicode( $zscii_string );
+#pod
+#pod This method converts a ZSCII string to a Unicode string, using the dialect of
+#pod ZSCII for the ZMachine::ZSCII's configuration.
+#pod
+#pod If the ZSCII input contains any characters that cannot be mapped to Unicode, an
+#pod exception is raised.  I<In the future, it may be possible to request a Unicode
+#pod replacement character instead.>
+#pod
+#pod =cut
 
 sub zscii_to_unicode {
   my ($self, $zscii) = @_;
@@ -228,6 +360,17 @@ sub zscii_to_unicode {
   return $unicode;
 }
 
+#pod =method zscii_to_zchars
+#pod
+#pod   my $zchars = $z->zscii_to_zchars( $zscii_string );
+#pod
+#pod Given a string of ZSCII characters, this method will return a (unpacked) string
+#pod of Z-characters.
+#pod
+#pod It will raise an exception on ZSCII codepoints that cannot be represented as
+#pod Z-characters, which should not be possible with legal ZSCII.
+#pod
+#pod =cut
 
 sub zscii_to_zchars {
   my ($self, $zscii) = @_;
@@ -261,6 +404,29 @@ sub zscii_to_zchars {
   return $zchars;
 }
 
+#pod =method zchars_to_zscii
+#pod
+#pod   my $zscii = $z->zchars_to_zscii( $zchars_string, \%arg );
+#pod
+#pod Given a string of (unpacked) Z-characters, this method will return a string of
+#pod ZSCII characters.
+#pod
+#pod It will raise an exception when the right thing to do can't be determined.
+#pod Right now, that could mean lots of things.
+#pod
+#pod Valid arguments are:
+#pod
+#pod =begin :list
+#pod
+#pod = allow_early_termination
+#pod
+#pod If C<allow_early_termination> is true, no exception is thrown if the
+#pod Z-character string ends in the middle of a four z-character sequence.  This is
+#pod useful when dealing with dictionary words.
+#pod
+#pod =end :list
+#pod
+#pod =cut
 
 sub zchars_to_zscii {
   my ($self, $zchars, $arg) = @_;
@@ -304,6 +470,19 @@ sub zchars_to_zscii {
   return $text;
 }
 
+#pod =method make_dict_length
+#pod
+#pod   my $zchars = $z->make_dict_length( $zchars_string )
+#pod
+#pod This method returns the Z-character string fit to dictionary length for the
+#pod Z-machine version being handled.  It will trim excess characters or pad with
+#pod Z-character 5 to be the right length.
+#pod
+#pod When converting such strings back to ZSCII, you should pass the
+#pod C<allow_early_termination> to C<zchars_to_zscii>, as a four-Z-character
+#pod sequence may have been terminated early.
+#pod
+#pod =cut
 
 sub make_dict_length {
   my ($self, $zchars) = @_;
@@ -315,6 +494,15 @@ sub make_dict_length {
   return $zchars;
 }
 
+#pod =method pack_zchars
+#pod
+#pod   my $packed_zchars = $z->pack_zchars( $zchars_string );
+#pod
+#pod This method takes a string of unpacked Z-characters and packs them into a
+#pod bytestring with three Z-characters per word.  The final word will have its top
+#pod bit set.
+#pod
+#pod =cut
 
 sub pack_zchars {
   my ($self, $zchars) = @_;
@@ -336,6 +524,18 @@ sub pack_zchars {
   return $bytestring;
 }
 
+#pod =method unpack_zchars
+#pod
+#pod   my $zchars_string = $z->pack_zchars( $packed_zchars );
+#pod
+#pod Given a bytestring of packed Z-characters, this method will unpack them into a
+#pod string of unpacked Z-characters that aren't packed anymore because they're
+#pod unpacked instead of packed.
+#pod
+#pod Exceptions are raised if the input bytestring isn't made of an even number of
+#pod octets, or if the string continues past the first word with its top bit set.
+#pod
+#pod =cut
 
 sub unpack_zchars {
   my ($self, $bytestring) = @_;
@@ -368,13 +568,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 ZMachine::ZSCII - an encoder/decoder for Z-Machine text
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 OVERVIEW
 
@@ -408,6 +610,18 @@ feature.
 ZMachine::ZSCII I<does> allow conversion between all four relevant
 representations:  Unicode text, ZSCII text, Z-character strings, and packed
 Z-character bytestrings.  All four forms are represented by Perl strings.
+
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -572,7 +786,7 @@ octets, or if the string continues past the first word with its top bit set.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

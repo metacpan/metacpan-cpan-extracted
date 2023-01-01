@@ -1,3 +1,79 @@
+1.000   2022-12-29  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes since 0.999_2.
+
+        - Documentation tweaks.
+
+
+0.999_2 2022-12-23  Released-By: PERLANCAR; Backward-Incompatible: yes
+
+        [Incompatible changes]
+
+        - [internal] Remove wants_repeat_* flow control because it is inherently
+          broken. Utilities that want to read files out of order or repeat
+          reading, like csv-concat, can construct the loop manually. Now,
+          csv-concat can work with non-seekable input files like process
+          substitution (e.g.: `csv-concat <(...) <(...)`).
+
+        [Documentation]
+
+        - Add entries to cookbook.
+
+
+0.999_1 2022-12-21  Released-By: PERLANCAR; Backward-Incompatible: yes
+
+        [Incompatible changes]
+
+        - Rename variable given to eval codes '$main::field_idxs' to
+          '$main::fields_idx'.
+
+        - [cli csv-sort-fields] --by-code code now receives [$field_name,
+          $field_idx] instead of just $field_name.
+
+        - [cli csv-select-rows] row number spec now means *data row* number
+          spec, e.g. 1 means the first *data* row.
+
+        - [cli csv-select-rows] Will not output header row if there is no rows
+          matching spec.
+
+        - [cli csv-setop] Will not output header row if there is no result data
+          rows.
+
+        - [cli csv-convert-to-hash] Row number now means *data* row number, e.g.
+          1 means the first row number.
+
+        [New features]
+
+        - Add utility: csv-gen.
+
+        [Internals]
+
+        - Make API modular. It is now possible and easier to create a new
+          utility without modifying the "core" routine. No more "core" routine.
+
+        [Enhancements]
+
+        - [cli csv-select-fields] Add option --show-selected-fields, like in
+          csv-delete-fields.
+
+        [Removed]
+
+        - Remove alias CLI's: csv2csv (only csv-csv now provided), dump-csv
+          (only csv-dump now provided).
+
+        - Reading from & writing to URL feature is removed to remove dependency
+          to LWP::UserAgent. One can use piping to/from clipget/clipadd to read
+          from/write to clipboard. There are other tools for reading/writing to
+          URL addresses.
+
+        [Documentation & UX]
+
+        - Add example(s) to all utilities.
+
+        - Add -a as shortcut for --include-all-fields, -A for
+          --exclude-all-fields.
+
+
 0.054   2022-12-14  Released-By: PERLANCAR; Urgency: medium
 
         - [cli csv-concat] Prevent warning & segfault because of extra

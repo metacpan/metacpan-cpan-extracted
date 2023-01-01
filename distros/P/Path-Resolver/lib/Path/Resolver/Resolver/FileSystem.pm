@@ -1,7 +1,4 @@
-package Path::Resolver::Resolver::FileSystem;
-{
-  $Path::Resolver::Resolver::FileSystem::VERSION = '3.100454';
-}
+package Path::Resolver::Resolver::FileSystem 3.100455;
 # ABSTRACT: find files in the filesystem
 use Moose;
 with 'Path::Resolver::Role::FileResolver';
@@ -12,6 +9,27 @@ use Carp ();
 use Cwd ();
 use File::Spec;
 
+#pod =head1 SYNOPSIS
+#pod
+#pod   my $resolver = Path::Resolver::Resolver::FileSystem->new({
+#pod     root => '/etc/myapp_config',
+#pod   });
+#pod
+#pod   my $simple_entity = $resolver->entity_at('foo/bar.txt');
+#pod
+#pod This resolver looks for files on disk under the given root directory.
+#pod
+#pod This resolver does the
+#pod L<Path::Resolver::Role::FileResolver|Path::Resolver::Role::FileResolver> role,
+#pod meaning its native type is Path::Resolver::Types::AbsFilePath and it has a
+#pod default converter to convert to Path::Resolver::SimpleEntity.
+#pod
+#pod =attr root
+#pod
+#pod This is the root on the filesystem under which to look.  If it is relative, it
+#pod will be resolved to an absolute path when the resolver is instantiated.
+#pod
+#pod =cut
 
 has root => (
   is => 'rw',
@@ -43,13 +61,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Path::Resolver::Resolver::FileSystem - find files in the filesystem
 
 =head1 VERSION
 
-version 3.100454
+version 3.100455
 
 =head1 SYNOPSIS
 
@@ -66,6 +86,16 @@ L<Path::Resolver::Role::FileResolver|Path::Resolver::Role::FileResolver> role,
 meaning its native type is Path::Resolver::Types::AbsFilePath and it has a
 default converter to convert to Path::Resolver::SimpleEntity.
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 ATTRIBUTES
 
 =head2 root
@@ -75,11 +105,11 @@ will be resolved to an absolute path when the resolver is instantiated.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Ricardo Signes.
+This software is copyright (c) 2022 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

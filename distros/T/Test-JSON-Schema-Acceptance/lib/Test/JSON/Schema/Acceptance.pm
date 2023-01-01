@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.016-5-g71cf8b2
+package Test::JSON::Schema::Acceptance; # git description: v1.017-8-g212c3e9
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
-# ABSTRACT: Acceptance testing for JSON-Schema based validators like JSON::Schema
+# ABSTRACT: Acceptance testing for JSON-Schema based validators
 
-our $VERSION = '1.017';
+our $VERSION = '1.018';
 
 use 5.020;
 use Moo;
@@ -130,12 +130,14 @@ sub acceptance {
   my $ctx = Test2::API::context;
 
   if ($options->{add_resource} and -d $self->additional_resources) {
-    my $base = 'http://localhost:1234'; # TODO? make this customizable
+    # this is essentially what `bin/jsonschema_suite remote` does: resolves the filename against the
+    # base uri to determine the absolute schema location of each resource.
+    my $base = 'http://localhost:1234';
     $ctx->note('adding resources from '.$self->additional_resources.' with the base URI "'.$base.'"...');
     $self->additional_resources->visit(
       sub ($path, @) {
         return if not $path->is_file or $path !~ /\.json$/;
-        my $data = $self->json_decoder->decode($path->slurp_raw);
+        my $data = $self->json_deserialize($path->slurp_raw);
         my $file = $path->relative($self->additional_resources);
         my $uri = $base.'/'.$file;
         $options->{add_resource}->($uri => $data);
@@ -183,14 +185,16 @@ sub acceptance {
         die 'specification_version unknown: cannot evaluate schema against metaschema'
           if not $self->_has_specification;
 
-        my $metaspec_uri = METASCHEMA->{$self->specification};
+        my $metaschema_uri = is_plain_hashref($test_group->{schema}) && $test_group->{schema}{'$schema'}
+          ? $test_group->{schema}{'$schema'}
+          : METASCHEMA->{$self->specification};
+        my $metaschema_schema = { '$ref' => $metaschema_uri };
         my $result = $options->{validate_data}
-          ? $options->{validate_data}->($metaspec_uri, $test_group->{schema})
-          # we use the decoder here so we don't prettify the string
-          : $options->{validate_json_string}->($metaspec_uri, $self->json_decoder->encode($test_group->{schema}));
+          ? $options->{validate_data}->($metaschema_schema, $test_group->{schema})
+          : $options->{validate_json_string}->($metaschema_schema, $self->json_serialize($test_group->{schema}));
         if (not $result) {
-          $ctx->fail('schema for '.$one_file->{file}.': "'.$test_group->{description}.'" fails to validate against '.$metaspec_uri.':');
-          $ctx->note($self->json_encoder->encode($result));
+          $ctx->fail('schema for '.$one_file->{file}.': "'.$test_group->{description}.'" fails to validate against '.$metaschema_uri.':');
+          $ctx->note($self->json_prettyprint($result));
           $schema_fails = 1;
         }
       }
@@ -258,16 +262,14 @@ sub _run_test ($self, $one_file, $test_group, $test, $options) {
     sub {
       my ($result, $schema_before, $data_before, $schema_after, $data_after);
       try {
-        # we use the decoder here so we don't prettify the string
-        ($schema_before, $data_before) = map $self->json_decoder->encode($_),
+        ($schema_before, $data_before) = map $self->json_serialize($_),
           $test_group->{schema}, $test->{data};
 
         $result = $options->{validate_data}
           ? $options->{validate_data}->($test_group->{schema}, $test->{data})
-            # we use the decoder here so we don't prettify the string
-          : $options->{validate_json_string}->($test_group->{schema}, $self->json_decoder->encode($test->{data}));
+          : $options->{validate_json_string}->($test_group->{schema}, $self->json_serialize($test->{data}));
 
-        ($schema_after, $data_after) = map $self->json_decoder->encode($_),
+        ($schema_after, $data_after) = map $self->json_serialize($_),
           $test_group->{schema}, $test->{data};
 
         my $ctx = Test2::API::context;
@@ -277,6 +279,7 @@ sub _run_test ($self, $one_file, $test_group, $test, $options) {
         if ($result xor $test->{valid}) {
           my $got = $result ? 'true' : 'false';
           $ctx->fail('evaluation result is incorrect', 'expected '.$expected.'; got '.$got);
+          $ctx->${ $self->verbose ? \'diag' : \'note' }($self->json_prettyprint($result));
           $pass = 0;
         }
         else {
@@ -360,29 +363,38 @@ sub _mutation_check ($self, $data) {
   return @error_paths;
 }
 
-# used for internal serialization also
-has json_decoder => (
+# used for internal serialization/deserialization; does not prettify the string.
+has _json_serializer => (
   is => 'ro',
   isa => HasMethods[qw(encode decode)],
+  handles => {
+    json_serialize => 'encode',
+    json_deserialize => 'decode',
+  },
   lazy => 1,
   default => sub { JSON::MaybeXS->new(allow_nonref => 1, utf8 => 1, allow_blessed => 1, canonical => 1) },
 );
 
-# used for pretty-printing diagnostics
-has json_encoder => (
+# used for displaying diagnostics only
+has _json_prettyprinter => (
   is => 'ro',
   isa => HasMethods['encode'],
   lazy => 1,
+  handles => {
+    json_prettyprint => 'encode',
+  },
   default => sub {
-    my $encoder = shift->json_decoder->convert_blessed->canonical->pretty;
+    my $encoder = JSON::MaybeXS->new(allow_nonref => 1, utf8 => 1, allow_blessed => 1, canonical => 1, convert_blessed => 1, pretty => 1)->space_before(0);
     $encoder->indent_length(2) if $encoder->can('indent_length');
     $encoder;
   },
 );
 
 # backcompat shims
-sub _json_decoder { shift->json_decoder(@_) }
-sub _json_encoder { shift->json_encoder(@_) }
+sub _json_decoder { shift->_json_serializer(@_) }
+sub json_decoder { shift->_json_serializer(@_) }
+sub _json_encoder { shift->_json_prettyprinter(@_) }
+sub json_encoder { shift->_json_prettyprinter(@_) }
 
 # see JSON::MaybeXS::is_bool
 my $json_bool = InstanceOf[qw(JSON::XS::Boolean Cpanel::JSON::XS::Boolean JSON::PP::Boolean)];
@@ -418,7 +430,7 @@ sub _build__test_data ($self) {
       return if any { $self->test_dir->child($_)->subsumes($path) } $self->skip_dir->@*;
       return if not $path->is_file;
       return if $path !~ /\.json$/;
-      my $data = $self->json_decoder->decode($path->slurp_raw);
+      my $data = $self->json_deserialize($path->slurp_raw);
       return if not @$data; # placeholder files for renamed tests
       my $file = $path->relative($self->test_dir);
       push @test_groups, [
@@ -497,11 +509,11 @@ __END__
 
 =head1 NAME
 
-Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based validators like JSON::Schema
+Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based validators
 
 =head1 VERSION
 
-version 1.017
+version 1.018
 
 =head1 SYNOPSIS
 
@@ -512,25 +524,25 @@ same tests that many modules (libraries, plugins, packages, etc.) use to confirm
 json-schema. Using this module to confirm support gives assurance of interoperability with other
 modules that run the same tests in different languages.
 
-In the JSON::Schema module, a test could look like the following:
+In the JSON::Schema::Modern module, a test could look like the following:
 
   use Test::More;
-  use JSON::Schema;
+  use JSON::Schema::Modern;
   use Test::JSON::Schema::Acceptance;
 
-  my $accepter = Test::JSON::Schema::Acceptance->new(specification => 'draft3');
+  my $accepter = Test::JSON::Schema::Acceptance->new(specification => 'draft7');
 
   $accepter->acceptance(
     validate_data => sub ($schema, $input_data) {
-      return JSON::Schema->new($schema)->validate($input_data);
+      return JSON::Schema::Modern->new($schema)->validate($input_data);
     },
     todo_tests => [ { file => 'dependencies.json' } ],
   );
 
   done_testing();
 
-This would determine if JSON::Schema's C<validate> method returns the right result for all of the
-cases in the JSON Schema Test Suite, except for those listed in C<$skip_tests>.
+This would determine if JSON::Schema::Modern's C<validate> method returns the right result for all
+of the cases in the JSON Schema Test Suite, except for those listed in C<$skip_tests>.
 
 =head1 DESCRIPTION
 
@@ -554,7 +566,7 @@ complex JSON data structures, or based on some sort of condition.
 
 =back
 
-This module allows other perl modules (for example JSON::Schema) to test that they are JSON
+This module allows other perl modules (for example JSON::Schema::Modern) to test that they are JSON
 Schema-compliant, by running the tests from the official test suite, without having to manually
 convert them to perl tests.
 
@@ -610,7 +622,7 @@ C<draft-next>
 
 =back
 
-The default is C<latest>, but in the synopsis example, L<JSON::Schema> is testing draft 3
+The default is C<latest>, but in the synopsis example, L<JSON::Schema::Modern> is testing draft 7
 compliance.
 
 (For backwards compatibility, C<new> can be called with a single numeric argument of 3 to 7, which
@@ -633,7 +645,7 @@ L</add_resource> value to L</acceptance> (see below), this will be done for you.
 
 =head2 verbose
 
-Optional. When true, prints version information and test result table such that it is visible
+Optional. When true, prints version information and the test result table such that it is visible
 during C<make test> or C<prove>.
 
 =head2 include_optional
@@ -706,7 +718,7 @@ Available options are:
 =head3 validate_data
 
 A subroutine reference, which is passed two arguments: the JSON Schema, and the B<inflated> data
-structure to be validated.
+structure to be validated. This is the main entry point to your JSON Schema library being tested.
 
 The subroutine should return truthy or falsey depending on if the schema was valid for the input or
 not.
@@ -716,12 +728,13 @@ Either C<validate_data> or C<validate_json_string> is required.
 =head3 validate_json_string
 
 A subroutine reference, which is passed two arguments: the JSON Schema, and the B<JSON string>
-containing the data to be validated.
+containing the data to be validated. This is an alternative to L</validate_data> above, if your
+library only accepts JSON strings.
 
 The subroutine should return truthy or falsey depending on if the schema was valid for the input or
 not.
 
-Either C<validate_data> or C<validate_json_string> is required.
+Exactly one of C<validate_data> or C<validate_json_string> is required.
 
 =head3 add_resource
 
@@ -833,6 +846,6 @@ This is free software, licensed under:
 This distribution includes data from the L<https://json-schema.org> test suite, which carries its own
 licence (see F<share/LICENSE>).
 
-=for Pod::Coverage BUILDARGS BUILD
+=for Pod::Coverage BUILDARGS BUILD json_encoder json_decoder
 
 =cut

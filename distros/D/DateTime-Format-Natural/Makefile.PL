@@ -9,6 +9,7 @@ WriteMakefile
                    'Clone' => 0,
                    'Cwd' => 0,
                    'DateTime' => 0,
+                   'DateTime::HiRes' => 0,
                    'DateTime::TimeZone' => 0,
                    'Exporter' => 0,
                    'File::Find' => 0,
@@ -21,7 +22,7 @@ WriteMakefile
                    'Scalar::Util' => 0,
                    'Storable' => 0,
                    'Term::ReadLine' => 0,
-                   'Test::MockTime' => 0,
+                   'Test::MockTime::HiRes' => 0,
                    'Test::More' => 0,
                    'boolean' => 0
                  },

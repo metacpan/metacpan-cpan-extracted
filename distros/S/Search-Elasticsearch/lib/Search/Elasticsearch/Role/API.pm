@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Role::API;
-$Search::Elasticsearch::Role::API::VERSION = '7.711001';
+$Search::Elasticsearch::Role::API::VERSION = '8.00';
 use Moo::Role;
 requires 'api_version';
 requires 'api';
@@ -34,9 +34,11 @@ our %Handler = (
     enum    => \&_list,
     number  => \&_num,
     int     => \&_num,
+    integer => \&_num,
     float   => \&_num,
     double  => \&_num,
     "number|string" => \&_numOrString,
+    "boolean|long"  => \&_booleanOrLong
 );
 
 #===================================
@@ -90,6 +92,16 @@ sub _numOrString {
 }
 
 #===================================
+sub _booleanOrLong {
+#===================================
+    if (looks_like_number($_[0])) {
+        return _num($_[0]);
+    }
+    my $val = _detect_bool(@_);
+    return ( $val && $val ne 'false' ) ? 'true' : 'false';
+}
+
+#===================================
 sub _qs_init {
 #===================================
     my $class = shift;
@@ -123,7 +135,7 @@ Search::Elasticsearch::Role::API - Provides common functionality for API impleme
 
 =head1 VERSION
 
-version 7.711001
+version 8.00
 
 =head1 AUTHOR
 
@@ -131,7 +143,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Elasticsearch BV.
+This software is Copyright (c) 2022 by Elasticsearch BV.
 
 This is free software, licensed under:
 

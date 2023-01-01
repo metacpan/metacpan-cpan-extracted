@@ -82,12 +82,12 @@ subtest 'database selection (HTTP)' => sub {
 
 
 subtest 'error handling' => sub {
-	
-	# this really just tests Neo4j::Driver
+	# These tests are of questionable utility and seem to bring more trouble
+	# than they're worth. Perhaps it would be best to remove them entirely.
+	plan skip_all => "(subtest not supported with Neo4j::Bolt)" if $Neo4j_Test::bolt;
 	throws_ok {
 		Neo4j_Test->driver_no_connect->session->run('');
 	} qr/\bConnection refused\b|\bCan't connect\b|\bUnknown host\b/i, 'no connection';
-	return if $Neo4j_Test::bolt;  # next test segfaults with Neo4j::Bolt 0.40 / Neo4j::Client 0.44
 	return unless $Neo4j_Test::sim || $ENV{TEST_NEO4J_PASSWORD};  # next test requires a real or simulated server with auth enabled
 	throws_ok {
 		Neo4j_Test->driver_no_auth->session->run('');

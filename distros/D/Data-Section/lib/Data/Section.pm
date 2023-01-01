@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Data::Section;
+package Data::Section 0.200008;
 # ABSTRACT: read multiple hunks of data out of your DATA section
-$Data::Section::VERSION = '0.200007';
+
 use Encode qw/decode/;
 use MRO::Compat 0.09;
 use Sub::Exporter 0.979 -setup => {
@@ -18,7 +18,7 @@ use Sub::Exporter 0.979 -setup => {
 #pod   sub quit {
 #pod     my ($class, $angry, %arg) = @_;
 #pod
-#pod     my $template = $self->section_data(
+#pod     my $template = $class->section_data(
 #pod       ($angry ? "angry_" : "professional_") . "letter"
 #pod     );
 #pod
@@ -359,7 +359,7 @@ Data::Section - read multiple hunks of data out of your DATA section
 
 =head1 VERSION
 
-version 0.200007
+version 0.200008
 
 =head1 SYNOPSIS
 
@@ -369,7 +369,7 @@ version 0.200007
   sub quit {
     my ($class, $angry, %arg) = @_;
 
-    my $template = $self->section_data(
+    my $template = $class->section_data(
       ($angry ? "angry_" : "professional_") . "letter"
     );
 
@@ -398,6 +398,16 @@ version 0.200007
 Data::Section provides an easy way to access multiple named chunks of
 line-oriented data in your module's DATA section.  It was written to allow
 modules to store their own templates, but probably has other uses.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 WARNING
 
@@ -573,11 +583,11 @@ Enough said.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Christian Walde Dan Kogai David Golden Steinbrunner Karen Etheridge Kenichi Ishigaki kentfredric Tatsuhiko Miyagawa
+=for stopwords Christian Walde Dan Kogai David Golden Steinbrunner Graham Ollis Karen Etheridge Kenichi Ishigaki kentfredric Ricardo Signes Tatsuhiko Miyagawa
 
 =over 4
 
@@ -599,6 +609,10 @@ David Steinbrunner <dsteinbrunner@pobox.com>
 
 =item *
 
+Graham Ollis <plicease@cpan.org>
+
+=item *
+
 Karen Etheridge <ether@cpan.org>
 
 =item *
@@ -608,6 +622,10 @@ Kenichi Ishigaki <ishigaki@cpan.org>
 =item *
 
 kentfredric <kentfredric+gravitar@gmail.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

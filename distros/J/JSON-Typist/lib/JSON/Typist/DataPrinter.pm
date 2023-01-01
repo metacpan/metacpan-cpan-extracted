@@ -1,7 +1,7 @@
 use strict;
 use warnings;
-package JSON::Typist::DataPrinter;
-$JSON::Typist::DataPrinter::VERSION = '0.007';
+package JSON::Typist::DataPrinter 0.008;
+
 # ABSTRACT: a helper for Data::Printer-ing JSON::Typist data
 
 use Data::Printer use_prototypes => 0;
@@ -74,7 +74,7 @@ JSON::Typist::DataPrinter - a helper for Data::Printer-ing JSON::Typist data
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -92,6 +92,16 @@ This library exists for one reason: to provide C<jdump>.  It might change at
 any time, but one thing is for sure:  it takes an argument to dump and it
 returns a printable string describing it.
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 FUNCTIONS
 
 =head2 jdump
@@ -105,7 +115,7 @@ to read.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

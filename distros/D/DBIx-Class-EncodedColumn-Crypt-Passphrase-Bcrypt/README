@@ -1,5 +1,5 @@
 This archive contains the distribution DBIx-Class-EncodedColumn-Crypt-Passphrase-Bcrypt,
-version 0.0109:
+version 0.0110:
 
   Crypt::Passphrase::Bcrypt backend
 

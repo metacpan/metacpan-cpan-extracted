@@ -1,5 +1,12 @@
 Revision log for Git-Fingerd
 
+2.093523  2022-12-31 21:25:25-05:00 America/New_York
+        - update author info
+
+2.093522  2022-12-29 19:01:51-05:00 America/New_York
+        - update metadata, repackage
+        - now requires v5.12; this may go up! see the docs
+
 2.093521  2013-08-31 23:55:47 America/New_York
           update bugtracker, repo metadata
 

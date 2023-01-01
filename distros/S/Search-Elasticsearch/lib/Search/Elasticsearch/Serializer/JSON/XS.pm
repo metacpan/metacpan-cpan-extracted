@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Serializer::JSON::XS;
-$Search::Elasticsearch::Serializer::JSON::XS::VERSION = '7.711001';
+$Search::Elasticsearch::Serializer::JSON::XS::VERSION = '8.00';
 use Moo;
 use JSON::XS 2.26;
 
@@ -36,7 +36,7 @@ Search::Elasticsearch::Serializer::JSON::XS - A JSON Serializer using JSON::XS
 
 =head1 VERSION
 
-version 7.711001
+version 8.00
 
 =head1 SYNOPSIS
 
@@ -70,7 +70,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Elasticsearch BV.
+This software is Copyright (c) 2022 by Elasticsearch BV.
 
 This is free software, licensed under:
 

@@ -21,6 +21,10 @@ DESCRIPTION
     and down arrow graphics to columns in the SMListbox that the data is
     currently sorted on indicating ascending and/or descending order.
 
+    It also now supports "-state => 'disabled'", but note that the state
+    must not be disabled when inserting rows (inserts silently fail)!
+    Tk::HMListbox is not subject to this restriction.
+
     Sorting is done by clicking on one of the column headings in the widget.
     The first click will sort the data with the selected column as key, a
     new click will reverse the sort order.
@@ -69,10 +73,11 @@ EXAMPLES
             );
 
 STANDARD OPTIONS
-    -background -foreground -relief -takefocus -borderwidth -heigh
-    -selectbackground -cursor -highlightbackground -selectborderwidth
-    -xscrollcommand -exportselection -highlightcolor -selectforeground
-    -yscrollcommand -font -highlightthickness -setgrid
+    -background -borderwidth -cursor -disabledforeground -exportselection
+    -font -foreground -height -highlightbackground -highlightcolor
+    -highlightthickness -relief -selectbackground -selectborderwidth
+    -selectforeground -setgrid -state -takefocus -width -xscrollcommand
+    -yscrollcommand
 
 WIDGET SPECIFIC OPTIONS
     -columns => *list*
@@ -153,6 +158,14 @@ WIDGET SPECIFIC OPTIONS
         Note that you can also specify -separatorcolor on a column by column
         basis. See the COLUMNS section below.
 
+    -scrollbarfocus => *value*
+        Specifies which scrollbars (if any) are allowed to take keyboard
+        focus via the tab-circulate order: Valid values are: 0 (no
+        scrollbars take focus), 1 or "xy" (all scrollbars take focus, "x"
+        (only horizontal scrollbar takes focus), or "y" (only vertical
+        scrollbar takes focus). Default is "" (Allow all to take focus based
+        on Tk's default focusing model).
+
     -separatorwidth => *integer*
         Specifies the width in pixels of the separator lines (the vertical
         lines that separates the columns). Default: 1.
@@ -166,6 +179,24 @@ WIDGET SPECIFIC OPTIONS
 
         Note that you can also specify -sortable on a column by column
         basis. See *COLUMNS* below.
+
+    -state
+        Specifies one of two states for the widget: "normal" or "disabled".
+        If the widget is disabled then user can interact with the widget in
+        a very limited (read-only) way. Items may not be selected, but
+        currently, the list can be resorted or the columns potentially
+        expanded for easier viewing. Items are drawn in the
+        -disabledforeground color, and selection cannot be modified and is
+        not shown (though selection information is retained).
+
+    -takefocus
+        There are actually three different focusing options: Specify 1 to
+        both allow the widget to take keyboard focus itself and to enable
+        grabbing the keyboard focus when a user clicks on a row in the
+        listbox. Specify '' to allow the widget to take focus (via the <TAB>
+        circulate order) but do not grab the focus when a user clicks on
+        (selects) a row. This is the default focusing model. Specify 0 to
+        not allow the widget to receive the keyboard focus. Default: ''.
 
 WIDGET SPECIFIC, COLUMN-SPECIFIC OPTIONS
     -comparecmd => *callback*
@@ -205,6 +236,9 @@ SMListbox COLUMN CONFIGURATION
     Each column has its own set of options which might be passed to
     SMListbox::configure(-columns), SMListbox::insert(),
     SMListbox::columnConfigure() or SMLColumn::configure().
+
+    NOTE: Unlike HListbox widgets, Listbox widgets will IGNORE
+    data-insertions if the current state is 'disabled'!
 
     The following code snippets are all equal:
 

@@ -1,4 +1,4 @@
-package Email::MIME::Kit::Renderer::TT 1.002;
+package Email::MIME::Kit::Renderer::TT 1.003;
 use Moose;
 with 'Email::MIME::Kit::Role::Renderer';
 # ABSTRACT: render parts of your mail with Template-Toolkit
@@ -98,7 +98,7 @@ Email::MIME::Kit::Renderer::TT - render parts of your mail with Template-Toolkit
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 DESCRIPTION
 
@@ -142,7 +142,13 @@ the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Perl::Critic::Policy::Tics::ProhibitManyArrows;
+package Perl::Critic::Policy::Tics::ProhibitManyArrows 0.010;
 # ABSTRACT: (this => is => not => good)
-$Perl::Critic::Policy::Tics::ProhibitManyArrows::VERSION = '0.009';
+
 #pod =head1 DESCRIPTION
 #pod
 #pod You are not clever if you do this:
@@ -93,7 +93,7 @@ Perl::Critic::Policy::Tics::ProhibitManyArrows - (this => is => not => good)
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 DESCRIPTION
 
@@ -104,6 +104,16 @@ You are not clever if you do this:
 You are even more not clever if you do this:
 
   my %hash = (key1=>value1=>key2=>value2=>key3=>value3=>);
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 CONFIGURATION
 
@@ -122,7 +132,7 @@ values:
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

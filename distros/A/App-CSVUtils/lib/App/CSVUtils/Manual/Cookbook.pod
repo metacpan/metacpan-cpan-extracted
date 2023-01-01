@@ -1,3 +1,4 @@
+## no critic: TestingAndDebugging::RequireUseStrict
 package App::CSVUtils::Manual::Cookbook;
 
 # AUTHORITY
@@ -20,7 +21,7 @@ App::CSVUtils::Manual::Cookbook - App::CSVUtils cookbook
 
 =head1 VERSION
 
-This document describes version 0.054 of App::CSVUtils::Manual::Cookbook (from Perl distribution App-CSVUtils), released on 2022-12-14.
+This document describes version 1.000 of App::CSVUtils::Manual::Cookbook (from Perl distribution App-CSVUtils), released on 2022-12-29.
 
 =head1 DESCRIPTION
 
@@ -35,58 +36,80 @@ Example F<1.csv> content:
  cinta,19,142
  derry,33,121
 
-=head2 ADDING COLUMNS
+Example F<2.csv> content:
 
-With L<csv-add-field>, we add a new column named C<foo> with the content
+ name,gender
+ andi,M
+ budi,M
+ cinta,F
+ erni,F
+
+=head1 ADDING FIELDS
+
+With L<csv-add-field>, we add a new field named C<foo> with the content
 calculated from Perl code:
 
- % csv-add-field 1.csv foo '$main::rownum * 2'
+ % csv-add-fields 1.csv foo -e '$main::rownum * 2'
  name,age,rank,foo
  andi,25,120,4
  budi,28,115,6
  cinta,19,142,8
  derry,33,121,10
 
-You can specify at which position the new column will be using one of the
-options C<--at>, C<--after>, C<--before>:
+You can specify at which position the new field will be using one of the options
+C<--at>, C<--after>, C<--before>.
 
-TODO EXAMPLE.
+=head2 Adding a field containing line number
 
-=head2 ADDING ROWS
+ % csv-add-fields 1.csv linenum --at 1 -e '++$i'
+ linenum,name,age,rank
+ 1,andi,25,120
+ 2,budi,28,115
+ 3,cinta,19,142
+ 4,derry,33,121
 
-TODO.
+Other ways:
 
-=head2 ADDING SUMMARY ROW (TOTAL, AVERAGE, ETC)
+ % csv-add-fields 1.csv linenum --at 1 -e '$rownum-1'
+ % csv-add-fields 1.csv linenum --at 1 -e '$data_rownum'
 
-TODO.
+See also: L</Adding line number to CSV rows>.
 
-=head2 CONVERTING TO OTHER FORMATS
-
-=head3 To CSV
-
-TODO.
-
-=head3 To JSON
-
-TODO.
-
-=head3 To Perl data structure
+=head1 ADDING ROWS
 
 TODO.
 
-=head3 To TSV
+=head1 ADDING SUMMARY ROW (TOTAL, AVERAGE, ETC)
 
 TODO.
 
-=head3 To YAML
+=head1 CONVERTING TO OTHER FORMATS
+
+=head2 To CSV
 
 TODO.
 
-=head2 DEALING WITH NEWLINES IN CSV
+=head2 To JSON
 
 TODO.
 
-=head2 DEALING WITH NON-STANDARD CSV
+=head2 To Perl data structure
+
+TODO.
+
+=head2 To TSV
+
+TODO.
+
+=head2 To YAML
+
+TODO.
+
+=head1 DEALING WITH NEWLINES IN CSV
+
+TODO.
+
+=head1 DEALING WITH NON-STANDARD CSV
 
 The utilities allow you to set input's field separator (`--sep-char`), quote
 character (`--quote-char`), and escape character (`--escape-char`), so if you
@@ -108,7 +131,9 @@ Likewise, you can customize output's field separator (`--output-sep-char`),
 quote character (`--output-quote-char`), and escape character
 (`--output-escape-char`).
 
-=head2 FILTERING (SELECTING) COLUMNS
+=head1 FILTERING FIELDS
+
+Keywords: selecting fields, grepping fields
 
 With L<csv-select-fields>:
 
@@ -124,11 +149,11 @@ Note that the order of the fields is as specified.
 You can select multiple fields using C<--include-field-pat> option. You can
 exclude fields using C<--exclude-field> and C<--exclude-field-pat>.
 
-=head2 FILTERING (SELECTING) ROWS
+=head1 FILTERING (SELECTING) ROWS
 
 TODO.
 
-=head2 GETTING INFORMATION ABOUT CSV
+=head1 GETTING INFORMATION ABOUT CSV
 
  % csv-info 1.csv
  {
@@ -144,7 +169,7 @@ TODO.
     "row_count" : 6
  }
 
-=head3 Listing the column names
+=head2 Listing the field names
 
  % csv-list-field-names 1.csv
  +------+-------+
@@ -183,42 +208,86 @@ TODO.
     }
  ]
 
-=head2 MERGING CSV
+=head1 MERGING CSV FILES
+
+Keywords: concatenating, combining.
+
+See also: L</SPLITTING CSV>
+
+=head2 Merging CSV files
+
+ % csv-concat 1.csv 2.csv
+ name,age,rank,name,gender
+ andi,25,120,
+ budi,28,115,
+ cinta,19,142,
+ derry,33,121,
+ andi,,,M
+ budi,,,M
+ cinta,,,F
+ erni,,,F
+
+=head2 Adding field containing filename
+
+ % csv-concat <(csv-add-fields 1.csv filename --at 1 -e '"1.csv"') <(csv-add-fields 2.csv filename --at 1 -e '"2.csv"')
+
+=head1 MODIFYING FIELDS
+
+Keywords: munging fields
+
+=head1 MODIFYING ROWS
+
+Keywords: munging rows
+
+=head1 Adding line number to CSV rows
+
+ % csv-munge-row 1.csv -e '$_->[0] = ++$i . "|$_->[0]"'
+ name,age,rank
+ 1|andi,25,120
+ 2|budi,28,115
+ 3|cinta,19,142
+ 4|derry,33,121
+
+Other ways:
+
+ % csv-munge-row 1.csv -e '$_->[0] = $data_rownum . "|$_->[0]"'
+
+See also: L</Adding a field containing line number>.
+
+=head1 Shuffling every row
+
+ % csv-munge-row 1.csv -e 'use List::Util "shuffle"; $_=[shuffle @$_]'
+
+=head1 PERFORMING SET OPERATIONS WITH CSV
+
+See L<csv-setop>.
 
 TODO.
 
-See also L</SPLITTING CSV>.
+=head1 SORTING FIELDS
 
-=head2 MODIFYING COLUMNS
-
-TODO.
-
-=head2 MODIFYING ROWS
+See L<csv-sort-fields>.
 
 TODO.
 
-=head2 PERFORMING SET OPERATIONS WITH CSV
+=head1 SORTING ROWS
+
+See L<csv-sort-rows>.
 
 TODO.
 
-=head2 SORTING COLUMNS
+=head1 SPLITTING CSV
+
+See L<csv-split>.
 
 TODO.
 
-=head2 SORTING ROWS
+See also L</MERGING CSV FILES>.
 
-TODO.
-
-=head2 SPLITTING CSV
-
-TODO.
-
-See also L</MERGING CSV>.
-
-=head2 TRANSPOSING
+=head1 TRANSPOSING
 
 Transposing, like in a two-dimensional matrix, means switching row and colum
-indices to produce a new CSV where the columns become rows and vice versa. For
+indices to produce a new CSV where the fields become rows and vice versa. For
 example:
 
  name,age

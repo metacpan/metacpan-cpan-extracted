@@ -2,12 +2,12 @@ NAME
     Graphics::Toolkit::Color - color palette creation helper
 
 SYNOPSIS
-        my $red = Graphics::Toolkit::Color->new('red');
-        say $red->add('blue')->name;              # 'magenta', mixed in RGB space
-        Graphics::Toolkit::Color->new( 0, 0, 255)->hsl    # 240, 100, 50 = blue
-        $blue->blend_with({H=> 0, S=> 0, L=> 80}, 0.1);# mix blue with a little grey
-        $red->gradient( '#0000FF', 10);           # 10 colors from red to blue  
-        $red->complementary( 3 );                 # get fitting red green and blue
+        my $red = Graphics::Toolkit::Color->new('red'); # create color object
+        say $red->add('blue')->name;                    # mix in RGB: 'magenta'
+        Graphics::Toolkit::Color->new( 0, 0, 255)->hsl; # 240, 100, 50 = blue
+        $blue->blend_with({H=> 0, S=> 0, L=> 80}, 0.1); # mix blue with a little grey in HSL
+        $red->gradient_to( '#0000FF', 10);              # 10 colors from red to blue
+        $red->complementary( 3 );                       # get fitting red green and blue
 
 DESCRIPTION
     Each object has 7 attributes, which are its RGB and HSL values and if
@@ -43,7 +43,7 @@ CONSTRUCTOR
     as above.
 
         my $color = Graphics::Toolkit::Color->new('SVG:green');
-        my @s = Graphics::ColorNames::all_schemes();          # installed
+        my @s = Graphics::ColorNames::all_schemes();          # look up the installed
 
   new( '#rgb' )
     Color definitions in hexadecimal format as widely used in the web, are
@@ -60,9 +60,9 @@ CONSTRUCTOR
         my $red = Graphics::Toolkit::Color->new([255, 0, 0]); # does the same
 
   new( {r => $r, g => $g, b => $b} )
-    Hash with the keys 'r', 'g' and 'b' does the same as previous paragraph,
-    only more declarative. Casing of the keys will be normalised and only
-    the first letter of each key is significant.
+    Hash with the keys 'r', 'g' and 'b' does the same as shown in previous
+    paragraph, only more declarative. Casing of the keys will be normalised
+    and only the first letter of each key is significant.
 
         my $red = Graphics::Toolkit::Color->new( r => 255, g => 0, b => 0 );
         my $red = Graphics::Toolkit::Color->new({r => 255, g => 0, b => 0}); # works too
@@ -100,9 +100,9 @@ GETTER / ATTRIBUTES
     "NAMES" in Graphics::Toolkit::Color::Constant
 
   string
-    String to reproduce color object by: Graphics::Toolkit::Color->new (eval
-    $string). It is either the name (if color has one) or the stringified
-    triplet: "[ $red, $green, $blue ]".
+    String to reproduce (serialize) color object by:
+    Graphics::Toolkit::Color->new (eval $string). It is either the name (if
+    color has one) or the stringified triplet: "[ $red, $green, $blue ]".
 
   red
     Integer between 0 .. 255 describing the red portion in RGB space.
@@ -119,6 +119,14 @@ GETTER / ATTRIBUTES
   rgb_hex
     String starting with '#', followed by six hexadecimal figures. Two
     digits for each of red, green and blue value - the format used in CSS.
+
+  rgb_hash
+    Reference to a *HASH* containing the keys 'red', 'green' and 'blue' with
+    their respective values as defined above.
+
+  hsl_hash
+    Reference to a *HASH* containing the keys 'hue', 'saturation' and
+    'lightness' with their respective values as defined below.
 
   hue
     Integer between 0 .. 359 describing the angle (in degrees) of the

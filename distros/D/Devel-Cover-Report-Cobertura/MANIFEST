@@ -1,0 +1,26 @@
+Build.PL
+cover_db_test/Empty/Empty.pm
+cover_db_test/Empty/Empty.t
+cover_db_test/multi_file/cobertura-1-12883.xml
+cover_db_test/multi_file/cobertura-1-13157.xml
+cover_db_test/multi_file/cobertura-1-15124.xml
+cover_db_test/multi_file/cobertura-2-12883.xml
+cover_db_test/multi_file/cobertura-2-13157.xml
+cover_db_test/multi_file/cobertura-2-15124.xml
+cover_db_test/multi_file/MultiFile.pm
+cover_db_test/multi_file/MultiFile.t
+cover_db_test/multi_file/MultiFile/First.pm
+cover_db_test/multi_file/MultiFile/Second.pm
+cover_db_test/multi_package/MultiPackage.pm
+cover_db_test/multi_package/MultiPackage.t
+lib/Devel/Cover/Report/Cobertura.pm
+lib/Devel/Cover/Report/Cobertura/Builder.pm
+lib/Devel/Cover/Report/Cobertura/cobertura.tt
+MANIFEST			This list of files
+README
+t/builder.t
+t/end_to_end.t
+t/testcover.pm
+Makefile.PL
+META.yml
+META.json

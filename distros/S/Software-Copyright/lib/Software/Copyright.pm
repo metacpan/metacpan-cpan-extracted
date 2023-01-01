@@ -8,7 +8,7 @@
 #   The GNU General Public License, Version 3, June 2007
 #
 package Software::Copyright;
-$Software::Copyright::VERSION = '0.005';
+$Software::Copyright::VERSION = '0.007';
 use 5.20.0;
 use warnings;
 use utf8;
@@ -140,6 +140,24 @@ sub is_not_equal ($self, $other, $=1) {
 sub is_valid ($self) {
     return (scalar grep {$_->name || $_->record } $self->statement_list) ? 1 : 0;
 }
+
+sub contains($self, $input) {
+    my $other = ref($input) ? $input : Software::Copyright->new($input);
+
+    my $result = 1 ;
+    foreach my $other_owner ($other->owners) {
+        my $other_st = $other->statement($other_owner);
+        my $self_st = $self->statement($other_owner);
+        if ($self_st) {
+            $result &&= $self_st->contains($other_st);
+        }
+        else {
+            $result = 0;
+        }
+    }
+    return $result;
+}
+
 1;
 
 # ABSTRACT: Copyright class
@@ -156,7 +174,7 @@ Software::Copyright - Copyright class
 
 =head1 VERSION
 
-version 0.005
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -224,6 +242,31 @@ statement when the owner match or appended to the list of statements.
 
 The statement parameter can either be a string or an
 L<Software::Copyright::Statement> object.
+
+=head2 contains
+
+Return 1 if the other copyright is contained in current copyright,
+i.e. all other statements are contained in current statements (See
+L<Copyright::Statement/"contains"> for details on statement
+containment).
+
+For instance:
+
+=over
+
+=item *
+
+C<2016, Joe> copyright is contained in C<2014-2020, Joe> copyright.
+
+=item *
+
+C<2016, Joe> is contained in C<2014-2020, Joe / 2019, Jack>
+
+=item *
+
+C<2010, Joe> is B<not> contained in C<2014-2020, Joe>
+
+=back
 
 =head1 Operator overload
 

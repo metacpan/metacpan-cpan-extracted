@@ -1,3 +1,10 @@
+0.007 2022-12-29 19:17:59-0500
+
+  Bug fixes
+
+   - Make parser happy on perl ≤ 5.20 to avoid "Use of ?PATTERN?"
+     error. See <https://github.com/Intertangle/p5-Intertangle-API-Gtk3/pull/21>.
+
 0.006 2022-12-22 12:59:56-0500
 
   Bug fixes

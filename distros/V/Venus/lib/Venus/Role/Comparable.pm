@@ -95,6 +95,20 @@ sub gtlt {
   }
 }
 
+sub is {
+  my ($self, $data) = @_;
+
+  if (!ref $data) {
+    return false;
+  }
+  if (Scalar::Util::refaddr($self) eq Scalar::Util::refaddr($data)) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
 sub lt {
   my ($self, $data) = @_;
 
@@ -137,6 +151,23 @@ sub ne {
   return $self->eq($data) ? false : true;
 }
 
+sub st {
+  my ($self, $data) = @_;
+
+  if (!Scalar::Util::blessed($data)) {
+    return false;
+  }
+  if (Scalar::Util::refaddr($self) eq Scalar::Util::refaddr($data)) {
+    return true;
+  }
+  if ($data->isa($self->class)) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
 sub tv {
   my ($self, $data) = @_;
 
@@ -157,7 +188,7 @@ sub tv {
 # EXPORTS
 
 sub EXPORT {
-  ['eq', 'ge', 'gele', 'gt', 'gtlt', 'lt', 'le', 'ne', 'tv']
+  ['eq', 'ge', 'gele', 'gt', 'gtlt', 'is', 'lt', 'le', 'ne', 'st', 'tv']
 }
 
 1;
@@ -487,6 +518,61 @@ I<Since C<0.08>>
 
 =cut
 
+=head2 is
+
+  is(Any $arg) (Bool)
+
+The is method performs an I<"is-exactly"> operation using the invocant and the
+argument provided. If the argument provided is blessed and exactly the same as
+the invocant (i.e. shares the same address space) the operation will return
+truthy.
+
+I<Since C<1.80>>
+
+=over 4
+
+=item is example 1
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->is($example);
+
+  # 1
+
+=back
+
+=over 4
+
+=item is example 2
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->is([1,2]);
+
+  # 0
+
+=back
+
+=over 4
+
+=item is example 3
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->is(Example->new);
+
+  # 0
+
+=back
+
+=cut
+
 =head2 le
 
   le(Any $arg) (Bool)
@@ -645,6 +731,84 @@ I<Since C<0.08>>
   my $example = Example->new;
 
   my $result = $example->ne(qr/2/);
+
+  # 1
+
+=back
+
+=cut
+
+=head2 st
+
+  st(Object $arg) (Bool)
+
+The st method performs a I<"same-type"> operation using the invocant and
+argument provided. If the argument provided is an instance of the invocant, or
+a subclass, the operation will return truthy.
+
+I<Since C<1.80>>
+
+=over 4
+
+=item st example 1
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->st($example);
+
+  # 1
+
+=back
+
+=over 4
+
+=item st example 2
+
+  package main;
+
+  use Venus::Number;
+
+  my $example = Example->new;
+
+  my $result = $example->st(Venus::Number->new(2));
+
+  # 0
+
+=back
+
+=over 4
+
+=item st example 3
+
+  package main;
+
+  use Venus::String;
+
+  my $example = Example->new;
+
+  my $result = $example->st(Venus::String->new('2'));
+
+  # 0
+
+=back
+
+=over 4
+
+=item st example 4
+
+  package Example2;
+
+  use base 'Example';
+
+  package main;
+
+  use Venus::String;
+
+  my $example = Example2->new;
+
+  my $result = $example->st(Example2->new);
 
   # 1
 

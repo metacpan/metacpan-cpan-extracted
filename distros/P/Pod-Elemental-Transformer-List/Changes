@@ -1,5 +1,10 @@
 Revision history for Pod-Elemental-Transformer-List
 
+0.102001  2022-12-31 14:12:06-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+        - tests for various error conditions added (but the code is unchanged)
+
 0.102000  2013-11-05 17:37:21 America/New_York
           allow bullet paragraphs to wrap if there's leading whitespace
           (thanks, David Golden!)

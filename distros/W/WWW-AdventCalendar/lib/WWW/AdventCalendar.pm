@@ -1,12 +1,12 @@
-package WWW::AdventCalendar;
+package WWW::AdventCalendar 1.113;
 # ABSTRACT: a calendar for a month of articles (on the web)
-$WWW::AdventCalendar::VERSION = '1.112';
+
 use Moose;
 
 use MooseX::StrictConstructor;
 
 use autodie;
-use Calendar::Simple;
+use Calendar::Simple 2; # the default start_day has changed
 use Color::Palette 0.100002; # optimized_for, as_strict_css_hash
 use Color::Palette::Schema;
 use DateTime::Format::W3CDTF;
@@ -96,7 +96,6 @@ use namespace::autoclean;
 #pod     -o --output-dir   output directory
 #pod     --today           the day we treat as "today"; default to today
 #pod
-#pod     -t --tracker      include Google Analytics; -t TRACKER-ID
 #pod     -y --year-links   place year links at the bottom of the page
 #pod
 #pod Options given on the command line override those loaded form configuration.  By
@@ -133,8 +132,6 @@ use namespace::autoclean;
 #pod The directory into which output files will be written.
 #pod = today
 #pod The date to treat as "today" when deciding how much of the calendar to publish.
-#pod = tracker_id
-#pod A Google Analytics tracker id.  If given, each page will include analytics.
 #pod
 #pod =cut
 
@@ -190,8 +187,6 @@ has end_date => (
 
 has today      => (is => 'rw');
 
-has tracker_id => (is => 'ro');
-
 class_type('Color::Palette', { class => 'Color::Palette' });
 
 has color_palette => (
@@ -226,7 +221,6 @@ sub _masonize {
   $interp->set_global('$calendar', $self);
 
   $interp->exec($comp,
-    tracker_id => $self->tracker_id,
     year_links => $self->year_links,
     %$args
   );
@@ -435,7 +429,7 @@ sub build {
       today  => $self->today,
       year   => $self->year,
       month  => \%month,
-      calendar => scalar calendar(12, $self->year),
+      calendar => scalar calendar(12, $self->year, 0),
       articles => $article,
     }),
   );
@@ -543,7 +537,7 @@ WWW::AdventCalendar - a calendar for a month of articles (on the web)
 
 =head1 VERSION
 
-version 1.112
+version 1.113
 
 =head1 DESCRIPTION
 
@@ -640,12 +634,23 @@ Finally, running L<advcal> is easy, too.  Here is its usage:
     -o --output-dir   output directory
     --today           the day we treat as "today"; default to today
 
-    -t --tracker      include Google Analytics; -t TRACKER-ID
     -y --year-links   place year links at the bottom of the page
 
 Options given on the command line override those loaded form configuration.  By
 running this program every day, we cause the calendar to be rebuilt, adding any
 new articles that have become available.
+
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -721,25 +726,35 @@ The directory into which output files will be written.
 
 The date to treat as "today" when deciding how much of the calendar to publish.
 
-=item tracker_id
-
-A Google Analytics tracker id.  If given, each page will include analytics.
-
 =back
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Len Jaffe
+=for stopwords Len Jaffe Ricardo Signes Shoichi Kaji
+
+=over 4
+
+=item *
 
 Len Jaffe <lenjaffe@jaffesystems.com>
 
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=item *
+
+Shoichi Kaji <skaji@cpan.org>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

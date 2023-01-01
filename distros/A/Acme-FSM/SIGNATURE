@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 20e3cb2cbf80cdb2d10898eef03c755ba6907651 Build.PL
+SHA1 1b85bf0138a5cae9819595d67676126ab8144e09 Changes
+SHA1 7b58556b82de69035357e5f3146b0fd38653a314 MANIFEST
+SHA1 c0bf75885faae655445f5c414e77acffe9926717 META.json
+SHA1 0955bb407083975e649ef806e47ca0c3c8178afa META.yml
+SHA1 26805cdbac2bc7fdcd0ca5ab9b606298dc72f324 README
+SHA1 481423a6a7be689117f8437c216bb7b53c8d2d90 lib/FSM.pm
+SHA1 b5af3b4f489c1b65af3d90be1281b34a14880b1a t/TestSuite.pm
+SHA1 8501f4edeaacf1c7fa6d739017b0ac498752f4c3 t/action/next.t
+SHA1 6f03a6e262239dce99b97eebafeccb147a348361 t/action/same.t
+SHA1 429e651536eeb345b61661330866f37ee88e3ce2 t/action/tstl.t
+SHA1 38b0845f5094497d20b769c70dce048aaea9a773 t/base/action.t
+SHA1 ddc224eb7e267e2ff82de6e094886089dcdd1d8e t/base/carp.t
+SHA1 3cd4e3c7347889a9b1c447ef1d4b77631497c2bd t/base/connect.t
+SHA1 41e98af76ac6745cd0080b69257cf733507b5ac6 t/base/diag.t
+SHA1 0e308e6f824e7e12a6825ffa35882937f26caa3b t/base/fst.t
+SHA1 cdf4590109f600fc3baa3dde47d71743d7c5aad4 t/base/query.t
+SHA1 6e798483638df47a604f9e2b808ee7a87c6b3017 t/base/query_dumper.t
+SHA1 ed3ded15ad701af2826404a95e21677d2d9444b5 t/base/query_source.t
+SHA1 a4cfbb571af2b2165e47e71f0c7c0e9bb59802ea t/base/query_switch.t
+SHA1 b4b601bbf6cafb5e62d22cc062aca378fdc64ea2 t/base/state.t
+SHA1 b8530460a05ce83f4776bd3f9fa84b7396ed0d69 t/base/turn.t
+SHA1 5157cf4aa9cbfada2451ae71909c2dae1e81e2b1 t/base/verify.t
+SHA1 1f334e7a6d7948deb7b70a1549fc0da79b2e8af6 t/process/consume.t
+SHA1 b245f8f872346e149f91f51786898a673a493a4b t/process/filter.t
+SHA1 0aae20d866f51226da3fe7a4ba581d4c39922083 t/process/parse.t
+SHA1 68e7b58b6e9726248bc1fa0592dac716eb46c924 t/process/quadratic.t
+SHA1 fceb588f7a59a97fa6d8b4cb82f0baba26b03b36 t/process/sort.t
+SHA1 a817e9bdca3f2efcce229d066accfd02f311c336 t/state/break.t
+SHA1 435f95f80767af13a2831fbcfc3f07ed317df2bc t/state/continue.t
+SHA1 af4ed5dbebcbf287b37dd355cea8102a0abd05fe t/state/start.t
+SHA1 3863edca0df01ee092b8f4710fdb568f4df0a7d3 t/state/stop.t
+SHA1 e1e99f9de5336bc6ef1c245deac4ab9ec69c0581 t/state/workload.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iD8DBQFjreMq1qsM9O+FbKQRAoMcAJwNvGAK72fIlzOqjdtXgMzdZE4kKwCfS/s0
+LqVAKa4vkOSVZRsC8rIyYBg=
+=DxhR
+-----END PGP SIGNATURE-----

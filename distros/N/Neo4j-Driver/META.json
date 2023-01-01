@@ -21,7 +21,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.64"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
@@ -71,99 +71,99 @@
    "provides" : {
       "Neo4j::Driver" : {
          "file" : "lib/Neo4j/Driver.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Neo4j::Driver::Net::Bolt" : {
          "file" : "lib/Neo4j/Driver/Net/Bolt.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Neo4j::Driver::Net::HTTP" : {
          "file" : "lib/Neo4j/Driver/Net/HTTP.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Neo4j::Driver::Net::HTTP::LWP" : {
          "file" : "lib/Neo4j/Driver/Net/HTTP/LWP.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Neo4j::Driver::Plugin" : {
          "file" : "lib/Neo4j/Driver/Plugin.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Neo4j::Driver::PluginManager" : {
          "file" : "lib/Neo4j/Driver/PluginManager.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Neo4j::Driver::Record" : {
          "file" : "lib/Neo4j/Driver/Record.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Neo4j::Driver::Result" : {
          "file" : "lib/Neo4j/Driver/Result.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Neo4j::Driver::Result::Bolt" : {
          "file" : "lib/Neo4j/Driver/Result/Bolt.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Neo4j::Driver::Result::JSON" : {
          "file" : "lib/Neo4j/Driver/Result/JSON.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Neo4j::Driver::Result::Jolt" : {
          "file" : "lib/Neo4j/Driver/Result/Jolt.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Neo4j::Driver::Result::Text" : {
          "file" : "lib/Neo4j/Driver/Result/Text.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Neo4j::Driver::ResultColumns" : {
          "file" : "lib/Neo4j/Driver/ResultColumns.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Neo4j::Driver::ResultSummary" : {
          "file" : "lib/Neo4j/Driver/ResultSummary.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Neo4j::Driver::ServerInfo" : {
          "file" : "lib/Neo4j/Driver/ServerInfo.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Neo4j::Driver::Session" : {
          "file" : "lib/Neo4j/Driver/Session.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Neo4j::Driver::StatementResult" : {
          "file" : "lib/Neo4j/Driver/StatementResult.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Neo4j::Driver::SummaryCounters" : {
          "file" : "lib/Neo4j/Driver/SummaryCounters.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Neo4j::Driver::Transaction" : {
          "file" : "lib/Neo4j/Driver/Transaction.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Neo4j::Driver::Type::Node" : {
          "file" : "lib/Neo4j/Driver/Type/Node.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Neo4j::Driver::Type::Path" : {
          "file" : "lib/Neo4j/Driver/Type/Path.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Neo4j::Driver::Type::Point" : {
          "file" : "lib/Neo4j/Driver/Type/Point.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Neo4j::Driver::Type::Relationship" : {
          "file" : "lib/Neo4j/Driver/Type/Relationship.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Neo4j::Driver::Type::Temporal" : {
          "file" : "lib/Neo4j/Driver/Type/Temporal.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       }
    },
    "release_status" : "stable",
@@ -177,7 +177,7 @@
          "web" : "https://github.com/johannessen/neo4j-driver-perl"
       }
    },
-   "version" : "0.31",
+   "version" : "0.33",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
    "x_spdx_expression" : "Artistic-2.0"

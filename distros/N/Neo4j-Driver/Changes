@@ -1,5 +1,18 @@
 Revision history for Neo4j::Driver
 
+0.33  2022-12-30
+
+ - Fix documentation to indicate that the Neo4j 5 non-numeric element ID for
+   nodes and relationships is not yet supported with Bolt in Perl at this time.
+
+0.32  2022-12-29
+
+ - Introduce Neo4j 5 non-numeric element ID for nodes and relationships
+ - Fix test suite for Neo4j 5
+ - Improve IPv6 support
+ - Add possible strategies to resolve HTTP connection problems when using
+   dual-stack host names (e. g. localhost) to driver documentation
+
 0.31  2022-06-13
 
  - Replace experimental net_module config option with plug-in interface

@@ -47,21 +47,19 @@
             "Data::Sah::Compiler::perl::TH::str" : "0.914",
             "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" : "0",
             "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" : "0",
+            "Exporter" : "5.57",
             "File::Slurper::Dash" : "0",
             "Getopt::Long" : "2.50",
-            "Hash::Subset" : "0.007",
-            "IO::Scalar" : "0",
-            "LWP::UserAgent" : "0",
             "List::Util" : "1.54",
             "Log::ger" : "0.038",
             "Perinci::CmdLine::Any" : "0.154",
             "Perinci::CmdLine::Lite" : "1.924",
+            "Perinci::Sub::Util" : "0.470",
             "Perinci::Sub::XCompletion::sortsub_spec" : "0",
             "Sah::Schema::filename" : "0",
             "Sah::Schema::posint" : "0",
             "Sah::Schema::true" : "0",
             "Sah::Schema::uint" : "0",
-            "Scalar::Util" : "0",
             "Sort::ByExample" : "0",
             "Text::CSV_XS" : "0",
             "Text::CSV_XS::TSV" : "0",
@@ -73,6 +71,7 @@
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "File::Slurper" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0.2307",
@@ -87,7 +86,143 @@
    "provides" : {
       "App::CSVUtils" : {
          "file" : "lib/App/CSVUtils.pm",
-         "version" : "0.054"
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv2td" : {
+         "file" : "lib/App/CSVUtils/csv2td.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv2vcf" : {
+         "file" : "lib/App/CSVUtils/csv2vcf.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_add_fields" : {
+         "file" : "lib/App/CSVUtils/csv_add_fields.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_avg" : {
+         "file" : "lib/App/CSVUtils/csv_avg.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_concat" : {
+         "file" : "lib/App/CSVUtils/csv_concat.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_convert_to_hash" : {
+         "file" : "lib/App/CSVUtils/csv_convert_to_hash.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_csv" : {
+         "file" : "lib/App/CSVUtils/csv_csv.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_delete_fields" : {
+         "file" : "lib/App/CSVUtils/csv_delete_fields.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_dump" : {
+         "file" : "lib/App/CSVUtils/csv_dump.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_each_row" : {
+         "file" : "lib/App/CSVUtils/csv_each_row.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_fill_template" : {
+         "file" : "lib/App/CSVUtils/csv_fill_template.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_freqtable" : {
+         "file" : "lib/App/CSVUtils/csv_freqtable.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_gen" : {
+         "file" : "lib/App/CSVUtils/csv_gen.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_get_cells" : {
+         "file" : "lib/App/CSVUtils/csv_get_cells.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_grep" : {
+         "file" : "lib/App/CSVUtils/csv_grep.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_info" : {
+         "file" : "lib/App/CSVUtils/csv_info.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_list_field_names" : {
+         "file" : "lib/App/CSVUtils/csv_list_field_names.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_lookup_fields" : {
+         "file" : "lib/App/CSVUtils/csv_lookup_fields.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_map" : {
+         "file" : "lib/App/CSVUtils/csv_map.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_munge_field" : {
+         "file" : "lib/App/CSVUtils/csv_munge_field.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_munge_row" : {
+         "file" : "lib/App/CSVUtils/csv_munge_row.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_pick_fields" : {
+         "file" : "lib/App/CSVUtils/csv_pick_fields.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_pick_rows" : {
+         "file" : "lib/App/CSVUtils/csv_pick_rows.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_replace_newline" : {
+         "file" : "lib/App/CSVUtils/csv_replace_newline.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_select_fields" : {
+         "file" : "lib/App/CSVUtils/csv_select_fields.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_select_rows" : {
+         "file" : "lib/App/CSVUtils/csv_select_rows.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_setop" : {
+         "file" : "lib/App/CSVUtils/csv_setop.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_shuf_fields" : {
+         "file" : "lib/App/CSVUtils/csv_shuf_fields.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_shuf_rows" : {
+         "file" : "lib/App/CSVUtils/csv_shuf_rows.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_sort_fields" : {
+         "file" : "lib/App/CSVUtils/csv_sort_fields.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_sort_rows" : {
+         "file" : "lib/App/CSVUtils/csv_sort_rows.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_split" : {
+         "file" : "lib/App/CSVUtils/csv_split.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_sum" : {
+         "file" : "lib/App/CSVUtils/csv_sum.pm",
+         "version" : "1.000"
+      },
+      "App::CSVUtils::csv_transpose" : {
+         "file" : "lib/App/CSVUtils/csv_transpose.pm",
+         "version" : "1.000"
       }
    },
    "release_status" : "stable",
@@ -102,7 +237,7 @@
          "web" : "https://github.com/perlancar/perl-App-CSVUtils"
       }
    },
-   "version" : "0.054",
+   "version" : "1.000",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -156,6 +291,11 @@
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv-freqtable",
+            "version" : "0.424"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript csv-gen",
             "version" : "0.424"
          },
          {
@@ -280,22 +420,12 @@
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript csv2csv",
-            "version" : "0.424"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv2td",
             "version" : "0.424"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript csv2vcf",
-            "version" : "0.424"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript dump-csv",
             "version" : "0.424"
          },
          {

@@ -1,5 +1,5 @@
 package Linux::FD::Pid;
-$Linux::FD::Pid::VERSION = '0.003';
+$Linux::FD::Pid::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -23,19 +23,23 @@ Linux::FD::Pid - PID file descriptors
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
  use Linux::FD::Pid
  
- my $fh = Linux::FD::Pid->new($pid)
+ my $fh = Linux::FD::Pid->new($pid, @flags)
+
+=head1 DESCRIPTION
+
+This creates a pidfd filehandle that can be used to await the termination of a process. This provides an alternative to using C<SIGCHLD>, and has the advantage that the file descriptor may be monitored by select, poll, and epoll.
 
 =head1 METHODS
 
 =head2 new($pid)
 
-This creates a pidfd file descriptor that can be used to await the termination of a process. This provides an alternative to using C<SIGCHLD>, and has the advantage that the file descriptor may be monitored by select, poll, and epoll.
+This creates a new filehandle object for the designated C<$pid>. C<@flags> is an optional list of flags, currently limited to C<'non-blocking'>.
 
 =head2 send($signo)
 

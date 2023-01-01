@@ -1,5 +1,8 @@
 Revision history for MooseX-OneArgNew
 
+0.007     2022-12-31 21:16:30-05:00 America/New_York
+        - update metadata: author address
+
 0.006     2022-05-29 15:48:22-04:00 America/New_York
         - update metadata: author address, support window, etc.
 

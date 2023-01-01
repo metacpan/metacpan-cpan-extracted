@@ -1,5 +1,12 @@
 Revision history for Perl module Test::File
 
+1.993 2022-12-31T20:33:55Z
+	* Try harder to check for symlinks on Windows by stealing some code
+	from Win32:: (Jean-Damien Durand) GitHub #36
+
+1.992_01 2022-11-10T21:59:59Z
+	* Try harder to test Windows symlinks, #36 from Jean-Damien Durand
+
 1.992 2022-02-15T19:40:16Z
 	* GitHub #29 - race condition in tests for mtime, from Slaven Rezić.
 	Most people never experienced this timing issue, so if you have this

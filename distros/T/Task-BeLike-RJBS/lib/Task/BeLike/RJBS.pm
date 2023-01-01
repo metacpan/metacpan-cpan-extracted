@@ -1,6 +1,6 @@
 use 5.20.0;
 use warnings;
-package Task::BeLike::RJBS 20211226.000;
+package Task::BeLike::RJBS 20221231.000;
 # ABSTRACT: be more like RJBS -- use the modules he likes!
 
 
@@ -18,7 +18,7 @@ Task::BeLike::RJBS - be more like RJBS -- use the modules he likes!
 
 =head1 VERSION
 
-version 20211226.000
+version 20221231.000
 
 =head1 TASK CONTENTS
 
@@ -138,8 +138,6 @@ I need this for TOTP.
 
 =head3 L<Authen::SASL>
 
-=head3 L<Carp::Always>
-
 =head3 L<Config::INI> 0.011
 
 =head3 L<Convert::Base32>
@@ -157,6 +155,8 @@ Version 0.044 required because: requires a new enough Data::UUID to work around 
 =head3 L<DateTime> 0.51
 
 Version 0.51 required because: provides CLDR support with fewest known bugs
+
+=head3 L<Devel::Confess>
 
 =head3 L<Devel::Cover>
 
@@ -242,11 +242,11 @@ These are just here to make sure other things work properly.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo Signes.
+This software is copyright (c) 2022 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

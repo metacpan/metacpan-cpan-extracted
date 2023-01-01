@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Email::MessageID 1.407;
+package Email::MessageID 1.408;
 # ABSTRACT: Generate world unique message-ids.
 
 use overload '""' => 'as_string', fallback => 1;
@@ -146,7 +146,7 @@ Email::MessageID - Generate world unique message-ids.
 
 =head1 VERSION
 
-version 1.407
+version 1.408
 
 =head1 SYNOPSIS
 
@@ -234,13 +234,13 @@ Casey West <casey@geeknest.com>
 
 =item *
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =back
 
 =head1 CONTRIBUTORS
 
-=for stopwords Aaron Crane Pali
+=for stopwords Aaron Crane Pali Ricardo Signes
 
 =over 4
 
@@ -251,6 +251,10 @@ Aaron Crane <arc@cpan.org>
 =item *
 
 Pali <pali@cpan.org>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =back
 

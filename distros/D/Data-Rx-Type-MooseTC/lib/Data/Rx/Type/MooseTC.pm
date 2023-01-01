@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Data::Rx::Type::MooseTC 0.007;
+package Data::Rx::Type::MooseTC 0.008;
 # ABSTRACT: experimental / proof of concept Rx types from Moose types
 use parent 'Data::Rx::CommonType::EasyNew';
 
@@ -87,7 +87,7 @@ Data::Rx::Type::MooseTC - experimental / proof of concept Rx types from Moose ty
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -128,11 +128,17 @@ Moose type constraints may change their interface in the future.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

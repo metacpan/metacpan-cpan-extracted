@@ -1,5 +1,6 @@
 requires 'Const::Fast';
 requires 'Encode';
+requires 'HTML::AutoTag';
 requires 'HTML::Entities';
 requires 'Ref::Util';
 requires 'YAML::Syck';

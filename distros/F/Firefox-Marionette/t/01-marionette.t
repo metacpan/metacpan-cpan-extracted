@@ -809,7 +809,7 @@ SKIP: {
 	ok($window_type && $window_type eq 'navigator:browser', "\$firefox->window_type() returns 'navigator:browser':$window_type");
 	ok($firefox->sleep_time_in_ms() == 1, "\$firefox->sleep_time_in_ms() is 1 millisecond");
 	my $new_x = 3;
-	my $new_y = 9;
+	my $new_y = 23;
 	my $new_height = 452;
 	my $new_width = 326;
 	my $new = Firefox::Marionette::Window::Rect->new( pos_x => $new_x, pos_y => $new_y, height => $new_height, width => $new_width );
@@ -1976,6 +1976,8 @@ SKIP: {
 		skip($skip_message, 6);
 	}
 	ok($firefox, "Firefox has started in Marionette mode with definable capabilities set to known values");
+	$uname = $firefox->uname();
+	ok($uname, "Firefox is currently running in $uname");
 	ok(scalar $firefox->logins() == 0, "\$firefox->logins() has no entries:" . scalar $firefox->logins());
         my $testing_header_name = 'X-CPAN-Testing';
         my $testing_header_value = (ref $firefox) . q[ All ] . $Firefox::Marionette::VERSION;
@@ -2003,8 +2005,6 @@ SKIP: {
 		skip("\$capabilities->accept_insecure_certs is not supported for " . $capabilities->browser_version(), 3);
 	}
 	ok(!$capabilities->accept_insecure_certs(), "\$capabilities->accept_insecure_certs() is false");
-	$uname = $firefox->uname();
-	ok($uname, "Firefox is currently running in $uname");
 	if (($ENV{RELEASE_TESTING}) && (!$ENV{FIREFOX_NO_NETWORK})) { # har sometimes hangs and sometimes metacpan.org fails certificate checks.  for example. http://www.cpantesters.org/cpan/report/e71bfb3b-7413-1014-98e6-045206f7812f
 		if (!$tls_tests_ok) {
 			skip("TLS test infrastructure seems compromised", 5);
@@ -2281,6 +2281,7 @@ SKIP: {
 	if (!($ENV{RELEASE_TESTING}) || ($ENV{FIREFOX_NO_NETWORK})) {
 		skip("Skipping network tests", 225);
 	}
+	ok($firefox->refresh(), "\$firefox->refresh()");
 	my $metacpan_uri = 'https://metacpan.org/';
 	ok($firefox->go($metacpan_uri), "$metacpan_uri has been loaded in the new window");
 	if (out_of_time()) {
@@ -2322,7 +2323,6 @@ SKIP: {
 	}
 	ok($firefox->page_source() =~ /Search[ ]the[ ]CPAN/smx, "metacpan.org contains the phrase 'Search the CPAN' in page source");
 	ok($firefox->html() =~ /Search[ ]the[ ]CPAN/smx, "metacpan.org contains the phrase 'Search the CPAN' in html");
-	ok($firefox->refresh(), "\$firefox->refresh()");
 	my $element = $firefox->active_element();
 	ok($element, "\$firefox->active_element() returns an element");
 	TODO: {
@@ -3924,10 +3924,8 @@ SKIP: {
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
 	if ($ENV{FIREFOX_HOST}) {
 		diag("\$capabilities->headless is forced on for FIREFOX_HOST testing");
-		skip("\$capabilities->headless is forced on for FIREFOX_HOST testing", 1);
 	} elsif ($ENV{FIREFOX_NO_VISIBLE}) {
 		diag("\$capabilities->headless is forced on for FIREFOX_NO_VISIBLE testing");
-		skip("\$capabilities->headless is forced on for FIREFOX_NO_VISIBLE testing", 1);
 	} else {
 		ok(!$capabilities->moz_headless(), "\$capabilities->moz_headless() is set to false");
 	}
@@ -3981,11 +3979,6 @@ SKIP: {
 		}
 	}
 	SKIP: {
-		if ((exists $ENV{XAUTHORITY}) && (defined $ENV{XAUTHORITY}) && ($ENV{XAUTHORITY} =~ /xvfb/smxi)) {
-			skip("Unable to change firefox screen size when xvfb is running", 3);	
-		} elsif ($firefox->xvfb_pid()) {
-			skip("Unable to change firefox screen size when xvfb is running", 3);	
-		}
 		local $TODO = "Not entirely stable in firefox";
 		my $full_screen;
 		local $SIG{ALRM} = sub { die "alarm during full screen\n" };
@@ -4017,6 +4010,72 @@ SKIP: {
 		};
 		alarm 0;
 		ok($maximise, "\$firefox->maximise()");
+		if ($major_version < 52) {
+			diag("Not attempting to resize for Firefox $major_version");
+		} elsif ($maximise) {
+			local $TODO = q[];
+			my $count = 0;
+			my $resize_works;
+			foreach my $display ($firefox->displays()) {
+				$count += 1;
+				ok(defined $display->usage(), "\$display->usage() is defined:" . $display->usage());
+				ok(defined $display->designation(), "\$display->designation() is defined:" . $display->designation());
+				ok($display->sar() =~ /^\d+(?:[.]\d+)?:\d+$/smx, "\$display->sar() is a ratio:" . $display->sar());
+				ok($display->dar() =~ /^\d+(?:[.]\d+)?(?::\d+)?$/smx, "\$display->dar() is a ratio or a floating point number:" . $display->dar());
+				ok($display->par() =~ /^\d+(?:[.]\d+)?(?::\d+(?:[.]\d+)?)?$/smx, "\$display->par() is a ratio or a floating point number:" . $display->par());
+				my $result;
+				eval {
+					$result = $firefox->resize($display->width(), $display->height());
+					$resize_works = 1;
+				} or do {
+					if ($major_version < 60) {
+						chomp $@;
+						diag("Failed to resize browser for old browser version $major_version:$@");
+					} else {
+						ok(0, "Failed to resize browser for a modern browser:$@");
+						diag("Failed to resize browser for a modern browser:$@");
+					}
+				};
+				if ($result) {
+					ok(1, "Resized the display to " . $display->width . "x" . $display->height());
+					last unless ($ENV{RELEASE_TESTING});
+				} else {
+					ok(1, "Not able to resize the display to " . $display->width . "x" . $display->height());
+				}
+			}
+			ok($count, "$count displays are currently known to firefox");
+			my $iphone_count = 0;
+			foreach my $display ($firefox->displays(qr/iphone/smxi)) {
+				$iphone_count += 1;
+				ok($display->usage() =~ /iphone/smxi, "iPhone display detected:" . $display->usage());
+			}
+			ok($iphone_count, "$iphone_count displays are for an iphone");
+			ok($firefox->displays(qr/iphone/i) < $firefox->displays(), "There are fewer displays for iphones than all displays");
+			if ($ENV{FIREFOX_HOST}) {
+			} elsif (($^O eq 'openbsd') && (Cwd::cwd() !~ /^($quoted_home_directory\/Downloads|\/tmp)/)) {
+				diag("Skipping checks that use a file:// url b/c of OpenBSD's unveil functionality - see https://bugzilla.mozilla.org/show_bug.cgi?id=1580271");
+			} else {
+				# Coping with OpenBSD unveil - see https://bugzilla.mozilla.org/show_bug.cgi?id=1580271
+				my $path = File::Spec->catfile(Cwd::cwd(), qw(t data visible.html));
+				if ($^O eq 'cygwin') {
+					$path = $firefox->execute( 'cygpath', '-s', '-m', $path );
+				}
+				my $url = "file://$path";
+				ok($firefox->go($url), "$url has been loaded");
+				my $element = $firefox->find_id('username');
+				if (($resize_works) && ($firefox->resize(800, 600))) {
+					my $percentage = $firefox->percentage_visible($element);
+					ok($percentage == 0, "Percentage visible is 0% for the username field:$percentage");
+					if ($major_version >= 59) {
+						ok($firefox->scroll($element, { block => 'center' }), "Scroll until the username field is in the center of the screen");
+						$percentage = $firefox->percentage_visible($element);
+						ok($percentage == 100, "Percentage visible is 100% for the username field:$percentage");
+					}
+				} else {
+					diag("Skipping checks that require resize to work");
+				}
+			}
+		}
 	}
 	if ($ENV{FIREFOX_HOST}) {
 		SKIP: {

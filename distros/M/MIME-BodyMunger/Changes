@@ -1,5 +1,9 @@
 Revision history for MIME-BodyMunger
 
+0.007     2022-12-31 13:28:40-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 0.006     2013-09-28 21:54:09 America/New_York
           update repo and bugtracker links
 

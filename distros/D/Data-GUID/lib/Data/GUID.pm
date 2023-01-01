@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Data::GUID;
 # ABSTRACT: globally unique identifiers
-$Data::GUID::VERSION = '0.050';
+$Data::GUID::VERSION = '0.051';
 use Carp ();
 use Data::UUID 1.148;
 use Sub::Install 0.03;
@@ -380,7 +380,7 @@ Data::GUID - globally unique identifiers
 
 =head1 VERSION
 
-version 0.050
+version 0.051
 
 =head1 SYNOPSIS
 
@@ -401,10 +401,10 @@ version 0.050
 Data::GUID provides a simple interface for generating and using globally unique
 identifiers.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has an extremely long-term perl support period.  That means it will
-not require a version of perl released fewer than ten years ago.
+This library should run on perls released even an extremely long time ago.  It
+should work on any version of perl released in the last ten years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
@@ -567,7 +567,13 @@ make it work on 5.005
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

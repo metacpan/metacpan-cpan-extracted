@@ -16,11 +16,16 @@ my $build = Alien::Build::MB->new(
     },
     build_requires => {
         'Alien::Build::MB' => 0,
-        'Test::More' => 0,
         'Module::Build' => 0,
         'Software::License' => 0,
         'Path::Tiny' => 0,
         'HTTP::Tiny' => 0,
+    },
+    test_requires => {
+        'Test::More'        => 0,
+        'Test2::V0'         => 0,
+        'Test::Alien'       => 0,
+        'Test::Alien::Diag' => 0,
     },
     requires => {
         'perl' => '5.10.0',

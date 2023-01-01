@@ -1,5 +1,8 @@
 Revision history for Email-MessageID
 
+1.408     2022-12-31 21:28:29-05:00 America/New_York
+        - update author contact info
+
 1.407     2022-10-22 16:07:04-04:00 America/New_York
         - update docs: this is not a subclass of Email::Address (thanks, Pali!)
         - update some packaging notes

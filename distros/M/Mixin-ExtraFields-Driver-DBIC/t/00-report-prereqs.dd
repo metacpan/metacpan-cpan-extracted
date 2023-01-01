@@ -1,0 +1,43 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '6.78'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Encode' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Mixin::ExtraFields::Driver' => '0.004',
+                                      'Sub::Exporter' => '0',
+                                      'parent' => '0',
+                                      'perl' => '5.012',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'DBIx::Class' => '0',
+                                   'DBIx::Class::Schema' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'File::Temp' => '0',
+                                   'Mixin::ExtraFields' => '0',
+                                   'SQL::Translator' => '0.11016',
+                                   'Test::More' => '0.96',
+                                   'lib' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

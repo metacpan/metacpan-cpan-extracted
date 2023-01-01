@@ -1,5 +1,8 @@
 Revision history for Role-Identifiable
 
+0.009     2022-12-31 16:48:48-05:00 America/New_York
+        - tweak some packaging information (author, etc)
+
 0.008     2022-06-12 15:25:28-04:00 America/New_York
         - tweak some packaging information (author, etc)
         - add Role::Identifiable just to make life simpler

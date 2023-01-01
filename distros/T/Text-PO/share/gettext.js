@@ -1,11 +1,11 @@
 /*
 * ----------------------------------------------------------------------------
 * PO Files Manipulation - Text-PO/share/gettext.js
-* Version v0.1.1
-* Copyright(c) 2021 DEGUEST Pte. Ltd.
+* Version v0.2.1
+* Copyright(c) 2021-2022 DEGUEST Pte. Ltd.
 * Author: Jacques Deguest <jack@deguest.jp>
 * Created 2021/06/29
-* Modified 2021/07/11
+* Modified 2022/12/30
 * All rights reserved
 * 
 * This program is free software; you can redistribute  it  and/or  modify  it
@@ -799,6 +799,36 @@
             return;
         }
     });
+
+    /*
+    NOTE: GettextString class inheriting from String
+    The purpose is to return an instance of GettextString class that automatically stringifies when necessary and that contains the string language property.
+    The string language property is set upon fetching the localised version, and is useful to know what language it actually is, especially when it failed to find any localised version.
+    */
+    window.GettextString = function(str,lang)
+    {
+        this._value = str;
+        this.lang = lang;
+    };
+
+    Object.getOwnPropertyNames(String.prototype).forEach(function(key)
+    {
+        var func = String.prototype[key];
+        GettextString.prototype[key] = function()
+        {
+            return func.apply(this._value, arguments);
+        };
+    });
+
+    GettextString.prototype.setLang = function(lang)
+    {
+        this.lang = lang;
+    };
+
+    GettextString.prototype.getLang = function()
+    {
+        return(this.lang);
+    };
     
     window.Gettext = Generic.extend(
     {
@@ -951,6 +981,8 @@
         dngettext: function(domain, msgid, msgidPlural, count)
         {
             var self = this;
+            // Force stringification of object, if any.
+            msgid = msgid + "";
             var defaultTranslation = msgid;
             var dict;
             var index;
@@ -979,7 +1011,7 @@
             if( !data.hasOwnProperty( opts.locale ) )
             {
                 this.warn( "No locale \"" + opts.locale + "\" found for the domain \"" + domain + "\"." );
-                return( defaultTranslation );
+                return( new GettextString( defaultTranslation ) );
             }
             var l10n = data[ opts.locale ];
             dict = l10n[ msgid ];
@@ -1014,15 +1046,17 @@
                         throw new Error( "The plural value for this message \"" + msgid + "\" indicate there are more than 1 plural, and thus I was expecting an array for msgstr, but instead found \"" + typeof( dict.msgstr ) + "\"." );
                     }
                     */
-                    return( dict.msgstr[index] || defaultTranslation );
+                    // return( dict.msgstr[index] || defaultTranslation );
+                    return( dict.msgstr[index] ? new GettextString( dict.msgstr[index], opts.locale ) : new GettextString( defaultTranslation ) );
                 }
-                return( dict.msgstr || defaultTranslation );
+                // return( dict.msgstr || defaultTranslation );
+                return( dict.msgstr ? new GettextString( dict.msgstr, opts.locale ) : new GettextString( defaultTranslation ) );
             }
             else if( !this.sourceLocale || opts.locale !== this.sourceLocale )
             {
                 this.warn( 'No dictionary was found for msgid "' + msgid + '" and domain "' + domain + '"' );
             }
-            return( defaultTranslation );
+            return( new GettextString( defaultTranslation ) );
         },
         
         /**
@@ -1730,7 +1764,7 @@
         },
         
         /**
-         * Provided with an original text and an optional language (locale), this return the localised equivalent if any, or the orinal string by default.
+         * Provided with an original text and an optional language (locale), this return the localised equivalent if any, or the original string by default.
          *
          * @example
          *     p.getText( "Hello !", "fr-FR" )
@@ -1748,14 +1782,18 @@
                 thisLang = document.getElementsByTagName('html')[0].getAttribute('lang');
             }
             thisLang = thisLang.replace( '-', '_' );
+            // Force stringification if this is an object
+            thisKey = thisKey + "";
             if( l10n.hasOwnProperty( thisLang ) )
             {
                 if( l10n[ thisLang ].hasOwnProperty( thisKey ) )
                 {
-                    return( l10n[ thisLang ][ thisKey ].msgstr );
+                    // return( l10n[ thisLang ][ thisKey ].msgstr );
+                    return( new GettextString( l10n[ thisLang ][ thisKey ].msgstr, thisLang ) );
                 }
             }
-            return( thisKey );
+            // return( thisKey );
+            return( new GettextString( thisKey ) );
         },
     
         /**
@@ -1783,8 +1821,10 @@
             params.lang = params.lang.replace( '-', '_' );
             //return( sprintf( getText( thisKey, params.lang ), ...args ) );
             var thisText = self.getText( thisKey, params.lang );
+            var strLang = thisText.getLang();
             args.unshift( thisText );
-            return( sprintf.apply( null, args ) );
+            // return( sprintf.apply( null, args ) );
+            return( new GettextString( sprintf.apply( null, args ), strLang ) );
         },
         
         /**
@@ -2731,6 +2771,7 @@
     });
 })();
 
+// NOTE: POD
 /*
 =pod
 
@@ -2744,21 +2785,21 @@ Gettext - A GNU Gettext JavaScript implementation
 
     let po = new Gettext({
         domain: "com.example.api",
-        # Get the lang attribute value from <html>
-        # Can also use document.getElementsByTagName('html')[0].getAttribute('lang')
-        # or in jQuery: $(':root').attr('lang')
+        // Get the lang attribute value from <html>
+        // Can also use document.getElementsByTagName('html')[0].getAttribute('lang')
+        // or in jQuery: $(':root').attr('lang')
         locale: document.documentElement.lang,
-        # Under which uri can be found the localised data arborescence?
-        # Alternatively, you can set a <link rel="gettext" href="/locale" />
-        # or even one specific by language:
-        # <link rel="gettext" lang="ja_JP" href="/locale/ja" />
+        // Under which uri can be found the localised data arborescence?
+        // Alternatively, you can set a <link rel="gettext" href="/locale" />
+        // or even one specific by language:
+        // <link rel="gettext" lang="ja_JP" href="/locale/ja" />
         path: "/locale",
         debug: true
     });
 
 =head1 VERSION
 
-    v0.1.1
+    v0.2.1
 
 =head1 DESCRIPTION
 
@@ -2780,15 +2821,15 @@ Takes the following options and returns a Gettext object.
 
 =over 4
 
-=item I<domain>
+=item * C<domain>
 
 The portable object domain, such as C<com.example.api>
 
-=item I<locale>
+=item * C<locale>
 
 The locale, such as C<ja_JP>, or C<en>, or it could even contain a dash instead of an underscore, such as C<en-GB>. Internally, though, this will be converted to underscore.
 
-=item I<path>
+=item * C<path>
 
 The uri path where the gettext localised data are.
 
@@ -2813,6 +2854,18 @@ Note that you can also call it with the special function C<_>, such as:
 
 See the global function L</_> for more information.
 
+If the C<msgid> is an object that supports stringification (i.e. it has the toString() method), it will be stringified before being used.
+
+From version v0.2.0, this method returns a C<GettextString> object, which inherits from JavaScript standard C<String> class and allows to set the language, if any, of the string returned. If no localised string could be found, the string language would be C<undefined>. For example:
+
+    let localStr = po.gettext( "Hello" );
+    // Assuming the language sought is ja-JP and it succeed:
+    localStr.getLang(); // returns ja-JP
+    localStr.lang; // also returns ja-JP
+    // If no localised string were found:
+    localStr.getLang(); // returns undefined
+    localStr.lang; // also returns undefined
+
 =head2 dgettext
 
 Takes a domain and a message id and returns the equivalent localised string if any, otherwise the original message id.
@@ -2820,6 +2873,8 @@ Takes a domain and a message id and returns the equivalent localised string if a
     po.dgettext( 'com.example.auth', 'Please enter your e-mail address' );
     # Assuming the locale currently set is ja_JP, this would return:
     # 電子メールアドレスをご入力下さい。
+
+From version v0.2.0, the string returned is a C<GettextString> object, which inherits from JavaScript standard C<String> and automatically stringifies. See L</gettext> above for more details.
 
 =head2 ngettext
 
@@ -2829,6 +2884,8 @@ Takes an original string (a.k.a message id), the plural version of that string, 
     # Assuming the locale is ru_RU, this would return:
     # %d комментариев ожидают проверки
 
+From version v0.2.0, the string returned is a C<GettextString> object, which inherits from JavaScript standard C<String> and automatically stringifies. See L</gettext> above for more details.
+
 =head2 dngettext
 
 Same as L</ngettext>, but takes also a domain as first argument. For example:
@@ -2836,6 +2893,8 @@ Same as L</ngettext>, but takes also a domain as first argument. For example:
     po.ngettext( 'com.example.auth', '%d comment awaiting moderation', '%d comments awaiting moderation', 12 );
     # Assuming the locale is ru_RU, this would return:
     # %d комментариев ожидают проверки
+
+From version v0.2.0, the string returned is a C<GettextString> object, which inherits from JavaScript standard C<String> and automatically stringifies. See L</gettext> above for more details.
 
 =head1 EXTENDED METHODS
 
@@ -2890,23 +2949,23 @@ Takes an hash of options and perform an HTTP query and return a promise. The acc
 
 =over 4
 
-=item I<headers>
+=item * C<headers>
 
 An hash of field-value pairs to be used in the request header.
 
-=item I<method>
+=item * C<method>
 
 The HTTP method to be used, such as C<GET> or C<POST>
 
-=item I<params>
+=item * C<params>
 
 An hash of key-value pairs to be set and encoded in the http request query.
 
-=item I<responseType>
+=item * C<responseType>
 
 The content-type expected in response. This is used to set it to C<arraybuffer> to load C<.mo> (machine object) files.
 
-=item I<url>
+=item * C<url>
 
 The url to make the query to.
 
@@ -2949,9 +3008,9 @@ Possible options are:
 
 =over 4
 
-=item I<domain> The domain for the data, such as C<com.example.api>
+=item * C<domain> The domain for the data, such as C<com.example.api>
 
-=item I<locale> The locale to return the associated dictionary.
+=item * C<locale> The locale to return the associated dictionary.
 
 =back
 
@@ -3011,29 +3070,29 @@ Returns an hash reference containing the following properties:
 
 =over 4
 
-=item I<currency> string
+=item * C<currency> string
 
 (This is not available in the JavaScript interface yet)
 
 Contains the usual currency symbol, such as C<€>, or C<$>, or C<¥>
 
-=item I<decimal> string
+=item * C<decimal> string
 
 Contains the character used to separate decimal. In English speaking countries, this would typically be a dot.
 
-=item I<int_currency> string
+=item * C<int_currency> string
 
 (This is not available in the JavaScript interface yet)
 
 Contains the 3-letters international currency symbol, such as C<USD>, or C<EUR> or C<JPY>
 
-=item I<negative_sign> string
+=item * C<negative_sign> string
 
 (This is not available in the JavaScript interface yet)
 
 Contains the negative sign used for negative number
 
-=item I<precision> integer
+=item * C<precision> integer
 
 (This is not available in the JavaScript interface yet)
 
@@ -3041,7 +3100,7 @@ An integer whose value represents the fractional precision allowed for monetary 
 
 For example, in Japanese, this value would be 0 while in many other countries, it would be 2.
 
-=item I<thousand> string
+=item * C<thousand> string
 
 Contains the character used to group and separate thousands.
 
@@ -3075,9 +3134,13 @@ The value returned cannot exceed the integer.
 
 Provided with an original string, and this will return its localised equivalent if it exists, or by default, it will return the original string.
 
+From version v0.2.0, the string returned is a C<GettextString> object, which inherits from JavaScript standard C<String> and automatically stringifies. See L</gettext> above for more details.
+
 =head2 getTextf
 
 Provided with an original string, and this will get its localised equivalent that wil be used as a template for the sprintf function. The resulting formatted localised content will be returned.
+
+From version v0.2.0, the string returned is a C<GettextString> object, which inherits from JavaScript standard C<String> and automatically stringifies. See L</gettext> above for more details.
 
 =head2 getTextDomain
 

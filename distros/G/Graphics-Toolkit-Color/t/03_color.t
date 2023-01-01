@@ -2,7 +2,7 @@
 #
 use v5.12;
 use warnings;
-use Test::More tests => 313;
+use Test::More tests => 321;
 use Test::Warn;
 
 BEGIN { unshift @INC, 'lib', '../lib'}
@@ -45,6 +45,14 @@ is(($red->rgb)[2],         0, 'named red has correct rgb blue component value');
 is(($red->hsl)[0],         0, 'named red has correct hsl hue component value');
 is(($red->hsl)[1],       100, 'named red has correct hsl saturation component value');
 is(($red->hsl)[2],        50, 'named red has correct hsl lightness component value');
+is(ref $red->rgb_hash,'HASH', 'named red has correct rgb HASH');
+is(ref $red->hsl_hash,'HASH', 'named red has correct hsl HASH');
+is( $red->rgb_hash->{'red'},  255, 'named red has correct red value in rgb HASH');
+is( $red->rgb_hash->{'green'},  0, 'named red has correct green value in rgb HASH');
+is( $red->rgb_hash->{'blue'},   0, 'named red has correct blue value in rgb HASH');
+is( $red->hsl_hash->{'hue'},          0, 'named red has correct hue value in hsl HASH');
+is( $red->hsl_hash->{'saturation'}, 100, 'named red has correct saturation value in hsl HASH');
+is( $red->hsl_hash->{'lightness'},   50, 'named red has correct lightness value in hsl HASH');
 is( $red->string,      'red', 'named red does stringify correctly');
 is( Graphics::Toolkit::Color->new(15,12,13)->string, '[ 15, 12, 13 ]', 'random color does stringify correctly');
 

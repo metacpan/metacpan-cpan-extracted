@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Session;
 # ABSTRACT: Context of work for database interactions
-$Neo4j::Driver::Session::VERSION = '0.31';
+$Neo4j::Driver::Session::VERSION = '0.33';
 
 use Carp qw();
 our @CARP_NOT = qw(Neo4j::Driver);
@@ -128,7 +128,7 @@ Neo4j::Driver::Session - Context of work for database interactions
 
 =head1 VERSION
 
-version 0.31
+version 0.33
 
 =head1 SYNOPSIS
 
@@ -249,9 +249,9 @@ L<Neo4j::Driver::B<ServerInfo>>,
 L<Neo4j::Driver::B<Result>>
 
 =item * Equivalent documentation for the official Neo4j drivers:
-L<Session (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/Session.html>,
-L<Session (JavaScript)|https://neo4j.com/docs/api/javascript-driver/4.4/class/lib6/session.js~Session.html>,
-L<ISession (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.4/html/6bcf5d8c-98e7-b521-03e7-210cd6155850.htm>
+L<Session (Java)|https://neo4j.com/docs/api/java-driver/5.2/org.neo4j.driver/org/neo4j/driver/Session.html>,
+L<Session (JavaScript)|https://neo4j.com/docs/api/javascript-driver/5.2/class/lib6/session.js~Session.html>,
+L<ISession (.NET)|https://neo4j.com/docs/api/dotnet-driver/5.2/html/6bcf5d8c-98e7-b521-03e7-210cd6155850.htm>
 
 =back
 
@@ -259,12 +259,15 @@ L<ISession (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.4/html/6bcf5d8c-98e
 
 Arne Johannessen <ajnn@cpan.org>
 
+If you contact me by email, please make sure you include the word
+"Perl" in your subject header to help beat the spam filters.
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0 or (at your option) the same terms
+as the Perl 5 programming language system itself.
 
 =cut

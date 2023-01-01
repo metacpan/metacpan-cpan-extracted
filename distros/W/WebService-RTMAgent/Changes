@@ -1,5 +1,9 @@
 Revision history for WebService-RTMAgent
 
+0.603     2022-12-31 16:03:05-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 0.602     2015-07-21 21:54:46-04:00 America/New_York
         - initialize the RTMAgent's parent class, LWP::UA, first
           (thanks, Ed Santiago)
@@ -13,7 +17,7 @@ Revision history for WebService-RTMAgent
         - use https
 
 0.5       14 March 2008
-	      - Fixed dependencies in Makefile.PL
+        - Fixed dependencies in Makefile.PL
 
 0.05      16 December 2007
         - First CPAN version, released on an unsuspecting world.

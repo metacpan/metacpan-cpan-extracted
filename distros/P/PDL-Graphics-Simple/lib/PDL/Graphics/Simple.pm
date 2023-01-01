@@ -256,7 +256,7 @@ use PDL::Options q/iparse/;
 use File::Temp qw/tempfile tempdir/;
 use Scalar::Util q/looks_like_number/;
 
-our $VERSION = '1.007';
+our $VERSION = '1.008';
 $VERSION = eval $VERSION;
 
 ##############################
@@ -432,7 +432,7 @@ sub new {
 		}
 	    }
 	      unless( $last_successful_type ) {
-		  die "Sorry, all known plotting engines failed.  Install one and try again.\n";
+		  barf "Sorry, all known plotting engines failed.  Install one and try again.\n";
 	      }
 	}
 	$opt->{engine} = $last_successful_type;
@@ -446,7 +446,7 @@ sub new {
 
     my $engine = $mod_abbrevs->{lc($opt->{engine})};
     unless(defined($engine) and defined($mods->{$engine})) {
-	die "$opt->{engine} is not a known plotting engine. Use PDL::Graphics::Simple::show() for a list. ";
+	barf "$opt->{engine} is not a known plotting engine. Use PDL::Graphics::Simple::show() for a list. ";
     }
     $last_successful_type = $opt->{engine};
 
@@ -460,7 +460,7 @@ sub new {
 	$type = (  ($output =~ m/\.(\w{2,4})$/) ? 'f' : 'i'  );
     }
     unless($type =~ m/^[fi]/i) {
-	die "$type is not a known output type (must be 'file' or 'interactive')\n";
+	barf "$type is not a known output type (must be 'file' or 'interactive')\n";
     }
 
     # Default to 'plot.png'  if no output is specified.
@@ -476,7 +476,7 @@ sub new {
     # Error-check multi
     if( defined($opt->{multi}) ) {
 	if(  ref($opt->{multi}) ne 'ARRAY'  or  @{$opt->{multi}} != 2  ) {
-	    die "PDL::Graphics::Simple::new: 'multi' option requires a 2-element ARRAY ref\n";
+	    barf "PDL::Graphics::Simple::new: 'multi' option requires a 2-element ARRAY ref\n";
 	}
 	$opt->{multi}->[0] = 1  unless(  $opt->{multi}->[0]  );
 	$opt->{multi}->[1] = 1  unless(  $opt->{multi}->[1]  );
@@ -750,10 +750,10 @@ sub plot {
     ##############################
     # Trap some simple errors
     if($#_ == 0) {
-	die "plot: requires at least one argument to plot!\n";
+	barf "plot: requires at least one argument to plot!\n";
     }
     if($#_ == 1  and  ref($_[0]) eq 'HASH') {
-	die "plot: requires at least one argument to plot, in addition to plot options\n";
+	barf "plot: requires at least one argument to plot, in addition to plot options\n";
     }
 
     ##############################
@@ -795,7 +795,7 @@ sub plot {
 	    ref($po->{bounds}) ne 'ARRAY'  or
 	    @{$po->{bounds}} != 2
 	    ) {
-	    die "Bounds option must be a 2-element ARRAY ref containing (xrange, yrange)\n";
+	    barf "Bounds option must be a 2-element ARRAY ref containing (xrange, yrange)\n";
 	}
 
 	if( defined($po->{bounds}->[0]) ) {
@@ -815,7 +815,7 @@ sub plot {
 	    @{$po->{xrange}} != 2 or
 	    $po->{xrange}->[0] == $po->{xrange}->[1])
 	) {
-	die "Invalid X range (must be a 2-element ARRAY ref with differing values)\n";
+	barf "Invalid X range (must be a 2-element ARRAY ref with differing values)\n";
     }
 
     if( defined($po->{yrange}) and (
@@ -824,7 +824,7 @@ sub plot {
 	    @{$po->{yrange}} != 2 or
 	    $po->{yrange}->[0] == $po->{yrange}->[1])
 	) {
-	die "Invalid Y range (must be a 2-element ARRAY ref with differing values)\n";
+	barf "Invalid Y range (must be a 2-element ARRAY ref with differing values)\n";
     }
 
     if( defined($po->{wedge}) ) {
@@ -833,7 +833,7 @@ sub plot {
 
     if( length($po->{logaxis}) ) {
 	if($po->{logaxis} =~ m/[^xyXY]/) {
-	    die "logaxis must be X, Y, or XY (case insensitive)\n";
+	    barf "logaxis must be X, Y, or XY (case insensitive)\n";
 	}
 	$po->{logaxis} =~ tr/XY/xy/;
 	$po->{logaxis} =~ s/yx/xy/;
@@ -877,7 +877,7 @@ sub plot {
 
 	my $ptn = $plot_type_abbrevs->{ $co2->{with} };
 	unless( defined($ptn) and defined($plot_types->{$ptn}) ) {
-	    die "Unknown plot type $ptn\n";
+	    barf "Unknown plot type $ptn\n";
 	}
 
 	if($co2->{key} and !defined($po->{legend})) {
@@ -915,7 +915,7 @@ sub plot {
 		$args[$i] = pdl($args[$i]) unless(UNIVERSAL::isa($args[$i],'PDL'));
 	    }
 	    if( ref($args[$#args]) ne 'ARRAY' ) {
-		die "Last argument to 'labels' plot type must be an array ref!";
+		barf "Last argument to 'labels' plot type must be an array ref!";
 	    }
 	} else {
 	    for my $i(0..$#args) {
@@ -926,7 +926,7 @@ sub plot {
 	##############################
 	# Now check options
 	unless(@args == $pt->{args}->[0]  or  @args == $pt->{args}->[1]) {
-	    die sprintf("plot style %s requires %d or %d columns; you gave %d\n",$ptn,$pt->{args}->[0],$pt->{args}->[1],0+@args);
+	    barf sprintf("plot style %s requires %d or %d columns; you gave %d\n",$ptn,$pt->{args}->[0],$pt->{args}->[1],0+@args);
 	}
 
 	# Add an index variable if needed
@@ -951,13 +951,13 @@ sub plot {
 	}
 	my $dmax = $dims->mv(1,0)->maximum;
 	unless( ( ($dims==1)  | ($dims==$dmax) )->all ) {
-	    die "Data dimensions do not agree in plot.\n";
+	    barf "Data dimensions do not agree in plot.\n";
 	}
 
 	# Check that the number of dimensions is correct...
 	if($dims->dim(0) != $pt->{ndims}->[0]  and
 	   ((!defined($pt->{ndims}->[1])) or ($dims->dim(0) != $pt->{ndims}->[1]))) {
-	    die "Data dimension (".$dims->dim(0)."-D PDLs) is not correct for plot type $ptn";
+	    barf "Data dimension (".$dims->dim(0)."-D PDLs) is not correct for plot type $ptn";
 	}
 
 	# Accumulate x and y ranges...
@@ -1032,10 +1032,10 @@ sub plot {
     }
 
     if($po->{logaxis} =~ m/x/  and  ($po->{xrange}->[0] <= 0   or  $po->{xrange}->[1] <= 0) ) {
-	die "logarithmic X axis requires positive limits (xrange is [$po->{xrange}->[0],$po->{xrange}->[1]])";
+	barf "logarithmic X axis requires positive limits (xrange is [$po->{xrange}->[0],$po->{xrange}->[1]])";
     }
     if($po->{logaxis} =~ m/y/  and  ($po->{yrange}->[0] <= 0   or  $po->{yrange}->[1] <= 0) ) {
-	die "logarithmic Y axis requires positive limits";
+	barf "logarithmic Y axis requires positive limits";
     }
 
     ##############################
@@ -1114,7 +1114,7 @@ sub _convenience_plot{
 
     my @args = @_;
 
-    die "Not enough args to PDL::Graphics::Simple::$type()\n" if( @args < 1 );
+    barf "Not enough args to PDL::Graphics::Simple::$type()\n" if( @args < 1 );
     if( ref($args[0]) eq 'HASH' ) {
 	if( ref($args[1]) eq 'HASH' ) {
 	    $args[1]->{with} = $type;
@@ -1190,7 +1190,7 @@ our $global_object;
 sub erase {
     my $me = shift;
     if(defined($me)) {
-	die "PDL::Graphics::Simple::erase: no arguments, please.";
+	barf "PDL::Graphics::Simple::erase: no arguments, please.";
     }
     if(defined($global_object)) {
 	undef $global_object;
@@ -1221,7 +1221,7 @@ sub hold {
     } elsif(defined($global_object)) {
 	$global_object->{held}=1;
     } else {
-	die "Can't hold a nonexistent window!\n";
+	barf "Can't hold a nonexistent window!\n";
     }
 }
 
@@ -1249,7 +1249,7 @@ sub release {
     } elsif(defined($global_object)) {
 	$global_object->{held} = 0;
     } else {
-	die "Can't release a nonexistent window!\n";
+	barf "Can't release a nonexistent window!\n";
     }
 }
 
@@ -1298,19 +1298,19 @@ sub _regularize_size {
     my $unit = shift;
 
     $unit =~ tr/A-Z/a-z/;
-    die "size specifier unit '$unit' is unrecognized\n" unless($units->{$unit});
+    barf "size specifier unit '$unit' is unrecognized\n" unless($units->{$unit});
 
     unless(ref($size)) {
 	$size = [ $size, $size, 'in' ];
     } elsif(ref($size) ne 'ARRAY') {
-	die "size option requires an ARRAY ref or scalar\n";
+	barf "size option requires an ARRAY ref or scalar\n";
     }
-    die "size array must have at least one element\n" unless(@{$size});
+    barf "size array must have at least one element\n" unless(@{$size});
     $size->[1] = $size->[0]     if(@{$size}==1);
     $size->[2] = 'in'           if(@{$size}==2);
-    die "size array can have at most three elements\n" if(@{$size}>3);
-    die "size array unit '$unit' is unrecognized\n" unless($units->{$unit});
-    die "new: size must be nonnegative\n" unless( $size->[0] > 0   and   $size->[1] > 0 );
+    barf "size array can have at most three elements\n" if(@{$size}>3);
+    barf "size array unit '$unit' is unrecognized\n" unless($units->{$unit});
+    barf "new: size must be nonnegative\n" unless( $size->[0] > 0   and   $size->[1] > 0 );
 
     my $ret = [];
     $ret->[0] = $size->[0] / $units->{$size->[2]} * $units->{$unit};
@@ -1383,13 +1383,13 @@ sub register {
     my $module = shift;
 
     my $modname = "\$${module}::mod";
-    die "PDL::Graphics::Simple::register: tried to register $module \n\t...but $modname wasn't defined.\n"
+    barf "PDL::Graphics::Simple::register: tried to register $module \n\t...but $modname wasn't defined.\n"
 	unless (eval qq{defined($modname) and ref($modname) eq 'HASH';});
 
     my $mod = eval $modname;
 
     for(qw/shortname module engine synopsis pgs_version/) {
-	die "PDL::Graphics::Simple::register: $modname looks fishy; I give up\n"
+	barf "PDL::Graphics::Simple::register: $modname looks fishy; I give up\n"
 	    unless( defined($mod->{$_}));
     }
 
@@ -1526,7 +1526,7 @@ Include Prima support
 
 =head1 REPOSITORY
 
-L<https:/github.com/drzowie/PDL-Graphics-Simple>
+L<https://github.com/PDLPorters/PDL-Graphics-Simple>
 
 =head1 AUTHOR
 

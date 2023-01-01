@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Color::Scheme;
+package Color::Scheme 1.08;
 # ABSTRACT: generate pleasant color schemes
-$Color::Scheme::VERSION = '1.07';
+
 use Carp;
 use List::Util 1.14 qw(min max);
 use POSIX 1.08 qw(floor);
@@ -81,7 +81,7 @@ sub _round { floor( 0.5 + shift ) }
 #pod
 #pod This module is a Perl implementation of Color Schemes
 #pod 2 (L<http://wellstyled.com/tools/colorscheme2/>), a color scheme generator.
-#pod Start by visitng the Color Schemes 2 web site and playing with the colors.
+#pod Start by visiting the Color Schemes 2 web site and playing with the colors.
 #pod When you want to generate those schemes on the fly, begin using this module.
 #pod The descriptions herein don't make too much sense without actually seeing the
 #pod colorful results.
@@ -670,7 +670,7 @@ Color::Scheme - generate pleasant color schemes
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 
@@ -700,7 +700,7 @@ version 1.07
 
 This module is a Perl implementation of Color Schemes
 2 (L<http://wellstyled.com/tools/colorscheme2/>), a color scheme generator.
-Start by visitng the Color Schemes 2 web site and playing with the colors.
+Start by visiting the Color Schemes 2 web site and playing with the colors.
 When you want to generate those schemes on the fly, begin using this module.
 The descriptions herein don't make too much sense without actually seeing the
 colorful results.
@@ -717,6 +717,16 @@ colors, but the red-yellow-blue combination is used here. This deformation also
 causes incompatibility in color conversions from RGB-values. Therefore, the RGB
 input (eg. the HTML hex values like #F854A9) is not exact, the conversion is
 rough and sometimes may produce slightly different color."
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -950,6 +960,10 @@ Ian Langworth <ian@cpan.org>
 =item *
 
 Ricardo Signes <rjbs@cpan.org>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

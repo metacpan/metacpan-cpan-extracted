@@ -1,4 +1,4 @@
-package Role::Identifiable 0.008;
+package Role::Identifiable 0.009;
 # ABSTRACT: a thing you can identify somehow
 
 use strict;
@@ -29,7 +29,7 @@ Role::Identifiable - a thing you can identify somehow
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 DESCRIPTION
 
@@ -51,6 +51,12 @@ for any reason, and there is no promise that patches will be accepted to lower
 the minimum required perl.
 
 =head1 AUTHOR
+
+Ricardo Signes <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
 
 Ricardo Signes <rjbs@semiotic.systems>
 

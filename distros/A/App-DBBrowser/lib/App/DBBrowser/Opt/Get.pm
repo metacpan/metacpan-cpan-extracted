@@ -22,16 +22,14 @@ sub defaults {
     my $defaults = {
         G => {
             auto_limit           => 0,
+            base_indent          => 1,
+            file_find_warnings   => 0,
             menu_memory          => 1,
             metadata             => 0,
             operators            => [ "REGEXP", "REGEXP_i", " = ", " != ", " < ", " > ", "IS NULL", "IS NOT NULL" ],
             plugins              => [ 'SQLite', 'mysql', 'Pg', 'Firebird' ],
             qualified_table_name => 0,
             quote_identifiers    => 1,
-            thsd_sep             => ',',
-            base_indent          => 1,
-            file_find_warnings   => 0,
-            round_precision_sign => 0,
         },
         alias => {
             select        => 0,
@@ -70,13 +68,13 @@ sub defaults {
             union_all => 0,
         },
         table => {
-            binary_filter     => 0,
-            binary_string     => 'BNRY',
             codepage_mapping  => 0, # not an option, always 0
             hide_cursor       => 0, # not an option, always 0
             page              => 2, # not an option, always 2
+
+            binary_filter     => 0,
+            binary_string     => 'BNRY',
             color             => 0,
-            decimal_separator => '.',
             min_col_width     => 30,
             mouse             => 0,
             progress_bar      => 40_000,
@@ -112,24 +110,44 @@ sub defaults {
             field_l_trim  => '\s+',
             field_r_trim  => '\s+',
         },
-        csv => {
-            sep_char            => ',',
-            quote_char          => '"',
-            escape_char         => '"',
-            eol                 => '',
+        csv_in => {
+            auto_diag => 1,  # not an option, always 1
+
+            sep_char    => ',',
+            quote_char  => '"',
+            escape_char => '"',
+            eol         => undef,
+            comment_str => undef,
 
             allow_loose_escapes => 0,
             allow_loose_quotes  => 0,
             allow_whitespace    => 0,
-            auto_diag           => 1,
             blank_is_undef      => 1,
             binary              => 1,
+            decode_utf8         => 1,
             empty_is_undef      => 0,
+            skip_empty_rows     => 0,
         },
         export => {
             export_dir      => $sf->{i}{home_dir},
             add_extension   => 0,
-            export_encoding => 'UTF-8',
+            file_encoding   => 'UTF-8',
+        },
+        csv_out => {
+            auto_diag => 1,  # not an option, always 1
+
+            sep_char    => ',',
+            quote_char  => '"',
+            escape_char => '"',
+            eol         => undef,
+            undef_str   => undef,
+
+            always_quote => 0,
+            binary       => 1,
+            escape_null  => 1,
+            quote_binary => 1,
+            quote_empty  => 0,
+            quote_space  => 1,
         },
     };
     return $defaults                   if ! $section;
@@ -145,6 +163,16 @@ sub read_config_files {
     my $file_fs = $sf->{i}{f_settings};
     if ( -f $file_fs && -s $file_fs ) {
         my $tmp = $ax->read_json( $file_fs ) // {};
+
+        ####################################################
+        if ( exists $tmp->{'csv'} ) {
+            for my $opt ( keys %{$tmp->{'csv'}} ) {
+                $tmp->{'csv_in'}{$opt} = $tmp->{'csv'}{$opt};
+            }
+            delete $tmp->{'csv'};
+        }
+        ####################################################
+
         for my $section ( keys %$tmp ) {
             for my $opt ( keys %{$tmp->{$section}} ) {
                 $o->{$section}{$opt} = $tmp->{$section}{$opt} if exists $o->{$section}{$opt};

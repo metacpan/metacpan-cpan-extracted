@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::API::Gtk3::GdkWin32;
 # ABSTRACT: Load the GdkWin32 library
-$Intertangle::API::Gtk3::GdkWin32::VERSION = '0.006';
+$Intertangle::API::Gtk3::GdkWin32::VERSION = '0.007';
 use Glib::Object::Introspection;
 use FFI::Platypus;
 use FFI::CheckLib 0.06;
@@ -69,7 +69,7 @@ Intertangle::API::Gtk3::GdkWin32 - Load the GdkWin32 library
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 AUTHOR
 

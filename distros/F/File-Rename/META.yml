@@ -21,5 +21,6 @@ no_index:
     - inc
 requires:
   Getopt::Long: '0'
-version: '1.992'
+  perl: '5.006000'
+version: '2.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

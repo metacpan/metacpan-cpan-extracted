@@ -1,5 +1,17 @@
 Revision history for Perl extension File::Rename.
 
+2.00    Robin Barker 2022-12-31
+    rename script requires options before code/files
+
+    New script unsafe-rename with no_require_order
+
+    Removed Build.PL from distribution
+    
+1.99_9  Robin Barker 2022-12-28
+    Remove Build.PL from distribution
+
+    Set MIN_PERL_VERSION in Makefile.PL
+
 1.992   Robin Barker 2022-12-27
     Reinstate shebang line
     https://rt.cpan.org/Ticket/Display.html?id=145711
@@ -44,7 +56,7 @@ Revision history for Perl extension File::Rename.
 1.31    Robin Barker 2022-05-07
     Add explicit LICENCE field
     Fix tests for perl 5.8.* and cygwin
-    
+
 1.30_03 Robin Barker 2022-04-23
     Add explicit 'cygwin' in test lib and script
 

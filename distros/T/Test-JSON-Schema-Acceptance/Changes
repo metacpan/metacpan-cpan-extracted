@@ -1,5 +1,15 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.018     2022-12-30 22:15:58Z
+        - use two separate json encoders, to avoid inadvertently changing
+          serialization results in the middle of testing
+        - prints actual result on test failure, for nicer diagnostics in
+          cpantesters reports
+        - validate each test schema against the proper metaschema, if a
+          $schema keyword exists, rather than the specification metaschema
+        - updated test suite:
+          https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/69acf52990b004240839ae19b4bec8fb01d50876...d21ed578aeb13b55dfe3604db53adb4750e1abc3
+
 1.017     2022-07-23 21:55:43Z
         - now allowing additional (ignored) properties in test data, to be
           forward-compatible with developments to the test suite

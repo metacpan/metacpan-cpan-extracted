@@ -13,6 +13,7 @@ lib/Firefox/Marionette/Profile.pm
 lib/Firefox/Marionette/Proxy.pm
 lib/Firefox/Marionette/ShadowRoot.pm
 lib/Firefox/Marionette/Window/Rect.pm
+lib/Firefox/Marionette/Display.pm
 lib/Firefox/Marionette/Element.pm
 lib/Firefox/Marionette/Element/Rect.pm
 lib/Firefox/Marionette/Exception.pm
@@ -33,12 +34,14 @@ README
 README.md
 ca-bundle-for-firefox
 check-firefox-certificate-authorities
+mozilla-head-check
 setup-for-firefox-marionette-build.sh
 ssh-auth-cmd-marionette
 firefox-passwords
 t/author/bulk_test.pl
 t/data/elements.html
 t/data/iframe.html
+t/data/visible.html
 t/data/logins.json
 t/data/keepass1.xml
 t/data/keepassxs.csv

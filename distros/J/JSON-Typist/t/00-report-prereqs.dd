@@ -24,6 +24,7 @@ do { my $x = {
                                       'Test::Deep' => '1.126',
                                       'Test::Deep::Cmp' => '0',
                                       'overload' => '0',
+                                      'perl' => '5.012',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

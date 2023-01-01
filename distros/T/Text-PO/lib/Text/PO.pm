@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO.pm
-## Version v0.2.4
+## Version v0.4.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2018/06/21
-## Modified 2022/11/23
+## Modified 2022/12/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -29,7 +29,7 @@ BEGIN
     use Scalar::Util;
     use Text::PO::Element;
     use constant HAS_LOCAL_TZ => ( eval( qq{DateTime::TimeZone->new( name => 'local' );} ) ? 1 : 0 );
-    our $VERSION = 'v0.2.4';
+    our $VERSION = 'v0.4.1';
 };
 
 use strict;
@@ -337,14 +337,16 @@ sub exists
 {
     my $self = shift( @_ );
     my $elem = shift( @_ ) || return( $self->error( "No element to check existence was provided." ) );
-    return( $self->error( "The element provided is not an Text::PO::Element object" ) ) if( !ref( $elem ) || ( ref( $elem ) && !$elem->isa( 'Text::PO::Element' ) ) );
+    return( $self->error( "The element provided is not an Text::PO::Element object" ) ) if( !$self->_is_a( $elem => 'Text::PO::Element' ) );
+    my $opts = $self->_get_args_as_hash( @_ );
+    $opts->{msgid_only} //= 0;
     my $elems = $self->{elements};
-    ## No need to go further if the object provided does not even have a msgid
+    # No need to go further if the object provided does not even have a msgid
     return(0) if( !length( $elem->msgid ) );
     foreach my $e ( @$elems )
     {
-        if( $e->msgid eq $elem->msgid &&
-            $e->msgstr eq $elem->msgstr )
+        if( ( $opts->{msgid_only} && $e->msgid eq $elem->msgid ) ||
+            ( $e->msgid eq $elem->msgid && $e->msgstr eq $elem->msgstr ) )
         {
             if( length( $elem->context ) )
             {
@@ -537,6 +539,8 @@ sub parse
             $header .= $_;
         }
     }
+    # Remove trailing blank lines from header
+    $header =~ s/(^[[:blank:]\h]*\#[[:blank:]\h]*\n$)+\Z//gms;
     ## Make sure to position ourself after the initial blank line if any, since blank lines are used as separators
     ## Actually, no we don't care. Blocks are: maybe some comments, msgid then msgstr. That's how we delimit them
     ## $_ = $io->getline while( /^[[:blank:]]*$/ && defined( $_ ) );
@@ -995,8 +999,8 @@ sub source { return( shift->_set_get_hash_as_object( 'source', @_ ) ); }
 sub sync
 {
     my $self = shift( @_ );
-    ## a filehandle, or a filename?
-    ## my $this = shift( @_ ) || return( $self->error( "No file or filehandle provided." ) );
+    # a filehandle, or a filename?
+    # my $this = shift( @_ ) || return( $self->error( "No file or filehandle provided." ) );
     my $this;
     $this = shift( @_ ) if( scalar( @_ ) && ( ( @_ % 2 ) || ( !( @_ % 2 ) && ref( $_[1] ) eq 'HASH' ) ) );
     my $opts = $self->_get_args_as_hash( @_ );
@@ -1067,7 +1071,7 @@ sub sync_fh
     for( my $i = 0; $i < scalar( @$elems ); $i++ )
     {
         my $e = $elems->[$i];
-        if( !$self->exists( $e ) )
+        if( !$self->exists( $e, { msgid_only => 1 } ) )
         {
             my $removedObj = splice( @$elems, $i, 1 );
             push( @removed, $removedObj ) if( $removedObj );
@@ -1078,7 +1082,7 @@ sub sync_fh
     my @added = ();
     foreach my $e ( @$elems )
     {
-        if( !$po->exists( $e ) )
+        if( !$po->exists( $e, { msgid_only => 1 } ) )
         {
             $po->add_element( $e );
             push( @added, $e );
@@ -1330,7 +1334,7 @@ Text::PO - Read and write PO files
 
 =head1 VERSION
 
-    v0.2.4
+    v0.4.1
 
 =head1 DESCRIPTION
 
@@ -1374,23 +1378,23 @@ All options take a boolean value. Possible options are:
 
 =over 4
 
-=item I<indent>
+=item * C<indent>
 
 If true, L<JSON> will indent the data.
 
 Default to false.
 
-=item I<pretty>
+=item * C<pretty>
 
 If true, this will return a human-readable json data.
 
-=item I<sort>
+=item * C<sort>
 
 If true, this will instruct L<JSON> to sort the keys. This makes it slower to generate.
 
 It defaults to false, which will use a pseudo random order set by perl.
 
-=item I<utf8>
+=item * C<utf8>
 
 If true, L<JSON> will utf8 encode the data.
 
@@ -1448,7 +1452,17 @@ Sets or gets the character set encoding for the GNU PO file. Typically this shou
 
 =head2 exists
 
-Given a L<Text::PO::Element> object, it will check if this object exists in its current stack.
+Given a L<Text::PO::Element> object, it will check if this object exists in its current stack. To achieve this, it will check if both the C<msgid> and the C<msgstr> exists and match. If you only want to check if the C<msgid> exists, use the C<msgid_only> option as explained below.
+
+It takes an optional hash or hash reference of options as follows:
+
+=over 4
+
+=item * C<msgid_only>
+
+Boolean. If true, this will check only if the C<msgid> already exists, and not the corresponding C<msgstr>
+
+=back
 
 It returns true of false accordingly.
 

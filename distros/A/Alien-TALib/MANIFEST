@@ -8,3 +8,4 @@ META.json
 META.yml
 README.md
 t/00_use.t
+t/01_basic.t

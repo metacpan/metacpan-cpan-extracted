@@ -4,12 +4,12 @@ use warnings;
 use List::Util 'max', 'all';
 use DBIx::Class::ResultDDL;
 use Carp;
-use Data::Dumper ();
-sub deparse { Data::Dumper->new([$_[0]])->Terse(1)->Quotekeys(0)->Sortkeys(1)->Indent(0)->Dump }
+sub deparse;
+sub deparse_hashkey;
 use namespace::clean;
 
 # ABSTRACT: Modify Schema Loader to generate ResultDDL notation
-our $VERSION = '2.01'; # VERSION
+our $VERSION = '2.02'; # VERSION
 
 
 #sub _write_classfile {
@@ -33,18 +33,23 @@ sub generate_column_info_sugar {
 
 	my %col_info= %$orig_col_info;
 	my $stmt= _get_data_type_sugar(\%col_info, $class_settings);
-	$stmt .= ' null' if delete $col_info{is_nullable};
-	$stmt .= ' default('.deparse(delete $col_info{default_value}).'),' if exists $col_info{default_value};
+	$stmt .= ' null'
+		if delete $col_info{is_nullable};
+	$stmt .= ' default('.deparse(delete $col_info{default_value}).'),'
+		if exists $col_info{default_value};
 	# add sugar for inflate_json if the serializer class is JSON, but not if the package feature inflate_json
 	# was enabled and the column type is flagged as json.
 	$stmt .= ' inflate_json' if 'JSON' eq ($col_info{serializer_class}||'');
+	$stmt .= ' fk' if delete $col_info{is_foreign_key};
 	
 	# Test the syntax for equality to the original
 	my $out;
 	eval "package $checkpkg; \$out= DBIx::Class::ResultDDL::expand_col_options(\$checkpkg, $stmt);";
 	defined $out or croak "Error verifying generated ResultDDL for $class $col_name: $@";
 	
-	if ($out->{'extra.unsigned'}) { $out->{extra}{unsigned}= delete $out->{'extra.unsigned'}; }
+	if ($out->{'extra.unsigned'}) {
+		$out->{extra}{unsigned}= delete $out->{'extra.unsigned'};
+	}
 
 	# Ignore the problem where 'integer' generates a default size for mysql that wasn't
 	# in the Schema Loader spec.  TODO: add an option to skip generating this.
@@ -64,16 +69,87 @@ sub generate_column_info_sugar {
 		# remove trailing comma
 		$stmt =~ s/,\s*$//;
 		# dump the rest, and done.
-		$stmt .= ', '._maybe_quote_identifier($_).' => '.deparse($col_info{$_})
+		$stmt .= ', '.&_deparse_hashkey.' => '.deparse($col_info{$_})
 			for sort keys %col_info;
 	}
 	else {
-		warn "Unable to use ResultDDL sugar '$stmt'\n  ".deparse({ %col_info, %$out })." ne ".deparse($orig_col_info)."\n";
-		$stmt= join(', ', map _maybe_quote_identifier($_).' => '.deparse($orig_col_info->{$_}), sort keys %$orig_col_info);
+		warn "Unable to use ResultDDL sugar '$stmt'\n  "
+			.deparse({ %col_info, %$out })." ne ".deparse($orig_col_info)."\n";
+		$stmt= join(', ',
+			map &_deparse_hashkey.' => '.deparse($orig_col_info->{$_}),
+			sort keys %$orig_col_info
+		);
 	}
 	return $stmt;
 }
 
+
+sub generate_relationship_sugar {
+	my ($self, $class, $method, $relname, $foreignclass, $colmap, $options)= @_;
+	#use DDP; &p(['before', @_[1..$#_]]);
+	my $expr= '';
+	# The $foreignclass $colmap arguments can be combined into a simpler
+	#  hashref of { local_col => 'ForeignClass.colname' } as long as some expectations hold:
+	my ($parent_ns)= ($class =~ /^(.*?::)([^:]+)$/);
+	if (defined $parent_ns and !ref $foreignclass and (!ref $colmap || ref $colmap eq 'HASH')) {
+		# Can we use a shortened class name for the foreign table?
+		if ($foreignclass =~ /^(.*?::)([^:]+)$/ and $1 eq $parent_ns) {
+			$foreignclass= $2;
+		}
+		my %newmap= ref $colmap eq 'HASH'? (%$colmap) : ($colmap => $colmap);
+		# Just in case SchemaLoader prefixed them with 'self.' or 'foreign.'...
+		s/^self[.]// for values %newmap;
+		%newmap= reverse %newmap;
+		s/^foreign[.]// for values %newmap;
+		# Apply the foreign class name to the first column in the map
+		my ($first_key)= sort keys %newmap;
+		$newmap{$first_key}= $foreignclass . '.' . $newmap{$first_key};
+		$expr .= deparse(\%newmap);
+	} else {
+		$expr .= deparse($foreignclass, $colmap);
+	}
+	if ($options && keys %$options) {
+		$expr .= ', ' . $self->generate_relationship_attr_sugar($options);
+	}
+
+	# Test the syntax for equality to the original
+	my $checkpkg= $self->_get_class_check_namespace($class);
+	my @out;
+	eval "package $checkpkg; \@out= DBIx::Class::ResultDDL::expand_relationship_params(\$class, \$method, \$relname, $expr);";
+	@out or croak "Error verifying generated ResultDDL for $class $method $relname: $@";
+
+	#use DDP; &p(['after', @out, $expr]);
+
+	return $method . ' ' . deparse_hashkey($relname) . ' => ' . $expr . ';';
+}
+
+
+sub generate_relationship_attr_sugar {
+	my ($self, $orig_options)= @_;
+	my %options= %$orig_options;
+	my @expr;
+	if (defined $options{on_update} && defined $options{on_delete}
+		&& $options{on_update} eq $options{on_delete}
+	) {
+		my $val= delete $options{on_update};
+		delete $options{on_delete};
+		push @expr, $val eq 'CASCADE'? 'ddl_cascade'
+			: $val eq 'RESTRICT'? 'ddl_cascade(0)'
+			: 'ddl_cascade('.deparse($val).')'
+	}
+	if (defined $options{cascade_copy} && defined $options{cascade_delete}
+		&& $options{cascade_copy} eq $options{cascade_delete}
+	) {
+		my $val= delete $options{cascade_copy};
+		delete $options{cascade_delete};
+		push @expr, $val eq '1'? 'dbic_cascade'
+			: 'dbic_cascade('.deparse($val).')'
+	}
+	push @expr, substr(deparse(\%options),2,-2) if keys %options;
+	return join ', ', @expr
+}
+
+my %rel_methods= map +($_ => 1), qw( belongs_to might_have has_one has_many );
 sub _dbic_stmt {
 	my ($self, $class, $method)= splice(@_, 0, 3);
 	$self->{_MyLoader_use_resultddl}{$class}++
@@ -86,7 +162,7 @@ sub _dbic_stmt {
 		while (@_) {
 			my ($col_name, $col_info)= splice(@_, 0, 2);
 			push @col_defs, [
-				_maybe_quote_identifier($col_name),
+				deparse_hashkey($col_name),
 				$self->generate_column_info_sugar($class, $col_name, $col_info)
 			];
 		}
@@ -99,6 +175,9 @@ sub _dbic_stmt {
 	}
 	elsif ($method eq 'set_primary_key') {
 		$self->_raw_stmt($class, q|primary_key |.deparse(@_).';');
+	}
+	elsif ($rel_methods{$method} && @_ == 4) {
+		$self->_raw_stmt($class, $self->generate_relationship_sugar($class, $method, @_));
 	}
 	else {
 		$self->next::method($class, $method, @_);
@@ -170,9 +249,40 @@ sub _get_data_type_sugar {
 	return $pl;
 }
 
-sub _maybe_quote_identifier {
+sub _deparse_scalar {
+	return $_ if /^(0|[1-9][0-9]*)$/;
+	my $x= $_;
+	$x =~ s/\\/\\\\/g;
+	$x =~ s/'/\\'/g;
+	return "'$x'";
+}
+sub _deparse_scalarref {
+	"\\" . (map &_deparse_scalar, $$_)[0]
+}
+sub deparse_hashkey { local $_= $_[0]; &_deparse_hashkey }
+sub _deparse_hashkey {
 	# TODO: complete support for perl's left-hand of => operator parsing rule
-	$_[0] =~ /^[A-Za-z0-9_]+$/? $_[0] : deparse($_[0]);
+	/^[A-Za-z_][A-Za-z0-9_]*$/? $_ : &_deparse_scalar;
+}
+sub _deparse_hashref {
+	my $h= $_;
+	return '{ '.join(', ', map +(&_deparse_hashkey.' => '.deparse($h->{$_})), sort keys %$h).' }'
+}
+sub _deparse_array {
+	return '[ '.join(', ', map &_deparse, @$_).' ]'
+}
+sub _deparse {
+	!ref? &_deparse_scalar
+	: ref eq 'SCALAR'? &_deparse_scalarref
+	: ref eq 'ARRAY'? &_deparse_arrayref
+	: ref eq 'HASH'? &_deparse_hashref
+	: do {
+		require Data::Dumper;
+		Data::Dumper->new([$_])->Terse(1)->Quotekeys(0)->Sortkeys(1)->Indent(0)->Dump;
+	}
+}
+sub deparse {
+	join(', ', map &_deparse, @_);
 }
 
 our %per_class_check_namespace;
@@ -188,6 +298,9 @@ sub _get_class_check_namespace {
 	});
 }
 
+
+
+
 1;
 
 __END__
@@ -200,17 +313,16 @@ __END__
 
 DBIx::Class::ResultDDL::SchemaLoaderMixin - Modify Schema Loader to generate ResultDDL notation
 
-=head1 VERSION
-
-version 2.01
-
 =head1 SYNOPSIS
 
   package MyLoader;
   use parent
     'DBIx::Class::ResultDDL::SchemaLoaderMixin', # mixin first
     'DBIx::Class::Schema::Loader::DBI::mysql';
+  
   1;
+
+You can then use it with the loader_class option:
 
   use DBIx::Class::Schema::Loader qw/ make_schema_at /;
   my %options= ...;
@@ -240,6 +352,7 @@ that SchemaLoader doesn't know about:
     }
     $self->next::method($class, $colname, $colinfo);
   }
+  
   1;
 
 =head1 DESCRIPTION
@@ -283,9 +396,37 @@ For instance, you might supply datetimes or serializer classes that
 
 You could also munge the returned string, or just create a string if your own.
 
+=head2 generate_relationship_sugar
+
+  $perl_stmt= $loader->generate_relationship_sugar(
+    $class, $rel_type, %rel_name, $foreign_class, $col_map, $attrs
+  );
+
+This method takes the typical arguments of one of the relationship-defining
+methods of DBIC and returns the equivalent sugar-ized form.  (namely, it
+attempts to convert the $foreign_class and $col_map into the simplified
+version used by ResultDDL, and replace $attrs with sugar functions where
+available.)
+
+=head2 generate_relationship_attr_sugar
+
+  $perl_expr= $loader->generate_relationship_attr_sugar(\%attrs);
+
+This is a piece of L</generate_relationship_sugar> that deals only with the
+replacement of relationship attributes with equivalent sugar functions.
+
+=head1 THANKS
+
+Thanks to L<Clippard Instrument Laboratory Inc.|http://www.clippard.com/>
+for supporting open source, including portions of this module.
+
 =head1 AUTHOR
 
 Michael Conrad <mconrad@intellitree.com>
+
+=head1 VERSION
+
+version 2.02
 
 =head1 COPYRIGHT AND LICENSE
 

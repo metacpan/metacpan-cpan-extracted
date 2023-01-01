@@ -1,6 +1,6 @@
 package DNS::Oterica::Node::Domain;
 # ABSTRACT: a domain node
-$DNS::Oterica::Node::Domain::VERSION = '0.313';
+$DNS::Oterica::Node::Domain::VERSION = '0.314';
 use Moose;
 extends 'DNS::Oterica::Node';
 
@@ -33,7 +33,7 @@ DNS::Oterica::Node::Domain - a domain node
 
 =head1 VERSION
 
-version 0.313
+version 0.314
 
 =head1 OVERVIEW
 
@@ -58,11 +58,11 @@ The fully qualified domain name for this domain.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

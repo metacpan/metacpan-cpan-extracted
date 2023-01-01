@@ -1,6 +1,6 @@
-package Config::MVP::Reader::Finder;
+package Config::MVP::Reader::Finder 2.200013;
 # ABSTRACT: a reader that finds an appropriate file
-$Config::MVP::Reader::Finder::VERSION = '2.200012';
+
 use Moose;
 extends 'Config::MVP::Reader';
 
@@ -139,7 +139,7 @@ Config::MVP::Reader::Finder - a reader that finds an appropriate file
 
 =head1 VERSION
 
-version 2.200012
+version 2.200013
 
 =head1 DESCRIPTION
 
@@ -157,6 +157,18 @@ which reading is delegated will be responsible for building the assembler,
 unless a Finder subclass overrides C<build_assembler> to set a default across
 all possible delegates.
 
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 METHODS
 
 =head2 default_search_path
@@ -168,11 +180,11 @@ method should return a list, and by default returns:
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo Signes.
+This software is copyright (c) 2022 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

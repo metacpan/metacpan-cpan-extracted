@@ -1,8 +1,5 @@
 use 5.14.0;
-package Router::Dumb::Route;
-{
-  $Router::Dumb::Route::VERSION = '0.005';
-}
+package Router::Dumb::Route 0.006;
 use Moose;
 # ABSTRACT: just one dumb route for use in a big dumb router
 
@@ -10,7 +7,21 @@ use Router::Dumb::Match;
 
 use namespace::autoclean;
 
+#pod =head1 OVERVIEW
+#pod
+#pod Router::Dumb::Route objects represent paths that a L<Router::Dumb> object can
+#pod route to.  They are usually created by calling the
+#pod C<L<add_route|Router::Dumb/add_route>> method on a router.
+#pod
+#pod =cut
 
+#pod =attr target
+#pod
+#pod The route's target is a string that can be used, for example, to give a file
+#pod path or URL for the resource to which the user should be directed.  Its meaning
+#pod is left up to Router::Dumb's user.
+#pod
+#pod =cut
 
 has target => (
   is  => 'ro',
@@ -18,6 +29,23 @@ has target => (
   required => 1,
 );
 
+#pod =attr parts
+#pod
+#pod The C<parts> attribute is an arrayref of strings that make up the route.
+#pod
+#pod =method parts
+#pod
+#pod This method returns a list of the contents of the C<parts> attribute.
+#pod
+#pod =method part_count
+#pod
+#pod =method get_part
+#pod
+#pod   my $part = $route->get_part( $n );
+#pod
+#pod This returns the string located at position C<$n> in the parts array.
+#pod
+#pod =cut
 
 has parts => (
   isa => 'ArrayRef[Str]',
@@ -30,6 +58,12 @@ has parts => (
   },
 );
 
+#pod =method path
+#pod
+#pod This returns the C</>-joined list of path parts, or the empty string if
+#pod C<parts> is empty.
+#pod
+#pod =cut
 
 sub path {
   my ($self) = @_;
@@ -37,6 +71,14 @@ sub path {
   return $path // '';
 }
 
+#pod =method normalized_path
+#pod
+#pod This method behaves like C<path>, but placeholder parts are replaced with
+#pod numbers so that, for example, instead of returning C<foo/:bar/baz/:quux> we
+#pod would return C<foo/:1/baz/:2>.  This normalization is used to prevent route
+#pod collision.
+#pod
+#pod =cut
 
 sub normalized_path {
   my ($self) = @_;
@@ -47,6 +89,11 @@ sub normalized_path {
   return join q{/}, map { /^:/ ? (':' . $i++) : $_ } @parts;
 }
 
+#pod =method is_slurpy
+#pod
+#pod This method returns true if the path ends in the slurpy C<*>.
+#pod
+#pod =cut
 
 has is_slurpy => (
   is   => 'ro',
@@ -56,6 +103,12 @@ has is_slurpy => (
   default  => sub { $_[0]->part_count && $_[0]->get_part(-1) eq '*' },
 );
 
+#pod =method has_params
+#pod
+#pod This method returns true if any of the route's path parts is a placeholder
+#pod (i.e., starts with a colon).
+#pod
+#pod =cut
 
 has has_params => (
   is   => 'ro',
@@ -65,6 +118,22 @@ has has_params => (
   default  => sub { !! (grep { /^:/ } $_[0]->parts) },
 );
 
+#pod =attr constraints
+#pod
+#pod The C<constraints> attribute holds a hashref of L<Moose type
+#pod constraints|Moose::Meta::TypeConstraint> objects, up to one for each
+#pod placeholder.
+#pod
+#pod =method constraint_names
+#pod
+#pod This method returns a list of all the placeholders for which a constraint is
+#pod registered.
+#pod
+#pod =method constraint_for
+#pod
+#pod   my $tc = $route->constraint_for( $placeholder_name );
+#pod
+#pod =cut
 
 has constraints => (
   isa => 'HashRef',
@@ -107,6 +176,15 @@ sub _match {
   });
 }
 
+#pod =method check
+#pod
+#pod   my $match_or_undef = $route->check( $str );
+#pod
+#pod This is the method used by the router to see if each route will accept the
+#pod string.  If it matches, it returns a L<match object|Router::Dumb::Match>.
+#pod Otherwise, it returns false.
+#pod
+#pod =cut
 
 sub check {
   my ($self, $str) = @_;
@@ -150,19 +228,31 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Router::Dumb::Route - just one dumb route for use in a big dumb router
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 OVERVIEW
 
 Router::Dumb::Route objects represent paths that a L<Router::Dumb> object can
 route to.  They are usually created by calling the
 C<L<add_route|Router::Dumb/add_route>> method on a router.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 ATTRIBUTES
 
@@ -236,11 +326,11 @@ Otherwise, it returns false.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Ricardo Signes.
+This software is copyright (c) 2022 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,10 +1,10 @@
-package Dist::Zilla::Plugin::TaskWeaver;
+package Dist::Zilla::Plugin::TaskWeaver 0.101629;
 # ABSTRACT: a PodWeaver plugin used to build Task distributions
-$Dist::Zilla::Plugin::TaskWeaver::VERSION = '0.101628';
+
 use Moose;
 extends qw(Dist::Zilla::Plugin::PodWeaver);
-with 'Dist::Zilla::Role::FileGatherer' => { -excludes => 'mvp_aliases' },
-     'Dist::Zilla::Role::PrereqSource' => { -excludes => 'mvp_aliases' };
+with 'Dist::Zilla::Role::FileGatherer' => { -excludes => [ qw(mvp_aliases mvp_multivalue_args) ] },
+     'Dist::Zilla::Role::PrereqSource' => { -excludes => [ qw(mvp_aliases mvp_multivalue_args) ] };
 
 use namespace::autoclean;
 
@@ -142,7 +142,7 @@ Dist::Zilla::Plugin::TaskWeaver - a PodWeaver plugin used to build Task distribu
 
 =head1 VERSION
 
-version 0.101628
+version 0.101629
 
 =head1 DESCRIPTION
 
@@ -176,6 +176,16 @@ Both C<min_version> and C<reason> are optional, although you can't give a
 reason without giving a version.  If a reason is given, it will be included in
 the Pod to explain why the specific version is required.
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 WARNING
 
 TaskWeaver works, but relies on doing some pretty evil stuff.  It may
@@ -205,11 +215,11 @@ attribute.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Apocalypse Glenn Fowler
+=for stopwords Apocalypse Glenn Fowler Ricardo Signes
 
 =over 4
 
@@ -221,11 +231,15 @@ Apocalypse <APOCAL@cpan.org>
 
 Glenn Fowler <cebjyre@cpan.org>
 
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Ricardo Signes.
+This software is copyright (c) 2022 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

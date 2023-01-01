@@ -1,5 +1,8 @@
 Revision history for Text-SlackEmoji
 
+0.009     2022-12-31 16:51:33-05:00 America/New_York
+        - update author contact info
+
 0.008     2022-03-23 12:59:20-04:00 America/New_York
         - updates for Unicode 14 and perl v5.35.4
 

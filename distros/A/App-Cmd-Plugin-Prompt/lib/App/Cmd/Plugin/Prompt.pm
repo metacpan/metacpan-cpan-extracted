@@ -1,9 +1,6 @@
 use strict;
 use warnings;
-package App::Cmd::Plugin::Prompt;
-{
-  $App::Cmd::Plugin::Prompt::VERSION = '1.005';
-}
+package App::Cmd::Plugin::Prompt 1.006;
 # ABSTRACT: plug prompting routines into your commands
 use App::Cmd::Setup -plugin => {
   exports => [ qw(prompt_str prompt_yn prompt_any_key) ],
@@ -11,6 +8,82 @@ use App::Cmd::Setup -plugin => {
 
 use Term::ReadKey;
 
+#pod =head1 SYNOPSIS
+#pod
+#pod In your app:
+#pod
+#pod   package MyApp;
+#pod   use App::Cmd::Setup -app => {
+#pod     plugins => [ qw(Prompt) ],
+#pod   };
+#pod
+#pod In your command:
+#pod
+#pod   package MyApp::Command::dostuff;
+#pod   use MyApp -command;
+#pod
+#pod   sub run {
+#pod     my ($self, $opt, $args) = @_;
+#pod
+#pod     return unless prompt_yn('really do stuff?', { default => 1 });
+#pod
+#pod     ...
+#pod   }
+#pod
+#pod =head1 SUBROUTINES
+#pod
+#pod =head2 prompt_str
+#pod
+#pod   my $input = prompt_str($prompt, \%opt)
+#pod
+#pod This prompts a user for string input.  It can be directed to
+#pod persist until input is 'acceptable'.
+#pod
+#pod Valid options are:
+#pod
+#pod =over 4
+#pod
+#pod =item *
+#pod
+#pod B<input:> optional coderef, which, when invoked, returns the
+#pod user's response; default is to read from STDIN.
+#pod
+#pod =item *
+#pod
+#pod B<output:> optional coderef, which, when invoked (with two
+#pod arguments: the prompt and the choices/default), should
+#pod prompt the user; default is to write to STDOUT.
+#pod
+#pod =item *
+#pod
+#pod B<valid:> an optional coderef which any input is passed into
+#pod and which must return true in order for the program to
+#pod continue
+#pod
+#pod =item *
+#pod
+#pod B<default:> may be any string; must pass the 'valid' coderef
+#pod (if given)
+#pod
+#pod =item *
+#pod
+#pod B<choices:> what to display after the prompt; default is
+#pod either the 'default' parameter or nothing
+#pod
+#pod =item *
+#pod
+#pod B<no_valid_default:> do not test the 'default' parameter
+#pod against the 'valid' coderef
+#pod
+#pod =item *
+#pod
+#pod B<invalid_default_error:> error message to throw when the
+#pod 'default' parameter is not valid (does not pass the 'valid'
+#pod coderef)
+#pod
+#pod =back
+#pod
+#pod =cut
 
 sub prompt_str {
   my ($plugin, $cmd, $message, $opt) = @_;
@@ -44,6 +117,19 @@ sub prompt_str {
   return $response;
 }
 
+#pod =head2 prompt_yn
+#pod
+#pod   my $bool = prompt_yn($prompt, \%opt);
+#pod
+#pod This prompts the user for a yes or no response and won't give up until it gets
+#pod one.  It returns true for yes and false for no.
+#pod
+#pod Valid options are:
+#pod
+#pod  default: may be yes or no, indicating how to interpret an empty response;
+#pod           if empty, require an explicit answer; defaults to empty
+#pod
+#pod =cut
 
 sub prompt_yn {
   my ($plugin, $cmd, $message, $opt) = @_;
@@ -75,6 +161,14 @@ sub prompt_yn {
   return lc($response) eq 'y';
 }
 
+#pod =head2 prompt_any_key($prompt)
+#pod
+#pod   my $input = prompt_any_key($prompt);
+#pod
+#pod This routine prompts the user to "press any key to continue."  C<$prompt>, if
+#pod supplied, is the text to prompt with.
+#pod
+#pod =cut
 
 sub prompt_any_key {
   my ($plugin, $cmd, $prompt) = @_;
@@ -87,6 +181,11 @@ sub prompt_any_key {
   print "\n";
 }
 
+#pod =head1 SEE ALSO
+#pod
+#pod L<App::Cmd>
+#pod
+#pod =cut
 
 1;
 
@@ -94,13 +193,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 App::Cmd::Plugin::Prompt - plug prompting routines into your commands
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 SYNOPSIS
 
@@ -123,6 +224,16 @@ In your command:
 
     ...
   }
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 SUBROUTINES
 
@@ -193,7 +304,7 @@ Valid options are:
 
   my $input = prompt_any_key($prompt);
 
-This routine prompts the user to "press any key to continue."  (C<$prompt>, if
+This routine prompts the user to "press any key to continue."  C<$prompt>, if
 supplied, is the text to prompt with.
 
 =head1 SEE ALSO
@@ -202,7 +313,13 @@ L<App::Cmd>
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

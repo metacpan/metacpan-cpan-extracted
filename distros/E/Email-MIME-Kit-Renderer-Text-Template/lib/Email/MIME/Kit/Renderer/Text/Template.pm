@@ -1,4 +1,4 @@
-package Email::MIME::Kit::Renderer::Text::Template 1.101303;
+package Email::MIME::Kit::Renderer::Text::Template 1.101304;
 use Moose;
 with 'Email::MIME::Kit::Role::Renderer';
 # ABSTRACT: render parts of your mail with Text::Template
@@ -78,7 +78,7 @@ Email::MIME::Kit::Renderer::Text::Template - render parts of your mail with Text
 
 =head1 VERSION
 
-version 1.101303
+version 1.101304
 
 =head1 PERL VERSION
 
@@ -105,6 +105,12 @@ These are the arguments that will be passed to C<fill_this_in> along with the
 template, input, and a few required handlers.
 
 =head1 AUTHOR
+
+Ricardo Signes <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
 
 Ricardo Signes <rjbs@semiotic.systems>
 

@@ -1,4 +1,4 @@
-package Email::MIME::Kit::Assembler::TextifyHTML 1.004;
+package Email::MIME::Kit::Assembler::TextifyHTML 1.005;
 # ABSTRACT: textify some HTML arguments to assembly
 
 use Moose;
@@ -99,7 +99,7 @@ Email::MIME::Kit::Assembler::TextifyHTML - textify some HTML arguments to assemb
 
 =head1 VERSION
 
-version 1.004
+version 1.005
 
 =head1 SYNOPSIS
 
@@ -144,6 +144,12 @@ render the part with the parent part's renderer, and then convert the produced
 HTML to text.  This would allow you to use one template for both HTML and text.
 
 =head1 AUTHOR
+
+Ricardo Signes <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
 
 Ricardo Signes <rjbs@semiotic.systems>
 

@@ -1,7 +1,11 @@
 Revision history for Email-MIME-Kit-Assembler-Markdown
 
+0.100009  2022-12-31 21:29:45-05:00 America/New_York
+        - update author contact info
+
 0.100008  2022-10-22 16:18:22-04:00 America/New_York
-        - prep next release
+        - update author contact info
+        - add "what version of perl can I use?" section
 
 0.100007  2018-06-18 17:58:45-04:00 America/New_York (TRIAL RELEASE)
         - render things twice, once with part_type set to "text" and one set to

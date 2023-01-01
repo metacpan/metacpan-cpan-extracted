@@ -1,6 +1,6 @@
-package HTTP::Throwable::Role::Status::RequestURITooLong;
+package HTTP::Throwable::Role::Status::RequestURITooLong 0.028;
 our $AUTHORITY = 'cpan:STEVAN';
-$HTTP::Throwable::Role::Status::RequestURITooLong::VERSION = '0.027';
+
 use Moo::Role;
 
 with(
@@ -23,7 +23,7 @@ HTTP::Throwable::Role::Status::RequestURITooLong - 414 Request-URI Too Long
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 DESCRIPTION
 
@@ -38,6 +38,16 @@ by a client attempting to exploit security holes present in some
 servers using fixed-length buffers for reading or manipulating
 the Request-URI.
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 AUTHORS
 
 =over 4
@@ -48,7 +58,7 @@ Stevan Little <stevan.little@iinteractive.com>
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =back
 

@@ -6,6 +6,7 @@
 #include <signal.h>
 #include <linux/wait.h>
 #include <sys/syscall.h>
+#include <sys/pidfd.h>
 
 #define die_sys(format) Perl_croak(aTHX_ format, strerror(errno))
 
@@ -51,6 +52,22 @@ static char S_get_flags(pTHX_ int fd) {
 }
 #define get_flags(fd) S_get_flags(aTHX_ fd)
 
+typedef struct { const char* key; unsigned long value; } map[];
+
+#define PIDFD_NONBLOCK O_NONBLOCK
+static map pid_flags = {
+	{ "non-blocking", PIDFD_NONBLOCK },
+};
+
+static UV S_get_pid_flag(pTHX_ SV* flag_name) {
+	int i;
+	for (i = 0; i < sizeof pid_flags / sizeof *pid_flags; ++i)
+		if (strEQ(SvPV_nolen(flag_name), pid_flags[i].key))
+			return pid_flags[i].value;
+	Perl_croak(aTHX_ "No such flag '%s' known", flag_name);
+}
+#define get_pid_flag(name) S_get_pid_flag(aTHX_ name)
+
 #define get_fd(self) PerlIO_fileno(IoOFP(sv_2io(SvRV(self))))
 
 MODULE = Linux::FD::Pid				PACKAGE = Linux::FD::Pid
@@ -58,12 +75,15 @@ MODULE = Linux::FD::Pid				PACKAGE = Linux::FD::Pid
 PROTOTYPES: DISABLED
 
 SV*
-new(classname, pid)
+new(classname, pid, ...)
 	const char* classname;
 	int pid;
 	PREINIT:
 	int pidfd;
+	int i, flags = 0;
 	CODE:
+	for (i = 2; i < items; i++)
+		flags |= get_pid_flag(ST(i));
 	pidfd = syscall(__NR_pidfd_open, pid, 0);
 	if (pidfd < 0)
 		die_sys("Couldn't open pidfd: %s");

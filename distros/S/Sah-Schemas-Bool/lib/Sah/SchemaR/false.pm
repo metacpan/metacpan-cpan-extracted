@@ -1,12 +1,13 @@
+## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::false;
 
-our $DATE = '2017-11-01'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2022-09-25'; # DATE
+our $VERSION = '0.002'; # VERSION
 
-our $rschema = ["bool",[{is_true=>0,summary=>"A false boolean"}],["bool"]];
+our $rschema = do{my$var={base=>"bool",clsets_after_base=>[{is_true=>0,summary=>"A false boolean, e.g. \"\" in Perl"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["bool"],type=>"bool",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
-# ABSTRACT: A false boolean
+# ABSTRACT: A false boolean, e.g. "" in Perl
 
 __END__
 
@@ -16,11 +17,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::false - A false boolean
+Sah::SchemaR::false - A false boolean, e.g. "" in Perl
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::SchemaR::false (from Perl distribution Sah-Schemas-Bool), released on 2017-11-01.
+This document describes version 0.002 of Sah::SchemaR::false (from Perl distribution Sah-Schemas-Bool), released on 2022-09-25.
 
 =head1 DESCRIPTION
 
@@ -36,6 +37,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Bool>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2017 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Bool>
@@ -43,16 +73,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2017 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

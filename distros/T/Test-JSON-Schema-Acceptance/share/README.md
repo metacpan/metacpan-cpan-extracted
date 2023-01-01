@@ -4,6 +4,7 @@
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Financial Contributors on Open Collective](https://opencollective.com/json-schema/all/badge.svg?label=financial+contributors)](https://opencollective.com/json-schema)
 
+[![DOI](https://zenodo.org/badge/5952934.svg)](https://zenodo.org/badge/latestdoi/5952934)
 [![Build Status](https://github.com/json-schema-org/JSON-Schema-Test-Suite/workflows/Test%20Suite%20Sanity%20Checking/badge.svg)](https://github.com/json-schema-org/JSON-Schema-Test-Suite/actions?query=workflow%3A%22Test+Suite+Sanity+Checking%22)
 
 This repository contains a set of JSON objects that implementers of JSON Schema validation libraries can use to test their validators.
@@ -102,6 +103,8 @@ The precise steps described do not need to be followed exactly, but the results 
 
 To test a specific version:
 
+* For 2019-09 and later published drafts, implementations that are able to detect the draft of each schema via `$schema` SHOULD be configured to do so
+* For draft-07 and earlier, draft-next, and implementations unable to detect via `$schema`, implementations MUST be configured to expect the draft matching the test directory name
 * Load any remote references [described below](additional-assumptions) and configure your implementation to retrieve them via their URIs
 * Walk the filesystem tree for that version's subdirectory and for each `.json` file found:
 
@@ -130,7 +133,26 @@ If your implementation supports multiple versions, run the above procedure for e
 
 1. The suite, notably in its `refRemote.json` file in each draft, expects a number of remote references to be configured.
    These are JSON documents, identified by URI, which are used by the suite to test the behavior of the `$ref` keyword (and related keywords).
-   Depending on your implementation, you may configure how to "register" these either by retrieving them from the `remotes/` directory at the root of the repository, *or* you may execute `bin/jsonschema_suite remotes` using the executable in the `bin/` directory, which will output a JSON object containing all of the remotes combined.
+   Depending on your implementation, you may configure how to "register" these *either*:
+
+    * by directly retrieving them off the filesystem from the `remotes/` directory, in which case you should load each schema with a retrieval URI of `http://localhost:1234` followed by the relative path from the remotes directory -- e.g. a `$ref` to `http://localhost:1234/foo/bar/baz.json` is expected to resolve to the contents of the file at `remotes/foo/bar/baz.json`
+
+    * or alternatively, by executing `bin/jsonschema_suite remotes` using the executable in the `bin/` directory, which will output a JSON object containing all of the remotes combined, e.g.:
+
+    ```
+
+    $  bin/jsonschema_suite remotes
+    ```
+    ```json
+    {
+        "http://localhost:1234/baseUriChange/folderInteger.json": {
+            "type": "integer"
+        },
+        "http://localhost:1234/baseUriChangeFolder/folderInteger.json": {
+            "type": "integer"
+        }
+    }
+    ```
 
 2. Test cases found within [special subdirectories](#subdirectories-within-each-draft) may require additional configuration to run.
    In particular, tests within the `optional/format` subdirectory may require implementations to change the way they treat the `"format"`keyword (particularly on older drafts which did not have a notion of vocabularies).
@@ -202,6 +224,7 @@ This suite is being used by:
 ### C++
 
 * [Modern C++ JSON schema validator](https://github.com/pboettch/json-schema-validator)
+* [Valijson](https://github.com/tristanpenman/valijson)
 
 ### Dart
 
@@ -260,8 +283,8 @@ Node-specific support is maintained in a [separate repository](https://github.co
 
 ### .NET
 
+* [JsonSchema.Net](https://github.com/gregsdennis/json-everything)
 * [Newtonsoft.Json.Schema](https://github.com/JamesNK/Newtonsoft.Json.Schema)
-* [Manatee.Json](https://github.com/gregsdennis/Manatee.Json)
 
 ### Perl
 
@@ -317,3 +340,5 @@ There are some sanity checks in place for testing the test suite. You can run
 them with `bin/jsonschema_suite check` or `tox`. They will be run automatically
 by [GitHub Actions](https://github.com/json-schema-org/JSON-Schema-Test-Suite/actions?query=workflow%3A%22Test+Suite+Sanity+Checking%22)
 as well.
+
+This repository is maintained by the JSON Schema organization, and will be governed by the JSON Schema steering committee (once it exists).

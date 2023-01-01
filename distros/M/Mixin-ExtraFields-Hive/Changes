@@ -1,5 +1,9 @@
 Changelog for Mixin-ExtraFields-Hive
 
+0.008     2022-12-31 13:31:16-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 0.007     2013-10-02 12:18:05 America/New_York
           repackage to provide updated META data
 

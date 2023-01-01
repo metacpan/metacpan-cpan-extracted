@@ -4,13 +4,13 @@ use warnings;
 
 use 5.010;
 
-use ExtUtils::MakeMaker 6.64;
+use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Neo4j community graph database driver for Bolt and HTTP",
   "AUTHOR" => "Arne Johannessen <ajnn\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => "6.64"
+    "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Neo4j-Driver",
   "LICENSE" => "artistic_2",
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "Test::Warnings" => 0
   },
-  "VERSION" => "0.31",
+  "VERSION" => "0.33",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -27,7 +27,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.205';
+our $VERSION = '1.206';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -3776,6 +3776,142 @@ sub recreateTable {
 
 # -----------------------------------------------------------------------------
 
+=head3 copyData() - Kopiere Tabellendaten von Quelldatenbank in Zieldatenbank
+
+=head4 Synopsis
+
+  $destDb->copyData($srcDb,$table,%options);
+
+=head4 Arguments
+
+=over 4
+
+=item $srcDb
+
+Verbindung zur Quelldatenbank
+
+=item $name
+
+(String) Name der Zieltabelle
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -chunkSize => $n (Default: 100)
+
+Kopiere die Datensätze in Chunks der Größe $n.
+
+=item -srcTable => $srcTable (Default: $table)
+
+Name der Tabelle in der Quelldatenbank, wenn er vom Namen der
+Zieltabelle abweicht.
+
+=item -mapColumns => \%hash
+
+Abbildung zwischen den Kolumnennamen der Quell- und der Zieltabelle.
+Der Schlüssel des Hash ist der Name in der Quelltabelle, der Wert des Hash
+der Name in der Zieltabelle. Es müssen nur die Kolumennamen angegeben
+werden, die nicht übereinstimmen.
+
+=back
+
+=head4 Description
+
+Kopiere die Daten der Tabelle $table aus der Quelldatenbank $srcDb
+in die Zieldatenbank $destDb. Weicht der Tabellenname ab, kann
+diese Abweichung mit der Option -srcTable behandelt werden. Weichen
+Kolumnennamen ab, kann dies mit der Option -mapColumns behandelt werden.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub copyData {
+    my ($self,$srcDb,$destTable) = splice @_,0,3;
+    # @_: %options
+
+    # Optionen
+
+    my $chunkSize = 100;
+    my $mapH = undef;
+    my $srcTable = $destTable;
+
+    $self->parameters(0,\@_,
+        -chunkSize => \$chunkSize,
+        -srcTable => \$srcTable,
+        -mapColumns => \$mapH,
+    );
+
+    # Prüfe, ob die Zieltabelle auf der Quelldatenbank existiert.
+    # Wenn nein, haben wir hier nichts zu tun.
+
+    if (!$srcDb->tableExists($srcTable)) {
+        return;
+    }
+
+    # Erstelle Abbildung der Kolumnen
+
+    my @destTitles = $self->titles($destTable);
+    my @srcTitles = $srcDb->titles($srcTable);
+    my $srcTitleH = Quiq::Hash->new(\@srcTitles,1)->unlockKeys;
+
+    my %map; # Abbildung Kolumnen Zieltabelle => Quelltabelle
+    for my $destTitle (@destTitles) {
+        if ($srcTitleH->{$destTitle}) {
+            $map{$destTitle} = $destTitle; # Kolumnenname bleibt gleich
+        }
+    }
+    for my $srcTitle (@srcTitles) {
+        if (my $destTitle = $mapH->{$srcTitle}) {
+            $map{$destTitle} = $srcTitle; # Kolumne wurde umbenannt
+        }
+    }
+    # Alle anderen Kolumnen werden nicht beachtet
+
+    @destTitles = @srcTitles = ();
+    for my $destTitle (keys %map) {
+        push @destTitles,$destTitle;
+        push @srcTitles,$map{$destTitle};
+    }
+    
+    # Selektiere die Daten aus der Quelltablle
+
+    my $cur = $srcDb->select(
+        -select => @srcTitles,
+        -from => $srcTable,
+        -raw => 1,
+        -cursor => 1,
+    );
+
+    # Kopiere die Daten in Chunks der Größe $chunkSize
+
+    while (1) {
+        my $i = 0;
+        my @rows;
+        while (my $row = $cur->fetch) {
+            $i++;
+            push @rows,$row;
+            if ($i == $chunkSize) {
+                last;
+            }
+        }
+        if (@rows) {
+            $self->insertMulti($destTable,\@destTitles,\@rows);
+        }
+        if (@rows < $chunkSize) {
+            last;
+        }
+    }
+    $cur->close;
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 dropTable() - Lösche Tabelle
 
 =head4 Synopsis
@@ -5936,7 +6072,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.205
+1.206
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Number::Tolerant 1.709;
+package Number::Tolerant 1.710;
 # ABSTRACT: tolerance ranges for inexact numbers
 
 use Sub::Exporter::Util;
@@ -530,7 +530,7 @@ Number::Tolerant - tolerance ranges for inexact numbers
 
 =head1 VERSION
 
-version 1.709
+version 1.710
 
 =head1 SYNOPSIS
 
@@ -808,11 +808,11 @@ also provided the initial implementation for the offset type.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexandre Mestiashvili Karen Etheridge Michael Carman Ricardo SIGNES Smylers
+=for stopwords Alexandre Mestiashvili Karen Etheridge Michael Carman Ricardo SIGNES Signes Smylers
 
 =over 4
 
@@ -831,6 +831,10 @@ Michael Carman <mjcarman@cpan.org>
 =item *
 
 Ricardo SIGNES <rjbs@codesimply.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

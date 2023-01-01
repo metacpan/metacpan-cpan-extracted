@@ -21,7 +21,7 @@ our @EXPORT = qw( process proc_event named_signal intercept_exit intercept_exec 
 our @CARP_NOT = qw( Test2::Tools::Process::SystemProc );
 
 # ABSTRACT: Unit tests for code that calls exit, exec, system or qx()
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 our %handlers;
@@ -489,7 +489,7 @@ Test2::Tools::Process - Unit tests for code that calls exit, exec, system or qx(
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -499,7 +499,7 @@ version 0.06
  process {
    system 'foo', 'bar';
  } [
-   # check tht the first system call is to
+   # check that the first system call is to
    # a command foo with any arguments
    proc_event(system => array {
      item 'foo';
@@ -508,7 +508,7 @@ version 0.06
      # simulate the foo command
      my($proc, @args) = @_;
      note "faux bar command: @args";
-     # simulate a notmsl exit
+     # simulate a normal exit
      $proc->exit(0);
    }),
  ];
@@ -798,11 +798,15 @@ Provides an interface to mocking C<system>, C<qx> and C<exec>.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Jeremy Mates (THRIG)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2021 by Graham Ollis.
+This software is copyright (c) 2015-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

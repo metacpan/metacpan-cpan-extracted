@@ -29,7 +29,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.205';
+our $VERSION = '1.206';
 
 use Time::HiRes ();
 
@@ -713,7 +713,7 @@ sub siblings {
 
 =head1 VERSION
 
-1.205
+1.206
 
 =head1 AUTHOR
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::MockTime qw(set_fixed_time);
+use Test::MockTime::HiRes qw(set_fixed_time);
 use DateTime::Format::Natural;
 use Test::More tests => 4;
 

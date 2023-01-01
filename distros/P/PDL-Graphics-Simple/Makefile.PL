@@ -44,9 +44,9 @@ WriteMakefile(
     },
     META_ADD => {
 	resources => {
-	    homepage => 'http://github.com/PDLPorters/PDL-Graphics-Simple',
+	    homepage => 'https://github.com/PDLPorters/PDL-Graphics-Simple',
 	    repository => 'git://github.com/PDLPorters/PDL-Graphics-Simple.git',
-	    bugtracker => 'http://github.com/PDLPorters/PDL-Graphics-Simple/issues'
+	    bugtracker => 'https://github.com/PDLPorters/PDL-Graphics-Simple/issues'
 	}
     },
 

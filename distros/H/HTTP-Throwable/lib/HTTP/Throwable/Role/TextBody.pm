@@ -1,6 +1,6 @@
-package HTTP::Throwable::Role::TextBody;
+package HTTP::Throwable::Role::TextBody 0.028;
 our $AUTHORITY = 'cpan:STEVAN';
-$HTTP::Throwable::Role::TextBody::VERSION = '0.027';
+
 use Moo::Role;
 
 sub body { $_[0]->text_body }
@@ -30,7 +30,7 @@ HTTP::Throwable::Role::TextBody - an exception with a plaintext body
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 OVERVIEW
 
@@ -45,6 +45,16 @@ method as the response body.  It will also stringify to the text body.
 The role L<HTTP::Throwable::Role::BoringText> can be useful to provide a
 C<text_body> method that issues the C<status_line> as the body.
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 AUTHORS
 
 =over 4
@@ -55,7 +65,7 @@ Stevan Little <stevan.little@iinteractive.com>
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =back
 

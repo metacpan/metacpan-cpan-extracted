@@ -1,0 +1,34 @@
+Build.PL
+Changes
+lib/FSM.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/action/next.t
+t/action/same.t
+t/action/tstl.t
+t/base/action.t
+t/base/carp.t
+t/base/connect.t
+t/base/diag.t
+t/base/fst.t
+t/base/query.t
+t/base/query_dumper.t
+t/base/query_source.t
+t/base/query_switch.t
+t/base/state.t
+t/base/turn.t
+t/base/verify.t
+t/process/consume.t
+t/process/filter.t
+t/process/parse.t
+t/process/quadratic.t
+t/process/sort.t
+t/state/break.t
+t/state/continue.t
+t/state/start.t
+t/state/stop.t
+t/state/workload.t
+t/TestSuite.pm
+SIGNATURE    Added here by Module::Build

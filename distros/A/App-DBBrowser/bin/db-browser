@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.306';
+our $VERSION = '2.307';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -47,7 +47,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.306
+Version 2.307
 
 =head1 SYNOPSIS
 
@@ -158,7 +158,7 @@ Control characters, code points of the surrogate ranges and non-characters are r
 See also the option group L</Output>.
 
 C<Ctrl-F> opens a prompt. A regular expression is expected as input. This enables one to only display rows where at
-least one column matches the entered pattern. See option L<Search>.
+least one column matches the entered pattern. See option L</Search>.
 
 =head1 MENUS
 
@@ -333,7 +333,7 @@ I<Create/Drop Table/View> can be reached by selecting the prompt-line in the L</
 activated.
 
 Selecting the prompt line of the I<Create/Drop Table/View> sub-menu allows one to set the parse settings described in
-L</Insert Data>.
+L</Import>.
 
 =head3 Create Table
 
@@ -348,17 +348,17 @@ are confirmed the user is asked
 
 =over
 
-=item - for the table name
+=item for the table name
 
-=item - if the first data row should be used as header
+=item if the first data row should be used as header
 
-=item - if an auto increment column should be added (if the option L<Auto increment> is enabled)
+=item if an auto increment column should be added (if the option L<Auto increment> is enabled)
 
-=item - to edit the column names
+=item to edit the column names
 
-=item - to edit the column data types
+=item to edit the column data types
 
-=item - to confirm the creating of the table
+=item to confirm the creating of the table
 
 =back
 
@@ -382,7 +382,7 @@ respective option is activated.
 I<Delete>, I<Update> or I<Insert Into>  may not be available with C<JOIN> and C<UNION> statements.
 
 Selecting the prompt line of the I<Insert Into/Update/Delete> sub-menu allows one to set the parse settings described in
-L</Insert Data>.
+L</Import>.
 
 =head3 Insert Into
 
@@ -431,7 +431,7 @@ automatically.
 
 After a directory has been chosen a sub-menu is opened where one can choose the source file.
 
-Selecting the prompt line of the source file sub-menu allows one to set the parse settings described in L</Insert Data>.
+Selecting the prompt line of the source file sub-menu allows one to set the parse settings described in L</Import>.
 If the previous sub-menu I<Source file directory> is not shown due to the settings described before, additionally to the
 parse settings it is also possible the change the source file directory in this sub-menu by selecting I<NEW search>.
 
@@ -513,9 +513,10 @@ In the replacement it can be used the variable C<$c> as a counter. C<$c> is set 
 
 Available modifiers: C<g>, C<i>, C<e>.
 
-By selecting the prompt line (C<Your choice:>) one can save search & replace instructions for later use.
+By selecting the prompt line (C<Your choice:>) one can save I<search & replace>-instructions for later use.
 
-If a search & replace has altered the first row of the input data, a menu entry named C<RESTORE header row> is offered.
+If a I<search & replace> has altered the first row of the input data, a menu entry named C<RESTORE header row> is
+offered.
 
 =item Split Table
 
@@ -637,49 +638,6 @@ Reset database specific parameter to the global I<DB Settings>.
 
 =back
 
-=head2 Behavior
-
-Set the behavior of the interactive menus.
-
-=head3 Menu memory
-
-If enabled: saves the menu position while entering in a sub menu.
-
-=head3 Expand table
-
-Expand table rows:
-
-=over
-
-=item C<YES>
-
-if C<Return> is pressed, the selected table row is printed with each column in its own line. The first row is not
-expanded if the cursor auto-jumped to the first row.
-
-=item C<NO>
-
-don't expand table rows.
-
-=back
-
-=head3 Search
-
-Set the search behavior (C<Ctrl-F>).
-
-=over
-
-=item C<disabled>
-
-=item C<case-insensitive search>
-
-=item C<case-sensitive search>
-
-=back
-
-=head3 Mouse mode
-
-Set the I<Mouse mode> (see L<Term::Choose/mouse>).
-
 =head2 Extensions
 
 Add menu entries to menus:
@@ -736,15 +694,25 @@ Enable substatement additions for:
 
 =over
 
-=item SELECT
+=item
 
-=item WHERE
+SELECT
 
-=item GROUP BY
+=item
 
-=item ORDER BY
+WHERE
 
-=item SET
+=item
+
+GROUP BY
+
+=item
+
+ORDER BY
+
+=item
+
+SET
 
 =back
 
@@ -752,12 +720,17 @@ If enabled, C<%%> is shown as additionally menu entry. Selecting C<%%> lets one 
 
 =over
 
-=item Functions (C<f()>). Selecting C<f()> opens the L</Functions> menu.
+=item Functions
 
-=item Subqueries (C<SQ>). Selecting C<SQ> opens the L</Subqueries> menu.
+Selecting C<f()> opens the L</Functions> menu.
 
-=item Set column to C<NULL> (C<=N>). Available after the C<SET> in an C<UPDATE> statement. Selecting C<=N> sets the
-column to C<NULL>.
+=item Subqueries
+
+Selecting C<SQ> opens the L</Subqueries> menu.
+
+=item Set column to C<NULL>
+
+Available after the C<SET> in an C<UPDATE> statement. Selecting C<=N> sets the column to C<NULL>.
 
 =back
 
@@ -850,7 +823,7 @@ Drop View
 
 =back
 
-=head2 SQL
+=head2 SQL Settings
 
 =head3 System data
 
@@ -909,7 +882,7 @@ If set to C<YES>, SQL identifiers are quoted.
 
 C<SQLite>:
 
-- databases in SQL statements (C<ATTACH DATABASE>) are always quoted.
+- database names in SQL statements (C<ATTACH DATABASE>) are always quoted.
 
 - if the current database has attached databases, the use of qualified table names is enabled automatically.
 
@@ -974,38 +947,21 @@ If I<squash_spaces> is enabled, consecutive spaces are squashed to one space and
 
 Set the indentation width for the SQL substatements.
 
-=head3 Set string
-
-=head4 Undef
+=head3 Undef string
 
 Set the string that will be shown on the screen instead of an undefined field.
 
-On C<MSWin32> only single-byte character sets are supported when entering the setting I<Undef>, I<user>, I<host> or
-I<port> with the C<db-browser>s readline. But it is possible to edit the entry in configuration files directly after the
-entry was created with this options menu.
-
-=head4 Decimal separator
-
-Set the decimal separator. Numbers with a decimal separator are formatted as number if this option is set to the right
-value.
-
-Allowed values: a character with a print width of C<1>. If an invalid value is passed, I<decimal_separator> falls back
-to the default value (dot).
+On C<MSWin32> only single-byte character sets are supported when entering the setting I<Undef string>, I<user>, I<host>
+or I<port> with the C<db-browser>s readline. But it is possible to edit the entry in configuration files directly after
+the entry was created with this options menu.
 
 =head3 Warnings
 
 Enable/disable C<File::Find> warnings when searching for C<SQLite> databases.
 
-=head2 Insert Data
+=head2 Import
 
-=head3 Data source menu
-
-Set the data source type to C<plain>, C<file> or C<menu> for C<Insert Into> and for C<Create Table>.
-
-If this option is set to C<menu>, a menu is offered where the user can choose the type of the data source. If this
-option is set to C<plain> or C<file>, the respective setting is used directly without any menu.
-
-=head3 Parse tool for 'file'
+=head3 Parse tool
 
 Set how to parse text files. Files where C<-T $filename> returns true are considered text files.
 
@@ -1017,7 +973,7 @@ If a file is not a text file, then it is always used C<Spreadsheet::Read> to par
 
 Text::CSV
 
-To decode the files it is used the L</File encoding>.
+To decode the files it is used the L</File encoding in>.
 
 Advantages:
 
@@ -1040,7 +996,7 @@ split
 Reads to whole input at once and splits the input with the input record separator (IRS) to get the records (rows). Then
 it splits the records with the input field separator (IFS) to get the fields (columns) of each record.
 
-To decode the files it is used the L</File encoding>.
+To decode the files it is used the L</File encoding in>.
 
 Advantages:
 
@@ -1106,37 +1062,22 @@ Auto-detects the separation character for csv-files
 
 =back
 
-=head3 csv settings-a
+=head3 CSV options in a
 
-Set the Text::CSV options
+Set C<sep_char>, C<quote_char>, C<escape_char>, C<eol> and C<comment_str>.
 
-=over
-
-=item
-
-sep_char
-
-=item
-
-quote_char
-
-=item
-
-escape_char
-
-=item
-
-eol
-
-=back
-
-=head3 csv settings-b
-
-Set Text::CSV options not mentioned in I<csv settings-a>:
+If entered nothing, default values are used.
 
 For the meaning of the different options see L<Text::CSV>.
 
-=head3 'split' settings
+=head3 CSV options in b
+
+Set C<allow_loose_escapes>, C<allow_loose_quotes>, C<allow_whitespace>, C<blank_is_undef>, C<binary>, C<decode_utf8>,
+C<empty_is_undef> and C<skip_empty_rows>.
+
+For the meaning of the different options see L<Text::CSV>.
+
+=head3 Settings 'split'
 
 =over
 
@@ -1188,7 +1129,7 @@ Enabling I<input filter> will cause a second copy of the data to be kept in memo
 
 Set the I<empty_to_null> defaults for the different data source types.
 
-=head3 File encoding
+=head3 File encoding in
 
 How to decode text files.
 
@@ -1212,19 +1153,83 @@ If I<file> is selected as the data source type, only files matching this glob pa
 If I<file> is selected as the data source type, this setting determines if hidden files are part of the available files
 or not.
 
-=head2 Export to CSV
+=head3 Menu 'data source'
+
+Set the data source type to C<plain>, C<file> or C<menu> for C<Insert Into> and for C<Create Table>.
+
+If this option is set to C<menu>, a menu is offered where the user can choose the type of the data source. If this
+option is set to C<plain> or C<file>, the respective setting is used directly without any menu.
+
+=head2 Export
 
 =head3 Destination folder
 
 Set the folder where the data to be exported will be saved as a CSV file.
 
-=head3 Auto-File-Extension
+=head3 File Extension
 
 If this option is enabled, the file extension C<csv> is added automatically to the file-name.
 
-=head3 Encoding to CSV
+=head3 CSV options out a
 
-Set the C<Text::CSV::csv>-option C<encoding>.
+Set C<sep_char>, C<quote_char>, C<escape_char>, C<eol> and C<undef_str>.
+
+If entered nothing, default values are used.
+
+For the meaning of the different options see L<Text::CSV>.
+
+=head3 CSV options out b
+
+Set C<always_quote>, C<binary>, C<escape_null>, C<quote_binary>, C<quote_empty> and C<quote_space>.
+
+For the meaning of the different options see L<Text::CSV>.
+
+=head3 File encoding out
+
+The encoding of the exported CSV file.
+
+=head2 Misc
+
+Set the behavior of
+
+=head3 Menu memory
+
+If enabled: saves the menu position while entering in a sub menu.
+
+=head3 Expand table
+
+Expand table rows:
+
+=over
+
+=item C<YES>
+
+if C<Return> is pressed, the selected table row is printed with each column in its own line. The first row is not
+expanded if the cursor auto-jumped to the first row.
+
+=item C<NO>
+
+don't expand table rows.
+
+=back
+
+=head3 Search
+
+Set the search behavior (C<Ctrl-F>).
+
+=over
+
+=item C<disabled>
+
+=item C<case-insensitive search>
+
+=item C<case-sensitive search>
+
+=back
+
+=head3 Mouse mode
+
+Set the I<Mouse mode> (see L<Term::Choose/mouse>).
 
 =head1 CONFIGURATION FILES
 
@@ -1268,7 +1273,7 @@ Matthäus Kiem <cuer2s@gmail.com>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2022 Matthäus Kiem.
+Copyright 2012-2023 Matthäus Kiem.
 
 THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE
 IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.

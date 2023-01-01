@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Client::7_0::Direct::Enrich;
-$Search::Elasticsearch::Client::7_0::Direct::Enrich::VERSION = '7.711001';
+$Search::Elasticsearch::Client::7_0::Direct::Enrich::VERSION = '8.00';
 use Moo;
 with 'Search::Elasticsearch::Client::7_0::Role::API';
 with 'Search::Elasticsearch::Role::Client::Direct';
@@ -36,7 +36,7 @@ Search::Elasticsearch::Client::7_0::Direct::Enrich - Enrich feature of Search::E
 
 =head1 VERSION
 
-version 7.711001
+version 8.00
 
 =head2 DESCRIPTION
 
@@ -57,7 +57,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Elasticsearch BV.
+This software is Copyright (c) 2022 by Elasticsearch BV.
 
 This is free software, licensed under:
 

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::ResultColumns;
 # ABSTRACT: Structure definition of Cypher result values
-$Neo4j::Driver::ResultColumns::VERSION = '0.31';
+$Neo4j::Driver::ResultColumns::VERSION = '0.33';
 
 # This package is not part of the public Neo4j::Driver API.
 

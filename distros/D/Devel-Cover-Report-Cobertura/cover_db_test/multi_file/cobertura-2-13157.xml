@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<coverage line-rate="0.782608695652174" function-rate="0.875" branch-rate="0" lines-covered="18" branches-covered="0" functions-covered="7">
+  <sources>
+    <source>/</source>
+  </sources>
+  <packages>
+    <package name = "main">
+      <classes> 
+        <class name="MultiFile" filename="cover_db_test/multi_file/MultiFile.pm">
+          <lines>           
+            <line number="3" hits="1"/>         
+            <line number="4" hits="1"/>            
+            <line number="12" hits="1"/>     
+            <line number="13" hits="1"/>    
+          </lines>
+        </class>
+      </classes>
+    </package>
+    <package name = "MultiFile">
+      <classes> 
+        <class name="Sub" filename="cover_db_test/multi_file/MultiFile.pm">
+          <lines>           
+            <line number="20" hits="1"/>         
+            <line number="21" hits="1"/>       
+            <line number="24" hits="0"/>     
+            <line number="25" hits="0"/>     
+            <line number="26" hits="0"/>     
+            <line number="27" hits="0"/>       
+            <line number="30" hits="0"/>    
+          </lines>
+        </class>
+      </classes>
+      <classes> 
+        <class name="First" filename="cover_db_test/multi_file/MultiFile/First.pm">
+          <lines>        
+            <line number="4" hits="1"/>     
+            <line number="5" hits="1"/>    
+          </lines>
+        </class>
+      </classes>
+      <classes> 
+        <class name="Second" filename="cover_db_test/multi_file/MultiFile/Second.pm">
+          <lines>        
+            <line number="4" hits="1"/>     
+            <line number="5" hits="1"/>   
+          </lines>
+        </class>
+      </classes>
+    </package>
+  </packages>
+</coverage>

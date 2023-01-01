@@ -21,7 +21,7 @@
             "File::Spec" : "0",
             "FindBin" : "0",
             "Module::Util" : "0",
-            "Test::MockTime" : "0",
+            "Test::MockTime::HiRes" : "0",
             "Test::More" : "0"
          }
       },
@@ -38,6 +38,7 @@
             "Carp" : "0",
             "Clone" : "0",
             "DateTime" : "0",
+            "DateTime::HiRes" : "0",
             "DateTime::TimeZone" : "0",
             "Exporter" : "0",
             "Getopt::Long" : "0",
@@ -53,11 +54,11 @@
    "provides" : {
       "DateTime::Format::Natural" : {
          "file" : "lib/DateTime/Format/Natural.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       },
       "DateTime::Format::Natural::Calc" : {
          "file" : "lib/DateTime/Format/Natural/Calc.pm",
-         "version" : "1.44"
+         "version" : "1.46"
       },
       "DateTime::Format::Natural::Compat" : {
          "file" : "lib/DateTime/Format/Natural/Compat.pm",
@@ -65,7 +66,7 @@
       },
       "DateTime::Format::Natural::Duration" : {
          "file" : "lib/DateTime/Format/Natural/Duration.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "DateTime::Format::Natural::Duration::Checks" : {
          "file" : "lib/DateTime/Format/Natural/Duration/Checks.pm",
@@ -73,7 +74,7 @@
       },
       "DateTime::Format::Natural::Expand" : {
          "file" : "lib/DateTime/Format/Natural/Expand.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "DateTime::Format::Natural::Extract" : {
          "file" : "lib/DateTime/Format/Natural/Extract.pm",
@@ -81,7 +82,7 @@
       },
       "DateTime::Format::Natural::Formatted" : {
          "file" : "lib/DateTime/Format/Natural/Formatted.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "DateTime::Format::Natural::Helpers" : {
          "file" : "lib/DateTime/Format/Natural/Helpers.pm",
@@ -93,7 +94,7 @@
       },
       "DateTime::Format::Natural::Lang::EN" : {
          "file" : "lib/DateTime/Format/Natural/Lang/EN.pm",
-         "version" : "1.70"
+         "version" : "1.72"
       },
       "DateTime::Format::Natural::Rewrite" : {
          "file" : "lib/DateTime/Format/Natural/Rewrite.pm",
@@ -101,11 +102,11 @@
       },
       "DateTime::Format::Natural::Test" : {
          "file" : "lib/DateTime/Format/Natural/Test.pm",
-         "version" : "0.10"
+         "version" : "0.12"
       },
       "DateTime::Format::Natural::Utils" : {
          "file" : "lib/DateTime/Format/Natural/Utils.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "DateTime::Format::Natural::Wrappers" : {
          "file" : "lib/DateTime/Format/Natural/Wrappers.pm",
@@ -121,6 +122,6 @@
          "url" : "https://github.com/stsc/DateTime-Format-Natural"
       }
    },
-   "version" : "1.13",
+   "version" : "1.14",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

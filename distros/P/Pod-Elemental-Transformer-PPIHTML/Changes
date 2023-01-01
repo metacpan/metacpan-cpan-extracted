@@ -1,5 +1,9 @@
 Revision history for Pod-Elemental-Transformer-PPIHTML
 
+0.093582  2022-12-31 14:13:05-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 0.093581  2013-10-12 22:18:28 America/New_York
           fix dist name!
 

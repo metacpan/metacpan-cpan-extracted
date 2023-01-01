@@ -1,7 +1,7 @@
 use 5.12.0;
 use warnings;
 
-package Data::TagHive 0.004;
+package Data::TagHive 0.005;
 # ABSTRACT: hierarchical tags with values
 
 use Carp;
@@ -224,7 +224,7 @@ Data::TagHive - hierarchical tags with values
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -321,6 +321,12 @@ This method returns, as a list of strings, all the tags set on the hive either
 explicitly or implicitly.
 
 =head1 AUTHOR
+
+Ricardo Signes <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
 
 Ricardo Signes <rjbs@semiotic.systems>
 

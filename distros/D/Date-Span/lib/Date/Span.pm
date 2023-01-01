@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Date::Span 1.128;
+package Date::Span 1.129;
 # ABSTRACT: deal with date/time ranges than span multiple dates
 
 use Exporter;
@@ -188,7 +188,7 @@ Date::Span - deal with date/time ranges than span multiple dates
 
 =head1 VERSION
 
-version 1.128
+version 1.129
 
 =head1 SYNOPSIS
 
@@ -276,7 +276,13 @@ further tested.  The interface should stay pretty stable, though.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

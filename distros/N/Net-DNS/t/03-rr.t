@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 03-rr.t 1864 2022-04-14 15:18:49Z willem $	-*-perl-*-
+# $Id: 03-rr.t 1891 2022-12-28 13:09:27Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -300,6 +300,7 @@ eval {					## exercise printing functions
 	require IO::File;
 	local $Data::Dumper::Maxdepth;
 	local $Data::Dumper::Sortkeys;
+	local $Data::Dumper::Useqq;
 	my $object = Net::DNS::RR->new('example.com A 192.0.2.1');
 	my $file   = "03-rr.tmp";
 	my $handle = IO::File->new( $file, '>' ) || die "Could not open $file for writing";
@@ -307,6 +308,7 @@ eval {					## exercise printing functions
 	select( ( select($handle), $object->dump )[0] );
 	$Data::Dumper::Maxdepth = 6;
 	$Data::Dumper::Sortkeys = 1;
+	$Data::Dumper::Useqq	= 1;
 	select( ( select($handle), $object->dump )[0] );
 	close($handle);
 	unlink($file);

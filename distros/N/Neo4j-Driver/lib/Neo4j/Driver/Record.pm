@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Record;
 # ABSTRACT: Container for Cypher result values
-$Neo4j::Driver::Record::VERSION = '0.31';
+$Neo4j::Driver::Record::VERSION = '0.33';
 
 use Carp qw(croak);
 use JSON::MaybeXS 1.003003 qw(is_bool);
@@ -112,7 +112,7 @@ Neo4j::Driver::Record - Container for Cypher result values
 
 =head1 VERSION
 
-version 0.31
+version 0.33
 
 =head1 SYNOPSIS
 
@@ -219,9 +219,9 @@ L<Neo4j::Driver::Type::B<Relationship>>,
 L<Neo4j::Driver::Type::B<Path>>
 
 =item * Equivalent documentation for the official Neo4j drivers:
-L<Record (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/Record.html>,
-L<Record (JavaScript)|https://neo4j.com/docs/api/javascript-driver/4.4/class/lib6/record.js~Record.html>,
-L<IRecord (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.4/html/ca4ccbd1-2925-945d-fd4c-a5635f3e4b23.htm>
+L<Record (Java)|https://neo4j.com/docs/api/java-driver/5.2/org.neo4j.driver/org/neo4j/driver/Record.html>,
+L<Record (JavaScript)|https://neo4j.com/docs/api/javascript-driver/5.2/class/lib6/record.js~Record.html>,
+L<IRecord (.NET)|https://neo4j.com/docs/api/dotnet-driver/5.2/html/ca4ccbd1-2925-945d-fd4c-a5635f3e4b23.htm>
 
 =back
 
@@ -229,12 +229,15 @@ L<IRecord (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.4/html/ca4ccbd1-2925
 
 Arne Johannessen <ajnn@cpan.org>
 
+If you contact me by email, please make sure you include the word
+"Perl" in your subject header to help beat the spam filters.
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0 or (at your option) the same terms
+as the Perl 5 programming language system itself.
 
 =cut

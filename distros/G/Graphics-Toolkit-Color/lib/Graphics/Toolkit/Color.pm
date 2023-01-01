@@ -4,11 +4,11 @@
 use v5.12;
 
 package Graphics::Toolkit::Color;
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use Carp;
 use Graphics::Toolkit::Color::Constant ':all';
-use Graphics::Toolkit::Color::Value ':all';
+use Graphics::Toolkit::Color::Value    ':all';
 
 use Exporter 'import';
 our @EXPORT_OK = qw/color/;
@@ -21,7 +21,7 @@ my $new_help = 'constructor of Graphics::Toolkit::Color object needs either:'.
 ## constructor #########################################################
 
 sub color { Graphics::Toolkit::Color->new ( @_ ) }
-        
+
 sub new {
     my ($pkg, @args) = @_;
     @args = ([@args]) if @args == 3;
@@ -43,7 +43,7 @@ sub _new_from_scalar {
     } elsif (ref $arg eq __PACKAGE__) {
         $arg = { r => $arg->[1], g => $arg->[2], b => $arg->[3] };
     }
-    
+
     return carp $new_help unless ref $arg eq 'HASH' and keys %$arg == 3;
     my %named_arg = map { _shrink_key($_) =>  $arg->{$_} } keys %$arg; # reduce keys to lc first char
 
@@ -72,7 +72,7 @@ sub _rgb_from_name_or_hex {
         my $module = $module_base.'::'.$pallet_name;
         eval "use $module";
         return carp "$module is not installed, but needed to load color '$pallet_name:$color_name'" if $@;
-        
+
         my $pal = Graphics::ColorNames->new( $pallet_name );
         my @rgb = $pal->rgb( $color_name );
         return carp "color '$color_name' was not found, propably not part of $module" unless @rgb == 3;
@@ -95,8 +95,10 @@ sub saturation  { $_[0][5] }
 sub lightness   { $_[0][6] }
 sub string      { $_[0][0] ? $_[0][0] : "[ $_[0][1], $_[0][2], $_[0][3] ]" }
 
-sub hsl         { @{$_[0]}[4 .. 6] }
 sub rgb         { @{$_[0]}[1 .. 3] }
+sub hsl         { @{$_[0]}[4 .. 6] }
+sub rgb_hash    { { red => $_[0][1], green => $_[0][2], blue => $_[0][3] } }
+sub hsl_hash    { { hue => $_[0][4], saturation => $_[0][5], lightness => $_[0][6] } }
 sub rgb_hex     { hex_from_rgb( $_[0]->rgb() ) }
 
 ## methods ##############################################################
@@ -106,7 +108,7 @@ sub distance_to {
     return croak "missing argument: color object or scalar color definition" unless defined $c2;
     $c2 = (ref $c2 eq __PACKAGE__) ? $c2 : new( __PACKAGE__, $c2 );
     return unless ref $c2 eq __PACKAGE__;
-    
+
     return distance_hsl( [$self->hsl], [$c2->hsl] ) unless defined $metric;
     $metric = lc $metric;
     return distance_hsl( [$self->hsl], [$c2->hsl] ) if $metric eq 'hsl';
@@ -139,9 +141,9 @@ sub add {
         '5. a hash with RGB and HSL keys (as in new, but can be mixed) (also in an hash ref).';
     if ((@args == 1 or @args == 2) and ref $args[0] ne 'HASH'){
         my @add_rgb;
-        if (ref $args[0] eq __PACKAGE__){ 
+        if (ref $args[0] eq __PACKAGE__){
             @add_rgb = $args[0]->rgb;
-        } elsif (ref $args[0] eq 'ARRAY'){ 
+        } elsif (ref $args[0] eq 'ARRAY'){
             @add_rgb = @{$args[0]};
             return carp "array ref argument needs to have 3 numerical values (RGB) in it." unless @add_rgb == 3;
         } elsif (not ref $args[0] and not $args[0] =~ /^\d/){
@@ -171,7 +173,7 @@ sub add {
         my @nrkey = grep {/^\d+$/} keys %named_arg;
         return carp "wrong number of numerical arguments (only 3 needed)" if @nrkey;
         carp "got unknown hash key starting with", map {' '.$_} keys %named_arg;
-    }    
+    }
     @hsl = trim_hsl( @hsl );
     new( __PACKAGE__, { H => $hsl[0], S => $hsl[1], L => $hsl[2] });
 }
@@ -193,7 +195,7 @@ sub blend_with {
     new( __PACKAGE__, { H => $hsl[0], S => $hsl[1], L => $hsl[2] });
 }
 
-    
+
 sub gradient_to {
     my ($self, $c2, $steps, $power) = @_;
     return carp "need color object or definition as first argument" unless defined $c2;
@@ -258,26 +260,26 @@ __END__
 
 Graphics::Toolkit::Color - color palette creation helper
 
-=head1 SYNOPSIS 
+=head1 SYNOPSIS
 
-    my $red = Graphics::Toolkit::Color->new('red');
-    say $red->add('blue')->name;              # 'magenta', mixed in RGB space
-    Graphics::Toolkit::Color->new( 0, 0, 255)->hsl    # 240, 100, 50 = blue
-    $blue->blend_with({H=> 0, S=> 0, L=> 80}, 0.1);# mix blue with a little grey
-    $red->gradient( '#0000FF', 10);           # 10 colors from red to blue  
-    $red->complementary( 3 );                 # get fitting red green and blue
+    my $red = Graphics::Toolkit::Color->new('red'); # create color object
+    say $red->add('blue')->name;                    # mix in RGB: 'magenta'
+    Graphics::Toolkit::Color->new( 0, 0, 255)->hsl; # 240, 100, 50 = blue
+    $blue->blend_with({H=> 0, S=> 0, L=> 80}, 0.1); # mix blue with a little grey in HSL
+    $red->gradient_to( '#0000FF', 10);              # 10 colors from red to blue
+    $red->complementary( 3 );                       # get fitting red green and blue
 
 =head1 DESCRIPTION
 
 Each object has 7 attributes, which are its RGB and HSL values and if possible a name.
 This is because humans access colors on hardware level (eye) in RGB,
-on cognition level in HSL (brain) and on cultural level (language) with names. 
+on cognition level in HSL (brain) and on cultural level (language) with names.
 Having easy access to all three and some color math should enable you to get the color
 palette you desire quickly and with no additional dependencies.
 
 =head1 CONSTRUCTOR
 
-There are many options to create a color objects.  In short you can 
+There are many options to create a color objects.  In short you can
 either use the name of a predefined constant or provide values in RGB
 or HSL color space.
 
@@ -296,7 +298,7 @@ L<Graphics::Toolkit::Color::Constant>.
 
 Get a color by name from a specific scheme or standard as provided by an
 external module L<Graphics::ColorNames>::* , which has to be installed
-separately. * is a placeholder for the pallet name, which might be: 
+separately. * is a placeholder for the pallet name, which might be:
 Crayola, CSS, EmergyC, GrayScale, HTML, IE, Mozilla, Netscape, Pantone,
 PantoneReport, SVG, VACCC, Werner, Windows, WWW or X. In ladder case
 Graphics::ColorNames::X has to be installed. You can get them all at once
@@ -304,7 +306,7 @@ via L<Bundle::Graphics::ColorNames>. The color name will be  normalized
 as above.
 
     my $color = Graphics::Toolkit::Color->new('SVG:green');
-    my @s = Graphics::ColorNames::all_schemes();          # installed
+    my @s = Graphics::ColorNames::all_schemes();          # look up the installed
 
 =head2 new( '#rgb' )
 
@@ -327,9 +329,9 @@ Out of range values will be corrected to the closest value in range.
 
 =head2 new( {r => $r, g => $g, b => $b} )
 
-Hash with the keys 'r', 'g' and 'b' does the same as previous paragraph,
-only more declarative. Casing of the keys will be normalised and only
-the first letter of each key is significant.
+Hash with the keys 'r', 'g' and 'b' does the same as shown in previous
+paragraph, only more declarative. Casing of the keys will be normalised
+and only the first letter of each key is significant.
 
     my $red = Graphics::Toolkit::Color->new( r => 255, g => 0, b => 0 );
     my $red = Graphics::Toolkit::Color->new({r => 255, g => 0, b => 0}); # works too
@@ -361,7 +363,7 @@ all the same arguments as described above.
 
 =head1 GETTER / ATTRIBUTES
 
-are all read only methods - giving access to different parts of the 
+are all read only methods - giving access to different parts of the
 objects data.
 
 =head2 name
@@ -369,12 +371,13 @@ objects data.
 Name of the color in the X11 or HTML (SVG) standard or the Pantone report.
 The name will be found and filled in, even when the object is created
 with RGB or HSL values. If the color is not found in any of the mentioned
-standards, it returns an empty string. All names are 
+standards, it returns an empty string. All names are
 at: L<Graphics::Toolkit::Color::Constant/NAMES>
 
 =head2 string
 
-String to reproduce color object by: Graphics::Toolkit::Color->new (eval $string).
+String to reproduce (serialize) color object by:
+Graphics::Toolkit::Color->new (eval $string).
 It is either the name (if color has one) or the stringified triplet:
 "[ $red, $green, $blue ]".
 
@@ -396,8 +399,18 @@ Three values of red, green and blue (see above).
 
 =head2 rgb_hex
 
-String starting with '#', followed by six hexadecimal figures. 
+String starting with '#', followed by six hexadecimal figures.
 Two digits for each of red, green and blue value - the format used in CSS.
+
+=head2 rgb_hash
+
+Reference to a I<HASH> containing the keys C<'red'>, C<'green'> and C<'blue'>
+with their respective values as defined above.
+
+=head2 hsl_hash
+
+Reference to a I<HASH> containing the keys C<'hue'>, C<'saturation'> and C<'lightness'>
+with their respective values as defined below.
 
 =head2 hue
 
@@ -428,9 +441,9 @@ create new, related color (objects) or compute similarity of colors
 
 =head2 distance_to
 
-A number that measures the distance (difference) between two colors: 
-1. the calling object (C1) and 2. a provided first argument C2 - 
-color object or scalar data that is acceptable by new method : 
+A number that measures the distance (difference) between two colors:
+1. the calling object (C1) and 2. a provided first argument C2 -
+color object or scalar data that is acceptable by new method :
 name or #hex or [$r, $g, $b] or {...} (see chapter L<CONSTRUCTOR>).
 
 If no second argument is provided, than the difference is the Euclidean
@@ -449,7 +462,7 @@ are possible, as r, g, b, rg, rb, gb, h, s, l, hs, hl, and sl.
 
 Create a Graphics::Toolkit::Color object, by adding any RGB or HSL values to current
 color. (Same rules apply for key names as in new - values can be negative.)
-RGB and HSL can be combined, but please note that RGB are applied first. 
+RGB and HSL can be combined, but please note that RGB are applied first.
 
 If the first argument is a Graphics::Toolkit::Color object, than RGB values will be added.
 In that case an optional second argument is a factor (default = 1),
@@ -467,11 +480,11 @@ result will be rounded (trimmed), to keep it inside the defined RGB space.
 
 =head2 blend_with
 
-Create Graphics::Toolkit::Color object, that is the average of two colors in HSL space: 
+Create Graphics::Toolkit::Color object, that is the average of two colors in HSL space:
 1. the calling object (C1) and 2. a provided argument C2 (object or a
-refrence to data that is acceptable definition). 
+refrence to data that is acceptable definition).
 
-The second argument is the blend ratio, which defaults to 0.5 ( 1:1 ). 
+The second argument is the blend ratio, which defaults to 0.5 ( 1:1 ).
 0 represents here C1 and 1 C2. Numbers below 0 and above 1 are possible,
 and will be applied, as long the result is inside the finite HSL space.
 There is a slight overlap with the add method which mostly operates in
@@ -488,11 +501,11 @@ RGB (unless told so), while this method always operates in HSL space.
 Creates a gradient (a list of colors that build a transition) between
 current (C1) and a second, given color (C2).
 
-The first argument is C2. Either as an Graphics::Toolkit::Color object or a 
-scalar (name, hex or reference), which is acceptable to the method new. 
+The first argument is C2. Either as an Graphics::Toolkit::Color object or a
+scalar (name, hex or reference), which is acceptable to the method new.
 
 Second argument is the number $n of colors, which make up the gradient
-(including C1 and C2). It defaults to 3. These 3 colors C1, C2 and a 
+(including C1 and C2). It defaults to 3. These 3 colors C1, C2 and a
 color in between, which is the same as the result of method blend_with.
 
 Third argument is also a positive number $p, which defaults to one.
@@ -513,14 +526,14 @@ and becoming slower and slower.
 Creates a set of complementary colors.
 It accepts 3 numerical arguments: n, delta_S and delta_L.
 
-Imagine an horizontal circle in HSL space, whith a center in the (grey) 
+Imagine an horizontal circle in HSL space, whith a center in the (grey)
 center column. The saturation and lightness of all colors on that
 circle is the same, they differ only in hue. The color of the current
 color object ($self a.k.a C1) lies on that circle as well as C2,
 which is 180 degrees (half the circumference) apposed to C1.
 
 This circle will be divided in $n (first argument) equal partitions,
-creating $n equally distanced colors. All of them will be returned, 
+creating $n equally distanced colors. All of them will be returned,
 as objects, starting with C1. However, when $n is set to 1 (default),
 the result is only C2, which is THE complementary color to C1.
 
@@ -571,7 +584,7 @@ L<Color::Similarity>
 
 Copyright 2022 Herbert Breunung.
 
-This program is free software; you can redistribute it and/or modify it 
+This program is free software; you can redistribute it and/or modify it
 under same terms as Perl itself.
 
 =head1 AUTHOR

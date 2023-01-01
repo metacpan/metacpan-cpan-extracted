@@ -98,11 +98,10 @@ my $session = eval { $driver->session(database => 'system') };
 
 subtest 'live ServerInfo' => sub {
 	plan skip_all => "(no session)" unless $session;
-	plan tests => 8;
+	plan tests => 7;
 	my $server;
 	lives_and { ok $server = $session->server } 'get ServerInfo';
 	isa_ok $server, 'Neo4j::Driver::ServerInfo', 'ServerInfo';
-	lives_and { my $a = Neo4j_Test->server_address(); like($server->address(), qr/$a$/) } 'server address';
 	my ($vinfo, $protocol, $result) = ("") x 3;
 	lives_and { ok $vinfo = $server->agent } 'server version';
 	like $vinfo, qr(^Neo4j/\d+\.\d+\.\d), 'server version syntax';
@@ -120,9 +119,10 @@ subtest 'live ServerInfo' => sub {
 		my $media_type = $session->{net}->{http_agent}->http_header->{content_type};
 		$protocol = "JSON" if $media_type =~ m/\bjson\b/i;
 		$protocol = "Jolt" if $media_type =~ m/\bjolt\b/i;
-		$protocol = "Jolt ndjson" if $media_type =~ m/\bjolt\b(?!\+json-seq\b)/i;
+		$protocol = "Jolt ndjson" if $media_type =~ m/\bjolt\b/i && $media_type !~ m/\+json-seq\b/i;
 		$protocol = "Jolt sparse" if $media_type =~ m/\bjolt\b.+\bstrict=false\b/i;
 		$protocol = "Jolt strict" if $media_type =~ m/\bjolt\b.+\bstrict=true\b/i;
+		$protocol =~ s/Jolt/Jolt v2/ if $media_type =~ m/\bjolt-v2\b/i;
 		$protocol .= " Sim" if $Neo4j_Test::sim;
 	};
 	$vinfo .= " ($protocol)";

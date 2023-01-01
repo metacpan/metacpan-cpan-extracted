@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.009';
+   our $VERSION = '0.010';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Finance::TA $VERSION;
@@ -111,7 +111,7 @@ All available functions handles BAD values in input piddles (BAD values at the b
   say $MA2;      # prints: [BAD BAD BAD BAD 2 3]
 
 =cut
-#line 115 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 115 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -164,14 +164,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 168 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 168 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_bbands = \&PDL::ta_bbands;
-#line 175 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 175 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -203,14 +203,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 207 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 207 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_dema = \&PDL::ta_dema;
-#line 214 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 214 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -242,14 +242,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 246 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 246 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_ema = \&PDL::ta_ema;
-#line 253 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 253 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -278,14 +278,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 282 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 282 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_ht_trendline = \&PDL::ta_ht_trendline;
-#line 289 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 289 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -317,14 +317,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 321 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 321 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_kama = \&PDL::ta_kama;
-#line 328 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 328 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -359,14 +359,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 363 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 363 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_ma = \&PDL::ta_ma;
-#line 370 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 370 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -402,14 +402,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 406 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 406 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_mama = \&PDL::ta_mama;
-#line 413 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 413 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -448,14 +448,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 452 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 452 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_mavp = \&PDL::ta_mavp;
-#line 459 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 459 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -487,14 +487,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 491 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 491 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_midpoint = \&PDL::ta_midpoint;
-#line 498 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 498 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -526,14 +526,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 530 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 530 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_midprice = \&PDL::ta_midprice;
-#line 537 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 537 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -568,14 +568,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 572 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 572 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_sar = \&PDL::ta_sar;
-#line 579 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 579 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -628,14 +628,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 632 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 632 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_sarext = \&PDL::ta_sarext;
-#line 639 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 639 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -667,14 +667,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 671 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 671 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_sma = \&PDL::ta_sma;
-#line 678 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 678 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -709,14 +709,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 713 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 713 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_t3 = \&PDL::ta_t3;
-#line 720 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 720 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -748,14 +748,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 752 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 752 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_tema = \&PDL::ta_tema;
-#line 759 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 759 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -787,14 +787,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 791 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 791 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_trima = \&PDL::ta_trima;
-#line 798 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 798 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -826,14 +826,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 830 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 830 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_wma = \&PDL::ta_wma;
-#line 837 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 837 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -865,14 +865,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 869 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 869 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_atr = \&PDL::ta_atr;
-#line 876 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 876 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -904,14 +904,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 908 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 908 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_natr = \&PDL::ta_natr;
-#line 915 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 915 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -940,14 +940,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 944 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 944 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_trange = \&PDL::ta_trange;
-#line 951 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 951 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -979,14 +979,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 983 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 983 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_adx = \&PDL::ta_adx;
-#line 990 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 990 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -1018,14 +1018,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1022 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1022 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_adxr = \&PDL::ta_adxr;
-#line 1029 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1029 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -1063,14 +1063,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1067 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1067 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_apo = \&PDL::ta_apo;
-#line 1074 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1074 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -1103,14 +1103,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1107 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1107 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_aroon = \&PDL::ta_aroon;
-#line 1114 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1114 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -1142,14 +1142,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1146 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1146 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_aroonosc = \&PDL::ta_aroonosc;
-#line 1153 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1153 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -1178,14 +1178,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1182 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1182 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_bop = \&PDL::ta_bop;
-#line 1189 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1189 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -1217,14 +1217,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1221 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1221 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cci = \&PDL::ta_cci;
-#line 1228 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1228 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -1256,14 +1256,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1260 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1260 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cmo = \&PDL::ta_cmo;
-#line 1267 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1267 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -1295,14 +1295,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1299 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1299 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_dx = \&PDL::ta_dx;
-#line 1306 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1306 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -1342,14 +1342,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1346 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1346 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_macd = \&PDL::ta_macd;
-#line 1353 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1353 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -1398,14 +1398,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1402 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1402 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_macdext = \&PDL::ta_macdext;
-#line 1409 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1409 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -1439,14 +1439,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1443 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1443 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_macdfix = \&PDL::ta_macdfix;
-#line 1450 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1450 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -1478,14 +1478,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1482 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1482 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_mfi = \&PDL::ta_mfi;
-#line 1489 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1489 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -1517,14 +1517,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1521 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1521 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_minus_di = \&PDL::ta_minus_di;
-#line 1528 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1528 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -1556,14 +1556,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1560 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1560 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_minus_dm = \&PDL::ta_minus_dm;
-#line 1567 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1567 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -1595,14 +1595,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1599 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1599 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_mom = \&PDL::ta_mom;
-#line 1606 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1606 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -1634,14 +1634,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1638 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1638 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_plus_di = \&PDL::ta_plus_di;
-#line 1645 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1645 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -1673,14 +1673,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1677 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1677 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_plus_dm = \&PDL::ta_plus_dm;
-#line 1684 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1684 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -1718,14 +1718,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1722 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1722 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_ppo = \&PDL::ta_ppo;
-#line 1729 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1729 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -1757,14 +1757,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1761 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1761 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_roc = \&PDL::ta_roc;
-#line 1768 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1768 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -1796,14 +1796,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1800 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1800 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_rocp = \&PDL::ta_rocp;
-#line 1807 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1807 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -1835,14 +1835,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1839 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1839 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_rocr = \&PDL::ta_rocr;
-#line 1846 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1846 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -1874,14 +1874,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1878 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1878 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_rocr100 = \&PDL::ta_rocr100;
-#line 1885 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1885 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -1913,14 +1913,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1917 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1917 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_rsi = \&PDL::ta_rsi;
-#line 1924 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1924 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -1965,14 +1965,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1969 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1969 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_stoch = \&PDL::ta_stoch;
-#line 1976 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 1976 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2011,14 +2011,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2015 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2015 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_stochf = \&PDL::ta_stochf;
-#line 2022 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2022 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2060,14 +2060,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2064 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2064 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_stochrsi = \&PDL::ta_stochrsi;
-#line 2071 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2071 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2099,14 +2099,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2103 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2103 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_trix = \&PDL::ta_trix;
-#line 2110 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2110 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2144,14 +2144,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2148 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2148 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_ultosc = \&PDL::ta_ultosc;
-#line 2155 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2155 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2183,14 +2183,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2187 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2187 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_willr = \&PDL::ta_willr;
-#line 2194 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2194 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2219,14 +2219,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2223 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2223 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_ht_dcperiod = \&PDL::ta_ht_dcperiod;
-#line 2230 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2230 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2255,14 +2255,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2259 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2259 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_ht_dcphase = \&PDL::ta_ht_dcphase;
-#line 2266 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2266 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2292,14 +2292,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2296 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2296 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_ht_phasor = \&PDL::ta_ht_phasor;
-#line 2303 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2303 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2329,14 +2329,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2333 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2333 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_ht_sine = \&PDL::ta_ht_sine;
-#line 2340 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2340 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2365,14 +2365,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2369 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2369 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_ht_trendmode = \&PDL::ta_ht_trendmode;
-#line 2376 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2376 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2401,14 +2401,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2405 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2405 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_ad = \&PDL::ta_ad;
-#line 2412 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2412 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2443,14 +2443,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2447 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2447 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_adosc = \&PDL::ta_adosc;
-#line 2454 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2454 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2480,14 +2480,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2484 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2484 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_obv = \&PDL::ta_obv;
-#line 2491 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2491 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2516,14 +2516,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2520 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2520 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdl2crows = \&PDL::ta_cdl2crows;
-#line 2527 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2527 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2552,14 +2552,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2556 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2556 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdl3blackcrows = \&PDL::ta_cdl3blackcrows;
-#line 2563 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2563 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2588,14 +2588,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2592 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2592 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdl3inside = \&PDL::ta_cdl3inside;
-#line 2599 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2599 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2624,14 +2624,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2628 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2628 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdl3linestrike = \&PDL::ta_cdl3linestrike;
-#line 2635 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2635 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2660,14 +2660,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2664 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2664 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdl3outside = \&PDL::ta_cdl3outside;
-#line 2671 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2671 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2696,14 +2696,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2700 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2700 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdl3starsinsouth = \&PDL::ta_cdl3starsinsouth;
-#line 2707 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2707 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2732,14 +2732,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2736 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2736 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdl3whitesoldiers = \&PDL::ta_cdl3whitesoldiers;
-#line 2743 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2743 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2771,14 +2771,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2775 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2775 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlabandonedbaby = \&PDL::ta_cdlabandonedbaby;
-#line 2782 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2782 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2807,14 +2807,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2811 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2811 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdladvanceblock = \&PDL::ta_cdladvanceblock;
-#line 2818 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2818 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2843,14 +2843,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2847 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2847 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlbelthold = \&PDL::ta_cdlbelthold;
-#line 2854 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2854 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2879,14 +2879,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2883 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2883 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlbreakaway = \&PDL::ta_cdlbreakaway;
-#line 2890 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2890 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2915,14 +2915,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2919 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2919 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlclosingmarubozu = \&PDL::ta_cdlclosingmarubozu;
-#line 2926 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2926 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2951,14 +2951,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2955 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2955 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlconcealbabyswall = \&PDL::ta_cdlconcealbabyswall;
-#line 2962 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2962 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -2987,14 +2987,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2991 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2991 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlcounterattack = \&PDL::ta_cdlcounterattack;
-#line 2998 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 2998 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3026,14 +3026,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3030 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3030 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdldarkcloudcover = \&PDL::ta_cdldarkcloudcover;
-#line 3037 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3037 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3062,14 +3062,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3066 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3066 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdldoji = \&PDL::ta_cdldoji;
-#line 3073 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3073 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3098,14 +3098,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3102 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3102 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdldojistar = \&PDL::ta_cdldojistar;
-#line 3109 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3109 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3134,14 +3134,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3138 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3138 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdldragonflydoji = \&PDL::ta_cdldragonflydoji;
-#line 3145 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3145 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3170,14 +3170,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3174 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3174 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlengulfing = \&PDL::ta_cdlengulfing;
-#line 3181 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3181 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3209,14 +3209,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3213 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3213 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdleveningdojistar = \&PDL::ta_cdleveningdojistar;
-#line 3220 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3220 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3248,14 +3248,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3252 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3252 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdleveningstar = \&PDL::ta_cdleveningstar;
-#line 3259 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3259 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3284,14 +3284,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3288 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3288 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlgapsidesidewhite = \&PDL::ta_cdlgapsidesidewhite;
-#line 3295 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3295 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3320,14 +3320,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3324 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3324 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlgravestonedoji = \&PDL::ta_cdlgravestonedoji;
-#line 3331 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3331 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3356,14 +3356,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3360 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3360 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlhammer = \&PDL::ta_cdlhammer;
-#line 3367 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3367 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3392,14 +3392,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3396 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3396 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlhangingman = \&PDL::ta_cdlhangingman;
-#line 3403 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3403 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3428,14 +3428,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3432 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3432 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlharami = \&PDL::ta_cdlharami;
-#line 3439 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3439 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3464,14 +3464,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3468 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3468 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlharamicross = \&PDL::ta_cdlharamicross;
-#line 3475 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3475 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3500,14 +3500,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3504 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3504 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlhighwave = \&PDL::ta_cdlhighwave;
-#line 3511 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3511 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3536,14 +3536,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3540 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3540 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlhikkake = \&PDL::ta_cdlhikkake;
-#line 3547 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3547 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3572,14 +3572,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3576 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3576 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlhikkakemod = \&PDL::ta_cdlhikkakemod;
-#line 3583 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3583 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3608,14 +3608,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3612 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3612 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlhomingpigeon = \&PDL::ta_cdlhomingpigeon;
-#line 3619 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3619 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3644,14 +3644,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3648 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3648 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlidentical3crows = \&PDL::ta_cdlidentical3crows;
-#line 3655 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3655 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3680,14 +3680,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3684 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3684 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlinneck = \&PDL::ta_cdlinneck;
-#line 3691 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3691 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3716,14 +3716,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3720 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3720 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlinvertedhammer = \&PDL::ta_cdlinvertedhammer;
-#line 3727 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3727 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3752,14 +3752,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3756 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3756 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlkicking = \&PDL::ta_cdlkicking;
-#line 3763 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3763 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3788,14 +3788,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3792 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3792 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlkickingbylength = \&PDL::ta_cdlkickingbylength;
-#line 3799 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3799 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3824,14 +3824,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3828 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3828 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlladderbottom = \&PDL::ta_cdlladderbottom;
-#line 3835 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3835 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3860,14 +3860,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3864 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3864 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdllongleggeddoji = \&PDL::ta_cdllongleggeddoji;
-#line 3871 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3871 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3896,14 +3896,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3900 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3900 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdllongline = \&PDL::ta_cdllongline;
-#line 3907 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3907 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3932,14 +3932,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3936 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3936 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlmarubozu = \&PDL::ta_cdlmarubozu;
-#line 3943 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3943 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -3968,14 +3968,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3972 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3972 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlmatchinglow = \&PDL::ta_cdlmatchinglow;
-#line 3979 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 3979 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4007,14 +4007,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4011 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4011 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlmathold = \&PDL::ta_cdlmathold;
-#line 4018 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4018 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4046,14 +4046,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4050 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4050 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlmorningdojistar = \&PDL::ta_cdlmorningdojistar;
-#line 4057 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4057 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4085,14 +4085,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4089 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4089 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlmorningstar = \&PDL::ta_cdlmorningstar;
-#line 4096 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4096 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4121,14 +4121,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4125 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4125 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlonneck = \&PDL::ta_cdlonneck;
-#line 4132 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4132 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4157,14 +4157,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4161 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4161 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlpiercing = \&PDL::ta_cdlpiercing;
-#line 4168 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4168 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4193,14 +4193,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4197 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4197 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlrickshawman = \&PDL::ta_cdlrickshawman;
-#line 4204 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4204 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4229,14 +4229,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4233 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4233 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlrisefall3methods = \&PDL::ta_cdlrisefall3methods;
-#line 4240 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4240 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4265,14 +4265,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4269 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4269 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlseparatinglines = \&PDL::ta_cdlseparatinglines;
-#line 4276 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4276 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4301,14 +4301,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4305 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4305 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlshootingstar = \&PDL::ta_cdlshootingstar;
-#line 4312 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4312 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4337,14 +4337,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4341 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4341 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlshortline = \&PDL::ta_cdlshortline;
-#line 4348 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4348 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4373,14 +4373,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4377 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4377 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlspinningtop = \&PDL::ta_cdlspinningtop;
-#line 4384 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4384 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4409,14 +4409,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4413 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4413 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlstalledpattern = \&PDL::ta_cdlstalledpattern;
-#line 4420 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4420 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4445,14 +4445,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4449 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4449 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlsticksandwich = \&PDL::ta_cdlsticksandwich;
-#line 4456 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4456 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4481,14 +4481,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4485 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4485 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdltakuri = \&PDL::ta_cdltakuri;
-#line 4492 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4492 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4517,14 +4517,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4521 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4521 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdltasukigap = \&PDL::ta_cdltasukigap;
-#line 4528 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4528 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4553,14 +4553,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4557 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4557 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlthrusting = \&PDL::ta_cdlthrusting;
-#line 4564 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4564 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4589,14 +4589,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4593 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4593 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdltristar = \&PDL::ta_cdltristar;
-#line 4600 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4600 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4625,14 +4625,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4629 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4629 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlunique3river = \&PDL::ta_cdlunique3river;
-#line 4636 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4636 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4661,14 +4661,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4665 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4665 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlupsidegap2crows = \&PDL::ta_cdlupsidegap2crows;
-#line 4672 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4672 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4697,14 +4697,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4701 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4701 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_cdlxsidegap3methods = \&PDL::ta_cdlxsidegap3methods;
-#line 4708 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4708 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4737,14 +4737,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4741 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4741 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_beta = \&PDL::ta_beta;
-#line 4748 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4748 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4777,14 +4777,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4781 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4781 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_correl = \&PDL::ta_correl;
-#line 4788 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4788 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4816,14 +4816,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4820 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4820 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_linearreg = \&PDL::ta_linearreg;
-#line 4827 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4827 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4855,14 +4855,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4859 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4859 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_linearreg_angle = \&PDL::ta_linearreg_angle;
-#line 4866 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4866 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4894,14 +4894,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4898 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4898 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_linearreg_intercept = \&PDL::ta_linearreg_intercept;
-#line 4905 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4905 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4933,14 +4933,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4937 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4937 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_linearreg_slope = \&PDL::ta_linearreg_slope;
-#line 4944 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4944 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -4975,14 +4975,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4979 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4979 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_stddev = \&PDL::ta_stddev;
-#line 4986 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 4986 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -5014,14 +5014,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 5018 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 5018 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_tsf = \&PDL::ta_tsf;
-#line 5025 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 5025 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -5056,14 +5056,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 5060 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 5060 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_var = \&PDL::ta_var;
-#line 5067 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 5067 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -5092,14 +5092,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 5096 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 5096 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_avgprice = \&PDL::ta_avgprice;
-#line 5103 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 5103 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -5128,14 +5128,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 5132 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 5132 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_medprice = \&PDL::ta_medprice;
-#line 5139 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 5139 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -5164,14 +5164,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 5168 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 5168 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_typprice = \&PDL::ta_typprice;
-#line 5175 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 5175 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -5200,14 +5200,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 5204 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 5204 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
 #line 951 "/home/vicash/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *ta_wclprice = \&PDL::ta_wclprice;
-#line 5211 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 5211 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 
@@ -5220,7 +5220,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut
-#line 5224 "PDL-Finance-TA-0.009/GENERATED/TA.pm"
+#line 5224 "PDL-Finance-TA-0.010/GENERATED/TA.pm"
 
 
 

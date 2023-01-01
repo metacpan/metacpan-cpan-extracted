@@ -4,7 +4,7 @@
       "Jim Turner"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -37,6 +37,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.13",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "2.21",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

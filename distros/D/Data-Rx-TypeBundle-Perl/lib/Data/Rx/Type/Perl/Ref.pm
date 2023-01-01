@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Data::Rx::Type::Perl::Ref 0.010;
+package Data::Rx::Type::Perl::Ref 0.011;
 # ABSTRACT: experimental / perl reference type
 use parent 'Data::Rx::CommonType::EasyNew';
 
@@ -99,7 +99,7 @@ Data::Rx::Type::Perl::Ref - experimental / perl reference type
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -138,11 +138,11 @@ the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

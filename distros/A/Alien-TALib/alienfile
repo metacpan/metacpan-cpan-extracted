@@ -34,7 +34,11 @@ share {
                 content => 'path=%2Ftrunk',
             },
         );
-        die 'Could not request snapshot' unless $response->{success};
+        unless ($response->{success}) {
+            print "HTTP Response: " . $response->{status} .
+                  " Reason: " . $response->{reason} . "\n";
+            die "Could not request snapshot from $response->{url}";
+        }
         sleep 4; # wait a bit
     });
     plugin 'Extract' => 'zip';
@@ -54,11 +58,25 @@ share {
     after gather => sub {
         my $build = shift;
         my $prefix = path($build->install_prop->{prefix})->absolute;
+
+        # for MSWin32 which creates a 'libta_lib_a.a' by default
+        my $static_libta_lib_a = $prefix->child( 'lib', 'libta_lib_a.a' );
+        my $static_libta_lib   = $prefix->child( 'lib', 'libta_lib.a'   );
+        if( -f $static_libta_lib_a && ! -f $static_libta_lib ) {
+            $build->log("move " . join(" => ", map $_->relative($prefix),
+                $static_libta_lib_a,
+                $static_libta_lib
+            ));
+            $static_libta_lib_a->move( $static_libta_lib );
+        }
+
         my $lib = $prefix->child('lib')->stringify;
         my $include = $prefix->child('include', 'ta-lib');
-        my $dynamic = $prefix->child('lib', 'dynamic');
+        my $dynamic = $prefix->child('dynamic');
         $build->runtime_prop->{cflags} = "-I$include";
         $build->runtime_prop->{libs} = "-L$dynamic -lta_lib -lm";
         $build->runtime_prop->{libs_static} = "-L$lib -lta_lib -lm";
+
+        $build->runtime_prop->{inline_auto_include} = [ 'ta_libc.h' ];
     };
 };

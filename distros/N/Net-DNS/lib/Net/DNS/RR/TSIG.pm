@@ -2,7 +2,7 @@ package Net::DNS::RR::TSIG;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: TSIG.pm 1856 2021-12-02 14:36:25Z willem $)[2];
+our $VERSION = (qw$Id: TSIG.pm 1883 2022-11-03 14:38:19Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -332,17 +332,7 @@ sub create {
 				);
 		}
 
-		croak "Usage:	$class->create( \$keyfile, \@options )";
-
-	} elsif ( scalar(@_) == 1 ) {
-		$class->_deprecate('create( $keyname, $key )'); # ( keyname, key )
-		return Net::DNS::RR->new(
-			name => $karg,
-			type => 'TSIG',
-			key  => shift
-			);
-
-	} else {
+	} elsif ( ( scalar(@_) % 2 ) == 0 ) {
 		require File::Spec;				# ( keyfile, options )
 		require Net::DNS::ZoneFile;
 		my ($keypath) = SYMLINK ? grep( {$_} readlink($karg), $karg ) : $karg;
@@ -379,6 +369,8 @@ sub create {
 			@_
 			);
 	}
+
+	croak "Usage:	$class->create( \$keyfile, \@options )";
 }
 
 
@@ -776,7 +768,7 @@ added by Dick Franks.
 
 =head1 BUGS
 
-A 32-bit representation of time is used, contrary to RFC2845 which
+A 32-bit representation of time is used, contrary to RFC8945 which
 demands 48 bits.  This design decision will need to be reviewed
 before the code stops working on 7 February 2106.
 
@@ -815,7 +807,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC8945
+L<perl>, L<Net::DNS>, L<Net::DNS::RR>, L<RFC8945|https://tools.ietf.org/html/rfc8945>
 
 L<TSIG Algorithm Names|http://www.iana.org/assignments/tsig-algorithm-names>
 

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package App::Cmd::Tester 0.334;
+package App::Cmd::Tester 0.335;
 
 # ABSTRACT: for capturing the result of running an app
 
@@ -138,7 +138,7 @@ sub _run_with_capture {
 }
 
 {
-  package App::Cmd::Tester::Result 0.334;
+  package App::Cmd::Tester::Result 0.335;
 
   sub new {
     my ($class, $arg) = @_;
@@ -154,7 +154,7 @@ sub _run_with_capture {
 }
 
 {
-  package App::Cmd::Tester::Exited 0.334;
+  package App::Cmd::Tester::Exited 0.335;
 
   sub throw {
     my ($class, $code) = @_;
@@ -178,7 +178,7 @@ App::Cmd::Tester - for capturing the result of running an app
 
 =head1 VERSION
 
-version 0.334
+version 0.335
 
 =head1 SYNOPSIS
 
@@ -207,10 +207,10 @@ provides to help make it easy to test App::Cmd-based programs.
 
 It provides one routine: test_app.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has a long-term perl support period.  That means it will not
-require a version of perl released fewer than five years ago.
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
@@ -251,11 +251,11 @@ L<App::Cmd::Tester::CaptureExternal> instead.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo Signes.
+This software is copyright (c) 2022 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

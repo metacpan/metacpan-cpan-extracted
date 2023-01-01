@@ -7,7 +7,7 @@ use boolean qw(true false);
 
 our ($VERSION, @EXPORT_OK);
 
-$VERSION = '0.07';
+$VERSION = '0.08';
 @EXPORT_OK = qw(trim);
 
 sub _valid_date
@@ -37,6 +37,8 @@ sub _valid
     my $self = shift;
     my $opts = pop;
     my %values = @_;
+
+    delete $values{nanosecond}; # always valid
 
     my %set = map { $_ => $self->{datetime}->$_ } @{$opts->{units}};
 

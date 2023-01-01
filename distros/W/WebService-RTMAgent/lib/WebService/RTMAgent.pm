@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package WebService::RTMAgent;
+package WebService::RTMAgent 0.603;
 # ABSTRACT: a user agent for the Remember The Milk API
-$WebService::RTMAgent::VERSION = '0.602';
+
 #pod =head1 SYNOPSIS
 #pod
 #pod  $ua = WebService::RTMAgent->new;
@@ -381,7 +381,7 @@ WebService::RTMAgent - a user agent for the Remember The Milk API
 
 =head1 VERSION
 
-version 0.602
+version 0.603
 
 =head1 SYNOPSIS
 
@@ -471,6 +471,16 @@ configure it the same way, in particular to cross proxy servers:
 Incidentally, this is the reason why the C<init> method exists: C<init> needs
 to access the network, so its work cannot be done in C<new> as that would leave
 no opportunity to configure the LWP::UserAgent.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 PUBLIC METHODS
 
@@ -581,7 +591,7 @@ Ed Santiago <ed@edsantiago.com>
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

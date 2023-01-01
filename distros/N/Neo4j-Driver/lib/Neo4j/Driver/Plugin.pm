@@ -4,7 +4,7 @@ use warnings;
 
 package Neo4j::Driver::Plugin;
 # ABSTRACT: Plug-in interface for Neo4j::Driver
-$Neo4j::Driver::Plugin::VERSION = '0.31';
+$Neo4j::Driver::Plugin::VERSION = '0.33';
 
 1;
 
@@ -20,7 +20,25 @@ Neo4j::Driver::Plugin - Plug-in interface for Neo4j::Driver
 
 =head1 VERSION
 
-version 0.31
+version 0.33
+
+=head1 DESCRIPTION
+
+This is the abstract base class for L<Neo4j::Driver> plug-ins.
+All plug-ins must inherit from L<Neo4j::Driver::Plugin>
+(or perform the role another way). For a description of the
+required behaviour for plug-ins, see L</"METHODS"> below.
+
+Plug-ins can be used to extend and customise L<Neo4j::Driver>
+to a significant degree. Upon being loaded, a plug-in will be
+asked to register event handlers with the driver. Handlers
+are references to custom subroutines defined by the plug-in.
+They will be invoked when the event they were registered for
+is triggered. Events triggered by the driver are specified in
+L</"EVENTS"> below. Plug-ins can also define custom events.
+
+I<The plug-in interface as described in this document is available
+since version 0.31.>
 
 =head1 SYNPOSIS
 
@@ -66,24 +84,6 @@ I'm grateful for any feedback you I<(yes, you!)> might have on
 this driver's plug-in API. Please open a GitHub issue or get in
 touch via email (make sure you mention Neo4j in the subject to
 beat the spam filters).
-
-=head1 DESCRIPTION
-
-This is the abstract base class for L<Neo4j::Driver> plug-ins.
-All plug-ins must inherit from L<Neo4j::Driver::Plugin>
-(or perform the role another way). For a description of the
-required behaviour for plug-ins, see L</"METHODS"> below.
-
-Plug-ins can be used to extend and customise L<Neo4j::Driver>
-to a significant degree. Upon being loaded, a plug-in will be
-asked to register event handlers with the driver. Handlers
-are references to custom subroutines defined by the plug-in.
-They will be invoked when the event they were registered for
-is triggered. Events triggered by the driver are specified in
-L</"EVENTS"> below. Plug-ins can also define custom events.
-
-I<The plug-in interface as described in this document is available
-since version 0.31.>
 
 =head1 EVENTS
 
@@ -178,7 +178,7 @@ The plug-in manager implements the following methods.
 Registers the given handler for the named event. When that event
 is triggered, the handler will be invoked (unless another plug-in's
 handler for the same event prevents this). Handlers will be invoked
-the order they are added (but the order may be subject to change).
+in the order they are added (but the order may be subject to change).
 
 Certain events provide handlers with a code reference for
 continuing with the next handler registered for that event. This
@@ -210,7 +210,7 @@ Most plug-ins won't need to call this method. But plug-ins may
 choose to trigger and handle custom events. These must have names
 that begin with C<x_>. Plug-ins should not trigger events with
 other names, as these are reserved for internal use by the driver
-itself.
+itself and for first-party plug-ins.
 
 You should avoid using custom event names that start with
 C<x_after_> and C<x_before_>, because a future version of the
@@ -547,12 +547,15 @@ but I am going to try.
 
 Arne Johannessen <ajnn@cpan.org>
 
+If you contact me by email, please make sure you include the word
+"Perl" in your subject header to help beat the spam filters.
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0 or (at your option) the same terms
+as the Perl 5 programming language system itself.
 
 =cut

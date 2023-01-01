@@ -96,7 +96,7 @@ sub __drop {
     }
     if ( $row_count ) {
         chomp $info;
-        $info .= sprintf "  (%s %s)\n", insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ), $row_count == 1 ? 'row' : 'rows';
+        $info .= sprintf "  (%s %s)\n", insert_sep( $row_count, $sf->{i}{info_thsd_sep} ), $row_count == 1 ? 'row' : 'rows';
     }
     my $prompt = "CONFIRM:";
     # Choose

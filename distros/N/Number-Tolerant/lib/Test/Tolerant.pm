@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Test::Tolerant 1.709;
+package Test::Tolerant 1.710;
 # ABSTRACT: test routines for testing numbers against tolerances
 
 #pod =head1 SYNOPSIS
@@ -98,7 +98,7 @@ Test::Tolerant - test routines for testing numbers against tolerances
 
 =head1 VERSION
 
-version 1.709
+version 1.710
 
 =head1 SYNOPSIS
 
@@ -148,7 +148,7 @@ this:
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

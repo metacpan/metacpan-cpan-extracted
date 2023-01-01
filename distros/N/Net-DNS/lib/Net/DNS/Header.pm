@@ -3,7 +3,7 @@ package Net::DNS::Header;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Header.pm 1875 2022-09-23 13:41:03Z willem $)[2];
+our $VERSION = (qw$Id: Header.pm 1891 2022-12-28 13:09:27Z willem $)[2];
 
 
 =head1 NAME
@@ -66,16 +66,11 @@ sub string {
 	my $an	   = $self->ancount;
 	my $ns	   = $self->nscount;
 	my $ar	   = $self->arcount;
-
-	my $opt	 = $$self->edns;
-	my $edns = $opt->_specified ? $opt->string : '';
-
-	return <<END . $edns if $opcode eq 'UPDATE';
+	return <<"QQ" if $opcode eq 'UPDATE';
 ;;	id = $id
 ;;	qr = $qr		opcode = $opcode	rcode = $rcode
 ;;	zocount = $qd	prcount = $an	upcount = $ns	adcount = $ar
-END
-
+QQ
 	my $aa = $self->aa;
 	my $tc = $self->tc;
 	my $rd = $self->rd;
@@ -84,14 +79,13 @@ END
 	my $ad = $self->ad;
 	my $cd = $self->cd;
 	my $do = $self->do;
-
-	return <<END . $edns;
+	return <<"QQ";
 ;;	id = $id
 ;;	qr = $qr	aa = $aa	tc = $tc	rd = $rd	opcode = $opcode
 ;;	ra = $ra	z  = $zz	ad = $ad	cd = $cd	rcode  = $rcode
 ;;	qdcount = $qd	ancount = $an	nscount = $ns	arcount = $ar
 ;;	do = $do
-END
+QQ
 }
 
 
@@ -120,15 +114,15 @@ A random value is assigned if the argument value is undefined.
 
 =cut
 
-my ( $cache1, $cache2, $limit ) = ( {}, {}, 50 );		# two part cache
+my ( $cache1, $cache2, $limit );				# two layer cache
 
 sub id {
 	my $self  = shift;
 	my $ident = scalar(@_) ? ( $$self->{id} = shift ) : $$self->{id};
-	return $ident if defined $ident;
-	$cache2->{$ident = int rand(0xffff)}++;			# preserve recent uniqueness
-	$cache2->{$ident = int rand(0xffff)}++ while $cache1->{$ident}++;
-	( $cache1, $cache2, $limit ) = ( $cache2, {}, 50 ) unless $limit--;
+	return $ident if $ident;
+	$ident = int rand(0xffff);				# preserve short-term uniqueness
+	$ident = int rand(0xffff) while $cache1->{$ident}++ + exists( $cache2->{$ident} );
+	( $cache1, $cache2, $limit ) = ( {0 => 1}, $cache1, 50 ) unless $limit--;
 	return $$self->{id} = $ident;
 }
 
@@ -169,7 +163,6 @@ sub rcode {
 	for ( $$self->{status} ) {
 		my $opt = $$self->edns;
 		unless ( defined $arg ) {
-			return rcodebyval( $_ & 0x0f ) unless $opt->_specified;
 			$rcode = ( $opt->rcode & 0xff0 ) | ( $_ & 0x00f );
 			$opt->rcode($rcode);			# write back full 12-bit rcode
 			return $rcode == 16 ? 'BADVERS' : rcodebyval($rcode);
@@ -478,7 +471,7 @@ Copyright (c)1997 Michael Fuhr.
 
 Portions Copyright (c)2002,2003 Chris Reinhardt.
 
-Portions Copyright (c)2012 Dick Franks.
+Portions Copyright (c)2012,2022 Dick Franks.
 
 All rights reserved.
 

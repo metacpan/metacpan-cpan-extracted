@@ -1,5 +1,9 @@
 Revision history for Number-Nary
 
+1.100313  2022-12-31 13:59:01-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 1.100312  2013-10-06 22:53:10 America/New_York
           yet further packaging fixes (repo, bugtracker)
 

@@ -1,7 +1,7 @@
 use v5.8.0;
 use strict;
 use warnings;
-package String::Formatter 1.234;
+package String::Formatter 1.235;
 # ABSTRACT: build sprintf-like functions of your own
 
 #pod =head1 SYNOPSIS
@@ -668,7 +668,7 @@ String::Formatter - build sprintf-like functions of your own
 
 =head1 VERSION
 
-version 1.234
+version 1.235
 
 =head1 SYNOPSIS
 
@@ -1019,7 +1019,7 @@ String::Formatter.  Very little of the original code remains.
 
 =item *
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =item *
 
@@ -1029,7 +1029,7 @@ Darren Chamberlain <darren@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Darren Chamberlain David Steinbrunner dlc
+=for stopwords Darren Chamberlain David Steinbrunner dlc Ricardo Signes
 
 =over 4
 
@@ -1045,11 +1045,15 @@ David Steinbrunner <dsteinbrunner@pobox.com>
 
 dlc <dlc>
 
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Ricardo Signes <rjbs@cpan.org>.
+This software is Copyright (c) 2022 by Ricardo Signes <cpan@semiotic.systems>.
 
 This is free software, licensed under:
 

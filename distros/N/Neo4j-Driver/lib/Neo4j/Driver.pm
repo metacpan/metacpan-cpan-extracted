@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Neo4j community graph database driver for Bolt and HTTP
-$Neo4j::Driver::VERSION = '0.31';
+$Neo4j::Driver::VERSION = '0.33';
 
 use Carp qw(croak);
 
@@ -74,11 +74,15 @@ sub _check_uri {
 	my $uri = $self->{uri};
 	
 	if ($uri) {
-		$uri =~ s|^|http://| if $uri !~ m{:|/};
+		$uri = "[$uri]" if $uri =~ m{^[0-9a-f:]*::|^(?:[0-9a-f]+:){6}}i;
+		$uri =~ s|^|http://| if $uri !~ m{:|/} || $uri =~ m{^\[.+\]$};
 		$uri =~ s|^|http:| if $uri =~ m{^//};
 		$uri = URI->new($uri);
 		
-		if (! $uri->scheme || $uri->scheme !~ m/^https?|bolt$/) {
+		if ( ! $uri->scheme ) {
+			croak sprintf "Failed to parse URI '%s'", $uri;
+		}
+		if ( $uri->scheme !~ m/^https?$|^bolt$/ ) {
 			croak sprintf "URI scheme '%s' unsupported; use 'http' or 'bolt'", $uri->scheme // "";
 		}
 		
@@ -225,7 +229,7 @@ Neo4j::Driver - Neo4j community graph database driver for Bolt and HTTP
 
 =head1 VERSION
 
-version 0.31
+version 0.33
 
 =head1 SYNOPSIS
 
@@ -256,7 +260,7 @@ This extends the uniformity across languages, which is a
 stated goal of the Neo4j Driver API, to Perl.
 
 This driver targets the Neo4j community edition,
-version 2.3, 3.x and 4.x. The Neo4j enterprise edition
+version 2.x, 3.x, 4.x, and 5.x. The Neo4j enterprise edition
 and AuraDB are only supported as far as practical,
 but patches will be accepted.
 
@@ -286,7 +290,7 @@ available. HTTP is still fast enough for many use cases and
 works even in a "Pure Perl" environment. It may also be
 quicker than Bolt to add support for future changes in Neo4j.
 
-HTTP connections will use B<Jolt> (JSON Bolt) when available.
+HTTP connections will use B<Jolt> (JSON Bolt) when offered by the server.
 For older Neo4j servers (before S<version 4.2>), the driver
 will automatically fall back to slower REST-style JSON.
 
@@ -462,7 +466,7 @@ L<Neo4j::Driver> implements the following configuration options.
 
  $driver->config(auth => {
    scheme      => 'basic',
-   principal   => 'neo4j',   # user id
+   principal   => $user_id,   # 'neo4j' by default
    credentials => $password,
  });
 
@@ -584,9 +588,11 @@ The C<neo4j> URI scheme is not yet implemented. Once it is added
 to a future version of this driver, the default URI scheme will
 likely change to C<neo4j>.
 
-Note that some network environments may have issues with dual-stack
-hostnames such as C<localhost>. The connection may appear to "hang".
-Literal IP addresses like C<127.0.0.1> are not affected.
+Note that there sometimes are issues with IPv4/IPv6 dual-stack
+hostnames such as C<localhost> when using HTTP. The connection may
+appear to "hang". Literal IP addresses like C<127.0.0.1> are not
+affected. See L<Neo4j::Driver::Net/"IPv6 / dual-stack support">
+for further discussion.
 
 =head1 ENVIRONMENT
 
@@ -622,9 +628,9 @@ there is a compelling reason for a different approach in Perl.
 =item * L<Neo4j::Driver::B<Session>>
 
 =item * Official API documentation:
-L<Neo4j Driver API Specification|https://7687.org/driver_api/driver-api-specification.html>,
-L<Neo4j Drivers Manual|https://neo4j.com/docs/driver-manual/4.1/>,
-L<Neo4j HTTP API Docs|https://neo4j.com/docs/http-api/4.4/>
+L<Neo4j Driver API Specification|https://github.com/neo4j/docs-bolt/blob/main/modules/ROOT/pages/driver-api/index.adoc>,
+L<Neo4j Drivers Manual|https://neo4j.com/docs/java-manual/5/>,
+L<Neo4j HTTP API Docs|https://neo4j.com/docs/http-api/5/>
 
 =item * Other modules for working with Neo4j:
 L<DBD::Neo4p>,
@@ -647,12 +653,15 @@ driver I<certainly> would be in much worse shape than it is today.
 
 Arne Johannessen <ajnn@cpan.org>
 
+If you contact me by email, please make sure you include the word
+"Perl" in your subject header to help beat the spam filters.
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0 or (at your option) the same terms
+as the Perl 5 programming language system itself.
 
 =cut

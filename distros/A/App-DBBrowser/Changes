@@ -1,6 +1,12 @@
 Revision history for App-DBBrowser
 
 
+2.307    2023-01-01
+        - Removed unused option 'decimal_separator'.
+        - Add option to config the CSV export.
+        - Code refactoring.
+        - Update documentation.
+
 2.306    2022-12-23
         - Removed stringification of the output of 'group_concat'.
 

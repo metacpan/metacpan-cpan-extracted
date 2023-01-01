@@ -7,6 +7,9 @@ Makefile.PL
 README
 dist.ini
 lib/Catalyst/ActionRole/RequestModel.pm
+lib/CatalystX/QueryModel.pm
+lib/CatalystX/QueryModel/DoesQueryModel.pm
+lib/CatalystX/QueryModel/QueryParser.pm
 lib/CatalystX/RequestModel.pm
 lib/CatalystX/RequestModel/ContentBodyParser.pm
 lib/CatalystX/RequestModel/ContentBodyParser/FormURLEncoded.pm
@@ -28,8 +31,11 @@ t/lib/Example/Controller/Upload.pm
 t/lib/Example/Model/API/AccountRequest.pm
 t/lib/Example/Model/AccountRequest.pm
 t/lib/Example/Model/InfoQuery.pm
+t/lib/Example/Model/InfoQuery2.pm
+t/lib/Example/Model/InfoQuery3.pm
 t/lib/Example/Model/InfoRequest.pm
 t/lib/Example/Model/LoginRequest.pm
 t/lib/Example/Model/UploadRequest.pm
 t/query.t
+t/query2.t
 t/upload.t

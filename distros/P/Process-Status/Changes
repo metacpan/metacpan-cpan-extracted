@@ -1,5 +1,9 @@
 Revision history for Process-Status
 
+0.010     2022-12-31 14:16:04-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 0.009     2020-04-08 17:58:46-04:00 America/New_York
         - fix behavior of assert_ok on negative statuses when called as a class
           method (thanks, Michael McClimon)

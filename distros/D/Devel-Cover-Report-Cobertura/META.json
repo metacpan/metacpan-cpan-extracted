@@ -1,0 +1,58 @@
+{
+   "abstract" : "Backend for Cobertura reporting of coverage statistics",
+   "author" : [
+      "Jeff Zhang <jhzhang@synopsys.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-Cover-Report-Cobertura",
+   "no_index" : {
+      "directory" : [
+         "cover_db_test",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Devel::Cover" : "0",
+            "TAP::Harness" : "0",
+            "Test::Exception" : "0",
+            "Test::MockObject" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Test::MockTime" : "0"
+         },
+         "requires" : {
+            "Class::Accessor" : "0",
+            "Devel::Cover" : "0",
+            "Devel::Cover::Report::Clover" : "1.01",
+            "HTML::Parser" : "0",
+            "Template" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.0",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

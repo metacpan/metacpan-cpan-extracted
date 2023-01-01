@@ -25,9 +25,10 @@ our $mod = {
     module=>'PDL::Graphics::Simple::PLplot',
     engine => 'PDL::Graphics::PLplot',
     synopsis=> 'PLplot (nice plotting, sloooow images)',
-    pgs_version=> '1.007',
+    pgs_version=> '1.008',
 };
-PDL::Graphics::Simple::register( 'PDL::Graphics::Simple::PLplot' );
+eval { require PDL::Graphics::PLplot; 1; } and
+  PDL::Graphics::Simple::register( 'PDL::Graphics::Simple::PLplot' );
 
 my @DEVICES = qw(
   qtwidget wxwidgets xcairo xwin wingcc
@@ -129,7 +130,8 @@ sub check {
 	$mod->{disp_dev} = $good_dev;
     } else {
 	$mod->{ok} = 0;
-	$mod->{msg} = "No suitable display device found";
+	$mod->{msg} = join "\n\t", "No suitable display device found among:",
+          sort keys %{ $mod->{devices} };
 	return 0;
     }
 

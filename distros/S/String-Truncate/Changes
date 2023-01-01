@@ -1,5 +1,9 @@
 Revision history for String-Truncate
 
+1.100603  2022-12-31 15:48:46-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 1.100602  2014-03-15 17:21:42+01:00 Europe/Paris
           typo fixes (thanks, David Steinbrunner)
 

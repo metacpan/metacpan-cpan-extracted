@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Test::Abortable;
+package Test::Abortable 0.003;
 # ABSTRACT: subtests that you can die your way out of ... but survive
-$Test::Abortable::VERSION = '0.002';
+
 #pod =head1 OVERVIEW
 #pod
 #pod Test::Abortable provides a simple system for catching some exceptions and
@@ -217,7 +217,7 @@ Test::Abortable - subtests that you can die your way out of ... but survive
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 OVERVIEW
 
@@ -279,6 +279,16 @@ events, or none — although providing none might lead to some serious confusion
 Right now, any exception that provides this method will be honored.  In the
 future, a facility for only allowing abortable exceptions of a given class may
 be added.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 FUNCTIONS
 
@@ -342,7 +352,13 @@ methods to his code through the use of application-specific Moose roles,
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

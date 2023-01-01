@@ -1,5 +1,5 @@
 package Playwright::Base;
-$Playwright::Base::VERSION = '1.251';
+$Playwright::Base::VERSION = '1.291';
 use strict;
 use warnings;
 
@@ -23,6 +23,7 @@ sub new ( $class, %options ) {
             guid   => $options{id},
             ua     => $options{handle}{ua},
             port   => $options{handle}{port},
+            host   => $options{handle}{host},
             parent => $options{parent},
         },
         $class
@@ -89,8 +90,8 @@ sub _api_request ( $self, %args ) {
 }
 
 sub _do ( $self, %args ) {
-    return Playwright::Util::request( 'POST', 'command', $self->{port},
-        $self->{ua}, %args );
+    return Playwright::Util::request( 'POST', 'command', $self->{host},
+        $self->{port}, $self->{ua}, %args );
 }
 
 sub spec {
@@ -111,7 +112,7 @@ Playwright::Base - Object representing Playwright pages
 
 =head1 VERSION
 
-version 1.251
+version 1.291
 
 =head2 DESCRIPTION
 

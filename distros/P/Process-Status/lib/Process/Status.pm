@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Process::Status;
+package Process::Status 0.010;
 # ABSTRACT: a handle on process termination, like $?
-$Process::Status::VERSION = '0.009';
+
 use Config ();
 
 #pod =head1 OVERVIEW
@@ -168,9 +168,9 @@ sub assert_ok {
 }
 
 {
-  package Process::Status::Negative;
-$Process::Status::Negative::VERSION = '0.009';
-BEGIN { our @ISA = 'Process::Status' }
+  package Process::Status::Negative 0.010;
+
+  BEGIN { our @ISA = 'Process::Status' }
   sub status_code { $_[0][0] }
   sub pid_t       { $_[0][0] } # historical nonsense
   sub is_success  { return }
@@ -211,7 +211,7 @@ Process::Status - a handle on process termination, like $?
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 OVERVIEW
 
@@ -229,6 +229,16 @@ work on an implicitly-constructed object using the current value of C<$?>.  To
 get an object for a specific value, you can call C<new> and pass an integer.
 You can also call C<new> with no arguments to get an object for the current
 value of C<$?>, if you want to keep that ugly variable out of your code.
+
+=head1 PERL VERSION
+
+This library should run on perls released even an extremely long time ago.  It
+should work on any version of perl released in the last ten years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -289,7 +299,7 @@ If a program name is not provided, "program" is used.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 

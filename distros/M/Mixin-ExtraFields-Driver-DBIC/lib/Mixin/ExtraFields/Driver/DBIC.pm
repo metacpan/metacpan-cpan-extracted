@@ -1,15 +1,68 @@
 use strict;
 use warnings;
-package Mixin::ExtraFields::Driver::DBIC;
-{
-  $Mixin::ExtraFields::Driver::DBIC::VERSION = '0.004';
-}
+package Mixin::ExtraFields::Driver::DBIC 0.005;
 use Mixin::ExtraFields::Driver 0.004 ();
 use parent 'Mixin::ExtraFields::Driver';
 # ABSTRACT: store Mixin::ExtraFields data in a DBIx::Class store
 
 use Carp ();
 
+#pod =head1 DESCRIPTION
+#pod
+#pod This class provides a driver for storing Mixin::ExtraFields data in
+#pod DBIx::Class storage.  You'll need to create a table resultsource for the
+#pod storage of entires and you'll need to use Mixin::ExtraFields in the class that
+#pod gets the extras.
+#pod
+#pod So, you might create:
+#pod
+#pod   package My::Schema::ObjectExtra;
+#pod   use Mixin::ExtraFields::Driver::DBIC -setup => { table => 'object_extras' };
+#pod   1;
+#pod
+#pod ...and elsewhere;
+#pod
+#pod   package My::Schema::Object;
+#pod   use parent 'DBIx::Class';
+#pod   ...
+#pod   use Mixin::ExtraFields -fields => {
+#pod     driver => { class => 'DBIC', rs_moniker => 'ObjectExtra' }
+#pod   };
+#pod
+#pod =head1 DRIVER ARGS
+#pod
+#pod The following arguments may be provided when defining the driver when setting
+#pod up Mixin::ExtraFields:
+#pod
+#pod   schema       - the schema for the DBIx::Class storage (see below)
+#pod   rs_moniker   - the moniker of the result source for extras
+#pod   id_column    - the name of the column that stores object ids
+#pod   name_column  - the name of the column that stores extra field names
+#pod   value_column - the name of the column that stores extra field values
+#pod
+#pod C<schema> may be an actual DBIx::Class::Schema object or a coderef which, when
+#pod called on an object, returns a schema.  The default value assumes that objects
+#pod will be DBIx::Class::Row objects, and returns their schema.
+#pod
+#pod =head1 SETUP ARGS
+#pod
+#pod When using Mixin::ExtraFields::Driver::DBIC to set up a table result source,
+#pod the following values may be in the argument to C<-setup> in the import call:
+#pod
+#pod   table        - (required) the name of the table in the storage
+#pod   id_column    - the name of the column that stores object ids
+#pod   name_column  - the name of the column that stores extra field names
+#pod   value_column - the name of the column that stores extra field values
+#pod
+#pod =begin Pod::Coverage
+#pod
+#pod   id_column
+#pod   name_column
+#pod   value_column
+#pod
+#pod =end Pod::Coverage
+#pod
+#pod =cut
 
 sub from_args {
   my ($class, $arg) = @_;
@@ -218,13 +271,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Mixin::ExtraFields::Driver::DBIC - store Mixin::ExtraFields data in a DBIx::Class store
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 
@@ -247,6 +302,16 @@ So, you might create:
   use Mixin::ExtraFields -fields => {
     driver => { class => 'DBIC', rs_moniker => 'ObjectExtra' }
   };
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 DRIVER ARGS
 
@@ -279,11 +344,17 @@ the following values may be in the argument to C<-setup> in the import call:
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

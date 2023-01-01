@@ -1,5 +1,9 @@
 Revision history for MooseX-ClassCompositor
 
+0.010     2022-12-31 13:39:41-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 0.009     2018-06-21 13:14:43-04:00 America/New_York
         - role modules are allowed to fail to load; if they fail to be set up,
           the process will still fail, but this permits roles embedded in other

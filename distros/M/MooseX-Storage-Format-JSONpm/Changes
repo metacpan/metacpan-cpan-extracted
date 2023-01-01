@@ -1,5 +1,9 @@
 Revision history for MooseX-Storage-Format-JSONpm
 
+0.093094  2022-12-31 13:51:29-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 0.093093  2013-10-05 09:11:19 America/New_York
           update bugtracker and repo
 

@@ -1,4 +1,4 @@
-package MooseX::OneArgNew 0.006;
+package MooseX::OneArgNew 0.007;
 
 use MooseX::Role::Parameterized 1.01;
 # ABSTRACT: teach ->new to accept single, non-hashref arguments
@@ -133,7 +133,7 @@ MooseX::OneArgNew - teach ->new to accept single, non-hashref arguments
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -221,17 +221,21 @@ the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords George Hartzell William Orr
+=for stopwords George Hartzell Ricardo Signes William Orr
 
 =over 4
 
 =item *
 
 George Hartzell <hartzell@alerce.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

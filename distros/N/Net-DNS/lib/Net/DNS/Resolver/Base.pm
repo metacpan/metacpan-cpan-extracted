@@ -2,7 +2,7 @@ package Net::DNS::Resolver::Base;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Base.pm 1864 2022-04-14 15:18:49Z willem $)[2];
+our $VERSION = (qw$Id: Base.pm 1883 2022-11-03 14:38:19Z willem $)[2];
 
 
 #
@@ -1043,6 +1043,8 @@ sub tsig {
 	my $self = shift;
 	$self->{tsig_rr} = eval {
 		local $SIG{__DIE__};
+		return shift unless $_[0];
+		return shift if ref($_[0]) eq 'Net::DNS::RR::TSIG';
 		require Net::DNS::RR::TSIG;
 		Net::DNS::RR::TSIG->create(@_);
 	};

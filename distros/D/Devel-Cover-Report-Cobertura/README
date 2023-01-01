@@ -1,0 +1,48 @@
+NAME
+    Devel::Cover::Report::Cobertura - Backend for Cobertura reporting of
+    coverage statistics
+
+SYNOPSIS
+     cover -report cobertura
+
+DESCRIPTION
+    This module generates a cobertura compatible coverage xml file which can
+    be used in Gitlab
+
+    It is designed to be called from the "cover" program distributed with
+    Devel::Cover Devel::Cover::Report::Clover.
+
+    It is implemented as sub class of Devel::Cover::Report::Clover with a
+    different template
+
+OPTIONS
+    Options are specified by adding the appropriate flags to the "cover"
+    program. This report format supports the following:
+
+    outputfile
+        This will be the file name that you would like to write this report
+        out to. It defaults to cobertura.xml.
+
+    projectname
+        This is simply a cosmetic item. When the xml is generated, it has a
+        project name which will show up in your continuous integration
+        system once it is parsed. This can be any string you want and it
+        defaults to 'Devel::Cover::Report::Cobertura'.
+
+SEE ALSO
+    Devel::Cover
+
+    Devel::Cover::Report::Clover
+
+CREDITS
+    David Bartle - author of Devel::Cover::Report::Clover
+
+AUTHOR
+    Jeff Zhang <jhzhang@synopsys.com>
+
+LICENSE
+    Copyright
+
+    This software is free. It is licensed under the same terms as Perl
+    itself.
+

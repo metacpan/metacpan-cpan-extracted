@@ -1,9 +1,6 @@
 use strict;
 use warnings;
-package Git::Fingerd;
-{
-  $Git::Fingerd::VERSION = '2.093521';
-}
+package Git::Fingerd 2.093523;
 use Net::Finger::Server 0.003;
 BEGIN { our @ISA = qw(Net::Finger::Server); }
 # ABSTRACT: let people finger your git server for... some reason
@@ -15,6 +12,28 @@ use SUPER;
 use String::Truncate qw(elide);
 use Text::Table;
 
+#pod =head1 DESCRIPTION
+#pod
+#pod This module implements a simple C<finger> server that describes the contents of
+#pod a server that hosts git repositories.  You can finger C<@servername> for a
+#pod listing of repositories and finger C<repo@servername> for information about
+#pod a single repository.
+#pod
+#pod This was meant to provide a simple example for Net::Finger::Server, but enough
+#pod people asked for the code that I've released it as something reusable.  Here's
+#pod an example program using Git::Fingerd:
+#pod
+#pod   #!/usr/bin/perl
+#pod   use Git::Fingerd -run => {
+#pod     isa     => 'Net::Server::INET',
+#pod     basedir => '/var/lib/git',
+#pod   };
+#pod
+#pod This program could then run out of F<xinetd>.
+#pod
+#pod =for Pod::Coverage new basedir
+#pod
+#pod =cut
 
 sub new {
   my ($class, %config) = @_;
@@ -120,13 +139,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Git::Fingerd - let people finger your git server for... some reason
 
 =head1 VERSION
 
-version 2.093521
+version 2.093523
 
 =head1 DESCRIPTION
 
@@ -147,15 +168,31 @@ an example program using Git::Fingerd:
 
 This program could then run out of F<xinetd>.
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =for Pod::Coverage new basedir
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

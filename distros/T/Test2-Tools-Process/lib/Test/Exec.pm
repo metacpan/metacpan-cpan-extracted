@@ -9,7 +9,7 @@ use Return::MultiLevel qw( with_return );
 use base 'Exporter';
 
 # ABSTRACT: Test that some code calls exec without terminating testing
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 our @EXPORT = qw( exec_arrayref never_exec_ok );
@@ -70,7 +70,7 @@ Test::Exec - Test that some code calls exec without terminating testing
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -128,11 +128,15 @@ Provides an interface to mocking C<system>, C<qx> and C<exec>.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Jeremy Mates (THRIG)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2021 by Graham Ollis.
+This software is copyright (c) 2015-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

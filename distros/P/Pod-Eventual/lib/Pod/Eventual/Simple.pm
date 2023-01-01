@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Pod::Eventual::Simple 0.094002;
+package Pod::Eventual::Simple 0.094003;
 use Pod::Eventual;
 BEGIN { our @ISA = 'Pod::Eventual' }
 # ABSTRACT: just get an array of the stuff Pod::Eventual finds
@@ -63,7 +63,7 @@ Pod::Eventual::Simple - just get an array of the stuff Pod::Eventual finds
 
 =head1 VERSION
 
-version 0.094002
+version 0.094003
 
 =head1 SYNOPSIS
 
@@ -97,11 +97,11 @@ the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

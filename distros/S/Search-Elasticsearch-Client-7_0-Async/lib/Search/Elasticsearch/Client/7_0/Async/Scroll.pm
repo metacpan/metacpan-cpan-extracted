@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Client::7_0::Async::Scroll;
-$Search::Elasticsearch::Client::7_0::Async::Scroll::VERSION = '7.711001';
+$Search::Elasticsearch::Client::7_0::Async::Scroll::VERSION = '8.00';
 use Moo;
 use Search::Elasticsearch::Util qw(parse_params throw);
 use Search::Elasticsearch::Async::Util qw(thenable);
@@ -233,7 +233,7 @@ Search::Elasticsearch::Client::7_0::Async::Scroll - A helper module for scrolled
 
 =head1 VERSION
 
-version 7.711001
+version 8.00
 
 =head1 SYNOPSIS
 
@@ -547,7 +547,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Elasticsearch BV.
+This software is Copyright (c) 2022 by Elasticsearch BV.
 
 This is free software, licensed under:
 

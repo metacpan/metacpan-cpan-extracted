@@ -6,10 +6,44 @@ use warnings;
 
 use Test::More;
 
-plan tests => 42 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 75 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'App/CSVUtils.pm'
+    'App/CSVUtils.pm',
+    'App/CSVUtils/csv2td.pm',
+    'App/CSVUtils/csv2vcf.pm',
+    'App/CSVUtils/csv_add_fields.pm',
+    'App/CSVUtils/csv_avg.pm',
+    'App/CSVUtils/csv_concat.pm',
+    'App/CSVUtils/csv_convert_to_hash.pm',
+    'App/CSVUtils/csv_csv.pm',
+    'App/CSVUtils/csv_delete_fields.pm',
+    'App/CSVUtils/csv_dump.pm',
+    'App/CSVUtils/csv_each_row.pm',
+    'App/CSVUtils/csv_fill_template.pm',
+    'App/CSVUtils/csv_freqtable.pm',
+    'App/CSVUtils/csv_gen.pm',
+    'App/CSVUtils/csv_get_cells.pm',
+    'App/CSVUtils/csv_grep.pm',
+    'App/CSVUtils/csv_info.pm',
+    'App/CSVUtils/csv_list_field_names.pm',
+    'App/CSVUtils/csv_lookup_fields.pm',
+    'App/CSVUtils/csv_map.pm',
+    'App/CSVUtils/csv_munge_field.pm',
+    'App/CSVUtils/csv_munge_row.pm',
+    'App/CSVUtils/csv_pick_fields.pm',
+    'App/CSVUtils/csv_pick_rows.pm',
+    'App/CSVUtils/csv_replace_newline.pm',
+    'App/CSVUtils/csv_select_fields.pm',
+    'App/CSVUtils/csv_select_rows.pm',
+    'App/CSVUtils/csv_setop.pm',
+    'App/CSVUtils/csv_shuf_fields.pm',
+    'App/CSVUtils/csv_shuf_rows.pm',
+    'App/CSVUtils/csv_sort_fields.pm',
+    'App/CSVUtils/csv_sort_rows.pm',
+    'App/CSVUtils/csv_split.pm',
+    'App/CSVUtils/csv_sum.pm',
+    'App/CSVUtils/csv_transpose.pm'
 );
 
 my @scripts = (
@@ -23,6 +57,7 @@ my @scripts = (
     'script/csv-each-row',
     'script/csv-fill-template',
     'script/csv-freqtable',
+    'script/csv-gen',
     'script/csv-get-cells',
     'script/csv-grep',
     'script/csv-info',
@@ -47,12 +82,10 @@ my @scripts = (
     'script/csv-split',
     'script/csv-sum',
     'script/csv-transpose',
-    'script/csv2csv',
     'script/csv2ltsv',
     'script/csv2td',
     'script/csv2tsv',
     'script/csv2vcf',
-    'script/dump-csv',
     'script/tsv2csv'
 );
 

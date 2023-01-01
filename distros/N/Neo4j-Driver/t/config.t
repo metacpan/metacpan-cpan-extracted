@@ -16,7 +16,7 @@ use Neo4j_Test::MockHTTP;
 
 my ($d, $r, $w);
 
-plan tests => 16 + 1;
+plan tests => 17 + 1;
 
 
 subtest 'config read/write' => sub {
@@ -133,7 +133,7 @@ subtest 'uri config' => sub {
 
 
 subtest 'uri variants' => sub {
-	plan tests => 16;
+	plan tests => 20;
 	# http scheme (default)
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('HTTP://TEST:7474'); } 'http uppercase lives';
 	lives_and { is $d->{uri}->scheme, 'http'; } 'http uppercase scheme';
@@ -151,6 +151,44 @@ subtest 'uri variants' => sub {
 	lives_and { is $d->{uri}, 'http://localhost:7474'; } 'network-path ref only';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new(''); } 'empty lives';
 	lives_and { is $d->{uri}, 'http://localhost:7474'; } 'empty';
+	# long host names
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://foo.bar.test:10023'); } 'new driver fqdn lives';
+	lives_and { is $d->config('uri'), 'http://foo.bar.test:10023'; } 'new driver fqdn';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('foo.bar.test'); } 'host only fqdn lives';
+	lives_and { is $d->{uri}, 'http://foo.bar.test:7474'; } 'host only fqdn';
+};
+
+
+subtest 'uri literal ips' => sub {
+	plan tests => 18;
+	# IPv4 parsing
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://198.51.100.2:4000'); } 'IPv4 full uri lives';
+	lives_and { is $d->{uri}, 'http://198.51.100.2:4000'; } 'IPv4 full uri';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('198.51.100.2'); } 'IPv4 only lives';
+	lives_and { is $d->{uri}, 'http://198.51.100.2:7474'; } 'IPv4 only';
+	throws_ok {
+		Neo4j::Driver->new('198.51.100.2:7474');
+	} qr/\bFailed to parse URI\b/i, 'IPv4 only with port dies';
+	# IPv6 parsing
+	my $ip;
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://[::1]:6000'); } 'IPv6 full uri lives';
+	lives_and { is $d->{uri}, 'http://[::1]:6000'; } 'IPv6 full uri';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('::1'); } 'IPv6 only lives';
+	lives_and { is $d->{uri}, 'http://[::1]:7474'; } 'IPv6 only';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('::'); } 'IPv6 default only lives';
+	lives_and { is $d->{uri}, 'http://[::]:7474'; } 'IPv6 default only';
+	$ip = '2001:db8:85a3:8d3:1319:fabe:360c:7348';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new("$ip"); } 'IPv6 long only lives';
+	lives_and { is $d->{uri}, "http://[$ip]:7474"; } 'IPv6 long only';
+	$ip = '64:ff9b:1:fffe::192.0.2.34';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new("[$ip]"); } 'IPv4/IPv6 translation lives';
+	lives_and { is $d->{uri}, "http://[$ip]:7474"; } 'IPv4/IPv6 translation';
+	$ip = '2001:DB8:0:0:01::AA';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new("//[$ip]"); } 'IPv6 non-canoncial lives';
+	lives_and { like $d->{uri}, qr{^http://\[2001:db8:[01:]+:aa\]:7474$}i; } 'IPv6 non-canoncial';
+	throws_ok {
+		Neo4j::Driver->new("[$ip]:7474");
+	} qr/\bFailed to parse URI\b/i, 'IPv6 literal only with port dies';
 };
 
 
@@ -174,7 +212,7 @@ subtest 'non-http uris' => sub {
 
 
 subtest 'unsupported uris' => sub {
-	plan tests => 8;
+	plan tests => 9;
 	# unimplemented scheme (Casual Clusters)
 	throws_ok {
 		Neo4j::Driver->new('bolt+routing://test12');
@@ -197,22 +235,27 @@ subtest 'unsupported uris' => sub {
 	} qr/\bscheme\b.*\bunsupported\b/i, 'unknown scheme only';
 	# illegal scheme
 	throws_ok {
+		Neo4j::Driver->new('://empty');
+	} qr/\bFailed to parse URI\b/i, 'empty scheme';
+	throws_ok {
 		Neo4j::Driver->new('ille*gal://test12');
-	} qr/\bscheme\b.*\bunsupported\b/i, 'illegal full uri';
+	} qr/\bscheme\b.*\bunsupported\b|\bFailed to parse URI\b/i, 'illegal full uri';
 	throws_ok {
 		Neo4j::Driver->new('ille*gal:');
-	} qr/\bscheme\b.*\bunsupported\b/i, 'illegal scheme only';
+	} qr/\bscheme\b.*\bunsupported\b|\bFailed to parse URI\b/i, 'illegal scheme only';
 };
 
 
 subtest 'uris with path/query' => sub {
-	plan tests => 8;
+	plan tests => 10;
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://extra-slash/'); } 'path / lives';
 	lives_and { is $d->{uri}, 'http://extra-slash:7474'; } 'path / removed';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://reverse/proxy/'); } 'path /proxy/ lives';
 	lives_and { is $d->{uri}, 'http://reverse:7474/proxy/'; } 'path /proxy/ unchanged';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://reverse/?proxy'); } 'query /?proxy lives';
 	lives_and { is $d->{uri}, 'http://reverse:7474/?proxy'; } 'query /?proxy unchanged';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://fqdn.test/foo.com'); } 'fqdn path lives';
+	lives_and { is $d->{uri}, 'http://fqdn.test:7474/foo.com'; } 'fqdn path unchanged';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://host/#fragment'); } 'fragment lives';
 	lives_and { is $d->{uri}, 'http://host:7474'; } 'fragment removed';
 };

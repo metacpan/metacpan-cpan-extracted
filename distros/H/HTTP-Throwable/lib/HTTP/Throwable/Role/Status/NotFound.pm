@@ -1,6 +1,6 @@
-package HTTP::Throwable::Role::Status::NotFound;
+package HTTP::Throwable::Role::Status::NotFound 0.028;
 our $AUTHORITY = 'cpan:STEVAN';
-$HTTP::Throwable::Role::Status::NotFound::VERSION = '0.027';
+
 use Moo::Role;
 
 with(
@@ -23,7 +23,7 @@ HTTP::Throwable::Role::Status::NotFound - 404 Not Found
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 DESCRIPTION
 
@@ -36,6 +36,16 @@ forwarding address. This status code is commonly used when
 the server does not wish to reveal exactly why the request
 has been refused, or when no other response is applicable.
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 AUTHORS
 
 =over 4
@@ -46,7 +56,7 @@ Stevan Little <stevan.little@iinteractive.com>
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =back
 

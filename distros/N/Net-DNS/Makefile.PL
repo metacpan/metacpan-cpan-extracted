@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1875 2022-09-23 13:41:03Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1886 2022-12-20 11:27:25Z willem $	-*-perl-*-
 #
 
 use 5.008009;
@@ -295,7 +295,7 @@ sub postamble {
 test_cover :
 	cover -delete
 	HARNESS_PERL_SWITCHES=-MDevel::Cover $(MAKE) test
-	cover -summary
+	cover
 END
 }
 

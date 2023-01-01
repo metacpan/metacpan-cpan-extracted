@@ -6,6 +6,7 @@ use Test::More;
 use MooseX::ClassCompositor;
 use MooseX::Role::Parameterized 0.23 ();
 
+use lib '.';
 use t::lib::Parameterized;
 
 my $comp = MooseX::ClassCompositor->new({

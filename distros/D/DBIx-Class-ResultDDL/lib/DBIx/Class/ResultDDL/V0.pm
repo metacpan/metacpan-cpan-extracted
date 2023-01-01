@@ -80,10 +80,6 @@ __END__
 
 DBIx::Class::ResultDDL::V0 - Back-compat for version 0 of this module
 
-=head1 VERSION
-
-version 2.01
-
 =head1 DESCRIPTION
 
 This package provides the ":V0" API functions, for backward compatibility.
@@ -393,6 +389,10 @@ contribute a patch.
 =head1 AUTHOR
 
 Michael Conrad <mconrad@intellitree.com>
+
+=head1 VERSION
+
+version 2.02
 
 =head1 COPYRIGHT AND LICENSE
 

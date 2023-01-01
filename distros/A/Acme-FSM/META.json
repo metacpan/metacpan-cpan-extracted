@@ -1,0 +1,48 @@
+{
+   "abstract" : "Pseudo Finite State Machine",
+   "author" : [
+      "Eric Pozharski <whynot@pozharski.name>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-FSM",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.10.0",
+            "version" : "v0.77.0"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::FSM" : {
+         "file" : "lib/FSM.pm",
+         "version" : "v2.3.5"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/lgpl-3.0.txt"
+      ]
+   },
+   "version" : "v2.3.5"
+}

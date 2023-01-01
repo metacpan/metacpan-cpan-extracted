@@ -1,4 +1,4 @@
-package Config::MVP::Reader::INI 2.101464;
+package Config::MVP::Reader::INI 2.101465;
 # ABSTRACT: an MVP config reader for .ini files
 
 use Moose;
@@ -91,7 +91,7 @@ Config::MVP::Reader::INI - an MVP config reader for .ini files
 
 =head1 VERSION
 
-version 2.101464
+version 2.101465
 
 =head1 DESCRIPTION
 
@@ -112,11 +112,11 @@ the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords nperez Olivier Mengué
+=for stopwords nperez Olivier Mengué Ricardo Signes
 
 =over 4
 
@@ -127,6 +127,10 @@ nperez <nperez@cpan.org>
 =item *
 
 Olivier Mengué <dolmen@cpan.org>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =back
 

@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 package App::RouterColorizer;
-$App::RouterColorizer::VERSION = '1.223500';
+$App::RouterColorizer::VERSION = '1.223650';
 use Moose;
 
 use feature 'signatures';
@@ -39,13 +39,13 @@ our $INFO   = "\e[36m";      # Cyan
 our $RESET  = "\e[0m";
 
 our @BGCOLORS = (
-    "\e[30m\e[47m",    # black on white
-    "\e[30m\e[41m",    # black on red
-    "\e[30m\e[42m",    # black on green
-    "\e[30m\e[43m",    # black on yellow (orange)
-    "\e[37m\e[44m",    # white on blue
-    "\e[30m\e[45m",    # black on magenta
-    "\e[30m\e[46m",    # black on cyan
+    "\e[30m\e[47m",          # black on white
+    "\e[30m\e[41m",          # black on red
+    "\e[30m\e[42m",          # black on green
+    "\e[30m\e[43m",          # black on yellow (orange)
+    "\e[37m\e[44m",          # white on blue
+    "\e[30m\e[45m",          # black on magenta
+    "\e[30m\e[46m",          # black on cyan
 );
 
 our $NUM      = qr/$RE{num}{real}/;
@@ -91,8 +91,13 @@ our $BIGOVERRIDES = qr/   (?:\QRx Remote Fault\E)
                         | (?:\QFar End Client Signal Fail\E)
                     /xx;
 
-our @INTERFACE_IGNORES = ( "bytes", "packets input", "packets output", "multicast" );
-our @INTERFACE_INFOS   = ( "PAUSE input", "PAUSE output", "pause input" );
+our @INTERFACE_IGNORES = ( "bytes",       "packets input", "packets output", "multicast" );
+our @INTERFACE_INFOS   = ( "PAUSE input", "PAUSE output",  "pause input" );
+
+our $STP_GOOD  = qr/forwarding|FWD/;
+our $STP_WARN  = qr/learning|LRN/;
+our $STP_BAD   = qr/discarding|BLK/;
+our $STP_TYPES = qr/designated|root|alternate|Desg|Root|Altn/;
 
 our @bgcolors = (
     "\e[30m\e[47m",    # black on white
@@ -292,6 +297,16 @@ s/^ ( \Q  Discovered \E \N+ \Q; Last changed \E \N+ \s ago ) $/$self->_colorize(
     $line =~ s/^ ( \Q  - System Name: \E \N+ ) $/$self->_colorize($1, $INFO)/exx;
     $line =~ s/^ ( \Q    Port ID     :\E \N+ ) $/$self->_colorize($1, $INFO)/exx;
     $line =~ s/^ ( \Q    Management Address        : \E \N+ ) $/$self->_colorize($1, $INFO)/exx;
+
+    #
+    # Show Spanning-Tree
+    #
+    $line =~
+s/^ ( $INTSHORT \s+ $STP_TYPES\s+ $STP_GOOD \s+ [0-9]+ \s+ [0-9]+\.[0-9]+ \s+ P2p .* ) $/$self->_colorize($1, $GREEN)/exx;
+    $line =~
+s/^ ( $INTSHORT \s+ $STP_TYPES\s+ $STP_WARN \s+ [0-9]+ \s+ [0-9]+\.[0-9]+ \s+ P2p .* ) $/$self->_colorize($1, $ORANGE)/exx;
+    $line =~
+s/^ ( $INTSHORT \s+ $STP_TYPES\s+ $STP_BAD  \s+ [0-9]+ \s+ [0-9]+\.[0-9]+ \s+ P2p .* ) $/$self->_colorize($1, $RED)/exx;
 
     return $line;
 }
@@ -605,7 +620,7 @@ sub _ipv4ify ( $self, $ip ) {
     $len //= 32;
 
     my (@oct) = split /\./, $subnet;
-    my $val   = 0;
+    my $val = 0;
     foreach my $i (@oct) {
         $val *= 256;
         $val += $i;
@@ -688,7 +703,7 @@ App::RouterColorizer - Colorize router CLI output
 
 =head1 VERSION
 
-version 1.223500
+version 1.223650
 
 =head1 DESCRIPTION
 

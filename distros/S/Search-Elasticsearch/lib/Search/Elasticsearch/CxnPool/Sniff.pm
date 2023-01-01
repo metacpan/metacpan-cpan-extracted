@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::CxnPool::Sniff;
-$Search::Elasticsearch::CxnPool::Sniff::VERSION = '7.711001';
+$Search::Elasticsearch::CxnPool::Sniff::VERSION = '8.00';
 use Moo;
 with 'Search::Elasticsearch::Role::CxnPool::Sniff',
     'Search::Elasticsearch::Role::Is_Sync';
@@ -98,7 +98,7 @@ Search::Elasticsearch::CxnPool::Sniff - A CxnPool for connecting to a local clus
 
 =head1 VERSION
 
-version 7.711001
+version 8.00
 
 =head1 SYNOPSIS
 
@@ -260,7 +260,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Elasticsearch BV.
+This software is Copyright (c) 2022 by Elasticsearch BV.
 
 This is free software, licensed under:
 

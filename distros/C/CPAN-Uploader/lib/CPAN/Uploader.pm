@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package CPAN::Uploader 0.103016;
+package CPAN::Uploader 0.103017;
 # ABSTRACT: upload things to the CPAN
 
 #pod =head1 ORIGIN
@@ -309,7 +309,7 @@ CPAN::Uploader - upload things to the CPAN
 
 =head1 VERSION
 
-version 0.103016
+version 0.103017
 
 =head1 PERL VERSION
 
@@ -387,11 +387,11 @@ into this module.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Barbie Christian Walde David Caldwell Golden fREW Schmidt Gabor Szabo Graham Knop Karen Etheridge Kent Fredric Marcus Ramberg Mark Fowler Mike Doherty perlancar Steven Haryanto (on Asus Zenbook) sungo Thibault DUPONCHELLE Torsten Raudssus Vincent Pit
+=for stopwords Barbie Christian Walde David Caldwell Golden fREW Schmidt Gabor Szabo Graham Knop Karen Etheridge Kent Fredric Marcus Ramberg Mark Fowler Mike Doherty perlancar Ricardo Signes Steven Haryanto (on Asus Zenbook) sungo Thibault DUPONCHELLE Torsten Raudssus Vincent Pit
 
 =over 4
 
@@ -449,6 +449,10 @@ perlancar <perlancar@gmail.com>
 
 =item *
 
+Ricardo Signes <rjbs@semiotic.systems>
+
+=item *
+
 Steven Haryanto (on Asus Zenbook) <stevenharyanto@gmail.com>
 
 =item *
@@ -471,7 +475,7 @@ Vincent Pit <perl@profvince.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

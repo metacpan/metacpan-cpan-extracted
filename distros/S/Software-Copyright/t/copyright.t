@@ -8,6 +8,9 @@ use warnings  qw(FATAL utf8);    # fatalize encoding glitches
 use Unicode::Normalize;
 use open ':std', ':encoding(utf8)';
 
+use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
+
 require_ok( 'Software::Copyright' );
 
 synopsis_ok('lib/Software/Copyright.pm');
@@ -175,5 +178,24 @@ subtest "merge record" => sub {
     }
 
 };
+
+subtest "record contains another" => sub {
+    my $original = '2014,2015-2020 Marcel / 2002 Dod / 2015 Marc';
+    my $copyright = Software::Copyright->new($original);
+    my @contains_tests = (
+        [__LINE__, '2015, Marc / 2014-2020, Marcel / 2002, Dod', 1],
+        [__LINE__, '2014-2020, Marcel / 2002, Dod', 1],
+        [__LINE__, '2016, Marc / 2014-2020, Marcel / 2002, Dod', 0],
+        [__LINE__, '2015, Yves / 2014-2020, Marcel / 2002, Dod', 0],
+    );
+
+    foreach my $t (@contains_tests) {
+        my ($line, $other, $expect) = $t->@*;
+        my $res = $copyright->contains(Software::Copyright->new($other));
+        is($res, $expect, "check $other");
+    }
+
+};
+
 done_testing;
 

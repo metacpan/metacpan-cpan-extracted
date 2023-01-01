@@ -10,6 +10,11 @@
 
 #define STRUCT_MEMBER_SIZE(s,m) sizeof(((s *)0)->m)
 
+#define SA_FAMILY_END_OFFSET ( \
+    STRUCT_OFFSET(struct sockaddr, sa_family) \
+    + STRUCT_MEMBER_SIZE(struct sockaddr, sa_family) \
+)
+
 // Modern Win32 releases do support UNIX sockets via afunix.h,
 // but that header file isn’t available on MinGW. Socket.xs defines
 // the necessary structs and constants directly; if needed we could
@@ -20,10 +25,7 @@
 #define HAS_UNIX_SOCKETS 1
 #include <sys/un.h>
 
-#define SA_FAMILY_END_OFFSET ( \
-    STRUCT_OFFSET(struct sockaddr, sa_family) \
-    + STRUCT_MEMBER_SIZE(struct sockaddr, sa_family) \
-)
+#define SUN_PATH_LEN STRUCT_MEMBER_SIZE(struct sockaddr_un, sun_path)
 
 #else
 #define HAS_UNIX_SOCKETS 0
@@ -378,10 +380,11 @@ static OP* _wrapped_pp_##OPID(pTHX) {   \
     return ORIG_PL_ppaddr[OPID](aTHX);  \
 }
 
-const char* _get_local_socket_path(pTHX_ SV* sockname_sv, STRLEN *pathlen) {
+static const char* _get_local_socket_path(pTHX_ SV* sockname_sv, STRLEN *pathlen) {
     char* path = NULL;
 
 #if HAS_UNIX_SOCKETS
+
     STRLEN sockname_len;
     const char* sockname_str = SvPVbyte(sockname_sv, sockname_len);
 
@@ -391,7 +394,21 @@ const char* _get_local_socket_path(pTHX_ SV* sockname_sv, STRLEN *pathlen) {
 
         if (family == AF_UNIX) {
             path = ( (struct sockaddr_un*) sockname_str )->sun_path;
-            *pathlen = sockname_len - STRUCT_OFFSET(struct sockaddr_un, sun_path);
+
+            // We could compute pathlen via strlen(), but that would break
+            // Linux abstract-namespace sockets. We could start at the end
+            // of sun_path and find the first non-NUL, but that breaks in
+            // macOS (at least), which doesn’t zero out the rest of
+            // sun_path.
+            //
+            // So, we make a special exception for leading-NUL. :(
+            //
+            if (path[0] == '\0') {
+                *pathlen = 1 + strnlen(1 + path, SUN_PATH_LEN - 1);
+            }
+            else {
+                *pathlen = strnlen(path, SUN_PATH_LEN);
+            }
         }
     }
 #endif

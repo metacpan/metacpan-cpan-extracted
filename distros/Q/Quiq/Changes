@@ -1,3 +1,46 @@
+1.206 2023-01-01
+================
+
+[Quiq::Converter]
+* protectRegexChars(): Methode hinzugefügt
+
+[Quiq::Database::Connection]
+* copyData(): Methode hinzugefügt
+
+[Quiq::Database::ResultSet]
+* unshift(): Methode hinzugefügt
+
+[Quiq::Epoch]
+* new(): Bug im falle von 'start-of-previous-month' behoben
+
+[Quiq::Hash::Db]
+* new(): Tilde-Expansion hinzugefügt
+* sync(): Fehlermeldung verbessert
+
+[Quiq::Html::Form::Matrix]
+* Sonderbehandlung von Hidden-Feldern hinzugefügt
+* Zellenumrandung hinzugefügt
+
+[Quiq::Image]
+* edit(): Löschen von Backupfile ausgebaut
+
+[Quiq::Ldap::Client]
+* Doku ergänzt
+* startTls(): Methode hinzugefügt
+
+[Quiq::Path]
+* duplicate(): Doku ergänzt
+* count(): Tilde-Expansion hinzugefügt
+* chmod(): Tilde-Expansion hinzugefügt
+* spreadToSubDirs(): Methode hinzugefügt
+
+[Quiq::Url]
+* Zu Klasse mit instantiierbaren Objekten gemacht
+
+[Quiq::Web::Navigation]
+* backUrlObj(): hinzugefügt
+* Doku navMsg=... hinzugefügt
+
 1.205 2022-10-23
 ================
 

@@ -15,8 +15,7 @@ use Term::Choose::Util     qw( unicode_sprintf get_term_height get_term_width );
 use Term::Form             qw();
 use Term::Form::ReadLine   qw();
 
-use App::DBBrowser::DB;
-#use App::DBBrowser::Opt::Set; # required
+use App::DBBrowser::Table::Functions::SQL;
 
 
 sub new {
@@ -200,14 +199,14 @@ sub col_function {
 
 sub __func_with_col {
     my ( $sf, $sql, $cols, $func, $multi_col ) = @_;
-    my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
+    my $fsql = App::DBBrowser::Table::Functions::SQL->new( $sf->{i}, $sf->{o} );
     my $chosen_cols = $sf->__choose_columns( $func, $cols, $multi_col );
     if ( ! defined $chosen_cols ) {
         return;
     }
     my $col_with_func = [];
     for my $qt_col ( @$chosen_cols ) {
-        push @$col_with_func, $plui->function_with_col( $func, $qt_col );
+        push @$col_with_func, $fsql->function_with_col( $func, $qt_col );
     }
     return $col_with_func;
 }
@@ -215,7 +214,7 @@ sub __func_with_col {
 
 sub __func_with_col_and_arg {
     my ( $sf, $sql, $cols, $func, $multi_col, $prompt, $history ) = @_;
-    my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
+    my $fsql = App::DBBrowser::Table::Functions::SQL->new( $sf->{i}, $sf->{o} );
     my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $chosen_cols = $sf->__choose_columns( $func, $cols, $multi_col );
     if ( ! defined $chosen_cols ) {
@@ -228,7 +227,7 @@ sub __func_with_col_and_arg {
 
     COLUMN: while ( 1 ) {
         my $qt_col = $chosen_cols->[$i];
-        my $incomplete = $func . '(' . $qt_col . ', ? )';
+        my $incomplete = $func . '(' . $qt_col . ',?)';
         my @tmp_info = $sf->__get_info_rows( $chosen_cols, $func, $col_with_func, $incomplete );
         my $info = join "\n", @tmp_info;
         my $readline = $tr->readline(
@@ -248,7 +247,7 @@ sub __func_with_col_and_arg {
         else {
             $value = $readline;
             @local_history = ( uniq $value, @local_history );
-            push @$col_with_func, $plui->function_with_col_and_arg( $func, $qt_col, $value );
+            push @$col_with_func, $fsql->function_with_col_and_arg( $func, $qt_col, $value );
             $i++;
             if ( $i > $#$chosen_cols ) {
                 my @tmp_info = $sf->__get_info_rows( $chosen_cols, $func, $col_with_func );
@@ -271,7 +270,7 @@ sub __func_with_col_and_arg {
 
 sub __func_Concat {
     my ( $sf, $sql, $cols, $func, $multi_col ) = @_;
-    my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
+    my $fsql = App::DBBrowser::Table::Functions::SQL->new( $sf->{i}, $sf->{o} );
     my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $subset = $sf->__choose_columns( $func, $cols, $multi_col );
     if ( ! defined $subset ) {
@@ -279,7 +278,7 @@ sub __func_Concat {
     }
     my @tmp_info = ( $sf->__func_info( $func ) );
     push @tmp_info, '';
-    push @tmp_info, 'Concat( ' . join( ',', @$subset ) . ' )';
+    push @tmp_info, 'Concat(' . join( ',', @$subset ) . ')';
     my $sep = $tr->readline(
         'Separator: ',
         { info => join( "\n", @tmp_info ) }
@@ -287,18 +286,18 @@ sub __func_Concat {
     if ( ! defined $sep ) {
         return;
     }
-    my $col_with_func = [ $plui->concatenate( $subset, $sep ) ];
+    my $col_with_func = [ $fsql->concatenate( $subset, $sep ) ];
     return $col_with_func;
 }
 
 
 sub __func_Replace {
     my ( $sf, $sql, $cols, $func, $multi_col ) = @_;
-    my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
+    my $fsql = App::DBBrowser::Table::Functions::SQL->new( $sf->{i}, $sf->{o} );
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $fields = [
         [ 'from str', ],
-        [ 'to   str', ],
+        [ '  to str', ],
     ];
     my $chosen_cols = $sf->__choose_columns( $func, $cols, $multi_col );
     if ( ! defined $chosen_cols ) {
@@ -309,7 +308,7 @@ sub __func_Replace {
 
     COLUMN: while ( 1 ) {
         my $qt_col = $chosen_cols->[$i];
-        my $incomplete = $func . '(' . $qt_col . ', ? , ? )';
+        my $incomplete = $func . '(' . $qt_col . ',?,?)';
         my @tmp_info = $sf->__get_info_rows( $chosen_cols, $func, $col_with_func, $incomplete );
         my $info = join "\n", @tmp_info;
         my $form = $tf->fill_form(
@@ -330,7 +329,7 @@ sub __func_Replace {
         else {
             my $string_to_replace =  $sf->{d}{dbh}->quote( $form->[0][1] );
             my $replacement_string = $sf->{d}{dbh}->quote( $form->[1][1] );
-            push @$col_with_func, $plui->replace( $qt_col, $string_to_replace, $replacement_string );
+            push @$col_with_func, $fsql->replace( $qt_col, $string_to_replace, $replacement_string );
             $fields = $form;
             $i++;
             if ( $i > $#$chosen_cols ) {
@@ -366,14 +365,10 @@ sub __func_Date_Time {
     my $key_length = 0;
     my $epochs_all_cols = {};
     my $maxrows = 30;
-    my $select_sprintf_fmt = $sf->__get_select_sprintf_fmt( $sql );
 
     for my $qt_col ( @$chosen_cols ) {
-        my $epochs = $sf->{d}{dbh}->selectcol_arrayref(
-            sprintf( $select_sprintf_fmt, $qt_col, $qt_col ),
-            { Columns=>[1], MaxRows => 100 },
-            @{$sql->{where_args}//[]}
-        );
+        my $stmt = $sf->__select_where_not_null_stmt( $sql, $qt_col, $qt_col );
+        my $epochs = $sf->{d}{dbh}->selectcol_arrayref( $stmt, { Columns => [1], MaxRows => 100 }, @{$sql->{where_args}//[]} );
         $epochs_all_cols->{$qt_col} = $epochs;
         $key_length = ( minmax $key_length, print_columns( $qt_col ) )[1];
     }
@@ -439,43 +434,39 @@ sub __func_Date_Time {
 }
 
 
-sub __get_select_sprintf_fmt {
-    my ( $sf, $sql ) = @_;
-    my $fmt;
+sub __select_where_not_null_stmt {
+    my ( $sf, $sql, $select_col, $where_col ) = @_;
+    my $stmt;
     if ( length $sql->{where_stmt} ) {
-        $fmt = "SELECT %s FROM $sql->{table} " . $sql->{where_stmt} . " AND %s IS NOT NULL";
+        $stmt = "SELECT $select_col FROM $sql->{table} " . $sql->{where_stmt} . " AND $where_col IS NOT NULL";
     }
     else {
-        $fmt = "SELECT %s FROM $sql->{table} WHERE %s IS NOT NULL";
+        $stmt = "SELECT $select_col FROM $sql->{table} WHERE $where_col IS NOT NULL";
     }
     if ( $sf->{i}{driver} =~ /^(?:Firebird|DB2|Oracle)\z/ ) {
-        $fmt .= " " . $sql->{offset_stmt} if $sql->{offset_stmt};
-        $fmt .= " " . $sql->{limit_stmt}  if $sql->{limit_stmt};
+        $stmt .= " " . $sql->{offset_stmt} if $sql->{offset_stmt};
+        $stmt .= " " . $sql->{limit_stmt}  if $sql->{limit_stmt};
     }
     else {
-        $fmt .= " " . $sql->{limit_stmt}  if $sql->{limit_stmt};
-        $fmt .= " " . $sql->{offset_stmt} if $sql->{offset_stmt};
+        $stmt .= " " . $sql->{limit_stmt}  if $sql->{limit_stmt};
+        $stmt .= " " . $sql->{offset_stmt} if $sql->{offset_stmt};
     }
-    return $fmt;
+    return $stmt;
 }
 
 
 sub __interval_to_converted_epoch { #
     my ( $sf, $sql, $func, $maxrows, $qt_col, $div ) = @_;
-    my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
+    my $fsql = App::DBBrowser::Table::Functions::SQL->new( $sf->{i}, $sf->{o} );
     my $converted_epoch;
     if ( $func eq 'Epoch_to_DateTime' ) {
-        $converted_epoch = $plui->epoch_to_datetime( $qt_col, $div );
+        $converted_epoch = $fsql->epoch_to_datetime( $qt_col, $div );
     }
     else {
-        $converted_epoch = $plui->epoch_to_date( $qt_col, $div );
+        $converted_epoch = $fsql->epoch_to_date( $qt_col, $div );
     }
-    my $select_sprintf_fmt = $sf->__get_select_sprintf_fmt( $sql );
-    my $first_dates = $sf->{d}{dbh}->selectcol_arrayref(
-        sprintf( $select_sprintf_fmt, $converted_epoch, $qt_col ),
-        { Columns=>[1], MaxRows => $maxrows },
-        @{$sql->{where_args}//[]}
-    );
+    my $stmt = $sf->__select_where_not_null_stmt( $sql, $converted_epoch, $qt_col );
+    my $first_dates = $sf->{d}{dbh}->selectcol_arrayref( $stmt, { Columns => [1], MaxRows => $maxrows }, @{$sql->{where_args}//[]} );
     return $converted_epoch, $first_dates;
 }
 

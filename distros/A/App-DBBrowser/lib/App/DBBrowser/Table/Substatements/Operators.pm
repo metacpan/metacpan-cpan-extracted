@@ -12,6 +12,7 @@ use Term::Form::ReadLine qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::Table::Extensions;
+#use App::DBBrowser::Table::Functions::SQL;  # required
 
 
 sub new {
@@ -188,9 +189,10 @@ sub __add_operator {
         }
         else {
             if ( ! eval {
-                my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
+                require App::DBBrowser::Table::Functions::SQL;
+                my $fsql = App::DBBrowser::Table::Functions::SQL->new( $sf->{i}, $sf->{o} );
                 my @el = map { "'$_'" } grep { length $_ } $arg =~ /^(%?)(col)(%?)\z/g;
-                my $qt_arg = $plui->concatenate( \@el );
+                my $qt_arg = $fsql->concatenate( \@el );
                 $qt_arg =~ s/'col'/$quote_col/;
                 $sql->{$stmt} .= ' ' . $qt_arg;
                 1 }
@@ -206,8 +208,7 @@ sub __add_operator {
         my $case_sensitive      = $op =~ /REGEXP_i\z/ ? 0 : 1;
         my $regex_op;
         if ( ! eval {
-            my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
-            $regex_op = $plui->regexp( $quote_col, $do_not_match_regexp, $case_sensitive );
+            $regex_op = _regexp( $quote_col, $do_not_match_regexp, $case_sensitive );
             1 }
         ) {
             $ax->print_error_message( $@ );
@@ -347,6 +348,60 @@ sub read_and_add_value {
     }
 }
 
+
+sub _regexp {
+    my ( $sf, $col, $do_not_match, $case_sensitive ) = @_;
+    if ( $sf->{i}{driver} eq 'SQLite' ) {
+        if ( $do_not_match ) {
+            return sprintf " NOT REGEXP(?,%s,%d)", $col, $case_sensitive;
+        }
+        else {
+            return sprintf " REGEXP(?,%s,%d)", $col, $case_sensitive;
+        }
+    }
+    elsif ( $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
+        if ( $do_not_match ) {
+            return " $col NOT REGEXP ?"        if ! $case_sensitive;
+            return " $col NOT REGEXP BINARY ?" if   $case_sensitive;
+        }
+        else {
+            return " $col REGEXP ?"            if ! $case_sensitive;
+            return " $col REGEXP BINARY ?"     if   $case_sensitive;
+        }
+    }
+    elsif ( $sf->{i}{driver} eq 'Pg' ) {
+        if ( $do_not_match ) {
+            return " ${col}::text !~* ?" if ! $case_sensitive;
+            return " ${col}::text !~ ?"  if   $case_sensitive;
+        }
+        else {
+            return " ${col}::text ~* ?"  if ! $case_sensitive;
+            return " ${col}::text ~ ?"   if   $case_sensitive;
+        }
+    }
+    elsif ( $sf->{i}{driver} eq 'Firebird' ) {
+        # SIMILAR TO
+        # Unlike in some other languages, the pattern must match the entire
+        # string in order to succeed — matching a substring is not enough.
+        # wildcards: % and _
+        if ( $do_not_match ) {
+            return " $col NOT SIMILAR TO ? ESCAPE '#'";
+        }
+        else {
+            return " $col SIMILAR TO ? ESCAPE '#'";
+        }
+    }
+    elsif ( $sf->{i}{driver} =~ /^(?:db2|oracle)\z/ ) {
+        if ( $do_not_match ) {
+            return " NOT REGEXP_LIKE($col,?,'i')" if ! $case_sensitive;
+            return " NOT REGEXP_LIKE($col,?,'c')" if   $case_sensitive;
+        }
+        else {
+            return " REGEXP_LIKE($col,?,'i')"     if ! $case_sensitive;
+            return " REGEXP_LIKE($col,?,'c')"     if   $case_sensitive;
+        }
+    }
+}
 
 
 

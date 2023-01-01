@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Perl::PrereqScanner::Scanner 1.024;
+package Perl::PrereqScanner::Scanner 1.025;
 # ABSTRACT: something that scans for prereqs in a Perl document
 
 use Moose::Role;
@@ -52,7 +52,7 @@ Perl::PrereqScanner::Scanner - something that scans for prereqs in a Perl docume
 
 =head1 VERSION
 
-version 1.024
+version 1.025
 
 =head1 DESCRIPTION
 
@@ -87,7 +87,7 @@ Jerome Quelin
 
 =item *
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =back
 

@@ -30,11 +30,8 @@ subtest 'ScalarRef' => sub {
 subtest 'ArrayRef' => sub {
     map { is( $td->dump( $_->{input}, $_->{name} ), $_->{expected}, $_->{name} ); } (
         {   input    => [],
-            expected => '<details>'
-                . '<summary class="trdKey">blank</summary>'
-                . '<ol class="trdOL" start="0"></ol>'
-                . '</details>',
-            name => 'blank'
+            expected => '<details>' . '<summary class="trdKey">blank</summary>' . '</details>',
+            name     => 'blank'
         },
         {   input    => [ 0, 1, 2 ],
             expected => '<details>'
@@ -62,11 +59,8 @@ subtest 'ArrayRef' => sub {
 subtest 'HashRef' => sub {
     map { is( $td->dump( $_->{input}, $_->{name} ), $_->{expected}, $_->{name} ); } (
         {   input    => {},
-            expected => '<details>'
-                . '<summary class="trdKey">blank</summary>'
-                . '<ul class="trdUL"></ul>'
-                . '</details>',
-            name => 'blank'
+            expected => '<details>' . '<summary class="trdKey">blank</summary>' . '</details>',
+            name     => 'blank'
         },
         {   input    => { A => 0, B => 1, C => 2 },
             expected => '<details>'
@@ -90,15 +84,12 @@ subtest 'ArrayOfArray' => sub {
                 . '<ol class="trdOL" start="0">'
                 . '<li><details>'
                 . '<summary class="trdKey">ARRAY</summary>'
-                . '<ol class="trdOL" start="0"></ol>'
                 . '</details></li>'
                 . '<li><details>'
                 . '<summary class="trdKey">ARRAY</summary>'
-                . '<ol class="trdOL" start="0"></ol>'
                 . '</details></li>'
                 . '<li><details>'
                 . '<summary class="trdKey">ARRAY</summary>'
-                . '<ol class="trdOL" start="0"></ol>'
                 . '</details></li>'
                 . '</ol></details>',
             name => 'blank array'

@@ -1,5 +1,12 @@
 Revision history for Config-MVP
 
+2.200013  2022-12-31 13:48:05-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+        - I know, there are still some open issues at this point, but I am
+          mostly looking to get metadata updated on many dists, and not
+          carefully reading bug reports.  Sorry!
+
 2.200012  2021-01-09 19:51:18-05:00 America/New_York
         - don't try to array-dereference non-array references (thanks, Sven
           Kirmess)

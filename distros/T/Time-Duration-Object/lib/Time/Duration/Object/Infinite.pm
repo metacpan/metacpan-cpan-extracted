@@ -1,9 +1,6 @@
 use strict;
 use warnings;
-package Time::Duration::Object::Infinite;
-{
-  $Time::Duration::Object::Infinite::VERSION = '0.301';
-}
+package Time::Duration::Object::Infinite 0.302;
 # ABSTRACT: Time::Duration::Object, but infinite
 
 sub isa {
@@ -11,6 +8,28 @@ sub isa {
   return $_[0]->UNIVERSAL::isa($_[1]);
 }
 
+#pod =head1 SYNOPSIS
+#pod
+#pod  use Time::Duration::Object::Infinite;
+#pod
+#pod  my $duration = Time::Duration::Object::Infinite->new_future;
+#pod
+#pod  # It will happen forever from now.
+#pod  print "It will happen ", $duration->from_now;
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This is a class for Time::Duration::Object-like objects representing infinite
+#pod durations.
+#pod
+#pod =method new
+#pod
+#pod =method new_positive
+#pod
+#pod These methods return a new Time::Duration::Object::Infinite for a positive
+#pod duration.
+#pod
+#pod =cut
 
 sub new_positive {
 	my ($class) = @_;
@@ -20,6 +39,11 @@ sub new_positive {
 
 sub new { shift->new_positive }
 
+#pod =method new_negative
+#pod
+#pod This returns a new Time::Duration::Object::Infinite for a negative duration.
+#pod
+#pod =cut
 
 sub new_negative {
 	my ($class) = @_;
@@ -29,12 +53,25 @@ sub new_negative {
 
 sub _is_pos { ${$_[0]} == -1 }
 
+#pod =method new_seconds
+#pod
+#pod This method returns either C<+inf> or C<-inf> using Math::BigInt.  (I don't
+#pod recommend calling it.)
+#pod
+#pod =cut
 
 sub seconds {
   require Math::BigInt;
   return Math::BigInt->binf(shift->_is_pos ? '-' : ());
 }
 
+#pod =method duration
+#pod
+#pod =method duration_exact
+#pod
+#pod These methods both return "forever."
+#pod
+#pod =cut
 
 sub duration { 'forever' }
 
@@ -54,27 +91,67 @@ BEGIN {
   $earlier_later = [ 'infinitely earlier', 'infinitely later' ];
 }
 
+#pod =method ago
+#pod
+#pod =method ago_exact
+#pod
+#pod These methods return "forever ago" for positive durations and "forever from
+#pod now" for negative durations.
+#pod
+#pod =cut
 
 sub ago       { $_[0]->_flop(1, $ago_from_now); }
 sub ago_exact { $_[0]->_flop(1, $ago_from_now); }
 
+#pod =method from_now
+#pod
+#pod =method from_now_exact
+#pod
+#pod These methods do the opposite of the C<ago> methods.
+#pod
+#pod =cut
 
 sub from_now       { $_[0]->_flop(0, $ago_from_now); }
 sub from_now_exact { $_[0]->_flop(0, $ago_from_now); }
 
+#pod =method later
+#pod
+#pod =method later_exact
+#pod
+#pod These methods return "infinitely later" for positive durations and "infinitely
+#pod earlier" for negative durations.
+#pod
+#pod =cut
 
 sub later       { $_[0]->_flop(0, $earlier_later); }
 sub later_exact { $_[0]->_flop(0, $earlier_later); }
 
+#pod =method earlier
+#pod
+#pod =method earlier_exact
+#pod
+#pod These methods do the opposite of the C<later> methods.
+#pod
+#pod =cut
 
 sub earlier       { $_[0]->_flop(1, $earlier_later); }
 sub earlier_exact { $_[0]->_flop(1, $earlier_later); }
 
-package Time::Duration::_Result::_Infinite;
-{
-  $Time::Duration::_Result::_Infinite::VERSION = '0.301';
-}
+package Time::Duration::_Result::_Infinite 0.302;
 
+#pod =method concise
+#pod
+#pod This method can be called on the result of the above methods, trimming down the
+#pod ouput.  For example:
+#pod
+#pod  my $duration = Time::Duration::Object::Infinite->new_positive;
+#pod  print $duration->ago; # forever ago
+#pod  print $duration->ago->concise # forever ago
+#pod
+#pod Doesn't look any shorter, does it?  No, it won't be.  These methods are here
+#pod for compatibility with Time::Duration::Object's returns.
+#pod
+#pod =cut
 
 sub concise {
 	${ $_[0] }
@@ -92,13 +169,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Time::Duration::Object::Infinite - Time::Duration::Object, but infinite
 
 =head1 VERSION
 
-version 0.301
+version 0.302
 
 =head1 SYNOPSIS
 
@@ -113,6 +192,16 @@ version 0.301
 
 This is a class for Time::Duration::Object-like objects representing infinite
 durations.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -178,7 +267,7 @@ for compatibility with Time::Duration::Object's returns.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

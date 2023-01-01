@@ -1,7 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
-use Test::Deep qw(all cmp_deeply methods subhashof superhashof);
+use Test::Deep;
+use Test::Deep::UnorderedPairs;
 
 use Moose::Util::TypeConstraints qw(find_type_constraint);
 use Path::Class;
@@ -24,13 +25,6 @@ Router::Dumb::Helper::FileMapper->new({
 Router::Dumb::Helper::RouteFile->new({ filename => 'eg/extras' })
                                ->add_routes_to($r);
 
-# Canonicalize hash.  This is stupid.  I need it because Test::Deep doesn't yet
-# have a way to do pairwise comparison. -- rjbs, 2011-07-13
-sub _CH {
-  my %hash = @_;
-  return all( superhashof(\%hash), subhashof(\%hash) );
-}
-
 $r->add_route(
   Router::Dumb::Route->new({
     parts       => [ qw(group :group uid :uid) ],
@@ -44,36 +38,36 @@ $r->add_route(
 my @tests = (
   '/' => {
     target  => 'pages/INDEX',
-    _matches_href => _CH(),
+    matches => samehash(),
   },
 
   '/images' => {
     target  => 'pages/images/INDEX',
-    _matches_href => _CH(),
+    matches => samehash(),
   },
 
   '/legal' => undef,
 
   '/legal/privacy' => {
     target  => 'pages/legal/privacy',
-    _matches_href => _CH(),
+    matches => samehash(),
   },
 
   '/citizen/1234/dob' => {
     target  => 'citizen/dob',
-    _matches_href => _CH(num => 1234),
+    matches => samehash(num => 1234),
   },
 
   '/citizen/xyzzy/dob' => undef,
 
   '/blog/1231/2;34/your-mom' => {
     target  => 'blog',
-    _matches_href => _CH(REST => '1231/2;34/your-mom'),
+    matches => samehash(REST => '1231/2;34/your-mom'),
   },
 
   '/group/123/uid/321' => {
     target  => 'pants',
-    _matches_href => _CH(group => 123, uid => 321),
+    matches => samehash(group => 123, uid => 321),
   },
 
   '/group/abc/uid/321' => undef,
@@ -83,7 +77,13 @@ for (my $i = 0; $i < @tests; $i += 2) {
   my $path = $tests[ $i ];
   my $test = $tests[ $i + 1 ];
 
-  my $want = $test ? methods(%$test) : undef;
+  my $want = $test
+    ?
+        all(
+            methods    (map { ref $test->{$_} ? () : ( $_ => $test->{$_} ) } keys %$test),
+            listmethods(map { ref $test->{$_} ? ( $_ => $test->{$_} ) : () } keys %$test),
+        )
+    : undef;
 
   cmp_deeply(
     scalar $r->route($path),

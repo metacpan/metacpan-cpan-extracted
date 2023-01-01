@@ -7,7 +7,7 @@ use Renard::Incunabula::Common::Setup;
 use lib 't/lib';
 
 use Gtk3;
-plan Gtk3::init_check
+plan Gtk3::init_check()
 	? ( tests    => 2 )
 	: ( skip_all => 'Could not init GTK' );
 

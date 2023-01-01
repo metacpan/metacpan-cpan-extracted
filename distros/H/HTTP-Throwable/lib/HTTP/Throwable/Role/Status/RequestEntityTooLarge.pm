@@ -1,6 +1,6 @@
-package HTTP::Throwable::Role::Status::RequestEntityTooLarge;
+package HTTP::Throwable::Role::Status::RequestEntityTooLarge 0.028;
 our $AUTHORITY = 'cpan:STEVAN';
-$HTTP::Throwable::Role::Status::RequestEntityTooLarge::VERSION = '0.027';
+
 use Types::Standard qw(Str);
 
 use Moo::Role;
@@ -37,7 +37,7 @@ HTTP::Throwable::Role::Status::RequestEntityTooLarge - 413 Request Entity Too La
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 DESCRIPTION
 
@@ -49,6 +49,16 @@ continuing the request.
 If the condition is temporary, the server SHOULD include a
 Retry-After header field to indicate that it is temporary and
 after what time the client MAY try again.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 ATTRIBUTES
 
@@ -67,7 +77,7 @@ Stevan Little <stevan.little@iinteractive.com>
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =back
 

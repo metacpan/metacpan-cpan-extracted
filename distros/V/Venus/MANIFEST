@@ -40,6 +40,7 @@ lib/Venus/Date.pm
 lib/Venus/Dump.pm
 lib/Venus/Error.pm
 lib/Venus/False.pm
+lib/Venus/Fault.pm
 lib/Venus/Float.pm
 lib/Venus/Gather.pm
 lib/Venus/Hash.pm
@@ -69,6 +70,7 @@ lib/Venus/Role/Catchable.pm
 lib/Venus/Role/Coercible.pm
 lib/Venus/Role/Comparable.pm
 lib/Venus/Role/Defaultable.pm
+lib/Venus/Role/Deferrable.pm
 lib/Venus/Role/Digestable.pm
 lib/Venus/Role/Doable.pm
 lib/Venus/Role/Dumpable.pm
@@ -121,6 +123,7 @@ t/Venus_Date.t
 t/Venus_Dump.t
 t/Venus_Error.t
 t/Venus_False.t
+t/Venus_Fault.t
 t/Venus_Float.t
 t/Venus_Gather.t
 t/Venus_Hash.t
@@ -150,6 +153,7 @@ t/Venus_Role_Catchable.t
 t/Venus_Role_Coercible.t
 t/Venus_Role_Comparable.t
 t/Venus_Role_Defaultable.t
+t/Venus_Role_Deferrable.t
 t/Venus_Role_Digestable.t
 t/Venus_Role_Doable.t
 t/Venus_Role_Dumpable.t

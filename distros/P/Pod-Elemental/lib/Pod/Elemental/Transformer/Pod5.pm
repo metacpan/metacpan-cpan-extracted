@@ -1,6 +1,6 @@
-package Pod::Elemental::Transformer::Pod5;
+package Pod::Elemental::Transformer::Pod5 0.103006;
 # ABSTRACT: the default, minimal semantics of Perl5's pod element hierarchy
-$Pod::Elemental::Transformer::Pod5::VERSION = '0.103005';
+
 use Moose;
 with 'Pod::Elemental::Transformer';
 
@@ -301,7 +301,7 @@ Pod::Elemental::Transformer::Pod5 - the default, minimal semantics of Perl5's po
 
 =head1 VERSION
 
-version 0.103005
+version 0.103006
 
 =head1 SYNOPSIS
 
@@ -337,6 +337,16 @@ Further, all elements are replaced with equivalent elements that perform the
 L<Pod::Elemental::Autoblank> role, so all "blank" events can be removed form
 the tree and ignored.
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 CONFIGURATION
 
 None.  For now, it just does the same thing every time with no configuration or
@@ -344,11 +354,11 @@ options.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

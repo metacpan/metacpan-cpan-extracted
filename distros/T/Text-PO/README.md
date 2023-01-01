@@ -36,7 +36,7 @@ SYNOPSIS
 VERSION
 =======
 
-        v0.2.4
+        v0.3.0
 
 DESCRIPTION
 ===========
@@ -109,29 +109,29 @@ json formatted string.
 
 All options take a boolean value. Possible options are:
 
-*indent*
+-   `indent`
 
-:   If true, [JSON](https://metacpan.org/pod/JSON){.perl-module} will
+    If true, [JSON](https://metacpan.org/pod/JSON){.perl-module} will
     indent the data.
 
     Default to false.
 
-*pretty*
+-   `pretty`
 
-:   If true, this will return a human-readable json data.
+    If true, this will return a human-readable json data.
 
-*sort*
+-   `sort`
 
-:   If true, this will instruct
+    If true, this will instruct
     [JSON](https://metacpan.org/pod/JSON){.perl-module} to sort the
     keys. This makes it slower to generate.
 
     It defaults to false, which will use a pseudo random order set by
     perl.
 
-*utf8*
+-   `utf8`
 
-:   If true, [JSON](https://metacpan.org/pod/JSON){.perl-module} will
+    If true, [JSON](https://metacpan.org/pod/JSON){.perl-module} will
     utf8 encode the data.
 
 as\_hash
@@ -210,7 +210,17 @@ exists
 
 Given a
 [Text::PO::Element](https://metacpan.org/pod/Text::PO::Element){.perl-module}
-object, it will check if this object exists in its current stack.
+object, it will check if this object exists in its current stack. To
+achieve this, it will check if both the `msgid` and the `msgstr` exists
+and match. If you only want to check if the `msgid` exists, use the
+`msgid_only` option as explained below.
+
+It takes an optional hash or hash reference of options as follows:
+
+-   `msgid_only`
+
+    Boolean. If true, this will check only if the `msgid` already
+    exists, and not the corresponding `msgstr`
 
 It returns true of false accordingly.
 
@@ -548,7 +558,7 @@ Takes a meta field name and sets or gets its value.
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x5555a1bf3230)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x56447fef5038)"}\>
 
 SEE ALSO
 ========

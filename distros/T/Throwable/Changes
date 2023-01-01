@@ -1,5 +1,9 @@
 Revision history for Throwable
 
+1.001     2022-12-31 19:37:15-05:00 America/New_York
+        - typo fix (thanks, Robert Rothenberg!)
+        - update metadata just a little
+
 1.000     2021-06-26 13:46:02-04:00 America/New_York
         - The previous release changed from 0.xxxxxx to 0.xxx for
           version numbering.  While this is safe to do within the realm

@@ -1,3 +1,10 @@
+1.05    2022-12-31    lichtkind
+-------
+    * = fixes
+    * + added getters for data hashes
+    * ? cleaned some sentences and comments
+    * ? synopsis cleanup
+
 1.04    2022-11-04  lichtkind
 -------
     * = fixes
@@ -22,7 +29,6 @@
     * = fixes
     * ? mention VACCC and other additional color palettes
     * ! loading from Graphics::ColorNames::* via 'palette_name:color_name' was actually broken
-    
 
 1.0     2022-10-04  lichtkind
 -------

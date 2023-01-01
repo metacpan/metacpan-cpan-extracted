@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::SummaryCounters;
 # ABSTRACT: Statement statistics
-$Neo4j::Driver::SummaryCounters::VERSION = '0.31';
+$Neo4j::Driver::SummaryCounters::VERSION = '0.33';
 
 sub new {
 	my ($class, $stats) = @_;
@@ -65,7 +65,7 @@ Neo4j::Driver::SummaryCounters - Statement statistics
 
 =head1 VERSION
 
-version 0.31
+version 0.33
 
 =head1 SYNOPSIS
 
@@ -127,7 +127,7 @@ probably make more sense to run a MATCH query, tedious or not.
 =item * L<Neo4j::Driver>
 
 =item * Equivalent documentation for the official Neo4j drivers:
-L<SummaryCounters (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/summary/SummaryCounters.html>
+L<SummaryCounters (Java)|https://neo4j.com/docs/api/java-driver/5.2/org.neo4j.driver/org/neo4j/driver/summary/SummaryCounters.html>
 
 =back
 
@@ -135,12 +135,15 @@ L<SummaryCounters (Java)|https://neo4j.com/docs/api/java-driver/current/index.ht
 
 Arne Johannessen <ajnn@cpan.org>
 
+If you contact me by email, please make sure you include the word
+"Perl" in your subject header to help beat the spam filters.
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0 or (at your option) the same terms
+as the Perl 5 programming language system itself.
 
 =cut

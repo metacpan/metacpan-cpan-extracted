@@ -178,7 +178,7 @@ sub info_format_insert_args {
             push @$tmp, $sf->__prepare_table_row( $row, $indent, $term_w );
         }
         my $row_count = scalar( @{$sql->{insert_into_args}} );
-        push @$tmp, $indent . '[' . insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ) . ' rows]';
+        push @$tmp, $indent . '[' . insert_sep( $row_count, $sf->{i}{info_thsd_sep} ) . ' rows]';
     }
     else {
         for my $row ( @{$sql->{insert_into_args}} ) {

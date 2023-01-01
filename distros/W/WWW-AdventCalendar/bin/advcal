@@ -18,7 +18,6 @@ use Getopt::Long::Descriptive 0.083;
 #pod     -o --output-dir   output directory
 #pod     --today           the day we treat as "today"; default to today
 #pod
-#pod     -t --tracker      include Google Analytics; -t TRACKER-ID
 #pod     -y --year-links   place year links at the bottom of the page
 #pod
 #pod For more detailed information, see L<WWW::AdventCalendar>.
@@ -109,6 +108,13 @@ my $colors = {
   codeNumbersBorder => 'generic02',
 };
 
+if ($opt->tracker_id) {
+  warn <<END;
+--tracker no longer does anything.  If you want to track people reading your
+advent calendar, you can update the templates.
+END
+}
+
 if (my $file = $opt->config) {
   die "configuration file '$file' does not exist\n" unless -f $file;
   require WWW::AdventCalendar::Config;
@@ -152,7 +158,19 @@ advcal - build an advent calendar
 
 =head1 VERSION
 
-version 1.112
+version 1.113
+
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 USAGE
 
@@ -163,18 +181,17 @@ version 1.112
     -o --output-dir   output directory
     --today           the day we treat as "today"; default to today
 
-    -t --tracker      include Google Analytics; -t TRACKER-ID
     -y --year-links   place year links at the bottom of the page
 
 For more detailed information, see L<WWW::AdventCalendar>.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

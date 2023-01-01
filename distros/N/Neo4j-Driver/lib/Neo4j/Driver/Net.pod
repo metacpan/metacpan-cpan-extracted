@@ -13,7 +13,7 @@ Neo4j::Driver::Net - Explains the design of the networking modules
 
 =head1 VERSION
 
-version 0.31
+version 0.33
 
 =head1 OVERVIEW
 
@@ -207,6 +207,51 @@ Neo4j versions might fix the implementation to match the docs.
 Neo4j spatial and temporal types are not currently implemented
 in all response format parsers.
 
+=head2 IPv6 / dual-stack support
+
+The driver supports IPv4 and IPv6 addresses as well as regular
+hostnames of all varieties.
+
+However, there appears to be an issue contacting S<Neo4j 4.0>
+and newer in some dual-stack environments. The issue only
+occurs when using HTTP networking with dual-stack hostnames
+(such as C<localhost>). The issue causes a delay upon sending
+a query to the server, usually by the duration of the timeout
+(as configured in the driver, or the socket's default timeout);
+however, an actual timeout exception is never reported to the
+driver. The issue only occurs I<sometimes> and at this point
+it's not known how to reproduce it reliably.
+
+I think this is caused in part by some slightly odd behaviour in
+L<setup() in IO::Socket::IP|https://metacpan.org/release/PEVANS/IO-Socket-IP-0.41/source/lib/IO/Socket/IP.pm#L668>.
+For the localhost address, the while loop is usually executed
+twice, with the first call to C<< $self->connect( $addr ) >>
+failing (with a C<$!> of "Connection refused"), but the second
+call succeeding. It seems like the first call uses IPv6 to ::1,
+but the second uses IPv4 to 127.0.0.1. For some reason, the
+first call I<sometimes> blocks until the timeout. The second
+call then still succeeds, which is why there is no timeout
+error reported by L<LWP>. This behaviour is documented under
+L<IO::Socket::IP/"Timeout =E<gt> NUM">.
+
+Specifying C<127.0.0.1> instead of C<localhost> seems to avoid
+this problem entirely. The same seems to be true for C<::1>
+(not sure why).
+
+This issue never seemed to occur with Neo4j 3.5, which raises
+the question which of the changes that came with S<version 4.0>
+may have caused this. While I don't have the answer, it seems
+that explicitly enabling or disabling IPv6 in the S<Neo4j 4.0>
+server configuration in F<neo4j.conf> may help to avoid
+triggering this issue:
+
+ # Disable IPv6 in neo4j.conf
+ dbms.jvm.additional=-Djava.net.preferIPv4Stack=true
+ 
+ # Enable IPv6 in neo4j.conf
+ dbms.jvm.additional=-Djava.net.preferIPv4Stack=false
+ dbms.jvm.additional=-Djava.net.preferIPv6Addresses=true
+
 =head1 EXTENSIONS
 
 The C<net_module> config option available in driver S<versions 0.21>
@@ -278,12 +323,15 @@ L<Neo4j:::Driver::Plugin/"USE OF INTERNAL APIS">.
 
 Arne Johannessen <ajnn@cpan.org>
 
+If you contact me by email, please make sure you include the word
+"Perl" in your subject header to help beat the spam filters.
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0 or (at your option) the same terms
+as the Perl 5 programming language system itself.
 
 =cut

@@ -1,9 +1,6 @@
 use strict;
 use warnings;
-package Time::Piece::MSSQL;
-{
-  $Time::Piece::MSSQL::VERSION = '0.022';
-}
+package Time::Piece::MSSQL 0.023;
 use Time::Piece 1.17;
 # ABSTRACT: MSSQL-specific methods for Time::Piece
 
@@ -13,6 +10,32 @@ sub import {
   goto &Time::Piece::import
 }
 
+#pod =head1 SYNOPSIS
+#pod
+#pod  use Time::Piece::MSSQL;
+#pod
+#pod  my $time = localtime;
+#pod
+#pod  print $time->mssql_datetime;
+#pod  print $time->mssql_smalldatetime;
+#pod
+#pod  my $time = Time::Piece->from_mssql_datetime( $mssql_datetime );
+#pod  my $time = Time::Piece->from_mssql_smalldatetime( $mssql_smalldatetime );
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This module adds functionality to L<Time::Piece>, providing methods useful for
+#pod using the object in conjunction with a Microsoft SQL database connection.  It
+#pod will produce and parse MSSQL's default-format datetime values.
+#pod
+#pod =method mssql_datetime
+#pod
+#pod =method mssql_smalldatetime
+#pod
+#pod These methods return the Time::Piece object, formatted in the default notation
+#pod for the correct MSSQL datatype.
+#pod
+#pod =cut
 
 sub mssql_datetime {
 	my $self = shift;
@@ -24,6 +47,19 @@ sub mssql_smalldatetime {
 	$self->strftime('%Y-%m-%d %H:%M:%S');
 }
 
+#pod =method from_mssql_datetime
+#pod
+#pod   my $time = Time::Piece->from_mssql_datetime($timestring);
+#pod
+#pod =method from_mssql_smalldatetime
+#pod
+#pod   my $time = Time::Piece->from_mssql_smalldatetime($timestring);
+#pod
+#pod These methods construct new Time::Piece objects from the given strings, which
+#pod must be in the default MSSQL format for the correct datatype.  If the string is
+#pod empty, undefined, or unparseable, C<undef> is returned.
+#pod
+#pod =cut
 
 sub from_mssql_datetime {
 	my ($class, $timestring) = @_;
@@ -47,6 +83,13 @@ BEGIN {
   }
 }
 
+#pod =head1 FINAL THOUGHTS
+#pod
+#pod This module saves less time than L<Time::Piece::MySQL>, because there are fewer
+#pod strange quirks to account for, but it becomes useful when tied to autoinflation
+#pod of datatypes in Class::DBI::MSSQL.
+#pod
+#pod =cut
 
 1;
 
@@ -62,7 +105,7 @@ Time::Piece::MSSQL - MSSQL-specific methods for Time::Piece
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -81,6 +124,16 @@ version 0.022
 This module adds functionality to L<Time::Piece>, providing methods useful for
 using the object in conjunction with a Microsoft SQL database connection.  It
 will produce and parse MSSQL's default-format datetime values.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -111,7 +164,23 @@ of datatypes in Class::DBI::MSSQL.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Ricardo SIGNES Signes
+
+=over 4
+
+=item *
+
+Ricardo SIGNES <rjbs@codesimply.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

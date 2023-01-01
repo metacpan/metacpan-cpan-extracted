@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Test::Deep::JType;
+package Test::Deep::JType 0.008;
 # ABSTRACT: Test::Deep helpers for JSON::Typist data
-$Test::Deep::JType::VERSION = '0.007';
+
 use JSON::PP ();
 use JSON::Typist ();
 use Test::Deep 1.126 (); # LeafWrapper, as_test_deep_cmp
@@ -157,9 +157,9 @@ sub jfalse { $FALSE }
 }
 
 {
-  package Test::Deep::JType::jstr;
-$Test::Deep::JType::jstr::VERSION = '0.007';
-use overload
+  package Test::Deep::JType::jstr 0.008;
+
+  use overload
     '""'    => sub {
       Carp::confess("can't use valueless jstr() as a string")
         unless defined ${ $_[0] };
@@ -183,9 +183,9 @@ use overload
 }
 
 {
-  package Test::Deep::JType::jnum;
-$Test::Deep::JType::jnum::VERSION = '0.007';
-use overload
+  package Test::Deep::JType::jnum 0.008;
+
+  use overload
     '0+'    => sub {
       Carp::confess("can't use valueless jnum() as a number")
         unless defined ${ $_[0] };
@@ -209,9 +209,9 @@ use overload
 }
 
 {
-  package Test::Deep::JType::jbool;
-$Test::Deep::JType::jbool::VERSION = '0.007';
-use overload
+  package Test::Deep::JType::jbool 0.008;
+
+  use overload
     'bool'    => sub {
       Carp::confess("can't use valueless jbool() as a bool")
         unless defined ${ $_[0] };
@@ -252,7 +252,7 @@ Test::Deep::JType - Test::Deep helpers for JSON::Typist data
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 OVERVIEW
 
@@ -281,6 +281,16 @@ rather than shallow ones, so they always compare with C<eq>.
 
 To test that the input data matches the right type, other routines are exported
 that check type as well as content.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 FUNCTIONS
 
@@ -332,7 +342,7 @@ well as testing it.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

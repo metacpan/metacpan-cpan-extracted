@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Perl::Critic::Policy::Tics::ProhibitLongLines;
+package Perl::Critic::Policy::Tics::ProhibitLongLines 0.010;
 # ABSTRACT: 80 x 40 for life!
-$Perl::Critic::Policy::Tics::ProhibitLongLines::VERSION = '0.009';
+
 #pod =head1 DESCRIPTION
 #pod
 #pod Please keep your code to about eighty columns wide, the One True Terminal
@@ -147,7 +147,7 @@ Perl::Critic::Policy::Tics::ProhibitLongLines - 80 x 40 for life!
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 DESCRIPTION
 
@@ -158,6 +158,16 @@ This policy always throws a violation for extremely long lines.  It will also
 throw a violation if there are too many lines that are slightly longer than the
 preferred maximum length.  If a only few lines exceed the preferred maximum
 width, they're let slide and only extremely long lines are violations.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 CONFIGURATION
 
@@ -172,7 +182,7 @@ There are three configuration options for this policy:
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

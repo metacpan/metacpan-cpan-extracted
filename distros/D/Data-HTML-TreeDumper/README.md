@@ -1,7 +1,7 @@
 [![Actions Status](https://github.com/TakeAsh/p-Data-HTML-TreeDumper/actions/workflows/test.yml/badge.svg)](https://github.com/TakeAsh/p-Data-HTML-TreeDumper/actions)
 # NAME
 
-Data::HTML::TreeDumper - dumps perl data as HTML5 open/close tree
+[Data::HTML::TreeDumper](https://metacpan.org/pod/Data%3A%3AHTML%3A%3ATreeDumper) - dumps perl data as HTML5 open/close tree
 
 # SYNOPSIS
 

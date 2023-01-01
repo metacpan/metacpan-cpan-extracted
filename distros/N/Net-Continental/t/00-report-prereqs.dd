@@ -1,11 +1,13 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '6.78'
                                       }
                       },
        'develop' => {
                       'requires' => {
+                                      'Encode' => '0',
+                                      'Test::More' => '0',
                                       'Test::Pod' => '1.41'
                                     }
                     },
@@ -15,6 +17,7 @@ do { my $x = {
                                       'Locale::Codes::Country' => '3.29',
                                       'Net::Domain::TLD' => '0',
                                       'Scalar::Util' => '0',
+                                      'perl' => '5.012',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

@@ -15,6 +15,12 @@ L<Quiq::Hash>
 Diese Klasse ist eine objektorientierte Überdeckung des Moduls DB_File,
 das eine Schnittstelle zu Berkeley DB 1.x darstellt.
 
+=head1 EXAMPLE
+
+Alle Hash-Keys ausgeben ($file ist der Name der Hash-Datei):
+
+  $ perl -MQuiq::Hash::Db -E '$h = Quiq::Hash::Db->new($file,"r"); for (keys %$h) { say $_}'
+
 =cut
 
 # -----------------------------------------------------------------------------
@@ -27,8 +33,9 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.205';
+our $VERSION = '1.206';
 
+use Quiq::Path;
 use Fcntl ();
 use DB_File ();
 
@@ -80,6 +87,8 @@ im Modus $mode und liefere eine Referenz auf das Objekt zurück.
 sub new {
     my ($class,$file,$mode) = @_;
 
+    $file = Quiq::Path->expandTilde($file);
+
     my $openMode = 0;
     if ($mode eq 'rw') {
         $openMode = Fcntl::O_RDWR|Fcntl::O_CREAT;
@@ -129,12 +138,15 @@ sub new {
 sub sync {
     my $self = shift;
 
-    my $x = tied %$self || $self->throw(
+    my $ref = tied %$self || $self->throw(
         'BDB-00002: Kann Tie-Objekt nicht ermitteln',
     );
-    if ($x->sync < 0) {
+    my $r = $ref->sync;
+    if ($r < 0) {
         $self->throw(
             'BDB-00003: Sync ist fehlgeschlagen',
+            TiedObject => "$ref",
+            Errcode => $r,
             Errstr => $!,
         );
     }
@@ -170,7 +182,7 @@ sub close {
 
 =head1 VERSION
 
-1.205
+1.206
 
 =head1 AUTHOR
 

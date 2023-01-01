@@ -1,5 +1,8 @@
 Revision history for Macro-Micro
 
+0.055     2022-12-30 14:26:06-05:00 America/New_York
+        - repackage, update metadata, bump required perl
+
 0.054     2013-09-22 00:27:13 Asia/Tokyo
           repackage to update bugtracker and repo
 

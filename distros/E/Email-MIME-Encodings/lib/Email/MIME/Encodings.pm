@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Email::MIME::Encodings 1.316;
+package Email::MIME::Encodings 1.317;
 # ABSTRACT: A unified interface to MIME encoding and decoding
 
 use MIME::Base64 3.05;
@@ -92,7 +92,7 @@ Email::MIME::Encodings - A unified interface to MIME encoding and decoding
 
 =head1 VERSION
 
-version 1.316
+version 1.317
 
 =head1 SYNOPSIS
 
@@ -136,15 +136,25 @@ Casey West <casey@geeknest.com>
 
 =item *
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =back
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords David Steinbrunner
+=for stopwords David Steinbrunner Ricardo Signes
+
+=over 4
+
+=item *
 
 David Steinbrunner <dsteinbrunner@pobox.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

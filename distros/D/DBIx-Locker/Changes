@@ -1,5 +1,8 @@
 Revision history for DBIx-Locker
 
+1.103     2022-12-31 21:27:58-05:00 America/New_York
+        - update author contact info
+
 1.102     2021-07-06 21:15:40-04:00 America/New_York
         - increase key size (thanks, Matthew Horsfall)
         - update author contact info

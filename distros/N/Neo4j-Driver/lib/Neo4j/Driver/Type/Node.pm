@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Node;
 # ABSTRACT: Describes a node from a Neo4j graph
-$Neo4j::Driver::Type::Node::VERSION = '0.31';
+$Neo4j::Driver::Type::Node::VERSION = '0.33';
 
 use parent 'Neo4j::Types::Node';
 use overload '%{}' => \&_hash, fallback => 1;
@@ -37,11 +37,30 @@ sub properties {
 }
 
 
+sub element_id {
+	my ($self) = @_;
+	
+	return $$self->{_meta}->{element_id} if defined $$self->{_meta}->{element_id};
+	return $$self->{_meta}->{id};
+}
+
+
 sub id {
 	my ($self) = @_;
 	
-	return $$self->{_meta}->{id};
+	return $$self->{_meta}->{id} if defined $$self->{_meta}->{id};
+	my ($id) = $$self->{_meta}->{element_id} =~ m/^4:[^:]*:([0-9]+)/;
+	$id = 0 + $id if defined $id;
+	return $id;
 }
+# Unlike Bolt v5, the Jolt v2 format regrettably removes the legacy
+# numeric ID from the response entirely. Therefore we generate it
+# here using the algorithm from Neo4j's DefaultElementIdMapperV1;
+# the final part of the element ID is identical to the legacy ID
+# according to CypherFunctions in Neo4j 5.3. This may break with
+# future Neo4j versions.
+# https://github.com/neo4j/neo4j/blob/0c092b70cc/community/kernel/src/main/java/org/neo4j/kernel/api/DefaultElementIdMapperV1.java#L62-L68
+# https://github.com/neo4j/neo4j/blob/0c092b70cc/community/cypher/runtime-util/src/main/java/org/neo4j/cypher/operations/CypherFunctions.java#L771-L802
 
 
 sub deleted {
@@ -83,14 +102,14 @@ Neo4j::Driver::Type::Node - Describes a node from a Neo4j graph
 
 =head1 VERSION
 
-version 0.31
+version 0.33
 
 =head1 SYNOPSIS
 
  $query = 'MATCH (m:Movie) RETURN m LIMIT 1';
  $node = $driver->session->run($query)->single->get('m');
  
- say 'Movie # ', $node->id(), ' :';
+ say 'Movie id ', $node->element_id(), ' :';
  say '   ', $node->get('name'), ' / ', $node->get('year');
  say '   Labels: ', join ', ', $node->labels;
 
@@ -109,12 +128,30 @@ distinct L<Neo4j::Driver::Type::Node> objects will be
 created by the driver. If your intention is to verify that two
 L<Neo4j::Driver::Type::Node> objects in Perl describe the
 same node in the Neo4j database, you need to compare their
-IDs.
+element IDs.
 
 =head1 METHODS
 
 L<Neo4j::Driver::Type::Node> inherits all methods from
 L<Neo4j::Types::Node>.
+
+=head2 element_id
+
+ $string = $node->element_id;
+
+Return an ID for this node that is unique within
+a particular context, for example the current transaction.
+
+This method provides the new element ID string introduced by
+S<Neo4j 5>. If the element ID is unavailable, for example with
+older Neo4j versions or with a L<Neo4j::Bolt> version that
+hasn't yet been updated for S<Neo4j 5>, this method provides
+the legacy numeric ID instead. Note that a numeric ID cannot
+successfully be used with C<elementId()> in Cypher expressions.
+
+Neo4j element IDs are not designed to be persistent. As such,
+if you want a public identity to use for your nodes,
+attaching an explicit 'id' property is a better choice.
 
 =head2 get
 
@@ -124,9 +161,24 @@ See L<Neo4j::Types::Node/"get">.
 
 =head2 id
 
- $id = $node->id;
+ $number = $node->id;
 
-See L<Neo4j::Types::Node/"id">.
+Return a legacy numeric ID for this node that is unique
+within a particular context, for example the current transaction.
+
+Neo4j 5 has B<deprecated> numeric IDs. They will likely become
+unavailable in future Neo4j versions. This method will try to
+auto-generate a S<numeric ID> from the new S<element ID> value
+(or return C<undef> if that fails). A deprecation warning will
+be issued by this method in a future version of this driver.
+
+Neo4j node IDs are not designed to be persistent. As such,
+if you want a public identity to use for your nodes,
+attaching an explicit 'id' property is a better choice.
+
+Legacy IDs are always integer numbers.
+A node with the ID C<0> may exist.
+Nodes and relationships do not share the same ID space.
 
 =head2 labels
 
@@ -176,8 +228,8 @@ is returned instead.
 =item * L<Neo4j::Types::Node>
 
 =item * Equivalent documentation for the official Neo4j drivers:
-L<Node (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/types/Node.html>,
-L<Node (Python)|https://neo4j.com/docs/api/python-driver/current/api.html#node>
+L<Node (Java)|https://neo4j.com/docs/api/java-driver/5.2/org.neo4j.driver/org/neo4j/driver/types/Node.html>,
+L<Node (Python)|https://neo4j.com/docs/api/python-driver/5.2/api.html#node>
 
 =back
 
@@ -185,12 +237,15 @@ L<Node (Python)|https://neo4j.com/docs/api/python-driver/current/api.html#node>
 
 Arne Johannessen <ajnn@cpan.org>
 
+If you contact me by email, please make sure you include the word
+"Perl" in your subject header to help beat the spam filters.
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0 or (at your option) the same terms
+as the Perl 5 programming language system itself.
 
 =cut

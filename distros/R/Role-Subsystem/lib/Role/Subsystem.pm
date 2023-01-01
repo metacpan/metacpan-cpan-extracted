@@ -1,19 +1,173 @@
-package Role::Subsystem;
-{
-  $Role::Subsystem::VERSION = '0.101341';
-}
+package Role::Subsystem 0.101342;
 use MooseX::Role::Parameterized;
 # ABSTRACT: a parameterized role for object subsystems, helpers, and delegates
 
+#pod =head1 DESCRIPTION
+#pod
+#pod Role::Subsystem is a L<parameterized role|MooseX::Role::Parameterized>.  It's
+#pod meant to simplify creating classes that encapsulate specific parts of the
+#pod business logic related to parent classes.  As in the L<synopsis|/What?>
+#pod below, it can be used to write "helpers."  The subsystems it creates must have
+#pod a reference to a parent object, which might be referenced by id or with an
+#pod actual object reference.  Role::Subsystem tries to guarantee that no matter
+#pod which kind of reference you have, the other kind can be obtained and stored for
+#pod use.
+#pod
+#pod =head2 What??
+#pod
+#pod Okay, imagine you have a big class called Account.  An Account is the central
+#pod point for a lot of behavior, and rather than dump all that logic in one place,
+#pod you partition it into subsytems.  Let's say we want to write a subsystem that
+#pod handles all of an Account's Services.  We might write this:
+#pod
+#pod   package Account::ServiceManager;
+#pod   use Moose;
+#pod   use Account;
+#pod
+#pod   with 'Role::Subsystem' => {
+#pod     ident  => 'acct-service-mgr',
+#pod     type   => 'Account',
+#pod     what   => 'account',
+#pod     getter => sub { Account->retrieve_by_id( $_[0] ) },
+#pod   };
+#pod
+#pod   sub add_service {
+#pod     my ($self, @args) = @_;
+#pod
+#pod     # ... do some preliminary business logic
+#pod
+#pod     $self->account->insert_related_rows(...);
+#pod
+#pod     # ... do some cleanup business logic
+#pod   }
+#pod
+#pod Then you might add to F<Account.pm>:
+#pod
+#pod   package Account;
+#pod   sub service_mgr {
+#pod     my ($self) = @_;
+#pod     return Account::ServiceManager->for_account($self);
+#pod   }
+#pod
+#pod Then, to add a service you can write:
+#pod
+#pod   $account->service_mgr->add_service(...);
+#pod
+#pod You could also just grab the service manager object and use it as a handle for
+#pod performing operations.
+#pod
+#pod If you don't have an Account object, just a reference to its id, you could get
+#pod the service manager like this:
+#pod
+#pod   my $service_mgr = Account::ServiceManager->for_account_id( $account_id );
+#pod
+#pod =head2 Why?
+#pod
+#pod Here's an overview of everything this role will do for you, in terms of the
+#pod Account::ServiceManager example above.
+#pod
+#pod It will create the C<for_account> and C<for_account_id> constructors on your
+#pod subsystem.  (The C<for_account_id> constructor will only be created if a
+#pod C<getter> is supplied.)
+#pod
+#pod It will defer retrieval of C<account> objects if you construct with only a
+#pod C<account_id>, so that if you never need the full object, you never waste time
+#pod getting it.
+#pod
+#pod It will ensure that any C<account> and C<account_id> encountered match the
+#pod C<type> and C<id_type> types, respectively.  This will prevent a bogus
+#pod identifier from being accepted, only to die later when it can't be used for
+#pod lazy retrieval.
+#pod
+#pod If you create a subsystem object by passing in the parent object (the
+#pod C<account>), it will take a weak reference to it to prevent cyclical references
+#pod from interfering with garbage collection.  If the reference goes away, or if
+#pod you did not start with a reference, a strong reference will be constructed to
+#pod allow the subsystem to function efficiently afterward.  (This behavior can be
+#pod disabled, if you never want to take a weak reference.)
+#pod
+#pod =head3 Swappable Subsystem Implementations
+#pod
+#pod You can also have multiple implementations of a single kind of subsystem.  For
+#pod example, you may eventually want to do something like this:
+#pod
+#pod   package Account::ServiceManager;
+#pod   use Moose::Role;
+#pod
+#pod   with 'Role::Subsystem' => { ... };
+#pod
+#pod   requries 'add_service';
+#pod   requries 'remove_service';
+#pod   requries 'service_summary';
+#pod
+#pod ...and then...
+#pod
+#pod   package Account::ServiceManager::Legacy;
+#pod   with 'Account::ServiceManager';
+#pod
+#pod   sub add_service { ... };
+#pod
+#pod ...and...
+#pod
+#pod   package Account::ServiceManager::Simple;
+#pod   with 'Account::ServiceManager';
+#pod
+#pod   sub add_service { ... };
+#pod
+#pod ...and finally...
+#pod
+#pod   package Account;
+#pod
+#pod   sub settings_mgr {
+#pod     my ($self) = @_;
+#pod
+#pod     my $mgr_class = $self->schema_version > 1
+#pod                   ? 'Account::ServiceManager::Simple'
+#pod                   : 'Account::ServiceManager::Legacy';
+#pod
+#pod     return $mgr_class->for_account($self);
+#pod   }
+#pod
+#pod This requires a bit more work, but lets you replace subsystem implementations
+#pod as fairly isolated units.
+#pod
+#pod =head1 PARAMETERS
+#pod
+#pod These parameters can be given when including Role::Subsystem; these are in
+#pod contrast to the L<attributes|/ATTRIBUTES> and L<methods|/METHODS> below, which
+#pod are added to the classe composing this role.
+#pod
+#pod =head2 ident
+#pod
+#pod This is a simple name for the role to use when describing itself in messages.
+#pod It is required.
+#pod
+#pod =cut
 
 parameter ident => (isa => 'Str', required => 1);
 
+#pod =head2 what
+#pod
+#pod This is the name of the attribute that will hold the parent object, like the
+#pod C<account> in the synopsis above.
+#pod
+#pod This attribute is required.
+#pod
+#pod =cut
 
 parameter what => (
   isa      => 'Str',
   required => 1,
 );
 
+#pod =head2 what_id
+#pod
+#pod This is the name of the attribute that will hold the parent object's
+#pod identifier, like the C<account_id> in the synopsis above.
+#pod
+#pod If not given, it will be the value of C<what> with "_id" stuck on the end.
+#pod
+#pod =cut
 
 parameter what_id => (
   isa      => 'Str',
@@ -21,20 +175,61 @@ parameter what_id => (
   default  => sub { $_[0]->what . '_id' },
 );
 
+#pod =head2 type
+#pod
+#pod This is the type that the C<what> must be.  It may be a stringly Moose type or
+#pod an L<MooseX::Types> type.  (Or anything else, right now, but anything else will
+#pod probably cause runtime failures or worse.)
+#pod
+#pod This attribute is required.
+#pod
+#pod =cut
 
 parameter type    => (isa => 'Defined', required => 1);
 
+#pod =head2 id_type
+#pod
+#pod This parameter is like C<type>, but is used to check the C<what>'s id,
+#pod discussed more below.  If not given, it defaults to C<Defined>.
+#pod
+#pod =cut
 
 parameter id_type => (isa => 'Defined', default => 'Defined');
 
+#pod =head2 id_method
+#pod
+#pod This is the name of a method to call on C<what> to get its id.  It defaults to
+#pod C<id>.
+#pod
+#pod =cut
 
 parameter id_method => (isa => 'Str', default => 'id');
 
+#pod =head2 getter
+#pod
+#pod This (optional) attribute supplied a callback that will produce the parent
+#pod object from the C<what_id>.
+#pod
+#pod =cut
 
 parameter getter => (
   isa     => 'CodeRef',
 );
 
+#pod =head2 weak_ref
+#pod
+#pod If true, when a subsytem object is created with a defined parent object (that
+#pod is, a value for C<what>), the reference to the object will be weakened.  This
+#pod allows the parent and the subsystem to store references to one another without
+#pod creating a problematic circular reference.
+#pod
+#pod If the parent object is subsequently garbage collected, a new value for C<what>
+#pod will be retreived and stored, and it will B<not> be weakened.  To allow this,
+#pod setting C<weak_ref> to true requires that C<getter> be supplied.
+#pod
+#pod C<weak_ref> is true by default.
+#pod
+#pod =cut
 
 parameter weak_ref => (
   isa     => 'Bool',
@@ -158,9 +353,49 @@ role {
   }
 };
 
+#pod =head1 ATTRIBUTES
+#pod
+#pod The following attributes are added classes composing Role::Subsystem.
+#pod
+#pod =head2 $what
+#pod
+#pod This will refer to the parent object of the subsystem.  It will be a value of
+#pod the C<type> type defined when parameterizing Role::Subsystem.  It may be lazily
+#pod computed if it was not supplied during creation or if the initial value was
+#pod weak and subsequently garbage collected.
+#pod
+#pod If the value of C<what> when parameterizing Role::Subsystem was C<account>,
+#pod that will be the name of this attribute, as well as the method used to read it.
+#pod
+#pod =head2 $what_id
+#pod
+#pod This method gets the id of the parent object.  It will be a defined value of
+#pod the C<id_type> provided when parameterizing Role::Subsystem.  It may be lazily
+#pod computed by calling the C<id_method> on C<what> as needed.
+#pod
+#pod =head1 METHODS
+#pod
+#pod =head2 for_$what
+#pod
+#pod   my $settings_mgr = Account::ServiceManager->for_account($account);
+#pod
+#pod This is a convenience constructor, returning a subsystem object for the given
+#pod C<what>.
+#pod
+#pod =head2 for_$what_id
+#pod
+#pod   my $settings_mgr = Account::ServiceManager->for_account_id($account_id);
+#pod
+#pod This is a convenience constructor, returning a subsystem object for the given
+#pod C<what_id>.
+#pod
+#pod =cut
+
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -168,14 +403,14 @@ Role::Subsystem - a parameterized role for object subsystems, helpers, and deleg
 
 =head1 VERSION
 
-version 0.101341
+version 0.101342
 
 =head1 DESCRIPTION
 
 Role::Subsystem is a L<parameterized role|MooseX::Role::Parameterized>.  It's
 meant to simplify creating classes that encapsulate specific parts of the
 business logic related to parent classes.  As in the L<synopsis|/What?>
-above, it can be used to write "helpers."  The subsystems it creates must have
+below, it can be used to write "helpers."  The subsystems it creates must have
 a reference to a parent object, which might be referenced by id or with an
 actual object reference.  Role::Subsystem tries to guarantee that no matter
 which kind of reference you have, the other kind can be obtained and stored for
@@ -299,6 +534,16 @@ example, you may eventually want to do something like this:
 This requires a bit more work, but lets you replace subsystem implementations
 as fairly isolated units.
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 PARAMETERS
 
 These parameters can be given when including Role::Subsystem; these are in
@@ -398,7 +643,23 @@ C<what_id>.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Matthew Horsfall Ricardo Signes
+
+=over 4
+
+=item *
+
+Matthew Horsfall <wolfsage@gmail.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

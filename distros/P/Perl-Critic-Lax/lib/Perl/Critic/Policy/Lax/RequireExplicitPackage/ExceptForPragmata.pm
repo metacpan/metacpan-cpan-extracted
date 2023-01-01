@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Perl::Critic::Policy::Lax::RequireExplicitPackage::ExceptForPragmata;
+package Perl::Critic::Policy::Lax::RequireExplicitPackage::ExceptForPragmata 0.014;
 # ABSTRACT: you can put strict and warnings before "package"
-$Perl::Critic::Policy::Lax::RequireExplicitPackage::ExceptForPragmata::VERSION = '0.013';
+
 #pod =head1 DESCRIPTION
 #pod
 #pod This policy is meant to replace Modules::RequireExplicitPackage.  That policy's
@@ -122,7 +122,7 @@ Perl::Critic::Policy::Lax::RequireExplicitPackage::ExceptForPragmata - you can p
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 DESCRIPTION
 
@@ -141,6 +141,16 @@ those cases.  By default, it permits turning on strictures, warnings,
 features, and diagnostics, as well as requiring a minimum Perl
 version.
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 METHODS
 
 =head2 supported_parameters
@@ -156,11 +166,11 @@ L<Perl::Critic::Policy::Modules::RequireExplicitPackage>.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo Signes <rjbs@cpan.org>.
+This software is copyright (c) 2022 by Ricardo Signes <cpan@semiotic.systems>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

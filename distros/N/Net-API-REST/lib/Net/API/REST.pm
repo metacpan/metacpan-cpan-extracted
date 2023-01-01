@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST.pm
-## Version v0.7.0
+## Version v0.7.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/09/01
-## Modified 2022/12/28
+## Modified 2023/01/01
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -53,7 +53,7 @@ BEGIN
     use Net::API::REST::Request;
     use Net::API::REST::Response;
     use Net::API::REST::Status;
-    $VERSION = 'v0.7.0';
+    $VERSION = 'v0.7.1';
 };
 
 use strict;
@@ -1539,7 +1539,7 @@ sub route
                     $self->message( 3, "Pattern #2: found a hash defined endpoint for '$part'." );
                     my $ep = Net::API::REST::Endpoint->new(
                         handler => $handler,
-                        methods => ( defined( $method ) ? [$method] : $ref->{_allowed_methods} ? $ref->{_allowed_methods} : $def_methods ),
+                        methods => ( defined( $method ) ? [uc($method)] : $ref->{_allowed_methods} ? $ref->{_allowed_methods} : $def_methods ),
                         variables => $vars,
                         access => $access,
                         path => $uri,
@@ -1698,7 +1698,7 @@ sub route
                     # return( $ref->{_handler} );
                     my $ep = Net::API::REST::Endpoint->new(
                         handler => $handler,
-                        methods => ( defined( $method ) ? [$method] : $ref->{_allowed_methods} ? $ref->{_allowed_methods} : $def_methods ),
+                        methods => ( defined( $method ) ? [uc($method)] : $ref->{_allowed_methods} ? $ref->{_allowed_methods} : $def_methods ),
                         variables => $vars,
                         access => $access,
                         path => $uri,
@@ -2213,7 +2213,7 @@ Net::API::REST - Framework for RESTful APIs
 
 =head1 VERSION
 
-    v0.7.0
+    v0.7.1
 
 =head1 DESCRIPTION
 

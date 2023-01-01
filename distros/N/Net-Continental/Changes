@@ -1,5 +1,9 @@
 Release history for Net-Continental
 
+0.017     2022-12-31 13:55:21-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 0.016     2015-02-25 14:59:45-05:00 America/New_York
         - added Curaçao (with its description in ASCII)
 

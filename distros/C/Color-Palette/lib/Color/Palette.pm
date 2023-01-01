@@ -1,13 +1,44 @@
-package Color::Palette;
-{
-  $Color::Palette::VERSION = '0.100003';
-}
+package Color::Palette 0.100004;
 use Moose;
 # ABSTRACT: a set of named colors
 
 use MooseX::Types::Moose qw(Str HashRef ArrayRef);
 use Color::Palette::Types qw(RecursiveColorDict ColorDict Color);
 
+#pod =head1 DESCRIPTION
+#pod
+#pod The libraries in the Color-Palette distribution are meant to make it easy to
+#pod build sets of named colors, and to write applications that can define and
+#pod validate the color names they required.
+#pod
+#pod For example, a color palette might contain the following data:
+#pod
+#pod   highlights => #f0f000
+#pod   background => #333
+#pod   sidebarBackground => #88d
+#pod   sidebarText       => 'highlights'
+#pod   sidebarBoder      => 'sidebarText'
+#pod
+#pod Colors can be defined by a color specifier (a L<Graphics::Color> object,
+#pod a CSS-style hex triple, or an arrayref of RGB values) or by a name of another
+#pod color that appears in the palette.  If colors are defined in terms of another
+#pod color that doesn't exist, an exception will be raised.
+#pod
+#pod Applications that wish to use color palettes can provide schemas that define
+#pod the names they expect to be present in a palette.  These schemas are
+#pod L<Color::Palette::Schema> objects.
+#pod
+#pod A palette can be checked against a schema with the schema's C<check> method, or
+#pod may be reduced to the minimal set of colors needed to satisfy the schema with
+#pod the palette's C<optimized_for> method.
+#pod
+#pod =attr colors
+#pod
+#pod This attribute is a hashref.  Keys are color names and values are either Color
+#pod objects or names of other colors.  To get at the color object for a name
+#pod consult the C<L</color>> method.
+#pod
+#pod =cut
 
 has colors => (
   is   => 'bare',
@@ -17,6 +48,15 @@ has colors => (
   reader   => '_colors',
 );
 
+#pod =begin :private
+#pod
+#pod =attr _resolved_colors
+#pod
+#pod This attribute is just like C<colors>, but all values are Color objects.
+#pod
+#pod =end :private
+#pod
+#pod =cut
 
 has _resolved_colors => (
   is   => 'ro',
@@ -70,6 +110,13 @@ sub _build_resolved_colors {
   return \%output;
 }
 
+#pod =method color
+#pod
+#pod   my $color_obj = $palette->color('extremeHighlight');
+#pod
+#pod This method will return the Color object to be used for the given name.
+#pod
+#pod =cut
 
 sub color {
   my ($self, $name) = @_;
@@ -78,6 +125,30 @@ sub color {
   return $color;
 }
 
+#pod =method color_names
+#pod
+#pod   my @names = $palette->color_names;
+#pod
+#pod This method returns a list of all color names the object knows about.
+#pod
+#pod =method as_css_hash
+#pod
+#pod   my $triple_for = $palette->as_css_hash
+#pod
+#pod This method returns a hashref.  Every color name known to the palette has an
+#pod entry, and the value is the CSS-safe hex string for the resolved color.  For
+#pod example, the output for the color scheme in the L</DESCRIPTION> section would
+#pod be:
+#pod
+#pod   {
+#pod     highlights => '#f0f000',
+#pod     background => '#333333',
+#pod     sidebarBackground => #8888dd',
+#pod     sidebarText       => #f0f000',
+#pod     sidebarBoder      => #f0f000',
+#pod   }
+#pod
+#pod =cut
 
 sub as_css_hash {
   my ($self) = @_;
@@ -86,6 +157,15 @@ sub as_css_hash {
   return $output;
 }
 
+#pod =method as_strict_css_hash
+#pod
+#pod   my $hashref = $palette->as_strict_css_hash;
+#pod
+#pod This method behaves just like C<L</as_css_hash>>, but the returned hashref is
+#pod tied so that trying to read values for keys that do not exist is fatal.  The
+#pod hash may also become read-only in the future.
+#pod
+#pod =cut
 
 sub as_strict_css_hash {
   my ($self) = @_;
@@ -95,6 +175,17 @@ sub as_strict_css_hash {
   return \%hash;
 }
 
+#pod =method optimized_for
+#pod
+#pod   my $optimized_palette = $palette->optimized_for($schema);
+#pod
+#pod This method returns a new palette containing only the colors needed to fulfill
+#pod the requirements of the given schema.  This is useful for reducing a large
+#pod palette to the small set that must be embedded in a document.
+#pod
+#pod C<optimize_for> redispatches to this method for historical reasons.
+#pod
+#pod =cut
 
 sub optimize_for {
   my $self = shift;
@@ -144,7 +235,7 @@ Color::Palette - a set of named colors
 
 =head1 VERSION
 
-version 0.100003
+version 0.100004
 
 =head1 DESCRIPTION
 
@@ -172,6 +263,16 @@ L<Color::Palette::Schema> objects.
 A palette can be checked against a schema with the schema's C<check> method, or
 may be reduced to the minimal set of colors needed to satisfy the schema with
 the palette's C<optimized_for> method.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 ATTRIBUTES
 
@@ -240,11 +341,27 @@ This attribute is just like C<colors>, but all values are Color objects.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Karen Etheridge Ricardo Signes
+
+=over 4
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

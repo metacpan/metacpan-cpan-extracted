@@ -1,5 +1,8 @@
 Revision history for DBIx-Class-EncodedColumn-Crypt-Passphrase-Argon2
 
+0.0107 2022-12-30 07:35:38
+    - Require the latest Test::SQLite.
+
 0.0106 2022-12-24 08:18:40
     - Include SQL::Translator as a dep.
 

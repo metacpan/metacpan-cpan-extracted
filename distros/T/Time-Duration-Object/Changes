@@ -1,5 +1,9 @@
 Revision history for Time-Duration-Object
 
+0.302     2022-12-31 16:01:21-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 0.301     2013-10-18 12:04:48 America/New_York
           add a repo and bugtracker link to metadata
 

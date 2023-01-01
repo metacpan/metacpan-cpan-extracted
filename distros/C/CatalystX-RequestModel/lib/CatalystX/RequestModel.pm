@@ -1,6 +1,6 @@
 package CatalystX::RequestModel;
 
-our $VERSION = '0.009';
+our $VERSION = '0.012';
 
 use Class::Method::Modifiers;
 use Scalar::Util;
@@ -175,9 +175,14 @@ Using it in a controller:
       ## Do something with the $request_model (instance of 'Example::Model::RegistrationRequest').
     }
 
+    sub list :GET Chained('root') PathPart('') Args(0) Does(RequestModel) QueryModel(PagingModel) {
+      my ($self, $c, $paging_model) = @_;
+    }
+
+
     __PACKAGE__->meta->make_immutable;
 
-Now if the incoming POST looks like this:
+Now if the incoming POST /update looks like this:
 
     .-------------------------------------+--------------------------------------.
     | Parameter                           | Value                                |
@@ -194,6 +199,22 @@ The object instance C<$request_model> would look like:
     say $request_model->username;       # jjn
     say $request_model->first_name;     # John
     say $request_model->last_name;      # Napiorkowski
+
+And if the incoming is GET /list looks like
+
+    [debug] Query Parameters are:
+    .-------------------------------------+--------------------------------------.
+    | Parameter                           | Value                                |
+    +-------------------------------------+--------------------------------------+
+    | page                                | 2                                    |
+    | status                              | active                               |
+    '-------------------------------------+--------------------------------------'
+
+The object instance C<$paging_model> would look like:
+
+    say $paging_model->page;       # 2
+    say $paging_model->status;     # 'active'
+
 
 And C<$request_model> has additional helper public methods to query attributes marked as request
 fields (via the C<property> attribute field) which you can read about below.
@@ -510,49 +531,7 @@ Also see L<Catalyst::ActionRole::RequestModel>.
 
 =head1 QUERY PARAMETERS
 
-You can use this to map URL query parameters to a model using the same approach as HTML Forms.
-
-    package Example::Model::InfoQuery;
-
-    use Moose;
-    use CatalystX::RequestModel;
-
-    extends 'Catalyst::Model';
-    content_type 'application/x-www-form-urlencoded';
-
-    content_in 'query';  # <<=== You need to use this!
-
-    has page => (is=>'ro', required=>1, property=>1);  
-    has offset => (is=>'ro', property=>1);
-    has search => (is=>'ro', property=>1);
-
-    __PACKAGE__->meta->make_immutable();
-
-Then if you GET to the action using this query model with the following parameters
-
-    .-------------------------------------+--------------------------------------.
-    | Parameter                           | Value                                |
-    +-------------------------------------+--------------------------------------+
-    | offset                              | 100                                  |
-    | page                                | 10                                   |
-    | search                              | nope                                 |
-    '-------------------------------------+--------------------------------------'
-
-You can get a model like this:
-
-    sub info :GET Chained(/) Args(0) Does(RequestModel) RequestModel(InfoQuery)  {
-      my ($self, $c, $query_model) = @_;
-    }
-
-Where C<$query_model> looks like:
-
-    print $query_model->offset;   # 100
-    print $query_model->page;     # 10
-    print $query_model->search;   # "nope"
-
-B<NOTE> Although GET queries usually don't have a content type, its recommended that your GET query
-parameters be C<application/x-www-form-urlencoded> encoded so for now I'm just hijacking that.  If
-this bothers you feel free to submit use cases and patches.
+See L<CatalystX::QueryModel>.
 
 =head2 Requests with mixed query and body models
 
@@ -564,11 +543,9 @@ query and body parameters.  You create your models as normal:
     package Example::Model::InfoQuery;
 
     use Moose;
-    use CatalystX::RequestModel;
+    use CatalystX::QueryModel;
 
     extends 'Catalyst::Model';
-    content_type 'application/x-www-form-urlencoded';
-    content_in 'query';
 
     has page => (is=>'ro', required=>1, property=>1);  
     has offset => (is=>'ro', property=>1);
@@ -591,13 +568,12 @@ query and body parameters.  You create your models as normal:
 
 And in your action you list the request models:
 
-    sub postinfo :Chained(/) Args(0) Does(RequestModel) RequestModel(LoginRequest) RequestModel(InfoQuery)  {
+    sub postinfo :Chained(/) Args(0) Does(RequestModel) RequestModel(LoginRequest) QueryModel(InfoQuery)  {
       my ($self, $c, $login_request, $info_query) = @_;
     }
 
 Now if you get a request like this:
 
-    [debug] "POST" request for "postinfo" from "127.0.0.1"
     [debug] Query Parameters are:
     .-------------------------------------+--------------------------------------.
     | Parameter                           | Value                                |
@@ -623,8 +599,14 @@ You'll get two models like this:
     print $info_query->page;          # 10
     print $info_query->search;        # "nope"
 
-This also works with other types of POST request content types such as 'application/json' (see
-test cases for examples).
+You can also do nesting and indexing with query params (See L<CatalystX::QueryModel::QueryParser> and
+L<CatalystX::QueryModel::DoesQueryModel>)
+
+B<IMPORTANT NOTE>: Due to a limitation in how Catalyst finds subroutine attributes on an action we cannot
+determine the order of declaration of dissimilar attributes (such as RequestModel and QueryModel).  As a
+result when you have both attibutes on an action we will process and add to the arguments list first the
+Request (body) Models and then the Query models, even if you list the Query model first in the method
+declaration.
 
 =head1 CONTENT BODY PARSERS
 

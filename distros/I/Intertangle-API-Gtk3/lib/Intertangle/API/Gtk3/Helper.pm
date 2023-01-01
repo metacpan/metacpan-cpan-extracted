@@ -1,6 +1,6 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::API::Gtk3::Helper;
-$Intertangle::API::Gtk3::Helper::VERSION = '0.006';
+$Intertangle::API::Gtk3::Helper::VERSION = '0.007';
 # ABSTRACT: Collection of helper utilities for Gtk3 and Glib
 
 
@@ -152,7 +152,7 @@ Intertangle::API::Gtk3::Helper - Collection of helper utilities for Gtk3 and Gli
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 FUNCTIONS
 

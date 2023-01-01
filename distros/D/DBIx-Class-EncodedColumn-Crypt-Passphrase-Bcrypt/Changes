@@ -1,5 +1,8 @@
 Revision history for DBIx-Class-EncodedColumn-Crypt-Passphrase-Bcrypt
 
+0.0110 2022-12-30 07:38:14
+    - Require the latest Test::SQLite.
+
 0.0109 2022-12-24 08:16:28
     - Include SQL::Translator as a dep.
 

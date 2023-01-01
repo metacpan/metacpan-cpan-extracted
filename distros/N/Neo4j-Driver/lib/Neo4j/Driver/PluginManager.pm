@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::PluginManager;
 # ABSTRACT: Plug-in manager for Neo4j::Driver
-$Neo4j::Driver::PluginManager::VERSION = '0.31';
+$Neo4j::Driver::PluginManager::VERSION = '0.33';
 
 # This package is not part of the public Neo4j::Driver API.
 # (except as far as documented in Plugin.pm)

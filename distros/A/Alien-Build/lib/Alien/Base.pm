@@ -11,7 +11,7 @@ use Text::ParseWords qw/shellwords/;
 use Alien::Util;
 
 # ABSTRACT: Base classes for Alien:: modules
-our $VERSION = '2.75'; # VERSION
+our $VERSION = '2.76'; # VERSION
 
 
 sub import {
@@ -479,8 +479,7 @@ sub alien_helper {
 
 sub inline_auto_include {
   my ($class) = @_;
-  return [] unless $class->config('inline_auto_include');
-  $class->runtime_prop->{inline_auto_include} || $class->config('inline_auto_include')
+  $class->runtime_prop->{inline_auto_include} || $class->config('inline_auto_include') || []
 }
 
 sub Inline {
@@ -605,7 +604,7 @@ Alien::Base - Base classes for Alien:: modules
 
 =head1 VERSION
 
-version 2.75
+version 2.76
 
 =head1 SYNOPSIS
 

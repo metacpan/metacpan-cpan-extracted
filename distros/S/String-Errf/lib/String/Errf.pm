@@ -1,7 +1,7 @@
 use strict;
 use warnings;
-package String::Errf; # I really wanted to call it String::Fister.
-$String::Errf::VERSION = '0.008';
+package String::Errf 0.009;
+
 use String::Formatter 0.102081 ();
 use parent 'String::Formatter';
 # ABSTRACT: a simple sprintf-like dialect
@@ -453,7 +453,7 @@ String::Errf - a simple sprintf-like dialect
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -474,6 +474,16 @@ L<String::Formatter> and L<Sub::Exporter>.  Their documentation may be useful
 in understanding or extending String::Errf.  The C<errf> subroutine is only
 available when imported.  Calling L<String::Errf::errf> will not do what you
 want.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 DIFFERENCES FROM SPRINTF
 
@@ -630,11 +640,11 @@ noun orthography.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Pedro Melo
+=for stopwords Karen Etheridge Pedro Melo Ricardo Signes
 
 =over 4
 
@@ -646,11 +656,15 @@ Karen Etheridge <ether@cpan.org>
 
 Pedro Melo <melo@simplicidade.org>
 
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo Signes.
+This software is copyright (c) 2022 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,11 @@
+Revision history for Perl extension Test::Named.
+
+0.01  Thu Dec 29 13:31:58 2022
+	- original version; created by h2xs 1.23 with options
+		-X Test::Named
+0.02  Thu Dec 30 13:07:13 2022
+	- added before_launch and before_exit hooks
+0.03  Thu Dec 30 13:34:03 2022
+	- fixed module version and versioning perl-style
+
+

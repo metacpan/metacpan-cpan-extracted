@@ -1,5 +1,9 @@
 Revision history for Pod-Elemental-Transformer-VimHTML
 
+0.093583  2022-12-31 14:14:40-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 0.093582  2013-10-12 22:18:38 America/New_York
           update bugtracker and repo
 

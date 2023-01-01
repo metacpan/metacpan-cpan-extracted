@@ -49,18 +49,18 @@ WriteMakefile(
   ABSTRACT      => 'PDL interface to ta-lib library',
   LICENSE       => 'perl',
   PREREQ_PM     => {
-        'PDL' => 2.006,
-        'Alien::TALib' => 0.10,
+        'PDL' => '2.006',
+        'Alien::TALib' => '0.12',
   },
   BUILD_REQUIRES     => {
-        'PDL' => 2.006,
-        'Test::More' => 0,
+        'PDL' => '2.006',
+        'Test::More' => '0',
         'Test::Number::Delta' => '1.06',
-        'Alien::TALib' => 0.10,
+        'Alien::TALib' => '0.12',
   },
   CONFIGURE_REQUIRES => {
-        'PDL' => 2.006,
-        'Alien::TALib' => 0.10,
+        'PDL' => '2.006',
+        'Alien::TALib' => '0.12',
   },
   META_MERGE   => {
       resources    => {

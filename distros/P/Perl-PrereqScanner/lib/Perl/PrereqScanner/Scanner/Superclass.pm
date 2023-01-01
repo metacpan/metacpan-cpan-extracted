@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Perl::PrereqScanner::Scanner::Superclass 1.024;
+package Perl::PrereqScanner::Scanner::Superclass 1.025;
 # ABSTRACT: scan for modules loaded with superclass.pm
 
 use Moose;
@@ -57,7 +57,7 @@ Perl::PrereqScanner::Scanner::Superclass - scan for modules loaded with supercla
 
 =head1 VERSION
 
-version 1.024
+version 1.025
 
 =head1 DESCRIPTION
 
@@ -85,7 +85,7 @@ Jerome Quelin
 
 =item *
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =back
 

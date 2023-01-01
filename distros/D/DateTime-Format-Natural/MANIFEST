@@ -24,15 +24,20 @@ README
 scripts/dateparse
 t/00-load.t
 t/01-parse.t
+t/01-parse_hires.t
 t/02-parse_format.t
 t/03-parse_daytime.t
 t/04-parse_durations.t
+t/04-parse_durations_hires.t
 t/05-parse_time_zone.t
 t/06-parse_demand_future.t
+t/06-parse_demand_future_hires.t
 t/06-parse_prefer_future.t
+t/06-parse_prefer_future_hires.t
 t/07-parse_datetime.t
 t/07-parse_datetime_future.t
 t/08-parse_aliases.t
+t/08-parse_aliases_hires.t
 t/09-parse_iso8601.t
 t/10-parse_expand.t
 t/11-parse_success.t
@@ -45,3 +50,4 @@ t/17-trace.t
 t/18-validate.t
 t/pod-coverage.t
 t/pod.t
+TODO

@@ -122,7 +122,7 @@ sub __transaction {
             $dbh->commit;
         }
         else {
-            my $commit_ok = sprintf qq(  %s %s "%s"), 'COMMIT', insert_sep( $count_affected, $sf->{o}{G}{thsd_sep} ), $stmt_type;
+            my $commit_ok = sprintf qq(  %s %s "%s"), 'COMMIT', insert_sep( $count_affected, $sf->{i}{info_thsd_sep} ), $stmt_type;
             my $menu = [ undef,  $commit_ok ];
             $sf->{i}{occupied_term_height} = @$menu + 2; # prompt, trailing empty line
             my $info = $ax->get_sql_info( $sql );
@@ -164,7 +164,7 @@ sub __auto_commit {
         # already asked for confirmation (create table + insert data) in Create_table
     }
     else {
-        my $commit_ok = sprintf qq(  %s %s "%s"), 'EXECUTE', insert_sep( $count_affected, $sf->{o}{G}{thsd_sep} ), $stmt_type;
+        my $commit_ok = sprintf qq(  %s %s "%s"), 'EXECUTE', insert_sep( $count_affected, $sf->{i}{info_thsd_sep} ), $stmt_type;
         my $menu = [ undef,  $commit_ok ];
         $sf->{i}{occupied_term_height} = @$menu + 1;
         my $info = $ax->get_sql_info( $sql ); #

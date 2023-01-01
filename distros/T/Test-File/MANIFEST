@@ -1,6 +1,7 @@
 Changes
 CITATION.cff
 examples/README
+File.xs
 INSTALL.SKIP
 lib/Test/File.pm
 LICENSE

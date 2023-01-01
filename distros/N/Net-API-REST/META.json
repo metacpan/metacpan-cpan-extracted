@@ -101,6 +101,6 @@
          "web" : "https://gitlab.com/jackdeguest/Net-API-REST"
       }
    },
-   "version" : "v0.7.0",
+   "version" : "v0.7.1",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

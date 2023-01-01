@@ -21,7 +21,7 @@ sub four_zchars {
   my $top = ($chr & 0b1111100000) >> 5;
   my $bot = ($chr & 0b0000011111);
 
-  return "\x05\x06" . chr($top) . chr($bot);
+  return(chr(5), chr(6), chr($top), chr($bot));
 }
 
 sub chrs { map chr hex, @_; }
@@ -149,7 +149,7 @@ subtest "custom extra characters" => sub {
   ok($ok, "we can encode HAMMER AND SICKLE if we make it an extra")
     or diag "error: $@";
 
-  is(ord(substr($zscii, 5, 1)), 157, "the H&C is ZSCII 157");
+  is(ord(substr($zscii, 5, 1)), 157, "the H&S is ZSCII 157");
   is(length($zscii), 9, "there are 8 ZSCII charactrs");
   is_binary($zscii, "Ameri\x9Dans", "...and they're what we expect too");
 
@@ -278,5 +278,11 @@ subtest "dictionary words" => sub {
     }
   }
 };
+
+{
+  my $ok = eval { my $fail_z = ZMachine::ZSCII->new(1); 1 };
+  my $err = $@;
+  like($err, qr/only version/i, "no support for v1 (yet?)");
+}
 
 done_testing;

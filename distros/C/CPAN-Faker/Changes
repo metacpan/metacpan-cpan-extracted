@@ -1,5 +1,8 @@
 Revision history for CPAN-Faker
 
+0.012     2022-12-31 20:56:59-05:00 America/New_York
+        - update author contact
+
 0.011     2021-06-18 23:57:44-04:00 America/New_York
         - update author contact
         - add perl-support docs

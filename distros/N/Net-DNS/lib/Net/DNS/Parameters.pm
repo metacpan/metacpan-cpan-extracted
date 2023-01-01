@@ -3,13 +3,13 @@ package Net::DNS::Parameters;
 ################################################
 ##
 ##	Domain Name System (DNS) Parameters
-##	(last updated 2022-04-01)
+##	(last updated 2022-12-06)
 ##
 ################################################
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Parameters.pm 1865 2022-05-21 09:57:49Z willem $)[2];
+our $VERSION = (qw$Id: Parameters.pm 1886 2022-12-20 11:27:25Z willem $)[2];
 
 use integer;
 use Carp;
@@ -112,8 +112,8 @@ my @typebyname = (
 	OPENPGPKEY => 61,					# RFC7929
 	CSYNC	   => 62,					# RFC7477
 	ZONEMD	   => 63,					# RFC8976
-	SVCB	   => 64,					# draft-ietf-dnsop-svcb-https-00
-	HTTPS	   => 65,					# draft-ietf-dnsop-svcb-https-00
+	SVCB	   => 64,					# RFC-ietf-dnsop-svcb-https-10
+	HTTPS	   => 65,					# RFC-ietf-dnsop-svcb-https-10
 	SPF	   => 99,					# RFC7208
 	UINFO	   => 100,					# IANA-Reserved
 	UID	   => 101,					# IANA-Reserved
@@ -249,6 +249,41 @@ my @dsotypebyname = (
 our %dsotypebyval = reverse @dsotypebyname;
 push @dsotypebyname, map { /^\d/ ? $_ : lc($_) } @dsotypebyname;
 our %dsotypebyname = @dsotypebyname;
+
+
+# Registry: Extended DNS Error Codes
+my @dnserrorbyval = (
+	0  => 'Other Error',					# RFC8914
+	1  => 'Unsupported DNSKEY Algorithm',			# RFC8914
+	2  => 'Unsupported DS Digest Type',			# RFC8914
+	3  => 'Stale Answer',					# RFC8914 RFC8767
+	4  => 'Forged Answer',					# RFC8914
+	5  => 'DNSSEC Indeterminate',				# RFC8914
+	6  => 'DNSSEC Bogus',					# RFC8914
+	7  => 'Signature Expired',				# RFC8914
+	8  => 'Signature Not Yet Valid',			# RFC8914
+	9  => 'DNSKEY Missing',					# RFC8914
+	10 => 'RRSIGs Missing',					# RFC8914
+	11 => 'No Zone Key Bit Set',				# RFC8914
+	12 => 'NSEC Missing',					# RFC8914
+	13 => 'Cached Error',					# RFC8914
+	14 => 'Not Ready',					# RFC8914
+	15 => 'Blocked',					# RFC8914
+	16 => 'Censored',					# RFC8914
+	17 => 'Filtered',					# RFC8914
+	18 => 'Prohibited',					# RFC8914
+	19 => 'Stale NXDomain Answer',				# RFC8914
+	20 => 'Not Authoritative',				# RFC8914
+	21 => 'Not Supported',					# RFC8914
+	22 => 'No Reachable Authority',				# RFC8914
+	23 => 'Network Error',					# RFC8914
+	24 => 'Invalid Data',					# RFC8914
+	25 => 'Signature Expired before Valid',			# https://github.com/NLnetLabs/unbound/pull/604#discussion_r802678343
+	26 => 'Too Early',					# RFC9250
+	27 => 'Unsupported NSEC3 Iterations Value',		# RFC9276
+	28 => 'Unable to conform to policy',			#
+	);
+our %dnserrorbyval = @dnserrorbyval;
 
 
 ########

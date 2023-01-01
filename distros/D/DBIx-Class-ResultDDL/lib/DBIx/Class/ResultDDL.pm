@@ -6,7 +6,7 @@ use B::Hooks::EndOfScope 'on_scope_end';
 use Carp;
 
 # ABSTRACT: Sugar methods for declaring DBIx::Class::Result data definitions
-our $VERSION = '2.01'; # VERSION
+our $VERSION = '2.02'; # VERSION
 
 
 our $CALLER; # can be used localized to wrap caller context into an anonymous sub
@@ -156,29 +156,7 @@ sub col {
 	1;
 }
 
-
-sub expand_col_options {
-	my $pkg= shift;
-	my $opts= { is_nullable => 0 };
-	# Apply options to the hash in order, so that they get overwritten as expected
-	while (@_) {
-		my ($k, $v)= (shift, shift);
-		$opts->{$k}= $v, next
-			unless index($k, '.') >= 0;
-		# We support "foo.bar => $v" syntax which we convert to "foo => { bar => $v }"
-		# because "foo => { bar => 1 }, foo => { baz => 2 }" would overwrite eachother.
-		my @path= split /\./, $k;
-		$k= pop @path;
-		my $dest= $opts;
-		$dest= ($dest->{$_} ||= {}) for @path;
-		$dest->{$k}= $v;
-	}
-	$opts->{retrieve_on_insert}= 1
-		if $opts->{default_value} and !defined $opts->{retrieve_on_insert}
-			and _settings_for_package($pkg)->{retrieve_defaults};
-	return $opts;
-}
-export 'expand_col_options';
+sub expand_col_options;
 
 sub _maybe_array {
 	my @dims;
@@ -343,21 +321,22 @@ sub many_to_many {
 	DBIx::Class::Core->can('many_to_many')->(scalar($CALLER||caller), @_);
 }
 
+sub expand_relationship_params;
+
 sub _add_rel {
-	my ($pkg, $reltype, $name, $maybe_colmap, @opts)= @_;
-	my ($rel_pkg, $dbic_colmap)= ref $maybe_colmap eq 'HASH'? _translate_colmap($maybe_colmap, $pkg)
-		: !ref $maybe_colmap? ( _interpret_pkg_name($maybe_colmap, $pkg), shift(@opts) )
-		: croak "Unexpected arguments";
-	
+	my ($pkg, $reltype, $relname, $rel_pkg, $dbic_colmap, $opts)= &expand_relationship_params;
 	if ($reltype eq 'rel_one' || $reltype eq 'rel_many') {
 		# Are we referring to the foreign row's primary key?  DBIC load order might not have
 		# gotten there yet, so take a guess that if it isn't a part of our primary key, then it
 		# is a part of their primary key.
-		my @pk= $pkg->primary_columns;
-		my $is_f_key= !grep { defined $dbic_colmap->{$_} || defined $dbic_colmap->{"self.$_"} } @pk;
+		my $is_f_key;
+		if (ref $dbic_colmap eq 'HASH') {
+			my @pk= $pkg->primary_columns;
+			$is_f_key= !grep { defined $dbic_colmap->{$_} || defined $dbic_colmap->{"self.$_"} } @pk;
+		}
 		
 		$pkg->add_relationship(
-			$name,
+			$relname,
 			$rel_pkg,
 			$dbic_colmap,
 			{
@@ -372,76 +351,13 @@ sub _add_rel {
 					is_depends_on => 0,
 				)),
 				cascade_copy => 0, cascade_delete => 0,
-				@opts
+				%$opts
 			}
 		);
 	} else {
 		require DBIx::Class::Core;
-		DBIx::Class::Core->can($reltype)->($pkg, $name, $rel_pkg, $dbic_colmap, { @opts });
+		DBIx::Class::Core->can($reltype)->($pkg, $relname, $rel_pkg, $dbic_colmap, $opts);
 	}
-}
-
-sub _interpret_pkg_name {
-	my ($rel_class, $current_pkg)= @_;
-	# Related class may be relative to same namespace as current
-	return $rel_class if index($rel_class, '::') >= 0;
-	my ($parent_namespace)= ($current_pkg =~ /(.*)::[^:]+$/);
-	return $parent_namespace.'::'.$rel_class;
-}
-
-# DBIC is normally { foreign.col => self.col } but I don't think that's very intuitive,
-# so allow an alternate notation of { self_col => CLASS.col } and automatically determine
-# which the user is using.
-sub _translate_colmap {
-	my ($colmap, $self_pkg)= @_;
-	my ($rel_class, $direction, %result, $inconsistent)= ('',0);
-	# First pass, find the values for $rel_class and $reverse
-	for (keys %$colmap) {
-		my ($key, $val)= ($_, $colmap->{$_});
-		if ($key =~ /([^.]+)\.(.*)/) {
-			if ($1 eq 'self') {
-				$direction ||= 1;
-				++$inconsistent if $direction < 0;
-			}
-			else {
-				$direction ||= -1;
-				++$inconsistent if $direction > 0;
-				if ($1 ne 'foreign') {
-					$rel_class ||= $1;
-					++$inconsistent if $rel_class ne $1;
-				}
-			}
-		}
-		if ($val =~ /([^.]+)\.(.*)/) {
-			if ($1 eq 'self') {
-				$direction ||= -1;
-				++$inconsistent if $direction > 0;
-			}
-			else {
-				$direction ||= 1;
-				++$inconsistent if $direction < 0;
-				if ($1 ne 'foreign') {
-					$rel_class ||= $1;
-					++$inconsistent if $rel_class ne $1;
-				}
-			}
-		}
-	}
-	croak "Inconsistent {self=>foreign} notation found in relation mapping"
-		if $inconsistent;
-	croak "Must reference foreign Result class name in one of the keys or values of relation mapping"
-		unless $rel_class && $direction;
-	# Related class may be relative to same namespace as current
-	$rel_class= _interpret_pkg_name($rel_class, $self_pkg);
-	
-	# Second pass, rename the keys & values to DBIC canonical notation
-	for (keys %$colmap) {
-		my ($key, $val)= ($_, $colmap->{$_});
-		$key =~ s/.*\.//;
-		$val =~ s/.*\.//;
-		$result{ $direction > 0? "foreign.$val" : "foreign.$key" }= $direction > 0? "self.$key" : "self.$val";
-	}
-	return $rel_class, \%result;
 }
 
 
@@ -540,6 +456,117 @@ sub create_index {
 BEGIN { *idx= *create_index; }
 
 
+sub expand_col_options {
+	my $pkg= shift;
+	my $opts= { is_nullable => 0 };
+	# Apply options to the hash in order, so that they get overwritten as expected
+	while (@_) {
+		my ($k, $v)= (shift, shift);
+		$opts->{$k}= $v, next
+			unless index($k, '.') >= 0;
+		# We support "foo.bar => $v" syntax which we convert to "foo => { bar => $v }"
+		# because "foo => { bar => 1 }, foo => { baz => 2 }" would overwrite eachother.
+		my @path= split /\./, $k;
+		$k= pop @path;
+		my $dest= $opts;
+		$dest= ($dest->{$_} ||= {}) for @path;
+		$dest->{$k}= $v;
+	}
+	$opts->{retrieve_on_insert}= 1
+		if $opts->{default_value} and !defined $opts->{retrieve_on_insert}
+			and _settings_for_package($pkg)->{retrieve_defaults};
+	return $opts;
+}
+
+
+sub expand_relationship_params {
+	my ($pkg, $reltype, $relname, $maybe_colmap)= splice(@_, 0, 4);
+	my ($rel_pkg, $dbic_colmap, %opts)= ref $maybe_colmap eq 'HASH'? _translate_colmap($maybe_colmap, $pkg)
+		: !ref $maybe_colmap && $maybe_colmap =~ /JOIN /? _translate_join_sql($maybe_colmap, $pkg)
+		: !ref $maybe_colmap? ( _interpret_pkg_name($maybe_colmap, $pkg), shift )
+		: croak "Unexpected arguments";
+	%opts= (%opts, @_);
+	return $pkg, $reltype, $relname, $rel_pkg, $dbic_colmap, \%opts;
+}
+
+sub _interpret_pkg_name {
+	my ($rel_class, $current_pkg)= @_;
+	# Related class may be relative to same namespace as current
+	return $rel_class if index($rel_class, '::') >= 0;
+	my ($parent_namespace)= ($current_pkg =~ /(.*)::[^:]+$/);
+	return $parent_namespace.'::'.$rel_class;
+}
+
+# DBIC is normally { foreign.col => self.col } but I don't think that's very intuitive,
+# so allow an alternate notation of { self_col => CLASS.col } and automatically determine
+# which the user is using.
+sub _translate_colmap {
+	my ($colmap, $self_pkg)= @_;
+	my ($rel_class, $direction, %result, $inconsistent)= ('',0);
+	# First pass, find the values for $rel_class and $reverse
+	for (keys %$colmap) {
+		my ($key, $val)= ($_, $colmap->{$_});
+		if ($key =~ /([^.]+)\.(.*)/) {
+			if ($1 eq 'self') {
+				$direction ||= 1;
+				++$inconsistent if $direction < 0;
+			}
+			else {
+				$direction ||= -1;
+				++$inconsistent if $direction > 0;
+				if ($1 ne 'foreign') {
+					$rel_class ||= $1;
+					++$inconsistent if $rel_class ne $1;
+				}
+			}
+		}
+		if ($val =~ /([^.]+)\.(.*)/) {
+			if ($1 eq 'self') {
+				$direction ||= -1;
+				++$inconsistent if $direction > 0;
+			}
+			else {
+				$direction ||= 1;
+				++$inconsistent if $direction < 0;
+				if ($1 ne 'foreign') {
+					$rel_class ||= $1;
+					++$inconsistent if $rel_class ne $1;
+				}
+			}
+		}
+	}
+	croak "Inconsistent {self=>foreign} notation found in relation mapping"
+		if $inconsistent;
+	croak "Must reference foreign Result class name in one of the keys or values of relation mapping"
+		unless $rel_class && $direction;
+	# Related class may be relative to same namespace as current
+	$rel_class= _interpret_pkg_name($rel_class, $self_pkg);
+	
+	# Second pass, rename the keys & values to DBIC canonical notation
+	for (keys %$colmap) {
+		my ($key, $val)= ($_, $colmap->{$_});
+		$key =~ s/.*\.//;
+		$val =~ s/.*\.//;
+		$result{ $direction > 0? "foreign.$val" : "foreign.$key" }= $direction > 0? "self.$key" : "self.$val";
+	}
+	return $rel_class, \%result;
+}
+
+sub _translate_join_sql {
+	my ($sql, $self_pkg)= @_;
+	my ($join_type, $rsrc, $alias, $on, $tpl)
+		= ($sql =~ /^\s*(LEFT\s*|INNER\s*)?JOIN\s+(\S+)\s+(\w+)\s+(ON\s+)?(.*)/si)
+		or Carp::croak("Can't pase SQL, make sure it starts with (LEFT)? JOIN \$class (\$alias)? ON ...\n$sql");
+	my $rel_class= _interpret_pkg_name($rsrc, $self_pkg);
+	my $replace= $alias =~ /^ON\s*$/i? $rsrc : $alias;
+	$tpl =~ s/(["\$\@\\])/\\$1/g;
+	$tpl =~ s/\b\Q$replace\E[.]/\$_[0]{foreign_alias}./g;
+	$tpl =~ s/\bself[.]/\$_[0]{self_alias}./g;
+	my $tpl_fn= eval 'sub { \"'.$tpl.'" }' or die "$@\n in generated expression \"$tpl\"";
+	return $rel_class, $tpl_fn, ($join_type? (join_type => $join_type) : () );
+}
+
+
 1;
 
 __END__
@@ -551,10 +578,6 @@ __END__
 =head1 NAME
 
 DBIx::Class::ResultDDL - Sugar methods for declaring DBIx::Class::Result data definitions
-
-=head1 VERSION
-
-version 2.01
 
 =head1 SYNOPSIS
 
@@ -574,6 +597,9 @@ version 2.01
   
   has_many albums => { id => 'Album.artist_id' };
   rel_many impersonators => { name => 'Artist.name' };
+  might_have newest_album => 'JOIN Album a ON 
+    a.id = (SELECT MAX(Album.id) FROM Album
+            WHERE Album.artist_id = self.id)';
 
 =head1 DESCRIPTION
 
@@ -586,6 +612,10 @@ as if you had said C<use namespace::clean;>.
 
 This module has a versioned API, to help prevent name collisions.  If you request the C<-Vx>
 behavior, you can rely on that to remain the same across upgrades.
+
+This module also has L<a mixin|DBIx::Class::ResultDDL::SchemaLoaderMixin> for L<Schema::Loader>!
+Now you can have pretty column definitions even on a SQL-first project that you generate from
+the database.
 
 =head1 EXPORTED FEATURES
 
@@ -694,14 +724,6 @@ Define a column.  This calls add_column after sensibly merging all your options.
 It defaults the column to not-null for you, but you can override that by saying
 C<null> in your options.
 You will probably use many of the methods below to build the options for the column:
-
-=head2 expand_col_options
-
-This is a utility function that performs most of the work of L</col>.
-Given the list of arguments returned by the sugar functions below, it
-returns a hashref of official options for L<DBIx::Class::ResultSource/add_column>.
-
-(It is not exported as part of any tag)
 
 =head3 null
 
@@ -946,6 +968,9 @@ Shortucut for __PACKAGE__->add_unique_constraint($name? \@cols)
 
   belongs_to $rel_name, $peer_class, $condition, @attr_list;
   belongs_to $rel_name, { colname => "$ResultClass.$colname" }, @attr_list;
+  belongs_to $rel_name, <<'SQL', @attr_list;
+    JOIN $ResultClass $alias ON $sql_expression
+  SQL
   # becomes...
   __PACKAGE__->belongs_to($rel_name, $peer_class, $condition, { @attr_list });
 
@@ -957,6 +982,46 @@ but all these sugar functions allow it to be written the other way around, and u
 Result Class name in place of "foreign.".  The Result Class may be a fully qualified
 package name, or just the final component if it is in the same parent package namespace
 as the current package.
+
+In the third case, this module identifies the C<< "JOIN $ResultClass $x ON $y" >>
+notation and parses that as a template to create the very awkward DBIC coderef system of:
+
+  sub {
+    my ($us, $them)= @{$_[0]}{'self_alias','foreign_alias'};
+    my $literal_sql= $sql_template->($us, $them);
+    return \$literal_sql;
+  }
+
+To write the template, start with 'JOIN' or 'LEFT JOIN' followed by the full or partial
+name of the related Result Class (not actual table name).  Optionally include an alias
+after that, and then the word 'ON'.  Everything else will be used as the template's SQL.
+All occurrences of the result class name (or alias, if you used one) will be replaced by
+a variable, and every occurrence of C<< self. >> will be replaced by a variable.  These
+variables get substituted with the aliases provided by DBIC during the construction of
+the resultset.
+
+Examples:
+
+  might_have example1 => <<'SQL';
+    LEFT JOIN MyApp::Result::Example
+      ON MyApp::Result::Example.id = self.example_id
+  SQL
+  
+  might_have example2 => <<'SQL';
+    JOIN MyApp::Result::Example foreign
+      ON foreign.id = self.example_id
+  SQL
+  
+  might_have max_example => <<'SQL';
+    LEFT JOIN Example ex ON ex.id = (
+      SELECT MAX(id) FROM example_table
+      WHERE category = self.category
+    )
+  SQL
+
+When writing the SQL, you need to ensure that "self." and whatever alias you chose
+don't occur anywhere that you didn't intend; This module does not actually parse the
+SQL, it just performs blind text substitution.
 
 =head2 might_have
 
@@ -1099,6 +1164,33 @@ L<SQL::Translator::Schema::Index/type>.
 
 Alias for L</create_index>; lines up nicely with 'col'.
 
+=head1 UTILITY FUNCTION
+
+These are not exported, but might be useful for integrating with this module:
+
+=over
+
+=item expand_col_options
+
+  my $opts= DBIx::Class::ResultDDL::expand_col_options(@_);
+
+This is a utility function that performs most of the work of L</col>.
+Given the list of arguments returned by the sugar functions above, it
+returns a hashref of official options for L<DBIx::Class::ResultSource/add_column>.
+
+=item expand_relationship_params
+
+  my ($pkg, $rel_type, $rel_name, $related_pkg, \%colmap, \%options)
+      = DBIx::Class::ResultDDL::expand_relationship_params(caller, @_);
+
+This is a utility function that parses the relationship notations accepted by
+the functions above, and returns the normal positional parameters for the DBIC
+relationship functions.
+
+=back
+
+=head2 expand_relationship_params
+
 =head1 MISSING FUNCTIONALITY
 
 The methods above in most cases allow you to insert plain-old-DBIC notation
@@ -1121,6 +1213,10 @@ Michael Conrad <mconrad@intellitree.com>
 =for stopwords Veesh Goldman
 
 Veesh Goldman <rabbiveesh@gmail.com>
+
+=head1 VERSION
+
+version 2.02
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,5 +1,9 @@
 Revision history for Throwable-X
 
+0.008     2022-12-31 16:00:55-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 0.007     2013-10-18 11:47:39 America/New_York
           add repo and bugtracker metadata
 

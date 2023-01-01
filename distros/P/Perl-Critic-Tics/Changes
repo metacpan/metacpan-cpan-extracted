@@ -1,5 +1,9 @@
 This is the revision history for Perl-Critic-Tics
 
+0.010     2022-12-31 14:03:41-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 0.009     2014-07-28 15:20:01-04:00 America/New_York
         - fix reported line number in ProhibitLongLines
           (thanks Kent Frederic and Oliver Trosien)

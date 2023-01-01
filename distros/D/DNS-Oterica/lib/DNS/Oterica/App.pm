@@ -1,6 +1,6 @@
 package DNS::Oterica::App;
 # ABSTRACT: the code behind `dnsoterica`
-$DNS::Oterica::App::VERSION = '0.313';
+$DNS::Oterica::App::VERSION = '0.314';
 use Moose;
 use DNS::Oterica::Hub;
 use File::Find::Rule;
@@ -129,7 +129,7 @@ DNS::Oterica::App - the code behind `dnsoterica`
 
 =head1 VERSION
 
-version 0.313
+version 0.314
 
 =head1 PERL VERSION
 
@@ -156,11 +156,11 @@ for hosts.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

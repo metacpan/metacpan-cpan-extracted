@@ -1,6 +1,6 @@
-package HTTP::Throwable::Role::Status::TooManyRequests;
+package HTTP::Throwable::Role::Status::TooManyRequests 0.028;
 our $AUTHORITY = 'cpan:STEVAN';
-$HTTP::Throwable::Role::Status::TooManyRequests::VERSION = '0.027';
+
 use Moo::Role;
 
 with(
@@ -23,7 +23,7 @@ HTTP::Throwable::Role::Status::TooManyRequests - 429 Too Many Requests
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 DESCRIPTION
 
@@ -32,6 +32,16 @@ requests in a given amount of time ("rate limiting"). The response
 representations SHOULD include details explaining the condition,
 and MAY include a Retry-After header indicating how to wait before
 making a new request.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 AUTHORS
 
@@ -43,7 +53,7 @@ Stevan Little <stevan.little@iinteractive.com>
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =back
 

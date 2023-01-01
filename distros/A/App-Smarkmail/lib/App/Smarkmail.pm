@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package App::Smarkmail 0.005;
+package App::Smarkmail 0.006;
 # ABSTRACT: pipemailer that changes plaintext to multi/alt with Markdown
 
 use Email::MIME;
@@ -120,7 +120,7 @@ App::Smarkmail - pipemailer that changes plaintext to multi/alt with Markdown
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -131,11 +131,12 @@ to multipart alternative, and then sends it via F<sendmail>
 All of this is really sketchy and probably has secret mail-damaging or
 mail-losing bugs.  -- rjbs, 2008-02-24
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has the same support period as perl itself:  it supports the two
-most recent versions of perl.  (That is, if the most recently released version
-is v5.40, then this module should work on both v5.40 and v5.38.)
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
@@ -172,7 +173,13 @@ seem to tickle some bugs in some popular MUAs.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

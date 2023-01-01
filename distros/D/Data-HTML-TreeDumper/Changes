@@ -1,5 +1,9 @@
 Revision history for Perl extension Data-HTML-TreeDumper
 
+v0.0.4 2022-12-29T17:50:33Z
+    - introduce HTML::AutoTag to generate HTML tags
+    - suppress blank ordered/unordered list
+
 v0.0.3 2022-12-18T10:14:30Z
     - update document.
 

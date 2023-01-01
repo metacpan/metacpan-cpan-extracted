@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package App::Whiff 0.007;
+package App::Whiff 0.008;
 # ABSTRACT: find the first executable of a series of alternatives
 
 use File::Which ();
@@ -62,7 +62,7 @@ App::Whiff - find the first executable of a series of alternatives
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 DESCRIPTION
 
@@ -95,7 +95,7 @@ This method is called by the F<whiff> program to ... well, run.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
@@ -106,6 +106,10 @@ Ricardo SIGNES <rjbs@semiotic.systems>
 =item *
 
 Florian Schlichting <fsfs@debian.org>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

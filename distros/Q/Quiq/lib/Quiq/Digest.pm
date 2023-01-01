@@ -21,7 +21,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.205';
+our $VERSION = '1.206';
 
 use Digest::MD5 ();
 
@@ -70,7 +70,7 @@ sub md5 {
 
 =head1 VERSION
 
-1.205
+1.206
 
 =head1 AUTHOR
 

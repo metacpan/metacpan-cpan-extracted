@@ -1,4 +1,4 @@
-package Email::MIME::Kit::Assembler::Markdown 0.100008;
+package Email::MIME::Kit::Assembler::Markdown 0.100009;
 # ABSTRACT: build multipart/alternative messages from Markdown alone
 
 use Moose;
@@ -294,7 +294,7 @@ Email::MIME::Kit::Assembler::Markdown - build multipart/alternative messages fro
 
 =head1 VERSION
 
-version 0.100008
+version 0.100009
 
 =head1 SYNOPSIS
 
@@ -375,11 +375,11 @@ the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Chris Nehren Michael McClimon Robert Norris
+=for stopwords Chris Nehren Michael McClimon Ricardo Signes Robert Norris
 
 =over 4
 
@@ -390,6 +390,10 @@ Chris Nehren <cnehren@gmail.com>
 =item *
 
 Michael McClimon <michael@mcclimon.org>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

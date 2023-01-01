@@ -3,7 +3,7 @@
 # See the LICENSE file in the project root for more information
 
 package Search::Elasticsearch::Client::7_0::Direct::Snapshot;
-$Search::Elasticsearch::Client::7_0::Direct::Snapshot::VERSION = '7.711001';
+$Search::Elasticsearch::Client::7_0::Direct::Snapshot::VERSION = '8.00';
 use Moo;
 with 'Search::Elasticsearch::Client::7_0::Role::API';
 with 'Search::Elasticsearch::Role::Client::Direct';
@@ -21,7 +21,7 @@ Search::Elasticsearch::Client::7_0::Direct::Snapshot - A client for managing sna
 
 =head1 VERSION
 
-version 7.711001
+version 8.00
 
 =head1 DESCRIPTION
 
@@ -201,7 +201,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Elasticsearch BV.
+This software is Copyright (c) 2022 by Elasticsearch BV.
 
 This is free software, licensed under:
 

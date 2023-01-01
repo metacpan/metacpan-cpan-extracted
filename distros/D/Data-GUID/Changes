@@ -1,5 +1,8 @@
 Revision history for Data-GUID
 
+0.051     2022-12-31 21:04:39-05:00 America/New_York
+        - update author contact info
+
 0.050     2021-06-20 20:18:40-04:00 America/New_York
         - update author contact info
         - add perl-support section in docs

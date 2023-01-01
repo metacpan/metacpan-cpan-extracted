@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::API::Gtk3::GdkX11;
 # ABSTRACT: Load the GdkX11 library
-$Intertangle::API::Gtk3::GdkX11::VERSION = '0.006';
+$Intertangle::API::Gtk3::GdkX11::VERSION = '0.007';
 use Glib::Object::Introspection;
 use FFI::CheckLib 0.06;
 use FFI::Platypus;
@@ -82,7 +82,7 @@ Intertangle::API::Gtk3::GdkX11 - Load the GdkX11 library
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 AUTHOR
 

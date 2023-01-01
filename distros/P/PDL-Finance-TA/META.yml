@@ -3,12 +3,12 @@ abstract: 'PDL interface to ta-lib library'
 author:
   - 'KMX <kmx@cpan.org>'
 build_requires:
-  Alien::TALib: '0.1'
+  Alien::TALib: '0.12'
   PDL: '2.006'
   Test::More: '0'
   Test::Number::Delta: '1.06'
 configure_requires:
-  Alien::TALib: '0.1'
+  Alien::TALib: '0.12'
   PDL: '2.006'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010'
@@ -22,9 +22,9 @@ no_index:
     - t
     - inc
 requires:
-  Alien::TALib: '0.1'
+  Alien::TALib: '0.12'
   PDL: '2.006'
 resources:
   repository: https://github.com/kmx/pdl-finance-ta
-version: '0.009'
+version: '0.010'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

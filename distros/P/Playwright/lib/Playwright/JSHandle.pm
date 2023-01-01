@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::JSHandle;
-$Playwright::JSHandle::VERSION = '1.251';
+$Playwright::JSHandle::VERSION = '1.291';
 use parent 'Playwright::Base';
 
 sub new {
@@ -32,41 +32,11 @@ sub evaluateHandle {
     );
 }
 
-sub dispose {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'dispose',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub jsonValue {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'jsonValue',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub evaluate {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'evaluate',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub asElement {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'asElement',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -82,11 +52,41 @@ sub getProperties {
     );
 }
 
+sub asElement {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'asElement',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub jsonValue {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'jsonValue',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub getProperty {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'getProperty',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub dispose {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'dispose',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -116,7 +116,7 @@ Playwright::JSHandle - Automatically generated class for Playwright::JSHandle
 
 =head1 VERSION
 
-version 1.251
+version 1.291
 
 =head1 CONSTRUCTOR
 
@@ -133,29 +133,11 @@ Execute the JSHandle::evaluateHandle playwright routine.
 
 See L<https://playwright.dev/api/class-JSHandle#JSHandle-evaluateHandle> for more information.
 
-=head2 dispose(@args)
-
-Execute the JSHandle::dispose playwright routine.
-
-See L<https://playwright.dev/api/class-JSHandle#JSHandle-dispose> for more information.
-
-=head2 jsonValue(@args)
-
-Execute the JSHandle::jsonValue playwright routine.
-
-See L<https://playwright.dev/api/class-JSHandle#JSHandle-jsonValue> for more information.
-
 =head2 evaluate(@args)
 
 Execute the JSHandle::evaluate playwright routine.
 
 See L<https://playwright.dev/api/class-JSHandle#JSHandle-evaluate> for more information.
-
-=head2 asElement(@args)
-
-Execute the JSHandle::asElement playwright routine.
-
-See L<https://playwright.dev/api/class-JSHandle#JSHandle-asElement> for more information.
 
 =head2 getProperties(@args)
 
@@ -163,11 +145,29 @@ Execute the JSHandle::getProperties playwright routine.
 
 See L<https://playwright.dev/api/class-JSHandle#JSHandle-getProperties> for more information.
 
+=head2 asElement(@args)
+
+Execute the JSHandle::asElement playwright routine.
+
+See L<https://playwright.dev/api/class-JSHandle#JSHandle-asElement> for more information.
+
+=head2 jsonValue(@args)
+
+Execute the JSHandle::jsonValue playwright routine.
+
+See L<https://playwright.dev/api/class-JSHandle#JSHandle-jsonValue> for more information.
+
 =head2 getProperty(@args)
 
 Execute the JSHandle::getProperty playwright routine.
 
 See L<https://playwright.dev/api/class-JSHandle#JSHandle-getProperty> for more information.
+
+=head2 dispose(@args)
+
+Execute the JSHandle::dispose playwright routine.
+
+See L<https://playwright.dev/api/class-JSHandle#JSHandle-dispose> for more information.
 
 =head2 on(@args)
 

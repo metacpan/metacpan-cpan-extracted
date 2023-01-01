@@ -13,7 +13,7 @@ Neo4j::Driver::Deprecations - Explains features that have been deprecated, but n
 
 =head1 VERSION
 
-version 0.31
+version 0.33
 
 =head1 OVERVIEW
 
@@ -124,7 +124,8 @@ See L<Neo4j::Driver::Plugin/"http_adapter_factory"> for details.
 =back
 
 At that point, your code setting the C<net_module> config option
-can simply be replaced by calls to L<Neo4j::Driver/"plugin">.
+can simply be replaced by calls to
+L<"plugin" in Neo4j::Driver|Neo4j::Driver/"Plug-in modules">.
 
  # Deprecated config option:
  use Local::Foo;
@@ -132,20 +133,20 @@ can simply be replaced by calls to L<Neo4j::Driver/"plugin">.
  
  # New plug-in interface:
  use Local::Foo;
- $driver->plugin( 'Local::Foo' );
+ $driver->plugin( Local::Foo->new );
 
 =head2 Disable or enforce Jolt
 
 I<Deprecated in version 0.30 and to be removed in 1.00.
 Originally added in 0.21 as an experimental feature.>
 
- $d->config(jolt => undef);  # prefer Jolt (the default)
+ $d->config(jolt => undef);  # prefer Jolt v2 (the default)
  $d->config(jolt => 0);      # accept only JSON
- $d->config(jolt => 1);      # accept only Jolt
+ $d->config(jolt => 1);      # accept only Jolt v2
  
  # Accept only Jolt and request ...
- $d->config(jolt => 'sparse');  # sparse Jolt mode + RFC 7464
- $d->config(jolt => 'strict');  # strict Jolt mode + RFC 7464
+ $d->config(jolt => 'sparse');  # sparse Jolt v1 mode + RFC 7464
+ $d->config(jolt => 'strict');  # strict Jolt v1 mode + RFC 7464
  $d->config(jolt => 'ndjson');  # newline delimited mode (non RFC)
 
 Since driver S<version 0.24>, the
@@ -193,8 +194,8 @@ option won't be extended any further. However, the existing
 parameter syntax conversion is probably useful enough to stand
 on its own feet if given a more appropriate name.
 
-Instead of this option, C<cypher_params> should be used;
-see L<Neo4j::Driver/"Parameter syntax conversion">.
+Instead of this option, L<Neo4j::Driver/"cypher_params"> should
+be used.
 
  $driver->config( cypher_params => v2 );
 
@@ -734,12 +735,15 @@ Use L<C<elements()>|Neo4j::Types::Path/"elements"> instead.
 
 Arne Johannessen <ajnn@cpan.org>
 
+If you contact me by email, please make sure you include the word
+"Perl" in your subject header to help beat the spam filters.
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0 or (at your option) the same terms
+as the Perl 5 programming language system itself.
 
 =cut

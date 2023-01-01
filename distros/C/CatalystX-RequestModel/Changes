@@ -1,5 +1,16 @@
 # This file documents the revision history for Perl extension CatalystX-RequestModel.
 
+0.012 - 30 December 2022
+  - Fixed typo in previous release
+
+0.011 - 30 December 2022
+  - Fixed load order issue in previous release
+
+0.010 - 30 December 2022
+  - Break out QueryModel into a separate class and method attribute.  For backwards
+    compatibility we will maintain the code for the previous approach but I recommend
+    changing to the new approach.  See docs.
+
 0.009 - 26 September 2022
   - Allow RequestModel(Model1, Model2) for more concise code when you have more than
     one request model.

@@ -1,0 +1,28 @@
+Test-Named version 0.01
+=======================
+
+Test::Named - Perl extension for named tests. Inspired on this:
+http://www.modernperlbooks.com/mt/2013/05/running-named-perl-tests-from-prove.html
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+No dependencies to run. Requires Test::More for building.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2022 by Alejandro Imass
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.35.10 or,
+at your option, any later version of Perl 5 you may have available.
+
+

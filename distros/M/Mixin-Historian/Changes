@@ -1,5 +1,9 @@
 Revision history for Mixin-Historian
 
+0.102001  2022-12-31 13:34:27-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 0.102000  2013-10-05 07:56:28 America/New_York
           update packaging
 

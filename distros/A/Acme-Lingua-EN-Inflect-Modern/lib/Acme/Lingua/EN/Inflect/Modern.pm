@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Acme::Lingua::EN::Inflect::Modern 0.007;
+package Acme::Lingua::EN::Inflect::Modern 0.008;
 
 use parent qw(Exporter);
 # ABSTRACT: modernize Lingua::EN::Inflect rule's
@@ -82,7 +82,7 @@ Acme::Lingua::EN::Inflect::Modern - modernize Lingua::EN::Inflect rule's
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -93,7 +93,7 @@ case's.
 See L<Lingua::EN::Inflect> for information on using this module, which has an
 identical interface.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
 This module is shipped with no promise about what version of perl it will
 require in the future.  In practice, this tends to mean "you need a perl from
@@ -110,7 +110,13 @@ your bug as I make change's.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

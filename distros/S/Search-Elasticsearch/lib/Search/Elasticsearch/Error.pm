@@ -16,12 +16,13 @@
 # under the License.
 
 package Search::Elasticsearch::Error;
-$Search::Elasticsearch::Error::VERSION = '7.711001';
+$Search::Elasticsearch::Error::VERSION = '8.00';
 our $DEBUG = 0;
 
 @Search::Elasticsearch::Error::Internal::ISA     = __PACKAGE__;
 @Search::Elasticsearch::Error::Param::ISA        = __PACKAGE__;
 @Search::Elasticsearch::Error::NoNodes::ISA      = __PACKAGE__;
+@Search::Elasticsearch::Error::ProductCheck::ISA = __PACKAGE__;
 @Search::Elasticsearch::Error::Unauthorized::ISA = __PACKAGE__;
 @Search::Elasticsearch::Error::Forbidden::ISA    = __PACKAGE__;
 @Search::Elasticsearch::Error::Illegal::ISA      = __PACKAGE__;
@@ -196,7 +197,7 @@ Search::Elasticsearch::Error - Errors thrown by Search::Elasticsearch
 
 =head1 VERSION
 
-version 7.711001
+version 8.00
 
 =head1 DESCRIPTION
 
@@ -333,7 +334,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Elasticsearch BV.
+This software is Copyright (c) 2022 by Elasticsearch BV.
 
 This is free software, licensed under:
 

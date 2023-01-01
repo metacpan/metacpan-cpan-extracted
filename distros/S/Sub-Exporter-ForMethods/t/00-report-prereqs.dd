@@ -16,6 +16,7 @@ do { my $x = {
                                       'Scalar::Util' => '0',
                                       'Sub::Exporter' => '0.978',
                                       'Sub::Util' => '0',
+                                      'perl' => '5.012',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

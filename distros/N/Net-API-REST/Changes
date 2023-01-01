@@ -1,5 +1,8 @@
 Revision history for Perl module Net::API::REST
 
+v0.7.1 2023-01-01T18:14:23+0900
+    - Ensured method is set in upper case when request handler is _delete, _get, _head, _post, _put
+
 v0.7.0 2022-12-28T19:27:25+0900
     - Added support for multiple HTTP methods for one endpoint with
     - Corrected a missing check on whether an HTTP method is supported for an endpoint.

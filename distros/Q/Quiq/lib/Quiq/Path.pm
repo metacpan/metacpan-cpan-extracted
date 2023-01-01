@@ -31,7 +31,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.205';
+our $VERSION = '1.206';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -415,8 +415,8 @@ sub copy {
             DestinationPath => $destPath,
         );
     }
-    $fh1->close;
     $fh2->close;
+    $fh1->close;
 
     if ($preserve) {
         $this->mtime($destPath,$this->mtime($srcPath));
@@ -487,6 +487,29 @@ sub copyToDir {
 =head4 Synopsis
 
   $class->duplicate($method,$srcPath,$destPath,@opt);
+
+=head4 Arguments
+
+=over 4
+
+=item $method
+
+Anzuwendende Pfadoperation:
+
+  copy
+  move -or- rename
+  link
+  symlink
+
+=item $srcPath
+
+(String) Quellpfad
+
+=item $destPath
+
+(String) Zielpfad
+
+=back
 
 =head4 Options
 
@@ -1597,7 +1620,8 @@ zurück. Die Einträge C<.> und C<..> werden I<nicht> mitgezählt.
 # -----------------------------------------------------------------------------
 
 sub count {
-    my ($this,$dir) = @_;
+    my $this = shift;
+    my $dir = $this->expandTilde(shift);
 
     my $n = 0;
     my $dh = Quiq::DirHandle->new($dir);
@@ -2552,7 +2576,7 @@ sub basePath {
 
 =head4 Synopsis
 
-  $class->chmod($path,$mode);
+  $this->chmod($path,$mode);
 
 =head4 Description
 
@@ -2563,10 +2587,12 @@ Setze Zugriffsrechte $mode auf Pfad $path.
 # -----------------------------------------------------------------------------
 
 sub chmod {
-    my ($class,$path,$mode) = @_;
+    my $this = shift;
+    my $path = $this->expandTilde(shift);
+    my $mode = shift;
 
     CORE::chmod $mode,$path or do {
-        $class->throw(
+        $this->throw(
             'PATH-00003: Setzen von Zugriffsrechten fehlgeschlagen',
             Path => $path,
             Mode => $mode,
@@ -3617,6 +3643,74 @@ sub split {
 
 # -----------------------------------------------------------------------------
 
+=head3 spreadToSubDirs() - Kopiere, bewege, linke oder symlinke Dateien in Subverzeichnisse
+
+=head4 Synopsis
+
+  $this->%METHOD($method,$destDir,$maxPerDir);
+
+=head4 Arguments
+
+=over 4
+
+=item $method
+
+Anzuwendende Pfadoperation (siehe Methode duplicate()):
+
+  copy
+  move -or- rename
+  link
+  symlink
+
+=item $destDir
+
+(String) Verzeichnis, in dem die Subverzeichnisse angelegt werden.
+Das Verzeichnis muss existieren.
+
+=item $maxPerDir
+
+(Integer) Maximale Anzahl Dateien pro Unterverzeichnis.
+
+=back
+
+=head4 Description
+
+Lies Pfade von <STDIN> und verteile die Pfade auf dynamisch erzeugte
+Subverzeichnisse.
+
+=head4 Example
+
+  $ find SRCDIR -type f | sort | perl -MQuiq::Path -E 'Quiq::Path->spreadToSubDirs("link",$destDir,100)'
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub spreadToSubDirs {
+    my $this = shift;
+    my $method = shift;
+    my $destDir = $this->expandTilde(shift);
+    my $maxPerDir = shift;
+
+    my $i = 0;
+    my $dir;
+    while (<STDIN>) {
+        chomp;
+        if ($i%$maxPerDir == 0) {
+            $dir = sprintf '%s/%04d',$destDir,int($i/$maxPerDir)+1;
+            $this->mkdir($dir);
+            say $dir;
+        }
+        $i++;
+        my $file = $this->filename($_);
+        $this->duplicate($method,$_,"$dir/$file");
+    }
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 stat() - Statusinformation eines Pfads
 
 =head4 Synopsis
@@ -3908,7 +4002,7 @@ sub uid {
 
 =head1 VERSION
 
-1.205
+1.206
 
 =head1 AUTHOR
 
@@ -3916,7 +4010,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2022 Frank Seitz
+Copyright (C) 2023 Frank Seitz
 
 =head1 LICENSE
 

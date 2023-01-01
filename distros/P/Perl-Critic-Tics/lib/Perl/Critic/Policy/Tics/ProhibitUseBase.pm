@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Perl::Critic::Policy::Tics::ProhibitUseBase;
+package Perl::Critic::Policy::Tics::ProhibitUseBase 0.010;
 # ABSTRACT: do not use base.pm
-$Perl::Critic::Policy::Tics::ProhibitUseBase::VERSION = '0.009';
+
 #pod =head1 DESCRIPTION
 #pod
 #pod   use base qw(Baseclass);
@@ -66,7 +66,7 @@ Perl::Critic::Policy::Tics::ProhibitUseBase - do not use base.pm
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 DESCRIPTION
 
@@ -81,6 +81,16 @@ that fields are even remotely relevant to modern (or any!) development of Perl
 classes.
 
 There are a lot of ways around using C<base>.  Pick one.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 WARNING
 
@@ -98,7 +108,7 @@ right for you.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

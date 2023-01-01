@@ -42,7 +42,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.205';
+our $VERSION = '1.206';
 
 use Time::HiRes ();
 use Time::Local ();
@@ -100,7 +100,7 @@ sub new {
     elsif ($epoch eq 'start-of-previous-month') {
         my (undef,undef,undef,undef,$m,$y) = localtime;
         if ($m == 0) {
-            $m = 12;
+            $m = 11;
             $y--;
         }
         else {
@@ -568,7 +568,7 @@ sub asIso {
 
 =head1 VERSION
 
-1.205
+1.206
 
 =head1 AUTHOR
 
@@ -576,7 +576,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2022 Frank Seitz
+Copyright (C) 2023 Frank Seitz
 
 =head1 LICENSE
 

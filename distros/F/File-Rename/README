@@ -1,12 +1,12 @@
-File-Rename version 1.99x
-=========================
+File-Rename version 2.00
+========================
 
 **** INCOMPATIBLE CHANGES IN THIS VERSION ****
 
 * rename script requires options to appear before code/files
 * new script 'unsafe-rename' allows options and other arguments
     to be mixed
-* Build.PL does not build the new 'unsafe-rename' 
+* Build.PL has been removed - it did not build 'unsafe-rename' 
 
 RENAME COMMAND
 
@@ -40,10 +40,13 @@ files was reintroduced - this requirement was dropped in version 0.30.
 The 'no_require_order' functionality is regarded as unsafe but is 
 available in the script unsafe-rename.
 
-Build.PL does not build unsafe-rename, and will be removed from 2.00
-
-In 1,991, added META data ExtUtils::MakeMaker => 7.36 
+In 1.991, added META data ExtUtils::MakeMaker => 7.36 
 to BUILD_REQUIRES and CONFIGURE_REQUIRES
+
+In 1.992, fixed bug #145711: installed script is missing shebang line
+https://rt.cpan.org/Ticket/Display.html?id=145711
+
+In 2.00, Build.PL does not build unsafe-rename, and was removed 
 
 INSTALLATION
 
@@ -53,13 +56,6 @@ To install this module type the following:
    make
    make test
    make install
-
-or if you have Module::Build (but this does not create unsafe-rename)
-
-   perl Build.PL
-   perl Build
-   perl Build test
-   perl Build install
 
 DEPENDENCIES
 

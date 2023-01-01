@@ -1,4 +1,4 @@
-package rjbs 20211226.000;
+package rjbs 20221231.000;
 # ABSTRACT: all the junk that rjbs likes in his one-offs
 
 use 5.20.0;
@@ -30,7 +30,7 @@ rjbs - all the junk that rjbs likes in his one-offs
 
 =head1 VERSION
 
-version 20211226.000
+version 20221231.000
 
 =head1 OVERVIEW
 
@@ -46,11 +46,11 @@ inside" Task::BeLike::RJBS.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo Signes.
+This software is copyright (c) 2022 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

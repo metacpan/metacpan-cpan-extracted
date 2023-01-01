@@ -2006,3 +2006,28 @@ Et50/10    37.88      3.30      0.00     -30.00    -30.00    0:00:00 ago
 Et50/11    37.88      3.30      0.00     -30.00    -30.00    0:00:00 ago
 Et50/12    37.88      3.30      0.00     -30.00    -30.00    0:00:00 ago
 [K[?1l>kswXX#\swXX#exit
+sw08#show spanning-tree
+VL1
+  Spanning tree enabled protocol rapid-pvst
+  Root ID    Priority    4097
+             Address     444c.1234.5678
+             This bridge is the root
+
+  Bridge ID  Priority     4097  (priority 4096 sys-id-ext 1)
+             Address     444c.1234.5678
+             Hello Time  2.000 sec  Max Age 20 sec  Forward Delay 15 sec
+
+Interface        Role       State      Cost      Prio.Nbr Type
+---------------- ---------- ---------- --------- -------- --------------------
+Et1              designated forwarding 2000      128.1    P2p
+Et7/2            designated discarding 2000      128.30   P2p Edge *BA_Inc
+Et7/3            designated forwarding 2000      128.85   P2p Edge
+Et9/3            designated forwarding 2000      128.49   P2p Edge
+Et9/4            designated forwarding 2000      128.65   P2p Edge
+Po2              designated forwarding 1999      128.128  P2p
+Po3              designated forwarding 1999      128.129  P2p
+Po4              designated forwarding 1999      128.127  P2p Edge
+Po5              designated forwarding 1999      128.132  P2p
+Po6              designated forwarding 1999      128.130  P2p Edge
+Po8              designated forwarding 19999     128.133  P2p Edge
+

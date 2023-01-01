@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::ResultSummary;
 # ABSTRACT: Details about the result of running a statement
-$Neo4j::Driver::ResultSummary::VERSION = '0.31';
+$Neo4j::Driver::ResultSummary::VERSION = '0.33';
 
 use Carp qw(croak);
 
@@ -90,7 +90,7 @@ Neo4j::Driver::ResultSummary - Details about the result of running a statement
 
 =head1 VERSION
 
-version 0.31
+version 0.33
 
 =head1 SYNOPSIS
 
@@ -199,9 +199,9 @@ or C<undef> if there were no notifications.
 L<Neo4j::Driver::B<SummaryCounters>>
 
 =item * Equivalent documentation for the official Neo4j drivers:
-L<ResultSummary (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/summary/ResultSummary.html>,
-L<ResultSummary (JavaScript)|https://neo4j.com/docs/api/javascript-driver/4.4/class/lib6/result-summary.js~ResultSummary.html>,
-L<IResultSummary (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.4/html/17958e2b-d923-ab62-bb96-697556493c2e.htm>
+L<ResultSummary (Java)|https://neo4j.com/docs/api/java-driver/5.2/org.neo4j.driver/org/neo4j/driver/summary/ResultSummary.html>,
+L<ResultSummary (JavaScript)|https://neo4j.com/docs/api/javascript-driver/5.2/class/lib6/result-summary.js~ResultSummary.html>,
+L<IResultSummary (.NET)|https://neo4j.com/docs/api/dotnet-driver/5.2/html/17958e2b-d923-ab62-bb96-697556493c2e.htm>
 
 =back
 
@@ -209,12 +209,15 @@ L<IResultSummary (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.4/html/17958e
 
 Arne Johannessen <ajnn@cpan.org>
 
+If you contact me by email, please make sure you include the word
+"Perl" in your subject header to help beat the spam filters.
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0 or (at your option) the same terms
+as the Perl 5 programming language system itself.
 
 =cut

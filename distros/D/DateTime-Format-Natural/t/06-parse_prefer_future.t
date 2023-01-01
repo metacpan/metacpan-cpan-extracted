@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use boolean qw(true);
 
-use Test::MockTime qw(set_fixed_time);
+use Test::MockTime::HiRes qw(set_fixed_time);
 use DateTime::Format::Natural;
 use DateTime::Format::Natural::Test ':set';
 use Test::More;
@@ -100,7 +100,7 @@ sub compare_strings
     my $parser = DateTime::Format::Natural->new(prefer_future => true);
     my $dt = $parser->parse_datetime($string);
 
-    if ($parser->success) {
+    if ($parser->success && $parser->_get_truncated) {
         is(_result_string($dt), $result, _message($string));
     }
     else {

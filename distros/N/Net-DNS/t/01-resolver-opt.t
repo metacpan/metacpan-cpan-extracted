@@ -1,10 +1,10 @@
 #!/usr/bin/perl
-# $Id: 01-resolver-opt.t 1815 2020-10-14 21:55:18Z willem $    -*-perl-*-
+# $Id: 01-resolver-opt.t 1883 2022-11-03 14:38:19Z willem $    -*-perl-*-
 #
 
 use strict;
 use warnings;
-use Test::More tests => 30;
+use Test::More tests => 32;
 
 use Net::DNS::Resolver;
 
@@ -59,15 +59,20 @@ foreach my $test (qw(nameservers searchlist)) {
 }
 
 
-my %bad_input = (
-	errorstring => 'set',
-	replyfrom   => 'set',
-	answerfrom  => 'set',		## historical
+my @other = (
+	tsig	   => bless( {}, 'Net::DNS::RR::TSIG' ),
+	tsig	   => undef,
+	tsig	   => 'bogus',
+	replyfrom  => 'IP',
+	answerfrom => 'IP',		## historical
 	);
 
-while ( my ( $key, $value ) = each %bad_input ) {
-	my $res = Net::DNS::Resolver->new( $key => $value );
-	isnt( $res->$key, 'set', "$key is not set" );
+while ( my $key = shift @other ) {
+	my $value = shift(@other);
+	my $res	  = Net::DNS::Resolver->new();
+	eval { $res->$key($value) };
+	my $image = defined($value) ? $value : 'undef';
+	ok( 1, "resolver->$key($image)" );
 }
 
 

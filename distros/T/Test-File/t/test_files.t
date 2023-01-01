@@ -68,11 +68,11 @@ subtest readable => sub {
 
 subtest readable_fails => sub { SKIP: {
 	skip "Superuser has special privileges", 2, is_unix_superuser();
-	test_out( 'not ok 1 - writeable is readable' );
-	test_diag("file [writeable] is not readable");
-	test_diag("  Failed test 'writeable is readable'");
+	test_out( 'not ok 1 - non_readable is readable' );
+	test_diag("file [non_readable] is not readable");
+	test_diag("  Failed test 'non_readable is readable'");
 	test_diag( "  at " . __FILE__ . " line " . (__LINE__+1) . ".");
-	file_readable_ok( 'writeable' );
+	file_readable_ok( 'non_readable' );
 	test_test();
 	done_testing();
 	}};

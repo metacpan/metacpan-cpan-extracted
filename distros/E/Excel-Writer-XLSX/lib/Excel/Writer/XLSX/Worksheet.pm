@@ -7,7 +7,7 @@ package Excel::Writer::XLSX::Worksheet;
 #
 # Used in conjunction with Excel::Writer::XLSX
 #
-# Copyright 2000-2021, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2023, John McNamara, jmcnamara@cpan.org
 #
 # Documentation after __END__
 #
@@ -30,7 +30,7 @@ use Excel::Writer::XLSX::Utility qw(xl_cell_to_rowcol
                                     quote_sheetname);
 
 our @ISA     = qw(Excel::Writer::XLSX::Package::XMLwriter);
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 
 ###############################################################################
@@ -92,6 +92,7 @@ sub new {
     $self->{_active_pane}          = 3;
     $self->{_selected}             = 0;
     $self->{_hide_row_col_headers} = 0;
+    $self->{_top_left_cell}        = '';
 
     $self->{_page_setup_changed} = 0;
     $self->{_paper_size}         = 0;
@@ -222,13 +223,15 @@ sub new {
     $self->{_drawing_rels_id}        = 0;
     $self->{_vml_drawing_rels}       = {};
     $self->{_vml_drawing_rels_id}    = 0;
+    $self->{_horizontal_dpi}         = 0;
+    $self->{_vertical_dpi}           = 0;
     $self->{_has_dynamic_arrays}     = 0;
-
-    $self->{_horizontal_dpi} = 0;
-    $self->{_vertical_dpi}   = 0;
+    $self->{_use_future_functions}   = 0;
 
     $self->{_rstring}      = '';
     $self->{_previous_row} = 0;
+
+
 
     if ( $self->{_optimization} == 1 ) {
         my $fh = tempfile( DIR => $self->{_tempdir} );
@@ -690,7 +693,7 @@ sub set_column {
     }
 
     # Store the column data based on the first column. Padded for sorting.
-    $self->{_colinfo}->{ sprintf "%05d", $first_col } = [@data];
+    $self->{_colinfo}->{ sprintf "%05d", $first_col } = [ $first_col, $last_col, $width, $format, $hidden, $level ];
 
     # Store the column change to allow optimisations.
     $self->{_col_size_changed} = 1;
@@ -804,6 +807,35 @@ sub set_selection {
     return if $sqref eq 'A1';
 
     $self->{_selections} = [ [ $pane, $active_cell, $sqref ] ];
+}
+
+
+###############################################################################
+#
+# set_top_left_cell()
+#
+# Set the first visible cell at the top left of the worksheet.
+#
+sub set_top_left_cell {
+
+    my $self = shift;
+    my $sqref;
+
+    return unless @_;
+
+    # Check for a cell reference in A1 notation and substitute row and column.
+    if ( $_[0] =~ /^\D/ ) {
+        @_ = $self->_substitute_cellref( @_ );
+    }
+
+    my $row = $_[0] || 0;
+    my $col = $_[1] || 0;
+
+    return if ( $row == 0 && $col == 0 );
+
+    my $top_left_cell = xl_rowcol_to_cell( $row, $col );
+
+    $self->{_top_left_cell} = $top_left_cell;
 }
 
 
@@ -1901,6 +1933,7 @@ sub print_black_and_white {
     my $self = shift;
 
     $self->{_black_white} = 1;
+    $self->{_page_setup_changed} = 1;
 }
 
 
@@ -2583,6 +2616,171 @@ sub write_blank {
     return 0;
 }
 
+###############################################################################
+#
+# _prepare_formula($formula)
+#
+# Utility method to strip equal sign and array braces from a formula and also
+# expand out future and dynamic array formulas.
+#
+sub _prepare_formula {
+
+    my $self    = shift;
+    my $formula = shift;
+
+    # Ignore empty/null formulas.
+    return $formula if !$formula;
+
+    # Remove array formula braces and the leading =.
+    $formula =~ s/^{(.*)}$/$1/;
+    $formula =~ s/^=//;
+
+    # # Don't expand formulas that the user has already expanded.
+    return $formula if $formula =~ m/_xlfn\./;
+
+    # Expand dynamic array formulas.
+    $formula =~ s/\b(LET\()/_xlfn.$1/g;
+    $formula =~ s/\b(LAMBDA\()/_xlfn.$1/g;
+    $formula =~ s/\b(SINGLE\()/_xlfn.$1/g;
+    $formula =~ s/\b(SORTBY\()/_xlfn.$1/g;
+    $formula =~ s/\b(UNIQUE\()/_xlfn.$1/g;
+    $formula =~ s/\b(XMATCH\()/_xlfn.$1/g;
+    $formula =~ s/\b(XLOOKUP\()/_xlfn.$1/g;
+    $formula =~ s/\b(SEQUENCE\()/_xlfn.$1/g;
+    $formula =~ s/\b(RANDARRAY\()/_xlfn.$1/g;
+    $formula =~ s/\b(SORT\()/_xlfn._xlws.$1/g;
+    $formula =~ s/\b(ANCHORARRAY\()/_xlfn.$1/g;
+    $formula =~ s/\b(FILTER\()/_xlfn._xlws.$1/g;
+
+    if ( !$self->{_use_future_functions} ) {
+        return $formula;
+    }
+
+    # Future functions.
+    $formula =~ s/\b(ACOTH\()/_xlfn.$1/g;
+    $formula =~ s/\b(ACOT\()/_xlfn.$1/g;
+    $formula =~ s/\b(AGGREGATE\()/_xlfn.$1/g;
+    $formula =~ s/\b(ARABIC\()/_xlfn.$1/g;
+    $formula =~ s/\b(BASE\()/_xlfn.$1/g;
+    $formula =~ s/\b(BETA.DIST\()/_xlfn.$1/g;
+    $formula =~ s/\b(BETA.INV\()/_xlfn.$1/g;
+    $formula =~ s/\b(BINOM.DIST.RANGE\()/_xlfn.$1/g;
+    $formula =~ s/\b(BINOM.DIST\()/_xlfn.$1/g;
+    $formula =~ s/\b(BINOM.INV\()/_xlfn.$1/g;
+    $formula =~ s/\b(BITAND\()/_xlfn.$1/g;
+    $formula =~ s/\b(BITLSHIFT\()/_xlfn.$1/g;
+    $formula =~ s/\b(BITOR\()/_xlfn.$1/g;
+    $formula =~ s/\b(BITRSHIFT\()/_xlfn.$1/g;
+    $formula =~ s/\b(BITXOR\()/_xlfn.$1/g;
+    $formula =~ s/\b(CEILING.MATH\()/_xlfn.$1/g;
+    $formula =~ s/\b(CEILING.PRECISE\()/_xlfn.$1/g;
+    $formula =~ s/\b(CHISQ.DIST.RT\()/_xlfn.$1/g;
+    $formula =~ s/\b(CHISQ.DIST\()/_xlfn.$1/g;
+    $formula =~ s/\b(CHISQ.INV.RT\()/_xlfn.$1/g;
+    $formula =~ s/\b(CHISQ.INV\()/_xlfn.$1/g;
+    $formula =~ s/\b(CHISQ.TEST\()/_xlfn.$1/g;
+    $formula =~ s/\b(COMBINA\()/_xlfn.$1/g;
+    $formula =~ s/\b(CONCAT\()/_xlfn.$1/g;
+    $formula =~ s/\b(CONFIDENCE.NORM\()/_xlfn.$1/g;
+    $formula =~ s/\b(CONFIDENCE.T\()/_xlfn.$1/g;
+    $formula =~ s/\b(COTH\()/_xlfn.$1/g;
+    $formula =~ s/\b(COT\()/_xlfn.$1/g;
+    $formula =~ s/\b(COVARIANCE.P\()/_xlfn.$1/g;
+    $formula =~ s/\b(COVARIANCE.S\()/_xlfn.$1/g;
+    $formula =~ s/\b(CSCH\()/_xlfn.$1/g;
+    $formula =~ s/\b(CSC\()/_xlfn.$1/g;
+    $formula =~ s/\b(DAYS\()/_xlfn.$1/g;
+    $formula =~ s/\b(DECIMAL\()/_xlfn.$1/g;
+    $formula =~ s/\b(ERF.PRECISE\()/_xlfn.$1/g;
+    $formula =~ s/\b(ERFC.PRECISE\()/_xlfn.$1/g;
+    $formula =~ s/\b(EXPON.DIST\()/_xlfn.$1/g;
+    $formula =~ s/\b(F.DIST.RT\()/_xlfn.$1/g;
+    $formula =~ s/\b(F.DIST\()/_xlfn.$1/g;
+    $formula =~ s/\b(F.INV.RT\()/_xlfn.$1/g;
+    $formula =~ s/\b(F.INV\()/_xlfn.$1/g;
+    $formula =~ s/\b(F.TEST\()/_xlfn.$1/g;
+    $formula =~ s/\b(FILTERXML\()/_xlfn.$1/g;
+    $formula =~ s/\b(FLOOR.MATH\()/_xlfn.$1/g;
+    $formula =~ s/\b(FLOOR.PRECISE\()/_xlfn.$1/g;
+    $formula =~ s/\b(FORECAST.ETS.CONFINT\()/_xlfn.$1/g;
+    $formula =~ s/\b(FORECAST.ETS.SEASONALITY\()/_xlfn.$1/g;
+    $formula =~ s/\b(FORECAST.ETS.STAT\()/_xlfn.$1/g;
+    $formula =~ s/\b(FORECAST.ETS\()/_xlfn.$1/g;
+    $formula =~ s/\b(FORECAST.LINEAR\()/_xlfn.$1/g;
+    $formula =~ s/\b(FORMULATEXT\()/_xlfn.$1/g;
+    $formula =~ s/\b(GAMMA.DIST\()/_xlfn.$1/g;
+    $formula =~ s/\b(GAMMA.INV\()/_xlfn.$1/g;
+    $formula =~ s/\b(GAMMALN.PRECISE\()/_xlfn.$1/g;
+    $formula =~ s/\b(GAMMA\()/_xlfn.$1/g;
+    $formula =~ s/\b(GAUSS\()/_xlfn.$1/g;
+    $formula =~ s/\b(HYPGEOM.DIST\()/_xlfn.$1/g;
+    $formula =~ s/\b(IFNA\()/_xlfn.$1/g;
+    $formula =~ s/\b(IFS\()/_xlfn.$1/g;
+    $formula =~ s/\b(IMCOSH\()/_xlfn.$1/g;
+    $formula =~ s/\b(IMCOT\()/_xlfn.$1/g;
+    $formula =~ s/\b(IMCSCH\()/_xlfn.$1/g;
+    $formula =~ s/\b(IMCSC\()/_xlfn.$1/g;
+    $formula =~ s/\b(IMSECH\()/_xlfn.$1/g;
+    $formula =~ s/\b(IMSEC\()/_xlfn.$1/g;
+    $formula =~ s/\b(IMSINH\()/_xlfn.$1/g;
+    $formula =~ s/\b(IMTAN\()/_xlfn.$1/g;
+    $formula =~ s/\b(ISFORMULA\()/_xlfn.$1/g;
+    $formula =~ s/\b(ISOWEEKNUM\()/_xlfn.$1/g;
+    $formula =~ s/\b(LOGNORM.DIST\()/_xlfn.$1/g;
+    $formula =~ s/\b(LOGNORM.INV\()/_xlfn.$1/g;
+    $formula =~ s/\b(MAXIFS\()/_xlfn.$1/g;
+    $formula =~ s/\b(MINIFS\()/_xlfn.$1/g;
+    $formula =~ s/\b(MODE.MULT\()/_xlfn.$1/g;
+    $formula =~ s/\b(MODE.SNGL\()/_xlfn.$1/g;
+    $formula =~ s/\b(MUNIT\()/_xlfn.$1/g;
+    $formula =~ s/\b(NEGBINOM.DIST\()/_xlfn.$1/g;
+    $formula =~ s/\b(NORM.DIST\()/_xlfn.$1/g;
+    $formula =~ s/\b(NORM.INV\()/_xlfn.$1/g;
+    $formula =~ s/\b(NORM.S.DIST\()/_xlfn.$1/g;
+    $formula =~ s/\b(NORM.S.INV\()/_xlfn.$1/g;
+    $formula =~ s/\b(NUMBERVALUE\()/_xlfn.$1/g;
+    $formula =~ s/\b(PDURATION\()/_xlfn.$1/g;
+    $formula =~ s/\b(PERCENTILE.EXC\()/_xlfn.$1/g;
+    $formula =~ s/\b(PERCENTILE.INC\()/_xlfn.$1/g;
+    $formula =~ s/\b(PERCENTRANK.EXC\()/_xlfn.$1/g;
+    $formula =~ s/\b(PERCENTRANK.INC\()/_xlfn.$1/g;
+    $formula =~ s/\b(PERMUTATIONA\()/_xlfn.$1/g;
+    $formula =~ s/\b(PHI\()/_xlfn.$1/g;
+    $formula =~ s/\b(POISSON.DIST\()/_xlfn.$1/g;
+    $formula =~ s/\b(QUARTILE.EXC\()/_xlfn.$1/g;
+    $formula =~ s/\b(QUARTILE.INC\()/_xlfn.$1/g;
+    $formula =~ s/\b(QUERYSTRING\()/_xlfn.$1/g;
+    $formula =~ s/\b(RANK.AVG\()/_xlfn.$1/g;
+    $formula =~ s/\b(RANK.EQ\()/_xlfn.$1/g;
+    $formula =~ s/\b(RRI\()/_xlfn.$1/g;
+    $formula =~ s/\b(SECH\()/_xlfn.$1/g;
+    $formula =~ s/\b(SEC\()/_xlfn.$1/g;
+    $formula =~ s/\b(SHEETS\()/_xlfn.$1/g;
+    $formula =~ s/\b(SHEET\()/_xlfn.$1/g;
+    $formula =~ s/\b(SKEW.P\()/_xlfn.$1/g;
+    $formula =~ s/\b(STDEV.P\()/_xlfn.$1/g;
+    $formula =~ s/\b(STDEV.S\()/_xlfn.$1/g;
+    $formula =~ s/\b(SWITCH\()/_xlfn.$1/g;
+    $formula =~ s/\b(T.DIST.2T\()/_xlfn.$1/g;
+    $formula =~ s/\b(T.DIST.RT\()/_xlfn.$1/g;
+    $formula =~ s/\b(T.DIST\()/_xlfn.$1/g;
+    $formula =~ s/\b(T.INV.2T\()/_xlfn.$1/g;
+    $formula =~ s/\b(T.INV\()/_xlfn.$1/g;
+    $formula =~ s/\b(T.TEST\()/_xlfn.$1/g;
+    $formula =~ s/\b(TEXTJOIN\()/_xlfn.$1/g;
+    $formula =~ s/\b(UNICHAR\()/_xlfn.$1/g;
+    $formula =~ s/\b(UNICODE\()/_xlfn.$1/g;
+    $formula =~ s/\b(VAR.P\()/_xlfn.$1/g;
+    $formula =~ s/\b(VAR.S\()/_xlfn.$1/g;
+    $formula =~ s/\b(WEBSERVICE\()/_xlfn.$1/g;
+    $formula =~ s/\b(WEIBULL.DIST\()/_xlfn.$1/g;
+    $formula =~ s/\b(XOR\()/_xlfn.$1/g;
+    $formula =~ s/\b(Z.TEST\()/_xlfn.$1/g;
+
+    return $formula;
+
+}
+
 
 ###############################################################################
 #
@@ -2614,6 +2812,25 @@ sub write_formula {
     my $value   = $_[4];           # Optional formula value.
     my $type    = 'f';             # The data type
 
+    # Check for dynamic array functions.
+    local $_ = $formula;
+    if (   m{\bLET\(}
+        || m{\bSORT\(}
+        || m{\bLAMBDA\(}
+        || m{\bSINGLE\(}
+        || m{\bSORTBY\(}
+        || m{\bUNIQUE\(}
+        || m{\bXMATCH\(}
+        || m{\bFILTER\(}
+        || m{\bXLOOKUP\(}
+        || m{\bSEQUENCE\(}
+        || m{\bRANDARRAY\(}
+        || m{\bANCHORARRAY\(} )
+    {
+        return $self->write_dynamic_array_formula( $row, $col, $row, $col,
+            $formula, $xf, $value );
+    }
+
     # Hand off array formulas.
     if ( $formula =~ /^{=.*}$/ ) {
         return $self->write_array_formula( $row, $col, $row, $col, $formula,
@@ -2641,22 +2858,33 @@ sub write_formula {
 sub _write_array_formula {
 
     my $self = shift;
+    my $type = shift;
+    my @args = @_;
 
     # Check for a cell reference in A1 notation and substitute row and column
-    if ( $_[0] =~ /^\D/ ) {
-        @_ = $self->_substitute_cellref( @_ );
+    if ( $args[0] =~ /^\D/ ) {
+        my $cellref = shift @args;
+
+        # Convert single cell to range.
+        my @dims = $self->_substitute_cellref( $cellref );
+
+        if ( @dims == 2 ) {
+            @args = ( @dims, @dims, @args );
+        }
+        else {
+            @args = ( @dims, @args );
+        }
     }
 
-    if ( @_ < 5 ) { return -1 }    # Check the number of args
+    if ( @args < 5 ) { return -1 }    # Check the number of args
 
-    my $row1    = $_[0];           # First row
-    my $col1    = $_[1];           # First column
-    my $row2    = $_[2];           # Last row
-    my $col2    = $_[3];           # Last column
-    my $formula = $_[4];           # The formula text string
-    my $xf      = $_[5];           # The format object.
-    my $value   = $_[6];           # Optional formula value.
-    my $type    = $_[7];           # The data type
+    my $row1    = $args[0];           # First row
+    my $col1    = $args[1];           # First column
+    my $row2    = $args[2];           # Last row
+    my $col2    = $args[3];           # Last column
+    my $formula = $args[4];           # The formula text string
+    my $xf      = $args[5];           # The format object.
+    my $value   = $args[6];           # Optional formula value.
 
     # Swap last row/col with first row/col as necessary
     ( $row1, $row2 ) = ( $row2, $row1 ) if $row1 > $row2;
@@ -2679,9 +2907,8 @@ sub _write_array_formula {
           . xl_rowcol_to_cell( $row2, $col2 );
     }
 
-    # Remove array formula braces and the leading =.
-    $formula =~ s/^{(.*)}$/$1/;
-    $formula =~ s/^=//;
+    # Modify the formula string, as needed.
+    $formula = $self->_prepare_formula($formula);
 
     # Write previous row if in in-line string optimization mode.
     my $row = $row1;
@@ -2691,7 +2918,6 @@ sub _write_array_formula {
 
     $self->{_table}->{$row1}->{$col1} =
       [ $type, $formula, $xf, $range, $value ];
-
 
     # Pad out the rest of the area with formatted zeroes.
     if ( !$self->{_optimization} ) {
@@ -2705,7 +2931,6 @@ sub _write_array_formula {
 
     return 0;
 }
-
 
 
 ###############################################################################
@@ -2724,7 +2949,7 @@ sub write_array_formula {
 
     my $self = shift;
 
-    return $self->_write_array_formula( @_, 'a' );
+    return $self->_write_array_formula( 'a', @_ );
 }
 
 
@@ -2744,7 +2969,7 @@ sub write_dynamic_array_formula {
 
     my $self = shift;
 
-    my $error = $self->_write_array_formula( @_, 'd' );
+    my $error = $self->_write_array_formula( 'd', @_ );
 
     if ( $error == 0 ) {
         $self->{_has_dynamic_arrays} = 1;
@@ -5727,6 +5952,8 @@ sub insert_chart {
     my $x_scale;
     my $y_scale;
     my $anchor;
+    my $description;
+    my $decorative;
 
     croak "Insufficient arguments in insert_chart()" unless @_ >= 3;
 
@@ -5743,13 +5970,16 @@ sub insert_chart {
     }
 
     if ( ref $_[3] eq 'HASH' ) {
+
         # Newer hashref bashed options.
-        my $options = $_[3];
-        $x_offset = $options->{x_offset}        || 0;
-        $y_offset = $options->{y_offset}        || 0;
-        $x_scale  = $options->{x_scale}         || 1;
-        $y_scale  = $options->{y_scale}         || 1;
-        $anchor   = $options->{object_position} || 1;
+        my $options  = $_[3];
+        $x_offset    = $options->{x_offset}        || 0;
+        $y_offset    = $options->{y_offset}        || 0;
+        $x_scale     = $options->{x_scale}         || 1;
+        $y_scale     = $options->{y_scale}         || 1;
+        $anchor      = $options->{object_position} || 1;
+        $description = $options->{description};
+        $decorative  = $options->{decorative};
     }
     else {
         # Older parameter based options.
@@ -5782,7 +6012,9 @@ sub insert_chart {
     $y_offset = $chart->{_y_offset} if $chart->{_y_offset};
 
     push @{ $self->{_charts} },
-      [ $row, $col, $chart, $x_offset, $y_offset, $x_scale, $y_scale, $anchor ];
+      [ $row,     $col,     $chart,  $x_offset,    $y_offset,
+        $x_scale, $y_scale, $anchor, $description, $decorative
+      ];
 }
 
 
@@ -5801,8 +6033,10 @@ sub _prepare_chart {
     my $drawing_type = 1;
     my $drawing;
 
-    my ( $row, $col, $chart, $x_offset, $y_offset, $x_scale, $y_scale, $anchor )
-      = @{ $self->{_charts}->[$index] };
+    my (
+        $row,     $col,     $chart,  $x_offset,    $y_offset,
+        $x_scale, $y_scale, $anchor, $description, $decorative
+    ) = @{ $self->{_charts}->[$index] };
 
     $chart->{_id} = $chart_id - 1;
 
@@ -5840,13 +6074,14 @@ sub _prepare_chart {
     $drawing_object->{_dimensions}    = \@dimensions;
     $drawing_object->{_width}         = 0;
     $drawing_object->{_height}        = 0;
-    $drawing_object->{_description}   = $name;
+    $drawing_object->{_name}          = $name;
     $drawing_object->{_shape}         = undef;
     $drawing_object->{_anchor}        = $anchor;
     $drawing_object->{_rel_index}     = $self->_get_drawing_rel_index();
     $drawing_object->{_url_rel_index} = 0;
     $drawing_object->{_tip}           = undef;
-    $drawing_object->{_decorative}    = 0;
+    $drawing_object->{_description}   = $description;
+    $drawing_object->{_decorative}    = $decorative;
 
     push @{ $self->{_drawing_links} },
       [ '/chart', '../charts/chart' . $chart_id . '.xml' ];
@@ -6057,16 +6292,17 @@ sub _prepare_image {
     $drawing_object->{_dimensions}    = \@dimensions;
     $drawing_object->{_width}         = $width;
     $drawing_object->{_height}        = $height;
-    $drawing_object->{_description}   = $name;
+    $drawing_object->{_name}          = $name;
     $drawing_object->{_shape}         = undef;
     $drawing_object->{_anchor}        = $anchor;
     $drawing_object->{_rel_index}     = 0;
     $drawing_object->{_url_rel_index} = 0;
     $drawing_object->{_tip}           = $tip;
+    $drawing_object->{_description}   = $description;
     $drawing_object->{_decorative}    = $decorative;
 
-    if ( defined $description ) {
-        $drawing_object->{_description} = $description;
+    if ( !defined $description ) {
+        $drawing_object->{_description} = $name;
     }
 
     if ( $url ) {
@@ -6827,6 +7063,8 @@ sub _button_params {
         $button->{_macro} = '[0]!Button' . $button_number . '_Click';
     }
 
+    # Set the alt text for the button.
+    $button->{_description} = $params->{description};
 
     # Ensure that a width and height have been set.
     my $default_width  = $self->{_default_col_pixels};
@@ -7187,6 +7425,7 @@ sub _write_sheet_view {
     my $view             = $self->{_page_view};
     my $zoom             = $self->{_zoom};
     my $row_col_headers  = $self->{_hide_row_col_headers};
+    my $top_left_cell    = $self->{_top_left_cell};
     my $workbook_view_id = 0;
     my @attributes       = ();
 
@@ -7225,6 +7464,11 @@ sub _write_sheet_view {
     # TODO. Add pageBreakPreview mode when requested.
     if ( $view ) {
         push @attributes, ( 'view' => 'pageLayout' );
+    }
+
+    # Set the first visible cell.
+    if ($top_left_cell) {
+        push @attributes, ( 'topLeftCell' => $top_left_cell );
     }
 
     # Set the zoom level.
@@ -10656,6 +10900,6 @@ John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-(c) MM-MMXXI, John McNamara.
+(c) MM-MMXXIII, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.

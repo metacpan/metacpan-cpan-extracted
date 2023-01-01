@@ -5,6 +5,31 @@ NAME
 SYNOPSIS
     *$listbox* = *$parent*->HListbox(?*options*?);
 
+DESCRIPTION
+    The HListbox method creates a new window (given by the $widget argument)
+    and makes it into an HListbox widget. Additional options, described
+    above, may be specified on the command line or in the option database to
+    configure aspects of the listbox such as its colors, font, text, and
+    relief. The HListbox command returns its $widget argument. At the time
+    this command is invoked, there must not exist a window named $widget,
+    but $widget's parent must exist.
+
+    An HListbox is a widget that displays a list of strings, images, or both
+    one per line. When first created, a new HListbox has no elements.
+    Elements may be added or deleted using methods described below. In
+    addition, one or more elements may be selected as described below. If an
+    HListbox is exporting its selection (see exportSelection option), then
+    it will observe the standard X11 protocols for handling the selection.
+    HListbox selections are available as type STRING; the value of the
+    selection will be the "text" of the selected elements, returned as an
+    array of zero or more elements.
+
+    It is not necessary for all the elements to be displayed in the HListbox
+    window at once; commands described below may be used to change the view
+    in the window. HListboxes allow scrolling in both directions using the
+    standard xScrollCommand and yScrollCommand options. They also support
+    scanning, as described below.
+
 STANDARD OPTIONS
     -background -borderwidth -cursor -disabledforeground -exportselection
     -font -foreground -height -highlightbackground -highlightcolor
@@ -30,14 +55,18 @@ WIDGET-SPECIFIC OPTIONS
             (0 (false) for visible, 1 (true) for hidden). Default: 0 -
             visible.
 
-        -indicatoritemtype => 'image'
-            Specify an "indicator" image
+        -indicatoritemtype => ['text' | 'image' | 'imagetext']
+            Specify an "indicator" of this type.
 
         -indicatorimage = $image
             Special image to be displayed next to entry (in addition to any
             other image specified in the entry).
 
-        -itemtype
+        -indicatortext = 'text'
+            Special text to be displayed next to entry (in addition to any
+            other image specified in the entry).
+
+        -itemtype => ['text' | 'image' | 'imagetext']
             Specifies the type of display item of this entry. Can be
             *"text"*, *"image"*, or *"imagetext"*. Default: Whatever is
             specified, if anything, for the widget, (see -itemtype under
@@ -45,7 +74,7 @@ WIDGET-SPECIFIC OPTIONS
             is *"text"*, though *"imagetext"* allows for either or both an
             image or text.
 
-        -textanchor => 'n', 's', 'e', 'w'
+        -textanchor => ['n', 's', 'e', 'w']
             Side of text the IMAGE is displayed on. Default: *'w'* (West /
             left, ie. image before text)
 
@@ -101,6 +130,12 @@ WIDGET-SPECIFIC OPTIONS
         Specifies the perl/Tk callback to be executed when the user invokes
         a list entry in the HList widget. Normally the user invokes a list
         entry by double-clicking it or pressing the Return key.
+
+    Switch: -gap value
+        The amount of space between the image and text in rows that have
+        both.
+
+        Default: 4 (pixels)
 
     Name: height
     Class: Height
@@ -242,31 +277,6 @@ LISTBOX OPTIONS AND METHODS NOT (YET?) SUPPORTED BY HLISTBOX
         in addition to text values, or need other Tk::HListbox - specific
         features such as hidden or disabled entries, callbacks, etc.
 
-DESCRIPTION
-    The HListbox method creates a new window (given by the $widget argument)
-    and makes it into an HListbox widget. Additional options, described
-    above, may be specified on the command line or in the option database to
-    configure aspects of the listbox such as its colors, font, text, and
-    relief. The HListbox command returns its $widget argument. At the time
-    this command is invoked, there must not exist a window named $widget,
-    but $widget's parent must exist.
-
-    An HListbox is a widget that displays a list of strings, images, or both
-    one per line. When first created, a new HListbox has no elements.
-    Elements may be added or deleted using methods described below. In
-    addition, one or more elements may be selected as described below. If an
-    HListbox is exporting its selection (see exportSelection option), then
-    it will observe the standard X11 protocols for handling the selection.
-    HListbox selections are available as type STRING; the value of the
-    selection will be the "text" of the selected elements, returned as an
-    array of zero or more elements.
-
-    It is not necessary for all the elements to be displayed in the HListbox
-    window at once; commands described below may be used to change the view
-    in the window. HListboxes allow scrolling in both directions using the
-    standard xScrollCommand and yScrollCommand options. They also support
-    scanning, as described below.
-
 INDICES
     Many of the methods for HListboxes take one or more indices as
     arguments. An index specifies a particular element of the listbox, in
@@ -342,6 +352,13 @@ WIDGET METHODS
         Given the text of an entry, return the index of the first entry
         whose text matches the string, or *<undef*> if no matches.
 
+    $listbox->fixListSize(*width*, *height*)
+        Will fix the height and width of the HListbox, caused by the
+        underlying HList, when non-default fonts are used.
+
+        The *width* and *height* values are the required character width and
+        the number of rows in the listbox.
+
     *$listbox*->fixPalette()
         Under certain situations, changing the color theme via
         $mainwin->setPalette(...) does not always update do to the myriad of
@@ -360,6 +377,18 @@ WIDGET METHODS
     *$listbox*->getEntry(*index*?)
         Given an index, returns the HList "entry" value, only useful with
         lower-level HList functions. Returns *<undef*> if no matches.
+
+    $listbox->getListHeight(*height*)
+        Will return the correct height in pixels, of the HListbox, when a
+        non-default -listfont is used.
+
+        *height* is the required number of rows for the listbox.
+
+    $listbox->getListWidth(*width*)
+        Will return the correct width, in pixels, of the HListbox, when a
+        non-default -listfont is used.
+
+        *width* is the required width in characters for the listbox.
 
     *$listbox*->hide([*-entry* => ] *index*)
         Given an index, sets the entry to "hidden" so that it does not
@@ -402,7 +431,7 @@ WIDGET METHODS
         command returns an empty string. The following options are currently
         supported for items:
 
-    *$listbox*->ItemStyle(*itemtype, *?*option, value, option, value, ...*?)
+    *$listbox*->ItemStyle(*itemtype, *?*option, value, ...*?)
         HList method to create a display style for the *-style* entry
         option. NOTE: It's better to change most display properties by
         listing them and their values when inserting entries since any
@@ -433,6 +462,22 @@ WIDGET METHODS
         Given a y-coordinate within the listbox window, this command returns
         the index of the (visible) listbox element nearest to that
         y-coordinate.
+
+    $listbox->nearestToIndex(*index*)
+        Given a zero based *index* within the listbox window, this command
+        returns the index of the (visible) listbox element nearest to the
+        *index*.
+
+        If there is no visible bounding box associated with the zero based
+        *index*, then *undef* is returned.
+
+    $listbox->nearestToHListIndex(*index*)
+        Given a HList *index* within the listbox window, this command
+        returns the index of the (visible) listbox element nearest to the
+        HList *index*.
+
+        If there is no visible bounding box associated with the HList
+        *index*, then *undef* is returned.
 
     *$listbox*->scan(*option, args*)
         This command is used to implement scanning on listboxes. It has two

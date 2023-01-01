@@ -369,13 +369,13 @@ sub __row_groups {
     # sort keys by group size
     my @keys_sorted = sort { scalar( @{$group{$b}} ) <=> scalar( @{$group{$a}} ) } keys %group;
     my @choices_groups;
-    my $len = length insert_sep( scalar @{$group{$keys_sorted[0]}}, $sf->{o}{G}{thsd_sep} );
+    my $len = length insert_sep( scalar @{$group{$keys_sorted[0]}}, $sf->{i}{info_thsd_sep} );
     for my $col_count ( @keys_sorted ) {
         my $row_count = scalar @{$group{$col_count}};
         my $row_str = $row_count == 1 ? 'row  has ' : 'rows have';
         my $col_str = $col_count == 1 ? 'column ' : 'columns';
         push @choices_groups, sprintf '  %*s %s %2d %s',
-            $len, insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ), $row_str,
+            $len, insert_sep( $row_count, $sf->{i}{info_thsd_sep} ), $row_str,
             $col_count, $col_str;
     }
     my $count_static_rows = 6; # filter_str, prompt, 2 x cs_label, cs_end, trailing empty line

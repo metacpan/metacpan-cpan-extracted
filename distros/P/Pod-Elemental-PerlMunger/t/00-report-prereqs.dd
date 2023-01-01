@@ -1,7 +1,7 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '6.78'
                                       }
                       },
        'develop' => {
@@ -21,7 +21,8 @@ do { my $x = {
                                       'PPI' => '0',
                                       'Params::Util' => '0',
                                       'Pod::Elemental' => '0.103000',
-                                      'namespace::autoclean' => '0'
+                                      'namespace::autoclean' => '0',
+                                      'perl' => '5.012'
                                     }
                     },
        'test' => {

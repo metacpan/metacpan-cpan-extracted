@@ -6,7 +6,7 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-our $VERSION = '0.0106';
+our $VERSION = '0.0107';
 
 use Encode qw(encode_utf8);
 use Crypt::Passphrase::Argon2 ();
@@ -60,7 +60,7 @@ DBIx::Class::EncodedColumn::Crypt::Passphrase::Argon2 - Crypt::Passphrase::Argon
 
 =head1 VERSION
 
-version 0.0106
+version 0.0107
 
 =head1 SYNOPSIS
 

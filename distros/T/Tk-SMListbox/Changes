@@ -35,3 +35,15 @@ Revision history for Perl extension Tk::SMListbox.
 2.13  Mon Jan 3, 2022
 	- Remember item cursor is on & restore cursor when sorting.
 	- Fix minor focus-traversal issue.
+2.2   Sat Dec 17, 2022
+	- Add support for "-state => 'disabled'".
+	- Add (and document) -scrollbarfocus option.
+	- Fix -takefocus issues.
+	- General code and doc. cleanups.
+	- Add bindings for the 2nd (horizontal) scrollwheel/device (buttons 6 and 
+	  7) to scroll the widget horizontally when hovering over the horizontal 
+	  scrollbar.
+2.21  Fri Dec 31, 2022
+	- Fix some mouse bindings to behave more like Listbox / HListbox.
+	- A few minor code fixups.
+	- Add a State button to the test suite to allow testing disabling.

@@ -1,4 +1,4 @@
-package Role::Identifiable::HasIdent 0.008;
+package Role::Identifiable::HasIdent 0.009;
 use Moose::Role;
 # ABSTRACT: a thing with an ident attribute
 
@@ -36,7 +36,7 @@ Role::Identifiable::HasIdent - a thing with an ident attribute
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 DESCRIPTION
 
@@ -58,7 +58,7 @@ the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

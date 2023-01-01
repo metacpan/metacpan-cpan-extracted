@@ -2,6 +2,7 @@
     {
         "description": "a schema given for items",
         "schema": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
             "items": {"type": "integer"}
         },
         "tests": [
@@ -32,7 +33,10 @@
     },
     {
         "description": "items with boolean schema (true)",
-        "schema": {"items": true},
+        "schema": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "items": true
+        },
         "tests": [
             {
                 "description": "any array is valid",
@@ -48,7 +52,10 @@
     },
     {
         "description": "items with boolean schema (false)",
-        "schema": {"items": false},
+        "schema": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "items": false
+        },
         "tests": [
             {
                 "description": "any non-empty array is invalid",
@@ -65,6 +72,7 @@
     {
         "description": "items and subitems",
         "schema": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
             "$defs": {
                 "item": {
                     "type": "array",
@@ -147,6 +155,7 @@
     {
         "description": "nested items",
         "schema": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
             "type": "array",
             "items": {
                 "type": "array",
@@ -182,6 +191,7 @@
     {
         "description": "prefixItems with no additional items allowed",
         "schema": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
             "prefixItems": [{}, {}, {}],
             "items": false
         },
@@ -214,8 +224,9 @@
         ]
     },
     {
-        "description": "items should not look in applicators, valid case",
+        "description": "items does not look in applicators, valid case",
         "schema": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
             "allOf": [
                 { "prefixItems": [ { "minimum": 3 } ] }
             ],
@@ -223,12 +234,12 @@
         },
         "tests": [
             {
-                "description": "prefixItems in allOf should not constrain items, invalid case",
+                "description": "prefixItems in allOf does not constrain items, invalid case",
                 "data": [ 3, 5 ],
                 "valid": false
             },
             {
-                "description": "prefixItems in allOf should not constrain items, valid case",
+                "description": "prefixItems in allOf does not constrain items, valid case",
                 "data": [ 5, 5 ],
                 "valid": true
             }
@@ -237,6 +248,7 @@
     {
         "description": "prefixItems validation adjusts the starting index for items",
         "schema": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
             "prefixItems": [ { "type": "string" } ],
             "items": { "type": "integer" }
         },
@@ -254,15 +266,16 @@
         ]
     },
     {
-        "description": "items should properly handle null data",
+        "description": "items with null instance elements",
         "schema": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
             "items": {
                 "type": "null"
             }
         },
         "tests": [
             {
-                "description": "null items allowed",
+                "description": "allows null elements",
                 "data": [ null ],
                 "valid": true
             }

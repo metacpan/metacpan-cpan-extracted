@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 6345c8bf3de071d66e1e78a99dc8e50a147896fda629001e811a6f9534732cfd Build.PL
+SHA256 ad191075a7f4d7f89906bf176de2cb6a72ff8a1190562dc6c42626db6a3f9489 Changes
+SHA256 db739608563af2d9f1763883315451cc38032cb67bdd42a443bfcc7eef1a49b2 LICENSE
+SHA256 100578e049785595ff62d765327bf691a8be11e85eaaf6bc709e2c8aa4940bc1 MANIFEST
+SHA256 c1bf42dcca99d53551dea0ce58f77333e6809784a7ae4f48eb438c2e7f1911fb META.json
+SHA256 783cd9d73f652a9167415a0e09c26a766e0f40a6d2ecbb2446d9aeeb69dd1137 META.yml
+SHA256 5c304aa20e754fd3d25859e290a1ccc60a1d468f7cae119c0ef5982b6e22b393 README
+SHA256 3820a38ccad20ca573ebfdbf38db0918631d0a23d0af1cabf2b2fc2d4cd3ff69 lib/Test2/Tools/Command.pm
+SHA256 66a071df66b2ac7e4d280dd694c5c6b213b4fd8ea6058ea41693aa78f6b351b0 t/00-load.t
+SHA256 5b77457353c99f0963848c91f3e58b07f0f45e81787cda5a347626cfde574d51 t/10-command.t
+SHA256 b778c206d1750a566c4dc82161a7b65cd6e646a21f21bf3e438c5f770964fe1b t/pod-coverage.t
+SHA256 26e8eef165b3efeb88516cf0e98ea5ac2455f53e57eabc1259f9cfa6937a51a8 t/pod.t
+SHA256 6272a66749001b6794133357862ff2e8f1ab80fdef1eb944c22dc2e4176be2e6 t/unsupercilious/README
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEElPO2YAAs9b/plKLEs1lvXE/ryKcFAmOxyKwACgkQs1lvXE/r
+yKd82Av7B3GxPU017FcdWTn8Kh8Z5uuYBol8wxnJMjfMYWLvw3OSmi9mpZ4jb1bn
+Q8bqEBdX2wVnMNcK/WusTuUVt4KgM2eBZGbJnITojV0Auyvhr7rEFUPCDCPKx+be
+vKegwZSqb+pqNuNzBBXsPsjOXETjaZtx/uB9vY3ICcqSzAA/gNa9rH+MvdoE0u9+
+FQd+qNl6yAj3JMyQyUW5If42+n14KkixRyfw5Km6SpAIMbtEuZDs6M3OWSubTPao
+WfbyUn3UzUQ7cwz5eRgVa2x1VdCfwX4EHNYTFy2tRsaU42LbkBWkakJ4t1dNxkKZ
+kus19j27KfiyXFKbhoIYfXWYI1fhxV7E8K18bV2hf/LLq5f2IDJLptpE0Se88dZh
+BveEuGvPT/Olo4hx56U2c95Og5ork/4MecNRnNo3gL+lahSDpSQS7rvo8P9G1J07
+91ryH+V1KOOjksP7I6DuE/RSsfgiX9X5oLh8+f9FDDkdsneq/sK4NnZa0K1u3e2U
+8K7q/zBl
+=sf69
+-----END PGP SIGNATURE-----

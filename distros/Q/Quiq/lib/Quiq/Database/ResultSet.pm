@@ -26,7 +26,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.205';
+our $VERSION = '1.206';
 
 use Quiq::Object;
 use Time::HiRes ();
@@ -722,6 +722,24 @@ sub push {
 
 # -----------------------------------------------------------------------------
 
+=head3 unshift() - Füge Datensatz am Anfang hinzu
+
+=head4 Synopsis
+
+  $tab->unshift($row);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub unshift {
+    my ($self,$row) = @_;
+    CORE::unshift @{$self->{'rows'}},$row;
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 defaultRowClass() - Liefere Namen der Default-Rowklasse
 
 =head4 Synopsis
@@ -1156,7 +1174,7 @@ sub reverse {
 
 =head1 VERSION
 
-1.205
+1.206
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Data::Bucketeer 0.005;
+package Data::Bucketeer 0.006;
 # ABSTRACT: sort data into buckets based on thresholds
 
 use Carp qw(croak);
@@ -190,7 +190,7 @@ Data::Bucketeer - sort data into buckets based on thresholds
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 OVERVIEW
 
@@ -275,10 +275,10 @@ exceptions.  Here is a contrived example of exception-throwing:
     86_400 => sub { die "secs-into-day must be between 0 and 86399; got $_" },
   });
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has a long-term perl support period.  That means it will not
-require a version of perl released fewer than five years ago.
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
@@ -317,7 +317,7 @@ Using the item quantity price above, for example:
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
@@ -328,6 +328,10 @@ Ricardo Signes <rjbs@semiotic.systems>
 =item *
 
 Graham Knop <haarg@haarg.org>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

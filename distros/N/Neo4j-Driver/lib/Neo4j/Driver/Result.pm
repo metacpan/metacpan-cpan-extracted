@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result;
 # ABSTRACT: Result of running a Cypher statement (a stream of records)
-$Neo4j::Driver::Result::VERSION = '0.31';
+$Neo4j::Driver::Result::VERSION = '0.33';
 
 use parent 'Neo4j::Driver::StatementResult';
 
@@ -217,7 +217,7 @@ Neo4j::Driver::Result - Result of running a Cypher statement (a stream of record
 
 =head1 VERSION
 
-version 0.31
+version 0.33
 
 =head1 SYNOPSIS
 
@@ -406,10 +406,10 @@ buffer and detach the result, but will never exhaust it.
 L<Neo4j::Driver::B<ResultSummary>>
 
 =item * Equivalent documentation for the official Neo4j drivers:
-L<Result (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/Result.html>,
-L<Result (Python)|https://neo4j.com/docs/api/python-driver/current/api.html#result>,
-L<Result (JavaScript)|https://neo4j.com/docs/api/javascript-driver/4.4/class/lib6/result.js~Result.html>,
-L<IResult (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.4/html/f1ac31ec-c6dd-798b-b5d6-3ca0794d7502.htm>
+L<Result (Java)|https://neo4j.com/docs/api/java-driver/5.2/org.neo4j.driver/org/neo4j/driver/Result.html>,
+L<Result (Python)|https://neo4j.com/docs/api/python-driver/5.2/api.html#result>,
+L<Result (JavaScript)|https://neo4j.com/docs/api/javascript-driver/5.2/class/lib6/result.js~Result.html>,
+L<IResult (.NET)|https://neo4j.com/docs/api/dotnet-driver/5.2/html/f1ac31ec-c6dd-798b-b5d6-3ca0794d7502.htm>
 
 =back
 
@@ -417,12 +417,15 @@ L<IResult (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.4/html/f1ac31ec-c6dd
 
 Arne Johannessen <ajnn@cpan.org>
 
+If you contact me by email, please make sure you include the word
+"Perl" in your subject header to help beat the spam filters.
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0 or (at your option) the same terms
+as the Perl 5 programming language system itself.
 
 =cut

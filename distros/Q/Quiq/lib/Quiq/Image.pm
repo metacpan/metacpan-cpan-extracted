@@ -21,7 +21,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.205';
+our $VERSION = '1.206';
 
 use Quiq::Option;
 use Quiq::Path;
@@ -133,10 +133,10 @@ sub edit {
     }
     Quiq::Shell->exec("$program $file");
 
-    if ($backupFile && !$p->compare($file,$backupFile)) {
-        $p->delete($backupFile);
-            
-    }
+    # MEMO: Geht nicht, wenn GIMP bereits offen ist
+    # if ($backupFile && !$p->compare($file,$backupFile)) {
+    #     $p->delete($backupFile);
+    # }
 
     return;
 }
@@ -444,7 +444,7 @@ sub type {
 
 =head1 VERSION
 
-1.205
+1.206
 
 =head1 AUTHOR
 

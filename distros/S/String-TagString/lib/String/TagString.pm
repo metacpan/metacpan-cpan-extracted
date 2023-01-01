@@ -1,11 +1,74 @@
 use warnings;
 use strict;
-package String::TagString;
-{
-  $String::TagString::VERSION = '0.005';
-}
+package String::TagString 0.006;
 # ABSTRACT: parse and emit tag strings (including tags with values)
 
+#pod =head1 SYNOPSIS
+#pod
+#pod   use String::TagString;
+#pod
+#pod   # Parse a string into a set of tags:
+#pod   my $tags   = String::TagString->tags_from_string($string);
+#pod
+#pod   # Represent a set of tags as a string:
+#pod   my $string = String::TagString->string_from_tags($tags);
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod String::TagString enables Web 2.0 synergy by deconstructing and synthesizing
+#pod folksonomic nomenclature into structured dynamic programming ontologies.
+#pod
+#pod Also, it parses strings of "tags" into hashrefs, so you can tag whatever junk
+#pod you want with strings.
+#pod
+#pod A set of tags is an unordered set of simple strings, each possibly associated
+#pod with a simple string value.  This library parses strings of these tags into
+#pod hashrefs, and turns hashrefs (or arrayrefs) back into these strings.
+#pod
+#pod This string:
+#pod
+#pod   my $string = q{ beef cheese: peppers:hot };
+#pod
+#pod Turns into this hashref:
+#pod
+#pod   my $tags = {
+#pod     beef    => undef,
+#pod     cheese  => '',
+#pod     peppers => 'hot',
+#pod   };
+#pod
+#pod That hashref, of course, would turn back into the same string -- although
+#pod sorting is not guaranteed.
+#pod
+#pod =head2 Tag String Syntax
+#pod
+#pod Tag strings are space-separated tags.  Tag syntax may change slightly in the
+#pod future, so don't get too attached to any specific quirk, but basically:
+#pod
+#pod A tag is a name, then optionally a colon and value.
+#pod
+#pod Tag names can contains letters, numbers, dots underscores, and dashes.  They
+#pod can't start with a dash, but they can start with an at sign.
+#pod
+#pod A value is similar, but cannot start with an at sign.
+#pod
+#pod Alternately, either a tag or a value can be almost anything if it enclosed in
+#pod double quotes.  (Internal double quotes can be escaped with a backslash.)
+#pod
+#pod =method tags_from_string
+#pod
+#pod   my $tag_hashref = String::TagString->tags_from_string($tag_string);
+#pod
+#pod This will either return a hashref of tags, as described above, or raise an
+#pod exception.  It will raise an exception if the string can't be interpreted, or
+#pod if a tag appears multiple times with conflicting definitions, like in these
+#pod examples:
+#pod
+#pod   foo foo:
+#pod
+#pod   foo:1 foo:2
+#pod
+#pod =cut
 
 sub _raw_tag_name_re  { qr{@?(?:\pL|[\d_.*])(?:\pL|[-\d_.*])*} }
 sub _raw_tag_value_re { qr{(?:\pL|[-\d_.*])*} }
@@ -58,6 +121,17 @@ sub tags_from_string {
   return \%tag;
 }
 
+#pod =method string_from_tags
+#pod
+#pod   my $string = String::TagString->string_from_tags( $tag_set );
+#pod
+#pod This method returns a string representing the given tags.  C<$tag_set> may be
+#pod either a hashref or arrayref.  An arrayref is treated like a hashref in which
+#pod every value is undef.
+#pod
+#pod Tag names and values will only be quoted if needed.
+#pod
+#pod =cut
 
 sub _qs {
   my ($self, $type, $str) = @_;
@@ -109,7 +183,7 @@ String::TagString - parse and emit tag strings (including tags with values)
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -163,6 +237,16 @@ A value is similar, but cannot start with an at sign.
 Alternately, either a tag or a value can be almost anything if it enclosed in
 double quotes.  (Internal double quotes can be escaped with a backslash.)
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 METHODS
 
 =head2 tags_from_string
@@ -190,7 +274,23 @@ Tag names and values will only be quoted if needed.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Ricardo SIGNES Signes
+
+=over 4
+
+=item *
+
+Ricardo SIGNES <rjbs@codesimply.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

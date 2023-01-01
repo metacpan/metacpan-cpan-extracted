@@ -28,7 +28,6 @@
             "Net::SSLeay" : "1.49",
             "Path::Tiny" : "0",
             "Software::License" : "0",
-            "Test::More" : "0",
             "URI" : "0"
          }
       },
@@ -46,12 +45,20 @@
          "requires" : {
             "perl" : "v5.10.0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0",
+            "Test::Alien" : "0",
+            "Test::Alien::Diag" : "0",
+            "Test::More" : "0"
+         }
       }
    },
    "provides" : {
       "Alien::TALib" : {
          "file" : "lib/Alien/TALib.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -66,7 +73,7 @@
          "url" : "https://github.com/vikasnkumar/Alien-TALib"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MB version 0.09",
       "requires" : {

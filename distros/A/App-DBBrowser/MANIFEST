@@ -28,6 +28,7 @@ lib/App/DBBrowser/Table.pm
 lib/App/DBBrowser/Table/CommitWriteSQL.pm
 lib/App/DBBrowser/Table/Extensions.pm
 lib/App/DBBrowser/Table/Functions.pm
+lib/App/DBBrowser/Table/Functions/SQL.pm
 lib/App/DBBrowser/Table/InsertUpdateDelete.pm
 lib/App/DBBrowser/Table/Substatements.pm
 lib/App/DBBrowser/Table/Substatements/Operators.pm

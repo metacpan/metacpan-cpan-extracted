@@ -65,8 +65,9 @@ sub set_values
                 @time{qw(year month day)} = split /-/, $1;
                 $got_date = true;
             }
-            if (/\b(\d{2}:\d{2}:\d{2})$/) {
+            if (/\b(\d{2}:\d{2}:\d{2})(?:\.(\d{3}))?$/) {
                 @time{qw(hour minute second)} = split /:/, $1;
+                $time{nanosecond} = $2 * 1_000_000 if $2; # milli to nano
                 $got_time = true;
             }
         }
@@ -174,7 +175,7 @@ EOT
 
             if ($parser->success) {
                 foreach my $dt (@dt) {
-                    print $dt->strftime('%Y-%m-%d %H:%M:%S'), "\n";
+                    print $dt->strftime('%Y-%m-%d %H:%M:%S.%3N'), "\n";
                     if ($trace && @traces) {
                         print shift @traces, "\n";
                     }
@@ -206,7 +207,7 @@ dateparse - frontend to DateTime::Format::Natural
    -T, --trace                 print trace after processing
    -V, --version               print version
 
-* The date must conform to YYYY-MM-DD and the time to hh:mm:ss.
+* The date must conform to YYYY-MM-DD and the time to hh:mm:ss(.ms).
 Valid datetime strings consist of either date, date/time or time.
 
 =head1 AUTHOR

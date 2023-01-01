@@ -1,5 +1,9 @@
 Revision history for Sub-Exporter-ForMethods
 
+0.100055  2022-12-31 16:54:39-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 0.100054  2021-04-17 17:59:05-04:00 America/New_York
         - no change since last trial release
 

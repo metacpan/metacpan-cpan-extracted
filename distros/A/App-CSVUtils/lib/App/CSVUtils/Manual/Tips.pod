@@ -20,25 +20,17 @@ App::CSVUtils::Manual::Tips - App::CSVUtils tips/tricks
 
 =head1 VERSION
 
-This document describes version 0.054 of App::CSVUtils::Manual::Tips (from Perl distribution App-CSVUtils), released on 2022-12-14.
+This document describes version 1.000 of App::CSVUtils::Manual::Tips (from Perl distribution App-CSVUtils), released on 2022-12-29.
 
 =head1 DESCRIPTION
 
 =head2 GET/SET CLIPBOARD
 
-If you process data from/to GUI spreadsheet programs, as an alternative to using
-stdin/stdout (which often involves copy-pasting to GUI terminal emulator), you
-can also operate on C<clipboard:> URLs as input/output to get/set data from/to
-clipboard. To do this, you must first install L<lwp::protocol::clipboard>.
+If you process data from/to GUI spreadsheet program, you can install L<clipget>
+and L<clipadd> from L<App::ClipboardUtils>. For example, after you copy a range
+of cells from LibreOffice, you can do:
 
-For example, after you copy a range of cells from LibreOffice, you can do:
-
- % csv-munge-row -He '$_->{foo} = some-calculation...' --input-tsv clipboard: --output-tsv -o clipboard:
-
-The first C<clipboard:> argument retrieves CSV from clipboard in TSV format,
-while the second C<clipboard:> argument sets output to clipboard where the
-result of operation will be sent to clipboard as new content. This is convenient
-because you don't have to copy-paste to/from terminal emulator first.
+ % clipget | csv-munge-row -He '$_->{foo} = some-calculation...' --input-tsv --output-tsv | clipadd
 
 =head1 HOMEPAGE
 

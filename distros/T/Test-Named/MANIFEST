@@ -1,0 +1,9 @@
+Changes
+lib/Test/Named.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/Test-Named-NoPlan.t
+t/Test-Named-Single.t
+t/Test-Named.t

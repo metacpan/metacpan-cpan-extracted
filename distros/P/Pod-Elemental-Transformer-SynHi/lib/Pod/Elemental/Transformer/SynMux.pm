@@ -1,47 +1,47 @@
-use v5.10.0;
-package Pod::Elemental::Transformer::SynMux;
+use v5.12.0;
+package Pod::Elemental::Transformer::SynMux 0.101001;
 # ABSTRACT: apply multiple SynHi transformers to one document in one pass
-$Pod::Elemental::Transformer::SynMux::VERSION = '0.101000';
+
 use Moose;
 with 'Pod::Elemental::Transformer::SynHi';
 
 use namespace::autoclean;
 
-# =head1 SYNOPSIS
-#
-#   my $xform = Pod::Elemental::Transformer::SynMux->new({
-#     transformers => [ @list_of_SynHi_transformers ],
-#   });
-#
-#   $xform->transform_node( $pod_document );
-#
-# =head1 OVERVIEW
-#
-# SynMux uses an array of SynHi transformers to perform syntax highlighting
-# markup in one pass over the input Pod.
-#
-# If multiple transformers for the same format name have been given, an exception
-# will be thrown at object construction time.
-#
-# Also, if the C<format_name> attribute for the transformer is set (and it
-# defaults to set, to C<synmux>) then a single hunk of code may be marked to be
-# syntax highlighted by multiple highlighters, then concatenated together, for
-# example:
-#
-#   #!synmux
-#   #!perl
-#
-#   print "This code will be highlighted with the #!perl highlighter.";
-#   #!vim javascript
-#
-#   console.log("...and this code by VimHTML javascript syntax.");
-#
-# All the shebang lines will be stripped.  Assuming the syntax highlighting
-# transformers all behave close to the standard behavior, you'll end up with one
-# code box with multiple styles of highlighting in it, which can be useful for
-# marking up one document with a few kinds of syntax.
-#
-# =cut
+#pod =head1 SYNOPSIS
+#pod
+#pod   my $xform = Pod::Elemental::Transformer::SynMux->new({
+#pod     transformers => [ @list_of_SynHi_transformers ],
+#pod   });
+#pod
+#pod   $xform->transform_node( $pod_document );
+#pod
+#pod =head1 OVERVIEW
+#pod
+#pod SynMux uses an array of SynHi transformers to perform syntax highlighting
+#pod markup in one pass over the input Pod.
+#pod
+#pod If multiple transformers for the same format name have been given, an exception
+#pod will be thrown at object construction time.
+#pod
+#pod Also, if the C<format_name> attribute for the transformer is set (and it
+#pod defaults to set, to C<synmux>) then a single hunk of code may be marked to be
+#pod syntax highlighted by multiple highlighters, then concatenated together, for
+#pod example:
+#pod
+#pod   #!synmux
+#pod   #!perl
+#pod
+#pod   print "This code will be highlighted with the #!perl highlighter.";
+#pod   #!vim javascript
+#pod
+#pod   console.log("...and this code by VimHTML javascript syntax.");
+#pod
+#pod All the shebang lines will be stripped.  Assuming the syntax highlighting
+#pod transformers all behave close to the standard behavior, you'll end up with one
+#pod code box with multiple styles of highlighting in it, which can be useful for
+#pod marking up one document with a few kinds of syntax.
+#pod
+#pod =cut
 
 use List::MoreUtils qw(natatime);
 use MooseX::Types;
@@ -144,12 +144,12 @@ sub BUILD {
   }
 }
 
-# =head1 SEE ALSO
-#
-# =for :list
-# * L<Pod::Elemental::Transformer::SynHi>
-#
-# =cut
+#pod =head1 SEE ALSO
+#pod
+#pod =for :list
+#pod * L<Pod::Elemental::Transformer::SynHi>
+#pod
+#pod =cut
 
 1;
 
@@ -165,7 +165,7 @@ Pod::Elemental::Transformer::SynMux - apply multiple SynHi transformers to one d
 
 =head1 VERSION
 
-version 0.101000
+version 0.101001
 
 =head1 SYNOPSIS
 
@@ -201,6 +201,16 @@ transformers all behave close to the standard behavior, you'll end up with one
 code box with multiple styles of highlighting in it, which can be useful for
 marking up one document with a few kinds of syntax.
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 SEE ALSO
 
 =over 4
@@ -213,11 +223,11 @@ L<Pod::Elemental::Transformer::SynHi>
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

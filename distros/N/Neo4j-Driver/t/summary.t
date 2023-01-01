@@ -40,13 +40,13 @@ END
 	lives_and { ok ! $r->plan; } 'no plan';
 	lives_and { is_deeply [$r->notifications], []; } 'no notification';
 #	diag explain $r;
+	SKIP: { skip 'EXPLAIN unsupported by Neo4j::Bolt', 4 if $Neo4j_Test::bolt;
 	$q = <<END;
 EXPLAIN MATCH (n), (m) RETURN n, m
 END
 	lives_ok { $r = $s->run($q)->summary; } 'get summary with plan';
 	lives_and { is_deeply $r->statement->{parameters}, {} } 'no params';
 	my ($plan, @notifications);
-	TODO: { local $TODO = 'plan/notifications not yet implemented for Bolt' if $Neo4j_Test::bolt;
 	lives_and { ok $plan = $r->plan; } 'get plan';
 	lives_and { ok @notifications = $r->notifications; } 'get notifications';
 	# NB: the server is a bit unreliable in providing notifications; if there are problems with this test, restarting the server usually helps

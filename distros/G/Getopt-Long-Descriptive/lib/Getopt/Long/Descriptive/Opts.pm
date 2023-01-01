@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Getopt::Long::Descriptive::Opts 0.110;
+package Getopt::Long::Descriptive::Opts 0.111;
 # ABSTRACT: object representing command line switches
 
 use Scalar::Util qw(blessed weaken);
@@ -145,7 +145,7 @@ Getopt::Long::Descriptive::Opts - object representing command line switches
 
 =head1 VERSION
 
-version 0.110
+version 0.111
 
 =head1 DESCRIPTION
 
@@ -203,7 +203,7 @@ Hans Dieter Pearcey <hdp@cpan.org>
 
 =item *
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =back
 

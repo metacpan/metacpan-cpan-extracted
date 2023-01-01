@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use lib '.';
 
 use Test::Deep;
 use Test::More;

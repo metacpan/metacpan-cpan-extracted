@@ -1,7 +1,13 @@
 Revision history for Linux-FD
 
+0.013     2022-12-30 14:36:23+01:00 Europe/Amsterdam
+          - Restore compilation on older Linuxes
+
 0.012     2022-12-27 23:13:33+01:00 Europe/Amsterdam
           - Add a correct IoTYPE to all filehandles
+          - Add flags to timerfd and signalfd
+          - Add more supported clocks to timerfd
+          - Add clocks method to Linux::FD::Timer
 
 0.011     2014-05-11 14:43:33 Europe/Amsterdam
           Fix various compilation issues on threaded perls

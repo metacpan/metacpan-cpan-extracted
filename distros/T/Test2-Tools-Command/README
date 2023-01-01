@@ -1,0 +1,22 @@
+Test2-Tools-Command - test simple unix commands
+
+this module can be installed using cpanm:
+
+	cpanm Test2::Tools::Command
+
+run perldoc(1) on Test2::Tools::Command for documentation
+
+
+to author a new release:
+
+	perl Build.PL
+	RELEASE_TESTING=1 ./Build test
+	# the CORE::dump test is not portable to CPAN Tester systems
+	# (nor maybe beyond OpenBSD)
+	AUTHOR_TEST_JMATES=1 ./Build testcover
+	./Build disttest
+	git tag -u ... -s v...
+	./Build dist
+	cpan-upload ...
+	git push ...
+	./Build realclean

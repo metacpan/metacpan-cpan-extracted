@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::Jolt;
 # ABSTRACT: Jolt result handler
-$Neo4j::Driver::Result::Jolt::VERSION = '0.31';
+$Neo4j::Driver::Result::Jolt::VERSION = '0.33';
 
 use parent 'Neo4j::Driver::Result';
 
@@ -16,7 +16,8 @@ our @CARP_NOT = qw(Neo4j::Driver::Net::HTTP Neo4j::Driver::Result);
 my ($TRUE, $FALSE);
 
 my $MEDIA_TYPE = "application/vnd.neo4j.jolt";
-my $ACCEPT_HEADER = "$MEDIA_TYPE+json-seq";
+my $ACCEPT_HEADER = "$MEDIA_TYPE-v2+json-seq";
+my $ACCEPT_HEADER_V1 = "$MEDIA_TYPE+json-seq";
 my $ACCEPT_HEADER_STRICT = "$MEDIA_TYPE+json-seq;strict=true";
 my $ACCEPT_HEADER_SPARSE = "$MEDIA_TYPE+json-seq;strict=false";
 my $ACCEPT_HEADER_NDJSON = "$MEDIA_TYPE";
@@ -29,6 +30,7 @@ sub new {
 	# uncoverable pod (private method)
 	my ($class, $params) = @_;
 	
+	my $jolt_v2 = $params->{http_header}->{content_type} =~ m/^\Q$MEDIA_TYPE\E-v2\b/i;
 	my $self = {
 		attached => 1,   # 1: unbuffered records may exist on the stream
 		exhausted => 0,  # 1: all records read by the client; fetch() will fail
@@ -37,6 +39,7 @@ sub new {
 		json_coder => $params->{http_agent}->json_coder,
 		http_agent => $params->{http_agent},
 		cypher_types => $params->{cypher_types},
+		v2_id_prefix => $jolt_v2 ? 'element_' : '',
 	};
 	bless $self, $class;
 	
@@ -132,6 +135,7 @@ sub _gather_results {
 sub _new_result {
 	my ($class, $result, $json, $params) = @_;
 	
+	my $jolt_v2 = $params->{http_header}->{content_type} =~ m/^\Q$MEDIA_TYPE\E-v2\b/i;
 	my $self = {
 		attached => 0,   # 1: unbuffered records may exist on the stream
 		exhausted => 0,  # 1: all records read by the client; fetch() will fail
@@ -141,6 +145,7 @@ sub _new_result {
 		summary => undef,
 		cypher_types => $params->{cypher_types},
 		server_info => $params->{server_info},
+		v2_id_prefix => $jolt_v2 ? 'element_' : '',
 	};
 	bless $self, $class;
 	
@@ -244,7 +249,7 @@ sub _deep_bless {
 		my $node = \( $props );
 		bless $node, $cypher_types->{node};
 		$$node->{_meta} = {
-			id => $value->[0],
+			"$self->{v2_id_prefix}id" => $value->[0],
 			labels => $value->[1],
 		};
 		$cypher_types->{init}->($node) if $cypher_types->{init};
@@ -259,10 +264,10 @@ sub _deep_bless {
 		my $rel = \( $props );
 		bless $rel, $cypher_types->{relationship};
 		$$rel->{_meta} = {
-			id => $value->[0],
+			"$self->{v2_id_prefix}id" => $value->[0],
 			type => $value->[2],
-			start => $sigil eq '->' ? $value->[1] : $value->[3],
-			end => $sigil eq '->' ? $value->[3] : $value->[1],
+			"$self->{v2_id_prefix}start" => $sigil eq '->' ? $value->[1] : $value->[3],
+			"$self->{v2_id_prefix}end" => $sigil eq '->' ? $value->[3] : $value->[1],
 		};
 		$cypher_types->{init}->($rel) if $cypher_types->{init};
 		return $rel;
@@ -304,6 +309,7 @@ sub _accept_header {
 	
 	if (defined $want_jolt) {
 		return if ! $want_jolt;
+		return ($ACCEPT_HEADER_V1) if $want_jolt eq 'v1';
 		return ($ACCEPT_HEADER_STRICT) if $want_jolt eq 'strict';
 		return ($ACCEPT_HEADER_SPARSE) if $want_jolt eq 'sparse';
 		return ($ACCEPT_HEADER_NDJSON) if $want_jolt eq 'ndjson';
@@ -320,46 +326,3 @@ sub _acceptable {
 
 
 1;
-
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-Neo4j::Driver::Result::Jolt - Jolt result handler
-
-=head1 VERSION
-
-version 0.31
-
-=head1 DESCRIPTION
-
-The L<Neo4j::Driver::Result::Jolt> package is not part of the
-public L<Neo4j::Driver> API.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<Neo4j::Driver::Net>
-
-=item * L<Neo4j::Driver::Result>
-
-=back
-
-=head1 AUTHOR
-
-Arne Johannessen <ajnn@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2016-2022 by Arne Johannessen.
-
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
-
-=cut

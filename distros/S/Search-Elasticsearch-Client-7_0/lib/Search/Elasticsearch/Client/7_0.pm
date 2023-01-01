@@ -17,8 +17,8 @@
 
 package Search::Elasticsearch::Client::7_0;
 
-our $VERSION='7.711001';
-use Search::Elasticsearch 7.00 ();
+our $VERSION='8.00';
+use Search::Elasticsearch 8.00 ();
 
 1;
 
@@ -32,7 +32,7 @@ Search::Elasticsearch::Client::7_0 - Thin client with full support for Elasticse
 
 =head1 VERSION
 
-version 7.711001
+version 8.00
 
 =head1 DESCRIPTION
 
@@ -85,7 +85,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Elasticsearch BV.
+This software is Copyright (c) 2022 by Elasticsearch BV.
 
 This is free software, licensed under:
 

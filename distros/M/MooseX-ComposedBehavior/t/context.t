@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+use lib '.';
+
 use Test::More;
 use Test::Deep qw(cmp_deeply bag);
 

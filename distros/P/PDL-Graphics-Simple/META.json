@@ -46,14 +46,14 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/PDLPorters/PDL-Graphics-Simple/issues"
+         "web" : "https://github.com/PDLPorters/PDL-Graphics-Simple/issues"
       },
-      "homepage" : "http://github.com/PDLPorters/PDL-Graphics-Simple",
+      "homepage" : "https://github.com/PDLPorters/PDL-Graphics-Simple",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/PDLPorters/PDL-Graphics-Simple.git"
       }
    },
-   "version" : "1.007",
+   "version" : "1.008",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

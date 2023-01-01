@@ -13,7 +13,7 @@ my $temp = Path::Tiny->tempdir;
 # Add to XDG_DATA_DIRS early so that it is available for system data dir lookup.
 $ENV{XDG_DATA_DIRS} .= join(":", "/usr/local/share", "/usr/share", $temp);
 
-plan Gtk3::init_check
+plan Gtk3::init_check()
 	? ( tests    => 2 )
 	: ( skip_all => 'Could not init GTK' );
 

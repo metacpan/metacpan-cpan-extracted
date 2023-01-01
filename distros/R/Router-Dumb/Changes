@@ -1,5 +1,9 @@
 Revision history for Router-Dumb
 
+0.006     2022-12-31 15:46:51-05:00 America/New_York
+        - update packaging and metadata
+        - tests rewritten to use Test::Deep::UnorderedPairs (Karen Etheridge)
+
 0.005     2013-07-28 21:53:59 America/New_York
           only test fixes: should now pass on Win32
 

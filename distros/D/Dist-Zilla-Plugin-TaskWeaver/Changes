@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-Plugin-TaskWeaver
 
+0.101629  2022-12-31 14:10:50-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+        - exclude more unwanted methods (thanks for Arne Johannessen for
+          the report!)
+
 0.101628  2015-07-24 22:02:12-04:00 America/New_York
         - do not bring in the mvp_ methods from the Plugin role!
           doing things this way seems to be exposing a bit of a stink…

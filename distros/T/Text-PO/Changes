@@ -1,5 +1,15 @@
 Revision history for Perl module Text::PO
 
+v0.4.1 2022-12-30T20:56:12+0900
+    - Implemented a minor improvement in gettext.js to stringify msgids that are objects.
+
+v0.4.0 2022-12-30T20:08:59+0900
+    - Improved the gettext.js JavaScript library to have gettext() and other methods return a GettextString object containing the "lang" property. This is useful to know the actual language of the string returned. It inherits from String object class and stringifies automatically.
+    - Updated POD documentation for gettext.js
+
+v0.3.0 2022-12-29T22:53:32+0900
+    - Improved the exists() method in Text::PO to take an optional hash or hash reference of parameters.
+
 v0.2.4 2022-12-09T20:07:10+0900
     - Improved documentation for scripts/po.pl
 

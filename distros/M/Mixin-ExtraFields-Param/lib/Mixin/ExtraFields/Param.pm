@@ -1,43 +1,44 @@
+package Mixin::ExtraFields::Param 0.022;
+# ABSTRACT: make your class provide a familiar "param" method
+
 use warnings;
 use strict;
-package Mixin::ExtraFields::Param;
-# ABSTRACT: make your class provide a familiar "param" method
-$Mixin::ExtraFields::Param::VERSION = '0.021';
+
 use Mixin::ExtraFields 0.002 ();
 use parent qw(Mixin::ExtraFields);
 
 use Carp ();
 
-# =head1 SYNOPSIS
-#
-#   package Widget::Parametric;
-#   use Mixin::ExtraFields::Param -fields => { driver => 'HashGuts' };;
-#
-#   ...
-#
-#   my $widget = Widget::Parametric->new({ flavor => 'vanilla' });
-#
-#   printf "%s: %s\n", $_, $widget->param($_) for $widget->param;
-#
-# =head1 DESCRIPTION
-#
-# This module mixes in to your class to provide a C<param> method like the ones
-# provided by L<CGI>, L<CGI::Application>, and other classes.  It uses
-# Mixin::ExtraFields, which means it can use any Mixin::ExtraFields driver to
-# store your data.
-#
-# By default, the methods provided are:
-#
-# =for :list
-# * param
-# * exists_param
-# * delete_param
-#
-# These methods are imported by the C<fields> group, which must be requested.  If
-# a C<moniker> argument is supplied, the moniker is used instead of "param".  For
-# more information, see L<Mixin::ExtraFields>.
-#
-# =cut
+#pod =head1 SYNOPSIS
+#pod
+#pod   package Widget::Parametric;
+#pod   use Mixin::ExtraFields::Param -fields => { driver => 'HashGuts' };;
+#pod
+#pod   ...
+#pod
+#pod   my $widget = Widget::Parametric->new({ flavor => 'vanilla' });
+#pod
+#pod   printf "%s: %s\n", $_, $widget->param($_) for $widget->param;
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This module mixes in to your class to provide a C<param> method like the ones
+#pod provided by L<CGI>, L<CGI::Application>, and other classes.  It uses
+#pod Mixin::ExtraFields, which means it can use any Mixin::ExtraFields driver to
+#pod store your data.
+#pod
+#pod By default, the methods provided are:
+#pod
+#pod =for :list
+#pod * param
+#pod * exists_param
+#pod * delete_param
+#pod
+#pod These methods are imported by the C<fields> group, which must be requested.  If
+#pod a C<moniker> argument is supplied, the moniker is used instead of "param".  For
+#pod more information, see L<Mixin::ExtraFields>.
+#pod
+#pod =cut
 
 sub default_moniker { 'param' }
 
@@ -57,19 +58,19 @@ sub build_method {
   return $self->SUPER::build_method($method_name, $arg);
 }
 
-# =method param
-#
-#  my @params = $object->param;        # get names of existing params
-#
-#  my $value = $object->param('name'); # get value of a param
-#
-#  my $value = $object->param(name => $value); # set a param's value
-#
-#  my @values = $object->param(n1 => $v1, n2 => $v2, ...); # set many values
-#
-# This method sets or retrieves parameters.
-#
-# =cut
+#pod =method param
+#pod
+#pod  my @params = $object->param;        # get names of existing params
+#pod
+#pod  my $value = $object->param('name'); # get value of a param
+#pod
+#pod  my $value = $object->param(name => $value); # set a param's value
+#pod
+#pod  my @values = $object->param(n1 => $v1, n2 => $v2, ...); # set many values
+#pod
+#pod This method sets or retrieves parameters.
+#pod
+#pod =cut
 
 sub _build_param_method {
   my ($self, $arg) = @_;
@@ -126,7 +127,7 @@ Mixin::ExtraFields::Param - make your class provide a familiar "param" method
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -168,6 +169,16 @@ These methods are imported by the C<fields> group, which must be requested.  If
 a C<moniker> argument is supplied, the moniker is used instead of "param".  For
 more information, see L<Mixin::ExtraFields>.
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 METHODS
 
 =head2 param
@@ -184,7 +195,23 @@ This method sets or retrieves parameters.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Ricardo SIGNES Signes
+
+=over 4
+
+=item *
+
+Ricardo SIGNES <rjbs@codesimply.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

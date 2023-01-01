@@ -3,7 +3,7 @@ package Net::DNS::Packet;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Packet.pm 1865 2022-05-21 09:57:49Z willem $)[2];
+our $VERSION = (qw$Id: Packet.pm 1891 2022-12-28 13:09:27Z willem $)[2];
 
 
 =head1 NAME
@@ -138,23 +138,23 @@ sub decode {
 		my $record;
 		$offset = HEADER_LENGTH;
 		while ( $qd-- ) {
-			( $record, $offset ) = decode Net::DNS::Question( $data, $offset, $hash );
+			( $record, $offset ) = Net::DNS::Question->decode( $data, $offset, $hash );
 			CORE::push( @{$self->{question}}, $record );
 		}
 
 		# RR sections
 		while ( $an-- ) {
-			( $record, $offset ) = decode Net::DNS::RR( $data, $offset, $hash );
+			( $record, $offset ) = Net::DNS::RR->decode( $data, $offset, $hash );
 			CORE::push( @{$self->{answer}}, $record );
 		}
 
 		while ( $ns-- ) {
-			( $record, $offset ) = decode Net::DNS::RR( $data, $offset, $hash );
+			( $record, $offset ) = Net::DNS::RR->decode( $data, $offset, $hash );
 			CORE::push( @{$self->{authority}}, $record );
 		}
 
 		while ( $ar-- ) {
-			( $record, $offset ) = decode Net::DNS::RR( $data, $offset, $hash );
+			( $record, $offset ) = Net::DNS::RR->decode( $data, $offset, $hash );
 			CORE::push( @{$self->{additional}}, $record );
 		}
 
@@ -173,7 +173,7 @@ sub decode {
 	if ($debug) {
 		local $@ = $@;
 		print $@ if $@;
-		$self->print if $self;
+		eval { $self->print };
 	}
 
 	return wantarray ? ( $self, $offset ) : $self;
@@ -404,6 +404,9 @@ sub string {
 	my $origin = $server ? ";; Response received from $server ($length octets)\n" : "";
 	my @record = ( "$origin;; HEADER SECTION", $header->string );
 
+	my $edns = $self->edns;
+	CORE::push( @record, $edns->string ) if $edns->_specified;
+
 	if ( $opcode eq 'DSO' ) {
 		CORE::push( @record, ";; DSO SECTION" );
 		foreach ( @{$self->{dso}} ) {
@@ -432,7 +435,9 @@ sub string {
 	my @additional = $self->additional;
 	my $arcount    = scalar @additional;
 	my $ars	       = $arcount != 1 ? 's' : '';
-	CORE::push( @record, "\n;; ADDITIONAL SECTION ($arcount record$ars)", map { $_->string } @additional );
+	my $EDNSmarker = join ' ', qq[;; {\t"EDNS-VERSION":], $edns->version, qq[}\n];
+	CORE::push( @record, "\n;; ADDITIONAL SECTION ($arcount record$ars)" );
+	CORE::push( @record, map { ( $_ eq $edns ) ? $EDNSmarker : $_->string } @additional );
 
 	return join "\n", @record, "\n";
 }
@@ -565,7 +570,7 @@ sub _section {				## returns array reference for section
     $query = Net::DNS::Packet->new( 'www.example.com', 'A' );
 
     $query->sign_tsig(
-		'Khmac-sha512.example.+165+01018.private',
+		$keyfile,
 		fudge => 60
 		);
 
@@ -597,12 +602,6 @@ specified key.
 		);
 
     $query->sign_tsig( $tsig );
-
-
-The historical simplified syntax is still available, but additional
-options can not be specified.
-
-    $packet->sign_tsig( $key_name, $key );
 
 
 The response to an inbound request is signed by presenting the request
@@ -841,6 +840,7 @@ sub dump {				## print internal data structure
 	require Data::Dumper;					# uncoverable pod
 	local $Data::Dumper::Maxdepth = $Data::Dumper::Maxdepth || 3;
 	local $Data::Dumper::Sortkeys = $Data::Dumper::Sortkeys || 1;
+	local $Data::Dumper::Useqq    = $Data::Dumper::Useqq	|| 1;
 	print Data::Dumper::Dumper(@_);
 	return;
 }

@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/tomhughes/IO-Zlib.svg?branch=master)](https://travis-ci.org/tomhughes/IO-Zlib)
+[![Tests](https://github.com/tomhughes/IO-Zlib/actions/workflows/tests.yml/badge.svg?branch=master&event=push)](https://github.com/tomhughes/IO-Zlib/actions/workflows/tests.yml?query=workflow%3ATests%20branch%3Amaster%20event%3Apush)
 
 This is the IO::Zlib module package for perl5.
 

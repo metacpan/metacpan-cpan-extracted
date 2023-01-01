@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Number::Tolerant::Constant 1.709;
+package Number::Tolerant::Constant 1.710;
 # ABSTRACT: a blessed constant type
 
 #pod =head1 SYNOPSIS
@@ -78,7 +78,7 @@ Number::Tolerant::Constant - a blessed constant type
 
 =head1 VERSION
 
-version 1.709
+version 1.710
 
 =head1 SYNOPSIS
 
@@ -109,7 +109,7 @@ the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

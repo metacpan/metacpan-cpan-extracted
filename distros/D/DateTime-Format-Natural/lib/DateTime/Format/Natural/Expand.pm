@@ -7,32 +7,32 @@ use boolean qw(true false);
 use Clone qw(clone);
 use DateTime::Format::Natural::Helpers qw(%flag);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my %data = (
     time => {
         4 => {},
         5 => '_time',
-        6 => { truncate_to => [q(hour_minute)] },
+        6 => { truncate_to => [q(hour_minute_second)] },
     },
     time_min => {
         4 => {},
         5 => '_time',
-        6 => { truncate_to => [q(minute)] },
+        6 => { truncate_to => [q(minute_second)] },
     },
     time_am => {
         2 => 'meridiem',
         3 => $flag{time_am},
         4 => {},
         5 => '_at',
-        6 => { truncate_to => [q(hour_minute)] },
+        6 => { truncate_to => [q(hour_minute_second)] },
     },
     time_pm => {
         2 => 'meridiem',
         3 => $flag{time_pm},
         4 => {},
         5 => '_at',
-        6 => { truncate_to => [q(hour_minute)] },
+        6 => { truncate_to => [q(hour_minute_second)] },
     },
 );
 

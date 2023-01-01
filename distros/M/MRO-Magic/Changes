@@ -1,5 +1,9 @@
 Revision history for MRO-Magic
 
+0.100002  2022-12-31 13:54:11-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 0.100001  2013-10-06 22:49:18 America/New_York
           repackaged again to provide META data
 

@@ -1,7 +1,11 @@
 Release history for String-Errf
 
+0.009     2022-12-31 16:43:32-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 0.008     2016-07-04 11:37:17-04:00 America/New_York
-          - switch from JSON to JSON::MaybeXS
+        - switch from JSON to JSON::MaybeXS
 
 0.007     2013-11-24 13:46:17 America/New_York
           catch more bad input and die [rt.cpan.org #83552]

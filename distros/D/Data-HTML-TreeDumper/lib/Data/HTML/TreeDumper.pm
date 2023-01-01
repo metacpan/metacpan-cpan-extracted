@@ -9,8 +9,9 @@ use YAML::Syck qw(Load LoadFile Dump DumpFile);
 use Ref::Util  qw(is_ref is_scalarref is_arrayref is_hashref);
 use Const::Fast;
 use HTML::Entities;
+use HTML::AutoTag;
 
-use version 0.77; our $VERSION = version->declare("v0.0.3");
+use version 0.77; our $VERSION = version->declare("v0.0.4");
 
 $YAML::Syck::ImplicitUnicode = 1;
 $YAML::Syck::ImplicitTyping  = 1;
@@ -24,6 +25,8 @@ const my %default => (
     StartOrderedList   => 0,
     MaxDepth           => 32,
 );
+
+my $autoTag = HTML::AutoTag->new( encode => 0, sorted => 1 );
 
 #region Class methods
 
@@ -131,7 +134,11 @@ sub _dumpRaw {
     my $x     = shift // '';
     my $name  = $self->_normalizeName( $x, shift );
     my $depth = shift || 0;
-    return sprintf( '<span class="%s">%s</span>', $self->ClassValue(), encode_entities($x) );
+    return $autoTag->tag(
+        tag   => 'span',
+        attr  => { class => $self->ClassValue(), },
+        cdata => encode_entities($x),
+    );
 }
 
 sub _dumpArray {
@@ -140,16 +147,31 @@ sub _dumpArray {
     my $name  = $self->_normalizeName( $x, shift );
     my $depth = shift || 0;
     if ( $depth > $self->MaxDepth() ) {
-        return sprintf( '<span class="%s">%s</span>: <span class="%s">[...]</span>',
-            $self->ClassKey(), encode_entities($name), $self->ClassValue() );
+        return $autoTag->tag(
+            tag   => 'span',
+            attr  => { class => $self->ClassKey(), },
+            cdata => encode_entities($name),
+            )
+            . ': '
+            . $autoTag->tag(
+            tag   => 'span',
+            attr  => { class => $self->ClassValue(), },
+            cdata => '[...]',
+            );
     }
-    my $inner
-        = join( "", map { sprintf( '<li>%s</li>', $self->dump( $_, undef, $depth ) ); } @{$x} );
-    return sprintf(
-        '<details><summary class="%s">%s</summary><ol class="%s" start="%d">%s</ol></details>',
-        $self->ClassKey(), encode_entities($name),
-        $self->ClassOrderedList(),
-        $self->StartOrderedList(), $inner
+    my $inner = [ map { { tag => 'li', cdata => $self->dump( $_, undef, $depth ) } } @{$x} ];
+    return $autoTag->tag(
+        tag   => 'details',
+        cdata => [
+            {   tag   => 'summary',
+                attr  => { class => $self->ClassKey(), },
+                cdata => encode_entities($name),
+            },
+            {   tag   => 'ol',
+                attr  => { class => $self->ClassOrderedList(), start => $self->StartOrderedList() },
+                cdata => $inner,
+            },
+        ],
     );
 }
 
@@ -159,22 +181,49 @@ sub _dumpHash {
     my $name  = $self->_normalizeName( $x, shift );
     my $depth = shift || 0;
     if ( $depth > $self->MaxDepth() ) {
-        return sprintf( '<span class="%s">%s</span>: <span class="%s">{...}</span>',
-            $self->ClassKey(), encode_entities($name), $self->ClassValue() );
+        return $autoTag->tag(
+            tag   => 'span',
+            attr  => { class => $self->ClassKey(), },
+            cdata => encode_entities($name),
+            )
+            . ': '
+            . $autoTag->tag(
+            tag   => 'span',
+            attr  => { class => $self->ClassValue(), },
+            cdata => '{...}',
+            );
     }
-    my $inner = join(
-        "",
+    my $inner = [
         map {
             is_arrayref( $x->{$_} )
-                ? sprintf( '<li>%s</li>', $self->_dumpArray( $x->{$_}, $_, $depth + 1 ) )
+                ? { tag => 'li', cdata => $self->_dumpArray( $x->{$_}, $_, $depth + 1 ) }
                 : is_hashref( $x->{$_} )
-                ? sprintf( '<li>%s</li>', $self->_dumpHash( $x->{$_}, $_, $depth + 1 ) )
-                : sprintf( '<li><span class="%s">%s</span>: %s</li>',
-                $self->ClassKey(), encode_entities($_), $self->dump( $x->{$_}, $_, $depth + 1 ) )
+                ? { tag => 'li', cdata => $self->_dumpHash( $x->{$_}, $_, $depth + 1 ) }
+                : {
+                tag   => 'li',
+                cdata => $autoTag->tag(
+                    tag   => 'span',
+                    attr  => { class => $self->ClassKey(), },
+                    cdata => encode_entities($_)
+                    )
+                    . ': '
+                    . $self->dump( $x->{$_}, $_, $depth + 1 )
+                }
         } sort( keys( %{$x} ) )
+    ];
+    return $autoTag->tag(
+        tag   => 'details',
+        cdata => [
+            {   tag   => 'summary',
+                attr  => { class => $self->ClassKey(), },
+                cdata => encode_entities($name),
+            },
+            {   tag   => 'ul',
+                attr  => { class => $self->ClassUnorderedList(), },
+                cdata => $inner,
+            },
+        ],
     );
-    return sprintf( '<details><summary class="%s">%s</summary><ul class="%s">%s</ul></details>',
-        $self->ClassKey(), encode_entities($name), $self->ClassUnorderedList(), $inner );
 }
 
 #endregion
@@ -187,7 +236,7 @@ __END__
 
 =head1 NAME
 
-Data::HTML::TreeDumper - dumps perl data as HTML5 open/close tree
+L<Data::HTML::TreeDumper> - dumps perl data as HTML5 open/close tree
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 #!perl
 
-# Note: This script is a CLI for Riap function /App/CSVUtils/csv_sort_rows
+# Note: This script is a CLI for Riap function /App/CSVUtils/csv_sort_rows/csv_sort_rows
 # and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
@@ -11,12 +11,12 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-14'; # DATE
+our $DATE = '2022-12-29'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.054'; # VERSION
+our $VERSION = '1.000'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
-    url => "/App/CSVUtils/csv_sort_rows",
+    url => "/App/CSVUtils/csv_sort_rows/csv_sort_rows",
     program_name => "csv-sort-rows",
     log => 1,
     read_config => 0,
@@ -41,7 +41,7 @@ csv-sort-rows - Sort CSV rows
 
 =head1 VERSION
 
-This document describes version 0.054 of csv-sort-rows (from Perl distribution App-CSVUtils), released on 2022-12-14.
+This document describes version 1.000 of csv-sort-rows (from Perl distribution App-CSVUtils), released on 2022-12-29.
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,7 @@ B<csv-sort-rows> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, 
 
 B<csv-sort-rows> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<csv-sort-rows> [B<L<--by-code|/"--by-code=s">>=I<any>|B<L<--by-code-json|/"--by-code=s">>=I<json>] [(B<L<--by-field|/"--by-fields-json=s">>=I<str>)+|B<L<--by-fields-json|/"--by-fields-json=s">>=I<json>] [B<L<--by-sortsub|/"--by-sortsub=s">>=I<str>] [B<L<--ci|/"--ci, -i">>|B<L<-i|/"--ci, -i">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--escape-char|/"--escape-char=s">>=I<str>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--hash|/"--hash, -H">>|B<L<-H|/"--hash, -H">>] [B<L<--header|/"--no-header, --input-header">>|B<L<--input-header|/"--no-header, --input-header">>|B<L<--no-header|/"--no-header, --input-header">>|B<L<--noheader|/"--no-header, --input-header">>] [B<L<--key|/"--key=s">>=I<any>|B<L<--key-json|/"--key=s">>=I<json>|B<L<-k|/"--key=s">>=I<any>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--output-escape-char|/"--output-escape-char=s">>=I<str>] [B<L<--output-header|/"--output-header">>|B<L<--no-output-header|/"--output-header">>|B<L<--nooutput-header|/"--output-header">>] [B<L<--output-quote-char|/"--output-quote-char=s">>=I<str>] [B<L<--output-sep-char|/"--output-sep-char=s">>=I<str>] [B<L<--output-tsv|/"--output-tsv">>|B<L<--no-output-tsv|/"--output-tsv">>|B<L<--nooutput-tsv|/"--output-tsv">>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>|B<L<--no-overwrite|/"--overwrite, -O">>|B<L<--nooverwrite|/"--overwrite, -O">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--quote-char|/"--quote-char=s">>=I<str>] [B<L<--reverse|/"--reverse, -r">>|B<L<-r|/"--reverse, -r">>] [B<L<--sep-char|/"--sep-char=s">>=I<str>] [(B<L<--sortsub-args|/"--sortsub-args=s%">> I<key>=I<s>)+|B<L<--sortsub-args-json|/"--sortsub-args=s%">>=I<json>] [B<L<--tsv|/"--tsv, --input-tsv">>|B<L<--input-tsv|/"--tsv, --input-tsv">>|B<L<--no-tsv|/"--tsv, --input-tsv">>|B<L<--notsv|/"--tsv, --input-tsv">>] -- E<lt>I<L<filename|/"--filename=s*">>E<gt> [I<L<output_filename|/"--output-filename=s, -o">>]
+B<csv-sort-rows> [B<L<--by-code|/"--by-code=s">>=I<any>|B<L<--by-code-json|/"--by-code=s">>=I<json>] [(B<L<--by-field|/"--by-fields-json=s">>=I<str>)+|B<L<--by-fields-json|/"--by-fields-json=s">>=I<json>] [B<L<--by-sortsub|/"--by-sortsub=s">>=I<str>] [B<L<--ci|/"--ci, -i">>|B<L<-i|/"--ci, -i">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--hash|/"--hash, -H">>|B<L<-H|/"--hash, -H">>] [B<L<--input-escape-char|/"--input-escape-char=s">>=I<str>] [B<L<--input-header|/"--no-input-header">>|B<L<--no-input-header|/"--no-input-header">>|B<L<--noinput-header|/"--no-input-header">>] [B<L<--input-quote-char|/"--input-quote-char=s">>=I<str>] [B<L<--input-sep-char|/"--input-sep-char=s">>=I<str>] [B<L<--input-tsv|/"--input-tsv">>] [B<L<--key|/"--key=s">>=I<any>|B<L<--key-json|/"--key=s">>=I<json>|B<L<-k|/"--key=s">>=I<any>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--output-escape-char|/"--output-escape-char=s">>=I<str>] [B<L<--output-header|/"--output-header">>|B<L<--no-output-header|/"--output-header">>|B<L<--nooutput-header|/"--output-header">>] [B<L<--output-quote-char|/"--output-quote-char=s">>=I<str>] [B<L<--output-sep-char|/"--output-sep-char=s">>=I<str>] [B<L<--output-tsv|/"--output-tsv">>|B<L<--no-output-tsv|/"--output-tsv">>|B<L<--nooutput-tsv|/"--output-tsv">>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>|B<L<--no-overwrite|/"--overwrite, -O">>|B<L<--nooverwrite|/"--overwrite, -O">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--reverse|/"--reverse, -r">>|B<L<-r|/"--reverse, -r">>] [(B<L<--sortsub-args|/"--sortsub-args=s%">> I<key>=I<s>)+|B<L<--sortsub-args-json|/"--sortsub-args=s%">>=I<json>] -- [I<L<input_filename|/"--input-filename=s">>] [I<L<output_filename|/"--output-filename=s, -o">>]
 
 =head1 DESCRIPTION
 
@@ -131,10 +131,6 @@ descending length of name):
  Andy,20
  Ben,30
 
-I<Common notes for the utilities>
-
-Encoding: The utilities in this module/distribution accept and emit UTF8 text.
-
 =head1 OPTIONS
 
 C<*> marks required options.
@@ -145,13 +141,13 @@ C<*> marks required options.
 
 =item B<--by-code-json>=I<s>
 
-Sort using Perl code (JSON-encoded).
+Sort by using Perl code (JSON-encoded).
 
 See C<--by-code>.
 
 =item B<--by-code>=I<s>
 
-Sort using Perl code.
+Sort by using Perl code.
 
 C<$a> and C<$b> (or the first and second argument) will contain the two rows to be
 compared. Which are arrayrefs; or if C<--hash> (C<-H>) is specified, hashrefs; or
@@ -210,7 +206,8 @@ keys. Relevant when sorting using C<--by-code> or C<--by-sortsub>. If specified,
 then instead of row when sorting rows, the code (or Sort::Sub routine) will
 receive these sort keys to sort against.
 
-Tthe code will receive the row (arrayref) as the argument.
+The code will receive the row (arrayref, or if -H is specified, hashref) as the
+argument.
 
 
 =item B<--reverse>, B<-r>
@@ -236,51 +233,60 @@ Each value is a name-value pair, use I<key=value> syntax. Can be specified multi
 
 =over
 
-=item B<--escape-char>=I<s>
+=item B<--input-escape-char>=I<s>
 
 Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
-Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+Defaults to C<\\> (backslash). Overrides C<--input-tsv> option.
 
 
-=item B<--filename>=I<s>*
+=item B<--input-filename>=I<s>
 
-Input CSV file or URL.
+Input CSV file.
 
-Use C<-> to read from stdin, use C<clipboard:> to read from clipboard.
+Default value:
+
+ "-"
+
+Use C<-> to read from stdin.
+
+Encoding of input file is assumed to be UTF-8.
 
 
 Can also be specified as the 1st command-line argument.
 
-=item B<--no-header>, B<--input-header>
-
-By default (C<--header>), the first row of the CSV will be assumed to contain
-field names (and the second row contains the first data row). When you declare
-that CSV does not have header row (C<--no-header>), the first row of the CSV is
-assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
-and so on.
-
-
-=item B<--quote-char>=I<s>
+=item B<--input-quote-char>=I<s>
 
 Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
-Defaults to C<"> (double quote). Overrides C<--tsv> option.
+Defaults to C<"> (double quote). Overrides C<--input-tsv> option.
 
 
-=item B<--sep-char>=I<s>
+=item B<--input-sep-char>=I<s>
 
 Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
-Defaults to C<,> (comma). Overrides C<--tsv> option.
+Defaults to C<,> (comma). Overrides C<--input-tsv> option.
 
 
-=item B<--tsv>, B<--input-tsv>
+=item B<--input-tsv>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
 
-Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
-those options is specified, then C<--tsv> will be ignored.
+Overriden by C<--input-sep-char>, C<--input-quote-char>, C<--input-escape-char>
+options. If one of those options is specified, then C<--input-tsv> will be
+ignored.
+
+
+=item B<--no-input-header>
+
+Specify that input CSV does not have a header row.
+
+By default, the first row of the input CSV will be assumed to contain field
+names (and the second row contains the first data row). When you declare that
+input CSV does not have header row (C<--no-input-header>), the first row of the
+CSV is assumed to contain the first data row. Fields will be named C<field1>,
+C<field2>, and so on.
 
 
 =back
@@ -369,17 +375,18 @@ C<--naked-res> so you just get:
 
 Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
 
-This is like C<--escape-char> option but for output instead of input.
+This is like C<--input-escape-char> option but for output instead of input.
 
 Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
 
 
 =item B<--output-filename>=I<s>, B<-o>
 
-Output filename or URL.
+Output filename.
 
-Use C<-> to output to stdout (the default if you don't specify this option), use
-C<clipboard:> to write to clipboard.
+Use C<-> to output to stdout (the default if you don't specify this option).
+
+Encoding of output file is assumed to be UTF-8.
 
 
 Can also be specified as the 2nd command-line argument.
@@ -400,7 +407,7 @@ row.
 
 Specify field quote character in output CSV, will be passed to Text::CSV_XS.
 
-This is like C<--quote-char> option but for output instead of input.
+This is like C<--input-quote-char> option but for output instead of input.
 
 Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
 
@@ -409,7 +416,7 @@ Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
 
 Specify field separator character in output CSV, will be passed to Text::CSV_XS.
 
-This is like C<--sep-char> option but for output instead of input.
+This is like C<--input-sep-char> option but for output instead of input.
 
 Defaults to C<,> (comma). Overrides C<--output-tsv> option.
 
@@ -418,7 +425,7 @@ Defaults to C<,> (comma). Overrides C<--output-tsv> option.
 
 Inform that output file is TSV (tab-separated) format instead of CSV.
 
-This is like C<--tsv> option but for output instead of input.
+This is like C<--input-tsv> option but for output instead of input.
 
 Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
 options. If one of those options is specified, then C<--output-tsv> will be

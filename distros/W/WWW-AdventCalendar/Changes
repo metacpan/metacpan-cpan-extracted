@@ -1,5 +1,10 @@
 Revision history for WWW-AdventCalendar
 
+1.113     2022-12-31 19:32:24-05:00 America/New_York
+        - removed support for Google Analytics tracker
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 1.112     2015-11-22 16:35:19-05:00 America/New_York
         - provide slightly better errors when articles are missing required
           headers

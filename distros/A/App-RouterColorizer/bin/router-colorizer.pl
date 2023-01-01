@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 #
-# Copyright (C) 2021 Joelle Maslak
+# Copyright (C) 2021-2022 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -17,7 +17,7 @@ no warnings 'experimental::signatures';
 
 use App::RouterColorizer;
 
-my $TIMER = 0.01;  # Delay to wait for more data, in secs.
+my $TIMER = 0.01;    # Delay to wait for more data, in secs.
 
 MAIN: {
     my $colorizer = App::RouterColorizer->new();
@@ -79,7 +79,7 @@ router-colorizer.pl - Colorize router CLI output
 
 =head1 VERSION
 
-version 1.223500
+version 1.223650
 
 =head1 DESCRIPTION
 

@@ -22,10 +22,10 @@ use Moo 2.001000 ();
 use Search::Elasticsearch::Util qw(parse_params load_plugin);
 use namespace::clean;
 
-our $VERSION = '7.711001';
+our $VERSION = '8.00';
 
 my %Default_Plugins = (
-    client      => [ 'Search::Elasticsearch::Client',       '7_0::Direct' ],
+    client      => [ 'Search::Elasticsearch::Client',       '8_0::Direct' ],
     cxn_factory => [ 'Search::Elasticsearch::Cxn::Factory', '' ],
     cxn_pool    => [ 'Search::Elasticsearch::CxnPool',      'Static' ],
     logger      => [ 'Search::Elasticsearch::Logger',       'LogAny' ],
@@ -79,7 +79,7 @@ Search::Elasticsearch - The official client for Elasticsearch
 
 =head1 VERSION
 
-version 7.711001
+version 8.00
 
 =head1 SYNOPSIS
 
@@ -582,7 +582,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Elasticsearch BV.
+This software is Copyright (c) 2022 by Elasticsearch BV.
 
 This is free software, licensed under:
 

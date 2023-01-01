@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package App::Cronjob 1.200012;
+package App::Cronjob 1.200013;
 # ABSTRACT: wrap up programs to be run as cron jobs
 
 use Digest::MD5 qw(md5_hex);
@@ -263,7 +263,7 @@ END_TEMPLATE
 }
 
 {
-  package App::Cronjob::Exception 1.200012;
+  package App::Cronjob::Exception 1.200013;
 
   sub new {
     my ($class, $type, $text, $extra) = @_;
@@ -285,7 +285,7 @@ App::Cronjob - wrap up programs to be run as cron jobs
 
 =head1 VERSION
 
-version 1.200012
+version 1.200013
 
 =head1 PERL VERSION
 
@@ -309,11 +309,11 @@ For a full description of the program's behavior, consult L<cronjob>.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords chromatic Mark Jason Dominus Rob N ★
+=for stopwords chromatic Mark Jason Dominus Ricardo Signes Rob N ★
 
 =over 4
 
@@ -324,6 +324,10 @@ chromatic <chromatic@wgz.org>
 =item *
 
 Mark Jason Dominus <mjd@plover.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

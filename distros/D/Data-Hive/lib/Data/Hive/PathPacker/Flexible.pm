@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Data::Hive::PathPacker::Flexible 1.014;
+package Data::Hive::PathPacker::Flexible 1.015;
 # ABSTRACT: a path packer that can be customized with callbacks
 
 use parent 'Data::Hive::PathPacker';
@@ -101,7 +101,7 @@ Data::Hive::PathPacker::Flexible - a path packer that can be customized with cal
 
 =head1 VERSION
 
-version 1.014
+version 1.015
 
 =head1 DESCRIPTION
 
@@ -109,10 +109,10 @@ This class provides the Data::Hive::PathPacker interface, and the way in which
 paths are packed and unpacked can be defined by callbacks set during
 initialization.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has a long-term perl support period.  That means it will not
-require a version of perl released fewer than five years ago.
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
@@ -161,7 +161,7 @@ Hans Dieter Pearcey <hdp@cpan.org>
 
 =item *
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =back
 

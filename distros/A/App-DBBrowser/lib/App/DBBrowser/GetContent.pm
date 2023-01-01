@@ -106,8 +106,12 @@ sub get_content {
                     }
                     elsif ( $sf->{i}{gc}{source_type} eq 'file' ) {
                         $parse_mode_idx = $sf->{o}{insert}{parse_mode_input_file};
-                        $open_mode = '<:encoding(' . $sf->{o}{insert}{file_encoding} . ')';
-                        #
+                        if ( length $sf->{o}{insert}{file_encoding} ) { ##
+                            $open_mode = '<:encoding(' . $sf->{o}{insert}{file_encoding} . ')';
+                        }
+                        else {
+                            $open_mode = '<';
+                        }
                     }
                     $sql->{insert_into_args} = [];
                     if ( $parse_mode_idx < 3 && -T $file_fs ) {

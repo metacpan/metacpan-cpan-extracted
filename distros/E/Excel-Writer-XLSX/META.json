@@ -4,7 +4,7 @@
       "John McNamara (jmcnamara@cpan.org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -43,10 +43,10 @@
       "bugtracker" : {
          "web" : "http://github.com/jmcnamara/excel-writer-xlsx/issues"
       },
-      "homepage" : "http://jmcnamara.github.com/excel-writer-xlsx/",
+      "homepage" : "http://github.com/jmcnamara/excel-writer-xlsx",
       "repository" : {
          "url" : "http://github.com/jmcnamara/excel-writer-xlsx"
       }
    },
-   "version" : "1.09"
+   "version" : "1.10"
 }

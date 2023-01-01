@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Sub::Exporter::ForMethods;
+package Sub::Exporter::ForMethods 0.100055;
 # ABSTRACT: helper routines for using Sub::Exporter to build methods
-$Sub::Exporter::ForMethods::VERSION = '0.100054';
+
 use Scalar::Util ();
 use Sub::Util ();
 
@@ -144,7 +144,7 @@ Sub::Exporter::ForMethods - helper routines for using Sub::Exporter to build met
 
 =head1 VERSION
 
-version 0.100054
+version 0.100055
 
 =head1 SYNOPSIS
 
@@ -201,10 +201,10 @@ After MyLibrary is compiled, C<namespace::autoclean> will remove C<tan> and
 C<trunc> as foreign contaminants, but will leave C<read_file> in place.  It
 will also remove C<method_installer>, an added win.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has a long-term perl support period.  That means it will not
-require a version of perl released fewer than five years ago.
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
@@ -232,7 +232,7 @@ package.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 CONTRIBUTOR
 
@@ -242,7 +242,7 @@ Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo Signes.
+This software is copyright (c) 2022 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

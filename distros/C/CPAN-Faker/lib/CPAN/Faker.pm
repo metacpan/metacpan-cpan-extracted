@@ -1,4 +1,4 @@
-package CPAN::Faker 0.011;
+package CPAN::Faker 0.012;
 use v5.14.0;
 use Moose;
 # ABSTRACT: build a bogus CPAN instance for testing
@@ -488,7 +488,7 @@ CPAN::Faker - build a bogus CPAN instance for testing
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -512,11 +512,12 @@ pretty big chunk of data to deal with, CPAN::Faker lets you build a fake
 CPAN-like directory tree out of simple descriptions of the distributions that
 should be in your fake CPAN.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has the same support period as perl itself:  it supports the two
-most recent versions of perl.  (That is, if the most recently released version
-is v5.40, then this module should work on both v5.40 and v5.38.)
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
@@ -627,11 +628,11 @@ construct an archive, index the author and (maybe) the contents.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Hans Dieter Pearcey Randy Stauner
+=for stopwords Hans Dieter Pearcey Randy Stauner Ricardo Signes
 
 =over 4
 
@@ -642,6 +643,10 @@ Hans Dieter Pearcey <hdp@pobox.com>
 =item *
 
 Randy Stauner <rwstauner@cpan.org>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =back
 

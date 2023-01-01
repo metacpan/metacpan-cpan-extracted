@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::HTTP;
 # ABSTRACT: Network controller for Neo4j HTTP
-$Neo4j::Driver::Net::HTTP::VERSION = '0.31';
+$Neo4j::Driver::Net::HTTP::VERSION = '0.33';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -130,6 +130,9 @@ sub _run {
 # request method. Accept headers are cached in $self->{accept_for}.
 sub _accept_for {
 	my ($self, $method) = @_;
+	
+	$self->{want_jolt} = 'v1' if ! defined $self->{want_jolt}
+		&& $self->{server_info} && $self->{server_info}->{version} =~ m{^Neo4j/4\.[234]\.};
 	
 	# GET requests may fail if Neo4j sees clients that support Jolt, see neo4j #12644
 	my @modules = @RESULT_MODULES;

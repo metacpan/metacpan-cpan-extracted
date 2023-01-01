@@ -36,17 +36,21 @@ my %green = qw(-bg green -fg white);
 my %white = qw(-fg black);
 
 my $ml = $mw->Scrolled('SMListbox',
-    -scrollbars => 'osoe',
+    -scrollbars => 'ose',
+    -headerbackground => 'blue', 
+    -headerforeground => 'white',
     -background => 'white', 
     -foreground => 'blue',
     -width => 575,
     -highlightthickness => 2,
-#    -width => 0,
     -selectmode => 'browse',
     -sortable => 1,
-    -bd=>2,
+    -moveable => 1,
+    -resizeable => 1,
+    -takefocus => 1,
     -relief=>'sunken',
     -fillcolumn => 6,
+    -focuscolumn => 6,
     -columns=>[
         [qw/-text ~Mode -textwidth 10/, %red],
         [qw/-text ~Link -textwidth 7/, %green, 
@@ -57,13 +61,13 @@ my $ml = $mw->Scrolled('SMListbox',
             -comparecmd => sub {$_[0] <=> $_[1]}],
         [qw/-text M~time/, %green, 
             -comparecmd => \&compareDate],
-        [qw/-text ~Name/, %white]
+        [qw/-text ~Name -textwidth 20/, %white]
  ]);
 
 print $ml ? "ok 2\n" : "not ok 2 ($@$? - widget not created?!)\n";
 
-$ml->columnHide(1);
-$ml->columnHide(3);
+#$ml->columnHide(1);
+#$ml->columnHide(3);
 
 my ($o, @s) = $ml->getSortOrder();
 
@@ -91,6 +95,22 @@ $f->Button(
         }
 })->pack(qw/-side left -anchor w/);
 
+	$stateBtn = $f->Button(   #MAIN WINDOW BUTTON TO TOGGLE STATE.
+		-text => 'State', 
+		-underline => 0,
+		-command => sub {
+			my $state = $ml->cget('-state');
+			my $newstate;
+			if ($state =~ /normal/) {
+				$newstate = 'disabled';
+			} else {
+				$newstate = 'normal';
+			}
+			$ml->configure('-state' => $newstate);
+			$stateBtn->configure('-text' => $newstate);
+		}
+	)->pack(qw/-side left -anchor w/);
+
 # Put the SMListbox widget on the bottom of the main window.
 $ml->pack(-expand=>1, -fill=>'both', -anchor=>'w');
 
@@ -114,6 +134,7 @@ $ml->bindRows('<ButtonRelease-1>',
 # Start by showing the current directory.
 directory (".");
 $ml->sort(1, 4);
+$ml->activate(0);  #RESET ACTIVE ELEMENT (SINCE WE SORTED).
 
 print "ok 4\n";
 

@@ -6,7 +6,7 @@ use Renard::Incunabula::Common::Setup;
 use Intertangle::API::Gtk3;
 use Gtk3;
 
-plan Gtk3::init_check
+plan Gtk3::init_check()
 	? ( tests    => 1 )
 	: ( skip_all => 'Could not init GTK' );
 

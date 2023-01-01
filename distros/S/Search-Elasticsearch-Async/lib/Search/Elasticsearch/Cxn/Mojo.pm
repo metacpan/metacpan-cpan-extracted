@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Cxn::Mojo;
-$Search::Elasticsearch::Cxn::Mojo::VERSION = '7.711001';
+$Search::Elasticsearch::Cxn::Mojo::VERSION = '8.00';
 use Mojo::UserAgent();
 use Promises qw(deferred);
 use Try::Tiny;
@@ -123,7 +123,7 @@ Search::Elasticsearch::Cxn::Mojo - An async Cxn implementation which uses Mojo::
 
 =head1 VERSION
 
-version 7.711001
+version 8.00
 
 =head1 DESCRIPTION
 
@@ -309,7 +309,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Elasticsearch BV.
+This software is Copyright (c) 2022 by Elasticsearch BV.
 
 This is free software, licensed under:
 

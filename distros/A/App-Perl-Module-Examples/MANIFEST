@@ -23,5 +23,6 @@ README
 SIGNATURE
 t/App-Perl-Module-Examples/01-use.t
 t/App-Perl-Module-Examples/02-version.t
+t/App-Perl-Module-Examples/03-new.t
 xt/App-Perl-Module-Examples/01-pod_coverage.t
 xt/App-Perl-Module-Examples/02-pod.t

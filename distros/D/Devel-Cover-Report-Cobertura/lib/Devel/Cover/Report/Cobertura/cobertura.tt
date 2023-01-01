@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+[%-
+  pj = project;
+  m  = project.metrics;
+  line_rate = m.coveredstatements / m.statements;
+  func_rate = m.coveredmethods / m.methods;
+  branch_rate = m.coveredconditionals / m.conditionals;
+%]
+<coverage line-rate="[% line_rate %]" function-rate="[% func_rate %]" branch-rate="[% branch_rate %]" lines-covered="[% m.coveredstatements %]" branches-covered="[% m.coveredconditionals %]" functions-covered="[% m.coveredmethods %]">
+  <sources>
+    <source>/</source>
+  </sources>
+  <packages>
+  [%- 
+      FOREACH package IN pj.packages;
+          SET p = package.metrics;
+  %]
+    <package name = "[% package.name_dotted | html_entity %]">
+    [%- FOREACH file IN package.files;
+        SET f = file.metrics;
+    %]
+      <classes>
+      [%- FOREACH class IN file.classes; SET c = class.metrics; %] [% IF c.statements > 0 %]
+        <class name="[% class.name_dotted | html_entity %]" filename="[% file.name | html_entity %]">
+          <lines>
+          [%- FOREACH line IN class.lines %] [% SET hit = -1 %] [%- FOREACH statement IN line.criteria.statement; %] [% IF statement.covered > hit ; %] [% SET hit = statement.covered %] [% END %] [% END %][% IF hit > -1 %]
+            <line number="[% line.number %]" hits="[% hit %]"/>[% END %][% END %]
+          </lines>
+        </class>[% END %][% END %]
+      </classes>[% END %]
+    </package>[% END %]
+  </packages>
+</coverage>

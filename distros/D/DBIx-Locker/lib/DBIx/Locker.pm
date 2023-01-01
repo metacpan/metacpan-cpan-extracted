@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.008;
 
-package DBIx::Locker 1.102;
+package DBIx::Locker 1.103;
 # ABSTRACT: locks for db resources that might not be totally insane
 
 use Carp ();
@@ -261,7 +261,7 @@ DBIx::Locker - locks for db resources that might not be totally insane
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 DESCRIPTION
 
@@ -364,11 +364,11 @@ See the C<sql> directory included in this dist for DDL for your database.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Arthur Axel 'fREW' Schmidt Chris Nehren Hans Dieter Pearcey Matthew Horsfall Rob N ★ Sergiy Borodych
+=for stopwords Arthur Axel 'fREW' Schmidt Chris Nehren Hans Dieter Pearcey Matthew Horsfall Ricardo Signes Rob N ★ Sergiy Borodych
 
 =over 4
 
@@ -390,6 +390,10 @@ Matthew Horsfall <wolfsage@gmail.com>
 
 =item *
 
+Ricardo Signes <rjbs@semiotic.systems>
+
+=item *
+
 Rob N ★ <robn@robn.io>
 
 =item *
@@ -400,7 +404,7 @@ Sergiy Borodych <sergiy.borodych@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

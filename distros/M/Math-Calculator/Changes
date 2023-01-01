@@ -1,5 +1,9 @@
 Release history for Math-Calculator
 
+1.023     2022-12-31 13:13:24-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 1.022     2013-09-28 21:45:13 America/New_York
           update packaging (for future updates for future teaching toolness)
 

@@ -88,3 +88,12 @@ Revision history for Perl extension Tk::HListbox.
 	- Fix cursor not being hidden when clicking on an HListbox that does not 
 	  have the keyboard focus and -takefocus is set to '' instead of 1. (in 
 	  which case the HListbox remains unfocused).
+2.60   Sat Dec 31, 2022
+	- Merge numerous patches, new functions & options from Jeff Stephens.
+	  (See docs for details)
+	- (hopefully) now works fully with "use strict".
+	- Fix left-tab (reverse) focus-traversal when widget is disabled, and 
+	  other minor focusing issues.
+	- Fix minor isues with user-set color options.
+	- Fix anchorSet() and a few other minor Listbox-compatability issues.
+	- Numerous code cleanups and documentation improvements.

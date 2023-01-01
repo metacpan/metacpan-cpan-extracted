@@ -9,6 +9,9 @@ use Cwd                   qw( realpath );
 use Encode                qw( encode decode );
 use File::Spec::Functions qw( catfile );
 
+#use String::Unescape  qw( unescape );             # required
+#use Text::CSV         qw( csv );                  # required
+
 use Term::Choose         qw();
 use Term::Choose::Screen qw( hide_cursor clear_screen );
 use Term::Form::ReadLine qw();
@@ -173,8 +176,24 @@ sub __on_table {
             if ( ! eval {
                 print 'Working ...' . "\r" if $sf->{o}{table}{progress_bar};
                 my $all_arrayref = $sf->__selected_statement_result( $sql );
+                my $open_mode;
+                if ( length $sf->{o}{export}{file_encoding} ) { ##
+                    $open_mode = '>:encoding(' . $sf->{o}{export}{file_encoding} . ')';
+                }
+                else {
+                    $open_mode = '>';
+                }
+                open my $fh, $open_mode, $file_fs or die $!;
+                require String::Unescape;
+                my $options = {
+                    map { $_ => String::Unescape::unescape( $sf->{o}{csv_out}{$_} ) }
+                    grep { defined $sf->{o}{csv_out}{$_} }
+                    keys %{$sf->{o}{csv_out}}
+                };
                 require Text::CSV;
-                Text::CSV::csv( in => $all_arrayref, out => $file_fs, encoding => $sf->{o}{export}{export_encoding} );
+                my $csv = Text::CSV->new( $options );
+                $csv->say( $fh, $_ ) for @$all_arrayref;
+                close $fh;
                 1 }
             ) {
                 $ax->print_error_message( $@ );

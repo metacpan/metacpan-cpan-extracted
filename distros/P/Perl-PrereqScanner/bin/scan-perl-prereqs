@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-package Perl::PrereqScanner::App 1.024;
+package Perl::PrereqScanner::App 1.025;
 # ABSTRACT: scan your working dir for likely prereqs
 
 use strict;
@@ -113,7 +113,7 @@ Perl::PrereqScanner::App - scan your working dir for likely prereqs
 
 =head1 VERSION
 
-version 1.024
+version 1.025
 
 =head1 SYNOPSIS
 
@@ -152,7 +152,7 @@ Jerome Quelin
 
 =item *
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =back
 

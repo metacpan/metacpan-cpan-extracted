@@ -1,5 +1,9 @@
 Revision history for String-TagString
 
+0.006     2022-12-31 15:48:03-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 0.005     2013-12-25 22:31:49-0500 America/New_York
           fix version number, repo links
 

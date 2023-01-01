@@ -10,7 +10,7 @@ use Carp();
 
 use base qw(Exporter);
 our @EXPORT_OK = qw(is_holiday holidays);
-our $VERSION   = '0.28';
+our $VERSION   = '0.29';
 
 sub _DEFAULT_STATE { return 'VIC' }
 
@@ -168,7 +168,7 @@ sub holidays {
             }
         }
         foreach my $holiday ( _compute_eight_hours_day($year) )
-        {                # TAS eight hours day
+        {    # TAS eight hours day
             $holidays{$holiday} = 'Eight Hours Day';
         }
     }
@@ -225,7 +225,7 @@ sub holidays {
                 $allowed =~ s/\s*//smxg;
                 if ( $allowed eq 'agfest' ) {
                     foreach my $holiday ( _compute_agfest($year) )
-                    {                                           # TAS Agfest
+                    {    # TAS Agfest
                         $holidays{$holiday} = 'Agfest';
                     }
                 }
@@ -239,9 +239,14 @@ sub holidays {
         }
     }
     else {
-        foreach my $holiday ( _compute_queens_bday($year) )
-        {    # Queens Birthday day
-            $holidays{$holiday} = 'Queens Birthday';
+        foreach my $holiday ( _compute_royal_bday($year) )
+        {    # King's Birthday day
+            if ( $year <= 2022 ) {
+                $holidays{$holiday} = q[Queen's Birthday];
+            }
+            else {
+                $holidays{$holiday} = q[King's Birthday];
+            }
         }
     }
     my $holiday_hashref;
@@ -269,14 +274,14 @@ sub holidays {
     }
     elsif ( $state eq 'SA' ) {
         foreach my $holiday ( _compute_nsw_sa_act_labour_day($year) )
-        {        # SA labour day
+        {    # SA labour day
             $holidays{$holiday} = 'Labour Day';
         }
     }
     elsif ( $state eq 'NT' ) {
         foreach
           my $holiday_hashref ( _compute_nt_show_day_hash( $year, \%params ) )
-        {        # NT regional show days
+        {    # NT regional show days
             $holidays{ $holiday_hashref->{date} } =
               $holiday_hashref->{name};
         }
@@ -285,9 +290,14 @@ sub holidays {
         }
     }
     elsif ( $state eq 'WA' ) {
-        foreach my $holiday ( _compute_wa_queens_bday($year) )
+        foreach my $holiday ( _compute_wa_royal_bday($year) )
         {    # WA Queens Birthday day
-            $holidays{$holiday} = 'Queens Birthday';
+            if ( $year <= 2022 ) {
+                $holidays{$holiday} = q[Queen's Birthday];
+            }
+            else {
+                $holidays{$holiday} = q[King's Birthday];
+            }
         }
     }
     elsif ( $state eq 'ACT' ) {
@@ -353,17 +363,17 @@ sub holidays {
             && ( $params{include_bank_holiday} ) )
         {
             foreach my $holiday ( _compute_nsw_act_bank_holiday($year) )
-            {            # NSW bank holiday
+            {    # NSW bank holiday
                 $holidays{$holiday} = 'Bank Holiday';
             }
         }
         foreach my $holiday ( _compute_nsw_sa_act_labour_day($year) )
-        {                # NSW labour day
+        {        # NSW labour day
             $holidays{$holiday} = 'Labour Day';
         }
     }
     foreach my $holiday_hashref ( _compute_christmas_hash( $year, $state ) )
-    {                    # christmas day + boxing day
+    {            # christmas day + boxing day
         $holidays{ $holiday_hashref->{date} } = $holiday_hashref->{name};
     }
     return ( \%holidays );
@@ -794,7 +804,7 @@ sub _compute_wa_foundation_day {    # first monday in june
     return ( sprintf '%02d%02d', ( $month + 1 ), $day );
 }
 
-sub _compute_queens_bday {    # second monday in june
+sub _compute_royal_bday {    # second monday in june
     my ($year)  = @_;
     my $day     = 1;
     my $month   = 5;
@@ -896,6 +906,7 @@ sub _compute_vic_grand_final_eve_day {    # i have no words ...
         2020 => { day => 23, month => 9 },    # Technically "Thank you" day.
         2021 => { day => 24, month => 8 },
         2022 => { day => 23, month => 8 },
+        2023 => { day => 22, month => 8 },
     );
     if ( $year < 2015 ) {
         return ();
@@ -1127,11 +1138,11 @@ sub _compute_nsw_sa_act_labour_day {    # first monday in october
     return ( sprintf '%02d%02d', ( $month + 1 ), $day );
 }
 
-sub _compute_wa_queens_bday
+sub _compute_wa_royal_bday
 { # monday closest to 30 september???  Formula unknown. Seems to have a 9 day spread???
     my ($year) = @_;
     my ( $day, $month );
-    my %wa_queens_bday = (
+    my %wa_royal_bday = (
         2004 => { day => 4,  month => 9 },
         2005 => { day => 26, month => 8 },
         2006 => { day => 2,  month => 9 },
@@ -1152,15 +1163,20 @@ sub _compute_wa_queens_bday
         2021 => { day => 27, month => 8 },
         2022 => { day => 26, month => 8 },
         2023 => { day => 25, month => 8 },
+        2024 => { day => 23, month => 8 },
     );
-    if ( $wa_queens_bday{$year} ) {
-        $day   = $wa_queens_bday{$year}{day};
-        $month = $wa_queens_bday{$year}{month};
+    if ( $wa_royal_bday{$year} ) {
+        $day   = $wa_royal_bday{$year}{day};
+        $month = $wa_royal_bday{$year}{month};
     }
-    else {
+    elsif ( $year <= 2022 ) {
         Carp::croak(
             q[Don't know how to calculate Queen's Birthday in WA for this year]
         );
+    }
+    else {
+        Carp::croak(
+            q[Don't know how to calculate King's Birthday in WA for this year]);
     }
     return ( sprintf '%02d%02d', ( $month + 1 ), $day );
 }
@@ -1263,7 +1279,7 @@ Date::Holidays::AU - Determine Australian Public Holidays
 
 =head1 VERSION
  
-Version 0.28
+Version 0.29
 
 =head1 SYNOPSIS
 

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Transaction;
 # ABSTRACT: Logical container for an atomic unit of work
-$Neo4j::Driver::Transaction::VERSION = '0.31';
+$Neo4j::Driver::Transaction::VERSION = '0.33';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(
@@ -283,7 +283,7 @@ Neo4j::Driver::Transaction - Logical container for an atomic unit of work
 
 =head1 VERSION
 
-version 0.31
+version 0.33
 
 =head1 SYNOPSIS
 
@@ -487,12 +487,12 @@ L<Neo4j::Driver::Plugin/"USE OF INTERNAL APIS">.
 =item * L<Neo4j::Driver::B<Result>>
 
 =item * Equivalent documentation for the official Neo4j drivers:
-L<Transaction (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/Transaction.html>,
-L<Transaction (JavaScript)|https://neo4j.com/docs/api/javascript-driver/4.4/class/lib6/transaction.js~Transaction.html>,
-L<ITransaction (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.4/html/b64c7dfe-87e9-8b85-5a02-8ff03800b67b.htm>,
-L<Sessions & Transactions (Python)|https://neo4j.com/docs/api/python-driver/current/api.html#transaction>
+L<Transaction (Java)|https://neo4j.com/docs/api/java-driver/5.2/org.neo4j.driver/org/neo4j/driver/Transaction.html>,
+L<Transaction (JavaScript)|https://neo4j.com/docs/api/javascript-driver/5.2/class/lib6/transaction.js~Transaction.html>,
+L<ITransaction (.NET)|https://neo4j.com/docs/api/dotnet-driver/5.2/html/b64c7dfe-87e9-8b85-5a02-8ff03800b67b.htm>,
+L<Sessions & Transactions (Python)|https://neo4j.com/docs/api/python-driver/5.2/api.html#transaction>
 
-=item * Neo4j L<Transactional Cypher HTTP API|https://neo4j.com/docs/http-api/4.4/actions/>
+=item * Neo4j L<Transactional Cypher HTTP API|https://neo4j.com/docs/http-api/5/actions/>
 
 =item * L<Feature::Compat::Try>
 
@@ -502,12 +502,15 @@ L<Sessions & Transactions (Python)|https://neo4j.com/docs/api/python-driver/curr
 
 Arne Johannessen <ajnn@cpan.org>
 
+If you contact me by email, please make sure you include the word
+"Perl" in your subject header to help beat the spam filters.
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0 or (at your option) the same terms
+as the Perl 5 programming language system itself.
 
 =cut

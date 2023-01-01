@@ -1,0 +1,51 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '6.78'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Encode' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Archive::Tar' => '0',
+                                      'Carp' => '0',
+                                      'Cwd' => '0',
+                                      'Data::Section' => '0',
+                                      'File::ShareDir' => '1',
+                                      'File::Spec' => '0',
+                                      'File::Spec::Unix' => '0',
+                                      'Moose' => '0.90',
+                                      'Moose::Role' => '0',
+                                      'Moose::Util::TypeConstraints' => '0',
+                                      'MooseX::Types' => '0',
+                                      'MooseX::Types::Moose' => '0',
+                                      'Path::Class' => '0',
+                                      'Path::Class::File' => '0',
+                                      'autodie' => '0',
+                                      'namespace::autoclean' => '0',
+                                      'perl' => '5.012',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Data::Section' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0.96',
+                                   'lib' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

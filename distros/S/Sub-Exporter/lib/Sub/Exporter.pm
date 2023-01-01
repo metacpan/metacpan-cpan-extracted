@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package Sub::Exporter;
 # ABSTRACT: a sophisticated exporter for custom-built routines
-$Sub::Exporter::VERSION = '0.988';
+$Sub::Exporter::VERSION = '0.989';
 use Carp ();
 use Data::OptList 0.100 ();
 use Params::Util 0.14 (); # _CODELIKE
@@ -1102,7 +1102,7 @@ Sub::Exporter - a sophisticated exporter for custom-built routines
 
 =head1 VERSION
 
-version 0.988
+version 0.989
 
 =head1 SYNOPSIS
 
@@ -1243,10 +1243,10 @@ How much easier to write:
 and to have at one's disposal C<offense> and C<trig_sin> -- not to mention
 C<trig_cos> and C<trig_tan>.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has a long-term perl support period.  That means it will not
-require a version of perl released fewer than five years ago.
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
@@ -1718,11 +1718,11 @@ notified of progress on your bug as I make changes.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords David Steinbrunner everybody George Hartzell Hans Dieter Pearcey Karen Etheridge
+=for stopwords David Steinbrunner everybody George Hartzell Hans Dieter Pearcey Karen Etheridge Ricardo Signes
 
 =over 4
 
@@ -1745,6 +1745,10 @@ Hans Dieter Pearcey <hdp@cpan.org>
 =item *
 
 Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =back
 

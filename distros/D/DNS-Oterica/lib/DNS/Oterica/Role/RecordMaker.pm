@@ -1,6 +1,6 @@
 package DNS::Oterica::Role::RecordMaker;
 # ABSTRACT: a delegation class for the DNSO recordmaker.
-$DNS::Oterica::Role::RecordMaker::VERSION = '0.313';
+$DNS::Oterica::Role::RecordMaker::VERSION = '0.314';
 use Moose::Role;
 
 use DNS::Oterica::RecordMaker::TinyDNS;
@@ -37,7 +37,7 @@ DNS::Oterica::Role::RecordMaker - a delegation class for the DNSO recordmaker.
 
 =head1 VERSION
 
-version 0.313
+version 0.314
 
 =head1 DESCRIPTION
 
@@ -62,11 +62,11 @@ The record maker, e.g. L<DNS::Oterica::RecordMaker::TinyDNS>.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

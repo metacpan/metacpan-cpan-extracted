@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Net::Continental;
+package Net::Continental 0.017;
 # ABSTRACT: code to map countries to continents, esp. with nerd.dk dnsbl
-$Net::Continental::VERSION = '0.016';
+
 use Carp ();
 use Locale::Codes::Country ();
 use Net::Continental::Zone;
@@ -396,7 +396,17 @@ Net::Continental - code to map countries to continents, esp. with nerd.dk dnsbl
 
 =head1 VERSION
 
-version 0.016
+version 0.017
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 NAME
 
@@ -430,7 +440,13 @@ The development of this code was sponsored by Pobox.com.  Thanks, Pobox!
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -6,8 +6,9 @@ use boolean qw(true false);
 
 use DateTime;
 use DateTime::Format::Natural;
+use DateTime::HiRes;
 use DateTime::TimeZone;
-use Test::More tests => 17;
+use Test::More tests => 18;
 
 eval { DateTime::Format::Natural->new(lang => 'en') };
 ok(!$@, 'lang');
@@ -50,4 +51,7 @@ eval { DateTime::Format::Natural->new(daytime => {}) };
 ok(!$@, 'daytime');
 
 eval { DateTime::Format::Natural->new(datetime => DateTime->now) };
-ok(!$@, 'datetime');
+ok(!$@, 'datetime with DateTime object');
+
+eval { DateTime::Format::Natural->new(datetime => DateTime::HiRes->now) };
+ok(!$@, 'datetime with DateTime::HiRes object');

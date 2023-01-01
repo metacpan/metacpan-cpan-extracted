@@ -261,7 +261,7 @@ Sub::Exporter::Tutorial - a friendly guide to exporting with Sub::Exporter
 
 =head1 VERSION
 
-version 0.988
+version 0.989
 
 =head1 DESCRIPTION
 
@@ -505,10 +505,10 @@ you can supply a generator for a group which returns a hashref of names and
 code references.  This generator is passed all the usual data, and the group
 may receive the usual C<-prefix> or C<-suffix> arguments.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has a long-term perl support period.  That means it will not
-require a version of perl released fewer than five years ago.
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
@@ -527,7 +527,7 @@ L<Sub::Exporter> for complete documentation and references to other exporters
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

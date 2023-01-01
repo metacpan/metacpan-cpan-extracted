@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Sort::ByExample;
+package Sort::ByExample 0.008;
 # ABSTRACT: sort lists to look like the example you provide
-$Sort::ByExample::VERSION = '0.007';
+
 #pod =head1 SYNOPSIS
 #pod
 #pod   use Sort::ByExample
@@ -98,7 +98,7 @@ use Sub::Exporter -setup => {
 #pod
 #pod If given named arguments as C<%arg>, valid arguments are:
 #pod
-#pod   fallback - a sub to sort data 
+#pod   fallback - a sub to sort data
 #pod   xform    - a sub to transform each item into the key to sort
 #pod
 #pod If no other named arguments are needed, the fallback sub may be given in place
@@ -270,7 +270,7 @@ Sort::ByExample - sort lists to look like the example you provide
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -337,6 +337,16 @@ Sort::ByExample makes this easy:  you give it a list of example input it should
 expect, pre-sorted, and it will sort things that way.  If you want, you can
 provide a fallback sub for sorting unknown or equally-positioned data.
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 METHODS
 
 =head2 sorter
@@ -358,7 +368,7 @@ are sorted by the fallback sub, if given.
 
 If given named arguments as C<%arg>, valid arguments are:
 
-  fallback - a sub to sort data 
+  fallback - a sub to sort data
   xform    - a sub to transform each item into the key to sort
 
 If no other named arguments are needed, the fallback sub may be given in place
@@ -431,7 +441,23 @@ provide a way to say "these things occur after any unknowns"
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Olaf Alders Ricardo Signes
+
+=over 4
+
+=item *
+
+Olaf Alders <olaf@wundersolutions.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

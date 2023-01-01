@@ -6,7 +6,7 @@ META.json
 META.yml
 Makefile.PL
 README
-dist.ini
+cpanfile
 lib/Neo4j/Driver.pm
 lib/Neo4j/Driver/Deprecations.pod
 lib/Neo4j/Driver/Net.pod
@@ -39,9 +39,11 @@ t/config.t
 t/deprecated.t
 t/experimental.t
 t/info.t
+t/jolt-mime.t
 t/jolt-types.t
 t/json-utf8.t
 t/lib/Neo4j_Test.pm
+t/lib/Neo4j_Test/EchoHTTP.pm
 t/lib/Neo4j_Test/MockHTTP.pm
 t/lib/Neo4j_Test/NetModulePlugin.pm
 t/lib/Neo4j_Test/Sim.pm

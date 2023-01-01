@@ -37,6 +37,15 @@ sub test_snakeCaseToCamelCase : Test(2) {
 
 # -----------------------------------------------------------------------------
 
+sub test_protectRegexChars : Test(1) {
+    my $self = shift;
+
+    my $val = Quiq::Converter->protectRegexChars('a\b.x{~Z');
+    $self->is($val,'a\\\\b\.x\{~Z');
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_strToHex : Test(1) {
     my $self = shift;
 

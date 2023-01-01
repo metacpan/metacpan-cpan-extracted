@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Perl::PrereqScanner::Scanner::Moose 1.024;
+package Perl::PrereqScanner::Scanner::Moose 1.025;
 # ABSTRACT: scan for Moose sugar indicators of required modules
 
 use Moose;
@@ -138,7 +138,7 @@ Perl::PrereqScanner::Scanner::Moose - scan for Moose sugar indicators of require
 
 =head1 VERSION
 
-version 1.024
+version 1.025
 
 =head1 DESCRIPTION
 
@@ -176,7 +176,7 @@ Jerome Quelin
 
 =item *
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =back
 

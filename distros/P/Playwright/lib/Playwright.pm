@@ -1,5 +1,5 @@
 package Playwright;
-$Playwright::VERSION = '1.251';
+$Playwright::VERSION = '1.291';
 use strict;
 use warnings;
 
@@ -103,17 +103,19 @@ sub new ( $class, %options ) {
     my $timeout = $options{timeout} // 30;
     my $self    = bless(
         {
-            ua      => $options{ua} // LWP::UserAgent->new(),
+            ua      => $options{ua}   // LWP::UserAgent->new(),
+            host    => $options{host} // 'localhost',
             port    => $port,
             debug   => $options{debug},
-            cleanup => ( $options{cleanup} || !$options{port} ) // 1,
-            pid     => _start_server(
+            cleanup =>
+              ( $options{cleanup} || !$options{port} || !$options{host} ) // 1,
+            pid => $options{host} ? "REUSE" : _start_server(
                 $port, $timeout, $options{debug}, $options{cleanup} // 1
             ),
             parent  => $$ // 'bogus',    # Oh lawds, this can be undef sometimes
             timeout => $timeout,
         },
-        $class
+        $class,
     );
 
     $self->_check_and_build_spec();
@@ -126,7 +128,8 @@ sub _check_and_build_spec ($self) {
     return $spec if ref $spec eq 'HASH';
 
     $spec =
-      Playwright::Util::request( 'GET', 'spec', $self->{port}, $self->{ua}, );
+      Playwright::Util::request( 'GET', 'spec', $self->{host}, $self->{port},
+        $self->{ua}, );
 
     confess(
         "Could not retrieve Playwright specification.  Check that your playwright installation is correct and complete."
@@ -144,7 +147,7 @@ sub launch ( $self, %args ) {
     delete $args{command};
 
     my $msg = Playwright::Util::request(
-        'POST', 'session', $self->{port}, $self->{ua},
+        'POST', 'session', $self->{host}, $self->{port}, $self->{ua},
         type => delete $args{type},
         args => [ \%args ]
     );
@@ -158,7 +161,7 @@ sub launch ( $self, %args ) {
 
 sub server ( $self, %args ) {
     return Playwright::Util::request(
-        'POST', 'server', $self->{port}, $self->{ua},
+        'POST', 'server', $self->{host}, $self->{port}, $self->{ua},
         object  => $args{browser}{guid},
         command => $args{command},
     );
@@ -225,7 +228,8 @@ sub quit ($self) {
     $self->{killed} = 1;
     print "Attempting to terminate server process...\n" if $self->{debug};
 
-    Playwright::Util::request( 'GET', 'shutdown', $self->{port}, $self->{ua} );
+    Playwright::Util::request( 'GET', 'shutdown', $self->{host}, $self->{port},
+        $self->{ua} );
 
     # 0 is always WCONTINUED, 1 is always WNOHANG, and POSIX is an expensive import
     # When 0 is returned, the process is still active, so it needs more persuasion
@@ -304,7 +308,7 @@ Playwright - Perl client for Playwright
 
 =head1 VERSION
 
-version 1.251
+version 1.291
 
 =head1 SYNOPSIS
 
@@ -489,6 +493,13 @@ A convenience script has been provided to clean up these orphaned instances, `re
 To save on memory, this is a good idea.  Pass the 'port' argument to the constructor, and we'll re-use anything listening on that port locally, and be sure to use it when starting up.
 
 This will also set the cleanup flag to false, so be sure you run `reap_playwright_servers` when you are sure that all testing on this server is done.
+
+=head2 Running against remote playwright servers
+
+Pass the 'host' along with the 'port' argument to the constructor in order to use an instance of playwright_server running on another host.
+This will naturally set the cleanup flag to false; it is the server operator's responsibility to reap the server when complete.
+
+A systemd service file, and Makefile are provided in the service/ folder of this module's git repository which will install playwright_server as a user-mode service on the PORT variable.
 
 =head2 Taking videos, Making Downloads
 

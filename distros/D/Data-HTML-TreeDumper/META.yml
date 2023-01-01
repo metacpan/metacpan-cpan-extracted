@@ -28,10 +28,11 @@ no_index:
 provides:
   Data::HTML::TreeDumper:
     file: lib/Data/HTML/TreeDumper.pm
-    version: v0.0.3
+    version: v0.0.4
 requires:
   Const::Fast: '0'
   Encode: '0'
+  HTML::AutoTag: '0'
   HTML::Entities: '0'
   Ref::Util: '0'
   YAML::Syck: '0'
@@ -41,7 +42,7 @@ resources:
   bugtracker: https://github.com/TakeAsh/p-Data-HTML-TreeDumper/issues
   homepage: https://github.com/TakeAsh/p-Data-HTML-TreeDumper
   repository: https://github.com/TakeAsh/p-Data-HTML-TreeDumper.git
-version: v0.0.3
+version: v0.0.4
 x_authority: cpan:TAKEASH
 x_contributors:
   - 'TakeAsh <take@TakeAsh.net>'

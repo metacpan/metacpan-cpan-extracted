@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/Intertangle/API/Gtk3/*.t t/Intertangle/API/Gtk3/Helper/Gtk3/*.t"
   }

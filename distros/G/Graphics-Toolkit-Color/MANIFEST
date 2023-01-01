@@ -15,3 +15,4 @@ lib/Graphics/Toolkit/Color/Value.pm
 t/01_color_value.t
 t/02_color_constant.t
 t/03_color.t
+xt/author/pod-syntax.t

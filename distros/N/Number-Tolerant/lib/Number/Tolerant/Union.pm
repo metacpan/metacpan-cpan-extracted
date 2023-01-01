@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Number::Tolerant::Union 1.709;
+package Number::Tolerant::Union 1.710;
 # ABSTRACT: unions of tolerance ranges
 
 #pod =head1 SYNOPSIS
@@ -149,7 +149,7 @@ Number::Tolerant::Union - unions of tolerance ranges
 
 =head1 VERSION
 
-version 1.709
+version 1.710
 
 =head1 SYNOPSIS
 
@@ -247,7 +247,7 @@ Who knows.  Collapsing overlapping options, probably.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

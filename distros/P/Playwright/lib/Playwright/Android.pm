@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Android;
-$Playwright::Android::VERSION = '1.251';
+$Playwright::Android::VERSION = '1.291';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,6 +22,26 @@ sub spec {
     return $Playwright::spec->{'Android'}{members};
 }
 
+sub setDefaultTimeout {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'setDefaultTimeout',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub connect {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'connect',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub devices {
     my $self = shift;
     return $self->_api_request(
@@ -32,11 +52,11 @@ sub devices {
     );
 }
 
-sub setDefaultTimeout {
+sub launchServer {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'setDefaultTimeout',
+        command => 'launchServer',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -86,7 +106,7 @@ Playwright::Android - Automatically generated class for Playwright::Android
 
 =head1 VERSION
 
-version 1.251
+version 1.291
 
 =head1 CONSTRUCTOR
 
@@ -97,17 +117,29 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
+=head2 setDefaultTimeout(@args)
+
+Execute the Android::setDefaultTimeout playwright routine.
+
+See L<https://playwright.dev/api/class-Android#Android-setDefaultTimeout> for more information.
+
+=head2 connect(@args)
+
+Execute the Android::connect playwright routine.
+
+See L<https://playwright.dev/api/class-Android#Android-connect> for more information.
+
 =head2 devices(@args)
 
 Execute the Android::devices playwright routine.
 
 See L<https://playwright.dev/api/class-Android#Android-devices> for more information.
 
-=head2 setDefaultTimeout(@args)
+=head2 launchServer(@args)
 
-Execute the Android::setDefaultTimeout playwright routine.
+Execute the Android::launchServer playwright routine.
 
-See L<https://playwright.dev/api/class-Android#Android-setDefaultTimeout> for more information.
+See L<https://playwright.dev/api/class-Android#Android-launchServer> for more information.
 
 =head2 on(@args)
 

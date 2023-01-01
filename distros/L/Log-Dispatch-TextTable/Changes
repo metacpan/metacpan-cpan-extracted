@@ -1,5 +1,8 @@
 Revision history for Log-Dispatch-Table
 
+0.033     2022-12-30 14:20:23-05:00 America/New_York
+        - update packaging, metadata, require v5.12
+
 0.032     2013-09-21 15:58:01 Asia/Tokyo
         - update packaging, metadata
 

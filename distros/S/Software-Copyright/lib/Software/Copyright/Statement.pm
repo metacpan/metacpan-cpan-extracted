@@ -8,7 +8,7 @@
 #   The GNU General Public License, Version 3, June 2007
 #
 package Software::Copyright::Statement;
-$Software::Copyright::Statement::VERSION = '0.005';
+$Software::Copyright::Statement::VERSION = '0.007';
 use 5.20.0;
 use warnings;
 
@@ -142,6 +142,19 @@ sub add_years ($self, $range) {
     return $self;
 }
 
+sub contains($self, $other) {
+    return 0 unless $self->identifier eq $other->identifier;
+
+    my $span = Array::IntSpan->new;
+    $span->set_range_as_string(scalar $self->span->get_range_list, $self->identifier);
+    # now $span is a copy of $self->span. Merge $other-span.
+    $span->set_range_as_string(scalar $other->span->get_range_list, $self->identifier);
+    $span->consolidate;
+
+    # if other span is contained in self->span, the merged result is not changed.
+    return scalar $span->get_range_list eq scalar $self->span->get_range_list ? 1 : 0;
+}
+
 1;
 
 # ABSTRACT: a copyright statement for one owner
@@ -158,7 +171,7 @@ Software::Copyright::Statement - a copyright statement for one owner
 
 =head1 VERSION
 
-version 0.005
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -179,6 +192,10 @@ version 0.005
 
  # stringification
  "$statement"; # => is '2015-2022, Joe <joe@example.com>'
+
+ # test if a statement "contains" another one
+ my $st_2020 = Software::Copyright::Statement->new('2020, Joe <joe@example.com>');
+ $statement->contains($st_2020); # => is '1'
 
 =head1 DESCRIPTION
 
@@ -255,6 +272,26 @@ This method returns C<$self>
 
 Returns a string containing a year range (if any), a name and email
 (if any) of the copyright owner.
+
+=head2 contains
+
+Return 1 if the other statement is contained in current statement,
+i.e. owner or record are identical and other year range is contained
+in current year range.
+
+For instance:
+
+=over
+
+=item *
+
+C<2016, Joe> is contained in C<2014-2020, Joe>
+
+=item *
+
+C<2010, Joe> is B<not> contained in C<2014-2020, Joe>
+
+=back
 
 =head2 Operator overload
 

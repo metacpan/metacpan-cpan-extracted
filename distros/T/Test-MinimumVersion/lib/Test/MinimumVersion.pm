@@ -1,8 +1,8 @@
-use 5.006;
+use v5.8;
 use strict;
 use warnings;
 package Test::MinimumVersion;
-$Test::MinimumVersion::VERSION = '0.101082';
+$Test::MinimumVersion::VERSION = '0.101083';
 # ABSTRACT: does your code require newer perl than you think?
 use base 'Exporter';
 
@@ -46,7 +46,7 @@ sub import {
 
 sub _objectify_version {
   my ($version) = @_;
-  $version = eval { $version->isa('version') } 
+  $version = eval { $version->isa('version') }
            ? $version
            : version->new($version);
 }
@@ -251,7 +251,7 @@ Test::MinimumVersion - does your code require newer perl than you think?
 
 =head1 VERSION
 
-version 0.101082
+version 0.101083
 
 =head1 SYNOPSIS
 
@@ -260,6 +260,16 @@ Example F<minimum-perl.t>:
   #!perl
   use Test::MinimumVersion;
   all_minimum_version_ok('5.008');
+
+=head1 PERL VERSION
+
+This library should run on perls released even an extremely long time ago.  It
+should work on any version of perl released in the last ten years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 FUNCTIONS
 
@@ -333,7 +343,7 @@ Ricardo Signes
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ricardo SIGNES Steve Hay
+=for stopwords Ricardo SIGNES Signes Steve Hay
 
 =over 4
 
@@ -343,7 +353,7 @@ Ricardo SIGNES <rjbs@codesimply.com>
 
 =item *
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

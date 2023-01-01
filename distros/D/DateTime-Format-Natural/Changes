@@ -1,5 +1,17 @@
 Revision history for Perl extension DateTime::Format::Natural.
 
+1.14  2022-12-30  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+1.13_02  2022-12-29  <schubiger@cpan.org>
+
+ - Distinguish between truncated/unaltered when testing.
+
+1.13_01  2022-08-06  <schubiger@cpan.org>
+
+ - Add support for millisecond(s) as parsable unit.
+
 1.13  2022-01-23  <schubiger@cpan.org>
 
  - Merged development version to stable.

@@ -484,7 +484,7 @@ sub __create {
     $sf->{i}{occupied_term_height} = @$menu + 2;  # + 2 for prompt and empty line
     if ( @{$sql->{insert_into_args}} ) {
         my $row_count = @{$sql->{insert_into_args}};
-        $prompt .= "\nInsert " . insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ) . " row";
+        $prompt .= "\nInsert " . insert_sep( $row_count, $sf->{i}{info_thsd_sep} ) . " row";
         if ( @{$sql->{insert_into_args}} > 1 ) {
             $prompt .= "s";
         }

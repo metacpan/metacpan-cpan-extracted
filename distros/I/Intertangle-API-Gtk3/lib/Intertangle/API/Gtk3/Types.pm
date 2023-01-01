@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::API::Gtk3::Types;
 # ABSTRACT: Type library for Gtk3
-$Intertangle::API::Gtk3::Types::VERSION = '0.006';
+$Intertangle::API::Gtk3::Types::VERSION = '0.007';
 use Type::Library 0.008 -base,
 	-declare => [qw(
 		SizeRequest
@@ -29,7 +29,7 @@ Intertangle::API::Gtk3::Types - Type library for Gtk3
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 EXTENDS
 

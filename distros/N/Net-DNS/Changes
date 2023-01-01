@@ -1,4 +1,12 @@
-$Id: Changes 1882 2022-10-04 19:53:44Z willem $                       -*-text-*-
+$Id: Changes 1893 2022-12-30 15:49:02Z willem $                       -*-text-*-
+
+
+**** 1.36 Dec 30, 2022
+
+	Adopt JSON as presentation notation for EDNS options.
+	Zero packet->id not allowed in outbound packet.
+	Remove deprecated 2-argument TSIG->create() method.
+	Revise TSIG test scripts and documentation.
 
 
 **** 1.35 Oct 4, 2022

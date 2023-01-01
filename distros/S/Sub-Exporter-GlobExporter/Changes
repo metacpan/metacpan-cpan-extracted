@@ -1,5 +1,9 @@
 Revision history for Sub-Exporter-GlobExporter
 
+0.006     2022-12-31 16:56:16-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 0.005     2015-11-04 23:27:05-05:00 America/New_York
           the "-as" argument can now be a scalar ref, to which the glob will be
           assigned

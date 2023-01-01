@@ -75,7 +75,7 @@ my %WriteMakefile = (
 		resources => {
 			repository => {
 				type => 'git',
-				url  => "$github.git",
+				url  => $github,
 				web  => $github,
 				},
 			bugtracker => {
@@ -95,6 +95,14 @@ my %WriteMakefile = (
 	test   => { TESTS    => 't/*.t t/*/*.t' },
 	);
 
+sub MY::dynamic {
+    #
+    # No dynamic library unless on MSWin32
+    #
+    package MY;
+    my ($self) = @_;
+    $^O eq 'MSWin32' ? $self->SUPER::dynamic : '';
+}
 
 sub arguments { \%WriteMakefile }
 
@@ -114,20 +122,6 @@ sub do_it {
 
 	WriteMakefile( %$arguments );
 	}
-
-BEGIN {
-use ExtUtils::MM_Unix;
-package ExtUtils::MM_Unix;
-
-my $original = \&ExtUtils::MM_Unix::init_dirscan;
-no warnings 'redefine';
-
-*init_dirscan = sub {
-	&$original;
-	delete $_[0]{PM}{'README.pod'};
-	$_[0];
-	};
-}
 
 no warnings;
 __PACKAGE__;

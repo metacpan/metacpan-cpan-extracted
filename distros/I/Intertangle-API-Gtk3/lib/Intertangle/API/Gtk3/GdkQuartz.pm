@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::API::Gtk3::GdkQuartz;
 # ABSTRACT: Load the GdkQuartz library
-$Intertangle::API::Gtk3::GdkQuartz::VERSION = '0.006';
+$Intertangle::API::Gtk3::GdkQuartz::VERSION = '0.007';
 use FFI::Platypus;
 use FFI::CheckLib 0.06;
 
@@ -42,7 +42,7 @@ Intertangle::API::Gtk3::GdkQuartz - Load the GdkQuartz library
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 AUTHOR
 

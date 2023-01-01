@@ -1,6 +1,6 @@
 package DNS::Oterica::RecordMaker::TinyDNS;
 # ABSTRACT: a tinydns recordmaker for DNSO.
-$DNS::Oterica::RecordMaker::TinyDNS::VERSION = '0.313';
+$DNS::Oterica::RecordMaker::TinyDNS::VERSION = '0.314';
 use Moose;
 
 #pod =head1 DESCRIPTION
@@ -430,7 +430,7 @@ DNS::Oterica::RecordMaker::TinyDNS - a tinydns recordmaker for DNSO.
 
 =head1 VERSION
 
-version 0.313
+version 0.314
 
 =head1 DESCRIPTION
 
@@ -511,11 +511,11 @@ Any tag given in the hashref will be included.  C<p> is required.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

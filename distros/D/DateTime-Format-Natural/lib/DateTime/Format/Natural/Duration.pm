@@ -6,7 +6,7 @@ use warnings;
 use DateTime::Format::Natural::Duration::Checks;
 use List::MoreUtils qw(all);
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub _pre_duration
 {
@@ -29,6 +29,9 @@ sub _pre_duration
             my $dt = $self->parse_datetime($present);
             ($dt, $self->{traces}[0]);
         };
+        if ($self->{running_tests}) {
+            $self->{insert}{truncated} = $self->_get_truncated;
+        }
     }
     elsif ($check_if->('first_to_last', \$extract)) {
         if (my ($complete) = $date_strings->[1] =~ $extract) {
@@ -45,12 +48,15 @@ sub _pre_duration
 sub _post_duration
 {
     my $self = shift;
-    my ($queue, $traces) = @_;
+    my ($queue, $traces, $truncated) = @_;
 
     my %assign = (
-        datetime => $queue,
-        trace    => $traces,
+        datetime  => $queue,
+        trace     => $traces,
+        truncated => $truncated,
     );
+    delete $assign{truncated} unless $self->{running_tests};
+
     if (all { exists $self->{insert}{$_} } keys %assign) {
         unshift @{$assign{$_}}, $self->{insert}{$_} foreach keys %assign;
     }

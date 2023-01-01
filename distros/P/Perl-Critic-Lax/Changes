@@ -1,5 +1,9 @@
 Revision history for Perl-Critic-Lax
 
+0.014     2022-12-31 14:02:33-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 0.013     2017-03-13 08:34:05-04:00 America/New_York
         - tiny doc change
 

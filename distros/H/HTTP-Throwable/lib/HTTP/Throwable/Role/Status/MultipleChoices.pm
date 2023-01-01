@@ -1,6 +1,6 @@
-package HTTP::Throwable::Role::Status::MultipleChoices;
+package HTTP::Throwable::Role::Status::MultipleChoices 0.028;
 our $AUTHORITY = 'cpan:STEVAN';
-$HTTP::Throwable::Role::Status::MultipleChoices::VERSION = '0.027';
+
 use Types::Standard qw(Str);
 
 use Moo::Role;
@@ -37,7 +37,7 @@ HTTP::Throwable::Role::Status::MultipleChoices - 300 Multiple Choices
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 DESCRIPTION
 
@@ -59,6 +59,16 @@ the specific URI for that representation in the Location field; user agents
 MAY use the Location field value for automatic redirection. This response is
 cacheable unless indicated otherwise.
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 ATTRIBUTES
 
 =head2 location
@@ -79,7 +89,7 @@ Stevan Little <stevan.little@iinteractive.com>
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =back
 

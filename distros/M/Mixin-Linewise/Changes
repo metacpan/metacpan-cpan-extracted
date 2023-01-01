@@ -1,5 +1,8 @@
 Changelog for Mixin-Linewise
 
+0.111     2022-12-31 21:09:24-05:00 America/New_York
+        - update author information
+
 0.110     2021-06-22 22:27:07-04:00 America/New_York
         - tweak the file test again to exclude directories; (is this going to
           turn into something more convoluted in several releases? probably)

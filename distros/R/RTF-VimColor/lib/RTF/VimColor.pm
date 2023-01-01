@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package RTF::VimColor;
+package RTF::VimColor 0.002;
 # ABSTRACT: generate colorized RTF using Vim's syntax highlighting
-$RTF::VimColor::VERSION = '0.001';
+
 use File::ShareDir;
 use File::Spec;
 use Graphics::ColorUtils qw(name2rgb);
@@ -11,7 +11,7 @@ use Text::VimColor;
 
 #pod =head1 SYNOPSIS
 #pod
-#pod B<Achtung!>  You I<probably> want to just use the F<synrtf> command included
+#pod B<Achtung!>  You I<probably> want to just use the L<synrtf> command included
 #pod with this distribution.  If not, though...
 #pod
 #pod   my $rtf_textref = RTF::VimColor->new->rtf_for_file(
@@ -52,6 +52,7 @@ sub rtf_for_file {
   my $syn = Text::VimColor->new(
     file => $filename,
     ($arg->{filetype} ? (filetype => $arg->{filetype}) : ()),
+    vim_let => { perl_sub_signatures => 1 },
   );
 
   my $rtf = RTF::Writer->new_to_string(\my $str);
@@ -231,11 +232,11 @@ RTF::VimColor - generate colorized RTF using Vim's syntax highlighting
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
-B<Achtung!>  You I<probably> want to just use the F<synrtf> command included
+B<Achtung!>  You I<probably> want to just use the L<synrtf> command included
 with this distribution.  If not, though...
 
   my $rtf_textref = RTF::VimColor->new->rtf_for_file(
@@ -244,6 +245,16 @@ with this distribution.  If not, though...
   );
 
   print $$rtf_textref;
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -265,7 +276,13 @@ Valid arguments for C<%arg> are:
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

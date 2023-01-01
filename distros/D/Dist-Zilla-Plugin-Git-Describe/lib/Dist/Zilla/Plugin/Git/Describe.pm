@@ -1,8 +1,8 @@
-package Dist::Zilla::Plugin::Git::Describe;
-# git description: 0.006-1-g35a750b
+package Dist::Zilla::Plugin::Git::Describe 0.008;
+# git description: 0.007-6-g8d29db3
 
 # ABSTRACT: add the results of `git describe` (roughly) to your main module
-$Dist::Zilla::Plugin::Git::Describe::VERSION = '0.007';
+
 use Moose;
 with(
   'Dist::Zilla::Role::FileMunger',
@@ -106,7 +106,7 @@ Dist::Zilla::Plugin::Git::Describe - add the results of `git describe` (roughly)
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -122,6 +122,18 @@ things in a package variable, or to provide an option.
 
 It inserts this in the same place that PkgVersion would insert a version.
 
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 ATTRIBUTES
 
 =head2 on_package_line
@@ -136,13 +148,27 @@ L<PodVersion|Dist::Zilla::Plugin::PkgVersion>
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge
+=for stopwords Karen Etheridge Mikko Koivunalho Ricardo Signes
+
+=over 4
+
+=item *
 
 Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Mikko Koivunalho <mikkoi@cpan.org>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

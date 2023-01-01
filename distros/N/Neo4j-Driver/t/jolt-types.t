@@ -51,11 +51,15 @@ response_for 'composite sparse' => { jolt => single_column(
 	[],
 )};
 
-response_for 'structural' => { jolt => single_column(
+response_for 'structural v1' => { jolt => single_column(
 	{ '()' => [ 101, ['Test'], { p => { Z => '59'} } ] },
 	{ '()' => [ 103, ['Test', 'N'], { p1 => 61, p2 => 67 } ] },
 	{ '->' => [ 233, 101, 'FOO', 103, { p => { Z => '71'} } ] },
 	{ '<-' => [ 239, 101, 'BAR', 103, {} ] },
+	{ '<-' => [ 0, 0, 'NIL', 0, {} ] },
+)};
+
+response_for 'structural paths v1' => { jolt => single_column(
 	{ '..' => [
 			{ '()' => [ 311, ['Test'], { p => 59 } ] },
 			{ '->' => [ 307, 311, 'TEST', 313, { p1 => { Z => '73'}, p2 => { Z => '79'} } ] },
@@ -64,11 +68,38 @@ response_for 'structural' => { jolt => single_column(
 	{ '..' => [ { '()' => [ 409, [], {} ] } ] },
 )};
 
+response_for 'structural v2' => {
+	content_type => 'application/vnd.neo4j.jolt-v2+json-seq',
+	jolt => single_column(
+	{ '()' => [ '4:db:101', ['Test'], { p => { Z => '59'} } ] },
+	{ '()' => [ '4:db:103', ['Test', 'N'], { p1 => 61, p2 => 67 } ] },
+	{ '->' => [ '5:db:233', '4:db:101', 'FOO', '4:db:103', { p => { Z => '71'} } ] },
+	{ '<-' => [ '5:db:239', '4:db:101', 'BAR', '4:db:103', {} ] },
+	{ '<-' => [ '5:db:0', '4:db:0', 'NIL', '4:db:0', {} ] },
+)};
+
+response_for 'structural paths v2' => {
+	content_type => 'application/vnd.neo4j.jolt-v2+json-seq',
+	jolt => single_column(
+	{ '..' => [
+			{ '()' => [ '4:db:311', ['Test'], { p => 59 } ] },
+			{ '->' => [ '5:db:307', '4:db:311', 'TEST', '4:db:313', { p1 => { Z => '73'}, p2 => { Z => '79'} } ] },
+			{ '()' => [ '4:db:313', ['Test'], {} ] },
+		] },
+	{ '..' => [ { '()' => [ '4:0d66f27a-d2c3-479e-80ac-d02bd263d24c:409', [], {} ] } ] },
+)};
+
 response_for 'bool error' => { jolt => single_column(
 	{ '?' => 'null' },
 )};
 response_for 'sigil error' => { jolt => single_column(
 	{ '' => '' },
+)};
+response_for 'element id format version error' => {
+	content_type => 'application/vnd.neo4j.jolt-v2+json-seq',
+	jolt => single_column(
+	{ '()' => [ '8::1:DLV', [], {} ] },
+	{ '->' => [ '9::1:DLX', '8::1:DLV', 'FOO', '8::1:DLI', {} ] },
 )};
 
 
@@ -79,7 +110,7 @@ use Neo4j::Driver;
 
 my ($s, $r, $v, $e);
 
-plan tests => 1 + 6 + 1;
+plan tests => 1 + 9 + 1;
 
 
 lives_and { ok $s = Neo4j::Driver->new('http:')
@@ -146,53 +177,167 @@ subtest 'composite types sparse' => sub {
 };
 
 
-subtest 'structural types' => sub {
-	plan tests => 48;
-	lives_and { ok $r = $s->run('structural') } 'run';
+subtest 'structural types v1' => sub {
+	plan tests => 44;
+	lives_and { ok $r = $s->run('structural v1') } 'run';
 	lives_and { $v = 0; ok $v = $r->fetch->get() } 'get n101';
 	lives_and { isa_ok $v, 'Neo4j::Types::Node' } 'n101 blessed';
+	lives_and { is $v->element_id(), '101' } 'n101 element_id';
 	lives_and { is $v->id(), 101 } 'n101 id';
 	lives_and { is_deeply [$v->labels], ['Test'] } 'n101 labels';
 	lives_and { is_deeply $v->properties(), {p=>59} } 'n101 properties';
 	lives_and { $v = 0; ok $v = $r->fetch->get() } 'get n103';
 	lives_and { isa_ok $v, 'Neo4j::Types::Node' } 'n103 blessed';
+	lives_and { is $v->element_id(), '103' } 'n103 element_id';
 	lives_and { is $v->id(), 103 } 'n103 id';
 	lives_and { is_deeply [$v->labels], ['Test', 'N'] } 'n103 labels';
 	lives_and { is_deeply $v->properties(), {p1=>61, p2=>67} } 'n103 properties';
 	lives_and { $v = 0; ok $v = $r->fetch->get() } 'get r233';
 	lives_and { isa_ok $v, 'Neo4j::Types::Relationship' } 'r233 blessed';
+	lives_and { is $v->element_id(), '233' } 'r233 element_id';
 	lives_and { is $v->id(), 233 } 'r233 id';
 	lives_and { is $v->type(), 'FOO' } 'r233 type';
+	lives_and { is $v->start_element_id(), '101' } 'r233 start_element_id';
 	lives_and { is $v->start_id(), 101 } 'r233 start_id';
+	lives_and { is $v->end_element_id(), '103' } 'r233 end_element_id';
 	lives_and { is $v->end_id(), 103 } 'r233 end_id';
 	lives_and { is_deeply $v->properties(), {p=>71} } 'r233 properties';
 	lives_and { $v = 0; ok $v = $r->fetch->get() } 'get r239';
 	lives_and { isa_ok $v, 'Neo4j::Types::Relationship' } 'r239 blessed';
+	lives_and { is $v->element_id(), '239' } 'r239 element_id';
 	lives_and { is $v->id(), 239 } 'r239 id';
 	lives_and { is $v->type(), 'BAR' } 'r239 type';
+	lives_and { is $v->start_element_id(), '103' } 'r239 start_element_id';
 	lives_and { is $v->start_id(), 103 } 'r239 start_id';
+	lives_and { is $v->end_element_id(), '101' } 'r239 end_element_id';
 	lives_and { is $v->end_id(), 101 } 'r239 end_id';
 	lives_and { is_deeply $v->properties(), {} } 'r239 properties';
-	# paths:
+	lives_and { $v = 0; ok $v = $r->fetch->get() } 'get r0';
+	lives_and { isa_ok $v, 'Neo4j::Types::Relationship' } 'r0 blessed';
+	lives_and { is $v->element_id(), '0' } 'r0 element_id';
+	lives_and { is $v->id(), 0 } 'r0 id';
+	lives_and { is $v->type(), 'NIL' } 'r0 type';
+	lives_and { is $v->start_element_id(), '0' } 'r0 start_element_id';
+	lives_and { is $v->start_id(), 0 } 'r0 start_id';
+	lives_and { is $v->end_element_id(), '0' } 'r0 end_element_id';
+	lives_and { is $v->end_id(), 0 } 'r0 end_id';
+	lives_and { is_deeply $v->properties(), {} } 'r239 properties';
+	lives_and { ok ! $r->has_next } 'no has_next';
+};
+
+
+subtest 'structural types v2' => sub {
+	plan tests => 44;
+	lives_and { ok $r = $s->run('structural v2') } 'run';
+	lives_and { $v = 0; ok $v = $r->fetch->get() } 'get n101';
+	lives_and { isa_ok $v, 'Neo4j::Types::Node' } 'n101 blessed';
+	lives_and { is $v->element_id(), '4:db:101' } 'n101 element_id';
+	lives_and { is $v->id(), 101 } 'n101 id';
+	lives_and { is_deeply [$v->labels], ['Test'] } 'n101 labels';
+	lives_and { is_deeply $v->properties(), {p=>59} } 'n101 properties';
+	lives_and { $v = 0; ok $v = $r->fetch->get() } 'get n103';
+	lives_and { isa_ok $v, 'Neo4j::Types::Node' } 'n103 blessed';
+	lives_and { is $v->element_id(), '4:db:103' } 'n103 element_id';
+	lives_and { is $v->id(), 103 } 'n103 id';
+	lives_and { is_deeply [$v->labels], ['Test', 'N'] } 'n103 labels';
+	lives_and { is_deeply $v->properties(), {p1=>61, p2=>67} } 'n103 properties';
+	lives_and { $v = 0; ok $v = $r->fetch->get() } 'get r233';
+	lives_and { isa_ok $v, 'Neo4j::Types::Relationship' } 'r233 blessed';
+	lives_and { is $v->element_id(), '5:db:233' } 'r233 element_id';
+	lives_and { is $v->id(), 233 } 'r233 id';
+	lives_and { is $v->type(), 'FOO' } 'r233 type';
+	lives_and { is $v->start_element_id(), '4:db:101' } 'r233 start_element_id';
+	lives_and { is $v->start_id(), 101 } 'r233 start_id';
+	lives_and { is $v->end_element_id(), '4:db:103' } 'r233 end_element_id';
+	lives_and { is $v->end_id(), 103 } 'r233 end_id';
+	lives_and { is_deeply $v->properties(), {p=>71} } 'r233 properties';
+	lives_and { $v = 0; ok $v = $r->fetch->get() } 'get r239';
+	lives_and { isa_ok $v, 'Neo4j::Types::Relationship' } 'r239 blessed';
+	lives_and { is $v->element_id(), '5:db:239' } 'r239 element_id';
+	lives_and { is $v->id(), 239 } 'r239 id';
+	lives_and { is $v->type(), 'BAR' } 'r239 type';
+	lives_and { is $v->start_element_id(), '4:db:103' } 'r239 start_element_id';
+	lives_and { is $v->start_id(), 103 } 'r239 start_id';
+	lives_and { is $v->end_element_id(), '4:db:101' } 'r239 end_element_id';
+	lives_and { is $v->end_id(), 101 } 'r239 end_id';
+	lives_and { is_deeply $v->properties(), {} } 'r239 properties';
+	lives_and { $v = 0; ok $v = $r->fetch->get() } 'get r0';
+	lives_and { isa_ok $v, 'Neo4j::Types::Relationship' } 'r0 blessed';
+	lives_and { is $v->element_id(), '5:db:0' } 'r0 element_id';
+	lives_and { is $v->id(), 0 } 'r0 id';
+	lives_and { is $v->type(), 'NIL' } 'r0 type';
+	lives_and { is $v->start_element_id(), '4:db:0' } 'r0 start_element_id';
+	lives_and { is $v->start_id(), 0 } 'r0 start_id';
+	lives_and { is $v->end_element_id(), '4:db:0' } 'r0 end_element_id';
+	lives_and { is $v->end_id(), 0 } 'r0 end_id';
+	lives_and { is_deeply $v->properties(), {} } 'r239 properties';
+	lives_and { ok ! $r->has_next } 'no has_next';
+};
+
+
+subtest 'structural types paths v1' => sub {
+	plan tests => 30;
+	lives_and { ok $r = $s->run('structural paths v1') } 'run';
 	lives_and { $v = 0; ok $v = $r->fetch->get() } 'get path1';
 	lives_and { isa_ok $v, 'Neo4j::Types::Path' } 'path1 blessed';
 	lives_and { is scalar(@{[$v->nodes]}), 2 } 'path1 nodes';
 	lives_and { is scalar(@{[$v->relationships]}), 1 } 'path1 relationships';
 	lives_and { $e = 0; ok $e = ($v->nodes)[0] } 'get n311';
+	lives_and { is $e->element_id(), '311' } 'n311 element_id';
 	lives_and { is $e->id(), 311 } 'n311 id';
 	lives_and { is_deeply [$e->labels], ['Test'] } 'n311 labels';
 	lives_and { is_deeply $e->properties(), {p=>59} } 'n311 properties';
 	lives_and { $e = 0; ok $e = ($v->relationships)[0] } 'get r307';
+	lives_and { is $e->element_id(), '307' } 'r307 element_id';
 	lives_and { is $e->id(), 307 } 'r307 id';
 	lives_and { is $e->type(), 'TEST' } 'r307 type';
+	lives_and { is $e->start_element_id(), '311' } 'r307 start_element_id';
 	lives_and { is $e->start_id(), 311 } 'r307 start_id';
+	lives_and { is $e->end_element_id(), '313' } 'r307 end_element_id';
 	lives_and { is $e->end_id(), 313 } 'r307 end_id';
 	lives_and { is_deeply $e->properties(), {p1=>73,p2=>79} } 'r307 properties';
 	lives_and { $e = 0; ok $e = ($v->nodes)[1] } 'get n313';
+	lives_and { is $e->element_id(), '313' } 'n313 element_id';
 	lives_and { is $e->id, 313 } 'n313 id';
 	lives_and { $v = 0; ok $v = $r->fetch->get() } 'get path2';
 	lives_and { $e = 0; ok $e = [$v->elements] } 'path2 elements';
 	lives_and { is scalar(@$e), 1 } 'path2 length';
+	lives_and { is $e->[0]->element_id(), '409' } 'n409 element_id';
+	lives_and { is $e->[0]->id(), 409 } 'n409 id';
+	lives_and { is_deeply [$e->[0]->labels], [] } 'n409 labels';
+	lives_and { is_deeply $e->[0]->properties(), {} } 'n409 properties';
+	lives_and { ok ! $r->has_next } 'no has_next';
+};
+
+
+subtest 'structural types paths v2' => sub {
+	plan tests => 30;
+	lives_and { ok $r = $s->run('structural paths v2') } 'run';
+	lives_and { $v = 0; ok $v = $r->fetch->get() } 'get path1';
+	lives_and { isa_ok $v, 'Neo4j::Types::Path' } 'path1 blessed';
+	lives_and { is scalar(@{[$v->nodes]}), 2 } 'path1 nodes';
+	lives_and { is scalar(@{[$v->relationships]}), 1 } 'path1 relationships';
+	lives_and { $e = 0; ok $e = ($v->nodes)[0] } 'get n311';
+	lives_and { is $e->element_id(), '4:db:311' } 'n311 element_id';
+	lives_and { is $e->id(), 311 } 'n311 id';
+	lives_and { is_deeply [$e->labels], ['Test'] } 'n311 labels';
+	lives_and { is_deeply $e->properties(), {p=>59} } 'n311 properties';
+	lives_and { $e = 0; ok $e = ($v->relationships)[0] } 'get r307';
+	lives_and { is $e->element_id(), '5:db:307' } 'r307 element_id';
+	lives_and { is $e->id(), 307 } 'r307 id';
+	lives_and { is $e->type(), 'TEST' } 'r307 type';
+	lives_and { is $e->start_element_id(), '4:db:311' } 'r307 start_element_id';
+	lives_and { is $e->start_id(), 311 } 'r307 start_id';
+	lives_and { is $e->end_element_id(), '4:db:313' } 'r307 end_element_id';
+	lives_and { is $e->end_id(), 313 } 'r307 end_id';
+	lives_and { is_deeply $e->properties(), {p1=>73,p2=>79} } 'r307 properties';
+	lives_and { $e = 0; ok $e = ($v->nodes)[1] } 'get n313';
+	lives_and { is $e->element_id(), '4:db:313' } 'n313 element_id';
+	lives_and { is $e->id, 313 } 'n313 id';
+	lives_and { $v = 0; ok $v = $r->fetch->get() } 'get path2';
+	lives_and { $e = 0; ok $e = [$v->elements] } 'path2 elements';
+	lives_and { is scalar(@$e), 1 } 'path2 length';
+	lives_and { is $e->[0]->element_id(), '4:0d66f27a-d2c3-479e-80ac-d02bd263d24c:409' } 'n409 element_id';
 	lives_and { is $e->[0]->id(), 409 } 'n409 id';
 	lives_and { is_deeply [$e->[0]->labels], [] } 'n409 labels';
 	lives_and { is_deeply $e->[0]->properties(), {} } 'n409 properties';
@@ -201,9 +346,22 @@ subtest 'structural types' => sub {
 
 
 subtest 'type errors' => sub {
-	plan tests => 2;
+	plan tests => 2 + 12;
 	throws_ok { $s->run('bool error') } qr/\bAssertion failed: unexpected bool value\b/i, 'bool';
 	throws_ok { $s->run('sigil error') } qr/\bAssertion failed: unexpected sigil\b/i, 'sigil';
+	# legacy numeric ids can only be derived from element id format version 1
+	lives_and { ok $r = $s->run('element id format version error') } 'run';
+	lives_and { $v = 0; ok $v = $r->fetch->get() } 'get nDLV';
+	lives_and { is $v->element_id(), '8::1:DLV' } 'nDLV element_id';
+	lives_and { is $v->id(), undef } 'nDLV id';
+	lives_and { $v = 0; ok $v = $r->fetch->get() } 'get rDLX';
+	lives_and { is $v->element_id(), '9::1:DLX' } 'rDLX element_id';
+	lives_and { is $v->id(), undef } 'rDLX id';
+	lives_and { is $v->start_element_id(), '8::1:DLV' } 'rDLX start_element_id';
+	lives_and { is $v->start_id(), undef } 'rDLX start_id';
+	lives_and { is $v->end_element_id(), '8::1:DLI' } 'rDLX end_element_id';
+	lives_and { is $v->end_id(), undef } 'rDLX end_id';
+	lives_and { ok ! $r->has_next } 'no has_next';
 };
 
 

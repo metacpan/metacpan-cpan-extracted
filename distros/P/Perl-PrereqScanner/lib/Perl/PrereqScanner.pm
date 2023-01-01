@@ -2,7 +2,7 @@ use 5.008;
 use strict;
 use warnings;
 
-package Perl::PrereqScanner 1.024;
+package Perl::PrereqScanner 1.025;
 # ABSTRACT: a tool to scan your Perl code for its prerequisites
 
 use Moose;
@@ -150,7 +150,7 @@ Perl::PrereqScanner - a tool to scan your Perl code for its prerequisites
 
 =head1 VERSION
 
-version 1.024
+version 1.025
 
 =head1 SYNOPSIS
 
@@ -271,13 +271,13 @@ Jerome Quelin
 
 =item *
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =back
 
 =head1 CONTRIBUTORS
 
-=for stopwords bowtie celogeek Christopher J. Madsen David Golden Steinbrunner Ed J Florian Ragwitz Jakob Voss Jérôme Quelin John SJ Anderson Karen Etheridge Mark Gardner Neil Bowers Randy Stauner Tina Mueller Vyacheslav Matjukhin
+=for stopwords bowtie celogeek Christopher J. Madsen David Golden Steinbrunner Ed J Florian Ragwitz Jakob Voss Jérôme Quelin John SJ Anderson Karen Etheridge Mark Gardner Neil Bowers Randy Stauner Ricardo Signes Tina Mueller Vyacheslav Matjukhin
 
 =over 4
 
@@ -336,6 +336,10 @@ Neil Bowers <neil@bowers.com>
 =item *
 
 Randy Stauner <rwstauner@cpan.org>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

@@ -1,5 +1,10 @@
 Revision history for Sub-Import
 
+1.002     2022-12-31 16:59:39-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+        - more content in the synopsis (thanks, Flavio Poletti)
+
 1.001     2013-10-15 22:41:36 America/New_York
           update bugtracker and repo metadata
 

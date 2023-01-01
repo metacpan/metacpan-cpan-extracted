@@ -2,7 +2,7 @@ use v5.20.0;
 use warnings;
 # ABSTRACT: a moer tolernat verison of mehtod location
 
-package Amce::CNA 0.068;
+package Amce::CNA 0.069;
 
 use mro ();
 
@@ -148,7 +148,7 @@ Amce::CNA - a moer tolernat verison of mehtod location
 
 =head1 VERSION
 
-version 0.068
+version 0.069
 
 =head1 SYNOPSIS
 
@@ -170,7 +170,7 @@ O NOES!
 
 This modlue makes it eaiser for dislexics to wriet workign Perl.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
 This module is shipped with no promise about what version of perl it will
 require in the future.  In practice, this tends to mean "you need a perl from
@@ -204,7 +204,13 @@ the saem terms as rePl etsilf.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

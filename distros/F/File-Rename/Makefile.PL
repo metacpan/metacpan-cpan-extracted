@@ -38,8 +38,9 @@ WriteMakefile(
           ABSTRACT_FROM => 'lib/File/Rename.pm',
                             # retrieve abstract from module
           AUTHOR        => 'Robin Barker <RMBarker@cpan.org>',
-         LICENSE        => 'perl',
+          LICENSE       => 'perl',
     
           NORECURS      => 1,
           test          => { RECURSIVE_TEST_FILES => 1 },
+          MIN_PERL_VERSION  => 5.6.0,
 );

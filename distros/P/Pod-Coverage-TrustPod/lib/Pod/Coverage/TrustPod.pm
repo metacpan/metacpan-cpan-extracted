@@ -1,7 +1,7 @@
 use strict;
 use warnings;
-package Pod::Coverage::TrustPod;
-$Pod::Coverage::TrustPod::VERSION = '0.100005';
+package Pod::Coverage::TrustPod 0.100006;
+
 use base 'Pod::Coverage::CountParents';
 # ABSTRACT: allow a module's pod to contain Pod::Coverage hints
 
@@ -148,7 +148,7 @@ Pod::Coverage::TrustPod - allow a module's pod to contain Pod::Coverage hints
 
 =head1 VERSION
 
-version 0.100005
+version 0.100006
 
 =head1 DESCRIPTION
 
@@ -209,19 +209,39 @@ Keep in mind that Pod::Coverage::TrustPod sets up exceptions using the "trust"
 mechanism rather than the "privacy" mechanism in Pod::Coverage.  This is
 unlikely ever to matter to you, but it's true.
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Andreas Marienborg
+=for stopwords Andreas Marienborg Ricardo Signes
+
+=over 4
+
+=item *
 
 Andreas Marienborg <andreas.marienborg@gmail.com>
 
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

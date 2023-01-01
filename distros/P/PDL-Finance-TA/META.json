@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::TALib" : "0.1",
+            "Alien::TALib" : "0.12",
             "PDL" : "2.006",
             "Test::More" : "0",
             "Test::Number::Delta" : "1.06"
@@ -30,13 +30,13 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::TALib" : "0.1",
+            "Alien::TALib" : "0.12",
             "PDL" : "2.006"
          }
       },
       "runtime" : {
          "requires" : {
-            "Alien::TALib" : "0.1",
+            "Alien::TALib" : "0.12",
             "PDL" : "2.006"
          }
       }
@@ -47,6 +47,6 @@
          "url" : "https://github.com/kmx/pdl-finance-ta"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-package Getopt::Long::Descriptive 0.110;
+package Getopt::Long::Descriptive 0.111;
 # ABSTRACT: Getopt::Long, but simpler and more powerful
 
-use v5.10.1;
+use v5.12;
 
 use Carp qw(carp croak);
 use File::Basename ();
@@ -731,7 +731,7 @@ Getopt::Long::Descriptive - Getopt::Long, but simpler and more powerful
 
 =head1 VERSION
 
-version 0.110
+version 0.111
 
 =head1 SYNOPSIS
 
@@ -1025,13 +1025,13 @@ Hans Dieter Pearcey <hdp@cpan.org>
 
 =item *
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =back
 
 =head1 CONTRIBUTORS
 
-=for stopwords Arthur Axel 'fREW' Schmidt Dave Rolsky Diab Jerius Hans Dieter Pearcey Harley Pig hdp@cpan.org Karen Etheridge Michael McClimon Niels Thykier Olaf Alders Roman Hubacek Smylers Thomas Neumann zhouzhen1
+=for stopwords Arthur Axel 'fREW' Schmidt Dave Rolsky Diab Jerius Hans Dieter Pearcey Harley Pig hdp@cpan.org Karen Etheridge Michael McClimon Niels Thykier Olaf Alders Ricardo Signes Roman Hubacek Smylers Thomas Neumann zhouzhen1
 
 =over 4
 
@@ -1078,6 +1078,10 @@ Niels Thykier <niels@thykier.net>
 =item *
 
 Olaf Alders <olaf@wundersolutions.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

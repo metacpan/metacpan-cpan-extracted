@@ -10,7 +10,7 @@ use List::MoreUtils qw( any );
 use Term::Choose qw();
 
 use App::DBBrowser::Auxil;
-
+#use App::DBBrowser::Subqueries; # required
 
 sub new {
     my ( $class, $info, $options, $data ) = @_;

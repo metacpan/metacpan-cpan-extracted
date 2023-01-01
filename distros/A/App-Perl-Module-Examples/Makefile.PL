@@ -28,10 +28,12 @@ requires 'Pod::Example' => 0.12;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/App-Perl-Module-Examples/issues',
 resources 'homepage' => 'https://github.com/michal-josef-spacek/App-Perl-Module-Examples';
 resources 'repository' => 'git://github.com/michal-josef-spacek/App-Perl-Module-Examples';
+test_requires 'English' => 0;
+test_requires 'Error::Pure::Utils' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.01';
+version '0.02';
 
 # Run.
 WriteAll();

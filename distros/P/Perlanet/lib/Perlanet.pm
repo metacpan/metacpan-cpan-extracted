@@ -1,5 +1,6 @@
 package Perlanet;
 
+use 5.10.0;
 use strict;
 use warnings;
 
@@ -17,11 +18,16 @@ use XML::Feed;
 
 use Perlanet::Types;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.2.0';
 
 with 'MooseX::Traits';
 
 $XML::Atom::ForceUnicode = 1;
+
+has 'config' => (
+  is => 'ro',
+  isa => 'HashRef',
+);
 
 has 'ua' => (
   is         => 'rw',
@@ -139,10 +145,15 @@ See L</ATTRIBUTES> below for details of the key/value pairs to pass in.
 
 =over
 
+=item config
+
+A hash reference that contains the complete contents of the configuration
+file.
+
 =item ua
 
 An instance of L<LWP::UserAgent>. Defaults to a simple agent using C<<
-$cfg->{agent} >> as the user agent name, or C< Perlanet/$VERSION >.
+$config->{agent} >> as the user agent name, or C< Perlanet/$VERSION >.
 
 =item cutoff
 

@@ -1,5 +1,8 @@
 Changelog for Data-GUID-URLSafe
 
+0.008     2022-12-31 21:04:56-05:00 America/New_York
+        - update author contact info
+
 0.007     2021-06-20 20:23:31-04:00 America/New_York
         - update author contact info
         - add perl-support section

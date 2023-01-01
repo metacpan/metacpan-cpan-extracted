@@ -7,7 +7,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( rename );
 
-our $VERSION = '1.992';
+our $VERSION = '2.00';
 
 sub import {
     my $pack = shift;

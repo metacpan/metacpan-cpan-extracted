@@ -17,6 +17,9 @@ use Term::Choose::LineFold qw( line_fold print_columns );
 use Term::Choose::Util     qw( get_term_size get_term_width unicode_sprintf insert_sep );
 use Term::Form             qw();
 
+#use App::DBBrowser::GetContent;    # required
+#use App::DBBrowser::Opt::Set;      # required
+
 
 sub new {
     my ( $class, $info, $options, $data ) = @_;
@@ -56,7 +59,11 @@ sub parse_with_Text_CSV {
     seek $fh, 0, 0;
     my $rows_of_cols = [];
     require String::Unescape;
-    my $options = { map { $_ => String::Unescape::unescape( $sf->{o}{csv}{$_} ) } keys %{$sf->{o}{csv}} };
+    my $options = {
+        map { $_ => String::Unescape::unescape( $sf->{o}{csv_in}{$_} ) }
+        grep { defined $sf->{o}{csv_in}{$_} }
+        keys %{$sf->{o}{csv_in}}
+    };
     require Text::CSV;
     my $csv = Text::CSV->new( $options ) or die Text::CSV->error_diag();
     $csv->callbacks( error => sub {
@@ -139,7 +146,7 @@ sub __print_template_info {
             $info .= "\n" . unicode_sprintf( $row, $term_w, { mark_if_truncated => [ $dots, $dots_w ] } );
         }
         my $row_count = scalar( @$rows );
-        $info .= "\n" . unicode_sprintf( '[' . insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ) . ' rows]', $term_w, { mark_if_truncated => [ $dots, $dots_w ] } );
+        $info .= "\n" . unicode_sprintf( '[' . insert_sep( $row_count, $sf->{i}{info_thsd_sep} ) . ' rows]', $term_w, { mark_if_truncated => [ $dots, $dots_w ] } );
     }
     else {
         for my $row ( @$rows ) {

@@ -1,28 +1,43 @@
-Neo4j::Driver
+Neo4j::Driver 0.33
 
-version 0.31
+This software is a community driver for the Neo4j <https://neo4j.com/> graph
+database server. It is designed to follow the Neo4j Driver API, allowing
+clients to interact with a Neo4j server using the same classes and method
+calls as the official Neo4j drivers do. This extends the uniformity across
+languages, which is a stated goal of the Neo4j Driver API, to Perl.
+
+More information about this software:
+https://metacpan.org/release/Neo4j-Driver
+
 
 INSTALLATION
 
-This is a Perl module distribution. It should be installed with whichever
-tool you use to manage your installation of Perl, e.g. any of
+The recommended way to install this Perl module distribution is directly
+from CPAN with whichever tool you use to manage your installation of Perl.
+For example:
 
-  cpanm .
-  cpan  .
-  cpanp -i .
+  cpanm Neo4j::Driver
 
-Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
-Should you wish to install this module manually, the procedure is
+If you already have downloaded the distribution, you can alternatively
+point your tool directly at the archive file or the directory:
+
+  cpanm Neo4j-Driver-0.33.tar.gz
+
+You can also install the module manually by following these steps:
 
   perl Makefile.PL
   make
   make test
   make install
 
+See https://www.cpan.org/modules/INSTALL.html for general information
+on installing CPAN modules.
+
+
 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0 or (at your option) the same terms
+as the Perl 5 programming language system itself.

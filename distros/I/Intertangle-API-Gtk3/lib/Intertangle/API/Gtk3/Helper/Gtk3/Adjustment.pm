@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::API::Gtk3::Helper::Gtk3::Adjustment;
 # ABSTRACT: Helpers for Gtk3::Adjustment
-$Intertangle::API::Gtk3::Helper::Gtk3::Adjustment::VERSION = '0.006';
+$Intertangle::API::Gtk3::Helper::Gtk3::Adjustment::VERSION = '0.007';
 package # hide from PAUSE
 	Gtk3::Adjustment;
 
@@ -31,7 +31,7 @@ Intertangle::API::Gtk3::Helper::Gtk3::Adjustment - Helpers for Gtk3::Adjustment
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 METHODS
 

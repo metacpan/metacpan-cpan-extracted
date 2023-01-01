@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Data::Hive 1.014;
+package Data::Hive 1.015;
 # ABSTRACT: convenient access to hierarchical data
 
 use Carp ();
@@ -458,7 +458,7 @@ Data::Hive - convenient access to hierarchical data
 
 =head1 VERSION
 
-version 1.014
+version 1.015
 
 =head1 SYNOPSIS
 
@@ -536,10 +536,10 @@ It is not legal to have an empty part in a hive path.
 
 =back
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has a long-term perl support period.  That means it will not
-require a version of perl released fewer than five years ago.
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
@@ -748,19 +748,23 @@ Hans Dieter Pearcey <hdp@cpan.org>
 
 =item *
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =back
 
 =head1 CONTRIBUTORS
 
-=for stopwords hdp rjbs
+=for stopwords hdp Ricardo Signes rjbs
 
 =over 4
 
 =item *
 
 hdp <hdp@1bcdbe44-fcfd-0310-b51b-975661d93aa0>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

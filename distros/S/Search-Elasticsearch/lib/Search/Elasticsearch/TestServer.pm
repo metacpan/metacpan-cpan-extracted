@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::TestServer;
-$Search::Elasticsearch::TestServer::VERSION = '7.711001';
+$Search::Elasticsearch::TestServer::VERSION = '8.00';
 use Moo;
 use Search::Elasticsearch();
 use POSIX 'setsid';
@@ -211,7 +211,7 @@ Search::Elasticsearch::TestServer - A helper class to launch Elasticsearch nodes
 
 =head1 VERSION
 
-version 7.711001
+version 8.00
 
 =head1 SYNOPSIS
 
@@ -305,7 +305,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Elasticsearch BV.
+This software is Copyright (c) 2022 by Elasticsearch BV.
 
 This is free software, licensed under:
 

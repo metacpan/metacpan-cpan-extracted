@@ -1,6 +1,6 @@
 #!perl
 
-# Note: This script is a CLI for Riap function /App/CSVUtils/csv_get_cells
+# Note: This script is a CLI for Riap function /App/CSVUtils/csv_get_cells/csv_get_cells
 # and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
@@ -11,12 +11,12 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-14'; # DATE
+our $DATE = '2022-12-29'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.054'; # VERSION
+our $VERSION = '1.000'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
-    url => "/App/CSVUtils/csv_get_cells",
+    url => "/App/CSVUtils/csv_get_cells/csv_get_cells",
     program_name => "csv-get-cells",
     log => 1,
     read_config => 0,
@@ -41,7 +41,7 @@ csv-get-cells - Get one or more cells from CSV
 
 =head1 VERSION
 
-This document describes version 0.054 of csv-get-cells (from Perl distribution App-CSVUtils), released on 2022-12-14.
+This document describes version 1.000 of csv-get-cells (from Perl distribution App-CSVUtils), released on 2022-12-29.
 
 =head1 SYNOPSIS
 
@@ -49,18 +49,18 @@ B<csv-get-cells> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, 
 
 B<csv-get-cells> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<csv-get-cells> [(B<L<--coordinate|/"--coordinates-json=s">>=I<str>)+|B<L<--coordinates-json|/"--coordinates-json=s">>=I<json>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--escape-char|/"--escape-char=s">>=I<str>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--header|/"--no-header, --input-header">>|B<L<--input-header|/"--no-header, --input-header">>|B<L<--no-header|/"--no-header, --input-header">>|B<L<--noheader|/"--no-header, --input-header">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--quote-char|/"--quote-char=s">>=I<str>] [B<L<--sep-char|/"--sep-char=s">>=I<str>] [B<L<--tsv|/"--tsv, --input-tsv">>|B<L<--input-tsv|/"--tsv, --input-tsv">>|B<L<--no-tsv|/"--tsv, --input-tsv">>|B<L<--notsv|/"--tsv, --input-tsv">>] -- E<lt>I<L<filename|/"--filename=s*">>E<gt> [I<L<coordinate|/"--coordinates-json=s">>] ...
+B<csv-get-cells> [(B<L<--coordinate|/"--coordinates-json=s">>=I<str>)+|B<L<--coordinates-json|/"--coordinates-json=s">>=I<json>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--input-escape-char|/"--input-escape-char=s">>=I<str>] [B<L<--input-header|/"--no-input-header">>|B<L<--no-input-header|/"--no-input-header">>|B<L<--noinput-header|/"--no-input-header">>] [B<L<--input-quote-char|/"--input-quote-char=s">>=I<str>] [B<L<--input-sep-char|/"--input-sep-char=s">>=I<str>] [B<L<--input-tsv|/"--input-tsv">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<input_filename|/"--input-filename=s">>] E<lt>I<L<coordinate|/"--coordinates-json=s">>E<gt> ...
+
+
+
+See examples in the L</EXAMPLES> section.
 
 =head1 DESCRIPTION
 
 This utility lets you specify "coordinates" of cell locations to extract. Each
-coordinate is in the form of C<< E<lt>colE<gt>,E<lt>rowE<gt> >> where C<< E<lt>colE<gt> >> is the column name or
-position (zero-based, so 0 is the first column) and C<< E<lt>rowE<gt> >> is the row position
-(one-based, so 1 is the header row and 2 is the first data row).
-
-I<Common notes for the utilities>
-
-Encoding: The utilities in this module/distribution accept and emit UTF8 text.
+coordinate is in the form of C<< E<lt>fieldE<gt>,E<lt>rowE<gt> >> where C<< E<lt>fieldE<gt> >> is the field name
+or position (1-based, so 1 is the first field) and C<< E<lt>rowE<gt> >> is the row position
+(1-based, so 1 is the header row and 2 is the first data row).
 
 =head1 OPTIONS
 
@@ -70,9 +70,9 @@ C<*> marks required options.
 
 =over
 
-=item B<--coordinate>=I<s@>
+=item B<--coordinate>=I<s@>*
 
-List of coordinates, each in the form of <col>,<row> e.g. colname,0 or 1,1.
+List of coordinates, each in the form of <col>,<row> e.g. age,1 or 1,1.
 
 Can also be specified as the 2nd command-line argument and onwards.
 
@@ -80,7 +80,7 @@ Can be specified multiple times.
 
 =item B<--coordinates-json>=I<s>
 
-List of coordinates, each in the form of <col>,<row> e.g. colname,0 or 1,1 (JSON-encoded).
+List of coordinates, each in the form of <col>,<row> e.g. age,1 or 1,1 (JSON-encoded).
 
 See C<--coordinate>.
 
@@ -92,51 +92,60 @@ Can also be specified as the 2nd command-line argument and onwards.
 
 =over
 
-=item B<--escape-char>=I<s>
+=item B<--input-escape-char>=I<s>
 
 Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
-Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+Defaults to C<\\> (backslash). Overrides C<--input-tsv> option.
 
 
-=item B<--filename>=I<s>*
+=item B<--input-filename>=I<s>
 
-Input CSV file or URL.
+Input CSV file.
 
-Use C<-> to read from stdin, use C<clipboard:> to read from clipboard.
+Default value:
+
+ "-"
+
+Use C<-> to read from stdin.
+
+Encoding of input file is assumed to be UTF-8.
 
 
 Can also be specified as the 1st command-line argument.
 
-=item B<--no-header>, B<--input-header>
-
-By default (C<--header>), the first row of the CSV will be assumed to contain
-field names (and the second row contains the first data row). When you declare
-that CSV does not have header row (C<--no-header>), the first row of the CSV is
-assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
-and so on.
-
-
-=item B<--quote-char>=I<s>
+=item B<--input-quote-char>=I<s>
 
 Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
-Defaults to C<"> (double quote). Overrides C<--tsv> option.
+Defaults to C<"> (double quote). Overrides C<--input-tsv> option.
 
 
-=item B<--sep-char>=I<s>
+=item B<--input-sep-char>=I<s>
 
 Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
-Defaults to C<,> (comma). Overrides C<--tsv> option.
+Defaults to C<,> (comma). Overrides C<--input-tsv> option.
 
 
-=item B<--tsv>, B<--input-tsv>
+=item B<--input-tsv>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
 
-Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
-those options is specified, then C<--tsv> will be ignored.
+Overriden by C<--input-sep-char>, C<--input-quote-char>, C<--input-escape-char>
+options. If one of those options is specified, then C<--input-tsv> will be
+ignored.
+
+
+=item B<--no-input-header>
+
+Specify that input CSV does not have a header row.
+
+By default, the first row of the input CSV will be assumed to contain field
+names (and the second row contains the first data row). When you declare that
+input CSV does not have header row (C<--no-input-header>), the first row of the
+CSV is assumed to contain the first data row. Fields will be named C<field1>,
+C<field2>, and so on.
 
 
 =back
@@ -287,6 +296,12 @@ It is also recommended to install L<shcompgen> (see above).
 =head2 other shells
 
 For fish and zsh, install L<shcompgen> as described above.
+
+=head1 EXAMPLES
+
+=head2 Get the age for second row
+
+ % csv-get-cells file.csv age,2
 
 =head1 HOMEPAGE
 

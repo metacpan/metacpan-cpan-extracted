@@ -1,5 +1,8 @@
 Revision history for Test-MinimumVersion
 
+0.101083  2022-12-31 16:00:37-05:00 America/New_York
+        - update packaging and metadata
+
 0.101082  2015-12-06 23:40:03-05:00 America/New_York
         - add all_minimum_version_from_mymetayml_ok (thanks, Steve Hay!)
         - add all_minimum_version_from_mymetajson_ok (thanks, Steve Hay!)

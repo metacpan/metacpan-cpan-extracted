@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-OPT.t 1864 2022-04-14 15:18:49Z willem $	-*-perl-*-
+# $Id: 05-OPT.t 1887 2022-12-20 14:39:53Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -8,17 +8,20 @@ use Test::More;
 
 use Net::DNS;
 use Net::DNS::Parameters;
+use Net::DNS::RR::OPT;
 
 
-plan tests => 33 + scalar( keys %Net::DNS::Parameters::ednsoptionbyval );
+my @options = keys %Net::DNS::Parameters::ednsoptionbyval;
+
+plan tests => 28 + scalar(@options);
 
 
 my $name = '.';
 my $type = 'OPT';
 my $code = 41;
-my @attr = qw( size rcode flags );
-my @data = qw( 1280 0 32768 );
-my @also = qw( version );
+my @attr = qw( version size rcode flags );
+my @data = qw( 0 1280 0 32768 );
+my @also = ();
 
 my $wire = '0000290500000080000000';
 
@@ -51,9 +54,6 @@ my $wire = '0000290500000080000000';
 	my $hex2    = uc unpack 'H*', $decoded->encode;
 	is( $hex1, $hex2, 'encode/decode transparent' );
 	is( $hex1, $wire, 'encoded RDATA matches example' );
-
-	$rr->option( 10, 'rawbytes' );
-	like( $rr->string, '/EDNS/', 'string method works' );
 }
 
 
@@ -64,8 +64,11 @@ my $wire = '0000290500000080000000';
 		my $changed = 0xA5A;
 		$rr->{$_} = $initial;
 		is( $rr->$_($changed), $changed, "rr->$_(x) returns function argument" );
-		is( $rr->$_(),	       $changed, "rr->$_(x) changes attribute value" );
+		is( $rr->$_(),	       $changed, "rr->$_()  returns changed value" );
 	}
+
+	$rr->version(1);
+	like( $rr->string, '/EDNS/', 'string method works' );
 }
 
 
@@ -75,7 +78,7 @@ foreach my $method (qw(class ttl)) {
 
 	eval { $rr->$method(512) };
 	my ($warning) = split /\n/, "$@\n";
-	ok( 1, "deprecated $method method:\t[$warning]" );	# warning may, or may not, be first
+	ok( 1, "deprecated $method method\t[$warning]" );	# warning may, or may not, be first
 
 	eval { $rr->$method(512) };
 	my ($repeated) = split /\n/, "$@\n";
@@ -84,32 +87,15 @@ foreach my $method (qw(class ttl)) {
 
 
 {
-	my $rr = Net::DNS::RR->new( type => $type, version => 1, rcode => 16 );
-	$rr->{rdlength} = 0;					# inbound OPT RR only
-	like( $rr->string, '/BADVER/', 'opt->rcode(16)' );
-}
-
-
-{
-	my $rr = Net::DNS::RR->new( name => '.', type => $type, rcode => 1 );
-	like( $rr->string, '/NOERROR/', 'opt->rcode(1)' );
-}
-
-
-{
-	my $edns = Net::DNS::RR->new( name => '.', type => $type );
+	my $packet = Net::DNS::Packet->new(qw(example A));
+	my $edns   = $packet->edns;
 
 	ok( ref($edns), 'new OPT RR created' );
 
 	is( scalar( $edns->options ), 0, 'EDNS option list initially empty' );
 
-	ok( !$edns->_format_option(0), 'format non-existent option(0)' );
-
 	my $non_existent = $edns->option(0);
 	is( $non_existent, undef, '$undef = option(0)' );
-
-	my @non_existent = $edns->option(0);
-	is( scalar(@non_existent), 0, '@empty = option(0)' );
 
 	ok( !$edns->_specified, 'state unmodified by existence probes' );
 
@@ -120,49 +106,54 @@ foreach my $method (qw(class ttl)) {
 	is( scalar( $edns->options ), 0, 'delete EDNS option' );
 
 
-	foreach my $option ( keys %Net::DNS::Parameters::ednsoptionbyval ) {
-		$edns->option( $option => 'rawbytes' );
+	foreach my $option (@options) {
+		$edns->option( $option => ( '00', [0] ) );	# exercise list expansion
+		$edns->option( $option => {'OPTION-DATA' => 'rawbytes'} );
 	}
 
+
+	$edns->option( 1 => {'OPTION-DATA' => pack( 'n@18', 1 )} );	     # deprecated option
 
 	$edns->option( 4 => '' );
-	is( length( $edns->option(4) ), 0, "option 4 => ''" );
 
-	$edns->option( DAU => [8, 10, 13, 14, 15, 16] );
-	is( length( $edns->option(5) ), 6, "option DAU => [ ... ]" );
+	$edns->option( 5 => [8, 10, 13, 14, 15, 16] );
 
-	$edns->option( 10 => {'CLIENT-COOKIE' => 'rawbytes'} );
-	is( length( $edns->option(10) ), 8, "option 10 => {CLIENT-COOKIE => ... }" );
+	$edns->option( 6 => [1, 2, 4] );
 
+	$edns->option( 7 => [] );
 
-	$edns->option( 6 => pack 'H*', '010204' );
+	$edns->option( 8 => {'FAMILY' => 99} );
+	$edns->option( 8 => {'BASE16' => '00990000'} );
+	my @option8 = $edns->option(8);
+	$edns->option( 8 => {'BASE16' => '0002380020010db8fd1342'} );
 
-	$edns->option( 7 => pack 'H*', '01' );
+	$edns->option( 9 => {'OPTION-LENGTH' => 0} );		# per RFC7314
+	my @option9 = $edns->option(9);
+	$edns->option( 9 => {'EXPIRE-TIMER' => 604800} );
 
-	$edns->option( 8 => pack 'H*', '000117007b7b7a' );
+	$edns->option( 11 => {'OPTION-LENGTH' => 0} );		# per RFC7828
+	my @option11 = $edns->option(11);
+	$edns->option( 11 => {'TIMEOUT' => 200} );
 
-	$edns->option( 9 => pack 'H*', '00093A80' );
+	my @option12 = $edns->option(12);			# non-zero content
+	$edns->option( 12 => {'LENGTH' => 100} );		# zero content per RFC7830
 
-	$edns->option( 10 => pack 'H*', '010000005EC233441122334455667788' );
+	$edns->option( 13 => {'BASE16' => '076578616d706c6500'} );
 
-	$edns->option( 11 => pack 'H*', '00C8' );
+	$edns->option( 15 => {'INFO-CODE' => 123} );
 
-	$edns->option( 12 => pack 'x100' );
+	$edns->option( 65023 => {'BASE16' => '076578616d706c6500'} );
 
-	$edns->option( 13 => pack 'H*', '03636F6D00' );
-
-	$edns->option( 15 => pack 'H*', '007B' );
-
-
-	foreach my $option ( sort { $a <=> $b } keys %Net::DNS::Parameters::ednsoptionbyval ) {
+	foreach my $option ( sort { $a <=> $b } @options ) {
+		my $uninterpreted  = unpack 'H*', $edns->option($option);
 		my @interpretation = $edns->option($option);	# check option interpretation
-		$edns->option( $option => (@interpretation) );
-		my @reconstitution = $edns->option($option);
-		is( "@reconstitution", "@interpretation", "compose/decompose option $option" );
+		$edns->option( $option => @interpretation );
+		my $reconstituted = unpack 'H*', $edns->option($option);
+		is( "$reconstituted", "$uninterpreted", "compose/decompose option $option" );
 	}
 
 
-	eval { $edns->option( 65001 => ( '', '' ) ) };
+	eval { $edns->option( 65001 => [] ) };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "unable to compose option:\t[$exception]" );
 
@@ -173,6 +164,7 @@ foreach my $method (qw(class ttl)) {
 	my @result  = $decoded->options;
 	is( scalar(@result), $options, 'expected number of options' );
 
+local $Net::DNS::Parameters::ednsoptionbyval{65023};
 	$edns->print;
 }
 

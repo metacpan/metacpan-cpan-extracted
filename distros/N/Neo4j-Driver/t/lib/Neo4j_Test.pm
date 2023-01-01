@@ -67,9 +67,10 @@ sub driver {
 
 # returns a driver that is expected to fail (no connection)
 sub driver_no_connect {
-	# NXDOMAIN via DNS is slow; Port 14 is unassigned and should be closed
+	# Port 14 is unassigned and should be closed. The IP address is the
+	# multicast address that belongs to TEST-NET-1 and should fail.
 	driver_maybe;  # init $bolt
-	my $driver = Neo4j::Driver->new(($bolt ? 'bolt' : 'http') . '://localhost:14');
+	my $driver = Neo4j::Driver->new(($bolt ? 'bolt' : 'http') . '://234.192.0.2:14');
 	return $driver;
 }
 
@@ -95,14 +96,6 @@ sub transaction_unconnected {
 	my $session = Neo4j::Driver::Session::HTTP->new( $driver );
 	my $transaction = Neo4j::Driver::Transaction::HTTP->new( $session );
 	return $transaction;
-}
-
-
-# used for the ResultSummary/ServerInfo test
-sub server_address {
-	return 'localhost:7474' unless $ENV{TEST_NEO4J_SERVER};
-	return 'localhost:7687' if $ENV{TEST_NEO4J_SERVER} =~ m{^bolt:(?://(?:localhost\b)?)?}i;
-	return '' . (URI->new( $ENV{TEST_NEO4J_SERVER} )->host_port // '');
 }
 
 

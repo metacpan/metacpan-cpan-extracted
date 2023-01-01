@@ -438,3 +438,25 @@ Port-channel1 is up, line protocol is up (connected)
      0 lost carrier, 0 no carrier, 0 pause output
      0 output buffer failures, 0 output buffers swapped out
 sw07#exit
+
+VLAN0001
+  Spanning tree enabled protocol rstp
+  Root ID    Priority    4097
+             Address     444c.1234.5678
+             Cost        2
+             Port        512 (Port-channel1)
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    32769  (priority 32768 sys-id-ext 1)
+             Address     503d.1234.5678
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+             Aging Time  300 sec
+
+Interface           Role Sts Cost      Prio.Nbr Type
+------------------- ---- --- --------- -------- --------------------------------
+Gi1/0/3             Desg FWD 19        128.3    P2p
+Gi1/0/4             Desg FWD 19        128.4    P2p Edge
+Gi1/0/5             Desg BLK 4         128.5    P2p Dispute
+Po1                 Root FWD 2         128.512  P2p
+Gi1/0/5             Desg LRN 4         128.5    P2p
+

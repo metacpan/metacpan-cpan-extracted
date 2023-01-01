@@ -1,5 +1,15 @@
 Revision history for Log-Dispatch-Array
 
+1.005     2022-12-31 21:24:20-05:00 America/New_York
+        - v1.004 was a little broken, so now this time *really*:
+        - set a policy for what perls to expect will work
+        - as of now, v5.12 is the minimum required perl
+
+1.004     2022-12-29 19:35:00-05:00 America/New_York
+        - update packaging
+        - set a policy for what perls to expect will work
+        - as of now, v5.12 is the minimum required perl
+
 1.003     2013-12-25 22:38:11-0500 America/New_York
           fix github links
 

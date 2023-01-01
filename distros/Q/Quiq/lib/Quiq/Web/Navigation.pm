@@ -123,6 +123,15 @@ Der Eintrag für die Rückkehrseite wird gelöscht.
 
 =back
 
+=item navMsg=msg
+
+Übermittelt an die Folgeseite (die typischerweise eine
+Rückkehrseite ist) einen Text. Dieser Parameter wird wie alle
+nav*-Parameter automatisch aus dem URL, der in
+Navigationshistorie (call.db) gespeichert wird entfernt, so
+dass dieser bei der erneuten Rückkehr nicht noch einmal
+verwendet wird.
+
 =back
 
 =cut
@@ -136,12 +145,13 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.205';
+our $VERSION = '1.206';
 
 use Quiq::Path;
 use Quiq::LockedCounter;
 use Quiq::Hash::Db;
 use POSIX ();
+use Quiq::Url;
 
 # -----------------------------------------------------------------------------
 
@@ -205,7 +215,7 @@ sub new {
     my ($x,$y) = ('','');
     if (my $navPos = $obj->param('navPos')) {
         ($x,$y) = $navPos =~ /(\d+)\*(\d+)/;
-warn "$x|$y\n";
+# warn "$x|$y\n";
     }
     
     # Navigationsobjekt mit der Rückkehrseite, falls existent
@@ -300,7 +310,7 @@ warn "$x|$y\n";
             $url .= index($url,'?') >= 0? '&': '?';
             $url .= "navScroll=$x*$y";
         }
-warn "backUrl: $url\n";
+# warn "backUrl: $url\n";
         $self->set(backUrl=>$url);
     }
 
@@ -351,9 +361,45 @@ sub backUrl {
 
 # -----------------------------------------------------------------------------
 
+=head3 backUrlObj() - URL-Objekt der Rückkehrseite
+
+=head4 Synopsis
+
+  $urlObj = $nav->backUrlObj;
+  $urlObj = $nav->backUrlObj($defaultUrl);
+
+=head4 Arguments
+
+=over 4
+
+=item (String) $defaultUrl
+
+URL, der genutzt wird, wenn kein Rückkehr-URL definiert ist.
+
+=back
+
+=head4 Returns
+
+(Object) URL-Objekt (siehe Quiq::Url)
+
+=head4 Description
+
+Liefere den URL der Rückkehrseite als Objekt.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub backUrlObj {
+    my $self = shift;
+    return Quiq::Url->new($self->backUrl);
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.205
+1.206
 
 =head1 AUTHOR
 

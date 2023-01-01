@@ -19,6 +19,10 @@ d.h. es besteht aus mehreren Zeilen gleichartiger Widgets.
 
 =over 4
 
+=item border => $bool (Default: 0)
+
+Umrande die Felder der zugrundeliegenden Tabelle.
+
 =item initialize => $sub (Default: sub {})
 
 Subroutine zur Initialisierung der Widgets. Beispiel:
@@ -65,10 +69,10 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.205';
+our $VERSION = '1.206';
 
-use Quiq::Storable;
 use Quiq::Html::Widget::Hidden;
+use Quiq::Storable;
 use Quiq::Html::Table::Simple;
 
 # -----------------------------------------------------------------------------
@@ -97,6 +101,7 @@ sub new {
     # @_: @keyVal
 
     my $self = $class->SUPER::new(
+        border => 0,
         initialize => sub {},
         name => 'formMatrix',
         names => [],
@@ -136,8 +141,8 @@ sub html {
 
     my $self = ref $this? $this: $this->new(@_);
 
-    my ($initializeSub,$name,$rows,$titleA,$widgetA) =
-        $self->get(qw/initialize name rows titles widgets/);
+    my ($border,$initializeSub,$name,$rows,$titleA,$widgetA) =
+        $self->get(qw/border initialize name rows titles widgets/);
 
     if (!@$widgetA) {
         return '';
@@ -151,6 +156,11 @@ sub html {
     }
     push @rows,\@row;
 
+    my $hidden = Quiq::Html::Widget::Hidden->html($h,
+        name => $name.'Size',
+        value => $rows
+    );
+
     for my $i (1 .. $rows) {
         my @row;
         for (@$widgetA) {
@@ -158,17 +168,18 @@ sub html {
             my $name = $w->name;
             $w->name($name."_$i");
             $initializeSub->($w,$name,$i);
+            if ($w->hidden) {
+               $hidden .= $w->html($h);
+               next;
+            }
             push @row,[$w->html($h)];
         }
         push @rows,\@row;
     }
 
-    return Quiq::Html::Widget::Hidden->html($h,
-            name => $name.'Size',
-            value => $rows
-        ).
+    return $hidden.
         Quiq::Html::Table::Simple->html($h,
-            border => 0,
+            border => $border,
             rows => \@rows,
         )
     ;
@@ -178,7 +189,7 @@ sub html {
 
 =head1 VERSION
 
-1.205
+1.206
 
 =head1 AUTHOR
 

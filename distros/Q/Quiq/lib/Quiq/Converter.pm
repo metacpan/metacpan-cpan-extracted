@@ -22,7 +22,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.205';
+our $VERSION = '1.206';
 
 use POSIX ();
 use Time::Local ();
@@ -147,6 +147,50 @@ sub snakeCaseToCamelCase {
     # Eingebettete Bindestriche und Unterstriche in Camel Case wandeln
     # $str =~ s/(.)[_-](.)/$1\U$2/g;
     $str =~ s/[_-](.)/\U$1/g;
+
+    return $str;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 protectRegexChars() - Maskiere Regex-Metazeichen in Zeichenkette
+
+=head4 Synopsis
+
+  $strProtexted = $this->protectRegexChars($str);
+
+=head4 Arguments
+
+=over 4
+
+=item $str
+
+Zeichenkette, in der die Zeichen maskiert werden sollen
+
+=back
+
+=head4 Returns
+
+(String) Zeichenkette, in der die Regex-Metazeichen maskiert sind.
+
+=head4 Description
+
+Maskiere in Zeichenkete $str alle Regex-Metazeichen und liefere
+das Resultat zurück. Maskiert werden die Zeichen
+
+  . + * ? | ( ) { } [ ] \ ^ $
+
+Im Gegensatz zur Perl Buildinfunktion quotemeta() bzw. "\Q..."
+maskiert diese Methode keine anderen Zeichen als Regex-Metazeichen.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub protectRegexChars {
+    my ($this,$str) = @_;
+
+    $str =~ s/([.+*?|(){}\[\]\\^\$])/\\$1/g;
 
     return $str;
 }
@@ -678,7 +722,7 @@ sub stringToKeyVal {
 
 =head1 VERSION
 
-1.205
+1.206
 
 =head1 AUTHOR
 

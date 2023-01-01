@@ -1,6 +1,6 @@
-package HTTP::Throwable::Role::Status::PreconditionFailed;
+package HTTP::Throwable::Role::Status::PreconditionFailed 0.028;
 our $AUTHORITY = 'cpan:STEVAN';
-$HTTP::Throwable::Role::Status::PreconditionFailed::VERSION = '0.027';
+
 use Moo::Role;
 
 with(
@@ -23,7 +23,7 @@ HTTP::Throwable::Role::Status::PreconditionFailed - 412 Precondition Failed
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 DESCRIPTION
 
@@ -33,6 +33,16 @@ This response code allows the client to place preconditions
 on the current resource metainformation (header field data)
 and thus prevent the requested method from being applied to
 a resource other than the one intended.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 AUTHORS
 
@@ -44,7 +54,7 @@ Stevan Little <stevan.little@iinteractive.com>
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =back
 

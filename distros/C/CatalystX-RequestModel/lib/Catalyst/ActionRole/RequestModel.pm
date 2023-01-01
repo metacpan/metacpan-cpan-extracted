@@ -18,7 +18,7 @@ around 'execute', sub {
 
 sub _get_request_model {
   my ($self, $controller, $ctx) = @_;
-  return unless exists $self->attributes->{RequestModel};
+  return unless exists $self->attributes->{RequestModel} || exists $self->attributes->{QueryModel};
 
   my @models = map { $_=~s/^\s+|\s+$//g; $_ } # Allow RequestModel( Model ) and RequestModel (Model, Model2)
      map {split ',', $_ }  # Allow RequestModel(Model1,Model2)
@@ -36,7 +36,25 @@ sub _get_request_model {
     $self->_build_request_model_instance($controller, $ctx, $_)
   } @models;
 
-  return CatalystX::RequestModel::Utils::InvalidContentType->throw(ct=>$ctx->req->content_type) unless @matching_models;
+  if(exists $self->attributes->{RequestModel}) {
+    return CatalystX::RequestModel::Utils::InvalidContentType->throw(ct=>$ctx->req->content_type) unless @matching_models;
+  }
+
+  ## Query
+  my @qmodels = map { $_=~s/^\s+|\s+$//g; $_ } # Allow RequestModel( Model ) and RequestModel (Model, Model2)
+    map {split ',', $_ }  # Allow RequestModel(Model1,Model2)
+    @{$self->attributes->{QueryModel} || []};
+
+  # Loop over all the found models.  Create each one and then filter by request
+  # content type if that is defined.  This allows you to have different query paremters
+  # based on the incoming content type.
+
+  push @matching_models, grep {
+    $_->has_content_type ? (lc($_->content_type) eq lc($request_content_type)) : 1;
+  } map {
+    $self->_build_request_model_instance($controller, $ctx, $_)
+  } @qmodels;
+
   return @matching_models;
 }
 
@@ -44,7 +62,6 @@ sub _build_request_model_instance {
   my ($self, $controller, $ctx, $request_model_class) = @_;
   my $request_model_instance = $ctx->model($request_model_class)
     || die "Request Model '$request_model_class' doesn't exist";
-
   return $request_model_instance;
 }
 
@@ -68,6 +85,10 @@ Catalyst::ActionRole::RequestModel - Inflate a Request Model
       sub update :POST Chained('root') PathPart('') Args(0) Does(RequestModel) RequestModel(AccountRequest) {
         my ($self, $c, $request_model) = @_;
         ## Do something with the $request_model
+      }
+
+      sub list :GET Chained('root') PathPart('') Args(0) Does(RequestModel) QueryModel(PagingModel) {
+        my ($self, $c, $paging_model) = @_;
       }
 
     __PACKAGE__->meta->make_immutable;
@@ -118,6 +139,26 @@ Example of an action with more than one request model, which will be matched bas
     }
 
 Also, if more than one model matches, you'll get an instance of each matching model.
+
+=head2 QueryModel
+
+Should be the name of a L<Catalyst::Model> subclass that does L<CatalystX::QueryModel::DoesQueryModel>.  You may 
+supply more than one value to handle different request content types (the code will match the incoming
+content type to an available query model and throw an L<CatalystX::RequestModel::Utils::InvalidContentType>
+exception if none of the available models match.
+
+    sub root :Chained(/root) PathPart('users') CaptureArgs(0)  { }
+
+      sub list :GET Chained('root') PathPart('') Args(0) Does(RequestModel) QueryModel(PagingModel) {
+        my ($self, $c, $paging_model) = @_;
+      }
+
+B<NOTE>: In the situation where you have QueryModel and Request model for the same action, the request models
+will be added first to the action argument list, followed by the query models, no matter what order they appear
+in the action method declaration.  This is due to a limitation in how Catalyst collects the subroutine attributes
+(we can't know the order of dissimilar attributes since this information is stored in a hash, not an array, and
+L<Catalyst> allows a controller to inherit attributes from a base class, or from a role or even from configutation).
+However the order of QueryModels and RequestModels independently are preserved.
 
 =head1 AUTHOR
 

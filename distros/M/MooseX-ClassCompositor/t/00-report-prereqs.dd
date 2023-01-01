@@ -1,7 +1,7 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '6.78'
                                       }
                       },
        'develop' => {
@@ -23,7 +23,8 @@ do { my $x = {
                                       'MooseX::Types::Perl' => '0',
                                       'Scalar::Util' => '0',
                                       'String::RewritePrefix' => '0',
-                                      'namespace::autoclean' => '0'
+                                      'namespace::autoclean' => '0',
+                                      'perl' => '5.012'
                                     }
                     },
        'test' => {
@@ -37,6 +38,7 @@ do { my $x = {
                                    'Moose::Role' => '0',
                                    'MooseX::Role::Parameterized' => '0.23',
                                    'Test::More' => '0.96',
+                                   'lib' => '0',
                                    'strict' => '0',
                                    'warnings' => '0'
                                  }

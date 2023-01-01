@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.306';
+our $VERSION = '2.307';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -38,22 +38,23 @@ BEGIN {
 sub new {
     my ( $class ) = @_;
     my $info = {
-        tc_default  => { hide_cursor => 0, clear_screen => 1, page => 2, undef => '<<', prompt => 'Your choice:' },
-        tf_default  => { hide_cursor => 2, clear_screen => 1, page => 2 },
-        tr_default  => { hide_cursor => 2, clear_screen => 1, page => 2 },
-        tcu_default => { hide_cursor => 0, clear_screen => 1, page => 2 }, ##
-        lyt_h       => { order => 0, alignment => 2 },
-        lyt_v       => { undef => '  BACK', layout => 2 },
-        dots        => '...',
-        quit        => 'QUIT',
-        back        => 'BACK',
-        confirm     => 'CONFIRM',
-        _quit       => '  QUIT',
-        _back       => '  BACK',
-        _continue   => '  CONTINUE',
-        _confirm    => '  CONFIRM',
-        _reset      => '  RESET',
-        ok          => '-OK-',
+        tc_default    => { hide_cursor => 0, clear_screen => 1, page => 2, undef => '<<', prompt => 'Your choice:' },
+        tf_default    => { hide_cursor => 2, clear_screen => 1, page => 2 },
+        tr_default    => { hide_cursor => 2, clear_screen => 1, page => 2 },
+        tcu_default   => { hide_cursor => 0, clear_screen => 1, page => 2 }, ##
+        lyt_h         => { order => 0, alignment => 2 },
+        lyt_v         => { undef => '  BACK', layout => 2 },
+        dots          => '...',
+        quit          => 'QUIT',
+        back          => 'BACK',
+        confirm       => 'CONFIRM',
+        _quit         => '  QUIT',
+        _back         => '  BACK',
+        _continue     => '  CONTINUE',
+        _confirm      => '  CONFIRM',
+        _reset        => '  RESET',
+        ok            => '-OK-',
+        info_thsd_sep => ',',
     };
     return bless { i => $info }, $class;
 }
@@ -591,7 +592,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.306
+Version 2.307
 
 =head1 DESCRIPTION
 
@@ -603,7 +604,7 @@ Matthäus Kiem <cuer2s@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2022 Matthäus Kiem.
+Copyright (C) 2012-2023 Matthäus Kiem.
 
 THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE
 IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.

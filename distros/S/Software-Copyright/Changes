@@ -1,3 +1,11 @@
+0.007 2022-12-30
+
+    * Fix test failure on perl 5.20
+
+0.006 2022-12-29
+
+    * Copyright: add contains method
+
 0.005 2022-11-11
 
     * Copyright: handle statements that contain only year information

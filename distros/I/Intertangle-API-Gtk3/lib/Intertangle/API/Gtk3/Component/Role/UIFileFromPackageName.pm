@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::API::Gtk3::Component::Role::UIFileFromPackageName;
 # ABSTRACT: Role to obtain name of Glade UI file from the name of the package
-$Intertangle::API::Gtk3::Component::Role::UIFileFromPackageName::VERSION = '0.006';
+$Intertangle::API::Gtk3::Component::Role::UIFileFromPackageName::VERSION = '0.007';
 use Moo::Role;
 
 use Renard::Incunabula::Common::Types qw(File);
@@ -35,7 +35,7 @@ Intertangle::API::Gtk3::Component::Role::UIFileFromPackageName - Role to obtain 
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 DESCRIPTION
 

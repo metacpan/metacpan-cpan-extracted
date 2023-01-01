@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '1.80';
+our $VERSION = '1.85';
 
 # AUTHORITY
 
@@ -27,6 +27,7 @@ sub import {
     catch => 1,
     error => 1,
     false => 1,
+    fault => 1,
     raise => 1,
     true => 1,
   );
@@ -82,6 +83,14 @@ sub false () {
   return Venus::False->value;
 }
 
+sub fault (;$) {
+  my ($data) = @_;
+
+  require Venus::Fault;
+
+  return Venus::Fault->new($data)->throw;
+}
+
 sub raise ($;$) {
   my ($self, $data) = @_;
 
@@ -120,7 +129,7 @@ OO Standard Library for Perl 5
 
 =head1 VERSION
 
-1.80
+1.85
 
 =cut
 
@@ -378,6 +387,45 @@ I<Since C<0.01>>
   my $true = !false;
 
   # 1
+
+=back
+
+=cut
+
+=head2 fault
+
+  fault(Str $args) (Fault)
+
+The fault function throws a L<Venus::Fault> exception object and represents a
+system failure, and isn't meant to be caught.
+
+I<Since C<1.80>>
+
+=over 4
+
+=item fault example 1
+
+  package main;
+
+  use Venus 'fault';
+
+  my $fault = fault;
+
+  # bless({message => 'Exception!'}, 'Venus::Fault')
+
+=back
+
+=over 4
+
+=item fault example 2
+
+  package main;
+
+  use Venus 'fault';
+
+  my $fault = fault 'Something failed!';
+
+  # bless({message => 'Something failed!'}, 'Venus::Fault')
 
 =back
 

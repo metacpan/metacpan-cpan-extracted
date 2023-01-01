@@ -1,15 +1,49 @@
 use strict;
 use warnings;
-package MIME::BodyMunger;
-{
-  $MIME::BodyMunger::VERSION = '0.006';
-}
+package MIME::BodyMunger 0.007;
 # ABSTRACT: rewrite the content of text parts, minding charset
 
 use Carp ();
 use Encode;
 use Variable::Magic ();
 
+#pod =head1 SYNOPSIS
+#pod
+#pod   MIME::BodyMunger->rewrite_content(
+#pod     $mime_entity,
+#pod     sub {
+#pod       my ($body_ref) = @_;
+#pod       $$body_ref =~ s/zig/zag/;
+#pod     },
+#pod   );
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod MIME::BodyMunger provides methods for rewriting text parts.  These methods
+#pod take care of character sets for you so that you can treat everything like text
+#pod instead of worrying about content transfer encoding or character set encoding.
+#pod
+#pod At present, only MIME::Entity messages can be handled.  Other types will be
+#pod added in the future.
+#pod
+#pod =method rewrite_content
+#pod
+#pod   MIME::BodyMunger->rewrite_content($message, sub { ... });
+#pod
+#pod This method uses the given callback to rewrite the content (body) of the
+#pod message.  It decodes the content (using Content-Transfer-Encoding and the
+#pod Content-Type charset (or ISO-8859-1, if none is given)) and provides a
+#pod reference to the character string to the coderef.  If the content is altered,
+#pod the body will be re-encoded into the original charset and the message will be
+#pod updated.
+#pod
+#pod The callback is invoked like this:
+#pod
+#pod   $code->(\$content, $message);
+#pod
+#pod In the future, there should be an option to re-encode to an alternate charset.
+#pod
+#pod =cut
 
 sub rewrite_content {
   my ($self, $entity, $code) = @_;
@@ -41,6 +75,19 @@ sub rewrite_content {
   }
 }
 
+#pod =method rewrite_lines
+#pod
+#pod   MIME::BodyMunger->rewrite_lines($message, sub { ... });
+#pod
+#pod This method behaves like C<rewrite_content>, but the callback is invoked once
+#pod per line, like this:
+#pod
+#pod   local $_ = $line;
+#pod   $code->($message);
+#pod
+#pod If any line is changed, the entire body will be reencoded and updated.
+#pod
+#pod =cut
 
 sub rewrite_lines {
   my ($self, $entity, $code) = @_;
@@ -75,6 +122,14 @@ sub rewrite_lines {
   }
 }
 
+#pod =head1 THANKS
+#pod
+#pod Thanks to Pobox.com and Listbox.com, who sponsored the development of this
+#pod module.
+#pod
+#pod Thanks to Brian Cassidy for writing some tests for the initial release.
+#pod
+#pod =cut
 
 1;
 
@@ -82,13 +137,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 MIME::BodyMunger - rewrite the content of text parts, minding charset
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -108,6 +165,16 @@ instead of worrying about content transfer encoding or character set encoding.
 
 At present, only MIME::Entity messages can be handled.  Other types will be
 added in the future.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -149,7 +216,23 @@ Thanks to Brian Cassidy for writing some tests for the initial release.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Brian Cassidy Ricardo Signes
+
+=over 4
+
+=item *
+
+Brian Cassidy <bricas@bricas-laptop.(none)>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

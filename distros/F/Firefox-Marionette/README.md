@@ -4,7 +4,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 # VERSION
 
-Version 1.33
+Version 1.34
 
 # SYNOPSIS
 
@@ -486,6 +486,27 @@ returns true if the [current version](https://metacpan.org/pod/Firefox::Marionet
 ## dismiss\_alert
 
 dismisses a currently displayed modal message box
+
+## displays
+
+accepts an optional regex to filter against the [usage for the display](https://metacpan.org/pod/Firefox::Marionette::Display#usage) and returns a list of all the [known displays](https://en.wikipedia.org/wiki/List_of_common_resolutions) as a [Firefox::Marionette::Display](https://metacpan.org/pod/Firefox::Marionette::Display).
+
+    use Firefox::Marionette();
+    use Encode();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new( visible => 1, kiosk => 1 )->go('http://metacpan.org');;
+    my $element = $firefox->find_id('metacpan_search-input');
+    foreach my $display ($firefox->displays(qr/iphone/smxi)) {
+        say 'Can Firefox resize for "' . Encode::encode('UTF-8', $display->usage(), 1) . '"?';
+        if ($firefox->resize($display->width(), $display->height())) {
+            say 'Now displaying with a Pixel aspect ratio of ' . $display->par();
+            say 'Now displaying with a Storage aspect ratio of ' . $display->sar();
+            say 'Now displaying with a Display aspect ratio of ' . $display->dar();
+        } else {
+            say 'Apparently NOT!';
+        }
+    }
 
 ## download
 
@@ -1313,6 +1334,26 @@ returns a [File::Temp](https://metacpan.org/pod/File::Temp) object containing a 
             ...
     }
 
+## percentage\_visible
+
+accepts an [element](https://metacpan.org/pod/Firefox::Marionette::Element) as the first parameter and returns the percentage of that [element](https://metacpan.org/pod/Firefox::Marionette::Element) that is currently visible in the [viewport](https://developer.mozilla.org/en-US/docs/Glossary/Viewport).  It achieves this by determining the co-ordinates of the [DOMRect](https://developer.mozilla.org/en-US/docs/Web/API/DOMRect) with a [getBoundingClientRect](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect) call and then using [elementsFromPoint](https://developer.mozilla.org/en-US/docs/Web/API/Document/elementsFromPoint) and [getComputedStyle](https://developer.mozilla.org/en-US/docs/Web/API/Window/getComputedStyle) calls to determine how the percentage of the [DOMRect](https://developer.mozilla.org/en-US/docs/Web/API/DOMRect) that is visible to the user.  The [getComputedStyle](https://developer.mozilla.org/en-US/docs/Web/API/Window/getComputedStyle) call is used to determine the state of the [visibility](https://developer.mozilla.org/en-US/docs/Web/CSS/visibility) and [display](https://developer.mozilla.org/en-US/docs/Web/CSS/display) attributes.
+
+    use Firefox::Marionette();
+    use Encode();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new( visible => 1, kiosk => 1 )->go('http://metacpan.org');;
+    my $element = $firefox->find_id('metacpan_search-input');
+    my $totally_viewable_percentage = $firefox->percentage_visible($element); # search box is slightly hidden by different effects
+    foreach my $display ($firefox->displays()) {
+        if ($firefox->resize($display->width(), $display->height())) {
+            if ($firefox->percentage_visible($element) < $totally_viewable_percentage) {
+               say 'Search box stops being fully viewable with ' . Encode::encode('UTF-8', $display->usage());
+               last;
+            }
+        }
+    }
+
 ## perform
 
 accepts a list of actions (see [mouse\_up](https://metacpan.org/pod/Firefox::Marionette#mouse_up), [mouse\_down](https://metacpan.org/pod/Firefox::Marionette#mouse_down), [mouse\_move](https://metacpan.org/pod/Firefox::Marionette#mouse_move), [pause](https://metacpan.org/pod/Firefox::Marionette#pause), [key\_down](https://metacpan.org/pod/Firefox::Marionette#key_down) and [key\_up](https://metacpan.org/pod/Firefox::Marionette#key_up)) and performs these actions in sequence.  This allows fine control over interactions, including sending right clicks to the browser and sending Control, Alt and other special keys.  The [release](https://metacpan.org/pod/Firefox::Marionette#release) method will complete outstanding actions (such as [mouse\_up](https://metacpan.org/pod/Firefox::Marionette#mouse_up) or [key\_up](https://metacpan.org/pod/Firefox::Marionette#key_up) actions).
@@ -1461,6 +1502,33 @@ completes any outstanding actions issued by the [perform](https://metacpan.org/p
                                   $firefox->mouse_down(RIGHT_BUTTON()),
                                   $firefox->pause(4),
                 )->release();
+
+## resize
+
+accepts width and height parameters in a list and then attempts to resize the entire browser to match those parameters.  Due to the oddities of various window managers, this function needs to manually calculate what the maximum and minimum sizes of the display is.  It does this by;
+
+- 1 performing a [maximise](https://metacpan.org/pod/Firefox::Marionette::maximise), then
+- 2 caching the browser's current width and height as the maximum width and height. It
+- 3 then calls [resizeTo](https://developer.mozilla.org/en-US/docs/Web/API/Window/resizeTo) to resize the window to 0,0
+- 4 wait for the browser to send a [resize](https://developer.mozilla.org/en-US/docs/Web/API/Window/resize_event) event.
+- 5 cache the browser's current width and height as the minimum width and height
+- 6 if the requested width and height are outside of the maximum and minimum widths and heights return false
+- 7 if the requested width and height matches the current width and height return [itself](https://metacpan.org/pod/Firefox::Marionette) to aid in chaining methods. Otherwise,
+- 8 call [resizeTo](https://developer.mozilla.org/en-US/docs/Web/API/Window/resizeTo) for the requested width and height
+- 9 wait for the [resize](https://developer.mozilla.org/en-US/docs/Web/API/Window/resize_event) event
+
+This method returns [itself](https://metacpan.org/pod/Firefox::Marionette) to aid in chaining methods if the method succeeds, otherwise it returns false.
+
+    use Firefox::Marionette();
+    use Encode();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new( visible => 1, kiosk => 1 )->go('http://metacpan.org');;
+    if ($firefox->resize(1024, 768)) {
+        say 'We are showing an XGA display';
+    } else {
+       say 'Resize failed to work';
+    }
 
 ## restart
 

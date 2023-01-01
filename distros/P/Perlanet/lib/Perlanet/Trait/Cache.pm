@@ -1,5 +1,6 @@
 package Perlanet::Trait::Cache;
 
+use 5.10.0;
 use strict;
 use warnings;
 
@@ -20,7 +21,7 @@ Perlanet::Trait::Cache - cache feeds with CHI
 
 =head1 DESCRIPTION
 
-Everytime a page is fetched it is cached first through CHI. This allows you
+Every time a page is fetched it is cached first through CHI. This allows you
 to cache pages to a local disk for example, if the feed has not changed.
 
 =head1 ATTRIBUTES

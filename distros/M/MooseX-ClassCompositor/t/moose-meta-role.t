@@ -3,6 +3,8 @@ use warnings;
 
 use Test::More;
 use MooseX::ClassCompositor;
+
+use lib '.';
 use t::lib::BasicBar;
 
 my $comp_2 = MooseX::ClassCompositor->new({

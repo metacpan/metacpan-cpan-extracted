@@ -9,7 +9,7 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0.88'
-  Test::SQLite: '0'
+  Test::SQLite: '0.0410'
   base: '0'
   lib: '0'
   perl: '5.008'
@@ -35,7 +35,7 @@ requires:
 resources:
   homepage: https://github.com/ology/DBIx-Class-EncodedColumn-Crypt-Passphrase-Argon2
   repository: https://github.com/ology/DBIx-Class-EncodedColumn-Crypt-Passphrase-Argon2.git
-version: '0.0106'
+version: '0.0107'
 x_Dist_Zilla:
   perl:
     version: '5.032001'

@@ -438,3 +438,25 @@ sw07#show int
 [32m     0 lost carrier, 0 no carrier, 0 pause output[0m
 [32m     0 output buffer failures, 0 output buffers swapped out[0m
 sw07#exit
+
+VLAN[4m0[24m001
+  Spanning tree enabled protocol rstp
+  Root ID    Priority    [4m4[24m097
+             Address     444c.1234.5678
+             Cost        2
+             Port        512 (Port-channel1)
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    [4m32[24m769  (priority [4m32[24m768 sys-id-ext 1)
+             Address     503d.1234.5678
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+             Aging Time  300 sec
+
+Interface           Role Sts Cost      Prio.Nbr Type
+------------------- ---- --- --------- -------- --------------------------------
+[32mGi1/0/3             Desg FWD 19        128.3    P2p[0m
+[32mGi1/0/4             Desg FWD 19        128.4    P2p Edge[0m
+[1;31mGi1/0/5             Desg BLK 4         128.5    P2p Dispute[0m
+[32mPo1                 Root FWD 2         128.512  P2p[0m
+[33mGi1/0/5             Desg LRN 4         128.5    P2p[0m
+

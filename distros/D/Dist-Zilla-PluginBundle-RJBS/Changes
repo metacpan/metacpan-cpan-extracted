@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-RJBS
 
+5.021     2022-12-31 15:42:26-05:00 America/New_York
+        - minor metadata changes
+
 5.020     2021-07-03 13:29:55-04:00 America/New_York
         - renamed "perl-support" to "perl-window"; the word "support" makes it
           sounds like support is guaranteed at all, which it never was

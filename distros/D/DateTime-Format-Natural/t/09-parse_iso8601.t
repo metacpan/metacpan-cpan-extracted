@@ -39,7 +39,7 @@ sub compare_strings
 
     my $dt = $parser->parse_datetime($string);
 
-    if ($parser->success) {
+    if ($parser->success && $parser->_get_truncated) {
         is(_result_string($dt), $result, $string);
     }
     else {

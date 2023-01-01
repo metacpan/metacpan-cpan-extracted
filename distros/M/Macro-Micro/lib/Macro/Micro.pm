@@ -1,13 +1,44 @@
 use strict;
 use warnings;
-package Macro::Micro;
-{
-  $Macro::Micro::VERSION = '0.054';
-}
+package Macro::Micro 0.055;
 # ABSTRACT: really simple templating for really simple templates
 
 use Carp ();
 
+#pod =head1 SYNOPSIS
+#pod
+#pod   use Macro::Micro;
+#pod
+#pod   my $expander = Macro::Micro->new;
+#pod
+#pod   $expander->register_macros(
+#pod     ALIGNMENT => "Lawful Good",
+#pod     HEIGHT    => sub {
+#pod       my ($macro, $object, $stash) = @_;
+#pod       $stash->{race}->avg_height;
+#pod     },
+#pod   );
+#pod
+#pod   $expander->expand_macros_in($character, { race => $human_obj });
+#pod
+#pod   # character is now a Lawful Good, 5' 6" human
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This module performs very basic expansion of macros in text, with a very basic
+#pod concept of context and lazy evaluation.
+#pod
+#pod =method new
+#pod
+#pod   my $mm = Macro::Micro->new(%arg);
+#pod
+#pod This method creates a new Macro::Micro object.
+#pod
+#pod There is only one valid argument:
+#pod
+#pod   macro_format - this is the format for macros; see the macro_format method
+#pod
+#pod =cut
 
 my $DEFAULT_MACRO_FORMAT = qr/(?<!\\)([\[<] (\w+) [>\]])/x;
 
@@ -23,6 +54,21 @@ sub new {
   return $self;
 }
 
+#pod =method macro_format
+#pod
+#pod   $mm->macro_format( qr/.../ );
+#pod
+#pod This method gets or sets the macro format regexp for the expander.
+#pod
+#pod The format must be a reference to a regular expression, and should have two
+#pod capture groups.  The first should return the entire string to be replaced in
+#pod the text, and the second the name of the macro found.
+#pod
+#pod The default macro format is:  C<< qr/([\[<] (\w+) [>\]])/x >>
+#pod
+#pod In other words: a probably-valid-identiifer inside angled or square backets.
+#pod
+#pod =cut
 
 sub macro_format {
   my $self = shift;
@@ -36,6 +82,17 @@ sub macro_format {
   $self->{macro_format} = $macro_format;
 }
 
+#pod =method register_macros
+#pod
+#pod   $mm->register_macros($name => $value, ... );
+#pod
+#pod This method register one or more macros for later expansion.  The macro names
+#pod must be either strings or a references to regular expression.  The values may
+#pod be either strings or references to code.
+#pod
+#pod These macros may later be used for expansion by C<L</expand_macros>>.
+#pod
+#pod =cut
 
 sub register_macros {
   my ($self, @macros) = @_;
@@ -57,6 +114,13 @@ sub register_macros {
   return $self;
 }
 
+#pod =method clear_macros
+#pod
+#pod   $mm->clear_macros;
+#pod
+#pod This method clears all registered macros.
+#pod
+#pod =cut
 
 sub clear_macros {
   my ($self, @macros) = @_;
@@ -70,6 +134,18 @@ sub clear_macros {
   return;
 }
 
+#pod =method get_macro
+#pod
+#pod   my $macro = $mm->get_macro($macro_name);
+#pod
+#pod This returns the currently-registered value for the named macro.  If the given
+#pod macro name is not registered exactly, the name is checked against any regular
+#pod expression macros that are registered.  The first of these to match is
+#pod returned.
+#pod
+#pod At present, the regular expression macros are checked in an arbitrary order.
+#pod
+#pod =cut
 
 sub get_macro {
   my ($self, $macro_name) = @_;
@@ -83,6 +159,25 @@ sub get_macro {
   return;
 }
 
+#pod =method expand_macros
+#pod
+#pod   my $rewritten = $mm->expand_macros($text, \%stash);
+#pod
+#pod This method returns the result of rewriting the macros found the text.  The
+#pod stash is a set of data that may be used to expand the macros.
+#pod
+#pod The text is scanned for content matching the expander's L</macro_format>.  If
+#pod found, the macro name in the found content is looked up with C<L</get_macro>>.
+#pod If a macro is found, it is used to replace the found content in the text.
+#pod
+#pod A macros whose value is text is expanded into that text.  A macros whose value
+#pod is code is expanded by calling the code as follows:
+#pod
+#pod   $replacement = $macro_value->($macro_name, $text, \%stash);
+#pod
+#pod Macros are not expanded recursively.
+#pod
+#pod =cut
 
 sub expand_macros {
   my ($self, $object, $stash) = @_;
@@ -109,6 +204,18 @@ sub _expand_template {
                   $object->_parts;
 }
 
+#pod =method expand_macros_in
+#pod
+#pod   $mm->expand_macros_in($object, \%stash);
+#pod
+#pod This rewrites the content of C<$object> in place, using the expander's macros
+#pod and the provided stash of data.
+#pod
+#pod At present, only scalar references can be rewritten in place.  In the future,
+#pod there will be a system to define how various classes of objects should be
+#pod rewritten in place, such as email messages.
+#pod
+#pod =cut
 
 sub expand_macros_in {
   my ($self, $object, $stash) = @_;
@@ -122,6 +229,18 @@ sub expand_macros_in {
   $$object = $fast_expander->($$object);
 }
 
+#pod =method string_expander
+#pod
+#pod   my $string_expander = $mm->string_expander($stash);
+#pod
+#pod   my $rewritten_text = $string_expander->($original_text);
+#pod
+#pod This method returns a closure which will expand the macros in text passed to
+#pod it using the expander's macros and the passed-in stash.
+#pod
+#pod C<fast_expander> is provided as an alias for legacy code.
+#pod
+#pod =cut
 
 sub string_expander {
   my ($self, $stash) = @_;
@@ -143,6 +262,18 @@ sub string_expander {
 
 BEGIN { *fast_expander = \&string_expander }
 
+#pod =method macro_expander
+#pod
+#pod   my $macro_expander = $mm->macro_expander(\%stash);
+#pod
+#pod This method returns a coderef that can be called as follows:
+#pod
+#pod   $macro_expander->($macro_string, $macro_name);
+#pod
+#pod It should return the string to be used to replace the macro string that was
+#pod found.
+#pod
+#pod =cut
 
 sub macro_expander {
   my ($self, $stash) = @_;
@@ -179,6 +310,15 @@ sub macro_expander {
 }
 
 
+#pod =method study
+#pod
+#pod   my $template = $expander->study($text);
+#pod
+#pod Given a string, this returns an object which can be used as an argument to
+#pod C<expand_macros>.  Macro::Micro will find and mark the locations of macros in
+#pod the text so that calls to expand the macros will not need to search the text.
+#pod
+#pod =cut
 
 sub study {
   my ($self, $text) = @_;
@@ -201,10 +341,7 @@ sub study {
 }
 
 {
-  package Macro::Micro::Template;
-{
-  $Macro::Micro::Template::VERSION = '0.054';
-}
+  package Macro::Micro::Template 0.055;
   sub _new   { bless [ $_[1], $_[2] ] => $_[0] }
   sub _parts { @{ $_[0][1] } }
   sub _text  {    $_[0][0]   }
@@ -216,13 +353,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Macro::Micro - really simple templating for really simple templates
 
 =head1 VERSION
 
-version 0.054
+version 0.055
 
 =head1 SYNOPSIS
 
@@ -246,6 +385,16 @@ version 0.054
 
 This module performs very basic expansion of macros in text, with a very basic
 concept of context and lazy evaluation.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -361,7 +510,27 @@ the text so that calls to expand the macros will not need to search the text.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Hans Dieter Pearcey Ricardo SIGNES Signes
+
+=over 4
+
+=item *
+
+Hans Dieter Pearcey <hdp@cpan.org>
+
+=item *
+
+Ricardo SIGNES <rjbs@codesimply.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

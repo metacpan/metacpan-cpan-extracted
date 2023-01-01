@@ -1,7 +1,10 @@
 [
     {
         "description": "validation of duration strings",
-        "schema": { "format": "duration" },
+        "schema": {
+            "$schema": "https://json-schema.org/draft/next/schema",
+            "format": "duration"
+        },
         "tests": [
             {
                 "description": "all string formats ignore integers",
@@ -119,8 +122,13 @@
                 "valid": false
             },
             {
-                "description": "non-ascii digits should be rejected",
+                "description": "invalid non-ASCII '২' (a Bengali 2)",
                 "data": "P২Y",
+                "valid": false
+            },
+            {
+                "description": "element without unit",
+                "data": "P1",
                 "valid": false
             }
         ]

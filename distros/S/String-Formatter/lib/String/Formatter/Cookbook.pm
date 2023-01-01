@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package String::Formatter::Cookbook 1.234;
+package String::Formatter::Cookbook 1.235;
 # ABSTRACT: ways to put String::Formatter to use
 1;
 
@@ -171,7 +171,7 @@ String::Formatter::Cookbook - ways to put String::Formatter to use
 
 =head1 VERSION
 
-version 1.234
+version 1.235
 
 =head1 OVERVIEW
 
@@ -340,7 +340,7 @@ You can easily use this to implement an actual stringf-like method:
 
 =item *
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =item *
 
@@ -350,7 +350,7 @@ Darren Chamberlain <darren@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Ricardo Signes <rjbs@cpan.org>.
+This software is Copyright (c) 2022 by Ricardo Signes <cpan@semiotic.systems>.
 
 This is free software, licensed under:
 

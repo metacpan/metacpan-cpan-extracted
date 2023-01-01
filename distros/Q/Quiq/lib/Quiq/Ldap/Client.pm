@@ -12,7 +12,35 @@ L<Quiq::Hash>
 
 =head1 DESCRIPTION
 
-Ein Objekt der Klasse repräsentiert einen LDAP-Client.
+Ein Objekt der Klasse repräsentiert einen LDAP-Client. Die Klasse
+stellt eine Überdeckung der Klasse Net::LDAP dar, mit dem Vorteil,
+dass keine Fehlerbehandlung nötig ist, sondern im Fehlerfall
+eine Exception geworfen wird.
+
+LDAP Test Zeppelin: /usr/local/bin/test_ldap_zeppelin.sh
+
+Homepage: L<Net::LDAP|http://ldap.perl.org/>
+
+=head1 EXAMPLE
+
+  # The following example shows how to use the Class
+  # to query the RootDSE of Acctive Directory
+  
+  my $ldap = Quiq::Ldap::Client->new('dc1');
+  my $res = $ldap->search(
+      base => '',
+      filter => '(objectclass=*)',
+      scope  => 'base',
+  );
+  for my $ent ($res->entries) {
+      for my $key (sort $ent->attributes) {
+          print "$key:";
+          for my $val ($ent->get($key)) {
+              print " $val";
+          }
+          print "\n";
+      }
+  }
 
 =cut
 
@@ -25,7 +53,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.205';
+our $VERSION = '1.206';
 
 use Net::LDAP ();
 
@@ -39,15 +67,15 @@ use Net::LDAP ();
 
 =head4 Synopsis
 
-  $ldap = $class->new($host,%options);
+  $ldap = $class->new($uri,%options);
 
 =head4 Arguments
 
 =over 4
 
-=item $host
+=item $uri
 
-LDAP-Server. Siehe Net::LDAP.
+URI des LDAP-Servers. Siehe Net::LDAP.
 
 =item %options
 
@@ -66,17 +94,38 @@ dieses Objekt zurück.
 
 =head4 Example
 
-  $ldap = Quiq::Ldap::Client->new('dc1',debug=>12);
+=over 2
+
+=item *
+
+LDAP
+
+  $ldap = Quiq::Ldap::Client->new(
+      'ldap://dc1',
+      debug => 12,
+  );
+
+=item *
+
+LDAPS
+
+  $ldap = Quiq::Ldap::Client->new(
+      'ldaps://dc1',
+      verify => 'none',
+      debug => 12,
+  );
+
+=back
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub new {
-    my ($class,$host) = splice @_,0,2;
+    my ($class,$uri) = splice @_,0,2;
     # @_: %options
 
-    my $ldap = Net::LDAP->new($host,
+    my $ldap = Net::LDAP->new($uri,
         onerror => sub {
             my $self = shift;
             $class->throw(
@@ -173,6 +222,38 @@ sub search {
 
 # -----------------------------------------------------------------------------
 
+=head3 startTls() - Wandele Verbindung nach TLS
+
+=head4 Synopsis
+
+  $ldap->startTls(%options);
+
+=head4 Arguments
+
+=over 4
+
+=item %options
+
+Optionen als Schlüssel/Wert-Paare. Siehe Net::LDAP.
+
+=back
+
+=head4 Description
+
+Wandele Verbindung nach TLS
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub startTls {
+    my $self = shift;
+    # @_: %options
+    return $self->ldap->start_tls(@_);
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 unbind() - Trenne Verbindung
 
 =head4 Synopsis
@@ -196,7 +277,7 @@ sub unbind {
 
 =head1 VERSION
 
-1.205
+1.206
 
 =head1 AUTHOR
 

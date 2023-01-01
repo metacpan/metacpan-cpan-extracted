@@ -1,3 +1,20 @@
+Thu Dec 29 22:12:06 2022  Tom Hughes  <tom@compton.nu>
+
+        * Zlib.pm
+          Change version number to 1.12.
+
+Fri Dec 323 19:14:56 2022  Yves Orton  <demerphq@gmail.com>
+
+        * t/basic.t
+        * t/external.t
+        * t/getc.t
+        * t/getline.t
+        * t/large.t
+        * t/tied.t
+        * t/uncomp1.t
+        * t/uncomp2.t
+          Use a distinct test file, with pid in it, for each test.
+
 Sun Sep 13 12:36:40 2020  Tom Hughes  <tom@compton.nu>
 
         * Zlib.pm

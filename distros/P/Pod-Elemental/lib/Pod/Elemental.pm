@@ -1,6 +1,6 @@
-package Pod::Elemental;
+package Pod::Elemental 0.103006;
 # ABSTRACT: work with nestable Pod elements
-$Pod::Elemental::VERSION = '0.103005';
+
 use Moose;
 
 use namespace::autoclean;
@@ -128,7 +128,7 @@ Pod::Elemental - work with nestable Pod elements
 
 =head1 VERSION
 
-version 0.103005
+version 0.103006
 
 =head1 SYNOPSIS
 
@@ -158,6 +158,16 @@ meaning of Pod commands described in the Perl 5 documentation hold: C<=begin>,
 C<=end>, and C<=for> commands mark regions of the document, leading whitespace
 marks a verbatim paragraph, and so on.  The Pod5 transformer also eliminates
 the need to track elements representing vertical whitespace.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 ATTRIBUTES
 
@@ -190,11 +200,11 @@ These methods read the given input and return a Pod::Elemental::Document.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Christian Walde Justin Cook Karen Etheridge Philippe Bruhat (BooK)
+=for stopwords Christian Walde Justin Cook Karen Etheridge Philippe Bruhat (BooK) Ricardo Signes
 
 =over 4
 
@@ -214,11 +224,15 @@ Karen Etheridge <ether@cpan.org>
 
 Philippe Bruhat (BooK) <book@cpan.org>
 
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

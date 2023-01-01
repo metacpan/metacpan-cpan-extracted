@@ -1,6 +1,6 @@
-package MooseX::ClassCompositor;
+package MooseX::ClassCompositor 0.010;
 # ABSTRACT: a factory that builds classes from roles
-$MooseX::ClassCompositor::VERSION = '0.009';
+
 use Moose;
 
 use namespace::autoclean;
@@ -73,7 +73,7 @@ has class_basename => (
 #pod
 #pod This attribute, if given, must be a hashref of class metaroles that will be
 #pod applied to newly-constructed classes with
-#pod L<Moose::Util::MetaRole::apply_metaroles>.
+#pod L<Moose::Util::MetaRole/apply_metaroles>.
 #pod
 #pod =cut
 
@@ -338,7 +338,7 @@ MooseX::ClassCompositor - a factory that builds classes from roles
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -381,6 +381,16 @@ describing all the classes that the factory has constructed.  This method can
 be useful for debugging and other somewhat esoteric purposes like
 serialization.
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 ATTRIBUTES
 
 =head2 class_basename
@@ -392,7 +402,7 @@ Constructed classes will all be under this namespace.
 
 This attribute, if given, must be a hashref of class metaroles that will be
 applied to newly-constructed classes with
-L<Moose::Util::MetaRole::apply_metaroles>.
+L<Moose::Util::MetaRole/apply_metaroles>.
 
 =head2 known_classes
 
@@ -457,7 +467,7 @@ Thanks to Pobox.com for sponsoring the development of this library.
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =item *
 
@@ -465,11 +475,25 @@ Mark Jason Dominus <mjd@cpan.org>
 
 =back
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Toby Inkster
+=for stopwords Mohammad S Anwar Ricardo Signes Toby Inkster
+
+=over 4
+
+=item *
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=item *
 
 Toby Inkster <tobyink@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

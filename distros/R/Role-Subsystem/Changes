@@ -1,5 +1,9 @@
 Revision history for Role-Subsystem
 
+0.101342  2022-12-31 15:47:06-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 0.101341  2013-10-15 22:21:30 America/New_York
           update bugtracker and repo metadata
 

@@ -114,7 +114,7 @@ sub date_header {
 
 
 sub uri {
-	return "http://" . Neo4j_Test->server_address;
+	return "http://localhost:7474";
 }
 
 

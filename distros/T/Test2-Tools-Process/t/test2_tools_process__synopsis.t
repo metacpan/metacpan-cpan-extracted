@@ -4,7 +4,7 @@ use Test2::Tools::Process;
 process {
   system 'foo', 'bar';
 } [
-  # check tht the first system call is to
+  # check that the first system call is to
   # a command foo with any arguments
   proc_event(system => array {
     item 'foo';
@@ -13,7 +13,7 @@ process {
     # simulate the foo command
     my($proc, @args) = @_;
     note "faux bar command: @args";
-    # simulate a notmsl exit
+    # simulate a normal exit
     $proc->exit(0);
   }),
 ];

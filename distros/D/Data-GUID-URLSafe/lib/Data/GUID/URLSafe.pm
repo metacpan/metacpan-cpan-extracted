@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Data::GUID::URLSafe 0.007;
+package Data::GUID::URLSafe 0.008;
 # ABSTRACT: url-safe base64-encoded GUIDs
 
 #pod =head1 SYNOPSIS
@@ -82,7 +82,7 @@ Data::GUID::URLSafe - url-safe base64-encoded GUIDs
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -105,10 +105,10 @@ legal in email addresses, some broken email address validators reject it.
 When Data::GUID::URLSafe is C<use>'d, it installs methods into Data::GUID using
 L<Sub::Exporter|Sub::Exporter>.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has a long-term perl support period.  That means it will not
-require a version of perl released fewer than five years ago.
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
@@ -129,7 +129,13 @@ This method returns the URL-safe base64 encoded representation of the GUID.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

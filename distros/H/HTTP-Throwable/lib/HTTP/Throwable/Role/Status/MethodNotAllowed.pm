@@ -1,6 +1,6 @@
-package HTTP::Throwable::Role::Status::MethodNotAllowed;
+package HTTP::Throwable::Role::Status::MethodNotAllowed 0.028;
 our $AUTHORITY = 'cpan:STEVAN';
-$HTTP::Throwable::Role::Status::MethodNotAllowed::VERSION = '0.027';
+
 use Type::Utils qw(subtype as where enum);
 use Types::Standard qw(ArrayRef);
 use List::Util 1.45 qw[ uniq ];
@@ -54,7 +54,7 @@ HTTP::Throwable::Role::Status::MethodNotAllowed - 405 Method Not Allowed
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 DESCRIPTION
 
@@ -62,6 +62,16 @@ The method specified in the Request-Line is not allowed for the
 resource identified by the Request-URI. The response MUST include
 an Allow header containing a list of valid methods for the requested
 resource.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 ATTRIBUTES
 
@@ -84,7 +94,7 @@ Stevan Little <stevan.little@iinteractive.com>
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =back
 

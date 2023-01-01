@@ -4,7 +4,7 @@ package Excel::Writer::XLSX;
 #
 # Excel::Writer::XLSX - Create a new file in the Excel 2007+ XLSX format.
 #
-# Copyright 2000-2021, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2023, John McNamara, jmcnamara@cpan.org
 #
 # Documentation after __END__
 #
@@ -17,7 +17,7 @@ use Exporter;
 use Excel::Writer::XLSX::Workbook;
 
 our @ISA     = qw(Excel::Writer::XLSX::Workbook Exporter);
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 
 ###############################################################################
@@ -482,7 +482,7 @@ The properties that can be set are:
     comments
     status
     hyperlink_base
-    created - File create date. Such be an aref of gmtime() values.
+    created - File create date. Should be an aref of gmtime() values.
 
 See also the C<properties.pl> program in the examples directory of the distro.
 
@@ -736,6 +736,7 @@ The following methods are available through a new worksheet:
     protect()
     unprotect_range()
     set_selection()
+    set_top_left_cell()
     set_row()
     set_row_pixels()
     set_default_row()
@@ -1146,7 +1147,6 @@ To find out more about array references refer to C<perlref> and C<perlreftut> in
 
 The C<write_row()> method returns the first error encountered when writing the elements of the data or zero if no errors were encountered. See the return values described for the C<write()> method above.
 
-See also the C<write_arrays.pl> program in the C<examples> directory of the distro.
 
 The C<write_row()> method allows the following idiomatic conversion of a text file to an Excel file:
 
@@ -1219,7 +1219,6 @@ To find out more about array references refer to C<perlref> and C<perlreftut> in
 
 The C<write_col()> method returns the first error encountered when writing the elements of the data or zero if no errors were encountered. See the return values described for the C<write()> method above.
 
-See also the C<write_arrays.pl> program in the C<examples> directory of the distro.
 
 
 
@@ -1800,6 +1799,8 @@ The optional C<options> hash/hashref parameter can be used to set various option
         x_scale         => 1,
         y_scale         => 1,
         object_position => 1,
+        description     => undef,
+        decorative      => 0,
     );
 
 The parameters C<x_offset> and C<y_offset> can be used to specify an offset from the top left hand corner of the cell specified by C<$row> and C<$col>. The offset values are in pixels.
@@ -1823,6 +1824,15 @@ The C<object_position> parameter can have one of the following allowable values:
     4. Same as Option 1, see below.
 
 Option 4 appears in Excel as Option 1. However, the worksheet object is sized to take hidden rows or columns into account. This is generally only useful for images and not for charts.
+
+The C<description> parameter can be used to specify a description or "alt text" string for the chart. In general this would be used to provide a text description of the chart to help accessibility. It is an optional parameter and has no default. It can be used as follows:
+
+    $worksheet->insert_chart( 'E9', $chart, {description => 'Some alternative text'} );
+
+The optional C<decorative> parameter is also used to help accessibility. It is used to mark the chart as decorative, and thus uninformative, for automated screen readers. As in Excel, if this parameter is in use the C<description> field isn't written. It is used as follows:
+
+    $worksheet->insert_chart( 'E9', $chart, {decorative => 1} );
+
 
 
 =head2 insert_shape( $row, $col, $shape, $x, $y, $x_scale, $y_scale )
@@ -1878,6 +1888,7 @@ The properties of the button that can be set are:
     y_scale
     x_offset
     y_offset
+    description
 
 
 =over
@@ -1934,6 +1945,10 @@ This option is used to change the x offset, in pixels, of a button within a cell
 =item Option: y_offset
 
 This option is used to change the y offset, in pixels, of a comment within a cell.
+
+=item Option: description
+
+The option is used to specify a description or "alt text" string for the button.
 
 =back
 
@@ -2184,6 +2199,20 @@ Examples:
     $worksheet6->set_selection( 'G7:D4' );       # Same as 3.
 
 The default cell selections is (0, 0), 'A1'.
+
+
+
+
+=head2 set_top_left_cell( $row, $col )
+
+This method can be used to set the top leftmost visible cell in the worksheet:
+
+    $worksheet->set_top_left_cell( 31, 26 );
+
+    # Same as:
+    $worksheet->set_top_left_cell( 'AA32' );
+
+You can also use A1 notation, as shown above, see the note about L</Cell notation>.
 
 
 
@@ -3774,7 +3803,7 @@ This property can be used to prevent modification of a cells contents. Following
     $locked->set_locked( 1 );    # A non-op
 
     my $unlocked = $workbook->add_format();
-    $locked->set_locked( 0 );
+    $unlocked->set_locked( 0 );
 
     # Enable worksheet protection
     $worksheet->protect();
@@ -7249,6 +7278,7 @@ different features and options of the module. See L<Excel::Writer::XLSX::Example
     sparklines2.pl          Sparklines demo showing formatting options.
     stats_ext.pl            Same as stats.pl with external references.
     stocks.pl               Demonstrates conditional formatting.
+    watermark.pl            Example of how to set a watermark image for a worksheet.
     background.pl           Example of how to set the background image for a worksheet.
     tab_colors.pl           Example of how to set worksheet tab colours.
     tables.pl               Add Excel tables to a worksheet.
@@ -7549,6 +7579,6 @@ John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright MM-MMXXI, John McNamara.
+Copyright MM-MMXXIII, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.

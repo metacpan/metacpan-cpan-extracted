@@ -66,9 +66,15 @@ typedef struct { const char* key; clockid_t value; } map[];
 static map clocks = {
 	{ "monotonic"     , CLOCK_MONOTONIC },
 	{ "realtime"      , CLOCK_REALTIME  },
+#ifdef CLOCK_BOOTTIME
 	{ "boottime"      , CLOCK_BOOTTIME  },
+#endif
+#ifdef CLOCK_REALTIME_ALARM
 	{ "realtime_alarm", CLOCK_REALTIME_ALARM },
+#endif
+#ifdef CLOCK_BOOTTIME_ALARM
 	{ "boottime_alarm", CLOCK_BOOTTIME_ALARM },
+#endif
 };
 
 static clockid_t S_get_clockid(pTHX_ const char* clock_name) {

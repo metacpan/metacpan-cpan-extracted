@@ -3,7 +3,7 @@ package Net::DNS::Resolver;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Resolver.pm 1855 2021-11-26 11:33:48Z willem $)[2];
+our $VERSION = (qw$Id: Resolver.pm 1883 2022-11-03 14:38:19Z willem $)[2];
 
 
 =head1 NAME
@@ -254,7 +254,7 @@ the reason for failure may be determined using C<errorstring()>.
 Here is an example that uses a timeout and TSIG verification:
 
     $resolver->tcp_timeout( 10 );
-    $resolver->tsig( 'Khmac-sha1.example.+161+24053.private' );
+    $resolver->tsig( $keyfile );
     @zone = $resolver->axfr( 'example.com' );
 
     foreach $rr (@zone) {
@@ -274,7 +274,7 @@ returned to the caller.
 Here is the example above, implemented using an iterator:
 
     $resolver->tcp_timeout( 10 );
-    $resolver->tsig( 'Khmac-sha1.example.+161+24053.private' );
+    $resolver->tsig( $keyfile );
     $iterator = $resolver->axfr( 'example.com' );
 
     while ( $rr = $iterator->() ) {
@@ -602,17 +602,13 @@ The default value is false.
 
 =head2 tsig
 
-    $resolver->tsig( $tsig );
+    $resolver->tsig( $keyfile );
 
-    $resolver->tsig( 'Khmac-sha1.example.+161+24053.private' );
-
-    $resolver->tsig( 'Khmac-sha1.example.+161+24053.key' );
-
-    $resolver->tsig( 'Khmac-sha1.example.+161+24053.key',
+    $resolver->tsig( $keyfile,
 		fudge => 60
 		);
 
-    $resolver->tsig( $key_name, $key );
+    $resolver->tsig( $tsig_rr );
 
     $resolver->tsig( undef );
 

@@ -7,7 +7,6 @@ WriteMakefile(
         MIN_PERL_VERSION => "5.22.0",
         PREREQ_PM => {
           'B::Generate' => 0,
-          'ModPerl::RegistryCooker' => 0,
         },
         test => { TESTS => "t/*.pl" },
         SIGN => 1,

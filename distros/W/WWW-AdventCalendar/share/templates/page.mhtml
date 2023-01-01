@@ -31,19 +31,6 @@
 % }
     </div>
 
-
-
-% if ($tracker_id) {
-<script type="text/javascript">
-var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-</script>
-<script type="text/javascript">
-try {
-var pageTracker = _gat._getTracker("<% $tracker_id %>");
-pageTracker._trackPageview();
-} catch(err) {}</script>
-% }
 </body>
 </html>
 
@@ -96,6 +83,5 @@ pageTracker._trackPageview();
 
 <%args>
 $article    => undef
-$tracker_id => undef
 $year_links => undef
 </%args>

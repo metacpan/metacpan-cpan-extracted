@@ -1,3 +1,7 @@
+1.223650  2022-12-30 23:01:19-07:00 America/Denver
+ Joelle Maslak <jmaslak@antelope.net>
+ * [feature] Colorize "show spanning tree"
+
 1.223500  2022-12-16 19:57:27+00:00 UTC
  Joelle Maslak <jmaslak@antelope.net>
  * [bugfix] Properly colorize Ciena alarms that have 5+ digit IIDs

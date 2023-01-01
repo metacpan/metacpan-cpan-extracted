@@ -1,11 +1,11 @@
 #!/usr/local/bin/perl
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib//media/sf_src/perl/Text-PO/scripts/po.pl
-## Version v0.1.2
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.0
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/07/24
-## Modified 2022/11/23
+## Modified 2022/12/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -25,7 +25,7 @@ BEGIN
     use Text::PO::MO;
     use Text::Wrap ();
     our $PLURALS = {};
-    our $VERSION = 'v0.1.2';
+    our $VERSION = 'v0.2.0';
 };
 
 {
@@ -37,10 +37,10 @@ BEGIN
     our $out  = IO::File->new;
     $out->fdopen( fileno( STDOUT ), 'w' );
     $out->binmode( ':utf8' );
-    $out->autoflush( 1 );
+    $out->autoflush(1);
     
     our $err = IO::File->new;
-    $err->autoflush( 1 );
+    $err->autoflush(1);
     $err->fdopen( fileno( STDERR ), 'w' );
     $err->binmode( ":utf8" );
     
@@ -114,13 +114,16 @@ BEGIN
     {
         my $error = join( "\n", map{ "\t* $_" } @errors );
         substr( $error, 0, 0, "\n\tThe following arguments are mandatory and missing.\n" );
-        $out->print( <<EOT ) if( !$opts->{ 'quiet' } );
+        if( !$opts->{quiet} )
+        {
+            $out->print( <<EOT );
     $error
     Please, use option '-h' or '--help' to find out and properly call
     this program in interactive mode:
     
     $PROG_NAME -h
 EOT
+        }
         exit(1);
     }
     
@@ -473,6 +476,28 @@ sub sync
     }
     _messagec( 3, "Synchronising against po file <green>$o</>" );
     $po->sync( $o ) || bailout( $po->error );
+    if( $po->debug )
+    {
+        my $added = $po->added;
+        my $removed = $po->removed;
+        if( scalar( @$added ) )
+        {
+            _message( 3, "The following ", scalar( @$added ), " element(s) were added:\n", join( "\n\n", @$added ) );
+        }
+        else
+        {
+            _message( 3, "No element were added." );
+        }
+
+        if( scalar( @$removed ) )
+        {
+            _message( 3, "The following ", scalar( @$removed ), " element(s) were removed:\n", join( "\n\n", @$removed ) );
+        }
+        else
+        {
+            _message( 3, "No element were removed." );
+        }
+    }
 }
 
 sub to_json
@@ -923,7 +948,7 @@ po - GNU PO file manager
 
 =head1 VERSION
 
-    v0.1.2
+    v0.2.0
 
 =head1 OPTIONS
 
@@ -991,8 +1016,8 @@ The PO file meta information header
 Init a new PO file
 
     po --init --domain com.example.api --lang fr_FR ./fr_FR/com.example.api.po
-    # or as a json file
-    po --init --domain com.example.api --lang fr_FR  --as-json ./fr_FR/com.example.api.json
+    # then you can convert it as a json file
+    po --as-json --output ./fr_FR/com.example.api.json ./fr_FR/com.example.api.po
 
 =head2 --lang
 
@@ -1045,6 +1070,14 @@ The file path to the C<settings.json> json file containing all the default value
 This is convenient to set various default values rather than specifying each of of them as option
 
     po --init --settings /some/where/settings.json --domain com.example.api --lang fr_FR ./fr_FR/com.example.api.po
+
+=head2 --sync
+
+Synchronise a PO file based on another (the source), adding any missing C<msgid> and C<msgstr> resources it finds in the source file.
+
+For example, to synchronise a Japanese PO file based on its English equivalent:
+
+    po --sync --output ./locale/ja_JP/LC_MESSAGES/com.example.api.json ./locale/en_GB/LC_MESSAGES/com.example.api.json
 
 =head2 --team
 

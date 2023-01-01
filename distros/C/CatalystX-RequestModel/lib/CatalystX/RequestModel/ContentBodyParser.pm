@@ -33,7 +33,9 @@ sub handle_data_encoded {
     if(exists($context->{$pointer})) {
       $context = $context->{$pointer};
     } else {
-      CatalystX::RequestModel::Utils::InvalidRequestNamespace->throw(ns=>join '.', @$ns);
+      return $response
+      ## TODO maybe need a 'namespace_required 1' or something?
+      ##CatalystX::RequestModel::Utils::InvalidRequestNamespace->throw(ns=>join '.', @$ns);
     }
   }
 

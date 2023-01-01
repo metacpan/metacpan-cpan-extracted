@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::Text;
 # ABSTRACT: Fallback handler for result errors
-$Neo4j::Driver::Result::Text::VERSION = '0.31';
+$Neo4j::Driver::Result::Text::VERSION = '0.33';
 
 use parent 'Neo4j::Driver::Result';
 
@@ -60,40 +60,3 @@ sub _results { () }  # no actual results provided here
 
 
 1;
-
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-Neo4j::Driver::Result::Text - Fallback handler for result errors
-
-=head1 VERSION
-
-version 0.31
-
-=head1 DESCRIPTION
-
-The L<Neo4j::Driver::Result::Text> package is not part of the
-public L<Neo4j::Driver> API.
-
-=head1 SEE ALSO
-
-L<Neo4j::Driver::Net>
-
-=head1 AUTHOR
-
-Arne Johannessen <ajnn@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2016-2022 by Arne Johannessen.
-
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
-
-=cut

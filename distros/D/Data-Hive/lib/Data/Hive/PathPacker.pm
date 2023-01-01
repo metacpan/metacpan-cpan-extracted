@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Data::Hive::PathPacker 1.014;
+package Data::Hive::PathPacker 1.015;
 # ABSTRACT: a thing that converts paths to strings and then back
 
 #pod =head1 DESCRIPTION
@@ -39,7 +39,7 @@ Data::Hive::PathPacker - a thing that converts paths to strings and then back
 
 =head1 VERSION
 
-version 1.014
+version 1.015
 
 =head1 DESCRIPTION
 
@@ -47,10 +47,10 @@ Data::Hive::PathPacker classes are used by some L<Data::Hive::Store> classes to 
 
 Path packers must implement two methods:
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has a long-term perl support period.  That means it will not
-require a version of perl released fewer than five years ago.
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
@@ -83,7 +83,7 @@ Hans Dieter Pearcey <hdp@cpan.org>
 
 =item *
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =back
 

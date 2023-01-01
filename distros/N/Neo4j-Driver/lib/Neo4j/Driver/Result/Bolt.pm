@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::Bolt;
 # ABSTRACT: Bolt result handler
-$Neo4j::Driver::Result::Bolt::VERSION = '0.31';
+$Neo4j::Driver::Result::Bolt::VERSION = '0.33';
 
 use parent 'Neo4j::Driver::Result';
 
@@ -191,46 +191,3 @@ sub _deep_bless {
 
 
 1;
-
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-Neo4j::Driver::Result::Bolt - Bolt result handler
-
-=head1 VERSION
-
-version 0.31
-
-=head1 DESCRIPTION
-
-The L<Neo4j::Driver::Result::Bolt> package is not part of the
-public L<Neo4j::Driver> API.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<Neo4j::Driver::Net>
-
-=item * L<Neo4j::Driver::Result>
-
-=back
-
-=head1 AUTHOR
-
-Arne Johannessen <ajnn@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2016-2022 by Arne Johannessen.
-
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
-
-=cut

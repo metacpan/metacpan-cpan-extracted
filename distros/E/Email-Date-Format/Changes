@@ -1,5 +1,8 @@
 Revision history for Email-Date-Format
 
+1.007     2022-12-31 21:19:59-05:00 America/New_York
+        - update author info
+
 1.006     2022-10-22 16:01:01-04:00 America/New_York
         - update packaging
         - avoid using ambiguous 2 digit years (thanks, bitcardbmw@lsmod.de)

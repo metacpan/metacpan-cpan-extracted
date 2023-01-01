@@ -1,5 +1,5 @@
-package Perl::Critic::Policy::Lax::RequireConstantOnLeftSideOfEquality::ExceptEq;
-$Perl::Critic::Policy::Lax::RequireConstantOnLeftSideOfEquality::ExceptEq::VERSION = '0.013';
+package Perl::Critic::Policy::Lax::RequireConstantOnLeftSideOfEquality::ExceptEq 0.014;
+
 use utf8;
 use strict;
 use warnings;
@@ -61,12 +61,22 @@ Perl::Critic::Policy::Lax::RequireConstantOnLeftSideOfEquality::ExceptEq - const
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 DESCRIPTION
 
 This policy behaves like Perl::Critic::Policy::ValuesAndExpressions::RequireConstantOnLeftSideOfEquality,
 but allows constant value on the right side of an equality with the operator 'eq'.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 NAME
 
@@ -74,11 +84,11 @@ Perl::Critic::Policy::Lax::RequireConstantOnLeftSideOfEquality::ExceptEq - const
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo Signes <rjbs@cpan.org>.
+This software is copyright (c) 2022 by Ricardo Signes <cpan@semiotic.systems>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

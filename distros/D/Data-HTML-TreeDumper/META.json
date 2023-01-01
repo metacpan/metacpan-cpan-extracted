@@ -44,6 +44,7 @@
          "requires" : {
             "Const::Fast" : "0",
             "Encode" : "0",
+            "HTML::AutoTag" : "0",
             "HTML::Entities" : "0",
             "Ref::Util" : "0",
             "YAML::Syck" : "0",
@@ -62,7 +63,7 @@
    "provides" : {
       "Data::HTML::TreeDumper" : {
          "file" : "lib/Data/HTML/TreeDumper.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.4"
       }
    },
    "release_status" : "stable",
@@ -77,7 +78,7 @@
          "web" : "https://github.com/TakeAsh/p-Data-HTML-TreeDumper"
       }
    },
-   "version" : "v0.0.3",
+   "version" : "v0.0.4",
    "x_authority" : "cpan:TAKEASH",
    "x_contributors" : [
       "TakeAsh <take@TakeAsh.net>"

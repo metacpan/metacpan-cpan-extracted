@@ -23,9 +23,10 @@ our $mod = {
     module=>'PDL::Graphics::Simple::PGPLOT',
     engine => 'PDL::Graphics::PGPLOT::Window',
     synopsis=> 'PGPLOT (venerable but trusted)',
-    pgs_version=> '1.007',
+    pgs_version=> '1.008',
 };
-eval q{PDL::Graphics::Simple::register( 'PDL::Graphics::Simple::PGPLOT' )};
+eval { require PDL::Graphics::PGPLOT::Window; 1; } and
+  PDL::Graphics::Simple::register( 'PDL::Graphics::Simple::PGPLOT' );
 print $@;
 
 ##########
@@ -49,7 +50,7 @@ sub check {
     my ($fh,$tf) = tempfile('pgg_pgplot_XXXX');
     close $fh;
 
-    my $cmd = qq{|perl -e "use PGPLOT; open STDOUT,q[>$tf] || die; open STDERR,STDOUT || die; pgopen(q[?])"};
+    my $cmd = qq{|perl -e "use PGPLOT; open STDOUT,q[>$tf] or die; open STDERR,STDOUT or die; pgopen(q[?])"};
     open FOO,$cmd;
     print FOO "?\n";
     close FOO;
@@ -79,6 +80,7 @@ sub check {
 	return 0;
     }
 
+    $mod->{ok} = 1;
     return 1;
 }
 

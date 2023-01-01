@@ -1,5 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://json-schema.org/tests/test-schema",
     "description": "A schema for files contained within this suite",
 
     "type": "array",

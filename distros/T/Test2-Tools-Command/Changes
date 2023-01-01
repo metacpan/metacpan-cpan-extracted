@@ -1,0 +1,18 @@
+Revision history for Test2-Tools-Command
+
+0.11    2023-01-01
+        Make better use of Test2. Fix tests such that stdout and
+        stderr tests are actually called, maybe. Remove needless
+        dependency on Cwd.
+
+0.10    2022-12-31
+        Breaking interface changes and other such work.
+        * Change the return values of command().
+        * qr// or exact string tests on stdout, stderr.
+        * Add munge_signal for when the signal type varies.
+        * Remove want_fh as that interacts poorly with timeout. 
+        * Improved test names for when tests fail, or the ability to
+          specify a custom name associated with the tests.
+
+0.01    2022-12-29
+        First version, released on an unsuspecting world.

@@ -1,0 +1,35 @@
+---
+abstract: 'Backend for Cobertura reporting of coverage statistics'
+author:
+  - 'Jeff Zhang <jhzhang@synopsys.com>'
+build_requires:
+  Devel::Cover: '0'
+  TAP::Harness: '0'
+  Test::Exception: '0'
+  Test::MockObject: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-Cover-Report-Cobertura
+no_index:
+  directory:
+    - cover_db_test
+    - t
+recommends:
+  Test::MockTime: '0'
+requires:
+  Class::Accessor: '0'
+  Devel::Cover: '0'
+  Devel::Cover::Report::Clover: '1.01'
+  HTML::Parser: '0'
+  Template: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '1.0'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

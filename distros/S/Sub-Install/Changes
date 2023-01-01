@@ -1,5 +1,8 @@
 Revision history for Sub-Install
 
+0.929     2022-12-31 15:58:28-05:00 America/New_York
+        - update packaging and metadata
+
 0.928     2014-06-26 18:57:27-04:00 America/New_York
         - cope with subroutines with spaces in their names when catching
           warnings

@@ -1,5 +1,9 @@
 Release history for Test-Abortable
 
+0.003     2022-12-31 14:04:32-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 0.002     2017-01-16 13:01:49-05:00 America/New_York
         - to better act like Test::Builder's subtest(), Test2's "no_fork" mode
           is now used

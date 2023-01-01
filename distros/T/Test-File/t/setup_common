@@ -1,6 +1,7 @@
 use strict;
 
 use Test::More 1;
+END{ done_testing() unless caller }
 
 use Config;
 use File::Temp qw(tempdir);
@@ -9,7 +10,7 @@ sub is_cygwin () { scalar grep { lc($^O) eq $_ or lc($Config{osname}) eq $_ } qw
 
 sub is_msys   () { scalar grep { lc($^O) eq $_ or lc($Config{osname}) eq $_ } qw( msys msys2 ) }
 
-sub is_win32 () { $^O eq 'MSWin32' }
+sub is_win32  () { $^O eq 'MSWin32' }
 
 sub is_unix_superuser () {
     ( not is_win32() and ( $> == 0 or $< == 0 ) )
@@ -17,7 +18,8 @@ sub is_unix_superuser () {
     ( is_cygwin() and grep { $_ == 544 } split /\s+/, `/usr/bin/id -G` )
 	}
 
-my $dir = tempdir( CLEANUP => 1 ) or BAIL_OUT( "Could not setup temp directory" );
+my $dir = tempdir( CLEANUP => 0 ) or BAIL_OUT( "Could not setup temp directory" );
+print "Temp dir in <$dir>\n";
 
 unless( -d $dir ) {
 	mkdir 'test_files', 0700
@@ -51,6 +53,9 @@ is( $count, 3 ) or BAIL_OUT( "Could not make files readable" );
 my $count = chmod 0200, 'writable', 'not_readable',
 		'zero_file', 'max_file', 'non_zero_file';
 is( $count, 5 ) or BAIL_OUT( "Could not make files writable" );
+if( is_win32() ) {
+	system 'attrib', '+', 'not_readable';
+	}
 }
 
 {

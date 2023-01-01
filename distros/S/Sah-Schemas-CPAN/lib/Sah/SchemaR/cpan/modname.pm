@@ -1,12 +1,13 @@
+## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::cpan::modname;
 
-our $DATE = '2021-07-19'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2022-09-25'; # DATE
+our $VERSION = '0.014'; # VERSION
 
-our $rschema = ["str",[{description=>"\nThis is a schema you can use when you want to accept a Perl module name. It\noffers basic checking of syntax as well as a couple of conveniences. First, it\noffers completion from list of locally installed Perl modules. Second, it\ncontains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, `Foo/Bar.pm`\nor even 'Foo.Bar' and it will be normalized into `Foo::Bar`.\n\nNote that this schema does not check that the Perl module exists or is installed\nlocally. To check that, use the `perl::modname::installed` schema. And there's\nalso a `perl::modname::not_installed` schema.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"Foo::Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo-Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar.pm"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo.Bar"},{valid=>0,value=>"Foo|Bar"}],match=>"\\A(?:[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*)\\z",prefilters=>["Perl::normalize_perl_modname"],summary=>"Perl module name, e.g. Foo::Bar","x.completion"=>"perl_modname"},{description=>"\nLike perl::modname, but with completion from module names on CPAN (using lcpan).\n\n",examples=>[{valid=>0,value=>""},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo::Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo-Bar"}],"x.completion"=>["lcpan_modname"]}],["perl::modname","str"]];
+our $rschema = do{my$var={base=>"perl::modname",clsets_after_base=>[{description=>"\nLike perl::modname, but with completion from module names on CPAN (using lcpan).\n\n",examples=>[{valid=>0,value=>""},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo::Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo-Bar"}],summary=>"A module name on CPAN, e.g. 'Module::Installed::Tiny'","x.completion"=>["lcpan_modname"]}],clsets_after_type=>[{description=>"\nThis is a schema you can use when you want to accept a Perl module name. It\noffers basic checking of syntax as well as a couple of conveniences. First, it\noffers completion from list of locally installed Perl modules. Second, it\ncontains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, `Foo/Bar.pm`\nor even 'Foo.Bar' and it will be normalized into `Foo::Bar`.\n\nTo see this schema in action on the CLI, you can try e.g. the `pmless` script\nfrom <pm:App::PMUtils> and activate its tab completion (see its manpage for more\ndetails). Then on the CLI try typing:\n\n    % pmless M/<tab>\n    % pmless dzp/<tab>\n    % pmless Module/List/Wildcard\n    % pmless Module::List::Wildcard\n\nNote that this schema does not check that the Perl module exists or is installed\nlocally. To check that, use the `perl::modname::installed` schema. And there's\nalso a `perl::modname::not_installed` schema.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"Foo::Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo-Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar.pm"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo.Bar"},{valid=>0,value=>"Foo|Bar"}],match=>"\\A(?:[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*)\\z",prefilters=>["Perl::normalize_perl_modname"],summary=>"Perl module name, e.g. Foo::Bar","x.completion"=>"perl_modname"},'$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_type}[0]','$var->{clsets_after_base}[0]'],resolve_path=>["str","perl::modname"],type=>"str",v=>2};$var->{clsets_after_type}[1]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_type}[0];$var->{"clsets_after_type.alt.merge.merged"}[1]=$var->{clsets_after_base}[0];$var};
 
 1;
-# ABSTRACT: 
+# ABSTRACT: A module name on CPAN, e.g. 'Module::Installed::Tiny'
 
 __END__
 
@@ -16,11 +17,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::cpan::modname -  
+Sah::SchemaR::cpan::modname - A module name on CPAN, e.g. 'Module::Installed::Tiny'
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::SchemaR::cpan::modname (from Perl distribution Sah-Schemas-CPAN), released on 2021-07-19.
+This document describes version 0.014 of Sah::SchemaR::cpan::modname (from Perl distribution Sah-Schemas-CPAN), released on 2022-09-25.
 
 =head1 DESCRIPTION
 
@@ -36,6 +37,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-CPAN>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-CPAN>
@@ -43,16 +73,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

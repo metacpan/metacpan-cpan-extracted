@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Data::Hive::PathPacker::Strict 1.014;
+package Data::Hive::PathPacker::Strict 1.015;
 # ABSTRACT: a simple, strict path packer
 
 use parent 'Data::Hive::PathPacker';
@@ -66,7 +66,7 @@ Data::Hive::PathPacker::Strict - a simple, strict path packer
 
 =head1 VERSION
 
-version 1.014
+version 1.015
 
 =head1 DESCRIPTION
 
@@ -75,10 +75,10 @@ L<Data::Hive::PathPacker>.  It joins path parts together with a fixed string
 and splits them apart on the same string.  If the fixed string occurs any path
 part, an exception is thrown.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has a long-term perl support period.  That means it will not
-require a version of perl released fewer than five years ago.
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
@@ -104,7 +104,7 @@ Hans Dieter Pearcey <hdp@cpan.org>
 
 =item *
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =back
 

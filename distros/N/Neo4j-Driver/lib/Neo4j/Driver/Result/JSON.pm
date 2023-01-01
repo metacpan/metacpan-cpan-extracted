@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::JSON;
 # ABSTRACT: JSON/REST result handler
-$Neo4j::Driver::Result::JSON::VERSION = '0.31';
+$Neo4j::Driver::Result::JSON::VERSION = '0.33';
 
 use parent 'Neo4j::Driver::Result';
 
@@ -241,8 +241,9 @@ sub _deep_bless {
 sub _accept_header {
 	my (undef, $want_jolt, $method) = @_;
 	
+	# 'v1' is used as an internal marker for Neo4j 4
 	# Note: Neo4j < 4.2 doesn't fail gracefully if Jolt is the only acceptable response type.
-	return if $want_jolt;
+	return if $want_jolt && $want_jolt ne 'v1';
 	
 	return ($ACCEPT_HEADER_POST) if $method eq 'POST';
 	return ($ACCEPT_HEADER);
@@ -258,46 +259,3 @@ sub _acceptable {
 
 
 1;
-
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-Neo4j::Driver::Result::JSON - JSON/REST result handler
-
-=head1 VERSION
-
-version 0.31
-
-=head1 DESCRIPTION
-
-The L<Neo4j::Driver::Result::JSON> package is not part of the
-public L<Neo4j::Driver> API.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<Neo4j::Driver::Net>
-
-=item * L<Neo4j::Driver::Result>
-
-=back
-
-=head1 AUTHOR
-
-Arne Johannessen <ajnn@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2016-2022 by Arne Johannessen.
-
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
-
-=cut

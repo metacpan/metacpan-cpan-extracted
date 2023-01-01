@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Role::Serializer::JSON;
-$Search::Elasticsearch::Role::Serializer::JSON::VERSION = '7.711001';
+$Search::Elasticsearch::Role::Serializer::JSON::VERSION = '8.00';
 use Moo::Role;
 requires 'JSON';
 
@@ -120,7 +120,7 @@ Search::Elasticsearch::Role::Serializer::JSON - A Serializer role for JSON modul
 
 =head1 VERSION
 
-version 7.711001
+version 8.00
 
 =head1 DESCRIPTION
 
@@ -171,7 +171,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Elasticsearch BV.
+This software is Copyright (c) 2022 by Elasticsearch BV.
 
 This is free software, licensed under:
 

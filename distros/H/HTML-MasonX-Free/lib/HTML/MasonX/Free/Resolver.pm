@@ -1,5 +1,5 @@
-package HTML::MasonX::Free::Resolver;
-$HTML::MasonX::Free::Resolver::VERSION = '0.006';
+package HTML::MasonX::Free::Resolver 0.007;
+
 # ABSTRACT: a resolver that lets you specialize components with dir overlays
 use Moose;
 
@@ -195,7 +195,7 @@ HTML::MasonX::Free::Resolver - a resolver that lets you specialize components wi
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 OVERVIEW
 
@@ -261,6 +261,16 @@ This is pretty experimental code.  It also probably doesn't work with some
 Mason options that I don't use, like preloading, because I haven't implemented
 the C<glob_path> method.
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 ATTRIBUTES
 
 =head2 comp_class
@@ -273,11 +283,11 @@ Class::Container, you can't pass this as an argument to the interp constructor.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo Signes.
+This software is copyright (c) 2022 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
