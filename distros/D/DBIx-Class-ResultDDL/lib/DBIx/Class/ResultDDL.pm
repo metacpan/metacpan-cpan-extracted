@@ -6,7 +6,7 @@ use B::Hooks::EndOfScope 'on_scope_end';
 use Carp;
 
 # ABSTRACT: Sugar methods for declaring DBIx::Class::Result data definitions
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
 
 our $CALLER; # can be used localized to wrap caller context into an anonymous sub
@@ -1216,11 +1216,11 @@ Veesh Goldman <rabbiveesh@gmail.com>
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Michael Conrad, IntelliTree Solutions llc.
+This software is copyright (c) 2023 by Michael Conrad, IntelliTree Solutions llc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

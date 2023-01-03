@@ -4,12 +4,12 @@ use warnings;
 use List::Util 'max', 'all';
 use DBIx::Class::ResultDDL;
 use Carp;
-sub deparse;
+sub deparse; #local utilities to be cleaned from the namespace
 sub deparse_hashkey;
 use namespace::clean;
 
 # ABSTRACT: Modify Schema Loader to generate ResultDDL notation
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
 
 #sub _write_classfile {
@@ -268,14 +268,14 @@ sub _deparse_hashref {
 	my $h= $_;
 	return '{ '.join(', ', map +(&_deparse_hashkey.' => '.deparse($h->{$_})), sort keys %$h).' }'
 }
-sub _deparse_array {
+sub _deparse_arrayref {
 	return '[ '.join(', ', map &_deparse, @$_).' ]'
 }
 sub _deparse {
-	!ref? &_deparse_scalar
-	: ref eq 'SCALAR'? &_deparse_scalarref
-	: ref eq 'ARRAY'? &_deparse_arrayref
-	: ref eq 'HASH'? &_deparse_hashref
+	!ref()? &_deparse_scalar
+	: ref() eq 'SCALAR'? &_deparse_scalarref
+	: ref() eq 'ARRAY'? &_deparse_arrayref
+	: ref() eq 'HASH'? &_deparse_hashref
 	: do {
 		require Data::Dumper;
 		Data::Dumper->new([$_])->Terse(1)->Quotekeys(0)->Sortkeys(1)->Indent(0)->Dump;
@@ -297,8 +297,6 @@ sub _get_class_check_namespace {
 		$pkg;
 	});
 }
-
-
 
 
 1;
@@ -426,11 +424,11 @@ Michael Conrad <mconrad@intellitree.com>
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Michael Conrad, IntelliTree Solutions llc.
+This software is copyright (c) 2023 by Michael Conrad, IntelliTree Solutions llc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,8 @@
 Revision history for Perl extension Plack::Middleware::EnvTracer
 
+0.03    Mon Jan  2 03:04:52 UTC 2023
+        - improve Pod (Thanks @manwar)
+
 0.02    Sun Sep  4 13:40:17 JST 2016
         - fix test for Perl5.25
         - sort .travis.yml

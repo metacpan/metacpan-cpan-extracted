@@ -10,7 +10,7 @@ use Test::Warnings;
 use Test::DZil;
 use List::Util 1.33 qw(any first);
 
-plan tests => 5 + 1 + 3 + 1 + 2 + 1;
+plan tests => 6 + 1 + 3 + 1 + 2 + 1;
 
 my $tzil;
 
@@ -27,7 +27,7 @@ lives_and {
 		{ dist_root => "t/corpus" },
 		{ add_files => { 'source/dist.ini' => simple_ini( {},
 			[ '@Author::AJNN' => {
-				'-remove' => ['CheckChangeLog', 'MetaJSON', 'MetaYAML'],
+				'-remove' => ['CheckChangeLog', 'Git::Check', 'MetaYAML', 'Readme'],
 			}],
 		)}},
 	);
@@ -35,8 +35,9 @@ lives_and {
 } '-remove lives';
 
 ok ! has_plugin($tzil, 'CheckChangeLog'), 'no plugin CheckChangeLog';
-ok ! has_plugin($tzil, 'MetaJSON'), 'no plugin MetaJSON';
+ok ! has_plugin($tzil, 'Git::Check'), 'no plugin Git::Check';
 ok ! has_plugin($tzil, 'MetaYAML'), 'no plugin MetaYAML';
+ok ! has_plugin($tzil, 'Readme'), 'no plugin Readme';
 ok has_plugin($tzil, 'Manifest'), 'plugin Manifest';
 
 

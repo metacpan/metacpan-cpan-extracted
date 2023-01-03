@@ -3,7 +3,7 @@ use warnings;
 
 package Dist::Zilla::PluginBundle::Author::AJNN::Readme;
 # ABSTRACT: Build a README file for AJNN's distributions
-$Dist::Zilla::PluginBundle::Author::AJNN::Readme::VERSION = '0.03';
+$Dist::Zilla::PluginBundle::Author::AJNN::Readme::VERSION = '0.04';
 
 use Dist::Zilla;
 use Dist::Zilla::File::FromCode;
@@ -186,7 +186,7 @@ Dist::Zilla::PluginBundle::Author::AJNN::Readme - Build a README file for AJNN's
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 
@@ -232,7 +232,7 @@ done by L<Pod::Weaver::PluginBundle::Author::AJNN::License>.
 
 =head2 cpan_release
 
-Whether the distribution is available on L<https://www.cpan.org/ CPAN>.
+Whether the distribution is available on L<CPAN|https://www.cpan.org/>.
 The default is yes. If set to no, the link in the readme will be changed
 to GitHub and CPAN will no longer be mentioned in the installation
 instructions.

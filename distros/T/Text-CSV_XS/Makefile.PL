@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright PROCURA B.V. (c) 2006-2021 H.Merijn Brand
+# Copyright PROCURA B.V. (c) 2006-2023 H.Merijn Brand
 
 require 5.006001; # <- also see postamble at the bottom for META.yml
 use strict;
@@ -20,7 +20,7 @@ my %wm = (
     NAME         => "Text::CSV_XS",
     DISTNAME     => "Text-CSV_XS",
     ABSTRACT     => "Comma-Separated Values manipulation routines",
-    AUTHOR       => "H.Merijn Brand <h.m.brand\@xs4all.nl>",
+    AUTHOR       => "H.Merijn Brand <hmbrand\@cpan.org>",
     VERSION_FROM => "CSV_XS.pm",
     PREREQ_PM	 => { "XSLoader"	=> 0,
 		      "Config"		=> 0,
@@ -160,7 +160,8 @@ sub postamble {
 	'test_used:	test',
 	'	prove -vwb sandbox/used-by.pl',
 	'',
-	'doc docs:		doc/CSV_XS.md doc/CSV_XS.html doc/CSV_XS.man',
+	'doc docs:		doc/CSV_XS.md doc/CSV_XS.html doc/CSV_XS.man \\',
+	'			doc/csv2xlsx.md doc/csv2xlsx.html doc/csv2xlsx.man',
 	'doc/CSV_XS.md:		CSV_XS.pm',
 	'	pod2markdown  < $? > $@',
 	'doc/CSV_XS.html:	CSV_XS.pm',
@@ -168,6 +169,14 @@ sub postamble {
 	'doc/CSV_XS.3:		CSV_XS.pm',
 	'	pod2man       < $? > $@',
 	'doc/CSV_XS.man:	doc/CSV_XS.3',
+	'	nroff -mandoc < $? > $@',
+	'doc/csv2xlsx.md:	examples/csv2xlsx',
+	'	pod2markdown  < $? > $@',
+	'doc/csv2xlsx.html:	examples/csv2xlsx',
+	'	pod2html      < $? 2>&1 | grep -v "^Cannot find" > $@',
+	'doc/csv2xlsx.3:	examples/csv2xlsx',
+	'	pod2man       < $? > $@',
+	'doc/csv2xlsx.man:	doc/csv2xlsx.3',
 	'	nroff -mandoc < $? > $@',
 	'',
 	$min_vsn;

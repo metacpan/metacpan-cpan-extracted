@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.307';
+our $VERSION = '2.308';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -47,7 +47,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.307
+Version 2.308
 
 =head1 SYNOPSIS
 
@@ -348,17 +348,29 @@ are confirmed the user is asked
 
 =over
 
-=item for the table name
+=item
 
-=item if the first data row should be used as header
+for the table name
 
-=item if an auto increment column should be added (if the option L<Auto increment> is enabled)
+=item
 
-=item to edit the column names
+if the first data row should be used as header
 
-=item to edit the column data types
+=item
 
-=item to confirm the creating of the table
+if an auto increment column should be added (if the option L<Auto increment> is enabled)
+
+=item
+
+to edit the column names
+
+=item
+
+to edit the column data types
+
+=item
+
+to confirm the creating of the table
 
 =back
 
@@ -1068,14 +1080,14 @@ Set C<sep_char>, C<quote_char>, C<escape_char>, C<eol> and C<comment_str>.
 
 If entered nothing, default values are used.
 
-For the meaning of the different options see L<Text::CSV>.
+For the meaning of the different options see L<Text::CSV_XS>.
 
 =head3 CSV options in b
 
 Set C<allow_loose_escapes>, C<allow_loose_quotes>, C<allow_whitespace>, C<blank_is_undef>, C<binary>, C<decode_utf8>,
 C<empty_is_undef> and C<skip_empty_rows>.
 
-For the meaning of the different options see L<Text::CSV>.
+For the meaning of the different options see L<Text::CSV_XS>.
 
 =head3 Settings 'split'
 
@@ -1174,15 +1186,15 @@ If this option is enabled, the file extension C<csv> is added automatically to t
 
 Set C<sep_char>, C<quote_char>, C<escape_char>, C<eol> and C<undef_str>.
 
-If entered nothing, default values are used.
+If entered nothing, default values are used except for C<eol> which is then set to C<$/> (input record separator).
 
-For the meaning of the different options see L<Text::CSV>.
+For the meaning of the different options see L<Text::CSV_XS>.
 
 =head3 CSV options out b
 
 Set C<always_quote>, C<binary>, C<escape_null>, C<quote_binary>, C<quote_empty> and C<quote_space>.
 
-For the meaning of the different options see L<Text::CSV>.
+For the meaning of the different options see L<Text::CSV_XS>.
 
 =head3 File encoding out
 

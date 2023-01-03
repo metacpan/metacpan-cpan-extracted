@@ -7,7 +7,7 @@ use warnings;
 use Carp qw(croak);
 use Test::Builder;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
@@ -99,6 +99,8 @@ Test::UnixExit - test exit status words
 
 =head1 DESCRIPTION
 
+NOTE L<Test2::Tools::Command> should be used instead of this module.
+
 This module provides a means to check that the exit status word of a
 unix process exactly matches a specific exit code, signal number, and
 whether a core was generated; the simple C<<< $? >> 8 == 0 >>> test
@@ -188,9 +190,7 @@ a particular way, and may be more suitable for testing code in a
 module over running a wrapper via the complication of a shell or
 virtual terminal.
 
-L<Test2::Suite> might have something suitable for testing unix exit
-status words in particular and external unix processes in general but I
-have not looked.
+L<Test2::Suite> and in particular L<Test2::Tools::Command>.
 
 L<sh(1)> vs. L<wait(2)> - note that the shell C<$?> variable differs
 from the 16-bit exit status word in that the signal number and core

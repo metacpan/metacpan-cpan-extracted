@@ -2,7 +2,6 @@ use strict;
 use warnings;
 
 use Test::More 0.88;
-use Test::Deep;
 use CPAN::Meta 2.120920;
 use CPAN::Meta::Check 'check_requirements';
 
@@ -33,8 +32,8 @@ my %expected_issues = (
 		requires => { 'Local::HasNoVersion' => undef },
 	},
 	test => {
-		conflicts => { 'Local::HasNoVersion' => re(qr/Installed version \(undef\) of Local::HasNoVersion is in range '<= 1.0'/) },
-		requires => { 'Local::HasNoVersion' => re(qr/Installed version \(undef\) of Local::HasNoVersion is not in range '== 1.0'/) },
+		conflicts => { 'Local::HasNoVersion' => q[Installed version (undef) of Local::HasNoVersion is in range '<= 1.0'] },
+		requires => { 'Local::HasNoVersion' => q[Installed version (undef) of Local::HasNoVersion is not in range '== 1.0'] },
 	},
 );
 
@@ -43,7 +42,7 @@ my $meta = CPAN::Meta->create({ prereqs => \%prereq_struct, version => 1, name =
 foreach my $phase (sort keys %expected_issues) {
 	foreach my $type (sort keys %{$expected_issues{$phase}}) {
 		my $issues = check_requirements($meta->effective_prereqs->requirements_for($phase, $type), $type, ['t/lib']);
-		cmp_deeply(
+		is_deeply(
 			$issues,
 			$expected_issues{$phase}{$type},
 			"$phase $type checked",

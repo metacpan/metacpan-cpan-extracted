@@ -56,8 +56,8 @@ L<Types::Common::Numeric> will be accelerated, as will the
 B<NonEmptyStr> type constraint from L<Types::Common::String>.
 
 The B<StringLike>, B<CodeLike>, B<HashLike>, and B<ArrayLike> types
-from L<Types::TypeTiny> will be accelerated, but parameterized
-B<HashLike> and B<ArrayLike> will not.
+from L<Types::TypeTiny> will be accelerated, including the parameterized
+versions of B<HashLike> and B<ArrayLike>.
 
 L<Type::Tiny::Union> and L<Type::Tiny::Intersection> will also be
 accelerated if their constituent type constraints are.
@@ -314,7 +314,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2022 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2023 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

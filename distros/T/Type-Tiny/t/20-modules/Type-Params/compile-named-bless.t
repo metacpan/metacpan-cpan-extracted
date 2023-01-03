@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2022 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2023 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -190,7 +190,7 @@ sub _simple_test {
 		
 		like(
 			exception { $check->({ foo => 3, bar => 42, xxx => 1, yyy => 2, zzz => 3 }) },
-			qr/^Unrecognized parameters: xxx, yyy, zzz/,
+			qr/^Unrecognized parameters: xxx, yyy, and zzz/,
 			'additional parameters',
 		);
 		

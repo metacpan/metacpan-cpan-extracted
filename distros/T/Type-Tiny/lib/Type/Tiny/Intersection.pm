@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Intersection::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Intersection::VERSION   = '2.000001';
+	$Type::Tiny::Intersection::VERSION   = '2.002000';
 }
 
 $Type::Tiny::Intersection::VERSION =~ tr/_//d;
@@ -84,6 +84,11 @@ sub new {
 	
 	return $proto->SUPER::new( %opts );
 } #/ sub new
+
+sub _lockdown {
+	my ( $self, $callback ) = @_;
+	$callback->( $self->{type_constraints} );
+}
 
 sub type_constraints { $_[0]{type_constraints} }
 sub constraint       { $_[0]{constraint} ||= $_[0]->_build_constraint }
@@ -352,7 +357,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2022 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2023 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

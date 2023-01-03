@@ -3,8 +3,8 @@
    "author" : [
       "Jeremy Mates <jeremy.mates@gmail.com>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "bsd"
    ],
@@ -42,7 +42,7 @@
    "provides" : {
       "Test::UnixCmdWrap" : {
          "file" : "lib/Test/UnixCmdWrap.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
          "url" : "https://github.com/thrig/Test-UnixCmdWrap"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

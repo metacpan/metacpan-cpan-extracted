@@ -11,7 +11,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Standard::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::VERSION   = '2.000001';
+	$Types::Standard::VERSION   = '2.002000';
 }
 
 $Types::Standard::VERSION =~ tr/_//d;
@@ -123,7 +123,8 @@ my $add_core_type = sub {
 		};
 	} #/ if ( defined( $xsubname...))
 	
-	$meta->add_type( $typedef );
+	@_ = ( $meta, $typedef );
+	goto \&Type::Library::add_type;
 };
 
 my $maybe_load_modules = sub {
@@ -1839,7 +1840,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2022 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2023 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -445,7 +445,6 @@ my $dynsym_re = qr<
 sub parse_dynamic_symbol {
     my ($self, $line) = @_;
     if ($line =~ $dynsym_re) {
-
 	my ($flags, $sect, $ver, $vis, $name) = ($1, $2, $3, $4, $5);
 
 	# Special case if version is missing but extra visibility
@@ -551,14 +550,16 @@ sub get_symbol {
 
 sub get_exported_dynamic_symbols {
     my $self = shift;
-    return grep { $_->{defined} && $_->{dynamic} && !$_->{local} }
-	    values %{$self->{dynsyms}};
+    return grep {
+        $_->{defined} && $_->{dynamic} && !$_->{local}
+    } values %{$self->{dynsyms}};
 }
 
 sub get_undefined_dynamic_symbols {
     my $self = shift;
-    return grep { (!$_->{defined}) && $_->{dynamic} }
-	    values %{$self->{dynsyms}};
+    return grep {
+        (!$_->{defined}) && $_->{dynamic}
+    } values %{$self->{dynsyms}};
 }
 
 sub get_needed_libraries {

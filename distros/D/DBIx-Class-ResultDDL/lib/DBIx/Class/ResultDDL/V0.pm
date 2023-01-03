@@ -392,11 +392,11 @@ Michael Conrad <mconrad@intellitree.com>
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Michael Conrad, IntelliTree Solutions llc.
+This software is copyright (c) 2023 by Michael Conrad, IntelliTree Solutions llc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

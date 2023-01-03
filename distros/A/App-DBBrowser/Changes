@@ -1,6 +1,10 @@
 Revision history for App-DBBrowser
 
 
+2.308    2023-01-03
+        - Use Text::CSV_XS.
+        - Bugfix/update option 'eol'.
+
 2.307    2023-01-01
         - Removed unused option 'decimal_separator'.
         - Add option to config the CSV export.

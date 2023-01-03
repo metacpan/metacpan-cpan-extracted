@@ -42,10 +42,10 @@ declare -a record=(`echo $record    | sed 's/:/\n/g'`)
 declare -a hash=(`echo ${record[1]} | sed 's/\\$/\n/g'`)
 
 # ${record[0]}	$username
-# ${record[1]}	$?$salt$hashed password
-# ${hash[0]}	encryption method
-# ${hash[1]}	salt
-# ${hash[2]}	hashed password
+# ${record[1]}  $?$salt$hashed password
+# ${hash[0]}    encryption method
+# ${hash[1]}    salt
+# ${hash[2]}    hashed password
 
 if [ ${record[1]} != $(echo $password | ${util[openssl]} passwd -${hash[0]} -salt ${hash[1]} -stdin) ]; then
 echo -e "wrong password\n";

@@ -12,7 +12,7 @@ use File::Spec::Functions qw( catfile catdir );
 
 use List::MoreUtils qw( all uniq );
 use Encode::Locale  qw();
-#use Text::CSV qw();                 # required
+#use Text::CSV_XS qw();              # required
 
 use Term::Choose           qw();
 use Term::Choose::LineFold qw( line_fold );
@@ -135,8 +135,8 @@ sub from_col_by_col {
                     return;
                 }
                 my $file_fs = $sf->{i}{f_plain};
-                require Text::CSV;
-                Text::CSV::csv( in => $aoa, out => $file_fs ) or die Text::CSV->error_diag;
+                require Text::CSV_XS;
+                Text::CSV_XS::csv( in => $aoa, out => $file_fs ) or die Text::CSV_XS->error_diag;
                 return 1, $file_fs;
             }
             elsif ( $choice eq $add ) {

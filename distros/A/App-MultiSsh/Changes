@@ -1,5 +1,10 @@
 Revision history for App-MultiSsh
 
+0.26   2023-01-01
+        Updating for release of version 0.26
+        Updated (Ivan Wills)
+        Adding better default config to show how it must work (Ivan Wills)
+
 0.25   2022-09-10
         Updating for release of version 0.25
         Updated (Ivan Wills)

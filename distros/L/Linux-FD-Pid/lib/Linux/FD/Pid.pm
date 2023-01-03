@@ -1,5 +1,5 @@
 package Linux::FD::Pid;
-$Linux::FD::Pid::VERSION = '0.004';
+$Linux::FD::Pid::VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -23,7 +23,7 @@ Linux::FD::Pid - PID file descriptors
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -41,13 +41,13 @@ This creates a pidfd filehandle that can be used to await the termination of a p
 
 This creates a new filehandle object for the designated C<$pid>. C<@flags> is an optional list of flags, currently limited to C<'non-blocking'>.
 
-=head2 send($signo)
+=head2 send($signal)
 
-This sends a signal to the process.
+This sends a signal to the process. The signal may be given as either a signal number (e.g. C<POSIX::SIGUSR1>) or as a signal name (e.g. C<'USR1'>).
 
 =head2 wait($flags = WEXITED)
 
-This waits for the process to end. It's only allowed to be child of the current process. It takes a flags argument like `waitpid`, the constants for this from the L<POSIX|POSIX> module can be used for this.
+This waits for the process to end and returns its return value. It's only allowed to be child of the current process. It takes a flags argument like `waitpid`, the constants for this from the L<POSIX|POSIX> module can be used for this. If either the pidfd is non-blocking or C<WNOHANG> is part of C<$flag> and the process isn't then ready C<undef> is returned instead.
 
 =head2 get_handle($fd)
 

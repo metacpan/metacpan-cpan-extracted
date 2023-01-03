@@ -1,6 +1,10 @@
+1.230020  2023-01-02 17:21:37+00:00 UTC
+ Joelle Maslak <jmaslak@antelope.ent>
+ * [feature] Colorize Ciena "module show" and "module show slot <x>"
+
 1.223650  2022-12-30 23:01:19-07:00 America/Denver
  Joelle Maslak <jmaslak@antelope.net>
- * [feature] Colorize "show spanning tree"
+ * [feature] Colorize Cisco & Arista "show spanning tree"
 
 1.223500  2022-12-16 19:57:27+00:00 UTC
  Joelle Maslak <jmaslak@antelope.net>

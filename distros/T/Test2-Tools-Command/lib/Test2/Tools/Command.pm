@@ -3,7 +3,7 @@
 # run simple unix commands for expected results given particular inputs
 
 package Test2::Tools::Command;
-our $VERSION = '0.11';
+our $VERSION = '0.20';
 
 use 5.10.0;
 use strict;
@@ -14,7 +14,7 @@ use Symbol 'gensym';
 use Test2::API 'context';
 
 use base 'Exporter';
-our @EXPORT = qw(command);
+our @EXPORT = qw(command is_exit);
 
 our @command;         # prefixed on each run, followed by any ->{args}
 our $timeout = 30;    # seconds, for alarm()
@@ -133,6 +133,51 @@ sub command ($) {
     return $result, $orig_status, \$stdout, \$stderr;
 }
 
+sub is_exit ($;$$) {
+    my ( $exit, $expect, $name ) = @_;
+
+    $name //= 'exit status';
+
+    if ( !defined $expect ) {
+        $expect = { code => 0, signal => 0, iscore => 0 };
+    } elsif ( ref $expect eq '' ) {
+        $expect = { code => $expect, signal => 0, iscore => 0 };
+    }
+
+    my $status = {
+        code   => $exit >> 8,
+        signal => $exit & 127,
+        iscore => $exit & 128 ? 1 : 0
+    };
+    $status->{code}   = $status->{code}   ? 1 : 0 if $expect->{munge_status};
+    $status->{signal} = $status->{signal} ? 1 : 0 if $expect->{munge_signal};
+
+    my ( $ctx, $result ) = ( context(), 1 );
+
+    if (    $expect->{code} == $status->{code}
+        and $expect->{signal} == $status->{signal}
+        and $expect->{iscore} == $status->{iscore} ) {
+        $ctx->pass($name);
+    } else {
+        $ctx->fail(
+            $name,
+            sprintf(
+                "code\t%d\tsignal\t%d\tiscore\t%d want",
+                $expect->{code}, $expect->{signal},
+                $expect->{iscore}
+            ),
+            sprintf(
+                "code\t%d\tsignal\t%d\tiscore\t%d got",
+                $status->{code}, $status->{signal}, $status->{iscore}
+            )
+        );
+        $result = 0;
+    }
+
+    $ctx->release;
+    return $result;
+}
+
 1;
 __END__
 
@@ -165,6 +210,10 @@ Test2::Tools::Command - test simple unix commands
              status  => { code => 0, signal => 15, iscore => 0 },
              timeout => 7 };
 
+  # check on a $? exit status word from somewhere
+  is_exit $?, 42;
+  is_exit $?, { code => 0, signal => 9, iscore => 0 };
+
 =head1 DESCRIPTION
 
 This module tests that commands given particular arguments result in
@@ -177,6 +226,9 @@ accept standard input and respond with some but not too much output.
 Interactive or otherwise complicated commands will need some other
 module such as L<Expect> to test them, as will programs that generate
 too much output.
+
+Also, B<is_exit> is provided to check on the 16-bit exit status word
+from other code.
 
 =head1 VARIABLES
 
@@ -310,6 +362,16 @@ program, if any.
 
   my ($result, $status, $out_ref, $err_ref) = command { ...
 
+=item B<is_exit> I<status> [ I<code-or-hashref> [ I<test-name> ] ]
+
+This routine checks that a 16-bit exit status word (usually by way of
+the C<$?> variable) conforms to some code or hash reference. The hash
+reference may contain I<mungle_signal> and I<munge_status> that will
+turn non-zero signal or codes into C<1>.
+
+  is_exit $?, 42;
+  is_exit $?, { code => 0, signal => 9, iscore => 0 };
+
 =back
 
 =head1 BUGS
@@ -325,13 +387,6 @@ L<Expect> may be necessary to test complicated programs.
 
 L<IPC::Open3> is used to run programs; this may run into portability
 problems on systems that stray from the way of unix?
-
-L<Test::UnixCmdWrap> is older and has similar functionality though
-contains various warts such as being unable to run a command with the
-sole argument of C<0>.
-
-L<Test::UnixExit> has specific tests for the unix exit status word;
-similar functionality is present in this module.
 
 =head1 COPYRIGHT AND LICENSE
 

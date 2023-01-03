@@ -3,12 +3,6 @@
 
 This is Perl module B<WebService::BitFlyer>.
 
-=begin html
-
-<a href="http://travis-ci.org/bayashi/WebService-BitFlyer"><img src="https://secure.travis-ci.org/bayashi/WebService-BitFlyer.png"/></a>
-
-=end html
-
 
 =head1 INSTALLATION
 

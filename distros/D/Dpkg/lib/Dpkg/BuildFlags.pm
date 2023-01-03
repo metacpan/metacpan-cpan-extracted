@@ -1,4 +1,5 @@
 # Copyright © 2010-2011 Raphaël Hertzog <hertzog@debian.org>
+# Copyright © 2012-2022 Guillem Jover <guillem@debian.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,11 +19,11 @@ package Dpkg::BuildFlags;
 use strict;
 use warnings;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use Dpkg ();
 use Dpkg::Gettext;
-use Dpkg::Build::Env;
+use Dpkg::BuildEnv;
 use Dpkg::ErrorHandling;
 use Dpkg::Vendor qw(run_vendor_hook);
 
@@ -46,6 +47,9 @@ to query the same information.
 Create a new Dpkg::BuildFlags object. It will be initialized based
 on the value of several configuration files and environment variables.
 
+If the option B<vendor_defaults> is set to false, then no vendor defaults are
+initialized (it defaults to true).
+
 =cut
 
 sub new {
@@ -55,20 +59,23 @@ sub new {
     my $self = {
     };
     bless $self, $class;
-    $self->load_vendor_defaults();
+
+    $opts{vendor_defaults} //= 1;
+
+    if ($opts{vendor_defaults}) {
+        $self->load_vendor_defaults();
+    } else {
+        $self->_init_vendor_defaults();
+    }
     return $self;
 }
 
-=item $bf->load_vendor_defaults()
-
-Reset the flags stored to the default set provided by the vendor.
-
-=cut
-
-sub load_vendor_defaults {
+sub _init_vendor_defaults {
     my $self = shift;
 
     $self->{features} = {};
+    $self->{builtins} = {};
+    $self->{optvals} = {};
     $self->{flags} = {
 	ASFLAGS => '',
 	CPPFLAGS => '',
@@ -108,6 +115,19 @@ sub load_vendor_defaults {
 	FCFLAGS  => 0,
 	LDFLAGS  => 0,
     };
+}
+
+=item $bf->load_vendor_defaults()
+
+Reset the flags stored to the default set provided by the vendor.
+
+=cut
+
+sub load_vendor_defaults {
+    my $self = shift;
+
+    $self->_init_vendor_defaults();
+
     # The vendor hook will add the feature areas build flags.
     run_vendor_hook('update-buildflags', $self);
 }
@@ -152,20 +172,20 @@ sub load_environment_config {
 
     foreach my $flag (keys %{$self->{flags}}) {
 	my $envvar = 'DEB_' . $flag . '_SET';
-	if (Dpkg::Build::Env::has($envvar)) {
-	    $self->set($flag, Dpkg::Build::Env::get($envvar), 'env');
+	if (Dpkg::BuildEnv::has($envvar)) {
+	    $self->set($flag, Dpkg::BuildEnv::get($envvar), 'env');
 	}
 	$envvar = 'DEB_' . $flag . '_STRIP';
-	if (Dpkg::Build::Env::has($envvar)) {
-	    $self->strip($flag, Dpkg::Build::Env::get($envvar), 'env');
+	if (Dpkg::BuildEnv::has($envvar)) {
+	    $self->strip($flag, Dpkg::BuildEnv::get($envvar), 'env');
 	}
 	$envvar = 'DEB_' . $flag . '_APPEND';
-	if (Dpkg::Build::Env::has($envvar)) {
-	    $self->append($flag, Dpkg::Build::Env::get($envvar), 'env');
+	if (Dpkg::BuildEnv::has($envvar)) {
+	    $self->append($flag, Dpkg::BuildEnv::get($envvar), 'env');
 	}
 	$envvar = 'DEB_' . $flag . '_PREPEND';
-	if (Dpkg::Build::Env::has($envvar)) {
-	    $self->prepend($flag, Dpkg::Build::Env::get($envvar), 'env');
+	if (Dpkg::BuildEnv::has($envvar)) {
+	    $self->prepend($flag, Dpkg::BuildEnv::get($envvar), 'env');
 	}
     }
 }
@@ -182,20 +202,20 @@ sub load_maintainer_config {
 
     foreach my $flag (keys %{$self->{flags}}) {
 	my $envvar = 'DEB_' . $flag . '_MAINT_SET';
-	if (Dpkg::Build::Env::has($envvar)) {
-	    $self->set($flag, Dpkg::Build::Env::get($envvar), undef, 1);
+	if (Dpkg::BuildEnv::has($envvar)) {
+	    $self->set($flag, Dpkg::BuildEnv::get($envvar), undef, 1);
 	}
 	$envvar = 'DEB_' . $flag . '_MAINT_STRIP';
-	if (Dpkg::Build::Env::has($envvar)) {
-	    $self->strip($flag, Dpkg::Build::Env::get($envvar), undef, 1);
+	if (Dpkg::BuildEnv::has($envvar)) {
+	    $self->strip($flag, Dpkg::BuildEnv::get($envvar), undef, 1);
 	}
 	$envvar = 'DEB_' . $flag . '_MAINT_APPEND';
-	if (Dpkg::Build::Env::has($envvar)) {
-	    $self->append($flag, Dpkg::Build::Env::get($envvar), undef, 1);
+	if (Dpkg::BuildEnv::has($envvar)) {
+	    $self->append($flag, Dpkg::BuildEnv::get($envvar), undef, 1);
 	}
 	$envvar = 'DEB_' . $flag . '_MAINT_PREPEND';
-	if (Dpkg::Build::Env::has($envvar)) {
-	    $self->prepend($flag, Dpkg::Build::Env::get($envvar), undef, 1);
+	if (Dpkg::BuildEnv::has($envvar)) {
+	    $self->prepend($flag, Dpkg::BuildEnv::get($envvar), undef, 1);
 	}
     }
 }
@@ -258,6 +278,78 @@ are "future", "qa", "sanitize", "optimize", "hardening" and "reproducible".
 sub set_feature {
     my ($self, $area, $feature, $enabled) = @_;
     $self->{features}{$area}{$feature} = $enabled;
+}
+
+=item $bf->use_feature($area, $feature)
+
+Returns true if the given feature within a known feature areas has been
+enabled, and false otherwise.
+The only currently recognized feature areas are "future", "qa", "sanitize",
+"optimize", "hardening" and "reproducible".
+
+=cut
+
+sub use_feature {
+    my ($self, $area, $feature) = @_;
+
+    return 0 if ! $self->has_features($area);
+    return 0 if ! $self->{features}{$area}{$feature};
+    return 1;
+}
+
+=item $bf->set_builtin($area, $feature, $enabled)
+
+Update the boolean state of whether a specific feature within a known
+feature area is handled (even if only in some architectures) as a builtin
+default by the compiler.
+
+=cut
+
+sub set_builtin {
+    my ($self, $area, $feature, $enabled) = @_;
+    $self->{builtins}{$area}{$feature} = $enabled;
+}
+
+=item $bf->get_builtins($area)
+
+Return, for the given area, a hash with keys as feature names, and values
+as booleans indicating whether the feature is handled as a builtin default
+by the compiler or not. Only features that might be handled as builtins on
+some architectures are returned as part of the hash. Missing features mean
+they are currently never handled as builtins by the compiler.
+
+=cut
+
+sub get_builtins {
+    my ($self, $area) = @_;
+    return if ! exists $self->{builtins}{$area};
+    return %{$self->{builtins}{$area}};
+}
+
+=item $bf->set_option_value($option, $value)
+
+B<Private> method to set the value of a build option.
+Do not use outside of the dpkg project.
+
+=cut
+
+sub set_option_value {
+    my ($self, $option, $value) = @_;
+
+    $self->{optvals}{$option} = $value;
+}
+
+=item $bf->get_option_value($option)
+
+B<Private> method to get the value of a build option.
+Do not use outside of the dpkg project.
+
+=cut
+
+sub get_option_value {
+    my ($self, $option) = @_;
+
+    return $self->{optvals}{$option};
 }
 
 =item $bf->strip($flag, $value, $source, $maint)
@@ -424,7 +516,7 @@ sub is_maintainer_modified {
 
 Returns true if the given area of features is known, and false otherwise.
 The only currently recognized feature areas are "future", "qa", "sanitize",
-"hardening" and "reproducible".
+"optimize", "hardening" and "reproducible".
 
 =cut
 
@@ -459,6 +551,13 @@ sub list {
 =back
 
 =head1 CHANGES
+
+=head2 Version 1.05 (dpkg 1.21.14)
+
+New option: 'vendor_defaults' in new().
+
+New methods: $bf->load_vendor_defaults(), $bf->use_feature(),
+$bf->set_builtin(), $bf->get_builtins().
 
 =head2 Version 1.04 (dpkg 1.20.0)
 

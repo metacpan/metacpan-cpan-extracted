@@ -116,8 +116,8 @@ sub defaults {
             sep_char    => ',',
             quote_char  => '"',
             escape_char => '"',
-            eol         => undef,
-            comment_str => undef,
+            eol         => '',
+            comment_str => '',
 
             allow_loose_escapes => 0,
             allow_loose_quotes  => 0,
@@ -139,8 +139,8 @@ sub defaults {
             sep_char    => ',',
             quote_char  => '"',
             escape_char => '"',
-            eol         => undef,
-            undef_str   => undef,
+            eol         => '',
+            undef_str   => '',
 
             always_quote => 0,
             binary       => 1,
@@ -150,8 +150,8 @@ sub defaults {
             quote_space  => 1,
         },
     };
-    return $defaults                   if ! $section;
-    return $defaults->{$section}       if ! $key;
+    return $defaults if ! $section;
+    return $defaults->{$section} if ! $key;
     return $defaults->{$section}{$key};
 }
 
@@ -164,7 +164,7 @@ sub read_config_files {
     if ( -f $file_fs && -s $file_fs ) {
         my $tmp = $ax->read_json( $file_fs ) // {};
 
-        ####################################################
+        #################################################### # 2.307    01.01.2023
         if ( exists $tmp->{'csv'} ) {
             for my $opt ( keys %{$tmp->{'csv'}} ) {
                 $tmp->{'csv_in'}{$opt} = $tmp->{'csv'}{$opt};

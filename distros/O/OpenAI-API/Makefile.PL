@@ -9,7 +9,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM       => 'lib/OpenAI/API.pm',
     ABSTRACT_FROM      => 'lib/OpenAI/API.pm',
     LICENSE            => 'artistic_2',
-    MIN_PERL_VERSION   => '5.10',
+    MIN_PERL_VERSION   => '5.010',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },

@@ -9,7 +9,7 @@ use Test::Exception;
 use Test::Warnings;
 use Test::DZil;
 
-plan tests => 3 + 3+6+5+3+1+3 + 1;
+plan tests => 3 + 3+7+5+3+1+3 + 1;
 
 
 my $tzil = Builder->from_config(
@@ -42,6 +42,7 @@ ok has_plugin('::PruneAliases'), 'plugin PruneAliases';
 ok has_plugin('::CPANFile'), 'plugin CPANFile';
 ok has_plugin('::MetaJSON'), 'plugin MetaJSON';
 ok has_plugin('::MetaYAML'), 'plugin MetaYAML';
+ok ! has_plugin('::MetaNoIndex'), 'no plugin MetaNoIndex';
 ok has_plugin('::MetaProvides::Package'), 'plugin MetaProvides::Package';
 ok has_plugin('::PkgVersion'), 'plugin PkgVersion';
 ok has_plugin('::GithubMeta'), 'plugin GithubMeta';

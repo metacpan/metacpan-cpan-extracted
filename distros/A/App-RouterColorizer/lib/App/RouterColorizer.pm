@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 #
-# Copyright (C) 2021-2022 Joelle Maslak
+# Copyright (C) 2021-2023 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 package App::RouterColorizer;
-$App::RouterColorizer::VERSION = '1.223650';
+$App::RouterColorizer::VERSION = '1.230020';
 use Moose;
 
 use feature 'signatures';
@@ -39,13 +39,13 @@ our $INFO   = "\e[36m";      # Cyan
 our $RESET  = "\e[0m";
 
 our @BGCOLORS = (
-    "\e[30m\e[47m",          # black on white
-    "\e[30m\e[41m",          # black on red
-    "\e[30m\e[42m",          # black on green
-    "\e[30m\e[43m",          # black on yellow (orange)
-    "\e[37m\e[44m",          # white on blue
-    "\e[30m\e[45m",          # black on magenta
-    "\e[30m\e[46m",          # black on cyan
+    "\e[30m\e[47m",    # black on white
+    "\e[30m\e[41m",    # black on red
+    "\e[30m\e[42m",    # black on green
+    "\e[30m\e[43m",    # black on yellow (orange)
+    "\e[37m\e[44m",    # white on blue
+    "\e[30m\e[45m",    # black on magenta
+    "\e[30m\e[46m",    # black on cyan
 );
 
 our $NUM      = qr/$RE{num}{real}/;
@@ -91,8 +91,8 @@ our $BIGOVERRIDES = qr/   (?:\QRx Remote Fault\E)
                         | (?:\QFar End Client Signal Fail\E)
                     /xx;
 
-our @INTERFACE_IGNORES = ( "bytes",       "packets input", "packets output", "multicast" );
-our @INTERFACE_INFOS   = ( "PAUSE input", "PAUSE output",  "pause input" );
+our @INTERFACE_IGNORES = ( "bytes", "packets input", "packets output", "multicast" );
+our @INTERFACE_INFOS   = ( "PAUSE input", "PAUSE output", "pause input" );
 
 our $STP_GOOD  = qr/forwarding|FWD/;
 our $STP_WARN  = qr/learning|LRN/;
@@ -422,19 +422,22 @@ sub _parse_line_ciena ( $self, $line ) {
     # Ciena
     #
 
+    # Admin/Operational state for multiple commands
+    $line =~
+s/^ ( \| \s? \QAdmin State \E \s+ \| ) ( \s? \QEnabled \E )  ( \N+ ) $/$1.$self->_colorize($2, $GREEN).$3/exx;
+    $line =~
+s/^ ( \| \s? \QAdmin State \E \s+ \| ) ( \s? \QDisabled \E ) ( \N+ ) $/$1.$self->_colorize($2, $ORANGE).$3/exx;
+    $line =~
+s/^ ( \| \s? \QAdmin State \E \s+ \| ) ( [^|]+ )             ( \N+ ) $/$1.$self->_colorize($2, $RED).$3/exx;
+
+    $line =~
+s/^ ( \| \s? \QOperational State \E \s+ \| ) ( \s? \QUp           \E ) ( \N+ ) $/$1.$self->_colorize($2, $GREEN).$3/exx;
+    $line =~
+s/^ ( \| \s? \QOperational State \E \s+ \| ) ( \s? \QInitializing \E ) ( \N+ ) $/$1.$self->_colorize($2, $ORANGE).$3/exx;
+    $line =~
+s/^ ( \| \s? \QOperational State \E \s+ \| ) ( [^|]+ )                 ( \N+ ) $/$1.$self->_colorize($2, $RED).$3/exx;
+
     # xcvr show xcvr N/N
-    $line =~
-s/^ ( \Q| Admin State \E \s+ \| ) ( \Q Enabled \E )  ( \N+ ) $/$1.$self->_colorize($2, $GREEN).$3/exx;
-    $line =~
-s/^ ( \Q| Admin State \E \s+ \| ) ( \Q Disabled \E ) ( \N+ ) $/$1.$self->_colorize($2, $ORANGE).$3/exx;
-    $line =~
-s/^ ( \Q| Admin State \E \s+ \| ) ( [^|]+ )          ( \N+ ) $/$1.$self->_colorize($2, $RED).$3/exx;
-
-    $line =~
-s/^ ( \Q| Operational State \E \s+ \| ) ( \Q Up \E ) ( \N+ ) $/$1.$self->_colorize($2, $GREEN).$3/exx;
-    $line =~
-s/^ ( \Q| Operational State \E \s+ \| ) ( [^|]+ )    ( \N+ ) $/$1.$self->_colorize($2, $RED).$3/exx;
-
     $line =~ s/ ^ ( \| ) ( \Q Tx Power (dBm)\E \s* ) ( \| ) ( \s+ $VERYLL \s+ ) ( \N+ ) $/
         $1.$self->_colorize($2, $INFO).$3.$self->_colorize($4, $RED).$5/exx;
     $line =~ s/ ^ ( \| ) ( \Q Tx Power (dBm)\E \s* ) ( \| ) ( \s+ $LIGHT \s+ ) ( \N+ ) $/
@@ -612,6 +615,44 @@ s/^ ( \| \s+ \| ) ( \Q Optical Return Loss \E \( \QdB\E \) ) ( \s+ \| \s+ ) ( $B
         $21.$self->_colorize($22, $INFO).
         $23/exx;
 
+    # module show
+    $line =~ s/ ^ ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( \Q Enabled \E \s+ )
+                  ( \| ) ( [^|]+ ) ( \| ) ( \Q Up \E           \s+ ) ( \| ) ( [^|]+ ) ( \| ) $ /
+        $1.$self->_colorize($2, $GREEN).
+        $3.$self->_colorize($4, $GREEN).
+        $5.$self->_colorize($6, $GREEN).
+        $7.$self->_colorize($8, $GREEN).
+        $9.$self->_colorize($10, $GREEN).
+        $11.$self->_colorize($12, $GREEN).
+        $13/exx;
+    $line =~ s/ ^ ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( \Q Enabled \E \s+ )
+                  ( \| ) ( [^|]+ ) ( \| ) ( \Q Initializing \E \s+ ) ( \| ) ( [^|]+ ) ( \| ) $ /
+        $1.$self->_colorize($2, $ORANGE).
+        $3.$self->_colorize($4, $ORANGE).
+        $5.$self->_colorize($6, $ORANGE).
+        $7.$self->_colorize($8, $ORANGE).
+        $9.$self->_colorize($10, $ORANGE).
+        $11.$self->_colorize($12, $ORANGE).
+        $13/exx;
+    $line =~ s/ ^ ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( \Q Enabled \E \s+ )
+                  ( \| ) ( [^|]+ ) ( \| ) ( [^|]+                  ) ( \| ) ( [^|]+ ) ( \| ) $ /
+        $1.$self->_colorize($2, $RED).
+        $3.$self->_colorize($4, $RED).
+        $5.$self->_colorize($6, $RED).
+        $7.$self->_colorize($8, $RED).
+        $9.$self->_colorize($10, $RED).
+        $11.$self->_colorize($12, $RED).
+        $13/exx;
+    $line =~ s/ ^ ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( \Q Disabled \E \s+ )
+                  ( \| ) ( [^|]+ ) ( \| ) ( [^|]+                  ) ( \| ) ( [^|]+ ) ( \| ) $ /
+        $1.$self->_colorize($2, $ORANGE).
+        $3.$self->_colorize($4, $ORANGE).
+        $5.$self->_colorize($6, $ORANGE).
+        $7.$self->_colorize($8, $ORANGE).
+        $9.$self->_colorize($10, $ORANGE).
+        $11.$self->_colorize($12, $ORANGE).
+        $13/exx;
+
     return $line;
 }
 
@@ -620,7 +661,7 @@ sub _ipv4ify ( $self, $ip ) {
     $len //= 32;
 
     my (@oct) = split /\./, $subnet;
-    my $val = 0;
+    my $val   = 0;
     foreach my $i (@oct) {
         $val *= 256;
         $val += $i;
@@ -703,7 +744,7 @@ App::RouterColorizer - Colorize router CLI output
 
 =head1 VERSION
 
-version 1.223650
+version 1.230020
 
 =head1 DESCRIPTION
 
@@ -800,7 +841,7 @@ Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021-2022 by Joelle Maslak.
+This software is copyright (c) 2021-2023 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

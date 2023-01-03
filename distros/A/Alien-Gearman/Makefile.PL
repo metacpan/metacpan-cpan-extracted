@@ -32,8 +32,8 @@ my %WriteMakefileArgs = (
         resources => {
             license     => 'http://dev.perl.org/licenses/',
             homepage    => 'https://metacpan.org/release/Alien-Gearman',
-            bugtracker  => 'https://github.com/thibaultduponchelle/Alien-Gearman/issues',
-            repository  => 'https://github.com/thibaultduponchelle/Alien-Gearman.git',
+            bugtracker  => 'https://github.com/thibaultduponchelle/CPAN-modules/issues',
+            repository  => 'https://github.com/thibaultduponchelle/CPAN-modules.git',
             IRC         => 'irc://irc.perl.org/#native'
         },
     },

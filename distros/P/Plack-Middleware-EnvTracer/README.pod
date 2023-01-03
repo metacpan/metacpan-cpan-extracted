@@ -5,7 +5,7 @@ This is Perl module B<Plack::Middleware::EnvTracer>.
 
 =begin html
 
-<a href="http://travis-ci.org/bayashi/Plack-Middleware-EnvTracer"><img src="https://secure.travis-ci.org/bayashi/Plack-Middleware-EnvTracer.png?_t=1472964066"/></a> <a href="https://coveralls.io/r/bayashi/Plack-Middleware-EnvTracer"><img src="https://coveralls.io/repos/bayashi/Plack-Middleware-EnvTracer/badge.png?_t=1472964066&branch=master"/></a>
+<a href="http://travis-ci.org/bayashi/Plack-Middleware-EnvTracer"><img src="https://secure.travis-ci.org/bayashi/Plack-Middleware-EnvTracer.png?_t=1672628692"/></a> <a href="https://coveralls.io/r/bayashi/Plack-Middleware-EnvTracer"><img src="https://coveralls.io/repos/bayashi/Plack-Middleware-EnvTracer/badge.png?_t=1672628692&branch=master"/></a>
 
 =end html
 

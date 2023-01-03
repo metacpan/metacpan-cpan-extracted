@@ -1,5 +1,11 @@
 Revision history for Excel-ValueWriter-XLSX
 
+0.9      03.01.2023
+  - fix missing dependencies for tests
+
+0.8      02.01.2023
+  - added method "add_sheets_from_database"
+
 0.7      04.11.2022
   - added parameter "compression_level"
 

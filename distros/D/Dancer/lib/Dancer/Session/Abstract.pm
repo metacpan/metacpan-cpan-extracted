@@ -1,7 +1,7 @@
 package Dancer::Session::Abstract;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: abstract class for session engine
-$Dancer::Session::Abstract::VERSION = '1.3513';
+$Dancer::Session::Abstract::VERSION = '1.3520';
 use strict;
 use warnings;
 use Carp;
@@ -145,6 +145,8 @@ sub write_session_id {
         secure => setting('session_secure'),
         http_only => defined(setting("session_is_http_only")) ?
                      setting("session_is_http_only") : 1,
+        same_site => defined(setting("session_same_site")) ?
+                    setting("session_same_site") : 'None',
     );
     if (my $expires = setting('session_expires')) {
         # It's # of seconds from the current time
@@ -171,7 +173,7 @@ Dancer::Session::Abstract - abstract class for session engine
 
 =head1 VERSION
 
-version 1.3513
+version 1.3520
 
 =head1 DESCRIPTION
 

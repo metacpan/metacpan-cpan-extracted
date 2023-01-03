@@ -1,5 +1,6 @@
 package CPAN::Meta::Check;
-$CPAN::Meta::Check::VERSION = '0.014';
+# vi:noet:sts=2:sw=2:ts=2
+$CPAN::Meta::Check::VERSION = '0.016';
 use strict;
 use warnings;
 
@@ -80,7 +81,7 @@ CPAN::Meta::Check - Verify requirements in a CPAN::Meta object
 
 =head1 VERSION
 
-version 0.014
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -113,8 +114,6 @@ This function returns a unified L<CPAN::Meta::Requirements|CPAN::Meta::Requireme
 =item * L<Test::CheckDeps|Test::CheckDeps>
 
 =item * L<CPAN::Meta|CPAN::Meta>
-
-=for comment # vi:noet:sts=2:sw=2:ts=2
 
 =back
 

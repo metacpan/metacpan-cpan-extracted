@@ -43,7 +43,7 @@ requires:
   Term::Form: '0.552'
   Term::Form::ReadLine: '0.552'
   Term::TablePrint: '0.154'
-  Text::CSV: '0'
+  Text::CSV_XS: '0'
   bytes: '0'
   open: '0'
   perl: '5.014'
@@ -51,7 +51,7 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/App-DBBrowser.git
-version: '2.307'
+version: '2.308'
 x_bugtracker:
   web: https://github.com/kuerbis/App-DBBrowser/issues
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

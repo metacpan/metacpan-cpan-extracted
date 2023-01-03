@@ -1,3 +1,10 @@
+0.742   2022-09-28  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [cli update-this-mod] Tweak Abstract.
+
+
 0.741   2022-09-11  Released-By: PERLANCAR; Urgency: medium
 
         - [cli pmchkver] [ux] Add -l as short alias for --detail.

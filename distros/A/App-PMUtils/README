@@ -2,8 +2,8 @@ NAME
     App::PMUtils - Command-line utilities related to Perl modules
 
 VERSION
-    This document describes version 0.741 of App::PMUtils (from Perl
-    distribution App-PMUtils), released on 2022-09-11.
+    This document describes version 0.742 of App::PMUtils (from Perl
+    distribution App-PMUtils), released on 2022-09-28.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related

@@ -5,7 +5,7 @@ use Test::Builder::Module;
 use Test::Name::FromLine;
 use Text::MatchedPosition;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 our @ISA = qw/Test::Builder::Module/;
 
@@ -936,7 +936,7 @@ The constructor.
 
 =item no_x
 
-If you set C<no_x> option the ture value, then the C<x> method doesn't show any message.
+If you set C<no_x> option the true value, then the C<x> method doesn't show any message.
 
 =item plan
 
@@ -1247,7 +1247,7 @@ B<Note> that you must never put C<done_testing> inside an C<END { ... }> block.
 
 =begin html
 
-<a href="https://github.com/bayashi/Test-Arrow/blob/master/README.pod"><img src="https://img.shields.io/badge/Version-0.20-green?style=flat"></a> <a href="https://github.com/bayashi/Test-Arrow/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Test-Arrow/actions"><img src="https://github.com/bayashi/Test-Arrow/workflows/master/badge.svg?_t=1587735883"/></a> <a href="https://coveralls.io/r/bayashi/Test-Arrow"><img src="https://coveralls.io/repos/bayashi/Test-Arrow/badge.png?_t=1587735883&branch=master"/></a>
+<a href="https://github.com/bayashi/Test-Arrow/blob/main/README.pod"><img src="https://img.shields.io/badge/Version-0.21-green?style=flat"></a> <a href="https://github.com/bayashi/Test-Arrow/blob/main/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Test-Arrow/actions"><img src="https://github.com/bayashi/Test-Arrow/workflows/main/badge.svg?_t=1672626498"/></a> <a href="https://coveralls.io/r/bayashi/Test-Arrow"><img src="https://coveralls.io/repos/bayashi/Test-Arrow/badge.png?_t=1672626498&branch=main"/></a>
 
 =end html
 

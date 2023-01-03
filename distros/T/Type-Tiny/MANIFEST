@@ -131,12 +131,14 @@ t/20-modules/Type-Library/assert.t
 t/20-modules/Type-Library/declared-types.t
 t/20-modules/Type-Library/deprecation.t
 t/20-modules/Type-Library/errors.t
+t/20-modules/Type-Library/exportables-duplicated.t
 t/20-modules/Type-Library/exportables.t
 t/20-modules/Type-Library/import-params.t
 t/20-modules/Type-Library/inheritance.t
 t/20-modules/Type-Library/is.t
 t/20-modules/Type-Library/own-registry.t
 t/20-modules/Type-Library/recursive-type-definitions.t
+t/20-modules/Type-Library/remove-type.t
 t/20-modules/Type-Library/to.t
 t/20-modules/Type-Library/types.t
 t/20-modules/Type-Params-Signature/basic.t
@@ -145,6 +147,7 @@ t/20-modules/Type-Params/badsigs.t
 t/20-modules/Type-Params/carping.t
 t/20-modules/Type-Params/clone.t
 t/20-modules/Type-Params/coerce.t
+t/20-modules/Type-Params/compile-named-avoidcallbacks.t
 t/20-modules/Type-Params/compile-named-bless.t
 t/20-modules/Type-Params/compile-named-oo-pp.t
 t/20-modules/Type-Params/compile-named-oo.t
@@ -232,6 +235,7 @@ t/20-modules/Type-Tiny/basic.t
 t/20-modules/Type-Tiny/cmp.t
 t/20-modules/Type-Tiny/coercion-modifiers.t
 t/20-modules/Type-Tiny/constraint-strings.t
+t/20-modules/Type-Tiny/definition-context.t
 t/20-modules/Type-Tiny/deprecation.t
 t/20-modules/Type-Tiny/esoteric.t
 t/20-modules/Type-Tiny/inline-assert.t

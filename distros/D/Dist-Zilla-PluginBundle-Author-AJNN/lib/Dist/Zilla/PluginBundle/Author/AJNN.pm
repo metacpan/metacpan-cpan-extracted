@@ -3,7 +3,7 @@ use warnings;
 
 package Dist::Zilla::PluginBundle::Author::AJNN;
 # ABSTRACT: Dist::Zilla configuration the way AJNN does it
-$Dist::Zilla::PluginBundle::Author::AJNN::VERSION = '0.03';
+$Dist::Zilla::PluginBundle::Author::AJNN::VERSION = '0.04';
 
 use Dist::Zilla;
 use Moose;
@@ -11,11 +11,11 @@ use namespace::autoclean;
 
 with 'Dist::Zilla::Role::PluginBundle::Easy';
 
-use Dist::Zilla::PluginBundle::Author::AJNN::PruneAliases;
 use Dist::Zilla::PluginBundle::Author::AJNN::Readme;
 use Pod::Weaver::PluginBundle::Author::AJNN;
 
-use List::Util 1.33 'any';
+use List::Util 1.33 'none';
+use Path::Tiny;
 
 
 my @mvp_multivalue_args;
@@ -60,6 +60,22 @@ has filter_remove => (
 push @mvp_multivalue_args, '-remove';
 
 
+sub _meta_no_index {
+	# Only include no_index in meta if t/lib actually exists in this dist
+	# (this may be slightly over-engineered)
+	my $path = Path::Tiny->cwd;
+	while (! $path->is_rootdir) {
+		if ($path->child('t')->child('lib')->exists) {
+			return ([ 'MetaNoIndex' => {
+				directory => 't/lib',
+			}]);
+		}
+		$path = $path->parent;
+	}
+	return ();
+}
+
+
 sub configure {
 	my ($self) = @_;
 	
@@ -91,6 +107,7 @@ sub configure {
 		[ 'CPANFile' ],
 		[ 'MetaJSON' ],
 		[ 'MetaYAML' ],
+		_meta_no_index(),
 		[ 'MetaProvides::Package' ],
 		[ 'PkgVersion' => {
 			die_on_existing_version => 1,
@@ -160,9 +177,9 @@ around add_plugins => sub {
 	
 	my @remove = $self->filter_remove->@*;
 	$self->$orig( grep {
-		my $plugin = $_;
-		my $moniker = ref $_ ? $_->[1] // $_->[0] : $_;
-		(any { $_ eq $moniker } @remove) ? () : ($plugin)
+		my $moniker = $_;
+		$moniker = $_->[1] && ! ref $_->[1] ? $_->[1] : $_->[0] if ref;
+		none { $_ eq $moniker } @remove
 	} @plugins );
 };
 
@@ -183,7 +200,7 @@ Dist::Zilla::PluginBundle::Author::AJNN - Dist::Zilla configuration the way AJNN
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -232,6 +249,8 @@ This plugin bundle is nearly equivalent to the following C<dist.ini> config:
  [CPANFile]
  [MetaJSON]
  [MetaYAML]
+ [MetaNoIndex]
+ directory = t/lib
  [MetaProvides::Package]
  [PkgVersion]
  die_on_existing_version = 1
@@ -274,12 +293,13 @@ be given multiple times. See L<Dist::Zilla::PluginBundle::Filter>.
 Offered here as a workaround for
 L<RT 81958|https://github.com/rjbs/Dist-Zilla/issues/695>.
 
+ -remove = CheckChangeLog
  -remove = Git::Check
 
 =head2 cpan_release
 
 Whether or not this distribution is meant to be released to
-L<https://www.cpan.org/ CPAN>. The default is yes, but for software
+L<CPAN|https://www.cpan.org/>. The default is yes, but for software
 of low quality or little interest to others, it can be set to no.
 
  cpan_release = 0
@@ -323,8 +343,6 @@ L<Dist::Zilla::PluginBundle::Author::AJNN::Readme>
 L<Pod::Weaver::PluginBundle::Author::AJNN>
 
 L<Dist::Zilla::Role::PluginBundle::Easy>
-
-L<Dist::Zilla::PluginBundle::Filter>
 
 =head1 AUTHOR
 

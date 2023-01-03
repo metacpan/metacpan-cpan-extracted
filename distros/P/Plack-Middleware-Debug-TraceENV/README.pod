@@ -5,7 +5,7 @@ This is Perl module B<Plack::Middleware::Debug::TraceENV>.
 
 =begin html
 
-<a href="http://travis-ci.org/bayashi/Plack-Middleware-Debug-TraceENV"><img src="https://secure.travis-ci.org/bayashi/Plack-Middleware-Debug-TraceENV.png?_t=1472963156"/></a> <a href="https://coveralls.io/r/bayashi/Plack-Middleware-Debug-TraceENV"><img src="https://coveralls.io/repos/bayashi/Plack-Middleware-Debug-TraceENV/badge.png?_t=1472963156&branch=master"/></a>
+<a href="http://travis-ci.org/bayashi/Plack-Middleware-Debug-TraceENV"><img src="https://secure.travis-ci.org/bayashi/Plack-Middleware-Debug-TraceENV.png?_t=1672628288"/></a> <a href="https://coveralls.io/r/bayashi/Plack-Middleware-Debug-TraceENV"><img src="https://coveralls.io/repos/bayashi/Plack-Middleware-Debug-TraceENV/badge.png?_t=1672628288&branch=master"/></a>
 
 =end html
 

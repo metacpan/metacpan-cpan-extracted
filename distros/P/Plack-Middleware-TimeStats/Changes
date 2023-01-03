@@ -1,5 +1,8 @@
 Revision history for Perl extension Plack::Middleware::TimeStats
 
+0.06    Mon Jan  2 02:48:01 UTC 2023
+        - Improve Pod (Thanks @manwar)
+
 0.05    Sat Feb  3 20:15:42 JST 2018
         -  fix tests for elapsed in Devel::TimeStats
 

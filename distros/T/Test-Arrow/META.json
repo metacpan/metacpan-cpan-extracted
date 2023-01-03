@@ -4,7 +4,7 @@
       "Dai Okabayashi <bayashi@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "artistic_2"
    ],
@@ -41,7 +41,7 @@
    "provides" : {
       "Test::Arrow" : {
          "file" : "lib/Test/Arrow.pm",
-         "version" : "0.20"
+         "version" : "0.21"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "url" : "http://github.com/bayashi/Test-Arrow"
       }
    },
-   "version" : "0.20",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.21",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

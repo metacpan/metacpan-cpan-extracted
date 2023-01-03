@@ -1,5 +1,12 @@
 Revision history for Linux-FD-Pid
 
+0.006     2023-01-03 00:45:16+01:00 Europe/Amsterdam
+          * Eliminate dependency on glibc 2.36+
+
+0.005     2023-01-02 03:48:36+01:00 Europe/Amsterdam
+          * Allow signal name in send method
+          * Handle non-blocking wait correctly
+
 0.004     2022-12-30 19:02:26+01:00 Europe/Amsterdam
           * Add flag support
 

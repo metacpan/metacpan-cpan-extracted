@@ -1,4 +1,5 @@
 # Copyright © 2008-2010 Raphaël Hertzog <hertzog@debian.org>
+# Copyright © 2008-2022 Guillem Jover <guillem@debian.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -56,7 +57,7 @@ sub new {
     bless $self, $class;
     $self->set_compression($args{compression} || compression_get_default());
     $self->set_compression_level($args{compression_level} ||
-	    compression_get_default_level());
+        compression_get_default_level());
     return $self;
 }
 
@@ -71,7 +72,7 @@ B<Dpkg::Compression>).
 sub set_compression {
     my ($self, $method) = @_;
     error(g_('%s is not a supported compression method'), $method)
-	    unless compression_is_supported($method);
+        unless compression_is_supported($method);
     $self->{compression} = $method;
 }
 
@@ -85,9 +86,8 @@ B<Dpkg::Compression>).
 
 sub set_compression_level {
     my ($self, $level) = @_;
-    error(g_('%s is not a compression level'), $level)
-	    unless compression_is_valid_level($level);
-    $self->{compression_level} = $level;
+
+    compression_set_level($self->{compression}, $level);
 }
 
 =item @exec = $proc->get_compress_cmdline()
@@ -105,24 +105,21 @@ and its standard output.
 
 sub get_compress_cmdline {
     my $self = shift;
-    my @prog = (@{compression_get_property($self->{compression}, 'comp_prog')});
-    my $level = '-' . $self->{compression_level};
-    $level = '--' . $self->{compression_level}
-	    if $self->{compression_level} !~ m/^[1-9]$/;
-    push @prog, $level;
-    return @prog;
+
+    return compression_get_cmdline_compress($self->{compression});
 }
 
 sub get_uncompress_cmdline {
     my $self = shift;
-    return (@{compression_get_property($self->{compression}, 'decomp_prog')});
+
+    return compression_get_cmdline_decompress($self->{compression});
 }
 
 sub _check_opts {
     my ($self, %opts) = @_;
     # Check for proper cleaning before new start
     error(g_('Dpkg::Compression::Process can only start one subprocess at a time'))
-	    if $self->{pid};
+        if $self->{pid};
     # Check options
     my $to = my $from = 0;
     foreach my $thing (qw(file handle string pipe)) {

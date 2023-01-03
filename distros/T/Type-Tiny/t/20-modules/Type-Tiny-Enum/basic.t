@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2022 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2023 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -24,6 +24,7 @@ use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
+use Test::Fatal;
 use Test::TypeTiny;
 use Type::Utils qw< enum >;
 
@@ -57,6 +58,18 @@ is_deeply(
 	FBB->values,
 	[qw/foo bar baz/],
 	'FBB->values retains order',
+);
+
+is_deeply(
+	[@{ +FBB }],
+	[qw/foo bar baz/],
+	'overload retains order',
+);
+
+isnt(
+	exception { push @{ +FBB }, 'quux' },
+	undef,
+	'cannot push to overloaded arrayref'
 );
 
 use Scalar::Util qw(refaddr);

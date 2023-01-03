@@ -8,7 +8,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::StrMatch::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::StrMatch::VERSION   = '2.000001';
+	$Types::Standard::StrMatch::VERSION   = '2.002000';
 }
 
 $Types::Standard::StrMatch::VERSION =~ tr/_//d;
@@ -74,7 +74,7 @@ sub __constraint_generator {
 		}
 		: sub {
 		my $value = shift;
-		!ref( $value ) and $value =~ $regexp;
+		!ref( $value ) and !!( $value =~ $regexp );
 		};
 } #/ sub __constraint_generator
 
@@ -123,7 +123,7 @@ sub __inline_generator {
 				Carp::carp(
 					"Cannot serialize regexp without callbacks; serializing using callbacks" );
 			}
-			"!ref($v) and $v =~ $serialized_re";
+			"!ref($v) and !!( $v =~ $serialized_re )";
 		};
 	} #/ else [ if ( $checker ) ]
 } #/ sub __inline_generator

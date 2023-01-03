@@ -61,7 +61,7 @@
   </helper>
   <helper>
     <foaf:Person>
-      <foaf:name>Alberto Simoes</foaf:name>
+      <foaf:name>Alberto Simões</foaf:name>
       <foaf:mbox rdf:resource="mailto:ambs@cpan.org" />
     </foaf:Person>
   </helper>
@@ -385,6 +385,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Eugen Konkov</foaf:name>
+      <foaf:mbox rdf:resource="mailto:kes-kes@yandex.ru" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Fabrice Gabolde</foaf:name>
       <foaf:mbox rdf:resource="mailto:fabrice.gabolde@gmail.com" />
     </foaf:Person>
@@ -547,14 +553,20 @@
   </helper>
   <helper>
     <foaf:Person>
-      <foaf:name>James Aitken</foaf:name>
-      <foaf:mbox rdf:resource="mailto:loonypandora@gmail.com" />
+      <foaf:name>jamhed</foaf:name>
+      <foaf:mbox rdf:resource="mailto:ip@ncom-ufa.ru" />
     </foaf:Person>
   </helper>
   <helper>
     <foaf:Person>
       <foaf:name>jamhed</foaf:name>
       <foaf:mbox rdf:resource="mailto:jamhed@lenobook.jh" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Jason A. Crome</foaf:name>
+      <foaf:mbox rdf:resource="mailto:jason@crome-plated.com" />
     </foaf:Person>
   </helper>
   <helper>
@@ -631,6 +643,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Josh Rabinowitz</foaf:name>
+      <foaf:mbox rdf:resource="mailto:joshr@joshr.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Joshua Barratt</foaf:name>
       <foaf:mbox rdf:resource="mailto:jbarratt@serialized.net" />
     </foaf:Person>
@@ -691,6 +709,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>LoonyPandora</foaf:name>
+      <foaf:mbox rdf:resource="mailto:loonypandora@gmail.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Manuel Weiss</foaf:name>
       <foaf:mbox rdf:resource="mailto:manuel@weiss.io" />
     </foaf:Person>
@@ -734,12 +758,6 @@
   </helper>
   <helper>
     <foaf:Person>
-      <foaf:name>Maurice</foaf:name>
-      <foaf:mbox rdf:resource="mailto:mauricemengel@gmail.com" />
-    </foaf:Person>
-  </helper>
-  <helper>
-    <foaf:Person>
       <foaf:name>Maxim Ivanov</foaf:name>
       <foaf:mbox rdf:resource="mailto:maxim.ivanov@net-a-porter.com" />
     </foaf:Person>
@@ -760,6 +778,12 @@
     <foaf:Person>
       <foaf:name>Michael G. Schwern</foaf:name>
       <foaf:mbox rdf:resource="mailto:schwern@pobox.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Michael McClennen</foaf:name>
+      <foaf:mbox rdf:resource="mailto:mmcclenn@geology.wisc.edu" />
     </foaf:Person>
   </helper>
   <helper>
@@ -790,6 +814,12 @@
     <foaf:Person>
       <foaf:name>Mohammad S Anwar</foaf:name>
       <foaf:mbox rdf:resource="mailto:mohammad.anwar@yahoo.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>mokko</foaf:name>
+      <foaf:mbox rdf:resource="mailto:mauricemengel@gmail.com" />
     </foaf:Person>
   </helper>
   <helper>
@@ -975,19 +1005,13 @@
   </helper>
   <helper>
     <foaf:Person>
-      <foaf:name>Roman Galeev</foaf:name>
-      <foaf:mbox rdf:resource="mailto:ip@ncom-ufa.ru" />
-    </foaf:Person>
-  </helper>
-  <helper>
-    <foaf:Person>
       <foaf:name>Roman Nuritdinov</foaf:name>
       <foaf:mbox rdf:resource="mailto:ky6uk.kun@gmail.com" />
     </foaf:Person>
   </helper>
   <helper>
     <foaf:Person>
-      <foaf:name>Rowan Thorpe</foaf:name>
+      <foaf:name>rowanthorpe</foaf:name>
       <foaf:mbox rdf:resource="mailto:rowanthorpe@gmail.com" />
     </foaf:Person>
   </helper>
@@ -1092,6 +1116,12 @@
     <foaf:Person>
       <foaf:name>tednolan</foaf:name>
       <foaf:mbox rdf:resource="mailto:tednolan@(none).com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Tim Gim Yee</foaf:name>
+      <foaf:mbox rdf:resource="mailto:tim.gim.yee@gmail.com" />
     </foaf:Person>
   </helper>
   <helper>
@@ -2133,6 +2163,42 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.3512</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2019-03-31T20:10:08+01:00</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.3513</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2020-01-29T21:00:41+00:00</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.3514</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2020-06-29T17:38:54+01:00</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.3514_02</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2020-10-02T21:39:34+01:00</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.3514_03</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2020-10-06T22:22:51+01:00</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.3514_04</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2022-06-29T22:38:57+01:00</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.3520</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2023-01-01</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

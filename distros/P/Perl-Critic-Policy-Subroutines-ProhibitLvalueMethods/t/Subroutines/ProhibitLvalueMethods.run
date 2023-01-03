@@ -1,0 +1,35 @@
+## name allow normal method call
+## failures 0
+## cut
+
+$obj->key;
+
+## name allow method call with parameters
+## failures 0
+## cut
+
+$obj->key('foo');
+
+## name allow method call with parameters with assignment
+## failures 0
+## cut
+
+$obj->key(my $k = 'foo');
+
+## name block lvalue method call
+## failures 1
+## cut
+
+$obj->key = 'foo';
+
+## name block lvalue method call with parameters
+## failures 1
+## cut
+
+$obj->key('bar') = 'foo';
+
+## name allow method call followed by assignment
+## failures 0
+## cut
+
+my @foo = ($obj->key, my $bar = 'foo');

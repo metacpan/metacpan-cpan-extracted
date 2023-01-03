@@ -61,19 +61,19 @@ static void nv_to_timespec(NV input, struct timespec* output) {
 	output->tv_nsec = (long) ((input - output->tv_sec) * NANO_SECONDS);
 }
 
-typedef struct { const char* key; clockid_t value; } map[];
+typedef struct { const char* key; size_t length; int value; } map[];
 
 static map clocks = {
-	{ "monotonic"     , CLOCK_MONOTONIC },
-	{ "realtime"      , CLOCK_REALTIME  },
+	{ STR_WITH_LEN("monotonic")     , CLOCK_MONOTONIC },
+	{ STR_WITH_LEN("realtime")      , CLOCK_REALTIME  },
 #ifdef CLOCK_BOOTTIME
-	{ "boottime"      , CLOCK_BOOTTIME  },
+	{ STR_WITH_LEN("boottime")      , CLOCK_BOOTTIME  },
 #endif
 #ifdef CLOCK_REALTIME_ALARM
-	{ "realtime_alarm", CLOCK_REALTIME_ALARM },
+	{ STR_WITH_LEN("realtime_alarm"), CLOCK_REALTIME_ALARM },
 #endif
 #ifdef CLOCK_BOOTTIME_ALARM
-	{ "boottime_alarm", CLOCK_BOOTTIME_ALARM },
+	{ STR_WITH_LEN("boottime_alarm"), CLOCK_BOOTTIME_ALARM },
 #endif
 };
 
@@ -118,13 +118,13 @@ static UV S_get_flag(pTHX_ map flags, size_t map_size, SV* flag_name) {
 	for (i = 0; i < map_size / sizeof *flags; ++i)
 		if (strEQ(SvPV_nolen(flag_name), flags[i].key))
 			return flags[i].value;
-	Perl_croak(aTHX_ "No such flag '%s' known", flag_name);
+	Perl_croak(aTHX_ "No such flag '%s' known", SvPV_nolen(flag_name));
 }
 #define get_flag(map, name) S_get_flag(aTHX_ map, sizeof(map), name)
 
 static map event_flags = {
-	{ "non-blocking"  , EFD_NONBLOCK  },
-	{ "semaphore"     , EFD_SEMAPHORE },
+	{ STR_WITH_LEN("non-blocking")  , EFD_NONBLOCK  },
+	{ STR_WITH_LEN("semaphore")     , EFD_SEMAPHORE },
 };
 #define get_event_flag(name) get_flag(event_flags, name)
 
@@ -137,7 +137,7 @@ static SV* S_new_eventfd(pTHX_ const char* classname, UV initial, int flags) {
 #define new_eventfd(classname, initial, flags) S_new_eventfd(aTHX_ classname, initial, flags)
 
 static map signal_flags = {
-	{ "non-blocking"  , SFD_NONBLOCK  },
+	{ STR_WITH_LEN("non-blocking")  , SFD_NONBLOCK  },
 };
 #define get_signal_flag(name) get_flag(signal_flags, name)
 
@@ -150,7 +150,7 @@ static SV* S_new_signalfd(pTHX_ const char* classname, SV* sigmask, int flags) {
 #define new_signalfd(classname, sigset, flags) S_new_signalfd(aTHX_ classname, sigset, flags)
 
 static map timer_flags = {
-	{ "non-blocking"  , TFD_NONBLOCK  },
+	{ STR_WITH_LEN("non-blocking")  , TFD_NONBLOCK  },
 };
 #define get_timer_flag(name) get_flag(timer_flags, name)
 
@@ -417,4 +417,4 @@ clocks(classname)
 	int i;
 	PPCODE:
 	for (i = 0; i < sizeof clocks / sizeof *clocks; ++i)
-		mXPUSHp(clocks[i].key, strlen(clocks[i].key));
+		mXPUSHp(clocks[i].key, clocks[i].length);

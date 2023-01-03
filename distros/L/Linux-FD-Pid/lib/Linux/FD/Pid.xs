@@ -6,7 +6,7 @@
 #include <signal.h>
 #include <linux/wait.h>
 #include <sys/syscall.h>
-#include <sys/pidfd.h>
+#include <unistd.h>
 
 #define die_sys(format) Perl_croak(aTHX_ format, strerror(errno))
 
@@ -64,7 +64,7 @@ static UV S_get_pid_flag(pTHX_ SV* flag_name) {
 	for (i = 0; i < sizeof pid_flags / sizeof *pid_flags; ++i)
 		if (strEQ(SvPV_nolen(flag_name), pid_flags[i].key))
 			return pid_flags[i].value;
-	Perl_croak(aTHX_ "No such flag '%s' known", flag_name);
+	Perl_croak(aTHX_ "No such flag '%s' known", SvPV_nolen(flag_name));
 }
 #define get_pid_flag(name) S_get_pid_flag(aTHX_ name)
 
@@ -94,12 +94,13 @@ new(classname, pid, ...)
 void
 send(file_handle, signal)
 	SV* file_handle;
-	int signal;
+	SV* signal;
 	PREINIT:
 		int fd, ret;
 	CODE:
 		fd = get_fd(file_handle);
-		ret = syscall(__NR_pidfd_send_signal, fd, signal, NULL, 0);
+		int signo = (SvIOK(signal) || looks_like_number(signal)) && SvIV(signal) ? SvIV(signal) : whichsig(SvPV_nolen(signal));
+		ret = syscall(__NR_pidfd_send_signal, fd, signo, NULL, 0);
 		if (ret < 0)
 			die_sys("Couldn't send signal: %s");
 
@@ -113,8 +114,14 @@ wait(file_handle, flags = WEXITED)
 	CODE:
 		fd = get_fd(file_handle);
 		wait_result = waitid(P_PIDFD, fd, &info, flags);
-		if (wait_result != 0)
-			die_sys("Can't wait pid: %s");
+		if (wait_result != 0) {
+			if (errno == EAGAIN)
+				XSRETURN_UNDEF;
+			else
+				die_sys("Can't wait pid: %s");
+		}
+		if (info.si_signo == 0)
+			XSRETURN_UNDEF;
 		RETVAL = info.si_status;
 	OUTPUT:
 		RETVAL

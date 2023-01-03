@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2022 by Toby Inkster.
+This software is copyright (c) 2022-2023 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -78,14 +78,14 @@ is $o->myfunc2( arr => \@arr, int => 4 ), 'e', 'myfunc2 (happy path)';
 
 {
 	my $e = exception {
-		$o->myfunc( arr => \@arr, int => 6, debug => undef );
+		$o->myfunc( arr => \@arr, int => 6, 'debug' );
 	};
 	like $e, qr/Wrong number of parameters/, 'myfunc (param count exception)'
 }
 
 {
 	my $e = exception {
-		$o->myfunc2( arr => \@arr, int => 8, debug => undef );
+		$o->myfunc2( arr => \@arr, int => 8, 'debug' );
 	};
 	like $e, qr/Wrong number of parameters/, 'myfunc2 (param count exception)'
 }

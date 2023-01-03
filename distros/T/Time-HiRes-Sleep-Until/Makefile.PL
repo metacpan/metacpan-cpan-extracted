@@ -4,7 +4,7 @@ WriteMakefile(
     VERSION_FROM  => 'lib/Time/HiRes/Sleep/Until.pm',
     AUTHOR        => 'Michael R. Davis (mdavis@stopllc.com)',
     ABSTRACT_FROM => 'lib/Time/HiRes/Sleep/Until.pm',
-    LICENSE       => "gplv2",
+    LICENSE       => "MIT",
     PREREQ_PM     => {
                       'Test::Simple'        => 0.44, #tests
                       'Test::Number::Delta' => 0,    #tests
@@ -13,4 +13,21 @@ WriteMakefile(
                       'Time::HiRes'         => 0,    #import sleep and time
                       'Math::Round'         => 0.05, #nhimult
                      },
+
+    'META_MERGE' => {
+                     'resources' => {
+                       'repository' => {
+                         'web' => 'https://github.com/mrdvt92/perl-Time-HiRes-Sleep-Until.git',
+                         'url' => 'git@github.com:mrdvt92/perl-Time-HiRes-Sleep-Until.git',
+                         'type' => 'git'
+                       },
+                       'homepage' => 'https://github.com/mrdvt92/perl-Time-HiRes-Sleep-Until',
+                       'bugtracker' => {
+                         'web' => 'https://github.com/mrdvt92/perl-Time-HiRes-Sleep-Until/issues'
+                       },
+                     },
+                     'meta-spec' => {
+                       'version' => 2
+                     },
+                    },
 );

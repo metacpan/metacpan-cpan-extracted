@@ -1,5 +1,5 @@
 package Linux::FD::Event;
-$Linux::FD::Event::VERSION = '0.013';
+$Linux::FD::Event::VERSION = '0.014';
 use 5.006;
 
 use strict;
@@ -22,7 +22,7 @@ Linux::FD::Event - Event filehandles for Linux
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 

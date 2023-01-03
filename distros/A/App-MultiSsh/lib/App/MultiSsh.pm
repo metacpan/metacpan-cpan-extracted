@@ -10,15 +10,15 @@ use strict;
 use warnings;
 use feature qw/:5.10/;
 use Carp;
-use POSIX qw/ceil/;
+use POSIX        qw/ceil/;
 use Data::Dumper qw/Dumper/;
-use English qw/ -no_match_vars /;
-use base qw/Exporter/;
+use English      qw/ -no_match_vars /;
+use base         qw/Exporter/;
 use Path::Tiny;
 use IO::Handle;
 use POSIX qw/:errno_h/;
 
-our $VERSION     = '0.25';
+our $VERSION     = '0.26';
 our @EXPORT_OK   = qw/hosts_from_map is_host multi_run shell_quote tmux/;
 our %EXPORT_TAGS = ();
 
@@ -35,9 +35,10 @@ sub hosts_from_map {
     while ( my $host_range = shift @{$map} ) {
         my ($num_range) = $host_range =~ /$num_range_re/;
 
-        if (!$num_range) {
+        if ( !$num_range ) {
             push @hosts, $host_range;
             next;
+
             #if ( is_host($host_range) ) {
             #    push @hosts, $host_range;
             #    next;
@@ -48,8 +49,10 @@ sub hosts_from_map {
             #}
         }
 
-        my @numbs    = map { /$range_re/ ? ($1 .. $2) : ($_) } split /,/, $num_range;
-        my @hostmaps = map { $a=$host_range; $a =~ s/$num_range_re/$_/e; $a } @numbs;
+        my @numbs = map { /$range_re/ ? ( $1 .. $2 ) : ($_) } split /,/,
+          $num_range;
+        my @hostmaps =
+          map { $a = $host_range; $a =~ s/$num_range_re/$_/e; $a } @numbs;
 
         if ( $hostmaps[0] =~ /$num_range_re/ ) {
             push @{$map}, @hostmaps;
@@ -70,7 +73,7 @@ sub is_host {
 sub shell_quote {
     my ($text) = @_;
 
-    if ($text =~ /[\s$|><;&*?#]/xms) {
+    if ( $text =~ /[\s$|><;&*?#]/xms ) {
         $text =~ s/'/'\\''/gxms;
         $text = "'$text'";
     }
@@ -79,12 +82,12 @@ sub shell_quote {
 }
 
 sub multi_run {
-    my ($hosts, $remote_cmd, $option) = @_;
+    my ( $hosts, $remote_cmd, $option ) = @_;
 
-    if ($option->{tmux}) {
-        my @cmds = map {"ssh $_ " . shell_quote($remote_cmd)} @$hosts;
-        exec tmux($option, @cmds) if !$option->{test};
-        print tmux($option, @cmds) . "\n";
+    if ( $option->{tmux} ) {
+        my @cmds = map { "ssh $_ " . shell_quote($remote_cmd) } @$hosts;
+        exec tmux( $option, @cmds ) if !$option->{test};
+        print tmux( $option, @cmds ) . "\n";
         return;
     }
 
@@ -95,17 +98,20 @@ sub multi_run {
     for my $host (@$hosts) {
         my $cmd = "ssh $host " . shell_quote($remote_cmd);
         print "$cmd\n" if $option->{verbose} > 1 || $option->{test};
-        next if $option->{test};
+        next           if $option->{test};
 
         if ( $option->{parallel} ) {
             my $child = fork;
 
-            if ( $child ) {
+            if ($child) {
+
                 # parent stuff
                 push @children, $child;
 
                 if ( @children == $option->{parallel} ) {
-                    warn "Waiting for children to finish\n" if $option->{verbose} > 1;
+                    warn "Waiting for children to finish\n"
+                      if $option->{verbose} > 1;
+
                     # reap children if reached max fork count
                     while ( my $pid = shift @children ) {
                         waitpid $pid, 0;
@@ -113,19 +119,21 @@ sub multi_run {
                 }
             }
             elsif ( defined $child ) {
+
                 # child code
                 if ( $option->{interleave} ) {
                     print "$host -\n" if $option->{verbose};
 
                     require IPC::Open3::Callback;
-                    my ($pid, $in, $out, $err) = IPC::Open3::Callback::safe_open3($cmd);
+                    my ( $pid, $in, $out, $err ) =
+                      IPC::Open3::Callback::safe_open3($cmd);
 
                     close $in;
                     $out->blocking(0);
                     $err->blocking(0);
-                    while ($out && $err) {
-                        $out = _read_label_line($out, \*STDOUT, $host);
-                        $err = _read_label_line($err, \*STDERR, $host);
+                    while ( $out && $err ) {
+                        $out = _read_label_line( $out, \*STDOUT, $host );
+                        $err = _read_label_line( $err, \*STDERR, $host );
                     }
                     waitpid $pid, 0;
                     exit 0;
@@ -153,16 +161,18 @@ sub multi_run {
 }
 
 sub _read_label_line {
-    my ($in_fh, $out_fh, $host) = @_;
+    my ( $in_fh, $out_fh, $host ) = @_;
     state %hosts;
-    my @colours = (qw/
-        red     on_red     bright_red
-        green   on_green   bright_green
-        blue    on_blue    bright_blue
-        magenta on_magenta bright_magenta
-        cyan    on_cyan
-        yellow  on_yellow
-    /);
+    my @colours = (
+        qw/
+          red     on_red     bright_red
+          green   on_green   bright_green
+          blue    on_blue    bright_blue
+          magenta on_magenta bright_magenta
+          cyan    on_cyan
+          yellow  on_yellow
+          /
+    );
     return if !$in_fh;
 
     my $line = <$in_fh>;
@@ -172,54 +182,63 @@ sub _read_label_line {
         return;
     }
 
-    if (defined $line) {
-        $hosts{$host} ||= $colours[rand @colours];
+    if ( defined $line ) {
+        $hosts{$host} ||= $colours[ rand @colours ];
         require Term::ANSIColor;
-        print {$out_fh} '[', Term::ANSIColor::colored($host, $hosts{$host}), '] ', $line;
+        print {$out_fh} '[', Term::ANSIColor::colored( $host, $hosts{$host} ),
+          '] ', $line;
     }
 
     return $in_fh;
 }
 
 sub tmux {
-    my ($option, @commands) = @_;
+    my ( $option, @commands ) = @_;
 
     confess "No commands for tmux to run!\n" if !@commands;
 
-    my $layout  = layout(@commands);
-    my $tmux    = '';
-    my $final = '';
-    my $pct     = int( 100 / scalar @commands );
+    my $layout = layout(@commands);
+    my $tmux   = '';
+    my $final  = '';
+    my $pct    = int( 100 / scalar @commands );
 
     for my $ssh (@commands) {
         if ( !$tmux && $option->{tmux_nested} ) {
             $tmux = ' rename-window mssh';
-            $final = '; bash -c ' . shell_quote("echo $ssh; echo 'set-window-option synchronize-panes on|off'") . '\\;' . shell_quote($ssh);
+            $final =
+              '; bash -c '
+              . shell_quote(
+                "echo $ssh; echo 'set-window-option synchronize-panes on|off'")
+              . '\\;'
+              . shell_quote($ssh);
         }
         else {
             my $cmd = !$tmux ? 'new-session' : '\\; split-window -d -p ' . $pct;
 
-            $tmux .= " $cmd " . shell_quote("echo $ssh") . '\\;' . shell_quote($ssh);
+            $tmux .=
+              " $cmd " . shell_quote("echo $ssh") . '\\;' . shell_quote($ssh);
         }
     }
 
     my $sync = $option->{tmux_sync} ? 'on' : 'off';
-    $tmux .= " \\; set-window-option synchronize-panes $sync" if $commands[0] !~ /\s$/xms;
+    $tmux .= " \\; set-window-option synchronize-panes $sync"
+      if $commands[0] !~ /\s$/xms;
 
-    return "tmux$tmux \\; select-layout tiled \\; setw synchronize-panes $sync$final";
+    return
+"tmux$tmux \\; select-layout tiled \\; setw synchronize-panes $sync$final";
 }
 
 sub layout {
     my (@commands) = @_;
-    my $rows = int sqrt @commands + 1;
-    my $cols = ceil @commands / $rows;
-    my $out = [];
+    my $rows       = int sqrt @commands + 1;
+    my $cols       = ceil @commands / $rows;
+    my $out        = [];
     if ( $cols > $rows + 1 ) {
         my $tmp = $rows;
         $rows++;
         $cols--;
     }
-    ROW:
+  ROW:
     for my $row ( 0 .. $rows - 1 ) {
         for my $col ( 0 .. $cols - 1 ) {
             last ROW if !@commands;
@@ -234,12 +253,12 @@ sub config {
     state $config;
     return $config if $config;
 
-    my $config_file = path($ENV{HOME}, '.mssh');
-    if (!-f $config_file) {
+    my $config_file = path( $ENV{HOME}, '.mssh' );
+    if ( !-f $config_file ) {
         $config = {};
 
         # create a default config file
-        $config_file->spew("---\ngroups:\n");
+        $config_file->spew("---\ngroups:\n  eg:\n    - host1\n    - host2\n");
 
         return $config;
     }
@@ -256,11 +275,11 @@ sub get_groups {
     my @hosts;
 
     for my $group (@$groups) {
-        if ($config->{groups} && $config->{groups}{$group}) {
+        if ( $config->{groups} && $config->{groups}{$group} ) {
             push @hosts,
-                ref $config->{groups}{$group}
-                ? @{ $config->{groups}{$group} }
-                : $config->{groups}{$group};
+              ref $config->{groups}{$group}
+              ? @{ $config->{groups}{$group} }
+              : $config->{groups}{$group};
         }
         else {
             warn "No host group '$group' defined in the config!\n";
@@ -280,7 +299,7 @@ App::MultiSsh - Multi host ssh executer
 
 =head1 VERSION
 
-This documentation refers to App::MultiSsh version 0.25
+This documentation refers to App::MultiSsh version 0.26
 
 =head1 SYNOPSIS
 

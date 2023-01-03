@@ -8,9 +8,9 @@ use App::PMUtils;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-11'; # DATE
+our $DATE = '2022-09-28'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.741'; # VERSION
+our $VERSION = '0.742'; # VERSION
 
 our %SPEC;
 
@@ -54,7 +54,7 @@ module-dir - Get per-module shared files directory
 
 =head1 VERSION
 
-This document describes version 0.741 of module-dir (from Perl distribution App-PMUtils), released on 2022-09-11.
+This document describes version 0.742 of module-dir (from Perl distribution App-PMUtils), released on 2022-09-28.
 
 =head1 SYNOPSIS
 

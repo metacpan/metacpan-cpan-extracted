@@ -12,7 +12,7 @@ use Date::Calc            qw/Delta_Days/;
 use Carp                  qw/croak/;
 use Encode                qw/encode_utf8/;
 
-our $VERSION = '0.7';
+our $VERSION = '0.9';
 
 #======================================================================
 # GLOBALS
@@ -177,6 +177,29 @@ sub add_sheet {
 
   return $sheet_id;
 }
+
+
+
+sub add_sheets_from_database {
+  my ($self, $dbh, $sheet_prefix, @table_names) = @_;
+
+  # in absence of table names, get them from the database metadata
+  if (!@table_names) {
+    my $tables = $dbh->table_info(undef, undef, undef, 'TABLE')->fetchall_arrayref({});
+    @table_names = map {$_->{TABLE_NAME}} @$tables;
+  }
+
+  $sheet_prefix //= "S.";
+
+  foreach my $table (@table_names) {
+    my $sth = $dbh->prepare("select * from $table");
+    $sth->execute;
+    my $headers = $sth->{NAME};
+    my $rows    = $sth->fetchall_arrayref;
+    $self->add_sheet("$sheet_prefix$table", $table, $headers, $rows);
+  }
+}
+
 
 
 sub add_shared_string {
@@ -499,6 +522,9 @@ sub n_days {
 }
 
 
+
+
+
 1;
 
 __END__
@@ -516,22 +542,43 @@ Excel::ValueWriter::XLSX - generating data-only Excel workbooks in XLSX format, 
                                                                  [3, 4]
                                                                 ]);
   $writer->add_sheet($sheet_name2, $table_name2, \@headers, $row_generator);
+  $writer->add_sheets_from_database($dbh);
   $writer->save_as($filename);
 
 
 =head1 DESCRIPTION
 
-The common way for generating Microsoft Excel workbooks in C<XLSX>
-format from Perl programs is the excellent L<Excel::Writer::XLSX>
-module. That module is very rich in features, but quite costly in CPU
-and memory usage. By contrast, the present module
-L<Excel::ValueWriter::XLSX> is aimed at fast and cost-effective
-production of data-only workbooks, containing nothing but plain values
-and formulas, without any formatting. Such workbooks are useful in
-architectures where Excel is used merely as a local database, for
-example in connection with a Power Pivot architecture. This module
-also lets you choose the ZIP compression level to be applied
-to the generated C<.xlsx> file.
+The present module is aimed at fast and cost-effective
+production of "data-only" Excel workbooks, containing nothing but plain values
+and formulas.
+
+CPU and memory usage are much lower than with the well-known L<Excel::Writer::XLSX>;
+however the set of features is also much more restricted : there is no support
+for formats, colors, figures or other fancy Excel features.
+
+Such workbooks with plain data are useful for example :
+
+=over 
+
+=item *
+
+in architectures where Excel is used merely as a local database, for
+example in connection with a Power Pivot architecture (for that purpose,
+see also the companion module L<Excel::PowerPivot::Utils>);
+
+=item *
+
+for fine tuning of the ZIP compression level to be applied
+to the generated C<.xlsx> file;
+
+=item *
+
+for generating files with large amounts of data (this was the original
+motivation for writing this module, because
+L<Excel::Writer::XLSX> tends to become very slow on files with large
+numbers of rows).
+
+=back
 
 
 =head1 METHODS
@@ -575,9 +622,13 @@ The C<$sheet_name> is mandatory; it must be unique and between 1 and 31 characte
 
 =item *
 
-The C<$table_name> is optional; if not C<undef>, the sheet contents
-will be registered as an Excel table. The table name must be unique,
-of minimum 3 characters, without spaces or special characters.
+If C<$table_name> is not C<undef>, the sheet contents will be registered as an
+L<Excel table|https://support.microsoft.com/en-us/office/overview-of-excel-tables-7ab0bb7d-3a9e-4b56-a3c9-6c94334e492c> of that name. Excel tables offer more features than regular ranges of cells,
+so generally it is a good idea to always assign a table name.
+Table names must be unique, of minimum 3 characters, without spaces or special characters.
+Technically table names could be equal to sheet names, but this is
+not recommended because it may create confusion if the data is later to
+be referred to from Power Query or from Power Pivot.
 
 =item *
 
@@ -596,7 +647,7 @@ or a reference to a callback function that will return a new row at each call, i
 form of a 1-dimensional array reference. An empty return from the callback
 function signals the end of data (but intermediate empty rows may be returned
 as C<< [] >>). Callback functions should typically be I<closures> over a lexical
-variable that remembers when the last row has been met. Here is an example of a
+variable used to decide when the last row has been met. Here is an example of a
 callback function used to feed a sheet with 500 lines of 300 columns of random numbers:
 
   my @headers_for_rand = map {"h$_"} 1 .. 300;
@@ -614,6 +665,33 @@ Everything else is treated as a string. Strings are shared at the
 workbook level (hence a string that appears several times in the input data will be stored
 only once within the workbook).
 
+=head2 add_sheets_from_database
+
+  $writer->add_sheets_from_database($dbh, $sheet_prefix, @table_names);
+
+Gets data from database tables and adds them as sheets into the Excel workbook.
+Arguments are :
+
+=over
+
+=item C<$dbh>
+
+An active L<DBI> database handle
+
+=item C<$sheet_prefix>
+
+A string that will be prepended at the beginning of each worksheet name,
+so that they are different from names of Excel tables.
+The default is 'S.'.
+
+=item C<@table_names>
+
+The list of tables to be read from the database.
+If empty, table names are retrieved automatically from the database
+through the L<DBI/table_info> method.
+
+=back
+
 =head2 save_as
 
   $writer->save_as($target);
@@ -622,25 +700,30 @@ Writes the workbook contents into the specified C<$target>, which can be either
 a filename or filehandle opened for writing.
 
 
-=head1 ARCHITECTURAL NOTE
+=head1 ARCHITECTURAL NOTES
 
-Âlthough I'm a big fan of L<Moose> and its variants, the present module is implemented
+=head2 Object-orientedness
+
+Although I'm a big fan of L<Moose> and its variants, the present module is implemented
 in POPO (Plain Old Perl Object) : since the aim is to maximize cost-effectiveness, and since
 the object model is extremely simple, there was no ground for using a sophisticated object system.
 
-=head1 SEE ALSO
+=head2 Benchmarks
 
-L<Excel::Writer::XLSX>
+I did a couple of measurements that demonstrate the effectiveness of this
+module on large datasets; but the results cannot be included into this distribution yet,
+because the tests are not sufficiently formalized and they are based on
+on data that is not public.
 
-=head1 BENCHMARKS
-
-Not done yet
-
-=head1 TO DO
+=head2 To do
 
   - options for workbook properties : author, etc.
   - support for 1904 date schema
+  - reproducible benchmarks
 
+=head1 SEE ALSO
+
+L<Excel::Writer::XLSX>, L<Excel::PowerPivot::Utils>.
 
 =head1 AUTHOR
 
@@ -648,7 +731,7 @@ Laurent Dami, E<lt>dami at cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2022 by Laurent Dami.
+Copyright 2022, 2023 by Laurent Dami.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

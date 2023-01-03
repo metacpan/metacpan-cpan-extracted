@@ -5,7 +5,7 @@
 # Joan Ntzougani, ✞
 
 package Dancer2::Plugin::WebService;
-our	$VERSION = '4.4.2';
+our	$VERSION = '4.4.3';
 use	strict;
 use	warnings;
 use Encode;
@@ -18,10 +18,12 @@ use Cpanel::JSON::XS; my $JSON=Cpanel::JSON::XS->new; $JSON->space_before(1);$JS
 
 
 if ($^O=~/(?i)MSWin/) {warn "Operating system is not supported\n"; exit 1}
+my $dir;
+my %Handler;
 my %TokenDB = ();
 my %Formats = ( json=>'application/json', xml=>'text/xml', yaml=>'text/x-yaml', perl=>'text/html', human=>'text/html' );
-my $fmt_rgx; $_ = join '|', sort keys %Formats; $fmt_rgx = qr/^($_)$/;
-
+   $_ = join '|', sort keys %Formats;
+my $fmt_rgx = qr/^($_)$/;
 
 has error           => (is=>'rw', lazy=>1, default=> 0);
 has sort            => (is=>'rw', lazy=>1, default=> 0);
@@ -35,21 +37,20 @@ has auth_config     => (is=>'rw', lazy=>1, default=> sub{ {} });
 has data            => (is=>'rw', lazy=>1, default=> sub{ {} }); # user posted data as hash
 has Format          => (is=>'rw', lazy=>1, default=> sub{ {from => undef, to => undef} });
 has Session_timeout => (is=>'ro', lazy=>0, from_config=>'Session idle timeout',default=> sub{ 3600 }, isa => sub {unless ( $_[0]=~/^\d+$/ ) {warn "Session idle timeout \"$_[0]\" It is not a number\n"; exit 1}} );
-has rules           => (is=>'ro', lazy=>0, from_config=>'Allowed hosts',       default=> sub{ ['127.0.*', '192.168.*', '172.16.*'] });
+has rules           => (is=>'ro', lazy=>0, from_config=>'Allowed hosts',       default=> sub{ ['127.*', '192.168.*', '172.16.*'] });
 has rules_compiled  => (is=>'ro', lazy=>0, default=> sub {my $array = [@{$_[0]->rules}]; for (@{$array}) { s/([^?*]+)/\Q$1\E/g; s|\?|.|g; s|\*+|.*?|g; $_ = qr/^$_$/i } $array});
-has dir_session     => (is=>'ro', lazy=>0, default=> sub {my $dir = exists $_[0]->config->{'Session directory'} ? $_[0]->config->{'Session directory'}."/$_[0]->{app}->{name}" : "$_[0]->{app}->{config}->{appdir}/session"; $dir=~s|/+|/|g; my @MD = split /(?:\\|\/)+/, $dir; my $i; for ($i=$#MD; $i>=0; $i--) { last if -d join '/', @MD[0..$i] } for (my $j=$i+1; $j<=$#MD; $j++) { unless (mkdir join '/', @MD[0 .. $j]) {warn "Could not create the session directory \"$dir\" because $!\n"; exit 1} } $dir} );
+has dir_session     => (is=>'ro', lazy=>0, default=> sub {my $D = exists $_[0]->config->{'Session directory'} ? $_[0]->config->{'Session directory'}."/$_[0]->{app}->{name}" : "$_[0]->{app}->{config}->{appdir}/session"; $D=~s|/+|/|g; my @MD = split /(?:\\|\/)+/, $D; my $i; for ($i=$#MD; $i>=0; $i--) { last if -d join '/', @MD[0..$i] } for (my $j=$i+1; $j<=$#MD; $j++) { unless (mkdir join '/', @MD[0 .. $j]) {warn "Could not create the session directory \"$D\" because $!\n"; exit 1} } $D} );
 has rm              => (is=>'ro', lazy=>0, default=> sub{foreach (qw[/usr/bin /bin /usr/sbin /sbin]) {return "$_/rm" if -f "$_/rm" && -x "$_/rm" } warn "Could not found utility rm\n"; exit 1});
 
 
 # Recursive walker of custom Perl Data Structures
-my %Handler; %Handler=(
+%Handler=(
 SCALAR => sub { $Handler{WALKER}->(${$_[0]}, $_[1], @{$_[2]} )},
 ARRAY  => sub { $Handler{WALKER}->($_, $_[1], @{$_[2]}) for @{$_[0]} },
 HASH   => sub { $Handler{WALKER}->($_[0]->{$_}, $_[1], @{$_[2]}, $_) for sort keys %{$_[0]} },
 ''     => sub { $_[1]->($_[0], @{$_[2]}) },
 WALKER => sub { my $data = shift; $Handler{ref $data}->($data, shift, \@_) }
 );
-
 
 
 sub BUILD
@@ -75,59 +76,59 @@ unless (-d $module_dir) {warn "Could not find the Dancer2::Plugin::WebService in
 
 # Use the first active authentication method
 
-	foreach my $method (@{$plg->config->{'Authentication methods'}}) {
-	next unless ((exists $method->{Active}) && ($method->{Active}=~/(?i)[y1t]/));
-	$plg->auth_method( $method->{Name} );
+  foreach my $method (@{$plg->config->{'Authentication methods'}}) {
+  next unless ((exists $method->{Active}) && ($method->{Active}=~/(?i)[y1t]/));
+  $plg->auth_method( $method->{Name} );
 
-		# If the Authorization method is an external script
-		if ($plg->auth_method ne 'INTERNAL') {
-		unless (exists $method->{Command}) {warn "The active Authentication method \"".$plg->auth_method."\" does not know what to do\n"; exit 1}
-		$method->{Command} =~s/^MODULE_INSTALL_DIR/$module_dir/;
-		unless (-f $method->{Command}) {warn "Sorry, could not found the external authorization utility $method->{Command}\n"; exit 1}
-		unless (-x $method->{Command}) {warn "Sorry, the external authorization utility $method->{Command} is not executable from user ". getpwuid($>) ."\n"; exit 1}
+    # If the Authorization method is an external script
+    if ($plg->auth_method ne 'INTERNAL') {
+    unless (exists $method->{Command}) {warn "The active Authentication method \"".$plg->auth_method."\" does not know what to do\n"; exit 1}
+    $method->{Command} =~s/^MODULE_INSTALL_DIR/$module_dir/;
+    unless (-f $method->{Command}) {warn "Sorry, could not found the external authorization utility $method->{Command}\n"; exit 1}
+    unless (-x $method->{Command}) {warn "Sorry, the external authorization utility $method->{Command} is not executable from user ". getpwuid($>) ."\n"; exit 1}
 
-			if ((exists $method->{'Use sudo'}) && ($method->{'Use sudo'}=~/(?i)[y1t]/)) {
-			my $sudo = undef;
-			foreach (qw[/usr/bin /bin /usr/sbin /sbin]) { if ((-f "$_/sudo") && -x ("$_/sudo")) { $sudo="$_/sudo"; last } }
-			unless (defined $sudo) {warn "Could not found sudo command\n"; exit 1}
-			$plg->auth_command( "$sudo \Q$method->{Command}\E" )
-			}
-			else {
-			$plg->auth_command( "\Q$method->{Command}\E" )
-			}
-		}
+      if ((exists $method->{'Use sudo'}) && ($method->{'Use sudo'}=~/(?i)[y1t]/)) {
+      my $sudo = undef;
+      foreach (qw[/usr/bin /bin /usr/sbin /sbin]) { if ((-f "$_/sudo") && -x ("$_/sudo")) { $sudo="$_/sudo"; last } }
+      unless (defined $sudo) {warn "Could not found sudo command\n"; exit 1}
+      $plg->auth_command( "$sudo \Q$method->{Command}\E" )
+      }
+      else {
+      $plg->auth_command( "\Q$method->{Command}\E" )
+      }
+    }
 
-	delete @{$method}{'Name','Active','Command','Use sudo'};
-	$method->{Arguments} //= [];
-	$plg->auth_config($method);
-	last
-	}
+  delete @{$method}{'Name','Active','Command','Use sudo'};
+  $method->{Arguments} //= [];
+  $plg->auth_config($method);
+  last
+  }
 
 delete $plg->config->{'Authentication methods'};
 
-	# Check for an active auth method if there are protected routes
-	foreach (keys %{$plg->config->{Routes}}) {
+  # Check the active auth method if there are protected routes
+  foreach (keys %{$plg->config->{Routes}}) {
 
-		if ((exists $plg->config->{Routes}->{$_}->{Protected}) && ($plg->config->{Routes}->{$_}->{Protected}=~/(?i)[y1t]/)) {
-		$plg->config->{Routes}->{$_}->{Protected} = 1;
+    if ((exists $plg->config->{Routes}->{$_}->{Protected}) && ($plg->config->{Routes}->{$_}->{Protected}=~/(?i)[y1t]/)) {
+    $plg->config->{Routes}->{$_}->{Protected} = 1;
 
-			if ($plg->auth_method eq '') {
-			warn "While there is at least one protected route ( $_ ) there is not any active authorization method\n"; exit 1
-			}
-			else {
+      if ($plg->auth_method eq '') {
+      warn "While there is at least one protected route ( $_ ) there is not any active authorization method\n"; exit 1
+      }
+      else {
 
-				if (exists $plg->config->{Routes}->{$_}->{Groups}) {
-				$plg->config->{Routes}->{$_}->{Groups} = [ $plg->config->{Routes}->{$_}->{Groups} ] unless 'ARRAY' eq ref $plg->config->{Routes}->{$_}->{Groups}
-				}
-				else {
-				$plg->config->{Routes}->{$_}->{Groups} = []
-				}
-			}
-		}
-		else {
-		$plg->config->{Routes}->{$_}->{Protected} = 0
-		}
-	}
+        if (exists $plg->config->{Routes}->{$_}->{Groups}) {
+        $plg->config->{Routes}->{$_}->{Groups} = [ $plg->config->{Routes}->{$_}->{Groups} ] unless 'ARRAY' eq ref $plg->config->{Routes}->{$_}->{Groups}
+        }
+        else {
+        $plg->config->{Routes}->{$_}->{Groups} = []
+        }
+      }
+    }
+    else {
+    $plg->config->{Routes}->{$_}->{Protected} = 0
+    }
+  }
 
 print 'Start time              : ', scalar localtime $^T ,"\n";
 print "Main PID                : $$\n";
@@ -143,19 +144,19 @@ print "version WebService      : $VERSION\n";
 # Restore the valid sessions, and delete the expired ones
 opendir DIR, $plg->dir_session or die "Could not list session directory $plg->{dir_session} because $!\n";
 
-	foreach my $token (grep ! /^\.+$/, readdir DIR) {
+  foreach my $token (grep ! /^\.+$/, readdir DIR) {
 
-		if ((-f "$plg->{dir_session}/$token/control/lastaccess") && (-f "$plg->{dir_session}/$token/control/username") && (-f "$plg->{dir_session}/$token/control/groups")) {
-		my $lastaccess = ${ Storable::retrieve "$plg->{dir_session}/$token/control/lastaccess" };
+    if ((-f "$plg->{dir_session}/$token/control/lastaccess") && (-f "$plg->{dir_session}/$token/control/username") && (-f "$plg->{dir_session}/$token/control/groups")) {
+    my $lastaccess = ${ Storable::retrieve "$plg->{dir_session}/$token/control/lastaccess" };
 
-			if (time - $lastaccess > $plg->Session_timeout) {
-			print "Delete expired session: $token\n";
-			system $plg->rm, '-rf', "$plg->{dir_session}/$token"
-			}
-			else {
-			  $TokenDB{$token}->{data} = {};
-			@{$TokenDB{$token}->{control}}{qw/lastaccess username groups/} = ($lastaccess, ${Storable::retrieve "$plg->{dir_session}/$token/control/username"}, ${Storable::retrieve "$plg->{dir_session}/$token/control/groups"});
-			opendir __TOKEN, "$plg->{dir_session}/$token/data" or die "Could not read session directory $plg->{dir_session}/$token/data because $!\n";
+      if (time - $lastaccess > $plg->Session_timeout) {
+      print "Delete expired session: $token\n";
+      system $plg->rm, '-rf', "$plg->{dir_session}/$token"
+      }
+      else {
+        $TokenDB{$token}->{data} = {};
+      @{$TokenDB{$token}->{control}}{qw/lastaccess username groups/} = ($lastaccess, ${Storable::retrieve "$plg->{dir_session}/$token/control/username"}, ${Storable::retrieve "$plg->{dir_session}/$token/control/groups"});
+      opendir __TOKEN, "$plg->{dir_session}/$token/data" or die "Could not read session directory $plg->{dir_session}/$token/data because $!\n";
 
 				foreach my $record (grep ! /^\.+$/, readdir __TOKEN) {
 				$TokenDB{$token}->{data}->{$record} = Storable::retrieve "$plg->{dir_session}/$token/data/$record";
@@ -163,7 +164,7 @@ opendir DIR, $plg->dir_session or die "Could not list session directory $plg->{d
 				}
 
 			close __TOKEN;
-			print "Restore session : $token , having ". scalar(keys %{$TokenDB{$token}->{data}}) ." records\n"
+			print "Restore session : $token (". scalar(keys %{$TokenDB{$token}->{data}}) ." records)\n"
 			}
 		}
 		else {
@@ -173,73 +174,75 @@ opendir DIR, $plg->dir_session or die "Could not list session directory $plg->{d
 	}
 
 closedir DIR;
-#print Dumper( $app )                   ;exit;
+
+#print Dumper( $app ) ;exit;
 #print Dumper( $plg->config->{Routes} ) ;exit;
 #print Dumper( $plg->auth_config )      ;exit;
 #print Dumper  \%TokenDB; exit;
+#print "---------\n*".  $plg->dir_session  ."*\n---------\n";
 
 
 # Hook, BEFORE the main app process the request
 
-	$app->add_hook(Dancer2::Core::Hook->new(name=>'before_request', code=>sub{
-	$plg->error(0);
-	$plg->sort(   exists $app->request->query_parameters->{sort}   ? $app->request->query_parameters->{sort}  =~/(?i)1|t|y/ ? 1:0:0);  # sort   default is 0
-    $plg->pretty( exists $app->request->query_parameters->{pretty} ? $app->request->query_parameters->{pretty}=~/(?i)1|t|y/ ? 1:0:1);  # pretty default is 1
-	$plg->ClientIP($app->request->env->{HTTP_X_REAL_IP} // $app->request->address // '127.0.0.1'); # Client IP address, even if running from a reverse proxy
+  $app->add_hook(Dancer2::Core::Hook->new(name=>'before_request', code=>sub{
+  $plg->error(0);
+  $plg->sort(   exists $app->request->query_parameters->{sort}   ? $app->request->query_parameters->{sort}  =~/(?i)1|t|y/ ? 1:0:0);  # sort   default is 0
+  $plg->pretty( exists $app->request->query_parameters->{pretty} ? $app->request->query_parameters->{pretty}=~/(?i)1|t|y/ ? 1:0:1);  # pretty default is 1
+  $plg->ClientIP($app->request->env->{HTTP_X_REAL_IP} // $app->request->address // '127.0.0.1'); # Client IP address, even if running from a reverse proxy
 
-		# format
-		foreach (qw/from to/) {
+    # format
+    foreach (qw/from to/) {
 
-			if (exists $app->request->query_parameters->{$_}) {
+      if (exists $app->request->query_parameters->{$_}) {
 
-				if ( $app->request->query_parameters->{$_} =~ $fmt_rgx ) {
-				$plg->Format->{$_} = $app->request->query_parameters->{$_}
-				}
-				else {
-				$plg->Format->{to}='json';
-				$app->halt($plg->reply('error'=>"Format parameter $_ ( ".$app->request->query_parameters->{$_}.' ) is not one of the :'. join(', ',keys %Formats)))
-				}
-			}
-			else {
-			$plg->Format->{$_} = $plg->config->{'Default format'}
-			}
-		}
+        if ( $app->request->query_parameters->{$_} =~ $fmt_rgx ) {
+        $plg->Format->{$_} = $app->request->query_parameters->{$_}
+        }
+        else {
+        $plg->Format->{to} = $plg->config->{'Default format'};
+        $app->halt($plg->reply('error'=>"Format parameter $_ ( ".$app->request->query_parameters->{$_}.' ) is not one of the :'. join(', ',keys %Formats)))
+        }
+      }
+      else {
+      $plg->Format->{$_} = $plg->config->{'Default format'}
+      }
+    }
 
-	# add header
-	$app->request->header('Content-Type'=> $Formats{$plg->Format->{to}});
+  # add header
+  $app->request->header('Content-Type'=> $Formats{$plg->Format->{to}});
 
-	# route name
-	if    ( $app->request->{route}->{regexp} =~/^\^[\/\\]+(.*?)[\/\\]+\(\?#token.*/ )	{ $plg->route_name($1) }
-	elsif ( $app->request->{route}->{regexp} =~/^\^[\/\\]+(.*?)\$/ )					{ $plg->route_name($1) }
-	else  { $app->halt($plg->reply('error'=>'Could not recognize the route')) }
+  # route name
+  if    ( $app->request->{route}->{regexp} =~/^\^[\/\\]+(.*?)[\/\\]+\(\?#token.*/ ) { $plg->route_name($1) }
+  elsif ( $app->request->{route}->{regexp} =~/^\^[\/\\]+(.*?)\$/ )                  { $plg->route_name($1) }
+  else  { $app->halt($plg->reply('error'=>'Could not recognize the route')) }
 
-	# Convert the posted data string, to hash $plg->data
-	$plg->data({});
+  # Convert the posted string (data), to hash $plg->data
+  $plg->data({});
 
-		if ($app->request->body) {
+    if ($app->request->body) {
 
-			eval  {
-			if    ($plg->Format->{from} eq 'json')	{ $plg->data(Cpanel::JSON::XS::decode_json  Encode::encode('UTF-8',$app->request->body)) }
-			elsif ($plg->Format->{from} eq 'xml')	{ $plg->data(XML::Hash::XS::xml2hash $app->request->body) }
-			elsif ($plg->Format->{from} eq 'yaml')	{ $plg->data(YAML::Syck::Load        $app->request->body) }
-			elsif ($plg->Format->{from} eq 'perl')	{ $plg->data(eval                    $app->request->body) }
-			elsif ($plg->Format->{from} eq 'human')	{ my $arrayref;
+      eval  {
+      if    ($plg->Format->{from} eq 'json')  { $plg->data(Cpanel::JSON::XS::decode_json  Encode::encode('UTF-8',$app->request->body)) }
+      elsif ($plg->Format->{from} eq 'xml')   { $plg->data(XML::Hash::XS::xml2hash $app->request->body) }
+      elsif ($plg->Format->{from} eq 'yaml')  { $plg->data(YAML::Syck::Load        $app->request->body) }
+      elsif ($plg->Format->{from} eq 'perl')  { $plg->data(eval                    $app->request->body) }
+      elsif ($plg->Format->{from} eq 'human') { my $arrayref;
 
-					while ( $app->request->body =~/(.*)$/gm ) {
-					my @array = split /\s*(?:\,| |\t|-->|==>|=>|->|=|;|\|)+\s*/, $1;
-					next unless @array;
+          while ( $app->request->body =~/(.*)$/gm ) {
+          my @array = split /\s*(?:\,| |\t|-->|==>|=>|->|=|;|\|)+\s*/, $1;
+          next unless @array;
 
-						if (@array % 2 == 0) {
-						push @{$arrayref}, { @array }
-						}
-						else {
-						push @{$arrayref}, { shift @array => [ @array ] }
-						}
-					}
+            if (@array % 2 == 0) {
+            push @{$arrayref}, { @array }
+            }
+            else {
+            push @{$arrayref}, { shift @array => [ @array ] }
+            }
+          }
 
-				$plg->data( 1==scalar @{$arrayref} ? $arrayref->[0] : {'Data'=>$arrayref} )
-				}
-			};
+        $plg->data( 1==scalar @{$arrayref} ? $arrayref->[0] : {'Data'=>$arrayref} )
+        }
+      };
 
 			if ($@) {
 			$@ =~s/[\s\v\h]+/ /g;
@@ -247,68 +250,63 @@ closedir DIR;
 			}
 		}
 
-		# Do not proceed if the posted data are not hash
-		if ('HASH' ne ref $plg->{data}) {
+    # Do not proceed if the posted data are not hash
+    if ('HASH' ne ref $plg->{data}) {
 
-			if ('ARRAY' eq ref $plg->{data}) {
-			$plg->{data} = { data => $plg->{data} }
-			}
-			else {
-			$app->halt($plg->reply('error'=>'Posted data are not keys or list'))
-			}
-		}
+      if ('ARRAY' eq ref $plg->{data}) {
+      $plg->{data} = { data => $plg->{data} }
+      }
+      else {
+      $app->halt($plg->reply('error'=>'Posted data are not keys or list'))
+      }
+    }
 
-	# Delete not needed control url parameters
-	delete $app->request->query_parameters->{$_} foreach qw/from to sort pretty message/;
+    # Delete not needed control url parameters
+    foreach (qw/from to sort pretty message/) {
+    delete $app->request->query_parameters->{$_}
+    }
 
-	# Use as data any url parameter
-	foreach (keys %{$app->request->query_parameters}) { $plg->data->{$_} = $app->request->query_parameters->{$_} }
-	}));
+    # Use as data any url parameter
+    foreach (keys %{$app->request->query_parameters}) {
+    $plg->data->{$_} = $app->request->query_parameters->{$_}
+    }
 
+  }));
 
 
 # Hook ONLY for the protected routes, before the main app do anything
 # halt if the session is expired, otherelse update the lastaccess
 
-	$app->add_hook(Dancer2::Core::Hook->new(name=>'before', code=>sub{
-	return unless (exists $plg->config->{Routes}->{$plg->route_name}) && $plg->config->{Routes}->{$plg->route_name}->{Protected};
+  $app->add_hook(Dancer2::Core::Hook->new(name=>'before', code=>sub{
+  return unless (exists $plg->config->{Routes}->{$plg->route_name}) && $plg->config->{Routes}->{$plg->route_name}->{Protected};
 
-		if (exists $plg->data->{token}) {
+  $app->halt($plg->reply('error' => "You must provide a token to use the protected route $plg->{route_name}")) unless exists $plg->data->{token};
+  $app->halt($plg->reply('error' => 'Invalid token')) unless exists $TokenDB{$plg->data->{token}};
+  $dir = $plg->dir_session.'/'.$plg->data->{token};
 
-			if (exists $TokenDB{$plg->data->{token}}) {
-			my $dir	= $plg->dir_session.'/'.$plg->data->{token};
+    if (time - $TokenDB{$plg->data->{token}}->{control}->{lastaccess} > $plg->Session_timeout) {
+    $plg->error('Session expired because its idle time '.(time - $TokenDB{$plg->data->{token}}->{control}->{lastaccess}).' secs is more than the allowed '.$plg->Session_timeout.' secs');
+    system $plg->rm,'-rf',$dir;
+    delete $TokenDB{$plg->data->{token}};
+    $plg->data({});	# clear user data
+    $app->halt($plg->reply)
+    }
+    else {
+    # update the lastaccess
+    $TokenDB{$plg->data->{token}}->{control}->{lastaccess} = time;
+    Storable::lock_store \$TokenDB{$plg->data->{token}}->{control}->{lastaccess}, "$dir/control/lastaccess"
+    }			
 
-				if (time - $TokenDB{$plg->data->{token}}->{control}->{lastaccess} > $plg->Session_timeout) {
-				$plg->error('Session expired because its idle time '.(time - $TokenDB{$plg->data->{token}}->{control}->{lastaccess}).' secs is more than the allowed '.$plg->Session_timeout.' secs');
-				system $plg->rm,'-rf',$dir;
-				delete $TokenDB{$plg->data->{token}};
-				$plg->data({});	# clear user data
-				$app->halt($plg->reply)
-				}
-				else {
-				# update the lastaccess
-				$TokenDB{$plg->data->{token}}->{control}->{lastaccess} = time;
-				Storable::lock_store \$TokenDB{$plg->data->{token}}->{control}->{lastaccess}, "$dir/control/lastaccess"
-				}
-			}
-			else {
-			$app->halt($plg->reply('error'=>'invalid or expired token'))
-			}
-		}
-		else {
-		$app->halt($plg->reply('error' => "You must provide a token to use the protected route $plg->{route_name}"))
-		}
+	# Check if the user is member to all the Groups of the route
 
-	# Check if the user is member to all the route's Groups
+    foreach (@{$plg->config->{Routes}->{$plg->route_name}->{Groups}}) {
 
-		foreach (@{$plg->config->{Routes}->{$plg->route_name}->{Groups}}) {
+      unless (exists $TokenDB{$plg->data->{token}}->{control}->{groups}->{$_} ) {
+      $app->halt($plg->reply('error'=>'Required route groups are '. join(',',@{$plg->config->{Routes}->{$plg->route_name}->{Groups}}) .' your groups are '. join(',', sort keys %{$TokenDB{$plg->data->{token}}->{control}->{groups}})))
+      }
+    }
 
-			unless (exists $TokenDB{$plg->data->{token}}->{control}->{groups}->{$_} ) {
-			$app->halt($plg->reply('error'=>'Required route groups are '. join(',',@{$plg->config->{Routes}->{$plg->route_name}->{Groups}}) .' your groups are '. join(',', sort keys %{$TokenDB{$plg->data->{token}}->{control}->{groups}})))
-			}
-		}
-	}));
-
+  }));
 
 
 
@@ -332,63 +330,63 @@ closedir DIR;
 		}
 	);
 
-	# Built in route /WebService/:what
-	$app->add_route(
-	regexp => '/WebService/:what?',
-	method => 'get',
-	code   => sub {
-		my $app= shift;
+  # Built in route /WebService/:what
+  $app->add_route(
+  regexp => '/WebService/:what?',
+  method => 'get',
+  code   => sub {
+    my $app= shift;
 
-			if ( $app->request->param('what') =~/(?i)v/ ) {
-			$plg->reply(Perl=> $], WebService=> $VERSION, Dancer2=> $Dancer2::VERSION)
-			}
-			elsif ( $app->request->param('what') =~/(?i)a/ ) {
+      if ( $app->request->param('what') =~/(?i)v/ ) {
+      $plg->reply(Perl=> $], WebService=> $VERSION, Dancer2=> $Dancer2::VERSION)
+      }
+      elsif ( $app->request->param('what') =~/(?i)a/ ) {
 
-				$plg->reply(
-				Application			=> $app->{name},
-				Os					=> eval{ local $_ = undef; local $/ = undef; open __F, -f '/etc/redhat-release' ? '/etc/redhat-release' : '/etc/issue'; if (fileno __F) { ($_= <__F>)=~s/\s*$//s; $_ = join ' ', split /v/, $_ } close __F; $_ // $^O },				
-				'Service uptime'	=> time - $^T,
-				Epoch				=> time,
-				Server				=> { address => $app->request->env->{SERVER_NAME}, ip => $app->request->env->{SERVER_PORT} },
-				'Login idle timeout'=> $plg->Session_timeout,
-				'Auth method'       => $plg->auth_method
-				)
-			}
-			elsif ( $app->request->param('what') =~/(?i)c/ ) {
+        $plg->reply(
+        Application         => $app->{name},
+        Os                  => eval{ local $_ = undef; local $/ = undef; open __F, -f '/etc/redhat-release' ? '/etc/redhat-release' : '/etc/issue'; if (fileno __F) { ($_= <__F>)=~s/\s*$//s; $_ = join ' ', split /v/, $_ } close __F; $_ // $^O },
+        'Server bind'       => $app->request->env->{SERVER_NAME},
+        'Server port'       => $app->request->env->{SERVER_PORT},
+        'Service uptime'    => time - $^T,
+        'Login idle timeout'=> $plg->Session_timeout,
+        'Auth method'       => $plg->auth_method
+        )
+      }
+      elsif ( $app->request->param('what') =~/(?i)c/ ) {
 
-				$plg->reply(
-				Address				=> $plg->ClientIP,
-				Port				=> $app->request->env->{REMOTE_PORT},
-				Agent				=> $app->request->agent,
-				Protocol			=> $app->request->protocol,
-				'Is secure'			=> $app->request->secure,
-				'Http method'		=> $app->request->method,
-				'Header accept'		=> $app->request->header('accept'),
-				'Parameters url'	=> join(' ', $app->request->params('query')),
-				'Parameters route'	=> join(' ', $app->request->params('route')),
-				'Parameters body'	=> join(' ', $app->request->params('body'))
-				)
-			}
-			else {
-			$plg->reply(error=>'Not existing internal route /WebService/'. $app->request->param('what') )
-			}
-		}
-	);
+        $plg->reply(
+        Address           => $plg->ClientIP,
+        Port              => $app->request->env->{REMOTE_PORT},
+        Agent             => $app->request->agent,
+        Protocol          => $app->request->protocol,
+        'Is secure'       => $app->request->secure,
+        'Http method'     => $app->request->method,
+        'Header accept'   => $app->request->header('accept'),
+        'Parameters url'  => join(' ', $app->request->params('query')),
+        'Parameters route'=> join(' ', $app->request->params('route')),
+        'Parameters body' => join(' ', $app->request->params('body'))
+        )
+      }
+      else {
+      $plg->reply(error=>'Not existing internal route /WebService/'. $app->request->param('what') )
+      }
+    }
+  );
 
-	# logout and delete the session
-	$app->add_route(
-	regexp => '/logout',
-	method => $_,
-	code   => sub {
+  # logout and delete the session
+  $app->add_route(
+  regexp => '/logout',
+  method => $_,
+  code   => sub {
 
-		if (exists $TokenDB{$plg->data->{token}}) {
-		delete $TokenDB{$plg->data->{token}};
-		system $plg->rm,'-rf',$plg->dir_session.'/'.$plg->data->{token}
-		}
+    if (exists $TokenDB{$plg->data->{token}}) {
+    delete $TokenDB{$plg->data->{token}};
+    system $plg->rm,'-rf',$plg->dir_session.'/'.$plg->data->{token}
+    }
 
-	$plg->data({});
-	$plg->reply()
-	}) foreach 'post','put';
+  $plg->data({});
+  $plg->reply()
+  }) foreach 'post','put';
 
 
 	# Authentication
@@ -414,8 +412,8 @@ closedir DIR;
 
 	# Check the input parameters
 	foreach ('username','password') {unless (exists $plg->data->{$_}) { $plg->error("Login failed, you did not pass the mandatory key $_"); $app->halt($plg->reply) }}
-	if ($plg->data->{username} =~/^\s*$/)	{ $plg->error('Login failed because the username is blank'); $app->halt($plg->reply) }
-	if ($plg->data->{password} eq '')		{ $plg->error('Login failed because the password is blank'); $app->halt($plg->reply) }
+	if ($plg->data->{username} =~/^\s*$/) { $plg->error('Login failed because the username is blank'); $app->halt($plg->reply) }
+	if ($plg->data->{password} eq '')     { $plg->error('Login failed because the password is blank'); $app->halt($plg->reply) }
 
 	$plg->error('authorization error');
 	my $groups={};
@@ -426,8 +424,8 @@ closedir DIR;
 		my $conf = $plg->auth_config;
 
 			if (exists $conf->{Accounts}->{$user}) {
-			if    ($conf->{Accounts}->{$user} eq '<any>')				{$plg->error(0)} # global password
-			elsif ($conf->{Accounts}->{$user} eq $plg->data->{password}){$plg->error(0)} # normal
+			if    ($conf->{Accounts}->{$user} eq '<any>') {$plg->error(0)} # global password
+			elsif ($conf->{Accounts}->{$user} eq $plg->data->{password}) {$plg->error(0)} # normal
 			}
 
 			if ($plg->error && exists $conf->{Accounts}->{'<any>'}) {
@@ -720,7 +718,7 @@ my $plg	= shift;
 	$plg->dsl->halt($plg->reply)
 	}
 
-my $dir = $plg->dir_session.'/'.$plg->data->{token};
+$dir = $plg->dir_session.'/'.$plg->data->{token};
 my @keys;
 
 	if (@_) {
@@ -760,7 +758,7 @@ Dancer2::Plugin::WebService - RESTful Web Services with login, persistent data, 
 
 =head1 VERSION
 
-version 4.4.2
+version 4.4.3
 
 =head2 SYNOPSIS
 
@@ -768,12 +766,12 @@ The replies have the extra key B<error> . At success B<error> is 0 , while at fa
 
 The posted keys can be placed as url parameters if wanted
 
-=head2 Routes
+=head2 Route examples
 
-  POST ViewKeysAll
-  POST ViewKeysSome    {"k1":"v1"}
   POST login           {"username":"joe", "password":"souvlaki"}
   POST login?username=joe&password=souvlaki
+  POST ViewKeysAll
+  POST ViewKeysSome    {"k1":"v1"}
   POST ProtectStore    {"token":"2d85b82b158e", "k1":"v1", "k2":"v2"}
   POST ProtectDelete   {"token":"2d85b82b158e"}
   POST ProtectRead     {"token":"2d85b82b158e"}
@@ -847,7 +845,7 @@ I<Built in routes>
 
 Your routes can be either B<public> or B<protected>
 
-B<public> are the routes that anyone can use without B<login> , Τhey do not support sessions / persistent data, but you can access the posted data using the method B<PostData>
+B<public> are the routes that anyone can use without B<login> , Τhey do not support sessions / persistent data. You can access the posted data using the method B<PostData>
 
 B<protected> are the routes that you must provide a token, returned by the login route.
 At B<protected> routes you can  I<read>, I<write>, I<delete> persistent data using the  methods B<SessionGet> , B<SessionSet> , B<SessionDel>
@@ -919,15 +917,10 @@ or at your main script
 
 WebService methods for your main Dancer2 code
 
-=head3 reply
+The posted data can be anything; hashes, lists, scalars
 
-Send the reply to the client; it applies any necessary format convertions.
-This should be the last route's statement
-
-  reply                        only the error
-  reply    k1 => 'v1', ...     anything you want
-  reply( { k1 => 'v1', ... } ) anything you want
-  reply   'k1'                 The specific key and its value of the posted data 
+  curl -X POST 0:/   -d  '{ "k1":"v1", "k2":"v2", "k3":"v3" }'
+  curl -X POST 0:/   -d  '[ "k1", "k2", "k3", "k4" ]'
 
 =head3 PostData
 
@@ -937,10 +930,15 @@ Get the posted data
   my %hash = PostData('k2','k4');   Only some keys  of a hash
   my @list = PostData('k2','k4');   Only some items of a list
 
-The posted data can be anything; hashes, lists, scalars
+=head3 reply
 
-  curl -X POST 0:/   -d  '{ "k1":"v1", "k2":"v2", "k3":"v3" }'
-  curl -X POST 0:/   -d  '[ "k1", "k2", "k3", "k4" ]'
+Send the reply to the client; it applies any necessary format convertions.
+This should be the last route's statement
+
+  reply                        only the error
+  reply    k1 => 'v1', ...     anything you want
+  reply( { k1 => 'v1', ... } ) anything you want
+  reply   'k1'                 The specific key and its value of the posted data 
 
 =head3 SessionGet
 
@@ -1135,7 +1133,7 @@ George Bouras <george.mpouras@yandex.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by George Bouras.
+This software is copyright (c) 2023 by George Bouras.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

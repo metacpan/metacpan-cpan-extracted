@@ -10,7 +10,7 @@ use Encode qw( decode );
 use Encode::Locale    qw();
 #use Spreadsheet::Read qw( ReadData rows ); # required
 #use String::Unescape  qw( unescape );      # required
-#use Text::CSV         qw();                # required
+#use Text::CSV_XS      qw();                # required
 
 use Term::Choose           qw();
 use Term::Choose::LineFold qw( line_fold print_columns );
@@ -44,8 +44,8 @@ sub parse_plain {
     my ( $sf, $sql, $fh ) = @_;
     my $rows_of_cols = [];
     my $file_fs = $sf->{i}{f_plain};
-    require Text::CSV;
-    $rows_of_cols = Text::CSV::csv( in => $file_fs ) or die Text::CSV->error_diag;
+    require Text::CSV_XS;
+    $rows_of_cols = Text::CSV_XS::csv( in => $file_fs ) or die Text::CSV_XS->error_diag;
     $sql->{insert_into_args} = $rows_of_cols;
     return 1;
 }
@@ -61,11 +61,12 @@ sub parse_with_Text_CSV {
     require String::Unescape;
     my $options = {
         map { $_ => String::Unescape::unescape( $sf->{o}{csv_in}{$_} ) }
-        grep { defined $sf->{o}{csv_in}{$_} }
+        # keep the default value if the option is set to '' or to undef:
+        grep { length $sf->{o}{csv_in}{$_} }
         keys %{$sf->{o}{csv_in}}
     };
-    require Text::CSV;
-    my $csv = Text::CSV->new( $options ) or die Text::CSV->error_diag();
+    require Text::CSV_XS;
+    my $csv = Text::CSV_XS->new( $options ) or die Text::CSV_XS->error_diag();
     $csv->callbacks( error => sub {
         my ( $code, $str, $pos, $rec, $fld ) = @_;
         if ( $code == 2012 ) {
@@ -76,7 +77,7 @@ sub parse_with_Text_CSV {
             my $error_input = $csv->error_input() // 'No Error Input defined.';
             my $prompt = "Error Input:";
             $error_input =~ s/\R/ /g;
-            my $info = "Close with ENTER\nText::CSV\n$code $str\nposition:$pos record:$rec field:$fld\n";
+            my $info = "Close with ENTER\nText::CSV_XS\n$code $str\nposition:$pos record:$rec field:$fld\n";
             $tc->choose(
                 [ line_fold( $error_input, get_term_width() ) ],
                 { info => $info, prompt => $prompt  }

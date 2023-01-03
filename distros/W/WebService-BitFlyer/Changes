@@ -1,4 +1,7 @@
 Revision history for Perl extension WebService::BitFlyer
 
+0.02    Mon Jan  2 03:10:40 UTC 2023
+        - improve Pod (Thanks @manwar)
+
 0.01    Sat Jan 20 22:00:14 JST 2018
         - original version

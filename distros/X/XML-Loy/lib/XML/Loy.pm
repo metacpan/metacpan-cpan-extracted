@@ -5,7 +5,7 @@ use Carp qw/croak carp/;
 use Scalar::Util qw/blessed weaken/;
 use Mojo::Base 'Mojo::DOM';
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 sub DESTROY;
 
@@ -212,6 +212,11 @@ sub add {
   my $tree = $element->tree;
 
   # Prepend with no prefix
+  if (index($tag, 'loy:') == 0) {
+    $tree->[1] = substr($tag, 4);
+    return $element;
+  };
+
   if (index($tag, '-') == 0) {
     $tree->[1] = substr($tag, 1);
     return $element;
@@ -259,7 +264,11 @@ sub set {
     $tag = shift;
 
     # No prefix
-    if (index($tag, '-') == 0) {
+    if (index($tag, 'loy:') == 0) {
+      $tag = substr($tag, 4);
+    }
+
+    elsif (index($tag, '-') == 0) {
       $tag = substr($tag, 1);
     }
 
@@ -417,6 +426,10 @@ sub _add_clean {
 
     my $att  = shift if ref( $_[0] ) eq 'HASH';
     my ($text, $comment) = @_;
+
+    if (index($name, '-') == 0) {
+      $name = 'loy:' . substr($name, 1);
+    };
 
     # Node content with text
     my $string = "<$name";
@@ -1435,7 +1448,7 @@ L<Renée Bäcker|https://github.com/reneeb>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2022, L<Nils Diewald|https://www.nils-diewald.de/>.
+Copyright (C) 2011-2023, L<Nils Diewald|https://www.nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the same terms as Perl.

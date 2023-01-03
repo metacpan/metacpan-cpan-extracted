@@ -1,7 +1,7 @@
 package Dancer::Handler;
 our $AUTHORITY = 'cpan:SUKRIA';
 # ABSTRACT: Dancer request handler
-$Dancer::Handler::VERSION = '1.3513';
+$Dancer::Handler::VERSION = '1.3520';
 use strict;
 use warnings;
 use Carp;
@@ -89,6 +89,7 @@ sub render_request {
         # workflow exception (continuation)
         my ($continuation) = @_;
         $continuation->isa('Dancer::Continuation::Halted')
+        || $continuation->isa('Dancer::Continuation::Route')
           or $continuation->rethrow();
         # special case for halted workflow continuation: still render the response
         Dancer::Serializer->process_response(Dancer::SharedData->response);
@@ -222,7 +223,7 @@ Dancer::Handler - Dancer request handler
 
 =head1 VERSION
 
-version 1.3513
+version 1.3520
 
 =head1 AUTHOR
 

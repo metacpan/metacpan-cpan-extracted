@@ -1,5 +1,5 @@
 package Date::Holidays::BY;
-our $VERSION = '1.2023.0'; # VERSION
+our $VERSION = '1.2023.1'; # VERSION
 
 =encoding utf8
 
@@ -61,8 +61,8 @@ INACCURATE_TIMES_SINCE after this year dates of holidays and working day shift a
 
 use List::Util;
 
-our $HOLIDAYS_VALID_SINCE = 2016; # TODO add all old
-our $INACCURATE_TIMES_SINCE = 2023;
+our $HOLIDAYS_VALID_SINCE = 2013; # TODO add all old
+our $INACCURATE_TIMES_SINCE = 2024;
 
 =head2 $Date::Holidays::BY::strict
 
@@ -117,7 +117,10 @@ my @REGULAR_HOLIDAYS = (
 );
 
 my %HOLIDAYS_SPECIAL = (
-    2016 => [ qw( 0108 0307  ) ],
+    2013 => [ qw( 0102 0510 ) ],
+    2014 => [ qw( 0102 0106 0430 0704 1226 ) ],
+    2015 => [ qw( 0102 0420 ) ],
+    2016 => [ qw( 0108 0307 ) ],
     2017 => [ qw( 0102 0424 0425 0508 1106 ) ],
     2018 => [ qw( 0102 0309 0416 0417 0430 0702 1224 1231 ) ],
     2019 => [ qw( 0506 0507 0508 1108 ) ],
@@ -128,6 +131,9 @@ my %HOLIDAYS_SPECIAL = (
 );
 
 my %BUSINESS_DAYS_ON_WEEKENDS = (
+    2013 => [ qw( 0105 0518 ) ],
+    2014 => [ qw( 0104 0111 0503 0712 1220 ) ],
+    2015 => [ qw( 0110 0425 ) ],
     2016 => [ qw( 0116 0305 ) ],
     2017 => [ qw( 0121 0429 0506 1104 ) ],
     2018 => [ qw( 0120 0303 0414 0428 0707 1222 1229 ) ],
@@ -139,6 +145,8 @@ my %BUSINESS_DAYS_ON_WEEKENDS = (
 );
 
 my %SHORT_BUSINESS_DAYS = (
+    2014 => [ qw( 0428 0508 0702 1106  1224 1231 ) ],
+    2015 => [ qw( 0106 0430 0508 0702 1106  1224 ) ],
     2016 => [ qw( 0106 ) ],
     2017 => [ qw( 0106 0307 0429 0506 1104 ) ],
     2018 => [ qw( 0307 0508 1106 ) ],
@@ -297,7 +305,7 @@ sub _get_date_key {
 
 =head1 LICENSE
 
-This software is copyright (c) 2022 by Vladimir Varlamov.
+This software is copyright (c) 2023 by Vladimir Varlamov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

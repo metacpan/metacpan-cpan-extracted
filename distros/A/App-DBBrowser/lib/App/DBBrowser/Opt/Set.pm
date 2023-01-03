@@ -471,14 +471,11 @@ sub set_options {
                     { name => 'eol',         prompt => "eol        " },
                     { name => 'comment_str', prompt => "comment_str" },
                 ];
-                my $prompt = 'Text::CSV read options a';
-                # readline returns the empty string if entered nothing
-                # see documentation: empty string means 'use default value' hence empty to undef
-                my $empty_to_undef = 1;
-                $sf->__group_readline( $section, $items, $prompt, $empty_to_undef );
+                my $prompt = 'Text::CSV_XS read options a';
+                $sf->__group_readline( $section, $items, $prompt );
             }
             elsif ( $opt eq '_csv_in_options' ) {
-                my $prompt = 'Text::CSV read options b';
+                my $prompt = 'Text::CSV_XS read options b';
                 my $sub_menu = [
                     [ 'allow_loose_escapes', "- allow_loose_escapes", [ $no, $yes ] ],
                     [ 'allow_loose_quotes',  "- allow_loose_quotes",  [ $no, $yes ] ],
@@ -571,12 +568,11 @@ sub set_options {
                     { name => 'eol',         prompt => "eol        " },
                     { name => 'undef_str',   prompt => "undef_str"   },
                 ];
-                my $prompt = 'Text::CSV write options a';
-                my $empty_to_undef = 1; # important for `eol` on write
-                $sf->__group_readline( $section, $items, $prompt, $empty_to_undef );
+                my $prompt = 'Text::CSV_XS write options a';
+                $sf->__group_readline( $section, $items, $prompt );
             }
             elsif ( $opt eq '_csv_out_options' ) {
-                my $prompt = 'Text::CSV write options b';
+                my $prompt = 'Text::CSV_XS write options b';
                 my $sub_menu = [
                     [ 'always_quote', "- always_quote", [ $no, $yes ] ],
                     [ 'binary',       "- binary",       [ $no, $yes ] ],
@@ -702,7 +698,7 @@ sub __choose_a_directory_wrap {
 
 
 sub __group_readline {
-    my ( $sf, $section, $items, $prompt, $empty_to_undef ) = @_;
+    my ( $sf, $section, $items, $prompt ) = @_;
     my $list = [ map {
         [
             exists $_->{prompt} ? $_->{prompt} : $_->{name},
@@ -716,12 +712,7 @@ sub __group_readline {
     );
     if ( $new_list ) {
         for my $i ( 0 .. $#$items ) {
-            if ( $empty_to_undef && $new_list->[$i][1] eq '' ) {
-                $sf->{o}{$section}{$items->[$i]{name}} = undef;
-            }
-            else {
-                $sf->{o}{$section}{$items->[$i]{name}} = $new_list->[$i][1];
-            }
+            $sf->{o}{$section}{$items->[$i]{name}} = $new_list->[$i][1];
         }
         $sf->{write_config}++;
     }

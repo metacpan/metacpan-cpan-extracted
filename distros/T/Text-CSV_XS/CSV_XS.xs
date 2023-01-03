@@ -1,4 +1,4 @@
-/*  Copyright (c) 2007-2021 H.Merijn Brand.  All rights reserved.
+/*  Copyright (c) 2007-2023 H.Merijn Brand.  All rights reserved.
  *  Copyright (c) 1998-2001 Jochen Wiedmann. All rights reserved.
  *  This program is free software; you can redistribute it and/or
  *  modify it under the same terms as Perl itself.
@@ -549,7 +549,7 @@ static void cx_xs_cache_set (pTHX_ HV *hv, int idx, SV *val) {
 #define _pretty_strl(csv)	cx_pretty_str (aTHX_ csv, strlen (csv))
 #define _pretty_str(csv,xse)	cx_pretty_str (aTHX_ csv, xse)
 static char *cx_pretty_str (pTHX_ byte *s, STRLEN l) {
-    SV *dsv = sv_2mortal (newSVpvs (""));
+    SV *dsv = newSVpvs_flags ("", SVs_TEMP);
     return (pv_pretty (dsv, (char *)s, l, 0, NULL, NULL,
 	    (PERL_PV_PRETTY_DUMP | PERL_PV_ESCAPE_UNI_DETECT)));
     } /* _pretty_str */
@@ -798,7 +798,7 @@ static int cx_Print (pTHX_ csv_t *csv, SV *dst) {
     int keep = 0;
 
     if (csv->useIO) {
-	SV *tmp = sv_2mortal (newSVpvn (csv->buffer, csv->used));
+	SV *tmp = newSVpvn_flags (csv->buffer, csv->used, SVs_TEMP);
 	dSP;
 	PUSHMARK (sp);
 	EXTEND (sp, 2);
@@ -2195,14 +2195,14 @@ static SV *cx_xsParse_all (pTHX_ SV *self, HV *hv, SV *io, SV *off, SV *len) {
 
     SetupCsv (&csv, hv, self);
 
-    if (SvIOK (off)) {
+    if (SvOK (off)) {
 	skip = SvIV (off);
 	if (skip < 0) {
 	    tail = -skip;
 	    skip = -1;
 	    }
 	}
-    if (SvIOK (len))
+    if (SvOK (len))
 	length = SvIV (len);
 
     while (c_xsParse (csv, hv, row, NULL, io, 1)) {

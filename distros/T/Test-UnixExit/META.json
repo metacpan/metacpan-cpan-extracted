@@ -3,8 +3,8 @@
    "author" : [
       "Jeremy Mates <jeremy.mates@gmail.com>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "bsd"
    ],
@@ -35,7 +35,7 @@
    "provides" : {
       "Test::UnixExit" : {
          "file" : "lib/Test/UnixExit.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -47,6 +47,6 @@
          "url" : "https://github.com/thrig/Test-UnixExit"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

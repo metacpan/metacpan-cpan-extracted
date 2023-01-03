@@ -9,9 +9,9 @@ use App::PMUtils;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-11'; # DATE
+our $DATE = '2022-09-28'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.741'; # VERSION
+our $VERSION = '0.742'; # VERSION
 
 Perinci::CmdLine::Any->new(
     url => '/App/PMUtils/rel2mod',
@@ -34,7 +34,7 @@ rel2mod - Convert release name (e.g. Foo-Bar-1.23.tar.gz) to module name (Foo::B
 
 =head1 VERSION
 
-This document describes version 0.741 of rel2mod (from Perl distribution App-PMUtils), released on 2022-09-11.
+This document describes version 0.742 of rel2mod (from Perl distribution App-PMUtils), released on 2022-09-28.
 
 =head1 SYNOPSIS
 

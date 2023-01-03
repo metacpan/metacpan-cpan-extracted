@@ -11,7 +11,7 @@ use Scalar::Util ();
 {
 	package Type::Tie;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '2.000001';
+	our $VERSION   = '2.002000';
 	our @ISA       = qw( Exporter::Tiny );
 	our @EXPORT    = qw( ttie );
 	
@@ -40,7 +40,7 @@ use Scalar::Util ();
 {
 	package Type::Tie::BASE;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '2.000001';
+	our $VERSION   = '2.002000';
 	
 	$VERSION =~ tr/_//d;
 	
@@ -165,7 +165,7 @@ use Scalar::Util ();
 {
 	package Type::Tie::ARRAY;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '2.000001';
+	our $VERSION   = '2.002000';
 	our @ISA       = qw( Type::Tie::BASE );
 	
 	$VERSION =~ tr/_//d;
@@ -203,7 +203,7 @@ use Scalar::Util ();
 {
 	package Type::Tie::HASH;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '2.000001';
+	our $VERSION   = '2.002000';
 	our @ISA       = qw( Type::Tie::BASE );
 	
 	$VERSION =~ tr/_//d;
@@ -229,7 +229,7 @@ use Scalar::Util ();
 {
 	package Type::Tie::SCALAR;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '2.000001';
+	our $VERSION   = '2.002000';
 	our @ISA       = qw( Type::Tie::BASE );
 	
 	$VERSION =~ tr/_//d;
@@ -382,7 +382,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2018-2019, 2022 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2018-2019, 2022-2023 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

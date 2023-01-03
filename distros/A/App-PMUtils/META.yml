@@ -20,13 +20,13 @@ name: App-PMUtils
 provides:
   App::ModuleUtils:
     file: lib/App/ModuleUtils.pm
-    version: '0.741'
+    version: '0.742'
   App::PMUtils:
     file: lib/App/PMUtils.pm
-    version: '0.741'
+    version: '0.742'
   App::pmgrep:
     file: lib/App/pmgrep.pm
-    version: '0.741'
+    version: '0.742'
 recommends:
   Perl::MinimumVersion::Fast: '0'
 requires:
@@ -86,7 +86,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-PMUtils
   homepage: https://metacpan.org/release/App-PMUtils
   repository: git://github.com/perlancar/perl-App-PMUtils.git
-version: '0.741'
+version: '0.742'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

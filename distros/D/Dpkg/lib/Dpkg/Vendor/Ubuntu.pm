@@ -24,6 +24,8 @@ use warnings;
 
 our $VERSION = '0.01';
 
+use List::Util qw(any);
+
 use Dpkg::ErrorHandling;
 use Dpkg::Gettext;
 use Dpkg::Control::Types;
@@ -76,13 +78,15 @@ sub run_hook {
                 '/usr/share/keyrings/ubuntu-archive-removed-keys.gpg');
     } elsif ($hook eq 'register-custom-fields') {
         my @field_ops = $self->SUPER::run_hook($hook);
-        push @field_ops,
-            [ 'register', 'Launchpad-Bugs-Fixed',
-              CTRL_FILE_CHANGES | CTRL_CHANGELOG  ],
-            [ 'insert_after', CTRL_FILE_CHANGES, 'Closes', 'Launchpad-Bugs-Fixed' ],
-            [ 'insert_after', CTRL_CHANGELOG, 'Closes', 'Launchpad-Bugs-Fixed' ];
+        push @field_ops, [
+            'register', 'Launchpad-Bugs-Fixed',
+              CTRL_FILE_CHANGES | CTRL_CHANGELOG,
+        ], [
+            'insert_after', CTRL_FILE_CHANGES, 'Closes', 'Launchpad-Bugs-Fixed',
+        ], [
+            'insert_after', CTRL_CHANGELOG, 'Closes', 'Launchpad-Bugs-Fixed',
+        ];
         return @field_ops;
-
     } elsif ($hook eq 'post-process-changelog-entry') {
         my $fields = shift @params;
 
@@ -91,36 +95,35 @@ sub run_hook {
         if (scalar(@$bugs)) {
             $fields->{'Launchpad-Bugs-Fixed'} = join(' ', @$bugs);
         }
-
     } elsif ($hook eq 'update-buildflags') {
 	my $flags = shift @params;
 
         # Run the Debian hook to add hardening flags
         $self->SUPER::run_hook($hook, $flags);
 
-        require Dpkg::BuildOptions;
-
-	my $build_opts = Dpkg::BuildOptions->new();
-
-	if (!$build_opts->has('noopt')) {
-            require Dpkg::Arch;
-
-            my $arch = Dpkg::Arch::get_host_arch();
-            if (Dpkg::Arch::debarch_eq($arch, 'ppc64el')) {
-		for my $flag (qw(CFLAGS CXXFLAGS OBJCFLAGS OBJCXXFLAGS GCJFLAGS
-		                 FFLAGS FCFLAGS)) {
-                    my $value = $flags->get($flag);
-                    $value =~ s/-O[0-9]/-O3/;
-                    $flags->set($flag, $value);
-		}
-	    }
-	}
 	# Per https://wiki.ubuntu.com/DistCompilerFlags
         $flags->prepend('LDFLAGS', '-Wl,-Bsymbolic-functions');
     } else {
         return $self->SUPER::run_hook($hook, @params);
     }
+}
 
+# Override Debian default features.
+sub set_build_features {
+    my ($self, $flags) = @_;
+
+    $self->SUPER::set_build_features($flags);
+
+    require Dpkg::Arch;
+    my $arch = Dpkg::Arch::get_host_arch();
+
+    if (any { $_ eq $arch } qw(amd64 arm64 ppc64el s390x)) {
+        $flags->set_feature('optimize', 'lto', 1);
+    }
+
+    if ($arch eq 'ppc64el' && $flags->get_option_value('optimize-level') != 0) {
+        $flags->set_option_value('optimize-level', 3);
+    }
 }
 
 =head1 PUBLIC FUNCTIONS

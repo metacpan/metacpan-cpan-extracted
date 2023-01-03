@@ -106,6 +106,10 @@ hook after => sub {
         );
     }
 };
+get '/session/destroy' => sub {
+    session->destroy;
+    return "OK, destroyed";
+};
 
 any['put','post'] => '/jsondata' => sub {
     request->body;
@@ -139,6 +143,9 @@ put '/setting/:setting_name/:new_value' => sub {
 };
 get '/setting/:setting_name' => sub {
     return setting( params->{setting_name} );
+};
+get '/largepage' => sub {
+    return "large page content\n" x 50;
 };
 
 true;

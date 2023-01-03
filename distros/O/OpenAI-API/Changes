@@ -1,5 +1,8 @@
 Revision history for OpenAI-API
 
+0.07    2023-01-03
+        Fix minimum perl version (thanks RAZ).
+
 0.03    2022-12-20
         Minor changes; more tests.
 

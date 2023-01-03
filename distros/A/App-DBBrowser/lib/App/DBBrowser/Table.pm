@@ -10,7 +10,7 @@ use Encode                qw( encode decode );
 use File::Spec::Functions qw( catfile );
 
 #use String::Unescape  qw( unescape );             # required
-#use Text::CSV         qw( csv );                  # required
+#use Text::CSV_XS      qw( csv );                  # required
 
 use Term::Choose         qw();
 use Term::Choose::Screen qw( hide_cursor clear_screen );
@@ -187,12 +187,16 @@ sub __on_table {
                 require String::Unescape;
                 my $options = {
                     map { $_ => String::Unescape::unescape( $sf->{o}{csv_out}{$_} ) }
-                    grep { defined $sf->{o}{csv_out}{$_} }
+                    # grep length: keep the default value if the option is set to ''
+                    grep { length $sf->{o}{csv_out}{$_} }
                     keys %{$sf->{o}{csv_out}}
                 };
-                require Text::CSV;
-                my $csv = Text::CSV->new( $options );
-                $csv->say( $fh, $_ ) for @$all_arrayref;
+                if ( ! length $options->{eol} ) {
+                    $options->{eol} = $/; # use $/ as default value for eol
+                }
+                require Text::CSV_XS;
+                my $csv = Text::CSV_XS->new( $options ) or die Text::CSV_XS->error_diag();
+                $csv->print( $fh, $_ ) for @$all_arrayref;
                 close $fh;
                 1 }
             ) {

@@ -47,11 +47,11 @@ requires:
   Alien::libuuid: '0'
 resources:
   IRC: irc://irc.perl.org/#native
-  bugtracker: https://github.com/thibaultduponchelle/Alien-Gearman/issues
+  bugtracker: https://github.com/thibaultduponchelle/CPAN-modules/issues
   homepage: https://metacpan.org/release/Alien-Gearman
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/thibaultduponchelle/Alien-Gearman.git
-version: '2.5'
+  repository: https://github.com/thibaultduponchelle/CPAN-modules.git
+version: '2.6'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.74'
   requires:

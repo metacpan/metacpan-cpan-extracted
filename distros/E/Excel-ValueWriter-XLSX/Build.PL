@@ -21,6 +21,8 @@ my $builder = Module::Build->new(
      },
     test_requires => {
       'Test::More'                => 0,
+      'LWP::UserAgent'            => 0,
+      'DBI'                       => 0,
     },
 
     add_to_cleanup      => [ 'Excel-ValueWriter-XLSX-*' ],

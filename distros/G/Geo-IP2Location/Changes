@@ -1,5 +1,11 @@
 Revision history for Perl extension Geo::IP2Location.
 
+8.70  Tue January 3 16:00:00 2023
+      Twenty-third release under the Geo::IP2Location
+      Added new function "get_district"
+      Added new function "get_asn"
+      Added new function "get_as"
+
 8.60  Tue June 21 16:00:00 2022
       Twenty-second release under the Geo::IP2Location
       Reduced file I/O to improve query performance

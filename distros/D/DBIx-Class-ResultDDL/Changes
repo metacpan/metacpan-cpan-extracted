@@ -1,3 +1,6 @@
+2.03 - 2023-01-02
+  - Fix SchemaLoaderMixin for earlier versions of perl
+
 2.02 - 2022-12-31
   - Add relationship sugar support to SchemaLoaderMixin
   - Fix some bugs in column support of SchemaLoaderMixin

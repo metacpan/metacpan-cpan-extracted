@@ -8,6 +8,13 @@ use warnings;
 use Module::Build;
 Module::Build->VERSION('0.4004');
 
+# there is also Devel::CheckOS but the use-devel-assertos script seems a
+# bit too complicated every time I look at it. so...
+if ( $^O =~ /MSWin32/ ) {
+    say "no automated install on Windows due to test failures.";
+    exit 0;
+}
+
 my $builder = Module::Build->new(
     module_name        => 'Test2::Tools::Command',
     license            => 'bsd',
@@ -18,7 +25,7 @@ my $builder = Module::Build->new(
     create_readme      => 0,
     dynamic_config     => 0,
     configure_requires => { 'Module::Build' => '0.4004', },
-    test_requires      => { 'File::Spec'    => '0', 'Test2::V0' => '0', },
+    test_requires      => { 'File::Spec'    => '0', 'Test2::V0' => '0.000060', },
     requires           => {
         'perl'        => '5.10.0',
         'File::chdir' => '0',

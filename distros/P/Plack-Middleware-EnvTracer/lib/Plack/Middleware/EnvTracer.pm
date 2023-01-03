@@ -4,7 +4,7 @@ use warnings;
 use parent 'Plack::Middleware';
 use Plack::Util::Accessor qw/methods callback/;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my $ENABLE = +{};
 
@@ -168,7 +168,7 @@ And you can set the C<callback> option.
 =head1 REPOSITORY
 
 Plack::Middleware::EnvTracer is hosted on github
-<http://github.com/bayashi/Plack-Middleware-EnvTracer>
+L<http://github.com/bayashi/Plack-Middleware-EnvTracer>
 
 Welcome your patches and issues :D
 

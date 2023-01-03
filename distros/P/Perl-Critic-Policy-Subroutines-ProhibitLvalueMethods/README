@@ -1,0 +1,32 @@
+NAME
+    Perl::Critic::Policy::Subroutines::ProhibitLvalueMethods - Prohibit
+    Methods being used as lvalues
+
+SYNOPSIS
+    In .perlcriticrc:
+
+      [Subroutines::ProhibitLvalueMethods]
+
+DESCRIPTION
+    Use of methods as lvalues is uncommon. For less experienced Perl
+    authors, or author primarily experienced in other languages, lvalue
+    methods can be confusing or can get used accidentally.
+
+    This policy blocks lvalue calls to methods. It does not block declaring
+    a method as lvalue.
+
+AUTHOR
+    haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
+
+CONTRIBUTORS
+    None so far.
+
+COPYRIGHT
+    Copyright (c) 2022 the
+    Perl::Critic::Policy::Subroutines::ProhibitLvalueMethods "AUTHOR" and
+    "CONTRIBUTORS" as listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself. See <https://dev.perl.org/licenses/>.
+

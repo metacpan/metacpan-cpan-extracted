@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Plack::Util::Accessor qw/method/;
 use parent qw/Plack::Middleware::Debug::Base/;
-our $VERSION = '0.043';
+our $VERSION = '0.044';
 
 my $ENABLE = +{};
 
@@ -154,7 +154,7 @@ see L<Plack::Middleware::Debug::Base>
 =head1 REPOSITORY
 
 Plack::Middleware::Debug::TraceENV is hosted on github
-<http://github.com/bayashi/Plack-Middleware-Debug-TraceENV>
+L<http://github.com/bayashi/Plack-Middleware-Debug-TraceENV>
 
 
 =head1 AUTHOR

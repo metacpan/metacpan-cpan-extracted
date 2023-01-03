@@ -1,7 +1,7 @@
 package Dancer::Config;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT:  how to configure Dancer to suit your needs
-$Dancer::Config::VERSION = '1.3513';
+$Dancer::Config::VERSION = '1.3520';
 use strict;
 use warnings;
 use base 'Exporter';
@@ -93,6 +93,14 @@ my $normalizers = {
         $name eq 'utf-8-strict'
           and $name = 'utf-8';
         return $name;
+    },
+    session_same_site => sub {
+        my ($setting, $same_site_setting) = @_;
+        if ($same_site_setting =~ m{^(strict|lax|none)$}i) {
+            return ucfirst lc $same_site_setting;
+        } else {
+            raise core_config => "Invalid session_same_site value $same_site_setting";
+        }
     },
 };
 
@@ -292,7 +300,7 @@ Dancer::Config - how to configure Dancer to suit your needs
 
 =head1 VERSION
 
-version 1.3513
+version 1.3520
 
 =head1 DESCRIPTION
 
@@ -667,6 +675,26 @@ Allows you to set the domain property on the cookie, which will
 override the default.  This is useful for setting the session cookie's
 domain to something like C<.domain.com> so that the same cookie will
 be applicable and usable across subdomains of a base domain.
+
+=head3 session_same_site
+
+If set, session cookies will have the SameSite attribute set to the specified
+value to control cross-site request cookie handling.  If set, the value
+must be one of the values described in RFC6265bis - 'Strict', 'Lax' or 'None'.
+
+=over
+
+=item C<Strict> - Cookies will only be sent in a first-party context and not 
+be sent along with requests initiated by third party websites.
+
+=item C<Lax> - Cookies are allowed to be sent with top-level navigations and 
+will be sent along with GET request initiated by third party website. This 
+is the default value in modern browsers.
+
+=item C<None> - Cookies will be sent in all contexts, i.e sending cross-origin
+is allowed.
+
+=back
 
 =head2 auto_page (boolean)
 

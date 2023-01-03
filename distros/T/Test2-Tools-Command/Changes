@@ -1,5 +1,10 @@
 Revision history for Test2-Tools-Command
 
+0.20    2023-01-02
+        Add is_exit() so that Test::UnixExit can be replaced by
+        this module. And, prevent installation on Windows due to
+        test failures.
+
 0.11    2023-01-01
         Make better use of Test2. Fix tests such that stdout and
         stderr tests are actually called, maybe. Remove needless

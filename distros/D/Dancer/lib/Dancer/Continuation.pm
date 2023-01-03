@@ -1,7 +1,7 @@
 package Dancer::Continuation;
 our $AUTHORITY = 'cpan:SUKRIA';
 # ABSTRACT: Continuation exception (internal exception) for Dancer
-$Dancer::Continuation::VERSION = '1.3513';
+$Dancer::Continuation::VERSION = '1.3520';
 use strict;
 use warnings;
 use Carp;
@@ -29,7 +29,7 @@ Dancer::Continuation - Continuation exception (internal exception) for Dancer
 
 =head1 VERSION
 
-version 1.3513
+version 1.3520
 
 =head1 AUTHOR
 

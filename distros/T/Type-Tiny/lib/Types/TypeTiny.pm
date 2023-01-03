@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '2.000001';
+our $VERSION   = '2.002000';
 
 $VERSION =~ tr/_//d;
 
@@ -17,7 +17,7 @@ BEGIN {
 		'Type::Tiny::XS'->VERSION( '0.022' );
 		1;
 	}
-		? sub () { !!1 }
+		? eval "sub () { '$Type::Tiny::XS::VERSION' }"
 		: sub () { !!0 };
 }
 
@@ -213,6 +213,13 @@ sub HashLike (;@) {
 		constraint_generator => sub {
 			my $param = TypeTiny()->assert_coerce( shift );
 			my $check = $param->compiled_check;
+			if ( __XS ge '0.025' ) {
+				my $paramname = Type::Tiny::XS::is_known( $check );
+				my $xsub = defined($paramname)
+					? Type::Tiny::XS::get_coderef_for( "HashLike[$paramname]" )
+					: undef;
+				return $xsub if $xsub;
+			}
 			sub {
 				my %hash = %$_;
 				for my $key ( sort keys %hash ) {
@@ -224,8 +231,17 @@ sub HashLike (;@) {
 		inline_generator => sub {
 			my $param = TypeTiny()->assert_coerce( shift );
 			return unless $param->can_be_inlined;
+			my $check = $param->compiled_check;
+			my $xsubname;
+			if ( __XS ge '0.025' ) {
+				my $paramname = Type::Tiny::XS::is_known( $check );
+				$xsubname = defined($paramname)
+					? Type::Tiny::XS::get_subname_for( "HashLike[$paramname]" )
+					: undef;
+			}
 			sub {
 				my $var  = pop;
+				return "$xsubname($var)" if $xsubname && !$Type::Tiny::AvoidCallbacks;
 				my $code = sprintf(
 					'do { my $ok=1; my %%h = %%{%s}; for my $k (sort keys %%h) { ($ok=0,next) unless (%s) }; $ok }',
 					$var,
@@ -295,6 +311,13 @@ sub ArrayLike (;@) {
 		constraint_generator => sub {
 			my $param = TypeTiny()->assert_coerce( shift );
 			my $check = $param->compiled_check;
+			if ( __XS ge '0.025' ) {
+				my $paramname = Type::Tiny::XS::is_known( $check );
+				my $xsub = defined($paramname)
+					? Type::Tiny::XS::get_coderef_for( "ArrayLike[$paramname]" )
+					: undef;
+				return $xsub if $xsub;
+			}
 			sub {
 				my @arr = @$_;
 				for my $val ( @arr ) {
@@ -306,8 +329,17 @@ sub ArrayLike (;@) {
 		inline_generator => sub {
 			my $param = TypeTiny()->assert_coerce( shift );
 			return unless $param->can_be_inlined;
+			my $check = $param->compiled_check;
+			my $xsubname;
+			if ( __XS ge '0.025' ) {
+				my $paramname = Type::Tiny::XS::is_known( $check );
+				$xsubname = defined($paramname)
+					? Type::Tiny::XS::get_subname_for( "ArrayLike[$paramname]" )
+					: undef;
+			}
 			sub {
 				my $var  = pop;
+				return "$xsubname($var)" if $xsubname && !$Type::Tiny::AvoidCallbacks;
 				my $code = sprintf(
 					'do { my $ok=1; for my $v (@{%s}) { ($ok=0,next) unless (%s) }; $ok }',
 					$var,
@@ -925,7 +957,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2022 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2023 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,6 +1,6 @@
 #MIT License
 #
-#Copyright (c) 2022 IP2Location.com
+#Copyright (c) 2023 IP2Location.com
 #
 #Permission is hereby granted, free of charge, to any person obtaining a copy
 #of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@ use vars qw(@ISA $VERSION @EXPORT);
 use Math::BigInt;
 use bigint;
 
-$VERSION = '8.60';
+$VERSION = '8.70';
 require Exporter;
 @ISA = qw(Exporter);
 
@@ -66,6 +66,7 @@ use constant IP_COUNTRY_REGION_CITY_LATITUDE_LONGITUDE_ZIPCODE_TIMEZONE_ISP_DOMA
 use constant IP_COUNTRY_REGION_CITY_LATITUDE_LONGITUDE_ISP_DOMAIN_MOBILE_USAGETYPE => 23;
 use constant IP_COUNTRY_REGION_CITY_LATITUDE_LONGITUDE_ZIPCODE_TIMEZONE_ISP_DOMAIN_NETSPEED_AREACODE_WEATHER_MOBILE_ELEVATION_USAGETYPE => 24;
 use constant IP_COUNTRY_REGION_CITY_LATITUDE_LONGITUDE_ZIPCODE_TIMEZONE_ISP_DOMAIN_NETSPEED_AREACODE_WEATHER_MOBILE_ELEVATION_USAGETYPE_ADDRESSTYPE_CATEGORY => 25;
+use constant IP_COUNTRY_REGION_CITY_LATITUDE_LONGITUDE_ZIPCODE_TIMEZONE_ISP_DOMAIN_NETSPEED_AREACODE_WEATHER_MOBILE_ELEVATION_USAGETYPE_ADDRESSTYPE_CATEGORY_DISTRICT_ASN => 26;
 
 use constant COUNTRYSHORT => 1;
 use constant COUNTRYLONG => 2;
@@ -89,55 +90,65 @@ use constant ELEVATION => 19;
 use constant USAGETYPE => 20;
 use constant ADDRESSTYPE => 21;
 use constant CATEGORY => 22;
+use constant DISTRICT => 23;
+use constant ASN => 24;
+use constant AS => 25;
 
 use constant ALL => 100;
 use constant IPV4 => 0;
 use constant IPV6 => 1;
 
-my @COUNTRY_POSITION =             (0,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2);
-my @REGION_POSITION =              (0,  0,  0,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3, 3);
-my @CITY_POSITION =                (0,  0,  0,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4, 4);
-my @LATITUDE_POSITION =            (0,  0,  0,  0,  0,  5,  5,  0,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5, 5);
-my @LONGITUDE_POSITION =           (0,  0,  0,  0,  0,  6,  6,  0,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6, 6);
-my @ZIPCODE_POSITION =             (0,  0,  0,  0,  0,  0,  0,  0,  0,  7,  7,  7,  7,  0,  7,  7,  7,  0,  7,  0,  7,  7,  7,  0,  7, 7);
-my @TIMEZONE_POSITION =            (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  8,  8,  7,  8,  8,  8,  7,  8,  0,  8,  8,  8,  0,  8, 8);
-my @ISP_POSITION =                 (0,  0,  3,  0,  5,  0,  7,  5,  7,  0,  8,  0,  9,  0,  9,  0,  9,  0,  9,  7,  9,  0,  9,  7,  9, 9);
-my @DOMAIN_POSITION =              (0,  0,  0,  0,  0,  0,  0,  6,  8,  0,  9,  0, 10,  0, 10,  0, 10,  0, 10,  8, 10,  0, 10,  8, 10, 10);
-my @NETSPEED_POSITION =            (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  8, 11,  0, 11,  8, 11,  0, 11,  0, 11,  0, 11, 11);
-my @IDDCODE_POSITION =             (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  9, 12,  0, 12,  0, 12,  9, 12,  0, 12, 12);
-my @AREACODE_POSITION =            (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 10, 13,  0, 13,  0, 13, 10, 13,  0, 13, 13);
-my @WEATHERSTATIONCODE_POSITION =  (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  9, 14,  0, 14,  0, 14,  0, 14, 14);
-my @WEATHERSTATIONNAME_POSITION =  (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 10, 15,  0, 15,  0, 15,  0, 15, 15);
-my @MCC_POSITION =                 (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  9, 16,  0, 16,  9, 16, 16);
-my @MNC_POSITION =                 (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 10, 17,  0, 17, 10, 17, 17);
-my @MOBILEBRAND_POSITION =         (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 11, 18,  0, 18, 11, 18, 18);
-my @ELEVATION_POSITION =           (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 11, 19,  0, 19, 19);
-my @USAGETYPE_POSITION =           (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 12, 20, 20);
-my @ADDRESSTYPE_POSITION =         (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 21);
-my @CATEGORY_POSITION =            (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 22);
+my @COUNTRY_POSITION =             (0,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2, 2);
+my @REGION_POSITION =              (0,  0,  0,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3, 3, 3);
+my @CITY_POSITION =                (0,  0,  0,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4, 4, 4);
+my @LATITUDE_POSITION =            (0,  0,  0,  0,  0,  5,  5,  0,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5, 5, 5);
+my @LONGITUDE_POSITION =           (0,  0,  0,  0,  0,  6,  6,  0,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6, 6, 6);
+my @ZIPCODE_POSITION =             (0,  0,  0,  0,  0,  0,  0,  0,  0,  7,  7,  7,  7,  0,  7,  7,  7,  0,  7,  0,  7,  7,  7,  0,  7, 7, 7);
+my @TIMEZONE_POSITION =            (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  8,  8,  7,  8,  8,  8,  7,  8,  0,  8,  8,  8,  0,  8, 8, 8);
+my @ISP_POSITION =                 (0,  0,  3,  0,  5,  0,  7,  5,  7,  0,  8,  0,  9,  0,  9,  0,  9,  0,  9,  7,  9,  0,  9,  7,  9, 9, 9);
+my @DOMAIN_POSITION =              (0,  0,  0,  0,  0,  0,  0,  6,  8,  0,  9,  0, 10,  0, 10,  0, 10,  0, 10,  8, 10,  0, 10,  8, 10, 10, 10);
+my @NETSPEED_POSITION =            (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  8, 11,  0, 11,  8, 11,  0, 11,  0, 11,  0, 11, 11, 11);
+my @IDDCODE_POSITION =             (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  9, 12,  0, 12,  0, 12,  9, 12,  0, 12, 12, 12);
+my @AREACODE_POSITION =            (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 10, 13,  0, 13,  0, 13, 10, 13,  0, 13, 13, 13);
+my @WEATHERSTATIONCODE_POSITION =  (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  9, 14,  0, 14,  0, 14,  0, 14, 14, 14);
+my @WEATHERSTATIONNAME_POSITION =  (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 10, 15,  0, 15,  0, 15,  0, 15, 15, 15);
+my @MCC_POSITION =                 (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  9, 16,  0, 16,  9, 16, 16, 16);
+my @MNC_POSITION =                 (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 10, 17,  0, 17, 10, 17, 17, 17);
+my @MOBILEBRAND_POSITION =         (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 11, 18,  0, 18, 11, 18, 18, 18);
+my @ELEVATION_POSITION =           (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 11, 19,  0, 19, 19, 19);
+my @USAGETYPE_POSITION =           (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 12, 20, 20, 20);
+my @ADDRESSTYPE_POSITION =         (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 21, 21);
+my @CATEGORY_POSITION =            (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 22, 22);
+my @DISTRICT_POSITION =            (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 23);
+my @ASN_POSITION =                 (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 24);
+my @AS_POSITION =                  (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 25);
+my @COLUMN_SIZE =                  (0,  2,  3,  4,  5,  6,  7,  6,  8,  7,  9,  8, 10,  8, 11, 10, 13, 10, 15, 11, 18, 11, 19, 12, 20, 22, 25);
 
-my @IPV6_COUNTRY_POSITION =             (0,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2);
-my @IPV6_REGION_POSITION =              (0,  0,  0,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3, 3);
-my @IPV6_CITY_POSITION =                (0,  0,  0,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4, 4);
-my @IPV6_LATITUDE_POSITION =            (0,  0,  0,  0,  0,  5,  5,  0,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5, 5);
-my @IPV6_LONGITUDE_POSITION =           (0,  0,  0,  0,  0,  6,  6,  0,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6, 6);
-my @IPV6_ZIPCODE_POSITION =             (0,  0,  0,  0,  0,  0,  0,  0,  0,  7,  7,  7,  7,  0,  7,  7,  7,  0,  7,  0,  7,  7,  7,  0,  7, 7);
-my @IPV6_TIMEZONE_POSITION =            (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  8,  8,  7,  8,  8,  8,  7,  8,  0,  8,  8,  8,  0,  8, 8);
-my @IPV6_ISP_POSITION =                 (0,  0,  3,  0,  5,  0,  7,  5,  7,  0,  8,  0,  9,  0,  9,  0,  9,  0,  9,  7,  9,  0,  9,  7,  9, 9);
-my @IPV6_DOMAIN_POSITION =              (0,  0,  0,  0,  0,  0,  0,  6,  8,  0,  9,  0, 10,  0, 10,  0, 10,  0, 10,  8, 10,  0, 10,  8, 10, 10);
-my @IPV6_NETSPEED_POSITION =            (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  8, 11,  0, 11,  8, 11,  0, 11,  0, 11,  0, 11, 11);
-my @IPV6_IDDCODE_POSITION =             (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  9, 12,  0, 12,  0, 12,  9, 12,  0, 12, 12);
-my @IPV6_AREACODE_POSITION =            (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 10, 13,  0, 13,  0, 13, 10, 13,  0, 13, 13);
-my @IPV6_WEATHERSTATIONCODE_POSITION =  (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  9, 14,  0, 14,  0, 14,  0, 14, 14);
-my @IPV6_WEATHERSTATIONNAME_POSITION =  (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 10, 15,  0, 15,  0, 15,  0, 15, 15);
-my @IPV6_MCC_POSITION =                 (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  9, 16,  0, 16,  9, 16, 16);
-my @IPV6_MNC_POSITION =                 (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 10, 17,  0, 17, 10, 17, 17);
-my @IPV6_MOBILEBRAND_POSITION =         (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 11, 18,  0, 18, 11, 18, 18);
-my @IPV6_ELEVATION_POSITION =           (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 11, 19,  0, 19, 19);
-my @IPV6_USAGETYPE_POSITION =           (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 12, 20, 20);
-my @IPV6_ADDRESSTYPE_POSITION =         (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 21);
-my @IPV6_CATEGORY_POSITION =            (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 22);
-
+my @IPV6_COUNTRY_POSITION =             (0,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2, 2);
+my @IPV6_REGION_POSITION =              (0,  0,  0,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3, 3, 3);
+my @IPV6_CITY_POSITION =                (0,  0,  0,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4, 4, 4);
+my @IPV6_LATITUDE_POSITION =            (0,  0,  0,  0,  0,  5,  5,  0,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5, 5, 5);
+my @IPV6_LONGITUDE_POSITION =           (0,  0,  0,  0,  0,  6,  6,  0,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6, 6, 6);
+my @IPV6_ZIPCODE_POSITION =             (0,  0,  0,  0,  0,  0,  0,  0,  0,  7,  7,  7,  7,  0,  7,  7,  7,  0,  7,  0,  7,  7,  7,  0,  7, 7, 7);
+my @IPV6_TIMEZONE_POSITION =            (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  8,  8,  7,  8,  8,  8,  7,  8,  0,  8,  8,  8,  0,  8, 8, 8);
+my @IPV6_ISP_POSITION =                 (0,  0,  3,  0,  5,  0,  7,  5,  7,  0,  8,  0,  9,  0,  9,  0,  9,  0,  9,  7,  9,  0,  9,  7,  9, 9, 9);
+my @IPV6_DOMAIN_POSITION =              (0,  0,  0,  0,  0,  0,  0,  6,  8,  0,  9,  0, 10,  0, 10,  0, 10,  0, 10,  8, 10,  0, 10,  8, 10, 10, 10);
+my @IPV6_NETSPEED_POSITION =            (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  8, 11,  0, 11,  8, 11,  0, 11,  0, 11,  0, 11, 11, 11);
+my @IPV6_IDDCODE_POSITION =             (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  9, 12,  0, 12,  0, 12,  9, 12,  0, 12, 12, 12);
+my @IPV6_AREACODE_POSITION =            (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 10, 13,  0, 13,  0, 13, 10, 13,  0, 13, 13, 13);
+my @IPV6_WEATHERSTATIONCODE_POSITION =  (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  9, 14,  0, 14,  0, 14,  0, 14, 14, 14);
+my @IPV6_WEATHERSTATIONNAME_POSITION =  (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 10, 15,  0, 15,  0, 15,  0, 15, 15, 15);
+my @IPV6_MCC_POSITION =                 (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  9, 16,  0, 16,  9, 16, 16, 16);
+my @IPV6_MNC_POSITION =                 (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 10, 17,  0, 17, 10, 17, 17, 17);
+my @IPV6_MOBILEBRAND_POSITION =         (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 11, 18,  0, 18, 11, 18, 18, 18);
+my @IPV6_ELEVATION_POSITION =           (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 11, 19,  0, 19, 19, 19);
+my @IPV6_USAGETYPE_POSITION =           (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 12, 20, 20, 20);
+my @IPV6_ADDRESSTYPE_POSITION =         (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 21, 21);
+my @IPV6_CATEGORY_POSITION =            (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 22, 22);
+my @IPV6_DISTRICT_POSITION =            (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 23);
+my @IPV6_ASN_POSITION =                 (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 24);
+my @IPV6_AS_POSITION =                  (0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 25);
+my @IPV6_COLUMN_SIZE =                  (0,  2,  3,  4,  5,  6,  7,  6,  8,  7,  9,  8, 10,  8, 11, 10, 13, 10, 15, 11, 18, 11, 19, 12, 20, 22, 25);
 
 my $IPv6_re = qr/:(?::[0-9a-fA-F]{1,4}){0,5}(?:(?::[0-9a-fA-F]{1,4}){1,2}|:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})))|[0-9a-fA-F]{1,4}:(?:[0-9a-fA-F]{1,4}:(?:[0-9a-fA-F]{1,4}:(?:[0-9a-fA-F]{1,4}:(?:[0-9a-fA-F]{1,4}:(?:[0-9a-fA-F]{1,4}:(?:[0-9a-fA-F]{1,4}:(?:[0-9a-fA-F]{1,4}|:)|(?::(?:[0-9a-fA-F]{1,4})?|(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))))|:(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|[0-9a-fA-F]{1,4}(?::[0-9a-fA-F]{1,4})?|))|(?::(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|:[0-9a-fA-F]{1,4}(?::(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|(?::[0-9a-fA-F]{1,4}){0,2})|:))|(?:(?::[0-9a-fA-F]{1,4}){0,2}(?::(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|(?::[0-9a-fA-F]{1,4}){1,2})|:))|(?:(?::[0-9a-fA-F]{1,4}){0,3}(?::(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|(?::[0-9a-fA-F]{1,4}){1,2})|:))|(?:(?::[0-9a-fA-F]{1,4}){0,4}(?::(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|(?::[0-9a-fA-F]{1,4}){1,2})|:))/;
 my $IPv4_re = qr/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/;
@@ -546,6 +557,51 @@ sub get_category {
 	}
 }
 
+sub get_district {
+	my $obj = shift(@_);
+	my $ipaddr = shift(@_);
+	my ($ipv, $ipnum) = $obj->validate_ip($ipaddr);
+	if ($ipv == 4) {
+		return $obj->get_ipv4_record($ipnum, DISTRICT);
+	} else {
+		if ($ipv == 6) {
+			return $obj->get_ipv6_record($ipnum, DISTRICT);	
+		} else {
+			return INVALID_IP_ADDRESS;
+		}
+	}
+}
+
+sub get_asn {
+	my $obj = shift(@_);
+	my $ipaddr = shift(@_);
+	my ($ipv, $ipnum) = $obj->validate_ip($ipaddr);
+	if ($ipv == 4) {
+		return $obj->get_ipv4_record($ipnum, ASN);
+	} else {
+		if ($ipv == 6) {
+			return $obj->get_ipv6_record($ipnum, ASN);	
+		} else {
+			return INVALID_IP_ADDRESS;
+		}
+	}
+}
+
+sub get_as {
+	my $obj = shift(@_);
+	my $ipaddr = shift(@_);
+	my ($ipv, $ipnum) = $obj->validate_ip($ipaddr);
+	if ($ipv == 4) {
+		return $obj->get_ipv4_record($ipnum, AS);
+	} else {
+		if ($ipv == 6) {
+			return $obj->get_ipv6_record($ipnum, AS);
+		} else {
+			return INVALID_IP_ADDRESS;
+		}
+	}
+}
+
 sub get_all {
 	my $obj = shift(@_);
 	my $ipaddr = shift(@_);
@@ -556,7 +612,7 @@ sub get_all {
 		if ($ipv == 6) {
 			return $obj->get_ipv6_record($ipnum, ALL);	
 		} else {
-			return (INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS);
+			return (INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS);
 		}
 	}
 }
@@ -569,7 +625,7 @@ sub get_ipv6_record {
 
 	if ($ipnum eq "") {
 		if ($mode == ALL) {
-			return (NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP);
+			return (NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP);
 		} else {
 			return NO_IP;
 		}
@@ -641,6 +697,15 @@ sub get_ipv6_record {
 	if (($mode == CATEGORY) && ($IPV6_CATEGORY_POSITION[$dbtype] == 0)) {
 		return NOT_SUPPORTED;
 	}
+	if (($mode == DISTRICT) && ($IPV6_DISTRICT_POSITION[$dbtype] == 0)) {
+		return NOT_SUPPORTED;
+	}
+	if (($mode == ASN) && ($IPV6_ASN_POSITION[$dbtype] == 0)) {
+		return NOT_SUPPORTED;
+	}
+	if (($mode == AS) && ($IPV6_AS_POSITION[$dbtype] == 0)) {
+		return NOT_SUPPORTED;
+	}
 
 	my $realipno = $ipnum;
 	my $handle = $obj->{"filehandle"};
@@ -651,7 +716,7 @@ sub get_ipv6_record {
 
 	if ($dbcount == 0) {
 		if ($mode == ALL) {
-			return (IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN);
+			return (IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN);
 		} else {
 			return IPV6_ADDRESS_IN_IPV4_BIN;
 		}
@@ -710,6 +775,9 @@ sub get_ipv6_record {
 				my $usagetype = NOT_SUPPORTED;
 				my $addresstype = NOT_SUPPORTED;
 				my $category = NOT_SUPPORTED;
+				my $district = NOT_SUPPORTED;
+				my $asn = NOT_SUPPORTED;
+				my $as = NOT_SUPPORTED;
 				
 				if ($IPV6_COUNTRY_POSITION[$dbtype] != 0) {
 					$country_short = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV6_COUNTRY_POSITION[$dbtype]+2), 4)));
@@ -777,7 +845,17 @@ sub get_ipv6_record {
 				if ($IPV6_CATEGORY_POSITION[$dbtype] != 0) {
 					$category = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV6_CATEGORY_POSITION[$dbtype]+2), 4)));
 				}
-				return ($country_short, $country_long, $region, $city, $latitude, $longitude, $zipcode, $timezone, $isp, $domain, $netspeed, $iddcode, $areacode, $weatherstationcode, $weatherstationname, $mcc, $mnc, $mobilebrand, $elevation, $usagetype, $addresstype, $category);
+				if ($IPV6_DISTRICT_POSITION[$dbtype] != 0) {
+					$district = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV6_DISTRICT_POSITION[$dbtype]+2), 4)));
+				}
+				if ($IPV6_ASN_POSITION[$dbtype] != 0) {
+					$asn = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV6_ASN_POSITION[$dbtype]+2), 4)));
+				}
+				if ($IPV6_AS_POSITION[$dbtype] != 0) {
+					$as = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV6_AS_POSITION[$dbtype]+2), 4)));
+				}
+
+				return ($country_short, $country_long, $region, $city, $latitude, $longitude, $zipcode, $timezone, $isp, $domain, $netspeed, $iddcode, $areacode, $weatherstationcode, $weatherstationname, $mcc, $mnc, $mobilebrand, $elevation, $usagetype, $addresstype, $category, $district, $asn, $as);
 			}
 			if ($mode == COUNTRYSHORT) {
 				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV6_COUNTRY_POSITION[$dbtype]+2), 4)));
@@ -849,6 +927,15 @@ sub get_ipv6_record {
 			if ($mode == CATEGORY) {
 				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV6_CATEGORY_POSITION[$dbtype]+2), 4)));
 			}
+			if ($mode == DISTRICT) {
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV6_DISTRICT_POSITION[$dbtype]+2), 4)));
+			}
+			if ($mode == ASN) {
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV6_ASN_POSITION[$dbtype]+2), 4)));
+			}
+			if ($mode == AS) {
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV6_AS_POSITION[$dbtype]+2), 4)));
+			}
 		} else {
 			if ($ipno < $ipfrom) {
 				$high = $mid - 1;
@@ -858,7 +945,7 @@ sub get_ipv6_record {
 		}
 	}
 	if ($mode == ALL) {
-		return (UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN);
+		return (UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN);
 	} else {
 		return UNKNOWN;
 	}
@@ -872,7 +959,7 @@ sub get_ipv4_record {
 	
 	if ($ipnum eq "") {
 		if ($mode == ALL) {
-			return (NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP);
+			return (NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP);
 		} else {
 			return NO_IP;
 		}
@@ -944,6 +1031,15 @@ sub get_ipv4_record {
 	if (($mode == CATEGORY) && ($CATEGORY_POSITION[$dbtype] == 0)) {
 		return NOT_SUPPORTED;
 	}
+	if (($mode == DISTRICT) && ($DISTRICT_POSITION[$dbtype] == 0)) {
+		return NOT_SUPPORTED;
+	}
+	if (($mode == ASN) && ($ASN_POSITION[$dbtype] == 0)) {
+		return NOT_SUPPORTED;
+	}
+	if (($mode == AS) && ($AS_POSITION[$dbtype] == 0)) {
+		return NOT_SUPPORTED;
+	}
 	
 	my $realipno = $ipnum;
 	my $handle = $obj->{"filehandle"};
@@ -1002,6 +1098,9 @@ sub get_ipv4_record {
 				my $usagetype = NOT_SUPPORTED;
 				my $addresstype = NOT_SUPPORTED;
 				my $category = NOT_SUPPORTED;
+				my $district = NOT_SUPPORTED;
+				my $asn = NOT_SUPPORTED;
+				my $as = NOT_SUPPORTED;
 				
 				if ($COUNTRY_POSITION[$dbtype] != 0) {
 					$country_short = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($COUNTRY_POSITION[$dbtype]-1), 4)));
@@ -1070,7 +1169,17 @@ sub get_ipv4_record {
 				if ($CATEGORY_POSITION[$dbtype] != 0) {
 					$category = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($CATEGORY_POSITION[$dbtype]-1), 4)));
 				}
-				return ($country_short, $country_long, $region, $city, $latitude, $longitude, $zipcode, $timezone, $isp, $domain, $netspeed, $iddcode, $areacode, $weatherstationcode, $weatherstationname, $mcc, $mnc, $mobilebrand, $elevation, $usagetype, $addresstype, $category);
+				if ($DISTRICT_POSITION[$dbtype] != 0) {
+					$district = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($DISTRICT_POSITION[$dbtype]-1), 4)));
+				}
+				if ($ASN_POSITION[$dbtype] != 0) {
+					$asn = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($ASN_POSITION[$dbtype]-1), 4)));
+				}
+				if ($AS_POSITION[$dbtype] != 0) {
+					$as = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($AS_POSITION[$dbtype]-1), 4)));
+				}
+
+				return ($country_short, $country_long, $region, $city, $latitude, $longitude, $zipcode, $timezone, $isp, $domain, $netspeed, $iddcode, $areacode, $weatherstationcode, $weatherstationname, $mcc, $mnc, $mobilebrand, $elevation, $usagetype, $addresstype, $category, $district, $asn, $as);
 			}
 			if ($mode == COUNTRYSHORT) {
 				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($COUNTRY_POSITION[$dbtype]-1), 4)));
@@ -1141,7 +1250,16 @@ sub get_ipv4_record {
 			}
 			if ($mode == CATEGORY) {
 				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($CATEGORY_POSITION[$dbtype]-1), 4)));
-			}			
+			}
+			if ($mode == DISTRICT) {
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($DISTRICT_POSITION[$dbtype]-1), 4)));
+			}
+			if ($mode == ASN) {
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($ASN_POSITION[$dbtype]-1), 4)));
+			}
+			if ($mode == AS) {
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($AS_POSITION[$dbtype]-1), 4)));
+			}
 		} else {
 			if ($ipno < $ipfrom) {
 				$high = $mid - 1;
@@ -1151,7 +1269,7 @@ sub get_ipv4_record {
 		}
 	}
 	if ($mode == ALL) {
-		return (UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN);
+		return (UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN);
 	} else {
 		return UNKNOWN;
 	}
@@ -1436,7 +1554,7 @@ __END__
 
 =head1 NAME
 
-Geo::IP2Location - Lookup of country, region, city, latitude, longitude, ZIP code, time zone, ISP, domain name, connection type, IDD code, area code, weather station code and station, MCC, MNC, mobile carrier brand name, elevation, usage type, IP address type and advertising category by using IP address. It supports both IPv4 and IPv6 addressing. Please visit L<IP2Location Database|https://www.ip2location.com> for more information.
+Geo::IP2Location - Lookup of country, region, city, latitude, longitude, ZIP code, time zone, ISP, domain name, connection type, IDD code, area code, weather station code and station, MCC, MNC, mobile carrier brand name, elevation, usage type, IP address type, advertising category, district, AS number and AS name by using IP address. It supports both IPv4 and IPv6 addressing. Please visit L<IP2Location Database|https://www.ip2location.com> for more information.
 
 =head1 SYNOPSIS
 
@@ -1444,7 +1562,7 @@ Geo::IP2Location - Lookup of country, region, city, latitude, longitude, ZIP cod
 
 	eval {
 
-		my $obj = Geo::IP2Location->open("IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE-ZIPCODE-TIMEZONE-ISP-DOMAIN-NETSPEED-AREACODE-WEATHER-MOBILE-ELEVATION-USAGETYPE-ADDRESSTYPE-CATEGORY.BIN");
+		my $obj = Geo::IP2Location->open("IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE-ZIPCODE-TIMEZONE-ISP-DOMAIN-NETSPEED-AREACODE-WEATHER-MOBILE-ELEVATION-USAGETYPE-ADDRESSTYPE-CATEGORY-DISTRICT-ASN.BIN");
 
 		if (!defined($obj)) {
 			print STDERR Geo::IP2Location::get_last_error_message();
@@ -1474,9 +1592,12 @@ Geo::IP2Location - Lookup of country, region, city, latitude, longitude, ZIP cod
 		my $usagetype = $obj->get_usagetype("20.11.187.239");
 		my $addresstype = $obj->get_addresstype("20.11.187.239");
 		my $category = $obj->get_category("20.11.187.239");
+		my $district = $obj->get_district("20.11.187.239");
+		my $asn = $obj->get_asn("20.11.187.239");
+		my $as = $obj->get_as("20.11.187.239");
 
-		($cos, $col, $reg, $cit, $lat, $lon, $zip, $tmz, $isp, $dom, $ns, $idd, $area, $wcode, $wname, $mcc, $mnc, $brand, $elevation, $usagetype, $addresstype, $category) = $obj->get_all("20.11.187.239");
-		($cos, $col, $reg, $cit, $lat, $lon, $zip, $tmz, $isp, $dom, $ns, $idd, $area, $wcode, $wname, $mcc, $mnc, $brand, $elevation, $usagetype, $addresstype, $category) = $obj->get_all("2001:1000:0000:0000:0000:0000:0000:0000");
+		($cos, $col, $reg, $cit, $lat, $lon, $zip, $tmz, $isp, $dom, $ns, $idd, $area, $wcode, $wname, $mcc, $mnc, $brand, $elevation, $usagetype, $addresstype, $category, $district, $asn, $as) = $obj->get_all("20.11.187.239");
+		($cos, $col, $reg, $cit, $lat, $lon, $zip, $tmz, $isp, $dom, $ns, $idd, $area, $wcode, $wname, $mcc, $mnc, $brand, $elevation, $usagetype, $addresstype, $category, $district, $asn, $as) = $obj->get_all("2001:1000:0000:0000:0000:0000:0000:0000");
 
 		$obj->close();
 
@@ -1488,7 +1609,7 @@ Geo::IP2Location - Lookup of country, region, city, latitude, longitude, ZIP cod
 
 =head1 DESCRIPTION
 
-This Perl module provides fast lookup of country, region, city, latitude, longitude, ZIP code, time zone, ISP, domain name, connection type, IDD code, area code, weather station code and station, MCC, MNC, mobile carrier brand, elevation, usage type, IP address type and IAB advertising category from IP address using IP2Location database. This module uses a file based BIN database available at L<IP2Location Product Page|https://www.ip2location.com/database/ip2location> upon subscription. You can visit L<Libraries|https://www.ip2location.com/development-libraries> to download BIN sample files. This database consists of IP address as keys and other information as values. It supports all IP addresses in IPv4 and IPv6.
+This Perl module provides fast lookup of country, region, city, latitude, longitude, ZIP code, time zone, ISP, domain name, connection type, IDD code, area code, weather station code and station, MCC, MNC, mobile carrier brand, elevation, usage type, IP address type, IAB advertising category, district, AS number and AS name from IP address using IP2Location database. This module uses a file based BIN database available at L<IP2Location Product Page|https://www.ip2location.com/database/ip2location> upon subscription. You can visit L<Libraries|https://www.ip2location.com/development-libraries> to download BIN sample files. This database consists of IP address as keys and other information as values. It supports all IP addresses in IPv4 and IPv6.
 
 This module can be used in many types of project such as:
 
@@ -1614,9 +1735,21 @@ Returns the IP address type (A-Anycast, B-Broadcast, M-Multicast & U-Unicast) of
 
 Returns the IAB content taxonomy category of IP address or domain name.
 
-=item ($cos, $col, $reg, $cit, $lat, $lon, $zip, $tmz, $isp, $dom, $ns, $idd, $area, $wcode, $wname, $mcc, $mnc, $brand, $elevation, $usagetype, $addresstype, $category) = $obj->get_all( $ip );
+=item $district = $obj->get_district( $ip );
 
-Returns an array of country, region, city, latitude, longitude, ZIP code, time zone, ISP, domain name, connection type, IDD code, area code, weather station code and station, MCC, MNC, mobile carrier brand, elevation, usage type, address type and IAB advertising category of IP address.
+Returns the district of IP address or domain name.
+
+=item $asn = $obj->get_asn( $ip );
+
+Returns the AS number of IP address or domain name.
+
+=item $as = $obj->get_as( $ip );
+
+Returns the AS name of IP address or domain name.
+
+=item ($cos, $col, $reg, $cit, $lat, $lon, $zip, $tmz, $isp, $dom, $ns, $idd, $area, $wcode, $wname, $mcc, $mnc, $brand, $elevation, $usagetype, $addresstype, $category, $district, $asn, $as) = $obj->get_all( $ip );
+
+Returns an array of country, region, city, latitude, longitude, ZIP code, time zone, ISP, domain name, connection type, IDD code, area code, weather station code and station, MCC, MNC, mobile carrier brand, elevation, usage type, address type, IAB advertising category, district, AS number and AS name of IP address.
 
 =item $dbversion = $obj->get_database_version();
 
@@ -1638,11 +1771,11 @@ L<IP2Location Product Page|https://www.ip2location.com>
 
 =head1 VERSION
 
-8.60
+8.70
 
 =head1 AUTHOR
 
-Copyright (c) 2022 IP2Location.com
+Copyright (c) 2023 IP2Location.com
 
 All rights reserved. This package is free software. It is licensed under the MIT. See the LICENSE file for full license information.
 

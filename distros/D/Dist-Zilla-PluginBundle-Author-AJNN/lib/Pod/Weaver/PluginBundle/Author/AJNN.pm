@@ -3,7 +3,7 @@ use warnings;
 
 package Pod::Weaver::PluginBundle::Author::AJNN;
 # ABSTRACT: AJNN Pod::Weaver configuration
-$Pod::Weaver::PluginBundle::Author::AJNN::VERSION = '0.03';
+$Pod::Weaver::PluginBundle::Author::AJNN::VERSION = '0.04';
 
 use Pod::Weaver 4.009;
 use Pod::Weaver::Config::Assembler;
@@ -51,7 +51,7 @@ Pod::Weaver::PluginBundle::Author::AJNN - AJNN Pod::Weaver configuration
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

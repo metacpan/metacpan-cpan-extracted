@@ -8,6 +8,7 @@ README
 lib/Test2/Tools/Command.pm
 t/00-load.t
 t/10-command.t
+t/20-isexit.t
 t/pod-coverage.t
 t/pod.t
 t/unsupercilious/README

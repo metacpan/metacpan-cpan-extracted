@@ -1,5 +1,5 @@
 package Selenium::Remote::Driver;
-$Selenium::Remote::Driver::VERSION = '1.47';
+$Selenium::Remote::Driver::VERSION = '1.48';
 use strict;
 use warnings;
 
@@ -498,18 +498,13 @@ sub _request_new_session {
                 ref $args->{capabilities}->{alwaysMatch}->{$cap} eq
                 'Selenium::Firefox::Profile' )
             {
-#XXX not sure if I need to keep a ref to the File::Temp::Tempdir object to prevent reaping
+                #XXX not sure if I need to keep a ref to the File::Temp::Tempdir object to prevent reaping
                 $args->{capabilities}->{alwaysMatch}->{'moz:firefoxOptions'}
                   ->{args} = [
                     '-profile',
                     $args->{capabilities}->{alwaysMatch}->{$cap}->{profile_dir}
                       ->dirname()
                   ];
-            }
-            else {
-           #previously undocumented feature that we can pass the encoded profile
-                $args->{capabilities}->{alwaysMatch}->{'moz:firefoxOptions'}
-                  ->{profile} = $args->{capabilities}->{alwaysMatch}->{$cap};
             }
         }
         foreach my $newkey ( keys(%$cmap) ) {
@@ -1890,7 +1885,7 @@ Selenium::Remote::Driver - Perl Client for Selenium Remote Driver
 
 =head1 VERSION
 
-version 1.47
+version 1.48
 
 =head1 SYNOPSIS
 
@@ -3520,7 +3515,7 @@ See L</find_element>.
 =head2 click
 
  Description:
-    Click any mouse button (at the coordinates set by the last moveto command).
+    Click any mouse button (at the coordinates set by the last move_to command).
 
  Input:
     button - any one of 'LEFT'/0 'MIDDLE'/1 'RIGHT'/2
@@ -3536,7 +3531,7 @@ See L</find_element>.
 =head2 double_click
 
  Description:
-    Double-clicks at the current mouse coordinates (set by moveto).
+    Double-clicks at the current mouse coordinates (set by move_to).
 
  Compatibility:
     On webdriver3 enabled servers, you can double click arbitrary mouse buttons.
@@ -3548,7 +3543,7 @@ See L</find_element>.
 
  Description:
     Click and hold the left mouse button (at the coordinates set by the
-    last moveto command). Note that the next mouse-related command that
+    last move_to command). Note that the next mouse-related command that
     should follow is buttonup . Any other mouse command (such as click
     or another call to buttondown) will yield undefined behaviour.
 

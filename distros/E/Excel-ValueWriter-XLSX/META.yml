@@ -3,6 +3,8 @@ abstract: 'generating data-only Excel workbooks in XLSX format, fast'
 author:
   - 'Laurent Dami <dami@cpan.org>'
 build_requires:
+  DBI: '0'
+  LWP::UserAgent: '0'
   Test::More: '0'
 configure_requires:
   Module::Build: '0.42'
@@ -16,7 +18,7 @@ name: Excel-ValueWriter-XLSX
 provides:
   Excel::ValueWriter::XLSX:
     file: lib/Excel/ValueWriter/XLSX.pm
-    version: '0.7'
+    version: '0.9'
 requires:
   Archive::Zip: '0'
   Carp: '0'
@@ -30,5 +32,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/Excel-ValueWriter-XLSX
-version: '0.7'
+version: '0.9'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

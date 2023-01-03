@@ -1,13 +1,14 @@
 package Dancer::Test;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: Test helpers to test a Dancer application
-$Dancer::Test::VERSION = '1.3513';
+$Dancer::Test::VERSION = '1.3520';
 # test helpers for Dancer apps
 
 use strict;
 use warnings;
 use Test::Builder;
 use Test::More import => [ '!pass' ];
+use Test::LongString;
 
 use Carp;
 use HTTP::Headers;
@@ -190,8 +191,7 @@ sub response_content_like {
     $test_name ||= "response content looks good for " . _req_label($req);
 
     my $response = _req_to_response($req);
-    my $tb = Test::Builder->new;
-    return $tb->like( $response->{content}, $matcher, $test_name );
+    return like_string( $response->{content}, $matcher, $test_name );   # better output for long content than Test::Builder
 }
 
 sub response_content_unlike {
@@ -199,8 +199,7 @@ sub response_content_unlike {
     $test_name ||= "response content looks good for " , _req_label($req);
 
     my $response = _req_to_response($req);
-    my $tb = Test::Builder->new;
-    return $tb->unlike( $response->{content}, $matcher, $test_name );
+    return unlike_string( $response->{content}, $matcher, $test_name ); # better for long content than Test::Builder
 }
 
 sub response_content_is_deeply {
@@ -351,7 +350,8 @@ sub dancer_response {
                 if ( $file->{data} ) {
                     $content .= $file->{data};
                 } else {
-                    open my $fh, '<', $file->{filename};
+                    open my $fh, '<', $file->{filename}
+                        or die "Failed to open $file->{filename} - $!";
                     if ( -B $file->{filename} ) {
                         binmode $fh;
                     }
@@ -468,7 +468,7 @@ Dancer::Test - Test helpers to test a Dancer application
 
 =head1 VERSION
 
-version 1.3513
+version 1.3520
 
 =head1 SYNOPSIS
 

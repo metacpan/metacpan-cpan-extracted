@@ -1,7 +1,7 @@
 requires   "Data::Dumper";
 requires   "XSLoader";
 
-recommends "Data::Dumper"             => "2.183";
+recommends "Data::Dumper"             => "2.184";
 recommends "Perl::Tidy";
 
 on "configure" => sub {
@@ -12,5 +12,5 @@ on "test" => sub {
     requires   "Test::More"               => "0.90";
     requires   "Test::Warnings";
 
-    recommends "Test::More"               => "1.302188";
+    recommends "Test::More"               => "1.302191";
     };

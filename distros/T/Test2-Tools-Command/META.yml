@@ -4,7 +4,7 @@ author:
   - 'Jeremy Mates <jeremy.mates@gmail.com>'
 build_requires:
   File::Spec: '0'
-  Test2::V0: '0'
+  Test2::V0: '0.000060'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 0
@@ -17,7 +17,7 @@ name: Test2-Tools-Command
 provides:
   Test2::Tools::Command:
     file: lib/Test2/Tools/Command.pm
-    version: '0.11'
+    version: '0.20'
 requires:
   File::chdir: '0'
   IPC::Open3: '0'
@@ -27,5 +27,5 @@ requires:
 resources:
   license: http://opensource.org/licenses/BSD-3-Clause
   repository: https://thrig.me/src/Test2-Tools-Command.git
-version: '0.11'
+version: '0.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

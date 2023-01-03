@@ -15,7 +15,7 @@ use Test::Differences qw(eq_or_diff);
 use Test::More;
 use Test::UnixExit qw(exit_is exit_is_nonzero);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 has cmd => (
     is      => 'rwp',
@@ -147,6 +147,8 @@ In C<./t/echo.t> and assuming that an C<./echo> exists...
 
 =head1 DESCRIPTION
 
+NOTE L<Test2::Tools::Command> should be used instead of this module.
+
 C<Test::UnixCmdWrap> wraps L<Test::Cmd> and provides automatic filename
 detection of the program being tested, and tests the exit status word,
 stdout, and stderr of each program run. Various other parameters can be
@@ -264,6 +266,8 @@ checks somehow.
 =back
 
 =head1 SEE ALSO
+
+L<Test2::Tools::Command> should be used instead of this module.
 
 L<Test::Cmd>, L<Test::Differences>, L<Test::More>, L<Test::UnixExit>
 

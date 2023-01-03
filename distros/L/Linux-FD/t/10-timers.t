@@ -45,6 +45,5 @@ my %clocks = map { $_ => 1 } Linux::FD::Timer->clocks;
 
 ok $clocks{monotonic}, 'Has monotonic clock';
 ok $clocks{realtime}, 'Has realtime clock';
-ok $clocks{boottime}, 'Has boottime clock';
 
 done_testing;

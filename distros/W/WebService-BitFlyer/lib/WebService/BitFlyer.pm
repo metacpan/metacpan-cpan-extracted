@@ -23,7 +23,7 @@ use Class::Accessor::Lite (
 
 use WebService::BitFlyer::API;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub new {
     my $class = shift;
@@ -129,7 +129,7 @@ __END__
 
 =head1 NAME
 
-WebService::BitFlyer - one line description
+WebService::BitFlyer - Perl libraries for bitFlyer API.
 
 
 =head1 SYNOPSIS
@@ -176,12 +176,6 @@ calling API
 
 
 =head1 REPOSITORY
-
-=begin html
-
-<a href="http://travis-ci.org/bayashi/WebService-BitFlyer"><img src="https://secure.travis-ci.org/bayashi/WebService-BitFlyer.png"/></a>
-
-=end html
 
 WebService::BitFlyer is hosted on github: L<http://github.com/bayashi/WebService-BitFlyer>
 

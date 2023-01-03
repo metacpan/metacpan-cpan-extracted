@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Duck::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Duck::VERSION   = '2.000001';
+	$Type::Tiny::Duck::VERSION   = '2.002000';
 }
 
 $Type::Tiny::Duck::VERSION =~ tr/_//d;
@@ -14,7 +14,6 @@ $Type::Tiny::Duck::VERSION =~ tr/_//d;
 use Scalar::Util qw< blessed >;
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
-
 
 use Exporter::Tiny 1.004001 ();
 use Type::Tiny::ConstrainedObject ();
@@ -57,6 +56,11 @@ sub new {
 	
 	return $proto->SUPER::new( %opts );
 } #/ sub new
+
+sub _lockdown {
+	my ( $self, $callback ) = @_;
+	$callback->( $self->{methods} );
+}
 
 sub methods { $_[0]{methods} }
 sub inlined { $_[0]{inlined} ||= $_[0]->_build_inlined }
@@ -278,7 +282,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2022 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2023 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

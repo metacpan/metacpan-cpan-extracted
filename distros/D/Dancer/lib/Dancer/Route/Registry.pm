@@ -1,7 +1,7 @@
 package Dancer::Route::Registry;
 our $AUTHORITY = 'cpan:SUKRIA';
 # ABSTRACT: Route registry for Dancer
-$Dancer::Route::Registry::VERSION = '1.3513';
+$Dancer::Route::Registry::VERSION = '1.3520';
 use strict;
 use warnings;
 use Carp;
@@ -20,7 +20,17 @@ sub init {
     unless (defined $self->{id}) {
         $self->id($id++);
     }
+
+    # Routes are stored here.  Keys are route methods, and values are
+    # arrays of routes.  Routes with options are stored in the
+    # beginning of the array while routes without options are stored
+    # at the end.
     $self->{routes} = {};
+
+    # Keep track of the border between routes with and without
+    # options, so that routes with options can be easily inserted into
+    # its routes array.
+    $self->{routes_border} = {};
 
     return $self;
 }
@@ -54,16 +64,28 @@ sub add_route {
     my $last       = $registered[-1];
     $route->set_previous($last) if defined $last;
 
-    # if the route have options, we store the route at the beginning
-    # of the routes. This way, we can have the following routes:
-    # get '/' => sub {} and ajax '/' => sub {}
-    # and the user won't have to declare the ajax route before the get
+    # Routes are stored in the order they are declared. However,
+    # routes with options (such as ajax routes) are stored before
+    # routes without options. This way, we can have the following
+    # routes:
+    #
+    #   get  '/'    => sub {};
+    #   get  qr{.*} => sub {};
+    #   ajax '/'    => sub {};
+    #   ajax qr{.*} => sub {};
+    #
+    # And the user won't have to declare the ajax routes before the
+    # get routes.
     if (keys %{$route->{options}}) {
-        unshift @{$self->routes($route->method)}, $route;
+        splice @{$self->routes($route->method)},
+               $self->{routes_border}{$route->method}++,
+               0,
+               $route;
     }
     else {
         push @{$self->routes($route->method)}, $route;
     }
+
     return $route;
 }
 
@@ -159,7 +181,7 @@ Dancer::Route::Registry - Route registry for Dancer
 
 =head1 VERSION
 
-version 1.3513
+version 1.3520
 
 =head1 AUTHOR
 

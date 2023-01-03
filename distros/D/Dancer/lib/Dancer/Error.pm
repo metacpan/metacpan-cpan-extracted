@@ -1,7 +1,7 @@
 package Dancer::Error;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: class for representing fatal errors
-$Dancer::Error::VERSION = '1.3513';
+$Dancer::Error::VERSION = '1.3520';
 use strict;
 use warnings;
 use Carp;
@@ -192,10 +192,15 @@ sub render {
     my $self = shift;
 
     my $serializer = setting('serializer');
-    Dancer::Factory::Hook->instance->execute_hooks('before_error_render', $self);
+    my $ops = { title => $self->title,
+		message => $self->message,
+		code => $self->code,
+		defined $self->exception ? ( exception => $self->exception ) : (),
+	      };
+    Dancer::Factory::Hook->instance->execute_hooks('before_error_render', $self, $ops);
     my $response;
     try {
-        $response = $serializer ? $self->_render_serialized() : $self->_render_html();
+        $response = $serializer ? $self->_render_serialized($ops) : $self->_render_html($ops);
     } continuation {
         my ($continuation) = @_;
         # If we have a Route continuation, run the after hook, then
@@ -243,17 +248,12 @@ sub _render_serialized {
 
 sub _render_html {
     my $self = shift;
-
+    my $ops = shift;
+    
     # I think it is irrelevant to look into show_errors. In the
     # template the user can hide them if she desires so.
     if (setting("error_template")) {
         my $template_name = setting("error_template");
-        my $ops = {
-                   title => $self->title,
-                   message => $self->message,
-                   code => $self->code,
-                   defined $self->exception ? ( exception => $self->exception ) : (),
-                  };
         my $content = Dancer::Engine->engine("template")->apply_renderer($template_name, $ops);
         return Dancer::Response->new(
             status => $self->code,
@@ -327,7 +327,7 @@ Dancer::Error - class for representing fatal errors
 
 =head1 VERSION
 
-version 1.3513
+version 1.3520
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,11 @@
 Revision history for Perl module Time::HiRes::Sleep::Until
 
+0.09 2023-01-02
+  - Updated LICENSE to MIT from GPL v2
+  - Added GitHub repository
+  - Removed nhimult import
+  - Dropped Todo file
+
 0.08 2020-04-30
   - Updated lib/Time/HiRes/Sleep/Until.pm
     - Added time and sleep wrappers

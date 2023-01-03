@@ -1,6 +1,6 @@
 package Text::CSV_XS;
 
-# Copyright (c) 2007-2021 H.Merijn Brand.  All rights reserved.
+# Copyright (c) 2007-2023 H.Merijn Brand.  All rights reserved.
 # Copyright (c) 1998-2001 Jochen Wiedmann. All rights reserved.
 # Copyright (c) 1997 Alan Citterman.       All rights reserved.
 #
@@ -25,15 +25,33 @@ require Exporter;
 use XSLoader;
 use Carp;
 
-use vars   qw( $VERSION @ISA @EXPORT_OK );
-$VERSION   = "1.47";
-@ISA       = qw( Exporter );
-@EXPORT_OK = qw( csv );
+use vars qw( $VERSION @ISA @EXPORT_OK %EXPORT_TAGS );
+$VERSION = "1.49";
+@ISA     = qw( Exporter );
 XSLoader::load ("Text::CSV_XS", $VERSION);
 
-sub PV { 0 }
-sub IV { 1 }
-sub NV { 2 }
+sub PV { 0 } sub CSV_TYPE_PV { PV }
+sub IV { 1 } sub CSV_TYPE_IV { IV }
+sub NV { 2 } sub CSV_TYPE_NV { NV }
+
+sub CSV_FLAGS_IS_QUOTED		{ 0x0001 }
+sub CSV_FLAGS_IS_BINARY		{ 0x0002 }
+sub CSV_FLAGS_ERROR_IN_FIELD	{ 0x0004 }
+sub CSV_FLAGS_IS_MISSING	{ 0x0010 }
+
+%EXPORT_TAGS = (
+    CONSTANTS	=> [qw( 
+	CSV_FLAGS_IS_QUOTED
+	CSV_FLAGS_IS_BINARY
+	CSV_FLAGS_ERROR_IN_FIELD
+	CSV_FLAGS_IS_MISSING
+
+	CSV_TYPE_PV
+	CSV_TYPE_IV
+	CSV_TYPE_NV
+	)],
+    );
+@EXPORT_OK = (qw( csv PV IV NV ), @{$EXPORT_TAGS{CONSTANTS}});
 
 if ($] < 5.008002) {
     no warnings "redefine";
@@ -107,6 +125,7 @@ my %attr_alias = (
     );
 my $last_new_err = Text::CSV_XS->SetDiag (0);
 my $ebcdic       = ord ("A") == 0xC1;	# Faster than $Config{'ebcdic'}
+my @internal_kh;
 
 # NOT a method: is also used before bless
 sub _unhealthy_whitespace {
@@ -757,21 +776,21 @@ sub is_quoted {
     my ($self, $idx) = @_;
     ref $self->{'_FFLAGS'} &&
 	$idx >= 0 && $idx < @{$self->{'_FFLAGS'}} or return;
-    $self->{'_FFLAGS'}[$idx] & 0x0001 ? 1 : 0;
+    $self->{'_FFLAGS'}[$idx] & CSV_FLAGS_IS_QUOTED  () ? 1 : 0;
     } # is_quoted
 
 sub is_binary {
     my ($self, $idx) = @_;
     ref $self->{'_FFLAGS'} &&
 	$idx >= 0 && $idx < @{$self->{'_FFLAGS'}} or return;
-    $self->{'_FFLAGS'}[$idx] & 0x0002 ? 1 : 0;
+    $self->{'_FFLAGS'}[$idx] & CSV_FLAGS_IS_BINARY  () ? 1 : 0;
     } # is_binary
 
 sub is_missing {
     my ($self, $idx) = @_;
     $idx < 0 || !ref $self->{'_FFLAGS'} and return;
     $idx >= @{$self->{'_FFLAGS'}} and return 1;
-    $self->{'_FFLAGS'}[$idx] & 0x0010 ? 1 : 0;
+    $self->{'_FFLAGS'}[$idx] & CSV_FLAGS_IS_MISSING () ? 1 : 0;
     } # is_missing
 
 # combine
@@ -1012,10 +1031,10 @@ sub getline_hr {
     $self->{'_COLUMN_NAMES'} or croak ($self->SetDiag (3002));
     my $fr = $self->getline (@args) or return;
     if (ref $self->{'_FFLAGS'}) { # missing
-	$self->{'_FFLAGS'}[$_] = 0x0010
+	$self->{'_FFLAGS'}[$_] = CSV_FLAGS_IS_MISSING ()
 	    for (@{$fr} ? $#{$fr} + 1 : 0) .. $#{$self->{'_COLUMN_NAMES'}};
 	@{$fr} == 1 && (!defined $fr->[0] || $fr->[0] eq "") and
-	    $self->{'_FFLAGS'}[0] ||= 0x0010;
+	    $self->{'_FFLAGS'}[0] ||= CSV_FLAGS_IS_MISSING ();
 	}
     @hr{@{$self->{'_COLUMN_NAMES'}}} = @{$fr};
     \%hr;
@@ -1275,6 +1294,9 @@ sub _csv_attr {
 	or croak ($last_new_err);
     defined $form and $csv->formula ($form);
 
+    $kh && !ref $kh && $kh =~ m/^(?:1|yes|true|internal|auto)$/i and
+	$kh = \@internal_kh;
+
     return {
 	'csv'  => $csv,
 	'attr' => { %attr },
@@ -1314,6 +1336,9 @@ sub csv {
 	}
 
     if ($c->{'out'} && !$c->{'sink'}) {
+	!$hdrs && ref $c->{'kh'} && $c->{'kh'} == \@internal_kh and
+	    $hdrs = $c->{'kh'};
+
 	if (ref $in eq "CODE") {
 	    my $hdr = 1;
 	    while (my $row = $in->($csv)) {
@@ -1360,7 +1385,7 @@ sub csv {
     my @row1;
     if (defined $c->{'hd_s'} || defined $c->{'hd_b'} || defined $c->{'hd_m'} || defined $c->{'hd_c'}) {
 	my %harg;
-	defined $c->{'hd_s'} and $harg{'set_set'}            = $c->{'hd_s'};
+	defined $c->{'hd_s'} and $harg{'sep_set'}            = $c->{'hd_s'};
 	defined $c->{'hd_d'} and $harg{'detect_bom'}         = $c->{'hd_b'};
 	defined $c->{'hd_m'} and $harg{'munge_column_names'} = $hdrs ? "none" : $c->{'hd_m'};
 	defined $c->{'hd_c'} and $harg{'set_column_names'}   = $hdrs ? 0      : $c->{'hd_c'};
@@ -1370,6 +1395,7 @@ sub csv {
 	}
 
     if ($c->{'kh'}) {
+	@internal_kh = ();
 	ref $c->{'kh'} eq "ARRAY" or croak ($csv->SetDiag (1501));
 	$hdrs ||= "auto";
 	}
@@ -1381,7 +1407,7 @@ sub csv {
 	}
     my $val = $c->{'val'};
     if ($val) {
-	$key					      or croak ($csv->SetDiag (1502));
+	$key						or croak ($csv->SetDiag (1502));
 	!ref $val or ref $val eq "ARRAY" && @{$val} > 0 or croak ($csv->SetDiag (1503));
 	}
 
@@ -1891,7 +1917,7 @@ If instead you want to escape the  L<C<quote_char>|/quote_char> by doubling
 it you will need to also change the  C<escape_char>  to be the same as what
 you have changed the L<C<quote_char>|/quote_char> to.
 
-Setting C<escape_char> to <undef> or C<""> will disable escaping completely
+Setting C<escape_char> to C<undef> or C<""> will completely disable escapes
 and is greatly discouraged. This will also disable C<escape_null>.
 
 The escape character can not be equal to the separation character.
@@ -1936,9 +1962,11 @@ one single empty field.
 This attribute is only used in parsing.
 
 =head3 formula_handling
+X<formula_handling>
+
+Alias for L</formula>
 
 =head3 formula
-X<formula_handling>
 X<formula>
 
  my $csv = Text::CSV_XS->new ({ formula => "none" });
@@ -2266,7 +2294,7 @@ X<quote_binary>
 
 By default,  all "unsafe" bytes inside a string cause the combined field to
 be quoted.  By setting this attribute to C<0>, you can disable that trigger
-for bytes >= C<0x7F>.
+for bytes C<< >= 0x7F >>.
 
 =head3 escape_null
 X<escape_null>
@@ -2580,7 +2608,8 @@ X<getline_all>
 This will return a reference to a list of L<getline ($fh)|/getline> results.
 In this call, C<keep_meta_info> is disabled.  If C<$offset> is negative, as
 with C<splice>, only the last  C<abs ($offset)> records of C<$fh> are taken
-into consideration.
+into consideration. Parameters C<$offset> and C<$length> are expected to be
+an integers. Non-integer values are interpreted as integer without check.
 
 Given a CSV file with 10 lines:
 
@@ -3078,15 +3107,24 @@ or fetch the current type settings with
 =item IV
 X<IV>
 
+=item CSV_TYPE_IV
+X<CSV_TYPE_IV>
+
 Set field type to integer.
 
 =item NV
 X<NV>
 
+=item CSV_TYPE_NV
+X<CSV_TYPE_NV>
+
 Set field type to numeric/float.
 
 =item PV
 X<PV>
+
+=item CSV_TYPE_PV
+X<CSV_TYPE_PV>
 
 Set field type to string.
 
@@ -3118,13 +3156,35 @@ L</combine> method. The flags are bit-wise-C<or>'d like:
 
 =over 2
 
-=item C< >0x0001
+=item C<0x0001>
+
+=item C<CSV_FLAGS_IS_QUOTED>
+X<CSV_FLAGS_IS_QUOTED>
 
 The field was quoted.
 
-=item C< >0x0002
+=item C<0x0002>
+
+=item C<CSV_FLAGS_IS_BINARY>
+X<CSV_FLAGS_IS_BINARY>
 
 The field was binary.
+
+=item C<0x0004>
+
+=item C<CSV_FLAGS_ERROR_IN_FIELD>
+X<CSV_FLAGS_ERROR_IN_FIELD>
+
+The field was invalid.
+
+Currently only used when C<allow_loose_quotes> is active.
+
+=item C<0x0010>
+
+=item C<CSV_FLAGS_IS_MISSING>
+X<CSV_FLAGS_IS_MISSING>
+
+The field was missing.
 
 =back
 
@@ -3258,6 +3318,30 @@ X<SetDiag>
  $csv->SetDiag (0);
 
 Use to reset the diagnostics if you are dealing with errors.
+
+=head1 IMPORTS/EXPORTS
+
+By default none of these are exported.
+
+=over 2
+
+=item csv
+
+ use Text::CSV_XS qw( csv );
+
+Import the function L</csv> function. See below.
+
+=item :CONSTANTS
+
+ use Text::CSV_XS qw( :CONSTANTS );
+
+Import module constants  L</CSV_FLAGS_IS_QUOTED>,  L</CSV_FLAGS_IS_BINARY>,
+L</CSV_FLAGS_ERROR_IN_FIELD>,  L</CSV_FLAGS_IS_MISSING>,   L</CSV_TYPE_PV>,
+L</CSV_TYPE_IV>, and L</CSV_TYPE_NV>. Each can be imported alone
+
+ use Text::CSV_XS qw( CSV_FLAS_IS_BINARY CSV_TYPE_NV );
+
+=back
 
 =head1 FUNCTIONS
 
@@ -3714,6 +3798,21 @@ headers are available after the call in the original order.
 This attribute can be abbreviated to C<kh> or passed as C<keep_column_names>.
 
 This attribute implies a default of C<auto> for the C<headers> attribute.
+
+X<stable header order>
+X<internal headers>
+The headers can also be kept internally to keep stable header order:
+
+ csv (in      => csv (in => "file.csv", kh => "internal"),
+      out     => "new.csv",
+      kh      => "internal");
+
+where C<internal> can also be C<1>, C<yes>, or C<true>. This is similar to
+
+ my @h;
+ csv (in      => csv (in => "file.csv", kh => \@h),
+      out     => "new.csv",
+      headers => \@h);
 
 =head3 fragment
 X<fragment>
@@ -4935,7 +5034,7 @@ L</csv> function. See ChangeLog releases 0.25 and on.
 
 =head1 COPYRIGHT AND LICENSE
 
- Copyright (C) 2007-2021 H.Merijn Brand.  All rights reserved.
+ Copyright (C) 2007-2023 H.Merijn Brand.  All rights reserved.
  Copyright (C) 1998-2001 Jochen Wiedmann. All rights reserved.
  Copyright (C) 1997      Alan Citterman.  All rights reserved.
 

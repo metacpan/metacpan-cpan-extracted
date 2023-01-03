@@ -47,8 +47,15 @@ if ($ENV{DANCER_TEST_SESSION_DBI_DSN}) {
     );
 }
 
+# Support testing with Dancer::Session::Storable if explicitly told to
+# (non-core module, so not tested by default; if you want to run these
+# tests against it, make sure it's installed first)
+if ($ENV{DANCER_TEST_SESSION_STORABLE}) {
+    push @engines, "Storable";
+}
 
-plan tests => 11 * scalar(@clients) * scalar(@engines) + (scalar(@engines));
+
+plan tests => 13 * scalar(@clients) * scalar(@engines) + (scalar(@engines));
 
 foreach my $engine (@engines) {
 
@@ -107,6 +114,17 @@ Test::TCP::test_tcp(
                 "Hi there, random person (after hook fired)",
                 "send_file route sent expected content and no explosion",
             );
+
+            # Now destroy the session (e.g. logging out)
+            $res = $ua->get("http://127.0.0.1:$port/session/destroy");
+            ok(
+                $res->{success},
+                "called session destroy route",
+            );
+            # ... and the previous session has indeed gone
+            $res = $ua->get("http://127.0.0.1:$port/read_session");
+            like $res->{content}, qr/name=''/, 
+            "empty session for client $client after destroy";
 
 
         }

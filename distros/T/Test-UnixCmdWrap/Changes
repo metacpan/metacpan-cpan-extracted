@@ -1,5 +1,9 @@
 Revision history for Test-UnixCmdWrap
 
+0.05    2023-01-01
+        Mention that Test2::Tools::Command should instead be used
+        in new code.
+
 0.03    2021-09-27
         Add a munge_status parameter that munges non-zero exit status
         codes to 1. Better code coverage.

@@ -4,7 +4,7 @@
       "Dpkg Developers <debian-dpkg@lists.debian.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4232",
    "keywords" : [
       "dpkg",
       "debian",
@@ -66,21 +66,21 @@
          "file" : "lib/Dpkg/Arch.pm",
          "version" : "1.03"
       },
-      "Dpkg::Build::Env" : {
-         "file" : "lib/Dpkg/Build/Env.pm",
-         "version" : "0.01"
-      },
       "Dpkg::Build::Info" : {
          "file" : "lib/Dpkg/Build/Info.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       },
-      "Dpkg::Build::Types" : {
-         "file" : "lib/Dpkg/Build/Types.pm",
-         "version" : "0.02"
+      "Dpkg::BuildEnv" : {
+         "file" : "lib/Dpkg/BuildEnv.pm",
+         "version" : "0.01"
       },
       "Dpkg::BuildFlags" : {
          "file" : "lib/Dpkg/BuildFlags.pm",
-         "version" : "1.04"
+         "version" : "1.05"
+      },
+      "Dpkg::BuildInfo" : {
+         "file" : "lib/Dpkg/BuildInfo.pm",
+         "version" : "1.00"
       },
       "Dpkg::BuildOptions" : {
          "file" : "lib/Dpkg/BuildOptions.pm",
@@ -89,6 +89,10 @@
       "Dpkg::BuildProfiles" : {
          "file" : "lib/Dpkg/BuildProfiles.pm",
          "version" : "1.00"
+      },
+      "Dpkg::BuildTypes" : {
+         "file" : "lib/Dpkg/BuildTypes.pm",
+         "version" : "0.02"
       },
       "Dpkg::Changelog" : {
          "file" : "lib/Dpkg/Changelog.pm",
@@ -116,7 +120,7 @@
       },
       "Dpkg::Compression" : {
          "file" : "lib/Dpkg/Compression.pm",
-         "version" : "2.00"
+         "version" : "2.01"
       },
       "Dpkg::Compression::FileHandle" : {
          "file" : "lib/Dpkg/Compression/FileHandle.pm",
@@ -376,6 +380,10 @@
          "file" : "lib/Dpkg/Vendor/Default.pm",
          "version" : "0.01"
       },
+      "Dpkg::Vendor::Devuan" : {
+         "file" : "lib/Dpkg/Vendor/Devuan.pm",
+         "version" : "0.01"
+      },
       "Dpkg::Vendor::Ubuntu" : {
          "file" : "lib/Dpkg/Vendor/Ubuntu.pm",
          "version" : "0.01"
@@ -403,6 +411,6 @@
          "web" : "https://git.dpkg.org/cgit/dpkg/dpkg.git"
       }
    },
-   "version" : "v1.21.13",
+   "version" : "v1.21.14",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

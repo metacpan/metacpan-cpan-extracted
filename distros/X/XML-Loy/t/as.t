@@ -49,7 +49,7 @@ use XML::Loy with => (
 package main;
 use lib '../lib';
 
-use Test::More tests => 12;
+use Test::More tests => 14;
 use Test::Warn;
 
 ok(my $atom = Atom->new('feed'), 'New atom');
@@ -58,7 +58,9 @@ ok($entry->add_id(5), 'Add id');
 
 ok(my $fun = $atom->as('Fun'), 'Convert to new Object');
 
+is($fun->at('entry id')->text, 5);
 ok($fun->add_happy('Yeah'), 'Add happy');
+is($fun->at('entry id')->text, 5);
 
 ok(my $animal = $fun->as('Animal', 'Atom'), 'Convert to new Object');
 

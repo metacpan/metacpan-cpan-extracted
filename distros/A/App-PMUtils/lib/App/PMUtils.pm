@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-11'; # DATE
+our $DATE = '2022-09-28'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.741'; # VERSION
+our $VERSION = '0.742'; # VERSION
 
 our %SPEC;
 
@@ -318,7 +318,7 @@ App::PMUtils - Command-line utilities related to Perl modules
 
 =head1 VERSION
 
-This document describes version 0.741 of App::PMUtils (from Perl distribution App-PMUtils), released on 2022-09-11.
+This document describes version 0.742 of App::PMUtils (from Perl distribution App-PMUtils), released on 2022-09-28.
 
 =head1 SYNOPSIS
 

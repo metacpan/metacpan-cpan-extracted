@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 13;
+use Test::More tests => 48;
 use Test::Dpkg qw(:paths);
 
 use IPC::Cmd qw(can_run);
@@ -89,6 +89,60 @@ sub test_read {
     is_deeply(\@lines, \@read, "$filename correctly read (IO::Handle methods)");
 }
 
+# Check compression properties.
+
+my @compressors = compression_get_list();
+is_deeply([ sort @compressors ] , [ qw(bzip2 gzip lzma xz) ],
+    'supported compressors');
+
+is(compression_get_default(), 'xz', 'default compressor is xz');
+eval {
+    compression_set_default('invented-compressor');
+};
+ok($@, 'cannot set compressor to an unsupported name');
+is(compression_get_default(), 'xz', 'default compressor is still xz');
+compression_set_default('gzip');
+is(compression_get_default(), 'gzip', 'default compressor changed to gzip');
+compression_set_default('xz');
+is(compression_get_default(), 'xz', 'default compressor reset to xz');
+
+ok(compression_is_supported('gzip'), 'gzip is supported');
+ok(compression_is_supported('xz'), 'xz is supported');
+ok(compression_is_supported('bzip2'), 'bzip2 is supported');
+ok(compression_is_supported('lzma'), 'lzma is supported');
+
+is(compression_guess_from_filename('filename'), undef,
+    'compressor <none> guessed from "filename"');
+is(compression_guess_from_filename('filename.gz'), 'gzip',
+    'compressor <none> guessed from "filename"');
+is(compression_guess_from_filename('filename.xz'), 'xz',
+    'compressor <none> guessed from "filename"');
+is(compression_guess_from_filename('filename.bz2'), 'bzip2',
+    'compressor <none> guessed from "filename"');
+is(compression_guess_from_filename('filename.lzma'), 'lzma',
+    'compressor <none> guessed from "filename"');
+
+is(compression_get_file_extension('gzip'), 'gz', 'gzip file ext');
+is(compression_get_file_extension('xz'), 'xz', 'xz file ext');
+is(compression_get_file_extension('bzip2'), 'bz2', 'bzip2 file ext');
+is(compression_get_file_extension('lzma'), 'lzma', 'lzma file ext');
+
+is(compression_get_level('gzip'), 9, 'gzip level is 9');
+compression_set_level('gzip', 1);
+is(compression_get_level('gzip'), 1, 'gzip level is now 1');
+compression_set_level('gzip');
+is(compression_get_level('gzip'), 9, 'gzip level is back to 9');
+is(compression_get_level('xz'), 6, 'xz level is 6');
+is(compression_get_level('bzip2'), 9, 'bzip2 level is 9');
+is(compression_get_level('lzma'), 6, 'lzma level is 6');
+
+my $ext_regex = compression_get_file_extension_regex();
+
+ok('filename.gz' =~ m/\.$ext_regex$/, '.gz matches regex');
+ok('filename.xz' =~ m/\.$ext_regex$/, '.xz matches regex');
+ok('filename.bz2' =~ m/\.$ext_regex$/, '.bz2 matches regex');
+ok('filename.lzma' =~ m/\.$ext_regex$/, '.lzma matches regex');
+
 # Test changing the default compression levels
 my $old_level = compression_get_default_level();
 compression_set_default_level(1);
@@ -97,6 +151,13 @@ compression_set_default_level(5);
 is(compression_get_default_level(), 5, 'change default compression level');
 compression_set_default_level(undef);
 is(compression_get_default_level(), $old_level, 'reset default compression level');
+
+ok(! compression_is_valid_level(0), 'compression 0 is invalid');
+ok(compression_is_valid_level(1), 'compression 1 is valid');
+ok(compression_is_valid_level(5), 'compression 5 is valid');
+ok(compression_is_valid_level(9), 'compression 9 is valid');
+ok(compression_is_valid_level('fast'), 'compression fast is valid');
+ok(compression_is_valid_level('best'), 'compression best is valid');
 
 # Test write on uncompressed file
 test_write("$tmpdir/myfile", \&check_uncompressed);

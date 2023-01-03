@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 #
-# Copyright (C) 2021-2022 Joelle Maslak
+# Copyright (C) 2021-2023 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -79,7 +79,7 @@ router-colorizer.pl - Colorize router CLI output
 
 =head1 VERSION
 
-version 1.223650
+version 1.230020
 
 =head1 DESCRIPTION
 
@@ -171,7 +171,7 @@ Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021-2022 by Joelle Maslak.
+This software is copyright (c) 2021-2023 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

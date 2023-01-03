@@ -1,7 +1,7 @@
 package Dancer::Response;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: Response object for Dancer
-$Dancer::Response::VERSION = '1.3513';
+$Dancer::Response::VERSION = '1.3520';
 use strict;
 use warnings;
 use Carp;
@@ -197,7 +197,7 @@ Dancer::Response - Response object for Dancer
 
 =head1 VERSION
 
-version 1.3513
+version 1.3520
 
 =head1 SYNOPSIS
 

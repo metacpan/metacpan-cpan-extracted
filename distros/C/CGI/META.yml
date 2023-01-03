@@ -9,7 +9,6 @@ build_requires:
   IO::File: '0'
   IO::Handle: '0'
   POSIX: '0'
-  Test::Deep: '0.11'
   Test::More: '0.98'
   Test::NoWarnings: '0'
   Test::Warn: '0.3'
@@ -47,5 +46,5 @@ resources:
   homepage: https://metacpan.org/module/CGI
   license: http://dev.perl.org/licenses/
   repository: https://github.com/leejo/CGI.pm
-version: '4.54'
+version: '4.55'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

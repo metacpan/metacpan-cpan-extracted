@@ -17,6 +17,9 @@ my $builder = Module::Build->new(
     dist_author        => q{Jeremy Mates <jeremy.mates@gmail.com>},
     dist_version_from  => 'lib/Test/UnixCmdWrap.pm',
     release_status     => 'stable',
+    create_license     => 0,
+    create_readme      => 0,
+    dynamic_config     => 0,
     configure_requires => { 'Module::Build' => '0.4004', },
     test_requires      => { 'Cwd' => '0', 'Test::Most' => '0', },
     requires           => {

@@ -1,5 +1,9 @@
 Revision history for Perl extension Plack::Middleware::Debug::TraceENV
 
+0.044   Mon Jan  2 02:58:08 UTC 2023
+    [No CODE CHANGES]
+        - improve Pod (Thanks @manwar)
+
 0.043   Sun Mar 18 04:19:03 JST 2018
     [No CODE CHANGES]
         - fix broken test

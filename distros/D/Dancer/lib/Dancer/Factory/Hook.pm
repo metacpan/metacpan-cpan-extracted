@@ -1,7 +1,7 @@
 package Dancer::Factory::Hook;
 our $AUTHORITY = 'cpan:SUKRIA';
 # ABSTRACT: Singleton class to create Dancer hooks
-$Dancer::Factory::Hook::VERSION = '1.3513';
+$Dancer::Factory::Hook::VERSION = '1.3520';
 use strict;
 use warnings;
 use Carp;
@@ -90,7 +90,7 @@ Dancer::Factory::Hook - Singleton class to create Dancer hooks
 
 =head1 VERSION
 
-version 1.3513
+version 1.3520
 
 =head1 AUTHOR
 
