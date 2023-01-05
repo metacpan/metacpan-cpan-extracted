@@ -45,6 +45,7 @@
             "Firefox::Util::Profile" : "0.005",
             "JSON::MaybeXS" : "0",
             "Log::ger" : "0.038",
+            "Log::ger::Screen" : "0",
             "Perinci::CmdLine::Any" : "0.152",
             "Perinci::CmdLine::Lite" : "1.915",
             "Sah::Schema::firefox::local_profile_name" : "0",
@@ -68,7 +69,7 @@
    "provides" : {
       "App::FirefoxMultiAccountContainersUtils" : {
          "file" : "lib/App/FirefoxMultiAccountContainersUtils.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       }
    },
    "release_status" : "stable",
@@ -83,7 +84,7 @@
          "web" : "https://github.com/perlancar/perl-App-FirefoxMultiAccountContainersUtils"
       }
    },
-   "version" : "0.014",
+   "version" : "0.015",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

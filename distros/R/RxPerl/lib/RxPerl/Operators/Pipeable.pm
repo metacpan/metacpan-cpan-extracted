@@ -20,7 +20,7 @@ our @EXPORT_OK = qw/
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.12.0";
+our $VERSION = "v6.13.1";
 
 sub op_audit_time {
     my ($duration) = @_;
@@ -306,40 +306,43 @@ sub op_delay {
 
             my %timers;
             my $queue;
+            my $completed;
             my $own_subscriber = {
-                error => sub {
+                error    => sub {
                     my @value = @_;
                     $subscriber->{error}->(@value) if defined $subscriber->{error};
                 },
-                map {
-                    my $type = $_;
+                next     => sub {
+                    my @value = @_;
 
-                    (
-                        $type => sub {
-                            my @value = @_;
-
-                            if (! defined $queue) {
-                                $queue = [];
-                                my ($timer1, $timer2);
-                                $timer1 = $timer_sub->(0, sub {
-                                    delete $timers{$timer1};
-                                    my @queue_copy = @$queue;
-                                    undef $queue;
-                                    $timer2 = $timer_sub->($delay, sub {
-                                        delete $timers{$timer2};
-                                        foreach my $item (@queue_copy) {
-                                            my ($type, $value_ref) = @$item;
-                                            $subscriber->{$type}->(@$value_ref) if defined $subscriber->{$type};
-                                        }
-                                    });
-                                    $timers{$timer2} = $timer2;
-                                });
-                                $timers{$timer1} = $timer1;
-                            }
-                            push @$queue, [$type, \@value];
-                        }
-                    );
-                } qw/ next complete /
+                    if (!defined $queue) {
+                        $queue = [];
+                        my ($timer1, $timer2);
+                        $timer1 = $timer_sub->(0, sub {
+                            delete $timers{$timer1};
+                            my @queue_copy = @$queue;
+                            undef $queue;
+                            $timer2 = $timer_sub->($delay, sub {
+                                delete $timers{$timer2};
+                                foreach my $item (@queue_copy) {
+                                    $subscriber->{next}->(@$item) if defined $subscriber->{next};
+                                }
+                                if ($completed and ! %timers) {
+                                    $subscriber->{complete}->() if defined $subscriber->{complete};
+                                }
+                            });
+                            $timers{$timer2} = $timer2;
+                        });
+                        $timers{$timer1} = $timer1;
+                    }
+                    push @$queue, \@value;
+                },
+                complete => sub {
+                    $completed = 1;
+                    if (! %timers) {
+                        $subscriber->{complete}->() if defined $subscriber->{complete};
+                    }
+                },
             };
 
             return [

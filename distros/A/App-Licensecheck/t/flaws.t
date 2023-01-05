@@ -5,36 +5,35 @@ use Path::Tiny;
 
 plan 20;
 
-my $app = App::Licensecheck->new(
+my @opts = (
 	top_lines => 0,
 );
 
+sub parse
+{
+	my ($path) = @_;
+
+	my ($license) = App::Licensecheck->new(@opts)->parse($path);
+
+	return $license;
+}
+
 path('t/flaws/fsf_address')->visit(
 	sub {
-		like [ $app->parse($_) ], array {
-			item qr/ \[(?:mis-spelled|obsolete) FSF postal address /;
-		};
+		like parse($_), qr/ \[(?:mis-spelled|obsolete) FSF postal address /;
 	}
 );
 
 path('t/flaws/no_fsf_address')->visit(
 	sub {
-		like [ $app->parse($_) ], array {
-			item mismatch qr/ \[(?:mis-spelled|obsolete) FSF postal address /;
-		};
+		unlike parse($_), qr/ \[(?:mis-spelled|obsolete) FSF postal address /;
 	}
 );
 
-path('t/flaws/generated')->visit(
-	sub {
-		like [ $app->parse($_) ], array {
-			item qr/\Q [generated file]/;
-		};
-	}
-);
+path('t/flaws/generated')
+	->visit( sub { like parse($_), qr/\Q [generated file]/ } );
 
-like [ $app->parse('t/SPDX/BSL-1.0.txt') ], array {
-	item mismatch qr/\Q [generated file]/;
-}, 'false positive: BSL-1.0 license fulltext';
+unlike parse('t/SPDX/BSL-1.0.txt'), qr/\Q [generated file]/,
+	'false positive: BSL-1.0 license fulltext';
 
 done_testing;

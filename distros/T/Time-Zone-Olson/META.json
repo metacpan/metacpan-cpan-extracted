@@ -71,6 +71,6 @@
          "web" : "https://github.com/david-dick/time-zone-olson"
       }
    },
-   "version" : "0.44",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.45",
+   "x_serialization_backend" : "JSON::PP version 4.11"
 }

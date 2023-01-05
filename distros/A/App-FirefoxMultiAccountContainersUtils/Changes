@@ -1,3 +1,11 @@
+0.015   2022-10-04  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        - [incompatible change] FIREFOX_CONTAINER now has higher precedence
+          over FIREFOX_CONTAINER_ENV, to ease doing standard behavior.
+
+        - Add logging to firefox-container.
+
+
 0.014   2022-09-08  Released-By: PERLANCAR; Urgency: medium
 
         - [cli firefox-container] Observe FIREFOX_CONTAINER_ENV.

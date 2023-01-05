@@ -1,4 +1,4 @@
-package JSCalendar::Duration 0.003;
+package JSCalendar::Duration 0.004;
 # ABSTRACT: Convert seconds to JSCalendar durations and back
 
 use strict;
@@ -158,7 +158,7 @@ JSCalendar::Duration - Convert seconds to JSCalendar durations and back
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -177,6 +177,18 @@ version 0.003
 
 This module converts between a duration of time as specified by seconds and
 a JSCalendar duration (L<https://tools.ietf.org/html/draft-ietf-calext-jscalendar-00#section-3.2.3>).
+
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 EXPORTS
 

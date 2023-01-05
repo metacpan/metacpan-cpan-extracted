@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Cleaner 2.73 {
+package Dist::Zilla::Plugin::Author::Plicease::Cleaner 2.74 {
 
   use 5.020;
   use Moose;
@@ -22,7 +22,20 @@ package Dist::Zilla::Plugin::Author::Plicease::Cleaner 2.73 {
 
   sub BUILD ($self, $) {
 
-    my @clean_list = ('ffi/_build', 't/ffi/_build', '.tmp', '_alien');
+    my @clean_list = qw(
+      .tmp
+      _alien
+    );
+
+    # rust:   target
+    # zig:    zig-cache, zig-out
+    # c:      *.o *.obj *.so *.dll *.dylib
+    # Pascal: *.ppu
+    foreach my $x (qw( target zig-cache zig-out *.o *.obj *.so *.dll *.dylib *.ppu))
+    {
+      push @clean_list, join('/', 'ffi', $x), join('/', 't/ffi', $x)
+    }
+
     push @clean_list, $self->clean->@*;
 
     install_modifier 'Dist::Zilla::Dist::Builder', 'after', 'clean' => sub ($bld, $dry) {
@@ -104,7 +117,7 @@ Dist::Zilla::Plugin::Author::Plicease::Cleaner - Clean things up
 
 =head1 VERSION
 
-version 2.73
+version 2.74
 
 =head1 SYNOPSIS
 

@@ -35,7 +35,7 @@ SYNOPSIS
         $po->merge( $file_handle );
 
 VERSION
-        v0.3.0
+        v0.5.0
 
 DESCRIPTION
     This module parse GNU PO (portable object) and POT (portable object

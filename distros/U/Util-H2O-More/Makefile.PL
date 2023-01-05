@@ -17,16 +17,16 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Util::H2O::More",
   "PREREQ_PM" => {
-    "Config::Tiny" => 0,
+    "Config::Tiny" => "2.28",
     "Util::H2O" => "0.18"
   },
   "TEST_REQUIRES" => {
-    "Config::Tiny" => 0,
+    "Config::Tiny" => "2.28",
     "File::Temp" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.2.2",
+  "VERSION" => "0.2.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Config::Tiny" => 0,
+  "Config::Tiny" => "2.28",
   "File::Temp" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,

@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.73 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.74 {
 
   use 5.020;
   use Moose;
@@ -243,8 +243,8 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.73 {
           maybe default_branch    => $self->payload->{default_branch},
 
           # these are for my ReadmeAnyFromPod wrapper.
-          maybe cirrus_user       => $self->payload->{cirrus_user},
           maybe github_user       => $self->payload->{github_user},
+          maybe github_repo       => $self->payload->{github_repo},
           maybe workflow          => $self->payload->{workflow},
        },
      ]);
@@ -341,7 +341,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.73
+version 2.74
 
 =head1 SYNOPSIS
 
@@ -505,10 +505,6 @@ Set the GitHub repo name to something other than the dist name.
 =head2 github_user
 
 Set the GitHub user name.
-
-=head2 cirrus_user
-
-Set the cirrus-ci user (defaults to same as github_user, which itself defaults to plicease).
 
 =head2 copy_mb
 

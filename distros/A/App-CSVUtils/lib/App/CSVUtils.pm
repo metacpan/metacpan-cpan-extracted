@@ -8,9 +8,9 @@ use Log::ger;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-29'; # DATE
+our $DATE = '2023-01-04'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.000'; # VERSION
+our $VERSION = '1.001'; # VERSION
 
 our @EXPORT_OK = qw(
                        gen_csv_util
@@ -95,6 +95,7 @@ sub compile_eval_code {
 }
 
 sub eval_code {
+    no warnings 'once';
     my ($code, $r, $value_for_topic, $return_topic) = @_;
     local $_ = $value_for_topic;
     local $main::r = $r;
@@ -304,6 +305,8 @@ sub _select_fields {
     [100, "Continue", [\@selected_fields, \@selected_field_idxs_array]];
 }
 
+our $xcomp_csvfiles = [filename => {file_ext_filter => qr/\.[tc]sv$/i}];
+
 our %argspecs_csv_input = (
     input_header => {
         summary => 'Specify whether input CSV has a header row',
@@ -447,6 +450,7 @@ Encoding of input file is assumed to be UTF-8.
 _
         schema => 'filename*',
         default => '-',
+        'x.completion' => $xcomp_csvfiles,
         tags => ['category:input'],
     },
 );
@@ -465,6 +469,7 @@ Encoding of input file is assumed to be UTF-8.
 _
         schema => ['array*', of=>'filename*'],
         default => ['-'],
+        'x.completion' => $xcomp_csvfiles,
         tags => ['category:input'],
     },
 );
@@ -515,6 +520,7 @@ our %argspecopt_field = (
         summary => 'Field name',
         schema => 'str*',
         cmdline_aliases => { f=>{} },
+        completion => \&_complete_field,
     },
 );
 
@@ -526,6 +532,20 @@ our %argspec_field_1 = (
         req => 1,
         pos => 1,
         completion => \&_complete_field,
+    },
+);
+
+our %argspec_fields_1plus = (
+    fields => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'field',
+        summary => 'Field names',
+        schema => ['array*', of=>['str*', min_len=>1], min_len=>1],
+        req => 1,
+        pos => 1,
+        slurpy => 1,
+        cmdline_aliases => {f=>{}},
+        element_completion => \&_complete_field,
     },
 );
 
@@ -563,6 +583,7 @@ our %argspec_fields = (
         schema => ['array*', of=>['str*', min_len=>1], min_len=>1],
         req => 1,
         cmdline_aliases => {f=>{}},
+        element_completion => \&_complete_field,
     },
 );
 
@@ -573,6 +594,7 @@ our %argspecopt_fields = (
         summary => 'Field names',
         schema => ['array*', of=>['str*', min_len=>1], min_len=>1],
         cmdline_aliases => {f=>{}},
+        element_completion => \&_complete_field,
     },
 );
 
@@ -1688,7 +1710,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 1.000 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2022-12-29.
+This document describes version 1.001 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2023-01-04.
 
 =head1 DESCRIPTION
 
@@ -1723,6 +1745,8 @@ This distribution contains the following CLI utilities:
 =item * L<csv-grep>
 
 =item * L<csv-info>
+
+=item * L<csv-intrange>
 
 =item * L<csv-list-field-names>
 
@@ -1765,6 +1789,8 @@ This distribution contains the following CLI utilities:
 =item * L<csv-sum>
 
 =item * L<csv-transpose>
+
+=item * L<csv-uniq>
 
 =item * L<csv2ltsv>
 
@@ -2242,7 +2268,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

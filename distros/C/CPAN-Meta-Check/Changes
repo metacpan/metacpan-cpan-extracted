@@ -1,5 +1,8 @@
 Revision history for CPAN-Meta-Check
 
+0.017     2023-01-03 16:53:14+01:00 Europe/Amsterdam
+          - Use Module::Metadata for more accurate testing
+
 0.016     2023-01-03 14:25:46+01:00 Europe/Amsterdam
           - Fix rounding issue in test
 

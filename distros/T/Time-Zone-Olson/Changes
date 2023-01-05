@@ -1,5 +1,8 @@
 Revision history for Time-Zone-Olson
 
+0.45  Wed Jan 04 21:08:00 2023
+       Test suite fixes for CPAN Testers
+
 0.44  Sat Oct 08 13:20:00 2022
        Fixing abbr for Win32 platform
 

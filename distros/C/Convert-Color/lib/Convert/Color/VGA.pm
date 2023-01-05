@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-package Convert::Color::VGA 0.13;
+package Convert::Color::VGA 0.14;
 
 use v5.14;
 use warnings;

@@ -8,6 +8,8 @@ if ( -e '/usr/share/zoneinfo' ) {
 }
 elsif ( -e '/usr/lib/zoneinfo' ) {
 }
+elsif ( -e '/etc/zoneinfo' ) {
+}
 elsif ( -e '/usr/share/lib/zoneinfo' ) {    # solaris
 }
 elsif ( ( $ENV{TZDIR} ) && ( -e $ENV{TZDIR} ) ) {

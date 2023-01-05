@@ -71,3 +71,7 @@
       files: ini2o, o2ini, o2h2o
     - added a dependency of Config::Tiny for ini2o and
       o2ini
+
+0.2.3 Tue Jan 02 15:00:04 2023
+    - maintenance release, updating minimum requirement
+      for Config::Tiny (2.28)

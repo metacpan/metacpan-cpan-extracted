@@ -27,6 +27,9 @@ my $app = {
          environment => 'GALOOK_BAR',
          default     => 'buzz',
       },
+      {
+         getopt      => 'kabooz|k',
+      },
    ],
    'default-child' => 'bar',
    children        => [

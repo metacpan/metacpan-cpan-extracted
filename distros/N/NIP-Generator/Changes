@@ -1,5 +1,8 @@
 Revision history for Perl extension NIP::Generator.
 
+1.1 Thu, 05 Jan 2023 12:39:51 +0100
+	- Reduction of dependencies.
+
 1.0 Tue, 21 Jul 2020 22:16:35 +0200 
 	- First stable release.
 

@@ -1,25 +1,19 @@
 Revision History for Text-NeatTemplate
 ======================================
 
-v0.1400 2020-12-31
+v0.1600 2023-01-05
+------------------
+
+* 2023-01-05 19:11:54 +1100
+  Added camelise format, and a script to test formatting.
+* 2021-12-06 14:17:29 +1100
+  more formatting
+
+v0.1400 2020-12-29
 ------------------
 
 * 2020-12-29 20:35:29 +1100
   New formatting for simple YYYY-MM-DD dates.
-
-v0.1300 2019-08-05
-------------------
-
-* 2019-08-05 10:34:44 +1000
-  added "alphahyphen" formatting directive
-
-v0.1200 2019-08-05
-------------------
-
-* 2019-08-05 10:26:22 +1000
-  tweak
-* 2019-08-05 10:24:47 +1000
-  added alphahash formatting directive
 
 ====================================
 End of changes in the last 1000 days

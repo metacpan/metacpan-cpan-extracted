@@ -7,23 +7,21 @@ use Carp;
 
 use Test::More;
 
-my $pkgname;
-BEGIN {
-  use Data::Dumper::Interp;
-  $pkgname = "Data::Dumper::Interp";
-  sub getPkgVar($) {
-    my ($varname) = @_;
-    no strict 'refs'; my $r = eval "\$${pkgname}::$varname"; die $@ if $@;
-    $r
-  }
-  sub setPkgVar($$) {
-    my ($varname, $value) = @_;
-    no strict 'refs'; eval "\$${pkgname}::$varname = \$value"; die $@ if $@;
-  }
-  sub callPkgNew(@) {
-    no strict 'refs'; my $r; eval "\$r = ${pkgname}->new(\@_)"; die $@ if $@;
-    $r
-  }
+use Data::Dumper::Interp;
+my $pkgname = "Data::Dumper::Interp";
+
+sub getPkgVar($) {
+  my ($varname) = @_;
+  no strict 'refs'; my $r = eval "\$${pkgname}::$varname"; die $@ if $@;
+  $r
+}
+sub setPkgVar($$) {
+  my ($varname, $value) = @_;
+  no strict 'refs'; eval "\$${pkgname}::$varname = \$value"; die $@ if $@;
+}
+sub callPkgNew(@) {
+  no strict 'refs'; my $r; eval "\$r = ${pkgname}->new(\@_)"; die $@ if $@;
+  $r
 }
 
 # ---------- Check stuff other than formatting or interpolation --------
@@ -42,7 +40,7 @@ sub unix_compatible_os() {
 my $unicode_str = join "", map { chr($_) } (0x263A .. 0x2650);
 
 require Data::Dumper;
-diag "Loaded ", $INC{"Data/Dumper.pm"}, 
+diag "Loaded ", $INC{"Data/Dumper.pm"},
      " VERSION=",u($Data::Dumper::VERSION),"\n";
 
 # Has Data::Dumper::Useqq('utf8') been fixed?
@@ -58,24 +56,38 @@ diag "Loaded ", $INC{"Data/Dumper.pm"},
   }
 }
 
-diag "Loaded ", $INC{"${pkgname}.pm" =~ s/::/\//gr}, 
-     " VERSION=", (getPkgVar("VERSION") // "undef"),"\n"; 
+diag "Loaded ", $INC{"${pkgname}.pm" =~ s/::/\//gr},
+     " VERSION=", (getPkgVar("VERSION") // "undef"),"\n";
 
 # Check default Foldwidth
-{ chomp( my $expected = `tput cols` );  # may default to 80 if no tty
-  die "Expected initial ${pkgname}::Foldwidth to be undef" 
+{
+  # 1/3/23: CPAN smoke tests failing because Term::ReadKey::GetTerminalSize
+  #   returns something different than `tput`; so we no longer try to check
+  #   that the "correct" value is returned, but only that COLUMNS overrides
+  #   what the terminal says, etc.
+
+  die "Expected initial ${pkgname}::Foldwidth to be undef"
     if defined getPkgVar("Foldwidth");
+  ivis("abc");
+  my $expected = getPkgVar("Foldwidth") // die "Foldwidth remained undef";
+
+  # COLUMNS should over-ride the actual terminal width
+  setPkgVar("Foldwidth", undef); # re-enable auto-detect
   { local $ENV{COLUMNS} = $expected + 13;
     ivis("abc");
-    die "${pkgname}::Foldwidth does not honor ENV{COLUMNS}" 
+    die "${pkgname}::Foldwidth ",u(getPkgVar('Foldwidth'))," does not honor ENV{COLUMS}=$ENV{COLUMNS}"
       unless u(getPkgVar("Foldwidth")) == $expected + 13;
   }
+
+  # Verify auto-detect works more than once
   setPkgVar("Foldwidth", undef); # re-enable auto-detect
   if (unix_compatible_os()) {
     delete local $ENV{COLUMNS};
     ivis("abc");
     die "${pkgname}::Foldwidth ",u(getPkgVar('Foldwidth'))," not defaulted correctly, expecting $expected" unless getPkgVar('Foldwidth') == $expected;
   }
+
+  # Should defauilt to 80 if there is no terminal and COLUMNS is unset
   setPkgVar("Foldwidth", undef); # re-enable auto-detect
   if (unix_compatible_os()) {
     delete local $ENV{COLUMNS};
@@ -89,7 +101,7 @@ diag "Loaded ", $INC{"${pkgname}.pm" =~ s/::/\//gr},
       exit(getPkgVar('Foldwidth') // 253);
     }
     waitpid($pid,0);
-    die "${pkgname}::Foldwidth defaulted to ", ($? >> 8)|($? & !0xFF), " (not 80 as expected)"
+    die "With no tty, ${pkgname}::Foldwidth defaulted to ", ($? >> 8)|($? & !0xFF), " (not 80 as expected)"
       unless $? == (80 << 8);
     $? = 0;
   }

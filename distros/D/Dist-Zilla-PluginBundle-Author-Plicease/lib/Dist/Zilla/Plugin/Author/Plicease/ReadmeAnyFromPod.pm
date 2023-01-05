@@ -1,7 +1,8 @@
-package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.73 {
+package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.74 {
 
   use 5.020;
   use Moose;
+  use experimental qw( signatures );
   use URI::Escape ();
   use File::Which ();
   use Ref::Util qw( is_plain_hashref );
@@ -26,18 +27,17 @@ package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.73 {
     return $class->$orig(@_);
   };
 
-  has cirrus_user => (
-    is      => 'ro',
-    lazy    => 1,
-    default => sub {
-      my($self) = @_;
-      $self->github_user;
-    },
-  );
-
   has github_user => (
     is      => 'ro',
     default => 'plicease',
+  );
+
+  has github_repo => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub ($self) {
+      $self->zilla->name
+    },
   );
 
   has workflow => (
@@ -49,8 +49,7 @@ package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.73 {
   has default_branch => (
     is      => 'ro',
     lazy    => 1,
-    default => sub {
-      my($self) = @_;
+    default => sub ($self) {
       if(File::Which::which('git'))
       {
         my %b = map { $_ => 1 }
@@ -91,6 +90,13 @@ package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.73 {
 
     my $content = do {
       no warnings 'redefine';
+
+      # The super class at some point changes its behavior to escape URLs
+      # so that IPv6 addresses could be properly used in markdown.
+      # Unfortunately this also meant that class names with :: also got
+      # escaped making them hard to read.  Since I never use literal IPv6
+      # addresses in URLs and I do very often have links to Perl
+      # documentation with :: that was not a useful change.
       local *URI::Escape::uri_escape = sub {
         my($uri) = @_;
         $uri;
@@ -101,20 +107,12 @@ package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.73 {
 
     return $content unless $self->type eq 'gfm';
 
-    my $status = do {
-      my $name = $self->zilla->name;
+    my $status = '';
 
-      my $cirrus_status = -f $self->zilla->root->child('.cirrus.yml');
-
-      my $status = '';
-      $status .= " [![Build Status](https://api.cirrus-ci.com/github/@{[ $self->cirrus_user ]}/$name.svg)](https://cirrus-ci.com/github/@{[ $self->cirrus_user ]}/$name)" if $cirrus_status;
-
-      foreach my $workflow ($self->workflow->@*)
-      {
-        $status .= " ![$workflow](https://github.com/@{[ $self->github_user ]}/$name/workflows/$workflow/badge.svg)";
-      }
-      $status;
-    };
+    foreach my $workflow ($self->workflow->@*)
+    {
+      $status .= " ![$workflow](https://github.com/@{[ $self->github_user ]}/@{[ $self->github_repo ]}/workflows/$workflow/badge.svg)";
+    }
 
     $content =~ s{# NAME\s+(.*?) - (.*?#)}{# $1$status\n\n$2}s;
     $content =~ s{# VERSION\s+version (\d+\.|)\d+\.\d+(\\_\d+|)\s+#}{#}a;
@@ -138,7 +136,7 @@ Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod - Personal subclass of D
 
 =head1 VERSION
 
-version 2.73
+version 2.74
 
 =head1 SYNOPSIS
 

@@ -8,9 +8,9 @@ use Log::ger;
 use Sort::Sub ();
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-08'; # DATE
+our $DATE = '2022-10-04'; # DATE
 our $DIST = 'App-FirefoxMultiAccountContainersUtils'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 $Sort::Sub::argsopt_sortsub{sort_sub}{cmdline_aliases} = {S=>{}};
 $Sort::Sub::argsopt_sortsub{sort_args}{cmdline_aliases} = {A=>{}};
@@ -388,7 +388,7 @@ App::FirefoxMultiAccountContainersUtils - Utilities related to Firefox Multi-Acc
 
 =head1 VERSION
 
-This document describes version 0.014 of App::FirefoxMultiAccountContainersUtils (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2022-09-08.
+This document describes version 0.015 of App::FirefoxMultiAccountContainersUtils (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2022-10-04.
 
 =head1 SYNOPSIS
 

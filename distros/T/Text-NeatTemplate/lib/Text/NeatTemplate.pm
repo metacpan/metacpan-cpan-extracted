@@ -1,5 +1,5 @@
 package Text::NeatTemplate;
-$Text::NeatTemplate::VERSION = '0.1400';
+$Text::NeatTemplate::VERSION = '0.1600';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ Text::NeatTemplate - a fast, middleweight template engine.
 
 =head1 VERSION
 
-version 0.1400
+version 0.1600
 
 =head1 SYNOPSIS
 
@@ -184,10 +184,30 @@ Convert to a string containing alphanumeric characters, dashes
 and underscores; spaces are converted to hyphens.
 (useful for anchors or filenames)
 
+=item camelise
+
+Convert the value into CamelCase.
+
 =item comma_front
 
 Put anything after the last comma at the front (as with an author name)
 For example, "Smith,Sarah Jane" becomes "Sarah Jane Smith".
+
+=item date_day
+
+Return the day part of a YYYY-MM-DD date.
+
+=item date_mth
+
+Return the month part of a YYYY-MM-DD date.
+
+=item date_month
+
+Return the month part of a YYYY-MM-DD date as an English month name.
+
+=item date_year
+
+Return the year part of a YYYY-MM-DD date.
 
 =item dollars
 
@@ -200,6 +220,10 @@ Convert to a HTML mailto link.
 =item float
 
 Convert to float.
+
+=item facettag
+
+Convert to a "faceted" tag, that is, the words are joined by a colon.
 
 =item hmail
 
@@ -277,6 +301,17 @@ Convert to a Proper Noun.
 
 Return the value with no change.
 
+=item span
+
+Surround the value with HTML span tags. (Useful for CSS formatting.)
+
+=item tagify
+
+Converts the value into something suitable to use as a tag.
+Replace pipe with comma, remove leading and trailing spaces,
+remove hyphens and underscores,
+replace slashes, ! and spaces with underscores.
+
 =item title
 
 Put any trailing ",The" ",A" or ",An" at the front (as this is a title)
@@ -296,6 +331,11 @@ Convert to a HTML href link.
 =item wikilink
 
 Format the value as the most common kind of wikilink, that is [[I<value>]]
+
+=item wlink_I<prefix>
+
+Format the value as the most common kind of wikilink with a prefix;
+that is [[I<prefix>/I<value>]]
 
 =item wordsI<num>
 
@@ -626,6 +666,7 @@ sub convert_value {
 		     || sprintf('%d%%',int($value*100))));
 	/^url/i &&    (return "<a href='$value'>$value</a>");
 	/^wikilink/i &&    (return "[[$value]]");
+	/^span/i &&    (return "<span>$value</span>");
 	/^email/i &&    (return "<a mailto='$value'>$value</a>");
 	/^hmail/i && do {
 	    $value =~ s/@/ at /;
@@ -761,6 +802,13 @@ sub convert_value {
 	    $value =~ s/ /_/g;
 	    return $value;
 	};
+	/^camelise/i && do {
+	    $value = join('',
+                map{ ucfirst $_ }
+                split(/(?<=[A-Za-z0-9+])[-_\s](?=[A-Za-z0-9'+])/,
+                    $value));
+	    return $value;
+	};
 	/^item(\d+)/ && do {
 	    my $ct = $1;
 	    ($ct>=0) || return '';
@@ -782,6 +830,21 @@ sub convert_value {
 		push @next_items, $self->convert_value(%args, value=>$item, format=>$next);
 	    }
 	    return join(' ', @next_items);
+	};
+	/^itemss_(\w+)/ && do {
+	    my $next = $1;
+            my @formats = split('_', $next);
+	    my @items = split(/[\|,]\s*/, $value);
+	    my @fmt_items = ();
+	    foreach my $item (@items)
+	    {
+                foreach my $fmt (@formats)
+                {
+		    $item = $self->convert_value(%args, value=>$item, format=>$fmt);
+                }
+		push @fmt_items, $item;
+	    }
+	    return join(' ', @fmt_items);
 	};
 	/^itemsjslash_(\w+)/ && do {
 	    my $next = $1;

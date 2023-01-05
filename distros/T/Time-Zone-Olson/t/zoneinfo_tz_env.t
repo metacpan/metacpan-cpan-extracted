@@ -13,6 +13,9 @@ use Digest::SHA();
 
 $ENV{PATH} = '/bin:/usr/bin:/usr/sbin:/sbin';
 delete @ENV{'IFS', 'CDPATH', 'ENV', 'BASH_ENV'};
+if ($^O eq 'cygwin') {
+	delete $ENV{PATH};
+}
 
 my $test_gnu_date = `TZ="Australia/Melbourne" date -d "2015/02/28 11:00:00" +"%Y/%m/%d %H:%M:%S" 2>&1`;
 if (defined $test_gnu_date) {

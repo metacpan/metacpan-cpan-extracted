@@ -3,7 +3,7 @@ use v5.24;
 use warnings;
 use experimental qw< signatures >;
 no warnings qw< experimental::signatures >;
-{ our $VERSION = '2.004' }
+{ our $VERSION = '2.006' }
 use Carp;
 
 use parent 'Exporter';
@@ -721,15 +721,24 @@ sub __commandline_help ($getopt) {
 
    my ($mode, $type, $desttype, $min, $max, $default);
    if (substr($getopt, -1, 1) eq '!') {
-      $type = 'bool';
+      $type = 'bool-negatable';
       substr $getopt, -1, 1, '';
-      push @retval, 'boolean option';
+      push @retval, 'boolean (can be negated)';
    }
+   elsif ($getopt =~ s<:\+ ([@%])? \z><>mxs) {
+      $mode     = 'optional';
+      $type     = 'i';
+      $default  = 'increment';
+      $desttype = $1;
+      my $line = "integer, value is optional, defaults to incrementing current value";
+      $line .= ", list valued" if defined($desttype) && $desttype eq '@';
+      push @retval, $line;
+   } ## end elsif ($getopt =~ s<:+ ([@%])? \z><>mxs)
    elsif (substr($getopt, -1, 1) eq '+') {
       $mode = 'increment';
       substr $getopt, -1, 1, '';
       push @retval,
-        'incremental option (adds 1 every time it is provided)';
+        'incremental integer (adds 1 every time it is provided)';
    } ## end elsif (substr($getopt, -1...))
    elsif (
       $getopt =~ s<(
@@ -745,7 +754,7 @@ sub __commandline_help ($getopt) {
          )? \z><>mxs
      )
    {
-      $mode     = $1 eq '=' ? 'mandatory' : 'optional';
+      $mode     = $1 eq '=' ? 'required' : 'optional';
       $type     = $2;
       $desttype = $3;
       $min      = $4;
@@ -759,7 +768,7 @@ sub __commandline_help ($getopt) {
          o => 'perl-extended-integer',
          f => 'float',
       }->{$type};
-      my $line = "$mode $type option";
+      my $line = "$type, value is $mode";
       $line .= ", at least $min times" if defined($min) && $min > 1;
       $line .= ", no more than $max times"
         if defined($max) && length($max);
@@ -771,25 +780,26 @@ sub __commandline_help ($getopt) {
       $type     = 'i';
       $default  = $1;
       $desttype = $2;
-      my $line = "optional integer, defaults to $default";
+      my $line = "integer, value is optional, defaults to $default";
       $line .= ", list valued" if defined($desttype) && $desttype eq '@';
       push @retval, $line;
    } ## end elsif ($getopt =~ s<: (\d+) ([@%])? \z><>mxs)
-   elsif ($getopt =~ s<:+ ([@%])? \z><>mxs) {
-      $mode     = 'optional';
-      $type     = 'i';
-      $default  = 'increment';
-      $desttype = $1;
-      my $line = "optional integer, current value incremented if omitted";
-      $line .= ", list valued" if defined($desttype) && $desttype eq '@';
-      push @retval, $line;
-   } ## end elsif ($getopt =~ s<:+ ([@%])? \z><>mxs)
+   else {  # boolean, non-negatable
+      $type = 'bool';
+      push @retval, 'boolean';
+   }
 
    my @alternatives = split /\|/, $getopt;
-   if ($type eq 'bool') {
+   if ($type eq 'bool-negatable') {
       push @retval, map {
          if   (length($_) == 1) { "-$_" }
          else                   { "--$_ | --no-$_" }
+      } @alternatives;
+   } ## end if ($type eq 'bool')
+   elsif ($type eq 'bool' || $mode eq 'increment') {
+      push @retval, map {
+         if   (length($_) == 1) { "-$_"  }
+         else                   { "--$_" }
       } @alternatives;
    } ## end if ($type eq 'bool')
    elsif ($mode eq 'optional') {

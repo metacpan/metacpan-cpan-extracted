@@ -1,6 +1,11 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.880 Tue Jan 03 20:00:00 EST 2023
+
+  * Bump MCE dependency to 1.883.
+  * Improve 05_mce_hobo.t test.
+
 1.879 Fri Dec 02 21:00:00 EST 2022
 
   * Update the error status if MCE::Hobo died due to receiving a signal.

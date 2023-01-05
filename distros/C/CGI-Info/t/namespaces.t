@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::Most;
 
-if($ENV{RELEASE_TESTING}) {
+if($ENV{'AUTHOR_TESTING'}) {
 	eval {
 		require Test::CleanNamespaces;
 	};

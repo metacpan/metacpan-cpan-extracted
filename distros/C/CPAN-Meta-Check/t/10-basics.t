@@ -6,9 +6,12 @@ use Test::More 0.88;
 
 use CPAN::Meta 2.120920;
 use CPAN::Meta::Check qw/check_requirements verify_dependencies/;
+use Module::Metadata;
 
 use Scalar::Util ();
 use Env ();
+
+my $scalar_version = Module::Metadata->new_from_module('Scalar::Util')->version;
 
 my %prereq_struct = (
 	runtime => {
@@ -24,9 +27,9 @@ my %prereq_struct = (
 			Env => 99999,
 		},
 		conflicts => {
-			'CPAN::Meta' => '<= 100.0',										# check should fail
-			'Scalar::Util' => '== ' . Scalar::Util->VERSION,	# check should fail
-			'Test::More' => '<= 0.01',										# check should pass (up to 0.01 is bad)
+			'CPAN::Meta' => '<= 100.0',             # check should fail
+			'Scalar::Util' => "== $scalar_version", # check should fail
+			'Test::More' => '<= 0.01',              # check should pass (up to 0.01 is bad)
     },
 	},
 	build => {
@@ -57,7 +60,7 @@ is_deeply([ sort +$pre_con->required_modules ], [ qw/CPAN::Meta Scalar::Util Tes
 is_deeply(check_requirements($pre_con, 'conflicts'), {
 		'CPAN::Meta' => "Installed version ($CPAN::Meta::VERSION) of CPAN::Meta is in range '<= 100.0'",
 		'Test::More' => undef,
-		'Scalar::Util' => sprintf("Installed version (%s) of Scalar::Util is in range '== %s'", Scalar::Util->VERSION, Scalar::Util->VERSION),
+		'Scalar::Util' => sprintf("Installed version (%s) of Scalar::Util is in range '== %s'", $scalar_version, $scalar_version),
 	}, 'Conflicts give the right errors');
 
 done_testing();

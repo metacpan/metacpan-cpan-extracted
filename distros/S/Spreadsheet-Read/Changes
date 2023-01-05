@@ -1,3 +1,11 @@
+0.85	- 04 Jan 2023, H.Merijn Brand
+    * Suggest the preferred parser if none found
+    * It's 2022
+    * xlscat --box and improvements for -L
+    * Add balloons to ss2tk buttons
+    * Fix typo in help (Erix)
+    * It's 2023
+
 0.84	- 26 Feb 2021, H.Merijn Brand
     * It's 2021
     * Alias pivot to transpose (issue#36)

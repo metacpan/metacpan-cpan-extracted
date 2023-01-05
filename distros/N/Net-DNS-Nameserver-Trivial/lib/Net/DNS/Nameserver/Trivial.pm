@@ -2,7 +2,7 @@ package Net::DNS::Nameserver::Trivial;
 
 use vars qw($VERSION);
 
-$VERSION = 0.301;
+$VERSION = 0.302;
 #---------------
 
 use strict;
@@ -69,7 +69,8 @@ sub new {
 	$self->{ log } = Log::Tiny->new( $params->{ LOG }->{ file } ) or die 'Could not log: ' . Log::Tiny->errstr . "\n";
 	$self->{ log }->log_only( @log_level );
 
-	select((select(Log::Tiny::LOG), $| = 1)[0]); # turn off buffering of LOG
+	#select((select(Log::Tiny::LOG), $| = 1)[0]); # turn off buffering of LOG
+	#select((select(Log::Tiny::LOG), $| = 1)[0]); # turn off buffering of LOG
 	
 	# Flags ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	$self->{ _ra } = $params->{ FLAGS }->{ ra };
@@ -392,7 +393,7 @@ MX:
 
 		$local = 1;
 		$rcode = "NOERROR";
-	}else{
+	}elsif( $self->{ _ra } ){
 		# poszukujemy informacji o zadanym wezle -----------------------
 		if( $qtype eq A or $qtype eq PTR or $qtype eq MX or $qtype eq SOA or $qtype eq NS ){
 			
@@ -424,10 +425,12 @@ MX:
 			$rcode = "NOTIMP";
 		}
 		#---------------------------------------------------------------
+	}else{
+		$rcode = "NXDOMAIN";
 	}
 
-	# zapis w lokalnej konfiguracji ------------------------------------
 	if( $rcode ne 'NOTIMP' ){
+		# zapis w lokalnej konfiguracji --------------------------------
 		if( $local ){
 			(my $rdom = $qname) =~ s/^[\d\w]+\.//o;		# fix it!!!
 			my   $dom = ( $qtype eq AXFR || $qtype eq SOA ) ? $qname : $rdom;

@@ -11,7 +11,7 @@ use Test2::V0;
 use Exporter 'import';
 our @EXPORT = qw/ obs_is cold /;
 
-our $VERSION = "v6.12.0";
+our $VERSION = "v6.13.1";
 
 sub cold {
     my ($marble, $mapping) = @_;
@@ -46,12 +46,12 @@ sub cold {
             $time++;
         } elsif ($token eq '|') {
             if ($time > $have_waited) {
-                push @components, rx_EMPTY->pipe(op_delay($time));
+                push @components, rx_timer($time)->pipe(op_ignore_elements);
             }
             last TOKEN;
         } elsif ($token eq '#') {
             push @components, rx_concat(
-                rx_EMPTY->pipe(op_delay($time)),
+                rx_timer($time)->pipe(op_ignore_elements),
                 rx_throw_error,
             );
             last TOKEN;

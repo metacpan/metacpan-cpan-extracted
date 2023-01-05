@@ -2,8 +2,8 @@ NAME
     Types::Sah::Firefox - Type constraints related to Firefox
 
 VERSION
-    This document describes version 0.002 of Types::Sah::Firefox (from Perl
-    distribution Types-Sah-Firefox), released on 2022-09-28.
+    This document describes version 0.003 of Types::Sah::Firefox (from Perl
+    distribution Types-Sah-Firefox), released on 2022-10-05.
 
 SYNOPSIS
      package MyApp;

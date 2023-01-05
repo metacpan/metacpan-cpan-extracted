@@ -12,7 +12,7 @@ licensecheck - simple license checker for source files
 
 =head1 VERSION
 
-Version v3.3.0
+Version v3.3.1
 
 =head1 SYNOPSIS
 
@@ -39,7 +39,7 @@ only files matching B<--check> and not B<--ignore> are checked.
 =cut
 
 use Getopt::Long 2.24 qw(:config gnu_getopt);
-use IO::Interactive qw(is_interactive);
+use IO::Interactive   qw(is_interactive);
 
 my $USE_COLOR;
 
@@ -51,21 +51,22 @@ BEGIN {
 	);
 	$Pod::Usage::Formatter = 'Pod::Text::Color' if $USE_COLOR;
 }
-use Pod::Usage;
+use Pod::Usage 1.60;
 my $COPYRIGHT;
 use Pod::Constants
-	-trim => 1,
+	-trim                   => 1,
 	'COPYRIGHT AND LICENSE' =>
 	sub { ($COPYRIGHT) = s/C<< (.*) >>/$1/gr; $COPYRIGHT =~ s/Â©/©/g };
 use Path::Tiny;
-use String::Escape qw(unbackslash);
+use Path::Iterator::Rule;
+use String::Escape  qw(unbackslash);
 use List::SomeUtils qw(uniq);
-use Log::Any qw($log);
+use Log::Any        qw($log);
 use Log::Any::Adapter;
 
 use App::Licensecheck;
 
-our $VERSION = 'v3.3.0';
+our $VERSION = 'v3.3.1';
 
 my $progname = path($0)->basename;
 
@@ -351,24 +352,30 @@ else {
 pod2usage(1) if ( $OPT{help} );
 if ( $OPT{version} ) { version(); exit 0; }
 
+my @shortname_schemes;
+if ( $OPT{'shortname-scheme'} ) {
+	@shortname_schemes = split /[\s,]+/, $OPT{'shortname-scheme'};
+}
+elsif ( $OPT{'deb-machine'} || $OPT{'deb-fmt'} ) {
+	@shortname_schemes = qw(debian spdx);
+}
 my %LIB_OPTS = (
 
 	# resolve patterns
-	shortname_scheme => $OPT{'shortname-scheme'}
-		// ( $OPT{'deb-machine'} || $OPT{'deb-fmt'} ) ? 'debian,spdx' : undef,
+	schemes => \@shortname_schemes,
 );
 
 if ( $OPT{'list-licenses'} ) {
 	my $app = App::Licensecheck->new(%LIB_OPTS);
 
-	$app->list_licenses;
+	say for $app->list_licenses;
 	exit 0;
 }
 
 if ( $OPT{'list-naming-schemes'} ) {
 	my $app = App::Licensecheck->new(%LIB_OPTS);
 
-	$app->list_naming_schemes;
+	say for $app->list_naming_schemes;
 	exit 0;
 }
 
@@ -388,26 +395,113 @@ pod2usage("$progname: No paths provided.")
 my $app = App::Licensecheck->new(
 	%LIB_OPTS,
 
-	# select
-	check_regex  => $OPT{check},
-	ignore_regex => $OPT{ignore},
-	recursive    => $OPT{recursive},
-
 	# parse
 	top_lines => $OPT{lines},
 	end_bytes => $OPT{tail},
 	encoding  => $OPT{encoding},
-
-	# report
-	skipped     => $OPT{skipped},
-	deb_machine => $OPT{'deb-machine'},
 );
+
+my $default_check_regex = q!
+	/[\w-]+$ # executable scripts or README like file
+	|\.( # search for file suffix
+		c(c|pp|xx)? # c and c++
+		|h(h|pp|xx)? # header files for c and c++
+		|S
+		|css|less # HTML css and similar
+		|f(77|90)?
+		|go
+		|groovy
+		|lisp
+		|scala
+		|clj
+		|p(l|m)?6?|t|xs|pod6? # perl5 or perl6
+		|sh
+		|php
+		|py(|x)
+		|rb
+		|java
+		|js
+		|vala
+		|el
+		|sc(i|e)
+		|cs
+		|pas
+		|inc
+		|dtd|xsl
+		|mod
+		|m
+		|md|markdown
+		|tex
+		|mli?
+		|(c|l)?hs
+	)$
+!;
+
+# From dpkg-source
+my $default_ignore_regex = q!
+	# Ignore general backup files
+	~$|
+	# Ignore emacs recovery files
+	(?:^|/)\.#|
+	# Ignore vi swap files
+	(?:^|/)\..*\.swp$|
+	# Ignore baz-style junk files or directories
+	(?:^|/),,.*(?:$|/.*$)|
+	# File-names that should be ignored (never directories)
+	(?:^|/)(?:DEADJOE|\.cvsignore|\.arch-inventory|\.bzrignore|\.gitignore)$|
+	# File or directory names that should be ignored
+	(?:^|/)(?:CVS|RCS|\.pc|\.deps|\{arch\}|\.arch-ids|\.svn|\.hg|_darcs|\.git|
+	\.shelf|_MTN|\.bzr(?:\.backup|tags)?)(?:$|/.*$)
+!;
+
+my $check_regex = $OPT{check};
+if ( !$check_regex or $check_regex eq 'common source files' ) {
+	$check_regex = qr/$default_check_regex/x;
+}
+else {
+	$check_regex = qr/$check_regex/;
+}
+
+my $ignore_regex = $OPT{ignore};
+if ( !$ignore_regex or $ignore_regex eq 'some backup and VCS files' ) {
+	$ignore_regex = qr/$default_ignore_regex/x;
+}
+else {
+	$ignore_regex = qr/$ignore_regex/;
+}
 
 my %patternfiles;
 my %patternownerlines;
 my %patternlicense;
 
-foreach my $file ( $app->find(@ARGV) ) {
+my @paths = @ARGV;
+
+my $do      = Path::Iterator::Rule->new;
+my %options = (
+	follow_symlinks => 0,
+);
+
+$do->max_depth(1)
+	unless $OPT{recursive};
+$do->not( sub {/$ignore_regex/} );
+$do->file->nonempty;
+
+if ( @paths >> 1 ) {
+	if ( $log->is_debug or $OPT{skipped} && $log->is_warn ) {
+		my $dont = $do->clone->not( sub {/$check_regex/} );
+		foreach ( $dont->all( @paths, \%options ) ) {
+			if ( $OPT{skipped} ) {
+				$log->warnf( 'skipped file %s', $_ );
+			}
+			else {
+				$log->debugf( 'skipped file %s', $_ );
+			}
+		}
+	}
+	$do->and( sub {/$check_regex/} );
+}
+
+foreach my $file ( $do->all( @paths, \%options ) ) {
 	my ( $license, $copyright ) = $app->parse($file);
 
 	# drop duplicates
@@ -604,9 +698,9 @@ originally introduced by Stefan Westerfeld C<< <stefan@space.twc.de> >>.
 
   Copyright © 2012 Francesco Poli
 
-  Copyright © 2016-2021 Jonas Smedegaard
+  Copyright © 2016-2022 Jonas Smedegaard
 
-  Copyright © 2017-2021 Purism SPC
+  Copyright © 2017-2022 Purism SPC
 
 This program is free software:
 you can redistribute it and/or modify it

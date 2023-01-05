@@ -15,7 +15,7 @@ use Apache2::ServerUtil qw();
 use Apache::Session::Browseable::SQLite qw();
 use Storable qw();
 
-our $VERSION = '0.10';
+our $VERSION = '0.20';
 
 my %session_dbh;
 
@@ -291,13 +291,13 @@ sub open_session {
 	my ($db, $session_id) = @_;
 
 	if (!exists($session_dbh{$db})) {
-		$session_dbh{$db} = DBI->connect("dbi:SQLite:$db",'','', { AutoCommit => 0 }) or
+		$session_dbh{$db} = DBI->connect("dbi:SQLite:$db",'','', { AutoCommit => 1 }) or
 			return "DBI connection failed - $DBI::errstr";
 	}
 
 	my %session;
 	eval { tie(%session, 'Apache::Session::Browseable::SQLite', $session_id,
-		    { Handle => $session_dbh{$db}, Commit => 1 }); };
+		    { Handle => $session_dbh{$db}, Commit => 0 }); };
 
 	return $@ ? $@ : \%session;
 }

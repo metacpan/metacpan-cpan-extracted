@@ -1,12 +1,19 @@
+2.006  2023-01-05 08:03:54 CET
+   - Release after 84 PASSes on CPAN Testers (thanks!)
+
+2.005  2023-01-02 00:36:49 CET
+   - Enhance automatic generation of help for options
+   - Fix bugs in automatic generation of help for options
+
 2.004  2022-07-16 12:28:13 CEST
-   - release after 90 PASSes on CPAN Testers (thanks!)
+   - Release after 90 PASSes on CPAN Testers (thanks!)
 
 2.003  2022-07-15 19:44:31 CEST
-   - accept sub reference for validate
-   - test validation, both with Params::Validate and sub ref
+   - Accept sub reference for validate
+   - Test validation, both with Params::Validate and sub ref
 
 2.002  2022-06-18 18:07:12 CEST
-   - release after 194 PASSes on CPAN Testers (thanks!)
+   - Release after 194 PASSes on CPAN Testers (thanks!)
 
 2.001001  2022-06-13 21:06:03 CEST
    - Try to (blindly) address an issue with tests in Strawberry Perl

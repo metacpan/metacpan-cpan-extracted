@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO.pm
-## Version v0.4.1
+## Version v0.5.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2018/06/21
-## Modified 2022/12/30
+## Modified 2023/01/04
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -29,7 +29,7 @@ BEGIN
     use Scalar::Util;
     use Text::PO::Element;
     use constant HAS_LOCAL_TZ => ( eval( qq{DateTime::TimeZone->new( name => 'local' );} ) ? 1 : 0 );
-    our $VERSION = 'v0.4.1';
+    our $VERSION = 'v0.5.0';
 };
 
 use strict;
@@ -1204,6 +1204,9 @@ sub _set_get_meta_value
         our $TEXT_REGEXP  = qr/^[\u000b\u0020-\u007e\u0080-\u00ff]+$/;
     };
     
+    use strict;
+    use warnings;
+    
     sub init
     {
         my $self = shift( @_ );
@@ -1334,7 +1337,7 @@ Text::PO - Read and write PO files
 
 =head1 VERSION
 
-    v0.4.1
+    v0.5.0
 
 =head1 DESCRIPTION
 

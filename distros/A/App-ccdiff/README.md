@@ -11,7 +11,7 @@ usage: ccdiff [options] file1 [file2]
 # Description
 
 All command-line tools that show the difference between two files fall
-short in showing minor changes visuably useful. This tool tries to give
+short in showing minor changes visually usefully. This tool tries to give
 the look and feel of `diff --color` or `colordiff`, but extending the
 display of colored output from red for deleted lines and green for added
 lines to red for deleted characters and green for added characters within
@@ -42,9 +42,11 @@ $ cpan App::ccdiff
 
  * `diff --color`
 
- * `colordiff`
+ * [`colordiff`](https://www.colordiff.org/)
 
- * `klondiff`
+ * [`klondiff`](https://github.com/pierstitus/klondiff)
+
+ * [`diff-so-fancy`](https://github.com/so-fancy/diff-so-fancy)
 
  * `git`
 
@@ -131,7 +133,7 @@ $ git config --global diff.tool ccdiff
 $ git config --global difftool.prompt false
 $ git config --global difftool.ccdiff.cmd 'ccdiff --utf-8 -u -r $LOCAL $REMOTE'
 $ git difftool SHA~..SHA
-$ wget https://github.com/Tux/App-ccdiff/blob/master/Files/git-ccdiff \
+$ wget https://github.com/Tux/App-ccdiff/raw/master/Files/git-ccdiff \
     -O ~/bin/git-ccdiff
 $ perl -pi -e 's{/pro/bin/perl}{/usr/bin/env perl}' ~/bin/git-ccdiff
 $ chmod 755 ~/bin/git-ccdiff
@@ -148,10 +150,10 @@ There is no provision (yet) for coping with double-width characters.
 Large datasets may consume all available memory, causing the diff to fail.
 
 Not all that can be set from the configuration files can be overruled by
-comman-line options.
+command-line options.
 
 ## LICENSE
 
 The Artistic License 2.0
 
-Copyright (c) 2018-2022 H.Merijn Brand
+Copyright (c) 2018-2023 H.Merijn Brand

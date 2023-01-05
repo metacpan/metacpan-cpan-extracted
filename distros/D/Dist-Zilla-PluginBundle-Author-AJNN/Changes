@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-PluginBundle-Author-AJNN
 
+0.05  2023-01-04
+
+ - Fix PruneAliases test failure
+
 0.04  2023-01-01
 
  - Fix broken logic for -remove attribute

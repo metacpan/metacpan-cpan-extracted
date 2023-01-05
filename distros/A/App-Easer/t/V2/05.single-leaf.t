@@ -26,8 +26,8 @@ my $app = {
          getopt => 'commands!'
       },
    ],
-   execute => sub ($self) {
-      LocalTester::command_execute(@_);
+   execute => sub ($self, @rest) {
+      LocalTester::command_execute($self, @rest);
       if ($self->config('help')) {
          $self->auto_help->run('MAIN');
          return 0;

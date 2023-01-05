@@ -1,5 +1,15 @@
 Revision history for Perl extension RxPerl
 
+v6.13.1 2023-01-04T17:14:49Z
+
+    - Started the CreatingObservables Guide
+
+v6.13.0 2023-01-03T20:19:42Z
+
+    - BREAKING CHANGE: modified op_delay to work like rxjs 7's.
+      So don't do this: rx_EMPTY->pipe( op_delay($n) )
+      Instead, do this: rx_timer($n)->pipe( op_ignore_elements() )
+
 v6.12.0 2021-12-26T11:03:24Z
 
     - added op_ignore_elements

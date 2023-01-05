@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 167;
+use Test::Most tests => 171;
 use Test::NoWarnings;
 use File::Spec;
 use lib 't/lib';
@@ -24,6 +24,7 @@ PARAMS: {
 	ok($p{foo} eq 'bar');
 	ok(!defined($p{fred}));
 	ok($i->as_string() eq 'foo=bar');
+	cmp_ok($i->status(), '==', 200, 'Check HTTP status code');
 
 	$ENV{'QUERY_STRING'} = '=bar';
 
@@ -415,6 +416,13 @@ EOF
 	ok(!-e $filename);
 	ok(!-r $filename);
 	close $fin;
+
+	$ENV{'REQUEST_METHOD'} = 'DELETE';
+	$ENV{'QUERY_STRING'} = 'laleh=tulip';
+	$i = new_ok('CGI::Info');
+	eval { %p = $i->params() };
+	cmp_ok(scalar(keys(%p)), '==', 0, 'params: DELETE mode is not supported');
+	cmp_ok($i->status(), '==', 405, 'params: DELETE sets HTTP status to 405');
 
 	# Check params are read from command line arguments for testing scripts
 	delete $ENV{'GATEWAY_INTERFACE'};

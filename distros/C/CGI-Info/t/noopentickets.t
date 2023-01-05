@@ -2,9 +2,12 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 3;
+use Test::Most tests => 4;
+use constant SITE =>'https://api.github.com/repos/nigelhorne/CGI-Info/issues';
+use constant URL =>'api.github.com';
 
-NOBUGS: {
+RT: {
+	# RT system, deprecated
 	SKIP: {
 		if($ENV{AUTHOR_TESTING}) {
 			eval 'use WWW::RT::CPAN';	# FIXME: use a REST client
@@ -27,6 +30,58 @@ NOBUGS: {
 		} else {
 			diag('Author tests not required for installation');
 			skip('Author tests not required for installation', 3);
+		}
+	}
+}
+
+GITHUB: {
+	# https://docs.github.com/en/rest/reference/issues#list-repository-issues
+	SKIP: {
+		if($ENV{'AUTHOR_TESTING'}) {
+			eval 'use JSON';
+			if($@) {
+				diag('JSON required to check for open tickets');
+				skip('JSON required to check for open tickets', 1);
+			} else {
+				eval 'use IO::Socket::INET';
+				if($@) {
+					diag('IO::Socket::INET required to check for open tickets');
+					skip('IO::Socket::INET required to check for open tickets', 1);
+				} else {
+					my $s = IO::Socket::INET->new(
+						PeerAddr => SITE,
+						Timeout => 5
+					);
+					if($s) {
+						eval 'use LWP::Simple';
+
+						if($@) {
+							diag('LWP::Simple required to check for open tickets');
+							skip('LWP::Simple required to check for open tickets', 1);
+						} elsif(my $data = LWP::Simple::get(URL)) {
+							my $json = JSON->new()->utf8();
+							my @issues = @{$json->decode($data)};
+							# diag(Data::Dumper->new([\@issues])->Dump());
+							if($ENV{'TEST_VERBOSE'}) {
+								foreach my $issue(@issues) {
+									# diag($issues[0]->{'user'}->{'login'});
+									diag($issue->{'html_url'});
+								}
+							}
+							cmp_ok(scalar(@issues), '==', 0, 'There are no opentickets');
+						} else {
+							diag(URL, ': failed to get data');
+							fail('Failed to get data');
+						}
+					} else {
+						diag("Can't connect to ", SITE);
+						skip("Can't connect to " . SITE, 1);
+					}
+				}
+			}
+		} else {
+			diag('Author tests not required for installation');
+			skip('Author tests not required for installation', 1);
 		}
 	}
 }

@@ -1,5 +1,10 @@
 Revision history for Devel-TraceUse
 
+2.097 2023-01-04 BOOK
+    - Take into account extra frames introduced in @INC hook handling
+      by Perl 5.37.7 (YVES)
+    - Declare Perl 5.8 as the minimum version requirement
+
 2.096 2018-12-30 BOOK
     - Properly separate different attempts at loading the same module
     - Override CORE::GLOBAL::require to ensure the hook is always first

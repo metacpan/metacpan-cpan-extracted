@@ -9,7 +9,7 @@ use base qw(
 use List::Util 					qw( min );
 use Parallel::parallel_map;
 #-----------------------------------------------------------------------
-$AI::ParticleSwarmOptimization::Pmap::VERSION = '1.005';
+$AI::ParticleSwarmOptimization::Pmap::VERSION = '1.006';
 #=======================================================================
 sub _initParticles {
     my ($self) = @_;

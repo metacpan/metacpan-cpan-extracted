@@ -1,5 +1,11 @@
 Revision history for CGI-Info
 
+0.74	Wed Jan  4 22:16:12 EST 2023
+	Added python-requests/2.27.1 as a robot
+	Use latest Github Actions environment
+	Support Sec-CH-UA-Mobile
+	Calling new on an object now returns a clone rather than setting the defaults in the new object
+
 0.73	Fri Oct 29 07:32:37 EDT 2021
 	Attempt to fix https://www.cpantesters.org/cpan/report/6db47260-389e-11ec-bc66-57723b537541
 

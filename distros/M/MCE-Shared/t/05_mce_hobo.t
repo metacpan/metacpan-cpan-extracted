@@ -10,15 +10,17 @@ use Time::HiRes 'sleep';
 
 BEGIN {
    use_ok 'MCE::Hobo';
+   use_ok 'MCE::Channel';
 }
 
 {
    my ( $cnt, @list, %pids, %ret ); local $_;
-   my ( $come_then_i_pray ) = ( "さあ、私は祈る" . "Ǣ" );
+   my $chnl = MCE::Channel->new( impl => 'MutexFast' );
+   my $come_then_i_pray = "さあ、私は祈る" . "Ǣ";
 
    ok( 1, "spawning asynchronously" );
 
-   MCE::Hobo->create( sub { sleep 1; sleep 1; "$come_then_i_pray $_" } ) for 1..3;
+   MCE::Hobo->create( sub { $chnl->recv; "$come_then_i_pray $_" } ) for 1..3;
 
    %pids = map { $_ => undef } MCE::Hobo->list_pids;
    is ( scalar( keys %pids ), 3, 'check for unique pids' );
@@ -41,6 +43,7 @@ BEGIN {
       is ( $_->is_joinable, '', 'check is_joinable hobo'.$cnt );
    }
 
+   $chnl->send('') for 1..3;
    $cnt = 0;
 
    for ( @list ) {
@@ -106,7 +109,7 @@ BEGIN {
 
    my (@procs, @result); local $_;
 
-   push @procs, MCE::Hobo->create(\&task, $_) for ( 1..3 );
+   push @procs, MCE::Hobo->create(\&task, $_) for 1..3;
 
    MCE::Hobo->wait_all();
 

@@ -6,14 +6,14 @@ use Path::Tiny;
 
 plan 26;
 
-my $app = App::Licensecheck->new(
-	shortname_scheme => 'osi',
-	top_lines        => 0,
+my @opts = (
+	schemes   => [qw(osi)],
+	top_lines => 0,
 );
 
 path("t/OSI")->visit(
 	sub {
-		my ( $license, $copyright ) = $app->parse($_);
+		my ($license) = App::Licensecheck->new(@opts)->parse($_);
 		is( $license, $_->basename('.txt'),
 			"Corpus file $_"
 		);

@@ -11,6 +11,7 @@ my $build = Module::Build->new(
 
       'List::UtilsBy' => 0,
       'Module::Pluggable' => 0,
+      'Sub::Util' => '1.40',
    },
    test_requires => {
       'Test::More' => '0.88', # done_testing

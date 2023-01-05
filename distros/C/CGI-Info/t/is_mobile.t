@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 30;
+use Test::Most tests => 37;
 use Test::NoWarnings;
 
 BEGIN {
@@ -14,7 +14,8 @@ MOBILE: {
 	delete $ENV{'HTTP_USER_AGENT'};
 
 	my $i = new_ok('CGI::Info');
-	ok($i->is_mobile() == 0);
+	cmp_ok($i->is_mobile(), '==', 0, 'Default is !mobile');
+	cmp_ok($i->browser_type(), 'ne', 'mobile', 'Default is !mobile');
 
 	$ENV{'HTTP_X_WAP_PROFILE'} = 'http://www.blackberry.net/go/mobile/profiles/uaprof/9000_80211g/5.0.0.rdf';
 	$i = new_ok('CGI::Info');
@@ -22,6 +23,17 @@ MOBILE: {
 	ok($i->browser_type eq 'mobile');
 
         delete $ENV{'HTTP_X_WAP_PROFILE'};
+	$ENV{'HTTP_SEC_CH_UA_MOBILE'} = '?0';
+	$i = new_ok('CGI::Info');
+	cmp_ok($i->is_mobile(), '==', 0, 'CH_UA_MOBILE = 0 => !mobile');
+	cmp_ok($i->browser_type(), 'ne', 'mobile', 'CH_UA_MOBILE = 0 => !mobile');
+
+	$ENV{'HTTP_SEC_CH_UA_MOBILE'} = '?1';
+	$i = new_ok('CGI::Info');
+	cmp_ok($i->is_mobile(), '==', 1, 'CH_UA_MOBILE = 1 => mobile');
+	cmp_ok($i->browser_type(), 'eq', 'mobile', 'CH_UA_MOBILE = 1 => mobile');
+
+	delete $ENV{'HTTP_SEC_CH_UA_MOBILE'};
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (iPhone; U)';
 	$i = new_ok('CGI::Info');
 	ok($i->is_mobile() == 1);

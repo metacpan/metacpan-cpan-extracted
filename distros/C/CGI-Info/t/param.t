@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 30;
+use Test::Most tests => 31;
 use Test::NoWarnings;
 use lib 't/lib';
 use MyLogger;
@@ -17,9 +17,9 @@ PARAM: {
 	$ENV{'QUERY_STRING'} = 'foo=bar';
 
 	my $i = new_ok('CGI::Info');
-	ok($i->param('foo') eq 'bar');
-	ok(!defined($i->param('fred')));
-	ok($i->as_string() eq 'foo=bar');
+	cmp_ok($i->param('foo'), 'eq', 'bar', 'basic param() test');
+	is($i->param('fred'), undef, 'param() returns undef when needed');
+	cmp_ok($i->as_string(), 'eq', 'foo=bar', 'basic as_string test');
 
 	$ENV{'QUERY_STRING'} = '=bar';
 
@@ -47,7 +47,8 @@ PARAM: {
 	$i = new_ok('CGI::Info');
 	my %p = %{$i->param()};
 	ok(!defined($i->param('foo')));
-	ok($i->as_string() eq 'fred=wilma');
+	cmp_ok($i->as_string(), 'eq', 'fred=wilma', 'as_string works');
+	cmp_ok($p{'fred'}, 'eq', 'wilma', 'param() with no arguments returns correct HASH');
 
 	$ENV{'QUERY_STRING'} = 'foo=bar\u0026fred=wilma';
 	$i = new_ok('CGI::Info');

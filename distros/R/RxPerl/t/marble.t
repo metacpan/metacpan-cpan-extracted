@@ -254,7 +254,7 @@ subtest 'op_repeat' => sub {
 
 subtest 'rx_throw_error' => sub {
     my $o = rx_concat(
-        rx_EMPTY->pipe( op_delay(1) ),
+        rx_timer(1)->pipe( op_ignore_elements ),
         rx_throw_error,
     );
     obs_is $o, ['-#'];
@@ -349,7 +349,7 @@ subtest 'op_skip_until' => sub {
     $o = cold('-01234567')->pipe(
         op_skip_until(
             rx_concat(
-                rx_EMPTY->pipe( op_delay(4) ),
+                rx_timer(4)->pipe( op_ignore_elements ),
                 rx_throw_error(undef),
             )
         ),
@@ -397,6 +397,24 @@ subtest 'op_ignore_elements' => sub {
     $source = cold('0123#');
     $o = $source->pipe(op_ignore_elements());
     obs_is $o, ['----#'], 'emits error correctly';
+};
+
+subtest 'op_delay' => sub {
+    my $source = cold('0(12)3');
+    my $o = $source->pipe(op_delay(2));
+    obs_is $o, ['--0(12)3'], 'completes correctly';
+
+    $source = cold('0123#');
+    $o = $source->pipe(op_delay(2));
+    obs_is $o, ['--01#'], 'emits error correctly';
+
+    $source = cold('5-');
+    $o = $source->pipe(op_delay(2));
+    obs_is $o, ['--5'], 'completes correctly';
+
+    $source = cold('5----');
+    $o = $source->pipe(op_delay(2));
+    obs_is $o, ['--5--'], 'completes correctly';
 };
 
 done_testing();

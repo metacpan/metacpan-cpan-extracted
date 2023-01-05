@@ -1,5 +1,9 @@
 Revision history for Test2-Tools-Rustfmt
 
+0.05      2023-01-04 16:20:36 -0700
+  - Fix bug where tool could fail if more than one rustfmt
+    or cargo is in the PATH (gh#5, gh#6)
+
 0.03      2022-10-25 13:46:22 -0600
   - Fix bug where Makefile.PL would happily not exit 0
     when rustfmt and cargo are not available (gh#3, gh#4)

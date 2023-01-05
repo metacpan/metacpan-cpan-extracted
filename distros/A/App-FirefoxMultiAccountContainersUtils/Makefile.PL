@@ -36,6 +36,7 @@ my %WriteMakefileArgs = (
     "Firefox::Util::Profile" => "0.005",
     "JSON::MaybeXS" => 0,
     "Log::ger" => "0.038",
+    "Log::ger::Screen" => 0,
     "Perinci::CmdLine::Any" => "0.152",
     "Perinci::CmdLine::Lite" => "1.915",
     "Sah::Schema::firefox::local_profile_name" => 0,
@@ -51,7 +52,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.014",
+  "VERSION" => "0.015",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -74,6 +75,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "JSON::MaybeXS" => 0,
   "Log::ger" => "0.038",
+  "Log::ger::Screen" => 0,
   "Perinci::CmdLine::Any" => "0.152",
   "Perinci::CmdLine::Lite" => "1.915",
   "Sah::Schema::firefox::local_profile_name" => 0,

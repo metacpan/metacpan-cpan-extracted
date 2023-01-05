@@ -1,0 +1,82 @@
+{
+   "abstract" : "Perl binding for F<tree-sitter>",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Text-Treesitter",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004",
+            "Module::Build::Using::PkgConfig" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::CppGuess" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Slurper" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Treesitter" : {
+         "file" : "lib/Text/Treesitter.pm",
+         "version" : "0.02"
+      },
+      "Text::Treesitter::Language" : {
+         "file" : "lib/Text/Treesitter/Language.pm",
+         "version" : "0.02"
+      },
+      "Text::Treesitter::Node" : {
+         "file" : "lib/Text/Treesitter/Node.pm",
+         "version" : "0.02"
+      },
+      "Text::Treesitter::Parser" : {
+         "file" : "lib/Text/Treesitter/Parser.pm",
+         "version" : "0.02"
+      },
+      "Text::Treesitter::Query" : {
+         "file" : "lib/Text/Treesitter/Query.pm",
+         "version" : "0.02"
+      },
+      "Text::Treesitter::QueryCursor" : {
+         "file" : "lib/Text/Treesitter/QueryCursor.pm",
+         "version" : "0.02"
+      },
+      "Text::Treesitter::QueryMatch" : {
+         "file" : "lib/Text/Treesitter/QueryMatch.pm",
+         "version" : "0.02"
+      },
+      "Text::Treesitter::Tree" : {
+         "file" : "lib/Text/Treesitter/Tree.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

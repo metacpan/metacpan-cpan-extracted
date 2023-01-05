@@ -41,21 +41,21 @@
             "Array::IntSpan" : "0",
             "Encode" : "2.93",
             "Fcntl" : "0",
+            "Feature::Compat::Class" : "0.04",
+            "Feature::Compat::Try" : "0",
             "Getopt::Long" : "2.24",
             "IO::Interactive" : "0",
             "List::SomeUtils" : "0",
             "Log::Any" : "0",
             "Log::Any::Adapter::Screen" : "0",
-            "Object::Pad" : "0.27",
             "Path::Iterator::Rule" : "0",
             "Path::Tiny" : "0.062",
             "Pod::Constants" : "0",
-            "Pod::Usage" : "0",
+            "Pod::Usage" : "1.60",
             "Regexp::Pattern" : "v0.2.12",
             "Regexp::Pattern::License" : "v3.4.0",
             "String::Copyright" : "0.003",
             "String::Escape" : "0",
-            "Try::Tiny" : "0",
             "autodie" : "0",
             "experimental" : "0",
             "namespace::clean" : "0",
@@ -82,7 +82,7 @@
    "provides" : {
       "App::Licensecheck" : {
          "file" : "lib/App/Licensecheck.pm",
-         "version" : "v3.3.0"
+         "version" : "v3.3.1"
       }
    },
    "release_status" : "stable",
@@ -100,7 +100,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/App-Licensecheck/project"
    },
-   "version" : "v3.3.0",
+   "version" : "v3.3.1",
    "x_contributors" : [
       "Paul Wise <pabs@debian.org>"
    ],
@@ -113,5 +113,5 @@
          "file" : "bin/licensecheck"
       }
    },
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

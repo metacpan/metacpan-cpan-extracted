@@ -12,7 +12,8 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Module::CoreList' => '0'
+                                      'Module::CoreList' => '0',
+                                      'perl' => '5.008'
                                     }
                     },
        'test' => {
@@ -27,7 +28,7 @@ do { my $x = {
                                    'IPC::Open3' => '0',
                                    'Test::More' => '0',
                                    'lib' => '0',
-                                   'perl' => '5.006',
+                                   'perl' => '5.008',
                                    'strict' => '0',
                                    'warnings' => '0'
                                  }

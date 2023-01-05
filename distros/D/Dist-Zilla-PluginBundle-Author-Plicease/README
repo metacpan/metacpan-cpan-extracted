@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.73
+    version 2.74
 
 SYNOPSIS
 
@@ -162,11 +162,6 @@ OPTIONS
  github_user
 
     Set the GitHub user name.
-
- cirrus_user
-
-    Set the cirrus-ci user (defaults to same as github_user, which itself
-    defaults to plicease).
 
  copy_mb
 

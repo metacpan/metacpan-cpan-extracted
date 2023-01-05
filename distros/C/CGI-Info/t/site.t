@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 25;
+use Test::Most tests => 24;
 use Test::NoWarnings;
 use Sys::Hostname;
 use lib 't/lib';
@@ -35,8 +35,12 @@ HOSTNAMES: {
 
 	$ENV{'HTTP_HOST'} = 'www.example.com';
 	$i = $i->new();	# Test creating a new object from an existing object
-	ok($i->domain_name() eq 'example.com');
-	ok($i->host_name() eq 'www.example.com');
+	# Because it's a clone, the old host will be used
+	if($i->host_name() =~ /^www\.(.+)/) {
+		ok($i->domain_name() eq $1);
+	} else {
+		ok($i->domain_name() eq $hostname);
+	}
 
 	# Dots at the end should be ignored
 	$ENV{'HTTP_HOST'} = 'www.example.com.';

@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2023 -- leonerd@leonerd.org.uk
 
-package Convert::Color 0.13;
+package Convert::Color 0.14;
 
 use v5.14;
 use warnings;
@@ -11,6 +11,10 @@ use warnings;
 use Carp;
 
 use List::UtilsBy qw( min_by );
+use Sub::Util 1.40 qw( set_subname );
+
+# Maximum number of entries in a ->closest_to cache
+use constant MAX_CACHE_SIZE => 1000;
 
 use Module::Pluggable require => 0,
                       search_path => [ 'Convert::Color' ];
@@ -117,7 +121,9 @@ sub register_color_space
    $_class2space_cache{$class} = $space;
 
    no strict 'refs';
-   *{"as_$space"} = sub { shift->convert_to( $space ) };
+   *{"as_$space"} = set_subname "as_$space" => sub {
+      shift->convert_to( $space )
+   };
 }
 
 sub _space2class
@@ -441,27 +447,34 @@ sub register_palette
 
    no strict 'refs';
 
-   *{"${pkg}::closest_to"} = sub {
+   my %cache;
+   *{"${pkg}::closest_to"} = set_subname "${pkg}::closest_to" => sub {
       my $class = shift;
       my ( $orig, $space ) = @_;
 
       $space ||= "rgb";
 
+      # Prevent the cache getting -too- big
+      delete $cache{ each %cache } while keys %cache > MAX_CACHE_SIZE;
+
       $orig = $orig->convert_to( $space );
       my $dst = "dst_${space}_cheap";
 
-      return min_by { $orig->$dst( $_->convert_to( $space ) ) } $class->$enumerate;
+      my $key = join ",", $space, $orig->$space;
+
+      return $cache{$key} //=
+         min_by { $orig->$dst( $_->convert_to( $space ) ) } $class->$enumerate;
    };
 
    foreach my $space (qw( rgb hsv hsl )) {
-      *{"${pkg}::new_from_${space}"} = sub {
+      *{"${pkg}::new_from_${space}"} = set_subname "${pkg}::new_from_${space}" => sub {
          my $class = shift;
          my ( $rgb ) = @_;
          return $pkg->closest_to( $rgb, $space );
       };
    }
 
-   *{"${pkg}::new_rgb"} = sub {
+   *{"${pkg}::new_rgb"} = set_subname "${pkg}::new_rgb" => sub {
       my $class = shift;
       return $class->closest_to( Convert::Color::RGB->new( @_ ), "rgb" );
    };

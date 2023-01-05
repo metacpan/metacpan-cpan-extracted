@@ -19,19 +19,19 @@ name: Dist-Zilla-PluginBundle-Author-AJNN
 provides:
   Dist::Zilla::PluginBundle::Author::AJNN:
     file: lib/Dist/Zilla/PluginBundle/Author/AJNN.pm
-    version: '0.04'
+    version: '0.05'
   Dist::Zilla::PluginBundle::Author::AJNN::Readme:
     file: lib/Dist/Zilla/PluginBundle/Author/AJNN/Readme.pm
-    version: '0.04'
+    version: '0.05'
   Pod::Weaver::PluginBundle::Author::AJNN:
     file: lib/Pod/Weaver/PluginBundle/Author/AJNN.pm
-    version: '0.04'
+    version: '0.05'
   Pod::Weaver::PluginBundle::Author::AJNN::Author:
     file: lib/Pod/Weaver/PluginBundle/Author/AJNN/Author.pm
-    version: '0.04'
+    version: '0.05'
   Pod::Weaver::PluginBundle::Author::AJNN::License:
     file: lib/Pod/Weaver/PluginBundle/Author/AJNN/License.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Dist::Zilla: '0'
   Dist::Zilla::File::FromCode: '0'
@@ -61,7 +61,7 @@ requires:
 resources:
   bugtracker: https://github.com/johannessen/dzil-pluginbundle/issues
   repository: https://github.com/johannessen/dzil-pluginbundle.git
-version: '0.04'
+version: '0.05'
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: CC0-1.0

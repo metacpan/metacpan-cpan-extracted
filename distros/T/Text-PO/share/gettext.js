@@ -1,7 +1,7 @@
 /*
 * ----------------------------------------------------------------------------
 * PO Files Manipulation - Text-PO/share/gettext.js
-* Version v0.2.1
+* Version v0.2.2
 * Copyright(c) 2021-2022 DEGUEST Pte. Ltd.
 * Author: Jacques Deguest <jack@deguest.jp>
 * Created 2021/06/29
@@ -802,13 +802,13 @@
 
     /*
     NOTE: GettextString class inheriting from String
-    The purpose is to return an instance of GettextString class that automatically stringifies when necessary and that contains the string language property.
-    The string language property is set upon fetching the localised version, and is useful to know what language it actually is, especially when it failed to find any localised version.
+    The purpose is to return an instance of GettextString class that automatically stringifies when necessary and that contains the string locale (a.k.a. language) property.
+    The string locale property is set upon fetching the localised version, and is useful to know what locale (a.k.a. language) it actually is, especially when it failed to find any localised version.
     */
-    window.GettextString = function(str,lang)
+    window.GettextString = function(str,locale)
     {
         this._value = str;
-        this.lang = lang;
+        this.locale = locale;
     };
 
     Object.getOwnPropertyNames(String.prototype).forEach(function(key)
@@ -820,16 +820,17 @@
         };
     });
 
-    GettextString.prototype.setLang = function(lang)
+    GettextString.prototype.setLocale = function(locale)
     {
-        this.lang = lang;
+        this.locale = locale;
     };
 
-    GettextString.prototype.getLang = function()
+    GettextString.prototype.getLocale = function()
     {
-        return(this.lang);
+        return(this.locale);
     };
     
+    // NOTE: Gettext class
     window.Gettext = Generic.extend(
     {
         __class__: "Gettext",
@@ -2799,7 +2800,7 @@ Gettext - A GNU Gettext JavaScript implementation
 
 =head1 VERSION
 
-    v0.2.1
+    v0.2.2
 
 =head1 DESCRIPTION
 

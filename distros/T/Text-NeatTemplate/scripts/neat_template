@@ -1,0 +1,139 @@
+#! /usr/bin/env perl
+=head1 NAME
+
+neat_template - apply simple values to a simple template
+
+=head1 VERSION
+
+version 0.1600
+
+=head1 SYNOPSIS
+
+neat_template [ --help | --manpage | --list ]
+
+neat_template [ --verbose ] { --data I<name>=I<value> } I<filename>
+
+=head1 DESCRIPTION
+
+This applies values to a template file and outputs the result.
+
+=head1 OPTIONS
+
+=over
+
+=item --data I<name>=I<value>
+
+The data to apply to the template. This can be repeated multiple
+times with different names and values.
+
+=item --help
+
+Print help and exit.
+
+=item --manpage
+
+Print manual page and exit. Requires "perldoc" to be installed.
+
+=item --show I<name>=1
+
+Say whether these values should be shown or not.
+If this is not given, all data will be shown.
+
+=item --verbose
+
+Be verbose.  If this option is repeated, the output will be even more verbose.
+
+=back
+
+=cut
+use Getopt::Long 2.34;
+use Pod::Usage;
+use File::Basename;
+use YAML::Any;
+use Text::NeatTemplate;
+use File::Slurper 'read_text';
+
+#========================================================
+# Subroutines
+
+sub process_args () {
+    my $opts = {
+        manpage => 0,
+        verbose => 0,
+    };
+
+    my $ok = 1;
+
+    # check the rc file if we can
+    if (eval("require Getopt::ArgvFile")) {
+	my $nameBuilder=sub
+	{
+	    my $bn = basename($_[0], '');
+	    [".${bn}rc", ".${bn}/config", ".config/${bn}/config"];
+	};
+	Getopt::ArgvFile::argvFile(
+				   startupFilename=>$nameBuilder,
+				   home=>1,
+				   current=>1);
+    }
+
+    pod2usage(2) unless @ARGV;
+
+    my $op = new Getopt::Long::Parser;
+    $op->configure(qw(auto_version auto_help));
+    $op->getoptions($opts,
+	       'verbose+',
+	       'quiet',
+               'data=s%',
+               'show=s%',
+	       'manpage',
+	      ) or pod2usage(2);
+
+    if ($opts->{'manpage'})
+    {
+	pod2usage({ -message => "$0 version $VERSION",
+		    -exitval => 0,
+		    -verbose => 2,
+	    });
+    }
+    if ($opts->{quiet})
+    {
+	$opts->{verbose} = 0;
+    }
+
+    # complain if there are no arguments
+    pod2usage({ -message => "$0 version $VERSION\nNeeds arguments!",
+        -exitval => 2,
+        -verbose => 0,
+    }) unless @ARGV;
+
+    return $opts;
+} # process_args
+
+#========================================================
+# Main
+
+MAIN: {
+    my $opts = process_args();
+
+    if ($opts->{verbose} > 1)
+    {
+        print STDERR Dump($opts);
+    }
+    my $template_file = $ARGV[0];
+    if ( ! -r $template_file )
+    {
+        die "FILE NOT FOUND $template_file";
+    }
+    my $template = read_text($template_file);
+    if ($opts->{verbose} > 1)
+    {
+        print STDERR $template;
+    }
+
+    my $tpl = Text::NeatTemplate->new();
+    my $result = $tpl->fill_in(data_hash=>$opts->{data},
+        show_names=>$opts->{show},
+        template=>$template);
+    print $result;
+}

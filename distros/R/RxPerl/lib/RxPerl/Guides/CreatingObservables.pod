@@ -1,0 +1,50 @@
+=encoding utf8
+
+=head1 NAME
+
+RxPerl::Guides::CreatingObservables - A guide to creating your own observables
+
+=head1 CREATING YOUR OWN OBSERVABLES
+
+Check out these examples, and draw your own conclusions:
+
+    my $o = rx_observable->new(sub ($subscriber) {
+        $subscriber->next(10);
+        $subscriber->next(20);
+        $subscriber->next(30);
+        $subscriber->complete();
+
+        return; # required
+    });
+
+Whatever comes after the return keyword will be processed during unsubscription, and will also
+be processed during observable completion or when it throws an error.
+
+    my $o = rx_observable->new(sub ($subscriber) {
+        my $timer = Mojo::IOLoop->timer(5, sub {
+            my $temperature = get_temperature_from_sensor();
+            $subscriber->next($temperature);
+        };
+
+        return sub {
+            Mojo::IOLoop->remove($timer);
+        };
+    });
+
+You can also return an arrayref, a hashref, or a scalar ref, of subroutine refs or RxPerl subscriptions, in
+any nested configuration (e.g. arrayref of hashrefs of subroutines). Subroutine refs will be executed, subscriptions
+will be unsubscribed from.
+
+    my $o = rx_observable->new(sub ($subscriber) {
+        my $s1 = rx_interval(0.7)->subscribe(sub ($value) {
+            $subscriber->next($value);
+        });
+
+        my $s2 = rx_interval(1)->subscribe(sub ($value) {
+            $subscriber->next($value);
+        });
+
+        return [$s1, $s2]; # or even: return { s1 => $s1, s2 => [ \$s2 ] };
+    });
+
+=cut

@@ -1,6 +1,6 @@
 package CPAN::Meta::Check;
 # vi:noet:sts=2:sw=2:ts=2
-$CPAN::Meta::Check::VERSION = '0.016';
+$CPAN::Meta::Check::VERSION = '0.017';
 use strict;
 use warnings;
 
@@ -81,7 +81,7 @@ CPAN::Meta::Check - Verify requirements in a CPAN::Meta object
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 

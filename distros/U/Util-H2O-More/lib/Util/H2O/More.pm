@@ -4,7 +4,7 @@ use warnings;
 package Util::H2O::More;
 use parent q/Exporter/;
 
-our $VERSION = q{0.2.2};
+our $VERSION = q{0.2.3};
 
 our @EXPORT_OK = (qw/baptise opt2h2o h2o o2h d2o o2d o2h2o ini2o o2ini/);
 

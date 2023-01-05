@@ -1,0 +1,37 @@
+---
+abstract: 'utilities for scripting Power Pivot models within Excel workbooks'
+author:
+  - 'Laurent Dami <dami@cpan.org>'
+build_requires:
+  Cwd: '0'
+  DBI: '0'
+  Excel::ValueWriter::XLSX: '0'
+  LWP::UserAgent: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Excel-PowerPivot-Utils
+provides:
+  Excel::PowerPivot::Utils:
+    file: lib/Excel/PowerPivot/Utils.pm
+    version: '0.1'
+requires:
+  List::Util: '1.33'
+  Log::Dispatch: '0'
+  Moose: '0'
+  POSIX: '0'
+  Scalar::Does: '0'
+  Win32::OLE: '0'
+  perl: '5.020000'
+  utf8: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/damil/Excel-PowerPivot-Utils
+version: '0.1'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -26,11 +26,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.73
+Version 0.74
 
 =cut
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 
 =head1 SYNOPSIS
 
@@ -76,20 +76,26 @@ our $stdin_data;	# Class variable storing STDIN in case the class
 			# is instantiated more than once
 
 sub new {
-	my $proto = shift;
-	my $class = ref($proto) || $proto;
+	my $class = $_[0];
 
-	# Use CGI::Info->new(), not CGI::Info::new()
-	if(!defined($class)) {
-		carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-		return;
-	}
-
+	shift;
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	if($args{expect} && (ref($args{expect}) ne 'ARRAY')) {
-		warn 'expect must be a reference to an array';
+		warn __PACKAGE__, ': expect must be a reference to an array';
 		return;
+	}
+
+	if(!defined($class)) {
+		# Using CGI::Info->new(), not CGI::Info::new()
+		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
+
+		# FIXME: this only works when no arguments are given
+		$class = __PACKAGE__;
+	} elsif(ref($class)) {
+		# clone the given object
+		return bless { %{$class}, %args }, ref($class);
 	}
 
 	my %defaults = (
@@ -1012,6 +1018,13 @@ sub is_mobile {
 		return $self->{is_mobile};
 	}
 
+	# Support Sec-CH-UA-Mobile
+	if(my $ch_ua_mobile = $ENV{'HTTP_SEC_CH_UA_MOBILE'}) {
+		if($ch_ua_mobile eq '?1') {
+			$self->{is_mobile} = 1;
+			return 1;
+		}
+	}
 	if($ENV{'HTTP_X_WAP_PROFILE'}) {
 		# E.g. Blackberry
 		# TODO: Check the sanity of this variable
@@ -1322,7 +1335,7 @@ sub is_robot {
 		return 0;
 	}
 
-	if($agent =~ /.+bot|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner/i) {
+	if($agent =~ /.+bot|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|python-requests/i) {
 		$self->{is_robot} = 1;
 		return 1;
 	}
@@ -1781,7 +1794,7 @@ L<http://deps.cpantesters.org/?module=CGI::Info>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2021 Nigel Horne.
+Copyright 2010-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

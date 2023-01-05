@@ -1,5 +1,8 @@
 Revision history for perl distribution Getopt-App
 
+0.11 2023-01-04T08:53:13
+ - Fix returning correct exit value from subcommands
+
 0.10 2022-10-23T10:59:27
  - Add support for specifying code refs in subcommands
 

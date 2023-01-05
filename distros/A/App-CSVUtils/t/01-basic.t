@@ -527,4 +527,21 @@ subtest "csv_csv" => sub {
     ok 1;
 };
 
+subtest "csv_uniq" => sub {
+    require App::CSVUtils::csv_uniq;
+
+    my ($res, $stdout);
+
+    write_text("$dir/uniq.csv", "f1,f2,f3\n1,2,a\n4,5,b\n4,7,B\n");
+
+    $res = App::CSVUtils::csv_uniq::csv_uniq(input_filename=>"$dir/uniq.csv", fields=>["foo"]);
+    is($res->[0], 404, "unknown field -> error") or diag explain $res;
+
+    is((capture_stdout { $res = App::CSVUtils::csv_uniq::csv_uniq(input_filename=>"$dir/uniq.csv", fields=>["f2"]) }), "", "no duplicate values in field f2");
+    is((capture_stdout { $res = App::CSVUtils::csv_uniq::csv_uniq(input_filename=>"$dir/uniq.csv", fields=>["f1"]) }), "csv-uniq: Duplicate value '4'\n", "duplicate values in field f1 reported");
+    is((capture_stdout { $res = App::CSVUtils::csv_uniq::csv_uniq(input_filename=>"$dir/uniq.csv", fields=>["f1","f3"]) }), "", "no duplicate values in fields f1+f3");
+    is((capture_stdout { $res = App::CSVUtils::csv_uniq::csv_uniq(input_filename=>"$dir/uniq.csv", fields=>["f1","f3"], ignore_case=>1) }), "csv-uniq: Duplicate value '4|b'\n", "Duplicate values (ignore_case) in fields f1+f3");
+    is((capture_stdout { $res = App::CSVUtils::csv_uniq::csv_uniq(input_filename=>"$dir/uniq.csv", fields=>["f2"], unique=>1) }), "csv-uniq: Unique value '2'\ncsv-uniq: Unique value '5'\ncsv-uniq: Unique value '7'\n", "unique values reported");
+};
+
 done_testing;

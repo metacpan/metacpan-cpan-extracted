@@ -3,7 +3,7 @@ use warnings;
 
 package Dist::Zilla::PluginBundle::Author::AJNN::Readme;
 # ABSTRACT: Build a README file for AJNN's distributions
-$Dist::Zilla::PluginBundle::Author::AJNN::Readme::VERSION = '0.04';
+$Dist::Zilla::PluginBundle::Author::AJNN::Readme::VERSION = '0.05';
 
 use Dist::Zilla;
 use Dist::Zilla::File::FromCode;
@@ -186,7 +186,7 @@ Dist::Zilla::PluginBundle::Author::AJNN::Readme - Build a README file for AJNN's
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 

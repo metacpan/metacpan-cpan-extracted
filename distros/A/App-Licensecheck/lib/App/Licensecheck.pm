@@ -1,4 +1,4 @@
-use Object::Pad 0.27;
+use Feature::Compat::Class 0.04;
 
 use v5.12;
 use utf8;
@@ -10,17 +10,28 @@ App::Licensecheck - functions for a simple license checker for source files
 
 =head1 VERSION
 
-Version v3.3.0
+Version v3.3.1
 
 =head1 SYNOPSIS
 
+    use Path::Tiny;
     use App::Licensecheck;
 
-    my $app = App::Licensecheck->new;
+    my $tempfile = Path::Tiny->tempfile;
 
-    my $app2 = App::Licensecheck->new( top_lines => 0 );  # Parse whole files
+    $tempfile->spew(<<EOF);
+# Dummy file simply stating some copyright and license.
+# Copyright (C) 2020, 2022  Foo Bar.
+#
+# This file is licensed under version 2 or later of the GPL.
+EOF
 
-    printf "License: %s\nCopyright: %s\n", $app->parse( 'some-file' );
+    my $app = App::Licensecheck->new( top_lines => 0 );  # Parse whole files
+
+    my @output = $app->parse($tempfile);
+
+    my $license    = $output[0];  # => is "GNU General Public License v2.0 or later"
+    my $copyrights = $output[1];  # => is "2020, 2022 Foo Bar."
 
 =head1 DESCRIPTION
 
@@ -30,13 +41,13 @@ See the script for casual usage.
 
 =cut
 
-package App::Licensecheck v3.3.0;
+package App::Licensecheck v3.3.1;
 
-use Log::Any ();
+use Carp            qw(croak);
+use Log::Any        ();
 use List::SomeUtils qw(nsort_by uniq);
-use Path::Iterator::Rule;
 use Path::Tiny();
-use Try::Tiny;
+use Feature::Compat::Try;
 use Fcntl qw(:seek);
 use Encode 2.93;
 use Array::IntSpan;
@@ -52,20 +63,14 @@ use String::Copyright 0.003 {
 	'copyright' => { -as => 'copyright_optimistic' };
 
 class Trait {
-	has $log = Log::Any->get_logger;
-	has $name :reader;
-	has $begin :reader;
-	has $end :reader;
-	has $file :reader;
+	field $log;
+	field $name :param;
+	field $begin :param;
+	field $end :param;
+	field $file :param;
 
-	BUILD {
-		my %opts = @_;
-
-		# TODO: use Object::Pad 0.41 and slot attribute :param
-		$name  = $opts{name};
-		$begin = $opts{begin};
-		$end   = $opts{end};
-		$file  = $opts{file};
+	ADJUST {
+		$log = Log::Any->get_logger;
 
 		$log->tracef(
 			'located trait: %s: %d-%d "%s"',
@@ -78,113 +83,107 @@ class Trait {
 			: ''
 		);
 	}
+
+	method name { return $name }
+	method begin { return $begin }
+	method end { return $end }
+	method file { return $file }
 }
 
 class Exception {
-	has $log = Log::Any->get_logger;
-	has $id :reader;
-	has $begin :reader;
-	has $end :reader;
-	has $file :reader;
+	field $log;
+	field $id :param;
+	field $begin :param;
+	field $end :param;
+	field $file :param;
 
-	BUILD {
-		my %opts = @_;
-
-		# TODO: use Object::Pad 0.41 and slot attribute :param
-		$id    = $opts{id};
-		$begin = $opts{begin};
-		$end   = $opts{end};
-		$file  = $opts{file};
+	ADJUST {
+		$log = Log::Any->get_logger;
 
 		$log->tracef(
 			'detected exception: %s: %d-%d',
 			$id->{caption}, $begin, $end
 		);
 	}
+
+	method id { return $id }
+	method begin { return $begin }
+	method end { return $end }
+	method file { return $file }
 }
 
 class Flaw {
-	has $log = Log::Any->get_logger;
-	has $id :reader;
-	has $begin :reader;
-	has $end :reader;
-	has $file :reader;
+	field $log;
+	field $id :param;
+	field $begin :param;
+	field $end :param;
+	field $file :param;
 
-	BUILD {
-		my %opts = @_;
-
-		# TODO: use Object::Pad 0.41 and slot attribute :param
-		$id    = $opts{id};
-		$begin = $opts{begin};
-		$end   = $opts{end};
-		$file  = $opts{file};
+	ADJUST {
+		$log = Log::Any->get_logger;
 
 		$log->tracef(
 			'detected flaw: %s: %d-%d',
 			$id->{caption}, $begin, $end
 		);
 	}
+
+	method id { return $id }
+	method begin { return $begin }
+	method end { return $end }
+	method file { return $file }
 }
 
 class Licensing {
-	has $log = Log::Any->get_logger;
-	has $name :reader;
+	field $log;
+	field $name :param;
 
-	BUILD {
-		my %opts = @_;
-
-		# TODO: use Object::Pad 0.41 and slot attribute :param
-		$name = $opts{name};
+	ADJUST {
+		$log = Log::Any->get_logger;
 
 		$log->debugf(
 			'collected some licensing: %s',
 			$name
 		);
 	}
+
+	method name { return $name }
 }
 
 class Fulltext {
-	has $log = Log::Any->get_logger;
-	has $name :reader;
-	has $begin :reader;
-	has $end :reader;
-	has $file :reader;
-	has $traits :reader;
+	field $log;
+	field $name :param;
+	field $begin :param;
+	field $end :param;
+	field $file :param;
+	field $traits :param = undef;
 
-	BUILD {
-		my %opts = @_;
-
-		# TODO: use Object::Pad 0.41 and slot attribute :param
-		$name   = $opts{name};
-		$begin  = $opts{begin};
-		$end    = $opts{end};
-		$file   = $opts{file};
-		$traits = $opts{traits} // [];
+	ADJUST {
+		$log = Log::Any->get_logger;
 
 		$log->debugf(
 			'collected fulltext: %s: %d-%d',
 			$name, $begin, $end
 		);
 	}
+
+	method name { return $name }
+	method begin { return $begin }
+	method end { return $end }
+	method file { return $file }
+	method traits { return $traits }
 }
 
 class Grant {
-	has $log = Log::Any->get_logger;
-	has $name :reader;
-	has $begin :reader;
-	has $end :reader;
-	has $file :reader;
-	has $traits :reader;
+	field $log;
+	field $name :param;
+	field $begin :param;
+	field $end :param;
+	field $file :param;
+	field $traits :param = undef;
 
-	BUILD {
-		my %opts = @_;
-
-		# TODO: use Object::Pad 0.41 and slot attribute :param
-		$name   = $opts{name};
-		$begin  = $opts{begin};
-		$end    = $opts{end};
-		$file   = $opts{file};
-		$traits = $opts{traits} // [];
+	ADJUST {
+		$log = Log::Any->get_logger;
 
 		$log->debugf(
 			'collected grant: %s: %d-%d "%s"',
@@ -197,6 +196,12 @@ class Grant {
 			: ''
 		);
 	}
+
+	method name { return $name }
+	method begin { return $begin }
+	method end { return $end }
+	method file { return $file }
+	method traits { return $file }
 }
 
 use namespace::clean qw(-except new);
@@ -211,151 +216,61 @@ my @OPT_RE2 = $@ ? () : ( engine => 'RE2' );
 use warnings FATAL => 'utf8';
 $PerlIO::encoding::fallback = Encode::FB_CROAK;
 
-my $default_check_regex = q!
-	/[\w-]+$ # executable scripts or README like file
-	|\.( # search for file suffix
-		c(c|pp|xx)? # c and c++
-		|h(h|pp|xx)? # header files for c and c++
-		|S
-		|css|less # HTML css and similar
-		|f(77|90)?
-		|go
-		|groovy
-		|lisp
-		|scala
-		|clj
-		|p(l|m)?6?|t|xs|pod6? # perl5 or perl6
-		|sh
-		|php
-		|py(|x)
-		|rb
-		|java
-		|js
-		|vala
-		|el
-		|sc(i|e)
-		|cs
-		|pas
-		|inc
-		|dtd|xsl
-		|mod
-		|m
-		|md|markdown
-		|tex
-		|mli?
-		|(c|l)?hs
-	)$
-!;
+no warnings "experimental::try";
 
-# From dpkg-source
-my $default_ignore_regex = q!
-	# Ignore general backup files
-	~$|
-	# Ignore emacs recovery files
-	(?:^|/)\.#|
-	# Ignore vi swap files
-	(?:^|/)\..*\.swp$|
-	# Ignore baz-style junk files or directories
-	(?:^|/),,.*(?:$|/.*$)|
-	# File-names that should be ignored (never directories)
-	(?:^|/)(?:DEADJOE|\.cvsignore|\.arch-inventory|\.bzrignore|\.gitignore)$|
-	# File or directory names that should be ignored
-	(?:^|/)(?:CVS|RCS|\.pc|\.deps|\{arch\}|\.arch-ids|\.svn|\.hg|_darcs|\.git|
-	\.shelf|_MTN|\.bzr(?:\.backup|tags)?)(?:$|/.*$)
-!;
+field $log;
 
-has $log = Log::Any->get_logger;
-
-has $path;
+field $path;
 
 # resolve patterns
 
-has $shortname_scheme :reader;
+field $schemes :param = undef;
 
-# select
-
-has $check_regex;
-has $ignore_regex;
-has $recursive;
+field @shortname_schemes;
 
 # parse
 
-has $top_lines;
-has $end_bytes;
-has $encoding;
-has $fh;
-has $content;
-has $tail_content;
-has $offset;
-has $license;
-has $copyrights;
+field $top_lines :param //= 60;
+field $end_bytes :param //= 5000;    # roughly 60 lines of 80 chars
+field $encoding :param = undef;
+field $fh;
+field $content :param = undef;
+field $tail_content;
+field $offset;
+field $license;
+field $copyrights;
 
-# report
+ADJUST {
+	$log = Log::Any->get_logger;
 
-has $skipped;
-has $deb_machine;
-
-BUILD {
-	my %opts = @_;
-
-	# TODO: use Object::Pad 0.41 and slot attribute :param
-	$recursive   = $opts{recursive};
-	$top_lines   = $opts{top_lines} // 60;
-	$end_bytes   = $opts{end_bytes} // 5000;    # roughly 60 lines of 80 chars
-	$encoding    = $opts{encoding};
-	$skipped     = $opts{skipped};
-	$deb_machine = $opts{deb_machine};
-
-	$shortname_scheme = $opts{shortname_scheme};
-	if ($shortname_scheme) {
-		if ( not ref($shortname_scheme) eq 'ARRAY' ) {
-			$shortname_scheme = [ split /[\s,]+/, $shortname_scheme ];
-		}
-	}
-	elsif ($deb_machine) {
-		$shortname_scheme = [qw(debian spdx)];
+	if ($schemes) {
+		croak $log->fatal('parameter "schemes" must be an array reference')
+			unless ref($schemes) eq 'ARRAY';
+		@shortname_schemes = @$schemes;
 	}
 	else {
-		$shortname_scheme = [];
+		$schemes = [];
 	}
 
-	$check_regex = $opts{check_regex};
-	if ( !$check_regex or $check_regex eq 'common source files' ) {
-		$check_regex = qr/$default_check_regex/x;
-	}
-	elsif ( not ref($check_regex) eq 'Regexp' ) {
-		$check_regex = qr/$check_regex/;
-	}
-
-	$ignore_regex = $opts{ignore_regex};
-	if ( !$ignore_regex or $ignore_regex eq 'some backup and VCS files' ) {
-		$ignore_regex = qr/$default_ignore_regex/x;
-	}
-	elsif ( not ref($ignore_regex) eq 'Regexp' ) {
-		$ignore_regex = qr/$ignore_regex/;
-	}
-
-	$encoding = $opts{encoding};
 	if ( $encoding and not ref($encoding) eq 'OBJECT' ) {
 		$encoding = find_encoding($encoding);
 	}
 }
 
-# TODO: drop when R::P::License v3.8.1 is required
-my $hack_3_8_1 = $Regexp::Pattern::License::VERSION < v3.8.1;
-
 method list_licenses
 {
 	my %names;
+
+	KEY:
 	for my $key ( keys %Regexp::Pattern::License::RE ) {
-		for ( keys %{ $Regexp::Pattern::License::RE{$key} } ) {
+		for my $key2 ( keys %{ $Regexp::Pattern::License::RE{$key} } ) {
 			my %attr;
-			my @attr = split /[.]/;
+			my @attr = split /[.]/, $key2;
 
 			next unless $attr[0] eq 'name';
 
-			# TODO: simplify when R::P::License v3.8.1 is required
-			if ($hack_3_8_1) {
+			# TODO: simplify, and require R::P::License v3.8.1
+			if ( $Regexp::Pattern::License::VERSION < v3.8.1 ) {
 				push @attr, undef
 					if @attr % 2;
 				%attr = @attr[ 2 .. $#attr ];
@@ -366,17 +281,18 @@ method list_licenses
 				%attr = @attr[ 2 .. $#attr ];
 				next if exists $attr{until};
 			}
-			for my $org (@$shortname_scheme) {
-				if ( exists $attr{$org} ) {
-					$names{$key} //= $attr{$org};
+			for my $org (@shortname_schemes) {
+				if ( exists $attr{org} and $attr{org} eq $org ) {
+					$names{$key} = $Regexp::Pattern::License::RE{$key}{$key2};
 					next KEY;
 				}
 			}
 		}
-		$names{$key} //= $Regexp::Pattern::License::RE{$key}{name} || $key;
+		$names{$key} = $Regexp::Pattern::License::RE{$key}{name} // $key;
 	}
+	my @result = sort { lc $a cmp lc $b } values %names;
 
-	print "$_\n" for sort { lc $a cmp lc $b } values %names;
+	return @result;
 }
 
 sub list_naming_schemes
@@ -384,42 +300,12 @@ sub list_naming_schemes
 	my $_prop = '(?:[a-z][a-z0-9_]*)';
 	my $_any  = '[a-z0-9_.()]';
 
-	print "$_\n"
-		for uniq sort map {/^(?:name|caption)\.alt\.org\.($_prop)$_any*/}
-		map               { keys %{ $Regexp::Pattern::License::RE{$_} } }
-		grep              {/^[a-z]/} keys %Regexp::Pattern::License::RE;
-}
+	my @result = uniq sort
+		map  {/^(?:name|caption)\.alt\.org\.($_prop)$_any*/}
+		map  { keys %{ $Regexp::Pattern::License::RE{$_} } }
+		grep {/^[a-z]/} keys %Regexp::Pattern::License::RE;
 
-method find
-{
-	my @paths = @_;
-
-	my $do      = Path::Iterator::Rule->new;
-	my %options = (
-		follow_symlinks => 0,
-	);
-
-	$do->max_depth(1)
-		unless $recursive;
-	$do->not( sub {/$ignore_regex/} );
-	$do->file->nonempty;
-
-	if ( @paths >> 1 ) {
-		if ( $log->is_debug or $skipped && $log->is_warn ) {
-			my $dont = $do->clone->not( sub {/$check_regex/} );
-			foreach ( $dont->all( @paths, \%options ) ) {
-				if ($skipped) {
-					$log->warnf( 'skipped file %s', $_ );
-				}
-				else {
-					$log->debugf( 'skipped file %s', $_ );
-				}
-			}
-		}
-		$do->and( sub {/$check_regex/} );
-	}
-
-	return $do->all( @paths, \%options );
+	return @result;
 }
 
 method parse
@@ -431,34 +317,34 @@ method parse
 	try {
 		return $self->parse_file;
 	}
-	catch {
-		if ( $encoding and /does not map to Unicode/ ) {
+	catch ($e) {
+		if ( $encoding and $e =~ /does not map to Unicode/ ) {
 			$log->warnf(
 				'failed decoding file %s as %s, will try iso-8859-1',
 				$path, $encoding->name
 			);
-			$log->debugf( 'decoding error: %s', $_ );
+			$log->debugf( 'decoding error: %s', $e );
 			try {
 				$encoding = find_encoding('iso-8859-1');
 				return $self->parse_file;
 			}
-			catch {
+			catch ($e) {
 				if (/does not map to Unicode/) {
 					$log->warnf(
 						'failed decoding file %s as iso-8859-1, will try raw',
 						$path
 					);
-					$log->debugf( 'decoding error: %s', $_ );
+					$log->debugf( 'decoding error: %s', $e );
 					$encoding = undef;
 					return $self->parse_file;
 				}
 				else {
-					die $log->fatalf( 'unknown error: %s', $_ );
+					die $log->fatalf( 'unknown error: %s', $e );
 				}
 			}
 		}
 		else {
-			die $log->fatalf( 'unknown error: %s', $_ );
+			die $log->fatalf( 'unknown error: %s', $e );
 		}
 	}
 }
@@ -689,7 +575,7 @@ method best_value
 
 	PROPERTY:
 	for my $prop (@props) {
-		for my $org (@$shortname_scheme) {
+		for my $org (@shortname_schemes) {
 			for ( keys %$hashref ) {
 				/$re_prop_attrs/;
 				next unless $+{prop} and $+{prop} eq $prop;
@@ -840,7 +726,7 @@ method init_licensepatterns
 				$L{usage}{$key} = $2;
 			}
 
-			# TODO: simplify when Regexp::Pattern::License v3.9.0 is required
+			# TODO: simplify, and require Regexp::Pattern::License v3.9.0
 			if ( $3 and $1 eq 'trait' ) {
 				if ( substr( $key, 0, 14 ) eq 'except_prefix_' ) {
 					$L{TRAITS_exception_prefix}{$key} = undef;
@@ -1300,8 +1186,8 @@ method parse_license
 				file  => $self,
 			);
 			$log->tracef(
-				'detected custom pattern multi#1: %s %s %s: %s [%s]',
-				'lgpl', $1, $2, $-[0], $path
+				'detected custom pattern multi#1: %s %s %s: %s',
+				'lgpl', $1, $2, $-[0]
 			);
 			push @multilicenses, 'lgpl', $1, $2;
 		}
@@ -1313,8 +1199,8 @@ method parse_license
 		$log->trace('scan for GPL dual-license grant');
 		if ( $licensetext =~ $L{multi_2} ) {
 			$log->tracef(
-				'detected custom pattern multi#2: %s %s %s: %s [%s]',
-				'gpl', $1, $2, $-[0], $path
+				'detected custom pattern multi#2: %s %s %s: %s',
+				'gpl', $1, $2, $-[0]
 			);
 			push @multilicenses, 'gpl', $1, $2;
 		}
@@ -1551,15 +1437,12 @@ method parse_license
 
 			# skip singleversion and unversioned equivalents
 			if ( $L{usage}{$id} ) {
-				$log->tracef(
-					'flagged license object: %s [%s]',
-					$id, $path
-				);
+				$log->tracef( 'flagged license object: %s', $id );
 				$match{ $L{usage}{$id} }{custom} = 1;
 				if ( $L{series}{ $L{usage}{$id} } ) {
 					$log->tracef(
-						'flagged license object: %s [%s]',
-						$L{usage}{$id}, $path
+						'flagged license object: %s',
+						$L{usage}{$id}
 					);
 					$match{ $L{series}{ $L{usage}{$id} } }{custom} = 1;
 				}
@@ -1608,10 +1491,7 @@ method parse_license
 
 			# skip unversioned equivalent
 			if ( $L{series}{$id} ) {
-				$log->tracef(
-					'flagged license object: %s [%s]',
-					$id, $path
-				);
+				$log->tracef( 'flagged license object: %s', $id );
 				$match{ $L{series}{$id} }{custom} = 1;
 			}
 		}
@@ -1739,11 +1619,8 @@ method parse_license
 			sort map { $self->best_value( $_->id, qw(caption name) ) } @flaws
 		) . ']';
 	}
-	$log->infof(
-		'resolved license expression: %s [%s]', $expr,
-		$path
-	);
-	return ( @$shortname_scheme ? $expr : $license ) || 'UNKNOWN';
+	$log->infof( 'resolved license expression: %s', $expr );
+	return ( @$schemes ? $expr : $license ) || 'UNKNOWN';
 }
 
 =encoding UTF-8
@@ -1761,9 +1638,9 @@ originally introduced by Stefan Westerfeld C<< <stefan@space.twc.de> >>.
 
   Copyright © 2012 Francesco Poli
 
-  Copyright © 2016-2021 Jonas Smedegaard
+  Copyright © 2016-2022 Jonas Smedegaard
 
-  Copyright © 2017-2021 Purism SPC
+  Copyright © 2017-2022 Purism SPC
 
 This program is free software:
 you can redistribute it and/or modify it

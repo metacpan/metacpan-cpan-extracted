@@ -1,5 +1,8 @@
 Revision history for JSCalendar-Duration
 
+0.004     2023-01-03 11:27:32-05:00 America/New_York
+        - updated repo metadata
+
 0.003     2022-12-27 16:47:45-05:00 America/New_York
         - add support for PnW for weekly durations
 

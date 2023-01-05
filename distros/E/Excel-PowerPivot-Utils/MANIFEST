@@ -1,0 +1,9 @@
+Build.PL
+Changes
+lib/Excel/PowerPivot/Utils.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+t/01_load.t
+t/02_chinook.t

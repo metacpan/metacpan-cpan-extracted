@@ -2,26 +2,24 @@ package Types::Sah::Firefox;
 
 use strict;
 use warnings;
-use Type::Library -base;
 
-use Data::Sah;
+# to let scan_prereqs know
 use Sah::Schema::firefox::profile_name;
 use Sah::Schema::firefox::local_profile_name;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-28'; # DATE
-our $DIST = 'Types-Sah-Firefox'; # DIST
-our $VERSION = '0.002'; # VERSION
+use Type::FromSah qw(sah2type);
+use Type::Library -base;
 
-my $sah = Data::Sah->new;
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-10-05'; # DATE
+our $DIST = 'Types-Sah-Firefox'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 __PACKAGE__->add_type(
-    name => 'FirefoxProfileName',
-    constraint => $sah->gen_validator("firefox::profile_name*"),
+    sah2type("firefox::profile_name*", name => 'FirefoxProfileName'),
 );
 __PACKAGE__->add_type(
-    name => 'FirefoxLocalProfileName',
-    constraint => $sah->gen_validator("firefox::local_profile_name*"),
+    sah2type("firefox::local_profile_name*", name => 'FirefoxLocalProfileName'),
 );
 
 1;
@@ -39,7 +37,7 @@ Types::Sah::Firefox - Type constraints related to Firefox
 
 =head1 VERSION
 
-This document describes version 0.002 of Types::Sah::Firefox (from Perl distribution Types-Sah-Firefox), released on 2022-09-28.
+This document describes version 0.003 of Types::Sah::Firefox (from Perl distribution Types-Sah-Firefox), released on 2022-10-05.
 
 =head1 SYNOPSIS
 

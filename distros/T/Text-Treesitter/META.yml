@@ -1,0 +1,49 @@
+---
+abstract: 'Perl binding for F<tree-sitter>'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  File::Slurper: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
+  Module::Build::Using::PkgConfig: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Treesitter
+provides:
+  Text::Treesitter:
+    file: lib/Text/Treesitter.pm
+    version: '0.02'
+  Text::Treesitter::Language:
+    file: lib/Text/Treesitter/Language.pm
+    version: '0.02'
+  Text::Treesitter::Node:
+    file: lib/Text/Treesitter/Node.pm
+    version: '0.02'
+  Text::Treesitter::Parser:
+    file: lib/Text/Treesitter/Parser.pm
+    version: '0.02'
+  Text::Treesitter::Query:
+    file: lib/Text/Treesitter/Query.pm
+    version: '0.02'
+  Text::Treesitter::QueryCursor:
+    file: lib/Text/Treesitter/QueryCursor.pm
+    version: '0.02'
+  Text::Treesitter::QueryMatch:
+    file: lib/Text/Treesitter/QueryMatch.pm
+    version: '0.02'
+  Text::Treesitter::Tree:
+    file: lib/Text/Treesitter/Tree.pm
+    version: '0.02'
+requires:
+  ExtUtils::CppGuess: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

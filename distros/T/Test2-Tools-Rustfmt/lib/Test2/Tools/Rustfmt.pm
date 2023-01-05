@@ -2,7 +2,7 @@ use warnings;
 use 5.020;
 use experimental qw( postderef signatures );
 
-package Test2::Tools::Rustfmt 0.03 {
+package Test2::Tools::Rustfmt 0.05 {
 
   # ABSTRACT: Test that bundled Rust code is formatted according to Rust style guidelines
 
@@ -22,7 +22,8 @@ package Test2::Tools::Rustfmt 0.03 {
 
     $name //= "rustfmt @$files";
 
-    my @command = (which('rustfmt'), '--check', $files->@*);
+    my $exe = which 'rustfmt';
+    my @command = ($exe, '--check', $files->@*);
     my($out, $exit) = capture_merged {
       system @command;
     };
@@ -47,7 +48,8 @@ package Test2::Tools::Rustfmt 0.03 {
 
     $name //= "cargo fmt for $dir";
 
-    my @command = (which('cargo'), 'fmt', '--check');
+    my $exe = which 'cargo';
+    my @command = ($exe, 'fmt', '--check');
     my($out, $exit) = capture_merged {
       local $CWD = $dir;
       system @command;
@@ -80,7 +82,7 @@ Test2::Tools::Rustfmt - Test that bundled Rust code is formatted according to Ru
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 SYNOPSIS
 

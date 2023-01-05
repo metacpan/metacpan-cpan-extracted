@@ -1,0 +1,47 @@
+NAME
+
+    Text::Treesitter - Perl binding for tree-sitter
+
+SYNOPSIS
+
+       TODO
+
+DESCRIPTION
+
+    This module provides several classes and utilities that wrap the
+    tree-sitter parser library.
+
+    This particular package does not (currently) provide any
+    functionallity; to actually use the parser you will need to use some of
+    the specific modules:
+
+      * Text::Treesitter::Language - represents a tree-sitter language
+      grammar
+
+      * Text::Treesitter::Node - an element of a tree-sitter parse result
+
+      * Text::Treesitter::Parser - parse some input text according to a
+      tree-sitter grammar
+
+      * Text::Treesitter::Query - represents a set of tree-sitter query
+      patterns
+
+      * Text::Treesitter::QueryCursor - stores the result of a tree-sitter
+      node query
+
+      * Text::Treesitter::QueryMatch - stores the result of a tree-sitter
+      query pattern match
+
+      * Text::Treesitter::Tree - holds the result of a tree-sitter parse
+      operation
+
+TODO
+
+    The following C library functions are currently unhandled:
+
+       the entire TSTreeCursor API
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

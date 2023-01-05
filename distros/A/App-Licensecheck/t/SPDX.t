@@ -6,9 +6,9 @@ use Path::Tiny;
 
 plan 88;
 
-my $app = App::Licensecheck->new(
-	shortname_scheme => 'spdx',
-	top_lines        => 0,
+my @opts = (
+	schemes   => [qw(spdx)],
+	top_lines => 0,
 );
 
 # TODO: Report SPDX bug: Missing versioning
@@ -20,8 +20,9 @@ my %Debian2SPDX = (
 
 path("t/SPDX")->visit(
 	sub {
-		my ( $license, $copyright ) = $app->parse($_);
-		is( $Debian2SPDX{$license} || $license, $_->basename('.txt'),
+		my ($license) = App::Licensecheck->new(@opts)->parse($_);
+		is( $Debian2SPDX{$license} || $license,
+			$_->basename('.txt'),
 			"Corpus file $_"
 		);
 	}

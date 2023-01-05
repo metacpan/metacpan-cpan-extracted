@@ -23,6 +23,7 @@ my $builder = Module::Build->new(
       'Test::More'                => 0,
       'LWP::UserAgent'            => 0,
       'DBI'                       => 0,
+      'DBD::SQLite'               => 0,
     },
 
     add_to_cleanup      => [ 'Excel-ValueWriter-XLSX-*' ],

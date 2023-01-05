@@ -1,0 +1,61 @@
+{
+   "abstract" : "utilities for scripting Power Pivot models within Excel workbooks",
+   "author" : [
+      "Laurent Dami <dami@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Excel-PowerPivot-Utils",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Util" : "1.33",
+            "Log::Dispatch" : "0",
+            "Moose" : "0",
+            "POSIX" : "0",
+            "Scalar::Does" : "0",
+            "Win32::OLE" : "0",
+            "perl" : "5.020000",
+            "utf8" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Cwd" : "0",
+            "DBI" : "0",
+            "Excel::ValueWriter::XLSX" : "0",
+            "LWP::UserAgent" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Excel::PowerPivot::Utils" : {
+         "file" : "lib/Excel/PowerPivot/Utils.pm",
+         "version" : "0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/damil/Excel-PowerPivot-Utils"
+      }
+   },
+   "version" : "0.1",
+   "x_serialization_backend" : "JSON::PP version 4.05"
+}

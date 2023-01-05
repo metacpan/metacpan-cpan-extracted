@@ -58,7 +58,7 @@
    "provides" : {
       "CPAN::Meta::Check" : {
          "file" : "lib/CPAN/Meta/Check.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       }
    },
    "release_status" : "stable",
@@ -73,7 +73,7 @@
          "web" : "https://github.com/Leont/cpan-meta-check"
       }
    },
-   "version" : "0.016",
+   "version" : "0.017",
    "x_contributors" : [
       "David Steinbrunner <dsteinbrunner@pobox.com>",
       "Graham Knop <haarg@haarg.org>",

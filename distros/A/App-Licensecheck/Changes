@@ -7,6 +7,38 @@ Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.3.1	2023-01-03
+
+ [ Bug Fixes ]
+ - resolve naming schemes when listing licenses
+
+ [ Documentation ]
+ - extend copyright to include present year
+ - improve synopsis
+
+ [ Test Suite ]
+ - add author tests to check SYNOPSIS
+ - simplify and generalize tests slightly
+ - tell Perl::Critic that Object::Pad implicitly enables strict and
+   warnings
+
+ [ Packaging ]
+ - tighten dependency on Pod::Usage to silence spurious 'used only once:
+   possible typo' warning notably with perls older than 5.18
+ - unset executable bit on module file in source
+
+ [ Other ]
+ - have module methods return lists, and print to STDOUT in main script
+ - modernize class instantiations to use field and :param and ADJUST (not
+   has and BUILD)
+ - parse shortname schemes in main script, slightly simplifying modules
+ - refactor to iterate files in main script
+ - rename parameter shortname_scheme -> schemes, and validate
+ - stop include path in log messages within method parse_license
+ - use Feature::Compat::Class (not Object::Pad)
+ - use Feature::Compat::Try (not Try::Tiny)
+ - use Object::Pad 0.74
+
 v3.3.0	2022-01-08
 
  [ Bug Fixes ]

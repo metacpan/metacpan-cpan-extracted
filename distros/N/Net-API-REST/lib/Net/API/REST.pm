@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST.pm
-## Version v0.7.1
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.8.0
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/09/01
-## Modified 2023/01/01
+## Modified 2023/01/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -53,7 +53,7 @@ BEGIN
     use Net::API::REST::Request;
     use Net::API::REST::Response;
     use Net::API::REST::Status;
-    $VERSION = 'v0.7.1';
+    $VERSION = 'v0.8.0';
 };
 
 use strict;
@@ -690,7 +690,7 @@ EOT
     $self->noexec->messagef( 3, $tmpl, $ep->handler, $ep->access, join( ', ', @{$ep->methods} ), join( ', ', @{$ep->path_info} ), $self->dumper( $ep->variables->as_hash ) );
 
     my $req_methods = [CORE::split( /\,[[:blank:]]*/, $req->headers( 'Access-Control-Request-Method' ) )];
-    $self->message( 3, "Requested methods are: '", join( "', '", @$req_methods ), "'." );
+    $self->message( 3, "OPTIONS requested methods are: '", join( "', '", @$req_methods ), "'." );
     foreach my $m ( @$req_methods )
     {
         if( !$ep->is_method_allowed( $m ) )
@@ -706,8 +706,8 @@ EOT
         return( Apache2::Const::HTTP_NO_CONTENT );
     }
     my $allow_origin = $req->headers( 'Access-Control-Allow-Origin' );
-    ## "The string "*" cannot be used for a resource that supports credentials"
-    ## https://www.w3.org/TR/cors/#http-access-control-allow-origin
+    # "The string "*" cannot be used for a resource that supports credentials"
+    # https://www.w3.org/TR/cors/#http-access-control-allow-origin
     if( $allow_origin )
     {
         $self->message( 3, "Checking for requested origin '$origin' and allowed origin '$allow_origin'." );
@@ -732,7 +732,7 @@ EOT
             }
             else
             {
-                ## Stringify
+                # Stringify
                 $res->headers( 'Access-Control-Allow-Origin' => $self->api_uri . '' );
             }
             $res->headers(
@@ -764,7 +764,7 @@ EOT
     {
         $res->headers( 'Access-Control-Allow-Credentials' => 'true' );
     }
-    ## Check from the most restrictive allowed methods in the context of the endpoint to the broader one for generally all supported methods
+    # Check from the most restrictive allowed methods in the context of the endpoint to the broader one for generally all supported methods
     my $ok_methods = scalar( @{$ep->methods} ) ? $ep->methods : $self->supported_methods;
     $res->headers( 'Access-Control-Allow-Methods' => join( ', ', @$ok_methods ) );
     
@@ -986,8 +986,8 @@ sub jwt_encoding { return( shift->_set_get_scalar( 'jwt_encoding', @_ ) ); }
 
 sub jwt_encrypt { return( shift->_set_get_scalar( 'jwt_encrypt', @_ ) ); }
 
-## We extract the jwt data, and do not verify it, which is very unsecure of course
-## Best to use jwt_verify()
+# We extract the jwt data, and do not verify it, which is very unsecure of course
+# Best to use jwt_verify()
 sub jwt_extract
 {
     my $self = shift( @_ );
@@ -1033,9 +1033,9 @@ sub jwt_verify
     $token ||= $opts->{token} || return( $self->error( "No json web token was provided to extract its data." ) );
     $self->message( 3, "Extracting token '$token'." );
     my $hash = $self->jwt_extract( $token ) || return( undef() );
-    ## Something like this:
-    ## Downloaded from https://accounts.google.com/.well-known/openid-configuration
-    ## and then from https://www.googleapis.com/oauth2/v3/certs
+    # Something like this:
+    # Downloaded from https://accounts.google.com/.well-known/openid-configuration
+    # and then from https://www.googleapis.com/oauth2/v3/certs
     # {
     #   "keys": [
     #     {
@@ -1063,7 +1063,7 @@ sub jwt_verify
         my $keys = $opts->{rsa_keys};
         return( $self->error( "No \"keys\" property found in the rsa keys provided." ) ) if( !$keys->{keys} );
         return( $self->error( "Property \"keys\" in rsa eys provided is not an array reference (of rsa keys)." ) ) if( !$self->_is_array( $keys->{keys} ) );
-        ## Check all is in order before going further
+        # Check all is in order before going further
         my( $e, $n );
         $n = 0;
         foreach my $ref ( @{$keys->{keys}} )
@@ -1074,17 +1074,17 @@ sub jwt_verify
                 return( $self->error( "No property \"$p\" could be found in this rsa key No $n. Hash is: ", sub{ $self->dump( $ref ) } ) ) if( !$ref->{ $p } );
             }
         }
-        ## Make sure our header has alg set to rsa and there is a kid property, or else Crypt::JWT will die
-        ## So at least, we can catch this issue and return an error gracefully...
-        ## {"alg":"RS256","kid":"0b0bf186743471a1edcac3060d1256f9e4050ba8","typ":"JWT"}
+        # Make sure our header has alg set to rsa and there is a kid property, or else Crypt::JWT will die
+        # So at least, we can catch this issue and return an error gracefully...
+        # {"alg":"RS256","kid":"0b0bf186743471a1edcac3060d1256f9e4050ba8","typ":"JWT"}
         my $header = $hash->{header} || return( $self->error( "Unable to get the header from the jwt token '$token'." ) );
         return( $self->error( "JWT token header returned by jwt_extract is empty! Original token is: '$token'" ) ) if( !scalar( keys( %$header ) ) );
         return( $self->error( "JWT token header found has no \"alg\" property set. Original token is: '$token'" ) ) if( !$header->{alg} );
         return( $self->error( "JWT token header found has no \"kid\" property set. Original token is: '$token'" ) ) if( !$header->{kid} );
-        ## https://metacpan.org/pod/Crypt::JWT#key
+        # https://metacpan.org/pod/Crypt::JWT#key
         return( $self->error( "JWT validation was requested using rsa keys, but could not find the property \"alg\" set to \"RS256\"." ) ) if( $header->{alg} !~ /^(RS|PS|ES)\d{3}$/i );
         my $kid = $header->{kid};
-        ## Check if kid value is in the rsa keys provided.
+        # Check if kid value is in the rsa keys provided.
         foreach my $ref ( @{$keys->{keys}} )
         {
             if( $ref->{kid} eq $kid )
@@ -1096,12 +1096,12 @@ sub jwt_verify
         }
         $self->message( 3, "Found 'e' to be '$e' and n to be '$n'." );
         return( $self->error( "Unable to find a matching key for the one found in the token header ($kid) against the rsa keys provided." ) ) if( !CORE::length( $e ) || !CORE::length( $n ) );
-        ## Ok, we are very reasonably safe to call Crypt::JWT now
+        # Ok, we are very reasonably safe to call Crypt::JWT now
         my $data;
         try
         {
-            ## $data = Crypt::JWT::decode_jwt( token => $token );
-            ## $data = Crypt::JWT::decode_jwt(
+            # $data = Crypt::JWT::decode_jwt( token => $token );
+            # $data = Crypt::JWT::decode_jwt(
             $self->message( 3, "Calling Net::API::REST::JWT::decode_jwt" );
             $data = Net::API::REST::JWT::decode_jwt(
                 token           => $token,
@@ -1283,10 +1283,17 @@ sub reply
     # Maybe error is a string, or maybe it is already an error hash like { error => { message => '', code => '' } }
     elsif( CORE::exists( $ref->{error} ) && !Net::API::REST::Status->is_success( $code ) )
     {
-        $msg = $ref->{error};
-        $ref->{error} = {} if( ref( $ref->{error} ) ne 'HASH' );
+        if( ref( $ref->{error} ) eq 'HASH' )
+        {
+            $msg = $ref->{error}->{message};
+        }
+        else
+        {
+            $msg = $ref->{error};
+            $ref->{error} = {};
+        }
         $ref->{error}->{code} = $code if( !CORE::length( $ref->{error}->{code} ) );
-        $ref->{error}->{message} = $msg if( !CORE::length( $ref->{error}->{message} ) && !ref( $msg ) );
+        $ref->{error}->{message} = "$msg" if( !CORE::length( $ref->{error}->{message} ) && ( !ref( $msg ) || overload::Method( $msg => "''" ) ) );
         CORE::delete( $ref->{message} ) if( CORE::length( $ref->{message} ) );
         CORE::delete( $ref->{code} ) if( CORE::length( $ref->{code} ) );
     }
@@ -1313,7 +1320,7 @@ sub reply
         $ref->{error}->{code} = $code if( !CORE::length( $ref->{error}->{code} ) );
         CORE::delete( $ref->{code} ) if( CORE::length( $ref->{code} ) );
     }
-    
+
     my $frameOffset = 0;
     my $sub = ( caller( $frameOffset + 1 ) )[3];
     $frameOffset++ if( substr( $sub, rindex( $sub, '::' ) + 2 ) eq 'reply' );
@@ -1352,7 +1359,12 @@ sub reply
         $ref->{error}->{code} = $code if( ref( $ref->{error} ) eq 'HASH' && !CORE::length( $ref->{error}->{code} ) );
         my $lang = $self->lang_unix;
         $self->message( 3, "Is a language set already? '$lang'" );
-        unless( length( $lang ) )
+        if( !length( "$lang" ) && $ref->{locale} )
+        {
+            $lang = $ref->{locale};
+        }
+        
+        unless( length( "$lang" ) )
         {
             $lang = $self->request->preferred_language( Net::API::REST::Status->supported_languages );
             $self->message( 3, "No language set, guessing a suitable one: '$lang'." );
@@ -1381,10 +1393,39 @@ sub reply
             $self->message( 3, "No error description found for http code '$code'." );
             $ref->{error}->{error_description} = $self->gettext( $self->response->get_http_message( $code ) );
         }
+
+        if( !exists( $ref->{error}->{locale} ) &&
+            defined( $msg ) && 
+            $self->_is_a( $msg => 'Text::PO::String' ) && 
+            defined( my $locale = $msg->locale ) )
+        {
+            $ref->{error}->{locale} = $locale if( length( "$locale" ) );
+        }
+        elsif( !exists( $ref->{error}->{locale} ) &&
+               defined( $lang ) &&
+               length( "$lang" ) )
+        {
+            $ref->{error}->{locale} = $lang;
+        }
     }
     else
     {
         $ref->{code} = $code if( !CORE::length( $ref->{code} ) );
+        if( !exists( $ref->{locale} ) &&
+            defined( $msg ) && 
+            $self->_is_a( $msg => 'Text::PO::String' ) && 
+            defined( my $locale = $msg->locale ) )
+        {
+            $ref->{locale} = $locale if( length( "$locale" ) );
+        }
+    }
+    
+    my $cleanup;
+    if( CORE::exists( $ref->{cleanup} ) &&
+        defined( $ref->{cleanup} ) &&
+        ref( $ref->{cleanup} ) eq 'CODE' )
+    {
+        $cleanup = CORE::delete( $ref->{cleanup} );
     }
     
     my $json = $self->json->utf8->relaxed(0)->encode( $ref );
@@ -1403,13 +1444,25 @@ sub reply
 #   $self->message( 3, "Returning code '$code'." );
 #   return( $code );
     
-    
     # Before we use this, we have to make sure all Apache module that deal with content encoding are de-activated because they would interfere
     $self->print( $json ) || do
     {
         $self->message( 3, "Net::API::REST::print had an error." );
         return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
     };
+    if( defined( $cleanup ) )
+    {
+        try
+        {
+            $self->message( 3, "Net::API::REST::reply calling cleanup." );
+            $cleanup->( $self->request );
+        }
+        catch( $e )
+        {
+            $self->message( 3, "Net::API::REST::reply: Error executing cleanup code: $e" );
+            warn( "Error executing cleanup code: $e\n" );
+        }
+    }
     $self->message( 3, "Returning code '$code'." );
     return( $code );
 }
@@ -1455,6 +1508,7 @@ sub route
     # my $vars = $req->variables;
     my $vars = {};
     my $def_methods = $self->default_methods;
+    my $http_meth = lc( $req->method // '' );
     # Until proven otherwise; If it is set at a certain point of the path, and nowhere after, then the path below inherit its value set before like a toll gate
     my $access = 'public';
     my $check;
@@ -1499,37 +1553,22 @@ sub route
                 {
                     return( $self->error({ code => 500, message => "Found an entry for path part \"$part\", which is a hash reference, but could not find a key \"_handler\", \"_delete\", \"_get\", \"_head\", \"_post\", or \"_put\" inside it." }) );
                 }
-                my( $handler, $method );
-                if( exists( $ref->{_delete} ) )
+                my $methods = {};
+                foreach my $h ( qw( _delete _get _head _post _put ) )
                 {
-                    $handler = $ref->{_delete};
-                    $method = 'delete';
+                    if( exists( $ref->{ $h } ) )
+                    {
+                        $methods->{ uc( substr( $h, 1 ) ) } = $ref->{ $h };
+                    }
                 }
-                elsif( exists( $ref->{_get} ) )
-                {
-                    $handler = $ref->{_get};
-                    $method = 'get';
-                }
-                elsif( exists( $ref->{_head} ) )
-                {
-                    $handler = $ref->{_head};
-                    $method = 'head';
-                }
-                elsif( exists( $ref->{_post} ) )
-                {
-                    $handler = $ref->{_post};
-                    $method = 'post';
-                }
-                elsif( exists( $ref->{_put} ) )
-                {
-                    $handler = $ref->{_put};
-                    $method = 'put';
-                }
-                else
-                {
-                    $handler = $ref->{_handler};
-                }
-                return( $self->error({ code => 500, message => "Found a route for the path part \"$part\", but the handler found is not a code reference." }) ) if( ref( $handler ) ne 'CODE' );
+
+                my $supported_methods = [sort( keys( %$methods ) )];
+                # If this is just a pre-flight check, at this stage the handler does not matter
+                my $handler = $http_meth eq 'options'
+                    ? sub{}
+                    : exists( $methods->{ uc( $http_meth ) } ) ? $methods->{ uc( $http_meth ) } : $ref->{_handler};
+                
+                return( $self->error({ code => 500, message => "Found a route for the path part \"${part}\" and HTTP method ${http_meth}, but the handler found is not a code reference." }) ) if( ref( $handler ) ne 'CODE' );
                 # We reached the end, return the handler
                 # return( $ref->{_handler} ) if( $pos == $#$parts );
                 # return( $check->( $pos + 1, $ref ) );
@@ -1539,7 +1578,7 @@ sub route
                     $self->message( 3, "Pattern #2: found a hash defined endpoint for '$part'." );
                     my $ep = Net::API::REST::Endpoint->new(
                         handler => $handler,
-                        methods => ( defined( $method ) ? [uc($method)] : $ref->{_allowed_methods} ? $ref->{_allowed_methods} : $def_methods ),
+                        methods => ( scalar( @$supported_methods ) ? $supported_methods : $ref->{_allowed_methods} ? $ref->{_allowed_methods} : $def_methods ),
                         variables => $vars,
                         access => $access,
                         path => $uri,
@@ -1628,36 +1667,21 @@ sub route
             {
                 return( $self->error({ code => 500, message => "Found a variable with name \"$ref->{_name}\" and was expecting a key _handler to be present in the definition hash reference, but could not find one." }) );
             }
-            my( $handler, $method );
-            if( exists( $ref->{_delete} ) )
+            
+            my $methods = {};
+            foreach my $h ( qw( _delete _get _head _post _put ) )
             {
-                $handler = $ref->{_delete};
-                $method = 'delete';
+                if( exists( $ref->{ $h } ) )
+                {
+                    $methods->{ uc( substr( $h, 1 ) ) } = $ref->{ $h };
+                }
             }
-            elsif( exists( $ref->{_get} ) )
-            {
-                $handler = $ref->{_get};
-                $method = 'get';
-            }
-            elsif( exists( $ref->{_head} ) )
-            {
-                $handler = $ref->{_head};
-                $method = 'head';
-            }
-            elsif( exists( $ref->{_post} ) )
-            {
-                $handler = $ref->{_post};
-                $method = 'post';
-            }
-            elsif( exists( $ref->{_put} ) )
-            {
-                $handler = $ref->{_put};
-                $method = 'put';
-            }
-            else
-            {
-                $handler = $ref->{_handler};
-            }
+
+            my $supported_methods = [sort( keys( %$methods ) )];
+            # If this is just a pre-flight check, at this stage the handler does not matter
+            my $handler = $http_meth eq 'options'
+                ? sub{}
+                : exists( $methods->{ uc( $http_meth ) } ) ? $methods->{ uc( $http_meth ) } : $ref->{_handler};
             
             my $var_name = $ref->{_name};
             # For variable type to be array
@@ -1698,7 +1722,7 @@ sub route
                     # return( $ref->{_handler} );
                     my $ep = Net::API::REST::Endpoint->new(
                         handler => $handler,
-                        methods => ( defined( $method ) ? [uc($method)] : $ref->{_allowed_methods} ? $ref->{_allowed_methods} : $def_methods ),
+                        methods => ( scalar( @$supported_methods ) ? $supported_methods : $ref->{_allowed_methods} ? $ref->{_allowed_methods} : $def_methods ),
                         variables => $vars,
                         access => $access,
                         path => $uri,
@@ -1748,7 +1772,7 @@ sub route
                                 $self->message( 3, "Pattern #5: Executing code with method '$meth' object '$o'." );
                                 $code->( $o, api => $self, @_ );
                             },
-                            methods => ( $ref->{_allowed_methods} ? $ref->{_allowed_methods} : $def_methods ),
+                            methods => ( scalar( @$supported_methods ) ? $supported_methods : $ref->{_allowed_methods} ? $ref->{_allowed_methods} : $def_methods ),
                             variables => $vars,
                             access => $access,
                             path => $uri,
@@ -1762,7 +1786,7 @@ sub route
                 }
                 else
                 {
-                    return( $self->error({ code => 500, message => "Found a scalar \"$ref->{_handler}\" to handle variable \"$var_name\", but I do not know what to do with it. If this was supposed to be a package, the syntax needs to be My::Package->my_sub" }) );
+                    return( $self->error({ code => 500, message => "Found a scalar \"${handler}\" to handle variable \"$var_name\", but I do not know what to do with it. If this was supposed to be a package, the syntax needs to be My::Package->my_sub" }) );
                 }
             }
             return( $check->( $pos + 1, $ref ) );
@@ -1849,7 +1873,7 @@ sub routes
                         }
                         # require $cl unless( defined( *{"${cl}::"} ) );
                         my $rc = $self->_load_class( $cl );
-                        return( $self->error({ code => 500, message => "Unable to load class \"$cl\": ", $self->error }) ) if( !defined( $rc ) );
+                        return( $self->error({ code => 500, message => "Unable to load class \"$cl\": " . $self->error }) ) if( !defined( $rc ) );
                         # 2021-09-06: We do not need to instantiate an object to check if the module 'can' a method, and also this would trigger code which could lead to undesired results, because the instantiated object does not know if this is an actual query and at this stage could be missing authentication tokens to work properly. Yes, I am talking out of experience here :)
                         #my $o = $cl->new(
                         #    apache_request => $self->apache_request,
@@ -2213,7 +2237,7 @@ Net::API::REST - Framework for RESTful APIs
 
 =head1 VERSION
 
-    v0.7.1
+    v0.8.0
 
 =head1 DESCRIPTION
 
@@ -2227,11 +2251,11 @@ This initiates the package and take the following parameters:
 
 =over 4
 
-=item I<request>
+=item * C<request>
 
 This is a required parameter to be sent with a value set to a L<Apache2::RequestRec> object
 
-=item I<debug>
+=item * C<debug>
 
 Optional. If set with a positive integer, this will activate verbose debugging message
 
@@ -2535,49 +2559,49 @@ It returns the encrypted token as a string or C<undef> if an error occurred whic
 
 =over 4
 
-=item I<algo>
+=item * C<algo>
 
 This will set the I<alg> property in the token.
 
-=item I<audience>
+=item * C<audience>
 
 This will set the I<aud> property in the token payload.
 
-=item I<encoding>
+=item * C<encoding>
 
 This will set the I<enc> property in the token payload.
 
-=item I<encrypt>
+=item * C<encrypt>
 
 If true, this will encrypt the token. When provided this will affect the I<algo>.
 
 For example, when not encrypted, by default the algorithm used is C<HS256>, but when encryption is activated, the algorithm becomes C<PBES2-HS256+A128KW>
 
-=item I<expires>
+=item * C<expires>
 
 This will set the I<exp> property in the token payload.
 
-=item I<issued_at>
+=item * C<issued_at>
 
 This will set the I<iat> property in the token payload.
 
-=item I<issuer>
+=item * C<issuer>
 
 This will set the I<iss> property in the token payload.
 
-=item I<key>
+=item * C<key>
 
 This will set the I<key> property in the token payload.
 
-=item I<payload>
+=item * C<payload>
 
 The hash data to become the token payload. It can contains discretionary elements.
 
-=item I<subject>
+=item * C<subject>
 
 This will set the I<sub> property in the token payload.
 
-=item I<ttl>
+=item * C<ttl>
 
 If provided, this will set the I<exp> property to I<iat> + I<ttl>
 
@@ -2737,7 +2761,7 @@ L<Apache2::Request>, L<Apache2::RequestRec>, L<Apache2::RequestUtil>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2021 DEGUEST Pte. Ltd.
+Copyright (c) 2018-2023 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

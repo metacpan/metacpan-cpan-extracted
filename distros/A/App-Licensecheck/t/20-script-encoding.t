@@ -49,7 +49,7 @@ utf8::upgrade($japanese_ujis_raw);
 
 subtest 'Latin-1 in UTF-8 parsed as UTF-8 returns chars' => sub {
 	run_ok @CMD, qw(--encoding utf8 t/encoding/copr-utf8.h);
-	is stdout,   $basic;
+	is stdout, $basic;
 	like stderr, qr/ as utf8\nheader end matches file size\ncollected/;
 };
 subtest 'Latin-1 in UTF-8 parsed by default returns mojibake' => sub {
@@ -68,12 +68,12 @@ subtest 'Latin-1 in UTF-8 parsed by guessing returns chars' => sub {
 };
 subtest 'Latin-1 in UTF-8 parsed as ISO 8859-1 returns mojibake' => sub {
 	run_ok @CMD, qw(--encoding iso-8859-1 t/encoding/copr-utf8.h);
-	is stdout,   $basic_utf8_as_latin1;
+	is stdout, $basic_utf8_as_latin1;
 	like stderr, qr/ as iso-8859-1\nheader end matches file size\ncollected/;
 };
 subtest 'Latin-1 in ISO 8859-1 parsed as ISO 8859-1 returns chars' => sub {
 	run_ok @CMD, qw(--encoding iso-8859-1 t/encoding/copr-iso8859.h);
-	is stdout,   $extended;
+	is stdout, $extended;
 	like stderr, qr/ as iso-8859-1\nheader end matches file size\ncollected/;
 };
 subtest 'Latin-1 in ISO 8859-1 parsed by default returns chars' => sub {
@@ -93,12 +93,12 @@ subtest 'Latin-1 in ISO 8859-1 parsed by guessing returns chars' => sub {
 subtest 'Latin-1 in ISO 8859-1 parsed as UTF-8 returns mojibake and warns' =>
 	sub {
 	run_ok @CMD, qw(--encoding utf8 t/encoding/copr-iso8859.h);
-	is stdout,   $extended;
+	is stdout, $extended;
 	like stderr, qr/ as utf8\nfailed decoding/;
 	};
 subtest 'CJK in EUC-JP parsed as EUC-JP returns chars' => sub {
 	run_ok @CMD, qw(--encoding euc-jp t/encoding/README.gs550j);
-	is stdout,   $japanese;
+	is stdout, $japanese;
 	like stderr, qr/ as euc-jp\nheader end matches file size\nresolved/;
 };
 subtest 'CJK in EUC-JP parsed by default returns mojibake and warns' => sub {
@@ -117,12 +117,12 @@ subtest 'CJK in EUC-JP parsed by guessing returns mojibake' => sub {
 };
 subtest 'CJK in EUC-JP parsed as ISO 8859-1 returns mojibake' => sub {
 	run_ok @CMD, qw(--encoding iso-8859-1 t/encoding/README.gs550j);
-	is stdout,   $japanese_ujis_as_latin1;
+	is stdout, $japanese_ujis_as_latin1;
 	like stderr, qr/ as iso-8859-1\nheader end matches file size\nresolved/;
 };
 subtest 'CJK in EUC-JP parsed as UTF-8 returns mojibake and warns' => sub {
 	run_ok @CMD, qw(--encoding utf8 t/encoding/README.gs550j);
-	is stdout,   $japanese_ujis_raw;
+	is stdout, $japanese_ujis_raw;
 	like stderr, qr/ as utf8\nfailed decoding/;
 
 #path('/tmp/_foo_')->spew(stdout);

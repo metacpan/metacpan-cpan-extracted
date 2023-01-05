@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO/Gettext.pm
-## Version v0.2.1
+## Version v0.3.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/07/12
-## Modified 2022/07/08
+## Modified 2023/01/04
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -35,7 +35,7 @@ BEGIN
             (?:\.(?<locale_encoding>[\w-]+))?
         )
     $/x;
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -112,7 +112,7 @@ sub dngettext
     if( !exists( $hash->{ $opts->{locale} } ) )
     {
         warnings::warn( "No locale \"$opts->{locale}\" found for the domain \"${domain}\".\n" ) if( warnings::enabled() );
-        return( $default );
+        return( Text::PO::String->new( $default ) );
     }
     my $l10n = $hash->{ $opts->{locale} };
     my $dict = $l10n->{ $msgid };
@@ -138,7 +138,10 @@ sub dngettext
             {
                 $index = 0;
             }
-            return( join( '', @{$dict->{msgstr}->[ $index ]} ) || $default );
+            # return( join( '', @{$dict->{msgstr}->[ $index ]} ) || $default );
+            my $locale_str = join( '', @{$dict->{msgstr}->[ $index ]} );
+            return( Text::PO::String->new( $locale_str => $opts->{locale} ) ) if( length( "$locale_str" ) );
+            return( Text::PO::String->new( $default ) );
         }
         return( $dict->{msgstr} || $default );
     }
@@ -663,6 +666,47 @@ sub _get_po
     return( $hash->{_po} );
 }
 
+# NOTE: Text::PO::String class
+{
+    package
+        Text::PO::String;
+    BEGIN
+    {
+        use strict;
+        use warnings;
+        use parent qw( Module::Generic );
+        use vars qw( $VERSION );
+        our $VERSION = 'v0.1.0';
+        use overload (
+            '""'    => 'as_string',
+            'bool'  => sub{1},
+            fallback => 1,
+        );
+    };
+    
+    use strict;
+    use warnings;
+    
+    sub init
+    {
+        my $self = shift( @_ );
+        my $value = shift( @_ );
+        my $locale = shift( @_ );
+        $self->{locale} = $locale;
+        $self->{value}  = $value;
+        $self->SUPER::init( @_ );
+        return( $self );
+    }
+    
+    sub as_string { return( shift->value->scalar ); }
+    
+    sub locale { return( shift->_set_get_scalar_as_object( 'locale', @_ ) ); }
+
+    sub value { return( shift->_set_get_scalar_as_object( 'value', @_ ) ); }
+    
+    sub TO_JSON { return( shift->as_string ); }
+}
+
 1;
 # NOTE: POD
 __END__
@@ -677,7 +721,7 @@ Text::PO::Gettext - A GNU Gettext implementation
 
     use Text::PO::Gettext;
     my $po = Text::PO::Gettext->new || die( Text::PO::Gettext->error, "\n" );
-    my $po = Text::PO::GettextGettext->new({
+    my $po = Text::PO::Gettext->new({
         category => 'LC_MESSAGES',
         debug    => 3,
         domain   => "com.example.api",
@@ -688,7 +732,7 @@ Text::PO::Gettext - A GNU Gettext implementation
 
 =head1 VERSION
 
-    v0.2.1
+    v0.3.0
 
 =head1 DESCRIPTION
 
@@ -753,7 +797,7 @@ Takes the following options and returns a Gettext object.
 
 =over 4
 
-=item I<category>
+=item * C<category>
 
 If I<category> is defined, such as C<LC_MESSAGES> (by default), it will be used when building the I<path>.
 
@@ -766,15 +810,15 @@ On the web, using the path is questionable.
 See the L<GNU documentation|https://www.gnu.org/software/libc/manual/html_node/Using-gettextized-soft
 ware.html> for more information on this.
 
-=item I<domain>
+=item * C<domain>
 
 The portable object domain, such as C<com.example.api>
 
-=item I<locale>
+=item * C<locale>
 
 The locale, such as C<ja_JP>, or C<en>, or it could even contain a dash instead of an underscore, such as C<en-GB>. Internally, though, this will be converted to underscore.
 
-=item I<path>
+=item * C<path>
 
 The uri path where the gettext localised data are.
 
@@ -844,6 +888,15 @@ Same as L</ngettext>, but takes also a domain as first argument. For example:
     $po->ngettext( 'com.example.auth', '%d comment awaiting moderation', '%d comments awaiting moderation', 12 );
     # Assuming the locale is ru_RU, this would return:
     # %d комментариев ожидают проверки
+
+Note that as of version C<v0.5.0>, this returns a C<Text::PO::String>, which is lightweight and stringifies automatically. It provides the benefit of tagging the string with the locale attached to it.
+
+Thus, in the example above, the resulting C<Text::PO::String> would have its method C<locale> value set to C<ru_RU>, and you could do:
+
+    my $localised = $po->ngettext( 'com.example.auth', '%d comment awaiting moderation', '%d comments awaiting moderation', 12 );
+    say "Locale for this string is: ", $localised->locale;
+
+If no locale string was found, C<locale> would be undefined.
 
 =head2 domain
 
@@ -928,9 +981,9 @@ Possible options are:
 
 =over 4
 
-=item I<domain> The domain for the data, such as C<com.example.api>
+=item * C<domain> The domain for the data, such as C<com.example.api>
 
-=item I<locale> The locale to return the associated dictionary.
+=item * C<locale> The locale to return the associated dictionary.
 
 =back
 
@@ -990,29 +1043,29 @@ Returns an hash reference containing the following properties:
 
 =over 4
 
-=item I<currency> string
+=item * C<currency> string
 
 Contains the usual currency symbol, such as C<€>, or C<$>, or C<¥>
 
-=item I<decimal> string
+=item * C<decimal> string
 
 Contains the character used to separate decimal. In English speaking countries, this would typically be a dot.
 
-=item I<int_currency> string
+=item * C<int_currency> string
 
 Contains the 3-letters international currency symbol, such as C<USD>, or C<EUR> or C<JPY>
 
-=item I<negative_sign> string
+=item * C<negative_sign> string
 
 Contains the negative sign used for negative number
 
-=item I<precision> integer
+=item * C<precision> integer
 
 An integer whose value represents the fractional precision allowed for monetary context.
 
 For example, in Japanese, this value would be 0 while in many other countries, it would be 2.
 
-=item I<thousand> string
+=item * C<thousand> string
 
 Contains the character used to group and separate thousands.
 
@@ -1034,91 +1087,91 @@ Here the values shown as example are for the locale C<en_US>
 
 =over 4
 
-=item I<currency_symbol> string
+=item * C<currency_symbol> string
 
 The local currency symbol: C<$>
 
-=item I<decimal_point> string
+=item * C<decimal_point> string
 
 The decimal point character, except for currency values, cannot be an empty string: C<.>
 
-=item I<frac_digits> integer
+=item * C<frac_digits> integer
 
 The number of digits after the decimal point in the local style for currency value: 2
 
-=item I<grouping>
+=item * C<grouping>
 
 The sizes of the groups of digits, except for currency values. unpack( "C*", $grouping ) will give the number
 
-=item I<int_curr_symbol> string
+=item * C<int_curr_symbol> string
 
 The standardized international currency symbol: C<USD>
 
-=item I<int_frac_digits> integer
+=item * C<int_frac_digits> integer
 
 The number of digits after the decimal point in an international-style currency value: 2
 
-=item I<int_n_cs_precedes> integer
+=item * C<int_n_cs_precedes> integer
 
 Same as n_cs_precedes, but for internationally formatted monetary quantities: 1
 
-=item I<int_n_sep_by_space> integer
+=item * C<int_n_sep_by_space> integer
 
 Same as n_sep_by_space, but for internationally formatted monetary quantities: 1
 
-=item I<int_n_sign_posn> integer
+=item * C<int_n_sign_posn> integer
 
 Same as n_sign_posn, but for internationally formatted monetary quantities: 1
 
-=item I<int_p_cs_precedes> integer
+=item * C<int_p_cs_precedes> integer
 
 Same as p_cs_precedes, but for internationally formatted monetary quantities: 1
 
-=item I<int_p_sep_by_space> integer
+=item * C<int_p_sep_by_space> integer
 
 Same as p_sep_by_space, but for internationally formatted monetary quantities: 1
 
-=item I<int_p_sign_posn> integer
+=item * C<int_p_sign_posn> integer
 
 Same as p_sign_posn, but for internationally formatted monetary quantities: 1
 
-=item I<mon_decimal_point> string
+=item * C<mon_decimal_point> string
 
 The decimal point character for currency values: C<.>
 
-=item I<mon_grouping>
+=item * C<mon_grouping>
 
 Like grouping but for currency values.
 
-=item I<mon_thousands_sep> string
+=item * C<mon_thousands_sep> string
 
 The separator for digit groups in currency values: C<,>
 
-=item I<n_cs_precedes> integer
+=item * C<n_cs_precedes> integer
 
 Like p_cs_precedes but for negative values: 1
 
-=item I<n_sep_by_space> integer
+=item * C<n_sep_by_space> integer
 
 Like p_sep_by_space but for negative values: 0
 
-=item I<n_sign_posn> integer
+=item * C<n_sign_posn> integer
 
 Like p_sign_posn but for negative currency values: 1
 
-=item I<negative_sign> string
+=item * C<negative_sign> string
 
 The character used to denote negative currency values, usually a minus sign: C<->
 
-=item I<p_cs_precedes> integer
+=item * C<p_cs_precedes> integer
 
 1 if the currency symbol precedes the currency value for nonnegative values, 0 if it follows: 1
 
-=item I<p_sep_by_space> integer
+=item * C<p_sep_by_space> integer
 
 1 if a space is inserted between the currency symbol and the currency value for nonnegative values, 0 otherwise: 0
 
-=item I<p_sign_posn> integer
+=item * C<p_sign_posn> integer
 
 The location of the positive_sign with respect to a nonnegative quantity and the currency_symbol, coded as follows:
 
@@ -1128,11 +1181,11 @@ The location of the positive_sign with respect to a nonnegative quantity and the
     3    Just before currency_symbol.
     4    Just after currency_symbol.
 
-=item I<positive_sign> string
+=item * C<positive_sign> string
 
 The character used to denote nonnegative currency values, usually the empty string
 
-=item I<thousands_sep> string
+=item * C<thousands_sep> string
 
 The separator between groups of digits before the decimal point, except for currency values: C<,>
 
@@ -1160,6 +1213,15 @@ Provided with a C<msgid> represented by a string, and this return a localised ve
     # With locale of fr_FR, this would return "Bonjour"
 
 See the global function L</_> for more information.
+
+Note that as of version C<v0.5.0>, this returns a C<Text::PO::String>, which is lightweight and stringifies automatically. It provides the benefit of tagging the string with the locale attached to it.
+
+Thus, in the example above, the resulting C<Text::PO::String> would have its method C<locale> value set to C<fr_FR>, and you could do:
+
+    my $localised = $po->gettext( "Hello" );
+    say "Locale for this string is: ", $localised->locale;
+
+If no locale string was found, C<locale> would be undefined.
 
 =head2 gettextf
 

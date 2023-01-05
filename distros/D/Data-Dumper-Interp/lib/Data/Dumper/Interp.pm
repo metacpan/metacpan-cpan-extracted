@@ -17,7 +17,7 @@
 use strict; use warnings FATAL => 'all'; use utf8; use 5.020;
 use feature qw(say state);
 package  Data::Dumper::Interp;
-$Data::Dumper::Interp::VERSION = '3.2';
+$Data::Dumper::Interp::VERSION = '3.3';
 
 package  # newline prevents Dist::Zilla::Plugin::PkgVersion from adding $VERSION
   DB;
@@ -276,6 +276,7 @@ sub __set_default_Foldwidth() {
       say "Foldwidth=$Foldwidth from hard-coded backup default" if $Debug;
     }
   }
+  undef $Foldwidth1;
 }
 
 my $unique = refaddr \&new;
@@ -381,7 +382,7 @@ sub Dump {
   #
   # (This used to just Clone:clone the whole thing and then walk and modify 
   # the copy; but cloned tied variables could blow up if their handlers
-  # got conused by our changes in the copy.  Now our copy never contains
+  # got confused by our changes in the copy.  Now our copy never contains
   # tied variables, although it might contain cloned objects (with any
   # internal tied vars substituted).
 
@@ -399,7 +400,7 @@ sub Dump {
     eval { 
       $values[0] = __copysubst($values[0], $callback)
     };
-    croak "Exception while traversing value: $@" if $@;
+    croak "Exception while traversing value:\n----\n$@----\n" if $@;
     $self->Values(\@values);
   }
 
@@ -515,20 +516,32 @@ sub __copysubst($$;$$) {
   $item
 }#__copysubst
 
-sub _show_as_number(_) { # Derived from JSON::PP version 4.02
+sub _show_as_number(_) { 
+  # Derived from JSON::PP version 4.02, except for the Overloaded stuff
   my $value = shift;
   return unless defined $value;
-  no warnings 'numeric';
   # if the utf8 flag is on, it almost certainly started as a string
   return if utf8::is_utf8($value);
+
+  no warnings 'numeric';
   # detect numbers
   # string & "" -> ""
   # number & "" -> 0 (with warning)
   # nan and inf can detect as numbers, so check with * 0
-  return unless length((my $dummy = "") & $value);
-  return unless 0 + $value eq $value;
-  return 1 if $value * 0 == 0;
-  return -1; # inf/nan
+  
+  # An exception will occur if $value is an object which does not overload 
+  # these operators.  Catch and ignore.
+  my $result = eval {
+    return unless length((my $dummy = "") & $value);
+    return unless 0 + $value eq $value;
+    return 1 if $value * 0 == 0;
+    return -1; # inf/nan
+  };
+  if ($@) {
+    oops unless $@ =~ /overload/i;
+    return;
+  }
+  $result
 }
 
 # Split keys into "components" (e.g. 2_16.A has 3 components) and sort
@@ -1316,7 +1329,7 @@ if wide characters are present.
 
 Creates an object initialized from the global configuration
 variables listed below
-(the function C<visnew> is simply a short-hand wrapper).
+(the function C<visnew> is simply a shorthand wrapper function).
 
 No arguments are permitted.
 
@@ -1400,12 +1413,13 @@ The avilable options are:
 
 =item "unicode" (or "utf8" for historical reasons)
 
-Show all printable
-characters as themselves rather than hex escapes.
+All printable
+characters are shown as themselves rather than hex escapes, and
+'\n', '\t', etc. are shown for common ASCII control codes.
 
 =item "controlpic"
 
-Show non-printing ASCII characters using single "control picture" characters,
+Show ASCII control characters using single "control picture" characters,
 for example '␤' is shown for newline instead of '\n'.  
 Similarly for \0 \a \b \e \f \r and \t.
 

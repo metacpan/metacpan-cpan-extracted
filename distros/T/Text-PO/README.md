@@ -36,7 +36,7 @@ SYNOPSIS
 VERSION
 =======
 
-        v0.3.0
+        v0.5.0
 
 DESCRIPTION
 ===========
@@ -558,7 +558,7 @@ Takes a meta field name and sets or gets its value.
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x56447fef5038)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x562901bfc778)"}\>
 
 SEE ALSO
 ========

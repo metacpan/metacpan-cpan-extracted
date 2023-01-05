@@ -1,5 +1,8 @@
 Revision history for Perl extension AI::ParticleSwarmOptimization::MCE.
 
+1.003 Thu, 05 Jan 2023 11:16:26 +0100
+	- Fix: MANIFEST
+
 1.002 Sun, 16 Oct 2022 15:02:03 +0200
 	- Improvements in a range of efficiency (thanks to Mario Roy :-)
 

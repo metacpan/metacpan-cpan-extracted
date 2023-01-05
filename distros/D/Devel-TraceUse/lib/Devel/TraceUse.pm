@@ -1,5 +1,5 @@
 package Devel::TraceUse;
-$Devel::TraceUse::VERSION = '2.096';
+$Devel::TraceUse::VERSION = '2.097';
 # detect being loaded via -d:TraceUse and disable the debugger features we
 # don't need. better names for evals (0x100) and anon subs (0x200).
 BEGIN {
@@ -92,9 +92,11 @@ sub trace_use
     };
 
     # info about the loading module
-    # (our require override adds one frame)
     my $caller = $info->{caller} = {};
-    @{$caller}{@caller_info} = caller(1);
+    my $caller_initial_level = 1;  # one for the require() wrapper
+    $caller_initial_level++ if $] >= 5.037007; # and another for modern perls
+                                               # which eval the INC hook.
+    @{$caller}{@caller_info} = caller($caller_initial_level);
 
     # try to compute a "filename" (as received by require)
     $caller->{filename} = $caller->{filepath};
@@ -123,7 +125,7 @@ sub trace_use
 
     # record potential proxies
     if ( $caller->{filename} ) {
-        my $level = 1;    # our require override adds one frame
+        my $level = $caller_initial_level;  # set up above
         my $subroutine;
         while ( $subroutine = ( caller ++$level )[3] || '' ) {
             last if $subroutine =~ /::/;
@@ -313,7 +315,7 @@ Devel::TraceUse - show the modules your program loads, recursively
 
 =head1 VERSION
 
-version 2.096
+version 2.097
 
 =head1 SYNOPSIS
 
@@ -571,7 +573,7 @@ L<https://metacpan.org/release/Devel-TraceUse>
 
 Copyright 2006 chromatic, most rights reserved.
 
-Copyright 2010-2018 Philippe Bruhat (BooK), for the rewrite.
+Copyright 2010-2023 Philippe Bruhat (BooK), for the rewrite.
 
 =head1 LICENSE
 

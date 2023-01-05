@@ -1,0 +1,36 @@
+---
+abstract: 'Melody is a language that compiles to regular expressions, while aiming to be more readable and maintainable'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+build_requires:
+  Test2::V0: '0.000121'
+  perl: '5.014'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  FFI::Build::File::Cargo: '0'
+  FFI::Build::MM: '0.83'
+  perl: '5.014'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Regexp-Melody
+requires:
+  Exporter::Shiny: '1.006000'
+  FFI::Platypus: '2.00'
+  FFI::Platypus::Lang::Rust: '0'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/tobyink/p5-regexp-melody/issues
+  homepage: https://metacpan.org/dist/Regexp-Melody
+  repository: git://github.com/tobyink/p5-regexp-melody.git
+version: '0.001000'
+x_contributors:
+  - 'Toby Inkster'
+  - 'Yoav Lavi (Rust library)'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

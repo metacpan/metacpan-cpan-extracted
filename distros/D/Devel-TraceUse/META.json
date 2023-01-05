@@ -4,7 +4,7 @@
       "Philippe Bruhat (BooK) <book@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "devel",
       "trace",
@@ -33,7 +33,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Module::CoreList" : "0"
+            "Module::CoreList" : "0",
+            "perl" : "5.008"
          }
       },
       "test" : {
@@ -48,7 +49,7 @@
             "IPC::Open3" : "0",
             "Test::More" : "0",
             "lib" : "0",
-            "perl" : "5.006",
+            "perl" : "5.008",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -66,8 +67,9 @@
          "web" : "http://github.com/book/Devel-TraceUse"
       }
    },
-   "version" : "2.096",
+   "version" : "2.097",
    "x_contributors" : [
+      "Yves Orton <yves@cpan.org>",
       "Neil Bowers <neilb@cpan.org>",
       "Graham Knop <haarg@cpan.org>",
       "Ioan Rogers <ioanr@cpan.org>",
@@ -76,7 +78,8 @@
       "Apocalypse <apocal@cpan.org>",
       "chromatic <chromatic@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

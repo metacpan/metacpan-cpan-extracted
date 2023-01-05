@@ -8,7 +8,7 @@ use Carp         qw(croak);
 use Getopt::Long ();
 use List::Util   qw(first);
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 our ($OPT_COMMENT_RE, $OPTIONS, $SUBCOMMAND, $SUBCOMMANDS, %APPS) = (qr{\s+\#\s+});
 
@@ -165,7 +165,7 @@ sub run {
 
   local $SUBCOMMANDS = $app->$call_maybe('getopt_subcommands');
   my $exit_value = $SUBCOMMANDS ? _subcommand_run_maybe($app, $SUBCOMMANDS, $argv) : undef;
-  return $exit_value if defined $exit_value;
+  return _exit($app, $exit_value) if defined $exit_value;
 
   my @configure = $app->$call_maybe('getopt_configure');
   my $prev      = Getopt::Long::Configure(@configure);
@@ -173,12 +173,7 @@ sub run {
   Getopt::Long::Configure($prev);
   $app->$call_maybe(getopt_post_process_argv => $argv, {valid => $valid});
 
-  $exit_value = $valid ? $app->$cb(@$argv) : 1;
-  $exit_value = $app->$call_maybe(getopt_post_process_exit_value => $exit_value) // $exit_value;
-  $exit_value = 0   unless $exit_value and $exit_value =~ m!^\d{1,3}$!;
-  $exit_value = 255 unless $exit_value < 255;
-  exit(int $exit_value) unless $Getopt::App::APP_CLASS;
-  return $exit_value;
+  return _exit($app, $valid ? $app->$cb(@$argv) : 1);
 }
 
 sub _getopt_complete_reply { Getopt::App::Complete::complete_reply(@_) }
@@ -204,7 +199,17 @@ sub _getopt_post_process_argv {
 
 sub _getopt_unknown_subcommand {
   my ($app, $argv) = @_;
+  $! = 2;
   die "Unknown subcommand: $argv->[0]\n";
+}
+
+sub _exit {
+  my ($app, $exit_value) = @_;
+  $exit_value = $app->$call_maybe(getopt_post_process_exit_value => $exit_value) // $exit_value;
+  $exit_value = 0   unless $exit_value and $exit_value =~ m!^\d{1,3}$!;
+  $exit_value = 255 unless $exit_value < 255;
+  exit $exit_value unless $Getopt::App::APP_CLASS;
+  return $exit_value;
 }
 
 sub _subcommand_run {

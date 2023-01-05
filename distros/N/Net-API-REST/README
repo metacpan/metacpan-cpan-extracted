@@ -117,7 +117,7 @@ SYNOPSIS
         }
 
 VERSION
-        v0.7.0
+        v0.7.3
 
 DESCRIPTION
     The purpose of this module is to provide a powerful, yet simple
@@ -127,11 +127,13 @@ METHODS
   new( hash )
     This initiates the package and take the following parameters:
 
-    *request*
+    *   "request"
+
         This is a required parameter to be sent with a value set to a
         Apache2::RequestRec object
 
-    *debug*
+    *   "debug"
+
         Optional. If set with a positive integer, this will activate verbose
         debugging message
 
@@ -447,16 +449,20 @@ METHODS
     occurred which can be retrieved using the "error" in Module::Generic
     method.
 
-    *algo*
+    *   "algo"
+
         This will set the *alg* property in the token.
 
-    *audience*
+    *   "audience"
+
         This will set the *aud* property in the token payload.
 
-    *encoding*
+    *   "encoding"
+
         This will set the *enc* property in the token payload.
 
-    *encrypt*
+    *   "encrypt"
+
         If true, this will encrypt the token. When provided this will affect
         the *algo*.
 
@@ -464,26 +470,33 @@ METHODS
         "HS256", but when encryption is activated, the algorithm becomes
         "PBES2-HS256+A128KW"
 
-    *expires*
+    *   "expires"
+
         This will set the *exp* property in the token payload.
 
-    *issued_at*
+    *   "issued_at"
+
         This will set the *iat* property in the token payload.
 
-    *issuer*
+    *   "issuer"
+
         This will set the *iss* property in the token payload.
 
-    *key*
+    *   "key"
+
         This will set the *key* property in the token payload.
 
-    *payload*
+    *   "payload"
+
         The hash data to become the token payload. It can contains
         discretionary elements.
 
-    *subject*
+    *   "subject"
+
         This will set the *sub* property in the token payload.
 
-    *ttl*
+    *   "ttl"
+
         If provided, this will set the *exp* property to *iat* + *ttl*
 
   jwt_encoding
@@ -634,7 +647,7 @@ SEE ALSO
     Apache2::Request, Apache2::RequestRec, Apache2::RequestUtil
 
 COPYRIGHT & LICENSE
-    Copyright (c) 2018-2021 DEGUEST Pte. Ltd.
+    Copyright (c) 2018-2023 DEGUEST Pte. Ltd.
 
     You can use, copy, modify and redistribute this package and associated
     files under the same terms as Perl itself.

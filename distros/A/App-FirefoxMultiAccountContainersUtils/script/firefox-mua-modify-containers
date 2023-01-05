@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-08'; # DATE
+our $DATE = '2022-10-04'; # DATE
 our $DIST = 'App-FirefoxMultiAccountContainersUtils'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/FirefoxMultiAccountContainersUtils/firefox_mua_modify_containers",
@@ -41,7 +41,7 @@ firefox-mua-modify-containers - Modify (and delete) Firefox Multi-Account Contai
 
 =head1 VERSION
 
-This document describes version 0.014 of firefox-mua-modify-containers (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2022-09-08.
+This document describes version 0.015 of firefox-mua-modify-containers (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2022-10-04.
 
 =head1 SYNOPSIS
 

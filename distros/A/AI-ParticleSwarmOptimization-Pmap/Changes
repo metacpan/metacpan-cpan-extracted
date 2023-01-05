@@ -1,5 +1,8 @@
 Revision history for Perl extension AI::ParticleSwarmOptimization::Pmap.
 
+1.006 Thu, 05 Jan 2023 11:16:26 +0100
+	- Fix: MANIFEST
+
 1.005 Mon, 17 Oct 2022 18:51:37 +0200
 	- Fix in a range of randomness. Thanks to Mario Roy :-)
 

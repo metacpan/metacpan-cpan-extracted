@@ -4,7 +4,7 @@ Text::NeatTemplate - a fast, middleweight template engine.
 
 # VERSION
 
-version 0.1400
+version 0.1600
 
 # SYNOPSIS
 
@@ -159,10 +159,30 @@ Formatting directives are:
     and underscores; spaces are converted to hyphens.
     (useful for anchors or filenames)
 
+- camelise
+
+    Convert the value into CamelCase.
+
 - comma\_front
 
     Put anything after the last comma at the front (as with an author name)
     For example, "Smith,Sarah Jane" becomes "Sarah Jane Smith".
+
+- date\_day
+
+    Return the day part of a YYYY-MM-DD date.
+
+- date\_mth
+
+    Return the month part of a YYYY-MM-DD date.
+
+- date\_month
+
+    Return the month part of a YYYY-MM-DD date as an English month name.
+
+- date\_year
+
+    Return the year part of a YYYY-MM-DD date.
 
 - dollars
 
@@ -175,6 +195,10 @@ Formatting directives are:
 - float
 
     Convert to float.
+
+- facettag
+
+    Convert to a "faceted" tag, that is, the words are joined by a colon.
 
 - hmail
 
@@ -252,6 +276,17 @@ Formatting directives are:
 
     Return the value with no change.
 
+- span
+
+    Surround the value with HTML span tags. (Useful for CSS formatting.)
+
+- tagify
+
+    Converts the value into something suitable to use as a tag.
+    Replace pipe with comma, remove leading and trailing spaces,
+    remove hyphens and underscores,
+    replace slashes, ! and spaces with underscores.
+
 - title
 
     Put any trailing ",The" ",A" or ",An" at the front (as this is a title)
@@ -271,6 +306,11 @@ Formatting directives are:
 - wikilink
 
     Format the value as the most common kind of wikilink, that is \[\[_value_\]\]
+
+- wlink\__prefix_
+
+    Format the value as the most common kind of wikilink with a prefix;
+    that is \[\[_prefix_/_value_\]\]
 
 - words_num_
 

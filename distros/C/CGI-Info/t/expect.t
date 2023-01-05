@@ -38,7 +38,7 @@ PARAMS: {
 
 	warning_is {
 		my $foo = CGI::Info->new(expect => 'scalar');
-	} 'expect must be a reference to an array';
+	} 'CGI::Info: expect must be a reference to an array';
 
 	warning_is {
 		my $foo = new_ok('CGI::Info')->params(expect => 'scalar');

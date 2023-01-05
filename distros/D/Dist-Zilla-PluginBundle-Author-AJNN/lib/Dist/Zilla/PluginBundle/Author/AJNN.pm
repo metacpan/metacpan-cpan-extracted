@@ -3,7 +3,7 @@ use warnings;
 
 package Dist::Zilla::PluginBundle::Author::AJNN;
 # ABSTRACT: Dist::Zilla configuration the way AJNN does it
-$Dist::Zilla::PluginBundle::Author::AJNN::VERSION = '0.04';
+$Dist::Zilla::PluginBundle::Author::AJNN::VERSION = '0.05';
 
 use Dist::Zilla;
 use Moose;
@@ -200,7 +200,7 @@ Dist::Zilla::PluginBundle::Author::AJNN - Dist::Zilla configuration the way AJNN
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

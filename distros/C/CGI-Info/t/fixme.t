@@ -13,7 +13,8 @@ if($ENV{AUTHOR_TESTING}) {
 
 	eval 'use Devel::FIXME';
 	if($@) {
-		diag('Devel::FIXME required for looking for FIXMEs');
+		# AUTHOR_TESTING=1 perl -MTest::Without::Module=Devel::FIXME -w -Iblib/lib t/fixme.t
+		diag('Devel::FIXME needed to test for FIXMEs');
 		done_testing(1);
 	} else {
 		$ENV{'GATEWAY_INTERFACE'} = 'CGI/1.1';
@@ -25,7 +26,7 @@ if($ENV{AUTHOR_TESTING}) {
 		use_ok('CGI::Info');
 
 		# ok($messages[0] !~ /lib\/CGI\/Info.pm/);
-		ok(scalar(@messages) == 0);
+		cmp_ok(scalar(@messages), '==', 0, 'No FIXMEs found');
 
 		done_testing(3);
 	}

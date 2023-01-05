@@ -1,6 +1,6 @@
 package Date::Holidays::GB;
 
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 
 # ABSTRACT: Determine British holidays - Current UK public and bank holiday dates up to 2023
 
@@ -196,7 +196,7 @@ sub _holiday {
     return join( ', ', @strings );
 }
 
-sub date_generated { '2022-09-10' }
+sub date_generated { '2023-01-04' }
 
 1;
 
@@ -520,6 +520,9 @@ __DATA__
 2023-05-01	EAW	Early May bank holiday
 2023-05-01	NIR	Early May bank holiday
 2023-05-01	SCT	Early May bank holiday
+2023-05-08	EAW	Bank holiday for the coronation of King Charles III
+2023-05-08	NIR	Bank holiday for the coronation of King Charles III
+2023-05-08	SCT	Bank holiday for the coronation of King Charles III
 2023-05-29	EAW	Spring bank holiday
 2023-05-29	NIR	Spring bank holiday
 2023-05-29	SCT	Spring bank holiday
@@ -534,3 +537,57 @@ __DATA__
 2023-12-26	EAW	Boxing Day
 2023-12-26	NIR	Boxing Day
 2023-12-26	SCT	Boxing Day
+2024-01-01	EAW	New Year’s Day
+2024-01-01	NIR	New Year’s Day
+2024-01-01	SCT	New Year’s Day
+2024-01-02	SCT	2nd January
+2024-03-18	NIR	St Patrick’s Day
+2024-03-29	EAW	Good Friday
+2024-03-29	NIR	Good Friday
+2024-03-29	SCT	Good Friday
+2024-04-01	EAW	Easter Monday
+2024-04-01	NIR	Easter Monday
+2024-05-06	EAW	Early May bank holiday
+2024-05-06	NIR	Early May bank holiday
+2024-05-06	SCT	Early May bank holiday
+2024-05-27	EAW	Spring bank holiday
+2024-05-27	NIR	Spring bank holiday
+2024-05-27	SCT	Spring bank holiday
+2024-07-12	NIR	Battle of the Boyne (Orangemen’s Day)
+2024-08-05	SCT	Summer bank holiday
+2024-08-26	EAW	Summer bank holiday
+2024-08-26	NIR	Summer bank holiday
+2024-12-02	SCT	St Andrew’s Day
+2024-12-25	EAW	Christmas Day
+2024-12-25	NIR	Christmas Day
+2024-12-25	SCT	Christmas Day
+2024-12-26	EAW	Boxing Day
+2024-12-26	NIR	Boxing Day
+2024-12-26	SCT	Boxing Day
+2025-01-01	EAW	New Year’s Day
+2025-01-01	NIR	New Year’s Day
+2025-01-01	SCT	New Year’s Day
+2025-01-02	SCT	2nd January
+2025-03-17	NIR	St Patrick’s Day
+2025-04-18	EAW	Good Friday
+2025-04-18	NIR	Good Friday
+2025-04-18	SCT	Good Friday
+2025-04-21	EAW	Easter Monday
+2025-04-21	NIR	Easter Monday
+2025-05-05	EAW	Early May bank holiday
+2025-05-05	NIR	Early May bank holiday
+2025-05-05	SCT	Early May bank holiday
+2025-05-26	EAW	Spring bank holiday
+2025-05-26	NIR	Spring bank holiday
+2025-05-26	SCT	Spring bank holiday
+2025-07-14	NIR	Battle of the Boyne (Orangemen’s Day)
+2025-08-04	SCT	Summer bank holiday
+2025-08-25	EAW	Summer bank holiday
+2025-08-25	NIR	Summer bank holiday
+2025-12-01	SCT	St Andrew’s Day
+2025-12-25	EAW	Christmas Day
+2025-12-25	NIR	Christmas Day
+2025-12-25	SCT	Christmas Day
+2025-12-26	EAW	Boxing Day
+2025-12-26	NIR	Boxing Day
+2025-12-26	SCT	Boxing Day

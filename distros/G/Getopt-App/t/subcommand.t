@@ -15,22 +15,24 @@ subtest 'dispatch' => sub {
 
   $res = capture($app, [qw(nope)]);
   is $res->[1], "Unknown subcommand: nope\n", 'nope';
+  is $res->[2], 2,                            'invalid exit';
 
   $res = capture($app, [qw(invalid)]);
-  is $res->[2], 2, 'invalid exit';
   like $res->[1], qr{Unable to load subcommand invalid:}, 'invalid stderr';
+  is $res->[2], 2, 'invalid exit';
 
   $res = capture($app, [qw(beans a 24)]);
-  is $res->[2], 11, 'invalid exit';
   like $res->[0], qr{^beans\|.*\bbeans\.pl\|.*\bbeans\.pl\|a\|24$}, 'beans stdout' or diag "ERROR: $res->[1]";
+  is $res->[2], 11, 'beans exit';
 
   $res = capture($app, [qw(coffee b 42)]);
-  is $res->[2], 12, 'invalid exit';
   like $res->[0], qr{\bcoffee\.pl/b/42$}, 'coffee stdout' or diag "ERROR: $res->[1]";
+  is $res->[2], 12, 'coffee exit';
 
   $res = capture($app, [qw(help)]);
   like $res->[0],   qr{Usage:},       'help stdout'    or diag "ERROR: $res->[1]";
   unlike $res->[0], qr{Subcommands:}, 'no subcommands' or diag "ERROR: $res->[1]";
+  is $res->[2], 1, 'help exit';
 };
 
 subtest 'help' => sub {

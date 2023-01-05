@@ -8,9 +8,9 @@ use Path::Tiny 0.053;
 
 plan 28;
 
-my $app = App::Licensecheck->new(
-	shortname_scheme => 'spdx',
-	top_lines        => 0,
+my @opts = (
+	schemes   => [qw(spdx)],
+	top_lines => 0,
 );
 
 my %LICENSES = (
@@ -62,7 +62,7 @@ foreach my $id ( sort keys %LICENSES ) {
 	$file = $workdir->child($id);
 	$file->spew_utf8( $license->notice, $license->license );
 	$expected = $LICENSES{$id} || $id;
-	($resolved) = $app->parse($file);
+	($resolved) = App::Licensecheck->new(@opts)->parse($file);
 	like $resolved, $expected,
 		"matches expected license for SPDX id $id";
 }

@@ -77,7 +77,8 @@ sub _init_mce {
 	
 	#-------------------------------------------------------------------
 	MCE::Map->init(
-		chunk_size 	=> q[auto], 
+		chunk_size 	=> 1,					# Thanks Roy :-)
+		#chunk_size => q[auto],				# The old one
 		max_workers => $self->workers,
 		posix_exit => 1,					# Thanks Roy :-)
 	);

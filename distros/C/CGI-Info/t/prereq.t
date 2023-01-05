@@ -1,12 +1,11 @@
-#!perl -w
+#!/usr/bin/env perl
 
 use strict;
-
+use warnings;
 use Test::Most;
 
-if($ENV{RELEASE_TESTING}) {
+if($ENV{AUTHOR_TESTING}) {
 	eval 'use Test::Prereq';
-
 	plan(skip_all => 'Test::Prereq required to test dependencies') if $@;
 	prereq_ok();
 } else {

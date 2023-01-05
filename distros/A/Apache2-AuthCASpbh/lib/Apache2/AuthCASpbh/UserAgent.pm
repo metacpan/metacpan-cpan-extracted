@@ -3,7 +3,7 @@ package Apache2::AuthCASpbh::UserAgent;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.20';
 
 use parent qw(LWP::UserAgent);
 

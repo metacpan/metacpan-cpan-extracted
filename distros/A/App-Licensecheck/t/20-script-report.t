@@ -19,13 +19,13 @@ diag "executable: @CMD";
 subtest 'machine-readable output; short-form option' => sub {
 	run_ok @CMD, qw(-m t/devscripts/beerware.cpp);
 	like stdout, qr{Beerware License}, 'Testing stdout';
-	is stderr,   '',                   'No stderr';
+	is stderr, '', 'No stderr';
 };
 
 subtest 'machine-readable output; long-form option' => sub {
 	run_ok @CMD, qw(--machine t/devscripts/gpl-2);
 	like stdout, qr{GNU General Public License, Version 2$}, 'Testing stdout';
-	is stderr,   '',                                         'No stderr';
+	is stderr, '', 'No stderr';
 };
 
 subtest 'machine-readable output w/ copyright' => sub {

@@ -16,9 +16,9 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Types::Sah::Firefox",
   "PREREQ_PM" => {
-    "Data::Sah" => "0.911",
     "Sah::Schema::firefox::local_profile_name" => 0,
     "Sah::Schema::firefox::profile_name" => 0,
+    "Type::FromSah" => 0,
     "Type::Library" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,13 +37,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Sah" => "0.911",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Sah::Schema::firefox::local_profile_name" => 0,
   "Sah::Schema::firefox::profile_name" => 0,
   "Test::More" => 0,
+  "Type::FromSah" => 0,
   "Type::Library" => 0,
   "strict" => 0,
   "warnings" => 0

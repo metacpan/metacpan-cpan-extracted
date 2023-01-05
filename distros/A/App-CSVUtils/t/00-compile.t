@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 75 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 79 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/CSVUtils.pm',
@@ -26,6 +26,7 @@ my @module_files = (
     'App/CSVUtils/csv_get_cells.pm',
     'App/CSVUtils/csv_grep.pm',
     'App/CSVUtils/csv_info.pm',
+    'App/CSVUtils/csv_intrange.pm',
     'App/CSVUtils/csv_list_field_names.pm',
     'App/CSVUtils/csv_lookup_fields.pm',
     'App/CSVUtils/csv_map.pm',
@@ -43,7 +44,8 @@ my @module_files = (
     'App/CSVUtils/csv_sort_rows.pm',
     'App/CSVUtils/csv_split.pm',
     'App/CSVUtils/csv_sum.pm',
-    'App/CSVUtils/csv_transpose.pm'
+    'App/CSVUtils/csv_transpose.pm',
+    'App/CSVUtils/csv_uniq.pm'
 );
 
 my @scripts = (
@@ -61,6 +63,7 @@ my @scripts = (
     'script/csv-get-cells',
     'script/csv-grep',
     'script/csv-info',
+    'script/csv-intrange',
     'script/csv-list-field-names',
     'script/csv-lookup-fields',
     'script/csv-map',
@@ -82,6 +85,7 @@ my @scripts = (
     'script/csv-split',
     'script/csv-sum',
     'script/csv-transpose',
+    'script/csv-uniq',
     'script/csv2ltsv',
     'script/csv2td',
     'script/csv2tsv',

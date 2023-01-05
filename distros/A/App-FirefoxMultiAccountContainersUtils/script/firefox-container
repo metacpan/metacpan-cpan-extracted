@@ -3,26 +3,37 @@
 #use 5.010001;
 use strict;
 use warnings;
+use Log::ger::Screen;
+use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-08'; # DATE
+our $DATE = '2022-10-04'; # DATE
 our $DIST = 'App-FirefoxMultiAccountContainersUtils'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 my $container;
-if (defined(my $n = $ENV{FIREFOX_CONTAINER_ENV})) {
-    if (defined(my $c = $ENV{$n})) {
-        $container = $c;
-    }
-} elsif (defined(my $c = $ENV{FIREFOX_CONTAINER})) {
+if (defined(my $c = $ENV{FIREFOX_CONTAINER})) {
+    log_trace "Using container '$c' (from FIREFOX_CONTAINER env))";
     $container = $c;
+} elsif (defined(my $n = $ENV{FIREFOX_CONTAINER_ENV})) {
+    if (defined(my $c = $ENV{$n})) {
+        log_trace "Using container '$c' (from $n env (from FIREFOX_CONTAINER_ENV env))";
+        $container = $c;
+    } else {
+        log_trace "No container set in $n env (set via FIREFOX_CONTAINER_ENV env)";
+    }
+} else {
+    log_trace "No container set";
 }
 
+my @exec_cmd;
 if (defined $container) {
-    exec "open-firefox-container", $container, @ARGV;
+    @exec_cmd = ("open-firefox-container", $container, @ARGV);
 } else {
-    exec "firefox", @ARGV;
+    @exec_cmd = ("firefox", @ARGV);
 }
+log_trace "Exec: %s", \@exec_cmd;
+exec @exec_cmd;
 
 # ABSTRACT: Firefox wrapper to open URL's in a specific container
 # PODNAME: firefox-container
@@ -39,7 +50,7 @@ firefox-container - Firefox wrapper to open URL's in a specific container
 
 =head1 VERSION
 
-This document describes version 0.014 of firefox-container (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2022-09-08.
+This document describes version 0.015 of firefox-container (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2022-10-04.
 
 =head1 SYNOPSIS
 
@@ -72,6 +83,8 @@ No other options are parsed by this wrapper. All will be passed to C<firefox>.
 
 Set the name of container to open URL's in.
 
+Overides by L</FIREFOX_CONTAINER_ENV>.
+
 =head2 FIREFOX_CONTAINER_ENV
 
 Set the name of environment variable to replace the default
@@ -86,6 +99,8 @@ you can instead use this:
  % export FIREFOX_CONTAINER_ENV=FC
  % FC=mycontainer1 firefox-container ...
  % FC=mycontainer2 other-command ...
+
+Overidden by L</FIREFOX_CONTAINER>.
 
 =head1 HOMEPAGE
 

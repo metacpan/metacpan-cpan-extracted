@@ -49,7 +49,7 @@ my $app = {
          description => 'first-level sub-command bar',
          options     => [],
          execute     => sub ($main, $conf, $args) {
-            LocalTester::command_execute(bar => @_);
+            LocalTester::command_execute(bar => $main, $conf, $args);
             print {*STDOUT} 'bar on out';
             print {*STDERR} 'bar on err';
             return 'Bar';
@@ -64,7 +64,7 @@ my $app = {
             },
          ],
          execute => sub ($main, $conf, $args) {
-            LocalTester::command_execute(baz => @_);
+            LocalTester::command_execute(baz => $main, $conf, $args);
             print {*STDOUT} 'baz on out';
             print {*STDERR} 'baz on err';
             return 'BAZ';

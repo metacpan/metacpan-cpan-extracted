@@ -19,9 +19,10 @@ use Apache2::Util qw();
 use CGI qw ();
 use CGI::Cookie qw ();
 use LWP::UserAgent qw ();
+use Storable qw();
 use XML::Simple qw();
 
-our $VERSION = '0.10';
+our $VERSION = '0.20';
 
 sub handler {
 	my ($r) = shift;
@@ -68,7 +69,7 @@ sub handler {
 				if (exists($session->{cas_attributes}) &&
 				    keys %{$session->{cas_attributes}} > 0) {
 					$_log->l($debug_level, 'session contains attributes');
-					$r->pnotes(cas_attributes => $session->{cas_attributes});
+					$r->pnotes(cas_attributes => Storable::dclone($session->{cas_attributes}));
 				}
 
 				if (exists($session->{cas_pgt})) {
@@ -257,7 +258,7 @@ sub handler {
 
 			   	$_log->l($debug_level, 'found attributes (' .
 						       join(',', keys(%$cas_attributes)) . ')');
-				$r->pnotes(cas_attributes => $cas_attributes);
+				$r->pnotes(cas_attributes => Storable::dclone($cas_attributes));
 			}
 
 			my $session = open_session($session_db, '');

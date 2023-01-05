@@ -19,11 +19,11 @@ name: Types-Sah-Firefox
 provides:
   Types::Sah::Firefox:
     file: lib/Types/Sah/Firefox.pm
-    version: '0.002'
+    version: '0.003'
 requires:
-  Data::Sah: '0.911'
   Sah::Schema::firefox::local_profile_name: '0'
   Sah::Schema::firefox::profile_name: '0'
+  Type::FromSah: '0'
   Type::Library: '0'
   strict: '0'
   warnings: '0'
@@ -31,7 +31,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Types-Sah-Firefox
   homepage: https://metacpan.org/release/Types-Sah-Firefox
   repository: git://github.com/perlancar/perl-Types-Sah-Firefox.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

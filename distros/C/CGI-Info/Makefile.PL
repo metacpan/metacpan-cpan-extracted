@@ -19,8 +19,8 @@ WriteMakefile(
 	  ? ('LICENSE'=> 'GPL')
 	  : ()),
 	'LIBS' => [''],   # e.g., '-lm'
-	'DEFINE' => '',     # e.g., '-DHAVE_SOMETHING'
-	'INC' => '',     # e.g., '-I/usr/include/other'
+	'DEFINE' => '',	# e.g., '-DHAVE_SOMETHING'
+	'INC' => '',	# e.g., '-I/usr/include/other'
 	PL_FILES	=> {},
 	TEST_REQUIRES => {
 		'LWP::UserAgent' => 0,
@@ -34,6 +34,8 @@ WriteMakefile(
 		'Test::CleanNamespaces' => 0,
 		# 'Test::Kwalitee' => 0,
 		'autodie' => 0,
+		'strict' => 0,
+		'warnings' => 0,
 		'IPC::System::Simple' => 0,
 		'Test::Warn' => 0,
 		'Tie::Filehandle::Preempt::Stdin' => 0,

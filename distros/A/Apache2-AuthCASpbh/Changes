@@ -3,3 +3,10 @@ Revision history for Apache2-AuthCASpbh
 0.10	2018/04/18
 
 	* First release
+
+0.20	2023/01/03
+
+	* Fiddle with sqlite autocommit to possibly resolve a locked db issue
+
+	* Pass a copy of the cas attributes data structure to consumers so
+	  they can't change the master session values

@@ -15,7 +15,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.12.0";
+our $VERSION = "v6.13.1";
 
 1;
 __END__
@@ -61,7 +61,7 @@ The documentation in this POD applies to all three adapter modules as well.
 This module is an implementation of L<Reactive Extensions|http://reactivex.io/> in Perl. It replicates the
 behavior of L<rxjs 6|https://www.npmjs.com/package/rxjs> which is the JavaScript implementation of ReactiveX.
 
-Currently 54 of the 100+ operators in rxjs are implemented in this module.
+Currently 57 of the 100+ operators in rxjs are implemented in this module.
 
 =head1 EXPORTABLE FUNCTIONS
 
@@ -423,12 +423,20 @@ Works like rxjs's "debounceTime", except the parameter is in seconds instead of 
 
 L<https://rxjs.dev/api/operators/delay>
 
-Works like rxjs's "delay", except the parameter is in seconds instead of ms.
+Works like rxjs 7's "delay", except the parameter is in seconds instead of ms.
 
     # (pause 11 seconds) 0, 1, 2, 3, ...
     rx_interval(1)->pipe(
         op_delay(10)
     )->subscribe($observer);
+
+Note: Just as in rxjs 7, the complete event will not be delayed, so don't do this:
+
+    rx_EMPTY->pipe( op_delay(2) )
+
+Do this instead, to achieve the expected effect:
+
+    rx_timer(2)->pipe( op_ignore_elements() )
 
 =item op_distinct_until_changed
 

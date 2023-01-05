@@ -23,7 +23,7 @@ __PACKAGE__->mk_accessors( qw(
 $Storable::Deparse 	= 1;
 $Storable::Eval 	= 1;
 #-----------------------------------------------------------------------
-$AI::ParticleSwarmOptimization::MCE::VERSION = '1.002';
+$AI::ParticleSwarmOptimization::MCE::VERSION = '1.003';
 #=======================================================================
 sub new {
     my ($class, %params) = @_;

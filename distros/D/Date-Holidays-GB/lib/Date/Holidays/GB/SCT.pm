@@ -1,6 +1,6 @@
 package Date::Holidays::GB::SCT;
 
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.021'; our $VERSION = '0.022'; # VERSION
 
 use strict;
 use warnings;

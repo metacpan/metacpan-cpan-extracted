@@ -9,7 +9,7 @@ use Apache2::Const -compile => qw(OK AUTHZ_DENIED_NO_USER
 				  AUTHZ_GENERAL_ERROR AUTHZ_NEUTRAL AUTHZ_GRANTED);
 use Apache2::Log qw();
 
-our $VERSION = '0.10';
+our $VERSION = '0.20';
 
 sub authz_attribute {
 	my ($auth_type, $r, $requires) = @_;

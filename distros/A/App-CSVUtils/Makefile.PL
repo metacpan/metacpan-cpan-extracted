@@ -28,6 +28,7 @@ my %WriteMakefileArgs = (
     "script/csv-get-cells",
     "script/csv-grep",
     "script/csv-info",
+    "script/csv-intrange",
     "script/csv-list-field-names",
     "script/csv-lookup-fields",
     "script/csv-map",
@@ -49,6 +50,7 @@ my %WriteMakefileArgs = (
     "script/csv-split",
     "script/csv-sum",
     "script/csv-transpose",
+    "script/csv-uniq",
     "script/csv2ltsv",
     "script/csv2td",
     "script/csv2tsv",
@@ -75,9 +77,11 @@ my %WriteMakefileArgs = (
     "Getopt::Long" => "2.50",
     "List::Util" => "1.54",
     "Log::ger" => "0.038",
+    "Number::Util::Range" => "0.003",
     "Perinci::CmdLine::Any" => "0.154",
     "Perinci::CmdLine::Lite" => "1.924",
     "Perinci::Sub::Util" => "0.470",
+    "Perinci::Sub::XCompletion::filename" => 0,
     "Perinci::Sub::XCompletion::sortsub_spec" => 0,
     "Sah::Schema::filename" => 0,
     "Sah::Schema::posint" => 0,
@@ -101,7 +105,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Needs" => 0
   },
-  "VERSION" => "1.000",
+  "VERSION" => "1.001",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -131,9 +135,11 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "List::Util" => "1.54",
   "Log::ger" => "0.038",
+  "Number::Util::Range" => "0.003",
   "Perinci::CmdLine::Any" => "0.154",
   "Perinci::CmdLine::Lite" => "1.924",
   "Perinci::Sub::Util" => "0.470",
+  "Perinci::Sub::XCompletion::filename" => 0,
   "Perinci::Sub::XCompletion::sortsub_spec" => 0,
   "Sah::Schema::filename" => 0,
   "Sah::Schema::posint" => 0,

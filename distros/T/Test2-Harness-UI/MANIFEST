@@ -73,6 +73,7 @@ lib/Test2/Harness/UI/Schema/MySQL/Session.pm
 lib/Test2/Harness/UI/Schema/MySQL/SessionHost.pm
 lib/Test2/Harness/UI/Schema/MySQL/SourceFile.pm
 lib/Test2/Harness/UI/Schema/MySQL/SourceSub.pm
+lib/Test2/Harness/UI/Schema/MySQL/Sweep.pm
 lib/Test2/Harness/UI/Schema/MySQL/TestFile.pm
 lib/Test2/Harness/UI/Schema/MySQL/User.pm
 lib/Test2/Harness/UI/Schema/MySQL56.pm
@@ -97,6 +98,7 @@ lib/Test2/Harness/UI/Schema/MySQL56/Session.pm
 lib/Test2/Harness/UI/Schema/MySQL56/SessionHost.pm
 lib/Test2/Harness/UI/Schema/MySQL56/SourceFile.pm
 lib/Test2/Harness/UI/Schema/MySQL56/SourceSub.pm
+lib/Test2/Harness/UI/Schema/MySQL56/Sweep.pm
 lib/Test2/Harness/UI/Schema/MySQL56/TestFile.pm
 lib/Test2/Harness/UI/Schema/MySQL56/User.pm
 lib/Test2/Harness/UI/Schema/Overlay/ApiKey.pm
@@ -120,6 +122,7 @@ lib/Test2/Harness/UI/Schema/Overlay/Session.pm
 lib/Test2/Harness/UI/Schema/Overlay/SessionHost.pm
 lib/Test2/Harness/UI/Schema/Overlay/SourceFile.pm
 lib/Test2/Harness/UI/Schema/Overlay/SourceSub.pm
+lib/Test2/Harness/UI/Schema/Overlay/Sweep.pm
 lib/Test2/Harness/UI/Schema/Overlay/TestFile.pm
 lib/Test2/Harness/UI/Schema/Overlay/User.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL.pm
@@ -144,6 +147,7 @@ lib/Test2/Harness/UI/Schema/PostgreSQL/Session.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/SessionHost.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/SourceFile.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/SourceSub.pm
+lib/Test2/Harness/UI/Schema/PostgreSQL/Sweep.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/TestFile.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/User.pm
 lib/Test2/Harness/UI/Schema/Result/ApiKey.pm
@@ -167,6 +171,7 @@ lib/Test2/Harness/UI/Schema/Result/Session.pm
 lib/Test2/Harness/UI/Schema/Result/SessionHost.pm
 lib/Test2/Harness/UI/Schema/Result/SourceFile.pm
 lib/Test2/Harness/UI/Schema/Result/SourceSub.pm
+lib/Test2/Harness/UI/Schema/Result/Sweep.pm
 lib/Test2/Harness/UI/Schema/Result/TestFile.pm
 lib/Test2/Harness/UI/Schema/Result/User.pm
 lib/Test2/Harness/UI/Schema/ResultSet.pm

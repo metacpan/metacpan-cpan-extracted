@@ -5,13 +5,14 @@
 -[![CPAN](https://img.shields.io/cpan/v/CGI-Info.svg)](http://search.cpan.org/~nhorne/CGI-Info/)
 -[![Kwalitee](https://cpants.cpanauthors.org/dist/CGI-Info.png)](http://cpants.cpanauthors.org/dist/CGI-Info)
 -[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Information+about+the+CGI+Environment+#perl+#CGI&url=https://github.com/nigelhorne/cgi-info&via=nigelhorne)
+
 # NAME
 
 CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 0.73
+Version 0.74
 
 # SYNOPSIS
 
@@ -355,13 +356,13 @@ cookie isn't in the jar.
 
 Deprecated - use cookie() instead.
 
-        use CGI::Info;
+    use CGI::Info;
 
-        my $i = CGI::Info->new();
-        my $name = $i->get_cookie(cookie_name => 'name');
-        print "Your name is $name\n";
-        my $address = $i->get_cookie('address');
-        print "Your address is $address\n";
+    my $i = CGI::Info->new();
+    my $name = $i->get_cookie(cookie_name => 'name');
+    print "Your name is $name\n";
+    my $address = $i->get_cookie('address');
+    print "Your address is $address\n";
 
 ## cookie
 
@@ -369,10 +370,10 @@ Returns a cookie's value, or undef if no name is given, or the requested
 cookie isn't in the jar.
 API is the same as "param", it will replace the "get\_cookie" method in the future.
 
-        use CGI::Info;
+    use CGI::Info;
 
-        my $name = CGI::Info->new()->cookie(name);
-        print "Your name is $name\n";
+    my $name = CGI::Info->new()->cookie('name');
+    print "Your name is $name\n";
 
 ## status
 
@@ -446,6 +447,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2010-2021 Nigel Horne.
+Copyright 2010-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2

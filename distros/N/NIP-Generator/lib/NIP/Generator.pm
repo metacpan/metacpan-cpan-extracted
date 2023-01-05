@@ -2,11 +2,10 @@ package NIP::Generator;
 
 #-----------------------------------------------------------------------
 use vars qw( $VERSION );
-$VERSION = 1.0;
+$VERSION = 1.1;
 #-----------------------------------------------------------------------
 use warnings;
 use strict;
-use List::Util	qw( sum				);
 use base		qw( Exporter::Tiny	);
 #=======================================================================
 our @EXPORT_OK = qw( nip );
@@ -20,7 +19,8 @@ sub nip {
 
     while( 1 ){
         my @val = map { int( rand 10 ) } @vec;
-        my $sum = sum( map { $vec[ $_ ] * $val[ $_ ] } 0 .. $#vec );
+        my $sum = 0;
+		$sum += $_ for map { $vec[ $_ ] * $val[ $_ ] } 0 .. $#vec;
         $sum %= 11;
         return join( q[], @val, $sum ) if $sum != 10;
     }

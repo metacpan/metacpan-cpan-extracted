@@ -5,12 +5,12 @@ use App::Licensecheck;
 
 plan 22;
 
-my $app = App::Licensecheck->new(
-	shortname_scheme => 'debian,spdx',
-	top_lines        => 0,
+my @opts = (
+	schemes   => [qw(debian spdx)],
+	top_lines => 0,
 );
 
-my ($license) = $app->parse('t/fedora/MIT');
+my ($license) = App::Licensecheck->new(@opts)->parse('t/fedora/MIT');
 like $license, qr/Adobe\-Glyph/;
 like $license, qr/BSL/;
 like $license, qr/DSDP/;

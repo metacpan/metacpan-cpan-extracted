@@ -51,6 +51,7 @@ is $chnl->impl(), 'Simple', 'implementation name';
 }
 
 # send recv_nb
+if ($^O ne 'MSWin32')
 {
    $chnl->send('a string');
    is $chnl->recv_nb, 'a string', 'send recv_nb scalar';
@@ -87,6 +88,7 @@ is $chnl->impl(), 'Simple', 'implementation name';
 }
 
 # send2 recv2_nb
+if ($^O ne 'MSWin32')
 {
    $chnl->send2('a string');
    is $chnl->recv2_nb, 'a string', 'send2 recv2_nb scalar';
@@ -129,6 +131,7 @@ is $chnl->impl(), 'Simple', 'implementation name';
 }
 
 # enqueue dequeue_nb
+if ($^O ne 'MSWin32')
 {
    $chnl->enqueue('a string');
    is $chnl->dequeue_nb, 'a string', 'enqueue dequeue_nb scalar';

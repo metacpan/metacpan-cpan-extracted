@@ -1,5 +1,9 @@
 Revision history for Perl module Text::PO
 
+v0.5.0 2023-01-04T19:55:54+0900
+    - Changed gettext.js class GettextString property 'lang' to 'locale'
+    - Implemented the class Text::PO::String containing the localised string and its locale property returned by Text::PO::Gettext methods
+
 v0.4.1 2022-12-30T20:56:12+0900
     - Implemented a minor improvement in gettext.js to stringify msgids that are objects.
 

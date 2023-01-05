@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 33;
+use Test::Most tests => 37;
 use Test::NoWarnings;
 
 BEGIN {
@@ -20,6 +20,13 @@ ALLOWED: {
 	ok(!exists($p{foo}));
 	ok($p{fred} eq 'wilma');
 	ok($i->as_string() eq 'fred=wilma');
+
+	$ENV{'QUERY_STRING'} = 'barney=betty&fred=wilma';
+	%allowed = ('fred' => 'barney', 'wilma' => 'betty');
+	$i = new_ok('CGI::Info');
+	is($i->params({allow => \%allowed}), undef, 'Check when different parameter is given');
+	cmp_ok($p{fred}, 'eq', 'wilma', 'check valid param');
+	cmp_ok($i->as_string(), 'eq', '', 'no valid args gives empty as_string()');
 
 	$ENV{'QUERY_STRING'} = 'foo=bar&fred=wilma&foo=baz';
 	%allowed = ('foo' => undef);
