@@ -1,5 +1,4 @@
-use strict;
-use warnings;
+use strictures 2;
 # no package, so things defined here appear in the namespace of the parent.
 
 use 5.020;
@@ -57,7 +56,7 @@ sub acceptance_tests (%options) {
       # to count that as a failure (an exception would be caught and perhaps TODO'd).
       # (This might change if tests are added that are expected to produce exceptions.)
       foreach my $r ($result, ($ENV{NO_SHORT_CIRCUIT} ? () : $result_short)) {
-        warn('evaluation generated an exception: '.$encoder->encode($_))
+        print STDERR 'evaluation generated an exception: '.$encoder->encode($_)
           foreach
             grep +($_->{error} =~ /^EXCEPTION/
                 && $_->{error} !~ /but short_circuit is enabled/            # unevaluated*

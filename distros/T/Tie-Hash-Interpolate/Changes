@@ -1,5 +1,8 @@
 Revision history for Perl extension Tie::Hash::Interpolate.
 
+0.08 Thu Jan  5 2023
+   - fix broken test that was assigning to scalar undef
+
 0.07 Sat Jan 16 16:37:09 2010
    - added repository to Build.PL
    - corrected MANIFEST t/ listing

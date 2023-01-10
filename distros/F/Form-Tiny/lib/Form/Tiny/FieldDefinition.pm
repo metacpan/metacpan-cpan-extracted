@@ -1,5 +1,5 @@
 package Form::Tiny::FieldDefinition;
-$Form::Tiny::FieldDefinition::VERSION = '2.16';
+$Form::Tiny::FieldDefinition::VERSION = '2.17';
 use v5.10;
 use strict;
 use warnings;
@@ -258,11 +258,14 @@ Form::Tiny::FieldDefinition - definition of a field to be validated
 
 =head1 DESCRIPTION
 
-This class keeps all the data for a field definition and contains method that handle single field validation.
+This class keeps all the data for a field definition and contains method that
+handle single field validation.
 
 =head1 ATTRIBUTES
 
-Each of the attributes can be accessed by calling its name as a function on Form::Tiny::FieldDefinition object. See L<Form::Tiny::Manual> for more examples.
+Each of the attributes can be accessed by calling its name as a function on
+Form::Tiny::FieldDefinition object. See L<Form::Tiny::Manual> for more
+examples.
 
 =head2 name
 
@@ -276,7 +279,8 @@ Special characters are:
 
 =item * dot [.], which specifies nesting
 
-=item * star [*], which specifies any number of array elements, but only if it is the only character on level, like a.*.b
+=item * star [*], which specifies any number of array elements, but only if it
+is the only character on level, like a.*.b
 
 =back
 
@@ -284,11 +288,13 @@ They both can be escaped by a backslash C<\> to lose their special meaning.
 
 =head2 required
 
-A field is not required by default (value C<0>), which means that its absence does not produce an error.
+A field is not required by default (value C<0>), which means that its absence
+does not produce an error.
 
 A field can also be soft required (C<'soft'>) or hard required (C<'hard'> or C<1>).
 
-Soft required field produce errors only if it is undefined or not present in the input data.
+Soft required field produce errors only if it is undefined or not present in
+the input data.
 
 Hard required field also checks if the field is not an empty string.
 
@@ -296,7 +302,9 @@ B<writer:> I<set_required>
 
 =head2 type
 
-The type attribute is where you can plug in a Type::Tiny type object. It has to be an instance of a class that provider I<validate> and I<check> methods, just like Type::Tiny. This can also be a Form::Tiny form instance.
+The type attribute is where you can plug in a Type::Tiny type object. It has to
+be an instance of a class that provider I<validate> and I<check> methods, just
+like Type::Tiny. This can also be a Form::Tiny form instance.
 
 B<writer:> I<set_type>
 
@@ -304,19 +312,26 @@ B<predicate:> I<has_type>
 
 =head2 addons
 
-Hash reference for internal use only - readable and writable under the C<addons> method. If you need additional data for a field definition that will be used in metaclasses (while extending Form::Tiny), put it here.
+Hash reference for internal use only - readable and writable under the
+C<addons> method. If you need additional data for a field definition that will
+be used in metaclasses (while extending Form::Tiny), put it here.
 
 =head2 coerce
 
-Coercions take place just before the validation. By default, values are not coerced. Specifying value I<1> will cause the field to use coercions from the type object.
+Coercions take place just before the validation. By default, values are not
+coerced. Specifying value I<1> will cause the field to use coercions from the
+type object.
 
-It can also be a code reference which will be called to coerce the value, passing in a field value as its only argument.
+It can also be a code reference which will be called to coerce the value,
+passing in a field value as its only argument.
 
 B<writer:> I<set_coercion>
 
 =head2 adjust
 
-Adjustments take place just after the validation. By default, values are not adjusted. You can specify a code reference which will be called to adjust the value (change the value after the validation).
+Adjustments take place just after the validation. By default, values are not
+adjusted. You can specify a code reference which will be called to adjust the
+value (change the value after the validation).
 
 B<writer:> I<set_adjustment>
 
@@ -324,9 +339,12 @@ B<predicate:> I<is_adjusted>
 
 =head2 default
 
-A coderef returning the default value for the field. Will be used when the field is not present in the input at all. Making the field hard-required will make the default value be used in place of undefined / empty value as well.
+A coderef returning the default value for the field. Will be used when the
+field is not present in the input at all. Making the field hard-required will
+make the default value be used in place of undefined / empty value as well.
 
-This coderef will be passed form instance as the only argument and is expected to return a scalar value.
+This coderef will be passed form instance as the only argument and is expected
+to return a scalar value.
 
 B<writer>: I<set_default>
 
@@ -334,7 +352,9 @@ B<predicate>: I<has_default>
 
 =head2 message
 
-If type class error messages are not helpful enough, you can specify your own message string which will be inserted into form errors if the validation for the field fails.
+If type class error messages are not helpful enough, you can specify your own
+message string which will be inserted into form errors if the validation for
+the field fails.
 
 B<writer:> I<set_message>
 
@@ -342,7 +362,9 @@ B<predicate:> I<has_message>
 
 =head2 data
 
-Custom data for the field. Can be anything and will not be used by Form::Tiny system itself. It should be anything that will help user's own system use the form instance.
+Custom data for the field. Can be anything and will not be used by Form::Tiny
+system itself. It should be anything that will help user's own system use the
+form instance.
 
 B<writer:> I<set_data>
 
@@ -352,17 +374,21 @@ B<predicate:> I<has_data>
 
 =head2 is_subform
 
-Checks if the field definition's type is a form - whether it mixes in L<Form::Tiny::Form> role.
+Checks if the field definition's type is a form - whether it mixes in
+L<Form::Tiny::Form> role.
 
 =head2 get_name_path
 
-Parses and returns the name of the field as an object of L<Form::Tiny::Path> class.
+Parses and returns the name of the field as an object of L<Form::Tiny::Path>
+class.
 
 =head2 hard_required
 
-Checks if the field is hard-required (any of the two values which are allowed for this flag)
+Checks if the field is hard-required (any of the two values which are allowed
+for this flag)
 
 =head2 validate
 
-Validates a scalar value. Arguments are C<$parent_form, $field_value>. Returns a boolean, whether the validation passed.
+Validates a scalar value. Arguments are C<$parent_form, $field_value>. Returns
+a boolean, whether the validation passed.
 

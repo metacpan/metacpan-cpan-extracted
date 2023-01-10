@@ -3187,23 +3187,23 @@ static inline void marpaESLIFPerl_constants_initv(pTHX_ MarpaX_ESLIF_constants_t
   if (! marpaESLIFPerl_canb(aTHX_ constantsp->MarpaX__ESLIF__Recognizer_svp, "SHALLOW", &(constantsp->MarpaX__ESLIF__Recognizer__SHALLOW_svp))) {
     MARPAESLIFPERL_CROAK("MarpaX::ESLIF::Recognizer must do \"SHALLOW\"");
   }
-  constantsp->MarpaX__ESLIF__Context__symbolName_svp = get_sv("MarpaX::ESLIF::Context::symbolName", GV_ADD);
+  constantsp->MarpaX__ESLIF__Context__symbolName_svp = get_sv("MarpaX::ESLIF::Context::symbolName", GV_ADD | GV_ADDMULTI);
   if (constantsp->MarpaX__ESLIF__Context__symbolName_svp == NULL) {
     MARPAESLIFPERL_CROAK("Failed to create MarpaX::ESLIF::Context::symbolName variable");
   }
-  constantsp->MarpaX__ESLIF__Context__symbolNumber_svp = get_sv("MarpaX::ESLIF::Context::symbolNumber", GV_ADD);
+  constantsp->MarpaX__ESLIF__Context__symbolNumber_svp = get_sv("MarpaX::ESLIF::Context::symbolNumber", GV_ADD | GV_ADDMULTI);
   if (constantsp->MarpaX__ESLIF__Context__symbolNumber_svp == NULL) {
     MARPAESLIFPERL_CROAK("Failed to create MarpaX::ESLIF::Context::symbolNumber variable");
   }
-  constantsp->MarpaX__ESLIF__Context__ruleName_svp = get_sv("MarpaX::ESLIF::Context::ruleName", GV_ADD);
+  constantsp->MarpaX__ESLIF__Context__ruleName_svp = get_sv("MarpaX::ESLIF::Context::ruleName", GV_ADD | GV_ADDMULTI);
   if (constantsp->MarpaX__ESLIF__Context__ruleName_svp == NULL) {
     MARPAESLIFPERL_CROAK("Failed to create MarpaX::ESLIF::Context::ruleName variable");
   }
-  constantsp->MarpaX__ESLIF__Context__ruleNumber_svp = get_sv("MarpaX::ESLIF::Context::ruleNumber", GV_ADD);
+  constantsp->MarpaX__ESLIF__Context__ruleNumber_svp = get_sv("MarpaX::ESLIF::Context::ruleNumber", GV_ADD | GV_ADDMULTI);
   if (constantsp->MarpaX__ESLIF__Context__ruleNumber_svp == NULL) {
     MARPAESLIFPERL_CROAK("Failed to create MarpaX::ESLIF::Context::ruleNumber variable");
   }
-  constantsp->MarpaX__ESLIF__Context__grammar_svp = get_sv("MarpaX::ESLIF::Context::grammar", GV_ADD);
+  constantsp->MarpaX__ESLIF__Context__grammar_svp = get_sv("MarpaX::ESLIF::Context::grammar", GV_ADD | GV_ADDMULTI);
   if (constantsp->MarpaX__ESLIF__Context__grammar_svp == NULL) {
     MARPAESLIFPERL_CROAK("Failed to create MarpaX::ESLIF::Context::grammar variable");
   }
@@ -3604,13 +3604,13 @@ CODE:
 
   /* maxDepth option verification */
   typei = marpaESLIFPerl_getTypei(aTHX_ Perl_maxDepthp);
-  if ((typei != SCALAR) || (!SvIOK(svp))) {
+  if ((typei != SCALAR) || (!SvIOK(Perl_maxDepthp))) {
     /* This is an error unless it is undef */
     if (! marpaESLIFPerl_is_undef(aTHX_ Perl_maxDepthp, typei)) {
       MARPAESLIFPERL_CROAK("maxDepth option must be an integer scalar or undef");
     }
   } else {
-    maxDepthl = (size_t) SvIVX(svp);
+    maxDepthl = (size_t) SvIVX(Perl_maxDepthp);
   }
   marpaESLIFJSONDecodeOption.disallowDupkeysb                = SvTRUE(Perl_disallowDupkeysp) ? 1 : 0;
   marpaESLIFJSONDecodeOption.maxDepthl                       = maxDepthl;

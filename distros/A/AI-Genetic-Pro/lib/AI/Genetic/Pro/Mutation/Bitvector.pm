@@ -1,5 +1,5 @@
 package AI::Genetic::Pro::Mutation::Bitvector;
-
+$AI::Genetic::Pro::Mutation::Bitvector::VERSION = '1.009';
 use warnings;
 use strict;
 #use Data::Dumper; $Data::Dumper::Sortkeys = 1;

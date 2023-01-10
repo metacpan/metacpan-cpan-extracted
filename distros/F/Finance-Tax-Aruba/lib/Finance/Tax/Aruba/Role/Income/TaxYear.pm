@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::Role::Income::TaxYear;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use Moose::Role;
 
 # ABSTRACT: A role that implements income tax logic
@@ -33,6 +33,7 @@ has yearly_income => (
     lazy => 1,
     builder => '_build_yearly_income',
     predicate => 'has_yearly_income',
+    init_arg => undef,
 );
 
 has pension_employee => (
@@ -41,6 +42,7 @@ has pension_employee => (
     lazy => 1,
     builder => '_build_pension_employee',
     predicate => 'has_pension_employee',
+    init_arg => undef,
 );
 
 has pension_employer => (
@@ -49,9 +51,22 @@ has pension_employer => (
     lazy => 1,
     builder => '_build_pension_employer',
     predicate => 'has_pension_employer',
+    init_arg => undef,
 );
 
 has bonus => (
+    is => 'ro',
+    isa => 'Num',
+    default => 0,
+);
+
+has fringe => (
+    is => 'ro',
+    isa => 'Num',
+    default => 0,
+);
+
+has tax_free => (
     is => 'ro',
     isa => 'Num',
     default => 0,
@@ -278,14 +293,12 @@ sub _get_taxable_amount {
 
 sub _get_tax_variable {
     my $self = shift;
-    return $self->get_cost($self->taxable_amount, $self->tax_rate);
+    return int($self->get_cost($self->taxable_amount, $self->tax_rate));
 }
 
 sub income_tax {
     my $self = shift;
-    my $income_tax = $self->tax_variable + $self->tax_fixed;
-    $income_tax =~ s/\.[0-9]+$//;
-    return $income_tax;
+    return $self->tax_variable + $self->tax_fixed;
 }
 
 sub _build_wervingskosten {
@@ -377,12 +390,18 @@ sub azv_employer {
     );
 }
 
+sub net_yearly_income {
+    my $self = shift;
+    return $self->zuiver_jaarloon;
+}
+
 sub zuiver_jaarloon {
     my $self = shift;
 
     return $self->yearly_income
          - $self->aov_employee
          - $self->azv_employee
+         + $self->fringe
 }
 
 sub taxable_wage {
@@ -411,7 +430,11 @@ sub tax_free_wage {
 
 sub net_income {
     my $self = shift;
-    $self->tax_free_wage + $self->taxfree_amount;
+    return
+          $self->tax_free_wage
+        + $self->taxfree_amount
+        + $self->wervingskosten
+        + $self->tax_free;
 }
 
 sub company_costs {
@@ -437,7 +460,7 @@ Finance::Tax::Aruba::Role::Income::TaxYear - A role that implements income tax l
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

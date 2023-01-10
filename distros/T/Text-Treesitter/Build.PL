@@ -7,6 +7,9 @@ use Module::Build::Using::PkgConfig;
 my $build = Module::Build::Using::PkgConfig->new(
    module_name => 'Text::Treesitter',
    requires => {
+      'perl' => '5.026',
+      'Object::Pad' => 0,
+
       'ExtUtils::CppGuess' => 0,
    },
    configure_requires => {

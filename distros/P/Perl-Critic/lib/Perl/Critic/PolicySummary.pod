@@ -22,7 +22,7 @@ module for its specific details.
 
 =head2 L<BuiltinFunctions::ProhibitBooleanGrep|Perl::Critic::Policy::BuiltinFunctions::ProhibitBooleanGrep>
 
-Use C<any> from C<List::SomeUtils> or C<List::MoreUtils> instead of C<grep> in boolean context. [Default severity 2]
+Use C<any> from C<List::Util>, C<List::SomeUtils>, or C<List::MoreUtils> instead of C<grep> in boolean context. [Default severity 2]
 
 =head2 L<BuiltinFunctions::ProhibitComplexMappings|Perl::Critic::Policy::BuiltinFunctions::ProhibitComplexMappings>
 

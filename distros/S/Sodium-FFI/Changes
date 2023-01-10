@@ -1,5 +1,8 @@
 Change history for Sodium-FFI
 
+0.008     2023-01-10
+    - Update tagline to say what Sodium is.
+
 0.007     2022-05-14
     - Added crypto_box_easy
     - Added crypto_box_keypair

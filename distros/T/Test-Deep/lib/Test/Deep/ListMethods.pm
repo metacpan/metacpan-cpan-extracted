@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Test::Deep::ListMethods 1.202;
+package Test::Deep::ListMethods 1.204;
 
 use base 'Test::Deep::Methods';
 
@@ -35,7 +35,7 @@ Test::Deep::ListMethods
 
 =head1 VERSION
 
-version 1.202
+version 1.204
 
 =head1 PERL VERSION
 

@@ -5,7 +5,7 @@ package Data::Scan::Printer;
 
 # ABSTRACT: Example of a printer consumer for Data::Scan
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -43,7 +43,7 @@ Data::Scan::Printer - Example of a printer consumer for Data::Scan
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

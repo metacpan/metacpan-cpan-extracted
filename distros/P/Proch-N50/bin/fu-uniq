@@ -9,6 +9,12 @@ use FASTX::Reader;
 use FASTX::Seq;
 use Data::Dumper;
 use Digest::MD5 qw( md5_hex );
+use FindBin qw($RealBin);
+# The following placeholder is to be programmatically replaced with 'use lib "$RealBin/../lib"' if needed
+#~loclib~
+if ( -e "$RealBin/../lib/Proch/N50.pm" and -e "$RealBin/../Changes" ) {
+    use lib "$RealBin/../lib";
+}
 use Proch::Seqfu;
 my $VERSION = $Proch::Seqfu::VERSION // "<Dev>";
 my $EXE = basename($0);
@@ -49,15 +55,15 @@ foreach my $file (@ARGV) {
 	debug("Reading $file");
 	$file = undef if ($file eq '-');
 	my $FASTX = FASTX::Reader->new({ filename => "$file"});
+   
+  while (my $seq = $FASTX->getRead()) {
+       
+			my $size = $seq->{seq} =~/size=(\d+)/ ?  $1  : 1;
 
-  while (my $seq = $FASTX->next()) {
-
-			my $size = $seq->seq() =~/size=(\d+)/ ?  $1  : 1;
-
-			$counter{uc( $seq->seq )} += $size;
+			$counter{uc( $seq->{seq} )} += $size;
 			next unless ($opt_keep_name);
 
-			$labels{uc( $seq->seq )}  = $seq->id;
+			$labels{uc( $seq->{seq} )}  = $seq->{id};
 	}
 
 }
@@ -170,7 +176,7 @@ fu-uniq - Dereplicate sequences
 
 =head1 VERSION
 
-version 1.5.0
+version 1.5.4
 
 =head1 SYNOPSIS
 

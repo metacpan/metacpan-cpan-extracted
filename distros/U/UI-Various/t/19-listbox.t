@@ -100,7 +100,7 @@ is($lb0->first(), -1, 'first of empty listbox is correct');
 is_deeply($lb0->{texts}, [], 'texts of empty listbox are correct');
 
 stdout_is(sub {   $lb0->_show('<1> ');   },
-	  "      0/0\n\n\n\n\n\n",
+	  "      0/0\n\n\n\n",
 	  '_show 1 prints correct empty Listbox');
 my $output_select0 = "<0>   leave listbox\nenter selection: ";
 stdout_is
@@ -365,9 +365,9 @@ my $output_part2 =
     '----- enter number to choose next step: ';
 stdout_is
 {   _call_with_stdin("2\n3\n", sub { $main->mainloop; });   }
-    "========== 0-42\n      0/0\n\n\n\n\n\n" .
+    "========== 0-42\n      0/0\n\n\n\n" .
     $output_part2 . "2\n" .
-    "========== 0-42\n<1>   1-1/1\n      42\n\n\n\n\n" .
+    "========== 0-42\n<1>   1-1/1\n      42\n\n\n\n" .
     $output_part2 . "3\n",
     'start with empty list prints correct output';
 

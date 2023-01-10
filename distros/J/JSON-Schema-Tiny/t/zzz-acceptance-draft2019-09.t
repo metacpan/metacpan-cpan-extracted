@@ -1,6 +1,5 @@
 # vim: set ft=perl ts=8 sts=2 sw=2 tw=100 et :
-use strict;
-use warnings;
+use strictures 2;
 use 5.020;
 use experimental qw(signatures postderef);
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -60,8 +59,13 @@ acceptance_tests(
           '$id must be resolved against nearest parent, not just immediate parent',
           'order of evaluation: $id and $ref',
           'order of evaluation: $id and $anchor and $ref',
+          'URN base URI with URN and anchor ref',
+          'URN ref with nested pointer ref',
         ] },
       { file => 'unknownKeyword.json', group_description => '$id inside an unknown keyword is not a real identifier', test_description => 'type matches second anyOf, which has a real schema in it' },
+      { file => 'optional/cross-draft.json', group_description => [
+          'refs to future drafts are processed as future drafts',
+          'refs to historic drafts are processed as historic drafts' ] },
       # I am not interested in back-supporting "dependencies"
       { file => 'optional/dependencies-compatibility.json' },
       # various edge cases that are difficult to accomodate

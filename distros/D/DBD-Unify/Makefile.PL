@@ -1,7 +1,6 @@
 #!/usr/local/bin/perl -w
 
 require 5.008006;
-
 use strict;
 
 # Be kind to testers, not verbose
@@ -100,12 +99,12 @@ if (-f ".perlcriticrc" && -s "$ENV{HOME}/.perlcriticrc") {
     print $fh join "\n" => "",
 	"[-Documentation::RequireLinkedURLs]", # L<DBI|http://...] requires 5.12
 	"[-Modules::ProhibitMultiplePackages]",
-	"[-Modules::RequireExplicitPackage]",			# use 5.8.0
+	"[-Modules::RequireExplicitPackage]",			# use 5.008000
 	"[-RegularExpressions::ProhibitFixedStringMatches]",	# deliberate
 	"[-Subroutines::ProhibitBuiltinHomonyms]",		# connect
 	"[-Subroutines::ProtectPrivateSubs]",
 	"[-TooMuchCode::ProhibitDuplicateSub]",	# sub private_attribute_info
-	"[-ValuesAndExpressions::ProhibitVersionStrings]",	# use 5.8.0
+	"[-ValuesAndExpressions::ProhibitVersionStrings]",	# use 5.008000
 	"[-Variables::ProhibitPackageVars]",			# our
 	"";
     close $fh;

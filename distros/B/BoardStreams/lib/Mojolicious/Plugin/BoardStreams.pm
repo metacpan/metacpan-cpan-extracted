@@ -3,704 +3,1039 @@ package Mojolicious::Plugin::BoardStreams;
 use Mojo::Base 'Mojolicious::Plugin', -signatures, -async_await;
 
 use BoardStreams::Registry;
-use BoardStreams::ListenerObservable 'get_listener_observable';
-use BoardStreams::Transaction;
-use BoardStreams::Exception 'db_duplicate_error';
-use BoardStreams::Util 'string', ':bool', 'next_tick_p';
+use BoardStreams::DBUtil qw/
+    query_throwing_exception_object_p exists_p
+    row_exists query_throwing_exception_object
+/;
+use BoardStreams::Util qw/
+    trim :bool unique_id hashify next_tick_p sleep_p
+    encode_json decode_json
+/;
+use BoardStreams::Exceptions qw/ jsonrpc_error /;
+use BoardStreams::REs;
 use BoardStreams::DBMigrations;
 
-use Mojo::Pg;
-use Mojo::JSON 'to_json', 'from_json', 'encode_json', 'decode_json';
-use Mojo::WebSocket 'WS_PING';
 use Mojo::IOLoop;
 use RxPerl::Mojo ':all';
-use Safe::Isa;
 use Syntax::Keyword::Try;
-use Data::GUID;
-use List::AllUtils qw/ max min /;
-use Time::HiRes ();
-use Sys::Hostname; # exports 'hostname' function
+use Syntax::Keyword::Dynamically;
+use Safe::Isa;
+use Text::Trim;
+use Struct::Diff 'diff';
+use List::AllUtils 'pairs', 'min';
+use Crypt::Digest::SHA256 'sha256_b64u';
+use Storable 'dclone';
 use Carp 'croak';
-use Encode 'encode_utf8';
 
-use experimental 'postderef';
+no autovivification;
 
-our $VERSION = "v0.0.23";
+use experimental 'isa';
 
+use constant UNIQUE_STREAM_NAME_INDEX => 'bs_streams_uidx_name';
 use constant {
-    DEFAULT_CLEANUP_INTERVAL          => 5,
-    DEFAULT_HEARTBEAT_INTERVAL        => 5,
-    DEFAULT_HEARTBEAT_TIMEOUT         => 5,
-    DEFAULT_PREFIX                    => 'bs',
-    DEFAULT_PING_INTERVAL             => 15,
-    DEFAULT_NOTIFY_PAYLOAD_SIZE_LIMIT => 8000,
-    MAX_WEBSOCKET_SIZE                => 262_144,
+    DEFAULT_HEARTBEAT_INTERVAL => 5,
+    DEFAULT_REPAIR_INTERVAL    => 40,
+    DEFAULT_PING_INTERVAL      => 15,
+    DEFAULT_NOTIFY_SIZE_LIMIT  => 8_000,
+    MAX_WEBSOCKET_SIZE         => 262_144,
 };
 
-my $WORKERS_CHANNEL = '_bs:workers';
-my $CLEANUP_CHANNEL = '_bs:cleanup';
+our $VERSION = "v0.0.30";
+
+has _listener_observables => sub { +{} };
+
+my $MAX_WEBSOCKET_SIZE = MAX_WEBSOCKET_SIZE;
+
+our @CARP_NOT;
 
 sub register ($self, $app, $config) {
-    my $worker_uuid = Data::GUID->new->as_base64;
+    # config options
+    my $HEARTBEAT_INTERVAL = $config->{heartbeat_interval} // DEFAULT_HEARTBEAT_INTERVAL;
+    my $REPAIR_INTERVAL = $config->{repair_interval} // DEFAULT_REPAIR_INTERVAL;
+    my $PING_INTERVAL = $config->{ping_interval} // DEFAULT_PING_INTERVAL;
+    my $NOTIFY_SIZE_LIMIT = ($config->{notify_size_limit} // DEFAULT_NOTIFY_SIZE_LIMIT) - 1;
 
-    # config params
-    my $cleanup_interval = $config->{cleanup_interval} // DEFAULT_CLEANUP_INTERVAL;
-    my $heartbeat_interval = $config->{heartbeat_interval} // DEFAULT_HEARTBEAT_INTERVAL;
-    my $heartbeat_timeout = $config->{heartbeat_timeout} // DEFAULT_HEARTBEAT_TIMEOUT;
-    my $bs_prefix = $config->{prefix} // DEFAULT_PREFIX;
-    my $ping_interval = $config->{ping_interval} // DEFAULT_PING_INTERVAL;
-    my $notify_payload_size_limit = ($config->{notify_payload_size_limit} // DEFAULT_NOTIFY_PAYLOAD_SIZE_LIMIT) - 1;
+    my $pg = $config->{Pg};
+    my $registry = BoardStreams::Registry->new;
+    my $worker_id;   # UUID
+    my $am_repairer; # is this worker process the repairer?
+    my $is_finished; # is this worker process shutting down?
+    my $can_accept_clients = 0;
 
-    # Database stuff
-    my $db_string = $config->{'db_string'} or die "missing db_string configuration option";
-    my $pg = Mojo::Pg->new($db_string);
+    # Migrate database to newest schema
     BoardStreams::DBMigrations->apply_migrations($pg);
-    $app->helper("$bs_prefix.pg" => sub { $pg });
-    $app->helper("$bs_prefix.db" => sub { $pg->db });
-    $app->helper("$bs_prefix.pubsub" => sub { $pg->pubsub });
-    my $event_patch_sequence_name = $app->$bs_prefix->db->query("
-        SELECT pg_get_serial_sequence('event_patch', 'id')
-    ")->array->[0];
 
-    my sub get_time {
-        return $app->$bs_prefix->db->query("SELECT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)")
-            ->array->[0];
+    $app->helper('bs.worker_id' => sub ($c) { $worker_id });
+
+    my sub stop_gracefully {
+        Mojo::IOLoop->stop_gracefully unless $is_finished;
     }
 
-    my $pubsub_connected_o = rx_behavior_subject->new(0);
-    my $pubsub_connected;
-
-    my @boot_emitters;
-    my $last_heartbeat_dt;
-
-    my sub calculate_hb_expiry_dur () {
-        state $hb_e_d = $heartbeat_interval + $heartbeat_timeout;
+    my sub get_pg_channel_name ($stream_name) {
+        return sha256_b64u("boardstreams.$stream_name");
     }
 
-    # on workers startup:
-    Mojo::IOLoop->next_tick(sub {
-        srand();
-
-        my $graceful_stop_o = rx_from_event(Mojo::IOLoop->singleton, 'finish')->pipe(
-            op_share(),
-        );
-
-        # on graceful stop, boot all clients
-        for my $i (1 .. 10) {
-            push @boot_emitters, $graceful_stop_o->pipe(
-                op_delay(2 * $i / 10),
-                op_share(),
-            );
-        }
-
-        # remove any heartbeat record
-        $graceful_stop_o->subscribe(sub {
-            # don't prevent other callbacks if this dies
-            eval {
-                $app->$bs_prefix->lock_state($WORKERS_CHANNEL, sub ($state) {
-                    delete $state->{$worker_uuid};
-                    return undef, $state;
-                }, no_ban => 1);
-            };
-        });
-
-        # register heartbeat at start, or gracefully stop
-        try {
-            $app->$bs_prefix->lock_state($WORKERS_CHANNEL, sub ($state) {
-                $last_heartbeat_dt = int get_time;
-                $state->{$worker_uuid} = {
-                    uuid      => $worker_uuid,
-                    pid       => $$,
-                    heartbeat => $last_heartbeat_dt,
-                    hostname  => hostname,
-                    banned    => false,
-                };
-                return undef, $state;
-            }, no_ban => 1);
-        } catch {
-            Mojo::IOLoop->stop_gracefully;
-        };
-
-        # register heartbeat every X seconds, or gracefully stop
-        rx_timer(rand($heartbeat_interval), $heartbeat_interval)->pipe(
-            op_take_until($graceful_stop_o),
-        )->subscribe(sub {
-            try {
-                $app->$bs_prefix->lock_state($WORKERS_CHANNEL, sub ($state) {
-                    my $me = $state->{$worker_uuid};
-                    if (! $me or $me->{banned}) {
-                        Mojo::IOLoop->stop_gracefully;
-                        return undef, undef;
-                    }
-                    $last_heartbeat_dt = int get_time;
-                    $me->{heartbeat} = $last_heartbeat_dt;
-                    return undef, $state;
-                }, no_ban => 1);
-            } catch {
-                Mojo::IOLoop->stop_gracefully;
-            };
-        });
-
-        $pubsub_connected_o->subscribe(sub {
-            $pubsub_connected = $_[0];
-        });
-        rx_from_event($pg->pubsub, 'reconnect')->subscribe(sub {
-            $pubsub_connected_o->next(1);
-        });
-        rx_from_event($pg->pubsub, 'disconnect')->subscribe(sub {
-            $pubsub_connected_o->next(0);
-        });
-
-        # close worker gracefully, if...
-        rx_merge(
-            # ...ever disconnect from pubsub
-            $pubsub_connected_o->pipe(
-                op_pairwise,
-                op_filter(sub {
-                    my ($prev, $curr) = $_[0]->@*;
-                    return $prev && !$curr;
-                }),
-                op_delay(1),
+    my $on_client_finish_sub = async sub ($c) {
+        $registry->is_conn_registered($c) or return;
+        $registry->unregister_conn($c);
+        await first_value_from(
+            $registry->pending_joins->{$c}->pipe(
+                op_filter(sub { $_ == 0 }),
             ),
-
-            # ...or if haven't connected to pubsub in first three seconds
-            rx_timer(3)->pipe(
-                op_take_until(
-                    $pubsub_connected_o->pipe(op_filter(sub {$_[0]}))
-                ),
-            ),
-        )->subscribe(sub { Mojo::IOLoop->stop_gracefully });
-
-        # if no notifications from _bs:workers in a while, stop gracefully
-        rx_observable->new(sub ($subscriber) {
-            try {
-                $pg->pubsub->listen($WORKERS_CHANNEL => sub ($pubsub, $payload) {
-                    $subscriber->next();
-                });
-            } catch {
-                Mojo::IOLoop->stop_gracefully;
-            };
-        })->pipe(
-            op_switch_map(sub {
-                return rx_timer(calculate_hb_expiry_dur());
-            }),
-        )->subscribe(sub {
-            Mojo::IOLoop->stop_gracefully;
-        });
-
-        # one process needs to call "global_cleanup" every "cleanup_interval" seconds:
-        if ($cleanup_interval) {
-            rx_defer(sub {
-                return rx_timer($cleanup_interval * 0.5 + rand($cleanup_interval));
-            })->pipe(
-                op_repeat(),
-                op_take_until($graceful_stop_o),
-            )->subscribe(async sub {
-                my $t0 = Time::HiRes::time();
-                my $cleanup_state = $app->$bs_prefix->get_state($CLEANUP_CHANNEL);
-                return unless $t0 >= $cleanup_state->{last_cleanup} + $cleanup_interval;
-
-                my $me_is_cleanup_executor = 0;
-
-                my $txn = $app->$bs_prefix->begin;
-                $txn->db->select('channel',
-                    'id',
-                    { name => $CLEANUP_CHANNEL },
-                    { for => \'update skip locked' },
-                )->hash or return;
-                $txn->lock_state($CLEANUP_CHANNEL, sub ($state) {
-                    return undef, undef if Time::HiRes::time() < $state->{last_cleanup} + $cleanup_interval;
-
-                    $state->{last_cleanup} = $t0;
-                    $me_is_cleanup_executor = 1;
-
-                    return undef, $state;
-                });
-                return unless $me_is_cleanup_executor;
-                await $app->$bs_prefix->global_cleanup;
-                $txn->commit;
-            });
-        }
-    });
-
-    $app->helper("$bs_prefix.on_action", sub ($c, $channel_name, $action_name, $action_sub) {
-        BoardStreams::Registry->add_action($channel_name, $action_name, $action_sub);
-    });
-
-    $app->helper("$bs_prefix.on_request", sub ($c, $channel_name, $request_name, $request_sub) {
-        BoardStreams::Registry->add_request($channel_name, $request_name, $request_sub);
-    });
-
-    $app->helper("$bs_prefix.create_channel_or_die", sub ($c, $channel_name, $state = undef, $attrs = {}) {
-        ! $c->$bs_prefix->db->select('channel',
-            'id',
-            { name => $channel_name },
-        )->hash or db_duplicate_error;
-        my $type = $attrs->{type} // '';
-        my $keep_events = exists $attrs->{keep_events} ? to_bool $attrs->{keep_events} : true;
-        my $sth;
-        try {
-            $sth = $c->$bs_prefix->db->dbh->prepare('
-                INSERT INTO "channel" (name, type, state, keep_events) VALUES (?, ?, ?, ?)
-            ');
-            $sth->execute($channel_name, $type, to_json($state), $keep_events);
-        } catch {
-            my $err = $@;
-            # look up 23505 in: https://www.postgresql.org/docs/current/errcodes-appendix.html
-            if ($sth->state eq '23505') {
-                db_duplicate_error;
-            } else {
-                die $err;
-            }
-        }
-    });
-
-    $app->helper("$bs_prefix.create_channel", sub ($c, $channel_name, $state = undef, $attrs = {}) {
-        try {
-            $c->$bs_prefix->create_channel_or_die($channel_name, $state, $attrs);
-            return 1;
-        } catch {
-            my $e = $@;
-            if ($e->$_isa('BoardStreams::Exception::DbError::Duplicate')) {
-                return !!0;
-            }
-            die $e;
-        };
-    });
-
-    $app->helper("$bs_prefix.begin", sub ($c) {
-        my $db = $c->$bs_prefix->db;
-
-        return BoardStreams::Transaction->new(
-            bs_prefix                 => $bs_prefix,
-            c                         => $c,
-            notify_payload_size_limit => $notify_payload_size_limit,
-            event_patch_sequence_name => $event_patch_sequence_name,
         );
-    });
+        await next_tick_p; # to allow pending join handlers to send their return values
+        my $streams_and_counts_of_conn = $registry->get_streams_and_counts_of_conn($c) or return;
 
-    $app->helper("$bs_prefix.lock_state", sub ($c, $channel_names, $sub, %opts) {
-        my $txn = $c->$bs_prefix->begin;
-        my $ret = $txn->lock_state($channel_names, $sub, %opts);
-        $txn->commit;
-        return $ret;
-    });
+        my $db = dynamically $BoardStreams::db = $pg->db;
 
-    $app->helper("$bs_prefix.on_join", sub ($c, $channel_name, $join_sub) {
-        BoardStreams::Registry->add_join($channel_name, $join_sub);
-    });
+        PAIR:
+        foreach my $stream_name (keys %$streams_and_counts_of_conn) {
+            $registry->is_member_of($c, $stream_name) or next PAIR;
 
-    $app->helper("$bs_prefix.on_leave", sub ($c, $channel_name, $leave_sub) {
-        BoardStreams::Registry->add_leave($channel_name, $leave_sub);
-    });
+            my $tx = $db->begin;
 
-    $app->helper("$bs_prefix.on_cleanup", sub ($c, $channel_name, $cleanup_sub) {
-        BoardStreams::Registry->add_cleanup($channel_name, $cleanup_sub);
-    });
+            await exists_p(
+                $db,
+                'bs_streams',
+                { name => $stream_name },
+                { for => 'update' },
+            ) or next PAIR;
 
-    # NOTE: turn this sub into async later
-    $app->helper("$bs_prefix.send", sub ($c, $data, $identifier, %opts) {
-        # opts can be: binary
+            $registry->is_member_of($c, $stream_name) or next PAIR;
 
-        my sub get_max_size {
-            return min($c->tx->max_websocket_size, MAX_WEBSOCKET_SIZE);
-        }
+            if (my $leave_sub = $registry->get_leave($stream_name)) {
+                my $left_completely;
+                while (! $left_completely) {
+                    $left_completely = $registry->remove_membership($c, $stream_name)
+                        and (delete $registry->conn_subscriptions->{$c}{$stream_name})->unsubscribe;
 
-        my $bytes = $opts{binary} ? $data : encode_json $data;
-        my $bytes_length = length($bytes);
-        if ($bytes_length < get_max_size) {
-            $c->send({binary => $bytes});
-            return;
-        }
-
-        $identifier =~ s/\:/{}/g;
-        my $ending_bytes_prefix = encode_utf8 ":$identifier end: ";
-        my $sent_ending = 0;
-        for (my ($i, $cursor) = (0, 0); ! $sent_ending; $i++) {
-            my $max_size = get_max_size;
-            my $remaining_length = $bytes_length - $cursor;
-            my $bytes_prefix;
-            if (length($ending_bytes_prefix) + $remaining_length <= $max_size) {
-                $bytes_prefix = $ending_bytes_prefix;
-                $sent_ending = 1;
-            } else {
-                $bytes_prefix = encode_utf8 ":$identifier $i: ";
-            }
-
-            my $sublength = $max_size - length $bytes_prefix;
-            my $substring = $remaining_length >= 0 ? substr($bytes, $cursor, $sublength) : '';
-            $cursor += $sublength;
-
-            my $piece = $bytes_prefix . $substring;
-            $c->send({binary => $piece});
-        }
-    });
-
-    $app->helper("$bs_prefix.initialize_client", sub ($self) {
-        # reject connection, if pubsub is not active
-        return $self->rendered(500) if not $pubsub_connected;
-
-        # send initial configuration
-        $self->send({binary => encode_json({
-            type => 'configuration',
-            pingInterval => $ping_interval,
-        })});
-
-        # disconnect soon if worker stops gracefully
-        $boot_emitters[int rand @boot_emitters]->subscribe(sub {
-            $self->finish;
-        });
-
-        # trap incoming messages
-        $self->on(binary => async sub ($c, $bytes) {
-            my $hash = decode_json($bytes);
-
-            # join
-            if ($hash->{type} eq 'join') {
-                my $channel_name = string $hash->{channel};
-                my $channel_uuid = string $hash->{channelUUID};
-                my $since_id = $hash->{sinceId};
-                $since_id = int $since_id if defined $since_id;
-
-                # join handler
-                my $join_handler = BoardStreams::Registry->get_join($channel_name) or return;
-                if (BoardStreams::Registry->has_pair($c, $channel_name)) {
-                    # not first join, so use a join handler that does nothing
-                    $join_handler = sub {
-                        return { limit => 0 };
+                    try {
+                        my $result = $leave_sub->($c, $stream_name);
+                        await $result if $result->$_can('then');
+                    } catch ($e) {
+                        $c->log->fatal("Couldn't execute leave sub, stopping worker: $e");
+                        # so as to not leave the streams in an inconsistent state
+                        stop_gracefully();
                     };
                 }
-                $c->$bs_prefix->channel_exists($channel_name) or return;
-                my $attrs = { since_id => $since_id, is_reconnect => int(defined $since_id) };
-
-                my $o = get_listener_observable($c, $channel_name, $bs_prefix);
-                my $s = $o->subscribe();
-
-                my $join_ret = eval { $join_handler->($channel_name, $c, $attrs) };
-                if ($join_ret->$_can('then')) {
-                    $join_ret = eval { await $join_ret };
-                }
-                if (! $join_ret) {
-                    $s->unsubscribe();
-                    return;
-                }
-                my $limit = eval { $join_ret->{limit} } // 0;
-
-                my $was_added = BoardStreams::Registry->add_pair($c, $channel_name);
-                if ($was_added) {
-                    $c->stash->{subscriptions}{channels}{$channel_name} = $s;
-                } else {
-                    $s->unsubscribe();
-                }
-
-                # NOTE: in the async case in the future, make sure the subscription is still there
-                # after the query, before sending state to user
-
-                my $db = $c->$bs_prefix->db;
-                my ($channel_id, $event_id, $state) = $db->select('channel',
-                    [qw/ id event_id state /],
-                    { name => $channel_name },
-                )->hash->@{qw/ id event_id state /};
-
-                # fetch & send most recent events
-                if ($event_id and $limit ne '0') {
-                    my $latest_event_rows = $db->select('event_patch',
-                        [qw/ id event /],
-                        {
-                            channel_id => $channel_id,
-                            id         => {
-                                '<=', $event_id,
-                                # $since_id defaults to 0
-                                defined $since_id ? ('>', $since_id) : (),
-                            },
-                        },
-                        {
-                            order_by => { -desc => 'id' },
-                            $limit eq 'all' ? () : (limit => $limit),
-                        },
-                    )->hashes->reverse;
-
-                    foreach my $event_row (@$latest_event_rows) {
-                        $c->$bs_prefix->send({
-                            type        => 'event_patch',
-                            channel     => $channel_name,
-                            channelUUID => $channel_uuid,
-                            immediate   => true,
-                            id          => int $event_row->{id},
-                            data        => {
-                                event => from_json($event_row->{event}),
-                            },
-                        }, "imm-event_patch-$channel_name-$channel_uuid");
-                    }
-                }
-
-                $c->$bs_prefix->send({
-                    type        => 'state',
-                    channel     => $channel_name,
-                    channelUUID => $channel_uuid,
-                    id          => int $event_id,
-                    data        => from_json($state),
-                }, "state-$channel_name-$channel_uuid");
+            } else {
+                1 until $registry->remove_membership($c, $stream_name);
+                (delete $registry->conn_subscriptions->{$c}{$stream_name})->unsubscribe;
             }
 
-            # leave
-            if ($hash->{type} eq 'leave') {
-                my $channel_name = string $hash->{channel};
-                return unless $c->$bs_prefix->joined($channel_name);
-                BoardStreams::Registry->remove_pair($c, $channel_name);
-                my $s = delete $c->stash->{subscriptions}{channels}{$channel_name};
-                $s->unsubscribe() if defined $s;
-                my $leave_sub = BoardStreams::Registry->get_leave($channel_name);
-                $leave_sub->($channel_name, $c) if $leave_sub;
-            }
+            $tx->commit;
+        }
+    };
 
-            # action
-            if ($hash->{type} eq 'action') {
-                my $channel_name = string $hash->{channel};
-                return unless $c->$bs_prefix->joined($channel_name);
-                my ($action_name, $payload) = $hash->{data}->@*;
-                my $action_sub = BoardStreams::Registry->get_action($channel_name, $action_name);
-                $action_sub->($channel_name, $c, $payload);
-            }
+    # all workers execute this at the beginning
+    Mojo::IOLoop->next_tick(sub {
+        $worker_id = unique_id;
 
-            # request
-            if ($hash->{type} eq 'request') {
-                my $channel_name = string $hash->{channel};
-                my ($request_name, $payload) = $hash->{data}->@*;
-                my $request_id = string $hash->{requestId};
-                my $request_sub;
-                $c->$bs_prefix->joined($channel_name) or $request_sub //= sub {
-                    die { 'system' => 'not_joined' };
-                };
-                $request_sub //= BoardStreams::Registry->get_request($channel_name, $request_name);
-                $request_sub //= sub {
-                    die { 'system' => 'invalid_request_name' };
-                };
-                my $t0 = Time::HiRes::time();
-                my $return_value;
-                my $ok = eval { $return_value = $request_sub->($channel_name, $c, $payload); 1 };
-                my $err; $err = $@ if ! $ok;
-                my $duration = sprintf("%.1fms", (Time::HiRes::time() - $t0) * 1e3);
-                if ($return_value->$_can('then')) {
-                    $ok = eval { $return_value = await $return_value; 1 };
-                    $err = $@ if !$ok;
-                }
+        # set $can_accept_clients
+        {
+            my $pubsub_connected_o = rx_merge(
+                rx_from_event($pg->pubsub, 'reconnect')->pipe(op_map_to(1)),
+                rx_from_event($pg->pubsub, 'disconnect')->pipe(op_map_to(0)),
+            )->pipe(op_start_with(0));
 
-                if (! $ok) {
-                    $err = "$err" if not eval { to_json $err; 1 };
-                }
+            # stop & kick everyone on these events
+            rx_merge(
+                # if disconnect from pg
+                $pubsub_connected_o->pipe(
+                    op_pairwise(),
+                    op_filter(sub {
+                        my ($prev, $curr) = @$_;
+                        return $prev && ! $curr;
+                    })
+                ),
 
-                if ($ok) {
-                    $c->$bs_prefix->send({
-                        type      => 'response',
-                        channel   => $channel_name,
-                        requestId => $request_id,
-                        result    => $return_value,
-                        duration  => $duration,
-                    }, "response-$channel_name-$request_id");
-                } else {
-                    $c->$bs_prefix->send({
-                        type      => 'response',
-                        channel   => $channel_name,
-                        requestId => $request_id,
-                        error     => $err,
-                        duration  => $duration,
-                    }, "response-$channel_name-$request_id");
-                }
-            }
+                # if not connected to pg the first three seconds
+                rx_timer(3)->pipe(
+                    op_take_until(
+                        $pubsub_connected_o->pipe(op_filter(sub { $_ })),
+                    ),
+                ),
+            )->subscribe(sub {
+                $can_accept_clients = 0;
+                stop_gracefully();
+            });
 
-            # on $hash->{type} eq 'ping', do nothing
+            # allow connections on...
+            $pubsub_connected_o->pipe(
+                op_filter(sub { $_ }),
+            )->subscribe(sub { $can_accept_clients = 1 });
+        }
+
+        # this is to... (?)
+        $pg->pubsub->listen('boardstreams.dummy' => sub {});
+
+        # create worker row
+        $pg->db->insert(
+            'bs_workers',
+            {
+                id           => $worker_id,
+                dt_heartbeat => \'CURRENT_TIMESTAMP',
+            },
+            { on_conflict => undef },
+        )->rows or stop_gracefully();
+
+        # store heartbeat, shutdown if worker row is missing
+        rx_timer(rand($HEARTBEAT_INTERVAL), $HEARTBEAT_INTERVAL)->subscribe(async sub {
+            # update heartbeat or stop and finish
+            (await $pg->db->update_p(
+                'bs_workers',
+                { dt_heartbeat => \'CURRENT_TIMESTAMP' },
+                { id => $worker_id },
+            ))->rows or stop_gracefully();
         });
 
-        # on finish, leave all channels
-        $self->on(finish => sub ($c, @) {
-            BoardStreams::Registry->remove_user($c);
-            my @channel_names = keys $c->stash->{subscriptions}{channels}->%*;
-            foreach my $channel_subscription (values $c->stash->{subscriptions}{channels}->%*) {
-                $channel_subscription->unsubscribe();
-            }
-            delete $c->stash->{subscriptions}{channels};
-            foreach my $channel_name (@channel_names) {
-                my $leave_sub = BoardStreams::Registry->get_leave($channel_name);
-                eval { $leave_sub->($channel_name, $c) } if $leave_sub;
-                if (my $err = $@) {
-                    $c->app->log->error("Error while leaving channel $channel_name: $err");
+        # elect repairer if needed, and repair
+        rx_timer(rand($REPAIR_INTERVAL), $REPAIR_INTERVAL)->subscribe(async sub {
+            my $db = $pg->db;
+
+            # revolt against absent ruler
+            await $db->delete_p(
+                'bs_workers',
+                {
+                    is_repairer  => 1,
+                    dt_heartbeat => { '<', \["NOW() - INTERVAL '1 SECOND' * ?", 2 * $HEARTBEAT_INTERVAL] }
                 }
+            );
+
+            my $repairer_row = (await $db->select_p(
+                'bs_workers',
+                'id',
+                { is_repairer => 1 },
+            ))->hashes->[0];
+
+            if ($repairer_row) {
+                $am_repairer = $repairer_row->{id} eq $worker_id;
+            } else {
+                $am_repairer = 1 if (await $db->update_p(
+                    'bs_workers',
+                    { is_repairer => 1 },
+                    { id => $worker_id },
+                    { on_conflict => undef },
+                ))->rows;
             }
+
+            if ($am_repairer) {
+                await $app->bs->repair_p;
+            }
+        });
+
+        # on ioloop finish, make clients leave and remove worker row
+        rx_from_event(Mojo::IOLoop->singleton, 'finish')->pipe(
+            op_take(1),
+        )->subscribe(async sub {
+            $is_finished = 1;
+            # this is to make clients leave their streams before before deleting worker row, to avoid
+            # having the repairer repairing w/o reason
+            $_->finish foreach $registry->get_all_conns->@*;
+            foreach my $conn ($registry->get_all_conns->@*) {
+                await $on_client_finish_sub->($conn);
+            };
+
+            await $pg->db->delete_p(
+                'bs_workers',
+                { id => $worker_id },
+            );
         });
     });
 
-    $app->helper("$bs_prefix.joined", sub ($c, $channel_name) {
-        return BoardStreams::Registry->has_pair($c, $channel_name);
+    # repair all streams that need repairing
+    $app->helper('bs.repair_p' => async sub ($c) {
+        my $db = dynamically $BoardStreams::db = $pg->db;
+
+        await $db->delete_p(
+            'bs_workers',
+            { dt_heartbeat => { '<', \["NOW() - INTERVAL '1 SECOND' * ?", 2 * $HEARTBEAT_INTERVAL] } },
+        );
+
+        my @dead_worker_ids = (await $db->select_p(
+            [
+                'bs_guards',
+                [-left, 'bs_workers', id => 'worker_id'],
+            ],
+            [\'DISTINCT bs_guards.worker_id'],
+            { 'bs_workers.id' => undef },
+        ))->hashes->map(sub {$_->{worker_id}})->@* or return;
+
+        while (1) {
+            my $tx = $db->begin;
+
+            # lock one stream that needs repair
+            my $stream_row = (await $db->select_p(
+                [
+                    'bs_guards',
+                    ['bs_streams', id => 'stream_id'],
+                ],
+                ['bs_streams.id', 'bs_streams.name'],
+                { 'bs_guards.worker_id' => {-in, \@dead_worker_ids} },
+                {
+                    limit => 1,
+                    for => 'update',
+                },
+            ))->hashes->[0] or last;
+            my ($stream_id, $stream_name) = $stream_row->@{qw/ id name /};
+
+            my @new_dead_worker_ids_for_stream;
+            my $get_dead_worker_ids = async sub {
+                my $results = await $db->select_p(
+                    [
+                        'bs_guards',
+                        [-left, 'bs_workers', id => 'worker_id'],
+                    ],
+                    [\'DISTINCT bs_guards.worker_id'],
+                    {
+                        'bs_guards.stream_id' => $stream_id,
+                        'bs_workers.id'       => undef,
+                    },
+                );
+                @new_dead_worker_ids_for_stream = $results->arrays->map(sub {$_->[0]})->@*;
+                return { map {( $_ => 1 )} @new_dead_worker_ids_for_stream };
+            };
+
+            # repair stream
+            if (my $stream_repair_sub = $registry->get_repair($stream_name)) {
+                my $ret = $stream_repair_sub->($c, $stream_name, $get_dead_worker_ids);
+                await $ret if $ret->$_can('then');
+            }
+
+            # delete guards pointing to this stream
+            await $db->delete_p(
+                'bs_guards',
+                {
+                    stream_id => $stream_id,
+                    worker_id => {-in, \@new_dead_worker_ids_for_stream},
+                },
+            ) if @new_dead_worker_ids_for_stream;
+
+            $tx->commit;
+        }
     });
 
-    $app->helper("$bs_prefix.worker_uuid", sub ($c) {
-        return $worker_uuid;
+    # send JSON, but only if transaction is not destroyed
+    async sub _send_p ($c, $data) {
+        my sub get_max_size {
+            my $tx = $c->tx or return $MAX_WEBSOCKET_SIZE;
+            return min($tx->max_websocket_size, $MAX_WEBSOCKET_SIZE);
+        }
+
+        my $message = encode_json $data;
+        my $whole_length = length $message;
+        if ($whole_length <= get_max_size) {
+            $c->tx or return !!0; # check if transaction is destroyed
+            $c->send({ binary => $message });
+            return 1;
+        }
+
+        my $identifier = $c->stash->{'boardstreams.outgoing_uuid'}++;
+
+        for (my ($i, $cursor, $sent_ending) = (0, 0, 0); ! $sent_ending; $i++) {
+            my $bytes_prefix;
+            my $ending_prefix = ":$identifier $i\$: ";
+            my $max_size = get_max_size;
+            if (length($ending_prefix) + $whole_length - $cursor <= $max_size) {
+                $bytes_prefix = $ending_prefix;
+                $sent_ending = 1;
+            } else {
+                $bytes_prefix = ":$identifier $i: ";
+            }
+
+            my $max_sublength = $max_size - length $bytes_prefix;
+            my $substring = $cursor <= $whole_length ? substr($message, $cursor, $max_sublength) : '';
+            $cursor += $max_sublength;
+
+            $c->tx or return !!0; # check if transaction is destroyed
+            $c->send({ binary => $bytes_prefix . $substring });
+
+            # don't cause other threads to hang if message is very large
+            await next_tick_p unless $sent_ending;
+        }
+
+        return 1;
+    }
+
+    $app->helper('bs.init_client_p' => async sub ($c) {
+        $can_accept_clients or return $c->rendered(503);
+
+        $registry->conn_subscriptions->{$c} = {};
+        $registry->pending_joins->{$c} = rx_behavior_subject->new(0);
+        $registry->register_conn($c);
+        $c->stash->{'boardstreams.outgoing_uuid'} = 'a';
+
+        $c->on(finish => async sub ($_c, @) {
+            await $on_client_finish_sub->($_c);
+        });
+
+        await sleep_p(0.25); # mojo issue 1895
+
+        $c->on(text => async sub ($_c, $bytes) {
+            my $data = decode_json $bytes;
+
+            my $id;
+
+            # pong and return on ping
+            if (($data->{type} // '') eq 'ping') {
+                await _send_p($_c, { type => 'pong' });
+                return;
+            }
+
+            try {
+                defined $data->{jsonrpc} and $data->{jsonrpc} eq '2.0'
+                    or die 'incoming message is not jsonrpc 2.0';
+
+                (my $method, my $params, $id) = $data->@{qw/ method params id /};
+
+                ! $is_finished or die jsonrpc_error 503, 'this server worker stopped, please try again';
+                $registry->is_conn_registered($_c)
+                    or die jsonrpc_error 503, "can't receive because connection is closing";
+
+                if ($method eq 'doAction') {
+                    # params
+                    my ($stream_name, $action_name, $payload) = @$params;
+
+                    # validation
+                    ! defined $id or die "action '$action_name' on stream '$stream_name' contains extra id ($id)\n";
+                    $registry->is_member_of($_c, $stream_name)
+                        or die "Connection has not joined '$stream_name' but tried to do action '$action_name'\n"
+                        unless $stream_name eq '!open';
+
+                    # fetch + act
+                    my $action_sub = $registry->get_action($stream_name, $action_name)
+                        or die "invalid action '$action_name' on stream '$stream_name'\n";
+
+                    my $ret = $action_sub->($_c, $stream_name, $payload);
+                    await $ret if $ret->$_can('then');
+                } elsif ($method eq 'doRequest') {
+                    # params
+                    my ($stream_name, $request_name, $payload) = @$params;
+
+                    # validation
+                    defined $id and ! length ref $id
+                        or die "request '$request_name' on stream '$stream_name' has missing or invalid id ("
+                            . ($id // 'undef') . ")\n";
+                    $registry->is_member_of($_c, $stream_name)
+                        or die jsonrpc_error(
+                            403,
+                            "Connection has not joined '$stream_name' but tried to do request '$request_name'"
+                        )
+                        unless $stream_name eq '!open';
+
+                    # fetch + act
+                    my $request_sub = $registry->get_request($stream_name, $request_name)
+                        or die "invalid request '$request_name' on stream '$stream_name'\n";
+
+                    my $result = $request_sub->($_c, $stream_name, $payload);
+                    $result = await $result if $result->$_can('then');
+
+                    # respond
+                    await _send_p($_c, {
+                        jsonrpc => '2.0',
+                        result  => $result,
+                        id      => $id,
+                    });
+                } else {
+                    die jsonrpc_error -32_601, 'invalid method', { method => $method };
+                }
+            } catch ($e) {
+                $_c->log->error(trim "$e");
+                if (defined $id) {
+                    my $jsonrpc_error =
+                        $e isa 'BoardStreams::Error::JSONRPC' ? $e
+                        : jsonrpc_error 500, trim("$e");
+
+                    await _send_p($_c, {
+                        jsonrpc => '2.0',
+                        error   => $jsonrpc_error,
+                        id      => $id,
+                    });
+                }
+            };
+        }) if $c->tx;
+
+        await _send_p($c, {
+            type => 'config',
+            data => {
+                pingInterval => 0 + $PING_INTERVAL,
+            },
+        });
     });
 
-    $app->helper("$bs_prefix.get_state", sub ($c, $channel_name) {
-        my $db = $c->$bs_prefix->db;
-        my $hash = $db->select('channel',
-            ['state'],
-            { name => $channel_name },
-        )->hash;
-
-        return $hash ? from_json($hash->{state}) : undef;
+    $app->hook(around_action => async sub ($next, $c, $action, $last) {
+        if ($last and $c->stash->{'boardstreams.endpoint'}) {
+            $c->render_later;
+            try {
+                my $ret = $next->();
+                await $ret if $ret->$_can('then');
+                return await $c->bs->init_client_p;
+            } catch ($e) {
+                await sleep_p(1.5);
+                await _send_p($c, { type => 'connection failure', requestId => scalar eval {$c->req->request_id} });
+                $c->finish if $c->tx;
+                $c->log->error($e);
+                die $e;
+            };
+        } else {
+            return $next->();
+        }
     });
 
-    $app->helper("$bs_prefix.alive_workers", sub ($c) {
-        my $workers_state = $c->$bs_prefix->get_state($WORKERS_CHANNEL);
-        return {
-            map {( $_, 1 )}
-                grep ! $workers_state->{$_}{banned},
-                keys %$workers_state
+    $app->helper('bs.create_stream_p' => async sub ($c, $stream_name, $starting_state, %opts) {
+        local @CARP_NOT = qw/ Mojolicious::Renderer /,
+            croak 'Not in an event loop, using bs->create_stream_p; use bs->create_stream instead'
+            unless Mojo::IOLoop->is_running;
+
+        # opts can be: type, keep_events
+        my $type = $opts{type};
+        my $keep_events = exists $opts{keep_events} ? int(!!$opts{keep_events}) : 1;
+
+        # validate params
+        $stream_name =~ $BoardStreams::REs::STREAM_NAME
+            or croak "invalid stream name: '$stream_name'";
+        defined $starting_state
+            or croak "starting state not defined";
+
+        my $db = $BoardStreams::db // $pg->db;
+
+        # TODO: Consider locking this row for update
+        return !!0 if await exists_p($db, 'bs_streams', { name => $stream_name });
+
+        my $savepoint_name = unique_id;
+        my ($in_txn) = eval {
+            await $db->query_p(qq{SAVEPOINT "$savepoint_name"});
+            1
+        };
+
+        try {
+            await query_throwing_exception_object_p($db, 'insert_p', [
+                'bs_streams',
+                {
+                    name        => $stream_name,
+                    state       => { -json => $starting_state },
+                    type        => $type,
+                    keep_events => $keep_events,
+                },
+            ]);
+
+            return 1;
+        } catch ($e) {
+            die $e
+                unless $e isa 'BoardStreams::Error::DB::Duplicate'
+                    and $e->data->{key_name} eq UNIQUE_STREAM_NAME_INDEX;
+
+            await $db->query_p(qq{ROLLBACK TO "$savepoint_name"}) if $in_txn;
+            return !!0;
         };
     });
 
-    $app->helper("$bs_prefix.global_cleanup", async sub ($c) {
-        my $workers_state = $c->$bs_prefix->get_state($WORKERS_CHANNEL);
-        my $time = get_time;
-        foreach my $worker (values %$workers_state) {
-            next if $time <= $worker->{heartbeat} + calculate_hb_expiry_dur();
+    $app->helper('bs.create_stream' => async sub ($c, $stream_name, $starting_state, %opts) {
+        local @CARP_NOT = qw/ Mojolicious::Renderer /,
+            croak 'In an event loop, using bs->create_stream; use await bs->create_stream_p instead'
+            if Mojo::IOLoop->is_running;
 
-            my $db = $c->$bs_prefix->db;
+        # opts can be: type, keep_events
+        my $type = $opts{type};
+        my $keep_events = exists $opts{keep_events} ? int(!!$opts{keep_events}) : 1;
 
-            # 0. set 'banned' property of worker to true
-            $c->$bs_prefix->lock_state($WORKERS_CHANNEL, sub ($state) {
-                $state->{$worker->{uuid}}{banned} = true
-                    if exists $state->{$worker->{uuid}};
-                return undef, $state;
-            }, no_ban => 1);
+        # validate params
+        $stream_name =~ $BoardStreams::REs::STREAM_NAME
+            or croak "invalid stream name: '$stream_name'";
+        defined $starting_state
+            or croak "starting state not defined";
 
-            # 1. find channel names from "guards" table
-            my $worker_uuid = $worker->{uuid};
-            my @channels = $db->query(q{
-                SELECT c.id, c.name
-                    FROM guards g JOIN channel c ON (c.id = g.channel_id)
-                    WHERE g.worker_uuid = ?
-            }, $worker_uuid)->hashes->@*;
+        my $db = $BoardStreams::db // $pg->db;
 
-            # 2. call cleanup subs (deleting guards rows in the process)
-            CHANNEL:
-            foreach my $channel (@channels) {
-                await next_tick_p();
-                my $txn = $c->$bs_prefix->begin;
-                my $db = $txn->db;
-                my $channel_name = $channel->{name};
+        # TODO: Consider locking this row for update
+        return !!0 if row_exists($db, 'bs_streams', { name => $stream_name });
 
-                # lock channel to prevent lock_state from modifying guard counts
-                $db->select('channel',
-                    'id',
-                    { name => $channel_name },
-                    { for => 'update' },
-                )->hash or next CHANNEL;
-                my $guard_row = $db->select('guards',
-                    ['counter'],
-                    {
-                        worker_uuid => $worker_uuid,
-                        channel_id  => $channel->{id},
-                    },
-                    { for => 'update' },
-                )->hash or next CHANNEL;
-                my $guards_counter = $guard_row->{counter};
+        my $savepoint_name = unique_id;
+        my ($in_txn) = eval { $db->query(qq{SAVEPOINT "$savepoint_name"}); 1 };
 
-                # call cleanup sub
-                if (my $cleanup_sub = BoardStreams::Registry->get_cleanup($channel_name)) {
-                    my $alive_workers = $c->$bs_prefix->alive_workers;
-                    $cleanup_sub->($channel_name, $txn, $alive_workers);
-                }
+        try {
+            query_throwing_exception_object($db, 'insert', [
+                'bs_streams',
+                {
+                    name        => $stream_name,
+                    state       => { -json => $starting_state },
+                    type        => $type,
+                    keep_events => $keep_events,
+                },
+            ]);
 
-                $db->update('guards',
-                    { counter => \"counter - $guards_counter" },
-                    {
-                        worker_uuid => $worker_uuid,
-                        channel_id => $channel->{id},
-                    },
-                );
-                $db->delete('guards',
-                    {
-                        worker_uuid => $worker_uuid,
-                        channel_id  => $channel->{id},
-                        counter     => {'<=', 0},
-                    },
-                );
-                $txn->commit;
-            }
+            return 1;
+        } catch ($e) {
+            die $e
+                unless $e isa 'BoardStreams::Error::DB::Duplicate'
+                    and $e->data->{key_name} eq UNIQUE_STREAM_NAME_INDEX;
 
-            # 3. delete worker from :heartbeats
-            $c->$bs_prefix->lock_state($WORKERS_CHANNEL, sub ($state) {
-                delete $state->{$worker->{uuid}};
-                return undef, $state;
-            }, no_ban => 1);
-        }
-        my $duration = get_time() - $time;
-        $c->app->log->warn('Channels cleanup took ' . (0 + sprintf("%.2f", $duration)) . ' seconds')
-            if $duration > 1;
+            $db->query(qq{ROLLBACK TO "$savepoint_name"}) if $in_txn;
+            return !!0;
+        };
     });
 
-    $app->helper("$bs_prefix.delete_events", sub ($c, $channel_name, %opts) {
+    $app->helper('bs.lock_stream_p' => async sub ($c, $stream_name, $sub) {
+        await $c->bs->do_txn_p(async sub ($db) {
+            my $stream_row = (await $db->select_p(
+                'bs_streams',
+                [qw/ id state keep_events /],
+                { name => $stream_name },
+                { for => 'update' },
+            ))->expand->hashes->[0] or die "Couldn't find stream '$stream_name' in database to lock\n";
+            my ($stream_id, $old_state, $keep_events) = $stream_row->@{qw/ id state keep_events /};
+
+            my ($new_event, $new_state, $extra_guards) = $sub->((dclone [$old_state])->[0]);
+            ($new_event, $new_state, $extra_guards) = await $new_event if $new_event->$_can('then');
+
+            my $new_event_id;
+            $new_event_id = (await $db->insert_p(
+                'bs_events',
+                {
+                    stream_id => $stream_id,
+                    data      => { -json => $new_event },
+                },
+                { returning => 'id' },
+            ))->hashes->[0]{id} if $keep_events and defined $new_event;
+
+            if ($new_event_id or defined $new_state) {
+                $new_event_id //= (await $db->query_p("SELECT nextval('bs_events_id_seq')"))->arrays->[0][0];
+
+                await $db->update_p(
+                    'bs_streams',
+                    {
+                        defined $new_state ? (state => { -json => $new_state }) : (),
+                        event_id => $new_event_id,
+                        last_dt  => \'CURRENT_TIMESTAMP',
+                    },
+                    { id => $stream_id },
+                );
+            }
+
+            my $diff;
+            if (defined $new_state) {
+                delete $old_state->{_secret} if ref $old_state eq 'HASH';
+                delete $new_state->{_secret} if ref $new_state eq 'HASH';
+                $diff = diff($old_state, $new_state, noO => 1, noU => 1);
+                $diff = undef if ! %$diff;
+            }
+
+            if (defined $extra_guards) {
+                if ($extra_guards > 0) {
+                    await $db->insert_p(
+                        'bs_guards',
+                        {
+                            worker_id => $worker_id,
+                            stream_id => $stream_id,
+                            count     => $extra_guards,
+                        },
+                        {
+                            on_conflict => [
+                                [ 'worker_id', 'stream_id' ] => { count => \'bs_guards.count + EXCLUDED.count' },
+                            ],
+                        }
+                    );
+                } elsif ($extra_guards < 0) {
+                    my $guard_row = (await $db->update_p(
+                        'bs_guards',
+                        { count => \['"count" - ?', abs($extra_guards)] },
+                        {
+                            worker_id => $worker_id,
+                            stream_id => $stream_id,
+                        },
+                        { returning => 'count' },
+                    ))->hashes->[0] or croak "missing guard row";
+
+                    if (! $guard_row->{count}) {
+                        await $db->delete_p(
+                            'bs_guards',
+                            {
+                                worker_id => $worker_id,
+                                stream_id => $stream_id,
+                                count     => 0, # because user may have forgotten to start a txn
+                            },
+                        );
+                    }
+                }
+            }
+
+            if (defined $diff or defined $new_event) {
+                my $pg_channel = get_pg_channel_name($stream_name);
+                my $notification = encode_json({
+                    id    => int $new_event_id,
+                    event => $new_event,
+                    patch => $diff,
+                });
+                my $whole_length = length $notification;
+                if ($whole_length <= $NOTIFY_SIZE_LIMIT) {
+                    $db->notify($pg_channel, $notification);
+                } else {
+                    # send notification in chunks
+                    for (my ($i, $cursor, $sent_ending) = (0, 0, 0); ! $sent_ending; $i++) {
+                        my $bytes_prefix;
+                        my $ending_bytes_prefix = ":$new_event_id $i\$: ";
+                        # this assumes that length $ending_bytes_prefix < $NOTIFY_SIZE_LIMIT
+                        if (length($ending_bytes_prefix) + $whole_length - $cursor <= $NOTIFY_SIZE_LIMIT) {
+                            $bytes_prefix = $ending_bytes_prefix;
+                            $sent_ending = 1;
+                        } else {
+                            $bytes_prefix = ":$new_event_id $i: ";
+                        }
+
+                        my $max_sublength = $NOTIFY_SIZE_LIMIT - length $bytes_prefix;
+                        my $substring = $cursor <= $whole_length ? substr($notification, $cursor, $max_sublength) : '';
+                        $cursor += $max_sublength;
+
+                        $db->notify($pg_channel, $bytes_prefix . $substring);
+
+                        # don't cause other threads to hang if notification is very large
+                        await next_tick_p unless $sent_ending;
+                    }
+                }
+            }
+        });
+
+        return undef;
+    });
+
+    $app->helper('bs.set_action' => sub ($c, $stream_name, $action_name, $sub) {
+        $registry->set_action_request(
+            action => $stream_name, $action_name, $sub
+        );
+    });
+
+    $app->helper('bs.set_request' => sub ($c, $stream_name, $request_name, $sub) {
+        $registry->set_action_request(
+            request => $stream_name, $request_name, $sub
+        );
+    });
+
+    $app->helper('bs.set_join' => sub ($c, $stream_name, $sub) {
+        $registry->set_action_request(
+            join_leave => $stream_name, 'join', $sub
+        );
+    });
+
+    $app->helper('bs.set_leave' => sub ($c, $stream_name, $sub) {
+        $registry->set_action_request(
+            join_leave => $stream_name, 'leave', $sub
+        );
+    });
+
+    $app->helper('bs.set_repair' => sub ($c, $stream_name, $sub) {
+        $registry->set_action_request(
+            join_leave => $stream_name, 'repair', $sub
+        );
+    });
+
+    $app->helper('bs.get_state_p' => async sub ($c, $stream_name) {
+        my $db = $BoardStreams::db // $pg->db;
+
+        my $stream_row = (await $db->select_p(
+            'bs_streams',
+            [qw/ state /],
+            { name => $stream_name },
+            { for => 'update' },
+        ))->expand->hashes->[0] or return undef;
+
+        return $stream_row->{state};
+    });
+
+    # join
+    $app->bs->set_request('!open', 'join', async sub ($c, $, $payload) {
+        my ($stream_name, $last_id) = $payload->@{qw/ name last_id /};
+
+        # fetch + act
+        my $join_sub = $registry->get_join($stream_name)
+            or die "stream '$stream_name' has no join method\n";
+
+        my $db = dynamically $BoardStreams::db = $pg->db;
+        my $tx = $db->begin;
+
+        await exists_p(
+            $db,
+            'bs_streams',
+            { name => $stream_name },
+            { for => 'update' },
+        ) or die "stream '$stream_name' does not exist\n";
+
+        $registry->inc_pending_joins_by($c, 1);
+        my $result = do {
+            try {
+                my $result = $join_sub->($c, $stream_name, {
+                    is_reconnect => defined $last_id,
+                });
+                $result = await $result if $result->$_can('then');
+                $result;
+            } catch ($e) {
+                $registry->inc_pending_joins_by($c, -1);
+                die $e;
+            };
+        };
+
+        $result or die jsonrpc_error 403, 'joining not allowed';
+
+        return do {
+            try {
+                if (my $is_first_join = $registry->add_membership($c, $stream_name)) {
+                    my $o = $c->bs->_get_listener_observable($stream_name);
+                    my $s = $o->subscribe();
+                    $registry->conn_subscriptions->{$c}{$stream_name} = $s;
+                }
+
+                my $limit = eval { $result->{limit} } // 0;
+
+                my $stream_row = (await $db->select_p(
+                    'bs_streams',
+                    [qw/ id event_id state /],
+                    { name => $stream_name },
+                ))->expand->hashes->[0] or die "Stream $stream_name does not exist in database";
+                my ($stream_id, $stream_event_id, $stream_state) = $stream_row->@{qw/ id event_id state /};
+                my $past_event_rows = !$limit ? [] : (await $db->select_p(
+                    'bs_events',
+                    [qw/ id data /],
+                    {
+                        stream_id => $stream_id,
+                        id        => { '<=', $stream_event_id },
+                        defined($last_id) ? (id => { '>', $last_id }) : (),
+                    },
+                    {
+                        order_by => { -desc, 'id' },
+                        limit    => $limit,
+                    }
+                ))->expand->hashes->reverse;
+
+                $tx->commit;
+
+                delete $stream_state->{_secret} if ref $stream_state eq 'HASH';
+
+                +{
+                    state  => {
+                        id   => int $stream_event_id,
+                        data => $stream_state,
+                    },
+                    events => [
+                        map +{
+                            id    => int $_->{id},
+                            event => $_->{data},
+                        }, @$past_event_rows
+                    ],
+                };
+            } catch ($e) {
+                my $is_last_leave = $registry->remove_membership($c, $stream_name);
+                if ($is_last_leave and exists $registry->conn_subscriptions->{$c}{$stream_name}) {
+                    (delete $registry->conn_subscriptions->{$c}{$stream_name})->unsubscribe();
+                }
+                die $e;
+            } finally {
+                $registry->inc_pending_joins_by($c, -1);
+            };
+        };
+    });
+
+    $app->bs->set_request('!open', 'leave', async sub ($c, $, $payload) {
+        my $stream_name = $payload;
+
+        my $db = dynamically $BoardStreams::db = $pg->db;
+        my $tx = $db->begin;
+
+        await exists_p(
+            $db,
+            'bs_streams',
+            { name => $stream_name },
+            { for => 'update' },
+        ) or return;
+
+        if (my $leave_sub = $registry->get_leave($stream_name)) {
+            if (my $is_last_leave = $registry->remove_membership($c, $stream_name)) {
+                (delete $registry->conn_subscriptions->{$c}{$stream_name})->unsubscribe;
+            }
+
+            try {
+                my $result = $leave_sub->($c, $stream_name);
+                await $result if $result->$_can('then');
+            } catch ($e) {
+                $c->log->fatal("Couldn't execute leave sub, stopping worker: $e");
+                # so as to not leave the streams in an inconsistent state
+                stop_gracefully();
+                die "$e";
+            };
+
+            $tx->commit;
+        } else {
+            if (my $is_last_leave = $registry->remove_membership($c, $stream_name)) {
+                (delete $registry->conn_subscriptions->{$c}{$stream_name})->unsubscribe;
+            }
+        }
+
+        return 'ok';
+    });
+
+    $app->helper('bs._get_listener_observable' => sub ($c, $stream_name) {
+        return $self->_listener_observables->{$stream_name} //= rx_observable->new(sub ($subscriber) {
+            my $pg_channel = get_pg_channel_name($stream_name);
+            my ($acc_event_id, $acc_string, $acc_i) = (0, '', -1);
+            my $cb = $pg->pubsub->listen($pg_channel => sub ($, $payload) {
+                my $msg;
+                if ($payload =~ s/^\:([0-9]+) ([0-9]+)(\$)?\: //) {
+                    my ($event_id, $i, $is_final) = ($1, $2, $3);
+                    $event_id >= $acc_event_id or die 'event_id < acc_event_id';
+                    $event_id == $acc_event_id or ($acc_event_id, $acc_string, $acc_i) = ($event_id, '', -1);
+                    $i == $acc_i + 1 or return; # on listen, maybe we receive second part of old message
+                    $acc_string .= $payload;
+                    if ($is_final) {
+                        $msg = decode_json $acc_string;
+                        ($acc_string, $acc_i) = ('', -2); # -2 is closed to appends
+                    } else {
+                        $acc_i = $i;
+                    }
+                } else {
+                    $msg = decode_json $payload;
+                    my ($event_id) = $msg->{id};
+                    $event_id > $acc_event_id or die 'event_id <= acc_event_id';
+                    ($acc_event_id, $acc_string, $acc_i) = ($event_id, '', -2);
+                }
+                $subscriber->next($msg) if defined $msg;
+            });
+
+            return sub {
+                $pg->pubsub->unlisten($pg_channel => $cb);
+                delete $self->_listener_observables->{$stream_name};
+            };
+        })->pipe(
+            # wait until all clients have been sent their message before going on to the next msg
+            op_concat_map(sub ($payload) {
+                my @conns = $registry->get_conns_of_stream($stream_name)->@*;
+                my $msg = {
+                    type   => 'eventPatch',
+                    stream => $stream_name,
+                    # payload is +{id, event, patch}
+                    %$payload,
+                };
+                return rx_merge(
+                    map rx_from(_send_p($_, $msg)), @conns
+                );
+            }),
+            op_share(),
+        );
+    });
+
+    $app->helper("bs.delete_events_p", async sub ($c, $stream_name, %opts) {
         # opts can be: keep_num and/or keep_dur
         my @until_ids;
 
-        my $channel_id = $c->$bs_prefix->db->select('channel',
-            ['id'],
-            { name => $channel_name },
-        )->hash->{id} or return;
+        my $db = $pg->db;
+
+        my $stream_row = (await $db->select_p(
+            'bs_streams',
+            'id',
+            { name => $stream_name },
+        ))->hashes->[0] or return;
+        my $stream_id = $stream_row->{id};
 
         if (defined $opts{keep_num}) {
-            my $until_hash = $c->$bs_prefix->db->select('event_patch',
-                ['id'],
+            my $until_row = (await $db->select_p(
+                'bs_events',
+                'id',
+                { stream_id => $stream_id },
                 {
-                    channel_id => $channel_id,
-                },
-                {
-                    order_by => { -desc => 'id' },
+                    order_by => { -desc, 'id' },
                     offset   => $opts{keep_num},
                     limit    => 1,
                 },
-            )->hash;
-            my $until_id = $until_hash ? $until_hash->{id} : 0;
+            ))->hashes->[0];
+            my $until_id = $until_row ? $until_row->{id} : 0;
             push @until_ids, $until_id;
         }
 
         if (defined $opts{keep_dur}) {
-            $opts{keep_dur} .= ' SECOND' if $opts{keep_dur} =~ /^\d+\z/;
-            my $interval = $c->$bs_prefix->db->dbh->quote( $opts{keep_dur} );
-            my $until_hash = $c->$bs_prefix->db->select('event_patch',
-                ['id'],
+            my $until_row = (await $db->select_p(
+                'bs_events',
+                'id',
                 {
-                    channel_id => $channel_id,
-                    datetime   => { '<', \"current_timestamp - INTERVAL $interval" },
+                    stream_id => $stream_id,
+                    datetime  => { '<', \["CURRENT_TIMESTAMP - INTERVAL '1 SECOND' * ?", $opts{keep_dur}] },
                 },
                 {
-                    order_by => { -desc => 'datetime' },
+                    order_by => { -desc, 'datetime' },
                     limit    => 1,
-                },
-            )->hash;
-            my $until_id = $until_hash ? $until_hash->{id} : 0;
+                }
+            ))->hashes->[0];
+            my $until_id = $until_row ? $until_row->{id} : 0;
             push @until_ids, $until_id;
         }
 
         my $until_id = min @until_ids;
 
-        $c->$bs_prefix->db->delete('event_patch',
+        await $db->delete_p(
+            'bs_events',
             {
-                channel_id => $channel_id,
-                defined($until_id) ? (id => { '<=', $until_id }) : (),
-            }
+                stream_id => $stream_id,
+                defined($until_id) ? (id => {'<=', $until_id}) : (),
+            },
         );
     });
 
-    $app->helper("$bs_prefix.channel_exists", sub ($c, $channel_name) {
-        my $hash = $c->$bs_prefix->db->select('channel', 'id', { name => $channel_name })->hash;
-        return !! $hash;
+    my $deleting_streams = {};
+    $app->helper("bs.delete_stream_p", async sub ($c, $stream_name) {
+        return 0 if $deleting_streams->{$stream_name};
+        dynamically $deleting_streams->{$stream_name} = 1;
+
+        await $c->bs->do_txn_p(async sub ($db) {
+            await exists_p(
+                $db,
+                'bs_streams',
+                { name => $stream_name },
+                { for => 'update' },
+            ) or return 0;
+
+
+            if (my $leave_sub = $registry->get_leave($stream_name)) {
+                foreach my $conn ($registry->get_conns_of_stream($stream_name)->@*) {
+                    my $left_completely;
+                    while (! $left_completely) {
+                        $left_completely = $registry->remove_membership($conn, $stream_name)
+                            and (delete $registry->conn_subscriptions->{$conn}{$stream_name})->unsubscribe;
+
+                        try {
+                            my $result = $leave_sub->($conn, $stream_name);
+                            await $result if $result->$_can('then');
+                        } catch ($e) {
+                            $c->log->fatal("Couldn't execute leave sub, stopping worker: $e");
+                            # so as to not leave the streams in an inconsistent state
+                            stop_gracefully();
+                        };
+                    }
+                }
+            } else {
+                foreach my $conn ($registry->get_conns_of_stream($stream_name)->@*) {
+                    1 until $registry->remove_membership($conn, $stream_name);
+                    (delete $registry->conn_subscriptions->{$conn}{$stream_name})->unsubscribe;
+                }
+            }
+
+            await $db->delete_p(
+                'bs_streams',
+                { name => $stream_name },
+            );
+        });
+
+        delete $deleting_streams->{$stream_name};
+
+        return 1;
     });
 
-    # system channels
-    {
-        $app->$bs_prefix->create_channel($WORKERS_CHANNEL, {}, { keep_events => 0 });
-        $app->$bs_prefix->create_channel($CLEANUP_CHANNEL, { last_cleanup => 0 }, { keep_events => 0 });
-    }
+    $app->helper('bs.do_txn_p', async sub ($c, $sub) {
+        my $tx;
+        dynamically $BoardStreams::db = do { my $db = $pg->db; $tx = $db->begin; $db }
+            if ! $BoardStreams::db;
+        my $db = $BoardStreams::db;
+
+        my $ret = $sub->($db);
+        await $ret if $ret->$_can('then');
+
+        $tx->commit if $tx;
+    });
 }
 
 1;

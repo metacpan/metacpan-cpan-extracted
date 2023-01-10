@@ -8,6 +8,7 @@ lib/App/DBBrowser/CreateDropAttach/CreateTable.pm
 lib/App/DBBrowser/CreateDropAttach/DropTable.pm
 lib/App/DBBrowser/Credentials.pm
 lib/App/DBBrowser/DB.pm
+lib/App/DBBrowser/DB/DB2.pm
 lib/App/DBBrowser/DB/Firebird.pm
 lib/App/DBBrowser/DB/MariaDB.pm
 lib/App/DBBrowser/DB/mysql.pm

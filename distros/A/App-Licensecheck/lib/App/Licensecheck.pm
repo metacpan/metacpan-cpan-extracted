@@ -10,7 +10,7 @@ App::Licensecheck - functions for a simple license checker for source files
 
 =head1 VERSION
 
-Version v3.3.1
+Version v3.3.3
 
 =head1 SYNOPSIS
 
@@ -41,7 +41,7 @@ See the script for casual usage.
 
 =cut
 
-package App::Licensecheck v3.3.1;
+package App::Licensecheck v3.3.3;
 
 use Carp            qw(croak);
 use Log::Any        ();
@@ -216,7 +216,7 @@ my @OPT_RE2 = $@ ? () : ( engine => 'RE2' );
 use warnings FATAL => 'utf8';
 $PerlIO::encoding::fallback = Encode::FB_CROAK;
 
-no warnings "experimental::try";
+no if ( $] >= 5.034 ), warnings => "experimental::try";
 
 field $log;
 

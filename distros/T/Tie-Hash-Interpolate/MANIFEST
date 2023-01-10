@@ -6,3 +6,4 @@ README
 lib/Tie/Hash/Interpolate.pm
 t/01-basic.t
 META.yml
+META.json

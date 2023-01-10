@@ -1,8 +1,9 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 3.0.0 FATAL_ERROR)
+PROJECT(genericHash VERSION 1.0.74 LANGUAGES C)
 IF (NOT MYPACKAGEBOOTSTRAP_DONE)
   INCLUDE ("3rdparty/github/cmake-utils/cmake/MyPackageBootstrap.cmake")
 ENDIF ()
-MYPACKAGESTART (genericHash 1 0 72)
+MYPACKAGESTART ()
 
 MYPACKAGECONFIG(test/config.h.in test/config.h)
 

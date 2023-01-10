@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010000;
+use 5.014000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,13 +14,12 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Plack-Middleware-EmulateOPTIONS",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.010000",
+  "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "Plack::Middleware::EmulateOPTIONS",
   "PREREQ_PM" => {
     "HTTP::Status" => 0,
     "Plack::Middleware" => 0,
     "parent" => 0,
-    "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
@@ -33,9 +32,10 @@ my %WriteMakefileArgs = (
     "Plack::Response" => 0,
     "Plack::Test" => 0,
     "Test::Differences" => 0,
-    "Test::More" => 0
+    "Test::More" => "1.302008",
+    "strict" => 0
   },
-  "VERSION" => "v0.2.2",
+  "VERSION" => "v0.3.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +54,7 @@ my %FallbackPrereqs = (
   "Plack::Response" => 0,
   "Plack::Test" => 0,
   "Test::Differences" => 0,
-  "Test::More" => 0,
+  "Test::More" => "1.302008",
   "parent" => 0,
   "strict" => 0,
   "warnings" => 0

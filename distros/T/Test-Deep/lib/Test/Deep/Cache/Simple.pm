@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Test::Deep::Cache::Simple 1.202;
+package Test::Deep::Cache::Simple 1.204;
 
 use Carp qw( confess );
 
@@ -95,7 +95,7 @@ Test::Deep::Cache::Simple
 
 =head1 VERSION
 
-version 1.202
+version 1.204
 
 =head1 PERL VERSION
 

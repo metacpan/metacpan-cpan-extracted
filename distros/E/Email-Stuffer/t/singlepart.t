@@ -1,8 +1,7 @@
-#!/usr/bin/perl -w
-use strict;
+use v5.12.0;
 use warnings;
 
-use Test::More qw[no_plan];
+use Test::More;
 use Email::Stuffer;
 use Email::Sender::Transport::Test ();
 
@@ -56,4 +55,4 @@ my $test = Email::Sender::Transport::Test->new;
   like( $string, qr/Content-Type: text\/html/,   'Email content type' );
 }
 
-1;
+done_testing;

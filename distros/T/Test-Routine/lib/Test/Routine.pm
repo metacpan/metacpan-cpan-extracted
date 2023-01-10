@@ -1,8 +1,8 @@
-use strict;
+use v5.12.0;
 use warnings;
-package Test::Routine;
+package Test::Routine 0.030;
 # ABSTRACT: composable units of assertion
-$Test::Routine::VERSION = '0.029';
+
 #pod =head1 SYNOPSIS
 #pod
 #pod   # mytest.t
@@ -255,7 +255,7 @@ sub test {
     $arg->{description} = delete $arg->{desc};
   }
 
-  $arg->{description} = $name unless defined $arg->{description};
+  $arg->{description} //= $name;
   $name =~ s/(?:::|')/_/g;
 
   my $class = Moose::Meta::Class->initialize($caller);
@@ -328,7 +328,7 @@ Test::Routine - composable units of assertion
 
 =head1 VERSION
 
-version 0.029
+version 0.030
 
 =head1 SYNOPSIS
 

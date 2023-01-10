@@ -18,7 +18,7 @@ my $right_ret = <<'END';
 <!-- comment -->
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Test simple comment with and without spaces.');
 
 # Test.
 $obj->reset;
@@ -27,7 +27,7 @@ $obj->put(
 );
 $ret = $obj->flush;
 $right_ret = '<!--comment- -->';
-is($ret, $right_ret);
+is($ret, $right_ret, 'Test comment with dash on the end.');
 
 # Test.
 $obj->reset;
@@ -36,7 +36,7 @@ $obj->put(
 );
 $ret = $obj->flush;
 $right_ret = '<!--<tag>comment</tag>-->';
-is($ret, $right_ret);
+is($ret, $right_ret, 'Test comment with elements.');
 
 # Test.
 $obj->reset;
@@ -52,7 +52,7 @@ $right_ret = <<'END';
 </tag>
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Test element with another element commented.');
 
 # Test.
 $obj->reset;
@@ -69,7 +69,7 @@ $right_ret = <<'END';
 </tag>
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Test element+params with another element commented.');
 
 # Test.
 $obj->reset;
@@ -88,7 +88,7 @@ $right_ret = <<'END';
 </tag>
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Test comment between element and params.');
 
 # Test.
 $obj->reset;
@@ -111,7 +111,7 @@ $right_ret = <<'END';
 </oo>
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Test comment between element and params - advanced version.');
 
 # Test.
 $obj->reset;
@@ -130,7 +130,7 @@ $right_ret = <<'END';
 </tag>
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Test comment between element and params - with cdata inside.');
 
 # Test.
 $obj->reset;
@@ -146,7 +146,7 @@ $right_ret = <<'END';
 <tag par="val" />
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Test comment between element and param - simple element.');
 
 # Test.
 $obj->reset;
@@ -166,4 +166,4 @@ $right_ret = <<'END';
 </tag1>
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Test comment between two elements.');

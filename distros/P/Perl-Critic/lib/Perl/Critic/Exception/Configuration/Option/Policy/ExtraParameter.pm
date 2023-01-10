@@ -6,14 +6,14 @@ use warnings;
 
 use Readonly;
 
-our $VERSION = '1.146';
+our $VERSION = '1.148';
 
 #-----------------------------------------------------------------------------
 
 use Exception::Class (
     'Perl::Critic::Exception::Configuration::Option::Policy::ExtraParameter' => {
         isa         => 'Perl::Critic::Exception::Configuration::Option::Policy',
-        description => 'The configuration of a policy referred to a non-existant parameter.',
+        description => 'The configuration of a policy referred to a non-existent parameter.',
         alias       => 'throw_extra_parameter',
     },
 );

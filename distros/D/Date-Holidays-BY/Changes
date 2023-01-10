@@ -1,4 +1,7 @@
-1.2023.1	2022-01-02
+1.2023.2	2023-01-09
+	* covered time from limitation of Time::Local on freebsd
+
+1.2023.1	2023-01-02
 	+ exact dates for 2013
 	+ exact dates for 2014
 	+ exact dates for 2015

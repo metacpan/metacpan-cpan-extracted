@@ -73,9 +73,11 @@ WHY MOO EXISTS
     what Moo provides. "Moo" is ideal for some situations where deployment
     or startup time precludes using Moose and Mouse:
 
-    a command line or CGI script where fast startup is essential
-    code designed to be deployed as a single file via App::FatPacker
-    a CPAN module that may be used by others in the above situations
+    * A command line or CGI script where fast startup is essential
+
+    * code designed to be deployed as a single file via App::FatPacker
+
+    * A CPAN module that may be used by others in the above situations
 
     "Moo" maintains transparent compatibility with Moose so if you install
     and load Moose you can use Moo classes and roles in Moose code without

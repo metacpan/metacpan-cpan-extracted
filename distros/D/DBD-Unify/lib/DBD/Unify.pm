@@ -1,16 +1,15 @@
-#   Copyright (c) 1999-2022 H.Merijn Brand
+#   Copyright (c) 1999-2023 H.Merijn Brand
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
 
-use 5.8.4;
-
+use 5.008004;
 use strict;
 use warnings;
 
 package DBD::Unify;
 
-our $VERSION = "0.92";
+our $VERSION = "0.93";
 
 =head1 NAME
 
@@ -530,7 +529,7 @@ sub primary_key {
     if ($catalog) {
 	$dbh->{Warn} and
 	    Carp::carp "Unify does not support catalogs in table_info\n";
-	return;
+	return ();
 	}
 
     if (my $dd = $dbh->func ("db_dict")) {
@@ -555,7 +554,7 @@ sub primary_key {
     @key and return @key;
 
     my $pki_cache = _sys_primary_keys ($dbh);
-    $pki_cache && $pki_cache->{key} or return;
+    $pki_cache && $pki_cache->{key} or return @key; # @key still empty
 
     foreach my $sch (sort keys %{$pki_cache->{key}}) {
 	defined $schema && lc $sch ne lc $schema and next;
@@ -1532,7 +1531,7 @@ Todd Zervas has given a lot of feedback and patches.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 1999-2022 H.Merijn Brand
+Copyright (C) 1999-2023 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

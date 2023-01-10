@@ -1,7 +1,7 @@
 ---
 abstract: 'An OOP interface to Monit.'
 author:
-  - 'Angelo Failla <pallotron@freaknet.org>'
+  - 'Angelo Failla <pallotron@gmail.com>'
   - 'Dean Hamstead <dean@fragfest.com.au>'
 build_requires:
   ExtUtils::MakeMaker: '0'
@@ -18,8 +18,8 @@ configure_requires:
   Module::Build: '0.28'
   perl: v5.10.0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
-license: perl
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
+license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -42,10 +42,9 @@ resources:
   bugtracker: https://github.com/djzort/perl-monit-http-api/issues
   homepage: https://github.com/djzort/perl-monit-http-api
   repository: https://github.com/djzort/perl-monit-http-api.git
-version: '0.05'
+version: '0.06'
 x_contributors:
-  - 'Angelo Failla <pallotron@gmail.com>'
   - 'Dean Hamstead <djzort@cpan.org>'
-x_generated_by_perl: v5.32.0
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
-x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_spdx_expression: MIT

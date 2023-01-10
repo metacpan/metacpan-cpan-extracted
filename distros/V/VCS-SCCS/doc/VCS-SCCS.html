@@ -38,39 +38,39 @@
 
 <h1 id="SYNOPSIS">SYNOPSIS</h1>
 
-<pre><code> use VCS::SCCS;
+<pre><code>use VCS::SCCS;
 
- my $sccs = VCS::SCCS-&gt;new (&quot;SCCS/s.file.pl&quot;);   # Read and parse
+my $sccs = VCS::SCCS-&gt;new (&quot;SCCS/s.file.pl&quot;);   # Read and parse
 
- # Meta info
- my $fn = $sccs-&gt;file ();            # file.pl
- my $cs = $sccs-&gt;checksum ();        # 52534
- my @us = $sccs-&gt;users ();           # qw( merijn user )
- my $fl = $sccs-&gt;flags ();           # { q =&gt; &quot;Test applic&quot;, v =&gt; undef }
- my $cm = $sccs-&gt;comment ();         # &quot;&quot;
- my $cr = $sccs-&gt;current ();         # 70
- my @cr = $sccs-&gt;current ();         # ( 70, &quot;5.39&quot;, 5, 39 )
+# Meta info
+my $fn = $sccs-&gt;file ();            # file.pl
+my $cs = $sccs-&gt;checksum ();        # 52534
+my @us = $sccs-&gt;users ();           # qw( merijn user )
+my $fl = $sccs-&gt;flags ();           # { q =&gt; &quot;Test applic&quot;, v =&gt; undef }
+my $cm = $sccs-&gt;comment ();         # &quot;&quot;
+my $cr = $sccs-&gt;current ();         # 70
+my @cr = $sccs-&gt;current ();         # ( 70, &quot;5.39&quot;, 5, 39 )
 
- # Delta related
- my $vs = $sccs-&gt;version ();         # &quot;5.39&quot;
- my $vs = $sccs-&gt;version (69);       # &quot;5.38&quot;
- my $rv = $sccs-&gt;revision ();        # 70
- my $rv = $sccs-&gt;revision (&quot;5.37&quot;);  # 68
- my $rm = $sccs-&gt;revision_map ();    # [ [ 1, &quot;4.1&quot; ], ... [ 70, &quot;5.39&quot; ]]
- my $dd = $sccs-&gt;delta (17);         # none, revision or version as arg
+# Delta related
+my $vs = $sccs-&gt;version ();         # &quot;5.39&quot;
+my $vs = $sccs-&gt;version (69);       # &quot;5.38&quot;
+my $rv = $sccs-&gt;revision ();        # 70
+my $rv = $sccs-&gt;revision (&quot;5.37&quot;);  # 68
+my $rm = $sccs-&gt;revision_map ();    # [ [ 1, &quot;4.1&quot; ], ... [ 70, &quot;5.39&quot; ]]
+my $dd = $sccs-&gt;delta (17);         # none, revision or version as arg
 
- # Content related
- my $body_70 = $sccs-&gt;body ();       # file.pl @70 incl NL&#39;s
- my @body_70 = $sccs-&gt;body ();       # file.pl @70 list of chomped lines
- my @body_69 = $sccs-&gt;body (69);     # same for file.pl at revision 69
- my @body_69 = $sccs-&gt;body (&quot;5.38&quot;); # same
+# Content related
+my $body_70 = $sccs-&gt;body ();       # file.pl @70 incl NL&#39;s
+my @body_70 = $sccs-&gt;body ();       # file.pl @70 list of chomped lines
+my @body_69 = $sccs-&gt;body (69);     # same for file.pl at revision 69
+my @body_69 = $sccs-&gt;body (&quot;5.38&quot;); # same
 
- $sccs-&gt;set_translate (&quot;SCCS&quot;);
- print $sccs-&gt;translate ($rev, $line);
+$sccs-&gt;set_translate (&quot;SCCS&quot;);
+print $sccs-&gt;translate ($rev, $line);
 
- -- NYI --
- my $diff = $sccs-&gt;diff (67);        # unified diff between rev 67 and 70
- my $diff = $sccs-&gt;diff (63, &quot;5.37&quot;);# unified diff between rev 63 and 68</code></pre>
+-- NYI --
+my $diff = $sccs-&gt;diff (67);        # unified diff between rev 67 and 70
+my $diff = $sccs-&gt;diff (63, &quot;5.37&quot;);# unified diff between rev 63 and 68</code></pre>
 
 <h1 id="DESCRIPTION">DESCRIPTION</h1>
 
@@ -253,13 +253,13 @@
 
 <p>You can also pass a hashref that will do custom translation:</p>
 
-<pre><code>  my %trans = (
-    &quot;%W%&quot; =&gt; &quot;This is my what id&quot;,
-    &quot;%E%&quot; =&gt; &quot;Yesterday&quot;,
-    &quot;%U%&quot; =&gt; &quot;Noon&quot;,
-    #...
-    };
-  $sccs-&gt;set_translate (\%tran);</code></pre>
+<pre><code>my %trans = (
+  &quot;%W%&quot; =&gt; &quot;This is my what id&quot;,
+  &quot;%E%&quot; =&gt; &quot;Yesterday&quot;,
+  &quot;%U%&quot; =&gt; &quot;Noon&quot;,
+  #...
+  };
+$sccs-&gt;set_translate (\%tran);</code></pre>
 
 <p>any missing keywords will not be translated.</p>
 
@@ -598,17 +598,17 @@
 
 <h1 id="TODO">TODO</h1>
 
-<pre><code> * improve documentation
- * implement diff ()
- * more tests
- * autodetect the available VCS candidates for sccs2***
- * sccs2git documentation and installation
- * sccs2rcs
- * sccs2cvs
- * sccs2hg
- * sccs2svn
- * errors and warnings
- * provide hooks to VCS::</code></pre>
+<pre><code>* improve documentation
+* implement diff ()
+* more tests
+* autodetect the available VCS candidates for sccs2***
+* sccs2git documentation and installation
+* sccs2rcs
+* sccs2cvs
+* sccs2hg
+* sccs2svn
+* errors and warnings
+* provide hooks to VCS::</code></pre>
 
 <h1 id="DIAGNOSTICS">DIAGNOSTICS</h1>
 
@@ -654,7 +654,7 @@
 
 <h1 id="LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</h1>
 
-<p>Copyright (C) 2007-2020 H.Merijn Brand</p>
+<p>Copyright (C) 2007-2023 H.Merijn Brand</p>
 
 <p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
 

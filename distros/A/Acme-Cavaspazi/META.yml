@@ -15,7 +15,7 @@ name: Acme-Cavaspazi
 provides:
   Acme::Cavaspazi:
     file: lib/Acme/Cavaspazi.pm
-    version: v1.0.0
+    version: v1.0.1
 requires:
   Carp: '1.2'
   File::Basename: '0'
@@ -26,5 +26,5 @@ requires:
   perl: '5.012'
 resources:
   repository: https://github.com/telatin/FASTX-Reader
-version: 1.0.0
+version: 1.0.1
 x_serialization_backend: 'YAML::Tiny version 1.70'

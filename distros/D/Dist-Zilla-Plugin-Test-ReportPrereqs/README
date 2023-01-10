@@ -3,7 +3,7 @@ NAME
     versions during automated testing
 
 VERSION
-    version 0.028
+    version 0.029
 
 SYNOPSIS
       # in dist.ini
@@ -98,6 +98,8 @@ CONTRIBUTORS
     *   Kent Fredric <kentfredric@gmail.com>
 
     *   Randy Stauner <randy@magnificent-tears.com>
+
+    *   Ricardo Signes <rjbs@users.noreply.github.com>
 
     *   Yanick Champoux <yanick@babyl.dyndns.org>
 

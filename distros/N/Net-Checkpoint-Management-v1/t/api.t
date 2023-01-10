@@ -244,6 +244,50 @@ ok($access_rule = $cpmgmt->update_accessrule({
     }), "disable access rule successful");
 is($access_rule->{enabled}, F(), "access rule is disabled");
 
+is($cpmgmt->where_used($acme_net_clients, { indirect => \1 }),
+    {
+        'used-directly'     => hash {
+            field 'total'   => 2;
+
+            field 'objects' => array {
+                item hash {
+                    field 'type' => 'group';
+                    field 'name' => 'acme_grp-test';
+
+                    etc();
+                };
+            };
+
+            field 'access-control-rules' => array {
+                item hash {
+                    field 'package'  => hash {
+                        field 'name' => $ENV{NET_CHECKPOINT_MANAGEMENT_V1_POLICY};
+
+                        etc();
+                    };
+
+                    field 'rule'    => hash {
+                        field 'name' => 'simple IPv4 literals rule';
+
+                        etc();
+                    };
+
+                    etc();
+                };
+
+                end();
+            };
+
+            etc();
+        },
+        'used-indirectly'   => hash {
+            field 'total'   => 0;
+
+            etc();
+        },
+    },
+    'where_used for network object directly in rule ok');
+
 ok($cpmgmt->delete_accessrule({
         uid     => $access_rule->{uid},
         layer   => $acl_uid,

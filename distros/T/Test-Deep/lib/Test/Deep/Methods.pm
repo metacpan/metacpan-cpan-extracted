@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Test::Deep::Methods 1.202;
+package Test::Deep::Methods 1.204;
 
 use Test::Deep::Cmp;
 use Scalar::Util;
@@ -94,7 +94,7 @@ Test::Deep::Methods
 
 =head1 VERSION
 
-version 1.202
+version 1.204
 
 =head1 PERL VERSION
 

@@ -1,14 +1,11 @@
-
-use strict;
+use v5.12;
+use warnings;
 
 use Test::More;
 
 my $have_scalar_util = 0;
 if (eval "use Scalar::Util 1.09 (); 1") {
   $have_scalar_util = 1;
-  plan tests => 8;
-} else {
-  plan tests => 6;
 }
 
 use_ok('Email::Address');
@@ -57,3 +54,5 @@ if ($have_scalar_util) {
     "we still get a cached copy",
   );
 }
+
+done_testing;

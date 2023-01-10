@@ -2,7 +2,8 @@ package Plack::Middleware::Security::Common;
 
 # ABSTRACT: A simple security filter for Plack with common rules.
 
-use strict;
+use v5.14;
+
 use warnings;
 
 use parent qw( Plack::Middleware::Security::Simple Exporter::Tiny );
@@ -30,7 +31,7 @@ our @EXPORT = qw(
    wordpress
 );
 
-our $VERSION = 'v0.8.3';
+our $VERSION = 'v0.9.1';
 
 
 
@@ -196,7 +197,7 @@ Plack::Middleware::Security::Common - A simple security filter for Plack with co
 
 =head1 VERSION
 
-version v0.8.3
+version v0.9.1
 
 =head1 SYNOPSIS
 
@@ -393,7 +394,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014,2018-2022 by Robert Rothenberg.
+This software is Copyright (c) 2014,2018-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

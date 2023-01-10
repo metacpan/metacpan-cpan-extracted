@@ -16,6 +16,7 @@ bin/fu-grep
 bin/fu-hash
 bin/fu-len
 bin/fu-rename
+bin/fu-say
 bin/fu-sort
 bin/fu-uniq
 bin/n50
@@ -50,6 +51,7 @@ scripts/n50_algorithm.txt
 scripts/n50_dump.pl
 scripts/test.fa
 scripts/test.pl
+t/01-ext.t
 t/10-FASTX-reader-seq.t
 t/10_FASTX-reader.t
 t/10_basic_test.t
@@ -63,12 +65,15 @@ t/15_bad_json.t
 t/30_Windows.t
 t/49-prebins.t
 t/50-bin.t
-t/50-other-bins.t
-t/51-grep.t
-t/52-cat.t
-t/53-count.t
-t/54-extract.t
-t/55-uniq.t
+t/TestFu.pm
+t/author-50-helps.t
+t/author-51-other-bins.t
+t/author-52-cat.t
+t/author-52-grep.t
+t/author-53-count.t
+t/author-54-extract.t
+t/author-55-uniq.t
+t/author-99_posse.t
 t/release-00-pod.t
 t/release-01-pod-coverage.t
 t/release-03-minimum-standards.t

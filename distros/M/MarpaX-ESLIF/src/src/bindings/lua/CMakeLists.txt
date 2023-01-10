@@ -1,9 +1,10 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 3.0.0 FATAL_ERROR)
+# marpaESLIFLua version is synced with marpaESLIF
+PROJECT(marpaESLIFLua VERSION ${marpaESLIF_VERSION} LANGUAGES C)
 IF (NOT MYPACKAGEBOOTSTRAP_DONE)
   INCLUDE ("../../../3rdparty/github/cmake-utils/cmake/MyPackageBootstrap.cmake")
 ENDIF ()
-# marpaESLIFLua version is synced with marpaESLIF
-MYPACKAGESTART (marpaESLIFLua ${marpaESLIF_VERSION_MAJOR} ${marpaESLIF_VERSION_MINOR} ${marpaESLIF_VERSION_PATCH})
+MYPACKAGESTART ()
 
 INCLUDE (FindLua)
 MESSAGE(STATUS "LUA_LIBRARIES     : ${LUA_LIBRARIES}")

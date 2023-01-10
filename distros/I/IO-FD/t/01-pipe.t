@@ -1,4 +1,4 @@
-use Test::More tests=>4;
+use Test::More;
 use IO::FD;
 
 
@@ -16,3 +16,11 @@ use IO::FD;
 	IO::FD::close $read;
 	IO::FD::close $write;
 }
+{
+  eval {
+    my $ret=IO::FD::pipe "",undef;
+  };
+  ok $@, "no readonly arguments in pipe";
+
+}
+done_testing;

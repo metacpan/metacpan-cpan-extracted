@@ -1,1034 +1,1052 @@
 package Passwd::Unix;
-
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
-
+$Passwd::Unix::VERSION = '1.09';
+use parent 		qw( Exporter::Tiny );
 use warnings;
 use strict;
-use Carp;
+#-----------------------------------------------------------------------
 use Config;
-use File::Spec;
-use File::Path;
-use File::Copy;
-use File::Basename qw(dirname basename);
-use IO::Compress::Bzip2 qw($Bzip2Error);
-use Struct::Compare;
-use Crypt::PasswdMD5 qw(unix_md5_crypt);
-require Exporter;
-#======================================================================
-$VERSION = '0.71';
-@ISA = qw(Exporter);
-@EXPORT_OK = qw(check_sanity reset encpass passwd_file shadow_file 
-				group_file backup debug warnings del del_user uid gid 
-				gecos home shell passwd rename maxgid maxuid exists_user 
-				exists_group user users users_from_shadow del_group 
-				group groups groups_from_gshadow default_umask
-				unused_uid unused_gid);
-#======================================================================
-use constant TRUE 	=> not undef;
-use constant FALSE 	=> undef;
-#======================================================================
-use constant DAY		=> 86400;
-use constant PASSWD 	=> '/etc/passwd';
-use constant GROUP  	=> '/etc/group';
-use constant SHADOW 	=> '/etc/shadow';
-use constant GSHADOW  	=> '/etc/gshadow';
-use constant BACKUP 	=> TRUE;
-use constant DEBUG  	=> FALSE;
-use constant WARNINGS 	=> FALSE;
-use constant UMASK		=> 0022;
-use constant PERM_PWD	=> 0644;
-use constant PERM_GRP	=> 0644;
-use constant PERM_SHD	=> 0400;
-use constant PATH		=>  qr/^[\w\+_\040\#\(\)\{\}\[\]\/\-\^,\.:;&%@\\~]+\$?$/;
-#======================================================================
-my $_CHECK = {
-	'rename' 	=> sub { return if not defined $_[0] or $_[0] !~ /^[A-Z0-9_\.-]+$/io; TRUE },
-	'gid'		=> sub { return if not defined $_[0] or $_[0] !~ /^[0-9]+$/o; TRUE },
-	'uid'		=> sub { return if not defined $_[0] or $_[0] !~ /^[0-9]+$/o; TRUE },
-	'home'		=> sub { return if not defined $_[0] or $_[0] !~ PATH; TRUE },
-	'shell'		=> sub { return if not defined $_[0] or $_[0] !~ PATH; TRUE },
-	'gecos'		=> sub { return if not defined $_[0] or $_[0] !~ /^[^:]+$/o; TRUE },
-	'passwd' 	=> sub { return if not defined $_[0]; TRUE},
-};
+use Crypt::Password;
+use IO::Compress::Bzip2 	qw( bzip2 $Bzip2Error );
+use Path::Tiny;
+use Tie::Array::CSV;
+#-----------------------------------------------------------------------
+use constant DAY => 86400;
+use constant SEP => q[:];
+
+use constant ALG => q[sha512];
+use constant BCK => 1;
+use constant CMP => 1;
+use constant DBG => 0;
+use constant WRN => 0;
+use constant MSK => 0022;
+
+use constant PWD => q[/etc/passwd];
+use constant GRP => q[/etc/group];
+use constant PSH => q[/etc/shadow];
+use constant GSH => q[/etc/gshadow];
+#=======================================================================
+our @EXPORT_OK	= qw(
+	
+	backup
+	compress
+	debug
+	warnings
+	error
+	
+	encpass 
+	
+	exists_user 
+	exists_group
+	
+	passwd_file 
+	group_file 
+	shadow_file 
+	gshadow_file
+	
+	user
+	uid 
+	gid 
+	gecos 
+	home 
+	shell 
+	passwd 
+	rename 
+	
+	del 
+	del_user  
+	
+	group
+	del_group
+	
+	users 
+	users_from_shadow
+	
+	minuid
+	mingid
+	
+	maxuid
+	maxgid
+	
+	unused_uid 
+	unused_gid
+	
+	groups 
+	groups_from_gshadow
+	
+	reset
+	
+	default_umask
+);
 #======================================================================
 my $Self = __PACKAGE__->new();
 #======================================================================
 sub new {
-	my ($class, %params) = @_;
+	my ( $class, %opt ) = @_;
 	
-	my $self = bless {
-				passwd 		=> (defined $params{passwd} 	? $params{passwd} 	: PASSWD	),
-				group 		=> (defined $params{group} 		? $params{group} 	: GROUP		),
-				shadow 		=> (defined $params{shadow} 	? $params{shadow} 	: SHADOW	),
-				gshadow 	=> (defined $params{gshadow} 	? $params{gshadow} 	: GSHADOW	),
-				backup 		=> (defined $params{backup} 	? $params{backup} 	: BACKUP	),
-				debug 		=> (defined $params{debug} 		? $params{debug} 	: DEBUG		),
-				warnings	=> (defined $params{warnings} 	? $params{warnings} : WARNINGS	),
-				'umask'		=> (defined $params{'umask'} 	? $params{'umask'}	: UMASK		),
-			}, $class;
-			
-	$self->check_sanity(TRUE) if (caller())[0] ne __PACKAGE__;
-			
+	my $self = bless { }, $class;
+	
+	$self->algorithm	( $opt{ algorithm 	} // ALG );
+	$self->backup	 	( $opt{ backup  	} // BCK );
+	$self->compress 	( $opt{ compress  	} // CMP );
+	$self->debug	 	( $opt{ debug 	 	} // DBG );
+	$self->default_umask( $opt{ umask 		} // MSK );
+	$self->warnings	 	( $opt{ warnings 	} // WRN );
+	
+	
+	$self->passwd_file	( $opt{ passwd  	} // PWD );
+	$self->group_file	( $opt{ group   	} // GRP );
+	$self->shadow_file	( $opt{ shadow		} // PSH );
+	$self->gshadow_file	( $opt{ gshadow 	} // GSH );
+	
 	return $self;
 }
-#======================================================================
-sub error {
-	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
+#=======================================================================
+sub _err {
+	my ( $self, @str ) = @_;
 	
-	$self->{ error } = shift if defined $_[0];
-
-	return $self->{ error } || q//;
-}
-#======================================================================
-sub check_sanity {
-	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	my $quiet = shift;
-
-	for($self->shadow_file, $self->passwd_file, $self->group_file){
-		next if -f $_;
-		croak('File not found: ' . $_);
-	}
-
-	unless($quiet){
-		carp(q/Insecure permissions to group file!/)	and sleep(1) if ((stat($self->group_file)  )[2] & 07777) != PERM_GRP;
-		carp(q/Insecure permissions to passwd file!/)	and sleep(1) if ((stat($self->passwd_file) )[2] & 07777) != PERM_PWD;
-		carp(q/Insecure permissions to shadow file!/)	and sleep(1) if ((stat($self->shadow_file) )[2] & 07777) != PERM_SHD;
-		carp(q/Insecure permissions to gshadow file!/)	and sleep(1) if ((stat($self->gshadow_file))[2] & 07777) != PERM_GRP;
-	}
-
-	if($( !~ /^0/o){
-		carp(q/Running as "/ . getlogin() . qq/", which has currently no permissions to write to system files. Some operations (i.e. modify) may fail!/) unless $quiet;
-		return;
-	}
-
-	my %filenames = ( shadow => $self->shadow_file, passwd => $self->passwd_file, group => $self->group_file, gshadow => $self->gshadow_file );
-	foreach my $file0 (keys %filenames){
-		foreach my $file1 (keys %filenames){
-			next if $file0 eq $file1;
-			croak(q/Files "/ . $file0 . q/" and "/ . $file1 . q/" cannot be the same!/) if $filenames{$file0} eq $filenames{$file1};
-		}
-	}
-
-	unless(compare([$self->users()], [$self->users_from_shadow()])){
-		carp(qq/\nYour ENVIRONMENT IS INSANE! Users in files "/.$self->passwd_file().q/" and "/.$self->shadow_file().qq/ are diffrent!!!\nI'll continue, but it is YOUR RISK! You'll probably go into BIG troubles!\n\n/);
-		warn "\a\n";
-		sleep 5;
-	}
-
+	$self->{ err } = join( q[], @str );
+	warn $self->{ err } if $self->{ wrn };
+	
 	return;
 }
-#======================================================================
-sub reset {
-	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->{passwd}		= PASSWD;
-	$self->{group}		= GROUP;
-	$self->{shadow}		= SHADOW;
-	$self->{gshadow}	= GSHADOW;
-	$self->{'umask'}	= UMASK;
-	return TRUE;
-}
-#======================================================================
-sub encpass {
-	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	my ($val) = @_;
-	return unless defined $val;
-	return unix_md5_crypt($val);
-}
-#======================================================================
-sub _do_backup {
-	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	my ($sec,$min,$hour,$mday,$mon,$year) = localtime(time);
-
-	my $umask = umask $self->{'umask'};
-
-	$self->error(q//);
-
-	my $dir = File::Spec->catfile($self->passwd_file.'.bak', ($year+1900).'.'.($mon+1).'.'.$mday.'-'.$hour.'.'.$min.'.'.$sec);
-	mkpath $dir; chmod 0500, $dir;
-
-	my $cpasswd		= File::Spec->catfile($dir, basename($self->passwd_file())  . q/.bz2/);
-	my $cgroup		= File::Spec->catfile($dir, basename($self->group_file())   . q/.bz2/);
-	my $cshadow		= File::Spec->catfile($dir, basename($self->shadow_file())  . q/.bz2/);
-	my $cgshadow	= File::Spec->catfile($dir, basename($self->gshadow_file()) . q/.bz2/);
-
-	# passwd
-	my $compress = IO::Compress::Bzip2->new($cpasswd, AutoClose => 1, Append => 1, BlockSize100K => 9) or ($self->error($Bzip2Error) and umask $umask and return);
-	open(my $fh, '<', $self->passwd_file) or (umask $umask and return);
-	$compress->print($_) while <$fh>;
-	$compress->close;
-	chmod 0644, $cpasswd;
+#=======================================================================
+sub _dat {
+	my ( $sec, $min, $hour, $mday, $mon, $year ) = localtime( time );
 	
-	# group
-	$compress = IO::Compress::Bzip2->new($cgroup, AutoClose => 1, Append => 1, BlockSize100K => 9) or ($self->error($Bzip2Error) and umask $umask and return);
-	open($fh, '<', $self->group_file) or (umask $umask and return);
-	$compress->print($_) while <$fh>;
-	$compress->close;
-	chmod 0644, $cgroup;
-
-	# shadow
-	$compress = IO::Compress::Bzip2->new($cshadow, AutoClose => 1, Append => 1, BlockSize100K => 9) or ($self->error($Bzip2Error) and umask $umask and return);
-	open($fh, '<', $self->shadow_file) or (umask $umask and return);
-	$compress->print($_) while <$fh>;
-	$compress->close;
-	chmod 0400, $cshadow;
-
-	# gshadow
-	if(-f $self->gshadow_file){
-		$compress = IO::Compress::Bzip2->new($cgshadow, AutoClose => 1, Append => 1, BlockSize100K => 9) or ($self->error($Bzip2Error) and umask $umask and return);
-		open($fh, '<', $self->gshadow_file) or (umask $umask and return);
-		$compress->print($_) while <$fh>;
-		$compress->close;
-		chmod 0400, $cgshadow;
-	}
-
-	umask $umask;
-
-	return TRUE;
+	$year += 1900;
+	$mon  += 1;
+	
+	$sec  = q[0] . $sec  if $sec  =~ /^\d$/o;
+	$min  = q[0] . $min  if $min  =~ /^\d$/o;
+	$hour = q[0] . $hour if $hour =~ /^\d$/o;
+	$mday = q[0] . $mday if $mday =~ /^\d$/o;
+	$mon  = q[0] . $mon  if $mon  =~ /^\d$/o;
+	
+	return $year . q[.] . $mon . q[.] . $mday . q[-] . $hour . q[.] . $min . q[.] . $sec;
 }
-#======================================================================
-sub passwd_file { 
-	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	my ($val) = @_;
-	return $self->{passwd} unless defined $val;
-	$self->{passwd} = File::Spec->canonpath($val);
-	return $self->{passwd};
-}
-#======================================================================
-sub group_file { 
-	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	my ($val) = @_;
-	return $self->{group} unless defined $val;
-	$self->{group} = File::Spec->canonpath($val);
-	return $self->{group};
-}
-#======================================================================
-sub shadow_file { 
-	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	my ($val) = @_;
-	return $self->{shadow} unless defined $val;
-	$self->{shadow} = File::Spec->canonpath($val);
-	return $self->{shadow};
-}
-#======================================================================
-sub gshadow_file { 
-	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	my ($val) = @_;
-	return $self->{gshadow} unless defined $val;
-	$self->{gshadow} = File::Spec->canonpath($val);
-	return $self->{gshadow};
-}
-#======================================================================
-sub backup {
-	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	my ($val) = @_;
-	return $self->{backup} unless defined $val;
-	$self->{backup} = $val ? TRUE : FALSE;
-	return $self->{backup};
-}
-#======================================================================
-sub debug {
-	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	my ($val) = @_;
-	return $self->{debug} unless defined $val;
-	$self->{debug} = $val ? TRUE : FALSE;
-	return $self->{debug};
-}
-#======================================================================
-sub warnings {
-	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	my ($val) = @_;
-	return $self->{warnings} unless defined $val;
-	$self->{warnings} = $val ? TRUE : FALSE;
-	return $self->{warnings};
-}
-#======================================================================
-sub default_umask {
-	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	my ($val) = @_;
-	return $self->{'umask'} unless defined $val;
-	$val = oct($val) if length($val) != 2;
-	$self->{'umask'} = $val;
-	return $self->{'umask'};
-}
-#======================================================================
-*del_user = { };
-*del_user = \&del;
-sub del { 
-#	This method will fail, if user doesn't have permissions to files.
-#   Error will be in $self->error() and error();
-#	return if $( !~ /^0/o;
-
-	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->error(q//);
-
-	unless(scalar @_){
-		my $error = $self->error(q|Method/function "del" cannot run without params!|);
-		carp($error) if $self->warnings();
-		return;
-	}
-
-	if( $self->backup() ){
-		$self->_do_backup() or return;
+#=======================================================================
+sub _bck {
+	my ( $self ) = @_;
+	
+	#-------------------------------------------------------------------
+	return unless $self->{ bck };
+	
+	#-------------------------------------------------------------------
+	my $dir = path( $self->{ pwd } . q[.bak], _dat() );
+	
+	if( $dir->exists ){
+		return $self->_err( $dir . " is a file. It should be a directory.\n" ) if $dir->is_file;
+	}else{
+		$dir->mkpath;
 	}
 	
-	my $regexp = '^'.join('$|^',@_).'$';
-	$regexp = qr/$regexp/;
-	
-	# here unused gids will be saved
-	my (@gids, @deleted, %_gids);
-	
-	my $umask = umask $self->{'umask'};
-
-	# remove from passwd
-	my $tmp = $self->passwd_file.'.tmp';
-	open(my $fh, '<', $self->passwd_file()) or ($self->error($!) and umask $umask and return);
-	open(my $ch, '>', $tmp) or ($self->error($!) and umask $umask and return);
-	chmod PERM_PWD, $ch;
-	while(my $line = <$fh>){
-		my ($user, undef, undef, $gid) = split(/:/,$line, 5);
-		if($user =~ $regexp){ 
-			push @gids, $gid; 
-			push @deleted, $user;
-		}else{ 
-			$_gids{$gid} = defined $_gids{$gid} ? $_gids{$gid} + 1 : 1;
-			print $ch $line; 
-		}
-	}
-	close($fh);close($ch);
-	move($tmp, $self->passwd_file()) or ($self->error($!) and umask $umask and return);
-	
-	# remove from shadow
-	$tmp = $self->shadow_file.'.tmp';
-	open($fh, '<', $self->shadow_file()) or ($self->error($!) and umask $umask and return);
-	open($ch, '>', $tmp) or ($self->error($!) and umask $umask and return);
-	chmod PERM_SHD, $ch;
-	while(my $line = <$fh>){
-		next if (split(/:/,$line,2))[0] =~ $regexp;
-		print $ch $line;
-	}
-	close($fh);close($ch);
-	move($tmp, $self->shadow_file()) or ($self->error($!) and umask $umask and return);
-
-	# remove from group
-	my $gids = '^'.join('$|^',@gids).'$';
-	$gids = qr/$gids/;
-	$tmp = $self->group_file.'.tmp';
-	open($fh, '<', $self->group_file()) or ($self->error($!) and umask $umask and return);
-	open($ch, '>', $tmp) or ($self->error($!) and umask $umask and return);
-	chmod PERM_GRP, $ch;
-	while(my $line = <$fh>){
-		chomp $line;
-		my ($name, $passwd, $gid, $users) = split(/:/,$line,4);
-		$users = join(q/,/, grep { !/$regexp/ } split(/\s*,\s*/, $users));
-		print $ch join(q/:/, $name, $passwd, $gid, $users),"\n";
-	}
-	close($fh);close($ch);
-	move($tmp, $self->group_file()) or ($self->error($!) and umask $umask and return);
-	
-	# remove from gshadow
-	if(-f $self->gshadow_file){
-		$tmp = $self->gshadow_file.'.tmp';
-		open($fh, '<', $self->gshadow_file()) or ($self->error($!) and umask $umask and return);
-		open($ch, '>', $tmp) or ($self->error($!) and umask $umask and return);
-		chmod PERM_SHD, $ch;
-		while(my $line = <$fh>){
-			chomp $line;
-			my ($name, $passwd, $gid, $users) = split(/:/,$line,4);
-			$users = join(q/,/, grep { !/$regexp/ } split(/\s*,\s*/, $users));
-			print $ch join(q/:/, $name, $passwd, $gid, $users),"\n";
-		}
-		close($fh);close($ch);
-		move($tmp, $self->gshadow_file()) or ($self->error($!) and umask $umask and return);
-	}
-
-	umask $umask;
-
-	return @deleted if wantarray;
-	return scalar @deleted;
-}
-#======================================================================
-sub _set {
-#	This method will fail, if user doesn't have permissions to files.
-#   Error will be in $self->error() and error();
-#	return if $( !~ /^0/o;
-
-	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->error(q//);
-
-	return if scalar @_ < 4;
-	my ($file, $user, $pos, $val, $count) = @_;
-	
-	my @t = split(/::/,(caller(1))[3]);
-	croak(qq/\n"_set" cannot be called from outside of Passwd::Unix!/) if $t[-2] ne 'Unix';	
-	unless($_CHECK->{$t[-1]}($val)){ 
-		my $error = $self->error(qq/Incorrect parameters for "$t[-1]! Leaving unchanged..."/);
-		carp($error) if $self->warnings(); 
-		return; 
-	}
-
-	if( $self->backup() ){
-		$self->_do_backup() or return;
-	}
-
-	my $umask = umask $self->{'umask'};
-	my $mode	=	$file eq $self->passwd_file()	?	PERM_PWD	:
-					$file eq $self->group_file()	?	PERM_GRP	:
-					$file eq $self->shadow_file()	?	PERM_SHD	:
-														PERM_SHD	;
-
-	$count ||= 6;
-	my $tmp = $file.'.tmp';
-	open(my $fh, '<', $file) or ($self->error($!) and umask $umask and return);
-	open(my $ch, '>', $tmp) or ($self->error($!) and umask $umask and return);
-	chmod $mode, $ch;
-	my $ret;
-	while(<$fh>){
-		chomp;
-		my @a = split /:/;
-		if($a[0] eq $user){
-			$a[$pos] = $val;
-			$ret = TRUE;
-			for(scalar @a .. $count){ push @a, ''; }
-			print $ch join(q/:/, @a),"\n";
+	#-------------------------------------------------------------------
+	for my $dis ( qw( pwd grp psh gsh ) ){
+		my $src = path( $self->{ $dis } );
+		my $dst = $dir->child( $src->basename . q[.bz2] );
+		
+		if( $self->{ cmp } ){
+			$dst->touch;
+			$dst->chmod( $src->stat->mode  );
+			bzip2 $src->stringify => $dst->stringify or return $self->_err( $Bzip2Error );
 		}else{
-			print $ch $_,"\n";	
+			$src->copy( $dst );
 		}
 	}
-	close($fh);close($ch);
-	move($tmp, $file) or ($self->error($!) and umask $umask and return);
-
-	umask $umask;
-
-	return $ret;
+	
+	#-------------------------------------------------------------------
+	return 1;
 }
-#======================================================================
-sub _get {
+#=======================================================================
+sub del_group {
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->error(q//);
-
-	return if scalar @_ != 3;
-	my ($file, $user, $pos) = @_;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( @val ) = @_;
 	
-	unless($_CHECK->{'rename'}($user)){ 
-		my $error = $self->error(qq/Incorrect user "$user"!/);
-		carp($error) if $self->warnings(); 
-		return; 
-	}
+	return $self->_err( q[Supplied value is undefined.] 	) unless @val;
+	#return $self->_err( q[Supplied group does not exists.] 	) unless _exs( $self->{ grp }, $val );
+	return $self->_err( q[Unsufficient permissions.] 		) unless open my $fhd, '>>', $self->{ gsh };
 	
-	open(my $fh, '<', $file) or ($self->error($!) and return);
-	while(<$fh>){
-		my @a = split /:/;
-		next if $a[0] ne $user;
-		chomp $a[$pos];
-		return $a[$pos];
+	close( $fhd );
+	
+	#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	$self->_bck or return;
+	#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	
+	#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	tie my @ary, q[Tie::Array::CSV], $self->{ grp }, { 
+		tie_file => { 
+			autochomp => 1, 
+		}, 
+		text_csv => { 
+			sep_char 	=> SEP,
+			binary 		=> 1,
+			quote_char => undef,
+		},
+	};
+	#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	tie my @yra, q[Tie::Array::CSV], $self->{ gsh }, { 
+		tie_file => { 
+			autochomp => 1, 
+		}, 
+		text_csv => { 
+			sep_char 	=> SEP,
+			binary 		=> 1,
+			quote_char => undef,
+		},
+	};
+	#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -	
+	for my $val ( @val ){
+		my $sav;
+		for my $idx ( 0 .. $#ary ){
+			next if $ary[ $idx ][ 0 ] ne $val;
+			splice @ary, $idx, 1;
+			$sav = $idx;
+			last;
+		}
+		#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		if( $yra[ $sav ][ 0 ] eq $val ){
+			splice @yra, $sav, 1;
+		}else{
+			for my $idx ( 0 .. $#yra ){
+				next if $yra[ $idx ][ 0 ] ne $val;
+				splice @yra, $idx, 1;
+				last;
+			}
+		}
 	}
+	#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	return 1;
+}
+#=======================================================================
+#*del_user = { };
+*del_user = \&del;
+#-----------------------------------------------------------------------
+sub del {
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( @val ) = @_;
+	
+	return $self->_err( q[Supplied value is undefined.] 	) unless @val;
+	#return $self->_err( q[Supplied user does not exists.] 	) unless _exs( $self->{ pwd }, $val );
+	return $self->_err( q[Unsufficient permissions.] 		) unless open my $fhd, '>>', $self->{ psh };
+	
+	close( $fhd );
+	
+	#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	$self->_bck or return;
+	#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	
+	#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	tie my @ary, q[Tie::Array::CSV], $self->{ pwd }, { 
+		tie_file => { 
+			autochomp => 1, 
+		}, 
+		text_csv => { 
+			sep_char 	=> SEP,
+			binary 		=> 1,
+			quote_char => undef,
+		},
+	};
+	#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	tie my @yra, q[Tie::Array::CSV], $self->{ psh }, { 
+		tie_file => { 
+			autochomp => 1, 
+		}, 
+		text_csv => { 
+			sep_char 	=> SEP,
+			binary 		=> 1,
+			quote_char => undef,
+		},
+	};
+	#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -	
+	for my $val ( @val ){
+		my $usr;
+		my $sav;
+		for my $idx ( 0 .. $#ary ){
+			next if $ary[ $idx ][ 0 ] ne $val;
+			$usr = splice @ary, $idx, 1;
+			$sav = $idx;
+			last;
+		}
+		#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		if( $yra[ $sav ][ 0 ] eq $val ){
+			splice @yra, $sav, 1;
+		}else{
+			for my $idx ( 0 .. $#yra ){
+				next if $yra[ $idx ][ 0 ] ne $val;
+				splice @yra, $idx, 1;
+				last;
+			}
+		}
+	}
+	#+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
+	untie @ary;
+	untie @yra;
+	
+	@ary = ( );
+	@yra = ( );
+	
+	#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	tie @ary, q[Tie::Array::CSV], $self->{ grp }, { 
+		tie_file => { 
+			autochomp => 1, 
+		}, 
+		text_csv => { 
+			sep_char 	=> SEP,
+			binary 		=> 1,
+			quote_char => undef,
+		},
+	};
+	#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	tie @yra, q[Tie::Array::CSV], $self->{ gsh }, { 
+		tie_file => { 
+			autochomp => 1, 
+		}, 
+		text_csv => { 
+			sep_char 	=> SEP,
+			binary 		=> 1,
+			quote_char => undef,
+		},
+	};
+	#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	for my $val ( @val ){
+		my $sav;
+		for my $idx ( 0 .. $#ary ){
+			next if $ary[ $idx ][ 3 ] !~ /\b$val\b/;
+			$ary[ $idx ][ 3 ] = join( q[,], grep { $_ ne $val } split( /\s*,\s*/, $ary[ $idx ][ 3 ] ) );
+		}
+		#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		for my $idx ( 0 .. $#yra ){
+			next if $ary[ $idx ][ 3 ] !~ /\b$val\b/;
+			$ary[ $sav ][ 3 ] = join( q[,], grep { $_ ne $val } split( /\s*,\s*/, $ary[ $sav ][ 3 ] ) );
+		}
+	}
+	#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	return 1;
+}
+#=======================================================================
+sub rename {
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $usr, $val ) = @_;
+	
+	return $self->_err( q[Supplied value is undefined.] 	) unless defined $usr and defined $val;
+	return $self->_err( q[Supplied user does not exists.] 	) unless _exs( $self->{ pwd }, $usr );
+	
+	_set( $self->{ pwd }, $usr, 0, $val );
+	_set( $self->{ psh }, $usr, 0, $val );
+	
 	return;
 }
-#======================================================================
-sub uid { 
+#=======================================================================
+sub passwd {
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->error(q//);
-
-	if(scalar @_ == 1){
-		return $self->_get($self->passwd_file(), $_[0], 2);
-	}elsif(scalar @_ != 2){
-		my $error = $self->error( q/Incorrect parameters for "uid"!/ );
-		carp($error) if $self->warnings();
-		return;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $usr, $val ) = @_;
+	
+	return $self->_err( q[Supplied value is undefined.] 	) unless defined $usr and defined $val;
+	return $self->_err( q[Supplied user does not exists.] 	) unless _exs( $self->{ pwd }, $usr );
+	
+	if( defined $val ){
+		return $self->_set( $self->{ psh }, $usr, 1, $val );
+	}else{
+		return $self->_get( $self->{ psh }, $usr, 1 );
 	}
-	return $self->_set($self->passwd_file(), $_[0], 2, $_[1]);
 }
-#======================================================================
-sub gid {
+#=======================================================================
+sub shell {
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->error(q//);
-
-	if(scalar @_ == 1){
-		return $self->_get($self->passwd_file(), $_[0], 3);
-	}elsif(scalar @_ != 2){
-		my $error = $self->error( q/Incorrect parameters for "gid"!/ );
-		carp($error) if $self->warnings();
-		return;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $usr, $val ) = @_;
+	
+	return $self->_err( q[Supplied value is undefined.] 	) unless defined $usr and defined $val;
+	return $self->_err( q[Supplied user does not exists.] 	) unless _exs( $self->{ pwd }, $usr );
+	
+	if( defined $val ){
+		return $self->_set( $self->{ pwd }, $usr, 6, $val );
+	}else{
+		return $self->_get( $self->{ pwd }, $usr, 6 );
 	}
-	return $self->_set($self->passwd_file(), $_[0], 3, $_[1]);
 }
-#======================================================================
+#=======================================================================
+sub home {
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $usr, $val ) = @_;
+	
+	return $self->_err( q[Supplied value is undefined.] 	) unless defined $usr and defined $val;
+	return $self->_err( q[Supplied user does not exists.] 	) unless _exs( $self->{ pwd }, $usr );
+	
+	if( defined $val ){
+		return $self->_set( $self->{ pwd }, $usr, 5, $val );
+	}else{
+		return $self->_get( $self->{ pwd }, $usr, 5 );
+	}
+}
+#=======================================================================
 sub gecos {
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->error(q//);
-
-	if(scalar @_ == 1){
-		return $self->_get($self->passwd_file(), $_[0], 4);
-	}elsif(scalar @_ != 2){
-		my $error = $self->error(q/Incorrect parameters for "gecos"!/);
-		carp($error) if $self->warnings();
-		return;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $usr, $val ) = @_;
+	
+	return $self->_err( q[Supplied value is undefined.] 	) unless defined $usr and defined $val;
+	return $self->_err( q[Supplied user does not exists.] 	) unless _exs( $self->{ pwd }, $usr );
+	
+	if( defined $val ){
+		return $self->_set( $self->{ pwd }, $usr, 4, $val );
+	}else{
+		return $self->_get( $self->{ pwd }, $usr, 4 );
 	}
-	return $self->_set($self->passwd_file(), $_[0], 4, $_[1]);
 }
-#======================================================================
-sub home { 
+#=======================================================================
+sub gid {
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->error(q//);
-
-	if(scalar @_ == 1){
-		return $self->_get($self->passwd_file(), $_[0], 5);
-	}elsif(scalar @_ != 2){
-		my $error = $self->error(q/Incorrect parameters for "home"!/);
-		carp($error) if $self->warnings();
-		return;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $usr, $val ) = @_;
+	
+	return $self->_err( q[Supplied value is undefined.] 	) unless defined $usr and defined $val;
+	return $self->_err( q[Supplied user does not exists.] 	) unless _exs( $self->{ pwd }, $usr );
+	
+	if( defined $val ){
+		return $self->_set( $self->{ pwd }, $usr, 3, $val );
+	}else{
+		return $self->_get( $self->{ pwd }, $usr, 3 );
 	}
-	return $self->_set($self->passwd_file(), $_[0], 5, $_[1]);
 }
-#======================================================================
-sub shell { 
+#=======================================================================
+sub uid {
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->error(q//);
-
-	if(scalar @_ == 1){
-		return $self->_get($self->passwd_file(), $_[0], 6);
-	}elsif(scalar @_ != 2){
-		my $error = $self->error(q/Incorrect parameters for "shell"!/);
-		carp($error) if $self->warnings();
-		return;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $usr, $val ) = @_;
+	
+	return $self->_err( q[Supplied value is undefined.] 	) unless defined $usr and defined $val;
+	return $self->_err( q[Supplied user does not exists.] 	) unless _exs( $self->{ pwd }, $usr );
+	
+	if( defined $val ){
+		return $self->_set( $self->{ pwd }, $usr, 2, $val );
+	}else{
+		return $self->_get( $self->{ pwd }, $usr, 2 );
 	}
-	return $self->_set($self->passwd_file(), $_[0], 6, $_[1]);	
 }
-#======================================================================
-sub passwd { 
-	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->error(q//);
+#=======================================================================
+sub _set {
+	my ( $self, $pth, $usr, $pos, $val ) = @_;
 
-	if(scalar @_ == 1){
-		return $self->_get($self->shadow_file(), $_[0], 1);
-	}elsif(scalar @_ != 2){
-		my $error = $self->error(q/Incorrect parameters for "passwd"!/);
-		carp($error) if $self->warnings();
-		return;
+	return $self->_err( q[Unsufficient permissions.] ) unless open my $fhd, '>>', $pth;
+	close( $fhd );
+	
+	#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	$self->_bck or return;
+	#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	
+	tie my @ary, q[Tie::Array::CSV], $pth, { 
+		tie_file => { 
+			autochomp => 1, 
+		}, 
+		text_csv => { 
+			sep_char 	=> SEP,
+			binary 		=> 1,
+			quote_char => undef,
+		},
+	};
+
+	for my $idx ( 0 .. $#ary ){
+		next if $ary[ $idx ][ 0 ] ne $usr;
+		$ary[ $idx ][ $pos ] = $val;
 	}
-	return $self->_set($self->shadow_file(), $_[0], 1, $_[1], 8);	
+	
+	return 1;
 }
-#======================================================================
-sub rename { 
-#	This method will fail, if user doesn't have permissions to files.
-#   Error will be in $self->error() and error();
-#	return if $( !~ /^0/o;
-
+#=======================================================================
+sub _get {
+	my ( $self, $pth, $usr, $pos ) = @_;
+	
+	return $self->_err( q[Unsufficient permissions.] ) unless open my $fhd, '<', $pth;
+	
+	while( <$fhd> ){
+		my @tmp = split /:/;
+		next if $tmp[ 0 ] ne $usr;
+		return $tmp[ $pos ];
+	}
+	close( $fhd );
+	
+	return;
+}
+#=======================================================================
+sub group {
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->error(q//);
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( @arg ) = @_;
 	
-	if(scalar @_ != 2){ 
-		my $error = $self->error(q/Incorrect parameters for "rename"!/);
-		carp($error) if $self->warnings(); 
-		return; 
-	}
-	
-	my ($user, $val) = @_;
-	unless($self->exists_user($user)){ 
-		my $error = $self->error(qq/User "$user" does not exists!/);
-		carp($error) if $self->warnings(); 
-		return; 
-	}
-	
-	my $gid = $self->gid($user);
-	unless(defined $gid){ 
-		my $error = $self->error(qq/Cannot retrieve GID of user "$user"! Leaving unchanged.../);
-		carp($error) if $self->warnings(); 
-		return; 
-	}
-	
-	if( $self->backup() ){
-		$self->_do_backup() or return;
-	}
-
-	my $umask = umask $self->{'umask'};
-	
-	my $tmp = $self->group_file.'.tmp';
-	open(my $fh, '<', $self->group_file()) or ($self->error($!) and umask $umask and return);
-	open(my $ch, '>', $tmp) or ($self->error($!) and umask $umask and return);
-	chmod PERM_GRP, $ch;
-	while(my $line = <$fh>){
-		chomp $line;
-		my ($name, $passwd, $gid, $users) = split(/:/,$line,4);
-		$users = join(q/,/, map { $_ eq $user ? $val : $_ } split(/\s*,\s*/, $users));
-		print $ch join(q/:/, $name, $passwd, $gid, $users),"\n";
-	}
-	close($fh);close($ch);
-	move($tmp, $self->group_file()) or ($self->error($!) and umask $umask and return);
-	
-	if(-f $self->gshadow_file){
-		my $tmp = $self->gshadow_file.'.tmp';
-		open(my $fh, '<', $self->gshadow_file()) or ($self->error($!) and umask $umask and return);
-		open(my $ch, '>', $tmp) or ($self->error($!) and umask $umask and return);
-		chmod PERM_PWD, $ch;
-		while(my $line = <$fh>){
-			chomp $line;
-			my ($name, $passwd, $gid, $users) = split(/:/,$line,4);
-			$users = join(q/,/, map { $_ eq $user ? $val : $_ } split(/\s*,\s*/, $users));
-			print $ch join(q/:/, $name, $passwd, $gid, $users),"\n";
+	#-------------------------------------------------------------------
+	if( @arg == 3 ){
+		return $self->_err( q[Unsufficient permissions.] ) unless open my $fhd, '>>', $self->{ gsh };
+		close( $fhd );
+		
+		#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		$self->_bck or return;
+		#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		
+		#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		tie my @ary, q[Tie::Array::CSV], $self->{ grp }, { 
+			tie_file => { 
+				autochomp => 1, 
+			}, 
+			text_csv => { 
+				sep_char 	=> SEP,
+				binary 		=> 1,
+				quote_char => undef,
+			},
+		};
+		#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		tie my @yra, q[Tie::Array::CSV], $self->{ gsh }, { 
+			tie_file => { 
+				autochomp => 1, 
+			}, 
+			text_csv => { 
+				sep_char 	=> SEP,
+				binary 		=> 1,
+				quote_char => undef,
+			},
+		};
+		#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		my $lst = join( q[,], @{ $arg[ 2 ] } );
+		
+		if(  _exs( $self->{ grp }, $arg[ 0 ] ) ){
+			my $sav;
+			for my $idx ( 0 .. $#ary ){
+				next if $ary[ $idx ][ 0 ] ne $arg[ 0 ];
+				$ary[ $idx ][ 2 ] = $arg[ 1 ];
+				$ary[ $idx ][ 3 ] = $lst;
+				$sav = $idx;
+				last;
+			}
+			if( $yra[ $sav ][ 0 ] eq $arg[ 0 ] ){
+				$yra[ $sav ][ 3 ] = $lst;
+			}else{
+				for my $idx ( 0 .. $#yra ){
+					next if $yra[ $idx ][ 0 ] ne $arg[ 0 ];
+					$yra[ $idx ][ 3 ] = $lst;
+					last;
+				}
+			}
+		}else{
+			push @ary, [
+				$arg[ 0 ],
+				q[x],
+				$arg[ 1 ],
+				$lst
+			];
+			
+			push @yra, [
+				$arg[ 0 ],
+				q[!],
+				q[],
+				$lst
+			];
 		}
-		close($fh);close($ch);
-		move($tmp, $self->gshadow_file()) or ($self->error($!) and umask $umask and return);
+		#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		return 1;
 	}
-	
-	$self->_set($self->passwd_file(), $user, 0, $val);	
-
-	umask $umask;
-
-	return $self->_set($self->shadow_file(), $user, 0, $val);
+	#-------------------------------------------------------------------
+	elsif( @arg == 1 ){
+		open( my $fhd, '<', $self->{ grp } ) or die $!;
+		my @grp = ( undef, [ ] );
+		while( <$fhd> ){
+			my @tmp = split /:/;
+			next if $tmp[ 0 ] ne $arg[ 0 ];
+			
+			chomp $tmp[ 3 ];
+			
+			$grp[ 0 ] = $tmp[ 2 ];
+			$grp[ 1 ] = [ split( /\s*,\s*/, $tmp[ 3 ] ) ];
+		
+			last;
+		}
+		close( $fhd );
+		
+		return wantarray ? @grp : \@grp;	
+	}
+	#-------------------------------------------------------------------
 }
-#======================================================================
-sub maxgid {
+#=======================================================================
+sub user {
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->error(q//);
-
-	my $max = 0;
-	open(my $fh, '<', $self->passwd_file()) or ($self->error($!) and return);
-	while(<$fh>){
-		my $tmp = (split(/:/,$_))[3];
-		$max = $tmp > $max ? $tmp : $max;
-	}
-	close($fh);
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( @arg ) = @_;
 	
-	# we should check group file too...
-	open($fh, '<', $self->group_file()) or ($self->error($!) and return);
-	while(<$fh>){
-		my $tmp = (split(/:/,$_))[2];
-		$max = $tmp > $max ? $tmp : $max;
+	#-------------------------------------------------------------------
+	if( @arg == 7 ){
+		return $self->_err( q[Unsufficient permissions.] ) unless open my $fhd, '>>', $self->{ psh };
+		close( $fhd );
+		
+		#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		$self->_bck or return;
+		#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		
+		#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		my $pwd = $arg[ 1 ];
+		$arg[ 1 ] = q[x];
+		#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		tie my @ary, q[Tie::Array::CSV], $self->{ pwd }, { 
+			tie_file => { 
+				autochomp => 1, 
+			}, 
+			text_csv => { 
+				sep_char 	=> SEP,
+				binary 		=> 1,
+				quote_char => undef,
+			},
+		};
+		#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		tie my @yra, q[Tie::Array::CSV], $self->{ psh }, { 
+			tie_file => { 
+				autochomp => 1, 
+			}, 
+			text_csv => { 
+				sep_char 	=> SEP,
+				binary 		=> 1,
+				quote_char => undef,
+			},
+		};
+		#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		if(  _exs( $self->{ pwd }, $arg[ 0 ] ) ){
+			my $sav;
+			for my $idx ( 0 .. $#ary ){
+				next if $ary[ $idx ][ 0 ] ne $arg[ 0 ];
+				$ary[ $idx ][ $_ ] = $arg[ $_ ] for 1 .. 6;
+				$sav = $idx;
+				last;
+			}
+			#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			if( $yra[ $sav ][ 0 ] eq $arg[ 0 ] ){
+				$yra[ $sav ][ 1 ] = $pwd;
+			}else{
+				for my $idx ( 0 .. $#yra ){
+					next if $yra[ $idx ][ 0 ] ne $arg[ 0 ];
+					$yra[ $idx ][ 1 ] = $pwd;
+					last;
+				}
+			}
+		}else{
+			push @ary, \@arg;
+			push @yra, [
+				$arg[ 0 ],
+				$pwd,
+				int( time / DAY ), 
+				0, 
+				99999, 
+				7, 
+				q[], q[], q[]
+			];
+		}
+		#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		return 1;
 	}
-	close($fh);
-
+	#-------------------------------------------------------------------
+	elsif( @arg == 1 ){
+		my @usr;
+		open( my $fhd, '<', $self->{ pwd } ) or die $!;
+		while( <$fhd> ){
+			my @tmp = split /:/;
+			next if $tmp[ 0 ] ne $arg[ 0 ];
+			$usr[ $_ - 1 ] = $tmp[ $_ ] for 1 .. 6;
+			last;
+		}
+		close( $fhd );
+		
+		chomp $usr[ $#usr ] if @usr;
+		
+		#if( $> == 0 ){
+			if( open( my $fhd, '<', $self->{ psh } ) ){
+				while( <$fhd> ){
+					my @tmp = split /:/;
+					next if $tmp[ 0 ] ne $arg[ 0 ];
+					$usr[ 0 ] = $tmp[ 1 ];
+					last;
+				}
+				close( $fhd );
+			}
+		#}
+		
+		return wantarray ? @usr : \@usr;
+	}
+	#-------------------------------------------------------------------
+}
+#=======================================================================
+sub _unu {
+	my ( $pth, $min, $max ) = @_;
+	
+	my %all;
+	open( my $fhd, '<', $pth ) or die $!;
+	while( <$fhd> ){
+		$all{ ( split /:/ )[ 2 ] } = 1;
+	}
+	close( $fhd );
+	
+	for( my $idx = $min; $idx <= $max; $idx++ ){
+		return $idx if not exists $all{ $idx };
+	}
+}
+#=======================================================================
+sub unused_uid {
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $min, $max ) = @_;
+	
+	return _unu( $self->{ pwd }, $min || 0, $max || ( 2 ** ( $Config{ intsize } * 8 ) ) );
+}
+#=======================================================================
+sub unused_gid {
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $min, $max ) = @_;
+	
+	return _unu( $self->{ grp }, $min || 0, $max || ( 2 ** ( $Config{ intsize } * 8 ) ) );
+}
+#=======================================================================
+sub _min {
+	my ( $pth, $min ) = @_;
+	
+	my %all;
+	open( my $fhd, '<', $pth ) or die $!;
+	while( <$fhd> ){
+		$all{ ( split /:/ )[ 2 ] } = 1;
+	}
+	close( $fhd );
+	
+	for( ;; ){
+		return $min if exists $all{ $min };
+		$min++;
+	};
+}
+#=======================================================================
+sub minuid {
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $val ) = @_;
+	
+	return _min( $self->{ pwd }, $val || 0 );
+}
+#=======================================================================
+sub mingid {
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $val ) = @_;
+	
+	return _min( $self->{ grp }, $val || 0 );
+}
+#=======================================================================
+sub _max {
+	my ( $pth ) = @_;
+	
+	my $max = 0;
+	open( my $fhd, '<', $pth ) or die $!;
+	while( <$fhd> ){
+		my @tmp = split /:/;
+		$max = $tmp[ 2 ] if $tmp[ 2 ] > $max;
+	}
+	close( $fhd );
+	
 	return $max;
 }
 #======================================================================
 sub maxuid {
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->error(q//);
-
-	my $max = 0;
-	open(my $fh, '<', $self->passwd_file()) or ($self->error($!) and return);
-	while(<$fh>){
-		my $tmp = (split(/:/,$_))[2];
-		$max = $tmp > $max ? $tmp : $max;
-	}
-	close($fh);
-	return $max;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	
+	return _max( $self->{ pwd } );
 }
 #======================================================================
-sub unused_uid {
+sub maxgid {
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->error(q//);
-
-	my $min  = shift || 0;
-	my $max  = shift || ( 2 ** ( $Config{ intsize } * 8 ) );
-
-	# UIDs could be in random order, so this is only safe way...
-	my ( @seen, $last );
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	
-	open(my $fh, '<', $self->passwd_file()) or ($self->error($!) and return);
-	push @seen, (split(/:/,$_))[2] while <$fh>;
-	close($fh);
-	
-	@seen = sort { $a <=> $b } @seen;
-	return $min if $seen[ -1 ] < $min;
-	
-	for my $uid ( @seen, $max ){
-		next if $uid < $min;
-
-		if( not defined $last ){
-			return $min if $uid > $min;
-
-			$last = $uid;
-			#next;
-		}
-
-		return $last + 1 if $uid > $last + 1 and $last + 1 <= $max;
-		return if $uid > $max;
-		$last = $uid;
-	}
-	
-	return;
+	return _max( $self->{ grp } );
 }
-#======================================================================
-sub unused_gid {
-	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->error(q//);
-
-	my $min  = shift || 0;
-	my $max  = shift || ( 2 ** ( $Config{ intsize } * 8 ) );
-
-	# GIDs could be in random order, so this is only safe way...
-	my ( %seen, $last );
+#=======================================================================
+sub _exs {
+	my ( $pth, $val, $pos ) = @_;
 	
-	open(my $fh, '<', $self->passwd_file()) or ($self->error($!) and return);
-	$seen{ (split(/:/,$_))[3] } = 1 while <$fh>;
-	close($fh);
+	$pos //= 0;
 	
-	# we should check group file too...
-	open($fh, '<', $self->group_file()) or ($self->error($!) and return);
-	$seen{ (split(/:/,$_))[2] } = 1 while <$fh>;
-	close($fh);
-	
-	my @seen = sort { $a <=> $b } keys %seen;
-	return $min if $seen[ -1 ] < $min;
-	
-	for my $gid ( @seen, $max ){
-		next if $gid < $min;
-		
-		if( not defined $last ){
-			return $min if $gid > $min;
-
-			$last = $gid;
-			#next;
-		}
-
-		return $last + 1 if $gid > $last + 1 and $last + 1 <= $max;
-		return if $gid > $max;
-		$last = $gid;
+	open( my $fhd, '<', $pth ) or die $!;
+	while( <$fhd> ){
+		my @tmp = split /:/;
+		return 1 if $tmp[ $pos ] eq $val;
 	}
-	
-	return;
-}
-#======================================================================
-sub _exists {
-	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->error(q//);
+	close( $fhd );
 
-	return if scalar @_ != 3;
-	my ($file, $pos, $val) = @_;
-	
-	open(my $fh, '<', $file) or ($self->error($!) and return);
-	while(<$fh>){
-		my @a = split /:/;
-		return TRUE if $a[$pos] eq $val;
-	}
 	return;
 }
 #======================================================================
 sub exists_user {
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->error(q//);
-
-	my ($user) = @_;
-	unless($_CHECK->{rename}($user)){ 
-		my $error = $self->error(qq/Incorrect user "$user"!/);
-		carp($error) if $self->warnings(); 
-		return; 
-	}
-	return $self->_exists($self->passwd_file(), 0, $user);
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $val ) = @_;
+	
+	return unless defined $val;
+	return _exs( $self->{ pwd }, $val );
 }
 #======================================================================
 sub exists_group {
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->error(q//);
-
-	my ($group) = @_;
-	unless($_CHECK->{rename}($group)){ 
-		my $error = $self->error(qq/Incorrect group "$group"!/);
-		carp($error) if $self->warnings(); 
-		return; 
-	}
-	return $self->_exists($self->group_file(), 0, $group);
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $val ) = @_;
+	
+	return unless defined $val;
+	return _exs( $self->{ grp }, $val );
 }
-#======================================================================
-sub user { 
+#=======================================================================
+sub reset {
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->error(q//);
-
-	my (@user) = @_;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	
-	unless($_CHECK->{rename}($user[0])){ 
-		my $error = $self->error(qq/Incorrect user "$user[0]"!/);
-		carp($error) if $self->warnings(); 
-		return; 
-	}
-
-	if(scalar @_ != 7){
-		open(my $fh, '<', $self->passwd_file()) or ($self->error($!) and return);
-		while(<$fh>){
-			my @a = split /:/;
-			next if $a[0] ne $user[0];
-			chomp $a[-1];
-			splice @a, 0, 2;
-			return $self->passwd($user[0]), @a;
-		}
-		my $error = $self->error(qq/User "$user[0]" does not exists!/);
-		carp($error) if $self->warnings();
-		return;
-	}
-	
-#	The rest of this method will fail, if user doesn't have permissions to files.
-#   Error will be in $self->error() and error();
-#	return if $( !~ /^0/o;
-
-	my @tests = qw(rename passwd uid gid gecos home shell);
-	for(1..6){
-		unless($_CHECK->{$tests[$_]}($user[$_])){ 
-			my $error = $self->error(qq/Incorrect parameters for "$tests[$_]"!/);
-			carp($error) if $self->warnings(); 
-			return; 
-		}
-	}
-	
-	if( $self->backup() ){
-		$self->_do_backup() or return;
-	}
-
-	my $umask = umask $self->{'umask'};
-	
-	my $passwd = splice @user,1, 1, 'x';
-	
-	my $mod;
-	my $tmp = $self->passwd_file.'.tmp';
-	open(my $fh, '<', $self->passwd_file()) or ($self->error($!) and umask $umask and return);
-	open(my $ch, '>', $tmp) or ($self->error($!) and umask $umask and return);
-	chmod PERM_PWD, $ch;
-	while(<$fh>){
-		my @a = split /:/;
-		if($user[0] eq $a[0]){
-			$mod = TRUE;
-			print $ch join(q/:/, @user),"\n";
-		}else{ print $ch $_; }
-	}
-	close($fh);
-	print $ch join(q/:/, @user),"\n" unless $mod;
-	close($ch);
-	move($tmp, $self->passwd_file()) or ($self->error($!) and umask $umask and return);
-	
-	# user already exists	
-	if($mod){ $self->passwd($user[0], $passwd); }
-	else{ 
-		open(my $fh, '>>', $self->shadow_file()) or ($self->error($!) and umask $umask and return);
-		chmod PERM_SHD, $fh;
-		print $fh join(q/:/, $user[0], $passwd, int(time()/DAY), ('') x 5, "\n");
-		close($fh);
-	}
-
-	umask $umask;	
-	return TRUE;
-}
-#======================================================================
-sub users { 
-	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->error(q//);
-
-	my @a;
-	open(my $fh, '<', $self->passwd_file()) or ($self->error($!) and return);
-	push @a, (split(/:/,$_))[0] while <$fh>;
-	close($fh);
-	return @a;
-}
-#======================================================================
-sub users_from_shadow { 
-#	This method will fail, if user doesn't have permissions to files.
-#   Error will be in $self->error() and error();
-#	return if $( !~ /^0/o;
-	
-	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->error(q//);
-
-	my @a;
-	open(my $fh, '<', $self->shadow_file()) or ($self->error($!) and return);
-	push @a, (split(/:/,$_))[0] while <$fh>;
-	close($fh);
-	return @a;
-}
-#======================================================================
-sub del_group {
-#	This method will fail, if user doesn't have permissions to files.
-#   Error will be in $self->error() and error();
-#	return if $( !~ /^0/o;
-	
-	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->error(q//);
-
-	my ($group) = @_;
-	unless($_CHECK->{rename}($group)){ 
-		my $error = $self->error(qq/Incorrect group "$group"!/);
-		carp($error) if $self->warnings(); 
-		return; 
-	}
-	
-	if( $self->backup() ){
-		$self->_do_backup() or return;
-	}
-
-	my $umask = umask $self->{'umask'};
-	
-	my @dels;
-	my $tmp = $self->group_file.'.tmp';
-	open(my $fh, '<', $self->group_file()) or ($self->error($!) and umask $umask and return);
-	open(my $ch, '>', $tmp) or ($self->error($!) and umask $umask and return);
-	chmod PERM_GRP, $ch;
-	while(my $line = <$fh>){
-		my ($name) = split(/:/,$line,2);
-		if($group eq $name){ push @dels, $name; }
-		else{ print $ch $line; }
-	}
-	close($fh);close($ch);
-	move($tmp, $self->group_file()) or ($self->error($!) and umask $umask and return);
-	
-	if(-f $self->gshadow_file){
-		my $tmp = $self->gshadow_file.'.tmp';
-		open(my $fh, '<', $self->gshadow_file()) or ($self->error($!) and umask $umask and return);
-		open(my $ch, '>', $tmp) or ($self->error($!) and umask $umask and return);
-		chmod PERM_SHD, $ch;
-		while(my $line = <$fh>){
-			my ($name) = split(/:/,$line,2);
-			print $ch $line if $group ne $name;
-		}
-		close($fh);close($ch);
-		move($tmp, $self->gshadow_file()) or ($self->error($!) and umask $umask and return);
-	}
-
-	umask $umask;
-
-	return @dels if wantarray;
-	return scalar @dels;
-}
-#======================================================================
-sub group { 
-	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->error(q//);
-
-	my ($group, $gid, $users) = @_;
-	unless($_CHECK->{rename}($group)){ 
-		my $error = $self->error(qq/Incorrect group "$group"!/);
-		carp($error) if $self->warnings(); 
-		return; 
-	}
-	
-	if(scalar @_ == 3){
-#	The rest of this "if" will fail, if user doesn't have permissions to files.
-#   Error will be in $self->error() and error();
-#		return if $( !~ /^0/o;
-
-		if( $self->backup() ){
-			$self->_do_backup() or return;
-		}
-
-		my $umask = umask $self->{'umask'};
+	$self->passwd_file	( PWD );
+	$self->group_file	( GRP );
+	$self->shadow_file	( PSH );
+	$self->gshadow_file	( GSH );
 		
-		unless($_CHECK->{gid}($gid)){ 
-			my $error = $self->error(qq/Incorrect GID "$gid"!/);
-			carp($error) if $self->warnings(); 
-			umask $umask;
-			return; 
-		}
-# 2009.03.30 - Thx to Jonas Genannt; will allow to add empty groups
-#		unless(ref $users and ref $users eq 'ARRAY'){ warn "AAA";		
-		if(defined($users) && ref $users ne 'ARRAY' ){ 
-			my $error = $self->error(qq/Incorrect parameter "users"! It should be arrayref.../);
-			carp($error) if $self->warnings(); 
-			umask $umask;
-			return; 
-		}
-		$users ||= [ ];
-		foreach(@$users){
-			unless($_CHECK->{rename}($_)){ 
-				my $error = $self->error(qq/Incorrect user "$_"!/);
-				carp($error) if $self->warnings(); 
-				umask $umask;
-				return; 
-			}
-		}
-		
-		my $mod;
-		my $tmp = $self->group_file.'.tmp';
-		open(my $fh, '<', $self->group_file()) or ($self->error($!) and umask $umask and return);
-		open(my $ch, '>', $tmp) or ($self->error($!) and umask $umask and return);
-		chmod PERM_GRP, $ch;
-		while(my $line = <$fh>){
-			chomp $line;
-			my ($name, $passwd) = split(/:/,$line,3);
-			if($group eq $name){ 
-				print $ch join(q/:/, $group, $passwd, $gid, join(q/,/, @$users)),"\n"; 
-				$mod = TRUE;
-			} else{ print $ch $line,"\n"; }
-		}
-		print $ch join(q/:/, $group, 'x', $gid, join(q/,/, @$users)),"\n" unless $mod;
-		close($fh);close($ch);
-		move($tmp, $self->group_file()) or ($self->error($!) and umask $umask and return);
-
-		if(-f $self->gshadow_file){
-			my $mod;
-			my $tmp = $self->gshadow_file.'.tmp';
-			open(my $fh, '<', $self->gshadow_file()) or ($self->error($!) and umask $umask and return);
-			open(my $ch, '>', $tmp) or ($self->error($!) and umask $umask and return);
-			chmod PERM_SHD, $ch;
-			while(my $line = <$fh>){
-				chomp $line;
-				my ($name, $passwd) = split(/:/,$line,3);
-				if($group eq $name){ 
-					print $ch join(q/:/, $group, $passwd, q//, join(q/,/, @$users)),"\n"; 
-					$mod = TRUE;
-				} else{ print $ch $line,"\n"; }
-			}
-			print $ch join(q/:/, $group, '!', q//, join(q/,/, @$users)),"\n" unless $mod;
-			close($fh);close($ch);
-			move($tmp, $self->gshadow_file()) or ($self->error($!) and umask $umask and return);
-		}
-		
-		umask $umask;
-	}else{
-		my ($gid, @users);
-		open(my $fh, '<', $self->group_file()) or ($self->error($!) and return);
-		while(my $line = <$fh>){
-			chomp $line;
-			my ($name, undef, $id, $usrs) = split(/:/,$line,4);
-			next if $group ne $name;
-			$gid = $id;
-			$usrs =~ s/\s+$//o;
-			push @users, split(/\s*,\s*/o, $usrs) if $usrs;
-			last;
-		}
-		
-		# if searched ground does not exist
-		return undef, [ ] unless defined $gid;
-	
-		open($fh, '<', $self->passwd_file()) or ($self->error($!) and return);
-		while(my $line = <$fh>){
-			my ($login, undef, undef, $id) = split(/:/,$line,5);
-			next if $id != $gid;
-			push @users, $login;
-		}
-
-		@users = sort @users;
-		for(reverse 0..$#users){
-			last if $_ == 0;
-			splice @users, $_, 1 if $users[$_] eq $users[ $_ - 1 ];
-		}
-		return $gid, \@users;
-	}
-	
-	return;
+	return 1;
 }
-#======================================================================
+#=======================================================================
+sub encpass {
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $val ) = @_;
+	
+	return unless defined $val;
+	return password( $val, undef, $self->{ alg } );
+}
+#=======================================================================
+sub algorithm { 
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $val ) = @_;
+	
+	return $self->{ alg } unless defined $val;
+
+	my $alg =	$val eq q[md5] 		? $val :
+				$val eq q[blowfish] ? $val :
+				$val eq q[sha256] 	? $val : q[sha512];
+					
+	$self->{ alg } = $alg;
+	
+	return $self->{ alg };
+}
+#=======================================================================
+sub default_umask { 
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $val ) = @_;
+	
+	return $self->{ msk } unless defined $val;
+	
+	$self->{ msk } = $val ? 1 : 0;
+	
+	return $self->{ msk };
+}
+#=======================================================================
+sub backup { 
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $val ) = @_;
+	
+	return $self->{ bck } unless defined $val;
+	
+	$self->{ bck } = $val ? 1 : 0;
+	
+	return $self->{ bck };
+}
+#=======================================================================
+sub compress { 
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $val ) = @_;
+	
+	return $self->{ cmp } unless defined $val;
+	
+	$self->{ cmp } = $val ? 1 : 0;
+	
+	return $self->{ cmp };
+}
+#=======================================================================
+sub warnings { 
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $val ) = @_;
+	
+	return $self->{ wrn } unless defined $val;
+	
+	$self->{ wrn } = $val ? 1 : 0;
+	
+	return $self->{ wrn };
+}
+#=======================================================================
+sub debug { 
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $val ) = @_;
+	
+	return $self->{ dbg } unless defined $val;
+	
+	$self->{ dbg } = $val ? 1 : 0;
+	
+	return $self->{ dbg };
+}
+#=======================================================================
+sub error { 
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $val ) = @_;
+	
+	return $self->{ err };
+}
+#=======================================================================
+sub passwd_file { 
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $val ) = @_;
+	
+	return $self->{ pwd } unless defined $val;
+	
+	my $pth = path( $val );
+	die q[Password file cannot be a directory.] if $pth->is_dir;
+	
+	#$pth->touchpath unless $pth->exists;
+	
+	$self->{ pwd } = $pth->absolute->canonpath;
+	
+	return $self->{ pwd };
+}
+#=======================================================================
+sub group_file { 
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $val ) = @_;
+	
+	return $self->{ grp } unless defined $val;
+	
+	my $pth = path( $val );
+	die q[Group file cannot be a directory.] if $pth->is_dir;
+	
+	#$pth->touchpath unless $pth->exists;
+	
+	$self->{ grp } = $pth->absolute->canonpath;
+	
+	return $self->{ grp };
+}
+#=======================================================================
+sub shadow_file { 
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $val ) = @_;
+	
+	return $self->{ psh } unless defined $val;
+	
+	my $pth = path( $val );
+	die q[Shadowed passwd file (aka "shadow") file cannot be a directory.] if $pth->is_dir;
+	
+	#$pth->touchpath unless $pth->exists;
+	
+	$self->{ psh } = $pth->absolute->canonpath;
+	
+	return $self->{ psh };
+}
+#=======================================================================
+sub gshadow_file { 
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my ( $val ) = @_;
+	
+	return $self->{ gsh } unless defined $val;
+	
+	my $pth = path( $val );
+	die q[Shadowed group file (aka "gshadow") file cannot be a directory.] if $pth->is_dir;
+	
+	#$pth->touchpath unless $pth->exists;
+	
+	$self->{ gsh } = $pth->absolute->canonpath;
+	
+	return $self->{ gsh };
+}
+#=======================================================================
+sub _lst {
+	my ( $pth ) = @_;
+	
+	my @ary;
+	open( my $fhd, '<', $pth ) or die $!;
+	push @ary, ( split( /:/, $_ ) )[ 0 ] while <$fhd>;
+	close($fhd);
+	
+	return wantarray ? @ary : \@ary;
+}
+#=======================================================================
 sub groups { 
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->error(q//);
-
-	my @a;
-	open(my $fh, '<', $self->group_file()) or ($self->error($!) and return);
-	push @a, (split(/:/,$_))[0] while <$fh>;
-	close($fh);
-	return @a;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	return _lst( $self->{ grp } );
 }
-#======================================================================
+#=======================================================================
 sub groups_from_gshadow { 
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
-	$self->error(q//);
-
-	my @a;
-	open(my $fh, '<', $self->gshadow_file()) or ($self->error($!) and return);
-	push @a, (split(/:/,$_))[0] while <$fh>;
-	close($fh);
-	return @a;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	return _lst( $self->{ gsh } );
+}
+#=======================================================================
+sub users { 
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	return _lst( $self->{ pwd } );
+}
+#=======================================================================
+sub check_sanity {
+	return 1;
+}
+#=======================================================================
+sub users_from_shadow { 
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	my $self = scalar @_ && ref $_[0] eq __PACKAGE__ ? shift : $Self;
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	return _lst( $self->{ psh } );
 }
 #======================================================================
-1;
-
-=encoding utf8
 
 =head1 NAME
 
@@ -1038,46 +1056,63 @@ Passwd::Unix - access to standard unix files
 
 	use Passwd::Unix;
 	
-	my $pu = Passwd::Unix->new();
-	my $err = $pu->user("example", $pu->encpass("my_secret"), $pu->maxuid + 1, 10,
-						"My User", "/home/example", "/bin/bash" );
-	$pu->passwd("example", $pu->encpass("newsecret"));
+	my $pu = Passwd::Unix->new;
+	
+	my $err = $pu->user(
+				"example", 
+				$pu->encpass("my_secret"), 
+				$pu->unused_uid, 
+				$pu->unused_gid, 
+				"My User", 
+				"/home/example", 
+				"/bin/bash" 
+	);
+	
+	$pu->passwd("example", $pu->encpass( "newsecret") );
 	foreach my $user ($pu->users) {
 		print "Username: $user\nFull Name: ", $pu->gecos($user), "\n\n";
 	}
+	
 	my $uid = $pu->uid('example');
 	$pu->del("example");
 
 	# or 
 
-	use Passwd::Unix qw(check_sanity reset encpass passwd_file shadow_file 
-				group_file backup warnings del del_user uid gid gecos
-				home shell passwd rename maxgid maxuid exists_user 
-				exists_group user users users_from_shadow del_group 
-				group groups groups_from_gshadow);
+	use Passwd::Unix qw( 
+		algorithm backup check_sanity compress del del_group del_user
+		encpass exists_group exists_user gecos gid group group_file
+		groups groups_from_gshadow home maxgid maxuid mingid minuid
+		passwd passwd_file rename reset shadow_file shell uid user
+		users users_from_shadow warnings
+	);
 	
-	my $err = user( "example", encpass("my_secret"), $pu->maxuid + 1, 10,
+	my $err = user( "example", encpass("my_secret"), unused_uid(), unused_gid(),
 					"My User", "/home/example", "/bin/bash" );
 	passwd("example",encpass("newsecret"));
-	foreach my $user (users()) {
-		print "Username: $user\nFull Name: ", gecos($user), "\n\n";
+	foreach my $user ( users() ) {
+		print "Username: $user\nFull Name: ", gecos( $user ), "\n\n";
 	}
-	my $uid = uid('example');
-	del("example");
+	
+	my $uid = uid( 'example' );
+	del( 'example' );
 
 =head1 ABSTRACT
 
 Passwd::Unix provides an abstract object-oriented and function interface to
 standard Unix files, such as /etc/passwd, /etc/shadow, /etc/group. Additionally
-this module provides  environment to testing new software, without using
-system critical files in /etc/dir.
+this module provides  environment for testing software without using
+system critical files in /etc/ dir (you can specify other files than 
+/etc/passwd etc.).
 
 =head1 DESCRIPTION
 
 The Passwd::Unix module provides an abstract interface to /etc/passwd, 
-/etc/shadow and /etc/group format files. It is inspired by 
-Unix::PasswdFile module (that one does not handle /etc/shadow file, 
-what is necessary in modern systems like Sun Solaris 10 or Linux).
+/etc/shadow, /etc/group, /etc/gshadow format files. It is inspired by 
+Unix::PasswdFile module (that one does not handle /etc/shadow file).
+
+B<Module was rewritten from the ground in version 1.0 (i.e. to support 
+newer hash algorithms and so on), however with compatibility in mind. 
+Despite this some incompatibilities can occur.>
 
 =head1 SUBROUTINES/METHODS
 
@@ -1097,19 +1132,43 @@ Constructor. Possible parameters are:
 
 =item B<gshadow> - path to gshadow file if any; default C</etc/gshadow>
 
-=item B<umask> - umask for creating files; default C<0022> (standard for UNIX and Linux systems)
+=item B<algorithm> - hash algorithm, possible values: md5, blowfish, sha256, sha512; default C<sha512>
+
+=item B<umask> - not used anymore; left only for compatibility reason
+
+=item B<debug> - not used anymore; left only for compatibility reason
 
 =item B<backup> - boolean; if set to C<1>, backup will be made; default C<1>
+
+=item B<compress> - boolean; if set to C<1>, backup compression will be made; default C<1>
 
 =item B<warnings> - boolean; if set to C<1>, important warnings will be displayed; default C<0>
 
 =back
 
+=item B<algorithm()>
+
+This method allows to specify algorithm for password generation. Possible values: C<md5>, C<blowfish>, C<sha256>, C<sha512>
+
+=item B<backup()>
+
+This method allows to specify if backups files have to be made before every modyfication (C<1> for on, C<0> for off).
+
+=item B<compress()>
+
+This method allows to specify if compression to backup files has to be made (C<1> for on, C<0> for off).
 
 =item B<check_sanity()>
 
-This method check if environment is sane. I.e. if users in I<shadow> and
-in I<passwd> are the same. This method is invoked in constructor.
+This function was left only for compatibility reason. Currently it does nothing (always returns 1).
+
+=item B<debug()>
+
+This function was left only for compatibility reason. Currently it does nothing.
+
+=item B<default_umask( [UMASK] )>
+
+This function was left only for compatibility reason. Currently it does nothing.
 
 =item B<del( USERNAME0, USERNAME1... )>
 
@@ -1127,70 +1186,29 @@ supplied groups do not exist.
 
 =item B<encpass( PASSWORD )>
 
-This method will encrypt plain text into unix style MD5 password.
+This method will encrypt plain text into unix style password.
+
+=item B<error()>
+
+This method returns the last error (even if "warnings" is disabled).
+
+=item B<exists_user(USERNAME)>
+
+This method checks if specified user exists. It returns C<undef> on failure and C<1> on success.
+
+=item B<exists_group(GROUPNAME)>
+
+This method checks if specified group exists. It returns C<undef> on failure and C<1> on success.
 
 =item B<gecos( USERNAME [,GECOS] )>
 
-Read or modify a user's GECOS string (typically their full name). 
+Read or modify a user's GECOS string (typically full name). 
 Returns the result of operation (C<1> or C<undef>) if GECOS was specified. 
-Otherwhise returns the GECOS.
+Otherwhise returns the GECOS if any.
 
 =item B<gid( USERNAME [,GID] )>
 
-Read or modify a user's GID. Returns the result of operation (TRUE or 
-FALSE) if GID was specified otherwhise returns the GID.
-
-=item B<home( USERNAME [,HOMEDIR] )>
-
-Read or modify a user's home directory. Returns the result of operation 
-(C<1> or C<undef>) if HOMEDIR was specified otherwhise returns the HOMEDIR.
-
-=item B<maxuid( )>
-
-This method returns the maximum UID in use by all users. 
-
-=item B<maxgid( )>
-
-This method returns the maximum GID in use by all groups. 
-
-=item B<unused_uid( [MINUID] [,MAXUID] )>
-
-This method returns the first unused UID in a given range. The default MINUID is 0. The default MAXUID is maximal integer value (computed from C<$Config{ intsize }> ).
-
-=item B<unused_gid( [MINGID] [,MAXGID] )>
-
-This method returns the first unused GID in a given range. The default MINGID is 0. The default MAXGID is maximal integer value (computed from C<$Config{ intsize }> ).
-
-=item B<passwd( USERNAME [,PASSWD] )>
-
-Read or modify a user's password. If you have a plaintext password, 
-use the encpass method to encrypt it before passing it to this method. 
-Returns the result of operation (C<1> or C<undef>) if PASSWD was specified. 
-Otherwhise returns the PASSWD.
-
-=item B<rename( OLDNAME, NEWNAME )>
-
-This method changes the username for a user. If NEWNAME corresponds to 
-an existing user, that user will be overwritten. It returns FALSE on 
-failure and TRUE on success.
-
-=item B<shell( USERNAME [,SHELL] )>
-
-Read or modify a user's shell. Returns the result of operation (TRUE 
-or FALSE) if SHELL was specified otherwhise returns the SHELL.
-
-=item B<uid( USERNAME [,UID] )>
-
-Read or modify a user's UID. Returns the result of operation (TRUE or 
-FALSE) if UID was specified otherwhise returns the UID.
-
-=item B<user( USERNAME [,PASSWD, UID, GID, GECOS, HOMEDIR, SHELL] )>
-
-This method can add, modify, or return information about a user. 
-Supplied with a single username parameter, it will return a six element 
-list consisting of (PASSWORD, UID, GID, GECOS, HOMEDIR, SHELL), or 
-undef if no such user exists. If you supply all seven parameters, 
-the named user will be created or modified if it already exists.
+Read or modify a user's GID. Returns the result of operation (C<1> or C<undef>) if GID was specified otherwhise returns the GID if any.
 
 =item B<group( GROUPNAME [,GID, ARRAYREF] )>
 
@@ -1201,13 +1219,10 @@ consisting names of users in this GROUP. It will return undef and ref to empty a
 exists. If you supply all three parameters, the named group will be 
 created or modified if it already exists.
 
-=item B<users()>
+=item B<group_file([PATH])>
 
-This method returns a list of all existing usernames. 
-
-=item B<users_from_shadow()>
-
-This method returns a list of all existing usernames in a shadow file. 
+This method, if called with an argument, sets path to the I<group> file.
+Otherwise returns the current PATH.
 
 =item B<groups()>
 
@@ -1217,47 +1232,95 @@ This method returns a list of all existing groups.
 
 This method returns a list of all existing groups in a gshadow file. 
 
-=item B<exists_user(USERNAME)>
+=item B<gshadow_file([PATH])>
 
-This method checks if specified user exists. It returns TRUE or FALSE.
+This method, if called with an argument, sets path to the I<gshadow> file.
+Otherwise returns the current PATH.
 
-=item B<exists_group(GROUPNAME)>
+=item B<home( USERNAME [,HOMEDIR] )>
 
-This method checks if specified group exists. It returns TRUE or FALSE.
+Read or modify a user's home directory. Returns the result of operation 
+(C<1> or C<undef>) if HOMEDIR was specified otherwhise returns the HOMEDIR if any.
 
-=item B<default_umask([UMASK])>
+=item B<maxuid( )>
 
-This method, if called with an argument, sets default umask for this module (not Your program!).
-Otherwise returns the current UMASK. Probably You don't want to change this.
+This method returns the maximum UID in use. 
+
+=item B<maxgid()>
+
+This method returns the maximum GID in use. 
+
+=item B<minuid( [UID] )>
+
+This method returns the minimum UID in use, that is greater then spupplied.
+
+=item B<mingid()>
+
+This method returns the minimum GID in use, that is greater then spupplied.
+
+=item B<passwd( USERNAME [,PASSWD] )>
+
+Read or modify a user's password. If you have a plaintext password, 
+use the encpass method to encrypt it before passing it to this method. 
+Returns the result of operation (C<1> or C<undef>) if PASSWD was specified. 
+Otherwhise returns the PASSWD if any.
 
 =item B<passwd_file([PATH])>
 
 This method, if called with an argument, sets path to the I<passwd> file.
 Otherwise returns the current PATH.
 
+=item B<rename( OLDNAME, NEWNAME )>
+
+This method changes the username for a user. If NEWNAME corresponds to 
+an existing user, that user will be overwritten. It returns C<undef> on 
+failure and C<1> on success.
+
+=item B<reset()>
+
+This method sets paths to files I<passwd>, I<shadow>, I<group>, I<gshadow> to the
+default values.
+
+=item B<shell( USERNAME [,SHELL] )>
+
+Read or modify a user's shell. Returns the result of operation (C<1> or C<undef>) if SHELL was specified otherwhise returns the SHELL if any.
+
+=item B<uid( USERNAME [,UID] )>
+
+Read or modify a user's UID. Returns the result of operation (C<1> or C<undef>) if UID was specified otherwhise returns the UID if any.
+
+=item B<user( USERNAME [,PASSWD, UID, GID, GECOS, HOMEDIR, SHELL] )>
+
+This method can add, modify, or return information about a user. 
+Supplied with a single username parameter, it will return a six element 
+list consisting of (PASSWORD, UID, GID, GECOS, HOMEDIR, SHELL), or 
+undef if no such user exists. If you supply all seven parameters, 
+the named user will be created or modified if it already exists.
+
+=item B<users()>
+
+This method returns a list of all existing usernames. 
+
+=item B<users_from_shadow()>
+
+This method returns a list of all existing usernames in a shadow file. 
+
 =item B<shadow_file([PATH])>
 
 This method, if called with an argument, sets path to the I<shadow> file.
 Otherwise returns the current PATH.
 
-=item B<group_file([PATH])>
+=item B<unused_uid( [MINUID] [,MAXUID] )>
 
-This method, if called with an argument, sets path to the I<group> file.
-Otherwise returns the current PATH.
+This method returns the first unused UID in a given range. The default MINUID is 0. The default MAXUID is maximal integer value (computed from C<$Config{ intsize }> ).
 
-=item B<gshadow_file([PATH])>
+=item B<unused_gid( [MINGID] [,MAXGID] )>
 
-This method, if called with an argument, sets path to the I<gshadow> file.
-Otherwise returns the current PATH.
+This method returns the first unused GID in a given range. The default MINGID is 0. The default MAXGID is maximal integer value (computed from C<$Config{ intsize }> ).
 
-=item B<reset()>
+=item B<warnings()>
 
-This method sets paths to files I<passwd>, I<shadow>, I<group> to the
-default values.
-
-=item B<error()>
-
-This method returns the last error (even if "warnings" is disabled).
+This method allows to specify if warnings has to be displayed (C<1> for on, C<0> for off). Whether you can check last warning/failure by calling C<error>.
 
 =back
 
@@ -1265,11 +1328,19 @@ This method returns the last error (even if "warnings" is disabled).
 
 =over 4
 
-=item Struct::Compare
+=item Crypt::Password
 
-=item Crypt::PasswdMD5
+=item IO::Compress::Bzip2
+
+=item Path::Tiny
+
+=item Tie::Array::CSV
 
 =back
+
+=head1 TODO
+
+Preparation of tests.
 
 =head1 INCOMPATIBILITIES
 

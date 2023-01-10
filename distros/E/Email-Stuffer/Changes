@@ -1,5 +1,9 @@
 Revision history for Perl extension Email::Stuffer
 
+0.019     2023-01-09 20:53:20-05:00 America/New_York
+        - update packaging and metadata
+        - minimum required Perl is now v5.12
+
 0.018     2020-07-03 17:14:36-04:00 America/New_York
         - document envelope argument to ->send (thanks, Dan Book)
         - fix a bug that prevented ->transport from being the first method

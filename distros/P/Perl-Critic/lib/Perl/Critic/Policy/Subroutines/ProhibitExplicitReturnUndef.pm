@@ -8,7 +8,7 @@ use Readonly;
 use Perl::Critic::Utils qw{ :severities :classification };
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.146';
+our $VERSION = '1.148';
 
 #-----------------------------------------------------------------------------
 
@@ -86,7 +86,7 @@ wanted it to be false.
 
       # This is my error handling code.
       # I probably want to be in here
-      # if $filname doesn't exist.
+      # if $filename doesn't exist.
 
       die "$filename not found";
   }

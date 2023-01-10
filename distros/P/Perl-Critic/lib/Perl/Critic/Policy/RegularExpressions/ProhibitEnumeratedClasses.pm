@@ -8,11 +8,11 @@ use English qw(-no_match_vars);
 use List::SomeUtils qw(all);
 use Readonly;
 
-use Perl::Critic::Utils qw{ :booleans :severities hashify };
+use Perl::Critic::Utils qw{ :booleans :severities };
 
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.146';
+our $VERSION = '1.148';
 
 #-----------------------------------------------------------------------------
 

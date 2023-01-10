@@ -18,10 +18,8 @@ my $main = UI::Various::Main->new();
 # return of $main->mainloop will (usually) not be visible, but may
 # completely garble your output (by moving the cursor)!
 
-my $window;			# must be declared before the sub using it!
-$window =
-    $main->window({title => 'Hello', width => 30, height => 6},
-		  UI::Various::Text->new(text => 'Hello World!'),
-		  UI::Various::Button->new(text => 'Quit',
-					   code => sub{ $window->destroy; }));
+$main->window({title => 'Hello', width => 30, height => 6},
+	      UI::Various::Text->new(text => 'Hello World!'),
+	      UI::Various::Button->new(text => 'Quit',
+				       code => sub{ $_[0]->destroy; }));
 $main->mainloop;

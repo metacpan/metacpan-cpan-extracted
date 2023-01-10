@@ -5,7 +5,7 @@ package Data::Scan::Impl::Printer;
 
 # ABSTRACT: Data::Scan printer implementation
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -607,7 +607,7 @@ Data::Scan::Impl::Printer - Data::Scan printer implementation
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

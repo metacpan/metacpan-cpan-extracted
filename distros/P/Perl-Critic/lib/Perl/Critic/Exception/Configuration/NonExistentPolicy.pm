@@ -6,14 +6,14 @@ use warnings;
 
 use Readonly;
 
-our $VERSION = '1.146';
+our $VERSION = '1.148';
 
 #-----------------------------------------------------------------------------
 
 use Exception::Class (
     'Perl::Critic::Exception::Configuration::NonExistentPolicy' => {
         isa         => 'Perl::Critic::Exception::Configuration',
-        description => 'The configuration referred to a non-existant policy.',
+        description => 'The configuration referred to a non-existent policy.',
         fields      => [ qw{ policy } ],
     },
 );

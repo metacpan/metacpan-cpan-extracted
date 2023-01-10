@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Test::Routine::Util;
+package Test::Routine::Util 0.030;
 # ABSTRACT: helpful exports for dealing with test routines
-$Test::Routine::Util::VERSION = '0.029';
+
 #pod =head1 OVERVIEW
 #pod
 #pod Test::Routine::Util is documented in L<the Test::Routine docs on running
@@ -46,7 +46,7 @@ sub _curry_tester {
 sub run_me {
   my ($class, $desc, $arg) = @_;
 
-  if (@_ == 2 and (reftype $desc || '') eq 'HASH') {
+  if (@_ == 2 and (reftype $desc // '') eq 'HASH') {
     ($desc, $arg) = (undef, $desc);
   }
 
@@ -64,9 +64,8 @@ sub run_tests {
 
   my @caller = caller($UPLEVEL);
 
-  $desc = defined($desc)
-        ? $desc
-        : sprintf 'tests from %s, line %s', $caller[1], $caller[2];
+  $desc = $desc
+       // sprintf 'tests from %s, line %s', $caller[1], $caller[2];
 
   my $builder = $class->_compositor_class->instance_builder($inv, $arg);
 
@@ -92,7 +91,7 @@ Test::Routine::Util - helpful exports for dealing with test routines
 
 =head1 VERSION
 
-version 0.029
+version 0.030
 
 =head1 OVERVIEW
 

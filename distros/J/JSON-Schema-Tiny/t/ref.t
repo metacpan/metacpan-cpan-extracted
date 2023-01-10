@@ -1,5 +1,4 @@
-use strict;
-use warnings;
+use strictures 2;
 use 5.020;
 use experimental qw(signatures postderef);
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -70,6 +69,36 @@ subtest 'fragment with URI-escaped and JSON Pointer-escaped characters' => sub {
 subtest 'local anchor' => sub {
   local $TODO = '$anchor is not yet supported';
   fail;
+};
+
+subtest '$ref using the local $id' => sub {
+  cmp_deeply(
+    evaluate(
+      1,
+      {
+        '$id' => 'https://localhost:1234/blah',
+        '$defs' => { 'my-definition' => true },
+        '$ref' => 'https://localhost:1234/blah#/$defs/my-definition',
+      },
+    ),
+    { valid => true },
+    'can follow $ref using a base URI that matches our document',
+  );
+
+  cmp_deeply(
+    evaluate(
+      [ 'foo', [ 'bar' ] ],
+      {
+        '$id' => 'https://localhost:1234/blah',
+        anyOf => [
+          { type => 'string' },
+          { type => 'array', items => { '$ref' => 'https://localhost:1234/blah' } },
+        ],
+      },
+    ),
+    { valid => true },
+    'can follow $ref using a base URI that matches our document',
+  );
 };
 
 done_testing;

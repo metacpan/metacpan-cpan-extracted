@@ -1,39 +1,18 @@
-# --8<--8<--8<--8<--
-#
-# Copyright (C) 2016 Smithsonian Astrophysical Observatory
-#
-# This file is part of PDLx::Mask
-#
-# PDLx::Mask is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at
-# your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# -->8-->8-->8-->8--
-
 package PDLx::MaskedData;
+
+# ABSTRACT: Automatically synchronize data and valid data masks
 
 use strict;
 use warnings;
-use Carp;
 
 use 5.10.0;
 
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
 use Params::Check qw[ check ];
 use Ref::Util ':all';
 use Scalar::Util qw[ refaddr ];
 use Safe::Isa;
-use Try::Tiny;
 
 use PDL::Core ':Internal';
 use Package::Stash;
@@ -62,7 +41,7 @@ use overload
         $_[0]->_clear_summary;
         $_[0]->update;
         $_[0];
-      }
+    }
   } (
     map {
         grep { $_ =~ /=$/ }
@@ -146,8 +125,6 @@ protected_has PDL => ( is => 'rwp' );
 sub BUILDARGS {
 
     my $class = shift;
-
-    my @args;
 
     # allow
     #    MaskedData->new( $data, $mask )
@@ -265,7 +242,7 @@ sub _reset_subscription_status {
 
 sub _reset_subscription_state {
 
-    my $self = shift;
+    my $self               = shift;
     my $reset_data_storage = shift // 1;
 
     $self->_reset_subscription_status;
@@ -473,7 +450,7 @@ sub {
     my $self = shift;
     my $data = $self->PDL;
     $self->_set_PDL( $self->base );
-    my $result = $self->SUPER::%s( @_ );
+    scalar $self->SUPER::%s( @_ );
     $self->_set_PDL( $data );
 
     $self->clear_dsum;
@@ -497,12 +474,29 @@ $stash->add_symbol( '&' . $_, _override( $_ ) ) foreach qw[
 
 1;
 
+#
+# This file is part of PDLx-Mask
+#
+# This software is Copyright (c) 2016 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
 
 __END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory dsum PDL nvalid
 
 =head1 NAME
 
 PDLx::MaskedData - Automatically synchronize data and valid data masks
+
+=head1 VERSION
+
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -557,7 +551,7 @@ the same elements marked as invalid, a separate I<mask> piddle (whose
 values are true for valid data and false otherwise) is often used.
 
 B<PDLx::MaskedData> (in concert with L<PDLx::Mask>) simplifies the
-management of mutiple piddles sharing the same mask.  B<PDLx::Mask> is
+management of multiple piddles sharing the same mask.  B<PDLx::Mask> is
 the shared mask, and B<PDLx::MaskedData> is a specialized piddle which
 will dynamically respond to changes in the mask, so that they are
 always up-to-date.
@@ -588,6 +582,14 @@ invalid data elements may either be set as L<bad values|PDL::Bad>, or may
 be set to any other value (e.g. 0).
 
 =back
+
+=head1 INTERNALS
+
+=for Pod::Coverage BUILD
+BUILDARGS
+DEMOLISH
+PDL
+has_mask
 
 =head1 INTERFACE
 
@@ -650,7 +652,6 @@ B<Don't alter the returned piddle!>
   $pdl = $data->data;
   $pdl = $data->data( $new_data );
 
-
 Return the I<effective> data, optionally altering the I<base> data.
 B<Don't alter the returned piddle!>
 
@@ -673,7 +674,6 @@ object.  To instead I<alter> the mask object, use the mask object's
 methods, e.g.:
 
   $data->mask->mask( $new_mask );
-
 
 =head3 nvalid
 
@@ -761,51 +761,44 @@ invokes the L<< B<update>|/update >> method.
 This is a lazily evaluated and cached version of the L<< B<PDL>
 dsum|PDL::Ufunc/dsum >> method.
 
-=head1 BUGS AND LIMITATIONS
+=head1 SUPPORT
 
-Please report any bugs or feature requests to
-C<bug-pdlx-mask@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/Public/Dist/Display.html?Name=PDLx-Mask>.
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-pdlx-mask@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=PDLx-Mask
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/pdlx-mask
+
+and may be cloned from
+
+  https://gitlab.com/djerius/pdlx-mask.git
 
 =head1 SEE ALSO
 
-=head1 VERSION
+Please see those modules/websites for more information related to this module.
 
-Version 0.01
+=over 4
 
-=head1 LICENSE AND COPYRIGHT
+=item *
 
-Copyright (c) 2016 The Smithsonian Astrophysical Observatory
+L<PDLx::Mask|PDLx::Mask>
 
-PDLx::MaskedData is free software: you can redistribute it and/or
-modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+=back
 
 =head1 AUTHOR
 
-Diab Jerius  E<lt>djerius@cpan.orgE<gt>
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
 
 =cut
-
-=begin fakeout_pod_coverage
-
-=head3 BUILD
-
-=head3 BUILDARGS
-
-=head3 DEMOLISH
-
-=head3 PDL
-
-=head3 has_mask
-
-=end fakeout_pod_coverage

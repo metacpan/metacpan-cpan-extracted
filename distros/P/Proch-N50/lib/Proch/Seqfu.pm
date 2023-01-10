@@ -90,7 +90,7 @@ Proch::Seqfu - Helper module to support Seqfu tools
 
 =head1 VERSION
 
-version 1.5.0
+version 1.5.4
 
 =head1 Proch::Seqfu
 

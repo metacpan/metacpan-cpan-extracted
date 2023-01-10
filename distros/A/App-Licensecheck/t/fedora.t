@@ -1,37 +1,77 @@
 use Test2::V0;
-use Test2::Require::Module 'Regexp::Pattern::License' => '3.7.0';
+use Test2::Require::Module 'Regexp::Pattern::License' => '3.9.0';
 
 use App::Licensecheck;
+use Path::Tiny;
 
-plan 22;
+# undetected or misdetected
+# TODO: add/update patterns in Regexp::Pattern::License
+my %broken = (
+	'MIT-Cheusov'                     => 'UNKNOWN',
+	'MIT-Minimal'                     => 'UNKNOWN',
+	'MIT-Bellcore'                    => 'UNKNOWN',
+	'MIT-Old-Style'                   => 'MIT-Open-Group and/or NTP',
+	'MIT-Old-Style-disclaimer-no-doc' => 'UNKNOWN',
+	'Unicode'                         => 'UNKNOWN',    # unicode_dfs_2005
+	'MIT-UnixCrypt-Variant'           => 'UNKNOWN',
+);
+
+plan 33 + %broken;
+
+# weakly labeled
+# TODO: add Fedora names in Regexp::Pattern::License
+my %imperfect = (
+	'Adobe-Glyph'           => 'MIT-Adobe-Glyph-List',
+	Boost                   => 'MIT-Thrift',
+	bdwgc                   => 'MIT-Another-Minimal',
+	'DSDP'                  => 'MIT-PetSC',
+	'Festival'              => 'MIT-Festival',
+	ICU                     => 'MIT-ICU',
+	libtiff                 => 'MIT-Hylafax',
+	mit_epinions            => 'MIT-Epinions',
+	mit_mpich2              => 'MIT-mpich2',
+	mit_new                 => 'MIT-sublicense',
+	mit_old                 => 'MIT-Modern',
+	mit_oldstyle_disclaimer => 'MIT-Old-Style-disclaimer',
+	mit_oldstyle            => 'MIT-Old-Style',
+	mit_openvision          => 'MIT-OpenVision',
+	mit_osf                 => 'MIT-HP',
+	mit_unixcrypt           => 'MIT-UnixCrypt',
+	mit_whatever            => 'MIT-Whatever',
+	mit_widget              => 'MIT-Nuclear',
+	mit_xfig                => 'MIT-Xfig',
+	mpich2                  => 'MIT-mpich2',
+	ntp_disclaimer          => 'MIT-Old-Style-disclaimer-no-ad',
+	NTP                     => 'MIT-Old-Style-no-ad',
+	SMLNJ                   => 'MIT-Mlton',
+	WordNet                 => 'MIT-WordNet',
+);
 
 my @opts = (
-	schemes   => [qw(debian spdx)],
+	schemes   => [qw(fedora)],
 	top_lines => 0,
 );
 
-my ($license) = App::Licensecheck->new(@opts)->parse('t/fedora/MIT');
-like $license, qr/Adobe\-Glyph/;
-like $license, qr/BSL/;
-like $license, qr/DSDP/;
-like $license, qr/Expat/;
-like $license, qr/ICU/;
-like $license, qr/MIT~Boehm/;
-like $license, qr/MIT\-CMU/;
-like $license, qr/MIT\-CMU~warranty/;
-like $license, qr/MIT\-enna/;
-like $license, qr/MIT~Epinions/;
-like $license, qr/MIT\-feh/;
-like $license, qr/MIT~old/;
-like $license, qr/MIT~oldstyle/;
-like $license, qr/MIT~oldstyle~disclaimer/;
-like $license, qr/MIT-Open-Group/;
-like $license, qr/MIT~OpenVision/;
-like $license, qr/MIT~OSF/;
-like $license, qr/MIT~UnixCrypt/;
-like $license, qr/MIT~whatever/;
-like $license, qr/MIT~Widget/;
-like $license, qr/MIT~Xfig/;
-like $license, qr/PostgreSQL/;
+sub scanner
+{
+	my $expected = $_->basename('.txt');
+
+	return if $expected eq $_->basename;
+
+	my ($license) = App::Licensecheck->new(@opts)->parse($_);
+	my $todo;
+
+	if ( exists $broken{$expected} ) {
+		like $imperfect{$license} || $license,
+			qr/^\Q$expected\E|\Q$broken{$expected}\E$/,
+			"Corpus file $_";
+		$todo = todo 'not yet implemented';
+	}
+	is( $imperfect{$license} || $license, $expected,
+		"Corpus file $_"
+	);
+}
+
+path("t/fedora")->visit( \&scanner );
 
 done_testing;

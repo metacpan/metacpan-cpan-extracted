@@ -4,7 +4,7 @@ package DBD::Unify::TypeInfo;
 # DBI::DBD::Metadata::write_typeinfo_pm v2.008696.
 # And manually reformatted into readable style
 
-our $VERSION = "0.92";
+our $VERSION = "0.93";
 
 use strict;
 use warnings;

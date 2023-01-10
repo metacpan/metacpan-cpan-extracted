@@ -1,51 +1,54 @@
 #!perl
 
-use strict;
-use warnings;
-
-use Test::More;
-use Test::Deep;
-
-use Test::PDL qw[ is_pdl ];
+use Test2::V0 '!float';
+use Test2::Tools::PDL;
+use Test::Lib;
 use PDL::Lite;
 
 use Safe::Isa;
 use PDLx::Mask;
 use PDLx::MaskedData;
 
-use Test::Fatal;
-use Scalar::Util qw[ refaddr ];
+require fix_devel_cover;
 
-require 't/fix_devel_cover.pl';
+sub badat {
+    my @vals = @_;
+    my @bad  = grep $vals[$_] eq 'BAD', 0 .. $#vals;
+
+    @vals[@bad] = 0;
+    my $pdl = pdl( @vals );
+    $pdl->setbadat( $_ ) for @bad;
+    return $pdl;
+}
+
 
 subtest "constructor" => sub {
 
     like(
-        exception { PDLx::MaskedData->new },
+        dies { PDLx::MaskedData->new },
         qr/missing required/i,
         'no base, no mask'
     );
 
     like(
-        exception { PDLx::MaskedData->new( mask => 0 ) },
+        dies { PDLx::MaskedData->new( mask => 0 ) },
         qr/missing required/i,
         'no base, mask'
     );
 
     like(
-        exception { PDLx::MaskedData->new( base => 'foo', mask => 0 ) },
+        dies { PDLx::MaskedData->new( base => 'foo', mask => 0 ) },
         qr/coercion (.*) failed/ix,
         'base not coercible'
     );
 
     like(
-        exception { PDLx::MaskedData->new( base => 0, mask => 'foo' ) },
+        dies { PDLx::MaskedData->new( base => 0, mask => 'foo' ) },
         qr/coercion (.*) failed/ix,
         'mask not coercible'
     );
 
-    is( exception { PDLx::MaskedData->new( { base => 0 } ) }, undef,
-        'hashref' );
+    is( dies { PDLx::MaskedData->new( { base => 0 } ) }, undef, 'hashref' );
 
     subtest "base, no mask" => sub {
 
@@ -53,13 +56,14 @@ subtest "constructor" => sub {
 
             my $data;
 
-            is( exception { $data = PDLx::MaskedData->new( base => 0 ) },
-                undef, "constructor", );
+            ok( lives { $data = PDLx::MaskedData->new( base => 0 ) },
+                "constructor" )
+              or note $@;
 
             ok( $data->mask->$_isa( 'PDLx::Mask' ), 'mask is PDLx::Mask' );
 
-            cmp_deeply( $data->base->unpdl, [0], 'base values' );
-            cmp_deeply( $data->mask->unpdl, [1], 'mask values' );
+            pdl_is( $data->base,       pdl( 0 ), 'base values' );
+            pdl_is( $data->mask->mask, pdl( 1 ), 'mask values' );
 
         };
 
@@ -69,19 +73,18 @@ subtest "constructor" => sub {
             my $pdl = pdl( 0, 1 );
             $pdl->badflag( 1 );
 
-            is(
-                exception {
+            ok(
+                lives {
                     $data
                       = PDLx::MaskedData->new( base => $pdl, data_mask => 1 )
                 },
-                undef,
                 "constructor",
-            );
+            ) or note $@;
 
             ok( $data->mask->$_isa( 'PDLx::Mask' ), 'mask is PDLx::Mask' );
 
-            cmp_deeply( $data->base->unpdl, [ 0, 1 ], 'base values' );
-            cmp_deeply( $data->mask->unpdl, [ 1, 1 ], 'mask values' );
+            pdl_is( $data->base,       pdl( 0, 1 ), 'base values' );
+            pdl_is( $data->mask->mask, pdl( 1, 1 ), 'mask values' );
 
         };
 
@@ -89,31 +92,25 @@ subtest "constructor" => sub {
 
             my $data;
 
-            my $pdl = pdl( 0, 1, 2 );
-            $pdl->setbadat( 0 );
+            my $pdl = badat( 'BAD', 1, 2 );
 
-            is(
-                exception {
+            ok(
+                lives {
                     $data = PDLx::MaskedData->new(
                         base      => $pdl,
                         data_mask => 1,
                         mask      => [ 1, 1, 0 ],
-                      )
+                    )
                 },
-                undef,
                 "constructor",
-            );
+            ) or note $@;
 
             ok( $data->mask->$_isa( 'PDLx::Mask' ), 'mask is PDLx::Mask' );
 
-            cmp_deeply( $data->base->unpdl, [ 'BAD', 1, 2 ], 'base values' );
-            cmp_deeply(
-                $data->_data_mask->unpdl,
-                [ 0, 1, 1 ],
-                'data mask values'
-            );
-            cmp_deeply( $data->mask->unpdl, [ 0, 1, 0 ], 'mask values' );
-            cmp_deeply( $data->unpdl, [ 'BAD', 1, 'BAD' ], 'data values' );
+            pdl_is( $data->base,       badat( 'BAD', 1, 2 ), 'base values' );
+            pdl_is( $data->_data_mask, pdl( [ 0, 1, 1 ] ), 'data mask values' );
+            pdl_is( $data->mask->mask, pdl( [ 0, 1, 0 ] ), 'mask values' );
+            pdl_is( $data->data, badat( 'BAD', 1, 'BAD' ), 'data values' );
             is( $data->nvalid, 1, 'number of valid values' );
 
         };
@@ -123,22 +120,21 @@ subtest "constructor" => sub {
             my $data;
             my $pdl = pdl( 1 );
 
-            is(
-                exception {
+            ok(
+                lives {
                     $data = PDLx::MaskedData->new(
                         base       => $pdl,
                         data_mask  => 1,
                         mask_value => 0
-                      )
+                    )
                 },
-                undef,
                 "constructor",
-            );
+            ) or note $@;
 
             ok( $data->mask->$_isa( 'PDLx::Mask' ), 'mask is PDLx::Mask' );
 
-            cmp_deeply( $data->base->unpdl, [1], 'base values' );
-            cmp_deeply( $data->mask->unpdl, [1], 'mask values' );
+            pdl_is( $data->base,       pdl( 1 ), 'base values' );
+            pdl_is( $data->mask->mask, pdl( 1 ), 'mask values' );
             is( $data->nvalid, 1, 'number of valid values' );
         };
 
@@ -147,22 +143,21 @@ subtest "constructor" => sub {
             my $data;
             my $pdl = pdl( 0 );
 
-            is(
-                exception {
+            ok(
+                lives {
                     $data = PDLx::MaskedData->new(
                         base       => $pdl,
                         data_mask  => 1,
                         mask_value => 0
-                      )
+                    )
                 },
-                undef,
                 "constructor",
-            );
+            ) or note $@;
 
             ok( $data->mask->$_isa( 'PDLx::Mask' ), 'mask is PDLx::Mask' );
 
-            cmp_deeply( $data->base->unpdl, [0], 'base values' );
-            cmp_deeply( $data->mask->unpdl, [0], 'mask values' );
+            pdl_is( $data->base,       pdl( 0 ), 'base values' );
+            pdl_is( $data->mask->mask, pdl( 0 ), 'mask values' );
             is( $data->nvalid, 0, 'number of valid values' );
         };
 
@@ -172,16 +167,15 @@ subtest "constructor" => sub {
     subtest "scalar, scalar" => sub {
         my $data;
 
-        is(
-            exception { $data = PDLx::MaskedData->new( base => 3, mask => 4 ) },
-            undef, 'construct'
-        );
+        ok( lives { $data = PDLx::MaskedData->new( base => 3, mask => 4 ) },
+            'construct' )
+          or note $@;
 
         ok( $data->base->$_isa( 'PDL' ),        'base is PDL' );
         ok( $data->mask->$_isa( 'PDLx::Mask' ), 'mask is PDLx::Mask' );
 
-        cmp_deeply( $data->base->unpdl, [3], 'base values' );
-        cmp_deeply( $data->mask->unpdl, [4], 'mask values' );
+        pdl_is( $data->base,       pdl( 3 ), 'base values' );
+        pdl_is( $data->mask->mask, pdl( 4 ), 'mask values' );
         is( $data->nvalid, 1, 'number of valid values' );
 
     };
@@ -189,21 +183,20 @@ subtest "constructor" => sub {
     subtest "scalar, Mask" => sub {
         my $data;
 
-        is(
-            exception {
+        ok(
+            lives {
                 $data = PDLx::MaskedData->new(
                     base => 3,
                     mask => PDLx::Mask->new( 4 ) )
             },
-            undef,
             'construct'
-        );
+        ) or note $@;
 
         ok( $data->base->$_isa( 'PDL' ),        'base is PDL' );
         ok( $data->mask->$_isa( 'PDLx::Mask' ), 'mask is PDLx::Mask' );
 
-        cmp_deeply( $data->base->unpdl, [3], 'base values' );
-        cmp_deeply( $data->mask->unpdl, [4], 'mask values' );
+        pdl_is( $data->base,       pdl( 3 ), 'base values' );
+        pdl_is( $data->mask->mask, pdl( 4 ), 'mask values' );
         is( $data->nvalid, 1, 'number of valid values' );
 
     };
@@ -211,60 +204,57 @@ subtest "constructor" => sub {
     subtest "arrayref, arrayref" => sub {
         my $data;
 
-        is(
-            exception {
+        ok(
+            lives {
                 $data = PDLx::MaskedData->new(
                     base => [ 2, 3, 4 ],
                     mask => [ 1, 1, 1 ] )
             },
-            undef,
             'construct'
-        );
+        ) or note $@;
 
         ok( $data->base->$_isa( 'PDL' ),        'base is PDL' );
         ok( $data->mask->$_isa( 'PDLx::Mask' ), 'mask is PDLx::Mask' );
 
-        cmp_deeply( $data->base->unpdl, [ 2, 3, 4 ], 'base values ok' );
-        cmp_deeply( $data->mask->unpdl, [ 1, 1, 1 ], 'mask values ok' );
+        pdl_is( $data->base,       pdl( 2, 3, 4 ), 'base values ok' );
+        pdl_is( $data->mask->mask, pdl( 1, 1, 1 ), 'mask values ok' );
         is( $data->nvalid, 3, 'number of valid values' );
     };
 
     subtest "shorthand arrayref, no mask" => sub {
         my $data;
 
-        is(
-            exception {
+        ok(
+            lives {
                 $data = PDLx::MaskedData->new( [ 2, 3, 4 ] )
             },
-            undef,
             'construct'
-        );
+        ) or note $@;
 
         ok( $data->base->$_isa( 'PDL' ),        'base is PDL' );
         ok( $data->mask->$_isa( 'PDLx::Mask' ), 'mask is PDLx::Mask' );
 
-        cmp_deeply( $data->base->unpdl, [ 2, 3, 4 ], 'base values ok' );
-        cmp_deeply( $data->mask->unpdl, [ 1, 1, 1 ], 'mask values ok' );
+        pdl_is( $data->base,       pdl( 2, 3, 4 ), 'base values ok' );
+        pdl_is( $data->mask->mask, pdl( 1, 1, 1 ), 'mask values ok' );
         is( $data->nvalid, 3, 'number of valid values' );
     };
 
     subtest "shorthand arrayref, Mask" => sub {
         my $data;
 
-        is(
-            exception {
+        ok(
+            lives {
                 $data = PDLx::MaskedData->new( [ 2, 3, 4 ],
                     PDLx::Mask->new( [ 1, 1, 1 ] ) )
             },
-            undef,
             'construct'
-        );
+        ) or note $@;
 
         ok( $data->base->$_isa( 'PDL' ),        'base is PDL' );
         ok( $data->mask->$_isa( 'PDLx::Mask' ), 'mask is PDLx::Mask' );
 
-        cmp_deeply( $data->base->unpdl, [ 2, 3, 4 ], 'base values ok' );
-        cmp_deeply( $data->mask->unpdl, [ 1, 1, 1 ], 'mask values ok' );
+        pdl_is( $data->base,       pdl( 2, 3, 4 ), 'base values ok' );
+        pdl_is( $data->mask->mask, pdl( 1, 1, 1 ), 'mask values ok' );
         is( $data->nvalid, 3, 'number of valid values' );
     };
 
@@ -274,22 +264,21 @@ subtest "constructor" => sub {
 subtest "post-constructor data assignment" => sub {
 
     my $data;
-    is(
-        exception {
+    ok(
+        lives {
             $data = PDLx::MaskedData->new(
                 base         => [ 2, 3, 4 ],
                 masked_value => 0,
                 data_mask    => 1
-              )
+            )
         },
-        undef,
         'construct'
-    );
+    ) or note $@;
 
     $data->data( [ 2, 0, 4 ] );
 
-    cmp_deeply( $data->unpdl,       [ 2, 0, 4 ], 'effective  values ok' );
-    cmp_deeply( $data->mask->unpdl, [ 1, 0, 1 ], 'mask values ok' );
+    pdl_is( $data->data,       pdl( 2, 0, 4 ), 'effective  values ok' );
+    pdl_is( $data->mask->mask, pdl( 1, 0, 1 ), 'mask values ok' );
     is( $data->nvalid, 2, 'number of valid values' );
 
 };
@@ -297,16 +286,15 @@ subtest "post-constructor data assignment" => sub {
 subtest "post-constructor mask assignment" => sub {
 
     my $data;
-    is(
-        exception {
+    ok(
+        lives {
             $data = PDLx::MaskedData->new( [ 2, 3, 4 ] )
         },
-        undef,
         'construct'
-    );
+    ) or note $@;
 
-    cmp_deeply( $data->unpdl,       [ 2, 3, 4 ], 'effective values ok' );
-    cmp_deeply( $data->mask->unpdl, [ 1, 1, 1 ], 'mask values ok' );
+    pdl_is( $data->data,       pdl( 2, 3, 4 ), 'effective values ok' );
+    pdl_is( $data->mask->mask, pdl( 1, 1, 1 ), 'mask values ok' );
     is( $data->nvalid, 3, 'number of valid values' );
 
     my $old_mask  = $data->mask;
@@ -316,14 +304,14 @@ subtest "post-constructor mask assignment" => sub {
 
     # expect that the old mask has been unsubscribed from
     like(
-        exception { $old_mask->unsubscribe( $old_token ) },
+        dies { $old_mask->unsubscribe( $old_token ) },
         qr/invalid token/,
         "verify unsubscription from old mask"
     );
 
 
-    cmp_deeply( $data->unpdl,       [ 2, 0, 4 ], 'effective  values ok' );
-    cmp_deeply( $data->mask->unpdl, [ 1, 0, 1 ], 'mask values ok' );
+    pdl_is( $data->data,       pdl( 2, 0, 4 ), 'effective  values ok' );
+    pdl_is( $data->mask->mask, pdl( 1, 0, 1 ), 'mask values ok' );
     is( $data->nvalid, 2, 'number of valid values' );
 
 };
@@ -332,23 +320,22 @@ subtest "post-constructor data bad methods" => sub {
 
     subtest 'setbadat' => sub {
         my $data;
-        is(
-            exception {
+        ok(
+            lives {
                 $data = PDLx::MaskedData->new(
                     base      => [ 2, 3, 4 ],
                     data_mask => 1,
                     mask      => [ 0, 1, 1 ],
                 );
             },
-            undef,
             'construct'
-        );
+        ) or note $@;
 
         $data->setbadat( 1 );
 
-        cmp_deeply( $data->base->unpdl, [ 2, 'BAD', 4 ], 'base values ok' );
-        cmp_deeply( $data->unpdl, [ 'BAD', 'BAD', 4 ], 'effective values ok' );
-        cmp_deeply( $data->mask->unpdl, [ 0, 0, 1 ], 'mask values ok' );
+        pdl_is( $data->base, badat( 2,     'BAD', 4 ), 'base values ok' );
+        pdl_is( $data->data, badat( 'BAD', 'BAD', 4 ), 'effective values ok' );
+        pdl_is( $data->mask->mask, pdl( 0, 0, 1 ), 'mask values ok' );
         is( $data->nvalid, 1, 'number of valid values' );
 
     };
@@ -358,43 +345,42 @@ subtest "post-constructor data bad methods" => sub {
 subtest "only data_mask" => sub {
 
     my $data;
-    is(
-        exception {
+    ok(
+        lives {
             $data = PDLx::MaskedData->new(
                 base         => [ 2, 3, 4 ],
                 masked_value => 0,
                 data_mask    => 1,
                 apply_mask   => 0,
-              )
+            )
         },
-        undef,
         'construct'
-    );
+    ) or note $@;
 
     $data->data( [ 2, 0, 4 ] );
 
-    cmp_deeply( $data->base->unpdl, [ 2, 0, 4 ], 'base values ok' );
-    cmp_deeply( $data->unpdl,       [ 2, 0, 4 ], 'effective values ok' );
-    cmp_deeply( $data->mask->unpdl, [ 1, 0, 1 ], 'mask values ok' );
+    pdl_is( $data->base,       pdl( 2, 0, 4 ), 'base values ok' );
+    pdl_is( $data->data,       pdl( 2, 0, 4 ), 'effective values ok' );
+    pdl_is( $data->mask->mask, pdl( 1, 0, 1 ), 'mask values ok' );
     is( $data->nvalid, 2, 'number of valid values' );
 
     $data->mask->mask( 0 );
 
-    cmp_deeply( $data->base->unpdl, [ 2, 0, 4 ], 'base values ok' );
-    cmp_deeply( $data->unpdl,       [ 2, 0, 4 ], 'effective values ok' );
-    cmp_deeply( $data->mask->unpdl, [ 0, 0, 0 ], 'mask values ok' );
+    pdl_is( $data->base,       pdl( 2, 0, 4 ), 'base values ok' );
+    pdl_is( $data->data,       pdl( 2, 0, 4 ), 'effective values ok' );
+    pdl_is( $data->mask->mask, pdl( 0, 0, 0 ), 'mask values ok' );
 
     # now apply mask after the fact
     $data->apply_mask( 1 );
 
-    cmp_deeply( $data->base->unpdl, [ 2, 0, 4 ], 'base values ok' );
-    cmp_deeply( $data->unpdl,       [ 0, 0, 0 ], 'effective values ok' );
+    pdl_is( $data->base, pdl( 2, 0, 4 ), 'base values ok' );
+    pdl_is( $data->data, pdl( 0, 0, 0 ), 'effective values ok' );
 };
 
 subtest "secondary mask" => sub {
 
     my $pmask = PDLx::Mask->new( pdl( byte, 1, 1, 1 ) );
-    cmp_deeply( $pmask->unpdl, [ 1, 1, 1 ], "primary mask initial value" );
+    pdl_is( $pmask->mask, pdl( 1, 1, 1 ), "primary mask initial value" );
 
     my $smask = PDLx::MaskedData->new(
         base       => pdl( byte, 0, 1, 0 ),
@@ -403,29 +389,29 @@ subtest "secondary mask" => sub {
         data_mask  => 1
     );
 
-    cmp_deeply( $smask->unpdl, [ 0, 1, 0 ], "secondary mask initial value" );
+    pdl_is( $smask->data, pdl( 0, 1, 0 ), "secondary mask initial value" );
 
-    cmp_deeply( $pmask->unpdl, $smask->unpdl,
+    pdl_is( $pmask->mask, $smask->data,
         "primary mask tracks initial secondary mask" );
 
     $smask->set( 0, 1 );
-    cmp_deeply( $smask->unpdl, [ 1, 1, 0 ], "update secondary mask" );
-    cmp_deeply(
-        $pmask->unpdl,
-        [ 1, 1, 0 ],
+    pdl_is( $smask->data, pdl( 1, 1, 0 ), "update secondary mask" );
+    pdl_is(
+        $pmask->mask,
+        pdl( 1, 1, 0 ),
         "primary mask tracks updated secondary mask"
     );
 
     $pmask->set( 0, 0 );
-    cmp_deeply( $pmask->base->unpdl, [ 0, 1, 1 ], "update base primary mask" );
-    cmp_deeply(
-        $pmask->unpdl,
-        [ 0, 1, 0 ],
+    pdl_is( $pmask->base, pdl( 0, 1, 1 ), "update base primary mask" );
+    pdl_is(
+        $pmask->mask,
+        pdl( 0, 1, 0 ),
         "effective primary mask tracks updated base mask"
     );
-    cmp_deeply(
-        $smask->unpdl,
-        [ 1, 1, 0 ],
+    pdl_is(
+        $smask->data,
+        pdl( 1, 1, 0 ),
         "secondary mask doesn't track primary mask"
     );
 
@@ -444,31 +430,21 @@ subtest "subscription follies" => sub {
             data_mask  => 1,
         );
 
-        cmp_deeply(
-            $data->unpdl,
-            [ 1, 0, 0, 0 ],
-            "effective data initial value"
-        );
-        cmp_deeply(
-            $mask->unpdl,
-            [ 1, 0, 0, 0 ],
+        pdl_is( $data->data, pdl( 1, 0, 0, 0 ),
+            "effective data initial value" );
+        pdl_is(
+            $mask->mask,
+            pdl( 1, 0, 0, 0 ),
             "mask tracks initial data mask"
         );
 
         $data->set( 2, 2 );
-        cmp_deeply(
-            $data->base->unpdl,
-            [ 1, 1, 2, 0 ],
-            "base data updated value"
-        );
-        cmp_deeply(
-            $data->unpdl,
-            [ 1, 0, 2, 0 ],
-            "effective data updated value"
-        );
-        cmp_deeply(
-            $mask->unpdl,
-            [ 1, 0, 1, 0 ],
+        pdl_is( $data->base, pdl( 1, 1, 2, 0 ), "base data updated value" );
+        pdl_is( $data->data, pdl( 1, 0, 2, 0 ),
+            "effective data updated value" );
+        pdl_is(
+            $mask->mask,
+            pdl( 1, 0, 1, 0 ),
             "mask tracks updated data mask"
         );
 
@@ -479,35 +455,21 @@ subtest "subscription follies" => sub {
             # if that's true unless we peek behind the curtain
 
             $data->unsubscribe( reset_data_storage => 0 );
-            is( 0 + $data->_has_shared_data_storage,
+            is( 0+ $data->_has_shared_data_storage,
                 0, "data storage still separate" );
 
-            cmp_deeply( $data->unpdl, $data->base->unpdl,
-                "effective data == base data" );
-            cmp_deeply( $mask->unpdl, $mask->base->unpdl,
-                "effective mask == base mask" );
+            pdl_is( $data->data, $data->base, "effective data == base data" );
+            pdl_is( $mask->mask, $mask->base, "effective mask == base mask" );
 
             $data->set( 0, 3 );
-            cmp_deeply(
-                $data->base->unpdl,
-                [ 3, 1, 2, 0 ],
-                "updated base data value"
-            );
-            cmp_deeply( $data->unpdl, $data->base->unpdl,
-                "effective data == base data" );
-            cmp_deeply( $mask->unpdl, $mask->base->unpdl,
-                "effective mask == base mask" );
+            pdl_is( $data->base, pdl( 3, 1, 2, 0 ), "updated base data value" );
+            pdl_is( $data->data, $data->base, "effective data == base data" );
+            pdl_is( $mask->mask, $mask->base, "effective mask == base mask" );
 
             $mask->set( 0, 0 );
-            cmp_deeply(
-                $mask->base->unpdl,
-                [ 0, 0, 1, 1 ],
-                "updated base mask value"
-            );
-            cmp_deeply( $mask->unpdl, $mask->base->unpdl,
-                "effective mask == base mask" );
-            cmp_deeply( $data->unpdl, $data->base->unpdl,
-                "effective data == base data" );
+            pdl_is( $mask->base, pdl( 0, 0, 1, 1 ), "updated base mask value" );
+            pdl_is( $mask->mask, $mask->base, "effective mask == base mask" );
+            pdl_is( $data->data, $data->base, "effective data == base data" );
 
         };
 
@@ -515,22 +477,22 @@ subtest "subscription follies" => sub {
         subtest "re-subscribe" => sub {
             $data->subscribe;
 
-            cmp_deeply(
-                $mask->base->unpdl,
-                [ 0, 0, 1, 1 ],
+            pdl_is(
+                $mask->base,
+                pdl( 0, 0, 1, 1 ),
                 "base mask value unchanged"
             );
-            cmp_deeply( $mask->unpdl, [ 0, 0, 1, 0 ], "mask tracks data mask" );
+            pdl_is( $mask->mask, pdl( 0, 0, 1, 0 ), "mask tracks data mask" );
 
-            cmp_deeply(
-                $data->base->unpdl,
-                [ 3, 1, 2, 0 ],
+            pdl_is(
+                $data->base,
+                pdl( 3, 1, 2, 0 ),
                 "base data value unchanged"
             );
 
-            cmp_deeply(
-                $data->unpdl,
-                [ 0, 0, 2, 0 ],
+            pdl_is(
+                $data->data,
+                pdl( 0, 0, 2, 0 ),
                 "effective data updated value"
             );
 
@@ -540,16 +502,20 @@ subtest "subscription follies" => sub {
 
     subtest "mask directed" => sub {
 
-        my $mask = PDLx::Mask->new( [ 0 ] );
+        my $mask = PDLx::Mask->new( [0] );
 
-        my $data = PDLx::MaskedData->new( [ 1 ], $mask );
+        my $data = PDLx::MaskedData->new( [1], $mask );
 
-	# yeah, this ain't public.
-	my $token = $data->_token;
+        # yeah, this ain't public.
+        my $token = $data->_token;
 
-	$mask->unsubscribe( $token );
+        $mask->unsubscribe( $token );
 
-	cmp_deeply( $data->unpdl, [ 1 ] , "data ignores mask after mask unsubscribes data" );
+        pdl_is(
+            $data->data,
+            pdl( [1] ),
+            "data ignores mask after mask unsubscribes data"
+        );
 
     };
 
@@ -633,16 +599,16 @@ subtest 'overload assignment ops/methods' => sub {
         ok( $copy->isa( 'PDL' ) && !$copy->isa( 'PDLx::Mask' ),
             '$data->copy => ordinary PDL' );
 
-        cmp_deeply( $copy->unpdl, [ 0, 0, 2 ], "copy returns effective data" );
+        pdl_is( $copy, pdl( 0, 0, 2 ), "copy returns effective data" );
 
         # operating on a data results in a normal piddle
         my $pdl = $data + 1;
         ok( $pdl->isa( 'PDL' ) && !$pdl->isa( 'PDLx::Mask' ),
             '$data + 1 => ordinary PDL' );
 
-        cmp_deeply(
-            $pdl->unpdl,
-            [ 1, 1, 3 ],
+        pdl_is(
+            $pdl,
+            pdl( 1, 1, 3 ),
             '$data + 1 => operates on effective data'
         );
     }
@@ -658,17 +624,21 @@ subtest 'overload assignment ops/methods' => sub {
 
             my $data = PDLx::MaskedData->new( $initial );
 
-            is( exception { $test->{op}->( $data ) }, undef, "evaluate" );
+            ok( lives { $test->{op}->( $data ) }, "evaluate" )
+              or note $@;
 
-            cmp_deeply( $data->base->unpdl, $expected->unpdl, "result" );
-
-            is( $data->dsum, $expected->dsum, "dsum" );
-
+            pdl_is( $data->base, $expected, "result" );
+            if ( $data->dsum->$_isa( 'PDL' ) ) {
+                pdl_is( $data->dsum, $expected->dsum, "dsum" );
+            }
+            else {
+                is( $data->dsum, $expected->dsum, "dsum" );
+            }
         };
 
         subtest "$op, upstream mask, mask value = 0" => sub {
 
-            my $initial = pdl( 1, 0, 1 );
+            my $initial      = pdl( 1, 0, 1 );
             my $initial_mask = $initial != 0;
 
             my $expected_base = $test->{op}->( $initial->copy );
@@ -678,24 +648,23 @@ subtest 'overload assignment ops/methods' => sub {
             my $data
               = PDLx::MaskedData->new( base => $initial, data_mask => 1 );
 
-            cmp_deeply( $data->mask->unpdl, $initial_mask->unpdl,
-                "initial mask" );
+            pdl_is( $data->mask->mask, $initial_mask, "initial mask" );
 
-            is( exception { $test->{op}->( $data ) }, undef, "evaluate" );
+            ok( lives { $test->{op}->( $data ) }, "evaluate" )
+              or note $@;
 
-            cmp_deeply( $data->base->unpdl, $expected_base->unpdl,
-                "expected result" );
-            cmp_deeply( $data->mask->unpdl, $expected_mask->unpdl,
-                "expected mask" );
-            cmp_deeply( $data->unpdl, $expected_data->unpdl, "expected mask" );
+            pdl_is( $data->base,       $expected_base, "expected result" );
+            pdl_is( $data->mask->mask, $expected_mask, "expected mask" );
+            pdl_is( $data->data,       $expected_data, "expected mask" );
 
-            is( $data->dsum, $expected_data->dsum, "dsum" );
-
+            if ( $data->dsum->$_isa( 'PDL' ) ) {
+                pdl_is( $data->dsum, $expected_data->dsum, "dsum" );
+            }
+            else {
+                is( $data->dsum, $expected_data->dsum, "dsum" );
+            }
         };
-
-
     }
-
 };
 
 done_testing;

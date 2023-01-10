@@ -1,5 +1,5 @@
 package Form::Tiny::Error;
-$Form::Tiny::Error::VERSION = '2.16';
+$Form::Tiny::Error::VERSION = '2.17';
 use v5.10;
 use strict;
 use warnings;
@@ -46,7 +46,7 @@ sub as_string
 
 	# Internal use only
 	package Form::Tiny::Error::NestedFormError;
-$Form::Tiny::Error::NestedFormError::VERSION = '2.16';
+$Form::Tiny::Error::NestedFormError::VERSION = '2.17';
 use parent -norequire, 'Form::Tiny::Error';
 
 }
@@ -54,7 +54,7 @@ use parent -norequire, 'Form::Tiny::Error';
 {
 
 	package Form::Tiny::Error::InvalidFormat;
-$Form::Tiny::Error::InvalidFormat::VERSION = '2.16';
+$Form::Tiny::Error::InvalidFormat::VERSION = '2.17';
 use parent -norequire, 'Form::Tiny::Error';
 
 	sub default_error
@@ -66,7 +66,7 @@ use parent -norequire, 'Form::Tiny::Error';
 {
 
 	package Form::Tiny::Error::Required;
-$Form::Tiny::Error::Required::VERSION = '2.16';
+$Form::Tiny::Error::Required::VERSION = '2.17';
 use parent -norequire, 'Form::Tiny::Error';
 
 	sub default_error
@@ -78,7 +78,7 @@ use parent -norequire, 'Form::Tiny::Error';
 {
 
 	package Form::Tiny::Error::IsntStrict;
-$Form::Tiny::Error::IsntStrict::VERSION = '2.16';
+$Form::Tiny::Error::IsntStrict::VERSION = '2.17';
 use parent -norequire, 'Form::Tiny::Error';
 
 	sub default_error
@@ -90,7 +90,7 @@ use parent -norequire, 'Form::Tiny::Error';
 {
 
 	package Form::Tiny::Error::DoesNotValidate;
-$Form::Tiny::Error::DoesNotValidate::VERSION = '2.16';
+$Form::Tiny::Error::DoesNotValidate::VERSION = '2.17';
 use parent -norequire, 'Form::Tiny::Error';
 
 	sub default_error
@@ -125,11 +125,14 @@ Form::Tiny::Error - form error wrapper
 
 =head1 DESCRIPTION
 
-The form errors class features field name which caused validation error, error message and automatic stringification.
+The form errors class features field name which caused validation error, error
+message and automatic stringification.
 
-The C<< $error->error >> can return a nested error object in case of nested forms.
+The C<< $error->error >> can return a nested error object in case of nested
+forms.
 
-A couple of in-place subclasses are provided to differentiate the type of error which occured. These are:
+A couple of in-place subclasses are provided to differentiate the type of error
+which occured. These are:
 
 =over
 

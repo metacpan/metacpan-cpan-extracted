@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Test::Deep::HashElements 1.202;
+package Test::Deep::HashElements 1.204;
 
 use Test::Deep::Ref;
 
@@ -26,7 +26,7 @@ sub descend
 
   my $master = $self->getMaster($got, $exp);
 
-  foreach my $key (keys %$master)
+  foreach my $key (sort keys %$master)
   {
     $data->{index} = $key;
 
@@ -65,7 +65,7 @@ sub reset_arrow
   return 0;
 }
 
-package Test::Deep::SuperHashElements 1.202;
+package Test::Deep::SuperHashElements 1.204;
 
 use base 'Test::Deep::HashElements';
 
@@ -78,7 +78,7 @@ sub getMaster
   return $exp;
 }
 
-package Test::Deep::SubHashElements 1.202;
+package Test::Deep::SubHashElements 1.204;
 
 use base 'Test::Deep::HashElements';
 
@@ -105,7 +105,7 @@ Test::Deep::HashElements
 
 =head1 VERSION
 
-version 1.202
+version 1.204
 
 =head1 PERL VERSION
 

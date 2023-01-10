@@ -31,15 +31,15 @@ requires:
   Indent: 0.01
   Indent::Block: 0.01
   Indent::Word: 0.01
-  List::MoreUtils: 0
+  List::Util: 1.33
   Readonly: 0
   Tags::Output: 0.1
   Tags::Utils: 0.09
   Tags::Utils::Preserve: 0.09
   perl: 5.6.0
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Tags-Output-Indent
+  bugtracker: https://github.com/michal-josef-spacek/Tags-Output-Indent/issues
   homepage: https://github.com/michal-josef-spacek/Tags-Output-Indent
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-Output-Indent
-version: '0.08'
+version: '0.10'

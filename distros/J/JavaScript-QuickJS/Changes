@@ -1,5 +1,9 @@
 Revision history for Perl extension JavaScript::QuickJS:
 
+0.16 Sun 8 Jan 2023
+- Update easyxs to fix Solaris strnlen problem seen in CPAN Testers.
+- Small fix to docs.
+
 0.15 Thu 8 Sep 2022
 - Add Date compatibility.
 - QuickJS memory-management parameters are now configurable.

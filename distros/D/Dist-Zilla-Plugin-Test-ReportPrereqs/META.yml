@@ -12,12 +12,13 @@ build_requires:
   Path::Tiny: '0'
   Test::Harness: '0'
   Test::More: '0.96'
-  perl: '5.006'
+  perl: '5.020'
+  strict: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
-  perl: '5.006'
+  perl: '5.020'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,7 +35,7 @@ no_index:
 provides:
   Dist::Zilla::Plugin::Test::ReportPrereqs:
     file: lib/Dist/Zilla/Plugin/Test/ReportPrereqs.pm
-    version: '0.028'
+    version: '0.029'
 requires:
   Data::Dumper: '0'
   Data::Section: '0.200002'
@@ -46,14 +47,13 @@ requires:
   Moose: '0'
   Moose::Util::TypeConstraints: '0'
   Sub::Exporter::ForMethods: '0'
-  perl: '5.006'
-  strict: '0'
+  perl: '5.020'
   warnings: '0'
 resources:
   bugtracker: https://github.com/dagolden/Dist-Zilla-Plugin-Test-ReportPrereqs/issues
   homepage: https://github.com/dagolden/Dist-Zilla-Plugin-Test-ReportPrereqs
   repository: https://github.com/dagolden/Dist-Zilla-Plugin-Test-ReportPrereqs.git
-version: '0.028'
+version: '0.029'
 x_authority: cpan:DAGOLDEN
 x_contributors:
   - 'Brendan Byrd <Perl@ResonatorSoft.org>'
@@ -61,7 +61,8 @@ x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Kent Fredric <kentfredric@gmail.com>'
   - 'Randy Stauner <randy@magnificent-tears.com>'
+  - 'Ricardo Signes <rjbs@users.noreply.github.com>'
   - 'Yanick Champoux <yanick@babyl.dyndns.org>'
-x_generated_by_perl: v5.32.0
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Apache-2.0

@@ -7,6 +7,19 @@ Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.3.3	2023-01-09
+
+ [ Bug Fixes ]
+ - avoid silence warnings on older (but not too old) perls
+
+v3.3.2	2023-01-07
+
+ [ Bug Fixes ]
+ - avoid silence warnings on older perls
+
+ [ Test Suite ]
+ - rewrite fedora tests
+
 v3.3.1	2023-01-03
 
  [ Bug Fixes ]

@@ -1,221 +1,353 @@
 NAME
+
     Passwd::Unix - access to standard unix files
 
 SYNOPSIS
+
             use Passwd::Unix;
-        
-            my $pu = Passwd::Unix->new();
-            my $err = $pu->user("example", $pu->encpass("my_secret"), $pu->maxuid + 1, 10,
-                                                    "My User", "/home/example", "/bin/bash" );
-            $pu->passwd("example", $pu->encpass("newsecret"));
+            
+            my $pu = Passwd::Unix->new;
+            
+            my $err = $pu->user(
+                                    "example", 
+                                    $pu->encpass("my_secret"), 
+                                    $pu->unused_uid, 
+                                    $pu->unused_gid, 
+                                    "My User", 
+                                    "/home/example", 
+                                    "/bin/bash" 
+            );
+            
+            $pu->passwd("example", $pu->encpass( "newsecret") );
             foreach my $user ($pu->users) {
                     print "Username: $user\nFull Name: ", $pu->gecos($user), "\n\n";
             }
+            
             my $uid = $pu->uid('example');
             $pu->del("example");
-
+    
             # or 
-
-            use Passwd::Unix qw(check_sanity reset encpass passwd_file shadow_file 
-                                    group_file backup warnings del del_user uid gid gecos
-                                    home shell passwd rename maxgid maxuid exists_user 
-                                    exists_group user users users_from_shadow del_group 
-                                    group groups groups_from_gshadow);
-        
-            my $err = user( "example", encpass("my_secret"), $pu->maxuid + 1, 10,
+    
+            use Passwd::Unix qw( 
+                    algorithm backup check_sanity compress del del_group del_user
+                    encpass exists_group exists_user gecos gid group group_file
+                    groups groups_from_gshadow home maxgid maxuid mingid minuid
+                    passwd passwd_file rename reset shadow_file shell uid user
+                    users users_from_shadow warnings
+            );
+            
+            my $err = user( "example", encpass("my_secret"), unused_uid(), unused_gid(),
                                             "My User", "/home/example", "/bin/bash" );
             passwd("example",encpass("newsecret"));
-            foreach my $user (users()) {
-                    print "Username: $user\nFull Name: ", gecos($user), "\n\n";
+            foreach my $user ( users() ) {
+                    print "Username: $user\nFull Name: ", gecos( $user ), "\n\n";
             }
-            my $uid = uid('example');
-            del("example");
+            
+            my $uid = uid( 'example' );
+            del( 'example' );
 
 ABSTRACT
-    Passwd::Unix provides an abstract object-oriented and function interface
-    to standard Unix files, such as /etc/passwd, /etc/shadow, /etc/group.
-    Additionally this module provides environment to testing new software,
-    without using system critical files in /etc/dir.
+
+    Passwd::Unix provides an abstract object-oriented and function
+    interface to standard Unix files, such as /etc/passwd, /etc/shadow,
+    /etc/group. Additionally this module provides environment for testing
+    software without using system critical files in /etc/ dir (you can
+    specify other files than /etc/passwd etc.).
 
 DESCRIPTION
+
     The Passwd::Unix module provides an abstract interface to /etc/passwd,
-    /etc/shadow and /etc/group format files. It is inspired by
-    Unix::PasswdFile module (that one does not handle /etc/shadow file, what
-    is necessary in modern systems like Sun Solaris 10 or Linux).
+    /etc/shadow, /etc/group, /etc/gshadow format files. It is inspired by
+    Unix::PasswdFile module (that one does not handle /etc/shadow file).
+
+    Module was rewritten from the ground in version 1.0 (i.e. to support
+    newer hash algorithms and so on), however with compatibility in mind.
+    Despite this some incompatibilities can occur.
 
 SUBROUTINES/METHODS
-    new( [ param0 = 1, param1 => 0... ] )>
-        Constructor. Possible parameters are:
 
-        passwd - path to passwd file; default "/etc/passwd"
-        shadow - path to shadow file; default "/etc/shadow"
-        group - path to group file; default "/etc/group"
-        gshadow - path to gshadow file if any; default "/etc/gshadow"
-        umask - umask for creating files; default 0022 (standard for UNIX
-        and Linux systems)
-        backup - boolean; if set to 1, backup will be made; default 1
-        warnings - boolean; if set to 1, important warnings will be
-        displayed; default 0
+    new( [ param0 = 1, param1 => 0... ] )>
+
+      Constructor. Possible parameters are:
+
+      passwd - path to passwd file; default /etc/passwd
+
+      shadow - path to shadow file; default /etc/shadow
+
+      group - path to group file; default /etc/group
+
+      gshadow - path to gshadow file if any; default /etc/gshadow
+
+      algorithm - hash algorithm, possible values: md5, blowfish, sha256,
+      sha512; default sha512
+
+      umask - not used anymore; left only for compatibility reason
+
+      debug - not used anymore; left only for compatibility reason
+
+      backup - boolean; if set to 1, backup will be made; default 1
+
+      compress - boolean; if set to 1, backup compression will be made;
+      default 1
+
+      warnings - boolean; if set to 1, important warnings will be
+      displayed; default 0
+
+    algorithm()
+
+      This method allows to specify algorithm for password generation.
+      Possible values: md5, blowfish, sha256, sha512
+
+    backup()
+
+      This method allows to specify if backups files have to be made before
+      every modyfication (1 for on, 0 for off).
+
+    compress()
+
+      This method allows to specify if compression to backup files has to
+      be made (1 for on, 0 for off).
 
     check_sanity()
-        This method check if environment is sane. I.e. if users in *shadow*
-        and in *passwd* are the same. This method is invoked in constructor.
+
+      This function was left only for compatibility reason. Currently it
+      does nothing (always returns 1).
+
+    debug()
+
+      This function was left only for compatibility reason. Currently it
+      does nothing.
+
+    default_umask( [UMASK] )
+
+      This function was left only for compatibility reason. Currently it
+      does nothing.
 
     del( USERNAME0, USERNAME1... )
-        This method is an alias for "del_user". It's for transition only.
+
+      This method is an alias for del_user. It's for transition only.
 
     del_user( USERNAME0, USERNAME1... )
-        This method will delete the list of users. It has no effect if the
-        supplied users do not exist.
+
+      This method will delete the list of users. It has no effect if the
+      supplied users do not exist.
 
     del_group( GROUPNAME0, GROUPNAME1... )
-        This method will delete the list of groups. It has no effect if the
-        supplied groups do not exist.
+
+      This method will delete the list of groups. It has no effect if the
+      supplied groups do not exist.
 
     encpass( PASSWORD )
-        This method will encrypt plain text into unix style MD5 password.
 
-    gecos( USERNAME [,GECOS] )
-        Read or modify a user's GECOS string (typically their full name).
-        Returns the result of operation (1 or "undef") if GECOS was
-        specified. Otherwhise returns the GECOS.
-
-    gid( USERNAME [,GID] )
-        Read or modify a user's GID. Returns the result of operation (TRUE
-        or FALSE) if GID was specified otherwhise returns the GID.
-
-    home( USERNAME [,HOMEDIR] )
-        Read or modify a user's home directory. Returns the result of
-        operation (1 or "undef") if HOMEDIR was specified otherwhise returns
-        the HOMEDIR.
-
-    maxuid( )
-        This method returns the maximum UID in use by all users.
-
-    maxgid( )
-        This method returns the maximum GID in use by all groups.
-
-    unused_uid( [MINUID] [,MAXUID] )
-        This method returns the first unused UID in a given range. The
-        default MINUID is 0. The default MAXUID is maximal integer value
-        (computed from $Config{ intsize } ).
-
-    unused_gid( [MINGID] [,MAXGID] )
-        This method returns the first unused GID in a given range. The
-        default MINGID is 0. The default MAXGID is maximal integer value
-        (computed from $Config{ intsize } ).
-
-    passwd( USERNAME [,PASSWD] )
-        Read or modify a user's password. If you have a plaintext password,
-        use the encpass method to encrypt it before passing it to this
-        method. Returns the result of operation (1 or "undef") if PASSWD was
-        specified. Otherwhise returns the PASSWD.
-
-    rename( OLDNAME, NEWNAME )
-        This method changes the username for a user. If NEWNAME corresponds
-        to an existing user, that user will be overwritten. It returns FALSE
-        on failure and TRUE on success.
-
-    shell( USERNAME [,SHELL] )
-        Read or modify a user's shell. Returns the result of operation (TRUE
-        or FALSE) if SHELL was specified otherwhise returns the SHELL.
-
-    uid( USERNAME [,UID] )
-        Read or modify a user's UID. Returns the result of operation (TRUE
-        or FALSE) if UID was specified otherwhise returns the UID.
-
-    user( USERNAME [,PASSWD, UID, GID, GECOS, HOMEDIR, SHELL] )
-        This method can add, modify, or return information about a user.
-        Supplied with a single username parameter, it will return a six
-        element list consisting of (PASSWORD, UID, GID, GECOS, HOMEDIR,
-        SHELL), or undef if no such user exists. If you supply all seven
-        parameters, the named user will be created or modified if it already
-        exists.
-
-    group( GROUPNAME [,GID, ARRAYREF] )
-        This method can add, modify, or return information about a group.
-        Supplied with a single groupname parameter, it will return a two
-        element list consisting of (GID, ARRAYREF), where ARRAYREF is a ref
-        to array consisting names of users in this GROUP. It will return
-        undef and ref to empty array ("undef, [ ]") if no such group exists.
-        If you supply all three parameters, the named group will be created
-        or modified if it already exists.
-
-    users()
-        This method returns a list of all existing usernames.
-
-    users_from_shadow()
-        This method returns a list of all existing usernames in a shadow
-        file.
-
-    groups()
-        This method returns a list of all existing groups.
-
-    groups_from_gshadow()
-        This method returns a list of all existing groups in a gshadow file.
-
-    exists_user(USERNAME)
-        This method checks if specified user exists. It returns TRUE or
-        FALSE.
-
-    exists_group(GROUPNAME)
-        This method checks if specified group exists. It returns TRUE or
-        FALSE.
-
-    default_umask([UMASK])
-        This method, if called with an argument, sets default umask for this
-        module (not Your program!). Otherwise returns the current UMASK.
-        Probably You don't want to change this.
-
-    passwd_file([PATH])
-        This method, if called with an argument, sets path to the *passwd*
-        file. Otherwise returns the current PATH.
-
-    shadow_file([PATH])
-        This method, if called with an argument, sets path to the *shadow*
-        file. Otherwise returns the current PATH.
-
-    group_file([PATH])
-        This method, if called with an argument, sets path to the *group*
-        file. Otherwise returns the current PATH.
-
-    gshadow_file([PATH])
-        This method, if called with an argument, sets path to the *gshadow*
-        file. Otherwise returns the current PATH.
-
-    reset()
-        This method sets paths to files *passwd*, *shadow*, *group* to the
-        default values.
+      This method will encrypt plain text into unix style password.
 
     error()
-        This method returns the last error (even if "warnings" is disabled).
+
+      This method returns the last error (even if "warnings" is disabled).
+
+    exists_user(USERNAME)
+
+      This method checks if specified user exists. It returns undef on
+      failure and 1 on success.
+
+    exists_group(GROUPNAME)
+
+      This method checks if specified group exists. It returns undef on
+      failure and 1 on success.
+
+    gecos( USERNAME [,GECOS] )
+
+      Read or modify a user's GECOS string (typically full name). Returns
+      the result of operation (1 or undef) if GECOS was specified.
+      Otherwhise returns the GECOS if any.
+
+    gid( USERNAME [,GID] )
+
+      Read or modify a user's GID. Returns the result of operation (1 or
+      undef) if GID was specified otherwhise returns the GID if any.
+
+    group( GROUPNAME [,GID, ARRAYREF] )
+
+      This method can add, modify, or return information about a group.
+      Supplied with a single groupname parameter, it will return a two
+      element list consisting of (GID, ARRAYREF), where ARRAYREF is a ref
+      to array consisting names of users in this GROUP. It will return
+      undef and ref to empty array (undef, [ ]) if no such group exists. If
+      you supply all three parameters, the named group will be created or
+      modified if it already exists.
+
+    group_file([PATH])
+
+      This method, if called with an argument, sets path to the group file.
+      Otherwise returns the current PATH.
+
+    groups()
+
+      This method returns a list of all existing groups.
+
+    groups_from_gshadow()
+
+      This method returns a list of all existing groups in a gshadow file.
+
+    gshadow_file([PATH])
+
+      This method, if called with an argument, sets path to the gshadow
+      file. Otherwise returns the current PATH.
+
+    home( USERNAME [,HOMEDIR] )
+
+      Read or modify a user's home directory. Returns the result of
+      operation (1 or undef) if HOMEDIR was specified otherwhise returns
+      the HOMEDIR if any.
+
+    maxuid( )
+
+      This method returns the maximum UID in use.
+
+    maxgid()
+
+      This method returns the maximum GID in use.
+
+    minuid( [UID] )
+
+      This method returns the minimum UID in use, that is greater then
+      spupplied.
+
+    mingid()
+
+      This method returns the minimum GID in use, that is greater then
+      spupplied.
+
+    passwd( USERNAME [,PASSWD] )
+
+      Read or modify a user's password. If you have a plaintext password,
+      use the encpass method to encrypt it before passing it to this
+      method. Returns the result of operation (1 or undef) if PASSWD was
+      specified. Otherwhise returns the PASSWD if any.
+
+    passwd_file([PATH])
+
+      This method, if called with an argument, sets path to the passwd
+      file. Otherwise returns the current PATH.
+
+    rename( OLDNAME, NEWNAME )
+
+      This method changes the username for a user. If NEWNAME corresponds
+      to an existing user, that user will be overwritten. It returns undef
+      on failure and 1 on success.
+
+    reset()
+
+      This method sets paths to files passwd, shadow, group, gshadow to the
+      default values.
+
+    shell( USERNAME [,SHELL] )
+
+      Read or modify a user's shell. Returns the result of operation (1 or
+      undef) if SHELL was specified otherwhise returns the SHELL if any.
+
+    uid( USERNAME [,UID] )
+
+      Read or modify a user's UID. Returns the result of operation (1 or
+      undef) if UID was specified otherwhise returns the UID if any.
+
+    user( USERNAME [,PASSWD, UID, GID, GECOS, HOMEDIR, SHELL] )
+
+      This method can add, modify, or return information about a user.
+      Supplied with a single username parameter, it will return a six
+      element list consisting of (PASSWORD, UID, GID, GECOS, HOMEDIR,
+      SHELL), or undef if no such user exists. If you supply all seven
+      parameters, the named user will be created or modified if it already
+      exists.
+
+    users()
+
+      This method returns a list of all existing usernames.
+
+    users_from_shadow()
+
+      This method returns a list of all existing usernames in a shadow
+      file.
+
+    shadow_file([PATH])
+
+      This method, if called with an argument, sets path to the shadow
+      file. Otherwise returns the current PATH.
+
+    unused_uid( [MINUID] [,MAXUID] )
+
+      This method returns the first unused UID in a given range. The
+      default MINUID is 0. The default MAXUID is maximal integer value
+      (computed from $Config{ intsize } ).
+
+    unused_gid( [MINGID] [,MAXGID] )
+
+      This method returns the first unused GID in a given range. The
+      default MINGID is 0. The default MAXGID is maximal integer value
+      (computed from $Config{ intsize } ).
+
+    warnings()
+
+      This method allows to specify if warnings has to be displayed (1 for
+      on, 0 for off). Whether you can check last warning/failure by calling
+      error.
 
 DEPENDENCIES
-    Struct::Compare
-    Crypt::PasswdMD5
+
+    Crypt::Password
+
+    IO::Compress::Bzip2
+
+    Path::Tiny
+
+    Tie::Array::CSV
+
+TODO
+
+    Preparation of tests.
 
 INCOMPATIBILITIES
+
     None known.
 
 BUGS AND LIMITATIONS
+
     None. I hope.
 
 THANKS
+
     Thanks to Jonas Genannt for many suggestions and patches!
-    Thanks to Christian Kuelker for suggestions and reporting some bugs :-).
+
+    Thanks to Christian Kuelker for suggestions and reporting some bugs
+    :-).
+
     Thanks to Steven Haryanto for suggestions.
+
     BIG THANKS to Lopes Victor for reporting some bugs and his exact
     sugesstions :-)
-    Thanks to Foudil BRÃ‰TEL for some remarks, suggestions as well as
+
+    Thanks to Foudil BRÉTEL for some remarks, suggestions as well as
     supplying relevant patch!
+
     BIG thanks to Artem Russakovskii for reporting a bug.
 
 AUTHOR
+
     Strzelecki Lukasz <lukasz@strzeleccy.eu>
 
 LICENCE AND COPYRIGHT
+
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
 
     See http://www.perl.com/perl/misc/Artistic.html
+
+POD ERRORS
+
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 315:
+
+      Non-ASCII character seen before =encoding in 'BRÉTEL'. Assuming UTF-8
 

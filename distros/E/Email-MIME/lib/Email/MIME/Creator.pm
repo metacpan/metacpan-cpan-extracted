@@ -1,9 +1,8 @@
-use 5.008001;
-use strict;
+use v5.12.0;
 use warnings;
-package Email::MIME::Creator;
+package Email::MIME::Creator 1.953;
 # ABSTRACT: obsolete do-nothing library
-$Email::MIME::Creator::VERSION = '1.952';
+
 use parent q[Email::Simple::Creator];
 use Email::MIME;
 use Encode ();
@@ -44,7 +43,7 @@ Email::MIME::Creator - obsolete do-nothing library
 
 =head1 VERSION
 
-version 1.952
+version 1.953
 
 =head1 SYNOPSIS
 
@@ -66,7 +65,7 @@ the minimum required perl.
 
 =item *
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =item *
 

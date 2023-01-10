@@ -1,0 +1,33 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 20840ecbaabb5adbef90b6dbf4d2adaa6a86908906a08d60cb843330e9b5ff64 Changes
+SHA256 eb7c9203a816e75efd5eb31482f4e7298da3bb673b7088fe1181d0f537b75391 LICENSE
+SHA256 dc31ef92ed57a68a722da4ab0277634802f4dfbcaa1d9c77ecfa66ce9a76e59f MANIFEST
+SHA256 0d9bf2615842d0c7e73bcf94655be85a69e2fc50f105239c2fc53683854bd218 META.json
+SHA256 437adba62335bf93676a2863d80fda52ca6efe6b8edd1d2dd98355878aac39f3 META.yml
+SHA256 c752738287fcc1ee9db5e54d4a459fd30ae5ee6cd5a9ba50b326398eb5907e80 Makefile.PL
+SHA256 3ab96d1ab679370b9b75478d4c60a8de3cb7d6ba035ba2673196a36ef6d21c26 README
+SHA256 79b4db14cfaddabdf931b4b7713c9b556c71de8ea5a7fcd4f4bc1353651a801b dist.ini
+SHA256 018d85447544e014720c027f6669727960be3f005ce81aaa3a3f854eff69a5de lib/Mojolicious/Plugin/Kinde.pm
+SHA256 6922cf687ed6db9564fcbc577a2cb02bf42b02d18d5bdb1b252465a38d91d089 t/00-compile.t
+SHA256 867ba18f52bd4126e42ca8db26b7984177cd48d325fa866057133884e09710ad t/00-report-prereqs.dd
+SHA256 5996417e8ae9973f82860dcf6d5f180d285d5c4b046e0346d06ed22802a3452b t/00-report-prereqs.t
+SHA256 b6b98c35caa1713f7b7d10283e033065eb578adc8ac59c71ee2ed97671cfecb1 t/author-pod-coverage.t
+SHA256 8835ccb71da79a1b53a576dd349e188d444fce139e1f9f62976458c066b8edf9 t/author-pod-linkcheck.t
+SHA256 305c657c6b73f10767a0ea286b8a73d693940f4cbb8b6a0a4d34e2b5a1c04635 t/author-pod-syntax.t
+SHA256 991f0e31a0b5eacae63fc3145d6b2e6124d705a56d305bf0f25fd7dcd17e7c22 t/release-cpan-changes.t
+SHA256 c7abebad263617efe56a21c1387a18c4054ed60f55212c15e199c4443edd815e t/release-dist-manifest.t

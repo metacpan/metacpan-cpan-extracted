@@ -1,8 +1,8 @@
-use strict;
+use v5.12.0;
 use warnings;
-package Test::Routine::Compositor;
+package Test::Routine::Compositor 0.030;
 # ABSTRACT: the tool for turning test routines into runnable classes
-$Test::Routine::Compositor::VERSION = '0.029';
+
 use Carp qw(confess);
 use Class::Load;
 use Moose::Meta::Class;
@@ -19,7 +19,7 @@ sub _invocant_for {
 
   return $thing if blessed $thing;
 
-  $arg ||= {};
+  $arg //= {};
   my $new_class = $self->_class_for($thing);
   $new_class->name->new($arg);
 }
@@ -65,7 +65,7 @@ sub instance_builder {
   return sub { $inv } if blessed $inv;
 
   my $new_class = $class->_class_for($inv);
-  $arg ||= {};
+  $arg //= {};
 
   return sub { $new_class->new($arg); };
 }
@@ -84,7 +84,7 @@ Test::Routine::Compositor - the tool for turning test routines into runnable cla
 
 =head1 VERSION
 
-version 0.029
+version 0.030
 
 =head1 PERL VERSION
 

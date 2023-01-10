@@ -71,7 +71,7 @@
    "provides" : {
       "App::BPOMUtils::NutritionFacts" : {
          "file" : "lib/App/BPOMUtils/NutritionFacts.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       }
    },
    "release_status" : "stable",
@@ -86,7 +86,7 @@
          "web" : "https://github.com/perlancar/perl-App-BPOMUtils-NutritionFacts"
       }
    },
-   "version" : "0.015",
+   "version" : "0.016",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

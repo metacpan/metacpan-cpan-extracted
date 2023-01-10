@@ -18,7 +18,6 @@ do { my $x = {
                                         'File::Which' => '1.23',
                                         'File::chdir' => '0',
                                         'IO::Handle' => '0',
-                                        'IPC::Run' => '0',
                                         'POSIX' => '0',
                                         'Perl::OSType' => '0',
                                         'Try::Tiny' => '0',

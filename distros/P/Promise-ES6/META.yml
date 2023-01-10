@@ -12,9 +12,9 @@ build_requires:
   Test::More: '1.302103'
   autodie: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,8 +24,10 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  Future::AsyncAwait: '0.47'
 resources:
   bugtracker: https://github.com/FGasper/p5-Promise-ES6/issues
   repository: git://github.com/FGasper/p5-Promise-ES6.git
-version: '0.25'
+version: '0.26'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

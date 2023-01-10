@@ -99,7 +99,7 @@ sub get_db_handle {
 sub get_databases {
     my ( $sf ) = @_;
     return \@ARGV if @ARGV;
-    my @regex_system_db = ( '^mysql$', '^information_schema$', '^performance_schema$' );
+    my @regex_system_db = ( '^mysql$', '^information_schema$', '^performance_schema$', '^sys$' );
     my $stmt = "SELECT schema_name FROM information_schema.schemata";
     if ( ! $sf->{o}{G}{metadata} ) {
         $stmt .= " WHERE " . join( " AND ", ( "schema_name NOT REGEXP ?" ) x @regex_system_db );

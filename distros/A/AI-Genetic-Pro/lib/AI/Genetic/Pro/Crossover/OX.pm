@@ -1,5 +1,5 @@
 package AI::Genetic::Pro::Crossover::OX;
-
+$AI::Genetic::Pro::Crossover::OX::VERSION = '1.009';
 use warnings;
 use strict;
 use List::MoreUtils qw(first_index);

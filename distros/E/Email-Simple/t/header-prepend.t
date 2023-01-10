@@ -1,6 +1,6 @@
-#!perl
-use strict;
+use v5.12.0;
 use warnings;
+
 use Test::More;
 
 # This test is not here to encourage you to muck about in the object guts, but

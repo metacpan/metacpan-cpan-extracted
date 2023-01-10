@@ -6,8 +6,9 @@ use warnings;
 use Error::Pure qw(err);
 use Mo qw(build default is);
 use Mo::utils qw(check_array_object check_number check_number_of_items);
+use Wikibase::Datatype::Value::Monolingual;
 
-our $VERSION = 0.23;
+our $VERSION = 0.24;
 
 has aliases => (
 	default => [],
@@ -75,6 +76,24 @@ sub BUILD {
 	check_array_object($self, 'labels', 'Wikibase::Datatype::Value::Monolingual',
 		'Label');
 	check_number_of_items($self, 'labels', 'language', 'Label', 'language');
+
+	# If length of value is greater than 250, strip.
+	my @labels = @{$self->labels};
+	my $strip_label = 0;
+	for (my $i = 0; $i < @labels; $i++) {
+		if (length $labels[$i]->value > 250) {
+			my $new_label = substr $labels[$i]->value, 0, 250;
+			my $new_language = $labels[$i]->language;
+			$strip_label = 1;
+			$labels[$i] = Wikibase::Datatype::Value::Monolingual->new(
+				'language' => $new_language,
+				'value' => $new_label,
+			);
+		}
+	}
+	if ($strip_label) {
+		$self->{'labels'} = \@labels;
+	}
 
 	# Check page id.
 	check_number($self, 'page_id');
@@ -155,7 +174,8 @@ Parameter is optional.
 
 =item * C<labels>
 
-Item descriptions. One per language.
+Item descriptions. One per language. Check length of string (250) and strip it
+if it's longer.
 Reference to array with Wikibase::Datatype::Value::Monolingual instances.
 Parameter is optional.
 
@@ -594,12 +614,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2022 Michal Josef Špaček
+© 2020-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.23
+0.24
 
 =cut

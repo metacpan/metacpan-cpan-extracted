@@ -13,6 +13,7 @@ t/30_prelim.t
 t/50_shebang.t
 t/55_tied.t
 t/56_overload.t
+t/57_numeric_show.t
 t/80_random.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t

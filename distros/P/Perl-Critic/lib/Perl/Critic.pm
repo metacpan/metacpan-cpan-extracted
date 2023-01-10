@@ -18,11 +18,10 @@ use Perl::Critic::Config;
 use Perl::Critic::Violation;
 use Perl::Critic::Document;
 use Perl::Critic::Statistics;
-#use Perl::Critic::Utils qw< :characters >;
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '1.146';
+our $VERSION = '1.148';
 
 Readonly::Array our @EXPORT_OK => qw(critique);
 
@@ -627,7 +626,7 @@ A simple configuration might look like this:
     [Modules::RequireFilenameMatchesPackage]
     add_themes = larry
 
-    [TestingAndDebugging::RequireTestLables]
+    [TestingAndDebugging::RequireTestLabels]
     add_themes = larry curly moe
 
     #--------------------------------------------------------------

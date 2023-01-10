@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
     "bin/fu-hash",
     "bin/fu-len",
     "bin/fu-rename",
+    "bin/fu-say",
     "bin/fu-sort",
     "bin/fu-uniq",
     "bin/n50"
@@ -37,7 +38,7 @@ my %WriteMakefileArgs = (
     "Pod::Usage" => "1.61",
     "Text::ASCIITable" => 0
   },
-  "VERSION" => "1.5.0",
+  "VERSION" => "1.5.4",
   "test" => {
     "TESTS" => "t/*.t"
   }

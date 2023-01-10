@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::VivaldiUtils",
   "PREREQ_PM" => {
-    "App::BrowserUtils" => "0.017",
+    "App::BrowserUtils" => "0.018",
     "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" => 0,
     "Data::Sah::Compiler::perl::TH::any" => "0.911",
     "Data::Sah::Compiler::perl::TH::array" => "0.911",
@@ -43,6 +43,7 @@ my %WriteMakefileArgs = (
     "Perinci::CmdLine::Any" => "0.152",
     "Perinci::CmdLine::Lite" => "1.915",
     "Sah::Schema::true" => 0,
+    "Sah::Schema::unix::signal" => 0,
     "Sah::Schema::unix::uid::exists" => 0,
     "Vivaldi::Util::Profile" => 0,
     "strict" => 0,
@@ -54,7 +55,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,7 +63,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::BrowserUtils" => "0.017",
+  "App::BrowserUtils" => "0.018",
   "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" => 0,
   "Data::Sah::Compiler::perl::TH::any" => "0.911",
   "Data::Sah::Compiler::perl::TH::array" => "0.911",
@@ -78,6 +79,7 @@ my %FallbackPrereqs = (
   "Perinci::CmdLine::Any" => "0.152",
   "Perinci::CmdLine::Lite" => "1.915",
   "Sah::Schema::true" => 0,
+  "Sah::Schema::unix::signal" => 0,
   "Sah::Schema::unix::uid::exists" => 0,
   "Test::More" => 0,
   "Vivaldi::Util::Profile" => 0,

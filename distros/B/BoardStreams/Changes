@@ -1,5 +1,13 @@
 Revision history for Perl extension BoardStreams
 
+v0.0.30 2023-01-09T23:37:24Z
+
+    - added version numbers to all modules of the distro
+
+v0.0.29 2023-01-09T16:52:45Z
+
+    - complete rewrite, completely breaking backwards compatibility
+
 v0.0.23 2021-09-08T23:14:09Z
 
     - upgraded version of Mojo::Pg dependency to 4.26, and removed

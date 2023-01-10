@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Test::Deep::MM 1.202;
+package Test::Deep::MM 1.204;
 
 sub import
 {
@@ -75,7 +75,7 @@ Test::Deep::MM
 
 =head1 VERSION
 
-version 1.202
+version 1.204
 
 =head1 PERL VERSION
 

@@ -1,6 +1,7 @@
-package Test::Routine::Runner;
+use v5.12.0;
+package Test::Routine::Runner 0.030;
 # ABSTRACT: tools for running Test::Routine tests
-$Test::Routine::Runner::VERSION = '0.029';
+
 use Moose;
 
 #pod =head1 OVERVIEW
@@ -22,27 +23,6 @@ use Try::Tiny;
 use Moose::Util::TypeConstraints;
 
 use namespace::clean;
-
-# XXX: THIS CODE BELOW WILL BE REMOVED VERY SOON -- rjbs, 2010-10-18
-use Sub::Exporter -setup => {
-  exports => [
-    run_tests => \'_curry_tester',
-    run_me    => \'_curry_tester',
-  ],
-  groups  => [ default   => [ qw(run_me run_tests) ] ],
-};
-
-sub _curry_tester {
-  my ($class, $name) = @_;
-  use Test::Routine::Util;
-  my $sub = Test::Routine::Util->_curry_tester($name);
-
-  return sub {
-    warn "you got $name from Test::Routine::Runner; use Test::Routine::Util instead; Test::Routine::Runner's exports will be removed soon\n";
-    goto &$sub;
-  }
-}
-# XXX: THIS CODE ABOVE WILL BE REMOVED VERY SOON -- rjbs, 2010-10-18
 
 subtype 'Test::Routine::_InstanceBuilder', as 'CodeRef';
 subtype 'Test::Routine::_Instance',
@@ -80,7 +60,7 @@ sub run {
               $test_instance->meta->get_all_methods;
 
   my $re = $ENV{TEST_METHOD};
-  if (defined $re and length $re) {
+  if (length $re) {
     my $filter = try { qr/$re/ } # compile the the regex separately ...
         catch { croak("TEST_METHOD ($re) is not a valid regular expression: $_") };
     $filter = qr/\A$filter\z/;  # ... so it can't mess with the anchoring
@@ -122,7 +102,7 @@ Test::Routine::Runner - tools for running Test::Routine tests
 
 =head1 VERSION
 
-version 0.029
+version 0.030
 
 =head1 OVERVIEW
 

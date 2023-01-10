@@ -1,5 +1,5 @@
 package AI::Genetic::Pro::Crossover::PMX;
-
+$AI::Genetic::Pro::Crossover::PMX::VERSION = '1.009';
 use warnings;
 use strict;
 use List::MoreUtils qw(indexes);

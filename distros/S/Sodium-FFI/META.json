@@ -1,10 +1,10 @@
 {
-   "abstract" : "FFI implementation of libsodium",
+   "abstract" : "Sodium is a modern, easy-to-use software library for encryption, decryption, signatures, password hashing, and more.",
    "author" : [
       "Chase Whitener <capoeirab@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -84,7 +84,7 @@
    "provides" : {
       "Sodium::FFI" : {
          "file" : "lib/Sodium/FFI.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       }
    },
    "release_status" : "stable",
@@ -99,12 +99,12 @@
          "web" : "https://github.com/genio/sodium-ffi"
       }
    },
-   "version" : "0.007",
+   "version" : "0.008",
    "x_contributors" : [
       "Chase Whitener <cwhitener@gmail.com>"
    ],
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

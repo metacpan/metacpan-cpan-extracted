@@ -10,7 +10,13 @@ use Test::FailWarnings -allow_deps => 1;
 use Test::Fatal;
 use Test::Deep;
 
+use Config;
+
 use parent 'Test::Class';
+
+if ($Config{'ccflags'} =~ m<DEBUGGING>) {
+    plan skip_all => 'DEBUGGING confuses Future::AsyncAwait.';
+}
 
 if ($^V lt v5.24.0) {
     plan skip_all => 'https://rt.cpan.org/Public/Bug/Display.html?id=137723';

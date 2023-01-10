@@ -8,7 +8,7 @@ use Readonly;
 use Perl::Critic::Utils qw{ :severities :data_conversion :classification };
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.146';
+our $VERSION = '1.148';
 
 Readonly::Array my @TERMINALS => qw( die exit croak confess );
 Readonly::Hash  my %TERMINALS => hashify( @TERMINALS );
@@ -52,13 +52,13 @@ sub violates {
     # operators.  If any are found, then this the following statements
     # could _potentially_ be executed, so this policy is satisfied.
 
-    # NOTE: When the first operand in an boolean expression is
+    # NOTE: When the first operand in a boolean expression is
     # C<croak> or C<die>, etc., the second operand is technically
     # unreachable.  But this policy doesn't catch that situation.
 
     for my $child ( $statement->schildren() ) {
-        return if $child->isa('PPI::Token::Operator') && exists $OPERATORS{$child};
-        return if $child->isa('PPI::Token::Word') && exists $CONDITIONALS{$child};
+        return if exists $OPERATORS{$child}    && $child->isa('PPI::Token::Operator');
+        return if exists $CONDITIONALS{$child} && $child->isa('PPI::Token::Word');
     }
 
     return $self->_gather_violations($statement);

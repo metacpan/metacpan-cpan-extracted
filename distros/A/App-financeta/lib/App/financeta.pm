@@ -2,48 +2,67 @@ package App::financeta;
 use strict;
 use warnings;
 use 5.10.0;
+use App::financeta::utils qw(dumper log_filter);
+use Log::Any '$log', filter => \&App::financeta::utils::log_filter;
+use Log::Any::Adapter 'Stderr';
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 $VERSION = eval $VERSION;
 
-use App::financeta::gui;
-use Carp;
-
-sub print_warning {
+sub print_banner {
     my $pkg = shift || __PACKAGE__;
+    my $this_year = (gmtime)[5] + 1900;
     my $license = <<"LICENSE";
-    $pkg  Copyright (C) 2014  Vikas N Kumar <vikas\@cpan.org>
+    $pkg  Copyright (C) 2013-$this_year  Vikas N Kumar <vikas\@cpan.org>
     This program comes with ABSOLUTELY NO WARRANTY; for details read the LICENSE
-    file in the distribution.
-    This is free software, and you are welcome to redistribute it
-    under certain conditions.
-    The developers are not responsible for any profits or losses due to use of this software.
-    Use at your own risk and with your own intelligence.
+    file in the distribution.This is free software, and you are welcome to
+    redistribute it under certain conditions. The developers are not responsible
+    for any profits or losses incurred due to the use of this software. Use at your own
+    risk and with your own intelligence.
 LICENSE
-    print STDERR "$license\n";
+    print STDERR $license, "\n";
+    return;
+}
+
+sub get_version { return $VERSION; }
+
+sub print_version_and_exit {
+    die __PACKAGE__ . " Version $VERSION\n";
 }
 
 sub run {
     my @args = @_;
-    shift @args if (@args and $args[0] eq __PACKAGE__);
+    shift @args if (@args and ($args[0] eq __PACKAGE__ or ref($args[0]) eq __PACKAGE__));
     my %opts = @args;
-    if ($opts{version}) {
-        print __PACKAGE__ . " Version $VERSION\n";
-        return;
+    delete $opts{help};
+    delete $opts{version};
+    my $log_level;
+    $opts{verbose} //= 0;
+    if ($opts{verbose} >= 3) {
+        $log_level = 'trace';
+    } elsif ($opts{verbose} eq 2 or $opts{debug}) {
+        $log_level = 'debug';
+    } elsif ($opts{quiet} or $opts{verbose} eq 0) {
+        $log_level = 'warn';
+    } else {
+        $log_level = 'info';
     }
-    if ($opts{help}) {
-        print "Help: Coming soon\n";
-        return;
-    }
-    my $gui = App::financeta::gui->new(debug => $opts{debug},
+    delete $opts{quiet};
+    Log::Any::Adapter->set('Stderr', log_level => $log_level);
+    $log->debug("Options sent to the Gui: " . dumper(\%opts));
+    $log->debug("Setting log level to $log_level");
+    eval { require App::financeta::gui; } or die "Unable to load App::financeta::gui";
+    my $gui = App::financeta::gui->new(
+        log_level => $log_level,
+        debug => $opts{debug},
         brand => __PACKAGE__,
     );
-    $gui->run;
+    return $gui->run;
 }
 
 1;
 __END__
-### COPYRIGHT: 2014 Vikas N. Kumar. All Rights Reserved.
+### COPYRIGHT: 2013-2023 Vikas N. Kumar. All Rights Reserved.
 ### AUTHOR: Vikas N Kumar <vikas@cpan.org>
 ### DATE: 15th Aug 2014
 ### LICENSE: Refer LICENSE file
@@ -59,13 +78,13 @@ as an application. It handles command line processing of C<financeta>.
 
 =head1 VERSION
 
-0.10
+0.11
 
 DESCRIPTION
 
-    The documentation is detailed at http://vikasnkumar.github.io/financeta/
+The documentation is detailed at http://vikasnkumar.github.io/financeta/
 
-    The github repository is at https://github.com/vikasnkumar/financeta.git
+The github repository is at https://github.com/vikasnkumar/financeta.git
 
 =head1 METHODS
 
@@ -96,9 +115,29 @@ The commandline script that calls C<App::financeta>.
 
 =back
 
+=head1 DEPENDENCIES FOR DEVELOPERS
+
+=over
+
+=item B<Linux>
+
+For Linux, such as Debian/Ubuntu based systems like Debian Bullseye or Ubuntu 20.04 LTS, you want the following packages installed:
+
+    libheif-dev libwebp-dev libxpm-dev libgtk-3-dev libgtkmm-3.0-dev libpng-dev libjpeg-dev libtiff-dev gnuplot
+
+Then you build L<Prima>, L<PDL>, L<PDL::Graphics::Gnuplot>, L<PDL::Graphics::Simple>, L<Mo>, L<IO::All>.
+
+=item B<Windows>
+
+For Windows you need Strawberry Perl installed and install L<Prima>, L<PDL>, L<PDL::Graphics::Prima>, L<PDL::Graphics::Gnuplot>, L<PDL::Graphics::Simple>.
+
+You may want to install Gnuplot from their website.
+
+=back
+
 =head1 COPYRIGHT
 
-Copyright (C) 2013-2014. Vikas N Kumar <vikas@cpan.org>. All Rights Reserved.
+Copyright (C) 2013-2023. Vikas N Kumar <vikas@cpan.org>. All Rights Reserved.
 
 =head1 LICENSE
 

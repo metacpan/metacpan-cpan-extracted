@@ -1,50 +1,47 @@
 {
-   "abstract" : "Quadratic programming solver for PDL",
+   "abstract" : "unknown",
    "author" : [
-      "Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>"
+      "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132510",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PDL-Opt-QP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Devel::CheckLib" : "0.04",
-            "ExtUtils::CBuilder" : "0.23",
-            "ExtUtils::F77" : "0",
-            "Module::Build::Pluggable::CheckLib" : "1.02",
-            "Module::Build::Pluggable::Fortran" : "0.23",
-            "Module::Build::Pluggable::PDL" : "0.23",
-            "PDL" : "2.006"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Devel::CheckLib" : "0.04",
-            "Module::Build" : "0.4004",
-            "Module::Build::Pluggable" : "0",
-            "Module::Build::Pluggable::CheckLib" : "1.02",
-            "Module::Build::Pluggable::Fortran" : "0.23",
-            "Module::Build::Pluggable::PDL" : "0.23"
+            "Devel::CheckLib" : "0",
+            "ExtUtils::F77" : "0",
+            "PDL" : "2.063"
          }
       },
       "runtime" : {
          "requires" : {
-            "PDL" : "2.006"
+            "PDL" : "2.063"
          }
-      }
-   },
-   "provides" : {
-      "PDL::Opt::QP" : {
-         "file" : "lib/PDL/Opt/QP.pd",
-         "version" : "0.27"
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.88"
+         }
       }
    },
    "release_status" : "stable",
@@ -52,16 +49,13 @@
       "bugtracker" : {
          "web" : "https://github.com/mvgrimes/pdl-opt-qp/issues"
       },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
       "repository" : {
-         "url" : "http://github.com/mvgrimes/pdl-opt-qp"
+         "type" : "git",
+         "url" : "git://github.com/mvgrimes/pdl-opt-qp.git",
+         "web" : "https://github.com/mvgrimes/pdl-opt-qp"
       }
    },
-   "version" : "0.27",
-   "x_test_requires" : {
-      "Test::Exception" : "0",
-      "Test::More" : "0"
-   }
+   "version" : "0.29",
+   "x_IRC" : "irc://irc.perl.org/#pdl",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

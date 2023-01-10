@@ -208,7 +208,8 @@ configures the handling of output send to STDERR:
 
 - `1`
 
-    identical to `2` when using a TUI and identical to `0` when using a GUI
+    identical to `2` when using a TUI (except `PoorTerm`) and identical to
+    `0` when using a GUI or `PoorTerm`
 
 - `0`
 

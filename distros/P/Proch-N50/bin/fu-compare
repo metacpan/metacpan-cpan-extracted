@@ -9,6 +9,11 @@ use FindBin qw($RealBin);
 use FASTX::Reader;
 use File::Basename;
 use Data::Dumper;
+# The following placeholder is to be programmatically replaced with 'use lib "$RealBin/../lib"' if needed
+#~loclib~
+if ( -e "$RealBin/../lib/Proch/N50.pm" and -e "$RealBin/../Changes" ) {
+    use lib "$RealBin/../lib";
+}
 sub loadseqs($);
 use Proch::Seqfu;
 my $VERSION = $Proch::Seqfu::VERSION // "<Dev>";
@@ -68,7 +73,7 @@ fu-compare - Find the common sequences between two files
 
 =head1 VERSION
 
-version 1.5.0
+version 1.5.4
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package Bundle::DadaMail;
 
-$VERSION = '0.0.16';
+$VERSION = '0.0.17';
 
 1;
 
@@ -22,7 +22,7 @@ C<Bundle::DadaMail> is a CPAN Bundle of all CPAN modules required to run Dada Ma
 
 Some modules are shipped with the app itself. These modules are for the most part Pure Perl. You may not want to use the included perllib, so we suggest installing C<Bundle::DadaMail> instead and letting your usual perl sys admin tools handle things in whatever way you do that. 
 
-Those modules are listed in, C<Bundle::DadaMail::IncludedInDistro>. Installing this module will also install that bundle.
+Those modules are listed in, C<Bundle::DadaMail::IncludedInDistribution>. Installing this module will also install that bundle.
 
 There are also optional modules that Dada Mail can utilize to extend its functionality. They are listed in, C<Bundle::DadaMailXXL> and installing C<Bundle::DadaMailXXL> will install the two bundles already mentioned.
 
@@ -38,7 +38,7 @@ L<https://github.com/justingit/Bundle-DadaMail>
 
 =head1 CONTENTS
 
-Bundle::DadaMail::IncludedInDistro
+Bundle::DadaMail::IncludedInDistribution
 
 DBI
 

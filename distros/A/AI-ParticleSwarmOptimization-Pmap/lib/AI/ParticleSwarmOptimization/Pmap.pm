@@ -1,5 +1,5 @@
 package AI::ParticleSwarmOptimization::Pmap;
-
+$AI::ParticleSwarmOptimization::Pmap::VERSION = '1.008';
 use strict;
 use warnings;
 use base qw( 
@@ -8,8 +8,6 @@ use base qw(
 #-----------------------------------------------------------------------
 use List::Util 					qw( min );
 use Parallel::parallel_map;
-#-----------------------------------------------------------------------
-$AI::ParticleSwarmOptimization::Pmap::VERSION = '1.006';
 #=======================================================================
 sub _initParticles {
     my ($self) = @_;
@@ -158,6 +156,7 @@ AI::ParticleSwarmOptimization::Pmap - Particle Swarm Optimization (object orient
         $sum += ($_ - $offset++) ** 2 for @values;
         return $sum;
     }
+
 =head1 Description
 
 This module is enhancement of on original AI::ParticleSwarmOptimization to support 

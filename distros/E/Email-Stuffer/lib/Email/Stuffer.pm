@@ -1,8 +1,8 @@
-use strict;
+use v5.12.0;
 use warnings;
-package Email::Stuffer;
+package Email::Stuffer 0.019;
 # ABSTRACT: A more casual approach to creating and sending Email:: emails
-$Email::Stuffer::VERSION = '0.018';
+
 use Scalar::Util qw(blessed);
 
 #pod =head1 SYNOPSIS
@@ -163,8 +163,6 @@ use Scalar::Util qw(blessed);
 #pod
 #pod =cut
 
-use 5.005;
-use strict;
 use Carp                   qw(croak);
 use File::Basename         ();
 use Params::Util 1.05      qw(_INSTANCE _INSTANCEDOES);
@@ -383,7 +381,7 @@ sub subject {
 #####################################################################
 # Body and Attachments
 
-#pod =method text_body $body [, $attribute => $value, ... ]
+#pod =method text_body $body [, $attributes => $value, ... ]
 #pod
 #pod Sets the text body of the email. Appropriate headers are set for you.
 #pod You may override MIME attributes as needed. See the C<attributes>
@@ -790,7 +788,7 @@ Email::Stuffer - A more casual approach to creating and sending Email:: emails
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -908,6 +906,16 @@ generate some stuff, and email it to somewhere, as conveniently as
 possible. DWIM, but do it as thinly as possible and use the solid
 Email:: modules underneath.
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 METHODS
 
 As you can see from the synopsis, all methods that B<modify> the
@@ -1006,7 +1014,7 @@ Sets the Bcc: header in the email
 
 Sets the Subject: header in the email
 
-=head2 text_body $body [, $attribute => $value, ... ]
+=head2 text_body $body [, $attributes => $value, ... ]
 
 Sets the text body of the email. Appropriate headers are set for you.
 You may override MIME attributes as needed. See the C<attributes>
@@ -1163,13 +1171,13 @@ Adam Kennedy <adamk@cpan.org>
 
 =item *
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =back
 
 =head1 CONTRIBUTORS
 
-=for stopwords Aaron W. Swenson adam adamk@cpan.org adam@phase-n.com Alastair Douglas Aristotle Pagaltzis Arthur Axel 'fREW' Schmidt Chase Whitener CosmicNet Dan Book John Napiorkowski Josh Stompro Kevin Tew Kieren Diment Kris Matthews Lee Johnson Manni Heumann Pali Ricardo Signes Ross Attrill Russell Jenkins Shawn Sorichetti Steve Dondley tokuhirom
+=for stopwords Aaron W. Swenson adam adamk@cpan.org adam@phase-n.com Alastair Douglas Aristotle Pagaltzis Chase Whitener CosmicNet Dan Book fREW Schmidt John Napiorkowski Josh Stompro Kevin Tew Kieren Diment Kris Matthews Lee Johnson Manni Heumann Pali Ricardo Signes Ross Attrill Russell Jenkins Shawn Sorichetti Steve Dondley tokuhirom
 
 =over 4
 
@@ -1199,10 +1207,6 @@ Aristotle Pagaltzis <pagaltzis@gmx.de>
 
 =item *
 
-Arthur Axel 'fREW' Schmidt <frioux@gmail.com>
-
-=item *
-
 Chase Whitener <chase.whitener@infotechfl.com>
 
 =item *
@@ -1212,6 +1216,10 @@ CosmicNet <webmaster@cosmicperl.com>
 =item *
 
 Dan Book <grinnz@gmail.com>
+
+=item *
+
+fREW Schmidt <frioux@gmail.com>
 
 =item *
 
@@ -1228,10 +1236,6 @@ Kevin Tew <tewk@tan.tewk.com>
 =item *
 
 Kieren Diment <kd@fenchurch.local>
-
-=item *
-
-Kris Matthews <krismatth@icloud.com>
 
 =item *
 

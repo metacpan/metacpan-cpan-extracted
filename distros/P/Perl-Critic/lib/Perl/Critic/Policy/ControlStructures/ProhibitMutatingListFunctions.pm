@@ -13,7 +13,7 @@ use Perl::Critic::Utils qw{
 
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.146';
+our $VERSION = '1.148';
 
 #-----------------------------------------------------------------------------
 
@@ -187,7 +187,7 @@ sub _is_topic_mutating_regex {
     # should be a binding operator.
     return 1 if not _is_binding_operator( $prevsib );
 
-    # Check if the sibling before the biding operator
+    # Check if the sibling before the binding operator
     # is explicitly set to $_
     my $bound_to = $prevsib->sprevious_sibling;
     return _is_topic( $bound_to );
@@ -198,8 +198,10 @@ sub _is_topic_mutating_regex {
 sub _is_topic_mutating_func {
     my $elem = shift;
     return if not $elem->isa('PPI::Token::Word');
-    my @mutator_funcs = qw(chop chomp undef);
-    return if not any { $elem->content() eq $_ } @mutator_funcs;
+
+    state $mutator_funcs = { hashify qw( chop chomp undef ) };
+    return if !$mutator_funcs->{$elem->content()};
+
     return if not is_function_call( $elem );
 
     # If these functions have no argument,
@@ -207,8 +209,7 @@ sub _is_topic_mutating_func {
     my $first_arg = first_arg( $elem );
     if (not defined $first_arg) {
         # undef does not default to $_, unlike the others
-        return if $elem->content() eq 'undef';
-        return 1;
+        return $elem->content() ne 'undef';
     }
     return _is_topic( $first_arg );
 }
@@ -229,19 +230,19 @@ sub _is_topic_mutating_substr {
 
 #-----------------------------------------------------------------------------
 
-{
-    ##no critic(ArgUnpacking)
+sub _is_assignment_operator {   ## no critic (RequireArgUnpacking)
+    state $assignment_ops = { hashify qw( = *= /= += -= %= **= x= .= &= |= ^=  &&= ||= <<= >>= //= ++ --) };
+    return exists $assignment_ops->{$_[0]};
+}
 
-    my %assignment_ops = hashify qw(
-        = *= /= += -= %= **= x= .= &= |= ^=  &&= ||= <<= >>= //= ++ --
-    );
-    sub _is_assignment_operator { return exists $assignment_ops{$_[0]} }
+sub _is_increment_operator {    ## no critic (RequireArgUnpacking)
+    state $increment_ops = { hashify qw( ++ -- ) };
+    return exists $increment_ops->{$_[0]};
+}
 
-    my %increment_ops = hashify qw( ++ -- );
-    sub _is_increment_operator { return exists $increment_ops{$_[0]} }
-
-    my %binding_ops = hashify qw( =~ !~ );
-    sub _is_binding_operator { return exists $binding_ops{$_[0]} }
+sub _is_binding_operator {  ## no critic (RequireArgUnpacking)
+    state $binding_ops = { hashify qw( =~ !~ ) };
+    return exists $binding_ops->{$_[0]};
 }
 
 1;
@@ -274,7 +275,7 @@ source array.  This IS technically allowed, but those side effects can
 be quite surprising, especially when the array being passed is C<@_>
 or perhaps C<values(%ENV)>!  Instead authors should restrict in-place
 array modification to C<for(@array) { ... }> constructs instead, or
-use C<List::SomeUtiles:apply()> or C<List::MoreUtils::apply()>.
+use C<List::SomeUtils:apply()> or C<List::MoreUtils::apply()>.
 
 =head1 CONFIGURATION
 

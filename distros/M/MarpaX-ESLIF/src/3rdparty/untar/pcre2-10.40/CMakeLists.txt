@@ -1,4 +1,5 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 3.0.0 FATAL_ERROR)
+PROJECT(pcre2 VERSION 10.40.0 LANGUAGES C)
 IF (NOT MYPACKAGEBOOTSTRAP_DONE)
   INCLUDE ("../../../3rdparty/github/cmake-utils/cmake/MyPackageBootstrap.cmake")
 ENDIF ()
@@ -12,7 +13,7 @@ FOREACH (_policy CMP0018 CMP0063 CMP0075)
   ENDIF ()
 ENDFOREACH ()
 
-MYPACKAGESTART (pcre2 10 40 0)
+MYPACKAGESTART ()
 
 IF (FIXME_CMAKE_ABSOLUTE)
   INCLUDE(${FIXME_CMAKE_ABSOLUTE})
@@ -183,7 +184,7 @@ ENDIF(PCRE2_SUPPORT_VALGRIND)
 
 # Parse version numbers and date out of configure.ac
 
-file(STRINGS ${PROJECT_SOURCE_DIR}/configure.ac
+file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/configure.ac
   configure_lines
   LIMIT_COUNT 50 # Read only the first 50 lines of the file
 )
@@ -231,7 +232,7 @@ MYPACKAGELIBRARY(
   ${CMAKE_CURRENT_SOURCE_DIR}/config-cmake.h.in
   ${INCLUDE_OUTPUT_PATH}/config.h
   src/pcre2_auto_possess.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/pcre2_chartables.c
+  ${CMAKE_CURRENT_BINARY_DIR}/pcre2_chartables.c
   src/pcre2_compile.c
   src/pcre2_config.c
   src/pcre2_context.c
@@ -292,6 +293,11 @@ FOREACH (_target ${PROJECT_NAME} ${PROJECT_NAME}_static)
     SET_PROPERTY(TARGET ${_target} PROPERTY COMPILE_DEFINITIONS PCRE2_CODE_UNIT_WIDTH=32)
   ENDIF(PCRE2_BUILD_PCRE2_32)
 ENDFOREACH ()
+
+################################################################################
+# Static target is special and requires a public PCRE2_STATIC compile definition
+################################################################################
+TARGET_COMPILE_DEFINITIONS(${PROJECT_NAME}_static PUBLIC -DPCRE2_STATIC)
 
 #############
 # Packaging #

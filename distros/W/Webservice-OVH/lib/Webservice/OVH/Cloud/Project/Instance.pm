@@ -36,7 +36,7 @@ use warnings;
 use Carp qw{ carp croak };
 use JSON;
 
-our $VERSION = 0.47;
+our $VERSION = 0.48;
 
 use Webservice::OVH::Cloud::Project::Instance::Group;
 
@@ -737,7 +737,7 @@ sub delete {
     $self->{_valid} = 0;
 }
 
-=head2 delete
+=head2 active_monthly_billing
 
 Activates monthly billing for rinstance.
 
@@ -763,7 +763,7 @@ sub active_monthly_billing {
     croak $response->error if $response->error;
 }
 
-=head2 delete
+=head2 monitoring
 
 Return many statistics about the virtual machine for a given period
 

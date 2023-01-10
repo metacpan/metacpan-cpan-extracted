@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Types;
-$Bitcoin::Crypto::Types::VERSION = '1.007';
+$Bitcoin::Crypto::Types::VERSION = '1.008';
 use v5.10;
 use strict;
 use warnings;
@@ -8,17 +8,8 @@ use Type::Coercion;
 use Types::Common::Numeric qw(assert_PositiveInt);
 use Types::Standard qw(Int InstanceOf Enum);
 
-BEGIN {
-	require Math::BigInt;
-
-	# Version 1.6003 of optional GMP is required for the from_bytes / to_bytes implementations
-	if (eval { require Math::BigInt::GMP; Math::BigInt::GMP->VERSION('1.6003'); 1 }) {
-		Math::BigInt->import(try => 'GMP,LTM');
-	}
-	else {
-		Math::BigInt->import(try => 'LTM');
-	}
-}
+# make sure Math::BigInt is loaded - this module loads it
+use Bitcoin::Crypto::Helpers;
 
 __PACKAGE__->add_type(
 	name => "BIP44Purpose",

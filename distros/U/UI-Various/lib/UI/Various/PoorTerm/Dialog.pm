@@ -33,7 +33,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use UI::Various::core;
 use UI::Various::Dialog;
@@ -157,6 +157,28 @@ sub destroy($)
     debug(2, __PACKAGE__, '::destroy');
     my ($self) = @_;
     $self->{_self_destruct} = 1;
+}
+
+#########################################################################
+
+=head2 B<_draw> - show dialogue
+
+C<PoorTerm>'s concrete implementation of
+L<UI::Various::Dialog::draw|UI::Various::Dialog/draw - show dialogue>
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+sub _draw($)
+{
+    debug(2, __PACKAGE__, '::_draw');
+    my ($self) = @_;
+
+    if ($self->top->{_running})
+    {
+	$self->_process;
+    }
 }
 
 1;

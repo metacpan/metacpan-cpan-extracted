@@ -109,10 +109,10 @@ sub get {
 
     my $source = $self->_sanitize_path( $path );
 
-    # We need to double encode the backslash escape (for local and remote) 
+    # We need to double encode the backslash escape (for local and remote)
     $source =~ s/\\/\\/g;
 
-    my $tmpdir = tempdir( CLEANUP => 1 );    
+    my $tmpdir = tempdir( CLEANUP => 1 );
     my ($fh, $target) = tempfile( DIR => $tmpdir );
 
     my $res = $self->_transfer($source, $target );
@@ -189,11 +189,11 @@ sub set {
 
     my $tmpdir = tempdir( CLEANUP => 1 );
     my ($fh, $source) = tempfile( DIR => $tmpdir );
-    
+
     open FILE, ">$source" || die "Unable to open file for writing";
     print FILE $content;
     close FILE;
-    
+
     if ($self->filemode()) {
         my $mode = $self->filemode();
         $mode = oct($mode) if $mode =~ /^0/;
@@ -203,11 +203,8 @@ sub set {
     my $target = $self->_sanitize_path( $file, $data );
 
     my $res = $self->_transfer( $source, $target );
-
-    unlink $target if (-e $target);
-
     if ($res) {
-        die "Unable to transfer data";
+        die sprintf("Unable to transfer data (EC %01d)", $res);
     }
 
     return 1;
@@ -236,6 +233,7 @@ sub _transfer {
 
     $self->log()->debug("scp command: " . join(" ",@cmd));
 
+    local $SIG{'CHLD'} = 'DEFAULT';
     my $command = Proc::SafeExec->new({
         exec => \@cmd,
         no_autowait => 1,
@@ -367,9 +365,9 @@ filename as the file parameter is not used, when path is set!
 
 =item filemode (set mode only)
 
-By default, the file is created with restrictive permissions of 0600. You 
+By default, the file is created with restrictive permissions of 0600. You
 can set other permissions using filemode. Due to perls lack for variable
-types, you must give this either as octal number with leading zero or as 
+types, you must give this either as octal number with leading zero or as
 string without the leading zero. Otherwise you might get wrong permissions.
 
 
@@ -408,7 +406,7 @@ Write data to a file.
 
     $conn->set('filename', { NAME => 'John Doe', 'ROLE' => 'Administrator' });
 
-See the file parameter how to control the filename. 
+See the file parameter how to control the filename.
 
 =head2 get
 
@@ -431,11 +429,11 @@ Results in a file I</var/data/test.txt> with the content I<Hello John Doe>.
 
 =head1 A note on security
 
-To enable the scp transfer, the file is created on the local disk using 
-tempdir/tempfile. The directory is created with permissions only for the 
-current user, so no other user than root and yourself is able to see the 
+To enable the scp transfer, the file is created on the local disk using
+tempdir/tempfile. The directory is created with permissions only for the
+current user, so no other user than root and yourself is able to see the
 content. The tempfile is cleaned up immediatly, the directory is handled
 by the internal garbage collection.
 
- 
+
 

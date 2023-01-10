@@ -1,8 +1,8 @@
-use strict;
+use v5.12.0;
 use warnings;
-package Test::Routine::Manual::Demo;
+package Test::Routine::Manual::Demo 0.030;
 # ABSTRACT: a walkthrough, in code, of Test::Routine
-$Test::Routine::Manual::Demo::VERSION = '0.029';
+
 #pod =head1 The Demo
 #pod
 #pod =head2 t/demo/01-demo.t
@@ -447,7 +447,7 @@ Test::Routine::Manual::Demo - a walkthrough, in code, of Test::Routine
 
 =head1 VERSION
 
-version 0.029
+version 0.030
 
 =head1 PERL VERSION
 

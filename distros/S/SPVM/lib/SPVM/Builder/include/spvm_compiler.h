@@ -150,7 +150,7 @@ struct spvm_compiler {
 SPVM_COMPILER* SPVM_COMPILER_new();
 void SPVM_COMPILER_free(SPVM_COMPILER* compiler);
 void SPVM_COMPILER_add_basic_types(SPVM_COMPILER* compiler);
-SPVM_RUNTIME* SPVM_COMPILER_new_runtime(SPVM_COMPILER* compiler);
+SPVM_RUNTIME* SPVM_COMPILER_new_object(SPVM_COMPILER* compiler);
 void SPVM_COMPILER_error(SPVM_COMPILER* compiler, const char* message, ...);
 
 void SPVM_COMPILER_print_error_messages(SPVM_COMPILER* compiler, FILE* fh);
@@ -158,7 +158,7 @@ void SPVM_COMPILER_print_error_messages(SPVM_COMPILER* compiler, FILE* fh);
 int32_t SPVM_COMPILER_get_error_messages_length(SPVM_COMPILER* compiler);
 const char* SPVM_COMPILER_get_error_message(SPVM_COMPILER* compiler, int32_t index);
 
-int32_t SPVM_COMPILER_compile_spvm(SPVM_COMPILER* compiler, const char* class_name);
+int32_t SPVM_COMPILER_compile(SPVM_COMPILER* compiler, const char* class_name);
 
 int32_t SPVM_COMPILER_calculate_spvm_32bit_codes_length(SPVM_COMPILER* compiler);
 int32_t* SPVM_COMPILER_create_spvm_32bit_codes(SPVM_COMPILER* compiler, SPVM_ALLOCATOR* allocator);

@@ -202,8 +202,42 @@ Files: INSTALL
  t/exception/Warzone/COPYING.README
  t/exception/Xerces/generator.cxx
  t/exception/non-GPL/buildnum.pl
- t/fedora/MIT
+ t/fedora/MIT-Adobe-Glyph-List.txt
+ t/fedora/MIT-Another-Minimal.txt
+ t/fedora/MIT-Bellcore.txt
+ t/fedora/MIT-CMU.txt
+ t/fedora/MIT-Cheusov.txt
+ t/fedora/MIT-DANSE/MIT-ICU.txt
+ t/fedora/MIT-Epinions.txt
+ t/fedora/MIT-Festival.txt
+ t/fedora/MIT-HP.txt
+ t/fedora/MIT-Hylafax.txt
+ t/fedora/MIT-ICU.txt
+ t/fedora/MIT-Minimal.txt
+ t/fedora/MIT-Mlton.txt
+ t/fedora/MIT-Modern.txt
+ t/fedora/MIT-Nuclear.txt
+ t/fedora/MIT-Old-Style-disclaimer-no-ad.txt
+ t/fedora/MIT-Old-Style-disclaimer-no-doc.txt
+ t/fedora/MIT-Old-Style-disclaimer.txt
+ t/fedora/MIT-Old-Style-no-ad.txt
+ t/fedora/MIT-Old-Style.txt
+ t/fedora/MIT-OpenVision.txt
+ t/fedora/MIT-PetSC.txt
+ t/fedora/MIT-SMLNJ/MIT-Mlton.txt
+ t/fedora/MIT-Thrift.txt
+ t/fedora/MIT-UnixCrypt-Variant.txt
+ t/fedora/MIT-UnixCrypt.txt
+ t/fedora/MIT-Whatever.txt
+ t/fedora/MIT-WordNet.txt
+ t/fedora/MIT-Xfig.txt
+ t/fedora/MIT-enna.txt
+ t/fedora/MIT-feh.txt
+ t/fedora/MIT-mpich2.txt
+ t/fedora/MIT-sublicense.txt
+ t/fedora/PostgreSQL.txt
  t/fedora/README
+ t/fedora/Unicode.txt
  t/flaws/fsf_address/HistAcc.tcc
  t/flaws/fsf_address/doschk.c
  t/flaws/fsf_address/gnuplot-context.el
@@ -270,9 +304,13 @@ Files: Changes
  META.json
  META.yml
  bin/licensecheck
+ dist.ini
  doap.ttl
  lib/App/Licensecheck.pm
  t/20-script-encoding.t
+ t/20-script-no-RE2.t
+ t/20-script-report.t
+ t/20-script-resolve.t
  t/OSI.t
  t/SPDX.t
  t/Software-License.t
@@ -283,15 +321,10 @@ Files: Changes
  t/flaws.t
  t/grant.t
  t/lib/Test2/Licensecheck/ScanCode.pm
+ t/lib/Test2/Require/TestCorpus.pm
  t/license.t
  t/reading.t
 Copyright: Copyright 2023 Jonas Smedegaard.
-License: AGPL_3
-
-Files: t/20-script-no-RE2.t
- t/20-script-report.t
- t/20-script-resolve.t
-Copyright: Copyright 2022 Jonas Smedegaard.
 License: AGPL_3
 
 Files: COPYRIGHT
@@ -304,21 +337,13 @@ Files: t/grant/LGPL/Model.pm
 Copyright: Copyright 2016 Jonas Smedegaard.
 License: AGPL_3
 
-Files: Makefile.PL
-Copyright: Copyright 2020 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: t/devscripts/artistic-2-0-modules.pm
 Copyright: Copyright (C) 2009 by Moritz Lenz and the SVG::Plot contributors (see file.
 License: Artistic-2.0
 
-Files: dist.ini
-Copyright: Copyright 2020 Jonas Smedegaard.
-License: AGPL_3
-
-Files: t/lib/Test2/Require/TestCorpus.pm
-Copyright: Copyright 2021 Jonas Smedegaard.
-License: AGPL_3
+Files: Makefile.PL
+Copyright: Copyright 2020 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
 
 License: AGPL_3
  This software is Copyright (c) 2023 by Jonas Smedegaard.

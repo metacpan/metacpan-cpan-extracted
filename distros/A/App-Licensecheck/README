@@ -3,7 +3,7 @@ NAME
     files
 
 VERSION
-    Version v3.3.1
+    Version v3.3.3
 
 SYNOPSIS
         use Path::Tiny;

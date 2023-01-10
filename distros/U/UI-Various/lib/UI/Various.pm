@@ -135,7 +135,7 @@ use warnings 'once';
 
 use Carp;			# may only be used in import!
 
-our $VERSION = "0.37";
+our $VERSION = "0.38";
 
 BEGIN  {  require UI::Various::core;  }
 
@@ -251,7 +251,8 @@ possible mitigation.
 
 =item C<1>
 
-identical to C<2> when using a TUI and identical to C<0> when using a GUI
+identical to C<2> when using a TUI (except C<PoorTerm>) and identical to
+C<0> when using a GUI or C<PoorTerm>
 
 =item C<0>
 

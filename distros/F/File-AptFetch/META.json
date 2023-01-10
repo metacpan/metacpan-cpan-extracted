@@ -42,7 +42,7 @@
    "provides" : {
       "File::AptFetch" : {
          "file" : "lib/AptFetch.pm",
-         "version" : "v0.1.14"
+         "version" : "v0.1.15"
       },
       "File::AptFetch::Simple" : {
          "file" : "lib/Simple.pm",
@@ -55,5 +55,5 @@
          "http://www.gnu.org/licenses/lgpl-3.0.txt"
       ]
    },
-   "version" : "v0.1.14"
+   "version" : "v0.1.15"
 }

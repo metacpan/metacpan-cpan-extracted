@@ -1,0 +1,507 @@
+#!/usr/bin/env perl
+
+use v5.10;
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use File::Spec;
+use File::Copy qw(copy);
+use FindBin qw($RealBin $RealScript);
+use File::Basename qw(fileparse);
+
+use constant FILE_COPY => <<SHELL;
+cp "_FROM" "_TO"
+chmod _MODE "_TO"
+chown _UID "_TO"
+chgrp _GID "_TO"
+
+SHELL
+
+use constant FILE_CREATE => <<SHELL . FILE_COPY;
+mkdir -p "_DIR"
+SHELL
+
+use constant FILE_DELETE => <<SHELL;
+rm "_TO"
+
+SHELL
+
+use constant FILE_DIFF => <<SHELL;
+echo "_TO"
+diff "_FROM" "_TO"
+
+SHELL
+
+use constant FILE_LS => <<SHELL;
+ls -l "_TO"
+
+SHELL
+
+use constant RESTORE_DIR => 'restore';
+use constant DEPLOY_DIR => 'deploy';
+use constant DEFAULT_CONFIG => 'transpierce.conf';
+
+my $config_filename = undef;
+my $describe = !!0;
+my $help = !!0;
+my $export = !!0;
+
+GetOptions(
+	'd|describe' => \$describe,
+	'c|config=s' => \$config_filename,
+	'e|self-export' => \$export,
+	'h|help' => \$help,
+) or $help = !!1;
+
+if ($help) {
+	pod2usage(1);
+}
+
+my $working_directory = shift() // '.';
+$config_filename = join_file([$working_directory, DEFAULT_CONFIG])
+	unless defined $config_filename;
+
+if ($export) {
+	my $export_to = join_file([$working_directory, 'transpierce']);
+	my $script_path = join_file([$RealBin, $RealScript]);
+	copy $script_path, $export_to or die "could not copy $script_path into $export_to: $!";
+	chmod 0774, $export_to;
+}
+else {
+	my $config = read_config();
+	print_permissions($config) if $describe;
+	run_actions(init_files($config), init_scripts($config));
+}
+
+sub read_config
+{
+	open my $fh, '<:encoding(UTF-8)', $config_filename
+		or die "could not open $config_filename for reading: $!";
+
+	if (!-d $working_directory) {
+		mkdir $working_directory
+			or die "$working_directory did not exist, and couldn't be created: $!";
+	}
+
+	my $file_string = qr{ (["']) (?<str> .*) \g1 | (?<str> \S+) }x;
+	my $perm_string = qr{ (?<chmod> 0[0-7]{3}) \s (?<chown> \S+) \s (?<chgrp> \S+) }x;
+
+	my $context = undef;
+	my @files;
+
+	while (my $line = readline $fh) {
+		if ($line =~ m{\A target \s+ $file_string}x) {
+			$context = $+{str};
+		}
+		elsif ($line =~ m{\A \s* (?: (new) \s+ $perm_string \s+ $file_string | $file_string ) \s* \z}x) {
+			my $file = {
+				parts => [$context, $+{str}],
+			};
+
+			if ($1 && $1 eq 'new') {
+				$file->{new} = !!1;
+				$file->{chmod} = $+{chmod};
+				$file->{chown} = $+{chown};
+				$file->{chgrp} = $+{chgrp};
+			}
+
+			gather_file_info($file);
+
+			push @files, $file;
+		}
+	}
+
+	close $fh
+		or die "could not close $config_filename: $!";
+
+	return \@files;
+}
+
+sub gather_file_info
+{
+	my ($file) = @_;
+	my $actual_file = join_file($file->{parts});
+	my $relpath = $actual_file;
+	my $absolute = File::Spec->file_name_is_absolute($relpath);
+
+	if (!$absolute) {
+		$relpath = join_file([$working_directory, $relpath]);
+	}
+
+	if (!$file->{new}) {
+		die "File $relpath does not seem to exist"
+			unless -f $relpath;
+
+		my @stat = stat $relpath;
+
+		$file->{chmod} = substr sprintf("%o", $stat[2]), 2, 4;
+		$file->{chown} = $stat[4];
+		$file->{chgrp} = $stat[5];
+	}
+
+	$file->{path} = $actual_file;
+	$file->{relpath} = $relpath;
+	$file->{mangled} = join_file([mangle_file($file->{parts})]);
+
+	if ($file->{parts}[0]) {
+		$file->{dir} = (mangle_file($file->{parts}))[0];
+	}
+}
+
+sub join_file
+{
+	return File::Spec->catdir(grep { defined } @{shift()});
+}
+
+sub mangle_file
+{
+	my ($file) = @_;
+
+	my @filename;
+	my ($context, $name) = @$file;
+
+	my $mangler = sub {
+		my @split = File::Spec->splitdir(shift);
+		join '__', map {
+			if ($_ eq '..') {
+				'UP';
+			}
+			else {
+				$_;
+			}
+		} @split;
+	};
+
+	if ($context) {
+		push @filename, $mangler->($context);
+	}
+
+	push @filename, $mangler->($name);
+
+	return @filename;
+}
+
+sub init_files
+{
+	my ($files) = @_;
+
+	my @actions;
+
+	push @actions, create_action(
+		'mkdir',
+		dir => join_file([$working_directory, RESTORE_DIR]),
+	);
+
+	push @actions, create_action(
+		'mkdir',
+		dir => join_file([$working_directory, DEPLOY_DIR]),
+	);
+
+	my %seen_dirs;
+	foreach my $file (@$files) {
+		if ($file->{dir} && !$seen_dirs{$file->{dir}}++) {
+			push @actions, create_action(
+				'mkdir',
+				dir => join_file([$working_directory, RESTORE_DIR, $file->{dir}]),
+			);
+
+			push @actions, create_action(
+				'mkdir',
+				dir => join_file([$working_directory, DEPLOY_DIR, $file->{dir}]),
+			);
+		}
+
+		if ($file->{new}) {
+			push @actions, create_action(
+				'touch',
+				file => $file,
+			);
+		}
+		else {
+			push @actions, create_action(
+				'copy',
+				file => $file,
+			);
+		}
+	}
+
+	return @actions;
+}
+
+sub init_scripts
+{
+	my ($files) = @_;
+
+	my @actions;
+
+	push @actions, create_action(
+		'create_script',
+		type => 'restore',
+		dest => join_file([$working_directory, 'restore.sh']),
+		files => $files,
+	);
+
+	push @actions, create_action(
+		'create_script',
+		type => 'deploy',
+		dest => join_file([$working_directory, 'deploy.sh']),
+		files => $files,
+	);
+
+	push @actions, create_action(
+		'create_script',
+		type => 'diff',
+		dest => join_file([$working_directory, 'diff.sh']),
+		files => $files,
+	);
+
+	return @actions;
+}
+
+sub process_template
+{
+	my ($template, %vars) = @_;
+
+	foreach my $key (keys %vars) {
+		$template =~ s/$key/$vars{$key}/g;
+	}
+
+	return $template;
+}
+
+sub spurt
+{
+	my ($file, $content) = @_;
+
+	open my $fh, '>:encoding(UTF-8)', $file
+		or die "could not open $file for writing: $!";
+
+	print {$fh} $content;
+
+	close $fh
+		or die "could not close $file: $!";
+}
+
+sub get_script_generator
+{
+	my ($type) = @_;
+
+	if ($type eq 'restore') {
+		return sub {
+			my ($file) = @_;
+
+			return process_template(
+				$file->{new} ? FILE_DELETE : FILE_COPY,
+				_FROM => join_file([RESTORE_DIR, $file->{mangled}]),
+				_TO => $file->{path},
+				_MODE => $file->{chmod},
+				_UID => $file->{chown},
+				_GID => $file->{chgrp},
+			);
+		};
+	}
+	elsif ($type eq 'deploy') {
+		return sub {
+			my ($file) = @_;
+
+			return process_template(
+				$file->{new} ? FILE_CREATE : FILE_COPY,
+				_FROM => join_file([DEPLOY_DIR, $file->{mangled}]),
+				_TO => $file->{path},
+				_MODE => $file->{chmod},
+				_UID => $file->{chown},
+				_GID => $file->{chgrp},
+				_DIR => (fileparse($file->{path}))[1],
+			);
+		};
+	}
+	elsif ($type eq 'diff') {
+		return sub {
+			my ($file) = @_;
+
+			return process_template(
+				$file->{new} ? FILE_LS : FILE_DIFF,
+				_FROM => join_file([RESTORE_DIR, $file->{mangled}]),
+				_TO => $file->{path},
+			);
+		};
+	}
+	else {
+		die "unknown script type $type";
+	}
+}
+
+sub create_action
+{
+	my ($type, %opts) = @_;
+
+	my %action = (
+		type => $type,
+		desc => 'action dummy',
+		code => sub { die 'unimplemented' },
+	);
+
+	my $copy_keys = sub {
+		foreach my $key (@_) {
+			die "missing key '$key' for action: $type"
+				unless exists $opts{$key};
+
+			$action{$key} = $opts{$key};
+		}
+	};
+
+	my %types = (
+		mkdir => sub {
+			$copy_keys->(qw(dir));
+			$action{desc} = join "\n",
+				'Create a directory',
+				'  mkdir -> ' . $action{dir}
+				;
+
+			$action{code} = sub {
+				mkdir $action{dir} unless -d $action{dir};
+			};
+		},
+		touch => sub {
+			$copy_keys->(qw(file));
+			$action{path} = join_file([$working_directory, DEPLOY_DIR, $action{file}{mangled}]);
+
+			$action{desc} = join "\n",
+				'Create a new file',
+				"  touch -> $action{path}"
+				;
+
+			$action{code} = sub {
+				open my $fh, '>', $action{path}
+					or die "Could not create $action{path}: $!";
+			};
+		},
+		copy => sub {
+			$copy_keys->(qw(file));
+			$action{into} = [
+				join_file([$working_directory, RESTORE_DIR, $action{file}{mangled}]),
+				join_file([$working_directory, DEPLOY_DIR, $action{file}{mangled}]),
+			];
+
+			$action{desc} = join "\n",
+				"Make copies of $action{file}{relpath}",
+				map { "  copy -> $_" } @{$action{into}}
+				;
+
+			$action{code} = sub {
+				foreach my $into (@{$action{into}}) {
+					die "file $into already exists - aborting"
+						if -e $into;
+
+					copy $action{file}{relpath}, $into or die "could not copy into $into: $!";
+				}
+			};
+		},
+		create_script => sub {
+			$copy_keys->(qw(type dest files));
+			$action{desc} = "Create script in $action{dest}\n" . join "\n", map {
+				"  $action{type} -> $_->{relpath}"
+			} @{$action{files}};
+
+			my $inner_sub = get_script_generator($action{type});
+
+			$action{code} = sub {
+				my $output = '';
+				foreach my $file (@{$action{files}}) {
+					$output .= $inner_sub->($file);
+				}
+
+				spurt($action{dest}, $output);
+				chmod 0774, $action{dest};
+			};
+		}
+	);
+
+	($types{$type} // die "invalid action type $type")->();
+
+	return \%action;
+}
+
+sub run_actions
+{
+	my (@action_list) = @_;
+
+	if ($describe) {
+		say 'Actions:';
+	}
+
+	foreach my $action (@action_list) {
+		if ($describe) {
+			say $action->{desc};
+			say '-------';
+			next;
+		}
+
+		$action->{code}->();
+	}
+}
+
+sub print_permissions
+{
+	my ($config) = @_;
+
+	say "Files specified in the config file";
+	foreach my $file (@$config) {
+		say $file->{relpath};
+		say "  mode -> $file->{chmod}";
+		say "  uid -> $file->{chown}";
+		say "  gid -> $file->{chgrp}";
+		say '-------';
+	}
+
+	say '';
+}
+
+__END__
+
+=head1 NAME
+
+transpierce - script for safer infiltration of sensitive environments
+
+=head1 SYNOPSIS
+
+	transpierce [OPTIONS] TARGET
+
+=head1 OPTIONS
+
+=over
+
+=item -d, --describe
+
+Print a summary of actions which will be taken. Do not execute the actions.
+
+=item -c FILE, --config=FILE
+
+Specify a filepath used for the configuration file. Default is C<transpierce.conf> in TARGET.
+
+=item -e, --self-export
+
+Export the script itself into TARGET directory. It can then be copied over to
+the target machine.
+
+=back
+
+=head1 DESCRIPTION
+
+Generate proper files in TARGET directory (by default current working
+directory) using contents of configuration file in that directory.
+
+Refer to L<App::Transpierce> for detailed usage explanation.
+
+=head1 AUTHOR
+
+Bartosz Jarzyna, E<lt>bbrtj.pro@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023 by Bartosz Jarzyna
+
+FreeBSD 2-clause license - see LICENSE
+

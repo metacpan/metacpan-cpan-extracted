@@ -33,7 +33,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use UI::Various::core;
 use UI::Various::Main;
@@ -89,6 +89,7 @@ sub _init($)
     # can't use accessors as we're not yet correctly blessed:
     $self->{max_height} = $rows;
     $self->{max_width} = $columns;
+    $self->{_running} = 0;
 }
 
 #########################################################################
@@ -117,6 +118,7 @@ sub mainloop($)
     debug(1, __PACKAGE__, '::mainloop: ', $i, ' / ', $n);
 
     local $_;
+    $self->{_running} = 1;
     while ($n > 0)
     {
 	$_ = $self->child($i)->_process;
@@ -135,6 +137,7 @@ sub mainloop($)
 	elsif ($i < 0)
 	{   $i = $n - 1;   }
     }
+    $self->{_running} = 0;
 }
 
 1;

@@ -1,7 +1,10 @@
 Revision history for Perl extension Gtk2::Ex::Spinner.
 
-0.2		Tue, 16 Feb 2010 11:48:06 +0100
+022	 Sun, 08 Jan 2023 13:42:07 +0100
+	- Fixed prerequisites.
+
+0.2 Tue, 16 Feb 2010 11:48:06 +0100
 	- Fixed position problem in a Gtk2::Handlebox.
 
-0.1		Mon, 15 Feb 2010 22:03:56 +0100
+0.1	Mon, 15 Feb 2010 22:03:56 +0100
 	- First release.

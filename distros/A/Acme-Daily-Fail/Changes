@@ -1,6 +1,17 @@
 ==================================================
-Changes from 2015-12-14 00:00:00 +0000 to present.
+Changes from 2018-01-07 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 1.20 at 2023-01-06 11:43:29 +0000
+-----------------------------------------
+
+  Change: 9e407d6d28ef0eed394dc7391c957519c4998ef1
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2023-01-06 11:43:29 +0000
+
+    Added the number one enemy of the British people (according to the
+    right-wing rags) 
 
 -----------------------------------------
 version 1.18 at 2020-12-12 13:34:35 +0000
@@ -22,26 +33,6 @@ version 1.16 at 2018-06-10 12:32:48 +0000
 
     Added judges 
 
------------------------------------------
-version 1.14 at 2017-03-29 14:55:28 +0000
------------------------------------------
-
-  Change: 7f6cd9a518cb89be16b1962bf8c5848db2aada35
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2017-03-29 15:55:28 +0000
-
-    Added Brexit 
-
------------------------------------------
-version 1.12 at 2016-09-02 20:10:34 +0000
------------------------------------------
-
-  Change: 5f7371e42720e937fa8bdb38b57cf18137723b10
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2016-09-02 21:10:34 +0000
-
-    Added some changes from upstream 
-
 ================================================
-Plus 7 releases after 2015-12-14 00:00:00 +0000.
+Plus 9 releases after 2018-01-07 00:00:00 +0000.
 ================================================

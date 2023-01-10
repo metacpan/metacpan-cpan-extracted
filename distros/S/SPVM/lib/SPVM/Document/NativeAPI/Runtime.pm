@@ -8,10 +8,10 @@ SPVM::Document::NativeAPI::Runtime - SPVM Runtime Native APIs
   void* runtime_api = env->api->runtime;
   
   // New runtime
-  void* runtime = runtime_api->new_runtime();
+  void* runtime = runtime_api->new_object();
   
   // Free runtime
-  runtime_api->free_runtime(runtime);
+  runtime_api->free_object(runtime);
 
 =head1 Description
 
@@ -21,8 +21,8 @@ SPVM runtime native APIs are the public APIs to manipulate the runtime informati
 
 Runtime native APIs have its IDs.
 
-  0  new_runtime
-  1  free_runtime
+  0  new_object
+  1  free_object
   2  prepare
   3  get_opcodes
   4  get_opcodes_length
@@ -105,17 +105,19 @@ Runtime native APIs have its IDs.
   81 build
   82 get_class_parent_class_id
   83 get_method_required_args_length
-  84 get_method_required_args_length
+  84 get_class_is_pointer
+  85 get_method_is_enum
+  86 get_type_flag
 
 =head1 Runtime Native APIs
 
-=head2 new_runtime
+=head2 new_object
 
-  void* (*new_runtime)();
+  void* (*new_object)();
 
-=head2 free_runtime
+=head2 free_object
 
-  void (*free_runtime)(void* runtime);
+  void (*free_object)(void* runtime);
 
 =head2 prepare
 
@@ -454,3 +456,12 @@ Reserved.
 =head2 get_class_is_pointer
 
   int32_t (*get_class_is_pointer)(void* runtime, int32_t class_id);
+
+=head2 get_method_is_enum
+
+  int32_t (*get_class_is_pointer)(void* runtime, int32_t class_id);
+
+=head2 get_type_flag
+
+  int32_t (*get_type_flag)(void* runtime, int32_t type_id);
+

@@ -1,5 +1,5 @@
-# $Id: AptFetch.pm 526 2017-04-15 01:52:05Z sync $
-# Copyright 2009, 2010, 2014, 2017 Eric Pozharski <whynot@pozharski.name>
+# $Id: AptFetch.pm 562 2023-01-07 23:31:53Z whynot $
+# Copyright 2009, 2010, 2014, 2017, 2023 Eric Pozharski <whynot@pozharski.name>
 # GNU LGPLv3
 # AS-IS, NO-WARRANTY, HOPE-TO-BE-USEFUL
 
@@ -7,7 +7,7 @@ use warnings;
 use strict;
 
 package File::AptFetch;
-use version 0.77; our $VERSION = version->declare( v0.1.14 );
+use version 0.77; our $VERSION = version->declare( v0.1.15 );
 
 use File::AptFetch::ConfigData;
 use Carp;
@@ -319,6 +319,7 @@ sub init {
     $self->{trace} = { };
     $self->{timeout} = File::AptFetch::ConfigData->config( q|timeout| );
     $self->{tick} = File::AptFetch::ConfigData->config( q|tick| );
+    $self->{leftover} = '';
     bless $self, $cls;
     my $rc;
     '' eq ($rc = $self->_cache_configuration)                   or return $rc;
@@ -1063,8 +1064,9 @@ sub _read {
 
     $self->{ALRM_error} = 0;
     my $timeout = $self->{timeout};
+# XXX:202301072158:whynot: Otherwise unfinished line would be lost.  Still no proper testing.
+    my $leftover = \$self->{leftover};
     while( 1 )                                                     {
-        my @line;
         $timeout -= $self->{tick};
         my $vec = '';
         vec( $vec, $self->{me}->fileno, 1 ) = 1;
@@ -1075,14 +1077,22 @@ sub _read {
               $_read_callback->( $_ ) || 0   foreach values %{$self->{trace}};
             if( $rc             ) {   $timeout = $self->{timeout} }
             elsif( $timeout < 0 ) { $self->{ALRM_error} = 1; last }}
-        elsif( @line = $self->{me}->getlines             )        {
-            chomp @line;
-            push @{$self->{log}}, @line;
+        elsif( not defined( my $flag =
+          $self->{me}->sysread( my $buffer, 4096 ))      )        {
+                            die qq|[sysread] ($self->{method}) $!| }
+        elsif( $flag                                     )        {
+            $buffer = $$leftover . $buffer;
+            my @prelog = split m{\n}, $buffer, -1;
+# WORKAROUND:202301052252:whynot: If C<chop $buffer> is C<\n> then B<split()> spews in one more trailing empty string (that empty string will break fscking everything).
+## XXX:202301062317:whynot: Correctness of log entry processing lacks explicit testing.  Sorry about that.
+# XXX:202301070412:whynot: Here's the deal.  If C<chop $buffer> is C<\n> then surprise empty string resets I<$leftover>.  If C<chop> isn't then I<$leftover> is refilled.  Neat :)
+            $$leftover = pop @prelog;
+            push @{$self->{log}}, @prelog;
 # WORKAROUND:201404232105:whynot: If method goes insane and bursts in one+ properly empty line separated messages then the separating empty line could got lost between.
 # XXX:201404232106:whynot: That's F<t/v-method> what does it, AAMF.
 # http://www.cpantesters.org/cpan/report/b19908e8-c870-11e3-aee5-9ca1c294a800
-            grep $_ eq '', @line                          and last }
-        elsif( $self->{me}->eof                          )        {
+            grep $_ eq '', @prelog                        and last }
+        elsif( !$flag                                    )        {
             waitpid delete $self->{pid}, 0;
             $self->{CHLD_error} = $?;                         last }
         else                                                      {
@@ -1258,6 +1268,11 @@ In L</_read()>.
 Per implementetaion there's a chain of if-elsif-else.
 That B<else> covers a routes I haven't think of.
 Purely my fault.
+
+=item [sysread] ($method): $!
+
+In L</_read()>.
+That's what has happened -- B<sysread()> has failed for reasons.
 
 =back
 

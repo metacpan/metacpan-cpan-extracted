@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Test::Deep::Hash 1.202;
+package Test::Deep::Hash 1.204;
 
 use Test::Deep::Ref;
 
@@ -55,7 +55,7 @@ sub reset_arrow
   return 0;
 }
 
-package Test::Deep::SuperHash 1.202;
+package Test::Deep::SuperHash 1.204;
 
 use base 'Test::Deep::Hash';
 
@@ -78,7 +78,7 @@ sub hash_keys
   return Test::Deep::SuperHashKeys->new(keys %$exp);
 }
 
-package Test::Deep::SubHash 1.202;
+package Test::Deep::SubHash 1.204;
 
 use base 'Test::Deep::Hash';
 
@@ -115,7 +115,7 @@ Test::Deep::Hash
 
 =head1 VERSION
 
-version 1.202
+version 1.204
 
 =head1 PERL VERSION
 

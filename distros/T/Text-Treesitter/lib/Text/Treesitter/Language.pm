@@ -3,12 +3,12 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package Text::Treesitter::Language 0.02;
+package Text::Treesitter::Language 0.03;
 
 use v5.14;
 use warnings;
 
-require Text::Treesitter;
+require Text::Treesitter::_XS;
 
 =head1 NAME
 
@@ -48,8 +48,6 @@ into an object file that can later be loaded.
 use Config;
 use constant CC => $Config::Config{cc};
 
-use ExtUtils::CppGuess;
-
 {
    my $guess;
 
@@ -57,6 +55,8 @@ use ExtUtils::CppGuess;
    sub CXX_compile
    {
       return @CXX_compile if @CXX_compile;
+
+      require ExtUtils::CppGuess;
       $guess //= ExtUtils::CppGuess->new;
       my %opts = $guess->module_build_options;
 
@@ -70,6 +70,8 @@ use ExtUtils::CppGuess;
    sub CXX_link
    {
       return @CXX_link if @CXX_link;
+
+      require ExtUtils::CppGuess;
       $guess //= ExtUtils::CppGuess->new;
       my %opts = $guess->module_build_options;
 
@@ -89,6 +91,7 @@ sub _compile
 
    my @args = ( $is_cpp ? CXX_compile : CC,
       "-o", $output,
+      "-fPIC",
       "-c", $source,
    );
 

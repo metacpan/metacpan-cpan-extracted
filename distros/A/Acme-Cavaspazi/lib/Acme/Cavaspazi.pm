@@ -9,7 +9,7 @@ our @ISA = qw(Exporter);
 # Export subroutine cavaspazi
 our @EXPORT = qw(cavaspazi);
 
-$Acme::Cavaspazi::VERSION = "1.0.0";
+$Acme::Cavaspazi::VERSION = "1.0.1";
 
 
 
@@ -44,7 +44,7 @@ Acme::Cavaspazi - a simple function to remove spaces from strings or lists of st
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 SYNOPSIS
 

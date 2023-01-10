@@ -1,5 +1,11 @@
 Revision history for Finance-Tax-Aruba
 
+0.005     2023-01-08 05:12:22Z
+
+    * Add 2023 year support
+    * Add support for fringe and non-fringe benefits
+    * Refactor tests to make them easier
+
 0.004     2022-06-13 16:12:59Z
 
     * Add 2022 year support (nothing changed compared to 2021)

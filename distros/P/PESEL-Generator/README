@@ -1,44 +1,54 @@
 NAME
+
     PESEL::Generator - generator of polish identifiers.
 
 SYNOPSIS
+
         use PESEL::Generator;
-    
+        
         # Main object
         my $gen = PESEL::Generator->new;
-        
+            
         # Run...
         my $psl = $gen->pesel;
-    
+        
         #-------------------------------------------------------------------
-    
+        
         use PESEL::Generator        qw( pesel ) ;
-    
+        
         # Run...
         my $psl = pesel();
 
 DESCRIPTION
+
     This module provides implementation of polish identifiers generator.
 
 METHODS
+
     new( )
-        Constructor. No options there.
+
+      Constructor. No options there.
 
     pesel( )
-        Get random PESEL number.
+
+      Get random PESEL number.
 
 REPORTING BUGS
+
     When reporting bugs/problems please include as much information as
     possible. A small script which yields the problem will probably be of
     help.
 
 AUTHOR
+
     Strzelecki Lukasz <lukasz@strzeleccy.eu>
 
 SEE ALSO
+
     Identifier::PL::PESEL
 
 COPYRIGHT
+
     Copyright (c) Strzelecki Lukasz. All rights reserved. This program is
     free software; you can redistribute it and/or modify it under the same
     terms as Perl itself.

@@ -97,8 +97,8 @@
 SPVM_ENV_RUNTIME* SPVM_API_RUNTIME_new_env() {
   
   void* env_runtime_init[]  = {
-    SPVM_API_RUNTIME_new_runtime,
-    SPVM_API_RUNTIME_free_runtime,
+    SPVM_API_RUNTIME_new_object,
+    SPVM_API_RUNTIME_free_object,
     SPVM_API_RUNTIME_prepare,
     SPVM_API_RUNTIME_get_opcodes,
     SPVM_API_RUNTIME_get_opcodes_length,
@@ -182,6 +182,8 @@ SPVM_ENV_RUNTIME* SPVM_API_RUNTIME_new_env() {
     SPVM_API_RUNTIME_get_class_parent_class_id,
     SPVM_API_RUNTIME_get_method_required_args_length,
     SPVM_API_RUNTIME_get_class_is_pointer,
+    SPVM_API_RUNTIME_get_method_is_enum,
+    SPVM_API_RUNTIME_get_type_flag,
   };
   SPVM_ENV_RUNTIME* env_runtime = calloc(1, sizeof(env_runtime_init));
   memcpy(env_runtime, env_runtime_init, sizeof(env_runtime_init));
@@ -189,7 +191,7 @@ SPVM_ENV_RUNTIME* SPVM_API_RUNTIME_new_env() {
   return env_runtime;
 }
 
-SPVM_RUNTIME* SPVM_API_RUNTIME_new_runtime() {
+SPVM_RUNTIME* SPVM_API_RUNTIME_new_object() {
   SPVM_RUNTIME* runtime = SPVM_RUNTIME_new();
   
   return runtime;
@@ -200,7 +202,7 @@ void SPVM_API_RUNTIME_prepare(SPVM_RUNTIME* runtime) {
   SPVM_RUNTIME_prepare(runtime);
 }
 
-void SPVM_API_RUNTIME_free_runtime(SPVM_RUNTIME* runtime) {
+void SPVM_API_RUNTIME_free_object(SPVM_RUNTIME* runtime) {
 
   SPVM_RUNTIME_free(runtime);
 }
@@ -406,6 +408,17 @@ int32_t SPVM_API_RUNTIME_get_type_is_ref(SPVM_RUNTIME* runtime, int32_t type_id)
   int32_t is_ref = type->flag & SPVM_TYPE_C_FLAG_REF;
   
   return is_ref;
+}
+
+int32_t SPVM_API_RUNTIME_get_type_flag(SPVM_RUNTIME* runtime, int32_t type_id) {
+  
+  SPVM_RUNTIME_TYPE* type = SPVM_API_RUNTIME_get_type(runtime, type_id);
+  
+  assert(type);
+  
+  int32_t type_flag = type->flag;
+  
+  return type_flag;
 }
 
 int32_t SPVM_API_RUNTIME_get_type_is_object(SPVM_RUNTIME* runtime, int32_t type_id) {
@@ -994,6 +1007,12 @@ int32_t SPVM_API_RUNTIME_get_method_is_precompile(SPVM_RUNTIME* runtime, int32_t
   
   SPVM_RUNTIME_METHOD* method = SPVM_API_RUNTIME_get_method(runtime, method_id);
   return method->is_precompile;
+}
+
+int32_t SPVM_API_RUNTIME_get_method_is_enum(SPVM_RUNTIME* runtime, int32_t method_id) {
+  
+  SPVM_RUNTIME_METHOD* method = SPVM_API_RUNTIME_get_method(runtime, method_id);
+  return method->is_enum;
 }
 
 int32_t SPVM_API_RUNTIME_get_method_args_length(SPVM_RUNTIME* runtime, int32_t method_id) {

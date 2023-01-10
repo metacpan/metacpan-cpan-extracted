@@ -1,5 +1,5 @@
 package Form::Tiny::Plugin;
-$Form::Tiny::Plugin::VERSION = '2.16';
+$Form::Tiny::Plugin::VERSION = '2.17';
 use v5.10;
 use strict;
 use warnings;
@@ -23,6 +23,8 @@ sub plugin
 }
 
 1;
+
+__END__
 
 =head1 NAME
 
@@ -49,13 +51,15 @@ Form::Tiny::Plugin - base class for Form::Tiny plugins
 
 =head1 DESCRIPTION
 
-Plugins are interface and behavior definitions for Form::Tiny forms - they determine how the form is built and can change how it behaves.
+Plugins are interface and behavior definitions for Form::Tiny forms - they
+determine how the form is built and can change how it behaves.
 
 To use your plugin in a form, L<Form::Tiny> must be imported like this:
 
 	use Form::Tiny plugins => [qw(MyPlugin +Full::Namespace::Plugin)];
 
-Prepending the name with a plus sign will stop Form::Tiny from prepending the given name with C<Form::Tiny::Plugin::>.
+Prepending the name with a plus sign will stop Form::Tiny from prepending the
+given name with C<Form::Tiny::Plugin::>.
 
 =head1 WRITING A PLUGIN
 
@@ -65,11 +69,14 @@ Plugin definition consists of:
 
 =item * subs which will be added to the namespace
 
-These subs will be treated as new DSL keywords. They will be imported into the package and take part in building the form, but they can also be cleaned away with L<namespace::autoclean> (together with all other DSL keywords).
+These subs will be treated as new DSL keywords. They will be imported into the
+package and take part in building the form, but they can also be cleaned away
+with L<namespace::autoclean> (together with all other DSL keywords).
 
 =item * roles which will be composed to the package
 
-These roles and all roles from other plugins will be composed into the form package in one operation, detecting method conflicts properly.
+These roles and all roles from other plugins will be composed into the form
+package in one operation, detecting method conflicts properly.
 
 =item * meta roles which will be composed to the meta object
 
@@ -77,7 +84,8 @@ Same as roles, but for the package metaobject.
 
 =back
 
-You may specify all, any, or none of those in the resulting hashref of the C<plugin> method. It will be called in class context:
+You may specify all, any, or none of those in the resulting hashref of the
+C<plugin> method. It will be called in class context:
 
 	Form::Tiny::Plugin::MyPlugin->plugin($caller, $context);
 
@@ -89,15 +97,20 @@ Where:
 
 =item * C<$context> will be a scalar reference to the current field context of the form
 
-The context may be referencing either L<Form::Tiny::FieldDefinition> or L<Form::Tiny::FieldDefinitionBuilder> (depending on whether the field was dynamic).
+The context may be referencing either L<Form::Tiny::FieldDefinition> or
+L<Form::Tiny::FieldDefinitionBuilder> (depending on whether the field was
+dynamic).
 
 =back
 
-Your plugin package must inherit from C<Form::Tiny::Plugin> and must reintroduce the C<plugin> method (without calling C<SUPER::plugin>).
+Your plugin package must inherit from C<Form::Tiny::Plugin> and must
+reintroduce the C<plugin> method (without calling C<SUPER::plugin>).
 
 =head2 Accessing form metaobject
 
-The C<$caller> variable will be a class name with C<form_meta> method. However, since your plugin will take part in configuring the form, there will not yet be a C<form_meta> method during execution of C<plugin>:
+The C<$caller> variable will be a class name with C<form_meta> method. However,
+since your plugin will take part in configuring the form, there will not yet be
+a C<form_meta> method during execution of C<plugin>:
 
 	sub plugin
 	{
@@ -115,12 +128,17 @@ The C<$caller> variable will be a class name with C<form_meta> method. However, 
 			}
 		};
 
-If you wish to perform an action after the form is configured, consider implementing a metaobject role that will have an C<after> method modifier on C<setup> method.
+If you wish to perform an action after the form is configured, consider
+implementing a metaobject role that will have an C<after> method modifier on
+C<setup> method.
 
 
 =head2 Handling context
 
-Context is passed into the C<plugin> method as a scalar reference. Your DSL keywords can set or consume context, and it should always be a subclass of L<Form::Tiny::FieldDefinition> or L<Form::Tiny::FieldDefinitionBuilder>. The reference itself is guaranteed to be defined.
+Context is passed into the C<plugin> method as a scalar reference. Your DSL
+keywords can set or consume context, and it should always be a subclass of
+L<Form::Tiny::FieldDefinition> or L<Form::Tiny::FieldDefinitionBuilder>. The
+reference itself is guaranteed to be defined.
 
 	sub plugin
 	{
@@ -144,7 +162,8 @@ Context is passed into the C<plugin> method as a scalar reference. Your DSL keyw
 
 =head2 Example plugins
 
-All of L<Form::Tiny> importing functionality is based on plugins. See these packages as a reference:
+All of L<Form::Tiny> importing functionality is based on plugins. See these
+packages as a reference:
 
 =over
 

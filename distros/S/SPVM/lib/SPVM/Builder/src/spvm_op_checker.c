@@ -1250,10 +1250,6 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                     SPVM_COMPILER_error(compiler, "The operand of the new operator can't be a multi-numeric type at %s line %d", op_cur->file, op_cur->line);
                     return;
                   }
-                  else if (class->is_pointer) {
-                    SPVM_COMPILER_error(compiler, "The operand of the new operator can't be a pointer class type at %s line %d", op_cur->file, op_cur->line);
-                    return;
-                  }
 
                   if (!(op_cur->flag & SPVM_OP_C_FLAG_NEW_INLINE)) {
                     SPVM_CLASS* cur_class = method->class;
@@ -2726,7 +2722,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                       args_length_for_user--;
                     }
                     
-                    SPVM_COMPILER_error(compiler, "The length of the arguments passed to the %s \"%s\" method in the \"%s\" class must be less than or equal to %d at %s line %d", call_method->method->is_class_method ? "class" : "instance", method_name, op_cur->uv.call_method->method->class->name, args_length_for_user, op_cur->file, op_cur->line);
+                    SPVM_COMPILER_error(compiler, "The length of the arguments passed to the \"%s\" %s method in the \"%s\" class must be less than or equal to %d at %s line %d", method_name, call_method->method->is_class_method ? "class" : "instance", op_cur->uv.call_method->method->class->name, args_length_for_user, op_cur->file, op_cur->line);
                     return;
                   }
                   
@@ -2740,7 +2736,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   if (!call_method->method->is_class_method) {
                     call_method_args_length_for_user--;
                   }
-                  sprintf(place, "the %dth argument of the %s \"%s\" method in the \"%s\" class", call_method_args_length_for_user, call_method->method->is_class_method ? "class" : "instance", method_name, op_cur->uv.call_method->method->class->name);
+                  sprintf(place, "the %dth argument of the \"%s\" %s method in the \"%s\" class", call_method_args_length_for_user, method_name, call_method->method->is_class_method ? "class" : "instance", op_cur->uv.call_method->method->class->name);
                   
                   // Invocant is not checked.
                   op_operand = SPVM_OP_CHECKER_check_assign(compiler, arg_var_decl_type, op_operand, place, op_cur->file, op_cur->line);
@@ -2757,7 +2753,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   required_args_length_for_user--;
                 }
                 
-                SPVM_COMPILER_error(compiler, "The length of the arguments passed to the %s \"%s\" method in the \"%s\" class must be at least %d at %s line %d", call_method->method->is_class_method ? "class" : "instance", method_name, op_cur->uv.call_method->method->class->name, required_args_length_for_user, op_cur->file, op_cur->line);
+                SPVM_COMPILER_error(compiler, "The length of the arguments passed to the \"%s\" %s method in the \"%s\" class must be at least %d at %s line %d", method_name, call_method->method->is_class_method ? "class" : "instance", op_cur->uv.call_method->method->class->name, required_args_length_for_user, op_cur->file, op_cur->line);
                 return;
               }
               
@@ -5004,16 +5000,6 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
       if (!SPVM_TYPE_is_class_type(compiler, class->type->basic_type->id, class->type->dimension, class->type->flag)) {
         SPVM_COMPILER_error(compiler, "The current class must be a class type when the class becomes a child class at %s line %d", class->op_extends->file, class->op_extends->line);
         return;
-      }
-      if (!(parent_class->is_pointer && class->is_pointer)) {
-        if (parent_class->is_pointer) {
-          SPVM_COMPILER_error(compiler, "The parant class can't be a pointer class type at %s line %d", class->op_extends->file, class->op_extends->line);
-          return;
-        }
-        if (class->is_pointer) {
-          SPVM_COMPILER_error(compiler, "The current class can't be a pointer class type when the class becomes a child class at %s line %d", class->op_extends->file, class->op_extends->line);
-          return;
-        }
       }
       
       if (strcmp(class->name, parent_class->name) == 0) {

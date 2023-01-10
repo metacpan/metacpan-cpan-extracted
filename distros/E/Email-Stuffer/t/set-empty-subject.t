@@ -1,5 +1,4 @@
-#!/usr/bin/perl -w
-use strict;
+use v5.12.0;
 use warnings;
 
 use Test::More;
@@ -34,5 +33,5 @@ like(
   qr/^Subject:\s\x0d?\x0a/mx,
   'matching subject header',
 );
-#print $stuffer->as_string;
+
 done_testing();

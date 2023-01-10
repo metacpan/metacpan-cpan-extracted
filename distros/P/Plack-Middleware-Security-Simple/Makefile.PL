@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010000;
+use 5.014000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Plack-Middleware-Security-Simple",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.010000",
+  "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "Plack::Middleware::Security::Simple",
   "PREREQ_PM" => {
     "Exporter::Tiny" => 0,
@@ -26,7 +26,6 @@ my %WriteMakefileArgs = (
     "Ref::Util" => 0,
     "Regexp::Common" => 0,
     "parent" => 0,
-    "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
@@ -39,9 +38,10 @@ my %WriteMakefileArgs = (
     "Plack::Builder" => 0,
     "Plack::Test" => 0,
     "Test::More" => 0,
-    "Test::Vars" => "0.015"
+    "Test::Vars" => "0.015",
+    "strict" => 0
   },
-  "VERSION" => "v0.8.3",
+  "VERSION" => "v0.9.1",
   "test" => {
     "TESTS" => "t/*.t"
   }

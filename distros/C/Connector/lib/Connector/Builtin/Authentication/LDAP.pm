@@ -64,9 +64,7 @@ sub _search_user {
     my $ldap = $self->ldap();
 
     $self->log()->debug('Searching LDAP databse for user "'.$user. '"');
-    my $result = $ldap->search(
-        $self->_build_search_options({ LOGIN => $user }, { noattrs => 1 } )
-    );
+    my $result = $self->_run_search({ LOGIN => $user }, { noattrs => 1 });
     if($result->is_error()) {
         $self->log()->error('LDAP search returned error code '.$result->code.' (error: '.$result->error_desc().')');
         return undef;

@@ -1,5 +1,30 @@
 Revision history for PDLx-Mask
 
+0.06      2023-01-10 13:39:52-05:00 America/New_York
+
+    * Promote to production; no changes from 0.05
+
+0.05      2022-12-29 13:34:56-05:00 America/New_York (TRIAL RELEASE)
+
+  [TEST FIX]
+
+    * Make tests work on PDL < 2.056, where dsum returns a Perl scalar instead of an  ndarray
+
+0.04      2022-12-29 00:02:53-05:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD FIX]
+
+    * removed unspecified Tet dependency on strictures
+
+    * moved to Dist::Zilla
+
+  [TEST FIX]
+
+    * Switch to Test2::V0, Test2::Tools::PDL
+
+    * Compare ndarrays directly rather than unpdl'ing them
+
+
 0.03	2016-10-28T13:45:54-0400
 
   [BUG FIX]

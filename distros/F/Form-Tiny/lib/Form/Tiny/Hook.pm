@@ -1,5 +1,5 @@
 package Form::Tiny::Hook;
-$Form::Tiny::Hook::VERSION = '2.16';
+$Form::Tiny::Hook::VERSION = '2.17';
 use v5.10;
 use strict;
 use warnings;
@@ -73,13 +73,16 @@ Form::Tiny::Hook - a representation of a hook
 
 =head1 DESCRIPTION
 
-This is a simple class which stores a hook type together with a code reference which will be fired on that stage. See L<Form::Tiny::Manual/"Hooks"> for details.
+This is a simple class which stores a hook type together with a code reference
+which will be fired on that stage. See L<Form::Tiny::Manual/"Hooks"> for
+details.
 
 =head1 ATTRIBUTES
 
 =head2 hook
 
-A hook type. Currently available types are: C<reformat before_mangle before_validate after_validate cleanup after_error>.
+A hook type. Currently available types are: C<reformat before_mangle
+before_validate after_validate cleanup after_error>.
 
 Required.
 
@@ -91,11 +94,14 @@ Required.
 
 =head2 inherited
 
-A boolean - whether the hook should be inherited to child forms. True by default.
+A boolean - whether the hook should be inherited to child forms. True by
+default.
 
 =head1 METHODS
 
 =head2 is_modifying
 
-Given a hook object, this method will return a boolean value which indicates whether the hook is meant to be modifying the passed in value. If false, we should discard the return value of that hook's code reference.
+Given a hook object, this method will return a boolean value which indicates
+whether the hook is meant to be modifying the passed in value. If false, we
+should discard the return value of that hook's code reference.
 

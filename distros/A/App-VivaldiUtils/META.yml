@@ -19,9 +19,9 @@ name: App-VivaldiUtils
 provides:
   App::VivaldiUtils:
     file: lib/App/VivaldiUtils.pm
-    version: '0.009'
+    version: '0.010'
 requires:
-  App::BrowserUtils: '0.017'
+  App::BrowserUtils: '0.018'
   Data::Sah::Coerce::perl::To_array::From_str::comma_sep: '0'
   Data::Sah::Compiler::perl::TH::any: '0.911'
   Data::Sah::Compiler::perl::TH::array: '0.911'
@@ -34,6 +34,7 @@ requires:
   Perinci::CmdLine::Any: '0.152'
   Perinci::CmdLine::Lite: '1.915'
   Sah::Schema::true: '0'
+  Sah::Schema::unix::signal: '0'
   Sah::Schema::unix::uid::exists: '0'
   Vivaldi::Util::Profile: '0'
   perl: '5.010001'
@@ -43,7 +44,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-VivaldiUtils
   homepage: https://metacpan.org/release/App-VivaldiUtils
   repository: git://github.com/perlancar/perl-App-VivaldiUtils.git
-version: '0.009'
+version: '0.010'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -369,7 +370,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::PERLANCAR::Contributing
               name: '@Author::PERLANCAR/PERLANCAR/Contributing'
-              version: '0.292'
+              version: '0.293'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'

@@ -1,8 +1,7 @@
-#!/usr/bin/perl
-use strict;
+use v5.12.0;
 use warnings;
 
-use Test::More qw[no_plan];
+use Test::More;
 use Email::Stuffer;
 use Email::Sender::Transport::Test ();
 
@@ -34,4 +33,4 @@ my $mime = $email->object;
 like( ($mime->subparts)[0]->body_str, qr/I am an emáil/, 'Email contains text_body' );
 like( ($mime->subparts)[1]->body_str, qr/<b>I am a html emáil<\/b>/, 'Email contains text_body' );
 
-1;
+done_testing;

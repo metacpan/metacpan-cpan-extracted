@@ -73,7 +73,10 @@ Read/Write/Close an fd
 
 Advanced:
 
-	fctrl...
+	fcntl
+  sendfile
+  accept4
+  accept_multiple
 
 	#TODO:
 	ioctl...
@@ -81,13 +84,13 @@ Advanced:
 
 =head1 DESCRIPTION
 
-IO::FD is an XS module which implements common core Perl system I/O functions
-to use B<file descriptors> instead of Perl B<file handles>. Functions include
-but are not limited to C<accept>, C<connect>, C<socket>, C<bind>, C<sysopen>,
+IO::FD is an XS module implementing common core Perl system I/O functions work
+with B<file descriptors> instead of Perl B<file handles>. Functions include but
+are not limited to C<accept>, C<connect>, C<socket>, C<bind>, C<sysopen>,
 C<sysread>, and C<syswrite>.
 
 It also implements some non core functions which normally would use file handles
-such as C<dup> and C<mkstemp>.
+such as C<sendfile>, C<dup> and C<mkstemp>.
 
 This module can significantly lower memory usage per file descriptor and
 decrease file/socket opening and socket accepting times.  C<accept> performance
@@ -117,6 +120,33 @@ at L<IO::FD::DWIM> which is part of the same distribution.
 
 Currently this module is focused on Unix/Linux systems, as this is the natural
 habitat of a file descriptor.
+
+=head1 IMPORTANT VERSION DIFFERENCES
+
+=head2 v0.2.0 and later
+
+B<New functions:>
+
+C<accept4>, C<accept_multiple>, C<sendfile>
+
+B<Changes:>
+
+All functions creating a new fd now behave more perlish and apply the CLOEXEC
+if larger than C<$^F>  to prevent fd leakage.  This may result in an extra
+system call you didn't need if your program never calls C<exec>. To disable
+this, increase the value of C<$^F>. 
+
+
+Functions now throw B<exceptions> when output variables (fds) are read only
+when they need to be writable. This matches perl behaviour in the same scenario
+for C<sysopen> etc.
+
+When function input fd variables doesn't look like an fd (an IV), a B<warning>
+'IO::FD::xxxx called with something other than a file descriptor' is generated,
+return value is C<undef> and the C<$!> variable is set to C<EBADF> (bad file
+descriptor>). This is analogous to perl behaviour when checking for valid
+GLOB/refs with C<sysread> and friends.
+
 
 =head1 WHERE SHOULD I USE THIS MODULE?
 
@@ -153,7 +183,6 @@ file descriptors directly B<you will loose>:
 
 =item Automatic close when out of scope
 
-=item Close on exec
 
 =item Special variables not supported (ie '_' in stat)
 
@@ -162,6 +191,10 @@ file descriptors directly B<you will loose>:
 =item IO::Handle inheritance
 
 =back
+
+B<NOTE:> Since version B<v0.2.0>  the close on exec flag is set for file
+descriptors created above the value in C<$^F>. Previouse versions did not do
+this.
 
 
 
@@ -202,30 +235,54 @@ name.
 
 =head3 IO::FD::accept
 
+=head3 IO::FD::accept4
+
+  my $ok=IO::FD::accept4 $new, $listen, $flags;
+  
+  Constants: IO::FD::SOCK_NONBLOCK, IO::FD::SOCK_CLOEXEC
+
+
+Implements the linux  C<accept4> syscall. On non linux systems this is emulated
+by calling C<fcntl> to set the FD_CLOEXEC flag and O_NONBLOCK status. Returns
+C<undef> on error, for the user to test C<$!>. 
+
+The flags argument can be the bitwise or'ed value of C<SOCK_NONBLOCK> and
+C<SOCK_CLOEXEC> from the L<Socket> module on linux and bsd.  Darwin (macos)
+does not have these values. so please use C<IO::FD::SOCK_NONBLOCK>,
+C<IO::FD::SOCK_CLOEXEC> on that platform.
+
+B<NOTE:>Unlike other functions returning new file descriptors, this B<DOES NOT>
+automatically apply the CLOEXEC flag. The C<$flags> argument must be set
+accordingly to achieve this.
+
+
+B<NOTE:> On emulated systems, any errors reported are only from the accept
+call, not subsequent C<fcntl> calls
+
 =head3 IO::FD::accept_multiple
 
 	my @new_fds;
 	my @peers;
 	my $count=accept_multiple(@new_fds, @peers, $listen_sock);
 
-B<Note:> DO NOT use this function on a blocking socket.
+B<NOTE:> DO NOT use this function on a blocking socket!!
 
 Accepts as many new connection sockets as available. The new sockets are stored
 in C<new_fds>, which is an array, not a array ref. The corresponding peers to
 the connections are stored in C<@peers>, also an array not a reference.
 
 C<$listen_sock> is the file descriptor from which  the sockets are accepted
-from. It MUST be configured for non blocking  operation, otherwise your program
-will just loop forever in this function
+from. It B<MUST> be configured for non blocking  operation, otherwise your
+program will just loop forever in this function
 
-Because this function will only works for non blocking listening sockets, the
-sockets/fds returned are forced into non blocking mode also. Than means on
-linux an explicit fcntl is called. On BSD type systems the socket will already
-be non blocking
+Because this function will only works for non blocking listening sockets, 
+B<the sockets/fds returned are configured for non blocking mode also>. 
+On BSD type systems the socket will already be non blocking. On linux systems
+the accept4 call is used to set the SOCK_NONBLOCK flag.
 
 Returns the number of sockets accepted until an error condition occurred.
-Returns C<undef> if no sockets where accepted. Check the C<$!> for normal
-non blocking error codes.
+Returns C<undef> if no sockets where accepted. Check the C<$!> for normal non
+blocking error codes.
 
 =head3 IO::FD::connect
 
@@ -239,6 +296,16 @@ Note: Implements the integer shorthand as per perldoc -f setsockopt
 
 =head3 IO::FD::getsockname
 
+=head3 IO::FD::sendfile
+
+  sendfile $socket, $source_fd, $length, $offset
+
+Calls system sendfile. Returns C<undef> on error or the number of bytes
+transferred otherwise. The error might be an B<EAGAIN> for non blocking
+sockets. Please reference the manual page for sendfile on your system, but be
+mindful the position of the arguments might not match.
+
+Currently advanced header/trailer features of BSD sendfile are not supported.
 
 =head2 File Maniupulation
 
@@ -263,7 +330,7 @@ Behaves like L<File::Temp::mkstemp>
 
 Requires at least six 'X' characters at the end of the template
 
-NOTE: Currently returns C<undef> as path in list context. Cross platform fd
+B<NOTE:> Currently returns C<undef> as path in list context. Cross platform fd
 paths are hard to extract.  TODO:  Fix this across platforms.
 
 =head3 IO::FD::sysseek
@@ -338,7 +405,6 @@ TODO: fix this!
 Likely differences to Perl lstat for larger integer values
 
 TODO: fix this!
-
 
 
 =head2 Experimental
@@ -560,11 +626,11 @@ provide any networking/socket support.
 =head1 FUTURE WORK (IDEAS/TODO)
 
 
+  Further emulate linux/bsd SOCK_NONBLOCK and SOCK_CLOEXEC on darwin
 	Add more tests for stat and DWIM module
 	Wider compatability for older perls
 	Add More system functions which work with fds
 	Work with win32 sockets
-	Look into making a listen/accept fh/fd hybrid
 	Maybe make an IO::Handle sub class
 
 =head1 AUTHOR
@@ -577,7 +643,7 @@ Please report any bugs via git hub: L<http://github.com/drclaw1394/perl-io-fd>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2022 by Ruben Westerberg
+Copyright (C) 2023 by Ruben Westerberg
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl or the MIT

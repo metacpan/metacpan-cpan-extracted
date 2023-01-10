@@ -20,7 +20,7 @@ dies_ok { Date::Holidays::BY::is_holiday( ) }, 'bad param';
 dies_ok { Date::Holidays::BY::is_holiday( 2020 ) }, 'bad param';
 dies_ok { Date::Holidays::BY::is_holiday( 1989, 1, 1 ) }, 'prehistoric time';
 ok { Date::Holidays::BY::is_holiday( 2017, 1, 1 ) }, 'valid';
-dies_ok { Date::Holidays::BY::is_holiday( 8000, 1, 1 ) }, 'easter computing limitation';
+dies_ok { Date::Holidays::BY::is_holiday( 1349, 1, 1 ) }, 'before Gregorian calendar (Date::Easter)';
 
 ok { Date::Holidays::BY::is_holiday( 5000, 1, 1 ) }, 'valid but weird';
 dies_ok {

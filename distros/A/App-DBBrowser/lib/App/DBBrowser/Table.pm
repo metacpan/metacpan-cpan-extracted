@@ -318,7 +318,7 @@ sub __get_filename_fs {
             elsif ( $choice eq $hidden ) {
                 require App::DBBrowser::Opt::Set;
                 my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
-                $sf->{o} = $opt_set->set_options( [ { name => 'group_export', text => '' } ] );
+                $sf->{o} = $opt_set->set_options( 'export' );
                 next FULL_FILE_NAME;
             }
             elsif ( $choice eq $no ) {

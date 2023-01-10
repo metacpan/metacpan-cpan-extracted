@@ -21,5 +21,5 @@ requires:
   perl: '5.036000'
 resources:
   repository: git://github.com/drclaw1394/perl-io-fd.git
-version: v0.1.4
+version: v0.2.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

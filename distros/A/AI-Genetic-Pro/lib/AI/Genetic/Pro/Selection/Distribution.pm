@@ -1,5 +1,5 @@
 package AI::Genetic::Pro::Selection::Distribution;
-
+$AI::Genetic::Pro::Selection::Distribution::VERSION = '1.009';
 use warnings;
 use strict;
 #use Data::Dumper; $Data::Dumper::Sortkeys = 1;

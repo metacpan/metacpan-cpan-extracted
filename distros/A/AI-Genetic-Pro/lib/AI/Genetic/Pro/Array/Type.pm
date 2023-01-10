@@ -1,5 +1,5 @@
 package AI::Genetic::Pro::Array::Type;
-
+$AI::Genetic::Pro::Array::Type::VERSION = '1.009';
 use warnings;
 use strict;
 use Exporter::Lite;

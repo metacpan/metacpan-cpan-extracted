@@ -3,12 +3,12 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package Text::Treesitter::QueryMatch 0.02;
+package Text::Treesitter::QueryMatch 0.03;
 
 use v5.14;
 use warnings;
 
-require Text::Treesitter;
+require Text::Treesitter::_XS;
 
 =head1 NAME
 

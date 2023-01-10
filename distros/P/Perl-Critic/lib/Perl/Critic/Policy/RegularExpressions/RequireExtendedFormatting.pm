@@ -9,7 +9,7 @@ use Perl::Critic::Utils qw{ :severities };
 
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.146';
+our $VERSION = '1.148';
 
 #-----------------------------------------------------------------------------
 
@@ -100,7 +100,7 @@ comments into the pattern, thus making them much more readable.
         [^\\']      # any non-special chars (i.e. not backslash or single quote)
         (?:         # then all of...
             \\ .    #    any explicitly backslashed char
-            [^\\']* #    followed by an non-special chars
+            [^\\']* #    followed by a non-special char
         )*          # ...repeated zero or more times
         '           # a closing single quote
     }x;

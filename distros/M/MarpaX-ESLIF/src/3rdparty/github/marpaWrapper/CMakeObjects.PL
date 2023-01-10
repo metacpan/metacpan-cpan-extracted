@@ -8,9 +8,12 @@ use File::Basename qw/basename dirname/;
 use File::Find qw/find/;
 use File::Path qw/make_path/;
 use File::Copy::Recursive qw/dircopy/;
-use IPC::Run qw/run/;
 use POSIX qw/EXIT_SUCCESS/;
+use IO::Handle;
 use Try::Tiny;
+
+autoflush STDOUT 1;
+autoflush STDERR 1;
 
 #
 # ExtUtils::CBuilder custom configuration from environment:
@@ -143,18 +146,9 @@ foreach (qw/genericLogger genericStack genericHash genericSparseArray/) {
     print "... Copying $_\n";
     my $CMakeObjects = File::Spec->catfile('output', '3rdparty', $_, 'CMakeObjects.PL');
     if (-e $CMakeObjects) {
-        print "... Executing $CMakeObjects\n";
-        my $in;
-        my $out;
-        my $err;
         {
             local $CWD = dirname($CMakeObjects);
-            run([$^X, basename($CMakeObjects)], \$in, \$out, \$err) || die "Failed to execute $CMakeObjects" . ($err ? "\n$err" : '');
-        }
-        if ($out) {
-            foreach (grep {defined} split(/\R/, $out)) {
-                print "... ... $_\n";
-            }
+            my_spawn($^X, basename($CMakeObjects));
         }
         my $inc = File::Spec->catdir('output', '3rdparty', $_, 'output', 'include');
         push(@additional_includes, $inc) if (-d $inc);
@@ -250,7 +244,7 @@ sub get_version {
     close($fh) || warn "Failed to close CMakeLists.txt, $!";
 
     my @rc;
-    if ($content =~ /^MYPACKAGESTART\s*\(\s*marpaWrapper\s+(\d+)\s+(\d+)\s+(\d+)\s*\)/sm) {
+    if ($content =~ /^\s*PROJECT\s*\(\s*marpaWrapper\s+VERSION\s+(\d+)\.(\d+)\.(\d+)/smi) {
         @rc = ($1, $2, $3);
     } else {
         foreach (qw/MARPAWRAPPER_VERSION_MAJOR MARPAWRAPPER_VERSION_MINOR MARPAWRAPPER_VERSION_PATCH/) {
@@ -289,4 +283,37 @@ $source
 #endif /* MARPAWRAPPER_CONFIG_WRAPPER_H */
 CONFIG
     close($fh) || warn "Cannot close $output, $!";
+}
+
+sub my_spawn {
+    my (@cmd) = @_;
+
+    die "Empty command to execute" unless @cmd;
+
+    print "=== Command: @cmd, CWD=$CWD\n";
+
+    my $pid = fork() // die "Failed to fork, $!";
+    $pid ? my_spawn_parent_side($pid, @cmd) : my_spawn_child_side(@cmd);
+}
+
+sub my_spawn_child_side {
+    my (@cmd) = @_;
+
+    exec { $cmd[0] } @cmd;
+    die "=== Command: @cmd, CWD=$CWD, $!"; # Should never be executed
+}
+
+sub my_spawn_parent_side {
+    my ($pid, @cmd ) = @_;
+
+    my $kid = waitpid($pid, 0);
+    warn "=== Command: @cmd, CWD=$CWD, waitpid on PID $pid returned child PID $kid?" unless $kid == $pid;
+    my $exit_value = $? >> 8;
+    my $signal = $? & 127;
+    my $core_dump = $? & 128;
+    if ($exit_value) {
+        die "=== Command: @cmd, CWD=$CWD, exit value $exit_value (signal=$signal, core_dump=$core_dump)\n";
+    } else {
+        print STDOUT "=== Command: @cmd, CWD=$CWD, exit value $exit_value\n";
+    }
 }

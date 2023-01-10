@@ -12,7 +12,7 @@ use IPC::System::Options 'system', 'readpipe', -log=>1;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-10-25'; # DATE
 our $DIST = 'Clipboard-Any'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 my $known_clipboard_managers = [qw/klipper/];
 my $sch_clipboard_manager = ['str', in=>$known_clipboard_managers];
@@ -97,9 +97,6 @@ _
     args => {
         %argspecopt_clipboard_manager,
     },
-    result => {
-        schema => $sch_clipboard_manager,
-    },
 };
 sub clear_clipboard_history {
     my %args = @_;
@@ -129,9 +126,6 @@ $SPEC{'clear_clipboard_content'} = {
 _
     args => {
         %argspecopt_clipboard_manager,
-    },
-    result => {
-        schema => $sch_clipboard_manager,
     },
 };
 sub clear_clipboard_content {
@@ -167,9 +161,15 @@ _
     args => {
         %argspecopt_clipboard_manager,
     },
-    result => {
-        schema => $sch_clipboard_manager,
-    },
+    examples => [
+        {
+            summary => 'Munge text (remove duplicate spaces) in clipboard',
+            src_plang => 'bash',
+            src => q{[[prog]] | perl -lpe's/ {2,}/ /g' | clipadd},
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+    ],
 };
 sub get_clipboard_content {
     my %args = @_;
@@ -207,9 +207,6 @@ empty result.
 _
     args => {
         %argspecopt_clipboard_manager,
-    },
-    result => {
-        schema => $sch_clipboard_manager,
     },
 };
 sub list_clipboard_history {
@@ -261,9 +258,15 @@ _
         %argspecopt_clipboard_manager,
         content => {schema => 'str*', pos=>0, cmdline_src=>'stdin_or_args'},
     },
-    result => {
-        schema => $sch_clipboard_manager,
-    },
+    examples => [
+        {
+            summary => 'Munge text (remove duplicate spaces) in clipboard',
+            src_plang => 'bash',
+            src => q{clipget | perl -lpe's/ {2,}/ /g' | [[prog]]},
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+    ],
 };
 sub add_clipboard_content {
     my %args = @_;
@@ -303,7 +306,7 @@ Clipboard::Any - Common interface to clipboard manager functions
 
 =head1 VERSION
 
-This document describes version 0.004 of Clipboard::Any (from Perl distribution Clipboard-Any), released on 2022-10-25.
+This document describes version 0.005 of Clipboard::Any (from Perl distribution Clipboard-Any), released on 2022-10-25.
 
 =head1 DESCRIPTION
 
@@ -377,7 +380,7 @@ First element ($status_code) is an integer containing HTTP-like status code
 element (%result_meta) is called result metadata and is optional, a hash
 that contains extra information, much like how HTTP response headers provide additional metadata.
 
-Return value:  (str)
+Return value:  (any)
 
 
 
@@ -413,7 +416,7 @@ First element ($status_code) is an integer containing HTTP-like status code
 element (%result_meta) is called result metadata and is optional, a hash
 that contains extra information, much like how HTTP response headers provide additional metadata.
 
-Return value:  (str)
+Return value:  (any)
 
 
 
@@ -449,7 +452,7 @@ First element ($status_code) is an integer containing HTTP-like status code
 element (%result_meta) is called result metadata and is optional, a hash
 that contains extra information, much like how HTTP response headers provide additional metadata.
 
-Return value:  (str)
+Return value:  (any)
 
 
 
@@ -508,7 +511,7 @@ First element ($status_code) is an integer containing HTTP-like status code
 element (%result_meta) is called result metadata and is optional, a hash
 that contains extra information, much like how HTTP response headers provide additional metadata.
 
-Return value:  (str)
+Return value:  (any)
 
 
 
@@ -552,7 +555,7 @@ First element ($status_code) is an integer containing HTTP-like status code
 element (%result_meta) is called result metadata and is optional, a hash
 that contains extra information, much like how HTTP response headers provide additional metadata.
 
-Return value:  (str)
+Return value:  (any)
 
 =head1 HOMEPAGE
 

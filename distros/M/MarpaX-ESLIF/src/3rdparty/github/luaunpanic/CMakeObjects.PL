@@ -10,10 +10,13 @@ use File::Find qw/find/;
 use File::Path qw/make_path/;
 use File::Copy::Recursive qw/dircopy/;
 use File::Temp qw/tempfile/;
-use IPC::Run qw/run/;
 use POSIX qw/EXIT_SUCCESS/;
 use Perl::OSType qw/is_os_type/;
+use IO::Handle;
 use Try::Tiny;
+
+autoflush STDOUT 1;
+autoflush STDERR 1;
 
 #
 # ExtUtils::CBuilder custom configuration from environment:
@@ -176,7 +179,7 @@ sub get_version {
     close($fh) || warn "Failed to close CMakeLists.txt, $!";
 
     my @rc;
-    if ($content =~ /^MYPACKAGESTART\s*\(\s*luaunpanic\s+(\d+)\s+(\d+)\s+(\d+)\s*\)/sm) {
+    if ($content =~ /^\s*PROJECT\s*\(\s*luaunpanic\s+VERSION\s+(\d+)\.(\d+)\.(\d+)/smi) {
         @rc = ($1, $2, $3);
     } else {
         foreach (qw/LUA_VERSION_MAJOR LUA_VERSION_MINOR LUA_VERSION_PATCH/) {

@@ -1,8 +1,5 @@
 package PESEL::Generator;
-
-#-----------------------------------------------------------------------
-use vars qw( $VERSION );
-$VERSION = 1.4;
+$PESEL::Generator::VERSION = '1.41';
 #-----------------------------------------------------------------------
 use warnings;
 use strict;

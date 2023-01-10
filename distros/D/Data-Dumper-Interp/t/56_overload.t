@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 use strict; use warnings  FATAL => 'all'; use feature qw(state say); use utf8;
-use open IO => ':locale';
+#use open IO => ':locale';
+use open ':std', ':encoding(UTF-8)';
 STDOUT->autoflush();
 STDERR->autoflush();
 select STDERR;

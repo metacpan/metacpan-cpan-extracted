@@ -52,13 +52,21 @@ Form::Tiny::Manual - reference for working with Form::Tiny
 
 =head1 DESCRIPTION
 
-L<Form::Tiny> is a form validation engine which can use all the type constraints you're already familiar with. The module does not ship with any field definitions on its own, instead it provides tools to reuse any type constraints from L<Type::Tiny> and other similar systems.
+L<Form::Tiny> is a form validation engine which can use all the type
+constraints you're already familiar with. The module does not ship with any
+field definitions on its own, instead it provides tools to reuse any type
+constraints from L<Type::Tiny> and other similar systems.
 
 =head2 Policy
 
-L<Form::Tiny> is designed to be a comprehensive data validation and filtering system based on existing validation solutions. Type::Tiny libraries cover most of the validation and coercion needs in models, and now with Form::Tiny they can be empowered to do the same with input data.
+L<Form::Tiny> is designed to be a comprehensive data validation and filtering
+system based on existing validation solutions. Type::Tiny libraries cover most
+of the validation and coercion needs in models, and now with Form::Tiny they
+can be empowered to do the same with input data.
 
-The module itself isn't much more than a hashref filter - it accepts one as input and returns the transformed one as output. The pipeline for a single field is as follows:
+The module itself isn't much more than a hashref filter - it accepts one as
+input and returns the transformed one as output. The pipeline for a single
+field is as follows:
 
 	input
 	  |
@@ -66,13 +74,17 @@ The module itself isn't much more than a hashref filter - it accepts one as inpu
 	                                                           v
 	                                                        output
 
-I<(Note that not every step on that pipeline is ran every time - it depends on form configuration)>
+I<(Note that not every step on that pipeline is ran every time - it depends on
+form configuration)>
 
-The module always tries to get as much data from input as possible and copy that into output. B<It will never copy any data that is not explicitly specified in the form fields configuration>.
+The module always tries to get as much data from input as possible and copy
+that into output. B<It will never copy any data that is not explicitly
+specified in the form fields configuration>.
 
 =head2 Moose-like form domain-specific language
 
-Form::Tiny allows you to define forms much like you would define a Moose class. The syntax is showcased below:
+Form::Tiny allows you to define forms much like you would define a Moose class.
+The syntax is showcased below:
 
 	use Form::Tiny -filtered;
 	use Types::Standard qw(Enum Str);
@@ -95,15 +107,23 @@ Form::Tiny allows you to define forms much like you would define a Moose class. 
 		... # perform cleaning
 	};
 
-Adding a C<use Form::Tiny> line will cause your current package to be turned into a form by composing L<Form::Tiny::Form> into it (and as a result, merging all of its symbols with your package). It also imports Moo into your namespace for convenience (unless you specify C<-nomoo> flag). Refer to L<Form::Tiny/"Available import flags"> for a full list of available flags.
+Adding a C<use Form::Tiny> line will cause your current package to be turned
+into a form by composing L<Form::Tiny::Form> into it (and as a result, merging
+all of its symbols with your package). It also imports Moo into your namespace
+for convenience (unless you specify C<-nomoo> flag). Refer to
+L<Form::Tiny/"Available import flags"> for a full list of available flags.
 
-This syntax is designed to resemble and mix in nicely with Moo/se syntax. Form fields and class properties are completely separate and can be freely intermixed with each other.
+This syntax is designed to resemble and mix in nicely with Moo/se syntax. Form
+fields and class properties are completely separate and can be freely
+intermixed with each other.
 
 A full list of DSL keywords is available in L<Form::Tiny/"Form domain-specific language">.
 
 =head2 Basic usage
 
-Input can be passed as a scalar to the constructor or with the C<set_input> method. Every call to that method will cause the form instance to be cleared of old errors and fields, so that it can be used again for different data.
+Input can be passed as a scalar to the constructor or with the C<set_input>
+method. Every call to that method will cause the form instance to be cleared of
+old errors and fields, so that it can be used again for different data.
 
 	use MyForm;
 
@@ -114,7 +134,10 @@ Input can be passed as a scalar to the constructor or with the C<set_input> meth
 	my $form = MyForm->new;
 	$form->set_input($data);
 
-With input in place, a C<valid> method can be called, which will return a validation result and fill in the C<errors> and C<fields> properties. These properties are mutually exclusive: errors are only present if the validation is unsuccessful, otherwise the fields are present.
+With input in place, a C<valid> method can be called, which will return a
+validation result and fill in the C<errors> and C<fields> properties. These
+properties are mutually exclusive: errors are only present if the validation is
+unsuccessful, otherwise the fields are present.
 
 The example below illustrates how a form class could be used to validate data.
 
@@ -132,18 +155,39 @@ The example below illustrates how a form class could be used to validate data.
 		...
 	}
 
+C<< $form->fields >> returns a hash reference which can be used to access
+validated and fields, but that might often be suboptimal. Using a hash
+reference by hand opens up possibilities of other errors, such as typos in
+field names.
+
+Alternatively, C<< $form->value >> can be used to access a value of a single field:
+
+	if ($form->valid) {
+		my $first = $form->value('first_field_name');
+		my $other = $form->value('other_field_name');
+	}
+
+If the field name was misspelled, an exception will be raised. Refer to
+L<Form::Tiny::Form/value> for details.
+
 =head2 Form building
 
-You can use C<form_field> function to declare form fields, just like you would use C<has> to declare class properties in Moo/se.
+You can use C<form_field> function to declare form fields, just like you would
+use C<has> to declare class properties in Moo/se.
 
 	form_field 'some_name';
 	form_field 'another_name' => (
 		required => 'soft',
 	);
 
-Form fields end up as instances of L<Form::Tiny::FieldDefinition> or its descendants. Also see full keyword docs at L<Form::Tiny/form_field>.
+Form fields end up as instances of L<Form::Tiny::FieldDefinition> or its
+descendants. Also see full keyword docs at L<Form::Tiny/form_field>.
 
-The only required element in hashes defining the fields is the key C<name>, which contains the string with name of the field in the form input. In the most basic style of C<form_field>, the name B<should not> be given explicitly, as it will be automatically overwritten by the first argument to that function. Other possible elements are:
+The only required element in hashes defining the fields is the key C<name>,
+which contains the string with name of the field in the form input. In the most
+basic style of C<form_field>, the name B<should not> be given explicitly, as it
+will be automatically overwritten by the first argument to that function. Other
+possible elements are:
 
 =over
 
@@ -153,7 +197,9 @@ The only required element in hashes defining the fields is the key C<name>, whic
 		type => SomeType,
 	);
 
-The type that the field will be validated against. Effectively, this needs to be an object with C<validate> and C<check> methods implemented. All types from Type::Tiny type libraries, as well as all Form::Tiny forms meet this criteria.
+The type that the field will be validated against. Effectively, this needs to
+be an object with C<validate> and C<check> methods implemented. All types from
+Type::Tiny type libraries, as well as all Form::Tiny forms meet this criteria.
 
 =item coerce
 
@@ -169,13 +215,17 @@ The type that the field will be validated against. Effectively, this needs to be
 		}
 	);
 
-A coercion that will be made B<before> the type is validated and will change the value of the field. This can be a coderef or a boolean:
+A coercion that will be made B<before> the type is validated and will change
+the value of the field. This can be a coderef or a boolean:
 
-Value of C<1> means that coercion will be applied from the specified C<type>. This requires the type to also provide C<coerce> and C<has_coercion> method, and the return value of the second one must be true.
+Value of C<1> means that coercion will be applied from the specified C<type>.
+This requires the type to also provide C<coerce> and C<has_coercion> method,
+and the return value of the second one must be true.
 
 Value of C<0> means no coercion will be made. This is the default behavior.
 
-Value that is a coderef will be passed C<($self, $value)>. It is required to make its own checks and return a scalar which will replace the old value.
+Value that is a coderef will be passed C<($self, $value)>. It is required to
+make its own checks and return a scalar which will replace the old value.
 
 =item adjust
 
@@ -187,9 +237,16 @@ Value that is a coderef will be passed C<($self, $value)>. It is required to mak
 		},
 	);
 
-An adjustment that will be made B<after> the type is validated and the validation is successful. This must be a coderef that gets passed the validated value and returns the new value for the field (just like the coderef version of coercion).
+An adjustment that will be made B<after> the type is validated and the
+validation is successful. This must be a coderef that gets passed the validated
+value and returns the new value for the field (just like the coderef version of
+coercion).
 
-At the point of adjustment, you can be sure that the value passed to the coderef meets the type constraint specified. It's probably a good idea to provide a type along with the adjustment to avoid unnecessary checks in the subroutine - if no type is specified, then any value from the input data will end up in the coderef.
+At the point of adjustment, you can be sure that the value passed to the
+coderef meets the type constraint specified. It's probably a good idea to
+provide a type along with the adjustment to avoid unnecessary checks in the
+subroutine - if no type is specified, then any value from the input data will
+end up in the coderef.
 
 =item required
 
@@ -197,13 +254,16 @@ At the point of adjustment, you can be sure that the value passed to the coderef
 		required => 'soft',
 	);
 
-Controls if the field should be skipped silently if it has no value or the value is empty. Possible values are:
+Controls if the field should be skipped silently if it has no value or the
+value is empty. Possible values are:
 
-C<0> - The field can be non-existent in the input, empty or undefined. This is the default behavior
+C<0> - The field can be non-existent in the input, empty or undefined. This is
+the default behavior
 
 C<"soft"> - The field has to exist in the input, but can be empty or undefined
 
-C<1> or C<"hard"> - The field has to exist in the input, must be defined and non-empty (a value C<0> is allowed, but an empty string is disallowed)
+C<1> or C<"hard"> - The field has to exist in the input, must be defined and
+non-empty (a value C<0> is allowed, but an empty string is disallowed)
 
 =item default
 
@@ -214,9 +274,13 @@ C<1> or C<"hard"> - The field has to exist in the input, must be defined and non
 		},
 	);
 
-A coderef, which should return a scalar value that will be used in place of a non-existent input value. If the field is marked as hard-required as well, the default value will also replace undefined or empty values. It gets passed a single parameter, which is the form instance.
+A coderef, which should return a scalar value that will be used in place of a
+non-existent input value. If the field is marked as hard-required as well, the
+default value will also replace undefined or empty values. It gets passed a
+single parameter, which is the form instance.
 
-The default value does not support nested arrays, like C<array.*>. An exception will be thrown at compile time if this condition is not met.
+The default value does not support nested arrays, like C<array.*>. An exception
+will be thrown at compile time if this condition is not met.
 
 =item message
 
@@ -225,13 +289,19 @@ The default value does not support nested arrays, like C<array.*>. An exception 
 		message => 'should be an integer',
 	);
 
-A static string that should be used instead of an error message returned by the C<type> when the validation fails. Can also be an object that overloads stringification.
+A static string that should be used instead of an error message returned by the
+C<type> when the validation fails. Can also be an object that overloads
+stringification.
 
-It can be useful since not all Type::Tiny error messages are meant to be readable for end users. It can also come in handy when the error messages need to be localized.
+It can be useful since not all Type::Tiny error messages are meant to be
+readable for end users. It can also come in handy when the error messages need
+to be localized.
 
 =item data
 
-While building your form fields, it's possible to save some extra data along with each field. This data can be used to prompt the user what to input, insert some HTML generation objects or store hints on how to fill the field properly.
+While building your form fields, it's possible to save some extra data along
+with each field. This data can be used to prompt the user what to input, insert
+some HTML generation objects or store hints on how to fill the field properly.
 
 	form_field "first name" => (
 		type => NonEmptySimpleStr,
@@ -243,7 +313,8 @@ While building your form fields, it's possible to save some extra data along wit
 		},
 	);
 
-The data field can hold any value you want and later retrieved with an instantiated form object:
+The data field can hold any value you want and later retrieved with an
+instantiated form object:
 
 	for my $definition (@{$form->field_defs}) {
 		say "field: " . $definition->name;
@@ -254,7 +325,10 @@ The data field can hold any value you want and later retrieved with an instantia
 
 =head2 Context
 
-While defining your form, the module keeps track of the context in which you're using certain keywords. After each C<form_field> which is not dynamic, the context is set to that field until the next DSL keyword. Other keywords can either use that context or reset it.
+While defining your form, the module keeps track of the context in which you're
+using certain keywords. After each C<form_field> which is not dynamic, the
+context is set to that field until the next DSL keyword. Other keywords can
+either use that context or reset it.
 
 	use Form::Tiny;
 
@@ -286,7 +360,10 @@ Keywords that are using the context are:
 
 =head2 Additional validators
 
-Having types for fields is great, but often a need arise to have more validators than just a type. While in theory you can create a subtype that will satisfy that need, it can prove to be hard to get right. Instead, you can specify multiple field validators:
+Having types for fields is great, but often a need arise to have more
+validators than just a type. While in theory you can create a subtype that will
+satisfy that need, it can prove to be hard to get right. Instead, you can
+specify multiple field validators:
 
 	form_field 'positive_even_int' => (
 		type => Int,
@@ -302,9 +379,13 @@ Having types for fields is great, but often a need arise to have more validators
 		pop() > 0
 	};
 
-Validators consist of two parts - an error message that should be added to form in case validation fails, and a subroutine that will perform the check. This subroutine is passed C<($self, $value)>, and should return a boolean value - validation result.
+Validators consist of two parts - an error message that should be added to form
+in case validation fails, and a subroutine that will perform the check. This
+subroutine is passed C<($self, $value)>, and should return a boolean value -
+validation result.
 
-Additional validations will take place after the type is validated, and only if the type validation is successful. This means that:
+Additional validations will take place after the type is validated, and only if
+the type validation is successful. This means that:
 
 =over
 
@@ -318,24 +399,36 @@ Additional validations will take place after the type is validated, and only if 
 
 	form_hook HOOK_NAME => $coderef;
 
-Hooks are the way to introduce more behavior to the form, not achievable with single field validation. Each type of hook can have multiple code references assigned to it, and they will fire in the order of declaration.
+Hooks are the way to introduce more behavior to the form, not achievable with
+single field validation. Each type of hook can have multiple code references
+assigned to it, and they will fire in the order of declaration.
 
-Each hook type defines its own set of parameters that get passed to the C<$coderef>. Most hooks require you to return they last parameter that got passed and you're free to change it however you like. If a hook does not require you to return the value, the return value is discarded.
+Each hook type defines its own set of parameters that get passed to the
+C<$coderef>. Most hooks require you to return they last parameter that got
+passed and you're free to change it however you like. If a hook does not
+require you to return the value, the return value is discarded.
 
 Hook types are listed below:
 
 =head3 cleanup
 
-While regular properties allow for single-field validation, sometimes a need arises to check if some fields are synchronized correctly, or even to perform some more complex validation. This can be done with the C<cleaup> hook, which will be only fired once after the validation for every individual field was successful. The cleaner subroutine should look like this:
+While regular properties allow for single-field validation, sometimes a need
+arises to check if some fields are synchronized correctly, or even to perform
+some more complex validation. This can be done with the C<cleaup> hook, which
+will be only fired once after the validation for every individual field was
+successful. The cleaner subroutine should look like this:
 
 	sub {
 		my ($self, $data) = @_;
 
 		# do something with $data
 		# call $self->add_error if necessary
+
+		# no need to return
 	};
 
-A subroutine like the one above should either be specified in a C<form_hook> or in a C<form_cleaner> shortcut.
+A subroutine like the one above should either be specified in a C<form_hook> or
+in a C<form_cleaner> shortcut.
 
 	# either ...
 	form_hook cleanup => sub { ... };
@@ -343,11 +436,21 @@ A subroutine like the one above should either be specified in a C<form_hook> or 
 	# or ...
 	form_cleaner sub { ... };
 
-Cleaning sub is also allowed to change C<$data>, which is a hash reference to the running copy of the input. Note that this is the final step in the validation process, so anything that is in $data after the cleanup will be available in the form's C<fields> after validation. The hook coderef need not to return the C<$data>, as it is a hash reference and will be updated just by changing it.
+Cleaning sub is also allowed to change C<$data>, which is a hash reference to
+the running copy of the input. Note that this is the final step in the
+validation process, so anything that is in $data after the cleanup will be
+available in the form's C<fields> after validation. The hook coderef doesn't
+have to return C<$data>, as it is a hash reference and will be updated just by
+changing its contents.
 
 =head3 before_mangle
 
-B<before_mangle> is fired for every field, just before it is changed ("mangled"). In addition to an object reference, this method will be passed the definition of the field (L<Form::Tiny::FieldDefinition>) and a scalar value of the field. The field must exist in the input data for this method to fire, but can be undefined. The return value of this method will become the new value for the field.
+B<before_mangle> is fired for every field, just before it is changed
+("mangled"). In addition to an object instance, this method will be passed the
+definition of the field (L<Form::Tiny::FieldDefinition>) and a scalar value of
+the field. The field must exist in the input hash for this method to fire, but
+can be undefined. The return value of this method will become the new value for
+the field.
 
 	form_hook before_mangle => sub {
 		my ($self, $field_definition, $value) = @_;
@@ -360,7 +463,9 @@ B<before_mangle> is fired for every field, just before it is changed ("mangled")
 
 =head3 before_validate
 
-B<before_validate> is fired just once for the form, before any field is validated. It is passed a hashref - the input data. This method is free to do anything with the input.
+B<before_validate> is fired just once for the form, before any field is
+validated. It is passed a hash reference - the input data. This method is free
+to do anything with the input.
 
 	form_hook before_validate => sub {
 		my ($self, $input_data) = @_;
@@ -370,7 +475,9 @@ B<before_validate> is fired just once for the form, before any field is validate
 		# no need to return
 	};
 
-This hook does not require you to return anything and is passed the same data as C<cleanup>. Note that it will not be fired if the input data was not a hash reference.
+This hook does not require you to return anything and is passed the same data
+as C<cleanup>. Note that it will not be fired if the input data was not a hash
+reference.
 
 =head3 after_validate
 
@@ -380,11 +487,13 @@ Same as C<cleanup>, but differs in two aspects:
 
 =item * it is ran before C<cleanup>
 
-=item * it is ran regardless of previous validation being successful or not, but only if the data format is correct
+=item * it is ran regardless of previous validation being successful or not,
+but only if the data format is correct
 
 =back
 
-This hook does not require you to return anything and is passed the same data as C<cleanup>.
+This hook does not require you to return anything and is passed the same data
+as C<cleanup>.
 
 =head3 reformat
 
@@ -398,9 +507,12 @@ Same as C<before_validate>, but differs in two aspects:
 
 =back
 
-This hook does require you to return a new input value to the validation. It is passed the same data as C<before_validate>.
+This hook does require you to return a new input value to the validation. It is
+passed the same data as C<before_validate>.
 
-B<Note>: This hook is ran inside a try/catch block, so it can throw an exception in order to stop form validation if the input is malformed. This will add I<Form::Tiny::Error::InvalidFormat> error to the form.
+B<Note>: This hook is ran inside a try/catch block, so you can throw an
+exception inside in order to stop form validation if the input is malformed.
+This will add I<Form::Tiny::Error::InvalidFormat> error to the form.
 
 =head3 after_error
 
@@ -411,37 +523,61 @@ B<Note>: This hook is ran inside a try/catch block, so it can throw an exception
 		if ($error_instance->field eq 'some_field') {
 			$error_instance->set_error('new error message');
 		}
+
+		# no need to return
 	};
 
-Called after an error has been added to the form. Gets passed two arguments: form instance and a newly created error instance. Can be used to log/debug or transform error messages in any way, like internationalize them.
+Called after an error has been added to the form. Gets passed two arguments:
+object instance and a newly created error instance. Can be used to log/debug or
+transform error messages in any way, like internationalize them.
 
 This hook does not require you to return anything.
 
 =head2 Optional behavior
 
-The module provides optional predefined behaviors which can be enabled with an import flag.
+The module provides optional predefined behaviors which can be enabled with an
+import flag.
 
 =head3 Strict mode
 
-Turned on with the C<-strict> flag in L<Form::Tiny>.
+Turned on by L<Form::Tiny::Plugin::Strict> plugin or with the C<-strict> flag
+in L<Form::Tiny>.
 
-Enables strict mode for the form. Validation will fail if form input contains any data not specified in the field definitions. This additional check is added to the form as a C<before_validate> hook.
+Enables strict mode for the form. Validation will fail if form input contains
+any data not specified in the field definitions. This additional check is added
+to the form as a C<before_validate> hook.
 
-Strict mode is helpful when you want to make sure you're not getting any extra data in your input. It does not affect the output of forms, only the validation result. Form::Tiny does not copy fields that are not declared explicitly to output regardless of the strict mode being turned on.
+Strict mode is helpful when you want to make sure you're not getting any extra
+data in your input. It does not affect the output of forms, only the validation
+result. Form::Tiny does not copy fields that are not declared explicitly to
+output regardless of the strict mode being turned on.
 
-For example, if your form contains many optional fields which change often, you may want to ensure that your users are not sending anything you're not going to handle. This can help debugging and prevent errors.
+For example, if your form contains many optional fields which change often, you
+may want to ensure that your users are not sending anything you're not going to
+handle. This can help debugging and prevent errors.
 
-B<Important note>: Strict mode will cause the system to crawl your entire input data to search for any odd elements. This will cause validation to only run at about half the speed, and more importantly it will not be able to cope with circular references (even weakened). If your input data may contain circular references you should not make use of the strict mode.
+B<Important note>: Strict mode will cause the system to crawl your entire input
+data to search for any odd elements. This will cause validation to only run at
+about half the speed, and more importantly it will not be able to cope with
+circular references (even weakened). If your input data may contain circular
+references you should not make use of the strict mode.
 
 =head3 Filters
 
-Turned on by L<Form::Tiny::Plugin::Filtered> plugin or with the C<-filtered> flag in L<Form::Tiny>.
+Turned on by L<Form::Tiny::Plugin::Filtered> plugin or with the C<-filtered>
+flag in L<Form::Tiny>.
 
-Enables initial filtering for the input fields. This behavior is added to the form as a C<before_mangle> hook.
+Enables initial filtering for the input fields. This behavior is added to the
+form as a C<before_mangle> hook.
 
-The filtering system performs a type check on field values and only apply a filtering subroutine when the type matches. This is done before the validation, and so can affect the validation result. Filters behave much like type coercion, but they are more flexible and can be stacked by having multiple filters for the same field, each using value returned by the previous one.
+The filtering system performs a type check on field values and only apply a
+filtering subroutine when the type matches. This is done before the validation,
+and so can affect the validation result. Filters behave much like type
+coercion, but they are more flexible and can be stacked by having multiple
+filters for the same field, each using value returned by the previous one.
 
-Filter subroutines should accept two parameters: C<($self, $value)>, and must return a C<$value>, changed or unchanged.
+Filter subroutines should accept two parameters: C<($self, $value)>, and must
+return a C<$value>, changed or unchanged.
 
 An example filter that turns integers into their absolute values:
 
@@ -450,7 +586,8 @@ An example filter that turns integers into their absolute values:
 		return abs $value;
 	};
 
-A filter can be also narrowed down to a single form field with C<field_filter> keyword, which will apply to the last field declared:
+A filter can be also narrowed down to a single form field with C<field_filter>
+keyword, which will apply to the last field declared:
 
 	form_field 'my_field';
 	field_filter Int, sub { abs pop() };
@@ -459,7 +596,8 @@ One special keyword exists for string trimming using the filters system:
 
 	form_trim_strings;
 
-When the field is filtered, the form filters are applied before field filters. Each type of filter is applied in the order they were defined.
+When the field is filtered, the form filters are applied before field filters.
+Each type of filter is applied in the order they were defined.
 
 =head3 Plugins
 
@@ -467,11 +605,14 @@ Form::Tiny can be extended with plugins:
 
 	use Form::Tiny plugins => [qw(Plugin1 +Namespace::Plugin2)];
 
-Added behavior is entirely up to the plugin. See L<Form::Tiny::Plugin> for details on how to implement a plugin.
+Added behavior is entirely up to the plugin. See L<Form::Tiny::Plugin> for
+details on how to implement a plugin.
 
 =head2 Inline forms
 
-The module enables a way to create a form without the need of a dedicated package. This is done with the L<Form::Tiny::Inline> class. This requires the user to pass all the data to the constructor, as shown in the example:
+The module enables a way to create a form without the need of a dedicated
+package. This is done with the L<Form::Tiny::Inline> class. This requires the
+user to pass all the data to the constructor, as shown in the example:
 
 	my $form = Form::Tiny::Inline          #     An inline form ...
 	           ->is(qw/strict filtered/)   # ... with Strict and Filtered plugins ...
@@ -496,21 +637,45 @@ The possible constructor arguments:
 
 The same syntax as for regular helpers will work.
 
-There's no way to define custom hooks (other than a single C<cleaner>) in inline forms. Additionally, a special case exists for the C<filtered> inline forms, as they will act as if you declared C<form_trim_strings> in their classes.
+There are some limitations though.
+
+There's no way to define custom hooks (other than a single C<cleaner>) in
+inline forms. Additionally, a special case exists for the C<filtered> inline
+forms, as they will act as if you declared C<form_trim_strings> in their
+classes.
+
+Additionally, inline forms are much slower, since they have to recompile every
+time, which means they are mostly useful for quick prototyping.
 
 =head2 Advanced topics
 
 =head3 Nesting
 
-A dot (C<.>) can be used in the name of a field to express hashref nesting. A field with C<< name => "a.b.c" >> will be expected to be found under the key "c", in the hashref under the key "b", in the hashref under the key "a", in the root input hashref.
+A dot (C<.>) can be used in the name of a field to express hashref nesting. A
+field with C<< name => "a.b.c" >> will be expected to be found under the key
+"c", in the hashref under the key "b", in the hashref under the key "a", in the
+root input hashref.
 
-This is the default behavior of a dot in a field name, so if what you want is the actual dot it has to be preceded with a literal backslash (C<\.>, which is C<'\\.'> in a string). Additionally, having a literal backslash in field name requires you to escape it as well (C<\\>, which is C<'\\\\'> in a string).
+This is the default behavior of a dot in a field name, so if what you want is
+the actual dot it has to be preceded with a literal backslash (C<\.>, which is
+C<'\\.'> in a string). Additionally, having a literal backslash in field name
+requires you to escape it as well (C<\\>, which is C<'\\\\'> in a string).
 
 =head3 Nested arrays
 
-Nesting adds many new options, but in the example above we're only talking about hashes. Regular arrays can of course be handled by I<ArrayRef> type from Type::Tiny, but that's a hassle and makes it impossible to have any deeper structure defined in a name. Instead, you can use a star (C<*>) as the only element inside the nesting segment to expect an array there. Adding named fields can be resumed after that, but needn't.
+Nesting adds many new options, but in the example above we're only talking
+about hashes. Regular arrays can of course be handled by I<ArrayRef> type from
+Type::Tiny, but that's a hassle and makes it impossible to have any deeper
+structure defined in a name. Instead, you can use a star (C<*>) as the only
+element inside the nesting segment to expect an array there. Adding named
+fields can be resumed after that, but needn't.
 
-For example, C<< name => "arr.*.some_key" >> expects C<arr> to be an array reference, with each element being a hash reference containing a key C<some_key>. Note that any array element that fails to contain wanted hash elements B<will cause the field to be ignored in the output> (since input does not meet the specification entirely). If you want the validation to fail instead, you need to make the nested element required.
+For example, C<< name => "arr.*.some_key" >> expects C<arr> to be an array
+reference, with each element being a hash reference containing a key
+C<some_key>. Note that any array element that fails to contain wanted hash
+elements B<will cause the field to be ignored in the output> (since input does
+not meet the specification entirely). If you want the validation to fail
+instead, you need to make the nested element required.
 
 	# This input data ...
 	{
@@ -525,13 +690,19 @@ For example, C<< name => "arr.*.some_key" >> expects C<arr> to be an array refer
 	# because the second element does not meet the specification.
 	# Make the element required to make the validation fail instead
 
-Other example is two nested arrays that not necessarily contain a hash at the end: C<< name => "arr.*.*" >>. The leaf values here can be simple scalars.
+Other example is two nested arrays that not necessarily contain a hash at the
+end: C<< name => "arr.*.*" >>. The leaf values here can be simple scalars.
 
-If you want a hash name consisted of star character C<*> alone, you can prepend it with a literal backslash, much like the nesting operator: C<\*>, which in perl string must be written as C<'\\*'>
+If you want a hash name consisted of star character C<*> alone, you can prepend
+it with a literal backslash, much like the nesting operator: C<\*>, which in
+perl string must be written as C<'\\*'>
 
 =head3 Nested forms
 
-Every form class created with I<Form::Tiny> is a consumer of L<Form::Tiny::Form> role, and can be used as a field definition type in other form. The outer and inner forms will validate independently, but inner form errors will be added to outer form with the outer field name prepended.
+Every form class created with I<Form::Tiny> is a consumer of
+L<Form::Tiny::Form> role, and can be used as a field definition type in other
+form. The outer and inner forms will validate independently, but inner form
+errors will be added to outer form with the outer field name prepended.
 
 	# in Form2
 	# everything under "nested" key will be validated using Form1 instance
@@ -540,15 +711,21 @@ Every form class created with I<Form::Tiny> is a consumer of L<Form::Tiny::Form>
 		type => Form1->new,
 	);
 
-Be aware of a special case, an adjustment will be inserted here automatically like the following:
+Be aware of a special case, an adjustment will be inserted here automatically
+like the following:
 
 	adjust => sub { $instance->fields }
 
-this will make sure that any coercions and adjustments made in the nested form will be added to the outer form as well. If you want to specify your own adjustment here, make sure to use the data provided by the C<fields> method of the nested form.
+this will make sure that any coercions and adjustments made in the nested form
+will be added to the outer form as well. If you want to specify your own
+adjustment here, make sure to use the data provided by the C<fields> method of
+the nested form.
 
 =head3 Form inheritance
 
-It is possible for Form::Tiny forms to inherit from one another, but the feature is experimental (meaning it does work, but is not tested enough and may not work properly for certain configurations).
+It is possible for Form::Tiny forms to inherit from one another, but the
+feature is experimental (meaning it does work, but is not tested enough and may
+not work properly for certain configurations).
 
 	# ParentForm.pm
 	package ParentForm;
@@ -574,7 +751,9 @@ It is possible for Form::Tiny forms to inherit from one another, but the feature
 
 	1;
 
-It is required that class parents are specified before any calls to Form::Tiny DSL have been made.
+It is required that class parents are specified before any calls to Form::Tiny
+DSL have been made. If there are no DSL calls, a special keyword must be used:
+see L<Form::Tiny::Manual::Cookbook/"Empty forms">.
 
 =head1 SEE ALSO
 

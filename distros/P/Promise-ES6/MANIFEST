@@ -3,6 +3,7 @@ LICENSE
 MANIFEST
 Makefile.PL
 README.md
+cpanfile
 lib/Promise/ES6.pm
 lib/Promise/ES6/AnyEvent.pm
 lib/Promise/ES6/Backend/PP.pm

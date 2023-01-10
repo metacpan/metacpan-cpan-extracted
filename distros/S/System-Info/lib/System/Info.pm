@@ -3,7 +3,7 @@ package System::Info;
 use strict;
 use warnings;
 
-our $VERSION = "0.062";
+our $VERSION = "0.063";
 
 use base "Exporter";
 our @EXPORT_OK = qw( &sysinfo &sysinfo_hash &si_uname );
@@ -179,10 +179,10 @@ Sys::Hostname is a CORE module, and will always be available.
 
  use Unix::Processors;
  my $up = Unix::Processors->new;
- say "CPU type : ", $up->processors->[0]->type;
- say "CPU count: ", $up->max_physical;
- say "CPU cores: ", $up->max_online;
- say "CPU speed: ", $up->max_clock;
+ say "CPU type : ", $up->processors->[0]->type; # Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz
+ say "CPU count: ", $up->max_physical;          # 4
+ say "CPU cores: ", $up->max_online;            # 8
+ say "CPU speed: ", $up->max_clock;             # 2700
 
  ->
 
@@ -206,9 +206,9 @@ install it on openSUSE Tumbleweed, I cannot test it and show the analogies.
 =head2 Sys::CPU
 
  use Sys::CPU;
- say "CPU type : ", Sys::CPU::cpu_type  ();
- say "CPU count: ", Sys::CPU::cpu_count ();
- say "CPU speed: ", Sys::CPU::cpu_clock ();
+ say "CPU type : ", Sys::CPU::cpu_type;  # Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz
+ say "CPU count: ", Sys::CPU::cpu_count; # 8
+ say "CPU speed: ", Sys::CPU::cpu_clock; # 2700
 
  ->
 
@@ -233,23 +233,35 @@ type, CPU speed, or Memory.
 
  use Devel::Platform::Info;
  my $info = Devel::Platform::Info->new->get_info ();
+ # { archname => 'x86_64',
+ #   codename => 'n/a',
+ #   is32bit  => 0,
+ #   is64bit  => 1,
+ #   kernel   => 'linux-5.17.4-1-default',
+ #   kname    => 'Linux',
+ #   kvers    => '5.17.4-1-default',
+ #   osflag   => 'linux',
+ #   oslabel  => 'openSUSE',
+ #   osname   => 'GNU/Linux',
+ #   osvers   => '20220426',
+ #   }
 
  ->
 
  use System::Info;
  my $si = System::Info->new;
  my $info = {
-    archname => $si->cpu_type,
+    archname => $si->cpu_type,       # x86_64
     codename => undef,
     is32bit  => undef,
     is64bit  => undef,
-    kernel   => "$^O-".$si->_osvers,
-    kname    => $si->_osname,
-    kvers    => $si->_osvers,
-    osflag   => $^O,
-    oslabel  => $si->distro,
+    kernel   => "$^O-".$si->_osvers, # linux-5.17.4-1-default
+    kname    => $si->_osname,        # Linux
+    kvers    => $si->_osvers,        # 5.17.4-1-default
+    osflag   => $^O,                 # linux
+    oslabel  => $si->distro,         # openSUSE Tumbleweed 20220426
     osname   => undef,
-    osvers   => $si->distro,
+    osvers   => $si->distro,         # openSUSE Tumbleweed 20220426
     };
 
 =head2 Devel::CheckOS
@@ -257,9 +269,28 @@ type, CPU speed, or Memory.
 This one does not return the OS information as such, but features an
 alternative to C<$^O>.
 
+=head2 Sys::OsRelease
+
+Interface to FreeDesktop.Org's os-release standard.
+
+ use Sys::OsRealease;
+ Sys::OsRelease->init;
+ my $i = Sys::OsRelease->instance;
+ say $i->ansi_color;                 # 0;32
+ say $i->bug_report_url;             # https://bugs.opensuse.org
+ say $i->cpe_name;                   # cpe:/o:opensuse:tumbleweed:20220426
+ say $i->documentation_url;          # https://en.opensuse.org/Portal:Tumbleweed
+ say $i->home_url;                   # https://www.opensuse.org/
+ say $i->id;                         # opensuse-tumbleweed
+ say $i->id_like;                    # opensuse suse
+ say $i->logo;                       # distributor-logo-Tumbleweed
+ say $i->name;                       # openSUSE Tumbleweed
+ say $i->pretty_name;                # openSUSE Tumbleweed
+ say $i->version_id;                 # 20220426
+
 =head1 COPYRIGHT AND LICENSE
 
-(c) 2016-2022, Abe Timmerman & H.Merijn Brand, All rights reserved.
+(c) 2016-2023, Abe Timmerman & H.Merijn Brand, All rights reserved.
 
 With contributions from Jarkko Hietaniemi, Campo Weijerman, Alan Burlison,
 Allen Smith, Alain Barbet, Dominic Dunlop, Rich Rauenzahn, David Cantrell.

@@ -155,7 +155,7 @@ sub get_version {
     close($fh) || warn "Failed to close CMakeLists.txt, $!";
 
     my @rc;
-    if ($content =~ /^MYPACKAGESTART\s*\(\s*genericLogger\s+(\d+)\s+(\d+)\s+(\d+)\s*\)/sm) {
+    if ($content =~ /^\s*PROJECT\s*\(\s*genericLogger\s+VERSION\s+(\d+)\.(\d+)\.(\d+)/smi) {
         @rc = ($1, $2, $3);
     } else {
         foreach (qw/GENERICLOGGER_VERSION_MAJOR GENERICLOGGER_VERSION_MINOR GENERICLOGGER_VERSION_PATCH/) {

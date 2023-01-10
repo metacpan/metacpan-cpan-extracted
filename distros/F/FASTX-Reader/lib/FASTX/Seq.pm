@@ -7,6 +7,7 @@ use Carp qw(confess);
 use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
 use File::Basename;
+
 $FASTX::Seq::VERSION = $FASTX::Reader::VERSION;
 
 require Exporter;
@@ -142,7 +143,7 @@ FASTX::Seq - A class for representing a sequence for FASTX::Reader
 
 =head1 VERSION
 
-version 1.7.0
+version 1.8.1
 
 =head1 SYNOPSIS
 

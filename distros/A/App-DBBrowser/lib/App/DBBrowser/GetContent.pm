@@ -175,7 +175,7 @@ sub get_content {
                         }
                         next GET_DATA;
                     }
-                    elsif ( $ok == -1 ) {
+                    elsif ( $ok == -1 ) { # -1 -> REPARSE
                         #if ( ! -T $file_fs ) {
                         #    $tc->choose(
                         #        [ 'Press ENTER' ],
@@ -185,7 +185,7 @@ sub get_content {
                         #}
                         require App::DBBrowser::Opt::Set;
                         my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
-                        $opt_set->set_options( [ { name => 'group_insert', text => '' } ] );
+                        $opt_set->set_options( 'import' );
                         next PARSE;
                     }
                     return 1;

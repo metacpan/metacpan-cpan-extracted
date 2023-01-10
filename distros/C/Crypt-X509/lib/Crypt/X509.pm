@@ -8,7 +8,7 @@ our @ISA         = qw(Exporter);
 our %EXPORT_TAGS = ( 'all' => [qw()] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
 #our @EXPORT      = qw(error new not_before not_after serial);
-our $VERSION = '0.54';
+our $VERSION = '0.55';
 my $parser = undef;
 my $asn    = undef;
 my $error  = undef;
@@ -39,6 +39,7 @@ our %oid2attr = (
     "2.5.4.11"                   => "OU",
     "1.2.840.113549.1.9.1"       => "emailAddress",
     '1.2.840.113549.1.9.2'       => 'unstructuredName',
+    '1.2.840.113549.1.9.8'       => 'unstructuredAddress',
     "0.9.2342.19200300.100.1.1"  => "UID",
     "0.9.2342.19200300.100.1.25" => "DC",
     "0.2.262.1.10.7.20"          => "nameDistinguisher",
@@ -394,6 +395,7 @@ from the OID-Numbers, unknown numbers are output verbatim.
   print "DN for this Certificate is:".join(',',@{$decoded->Subject})."\n";
 
 =cut back
+
 sub Subject {
     my $self = shift;
     my ( $i, $type );
@@ -414,6 +416,15 @@ sub Subject {
     return $subjdn;
 }
 
+=head2 SubjectRaw
+
+Returns the RDNs as list of hashes, values are stringified but OIDs are
+not translated.
+
+If a component contains a SET, the component will become an array of hashes
+on the second level.
+
+=cut
 
 sub SubjectRaw {
 
@@ -432,6 +443,19 @@ sub SubjectRaw {
         }
     }
     return \@subject;
+}
+
+=head2 SubjectSequence
+
+Returns the subject as returned from the ASN1 parser.
+
+=cut
+
+sub SubjectSequence {
+
+    my $self = shift;
+    return $self->{'tbsCertificate'}->{'subject'}->{'rdnSequence'};
+
 }
 
 sub _subject_part {
@@ -1204,7 +1228,7 @@ sub SubjectDirectoryAttributes {
             for my $type ( @{$subject_dir_attrs} ) {
                 for my $value ( @{ $type->{'values'} } ) {
                     for my $key ( keys %{$value} ) {
-      push @{$attributes}, $type->{'type'} . " = " . $value->{$key} . " ($key)";
+                        push @{$attributes}, $type->{'type'} . " = " . $value->{$key} . " ($key)";
                     }
                 }
             }

@@ -5,7 +5,7 @@ package Data::Scan;
 
 # ABSTRACT: Stackfree arbitrary data scanner
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -81,7 +81,7 @@ Data::Scan - Stackfree arbitrary data scanner
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -144,7 +144,7 @@ Indicates to the consumer that scanning is ending. Return value of consumer->end
 
 L<Data::Scan::Role::Consumer>, L<Data::Scan::Printer>
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 

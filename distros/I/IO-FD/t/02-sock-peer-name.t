@@ -1,4 +1,4 @@
-use Test::More tests=>10;
+use Test::More;
 
 use strict;
 use warnings;
@@ -68,3 +68,25 @@ ok $peer_name eq IO::FD::getsockname($client),"getsockname";
 IO::FD::close($socket);
 IO::FD::close($client);
 IO::FD::close($c);
+
+
+
+{
+  local $SIG{__WARN__}=sub {
+    ok $_[0] =~ /IO::FD::getpeername called with something other than a file descriptor/, "Got warning";
+  };
+  my $ret=IO::FD::getpeername "";
+  ok !defined($ret), "Undef for bad fd";
+  ok $! == EBADF,"bad fd";
+  
+}
+{
+  local $SIG{__WARN__}=sub {
+    ok $_[0] =~ /IO::FD::getsockname called with something other than a file descriptor/, "Got warning";
+  };
+  my $ret=IO::FD::getsockname "";
+  ok !defined($ret), "Undef for bad fd";
+  ok $! == EBADF,"bad fd";
+  
+}
+done_testing;

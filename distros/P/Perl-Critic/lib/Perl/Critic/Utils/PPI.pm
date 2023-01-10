@@ -6,11 +6,11 @@ use warnings;
 
 use Readonly;
 
-use Scalar::Util qw< blessed readonly >;
+use Scalar::Util qw< blessed >;
 
 use Exporter 'import';
 
-our $VERSION = '1.146';
+our $VERSION = '1.148';
 
 #-----------------------------------------------------------------------------
 

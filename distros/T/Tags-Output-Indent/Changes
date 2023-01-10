@@ -1,3 +1,12 @@
+0.10 2023-01-09T11:38:05+01:00
+ - Add test messages.
+ - Rewrite from List::MoreUtils to List::Util.
+ - Update copyright years.
+
+0.09 2022-11-02T23:16:46+01:00
+ - Change bugtracker to github.
+ - Fix warning for 'no_data_callback' if isn't in element.
+
 0.08 2022-10-25T16:13:46+02:00
  - Add 'no_data_callback' parameter to set list of elements which not
    process 'data_callback'. Example is 'script' in which we don't need HTML

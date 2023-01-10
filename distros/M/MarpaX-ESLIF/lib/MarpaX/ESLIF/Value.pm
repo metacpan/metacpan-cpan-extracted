@@ -16,7 +16,7 @@ sub _EQ       { return }
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '6.0.27'; # VERSION
+our $VERSION = '6.0.28'; # VERSION
 
 
 sub CLONE_SKIP {
@@ -37,7 +37,7 @@ MarpaX::ESLIF::Value - MarpaX::ESLIF's value
 
 =head1 VERSION
 
-version 6.0.27
+version 6.0.28
 
 =head1 SYNOPSIS
 

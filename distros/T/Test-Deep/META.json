@@ -58,7 +58,7 @@
          "web" : "https://github.com/rjbs/Test-Deep"
       }
    },
-   "version" : "1.202",
+   "version" : "1.204",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.037002"
@@ -443,7 +443,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "1.202",
+                  "tag" : "1.204",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

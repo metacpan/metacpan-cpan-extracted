@@ -1,20 +1,24 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use Carp;
+use lib 'lib';
+use v5.14;
 use Getopt::Long qw/GetOptions/;
-#TODO: parse arguments and set up options
-my %options = ();
+use Pod::Usage;
+use Prima::noARGV;# do not let Prima use @ARGV
+use App::financeta;
+#parse arguments and set up options
+my %options = (verbose => 1);
 GetOptions(\%options,
-    "debug", "version", "help") or
-    croak "Error in commandline arguments";
-#WTF: when use is used the @ARGV is swallowed
-eval { require App::financeta; } or croak "Unable to load App::financeta";
-App::financeta->print_warning;
+    qw(help version verbose=i debug quiet),
+) or pod2usage(-verbose => 1, -noperldoc => 1, -exitval => 2);
+pod2usage(-verbose => 1, -noperldoc => 1, -exitval => 2) if $options{help};
+App::financeta->print_banner if $options{verbose};
+App::financeta->print_version_and_exit if $options{version};
 App::financeta->run(%options);
 
 __END__
-#### COPYRIGHT: 2014. Vikas N Kumar. All Rights Reserved
+#### COPYRIGHT: 2013-2023. Vikas N Kumar. All Rights Reserved
 #### AUTHOR: Vikas N Kumar <vikas@cpan.org>
 #### DATE: 15th Aug 2014
 
@@ -24,16 +28,26 @@ financeta
 
 =head1 SYNOPSIS
 
+   ./bin/financeta
+
 financeta is a commandline application that invokes L<App::financeta> and starts
 a GUI for technical analysis of stocks.
 
 =head1 VERSION
 
-0.10
+0.11
 
 =head1 OPTIONS
 
-B<TODO>
+B<--help>                Print this help
+
+B<--version>             Print version
+
+B<--verbose=[0|1|2]>     Adjust verbosity. Default 1.
+
+B<--debug>               Set verbosity to 2. Run other debug settings.
+
+B<--quiet>               Set verbosity to 0.
 
 =head1 SEE ALSO
 
@@ -51,7 +65,7 @@ This module just runs the application that calls C<App::financeta::gui>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2013-2014. Vikas N Kumar <vikas@cpan.org>. All Rights Reserved.
+Copyright (C) 2013-2023. Vikas N Kumar <vikas@cpan.org>. All Rights Reserved.
 
 =head1 LICENSE
 

@@ -18,7 +18,7 @@ name: File-AptFetch
 provides:
   File::AptFetch:
     file: lib/AptFetch.pm
-    version: v0.1.14
+    version: v0.1.15
   File::AptFetch::Simple:
     file: lib/Simple.pm
     version: v0.1.7
@@ -33,4 +33,4 @@ requires:
   version: v0.77.0
 resources:
   license: http://www.gnu.org/licenses/lgpl-3.0.txt
-version: v0.1.14
+version: v0.1.15

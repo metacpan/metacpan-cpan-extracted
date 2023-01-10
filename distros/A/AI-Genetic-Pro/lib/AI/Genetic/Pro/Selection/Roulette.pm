@@ -1,5 +1,5 @@
 package AI::Genetic::Pro::Selection::Roulette;
-
+$AI::Genetic::Pro::Selection::Roulette::VERSION = '1.009';
 use warnings;
 use strict;
 #use Data::Dumper; $Data::Dumper::Sortkeys = 1;

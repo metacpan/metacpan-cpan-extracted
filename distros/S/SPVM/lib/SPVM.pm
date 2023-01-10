@@ -1,6 +1,6 @@
 package SPVM;
 
-our $VERSION = '0.9675';
+our $VERSION = '0.9680';
 
 use 5.008007;
 use strict;
@@ -52,7 +52,7 @@ sub import {
     my $start_classes_length = $BUILDER->get_classes_length;
 
     # Compile SPVM source code and create runtime env
-    my $compile_success = $BUILDER->compile_spvm($class_name, $file, $line);
+    my $compile_success = $BUILDER->compile($class_name, $file, $line);
 
     unless ($compile_success) {
       $BUILDER->print_error_messages(*STDERR);
@@ -77,11 +77,30 @@ sub import {
     for my $added_class_name (@$added_class_names) {
       next if $added_class_name =~ /::anon/;
       
-      # Build Precompile classs - Compile C source codes and link them to SPVM precompile method
-      $BUILDER->build_and_bind_dynamic_lib_at_runtime($added_class_name, 'precompile');
-      
-      # Build native classs - Compile C source codes and link them to SPVM native method
-      $BUILDER->build_and_bind_dynamic_lib_at_runtime($added_class_name, 'native');
+      for my $category ('precompile', 'native') {
+        my $cc = SPVM::Builder::CC->new(
+          build_dir => $BUILDER->{build_dir},
+          builder => $BUILDER,
+          runtime => 1,
+        );
+        
+        my $method_names = $BUILDER->get_method_names($added_class_name, $category);
+        
+        if (@$method_names) {
+          # Build classs - Compile C source codes and link them to SPVM precompile method
+          # Shared library which is already installed in distribution directory
+          my $dynamic_lib_file = $BUILDER->get_dynamic_lib_file_dist($added_class_name, $category);
+          
+          # Try runtime compile if shared library is not found
+          unless (-f $dynamic_lib_file) {
+            $dynamic_lib_file = $cc->build_runtime($added_class_name, {category => $category});
+          }
+          
+          if (-f $dynamic_lib_file) {
+            $BUILDER->dynamic_lib_files->{$category}{$added_class_name} = $dynamic_lib_file;
+          }
+        }
+      }
     }
   }
 }
@@ -92,39 +111,36 @@ sub init {
       # If any SPVM module are not yet loaded, $BUILDER is not set.
       my $build_dir = $ENV{SPVM_BUILD_DIR};
       $BUILDER = SPVM::Builder->new(build_dir => $build_dir, include_dirs => [@INC]);
-      my $compile_success = $BUILDER->compile_spvm('Int', 'embedded://none', 0);
+      my $compile_success = $BUILDER->compile('Int', 'embedded://none', 0);
       unless ($compile_success) {
         confess "Unexpcted Error:the compiliation must be always successful";
       }
       $BUILDER->build_runtime;
     }
     
-    # Prepare runtime environment
-    $BUILDER->prepare_env;
+    # Build an environment
+    $BUILDER->build_env;
 
-    # Set native method addresses
-    for my $class_name (keys %{$BUILDER->native_address_info}) {
-      my $address_of_methods = $BUILDER->native_address_info->{$class_name};
-      for my $method_name (keys %$address_of_methods) {
-        my $address = $address_of_methods->{$method_name};
-        $BUILDER->set_native_method_address($class_name, $method_name, $address);
+    # Set function addresses of native and precompile methods
+    for my $category ('precompile', 'native') {
+      for my $class_name (keys %{$BUILDER->dynamic_lib_files->{$category}}) {
+        my $dynamic_lib_file = $BUILDER->dynamic_lib_files->{$category}{$class_name};
+        $BUILDER->bind_methods($dynamic_lib_file, $class_name, $category);
       }
     }
-
-    # Set precompile method addresses
-    for my $class_name (keys %{$BUILDER->precompile_address_info}) {
-      my $address_of_methods = $BUILDER->precompile_address_info->{$class_name};
-      for my $method_name (keys %$address_of_methods) {
-        my $address = $address_of_methods->{$method_name};
-        $BUILDER->set_precompile_method_address($class_name, $method_name, $address);
-      }
-    }
-
-    # Call INIT blocks
-    $BUILDER->call_init_blocks;
     
+    my $env = $BUILDER->env;
+
     # Set command line info
-    $BUILDER->set_command_info($0, \@ARGV);
+    $BUILDER->set_command_info($env, $0, \@ARGV);
+    
+    # Call INIT blocks
+    $BUILDER->call_init_blocks($env);
+    
+    # Build an stack
+    $BUILDER->build_stack;
+    
+    my $stack = $BUILDER->stack;
     
     $SPVM_INITED = 1;
   }

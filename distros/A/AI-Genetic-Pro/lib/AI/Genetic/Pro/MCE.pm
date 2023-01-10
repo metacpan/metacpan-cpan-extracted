@@ -1,5 +1,5 @@
 package AI::Genetic::Pro::MCE;
-
+$AI::Genetic::Pro::MCE::VERSION = '1.009';
 use warnings;
 use strict;
 use base 							qw( AI::Genetic::Pro );

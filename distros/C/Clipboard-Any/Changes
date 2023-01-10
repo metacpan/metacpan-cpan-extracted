@@ -1,3 +1,10 @@
+0.005   2022-10-25  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add examples.
+
+        - Remove copy-pasted Rinci metadata property.
+
+
 0.004   2022-10-25  Released-By: PERLANCAR; Urgency: medium
 
         - [func add-clipboard-content][ux] Tweak Rinci metadata: get

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Test::Deep::RegexpRef 1.202;
+package Test::Deep::RegexpRef 1.204;
 
 use Test::Deep::Ref;
 use Test::Deep::RegexpVersion;
@@ -54,7 +54,7 @@ Test::Deep::RegexpRef
 
 =head1 VERSION
 
-version 1.202
+version 1.204
 
 =head1 PERL VERSION
 

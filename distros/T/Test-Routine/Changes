@@ -1,5 +1,11 @@
 Revision history for Test-Routine
 
+0.030     2023-01-05 19:03:17-05:00 America/New_York
+        - this version of Test-Routine now requires Perl v5.12 (but its prereqs
+          already did)
+        - remove the run_* exports from Test::Routine::Runner, as foretold in
+          the year 2010
+
 0.029     2022-12-31 19:35:50-05:00 America/New_York
         - update author contact info
 

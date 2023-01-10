@@ -1,6 +1,6 @@
-use strict;
+use v5.12.0;
 use warnings;
-package Email::MIME::ContentType 1.027;
+package Email::MIME::ContentType 1.028;
 # ABSTRACT: Parse and build a MIME Content-Type or Content-Disposition Header
 
 use Carp;
@@ -95,7 +95,7 @@ sub parse_content_type {
   my $ct = shift;
 
   # If the header isn't there or is empty, give default answer.
-  return parse_content_type($ct_default) unless defined $ct and length $ct;
+  return parse_content_type($ct_default) unless length $ct;
 
   _unfold_lines($ct);
   _clean_comments($ct);
@@ -138,7 +138,7 @@ my $cd_default = 'attachment';
 sub parse_content_disposition {
   my $cd = shift;
 
-  return parse_content_disposition($cd_default) unless defined $cd and length $cd;
+  return parse_content_disposition($cd_default) unless length $cd;
 
   _unfold_lines($cd);
   _clean_comments($cd);
@@ -538,7 +538,7 @@ Email::MIME::ContentType - Parse and build a MIME Content-Type or Content-Dispos
 
 =head1 VERSION
 
-version 1.027
+version 1.028
 
 =head1 SYNOPSIS
 
@@ -596,6 +596,16 @@ version 1.027
 
   my $cd_new = build_content_disposition($data);
   # attachment; filename=genome.jpeg; modification-date="Wed, 12 Feb 1997 16:29:51 -0500"
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 FUNCTIONS
 
@@ -677,13 +687,13 @@ Casey West <casey@geeknest.com>
 
 =item *
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =back
 
 =head1 CONTRIBUTORS
 
-=for stopwords Matthew Green Pali Thomas Szukala
+=for stopwords Matthew Green Pali Ricardo Signes Thomas Szukala
 
 =over 4
 
@@ -694,6 +704,10 @@ Matthew Green <mrg@eterna.com.au>
 =item *
 
 Pali <pali@cpan.org>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

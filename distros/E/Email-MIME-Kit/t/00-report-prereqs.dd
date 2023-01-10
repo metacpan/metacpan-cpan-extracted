@@ -1,7 +1,7 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '6.78'
                                       }
                       },
        'develop' => {
@@ -27,7 +27,7 @@ do { my $x = {
                                       'Moose::Util::TypeConstraints' => '0',
                                       'String::RewritePrefix' => '0',
                                       'YAML::XS' => '0',
-                                      'perl' => '5.008'
+                                      'perl' => 'v5.20.0'
                                     }
                     },
        'test' => {

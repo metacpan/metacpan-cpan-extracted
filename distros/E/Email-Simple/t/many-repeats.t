@@ -1,5 +1,6 @@
-#!/usr/bin/perl -w
-use strict;
+use v5.12.0;
+use warnings;
+
 use Test::More tests => 4;
 
 sub read_file { local $/; local *FH; open FH, shift or die $!; return <FH> }

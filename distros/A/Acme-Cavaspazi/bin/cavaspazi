@@ -73,7 +73,7 @@ cavaspazi - a simple script to remove spaces from filenames or file contents
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 SYNOPSIS
 
@@ -113,7 +113,8 @@ Print a brief help message and exits.
 
 =head1 SEE ALSO
 
-This module is a tribute to Nicola Vitulo. Read more on L<Acme::Cavaspazi>.
+This module is a tribute to Nicola Vitulo and its glorious C<cavaspazi.pl>.
+Read more on L<Acme::Cavaspazi> under "Acknowledgments".
 
 =head1 AUTHOR
 

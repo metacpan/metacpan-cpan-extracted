@@ -17,7 +17,7 @@ use Specio::Library::Builtins;
 
     like(
         dies { $sub->( 'foo', 'bar' ) },
-        qr{Got 1 extra parameter for test validator.+called at t[\\/]exceptions\.t line \d+}s,
+        qr{Got 1 extra parameter for test validator.+called at .*t[\\/]exceptions\.t line \d+}s,
         'exception includes stack trace',
     );
 }

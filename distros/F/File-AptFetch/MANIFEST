@@ -4,6 +4,8 @@ lib/AptFetch.pm
 lib/Cookbook.pod
 lib/Simple.pm
 MANIFEST			This list of files
+META.json
+META.yml
 README
 t/0.t
 t/0/9raCtd.t
@@ -45,6 +47,4 @@ t/w-method
 t/x-method
 t/y-method
 t/z-method
-META.yml
-META.json
 SIGNATURE    Added here by Module::Build

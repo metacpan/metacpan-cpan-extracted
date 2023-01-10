@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Key::Private;
-$Bitcoin::Crypto::Key::Private::VERSION = '1.007';
+$Bitcoin::Crypto::Key::Private::VERSION = '1.008';
 use v5.10;
 use strict;
 use warnings;
@@ -218,7 +218,7 @@ Returns current key instance.
 
 	$public_key_object = $object->get_public_key()
 
-Returns instance of L<Bitcoin::Crypto::PublicKey> generated from the private key.
+Returns instance of L<Bitcoin::Crypto::Key::Public> generated from the private key.
 
 =head2 sign_message
 

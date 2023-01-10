@@ -1,6 +1,12 @@
 Changelog for Data-Scan
 
-0.008 2017-03-10T04:28:55
+0.009 2023-01-09T06:19:50
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - dist.ini: Removed the OSPrereqs/MSWin32 for Win32::Console::ANSI, this
+   module does not always install and there is no yet a Dist::Zilla plugin
+   that injects as RunTimeSuggests
+
+0.008 2017-03-10T04:28:55Z
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - Add initial arguments to dsstart()
 

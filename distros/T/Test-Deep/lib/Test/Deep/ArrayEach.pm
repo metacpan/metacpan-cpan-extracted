@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Test::Deep::ArrayEach 1.202;
+package Test::Deep::ArrayEach 1.204;
 
 use Test::Deep::Cmp;
 use Scalar::Util ();
@@ -48,7 +48,7 @@ Test::Deep::ArrayEach
 
 =head1 VERSION
 
-version 1.202
+version 1.204
 
 =head1 PERL VERSION
 

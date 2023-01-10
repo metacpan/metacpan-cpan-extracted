@@ -6,7 +6,6 @@ use IO::FD;
 use Socket ":all";
 my $sock_file=$ARGV[0]//"test.sock";
 my $counter=$ARGV[1]//100_000;
-
 my $addr=pack_sockaddr_un($sock_file);
 my $complete=0;
 for(1..$counter){

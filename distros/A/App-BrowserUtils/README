@@ -3,8 +3,8 @@ NAME
     GUI ones
 
 VERSION
-    This document describes version 0.017 of App::BrowserUtils (from Perl
-    distribution App-BrowserUtils), released on 2022-07-24.
+    This document describes version 0.018 of App::BrowserUtils (from Perl
+    distribution App-BrowserUtils), released on 2022-10-07.
 
 SYNOPSIS
 DESCRIPTION
@@ -241,6 +241,8 @@ FUNCTIONS
 
     *   quiet => *true*
 
+    *   restart_brave => *bool*
+
     *   restart_chrome => *bool*
 
     *   restart_firefox => *bool*
@@ -310,6 +312,8 @@ FUNCTIONS
     *   opera_cmd => *array[str]|str* (default: "opera")
 
     *   quiet => *true*
+
+    *   start_brave => *bool*
 
     *   start_chrome => *bool*
 
@@ -435,10 +439,10 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2022, 2021, 2020, 2019 by perlancar

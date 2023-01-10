@@ -1,211 +1,172 @@
 package BoardStreams::Registry;
 
-use Mojo::Base -strict, -signatures;
+use Mojo::Base -base, -signatures;
 
 use BoardStreams::Util 'belongs_to';
+use BoardStreams::REs;
 
-use Safe::Isa;
-use List::Util 'pairs', 'first';
-use Data::Dumper;
+use List::AllUtils 'pairs';
+use Hash::Util 'fieldhash';
+use Carp 'croak';
 
 no autovivification;
 
-use experimental 'postderef';
+our $VERSION = "v0.0.30";
 
-our $VERSION = "v0.0.23";
+has _streams_to_conns => sub { +{} };                # ends in connection object
+has _conns_to_streams => sub { +{} };                # ends in number of joins of that connection
+has _conns => sub { +{} };                           # $int_c -> $c
+has conn_subscriptions => sub { fieldhash my %foo }; # stuff to unsubscribe from on leave/finish
+has pending_joins => sub { fieldhash my %foo };      # $c -> behavior subject ($num)
 
-use constant SINGLE_VARS => qw/ join leave cleanup /;
+has _actions_requests => sub { +{} }; # actions and requests
 
-my %user_to_channels;
-my %channel_to_users;
-
-sub create_empty_node {
-    return {
-        strings  => {},
-        regexes  => [],
-        actions  => {},
-        requests => {},
-        join     => undef,
-        leave    => undef,
-        cleanup  => undef,
-    };
+sub register_conn ($self, $c) {
+    $self->_conns->{int $c} = $c;
 }
 
-# registry for actions, requests and join/leave/cleanup handlers
-my $channels_info = create_empty_node;
+sub unregister_conn ($self, $c) {
+    delete $self->_conns->{int $c};
+}
 
-sub set_var ($class, $channel, $var, @args) {
-    my @segments = ref($channel) eq 'ARRAY' ? @$channel : ($channel);
-    my $sub = pop @args;
-    my $name; $name = pop @args unless belongs_to($var, [SINGLE_VARS]);
-    my $cursor = $channels_info;
-    SEGMENT: while (@segments) {
-        my $segment = shift @segments;
-        if (! ref $segment) {
-            # $segment is a string
-            if ($segment =~ /\:/) {
-                unshift @segments, split(/\:/, $segment);
-                next SEGMENT;
-            }
-            $cursor = $cursor->{strings}{$segment} //= create_empty_node;
-        } elsif (ref $segment eq 'Regexp') {
-            push $cursor->{regexes}->@*, $segment, create_empty_node;
-            $cursor = $cursor->{regexes}[-1];
+sub is_conn_registered ($self, $c) {
+    return exists $self->_conns->{int $c};
+}
+
+sub add_membership ($self, $c, $stream_name) {
+    my $int_c = int $c;
+    $self->_streams_to_conns->{$stream_name}{$int_c} //= $c;
+    $self->_conns_to_streams->{$int_c}{$stream_name}++;
+
+    return $self->_conns_to_streams->{$int_c}{$stream_name} == 1;
+}
+
+sub remove_membership ($self, $c, $stream_name) {
+    my $int_c = int $c;
+    my $count_ref = \($self->_conns_to_streams->{$int_c}{$stream_name});
+
+    die "not a member of '$stream_name'\n"
+        unless defined $$count_ref and $$count_ref > 0;
+
+    if (--$$count_ref == 0) {
+        delete $self->_streams_to_conns->{$stream_name}{$int_c};
+        delete $self->_streams_to_conns->{$stream_name} if ! $self->_streams_to_conns->{$stream_name}->%*;
+        delete $self->_conns_to_streams->{$int_c}{$stream_name};
+        delete $self->_conns_to_streams->{$int_c} if ! $self->_conns_to_streams->{$int_c}->%*;
+        return 1;
+    }
+
+    return 0;
+}
+
+sub is_member_of ($self, $c, $stream_name) {
+    return exists $self->_streams_to_conns->{$stream_name}{int $c};
+}
+
+sub get_conns_of_stream ($self, $stream_name) {
+    return [
+        values $self->_streams_to_conns->{$stream_name}->%*
+    ];
+}
+
+sub get_streams_and_counts_of_conn ($self, $c) {
+    return $self->_conns_to_streams->{int $c};
+}
+
+sub get_all_conns ($self) {
+    return [
+        values $self->_conns->%*
+    ];
+}
+
+sub inc_pending_joins_by ($self, $c, $n) {
+    my $pj_o = $self->pending_joins->{$c};
+    my $pj_value = $pj_o->get_value;
+    $pj_o->next($pj_value + $n);
+}
+
+### ACTIONS AND REQUESTS
+
+sub set_action_request ($self, $type, $stream_def, $thing_name, $sub) {
+    # validate
+    belongs_to($type, [qw/ action request join_leave /])
+        or die "invalid type '$type'";
+
+    # pre-process
+    $stream_def = [$stream_def] if ref $stream_def ne 'ARRAY';
+    @$stream_def = map {
+        my $thing = $_;
+        if (! length ref $thing) {
+            $thing =~ $BoardStreams::REs::ANY_STREAM_NAME or croak 'invalid stream definition';
+            split /\:/, $thing;
         } else {
-            die "problematic channel path segment found while adding $var";
+            $thing;
         }
-    }
+    } @$stream_def;
 
-    if (belongs_to($var, [SINGLE_VARS])) {
-        $cursor->{$var} = $sub;
-    } elsif (belongs_to($var, [qw/ action request /])) {
-        $cursor->{"${var}s"}{$name} = $sub;
-    } else {
-        die "invalid var $var";
-    }
-}
-
-sub get_var ($class, $channel, $var, $name = undef) {
-    my @segments = split /\:/, $channel;
-    my @cursors = ($channels_info);
-    foreach my $segment (@segments) {
-        @cursors = map {
-            my $cursor = $_;
-            my @ret;
-            if (my $node = $cursor->{strings}{$segment}) {
-                push @ret, $node;
-            }
-            foreach my $pair (pairs $cursor->{regexes}->@*) {
-                my ($regex, $node) = @$pair;
-                if ($segment =~ $regex) {
-                    push @ret, $node;
+    my $start = $self->_actions_requests;
+    my $cursor_ref = \$start;
+    SEGMENT:
+    foreach my $segment (@$stream_def) {
+        if (! length ref $segment) {
+            $cursor_ref = \($$cursor_ref->{strings}{$segment} //= {});
+        } else {
+            foreach my $pair (pairs $$cursor_ref->{regexes}->@*) {
+                my ($preexisting_regex, $hashref) = @$pair;
+                if ("$segment" eq "$preexisting_regex") {
+                    $cursor_ref = \$hashref;
+                    next SEGMENT;
                 }
             }
-            @ret;
-        } @cursors;
-    }
-
-    if (belongs_to($var, [SINGLE_VARS])) {
-        return first {defined} map $_->{$var}, @cursors;
-    } elsif (belongs_to($var, [qw/ action request /])) {
-        return first {defined} map $_->{"${var}s"}{$name}, @cursors;
-    } else {
-        die "invalid var $var";
-    }
-}
-
-sub debug_dump ($class) {
-    my %channel_to_users_clone;
-    foreach my $channel_name (keys %channel_to_users) {
-        $channel_to_users_clone{$channel_name} //= {};
-        foreach my $user (keys $channel_to_users{$channel_name}->%*) {
-            $channel_to_users_clone{$channel_name}{$user} = $user;
+            push $$cursor_ref->{regexes}->@*, ($segment => {});
+            $cursor_ref = \$$cursor_ref->{regexes}[-1];
         }
     }
-    warn Dumper({
-        user_to_channels => \%user_to_channels,
-        channel_to_users => \%channel_to_users_clone,
-        channels_info    => $channels_info,
-    });
+    $$cursor_ref->{$type}{$thing_name} = $sub;
 }
 
-sub add_pair ($class, $c, $channel_name) {
+sub get_action_request ($self, $type, $stream_name, $thing_name) {
+    # validate
+    belongs_to($type, [qw/ action request join_leave /])
+        or die "invalid type '$type'";
 
-    my $was_added = not exists $channel_to_users{$channel_name}{$c};
-
-    # user_to_channels
-    $user_to_channels{$c}{$channel_name} = $channel_name;
-
-    # channel_to_users
-    $channel_to_users{$channel_name}{$c} = $c;
-
-    # return
-    return $was_added;
-}
-
-sub has_pair ($class, $c, $channel_name) {
-    return exists $channel_to_users{$channel_name}{$c};
-}
-
-sub remove_pair ($class, $c, $channel_name) {
-
-    # user_to_channels
-    delete $user_to_channels{$c}{$channel_name};
-    if (keys($user_to_channels{$c}->%*) == 0) {
-        delete $user_to_channels{$c};
-    }
-
-    # channel_to_users
-    my $was_deleted;
-    delete $channel_to_users{$channel_name}{$c};
-    if (keys($channel_to_users{$channel_name}->%*) == 0) {
-        $was_deleted = 1;
-        delete $channel_to_users{$channel_name};
-    }
-}
-
-sub remove_user ($class, $c) {
-    my $hashref = $user_to_channels{$c} // {};
-    my @channels = keys %$hashref;
-    my @deleted_channels;
-    foreach my $channel (@channels) {
-        delete $channel_to_users{$channel}{$c};
-        if (!(keys $channel_to_users{$channel}->%*)) {
-            push @deleted_channels, $channel;
-            delete $channel_to_users{$channel};
+    my @segments = split /\:/, $stream_name;
+    my @cursors = $self->_actions_requests;
+    foreach my $segment (@segments) {
+        my @new_cursors = grep defined, map $_->{strings}{$segment}, @cursors;
+        foreach my $cursor (@cursors) {
+            if ($cursor->{regexes}) {
+                foreach my $pair (pairs $cursor->{regexes}->@*) {
+                    my ($regex, $new_candidate_cursor) = @$pair;
+                    if ($segment =~ $regex) {
+                        push @new_cursors, $new_candidate_cursor;
+                    }
+                }
+            }
         }
+        @cursors = @new_cursors;
     }
-    delete $user_to_channels{$c};
+    return (grep defined, map $_->{$type}{$thing_name}, @cursors)[0];
 }
 
-sub query ($class, $thing) {
-    if ($thing->$_isa('Mojolicious::Controller')) {
-        return [values $user_to_channels{$thing}->%*];
-    } elsif (! ref $thing) {
-        return [values $channel_to_users{$thing}->%*];
-    } else {
-        die;
-    }
+sub get_action ($self, $stream_name, $action_name) {
+    return $self->get_action_request(action => $stream_name, $action_name);
 }
 
-sub add_action ($class, $channel, $action_name, $action_sub) {
-    $class->set_var($channel, 'action', $action_name, $action_sub);
+sub get_request ($self, $stream_name, $request_name) {
+    return $self->get_action_request(request => $stream_name, $request_name);
 }
 
-sub get_action ($class, $channel, $action_name) {
-    return $class->get_var($channel, 'action', $action_name);
+sub get_join ($self, $stream_name) {
+    return $self->get_action_request(join_leave => $stream_name, 'join');
 }
 
-sub add_request ($class, $channel, $request_name, $request_sub) {
-    $class->set_var($channel, 'request', $request_name, $request_sub);
+sub get_leave ($self, $stream_name) {
+    return $self->get_action_request(join_leave => $stream_name, 'leave');
 }
 
-sub get_request ($class, $channel, $request_name) {
-    return $class->get_var($channel, 'request', $request_name);
-}
-
-sub add_join ($class, $channel, $join_sub) {
-    $class->set_var($channel, 'join', $join_sub);
-}
-
-sub get_join ($class, $channel) {
-    return $class->get_var($channel, 'join');
-}
-
-sub add_leave ($class, $channel, $leave_sub) {
-    $class->set_var($channel, 'leave', $leave_sub);
-}
-
-sub get_leave ($class, $channel) {
-    return $class->get_var($channel, 'leave');
-}
-
-sub add_cleanup ($class, $channel, $cleanup_sub) {
-    $class->set_var($channel, 'cleanup', $cleanup_sub);
-}
-
-sub get_cleanup ($class, $channel) {
-    return $class->get_var($channel, 'cleanup');
+sub get_repair ($self, $stream_name) {
+    return $self->get_action_request(join_leave => $stream_name, 'repair');
 }
 
 1;

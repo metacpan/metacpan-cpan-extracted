@@ -4,7 +4,7 @@ use warnings;
 # this is for people who don't want Test::Builder to be loaded but want to
 # use eq_deeply. It's a bit hacky...
 
-package Test::Deep::NoTest 1.202;
+package Test::Deep::NoTest 1.204;
 # ABSTRACT: Use Test::Deep outside of the testing framework
 
 our $NoTest;
@@ -50,7 +50,7 @@ Test::Deep::NoTest - Use Test::Deep outside of the testing framework
 
 =head1 VERSION
 
-version 1.202
+version 1.204
 
 =head1 SYNOPSIS
 

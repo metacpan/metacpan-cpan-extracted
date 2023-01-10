@@ -4,13 +4,13 @@ use strict;
 use warnings;
 
 use Class::Utils qw(set_params);
-use List::MoreUtils qw(any);
+use List::Util qw(any);
 use Readonly;
 
 # Constants.
 Readonly::Scalar my $LAST_INDEX => -1;
 
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 
 # Constructor.
 sub new {
@@ -227,7 +227,7 @@ __END__
 =head1 DEPENDENCIES
 
 L<Class::Utils>,
-L<List::MoreUtils>,
+L<List::Util>,
 L<Readonly>.
 
 =head1 SEE ALSO
@@ -252,12 +252,12 @@ L<http://skim.cz/>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2005-2022 Michal Josef Špaček
+© 2005-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.13
+0.14
 
 =cut

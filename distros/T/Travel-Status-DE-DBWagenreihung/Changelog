@@ -1,3 +1,11 @@
+Travel::Status::DE::DBWagenreihung 0.07 - Sat Jan 07 2023
+
+    * Add ICE 3neo (model 408)
+    * DBWagenreihung: Rename train_powertype to wagongroup_powertype
+    * DBWagenreihung: Rename train_desc to wagongroup_description
+    * DBWagenreihung: Rename train_model to wagongroup_model
+    * DBWagenreihung: Rename train_subtype to wagongroup_subtype
+
 Travel::Status::DE::DBWagenreihung 0.06 - Sun Jan 10 2021
 
     * DBWagenreihung: Add train_descriptions accessor

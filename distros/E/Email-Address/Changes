@@ -1,5 +1,11 @@
 Release history for Email-Address
 
+1.913     2023-01-09 19:41:25-05:00 America/New_York
+        - as ever, you should probably use Email::Address::XS instead
+        - this version now requires Perl v5.12
+        - some small tweaks to the code to take advantage of v5.12 made
+        - update distribution metadata
+
 1.912     2018-12-31 13:46:22-05:00 America/New_York
         - include the doc updates from 1.911 changelog, oops!
 

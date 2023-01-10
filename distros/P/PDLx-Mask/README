@@ -1,82 +1,65 @@
-NAME
-      PDLx::Mask - Mask multiple piddles with two way feedback
-      PDLx::MaskedData - Automatically synchronize data and valid data masks
+PDLx::Mask
 
-SYNOPSIS
-      use 5.10.0;
+Typically PDL uses bad values to mark elements in a piddle which contain
+invalid data. When multiple piddles should have the same elements marked
+as invalid, a separate *mask* piddle (whose values are true for valid
+data and false otherwise) is often used.
 
-      use PDLx::MaskedData;
+PDLx::Mask in concert with PDLx::MaskedData simplifies the management of
+multiple piddles sharing the same mask. PDLx::Mask is the shared mask,
+and PDLx::MaskedData is a specialized piddle which will dynamically
+respond to changes in the mask, so that they are always up-to-date.
 
-      $data1 = PDLx::MaskedData->new( sequence(9) );
-      say $data1;    # [0 1 2 3 4 5 6 7 8]
+Additionally, invalid elements in the data piddles may automatically be
+added to the shared mask, so that there is a consistent view of valid
+elements across all piddles.
 
-      # grab the mask
-      $mask = $data1->mask;
-      say $mask;    # [1 1 1 1 1 1 1 1 1]
+  Details
 
+PDLx::Mask is a subclass of PDL which manages a mask across on or more
+piddles. It can be used directly as a piddle, but be careful not to
+change its contents inadvertently. *It should only be manipulated via
+the provided methods or overloaded operators.*
 
-      # create another masked piddle with the same mask
-      my $pdl = $data1 + 1;
+It maintains two views of the mask:
 
-      $data2 = PDLx::MaskedData->new( $pdl, $mask );
+1   the original *base* mask; and
 
-      say $data2;    # [1 2 3 4 5 6 7 8 9]
+2   the *effective* mask, which is the base mask combined with
+    additional invalid elements from the data piddles.
 
-      # update the mask
-      $mask->set( 3, 0 );
-      say $mask;     # [1 1 1 0 1 1 1 1 1]
+The subscribe method is used to register callbacks to be invoked when
+the mask has been changed. Multiple subscriptions are allowed; each can
+register two callbacks:
 
-      # and see it propagate
-      say $data1;    # [0 1 2 0 4 5 6 7 8]
-      say $data2;    # [1 2 3 0 5 6 7 8 9]
+*   A subroutine invoked when the mask has changed. It is passed a
+    piddle containing the mask. It should not alter it.
 
-      # use bad values for $data1
-      $data1->badflag(1);
-      # notice that the invalid element is now bad
-      say $data1;    # [0 1 2 BAD 4 5 6 7 8]
+*   A subroutine which will return a data mask. If the data mask
+    changes, the mask's update method *must* be called.
 
-      # push invalid values upstream to the shared mask
-      $data1->upstream_mask(1);
-      $data1->setbadat(0);
-      say $data1;    # [BAD 1 2 BAD 4 5 6 7 8]
+INSTALLATION
 
-      # see the mask change
-      say $mask;     # [0 1 1 0 1 1 1 1 1]
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-      # and see the other piddle change
-      say $data2;    # [0 2 3 0 5 6 7 8 9]
+  cpanm .
+  cpan  .
+  cpanp -i .
 
-DESCRIPTION
-    Typically PDL uses bad values to mark elements in a piddle which contain
-    invalid data. When multiple piddles should have the same elements marked
-    as invalid, a separate *mask* piddle (whose values are true for valid
-    data and false otherwise) is used.
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
 
-    PDLx::Mask in concert with PDLx::MaskedData simplifies the management of
-    mutiple piddles sharing the same mask. PDLx::Mask is the shared mask,
-    and PDLx::MaskedData is a specialized piddle which will dynamically
-    respond to changes in the mask, so that they are always up-to-date.
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
 
-    Additionally, invalid elements in the data piddles may be added to the
-    shared mask, so that there is a consistent view of valid elements across
-    all piddles.
+COPYRIGHT AND LICENSE
 
-LICENSE AND COPYRIGHT
-    Copyright (c) 2016 The Smithsonian Astrophysical Observatory
+This software is Copyright (c) 2016 by Smithsonian Astrophysical
+Observatory.
 
-    PDLx::Mask is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
-    option) any later version.
+This is free software, licensed under:
 
-    This program is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
-    Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program. If not, see <http://www.gnu.org/licenses/>.
-
-AUTHOR
-      Diab Jerius <djerius@cpan.org>
-
+  The GNU General Public License, Version 3, June 2007

@@ -208,7 +208,7 @@ sub __add_operator {
         my $case_sensitive      = $op =~ /REGEXP_i\z/ ? 0 : 1;
         my $regex_op;
         if ( ! eval {
-            $regex_op = _regexp( $quote_col, $do_not_match_regexp, $case_sensitive );
+            $regex_op = $sf->_regexp( $quote_col, $do_not_match_regexp, $case_sensitive );
             1 }
         ) {
             $ax->print_error_message( $@ );
@@ -365,8 +365,8 @@ sub _regexp {
             return " $col NOT REGEXP BINARY ?" if   $case_sensitive;
         }
         else {
-            return " $col REGEXP ?"            if ! $case_sensitive;
-            return " $col REGEXP BINARY ?"     if   $case_sensitive;
+            return " $col REGEXP ?"        if ! $case_sensitive;
+            return " $col REGEXP BINARY ?" if   $case_sensitive;
         }
     }
     elsif ( $sf->{i}{driver} eq 'Pg' ) {
@@ -375,8 +375,8 @@ sub _regexp {
             return " ${col}::text !~ ?"  if   $case_sensitive;
         }
         else {
-            return " ${col}::text ~* ?"  if ! $case_sensitive;
-            return " ${col}::text ~ ?"   if   $case_sensitive;
+            return " ${col}::text ~* ?" if ! $case_sensitive;
+            return " ${col}::text ~ ?"  if   $case_sensitive;
         }
     }
     elsif ( $sf->{i}{driver} eq 'Firebird' ) {
@@ -391,14 +391,14 @@ sub _regexp {
             return " $col SIMILAR TO ? ESCAPE '#'";
         }
     }
-    elsif ( $sf->{i}{driver} =~ /^(?:db2|oracle)\z/ ) {
+    elsif ( $sf->{i}{driver} =~ /^(?:DB2|oracle)\z/ ) {
         if ( $do_not_match ) {
             return " NOT REGEXP_LIKE($col,?,'i')" if ! $case_sensitive;
             return " NOT REGEXP_LIKE($col,?,'c')" if   $case_sensitive;
         }
         else {
-            return " REGEXP_LIKE($col,?,'i')"     if ! $case_sensitive;
-            return " REGEXP_LIKE($col,?,'c')"     if   $case_sensitive;
+            return " REGEXP_LIKE($col,?,'i')" if ! $case_sensitive;
+            return " REGEXP_LIKE($col,?,'c')" if   $case_sensitive;
         }
     }
 }

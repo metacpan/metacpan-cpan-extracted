@@ -44,6 +44,6 @@
          "web" : "http://github.com/drclaw1394/perl-io-fd"
       }
    },
-   "version" : "v0.1.4",
+   "version" : "v0.2.0",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -1,0 +1,201 @@
+package CLI::MetaUtil::Getopt::Long::Complete;
+
+use strict 'subs', 'vars';
+use warnings;
+
+use Getopt::Long::Complete ();
+
+use Exporter qw(import);
+our @EXPORT_OK = qw(GetOptionsCLIWrapper);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-10-07'; # DATE
+our $DIST = 'CLI-MetaUtil-Getopt-Long-Complete'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+our %SPEC;
+
+our @cli_argv;
+
+$SPEC{':package'} = {
+    v => 1.1,
+    summary => 'Routine related to Getopt::Long::Complete',
+};
+
+$SPEC{GetOptionsCLIWrapper} = {
+    v => 1.1,
+    summary => 'Get options for a CLI wrapper',
+    description => <<'_',
+
+This routine can be used to get options for your CLI wrapper. For example, if
+you are creating a wrapper for the `diff` command, this routine will let you
+collect all known `diff` options (declared in <pm:CLI::Meta::diff>) while
+letting you add new options.
+
+_
+    args => {
+        cli => {
+            schema => 'str*',
+            req => 1,
+        },
+        add_opts => {
+            schema => 'hash*',
+        },
+        arg_completion => {
+            schema => 'code*',
+        },
+    },
+    result_naked => 1,
+};
+sub GetOptionsCLIWrapper {
+    my %args = @_;
+    my $cli = $args{cli} or die "Please specify 'cli' argument";
+
+    my %opts;
+    my $mod = "CLI::Meta::$cli";
+    (my $mod_pm = "$mod.pm") =~ s!::!/!g;
+    require $mod_pm;
+    my $meta = ${"$mod\::META"};
+
+    @cli_argv = ();
+    my $code_push_opt     = sub { my ($cb, $optval) = @_; my $optname = $cb->name; push @cli_argv, (length($optname) > 1 ? "--" : "-").$optname };
+    my $code_push_opt_val = sub { my ($cb, $optval) = @_; my $optname = $cb->name; push @cli_argv, (length($optname) > 1 ? "--" : "-").$optname, $optval };
+    for my $ospec (keys %{ $meta->{opts} }) {
+        $opts{$ospec} = $ospec =~ /=/ ? $code_push_opt_val : $code_push_opt;
+    }
+    if ($args{add_opts}) {
+        for my $optname (keys %{ $args{add_opts} }) {
+            $opts{$optname} = $args{add_opts}{$optname};
+        }
+    }
+
+    my $code_completion = sub {
+        my %cargs = @_;
+        my $type = $cargs{type};
+        if ($type eq 'arg' && $args{arg_completion}) { return ref($args{arg_completion}) eq 'CODE' ? $args{arg_completion}->(word=>$cargs{word}) : $args{arg_completion} }
+        if ($type eq 'optval') {
+            for my $ospec (keys %{ $meta->{opts} }) {
+                if ($cargs{ospec} eq $ospec) {
+                    my $comp = $meta->{opts}{$ospec}{completion};
+                    last unless $comp;
+                    return ref($comp) eq 'CODE' ?  $comp->(word=>$cargs{word}) : $comp;
+                }
+            }
+        }
+        undef;
+    };
+
+    Getopt::Long::Complete::GetOptionsWithCompletion(
+        $code_completion,
+        %opts,
+    );
+    @ARGV = @cli_argv;
+}
+
+1;
+# ABSTRACT: Routine related to Getopt::Long::Complete
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+CLI::MetaUtil::Getopt::Long::Complete - Routine related to Getopt::Long::Complete
+
+=head1 VERSION
+
+This document describes version 0.001 of CLI::MetaUtil::Getopt::Long::Complete (from Perl distribution CLI-MetaUtil-Getopt-Long-Complete), released on 2022-10-07.
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+This module is like L<CLI::MetaUtil::Getopt::Long> except instead of passing to
+L<Getopt::Long>, it passes to L<Getopt::Long::Complete>.
+
+=head1 FUNCTIONS
+
+
+=head2 GetOptionsCLIWrapper
+
+Usage:
+
+ GetOptionsCLIWrapper(%args) -> any
+
+Get options for a CLI wrapper.
+
+This routine can be used to get options for your CLI wrapper. For example, if
+you are creating a wrapper for the C<diff> command, this routine will let you
+collect all known C<diff> options (declared in L<CLI::Meta::diff>) while
+letting you add new options.
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<add_opts> => I<hash>
+
+=item * B<arg_completion> => I<code>
+
+=item * B<cli>* => I<str>
+
+
+=back
+
+Return value:  (any)
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/CLI-MetaUtil-Getopt-Long-Complete>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-CLI-MetaUtil-Getopt-Long-Complete>.
+
+=head1 SEE ALSO
+
+L<CLI::MetaUtil::Getopt::Long>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=CLI-MetaUtil-Getopt-Long-Complete>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

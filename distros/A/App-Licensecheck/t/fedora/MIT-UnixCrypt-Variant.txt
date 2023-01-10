@@ -1,0 +1,8 @@
+=== Variant Text ===
+Yes, there is a variant of this variant, replacing the "non-commercial or commercial purposes and without fee" wording that is confusing with "any purpose with or without fee". It is still free (and GPL-compatible), but because of the absence of any warranty disclaimer, we do not recommend its use.
+
+<pre>
+ Permission to use, copy, modify, and distribute this software 
+ for any purpose with or without fee is hereby granted, provided that the above
+ copyright notice and this permission notice appear in all copies. 
+</pre>

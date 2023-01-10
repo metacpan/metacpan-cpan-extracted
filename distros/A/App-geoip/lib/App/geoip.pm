@@ -1,9 +1,9 @@
 #!/pro/bin/perl
 
-use 5.14.0;
+use 5.014000;
 use warnings;
 
-our $VERSION = "0.16";
+our $VERSION = "0.17";
 our $CMD = $0 =~ s{.*/}{}r;
 
 sub usage {
@@ -1155,6 +1155,8 @@ L<Geo::IP6>, L<Geo::IPfree>, L<Geo::IP::RU::IpGeoBase>, L<IP::Country>,
 L<IP::Country::DB_File>, L<IP::Country::DNSBL>, L<IP::Info>, L<IP::Location>,
 L<IP::QQWry>, L<IP::World>, L<Metabrik::Lookup::Iplocation>, L<Pcore::GeoIP>
 
+L<IP::Geolocation::MMDB>
+
 Check L<CPAN|https://metacpan.org/search?q=geoip> for more.
 
 =head1 THANKS
@@ -1163,7 +1165,7 @@ Thanks to cavac for the inspiration
 
 =head1 AUTHOR
 
-H.Merijn Brand F<E<lt>h.m.brand@xs4all.nlE<gt>>, aka Tux.
+H.Merijn Brand F<E<lt>hmbrand@cpan.orgE<gt>>, aka Tux.
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -1176,7 +1178,7 @@ mentioning features of or use of this database.
 This tool uses, but does not include, the GeoLite2 data created by MaxMind,
 available from [http://www.maxmind.com](http://www.maxmind.com).
 
- Copyright (C) 2018-2022 H.Merijn Brand.  All rights reserved.
+ Copyright (C) 2018-2023 H.Merijn Brand.  All rights reserved.
 
 This library is free software;  you can redistribute and/or modify it under
 the same terms as Perl itself.

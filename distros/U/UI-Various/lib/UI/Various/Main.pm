@@ -48,7 +48,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use UI::Various::core;
 use UI::Various::container;
@@ -286,11 +286,14 @@ on to the created dialogue while optional other UI elements are added in the
 specified sequence.
 
 Note that in C<Curses> the call blocks until the dialogue has finished!  (It
-will therefore return C<undef> in those cases.)
+will therefore return C<undef> in those cases.)  The same goes for
+C<PoorTerm> when the L<mainloop|/mainloop - main event loop of an
+application> is already running.
 
 =head3 returns:
 
-the new dialogue or undef in case of an error (and always in C<Curses>)
+the new dialogue or undef in case of an error (and always in C<Curses> or
+C<PoorTerm> with running C<mainloop>)
 
 =cut
 

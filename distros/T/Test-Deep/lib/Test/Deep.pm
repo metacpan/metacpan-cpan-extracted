@@ -2,7 +2,7 @@ use v5.10.0;
 use strict;
 use warnings;
 
-package Test::Deep 1.202;
+package Test::Deep 1.204;
 # ABSTRACT: Extremely flexible deep comparison
 
 use Carp qw( confess );
@@ -79,7 +79,16 @@ while (my ($pkg, $name) = splice @constructors, 0, 2)
   my $file = "$full_pkg.pm";
   $file =~ s#::#/#g;
   my $sub = sub {
-    require $file;
+    # We might be in the middle of testing one of the globals that require()
+    # overwrites. To simplify test authorship, we'll preserve any existing
+    # value.
+    {
+      local $@;
+      local $!;
+      local $^E;
+      require $file;
+    }
+
     return $full_pkg->new(@_);
   };
   {
@@ -646,7 +655,7 @@ Test::Deep - Extremely flexible deep comparison
 
 =head1 VERSION
 
-version 1.202
+version 1.204
 
 =head1 SYNOPSIS
 

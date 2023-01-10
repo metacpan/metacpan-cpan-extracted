@@ -130,15 +130,23 @@ sub _options {
 
 
 sub set_options {
-    my ( $sf, $arg_groups, $arg_options ) = @_;
+    my ( $sf, $arg_group ) = @_;
     if ( ! $sf->{o} || ! %{$sf->{o}} ) {
         my $opt_get = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
         $sf->{o} = $opt_get->read_config_files();
     }
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $groups;
-    if ( $arg_groups ) {
-        $groups = [ @$arg_groups ];
+    if ( $arg_group ) {
+        if ( $arg_group eq 'import' ) {
+            $groups = [ { name => 'group_import', text => '' } ];
+        }
+        elsif ( $arg_group eq 'export' ) {
+            $groups = [ { name => 'group_export', text => '' } ];
+        }
+        else {
+            die "'$arg_group' invalid argument";
+        }
     }
     else {
         $groups = _groups();
@@ -189,14 +197,11 @@ sub set_options {
             $group_name = $groups->[$grp_idx-@pre]{name};
             $group_text = $groups->[$grp_idx-@pre]{text};
         };
-        my $group_prompt = $group_text =~ s/^- //r . ':';
-        my $options;
-        if ( $arg_options ) {
-            $options = [ @$arg_options ];
+        my $group_prompt;
+        if ( length $group_text ) {
+            $group_prompt = $group_text =~ s/^- //r . ':';
         }
-        else {
-            $options = _options( $group_name );
-        }
+        my $options = _options( $group_name );
         my $opt_old_idx = 0;
 
         OPTION: while ( 1 ) {

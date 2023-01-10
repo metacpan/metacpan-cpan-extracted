@@ -27,7 +27,9 @@
       },
       "runtime" : {
          "requires" : {
-            "ExtUtils::CppGuess" : "0"
+            "ExtUtils::CppGuess" : "0",
+            "Object::Pad" : "0",
+            "perl" : "5.026"
          }
       },
       "test" : {
@@ -40,35 +42,35 @@
    "provides" : {
       "Text::Treesitter" : {
          "file" : "lib/Text/Treesitter.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Text::Treesitter::Language" : {
          "file" : "lib/Text/Treesitter/Language.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Text::Treesitter::Node" : {
          "file" : "lib/Text/Treesitter/Node.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Text::Treesitter::Parser" : {
          "file" : "lib/Text/Treesitter/Parser.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Text::Treesitter::Query" : {
          "file" : "lib/Text/Treesitter/Query.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Text::Treesitter::QueryCursor" : {
          "file" : "lib/Text/Treesitter/QueryCursor.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Text::Treesitter::QueryMatch" : {
          "file" : "lib/Text/Treesitter/QueryMatch.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Text::Treesitter::Tree" : {
          "file" : "lib/Text/Treesitter/Tree.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -77,6 +79,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

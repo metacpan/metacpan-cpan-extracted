@@ -8,7 +8,7 @@ use Readonly;
 use Perl::Critic::Utils qw{ :severities :classification $EMPTY hashify};
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.146';
+our $VERSION = '1.148';
 
 #-----------------------------------------------------------------------------
 
@@ -63,14 +63,15 @@ sub violates {
 sub _is_non_local_magic_dest {
     my ($self, $elem) = @_;
 
+    state $local_or_my = { hashify( 'local', 'my' ) };
+
     # Quick exit if in good form
     my $modifier = $elem->sprevious_sibling;
     return
         if
                 $modifier
             &&  $modifier->isa('PPI::Token::Word')
-            &&  ($modifier->content() eq 'local'
-                || $modifier->content() eq 'my');
+            &&  $local_or_my->{$modifier->content()};
 
     # Implementation note: Can't rely on PPI::Token::Magic,
     # unfortunately, because we need English too

@@ -7,7 +7,7 @@ use strict;
 use v5.10;
 
 package Monit::HTTP;
-$Monit::HTTP::VERSION = '0.05';
+$Monit::HTTP::VERSION = '0.06';
 use HTTP::Tiny;
 use XML::Fast;
 use Carp qw( croak );
@@ -335,7 +335,7 @@ Monit::HTTP - An OOP interface to Monit.
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -583,7 +583,7 @@ This method throws errors in case something goes wrong. Use eval { } statement t
 
 =item *
 
-Angelo Failla <pallotron@freaknet.org>
+Angelo Failla <pallotron@gmail.com>
 
 =item *
 
@@ -593,9 +593,10 @@ Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Angelo Failla.
+This software is Copyright (c) 2022 by Dean Hamstead.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

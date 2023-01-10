@@ -1,11 +1,11 @@
-use strict;
+use v5.12.0;
 use warnings;
-package Email::Address;
+package Email::Address 1.913;
 # ABSTRACT: RFC 2822 Address Parsing and Creation
-$Email::Address::VERSION = '1.912';
+
 our $COMMENT_NEST_LEVEL ||= 1;
 our $STRINGIFY          ||= 'format';
-our $COLLAPSE_SPACES      = 1 unless defined $COLLAPSE_SPACES; # I miss //=
+our $COLLAPSE_SPACES    //= 1;
 
 #pod =head1 SYNOPSIS
 #pod
@@ -32,7 +32,7 @@ our $COLLAPSE_SPACES      = 1 unless defined $COLLAPSE_SPACES; # I miss //=
 #pod If you're running version 1.909 or older, you should update!
 #pod
 #pod Alternatively, you could switch to L<B<Email::Address::XS>|Email::Address::XS>
-#pod which has a backward compatible API.
+#pod which has a backward compatible API. B<Why not just use that?>
 #pod
 #pod =cut
 
@@ -423,20 +423,16 @@ sub format {
 sub _format {
     my ($self) = @_;
 
-    unless (
-      defined $self->[_PHRASE] && length $self->[_PHRASE]
-      ||
-      defined $self->[_COMMENT] && length $self->[_COMMENT]
-    ) {
-        return defined $self->[_ADDRESS] ? $self->[_ADDRESS] : '';
+    unless (length $self->[_PHRASE] || length $self->[_COMMENT]) {
+        return $self->[_ADDRESS] // '';
     }
 
-    my $comment = defined $self->[_COMMENT] ? $self->[_COMMENT] : '';
+    my $comment = $self->[_COMMENT] // '';
     $comment = "($comment)" if length $comment and $comment !~ /\A\(.*\)\z/;
 
     my $format = sprintf q{%s <%s> %s},
                  $self->_enquoted_phrase,
-                 (defined $self->[_ADDRESS] ? $self->[_ADDRESS] : ''),
+                 ($self->[_ADDRESS] // ''),
                  $comment;
 
     $format =~ s/^\s+//;
@@ -450,7 +446,7 @@ sub _enquoted_phrase {
 
   my $phrase = $self->[_PHRASE];
 
-  return '' unless defined $phrase and length $phrase;
+  return '' unless length $phrase;
 
   # if it's encoded -- rjbs, 2007-02-28
   return $phrase if $phrase =~ /\A=\?.+\?=\z/;
@@ -553,7 +549,7 @@ Email::Address - RFC 2822 Address Parsing and Creation
 
 =head1 VERSION
 
-version 1.912
+version 1.913
 
 =head1 SYNOPSIS
 
@@ -580,7 +576,7 @@ shouldn't occur in normal email) have been addressed in version 1.910 and newer.
 If you're running version 1.909 or older, you should update!
 
 Alternatively, you could switch to L<B<Email::Address::XS>|Email::Address::XS>
-which has a backward compatible API.
+which has a backward compatible API. B<Why not just use that?>
 
 =head2 Package Variables
 
@@ -810,6 +806,16 @@ On his 1.8GHz Apple MacBook, rjbs gets these results:
 certain known characteristics, and disabling cache will also degrade
 performance.
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Kevin Riggle and Tatsuhiko Miyagawa for tests for annoying
@@ -825,13 +831,13 @@ Casey West
 
 =item *
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =back
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex Vandiver David Golden Steinbrunner Glenn Fowler Jim Brandt Kevin Falcone Pali Ruslan Zakirov sunnavy William Yardley
+=for stopwords Alex Vandiver David Golden Steinbrunner Glenn Fowler Jim Brandt Kevin Falcone Pali Ricardo Signes Ruslan Zakirov sunnavy William Yardley
 
 =over 4
 
@@ -862,6 +868,10 @@ Kevin Falcone <kevin@jibsheet.com>
 =item *
 
 Pali <pali@cpan.org>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

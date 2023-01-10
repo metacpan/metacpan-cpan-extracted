@@ -4,7 +4,7 @@ package Proch::N50;
 use 5.012;
 use warnings;
 my  $opt_digits = 2;
-$Proch::N50::VERSION = '1.5.0';
+$Proch::N50::VERSION = '1.5.4';
 use File::Spec;
 use JSON::PP;
 use FASTX::Reader;
@@ -189,7 +189,7 @@ Proch::N50 - a small module to calculate N50 (total size, and total number of se
 
 =head1 VERSION
 
-version 1.5.0
+version 1.5.4
 
 =head1 SYNOPSIS
 
@@ -231,14 +231,6 @@ version 1.5.0
   # Directly ask for the JSON object only:
   my $json = jsonStats($filepath);
   print $json;
-
-=head1 NAME
-
-Proch::N50 - a small module to calculate N50 (total size, and total number of sequences) for a FASTA or FASTQ file. It's easy to install, with minimal dependencies.
-
-=head1 VERSION
-
-version 1.4.2
 
 =head1 METHODS
 

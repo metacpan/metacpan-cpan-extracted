@@ -39,19 +39,19 @@
    "provides" : {
       "FASTX::Reader" : {
          "file" : "lib/FASTX/Reader.pm",
-         "version" : "v1.7.0"
+         "version" : "v1.8.1"
       },
       "FASTX::ReaderPaired" : {
          "file" : "lib/FASTX/ReaderPaired.pm",
-         "version" : "v1.7.0"
+         "version" : "v1.8.1"
       },
       "FASTX::ScriptHelper" : {
          "file" : "lib/FASTX/ScriptHelper.pm",
-         "version" : "v1.7.0"
+         "version" : "v1.8.1"
       },
       "FASTX::Seq" : {
          "file" : "lib/FASTX/Seq.pm",
-         "version" : "v1.7.0"
+         "version" : "v1.8.1"
       }
    },
    "release_status" : "stable",
@@ -60,7 +60,7 @@
          "url" : "https://github.com/telatin/FASTX-Reader"
       }
    },
-   "version" : "1.7.0",
+   "version" : "1.8.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

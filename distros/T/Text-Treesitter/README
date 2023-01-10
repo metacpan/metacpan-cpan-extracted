@@ -9,11 +9,9 @@ SYNOPSIS
 DESCRIPTION
 
     This module provides several classes and utilities that wrap the
-    tree-sitter parser library.
-
-    This particular package does not (currently) provide any
-    functionallity; to actually use the parser you will need to use some of
-    the specific modules:
+    tree-sitter parser library. A toplevel class is provided by this module
+    which wraps the functionallity of several other classes, which are also
+    available directly in the following modules:
 
       * Text::Treesitter::Language - represents a tree-sitter language
       grammar
@@ -34,6 +32,77 @@ DESCRIPTION
 
       * Text::Treesitter::Tree - holds the result of a tree-sitter parse
       operation
+
+CONSTRUCTOR
+
+ new
+
+       $ts = Text::Treesitter->new( %params );
+
+    Returns a new Text::Treesitter instance. Takes the following named
+    parameters:
+
+    lang => Text::Treesitter::Language
+
+      Optional. An instance of Text::Treesitter::Language to use in the
+      parser.
+
+    lang_name => STRING
+
+      Optional. Gives the short name of the tree-sitter language grammar.
+
+      Exactly one of lang or lang_name must be provided.
+
+    lang_lib => STRING
+
+      Gives the path to the compiled object file which contains the
+      language grammar. Optional; if not provided it will be presumed to be
+      named based on the language name, as tree-sitter-$LANG.so within the
+      language directory. If the path does not contain a / character, it
+      will have the language directory path prepended onto it.
+
+    lang_dir => STRING
+
+      Gives the directory name in which to find the compiled object file
+      which contains the language grammar, or the sources to build it from.
+
+METHODS
+
+ parser
+
+       $parser = $ts->parser;
+
+    Returns the Text::Treesitter::Parser instance being used. The
+    constructor ensures that this will have a language set on it.
+
+ lang
+
+       $lang = $ts->lang;
+
+    Returns the Text::Treesitter::Language instance being used by the
+    parser.
+
+ parse_string
+
+       $tree = $ts->parse_string( $str );
+
+    Parses a given input string using the internal parser, returning a node
+    tree as an instance of Text::Treesitter::Tree.
+
+ load_query_string
+
+       $query = $ts->load_query_string( $str );
+
+    Creates a Text::Treesitter::Query instance by compiling the match
+    patterns given in the source string for the language used by the
+    parser.
+
+ load_query_file
+
+       $query = $ts->load_query_file( $path );
+
+    Creates a Text::Treesitter::Query instance by loading the text from the
+    given path, and then compiling it as per "load_query_string".
 
 TODO
 

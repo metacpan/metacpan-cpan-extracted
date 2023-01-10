@@ -1,5 +1,6 @@
-#!/usr/bin/perl -w
-use strict;
+use v5.12.0;
+use warnings;
+
 use Test::More tests => 37;
 
 sub read_file { local $/; local *FH; open FH, shift or die $!; return <FH> }
@@ -14,8 +15,8 @@ for my $mail_text ($file_contents, \$file_contents) {
   isa_ok($mail, "Email::Simple");
 
   my $old_from;
-  is($old_from = $mail->header("From"), 
-     'Andrew Josey <ajosey@rdg.opengroup.org>',  
+  is($old_from = $mail->header("From"),
+     'Andrew Josey <ajosey@rdg.opengroup.org>',
       "We can get a header");
   my $sc = 'Simon Cozens <simon@cpan.org>';
   is($mail->header_set("From", $sc), $sc, "Setting returns new value");

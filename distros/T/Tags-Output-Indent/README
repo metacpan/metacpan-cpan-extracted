@@ -233,8 +233,8 @@ EXAMPLE
      # </text>
 
 DEPENDENCIES
-    Error::Pure, Indent, Indent::Word, Indent::Block, List::MoreUtils,
-    Readonly, Tags::Utils::Preserve.
+    Error::Pure, Indent, Indent::Word, Indent::Block, List::Util, Readonly,
+    Tags::Utils::Preserve.
 
 SEE ALSO
     Tags
@@ -255,10 +255,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2011-2022 Michal Josef Špaček
+    © 2011-2023 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.08
+    0.10
 

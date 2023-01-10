@@ -1,5 +1,8 @@
 Revision history for Perl extension AI::Genetic::Pro.
 
+1.009 Mon, 09 Jan 2023 21:53:41 +0100
+	- First release with Dist::Zilla.
+
 1.008 Thu, 05 Jan 2023 11:16:26 +0100
 	- Fix: MANIFEST
 

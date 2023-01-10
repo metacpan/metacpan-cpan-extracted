@@ -1,8 +1,8 @@
-use strict;
+use v5.12.0;
 use warnings;
-package Email::MIME::Header;
+package Email::MIME::Header 1.953;
 # ABSTRACT: the header of a MIME message
-$Email::MIME::Header::VERSION = '1.952';
+
 use parent 'Email::Simple::Header';
 
 use Carp ();
@@ -92,7 +92,7 @@ sub header_str_pairs {
 sub header_as_obj {
   my ($self, $name, $index, $class) = @_;
 
-  $class = $self->get_class_for_header($name) unless defined $class;
+  $class //= $self->get_class_for_header($name);
 
   {
     local @CARP_NOT = qw(Email::MIME);
@@ -143,7 +143,7 @@ Email::MIME::Header - the header of a MIME message
 
 =head1 VERSION
 
-version 1.952
+version 1.953
 
 =head1 DESCRIPTION
 
@@ -196,7 +196,7 @@ the minimum required perl.
 
 =item *
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =item *
 

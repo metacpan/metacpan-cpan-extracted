@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use UI::Various::core;
 use UI::Various::Input;

@@ -1,5 +1,35 @@
 Revision history for Perl extension Passwd::Unix.
 
+1.09  Tue, 10 Jan 2023 09:16:15 +0100
+	- Fixed file creation issue (during use of package). We should not create files - this is on the user site.
+
+1.08  Mon, 09 Jan 2023 07:12:02 +0100
+	- Removed "test.pl" file. From now on there sould be used real tests.
+
+1.07  Sun, 08 Jan 2023 09:57:30 +0100
+	- Addition of tests.
+
+1.06  Sun, 08 Jan 2023 09:50:59 +0100
+	- Fix in a Makefile.PL dependencies.
+
+1.05  Sat, 07 Jan 2023 19:15:21 +0100
+	- Support for deletion many groups/users at one time.
+
+1.04  Sat, 07 Jan 2023 17:27:35 +0100
+	- Update of README.
+
+1.03  Sat, 07 Jan 2023 17:21:53 +0100
+	- Fix version number.
+
+1.02  Sat, 07 Jan 2023 17:21:53 +0100
+	- Update of Makefile.pl.
+
+1.01  Fri, 06 Jan 2023 14:20:00 +0100
+	- Update of "Changes" file.
+
+1.0   Fri, 06 Jan 2023 14:19:16 +0100
+	- Full refactorisation of code.
+
 0.7	  Mon, 22 Nov 2012 18:52
 	- Fixed methods: unused_gid unused_uid.
 

@@ -5,13 +5,14 @@ use strict;
 use warnings;
 use Readonly;
 
+use List::SomeUtils qw(any);
 use Perl::Critic::Utils qw{
     :booleans :characters :severities :classification :data_conversion
 };
 use Perl::Critic::Utils::PPI qw{ is_ppi_expression_or_generic_statement };
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.146';
+our $VERSION = '1.148';
 
 #-----------------------------------------------------------------------------
 
@@ -161,7 +162,7 @@ sub _last_flattened_argument_list_element_ends_in_newline {
 # through the components of the List; again, the goal is to find the last
 # value in the flattened list.
 #
-# Before decending into the List, we check that it isn't a subroutine call by
+# Before descending into the List, we check that it isn't a subroutine call by
 # looking at its prior sibling.  In this case, the prior sibling is a comma
 # operator, so it's fine.
 #
@@ -288,20 +289,13 @@ sub _determine_if_list_is_a_plain_list_and_get_last_child {
 
 
 #-----------------------------------------------------------------------------
-Readonly::Hash my %POSTFIX_OPERATORS =>
-    hashify qw{ if unless while until for foreach };
 
 sub _is_postfix_operator {
     my $element = shift;
 
-    if (
-            $element->isa('PPI::Token::Word')
-        and $POSTFIX_OPERATORS{$element}
-    ) {
-        return $TRUE;
-    }
+    state $postfix_operators = { hashify qw( if unless while until for foreach ) };
 
-    return $FALSE;
+    return $element->isa('PPI::Token::Word') && $postfix_operators->{$element};
 }
 
 
@@ -320,11 +314,7 @@ sub _is_simple_list_element_token {
 
     return $FALSE if not $element->isa('PPI::Token');
 
-    foreach my $class (@SIMPLE_LIST_ELEMENT_TOKEN_CLASSES) {
-        return $TRUE if $element->isa($class);
-    }
-
-    return $FALSE;
+    return any { $element->isa($_) } @SIMPLE_LIST_ELEMENT_TOKEN_CLASSES;
 }
 
 
@@ -352,11 +342,7 @@ sub _is_complex_expression_token {
 
     return $FALSE if not $element->isa('PPI::Token');
 
-    foreach my $class (@COMPLEX_EXPRESSION_TOKEN_CLASSES) {
-        return $TRUE if $element->isa($class);
-    }
-
-    return $FALSE;
+    return any { $element->isa($_) } @COMPLEX_EXPRESSION_TOKEN_CLASSES;
 }
 
 #-----------------------------------------------------------------------------
@@ -484,7 +470,7 @@ Jeffrey Ryan Thalhammer <jeff@imaginative-software.com>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2005-2011 Imaginative Software Systems.  All rights reserved.
+Copyright (c) 2005-2023 Imaginative Software Systems.  All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.  The full text of this license

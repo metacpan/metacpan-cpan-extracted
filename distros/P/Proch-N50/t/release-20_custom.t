@@ -23,7 +23,7 @@ if (-e "$file" and -e "$script") {
   my @fields = split /\t/, $output;
   ok($fields[0] == 65,  "N50==65 as expected: got $fields[0]");
   ok(defined $fields[1],  "Expected path in column 2: got $fields[1]");
-  ok($#fields == 1,  "Expected no third column: got $fields[2]");
+  ok($#fields == 1,  "Expected no third column: got " . $#fields . " indexes");
 
 }
 

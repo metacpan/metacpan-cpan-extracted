@@ -509,7 +509,7 @@ H.Merijn Brand <h.m.brand@xs4all.nl>
 
 # LICENSE AND COPYRIGHT
 
-Copyright (C) 2007-2020 H.Merijn Brand
+Copyright (C) 2007-2023 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

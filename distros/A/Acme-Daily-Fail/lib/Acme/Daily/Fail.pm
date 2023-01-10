@@ -1,5 +1,5 @@
 package Acme::Daily::Fail;
-$Acme::Daily::Fail::VERSION = '1.18';
+$Acme::Daily::Fail::VERSION = '1.20';
 #ABSTRACT: generate random newspaper headlines
 
 use strict;
@@ -91,8 +91,9 @@ my $subjects = [
 	["foxes",3,2],
 	["twitter",3,1],            # Topical
 	["the mmr jab",3,1],             # Topical
-  ["judges",3,1],
+  ["judges",3,2],
   ["covid",3,1],              # fuck you, 2020
+  ['meghan markle',3,1],
 ];
 
 # Transitive phrases (i.e. bad thing they do)
@@ -224,7 +225,7 @@ Acme::Daily::Fail - generate random newspaper headlines
 
 =head1 VERSION
 
-version 1.18
+version 1.20
 
 =head1 SYNOPSIS
 
@@ -267,7 +268,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Chris Applegate and Chris Williams.
+This software is copyright (c) 2023 by Chris Applegate and Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -37,7 +37,7 @@ use warnings 'once';
 use Carp;
 use Storable ();
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use UI::Various::language::en;
 
@@ -151,6 +151,7 @@ Otherwise this method just exports the core functions to our other modules.
     my $re_packages =
 	'^' . join('|', PACKAGES,  FINAL_PACKAGE, UNIT_TEST_PACKAGE) . '$';
     my $re_gui_packages = '^' . join('|', GUI_PACKAGES) . '$';
+    my $re_gui_pt_packages = '^' . join('|', GUI_PACKAGES,  FINAL_PACKAGE) . '$';
     my %ui_map = PACKAGE_MAP;
 
     sub import($;%)
@@ -253,6 +254,7 @@ Otherwise this method just exports the core functions to our other modules.
 		info('using__1_as_ui', $use);
 		$UI->{using} = $use;
 		$UI->{is_gui} = $use =~ m/$re_gui_packages/o ? 1 : 0;
+		$UI->{_is_gui_pt} = $use =~ m/$re_gui_pt_packages/o ? 1 : 0;
 		$UI->{ui} = _ROOT_PACKAGE_ . '::' . $use;
 		last;
 	    }
@@ -366,7 +368,7 @@ get or set currently used handling of output>
 	    {
 		if ($new_value == 1)
 		{
-		    $new_value = $UI->{is_gui} ? 0 : 2;
+		    $new_value = $UI->{_is_gui_pt} ? 0 : 2;
 		}
 		if ($new_value != $UI->{stderr})
 		{

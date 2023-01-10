@@ -4,7 +4,6 @@ class TestCase::NativeAPI {
   use TestCase::Minimal;
   use TestCase::Pointer;
   use TestCase::PointerChild;
-  use TestCase::PointerNoNeedFree;
   use TestCase::PointerEmpty;
   use TestCase::Callback::Callback;
   use TestCase::Callback::ImplementCallback1;
@@ -13,6 +12,15 @@ class TestCase::NativeAPI {
   use Array;
   use Error;
   use Complex_2d;
+  
+  INIT {
+    # Call native method in INIT block
+    Fn->sizeof_native_int;
+  }
+  
+  enum {
+    VALUE0,
+  }
   
   our $BYTE_VALUE : byte;
   our $SHORT_VALUE : short;
@@ -1176,7 +1184,7 @@ class TestCase::NativeAPI {
 
 
   
-  static method new_pointer_by_name : int () {
+  static method new_pointer_object_by_name : int () {
     my $pointer = TestCase::Pointer->new(3);
     
     unless ($pointer isa TestCase::Pointer) {
@@ -1190,9 +1198,9 @@ class TestCase::NativeAPI {
     return 1;
   }
 
-  static method new_pointer_by_name_exception : int () {
+  static method new_pointer_object_by_name_exception : int () {
     my $pointer : TestCase::Pointer;
-    eval { $pointer = TestCase::NativeAPI->native_new_pointer_by_name_exception(); };
+    eval { $pointer = TestCase::NativeAPI->native_new_pointer_object_by_name_exception(); };
     
     unless ($@) {
       return 0;
@@ -1201,7 +1209,7 @@ class TestCase::NativeAPI {
     $@ = undef;
     return 1;
   }
-  native static method native_new_pointer_by_name_exception : TestCase::Pointer ();
+  native static method native_new_pointer_object_by_name_exception : TestCase::Pointer ();
 
   static method get_instance_method_id_static : int () {
     
@@ -1369,11 +1377,12 @@ class TestCase::NativeAPI {
   native static method items_4 : int ($args_2d : Complex_2d, $args0 = 0 : int, $args1 = 0 : int);
 
   native static method dumpc : int ();
-  native static method pointer_fields : int ();
-  native static method get_pointer_no_need_free : int ();
-  native static method get_pointer_length : int ();
 
   native static method precompile_build_methodd_source : int ();
+
+  native static method get_compile_type_name : int ();
+
+  native static method runtime_get_method_is_enum : int ();
 
   native static method check_stdin_stdout_stderr_binary_mode : int ();
 }

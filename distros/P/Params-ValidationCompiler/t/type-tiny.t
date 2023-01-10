@@ -6,7 +6,7 @@ use Test2::Plugin::NoWarnings;
 use Test2::Require::Module 'Type::Tiny' => '0.024';
 
 use Params::ValidationCompiler qw( validation_for );
-use Types::Standard qw( ArrayRef Int );
+use Types::Standard            qw( ArrayRef Int );
 
 subtest(
     'type can be inlined',

@@ -343,9 +343,9 @@ use Test::More;
   {
     my $source = [
       'class MyClass { use MyPoint; static method main : void () { new MyPoint; } }',
-      'class MyPoint : pointer_t;',
+      'class MyPoint : public pointer;',
     ];
-    compile_not_ok($source, q|The operand of the new operator can't be a pointer class type|);
+    compile_ok($source);
   }
   {
     my $source = 'class MyClass { static method main : void () {  new Int; } }';
@@ -761,15 +761,15 @@ use Test::More;
   }
   {
     my $source = 'class MyClass { static method main : void () { &foo(); } static method foo : void ($arg0 : int, $arg1 = 0 : int) { } }';
-    compile_not_ok($source, q|The length of the arguments passed to the class "foo" method in the "MyClass" class must be at least 1|);
+    compile_not_ok($source, q|The length of the arguments passed to the "foo" class method in the "MyClass" class must be at least 1|);
   }
   {
     my $source = 'class MyClass { static method main : void () { my $object = new MyClass; $object->foo(); } method foo : void ($arg0 : int, $arg1 = 0 : int) { } }';
-    compile_not_ok($source, q|The length of the arguments passed to the instance "foo" method in the "MyClass" class must be at least 1|);
+    compile_not_ok($source, q|The length of the arguments passed to the "foo" instance method in the "MyClass" class must be at least 1|);
   }
   {
     my $source = 'class MyClass { static method main : void () { my $object = new MyClass; $object->foo(1, 2, 3); } method foo : void ($arg0 : int, $arg1 = 0 : int) { } }';
-    compile_not_ok($source, q|The length of the arguments passed to the instance "foo" method in the "MyClass" class must be less than or equal to 2|);
+    compile_not_ok($source, q|The length of the arguments passed to the "foo" instance method in the "MyClass" class must be less than or equal to 2|);
   }
 }
 
@@ -889,11 +889,11 @@ use Test::More;
   }
   {
     my $source = 'class MyClass { static method main : void () { &foo("abc"); } static method foo : int ($string : mutable string) { }}';
-    compile_not_ok($source, q|The non-mutable type can't be assign to a mutable type in the 1th argument of the class "foo" method in the "MyClass" class|);
+    compile_not_ok($source, q|The non-mutable type can't be assign to a mutable type in the 1th argument of the "foo" class method in the "MyClass" class|);
   }
   {
     my $source = 'class MyClass { static method main : void () { my $object = new MyClass; $object->foo("abc"); } method foo : int ($string : mutable string) { }}';
-    compile_not_ok($source, q|The non-mutable type can't be assign to a mutable type in the 1th argument of the instance "foo" method in the "MyClass" class|);
+    compile_not_ok($source, q|The non-mutable type can't be assign to a mutable type in the 1th argument of the "foo" instance method in the "MyClass" class|);
   }
   {
     my $source = 'class MyClass { static method main : void () { my $var : int = "foo"; } }';
@@ -1055,9 +1055,9 @@ use Test::More;
   {
     my $source = [
       'class MyClass extends MyClass2 {}',
-      'class MyClass2 : pointer_t;',
+      'class MyClass2 : pointer;',
     ];
-    compile_not_ok($source, q|The parant class can't be a pointer class|);
+    compile_ok($source);
   }
   {
     my $source = 'class MyClass extends MyClass {}';
@@ -1068,8 +1068,8 @@ use Test::More;
     compile_not_ok($source, q|The current class must be a class type when the class becomes a child class|);
   }
   {
-    my $source = 'class MyClass extends Point : pointer_t { }';
-    compile_not_ok($source, q|The current class can't be a pointer class type when the class becomes a child class|);
+    my $source = 'class MyClass extends Point : pointer { }';
+    compile_ok($source);
   }
 }
 

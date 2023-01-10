@@ -6,7 +6,7 @@ use warnings;
 
 use Test::Shared::Fixture::Wikibase::Datatype::Value::Item::Wikidata::Douglas;
 
-our $VERSION = 0.23;
+our $VERSION = 0.24;
 
 sub new {
 	my $class = shift;
@@ -136,12 +136,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020-2022
+© Michal Josef Špaček 2020-2023
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.23
+0.24
 
 =cut

@@ -1,5 +1,5 @@
 package Config::Structured::Deserializer;
-$Config::Structured::Deserializer::VERSION = '2.002';
+$Config::Structured::Deserializer::VERSION = '2.003';
 # ABSTRACT: Deserializes perl structures, JSON or YML data, from strings or files
 
 use strict;
@@ -79,7 +79,7 @@ Config::Structured::Deserializer - Deserializes perl structures, JSON or YML dat
 
 =head1 VERSION
 
-version 2.002
+version 2.003
 
 =head1 AUTHOR
 
@@ -87,7 +87,7 @@ Mark Tyrrell <mtyrrell@concertpharma.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Concert Pharmaceuticals, Inc.
+This software is copyright (c) 2023 by Concert Pharmaceuticals, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

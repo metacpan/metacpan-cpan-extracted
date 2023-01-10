@@ -13,63 +13,81 @@ Note: Replace '1.10' in the examples below with the current version.
 
 * Start release branch
 
-    # Set the connver to the new version number
-    connver=1.10
-    git flow release start $connver develop
+Set the connver to the new version number:
+
+```
+connver=1.10
+git flow release start $connver develop
+```
 
 * Merge in any remote work (optional)
 
-    git remote update
-    git merge <remote-branch>
+```
+git remote update
+git merge <remote-branch>
+```
 
 * Run unit tests
 
-    minil test
+```
+minil test
+```
 
 * Bump version number in lib/Connector.pm
 
-    perl -i -pe "s{our \\\$VERSION = .+}{our \\\$VERSION = '$connver';};" \
-        lib/Connector.pm
-    git add lib/Connector.pm
-    git commit -m "bump version to $connver"
+```
+perl -i -pe "s{our \\\$VERSION = .+}{our \\\$VERSION = '$connver';};" \
+  lib/Connector.pm
+git add lib/Connector.pm
+git commit -m "bump version to $connver"
+```
 
 * Make any last-minute fixes and re-test
 
-    minil test
+```
+minil test
+```
 
 * Finalize release (write the version number in the TAG\_MSG)
 
-    git flow release finish -m "$connver" "$connver"
-    git push origin develop master "$connver"
+```
+git flow release finish -m "$connver" "$connver"
+git push origin develop master "$connver"
+```
 
 * Build tarball
 
-    minil dist
+```
+minil dist
+```
 
 * Upload tarball to https://pause.perl.org
 
-    minil release
+```
+minil release
+```
 
 # If the build env is not already set up, run the following:
 
-    curl -L http://install.perlbrew.pl | bash
-    echo "source $HOME/perl5/perlbrew/etc/bashrc" >> $HOME/.bashrc
-    source $HOME/perl5/perlbrew/etc/bashrc
-    perlbrew available
-    # Note: Adjust perl version based on results from 'perlbrew available'
-    perlbrew install perl-5.19.5
-    perlbrew switch perl-5.19.5
- 
-    perlbrew install-cpanm
-    cpanm Module::Install
-    cpanm --installdeps --notest .
+```
+curl -L http://install.perlbrew.pl | bash
+echo "source $HOME/perl5/perlbrew/etc/bashrc" >> $HOME/.bashrc
+source $HOME/perl5/perlbrew/etc/bashrc
+perlbrew available
+# Note: Adjust perl version based on results from 'perlbrew available'
+perlbrew install perl-5.19.5
+perlbrew switch perl-5.19.5
+
+perlbrew install-cpanm
+cpanm Module::Install
+cpanm --installdeps --notest .
+```
 
 ## To set up a new perl version
 
-    perlbrew install perl-5.32.0
-    perlbrew use perl-5.32.0
-    cpanm Module::Install
-    cpanm --installdeps --notest .
-
-
-
+```
+perlbrew install perl-5.32.0
+perlbrew use perl-5.32.0
+cpanm Module::Install
+cpanm --installdeps --notest .
+```

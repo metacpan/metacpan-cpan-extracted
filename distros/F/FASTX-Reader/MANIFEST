@@ -43,6 +43,8 @@ lib/FASTX/Reader.pm
 lib/FASTX/ReaderPaired.pm
 lib/FASTX/ScriptHelper.pm
 lib/FASTX/Seq.pm
+protein.txt
+read2.py
 scripts/Benchmark.pl
 scripts/CountTwo.pl
 scripts/Counter.pl
@@ -83,6 +85,7 @@ t/18_parse_pe_bad_names.t
 t/19_parse_pe_rev.t
 t/20_parse_pe_bad_interleaved.t
 t/21_next.t
+t/22_nextobj.t
 t/30_helper.t
 t/31_helper_fun.t
 t/40_two_fastas.t
@@ -96,7 +99,9 @@ t/release-01-pod-coverage.t
 t/release-03-minimum-standards.t
 t/release-05-changes.t
 t/release-check-version.t
+test.py
 xt/author/bench.pl
 xt/release/02-perl-min.pl
 xt/release/after.sh
 xt/release/before.sh
+xt/whiler.pl

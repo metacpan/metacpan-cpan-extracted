@@ -6353,14 +6353,14 @@ static inline void _marpaESLIF_symbol_freev(marpaESLIF_symbol_t *symbolp)
       /* All pointers are the top level of this structure are shallow pointers EXCEPT luaexplist family */
       switch (symbolp->type) {
       case MARPAESLIF_SYMBOL_TYPE_TERMINAL:
-        if (symbolp->descp != symbolp->u.terminalp->descp) {
+        if ((symbolp->descp != NULL) && (symbolp->descp != symbolp->u.terminalp->descp)) {
           /* A :terminal or :symbol rule overwrote default description */
           _marpaESLIF_string_freev(symbolp->descp, 0 /* onStackb */);
         }
         _marpaESLIF_terminal_freev(symbolp->u.terminalp);
         break;
       case MARPAESLIF_SYMBOL_TYPE_META:
-        if (symbolp->descp != symbolp->u.metap->descp) {
+        if ((symbolp->descp != NULL) && (symbolp->descp != symbolp->u.metap->descp)) {
           /* A :lexeme or :symbol rule overwrote default description */
           _marpaESLIF_string_freev(symbolp->descp, 0 /* onStackb */);
         }
@@ -24239,7 +24239,6 @@ static inline marpaESLIFSymbol_t *_marpaESLIFSymbol_terminal_newp(marpaESLIF_t *
   marpaESLIF_terminal_t *terminalp             = NULL;
   marpaESLIF_string_t   *utf8Substitutionp     = NULL;
   marpaESLIF_terminal_t *substitutionTerminalp = NULL;
-  marpaESLIF_string_t   *descp                 = NULL;
 
   utf8p = _marpaESLIF_string2utf8p(marpaESLIFp, stringp, 0 /* tconvsilentb */);
   if (MARPAESLIF_UNLIKELY(utf8p == NULL)) {
@@ -24277,7 +24276,14 @@ static inline marpaESLIFSymbol_t *_marpaESLIFSymbol_terminal_newp(marpaESLIF_t *
     goto err;
   }
 
+  symbolp->type        = MARPAESLIF_SYMBOL_TYPE_TERMINAL;
+  symbolp->u.terminalp = terminalp;
+  symbolp->idi         = terminalp->idi;
+  symbolp->descp       = terminalp->descp;
+  terminalp = NULL; /* It is in symbolp */
+
   if (substitutionStringp != NULL) {
+    /* Overwrite symbol description */
     substitutionTerminalp = _marpaESLIF_terminal_newp(marpaESLIFp,
                                                       NULL, /* marpaWrapperGrammarStartp */
                                                       0, /* eventSeti */
@@ -24298,22 +24304,23 @@ static inline marpaESLIFSymbol_t *_marpaESLIFSymbol_terminal_newp(marpaESLIF_t *
       goto err;
     }
 
-    descp = _marpaESLIF_terminal_add_substitution_desc_to_terminal_descp(marpaESLIFp, terminalp, substitutionTerminalp);
-    if (descp == NULL) {
+    symbolp->descp = _marpaESLIF_terminal_add_substitution_desc_to_terminal_descp(marpaESLIFp, symbolp->u.terminalp, substitutionTerminalp);
+    if (symbolp->descp == NULL) {
       goto err;
     }
-    /* Replace description */
-    _marpaESLIF_string_freev(terminalp->descp, 0 /* onStackb */);
-    terminalp->descp = descp;
-    descp = NULL; /* descp is now in terminalp */
+
+    /* Transfer substitution information from substitutionTerminalp to symbolp->u.terminalp */
+    symbolp->u.terminalp->substitutionUtf8s     = substitutionTerminalp->utf8s;
+    symbolp->u.terminalp->substitutionUtf8l     = substitutionTerminalp->utf8l;
+    symbolp->u.terminalp->substitutionModifiers = substitutionTerminalp->modifiers;
+    symbolp->u.terminalp->substitutionPatterns  = substitutionTerminalp->patterns;
+    symbolp->u.terminalp->substitutionPatternl  = substitutionTerminalp->patternl;
+    symbolp->u.terminalp->substitutionPatterni  = substitutionTerminalp->patterni;
+
+    substitutionTerminalp->utf8s     = NULL; /* it is now in terminalp */
+    substitutionTerminalp->modifiers = NULL; /* it is now in terminalp */
+    substitutionTerminalp->patterns  = NULL; /* it is now in terminalp */
   }
-
-  symbolp->type        = MARPAESLIF_SYMBOL_TYPE_TERMINAL;
-  symbolp->u.terminalp = terminalp;
-  symbolp->idi         = terminalp->idi;
-  symbolp->descp       = terminalp->descp;
-
-  terminalp = NULL; /* It is in symbolp */
 
   goto done;
 
@@ -24323,14 +24330,13 @@ static inline marpaESLIFSymbol_t *_marpaESLIFSymbol_terminal_newp(marpaESLIF_t *
 
  done:
   if (utf8p != stringp) {
-    _marpaESLIF_string_freev(utf8p, 0 /* onStackb */);
+    _marpaESLIF_string_freev(utf8p, 0 /* onStackb */); /* NULL aware */
   }
-  if (utf8Substitutionp != stringp) {
-    _marpaESLIF_string_freev(utf8Substitutionp, 0 /* onStackb */);
+  if (utf8Substitutionp != substitutionStringp) {
+    _marpaESLIF_string_freev(utf8Substitutionp, 0 /* onStackb */); /* NULL aware */
   }
   _marpaESLIF_terminal_freev(terminalp);
   _marpaESLIF_terminal_freev(substitutionTerminalp);
-  _marpaESLIF_string_freev(descp, 0 /* onStackb */);
 
   return symbolp;
 }
@@ -25436,17 +25442,6 @@ static marpaESLIF_string_t *_marpaESLIF_terminal_add_substitution_desc_to_termin
   marpaESLIF_string_t *rcp               = NULL;
   char                *p;
   size_t               asciil;
-
-  terminalp->substitutionUtf8s     = substitutionTerminalp->utf8s;
-  terminalp->substitutionUtf8l     = substitutionTerminalp->utf8l;
-  terminalp->substitutionModifiers = substitutionTerminalp->modifiers;
-  terminalp->substitutionPatterns  = substitutionTerminalp->patterns;
-  terminalp->substitutionPatternl  = substitutionTerminalp->patternl;
-  terminalp->substitutionPatterni  = substitutionTerminalp->patterni;
-
-  substitutionTerminalp->utf8s     = NULL; /* it is now in terminalp */
-  substitutionTerminalp->modifiers = NULL; /* it is now in terminalp */
-  substitutionTerminalp->patterns  = NULL; /* it is now in terminalp */
 
   /* We also want to overwrite the terminal description to include the substitution */
   /* We revisit the ASCII version of the description */

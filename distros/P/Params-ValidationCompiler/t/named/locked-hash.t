@@ -5,7 +5,7 @@ use Test2::V0;
 use Test2::Plugin::NoWarnings;
 use Test2::Require::Module 'Hash::Util';
 
-use Hash::Util qw( lock_hash );
+use Hash::Util                 qw( lock_hash );
 use Params::ValidationCompiler qw( validation_for );
 use Specio::Library::Builtins;
 

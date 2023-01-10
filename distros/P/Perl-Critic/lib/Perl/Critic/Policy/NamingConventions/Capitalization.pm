@@ -25,7 +25,7 @@ use PPIx::Utilities::Statement qw<
 
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.146';
+our $VERSION = '1.148';
 
 #-----------------------------------------------------------------------------
 
@@ -57,7 +57,7 @@ Readonly::Hash my %CAPITALIZATION_SCHEME_TAGS    => (
     },
     ':starts_with_upper'    => {
         regex               => $STARTS_WITH_UPPER_REGEX,
-        regex_violation     => 'does not start with a upper case letter',
+        regex_violation     => 'does not start with an upper case letter',
     },
     ':no_restriction'       => {
         regex               => $NO_RESTRICTION_REGEX,
@@ -236,8 +236,7 @@ sub initialize_if_enabled {
         $self->{"_${kind_of_name}_test"} = sub {
             my ($name) = @_;
 
-            return if _name_is_exempt($name, $exemption_regexes);
-
+            return if any { $name =~ m/$_/xms } @{$exemption_regexes};
             return $message if $name !~ m/$capitalization_regex/xms;
             return;
         }
@@ -323,22 +322,11 @@ sub _derive_capitalization_exemption_test_regexes {
     return \@regexes;
 }
 
-sub _name_is_exempt {
-    my ($name, $exemption_regexes) = @_;
-
-    foreach my $regex ( @{$exemption_regexes} ) {
-        return $TRUE if $name =~ m/$regex/xms;
-    }
-
-    return $FALSE;
-}
-
 #-----------------------------------------------------------------------------
 
 sub violates {
     my ( $self, $elem, undef ) = @_;
 
-    # Want given.  Want 5.10.  Gimme gimme gimme.  :]
     if ( $elem->isa('PPI::Statement::Variable') ) {
         return $self->_variable_capitalization($elem);
     }
@@ -766,7 +754,7 @@ Multiple people
 
 =head1 COPYRIGHT
 
-Copyright (c) 2008-2021 Michael G Schwern.  All rights reserved.
+Copyright (c) 2008-2023 Michael G Schwern.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.  The full text of this license

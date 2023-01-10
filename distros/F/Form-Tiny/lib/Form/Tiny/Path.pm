@@ -1,5 +1,5 @@
 package Form::Tiny::Path;
-$Form::Tiny::Path::VERSION = '2.16';
+$Form::Tiny::Path::VERSION = '2.17';
 use v5.10;
 use strict;
 use warnings;
@@ -18,6 +18,9 @@ has 'path' => (
 	required => 1,
 );
 
+# Note: this clashes with 'meta' from Moo :/
+# will stay as it is though as long as it works (overrides the other meta)
+# properly, since can't know how much external code uses it
 has 'meta' => (
 	is => 'ro',
 	isa => ArrayRef,

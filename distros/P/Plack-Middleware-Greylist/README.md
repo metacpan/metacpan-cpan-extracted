@@ -4,7 +4,7 @@ Plack::Middleware::Greylist - throttle requests with different rates based on ne
 
 # VERSION
 
-version v0.3.4
+version v0.3.5
 
 # SYNOPSIS
 
@@ -161,9 +161,13 @@ Robert Rothenberg <rrwo@cpan.org>
 The initial development of this module was sponsored by Science Photo
 Library [https://www.sciencephoto.com](https://www.sciencephoto.com).
 
+# CONTRIBUTOR
+
+Gabor Szabo <gabor@szabgab.com>
+
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Robert Rothenberg.
+This software is Copyright (c) 2022-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

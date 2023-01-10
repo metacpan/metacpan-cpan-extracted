@@ -1,24 +1,4 @@
-# --8<--8<--8<--8<--
-#
-# Copyright (C) 2016 Smithsonian Astrophysical Observatory
-#
-# This file is part of PDLx::Mask
-#
-# PDLx::Mask is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at
-# your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# -->8-->8-->8-->8--
-
+# ABSTRACT: Mask multiple piddles with automatic two way feedback
 package PDLx::Mask;
 
 use strict;
@@ -27,7 +7,7 @@ use Carp;
 
 use v5.10;
 
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
 use Params::Check qw[ check ];
 use Ref::Util ':all';
@@ -39,11 +19,13 @@ use PDL::Core ':Internal';
 
 use Moo;
 use MooX::ProtectedAttributes;
-use namespace::clean 0.16;
+
+use namespace::clean;
 
 extends 'PDLx::DetachedObject';
 
 with 'PDLx::Role::RestrictedPDL';
+
 
 use overload
   map {
@@ -58,7 +40,7 @@ use overload
         $_[0]->clear_nvalid;
         $_[0]->update;
         $_[0];
-      }
+    }
   } qw[ |= &= ^= .= ];
 
 has base => (
@@ -119,8 +101,7 @@ sub subscribe {
 
         token => {
             default => undef,
-          }
-    };
+        } };
 
     my $opts = check( $tmpl, {@_} )
       or die Params::Check::last_error();
@@ -196,9 +177,7 @@ sub update {
 
     # now push new mask
     $_->{apply_mask}->( $self->PDL )
-      foreach
-	grep { defined $_->{apply_mask} }
-	  values %{ $self->subscribers };
+      foreach grep { defined $_->{apply_mask} } values %{ $self->subscribers };
 
     return;
 }
@@ -244,13 +223,29 @@ sub copy { return $_[0]->mask->copy }
 
 1;
 
+#
+# This file is part of PDLx-Mask
+#
+# This software is Copyright (c) 2016 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
 
 __END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory PDL nvalid
 
 =head1 NAME
 
 PDLx::Mask - Mask multiple piddles with automatic two way feedback
 
+=head1 VERSION
+
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -293,7 +288,6 @@ PDLx::Mask - Mask multiple piddles with automatic two way feedback
   # and see the other piddle change
   say $data2;    # [0 2 3 0 5 6 7 8 9]
 
-
 =head1 DESCRIPTION
 
 Typically L<PDL> uses L<bad values|PDL::Bad> to mark elements in a piddle which
@@ -302,7 +296,7 @@ marked as invalid, a separate I<mask> piddle (whose values are true for valid da
 and false otherwise) is often used.
 
 B<PDLx::Mask> in concert with L<PDLx::MaskedData> simplifies the management of
-mutiple piddles sharing the same mask.  B<PDLx::Mask> is the shared mask,
+multiple piddles sharing the same mask.  B<PDLx::Mask> is the shared mask,
 and B<PDLx::MaskedData> is a specialized piddle which will dynamically respond
 to changes in the mask, so that they are always up-to-date.
 
@@ -350,6 +344,14 @@ the mask's L<< B<update>|/update >> method I<must> be called.
 
 =back
 
+=head1 INTERNALS
+
+=for Pod::Coverage BUILD
+BUILDARGS
+PDL
+subscribers
+nvalid
+readonly
 
 =head1 INTERFACE
 
@@ -470,7 +472,6 @@ with the I<effective> mask.
 
 =back
 
-
 =head2 Overridden methods
 
 =head3 C<copy>
@@ -534,7 +535,7 @@ mask won't be replicated in the secondary.
   say $pmask->base; #  [ 0 1 1 ]
   say $pmask;       #  [ 0 1 0 ]
 
-=head2 Intermittant Secondary Masks
+=head2 Intermittent Secondary Masks
 
 Building upon the previous example, let's say the secondary mask is
 used intermittently.  For example
@@ -560,50 +561,32 @@ used intermittently.  For example
   $smask->subscribe;
   say $data         #  [ 0, 22, 0 ]
 
+=head1 SUPPORT
 
-=head1 BUGS AND LIMITATIONS
+=head2 Bugs
 
-Please report any bugs or feature requests to
-C<bug-pdlx-mask@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/Public/Dist/Display.html?Name=PDLx-Mask>.
+Please report any bugs or feature requests to bug-pdlx-mask@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=PDLx-Mask
 
-=head1 VERSION
+=head2 Source
 
-Version 0.01
+Source is available at
 
-=head1 LICENSE AND COPYRIGHT
+  https://gitlab.com/djerius/pdlx-mask
 
-Copyright (c) 2016 The Smithsonian Astrophysical Observatory
+and may be cloned from
 
-PDLx::Mask is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or (at
-your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  https://gitlab.com/djerius/pdlx-mask.git
 
 =head1 AUTHOR
 
-Diab Jerius  E<lt>djerius@cpan.orgE<gt>
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
 
 =cut
-
-=begin fakeout_pod_coverage
-
-=head3 BUILD
-
-=head3 BUILDARGS
-
-=head3 PDL
-
-=head3 subscribers
-
-=end fakeout_pod_coverage
-
-

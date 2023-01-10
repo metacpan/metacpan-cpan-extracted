@@ -12,11 +12,14 @@ my @files = (
     'lib/Finance/Tax/Aruba/Income.pm',
     'lib/Finance/Tax/Aruba/Income/2020.pm',
     'lib/Finance/Tax/Aruba/Income/2021.pm',
+    'lib/Finance/Tax/Aruba/Income/2023.pm',
     'lib/Finance/Tax/Aruba/Role/Income/TaxYear.pm',
     't/00-compile.t',
     't/01-2020.t',
     't/02-2021.t',
-    't/03-2022.t'
+    't/03-2022.t',
+    't/04-2023.t',
+    't/lib/Test/TestFinanceAW.pm'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

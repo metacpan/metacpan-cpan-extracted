@@ -1,5 +1,12 @@
 Revision history for Plack-Middleware-Greylist
 
+v0.3.5    2023-01-10 14:47:47+00:00 Europe/London
+  [Documentation]
+  - Bumped copyright year.
+
+  [Other]
+  - Added GitHub Actions to run tests, GH#3, thanks @szabgab
+
 v0.3.4    2022-12-08 13:33:03+00:00 Europe/London
   [Other]
   - Fixed typo in git repository URL, GH#2, thanks @szabgab.

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Applicator;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Applicator vocabulary
 
-our $VERSION = '0.560';
+our $VERSION = '0.561';
 
 use 5.020;
 use Moo;
@@ -274,11 +274,13 @@ sub _eval_keyword__items_array_schemas ($self, $data, $schema, $state) {
     if (is_type('boolean', $schema->{$state->{keyword}}[$idx])) {
       next if $schema->{$state->{keyword}}[$idx];
       $valid = E({ %$state, data_path => $state->{data_path}.'/'.$idx,
-        _schema_path_suffix => $idx }, 'item not permitted');
+        _schema_path_suffix => $idx, collect_annotations => $state->{collect_annotations} & ~1 },
+        'item not permitted');
     }
     elsif ($self->eval($data->[$idx], $schema->{$state->{keyword}}[$idx],
         +{ %$state, data_path => $state->{data_path}.'/'.$idx,
-          schema_path => $state->{schema_path}.'/'.$state->{keyword}.'/'.$idx })) {
+          schema_path => $state->{schema_path}.'/'.$state->{keyword}.'/'.$idx,
+          collect_annotations => $state->{collect_annotations} & ~1 })) {
       next;
     }
 
@@ -311,7 +313,8 @@ sub _eval_keyword__items_schema ($self, $data, $schema, $state) {
     else {
       if ($self->eval($data->[$idx], $schema->{$state->{keyword}},
         +{ %$state, data_path => $state->{data_path}.'/'.$idx,
-          schema_path => $state->{schema_path}.'/'.$state->{keyword} })) {
+          schema_path => $state->{schema_path}.'/'.$state->{keyword},
+          collect_annotations => $state->{collect_annotations} & ~1 })) {
         next;
       }
 
@@ -335,11 +338,13 @@ sub _eval_keyword_contains ($self, $data, $schema, $state) {
 
   $state->{_num_contains} = 0;
   my (@errors, @valid);
+
   foreach my $idx (0 .. $data->$#*) {
     if ($self->eval($data->[$idx], $schema->{contains},
         +{ %$state, errors => \@errors,
           data_path => $state->{data_path}.'/'.$idx,
-          schema_path => $state->{schema_path}.'/contains' })) {
+          schema_path => $state->{schema_path}.'/contains',
+          collect_annotations => $state->{collect_annotations} & ~1 })) {
       ++$state->{_num_contains};
       push @valid, $idx;
 
@@ -379,7 +384,8 @@ sub _eval_keyword_properties ($self, $data, $schema, $state) {
     else {
       if ($self->eval($data->{$property}, $schema->{properties}{$property},
           +{ %$state, data_path => jsonp($state->{data_path}, $property),
-            schema_path => jsonp($state->{schema_path}, 'properties', $property) })) {
+            schema_path => jsonp($state->{schema_path}, 'properties', $property),
+            collect_annotations => $state->{collect_annotations} & ~1 })) {
         next;
       }
 
@@ -420,7 +426,8 @@ sub _eval_keyword_patternProperties ($self, $data, $schema, $state) {
       else {
         if ($self->eval($data->{$property}, $schema->{patternProperties}{$property_pattern},
             +{ %$state, data_path => jsonp($state->{data_path}, $property),
-              schema_path => jsonp($state->{schema_path}, 'patternProperties', $property_pattern) })) {
+              schema_path => jsonp($state->{schema_path}, 'patternProperties', $property_pattern),
+              collect_annotations => $state->{collect_annotations} & ~1 })) {
           next;
         }
 
@@ -456,7 +463,8 @@ sub _eval_keyword_additionalProperties ($self, $data, $schema, $state) {
     else {
       if ($self->eval($data->{$property}, $schema->{additionalProperties},
           +{ %$state, data_path => jsonp($state->{data_path}, $property),
-            schema_path => $state->{schema_path}.'/additionalProperties' })) {
+            schema_path => $state->{schema_path}.'/additionalProperties',
+            collect_annotations => $state->{collect_annotations} & ~1 })) {
         next;
       }
 
@@ -479,7 +487,8 @@ sub _eval_keyword_propertyNames ($self, $data, $schema, $state) {
   foreach my $property (sort keys %$data) {
     if ($self->eval($property, $schema->{propertyNames},
         +{ %$state, data_path => jsonp($state->{data_path}, $property),
-          schema_path => $state->{schema_path}.'/propertyNames' })) {
+          schema_path => $state->{schema_path}.'/propertyNames',
+          collect_annotations => $state->{collect_annotations} & ~1 })) {
       next;
     }
 
@@ -505,7 +514,7 @@ JSON::Schema::Modern::Vocabulary::Applicator - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.560
+version 0.561
 
 =head1 DESCRIPTION
 

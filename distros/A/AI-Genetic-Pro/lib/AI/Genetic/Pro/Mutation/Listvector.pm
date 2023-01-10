@@ -1,5 +1,5 @@
 package AI::Genetic::Pro::Mutation::Listvector;
-
+$AI::Genetic::Pro::Mutation::Listvector::VERSION = '1.009';
 use warnings;
 use strict;
 use List::MoreUtils qw(first_index);

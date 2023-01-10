@@ -6,7 +6,11 @@ use warnings;
 use Getopt::Long;
 use FindBin qw($RealBin);
 use FASTX::Reader;
-
+# The following placeholder is to be programmatically replaced with 'use lib "$RealBin/../lib"' if needed
+#~loclib~
+if ( -e "$RealBin/../lib/Proch/N50.pm" and -e "$RealBin/../Changes" ) {
+    use lib "$RealBin/../lib";
+}
 use File::Basename;
 use Data::Dumper;
 my $BASENAME = basename($0);
@@ -110,7 +114,7 @@ fu-extract - Get sequences by name (also using lists)
 
 =head1 VERSION
 
-version 1.5.0
+version 1.5.4
 
 =head1 PARAMETERS
 

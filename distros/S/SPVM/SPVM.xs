@@ -6,6 +6,7 @@
 #include "ppport.h"
 
 #undef call_method
+#undef leave_scope
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -60,7 +61,7 @@ void* SPVM_XS_UTIL_get_object(pTHX_ SV* sv_data) {
 void* SPVM_XS_UTIL_new_mulnum_array(pTHX_ SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, SV* sv_elems, SV** sv_error) {
   
   if (!sv_derived_from(sv_elems, "ARRAY")) {
-    *sv_error = sv_2mortal(newSVpvf("The argument must be an array reference at %s line %d\n", FILE_NAME, __LINE__));
+    *sv_error = sv_2mortal(newSVpvf("The elements must be an array reference at %s line %d\n", FILE_NAME, __LINE__));
     return NULL;
   }
   
@@ -74,7 +75,7 @@ void* SPVM_XS_UTIL_new_mulnum_array(pTHX_ SPVM_ENV* env, SPVM_VALUE* stack, cons
   int32_t basic_type_id = env->api->runtime->get_basic_type_id_by_name(env->runtime, basic_type_name);
   
   if (basic_type_id < 0) {
-    *sv_error = sv_2mortal(newSVpvf("Not found %s at %s line %d\n", basic_type_name, FILE_NAME, __LINE__));
+    *sv_error = sv_2mortal(newSVpvf("The \"%s\" basic type is not found at %s line %d\n", basic_type_name, FILE_NAME, __LINE__));
     return NULL;
   }
   
@@ -103,11 +104,7 @@ void* SPVM_XS_UTIL_new_mulnum_array(pTHX_ SPVM_ENV* env, SPVM_VALUE* stack, cons
       while (hv_iternext(hv_value)) {
         hash_keys_length++;
       }
-      if (hash_keys_length != fields_length) {
-        *sv_error = sv_2mortal(newSVpvf("Value element hash key is lacked at %s line %d\n", FILE_NAME, __LINE__));
-        return NULL;
-      }
-
+      
       for (int32_t field_index = 0; field_index < class_fields_length; field_index++) {
         int32_t mulnum_field_id = class_fields_base_id + field_index;
         int32_t mulnum_field_name_id = env->api->runtime->get_field_name_id(env->runtime, mulnum_field_id);
@@ -120,7 +117,7 @@ void* SPVM_XS_UTIL_new_mulnum_array(pTHX_ SPVM_ENV* env, SPVM_VALUE* stack, cons
           sv_field_value = *sv_field_value_ptr;
         }
         else {
-          *sv_error = sv_2mortal(newSVpvf("Value element must be defined at %s line %d\n", FILE_NAME, __LINE__));
+          *sv_error = sv_2mortal(newSVpvf("The \"%s\" field of the %dth element must be defined at %s line %d\n", mulnum_field_name, index + 1, FILE_NAME, __LINE__));
           return NULL;
         }
 
@@ -202,7 +199,7 @@ xs_call_method(...)
   // Method not found
   int32_t method_id = env->api->runtime->get_method_id_by_name(env->runtime, class_name, method_name);
   if (method_id < 0) {
-    croak("The %s method in the %s class is not found at %s line %d\n", method_name, class_name, FILE_NAME, __LINE__);
+    croak("The \"%s\" method in the \"%s\" class is not found at %s line %d\n", method_name, class_name, FILE_NAME, __LINE__);
   }
   
   // Base index of SPVM arguments
@@ -222,10 +219,10 @@ xs_call_method(...)
   // Check argument count
   int32_t call_method_args_length = items - spvm_args_base;
   if (call_method_args_length < method_required_args_length) {
-    croak("Too few arguments. The length of the arguments of the %s method in the %s class must be less than %d at %s line %d\n", method_name, class_name, method_required_args_length, FILE_NAME, __LINE__);
+    croak("Too few arguments. The length of the arguments of the \"%s\" method in the \"%s\" class must be less than %d at %s line %d\n", method_name, class_name, method_required_args_length, FILE_NAME, __LINE__);
   }
   else if (call_method_args_length > method_args_length) {
-    croak("Too many arguments. The length of the arguments of the %s method in the %s class must be more than %d at %s line %d\n", method_name, class_name, method_args_length, FILE_NAME, __LINE__);
+    croak("Too many arguments. The length of the arguments of the \"%s\" method in the \"%s\" class must be more than %d at %s line %d\n", method_name, class_name, method_args_length, FILE_NAME, __LINE__);
   }
   
   // 0-255 are used as arguments and return values. 256 is used as exception variable. 257 is used as mortal stack.
@@ -257,10 +254,10 @@ xs_call_method(...)
     int32_t arg_basic_type_id = env->api->runtime->get_type_basic_type_id(env->runtime, arg_type_id);
     int32_t arg_basic_type_category = env->api->runtime->get_basic_type_category(env->runtime, arg_basic_type_id);
     int32_t arg_type_dimension = env->api->runtime->get_type_dimension(env->runtime, arg_type_id);
-    int32_t arg_type_is_ref = env->api->runtime->get_type_is_ref(env->runtime, arg_type_id);
+    int32_t arg_type_flag = env->api->runtime->get_type_flag(env->runtime, arg_type_id);
     
     if (arg_type_dimension == 0) {
-      if (arg_type_is_ref) {
+      if (arg_type_flag & SPVM_NATIVE_C_TYPE_FLAG_REF) {
         switch (arg_basic_type_category) {
           case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_NUMERIC: {
             switch (arg_basic_type_id) {
@@ -277,7 +274,7 @@ xs_call_method(...)
                 }
                 
                 if (!is_iok_scalar_ref) {
-                  croak("The %dth argument of the %s method in the %s class must be an interger reference at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+                  croak("The %dth argument of the \"%s\" method in the \"%s\" class must be an interger reference at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
                 }
                 
                 SV* sv_value_deref = SvRV(sv_value);
@@ -300,7 +297,7 @@ xs_call_method(...)
                   is_iok_scalar_ref = 0;
                 }
                 if (!is_iok_scalar_ref) {
-                  croak("The %dth argument of the %s method in the %s class must be an interger reference at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+                  croak("The %dth argument of the \"%s\" method in the \"%s\" class must be an interger reference at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
                 }
                 SV* sv_value_deref = SvRV(sv_value);
                 int16_t value = (int16_t)SvIV(sv_value_deref);
@@ -322,7 +319,7 @@ xs_call_method(...)
                   is_iok_scalar_ref = 0;
                 }
                 if (!is_iok_scalar_ref) {
-                  croak("The %dth argument of the %s method in the %s class must be an interger reference at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+                  croak("The %dth argument of the \"%s\" method in the \"%s\" class must be an interger reference at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
                 }
                 SV* sv_value_deref = SvRV(sv_value);
                 int32_t value = (int32_t)SvIV(sv_value_deref);
@@ -344,7 +341,7 @@ xs_call_method(...)
                   is_iok_scalar_ref = 0;
                 }
                 if (!is_iok_scalar_ref) {
-                  croak("The %dth argument of the %s method in the %s class must be an interger reference at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+                  croak("The %dth argument of the \"%s\" method in the \"%s\" class must be an interger reference at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
                 }
                 SV* sv_value_deref = SvRV(sv_value);
                 int64_t value = (int64_t)SvIV(sv_value_deref);
@@ -366,7 +363,7 @@ xs_call_method(...)
                   is_nok_scalar_ref = 0;
                 }
                 if (!is_nok_scalar_ref) {
-                  croak("The %dth argument of the %s method in the %s class must be a floating-point reference at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+                  croak("The %dth argument of the \"%s\" method in the \"%s\" class must be a floating-point reference at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
                 }
                 SV* sv_value_deref = SvRV(sv_value);
                 float value = (float)SvNV(sv_value_deref);
@@ -388,7 +385,7 @@ xs_call_method(...)
                   is_nok_scalar_ref = 0;
                 }
                 if (!is_nok_scalar_ref) {
-                  croak("The %dth argument of the %s method in the %s class must be a floating-point reference at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+                  croak("The %dth argument of the \"%s\" method in the \"%s\" class must be a floating-point reference at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
                 }
                 SV* sv_value_deref = SvRV(sv_value);
                 double value = (double)SvNV(sv_value_deref);
@@ -415,7 +412,7 @@ xs_call_method(...)
               }
             }
             if (hv_value == NULL) {
-              croak("The %dth argument of the %s method in the %s class must be a scalar reference of a hash reference at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+              croak("The %dth argument of the \"%s\" method in the \"%s\" class must be a scalar reference of a hash reference at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
             }
             int32_t arg_class_id = env->api->runtime->get_basic_type_class_id(env->runtime, arg_basic_type_id);
             int32_t arg_class_fields_length = env->api->runtime->get_class_fields_length(env->runtime, arg_class_id);
@@ -435,7 +432,7 @@ xs_call_method(...)
               else {
                 int32_t arg_class_name_id = env->api->runtime->get_class_name_id(env->runtime, arg_class_id);
                 const char* arg_class_name = env->api->runtime->get_constant_string_value(env->runtime, arg_class_name_id, NULL);
-                croak("The %dth argument of the %s field in the %s class is not found at %s line %d\n", args_index_nth, mulnum_field_name, arg_class_name, FILE_NAME, __LINE__);
+                croak("The %dth argument of the \"%s\" field in the \"%s\" class is not found at %s line %d\n", args_index_nth, mulnum_field_name, arg_class_name, FILE_NAME, __LINE__);
               }
               switch(arg_class_field_type_basic_type_id) {
                 case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE: {
@@ -492,7 +489,7 @@ xs_call_method(...)
               // Perl scalar to SPVM byte
               case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE : {
                 if (!(SvOK(sv_value) && SvNIOK(sv_value))) {
-                  croak("The %dth argument of the %s method in the %s class must be a number at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+                  croak("The %dth argument of the \"%s\" method in the \"%s\" class must be a number at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
                 }
                 int8_t value = (int8_t)SvIV(sv_value);
                 stack[stack_index].bval = value;
@@ -502,7 +499,7 @@ xs_call_method(...)
               // Perl scalar to SPVM short
               case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT : {
                 if (!(SvOK(sv_value) && SvNIOK(sv_value))) {
-                  croak("The %dth argument of the %s method in the %s class must be a number at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+                  croak("The %dth argument of the \"%s\" method in the \"%s\" class must be a number at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
                 }
                 int16_t value = (int16_t)SvIV(sv_value);
                 stack[stack_index].sval = value;
@@ -512,7 +509,7 @@ xs_call_method(...)
               // Perl scalar to SPVM int
               case SPVM_NATIVE_C_BASIC_TYPE_ID_INT : {
                 if (!(SvOK(sv_value) && SvNIOK(sv_value))) {
-                  croak("The %dth argument of the %s method in the %s class must be a number at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+                  croak("The %dth argument of the \"%s\" method in the \"%s\" class must be a number at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
                 }
                 int32_t value = (int32_t)SvIV(sv_value);
                 stack[stack_index].ival = value;
@@ -522,7 +519,7 @@ xs_call_method(...)
               // Perl scalar to SPVM long
               case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG : {
                 if (!(SvOK(sv_value) && SvNIOK(sv_value))) {
-                  croak("The %dth argument of the %s method in the %s class must be a number at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+                  croak("The %dth argument of the \"%s\" method in the \"%s\" class must be a number at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
                 }
                 int64_t value = (int64_t)SvIV(sv_value);
                 stack[stack_index].lval = value;
@@ -532,7 +529,7 @@ xs_call_method(...)
               // Perl scalar to SPVM float
               case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT : {
                 if (!(SvOK(sv_value) && SvNIOK(sv_value))) {
-                  croak("The %dth argument of the %s method in the %s class must be a number at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+                  croak("The %dth argument of the \"%s\" method in the \"%s\" class must be a number at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
                 }
                 float value = (float)SvNV(sv_value);
                 stack[stack_index].fval = value;
@@ -542,7 +539,7 @@ xs_call_method(...)
               // Perl scalar to SPVM double
               case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE : {
                 if (!(SvOK(sv_value) && SvNIOK(sv_value))) {
-                  croak("The %dth argument of the %s method in the %s class must be a number at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+                  croak("The %dth argument of the \"%s\" method in the \"%s\" class must be a number at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
                 }
                 double value = (double)SvNV(sv_value);
                 stack[stack_index].dval = value;
@@ -587,7 +584,7 @@ xs_call_method(...)
                   stack[stack_index].oval = object;
                 }
                 else {
-                  croak("The %dth argument of the %s method in the %s class must be a SPVM::BlessedObject::String object at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+                  croak("The %dth argument of the \"%s\" method in the \"%s\" class must be a SPVM::BlessedObject::String object at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
                 }
               }
               else if (arg_basic_type_id == SPVM_NATIVE_C_BASIC_TYPE_ID_ANY_OBJECT) {
@@ -596,7 +593,7 @@ xs_call_method(...)
                   stack[stack_index].oval = object;
                 }
                 else {
-                  croak("The %dth argument of the %s method in the %s class must be a SPVM::BlessedObject object at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+                  croak("The %dth argument of the \"%s\" method in the \"%s\" class must be a SPVM::BlessedObject object at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
                 }
               }
               else {
@@ -604,13 +601,13 @@ xs_call_method(...)
                   void* object = SPVM_XS_UTIL_get_object(aTHX_ sv_value);
                   
                   if (!env->isa(env, stack, object, arg_basic_type_id, arg_type_dimension)) {
-                    croak("The %dth argument of the %s method in the %s class must be assinged to the argument type at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+                    croak("The %dth argument of the \"%s\" method in the \"%s\" class must be assinged to the argument type at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
                   }
                   
                   stack[stack_index].oval = object;
                 }
                 else {
-                  croak("The %dth argument of the %s method in the %s class must be a SPVM::BlessedObject::Class object at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+                  croak("The %dth argument of the \"%s\" method in the \"%s\" class must be a SPVM::BlessedObject::Class object at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
                 }
               }
             }
@@ -642,7 +639,7 @@ xs_call_method(...)
                 else {
                   int32_t arg_class_name_id = env->api->runtime->get_class_name_id(env->runtime, arg_class_id);
                   const char* arg_class_name = env->api->runtime->get_constant_string_value(env->runtime, arg_class_name_id, NULL);
-                  croak("The %s field in the %dth argument must be defined. The field is defined in the %s class at %s line %d\n", mulnum_field_name, args_index_nth, arg_class_name, FILE_NAME, __LINE__);
+                  croak("The \"%s\" field in the %dth argument must be defined. The field is defined in the \"%s\" class at %s line %d\n", mulnum_field_name, args_index_nth, arg_class_name, FILE_NAME, __LINE__);
                 }
                 
                 switch (arg_class_field_type_basic_type_id) {
@@ -684,7 +681,7 @@ xs_call_method(...)
               stack_index += arg_class_fields_length;
             }
             else {
-              croak("The %dth argument of the %s method in the %s class must be a hash reference at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+              croak("The %dth argument of the \"%s\" method in the \"%s\" class must be a hash reference at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
             }
             break;
           }
@@ -801,13 +798,15 @@ xs_call_method(...)
               
               int32_t isa = env->isa(env, stack, object, arg_basic_type_id, arg_type_dimension);
               if (!isa) {
-                croak("The object must be assigned to the type of the %dth argument of the %s method in the %s class at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+                void* obj_compile_type_name = env->get_compile_type_name(env, stack, arg_basic_type_id, arg_type_dimension, arg_type_flag);
+                const char* compile_type_name = env->get_chars(env, stack, obj_compile_type_name);
+                croak("The object must be assigned to the %s type of the %dth argument of the \"%s\" method in the \"%s\" class at %s line %d\n", compile_type_name, args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
               }
               
               stack[stack_index].oval = object;
             }
             else {
-              croak("The %dth argument of the %s method in the %s class must be a SPVM::BlessedObject::Array object at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+              croak("The %dth argument of the \"%s\" method in the \"%s\" class must be a SPVM::BlessedObject::Array object at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
             }
           }
           
@@ -843,13 +842,15 @@ xs_call_method(...)
               
               int32_t isa = env->isa(env, stack, object, arg_basic_type_id, arg_type_dimension);
               if (!isa) {
-                croak("The object must be assigned to the type of the %dth argument of the %s method in the %s class at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+                void* obj_compile_type_name = env->get_compile_type_name(env, stack, arg_basic_type_id, arg_type_dimension, arg_type_flag);
+                const char* compile_type_name = env->get_chars(env, stack, obj_compile_type_name);
+                croak("The object must be assigned to the %s type of the %dth argument of the \"%s\" method in the \"%s\" class at %s line %d\n", compile_type_name, args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
               }
               
               stack[stack_index].oval = object;
             }
             else {
-              croak("The %dth argument of the %s method in the %s class must be a SPVM::BlessedObject::Array object at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+              croak("The %dth argument of the \"%s\" method in the \"%s\" class must be a SPVM::BlessedObject::Array object at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
             }
           }
           
@@ -894,7 +895,7 @@ xs_call_method(...)
                       env->set_elem_object(env, stack, array, i, object);
                     }
                     else {
-                      croak("The %dth argument of the %s method in the %s class must be a SPVM::BlessedObject::String object at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+                      croak("The %dth argument of the \"%s\" method in the \"%s\" class must be a SPVM::BlessedObject::String object at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
                     }
                   }
                 }
@@ -908,13 +909,15 @@ xs_call_method(...)
               
               int32_t isa = env->isa(env, stack, object, arg_basic_type_id, arg_type_dimension);
               if (!isa) {
-                croak("The object must be assigned to the type of the %dth argument of the %s method in the %s class at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+                void* obj_compile_type_name = env->get_compile_type_name(env, stack, arg_basic_type_id, arg_type_dimension, arg_type_flag);
+                const char* compile_type_name = env->get_chars(env, stack, obj_compile_type_name);
+                croak("The object must be assigned to the %s type of the %dth argument of the \"%s\" method in the \"%s\" class at %s line %d\n", compile_type_name, args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
               }
               
               stack[stack_index].oval = object;
             }
             else {
-              croak("The %dth argument of the %s method in the %s class must be a SPVM::BlessedObject::Array object at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+              croak("The %dth argument of the \"%s\" method in the \"%s\" class must be a SPVM::BlessedObject::Array object at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
             }
           }
           
@@ -960,7 +963,7 @@ xs_call_method(...)
                   env->set_elem_object(env, stack, array, i, object);
                 }
                 else {
-                  croak("The %dth argument of the %s method in the %s class must be a SPVM::BlessedObject::String object at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+                  croak("The %dth argument of the \"%s\" method in the \"%s\" class must be a SPVM::BlessedObject::String object at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
                 }
               }
             }
@@ -977,13 +980,15 @@ xs_call_method(...)
           
           int32_t isa = env->isa(env, stack, object, arg_basic_type_id, arg_type_dimension);
           if (!isa) {
-            croak("The object must be assigned to the type of the %dth argument of the %s method in the %s class at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+            void* obj_compile_type_name = env->get_compile_type_name(env, stack, arg_basic_type_id, arg_type_dimension, arg_type_flag);
+            const char* compile_type_name = env->get_chars(env, stack, obj_compile_type_name);
+            croak("The object must be assigned to the %s type of the %dth argument of the \"%s\" method in the \"%s\" class at %s line %d\n", compile_type_name, args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
           }
           
           stack[stack_index].oval = object;
         }
         else {
-          croak("The %dth argument of the %s method in the %s class must be a SPVM::BlessedObject::Array object at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
+          croak("The %dth argument of the \"%s\" method in the \"%s\" class must be a SPVM::BlessedObject::Array object at %s line %d\n", args_index_nth, method_name, class_name, FILE_NAME, __LINE__);
         }
       }
       
@@ -1198,10 +1203,10 @@ xs_call_method(...)
         // Convert to runtime type
         int32_t arg_basic_type_id = env->api->runtime->get_type_basic_type_id(env->runtime, arg_type_id);
         int32_t arg_type_dimension = env->api->runtime->get_type_dimension(env->runtime, arg_type_id);
-        int32_t arg_type_is_ref = env->api->runtime->get_type_is_ref(env->runtime, arg_type_id);
+        int32_t arg_type_flag = env->api->runtime->get_type_flag(env->runtime, arg_type_id);
         int32_t arg_basic_type_category = env->api->runtime->get_basic_type_category(env->runtime, arg_basic_type_id);
         
-        if (arg_type_is_ref) {
+        if (arg_type_flag & SPVM_NATIVE_C_TYPE_FLAG_REF) {
           int32_t ref_stack_index = ref_stack_indexes[args_index];
           switch (arg_basic_type_category) {
             case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_NUMERIC: {
@@ -1519,7 +1524,7 @@ xs_array_to_elems(...)
     }
   }
   else {
-    croak("The argument must be an array type at %s line %d\n", FILE_NAME, __LINE__);
+    croak("The object must be an array type at %s line %d\n", FILE_NAME, __LINE__);
   }
 
   SV* sv_values = sv_2mortal(newRV_inc((SV*)av_values));
@@ -1626,12 +1631,12 @@ xs_array_to_bin(...)
           break;
         }
         default: {
-          croak("Invalid type at %s line %d\n", FILE_NAME, __LINE__);
+          assert(0);
         }
       }
     }
     else if (array_is_object_array) {
-      croak("Objec type is not supported at %s line %d\n", FILE_NAME, __LINE__);
+      croak("The array can't be an object array at %s line %d\n", FILE_NAME, __LINE__);
     }
     else {
       switch (basic_type_id) {
@@ -1671,13 +1676,14 @@ xs_array_to_bin(...)
           sv_bin = sv_2mortal(newSVpvn((char*)elems, length * 8));
           break;
         }
-        default:
-          croak("Invalid type at %s line %d\n", FILE_NAME, __LINE__);
+        default: {
+          assert(0);
+        }
       }
     }
   }
   else {
-    croak("The argument must be an array type at %s line %d\n", FILE_NAME, __LINE__);
+    croak("The object must be an array type at %s line %d\n", FILE_NAME, __LINE__);
   }
   
   XPUSHs(sv_bin);
@@ -2057,7 +2063,7 @@ xs_new_string_array(...)
   SV* sv_array;
   if (SvOK(sv_elems)) {
     if (!sv_derived_from(sv_elems, "ARRAY")) {
-      croak("The argument of the new_string_array function in the SPVM::ExchangeAPI module must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
+      croak("The elements must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
     }
 
     AV* av_elems = (AV*)SvRV(sv_elems);
@@ -2121,7 +2127,7 @@ xs_new_byte_array(...)
   SV* sv_array;
   if (SvOK(sv_elems)) {
     if (!sv_derived_from(sv_elems, "ARRAY")) {
-      croak("The argument of the new_byte_array function in the SPVM::ExchangeAPI module must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
+      croak("The elements must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
     }
     
     // Elements
@@ -2178,7 +2184,7 @@ xs_new_byte_array_unsigned(...)
   SV* sv_array;
   if (SvOK(sv_elems)) {
     if (!sv_derived_from(sv_elems, "ARRAY")) {
-      croak("The argument of the new_byte_array function in the SPVM::ExchangeAPI module must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
+      croak("The elements must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
     }
     
     // Elements
@@ -2325,7 +2331,7 @@ xs_new_string(...)
   if (SvOK(sv_value)) {
     
     if (SvROK(sv_value)) {
-      croak("The argument can't be reference at %s line %d\n", FILE_NAME, __LINE__);
+      croak("The string can't be a reference at %s line %d\n", FILE_NAME, __LINE__);
     }
     else {
       // Environment
@@ -2346,7 +2352,7 @@ xs_new_string(...)
     }
   }
   else {
-    croak("The argument must be defined at %s line %d\n", FILE_NAME, __LINE__);
+    croak("The string must be defined at %s line %d\n", FILE_NAME, __LINE__);
   }
   
   XPUSHs(sv_string);
@@ -2378,7 +2384,7 @@ xs_new_string_from_bin(...)
   SV* sv_string;
   if (SvOK(sv_binary)) {
     if (SvROK(sv_binary)) {
-      croak("The argument can't be reference at %s line %d\n", FILE_NAME, __LINE__);
+      croak("The binary can't be a reference at %s line %d\n", FILE_NAME, __LINE__);
     }
     else {
       int32_t binary_length = sv_len(sv_binary);
@@ -2399,7 +2405,7 @@ xs_new_string_from_bin(...)
     }
   }
   else {
-    croak("The argument must be defined at %s line %d\n", FILE_NAME, __LINE__);
+    croak("The binary must be defined at %s line %d\n", FILE_NAME, __LINE__);
   }
   
   XPUSHs(sv_string);
@@ -2431,7 +2437,7 @@ xs_new_short_array(...)
   SV* sv_array;
   if (SvOK(sv_elems)) {
     if (!sv_derived_from(sv_elems, "ARRAY")) {
-      croak("The argument of the new_short_array function in the SPVM::ExchangeAPI module must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
+      croak("The elements must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
     }
     
     // Elements
@@ -2488,7 +2494,7 @@ xs_new_short_array_unsigned(...)
   SV* sv_array;
   if (SvOK(sv_elems)) {
     if (!sv_derived_from(sv_elems, "ARRAY")) {
-      croak("The argument of the new_short_array in the SPVM::ExchangeAPI module must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
+      croak("The elements must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
     }
     
     // Elements
@@ -2634,7 +2640,7 @@ xs_new_int_array(...)
   SV* sv_array;
   if (SvOK(sv_elems)) {
     if (!sv_derived_from(sv_elems, "ARRAY")) {
-      croak("The argument of the new_int_array in the SPVM::ExchangeAPI module must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
+      croak("The elements must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
     }
     
     // Elements
@@ -2690,7 +2696,7 @@ xs_new_int_array_unsigned(...)
   SV* sv_array;
   if (SvOK(sv_elems)) {
     if (!sv_derived_from(sv_elems, "ARRAY")) {
-      croak("The argument of the new_int_array function in the SPVM::ExchangeAPI module must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
+      croak("The elements must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
     }
     
     // Elements
@@ -2835,7 +2841,7 @@ xs_new_long_array(...)
   SV* sv_array;
   if (SvOK(sv_elems)) {
     if (!sv_derived_from(sv_elems, "ARRAY")) {
-      croak("The argument of the new_long_array in the SPVM::ExchangeAPI module must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
+      croak("The elements must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
     }
     
     // Elements
@@ -2892,7 +2898,7 @@ xs_new_long_array_unsigned(...)
   SV* sv_array;
   if (SvOK(sv_elems)) {
     if (!sv_derived_from(sv_elems, "ARRAY")) {
-      croak("The argument of the new_long_array function in the SPVM::ExchangeAPI module must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
+      croak("The elements must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
     }
     
     // Elements
@@ -3038,7 +3044,7 @@ xs_new_float_array(...)
   SV* sv_array;
   if (SvOK(sv_elems)) {
     if (!sv_derived_from(sv_elems, "ARRAY")) {
-      croak("The argument of the new_float_array function in the SPVM::ExchangeAPI module must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
+      croak("The elements must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
     }
     
     AV* av_elems = (AV*)SvRV(sv_elems);
@@ -3183,7 +3189,7 @@ xs_new_double_array(...)
   SV* sv_array;
   if (SvOK(sv_elems)) {
     if (!sv_derived_from(sv_elems, "ARRAY")) {
-      croak("The argument of the new_double_array function in the SPVM::ExchangeAPI module must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
+      croak("The elements must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
     }
     
     AV* av_elems = (AV*)SvRV(sv_elems);
@@ -3420,7 +3426,7 @@ _xs_new_object_array(...)
   SV* sv_elems = ST(2);
   
   if (!sv_derived_from(sv_elems, "ARRAY")) {
-    croak("The second argument of the new_object_array function in the SPVM module must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
+    croak("The elements must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
   }
   
   const char* basic_type_name = SvPV_nolen(sv_basic_type_name);
@@ -3453,14 +3459,16 @@ _xs_new_object_array(...)
       env->set_elem_object(env, stack, array, index, NULL);
     }
     else if (sv_isobject(sv_element) && sv_derived_from(sv_element, "SPVM::BlessedObject")) {
-      void* object = SPVM_XS_UTIL_get_object(aTHX_ sv_element);
+      void* element = SPVM_XS_UTIL_get_object(aTHX_ sv_element);
 
-      int32_t elem_isa = env->elem_isa(env, stack, array, object);
+      int32_t elem_isa = env->elem_isa(env, stack, array, element);
       if (elem_isa) {
-        env->set_elem_object(env, stack, array, index, object);
+        env->set_elem_object(env, stack, array, index, element);
       }
       else {
-        croak("The object must be assigned to the element of the array at %s line %d\n", FILE_NAME, __LINE__);
+        void* obj_element_type_name = env->get_type_name(env, stack, element);
+        const char* element_type_name = env->get_chars(env, stack, obj_element_type_name);
+        croak("The element must be assigned to the %s type at %s line %d\n", element_type_name, FILE_NAME, __LINE__);
       }
     }
     else {
@@ -3501,7 +3509,7 @@ _xs_new_muldim_array(...)
   SV* sv_elems = ST(3);
   
   if (!sv_derived_from(sv_elems, "ARRAY")) {
-    croak("The argument must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
+    croak("The elements must be an array reference at %s line %d\n", FILE_NAME, __LINE__);
   }
   
   AV* av_elems = (AV*)SvRV(sv_elems);
@@ -3622,7 +3630,7 @@ _xs_new_mulnum_array_from_bin(...)
   SV* sv_binary = ST(2);
   
   if (!SvOK(sv_binary)) {
-    croak("The argument must be defined at %s line %d\n", FILE_NAME, __LINE__);
+    croak("The binary must be defined at %s line %d\n", FILE_NAME, __LINE__);
   }
   
   const char* basic_type_name = SvPV_nolen(sv_basic_type_name);
@@ -3640,7 +3648,7 @@ _xs_new_mulnum_array_from_bin(...)
   int32_t basic_type_id = env->api->runtime->get_basic_type_id_by_name(env->runtime, basic_type_name);
   
   if (basic_type_id < 0) {
-    croak("Can't load %s at %s line %d\n", basic_type_name, FILE_NAME, __LINE__);
+    croak("The \"%s\" basic type is not found at %s line %d\n", basic_type_name, FILE_NAME, __LINE__);
   }
 
   int32_t class_id = env->api->runtime->get_basic_type_class_id(env->runtime, basic_type_id);
@@ -3685,7 +3693,7 @@ _xs_new_mulnum_array_from_bin(...)
   }
   
   if (binary_length % (field_length * field_stack_length) != 0) {
-    croak("Invalid binary data size at %s line %d", FILE_NAME, __LINE__);
+    croak("The size of the binary data is invalid at %s line %d", FILE_NAME, __LINE__);
   }
   
   int32_t array_length = binary_length / field_length / field_stack_length;
@@ -3814,7 +3822,7 @@ _xs_set_exception(...)
 
   if (SvOK(sv_exception)) {
     if (!(sv_isobject(sv_exception) && sv_derived_from(sv_exception, "SPVM::BlessedObject::String"))) {
-      croak("The argument must be a SPVM::BlessedObject::String object");
+      croak("The exception must be a SPVM::BlessedObject::String object");
     }
     void* exception = SPVM_XS_UTIL_get_object(aTHX_ sv_exception);
     env->set_exception(env, stack, exception);
@@ -3901,25 +3909,6 @@ DESTROY(...)
 MODULE = SPVM::Builder		PACKAGE = SPVM::Builder
 
 SV*
-create_env(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  SV* sv_self = ST(0);
-  HV* hv_self = (HV*)SvRV(sv_self);
-
-  // Create env
-  SPVM_ENV* env = SPVM_NATIVE_new_env_raw();
-  size_t iv_env = PTR2IV(env);
-  SV* sviv_env = sv_2mortal(newSViv(iv_env));
-  SV* sv_env = sv_2mortal(newRV_inc(sviv_env));
-  (void)hv_store(hv_self, "env", strlen("env"), SvREFCNT_inc(sv_env), 0);
-  
-  XSRETURN(0);
-}
-
-SV*
 create_compiler(...)
   PPCODE:
 {
@@ -3928,12 +3917,15 @@ create_compiler(...)
   SV* sv_self = ST(0);
   HV* hv_self = (HV*)SvRV(sv_self);
 
-  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
-  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
-  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
-  
+  // Create compiler env
+  SPVM_ENV* compiler_env = SPVM_NATIVE_new_env_raw();
+  size_t iv_compiler_env = PTR2IV(compiler_env);
+  SV* sviv_compiler_env = sv_2mortal(newSViv(iv_compiler_env));
+  SV* sv_compiler_env = sv_2mortal(newRV_inc(sviv_compiler_env));
+  (void)hv_store(hv_self, "compiler_env", strlen("compiler_env"), SvREFCNT_inc(sv_compiler_env), 0);
+
   // Create compiler
-  void* compiler = env->api->compiler->new_compiler();
+  void* compiler = compiler_env->api->compiler->new_object();
 
   size_t iv_compiler = PTR2IV(compiler);
   SV* sviv_compiler = sv_2mortal(newSViv(iv_compiler));
@@ -3944,7 +3936,60 @@ create_compiler(...)
 }
 
 SV*
-compile_spvm(...)
+DESTROY(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+  HV* hv_self = (HV*)SvRV(sv_self);
+
+  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
+  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
+  if (SvOK(sv_env)) {
+    SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+
+    if (env->runtime) {
+      // Free stack
+      SV** sv_stack_ptr = hv_fetch(hv_self, "stack", strlen("stack"), 0);
+      SV* sv_stack = sv_stack_ptr ? *sv_stack_ptr : &PL_sv_undef;
+      void* stack = NULL;
+      if (SvOK(sv_stack)) {
+        stack = INT2PTR(void*, SvIV(SvRV(sv_stack)));
+      }
+        
+      // Free stack
+      env->free_stack(env, stack);
+
+      // Cleanup global varialbes
+      env->cleanup_global_vars(env);
+      
+      // Free runtime
+      env->api->runtime->free_object(env->runtime);
+      env->runtime = NULL;
+    }
+    
+    env->free_env_raw(env);
+  }
+
+  SV** sv_compiler_env_ptr = hv_fetch(hv_self, "compiler_env", strlen("compiler_env"), 0);
+  SV* sv_compiler_env = sv_compiler_env_ptr ? *sv_compiler_env_ptr : &PL_sv_undef;
+  SPVM_ENV* compiler_env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_compiler_env)));
+  
+  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
+  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
+  void* compiler = INT2PTR(void*, SvIV(SvRV(sv_compiler)));
+
+  // Free compiler
+  compiler_env->api->compiler->free_object(compiler);
+  
+  compiler_env->free_env_raw(compiler_env);
+  
+  XSRETURN(0);
+}
+
+SV*
+compile(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -3973,15 +4018,15 @@ compile_spvm(...)
   // Line
   int32_t start_line = (int32_t)SvIV(sv_start_line);
 
-  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
-  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
-  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+  SV** sv_compiler_env_ptr = hv_fetch(hv_self, "compiler_env", strlen("compiler_env"), 0);
+  SV* sv_compiler_env = sv_compiler_env_ptr ? *sv_compiler_env_ptr : &PL_sv_undef;
+  SPVM_ENV* compiler_env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_compiler_env)));
 
   // Set starting file
-  env->api->compiler->set_start_file(compiler, start_file);
+  compiler_env->api->compiler->set_start_file(compiler, start_file);
   
   // Set starting line
-  env->api->compiler->set_start_line(compiler, start_line);
+  compiler_env->api->compiler->set_start_line(compiler, start_line);
   
   // Add include paths
   AV* av_module_dirs;
@@ -3996,11 +4041,11 @@ compile_spvm(...)
     SV** sv_include_dir_ptr = av_fetch(av_module_dirs, i, 0);
     SV* sv_include_dir = sv_include_dir_ptr ? *sv_include_dir_ptr : &PL_sv_undef;
     char* include_dir = SvPV_nolen(sv_include_dir);
-    env->api->compiler->add_module_dir(compiler, include_dir);
+    compiler_env->api->compiler->add_module_dir(compiler, include_dir);
   }
 
   // Compile SPVM
-  int32_t compile_error_code = env->api->compiler->compile_spvm(compiler, class_name);
+  int32_t compile_error_code = compiler_env->api->compiler->compile(compiler, class_name);
   
   SV* sv_compile_success;
   if (compile_error_code == 0) {
@@ -4012,6 +4057,41 @@ compile_spvm(...)
 
   XPUSHs(sv_compile_success);
   
+  XSRETURN(1);
+}
+
+SV*
+get_error_messages(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+
+  HV* hv_self = (HV*)SvRV(sv_self);
+
+  // The compiler_environment
+  SV** sv_compiler_env_ptr = hv_fetch(hv_self, "compiler_env", strlen("compiler_env"), 0);
+  SV* sv_compiler_env = sv_compiler_env_ptr ? *sv_compiler_env_ptr : &PL_sv_undef;
+  SPVM_ENV* compiler_env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_compiler_env)));
+  
+  // Compiler
+  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
+  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
+  void* compiler = INT2PTR(void*, SvIV(SvRV(sv_compiler)));
+
+  AV* av_error_messages = (AV*)sv_2mortal((SV*)newAV());
+  SV* sv_error_messages = sv_2mortal(newRV_inc((SV*)av_error_messages));
+
+  int32_t error_messages_legnth = compiler_env->api->compiler->get_error_messages_length(compiler);
+
+  for (int32_t i = 0; i < error_messages_legnth; i++) {
+    const char* error_message = compiler_env->api->compiler->get_error_message(compiler, i);
+    SV* sv_error_message = sv_2mortal(newSVpv(error_message, 0));
+    av_push(av_error_messages, SvREFCNT_inc(sv_error_message));
+  }
+  
+  XPUSHs(sv_error_messages);
   XSRETURN(1);
 }
 
@@ -4030,39 +4110,31 @@ get_method_names(...)
   // Name
   const char* class_name = SvPV_nolen(sv_class_name);
 
-  // The environment
-  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
-  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
-  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+  // The compiler_environment
+  SV** sv_compiler_env_ptr = hv_fetch(hv_self, "compiler_env", strlen("compiler_env"), 0);
+  SV* sv_compiler_env = sv_compiler_env_ptr ? *sv_compiler_env_ptr : &PL_sv_undef;
+  SPVM_ENV* compiler_env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_compiler_env)));
   
   AV* av_method_names = (AV*)sv_2mortal((SV*)newAV());
   SV* sv_method_names = sv_2mortal(newRV_inc((SV*)av_method_names));
-  
-  // Stack
-  SV** sv_stack_ptr = hv_fetch(hv_self, "stack", strlen("stack"), 0);
-  SV* sv_stack = sv_stack_ptr ? *sv_stack_ptr : &PL_sv_undef;
-  SPVM_VALUE* stack;
-  if (SvOK(sv_stack)) {
-    stack = INT2PTR(void*, SvIV(SvRV(sv_stack)));
-  }
   
   // Runtime
   SV** sv_runtime_ptr = hv_fetch(hv_self, "runtime", strlen("runtime"), 0);
   SV* sv_runtime = sv_runtime_ptr ? *sv_runtime_ptr : &PL_sv_undef;
   void* runtime = INT2PTR(void*, SvIV(SvRV(sv_runtime)));
   
-  int32_t class_id = env->api->runtime->get_class_id_by_name(runtime, class_name);
-  int32_t methods_length = env->api->runtime->get_class_methods_length(runtime, class_id);
+  int32_t class_id = compiler_env->api->runtime->get_class_id_by_name(runtime, class_name);
+  int32_t methods_length = compiler_env->api->runtime->get_class_methods_length(runtime, class_id);
   for (int32_t method_index = 0; method_index < methods_length; method_index++) {
-    int32_t method_id = env->api->runtime->get_method_id_by_index(runtime, class_id, method_index);
-    const char* method_name = env->api->runtime->get_name(runtime, env->api->runtime->get_method_name_id(runtime, method_id));
+    int32_t method_id = compiler_env->api->runtime->get_method_id_by_index(runtime, class_id, method_index);
+    const char* method_name = compiler_env->api->runtime->get_name(runtime, compiler_env->api->runtime->get_method_name_id(runtime, method_id));
     SV* sv_method_name = sv_2mortal(newSVpv(method_name, 0));
     int32_t is_push = 0;
     if (SvOK(sv_category)) {
-      if(strEQ(SvPV_nolen(sv_category), "native") && env->api->runtime->get_method_is_native(runtime, method_id)) {
+      if(strEQ(SvPV_nolen(sv_category), "native") && compiler_env->api->runtime->get_method_is_native(runtime, method_id)) {
         av_push(av_method_names, SvREFCNT_inc(sv_method_name));
       }
-      else if (strEQ(SvPV_nolen(sv_category), "precompile") && env->api->runtime->get_method_is_precompile(runtime, method_id)) {
+      else if (strEQ(SvPV_nolen(sv_category), "precompile") && compiler_env->api->runtime->get_method_is_precompile(runtime, method_id)) {
         av_push(av_method_names, SvREFCNT_inc(sv_method_name));
       }
     }
@@ -4090,34 +4162,26 @@ get_parent_class_name(...)
   // Name
   const char* class_name = SvPV_nolen(sv_class_name);
 
-  // The environment
-  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
-  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
-  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+  // The compiler_environment
+  SV** sv_compiler_env_ptr = hv_fetch(hv_self, "compiler_env", strlen("compiler_env"), 0);
+  SV* sv_compiler_env = sv_compiler_env_ptr ? *sv_compiler_env_ptr : &PL_sv_undef;
+  SPVM_ENV* compiler_env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_compiler_env)));
   
   AV* av_method_names = (AV*)sv_2mortal((SV*)newAV());
   SV* sv_method_names = sv_2mortal(newRV_inc((SV*)av_method_names));
-  
-  // Stack
-  SV** sv_stack_ptr = hv_fetch(hv_self, "stack", strlen("stack"), 0);
-  SV* sv_stack = sv_stack_ptr ? *sv_stack_ptr : &PL_sv_undef;
-  SPVM_VALUE* stack;
-  if (SvOK(sv_stack)) {
-    stack = INT2PTR(void*, SvIV(SvRV(sv_stack)));
-  }
   
   // Runtime
   SV** sv_runtime_ptr = hv_fetch(hv_self, "runtime", strlen("runtime"), 0);
   SV* sv_runtime = sv_runtime_ptr ? *sv_runtime_ptr : &PL_sv_undef;
   void* runtime = INT2PTR(void*, SvIV(SvRV(sv_runtime)));
   
-  int32_t class_id = env->api->runtime->get_class_id_by_name(runtime, class_name);
-  int32_t parent_class_id = env->api->runtime->get_class_parent_class_id(runtime, class_id);
+  int32_t class_id = compiler_env->api->runtime->get_class_id_by_name(runtime, class_name);
+  int32_t parent_class_id = compiler_env->api->runtime->get_class_parent_class_id(runtime, class_id);
   
   SV* sv_parent_class_name = &PL_sv_undef;
   if (parent_class_id >= 0) {
-    int32_t parent_class_name_id = env->api->runtime->get_class_name_id(runtime, parent_class_id);
-    const char* parent_class_name = env->api->runtime->get_name(runtime, parent_class_name_id);
+    int32_t parent_class_name_id = compiler_env->api->runtime->get_class_name_id(runtime, parent_class_id);
+    const char* parent_class_name = compiler_env->api->runtime->get_name(runtime, parent_class_name_id);
     sv_parent_class_name = sv_2mortal(newSVpv(parent_class_name, 0));
   }
   
@@ -4140,18 +4204,10 @@ get_anon_class_names_by_parent_class_name(...)
   // Name
   const char* class_name = SvPV_nolen(sv_class_name);
 
-  // The environment
-  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
-  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
-  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
-  
-  // Stack
-  SV** sv_stack_ptr = hv_fetch(hv_self, "stack", strlen("stack"), 0);
-  SV* sv_stack = sv_stack_ptr ? *sv_stack_ptr : &PL_sv_undef;
-  SPVM_VALUE* stack;
-  if (SvOK(sv_stack)) {
-    stack = INT2PTR(void*, SvIV(SvRV(sv_stack)));
-  }
+  // The compiler_environment
+  SV** sv_compiler_env_ptr = hv_fetch(hv_self, "compiler_env", strlen("compiler_env"), 0);
+  SV* sv_compiler_env = sv_compiler_env_ptr ? *sv_compiler_env_ptr : &PL_sv_undef;
+  SPVM_ENV* compiler_env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_compiler_env)));
   
   // Runtime
   SV** sv_runtime_ptr = hv_fetch(hv_self, "runtime", strlen("runtime"), 0);
@@ -4162,18 +4218,18 @@ get_anon_class_names_by_parent_class_name(...)
   SV* sv_anon_class_names = sv_2mortal(newRV_inc((SV*)av_anon_class_names));
   
   // Copy class load path to builder
-  int32_t class_id = env->api->runtime->get_class_id_by_name(runtime, class_name);
+  int32_t class_id = compiler_env->api->runtime->get_class_id_by_name(runtime, class_name);
 
-  int32_t methods_length = env->api->runtime->get_class_methods_length(runtime, class_id);
+  int32_t methods_length = compiler_env->api->runtime->get_class_methods_length(runtime, class_id);
 
   for (int32_t method_index = 0; method_index < methods_length; method_index++) {
     
-    int32_t method_id = env->api->runtime->get_method_id_by_index(runtime, class_id, method_index);
-    int32_t is_anon_method = env->api->runtime->get_method_is_anon(runtime, method_id);
+    int32_t method_id = compiler_env->api->runtime->get_method_id_by_index(runtime, class_id, method_index);
+    int32_t is_anon_method = compiler_env->api->runtime->get_method_is_anon(runtime, method_id);
     
     if (is_anon_method) {
-      int32_t anon_class_id = env->api->runtime->get_method_class_id(runtime, method_id);
-      const char* anon_class_name = env->api->runtime->get_name(runtime, env->api->runtime->get_class_name_id(runtime, anon_class_id));
+      int32_t anon_class_id = compiler_env->api->runtime->get_method_class_id(runtime, method_id);
+      const char* anon_class_name = compiler_env->api->runtime->get_name(runtime, compiler_env->api->runtime->get_class_name_id(runtime, anon_class_id));
       SV* sv_anon_class_name = sv_2mortal(newSVpv(anon_class_name, 0));
       av_push(av_anon_class_names, SvREFCNT_inc(sv_anon_class_name));
     }
@@ -4193,19 +4249,11 @@ get_class_names(...)
 
   HV* hv_self = (HV*)SvRV(sv_self);
 
-  // The environment
-  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
-  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
-  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+  // The compiler_environment
+  SV** sv_compiler_env_ptr = hv_fetch(hv_self, "compiler_env", strlen("compiler_env"), 0);
+  SV* sv_compiler_env = sv_compiler_env_ptr ? *sv_compiler_env_ptr : &PL_sv_undef;
+  SPVM_ENV* compiler_env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_compiler_env)));
 
-  // Stack
-  SV** sv_stack_ptr = hv_fetch(hv_self, "stack", strlen("stack"), 0);
-  SV* sv_stack = sv_stack_ptr ? *sv_stack_ptr : &PL_sv_undef;
-  SPVM_VALUE* stack;
-  if (SvOK(sv_stack)) {
-    stack = INT2PTR(void*, SvIV(SvRV(sv_stack)));
-  }
-  
   // Runtime
   SV** sv_runtime_ptr = hv_fetch(hv_self, "runtime", strlen("runtime"), 0);
   SV* sv_runtime = sv_runtime_ptr ? *sv_runtime_ptr : &PL_sv_undef;
@@ -4214,49 +4262,14 @@ get_class_names(...)
   AV* av_class_names = (AV*)sv_2mortal((SV*)newAV());
   SV* sv_class_names = sv_2mortal(newRV_inc((SV*)av_class_names));
   
-  int32_t classes_legnth = env->api->runtime->get_classes_length(runtime);
+  int32_t classes_legnth = compiler_env->api->runtime->get_classes_length(runtime);
   for (int32_t class_id = 0; class_id < classes_legnth; class_id++) {
-    const char* class_name = env->api->runtime->get_name(runtime, env->api->runtime->get_class_name_id(runtime, class_id));
+    const char* class_name = compiler_env->api->runtime->get_name(runtime, compiler_env->api->runtime->get_class_name_id(runtime, class_id));
     SV* sv_class_name = sv_2mortal(newSVpv(class_name, 0));
     av_push(av_class_names, SvREFCNT_inc(sv_class_name));
   }
   
   XPUSHs(sv_class_names);
-  XSRETURN(1);
-}
-
-SV*
-get_error_messages(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  SV* sv_self = ST(0);
-
-  HV* hv_self = (HV*)SvRV(sv_self);
-
-  // The environment
-  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
-  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
-  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
-  
-  // Compiler
-  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
-  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
-  void* compiler = INT2PTR(void*, SvIV(SvRV(sv_compiler)));
-
-  AV* av_error_messages = (AV*)sv_2mortal((SV*)newAV());
-  SV* sv_error_messages = sv_2mortal(newRV_inc((SV*)av_error_messages));
-
-  int32_t error_messages_legnth = env->api->compiler->get_error_messages_length(compiler);
-
-  for (int32_t i = 0; i < error_messages_legnth; i++) {
-    const char* error_message = env->api->compiler->get_error_message(compiler, i);
-    SV* sv_error_message = sv_2mortal(newSVpv(error_message, 0));
-    av_push(av_error_messages, SvREFCNT_inc(sv_error_message));
-  }
-  
-  XPUSHs(sv_error_messages);
   XSRETURN(1);
 }
 
@@ -4270,18 +4283,10 @@ get_classes_length(...)
 
   HV* hv_self = (HV*)SvRV(sv_self);
 
-  // The environment
-  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
-  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
-  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
-  
-  // Stack
-  SV** sv_stack_ptr = hv_fetch(hv_self, "stack", strlen("stack"), 0);
-  SV* sv_stack = sv_stack_ptr ? *sv_stack_ptr : &PL_sv_undef;
-  SPVM_VALUE* stack;
-  if (SvOK(sv_stack)) {
-    stack = INT2PTR(void*, SvIV(SvRV(sv_stack)));
-  }
+  // The compiler_environment
+  SV** sv_compiler_env_ptr = hv_fetch(hv_self, "compiler_env", strlen("compiler_env"), 0);
+  SV* sv_compiler_env = sv_compiler_env_ptr ? *sv_compiler_env_ptr : &PL_sv_undef;
+  SPVM_ENV* compiler_env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_compiler_env)));
   
   // Runtime
   SV** sv_runtime_ptr = hv_fetch(hv_self, "runtime", strlen("runtime"), 0);
@@ -4290,7 +4295,7 @@ get_classes_length(...)
   int32_t classes_length;
   if (SvOK(sv_runtime)) {
     void* runtime = INT2PTR(void*, SvIV(SvRV(sv_runtime)));
-    classes_length = env->api->runtime->get_classes_length(runtime);
+    classes_length = compiler_env->api->runtime->get_classes_length(runtime);
   }
   else {
     classes_length = 0;
@@ -4316,42 +4321,34 @@ get_module_file(...)
   const char* class_name = SvPV_nolen(sv_class_name);
   
   // Env
-  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
-  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
-  SPVM_ENV* env = INT2PTR(void*, SvIV(SvRV(sv_env)));
+  SV** sv_compiler_env_ptr = hv_fetch(hv_self, "compiler_env", strlen("compiler_env"), 0);
+  SV* sv_compiler_env = sv_compiler_env_ptr ? *sv_compiler_env_ptr : &PL_sv_undef;
+  SPVM_ENV* compiler_env = INT2PTR(void*, SvIV(SvRV(sv_compiler_env)));
 
-  // Stack
-  SV** sv_stack_ptr = hv_fetch(hv_self, "stack", strlen("stack"), 0);
-  SV* sv_stack = sv_stack_ptr ? *sv_stack_ptr : &PL_sv_undef;
-  SPVM_VALUE* stack;
-  if (SvOK(sv_stack)) {
-    stack = INT2PTR(void*, SvIV(SvRV(sv_stack)));
-  }
-  
   // Runtime
   SV** sv_runtime_ptr = hv_fetch(hv_self, "runtime", strlen("runtime"), 0);
   SV* sv_runtime = sv_runtime_ptr ? *sv_runtime_ptr : &PL_sv_undef;
   void* runtime = INT2PTR(void*, SvIV(SvRV(sv_runtime)));
 
   // Copy class load path to builder
-  int32_t class_id = env->api->runtime->get_class_id_by_name(runtime, class_name);
+  int32_t class_id = compiler_env->api->runtime->get_class_id_by_name(runtime, class_name);
   const char* module_file;
   SV* sv_module_file;
 
   if (class_id >= 0) {
-    int32_t module_rel_file_id = env->api->runtime->get_class_module_rel_file_id(runtime, class_id);
-    int32_t module_dir_id = env->api->runtime->get_class_module_dir_id(runtime, class_id);
+    int32_t module_rel_file_id = compiler_env->api->runtime->get_class_module_rel_file_id(runtime, class_id);
+    int32_t module_dir_id = compiler_env->api->runtime->get_class_module_dir_id(runtime, class_id);
     const char* module_dir = NULL;
     const char* module_dir_sep;
     if (module_dir_id >= 0) {
       module_dir_sep = "/";
-      module_dir = env->api->runtime->get_constant_string_value(runtime, module_dir_id, NULL);
+      module_dir = compiler_env->api->runtime->get_constant_string_value(runtime, module_dir_id, NULL);
     }
     else {
       module_dir_sep = "";
       module_dir = "";
     }
-    const char* module_rel_file = env->api->runtime->get_constant_string_value(runtime, module_rel_file_id, NULL);
+    const char* module_rel_file = compiler_env->api->runtime->get_constant_string_value(runtime, module_rel_file_id, NULL);
 
     sv_module_file = sv_2mortal(newSVpv(module_dir, 0));
     sv_catpv(sv_module_file, module_dir_sep);
@@ -4374,22 +4371,14 @@ build_runtime(...)
   SV* sv_self = ST(0);
   HV* hv_self = (HV*)SvRV(sv_self);
 
-  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
-  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
-  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+  SV** sv_compiler_env_ptr = hv_fetch(hv_self, "compiler_env", strlen("compiler_env"), 0);
+  SV* sv_compiler_env = sv_compiler_env_ptr ? *sv_compiler_env_ptr : &PL_sv_undef;
+  SPVM_ENV* compiler_env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_compiler_env)));
   
   SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
   SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
   void* compiler = INT2PTR(void*, SvIV(SvRV(sv_compiler)));
 
-  // Stack
-  SV** sv_stack_ptr = hv_fetch(hv_self, "stack", strlen("stack"), 0);
-  SV* sv_stack = sv_stack_ptr ? *sv_stack_ptr : &PL_sv_undef;
-  SPVM_VALUE* stack;
-  if (SvOK(sv_stack)) {
-    stack = INT2PTR(void*, SvIV(SvRV(sv_stack)));
-  }
-  
   void* runtime = NULL;
   {
     SV** sv_runtime_ptr = hv_fetch(hv_self, "runtime", strlen("runtime"), 0);
@@ -4400,24 +4389,24 @@ build_runtime(...)
   }
   
   if (runtime) {
-    env->api->runtime->free_runtime(runtime);
+    compiler_env->api->runtime->free_object(runtime);
     runtime = NULL;
   }
 
   // Build runtime information
-  runtime = env->api->runtime->new_runtime(env);
+  runtime = compiler_env->api->runtime->new_object(compiler_env);
 
   // Runtime allocator
-  void* runtime_allocator = env->api->runtime->get_allocator(runtime);
+  void* runtime_allocator = compiler_env->api->runtime->get_allocator(runtime);
   
   // SPVM 32bit codes
-  int32_t* spvm_32bit_codes = env->api->compiler->create_spvm_32bit_codes(compiler, runtime_allocator);
+  int32_t* spvm_32bit_codes = compiler_env->api->compiler->create_spvm_32bit_codes(compiler, runtime_allocator);
   
   // Build runtime
-  env->api->runtime->build(runtime, spvm_32bit_codes);
+  compiler_env->api->runtime->build(runtime, spvm_32bit_codes);
 
   // Prepare runtime
-  env->api->runtime->prepare(runtime);
+  compiler_env->api->runtime->prepare(runtime);
 
   // Set runtime information
   size_t iv_runtime = PTR2IV(runtime);
@@ -4438,17 +4427,9 @@ get_spvm_32bit_codes(...)
   HV* hv_self = (HV*)SvRV(sv_self);
   
   // Environment
-  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
-  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
-  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
-  
-  // Stack
-  SV** sv_stack_ptr = hv_fetch(hv_self, "stack", strlen("stack"), 0);
-  SV* sv_stack = sv_stack_ptr ? *sv_stack_ptr : &PL_sv_undef;
-  SPVM_VALUE* stack;
-  if (SvOK(sv_stack)) {
-    stack = INT2PTR(void*, SvIV(SvRV(sv_stack)));
-  }
+  SV** sv_compiler_env_ptr = hv_fetch(hv_self, "compiler_env", strlen("compiler_env"), 0);
+  SV* sv_compiler_env = sv_compiler_env_ptr ? *sv_compiler_env_ptr : &PL_sv_undef;
+  SPVM_ENV* compiler_env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_compiler_env)));
   
   // Runtime
   SV** sv_runtime_ptr = hv_fetch(hv_self, "runtime", strlen("runtime"), 0);
@@ -4456,8 +4437,8 @@ get_spvm_32bit_codes(...)
   void* runtime = INT2PTR(void*, SvIV(SvRV(sv_runtime)));
 
   // SPVM 32bit codes
-  int32_t* spvm_32bit_codes = env->api->runtime->get_spvm_32bit_codes(runtime);
-  int32_t spvm_32bit_codes_length = env->api->runtime->get_spvm_32bit_codes_length(runtime);
+  int32_t* spvm_32bit_codes = compiler_env->api->runtime->get_spvm_32bit_codes(runtime);
+  int32_t spvm_32bit_codes_length = compiler_env->api->runtime->get_spvm_32bit_codes_length(runtime);
   
   AV* av_spvm_32bit_codes = (AV*)sv_2mortal((SV*)newAV());
   SV* sv_spvm_32bit_codes = sv_2mortal(newRV_inc((SV*)av_spvm_32bit_codes));
@@ -4470,150 +4451,6 @@ get_spvm_32bit_codes(...)
   XPUSHs(sv_spvm_32bit_codes);
 
   XSRETURN(1);
-}
-
-SV*
-free_compiler(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  SV* sv_self = ST(0);
-  HV* hv_self = (HV*)SvRV(sv_self);
-
-  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
-  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
-  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
-  
-  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
-  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
-  void* compiler = INT2PTR(void*, SvIV(SvRV(sv_compiler)));
-
-  // Free compiler
-  env->api->compiler->free_compiler(compiler);
-
-  XSRETURN(0);
-}
-
-SV*
-prepare_env(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  SV* sv_self = ST(0);
-  HV* hv_self = (HV*)SvRV(sv_self);
-
-  SV** sv_runtime_ptr = hv_fetch(hv_self, "runtime", strlen("runtime"), 0);
-  SV* sv_runtime = sv_runtime_ptr ? *sv_runtime_ptr : &PL_sv_undef;
-  void* runtime = INT2PTR(void*, SvIV(SvRV(sv_runtime)));
-
-  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
-  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
-  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
-  
-  if (env == NULL) {
-    croak("Can't create SPVM env");
-  }
-
-  // Set runtime information
-  env->runtime = runtime;
-  
-  // Initialize env
-  env->init_env(env);
-
-  // Create stack
-  SPVM_VALUE* stack = env->new_stack(env);
-  size_t iv_stack = PTR2IV(stack);
-  SV* sviv_stack = sv_2mortal(newSViv(iv_stack));
-  SV* sv_stack = sv_2mortal(newRV_inc(sviv_stack));
-  (void)hv_store(hv_self, "stack", strlen("stack"), SvREFCNT_inc(sv_stack), 0);
-
-  XSRETURN(0);
-}
-
-SV*
-set_command_info(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  SV* sv_self = ST(0);
-  HV* hv_self = (HV*)SvRV(sv_self);
-  
-  SV* sv_program_name = ST(1);
-  const char* program_name = SvPV_nolen(sv_program_name);
-  int32_t program_name_length = strlen(program_name);
-  
-  SV* sv_argv = ST(2);
-  AV* av_argv = (AV*)SvRV(sv_argv);
-  int32_t argv_length = av_len(av_argv) + 1;
-  
-  // Stack
-  SV** sv_stack_ptr = hv_fetch(hv_self, "stack", strlen("stack"), 0);
-  SV* sv_stack = sv_stack_ptr ? *sv_stack_ptr : &PL_sv_undef;
-  SPVM_VALUE* stack;
-  if (SvOK(sv_stack)) {
-    stack = INT2PTR(void*, SvIV(SvRV(sv_stack)));
-  }
-  
-  // The environment
-  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
-  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
-  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
-
-  // Program name - string
-  void* obj_program_name = env->new_string(env, stack, program_name, program_name_length);
-  
-  void* obj_argv = env->new_object_array(env, stack, SPVM_NATIVE_C_BASIC_TYPE_ID_STRING, argv_length);
-  for (int32_t index = 0; index < argv_length; index++) {
-    SV** sv_arg_ptr = av_fetch(av_argv, index, 0);
-    SV* sv_arg = sv_arg_ptr ? *sv_arg_ptr : &PL_sv_undef;
-    
-    const char* arg = SvPV_nolen(sv_arg);
-    int32_t arg_length = strlen(arg);
-    
-    void* obj_arg = env->new_string(env, stack, arg, arg_length);
-    env->set_elem_object(env, stack, obj_argv, index, obj_arg);
-  }
-
-  // Set command info
-  {
-    int32_t e;
-    e = env->set_command_info_program_name(env, stack, obj_program_name);
-    assert(e == 0);
-    e = env->set_command_info_argv(env, stack, obj_argv);
-    assert(e == 0);
-  }
-  
-  XSRETURN(0);
-}
-
-SV*
-call_init_blocks(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  SV* sv_self = ST(0);
-  HV* hv_self = (HV*)SvRV(sv_self);
-  
-  // Stack
-  SV** sv_stack_ptr = hv_fetch(hv_self, "stack", strlen("stack"), 0);
-  SV* sv_stack = sv_stack_ptr ? *sv_stack_ptr : &PL_sv_undef;
-  SPVM_VALUE* stack;
-  if (SvOK(sv_stack)) {
-    stack = INT2PTR(void*, SvIV(SvRV(sv_stack)));
-  }
-  
-  // The environment
-  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
-  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
-  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
-  
-  env->call_init_blocks(env, stack);
-
-  XSRETURN(0);
 }
 
 SV*
@@ -4693,48 +4530,6 @@ set_precompile_method_address(...)
 }
 
 SV*
-DESTROY(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  SV* sv_self = ST(0);
-  HV* hv_self = (HV*)SvRV(sv_self);
-
-  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
-  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
-  if (SvOK(sv_env)) {
-    SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
-
-    if (env->runtime) {
-      // Free stack
-      SV** sv_stack_ptr = hv_fetch(hv_self, "stack", strlen("stack"), 0);
-      SV* sv_stack = sv_stack_ptr ? *sv_stack_ptr : &PL_sv_undef;
-      void* stack = NULL;
-      if (SvOK(sv_stack)) {
-        stack = INT2PTR(void*, SvIV(SvRV(sv_stack)));
-      }
-        
-      // Cleanup global varialbes
-      env->cleanup_global_vars(env, stack);
-      
-      // Free stack
-      env->free_stack(env, stack);
-
-      // Free runtime
-      env->api->runtime->free_runtime(env->runtime);
-      env->runtime = NULL;
-    }
-    
-    env->free_env_raw(env);
-  }
-  
-  XSRETURN(0);
-}
-
-MODULE = SPVM::Builder::CC		PACKAGE = SPVM::Builder::CC
-
-SV*
 build_precompile_class_source(...)
   PPCODE:
 {
@@ -4743,21 +4538,8 @@ build_precompile_class_source(...)
   SV* sv_class_name = ST(1);
   const char* class_name = SvPV_nolen(sv_class_name);
   
-  // Builder
-  SV** sv_builder_ptr = hv_fetch(hv_self, "builder", strlen("builder"), 0);
-  SV* sv_builder = sv_builder_ptr ? *sv_builder_ptr : &PL_sv_undef;
-  HV* hv_builder = (HV*)SvRV(sv_builder);
-
-  // Stack
-  SV** sv_stack_ptr = hv_fetch(hv_builder, "stack", strlen("stack"), 0);
-  SV* sv_stack = sv_stack_ptr ? *sv_stack_ptr : &PL_sv_undef;
-  SPVM_VALUE* stack;
-  if (SvOK(sv_stack)) {
-    stack = INT2PTR(void*, SvIV(SvRV(sv_stack)));
-  }
-  
   // Runtime
-  SV** sv_runtime_ptr = hv_fetch(hv_builder, "runtime", strlen("runtime"), 0);
+  SV** sv_runtime_ptr = hv_fetch(hv_self, "runtime", strlen("runtime"), 0);
   SV* sv_runtime = sv_runtime_ptr ? *sv_runtime_ptr : &PL_sv_undef;
   void* runtime = INT2PTR(void*, SvIV(SvRV(sv_runtime)));
 
@@ -4765,34 +4547,159 @@ build_precompile_class_source(...)
   SPVM_ENV* env = SPVM_NATIVE_new_env_raw();
   
   // New allocator
-  void* allocator = env->api->allocator->new_allocator();
+  void* allocator = env->api->allocator->new_object();
   
   // New string buffer
-  void* string_buffer = env->api->string_buffer->new_string_buffer_tmp(allocator, 0);
+  void* string_buffer = env->api->string_buffer->new_object(allocator, 0);
 
-  void* precompile = env->api->precompile->new_precompile();
+  void* precompile = env->api->precompile->new_object();
   
   env->api->precompile->set_runtime(precompile, runtime);
   
   env->api->precompile->build_class_source(precompile, string_buffer, class_name);
   
-  env->api->precompile->free_precompile(precompile);
+  env->api->precompile->free_object(precompile);
 
   const char* string_buffer_value = env->api->string_buffer->get_value(string_buffer);
   int32_t string_buffer_length = env->api->string_buffer->get_length(string_buffer);
   SV* sv_precompile_source = sv_2mortal(newSVpv(string_buffer_value, string_buffer_length));
 
   // Free string buffer
-  env->api->string_buffer->free_string_buffer(string_buffer);
+  env->api->string_buffer->free_object(string_buffer);
 
   // Free allocator
-  env->api->allocator->free_allocator(allocator);
+  env->api->allocator->free_object(allocator);
 
   // Free env
   env->free_env_raw(env);
   
   XPUSHs(sv_precompile_source);
   XSRETURN(1);
+}
+
+SV*
+build_env(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+  HV* hv_self = (HV*)SvRV(sv_self);
+
+  SV** sv_runtime_ptr = hv_fetch(hv_self, "runtime", strlen("runtime"), 0);
+  SV* sv_runtime = sv_runtime_ptr ? *sv_runtime_ptr : &PL_sv_undef;
+  void* runtime = INT2PTR(void*, SvIV(SvRV(sv_runtime)));
+
+  // Create env
+  SPVM_ENV* env = SPVM_NATIVE_new_env_raw();
+  size_t iv_env = PTR2IV(env);
+  SV* sviv_env = sv_2mortal(newSViv(iv_env));
+  SV* sv_env = sv_2mortal(newRV_inc(sviv_env));
+  (void)hv_store(hv_self, "env", strlen("env"), SvREFCNT_inc(sv_env), 0);
+
+  // Set runtime information
+  env->runtime = runtime;
+  
+  // Initialize env
+  env->init_env(env);
+  
+  XSRETURN(0);
+}
+
+SV*
+build_stack(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+  HV* hv_self = (HV*)SvRV(sv_self);
+
+  // The environment
+  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
+  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
+  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+
+  // Create stack
+  SPVM_VALUE* stack = env->new_stack(env);
+  size_t iv_stack = PTR2IV(stack);
+  SV* sviv_stack = sv_2mortal(newSViv(iv_stack));
+  SV* sv_stack = sv_2mortal(newRV_inc(sviv_stack));
+  (void)hv_store(hv_self, "stack", strlen("stack"), SvREFCNT_inc(sv_stack), 0);
+
+  XSRETURN(0);
+}
+
+SV*
+call_init_blocks(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+  HV* hv_self = (HV*)SvRV(sv_self);
+
+  SV* sv_env = ST(1);
+  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+  
+  env->call_init_blocks(env);
+
+  XSRETURN(0);
+}
+
+SV*
+set_command_info(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+  HV* hv_self = (HV*)SvRV(sv_self);
+
+  SV* sv_env = ST(1);
+  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+  
+  SV* sv_program_name = ST(2);
+  const char* program_name = SvPV_nolen(sv_program_name);
+  int32_t program_name_length = strlen(program_name);
+  
+  SV* sv_argv = ST(3);
+  AV* av_argv = (AV*)SvRV(sv_argv);
+  int32_t argv_length = av_len(av_argv) + 1;
+  
+  {
+    SPVM_VALUE* my_stack = env->new_stack(env);
+    int32_t scope_id = env->enter_scope(env, my_stack);
+    
+    // Program name - string
+    void* obj_program_name = env->new_string(env, my_stack, program_name, program_name_length);
+    
+    void* obj_argv = env->new_object_array(env, my_stack, SPVM_NATIVE_C_BASIC_TYPE_ID_STRING, argv_length);
+    for (int32_t index = 0; index < argv_length; index++) {
+      SV** sv_arg_ptr = av_fetch(av_argv, index, 0);
+      SV* sv_arg = sv_arg_ptr ? *sv_arg_ptr : &PL_sv_undef;
+      
+      const char* arg = SvPV_nolen(sv_arg);
+      int32_t arg_length = strlen(arg);
+      
+      void* obj_arg = env->new_string(env, my_stack, arg, arg_length);
+      env->set_elem_object(env, my_stack, obj_argv, index, obj_arg);
+    }
+
+    // Set command info
+    {
+      int32_t e;
+      e = env->set_command_info_program_name(env, obj_program_name);
+      assert(e == 0);
+      e = env->set_command_info_argv(env, obj_argv);
+      assert(e == 0);
+    }
+    
+    env->leave_scope(env, my_stack, scope_id);
+    env->free_stack(env, my_stack);
+  }
+  
+  XSRETURN(0);
 }
 
 MODULE = SPVM		PACKAGE = SPVM

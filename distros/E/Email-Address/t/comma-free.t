@@ -1,4 +1,6 @@
-use strict;
+use v5.12;
+use warnings;
+
 use Test::More 0.88;
 
 use Email::Address;

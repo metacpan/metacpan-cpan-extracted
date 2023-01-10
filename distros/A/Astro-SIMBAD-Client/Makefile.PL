@@ -52,6 +52,7 @@ if ($^O eq 'MSWin32') {
 	open (my $fhi, '<', $fni) or die "Unable to open $fni: $!\n";
 	open (my $fho, '>', $fno) or die "Unable to open $fno: $!\n";
 	print $fho "$Config{startperl}\n";
+	local $_ = undef;	# while (<>) ... does not localize $_.
 	while (<$fhi>) {print $fho $_}
 	close $fho;
 	close $fhi;
@@ -137,6 +138,11 @@ functional_test :: pure_all
 	\$(NOECHO) \$(ECHO) functional_test
 	AUTHOR_TESTING=1 $test
 
+entities_test :: pure_all
+	\$(NOECHO) \$(ECHO)
+	\$(NOECHO) \$(ECHO) entities_test
+	AUTHOR_TESTING=1 PERL5OPT=-MTest::Without::Module=XML::DoubleEncodedEntities $test
+
 optionals_test :: pure_all
 	\$(NOECHO) \$(ECHO)
 	\$(NOECHO) \$(ECHO) optionals_test
@@ -147,7 +153,7 @@ structural_test :: pure_all
 	\$(NOECHO) \$(ECHO) structural_test
 	AUTHOR_TESTING=1 $structural_test
 
-authortest :: functional_test optionals_test structural_test
+authortest :: functional_test entities_test optionals_test structural_test
 
 testcover :: pure_all
 	cover -test -ignore_re=inc/ -ignore_re=eg/

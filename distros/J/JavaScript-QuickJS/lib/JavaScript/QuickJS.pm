@@ -47,7 +47,7 @@ your system.
 
 use XSLoader;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 XSLoader::load( __PACKAGE__, $VERSION );
 
@@ -223,11 +223,9 @@ to prevent your Perl “number” from becoming a JavaScript string. (Even in
 
 =item * Perl code references become JavaScript functions.
 
-=item * L<JavaScript::QuickJS::Function> objects become their original
-JavaScript C<Function> objects.
-
-=item * L<JavaScript::QuickJS::RegExp> objects become their original
-JavaScript C<RegExp> objects.
+=item * Perl L<JavaScript::QuickJS::Function>, L<JavaScript::QuickJS::RegExp>,
+and L<JavaScript::QuickJS::Date> objects become their original
+JavaScript objects.
 
 =item * Anything else triggers an exception.
 

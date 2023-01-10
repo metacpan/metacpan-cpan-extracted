@@ -1,6 +1,7 @@
-use Test::More;
-use strict;
+use v5.12;
 use warnings;
+
+use Test::More;
 
 # This is a corpus of addresses to test.  Each element of @list is a pair of
 # input and expected output.  The input is a string that will be given to
@@ -1634,8 +1635,6 @@ my @list = (
 my $tests = 1;
 $tests += @list;
 
-plan tests => $tests;
-
 use_ok 'Email::Address';
 
 for my $i (0 .. $#list) {
@@ -1675,3 +1674,5 @@ for my $i (0 .. $#list) {
     }
   }
 }
+
+done_testing;

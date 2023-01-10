@@ -1,5 +1,15 @@
 Revision history for Text-Treesitter
 
+0.03    2023-01-05
+        [CHANGES]
+         * Provide a real toplevel `Text::Treesitter` class to wrap the
+           lower-level parts in a more convenient wrapper API
+         * Compile .o files using `-fPIC` because some scanner C++ files will
+           need it
+         * Added `examples/viewtree.pl` as a tree/grammar debugging tool
+         * Lazily load `ExtUtils::CppGuess` as needed because most of the time
+           it isn't.
+
 0.02    2023-01-04
         [CHANGES]
          * Added Text::Treesitter::Query, ::QueryCursor and ::QueryMatch

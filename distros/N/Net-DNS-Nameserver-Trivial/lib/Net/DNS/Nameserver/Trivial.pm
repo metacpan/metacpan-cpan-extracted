@@ -1,10 +1,5 @@
 package Net::DNS::Nameserver::Trivial;
-
-use vars qw($VERSION);
-
-$VERSION = 0.302;
-#---------------
-
+$Net::DNS::Nameserver::Trivial::VERSION = '0.305';
 use strict;
 use warnings;
 #-----------------------------------------------------------------------

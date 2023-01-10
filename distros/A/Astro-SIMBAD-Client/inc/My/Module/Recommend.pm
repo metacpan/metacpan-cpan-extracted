@@ -17,6 +17,12 @@ EOD
       This module is required for the query() method. If you do not
       intend to use this method, SOAP::Lite is not needed.
 EOD
+    __any( 'XML::DoubleEncodedEntities' => <<'EOD' ),
+      This module is not normally required. But at one point the SIMBAD
+      service was double-encoding XML entities, and anything that has
+      gone wrong once can go wrong again. If you find you need this
+      module you cam install it and it will be used.
+EOD
     __any( qw{ XML::Parser XML::Parser::Lite }	=> <<'EOD' ),
       One of these module is required to process the results of
       VO-format queries. If you do not intend to make VO-format queries,
@@ -28,8 +34,15 @@ EOD
     __none( YAML	=> '' ),
 );
 
+my %core = map { $_ => 1 } qw{ Time::HiRes };
+
 sub optionals {
-    return ( map { $_->modules() } @optionals );
+    # As of Test::Builder 1.302190 (March 2 2022) Time::HiRes is needed
+    # by Test::Builder, which is used by Test::More. It's a core module,
+    # so it OUGHT to be available, though there are known downstream
+    # packagers who strip core modules. Sigh. This is the reason I'm
+    # stripping it here rather than removing it completely.
+    return ( grep { ! $core{$_} } map { $_->modules() } @optionals );
 }
 
 sub recommend {
@@ -107,7 +120,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013-2021 by Thomas R. Wyant, III
+Copyright (C) 2013-2023 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

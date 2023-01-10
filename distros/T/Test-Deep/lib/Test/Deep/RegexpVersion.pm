@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Test::Deep::RegexpVersion 1.202;
+package Test::Deep::RegexpVersion 1.204;
 
 # Older versions of Perl treated Regexp refs as opaque scalars blessed
 # into the "Regexp" class. Several bits of code need this so we
@@ -22,7 +22,7 @@ Test::Deep::RegexpVersion
 
 =head1 VERSION
 
-version 1.202
+version 1.204
 
 =head1 PERL VERSION
 

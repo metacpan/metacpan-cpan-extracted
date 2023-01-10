@@ -1,3 +1,8 @@
+0.047		2023-01-07	T. R. Wyant
+    Make XML::DoubleEncodedEntities optional.  Add test entities_test,
+    without this module but with all others, to prove it is not needed
+    -- or warn if it is, as the case may be.
+
 0.046		2021-08-12	T. R. Wyant
     Correct generation of 'provides' metadata.  Thanks to Favio Poletti
     for blogging

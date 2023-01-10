@@ -2,7 +2,7 @@ package Sodium::FFI;
 use strict;
 use warnings;
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 use Carp qw(croak);
 use Exporter qw(import);
@@ -1031,7 +1031,7 @@ __END__
 
 =head1 NAME
 
-Sodium::FFI - FFI implementation of libsodium
+Sodium::FFI - Sodium is a modern, easy-to-use software library for encryption, decryption, signatures, password hashing, and more.
 
 =head1 SYNOPSIS
 
@@ -1048,10 +1048,12 @@ Sodium::FFI - FFI implementation of libsodium
 =head1 DESCRIPTION
 
 L<Sodium::FFI> is a set of Perl bindings for the L<LibSodium|https://doc.libsodium.org/>
-C library. These bindings have been created using FFI via L<FFI::Platypus> to make
-building and maintaining the bindings easier than was done via L<Crypt::NaCl::Sodium>.
-While we also intend to fix up L<Crypt::NaCl::Sodium> so that it can use newer versions
-of LibSodium, the FFI method is faster to build and release.
+C library. Sodium is a modern, easy-to-use software library for encryption, decryption,
+signatures, password hashing, and more. These bindings have been created using FFI
+via L<FFI::Platypus>.
+
+While we also intend to eventually fix L<Crypt::NaCl::Sodium> so that it can use newer versions
+of LibSodium.
 
 =head1 Crypto Auth Functions
 

@@ -406,7 +406,12 @@ sub _getbyDN {
         # Search for the next node
         #print "Probe $currentPath - $nextComponent: ";
         $mesg = $ldap->search( base => $currentPath, scope  => 'one', filter => '('.$nextComponent.')' );
-
+	
+	# Lost connection, try to rebind and rerun query
+	if ($self->_is_transient_error($mesg)) {
+	  $mesg = $ldap->search( base => $currentPath, scope  => 'one', filter => '('.$nextComponent.')' );
+	}
+	
         # found, push to path and test next
         if ( $mesg->count() == 1) {
             #print "Found\n";

@@ -1,6 +1,6 @@
 use v5.20.0;
 use warnings;
-package Pod::Weaver::PluginBundle::RJBS 5.021;
+package Pod::Weaver::PluginBundle::RJBS 5.022;
 # ABSTRACT: RJBS's default Pod::Weaver config
 
 #pod =head1 OVERVIEW
@@ -149,7 +149,7 @@ Pod::Weaver::PluginBundle::RJBS - RJBS's default Pod::Weaver config
 
 =head1 VERSION
 
-version 5.021
+version 5.022
 
 =head1 OVERVIEW
 
@@ -181,7 +181,7 @@ Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Ricardo Signes.
+This software is copyright (c) 2023 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

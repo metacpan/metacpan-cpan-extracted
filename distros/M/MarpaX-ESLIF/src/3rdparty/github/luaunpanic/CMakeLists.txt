@@ -1,8 +1,9 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 3.0.0 FATAL_ERROR)
+PROJECT(luaunpanic VERSION 5.3.4 LANGUAGES C)
 IF (NOT MYPACKAGEBOOTSTRAP_DONE)
   INCLUDE ("3rdparty/github/cmake-utils/cmake/MyPackageBootstrap.cmake")
 ENDIF ()
-MYPACKAGESTART (luaunpanic 5 3 4)
+MYPACKAGESTART ()
 
 OPTION (LUA_32BITS "Use 32-bit integers and 32-bit floats" OFF)
 OPTION (LUA_USE_C89 "Avoid the use of few C99 feature" OFF)

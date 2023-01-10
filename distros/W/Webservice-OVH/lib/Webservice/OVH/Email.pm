@@ -34,7 +34,7 @@ use strict;
 use warnings;
 use Carp qw{ carp croak };
 
-our $VERSION = 0.47;
+our $VERSION = 0.48;
 
 use Webservice::OVH::Email::Domain;
 

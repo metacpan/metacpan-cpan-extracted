@@ -1,5 +1,4 @@
-use strict;
-use warnings;
+use strictures 2;
 use 5.020;
 use experimental qw(signatures postderef);
 no if "$]" >= 5.031009, feature => 'indirect';

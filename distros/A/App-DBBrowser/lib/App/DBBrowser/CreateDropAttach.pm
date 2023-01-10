@@ -67,8 +67,7 @@ sub create_drop_or_attach {
         if ( $choice eq $hidden ) {
             require App::DBBrowser::Opt::Set;
             my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
-            my $groups = [ { name => 'group_insert', text => '' } ];
-            $opt_set->set_options( $groups );
+            $opt_set->set_options( 'import' );
             next CREATE_DROP_ATTACH;
         }
         elsif ( $choice =~ /^-\ Create/i ) {

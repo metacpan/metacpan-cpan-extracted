@@ -1,5 +1,5 @@
 package AI::ParticleSwarmOptimization::MCE;
-
+$AI::ParticleSwarmOptimization::MCE::VERSION = '1.006';
 use strict;
 use warnings;
 use base qw( 
@@ -22,8 +22,6 @@ __PACKAGE__->mk_accessors( qw(
 #-----------------------------------------------------------------------	
 $Storable::Deparse 	= 1;
 $Storable::Eval 	= 1;
-#-----------------------------------------------------------------------
-$AI::ParticleSwarmOptimization::MCE::VERSION = '1.003';
 #=======================================================================
 sub new {
     my ($class, %params) = @_;
@@ -296,6 +294,7 @@ AI::ParticleSwarmOptimization::MCE - Particle Swarm Optimization (object oriente
         $sum += ($_ - $offset++) ** 2 for @values;
         return $sum;
     }
+
 =head1 Description
 
 This module is enhancement of on original AI::ParticleSwarmOptimization to support 

@@ -1,5 +1,5 @@
 package AI::Genetic::Pro::Selection::RouletteBasic;
-
+$AI::Genetic::Pro::Selection::RouletteBasic::VERSION = '1.009';
 use warnings;
 use strict;
 use List::Util qw(min);

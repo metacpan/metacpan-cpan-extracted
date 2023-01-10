@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Test::Deep::All 1.202;
+package Test::Deep::All 1.204;
 
 use Scalar::Util ();
 use Test::Deep::Cmp;
@@ -65,7 +65,7 @@ Test::Deep::All
 
 =head1 VERSION
 
-version 1.202
+version 1.204
 
 =head1 PERL VERSION
 

@@ -29,11 +29,11 @@ use File::Basename;
 use File::Find;
 use File::Which;
 use IO::Handle;
-use IPC::Run qw/run/;
 use Perl::OSType qw/is_os_type/;
 use Try::Tiny;
 
 autoflush STDOUT 1;
+autoflush STDERR 1;
 
 #
 # Our distribution have both C and CPP files, and we want to make sure that modifying
@@ -428,7 +428,7 @@ foreach (sort keys %types) {
   close($fh) || warn "Failed to close $pkgfile, $!";
 }
 
-run([$^X, File::Spec->catfile('src', 'CMakeObjects.PL')]) or die "src/CMakeObjects.PL: $?";
+my_spawn($^X, File::Spec->catfile('src', 'CMakeObjects.PL'));
 my @ldfrom = ();
 my %unique = ();
 
@@ -523,6 +523,39 @@ sub try_compile {
     return $rc;
 }
 
+sub my_spawn {
+    my (@cmd) = @_;
+
+    die "Empty command to execute" unless @cmd;
+
+    print "=== Command: @cmd\n";
+
+    my $pid = fork() // die "Failed to fork, $!";
+    $pid ? my_spawn_parent_side($pid, @cmd) : my_spawn_child_side(@cmd);
+}
+
+sub my_spawn_child_side {
+    my (@cmd) = @_;
+
+    exec { $cmd[0] } @cmd;
+    die "=== Command: @cmd, $!"; # Should never be executed
+}
+
+sub my_spawn_parent_side {
+    my ($pid, @cmd ) = @_;
+
+    my $kid = waitpid($pid, 0);
+    warn "=== Command: @cmd, waitpid on PID $pid returned child PID $kid?" unless $kid == $pid;
+    my $exit_value = $? >> 8;
+    my $signal = $? & 127;
+    my $core_dump = $? & 128;
+    if ($exit_value) {
+        die "=== Command: @cmd, exit value $exit_value (signal=$signal, core_dump=$core_dump)\n";
+    } else {
+        print STDOUT "=== Command: @cmd, exit value $exit_value\n";
+    }
+}
+
 my %WriteMakefileArgs = (
   "ABSTRACT" => "ESLIF is Extended ScanLess InterFace",
   "AUTHOR" => "Jean-Damien Durand <jeandamiendurand\@free.fr>",
@@ -544,7 +577,6 @@ my %WriteMakefileArgs = (
     "File::Which" => "1.23",
     "File::chdir" => 0,
     "IO::Handle" => 0,
-    "IPC::Run" => 0,
     "POSIX" => 0,
     "Perl::OSType" => 0,
     "Try::Tiny" => 0,
@@ -596,7 +628,7 @@ my %WriteMakefileArgs = (
     "threads::shared" => 0,
     "utf8" => 0
   },
-  "VERSION" => "6.0.27",
+  "VERSION" => "6.0.28",
   "test" => {
     "TESTS" => "t/*.t"
   }

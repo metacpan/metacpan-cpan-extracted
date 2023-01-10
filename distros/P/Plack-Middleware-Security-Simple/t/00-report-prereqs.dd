@@ -35,8 +35,7 @@ do { my $x = {
                                       'Ref::Util' => '0',
                                       'Regexp::Common' => '0',
                                       'parent' => '0',
-                                      'perl' => 'v5.10.0',
-                                      'strict' => '0',
+                                      'perl' => 'v5.14.0',
                                       'warnings' => '0'
                                     }
                     },
@@ -54,7 +53,8 @@ do { my $x = {
                                    'Plack::Builder' => '0',
                                    'Plack::Test' => '0',
                                    'Test::More' => '0',
-                                   'Test::Vars' => '0.015'
+                                   'Test::Vars' => '0.015',
+                                   'strict' => '0'
                                  }
                  }
      };

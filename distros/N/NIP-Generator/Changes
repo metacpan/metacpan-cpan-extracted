@@ -1,5 +1,20 @@
 Revision history for Perl extension NIP::Generator.
 
+1.24 Sun, 08 Jan 2023 17:37:47 +0100
+	- Changes in a dist.ini file.
+
+1.23 Sun, 08 Jan 2023 17:37:47 +0100
+	- Changes in a dist.ini file.
+
+1.24 Sun, 08 Jan 2023 17:37:47 +0100
+	- Changes in a dist.ini file.
+
+1.21 Sun, 08 Jan 2023 17:37:47 +0100
+	- Changes in a dist.ini file.
+
+1.2 Sun, 08 Jan 2023 15:40:47 +0100
+	- Dist::Zilla release.
+
 1.1 Thu, 05 Jan 2023 12:39:51 +0100
 	- Reduction of dependencies.
 

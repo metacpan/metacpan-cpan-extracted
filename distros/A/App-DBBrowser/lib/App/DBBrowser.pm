@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.308';
+our $VERSION = '2.310';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -320,6 +320,7 @@ sub run {
                 last PLUGIN;
             }
             my $old_idx_sch = 0;
+            my $is_system_schema;
 
             SCHEMA: while ( 1 ) {
 
@@ -339,6 +340,9 @@ sub run {
                 elsif ( @schemas == 1 ) {
                     $schema = $schemas[0];
                     $schema =~ s/^[-\ ]\s//;
+                    if ( ! @$user_schemas ) {
+                        $is_system_schema = 1;
+                    }
                     $auto_one++ if $auto_one == 2
                 }
                 else {
@@ -367,6 +371,9 @@ sub run {
                         $old_idx_sch = $idx_sch;
                     }
                     $schema =~ s/^[-\ ]\s//;
+                    if ( $idx_sch - 1 > $#$user_schemas ) {
+                        $is_system_schema = 1;
+                    }
                 }
                 $db_string = 'DB ' . basename( $db ) . ( @schemas > 1 ? '.' . $schema : '' ) . '';
                 $sf->{d}{schema}       = $schema;
@@ -396,7 +403,7 @@ sub run {
                 my ( $user_tables, $sys_tables ) = ( [], [] );
                 for my $table ( sort keys %$tables_info ) {
                     if ( $tables_info->{$table}[3] =~ /SYSTEM/ ) {
-                        # next if ! $sf->{o}{G}{metadata}; # already filtered in 'tables_info'
+                        # next if ! $sf->{o}{G}{metadata}; # not required because already filtered in 'tables_info'
                         push @$sys_tables, $table;
                     }
                     else {
@@ -417,7 +424,13 @@ sub run {
                         $table = delete $sf->{redo_table};
                     }
                     else {
-                        my $menu_table = [ $hidden, undef, map( "- $_", @$user_tables ), map( "  $_", @$sys_tables ) ];
+                        my $menu_table;
+                        if ( $is_system_schema ) {
+                            $menu_table = [ $hidden, undef, map( "- $_", sort( @$user_tables, @$sys_tables ) ) ];
+                        }
+                        else {
+                            $menu_table = [ $hidden, undef, map( "- $_", @$user_tables ), map( "  $_", @$sys_tables ) ];
+                        }
                         push @$menu_table, $from_subquery if $sf->{o}{enable}{m_derived};
                         push @$menu_table, $join          if $sf->{o}{enable}{join};
                         push @$menu_table, $union         if $sf->{o}{enable}{union};
@@ -592,7 +605,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.308
+Version 2.310
 
 =head1 DESCRIPTION
 

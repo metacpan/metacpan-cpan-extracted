@@ -5,16 +5,21 @@ use 5.012;
 use warnings;
 use Getopt::Long;
 use FindBin qw($RealBin);
-
 use FASTX::Reader;
 use File::Basename;
 use Data::Dumper;
+# The following placeholder is to be programmatically replaced with 'use lib "$RealBin/../lib"' if needed
+#~loclib~
+if ( -e "$RealBin/../lib/Proch/N50.pm" and -e "$RealBin/../Changes" ) {
+    use lib "$RealBin/../lib";
+}
 my $BASENAME = basename($0);
 use Proch::Seqfu;
 my $VERSION = $Proch::Seqfu::VERSION // "<Dev>";
 my $warnings = 0;
 my ($opt_verbose, $opt_debug);
 my $opt_separator   = ".";
+my $opt_version     = 0;
 my $opt_prefix      = "{b}";
 my $opt_reset       = 0;
 my $opt_fasta;
@@ -27,11 +32,13 @@ my $_opt          = GetOptions(
 	's|separator=s' => \$opt_separator,
 	'f|fasta'       => \$opt_fasta,
 	'v|verbose'     => \$opt_verbose,
+	'version'       => \$opt_version,
 	'n|nocomments'  => \$opt_nocomm,
 	'd|debug'		    => \$opt_debug,
 	'h|help'        => \$opt_help,
 );
 
+$opt_version && version(); 
 $opt_help && usage();
 
 my $total_seqs = 0;
@@ -113,6 +120,10 @@ END
 	exit 0;
 }
 
+sub version {
+	say STDERR "$BASENAME $VERSION";
+	exit 0;
+}
 sub vprint {
 	say $_[0] if ($opt_verbose or $opt_debug) ;
 }
@@ -133,7 +144,7 @@ fu-rename - rename sequences
 
 =head1 VERSION
 
-version 1.5.0
+version 1.5.4
 
 =head1 SYNOPSIS
 

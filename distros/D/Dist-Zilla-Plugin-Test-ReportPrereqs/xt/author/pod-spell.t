@@ -25,7 +25,9 @@ Perl
 Plugin
 Randy
 ReportPrereqs
+Ricardo
 Rolsky
+Signes
 Stauner
 Test
 Yanick
@@ -36,4 +38,5 @@ ether
 kentfredric
 lib
 randy
+rjbs
 yanick

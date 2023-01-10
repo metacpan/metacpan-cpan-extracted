@@ -4,7 +4,7 @@
       "Patrick Jendral"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.16",
+   "generated_by" : "Minilla/v3.1.20",
    "license" : [
       "perl_5"
    ],
@@ -57,190 +57,190 @@
    "provides" : {
       "OVH::OvhApi" : {
          "file" : "lib/OVH/OvhApi.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "OVH::OvhApi::Answer" : {
          "file" : "lib/OVH/OvhApi/Answer.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH" : {
          "file" : "lib/Webservice/OVH.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Cloud" : {
          "file" : "lib/Webservice/OVH/Cloud.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Cloud::Project" : {
          "file" : "lib/Webservice/OVH/Cloud/Project.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Cloud::Project::IP" : {
          "file" : "lib/Webservice/OVH/Cloud/Project/IP.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Cloud::Project::IP::Failover" : {
          "file" : "lib/Webservice/OVH/Cloud/Project/IP/Failover.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Cloud::Project::Image" : {
          "file" : "lib/Webservice/OVH/Cloud/Project/Image.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Cloud::Project::Instance" : {
          "file" : "lib/Webservice/OVH/Cloud/Project/Instance.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Cloud::Project::Instance::Group" : {
          "file" : "lib/Webservice/OVH/Cloud/Project/Instance/Group.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Cloud::Project::Network" : {
          "file" : "lib/Webservice/OVH/Cloud/Project/Network.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Cloud::Project::Network::Private" : {
          "file" : "lib/Webservice/OVH/Cloud/Project/Network/Private.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Cloud::Project::Network::Private::Subnet" : {
          "file" : "lib/Webservice/OVH/Cloud/Project/Network/Private/Subnet.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Cloud::Project::SSH" : {
          "file" : "lib/Webservice/OVH/Cloud/Project/SSH.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Domain" : {
          "file" : "lib/Webservice/OVH/Domain.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Domain::Service" : {
          "file" : "lib/Webservice/OVH/Domain/Service.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Domain::Zone" : {
          "file" : "lib/Webservice/OVH/Domain/Zone.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Domain::Zone::Record" : {
          "file" : "lib/Webservice/OVH/Domain/Zone/Record.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Email" : {
          "file" : "lib/Webservice/OVH/Email.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Email::Domain" : {
          "file" : "lib/Webservice/OVH/Email/Domain.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Email::Domain::Domain" : {
          "file" : "lib/Webservice/OVH/Email/Domain/Domain.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Email::Domain::Domain::Account" : {
          "file" : "lib/Webservice/OVH/Email/Domain/Domain/Account.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Email::Domain::Domain::MailingList" : {
          "file" : "lib/Webservice/OVH/Email/Domain/Domain/MailingList.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Email::Domain::Domain::Redirection" : {
          "file" : "lib/Webservice/OVH/Email/Domain/Domain/Redirection.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Email::Domain::Domain::Task" : {
          "file" : "lib/Webservice/OVH/Email/Domain/Domain/Task.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Email::Domain::Domain::Task::Account" : {
          "file" : "lib/Webservice/OVH/Email/Domain/Domain/Task/Account.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Email::Domain::Domain::Task::Mailinglist" : {
          "file" : "lib/Webservice/OVH/Email/Domain/Domain/Task/Mailinglist.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Email::Domain::Domain::Task::Redirection" : {
          "file" : "lib/Webservice/OVH/Email/Domain/Domain/Task/Redirection.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Helper" : {
          "file" : "lib/Webservice/OVH/Helper.pm"
       },
       "Webservice::OVH::Hosting" : {
          "file" : "lib/Webservice/OVH/Hosting.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Hosting::Web" : {
          "file" : "lib/Webservice/OVH/Hosting/Web.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Hosting::Web::Service" : {
          "file" : "lib/Webservice/OVH/Hosting/Web/Service.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Me" : {
          "file" : "lib/Webservice/OVH/Me.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Me::Bill" : {
          "file" : "lib/Webservice/OVH/Me/Bill.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Me::Contact" : {
          "file" : "lib/Webservice/OVH/Me/Contact.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Me::Order" : {
          "file" : "lib/Webservice/OVH/Me/Order.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Me::Order::Detail" : {
          "file" : "lib/Webservice/OVH/Me/Order/Detail.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Me::Task" : {
          "file" : "lib/Webservice/OVH/Me/Task.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Order" : {
          "file" : "lib/Webservice/OVH/Order.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Order::Cart" : {
          "file" : "lib/Webservice/OVH/Order/Cart.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Order::Cart::Item" : {
          "file" : "lib/Webservice/OVH/Order/Cart/Item.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Order::Domain" : {
          "file" : "lib/Webservice/OVH/Order/Domain.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Order::Domain::Zone" : {
          "file" : "lib/Webservice/OVH/Order/Domain/Zone.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Order::Email" : {
          "file" : "lib/Webservice/OVH/Order/Email.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Order::Email::Domain" : {
          "file" : "lib/Webservice/OVH/Order/Email/Domain.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Order::Hosting" : {
          "file" : "lib/Webservice/OVH/Order/Hosting.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Webservice::OVH::Order::Hosting::Web" : {
          "file" : "lib/Webservice/OVH/Order/Hosting/Web.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       }
    },
    "release_status" : "stable",
@@ -255,15 +255,15 @@
          "web" : "https://github.com/itnode/Webservice-OVH"
       }
    },
-   "version" : "0.47",
+   "version" : "0.48",
    "x_contributors" : [
       "Jens Gassmann <jens.gassmann@atomix.de>",
       "Jens Gassmann <jg@gassmann.it>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
-      "Patrick Jendral <pj@gassmann.it>",
+      "PJ <pj@gassmann.it>",
       "Patrick Jendral <pj@itnode.de>",
       "pjen <patrick.jendral@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1
 }

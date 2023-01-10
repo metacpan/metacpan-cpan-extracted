@@ -10,7 +10,7 @@ use Perl::Critic::Utils qw{
 };
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.146';
+our $VERSION = '1.148';
 
 #-----------------------------------------------------------------------------
 
@@ -20,7 +20,7 @@ Readonly::Hash my %ALLOW => hashify( @ALLOW );
 Readonly::Scalar my $DESC  => q{Builtin function called with parentheses};
 Readonly::Scalar my $EXPL  => [ 13 ];
 
-Readonly::Scalar my $PRECENDENCE_OF_LIST => precedence_of(q{>>}) + 1;
+Readonly::Scalar my $PRECEDENCE_OF_LIST  => precedence_of(q{>>}) + 1;
 Readonly::Scalar my $PRECEDENCE_OF_COMMA => precedence_of(q{,});
 
 #-----------------------------------------------------------------------------
@@ -92,7 +92,7 @@ sub _is_named_unary_with_operator_following_parens_exemption {
     if ( _is_named_unary( $elem ) && $elem_after_parens ){
         # Smaller numbers mean higher precedence
         my $precedence = precedence_of( $elem_after_parens );
-        return $TRUE if defined $precedence && $precedence < $PRECENDENCE_OF_LIST;
+        return $TRUE if defined $precedence && $precedence < $PRECEDENCE_OF_LIST;
     }
 
     return $FALSE;

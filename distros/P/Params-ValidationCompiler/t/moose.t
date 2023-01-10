@@ -4,7 +4,7 @@ use warnings;
 
 use Test2::V0;
 use Test2::Plugin::NoWarnings;
-use Test2::Require::Module 'Moose::Util::TypeConstraints';
+use Test2::Require::Module 'Moose::Util::TypeConstraints' => '2.0000';
 
 use Params::ValidationCompiler qw( validation_for );
 use Moose::Util::TypeConstraints;

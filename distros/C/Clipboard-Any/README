@@ -2,7 +2,7 @@ NAME
     Clipboard::Any - Common interface to clipboard manager functions
 
 VERSION
-    This document describes version 0.004 of Clipboard::Any (from Perl
+    This document describes version 0.005 of Clipboard::Any (from Perl
     distribution Clipboard-Any), released on 2022-10-25.
 
 DESCRIPTION
@@ -67,7 +67,7 @@ FUNCTIONS
     information, much like how HTTP response headers provide additional
     metadata.
 
-    Return value: (str)
+    Return value: (any)
 
   clear_clipboard_content
     Usage:
@@ -99,7 +99,7 @@ FUNCTIONS
     information, much like how HTTP response headers provide additional
     metadata.
 
-    Return value: (str)
+    Return value: (any)
 
   clear_clipboard_history
     Usage:
@@ -131,7 +131,7 @@ FUNCTIONS
     information, much like how HTTP response headers provide additional
     metadata.
 
-    Return value: (str)
+    Return value: (any)
 
   detect_clipboard_manager
     Usage:
@@ -184,7 +184,7 @@ FUNCTIONS
     information, much like how HTTP response headers provide additional
     metadata.
 
-    Return value: (str)
+    Return value: (any)
 
   list_clipboard_history
     Usage:
@@ -224,7 +224,7 @@ FUNCTIONS
     information, much like how HTTP response headers provide additional
     metadata.
 
-    Return value: (str)
+    Return value: (any)
 
 HOMEPAGE
     Please visit the project's homepage at

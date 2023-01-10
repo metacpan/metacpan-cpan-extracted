@@ -14,9 +14,9 @@ name: VCS-SCCS
 provides: 
   VCS::SCCS: 
     file: SCCS.pm
-    version: '0.27'
+    version: '0.28'
 recommends: 
-  Test::More: '1.302183'
+  Test::More: '1.302191'
 requires: 
   Carp: 0
   File::Spec: 0
@@ -28,4 +28,4 @@ resources:
   bugtracker: https://github.com/Tux/VCS-SCCS/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/VCS-SCCS
-version: '0.27'
+version: '0.28'

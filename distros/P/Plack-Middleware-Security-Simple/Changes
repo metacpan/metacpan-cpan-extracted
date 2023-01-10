@@ -1,5 +1,17 @@
 Revision history for Plack-Middleware-Security-Simple:
 
+v0.9.1    2023-01-10 10:55:57+00:00 Europe/London
+  No changes since v0.9.0.
+
+v0.9.0    2023-01-05 09:27:11+00:00 Europe/London (TRIAL RELEASE)
+  [Incompatible Changes]
+  - Minimum Perl version is v5.14.
+
+  [Documentation]
+  - Bumped copyright year.
+
+  - Documented support for older Perl versions.
+
 v0.8.3    2022-12-22 14:03:34+00:00 Europe/London
   [Enhancements]
   - Added php: to the protocol_in_path_or_referer rule.

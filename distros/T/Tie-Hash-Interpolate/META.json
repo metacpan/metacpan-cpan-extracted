@@ -1,0 +1,46 @@
+{
+   "abstract" : "tied mathematical interpolation/extrapolation",
+   "author" : [
+      "Dan Boorstein <danboo@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Tie-Hash-Interpolate",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Scalar::Util" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      }
+   },
+   "provides" : {
+      "Tie::Hash::Interpolate" : {
+         "file" : "lib/Tie/Hash/Interpolate.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/danboo/perl-tie-hash-interpolate/"
+      }
+   },
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

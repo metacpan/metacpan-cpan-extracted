@@ -1,3 +1,11 @@
+20230108.0.0  2023-01-08  Released-By: PERLANCAR; Urgency: medium
+
+              - Update database.
+
+              - Add a note about why some modules are skipped in the
+                configuration to produce the boostrap database.
+
+
 20200508.0.0  2020-04-19  Released-By: PERLANCAR; Urgency: medium
 
               - Update database.

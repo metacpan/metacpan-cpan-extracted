@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.308';
+our $VERSION = '2.310';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -43,15 +43,15 @@ __END__
 
 =head1 NAME
 
-C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tables interactively.
+C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL>/C<Firebird>/C<DB2> databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.308
+Version 2.310
 
 =head1 SYNOPSIS
 
-=head2 SQLite/MySQL/PostgreSQL/Firebird
+=head2 SQLite/MySQL/PostgreSQL/Firebird/DB2
 
     db-browser -h|--help
 
@@ -848,6 +848,8 @@ Choose the required operators.
 There are two regexp entries: C<REGEXP> matches case sensitive while C<REGEXP_i> matches case insensitive.
 
 With C<MySQL> the sensitive match is achieved by enabling the C<BINARY> operator.
+
+With C<Firebird>, C<SIMILAR TO> is used instead of C<REGEXP>.
 
 =head3 Aliases
 

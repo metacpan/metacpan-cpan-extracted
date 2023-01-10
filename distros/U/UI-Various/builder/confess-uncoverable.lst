@@ -20,5 +20,13 @@ lib/UI/Various/core.pm-		    if ($rc == 0)
 lib/UI/Various/core.pm:			# uncoverable not statement
 lib/UI/Various/core.pm-			print "\n***** can't redirect STDERR: $! *****\n";
 --
+lib/UI/Various/Curses/Dialog.pm:	# uncoverable condition false
+lib/UI/Various/Curses/Dialog.pm:	# uncoverable condition right
+lib/UI/Various/Curses/Dialog.pm-	$row += $_->_cui->height || 1;
+--
+lib/UI/Various/Curses/Window.pm:	# uncoverable condition false
+lib/UI/Various/Curses/Window.pm:	# uncoverable condition right
+lib/UI/Various/Curses/Window.pm-	$row += $_->_cui->height || 1;
+--
 lib/UI/Various/Curses/Box.pm:	# uncoverable statement
 lib/UI/Various/Curses/Box.pm-    };

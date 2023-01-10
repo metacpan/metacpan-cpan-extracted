@@ -1,12 +1,14 @@
 Build.PL
 Changes
 examples/highlight.pl
+examples/viewtree.pl
 languages/tree-sitter-fourfunc/grammar.js
 languages/tree-sitter-fourfunc/queries/highlights.scm
 languages/tree-sitter-fourfunc/src/parser.c
 languages/tree-sitter-fourfunc/src/tree_sitter/parser.h
 lib/Text/Treesitter.pm
 lib/Text/Treesitter.xs
+lib/Text/Treesitter/_XS.pm
 lib/Text/Treesitter/Language.pm
 lib/Text/Treesitter/Node.pm
 lib/Text/Treesitter/Parser.pm
@@ -14,7 +16,11 @@ lib/Text/Treesitter/Query.pm
 lib/Text/Treesitter/QueryCursor.pm
 lib/Text/Treesitter/QueryMatch.pm
 lib/Text/Treesitter/Tree.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01parse-c.t
 t/01parse-fourfunc.t
@@ -22,9 +28,6 @@ t/01parse-sexp.t
 t/02reset.t
 t/03language.t
 t/10query-fourfunc.t
+t/60treesitter.t
 t/99pod.t
 typemap
-README
-LICENSE
-META.yml
-META.json

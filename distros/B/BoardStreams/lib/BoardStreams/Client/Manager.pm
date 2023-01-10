@@ -2,162 +2,205 @@ package BoardStreams::Client::Manager;
 
 use Mojo::Base 'Mojo::EventEmitter', -signatures;
 
-use BoardStreams::Client::WebSocket 'make_websocket_observable';
-use BoardStreams::Client::Channel;
-use BoardStreams::Client::StructDiff 'patch_state';
+use BoardStreams::Client::Stream;
+use BoardStreams::Client::WebSockets 'make_websockets_observable';
+use BoardStreams::Client::Util 'unique_id';
+use BoardStreams::Util 'decode_json', 'eqq';
 
-use Mojo::JSON 'decode_json', 'encode_json';
 use RxPerl::Mojo ':all';
-use Data::Dump 'dump';
-use List::Util 'min';
-use Carp 'croak';
+use Mojo::UserAgent;
 
-our $VERSION = "v0.0.23";
+no autovivification;
 
-has 'url';
-has 'connection_status_o';
+has url => sub { die 'missing url' };
+has ua => sub { Mojo::UserAgent->new };
+has 'connected_o';
 
-my @WAIT_TIMES = (1, 1, 3, 5);
+our $VERSION = "v0.0.30";
 
 sub new ($class, $url) {
     my $self = $class->SUPER::new(url => $url);
 
-    $self->{wses} = rx_behavior_subject->new(undef);
-    $self->connection_status_o(
-        $self->{wses}->pipe(
-            op_map(sub { !!$_[0] }),
-            op_distinct_until_changed(),
-        )
+    # to send structured data to the webserver, next send$
+    $self->{send_o} = rx_subject->new;
+
+    # long incoming messages are divided into chunks
+    my $ongoing_messages = {};
+
+    # by setting pleaseBeConnected$, one initiates
+    # WS connection attempts
+    $self->{please_be_connected} = rx_subject->new;
+    my $websocket_o = $self->{please_be_connected}->pipe(
+        op_switch_map(sub ($be_connected) {
+            if ($be_connected) {
+                return make_websockets_observable($self->url, $self);
+            }
+            return rx_of(undef);
+        }),
+        op_distinct_until_changed(),
+        op_tap(sub { $ongoing_messages = {} }),
+        op_share(),
     );
-    $self->connection_status_o->subscribe(sub ($value) {
-        $self->emit('connection_status', $value);
+
+    # connect send_o to the latest websocket
+    $self->{send_o}->pipe(
+        op_with_latest_from($websocket_o),
+    )->subscribe(sub ($data_ws) {
+        my ($data, $ws) = @$data_ws;
+        $ws or die 'Attempted to send data while not connected';
+        $ws->send({ json => $data });
     });
 
-    my $wait_times_cursor = 0;
+    # read incoming messages
+    $self->{incoming_o} = rx_subject->new;
+    $websocket_o->pipe(
+        op_filter(sub { defined $_ }),
+        op_switch_map(sub ($ws) { rx_from_event($ws, 'binary') }),
+        op_switch_map(sub ($binary_part) {
+            if (my ($bytes_prefix, $remaining) = $binary_part =~ /^\:(.+?)\:\ (.*)\z/) {
+                my ($identifier, $i, $is_final) = $bytes_prefix =~ /^(\S+)\ ([0-9]+)(\$)?\z/;
 
-    rx_defer(sub {
-        $wait_times_cursor = min($wait_times_cursor, $#WAIT_TIMES);
-        my $wait_time = $WAIT_TIMES[$wait_times_cursor];
-        $wait_times_cursor++;
-        say "Waiting for ${wait_time}ms";
+                if ($i == 0) {
+                    $ongoing_messages->{$identifier} = {
+                        i     => 0,
+                        bytes => $remaining,
+                    };
+                } else {
+                    if ($i == ($ongoing_messages->{$identifier}{i} // -2) + 1) {
+                        delete $ongoing_messages->{$identifier};
+                    }
 
-        return rx_concat(
-            rx_EMPTY->pipe(op_delay($wait_time)),
-            make_websocket_observable($self->url),
-            rx_of(undef),
-        )->pipe(
-            op_tap(sub ($x) {
-                if ($x) {
-                    $wait_times_cursor = 0;
+                    if (my $ong = $ongoing_messages->{$identifier}) {
+                        $ong->{i} = $i;
+                        substr($ong->{bytes}, length($ong->{bytes}), 0) = $remaining;
+                    }
                 }
-            }),
-        );
-    })->pipe(
-        op_repeat(),
-        op_distinct_until_changed(),
-    )->subscribe(sub { $self->{wses}->next($_[0]) });
 
-    # set & keep updated $self->{ws}
-    $self->{ws} = undef;
-
-    my %ongoing_messages;
-    my $msgs_from_ws_o = $self->{wses}->pipe(
-        op_switch_map(sub ($x) {
-            $self->{ws} = $x;
-            undef %ongoing_messages;
-            return rx_EMPTY if ! $x;
-            return rx_from_event($self->{ws}, 'binary');
-        }),
-        op_switch_map(sub ($bytes) {
-            $bytes =~ s/^\:([^:]+)\: //s;
-            if (defined(my $bytes_prefix = $1)) {
-                my ($identifier, $i) = $bytes_prefix =~ /^(.*)\s(\S+)\z/;
-                if ($i eq '0') {
-                    $ongoing_messages{$identifier} = $bytes;
-                } elsif ($i =~ /^\d+\z/) {
-                    $ongoing_messages{$identifier} .= $bytes;
-                } elsif ($i eq 'end') {
-                    $ongoing_messages{$identifier} .= $bytes;
-                    my $data = decode_json(delete $ongoing_messages{$identifier});
+                if ($is_final and $i == ($ongoing_messages->{$identifier}{i} // -1)) {
+                    my $data = decode_json $ongoing_messages->{$identifier}{bytes};
+                    delete $ongoing_messages->{$identifier};
                     return rx_of($data);
                 }
+
                 return rx_EMPTY;
             }
-            my $data = decode_json($bytes);
-            return rx_of($data);
+
+            # if message is not a part
+            return rx_of(decode_json $binary_part);
+        }),
+    )->subscribe($self->{incoming_o});
+
+    # incoming JSON-RPC responses
+    $self->{responses_o} = $self->{incoming_o}->pipe(
+        op_filter(sub {
+            eqq($_->{jsonrpc}, '2.0')
+                and (exists $_->{result} or exists $_->{error})
         }),
         op_share(),
     );
 
-    $msgs_from_ws_o->pipe(
-        op_filter(sub ($data, @) { exists $data->{channel} }),
-    )->subscribe(sub ($data) {
-        my $channel_name = $data->{channel};
-        my $channel_uuid = $data->{channelUUID};
-        if (my $channels_set = $self->{channels}{$channel_name}) {
-            foreach my $channel (values %$channels_set) {
-                next unless !$channel_uuid or $channel->{uuid} eq $channel_uuid;
-                $channel->{messages_o}->next($data);
-            }
-        }
-    });
+    my $config_o = $self->{incoming_o}->pipe(
+        op_filter(sub { eqq $_->{type}, 'config' }),
+        op_map(sub { $_->{data} }),
+        op_share(),
+    );
 
-    $msgs_from_ws_o->pipe(
-        op_filter(sub ($data, @) { ($data->{type} // '') eq 'configuration' }),
+    # create connected_o to show websocket connection status (after config is received)
+    $self->connected_o( rx_behavior_subject->new(0) );
+    rx_merge(
+        $config_o->pipe(
+            op_map_to(1),
+        ),
+        $websocket_o->pipe(
+            op_filter(sub { ! $_ }),
+            op_map_to(0),
+        ),
+    )->pipe(
+        op_distinct_until_changed(),
+    )->subscribe($self->connected_o);
+    $self->connected_o->subscribe(sub ($status) { $self->emit('connected', $status) });
+
+    # ping
+    $config_o->pipe(
+        op_map(sub ($config, @) { $config->{pingInterval} - rand() }),
+        op_switch_map(sub ($iv) {
+            rx_timer($iv * rand(), $iv)->pipe(
+                op_take_until($self->connected_o->pipe(op_filter(sub { ! $_ }))),
+            ),
+        }),
+    )->subscribe(sub { $self->send({ type => 'ping' }) });
+
+    # timeout
+    $config_o->pipe(
         op_switch_map(sub ($config) {
-            my $ping_interval = $config->{pingInterval};
-            return rx_timer(rand($ping_interval), $ping_interval)->pipe(
-                op_take_until(
-                    $self->{wses}->pipe( op_filter(sub ($ws, @) { ! $ws }) )
-                ),
+            $self->{incoming_o}->pipe(
+                op_start_with(undef),
+                op_switch_map(sub {
+                    rx_of(1)->pipe(
+                        op_delay($config->{pingInterval} + 10),
+                        op_take_until(
+                            $self->connected_o->pipe(op_filter(sub { !$_ }))
+                        ),
+                    );
+                }),
             );
         }),
-    )->subscribe(sub { $self->send({type => 'ping'}) });
-
-    $self->{channels} = {};
+        op_with_latest_from($websocket_o),
+    )->subscribe(sub ($conf_ws) {
+        my (undef, $ws) = @$conf_ws;
+        $ws && $ws->finish; # TODO: or maybe some other way to close (?)
+    });
 
     return $self;
 }
 
-sub send ($self, $msg) {
-    if ($self->{ws}) {
-        $self->{ws}->send({ binary => encode_json $msg });
-        # debug
-        say "output: ", dump $msg if $ENV{BS_DEBUG};
-    } else {
-        croak "no websocket connection to send through";
-    }
+sub connect ($self) {
+    $self->{please_be_connected}->next(1);
 }
 
-sub send_leave ($self, $channel_name) {
+sub disconnect ($self) {
+    $self->{please_be_connected}->next(0);
+}
+
+sub send ($self, $data) {
+    $self->connected_o->get_value or eqq($data->{type}, 'ping')
+        or die "Can't send data because websocket not available";
+
+    $self->{send_o}->next($data);
+}
+
+sub do_action ($self, $stream_name, $action_name, $payload = undef) {
     $self->send({
-        type    => 'leave',
-        channel => $channel_name,
-    }) unless ! $self->{ws};
-}
-
-sub join_channel ($self, $channel_name) {
-    $self->{channels}{$channel_name} //= {};
-    my $messages_to_server_o = rx_subject->new;
-    $messages_to_server_o->subscribe(sub ($msg) {
-        $self->send($msg);
+        jsonrpc => '2.0',
+        method  => 'doAction',
+        params  => [$stream_name, $action_name, $payload],
     });
-    my $channel =
-        BoardStreams::Client::Channel->new($channel_name, $self, $messages_to_server_o);
-    $self->{channels}{$channel_name}{$channel} = $channel;
-
-    return $channel;
 }
 
-sub remove_channel_from_memory ($self, $channel) {
-    my $channel_name = $channel->name;
-    my $set = $self->{channels}{$channel_name};
-    return unless $set;
-    my $existed = delete $set->{$channel};
-    if ($existed and ! %$set) {
-        $self->send_leave($channel_name);
-        delete $self->{channels}{$channel_name};
-    }
+sub do_request ($self, $stream_name, $request_name, $payload = undef) {
+    my $id = unique_id;
+
+    $self->send({
+        jsonrpc => '2.0',
+        method  => 'doRequest',
+        params  => [ $stream_name, $request_name, $payload ],
+        id      => $id,
+    });
+
+    return first_value_from(
+        $self->{responses_o}->pipe(
+            op_filter(sub { eqq($_->{jsonrpc}, '2.0') and $_->{id} eq $id }),
+            op_take_until($self->connected_o->pipe(op_filter(sub { ! $_ }))),
+            op_switch_map(sub ($data) {
+                if (exists $data->{result}) { return rx_of($data->{result}) }
+                return rx_throw_error($data->{error});
+            }),
+        ),
+    );
+}
+
+sub new_stream ($self, $stream_name) {
+    return BoardStreams::Client::Stream->new($stream_name, $self);
 }
 
 1;

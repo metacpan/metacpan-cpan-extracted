@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.002
+    version 2.003
 
 SYNOPSIS
 
@@ -98,13 +98,18 @@ METHODS
     Call on a Config::Structured instance to register the instance as the
     provided name.
 
+ __get_child_node_names()
+
+    Returns a list of names (strings) of all immediate child nodes of the
+    current config node
+
 AUTHOR
 
     Mark Tyrrell <mtyrrell@concertpharma.com>
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2019 by Concert Pharmaceuticals, Inc.
+    This software is copyright (c) 2023 by Concert Pharmaceuticals, Inc.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

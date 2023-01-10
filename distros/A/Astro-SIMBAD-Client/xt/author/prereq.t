@@ -13,6 +13,7 @@ eval {
 my $tpm = Test::Prereq::Meta->new(
     accept	=> [ qw{
 	Time::HiRes
+	XML::DoubleEncodedEntities
 	YAML
 	} ],
     prune	=> [ qw{

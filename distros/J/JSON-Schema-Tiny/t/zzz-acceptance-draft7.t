@@ -1,6 +1,5 @@
 # vim: set ft=perl ts=8 sts=2 sw=2 tw=100 et :
-use strict;
-use warnings;
+use strictures 2;
 use 5.020;
 use experimental qw(signatures postderef);
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -52,8 +51,10 @@ acceptance_tests(
           'refs with relative uris and defs',
           'relative refs with absolute uris and defs',
           '$id must be resolved against nearest parent, not just immediate parent',
+          'URN base URI with URN and anchor ref',
         ] },
       { file => 'unknownKeyword.json', group_description => '$id inside an unknown keyword is not a real identifier', test_description => 'type matches second anyOf, which has a real schema in it' },
+      { file => 'optional/cross-draft.json', group_description => 'refs to future drafts are processed as future drafts' },
       # various edge cases that are difficult to accomodate
       { file => 'optional/ecmascript-regex.json', group_description => '\w in patterns matches [A-Za-z0-9_], not unicode letters', test_description => [ 'literal unicode character in json string', 'unicode character in hex format in string' ] },
       { file => 'optional/ecmascript-regex.json', group_description => '\d in pattern matches [0-9], not unicode digits', test_description => 'non-ascii digits (BENGALI DIGIT FOUR, BENGALI DIGIT TWO)' },

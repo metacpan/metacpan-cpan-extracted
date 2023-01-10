@@ -9,6 +9,7 @@ use warnings;
 
 use English qw< -no_match_vars >;
 use Carp qw< confess >;
+use List::SomeUtils qw(any);
 
 use File::Temp qw< >;
 use PPI::Document qw< >;
@@ -20,7 +21,7 @@ use Perl::Critic::Utils;
 
 use Test::More tests => 168;
 
-our $VERSION = '1.146';
+our $VERSION = '1.148';
 
 use Perl::Critic::TestUtils;
 Perl::Critic::TestUtils::assert_version( $VERSION );
@@ -219,12 +220,12 @@ sub test_is_perl_builtin {
     $code = 'my sub print {}';
     $doc = make_doc( $code );
     $sub = $doc->find_first('Statement::Sub');
-    ok( is_perl_builtin($sub), 'Is perl builtin function (PPI, lexial subroutines)' );
+    ok( is_perl_builtin($sub), 'Is perl builtin function (PPI, lexical subroutines)' );
 
     $code = 'my sub foobar {}';
     $doc = make_doc( $code );
     $sub = $doc->find_first('Statement::Sub');
-    ok( !is_perl_builtin($sub), 'Is not perl builtin function (PPI, lexial subroutines)' );
+    ok( !is_perl_builtin($sub), 'Is not perl builtin function (PPI, lexical subroutines)' );
 
     return;
 }
@@ -254,17 +255,17 @@ sub test_is_perl_bareword {
     $code = 'my sub if {}';
     $doc = make_doc( $code );
     $sub = $doc->find_first('Statement::Sub');
-    ok( is_perl_bareword($sub), 'Is perl bareword (PPI, lexial subroutines)' );
+    ok( is_perl_bareword($sub), 'Is perl bareword (PPI, lexical subroutines)' );
 
     $code = 'my sub import {}';
     $doc = make_doc( $code );
     $sub = $doc->find_first('Statement::Sub');
-    ok( is_perl_bareword($sub), 'Is perl extra bareword (PPI, lexial subroutines)' );
+    ok( is_perl_bareword($sub), 'Is perl extra bareword (PPI, lexical subroutines)' );
 
     $code = 'my sub foobar {}';
     $doc = make_doc( $code );
     $sub = $doc->find_first('Statement::Sub');
-    ok( !is_perl_bareword($sub), 'Is not perl bareword (PPI, lexial subroutines)' );
+    ok( !is_perl_bareword($sub), 'Is not perl bareword (PPI, lexical subroutines)' );
 
     return;
 }
@@ -495,7 +496,7 @@ sub test_is_function_call {
     my $doc = PPI::Document->new( \$code );
     my $words = $doc->find('PPI::Token::Word');
     is(scalar @{$words}, 2, 'count PPI::Token::Words');
-    is((scalar grep {is_function_call($_)} @{$words}), 0, 'is_function_call');
+    ok(!(any {is_function_call($_)} @{$words}), 'is_function_call');
 
     return;
 }

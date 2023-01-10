@@ -1,5 +1,5 @@
 package AI::Genetic::Pro::Crossover::PointsBasic;
-
+$AI::Genetic::Pro::Crossover::PointsBasic::VERSION = '1.009';
 use warnings;
 use strict;
 use List::MoreUtils qw(first_index);

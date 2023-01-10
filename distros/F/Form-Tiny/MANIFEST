@@ -15,7 +15,6 @@ lib/Form/Tiny.pm
 lib/Form/Tiny/Error.pm
 lib/Form/Tiny/FieldDefinition.pm
 lib/Form/Tiny/FieldDefinitionBuilder.pm
-lib/Form/Tiny/Filter.pm
 lib/Form/Tiny/Form.pm
 lib/Form/Tiny/Hook.pm
 lib/Form/Tiny/Inline.pm

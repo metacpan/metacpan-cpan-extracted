@@ -193,8 +193,7 @@ sub from_file {
             if ( $menu->[$idx] eq $hidden ) {
                 require App::DBBrowser::Opt::Set;
                 my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
-                say "Settings";
-                $opt_set->set_options( [ { name => 'group_insert', text => '' } ] );
+                $opt_set->set_options( 'import' );
                 next DIR;
             }
             elsif ( $menu->[$idx] eq $change_dir ) {

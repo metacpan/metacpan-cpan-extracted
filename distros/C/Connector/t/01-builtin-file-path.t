@@ -72,7 +72,7 @@ ok (!$conn->exists('test2'), 'Not exists');
 $conn->mode("8999");
 $conn->ifexists('replace');
 eval { $conn->set('testumask', 'wont see'); };
-like( $EVAL_ERROR, "/Given umask '8999' is not valid/", 'wrong umask');
+like( $EVAL_ERROR, "/Given mode string '8999' is not valid/", 'wrong umask');
 
 $conn->mode("0640");
 $conn->set('testumask', 'wont see');

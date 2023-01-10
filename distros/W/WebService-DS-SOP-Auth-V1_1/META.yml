@@ -1,0 +1,69 @@
+---
+abstract: 'SOP version 1.1 authentication module'
+author:
+  - 'yowcow <yoko.oyama [ at ] d8aspring.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::Mock::Guard: '0'
+  Test::More: '0.98'
+  Test::Perl::Critic: '0'
+  Test::Pod::Coverage: '0'
+  Test::Stub: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.20, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-DS-SOP-Auth-V1_1
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WebService::DS::SOP::Auth::V1_1:
+    file: lib/WebService/DS/SOP/Auth/V1_1.pm
+    version: '0.05'
+  WebService::DS::SOP::Auth::V1_1::Request::DELETE:
+    file: lib/WebService/DS/SOP/Auth/V1_1/Request/DELETE.pm
+  WebService::DS::SOP::Auth::V1_1::Request::GET:
+    file: lib/WebService/DS/SOP/Auth/V1_1/Request/GET.pm
+  WebService::DS::SOP::Auth::V1_1::Request::POST:
+    file: lib/WebService/DS/SOP/Auth/V1_1/Request/POST.pm
+  WebService::DS::SOP::Auth::V1_1::Request::POST_JSON:
+    file: lib/WebService/DS/SOP/Auth/V1_1/Request/POST_JSON.pm
+  WebService::DS::SOP::Auth::V1_1::Request::PUT:
+    file: lib/WebService/DS/SOP/Auth/V1_1/Request/PUT.pm
+  WebService::DS::SOP::Auth::V1_1::Request::PUT_JSON:
+    file: lib/WebService/DS/SOP/Auth/V1_1/Request/PUT_JSON.pm
+  WebService::DS::SOP::Auth::V1_1::Util:
+    file: lib/WebService/DS/SOP/Auth/V1_1/Util.pm
+requires:
+  Carp: '0'
+  Digest::SHA: '0'
+  HTTP::Request::Common: '6.07'
+  JSON::XS: '0'
+  URI: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/researchpanelasia/p5-WebService-SOP-Auth-V1_1/issues
+  homepage: https://github.com/researchpanelasia/p5-WebService-SOP-Auth-V1_1
+  repository: https://github.com/researchpanelasia/p5-WebService-SOP-Auth-V1_1.git
+version: '0.05'
+x_authority: cpan:DSSYSTEM
+x_contributors:
+  - 'Jamerswu <jamers.wu@d8aspring.com>'
+  - 'Yoko OYAMA <yowcow@users.noreply.github.com>'
+  - 't-sekiguchi <Takafumi_Sekiguchi@voyagegroup.com>'
+  - 'yowcow <yowcow@cpan.org>'
+  - 'yowcowvg <yoko_ohyama@voyagegroup.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

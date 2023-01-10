@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use UI::Various::core;
 use UI::Various::Window;
@@ -77,16 +77,23 @@ sub _prepare($@)
     my ($self) = @_;
     local $_ =  $self->parent;
 
+    # height/width must be defined!
+    my ($h, $w) = ($self->height, $self->width);
+    defined $h  or  $h = $self->max_height;
+    defined $w  or  $w = $self->max_width;
     $self->_cui($_->_cui
 		->add($self->_cid,
 		      'Window', -border => 1, -title => $self->title,
-		      -height => $self->height, -width => $self->width));
+		      -height => $h, -width => $w));
 
     my ($errors, $row) = (0, 0);
     while ($_ = $self->child)
     {
 	$errors += $_->_prepare($row, 0);
-	$row += $_->_cui->height;
+	# The 1 is a fallback for FreeBSD missing the height (missing max.?):
+	# uncoverable condition false
+	# uncoverable condition right
+	$row += $_->_cui->height || 1;
     }
 
     return $errors;

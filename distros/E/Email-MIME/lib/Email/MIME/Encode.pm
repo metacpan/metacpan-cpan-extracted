@@ -1,8 +1,8 @@
-use strict;
+use v5.12.0;
 use warnings;
-package Email::MIME::Encode;
+package Email::MIME::Encode 1.953;
 # ABSTRACT: a private helper for MIME header encoding
-$Email::MIME::Encode::VERSION = '1.952';
+
 use Carp ();
 use Encode ();
 use Email::MIME::Header;
@@ -79,8 +79,8 @@ sub _object_encode {
 sub mime_encode {
   my ($text, $charset, $header_name_length) = @_;
 
-  $header_name_length = 0 unless defined $header_name_length;
-  $charset = 'UTF-8' unless defined $charset;
+  $header_name_length //= 0;
+  $charset //= 'UTF-8';
 
   my $enc_obj = Encode::find_encoding($charset);
 
@@ -163,7 +163,7 @@ sub mime_decode {
   # -- rjbs, 2014-12-04
   local $@;
   my $result = eval { Encode::decode("MIME-Header", $text) };
-  return defined $result ? $result : $text;
+  return $result // $text;
 }
 
 1;
@@ -180,7 +180,7 @@ Email::MIME::Encode - a private helper for MIME header encoding
 
 =head1 VERSION
 
-version 1.952
+version 1.953
 
 =head1 PERL VERSION
 
@@ -198,7 +198,7 @@ the minimum required perl.
 
 =item *
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =item *
 

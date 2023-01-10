@@ -111,7 +111,7 @@ sub get {
 
     }
 
-    $self->log()->debug('Valid return: ' . $row->[0]);
+    $self->log()->debug('Valid return: ' . ($row->[0] // '<undef>'));
     return $row->[0];
 
 }
@@ -341,7 +341,8 @@ Die with an error message.
 =head2 get
 
 Will return the value of the requested column of the matching row. If no row
-is found, undef is returned (dies if die_on_undef is set).
+is found, undef is returned (dies if die_on_undef is set). B<Note:> You will
+also get undef if the row exists but the requested column has a NULL value.
 
 If multiple rows are found, behaviour depends on the value of I<ambiguous>.
 

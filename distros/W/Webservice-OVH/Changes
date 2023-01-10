@@ -1,5 +1,9 @@
 Revision history for Perl extension Webservice-OVH
 
+0.48 2023-01-09T09:15:33Z
+
+    - fix project->instances access
+
 0.47 2022-03-23T14:25:59Z
 
     - test method, refelct changes in OVH api

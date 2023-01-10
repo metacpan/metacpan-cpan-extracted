@@ -8,6 +8,11 @@ use Getopt::Long;
 use File::Basename;
 use FindBin qw($RealBin);
 my $PROGRAM = 'fu-len';
+# The following placeholder is to be programmatically replaced with 'use lib "$RealBin/../lib"' if needed
+#~loclib~
+if ( -e "$RealBin/../lib/Proch/N50.pm" and -e "$RealBin/../Changes" ) {
+    use lib "$RealBin/../lib";
+}
 use Proch::Seqfu;
 my $VERSION = $Proch::Seqfu::VERSION // "<Dev>";
 my $DESCR   = 'Select sequences by size';
@@ -178,7 +183,7 @@ fu-len - A demo implementation to filter fastx files by length
 
 =head1 VERSION
 
-version 1.5.0
+version 1.5.4
 
 =head1 USAGE
 

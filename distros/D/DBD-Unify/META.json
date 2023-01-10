@@ -1,83 +1,83 @@
 {
+   "dynamic_config" : 1,
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+      },
    "resources" : {
-      "repository" : {
-         "url" : "https://github.com/perl5-dbi/DBD-Unify",
-         "type" : "git",
-         "web" : "https://github.com/perl5-dbi/DBD-Unify"
-         },
       "bugtracker" : {
          "web" : "https://github.com/perl5-dbi/DBD-Unify/issues"
          },
       "license" : [
          "http://dev.perl.org/licenses/"
-         ]
+         ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/perl5-dbi/DBD-Unify",
+         "url" : "https://github.com/perl5-dbi/DBD-Unify"
+         }
       },
+   "version" : "0.93",
    "abstract" : "DBI driver for Unify database systems",
+   "name" : "DBD-Unify",
+   "license" : [
+      "perl_5"
+      ],
+   "provides" : {
+      "DBD::Unify::TypeInfo" : {
+         "version" : "0.93",
+         "file" : "lib/DBD/Unify/TypeInfo.pm"
+         },
+      "DBD::Unify" : {
+         "file" : "lib/DBD/Unify.pm",
+         "version" : "0.93"
+         },
+      "DBD::Unify::GetInfo" : {
+         "version" : "0.93",
+         "file" : "lib/DBD/Unify/GetInfo.pm"
+         }
+      },
+   "release_status" : "stable",
+   "author" : [
+      "H.Merijn Brand <h.m.brand@xs4all.nl>"
+      ],
+   "generated_by" : "Author",
    "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Cwd" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "DBI::DBD" : "0",
+            "Config" : "0"
+            }
+         },
+      "build" : {
+         "requires" : {
+            "File::Find" : "0",
+            "Config" : "0",
+            "File::Copy" : "0"
+            }
+         },
       "test" : {
          "recommends" : {
-            "Test::More" : "1.302188"
+            "Test::More" : "1.302191"
             },
          "requires" : {
             "Test::Harness" : "0",
             "Test::More" : "0.90"
             }
          },
-      "build" : {
-         "requires" : {
-            "File::Copy" : "0",
-            "Config" : "0",
-            "File::Find" : "0"
-            }
-         },
-      "configure" : {
-         "requires" : {
-            "DBI::DBD" : "0",
-            "ExtUtils::MakeMaker" : "0",
-            "Cwd" : "0",
-            "Config" : "0"
-            }
-         },
       "runtime" : {
-         "requires" : {
-            "DynaLoader" : "0",
-            "Carp" : "0",
-            "DBI" : "1.42",
-            "perl" : "5.008006"
-            },
          "recommends" : {
             "DBI" : "1.643",
             "perl" : "5.030001"
+            },
+         "requires" : {
+            "perl" : "5.008006",
+            "DynaLoader" : "0",
+            "DBI" : "1.42",
+            "Carp" : "0"
             }
          }
-      },
-   "provides" : {
-      "DBD::Unify::TypeInfo" : {
-         "file" : "lib/DBD/Unify/TypeInfo.pm",
-         "version" : "0.92"
-         },
-      "DBD::Unify::GetInfo" : {
-         "version" : "0.92",
-         "file" : "lib/DBD/Unify/GetInfo.pm"
-         },
-      "DBD::Unify" : {
-         "version" : "0.92",
-         "file" : "lib/DBD/Unify.pm"
-         }
-      },
-   "version" : "0.92",
-   "release_status" : "stable",
-   "license" : [
-      "perl_5"
-      ],
-   "meta-spec" : {
-      "version" : 2,
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
-      },
-   "name" : "DBD-Unify",
-   "author" : [
-      "H.Merijn Brand <h.m.brand@xs4all.nl>"
-      ],
-   "generated_by" : "Author",
-   "dynamic_config" : 1
+      }
    }

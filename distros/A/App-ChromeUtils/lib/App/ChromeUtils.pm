@@ -8,9 +8,9 @@ use Log::ger;
 use App::BrowserUtils ();
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-24'; # DATE
+our $DATE = '2022-10-07'; # DATE
 our $DIST = 'App-ChromeUtils'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 our %SPEC;
 
@@ -171,7 +171,7 @@ App::ChromeUtils - Utilities related to Google Chrome browser
 
 =head1 VERSION
 
-This document describes version 0.010 of App::ChromeUtils (from Perl distribution App-ChromeUtils), released on 2022-07-24.
+This document describes version 0.011 of App::ChromeUtils (from Perl distribution App-ChromeUtils), released on 2022-10-07.
 
 =head1 SYNOPSIS
 
@@ -641,6 +641,8 @@ Source repository is at L<https://github.com/perlancar/perl-App-ChromeUtils>.
 Some other CLI utilities related to Chrome: L<dump-chrome-history> (from
 L<App::DumpChromeHistory>).
 
+L<App::BraveUtils>
+
 L<App::FirefoxUtils>
 
 L<App::OperaUtils>
@@ -666,9 +668,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

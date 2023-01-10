@@ -1,3 +1,10 @@
+0.011   2022-10-07  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention App::BraveUtils.
+
+
 0.010   2022-07-24  Released-By: PERLANCAR; Urgency: medium
 
         - Update to App::BrowserUtils 0.017 (updated Sah schema name).

@@ -1,3 +1,781 @@
+Sat Jan 7 23:25:23 2023 -0500
+a9ff92a5fa6a9d48ca38016bb13bad89503f73aa
+Getting POE::Loop::Prima to be imported correctly
+
+Sat Jan 7 23:07:47 2023 -0500
+9e1af2c077961e3998338a7a08607259b5e22e1a
+Do not use POE::Loop::Prima on Windows, since POE hangs while installing
+
+Tue Jan 3 08:55:45 2023 -0500
+18d3fcf11a75c8cfbc01978c449ebc85433cca1f
+updating Changes file
+
+Tue Jan 3 08:54:47 2023 -0500
+2a079cd4628c54669f75bbca35addfe56188a680
+Getting the menu-based crash fixed . updating the test script to test Prima
+
+Mon Jan 2 23:00:46 2023 -0500
+1d4edee9e6df05f46d4109e69f4e4c9683157bb2
+fixing the erroneous pod
+
+Mon Jan 2 22:59:45 2023 -0500
+b081b8c2260ca3d6ca2f3dcfa009431d1c03a26c
+running pod2readme to update it
+
+Mon Jan 2 22:53:36 2023 -0500
+3b8100d70655f470dd21302752b899db1acbd80e
+Icons can be auto-inherited, so removing redundant code
+
+Mon Jan 2 21:48:27 2023 -0500
+01e85c0aa83a77ca593f35324bf8cfb5483d6951
+Removing handling of old Prima versions. we only support 1.67 and above now
+
+Mon Jan 2 21:40:12 2023 -0500
+5a8d012439d54218a28acb0dde3f2f1cc6be9f02
+Removing usage of say/carp and using Log::Any instead all over. Updating unit test to load the language module and moving the icon building code into utils module
+
+Mon Jan 2 20:58:23 2023 -0500
+2af40340bb64a4aea1961ffc97bf38ca170d4355
+Replacing say/carp with $log from Log::Any.
+
+Mon Jan 2 18:02:22 2023 -0500
+2ec3e8a8e5d10766e631d17ef20ff524336f895c
+Adding checks for every menu item call to make sure we do not crash if the item is corrupt
+
+Mon Jan 2 17:58:52 2023 -0500
+5a01a16e337d8e8e692bff0d363fd9a24d8f5382
+Got the icon to stop segfaulting. adding a testicon script for that. MenuItems are now able to load the gui object using the API change
+
+Sun Jan 1 23:04:04 2023 -0500
+64764eb9dabd6c43efff1c25e7ca35d59cac0387
+Improving the main window invocation and handling the icon check. using a new icon from FontAwesome
+
+Sun Jan 1 15:59:28 2023 -0500
+1e27aa0210d8a9bd9d4b90ac74fbf954542de734
+Many updates: - fixing copyright to be from 2013-2023 - Adding cmdline option handling to the top-level script - Adding Log::Any to handle logging correctly. More changes to use this   coming soon. - Update unit tests to check for functions, be more strict. - Update version for next release to be 0.11. - Build dependencies updated. - Prima latest to be used and that requires a lot of UI dependency   updates - code does not run the UI yet - WIP
+
+Sun Jan 1 14:20:20 2023 -0500
+db75e4e655ba348d0b5ccb6138d3e074d3f5e1bb
+Updating gitignore and manifest skip
+
+Sun Jan 1 14:19:13 2023 -0500
+0868631dfccf3feed0785b91323b8fba5dc59f1a
+Updating Build.PL with all the exact minimum required supported versions of the latest libraries we want to support going forward.
+
+Sun Jan 1 13:50:18 2023 -0500
+a8807dfecc85ad9b370470249be56d20314b502a
+Updating to latest version of Mo which is 0.40 on 2023-01-01. Happy New Year!
+
+Thu Mar 19 13:23:01 2015 -0400
+0a8268ae3d923ab4c0b1c6a5bf6e2bf17d4ad5c8
+STOCHRSI bug fixed
+
+Sat Nov 8 15:52:56 2014 -0500
+dc0e58fcbba34d39158b5ef1a3a727a68bb29e1f
+Using a Prima real release instead of dev release
+
+Tue Sep 30 15:03:50 2014 -0400
+ebcaf38c8468e3f781de117862f94a4536d09b72
+improving syntax highlighting for the grammar rules
+
+Tue Sep 30 13:14:38 2014 -0400
+dc8879027f0e73cf4b9c51aecf9c8b46d62840a6
+implementing the basic comparisons
+
+Tue Sep 30 13:14:18 2014 -0400
+66b2ee055bcd69616adf6be5c590023b20e9cad0
+if the P&L calcs gave back nothing say that
+
+Tue Sep 30 11:49:54 2014 -0400
+d9af44e6a8853e63db0ae5ce7ed4d59c9745ec9e
+fixing the grammar to handle numeric states correctly
+
+Tue Sep 30 10:59:40 2014 -0400
+e54f858537a515b67dbb48d2880107302adcf61f
+Adding save to CSV feature in the tradereport
+
+Mon Sep 29 18:01:41 2014 -0400
+46c57c2e555916f024588e6cdec46d696dd30f1d
+removing unnecessary function
+
+Mon Sep 29 18:00:55 2014 -0400
+6759d18746c6daa9a57970871e2c318ea3c26d86
+Adding a Trade-report class
+
+Mon Sep 29 16:40:14 2014 -0400
+6cc0acfe142ee87cceb9d548bf35fad663a6ee7e
+showing a dummy trade report
+
+Mon Sep 29 16:20:49 2014 -0400
+ddfef0981a4a6c7c4ac208a5ee817ae5bb3b1e75
+Implementing the P&L calculator function to filter out the bad buy/sell signals and only display the ones that should be displayed.
+
+Mon Sep 29 15:56:14 2014 -0400
+8c33797bc0404eedeaf48b515e73adafe4381021
+adding long/short trade flags to the result
+
+Mon Sep 29 14:55:04 2014 -0400
+7cfcb76888416a2eb9779a68f5cf16471bf1ffb8
+seems like we tackle pretty much all the different cases here
+
+Mon Sep 29 14:13:52 2014 -0400
+d46c7dc9c24003c660bf8f78a402a9d9ca91c3ee
+sample P&L calculator shown here
+
+Mon Sep 29 12:45:33 2014 -0400
+b70aff44b23597b5b76a26216bb7f9b0859649cd
+Adding simple declaration grammar to handle instructions on allowing or not allowing short/long trades
+
+Fri Sep 26 16:27:49 2014 -0400
+24989d0c7f2dd7ba6efb384b057e29e803ccfdfe
+Win32 perltidy difference handling
+
+Fri Sep 26 16:24:49 2014 -0400
+dbbee4373f7cc6c8dc9e3e3e100722b8acebd18b
+handling canceled save-as
+
+Fri Sep 26 16:22:34 2014 -0400
+74924cb25fcfe7254075420f8aa81c26ae3438fb
+Plotting of buy/sells done
+
+Fri Sep 26 16:01:24 2014 -0400
+9ce80ae3e920f01753a28c6c13cfbb42d746e8bb
+morphing the calls to plot_data to pass an empty buy-sell {} if necessary
+
+Fri Sep 26 15:51:32 2014 -0400
+661e2e54cee3495166ed4b3ef879c028d6f53139
+modify the header only if needed
+
+Fri Sep 26 15:47:53 2014 -0400
+1a8b9ae84208976da4e490865acb3eb253160b6a
+Executing rules from the main window itself
+
+Fri Sep 26 15:33:24 2014 -0400
+fa713e4e975c6466abffd357f7784aa68790361f
+Display the buy-sell output into the tab
+
+Fri Sep 26 14:59:41 2014 -0400
+6605565d6b98b861b97075302e903452dd96e466
+guaranteeing that the 1e-6 value is printed as expected instead of differences in printing on different versions of perl breaking tests
+
+Fri Sep 26 14:56:21 2014 -0400
+f6fe6d6a704f22da944bd0bb3be793002e44d507
+fixing the code generation to use bit-wise operators in which() and also to guarantee precision by using ()
+
+Fri Sep 26 14:22:09 2014 -0400
+496142879a5fa44a0080aea2999b670fabe488f0
+adding a unit test to verify if the code generated can actually run
+
+Fri Sep 26 12:47:05 2014 -0400
+0027712b89525f8f2c1bbaed6b48bfc38bc826ff
+eval sub{} requires the loading of PDL module for the functions to work
+
+Fri Sep 26 12:09:39 2014 -0400
+dfffb4ca15f545bb7846ee534bda6730f79ee524
+getting the compiled code to be eval'ed into an anonymous code-ref for use by the gui. fixing the editor closing bug if only 1 editor/tab was opened.
+
+Wed Sep 24 17:23:43 2014 -0400
+3b9ead1b43bd5cc8aa2af284894cb698e3a275b4
+Windows fixes and using latest PDL::Graphics::Gnuplot
+
+Wed Sep 24 15:54:48 2014 -0400
+7a8eaf71dcfc8537219e811d3710f70f7cb57aea
+- preset-vars is an array since it has to be in order. - the user-rule code is now generated as a sub-routine so that it can be invoked   regularly as needed
+
+Wed Sep 24 14:05:10 2014 -0400
+8b419b834231eea9754386739a60f424bf295cd7
+the compiler error can now be displayed to the user
+
+Wed Sep 24 13:52:15 2014 -0400
+f828cb4acff919f63ca1091a9b791c8d5cff0398
+bugfix for handling multiple indicators on loading via YAML
+
+Wed Sep 24 12:33:35 2014 -0400
+fb62ef4ee14cb1f7f824e969ecbdaa2ada2bbd1d
+updating the editor to do a compile on the rules that the user writes
+
+Wed Sep 24 11:17:25 2014 -0400
+1e94dd17b590f11ce028235a7480181f77133a4b
+handling the from-above condition. allowing breaks in lines during the condition
+
+Tue Sep 23 17:53:24 2014 -0400
+8b90c7a0f5ea995fbce48017d0ec4d6cfee937c6
+we perltidy the expected output too just to be safe
+
+Tue Sep 23 17:18:40 2014 -0400
+ed8ef50972ba51ceda1c0b3f6abcde787d2820ff
+$lookback is now a variable to allow for machine-learning later. the unit-test verifies the output albeit in a dumb way
+
+Tue Sep 23 17:08:56 2014 -0400
+fc7543716f12c9072871877cfedcdeb72dbafefd
+printing output for viewing
+
+Tue Sep 23 17:06:55 2014 -0400
+d4859d4c526c184476504ac605e3ba18002041ce
+code generation tidying updated correctly. buys and sells are created once only
+
+Tue Sep 23 16:45:39 2014 -0400
+57ea70e783cbb303a7ec79e1dbb75f6bf6709f85
+some code generation added
+
+Tue Sep 23 15:42:09 2014 -0400
+38df239700a2a059eaa3e6f246e985c78e1c64a3
+some minor code gen work in progress
+
+Tue Sep 23 15:35:22 2014 -0400
+3740f572bb0552da571d33998c81e30fe2531f52
+more state-less AST generation without using :: joins which is ugly
+
+Tue Sep 23 15:23:42 2014 -0400
+76a706f28afb2918fa6ef7335ca42d546de83009
+Adding some receiver handlers to create a state-less AST per instruction
+
+Fri Sep 19 13:25:09 2014 -0400
+6aaeb8b43ccc3a9652a2f60f545f4382957575b5
+getting the code right for a sample test of conditional buying at a price
+
+Thu Sep 18 17:44:07 2014 -0400
+dceda2674d3f976fed0ac70b88a4dad8be5c0ff6
+updating the grammar to handle some minor changes. adding some sample receiver code
+
+Thu Sep 18 17:43:04 2014 -0400
+e72d243e051835333b7e4071e35e572ad6a08669
+updating the test-threading script. we have found a way to not use thread_define
+
+Wed Sep 17 16:26:16 2014 -0400
+a06aa0de9a46eeba2459fa37371a5e99410260f1
+removing redundant grammar keywords
+
+Wed Sep 17 15:14:28 2014 -0400
+7cbba0f1ade652ae8a06220e224ca2fe0d85b8ac
+Adding auto-generated variable names to the rules editor
+
+Wed Sep 17 14:03:21 2014 -0400
+06d4def0c1e064c8f2ed05713c92e13e637c2bcb
+renaming a function for better clarity
+
+Tue Sep 9 11:10:58 2014 -0400
+ee6ec51da9dde6e95a6fe1b0ed9303af54c196d9
+bugfix
+
+Tue Sep 9 11:00:04 2014 -0400
+06f104eed4f90b22744d1bcf32c6cac709504c38
+renaming for consistency with docs
+
+Tue Sep 9 10:27:49 2014 -0400
+6f27ff464121a817c97d7f28f6a09707912ed119
+some renaming and rearranging
+
+Tue Sep 9 10:09:26 2014 -0400
+879cdff6df9abca8e40bb7c058c40e55d8fc8c97
+Moving some indicators around to fall into the appropriate categories
+
+Mon Sep 8 22:52:01 2014 -0400
+b404546ca2a42351e3442235c44627a66850e154
+rearranging the TSF to be LinearReg-TSF
+
+Mon Sep 8 17:50:16 2014 -0400
+1f9d60fc028257a46d160166f46f8a976f27eb98
+renaming indicator
+
+Mon Sep 8 13:56:14 2014 -0400
+bfd5d0d2d35ae1c9a962b28c7154074fa81734e5
+fixing pod
+
+Mon Sep 8 13:44:30 2014 -0400
+f7b5948ca1f50418f33785f9e5675eeb35bf2305
+updating changes
+
+Mon Sep 8 13:44:18 2014 -0400
+18dbf677fe4d178be293a3c532d3955b1fbf17e8
+getting ready for release 0.10
+
+Mon Sep 8 10:34:27 2014 -0400
+70f8a260f7949c99765342e081fd96d8b137bc46
+switching Talib to TA as per kmx's module renaming
+
+Fri Sep 5 17:28:23 2014 -0400
+31c8d371badc77ab20e7032c82b46973772b6e73
+bugfix
+
+Fri Sep 5 16:43:20 2014 -0400
+b8f86a452290540abb64b210690037b9fe47feda
+ok the candlesticks are also done pretty easily
+
+Fri Sep 5 16:40:19 2014 -0400
+339f6cc557c461a49586b9387802248e96d3b7f4
+adding variables for all other indicators except candlesticks
+
+Fri Sep 5 16:32:44 2014 -0400
+d548ed821473e556ee02edfa7fdb390a93662e5f
+momemtum indicator variables written now
+
+Fri Sep 5 16:05:28 2014 -0400
+d904a946b2c2ff6f6381886bc2575260c0ae9da8
+adding variable names for volatility indicators
+
+Fri Sep 5 15:52:56 2014 -0400
+3a4e80274fb4280a3eb0b8ff6714bbffa605def5
+adding variable names to the output arrays for use by the rules editor
+
+Thu Sep 4 16:58:19 2014 -0400
+0667c2fe038ec4becae95db9d3dc743ae3fbfe20
+Making keywords case insensitive but variables are case-sensitive
+
+Thu Sep 4 16:00:05 2014 -0400
+289bf16ce40b1bb920a45e245bbcbb18cec823d5
+saving the file in the .financeta directory by default to avoid polluting random directories. Also tracking if the old-filename saved was different from the new
+
+Wed Sep 3 18:08:38 2014 -0400
+1947196f7af6d24c44080669c7b023240af75e01
+Banging out a basic grammar schema for the language
+
+Wed Sep 3 16:13:42 2014 -0400
+64b8294fb556cfbadb14c5e2b6704103dc6f4a74
+sample language class updated. handles comments correctly
+
+Wed Sep 3 12:44:45 2014 -0400
+173e3baff84bd24c0d854471a44dc52b85a31e42
+Adding a framework package module to kickstart the language parsing
+
+Tue Sep 2 12:30:41 2014 -0400
+6825355b8a3a75610d4f81fafcdf4bc063ccc075
+binary mode for plots now adjusted based on Gnuplot version
+
+Tue Sep 2 11:32:13 2014 -0400
+2bdc083c76605d32ec3396107580989d75c84307
+updating the binary thing to only be on windows as Linux gnuplot 4.4 doesn't support it but gnuplot 4.6 does
+
+Tue Sep 2 10:55:58 2014 -0400
+6a6ea0416ab01ca5e97124d8b7f5f0fbf03f6c89
+Windows needs binary => 1 flag set to allow plotting BAD values. Linux works with or without it.
+
+Sun Aug 31 22:51:43 2014 -0400
+b6cfea70172de5783ddd107e258e4e4bad822fc7
+Allow loading of stock data from user's own CSV file in Date-OHLC-Volume format
+
+Sun Aug 31 12:42:56 2014 -0400
+b1ac1d28f890ea1e21f14c7552fcd00d84904a19
+some auto-rule saving if the rules have never been saved
+
+Sun Aug 31 10:17:10 2014 -0400
+465f76772d20ac31bba46043a13c0add1f39c85f
+Unique editor per tab is now being opened. If editor is already open it is brought to the front.
+
+Sat Aug 30 23:26:53 2014 -0400
+95a2988204ec27a4418cd139c58981f558da7a2d
+Adding an editor for rules to the gui.
+
+Thu Aug 28 16:24:06 2014 -0400
+057d5a8c578c664c026af351a35838f708a914aa
+Refactoring of code to allow saving and loading of model files
+
+Thu Aug 28 16:00:29 2014 -0400
+2210cb65feadfcb58ca55492bfc8053046c9d74e
+Save, save-as and load of models is now working except for loading indicators
+
+Thu Aug 28 15:14:03 2014 -0400
+8f0b7772509dbc55de328b7bf47f347b8a74c1c7
+Saving the model is now done
+
+Thu Aug 28 13:32:47 2014 -0400
+0f1022f53ee5e1a01633a0be7528c2d0c333ed3d
+if the tab closes, update the plot despite the index number being same
+
+Thu Aug 28 13:23:43 2014 -0400
+783c395bb4d5365b8014a85373c5eb9fd52946ed
+Updating the MAVP with some elegant cyclic pdl work
+
+Thu Aug 28 13:02:16 2014 -0400
+8f8c08f48bab979b2782845a49cfdb3d15fcb981
+Updating the build.pl to use the correct version
+
+Thu Aug 28 12:39:17 2014 -0400
+5f375c4e16564c3d7902f30986f56c8acc95ab75
+updating changes
+Tue Jan 3 08:54:47 2023 -0500
+2a079cd4628c54669f75bbca35addfe56188a680
+Getting the menu-based crash fixed . updating the test script to test Prima
+
+Mon Jan 2 23:00:46 2023 -0500
+1d4edee9e6df05f46d4109e69f4e4c9683157bb2
+fixing the erroneous pod
+
+Mon Jan 2 22:59:45 2023 -0500
+b081b8c2260ca3d6ca2f3dcfa009431d1c03a26c
+running pod2readme to update it
+
+Mon Jan 2 22:53:36 2023 -0500
+3b8100d70655f470dd21302752b899db1acbd80e
+Icons can be auto-inherited, so removing redundant code
+
+Mon Jan 2 21:48:27 2023 -0500
+01e85c0aa83a77ca593f35324bf8cfb5483d6951
+Removing handling of old Prima versions. we only support 1.67 and above now
+
+Mon Jan 2 21:40:12 2023 -0500
+5a8d012439d54218a28acb0dde3f2f1cc6be9f02
+Removing usage of say/carp and using Log::Any instead all over. Updating unit test to load the language module and moving the icon building code into utils module
+
+Mon Jan 2 20:58:23 2023 -0500
+2af40340bb64a4aea1961ffc97bf38ca170d4355
+Replacing say/carp with $log from Log::Any.
+
+Mon Jan 2 18:02:22 2023 -0500
+2ec3e8a8e5d10766e631d17ef20ff524336f895c
+Adding checks for every menu item call to make sure we do not crash if the item is corrupt
+
+Mon Jan 2 17:58:52 2023 -0500
+5a01a16e337d8e8e692bff0d363fd9a24d8f5382
+Got the icon to stop segfaulting. adding a testicon script for that. MenuItems are now able to load the gui object using the API change
+
+Sun Jan 1 23:04:04 2023 -0500
+64764eb9dabd6c43efff1c25e7ca35d59cac0387
+Improving the main window invocation and handling the icon check. using a new icon from FontAwesome
+
+Sun Jan 1 15:59:28 2023 -0500
+1e27aa0210d8a9bd9d4b90ac74fbf954542de734
+Many updates: - fixing copyright to be from 2013-2023 - Adding cmdline option handling to the top-level script - Adding Log::Any to handle logging correctly. More changes to use this   coming soon. - Update unit tests to check for functions, be more strict. - Update version for next release to be 0.11. - Build dependencies updated. - Prima latest to be used and that requires a lot of UI dependency   updates - code does not run the UI yet - WIP
+
+Sun Jan 1 14:20:20 2023 -0500
+db75e4e655ba348d0b5ccb6138d3e074d3f5e1bb
+Updating gitignore and manifest skip
+
+Sun Jan 1 14:19:13 2023 -0500
+0868631dfccf3feed0785b91323b8fba5dc59f1a
+Updating Build.PL with all the exact minimum required supported versions of the latest libraries we want to support going forward.
+
+Sun Jan 1 13:50:18 2023 -0500
+a8807dfecc85ad9b370470249be56d20314b502a
+Updating to latest version of Mo which is 0.40 on 2023-01-01. Happy New Year!
+
+Thu Mar 19 13:23:01 2015 -0400
+0a8268ae3d923ab4c0b1c6a5bf6e2bf17d4ad5c8
+STOCHRSI bug fixed
+
+Sat Nov 8 15:52:56 2014 -0500
+dc0e58fcbba34d39158b5ef1a3a727a68bb29e1f
+Using a Prima real release instead of dev release
+
+Tue Sep 30 15:03:50 2014 -0400
+ebcaf38c8468e3f781de117862f94a4536d09b72
+improving syntax highlighting for the grammar rules
+
+Tue Sep 30 13:14:38 2014 -0400
+dc8879027f0e73cf4b9c51aecf9c8b46d62840a6
+implementing the basic comparisons
+
+Tue Sep 30 13:14:18 2014 -0400
+66b2ee055bcd69616adf6be5c590023b20e9cad0
+if the P&L calcs gave back nothing say that
+
+Tue Sep 30 11:49:54 2014 -0400
+d9af44e6a8853e63db0ae5ce7ed4d59c9745ec9e
+fixing the grammar to handle numeric states correctly
+
+Tue Sep 30 10:59:40 2014 -0400
+e54f858537a515b67dbb48d2880107302adcf61f
+Adding save to CSV feature in the tradereport
+
+Mon Sep 29 18:01:41 2014 -0400
+46c57c2e555916f024588e6cdec46d696dd30f1d
+removing unnecessary function
+
+Mon Sep 29 18:00:55 2014 -0400
+6759d18746c6daa9a57970871e2c318ea3c26d86
+Adding a Trade-report class
+
+Mon Sep 29 16:40:14 2014 -0400
+6cc0acfe142ee87cceb9d548bf35fad663a6ee7e
+showing a dummy trade report
+
+Mon Sep 29 16:20:49 2014 -0400
+ddfef0981a4a6c7c4ac208a5ee817ae5bb3b1e75
+Implementing the P&L calculator function to filter out the bad buy/sell signals and only display the ones that should be displayed.
+
+Mon Sep 29 15:56:14 2014 -0400
+8c33797bc0404eedeaf48b515e73adafe4381021
+adding long/short trade flags to the result
+
+Mon Sep 29 14:55:04 2014 -0400
+7cfcb76888416a2eb9779a68f5cf16471bf1ffb8
+seems like we tackle pretty much all the different cases here
+
+Mon Sep 29 14:13:52 2014 -0400
+d46c7dc9c24003c660bf8f78a402a9d9ca91c3ee
+sample P&L calculator shown here
+
+Mon Sep 29 12:45:33 2014 -0400
+b70aff44b23597b5b76a26216bb7f9b0859649cd
+Adding simple declaration grammar to handle instructions on allowing or not allowing short/long trades
+
+Fri Sep 26 16:27:49 2014 -0400
+24989d0c7f2dd7ba6efb384b057e29e803ccfdfe
+Win32 perltidy difference handling
+
+Fri Sep 26 16:24:49 2014 -0400
+dbbee4373f7cc6c8dc9e3e3e100722b8acebd18b
+handling canceled save-as
+
+Fri Sep 26 16:22:34 2014 -0400
+74924cb25fcfe7254075420f8aa81c26ae3438fb
+Plotting of buy/sells done
+
+Fri Sep 26 16:01:24 2014 -0400
+9ce80ae3e920f01753a28c6c13cfbb42d746e8bb
+morphing the calls to plot_data to pass an empty buy-sell {} if necessary
+
+Fri Sep 26 15:51:32 2014 -0400
+661e2e54cee3495166ed4b3ef879c028d6f53139
+modify the header only if needed
+
+Fri Sep 26 15:47:53 2014 -0400
+1a8b9ae84208976da4e490865acb3eb253160b6a
+Executing rules from the main window itself
+
+Fri Sep 26 15:33:24 2014 -0400
+fa713e4e975c6466abffd357f7784aa68790361f
+Display the buy-sell output into the tab
+
+Fri Sep 26 14:59:41 2014 -0400
+6605565d6b98b861b97075302e903452dd96e466
+guaranteeing that the 1e-6 value is printed as expected instead of differences in printing on different versions of perl breaking tests
+
+Fri Sep 26 14:56:21 2014 -0400
+f6fe6d6a704f22da944bd0bb3be793002e44d507
+fixing the code generation to use bit-wise operators in which() and also to guarantee precision by using ()
+
+Fri Sep 26 14:22:09 2014 -0400
+496142879a5fa44a0080aea2999b670fabe488f0
+adding a unit test to verify if the code generated can actually run
+
+Fri Sep 26 12:47:05 2014 -0400
+0027712b89525f8f2c1bbaed6b48bfc38bc826ff
+eval sub{} requires the loading of PDL module for the functions to work
+
+Fri Sep 26 12:09:39 2014 -0400
+dfffb4ca15f545bb7846ee534bda6730f79ee524
+getting the compiled code to be eval'ed into an anonymous code-ref for use by the gui. fixing the editor closing bug if only 1 editor/tab was opened.
+
+Wed Sep 24 17:23:43 2014 -0400
+3b9ead1b43bd5cc8aa2af284894cb698e3a275b4
+Windows fixes and using latest PDL::Graphics::Gnuplot
+
+Wed Sep 24 15:54:48 2014 -0400
+7a8eaf71dcfc8537219e811d3710f70f7cb57aea
+- preset-vars is an array since it has to be in order. - the user-rule code is now generated as a sub-routine so that it can be invoked   regularly as needed
+
+Wed Sep 24 14:05:10 2014 -0400
+8b419b834231eea9754386739a60f424bf295cd7
+the compiler error can now be displayed to the user
+
+Wed Sep 24 13:52:15 2014 -0400
+f828cb4acff919f63ca1091a9b791c8d5cff0398
+bugfix for handling multiple indicators on loading via YAML
+
+Wed Sep 24 12:33:35 2014 -0400
+fb62ef4ee14cb1f7f824e969ecbdaa2ada2bbd1d
+updating the editor to do a compile on the rules that the user writes
+
+Wed Sep 24 11:17:25 2014 -0400
+1e94dd17b590f11ce028235a7480181f77133a4b
+handling the from-above condition. allowing breaks in lines during the condition
+
+Tue Sep 23 17:53:24 2014 -0400
+8b90c7a0f5ea995fbce48017d0ec4d6cfee937c6
+we perltidy the expected output too just to be safe
+
+Tue Sep 23 17:18:40 2014 -0400
+ed8ef50972ba51ceda1c0b3f6abcde787d2820ff
+$lookback is now a variable to allow for machine-learning later. the unit-test verifies the output albeit in a dumb way
+
+Tue Sep 23 17:08:56 2014 -0400
+fc7543716f12c9072871877cfedcdeb72dbafefd
+printing output for viewing
+
+Tue Sep 23 17:06:55 2014 -0400
+d4859d4c526c184476504ac605e3ba18002041ce
+code generation tidying updated correctly. buys and sells are created once only
+
+Tue Sep 23 16:45:39 2014 -0400
+57ea70e783cbb303a7ec79e1dbb75f6bf6709f85
+some code generation added
+
+Tue Sep 23 15:42:09 2014 -0400
+38df239700a2a059eaa3e6f246e985c78e1c64a3
+some minor code gen work in progress
+
+Tue Sep 23 15:35:22 2014 -0400
+3740f572bb0552da571d33998c81e30fe2531f52
+more state-less AST generation without using :: joins which is ugly
+
+Tue Sep 23 15:23:42 2014 -0400
+76a706f28afb2918fa6ef7335ca42d546de83009
+Adding some receiver handlers to create a state-less AST per instruction
+
+Fri Sep 19 13:25:09 2014 -0400
+6aaeb8b43ccc3a9652a2f60f545f4382957575b5
+getting the code right for a sample test of conditional buying at a price
+
+Thu Sep 18 17:44:07 2014 -0400
+dceda2674d3f976fed0ac70b88a4dad8be5c0ff6
+updating the grammar to handle some minor changes. adding some sample receiver code
+
+Thu Sep 18 17:43:04 2014 -0400
+e72d243e051835333b7e4071e35e572ad6a08669
+updating the test-threading script. we have found a way to not use thread_define
+
+Wed Sep 17 16:26:16 2014 -0400
+a06aa0de9a46eeba2459fa37371a5e99410260f1
+removing redundant grammar keywords
+
+Wed Sep 17 15:14:28 2014 -0400
+7cbba0f1ade652ae8a06220e224ca2fe0d85b8ac
+Adding auto-generated variable names to the rules editor
+
+Wed Sep 17 14:03:21 2014 -0400
+06d4def0c1e064c8f2ed05713c92e13e637c2bcb
+renaming a function for better clarity
+
+Tue Sep 9 11:10:58 2014 -0400
+ee6ec51da9dde6e95a6fe1b0ed9303af54c196d9
+bugfix
+
+Tue Sep 9 11:00:04 2014 -0400
+06f104eed4f90b22744d1bcf32c6cac709504c38
+renaming for consistency with docs
+
+Tue Sep 9 10:27:49 2014 -0400
+6f27ff464121a817c97d7f28f6a09707912ed119
+some renaming and rearranging
+
+Tue Sep 9 10:09:26 2014 -0400
+879cdff6df9abca8e40bb7c058c40e55d8fc8c97
+Moving some indicators around to fall into the appropriate categories
+
+Mon Sep 8 22:52:01 2014 -0400
+b404546ca2a42351e3442235c44627a66850e154
+rearranging the TSF to be LinearReg-TSF
+
+Mon Sep 8 17:50:16 2014 -0400
+1f9d60fc028257a46d160166f46f8a976f27eb98
+renaming indicator
+
+Mon Sep 8 13:56:14 2014 -0400
+bfd5d0d2d35ae1c9a962b28c7154074fa81734e5
+fixing pod
+
+Mon Sep 8 13:44:30 2014 -0400
+f7b5948ca1f50418f33785f9e5675eeb35bf2305
+updating changes
+
+Mon Sep 8 13:44:18 2014 -0400
+18dbf677fe4d178be293a3c532d3955b1fbf17e8
+getting ready for release 0.10
+
+Mon Sep 8 10:34:27 2014 -0400
+70f8a260f7949c99765342e081fd96d8b137bc46
+switching Talib to TA as per kmx's module renaming
+
+Fri Sep 5 17:28:23 2014 -0400
+31c8d371badc77ab20e7032c82b46973772b6e73
+bugfix
+
+Fri Sep 5 16:43:20 2014 -0400
+b8f86a452290540abb64b210690037b9fe47feda
+ok the candlesticks are also done pretty easily
+
+Fri Sep 5 16:40:19 2014 -0400
+339f6cc557c461a49586b9387802248e96d3b7f4
+adding variables for all other indicators except candlesticks
+
+Fri Sep 5 16:32:44 2014 -0400
+d548ed821473e556ee02edfa7fdb390a93662e5f
+momemtum indicator variables written now
+
+Fri Sep 5 16:05:28 2014 -0400
+d904a946b2c2ff6f6381886bc2575260c0ae9da8
+adding variable names for volatility indicators
+
+Fri Sep 5 15:52:56 2014 -0400
+3a4e80274fb4280a3eb0b8ff6714bbffa605def5
+adding variable names to the output arrays for use by the rules editor
+
+Thu Sep 4 16:58:19 2014 -0400
+0667c2fe038ec4becae95db9d3dc743ae3fbfe20
+Making keywords case insensitive but variables are case-sensitive
+
+Thu Sep 4 16:00:05 2014 -0400
+289bf16ce40b1bb920a45e245bbcbb18cec823d5
+saving the file in the .financeta directory by default to avoid polluting random directories. Also tracking if the old-filename saved was different from the new
+
+Wed Sep 3 18:08:38 2014 -0400
+1947196f7af6d24c44080669c7b023240af75e01
+Banging out a basic grammar schema for the language
+
+Wed Sep 3 16:13:42 2014 -0400
+64b8294fb556cfbadb14c5e2b6704103dc6f4a74
+sample language class updated. handles comments correctly
+
+Wed Sep 3 12:44:45 2014 -0400
+173e3baff84bd24c0d854471a44dc52b85a31e42
+Adding a framework package module to kickstart the language parsing
+
+Tue Sep 2 12:30:41 2014 -0400
+6825355b8a3a75610d4f81fafcdf4bc063ccc075
+binary mode for plots now adjusted based on Gnuplot version
+
+Tue Sep 2 11:32:13 2014 -0400
+2bdc083c76605d32ec3396107580989d75c84307
+updating the binary thing to only be on windows as Linux gnuplot 4.4 doesn't support it but gnuplot 4.6 does
+
+Tue Sep 2 10:55:58 2014 -0400
+6a6ea0416ab01ca5e97124d8b7f5f0fbf03f6c89
+Windows needs binary => 1 flag set to allow plotting BAD values. Linux works with or without it.
+
+Sun Aug 31 22:51:43 2014 -0400
+b6cfea70172de5783ddd107e258e4e4bad822fc7
+Allow loading of stock data from user's own CSV file in Date-OHLC-Volume format
+
+Sun Aug 31 12:42:56 2014 -0400
+b1ac1d28f890ea1e21f14c7552fcd00d84904a19
+some auto-rule saving if the rules have never been saved
+
+Sun Aug 31 10:17:10 2014 -0400
+465f76772d20ac31bba46043a13c0add1f39c85f
+Unique editor per tab is now being opened. If editor is already open it is brought to the front.
+
+Sat Aug 30 23:26:53 2014 -0400
+95a2988204ec27a4418cd139c58981f558da7a2d
+Adding an editor for rules to the gui.
+
+Thu Aug 28 16:24:06 2014 -0400
+057d5a8c578c664c026af351a35838f708a914aa
+Refactoring of code to allow saving and loading of model files
+
+Thu Aug 28 16:00:29 2014 -0400
+2210cb65feadfcb58ca55492bfc8053046c9d74e
+Save, save-as and load of models is now working except for loading indicators
+
+Thu Aug 28 15:14:03 2014 -0400
+8f0b7772509dbc55de328b7bf47f347b8a74c1c7
+Saving the model is now done
+
+Thu Aug 28 13:32:47 2014 -0400
+0f1022f53ee5e1a01633a0be7528c2d0c333ed3d
+if the tab closes, update the plot despite the index number being same
+
+Thu Aug 28 13:23:43 2014 -0400
+783c395bb4d5365b8014a85373c5eb9fd52946ed
+Updating the MAVP with some elegant cyclic pdl work
+
+Thu Aug 28 13:02:16 2014 -0400
+8f8c08f48bab979b2782845a49cfdb3d15fcb981
+Updating the build.pl to use the correct version
+
+Thu Aug 28 12:39:17 2014 -0400
+5f375c4e16564c3d7902f30986f56c8acc95ab75
+updating changes
 Mon Sep 8 13:44:18 2014 -0400
 18dbf677fe4d178be293a3c532d3955b1fbf17e8
 getting ready for release 0.10

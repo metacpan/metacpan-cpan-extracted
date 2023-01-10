@@ -1,5 +1,5 @@
 package AI::Genetic::Pro::Chromosome;
-
+$AI::Genetic::Pro::Chromosome::VERSION = '1.009';
 use warnings;
 use strict;
 use List::Util qw(shuffle first);

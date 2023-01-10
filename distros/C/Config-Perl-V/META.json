@@ -1,43 +1,36 @@
 {
-   "abstract" : "Structured data retrieval of perl -V output",
-   "provides" : {
-      "Config::Perl::V" : {
-         "version" : "0.34",
-         "file" : "V.pm"
-         }
-      },
-   "dynamic_config" : 1,
    "meta-spec" : {
-      "version" : 2,
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
       },
-   "resources" : {
-      "repository" : {
-         "url" : "https://github.com/Tux/Config-Perl-V",
-         "type" : "git",
-         "web" : "https://github.com/Tux/Config-Perl-V"
-         },
-      "bugtracker" : {
-         "web" : "https://github.com/Tux/Config-Perl-V/issues"
-         },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-         ]
-      },
+   "name" : "Config-Perl-V",
+   "dynamic_config" : 1,
    "license" : [
       "perl_5"
       ],
-   "version" : "0.34",
-   "prereqs" : {
-      "build" : {
-         "requires" : {
-            "perl" : "5.006"
-            }
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+         ],
+      "repository" : {
+         "web" : "https://github.com/Tux/Config-Perl-V",
+         "url" : "https://github.com/Tux/Config-Perl-V",
+         "type" : "git"
          },
+      "bugtracker" : {
+         "web" : "https://github.com/Tux/Config-Perl-V/issues"
+         }
+      },
+   "prereqs" : {
       "test" : {
          "requires" : {
             "Test::NoWarnings" : "0",
             "Test::More" : "0"
+            }
+         },
+      "build" : {
+         "requires" : {
+            "perl" : "5.006"
             }
          },
       "configure" : {
@@ -52,10 +45,17 @@
             }
          }
       },
-   "name" : "Config-Perl-V",
    "author" : [
       "H.Merijn Brand <h.m.brand@xs4all.nl>"
       ],
    "release_status" : "stable",
-   "generated_by" : "Author"
+   "provides" : {
+      "Config::Perl::V" : {
+         "version" : "0.35",
+         "file" : "V.pm"
+         }
+      },
+   "generated_by" : "Author",
+   "abstract" : "Structured data retrieval of perl -V output",
+   "version" : "0.35"
    }

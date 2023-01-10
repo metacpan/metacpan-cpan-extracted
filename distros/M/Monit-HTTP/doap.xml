@@ -11,7 +11,7 @@
   <developer>
     <foaf:Person>
       <foaf:name>Angelo Failla</foaf:name>
-      <foaf:mbox rdf:resource="mailto:pallotron@freaknet.org" />
+      <foaf:mbox rdf:resource="mailto:pallotron@gmail.com" />
     </foaf:Person>
   </developer>
   <developer>
@@ -22,17 +22,11 @@
   </developer>
   <helper>
     <foaf:Person>
-      <foaf:name>Angelo Failla</foaf:name>
-      <foaf:mbox rdf:resource="mailto:pallotron@gmail.com" />
-    </foaf:Person>
-  </helper>
-  <helper>
-    <foaf:Person>
       <foaf:name>Dean Hamstead</foaf:name>
       <foaf:mbox rdf:resource="mailto:djzort@cpan.org" />
     </foaf:Person>
   </helper>
-  <license rdf:resource="http://dev.perl.org/licenses/" />
+  <license rdf:resource="http://www.opensource.org/licenses/mit-license.php" />
   <homepage rdf:resource="https://github.com/djzort/perl-monit-http-api" />
   <bug-database rdf:resource="https://github.com/djzort/perl-monit-http-api/issues" />
   <repository>

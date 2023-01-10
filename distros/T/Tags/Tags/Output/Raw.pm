@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Error::Pure qw(err);
-use List::MoreUtils qw(none);
+use List::Util qw(none);
 use Readonly;
 use Tags::Utils::Preserve;
 use Tags::Utils qw(encode_attr_entities encode_char_entities);
@@ -15,7 +15,7 @@ Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $LAST_INDEX => -1;
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 
 # Finalize Tags output.
 sub finalize {
@@ -691,7 +691,7 @@ __END__
 =head1 DEPENDENCIES
 
 L<Error::Pure>,
-L<List::MoreUtils>,
+L<List::Util>,
 L<Readonly>,
 L<Tags::Utils::Preserve>.
 
@@ -717,12 +717,12 @@ L<http://skim.cz/>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2005-2022 Michal Josef Špaček
+© 2005-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.13
+0.14
 
 =cut

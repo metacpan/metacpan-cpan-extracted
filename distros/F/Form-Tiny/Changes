@@ -1,5 +1,9 @@
 Revision history for Perl extension Form::Tiny.
 
+2.17 Sat Jan 7 2023
+	- resolve deprecation of Form::Tiny::Filter (removed the package)
+	- documentation improvements
+
 2.16 Mon Dec 19 2022
 	- Empty child forms now produce a proper error message (gh#8)
 

@@ -56,6 +56,7 @@ t/has-plus.t
 t/init-arg.t
 t/isa-interfere.t
 t/lazy_isa.t
+t/lib/CaptureException.pm
 t/lib/ErrorLocation.pm
 t/lib/InlineModule.pm
 t/lib/TestEnv.pm

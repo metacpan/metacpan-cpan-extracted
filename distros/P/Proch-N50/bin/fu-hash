@@ -8,6 +8,11 @@ use Pod::Usage;
 use File::Basename;
 use Digest::MD5 qw( md5_hex );
 use FindBin qw($RealBin);
+# The following placeholder is to be programmatically replaced with 'use lib "$RealBin/../lib"' if needed
+#~loclib~
+if ( -e "$RealBin/../lib/Proch/N50.pm" and -e "$RealBin/../Changes" ) {
+    use lib "$RealBin/../lib";
+}
 use FASTX::Reader;
 use Proch::Seqfu;
 
@@ -138,7 +143,7 @@ fu-hash - Print sequence hashes
 
 =head1 VERSION
 
-version 1.5.0
+version 1.5.4
 
 =head1 SYNOPSIS
 

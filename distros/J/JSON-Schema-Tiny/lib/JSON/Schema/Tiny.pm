@@ -1,11 +1,10 @@
-use strict;
-use warnings;
-package JSON::Schema::Tiny; # git description: v0.017-3-g0f5b024
+use strictures 2;
+package JSON::Schema::Tiny; # git description: v0.018-5-gca48552
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema, minimally
 # KEYWORDS: JSON Schema data validation structure specification tiny
 
-our $VERSION = '0.018';
+our $VERSION = '0.019';
 
 use 5.020;  # for unicode_strings, signatures, postderef features
 use experimental 0.026 qw(signatures postderef args_array_with_signatures);
@@ -260,7 +259,7 @@ sub _eval_keyword_ref ($data, $schema, $state) {
   abort($state, 'only same-document, same-base JSON pointers are supported in %s', $state->{keyword})
     if $uri->clone->fragment(undef) ne Mojo::URL->new($state->{root_schema}{'$id'}//'');
 
-  my $subschema = Mojo::JSON::Pointer->new($state->{root_schema})->get($uri->fragment);
+  my $subschema = Mojo::JSON::Pointer->new($state->{root_schema})->get($uri->fragment//'');
   abort($state, 'EXCEPTION: unable to find resource %s', $uri) if not defined $subschema;
 
   return _eval_subschema($data, $subschema,
@@ -1274,7 +1273,7 @@ JSON::Schema::Tiny - Validate data against a schema, minimally
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 

@@ -57,7 +57,7 @@ use warnings 'once';
 
 use Cwd 'abs_path';
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use UI::Various::core;
 use UI::Various::Box;
@@ -149,14 +149,48 @@ sub mode($;$)
 		  @_);
 }
 
+=item symlinks [rw, fixed]
+
+an optional flag if symbolic links can be selected or not:
+
+=over
+
+=item C<0>
+
+Symbolic links are automatically followed (replaced with their target).
+This is the default.
+
+=item C<1>
+
+Symbolic links are kept as they are.  This allows selecting them instead of
+their target.
+
+=back
+
+=cut
+
+sub symlinks($;$)
+{
+    return access('symlinks',
+		  sub{
+		      unless (m/^[01]$/)
+		      {
+			  error('parameter__1_must_be_in__2__3',
+				'symlinks', 0, 1);
+			  $_ = 1;
+		      }
+		  },
+		  @_);
+}
+
 #########################################################################
 #
 # internal constants and data:
 
 use constant ALLOWED_PARAMETERS =>
-    (UI::Various::Box::ALLOWED_PARAMETERS, qw(directory filter mode));
+    (UI::Various::Box::ALLOWED_PARAMETERS, qw(directory filter mode symlinks));
 use constant DEFAULT_ATTRIBUTES =>
-    (directory => abs_path('.'), height => 8, width => 24);
+    (directory => abs_path('.'), height => 8, width => 24, symlinks => 0);
 
 #########################################################################
 #########################################################################
@@ -295,7 +329,14 @@ sub _cd($;$)
 
     $self->{_msg} = ' ' x $self->{width};
     $cd  and  $_ .= '/' . $cd;
-    $_ = abs_path($_);
+    if (m|^/|  and  $self->symlinks)
+    {
+	s|(?<=.)/[^/]+/\.\.$||;
+	s|^/[^/]+/\.\.$|/|;
+	s|^/{2,}|/|;
+    }
+    else
+    {   $_ = abs_path($_);   }
     my @files = ();
     my $dir;
     if (opendir $dir, $_)
@@ -314,7 +355,10 @@ sub _cd($;$)
 	closedir $dir;
     }
     else
-    {   $self->{_msg} = message('can_t_open__1__2', $_, $!);   }
+    {
+	@files = $self->_cd();
+	$self->{_msg} = message('can_t_open__1__2', $_, $!);
+    }
     return sort @files;
 }
 

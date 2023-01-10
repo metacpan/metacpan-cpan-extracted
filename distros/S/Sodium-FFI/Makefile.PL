@@ -8,7 +8,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "FFI implementation of libsodium",
+  "ABSTRACT" => "Sodium is a modern, easy-to-use software library for encryption, decryption, signatures, password hashing, and more.",
   "AUTHOR" => "Chase Whitener <capoeirab\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "Alien::Base::Wrapper" => 0,
@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t t/aead/*.t t/pub_key_crypto/*.t"
   }

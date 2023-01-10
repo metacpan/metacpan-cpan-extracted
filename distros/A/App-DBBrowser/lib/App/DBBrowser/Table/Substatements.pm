@@ -30,7 +30,7 @@ sub new {
     if    ( $info->{driver} =~ /^(?:SQLite|mysql|MariaDB)\z/ ) { push @{$sf->{aggregate}}, "GROUP_CONCAT(X)"; }
     elsif ( $info->{driver} eq 'Pg' )                          { push @{$sf->{aggregate}}, "STRING_AGG(X)"; }
     elsif ( $info->{driver} eq 'Firebird' )                    { push @{$sf->{aggregate}}, "LIST(X)"; }
-    elsif ( $info->{driver} =~ /^(?:db2|oracle)\z/ )           { push @{$sf->{aggregate}}, "LISTAGG(X)"; }
+    elsif ( $info->{driver} =~ /^(?:DB2|oracle)\z/ )           { push @{$sf->{aggregate}}, "LISTAGG(X)"; }
     $sf->{i}{menu_addition} = '%%';
     bless $sf, $class;
 }
@@ -190,7 +190,7 @@ sub __add_aggregate_substmt {
         $aggr =~ s/\(\X\)\z//;
         $sql->{aggr_cols}[$i] = $aggr . "(";
         $default_alias = $aggr;
-
+        my $is_distinct;
         if ( $aggr =~ /^(?:COUNT|$GROUP_CONCAT)\z/ ) {
             my $info = $ax->get_sql_info( $sql );
             # Choose
@@ -205,6 +205,7 @@ sub __add_aggregate_substmt {
             if ( $all_or_distinct eq $sf->{distinct} ) {
                 $sql->{aggr_cols}[$i] .= $sf->{distinct} . " ";
                 $default_alias .= ' ' .  $sf->{distinct};
+                $is_distinct = 1;
             }
         }
         my $info = $ax->get_sql_info( $sql );
@@ -222,7 +223,11 @@ sub __add_aggregate_substmt {
         if ( $aggr =~ /^$GROUP_CONCAT\z/ ) {
             if ( $sf->{i}{driver} eq 'Pg' ) {
                 # Pg, STRING_AGG: separator mandatory
-                $sql->{aggr_cols}[$i] .= "${qt_col}::text, ',')";
+                $sql->{aggr_cols}[$i] .= "${qt_col}::text,',')";
+            }
+            elsif ( $sf->{i}{driver} =~ /^(?:DB2|oracle)\z/ ) {
+                # DB2: no default separator
+                $sql->{aggr_cols}[$i] .= "$qt_col,',')";
             }
             else {
                 # https://sqlite.org/forum/info/221c2926f5e6f155
@@ -230,22 +235,39 @@ sub __add_aggregate_substmt {
                 $sql->{aggr_cols}[$i] .= "$qt_col)";
             }
             #my $sep = ',';
-            #if ( $sf->{i}{driver} eq 'SQLite' ) { # && $sql->{aggr_cols}[$i] =~ /$sf->{distinct}\s\z/ ) {
-            #    # https://sqlite.org/forum/info/221c2926f5e6f155
-            #    # SQLite: group_concat with DISTINCT and custom seperator does not work
-            #    $sql->{aggr_cols}[$i] .= "$qt_col)";
+            #if ( $sf->{i}{driver} eq 'SQLite' ) {
+            #    if ( $is_distinct ) {
+            #        # https://sqlite.org/forum/info/221c2926f5e6f155
+            #        # SQLite: GROUP_CONCAT with DISTINCT and custom seperator does not work
+            #        # default separator is ','
+            #        $sql->{aggr_cols}[$i] .= "$qt_col)";
+            #    }
+            #    else {
+            #        $sql->{aggr_cols}[$i] .= "$qt_col,'$sep')";
+            #    }
             #}
             #elsif ( $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
             #    $sql->{aggr_cols}[$i] .= "$qt_col ORDER BY $qt_col SEPARATOR '$sep')";
             #}
             #elsif ( $sf->{i}{driver} eq 'Pg' ) {
-            #    $sql->{aggr_cols}[$i] .= "${qt_col}::text, '$sep' ORDER BY $qt_col)";
+            #    # Pg: separator mandatory
+            #    # STRING_AGG expects text type as argument
+            #    # with DISTINCT the STRING_AGG col and the ORDER BY col must be identical
+            #    $sql->{aggr_cols}[$i] .= "${qt_col}::text,'$sep' ORDER BY ${qt_col}::text)";
             #}
             #elsif ( $sf->{i}{driver} eq 'Firebird' ) {
-            #    $sql->{aggr_cols}[$i] .= "$qt_col, '$sep')";
+            #    $sql->{aggr_cols}[$i] .= "$qt_col,'$sep')";
             #}
-            #elsif ( $sf->{i}{driver} =~ /^(?:db2|oracle)\z/ ) {
-            #    $sql->{aggr_cols}[$i] .= "$qt_col, '$sep') WITHIN GROUP (ORDER BY $qt_col)";
+            #elsif ( $sf->{i}{driver} =~ /^(?:DB2|oracle)\z/ ) {
+            #    if ( $is_distinct ) {
+            #        # DB2 codes: error code -214 - error caused by:
+            #        # DISTINCT is specified in the SELECT clause, and a column name or sort-key-expression in the
+            #        # ORDER BY clause cannot be matched exactly with a column name or expression in the select list.
+            #        $sql->{aggr_cols}[$i] .= "$qt_col,'$sep')";
+            #    }
+            #    else {
+            #        $sql->{aggr_cols}[$i] .= "$qt_col,'$sep') WITHIN GROUP (ORDER BY $qt_col)";
+            #    }
             #}
             #else {
             #    return;

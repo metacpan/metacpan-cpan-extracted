@@ -1,6 +1,7 @@
-use strict;
+use v5.12.0;
 use warnings;
 use utf8;
+
 use Test::More;
 use File::Spec::Functions ':ALL';
 use Email::Stuffer;

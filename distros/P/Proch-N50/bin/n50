@@ -415,13 +415,13 @@ elsif ( $opt_format eq 'custom' ) {
         my $output_string = '';
         $output_string .= $opt_template if ( defined $opt_template );
 
-        $output_string =~ s/({new}|{n}|\\n)/$new/g
-          if ( $output_string =~ /({new}|{n}|\\n)/ );
-        $output_string =~ s/({tab}|{t}|\\t)/$tab/g
-          if ( $output_string =~ /({tab}|{t}|\\t)/ );
-        $output_string =~ s/{path}/$r/g if ( $output_string =~ /{path}/ );
+        $output_string =~ s/(\{new\}|\{n\}|\\n)/$new/g
+          if ( $output_string =~ /(\{new\}|\{n\}|\\n)/ );
+        $output_string =~ s/(\{tab\}|\{t\}|\\t)/$tab/g
+          if ( $output_string =~ /(\{tab\}|{t}|\\t)/ );
+        $output_string =~ s/\{path\}/$r/g if ( $output_string =~ /\{path\}/ );
         foreach my $f (@fields) {
-            $output_string =~ s/{$f}/$output_print{$r}{$f}/g;
+            $output_string =~ s/\{$f\}/$output_print{$r}{$f}/g;
         }
         print $output_string;
     }
@@ -583,7 +583,7 @@ n50 - A script to calculate N50 from one or multiple FASTA/FASTQ files.
 
 =head1 VERSION
 
-version 1.5.0
+version 1.5.4
 
 =head1 SYNOPSIS
 

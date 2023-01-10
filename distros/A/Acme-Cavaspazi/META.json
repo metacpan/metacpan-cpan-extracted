@@ -34,7 +34,7 @@
    "provides" : {
       "Acme::Cavaspazi" : {
          "file" : "lib/Acme/Cavaspazi.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       }
    },
    "release_status" : "stable",
@@ -43,7 +43,7 @@
          "url" : "https://github.com/telatin/FASTX-Reader"
       }
    },
-   "version" : "1.0.0",
+   "version" : "1.0.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

@@ -1,20 +1,26 @@
-requires 'perl', '5.026';
+requires 'perl', '5.034';
 
-requires 'RxPerl::Mojo', 'v6.0.0';
-requires 'RxPerl', 'v6.5.0';
-requires 'Safe::Isa';
-requires 'Syntax::Keyword::Try';
-requires 'Struct::Diff';
+requires 'Mojolicious';
+requires 'Cpanel::JSON::XS';
 requires 'Mojo::Pg', '4.26';
-requires 'Moo';
+requires 'RxPerl::Mojo', 'v6.8.1';
+requires 'RxPerl', 'v6.12.0';
+requires 'Syntax::Keyword::Dynamically';
 requires 'Throwable';
-requires 'autovivification';
-requires 'Future::AsyncAwait', '0.36';
-requires 'Mojolicious', '8.32';
-requires 'Data::GUID';
 requires 'Data::Dump';
+requires 'Syntax::Keyword::Try';
+requires 'Safe::Isa';
+requires 'Text::Trim';
+requires 'autovivification';
 requires 'List::AllUtils';
+requires 'Struct::Diff';
+requires 'Data::GUID';
+requires 'Data::GUID::URLSafe';
+requires 'Future::AsyncAwait';
+requires 'Encode::Simple';
+requires 'Unicode::UTF8';
+requires 'CryptX';
 
-on 'test' => sub {
-    requires 'Test::More', '0.98';
-};
+# Testing
+requires 'Test2::V0';
+requires 'Test2::Harness';

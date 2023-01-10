@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::BIP44;
-$Bitcoin::Crypto::BIP44::VERSION = '1.007';
+$Bitcoin::Crypto::BIP44::VERSION = '1.008';
 use v5.10;
 use strict;
 use warnings;

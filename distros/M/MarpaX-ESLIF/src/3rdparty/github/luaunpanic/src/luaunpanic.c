@@ -434,7 +434,6 @@ LUAUNPANIC_ON_VOID_FUNCTION    (luaunpanicL_where,       ,                      
 /* This function needs to be writen explicitly because of the ellipsis ... */
 short luaunpanicL_error (int *rcp, lua_State *L, const char *fmt, ...)
 {
-  luaunpanic_userdata_t *LW;
   va_list                argp;
 
   if (L == NULL) {

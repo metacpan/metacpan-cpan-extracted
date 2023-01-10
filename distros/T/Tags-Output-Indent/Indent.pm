@@ -8,7 +8,7 @@ use Error::Pure qw(err);
 use Indent;
 use Indent::Word;
 use Indent::Block;
-use List::MoreUtils qw(none);
+use List::Util qw(none);
 use Readonly;
 use Tags::Utils qw(encode_attr_entities encode_char_entities);
 use Tags::Utils::Preserve;
@@ -19,7 +19,7 @@ Readonly::Scalar my $LAST_INDEX => -1;
 Readonly::Scalar my $LINE_SIZE => 79;
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.08;
+our $VERSION = 0.10;
 
 # Finalize Tags output.
 sub finalize {
@@ -417,7 +417,9 @@ sub _put_data {
 	}
 
 	# Process data callback.
-	if (none { $_ eq $self->{'printed_tags'}->[0] } @{$self->{'no_data_callback'}}) {
+	if (none { defined $self->{'printed_tags'}->[0] && $_ eq $self->{'printed_tags'}->[0] }
+		@{$self->{'no_data_callback'}}) {
+
 		$self->_process_callback(\@data, 'data_callback');
 	}
 
@@ -798,7 +800,7 @@ L<Error::Pure>,
 L<Indent>,
 L<Indent::Word>,
 L<Indent::Block>,
-L<List::MoreUtils>,
+L<List::Util>,
 L<Readonly>,
 L<Tags::Utils::Preserve>.
 
@@ -832,12 +834,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2011-2022 Michal Josef Špaček
+© 2011-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.10
 
 =cut

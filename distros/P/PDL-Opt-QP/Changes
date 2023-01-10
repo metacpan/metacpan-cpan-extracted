@@ -1,4 +1,12 @@
-Changes for PDL::Opt::QP
+0.29 2023-01-09
+- fix Makefile.PL by including PDL::LinearAlgebra find_libs func
+
+0.28 2023-01-06
+- no changes from 0.27_01
+
+0.27_01 2023-01-05
+- switch build to EUMM
+- use LAPACK routines rather than own obsolete LINPACK ones (still 32-bit)
 
 0.27 - Fri Mar 21 09:10:15 EDT 2014
     Removes MB::Pluggable::Warn64Bit from requires RE#94031

@@ -8,9 +8,9 @@ use Log::ger;
 use Hash::Subset qw(hash_subset);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-24'; # DATE
+our $DATE = '2022-10-07'; # DATE
 our $DIST = 'App-BrowserUtils'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 our %SPEC;
 
@@ -76,6 +76,18 @@ our %browsers = (
             0;
         },
     },
+    brave => {
+        filter => sub {
+            my $p = shift;
+            do { $p->{_note} = "fname looks like brave"; goto FOUND } if $p->{fname} =~ /\A(brave)\z/;
+            goto NOT_FOUND;
+          FOUND:
+            log_trace "Found brave process (PID=%d, cmdline=%s, note=%s)", $p->{pid}, $p->{cmndline}, $p->{_note};
+            return 1;
+          NOT_FOUND:
+            0;
+        },
+    },
 );
 
 our $sch_cmd = ['any*', of=>[ ['array*',of=>'str*',min_len=>1], ['str*'] ]];
@@ -128,6 +140,9 @@ our %argsopt_browser_start = (
     start_vivaldi => {
         schema => 'bool*',
     },
+    start_brave => {
+        schema => 'bool*',
+    },
 );
 
 our %argsopt_browser_restart = (
@@ -141,6 +156,9 @@ our %argsopt_browser_restart = (
         schema => 'bool*',
     },
     restart_vivaldi => {
+        schema => 'bool*',
+    },
+    restart_brave => {
         schema => 'bool*',
     },
 );
@@ -717,7 +735,7 @@ App::BrowserUtils - Utilities related to browsers, particularly modern GUI ones
 
 =head1 VERSION
 
-This document describes version 0.017 of App::BrowserUtils (from Perl distribution App-BrowserUtils), released on 2022-07-24.
+This document describes version 0.018 of App::BrowserUtils (from Perl distribution App-BrowserUtils), released on 2022-10-07.
 
 =head1 SYNOPSIS
 
@@ -980,6 +998,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<quiet> => I<true>
 
+=item * B<restart_brave> => I<bool>
+
 =item * B<restart_chrome> => I<bool>
 
 =item * B<restart_firefox> => I<bool>
@@ -1058,6 +1078,8 @@ Arguments ('*' denotes required arguments):
 =item * B<opera_cmd> => I<array[str]|str> (default: "opera")
 
 =item * B<quiet> => I<true>
+
+=item * B<start_brave> => I<bool>
 
 =item * B<start_chrome> => I<bool>
 
@@ -1203,9 +1225,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

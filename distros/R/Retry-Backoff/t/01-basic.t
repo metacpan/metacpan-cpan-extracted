@@ -66,6 +66,16 @@ subtest "param:on_failure" => sub {
     is($m, 1);
 };
 
+subtest "param:on_final_failure" => sub {
+    my $n = 0;
+    my $m = 0;
+    my $f = 0 ;
+    retry { $n++ < 20 and die } initial_delay=>0.1, on_failure => sub { $m++ }, on_final_failure => sub { $f++ }, max_attempts => 3;
+    is($n, 3);
+    is($m, 3);
+    is($f, 1);
+};
+
 #XXX
 #subtest "param:non_blocking" => sub {
 #};

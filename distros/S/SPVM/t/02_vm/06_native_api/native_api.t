@@ -42,10 +42,10 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
   ok(SPVM::TestCase::NativeAPI->new_object_by_name_exception);
 }
 
-# new_pointer_by_name
+# new_pointer_object_by_name
 {
-  ok(SPVM::TestCase::NativeAPI->new_pointer_by_name);
-  ok(SPVM::TestCase::NativeAPI->new_pointer_by_name_exception);
+  ok(SPVM::TestCase::NativeAPI->new_pointer_object_by_name);
+  ok(SPVM::TestCase::NativeAPI->new_pointer_object_by_name_exception);
 }
 
 {
@@ -327,12 +327,11 @@ ok(SPVM::TestCase::NativeAPI->new_memory_apis);
 
 ok(SPVM::TestCase::NativeAPI->dumpc);
 
-ok(SPVM::TestCase::NativeAPI->pointer_fields);
-
-ok(SPVM::TestCase::NativeAPI->get_pointer_no_need_free);
-ok(SPVM::TestCase::NativeAPI->get_pointer_length);
-
 ok(SPVM::TestCase::NativeAPI->precompile_build_methodd_source);
+
+ok(SPVM::TestCase::NativeAPI->get_compile_type_name);
+
+ok(SPVM::TestCase::NativeAPI->runtime_get_method_is_enum);
 
 # Clear exception
 SPVM::set_exception(undef);

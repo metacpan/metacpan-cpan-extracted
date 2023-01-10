@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Test::Deep::Regexp 1.202;
+package Test::Deep::Regexp 1.204;
 
 use Test::Deep::Cmp;
 use Test::Deep::RegexpMatches;
@@ -113,7 +113,7 @@ Test::Deep::Regexp
 
 =head1 VERSION
 
-version 1.202
+version 1.204
 
 =head1 PERL VERSION
 

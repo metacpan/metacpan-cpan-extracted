@@ -9,7 +9,12 @@ use File::Basename;
 use FASTX::Reader;
 use FASTX::Seq;
 use Data::Dumper;
-
+# The following placeholder is to be programmatically replaced with 'use lib "$RealBin/../lib"' if needed
+#~loclib~
+use FindBin qw($RealBin);
+if ( -e "$RealBin/../lib/Proch/N50.pm" and -e "$RealBin/../Changes" ) {
+    use lib "$RealBin/../lib";
+}
 my $EXE = basename($0);
 use Proch::Seqfu;
 my $VERSION = $Proch::Seqfu::VERSION // "<Dev>";
@@ -40,8 +45,8 @@ foreach my $file (@ARGV) {
 	debug("Reading $file");
 	$file = undef if ($file eq '-');
 	my $FASTX = FASTX::Reader->new({ filename => "$file" });
-  while (my $seq = $FASTX->next() ) {
-	    my $len = length($seq->seq);
+  while (my $seq = $FASTX->getRead() ) {
+	    my $len = length($seq->{seq});
 	    push(@{ $seqs{$len} }, \$seq );
   }
 
@@ -71,15 +76,15 @@ for my $size (sort $sorter keys %seqs ) {
           }
         }
 		# Print sequences
-    my $sep = length($seq->comment()) ? " " : "";
+    my $sep = length($seq->{comment}) ? " " : "";
 		if ( ($opt_fasta) or (not $opt_fastq and not $seq->{qual})) {
       
-			print ">", $seq->name, $sep, $seq->comment, "\n", $seq->seq, "\n";
+			print ">", $seq->{name}, $sep, $seq->{comment}, "\n", $seq->{seq}, "\n";
 		} elsif ( $opt_fastq or (not $opt_fasta and  $seq->{qual}) ) {
 			my $q = $seq->{qual} ? undef : $opt_def_qual;
       my $Q = chr($q + 33);
       my $qualstring = $Q x length($seq->seq);
-			print "@", $seq->name, $sep, $seq->comment, "\n", $seq->seq, "\n+\n", $qualstring, "\n";
+			print "@", $seq->{name}, $sep, $seq->{comment}, "\n", $seq->{seq}, "\n+\n", $qualstring, "\n";
 		} else {
 			debug("What");
 			say Dumper $seq;
@@ -182,7 +187,7 @@ fu-sort - Sort sequences by size
 
 =head1 VERSION
 
-version 1.5.0
+version 1.5.4
 
 =head1 EXAMPLES
 

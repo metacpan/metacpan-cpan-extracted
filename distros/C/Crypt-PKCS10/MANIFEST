@@ -17,6 +17,7 @@ runbrew
 t/0-signature.t
 t/02_base.t
 t/03_ecc.t
+t/04_complex_rdn.t
 t/csr1.cer
 t/csr1.pem
 t/csr2.pem

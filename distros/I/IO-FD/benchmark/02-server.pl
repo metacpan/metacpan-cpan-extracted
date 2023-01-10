@@ -10,6 +10,7 @@ use Socket ":all";
 my $back_log=100;
 my $limit=1000;
 
+$^F=1000;
 
 
 

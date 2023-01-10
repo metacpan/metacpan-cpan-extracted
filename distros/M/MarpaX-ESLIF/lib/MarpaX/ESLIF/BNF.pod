@@ -14,7 +14,7 @@ MarpaX::ESLIF::BNF - MarpaX::ESLIF's BNF
 
 =head1 VERSION
 
-version 6.0.27
+version 6.0.28
 
 =head1 DESCRIPTION
 
@@ -874,17 +874,17 @@ Content of grammar's luascript is always loaded first
 
 =item 2
 
-Lua actions are loaded dynamcally:
+Lua actions are loaded dynamcally and can have two forms:
 
 =over
 
-=item a
+=item C<< ::lua->function >>
 
-The actions starting with C<::lua->function> are always loaded as string, i.e. compiled and then executed
+The actions starting with C<< ::lua->function >> are always loaded as string, i.e. compiled and then executed
 
-=item a
+=item C<< ::luac->function >>
 
-The actions starting with C<::luac->function> are compiled once if needed, and the binary chunk is re-injected as is for execution.
+The actions starting with C<< ::luac->function >> are compiled once if needed, and the binary chunk is re-injected as is for execution.
 
 =back
 
@@ -1191,7 +1191,8 @@ MarpaX::ESLIF BNF can be expressed in itself:
                                    | ':sol'
                                    | ':empty'
                                    | <regular expression>
-  <symbol>                       ::= <symbol name> '->' <regular substitution>
+                                   | <regular expression> '->' <regular substitution>
+  <symbol>                       ::= <symbol name>
   <symbol name>                  ::= <bare name>
                                    | <bracketed name>
   <action name>                  ::= <restricted ascii graph name>

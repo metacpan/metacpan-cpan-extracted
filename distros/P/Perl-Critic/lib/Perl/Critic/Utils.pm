@@ -22,7 +22,7 @@ use Perl::Critic::Utils::PPI qw< is_ppi_expression_or_generic_statement >;
 
 use Exporter 'import';
 
-our $VERSION = '1.146';
+our $VERSION = '1.148';
 
 #-----------------------------------------------------------------------------
 # Exportable symbols here.
@@ -753,12 +753,13 @@ sub is_label_pointer {
 
     my $statement = $elem->statement();
     return if !$statement;
+    return if !$statement->isa('PPI::Statement::Break');
 
     my $psib = $elem->sprevious_sibling();
     return if !$psib;
 
-    return $statement->isa('PPI::Statement::Break')
-        && $psib =~ m/(?:redo|goto|next|last)/xmso;
+    state $redirectors = { hashify( qw( redo goto next last ) ) };
+    return exists $redirectors->{$psib};
 }
 
 #-----------------------------------------------------------------------------
@@ -1334,16 +1335,12 @@ sub _is_fatal {
 
         if ('Fatal' eq $include->module()) {
             my @args = parse_arg_list($include->schild(1));
-            foreach my $arg (@args) {
-                return $TRUE if $arg->[0]->isa('PPI::Token::Quote') && $elem eq $arg->[0]->string();
-            }
+            return $TRUE if any { $_->[0]->isa('PPI::Token::Quote') && $elem eq $_->[0]->string() } @args;
         }
         elsif ('Fatal::Exception' eq $include->module()) {
             my @args = parse_arg_list($include->schild(1));
             shift @args;  # skip exception class name
-            foreach my $arg (@args) {
-                return $TRUE if $arg->[0]->isa('PPI::Token::Quote') && $elem eq $arg->[0]->string();
-            }
+            return $TRUE if any { $_->[0]->isa('PPI::Token::Quote') && $elem eq $_->[0]->string() } @args;
         }
         elsif ($include->pragma eq 'autodie' || any {$_ eq $include->module()} @{$autodie_modules || []}) {
             return _is_covered_by_autodie($elem, $include);
@@ -1365,13 +1362,14 @@ sub _is_covered_by_autodie {
     if ($first_arg and $first_arg->isa('PPI::Token::Number')){ shift @args };
 
     if (@args) {
+        my $elem_content = $elem->content();
         foreach my $arg (@args) {
             my $builtins =
                 $AUTODIE_PARAMETER_TO_AFFECTED_BUILTINS_MAP{
                     $arg->[0]->string
                 };
 
-            return $TRUE if $builtins and $builtins->{$elem->content()};
+            return $TRUE if $builtins and $builtins->{$elem_content};
         }
     }
     else {
@@ -1994,7 +1992,7 @@ Jeffrey Ryan Thalhammer <jeff@imaginative-software.com>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2005-2021 Imaginative Software Systems
+Copyright (c) 2005-2023 Imaginative Software Systems
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.  The full text of this license

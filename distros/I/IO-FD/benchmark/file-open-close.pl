@@ -7,6 +7,7 @@ use POSIX;
 use Benchmark qw<cmpthese>;
 
 use Fcntl;
+$^F=1000;
 my $filename=IO::FD::mktemp("/tmp/emptyfileXXXXXXXXX");
 `touch $filename`;
 

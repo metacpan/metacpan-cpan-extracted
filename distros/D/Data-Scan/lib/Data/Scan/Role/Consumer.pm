@@ -6,7 +6,7 @@ use Moo::Role;
 
 # ABSTRACT: Data::Scan consumer role
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -32,7 +32,7 @@ Data::Scan::Role::Consumer - Data::Scan consumer role
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 DESCRIPTION
 

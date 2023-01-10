@@ -1,6 +1,6 @@
-#!/usr/bin/perl -w
+use v5.12.0;
+use warnings;
 
-use strict;
 use Test::More tests => 3;
 
 use_ok( 'Email::Simple' );

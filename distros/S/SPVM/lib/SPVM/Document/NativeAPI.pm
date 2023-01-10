@@ -215,30 +215,30 @@ Native APIs have its IDs. These IDs are permanently same for the binary compatib
   198 get_args_stack_length
   199 set_args_stack_length
   200 dumpc
-  201 new_pointer_with_fields
-  202 new_pointer_with_fields_raw
-  203 new_pointer_with_fields_by_name
-  204 get_pointer_no_need_free
-  205 set_pointer_no_need_free
-  206 get_pointer_length
-  207 set_pointer_length
+  201 new_pointer_object_raw
+  202 new_pointer_object
+  203 new_pointer_object_by_name
+  204 reserved204
+  205 reserved205
+  206 reserved206
+  207 reserved207
   208 is_class
   209 is_pointer_class
-  210 get_pointer_fields_length
-  211 get_pointer_field_byte
-  212 get_pointer_field_short
-  213 get_pointer_field_int
-  214 get_pointer_field_long
-  215 get_pointer_field_float
-  216 get_pointer_field_double
-  217 get_pointer_field_pointer
-  218 set_pointer_field_byte
-  219 set_pointer_field_short
-  220 set_pointer_field_int
-  221 set_pointer_field_long
-  222 set_pointer_field_float
-  223 set_pointer_field_double
-  224 set_pointer_field_pointer
+  210 reserved201
+  211 reserved211
+  212 reserved212
+  213 reserved213
+  214 reserved214
+  215 reserved215
+  216 reserved216
+  217 reserved217
+  218 reserved218
+  219 reserved219
+  220 reserved220
+  221 reserved221
+  222 reserved222
+  223 reserved223
+  224 reserved224
   225 strerror_string
   226 get_basic_type_id_by_name
   227 get_field_id_static
@@ -247,6 +247,8 @@ Native APIs have its IDs. These IDs are permanently same for the binary compatib
   230 get_method_id
   231 strerror_nolen
   232 strerror_string_nolen
+  233 get_compile_type_name_raw
+  234 get_compile_type_name
 
 =head2 class_vars_heap
 
@@ -650,19 +652,15 @@ Examples:
 
   void* (*new_pointer_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, void* pointer);
 
-Creates a pointer type object by specifying a basic type ID and a C language pointer. The basic type ID must be the correct basic type ID got by C<get_basic_type_id> function.
+Creates a pointer object by specifying a basic type ID and a C language pointer. The basic type ID must be the correct basic type ID got by C<get_basic_type_id> function.
+
+The same as the L</"new_pointer_raw">, but this is deprecagted and will be removed.
 
 =head2 new_pointer
 
   void* (*new_pointer)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, void* pointer);
 
-The same as L</"new_pointer_raw">, and push the created object to the mortal stack. Use this function in normal use instead of C<new_pointer_raw>.
-
-Examples:
-
-  int32_t basic_type_id = env->get_basic_type_id(env, "MyTime");
-  void* pointer = malloc(sizeof (struct tm));
-  void* pointer_obj = env->new_pointer(env, stack, basic_type_id, pointer);
+The same as the L</"new_pointer_object">, but this is deprecagted and will be removed.
 
 =head2 concat_raw
 
@@ -1110,7 +1108,7 @@ Examples:
 
   void* (*get_pointer)(SPVM_ENV* env, SPVM_VALUE* stack, void* pointer_object);
 
-Specifies a pointer type object and return the C language pointer stored inside the object.
+Specifies a pointer object and return the C language pointer stored inside the object.
 
 Examples:
 
@@ -1120,7 +1118,7 @@ Examples:
 
   void (*set_pointer)(SPVM_ENV* env, SPVM_VALUE* stack, void* pointer_object, void* pointer);
 
-If you specify a pointer type object and a C language pointer, the C language pointer is saved in the internal data of the pointer type object.
+If you specify a pointer object and a C language pointer, the C language pointer is saved in the internal data of the pointer type object.
 
 =head2 call_method
 
@@ -1276,15 +1274,15 @@ Returns the count of the memory blocks on the environment.
 
   void* (*get_type_name_raw)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
 
-If you specify an object, a new byte[] type object that stores the type name is returned.
+Gets a new C<string> object that is the type name of the object.
 
-This function does not add objects to the mortal stack, so use type_name for normal use to avoid memory leaks.
+This function does not add the returned object to the mortal stack, so use the L<get_type_name> Native API for normal use to avoid memory leaks.
 
 =head2 get_type_name
 
   void* (*get_type_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
 
-If you specify an object, a new byte[] type object that stores the type name is returned. Add the newly created object to the mortal stack.
+Gets a new C<string> object that is the type name of the object.
 
 =head2 new_env
 
@@ -1320,7 +1318,7 @@ Unused from v0.9508+. The count of memory blocks is managed in L<"runtime">.
 
   const char* (*get_chars)(SPVM_ENV* env, SPVM_VALUE* stack, void* string_object);
 
-Gets characters pointer in the string object.
+Gets characters in the string object.
 
 Examples:
 
@@ -1358,13 +1356,7 @@ Examples:
 
   void* (*new_pointer_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, void* pointer, int32_t* error, const char* file, int32_t line);
 
-This is same as L</"new_pointer"> function, but you can specify class name directly.
-
-If function is succeeded, C<error> is set to 0. If a exception occurs, C<error> is set to 1. 
-
-  int32_t e;
-  void* minimal = env->new_pointer_by_name(env, stack, "TestCase::Pointer", pointer, &e, __FILE__, __LINE__);
-  if (e) { return e; }
+The same as the L</"new_pointer_object_by_name">, but this is deprecagted and will be removed.
 
 =head2 set_field_byte_by_name
 
@@ -1891,7 +1883,7 @@ Examples:
 
 =head2 cleanup_global_vars
   
-  void (*cleanup_global_vars)(SPVM_ENV* env, SPVM_VALUE* stack);
+  void (*cleanup_global_vars)(SPVM_ENV* env);
 
 Cleanup gloval variable, such as class variables and the exception variable.
 
@@ -2081,7 +2073,7 @@ Returns the count of the memory blocks on the stack.
 
 =head2 set_command_info_program_name
 
-  int32_t (*set_command_info_program_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* obj_program_name);
+  int32_t (*set_command_info_program_name)(SPVM_ENV* env, void* obj_program_name);
 
 Sets the program name. This value is got by L<CommandInfo->PROGRAM_NAME|SPVM::CommandInfo/"PROGRAM_NAME">.
 
@@ -2091,7 +2083,7 @@ The program name must be a C<string> object. Otherwise return non-zero value.
 
 =head2 set_command_info_argv
 
-  int32_t (*set_command_info_argv)(SPVM_ENV* env, SPVM_VALUE* stack, void* obj_argv);
+  int32_t (*set_command_info_argv)(SPVM_ENV* env, void* obj_argv);
 
 Sets the argv. This value is got by L<CommandInfo->ARGV|SPVM::CommandInfo/"ARGV">.
 
@@ -2143,23 +2135,35 @@ The alias for the following code using L</"dump">.
 
   const char* ret = env->get_chars(env, stack, SPVM_API_dump(env, stack, object));
 
-=head2 new_pointer_with_fields_raw
+=head2 new_pointer_object_raw
 
-  void* (*new_pointer_with_fields_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, void* pointer, int32_t fields_length);
-  
-Creates a pointer type object by specifying a basic type ID and a C language pointer with the length of the pointer fields. The basic type ID must be the correct basic type ID got by C<get_basic_type_id> function.
+  void* (*new_pointer_object_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, void* pointer);
 
-=head2 new_pointer_with_fields
+Creates a pointer object by specifying a basic type ID and a C language pointer. The basic type ID must be the correct basic type ID got by C<get_basic_type_id> function.
 
-  void* (*new_pointer_with_fields)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, void* pointer, int32_t fields_length);
+=head2 new_pointer_object
 
-The same as L</"new_pointer_with_fields_raw">, and push the created object to the mortal stack using L</"push_mortal"> function.
+  void* (*new_pointer_object)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, void* pointer);
 
-=head2 new_pointer_with_fields_by_name
+The same as L</"new_pointer_raw">, and push the created object to the mortal stack. Use this function in normal use instead of C<new_pointer_raw>.
 
-  void* (*new_pointer_with_fields_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, void* pointer, int32_t fields_length, int32_t* error, const char* file, int32_t line);
+Examples:
 
-This is same as L</"new_pointer_with_fields"> function, but you can specify class name directly.
+  int32_t basic_type_id = env->get_basic_type_id(env, "MyTime");
+  void* pointer = malloc(sizeof (struct tm));
+  void* pointer_obj = env->new_pointer(env, stack, basic_type_id, pointer);
+
+=head2 new_pointer_object_by_name
+
+  void* (*new_pointer_object_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, void* pointer, int32_t* error, const char* file, int32_t line);
+
+This is same as L</"new_pointer"> function, but you can specify class name directly.
+
+If function is succeeded, C<error> is set to 0. If a exception occurs, C<error> is set to 1. 
+
+  int32_t e;
+  void* minimal = env->new_pointer_by_name(env, stack, "TestCase::Pointer", pointer, &e, __FILE__, __LINE__);
+  if (e) { return e; }
 
 =head2 is_class
 
@@ -2176,120 +2180,6 @@ If the object is C<NULL>, returns C<0>.
 If the object is a instance of a pointer class, returns C<1>, otherwise returns C<0>.
 
 If the object is C<NULL>, returns C<0>.
-
-=head2 get_pointer_fields_length
-
-  int32_t (*get_pointer_fields_length)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
-
-Gets the length of the pointer fields.
-
-=head2 get_pointer_field_byte
-
-  int8_t (*get_pointer_field_byte)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index);
-
-Gets the C<byte> value of a pointer field with the field index.
-
-=head2 get_pointer_field_short
-
-  int16_t (*get_pointer_field_short)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index);
-
-Gets the C<short> value of a pointer field with the field index.
-
-=head2 get_pointer_field_int
-
-  int32_t (*get_pointer_field_int)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index);
-
-Gets the C<int> value of a pointer field with the field index.
-
-=head2 get_pointer_field_long
-
-  int64_t (*get_pointer_field_long)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index);
-
-Gets the C<long> value of a pointer field with the field index.
-
-=head2 get_pointer_field_float
-
-  float (*get_pointer_field_float)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index);
-
-Gets the C<float> value of a pointer field with the field index.
-
-=head2 get_pointer_field_double
-
-  double (*get_pointer_field_double)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index);
-
-Gets the C<double> value of a pointer field with the field index.
-
-=head2 get_pointer_field_pointer
-
-  void* (*get_pointer_field_pointer)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index);
-
-Gets the pointer value of a pointer field with the field index.
-
-=head2 set_pointer_field_byte
-
-  void (*set_pointer_field_byte)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index, int8_t value);
-
-Sets the C<byte> value of a pointer field with the field index.
-
-=head2 set_pointer_field_short
-
-  void (*set_pointer_field_short)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index, int16_t value);
-
-Sets the C<short> value of a pointer field with the field index.
-
-=head2 set_pointer_field_int
-
-  void (*set_pointer_field_int)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index, int32_t value);
-
-Sets the C<int> value of a pointer field with the field index.
-
-=head2 set_pointer_field_long
-
-  void (*set_pointer_field_long)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index, int64_t value);
-
-Sets the C<long> value of a pointer field with the field index.
-
-=head2 set_pointer_field_float
-
-  void (*set_pointer_field_float)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index, float value);
-
-Sets the C<float> value of a pointer field with the field index.
-
-=head2 set_pointer_field_double
-
-  void (*set_pointer_field_double)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index, double value);
-
-Sets the C<double> value of a pointer field with the field index.
-
-=head2 set_pointer_field_pointer
-
-  void (*set_pointer_field_pointer)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t field_index, void* value);
-
-Sets the pointer value of a pointer field with the field index.
-
-=head2 get_pointer_no_need_free
-
-  void (*get_pointer_no_need_free)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
-
-Sets s the the flag that indicates that the pointer set by L</"set_pointer"> doesn't need to be freed.
-
-=head2 set_pointer_no_need_free
-
-  void (*set_pointer_no_need_free)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t flag);
-
-Gets the the flag that indicates that the pointer set by L</"set_pointer"> doesn't need to be freed.
-
-=head2 get_pointer_length
-
-  int32_t (*get_pointer_length)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
-
-Gets the length of the array set by L</"set_pointer">. The default value is C<0>.
-
-=head2 set_pointer_length
-
-  void (*set_pointer_length)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, int32_t length);
-
-Sets s the length of the array set by L</"set_pointer">. It is useful when the data is the pointer to an array.
 
 =head2 strerror_string
 
@@ -2369,6 +2259,20 @@ The same as L</"strerror"> given the length to C<0>.
   void* (*strerror_string_nolen)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_value);
 
 The same as L</"strerror_string"> given the length to C<0>.
+
+=head2 get_compile_type_name_raw
+
+  void* (*get_compile_type_name_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t type_dimension, int32_t type_flag);
+
+Gets a new C<string> object that is the compile-time type name with a basic type id, a type dimension, a type flag.
+
+This function does not add the returned object to the mortal stack, so use the L<get_compile_type_name> Native API for normal use to avoid memory leaks.
+
+=head2 get_compile_type_name
+
+  void* (*get_compile_type_name)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t type_dimension, int32_t type_flag);
+
+Gets a new C<string> object that is the compile-time type name with a basic type id, a type dimension, a type flag.
 
 =head1 Compiler Native API
 
@@ -2557,6 +2461,13 @@ The basic type category for the interface types.
 =head3 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_ANY_OBJECT
 
 The basic type category for the any object type.
+
+=head2 Type Flags
+
+  1 SPVM_NATIVE_C_TYPE_FLAG_REF
+  2 SPVM_NATIVE_C_TYPE_FLAG_MUTABLE
+
+The type flags.
 
 =head2 Class IDs
 

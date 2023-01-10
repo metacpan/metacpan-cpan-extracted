@@ -1,6 +1,7 @@
-package Test::Routine::Test;
+use v5.12.0;
+package Test::Routine::Test 0.030;
 # ABSTRACT: a test method in a Test::Routine role
-$Test::Routine::Test::VERSION = '0.029';
+
 use Moose;
 extends 'Moose::Meta::Method';
 
@@ -28,7 +29,7 @@ Test::Routine::Test - a test method in a Test::Routine role
 
 =head1 VERSION
 
-version 0.029
+version 0.030
 
 =head1 OVERVIEW
 

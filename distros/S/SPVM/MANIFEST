@@ -58,6 +58,8 @@ lib/SPVM/Builder.pm
 lib/SPVM/Builder/API.pm
 lib/SPVM/Builder/CC.pm
 lib/SPVM/Builder/CompileInfo.pm
+lib/SPVM/Builder/Compiler.pm
+lib/SPVM/Builder/Compiler/Util.pm
 lib/SPVM/Builder/Config.pm
 lib/SPVM/Builder/Config/Exe.pm
 lib/SPVM/Builder/Exe.pm
@@ -663,6 +665,7 @@ t/02_vm/lib/SPVM/TestCase/Module/Array.spvm
 t/02_vm/lib/SPVM/TestCase/Module/Bool.spvm
 t/02_vm/lib/SPVM/TestCase/Module/Byte.spvm
 t/02_vm/lib/SPVM/TestCase/Module/ByteList.spvm
+t/02_vm/lib/SPVM/TestCase/Module/CommandInfo.spvm
 t/02_vm/lib/SPVM/TestCase/Module/Double.spvm
 t/02_vm/lib/SPVM/TestCase/Module/DoubleList.spvm
 t/02_vm/lib/SPVM/TestCase/Module/Float.spvm
@@ -725,9 +728,6 @@ t/02_vm/lib/SPVM/TestCase/Pointer.config
 t/02_vm/lib/SPVM/TestCase/Pointer.spvm
 t/02_vm/lib/SPVM/TestCase/PointerChild.spvm
 t/02_vm/lib/SPVM/TestCase/PointerEmpty.spvm
-t/02_vm/lib/SPVM/TestCase/PointerNoNeedFree.c
-t/02_vm/lib/SPVM/TestCase/PointerNoNeedFree.config
-t/02_vm/lib/SPVM/TestCase/PointerNoNeedFree.spvm
 t/02_vm/lib/SPVM/TestCase/PointForTest.spvm
 t/02_vm/lib/SPVM/TestCase/PointInterface.spvm
 t/02_vm/lib/SPVM/TestCase/Precedence.spvm

@@ -81,6 +81,7 @@ t/lib/Std.pm
 t/listmethods.t
 t/memory.t
 t/methods.t
+t/no-clobber-globals.t
 t/none.t
 t/notest.t
 t/notest_extra.t

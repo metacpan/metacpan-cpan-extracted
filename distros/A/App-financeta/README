@@ -1,34 +1,74 @@
 NAME
+
     App::financeta
 
 SYNOPSIS
-    App::financeta is an application that does Technical Analysis for stocks.
+
+    App::financeta is a high level module that uses App::financeta::gui and
+    invokes it as an application. It handles command line processing of
+    financeta.
 
 VERSION
-    0.10
 
-DESCRIPTION
+    0.11
 
-    The documentation is detailed at http://vikasnkumar.github.io/financeta/
+    DESCRIPTION
 
-    The github repository is at https://github.com/vikasnkumar/financeta.git
+    The documentation is detailed at
+    http://vikasnkumar.github.io/financeta/
+
+    The github repository is at
+    https://github.com/vikasnkumar/financeta.git
+
+METHODS
+
+    run
+
+      This function starts the graphical user interface (GUI) and parses
+      command line arguments. It invokes App::financeta::gui.
+
+    print_warning
+
+      This function prints license and disclaimer to STDERR.
 
 SEE ALSO
-    PDL::Finance::TA
-        This module will be used to add technical analysis to the charts.
 
     App::financeta::gui
-        This module just manages everything under the hood.
+
+      This is the GUI internal details being used by App::financeta.
 
     financeta
-        The commandline script that calls `App::financeta'.
+
+      The commandline script that calls App::financeta.
+
+DEPENDENCIES FOR DEVELOPERS
+
+    Linux
+
+      For Linux, such as Debian/Ubuntu based systems like Debian Bullseye
+      or Ubuntu 20.04 LTS, you want the following packages installed:
+
+          libheif-dev libwebp-dev libxpm-dev libgtk-3-dev libgtkmm-3.0-dev libpng-dev libjpeg-dev libtiff-dev gnuplot
+
+      Then you build Prima, PDL, PDL::Graphics::Gnuplot,
+      PDL::Graphics::Simple, Mo, IO::All.
+
+    Windows
+
+      For Windows you need Strawberry Perl installed and install Prima,
+      PDL, PDL::Graphics::Prima, PDL::Graphics::Gnuplot,
+      PDL::Graphics::Simple.
+
+      You may want to install Gnuplot from their website.
 
 COPYRIGHT
-    Copyright (C) 2013-2014. Vikas N Kumar <vikas@cpan.org>. All Rights
+
+    Copyright (C) 2013-2023. Vikas N Kumar <vikas@cpan.org>. All Rights
     Reserved.
 
 LICENSE
+
     This is free software. You can redistribute it or modify it under the
-    terms of GNU General Public License version 3. Refer LICENSE file in the
-    top level source directory for more information.
+    terms of GNU General Public License version 3. Refer LICENSE file in
+    the top level source directory for more information.
 

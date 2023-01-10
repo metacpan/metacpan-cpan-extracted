@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-20'; # DATE
+our $DATE = '2023-01-10'; # DATE
 our $DIST = 'App-BPOMUtils-NutritionFacts'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/NutritionFacts/bpom_show_nutrition_facts",
@@ -38,7 +38,7 @@ bpom-tampilkan-ing - Round values and format them as nutrition fact table (ING -
 
 =head1 VERSION
 
-This document describes version 0.015 of bpom-tampilkan-ing (from Perl distribution App-BPOMUtils-NutritionFacts), released on 2022-12-20.
+This document describes version 0.016 of bpom-tampilkan-ing (from Perl distribution App-BPOMUtils-NutritionFacts), released on 2023-01-10.
 
 =head1 SYNOPSIS
 
@@ -257,7 +257,7 @@ Default value:
 
 Valid values:
 
- ["raw_table","vertical_html_table","vertical_text_table","linear_html","linear_text"]
+ ["raw_table","vertical_html_table","vertical_text_table","linear_html","linear_text","calculation_html","calculation_text"]
 
 =item B<--page-result>
 
@@ -401,11 +401,11 @@ String. Specify additional command-line options.
  % bpom-tampilkan-ing --carbohydrate 13.113 --fat 0.223 --output-format vertical_html_table --package-size 20 --protein 0.99 --saturated-fat 0.01 --serving-size 175 --sodium 0.223 --sugar 7.173
  
  <style>
-   table { border-collapse: collapse; border: 1px solid; }
-   tr.has_bottom_border { border-bottom: 1pt solid black; }
+   table.vertical_html_table { border-collapse: collapse; border: 1px solid; }
+   tr.vertical_html_table.has_bottom_border { border-bottom: 1pt solid black; }
    // td:first-child { background: red; }
  </style>
- <table><colgroup><col style="width:16pt;"><col style="width:200pt;"><col style="width:48pt;"><col style="width:48pt;"><col style="width:36pt;"></colgroup>
+ <table class="vertical_html_table"><colgroup><col style="width:16pt;"><col style="width:200pt;"><col style="width:48pt;"><col style="width:48pt;"><col style="width:36pt;"></colgroup>
  <tr><td colspan=5 align="middle"><b>INFORMASI NILAI GIZI</b></td></tr>
  <tbody>
  <tr><td colspan=5></td></tr>
@@ -476,7 +476,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -32,7 +32,9 @@ do { my $x = {
                                       'Test::Pod::No404s' => '0',
                                       'Test::Portability::Files' => '0',
                                       'Test::Spelling' => '0.12',
-                                      'Test::Warnings' => '0'
+                                      'Test::Warnings' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
                                     }
                     },
        'runtime' => {
@@ -54,8 +56,7 @@ do { my $x = {
                                       'if' => '0',
                                       'namespace::clean' => '0',
                                       'perl' => '5.020',
-                                      'strict' => '0',
-                                      'warnings' => '0'
+                                      'strictures' => '2'
                                     },
                       'suggests' => {
                                       'Cpanel::JSON::XS' => '0',
@@ -83,7 +84,9 @@ do { my $x = {
                                    'lib' => '0',
                                    'open' => '0',
                                    'perl' => '5.020',
-                                   'utf8' => '0'
+                                   'strict' => '0',
+                                   'utf8' => '0',
+                                   'warnings' => '0'
                                  }
                  },
        'x_Dist_Zilla' => {

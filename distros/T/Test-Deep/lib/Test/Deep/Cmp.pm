@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Test::Deep::Cmp 1.202;
+package Test::Deep::Cmp 1.204;
 
 use overload
   '&' => \&make_all,
@@ -117,7 +117,7 @@ Test::Deep::Cmp
 
 =head1 VERSION
 
-version 1.202
+version 1.204
 
 =head1 PERL VERSION
 

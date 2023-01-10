@@ -1,12 +1,13 @@
 use strict;
 use warnings;
 
-package Foo {
-    use Test::Deep::NoTest;
+{
+  package Foo;
+  use Test::Deep::NoTest;
 
-    sub check_this {
-        return eq_deeply($_[1], []);
-    }
+  sub check_this {
+      return eq_deeply($_[1], []);
+  }
 }
 
 use Test::More 0.88;

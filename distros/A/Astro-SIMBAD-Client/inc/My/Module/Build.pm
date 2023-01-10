@@ -6,7 +6,7 @@ use warnings;
 use Module::Build;
 our @ISA = qw{ Module::Build };
 
-our $VERSION = '0.046';
+our $VERSION = '0.047';
 
 use Carp;
 
@@ -17,7 +17,12 @@ sub ACTION_authortest {
 ##  my ( $self, @args ) = @_;	# Arguments unused
     my ( $self ) = @_;
 
-    $self->depends_on( qw{ functional_test optionals_test structural_test } );
+    $self->depends_on( qw{
+	functional_test
+	entities_test
+	optionals_test
+	structural_test
+    } );
 
     return;
 }
@@ -33,6 +38,30 @@ sub ACTION_functional_test {
 
 functional_test
 AUTHOR_TESTING=1
+EOD
+
+    # Not depends_on(), because that is idempotent. But we really do
+    # want to run 'test' more than once if we do more than one of the
+    # *_test actions.
+    $self->dispatch( 'test' );
+
+    return;
+}
+
+sub ACTION_entities_test {
+    my ( $self ) = @_;
+
+    my $optionals = join ',', qw{ XML::DoubleEncodedEntities };
+    local $ENV{AUTHOR_TESTING} = 1;
+    local $ENV{PERL5OPT} = "-MTest::Without::Module=$optionals";
+
+    $self->my_depends_on();
+
+    print <<"EOD";
+
+entities_test
+AUTHOR_TESTING=1
+PERL5OPT=-MTest::Without::Module=$optionals
 EOD
 
     # Not depends_on(), because that is idempotent. But we really do
@@ -205,7 +234,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2021 by Thomas R. Wyant, III
+Copyright (C) 2009-2023 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

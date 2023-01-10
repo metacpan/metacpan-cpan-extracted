@@ -27,26 +27,24 @@ my $listbox = UI::Various::Listbox->new(texts => \@list, height => 5,
 # return of $main->mainloop will (usually) not be visible, but may
 # completely garble your output (by moving the cursor)!
 
-my $window;			# must be declared before the sub using it!
-$window =
-    $main->window({title => 'Listbox', width => 20, height => 12},
-		  $listbox,
-		  UI::Various::Button->new
-		  (text => 'Add Entry',
-		   code => sub{   $listbox->add('entry #' . $next_id++);   }),
-		  UI::Various::Button->new
-		  (text => 'Remove 2nd',
-		   code => sub{   $listbox->remove(1);   }),
-		  UI::Various::Button->new
-		  (text => 'Quit',
-		   code => sub{
-		       local $_;
-		       # Note that Curses needs "\r\n":
-		       print STDERR "Selection (after $counter changes):\r\n";
-		       print STDERR "\t$_\t$list[$_]\r\n"
-			   foreach $listbox->selected;
-		       $window->destroy;
-		   }));
+$main->window({title => 'Listbox', width => 20, height => 12},
+	      $listbox,
+	      UI::Various::Button->new
+	      (text => 'Add Entry',
+	       code => sub{   $listbox->add('entry #' . $next_id++);   }),
+	      UI::Various::Button->new
+	      (text => 'Remove 2nd',
+	       code => sub{   $listbox->remove(1);   }),
+	      UI::Various::Button->new
+	      (text => 'Quit',
+	       code => sub{
+		   local $_;
+		   # Note that Curses needs "\r\n":
+		   print STDERR "Selection (after $counter changes):\r\n";
+		   print STDERR "\t$_\t$list[$_]\r\n"
+		       foreach $listbox->selected;
+		   $_[0]->destroy;
+	       }));
 $main->mainloop;
 
 #########################################################################

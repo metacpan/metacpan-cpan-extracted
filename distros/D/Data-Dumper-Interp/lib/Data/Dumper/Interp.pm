@@ -14,10 +14,12 @@
 
 ##FIXME: Blessed structures are not formatted because we treat bless(...) as an atom
 
-use strict; use warnings FATAL => 'all'; use utf8; use 5.020;
-use feature qw(say state);
+use strict; use warnings FATAL => 'all'; use utf8; 
+use 5.020; 
+use feature qw(say state lexical_subs);
+use feature 'lexical_subs'; no warnings "experimental::lexical_subs";
 package  Data::Dumper::Interp;
-$Data::Dumper::Interp::VERSION = '3.3';
+$Data::Dumper::Interp::VERSION = '3.8';
 
 package  # newline prevents Dist::Zilla::Plugin::PkgVersion from adding $VERSION
   DB;
@@ -265,10 +267,17 @@ sub __set_default_Foldwidth() {
   } else {
     local *_; # Try to avoid clobbering special filehandle "_"
     # Does not yet work, see https://github.com/Perl/perl5/issues/19142
+    
+    # Suppress hard-coded "didn't work" warning from Term::ReadKey when
+    # the terminal size can not be determined via any method
+    my $wmsg = "";
+    local $SIG{'__WARN__'} = sub { $wmsg .= $_[0] };
     my ($width, $height) = Term::ReadKey::GetTerminalSize(
       -t STDERR ? *STDERR : -t STDOUT ? *STDOUT
       : do{my $fh; for("/dev/tty",'CONOUT$') { last if open $fh, $_ } $fh}
     );
+    warn $wmsg if $wmsg && $wmsg !~ /did.*n.*work/i;
+
     if (($Foldwidth = $width)) {
       say "Default Foldwidth=$Foldwidth from Term::ReadKey" if $Debug;
     } else {
@@ -286,7 +295,7 @@ my $COPY_NEEDED = "_CN_$unique";
 sub __COPY_NEEDED() { $COPY_NEEDED }
 
 sub _doedits {
-  my $self = shift;
+  my $self = shift; oops unless @_ == 5;
   my ($item, $testonly, $maxstringwidth, $truncsuf, $overloads) = @_;
   return undef
     unless defined($item);
@@ -433,7 +442,7 @@ sub Dump {
 #
 # Substitute values may not use tied variables or overloads because the
 # copy-and-substitute process may cause tie handlers to encounter unexpected
-# data, and misbehave.  The copy machinery re-creates all refs so as to
+# data and misbehave.  The copy machinery re-creates all refs so as to
 # disable any overloads initially present; if the virtual content behind an
 # overload is desired, the callback must perform the overloaded operation(s) 
 # and return the virtual content as a substition value.
@@ -516,32 +525,47 @@ sub __copysubst($$;$$) {
   $item
 }#__copysubst
 
-sub _show_as_number(_) { 
-  # Derived from JSON::PP version 4.02, except for the Overloaded stuff
+sub _show_as_number(_) {
   my $value = shift;
-  return unless defined $value;
-  # if the utf8 flag is on, it almost certainly started as a string
-  return if utf8::is_utf8($value);
 
-  no warnings 'numeric';
-  # detect numbers
-  # string & "" -> ""
-  # number & "" -> 0 (with warning)
-  # nan and inf can detect as numbers, so check with * 0
+  # IMPORTANT: We must not do any numeric ops or comparisions
+  # on $value because that may set some magic which defeats our attempt 
+  # to try bitstring unary & below (after a numeric compare, $value is 
+  # apparently assumed to be numeric even if it is/was a "string").
   
-  # An exception will occur if $value is an object which does not overload 
-  # these operators.  Catch and ignore.
-  my $result = eval {
-    return unless length((my $dummy = "") & $value);
-    return unless 0 + $value eq $value;
-    return 1 if $value * 0 == 0;
-    return -1; # inf/nan
+  return 0 if !defined $value;
+
+  # if the utf8 flag is on, it almost certainly started as a string
+  return 0 if !ref($value) && utf8::is_utf8($value);
+
+  return 0 unless looks_like_number($value);
+
+  # JSON::PP uses these tricks.  We used to do that but no longer.
+  # string & "" -> ""  # bitstring AND, truncating to shortest operand
+  # number & "" -> 0 (with warning)
+  # number * 0 -> 0 unless number is nan or inf
+
+  # Attempt uniary & and see what happens
+  my $and_result = eval { 
+    use warnings "FATAL" => "all"; # Convert warnings into exceptions
+    # 'bitwise' is the default only in newer perls. So disable.
+    no feature 'bitwise';
+    no warnings "experimental::bitwise", "once";
+    my $dummy = ($value & "");
   };
   if ($@) {
-    oops unless $@ =~ /overload/i;
-    return;
+    die "bug($@) ",_dbvis($value) unless $@ =~ /"" isn't numeric/;
+    #say "DD (",_dbvis($value),"): Got $@ ...so must be numeric";
+    return 1;  # value must be numeric
+  } 
+  elsif (ref($and_result) && $and_result =~ /NaN|Inf/) {
+    # unary & returned a an object representing Nan or Inf 
+    # (e.g. Math::BigFloat) so $value must be numberish.
+    return 1;
   }
-  $result
+  else {
+    return 0;  # (value & "") succeeded so value must be stringy
+  }
 }
 
 # Split keys into "components" (e.g. 2_16.A has 3 components) and sort

@@ -6,21 +6,33 @@ Form::Tiny::Manual::Performance - validation performance tips
 
 =head1 DESCRIPTION
 
-Form::Tiny is a pretty fast validation framework (L<benchmark|https://bbrtj.eu/blog/article/validation-frameworks-benchmark>), but when the need arise, certain steps can be taken to improve it even further.
+Form::Tiny is a pretty fast validation framework
+(L<benchmark|https://bbrtj.eu/blog/article/validation-frameworks-benchmark>),
+but when the need arise, certain steps can be taken to improve it even further.
 
 =head1 THINGS THAT SLOW THE MODULE DOWN
 
 =head2 Inline forms
 
-The module gives you an option to create inline forms - without the need to set up a dedicated form class. While the inline style does not give you full capabilities of the regular form, it also is slow to instantiate, because it has to re-create its metamodel object everytime form constructor is called. Creating a dedicated package for a form will ensure that metamodel object will only be created one time in script runtime.
+The module gives you an option to create inline forms - without the need to set
+up a dedicated form class. While the inline style does not give you full
+capabilities of the regular form, it also is slow to instantiate, because it
+has to re-create its metamodel object everytime form constructor is called.
+Creating a dedicated package for a form will ensure that metamodel object will
+only be created one time in script runtime.
 
 =head2 Strict mode
 
-Strict mode is a nice addition that causes the module to identify any extra data in the input (not mentioned in the form definition) as an error. It is enabled with an import flag:
+Strict mode is a nice addition that causes the module to identify any extra
+data in the input (not mentioned in the form definition) as an error. It is
+enabled with an import flag:
 
 	use Form::Tiny -strict;
 
-While it may come useful, it is often unnecessary. The module already does not copy any extra data from input to output fields, so you don't have to worry about it at all - it will simply get ignored. Enabling strict mode reduces the performance of the module by about 50%:
+While it may come useful, it is often unnecessary. The module already does not
+copy any extra data from input to output fields, so you don't have to worry
+about it at all - it will simply get ignored. Enabling strict mode reduces the
+performance of the module by about 50%:
 
 
 	Parsing 100 hash references in an array
@@ -33,13 +45,23 @@ While it may come useful, it is often unnecessary. The module already does not c
 
 =head2 Flat forms
 
-Form::Tiny has a built in condition that allows it to optimize form validation when the form is "flat": no fields are nested or dynamic. If you can avoid having nested fields (fields with a dot, like C<hashref.key> or C<arrayref.*>) or dynamic fields (fields which are constructed by a sub) in you form, validation speed will be increased by up to 70%. The module can then completely skip searching for the field in the input structure and simply use its name as a key in the input hash reference.
+Form::Tiny has a built in condition that allows it to optimize form validation
+when the form is "flat": no fields are nested or dynamic. If you can avoid
+having nested fields (fields with a dot, like C<hashref.key> or C<arrayref.*>)
+or dynamic fields (fields which are constructed by a sub) in you form,
+validation speed will be increased by up to 70%. The module can then completely
+skip searching for the field in the input structure and simply use its name as
+a key in the input hash reference.
 
 =head2 Class::XSAccessor
 
-When using Form::Tiny with Moo, installing Class::XSAccessor can provide small but free boost to runtime speed of the module.
+When using Form::Tiny with Moo, installing Class::XSAccessor can provide small
+but free boost to runtime speed of the module.
 
 =head2 Type::Tiny::XS
 
-Form::Tiny uses a lot of Type::Tiny type constraints, both internally and in its form classes. Installing L<Type::Tiny::XS> should give them some XS boost, although it may be hard to measure exactly what kind of performance boost it gives.
+Form::Tiny uses a lot of Type::Tiny type constraints, both internally and in
+its form classes. Installing L<Type::Tiny::XS> should give them some XS boost,
+although it may be hard to measure exactly what kind of performance boost it
+gives.
 

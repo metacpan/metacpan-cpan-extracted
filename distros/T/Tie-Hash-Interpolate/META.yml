@@ -1,23 +1,25 @@
 ---
-name: Tie-Hash-Interpolate
-version: 0.07
+abstract: 'tied mathematical interpolation/extrapolation'
 author:
   - 'Dan Boorstein <danboo@cpan.org>'
-abstract: tied mathematical interpolation/extrapolation
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/danboo/perl-tie-hash-interpolate/
 build_requires:
-  Scalar::Util: 0
-  Test::More: 0
+  Scalar::Util: '0'
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0.35
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-Hash-Interpolate
 provides:
   Tie::Hash::Interpolate:
     file: lib/Tie/Hash/Interpolate.pm
-    version: 0.07
-generated_by: Module::Build version 0.35
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+    version: '0.08'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/danboo/perl-tie-hash-interpolate/
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

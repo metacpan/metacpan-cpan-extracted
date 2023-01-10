@@ -6,7 +6,7 @@ BEGIN { use_ok('Tie::Hash::Interpolate') }
 
 tie my %lut, 'Tie::Hash::Interpolate', one_key => 'constant';
 
-eval { undef = $lut{2} };
+eval { my $foo = $lut{2} };
 ok($@, "too few keys");
 
 ## fetch-store non-numbers
@@ -123,7 +123,7 @@ is($lut2{7}, undef, 'opts: extrapolate => "undef", 7 -> undef');
 
 my $lut = Tie::Hash::Interpolate->new(one_key => 'constant');
 
-eval { undef = $lut->{2} };
+eval { my $foo = $lut->{2} };
 ok($@, "too few keys");
 
 ## fetch-store non-numbers

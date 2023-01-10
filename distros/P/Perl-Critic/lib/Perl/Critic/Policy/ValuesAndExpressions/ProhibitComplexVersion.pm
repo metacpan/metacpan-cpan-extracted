@@ -13,11 +13,10 @@ use Perl::Critic::Utils::PPI qw{
     is_ppi_simple_statement
 };
 use Readonly;
-use Scalar::Util qw{ blessed };
 
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.146';
+our $VERSION = '1.148';
 
 #-----------------------------------------------------------------------------
 

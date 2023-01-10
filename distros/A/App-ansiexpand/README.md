@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/kaz-utashiro/App-ansiexpand/workflows/test/badge.svg)](https://github.com/kaz-utashiro/App-ansiexpand/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-ansiexpand.svg)](https://metacpan.org/release/App-ansiexpand)
+[![Actions Status](https://github.com/tecolicom/App-ansiexpand/workflows/test/badge.svg)](https://github.com/tecolicom/App-ansiexpand/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-ansiexpand.svg)](https://metacpan.org/release/App-ansiexpand)
 # NAME
 
 ansiexpand, ansiunexpand - ANSI sequences aware tab expand/unexpand command
@@ -18,7 +18,7 @@ ansiunexpand \[ option \] file ...
 
 # VERSION
 
-Version 1.03
+Version 1.04
 
 # DESCRIPTION
 
@@ -47,11 +47,17 @@ implementation detail.
     Set tab head and following space character.  If longer than single
     character, it is considered as a Unicode name.
 
-- **--tabstyle**=_style_, **--ts**=_style_
+- **--tabstyle**, **--ts**
+- **--tabstyle**=_style_, **--ts**=...
+- **--tabstyle**=_head-style_,_space-style_ **--ts**=...
 
-    Set tab style.  Try `--tabstyle=shade` for example.  My recent
-    favorite is `--tabstyle=squat-arrow,emspace`. See [Text::ANSI::Fold](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold)
-    for detail.
+    Set the style how tab is expanded.  Select `symbol` or `shade` for
+    example.  If two style names are combined, like
+    `squat-arrow,middle-dot`, use `squat-arrow` for tabhead and
+    `middle-dot` for tabspace.
+
+    Show available style list if called without parameter.  Styles are
+    defined in [Text::ANSI::Fold](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold) library.
 
 - **--ambiguous**=`wide`|`narrow`
 
@@ -82,11 +88,11 @@ including single space even if it does not reduce total data length.
 
 # SEE ALSO
 
-[App::ansiexpand](https://metacpan.org/pod/App%3A%3Aansiexpand), [https://github.com/kaz-utashiro/App-ansiexpand](https://github.com/kaz-utashiro/App-ansiexpand)
+[App::ansiexpand](https://metacpan.org/pod/App%3A%3Aansiexpand), [https://github.com/tecolicom/App-ansiexpand](https://github.com/tecolicom/App-ansiexpand)
 
-[Text::ANSI::Tabs](https://github.com/kaz-utashiro/Text-ANSI-Tabs)
+[Text::ANSI::Tabs](https://github.com/tecolicom/Text-ANSI-Tabs)
 
-[Text::ANSI::Fold](https://github.com/kaz-utashiro/Text-ANSI-Fold)
+[Text::ANSI::Fold](https://github.com/tecolicom/Text-ANSI-Fold)
 
 # AUTHOR
 
@@ -94,7 +100,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2021-2022 Kazumasa Utashiro
+Copyright 2021-2023 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

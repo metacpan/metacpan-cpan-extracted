@@ -2,9 +2,7 @@
 
 use v5.36;
 
-use Text::Treesitter::Language;
-use Text::Treesitter::Parser;
-use Text::Treesitter::Query;
+use Text::Treesitter;
 use Text::Treesitter::QueryCursor;
 use Text::Treesitter::QueryMatch;
 
@@ -21,22 +19,17 @@ GetOptions(
 ) or exit 1;
 
 $LANGUAGE_DIR //= "languages/tree-sitter-$LANGUAGE";
-my $LANGUAGE_OBJECT = $LANGUAGE_DIR . "/tree-sitter-$LANGUAGE.so";
-unless( -f $LANGUAGE_OBJECT ) {
-   require Text::Treesitter::Language;
-   Text::Treesitter::Language::build( $LANGUAGE_OBJECT, $LANGUAGE_DIR );
-}
 
-my $p = Text::Treesitter::Parser->new;
-my $lang = Text::Treesitter::Language::load( $LANGUAGE_OBJECT, $LANGUAGE );
-$p->set_language( $lang );
+my $ts = Text::Treesitter->new(
+   lang_name => $LANGUAGE,
+   lang_dir  => $LANGUAGE_DIR,
+);
 
-my $querysrc = read_text "$LANGUAGE_DIR/queries/highlights.scm";
-my $query = Text::Treesitter::Query->new( $lang, $querysrc );
+my $query = $ts->load_query_file( "$LANGUAGE_DIR/queries/highlights.scm" );
 
 my $str = String::Tagged->new( read_text $ARGV[0] // "/dev/stdin" );
 
-my $tree = $p->parse_string( $str );
+my $tree = $ts->parse_string( $str );
 
 my %FORMATS = (
    comment    => { bg => "vga:blue", italic => 1 },

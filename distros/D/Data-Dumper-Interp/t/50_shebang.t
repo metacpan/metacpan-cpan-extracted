@@ -1,7 +1,9 @@
 #!/usr/bin/perl
 use strict; use warnings  FATAL => 'all'; use feature qw(state say); use utf8;
+use feature 'lexical_subs'; no warnings "experimental::lexical_subs";
 srand(42);  # so reproducible
-use open IO => ':locale';
+#use open IO => ':locale';
+use open ':std', ':encoding(UTF-8)';
 select STDERR; $|=1; select STDOUT; $|=1;
 use Scalar::Util qw(blessed reftype looks_like_number);
 use Carp;
@@ -50,11 +52,15 @@ sub fmt_codestring($;$) { # returns list of lines
 
 sub timed_run(&$@) {
   my ($code, $maxcpusecs, @codeargs) = @_;
-  use Time::HiRes qw(clock);
-  my $startclock = clock();
+
+  eval { require Time::HiRes };
+  my $getcpu = defined(eval{ &Time::HiRes::clock() }) 
+    ? \&Time::HiRes::clock : sub{ my @t = times; $t[0]+$t[1] };
+  
+  my $startclock = &$getcpu();
   my (@result, $result);
   if (wantarray) {@result = &$code(@codeargs)} else {$result = &$code(@codeargs)};
-  my $cpusecs = clock() - $startclock;
+  my $cpusecs = &$getcpu() - $startclock;
   confess "TOOK TOO LONG ($cpusecs CPU seconds vs. limit of $maxcpusecs)\n"
     if $cpusecs > $maxcpusecs;
   if (wantarray) {return @result} else {return $result};
@@ -411,12 +417,6 @@ my $ratstr  = '1/9';
   }
 }
 {
-  use bigrat;
-  my $rat = eval $ratstr // die;
-  die unless blessed($rat) =~ /^Math::BigRat/;
-  checklit(sub{eval $_[0]}, $rat, qr/(?:\(Math::BigRat[^\)]*\))?${ratstr}/);
-}
-{
   # no 'bignum' etc. in effect, just explicit class names
   use Math::BigFloat;
   my $bigf = Math::BigFloat->new($bigfstr);
@@ -436,6 +436,24 @@ my $ratstr  = '1/9';
     # But not other classes
     my $s = vis($rat); die "bug($s)" unless $s =~ /^bless.*BigRat/s;
   }
+}
+
+{
+  # There is a new (with bigrat 0.51) bug where "use bigrat" immediately and
+  # permanently causes math operations on Math::BitFloat to produce BigRats in all 
+  # scopes, not just in the scope of the 'use bigrat'.   This breaks Math::BigFloat
+  # tests which execute after the bigrat package is loaded.
+  #
+  # So we have to do the bigrat test in an eval to defer loading it until after
+  # all other bignum tests have run.
+  # Arrgh!
+  eval <<'EOF';
+    use bigrat;
+    my $rat = eval $ratstr // die;
+    die unless blessed($rat) =~ /^Math::BigRat/;
+    checklit(sub{eval $_[0]}, $rat, qr/(?:\(Math::BigRat[^\)]*\))?${ratstr}/);
+EOF
+  die "urp\n$@" if $@
 }
 
 # Check string truncation, and that the original data is not modified in-place
@@ -484,7 +502,7 @@ timed_run {
   check 'dvis @backtrack_bugtest_data',
         '@backtrack_bugtest_data=(42,{A => 0,BBBBBBBBBBBBB => "foo"})',
         dvis('@backtrack_bugtest_data');
-} 0.01;
+} 0.05; # was 0.01 but that failed on slow arm machines
 
 sub doquoting($$) {
   my ($input, $useqq) = @_;

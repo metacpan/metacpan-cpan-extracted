@@ -6,14 +6,14 @@ use warnings;
 
 use Readonly;
 
-our $VERSION = '1.146';
+our $VERSION = '1.148';
 
 #-----------------------------------------------------------------------------
 
 use Exception::Class (
     'Perl::Critic::Exception::Configuration::Option::Global::ExtraParameter' => {
         isa         => 'Perl::Critic::Exception::Configuration::Option::Global',
-        description => 'The configuration referred to a non-existant global option.',
+        description => 'The configuration referred to a non-existent global option.',
         alias       => 'throw_extra_global',
     },
 );

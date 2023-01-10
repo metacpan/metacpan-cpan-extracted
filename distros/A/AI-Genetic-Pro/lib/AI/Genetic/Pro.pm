@@ -1,8 +1,5 @@
 package AI::Genetic::Pro;
-
-use vars qw($VERSION);
-
-$VERSION = 1.008;
+$AI::Genetic::Pro::VERSION = '1.009';
 #---------------
 
 use warnings;

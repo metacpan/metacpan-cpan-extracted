@@ -21,14 +21,13 @@ requires 'Error::Pure' => 0.05;
 requires 'Indent' => 0.01;
 requires 'Indent::Word' => 0.01;
 requires 'Indent::Block' => 0.01;
-requires 'List::MoreUtils' => 0;
+requires 'List::Util' => 1.33;
 requires 'Readonly' => 0;
 requires 'Tags::Output' => 0.10;
 requires 'Tags::Utils' => 0.09;
 requires 'Tags::Utils::Preserve' => 0.09;
 requires 'perl' => '5.6.0';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=Tags-Output-Indent';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Tags-Output-Indent/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Tags-Output-Indent';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Tags-Output-Indent';
 test_requires 'English' => 0;
@@ -38,7 +37,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Warn' => 0;
 tests_recursive;
-version '0.08';
+version '0.10';
 
 # Run.
 WriteAll();

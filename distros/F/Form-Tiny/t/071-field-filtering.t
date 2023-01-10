@@ -9,7 +9,6 @@ use Test::More;
 	use Form::Tiny -filtered;
 	use Types::Standard qw(Str Int);
 
-	use Form::Tiny::Filter;
 	use Form::Tiny::Plugin::Filtered::Filter;
 
 	form_field 'f1';
@@ -22,15 +21,13 @@ use Test::More;
 
 	form_field 'f3';
 
-	# use classes (deprecated)
 	field_filter(
-		Form::Tiny::Filter->new(
+		Form::Tiny::Plugin::Filtered::Filter->new(
 			type => Str,
 			code => sub { pop() . '+' }
 		)
 	);
 
-	# use classes (current)
 	field_filter(
 		Form::Tiny::Plugin::Filtered::Filter->new(
 			type => Str,

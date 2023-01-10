@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = "1.03";
+our $VERSION = "1.04";
 
 BEGIN {
     if ($0 =~ /unexpand$/) {
@@ -37,7 +37,7 @@ ansiunexpand [ option ] file ...
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 DESCRIPTION
 
@@ -69,11 +69,19 @@ Set tab stop width.  Unlike L<expand(1)>, takes only single value.
 Set tab head and following space character.  If longer than single
 character, it is considered as a Unicode name.
 
-=item B<--tabstyle>=I<style>, B<--ts>=I<style>
+=item B<--tabstyle>, B<--ts>
 
-Set tab style.  Try C<--tabstyle=shade> for example.  My recent
-favorite is C<--tabstyle=squat-arrow,emspace>. See L<Text::ANSI::Fold>
-for detail.
+=item B<--tabstyle>=I<style>, B<--ts>=...
+
+=item B<--tabstyle>=I<head-style>,I<space-style> B<--ts>=...
+
+Set the style how tab is expanded.  Select C<symbol> or C<shade> for
+example.  If two style names are combined, like
+C<squat-arrow,middle-dot>, use C<squat-arrow> for tabhead and
+C<middle-dot> for tabspace.
+
+Show available style list if called without parameter.  Styles are
+defined in L<Text::ANSI::Fold> library.
 
 =item B<--ambiguous>=C<wide>|C<narrow>
 
@@ -111,11 +119,11 @@ See L<Getopt::EX::Module> for format.
 
 =head1 SEE ALSO
 
-L<App::ansiexpand>, L<https://github.com/kaz-utashiro/App-ansiexpand>
+L<App::ansiexpand>, L<https://github.com/tecolicom/App-ansiexpand>
 
-L<Text::ANSI::Tabs|https://github.com/kaz-utashiro/Text-ANSI-Tabs>
+L<Text::ANSI::Tabs|https://github.com/tecolicom/Text-ANSI-Tabs>
 
-L<Text::ANSI::Fold|https://github.com/kaz-utashiro/Text-ANSI-Fold>
+L<Text::ANSI::Fold|https://github.com/tecolicom/Text-ANSI-Fold>
 
 =head1 AUTHOR
 
@@ -123,7 +131,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2021-2022 Kazumasa Utashiro
+Copyright 2021-2023 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

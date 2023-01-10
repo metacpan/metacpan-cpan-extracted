@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.3, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Crypt::PKCS10:
     file: lib/Crypt/PKCS10.pm
-    version: '2.004'
+    version: '2.005'
 requires:
   Convert::ASN1: '0'
   Encode: '0'
@@ -36,8 +36,8 @@ requires:
 resources:
   bugtracker: https://github.com/openxpki/Crypt-PKCS10/issues
   homepage: https://github.com/openxpki/Crypt-PKCS10
-  repository: https://github.com/openxpki/Crypt-PKCS10.git
-version: '2.004'
+  repository: git://github.com/openxpki/Crypt-PKCS10.git
+version: '2.005'
 x_contributors:
   - 'Daniel Hoffend <dh@dotlan.net>'
   - 'Gideon Knocke <gideonknocke@googlemail.com>'

@@ -4,8 +4,7 @@
 requires "HTTP::Status" => "0";
 requires "Plack::Middleware" => "0";
 requires "parent" => "0";
-requires "perl" => "v5.10.0";
-requires "strict" => "0";
+requires "perl" => "v5.14.0";
 requires "warnings" => "0";
 
 on 'test' => sub {
@@ -18,7 +17,8 @@ on 'test' => sub {
   requires "Plack::Response" => "0";
   requires "Plack::Test" => "0";
   requires "Test::Differences" => "0";
-  requires "Test::More" => "0";
+  requires "Test::More" => "1.302008";
+  requires "strict" => "0";
 };
 
 on 'test' => sub {
@@ -43,5 +43,4 @@ on 'develop' => sub {
   requires "Test::Pod::LinkCheck" => "0";
   requires "Test::Portability::Files" => "0";
   requires "Test::TrailingSpace" => "0.0203";
-  requires "Test::Vars" => "0.015";
 };

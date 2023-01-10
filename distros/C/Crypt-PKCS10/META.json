@@ -4,7 +4,7 @@
       "Gideon Knocke <gknocke@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.19",
+   "generated_by" : "Minilla/v3.1.3",
    "license" : [
       "gpl_1"
    ],
@@ -35,7 +35,7 @@
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.07",
+            "Test::PAUSE::Permissions" : "0.04",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -58,7 +58,7 @@
    "provides" : {
       "Crypt::PKCS10" : {
          "file" : "lib/Crypt/PKCS10.pm",
-         "version" : "2.004"
+         "version" : "2.005"
       }
    },
    "release_status" : "stable",
@@ -68,12 +68,11 @@
       },
       "homepage" : "https://github.com/openxpki/Crypt-PKCS10",
       "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/openxpki/Crypt-PKCS10.git",
+         "url" : "git://github.com/openxpki/Crypt-PKCS10.git",
          "web" : "https://github.com/openxpki/Crypt-PKCS10"
       }
    },
-   "version" : "2.004",
+   "version" : "2.005",
    "x_contributors" : [
       "Daniel Hoffend <dh@dotlan.net>",
       "Gideon Knocke <gideonknocke@googlemail.com>",
@@ -89,6 +88,6 @@
       "gknocke <gknocke@develop.localdomain>",
       "washburnwi64 <gideonknocke@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.06",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
    "x_static_install" : 1
 }

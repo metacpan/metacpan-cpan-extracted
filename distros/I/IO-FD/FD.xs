@@ -17,9 +17,23 @@
 
 #if defined(IO_FD_OS_DARWIN) || defined(IO_FD_OS_BSD)
 #include <sys/event.h>
+#include <sys/uio.h>
+#include <sys/types.h>
+
+
+#endif
+
+#if defined(IO_FD_OS_LINUX)
+#include <sys/sendfile.h>
 #endif
 
 #include <sys/stat.h>
+
+#if defined(IO_FD_OS_DARWIN)
+//Make up constants for manipulating accept4, socketpair, and socket
+#define SOCK_NONBLOCK 0x10000000
+#define SOCK_CLOEXEC  0x20000000
+#endif
 
 //Read from an fd until eof or error condition
 //Returns SV containing all the data
@@ -59,6 +73,8 @@ SV * slurp(pTHX_ int fd, int read_size){
 
 	SV *accept_multiple_next_addr;
 	struct sockaddr *accept_multiple_next_buf;
+
+  SV *max_file_desc;
 
 #if defined(IO_FD_OS_DARWIN)|| defined(IO_FD_OS_BSD)
 #define IO_FD_ATIME atime=buf.st_atimespec.tv_sec+buf.st_atimespec.tv_nsec*1e-9;
@@ -110,6 +126,9 @@ BOOT:
 	accept_multiple_next_addr=newSV(sizeof(struct sockaddr_storage));
 	accept_multiple_next_buf=(struct sockaddr *)SvPVX(accept_multiple_next_addr);
 
+  //locate the $^F variable 
+  //max_file_desc=get_sv("^F",0);
+
 #SOCKET
 #######
 
@@ -127,6 +146,9 @@ socket(sock,af,type,proto)
 			int fd;
 			int s;
 		CODE:
+      if(SvREADONLY(sock)){
+            Perl_croak(aTHX_ "%s", PL_no_modify);
+      }
 			s=socket(af, type, proto);
 
 			//Set error variable...
@@ -136,6 +158,9 @@ socket(sock,af,type,proto)
 				#need to set error code here
 			}
 			else{
+        if(s>PL_maxsysfd){
+          fcntl(s, F_SETFD, FD_CLOEXEC);
+        }
 				RETVAL=newSViv(s);
 				if(SvOK(sock)){
 					sv_setiv(sock,s);
@@ -155,67 +180,150 @@ socket(sock,af,type,proto)
 
 SV *
 listen(listener,backlog)
-	int listener;
+	SV * listener;
 	int backlog;
 
 
 	INIT:
 		int ret;
 
-	CODE:
-
-		ret=listen(listener, backlog);
+	PPCODE:
+    if(SvOK(listener) && SvIOK(listener)){
+		ret=listen(SvIV(listener), backlog);
 
 		if(ret<0){
-			RETVAL=&PL_sv_undef;
+			//RETVAL=&PL_sv_undef;
+      XSRETURN_UNDEF;
 		}
 		else{
-			RETVAL=newSViv(ret+1);
+		  //RETVAL=newSViv(ret+1);
+      XSRETURN_IV(ret+1);
 		}
+  }
+  else{
+        Perl_warn(aTHX_ "%s", "IO::FD::listen called with something other than a file descriptor");
+        errno=EBADF;
+        XSRETURN_UNDEF;
+  }
 
-	OUTPUT:
-		RETVAL
 
 #ACCEPT
 #######
 
 SV*
 accept(new_fd, listen_fd)
-		SV* new_fd
-                int listen_fd
+  SV* new_fd
+  SV* listen_fd
 
-                PREINIT:
-                        struct sockaddr *packed_addr;
-                        int ret;
+  PREINIT:
+      struct sockaddr *packed_addr;
+      int ret;
 			SV *addr=newSV(sizeof(struct sockaddr_storage));
 			struct sockaddr *buf=(struct sockaddr *)SvPVX(addr);
 			unsigned int len=sizeof(struct sockaddr_storage);
 
 			
 
-                CODE:
-                ret=accept(listen_fd, buf, &len);
-		if(ret<0){
-			RETVAL=&PL_sv_undef;
-		}
-		else {
-			SvPOK_on(addr);
-			//SvCUR_set(addr, sizeof(struct sockaddr_storage));
-			ADJUST_SOCKADDR_SIZE(addr);
-			RETVAL=addr;
-			if(SvOK(new_fd)){
-				sv_setiv(new_fd, ret);		
-			}
-			else{
-				new_fd=newSViv(ret);
-			}
-			//Adjust the current size of the buffer based on socket family
-		}
+  CODE:
+    if(SvOK(listen_fd)&& SvIOK(listen_fd)){
+      if(SvREADONLY(new_fd)){
+            Perl_croak(aTHX_ "%s", PL_no_modify);
+      }
+      ret=accept(SvIV(listen_fd), buf, &len);
+      if(ret<0){
+        RETVAL=&PL_sv_undef;
+      }
+      else {
+        if(ret>PL_maxsysfd){
+          fcntl(ret, F_SETFD, FD_CLOEXEC);
+        }
+        SvPOK_on(addr);
+        //SvCUR_set(addr, sizeof(struct sockaddr_storage));
+        ADJUST_SOCKADDR_SIZE(addr);
+        RETVAL=addr;
+        if(SvOK(new_fd)){
+          sv_setiv(new_fd, ret);		
+        }
+        else{
+          new_fd=newSViv(ret);
+        }
+        //Adjust the current size of the buffer based on socket family
+      }
+    }
+    else {
+        errno=EBADF;
+        RETVAL=&PL_sv_undef;
+        Perl_warn(aTHX_ "%s", "IO::FD::accept called with something other than a file descriptor");
+    }
 	
 	
-                OUTPUT:
-			RETVAL
-			new_fd
+  OUTPUT:
+    RETVAL
+    new_fd
+
+SV *
+accept4(new_fd, listen_fd, flags)
+  SV *new_fd
+  SV *listen_fd
+  UV flags
+
+  INIT:
+      struct sockaddr *packed_addr;
+      int ret;
+      int ret2;
+			SV *addr=newSV(sizeof(struct sockaddr_storage));
+			struct sockaddr *buf=(struct sockaddr *)SvPVX(addr);
+			unsigned int len=sizeof(struct sockaddr_storage);
+
+  CODE:
+    if(SvOK(listen_fd) && SvIOK(listen_fd)){
+      if(SvREADONLY(new_fd)){
+            Perl_croak(aTHX_ "%s", PL_no_modify);
+      }
+#if defined(IO_FD_OS_LINUX)
+      ret=accept4(SvIV(listen_fd), buf, &len, flags);
+#endif
+#if defined(IO_FD_OS_DARWIN) || defined(IO_FD_OS_BSD)
+      ret=accept(SvIV(listen_fd), buf, &len);
+      if(ret<0){
+        RETVAL=&PL_sv_undef;
+      }
+      else {
+        if(SOCK_NONBLOCK & flags){
+          //Assumes no other status flags are set
+          fcntl(ret, F_SETFL, O_NONBLOCK);
+        }
+        if(SOCK_CLOEXEC & flags){
+          fcntl(ret, F_SETFD, FD_CLOEXEC);
+        }
+	}
+#endif
+        if(ret<0){
+          RETVAL=&PL_sv_undef;
+        }
+        else {
+          SvPOK_on(addr);
+          ADJUST_SOCKADDR_SIZE(addr);
+          RETVAL=addr;
+          if(SvOK(new_fd)){
+            sv_setiv(new_fd, ret);		
+          }
+          else{
+            new_fd=newSViv(ret);
+          }
+          //mXPUSHs(addr);
+          //XSRETURN(1);
+        }
+    }
+    else{
+        errno=EBADF;
+        RETVAL=&PL_sv_undef;
+        Perl_warn(aTHX_ "%s", "IO::FD::accept4 called with something other than a file descriptor");
+    }
+
+  OUTPUT:
+    RETVAL
+    new_fd
 
 
 SV*
@@ -232,26 +340,25 @@ accept_multiple(new_fds, peers, listen_fd)
 		unsigned int len=sizeof(struct sockaddr_storage);
 
 		int count=0;
-	#if defined(IO_FD_OS_LINUX) 
+#if defined(IO_FD_OS_LINUX) 
 		int flags;
-	#endif
+#endif
 
 
-	#
 
 	PPCODE:
 
+    if(SvOK(listen_fd) && SvIOK(listen_fd)){
+#if defined(IO_FD_OS_LINUX) 
+		while((ret=accept4(SvIV(listen_fd),accept_multiple_next_buf, &len,SOCK_NONBLOCK))>=0){
+			//fcntl(ret, F_SETFL, O_NONBLOCK);
+#endif
+#if defined(IO_FD_OS_DARWIN)  || defined(IO_FD_OS_BSD)
 		while((ret=accept(SvIV(listen_fd),accept_multiple_next_buf, &len))>=0){
-
-	#if defined(IO_FD_OS_LINUX) 
-			flags=fcntl(ret, F_GETFD);
-			fcntl(ret, F_SETFD, flags|O_NONBLOCK);
-	#endif
-	#if defined(IO_FD_OS_DARWIN)  || defined(IO_FD_OS_BSD)
-			//flags=fcntl(ret, F_GETFD);
-			//fcntl(ret, F_SETFD, flags|O_NONBLOCK);
-
-	#endif
+#endif
+      if(ret>PL_maxsysfd){
+        fcntl(ret, F_SETFD, FD_CLOEXEC);
+      }
 			SvPOK_on(accept_multiple_next_addr);
 			SvCUR_set(accept_multiple_next_addr, sizeof(struct sockaddr_storage));
 
@@ -268,6 +375,13 @@ accept_multiple(new_fds, peers, listen_fd)
 		//If new_fd is still null, we failed all to gether
 		mXPUSHs((new_fd==NULL) ?&PL_sv_undef :newSViv(count));
 		XSRETURN(1);
+    }
+    else{
+
+        errno=EBADF;
+        Perl_warn(aTHX_ "%s", "IO::FD::accept_multiple called with something other than a file descriptor");
+        XSRETURN_UNDEF;
+    }
 
 
 
@@ -281,19 +395,34 @@ connect(fd, address)
 
 	PREINIT:
 		int ret;
-		int len=SvOK(address)?SvCUR(address):0;
-		struct sockaddr *addr=(struct sockaddr *)SvPVX(address);
+		int len;//=SvOK(address)?SvCUR(address):0;
+		struct sockaddr *addr;//=(struct sockaddr *)SvPVX(address);
 
 	CODE:
+    if(SvOK(fd) &&SvIOK(fd)){
+      if(SvOK(address)){
+        len=SvOK(address)?SvCUR(address):0;
+        addr=(struct sockaddr *)SvPVX(address);
+      }
+      else {
+        addr=NULL;
+        len=0;
+      }
+      ret=connect(SvIVX(fd),addr,len);
+      //fprintf(stderr,"CONNECT: %d\n",ret);
+      if(ret<0){
+        RETVAL=&PL_sv_undef;	
+      }
+      else{
+        RETVAL=newSViv(ret+1);
+      }
+    }
+    else{
+        errno=EBADF;
+        Perl_warn(aTHX_ "%s", "IO::FD::connect called with something other than a file descriptor");
+        RETVAL=&PL_sv_undef;	
+    }
 
-		ret=connect(SvIVX(fd),addr,len);
-		//fprintf(stderr,"CONNECT: %d\n",ret);
-		if(ret<0){
-			RETVAL=&PL_sv_undef;	
-		}
-		else{
-			RETVAL=newSViv(ret+1);
-		}
 	OUTPUT:
 		RETVAL
 	
@@ -316,6 +445,8 @@ sockatmark(fd)
 
 		}
 		else{
+      errno=EBADF;
+      Perl_warn(aTHX_ "%s", "IO::FD::sockatmark called with something other than a file descriptor");
 			XSRETURN_UNDEF;
 		}
 		
@@ -325,14 +456,17 @@ sockatmark(fd)
 SV*
 sysopen(fd, path, mode, ... )
  		SV* fd
-                char *path
-                int mode
+    char *path
+    int mode
 
 		PREINIT:
 			int f;
-                	int permissions=0666;	//Default if not provided
+      int permissions=0666;	//Default if not provided
 
 		CODE:
+      if(SvREADONLY(fd)){
+        Perl_croak(aTHX_ "%s", PL_no_modify);
+      }
 			if(items==4){
 				permissions=SvIV(ST(3));
 			}
@@ -341,6 +475,9 @@ sysopen(fd, path, mode, ... )
 				RETVAL=&PL_sv_undef;
 			}
 			else{
+        if(f>PL_maxsysfd){
+          fcntl(f, F_SETFD, FD_CLOEXEC);
+        }
 				RETVAL=newSViv(f);
 				if(SvOK(fd)){
 					sv_setiv(fd,f);
@@ -357,46 +494,66 @@ sysopen(fd, path, mode, ... )
 
 SV*
 sysopen4(fd, path, mode, permissions)
- 		int fd
-                char *path
-                int mode
-                int permissions
+ 		SV *fd
+    char *path
+    int mode
+    int permissions
 
 		PREINIT:
 			int f;
 
 		CODE:
-			fd=open(path, mode, permissions);
+      if(SvREADONLY(fd)){
+        Perl_croak(aTHX_ "%s", PL_no_modify);
+      }
+			f=open(path, mode, permissions);
 			if(fd<0){
 				RETVAL=&PL_sv_undef;
 			}
 			else{
-				RETVAL=newSViv(fd);
+        if(f>PL_maxsysfd){
+          fcntl(f, F_SETFD, FD_CLOEXEC);
+        }
+				RETVAL=newSViv(f);
+				if(SvOK(fd)){
+					sv_setiv(fd,f);
+				}
+				else {
+					fd= newSViv(f);
+				}
 			}
 
 		OUTPUT:
 			RETVAL
 			fd
+
 #CLOSE
 ######
 
 SV*
 close(fd)
-	int fd;
+	SV* fd;
 
 	INIT:
 		int ret;
 
 	CODE:
-		ret=close(fd);
-		if(ret<0){
-			RETVAL=&PL_sv_undef;
-		}
-		else{
-			#close returns 0 on success.. which is false in perl 
-			#so increment
-			RETVAL=newSViv(ret+1);
-		}
+    if(SvOK(fd) && SvIOK(fd)){
+      ret=close(SvIV(fd));
+      if(ret<0){
+        RETVAL=&PL_sv_undef;
+      }
+      else{
+#close returns 0 on success.. which is false in perl 
+#so increment
+        RETVAL=newSViv(ret+1);
+      }
+    }
+    else {
+      errno=EBADF;
+      RETVAL=&PL_sv_undef;
+      Perl_warn(aTHX_ "%s", "IO::FD::close called with something other than a file descriptor");
+    }
 	OUTPUT:
 		RETVAL
 
@@ -407,8 +564,8 @@ close(fd)
 
 SV*
 sysread(fd, data, len, ...)
-                SV* fd;
-                SV* data
+    SV* fd;
+    SV* data
 		int len
 		INIT:
 			int ret;
@@ -420,47 +577,52 @@ sysread(fd, data, len, ...)
 
 			//grow scalar to fit potental read
       if(SvOK(fd) && SvIOK(fd)){
-			if(items >=4 ){
-				//len=SvIOK(ST(2))?SvIV(ST(2)):0;
-				offset=SvIOK(ST(3))?SvIV(ST(3)):0;
-			}
-				
-			int data_len=sv_len(data);
-			int request_len;
-			if(offset<0){
-				offset=data_len-offset;
-			}
-			else{
+        if(SvREADONLY(data)){
+            Perl_croak(aTHX_ "%s", PL_no_modify);
+        }
+        if(items >=4 ){
+          //len=SvIOK(ST(2))?SvIV(ST(2)):0;
+          offset=SvIOK(ST(3))?SvIV(ST(3)):0;
+        }
 
-			}
-			request_len=len+offset;
+        int data_len=sv_len(data);
+        int request_len;
+        if(offset<0){
+          offset=data_len-offset;
+        }
+        else{
 
-			#fprintf(stderr, "Length of buffer is: %d\n", data_len);
-			#fprintf(stderr, "Length of request is: %d\n", request_len);
+        }
+        request_len=len+offset;
 
-			buf = SvPOK(data) ? SvGROW(data, request_len+1) : 0;
+        //fprintf(stderr, "Length of buffer is: %d\n", data_len);
+        //fprintf(stderr, "Length of request is: %d\n", request_len);
 
-			data_len=sv_len(data);
-			#fprintf(stderr, "Length of buffer is: %d\n", data_len);
-			#TODO: fill with nulls if offset past end of original data
-					
-			buf+=offset;
+        buf = SvPOK(data) ? SvGROW(data, request_len+1) : 0;
 
-      ret=read(SvIV(fd), buf, len);
-			if(ret<0){
+        data_len=sv_len(data);
+        //fprintf(stderr, "Length of buffer is: %d\n", data_len);
+        //TODO: fill with nulls if offset past end of original data
 
-				//RETVAL=&PL_sv_undef;
-        XSRETURN_UNDEF;
-			}
-			else {
-				buf[ret]='\0';
-				SvCUR_set(data,ret+offset);
-				//RETVAL=newSViv(ret);
-        mXPUSHs(newSViv(ret));
-        XSRETURN(1);
-			}
+        buf+=offset;
+
+        ret=read(SvIV(fd), buf, len);
+        if(ret<0){
+
+          //RETVAL=&PL_sv_undef;
+          XSRETURN_UNDEF;
+        }
+        else {
+          buf[ret]='\0';
+          SvCUR_set(data,ret+offset);
+          //RETVAL=newSViv(ret);
+          mXPUSHs(newSViv(ret));
+          XSRETURN(1);
+        }
       }
       else{
+        errno=EBADF;
+        Perl_warn(aTHX_ "%s", "IO::FD::sysread called with something other than a file descriptor");
         XSRETURN_UNDEF;
       }
 
@@ -477,19 +639,22 @@ sysread3(fd, data, len)
 			int offset;
 
 		PPCODE:
-    if(SvOK(fd) && SvOK(data) &&SvIOK(fd)){
+    if(SvOK(fd) &&SvIOK(fd)){
+      if(SvREADONLY(data)){
+        Perl_croak(aTHX_ "%s", PL_no_modify);
+      }
 			int data_len=SvCUR(data);
 
-			#fprintf(stderr, "Length of buffer is: %d\n", data_len);
-			#fprintf(stderr, "Length of request is: %d\n",len);
+			//fprintf(stderr, "Length of buffer is: %d\n", data_len);
+			//fprintf(stderr, "Length of request is: %d\n",len);
 
 			buf = SvPOK(data) ? SvGROW(data,len+1) : 0;
 
 			//data_len=SvPVX(data);
-			#fprintf(stderr, "Length of buffer is: %d\n", data_len);
+			//fprintf(stderr, "Length of buffer is: %d\n", data_len);
 
 
-			ret=read(fd, buf, len);
+			ret=read(SvIV(fd), buf, len);
 			if(ret<0){
 
 				//RETVAL=&PL_sv_undef;
@@ -505,15 +670,17 @@ sysread3(fd, data, len)
       }
 
       else {
+        errno=EBADF;
+        Perl_warn(aTHX_ "%s", "IO::FD::sysread called with something other than a file descriptor");
         XSRETURN_UNDEF;
       }
 
 
 SV*
 sysread4(fd, data, len, offset)
-                SV* fd;
-                SV* data
-                int len
+    SV* fd;
+    SV* data
+    int len
 		int offset
 
 		INIT:
@@ -521,46 +688,46 @@ sysread4(fd, data, len, offset)
 			char *buf;
 
       PPCODE:
-      if(SvOK(fd) && SvOK(data) &&SvIOK(fd)){
-			#TODO: allow unspecified len and offset
+      if(SvOK(fd) &&SvIOK(fd)){
+        if(SvREADONLY(data)){
+          Perl_croak(aTHX_ "%s", PL_no_modify);
+        }
 
-			#grow scalar to fit potental read
-			int data_len=sv_len(data);
-			int request_len;
-			if(offset<0){
-				offset=data_len-offset;
-			}
-			else{
+#grow scalar to fit potental read
+        int data_len=sv_len(data);
+        int request_len;
+        if(offset<0){
+          offset=data_len-offset;
+        }
+        else{
 
-			}
-			request_len=len+offset;
+        }
+        request_len=len+offset;
 
-			#fprintf(stderr, "Length of buffer is: %d\n", data_len);
-			#fprintf(stderr, "Length of request is: %d\n", request_len);
 
-			buf = SvPOK(data) ? SvGROW(data, request_len+1) : 0;
+        buf = SvPOK(data) ? SvGROW(data, request_len+1) : 0;
 
-			data_len=sv_len(data);
-			#fprintf(stderr, "Length of buffer is: %d\n", data_len);
-			#TODO: fill with nulls if offset past end of original data
-					
-			buf+=offset;
+        data_len=sv_len(data);
 
-                        ret=read(fd, buf, len);
-			if(ret<0){
+        buf+=offset;
 
-				//RETVAL=&PL_sv_undef;
-        XSRETURN_UNDEF;
-			}
-			else {
-				buf[ret]='\0';
-				SvCUR_set(data,ret+offset);
-				//RETVAL=newSViv(ret);
-        mXPUSHs(newSViv(ret));
-        XSRETURN(1);
-			}
+        ret=read(SvIV(fd), buf, len);
+        if(ret<0){
+
+          //RETVAL=&PL_sv_undef;
+          XSRETURN_UNDEF;
+        }
+        else {
+          buf[ret]='\0';
+          SvCUR_set(data,ret+offset);
+          //RETVAL=newSViv(ret);
+          mXPUSHs(newSViv(ret));
+          XSRETURN(1);
+        }
       }
       else {
+        errno=EBADF;
+        Perl_warn(aTHX_ "%s", "IO::FD::sysread called with something other than a file descriptor");
         XSRETURN_UNDEF;
       }
 
@@ -568,17 +735,22 @@ sysread4(fd, data, len, offset)
 ##########
 
 SV*
-syswrite(fd,data,...)
+syswrite(fd,data, ...)
 	SV *fd
 	SV* data
 
 	INIT:
 		int ret;
 		char *buf;
-		STRLEN max=SvCUR(data);
+		STRLEN max;//=SvCUR(data);
 		int len;
 		int offset;
 	PPCODE:
+    if(!SvOK(data)){
+     Perl_warn(aTHX_ "%s", "IO::FD::syswrite called with use of uninitialized value");
+     XSRETURN_IV(0);
+    }
+    max=SvCUR(data);
 		if(items >=4 ){
 			//length and  Offset provided
 			len=SvIOK(ST(2))?SvIV(ST(2)):0;
@@ -626,6 +798,8 @@ syswrite(fd,data,...)
       }
     }
     else{
+        errno=EBADF;
+        Perl_warn(aTHX_ "%s", "IO::FD::syswrite called with something other than a file descriptor");
         XSRETURN_UNDEF;  
     }
 
@@ -642,27 +816,32 @@ syswrite2(fd,data)
 	PPCODE:
 
     if(SvOK(fd) && SvIOK(fd)){
-		len=SvPOK(data)?SvCUR(data):0;
-		#TODO: fix negative offset processing
-		#TODO: allow unspecified len and offset
+      if(!SvOK(data)){
+        Perl_warn(aTHX_ "%s", "IO::FD::syswrite called with use of uninitialized value");
+        XSRETURN_IV(0);
+      }
+      len=SvPOK(data)?SvCUR(data):0;
+      //TODO: fix negative offset processing
+      //TODO: allow unspecified len and offset
 
-		#fprintf(stderr,"Input size: %zu\n",SvCUR(data));
+      //fprintf(stderr,"Input size: %zu\n",SvCUR(data));
 
-		
-		buf=SvPVX(data);
-		ret=write(SvIV(fd), buf, len);
-		if(ret<0){
-      XSRETURN_UNDEF;
-			//RETVAL=&PL_sv_undef;	
-		}
-		else{
-			//RETVAL=newSViv(ret);
-      mXPUSHs(newSViv(ret));
-      XSRETURN(1);
-		}
+
+      buf=SvPVX(data);
+      ret=write(SvIV(fd), buf, len);
+      if(ret<0){
+        XSRETURN_UNDEF;
+        //RETVAL=&PL_sv_undef;	
+      }
+      else{
+        //RETVAL=newSViv(ret);
+        mXPUSHs(newSViv(ret));
+        XSRETURN(1);
+      }
     }
     else{
-
+      errno=EBADF;
+      Perl_warn(aTHX_ "%s", "IO::FD::syswrite called with something other than a file descriptor");
       XSRETURN_UNDEF;
     }
 
@@ -675,34 +854,40 @@ syswrite3(fd,data,len)
 	INIT:
 		int ret;
 		char *buf;
-		STRLEN max=SvCUR(data);
+		STRLEN max;//=SvCUR(data);
 		int offset=0;
 	PPCODE:
 
     if(SvOK(fd) && SvIOK(fd)){
-		#TODO: fix negative offset processing
-		#TODO: allow unspecified len and offset
+      if(!SvOK(data)){
+        Perl_warn(aTHX_ "%s", "IO::FD::syswrite called with use of uninitialized value");
+        XSRETURN_IV(0);
+      }
+      //TODO: fix negative offset processing
+      //TODO: allow unspecified len and offset
 
-		#fprintf(stderr,"Input size: %zu\n",SvCUR(data));
+      //fprintf(stderr,"Input size: %zu\n",SvCUR(data));
+      max=SvCUR(data);
+      if(len>max){
+        len=max;
+      }
 
-		if(len>max){
-			len=max;
-		}
-		
-		buf=SvPVX(data);
-		ret=write(SvIV(fd),buf,len);
-		#fprintf(stderr, "write consumed %d bytes\n", ret);	
-		if(ret<0){
-			//RETVAL=&PL_sv_undef;	
-      XSRETURN_UNDEF;
-		}
-		else{
-			//RETVAL=newSViv(ret);
-      mXPUSHs(newSViv(ret));
-      XSRETURN(1);
-		}
+      buf=SvPVX(data);
+      ret=write(SvIV(fd),buf,len);
+      //fprintf(stderr, "write consumed %d bytes\n", ret);	
+      if(ret<0){
+        //RETVAL=&PL_sv_undef;	
+        XSRETURN_UNDEF;
+      }
+      else{
+        //RETVAL=newSViv(ret);
+        mXPUSHs(newSViv(ret));
+        XSRETURN(1);
+      }
     }
     else {
+      errno=EBADF;
+      Perl_warn(aTHX_ "%s", "IO::FD::syswrite called with something other than a file descriptor");
       XSRETURN_UNDEF;
     }
 
@@ -717,39 +902,93 @@ syswrite4(fd,data,len,offset)
 	INIT:
 		int ret;
 		char *buf;
-		STRLEN max=SvCUR(data);
+		STRLEN max;//=SvCUR(data);
 	PPCODE:
 
-		#TODO: fix negative offset processing
-		#TODO: allow unspecified len and offset
+		//TODO: fix negative offset processing
+		//TODO: allow unspecified len and offset
 
     if(SvOK(fd) && SvIOK(fd)){
-		#fprintf(stderr,"Input size: %zu\n",SvCUR(data));
-		offset=
-			offset>max
-				?max
-				:offset;
+      if(!SvOK(data)){
+        Perl_warn(aTHX_ "%s", "IO::FD::syswrite called with use of uninitialized value");
+        XSRETURN_IV(0);
+      }
+      //fprintf(stderr,"Input size: %zu\n",SvCUR(data));
+      max=SvCUR(data);
+      offset=
+        offset>max
+        ?max
+        :offset;
 
-		if((offset+len)>max){
-			len=max-offset;
-		}
-		
-		buf=SvPVX(data);
-		buf+=offset;
-		ret=write(SvIV(fd),buf,len);
-		#fprintf(stderr, "write consumed %d bytes\n", ret);	
-		if(ret<0){
-			//RETVAL=&PL_sv_undef;	
-      XSRETURN_UNDEF;
-		}
-		else{
-			//RETVAL=newSViv(ret);
-      mXPUSHs(newSViv(ret));
-		}
+      if((offset+len)>max){
+        len=max-offset;
+      }
+
+      buf=SvPVX(data);
+      buf+=offset;
+      ret=write(SvIV(fd),buf,len);
+      //fprintf(stderr, "write consumed %d bytes\n", ret);	
+      if(ret<0){
+        //RETVAL=&PL_sv_undef;	
+        XSRETURN_UNDEF;
+      }
+      else{
+        //RETVAL=newSViv(ret);
+        mXPUSHs(newSViv(ret));
+      }
     }
     else{
+      errno=EBADF;
+      Perl_warn(aTHX_ "%s", "IO::FD::syswrite called with something other than a file descriptor");
       XSRETURN_UNDEF;
     }
+
+
+#SENDFILE
+#########
+
+SV *
+sendfile(socket, source, len, offset)
+  SV * socket
+  SV * source
+  SV * len 
+  SV * offset
+
+  INIT:
+
+    off_t l;
+	  off_t o;
+    int ret;
+
+  PPCODE:
+    if(SvOK(socket) && SvIOK(socket) && SvOK(source) && SvIOK(source)){
+        l=SvIV(len);
+	o=SvIV(offset);
+#if defined(IO_FD_OS_DARWIN)
+        ret=sendfile(SvIV(source),SvIV(socket),SvIV(offset),&l, NULL, 0);
+#endif
+#if defined(IO_FD_OS_BSD)
+        ret=sendfile(SvIV(source),SvIV(socket),SvIV(offset),l, NULL, 0,0);
+#endif
+#if defined(IO_FD_OS_LINUX)
+        ret=sendfile(SvIV(socket), SvIV(source), &o,l);
+#endif
+        if(ret<0){
+          //Return undef on error
+          XSRETURN_UNDEF;
+        }
+        //Otherwise return the number of bytes transfered
+        ret=l;
+        XSRETURN_IV(ret);
+
+      }
+      else {
+        errno=EBADF;
+        Perl_warn(aTHX_ "%s", "IO::FD::sendfile called with something other than a file descriptor");
+        XSRETURN_UNDEF;
+      }
+
+
 
 #PIPE
 ######
@@ -767,12 +1006,21 @@ pipe(read_end,write_end)
 		int fds[2];
 
 	CODE:
+    if(SvREADONLY(read_end) || SvREADONLY(write_end)){
+      Perl_croak(aTHX_ "%s", PL_no_modify);
+    }
 		ret=pipe(fds);
 
 		if(ret<0){
 			RETVAL=&PL_sv_undef;
 		}
 		else{
+      if(fds[0]>PL_maxsysfd){
+        fcntl(fds[0], F_SETFD, FD_CLOEXEC);
+      }
+      if(fds[1]>PL_maxsysfd){
+        fcntl(fds[1], F_SETFD, FD_CLOEXEC);
+      }
 			//pipe returns 0 on success...
 			RETVAL=newSViv(ret+1);
 			if(SvOK(read_end)){
@@ -799,28 +1047,43 @@ pipe(read_end,write_end)
 
 SV*
 bind(fd, address)
-	int fd
-	SV*address
+	SV *fd
+	SV *address
 	
 	ALIAS: sysbind=1
 
 	INIT:
 		int ret;
-		int len=SvOK(address)?SvCUR(address):0;
-		struct sockaddr *addr=(struct sockaddr *)SvPVX(address);
+		int len;//=SvOK(address)?SvCUR(address):0;
+		struct sockaddr *addr;//=(struct sockaddr *)SvPVX(address);
+
 	CODE:
-		//fprintf(stderr, "bind fd: %d\n",fd);
-		//fprintf(stderr, "bind len: %d\n",len);
-		ret=bind(fd, addr, len);
-		if(ret<0){
-			RETVAL=&PL_sv_undef;
-		}
-		else{
-			RETVAL=newSViv(ret+1);
-		}
+    if(SvOK(fd) && SvIOK(fd)){
+      if(SvOK(address) &&SvPOK(address)){  
+		    len=SvOK(address)?SvCUR(address):0;
+		    addr=(struct sockaddr *)SvPVX(address);
+      }
+      else {
+        addr=NULL;
+        len=0;
+      }
+      ret=bind(SvIV(fd), addr, len);
+      if(ret<0){
+        RETVAL=&PL_sv_undef;
+      }
+      else{
+        RETVAL=newSViv(ret+1);
+      }
+    }
+    else {
+      errno=EBADF;
+      Perl_warn(aTHX_ "%s", "IO::FD::bind called with something other than a file descriptor");
+      RETVAL=&PL_sv_undef;
+    }
 	
 	OUTPUT:
 		RETVAL
+
 #SOCKETPAIR
 ###########
 # TODO: 
@@ -828,8 +1091,8 @@ bind(fd, address)
 
 SV*
 socketpair(fd1,fd2, domain, type, protocol)
-	int fd1
-	int fd2
+	SV *fd1
+	SV *fd2
 	int domain
 	int type
 	int protocol
@@ -840,15 +1103,30 @@ socketpair(fd1,fd2, domain, type, protocol)
 		int fds[2];
 
 	CODE:
-		#TODO need to emulate via tcp to localhost for non unix
+		//TODO need to emulate via tcp to localhost for non unix
+    if(SvREADONLY(fd1) || SvREADONLY(fd2)){
+      Perl_croak(aTHX_ "%s", PL_no_modify);
+    }
 		ret=socketpair(domain, type, protocol, fds);
 		if(ret<0){
 			RETVAL=&PL_sv_undef;
 		}
 		else{
+      if(!SvOK(fd1)){
+          fd1=newSViv(fds[0]);
+      }
+      if(!SvOK(fd2)){
+          fd2=newSViv(fds[1]);
+      }
 			RETVAL=newSViv(ret+1);
-			fd1=fds[0];
-			fd2=fds[1];
+      if(fds[0]>PL_maxsysfd){
+        fcntl(fds[0], F_SETFD, FD_CLOEXEC);
+      }
+      if(fds[1]>PL_maxsysfd){
+        fcntl(fds[1], F_SETFD, FD_CLOEXEC);
+      }
+			//fd1=fds[0];
+			//fd2=fds[1];
 		}
 	OUTPUT:
 		RETVAL
@@ -860,7 +1138,7 @@ socketpair(fd1,fd2, domain, type, protocol)
 
 SV*
 sysseek(fd,offset,whence)
-	int fd;
+	SV *fd;
 	int offset;
 	int whence;
 
@@ -868,14 +1146,20 @@ sysseek(fd,offset,whence)
 		int ret;
 
 	CODE:
-
-		ret=lseek(fd, offset,whence);
-		if(ret<0){
-			RETVAL=&PL_sv_undef;
-		}
-		else{
-			RETVAL=newSViv(ret);
-		}
+    if(SvOK(fd) && SvIOK(fd)){
+      ret=lseek(SvIV(fd), offset, whence);
+      if(ret<0){
+        RETVAL=&PL_sv_undef;
+      }
+      else{
+        RETVAL=newSViv(ret);
+      }
+    }
+    else{
+      errno=EBADF;
+      RETVAL=&PL_sv_undef;
+      Perl_warn(aTHX_ "%s", "IO::FD::bind called with something other than a file descriptor");
+    }
 
 	OUTPUT:
 		RETVAL
@@ -885,19 +1169,26 @@ sysseek(fd,offset,whence)
 
 SV*
 dup(fd)
-	int fd;
+	SV *fd;
 
 	INIT:
 		int ret;
 
 	CODE:
-		ret=dup(fd);
-		if(ret<0){
-			RETVAL=&PL_sv_undef;
-		}
-		else{
-			RETVAL=newSViv(ret);
-		}
+    if(SvOK(fd) && SvIOK(fd)){
+      ret=dup(SvIV(fd));
+      if(ret<0){
+        RETVAL=&PL_sv_undef;
+      }
+      else{
+        RETVAL=newSViv(ret);
+      }
+    }
+    else {
+      errno=EBADF;
+      RETVAL=&PL_sv_undef;
+      Perl_warn(aTHX_ "%s", "IO::FD::dup called with something other than a file descriptor");
+    }
 
 	OUTPUT:
 		RETVAL
@@ -908,30 +1199,40 @@ dup(fd)
 
 SV*
 dup2(fd1,fd2)
-	int fd1
-	int fd2
+	SV *fd1
+	SV *fd2
 
 	INIT: 
 		int ret;
 
 	CODE:
-		ret=dup2(fd1,fd2);
-		if(ret<0){
-			RETVAL=&PL_sv_undef;
-		}
-		else{
-			RETVAL=newSViv(ret);
-		}
+    if(SvOK(fd1) && SvIOK(fd1) && SvOK(fd2) && SvIOK(fd2)){
+      ret=dup2(SvIV(fd1),SvIV(fd2));
+      if(ret<0){
+        RETVAL=&PL_sv_undef;
+      }
+      else{
+        if(ret>PL_maxsysfd){
+          fcntl(ret, F_SETFD, FD_CLOEXEC);
+        }
+        RETVAL=newSViv(ret);
+      }
+    }
+    else {
+      errno=EBADF;
+      RETVAL=&PL_sv_undef;
+      Perl_warn(aTHX_ "%s", "IO::FD::dup2 called with something other than a file descriptor");
+    }
 
 	OUTPUT:
-
 		RETVAL
+    
 #FCNTL
 ######
 
 SV*
 fcntl(fd, cmd, arg)
-	int fd
+	SV *fd
 	int cmd
 	SV* arg
 
@@ -941,28 +1242,35 @@ fcntl(fd, cmd, arg)
 	INIT:
 		int ret;
 	CODE:
-		#if arg is numeric, call with iv
-		#otherwise we pass pointers and hope for the best
-		if(SvOK(arg)){
-			if(SvIOK(arg)){
-				#fprintf(stderr, "PROCESSING ARG AS NUMBER\n");
-				ret=fcntl(fd,cmd, SvIV(arg));
-			}else if(SvPOK(arg)){
-				#fprintf(stderr, "PROCESSING ARG AS STRING\n");
-				ret=fcntl(fd,cmd,SvPVX(arg));
-			}
-			else {
-				#error
-				#fprintf(stderr, "PROCESSING ARG AS UNKOWN\n");
-				ret=-1;
-			}
-			if(ret==-1){
-				RETVAL=&PL_sv_undef;
-			}
-			else {
-				RETVAL=newSViv(ret);
-			}
-		}
+    if(SvOK(fd) && SvIOK(fd)){
+      //if arg is numeric, call with iv
+      //otherwise we pass pointers and hope for the best
+      if(SvOK(arg)){
+        if(SvIOK(arg)){
+          //fprintf(stderr, "PROCESSING ARG AS NUMBER\n");
+          ret=fcntl(SvIV(fd),cmd, SvIV(arg));
+        }else if(SvPOK(arg)){
+          //fprintf(stderr, "PROCESSING ARG AS STRING\n");
+          ret=fcntl(SvIV(fd),cmd,SvPVX(arg));
+        }
+        else {
+          //error
+          //fprintf(stderr, "PROCESSING ARG AS UNKOWN\n");
+          ret=-1;
+        }
+        if(ret==-1){
+          RETVAL=&PL_sv_undef;
+        }
+        else {
+          RETVAL=newSViv(ret);
+        }
+      }
+    }
+    else {
+      errno=EBADF;
+      RETVAL=&PL_sv_undef;
+      Perl_warn(aTHX_ "%s", "IO::FD::fcntl called with something other than a file descriptor");
+    }
 
 	OUTPUT:
 		RETVAL
@@ -973,7 +1281,7 @@ fcntl(fd, cmd, arg)
 
 SV*
 ioctl(fd, request, arg)
-	int fd
+	SV *fd
 	int request
 	int arg
 
@@ -990,7 +1298,7 @@ ioctl(fd, request, arg)
 ############
 SV*
 getsockopt(fd, level, option) 
-	int fd
+	SV *fd
 	int level
 	int option
 
@@ -1001,21 +1309,29 @@ getsockopt(fd, level, option)
 		SV *buffer;
 
 	CODE:
-		buffer=newSV(257);
-		SvPOK_on(buffer);
-		buf=SvPVX(buffer);
-		len=256;
+    if(SvOK(fd) && SvIOK(fd)){
+      buffer=newSV(257);
+      SvPOK_on(buffer);
+      buf=SvPVX(buffer);
+      len=256;
 
-		ret=getsockopt(fd,level, option, buf, &len);	
+      ret=getsockopt(SvIV(fd),level, option, buf, &len);	
 
-		if(ret<0){
-			RETVAL=&PL_sv_undef;
-		}
-		else {
-			SvCUR_set(buffer, len);
-			*SvEND(buffer)='\0';
-			RETVAL=buffer;
-		}
+      if(ret<0){
+        RETVAL=&PL_sv_undef;
+      }
+      else {
+        SvCUR_set(buffer, len);
+        *SvEND(buffer)='\0';
+        RETVAL=buffer;
+      }
+    }
+    else{
+      errno=EBADF;
+      RETVAL=&PL_sv_undef;
+      Perl_warn(aTHX_ "%s", "IO::FD::getsockopt called with something other than a file descriptor");
+    }
+    
 
 
 	OUTPUT:
@@ -1026,7 +1342,7 @@ getsockopt(fd, level, option)
 ###########
 SV*
 setsockopt(fd, level, option, buffer)
-	int fd
+	SV *fd
 	int level
 	int option
 	SV* buffer;
@@ -1040,81 +1356,57 @@ setsockopt(fd, level, option, buffer)
 
 
 	CODE:
-		if(SvOK(buffer)){
-			if(SvIOK(buffer)){
-				#fprintf(stderr, "SET SOCKOPT as integer\n");
-				//Do what perl does and convert integers
-				_buffer=newSV(sizeof(int));
-				len=sizeof(int);
-				
-				SvPOK_on(_buffer);
-				SvCUR_set(_buffer, len);
-				//*SvEND(_buffer)='\0';
-				buf=SvPVX(_buffer);
-				*((int *)buf)=SvIVX(buffer);
+    if(SvOK(fd) && SvIOK(fd)){
+      if(SvOK(buffer)){
+        if(SvIOK(buffer)){
+          //fprintf(stderr, "SET SOCKOPT as integer\n");
+          //Do what perl does and convert integers
+          _buffer=newSV(sizeof(int));
+          len=sizeof(int);
 
-			}
-			else if(SvPOK(buffer)){
-				#fprintf(stderr, "SET SOCKOPT as NON integer\n");
-				_buffer=buffer;
+          SvPOK_on(_buffer);
+          SvCUR_set(_buffer, len);
+          //*SvEND(_buffer)='\0';
+          buf=SvPVX(_buffer);
+          *((int *)buf)=SvIVX(buffer);
 
-			}
+        }
+        else if(SvPOK(buffer)){
+          //fprintf(stderr, "SET SOCKOPT as NON integer\n");
+          _buffer=buffer;
 
-			len=SvCUR(_buffer);
-			buf=SvPVX(_buffer);
-			ret=setsockopt(fd,level,option,buf, len);
-			if(ret<0){
-				//fprintf(stderr, "call failed\n");
-				RETVAL=&PL_sv_undef;
-			}
-			else{
-				//fprintf(stderr, "call succeeded\n");
-				RETVAL=newSViv(ret+1);
-			}
-			
-		}
-		else{
-			//fprintf(stderr, "no buffer");
-			RETVAL=&PL_sv_undef;
-		}	
+        }
 
+        len=SvCUR(_buffer);
+        buf=SvPVX(_buffer);
+        ret=setsockopt(SvIV(fd),level,option,buf, len);
+        if(ret<0){
+          //fprintf(stderr, "call failed\n");
+          RETVAL=&PL_sv_undef;
+        }
+        else{
+          //fprintf(stderr, "call succeeded\n");
+          RETVAL=newSViv(ret+1);
+        }
+
+      }
+      else{
+        //fprintf(stderr, "no buffer");
+        RETVAL=&PL_sv_undef;
+      }	
+
+    }
+    else{
+      errno=EBADF;
+      RETVAL=&PL_sv_undef;
+      Perl_warn(aTHX_ "%s", "IO::FD::setsockopt called with something other than a file descriptor");
+    }
 
 		
 
 	OUTPUT:
 		RETVAL
 
-        ##########################################################
-        # #FILENO                                                #
-        # #######                                                #
-        #                                                        #
-        # SV *                                                   #
-        # fileno (fd_fh)                                         #
-        #         SV *fd_fh;                                     #
-        #                                                        #
-        #         INIT:                                          #
-        #                 int ret;                               #
-        #                                                        #
-        #         CODE:                                          #
-        #                 if(!SvOK(fd_fh)){                      #
-        #                         RETVAL=&PL_sv_undef;           #
-        #                 }                                      #
-        #                 else{                                  #
-        #                         if(SvIOK(fd_fh)){              #
-        #                                 //treat as integer fd  #
-        #                                 RETVAL=newSVsv(fd_fh); #
-        #                         }                              #
-        #                         else{                          #
-        #                                 //assume glob          #
-        #                                 REVAL=GvIO             #
-        #                         }                              #
-        #                 }                                      #
-        #                                                        #
-        #                                                        #
-        #         OUTPUT:                                        #
-        #                 RETVAL                                 #
-        #                                                        #
-        ##########################################################
 
 
 #SELECT
@@ -1295,6 +1587,10 @@ mkstemp(template)
 			//mXPUSHs(&PL_sv_undef);
 		}	
 		else{
+
+      if(ret>PL_maxsysfd){
+        fcntl(ret, F_SETFD, FD_CLOEXEC);
+      }
 			switch(GIMME_V){
 				case G_SCALAR:
 					mXPUSHs(newSViv(ret));
@@ -1358,7 +1654,7 @@ mktemp(template)
 
 SV*
 recv(fd, data, len, flags)
-	int fd
+	SV *fd
 	SV *data
 	int len
 	int flags
@@ -1371,34 +1667,44 @@ recv(fd, data, len, flags)
 		char *buf;
 
 	CODE:
-		//Makesure the buffer exists and is large enough to recv
-		if(!SvOK(data)){
-			data=newSV(len);
-		}
-		buf = SvPOK(data) ? SvGROW(data,len+1) : NULL;
+    if(SvOK(fd) && SvIOK(fd)){
+        if(SvREADONLY(data)){
+            Perl_croak(aTHX_ "%s", PL_no_modify);
+        }
+      //Makesure the buffer exists and is large enough to recv
+      if(!SvOK(data)){
+        data=newSV(len);
+      }
+      buf = SvPOK(data) ? SvGROW(data,len+1) : NULL;
 
-		peer=newSV(sizeof(struct sockaddr_storage));
-		peer_buf=(struct sockaddr *)SvPVX(peer);
+      peer=newSV(sizeof(struct sockaddr_storage));
+      peer_buf=(struct sockaddr *)SvPVX(peer);
 
-		addr_len=sizeof(struct sockaddr_storage);
-		ret=recvfrom(fd, buf, len, flags, peer_buf, &addr_len);
+      addr_len=sizeof(struct sockaddr_storage);
+      ret=recvfrom(SvIV(fd), buf, len, flags, peer_buf, &addr_len);
 
-		if(ret<0){
-			RETVAL=&PL_sv_undef;
-		}
-		else{
-			SvCUR_set(data,ret);
-			SvPOK_on(peer);
-			//SvCUR_set(peer, addr_len);
-			ADJUST_SOCKADDR_SIZE(peer);
-			RETVAL=peer;
-		}
+      if(ret<0){
+        RETVAL=&PL_sv_undef;
+      }
+      else{
+        SvCUR_set(data,ret);
+        SvPOK_on(peer);
+        //SvCUR_set(peer, addr_len);
+        ADJUST_SOCKADDR_SIZE(peer);
+        RETVAL=peer;
+      }
+    }
+    else {
+      errno=EBADF;
+      RETVAL=&PL_sv_undef;
+      Perl_warn(aTHX_ "%s", "IO::FD::recv called with something other than a file descriptor");
+    }
 	OUTPUT:
 		RETVAL
 
 SV*
 send(fd,data,flags, ...)
-	int fd
+	SV *fd
 	SV* data
 	int flags
 
@@ -1412,37 +1718,45 @@ send(fd,data,flags, ...)
 
 		
 	CODE:
-		if(SvOK(data) && SvPOK(data)){
-			if((items == 4) && SvOK(ST(3)) && SvPOK(ST(3))){
-				//Do sendto
-				len=SvCUR(data);
-				buf=SvPVX(data);
+    if(SvOK(fd) && SvIOK(fd)){
+      if(SvOK(data) && SvPOK(data)){
+        if((items == 4) && SvOK(ST(3)) && SvPOK(ST(3))){
+          //Do sendto
+          len=SvCUR(data);
+          buf=SvPVX(data);
 
-				dest=(struct sockaddr *)SvPVX(ST(3));
+          dest=(struct sockaddr *)SvPVX(ST(3));
 
-				ret=sendto(fd, buf, len, flags, dest, SvCUR(ST(3)));
-			}
-			else {
-				//Regular send
-				len=SvCUR(data);
-				buf=SvPVX(data);
-				ret=send(fd, buf, len, flags);
-			}
-		}
-		if(ret<0){
+          ret=sendto(SvIV(fd), buf, len, flags, dest, SvCUR(ST(3)));
+        }
+        else {
+          //Regular send
+          len=SvCUR(data);
+          buf=SvPVX(data);
+          ret=send(SvIV(fd), buf, len, flags);
+        }
+      }
+      if(ret<0){
 
-			RETVAL=&PL_sv_undef;
-		}
-		else{
-			RETVAL=newSViv(ret);
-		}
+        RETVAL=&PL_sv_undef;
+      }
+      else{
+        RETVAL=newSViv(ret);
+      }
+    }
+    else{
+      errno=EBADF;
+      RETVAL=&PL_sv_undef;
+      Perl_warn(aTHX_ "%s", "IO::FD::send called with something other than a file descriptor");
+    }
+
 	OUTPUT:
 		RETVAL
 
 
 SV*
 getpeername(fd)
-	int fd;
+	SV *fd;
 	
 	INIT:
 		int ret;
@@ -1451,25 +1765,31 @@ getpeername(fd)
 		unsigned int len=sizeof(struct sockaddr_storage);
 
 	CODE:
-		
-		ret=getpeername(fd,buf,&len);
-		if(ret<0){
-			RETVAL=&PL_sv_undef;
-		}
-		else {
-			//SvCUR_set(addr,len);
-			ADJUST_SOCKADDR_SIZE(addr);
-			SvPOK_on(addr);
+    if(SvOK(fd)&&SvIOK(fd)){	
+      ret=getpeername(SvIV(fd),buf,&len);
+      if(ret<0){
+        RETVAL=&PL_sv_undef;
+      }
+      else {
+        //SvCUR_set(addr,len);
+        ADJUST_SOCKADDR_SIZE(addr);
+        SvPOK_on(addr);
 
-			RETVAL=addr;
-		}
+        RETVAL=addr;
+      }
+    }
+    else {
+      errno=EBADF;
+      RETVAL=&PL_sv_undef;
+      Perl_warn(aTHX_ "%s", "IO::FD::getpeername called with something other than a file descriptor");
+    }
 	
 	OUTPUT:
 		RETVAL
 
 SV*
 getsockname(fd)
-	int fd;
+	SV *fd;
 	
 	INIT:
 		int ret;
@@ -1478,40 +1798,53 @@ getsockname(fd)
 		unsigned int len=sizeof(struct sockaddr_storage);
 
 	CODE:
-		
-		ret=getsockname(fd,buf,&len);
-		if(ret<0){
-			RETVAL=&PL_sv_undef;
-		}
-		else {
-			//SvCUR_set(addr,len);
-			ADJUST_SOCKADDR_SIZE(addr);
-			SvPOK_on(addr);
+    if(SvOK(fd) && SvIOK(fd)){	
+      ret=getsockname(SvIV(fd),buf,&len);
+      if(ret<0){
+        RETVAL=&PL_sv_undef;
+      }
+      else {
+        //SvCUR_set(addr,len);
+        ADJUST_SOCKADDR_SIZE(addr);
+        SvPOK_on(addr);
 
-			RETVAL=addr;
-		}
+        RETVAL=addr;
+      }
+    }
+    else{
+      errno=EBADF;
+      RETVAL=&PL_sv_undef;
+      Perl_warn(aTHX_ "%s", "IO::FD::getsockname called with something other than a file descriptor");
+    }
 	
 	OUTPUT:
 		RETVAL
 
 void
 shutdown(fd, how)
-	int fd
+	SV *fd
 	int how
 
 	INIT:
 
 	  int ret;
 	PPCODE:
-		ret=shutdown(fd, how);
+  if(SvOK(fd)&& SvIOK(fd)){ 
+    ret=shutdown(SvIV(fd), how);
 
-		if(ret<0){
-			XSRETURN_UNDEF;
-		}
-		else{
-			mXPUSHs(newSViv(1));
-			XSRETURN(1);
-		}
+    if(ret<0){
+      XSRETURN_UNDEF;
+    }
+    else{
+      mXPUSHs(newSViv(1));
+      XSRETURN(1);
+    }
+  }
+  else{
+      errno=EBADF;
+      Perl_warn(aTHX_ "%s", "IO::FD::shutdown called with something other than a file descriptor");
+      XSRETURN_UNDEF;
+  }
 
 void
 stat(target)
@@ -1799,7 +2132,7 @@ SV(size)
 
 void
 readline(fd)
-	int fd
+	SV *fd
 	
 	INIT:
 		SV *irs;
@@ -1811,50 +2144,55 @@ readline(fd)
 
 		int tmp;
 	PPCODE:
-		irs=get_sv("/",0);
-		if(irs){
-			#Found variable. Read records
-			if(SvOK(irs)){
-				if(SvROK(irs)){
-					//fprintf(stderr, "DOING RECORD READ\n");
-					//SLURP RECORDS
+    if(SvOK(fd)&& SvIOK(fd)){
+      irs=get_sv("/",0);
+      if(irs){
+  #Found variable. Read records
+        if(SvOK(irs)){
+          if(SvROK(irs)){
+            //fprintf(stderr, "DOING RECORD READ\n");
+            //SLURP RECORDS
 
-					SV* v=SvRV(irs);	//Dereference to get SV
-					tmp=SvIV(v);		//The integer value of the sv
-					buffer=newSV(tmp);	//Allocate buffer at record size
-					buf=SvPVX(buffer);	//Get the pointer we  need
-					ret=read(fd, buf, tmp);	//Do the read into buffer
-					//fprintf(stderr, "read return: %d\n", ret);
-					SvPOK_on(buffer);	//Make a string
-					if(ret>=0){
-						buf[ret]='\0';		//Set null just in case
-						SvCUR_set(buffer,ret);	//Set the length of the string
-						EXTEND(SP,1);		//Extend stack
-						mPUSHs(buffer);		//Push record
-						XSRETURN(1);
-					}
-					else {
-						XSRETURN_UNDEF;
-					}
+            SV* v=SvRV(irs);	//Dereference to get SV
+            tmp=SvIV(v);		//The integer value of the sv
+            buffer=newSV(tmp);	//Allocate buffer at record size
+            buf=SvPVX(buffer);	//Get the pointer we  need
+            ret=read(SvIV(fd), buf, tmp);	//Do the read into buffer
+            //fprintf(stderr, "read return: %d\n", ret);
+            SvPOK_on(buffer);	//Make a string
+            if(ret>=0){
+              buf[ret]='\0';		//Set null just in case
+              SvCUR_set(buffer,ret);	//Set the length of the string
+              EXTEND(SP,1);		//Extend stack
+              mPUSHs(buffer);		//Push record
+              XSRETURN(1);
+            }
+            else {
+              XSRETURN_UNDEF;
+            }
 
-				}
-				else {
-					Perl_croak( aTHX_ "IO::FD::readline does not split lines");
-				}
-			}
-			else{
+          }
+          else {
+            Perl_croak( aTHX_ "IO::FD::readline does not split lines");
+          }
+        }
+        else{
 
-				//fprintf(stderr, "DOING SLURP READ\n");
-				//SLURP entire file
-				EXTEND(SP,1);
-				PUSHs(slurp(aTHX_ fd, 4096));
-				XSRETURN(1);
-			}
-		}
-		else {
-			#not found.. this isn't good
+          //fprintf(stderr, "DOING SLURP READ\n");
+          //SLURP entire file
+          EXTEND(SP,1);
+          PUSHs(slurp(aTHX_ SvIV(fd), 4096));
+          XSRETURN(1);
+        }
+      }
+      else {
+        //not found.. this isn't good
 
-		}
+      }
+    }
+    else{
+      XSRETURN_UNDEF;
+    }
 
 
 #Naming

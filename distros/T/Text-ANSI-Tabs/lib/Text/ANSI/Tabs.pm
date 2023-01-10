@@ -1,5 +1,5 @@
 package Text::ANSI::Tabs;
-our $VERSION = "1.02";
+our $VERSION = "1.03";
 
 =encoding utf-8
 
@@ -20,7 +20,7 @@ Text::ANSI::Tabs - Tab expand and unexpand with ANSI sequence
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =cut
 
@@ -182,16 +182,16 @@ See L<Text::ANSI::Fold> for detail.
 =head1 SEE ALSO
 
 L<App::ansiexpand>,
-L<https://github.com/kaz-utashiro/App-ansiexpand>
+L<https://github.com/tecolicom/App-ansiexpand>
 
 L<Text::ANSI::Tabs>,
-L<https://github.com/kaz-utashiro/Text-ANSI-Tabs>
+L<https://github.com/tecolicom/Text-ANSI-Tabs>
 
 L<Text::ANSI::Fold::Util>,
-L<https://github.com/kaz-utashiro/Text-ANSI-Fold-Util>
+L<https://github.com/tecolicom/Text-ANSI-Fold-Util>
 
 L<Text::ANSI::Fold>,
-L<https://github.com/kaz-utashiro/Text-ANSI-Fold>
+L<https://github.com/tecolicom/Text-ANSI-Fold>
 
 L<Text::Tabs>
 
@@ -201,7 +201,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2021-2022 Kazumasa Utashiro.
+Copyright 2021-2023 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

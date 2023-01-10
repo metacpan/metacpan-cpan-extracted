@@ -1,43 +1,64 @@
 package PDLx::Role::RestrictedPDL;
 
-use strictures 2;
+# ABSTRACT: restrict write access to a PDL object as much as possible
 
-use Carp;
+use strict;
+use warnings;
+
 use PDL::Core ':Internal';
 use overload;
 
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
 my $_cant_mutate;
 
 BEGIN {
-    $_cant_mutate = sub { croak "restricted piddle: cannot mutate" };
+    $_cant_mutate = sub {
+        require Carp;
+        Carp::croak "restricted piddle: cannot mutate";
+    };
 }
 
 
 use Moo::Role;
+use namespace::clean 0.16;
 
 use overload
-    map { $_ => $_cant_mutate }
-    grep { $_ =~ /=$/ }
-    map { split( ' ', $_ ) } @{overload::ops}{ 'assign', 'mutators', 'binary' };
+  map  { $_ => $_cant_mutate }
+  grep { $_ =~ /=$/ }
+  map  { split( ' ', $_ ) } @{overload::ops}{ 'assign', 'mutators', 'binary' };
 
-sub is_inplace { 0; }
+sub is_inplace  { 0; }
 sub set_inplace { goto $_cant_mutate unless @_ > 0 && $_[1] == 0 }
 
+sub inplace;
 *inplace = $_cant_mutate;
 
 1;
 
+#
+# This file is part of PDLx-Mask
+#
+# This software is Copyright (c) 2016 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
 
 __END__
 
-
 =pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory PDL
 
 =head1 NAME
 
-PDLx::Role::RestrictedPDL -- restrict write access to a PDL object as much as possible
+PDLx::Role::RestrictedPDL - restrict write access to a PDL object as much as possible
+
+=head1 VERSION
+
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -46,7 +67,6 @@ PDLx::Role::RestrictedPDL -- restrict write access to a PDL object as much as po
   use Moo;
 
   with 'PDLx::Role::RestrictedPDL';
-
 
 =head1 DESCRIPTION
 
@@ -57,51 +77,51 @@ and
 L<< B<set_inplace>|PDL::Core/set_inplace >>,
 methods to attempt to prevent mutation of a piddle.
 
-=head1 BUGS AND LIMITATIONS
+=head1 INTERNALS
 
-B<< This does I<not> provide a readonly PDL! >>  Currently that's impossible.
-It tries to make common operations croak, but cannot handle corner cases.
+=for Pod::Coverage inplace
+is_inplace
+PDL
+set_inplace
 
-Please report any bugs or feature requests to
-C<bug-pdlx-mask@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/Public/Dist/Display.html?Name=PDLx-Mask>.
+=head1 SUPPORT
 
+=head2 Bugs
 
-=head1 VERSION
+Please report any bugs or feature requests to bug-pdlx-mask@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=PDLx-Mask
 
-Version 0.01
+=head2 Source
 
-=head1 LICENSE AND COPYRIGHT
+Source is available at
 
-Copyright (c) 2016 The Smithsonian Astrophysical Observatory
+  https://gitlab.com/djerius/pdlx-mask
 
-PDLx::Mask is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or (at
-your option) any later version.
+and may be cloned from
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+  https://gitlab.com/djerius/pdlx-mask.git
 
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<PDLx::Mask|PDLx::Mask>
+
+=back
 
 =head1 AUTHOR
 
-Diab Jerius  E<lt>djerius@cpan.orgE<gt>
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
 
 =cut
-
-=begin fakeout_pod_coverage
-
-=head3 inplace
-
-=head3 is_inplace
-
-=head3 PDL
-
-=head3 set_inplace
-
-=end fakeout_pod_coverage

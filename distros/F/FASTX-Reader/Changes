@@ -2,6 +2,13 @@ This is the changelog for FASTX::Reader. Version prior to v 0.1 are preliminary 
 Some APIs *can change* with the release of the first stable release (v 1.0).
 Version 0.61 has been available via BioConda
 
+1.8.1 2023-01-09
+  * Updated tests
+  * Update POD documentation
+
+1.8.0 2023-01-08
+  * CRITICAL BUG FIX in next() method used in while loops
+
 1.7.0 2022-12-12
   * FASTX::Seq has more stringent requirements, undef seq not allowed (but empty are fine)
   

@@ -1,10 +1,8 @@
-#!/usr/bin/perl
-# This is a series of unit tests to ensure that things do what I think
-# they do.
-use strict;
+use v5.12.0;
+use warnings;
+
 use Email::Simple;
 
-package Email::Simple;
 use Test::More tests => 8;
 
 # Simple "email", no body

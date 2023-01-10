@@ -1,5 +1,5 @@
 package Config::Structured;
-$Config::Structured::VERSION = '2.002';
+$Config::Structured::VERSION = '2.003';
 # ABSTRACT: Provides generalized and structured configuration value access
 
 use 5.022;
@@ -11,9 +11,9 @@ use Mojo::DynamicMethods -dispatch;
 use Syntax::Keyword::Junction;
 use Carp;
 use IO::All;
-use List::Util qw(reduce);
+use List::Util  qw(reduce);
 use Data::DPath qw(dpath);
-use Text::Glob qw(match_glob);
+use Text::Glob  qw(match_glob);
 
 use Readonly;
 
@@ -39,7 +39,7 @@ Readonly::Scalar my $CONF_FROM_ENV  => q(env);
 
 # Method names that are needed by Config::Structured and cannot be overridden by config node names
 Readonly::Array my @RESERVED =>
-  qw(get meta BUILDCARGS BUILD BUILD_DYNAMIC _config _structure _hooks _base _add_helper __register_default __register_as);
+  qw(get meta BUILDCARGS BUILD BUILD_DYNAMIC _config _structure _hooks _base _add_helper __register_default __register_as __get_child_node_names);
 
 #
 # The configuration structure (e.g., $app.conf.def contents)
@@ -115,15 +115,15 @@ around BUILDARGS => sub ($orig, $class, @args) {
 sub BUILD ($self, $args) {
   # lexical subroutines
 
-  state sub pkg_prefix($msg) {
+  state sub pkg_prefix ($msg) {
     '[' . __PACKAGE__ . "] $msg";
   }
 
-  state sub is_hashref($node) {
+  state sub is_hashref ($node) {
     return ref($node) eq 'HASH';
   }
 
-  state sub is_leaf_node($node) {
+  state sub is_leaf_node ($node) {
     exists($node->{isa});
   }
 
@@ -133,7 +133,7 @@ sub BUILD ($self, $args) {
     return (exists($node->{$CFG_SOURCE}) && exists($node->{$CFG_REF}));
   }
 
-  state sub ref_content_value($node) {
+  state sub ref_content_value ($node) {
     my $source = $node->{$CFG_SOURCE};
     my $ref    = $node->{$CFG_REF};
     if ($source eq $CONF_FROM_FILE) {
@@ -174,7 +174,7 @@ sub BUILD ($self, $args) {
     return node_value($el, dpath($path)->matchr($self->_config)->[0]);
   };
 
-  my $get_hooks = sub($path) {
+  my $get_hooks = sub ($path) {
     return map {$self->_hooks->{$_}} grep {match_glob($_, $path) ? $_ : ()} keys(%{$self->_hooks});
   };
 
@@ -199,7 +199,7 @@ sub BUILD ($self, $args) {
     }
   };
 
-  my $make_branch_generator = sub($path) {
+  my $make_branch_generator = sub ($path) {
     return sub {
       return __PACKAGE__->new(
         structure => $self->_structure,
@@ -235,15 +235,15 @@ sub BUILD ($self, $args) {
         if (is_leaf_node($n)) {
           my @hooks = grep {defined} map {$_->{on_load}} $get_hooks->($p);
           if (@hooks) {
-            my $v = $get_node_value->($n, $p);                         #put off resolving the node value until we know we need it
+            my $v = $get_node_value->($n, $p);    #put off resolving the node value until we know we need it
             foreach (@hooks) {$_->($p, $v)}
           }
         } else {
-          __SUB__->($p, $n);                                           #recurse on the new branch node
+          __SUB__->($p, $n);                      #recurse on the new branch node
         }
       }
       }
-      ->($self->_base, $self->_structure);                             #initially call on root of structure
+      ->($self->_base, $self->_structure);    #initially call on root of structure
   }
 }
 
@@ -273,7 +273,7 @@ our $saved_instances = {
 # Instance method
 # Saves the current instance as the default instance
 #
-sub __register_default($self) {
+sub __register_default ($self) {
   $saved_instances->{default} = $self;
   return $self;
 }
@@ -305,6 +305,16 @@ sub get ($class, $name = undef) {
   }
 }
 
+#
+# Instance method
+# Get all the node names that are children of the current node in config structure
+# Returns:
+#   List of strings
+sub __get_child_node_names ($self) {
+  my ($node) = dpath($self->_base)->match($self->_structure);
+  return (keys($node->%*));
+}
+
 1;
 
 __END__
@@ -319,7 +329,7 @@ Config::Structured - Provides generalized and structured configuration value acc
 
 =head1 VERSION
 
-version 2.002
+version 2.003
 
 =head1 SYNOPSIS
 
@@ -408,13 +418,17 @@ Call on a L<Config::Structured> instance to set the instance as the default.
 
 Call on a L<Config::Structured> instance to register the instance as the provided name.
 
+=head2 __get_child_node_names()
+
+Returns a list of names (strings) of all immediate child nodes of the current config node
+
 =head1 AUTHOR
 
 Mark Tyrrell <mtyrrell@concertpharma.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Concert Pharmaceuticals, Inc.
+This software is copyright (c) 2023 by Concert Pharmaceuticals, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

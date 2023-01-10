@@ -1,5 +1,5 @@
 package Date::Holidays::BY;
-our $VERSION = '1.2023.1'; # VERSION
+our $VERSION = '1.2023.2'; # VERSION
 
 =encoding utf8
 
@@ -161,7 +161,7 @@ my %SHORT_BUSINESS_DAYS = (
 
 sub _radonitsa_mmdd {
     my $year=$_[0];
-    if ($year < 1583 || $year > 7666) {croak "Module has limitation in counting Easter outside the period 1583-7666";}
+    if ($year < 1583) {croak "Module has limitation in counting Easter outside the period 1583-7666";}
     require Date::Easter;
     my ($easter_month, $easter_day) = Date::Easter::orthodox_easter($year);
     my $radonitsa_month = $easter_month;

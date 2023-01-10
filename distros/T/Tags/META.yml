@@ -32,6 +32,7 @@ requires:
   Error::Pure: 0.07
   Exporter: 0
   HTML::Entities: 0
+  List::Util: 1.33
   Readonly: 0
   perl: 5.8.0
 resources:
@@ -39,4 +40,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Tags
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags
-version: '0.13'
+version: '0.14'

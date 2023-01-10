@@ -1,5 +1,5 @@
 package Bitcoin::Crypto;
-$Bitcoin::Crypto::VERSION = '1.007';
+$Bitcoin::Crypto::VERSION = '1.008';
 use v5.10;
 use strict;
 use warnings;
@@ -187,9 +187,15 @@ The module have a little bit of startup time because of Moo and Type::Tiny, meas
 
 =head1 TODO
 
+I will gladly accept help working on these:
+
 =over 2
 
 =item * Taproot compatibility
+
+=item * Better error checking (subroutine inputs, edge cases etc.)
+
+=item * Detailed manual
 
 =item * Better test coverage
 
@@ -211,7 +217,7 @@ Bartosz Jarzyna E<lt>bbrtj.pro@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018 - 2022 by Bartosz Jarzyna
+Copyright (C) 2018 - 2023 by Bartosz Jarzyna
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

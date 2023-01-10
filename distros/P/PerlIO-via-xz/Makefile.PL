@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2020-2022 H.Merijn Brand
+# Copyright 2020-2023 H.Merijn Brand
 
 require 5.012000;
 use strict;

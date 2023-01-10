@@ -17,9 +17,9 @@ use strictures;
 no indirect 'fatal';
 no multidimensional;
 
-use Cwd 'abs_path';
+use Cwd qw(abs_path getcwd);
 
-use Test::More tests => 18;
+use Test::More tests => 21;
 use Test::Output;
 use Test::Warn;
 
@@ -30,6 +30,9 @@ use UI::Various({use => [], include => [qw(Main Compound::FileSelect)]});
 
 use constant T_PATH => map { s|/[^/]+$||; $_ } abs_path($0);
 do(T_PATH . '/functions/call_with_stdin.pl');
+# This will fail if test is ever called with a relative path containing '..':
+use constant CWD => getcwd;
+use constant REL_PATH => (CWD eq T_PATH ? '.' : substr(T_PATH, length(CWD) + 1));
 
 #########################################################################
 # identical parts of messages and some basic building blocks:
@@ -59,10 +62,16 @@ warning_like
 {   $_ = UI::Various::Compound::FileSelect->new(mode => 3);   }
 {   carped => qr/^parameter 'mode' must be in \[0\.\.2\]$re_msg_tail/   },
     'bad mode parameter fails';
+warning_like
+{   $_ = UI::Various::Compound::FileSelect->new(mode => 0, symlinks => 2);   }
+{   carped => qr/^parameter 'symlinks' must be in \[0\.\.1\]$re_msg_tail/   },
+    'bad symlinks parameter fails';
 
 ####################################
 # test selection of single input file:
-my $fs = UI::Various::Compound::FileSelect->new(mode => 1, directory => T_PATH);
+my $fs = UI::Various::Compound::FileSelect->new(mode => 1,
+						directory => REL_PATH,
+						symlinks => 1);
 $main->add($fs);			# now we have a maximum width
 is($fs->selection(), T_PATH . '/',
    'no selection in mode 0 returns current directory with trailing /');
@@ -103,10 +112,17 @@ like($fs->selection(), qr'/t/01-use.t',
 $main->remove($fs);
 
 ####################################
+# test of _cd with simulated entries in root directory:
+$fs->{directory} = '/';
+is($fs->symlinks, 1, 'symlinks is set');
+$fs->_cd('dev');
+is($fs->{directory}, '/dev', 'path in root directory starts with 1 slash');
+
+####################################
 # test selection of multiple Perl scripts as input files:
 
 $fs = UI::Various::Compound::FileSelect->new(mode => 2,
-					     directory => T_PATH,
+					     directory => REL_PATH,
 					     filter =>
 					     [['all files' => '.+'],
 					      ['PL scripts' => '\.pl$']]
@@ -129,15 +145,16 @@ my $re_pl_whole_output_t =
     "<1> \n<\\*> \\[ \\.\\. \\]\n    " . T_PATH . "\n    \n" .
     "<2> \\[ PL scripts \\]\n" .
     "<3>   1-1/1\n" .
-    "      functions\n\n\n\n\n\n\n\n";
+    "      functions\n\n\n\n";
 my $re_list_output_t =
     "      1-1/1\n" .
     "<1>   functions\n\n\n\n\n\n\n\n";
-my $re_basic_pl_output =
+my $re_basic_pl_output_short =
     "[ <1-3>*]+ call_with_stdin\\.pl\n" .
     "[ <1-3>*]+ run_in_fork\\.pl\n" .
     "[ <1-3>*]+ sub_perl\\.pl\n" .
-    "\n\n\n\n\n";
+    "\n\n\n";
+my $re_basic_pl_output = $re_basic_pl_output_short . "\n\n";
 $re_output =
     $re_whole_output . "2\n" .
     "<1> all files\n<2> PL scripts\n" . $re_output_select_option . "2\n" .
@@ -150,8 +167,8 @@ $re_output =
     "      1-3/3\n" . $re_basic_pl_output . $re_output_select_list . "0\n" .
     "<1> \n<\\*> \\[ \\.\\. \\]\n    " . T_PATH . "/functions\n    \n" .
     "<2> \\[ PL scripts \\]\n" .
-    "<3>   1-3/3\n" . $re_basic_pl_output . $re_output_select_box . "0\n" .
-'';
+    "<3>   1-3/3\n" . $re_basic_pl_output_short .
+    $re_output_select_box . "0\n";
 stdout_like
 {   _call_with_stdin($selection, sub {   $fs->_process();   });   }
     qr/^$re_output$/,
@@ -185,7 +202,7 @@ my $re_txt_whole_output_t =
     "<1> \n<\\*> \\[ \\.\\. \\]\n    " . T_PATH . "\n    \n" .
     "<2> \\[ text files \\]\n" .
     "<3>   1-1/1\n" .
-    "      functions\n\n\n\n\n\n\n\n";
+    "      functions\n\n\n\n";
 $re_output =
     $re_whole_output . "2\n" .
     "<1> all files\n<2> text files\n" . $re_output_select_option . "2\n" .
@@ -194,7 +211,7 @@ $re_output =
     "      0/0\n\n\n\n\n\n\n\n\n" . $re_output_select_list . "0\n" .
     "<1> \n<\\*> \\[ \\.\\. \\]\n    " . T_PATH . "/functions\n    \n" .
     "<2> \\[ text files \\]\n" .
-    "      0/0\n\n\n\n\n\n\n\n\n" .
+    "      0/0\n\n\n\n" .
     "<4> *\n" . $re_output_select_box . "1\n" .
     $re_txt_whole_output_t . "<4> *\n" . $re_output_select_box . "4\n" .
     "old value: *\nnew value\\? " .

@@ -1,5 +1,5 @@
 package AI::Genetic::Pro::Mutation::Rangevector;
-
+$AI::Genetic::Pro::Mutation::Rangevector::VERSION = '1.009';
 use warnings;
 use strict;
 use List::MoreUtils qw(first_index);

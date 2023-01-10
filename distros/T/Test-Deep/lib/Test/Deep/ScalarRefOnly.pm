@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Test::Deep::ScalarRefOnly 1.202;
+package Test::Deep::ScalarRefOnly 1.204;
 
 use Test::Deep::Cmp;
 
@@ -47,7 +47,7 @@ Test::Deep::ScalarRefOnly
 
 =head1 VERSION
 
-version 1.202
+version 1.204
 
 =head1 PERL VERSION
 

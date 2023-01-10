@@ -208,22 +208,19 @@ stdout_is
 
 is(@{$main->{children}}, 0, 'main is clean again');
 
-my $dialog6;
 my $button6d = UI::Various::Button->new(text => 'Close',
-					code => sub { $dialog6->destroy; });
+					code => sub { $_[0]->destroy; });
 my $text6w = UI::Various::Text->new(text => 'Hello Window!');
 my $button6w1 =
     UI::Various::Button->new(text => 'Dialogue',
 			     code => sub {
-				 $dialog6 =
-				     $main->dialog({title => 'D in W'},
-						   $text, $button, $button6d);
+				 $main->dialog({title => 'D in W'},
+					       $text, $button, $button6d);
 			     });
-my $window;
 my $button6w2 =
     UI::Various::Button->new(text => 'Quit',
-			     code => sub { $window->destroy(); });
-$window = $main->window({title => 'W'}, $text6w, $button6w1, $button6w2);
+			     code => sub { $_[0]->destroy(); });
+$main->window({title => 'W'}, $text6w, $button6w1, $button6w2);
 
 my $standard_output6d = join("\n",
 			     '========== D in W',
@@ -241,6 +238,7 @@ my $standard_output6w = join("\n",
 			     '<0> leave window',
 			     '',
 			     '----- enter number to choose next step: ');
+#$main->mainloop;print"OK\n";exit;
 stdout_is
 {   _call_with_stdin("0\n1\n0\n1\n1\n2\n2\n", sub { $main->mainloop; });   }
     $standard_output6w . "0\n" .

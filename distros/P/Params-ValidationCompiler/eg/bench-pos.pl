@@ -7,13 +7,13 @@ use Benchmark qw( cmpthese );
 use DateTime;
 use Moose::Util::TypeConstraints qw( class_type find_type_constraint );
 use MooseX::Params::Validate;
-use Params::Validate qw( validate_pos SCALAR ARRAYREF );
+use Params::Validate           qw( validate_pos SCALAR ARRAYREF );
 use Params::ValidationCompiler ();
 use Specio::Declare;
 use Specio::Library::Builtins;
 use Test2::V0;
 use Test2::Plugin::DieOnFail;
-use Type::Params ();
+use Type::Params    ();
 use Types::Standard qw( ArrayRef Dict InstanceOf Int Optional slurpy );
 
 my $dt = DateTime->new( year => 2016 );

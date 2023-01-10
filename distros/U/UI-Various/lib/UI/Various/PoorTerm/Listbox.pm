@@ -33,7 +33,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use UI::Various::core;
 use UI::Various::Listbox;
@@ -88,6 +88,7 @@ sub _show($$)
     else
     {   print $blank, "  0/0\n";   }
     local $_ = 0;
+    my $empty = 0;
     while ($_ < $h)
     {
 	if (0 <= $i  &&  $i < $entries)
@@ -98,7 +99,10 @@ sub _show($$)
 	    $i++;
 	}
 	else
-	{   print "\n";   }
+	{
+	    print "\n" unless $empty > 2;
+	    $empty++;
+	}
 	$_++;
     }
 }

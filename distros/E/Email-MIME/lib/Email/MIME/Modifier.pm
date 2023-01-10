@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Email::MIME::Modifier;
+package Email::MIME::Modifier 1.953;
 # ABSTRACT: obsolete do-nothing library
-$Email::MIME::Modifier::VERSION = '1.952';
+
 1;
 
 __END__
@@ -17,7 +17,7 @@ Email::MIME::Modifier - obsolete do-nothing library
 
 =head1 VERSION
 
-version 1.952
+version 1.953
 
 =head1 PERL VERSION
 
@@ -35,7 +35,7 @@ the minimum required perl.
 
 =item *
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =item *
 

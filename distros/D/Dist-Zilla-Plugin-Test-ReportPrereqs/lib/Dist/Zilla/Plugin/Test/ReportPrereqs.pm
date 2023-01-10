@@ -1,11 +1,10 @@
-use 5.006;
-use strict;
+use 5.020;
 use warnings;
 
 package Dist::Zilla::Plugin::Test::ReportPrereqs;
 # ABSTRACT: Report on prerequisite versions during automated testing
 
-our $VERSION = '0.028';
+our $VERSION = '0.029';
 
 use Dist::Zilla 4 ();
 
@@ -223,7 +222,7 @@ Dist::Zilla::Plugin::Test::ReportPrereqs - Report on prerequisite versions durin
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 SYNOPSIS
 
@@ -332,7 +331,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Brendan Byrd Dave Rolsky Karen Etheridge Kent Fredric Randy Stauner Yanick Champoux
+=for stopwords Brendan Byrd Dave Rolsky Karen Etheridge Kent Fredric Randy Stauner Ricardo Signes Yanick Champoux
 
 =over 4
 
@@ -355,6 +354,10 @@ Kent Fredric <kentfredric@gmail.com>
 =item *
 
 Randy Stauner <randy@magnificent-tears.com>
+
+=item *
+
+Ricardo Signes <rjbs@users.noreply.github.com>
 
 =item *
 
@@ -485,19 +488,23 @@ for my $phase ( qw(configure build test runtime develop other) ) {
         my @reports = [qw/Module Want Have/];
 
         for my $mod ( sort keys %{ $req_hash->{$phase}{$type} } ) {
-            next if $mod eq 'perl';
             next if grep { $_ eq $mod } @exclude;
-
-            my $file = $mod;
-            $file =~ s{::}{/}g;
-            $file .= ".pm";
-            my ($prefix) = grep { -e File::Spec->catfile($_, $file) } @INC;
 
             my $want = $req_hash->{$phase}{$type}{$mod};
             $want = "undef" unless defined $want;
             $want = "any" if !$want && $want == 0;
 
+            if ($mod eq 'perl') {
+                push @reports, ['perl', $want, $]];
+                next;
+            }
+
             my $req_string = $want eq 'any' ? 'any version required' : "version '$want' required";
+
+            my $file = $mod;
+            $file =~ s{::}{/}g;
+            $file .= ".pm";
+            my ($prefix) = grep { -e File::Spec->catfile($_, $file) } @INC;
 
             if ($prefix) {
                 my $have = VERSION_EXTRACTION;

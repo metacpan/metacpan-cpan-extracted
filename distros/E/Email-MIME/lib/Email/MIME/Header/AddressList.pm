@@ -1,10 +1,10 @@
 # Copyright (c) 2016-2017 by Pali <pali@cpan.org>
 
-package Email::MIME::Header::AddressList;
-$Email::MIME::Header::AddressList::VERSION = '1.952';
+package Email::MIME::Header::AddressList 1.953;
+
 # ABSTRACT: MIME support for list of Email::Address::XS objects
 
-use strict;
+use v5.12.0;
 use warnings;
 
 use Carp ();
@@ -333,7 +333,7 @@ Email::MIME::Header::AddressList - MIME support for list of Email::Address::XS o
 
 =head1 VERSION
 
-version 1.952
+version 1.953
 
 =head1 SYNOPSIS
 
@@ -489,7 +489,7 @@ Pali E<lt>pali@cpan.orgE<gt>
 
 =item *
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =item *
 

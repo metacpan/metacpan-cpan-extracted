@@ -41,15 +41,13 @@ foreach (@text)
 }
 my $box = UI::Various::Box->new(rows => 3, columns => 3, border => 1);
 $box->add(@text_fields);
-my $window;			# must be declared before the sub using it!
-$window =
-    $main->window({title => 'Overview Alignments', width => 51},
-		  UI::Various::Text->new(text => $title_text,
-					 width => 51),
-		  $box,
-		  UI::Various::Button->new(text => 'Quit',
-					   height => 3,
-					   width => 42,
-					   align => 5,
-					   code => sub{ $window->destroy; }));
+$main->window({title => 'Overview Alignments', width => 51},
+	      UI::Various::Text->new(text => $title_text,
+				     width => 51),
+	      $box,
+	      UI::Various::Button->new(text => 'Quit',
+				       height => 3,
+				       width => 42,
+				       align => 5,
+				       code => sub{ $_[0]->destroy; }));
 $main->mainloop;

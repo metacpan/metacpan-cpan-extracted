@@ -16,7 +16,7 @@ use constant ONE_KEY_FATAL    => 'fatal';
 use constant ONE_KEY_CONSTANT => 'constant';
 use constant ONE_KEY_UNDEF    => 'undef';
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub new
    {

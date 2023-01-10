@@ -3,8 +3,8 @@
    "author" : [
       "Felipe Gasper (FELIPE)"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -27,7 +27,18 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker::CPANfile" : "0.09"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "IO::Async" : "0",
+            "Mojolicious" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Future::AsyncAwait" : "0.47"
          }
       },
       "test" : {
@@ -53,6 +64,6 @@
          "web" : "https://github.com/FGasper/p5-Promise-ES6"
       }
    },
-   "version" : "0.25",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.26",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

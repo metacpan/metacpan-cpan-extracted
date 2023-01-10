@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "PerlIO::encoding" => 0,
     "Pod::Usage" => 0
   },
-  "VERSION" => "1.0.0",
+  "VERSION" => "1.0.1",
   "test" => {
     "TESTS" => "t/*.t"
   }

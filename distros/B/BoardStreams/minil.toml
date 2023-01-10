@@ -1,5 +1,5 @@
 name = "BoardStreams"
-# badges = ["travis-ci.com"]
+badges = ["github-actions/test.yml"]
 authority="cpan:KARJALA"
 
 module_maker="ModuleBuildTiny"

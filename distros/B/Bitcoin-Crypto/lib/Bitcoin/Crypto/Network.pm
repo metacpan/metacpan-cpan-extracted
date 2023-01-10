@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Network;
-$Bitcoin::Crypto::Network::VERSION = '1.007';
+$Bitcoin::Crypto::Network::VERSION = '1.008';
 use v5.10;
 use strict;
 use warnings;

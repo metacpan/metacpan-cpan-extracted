@@ -85,6 +85,7 @@ if ($^O eq 'MSWin32') {
 	open (my $fhi, '<', $fni) or die "Unable to open $fni: $!\n";
 	open (my $fho, '>', $fno) or die "Unable to open $fno: $!\n";
 	print $fho "$Config{startperl}\n";
+	local $_ = undef;	# while (<>) ... does not localize $_.
 	while (<$fhi>) {print $fho $_}
 	close $fho;
 	close $fhi;

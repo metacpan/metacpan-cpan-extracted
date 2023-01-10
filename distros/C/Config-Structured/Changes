@@ -1,0 +1,33 @@
+Revision history for perl distribution Config::Structured
+
+2.003
+- Added __get_child_node_names method to introspect valid keys from current node
+
+2.002
+- Fixed typecheck tests
+- Added support for hooks
+
+2.001
+- Minor improvements
+
+2.000
+- Added typechecking
+- Added tests
+- Simplified prereqs
+
+1.004
+- Allow undef config values
+- Simplified syntax for sourcing config values from files
+- Removed existing unuseable tests
+
+1.003
+- Added POD documentation
+
+1.002
+- Improved handling of file-sourced values with linebreaks
+
+1.001
+- Added file value option
+
+1.000
+- First public release

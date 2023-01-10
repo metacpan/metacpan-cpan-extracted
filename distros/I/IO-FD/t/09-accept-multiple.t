@@ -84,4 +84,20 @@ for(@peers){
 IO::FD::close $_ for @clients;
 IO::FD::close $listener;
 
+
+
+{
+  my @peers;
+  my @sockets;
+
+  # non fd for accept
+  local $SIG{__WARN__}=sub {
+    ok $_[0] =~ /IO::FD::accept_multiple called with something other than a file descriptor/, "Got warning";
+  };
+  my $ret=IO::FD::accept_multiple @sockets, @peers, "asdf";
+  ok !defined($ret), "Undef for bad fd";
+  ok $! == EBADF,"bad fd";
+}
+
+
 done_testing;

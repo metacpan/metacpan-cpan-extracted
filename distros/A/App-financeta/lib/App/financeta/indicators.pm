@@ -2,17 +2,16 @@ package App::financeta::indicators;
 use strict;
 use warnings;
 use 5.10.0;
-use feature 'say';
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 $VERSION = eval $VERSION;
 
 use App::financeta::mo;
-use Carp;
-use PDL::Lite;
+use App::financeta::utils qw(dumper log_filter);
+use Log::Any '$log', filter => \&App::financeta::utils::log_filter;
+use PDL;
 use PDL::NiceSlice;
 use PDL::Finance::TA;
-use Data::Dumper;
 use POSIX ();
 
 $PDL::doubleformat = "%0.6lf";
@@ -105,7 +104,7 @@ sub next_color {
     my $idx = $self->color_idx; # read
     my $colors = $self->colors;
     $idx = 0 if $idx >= scalar @$colors; # reset;
-    say "Using Color Index: $idx" if $self->debug;
+    $log->info("Using Color Index: $idx");
     $self->color_idx($idx + 1); # update
     return $colors->[$idx];
 }
@@ -118,7 +117,7 @@ sub _plot_gnuplot_general {
         my $p = (defined $scale) ? $_->[1] / $scale : $_->[1];
         my %legend = (legend => $_->[0]) if length $_->[0];
         my $args = $_->[2] || {};
-        say "Plot args: ", Dumper($args) if $self->debug;
+        $log->debug("Plot args: ", dumper($args));
         push @plotinfo, {
             with => 'lines',
             axes => 'x1y1',
@@ -149,7 +148,7 @@ sub _plot_gnuplot_candlestick {
         my $p = $_->[1];
         my %legend = (legend => $_->[0]) if length $_->[0];
         my $args = $_->[2] || {};
-        say "Plot args: ", Dumper($args) if $self->debug;
+        $log->debug("Plot args: ", dumper($args));
         push @plotinfo, {
             with => 'impulses',
             axes => 'x1y2',
@@ -215,7 +214,7 @@ has overlaps => {
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_bbands with parameters: ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_bbands with parameters: ", dumper(\@args));
             my $period = $args[0];
             my ($upper, $middle, $lower) = PDL::ta_bbands($inpdl, @args);
             return [
@@ -235,7 +234,7 @@ has overlaps => {
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_dema with parameters: ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_dema with parameters: ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_dema($inpdl, @args);
             return [
@@ -252,26 +251,11 @@ has overlaps => {
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_ema with parameters: ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_ema with parameters: ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_ema($inpdl, @args);
             return [
                 ["EMA($period)", $outpdl, undef, "ema_$period"],
-            ];
-        },
-        gnuplot => \&_plot_gnuplot_general,
-    },
-    ht_trendline => {
-        name => 'Hilbert Transform - Instantaneous Trendline',
-        params => [
-            # no params
-        ],
-        code => sub {
-            my ($obj, $inpdl) = @_;
-            say "Executing ta_ht_trendline" if $obj->debug;
-            my $outpdl = PDL::ta_ht_trendline($inpdl);
-            return [
-                ['HT-trendline', $outpdl, undef, "ht_trend"],
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
@@ -284,7 +268,7 @@ has overlaps => {
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_kama with parameters: ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_kama with parameters: ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_kama($inpdl, @args);
             return [
@@ -315,7 +299,7 @@ has overlaps => {
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_ma with parameters: ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_ma with parameters: ", dumper(\@args));
             my $period = $args[0];
             my $type = $obj->ma_name->{$args[1]} || 'UNKNOWN';
             my $outpdl = PDL::ta_ma($inpdl, @args);
@@ -334,7 +318,7 @@ has overlaps => {
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_mama with parameters: ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_mama with parameters: ", dumper(\@args));
             my ($omama, $ofama) = PDL::ta_mama($inpdl, @args);
             return [
                 ["MAMA", $omama, undef, "mama"],
@@ -368,10 +352,10 @@ has overlaps => {
         ],
         code => sub {
             my ($obj, $inpdl, $period_pdl, @args) = @_;
-            say "Executing ta_mavp with parameters: ", $period_pdl, "\t", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_mavp with parameters: ", $period_pdl, "\t", dumper(\@args));
             my $type = $obj->ma_name->{$args[2]} || 'UNKNOWN';
             if ($period_pdl->isnull) {
-                carp "The list of periods cannot be null";
+                $log->error("The list of periods cannot be null");
                 return;
             }
             # the period-pdl has to be the same size as the input-pdl
@@ -383,47 +367,12 @@ has overlaps => {
                 $np = $np->dice([0 .. $sz - 1]);
             }
             if ($np->dim(0) != $sz) {
-                carp "Sizes of the PDLs are not the same: ", $np->dim(0), " vs $sz";
+                $log->error("Sizes of the PDLs are not the same: ", $np->dim(0), " vs $sz");
                 return;
             }
             my $outpdl = PDL::ta_mavp($inpdl, $np, @args);
             return [
                 ["MAVP($type)", $outpdl, undef, "mavp_$type"],
-            ];
-        },
-        gnuplot => \&_plot_gnuplot_general,
-    },
-    midpoint => {
-        name => 'Mid-point over period',
-        params => [
-            # key, pretty name, type, default value
-            [ 'InTimePeriod', 'Period Window (2 - 100000)', PDL::long, 14],
-        ],
-        code => sub {
-            my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_midpoint with parameters: ", Dumper(\@args) if $obj->debug;
-            my $period = $args[0];
-            my $outpdl = PDL::ta_midpoint($inpdl, @args);
-            return [
-                ["MIDPOINT($period)", $outpdl, undef, "midpt_$period"],
-            ];
-        },
-        gnuplot => \&_plot_gnuplot_general,
-    },
-    midprice => {
-        name => 'Mid-point Price over period',
-        params => [
-            # key, pretty name, type, default value
-            [ 'InTimePeriod', 'Period Window (2 - 100000)', PDL::long, 14],
-        ],
-        input => ['high', 'low'],
-        code => sub {
-            my ($obj, $highpdl, $lowpdl, @args) = @_;
-            say "Executing ta_midprice parameters: ", Dumper(\@args) if $obj->debug;
-            my $period = $args[0];
-            my $outpdl = PDL::ta_midprice($highpdl, $lowpdl, @args);
-            return [
-                ["MIDPRICE($period)", $outpdl, undef, "midpx_$period"],
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
@@ -438,7 +387,7 @@ has overlaps => {
         input => ['high', 'low'],
         code => sub {
             my ($obj, $highpdl, $lowpdl, @args) = @_;
-            say "Executing ta_sar parameters: ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_sar parameters: ", dumper(\@args));
             my $outpdl = PDL::ta_sar($highpdl, $lowpdl, @args);
             return [
                 ["SAR", $outpdl, {with => 'points pointtype 7'}, "sar"], #bug in P:G:G
@@ -462,7 +411,7 @@ has overlaps => {
         input => ['high', 'low'],
         code => sub {
             my ($obj, $highpdl, $lowpdl, @args) = @_;
-            say "Executing ta_sarext parameters: ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_sarext parameters: ", dumper(\@args));
             my $outpdl = PDL::ta_sarext($highpdl, $lowpdl, @args);
             my $shortpdl = $outpdl;
             $shortpdl = $shortpdl->setbadif($shortpdl > 0)->abs;
@@ -482,7 +431,7 @@ has overlaps => {
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_sma with parameters: ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_sma with parameters: ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_sma($inpdl, @args);
             return [
@@ -500,7 +449,7 @@ has overlaps => {
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_t3 with parameters: ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_t3 with parameters: ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_t3($inpdl, @args);
             return [
@@ -517,7 +466,7 @@ has overlaps => {
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_trima with parameters: ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_trima with parameters: ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_tema($inpdl, @args);
             return [
@@ -534,7 +483,7 @@ has overlaps => {
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_trima with parameters: ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_trima with parameters: ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_trima($inpdl, @args);
             return [
@@ -551,7 +500,7 @@ has overlaps => {
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_wma with parameters: ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_wma with parameters: ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_wma($inpdl, @args);
             return [
@@ -592,7 +541,7 @@ has volatility => {
         input => [qw/high low close/],
         code => sub {
             my ($obj, $high, $low, $close, @args) = @_;
-            say "Executing ta_atr with parameters: ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_atr with parameters: ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_atr($high, $low, $close, @args);
             return [
@@ -610,7 +559,7 @@ has volatility => {
         input => [qw/high low close/],
         code => sub {
             my ($obj, $high, $low, $close, @args) = @_;
-            say "Executing ta_natr with parameters: ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_natr with parameters: ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_natr($high, $low, $close, @args);
             return [
@@ -627,7 +576,7 @@ has volatility => {
         input => [qw/high low close/],
         code => sub {
             my ($obj, $high, $low, $close) = @_;
-            say "Executing ta_trange" if $obj->debug;
+            $log->debug("Executing ta_trange");
             my $outpdl = PDL::ta_trange($high, $low, $close);
             return [
                 ["True Range", $outpdl, undef, "truerange"],
@@ -639,7 +588,7 @@ has volatility => {
 
 has momentum => {
     adx => {
-        name => 'Average Directional Movement Index',
+        name => 'Average Directional Movement Index (ADX)',
         params => [
             # key, pretty name, type, default value
             [ 'InTimePeriod', 'Period Window (2 - 100000)', PDL::long, 14],
@@ -647,7 +596,7 @@ has momentum => {
         input => [qw/high low close/],
         code => sub {
             my ($obj, $high, $low, $close, @args) = @_;
-            say "Executing ta_adx with parameters: ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_adx with parameters: ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_adx($high, $low, $close, @args);
             return [
@@ -657,7 +606,7 @@ has momentum => {
         gnuplot => \&_plot_gnuplot_additional,
     },
     adxr => {
-        name => 'Average Directional Movement Index Rating',
+        name => 'Average Directional Movement Index Rating (ADXR)',
         params => [
             # key, pretty name, type, default value
             [ 'InTimePeriod', 'Period Window (2 - 100000)', PDL::long, 14],
@@ -665,7 +614,7 @@ has momentum => {
         input => [qw/high low close/],
         code => sub {
             my ($obj, $high, $low, $close, @args) = @_;
-            say "Executing ta_adxr with parameters: ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_adxr with parameters: ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_adxr($high, $low, $close, @args);
             return [
@@ -675,7 +624,7 @@ has momentum => {
         gnuplot => \&_plot_gnuplot_additional,
     },
     apo => {
-        name => 'Absolute Price Oscillator',
+        name => 'Absolute Price Oscillator (APO)',
         params => [
             # key, pretty name, type, default value
             [ 'InFastPeriod', 'Fast MA Period Window (2 - 100000)', PDL::long, 12],
@@ -697,7 +646,7 @@ has momentum => {
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_apo with parameters ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_apo with parameters ", dumper(\@args));
             my $fast = $args[0];
             my $slow = $args[1];
             my $type = $obj->ma_name->{$args[2]} || 'UNKNOWN';
@@ -717,7 +666,7 @@ has momentum => {
         input => [qw/high low/],
         code => sub {
             my ($obj, $high, $low, @args) = @_;
-            say "Executing ta_aroon with parameters: ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_aroon with parameters: ", dumper(\@args));
             my $period = $args[0];
             my ($adown, $aup) = PDL::ta_aroon($high, $low, @args);
             return [
@@ -736,7 +685,7 @@ has momentum => {
         input => [qw/high low/],
         code => sub {
             my ($obj, $high, $low, @args) = @_;
-            say "Executing ta_aroonosc with parameters: ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_aroonosc with parameters: ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_aroonosc($high, $low, @args);
             return [
@@ -746,14 +695,14 @@ has momentum => {
         gnuplot => \&_plot_gnuplot_additional,
     },
     bop => {
-        name => 'Balance Of Power',
+        name => 'Balance Of Power (BOP)',
         params => [
             # no params
         ],
         input => [qw/open high low close/],
         code => sub {
             my ($obj, $open, $high, $low, $close) = @_;
-            say "Executing ta_bop" if $obj->debug;
+            $log->debug("Executing ta_bop");
             my $outpdl = PDL::ta_bop($open, $high, $low, $close);
             return [
                 ["Balance of Power", $outpdl, undef, "balpow"],
@@ -762,7 +711,7 @@ has momentum => {
         gnuplot => \&_plot_gnuplot_additional,
     },
     cci => {
-        name => 'Commodity Channel Index',
+        name => 'Commodity Channel Index (CCI)',
         params => [
             # key, pretty name, type, default value
             [ 'InTimePeriod', 'Period Window (2 - 100000)', PDL::long, 14],
@@ -770,7 +719,7 @@ has momentum => {
         input => [qw/high low close/],
         code => sub {
             my ($obj, $high, $low, $close, @args) = @_;
-            say "Executing ta_cci with parameters: ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_cci with parameters: ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_cci($high, $low, $close, @args);
             return [
@@ -780,14 +729,14 @@ has momentum => {
         gnuplot => \&_plot_gnuplot_additional,
     },
     cmo => {
-        name => 'Chande Momentum Oscillator',
+        name => 'Chande Momentum Oscillator (CMO)',
         params => [
             # key, pretty name, type, default value
             [ 'InTimePeriod', 'Period Window (2 - 100000)', PDL::long, 14],
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_cmo with parameters: ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_cmo with parameters: ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_cmo($inpdl, @args);
             return [
@@ -797,7 +746,7 @@ has momentum => {
         gnuplot => \&_plot_gnuplot_additional,
     },
     dx => {
-        name => 'Directional Movement Index',
+        name => 'Directional Movement Index (DX)',
         params => [
             # key, pretty name, type, default value
             [ 'InTimePeriod', 'Period Window (2 - 100000)', PDL::long, 14],
@@ -805,7 +754,7 @@ has momentum => {
         input => [qw/high low close/],
         code => sub {
             my ($obj, $high, $low, $close, @args) = @_;
-            say "Executing ta_dx with parameters: ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_dx with parameters: ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_dx($high, $low, $close, @args);
             return [
@@ -815,7 +764,7 @@ has momentum => {
         gnuplot => \&_plot_gnuplot_additional,
     },
     macd => {
-        name => 'Moving Average Convergence/Divergence',
+        name => 'Moving Average Convergence/Divergence (MACD)',
         params => [
             # key, pretty name, type, default value
             [ 'InFastPeriod', 'Fast MA Period Window (2 - 100000)', PDL::long, 12],
@@ -824,7 +773,7 @@ has momentum => {
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_macd with parameters ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_macd with parameters ", dumper(\@args));
             my $fast = $args[0];
             my $slow = $args[1];
             my $signal = $args[2];
@@ -889,7 +838,7 @@ has momentum => {
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_macdext with parameters ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_macdext with parameters ", dumper(\@args));
             my $fast = $args[0];
             my $slow = $args[2];
             my $signal = $args[4];
@@ -910,19 +859,19 @@ has momentum => {
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_macdfix with parameters ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_macdfix with parameters ", dumper(\@args));
             my $signal = $args[0];
             my ($omacd, $omacdsig, $omacdhist) = PDL::ta_macdfix($inpdl, @args);
             return [
                 ["MACD(12/26/$signal)", $omacd, undef, "macd_12_26_$signal"],
                 ["MACD Signal(12/26/$signal)", $omacdsig, undef, "macdsig_12_26_$signal"],
-                ["MACD Histogram(12/26/$signal)", $omacdhist, { with => 'impulses' }, undef, "macdhist_12_26_$signal"],
+                ["MACD Histogram(12/26/$signal)", $omacdhist, { with => 'impulses' }, "macdhist_12_26_$signal"],
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
     },
     mfi => {
-        name => 'Money Flow Index',
+        name => 'Money Flow Index (MFI)',
         params => [
             # key, pretty name, type, default value
             [ 'InTimePeriod', 'Period Window(2 - 100000)', PDL::long, 14],
@@ -930,7 +879,7 @@ has momentum => {
         input => [qw/high low close volume/],
         code => sub {
             my ($obj, $high, $low, $close, $volume, @args) = @_;
-            say "Executing ta_mfi with parameters ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_mfi with parameters ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_mfi($high, $low, $close, $volume, @args);
             return [
@@ -940,7 +889,7 @@ has momentum => {
         gnuplot => \&_plot_gnuplot_additional,
     },
     minus_di => {
-        name => 'Minus Directional Indicator',
+        name => 'Minus Directional Indicator (-DI)',
         params => [
             # key, pretty name, type, default value
             [ 'InTimePeriod', 'Period Window(1 - 100000)', PDL::long, 14],
@@ -948,17 +897,17 @@ has momentum => {
         input => [qw/high low close/],
         code => sub {
             my ($obj, $high, $low, $close, @args) = @_;
-            say "Executing ta_minus_di with parameters ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_minus_di with parameters ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_minus_di($high, $low, $close, @args);
             return [
-                ["MINUS-DI($period)", $outpdl, undef, "minusdi_$period"],
+                ["-DI($period)", $outpdl, undef, "minusdi_$period"],
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
     },
     minus_dm => {
-        name => 'Minus Directional Movement',
+        name => 'Minus Directional Movement (-DM)',
         params => [
             # key, pretty name, type, default value
             [ 'InTimePeriod', 'Period Window(1 - 100000)', PDL::long, 14],
@@ -966,11 +915,11 @@ has momentum => {
         input => [qw/high low/],
         code => sub {
             my ($obj, $high, $low, @args) = @_;
-            say "Executing ta_minus_dm with parameters ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_minus_dm with parameters ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_minus_dm($high, $low, @args);
             return [
-                ["MINUS-DM($period)", $outpdl, undef, "minusdm_$period"],
+                ["-DM($period)", $outpdl, undef, "minusdm_$period"],
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
@@ -983,7 +932,7 @@ has momentum => {
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_mom with parameters ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_mom with parameters ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_mom($inpdl, @args);
             return [
@@ -993,7 +942,7 @@ has momentum => {
         gnuplot => \&_plot_gnuplot_additional,
     },
     plus_di => {
-        name => 'Plus Directional Indicator',
+        name => 'Plus Directional Indicator (+DI)',
         params => [
             # key, pretty name, type, default value
             [ 'InTimePeriod', 'Period Window(1 - 100000)', PDL::long, 14],
@@ -1001,17 +950,17 @@ has momentum => {
         input => [qw/high low close/],
         code => sub {
             my ($obj, $high, $low, $close, @args) = @_;
-            say "Executing ta_plus_di with parameters ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_plus_di with parameters ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_plus_di($high, $low, $close, @args);
             return [
-                ["PLUS-DI($period)", $outpdl, undef, "plusdi_$period"],
+                ["+DI($period)", $outpdl, undef, "plusdi_$period"],
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
     },
     plus_dm => {
-        name => 'Plus Directional Indicator',
+        name => 'Plus Directional Movement (+DM)',
         params => [
             # key, pretty name, type, default value
             [ 'InTimePeriod', 'Period Window(1 - 100000)', PDL::long, 14],
@@ -1019,17 +968,17 @@ has momentum => {
         input => [qw/high low/],
         code => sub {
             my ($obj, $high, $low, @args) = @_;
-            say "Executing ta_plus_dm with parameters ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_plus_dm with parameters ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_plus_dm($high, $low, @args);
             return [
-                ["PLUS-DM($period)", $outpdl, undef, "plusdm_$period"],
+                ["+DM($period)", $outpdl, undef, "plusdm_$period"],
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
     },
     ppo => {
-        name => 'Percentage Price Oscillator',
+        name => 'Percentage Price Oscillator (PPO)',
         params => [
             # key, pretty name, type, default value
             [ 'InFastPeriod', 'Fast MA Period Window (2 - 100000)', PDL::long, 12],
@@ -1051,7 +1000,7 @@ has momentum => {
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_ppo with parameters ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_ppo with parameters ", dumper(\@args));
             my $fast = $args[0];
             my $slow = $args[1];
             my $type = $obj->ma_name->{$args[2]} || 'UNKNOWN';
@@ -1063,14 +1012,14 @@ has momentum => {
         gnuplot => \&_plot_gnuplot_additional,
     },
     roc => {
-        name => 'Rate of Change',
+        name => 'Rate of Change (ROC)',
         params => [
             # key, pretty name, type, default value
             [ 'InTimePeriod', 'Period Window(1 - 100000)', PDL::long, 10],
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_roc with parameters ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_roc with parameters ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_roc($inpdl, @args);
             return [
@@ -1080,14 +1029,14 @@ has momentum => {
         gnuplot => \&_plot_gnuplot_additional,
     },
     rocp => {
-        name => 'Rate of Change Precentage',
+        name => 'Rate of Change Precentage (ROCP)',
         params => [
             # key, pretty name, type, default value
             [ 'InTimePeriod', 'Period Window(1 - 100000)', PDL::long, 10],
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_rocp with parameters ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_rocp with parameters ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_rocp($inpdl, @args);
             return [
@@ -1097,14 +1046,14 @@ has momentum => {
         gnuplot => \&_plot_gnuplot_additional,
     },
     rocr => {
-        name => 'Rate of Change Ratio',
+        name => 'Rate of Change Ratio (ROCR)',
         params => [
             # key, pretty name, type, default value
             [ 'InTimePeriod', 'Period Window(1 - 100000)', PDL::long, 10],
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_rocr with parameters ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_rocr with parameters ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_rocr($inpdl, @args);
             return [
@@ -1114,14 +1063,14 @@ has momentum => {
         gnuplot => \&_plot_gnuplot_additional,
     },
     rocr100 => {
-        name => 'Rate of Change Ratio - scale 100',
+        name => 'Rate of Change Ratio x 100 (ROCR100)',
         params => [
             # key, pretty name, type, default value
             [ 'InTimePeriod', 'Period Window(1 - 100000)', PDL::long, 10],
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_rocr100 with parameters ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_rocr100 with parameters ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_rocr100($inpdl, @args);
             return [
@@ -1131,14 +1080,14 @@ has momentum => {
         gnuplot => \&_plot_gnuplot_additional,
     },
     rsi => {
-        name => 'Relative Strength Index',
+        name => 'Relative Strength Index (RSI)',
         params => [
             # key, pretty name, type, default value
             [ 'InTimePeriod', 'Period Window(2 - 100000)', PDL::long, 14],
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_rsi with parameters ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_rsi with parameters ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_rsi($inpdl, @args);
             return [
@@ -1186,7 +1135,7 @@ has momentum => {
         input => [qw/high low close/],
         code => sub {
             my ($obj, $high, $low, $close, @args) = @_;
-            say "Executing ta_stoch with parameters ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_stoch with parameters ", dumper(\@args));
             my $slowK = $args[1];
             my $slowD = $args[3];
             my ($oslowK, $oslowD) = PDL::ta_stoch($high, $low, $close, @args);
@@ -1221,7 +1170,7 @@ has momentum => {
         input => [qw/high low close/],
         code => sub {
             my ($obj, $high, $low, $close, @args) = @_;
-            say "Executing ta_stochf with parameters ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_stochf with parameters ", dumper(\@args));
             my $fastK = $args[0];
             my $fastD = $args[1];
             my ($ofastK, $ofastD) = PDL::ta_stochf($high, $low, $close, @args);
@@ -1233,7 +1182,7 @@ has momentum => {
         gnuplot => \&_plot_gnuplot_additional,
     },
     stochrsi => {
-        name => 'Stochastic Relative Strength Index',
+        name => 'Stochastic Relative Strength Index (STOCHRSI)',
         params => [
             # key, pretty name, type, default value
             [ 'InTimePeriod', 'Period Window (2 - 100000)', PDL::long, 14],
@@ -1254,14 +1203,14 @@ has momentum => {
                 ],
             ],
         ],
-        input => [qw/high low close/],
+        input => [qw/close/],
         code => sub {
-            my ($obj, $high, $low, $close, @args) = @_;
-            say "Executing ta_stochrsi with parameters ", Dumper(\@args) if $obj->debug;
+            my ($obj, $close, @args) = @_;
+            $log->debug("Executing ta_stochrsi with parameters ", dumper(\@args));
             my $period = $args[0];
             my $fastK = $args[1];
             my $fastD = $args[2];
-            my ($ofastK, $ofastD) = PDL::ta_stochrsi($high, $low, $close, @args);
+            my ($ofastK, $ofastD) = PDL::ta_stochrsi($close, @args);
             return [
                 ["Fast-K($fastK, $period)", $ofastK, undef, "fastK_$fastK\_$period"],
                 ["Fast-D($fastD, $period)", $ofastD, undef, "fastD_$fastD\_$period"],
@@ -1270,14 +1219,14 @@ has momentum => {
         gnuplot => \&_plot_gnuplot_additional,
     },
     trix => {
-        name => '1-day ROC of Triple Smooth EMA',
+        name => 'ROC of Triple Smooth EMA (TRIX)',
         params => [
             # key, pretty name, type, default value
             [ 'InTimePeriod', 'Period Window (1 - 100000)', PDL::long, 30],
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_trix with parameters", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_trix with parameters", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_trix($inpdl, @args);
             return [
@@ -1297,7 +1246,7 @@ has momentum => {
         input => [qw/high low close/],
         code => sub {
             my ($obj, $high, $low, $close, @args) = @_;
-            say "Executing ta_ultosc with parameters ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_ultosc with parameters ", dumper(\@args));
             my $p1 = $args[0];
             my $p2 = $args[1];
             my $p3 = $args[2];
@@ -1317,7 +1266,7 @@ has momentum => {
         input => [qw/high low close/],
         code => sub {
             my ($obj, $high, $low, $close, @args) = @_;
-            say "Executing ta_willr with parameters ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_willr with parameters ", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_willr($high, $low, $close, @args);
             return [
@@ -1328,7 +1277,22 @@ has momentum => {
     },
 };
 
-has cycle => {
+has hilbert => {
+    ht_trendline => {
+        name => 'Hilbert Transform - Instantaneous Trendline',
+        params => [
+            # no params
+        ],
+        code => sub {
+            my ($obj, $inpdl) = @_;
+            $log->debug("Executing ta_ht_trendline");
+            my $outpdl = PDL::ta_ht_trendline($inpdl);
+            return [
+                ['HT-trendline', $outpdl, undef, "ht_trend"],
+            ];
+        },
+        gnuplot => \&_plot_gnuplot_general,
+    },
     ht_dcperiod => {
         name => 'Hilbert Transform - Dominant Cycle Period',
         params => [
@@ -1336,7 +1300,7 @@ has cycle => {
         ],
         code => sub {
             my ($obj, $inpdl) = @_;
-            say "Executing ta_ht_dcperiod" if $obj->debug;
+            $log->debug("Executing ta_ht_dcperiod");
             my $outpdl = PDL::ta_ht_dcperiod($inpdl);
             return [
                 ['HT-DCperiod', $outpdl, { axes => 'x1y2' }, "ht_dcperiod"],
@@ -1351,7 +1315,7 @@ has cycle => {
         ],
         code => sub {
             my ($obj, $inpdl) = @_;
-            say "Executing ta_ht_dcphase" if $obj->debug;
+            $log->debug("Executing ta_ht_dcphase");
             my $outpdl = PDL::ta_ht_dcphase($inpdl);
             return [
                 ['HT-DCphase', $outpdl, undef, "ht_dcphase"],
@@ -1360,13 +1324,13 @@ has cycle => {
         gnuplot => \&_plot_gnuplot_additional,
     },
     ht_phasor => {
-        name => 'Hilbert Transform - Phasor Components',
+        name => 'Hilbert Transform - In-Phase & Quadrature',
         params => [
             #no params,
         ],
         code => sub {
             my ($obj, $inpdl) = @_;
-            say "Executing ta_ht_phasor" if $obj->debug;
+            $log->debug("Executing ta_ht_phasor");
             my ($oinphase, $oquad) = PDL::ta_ht_phasor($inpdl);
             return [
                 ['HT-InPhase', $oinphase, undef, "ht_inphase"],
@@ -1382,7 +1346,7 @@ has cycle => {
         ],
         code => sub {
             my ($obj, $inpdl) = @_;
-            say "Executing ta_ht_sine" if $obj->debug;
+            $log->debug("Executing ta_ht_sine");
             my ($osine, $oleadsine) = PDL::ta_ht_sine($inpdl);
             return [
                 ['HT-Sine', $osine, { axes => 'x1y2' }, "ht_sine"],
@@ -1392,16 +1356,16 @@ has cycle => {
         gnuplot => \&_plot_gnuplot_additional,
     },
     ht_trendmode => {
-        name => 'Hilbert Transform - Trend vs Cycle Mode',
+        name => 'Hilbert Transform - Market Mode (Trend vs Cycle)',
         params => [
             #no params,
         ],
         code => sub {
             my ($obj, $inpdl) = @_;
-            say "Executing ta_ht_trendmode" if $obj->debug;
+            $log->debug("Executing ta_ht_trendmode");
             my $outpdl = PDL::ta_ht_trendmode($inpdl);
             return [
-                ['HT-Trend vs Cycle', $outpdl, { with => 'impulses', axes => 'x1y2' }, "ht_trendcycle"],
+                ['HT-TrendvCycle', $outpdl, { with => 'impulses', axes => 'x1y2' }, "ht_trendcycle"],
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
@@ -1410,17 +1374,17 @@ has cycle => {
 
 has volume => {
     ad => {
-        name => 'Chaikin Accumulation/Distribution line',
+        name => 'Accumulation/Distribution line (A/D)',
         params => [
             # no params
         ],
         input => [qw/high low close volume/],
         code => sub {
             my ($obj, $high, $low, $close, $volume) = @_;
-            say "Executing ta_ad" if $obj->debug;
+            $log->debug("Executing ta_ad");
             my $outpdl = PDL::ta_ad($high, $low, $close, $volume);
             return [
-                ["Chaikin A/D", $outpdl, undef, "chaikin"],
+                ["A/D", $outpdl, undef, "chaikin"],
             ];
         },
         gnuplot => \&_plot_gnuplot_volume,
@@ -1435,7 +1399,7 @@ has volume => {
         input => [qw/high low close volume/],
         code => sub {
             my ($obj, $high, $low, $close, $volume, @args) = @_;
-            say "Executing ta_adosc with parameters ", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_adosc with parameters ", dumper(\@args));
             my $fast = $args[0];
             my $slow = $args[1];
             my $outpdl = PDL::ta_adosc($high, $low, $close, $volume, @args);
@@ -1446,14 +1410,14 @@ has volume => {
         gnuplot => \&_plot_gnuplot_volume,
     },
     obv => {
-        name => 'On Balance Volume',
+        name => 'On Balance Volume (OBV)',
         params => [
             # no params
         ],
         input => [qw/close volume/],
         code => sub {
             my ($obj, $close, $volume) = @_;
-            say "Executing ta_obv" if $obj->debug;
+            $log->debug("Executing ta_obv");
             my $outpdl = PDL::ta_obv($close, $volume);
             return [
                 ["OBV", $outpdl, undef, "obv"],
@@ -1467,9 +1431,9 @@ sub _execute_candlestick {
     my ($obj, $fn, $fname, $tag, $o, $h, $l, $c, @args) = @_;
     return unless ref $fn eq 'CODE';
     if (@args) {
-        say "Executing $fname with parameters ", Dumper(\@args) if $obj->debug;
+        $log->debug("Executing $fname with parameters ", dumper(\@args));
     } else {
-        say "Executing $fname" if $obj->debug;
+        $log->debug("Executing $fname");
     }
     my $outpdl = &$fn($o, $h, $l, $c, @args);
     my $varname = $fname;
@@ -1943,9 +1907,9 @@ has statistic => {
         input => [qw/close/],
         code => sub {
             my ($obj, $inpdl1, $inpdl2, $period, $name) = @_;
-            say "Executing ta_beta with parameters: $period and $name" if $obj->debug;
+            $log->debug("Executing ta_beta with parameters: $period and $name");
             if ($inpdl1->dim(0) != $inpdl2->dim(0)) {
-                carp "Cannot compare unless the sizes of the PDLs are same";
+                $log->error("Cannot compare unless the sizes of the PDLs are same");
                 return;
             }
             my $outpdl = PDL::ta_beta($inpdl1, $inpdl2, $period);
@@ -1968,9 +1932,9 @@ has statistic => {
         input => [qw/close/],
         code => sub {
             my ($obj, $inpdl1, $inpdl2, $period, $name) = @_;
-            say "Executing ta_beta with parameters: $period and $name" if $obj->debug;
+            $log->debug("Executing ta_beta with parameters: $period and $name");
             if ($inpdl1->dim(0) != $inpdl2->dim(0)) {
-                carp "Cannot compare unless the sizes of the PDLs are same";
+                $log->error("Cannot compare unless the sizes of the PDLs are same");
                 return;
             }
             my $outpdl = PDL::ta_correl($inpdl1, $inpdl2, $period);
@@ -1989,7 +1953,7 @@ has statistic => {
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_linearreg with parameters", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_linearreg with parameters", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_linearreg($inpdl, @args);
             return [
@@ -2006,7 +1970,7 @@ has statistic => {
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_linearreg_angle with parameters", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_linearreg_angle with parameters", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_linearreg_angle($inpdl, @args);
             return [
@@ -2023,7 +1987,7 @@ has statistic => {
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_linearreg_intercept with parameters", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_linearreg_intercept with parameters", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_linearreg_intercept($inpdl, @args);
             return [
@@ -2040,7 +2004,7 @@ has statistic => {
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_linearreg_slope with parameters", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_linearreg_slope with parameters", dumper(\@args));
             my $period = $args[0];
             my $outpdl = PDL::ta_linearreg_slope($inpdl, @args);
             return [
@@ -2048,6 +2012,23 @@ has statistic => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+    },
+    linearreg_tsf => {
+        name => 'Linear Regression - Forecast',
+        params => [
+            # key, pretty name, type, default value
+            [ 'InTimePeriod', 'Period Window (2 - 100000)', PDL::long, 14],
+        ],
+        code => sub {
+            my ($obj, $inpdl, @args) = @_;
+            $log->debug("Executing ta_tsf with parameters", dumper(\@args));
+            my $period = $args[0];
+            my $outpdl = PDL::ta_tsf($inpdl, @args);
+            return [
+                ["FORECAST($period)", $outpdl, undef, "forecast_$period"],
+            ];
+        },
+        gnuplot => \&_plot_gnuplot_general,
     },
     stddev => {
         name => 'Standard Deviation',
@@ -2058,7 +2039,7 @@ has statistic => {
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_stddev with parameters", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_stddev with parameters", dumper(\@args));
             my $period = $args[0];
             my $num = $args[1];
             my $outpdl = PDL::ta_stddev($inpdl, @args);
@@ -2067,23 +2048,6 @@ has statistic => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
-    },
-    tsf => {
-        name => 'Timeseries Forecast',
-        params => [
-            # key, pretty name, type, default value
-            [ 'InTimePeriod', 'Period Window (2 - 100000)', PDL::long, 14],
-        ],
-        code => sub {
-            my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_tsf with parameters", Dumper(\@args) if $obj->debug;
-            my $period = $args[0];
-            my $outpdl = PDL::ta_tsf($inpdl, @args);
-            return [
-                ["FORECAST($period)", $outpdl, undef, "forecast_$period"],
-            ];
-        },
-        gnuplot => \&_plot_gnuplot_general,
     },
     var => {
         name => 'Variance',
@@ -2094,7 +2058,7 @@ has statistic => {
         ],
         code => sub {
             my ($obj, $inpdl, @args) = @_;
-            say "Executing ta_var with parameters", Dumper(\@args) if $obj->debug;
+            $log->debug("Executing ta_var with parameters", dumper(\@args));
             my $period = $args[0];
             my $num = $args[1];
             my $outpdl = PDL::ta_var($inpdl, @args);
@@ -2107,6 +2071,41 @@ has statistic => {
 };
 
 has price => {
+    midpoint => {
+        name => 'Mid-point over period',
+        params => [
+            # key, pretty name, type, default value
+            [ 'InTimePeriod', 'Period Window (2 - 100000)', PDL::long, 14],
+        ],
+        code => sub {
+            my ($obj, $inpdl, @args) = @_;
+            $log->debug("Executing ta_midpoint with parameters: ", dumper(\@args));
+            my $period = $args[0];
+            my $outpdl = PDL::ta_midpoint($inpdl, @args);
+            return [
+                ["MIDPOINT($period)", $outpdl, undef, "midpt_$period"],
+            ];
+        },
+        gnuplot => \&_plot_gnuplot_general,
+    },
+    midprice => {
+        name => 'Mid-point Price over period',
+        params => [
+            # key, pretty name, type, default value
+            [ 'InTimePeriod', 'Period Window (2 - 100000)', PDL::long, 14],
+        ],
+        input => ['high', 'low'],
+        code => sub {
+            my ($obj, $highpdl, $lowpdl, @args) = @_;
+            $log->debug("Executing ta_midprice parameters: ", dumper(\@args));
+            my $period = $args[0];
+            my $outpdl = PDL::ta_midprice($highpdl, $lowpdl, @args);
+            return [
+                ["MIDPRICE($period)", $outpdl, undef, "midpx_$period"],
+            ];
+        },
+        gnuplot => \&_plot_gnuplot_general,
+    },
     avgprice => {
         name => 'Average Price',
         params => [
@@ -2115,7 +2114,7 @@ has price => {
         input => [qw/open high low close/],
         code => sub {
             my ($obj, $open, $high, $low, $close) = @_;
-            say "Executing ta_avgprice" if $obj->debug;
+            $log->debug("Executing ta_avgprice");
             my $outpdl = PDL::ta_avgprice($open, $high, $low, $close);
             return [
                 ["Avg. Price", $outpdl, undef, "avgpx"],
@@ -2131,7 +2130,7 @@ has price => {
         input => [qw/high low/],
         code => sub {
             my ($obj, $high, $low) = @_;
-            say "Executing ta_medprice" if $obj->debug;
+            $log->debug("Executing ta_medprice");
             my $outpdl = PDL::ta_medprice($high, $low);
             return [
                 ["Median Price", $outpdl, undef, "medianpx"],
@@ -2147,7 +2146,7 @@ has price => {
         input => [qw/high low close/],
         code => sub {
             my ($obj, $high, $low, $close) = @_;
-            say "Executing ta_typprice" if $obj->debug;
+            $log->debug("Executing ta_typprice");
             my $outpdl = PDL::ta_typprice($high, $low, $close);
             return [
                 ["Typical Price", $outpdl, undef, "typpx"],
@@ -2163,7 +2162,7 @@ has price => {
         input => [qw/high low close/],
         code => sub {
             my ($obj, $high, $low, $close) = @_;
-            say "Executing ta_wclprice" if $obj->debug;
+            $log->debug("Executing ta_wclprice");
             my $outpdl = PDL::ta_wclprice($high, $low, $close);
             return [
                 ["Wt. Close Price", $outpdl, undef, "wclpx"],
@@ -2175,24 +2174,24 @@ has price => {
 
 has group_name => {
     overlaps => 'Overlap Studies',
-    volatility => 'Volatility Indicators',
     momentum => 'Momentum Indicators',
-    cycle => 'Cycle Indicators',
+    volatility => 'Volatility Indicators',
     volume => 'Volume Indicators',
-    candlestick => 'Candlestick Patterns',
     statistic => 'Statistic Functions',
     price => 'Price Transform',
+    hilbert => 'Hilbert Transform',
+    candlestick => 'Candlestick Patterns',
 };
 
 has group_key => {
     'Overlap Studies' => 'overlaps',
-    'Volatility Indicators' => 'volatility',
     'Momentum Indicators' => 'momentum',
-    'Cycle Indicators' => 'cycle',
+    'Volatility Indicators' => 'volatility',
     'Volume Indicators' => 'volume',
-    'Candlestick Patterns' => 'candlestick',
     'Statistic Functions' => 'statistic',
     'Price Transform' => 'price',
+    'Hilbert Transform' => 'hilbert',
+    'Candlestick Patterns' => 'candlestick',
 };
 
 sub get_groups {
@@ -2200,13 +2199,13 @@ sub get_groups {
     ## NEEDS TO BE IN THIS ORDER
     my @groups = (
         'Overlap Studies',
-        'Volatility Indicators',
         'Momentum Indicators',
-        'Cycle Indicators',
+        'Volatility Indicators',
         'Volume Indicators',
-        'Candlestick Patterns',
         'Statistic Functions',
         'Price Transform',
+        'Hilbert Transform',
+        'Candlestick Patterns',
     );
     return wantarray ? @groups : \@groups;
 }
@@ -2220,7 +2219,7 @@ sub get_funcs($) {
         foreach my $k (sort(keys %$r)) {
             push @funcs, $r->{$k}->{name};
         }
-        say "Found funcs: ", Dumper(\@funcs) if $self->debug;
+        $log->debug("Found funcs: ", dumper(\@funcs));
         return wantarray ? @funcs : \@funcs;
     }
 }
@@ -2237,7 +2236,7 @@ sub get_params($$) {
             last if defined $fn;
         }
         my $params = $r->{$fn}->{params} if defined $fn;
-        say "Found params: ", Dumper($params) if $self->debug;
+        $log->debug("Found params: ", dumper($params));
         return $params;
     }
 }
@@ -2257,7 +2256,7 @@ sub _find_func_key($$) {
         }
     }
     return unless defined $fn_key;
-    say "Found function key: $fn_key" if $self->debug;
+    $log->debug("Found function key: $fn_key");
     return $fn_key;
 }
 
@@ -2306,10 +2305,10 @@ sub execute_ohlcv($$) {
     }
     if (defined $data2 and ref $data2 eq 'PDL') {
         push @input_pdls, $data2(,(4)); # always use close
-        say "Adding close2 price" if $self->debug;
+        $log->debug("Adding close2 price");
     }
     unless (scalar @input_pdls) {
-        carp "These input columns are not supported yet: ", Dumper($input_cols);
+        $log->warn("These input columns are not supported yet: ", dumper($input_cols));
         return;
     }
     return &$coderef($self, @input_pdls, @args) if ref $coderef eq 'CODE';
@@ -2322,13 +2321,206 @@ sub get_plot_args($$$) {
     my $grp = $self->group_key->{$iref->{group}} if defined $iref->{group};
     return unless defined $grp;
     my $plotref = $self->$grp->{$fn_key}->{lc($self->plot_engine)};
-    carp "There is no plotting function available for $fn_key" unless ref $plotref eq 'CODE';
+    $log->warn("There is no plotting function available for $fn_key") unless ref $plotref eq 'CODE';
     return &$plotref($self, $xdata, $output) if ref $plotref eq 'CODE';
+}
+
+has buysell => {
+    gnuplot => \&_plot_gnuplot_general,
+};
+
+sub get_plot_args_buysell {
+    my ($self, $xdata, $buys, $sells) = @_;
+    my $plotref = $self->buysell->{lc($self->plot_engine)};
+    $log->warn("There is no plotting function available for buy-sell") unless ref $plotref eq 'CODE';
+    my $output = [
+        # plotting beautifier
+        [ 'Buys', $buys->setbadif($buys == 0), { with => 'points', pointtype => 5, linecolor => 'green', }, 'buys' ],
+        [ 'Sells', $sells->setbadif($sells == 0), { with => 'points', pointtype => 7, linecolor => 'red', }, 'sells' ],
+    ];
+    return &$plotref($self, $xdata, $output) if ref $plotref eq 'CODE';
+}
+
+sub calculate_pnl {
+    my ($self, $xdata, $buysells) = @_;
+    my $buys = $buysells->{buys};
+    my $sells = $buysells->{sells};
+    my $qty = $buysells->{quantity} || 100;
+    my $b_idx = which( $buys > 0 );
+    my $s_idx = which( $sells > 0 );
+    my $final_buys = zeroes($buys->dim(0));
+    my $final_sells = zeroes($sells->dim(0));
+    my $long_flag = $buysells->{long};
+    my $short_flag = $buysells->{short};
+    $buysells->{shorts_pnl} = 0;
+    $buysells->{longs_pnl} = 0;
+    $buysells->{quantity} = $qty unless defined $buysells->{quantity};
+    $log->info("buy index: $b_idx\n",  $b_idx->info);
+    $log->info("sell index: $s_idx\n", $s_idx->info);
+    if ($b_idx->dim(0) > $s_idx->dim(0)) {
+        $b_idx = $b_idx->index(xvals($s_idx->dim(0)));
+        $log->info("adjusting buy index to $b_idx");
+        $log->info("keeping sell index as $s_idx");
+        # fix the $buys
+    } elsif ($b_idx->dim(0) < $s_idx->dim(0)) {
+        $s_idx = $s_idx->index(xvals($b_idx->dim(0)));
+        $log->info("keeping buy index as $b_idx");
+        $log->info("adjusting sell index to $s_idx");
+        # fix the $sells
+    }
+    if ($b_idx->isempty or $s_idx->isempty) {
+        $log->info("no trades possible");
+        return;
+    }
+    # numbers of buys and sells are equal
+    if ( $b_idx->dim(0) == $s_idx->dim(0) ) {
+        # long only
+        my $longonly  = which( $b_idx < $s_idx );
+        my $shortonly = which( $b_idx > $s_idx );
+        if ($long_flag) {
+            $log->debug("allow long trades");
+            unless ( $longonly->isempty ) {
+                $log->debug("long-only index ", $longonly);
+                my $trades = PDL::null;
+                $trades =
+                $trades->glue( 1, $xdata->index( $b_idx->index($longonly) ) );
+                $trades =
+                $trades->glue( 1, $buys->index( $b_idx->index($longonly) ) );
+                $trades =
+                $trades->glue( 1, $xdata->index( $s_idx->index($longonly) ) );
+                $trades =
+                $trades->glue( 1, $sells->index( $s_idx->index($longonly) ) );
+                $log->debug("Long Trades: $trades");
+                $final_buys->index($b_idx->index($longonly)) .= $buys->index($b_idx->index($longonly));
+                $final_sells->index($s_idx->index($longonly)) .= $sells->index($s_idx->index($longonly));
+
+                # since they are ordered correctly as long only
+                my $pnl = $trades ( , (3) ) - $trades ( , (1) );
+                $pnl = sumover($pnl * $qty);
+                $log->debug("long-only P&L for $qty shares: $pnl");
+                $buysells->{longs} = $trades;
+                $buysells->{longs_pnl} += $pnl;
+            } else {
+                $log->debug("some long trades possible");
+                my $s2 = $s_idx->copy;
+                my $b2 = $b_idx->copy;
+                $s2->setbadat(0);
+                $b2 = $b2->setbadat(-1)->rotate(1);
+                $longonly = which( $b2 < $s2 );
+                if ($self->debug) {
+                    $log->info("adjusting sell index to $s2");
+                    $log->info("adjusting buy index to $b2");
+                    $log->info("long-only index: $longonly");
+                }
+                if ($s2->isempty or $b2->isempty) {
+                    $log->info("no trades possible");
+                    return;
+                }
+                unless ( $longonly->isempty ) {
+                    my $trades = PDL::null;
+                    $trades =
+                    $trades->glue( 1, $xdata->index( $b2->index($longonly) ) );
+                    $trades =
+                    $trades->glue( 1, $buys->index( $b2->index($longonly) ) );
+                    $trades =
+                    $trades->glue( 1, $xdata->index( $s2->index($longonly) ) );
+                    $trades =
+                    $trades->glue( 1, $sells->index( $s2->index($longonly) ) );
+                    $log->debug("Long Trades: $trades");
+                    $final_buys->index($b2->index($longonly)) .= $buys->index($b2->index($longonly));
+                    $final_sells->index($s2->index($longonly)) .= $sells->index($s2->index($longonly));
+
+                    # since they are ordered correctly as long only
+                    my $pnl = $trades ( , (3) ) - $trades ( , (1) );
+                    $pnl = sumover($pnl * $qty);
+                    $log->debug("long-only P&L for $qty shares: $pnl");
+                    $self->debug;
+                    $buysells->{longs} = $trades;
+                    $buysells->{longs_pnl} += $pnl;
+                } else {
+                    $log->warn("No long trades possible");
+                }
+            }
+        }
+        if ($short_flag) {
+            $log->debug("allow short trades");
+            unless ( $shortonly->isempty ) {
+                $log->debug("short-only index: $shortonly");
+                my $trades = PDL::null;
+                $trades =
+                $trades->glue( 1, $xdata->index( $s_idx->index($shortonly) ) );
+                $trades =
+                $trades->glue( 1, $sells->index( $s_idx->index($shortonly) ) );
+                $trades =
+                $trades->glue( 1, $xdata->index( $b_idx->index($shortonly) ) );
+                $trades =
+                $trades->glue( 1, $buys->index( $b_idx->index($shortonly) ) );
+                $log->debug("Short Trades: $trades");
+                $final_buys->index($b_idx->index($shortonly)) .= $buys->index($b_idx->index($shortonly));
+                $final_sells->index($s_idx->index($shortonly)) .= $sells->index($s_idx->index($shortonly));
+
+                # since they are ordered correctly as short only
+                my $pnl = $trades ( , (3) ) - $trades ( , (1) );
+                $pnl = sumover($pnl * $qty);
+                $log->debug("short-only P&L for $qty shares: $pnl");
+                $buysells->{shorts} = $trades;
+                $buysells->{shorts_pnl} += $pnl;
+            } else {
+                $log->debug("some short trades possible");
+                my $s2 = $s_idx->copy;
+                my $b2 = $b_idx->copy;
+                $b2->setbadat(0);
+                $s2 = $s2->setbadat(-1)->rotate(1);
+                $shortonly = which( $b2 > $s2 );
+                if ($self->debug) {
+                    $log->debug("adjusting sell index to $s2");
+                    $log->info("adjusting buy index to $b2");
+                    $log->info("short-only index: $shortonly");
+                }
+                if ($s2->isempty or $b2->isempty) {
+                    $log->info("no trades possible");
+                    return;
+                }
+                unless ( $shortonly->isempty ) {
+                    my $trades = PDL::null;
+                    $trades =
+                    $trades->glue( 1, $xdata->index( $s2->index($shortonly) ) );
+                    $trades =
+                    $trades->glue( 1, $sells->index( $s2->index($shortonly) ) );
+                    $trades =
+                    $trades->glue( 1, $xdata->index( $b2->index($shortonly) ) );
+                    $trades =
+                    $trades->glue( 1, $buys->index( $b2->index($shortonly) ) );
+                    $log->debug("Short Trades: $trades");
+                    $final_buys->index($b2->index($shortonly)) .= $buys->index($b2->index($shortonly));
+                    $final_sells->index($s2->index($shortonly)) .= $sells->index($s2->index($shortonly));
+
+                    # since they are ordered correctly as long only
+                    my $pnl = $trades ( , (3) ) - $trades ( , (1) );
+                    $pnl = sumover($pnl * $qty);
+                    $log->debug("short-only P&L for $qty shares: $pnl");
+                    $buysells->{shorts} = $trades;
+                    $buysells->{shorts_pnl} += $pnl;
+                } else {
+                    $log->warn("No short trades possible");
+                }
+            }
+        }
+    } else {
+        $log->warn("No. of buys and sells are not equal anyway");
+        return $buysells;
+    }
+    # swap the original with the final
+    $buysells->{orig_buys} = $buys;
+    $buysells->{orig_sells} = $sells;
+    $buysells->{buys} = $final_buys;
+    $buysells->{sells} = $final_sells;
+    return $buysells;
 }
 
 1;
 __END__
-### COPYRIGHT: 2014 Vikas N. Kumar. All Rights Reserved.
+### COPYRIGHT: 2013-2023. Vikas N. Kumar. All Rights Reserved.
 ### AUTHOR: Vikas N Kumar <vikas@cpan.org>
 ### DATE: 17th Aug 2014
 ### LICENSE: Refer LICENSE file

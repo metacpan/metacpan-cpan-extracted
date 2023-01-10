@@ -1,3 +1,16 @@
+0.24 2023-01-06T12:57:15+01:00
+ - Add Czech description to
+   Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog.
+ - Add check for label length (250). If it's longer then strip.
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog.
+ - Change alias from 'pes' to 'pes domácí' in
+   Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog.
+ - Sort labels in
+   Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog.
+ - Update copyright years.
+ - Update examples.
+
 0.23 2022-11-06T11:03:06+01:00
  - Add cs label to
    Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog.

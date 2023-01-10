@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Role::Key;
-$Bitcoin::Crypto::Role::Key::VERSION = '1.007';
+$Bitcoin::Crypto::Role::Key::VERSION = '1.008';
 use v5.10;
 use strict;
 use warnings;
@@ -27,6 +27,7 @@ has 'purpose' => (
 	isa => BIP44Purpose,
 	writer => '_set_purpose',
 	predicate => 'has_purpose',
+	clearer => 'clear_purpose',
 	required => 0,
 );
 

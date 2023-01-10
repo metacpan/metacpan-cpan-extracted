@@ -1,18 +1,18 @@
 package Retry::Backoff;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-06'; # DATE
-our $DIST = 'Retry-Backoff'; # DIST
-our $VERSION = '0.003'; # VERSION
-
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
 use Log::ger;
 
+use Exporter 'import';
 use Time::HiRes qw(time);
 
-use Exporter 'import';
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-01-08'; # DATE
+our $DIST = 'Retry-Backoff'; # DIST
+our $VERSION = '0.004'; # VERSION
+
 our @EXPORT_OK = qw(retry);
 
 sub new {
@@ -33,6 +33,7 @@ sub new {
     $self->{retry_if}     = delete $args{retry_if};
     $self->{non_blocking} = delete $args{non_blocking};
     $self->{attempt_code} = delete $args{attempt_code};
+    $self->{on_final_failure} = delete $args{on_final_failure};
 
     my $ba_mod = "Algorithm::Backoff::$self->{strategy}";
     (my $ba_mod_pm = "$ba_mod.pm") =~ s!::!/!g;
@@ -94,6 +95,7 @@ sub run {
         }
 
         if ($delay == -1) {
+            $self->{on_final_failure}->($h) if $self->{on_final_failure} && $error;
             last;
         } elsif ($self->{non_blocking}) {
             $self->{_needs_sleeping_until} = $now + $delay;
@@ -108,7 +110,7 @@ sub run {
 }
 
 
-sub retry (&;@) {
+sub retry (&;@) { ## no critic: Subroutines::ProhibitSubroutinePrototypes
     my $code = shift;
     @_ % 2
         and die "Arguments to retry must be a CodeRef, and an even number of key / values";
@@ -131,7 +133,7 @@ Retry::Backoff - Retry a piece of code, with backoff strategies
 
 =head1 VERSION
 
-This document describes version 0.003 of Retry::Backoff (from Perl distribution Retry-Backoff), released on 2021-08-06.
+This document describes version 0.004 of Retry::Backoff (from Perl distribution Retry-Backoff), released on 2023-01-08.
 
 =head1 SYNOPSIS
 
@@ -187,6 +189,10 @@ Coderef. Will be called if attempt-code is deemed as successful.
 
 Coderef. Will be called if attempt-code is deemed to have failed.
 
+=item * on_final_failure
+
+Coderef. Will be called if attempt-code is deemed to have failed and will not be retried.
+
 =item * retry_if
 
 Coderef. If this argument is not specified, attempt-code is deemed to have
@@ -240,14 +246,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Retry-Back
 
 Source repository is at L<https://github.com/perlancar/perl-Retry-Backoff>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Retry-Backoff>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 Code is based on L<Action::Retry>.
@@ -260,11 +258,43 @@ Backoff strategies are from L<Algorithm::Backoff>::* modules.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Dave Baird
+
+Dave Baird <dave@zerofive.co.uk>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2021, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Retry-Backoff>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

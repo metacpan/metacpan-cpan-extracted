@@ -139,14 +139,6 @@ sub set {
         return;
     }
 
-    if (my $mode = $self->mode()) {
-        if ($mode =~ m{\A[0-7]{4}\z}) {
-            chmod oct($mode), $filename || die "Unable to change mode to $mode";
-        } else {
-            die "Given umask '$mode' is not valid";
-        }
-    }
-
     my $uid = -1;
     my $gid;
     if (my $user = $self->user()) {
@@ -166,6 +158,14 @@ sub set {
 
     print FILE $content;
     close FILE;
+
+    if (my $filemode = $self->mode()) {
+        if ($filemode =~ m{\A[0-7]{4}\z}) {
+            chmod (oct($filemode), $filename) || die "Unable to change mode to $filemode";
+        } else {
+            die "Given mode string '$filemode' is not valid";
+        }
+    }
 
     if ($gid) {
         chown ($uid, $gid, $filename) || die "Unable to chown $filename to $uid/$gid";

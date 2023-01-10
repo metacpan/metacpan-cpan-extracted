@@ -1,5 +1,5 @@
 package Form::Tiny::Inline;
-$Form::Tiny::Inline::VERSION = '2.16';
+$Form::Tiny::Inline::VERSION = '2.17';
 use v5.10;
 use strict;
 use warnings;
@@ -22,7 +22,7 @@ sub new
 {
 
 	package Form::Tiny::Inline::Form;
-$Form::Tiny::Inline::Form::VERSION = '2.16';
+$Form::Tiny::Inline::Form::VERSION = '2.17';
 use v5.10;
 	use strict;
 	use warnings;
@@ -64,7 +64,7 @@ use v5.10;
 {
 
 	package Form::Tiny::Inline::Builder;
-$Form::Tiny::Inline::Builder::VERSION = '2.16';
+$Form::Tiny::Inline::Builder::VERSION = '2.17';
 use v5.10;
 	use strict;
 	use warnings;
@@ -161,24 +161,31 @@ Form::Tiny::Inline - Form::Tiny with less hassle
 
 =head1 DESCRIPTION
 
-Inline forms are designed to cover all the basic use cases, but they are not as customizable and performant. Currently, they lack the ability to specify custom hooks, field filters, field validators. Furthermore, non-core plugins may be incompatible with inline forms.
+Inline forms are designed to cover all the basic use cases, but they are not as
+customizable and performant. Currently, they lack the ability to specify custom
+hooks, field filters and field validators. Furthermore, non-core plugins may be
+incompatible with inline forms.
 
 =head1 METHODS
 
 =head2 is
 
-When ran on a Form::Tiny::Inline class, it produces a new object that you can call C<< ->new >> on.
+When ran on C<Form::Tiny::Inline> class, it produces a new object that you can
+call C<< ->new >> on.
 
 	my $inline_form_builder = Form::Tiny::Inline->is('Filtered', 'Strict');
 	my $form = $inline_form_builder->new(%params);
 
-Arguments passed to C<is> are names of plugins that will be used in the inline form. Not all plugins may be compatible with inline forms.
+Arguments passed to C<is> are names of plugins that will be used in the inline
+form. Not all plugins may be compatible with inline forms.
 
-Note: callng C<is> is not required, if you don't intend to use additional plugins.
+I<Note>: callng C<is> is not required, if you don't intend to use additional
+plugins.
 
 =head2 new
 
-Constructs a new object of C<Form::Tiny::Inline::Form> class. This class consumes L<Form::Tiny::Form>, so refer to its interface for details.
+Constructs a new object of C<Form::Tiny::Inline::Form> class. This class
+consumes L<Form::Tiny::Form>, so refer to its interface for details.
 
 	my $form = Form::Tiny::Inline->new(%params);
 

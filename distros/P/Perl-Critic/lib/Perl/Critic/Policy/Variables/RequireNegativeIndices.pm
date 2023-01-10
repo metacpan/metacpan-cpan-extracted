@@ -8,7 +8,7 @@ use Readonly;
 use Perl::Critic::Utils qw{ :severities };
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.146';
+our $VERSION = '1.148';
 
 #-----------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ sub violates {
     return $self->violation( $DESC, $EXPL, $elem );
 }
 
-Readonly::Scalar my $MAX_EXPRESSION_COMPLEXETY => 4;
+Readonly::Scalar my $MAX_EXPRESSION_COMPLEXITY => 4;
 
 sub _is_bad_index {
     # return (varname, 0|1) if this could be a violation
@@ -46,7 +46,7 @@ sub _is_bad_index {
 
     # This is the expression elements that compose the array indexing
     my @expr = $children[0]->schildren();
-    return if !@expr || @expr > $MAX_EXPRESSION_COMPLEXETY;
+    return if !@expr || @expr > $MAX_EXPRESSION_COMPLEXITY;
     my ($name, $isref, $isindex) = _is_bad_var_in_index(\@expr);
     return if !$name;
     return $name, $isref if !@expr && $isindex;

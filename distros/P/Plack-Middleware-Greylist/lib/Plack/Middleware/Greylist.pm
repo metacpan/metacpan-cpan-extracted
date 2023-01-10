@@ -21,7 +21,7 @@ use Plack::Util::Accessor qw/ default_rate rules cache file _match greylist retr
 use Ref::Util             qw/ is_plain_arrayref /;
 use Time::Seconds         qw/ ONE_MINUTE /;
 
-our $VERSION = 'v0.3.4';
+our $VERSION = 'v0.3.5';
 
 
 sub prepare_app {
@@ -167,7 +167,7 @@ Plack::Middleware::Greylist - throttle requests with different rates based on ne
 
 =head1 VERSION
 
-version v0.3.4
+version v0.3.5
 
 =head1 SYNOPSIS
 
@@ -312,9 +312,15 @@ Robert Rothenberg <rrwo@cpan.org>
 The initial development of this module was sponsored by Science Photo
 Library L<https://www.sciencephoto.com>.
 
+=head1 CONTRIBUTOR
+
+=for stopwords Gabor Szabo
+
+Gabor Szabo <gabor@szabgab.com>
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Robert Rothenberg.
+This software is Copyright (c) 2022-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

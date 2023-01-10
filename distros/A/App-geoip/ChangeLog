@@ -1,3 +1,9 @@
+0.17	- 2023-01-06, H.Merijn Brand
+    * It is 2023
+
+0.16	- 2022-01-02, H.Merijn Brand
+    * Add IP::Geolocation::MMDB to SEE ALSO
+
 0.15	- 2022-01-01, H.Merijn Brand
     * It is 2021
     * Use $GEOIP_HOST as default for IP/Host

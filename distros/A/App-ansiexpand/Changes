@@ -1,5 +1,9 @@
 Revision history for Perl extension App-ansiexpand
 
+1.04 2023-01-10T11:05:43Z
+
+    - use --tabstyle option without parameter to show style list
+
 1.03 2022-12-23T03:21:32Z
 
     - Require Text::ANSI::Tabs 1.02

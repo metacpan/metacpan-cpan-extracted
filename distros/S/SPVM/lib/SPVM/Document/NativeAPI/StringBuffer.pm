@@ -11,7 +11,7 @@ SPVM::Document::NativeAPI::StringBuffer - SPVM String Buffer Native APIs
   void* string_buffer = string_buffer_api->new_string_buffer();
   
   // Free string_buffer
-  string_buffer_api->free_string_buffer(string_buffer);
+  string_buffer_api->free_object(string_buffer);
 
 =head1 Description
 
@@ -21,22 +21,22 @@ SPVM String Buffer Native APIs are the public APIs for string buffers.
 
 String buffer native APIs have its IDs.
 
-  0 new_string_buffer_tmp
-  1 free_string_buffer
+  0 new_object
+  1 free_object
   2 get_value
   3 get_length
 
 =head1 String Buffer Native APIs
 
-=head2 new_string_buffer_tmp
+=head2 new_object
 
-  void* (*new_string_buffer_tmp)();
+  void* (*new_object)();
 
 Create a new temporary string buffer object.
 
-=head2 free_string_buffer
+=head2 free_object
 
-  void (*free_string_buffer)(void* string_buffer);
+  void (*free_object)(void* string_buffer);
 
 Free the string buffer object.
 

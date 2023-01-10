@@ -7,7 +7,7 @@ use PerlIO::encoding;
 $Data::Dumper::Sortkeys = 1;
 use FASTX::Seq;
 use File::Basename;
-$FASTX::Reader::VERSION = '1.7.0';
+$FASTX::Reader::VERSION = '1.8.1';
 require Exporter;
 our @ISA = qw(Exporter);
 
@@ -193,13 +193,12 @@ sub getRead {
 sub next {
   my $self   = shift;
   my $scalar_read = $self->getRead();
-
-
+  return unless defined $scalar_read;
   return FASTX::Seq->new( $scalar_read->{seq}  // '', 
-                          $scalar_read->{name}   // undef, 
-                          $scalar_read->{comment} // undef, 
-                          $scalar_read->{qual} // undef);
- 
+                            $scalar_read->{name}   // undef, 
+                            $scalar_read->{comment} // undef, 
+                            $scalar_read->{qual} // undef);
+  
 }
 
 
@@ -440,7 +439,7 @@ FASTX::Reader - A simple module to parse FASTA and FASTQ files, supporting compr
 
 =head1 VERSION
 
-version 1.7.0
+version 1.8.1
 
 =head1 SYNOPSIS
 

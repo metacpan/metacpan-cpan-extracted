@@ -34,7 +34,9 @@ my %opts = (
             'pension-employee=f',
             'pension-employer=f',
             'tax-free=f',
-            'bonus=f'
+            'bonus=f',
+            'year=i',
+            'fringe=f',
         );
     };
     if (!$ok) {
@@ -68,6 +70,7 @@ my $maandloon = to_awg($ARGV[0]);
 my $months    = $opts{months};
 
 $opts{'tax-free'} = ($opts{'tax-free'} // 0) * $months;
+$opts{'fringe'} = ($opts{'fringe'} // 0) * $months;
 
 if ($opts{yearly}) {
     $maandloon = $maandloon / $months;
@@ -88,6 +91,12 @@ my $calc = Finance::Tax::Aruba::Income->tax_year(
 
     exists $opts{'bonus'}
         ? (bonus => $opts{'bonus'})
+        : (),
+    $opts{'fringe'}
+        ? (fringe => $opts{'fringe'})
+        : (),
+    $opts{'tax-free'}
+        ? (tax_free => $opts{'tax-free'})
         : (),
 
 );
@@ -115,6 +124,7 @@ my @order = qw(
     azv
     aov
     -
+    fringe
     zuiver
     tabelinkomen
     taxed
@@ -172,7 +182,7 @@ my %year = (
     aov_employer   => $calc->aov_employer,
     conv_rate      => $opts{rate},
     free           => $calc->taxfree_amount,
-    wage           => $calc->net_income + $opts{'tax-free'},
+    wage           => $calc->net_income,
     pensioen_employee => $calc->pension_employee,
     pensioen_employer => $calc->pension_employer,
     pensioen       => $calc->pension_total,
@@ -181,8 +191,9 @@ my %year = (
     gov_gets       => $gov_gets,
     azv_total      => $calc->azv_premium,
     aov_total      => $calc->aov_premium,
-    tax_free       => $opts{'tax-free'},
+    tax_free       => $calc->tax_free,
     bonus          => $calc->bonus,
+    fringe         => $calc->fringe,
 );
 
 my %mapping = (
@@ -219,7 +230,8 @@ my %mapping = (
         $calc->aov_percentage_employee + $calc->aov_percentage_employer),
 
     gov_gets       => "Social premiums and taxes",
-    bonus          => "Bonus"
+    bonus          => "Bonus",
+    fringe         => "Fringe benefits"
 );
 
 my ($longest) = sort { length($b) <=> length($a) } values %mapping;
@@ -276,7 +288,7 @@ loon.pl - A salary cost calculator
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

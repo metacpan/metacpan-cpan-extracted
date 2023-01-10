@@ -43,7 +43,7 @@
       "runtime" : {
          "requires" : {
             "List::Util" : "1.45",
-            "Text::ANSI::Fold" : "2.17",
+            "Text::ANSI::Fold" : "2.19",
             "perl" : "v5.14.0"
          }
       },
@@ -57,22 +57,22 @@
    "provides" : {
       "Text::ANSI::Tabs" : {
          "file" : "lib/Text/ANSI/Tabs.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/kaz-utashiro/Text-ANSI-Tabs/issues"
+         "web" : "https://github.com/tecolicom/Text-ANSI-Tabs/issues"
       },
-      "homepage" : "https://github.com/kaz-utashiro/Text-ANSI-Tabs",
+      "homepage" : "https://github.com/tecolicom/Text-ANSI-Tabs",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/kaz-utashiro/Text-ANSI-Tabs.git",
-         "web" : "https://github.com/kaz-utashiro/Text-ANSI-Tabs"
+         "url" : "https://github.com/tecolicom/Text-ANSI-Tabs.git",
+         "web" : "https://github.com/tecolicom/Text-ANSI-Tabs"
       }
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

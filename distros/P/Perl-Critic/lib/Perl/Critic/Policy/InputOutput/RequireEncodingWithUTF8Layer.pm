@@ -11,7 +11,7 @@ use version;
 use Perl::Critic::Utils qw{ :severities :ppi };
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.146';
+our $VERSION = '1.148';
 
 #-----------------------------------------------------------------------------
 
@@ -79,7 +79,7 @@ sub _recover_binmode_encoding {
 # my $encoding = _recover_open_encoding( _parse_arg_list( $elem ) );
 #
 # This subroutine returns the encoding specified by the given $elem,
-# which _MUST_ be the 'open' of a open() call.
+# which _MUST_ be the 'open' of an open() call.
 
 sub _recover_open_encoding {
     my ( @args ) = @_;

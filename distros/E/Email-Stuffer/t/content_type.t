@@ -1,7 +1,8 @@
-use strict;
+use v5.12.0;
 use warnings;
 use utf8;
-use Test::More tests => 17;
+
+use Test::More;
 use File::Spec::Functions ':ALL';
 use Email::Stuffer;
 
@@ -53,3 +54,5 @@ sub slurp {
     or Carp::croak("Can't open '$fname' for reading: '$!'");
   scalar(do { local $/; <$fh> })
 }
+
+done_testing;

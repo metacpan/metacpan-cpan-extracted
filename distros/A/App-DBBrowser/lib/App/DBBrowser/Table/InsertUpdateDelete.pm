@@ -70,8 +70,7 @@ sub table_write_access {
         if ( $stmt_type eq $hidden ) {
             require App::DBBrowser::Opt::Set;
             my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
-            my $groups = [ { name => 'group_insert', text => '' } ];
-            $opt_set->set_options( $groups );
+            $opt_set->set_options( 'import' );
             next STMT_TYPE;
         }
         $stmt_type =~ s/^-\ //;

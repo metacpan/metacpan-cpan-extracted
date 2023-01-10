@@ -2,9 +2,8 @@ package Plack::Middleware::EmulateOPTIONS;
 
 # ABSTRACT: handle OPTIONS requests as HEAD
 
-use v5.10;
+use v5.14;
 
-use strict;
 use warnings;
 
 use parent 'Plack::Middleware';
@@ -13,7 +12,7 @@ use Plack::Util;
 use Plack::Util::Accessor qw/ filter callback /;
 use HTTP::Status ();
 
-our $VERSION = 'v0.2.2';
+our $VERSION = 'v0.3.1';
 
 
 sub prepare_app {
@@ -72,7 +71,7 @@ Plack::Middleware::EmulateOPTIONS - handle OPTIONS requests as HEAD
 
 =head1 VERSION
 
-version v0.2.2
+version v0.3.1
 
 =head1 SYNOPSIS
 
@@ -138,6 +137,14 @@ If you override this, then you will need to manually set the header yourself, fo
 
 This was added in v0.2.0.
 
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.3.0, the this module requires Perl v5.14 or later.
+
+If you need this module on Perl v5.10, please use one of the v0.2.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
+
 =head1 SEE ALSO
 
 L<Plack>
@@ -164,7 +171,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Robert Rothenberg.
+This software is Copyright (c) 2022-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

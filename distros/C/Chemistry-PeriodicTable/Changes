@@ -1,0 +1,29 @@
+Revision history for Chemistry-PeriodicTable
+
+0.0303 2023-01-09 07:10:06
+    - Fix element types again.
+    - Improve the eg/periodic.pl script more.
+
+0.0302 2023-01-09 06:33:23
+    - Fix element types.
+    - Improve the eg/periodic.pl script.
+
+0.0301 2023-01-08 12:52:49
+    - Fix element names 113-118.
+
+0.0300 2023-01-08 12:17:33
+    - Make headers an attribute.
+    - Add a WIP table display mojo app.
+
+0.0202 2023-01-08 11:33:51
+    - Add tests.
+
+0.0201 2023-01-08 11:25:47
+    - Improve documentation.
+
+0.0200 2023-01-08 03:13:25
+    - Make the hash data a proper attribute.
+
+0.0100 2023-01-08 02:58:42
+    - Filled in the blanks AKA everything except the CSV.
+    - Mint with Dist::Zilla.

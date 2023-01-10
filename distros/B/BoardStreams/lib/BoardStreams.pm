@@ -1,14 +1,12 @@
 package BoardStreams;
-use 5.008001;
-use strict;
-use warnings;
 
-our $VERSION = "v0.0.23";
+use Mojo::Base -strict;
 
+our $VERSION = "v0.0.30";
 
+our $db;
 
 1;
-__END__
 
 =encoding utf-8
 
@@ -31,13 +29,13 @@ For now, the documentation can be found at: L<https://boardstreams.dev>.
 =head1 ASSOCIATION WITH JAVASCRIPT LIBRARIES
 
 This module release should be used in conjunction with npm package C<boardstreams> version
-L<0.0.12|https://www.npmjs.com/package/boardstreams/v/0.0.12>.
+L<0.0.13|https://www.npmjs.com/package/boardstreams/v/0.0.13>.
 
-    $ npm install boardstreams@0.0.12 --save
+    $ npm install boardstreams@0.0.13 --save
 
 Or:
 
-    <script src="https://unpkg.com/boardstreams@0.0.12"></script>
+    <script src="https://unpkg.com/boardstreams@0.0.13"></script>
 
 =head1 NOTIFICATIONS FOR NEW RELEASES
 

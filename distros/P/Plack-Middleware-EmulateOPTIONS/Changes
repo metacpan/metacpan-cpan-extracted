@@ -1,5 +1,27 @@
 Revision history for Plack-Middleware-EmulateOPTIONS:
 
+v0.3.1    2023-01-10 10:57:23+00:00 Europe/London
+  No Changes since v0.3.0
+
+v0.3.0    2023-01-05 09:27:47+00:00 Europe/London (TRIAL RELEASE)
+  [Incompatible Changes]
+  - Minimum Perl version is v5.14.
+
+  [Tests]
+  - Set minimum version of Test::More.
+
+  - Removed unused Test::Vars dependency.
+
+  [Documentation]
+  - Documented support for older Perl versions.
+
+  - Minor reformatting.
+
+  - Bumped copyright year.
+
+  [Other]
+  - Added GitHub Actions to run tests.
+
 v0.2.2    2022-12-12 16:50:49+00:00 Europe/London
   [Tests]
   - Adjusted minimum version of HTTP::Request::Common used for testing.
