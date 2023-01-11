@@ -1,4 +1,13 @@
-Revision history for 140426442310536
+Revision history for 5663624464
+
+0.100000  2023-01-10 21:58:54-05:00 America/New_York
+        - switch guts to builtin::export_lexically
+        - this means you'll get experimental warnings
+        - This also means v5.37.2 is required.  Lexical::Sub hasn't worked
+          since v5.22.  The code to use Lexical::Sub is still in place, but
+          you won't reach it because the dist prereq is v5.37.2.  If there is
+          any demand at all, we can tweak the prereqs.  I just don't think
+          there is!
 
 0.092292  2013-11-24 13:59:03 America/New_York
         - switch guts to Lexical:::Sub

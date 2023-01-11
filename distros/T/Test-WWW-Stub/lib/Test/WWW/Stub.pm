@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.10";
+our $VERSION = "0.11";
 
 use Carp ();
 use Guard;  # guard
@@ -20,6 +20,7 @@ our @Requests;
 
 my $register_g;
 my $app;
+my %import_options;
 sub _app { $app; }
 
 $app = sub {
@@ -42,7 +43,16 @@ $app = sub {
 };
 
 sub import {
-    $register_g //= LWP::Protocol::PSGI->register($app);
+    my ($class, %options) = @_;
+    if (!defined $register_g || _diff(\%import_options, \%options)) {
+        %import_options = %options;
+        $register_g = LWP::Protocol::PSGI->register($app, %options);
+    }
+}
+
+sub unimport {
+    undef $register_g;
+    undef %import_options;
 }
 
 sub register {
@@ -112,9 +122,22 @@ sub _trace_file_and_line {
 sub unstub {
     Carp::croak 'guard is required' unless defined wantarray;
     undef $register_g;
+
+    # Copy options to restore the state at the time of unstub
+    my %options = %import_options;
     return guard {
-        $register_g = LWP::Protocol::PSGI->register($app);
+        %import_options = %options;
+        $register_g = LWP::Protocol::PSGI->register($app, %options);
     }
+}
+
+sub _diff {
+    my ($a, $b) = @_;
+
+    my @diff_a = List::MoreUtils::any { !(exists $b->{$_} && ($b->{$_} eq $a->{$_})) } keys %$a;
+    my @diff_b = List::MoreUtils::any { !(exists $a->{$_} && ($a->{$_} eq $b->{$_})) } keys %$b;
+
+    @diff_a || @diff_b
 }
 
 1;
@@ -180,7 +203,7 @@ Because this modules uses L<LWP::Protocol::PSGI> internally, you don't have to m
 
 =head1 METHODS
 
-=over 4
+=over 6
 
 =item C<register>
 
@@ -242,6 +265,29 @@ C<[Test::WWW::Stub-E<gt>requests]> becomes empty just after this method called.
 Unregister stub and enables external access, and returns a guard object which re-enables stub on destroyed.
 
 In constrast to C<register>, this method doesn't work when called in void context.
+
+=item C<import>
+
+    Test::WWW::Stub->import(%options)
+    or
+    use Test:::WWW::Stub
+
+This C<%options> are equivalent to the options of C<LWP::Protocol::PSGI-E<gt>register(%options)>. For example, the options can be set as follows:
+
+    use Test::WWW::Stub (
+        uri => sub {
+            my $uri = shift;
+            $uri ne 'http://localhost:9200'
+        }
+    );
+
+=item C<unimport>
+
+    Test::WWW::Stub->unimport
+    or
+    no Test::WWW::Stub;
+
+Delete the stubbed app and stop stubbing. If you need to stub again, import Test::WWW::Stub.
 
 =back
 

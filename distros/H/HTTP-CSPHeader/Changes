@@ -1,5 +1,22 @@
 Revision history for HTTP-CSPHeader
 
+v0.2.1    2023-01-11 14:43:34+00:00 Europe/London
+  No Changes from v0.2.0.
+
+v0.2.0    2023-01-10 09:24:16+00:00 Europe/London (TRIAL RELEASE)
+  [Incompatible Changes]
+  - Minimum Perl version is v5.14.
+
+  [Documentation]
+  - Add note that the source and format of the nonce may change in the future.
+
+  - Documented support for older Perl versions.
+
+  - Bumped copyright year.
+
+  [Other]
+  - Added GitHub Actions to run tests.
+
 v0.1.4    2022-07-05 12:08:50+01:00 Europe/London
   [Documentation]
   - Fix typo in Changes.

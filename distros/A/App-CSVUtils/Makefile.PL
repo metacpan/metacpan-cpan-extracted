@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
     "script/csv-dump",
     "script/csv-each-row",
     "script/csv-fill-template",
+    "script/csv-find-values",
     "script/csv-freqtable",
     "script/csv-gen",
     "script/csv-get-cells",
@@ -105,7 +106,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Needs" => 0
   },
-  "VERSION" => "1.001",
+  "VERSION" => "1.003",
   "test" => {
     "TESTS" => "t/*.t"
   }

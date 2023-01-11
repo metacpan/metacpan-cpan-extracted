@@ -1,5 +1,8 @@
 Revision history for Quote-Code
 
+1.0103  2023-01-11
+        Fix a test failure with perl v5.37.7.
+
 1.0102  2017-03-16
         Explicitly document supported escape sequences.
         Update internal build/test infrastructure.

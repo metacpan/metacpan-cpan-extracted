@@ -8,9 +8,9 @@ use Log::ger;
 use App::BrowserUtils ();
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-24'; # DATE
+our $DATE = '2022-10-07'; # DATE
 our $DIST = 'App-OperaUtils'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 our %SPEC;
 
@@ -159,7 +159,7 @@ App::OperaUtils - Utilities related to the Opera browser
 
 =head1 VERSION
 
-This document describes version 0.007 of App::OperaUtils (from Perl distribution App-OperaUtils), released on 2022-07-24.
+This document describes version 0.008 of App::OperaUtils (from Perl distribution App-OperaUtils), released on 2022-10-07.
 
 =head1 SYNOPSIS
 
@@ -494,6 +494,8 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<signal> => I<unix::signal>
+
 =item * B<users> => I<array[unix::uid::exists]>
 
 Kill browser processes that belong to certain user(s) only.
@@ -559,6 +561,8 @@ Source repository is at L<https://github.com/perlancar/perl-App-OperaUtils>.
 Some other CLI utilities related to Opera: L<dump-opera-history> (from
 L<App::DumpOperaHistory>).
 
+L<App::BraveUtils>
+
 L<App::ChromeUtils>
 
 L<App::FirefoxUtils>
@@ -584,9 +588,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

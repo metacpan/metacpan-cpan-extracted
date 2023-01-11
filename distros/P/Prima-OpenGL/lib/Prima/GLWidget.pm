@@ -31,7 +31,7 @@ sub init
 {
 	my ( $self, %profile) = @_;
 	$self-> {gl_config} = {};
-	%profile = $self-> SUPER::init( %profile);	
+	%profile = $self-> SUPER::init( %profile);
 	$self-> gl_config($profile{gl_config});
 }
 
@@ -41,6 +41,7 @@ sub notify
 
 	return $self-> SUPER::notify( $command, @params )
 		if $command ne 'Paint';
+	return 0 unless $self-> gl_paint_state;
 
 	unless ( Prima::OpenGL::context_push()) {
 		warn Prima::OpenGL::last_error();
@@ -68,7 +69,7 @@ sub gl_config
 sub on_size
 {
 	my ( $self, $ox, $oy, $x, $y) = @_;
-	$self-> gl_select;
+	$self-> gl_select or return;
 	glViewport(0,0,$x,$y);	
 }
 

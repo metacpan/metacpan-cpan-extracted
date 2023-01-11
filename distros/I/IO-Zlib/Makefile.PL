@@ -8,7 +8,7 @@ my %options = (
     VERSION_FROM => "Zlib.pm",
     PREREQ_PM => { "Compress::Zlib" => 2.000 },
     SIGN => 1,
-    INSTALLDIRS  => $] >= 5.00903 ? "perl" : "site",
+    INSTALLDIRS  => ($] >= 5.009003 && $] < 5.012000) ? "perl" : "site",
     dist => { COMPRESS => "gzip", SUFFIX => "gz" }
 );
 

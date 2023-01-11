@@ -37,7 +37,7 @@ resources:
   bugtracker: https://github.com/rjbs/Email-Stuffer/issues
   homepage: https://github.com/rjbs/Email-Stuffer
   repository: https://github.com/rjbs/Email-Stuffer.git
-version: '0.019'
+version: '0.020'
 x_Dist_Zilla:
   perl:
     version: '5.037002'
@@ -341,7 +341,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.019'
+          tag: '0.020'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

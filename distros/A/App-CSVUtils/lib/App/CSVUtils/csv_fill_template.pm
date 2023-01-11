@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-04'; # DATE
+our $DATE = '2023-01-11'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.001'; # VERSION
+our $VERSION = '1.003'; # VERSION
 
 use App::CSVUtils qw(gen_csv_util);
 
@@ -115,7 +115,7 @@ App::CSVUtils::csv_fill_template - Substitute template values in a text file wit
 
 =head1 VERSION
 
-This document describes version 1.001 of App::CSVUtils::csv_fill_template (from Perl distribution App-CSVUtils), released on 2023-01-04.
+This document describes version 1.003 of App::CSVUtils::csv_fill_template (from Perl distribution App-CSVUtils), released on 2023-01-11.
 
 =head1 FUNCTIONS
 

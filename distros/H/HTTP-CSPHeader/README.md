@@ -4,7 +4,7 @@ HTTP::CSPHeader - manage dynamic content security policy headers
 
 # VERSION
 
-version v0.1.4
+version v0.2.1
 
 # SYNOPSIS
 
@@ -87,6 +87,9 @@ from [Math::Random::ISAAC](https://metacpan.org/pod/Math%3A%3ARandom%3A%3AISAAC)
 If you do not have `/dev/urandom` or you want to change how it is generated,
 you can override the `_build_nonce` method in a subclass.
 
+Note that you should never make an assumption about the format of the
+nonce, as the source may change in future versions.
+
 ## header
 
 This is the value of the header, generated from the ["policy"](#policy).
@@ -155,6 +158,14 @@ and in your templates, you can use the following for inline scripts:
 
 If you do not need the nonce, then you might consider using [Mojolicious::Plugin::CSPHeader](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3ACSPHeader).
 
+# SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.2.0, the this module requires Perl v5.14 or later.
+
+If you need this module on Perl v5.10, please use one of the v0.1.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
+
 # SEE ALSO
 
 [https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy)
@@ -183,7 +194,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Robert Rothenberg.
+This software is Copyright (c) 2022-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

@@ -220,7 +220,6 @@ foreach (
         )
 {
   my ($confname, @values) = @$_;
-  my $testval = [123];
   foreach my $value (@values) {
     foreach my $base (qw(vis avis hvis alvis hlvis dvis ivis)) {
       foreach my $q ("", "q") {

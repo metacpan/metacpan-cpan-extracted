@@ -73,6 +73,16 @@ for my $value ("", "-1", "0", "00", "001", "1", "42", "19/37",
   check_numeric($value, 0);
 }
 
+diag "=== numbers with 'use bigrat' ===";
+{
+  use bigrat;
+  check_numeric(-1, 1);
+  check_numeric(0, 1);
+  check_numeric(1, 1);
+  check_numeric(0.5, 1);
+  check_numeric(1/9, 1);
+}
+
 done_testing();
 
 #say "Checked $n_count numerics and $s_count strings";

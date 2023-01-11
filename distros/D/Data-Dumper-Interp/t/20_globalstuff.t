@@ -40,9 +40,15 @@ sub unix_compatible_os() {
 
 my $unicode_str = join "", map { chr($_) } (0x263A .. 0x2650);
 
-require Data::Dumper;
-diag "Loaded ", $INC{"Data/Dumper.pm"},
-     " VERSION=",u($Data::Dumper::VERSION),"\n";
+#require Data::Dumper;
+#diag "Loaded ", $INC{"Data/Dumper.pm"},
+#     " VERSION=",u($Data::Dumper::VERSION),"\n";
+for my $modname (qw/Data::Dumper Math::BigInt Math::BigFloat Math::BigRat/) {
+  (my $modpath = "${modname}.pm") =~ s/::/\//g;
+  require $modpath;
+  no strict 'refs';
+  diag "Loaded ", $INC{$modpath}, " VERSION=",u(${"${modname}::VERSION"}), "\n";
+}
 
 # Has Data::Dumper::Useqq('utf8') been fixed?
 { my $s = Data::Dumper->new([$unicode_str],['unicode_str'])->Terse(1)->Useqq('utf8')->Dump;

@@ -1,7 +1,7 @@
 ### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
 #
 #    Net::FullAuto - Distributed Workload Automation Software
-#    Copyright © 2000-2022  Brian M. Kelly
+#    Copyright © 2000-2023  Brian M. Kelly
 #
 #    This program is free software: you can redistribute it and/or
 #    modify it under the terms of the GNU Affero General Public License
@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000631';
+our $VERSION='1.0000632';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -269,7 +269,7 @@ my $fa_banner=<<END;
 
 
 
-   Copyright $c 2000-2022  Brian M. Kelly  Brian.Kelly\@FullAuto.com
+   Copyright $c 2000-2023  Brian M. Kelly  Brian.Kelly\@FullAuto.com
 
 
 END
@@ -853,7 +853,7 @@ if ($^O eq 'cygwin') {
                            'perl-libwww-perl','perl-LWP-Protocol-https',
                            'wget','git','figlet','autobuild','autoconf',
                            'automake','libtool','libxml2','libxml2-devel',
-                           'pkg-config','libisl15',
+                           'pkg-config','libisl15','libnsl-devel',
                            #'pkg-config','libisl15','libcloog-isl4',
                            'sqlite3','rpm','cpio','curl') {
          unless (-1<index $cygcheck, "$package ") {
@@ -2070,6 +2070,7 @@ END
    &fa_install_module('Data::Password::Check','install','Makefile');
    &fa_install_module('Crypt::GeneratePassword','install','Makefile');
    &fa_install_module('Archive::Zip','install','Makefile');
+   &fa_install_module('CPAN::DistnameInfo','install','Makefile');
    #&fa_install_module('Excel::Writer::XLSX','install','Makefile');
    #&fa_install_module('Spreadsheet::Read','install','Makefile');
 
@@ -2837,7 +2838,8 @@ if ($^O eq 'MSWin32' || $^O eq 'MSWin64') {
                       .'db,libdb-devel,ncurses,cron,inetutils,pkg-config,'
                       .'git,libcrypt-devel,perl-LWP-Protocol-https,nano,'
                       .'autobuild,autoconf,automake,libtool,libxml2-devel,'
-                      .'libisl15,libcloog-isl4,sqlite3,rpm,cpio,curl'
+                      .'libisl15,libcloog-isl4,sqlite3,rpm,cpio,curl,'
+                      .'libnsl-devel'
                       .$selection.' -X -A -q '."-R $cygwin_root_dir "
                       .'-s '.$mirror_url;
             } else {
@@ -6153,7 +6155,7 @@ END
 
    *THANK YOU* For Trying FullAuto!   Net::FullAuto INSTALLATION PROGRAM
 
-   Copyright (C) 2000-2022   Brian M. Kelly   Brian.Kelly\@FullAuto.com
+   Copyright (C) 2000-2023   Brian M. Kelly   Brian.Kelly\@FullAuto.com
 
    This program comes with ABSOLUTELY NO WARRANTY; for details select 2.
    This is free software, and you are welcome to redistribute it under certain

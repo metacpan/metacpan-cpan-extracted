@@ -4,7 +4,7 @@ BEGIN { $ENV{PERL_DL_NONLAZY} = 0; }
 use strict;
 use warnings;
 use Test::More;
-use Prima::Test;
+use Prima::sys::Test;
 use OpenGL;
 use Prima::OpenGL;
 use Prima::Application;

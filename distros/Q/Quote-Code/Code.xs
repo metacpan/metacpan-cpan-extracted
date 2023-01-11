@@ -1,5 +1,5 @@
 /*
-Copyright 2012, 2013 Lukas Mai.
+Copyright 2012, 2013, 2023 Lukas Mai.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
@@ -47,6 +47,16 @@ See http://dev.perl.org/licenses/ for more information.
 #else
  #define WARNINGS_RESET
  #define WARNINGS_ENABLE
+#endif
+
+#ifdef __has_attribute
+ #if __has_attribute(noreturn)
+  #define ATTR_NORETURN __attribute__((noreturn))
+ #endif
+#endif
+
+#ifndef ATTR_NORETURN
+ #define ATTR_NORETURN
 #endif
 
 
@@ -99,6 +109,7 @@ typedef struct {
     int flags;
 } QCSpec;
 
+ATTR_NORETURN
 static void missing_terminator(pTHX_ const QCSpec *spec, line_t line) {
     I32 c = spec->delim_stop;
     SV *sv = spec->delim_str;

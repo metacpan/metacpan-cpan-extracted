@@ -1,3 +1,5 @@
+use v5.14;
+
 use Test::Most;
 
 use HTTP::CSPHeader;

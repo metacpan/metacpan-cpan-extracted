@@ -1,0 +1,26 @@
+#!perl
+
+use strict;
+use warnings;
+
+use Carp qw( croak );
+use DBI;
+use Path::Tiny qw( path );
+
+my $dir = shift
+	or croak( 'Usage: story-interact-dir2sqlite [DIR] [SQLITE_FILE]' );
+
+my $file = shift
+	or croak( 'Usage: story-interact-dir2sqlite [DIR] [SQLITE_FILE]' );
+
+croak( 'File already exists!' ) if -e $file;
+
+my $dbh = DBI->connect("dbi:SQLite:dbname=$file","","");
+$dbh->do('CREATE TABLE page ( id TEXT PRIMARY KEY, content TEXT )');
+
+my $sth = $dbh->prepare( 'INSERT INTO page ( id, content ) VALUES ( ?, ? )' );
+my $extension = qr/\.page\.pl\z/;
+
+for my $file ( path( $dir )->children( $extension ) ) {
+	$sth->execute( $file->basename( $extension ), $file->slurp_utf8 );
+}

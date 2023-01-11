@@ -1,19 +1,121 @@
-use strict;
+use v5.12.0;
 use warnings;
-package Sub::Exporter::Lexical;
-{
-  $Sub::Exporter::Lexical::VERSION = '0.092292';
-}
+package Sub::Exporter::Lexical 0.100000;
 # ABSTRACT: to export lexically-available subs with Sub::Exporter
 
-use v5.12.0;
+BEGIN {
+  if ($] >= 5.021 && $] < 5.037002) {
+    use Carp ();
+    Carp::confess("There is no functioning lexical exporter between perl v5.20 and v5.38");
+  }
+}
 
-use Lexical::Sub ();
+use if $] < 5.021, 'Lexical::Sub';
+use if $] >= 5.037002, 'builtin';
 
 use Sub::Exporter -setup => {
   exports => [ qw(lexical_installer) ],
 };
 
+#pod =head1 SYNOPSIS
+#pod
+#pod In an exporting library:
+#pod
+#pod   package Some::Toolkit;
+#pod
+#pod   use Sub::Exporter -setup => {
+#pod     exports   => [ qw(foo bar baz) ],
+#pod   };
+#pod
+#pod   sub foo { ... }
+#pod   sub bar { ... }
+#pod   sub baz { ... }
+#pod
+#pod In an importing library:
+#pod
+#pod   package Vehicle::Autobot;
+#pod
+#pod   use Sub::Exporter::Lexical lexical_installer => { -as => 'lex' };
+#pod
+#pod   ...;
+#pod
+#pod   {
+#pod     use Some:::Toolkit { installer => lex }, qw(foo bar);
+#pod
+#pod     foo(1,2,3);
+#pod     my $x = bar;
+#pod
+#pod     ...
+#pod   };
+#pod
+#pod   # ... and here, foo and bar are no longer available ...
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod Sub::Exporter::Lexical provides an alternate installer for
+#pod L<Sub::Exporter|Sub::Exporter>.  Installers are documented in Sub::Exporter's
+#pod documentation; all you need to know is that by using Sub::Exporter::Lexical's
+#pod installer, you can import routines into a lexical scope that will be cleaned up
+#pod when that scope ends.
+#pod
+#pod There are two places it makes sense to use the lexical installer: when
+#pod configuring Sub::Exporter in your exporting package or when importing from a
+#pod package that uses Sub::Exporter.  For the first case, do something like this:
+#pod
+#pod   package Some::Toolkit;
+#pod   use Sub::Exporter::Lexical ();
+#pod   use Sub::Exporter -setup => {
+#pod     exports   => [ ... ],
+#pod     installer => Sub::Exporter::Lexical::lexical_installer,
+#pod   };
+#pod
+#pod For the second:
+#pod
+#pod   package My::Library;
+#pod
+#pod   use Sub::Exporter::Lexical ();
+#pod   use Some::Toolkit
+#pod     { installer => Sub::Exporter::Lexical::lexical_installer },
+#pod     qw(foo bar baz);
+#pod
+#pod =head1 EXPORTS
+#pod
+#pod Sub::Exporter::Lexical offers only one routine for export, and it may also
+#pod be called by its full package name:
+#pod
+#pod =head2 lexical_installer
+#pod
+#pod This routine returns an installer suitable for use as the C<installer> argument
+#pod to Sub::Exporter.  It installs all requested routines as usual, but marks them
+#pod to be removed from the target package as soon as the block in which it was
+#pod called is complete.
+#pod
+#pod It does not affect the behavior of routines exported into scalar references.
+#pod
+#pod B<More importantly>, it does not affect scopes in which it is invoked at
+#pod runtime, rather than compile time.  B<This is important!>  It means that this
+#pod works:
+#pod
+#pod   {
+#pod     use Some::Toolkit { installer => lexical_installer }, qw(foo);
+#pod     foo(1,2,3);
+#pod   }
+#pod
+#pod   foo(); # this dies
+#pod
+#pod ...but this does not...
+#pod
+#pod   {
+#pod     require Some::Toolkit;
+#pod     Some::Toolkit->import({ installer => lexical_installer }, qw(foo));
+#pod     foo(1,2,3);
+#pod   }
+#pod
+#pod   foo(); # this does not die, even though you might expect it to
+#pod
+#pod Finally, you can't supply a C<< -as => \$var >> install destination yet.
+#pod
+#pod =cut
 
 sub lexical_installer {
   sub {
@@ -32,7 +134,10 @@ sub lexical_installer {
         Carp::cluck("can't import to variable with lexical installer (yet)");
         next;
       }
-      Lexical::Sub->import($name, $code);
+
+      if ($] >= 5.037002) { builtin::export_lexically($name, $code); }
+      elsif ($] <= 5.021) { Lexical::Sub->import($name, $code); }
+      else { Carp::confess("This code should be unreachable.") }
     }
   };
 }
@@ -51,15 +156,9 @@ Sub::Exporter::Lexical - to export lexically-available subs with Sub::Exporter
 
 =head1 VERSION
 
-version 0.092292
+version 0.100000
 
 =head1 SYNOPSIS
-
-B<Achtung!>  I don't know why I wrote this.  I don't use it and never have.
-Originally, it was not lexical, but dynamic, despite the name.  What was I
-thinking?  Clearly this was a bad brain day.  I have rewritten the code now to
-use L<Lexical::Sub>, which should make the behavior actually lexical, but I
-have not expanded the test suite.  To continue...
 
 In an exporting library:
 
@@ -120,6 +219,14 @@ For the second:
     { installer => Sub::Exporter::Lexical::lexical_installer },
     qw(foo bar baz);
 
+=head1 PERL VERSION
+
+This module is shipped with no promise about what version of perl it will
+require in the future.  In practice, this tends to mean "you need a perl from
+the last three years," but you can't rely on that.  If a new version of perl
+ship, this software B<may> begin to require it for any reason, and there is no
+promise that patches will be accepted to lower the minimum required perl.
+
 =head1 EXPORTS
 
 Sub::Exporter::Lexical offers only one routine for export, and it may also
@@ -159,11 +266,31 @@ Finally, you can't supply a C<< -as => \$var >> install destination yet.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Hans Dieter Pearcey Ricardo SIGNES Signes
+
+=over 4
+
+=item *
+
+Hans Dieter Pearcey <hdp@weftsoar.net>
+
+=item *
+
+Ricardo SIGNES <rjbs@cpan.org>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Ricardo Signes.
+This software is copyright (c) 2023 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

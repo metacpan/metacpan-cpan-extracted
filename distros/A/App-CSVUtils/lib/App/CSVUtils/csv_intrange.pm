@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-04'; # DATE
+our $DATE = '2023-01-11'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.001'; # VERSION
+our $VERSION = '1.003'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -58,6 +58,18 @@ Example:
 _
     add_args => {
         %App::CSVUtils::argspecopt_with_data_rows,
+        sort => {
+            summary => 'Sort the values first',
+            schema => 'true*',
+            description => <<'_',
+
+Sort is done numerically, in ascending order.
+
+If you want only certain fields sorted, you can use <prog:csv-sort-rows> first
+and pipe the result.
+
+_
+        },
     },
 
     on_input_header_row => sub {
@@ -86,6 +98,12 @@ _
 
         my $r = shift;
 
+        if ($r->{util_args}{sort}) {
+            for my $j (0 .. $#{ $r->{output_fields} }) {
+                $r->{field_values}[$j] = [ sort { $a <=> $b } @{ $r->{field_values}[$j] } ];
+            }
+        }
+
         my @ranges;
         for my $j (0 .. $#{ $r->{output_fields} }) {
             push @ranges, join(",", @{ Number::Util::Range::convert_number_sequence_to_range(array => $r->{field_values}[$j], ignore_duplicates=>1) });
@@ -110,7 +128,7 @@ App::CSVUtils::csv_intrange - Output a summary row which are range notation of n
 
 =head1 VERSION
 
-This document describes version 1.001 of App::CSVUtils::csv_intrange (from Perl distribution App-CSVUtils), released on 2023-01-04.
+This document describes version 1.003 of App::CSVUtils::csv_intrange (from Perl distribution App-CSVUtils), released on 2023-01-11.
 
 =head1 FUNCTIONS
 
@@ -266,6 +284,15 @@ ignored.
 =item * B<overwrite> => I<bool>
 
 Whether to override existing output file.
+
+=item * B<sort> => I<true>
+
+Sort the values first.
+
+Sort is done numerically, in ascending order.
+
+If you want only certain fields sorted, you can use L<csv-sort-rows> first
+and pipe the result.
 
 =item * B<with_data_rows> => I<bool>
 

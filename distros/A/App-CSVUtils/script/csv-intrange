@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-04'; # DATE
+our $DATE = '2023-01-11'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.001'; # VERSION
+our $VERSION = '1.003'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_intrange/csv_intrange",
@@ -41,7 +41,7 @@ csv-intrange - Output a summary row which are range notation of numbers
 
 =head1 VERSION
 
-This document describes version 1.001 of csv-intrange (from Perl distribution App-CSVUtils), released on 2023-01-04.
+This document describes version 1.003 of csv-intrange (from Perl distribution App-CSVUtils), released on 2023-01-11.
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,7 @@ B<csv-intrange> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B
 
 B<csv-intrange> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<csv-intrange> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--input-escape-char|/"--input-escape-char=s">>=I<str>] [B<L<--input-header|/"--no-input-header">>|B<L<--no-input-header|/"--no-input-header">>|B<L<--noinput-header|/"--no-input-header">>] [B<L<--input-quote-char|/"--input-quote-char=s">>=I<str>] [B<L<--input-sep-char|/"--input-sep-char=s">>=I<str>] [B<L<--input-tsv|/"--input-tsv">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--output-escape-char|/"--output-escape-char=s">>=I<str>] [B<L<--output-header|/"--output-header">>|B<L<--no-output-header|/"--output-header">>|B<L<--nooutput-header|/"--output-header">>] [B<L<--output-quote-char|/"--output-quote-char=s">>=I<str>] [B<L<--output-sep-char|/"--output-sep-char=s">>=I<str>] [B<L<--output-tsv|/"--output-tsv">>|B<L<--no-output-tsv|/"--output-tsv">>|B<L<--nooutput-tsv|/"--output-tsv">>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>|B<L<--no-overwrite|/"--overwrite, -O">>|B<L<--nooverwrite|/"--overwrite, -O">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--with-data-rows|/"--with-data-rows">>|B<L<--without-data-rows|/"--with-data-rows">>] -- [I<L<input_filename|/"--input-filename=s">>] [I<L<output_filename|/"--output-filename=s, -o">>]
+B<csv-intrange> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--input-escape-char|/"--input-escape-char=s">>=I<str>] [B<L<--input-header|/"--no-input-header">>|B<L<--no-input-header|/"--no-input-header">>|B<L<--noinput-header|/"--no-input-header">>] [B<L<--input-quote-char|/"--input-quote-char=s">>=I<str>] [B<L<--input-sep-char|/"--input-sep-char=s">>=I<str>] [B<L<--input-tsv|/"--input-tsv">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--output-escape-char|/"--output-escape-char=s">>=I<str>] [B<L<--output-header|/"--output-header">>|B<L<--no-output-header|/"--output-header">>|B<L<--nooutput-header|/"--output-header">>] [B<L<--output-quote-char|/"--output-quote-char=s">>=I<str>] [B<L<--output-sep-char|/"--output-sep-char=s">>=I<str>] [B<L<--output-tsv|/"--output-tsv">>|B<L<--no-output-tsv|/"--output-tsv">>|B<L<--nooutput-tsv|/"--output-tsv">>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>|B<L<--no-overwrite|/"--overwrite, -O">>|B<L<--nooverwrite|/"--overwrite, -O">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--sort|/"--sort">>] [B<L<--with-data-rows|/"--with-data-rows">>|B<L<--without-data-rows|/"--with-data-rows">>] -- [I<L<input_filename|/"--input-filename=s">>] [I<L<output_filename|/"--output-filename=s, -o">>]
 
 =head1 DESCRIPTION
 
@@ -97,6 +97,16 @@ C<*> marks required options.
 =head2 Main options
 
 =over
+
+=item B<--sort>
+
+Sort the values first.
+
+Sort is done numerically, in ascending order.
+
+If you want only certain fields sorted, you can use L<csv-sort-rows> first
+and pipe the result.
+
 
 =item B<--with-data-rows>
 

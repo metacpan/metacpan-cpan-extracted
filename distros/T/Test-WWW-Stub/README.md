@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/astj/p5-Test-WWW-Stub.svg?branch=master)](https://travis-ci.org/astj/p5-Test-WWW-Stub)
+[![Actions Status](https://github.com/hatena/p5-Test-WWW-Stub/workflows/test/badge.svg)](https://github.com/hatena/p5-Test-WWW-Stub/actions)
 # NAME
 
 Test::WWW::Stub - Block and stub specified URL for LWP
@@ -52,7 +52,7 @@ Test::WWW::Stub - Block and stub specified URL for LWP
 
 Test::WWW::Stub is a helper module to block external http(s) request and stub some specific requests in your test.
 
-Because this modules uses [LWP::Protocol::PSGI](https://metacpan.org/pod/LWP::Protocol::PSGI) internally, you don't have to modify target codes using [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent).
+Because this modules uses [LWP::Protocol::PSGI](https://metacpan.org/pod/LWP%3A%3AProtocol%3A%3APSGI) internally, you don't have to modify target codes using [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent).
 
 # METHODS
 
@@ -85,7 +85,7 @@ Because this modules uses [LWP::Protocol::PSGI](https://metacpan.org/pod/LWP::Pr
 
         my @requests = Test::WWW::Stub->requests;
 
-    Returns an array of [Plack::Request](https://metacpan.org/pod/Plack::Request) which is handled by Test::WWW::Stub.
+    Returns an array of [Plack::Request](https://metacpan.org/pod/Plack%3A%3ARequest) which is handled by Test::WWW::Stub.
 
 - `last_request`
 
@@ -116,6 +116,29 @@ Because this modules uses [LWP::Protocol::PSGI](https://metacpan.org/pod/LWP::Pr
     Unregister stub and enables external access, and returns a guard object which re-enables stub on destroyed.
 
     In constrast to `register`, this method doesn't work when called in void context.
+
+- `import`
+
+        Test::WWW::Stub->import(%options)
+        or
+        use Test:::WWW::Stub
+
+    This `%options` are equivalent to the options of `LWP::Protocol::PSGI->register(%options)`. For example, the options can be set as follows:
+
+        use Test::WWW::Stub (
+            uri => sub {
+                my $uri = shift;
+                $uri ne 'http://localhost:9200'
+            }
+        );
+
+- `unimport`
+
+        Test::WWW::Stub->unimport
+        or
+        no Test::WWW::Stub;
+
+    Delete the stubbed app and stop stubbing. If you need to stub again, import Test::WWW::Stub.
 
 # LICENSE
 

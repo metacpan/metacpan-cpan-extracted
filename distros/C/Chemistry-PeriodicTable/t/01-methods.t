@@ -12,16 +12,15 @@ my $got = $obj->as_file;
 ok -e $got, 'as_file';
 
 my @headers = $obj->headers;
-is @headers, 21, 'headers';
 is_deeply \@headers, $obj->header, 'header';
+is @headers, 21, 'headers';
 
 $got = $obj->as_hash;
+is_deeply $got, $obj->symbols, 'symbols';
 is_deeply [ @{ $got->{H} }[0,1] ], [1, 'Hydrogen'], 'as_hash';
 
-is_deeply $got, $obj->data, 'data';
-
-is $obj->atomic_number('H'), 1, 'atomic_number';
-is $obj->atomic_number('hydrogen'), 1, 'atomic_number';
+is $obj->number('H'), 1, 'number';
+is $obj->number('hydrogen'), 1, 'number';
 
 is $obj->name(1), 'Hydrogen', 'name';
 is $obj->name('H'), 'Hydrogen', 'name';

@@ -3,7 +3,7 @@ package Net::FullAuto::FA_Core;
 ### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
 #
 #    Net::FullAuto - Distributed Workload Automation Software
-#    Copyright © 2000-2022  Brian M. Kelly
+#    Copyright © 2000-2023  Brian M. Kelly
 #
 #    This program is free software: you can redistribute it and/or
 #    modify it under the terms of the GNU Affero General Public License
@@ -2648,7 +2648,7 @@ my $version=<<VERSION;
 This is Net::FullAuto©, v$Net::FullAuto::VERSION
 (See  fullauto -V  or  fa -V  for more detail)
 
-Copyright © 2000-2022, Brian M. Kelly  Brian.Kelly\@FullAuto.com
+Copyright © 2000-2023, Brian M. Kelly  Brian.Kelly\@FullAuto.com
 
 FullAuto© may be copied only under the terms of the GNU Affero General Public
 License, which may be found in the FullAuto source distribution.
@@ -9658,7 +9658,7 @@ my $affero=<<END;
 ### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
 #
 #    Net::FullAuto - Powerful Network Process Automation Software
-#    Copyright © 2000-2022  Brian M. Kelly
+#    Copyright © 2000-2023  Brian M. Kelly
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -11433,7 +11433,7 @@ our $fa_welcome=<<'END';
 
 
 
-   Copyright © 2000-2022  Brian M. Kelly  Brian.Kelly@FullAuto.com
+   Copyright © 2000-2023  Brian M. Kelly  Brian.Kelly@FullAuto.com
 
 
 
@@ -17183,7 +17183,7 @@ print $Net::FullAuto::FA_Core::LOG "main::cmd() CMD to Rem_Command=",
    }
    if ($all) {
       foreach my $line (split /^/, $all) {
-         if ($line=~s/^[\t ]*stdout: //) {
+         if ($line=~s/^[\t ]*stdout: // || $line=~s/[[]6nstdout: //) {
             push @outlines, $line;
          } else { push @errlines, $line }
       } $stdout=join '', @outlines;$stderr=join '',@errlines;
@@ -23228,16 +23228,16 @@ sub get_drive
       } else {
          my $banner="\n   Please Pick a $base_or_dest Directory\n"
                    ."   on the Local Host "
-                   ."$Net::FullAuto::FA_Core::Local_HostName :";
+                   ."$Net::FullAuto::FA_Core::Local_HostName :\n\n";
          $dir=&Term::Menus::pick(\@drvs,$banner);
       }
       my ($drive,$path)=unpack('a1 x1 a*',$dir);
       $path=~tr/\\/\//;
       if ($cmd_handle) {
-         $folder=$cmd_handle->{_cygdrive}.'/'.lc($drive).$path.'/';
+         $folder=$cmd_handle->{_cygdrive}.'/'.lc($drive).$path;
       } else {
          $folder=$Net::FullAuto::FA_Core::localhost->{_cygdrive}.'/'.
-                 lc($drive).$path.'/';
+                 lc($drive).$path;
       }
    } else {
       my $die="Cannot Locate Directory $folder\n"
@@ -30033,6 +30033,8 @@ print "GOING TO INT SIX\n";
                      $output=~s/^(.*2[>][&]1\s*)\[A\s*$/$1/s;
                   } elsif (-1<index $output,'7[r') {
                      $output=~s/7[[]r[[]999[;]999H[[]6n//s;
+                  } elsif (-1<index $output,'[?2004') {
+                     $output=~s/[[][?]2004[h|l]?//g;
                   }
                   print $Net::FullAuto::FA_Core::LOG
                      "\nCMD RAW OUTPUT: ==>$output<== at Line ",__LINE__,"\n\n"

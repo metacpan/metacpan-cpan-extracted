@@ -2,7 +2,7 @@ package HTTP::CSPHeader;
 
 # ABSTRACT: manage dynamic content security policy headers
 
-use v5.10;
+use v5.14;
 
 use Moo;
 
@@ -16,7 +16,7 @@ use Types::Standard qw/ ArrayRef is_ArrayRef Bool HashRef Str /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.1.4';
+our $VERSION = 'v0.2.1';
 
 
 has _base_policy => (
@@ -164,7 +164,7 @@ HTTP::CSPHeader - manage dynamic content security policy headers
 
 =head1 VERSION
 
-version v0.1.4
+version v0.2.1
 
 =head1 SYNOPSIS
 
@@ -245,6 +245,9 @@ from L<Math::Random::ISAAC>.  The RNG is seeded by F</dev/urandom>.
 If you do not have F</dev/urandom> or you want to change how it is generated,
 you can override the C<_build_nonce> method in a subclass.
 
+Note that you should never make an assumption about the format of the
+nonce, as the source may change in future versions.
+
 =head2 header
 
 This is the value of the header, generated from the L</policy>.
@@ -307,6 +310,14 @@ and in your templates, you can use the following for inline scripts:
 
 If you do not need the nonce, then you might consider using L<Mojolicious::Plugin::CSPHeader>.
 
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.2.0, the this module requires Perl v5.14 or later.
+
+If you need this module on Perl v5.10, please use one of the v0.1.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
+
 =head1 SEE ALSO
 
 L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy>
@@ -335,7 +346,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Robert Rothenberg.
+This software is Copyright (c) 2022-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

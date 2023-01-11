@@ -33,7 +33,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Chemistry-PeriodicTable
   repository: https://github.com/ology/Chemistry-PeriodicTable.git
-version: '0.0303'
+version: '0.0400'
 x_Dist_Zilla:
   perl:
     version: '5.032001'
@@ -239,7 +239,8 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename: []
-          exclude_match: []
+          exclude_match:
+            - \.png
           follow_symlinks: 0
           include_dotfiles: 0
           prefix: ''

@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-04'; # DATE
+our $DATE = '2023-01-11'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.001'; # VERSION
+our $VERSION = '1.003'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -15,7 +15,7 @@ use App::CSVUtils qw(
 
 gen_csv_util(
     name => 'csv_uniq',
-    summary => 'Repeat or omit duplicated values in CSV',
+    summary => 'Report or omit duplicated values in CSV',
     add_args => {
         %App::CSVUtils::argspec_fields_1plus,
         ignore_case => {
@@ -84,7 +84,7 @@ gen_csv_util(
 );
 
 1;
-# ABSTRACT: Repeat or omit duplicated values in CSV
+# ABSTRACT: Report or omit duplicated values in CSV
 
 __END__
 
@@ -94,11 +94,11 @@ __END__
 
 =head1 NAME
 
-App::CSVUtils::csv_uniq - Repeat or omit duplicated values in CSV
+App::CSVUtils::csv_uniq - Report or omit duplicated values in CSV
 
 =head1 VERSION
 
-This document describes version 1.001 of App::CSVUtils::csv_uniq (from Perl distribution App-CSVUtils), released on 2023-01-04.
+This document describes version 1.003 of App::CSVUtils::csv_uniq (from Perl distribution App-CSVUtils), released on 2023-01-11.
 
 =head1 FUNCTIONS
 
@@ -109,7 +109,7 @@ Usage:
 
  csv_uniq(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Repeat or omit duplicated values in CSV.
+Report or omit duplicated values in CSV.
 
 Examples:
 

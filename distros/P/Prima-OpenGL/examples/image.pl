@@ -1,5 +1,3 @@
-use lib '../lib', '../blib/arch';
-use lib 'lib', 'blib/arch';
 use strict;
 use warnings;
 use OpenGL;

@@ -19,7 +19,7 @@ use 5.020;
 use feature qw(say state lexical_subs);
 use feature 'lexical_subs'; no warnings "experimental::lexical_subs";
 package  Data::Dumper::Interp;
-$Data::Dumper::Interp::VERSION = '3.8';
+$Data::Dumper::Interp::VERSION = '3.9';
 
 package  # newline prevents Dist::Zilla::Plugin::PkgVersion from adding $VERSION
   DB;
@@ -538,7 +538,10 @@ sub _show_as_number(_) {
   # if the utf8 flag is on, it almost certainly started as a string
   return 0 if !ref($value) && utf8::is_utf8($value);
 
-  return 0 unless looks_like_number($value);
+  # Recently there is a bug where looks_like_number provokes a warning from BigRat.pm
+  # if it is called under 'use bigrat;'
+  # https://github.com/Perl/perl5/issues/20685
+  #return 0 unless looks_like_number($value);
 
   # JSON::PP uses these tricks.  We used to do that but no longer.
   # string & "" -> ""  # bitstring AND, truncating to shortest operand
@@ -549,8 +552,15 @@ sub _show_as_number(_) {
   my $and_result = eval { 
     use warnings "FATAL" => "all"; # Convert warnings into exceptions
     # 'bitwise' is the default only in newer perls. So disable.
-    no feature 'bitwise';
-    no warnings "experimental::bitwise", "once";
+    BEGIN {
+      if ($] >= 5.022) { # no feature 'bitwise' won't compile on Perl 5.20
+        require feature;
+        feature->unimport( 'bitwise' ); 
+        require warnings;
+        warnings->unimport("experimental::bitwise");
+      }
+    }
+    no warnings "once";
     my $dummy = ($value & "");
   };
   if ($@) {

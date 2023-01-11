@@ -1,0 +1,114 @@
+NAME
+    Story::Interact - tools for writing (and reading) an interactive story
+
+SYNOPSIS
+    Reading story from a directory:
+
+      story-interact /path/to/story/
+
+    Reading story from a SQLite database:
+
+      story-interact /path/to/story.sqlite
+
+    Reading story from an arbitrary database:
+
+      story-interact 'dbi:...'
+
+    Compiling a directory into an SQLite database:
+
+      story-interact-dir2sqlite "/path/to/story/" "/path/to/story.sqlite"
+
+DESCRIPTION
+    Story::Interact is for choose-your-own-adventure-style stories, but with a
+    difference. Pages can alter a global "state". This allows your character
+    to achieve things, and those achievements alter the course of the story
+    later on. This elevates stories to a full text-based game.
+
+    Documentation is currently very limited. Tests are almost non-existent.
+
+    Stories are written in pages. Each page is a Perl script using the
+    functions defined in Story::Interactive::Syntax. They may contain
+    arbitrary Perl code, but are evaluated within a Safe container, so do have
+    some limits.
+
+    Stories may contain arbitrary Perl code. Do not run untrusted stories.
+
+    An example page:
+
+      at 'kitchen';
+  
+      text "You are in the kitchen.";
+  
+      unless ( location->{apple_gone} ) {
+       text "There is an *apple* on the counter.";
+       next_page apple => 'Pick up apple';
+      }
+  
+      next_page living_room => 'Go to the living room';
+
+    The `text` function is just to add a paragraph of text. (It may use simple
+    Markdown for **bold** and **italics**.) Pages can of course contain
+    multiple paragraphs.
+
+    The `next_page` function defines a path the story can take after this
+    page. It takes a page identifier followed by a description. It can be used
+    multiple times to present the user with a choice. If a page has no next
+    page, then it is an end to the story. (The `next_page` function can
+    actually be called as `next_page( $id, $description, %metadata )` though
+    this metadata is not currently used for anything! In future versions it
+    might be used to allow shortcut keys for certain choices, etc.)
+
+    The `at` function should be used at the top of a page to indicate what
+    place this page occurs at. It is an arbitrary string, so could be a room
+    name, grid co-ordinates, etc. Multiple pages may be written for the same
+    location.
+
+    The `location` function returns a hashref associated with this location.
+    This can be used to store state for this location. You can use `location(
+    $string )` to access another location's hashref; the string match must be
+    exact.
+
+    The `world` function returns a hashref for storing story-wide state.
+
+    The `player` function returns a Story::Interactive::Character object
+    representing the player. This object contains multiple hashrefs to store
+    character state, including what things the player knows, items the player
+    carries, and tasks the player has achieved.
+
+    The `npc( $id )` command returns a Story::Interactive::Character object
+    for a non-player character, if such a character has been defined.
+
+    The `define_npc( $id, %data )` function defines a new NPC. If an NPC
+    already exists with that identifier, it does nothing. If the player
+    character will need to interact with another character on multiple
+    occasions, it is useful to define an NPC for them to track the character's
+    state.
+
+    The `visited` function returns the number of times this page has been
+    visited as part of the narrative before.
+
+    The `true` and `false` functions are just to make your code more readable.
+
+    The first page always has id "main".
+
+BUGS
+    Please report any bugs to
+    <https://github.com/tobyink/p5-story-interact/issues>.
+
+SEE ALSO
+    Pod::CYOA, <https://en.wikipedia.org/wiki/Choose_Your_Own_Adventure>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2023 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

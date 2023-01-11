@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.20, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,7 +30,7 @@ no_index:
 provides:
   Test::WWW::Stub:
     file: lib/Test/WWW/Stub.pm
-    version: '0.10'
+    version: '0.11'
   Test::WWW::Stub::Handler:
     file: lib/Test/WWW/Stub/Handler.pm
   Test::WWW::Stub::Intercepter:
@@ -44,14 +44,18 @@ requires:
   URI: '0'
   perl: '5.010'
 resources:
-  bugtracker: https://github.com/astj/p5-Test-WWW-Stub/issues
-  homepage: https://github.com/astj/p5-Test-WWW-Stub
-  repository: git://github.com/astj/p5-Test-WWW-Stub.git
-version: '0.10'
+  bugtracker: https://github.com/hatena/p5-Test-WWW-Stub/issues
+  homepage: https://github.com/hatena/p5-Test-WWW-Stub
+  repository: https://github.com/hatena/p5-Test-WWW-Stub.git
+version: '0.11'
+x_authority: cpan:ASTJ
 x_contributors:
+  - 'AnaTofuZ <anatofuz@gmail.com>'
+  - 'AnaTofuZ <anatofuz@hatena.ne.jp>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Takumi Akiyama <t.akiym@gmail.com>'
   - 'aereal <aereal@aereal.org>'
+  - 'kfly8 <kfly@cpan.org>'
   - 'papix <mail@papix.net>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

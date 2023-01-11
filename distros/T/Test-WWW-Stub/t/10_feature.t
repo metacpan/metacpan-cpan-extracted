@@ -34,6 +34,29 @@ sub lwp_protocol : Tests {
         my $warnings = [ warnings { ua()->get('http://example.com/') } ];
         cmp_deeply $warnings, [], 'no warnings';
     };
+    subtest 'imported with option' => sub {
+        Test::WWW::Stub->import(uri => 'http://example.com/TEST');
+
+        my $warnings = [ warnings { ua()->get('http://example.com/') } ];
+        cmp_deeply $warnings, [], 'no warnings';
+
+        my $warnings_TEST = [ warnings { ua()->get('http://example.com/TEST') } ];
+        cmp_deeply $warnings_TEST, [re('Unexpected external access:')], 'warnings appeared';
+
+        # override with import without option
+        Test::WWW::Stub->import;
+        $warnings = [ warnings { ua()->get('http://example.com/') } ];
+        cmp_deeply $warnings, [ re('Unexpected external access:') ], 'warnings appeared';
+    };
+    subtest 'unimported' => sub {
+        Test::WWW::Stub->unimport;
+        my $warnings = [ warnings { ua()->get('http://example.com/') } ];
+        cmp_deeply $warnings, [], 'no warnings';
+
+        Test::WWW::Stub->import;
+        $warnings = [ warnings { ua()->get('http://example.com/') } ];
+        cmp_deeply $warnings, [ re('Unexpected external access:') ], 'warnings appeared';
+    };
 }
 
 sub register : Tests {
@@ -115,7 +138,7 @@ sub register : Tests {
 sub unstub : Tests {
     my $self = shift;
 
-    my $stub_g = Test::WWW::Stub->register('http://example.com/TEST', [ 200, [], ['2'] ]);
+    my $stub_g = Test::WWW::Stub->register('http://example.com/TEST', [ 200, [], ['HOGE'] ]);
     ok $self->ua->get('http://example.com/TEST')->is_success;
 
     {
@@ -132,7 +155,37 @@ sub unstub : Tests {
         }
 
         ok $self->ua->get('http://example.com/TEST')->is_success, 're-registered stub';
-    }
+    };
+    subtest 'unstub with import option' => sub {
+        Test::WWW::Stub->import(uri => 'http://example.com/TEST');
+
+        is $self->ua->get('http://example.com/TEST')->content, 'HOGE', 'stubbed';
+        is $self->ua->get('http://example.com')->code, 200, 'not stubbed';
+
+        {
+            my $unstub_g = Test::WWW::Stub->unstub;
+            isnt $self->ua->get('http://example.com/TEST')->content, 'HOGE', 'unstubbed';
+            is $self->ua->get('http://example.com')->code, 200, 'not stubbed';
+        }
+
+        is $self->ua->get('http://example.com/TEST')->content, 'HOGE', 'stubbed';
+        is $self->ua->get('http://example.com')->code, 200, 'not stubbed';
+
+        # override with import without option
+        Test::WWW::Stub->import;
+
+        is $self->ua->get('http://example.com/TEST')->content, 'HOGE', 'stubbed';
+        is $self->ua->get('http://example.com')->code, 499, 'stubbed';
+
+        {
+            my $unstub_g = Test::WWW::Stub->unstub;
+            isnt $self->ua->get('http://example.com/TEST')->content, 'HOGE', 'unstubbed';
+            is $self->ua->get('http://example.com')->code, 200, 'unstubbed';
+        }
+
+        is $self->ua->get('http://example.com/TEST')->content, 'HOGE', 'stubbed';
+        is $self->ua->get('http://example.com')->code, 499, 'stubbed';
+    };
 }
 
 sub last_request_for : Tests {

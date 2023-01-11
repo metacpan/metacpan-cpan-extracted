@@ -45,6 +45,6 @@
          "url" : "https://github.com/tomhughes/IO-Zlib.git"
       }
    },
-   "version" : "1.13",
+   "version" : "1.14",
    "x_serialization_backend" : "JSON::PP version 4.11"
 }

@@ -1,5 +1,8 @@
 Revision history for Perl extension Email::Stuffer
 
+0.020     2023-01-10 20:49:42-05:00 America/New_York
+        - improve documentation to eliminate errors and be easier to link into
+
 0.019     2023-01-09 20:53:20-05:00 America/New_York
         - update packaging and metadata
         - minimum required Perl is now v5.12

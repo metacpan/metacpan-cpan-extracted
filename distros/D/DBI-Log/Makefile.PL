@@ -21,6 +21,7 @@ my @requires = (
     "strict" => 0,
     "warnings" => 0,
     "DBI" => 0,
+    "Time::HiRes" => 0,
 );
 
 my @test_requires = (

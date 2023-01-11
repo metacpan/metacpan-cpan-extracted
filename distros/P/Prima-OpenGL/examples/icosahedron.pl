@@ -16,8 +16,6 @@ The original example code can be found in OpenGL distribution in examples/light.
 
 use strict;
 use warnings;
-use lib '../lib', '../blib/arch';
-use lib 'lib', 'blib/arch';
 use Prima qw(Application Buttons GLWidget);
 use OpenGL qw(:glfunctions :glconstants);
 
@@ -159,7 +157,9 @@ sub create_gl_widget
 		size      => [ $top-> size ],
 		gl_config => { double_buffer => $gl_buffer, depth_bits => 16 },
 		onCreate  => sub {
-			reset_gl(shift,$config);
+			my $self = shift;
+			return unless $self->gl_paint_state;
+			reset_gl($self,$config);
 			glEnable(GL_DEPTH_TEST);
 			glRotatef(0.12,1,0,0);
 		},

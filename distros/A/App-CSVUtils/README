@@ -2,8 +2,8 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 1.001 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2023-01-04.
+    This document describes version 1.003 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2023-01-11.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -25,6 +25,8 @@ DESCRIPTION
     *   csv-each-row
 
     *   csv-fill-template
+
+    *   csv-find-values
 
     *   csv-freqtable
 

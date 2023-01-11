@@ -33,7 +33,7 @@
       },
       "runtime" : {
          "requires" : {
-            "App::BrowserUtils" : "0.017",
+            "App::BrowserUtils" : "0.018",
             "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" : "0",
             "Data::Sah::Compiler::perl::TH::any" : "0.911",
             "Data::Sah::Compiler::perl::TH::array" : "0.911",
@@ -46,6 +46,7 @@
             "Perinci::CmdLine::Any" : "0.152",
             "Perinci::CmdLine::Lite" : "1.915",
             "Sah::Schema::true" : "0",
+            "Sah::Schema::unix::signal" : "0",
             "Sah::Schema::unix::uid::exists" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -64,7 +65,7 @@
    "provides" : {
       "App::OperaUtils" : {
          "file" : "lib/App/OperaUtils.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       }
    },
    "release_status" : "stable",
@@ -79,7 +80,7 @@
          "web" : "https://github.com/perlancar/perl-App-OperaUtils"
       }
    },
-   "version" : "0.007",
+   "version" : "0.008",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -486,7 +487,7 @@
                      {
                         "class" : "Pod::Weaver::Section::PERLANCAR::Contributing",
                         "name" : "@Author::PERLANCAR/PERLANCAR/Contributing",
-                        "version" : "0.292"
+                        "version" : "0.293"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Legal",

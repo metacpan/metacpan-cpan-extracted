@@ -9,6 +9,7 @@ README
 README.md
 cpanfile
 dist.ini
+eg/element-property.pl
 eg/periodic.pl
 eg/table.pl
 lib/Chemistry/PeriodicTable.pm

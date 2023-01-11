@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Provide access to chemical element properties
 
-our $VERSION = '0.0303';
+our $VERSION = '0.0400';
 
 use Moo;
 use strictures 2;
@@ -14,12 +14,12 @@ use Text::CSV_XS ();
 use namespace::clean;
 
 
-has data => (is => 'lazy', init_args => undef);
+has symbols => (is => 'lazy', init_args => undef);
 
-sub _build_data {
+sub _build_symbols {
     my ($self) = @_;
-    my $data = $self->as_hash;
-    return $data;
+    my $symbols = $self->as_hash;
+    return $symbols;
 }
 
 
@@ -95,16 +95,16 @@ sub headers {
 }
 
 
-sub atomic_number {
+sub number {
     my ($self, $string) = @_;
     my $n;
     if (length $string < 4) {
-        $n = $self->data->{ ucfirst $string }[0];
+        $n = $self->symbols->{ ucfirst $string }[0];
     }
     else {
-        for my $symbol (keys %{ $self->data }) {
-            if (lc $self->data->{$symbol}[1] eq lc $string) {
-                $n = $self->data->{$symbol}[0];
+        for my $symbol (keys %{ $self->symbols }) {
+            if (lc $self->symbols->{$symbol}[1] eq lc $string) {
+                $n = $self->symbols->{$symbol}[0];
             }
         }
     }
@@ -115,13 +115,13 @@ sub atomic_number {
 sub name {
     my ($self, $string) = @_;
     my $n;
-    for my $symbol (keys %{ $self->data }) {
+    for my $symbol (keys %{ $self->symbols }) {
         if (
-            ($string =~ /^\d+$/ && $self->data->{$symbol}[0] == $string)
+            ($string =~ /^\d+$/ && $self->symbols->{$symbol}[0] == $string)
             ||
-            (lc $self->data->{$symbol}[2] eq lc $string)
+            (lc $self->symbols->{$symbol}[2] eq lc $string)
         ) {
-            $n = $self->data->{$symbol}[1];
+            $n = $self->symbols->{$symbol}[1];
             last;
         }
     }
@@ -132,11 +132,11 @@ sub name {
 sub symbol {
     my ($self, $string) = @_;
     my $s;
-    for my $symbol (keys %{ $self->data }) {
+    for my $symbol (keys %{ $self->symbols }) {
         if (
-            ($string =~ /^\d+$/ && $self->data->{$symbol}[0] == $string)
+            ($string =~ /^\d+$/ && $self->symbols->{$symbol}[0] == $string)
             ||
-            (lc $self->data->{$symbol}[1] eq lc $string)
+            (lc $self->symbols->{$symbol}[1] eq lc $string)
         ) {
             $s = $symbol;
             last;
@@ -151,13 +151,13 @@ sub value {
     my $v;
     my $idx = first_index { $_ =~ /$string/i } @{ $self->header };
     if ($key !~ /^\d+$/ && length $key < 4) {
-        $v = $self->data->{$key}[$idx];
+        $v = $self->symbols->{$key}[$idx];
     }
     else {
         $key = $self->symbol($key);
-        for my $symbol (keys %{ $self->data }) {
+        for my $symbol (keys %{ $self->symbols }) {
             next unless $symbol eq $key;
-            $v = $self->data->{$symbol}[$idx];
+            $v = $self->symbols->{$symbol}[$idx];
             last;
         }
     }
@@ -178,7 +178,7 @@ Chemistry::PeriodicTable - Provide access to chemical element properties
 
 =head1 VERSION
 
-version 0.0303
+version 0.0400
 
 =head1 SYNOPSIS
 
@@ -186,12 +186,13 @@ version 0.0303
 
   my $pt = Chemistry::PeriodicTable->new;
 
-  my $x = $pt->as_file;
-  $x = $pt->as_hash;
-  my @headers = $pt->headers;
+  my $filename = $pt->as_file;
 
-  $pt->atomic_number('H');        # 1
-  $pt->atomic_number('hydrogen'); # 1
+  my $headers = $pt->header;
+  my $symbols = $pt->symbols; # element properties keyed by symbol
+
+  $pt->number('H');        # 1
+  $pt->number('hydrogen'); # 1
 
   $pt->name(1);   # Hydrogen
   $pt->name('H'); # Hydrogen
@@ -209,9 +210,9 @@ C<Chemistry::PeriodicTable> provides access to chemical element properties.
 
 =head1 ATTRIBUTES
 
-=head2 data
+=head2 symbols
 
-  $data = $pt->data;
+  $symbols = $pt->symbols;
 
 The computed hash-reference of the element properties.
 
@@ -272,10 +273,10 @@ Return the data headers. These are:
   Display Row
   Display Column
 
-=head2 atomic_number
+=head2 number
 
-  $n = $pt->atomic_number($symbol);
-  $n = $pt->atomic_number($name);
+  $n = $pt->number($symbol);
+  $n = $pt->number($name);
 
 Return the atomic number of either a symbol or name.
 

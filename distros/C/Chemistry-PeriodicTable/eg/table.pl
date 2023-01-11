@@ -7,7 +7,7 @@ use Chemistry::PeriodicTable ();
 get '/' => sub ($c) {
   my $pt = Chemistry::PeriodicTable->new;
   my $headers = $pt->header;
-  my $elements = $pt->data;
+  my $elements = $pt->symbols;
   $c->render(
     template => 'index',
     headers  => $headers,

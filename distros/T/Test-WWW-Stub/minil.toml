@@ -1,4 +1,4 @@
 name = "Test-WWW-Stub"
-badges = ["travis"]
+badges = ['github-actions/test']
 module_maker="ModuleBuildTiny"
-
+authority = "cpan:ASTJ"

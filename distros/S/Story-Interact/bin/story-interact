@@ -1,0 +1,31 @@
+#!perl
+
+use strict;
+use warnings;
+
+use Carp qw( croak );
+use Story::Interact::Harness::Terminal ();
+use Story::Interact::PageSource::Dir ();
+
+my $story = shift
+	or croak( 'Usage: story-interact [STORY]' );
+my $src;
+
+if ( -d $story ) {
+	require Story::Interact::PageSource::Dir;
+	$src = Story::Interact::PageSource::Dir->new( dir => $story );
+}
+elsif ( $story =~ /^dbi:/i ) {
+	require Story::Interact::PageSource::DBI;
+	require DBI;
+	my $dbh = DBI->connect( $story, undef, undef );
+	$src = Story::Interact::PageSource::DBI->new( dbh => $dbh );
+}
+else {
+	require Story::Interact::PageSource::DBI;
+	require DBI;
+	my $dbh = DBI->connect( "dbi:SQLite:dbname=$story", '', '' );
+	$src = Story::Interact::PageSource::DBI->new( dbh => $dbh );
+}
+
+Story::Interact::Harness::Terminal->new( page_source => $src )->run();

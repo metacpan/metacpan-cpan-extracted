@@ -6,10 +6,30 @@ use Chemistry::PeriodicTable ();
 
 get '/' => sub ($c) {
   my $pt = Chemistry::PeriodicTable->new;
-  my $elements = $pt->data;
+  my $elements = $pt->symbols;
+  my $phases = {
+    gas     => 'red',
+    liquid  => 'blue',
+    solid   => 'black',
+    unknown => 'gray',
+  };
+  my $types = {
+    ''                      => 'gainsboro',
+    'Actinide'              => 'pink',
+    'Alkali Metal'          => 'bisque',
+    'Alkaline Earth Metal'  => 'lemonchiffon',
+    'Lanthanide'            => 'wheat',
+    'Transition Metal'      => 'sandybrown',
+    'Metalloid'             => 'lightcyan',
+    'Noble Gas'             => 'plum',
+    'Reactive Nonmetal'     => 'lightgreen',
+    'Post-transition Metal' => 'lightblue',
+  };
   $c->render(
     template => 'index',
     elements => $elements,
+    phases   => $phases,
+    types    => $types,
   );
 } => 'index';
 
@@ -19,27 +39,8 @@ __DATA__
 
 @@ index.html.ep
 % layout 'default';
-<table class="table table-sm table-bordered">
+<table class="table table-sm table-borderless">
   <tbody>
-% my $phases = {
-%   gas     => 'red',
-%   liquid  => 'blue',
-%   solid   => 'black',
-%   unknown => 'gray',
-% };
-% my $types = {
-%   '' => 'gainsboro',
-%   'Actinide'              => 'pink',
-%   'Alkali Metal'          => 'gold',
-%   'Alkaline Earth Metal'  => 'lightyellow',
-%   'Lanthanide'            => 'wheat',
-%   'Transition Metal'      => 'sandybrown',
-%   'Metalloid'             => 'lightcyan',
-%   'Noble Gas'             => 'plum',
-%   'Reactive Nonmetal'     => 'lightgreen',
-%   'Transactinide'         => 'lavender',
-%   'Post-transition Metal' => 'lightblue',
-% };
 % for my $row (1 .. 9) {
     <tr>
 %   my $col = 0;
@@ -56,7 +57,9 @@ __DATA__
 %     if ($row >= 6 && $col == 3) {
       <td>&nbsp;</td>
 %     }
-      <td title="<%= $elements->{$i}[1] %>" style="background-color: <%= $types->{ $elements->{$i}[8] } %>;">
+      <td title="<%= $elements->{$i}[1] %>
+Phase: <%= $elements->{$i}[6] %>
+Type: <%= $elements->{$i}[8] %>" style="background-color: <%= $types->{ $elements->{$i}[8] } %>;">
         <%= $elements->{$i}[0] %>
         <br>
         <b><span style="color: <%= $phases->{ $elements->{$i}[6] } %>"><%= $elements->{$i}[2] %></span></b>
@@ -93,6 +96,13 @@ __DATA__
       }
       .danger {
         color: red;
+      }
+      table {
+        border-collapse: separate;
+        border-spacing: 0.2em;
+      }
+      .table thead tr th, .table tbody tr td {
+          border: none;
       }
     </style>
   </head>

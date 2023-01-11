@@ -1,3 +1,12 @@
+2.060004 - 2023-01-10
+
+  [BUG FIXES]
+
+  * #953 port reconfig (vlan) fail due to missing DB column data
+  * #956 numberic interpretation error in Node MAC search template
+  * #957 make job queue updates work reliably and atomically
+  * #958 make job queue updates work reliably and atomically
+
 2.060003 - 2022-12-14
 
   [ENHANCEMENTS]

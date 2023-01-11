@@ -1,0 +1,55 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 a348296879f913cadd173349c5848298c2649048b056331cd3e63c3a43322f21 COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 0f161b01bdce891c6c55de4a1f87336645e7dc8e582eda922cd3dc4517295dd7 Changes
+SHA256 76d78c652c5fb8a95b4354db20b68da8a9b28bc341391789b10f8bdd855241ac INSTALL
+SHA256 1a2929dacaef239beca27a85f7f97b793628dfb22f07fdfb406cb6f3f0d22a6b LICENSE
+SHA256 0aaf7e8475d31bba890937439177127a36b819ca5856b56b133a213ef31d7715 MANIFEST
+SHA256 8b416b9a7dc58c56a9e91d501158a26a6f3c3b918e8f48b56e5a10bbefe8c2fb META.json
+SHA256 4090364d6bec4ab44b72588fe5294a81eacba44aa3590236654d5d3c6891014d META.yml
+SHA256 82f4eba56a0563bd0734886b68b7b94d301ecafa675496040c9c2eec497c29ee Makefile.PL
+SHA256 14b9728f890b399630ada9634cf96edaf9e434dead7d6bb566b5f2bf08951bb3 README
+SHA256 77040e707d1e25f595d6361bb5b28d647daef4858068783826abcc3f4d2c2b39 bin/story-interact
+SHA256 7185589f608ba444eb766701e69ba177aca894bc25a993a3ae709e8a1481dd98 bin/story-interact-dir2sqlite
+SHA256 9cb04970da6181c1054b6e180f34604c2302337734581a95a61aec804fcf97f4 dist.ini
+SHA256 5dc738aea40d2fd0bcd65bf3a22145c534376e6425177d9d2e82d6fcb4b7a440 doap.ttl
+SHA256 3ea0cd24c0dbee446debebb72df49abebc5bc4b2943bf062b6ce3203fb410b41 examples/house.sqlite
+SHA256 817eba7eab7d60ab3e7106b0e2406cdd67b64653aa2283d539241632be40e9b8 examples/house/apple.page.pl
+SHA256 9a287187515a606310289bff333d345436e85b8610da11cc82d4af6fee541231 examples/house/bedroom.page.pl
+SHA256 555d955120491dfbbfd586c733d09c8ad8a57223230ee88abb36e886846edc72 examples/house/kitchen.page.pl
+SHA256 7ea8613261d203960129f60f35e3e44e57f62871bbdae91e85cef116ff079595 examples/house/living_room.page.pl
+SHA256 552a55c4ddb552a72f7c9d85d9c5729962c2d7ea3ed736ec4ad08d49edb20d39 examples/house/main.page.pl
+SHA256 922a26cd6a437df164223c59d3000d0d4ffb9396652cf06b78c6e12bb13e211b examples/house/sleep.page.pl
+SHA256 45174e670e2027b0b6560061684324f9b4661751da0ad372c49dc398b566fc59 lib/Story/Interact.pm
+SHA256 79dacb5bf645363f893b9df3285a44016611c89e8a0d157c14e414f28979089b lib/Story/Interact/Character.pm
+SHA256 beb7a458a75d7dabc5ed1e473fc4203237d972f23374437a006c7154300363fa lib/Story/Interact/Harness/Terminal.pm
+SHA256 3f207db579f2798abb94d3b735d2663d1409974dd2460925eea0c9aa7ff83b53 lib/Story/Interact/Page.pm
+SHA256 f21e5005b68f896bc37808643520fdf177e23afd67dbf6f4db40545e175f6efa lib/Story/Interact/PageSource.pm
+SHA256 298b3d069d8330b3b43acc044b3dc09210b1fa398bbf00c78d654c0cf0435a77 lib/Story/Interact/PageSource/DBI.pm
+SHA256 752daa9326659389c46dca1f938622314c22112f2dc605f520c3e70556938bbe lib/Story/Interact/PageSource/Dir.pm
+SHA256 1e8d1636de6293362068c2d440cc48012e1a619bdccf24689749e313312e392c lib/Story/Interact/State.pm
+SHA256 a665dc8ba7dd356893075d241bb5feba20a253a9d8be766ae59b278c2eb0d2fa lib/Story/Interact/Syntax.pm
+SHA256 a096b4bbe1e2bff2db7666a52d618aa7a9d9e3daac0e403c4e9007c2d9d8a1ac t/00start.t
+SHA256 7d923b990a8b617153cd79923bc84b287dd72521778513ddaa50c72af0e94423 t/01basic.t
+SHA256 b00ddad0545c7d5be957cd818c577b328abc00dbbfe6c1e7daffd5f922eff64d t/unit/Story/Interact.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCY78RwwAKCRDOv4Eoaip9
+OcmTAKCGnbEr36YsBWiz1bBPxas2PfRBOACfc29bD1abc9F3aKXinOQmBbLw2JI=
+=1KkX
+-----END PGP SIGNATURE-----
