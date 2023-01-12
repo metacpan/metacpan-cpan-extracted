@@ -31,9 +31,11 @@ my $build = Module::Build->new
                        'File::Spec' => 0,
                        'FindBin' => 0,
                        'Module::Util' => 0,
-                       'Test::MockTime::HiRes' => 0,
-                       'Test::More' => 0,
                      },
+   test_requires => {
+                      'Test::MockTime::HiRes' => 0,
+                      'Test::More' => 0,
+                    },
    recommends => { 'Date::Calc' => 0 },
    script_files => [ 'scripts/dateparse' ],
    license => 'perl',

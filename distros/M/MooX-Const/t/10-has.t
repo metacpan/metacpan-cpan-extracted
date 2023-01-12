@@ -16,7 +16,7 @@ throws_ok {
 
 throws_ok {
 
-    has b => ( is => 'wo', isa => Str );
+    has b => ( is => 'once', isa => Str );
 
 } qr/write-once attributes are not supported for Value types/;
 
@@ -28,7 +28,7 @@ throws_ok {
 
 throws_ok {
 
-    has d => ( is => 'wo', isa => InstanceOf['Thing'] );
+    has d => ( is => 'once', isa => InstanceOf['Thing'] );
 
 } qr/isa cannot be a type of Types::Standard::Object/;
 
@@ -82,7 +82,7 @@ lives_ok {
 
 lives_ok {
 
-    has f2 => ( is => 'wo', isa => Ref, trigger => sub {}  );
+    has f2 => ( is => 'once', isa => Ref, trigger => sub {}  );
 
 } 'triggers allowed for write-once attributes (deprecated)';
 

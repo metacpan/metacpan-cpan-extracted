@@ -7,6 +7,7 @@ use Test::More;
 
 use Text::Treesitter::Language;
 use Text::Treesitter::Parser;
+use Text::Treesitter::Tree;
 
 use constant TREE_SITTER_LANGUAGE_FOURFUNC_DIR => "languages/tree-sitter-fourfunc";
 
@@ -35,8 +36,12 @@ EOF
 my $tree = $p->parse_string( SOURCE );
 isa_ok( $tree, "Text::Treesitter::Tree", '$tree' );
 
+is( $tree->text, SOURCE, '$tree->text' );
+
 my $root = $tree->root_node;
 isa_ok( $root, "Text::Treesitter::Node", '$root' );
+
+is( $root->tree, $tree, '$root->tree is $tree' );
 
 ## The following is quite fragile based on the grammar for the program above.
 #  We'll try to do our best
@@ -59,7 +64,12 @@ is( scalar @nodes, 3, '$root->child_nodes returned 3 nodes' );
 isa_ok( $nodes[0], "Text::Treesitter::Node", '$nodes[0]' );
 
 is( $nodes[0]->type, "number", '$nodes[0]->type' );
+is( $nodes[0]->text, "1",      '$nodes[0]->text' );
+
 is( $nodes[1]->type, "+",      '$nodes[1]->type' );
+is( $nodes[1]->text, "+",      '$nodes[1]->text' );
+
 is( $nodes[2]->type, "number", '$nodes[2]->type' );
+is( $nodes[2]->text, "2",      '$nodes[2]->text' );
 
 done_testing;

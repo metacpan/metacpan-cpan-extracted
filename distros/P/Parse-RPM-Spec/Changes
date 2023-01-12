@@ -1,5 +1,11 @@
+2023-01-12  Dave Cross <dave@perlhacks.com>
+
+        * Version 1.1.1
+        * Fix problem parsing perl-License-Syntax.spec (thanks Michal Josef Špaček)
+
 2022-12-09  Dave Cross <dave@perlhacks.com>
 
+        * Version 1.1.0
         * Support ExcludeArch, ExclusiveArch, ExcluseOS, ExclusiveOS
 
 2021-01-23  Dave Cross <dave@perlhacks.com>

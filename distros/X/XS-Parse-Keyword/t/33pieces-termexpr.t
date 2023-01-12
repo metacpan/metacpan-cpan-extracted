@@ -35,6 +35,14 @@ my $ret;
    is( $ret, "(x)y", 'termexpr treats (PARENS) as entire expression' );
 }
 
+# termexpr in piece1 can act as eat empty parens
+{
+   no warnings 'uninitialized';
+
+   $ret = piecetermexpr() . "y";
+   is( $ret, "()y", 'termexpr accepts empty (PARENS)' );
+}
+
 {
    $ret = pieceprefixedtermexpr_VAR $VAR . ", world!";
    is( $ret, "(Hello, world!)", 'result of pieceprefixedtermexpr_VAR' );

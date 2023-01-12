@@ -3,25 +3,35 @@
    "author" : [
       "Lukas Mai <l.mai@web.de>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.74, CPAN::Meta::Converter version 2.132140",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Quote-Ref",
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "xt"
       ]
    },
    "prereqs" : {
       "build" : {
          "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
       },
       "runtime" : {
          "requires" : {
@@ -45,9 +55,10 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/mauke/Quote-Ref.git",
+         "url" : "git://github.com/mauke/Quote-Ref",
          "web" : "https://github.com/mauke/Quote-Ref"
       }
    },
-   "version" : "0.03"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -25,8 +25,6 @@ GetOptions(
    'directory|d=s'  => \( my $LANGUAGE_DIR ),
 ) or exit 1;
 
-$LANGUAGE_DIR //= "languages/tree-sitter-$LANGUAGE";
-
 my $ts = Text::Treesitter->new(
    lang_name => $LANGUAGE,
    lang_dir  => $LANGUAGE_DIR,

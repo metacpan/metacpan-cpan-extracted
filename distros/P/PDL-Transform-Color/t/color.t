@@ -91,21 +91,23 @@ ok(all( ($itriplet*10000)->rint == ($i2triplet*10000)->rint), "non-grey sample i
 ##########
 # test t_xyz
 $itriplet = pdl([1,0,0],[0,1,0],[0,0,1]);
-eval { $otriplet = $itriplet->apply(t_xyz()); };
-is $@, '', "t_xyz runs OK ($@)";
-# Check against chromaticities of the sRGB primaries
-my $xpypzptriplet = $otriplet / $otriplet->sumover->slice('*1');
-ok( all( ($xpypzptriplet->slice('0:1')*1000)->rint ==
-	 ( pdl( [ 0.640, 0.330 ], 
-		[ 0.300, 0.600 ],
-		[ 0.150, 0.060 ]
-	   )
-	   * 1000)->rint
-    ),
-    "XYZ translation works for R, G, and B vectors");
-eval { $i2triplet = $otriplet->invert(t_xyz()); };
-is $@, '', "t_xyz inverse runs OK";
-ok( all( ($i2triplet*10000)->rint == ($itriplet*10000)->rint ), "t_xyz inverse works OK");
+for my $trans (t_xyz(), t_xyz(rgb_system=>'sRGB')) {
+  eval { $otriplet = $itriplet->apply($trans); };
+  is $@, '', "t_xyz runs OK ($@)";
+  # Check against chromaticities of the sRGB primaries
+  my $xpypzptriplet = $otriplet / $otriplet->sumover->slice('*1');
+  ok( all( ($xpypzptriplet->slice('0:1')*1000)->rint ==
+           ( pdl( [ 0.640, 0.330 ],
+                  [ 0.300, 0.600 ],
+                  [ 0.150, 0.060 ]
+             )
+             * 1000)->rint
+      ),
+      "XYZ translation works for R, G, and B vectors ($trans)") or diag "got: ", ($xpypzptriplet->slice('0:1')*1000)->rint;
+  eval { $i2triplet = $otriplet->invert($trans); };
+  is $@, '', "t_xyz inverse runs OK";
+  ok( all( ($i2triplet*10000)->rint == ($itriplet*10000)->rint ), "t_xyz inverse works OK ($trans)") or diag "got: ", ($i2triplet*10000)->rint;
+}
 
 ##########
 # test t_rgi
@@ -114,14 +116,14 @@ my $brgbcmyw = pdl([0,0,0],
 		   [0,1,1],[1,0,1],[1,1,0],
 		   [1,1,1]);
 my $ocolors;
-eval { $t = t_rgi(); }; 
+eval { $t = t_rgi(); };
 is $@, '', "t_rgi runs OK ($@)";
 eval { $ocolors = $brgbcmyw->apply($t) };
 is $@, '', "t_rgi forward transform is OK ($@)";
 my $test = pdl([0,0,0],
 	       [ 1 , 0 ,   0.3333333 ], [ 0 , 1 ,   0.3333333 ], [ 0 , 0 ,    0.3333333 ],
 	       [ 0 , 0.5 , 0.6666667 ], [ 0.5 , 0 , 0.6666667 ], [0.5 , 0.5 , 0.6666667 ],
-	       [ 0.3333333 , 0.3333333 , 1         ] 
+	       [ 0.3333333 , 0.3333333 , 1         ]
     );
 ok( all( ($test*10000)->rint == ($ocolors*10000)->rint ), "t_rgi passees 8-color test");
 
@@ -149,18 +151,25 @@ eval { $hsltest2 = $hsltest->invert($t);};
 is $@, '', "t_hsv ran ok in reverse";
 ok(all( ($brgbcmyw - $hsltest2 )->abs < 1e-4), "t_hsv gave good reverse answers");
 
+{
 ##########
 # test _srgb_encode and _srgb_decode
-$a = xvals(256)/255;
-eval { $b = PDL::Transform::Color::_srgb_encode($a); };
-is $@, '', "_srgb_encode ran ok";
-ok(all($b+1e-10 > $a), "_srgb_encode output is always larger than input on [0,1]");
-ok(all($b->slice('1:-1')>$b->slice('0:-2')),"_srgb_encode output is monotonically increasing");
-my $slope = $b->slice('1:-1') - $b->slice('0:-2');
-ok(all($slope->slice('1:-1') < $slope->slice('0:-2')),"slope is monotonically decreasing");
-my $aa = eval { PDL::Transform::Color::_srgb_decode($b) };
-is $@, '', "_srgb_decode ran ok";
-ok(all( ($aa > $a -1e-10) & ($aa < $a + 1e-10) ),"decoding undoes coding");
+my ($a,$bfull,$b) = sequence(3,8)/255;
+my $t = t_srgb();
+eval { $b = ($bfull = $a->apply($t))->flat; };
+is $@, '', "t_srgb ran ok";
+ok(all($b+1e-10 > $a->flat), "_srgb_encode output is always larger than input on [0,1]");
+my $slope1 = $b->slice('1:-1');
+my $slope2 = $b->slice('0:-2');
+ok(all($slope1>$slope2),"_srgb_encode output is monotonically increasing") or diag $slope1, $slope2;
+my $slope = $slope1 - $slope2;
+my $slope1a = $slope->slice('1:9');
+my $slope2a = $slope->slice('0:8');
+ok(all($slope1a <= $slope2a),"early slope is non-increasing") or diag $slope1a, "\n", $slope2a, "\n", $slope1a <= $slope2a;
+my $aa = eval { $bfull->apply(!$t) };
+is $@, '', "!t_srgb ran ok";
+ok(all approx($aa, $a, 1e-3), "decoding undoes coding") or diag $aa, $a;
+}
 
 ##############################
 # test t_pc
@@ -178,6 +187,14 @@ eval {$t = t_xyz2lab();};
 is $@, '', "t_xyz2lab ran OK";
 eval {$b=pdl(1,1,1)->apply($t);};
 is $@, '', "t_xyz2lab applied OK";
-ok all(approx $b, pdl(100, 8.5859237, 5.5509345)), 't_xyz2lab right values' or diag "got=$b";
+ok all(approx $b, pdl(100, 8.5945916, 5.5564131)), 't_xyz2lab right values' or diag "got=$b";
+
+
+for my $rgb (pdl(255, 0, 0), pdl(0, 255, 0), pdl(0, 0, 255)) {
+    my $t = t_lab() x !t_srgb();
+    my $lab = $rgb->apply($t);
+    my $rgb2 = $lab->invert($t);
+    ok(all(approx $rgb2, $rgb), "t_lab loop $rgb") or diag "got=$b";
+}
 
 done_testing;

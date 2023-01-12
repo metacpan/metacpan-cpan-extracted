@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.70 ':experimental(adjust_params)';
 
-package Text::Treesitter 0.03;
+package Text::Treesitter 0.04;
 class Text::Treesitter
    :strict(params);
 
@@ -97,6 +97,10 @@ language directory path prepended onto it.
 Gives the directory name in which to find the compiled object file which
 contains the language grammar, or the sources to build it from.
 
+If not specified, a search will be made for a directory named
+F<tree-sitter-$LANG> among any of the user's configured parser directories, as
+given by the F<tree-sitter> config file.
+
 =back
 
 =cut
@@ -104,6 +108,33 @@ contains the language grammar, or the sources to build it from.
 =head1 METHODS
 
 =cut
+
+=head2 treesitter_config
+
+   $config = Text::Treesitter->treesitter_config;
+
+Returns a data structure containing the user's tree-sitter config, parsed from
+F<$HOME/.config/tree-sitter/config.json> if it exists. If there is no file
+then C<undef> is returned.
+
+This is usable as a class method.
+
+=cut
+
+{
+   my $treesitter_config;
+   sub treesitter_config
+   {
+      return $treesitter_config if $treesitter_config;
+
+      require JSON::MaybeUTF8;
+
+      my $path = "$ENV{HOME}/.config/tree-sitter/config.json";
+      next unless -f $path;
+
+      return $treesitter_config = JSON::MaybeUTF8::decode_json_text( read_text( $path ) );
+   }
+}
 
 =head2 parser
 
@@ -126,9 +157,33 @@ ADJUST {
 
 Returns the L<Text::Treesitter::Language> instance being used by the parser.
 
+=head2 lang_dir
+
+   $dir = $ts->lang_dir;
+
+Returns the directory path to the language directory. This is either the
+configured path that was set by the C<lang_dir> parameter, or discovered by
+searching if one was not.
+
 =cut
 
+sub _find_langdir
+{
+   my ( $lang ) = @_;
+
+   my $parser_directories = ( treesitter_config or return undef )->{"parser-directories"};
+   foreach my $dir ( @$parser_directories ) {
+      my $langdir = "$dir/tree-sitter-$lang";
+
+      return $langdir if -d $langdir;
+   }
+
+   return undef;
+}
+
 field $_lang :reader;
+field $_lang_dir :reader;
+
 ADJUST :params (
    :$lang      = undef,
    :$lang_name = undef,
@@ -141,14 +196,17 @@ ADJUST :params (
    elsif( defined $lang_name ) {
       require Text::Treesitter::Language;
 
-      # TODO: maybe there's a platform-standard place to find a langdir?
-      croak "Need a 'lang_dir' if using 'lang_name'" unless defined $lang_dir;
+      $lang_dir //= _find_langdir( $lang_name );
 
       $lang_lib //= "tree-sitter-$lang_name.so";
-      $lang_lib =~ m{/} or
+      if( $lang_lib !~ m{/} and defined $lang_dir ) {
          $lang_lib = "$lang_dir/$lang_lib";
+      }
 
       unless( -f $lang_lib ) {
+         defined $lang_dir or
+            croak "Language library object does not exist but cannot be built without a 'lang_dir'";
+
          Text::Treesitter::Language::build( $lang_lib, $lang_dir );
       }
 
@@ -159,6 +217,7 @@ ADJUST :params (
    }
 
    $_parser->set_language( $_lang );
+   $_lang_dir //= $lang_dir;
 }
 
 =head2 parse_string
@@ -172,6 +231,8 @@ as an instance of L<Text::Treesitter::Tree>.
 
 method parse_string ( $str )
 {
+   require Text::Treesitter::Tree;
+
    $_parser->reset;
    return $_parser->parse_string( $str );
 }
@@ -196,12 +257,15 @@ method load_query_string ( $src )
    $query = $ts->load_query_file( $path );
 
 Creates a L<Text::Treesitter::Query> instance by loading the text from the
-given path, and then compiling it as per L</load_query_string>.
+given path, and then compiling it as per L</load_query_string>. C<$path> may
+be specified as relative to the current working directory, or relative to the
+language directory given by C<lang_dir>. The first one found will be loaded.
 
 =cut
 
 method load_query_file ( $path )
 {
+   -f $path or $path = "$_lang_dir/$path";
    return $self->load_query_string( read_text $path );
 }
 

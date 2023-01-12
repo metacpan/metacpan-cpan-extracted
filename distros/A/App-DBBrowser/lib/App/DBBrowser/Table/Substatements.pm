@@ -226,12 +226,12 @@ sub __add_aggregate_substmt {
                 $sql->{aggr_cols}[$i] .= "${qt_col}::text,',')";
             }
             elsif ( $sf->{i}{driver} =~ /^(?:DB2|oracle)\z/ ) {
-                # DB2: no default separator
+                # DB2, LISTAGG: no default separator
                 $sql->{aggr_cols}[$i] .= "$qt_col,',')";
             }
             else {
                 # https://sqlite.org/forum/info/221c2926f5e6f155
-                # SQLite: group_concat with DISTINCT and custom seperator does not work
+                # SQLite: GROUP_CONCAT with DISTINCT and custom seperator does not work
                 $sql->{aggr_cols}[$i] .= "$qt_col)";
             }
             #my $sep = ',';
@@ -250,8 +250,9 @@ sub __add_aggregate_substmt {
             #    $sql->{aggr_cols}[$i] .= "$qt_col ORDER BY $qt_col SEPARATOR '$sep')";
             #}
             #elsif ( $sf->{i}{driver} eq 'Pg' ) {
-            #    # Pg: separator mandatory
-            #    # STRING_AGG expects text type as argument
+            #    # Pg, STRING_AGG:
+            #    # separator mandatory
+            #    # expects text type as argument
             #    # with DISTINCT the STRING_AGG col and the ORDER BY col must be identical
             #    $sql->{aggr_cols}[$i] .= "${qt_col}::text,'$sep' ORDER BY ${qt_col}::text)";
             #}
@@ -759,8 +760,8 @@ sub limit_offset {
         if ( $choice eq $offset ) {
             if ( ! $sql->{limit_stmt} ) {
                 # SQLite/mysql/MariaDB: no offset without limit
-                $sql->{limit_stmt} = "LIMIT " . ( $sf->{o}{G}{auto_limit} || '9223372036854775807'  ) if $sf->{i}{driver} eq 'SQLite';   # 2 ** 63 - 1
-                $sql->{limit_stmt} = "LIMIT " . ( $sf->{o}{G}{auto_limit} || '18446744073709551615' ) if $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/;    # 2 ** 64 - 1
+                $sql->{limit_stmt} = "LIMIT " . '9223372036854775807'  if $sf->{i}{driver} eq 'SQLite';   # 2 ** 63 - 1
+                $sql->{limit_stmt} = "LIMIT " . '18446744073709551615' if $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/;    # 2 ** 64 - 1
                 # MySQL 8.0 Reference Manual - SQL Statements/Data Manipulation Statements/Select Statement/Limit clause:
                 #    SELECT * FROM tbl LIMIT 95,18446744073709551615;   -> all rows from the 95th to the last
             }

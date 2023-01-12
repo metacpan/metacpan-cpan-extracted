@@ -22,7 +22,7 @@
 #
 
 package API::Octopart;
-$VERSION = 1.001;
+$VERSION = 1.002;
 
 use 5.006;
 use strict;
@@ -45,6 +45,7 @@ API::Octopart - Simple inteface for querying part status across vendors at octop
 		cache => "$ENV{HOME}/.octopart/cache",
 		include_specs => 1,
 		ua_debug => 1,
+		query_limit => 10
 		);
 
 	# Query part stock:
@@ -82,19 +83,41 @@ If you have a PRO account then you can include product specs:
 
 An optional (but recommended) cache directory to minimize requests to Octopart:
 
+=item *	cache_age => 3
+
+The cache age (in days) before re-querying octopart.  Defaults to 30 days.
+
+=item * query_limit: die if too many API requests are made.
+
+Defaults to no limit.  I exhasted 20,000 queries very quickly due to a bug!
+This might help with that, set to a reasonable limit while testing.
+
 =item * ua_debug => 1
 
 User Agent debugging.  This is very verbose and provides API communication details.
+
+=item * json_debug => 1
+
+JSON response debugging.  This is very verbose and dumps the Octopart response
+in JSON.
 
 =back
 	
 =cut 
 
+
+our %valid_opts = map { $_ => 1 } qw/token include_specs cache cache_age ua_debug query_limit json_debug/;
 sub new
 {
 	my ($class, %args) = @_;
 
+	foreach my $arg (keys %args)
+	{
+		die "invalid option: $arg => $args{$arg}" if !$valid_opts{$arg};
+	}
+
 	$args{api_queries} = 0;
+	$args{cache_age} //= 30;
 
 	die "An Octopart API token is required." if (!$args{token});
 
@@ -269,37 +292,51 @@ sub octo_query
 	my $part = shift;
 
 
-	my $content;
+	my ($content, $hashfile);
 
-	my $h = md5_hex($q);
-	my $hashfile = "$self->{cache}/$h.query";
-
-	if ($self->{cache} && -e $hashfile)
+	if ($self->{cache})
 	{
 		system('mkdir', '-p', $self->{cache}) if (! -d $self->{cache});
 
+		my $h = md5_hex($q);
 
-		if ($self->{ua_debug})
-		{
-			print STDERR "Reading from cache file: $hashfile\n";
-		}
+		$hashfile = "$self->{cache}/$h.query";
 
-		if (open(my $in, $hashfile))
+		# Load the cached version if older than cache_age days.
+		my $age_days = (-M $hashfile);
+		if (-e $hashfile && $age_days < $self->{cache_age})
 		{
-			local $/;
-			$content = <$in>;
-			close($in);
-		}
-		else
-		{
-			die "$hashfile: $!";
+			if ($self->{ua_debug})
+			{
+				print STDERR "Reading from cache file (age=$age_days days): $hashfile\n";
+			}
+
+			if (open(my $in, $hashfile))
+			{
+				local $/;
+				$content = <$in>;
+				close($in);
+			}
+			else
+			{
+				die "$hashfile: $!";
+			}
 		}
 	}
-	else
+
+	if (!$content)
 	{
 		my $ua = LWP::UserAgent->new( agent => 'mdf-perl/1.0', keep_alive => 3);
 
+		$self->{api_queries} //= 0;
+
+		if ($self->{query_limit} && $self->{api_queries} >= $self->{query_limit})
+		{
+			die "query limit exceeded: $self->{api_queries} >= $self->{query_limit}";
+		}
+
 		$self->{api_queries}++;
+
 
 		if ($self->{ua_debug})
 		{
@@ -327,37 +364,60 @@ sub octo_query
 			);
 		}
 
-		my $req = HTTP::Request->new('POST' => 'https://octopart.com/api/v4/endpoint',
-			 HTTP::Headers->new(
-				'Host' => 'octopart.com',
-				'Content-Type' => 'application/json',
-				'Accept' => 'application/json',
-				'Accept-Encoding' => 'gzip, deflate',
-				'token' => $self->{token},
-				'DNT' => 1,
-				'Origin' => 'https://octopart.com',
-				),
-			encode_json( { query => $q }));
+		my $req;
+		my $response;
 
-		my $response = $ua->request($req);
+		my $tries = 0;
+		while ($tries < 3)
+		{
+			$req = HTTP::Request->new('POST' => 'https://octopart.com/api/v4/endpoint',
+				 HTTP::Headers->new(
+					'Host' => 'octopart.com',
+					'Content-Type' => 'application/json',
+					'Accept' => 'application/json',
+					'Accept-Encoding' => 'gzip, deflate',
+					'token' => $self->{token},
+					'DNT' => 1,
+					'Origin' => 'https://octopart.com',
+					),
+				encode_json( { query => $q }));
 
-		if (!$response->is_success) {
-			die $response->status_line;
+			$response = $ua->request($req);
+			if (!$response->is_success)
+			{
+				$tries++;
+				print STDERR "query error, retry $tries. "
+					. $response->code . ": "
+					. $response->message . "\n";
+				sleep 2**$tries;
+			}
+			else
+			{
+				last;
+			}
 		}
 
 		$content = $response->decoded_content;
 
-		if ($self->{cache})
+		if (!$response->is_success) {
+			die "request: " . $req->as_string . "\n" .
+			    "resp: " . $response->as_string;
+		}
+
+	}
+
+	my $j = from_json($content);
+
+	if (!$j->{errors})
+	{
+		if ($hashfile)
 		{
 			open(my $out, ">", $hashfile) or die "$hashfile: $!";
 			print $out $content;
 			close($out);
 		}
 	}
-
-	my $j = from_json($content); 
-
-	if ($j->{errors})
+	else
 	{
 		my %errors;
 		foreach my $e (@{ $j->{errors} })
@@ -367,9 +427,14 @@ sub octo_query
 		die "Octopart: " . join("\n", keys(%errors)) . "\n";
 	}
 
-	if ($self->{ua_debug})
+	if ($self->{json_debug})
 	{
-		print Dumper $j;
+		if ($hashfile)
+		{
+			my $age_days = (-M $hashfile);
+			print STDERR "======= cache: $hashfile (age=$age_days days) =====\n"
+		}
+		print STDERR Dumper $j;
 	}
 
 	return $j;

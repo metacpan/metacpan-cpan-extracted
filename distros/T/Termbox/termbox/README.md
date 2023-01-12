@@ -1,31 +1,23 @@
-# Termbox
+# termbox
 
-Termbox is a library that provides minimalistic API which allows the
-programmer to write text-based user interfaces.
+*New projects should consider using [termbox2][0], a rewrite of termbox with
+stricter error checking and some additional features.*
 
-It is based on a very simple abstraction. The main idea is viewing terminals as
-a table of fixed-size cells and input being a stream of structured
-messages. Would be fair to say that the model is inspired by windows console
-API. The abstraction itself is not perfect and it may create problems in certain
-areas. The most sensitive ones are copy & pasting and wide characters (mostly
-Chinese, Japanese, Korean (CJK) characters). When it comes to copy & pasting,
-the notion of cells is not really compatible with the idea of text. And CJK
-runes often require more than one cell to display them nicely. Despite the
-mentioned flaws, using such a simple model brings benefits in a form of
-simplicity. And KISS principle is important.
+termbox is a minimal, legacy-free alternative to ncurses, suitable for building
+text-based user interfaces.
 
-At this point one should realize, that CLI (command-line interfaces) aren't
-really a thing termbox is aimed at. But rather pseudo-graphical user interfaces.
+This repo represents an effort to recentralize termbox development as the
+original repo is no longer maintained.
 
-### Installation
+### Building
 
 Use `make` to build and `make install` to install.
 
 The `install` target supports `prefix` and `DESTDIR` if needed.
 
-### Getting started
+### Usage
 
-Termbox's interface only consists of 12 functions::
+The termbox API consists of the following functions.
 
 ```
 tb_init() // initialization
@@ -46,36 +38,37 @@ tb_peek_event() // peek a keyboard event
 tb_poll_event() // wait for a keyboard event
 ```
 
-See termbox.h header file for full detail.
+See termbox.h for more details.
 
 ### Links
 
-If you want me to add your Termbox project here, send me a pull request or drop
-a note via email, you can find my email below.
+Make a pull request if you would like your termbox project listed here.
 
 ##### Language bindings
 
 - https://github.com/nsf/termbox - Python
 - https://github.com/adsr/termbox-php - PHP
 - https://github.com/gchp/rustbox - Rust
-- https://github.com/fouric/cl-termbox - Common Lisp
+- https://github.com/cl-fui/cl-termbox - Common Lisp
 - https://github.com/zyedidia/termbox-d - D
 - https://github.com/dduan/Termbox - Swift
 - https://github.com/andrewsuzuki/termbox-crystal - Crystal
 - https://github.com/jgoldfar/Termbox.jl - Julia
-- https://github.com/mitchellwrosen/termbox - Haskell
+- https://github.com/termbox/termbox-haskell - Haskell
 - https://github.com/dom96/nimbox - Nim
 - https://github.com/ndreynolds/ex_termbox - Elixir
 - https://github.com/bmsauer/termbox-ada - Ada
+- https://github.com/luxint/termbox - newLISP
 
 ##### Other implementations
 
-- https://github.com/nsf/termbox-go - Go pure Termbox implementation
+- https://github.com/nsf/termbox-go - Go pure termbox implementation
 
 ##### Applications
 
 - https://github.com/adsr/mle - a small, flexible terminal-based text editor
 - https://github.com/colinta/Ashen - framework for building terminal applications based on the Elm architecture
+- https://github.com/afify/sfm - simple file manager for unix-like systems
 
 ### Changes
 
@@ -132,3 +125,6 @@ v1.0.0:
 - API: Add TB_INPUT_CURRENT.
 - Move python module to its own directory and update it due to changes in the
   termbox library.
+
+
+[0]: https://github.com/termbox/termbox2

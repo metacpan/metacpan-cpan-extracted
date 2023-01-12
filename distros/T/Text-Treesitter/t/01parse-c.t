@@ -7,6 +7,7 @@ use Test::More;
 
 use Text::Treesitter::Language;
 use Text::Treesitter::Parser;
+use Text::Treesitter::Tree;
 
 use constant TREE_SITTER_LANGUAGE_C_DIR => "languages/tree-sitter-c";
 
@@ -40,8 +41,12 @@ EOF
 my $tree = $p->parse_string( C_PROG );
 isa_ok( $tree, "Text::Treesitter::Tree", '$tree' );
 
+is( $tree->text, C_PROG, '$tree->text' );
+
 my $root = $tree->root_node;
 isa_ok( $root, "Text::Treesitter::Node", '$root' );
+
+is( $root->tree, $tree, '$root->tree is $tree' );
 
 ## The following is quite fragile based on the grammar for the program above.
 #  We'll try to do our best
@@ -64,6 +69,7 @@ is( scalar @nodes, 2, '$root->child_nodes returned 2 nodes' );
 isa_ok( $nodes[0], "Text::Treesitter::Node", '$nodes[0]' );
 
 is( $nodes[0]->type, "preproc_include", '$nodes[0]->type' );
+is( $nodes[0]->text, "#include <stdio.h>\n\n", '$nodes[0]->text' );
 
 is( $nodes[1]->type, "function_definition", '$nodes[1]->type' );
 

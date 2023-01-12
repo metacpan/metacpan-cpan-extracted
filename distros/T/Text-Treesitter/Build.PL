@@ -11,6 +11,8 @@ my $build = Module::Build::Using::PkgConfig->new(
       'Object::Pad' => 0,
 
       'ExtUtils::CppGuess' => 0,
+      'JSON::MaybeUTF8' => 0,
+      'List::Util' => '1.29',
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

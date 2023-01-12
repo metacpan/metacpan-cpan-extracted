@@ -48,7 +48,7 @@ for my $left ( 0 .. 10 ) {
         exit;
     }
 }
-while (1) {                            # let it run
+while (1) {    # let it run
     tb_poll_event($ev);
     if ( $ev->key == TB_KEY_ESC ) {
         tb_shutdown();

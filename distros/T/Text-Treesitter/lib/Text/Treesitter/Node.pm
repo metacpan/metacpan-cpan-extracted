@@ -3,10 +3,14 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package Text::Treesitter::Node 0.03;
+use v5.26;
+use Object::Pad 0.70;
 
-use v5.14;
-use warnings;
+package Text::Treesitter::Node 0.04;
+class Text::Treesitter::Node
+   :strict(params);
+
+use List::Util 1.29 qw( pairmap );
 
 require Text::Treesitter::_XS;
 
@@ -27,7 +31,30 @@ operating on these tree nodes.
 
 =cut
 
+field $node :param;
+field $tree :param :reader;
+
 =head1 METHODS
+
+=head2 tree
+
+   $tree = $node->tree;
+
+Returns the L<Text::Treesitter::Tree> instance from which this child node was
+obtained.
+
+=head2 text
+
+   $text = $node->text;
+
+Returns the substring of the tree's stored text that is covered by this node.
+
+=cut
+
+method text ()
+{
+   return $tree->text_substring_between_bytes( $self->start_byte, $self->end_byte );
+}
 
 =head2 type
 
@@ -56,7 +83,8 @@ node).
 
 Returns the position in the input text where this node's extent begins, split
 into a line and column number (both 0-based; the string is considered to start
-at position C<(0, 0)>).
+at position C<(0, 0)>). Note that the column is counted in bytes, not
+characters.
 
 =head2 end_point
 
@@ -139,6 +167,38 @@ used instead:
    }
 
 =cut
+
+method _node () { $node }
+
+BEGIN {
+   use Object::Pad ':experimental(mop)';
+
+   my $mop = Object::Pad::MOP::Class->for_caller;
+
+   foreach my $meth (qw(
+         type start_byte end_byte start_point end_point
+         is_named is_missing is_extra has_error child_count
+      )) {
+
+      $mop->add_method( $meth => method { $node->$meth( @_ ) } );
+   }
+}
+
+sub parent
+{
+   my $self = shift;
+   return Text::Treesitter::Node->new( $self->[0]->parent, $self->[1] );
+}
+
+method child_nodes ()
+{
+   return map { Text::Treesitter::Node->new( node => $_, tree => $tree ) } $node->child_nodes;
+}
+
+method field_names_with_child_nodes ()
+{
+   return pairmap { $a => Text::Treesitter::Node->new( node => $b, tree => $tree ) } $node->field_names_with_child_nodes;
+}
 
 =head1 TODO
 

@@ -1,4 +1,4 @@
-package Pod::Weaver 4.018;
+package Pod::Weaver 4.019;
 # ABSTRACT: weave together a Pod document from an outline
 
 use Moose;
@@ -240,7 +240,7 @@ Pod::Weaver - weave together a Pod document from an outline
 
 =head1 VERSION
 
-version 4.018
+version 4.019
 
 =head1 SYNOPSIS
 
@@ -263,11 +263,12 @@ Pod::Elemental::Document.  Its plugins sketch out a series of sections
 that will be produced based on an existing Pod document or other provided
 information.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has the same support period as perl itself:  it supports the two
-most recent versions of perl.  (That is, if the most recently released version
-is v5.40, then this module should work on both v5.40 and v5.38.)
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
@@ -325,11 +326,11 @@ L<Pod::Weaver::PluginBundle::Default>.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex Peters Apocalypse Blabos de Blebe Caleb Cushing Christian Walde Christopher J. Madsen Chris Weyl Dave Houston Rolsky David E. Wheeler Golden Miguel Susano Pinto Zurborg Doug Bell Florian Ragwitz Jonathan "Duke" Leto Joshua Keroes Karen Etheridge Kent Fredric Kivanc Yazan Marcel Gruenauer Randy Stauner Sam Graham Shlomi Fish
+=for stopwords Alex Peters Apocalypse Blabos de Blebe Caleb Cushing Christian Walde Christopher J. Madsen Chris Weyl Dave Houston Rolsky David E. Wheeler Golden Miguel Susano Pinto Zurborg Doug Bell Florian Ragwitz Jonathan "Duke" Leto Joshua Keroes Karen Etheridge Kent Fredric Kivanc Yazan Marcel Gruenauer Randy Stauner Ricardo Signes Sam Graham Shlomi Fish
 
 =over 4
 
@@ -423,6 +424,10 @@ Randy Stauner <randy@magnificent-tears.com>
 
 =item *
 
+Ricardo Signes <rjbs@semiotic.systems>
+
+=item *
+
 Sam Graham <git@illusori.co.uk>
 
 =item *
@@ -433,7 +438,7 @@ Shlomi Fish <shlomif@shlomifish.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo SIGNES.
+This software is copyright (c) 2023 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

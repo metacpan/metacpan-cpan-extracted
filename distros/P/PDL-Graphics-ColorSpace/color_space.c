@@ -10,35 +10,50 @@ struct pixel {
 	double c;
 };
 
+#include "color_space.h"  /* Local decs */
 
-/*** function defs ***/
-double  rgb_quant( double p, double q, double h );
-void    rgb2cmyk( double *rgb, double *cmyk );
-void    cmyk2rgb( double *cmyk, double *rgb );
-void    rgb2hsl( double *rgb, double *hsl );
-void    hsl2rgb( double *hsl, double *rgb );
-void    rgb2hsv( double *rgb, double *hsv );
-void    hsv2rgb( double *hsv, double *rgb );
-void    rgb2xyz( double *rgb, double gamma, double *m0, double *m1, double *m2, double *xyz );
-void    xyz2rgb( double *xyz, double gamma, double *m0, double *m1, double *m2, double *rgb );
-double  _apow( double a, double p );
-double  _rad2deg( double rad );
-double  _deg2rad( double deg );
-void    _mult_v3_m33( struct pixel *p, double *m0, double *m1, double *m2, double *result );
-void    xyY2xyz( double *xyY, double *xyz );
-void    xyz2lab( double *xyz, double *w, double *lab );
-void	lab2lch( double *lab, double *lch );
-void    lch2lab( double *lch, double *lab );
-void    lab2xyz( double *lab, double *w, double *xyz );
-
+/*** util functions ***/
+double _apow (double a, double p) {
+	return pow(a >= 0.0 ? a : -a, p);
+}
+#define EXTREME(var, a, b, c, cmp) \
+  double var = a; \
+  if (b cmp var) var = b; \
+  if (c cmp var) var = c
+#define BOUNDED(v, min, max) while (v < min) v += max;while (v >= max) v -= max
+#define CALC_HS(h, s, max, delta, r, g, b, satscale) \
+	/* set up a greyscale if rgb values are identical */ \
+	/* Note: automatically includes max = 0 */ \
+	if (delta <= 0.0) { \
+		h = s = 0; \
+		return; \
+	} \
+	s = delta / satscale; \
+	h = (r == max) ?  (g - b) / delta : \
+		 (g == max) ?  2 + (b - r) / delta : \
+		 4 + (r - g) / delta; \
+	h *= 60.0; \
+	BOUNDED(h, 0, 360)
+double _rad2deg( double rad )
+{
+	return 180.0 * rad / M_PI;
+}
+double _deg2rad( double deg )
+{
+    return deg * (M_PI / 180.0);
+}
+void _mult_v3_m33( struct pixel *p, double *m0, double *m1, double *m2, double *result )
+{
+	result[0] = p->a * m0[0]  +  p->b * m1[0]  +  p->c * m2[0];
+	result[1] = p->a * m0[1]  +  p->b * m1[1]  +  p->c * m2[1];
+	result[2] = p->a * m0[2]  +  p->b * m1[2]  +  p->c * m2[2];
+}
 
 /* ~~~~~~~~~~:> */
 
 double rgb_quant( double p, double q, double h )
 {
-	while (h < 0)     { h += 360; }
-	while (h >= 360 ) { h -= 360; }
-
+	BOUNDED(h, 0, 360);
 	if (h < 60)       { return p + (q-p)*h/60; }
 	else if (h < 180) { return q; }
 	else if (h < 240) { return p + (q-p)*(240-h)/60; }
@@ -48,36 +63,31 @@ double rgb_quant( double p, double q, double h )
 
 void rgb2cmyk( double *rgb, double *cmyk )
 {
-	struct pixel  cmy = { 1.0-*rgb, 1.0-*(rgb+1), 1.0-*(rgb+2) };
+	struct pixel  cmy = { 1.0-rgb[0], 1.0-rgb[1], 1.0-rgb[2] };
 
-	double k = cmy.a;
-	if (cmy.b < k)  k = cmy.b; 
-	if (cmy.c < k)  k = cmy.c; 
+	EXTREME(k, cmy.a, cmy.b, cmy.c, <);
 
-	*cmyk     = cmy.a - k;
-	*(cmyk+1) = cmy.b - k;
-	*(cmyk+2) = cmy.c - k;
-	*(cmyk+3) = k;
+	cmyk[0] = cmy.a - k;
+	cmyk[1] = cmy.b - k;
+	cmyk[2] = cmy.c - k;
+	cmyk[3] = k;
 }
 
 
 void cmyk2rgb( double *cmyk, double *rgb )
 {
-	double k = *(cmyk+3);
-
-	struct pixel cmy = { *cmyk + k, *(cmyk+1) + k, *(cmyk+2) + k };
-
-	*rgb     = 1.0 - cmy.a;
-	*(rgb+1) = 1.0 - cmy.b;
-	*(rgb+2) = 1.0 - cmy.c;
+	double k = cmyk[3];
+	rgb[0] = 1.0 - cmyk[0] - k;
+	rgb[1] = 1.0 - cmyk[1] - k;
+	rgb[2] = 1.0 - cmyk[2] - k;
 }
 
 
 void hsl2rgb( double *hsl, double *rgb )
 {
-	double h = *hsl; 
-	double s = *(hsl+1);
-	double l = *(hsl+2);
+	double h = hsl[0];
+	double s = hsl[1];
+	double l = hsl[2];
 
     double p, q;
 
@@ -89,112 +99,49 @@ void hsl2rgb( double *hsl, double *rgb )
 		q = l + s - (l*s);
 		p = 2*l - q;
 	}
-	
-	*rgb = rgb_quant(p, q, h+120);
-	*(rgb+1) = rgb_quant(p, q, h);
-	*(rgb+2) = rgb_quant(p, q, h-120);
+
+	rgb[0] = rgb_quant(p, q, h+120);
+	rgb[1] = rgb_quant(p, q, h);
+	rgb[2] = rgb_quant(p, q, h-120);
 }
 
 
 void rgb2hsl( double *rgb, double *hsl )
 {
-    double r = *rgb;
-    double g = *(rgb+1);
-    double b = *(rgb+2);
-
+	double r = rgb[0];
+	double g = rgb[1];
+	double b = rgb[2];
 	/* compute the min and max */
-	double max = r;
-	if (max < g) max = g;
-	if (max < b) max = b;
-	double min = r;
-	if (g < min) min = g;
-	if (b < min) min = b;
-	
-	/* Set the sum and delta */
+	EXTREME(max, r, g, b, >);
+	EXTREME(min, r, g, b, <);
 	double delta = max - min;
 	double sum   = max + min;
-
 	/* luminance */
-	*(hsl+2) = sum / 2.0;
-	
-	/* set up a greyscale if rgb values are identical */
-	/* Note: automatically includes max = 0 */
-	if (delta == 0.0) {
-		*hsl = 0.0;
-		*(hsl+1) = 0.0;
-	}
-	else {
-		/* satuaration */
-		if (*(hsl+2) <= 0.5) {
-			*(hsl+1) = delta / sum;
-		}
-		else {
-			*(hsl+1) = delta / (2.0 - sum);
-		}
-		
-		/* compute hue */
-		if (r == max) {
-			*hsl = (g - b) / delta;
-		}
-		else if (g == max) {
-			*hsl = 2.0 + (b - r) / delta;
-		}
-		else {
-			*hsl = 4.0 + (r - g) / delta;
-		}
-		*hsl *= 60.0;
-		while (*hsl < 0.0)   { *hsl += 360; }
-		while (*hsl > 360.0) { *hsl -= 360; }
-    }
+	hsl[2] = sum / 2.0;
+	CALC_HS(hsl[0], hsl[1], max, delta, r, g, b, (hsl[2] <= 0.5 ? sum : (2.0 - sum)));
 }
 
 
 void rgb2hsv( double *rgb, double *hsv )
 {
-    double r = *rgb;
-    double g = *(rgb+1);
-    double b = *(rgb+2);
-
+	double r = rgb[0];
+	double g = rgb[1];
+	double b = rgb[2];
 	/* compute the min and max */
-	double max = r;
-	if (max < g) max = g;
-	if (max < b) max = b;
-	double min = r;
-	if (g < min) min = g;
-	if (b < min) min = b;
-
-	/* got V */	
-	*(hsv+2) = max;
-
+	EXTREME(max, r, g, b, >);
+	EXTREME(min, r, g, b, <);
+	/* got V */
+	hsv[2] = max;
 	double delta = max - min;
-
-	if (delta > 0.0) {
-		/* got S */	
-		*(hsv+1) = delta / max;
-	}
-	else {
-		*hsv = 0;
-		*(hsv+1) = 0;
-		return;
-	}
-
-	/* getting H */	
-	*hsv = (r == max) ?  (g - b) / delta
-		 : (g == max) ?  2 + (b - r) / delta
-		 :               4 + (r - g) / delta
-		 ;
-
-	*hsv *= 60;
-	while (*hsv < 0.0)    { *hsv += 360; }
-	while (*hsv >= 360.0) { *hsv -= 360; }
+	CALC_HS(hsv[0], hsv[1], max, delta, r, g, b, max);
 }
 
 
 void hsv2rgb( double *hsv, double *rgb )
 {
-    double h = *hsv;
-    double s = *(hsv+1);
-    double v = *(hsv+2);
+    double h = hsv[0];
+    double s = hsv[1];
+    double v = hsv[2];
 
 	h /= 60.0;
 	double i = floor( h );
@@ -207,34 +154,34 @@ void hsv2rgb( double *hsv, double *rgb )
 	switch( (int) i )
 	{
 		case 0:
-			*rgb     = v;
-			*(rgb+1) = t;
-			*(rgb+2) = p;
+			rgb[0] = v;
+			rgb[1] = t;
+			rgb[2] = p;
 			break;
 		case 1:
-			*rgb     = q;
-			*(rgb+1) = v;
-			*(rgb+2) = p;
+			rgb[0] = q;
+			rgb[1] = v;
+			rgb[2] = p;
 			break;
 		case 2:
-			*rgb     = p;
-			*(rgb+1) = v;
-			*(rgb+2) = t;
+			rgb[0] = p;
+			rgb[1] = v;
+			rgb[2] = t;
 			break;
 		case 3:
-			*rgb     = p;
-			*(rgb+1) = q;
-			*(rgb+2) = v;
+			rgb[0] = p;
+			rgb[1] = q;
+			rgb[2] = v;
 			break;
 		case 4:
-			*rgb     = t;
-			*(rgb+1) = p;
-			*(rgb+2) = v;
+			rgb[0] = t;
+			rgb[1] = p;
+			rgb[2] = v;
 			break;
 		default:
-			*rgb     = v;
-			*(rgb+1) = p;
-			*(rgb+2) = q;
+			rgb[0] = v;
+			rgb[1] = p;
+			rgb[2] = q;
 			break;
 	}
 }
@@ -242,125 +189,101 @@ void hsv2rgb( double *hsv, double *rgb )
 
 void rgb2xyz( double *rgb, double gamma, double *m0, double *m1, double *m2, double *xyz )
 {
-	/* weighted RGB */
-	struct pixel  p = { *rgb, *(rgb+1), *(rgb+2) };
-
-	if (gamma < 0) {
-		/* special case for sRGB gamma curve */
-		if ( fabs(p.a) <= 0.04045 ) { p.a /= 12.92; }
-		else { p.a =_apow( (p.a + 0.055)/1.055, 2.4 ); }
-
-		if ( fabs(p.b) <= 0.04045 ) { p.b /= 12.92; }
-		else { p.b =_apow( (p.b + 0.055)/1.055, 2.4 ); }
-
-		if ( fabs(p.c) <= 0.04045 ) { p.c /= 12.92; }
-		else { p.c =_apow( (p.c + 0.055)/1.055, 2.4 ); }
-	}
-	else {
-		p.a = _apow(p.a, gamma);
-		p.b = _apow(p.b, gamma);
-		p.c = _apow(p.c, gamma);
-	}
-
+	rgb2linear(rgb, gamma, xyz);
+	struct pixel  p = { xyz[0], xyz[1], xyz[2] };
 	_mult_v3_m33( &p, m0, m1, m2, xyz );
+}
+
+
+void rgb2linear( double *rgb, double gamma, double *out )
+{
+	int i;
+	if (gamma < 0) { /* special case for sRGB gamma curve */
+	  for (i = 0; i < 3; i++)
+	    out[i] = fabs(rgb[i]) <= 0.04045 ? rgb[i] / 12.92 : _apow( (rgb[i] + 0.055)/1.055, 2.4 );
+	} else if (gamma == 1.0) { /* copy if different locations */
+	  if (rgb != out)
+	    for (i = 0; i < 3; i++)
+	      out[i] = rgb[i];
+	} else {
+	  for (i = 0; i < 3; i++)
+	    out[i] = _apow(rgb[i], gamma);
+	}
 }
 
 
 void xyz2rgb( double *xyz, double gamma, double *m0, double *m1, double *m2, double *rgb )
 {
-	struct pixel  p = { *xyz, *(xyz+1), *(xyz+2) };
-
+	struct pixel  p = { xyz[0], xyz[1], xyz[2] };
 	_mult_v3_m33( &p, m0, m1, m2, rgb );
-
-	double *r;  r = rgb;
-	double *g;  g = rgb+1;
-	double *b;  b = rgb+2;
-
-	if (gamma < 0) {
-		/* special case for sRGB gamma curve */
-		*r = (fabs(*r) <= 0.0031308) ?  12.92 * *r  :  1.055 * _apow(*r, 1.0/2.4) - 0.055;
-		*g = (fabs(*g) <= 0.0031308) ?  12.92 * *g  :  1.055 * _apow(*g, 1.0/2.4) - 0.055;
-		*b = (fabs(*b) <= 0.0031308) ?  12.92 * *b  :  1.055 * _apow(*b, 1.0/2.4) - 0.055;
-	}
-	else {
-		*r = _apow(*r, 1.0 / gamma);
-		*g = _apow(*g, 1.0 / gamma);
-		*b = _apow(*b, 1.0 / gamma);
-	}
+	rgb2gamma(rgb, gamma, rgb);
 }
 
 
-double _apow (double a, double p) {
-	return a >= 0.0?   pow(a, p) : -pow(-a, p);
-}
-
-void _mult_v3_m33( struct pixel *p, double *m0, double *m1, double *m2, double *result )
+void rgb2gamma( double *rgb, double gamma, double *out )
 {
-	*result     = p->a  *  *m0      +  p->b  *  *m1      +  p->c  *  *m2;
-	*(result+1) = p->a  *  *(m0+1)  +  p->b  *  *(m1+1)  +  p->c  *  *(m2+1);
-	*(result+2) = p->a  *  *(m0+2)  +  p->b  *  *(m1+2)  +  p->c  *  *(m2+2);
+	int i;
+	if (gamma < 0) { /* special case for sRGB gamma curve */
+	  for (i = 0; i < 3; i++)
+	    out[i] = (fabs(rgb[i]) <= 0.0031308) ? 12.92 * rgb[i] : 1.055 * _apow(rgb[i], 1.0/2.4) - 0.055;
+	} else if (gamma == 1.0) { /* copy if different locations */
+	  if (rgb != out)
+	    for (i = 0; i < 3; i++)
+	      out[i] = rgb[i];
+	} else {
+	  for (i = 0; i < 3; i++)
+	    out[i] = _apow(rgb[i], 1.0 / gamma);
+	}
 }
 
 
 void xyY2xyz( double *xyY, double *xyz )
 {
-
-	*(xyz+1) = *(xyY+2);
-
-	if ( *(xyY+1) != 0.0 ) {
-		*xyz     = *xyY  *  *(xyY+2)  /  *(xyY+1);
-		*(xyz+2) = (1.0 - *xyY - *(xyY+1))  *  *(xyY+2)  /  *(xyY+1);
+	if ( xyY[1] == 0.0 ) {
+		xyz[0] = xyz[1] = xyz[2] = 0.0;
+		return;
 	}
-	else {
-		*xyz = *(xyz+1) = *(xyz+2) = 0.0;
-	}
+	xyz[0] = xyY[0]  /  xyY[1];
+	xyz[1] = 1.0;
+	xyz[2] = (1.0 - xyY[0] - xyY[1])  /  xyY[1];
 }
 
 
 void xyz2lab( double *xyz, double *w, double *lab )
 {
-	double xr, yr, zr;
+	double xr = xyz[0] / w[0];
+	double yr = xyz[1] / w[1];
+	double zr = xyz[2] / w[2];
 
-	xr = *xyz / *w;
-	yr = *(xyz+1) / *(w+1);
-	zr = *(xyz+2) / *(w+2);
+	double fx = (xr > epsilon)?  pow(xr, 1.0/3.0) : (kappa * xr + 16.0) / 116.0;
+	double fy = (yr > epsilon)?  pow(yr, 1.0/3.0) : (kappa * yr + 16.0) / 116.0;
+	double fz = (zr > epsilon)?  pow(zr, 1.0/3.0) : (kappa * zr + 16.0) / 116.0;
 
-	double fx, fy, fz;
-
-	fx = (xr > epsilon)?  pow(xr, 1.0/3.0) : (kappa * xr + 16.0) / 116.0;
-	fy = (yr > epsilon)?  pow(yr, 1.0/3.0) : (kappa * yr + 16.0) / 116.0;
-	fz = (zr > epsilon)?  pow(zr, 1.0/3.0) : (kappa * zr + 16.0) / 116.0;
-
-	*lab     = 116.0 * fy - 16.0;
-	*(lab+1) = 500.0 * (fx - fy);
-	*(lab+2) = 200.0 * (fy - fz);
+	lab[0] = 116.0 * fy - 16.0;
+	lab[1] = 500.0 * (fx - fy);
+	lab[2] = 200.0 * (fy - fz);
 }
 
 void lab2lch( double *lab, double *lch )
 {
-	*lch = *lab;
+	lch[0] = lab[0];
+	lch[1] = sqrt( pow(lab[1], 2) + pow(lab[2], 2) );
+	lch[2] = _rad2deg( atan2( lab[2], lab[1] ) );
 
-	*(lch+1) = sqrt( pow(*(lab+1), 2) + pow(*(lab+2), 2) );
-	*(lch+2) = _rad2deg( atan2( *(lab+2), *(lab+1) ) );
-
-	while (*(lch+2) < 0.0)   { *(lch+2) += 360; }
-	while (*(lch+2) > 360.0) { *(lch+2) -= 360; }
+	BOUNDED(lch[2], 0.0, 360.0);
 }
 
 void lch2lab( double *lch, double *lab )
 {
     /* l is set */
-    *lab = *lch;
+    lab[0] = lch[0];
 
-    double c = *(lch+1);
-    double h = _deg2rad( *(lch+2) );
+    double c = lch[1];
+    double h = _deg2rad( lch[2] );
     double th = tan(h);
 
-    double *a;
-    double *b;
-
-    a = lab+1;
-    b = lab+2;
+    double *a = lab+1;
+    double *b = lab+2;
 
     *a = c / sqrt( pow(th,2) + 1 );
     *b = sqrt( pow(c, 2) - pow(*a, 2) );
@@ -376,31 +299,16 @@ void lch2lab( double *lch, double *lab )
 
 void lab2xyz( double *lab, double *w, double *xyz )
 {
-	double xr, yr, zr;
+	double yr = (lab[0] > kappa * epsilon) ?  pow( (lab[0] + 16.0)/116.0, 3 )  :  lab[0] / kappa;
 
-	yr = (*lab > kappa * epsilon) ?  pow( (*lab + 16.0)/116.0, 3 )  :  *lab / kappa;
+	double fy = (yr > epsilon) ?  (lab[0] + 16.0)/116.0  :  (kappa * yr + 16.0)/116.0;
+	double fx = fy + lab[1] / 500.0;
+	double fz = fy - lab[2] / 200.0;
 
-	double fx, fy, fz;
+	double xr = (pow(fx, 3) > epsilon) ?  pow(fx, 3)  :  (fx * 116.0 - 16.0) / kappa;
+	double zr = (pow(fz, 3) > epsilon) ?  pow(fz, 3)  :  (fz * 116.0 - 16.0) / kappa;
 
-	fy = (yr > epsilon) ?  (*lab + 16.0)/116.0  :  (kappa * yr + 16.0)/116.0;
-	fx = *(lab+1) / 500.0 + fy;
-	fz = fy - *(lab+2) / 200.0;
-
-	xr = (pow(fx, 3) > epsilon) ?  pow(fx, 3)  :  (fx * 116.0 - 16.0) / kappa;
-	zr = (pow(fz, 3) > epsilon) ?  pow(fz, 3)  :  (fz * 116.0 - 16.0) / kappa;
-
-	*xyz     = xr * *w;
-	*(xyz+1) = yr * *(w+1);
-	*(xyz+2) = zr * *(w+2);
-}
-
-
-double _rad2deg( double rad )
-{
-	return 180.0 * rad / M_PI;
-}
-
-double _deg2rad( double deg )
-{
-    return deg * (M_PI / 180.0); 
+	xyz[0] = xr * w[0];
+	xyz[1] = yr * w[1];
+	xyz[2] = zr * w[2];
 }

@@ -1,5 +1,11 @@
 Revision history for API-Octopart
 
-1.001	Fri, 05 Aug 2022 17:36:28 -0700
-        First version, released on an unsuspecting world.
+1.002	2023-01-11T16:44:52-08:00
+	- Added new options: query_limit, json_debug
+	- Added 3x auto-retry if the request fails
+	- Added constructor option validation
+	- Fixed Changes file formatting
+
+1.001	2022-08-05T17:36:28-07:00
+	- First version, released on an unsuspecting world.
 

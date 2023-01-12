@@ -3,12 +3,17 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package Text::Treesitter::Tree 0.03;
+use v5.26;
+use Object::Pad 0.70;
 
-use v5.14;
-use warnings;
+package Text::Treesitter::Tree 0.04;
+class Text::Treesitter::Tree
+   :strict(params);
 
 require Text::Treesitter::_XS;
+require Text::Treesitter::Node;
+
+require Encode;
 
 =head1 NAME
 
@@ -26,7 +31,37 @@ directly, but are returned by the C<parse_string> method on a parser instance.
 
 =cut
 
+field $tree :param;
+field $text :param :reader;
+
 =head1 METHODS
+
+=head2 text
+
+   $text = $tree->text;
+
+Returns the original source text that was parsed to create the tree.
+
+=cut
+
+field $_text_bytes;
+field %_byte_to_char;
+method $byte_to_char ( $bytecount )
+{
+   $_text_bytes //= Encode::encode_utf8( $text );
+
+   # TODO: This can be done incrementally by finding the largest known
+   # precached position before $bytecount
+   return length( Encode::decode_utf8( substr $_text_bytes, 0, $bytecount ) );
+}
+
+method text_substring_between_bytes ( $start_byte, $end_byte )
+{
+   my $start_char = $_byte_to_char{$start_byte} //= $self->$byte_to_char( $start_byte );
+   my $end_char   = $_byte_to_char{$end_byte}   //= $self->$byte_to_char( $end_byte );
+
+   return substr( $text, $start_char, $end_char - $start_char );
+}
 
 =head2 root_node
 
@@ -36,6 +71,11 @@ Returns the root node of the parse tree, as an instance of
 L<Text::Treesitter::Node>.
 
 =cut
+
+method root_node ()
+{
+   return Text::Treesitter::Node->new( node => $tree->_root_node, tree => $self );
+}
 
 =head1 TODO
 

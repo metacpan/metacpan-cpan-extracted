@@ -109,7 +109,7 @@ typedef struct ParamMeta {
     for(hooki = 0; classmeta->hooks && hooki < av_count(classmeta->hooks); hooki++) {     \
       struct ClassHook *h = (struct ClassHook *)AvARRAY(classmeta->hooks)[hooki];         \
       if(*h->funcs->func)                                                                 \
-        (*h->funcs->func)(aTHX_ classmeta, h->hookdata, h->funcdata);                     \
+        (*h->funcs->func)(aTHX_ classmeta, h->attrdata, h->funcdata);                     \
     }                                                                                     \
   }
 
@@ -119,7 +119,7 @@ typedef struct ParamMeta {
     for(hooki = 0; classmeta->hooks && hooki < av_count(classmeta->hooks); hooki++) {     \
       struct ClassHook *h = (struct ClassHook *)AvARRAY(classmeta->hooks)[hooki];         \
       if(*h->funcs->func)                                                                 \
-        (*h->funcs->func)(aTHX_ classmeta, h->hookdata, h->funcdata, __VA_ARGS__);        \
+        (*h->funcs->func)(aTHX_ classmeta, h->attrdata, h->funcdata, __VA_ARGS__);        \
     }                                                                                     \
   }
 

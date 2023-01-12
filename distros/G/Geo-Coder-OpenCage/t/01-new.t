@@ -24,7 +24,7 @@ dies_ok {
     my $geocoder = Geo::Coder::OpenCage->new(api_key => "abcde");
     my $v        = $geocoder->{ua}->agent;
     $v =~ s/Geo::Coder::OpenCage //;
-    is($v > 0.22, 1, 'version number greater than 0.22');
+    is($v > 0.33, 1, 'version number greater than 0.33');
 }
 
 done_testing();

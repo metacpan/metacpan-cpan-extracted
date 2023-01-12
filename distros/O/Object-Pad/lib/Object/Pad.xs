@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
  */
 #define PERL_NO_GET_CONTEXT
 
@@ -438,6 +438,7 @@ static struct MethodAttributeDefinition method_attributes[] = {
 static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
 {
   int argi = 0;
+  HV *hints = GvHV(PL_hintgv);
 
   SV *packagename = args[argi++]->sv;
   /* Grrr; XPK bug */
@@ -514,10 +515,10 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
 
   int nattrs = args[argi++]->i;
   if(nattrs) {
-    if(hv_fetchs(GvHV(PL_hintgv), "Object::Pad/configure(no_class_attrs)", 0))
+    if(hv_fetchs(hints, "Object::Pad/configure(no_class_attrs)", 0))
       croak("Class/role attributes are not permitted");
 
-    SV **svp = hv_fetchs(GvHV(PL_hintgv), "Object::Pad/configure(only_class_attrs)", 0);
+    SV **svp = hv_fetchs(hints, "Object::Pad/configure(only_class_attrs)", 0);
     HV *only_class_attrs = svp && SvROK(*svp) ? HV_FROM_REF(*svp) : NULL;
 
     int i;
@@ -536,7 +537,7 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
     }
   }
 
-  if(hv_fetchs(GvHV(PL_hintgv), "Object::Pad/configure(always_strict)", 0)) {
+  if(hv_fetchs(hints, "Object::Pad/configure(always_strict)", 0)) {
     mop_class_apply_attribute(meta, "strict", sv_2mortal(newSVpvs("params")));
   }
 
@@ -559,16 +560,18 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
   else
     croak("Expected a block or ';'");
 
-  import_pragma("strict", NULL);
-  import_pragma("warnings", NULL);
+  if(!hv_fetchs(hints, "Object::Pad/configure(no_implicit_pragmata)", 0)) {
+    import_pragma("strict", NULL);
+    import_pragma("warnings", NULL);
 #if HAVE_PERL_VERSION(5, 31, 9)
-  import_pragma("-feature", "indirect");
+    import_pragma("-feature", "indirect");
 #else
-  import_pragma("-indirect", ":fatal");
+    import_pragma("-indirect", ":fatal");
 #endif
 #ifdef HAVE_PARSE_SUBSIGNATURE
-  import_pragma("experimental", "signatures");
+    import_pragma("experimental", "signatures");
 #endif
+  }
 
   /* CARGOCULT from perl/op.c:Perl_package() */
   {
@@ -668,6 +671,7 @@ static bool optree_is_const(OP *o)
   switch(OP_TYPE_OR_EX(o)) {
     case OP_CONST:
     case OP_UNDEF:
+    case OP_STUB:
       return TRUE;
 
     case OP_SCOPE:
@@ -1077,6 +1081,12 @@ static void parse_method_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx
   enum PhaserType type = PTR2UV(hookdata);
 
   MethodMeta *compmethodmeta = NUM2PTR(MethodMeta *, SvUV(*hv_fetchs(ctx->moddata, "Object::Pad/compmethodmeta", 0)));
+
+  /* `method` always permits signatures */
+#ifdef HAVE_PARSE_SUBSIGNATURE
+  import_pragma("feature", "signatures");
+  import_pragma("-warnings", "experimental::signatures");
+#endif
 
   start_method_parse(compclassmeta, compmethodmeta->is_common);
 

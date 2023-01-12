@@ -1,5 +1,11 @@
 Revision history for Object-Pad
 
+0.78    2023-01-12
+        [BUGFIXES]
+         * Don't complain about empty-list field initialisers being
+           non-constant (related to RT145618)
+         * Define more configuration options for `Feature::Compat::Class`
+
 0.77    2022-12-19
         [BUGFIXES]
          * Fix C compiler errors and warnings

@@ -1,4 +1,4 @@
-package Pod::Weaver::Section::Generic 4.018;
+package Pod::Weaver::Section::Generic 4.019;
 # ABSTRACT: a generic section, found by lifting sections
 
 use Moose;
@@ -108,7 +108,7 @@ Pod::Weaver::Section::Generic - a generic section, found by lifting sections
 
 =head1 VERSION
 
-version 4.018
+version 4.019
 
 =head1 OVERVIEW
 
@@ -133,11 +133,12 @@ configuration above could be specified just as:
 If the C<required> attribute is given, and true, then an exception will be
 raised if this section can't be found.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has the same support period as perl itself:  it supports the two
-most recent versions of perl.  (That is, if the most recently released version
-is v5.40, then this module should work on both v5.40 and v5.38.)
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
@@ -159,11 +160,11 @@ The name of this section. Defaults to the plugin name.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo SIGNES.
+This software is copyright (c) 2023 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

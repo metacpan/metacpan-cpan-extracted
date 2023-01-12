@@ -3,7 +3,7 @@ package MooX::Const;
 # ABSTRACT: Syntactic sugar for constant and write-once Moo attributes
 
 use utf8;
-use v5.10.1;
+use v5.14;
 
 use Carp qw( croak );
 use Devel::StrictMode;
@@ -19,7 +19,7 @@ use Types::Standard qw( is_CodeRef Value Object Ref );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.5.4';
+our $VERSION = 'v0.6.1';
 
 
 sub import {
@@ -47,8 +47,6 @@ sub _process_has {
     my $strict = STRICT || ( $opts{strict} // 1 );
 
     my $is = $opts{is};
-
-    $is = "once" if $is && $is eq "wo";
 
     my $once = $is && $is eq "once";
 
@@ -143,7 +141,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 =head1 VERSION
 
-version v0.5.4
+version v0.6.1
 
 =head1 SYNOPSIS
 
@@ -192,8 +190,8 @@ references:
 This allows you to set the attribute I<once>. The value is coerced
 into a constant, and cannot be changed again.
 
-Note that "wo" is a deprecated synonym for "once". It will be removed
-in the future, since "wo" is used for "write-only" in some Moose-like
+Note that "wo" is a removed synonym for "once". It no longer works in
+v0.6.0, since "wo" is used for "write-only" in some Moose-like
 extensions.
 
 As of v0.4.0, this now supports the C<strict> setting:
@@ -228,12 +226,13 @@ test suite.
 
 It does not work with L<Mouse>. Pull requests are welcome.
 
-=head2 Write-Once Attributes
+=head1 SUPPORT FOR OLDER PERL VERSIONS
 
-L<Class::Accessor> antlers/moose-like mode uses "wo" for write-only
-attributes, not write-once attributes.
+Since v0.6.0, the this module requires Perl v5.14 or later.
 
-As of v0.5.0, you should be using "once" instead of "wo".
+If you need this module on Perl v5.10, please use one of the v0.5.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
 
 =head1 SEE ALSO
 
@@ -244,6 +243,8 @@ L<Devel::StrictMode>
 L<Moo>
 
 L<MooseX::SetOnce>
+
+L<Sub::Trigger::Lock>
 
 L<Types::Const>
 
@@ -278,7 +279,7 @@ Kang-min Liu 劉康民 <gugod@gugod.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2022 by Robert Rothenberg.
+This software is Copyright (c) 2018-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

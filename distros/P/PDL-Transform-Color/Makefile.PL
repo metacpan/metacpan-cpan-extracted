@@ -24,16 +24,15 @@ FOO
     return $text;
 }
 
-
 WriteMakefile(
     NAME                      => 'PDL::Transform::Color',
     AUTHOR                    => 'Craig DeForest <craig@deforest.org>',
     VERSION_FROM              => 'lib/PDL/Transform/Color.pm',
     ABSTRACT_FROM             => 'lib/PDL/Transform/Color.pm',
     LICENSE                   => 'perl',
-    MIN_PERL_VERSION          => 5.006,
+    MIN_PERL_VERSION          => '5.010',
     CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker' => 6.48,
+        'ExtUtils::MakeMaker' => '6.48',
     },
     TEST_REQUIRES => {
         'Test::More' => '0.88',
@@ -42,6 +41,7 @@ WriteMakefile(
         'PDL'                 => 0,
         'PDL::MatrixOps'      => 0,
 	'PDL::Transform'      => 0,
+	'PDL::Graphics::ColorSpace' => '0.203',
     },
     META_ADD => {
         resources => {

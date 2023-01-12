@@ -196,15 +196,15 @@ void ObjectPad_mop_field_apply_attribute(pTHX_ FieldMeta *fieldmeta, const char 
   if((reg->funcs->flags & OBJECTPAD_FLAG_ATTR_MUST_VALUE) && !value)
     croak("Attribute :%s requires a value", name);
 
-  SV *hookdata = value;
+  SV *attrdata = value;
 
   if(reg->funcs->apply) {
-    if(!(*reg->funcs->apply)(aTHX_ fieldmeta, value, &hookdata, reg->funcdata))
+    if(!(*reg->funcs->apply)(aTHX_ fieldmeta, value, &attrdata, reg->funcdata))
       return;
   }
 
-  if(hookdata && hookdata == value)
-    SvREFCNT_inc(hookdata);
+  if(attrdata && attrdata == value)
+    SvREFCNT_inc(attrdata);
 
   if(!fieldmeta->hooks)
     fieldmeta->hooks = newAV();
@@ -214,7 +214,7 @@ void ObjectPad_mop_field_apply_attribute(pTHX_ FieldMeta *fieldmeta, const char 
 
   *hook = (struct FieldHook){
     .funcs    = reg->funcs,
-    .hookdata = hookdata,
+    .attrdata = attrdata,
     .funcdata = reg->funcdata,
   };
 
@@ -296,7 +296,7 @@ AV *ObjectPad_mop_field_get_attribute_values(pTHX_ FieldMeta *fieldmeta, const c
     if(!ret)
       ret = newAV();
 
-    av_push(ret, newSVsv(hook->hookdata));
+    av_push(ret, newSVsv(hook->attrdata));
   }
 
   return ret;
@@ -407,7 +407,7 @@ void ObjectPad_mop_field_seal(pTHX_ FieldMeta *fieldmeta)
 
 /* :weak */
 
-static void fieldhook_weak_post_construct(pTHX_ FieldMeta *fieldmeta, SV *_hookdata, void *_funcdata, SV *field)
+static void fieldhook_weak_post_construct(pTHX_ FieldMeta *fieldmeta, SV *_attrdata, void *_funcdata, SV *field)
 {
   sv_rvweaken(field);
 }
@@ -422,7 +422,7 @@ static OP *pp_weaken(pTHX)
 }
 #endif
 
-static void fieldhook_weak_gen_accessor(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *_funcdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
+static void fieldhook_weak_gen_accessor(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *_funcdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
 {
   if(type != ACCESSOR_WRITER)
     return;
@@ -444,7 +444,7 @@ static struct FieldHookFuncs fieldhooks_weak = {
 
 /* :param */
 
-static bool fieldhook_param_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
+static bool fieldhook_param_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **attrdata_ptr, void *_funcdata)
 {
   if(SvPVX(fieldmeta->name)[0] != '$')
     croak("Can only add a named constructor parameter for scalar fields");
@@ -467,7 +467,7 @@ static bool fieldhook_param_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **ho
 
   mop_field_set_param(fieldmeta, namesv);
 
-  *hookdata_ptr = namesv;
+  *attrdata_ptr = namesv;
   return TRUE;
 }
 
@@ -588,18 +588,18 @@ static void S_generate_field_accessor_method(pTHX_ FieldMeta *fieldmeta, SV *mna
   LEAVE;
 }
 
-static bool fieldhook_reader_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
+static bool fieldhook_reader_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **attrdata_ptr, void *_funcdata)
 {
-  *hookdata_ptr = make_accessor_mnamesv(aTHX_ fieldmeta, value, "%s");
+  *attrdata_ptr = make_accessor_mnamesv(aTHX_ fieldmeta, value, "%s");
   return TRUE;
 }
 
-static void fieldhook_reader_seal(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *_funcdata)
+static void fieldhook_reader_seal(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *_funcdata)
 {
-  S_generate_field_accessor_method(aTHX_ fieldmeta, hookdata, ACCESSOR_READER);
+  S_generate_field_accessor_method(aTHX_ fieldmeta, attrdata, ACCESSOR_READER);
 }
 
-static void fieldhook_gen_reader_ops(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *_funcdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
+static void fieldhook_gen_reader_ops(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *_funcdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
 {
   if(type != ACCESSOR_READER)
     return;
@@ -626,18 +626,18 @@ static struct FieldHookFuncs fieldhooks_reader = {
 
 /* :writer */
 
-static bool fieldhook_writer_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
+static bool fieldhook_writer_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **attrdata_ptr, void *_funcdata)
 {
-  *hookdata_ptr = make_accessor_mnamesv(aTHX_ fieldmeta, value, "set_%s");
+  *attrdata_ptr = make_accessor_mnamesv(aTHX_ fieldmeta, value, "set_%s");
   return TRUE;
 }
 
-static void fieldhook_writer_seal(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *_funcdata)
+static void fieldhook_writer_seal(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *_funcdata)
 {
-  S_generate_field_accessor_method(aTHX_ fieldmeta, hookdata, ACCESSOR_WRITER);
+  S_generate_field_accessor_method(aTHX_ fieldmeta, attrdata, ACCESSOR_WRITER);
 }
 
-static void fieldhook_gen_writer_ops(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *_funcdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
+static void fieldhook_gen_writer_ops(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *_funcdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
 {
   if(type != ACCESSOR_WRITER)
     return;
@@ -676,22 +676,22 @@ static struct FieldHookFuncs fieldhooks_writer = {
 
 /* :mutator */
 
-static bool fieldhook_mutator_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
+static bool fieldhook_mutator_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **attrdata_ptr, void *_funcdata)
 {
   if(SvPVX(fieldmeta->name)[0] != '$')
     /* TODO: A reader for an array or hash field should also be fine */
     croak("Can only generate accessors for scalar fields");
 
-  *hookdata_ptr = make_accessor_mnamesv(aTHX_ fieldmeta, value, "%s");
+  *attrdata_ptr = make_accessor_mnamesv(aTHX_ fieldmeta, value, "%s");
   return TRUE;
 }
 
-static void fieldhook_mutator_seal(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *_funcdata)
+static void fieldhook_mutator_seal(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *_funcdata)
 {
-  S_generate_field_accessor_method(aTHX_ fieldmeta, hookdata, ACCESSOR_LVALUE_MUTATOR);
+  S_generate_field_accessor_method(aTHX_ fieldmeta, attrdata, ACCESSOR_LVALUE_MUTATOR);
 }
 
-static void fieldhook_gen_mutator_ops(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *_funcdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
+static void fieldhook_gen_mutator_ops(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *_funcdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
 {
   if(type != ACCESSOR_LVALUE_MUTATOR)
     return;
@@ -712,12 +712,12 @@ static struct FieldHookFuncs fieldhooks_mutator = {
 
 /* :accessor */
 
-static void fieldhook_accessor_seal(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *_funcdata)
+static void fieldhook_accessor_seal(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *_funcdata)
 {
-  S_generate_field_accessor_method(aTHX_ fieldmeta, hookdata, ACCESSOR_COMBINED);
+  S_generate_field_accessor_method(aTHX_ fieldmeta, attrdata, ACCESSOR_COMBINED);
 }
 
-static void fieldhook_gen_accessor_ops(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *_funcdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
+static void fieldhook_gen_accessor_ops(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *_funcdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
 {
   if(type != ACCESSOR_COMBINED)
     return;

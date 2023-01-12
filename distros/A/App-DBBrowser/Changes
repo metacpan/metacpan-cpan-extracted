@@ -1,6 +1,15 @@
 Revision history for App-DBBrowser
 
 
+2.312    2023-01-12
+        - Removed option 'auto_limit'.
+
+2.311    2023-01-12
+        - SQLite: 'sqlite_'-tables are system tables.
+        - No reconnect database after create/drop table.
+        - Bugfix in first_column_is_autoincrement.
+        - Bugfix in get_join_info.
+
 2.310    2023-01-08
         - Added DB2-plugin.
         - Bugfix import and export options.

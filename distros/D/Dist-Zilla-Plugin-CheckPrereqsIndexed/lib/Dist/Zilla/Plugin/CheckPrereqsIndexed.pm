@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::CheckPrereqsIndexed 0.021;
+package Dist::Zilla::Plugin::CheckPrereqsIndexed 0.022;
 # ABSTRACT: prevent a release if you have prereqs not found on CPAN
 
 use Moose;
@@ -193,7 +193,7 @@ Dist::Zilla::Plugin::CheckPrereqsIndexed - prevent a release if you have prereqs
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 OVERVIEW
 
@@ -210,11 +210,12 @@ cpanmetadb. This behavior may change again in the future, or it may become
 pluggable.  In the meantime, this makes releasing while offline impossible...
 but it was anyway, right?
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has the same support period as perl itself:  it supports the two
-most recent versions of perl.  (That is, if the most recently released version
-is v5.40, then this module should work on both v5.40 and v5.38.)
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
@@ -232,11 +233,11 @@ other way).
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Christopher J. Madsen Dave Rolsky David Golden Karen Etheridge Olivier Mengué Piers Cawley Sébastien Deseille Van de Bugger
+=for stopwords Christopher J. Madsen Dave Rolsky David Golden Karen Etheridge Olivier Mengué Piers Cawley Ricardo Signes Sébastien Deseille Van de Bugger
 
 =over 4
 
@@ -263,6 +264,10 @@ Olivier Mengué <dolmen@cpan.org>
 =item *
 
 Piers Cawley <pdcawley@bofh.org.uk>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

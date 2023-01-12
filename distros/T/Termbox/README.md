@@ -1,46 +1,48 @@
-[![Build Status](https://travis-ci.com/sanko/Termbox.pm.svg?branch=master)](https://travis-ci.com/sanko/Termbox.pm) [![MetaCPAN Release](https://badge.fury.io/pl/Termbox.svg)](https://metacpan.org/release/Termbox)
+[![Actions Status](https://github.com/sanko/Termbox.pm/actions/workflows/ci.yaml/badge.svg)](https://github.com/sanko/Termbox.pm/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Termbox.svg)](https://metacpan.org/release/Termbox)
 # NAME
 
 Termbox - Create Text-based User Interfaces Without ncurses
 
 # SYNOPSIS
 
-        use Termbox qw[:all];
-        my @chars = split //, 'hello, world!';
-        my $code  = tb_init();
-        die sprintf "termbox init failed, code: %d\n", $code if $code;
-        tb_select_input_mode(TB_INPUT_ESC);
-        tb_select_output_mode(TB_OUTPUT_NORMAL);
-        tb_clear();
-        my @rows = (
-                [TB_WHITE,   TB_BLACK],
-                [TB_BLACK,   TB_DEFAULT],
-                [TB_RED,     TB_GREEN],
-                [TB_GREEN,   TB_RED],
-                [TB_YELLOW,  TB_BLUE],
-                [TB_MAGENTA, TB_CYAN]);
+```perl
+    use Termbox qw[:all];
+    my @chars = split //, 'hello, world!';
+    my $code  = tb_init();
+    die sprintf "termbox init failed, code: %d\n", $code if $code;
+    tb_select_input_mode(TB_INPUT_ESC);
+    tb_select_output_mode(TB_OUTPUT_NORMAL);
+    tb_clear();
+    my @rows = (
+            [TB_WHITE,   TB_BLACK],
+            [TB_BLACK,   TB_DEFAULT],
+            [TB_RED,     TB_GREEN],
+            [TB_GREEN,   TB_RED],
+            [TB_YELLOW,  TB_BLUE],
+            [TB_MAGENTA, TB_CYAN]);
 
-        for my $colors (0 .. $#rows) {
-                my $j = 0;
-                for my $char (@chars) {
-                        tb_change_cell($j, $colors, ord $char, @{ $rows[$colors] });
-                        $j++;
-                }
-        }
-        tb_present();
-        while (1) {
-                my $ev = Termbox::Event->new();
-                tb_poll_event($ev);
-                if ($ev->key == TB_KEY_ESC) {
-                        tb_shutdown();
-                        exit 0;
-                }
-        }
+    for my $colors (0 .. $#rows) {
+            my $j = 0;
+            for my $char (@chars) {
+                    tb_change_cell($j, $colors, ord $char, @{ $rows[$colors] });
+                    $j++;
+            }
+    }
+    tb_present();
+    while (1) {
+            my $ev = Termbox::Event->new();
+            tb_poll_event($ev);
+            if ($ev->key == TB_KEY_ESC) {
+                    tb_shutdown();
+                    exit 0;
+            }
+    }
+```
 
 # DESCRIPTION
 
 Termbox is a library that provides minimalistic API which allows the programmer
-to write text-based user interfaces. The library is crossplatform and has both
+to write text-based user interfaces. The library is cross-platform and has both
 terminal-based implementations on \*nix operating systems and a winapi console
 based implementation for windows operating systems. The basic idea is an
 abstraction of the greatest common subset of features available on all major
@@ -179,21 +181,27 @@ Sets the termbox output mode. Termbox has three output options:
 
     Example usage:
 
-            tb_change_cell(x, y, '@', TB_BLACK | TB_BOLD, TB_RED);
+    ```
+        tb_change_cell(x, y, '@', TB_BLACK | TB_BOLD, TB_RED);
+    ```
 
 - 2. `TB_OUTPUT_256` - `0 .. 256`
 
     In this mode you can leverage the 256 terminal mode:
 
-            0x00 - 0x07: the 8 colors as in TB_OUTPUT_NORMAL
-            0x08 - 0x0f: TB_* | TB_BOLD
-            0x10 - 0xe7: 216 different colors
-            0xe8 - 0xff: 24 different shades of grey
+    ```
+        0x00 - 0x07: the 8 colors as in TB_OUTPUT_NORMAL
+        0x08 - 0x0f: TB_* | TB_BOLD
+        0x10 - 0xe7: 216 different colors
+        0xe8 - 0xff: 24 different shades of grey
+    ```
 
     Example usage:
 
-            tb_change_cell(x, y, '@', 184, 240);
-            tb_change_cell(x, y, '@', 0xb8, 0xf0);
+    ```
+        tb_change_cell(x, y, '@', 184, 240);
+        tb_change_cell(x, y, '@', 0xb8, 0xf0);
+    ```
 
 - 3. `TB_OUTPUT_216` - `0 .. 216`
 
@@ -202,7 +210,7 @@ Sets the termbox output mode. Termbox has three output options:
 
 - 4. `TB_OUTPUT_GRAYSCALE` - `0 .. 23`
 
-    This mode supports the 4th range of the 256 mode only. But you dont need to
+    This mode supports the 4th range of the 256 mode only. But you do not need to
     provide an offset.
 
 If 'mode' is `TB_OUTPUT_CURRENT`, it returns the current output mode.
@@ -218,8 +226,10 @@ were no event during 'timeout' period.
 
 Current usage:
 
-        my $ev = Termbox::Event->new( );
-        tb_peek_event( $evl, 1 ); # $ev is filled by the API; yes, this will change before v1.0
+```perl
+    my $ev = Termbox::Event->new( );
+    tb_peek_event( $evl, 1 ); # $ev is filled by the API; yes, this will change before v1.0
+```
 
 ## `tb_poll_event( $event )`
 
@@ -229,8 +239,10 @@ is available. Returns the type of the event (one of `TB_EVENT_*` constants) or
 
 Current usage:
 
-        my $ev = Termbox::Event->new( );
-        tb_peek_event( $evl, 1 ); # $ev is filled by the API; yes, this will change before v1.0
+```perl
+    my $ev = Termbox::Event->new( );
+    tb_peek_event( $evl, 1 ); # $ev is filled by the API; yes, this will change before v1.0
+```
 
 # Constants
 
@@ -330,7 +342,7 @@ CPAN ID: SANKO
 
 # License and Legal
 
-Copyright (C) 2020 by Sanko Robinson <sanko@cpan.org>
+Copyright (C) 2020-2023 by Sanko Robinson <sanko@cpan.org>
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of The Artistic License 2.0. See

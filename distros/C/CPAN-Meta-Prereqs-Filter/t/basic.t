@@ -41,7 +41,7 @@ my $third = CPAN::Meta::Prereqs->new({
 	},
 	testing => {
 		requires => {
-			Carp => 1,
+			Carp => 0.001,
 		},
 	},
 });

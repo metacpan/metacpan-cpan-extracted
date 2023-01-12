@@ -7,7 +7,7 @@ use warnings;
 use Carp;
 use Moose;
 
-our $VERSION = 'v1.1.0';
+our $VERSION = 'v1.1.1';
 
 has file          => ( is => 'ro', isa => 'Str', required => 1 );
 has name          => ( is => 'rw', isa => 'Str' );
@@ -35,25 +35,25 @@ has parse_spec => (
 sub _build_parse_spec {
   return {
     scalars => {
-      name      => qr[^Name:\s*(\S+)],
-      version   => qr[^Version:\s*(\S+)],
-      epoch     => qr[^Epoch:\s*(\S+)],
-      release   => qr[^Release:\s*(\S+)],
-      summary   => qr[^Summary:\s*(.+)],
-      license   => qr[^License:\s*(.+)],
-      group     => qr[^Group:\s*(\S+)],
-      url       => qr[^URL:\s*(\S+)],
-      buildroot => qr[^BuildRoot:\s*(\S+)],
-      buildarch => qr[^BuildArch:\s*(\S+)],
-      excludearch   => qr[^ExcludeArch:\s*(\S+)],
-      exclusivearch => qr[^ExclusiveArch:\s*(\S+)],
-      excludeos     => qr[^ExcludeOS:\s*(\S+)],
-      exclusiveos   => qr[^ExclusiveOS:\s*(\S+)],
+      name      => qr[^Name:\s+(\S+)],
+      version   => qr[^Version:\s+(\S+)],
+      epoch     => qr[^Epoch:\s+(\S+)],
+      release   => qr[^Release:\s+(\S+)],
+      summary   => qr[^Summary:\s+(.+)],
+      license   => qr[^License:\s+(.+)],
+      group     => qr[^Group:\s+(\S+)],
+      url       => qr[^URL:\s+(\S+)],
+      buildroot => qr[^BuildRoot:\s+(\S+)],
+      buildarch => qr[^BuildArch:\s+(\S+)],
+      excludearch   => qr[^ExcludeArch:\s+(\S+)],
+      exclusivearch => qr[^ExclusiveArch:\s+(\S+)],
+      excludeos     => qr[^ExcludeOS:\s+(\S+)],
+      exclusiveos   => qr[^ExclusiveOS:\s+(\S+)],
     },
     arrays => {
-      source        => qr[^Source\d*:\s*(\S+)],
-      buildrequires => qr[^BuildRequires:\s*(.+)],
-      requires      => qr[^Requires:\s*(.+)],
+      source        => qr[^Source\d*:\s+(\S+)],
+      buildrequires => qr[^BuildRequires:\s+(.+)],
+      requires      => qr[^Requires:\s+(.+)],
     },
   };
 }

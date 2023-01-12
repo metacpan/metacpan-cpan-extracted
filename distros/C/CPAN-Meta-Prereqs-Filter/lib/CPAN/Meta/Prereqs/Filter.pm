@@ -1,5 +1,5 @@
 package CPAN::Meta::Prereqs::Filter;
-$CPAN::Meta::Prereqs::Filter::VERSION = '0.005';
+$CPAN::Meta::Prereqs::Filter::VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -66,7 +66,7 @@ sub filter_prereqs {
 					for my $module ($source->required_modules) {
 						next if not defined(my $right = $sink->requirements_for_module($module));
 						my $left = $source->requirements_for_module($module);
-						$sink->clear_requirement($module) if $left eq $right || $right eq '0';
+						$sink->clear_requirement($module) if $left ge $right;
 					}
 				}
 			}
@@ -111,7 +111,7 @@ CPAN::Meta::Prereqs::Filter - Filtering various things out of CPAN::Meta::Prereq
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

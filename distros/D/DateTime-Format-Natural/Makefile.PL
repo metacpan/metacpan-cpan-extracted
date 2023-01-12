@@ -22,8 +22,6 @@ WriteMakefile
                    'Scalar::Util' => 0,
                    'Storable' => 0,
                    'Term::ReadLine' => 0,
-                   'Test::MockTime::HiRes' => 0,
-                   'Test::More' => 0,
                    'boolean' => 0
                  },
   'INSTALLDIRS' => 'site',

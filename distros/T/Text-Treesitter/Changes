@@ -1,5 +1,14 @@
 Revision history for Text-Treesitter
 
+0.04    2023-01-12
+        [CHANGES]
+         * Remember the original source text in a Tree instance
+         * Remember the Tree instance that generated every Node
+         * Added `->text` accessor on both Tree and Node instances
+         * Read the user's `tree-sitter/config.json` if found
+         * Use the configured `parser-directories` to find lang_dir if not
+           supplied
+
 0.03    2023-01-05
         [CHANGES]
          * Provide a real toplevel `Text::Treesitter` class to wrap the

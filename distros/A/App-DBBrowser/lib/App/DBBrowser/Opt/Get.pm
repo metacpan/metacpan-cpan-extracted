@@ -21,7 +21,6 @@ sub defaults {
     my ( $sf, $section, $key ) = @_;
     my $defaults = {
         G => {
-            auto_limit           => 0,
             base_indent          => 1,
             file_find_warnings   => 0,
             menu_memory          => 1,

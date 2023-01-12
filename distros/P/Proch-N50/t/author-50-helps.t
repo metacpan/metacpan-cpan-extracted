@@ -35,7 +35,7 @@ SKIP: {
 
     test_bin("fu-hash", "--help");
 
-	test_bin("fu-grep", "--help"); 
+	  test_bin("fu-grep", "--help"); 
     
     test_bin("fu-uniq", "--help");
     

@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001001';
+our $VERSION   = '0.001002';
 
 use Story::Interact::Character ();
 use Story::Interact::Harness::Terminal ();
@@ -57,7 +57,7 @@ B<< Documentation is currently very limited. Tests are almost non-existent. >>
 
 Stories are written in pages. Each page is a Perl script using the functions
 defined in L<Story::Interactive::Syntax>. They may contain arbitrary Perl
-code, but are evaluated within a L<Safe> container, so do have some limits.
+code.
 
 B<< Stories may contain arbitrary Perl code. Do not run untrusted stories. >>
 

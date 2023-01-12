@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.310';
+our $VERSION = '2.312';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -47,7 +47,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL>/C<Firebird>/C<DB2> datab
 
 =head1 VERSION
 
-Version 2.310
+Version 2.312
 
 =head1 SYNOPSIS
 
@@ -913,13 +913,6 @@ when creating a table. The value set here is then used as the default name for t
 
 If this option is enabled and a table is created, C<SQL::Type::Guess> is used to detect the data types. These data types
 are then used as default values when the user is asked for the data types.
-
-=head3 Auto Limit
-
-Sets C<LIMIT> automatically to I<Auto Limit>. This can be overwritten by setting a SQL C<LIMIT> statement manually.
-Fetched table rows are kept in memory.
-
-To disable the automatic limit set I<Auto Limit> to C<0>.
 
 =head2 Output
 

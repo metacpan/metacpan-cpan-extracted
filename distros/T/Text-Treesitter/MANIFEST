@@ -24,7 +24,6 @@ README
 t/00use.t
 t/01parse-c.t
 t/01parse-fourfunc.t
-t/01parse-sexp.t
 t/02reset.t
 t/03language.t
 t/10query-fourfunc.t

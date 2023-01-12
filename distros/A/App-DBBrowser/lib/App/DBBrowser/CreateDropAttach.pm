@@ -54,6 +54,10 @@ sub create_drop_or_attach {
             { %{$sf->{i}{lyt_v}}, prompt => '', index => 1, default => $sf->{i}{old_idx_cda}, undef => '  <=' }
         );
         if ( ! defined $idx || ! defined $menu->[$idx] ) {
+            # Here this menu is left without comming back hence the cleanup.
+            # (with a true return value, this menu is - after leaving to update data - reopened automatically)
+            delete $sf->{i}{ss} if exists $sf->{i}{ss};  # delete saved books
+            delete $sf->{i}{gc} if exists $sf->{i}{gc};  # delete datasource-file menu memory
             return;
         }
         if ( $sf->{o}{G}{menu_memory} ) {
@@ -75,7 +79,7 @@ sub create_drop_or_attach {
             my $ct = App::DBBrowser::CreateDropAttach::CreateTable->new( $sf->{i}, $sf->{o}, $sf->{d} );
             if ( $choice eq $create_table ) {
                 if ( ! eval { $ct->create_table(); 1 } ) {
-                    $ax->print_error_message( $@ );
+                    $ax->print_error_message( $@ ); ##
                 }
             }
             elsif ( $choice eq $create_view ) {
@@ -83,6 +87,7 @@ sub create_drop_or_attach {
                     $ax->print_error_message( $@ );
                 }
             }
+            return 1;
         }
         elsif ( $choice =~ /^-\ Drop/i ) {
             require App::DBBrowser::CreateDropAttach::DropTable;
@@ -97,6 +102,7 @@ sub create_drop_or_attach {
                     $ax->print_error_message( $@ );
                 }
             }
+            return 2;
         }
         elsif ( $choice =~ /^-\ (?:Attach|Detach)/ ) {
             require App::DBBrowser::CreateDropAttach::AttachDB;
@@ -117,8 +123,8 @@ sub create_drop_or_attach {
             if ( ! $changed ) {
                 next CREATE_DROP_ATTACH;
             }
+            return 3;
         }
-        return 1;
     }
 }
 

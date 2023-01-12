@@ -11,28 +11,27 @@ $SIG{__WARN__} = sub { confess "warning trapped; @_" };
 use English qw( -no_match_vars );;
 use Data::Compare qw(Compare);
 
+confess "Non-zero CHILD_ERROR ($?)" if $? != 0;
+
 # This script was written before the author knew anything about standard
 # Perl test-harness tools.  Perhaps someday it will be wholely rewritten.
 # Meanwhile, some baby steps...
 use Test::More;
 
-my $pkgname;
-BEGIN {
-  use Data::Dumper::Interp;
-  $pkgname = "Data::Dumper::Interp";
-  sub _doeval($;@) {
-    my $saved_at = $@;
-    no strict 'refs'; my @r = eval $_[0]; die $@ if $@;
-    $@ = $saved_at;
-    wantarray ? @r : (@r > 1 ? confess("scalar context but > 1 value returned") : $r[0])
-  }
-  sub getPkgVar($) { _doeval "\$${pkgname}::$_[0]" }
-  sub getPkgAry($) { my @a = _doeval "\@${pkgname}::$_[0]"; @a }
-  sub setPkgVar($$) { _doeval "\$${pkgname}::$_[0] = \$_[1]", $_[1] }
-  sub callPkgNew(@) { _doeval "${pkgname}->new( \@_[1..\$#_] )", @_ }
+use Data::Dumper::Interp;
+diag "Loaded ", $INC{"Data::Dumper::Interp.pm" =~ s/::/\//gr}, 
+     " VERSION=", ($Data::Dumper::Interp::VERSION // "undef"),"\n"; 
+
+confess "Non-zero CHILD_ERROR ($?)" if $? != 0;
+
+# Format a Unicode string in «french quotes» and also with hex escapes
+# (so we can still see something useful on non-Unicode platforms).
+sub displaystr($) {
+  my ($input) = @_;
+  return "undef" if ! defined($input);
+  chomp( my $s = Data::Dumper->new([$input])->Useqq(1)->Terse(1)->Indent(0)->Dump );
+  "«${input}»($s)"
 }
-diag "Loaded ", $INC{"${pkgname}.pm" =~ s/::/\//gr}, 
-     " VERSION=", (getPkgVar("VERSION") // "undef"),"\n"; 
 
 # Do an initial read of $[ so arybase will be autoloaded
 # (prevents corrupting $!/ERRNO in subsequent tests)
@@ -67,13 +66,14 @@ sub timed_run(&$@) {
 }
 
 sub visFoldwidth() {
-  "${pkgname}::Foldwidth=".u(getPkgVar("Foldwidth"))
- ." Foldwidth1=".u(getPkgVar("Foldwidth1"))
- .(getPkgVar('Foldwidth') ? ("\n".("." x getPkgVar('Foldwidth'))) : "")
+  "Data::Dumper::Interp::Foldwidth=".u($Data::Dumper::Interp::Foldwidth)
+ ." Foldwidth1=".u($Data::Dumper::Interp::Foldwidth1)
+ .($Data::Dumper::Interp::Foldwidth ? ("\n".("." x $Data::Dumper::Interp::Foldwidth)) : "")
 }
 sub checkeq_literal($$$) {
   my ($testdesc, $exp, $act) = @_;
-  $exp = show_white($exp); $act = show_white($act);
+  $exp = show_white($exp); # stringifies undef
+  $act = show_white($act);
   return unless $exp ne $act;
   my $posn = 0;
   for (0..length($exp)) {
@@ -83,15 +83,15 @@ sub checkeq_literal($$$) {
   }
   @_ = ( "\n**************************************\n"
         ."${testdesc}\n"
-        ."Expected:\n$exp«end»\n"
-        ."Actual  :\n$act«end»\n"
-        .(" " x $posn)."^\n"
+        ."Expected:\n".displaystr($exp)."\n"
+        ."Actual  :\n".displaystr($act)."\n"
+        .(" " x ($posn+1))."^\n" # +1 for the opening « in the displayed str
         .visFoldwidth()."\n" ) ;
   goto &Carp::confess;
 }
 
 # USAGE: check $code_display, qr/$exp/, $doeval->($code, $item) ;
-# { my $code="${pkgname}->new->hvis(k=>'v');"; check $code, '(k => "v")',eval $code }
+# { my $code="Data::Dumper::Interp->new->hvis(k=>'v');"; check $code, '(k => "v")',eval $code }
 sub check($$@) {
   my ($code, $expected_arg, @actual) = @_;
   local $_;  # preserve $1 etc. for caller
@@ -110,7 +110,7 @@ sub check($$@) {
     if (ref($expected) eq "Regexp") {
       confess "\nTESTb FAILED: ",$code,"\n"
              ."Expected (Regexp):u\n".${expected}."«end»\n"
-             ."Got:\n".u($actual)."«end»\n"
+             ."Got:\n".displaystr($actual)."\n"
              .visFoldwidth()
         unless $actual =~ ($expected // "Never Matched");
     } else {
@@ -169,7 +169,7 @@ sub checklit(&$$) {
     =~ s{ ( [^\\"]++|(\\.) )*+ \K " }{'}xsg
        or do{ die "bug" if $dq_expected_re =~ /(?<![^\\])'/; }; #probably
   foreach (
-    [ "${pkgname}->new()->vis(\$_[1])",  '_Q_' ],
+    [ "Data::Dumper::Interp->new()->vis(\$_[1])",  '_Q_' ],
     [ 'vis($_[1])',              '_Q_' ],
     [ 'visq($_[1])',             '_q_' ],
     [ 'avis($_[1])',             '(_Q_)' ],
@@ -197,11 +197,11 @@ sub checklit(&$$) {
 }#checklit()
 
 # Basic test of OO interfaces
-{ my $code="${pkgname}->new->vis('foo')  ;"; check $code, '"foo"',     eval $code }
-{ my $code="${pkgname}->new->avis('foo') ;"; check $code, '("foo")',   eval $code }
-{ my $code="${pkgname}->new->hvis(k=>'v');"; check $code, '(k => "v")',eval $code }
-{ my $code="${pkgname}->new->dvis('foo') ;"; check $code, 'foo',       eval $code }
-{ my $code="${pkgname}->new->ivis('foo') ;"; check $code, 'foo',       eval $code }
+{ my $code="Data::Dumper::Interp->new->vis('foo')  ;"; check $code, '"foo"',     eval $code }
+{ my $code="Data::Dumper::Interp->new->avis('foo') ;"; check $code, '("foo")',   eval $code }
+{ my $code="Data::Dumper::Interp->new->hvis(k=>'v');"; check $code, '(k => "v")',eval $code }
+{ my $code="Data::Dumper::Interp->new->dvis('foo') ;"; check $code, 'foo',       eval $code }
+{ my $code="Data::Dumper::Interp->new->ivis('foo') ;"; check $code, 'foo',       eval $code }
 
 foreach (
           ['Foldwidth',0,1,80,9999],
@@ -227,14 +227,14 @@ foreach (
          $dumper .= ", 43" if $base =~ /^[ahl]/;
          $dumper .= ")";
         {
-          my $v = eval "{ local \$${pkgname}::$confname = \$value;
-                          my \$obj = ${pkgname}->new();
+          my $v = eval "{ local \$Data::Dumper::Interp::$confname = \$value;
+                          my \$obj = Data::Dumper::Interp->new();
                           \$obj->$dumper ;   # discard dump result
                           \$obj->$confname() # fetch effective setting
                         }";
         confess "bug:$@ " if $@;
-        confess "\$${pkgname}::$confname value is not preserved by $dumper\n",
-            "(Set \$${pkgname}::$confname=",u($value)," but new()...->$confname() returned ",u($v),")\n"
+        confess "\$Data::Dumper::Interp::$confname value is not preserved by $dumper\n",
+            "(Set \$Data::Dumper::Interp::$confname=",u($value)," but new()...->$confname() returned ",u($v),")\n"
          unless (! defined $v and ! defined $value) || ($v eq $value);
         }
       }
@@ -250,7 +250,7 @@ sub MyClass::meth {
 }
 
 # Many tests assume this
-setPkgVar('Foldwidth', 72);
+$Data::Dumper::Interp::Foldwidth = 72;
 
 @ARGV = ('fake','argv');
 $. = 1234;
@@ -374,7 +374,7 @@ $_ = "GroupA.GroupB";
 { my $data = eval 'BEGIN{ ${^WARNING_BITS} = 0 } no strict; no feature;
                    sub{ my $x = 42; };';
   { my $code = 'vis($data)'; check $code, 'sub { "DUMMY" }', eval $code; }
-  setPkgVar("Deparse", 1);
+  local $Data::Dumper::Interp::Deparse = 1;
   { my $code = 'vis($data)'; check $code, qr/sub \{\s*my \$x = 42;\s*\}/, eval $code; }
 }
 
@@ -559,8 +559,8 @@ my $unicode_str = join "", map { chr($_) } (0x263A .. 0x2650);
 my $byte_str = join "",map { chr $_ } 10..30;
 
 sub get_closure(;$) {
-
  my ($clobber) = @_;
+ confess "Non-zero CHILD_ERROR ($?)" if $? != 0;
 
  my %closure_h = (%toplex_h);
  my @closure_a = (@toplex_a);
@@ -572,6 +572,8 @@ sub get_closure(;$) {
  }
 
  return sub {
+
+  confess "Non-zero CHILD_ERROR ($?)" if $? != 0;
 
   # Perl is inconsistent about whether an eval in package DB can see
   # lexicals in enclosing scopes.  Sometimes it can, sometimes not.
@@ -842,7 +844,7 @@ EOF
           = ($fakeAt,$fakeFs,$fakeBs,$fakeCom,$fakeBang,$fake_cE,$fake_cW);
 
         $actual = $use_oo
-           ? callPkgNew()->dvis($dvis_input)
+           ? Data::Dumper::Interp->new()->dvis($dvis_input)
            : dvis($dvis_input);
 
         checkspunct('$@',  $@,   $fakeAt);
@@ -878,11 +880,11 @@ EOF
       next
         if !$useqq && $input =~ tr/\0-\377//c;
       my $exp = doquoting($input, $useqq);
-      my $act = callPkgNew()->Useqq($useqq)->vis($input);
+      my $act = Data::Dumper::Interp->new()->Useqq($useqq)->vis($input);
       die "\n\nUseqq ",u($useqq)," bug:\n"
-         ."   Input   «${input}»\n"
-         ."  Expected «${exp}»\n"
-         ."       Got «${act}»\n "
+         ."     Input ".displaystr($input)."\n"
+         ."  Expected ".displaystr($exp)."\n"
+         ."       Got ".displaystr($act)."\n"
         unless $exp eq $act;
     }
   }
@@ -894,12 +896,13 @@ sub f($) {
   get_closure(1);
   get_closure(1);
   $code->(@_);
-  die "Punct save/restore imbalance" if getPkgAry('save_stack') != 0;
+  die "Punct save/restore imbalance" if @Data::Dumper::save_stack != 0;
 }
 sub g($) {
   local $_ = 'SHOULD NEVER SEE THIS';
   goto &f;
 }
+confess "Non-zero CHILD_ERROR ($?)" if $? != 0;
 &g(42,$toplex_ar);
 
 #print "Tests passed.\n";

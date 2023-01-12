@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact::PageSource::DBI;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001001';
+our $VERSION   = '0.001002';
 
 use Moo;
 use Types::Common -types;

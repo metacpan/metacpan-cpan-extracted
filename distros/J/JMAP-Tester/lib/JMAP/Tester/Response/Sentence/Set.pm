@@ -1,5 +1,5 @@
-use v5.10.0;
-package JMAP::Tester::Response::Sentence::Set 0.102;
+use v5.14.0;
+package JMAP::Tester::Response::Sentence::Set 0.103;
 # ABSTRACT: the kind of sentence you get in reply to a setFoos call
 
 use Moo;
@@ -182,13 +182,23 @@ JMAP::Tester::Response::Sentence::Set - the kind of sentence you get in reply to
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 OVERVIEW
 
 A "Set" sentence is a kind of L<Sentence|JMAP::Tester::Response::Sentence>
 for representing C<foosSet> results.  It has convenience methods for getting
 out the data returned in these kinds of sentences.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -254,11 +264,11 @@ This returns a hashref mapping object ids to error properties.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by FastMail, Ltd.
+This software is copyright (c) 2016 by Fastmail Pty. Ltd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

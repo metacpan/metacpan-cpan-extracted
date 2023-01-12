@@ -39,21 +39,24 @@ struct ClassHookFuncs {
   const char *permit_hintkey;
 
   /* called immediately at apply time; return FALSE means it did its thing immediately, so don't store it */
-  bool (*apply)(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr, void *funcdata);
+  bool (*apply)(pTHX_ ClassMeta *classmeta, SV *value, SV **attrdata_ptr, void *funcdata);
 
   /* called immediately before class seal */
-  void (*pre_seal)(pTHX_ ClassMeta *classmeta, SV *hookdata, void *funcdata);
+  void (*pre_seal)(pTHX_ ClassMeta *classmeta, SV *attrdata, void *funcdata);
   /* called immediately after class seal */
-  void (*post_seal)(pTHX_ ClassMeta *classmeta, SV *hookdata, void *funcdata);
+  void (*post_seal)(pTHX_ ClassMeta *classmeta, SV *attrdata, void *funcdata);
 
   /* called by mop_class_add_field() */
-  void (*post_add_field)(pTHX_ ClassMeta *classmeta, SV *hookdata, void *funcdata, FieldMeta *fieldmeta);
+  void (*post_add_field)(pTHX_ ClassMeta *classmeta, SV *attrdata, void *funcdata, FieldMeta *fieldmeta);
 };
 
 struct ClassHook {
   const struct ClassHookFuncs *funcs;
   void *funcdata;
-  SV *hookdata;
+  union {
+    SV *attrdata;
+    SV *hookdata; // old name
+  };
 };
 
 struct FieldHookFuncs {
@@ -62,18 +65,18 @@ struct FieldHookFuncs {
   const char *permit_hintkey;
 
   /* called immediately at apply time; return FALSE means it did its thing immediately, so don't store it */
-  bool (*apply)(pTHX_ FieldMeta *fieldmeta, SV *value, SV **hookdata_ptr, void *funcdata);
+  bool (*apply)(pTHX_ FieldMeta *fieldmeta, SV *value, SV **attrdata_ptr, void *funcdata);
 
   /* called at the end of `has` statement compiletime */
-  void (*seal)(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *funcdata);
+  void (*seal)(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *funcdata);
 
   /* called as part of accessor generation */
-  void (*gen_accessor_ops)(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *funcdata,
+  void (*gen_accessor_ops)(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *funcdata,
           enum AccessorType type, struct AccessorGenerationCtx *ctx);
 
   /* called by constructor */
-  void (*post_initfield)(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *funcdata, SV *field);
-  void (*post_construct)(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *funcdata, SV *field);
+  void (*post_initfield)(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *funcdata, SV *field);
+  void (*post_construct)(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *funcdata, SV *field);
 };
 
 struct FieldHook {
@@ -81,7 +84,10 @@ struct FieldHook {
   FieldMeta *fieldmeta;
   const struct FieldHookFuncs *funcs;
   void *funcdata;
-  SV *hookdata;
+  union {
+    SV *attrdata;
+    SV *hookdata; // old name
+  };
 };
 
 enum MetaType {

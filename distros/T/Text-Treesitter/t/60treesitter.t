@@ -15,6 +15,8 @@ my $ts = Text::Treesitter->new(
 my $tree = $ts->parse_string( "1 + 2" );
 my $root = $tree->root_node;
 
+is( $root->tree, $tree, '$root->tree is $tree' );
+
 ## The following is quite fragile based on the grammar for the program above.
 #  We'll try to do our best
 

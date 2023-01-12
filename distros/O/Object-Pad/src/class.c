@@ -140,10 +140,10 @@ void ObjectPad_mop_class_apply_attribute(pTHX_ ClassMeta *classmeta, const char 
     if((reg->funcs->flags & OBJECTPAD_FLAG_ATTR_MUST_VALUE) && !value)
       croak("Attribute :%s requires a value", name);
 
-    SV *hookdata = value;
+    SV *attrdata = value;
 
     if(reg->funcs->apply) {
-      if(!(*reg->funcs->apply)(aTHX_ classmeta, value, &hookdata, reg->funcdata))
+      if(!(*reg->funcs->apply)(aTHX_ classmeta, value, &attrdata, reg->funcdata))
         return;
     }
 
@@ -156,12 +156,12 @@ void ObjectPad_mop_class_apply_attribute(pTHX_ ClassMeta *classmeta, const char 
     *hook = (struct ClassHook){
       .funcs    = reg->funcs,
       .funcdata = reg->funcdata,
-      .hookdata = hookdata,
+      .attrdata = attrdata,
     };
 
     av_push(classmeta->hooks, (SV *)hook);
 
-    if(value && value != hookdata)
+    if(value && value != attrdata)
       SvREFCNT_dec(value);
 
     return;
@@ -964,7 +964,7 @@ static struct FieldHook *S_embed_fieldhook(pTHX_ struct FieldHook *roleh, FIELDO
     .fieldix   = roleh->fieldix + offset,
     .fieldmeta = roleh->fieldmeta,
     .funcs     = roleh->funcs,
-    .hookdata  = roleh->hookdata,
+    .attrdata  = roleh->attrdata,
   };
 
   return classh;
@@ -1294,7 +1294,7 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
             .fieldmeta = fieldmeta,
             .funcs     = h->funcs,
             .funcdata  = h->funcdata,
-            .hookdata  = h->hookdata,
+            .attrdata  = h->attrdata,
           };
 
           av_push(meta->fieldhooks_initfield, (SV *)fasth);
@@ -1312,7 +1312,7 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
             .fieldmeta = fieldmeta,
             .funcs     = h->funcs,
             .funcdata  = h->funcdata,
-            .hookdata  = h->hookdata,
+            .attrdata  = h->attrdata,
           };
 
           av_push(meta->fieldhooks_construct, (SV *)fasth);
@@ -1540,7 +1540,7 @@ XS_INTERNAL(injected_constructor)
       struct FieldHook *h = (struct FieldHook *)AvARRAY(fieldhooks)[i];
       FIELDOFFSET fieldix = h->fieldix;
 
-      (*h->funcs->post_initfield)(aTHX_ h->fieldmeta, h->hookdata, h->funcdata, fieldsvs[fieldix]);
+      (*h->funcs->post_initfield)(aTHX_ h->fieldmeta, h->attrdata, h->funcdata, fieldsvs[fieldix]);
     }
   }
 
@@ -1677,7 +1677,7 @@ XS_INTERNAL(injected_constructor)
       struct FieldHook *h = (struct FieldHook *)AvARRAY(fieldhooks)[i];
       FIELDOFFSET fieldix = h->fieldix;
 
-      (*h->funcs->post_construct)(aTHX_ h->fieldmeta, h->hookdata, h->funcdata, fieldsvs[fieldix]);
+      (*h->funcs->post_construct)(aTHX_ h->fieldmeta, h->attrdata, h->funcdata, fieldsvs[fieldix]);
     }
   }
 
@@ -2075,7 +2075,7 @@ static const char *S_split_package_ver(pTHX_ SV *value, SV *pkgname, SV *pkgvers
 
 /* :isa */
 
-static bool classhook_isa_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
+static bool classhook_isa_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **attrdata, void *_funcdata)
 {
   SV *superclassname = newSV(0), *superclassver = newSV(0);
   SAVEFREESV(superclassname);
@@ -2116,7 +2116,7 @@ static const struct ClassHookFuncs classhooks_isa = {
 
 /* :does */
 
-static bool classhook_does_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
+static bool classhook_does_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **attrdata, void *_funcdata)
 {
   SV *rolename = newSV(0), *rolever = newSV(0);
   SAVEFREESV(rolename);
@@ -2140,7 +2140,7 @@ static const struct ClassHookFuncs classhooks_does = {
 
 /* :repr */
 
-static bool classhook_repr_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
+static bool classhook_repr_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **attrdata, void *_funcdata)
 {
   char *val = SvPV_nolen(value); /* all comparisons are ASCII */
 
@@ -2172,7 +2172,7 @@ static const struct ClassHookFuncs classhooks_repr = {
 
 /* :compat */
 
-static bool classhook_compat_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
+static bool classhook_compat_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **attrdata, void *_funcdata)
 {
   if(strEQ(SvPV_nolen(value), "invokable")) {
     if(classmeta->type != METATYPE_ROLE)
@@ -2194,7 +2194,7 @@ static const struct ClassHookFuncs classhooks_compat = {
 
 /* :strict */
 
-static bool classhook_strict_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
+static bool classhook_strict_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **attrdata_ptr, void *_funcdata)
 {
   if(strEQ(SvPV_nolen(value), "params"))
     classmeta->strict_params = TRUE;

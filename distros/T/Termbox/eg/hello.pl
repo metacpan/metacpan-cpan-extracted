@@ -4,7 +4,6 @@ use Termbox qw[:all];
 use experimental 'signatures';
 
 # Based on http://electronictoofree.blogspot.com/2018/03/text-based-user-interface-termbox.html
-
 my @chars = split //, 'hello, world!';
 my $code  = tb_init();
 die sprintf "termbox init failed, code: %d\n", $code if $code;

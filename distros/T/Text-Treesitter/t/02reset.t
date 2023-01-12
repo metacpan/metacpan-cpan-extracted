@@ -7,6 +7,7 @@ use Test::More;
 
 use Text::Treesitter::Language;
 use Text::Treesitter::Parser;
+use Text::Treesitter::Tree;
 
 use constant TREE_SITTER_LANGUAGE_FOURFUNC_DIR => "languages/tree-sitter-fourfunc";
 

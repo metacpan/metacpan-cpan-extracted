@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.310';
+our $VERSION = '2.312';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -278,7 +278,7 @@ sub run {
                 $ax->print_error_message( $@ );
                 # remove database from @databases
                 $sf->{i}{login_error} = 1;
-                $dbh->disconnect() if defined $dbh || $dbh->{Active}; ##
+                $dbh->disconnect() if defined $dbh && $dbh->{Active};
                 next DATABASE if @databases              > 1;
                 next PLUGIN   if @{$sf->{o}{G}{plugins}} > 1;
                 last PLUGIN;
@@ -384,13 +384,9 @@ sub run {
 
                 # TABLES
 
-                my $tables_info;
+                my ( $tables_info, $user_table_keys, $sys_table_keys );
                 if ( ! eval {
-                    # if a SQLite database has databases attached, set $schema to undef so that '$dbh->table_info' in
-                    # 'tables_info' returns also the tables from the attached databases
-                    # if a SQLite database has databases attached, the fully qualified table name is used in the SQL
-                    # code regardless of the setting of the option 'qualified_table_name'.
-                    $tables_info = $plui->tables_info( $dbh, $sf->{i}{db_attached} ? undef : $schema );
+                    ( $tables_info, $user_table_keys, $sys_table_keys ) = $plui->tables_info( $dbh, $schema, $is_system_schema );
                     1 }
                 ) {
                     $ax->print_error_message( $@ );
@@ -400,19 +396,9 @@ sub run {
                     next PLUGIN    if @{$sf->{o}{G}{plugins}} > 1;
                     last PLUGIN;
                 }
-                my ( $user_tables, $sys_tables ) = ( [], [] );
-                for my $table ( sort keys %$tables_info ) {
-                    if ( $tables_info->{$table}[3] =~ /SYSTEM/ ) {
-                        # next if ! $sf->{o}{G}{metadata}; # not required because already filtered in 'tables_info'
-                        push @$sys_tables, $table;
-                    }
-                    else {
-                        push @$user_tables, $table;
-                    }
-                }
                 $sf->{d}{tables_info} = $tables_info;
-                $sf->{d}{user_tables} = $user_tables;
-                $sf->{d}{sys_tables}  = $sys_tables;
+                $sf->{d}{user_table_keys} = $user_table_keys;
+                $sf->{d}{sys_table_keys}  = $sf->{o}{G}{metadata} ? $sys_table_keys : [];
                 my $old_idx_tbl = 1;
 
                 TABLE: while ( 1 ) {
@@ -425,11 +411,16 @@ sub run {
                     }
                     else {
                         my $menu_table;
-                        if ( $is_system_schema ) {
-                            $menu_table = [ $hidden, undef, map( "- $_", sort( @$user_tables, @$sys_tables ) ) ];
+                        if ( $sf->{o}{G}{metadata} ) {
+                            if ( $is_system_schema ) {
+                                $menu_table = [ $hidden, undef, map( "- $_", @$sys_table_keys ) ];
+                            }
+                            else {
+                                $menu_table = [ $hidden, undef, map( "- $_", @$user_table_keys ), map( "  $_", @$sys_table_keys ) ];
+                            }
                         }
                         else {
-                            $menu_table = [ $hidden, undef, map( "- $_", @$user_tables ), map( "  $_", @$sys_tables ) ];
+                            $menu_table = [ $hidden, undef, map( "- $_", @$user_table_keys ) ];
                         }
                         push @$menu_table, $from_subquery if $sf->{o}{enable}{m_derived};
                         push @$menu_table, $join          if $sf->{o}{enable}{join};
@@ -483,23 +474,21 @@ sub run {
                         my $cda = App::DBBrowser::CreateDropAttach->new( $sf->{i}, $sf->{o}, $sf->{d} );
                         my $ok = $cda->create_drop_or_attach();
                         if ( $ok ) {
-                            $sf->{redo_db}     = $sf->{d}{db};
                             $sf->{redo_schema} = $sf->{d}{schema};
-                            $sf->{redo_table}  = $table; # redo 'create_drop_or_attach' if $table eq $hidden
+                            $sf->{redo_table}  = $table;  # to go back automatically into the create_drop_or_attach menu after loop
+                            if ( $ok == 3 ) {
+                                $sf->{redo_db} = $db;
+                                $dbh->disconnect();
+                                next DATABASE; # loop to DATABASE to attach/detach databases
+                            }
+                            else {
+                                next SCHEMA; # loop to SCHEMA to update the list of tables
+                            }
                         }
                         else {
-                            # when leaving the 'create_drop_or_attach'-menu:
-                            delete $sf->{i}{ss} if exists $sf->{i}{ss};  # deletes any existing saved books
-                            delete $sf->{i}{gc} if exists $sf->{i}{gc};  # datasource file: delete menu memory
+                            # leave 'create_drop_or_attach'-menu without reentering when the return value is false
+                            next TABLE
                         }
-                        if ( $sf->{redo_db} ) {
-                            $dbh->disconnect();
-                            next DATABASE;
-                        }
-                        elsif ( $sf->{redo_schema} ) {
-                            next SCHEMA;
-                        }
-                        next TABLE;
                     }
                     my ( $qt_table, $qt_columns );
                     if ( $table eq $join ) {
@@ -534,7 +523,7 @@ sub run {
                         $sf->{i}{special_table} = '';
                         if ( ! eval {
                             $table =~ s/^[-\ ]\s//;
-                            $sf->{d}{table} = $table;
+                            $sf->{d}{table_key} = $table;
                             my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
                             $qt_table = $ax->quote_table( $sf->{d}{tables_info}{$table} );
                             $sf->{d}{cols} = $ax->column_names( $qt_table );
@@ -545,13 +534,18 @@ sub run {
                             next TABLE;
                         }
                     }
+                    my $table_footer;
                     if ( $sf->{i}{special_table} ) {
-                        $sf->{d}{table} = ucfirst $sf->{i}{special_table};
+                        $table_footer = ucfirst $sf->{i}{special_table};
                         my $qc = quotemeta $sf->{i}{quote_char};
                         if ( $qt_table =~ /\sAS\s$qc([^$qc]+)$qc\z/ ) {
-                            $sf->{d}{table} .= ': ' . $1;
+                            $table_footer .= ': ' . $1;
                         }
                     }
+                    else {
+                        $table_footer = $sf->{d}{table_key};
+                    }
+                    $sf->{d}{table_footer} = "     '$table_footer'     ";
                     require App::DBBrowser::Table;
                     my $tbl = App::DBBrowser::Table->new( $sf->{i}, $sf->{o}, $sf->{d} );
                     $tbl->browse_the_table( $qt_table, $qt_columns );
@@ -605,7 +599,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.310
+Version 2.312
 
 =head1 DESCRIPTION
 

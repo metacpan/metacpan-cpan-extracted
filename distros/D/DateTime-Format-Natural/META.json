@@ -20,9 +20,7 @@
             "File::Find" : "0",
             "File::Spec" : "0",
             "FindBin" : "0",
-            "Module::Util" : "0",
-            "Test::MockTime::HiRes" : "0",
-            "Test::More" : "0"
+            "Module::Util" : "0"
          }
       },
       "configure" : {
@@ -49,12 +47,18 @@
             "Term::ReadLine" : "0",
             "boolean" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::MockTime::HiRes" : "0",
+            "Test::More" : "0"
+         }
       }
    },
    "provides" : {
       "DateTime::Format::Natural" : {
          "file" : "lib/DateTime/Format/Natural.pm",
-         "version" : "1.14"
+         "version" : "1.15"
       },
       "DateTime::Format::Natural::Calc" : {
          "file" : "lib/DateTime/Format/Natural/Calc.pm",
@@ -122,6 +126,6 @@
          "url" : "https://github.com/stsc/DateTime-Format-Natural"
       }
    },
-   "version" : "1.14",
+   "version" : "1.15",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

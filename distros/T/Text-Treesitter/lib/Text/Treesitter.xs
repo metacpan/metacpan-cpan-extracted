@@ -14,17 +14,17 @@
 #include <dlfcn.h>
 
 typedef TSLanguage    *Text__Treesitter__Language;
-typedef TSNode         Text__Treesitter__Node;
+typedef TSNode         Text__Treesitter___Node;
 typedef TSParser      *Text__Treesitter__Parser;
 typedef TSQuery       *Text__Treesitter__Query;
 typedef TSQueryCursor *Text__Treesitter__QueryCursor;
 typedef TSQueryMatch   Text__Treesitter__QueryMatch;
-typedef TSTree        *Text__Treesitter__Tree;
+typedef TSTree        *Text__Treesitter___Tree;
 
 static SV *S_newSVnode(pTHX_ TSNode node)
 {
   SV *sv = newSV(0);
-  sv_setref_pvn(sv, "Text::Treesitter::Node", (void *)&node, sizeof(node));
+  sv_setref_pvn(sv, "Text::Treesitter::_Node", (void *)&node, sizeof(node));
   return sv;
 }
 #define newSVnode(node)  S_newSVnode(aTHX_ node)
@@ -69,15 +69,15 @@ U32 ts_language_field_count(Text::Treesitter::Language self)
 
 const char *ts_language_field_name_for_id(Text::Treesitter::Language self, U16 field)
 
-MODULE = Text::Treesitter  PACKAGE = Text::Treesitter::Node  PREFIX = ts_node_
+MODULE = Text::Treesitter  PACKAGE = Text::Treesitter::_Node  PREFIX = ts_node_
 
-const char *ts_node_type(Text::Treesitter::Node self)
+const char *ts_node_type(Text::Treesitter::_Node self)
 
-U32 ts_node_start_byte(Text::Treesitter::Node self)
+U32 ts_node_start_byte(Text::Treesitter::_Node self)
 
-U32 ts_node_end_byte(Text::Treesitter::Node self)
+U32 ts_node_end_byte(Text::Treesitter::_Node self)
 
-void start_point(Text::Treesitter::Node self)
+void start_point(Text::Treesitter::_Node self)
   ALIAS:
     start_point = 0
     end_point   = 1
@@ -90,23 +90,23 @@ void start_point(Text::Treesitter::Node self)
     XSRETURN(2);
   }
 
-bool ts_node_is_null(Text::Treesitter::Node self)
+bool ts_node_is_null(Text::Treesitter::_Node self)
 
-bool ts_node_is_named(Text::Treesitter::Node self)
+bool ts_node_is_named(Text::Treesitter::_Node self)
 
-bool ts_node_is_missing(Text::Treesitter::Node self)
+bool ts_node_is_missing(Text::Treesitter::_Node self)
 
-bool ts_node_is_extra(Text::Treesitter::Node self)
+bool ts_node_is_extra(Text::Treesitter::_Node self)
 
-bool ts_node_has_changes(Text::Treesitter::Node self)
+bool ts_node_has_changes(Text::Treesitter::_Node self)
 
-bool ts_node_has_error(Text::Treesitter::Node self)
+bool ts_node_has_error(Text::Treesitter::_Node self)
 
-Text::Treesitter::Node ts_node_parent(Text::Treesitter::Node self)
+Text::Treesitter::_Node ts_node_parent(Text::Treesitter::_Node self)
 
-U32 ts_node_child_count(Text::Treesitter::Node self)
+U32 ts_node_child_count(Text::Treesitter::_Node self)
 
-void child_nodes(Text::Treesitter::Node self)
+void child_nodes(Text::Treesitter::_Node self)
   ALIAS:
     child_nodes = 0
     field_names_with_child_nodes = 1
@@ -144,7 +144,7 @@ void DESTROY(Text::Treesitter::Parser self)
 
 bool ts_parser_set_language(Text::Treesitter::Parser self, Text::Treesitter::Language lang)
 
-Text::Treesitter::Tree parse_string(Text::Treesitter::Parser self, SV *str)
+Text::Treesitter::_Tree _parse_string(Text::Treesitter::Parser self, SV *str)
   CODE:
     SvGETMAGIC(str);
 
@@ -221,7 +221,9 @@ void DESTROY(Text::Treesitter::QueryCursor self)
   CODE:
     ts_query_cursor_delete(self);
 
-void ts_query_cursor_exec(Text::Treesitter::QueryCursor self, Text::Treesitter::Query query, Text::Treesitter::Node node)
+void _exec(Text::Treesitter::QueryCursor self, Text::Treesitter::Query query, Text::Treesitter::_Node node)
+  CODE:
+    ts_query_cursor_exec(self, query, node);
 
 SV *next_match(Text::Treesitter::QueryCursor self)
   CODE:
@@ -255,7 +257,7 @@ U32 capture_count(Text::Treesitter::QueryMatch self)
   OUTPUT:
     RETVAL
 
-Text::Treesitter::Node node_for_capture(Text::Treesitter::QueryMatch self, U32 capture_index)
+Text::Treesitter::_Node node_for_capture(Text::Treesitter::QueryMatch self, U32 capture_index)
   CODE:
     if(capture_index >= self.capture_count)
       croak("index_for_capture: capture index out of bounds");
@@ -271,20 +273,24 @@ U32 index_for_capture(Text::Treesitter::QueryMatch self, U32 capture_index)
   OUTPUT:
     RETVAL
 
-MODULE = Text::Treesitter  PACKAGE = Text::Treesitter::Tree  PREFIX = ts_tree_
+MODULE = Text::Treesitter  PACKAGE = Text::Treesitter::_Tree  PREFIX = ts_tree_
 
-void DESTROY(Text::Treesitter::Tree self)
+void DESTROY(Text::Treesitter::_Tree self)
   CODE:
     ts_tree_delete(self);
 
-void print_dot_graph_stdout(Text::Treesitter::Tree self)
+void print_dot_graph_stdout(Text::Treesitter::_Tree self)
   ALIAS:
     print_dot_graph_stdout = 1
     print_dot_graph_stderr = 2
   CODE:
     ts_tree_print_dot_graph(self, ix == 1 ? stdout : stderr);
 
-Text::Treesitter::Node ts_tree_root_node(Text::Treesitter::Tree self)
+Text::Treesitter::_Node _root_node(Text::Treesitter::_Tree self)
+  CODE:
+    RETVAL = ts_tree_root_node(self);
+  OUTPUT:
+    RETVAL
 
 MODULE = Text::Treesitter  PACKAGE = Text::Treesitter
 

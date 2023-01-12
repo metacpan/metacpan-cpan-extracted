@@ -1,20 +1,39 @@
-#!/usr/bin/perl
+pp_add_exported(
+  'rgb_to_xyz', 'xyz_to_rgb',
+  'xyz_to_lab', 'lab_to_xyz',
+  'rgb_to_lch', 'lch_to_rgb',
+  'rgb_to_lab', 'lab_to_rgb',
+  'add_rgb_space',
+);
 
-pp_add_exported('', 'rgb_to_cmyk', 'cmyk_to_rgb', 'hsl_to_rgb', 'rgb_to_hsl', 'rgb_to_hsv', 'hsv_to_rgb', 'rgb_to_xyz', 'xyz_to_rgb', 'xyY_to_xyz', 'xyz_to_lab', 'lab_to_xyz', 'lab_to_lch', 'lch_to_lab', 'rgb_to_lch', 'lch_to_rgb', 'lch_to_lab', 'add_rgb_space');
-
-$PDL::Graphics::ColorSpace::VERSION = '0.201';
+$PDL::Graphics::ColorSpace::VERSION = '0.203';
 
 pp_setversion("'$PDL::Graphics::ColorSpace::VERSION'");
 
 pp_addpm({At=>'Top'}, <<'EOD');
 
+=encoding utf8
+
 =head1 NAME
 
 PDL::Graphics::ColorSpace
 
-=head1 VERSION
+=head1 SYNOPSIS
 
-0.1.0
+    use PDL::LiteF;
+    use PDL::IO::Pic;
+    use PDL::Graphics::ColorSpace;
+
+    my $image_rgb = PDL->rpic('photo.jpg') if PDL->rpiccan('JPEG');
+
+    # convert RGB value from [0,255] to [0,1]
+    $image_rgb = $image_rgb->double / 255;
+
+    my $image_xyz = $image_rgb->rgb_to_xyz( 'sRGB' );
+
+Or
+
+    my $image_xyz = rgb_to_xyz( $image_rgb, 'sRGB' );
 
 =head1 DESCRIPTION
 
@@ -64,7 +83,7 @@ For more info, see L<http://www.chaospro.de/documentation/html/paletteeditor/col
 
 =head2 XYZ and xyY
 
-The CIE XYZ color space was derived the CIE RGB color space. XYZ are three hypothetical primaries. Y means brightness, Z is quasi-equal to blue stimulation, and X is a mix which looks like red sensitivy curve of cones.  All visible colors can be represented by using only positive values of X, Y, and Z. The main advantage of the CIE XYZ space (and any color space based on it) is that this space is completely device-independent.
+The CIE XYZ color space was derived the CIE RGB color space. XYZ are three hypothetical primaries. Y means brightness, Z is quasi-equal to blue stimulation, and X is a mix which looks like red sensitivity curve of cones.  All visible colors can be represented by using only positive values of X, Y, and Z. The main advantage of the CIE XYZ space (and any color space based on it) is that this space is completely device-independent.
 
 For more info, see L<http://en.wikipedia.org/wiki/CIE_1931_color_space>.
 
@@ -86,26 +105,9 @@ If we take a horizontal slice through the centre, we see a coloured circle. Arou
 
 For more info, see L<http://www.colourphil.co.uk/lab_lch_colour_space.html>.
 
-=head1 SYNOPSIS
-
-    use PDL::LiteF;
-    use PDL::IO::Pic;
-    use PDL::Graphics::ColorSpace;
-
-    my $image_rgb = PDL->rpic('photo.jpg') if PDL->rpiccan('JPEG');
-
-    # convert RGB value from [0,255] to [0,1]
-    $image_rgb = $image_rgb->double / 255;
-
-    my $image_xyz = $image_rgb->rgb_to_xyz( 'sRGB' );
-
-Or
-
-    my $image_xyz = rgb_to_xyz( $image_rgb, 'sRGB' );
-
 =head1 OPTIONS
 
-Some conversions require specifying the RGB space which includes gamma curve and white point definitions. Supported RGB space include (aliases in square brackets):
+Some conversions require specifying the RGB space which includes gamma curve and white point definitions. Supported RGB spaces include (aliases in square brackets):
 
     Adobe RGB (1998) [Adobe]
     Apple RGB [Apple]
@@ -123,18 +125,34 @@ Some conversions require specifying the RGB space which includes gamma curve and
     SMPTE-C [SMPTE]
     WideGamut
     sRGB [709] [CIE Rec 709]
+    lsRGB
 
 You can also add custom RGB space definitions via the function add_rgb_space.
-
+Alternatively, as of 0.202 you can directly supply the function with a
+hash-ref in the same format.
 
 =head1 CONVERSIONS
 
-The full list of exported functions include rgb_to_cmyk, cmyk_to_rgb, rgb_to_hsl, hsl_to_rgb, rgb_to_hsv, hsv_to_rgb, rgb_to_xyz, xyz_to_rgb, xyY_to_xyz, xyz_to_lab, lab_to_xyz, lab_to_lch, lch_to_lab, rgb_to_lch, lch_to_rgb, lch_to_lab.
+Some conversions, if not already included as functions, can be achieved
+by chaining existing functions. For example, LCH to HSV conversion can
+be achieved by chaining lch_to_rgb and rgb_to_hsv:
 
-Some conversions, if not already included as functions, can be achieved by chaining existing functions. For example, RGB to Lab conversion can be achieved by chaining rgb_to_xyz and xyz_to_lab.
+    my $hsv = rgb_to_hsv( lch_to_rgb( $lch, 'sRGB' ), 'sRGB' );
 
-    my $lab = xyz_to_lab( rgb_to_xyz( $rgb, 'sRGB' ), 'sRGB' );
+To generate a local diagram of what conversions are available between
+formats, using GraphViz, you can use this script:
 
+  use blib;
+  use PDL::Graphics::ColorSpace;
+  print "digraph {\n";
+  print join(' -> ', split /_to_/), "\n"
+    for grep !/^_/ && /_to_/, @PDL::Graphics::ColorSpace::EXPORT_OK;
+  print "}\n";
+  # then:
+  perl scriptname >d.dot; dot -Tsvg d.dot >d.svg; display d.svg
+
+(As of 0.202, this is everything to and from C<rgb>, plus C<xyz> <->
+C<lab> <-> C<lch>)
 
 =cut
 
@@ -144,8 +162,6 @@ use warnings;
 use Carp;
 use PDL::LiteF;
 use PDL::Graphics::ColorSpace::RGBSpace;
-
-$PDL::onlinedoc->scan(__FILE__) if $PDL::onlinedoc;
 
 my $RGB_SPACE = $PDL::Graphics::ColorSpace::RGBSpace::RGB_SPACE;
 
@@ -158,21 +174,18 @@ pp_addhdr('
 );
 
 pp_def('rgb_to_cmyk',
-    Pars => 'double rgb(c=3); double [o]cmyk(d=4)',
-    Code => '
-        rgb2cmyk($P(rgb), $P(cmyk));
-    ',
-
+    Pars => 'rgb(c=3); [o]cmyk(d=4)',
     HandleBad => 1,
-    BadCode => '
+    GenericTypes=>['D'],
+    Code => '
         /* First check for bad values */
-        if ($ISBAD(rgb(c=>0)) || $ISBAD(rgb(c=>1)) || $ISBAD(rgb(c=>2))) {
+        PDL_IF_BAD(if ($ISBAD(rgb(c=>0)) || $ISBAD(rgb(c=>1)) || $ISBAD(rgb(c=>2))) {
             loop (d) %{
                 $SETBAD(cmyk());
             %}
             /* skip to the next cmyk triple */
         }
-        else {
+        else,) {
             rgb2cmyk($P(rgb), $P(cmyk));
         }
     ',
@@ -183,9 +196,9 @@ pp_def('rgb_to_cmyk',
 
 =for ref
 
-Converts an RGB color triple to an CYMK color quadruple.
+Converts an RGB color triple to an CMYK color quadruple.
 
-The first dimension of the piddles holding the rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...). The first dimension of the piddles holding the cmyk values must be size 4.
+The first dimension of the ndarrays holding the rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...). The first dimension of the ndarrays holding the cmyk values must be size 4.
 
 =for usage
 
@@ -200,7 +213,7 @@ DOCUMENTATION
 
 =for bad
 
-If C<rgb_to_cmyk> encounters a bad value in any of the R, G, or B values the output piddle will be marked as bad and the associated C, M, Y, and K values will all be marked as bad.
+If C<rgb_to_cmyk> encounters a bad value in any of the R, G, or B values the output ndarray will be marked as bad and the associated C, M, Y, and K values will all be marked as bad.
 
 =cut
 
@@ -209,20 +222,18 @@ BADDOC
 
 
 pp_def('cmyk_to_rgb',
-    Pars => 'double cmyk(d=4); double [o]rgb(c=3)',
-    Code => '
-        cmyk2rgb($P(cmyk), $P(rgb));
-    ',
+    Pars => 'cmyk(d=4); [o]rgb(c=3)',
     HandleBad => 1,
-    BadCode => '
+    GenericTypes=>['D'],
+    Code => '
         /* First check for bad values */
-        if ($ISBAD(cmyk(d=>0)) || $ISBAD(cmyk(d=>1)) || $ISBAD(cmyk(d=>2)) || $ISBAD(cmyk(d=>3))) {
+        PDL_IF_BAD(if ($ISBAD(cmyk(d=>0)) || $ISBAD(cmyk(d=>1)) || $ISBAD(cmyk(d=>2)) || $ISBAD(cmyk(d=>3))) {
             loop (c) %{
                 $SETBAD(rgb());
             %}
             /* skip to the next cmyk triple */
         }
-        else {
+        else,) {
             cmyk2rgb($P(cmyk), $P(rgb));
         }
     ',
@@ -232,9 +243,9 @@ pp_def('cmyk_to_rgb',
 
 =for ref
 
-Converts an CYMK color quadruple to an RGB color triple
+Converts an CMYK color quadruple to an RGB color triple
 
-The first dimension of the piddles holding the cmyk values must be size 4, i.e. the dimensions must look like (4, m, n, ...). The first dimension of the piddle holding the rgb values must be 3.
+The first dimension of the ndarrays holding the cmyk values must be size 4, i.e. the dimensions must look like (4, m, n, ...). The first dimension of the ndarray holding the rgb values must be 3.
 
 =for usage
 
@@ -249,7 +260,7 @@ DOCUMENTATION
 
 =for bad
 
-If C<cmyk_to_rgb> encounters a bad value in any of the C, M, Y, or K quantities, the output piddle will be marked as bad and the associated R, G, and B color values will all be marked as bad.
+If C<cmyk_to_rgb> encounters a bad value in any of the C, M, Y, or K quantities, the output ndarray will be marked as bad and the associated R, G, and B color values will all be marked as bad.
 
 =cut
 
@@ -258,21 +269,19 @@ BADDOC
 
 
 pp_def('rgb_to_hsl',
-    Pars => 'double rgb(c=3); double [o]hsl(c=3)',
-    Code => '
-        rgb2hsl($P(rgb), $P(hsl));
-    ',
-
+    Pars => 'rgb(c=3); [o]hsl(c=3)',
     HandleBad => 1,
-    BadCode => '
+    Inplace => 1,
+    GenericTypes=>['D'],
+    Code => '
         /* First check for bad values */
-        if ($ISBAD(rgb(c=>0)) || $ISBAD(rgb(c=>1)) || $ISBAD(rgb(c=>2))) {
+        PDL_IF_BAD(if ($ISBAD(rgb(c=>0)) || $ISBAD(rgb(c=>1)) || $ISBAD(rgb(c=>2))) {
             loop (c) %{
                 $SETBAD(hsl());
             %}
             /* skip to the next hsl triple */
         }
-        else {
+        else,) {
             rgb2hsl($P(rgb), $P(hsl));
         }
     ',
@@ -285,7 +294,7 @@ pp_def('rgb_to_hsl',
 
 Converts an RGB color triple to an HSL color triple.
 
-The first dimension of the piddles holding the hsl and rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+The first dimension of the ndarrays holding the hsl and rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
 
 =for usage
 
@@ -300,7 +309,7 @@ DOCUMENTATION
 
 =for bad
 
-If C<rgb_to_hsl> encounters a bad value in any of the R, G, or B values the output piddle will be marked as bad and the associated H, S, and L values will all be marked as bad.
+If C<rgb_to_hsl> encounters a bad value in any of the R, G, or B values the output ndarray will be marked as bad and the associated H, S, and L values will all be marked as bad.
 
 =cut
 
@@ -309,20 +318,19 @@ BADDOC
 
 
 pp_def('hsl_to_rgb',
-    Pars => 'double hsl(c=3); double [o]rgb(c=3)',
-    Code => '
-        hsl2rgb($P(hsl), $P(rgb));
-    ',
+    Pars => 'hsl(c=3); [o]rgb(c=3)',
     HandleBad => 1,
-    BadCode => '
+    Inplace => 1,
+    GenericTypes=>['D'],
+    Code => '
         /* First check for bad values */
-        if ($ISBAD(hsl(c=>0)) || $ISBAD(hsl(c=>1)) || $ISBAD(hsl(c=>2))) {
+        PDL_IF_BAD(if ($ISBAD(hsl(c=>0)) || $ISBAD(hsl(c=>1)) || $ISBAD(hsl(c=>2))) {
             loop (c) %{
                 $SETBAD(rgb());
             %}
             /* skip to the next hsl triple */
         }
-        else {
+        else,) {
             hsl2rgb($P(hsl), $P(rgb));
         }
     ',
@@ -334,7 +342,7 @@ pp_def('hsl_to_rgb',
 
 Converts an HSL color triple to an RGB color triple
 
-The first dimension of the piddles holding the hsl and rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+The first dimension of the ndarrays holding the hsl and rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
 
 =for usage
 
@@ -349,7 +357,7 @@ DOCUMENTATION
 
 =for bad
 
-If C<hsl_to_rgb> encounters a bad value in any of the H, S, or V quantities, the output piddle will be marked as bad and the associated R, G, and B color values will all be marked as bad.
+If C<hsl_to_rgb> encounters a bad value in any of the H, S, or V quantities, the output ndarray will be marked as bad and the associated R, G, and B color values will all be marked as bad.
 
 =cut
 
@@ -358,21 +366,19 @@ BADDOC
 
 
 pp_def('rgb_to_hsv',
-    Pars => 'double rgb(c=3); double [o]hsv(c=3)',
-    Code => '
-        rgb2hsv($P(rgb), $P(hsv));
-    ',
-
+    Pars => 'rgb(c=3); [o]hsv(c=3)',
     HandleBad => 1,
-    BadCode => '
+    Inplace => 1,
+    GenericTypes=>['D'],
+    Code => '
         /* First check for bad values */
-        if ($ISBAD(rgb(c=>0)) || $ISBAD(rgb(c=>1)) || $ISBAD(rgb(c=>2))) {
+        PDL_IF_BAD(if ($ISBAD(rgb(c=>0)) || $ISBAD(rgb(c=>1)) || $ISBAD(rgb(c=>2))) {
             loop (c) %{
                 $SETBAD(hsv());
             %}
             /* skip to the next hsv triple */
         }
-        else {
+        else,) {
             rgb2hsv($P(rgb), $P(hsv));
         }
     ',
@@ -385,7 +391,7 @@ pp_def('rgb_to_hsv',
 
 Converts an RGB color triple to an HSV color triple.
 
-The first dimension of the piddles holding the hsv and rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+The first dimension of the ndarrays holding the hsv and rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
 
 =for usage
 
@@ -400,7 +406,7 @@ DOCUMENTATION
 
 =for bad
 
-If C<rgb_to_hsv> encounters a bad value in any of the R, G, or B values the output piddle will be marked as bad and the associated H, S, and V values will all be marked as bad.
+If C<rgb_to_hsv> encounters a bad value in any of the R, G, or B values the output ndarray will be marked as bad and the associated H, S, and V values will all be marked as bad.
 
 =cut
 
@@ -409,21 +415,19 @@ BADDOC
 
 
 pp_def('hsv_to_rgb',
-    Pars => 'double hsv(c=3); double [o]rgb(c=3)',
-    Code => '
-        hsv2rgb($P(hsv), $P(rgb));
-    ',
-
+    Pars => 'hsv(c=3); [o]rgb(c=3)',
     HandleBad => 1,
-    BadCode => '
+    Inplace => 1,
+    GenericTypes=>['D'],
+    Code => '
         /* First check for bad values */
-        if ($ISBAD(hsv(c=>0)) || $ISBAD(hsv(c=>1)) || $ISBAD(hsv(c=>2))) {
+        PDL_IF_BAD(if ($ISBAD(hsv(c=>0)) || $ISBAD(hsv(c=>1)) || $ISBAD(hsv(c=>2))) {
             loop (c) %{
                 $SETBAD(rgb());
             %}
             /* skip to the next rgb triple */
         }
-        else {
+        else,) {
             hsv2rgb($P(hsv), $P(rgb));
         }
     ',
@@ -436,7 +440,7 @@ pp_def('hsv_to_rgb',
 
 Converts an HSV color triple to an RGB color triple
 
-The first dimension of the piddles holding the hsv and rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+The first dimension of the ndarrays holding the hsv and rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
 
 =for usage
 
@@ -451,7 +455,7 @@ DOCUMENTATION
 
 =for bad
 
-If C<hsv_to_rgb> encounters a bad value in any of the H, S, or V quantities, the output piddle will be marked as bad and the associated R, G, and B color values will all be marked as bad.
+If C<hsv_to_rgb> encounters a bad value in any of the H, S, or V quantities, the output ndarray will be marked as bad and the associated R, G, and B color values will all be marked as bad.
 
 =cut
 
@@ -460,23 +464,20 @@ BADDOC
 
 
 pp_def('xyY_to_xyz',
-    Pars => 'double xyY(c=3); double [o]xyz(c=3)',
-    Code => '
-        xyY2xyz($P(xyY), $P(xyz));
-    ',
-
+    Pars => 'xyY(c=3); [o]xyz(c=3)',
     Doc => 'Internal function for white point calculation. Use it if you must.',
-
     HandleBad => 1,
-    BadCode => '
+    Inplace => 1,
+    GenericTypes=>['D'],
+    Code => '
         /* First check for bad values */
-        if ($ISBAD(xyY(c=>0)) || $ISBAD(xyY(c=>1)) || $ISBAD(xyY(c=>2))) {
+        PDL_IF_BAD(if ($ISBAD(xyY(c=>0)) || $ISBAD(xyY(c=>1)) || $ISBAD(xyY(c=>2))) {
             loop (c) %{
                 $SETBAD(xyz());
             %}
             /* skip to the next hsl triple */
         }
-        else {
+        else,) {
             xyY2xyz($P(xyY), $P(xyz));
         }
     ',
@@ -484,55 +485,53 @@ pp_def('xyY_to_xyz',
 
 
 pp_def('_rgb_to_xyz',
-    Pars => 'double rgb(c=3); double gamma(); double l(i=3); double m(i=3); double n(i=3); double [o]xyz(c=3)',
-    Code => '
-        rgb2xyz($P(rgb), $gamma(), $P(l), $P(m), $P(n), $P(xyz));
-    ',
-
+    Pars => 'rgb(c=3); gamma(); m(i=3,rows=3); [o]xyz(c=3)',
     HandleBad => 1,
-    BadCode => '
+    Inplace => ['rgb'],
+    GenericTypes=>['D'],
+    Code => '
         /* First check for bad values */
-        if ($ISBAD(rgb(c=>0)) || $ISBAD(rgb(c=>1)) || $ISBAD(rgb(c=>2))) {
+        PDL_IF_BAD(if ($ISBAD(rgb(c=>0)) || $ISBAD(rgb(c=>1)) || $ISBAD(rgb(c=>2))) {
             loop (c) %{
                 $SETBAD(xyz());
             %}
             /* skip to the next xyz triple */
         }
-        else {
-            rgb2xyz($P(rgb), $gamma(), $P(l), $P(m), $P(n), $P(xyz));
+        else,) {
+            rgb2xyz($P(rgb), $gamma(), &$m(i=>0,rows=>0), &$m(i=>0,rows=>1), &$m(i=>0,rows=>2), $P(xyz));
         }
     ',
     Doc => undef,
-    BadDoc => undef,
 );
 
 
 pp_def('_xyz_to_rgb',
-    Pars => 'double xyz(c=3); double gamma(); double l(i=3); double m(i=3); double n(i=3); double [o]rgb(c=3)',
-    Code => '
-        xyz2rgb($P(xyz), $gamma(), $P(l), $P(m), $P(n), $P(rgb));
-    ',
-
+    Pars => 'xyz(c=3); gamma(); mstar(i=3,rows=3); [o]rgb(c=3)',
     HandleBad => 1,
-    BadCode => '
+    Inplace => ['xyz'],
+    GenericTypes=>['D'],
+    Code => '
         /* First check for bad values */
-        if ($ISBAD(xyz(c=>0)) || $ISBAD(xyz(c=>1)) || $ISBAD(xyz(c=>2))) {
+        PDL_IF_BAD(if ($ISBAD(xyz(c=>0)) || $ISBAD(xyz(c=>1)) || $ISBAD(xyz(c=>2))) {
             loop (c) %{
                 $SETBAD(rgb());
             %}
             /* skip to the next rgb triple */
         }
-        else {
-            xyz2rgb($P(xyz), $gamma(), $P(l), $P(m), $P(n), $P(rgb));
+        else,) {
+            xyz2rgb($P(xyz), $gamma(), &$mstar(i=>0,rows=>0), &$mstar(i=>0,rows=>1), &$mstar(i=>0,rows=>2), $P(rgb));
         }
     ',
     Doc => undef,
-    BadDoc => undef,
 );
 
 
 pp_def('_xyz_to_lab',
-    Pars => 'double xyz(c=3); double w(d=2);  double [o]lab(c=3)',
+    Pars => 'xyz(c=3); w(d=2);  [o]lab(c=3)',
+    Doc => undef,
+    HandleBad => 1,
+    Inplace => ['xyz'],
+    GenericTypes=>['D'],
     Code => '
         /* construct white point */
         double xyY[3] = { $w(d=>0), $w(d=>1), 1.0 };
@@ -540,51 +539,29 @@ pp_def('_xyz_to_lab',
         xyY2xyz( &xyY[0], &xyz_white[0] );
 
         threadloop %{
-            xyz2lab( $P(xyz), &xyz_white[0], $P(lab) );
-        %}
-    ',
-    Doc => undef,
-
-    HandleBad => 1,
-    BadCode => '
-        /* construct white point */
-        double xyY[3] = { $w(d=>0), $w(d=>1), 1.0 };
-        double xyz_white[3];
-        xyY2xyz( &xyY[0], &xyz_white[0] );
-
-        threadloop %{
             /* First check for bad values */
-            if ($ISBAD(xyz(c=>0)) || $ISBAD(xyz(c=>1)) || $ISBAD(xyz(c=>2))) {
+            PDL_IF_BAD(if ($ISBAD(xyz(c=>0)) || $ISBAD(xyz(c=>1)) || $ISBAD(xyz(c=>2))) {
                 loop (c) %{
                     $SETBAD(lab());
                 %}
                 /* skip to the next xyz triple */
             }
-            else {
+            else,) {
                 xyz2lab( $P(xyz), &xyz_white[0], $P(lab) );
             }
         %}
     ',
-    BadDoc => undef,
 );
 
 
 pp_def('_lab_to_xyz',
-    Pars => 'double lab(c=3); double w(d=2);  double [o]xyz(c=3)',
-    Code => '
-        /* construct white point */
-        double xyY[3] = { $w(d=>0), $w(d=>1), 1.0 };
-        double xyz_white[3];
-        xyY2xyz( &xyY[0], &xyz_white[0] );
-
-        threadloop %{
-            lab2xyz( $P(lab), &xyz_white[0], $P(xyz) );
-        %}
-    ',
+    Pars => 'lab(c=3); w(d=2);  [o]xyz(c=3)',
     Doc => undef,
 
     HandleBad => 1,
-    BadCode => '
+    Inplace => ['lab'],
+    GenericTypes=>['D'],
+    Code => '
         /* construct white point */
         double xyY[3] = { $w(d=>0), $w(d=>1), 1.0 };
         double xyz_white[3];
@@ -592,37 +569,34 @@ pp_def('_lab_to_xyz',
 
         threadloop %{
             /* First check for bad values */
-            if ($ISBAD(lab(c=>0)) || $ISBAD(lab(c=>1)) || $ISBAD(lab(c=>2))) {
+            PDL_IF_BAD(if ($ISBAD(lab(c=>0)) || $ISBAD(lab(c=>1)) || $ISBAD(lab(c=>2))) {
                 loop (c) %{
                     $SETBAD(xyz());
                 %}
                 /* skip to the next lab triple */
             }
-            else {
+            else,) {
                 lab2xyz( $P(lab), &xyz_white[0], $P(xyz) );
             }
         %}
     ',
-    BadDoc => undef,
 );
 
 
 pp_def('lab_to_lch',
-    Pars => 'double lab(c=3); double [o]lch(c=3)',
-    Code => '
-        lab2lch( $P(lab), $P(lch) );
-    ',
-
+    Pars => 'lab(c=3); [o]lch(c=3)',
     HandleBad => 1,
-    BadCode => '
+    Inplace => 1,
+    GenericTypes=>['D'],
+    Code => '
         /* First check for bad values */
-        if ($ISBAD(lab(c=>0)) || $ISBAD(lab(c=>1)) || $ISBAD(lab(c=>2))) {
+        PDL_IF_BAD(if ($ISBAD(lab(c=>0)) || $ISBAD(lab(c=>1)) || $ISBAD(lab(c=>2))) {
             loop (c) %{
                 $SETBAD(lch());
             %}
             /* skip to the next lch triple */
         }
-        else {
+        else,) {
             lab2lch( $P(lab), $P(lch) );
         }
     ',
@@ -634,7 +608,7 @@ pp_def('lab_to_lch',
 
 Converts an Lab color triple to an LCH color triple.
 
-The first dimension of the piddles holding the lab values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+The first dimension of the ndarrays holding the lab values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
 
 =for usage
 
@@ -649,7 +623,7 @@ DOCUMENTATION
 
 =for bad
 
-If C<lab_to_lch> encounters a bad value in any of the L, a, or b values the output piddle will be marked as bad and the associated L, C, and H values will all be marked as bad.
+If C<lab_to_lch> encounters a bad value in any of the L, a, or b values the output ndarray will be marked as bad and the associated L, C, and H values will all be marked as bad.
 
 =cut
 
@@ -658,21 +632,19 @@ BADDOC
 
 
 pp_def('lch_to_lab',
-    Pars => 'double lch(c=3); double [o]lab(c=3)',
-    Code => '
-        lch2lab( $P(lch), $P(lab) );
-    ',
-
+    Pars => 'lch(c=3); [o]lab(c=3)',
     HandleBad => 1,
-    BadCode => '
+    Inplace => 1,
+    GenericTypes=>['D'],
+    Code => '
         /* First check for bad values */
-        if ($ISBAD(lch(c=>0)) || $ISBAD(lch(c=>1)) || $ISBAD(lch(c=>2))) {
+        PDL_IF_BAD(if ($ISBAD(lch(c=>0)) || $ISBAD(lch(c=>1)) || $ISBAD(lch(c=>2))) {
             loop (c) %{
                 $SETBAD(lab());
             %}
             /* skip to the next lab triple */
         }
-        else {
+        else,) {
             lch2lab( $P(lch), $P(lab) );
         }
     ',
@@ -684,7 +656,7 @@ pp_def('lch_to_lab',
 
 Converts an LCH color triple to an Lab color triple.
 
-The first dimension of the piddles holding the lch values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+The first dimension of the ndarrays holding the lch values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
 
 =for usage
 
@@ -699,13 +671,82 @@ DOCUMENTATION
 
 =for bad
 
-If C<lch_to_lab> encounters a bad value in any of the L, C, or H values the output piddle will be marked as bad and the associated L, a, and b values will all be marked as bad.
+If C<lch_to_lab> encounters a bad value in any of the L, C, or H values the output ndarray will be marked as bad and the associated L, a, and b values will all be marked as bad.
 
 =cut
 
 BADDOC
 );
 
+
+pp_def('rgb_to_linear',
+    Pars => 'rgb(c=3); gamma(); [o]out(c=3)',
+    HandleBad => 1,
+    Inplace => ['rgb'],
+    GenericTypes=>['D'],
+    Code => '
+        PDL_IF_BAD(if ($ISBAD(rgb(c=>0)) || $ISBAD(rgb(c=>1)) || $ISBAD(rgb(c=>2))) {
+            loop (c) %{ $SETBAD(out()); %}
+        }
+        else,) {
+            rgb2linear( $P(rgb), $gamma(), $P(out) );
+        }
+    ',
+    Doc => <<'DOCUMENTATION',
+=for ref
+
+Converts an RGB color triple (presumably with gamma) to an RGB color triple
+with linear values.
+
+=for usage
+
+Usage:
+
+    my $rgb_linear = rgb_to_linear( $gammaed, 2.2 );
+DOCUMENTATION
+    BadDoc => <<BADDOC,
+=for bad
+
+If C<rgb_to_linear> encounters a bad value in any of the R, G, or B
+values the output ndarray will be marked as bad and the associated R,
+G, and B values will all be marked as bad.
+BADDOC
+);
+
+
+pp_def('rgb_from_linear',
+    Pars => 'rgb(c=3); gamma(); [o]out(c=3)',
+    HandleBad => 1,
+    Inplace => ['rgb'],
+    GenericTypes=>['D'],
+    Code => '
+        PDL_IF_BAD(if ($ISBAD(rgb(c=>0)) || $ISBAD(rgb(c=>1)) || $ISBAD(rgb(c=>2))) {
+            loop (c) %{ $SETBAD(out()); %}
+        }
+        else,) {
+            rgb2gamma( $P(rgb), $gamma(), $P(out) );
+        }
+    ',
+    Doc => <<'DOCUMENTATION',
+=for ref
+
+Converts an RGB color triple (presumably linear) to an RGB color triple
+with the specified gamma.
+
+=for usage
+
+Usage:
+
+    my $gammaed = rgb_from_linear( $rgb_linear, 2.2 );
+DOCUMENTATION
+    BadDoc => <<BADDOC,
+=for bad
+
+If C<rgb_from_linear> encounters a bad value in any of the R, G, or B
+values the output ndarray will be marked as bad and the associated R,
+G, and B values will all be marked as bad.
+BADDOC
+);
 
 
 pp_addpm(<<'EOD');
@@ -717,30 +758,27 @@ pp_addpm(<<'EOD');
 
 Converts an RGB color triple to an XYZ color triple.
 
-The first dimension of the piddles holding the rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+The first dimension of the ndarrays holding the rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
 
 =for bad
 
-If C<rgb_to_xyz> encounters a bad value in any of the R, G, or B values the output piddle will be marked as bad and the associated X, Y, and Z values will all be marked as bad.
+If C<rgb_to_xyz> encounters a bad value in any of the R, G, or B values the output ndarray will be marked as bad and the associated X, Y, and Z values will all be marked as bad.
 
 =for usage
 
 Usage:
 
     my $xyz = rgb_to_xyz( $rgb, 'sRGB' );
+    my $xyz = rgb_to_xyz( $rgb, \%rgb_spec );
 
 =cut
 
 *rgb_to_xyz = \&PDL::rgb_to_xyz;
 sub PDL::rgb_to_xyz {
     my ($rgb, $space) = @_;
-
-    croak "Please specify RGB Space ('sRGB' for generic JPEG images)!"
-        if !$space;
-
-    my @m = pdl( $RGB_SPACE->{$space}{m} )->dog;
-
-    return _rgb_to_xyz( $rgb, $RGB_SPACE->{$space}{gamma}, @m );
+    my $spec = get_space($space);
+    my $m = PDL->topdl( $spec->{m} );
+    return _rgb_to_xyz( $rgb, $spec->{gamma}, $m );
 }
 
 
@@ -750,30 +788,27 @@ sub PDL::rgb_to_xyz {
 
 Converts an XYZ color triple to an RGB color triple.
 
-The first dimension of the piddles holding the xyz and rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+The first dimension of the ndarrays holding the xyz and rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
 
 =for bad
 
-If C<xyz_to_rgb> encounters a bad value in any of the X, Y, or Z values the output piddle will be marked as bad and the associated R, G, and B values will all be marked as bad.
+If C<xyz_to_rgb> encounters a bad value in any of the X, Y, or Z values the output ndarray will be marked as bad and the associated R, G, and B values will all be marked as bad.
 
 =for usage
 
 Usage:
 
     my $rgb = xyz_to_rgb( $xyz, 'sRGB' );
+    my $rgb = xyz_to_rgb( $xyz, \%rgb_spec );
 
 =cut
 
 *xyz_to_rgb = \&PDL::xyz_to_rgb;
 sub PDL::xyz_to_rgb {
     my ($xyz, $space) = @_;
-
-    croak "Please specify RGB Space ('sRGB' for generic JPEG images)!"
-        if !$space;
-
-    my @mstar = pdl( $RGB_SPACE->{$space}{mstar} )->dog;
-
-    return _xyz_to_rgb( $xyz, $RGB_SPACE->{$space}{gamma}, @mstar );
+    my $spec = get_space($space);
+    my $mstar = exists $spec->{mstar} ? PDL->topdl( $spec->{mstar} ) : PDL->topdl( $spec->{m} )->inv;
+    return _xyz_to_rgb( $xyz, $spec->{gamma}, $mstar );
 }
 
 
@@ -783,29 +818,26 @@ sub PDL::xyz_to_rgb {
 
 Converts an XYZ color triple to an Lab color triple.
 
-The first dimension of the piddles holding the xyz values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+The first dimension of the ndarrays holding the xyz values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
 
 =for bad
 
-If C<xyz_to_lab> encounters a bad value in any of the X, Y, or Z values the output piddle will be marked as bad and the associated L, a, and b values will all be marked as bad.
+If C<xyz_to_lab> encounters a bad value in any of the X, Y, or Z values the output ndarray will be marked as bad and the associated L, a, and b values will all be marked as bad.
 
 =for usage
 
 Usage:
 
     my $lab = xyz_to_lab( $xyz, 'sRGB' );
+    my $lab = xyz_to_lab( $xyz, \%rgb_spec );
 
 =cut
 
 *xyz_to_lab = \&PDL::xyz_to_lab;
 sub PDL::xyz_to_lab {
     my ($xyz, $space) = @_;
-
-    croak "Please specify RGB Space ('sRGB' for generic JPEG images)!"
-        if !$space;
-
-    my $w = pdl $RGB_SPACE->{$space}{white_point};
-
+    my $spec = get_space($space);
+    my $w = PDL->topdl($spec->{white_point});
     return _xyz_to_lab( $xyz, $w );
 }
 
@@ -816,29 +848,26 @@ sub PDL::xyz_to_lab {
 
 Converts an Lab color triple to an XYZ color triple.
 
-The first dimension of the piddles holding the lab values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+The first dimension of the ndarrays holding the lab values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
 
 =for bad
 
-If C<lab_to_xyz> encounters a bad value in any of the L, a, or b values the output piddle will be marked as bad and the associated X, Y, and Z values will all be marked as bad.
+If C<lab_to_xyz> encounters a bad value in any of the L, a, or b values the output ndarray will be marked as bad and the associated X, Y, and Z values will all be marked as bad.
 
 =for usage
 
 Usage:
 
     my $xyz = lab_to_xyz( $lab, 'sRGB' );
+    my $xyz = lab_to_xyz( $lab, \%rgb_spec );
 
 =cut
 
 *lab_to_xyz = \&PDL::lab_to_xyz;
 sub PDL::lab_to_xyz {
     my ($lab, $space) = @_;
-
-    croak "Please specify RGB Space ('sRGB' for generic JPEG images)!"
-        if !$space;
-
-    my $w = pdl $RGB_SPACE->{$space}{white_point};
-
+    my $spec = get_space($space);
+    my $w = PDL->topdl($spec->{white_point});
     return _lab_to_xyz( $lab, $w );
 }
 
@@ -849,29 +878,26 @@ sub PDL::lab_to_xyz {
 
 Converts an RGB color triple to an LCH color triple.
 
-The first dimension of the piddles holding the rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+The first dimension of the ndarrays holding the rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
 
 =for bad
 
-If C<rgb_to_lch> encounters a bad value in any of the R, G, or B values the output piddle will be marked as bad and the associated L, C, and H values will all be marked as bad.
+If C<rgb_to_lch> encounters a bad value in any of the R, G, or B values the output ndarray will be marked as bad and the associated L, C, and H values will all be marked as bad.
 
 =for usage
 
 Usage:
 
     my $lch = rgb_to_lch( $rgb, 'sRGB' );
+    my $lch = rgb_to_lch( $rgb, \%rgb_spec );
 
 =cut
 
 *rgb_to_lch = \&PDL::rgb_to_lch;
 sub PDL::rgb_to_lch {
     my ($rgb, $space) = @_;
-
-    croak "Please specify RGB Space ('sRGB' for generic JPEG images)!"
-        if !$space;
-
-    my $lab = xyz_to_lab( rgb_to_xyz( $rgb, $space ), $space );
-
+    my $spec = get_space($space);
+    my $lab = xyz_to_lab( rgb_to_xyz( $rgb, $spec ), $spec );
     return lab_to_lch( $lab );
 }
 
@@ -882,35 +908,94 @@ sub PDL::rgb_to_lch {
 
 Converts an LCH color triple to an RGB color triple.
 
-The first dimension of the piddles holding the lch values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+The first dimension of the ndarrays holding the lch values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
 
 =for bad
 
-If C<lch_to_rgb> encounters a bad value in any of the L, C, or H values the output piddle will be marked as bad and the associated R, G, and B values will all be marked as bad.
+If C<lch_to_rgb> encounters a bad value in any of the L, C, or H values the output ndarray will be marked as bad and the associated R, G, and B values will all be marked as bad.
 
 =for usage
 
 Usage:
 
     my $rgb = lch_to_rgb( $lch, 'sRGB' );
+    my $rgb = lch_to_rgb( $lch, \%rgb_spec );
 
 =cut
 
 *lch_to_rgb = \&PDL::lch_to_rgb;
 sub PDL::lch_to_rgb {
     my ($lch, $space) = @_;
-
-    croak "Please specify RGB Space ('sRGB' for generic JPEG images)!"
-        if !$space;
-
-    my $xyz = lab_to_xyz( lch_to_lab( $lch ), $space );
-
-    return xyz_to_rgb( $xyz, $space );
+    my $spec = get_space($space);
+    my $xyz = lab_to_xyz( lch_to_lab( $lch ), $spec );
+    return xyz_to_rgb( $xyz, $spec );
 }
+
+
+=head2 rgb_to_lab
+
+=for ref
+
+Converts an RGB color triple to an LAB color triple.
+
+The first dimension of the ndarrays holding the rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+
+=for bad
+
+If C<rgb_to_lab> encounters a bad value in any of the R, G, or B values the output ndarray will be marked as bad and the associated L, A, and B values will all be marked as bad.
+
+=for usage
+
+Usage:
+
+    my $lab = rgb_to_lab( $rgb, 'sRGB' );
+    my $lab = rgb_to_lab( $rgb, \%rgb_spec );
+
+=cut
+
+*rgb_to_lab = \&PDL::rgb_to_lab;
+sub PDL::rgb_to_lab {
+    my ($rgb, $space) = @_;
+    my $spec = get_space($space);
+    return xyz_to_lab( rgb_to_xyz( $rgb, $spec ), $spec );
+}
+
+
+=head2 lab_to_rgb
+
+=for ref
+
+Converts an LAB color triple to an RGB color triple.
+
+The first dimension of the ndarrays holding the lab values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+
+=for bad
+
+If C<lab_to_rgb> encounters a bad value in any of the L, A, or B values the output ndarray will be marked as bad and the associated R, G, and B values will all be marked as bad.
+
+=for usage
+
+Usage:
+
+    my $rgb = lab_to_rgb( $lab, 'sRGB' );
+    my $rgb = lab_to_rgb( $lab, \%rgb_spec );
+
+=cut
+
+*lab_to_rgb = \&PDL::lab_to_rgb;
+sub PDL::lab_to_rgb {
+    my ($lab, $space) = @_;
+    my $spec = get_space($space);
+    return xyz_to_rgb( lab_to_xyz( $lab, $spec ), $spec );
+}
+
 
 =head2 add_rgb_space
 
-Supports adding custom RGB space definitions.
+Supports adding custom RGB space definitions. The C<m> and C<white_point>
+can be supplied as PDL ndarrays if desired. As of 0.202, you don't need
+to provide an C<mstar> since the inverse of the C<m> will be calculated
+(once) as a default.
 
 Usage:
 
@@ -934,23 +1019,6 @@ Usage:
                      '0.993451333333334'
                    ]
                  ],
-          'mstar' => [
-                       [
-                         '2.74565437614039',
-                         '-0.969256810842655',
-                         '0.0112706581772173'
-                       ],
-                       [
-                         '-1.1358911781912',
-                         '1.87599300082369',
-                         '-0.113958877125197'
-                       ],
-                       [
-                         '-0.435056564214666',
-                         '0.0415556222493375',
-                         '1.01310694059653'
-                       ]
-                     ],
           'white_point' => [
                              '0.312713',
                              '0.329016'
@@ -966,6 +1034,7 @@ Usage:
 =cut
 
 *add_rgb_space = \&PDL::Graphics::ColorSpace::RGBSpace::add_rgb_space;
+*get_space = \&PDL::Graphics::ColorSpace::RGBSpace::get_space;
 
 
 =head1 SEE ALSO

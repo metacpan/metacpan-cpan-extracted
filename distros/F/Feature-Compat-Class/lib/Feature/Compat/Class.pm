@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022-2023 -- leonerd@leonerd.org.uk
 
-package Feature::Compat::Class 0.04;
+package Feature::Compat::Class 0.05;
 
 use v5.14;
 use warnings;
@@ -76,10 +76,13 @@ sub import
    }
    else {
       require Object::Pad;
-      Object::Pad->VERSION( '0.75' );
+      Object::Pad->VERSION( '0.78' );
       Object::Pad->import(qw( class method field ADJUST ),
          ':experimental(init_expr)',
-         ':config(always_strict only_class_attrs=isa only_field_attrs=param no_field_block no_adjust_attrs)',
+         ':config(' .
+            'always_strict only_class_attrs=isa only_field_attrs=param ' .
+            'no_field_block no_adjust_attrs no_implicit_pragmata' .
+         ')',
       );
    }
 }
@@ -137,6 +140,13 @@ mechanisms.
 An optional version check can also be supplied; it performs the equivalent of
 
    BaseClass->VERSION( $ver )
+
+Note that C<class> blocks B<do not> implicitly enable the C<strict> and
+C<warnings> pragmata; either when using the core feature or C<Object::Pad>.
+This is to avoid surprises when eventually switching to purely using the core
+perl feature, which will not do that. Remember however that a C<use VERSION>
+of a version C<v5.36> or above will enable both these pragmata anyway, so that
+will be sufficient.
 
 =head2 method
 

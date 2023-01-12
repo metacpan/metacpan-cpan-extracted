@@ -233,6 +233,8 @@ CREDITS
      Ricardo Signes
      Felix Ostmann
      Jörn Clausen
+     Jim Avera
+     Olaf Alders
 
 SEE ALSO
     dateparse, DateTime, Date::Calc, <http://datetime.perl.org>

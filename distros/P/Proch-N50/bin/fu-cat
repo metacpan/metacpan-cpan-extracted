@@ -17,7 +17,7 @@ if ( -e "$RealBin/../lib/Proch/N50.pm" and -e "$RealBin/../Changes" ) {
 }
 use Proch::Seqfu;
 my $VERSION = $Proch::Seqfu::VERSION // "<Dev>";
-my $PROGRAM = basename($0);
+my $BASENAME = basename($0);
 
 my ($opt_force_fasta, $opt_force_fastq, $opt_upper, $opt_help, $opt_verbose, $opt_version);
 my ($opt_minlen, $opt_maxlen, $opt_dereplicate, $opt_rename_md5);
@@ -40,7 +40,7 @@ if (!GetOptions(
     'verbose'       => \$opt_verbose,
     'help'          => \$opt_help,
 )) {
-        say STDERR "Wrong parameters: type $PROGRAM --help for full documentation.";
+        say STDERR "Wrong parameters: type $BASENAME --help for full documentation.";
         exit 1  ;
 }
 
@@ -154,18 +154,20 @@ for my $filename (@ARGV) {
 
 sub usage {
     my $horizontal_bar = " " . '-' x 50;
-    say STDERR " $PROGRAM $VERSION";
+    say STDERR " $BASENAME $VERSION";
     say STDERR " A program to concatenate sequence files";
 
     say STDERR $horizontal_bar;
-    say STDERR " Type \`$PROGRAM --help\` to display the full manual";
+    say STDERR " Type \`$BASENAME --help\` to display the full manual";
     say STDERR " Waiting for sequences from STDIN. Press Ctrl-C to exit."
 }
 
 sub version {
-    say STDOUT "$PROGRAM $VERSION";
-    exit;
+	say $BASENAME, " ", $VERSION;
+	say STDERR "Using Proch::Seqfu=", $Proch::Seqfu::VERSION, " and FASTX::Reader=", $FASTX::Reader::VERSION;
+	exit();
 }
+ ;
 
 __END__
 
@@ -179,7 +181,7 @@ fu-cat - Concatenate FASTA or FASTQ files
 
 =head1 VERSION
 
-version 1.5.4
+version 1.5.5
 
 =head1 SYNOPSIS
 

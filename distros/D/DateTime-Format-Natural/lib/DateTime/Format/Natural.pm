@@ -24,7 +24,7 @@ use Storable qw(dclone);
 
 use DateTime::Format::Natural::Utils qw(trim);
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 validation_options(
     on_fail => sub
@@ -77,6 +77,8 @@ sub _init
     $self->{grammar_class} = $mod;
 
     $self->{format_provided} = exists $opts{format};
+
+    $self->{mode} = '';
 }
 
 sub _init_check
@@ -171,6 +173,8 @@ sub parse_datetime
     $self->_parse_init(@_);
 
     $self->{input_string} = $self->{date_string};
+
+    $self->{mode} = 'parse';
 
     my $date_string = $self->{date_string};
 
@@ -398,7 +402,17 @@ sub extract_datetime
     my $extract_string;
     $self->_params_init(@_, { string => \$extract_string });
 
+    $self->_unset_failure;
+    $self->_unset_error;
+    $self->_unset_valid_exp;
+
+    $self->{input_string} = $extract_string;
+
+    $self->{mode} = 'extract';
+
     my @expressions = $self->_extract_expressions($extract_string);
+
+    $self->_set_valid_exp if @expressions;
 
     return wantarray ? @expressions : $expressions[0];
 }
@@ -416,8 +430,22 @@ sub error
 
     return '' if $self->success;
 
-    my $error  = "'$self->{input_string}' does not parse ";
-       $error .= $self->_get_error || '(perhaps you have some garbage?)';
+    my $error = sub
+    {
+        return undef unless defined $self->{mode} && length $self->{mode};
+        my %errors = (
+            extract => "'$self->{input_string}' cannot be extracted from",
+            parse   => "'$self->{input_string}' does not parse",
+        );
+        return $errors{$self->{mode}};
+    }->();
+
+    if (defined $error) {
+        $error .= ' ' . ($self->_get_error || '(perhaps you have some garbage?)');
+    }
+    else {
+        $error = 'neither extracting nor parsing method invoked';
+    }
 
     return $error;
 }
@@ -426,7 +454,7 @@ sub trace
 {
     my $self = shift;
 
-    return @{$self->{traces}};
+    return @{$self->{traces} || []};
 }
 
 sub _process
@@ -959,6 +987,8 @@ valuable suggestions and patches:
  Ricardo Signes
  Felix Ostmann
  Jörn Clausen
+ Jim Avera
+ Olaf Alders
 
 =head1 SEE ALSO
 

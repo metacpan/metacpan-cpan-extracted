@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 1382cc78b05893b99e0e4aab4f758b31f386ef89760b0dcd4988b20b5119312e Changes
+SHA256 e9ae42c89b2f406c60c950a2a41695eabc2d324c0a9cd90d165e87c4e8a731bd LICENSE
+SHA256 f48f3dff04f6392c64446eb9673df3b33caefdfbfa922c162b840de93d2f19ad License.pm
+SHA256 54c0a92c0c3e2fa52fc332db55db52157045afbfc1c8bb7d9d9e96f81cac81e4 MANIFEST
+SHA256 e30e682f1a9c8823e58d0dd87c700f8aae7871129921253b227af4e7ff724221 META.yml
+SHA256 89045bdf6c2d4bc582b8c28ef0ab11f1fcff1d92723bbbb06fc7a5233b12f360 Makefile.PL
+SHA256 0d057ae3566486af87e0803a566c2b7193546ffafd0e2625a8505f1d50f6e279 README
+SHA256 14f6073b8da9d51d37c8e229e87c5122a4eef382b0e3d611c00090a951bf0648 bin/rpm-spec-license
+SHA256 831f0ea1cf4c52ab85eec8e916dac339361b47a470916d8dc3f856b76f3862a5 examples/print_license.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 751bc4e2f98074c05c9e23d484f2406cef042099664b6c87a73d6530bbeda427 inc/Module/Install/Scripts.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 3e97dd134afe2918e7ea1ddc3ffc08c3711b53fa8ba910198d5ddab736cacbee t/App-RPM-Spec-License/01-use.t
+SHA256 b3627492f53a06382e69de107a2189f405c9896946aa1c76ed56417e00623c57 t/App-RPM-Spec-License/02-version.t
+SHA256 89827c81813565da3dbbaa0cad5f2c7476ed2d82fb782e555cfe0f8f85753e0a xt/App-RPM-Spec-License/01-pod_coverage.t
+SHA256 1648c52a39e0a66597f72e505afc9d2283bee5e181c3927dc71eb1f9ce0b2f55 xt/App-RPM-Spec-License/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmPAG0oACgkQojV9Rpe/
+B8uJ6g/9FNH6m6qu6P0SXtMkLK2rqxpOmM9En5zT4b353ddN3lZjOukN5uuCDVOi
+n2tZInpybp4B3bCSgZ2pav30SBhskTSOysc0NbQjodK70+9KL6b++d0AAaZuiKTs
+EtLUtFE5gI6cylE/8N5sjZgAlEig/YBmHahFt/5kU9P6T+iNuPhJrgs7Oupm1jnk
+JWB5KVEAogSn0GQ+B/2QgqFJPzfVEkRVrmSM4C82U7sswkK/0lfddZgX5Enn49+X
+kuP5oqLzOcKkd/LR3wyC+FmZRSetxJVg44s/QWgpAgPAySALm/Es4NWETsgfG69c
+03rzuTxIhX4KC5FfP54AKO0EXxZfVgMhpcFipKJLBLkWqOH05KV07WMuIDMUp8kW
+TKMisLTcHRGv3MvsAwTtlQNXkx6pQtRcXV89PJJ1JMIF+ZpXqTNHKRlfWXWY8FzY
+lY/Hakpa5lLQ0kup6JyJGsQZapdx8pIGI7yUiEjw1bMhO5RrLdr4AVDXXBjLhRoX
+veHEGHkllPW28sPs9c3UfihbeU+ECM8QfqU1e1Il2sxPAzpkCYntUdrfoA5tgYSa
+t3IGYZcfxqGdS5qTonN+jEOU6JrJ8yXn6Ympt6ZPcN3PN2hsIcPwQbEpIe8LbnCr
+PdzxmQ3cYgat2r21KfPSB73R94y8rXxPUfvbUZ8oZhj9fWyIsCE=
+=22/g
+-----END PGP SIGNATURE-----

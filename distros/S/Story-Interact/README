@@ -28,8 +28,7 @@ DESCRIPTION
 
     Stories are written in pages. Each page is a Perl script using the
     functions defined in Story::Interactive::Syntax. They may contain
-    arbitrary Perl code, but are evaluated within a Safe container, so do have
-    some limits.
+    arbitrary Perl code.
 
     Stories may contain arbitrary Perl code. Do not run untrusted stories.
 

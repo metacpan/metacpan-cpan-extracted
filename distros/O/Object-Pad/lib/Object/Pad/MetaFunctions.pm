@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MetaFunctions 0.77;
+package Object::Pad::MetaFunctions 0.78;
 
 use v5.14;
 use warnings;

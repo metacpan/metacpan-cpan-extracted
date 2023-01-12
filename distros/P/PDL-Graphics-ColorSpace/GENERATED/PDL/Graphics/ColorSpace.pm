@@ -3,7 +3,7 @@
 #
 package PDL::Graphics::ColorSpace;
 
-our @EXPORT_OK = qw(rgb_to_cmyk cmyk_to_rgb hsl_to_rgb rgb_to_hsl rgb_to_hsv hsv_to_rgb rgb_to_xyz xyz_to_rgb xyY_to_xyz xyz_to_lab lab_to_xyz lab_to_lch lch_to_lab rgb_to_lch lch_to_rgb lch_to_lab add_rgb_space rgb_to_cmyk cmyk_to_rgb rgb_to_hsl hsl_to_rgb rgb_to_hsv hsv_to_rgb xyY_to_xyz _rgb_to_xyz _xyz_to_rgb _xyz_to_lab _lab_to_xyz lab_to_lch lch_to_lab );
+our @EXPORT_OK = qw(rgb_to_xyz xyz_to_rgb xyz_to_lab lab_to_xyz rgb_to_lch lch_to_rgb rgb_to_lab lab_to_rgb add_rgb_space rgb_to_cmyk cmyk_to_rgb rgb_to_hsl hsl_to_rgb rgb_to_hsv hsv_to_rgb xyY_to_xyz _rgb_to_xyz _xyz_to_rgb _xyz_to_lab _lab_to_xyz lab_to_lch lch_to_lab rgb_to_linear rgb_from_linear );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.201';
+   our $VERSION = '0.203';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Graphics::ColorSpace $VERSION;
@@ -21,16 +21,31 @@ use DynaLoader;
 
 
 
-#line 9 "color_space.pd"
+#line 13 "color_space.pd"
 
+
+=encoding utf8
 
 =head1 NAME
 
 PDL::Graphics::ColorSpace
 
-=head1 VERSION
+=head1 SYNOPSIS
 
-0.1.0
+    use PDL::LiteF;
+    use PDL::IO::Pic;
+    use PDL::Graphics::ColorSpace;
+
+    my $image_rgb = PDL->rpic('photo.jpg') if PDL->rpiccan('JPEG');
+
+    # convert RGB value from [0,255] to [0,1]
+    $image_rgb = $image_rgb->double / 255;
+
+    my $image_xyz = $image_rgb->rgb_to_xyz( 'sRGB' );
+
+Or
+
+    my $image_xyz = rgb_to_xyz( $image_rgb, 'sRGB' );
 
 =head1 DESCRIPTION
 
@@ -80,7 +95,7 @@ For more info, see L<http://www.chaospro.de/documentation/html/paletteeditor/col
 
 =head2 XYZ and xyY
 
-The CIE XYZ color space was derived the CIE RGB color space. XYZ are three hypothetical primaries. Y means brightness, Z is quasi-equal to blue stimulation, and X is a mix which looks like red sensitivy curve of cones.  All visible colors can be represented by using only positive values of X, Y, and Z. The main advantage of the CIE XYZ space (and any color space based on it) is that this space is completely device-independent.
+The CIE XYZ color space was derived the CIE RGB color space. XYZ are three hypothetical primaries. Y means brightness, Z is quasi-equal to blue stimulation, and X is a mix which looks like red sensitivity curve of cones.  All visible colors can be represented by using only positive values of X, Y, and Z. The main advantage of the CIE XYZ space (and any color space based on it) is that this space is completely device-independent.
 
 For more info, see L<http://en.wikipedia.org/wiki/CIE_1931_color_space>.
 
@@ -102,26 +117,9 @@ If we take a horizontal slice through the centre, we see a coloured circle. Arou
 
 For more info, see L<http://www.colourphil.co.uk/lab_lch_colour_space.html>.
 
-=head1 SYNOPSIS
-
-    use PDL::LiteF;
-    use PDL::IO::Pic;
-    use PDL::Graphics::ColorSpace;
-
-    my $image_rgb = PDL->rpic('photo.jpg') if PDL->rpiccan('JPEG');
-
-    # convert RGB value from [0,255] to [0,1]
-    $image_rgb = $image_rgb->double / 255;
-
-    my $image_xyz = $image_rgb->rgb_to_xyz( 'sRGB' );
-
-Or
-
-    my $image_xyz = rgb_to_xyz( $image_rgb, 'sRGB' );
-
 =head1 OPTIONS
 
-Some conversions require specifying the RGB space which includes gamma curve and white point definitions. Supported RGB space include (aliases in square brackets):
+Some conversions require specifying the RGB space which includes gamma curve and white point definitions. Supported RGB spaces include (aliases in square brackets):
 
     Adobe RGB (1998) [Adobe]
     Apple RGB [Apple]
@@ -139,18 +137,34 @@ Some conversions require specifying the RGB space which includes gamma curve and
     SMPTE-C [SMPTE]
     WideGamut
     sRGB [709] [CIE Rec 709]
+    lsRGB
 
 You can also add custom RGB space definitions via the function add_rgb_space.
-
+Alternatively, as of 0.202 you can directly supply the function with a
+hash-ref in the same format.
 
 =head1 CONVERSIONS
 
-The full list of exported functions include rgb_to_cmyk, cmyk_to_rgb, rgb_to_hsl, hsl_to_rgb, rgb_to_hsv, hsv_to_rgb, rgb_to_xyz, xyz_to_rgb, xyY_to_xyz, xyz_to_lab, lab_to_xyz, lab_to_lch, lch_to_lab, rgb_to_lch, lch_to_rgb, lch_to_lab.
+Some conversions, if not already included as functions, can be achieved
+by chaining existing functions. For example, LCH to HSV conversion can
+be achieved by chaining lch_to_rgb and rgb_to_hsv:
 
-Some conversions, if not already included as functions, can be achieved by chaining existing functions. For example, RGB to Lab conversion can be achieved by chaining rgb_to_xyz and xyz_to_lab.
+    my $hsv = rgb_to_hsv( lch_to_rgb( $lch, 'sRGB' ), 'sRGB' );
 
-    my $lab = xyz_to_lab( rgb_to_xyz( $rgb, 'sRGB' ), 'sRGB' );
+To generate a local diagram of what conversions are available between
+formats, using GraphViz, you can use this script:
 
+  use blib;
+  use PDL::Graphics::ColorSpace;
+  print "digraph {\n";
+  print join(' -> ', split /_to_/), "\n"
+    for grep !/^_/ && /_to_/, @PDL::Graphics::ColorSpace::EXPORT_OK;
+  print "}\n";
+  # then:
+  perl scriptname >d.dot; dot -Tsvg d.dot >d.svg; display d.svg
+
+(As of 0.202, this is everything to and from C<rgb>, plus C<xyz> <->
+C<lab> <-> C<lch>)
 
 =cut
 
@@ -161,10 +175,8 @@ use Carp;
 use PDL::LiteF;
 use PDL::Graphics::ColorSpace::RGBSpace;
 
-$PDL::onlinedoc->scan(__FILE__) if $PDL::onlinedoc;
-
 my $RGB_SPACE = $PDL::Graphics::ColorSpace::RGBSpace::RGB_SPACE;
-#line 168 "ColorSpace.pm"
+#line 180 "ColorSpace.pm"
 
 
 
@@ -178,7 +190,7 @@ my $RGB_SPACE = $PDL::Graphics::ColorSpace::RGBSpace::RGB_SPACE;
 
 
 
-#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 949 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -186,16 +198,16 @@ my $RGB_SPACE = $PDL::Graphics::ColorSpace::RGBSpace::RGB_SPACE;
 
 =for sig
 
-  Signature: (double rgb(c=3); double [o]cmyk(d=4))
+  Signature: (rgb(c=3); [o]cmyk(d=4))
 
 
 =pod
 
 =for ref
 
-Converts an RGB color triple to an CYMK color quadruple.
+Converts an RGB color triple to an CMYK color quadruple.
 
-The first dimension of the piddles holding the rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...). The first dimension of the piddles holding the cmyk values must be size 4.
+The first dimension of the ndarrays holding the rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...). The first dimension of the ndarrays holding the cmyk values must be size 4.
 
 =for usage
 
@@ -209,23 +221,23 @@ Usage:
 
 =for bad
 
-If C<rgb_to_cmyk> encounters a bad value in any of the R, G, or B values the output piddle will be marked as bad and the associated C, M, Y, and K values will all be marked as bad.
+If C<rgb_to_cmyk> encounters a bad value in any of the R, G, or B values the output ndarray will be marked as bad and the associated C, M, Y, and K values will all be marked as bad.
 
 
 
 =cut
-#line 218 "ColorSpace.pm"
+#line 230 "ColorSpace.pm"
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *rgb_to_cmyk = \&PDL::rgb_to_cmyk;
-#line 225 "ColorSpace.pm"
+#line 237 "ColorSpace.pm"
 
 
 
-#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 949 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -233,16 +245,16 @@ If C<rgb_to_cmyk> encounters a bad value in any of the R, G, or B values the out
 
 =for sig
 
-  Signature: (double cmyk(d=4); double [o]rgb(c=3))
+  Signature: (cmyk(d=4); [o]rgb(c=3))
 
 
 =pod
 
 =for ref
 
-Converts an CYMK color quadruple to an RGB color triple
+Converts an CMYK color quadruple to an RGB color triple
 
-The first dimension of the piddles holding the cmyk values must be size 4, i.e. the dimensions must look like (4, m, n, ...). The first dimension of the piddle holding the rgb values must be 3.
+The first dimension of the ndarrays holding the cmyk values must be size 4, i.e. the dimensions must look like (4, m, n, ...). The first dimension of the ndarray holding the rgb values must be 3.
 
 =for usage
 
@@ -256,23 +268,23 @@ Usage:
 
 =for bad
 
-If C<cmyk_to_rgb> encounters a bad value in any of the C, M, Y, or K quantities, the output piddle will be marked as bad and the associated R, G, and B color values will all be marked as bad.
+If C<cmyk_to_rgb> encounters a bad value in any of the C, M, Y, or K quantities, the output ndarray will be marked as bad and the associated R, G, and B color values will all be marked as bad.
 
 
 
 =cut
-#line 265 "ColorSpace.pm"
+#line 277 "ColorSpace.pm"
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *cmyk_to_rgb = \&PDL::cmyk_to_rgb;
-#line 272 "ColorSpace.pm"
+#line 284 "ColorSpace.pm"
 
 
 
-#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 949 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -280,7 +292,7 @@ If C<cmyk_to_rgb> encounters a bad value in any of the C, M, Y, or K quantities,
 
 =for sig
 
-  Signature: (double rgb(c=3); double [o]hsl(c=3))
+  Signature: (rgb(c=3); [o]hsl(c=3))
 
 
 =pod
@@ -289,7 +301,7 @@ If C<cmyk_to_rgb> encounters a bad value in any of the C, M, Y, or K quantities,
 
 Converts an RGB color triple to an HSL color triple.
 
-The first dimension of the piddles holding the hsl and rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+The first dimension of the ndarrays holding the hsl and rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
 
 =for usage
 
@@ -303,23 +315,23 @@ Usage:
 
 =for bad
 
-If C<rgb_to_hsl> encounters a bad value in any of the R, G, or B values the output piddle will be marked as bad and the associated H, S, and L values will all be marked as bad.
+If C<rgb_to_hsl> encounters a bad value in any of the R, G, or B values the output ndarray will be marked as bad and the associated H, S, and L values will all be marked as bad.
 
 
 
 =cut
-#line 312 "ColorSpace.pm"
+#line 324 "ColorSpace.pm"
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *rgb_to_hsl = \&PDL::rgb_to_hsl;
-#line 319 "ColorSpace.pm"
+#line 331 "ColorSpace.pm"
 
 
 
-#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 949 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -327,7 +339,7 @@ If C<rgb_to_hsl> encounters a bad value in any of the R, G, or B values the outp
 
 =for sig
 
-  Signature: (double hsl(c=3); double [o]rgb(c=3))
+  Signature: (hsl(c=3); [o]rgb(c=3))
 
 
 =pod
@@ -336,7 +348,7 @@ If C<rgb_to_hsl> encounters a bad value in any of the R, G, or B values the outp
 
 Converts an HSL color triple to an RGB color triple
 
-The first dimension of the piddles holding the hsl and rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+The first dimension of the ndarrays holding the hsl and rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
 
 =for usage
 
@@ -350,23 +362,23 @@ Usage:
 
 =for bad
 
-If C<hsl_to_rgb> encounters a bad value in any of the H, S, or V quantities, the output piddle will be marked as bad and the associated R, G, and B color values will all be marked as bad.
+If C<hsl_to_rgb> encounters a bad value in any of the H, S, or V quantities, the output ndarray will be marked as bad and the associated R, G, and B color values will all be marked as bad.
 
 
 
 =cut
-#line 359 "ColorSpace.pm"
+#line 371 "ColorSpace.pm"
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *hsl_to_rgb = \&PDL::hsl_to_rgb;
-#line 366 "ColorSpace.pm"
+#line 378 "ColorSpace.pm"
 
 
 
-#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 949 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -374,7 +386,7 @@ If C<hsl_to_rgb> encounters a bad value in any of the H, S, or V quantities, the
 
 =for sig
 
-  Signature: (double rgb(c=3); double [o]hsv(c=3))
+  Signature: (rgb(c=3); [o]hsv(c=3))
 
 
 =pod
@@ -383,7 +395,7 @@ If C<hsl_to_rgb> encounters a bad value in any of the H, S, or V quantities, the
 
 Converts an RGB color triple to an HSV color triple.
 
-The first dimension of the piddles holding the hsv and rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+The first dimension of the ndarrays holding the hsv and rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
 
 =for usage
 
@@ -397,23 +409,23 @@ Usage:
 
 =for bad
 
-If C<rgb_to_hsv> encounters a bad value in any of the R, G, or B values the output piddle will be marked as bad and the associated H, S, and V values will all be marked as bad.
+If C<rgb_to_hsv> encounters a bad value in any of the R, G, or B values the output ndarray will be marked as bad and the associated H, S, and V values will all be marked as bad.
 
 
 
 =cut
-#line 406 "ColorSpace.pm"
+#line 418 "ColorSpace.pm"
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *rgb_to_hsv = \&PDL::rgb_to_hsv;
-#line 413 "ColorSpace.pm"
+#line 425 "ColorSpace.pm"
 
 
 
-#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 949 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -421,7 +433,7 @@ If C<rgb_to_hsv> encounters a bad value in any of the R, G, or B values the outp
 
 =for sig
 
-  Signature: (double hsv(c=3); double [o]rgb(c=3))
+  Signature: (hsv(c=3); [o]rgb(c=3))
 
 
 =pod
@@ -430,7 +442,7 @@ If C<rgb_to_hsv> encounters a bad value in any of the R, G, or B values the outp
 
 Converts an HSV color triple to an RGB color triple
 
-The first dimension of the piddles holding the hsv and rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+The first dimension of the ndarrays holding the hsv and rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
 
 =for usage
 
@@ -444,23 +456,23 @@ Usage:
 
 =for bad
 
-If C<hsv_to_rgb> encounters a bad value in any of the H, S, or V quantities, the output piddle will be marked as bad and the associated R, G, and B color values will all be marked as bad.
+If C<hsv_to_rgb> encounters a bad value in any of the H, S, or V quantities, the output ndarray will be marked as bad and the associated R, G, and B color values will all be marked as bad.
 
 
 
 =cut
-#line 453 "ColorSpace.pm"
+#line 465 "ColorSpace.pm"
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *hsv_to_rgb = \&PDL::hsv_to_rgb;
-#line 460 "ColorSpace.pm"
+#line 472 "ColorSpace.pm"
 
 
 
-#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 949 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -468,7 +480,7 @@ If C<hsv_to_rgb> encounters a bad value in any of the H, S, or V quantities, the
 
 =for sig
 
-  Signature: (double xyY(c=3); double [o]xyz(c=3))
+  Signature: (xyY(c=3); [o]xyz(c=3))
 
 =for ref
 
@@ -481,46 +493,46 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 485 "ColorSpace.pm"
+#line 497 "ColorSpace.pm"
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *xyY_to_xyz = \&PDL::xyY_to_xyz;
-#line 492 "ColorSpace.pm"
+#line 504 "ColorSpace.pm"
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *_rgb_to_xyz = \&PDL::_rgb_to_xyz;
-#line 499 "ColorSpace.pm"
+#line 511 "ColorSpace.pm"
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *_xyz_to_rgb = \&PDL::_xyz_to_rgb;
-#line 506 "ColorSpace.pm"
+#line 518 "ColorSpace.pm"
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *_xyz_to_lab = \&PDL::_xyz_to_lab;
-#line 513 "ColorSpace.pm"
+#line 525 "ColorSpace.pm"
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *_lab_to_xyz = \&PDL::_lab_to_xyz;
-#line 520 "ColorSpace.pm"
+#line 532 "ColorSpace.pm"
 
 
 
-#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 949 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -528,7 +540,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double lab(c=3); double [o]lch(c=3))
+  Signature: (lab(c=3); [o]lch(c=3))
 
 
 =pod
@@ -537,7 +549,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Converts an Lab color triple to an LCH color triple.
 
-The first dimension of the piddles holding the lab values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+The first dimension of the ndarrays holding the lab values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
 
 =for usage
 
@@ -551,23 +563,23 @@ Usage:
 
 =for bad
 
-If C<lab_to_lch> encounters a bad value in any of the L, a, or b values the output piddle will be marked as bad and the associated L, C, and H values will all be marked as bad.
+If C<lab_to_lch> encounters a bad value in any of the L, a, or b values the output ndarray will be marked as bad and the associated L, C, and H values will all be marked as bad.
 
 
 
 =cut
-#line 560 "ColorSpace.pm"
+#line 572 "ColorSpace.pm"
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lab_to_lch = \&PDL::lab_to_lch;
-#line 567 "ColorSpace.pm"
+#line 579 "ColorSpace.pm"
 
 
 
-#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 949 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -575,7 +587,7 @@ If C<lab_to_lch> encounters a bad value in any of the L, a, or b values the outp
 
 =for sig
 
-  Signature: (double lch(c=3); double [o]lab(c=3))
+  Signature: (lch(c=3); [o]lab(c=3))
 
 
 =pod
@@ -584,7 +596,7 @@ If C<lab_to_lch> encounters a bad value in any of the L, a, or b values the outp
 
 Converts an LCH color triple to an Lab color triple.
 
-The first dimension of the piddles holding the lch values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+The first dimension of the ndarrays holding the lch values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
 
 =for usage
 
@@ -598,23 +610,109 @@ Usage:
 
 =for bad
 
-If C<lch_to_lab> encounters a bad value in any of the L, C, or H values the output piddle will be marked as bad and the associated L, a, and b values will all be marked as bad.
+If C<lch_to_lab> encounters a bad value in any of the L, C, or H values the output ndarray will be marked as bad and the associated L, a, and b values will all be marked as bad.
 
 
 
 =cut
-#line 607 "ColorSpace.pm"
+#line 619 "ColorSpace.pm"
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lch_to_lab = \&PDL::lch_to_lab;
-#line 614 "ColorSpace.pm"
+#line 626 "ColorSpace.pm"
 
 
 
-#line 711 "color_space.pd"
+#line 949 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+
+
+
+=head2 rgb_to_linear
+
+=for sig
+
+  Signature: (rgb(c=3); gamma(); [o]out(c=3))
+
+=for ref
+
+Converts an RGB color triple (presumably with gamma) to an RGB color triple
+with linear values.
+
+=for usage
+
+Usage:
+
+    my $rgb_linear = rgb_to_linear( $gammaed, 2.2 );
+
+
+=for bad
+
+=for bad
+
+If C<rgb_to_linear> encounters a bad value in any of the R, G, or B
+values the output ndarray will be marked as bad and the associated R,
+G, and B values will all be marked as bad.
+
+
+=cut
+#line 662 "ColorSpace.pm"
+
+
+
+#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+
+*rgb_to_linear = \&PDL::rgb_to_linear;
+#line 669 "ColorSpace.pm"
+
+
+
+#line 949 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+
+
+
+=head2 rgb_from_linear
+
+=for sig
+
+  Signature: (rgb(c=3); gamma(); [o]out(c=3))
+
+=for ref
+
+Converts an RGB color triple (presumably linear) to an RGB color triple
+with the specified gamma.
+
+=for usage
+
+Usage:
+
+    my $gammaed = rgb_from_linear( $rgb_linear, 2.2 );
+
+
+=for bad
+
+=for bad
+
+If C<rgb_from_linear> encounters a bad value in any of the R, G, or B
+values the output ndarray will be marked as bad and the associated R,
+G, and B values will all be marked as bad.
+
+
+=cut
+#line 705 "ColorSpace.pm"
+
+
+
+#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+
+*rgb_from_linear = \&PDL::rgb_from_linear;
+#line 712 "ColorSpace.pm"
+
+
+
+#line 752 "color_space.pd"
 
 
 
@@ -624,30 +722,27 @@ If C<lch_to_lab> encounters a bad value in any of the L, C, or H values the outp
 
 Converts an RGB color triple to an XYZ color triple.
 
-The first dimension of the piddles holding the rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+The first dimension of the ndarrays holding the rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
 
 =for bad
 
-If C<rgb_to_xyz> encounters a bad value in any of the R, G, or B values the output piddle will be marked as bad and the associated X, Y, and Z values will all be marked as bad.
+If C<rgb_to_xyz> encounters a bad value in any of the R, G, or B values the output ndarray will be marked as bad and the associated X, Y, and Z values will all be marked as bad.
 
 =for usage
 
 Usage:
 
     my $xyz = rgb_to_xyz( $rgb, 'sRGB' );
+    my $xyz = rgb_to_xyz( $rgb, \%rgb_spec );
 
 =cut
 
 *rgb_to_xyz = \&PDL::rgb_to_xyz;
 sub PDL::rgb_to_xyz {
     my ($rgb, $space) = @_;
-
-    croak "Please specify RGB Space ('sRGB' for generic JPEG images)!"
-        if !$space;
-
-    my @m = pdl( $RGB_SPACE->{$space}{m} )->dog;
-
-    return _rgb_to_xyz( $rgb, $RGB_SPACE->{$space}{gamma}, @m );
+    my $spec = get_space($space);
+    my $m = PDL->topdl( $spec->{m} );
+    return _rgb_to_xyz( $rgb, $spec->{gamma}, $m );
 }
 
 
@@ -657,30 +752,27 @@ sub PDL::rgb_to_xyz {
 
 Converts an XYZ color triple to an RGB color triple.
 
-The first dimension of the piddles holding the xyz and rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+The first dimension of the ndarrays holding the xyz and rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
 
 =for bad
 
-If C<xyz_to_rgb> encounters a bad value in any of the X, Y, or Z values the output piddle will be marked as bad and the associated R, G, and B values will all be marked as bad.
+If C<xyz_to_rgb> encounters a bad value in any of the X, Y, or Z values the output ndarray will be marked as bad and the associated R, G, and B values will all be marked as bad.
 
 =for usage
 
 Usage:
 
     my $rgb = xyz_to_rgb( $xyz, 'sRGB' );
+    my $rgb = xyz_to_rgb( $xyz, \%rgb_spec );
 
 =cut
 
 *xyz_to_rgb = \&PDL::xyz_to_rgb;
 sub PDL::xyz_to_rgb {
     my ($xyz, $space) = @_;
-
-    croak "Please specify RGB Space ('sRGB' for generic JPEG images)!"
-        if !$space;
-
-    my @mstar = pdl( $RGB_SPACE->{$space}{mstar} )->dog;
-
-    return _xyz_to_rgb( $xyz, $RGB_SPACE->{$space}{gamma}, @mstar );
+    my $spec = get_space($space);
+    my $mstar = exists $spec->{mstar} ? PDL->topdl( $spec->{mstar} ) : PDL->topdl( $spec->{m} )->inv;
+    return _xyz_to_rgb( $xyz, $spec->{gamma}, $mstar );
 }
 
 
@@ -690,29 +782,26 @@ sub PDL::xyz_to_rgb {
 
 Converts an XYZ color triple to an Lab color triple.
 
-The first dimension of the piddles holding the xyz values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+The first dimension of the ndarrays holding the xyz values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
 
 =for bad
 
-If C<xyz_to_lab> encounters a bad value in any of the X, Y, or Z values the output piddle will be marked as bad and the associated L, a, and b values will all be marked as bad.
+If C<xyz_to_lab> encounters a bad value in any of the X, Y, or Z values the output ndarray will be marked as bad and the associated L, a, and b values will all be marked as bad.
 
 =for usage
 
 Usage:
 
     my $lab = xyz_to_lab( $xyz, 'sRGB' );
+    my $lab = xyz_to_lab( $xyz, \%rgb_spec );
 
 =cut
 
 *xyz_to_lab = \&PDL::xyz_to_lab;
 sub PDL::xyz_to_lab {
     my ($xyz, $space) = @_;
-
-    croak "Please specify RGB Space ('sRGB' for generic JPEG images)!"
-        if !$space;
-
-    my $w = pdl $RGB_SPACE->{$space}{white_point};
-
+    my $spec = get_space($space);
+    my $w = PDL->topdl($spec->{white_point});
     return _xyz_to_lab( $xyz, $w );
 }
 
@@ -723,29 +812,26 @@ sub PDL::xyz_to_lab {
 
 Converts an Lab color triple to an XYZ color triple.
 
-The first dimension of the piddles holding the lab values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+The first dimension of the ndarrays holding the lab values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
 
 =for bad
 
-If C<lab_to_xyz> encounters a bad value in any of the L, a, or b values the output piddle will be marked as bad and the associated X, Y, and Z values will all be marked as bad.
+If C<lab_to_xyz> encounters a bad value in any of the L, a, or b values the output ndarray will be marked as bad and the associated X, Y, and Z values will all be marked as bad.
 
 =for usage
 
 Usage:
 
     my $xyz = lab_to_xyz( $lab, 'sRGB' );
+    my $xyz = lab_to_xyz( $lab, \%rgb_spec );
 
 =cut
 
 *lab_to_xyz = \&PDL::lab_to_xyz;
 sub PDL::lab_to_xyz {
     my ($lab, $space) = @_;
-
-    croak "Please specify RGB Space ('sRGB' for generic JPEG images)!"
-        if !$space;
-
-    my $w = pdl $RGB_SPACE->{$space}{white_point};
-
+    my $spec = get_space($space);
+    my $w = PDL->topdl($spec->{white_point});
     return _lab_to_xyz( $lab, $w );
 }
 
@@ -756,29 +842,26 @@ sub PDL::lab_to_xyz {
 
 Converts an RGB color triple to an LCH color triple.
 
-The first dimension of the piddles holding the rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+The first dimension of the ndarrays holding the rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
 
 =for bad
 
-If C<rgb_to_lch> encounters a bad value in any of the R, G, or B values the output piddle will be marked as bad and the associated L, C, and H values will all be marked as bad.
+If C<rgb_to_lch> encounters a bad value in any of the R, G, or B values the output ndarray will be marked as bad and the associated L, C, and H values will all be marked as bad.
 
 =for usage
 
 Usage:
 
     my $lch = rgb_to_lch( $rgb, 'sRGB' );
+    my $lch = rgb_to_lch( $rgb, \%rgb_spec );
 
 =cut
 
 *rgb_to_lch = \&PDL::rgb_to_lch;
 sub PDL::rgb_to_lch {
     my ($rgb, $space) = @_;
-
-    croak "Please specify RGB Space ('sRGB' for generic JPEG images)!"
-        if !$space;
-
-    my $lab = xyz_to_lab( rgb_to_xyz( $rgb, $space ), $space );
-
+    my $spec = get_space($space);
+    my $lab = xyz_to_lab( rgb_to_xyz( $rgb, $spec ), $spec );
     return lab_to_lch( $lab );
 }
 
@@ -789,35 +872,94 @@ sub PDL::rgb_to_lch {
 
 Converts an LCH color triple to an RGB color triple.
 
-The first dimension of the piddles holding the lch values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+The first dimension of the ndarrays holding the lch values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
 
 =for bad
 
-If C<lch_to_rgb> encounters a bad value in any of the L, C, or H values the output piddle will be marked as bad and the associated R, G, and B values will all be marked as bad.
+If C<lch_to_rgb> encounters a bad value in any of the L, C, or H values the output ndarray will be marked as bad and the associated R, G, and B values will all be marked as bad.
 
 =for usage
 
 Usage:
 
     my $rgb = lch_to_rgb( $lch, 'sRGB' );
+    my $rgb = lch_to_rgb( $lch, \%rgb_spec );
 
 =cut
 
 *lch_to_rgb = \&PDL::lch_to_rgb;
 sub PDL::lch_to_rgb {
     my ($lch, $space) = @_;
-
-    croak "Please specify RGB Space ('sRGB' for generic JPEG images)!"
-        if !$space;
-
-    my $xyz = lab_to_xyz( lch_to_lab( $lch ), $space );
-
-    return xyz_to_rgb( $xyz, $space );
+    my $spec = get_space($space);
+    my $xyz = lab_to_xyz( lch_to_lab( $lch ), $spec );
+    return xyz_to_rgb( $xyz, $spec );
 }
+
+
+=head2 rgb_to_lab
+
+=for ref
+
+Converts an RGB color triple to an LAB color triple.
+
+The first dimension of the ndarrays holding the rgb values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+
+=for bad
+
+If C<rgb_to_lab> encounters a bad value in any of the R, G, or B values the output ndarray will be marked as bad and the associated L, A, and B values will all be marked as bad.
+
+=for usage
+
+Usage:
+
+    my $lab = rgb_to_lab( $rgb, 'sRGB' );
+    my $lab = rgb_to_lab( $rgb, \%rgb_spec );
+
+=cut
+
+*rgb_to_lab = \&PDL::rgb_to_lab;
+sub PDL::rgb_to_lab {
+    my ($rgb, $space) = @_;
+    my $spec = get_space($space);
+    return xyz_to_lab( rgb_to_xyz( $rgb, $spec ), $spec );
+}
+
+
+=head2 lab_to_rgb
+
+=for ref
+
+Converts an LAB color triple to an RGB color triple.
+
+The first dimension of the ndarrays holding the lab values must be size 3, i.e. the dimensions must look like (3, m, n, ...).
+
+=for bad
+
+If C<lab_to_rgb> encounters a bad value in any of the L, A, or B values the output ndarray will be marked as bad and the associated R, G, and B values will all be marked as bad.
+
+=for usage
+
+Usage:
+
+    my $rgb = lab_to_rgb( $lab, 'sRGB' );
+    my $rgb = lab_to_rgb( $lab, \%rgb_spec );
+
+=cut
+
+*lab_to_rgb = \&PDL::lab_to_rgb;
+sub PDL::lab_to_rgb {
+    my ($lab, $space) = @_;
+    my $spec = get_space($space);
+    return xyz_to_rgb( lab_to_xyz( $lab, $spec ), $spec );
+}
+
 
 =head2 add_rgb_space
 
-Supports adding custom RGB space definitions.
+Supports adding custom RGB space definitions. The C<m> and C<white_point>
+can be supplied as PDL ndarrays if desired. As of 0.202, you don't need
+to provide an C<mstar> since the inverse of the C<m> will be calculated
+(once) as a default.
 
 Usage:
 
@@ -841,23 +983,6 @@ Usage:
                      '0.993451333333334'
                    ]
                  ],
-          'mstar' => [
-                       [
-                         '2.74565437614039',
-                         '-0.969256810842655',
-                         '0.0112706581772173'
-                       ],
-                       [
-                         '-1.1358911781912',
-                         '1.87599300082369',
-                         '-0.113958877125197'
-                       ],
-                       [
-                         '-0.435056564214666',
-                         '0.0415556222493375',
-                         '1.01310694059653'
-                       ]
-                     ],
           'white_point' => [
                              '0.312713',
                              '0.329016'
@@ -873,6 +998,7 @@ Usage:
 =cut
 
 *add_rgb_space = \&PDL::Graphics::ColorSpace::RGBSpace::add_rgb_space;
+*get_space = \&PDL::Graphics::ColorSpace::RGBSpace::get_space;
 
 
 =head1 SEE ALSO
@@ -890,7 +1016,7 @@ Original work sponsored by Shutterstock, LLC L<http://www.shutterstock.com/>
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 894 "ColorSpace.pm"
+#line 1020 "ColorSpace.pm"
 
 
 

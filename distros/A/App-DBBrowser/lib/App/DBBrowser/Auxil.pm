@@ -59,7 +59,7 @@ sub get_stmt {
         $indent1 = { init_tab => $in x 1, subseq_tab => $in x 2 };
         $indent2 = { init_tab => $in x 2, subseq_tab => $in x 3 };
     }
-    my $table = $sql->{table};
+    my $table = $sql->{table}; # q
     my @tmp;
     if ( $stmt_type eq 'Drop_table' ) {
         @tmp = ( $sf->__stmt_fold( "DROP TABLE $table", $term_w, $indent0 ) );
@@ -312,9 +312,12 @@ sub alias {
 
 
 sub quote_table {
-    my ( $sf, $td ) = @_;
+    my ( $sf, $td ) = @_; # n
     my @idx;
     if ( $sf->{o}{G}{qualified_table_name} || $sf->{i}{db_attached} ) {
+        # If a SQLite database has databases attached, the fully qualified table name is used in SQL code regardless of
+        # the setting of the option 'qualified_table_name' because attached databases could have tables with the same
+        # name.
         @idx = ( 0 .. 2 );
     }
     else {

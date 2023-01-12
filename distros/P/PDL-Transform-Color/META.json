@@ -33,9 +33,10 @@
       "runtime" : {
          "requires" : {
             "PDL" : "0",
+            "PDL::Graphics::ColorSpace" : "0.203",
             "PDL::MatrixOps" : "0",
             "PDL::Transform" : "0",
-            "perl" : "5.006"
+            "perl" : "5.010"
          }
       },
       "test" : {
@@ -55,6 +56,6 @@
          "url" : "git://github.com/PDLPorters/PDL-Transform-Color.git"
       }
    },
-   "version" : "1.006",
+   "version" : "1.007",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

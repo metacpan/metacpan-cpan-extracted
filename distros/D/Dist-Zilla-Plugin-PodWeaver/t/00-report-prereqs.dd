@@ -14,7 +14,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Dist::Zilla' => '5',
+                                      'Dist::Zilla' => '6',
                                       'Dist::Zilla::Role::FileFinderUser' => '0',
                                       'Dist::Zilla::Role::FileMunger' => '0',
                                       'Moose' => '0',

@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
  */
 
 #define PERL_NO_GET_CONTEXT
@@ -513,10 +513,16 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
         /* consume a fullexpr and stop at the close paren */
         lex_read_unichar(0);
 
-        THISARG.op = parse_fullexpr(0);
-        CHECK_PARSEFAIL;
-
         lex_read_space(0);
+
+        if(lex_peek_unichar(0) == ')')
+          THISARG.op = newOP(OP_STUB, 0);
+        else {
+          THISARG.op = parse_fullexpr(0);
+          CHECK_PARSEFAIL;
+
+          lex_read_space(0);
+        }
 
         lex_expect_unichar(')');
       }

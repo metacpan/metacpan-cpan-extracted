@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package Text::Treesitter::Parser 0.03;
+package Text::Treesitter::Parser 0.04;
 
 use v5.14;
 use warnings;
@@ -51,6 +51,21 @@ L<Text::Treesitter::Language>.
 
 Parses a given input string, returning a node tree as an instance of
 L<Text::Treesitter::Tree>.
+
+=cut
+
+sub parse_string
+{
+   my $self = shift;
+   my ( $str ) = @_;
+
+   require Text::Treesitter::Tree;
+
+   return Text::Treesitter::Tree->new(
+      tree => $self->_parse_string( $str ),
+      text => $str,
+   );
+}
 
 =head2 reset
 

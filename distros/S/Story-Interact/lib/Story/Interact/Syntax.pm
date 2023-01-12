@@ -5,9 +5,8 @@ use warnings;
 package Story::Interact::Syntax;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001001';
+our $VERSION   = '0.001002';
 
-use Story::Interact::Character ();
 use Story::Interact::Page ();
 
 use Exporter::Shiny;
@@ -69,8 +68,7 @@ sub npc ($) {
 
 sub define_npc {
 	my ( $code, %attrs ) = @_;
-	return if defined $state->character->{$code};
-	$state->character->{$code} = Story::Interact::Character->new( %attrs );
+	return $state->define_npc( $code, %attrs );
 }
 
 sub visited {

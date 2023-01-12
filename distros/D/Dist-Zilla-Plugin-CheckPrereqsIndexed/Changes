@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-CheckPrereqsIndexed
 
+0.022     2023-01-11 21:28:39-05:00 America/New_York
+        - update some dist metadata
+
 0.021     2021-06-19 11:11:39-04:00 America/New_York
         - BREAKING: $plugin->skips now returns a list, not an arrayref
         - versions are now parsed before comparison

@@ -39,8 +39,7 @@ sub join_tables {
     my ( $sf ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    #my $tables = [ sort keys %{$sf->{d}{tables_info}} ];
-    my $tables = [ @{$sf->{d}{user_tables}}, @{$sf->{d}{sys_tables}} ];
+    my $tables = [ @{$sf->{d}{user_table_keys}}, @{$sf->{d}{sys_table_keys}} ];
     ( $sf->{d}{col_names}, $sf->{d}{col_types} ) = $ax->tables_column_names_and_types( $tables );
     my $join = {};
 
@@ -334,20 +333,18 @@ sub __print_join_info {
     my ( $sf ) = @_;
     my $pk = $sf->{d}{pk_info};
     my $fk = $sf->{d}{fk_info};
-    my $aref = [ [ qw(PK_TABLE PK_COLUMN), ' ', qw(FK_TABLE FK_COLUMN) ] ];
+    my $aref = [ [ qw(PK_TABLE PK_COLUMN FK_TABLE FK_COLUMN) ] ];
     my $r = 1;
     for my $t ( sort keys %$pk ) {
         $aref->[$r][0] = $pk->{$t}{TABLE_NAME};
         $aref->[$r][1] = join( ', ', @{$pk->{$t}{COLUMN_NAME}} );
         if ( defined $fk->{$t}->{FKCOLUMN_NAME} && @{$fk->{$t}{FKCOLUMN_NAME}} ) {
-            $aref->[$r][2] = 'ON';
-            $aref->[$r][3] = $fk->{$t}{FKTABLE_NAME};
-            $aref->[$r][4] = join( ', ', @{$fk->{$t}{FKCOLUMN_NAME}} );
+            $aref->[$r][2] = $fk->{$t}{FKTABLE_NAME};
+            $aref->[$r][3] = join( ', ', @{$fk->{$t}{FKCOLUMN_NAME}} );
         }
         else {
             $aref->[$r][2] = '';
             $aref->[$r][3] = '';
-            $aref->[$r][4] = '';
         }
         $r++;
     }
@@ -360,10 +357,10 @@ sub __get_join_info {
     my ( $sf ) = @_;
     return if $sf->{d}{pk_info};
     my $td = $sf->{d}{tables_info};
-    my $tables = $sf->{d}{user_tables};
+    my $tables = [ @{$sf->{d}{user_table_keys}}, @{$sf->{d}{sys_table_keys}} ];
     my $pk = {};
     for my $table ( @$tables ) {
-        my $sth = $sf->{d}{dbh}->primary_key_info( @{$td->{$table}} );
+        my $sth = $sf->{d}{dbh}->primary_key_info( @{$td->{$table}}[0..2] );
         next if ! defined $sth;
         while ( my $ref = $sth->fetchrow_hashref() ) {
             next if ! defined $ref;
@@ -375,7 +372,7 @@ sub __get_join_info {
     }
     my $fk = {};
     for my $table ( @$tables ) {
-        my $sth = $sf->{d}{dbh}->foreign_key_info( @{$td->{$table}}, undef, undef, undef );
+        my $sth = $sf->{d}{dbh}->foreign_key_info( @{$td->{$table}}[0..2], undef, undef, undef );
         next if ! defined $sth;
         while ( my $ref = $sth->fetchrow_hashref() ) {
             next if ! defined $ref;

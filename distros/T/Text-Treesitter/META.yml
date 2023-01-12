@@ -19,33 +19,35 @@ name: Text-Treesitter
 provides:
   Text::Treesitter:
     file: lib/Text/Treesitter.pm
-    version: '0.03'
+    version: '0.04'
   Text::Treesitter::Language:
     file: lib/Text/Treesitter/Language.pm
-    version: '0.03'
+    version: '0.04'
   Text::Treesitter::Node:
     file: lib/Text/Treesitter/Node.pm
-    version: '0.03'
+    version: '0.04'
   Text::Treesitter::Parser:
     file: lib/Text/Treesitter/Parser.pm
-    version: '0.03'
+    version: '0.04'
   Text::Treesitter::Query:
     file: lib/Text/Treesitter/Query.pm
-    version: '0.03'
+    version: '0.04'
   Text::Treesitter::QueryCursor:
     file: lib/Text/Treesitter/QueryCursor.pm
-    version: '0.03'
+    version: '0.04'
   Text::Treesitter::QueryMatch:
     file: lib/Text/Treesitter/QueryMatch.pm
-    version: '0.03'
+    version: '0.04'
   Text::Treesitter::Tree:
     file: lib/Text/Treesitter/Tree.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   ExtUtils::CppGuess: '0'
+  JSON::MaybeUTF8: '0'
+  List::Util: '1.29'
   Object::Pad: '0'
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

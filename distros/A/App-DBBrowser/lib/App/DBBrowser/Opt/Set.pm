@@ -84,7 +84,6 @@ sub _options {
             { name => '_view_name_prefix',       text => "- View prefix",      section => 'create' },
             { name => '_autoincrement_col_name', text => "- Auto increment",   section => 'create' },
             { name => '_data_type_guessing',     text => "- Guess data types", section => 'create' },
-            { name => 'auto_limit',              text => "- Auto Limit",       section => 'G'      },
         ],
         group_output => [
             { name => 'min_col_width',       text => "- Trunc col threshold", section => 'table' },
@@ -381,11 +380,6 @@ sub set_options {
                     [ 'data_type_guessing', "- Enable data type guessing", [ $no, $yes ] ]
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
-            }
-            elsif ( $opt eq 'auto_limit' ) {
-                my $digits = 7;
-                my $prompt = 'Set the SQL auto LIMIT ';
-                $sf->__choose_a_number_wrap( $section, $opt, $prompt, $digits, 0 );
             }
             ##### Output ####
             elsif ( $opt eq 'min_col_width' ) {

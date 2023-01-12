@@ -17,6 +17,7 @@ if ( -e "$RealBin/../lib/Proch/N50.pm" and -e "$RealBin/../Changes" ) {
     use lib "$RealBin/../lib";
 }
 use Proch::Seqfu;
+my $BASENAME = basename($0);
 my $VERSION = $Proch::Seqfu::VERSION // "<Dev>";
 
 die "ERROR: FASTX::Reader required version is >= 0.6 [$FASTX::Reader::VERSION found]\n"
@@ -29,7 +30,7 @@ my $counter = 0;
 my $opt_invalid = 'n/a';
 my $opt_separator ="\t";
 my $opt_sortby = 'order';
-my ($opt_abs, $opt_basename, $opt_thousand, $opt_fastx, $opt_csv, $opt_json, $opt_rev, $opt_screen, $opt_tsv, $opt_help, $opt_pretty_json, $opt_verbose);
+my ($opt_abs, $opt_version, $opt_basename, $opt_thousand, $opt_fastx, $opt_csv, $opt_json, $opt_rev, $opt_screen, $opt_tsv, $opt_help, $opt_pretty_json, $opt_verbose);
 my $sort_direction = 'desc';
 my $_opt = GetOptions(
   'a|abspath'    => \$opt_abs,
@@ -45,6 +46,7 @@ my $_opt = GetOptions(
   't|tsv'        => \$opt_tsv,
   'v|verbose'    => \$opt_verbose,
   'x|screen'     => \$opt_screen,
+  'version'      => \$opt_version,
 
 );
 
@@ -212,6 +214,12 @@ END
   }
 }
 
+sub version {
+	say $BASENAME, " ", $VERSION;
+	say STDERR "Using Proch::Seqfu=", $Proch::Seqfu::VERSION, " and FASTX::Reader=", $FASTX::Reader::VERSION;
+	exit();
+}
+
 __END__
 
 =pod
@@ -224,7 +232,7 @@ fu-count - A FASTA/FASTQ sequence counter
 
 =head1 VERSION
 
-version 1.5.4
+version 1.5.5
 
 =head1 SYNOPSIS
 

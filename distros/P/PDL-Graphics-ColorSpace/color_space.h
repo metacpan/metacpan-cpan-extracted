@@ -8,6 +8,8 @@ void    rgb2hsv( double *rgb, double *hsv );
 void    hsv2rgb( double *hsv, double *rgb );
 void    rgb2xyz( double *rgb, double gamma, double *m0, double *m1, double *m2, double *xyz );
 void    xyz2rgb( double *xyz, double gamma, double *m0, double *m1, double *m2, double *rgb );
+void    rgb2linear( double *rgb, double gamma, double *out );
+void    rgb2gamma( double *rgb, double gamma, double *out );
 void    xyY2xyz( double *xyY, double *xyz );
 void    xyz2lab( double *xyz, double *w, double *lab );
 void    lab2lch( double *lab, double *lch );

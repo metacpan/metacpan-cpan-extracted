@@ -1,27 +1,24 @@
-package Termbox {
+package Termbox 0.12 {
     use 5.020;
     use strictures 2;
     use warnings;
-    our $VERSION = "0.11";
     #
-    use File::ShareDir qw[dist_dir];
+    use File::ShareDir        qw[dist_dir];
     use File::Spec::Functions qw[catdir canonpath];
     #
     use FFI::CheckLib;
-    use FFI::Platypus 1.00;
+    use FFI::Platypus 2.00;
     use FFI::Platypus::Memory qw( malloc free );
     $ENV{FFI_PLATYPUS_DLERROR} = 1;
     my $ffi = FFI::Platypus->new(
-        api          => 1,
-        experimental => 2,
-        lang         => 'CPP',
-        lib          => find_lib_or_exit(
+        api  => 2,
+        lang => 'CPP',
+        lib  => find_lib_or_exit(
             lib       => 'termbox',
             recursive => 1,
             libpath   => [ qw[ . ./share/lib], canonpath( catdir( dist_dir(__PACKAGE__), 'lib' ) ) ]
         )
     );
-
     #
     use base qw[Exporter];
     use vars qw[@EXPORT_OK @EXPORT %EXPORT_TAGS];
@@ -39,7 +36,7 @@ package Termbox {
             tb_select_output_mode
             tb_peek_event
             tb_poll_event
-            ]
+        ]
     ];
     use constant {
         TB_KEY_F1               => ( 0xFFFF - 0 ),
@@ -193,21 +190,16 @@ package Termbox {
             TB_KEY_SPACE
             TB_KEY_BACKSPACE2
             TB_KEY_CTRL_8
-            ]
+        ]
     ];
-
     #
-    use constant {
-        TB_MOD_ALT    => 0x01,
-        TB_MOD_MOTION => 0x02
-    };
+    use constant { TB_MOD_ALT => 0x01, TB_MOD_MOTION => 0x02 };
     $EXPORT_TAGS{modifier} = [
         qw[
             TB_MOD_ALT
             TB_MOD_MOTION
-            ]
+        ]
     ];
-
     #
     use constant {
         TB_DEFAULT => 0x00,
@@ -231,9 +223,8 @@ package Termbox {
             TB_MAGENTA
             TB_CYAN
             TB_WHITE
-            ]
+        ]
     ];
-
     #
     use constant { TB_BOLD => 0x0100, TB_UNDERLINE => 0x0200, TB_REVERSE => 0x0400 };
     $EXPORT_TAGS{font} = [
@@ -241,7 +232,7 @@ package Termbox {
             TB_BOLD
             TB_UNDERLINE
             TB_REVERSE
-            ]
+        ]
     ];
     #
     use constant { TB_EVENT_KEY => 1, TB_EVENT_RESIZE => 2, TB_EVENT_MOUSE => 3 };
@@ -250,36 +241,33 @@ package Termbox {
             TB_EVENT_KEY
             TB_EVENT_RESIZE
             TB_EVENT_MOUSE
-            ]
+        ]
     ];
-
     #
     use constant {
         TB_EUNSUPPORTED_TERMINAL => -1,
         TB_EFAILED_TO_OPEN_TTY   => -2,
         TB_EPIPE_TRAP_ERROR      => -3
-
     };
     $EXPORT_TAGS{error} = [
         qw[
             TB_EUNSUPPORTED_TERMINAL
             TB_EFAILED_TO_OPEN_TTY
             TB_EPIPE_TRAP_ERROR
-            ]
+        ]
     ];
     #
-    use constant {
-        TB_HIDE_CURSOR => -1
-
-    };
+    use constant { TB_HIDE_CURSOR => -1 };
     $EXPORT_TAGS{cursor} = [
         qw[
             TB_HIDE_CURSOR
-            ]
+        ]
     ];
     #
     use constant {
-        TB_INPUT_CURRENT => 0, TB_INPUT_ESC => 1, TB_INPUT_ALT => 2,
+        TB_INPUT_CURRENT => 0,
+        TB_INPUT_ESC     => 1,
+        TB_INPUT_ALT     => 2,
         TB_INPUT_MOUSE   => => 4
     };
     $EXPORT_TAGS{input} = [
@@ -288,7 +276,7 @@ package Termbox {
             TB_INPUT_ESC
             TB_INPUT_ALT
             TB_INPUT_MOUSE
-            ]
+        ]
     ];
     use constant {
         TB_OUTPUT_CURRENT   => 0,
@@ -303,15 +291,14 @@ package Termbox {
             TB_OUTPUT_256
             TB_OUTPUT_216
             TB_OUTPUT_GRAYSCALE
-            ]
+        ]
     ];
-
-    @EXPORT_OK = sort map { @$_ = sort @$_; @$_ } values %EXPORT_TAGS;
+    @EXPORT_OK          = sort map { @$_ = sort @$_; @$_ } values %EXPORT_TAGS;
     $EXPORT_TAGS{'all'} = \@EXPORT_OK;    # When you want to import everything
-                                          #
+
+    #
     use Termbox::Cell;
     $ffi->type('record(Termbox::Cell)');
-
     #
     use Termbox::Event;
     $ffi->type('record(Termbox::Event)');
@@ -332,10 +319,8 @@ package Termbox {
     $ffi->attach( tb_set_cursor => [ 'int', 'int' ] => 'void' );
     #
     $ffi->attach( tb_put_cell => [ 'int', 'int', 'record(Termbox::Cell)*' ] => 'void' );
-    $ffi->attach(
-        [ 'tb_change_cell' => '_tb_change_cell' ],
-        [ 'int', 'int', 'uint32_t', 'uint16_t', 'uint16_t' ] => 'void'
-    );
+    $ffi->attach( [ 'tb_change_cell' => '_tb_change_cell' ],
+        [ 'int', 'int', 'uint32_t', 'uint16_t', 'uint16_t' ] => 'void' );
 
     # The C API expects a char which doesn't so much work with Perl's representation of a character.
     sub tb_change_cell {
@@ -404,7 +389,7 @@ Termbox - Create Text-based User Interfaces Without ncurses
 =head1 DESCRIPTION
 
 Termbox is a library that provides minimalistic API which allows the programmer
-to write text-based user interfaces. The library is crossplatform and has both
+to write text-based user interfaces. The library is cross-platform and has both
 terminal-based implementations on *nix operating systems and a winapi console
 based implementation for windows operating systems. The basic idea is an
 abstraction of the greatest common subset of features available on all major
@@ -574,7 +559,7 @@ provide an offset.
 
 =item 4. C<TB_OUTPUT_GRAYSCALE> - C<0 .. 23>
 
-This mode supports the 4th range of the 256 mode only. But you dont need to
+This mode supports the 4th range of the 256 mode only. But you do not need to
 provide an offset.
 
 =back
@@ -758,7 +743,7 @@ CPAN ID: SANKO
 
 =head1 License and Legal
 
-Copyright (C) 2020 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+Copyright (C) 2020-2023 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of The Artistic License 2.0. See
@@ -769,5 +754,11 @@ When separated from the distribution, all POD documentation is covered by the
 Creative Commons Attribution-Share Alike 3.0 License. See
 http://creativecommons.org/licenses/by-sa/3.0/us/legalcode.  For clarification,
 see http://creativecommons.org/licenses/by-sa/3.0/us/.
+
+=begin stopwords
+
+nurses winapi libtermbox termbox terminfo bitwise unix ncurses
+
+=end stopwords
 
 =cut

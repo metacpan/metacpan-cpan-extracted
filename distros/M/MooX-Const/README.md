@@ -4,7 +4,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 # VERSION
 
-version v0.5.4
+version v0.6.1
 
 # SYNOPSIS
 
@@ -59,8 +59,8 @@ has setting => (
 This allows you to set the attribute _once_. The value is coerced
 into a constant, and cannot be changed again.
 
-Note that "wo" is a deprecated synonym for "once". It will be removed
-in the future, since "wo" is used for "write-only" in some Moose-like
+Note that "wo" is a removed synonym for "once". It no longer works in
+v0.6.0, since "wo" is used for "write-only" in some Moose-like
 extensions.
 
 As of v0.4.0, this now supports the `strict` setting:
@@ -97,12 +97,13 @@ test suite.
 
 It does not work with [Mouse](https://metacpan.org/pod/Mouse). Pull requests are welcome.
 
-## Write-Once Attributes
+# SUPPORT FOR OLDER PERL VERSIONS
 
-[Class::Accessor](https://metacpan.org/pod/Class%3A%3AAccessor) antlers/moose-like mode uses "wo" for write-only
-attributes, not write-once attributes.
+Since v0.6.0, the this module requires Perl v5.14 or later.
 
-As of v0.5.0, you should be using "once" instead of "wo".
+If you need this module on Perl v5.10, please use one of the v0.5.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
 
 # SEE ALSO
 
@@ -113,6 +114,8 @@ As of v0.5.0, you should be using "once" instead of "wo".
 [Moo](https://metacpan.org/pod/Moo)
 
 [MooseX::SetOnce](https://metacpan.org/pod/MooseX%3A%3ASetOnce)
+
+[Sub::Trigger::Lock](https://metacpan.org/pod/Sub%3A%3ATrigger%3A%3ALock)
 
 [Types::Const](https://metacpan.org/pod/Types%3A%3AConst)
 
@@ -145,7 +148,7 @@ Kang-min Liu 劉康民 <gugod@gugod.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2022 by Robert Rothenberg.
+This software is Copyright (c) 2018-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

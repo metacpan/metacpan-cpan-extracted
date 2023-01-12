@@ -4,7 +4,7 @@
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "Const::Fast",
       "constants",
@@ -68,7 +68,7 @@
             "Types::Const" : "v0.3.3",
             "Types::Standard" : "0",
             "namespace::autoclean" : "0",
-            "perl" : "v5.10.1",
+            "perl" : "v5.14.0",
             "utf8" : "0"
          }
       },
@@ -94,7 +94,7 @@
    "provides" : {
       "MooX::Const" : {
          "file" : "lib/MooX/Const.pm",
-         "version" : "v0.5.4"
+         "version" : "v0.6.1"
       }
    },
    "release_status" : "stable",
@@ -109,7 +109,7 @@
          "web" : "https://github.com/robrwo/MooX-Const"
       }
    },
-   "version" : "v0.5.4",
+   "version" : "v0.6.1",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Kang-min Liu \u5289\u5eb7\u6c11 <gugod@gugod.org>"

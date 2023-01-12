@@ -1,5 +1,11 @@
+1.5.5	2023-01-11
+	* Fixing tests for non verbose continuous integration systems
+	* Testing fu-extract with a list file
+
 1.5.4	2023-01-09
 	* Fixing tests 
+	* Fixing future deprecation (unescaped brackets in regex)
+	* Consistent --version across programs now prints library version too
 
 1.5.3	2023-01-08
 	* Refactoring test suite (TestFu.pm)

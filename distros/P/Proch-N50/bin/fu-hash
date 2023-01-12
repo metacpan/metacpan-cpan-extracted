@@ -16,7 +16,7 @@ if ( -e "$RealBin/../lib/Proch/N50.pm" and -e "$RealBin/../Changes" ) {
 use FASTX::Reader;
 use Proch::Seqfu;
 
-my $PROGRAM = basename($0);
+my $BASENAME = basename($0);
 my $VERSION = $Proch::Seqfu::VERSION;
 my ($opt_rename_prefix, $opt_fast,$opt_rename_with_hash, $opt_help, $opt_verbose, $opt_version);
 my $opt_upper = 1;
@@ -35,7 +35,7 @@ if (!GetOptions(
     'verbose'       => \$opt_verbose,
     'help'          => \$opt_help,
 )) { 
-        say STDERR "Wrong parameters: type $PROGRAM --help for full documentation."; 
+        say STDERR "Wrong parameters: type $BASENAME --help for full documentation."; 
         exit 1  ;
 }
 
@@ -43,6 +43,7 @@ if (!GetOptions(
 $Proch::Seqfu::fu_linesize  = $opt_line_size;
 $Proch::Seqfu::fu_verbose   = $opt_verbose;
 
+version() if ($opt_version);
 # Check consistency of parameters
 if ($opt_rename_prefix and $opt_rename_with_hash) {
     die " ERROR: Please specify either --hash or --prefix to rename sequences with MD5 or a string\n";
@@ -51,10 +52,6 @@ if ($opt_fast and ($opt_size_as_comment)) {
     say STDERR "WARNING: Size will not be printed in fast mode.";
 }
 
-# Print version
-if ($opt_version) {
-    version();
-}
 
 # Print man (help)
 pod2usage({-exitval => 0, -verbose => 2}) if $opt_help;
@@ -118,17 +115,19 @@ if (not defined $opt_fast) {
 
 sub usage {
     my $horizontal_bar = " " . '-' x 50;
-    say STDERR " $PROGRAM $VERSION";
+    say STDERR " $BASENAME $VERSION";
     say STDERR " A program to concatenate sequence files";
 
     say STDERR $horizontal_bar;
-    say STDERR " Type \`$PROGRAM --help\` to display the full manual";
+    say STDERR " Type \`$BASENAME --help\` to display the full manual";
     say STDERR " Waiting for sequences from STDIN. Press Ctrl-C to exit."
 }
 
+
 sub version {
-    say STDOUT "$PROGRAM $VERSION";
-    exit;
+	say $BASENAME, " ", $VERSION;
+	say STDERR "Using Proch::Seqfu=", $Proch::Seqfu::VERSION, " and FASTX::Reader=", $FASTX::Reader::VERSION;
+	exit();
 }
 
 __END__
@@ -143,7 +142,7 @@ fu-hash - Print sequence hashes
 
 =head1 VERSION
 
-version 1.5.4
+version 1.5.5
 
 =head1 SYNOPSIS
 

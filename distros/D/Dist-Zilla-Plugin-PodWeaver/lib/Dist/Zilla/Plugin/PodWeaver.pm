@@ -1,11 +1,11 @@
-package Dist::Zilla::Plugin::PodWeaver 4.009;
+package Dist::Zilla::Plugin::PodWeaver 4.010;
 # ABSTRACT: weave your Pod together from configuration and Dist::Zilla
 
 use Moose;
 use Pod::Weaver 3.100710; # logging with proxies
 with 'Dist::Zilla::Role::FileMunger',
      'Dist::Zilla::Role::FileFinderUser' => {
-       default_finders => [ ':InstallModules', ':ExecFiles' ],
+       default_finders => [ ':InstallModules', ':PerlExecFiles' ],
      };
 
 # BEGIN BOILERPLATE
@@ -205,18 +205,19 @@ Dist::Zilla::Plugin::PodWeaver - weave your Pod together from configuration and 
 
 =head1 VERSION
 
-version 4.009
+version 4.010
 
 =head1 DESCRIPTION
 
 [PodWeaver] is the bridge between L<Dist::Zilla> and L<Pod::Weaver>.  It rips
 apart your kinda-Pod and reconstructs it as boring old real Pod.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has the same support period as perl itself:  it supports the two
-most recent versions of perl.  (That is, if the most recently released version
-is v5.40, then this module should work on both v5.40 and v5.38.)
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
@@ -267,11 +268,11 @@ Otherwise, it will use the default configuration.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords David Golden Florian Ragwitz Karen Etheridge Yasutaka ATARASHI Сергей Романов
+=for stopwords David Golden Florian Ragwitz Karen Etheridge Ricardo Signes Yasutaka ATARASHI Сергей Романов
 
 =over 4
 
@@ -289,6 +290,10 @@ Karen Etheridge <ether@cpan.org>
 
 =item *
 
+Ricardo Signes <rjbs@semiotic.systems>
+
+=item *
+
 Yasutaka ATARASHI <yakex@cpan.org>
 
 =item *
@@ -299,7 +304,7 @@ Yasutaka ATARASHI <yakex@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo SIGNES.
+This software is copyright (c) 2023 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

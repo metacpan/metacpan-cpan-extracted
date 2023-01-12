@@ -8,13 +8,13 @@ use Data::Dumper;
 use Term::ANSIColor qw(:constants);
 require Exporter;
 
-$Proch::SeqFu::VERSION = '1.5.1';
-$Proch::SeqFu::fu_linesize = 0;
-$Proch::SeqFu::fu_verbose  = 0;
+$Proch::Seqfu::VERSION = '1.5.5';
+$Proch::Seqfu::fu_linesize = 0;
+$Proch::Seqfu::fu_verbose  = 0;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(rc fu_printfasta fu_printfastq verbose);
-our @EXPORT_OK = qw(munge frobnicate $fu_linesize $fu_verbose);  # symbols to export on request
+our @EXPORT = qw(rc fu_printfasta fu_printfastq verbose has_seqfu seqfu_version);
+our @EXPORT_OK = qw($fu_linesize $fu_verbose);  # symbols to export on request
 
 
 sub fu_printfasta {
@@ -42,7 +42,7 @@ sub fu_printfastq {
 
 # Print verbose info
 sub verbose {
-    if ($Proch::SeqFu::fu_verbose) {
+    if ($Proch::Seqfu::fu_verbose) {
         say STDERR " - ", $_[0];
     }
 }
@@ -70,13 +70,41 @@ sub is_seq {
 sub split_string {
 	my $input_string = $_[0];
 	my $formatted = '';
-	my $line_width = $Proch::SeqFu::fu_linesize; # change here
+	my $line_width = $Proch::Seqfu::fu_linesize; # change here
     return $input_string. "\n" unless ($line_width);
 	for (my $i = 0; $i < length($input_string); $i += $line_width) {
 		my $frag = substr($input_string, $i, $line_width);
 		$formatted .= $frag."\n";
 	}
 	return $formatted;
+}
+
+
+sub seqfu_version {
+    my $cmd = '';
+    eval {
+        $cmd = `seqfu version`;
+    };
+    chomp($cmd);
+    if (length($@) > 0) {
+        return -2;
+    } elsif ($cmd =~/^(\d+)\.(\d+)\.?(\d+)?$/) {
+        return $cmd;
+    } else {
+        return "-" . $cmd;
+    }
+}
+
+
+sub has_seqfu {
+    my $ver = seqfu_version();
+    if (substr($ver, 0, 1) eq '-') {
+        return 0
+    } elsif (length($ver) > 0) {
+        return 1
+    } else {
+        return undef;
+    }
 }
 1;
 
@@ -90,7 +118,7 @@ Proch::Seqfu - Helper module to support Seqfu tools
 
 =head1 VERSION
 
-version 1.5.4
+version 1.5.5
 
 =head1 Proch::Seqfu
 
@@ -118,7 +146,16 @@ Check if a string is a DNA sequence, including degenerate chars.
 
 =head2 split_string(dna)
 
-Add newlines using $Proch::SeqFu::fu_linesize as line width
+Add newlines using $Proch::Seqfu::fu_linesize as line width
+
+=head2 seqfu_version()
+
+Check if a `seqfu` binary is present and returns its version if found.
+Note this will require SeqFu > 1.13
+
+=head2 has_seqfu()
+
+If SeqFu is detected returns 1, 0 otherwise, I<undef> when detection of SeqFu version fails.
 
 =head1 AUTHOR
 

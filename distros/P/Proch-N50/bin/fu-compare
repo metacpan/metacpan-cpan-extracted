@@ -19,9 +19,11 @@ use Proch::Seqfu;
 my $VERSION = $Proch::Seqfu::VERSION // "<Dev>";
 my $BASENAME = basename($0);
 my $opt_verbose;
-
+my $opt_version;
 my ($file1, $file2) = @ARGV;
-
+if (defined $ARGV[0] and $ARGV[0] =~/^-?-?version/) {
+	version();
+}
 usage() unless (defined $file2);
 
 my %s1 = loadseqs "$file1";
@@ -61,6 +63,12 @@ END
  exit;
 }
 
+sub version {
+	say $BASENAME, " ", $VERSION;
+	say STDERR "Using Proch::Seqfu=", $Proch::Seqfu::VERSION, " and FASTX::Reader=", $FASTX::Reader::VERSION;
+	exit();
+}
+
 __END__
 
 =pod
@@ -73,7 +81,7 @@ fu-compare - Find the common sequences between two files
 
 =head1 VERSION
 
-version 1.5.4
+version 1.5.5
 
 =head1 SYNOPSIS
 

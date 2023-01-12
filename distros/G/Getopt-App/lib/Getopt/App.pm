@@ -8,7 +8,7 @@ use Carp         qw(croak);
 use Getopt::Long ();
 use List::Util   qw(first);
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 our ($OPT_COMMENT_RE, $OPTIONS, $SUBCOMMAND, $SUBCOMMANDS, %APPS) = (qr{\s+\#\s+});
 
@@ -69,22 +69,34 @@ sub bundle {
 
 sub capture {
   my ($app, $argv) = @_;
-  my ($exit_value, $stderr, $stdout) = (-1, '', '');
 
-  local *STDERR;
-  local *STDOUT;
-  open STDERR, '>', \$stderr;
-  open STDOUT, '>', \$stdout;
-  ($!, $@) = (0, '');
-  eval {
-    $exit_value = $app->($argv || [@ARGV]);
-    1;
-  } or do {
-    print STDERR $@;
-    $exit_value = int $!;
+  require File::Temp;
+  my ($STDOUT_CAPTURE, $STDERR_CAPTURE) = (File::Temp->new, File::Temp->new);
+  open my $STDOUT_ORIG, '>&STDOUT' or die "Can't remember original STDOUT: $!";
+  open my $STDERR_ORIG, '>&STDERR' or die "Can't remember original STDERR: $!";
+
+  my $restore = sub {
+    open STDERR, '>&', fileno($STDERR_ORIG) or die "Can't restore STDERR: $!";
+    open STDOUT, '>&', fileno($STDOUT_ORIG) or die "Can't restore STDOUT: $!";
+    die $_[0] if $_[0];
   };
 
-  return [$stdout, $stderr, $exit_value];
+  open STDOUT, '>&', fileno($STDOUT_CAPTURE) or $restore->("Can't capture STDOUT: $!");
+  open STDERR, '>&', fileno($STDERR_CAPTURE) or $restore->("Can't capture STDERR: $!");
+
+  my $exit_value;
+  unless (eval { $exit_value = $app->($argv || [@ARGV]); 1; }) {
+    print STDERR $@;
+    $exit_value = int $!;
+  }
+
+  STDERR->flush;
+  STDOUT->flush;
+  $restore->();
+  seek $STDERR_CAPTURE, 0, 0;
+  seek $STDOUT_CAPTURE, 0, 0;
+
+  return [join('', <$STDOUT_CAPTURE>), join('', <$STDERR_CAPTURE>), $exit_value];
 }
 
 sub extract_usage {
@@ -494,6 +506,14 @@ Used to run an C<$app> and capture STDOUT, STDERR and the exit value in that
 order in C<$array_ref>. This function will also capture C<die>. C<$@> will be
 set and captured in the second C<$array_ref> element, and C<$exit_value> will
 be set to C<$!>.
+
+This function is a very slimmed down alternative to L<Capture::Tiny/capture>.
+The main reason why L</capture> exists in this package is that if something
+inside the C<$app> throws an exception, then it will be part of the captured
+C<$stderr> instead of making C<capture()> throw an exception.
+
+L<Capture::Tiny/capture> is however more robust than this function, so please
+try L<Capture::Tiny> out in case you find an edge case.
 
 =head2 extract_usage
 

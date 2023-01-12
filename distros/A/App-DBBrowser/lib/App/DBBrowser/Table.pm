@@ -60,11 +60,8 @@ sub browse_the_table {
         my $tp = Term::TablePrint->new( $sf->{o}{table} );
         $tp->print_table(
             $all_arrayref,
-            { footer => "     '" . $sf->{d}{table} . "'     " }
+            { footer => $sf->{d}{table_footer} }
         );
-
-        delete $sf->{o}{table}{max_rows}   if exists $sf->{o}{table}{max_rows};
-        delete $sf->{o}{table}{table_name} if exists $sf->{o}{table}{table_name};
     }
 }
 
@@ -224,13 +221,6 @@ sub __selected_statement_result {
     unshift @{$sf->{i}{history}{ $sf->{d}{db} }{print}}, [ $statement, \@arguments ];
     if ( $#{$sf->{i}{history}{ $sf->{d}{db} }{print}} > 50 ) {
         $#{$sf->{i}{history}{ $sf->{d}{db} }{print}} = 50;
-    }
-    if ( $sf->{o}{G}{auto_limit} && ! $sql->{limit_stmt} ) {
-        $statement .= $ax->sql_limit( $sf->{o}{G}{auto_limit} );
-        $sf->{o}{table}{max_rows} = $sf->{o}{G}{auto_limit};
-    }
-    else {
-        $sf->{o}{table}{max_rows} = 0;
     }
     my $sth = $sf->{d}{dbh}->prepare( $statement );
     $sth->execute( @arguments );

@@ -19,7 +19,7 @@ use 5.020;
 use feature qw(say state lexical_subs);
 use feature 'lexical_subs'; no warnings "experimental::lexical_subs";
 package  Data::Dumper::Interp;
-$Data::Dumper::Interp::VERSION = '3.9';
+$Data::Dumper::Interp::VERSION = '4.0';
 
 package  # newline prevents Dist::Zilla::Plugin::PkgVersion from adding $VERSION
   DB;
@@ -268,6 +268,7 @@ sub __set_default_Foldwidth() {
     local *_; # Try to avoid clobbering special filehandle "_"
     # Does not yet work, see https://github.com/Perl/perl5/issues/19142
     
+    _SaveAndResetPunct();
     # Suppress hard-coded "didn't work" warning from Term::ReadKey when
     # the terminal size can not be determined via any method
     my $wmsg = "";
@@ -284,6 +285,7 @@ sub __set_default_Foldwidth() {
       $Foldwidth = 80;
       say "Foldwidth=$Foldwidth from hard-coded backup default" if $Debug;
     }
+    _RestorePunct();
   }
   undef $Foldwidth1;
 }
@@ -981,15 +983,16 @@ my $sane_cH = $^H;
 our @save_stack;
 sub _SaveAndResetPunct() {
   # Save things which will later be restored, and reset to sane values.
-  push @save_stack, [ $@, $!+0, $^E+0, $,, $/, $\, $^W ];
+  push @save_stack, [ $@, $!+0, $^E+0, $,, $/, $\, $?, $^W ];
   $,  = "";       # output field separator is null string
   $/  = "\n";     # input record separator is newline
   $\  = "";       # output record separator is null string
+  $?  = 0;        # child process exit status
   $^W = $sane_cW; # our load-time warnings
   #$^H = $sane_cH; # our load-time strictures etc.
 }
 sub _RestorePunct() {
-  ( $@, $!, $^E, $,, $/, $\, $^W ) = @{ pop @save_stack };
+  ( $@, $!, $^E, $,, $/, $\, $?, $^W ) = @{ pop @save_stack };
 }
 
 sub _Interpolate {

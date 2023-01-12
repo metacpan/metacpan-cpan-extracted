@@ -19,6 +19,8 @@ use IPC::Cmd qw(run);
 
 my ($ok, $output, $err) = run_bin("fu-say");
 ok($output eq "OK", "Testing external programs is OK");
+chomp($output);
+chomp($err);
 say STDERR "out={", $output, "}";
 say STDERR "err=[[", $err, "]]";
 done_testing();

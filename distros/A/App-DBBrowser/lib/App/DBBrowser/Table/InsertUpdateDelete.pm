@@ -10,7 +10,6 @@ use Term::Choose::Util qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::Table::CommitWriteSQL;
-use App::DBBrowser::DB;
 #use App::DBBrowser::GetContent; # required
 #use App::DBBrowser::Opt::Set;   # required
 use App::DBBrowser::Table::Substatements;
@@ -166,10 +165,9 @@ sub __insert_into_stmt_columns {
     my ( $sf, $sql ) = @_;
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
     $sql->{insert_into_cols} = [];
     my @cols = ( @{$sql->{cols}} );
-    if ( $plui->first_column_is_autoincrement( $sf->{d}{dbh}, $sf->{d}{schema}, $sf->{d}{table} ) ) {
+    if ( $sf->__first_column_is_autoincrement( $sql ) ) {
         shift @cols;
     }
     my $bu_cols = [ @cols ];
@@ -189,6 +187,74 @@ sub __insert_into_stmt_columns {
 }
 
 
+sub __first_column_is_autoincrement {
+    my ( $sf, $sql ) = @_;
+    my $dbh = $sf->{d}{dbh};
+    my $schema = $sf->{d}{schema};
+    my $table = $sf->{d}{tables_info}{$sf->{d}{table_key}}[2];
+    if ( $sf->{i}{driver} eq 'SQLite' ) {
+        my $stmt = "SELECT sql FROM sqlite_master WHERE name = ?";
+        my ( $row ) = $sf->{d}{dbh}->selectrow_array( $stmt, {}, $table );
+        my $qt_table = $sql->{table};
+        my $sth = $dbh->prepare( "SELECT * FROM " . $qt_table . " LIMIT 0" );
+        my $col = $sth->{NAME}[0];
+        my $qt_col = $dbh->quote_identifier( $col );
+        if ( $row =~ /^\s*CREATE\s+TABLE\s+(?:\Q$table\E|\Q$qt_table\E)\s+\(\s*(?:\Q$col\E|\Q$qt_col\E)\s+INTEGER\s+PRIMARY\s+KEY[^,]*,/i ) {
+            return 1;
+        }
+    }
+    elsif ( $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
+        my $stmt = "SELECT COUNT(*) FROM information_schema.columns WHERE
+                    TABLE_SCHEMA = ?
+                AND TABLE_NAME = ?
+                AND ORDINAL_POSITION = 1
+                AND DATA_TYPE = 'int'
+                AND COLUMN_DEFAULT IS NULL
+                AND IS_NULLABLE = 'NO'
+                AND EXTRA like '%auto_increment%'";
+        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $sql, {}, $schema, $table );
+        return $first_col_is_autoincrement;
+    }
+    elsif ( $sf->{i}{driver} eq 'Pg' ) {
+        my $stmt = "SELECT COUNT(*) FROM information_schema.columns WHERE
+                    TABLE_SCHEMA = ?
+                AND TABLE_NAME = ?
+                AND ORDINAL_POSITION = 1
+                AND DATA_TYPE = 'integer'
+                AND IS_NULLABLE = 'NO'
+                AND (
+                       UPPER(column_default) LIKE 'NEXTVAL%'
+                    OR UPPER(identity_generation) = 'BY DEFAULT'
+                )";
+        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $sql, {}, $schema, $table );
+        return $first_col_is_autoincrement;
+    }
+    elsif ( $sf->{i}{driver} eq 'Firebird' ) {
+        my $stmt = "SELECT COUNT(*) FROM RDB\$RELATION_FIELDS WHERE
+                RDB\$RELATION_NAME = ?
+            AND RDB\$FIELD_POSITION = 0
+            AND (
+                   RDB\$IDENTITY_TYPE = 0
+                OR RDB\$IDENTITY_TYPE = 1
+            )";
+        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $sql, {}, $table );
+        return $first_col_is_autoincrement;
+    }
+    #elsif ( $sf->{i}{driver} eq 'DB2' ) {
+    #    my $stmt = "SELECT COUNT(*) FROM SYSCAT.COLUMNS WHERE
+    #            TABSCHEMA = ?
+    #        AND TABNAME = ?
+    #        AND COLNO = 0
+    #        AND TYPENAME = 'INTEGER'
+    #        AND NULLS = 'N'
+    #        AND KEYSEQ = 1
+    #        AND GENERATED = 'A'
+    #        AND IDENTITY = 'Y'";
+    #    my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $sql, {}, $schema, $table );
+    #    return $first_col_is_autoincrement;
+    #}
+    return;
+}
 
 
 

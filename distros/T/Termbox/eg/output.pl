@@ -8,7 +8,7 @@ use Data::Dump;
 my $chars     = "nnnnnnnnnbbbbbbbbbuuuuuuuuuBBBBBBBBB";
 my $all_attrs = [ 0, TB_BOLD, TB_UNDERLINE, TB_BOLD | TB_UNDERLINE, ];
 
-sub next_char($current) {
+sub next_char ($current) {
     $current = 0 if ++$current > length $chars;
     $current;
 }

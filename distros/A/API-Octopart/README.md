@@ -9,6 +9,7 @@ API::Octopart - Simple inteface for querying part status across vendors at octop
                 cache => "$ENV{HOME}/.octopart/cache",
                 include_specs => 1,
                 ua_debug => 1,
+                query_limit => 10
                 );
 
         # Query part stock:
@@ -42,9 +43,23 @@ API::Octopart - Simple inteface for querying part status across vendors at octop
 
         An optional (but recommended) cache directory to minimize requests to Octopart:
 
+    - cache\_age => 3
+
+        The cache age (in days) before re-querying octopart.  Defaults to 30 days.
+
+    - query\_limit: die if too many API requests are made.
+
+        Defaults to no limit.  I exhasted 20,000 queries very quickly due to a bug!
+        This might help with that, set to a reasonable limit while testing.
+
     - ua\_debug => 1
 
         User Agent debugging.  This is very verbose and provides API communication details.
+
+    - json\_debug => 1
+
+        JSON response debugging.  This is very verbose and dumps the Octopart response
+        in JSON.
 
 - $o->has\_stock($part, %opts) - Returns the number of items in stock
 

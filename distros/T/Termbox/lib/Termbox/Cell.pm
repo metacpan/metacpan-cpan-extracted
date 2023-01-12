@@ -1,8 +1,7 @@
-package Termbox::Cell {
+package Termbox::Cell 0.12 {
     use 5.020;
     use strictures 2;
     use warnings;
-    our $VERSION = "0.11";
     #
     use FFI::Platypus::Record;
     record_layout_1(
@@ -10,12 +9,11 @@ package Termbox::Cell {
             uint32_t ch
             uint16_t fg
             uint16_t bg
-            ]
+        ]
     );
 }
 #
 1;
-
 __END__
 
 =encoding utf-8
@@ -36,11 +34,11 @@ Each cell contains the following values:
 
 =head2 C<ch( )>
 
-A single unicode character, if available.
+A single Unicode character, if available.
 
 =head2 C<fg( )>
 
-The foregound color within the cell.
+The foreground color within the cell.
 
 =head2 C<bg( )>
 

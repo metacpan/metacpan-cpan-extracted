@@ -48,7 +48,7 @@ my %WriteMakefileArgs = (
     "bigrat" => 0,
     "open" => 0
   },
-  "VERSION" => "3.9",
+  "VERSION" => "4.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

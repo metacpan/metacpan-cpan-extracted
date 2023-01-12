@@ -1,5 +1,24 @@
 Revision history for MooX-Const:
 
+v0.6.1    2023-01-12 14:25:42+00:00 Europe/London
+  No changes sicne v0.6.0.
+
+v0.6.0    2023-01-10 14:46:04+00:00 Europe/London (TRIAL RELEASE)
+  [Incompatible Changes]
+  - Minimum Perl version is v5.14.
+
+  - The deprecated "wo" (write once) attribute type has been removed. Use "once" instead.
+
+  [Documentation]
+  - Bumped copyright year.
+
+  - Added Sub::Trigger::Lock to SEE ALSO.
+
+  - Documented support for older Perl versions.
+
+  [Other]
+  - Added GitHub Actions to run tests.
+
 v0.5.4    2022-09-04 16:02:53+01:00 Europe/London
   [Other]
   - Sign distribution.

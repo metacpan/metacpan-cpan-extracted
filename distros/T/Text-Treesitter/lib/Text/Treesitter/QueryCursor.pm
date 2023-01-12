@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package Text::Treesitter::QueryCursor 0.03;
+package Text::Treesitter::QueryCursor 0.04;
 
 use v5.14;
 use warnings;
@@ -61,6 +61,14 @@ C<undef> if there are no more matches. The match is returned as an instance
 of L<Text::Treesitter::QueryMatch>.
 
 =cut
+
+sub exec
+{
+   my $self = shift;
+   my ( $query, $node ) = @_;
+
+   $self->_exec( $query, $node->_node );
+}
 
 =head1 TODO
 

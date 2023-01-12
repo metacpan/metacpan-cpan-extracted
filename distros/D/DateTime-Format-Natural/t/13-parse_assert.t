@@ -5,7 +5,7 @@ use warnings;
 use boolean qw(true false);
 
 use DateTime::Format::Natural;
-use Test::More tests => 18;
+use Test::More tests => 23;
 
 {
     # Assert for prefixed dates that an extracted unit which is
@@ -121,4 +121,22 @@ use Test::More tests => 18;
     my $parser = DateTime::Format::Natural->new;
     $parser->parse_datetime('now'); # success
     is($parser->error, '', "error() returns '' on success");
+}
+
+{
+    my $parser;
+
+    # Assert that error() returns an appropriate message.
+    $parser = DateTime::Format::Natural->new;
+    like($parser->error, qr/neither .+? nor .+? method invoked/, 'error() with no method invoked');
+    $parser->extract_datetime('fail');
+    like($parser->error, qr/cannot be extracted from/, 'error() with extract_datetime()');
+    $parser->parse_datetime('fail');
+    like($parser->error, qr/does not parse/, 'error() with parse_datetime()');
+    $parser->parse_datetime_duration('fail to fail');
+    like($parser->error, qr/does not parse/, 'error() with parse_datetime_duration()');
+
+    # Assert that trace() without traces returns cleanly.
+    $parser = DateTime::Format::Natural->new;
+    is_deeply([$parser->trace], [], 'trace() without traces returns cleanly');
 }

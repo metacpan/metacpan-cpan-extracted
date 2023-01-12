@@ -1,6 +1,6 @@
 package Geo::Coder::OpenCage;
 # ABSTRACT: Geocode coordinates and addresses with the OpenCage Geocoder
-$Geo::Coder::OpenCage::VERSION = '0.33';
+$Geo::Coder::OpenCage::VERSION = '0.34';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ use HTTP::Tiny;
 use JSON::MaybeXS;
 use URI;
 # FIXME - must be a way to get this from dist.ini?
-my $version = 0.33;
+my $version = 0.34;
 my $ua_string;
 
 sub new {
@@ -22,12 +22,17 @@ sub new {
 
     $ua_string = $class . ' ' . $version;
     my $ua   = $params{ua} || HTTP::Tiny->new(agent => $ua_string);
+    my $api_url = 'https://api.opencagedata.com/geocode/v1/json';
+    
+    if (defined($params{http} && $params{http} == 1 )){
+        $api_url =~ s|^https|http|;
+    }
     my $self = {
         version => $version,
         api_key => $params{api_key},
         ua      => $ua,
         json    => JSON::MaybeXS->new(utf8 => 1),
-        url     => URI->new('https://api.opencagedata.com/geocode/v1/json'),
+        url     => URI->new($api_url),
     };
 
     return bless $self, $class;
@@ -46,6 +51,7 @@ sub ua {
 # see list: https://opencagedata.com/api#forward-opt
 my %valid_params = (
     abbrv          => 1,
+    address_only   => 1,    
     add_request    => 1,
     bounds         => 1,
     countrycode    => 1,
@@ -95,7 +101,7 @@ sub geocode {
     }
     my $URL = $self->{url}->clone();    
     $URL->query_form(\@final_params);
-    #print STDERR 'url: ' . $URL->as_string . "\n";
+    # print STDERR 'url: ' . $URL->as_string . "\n";
     my $response = $self->{ua}->get($URL);
 
     if (!$response) {
@@ -153,7 +159,7 @@ Geo::Coder::OpenCage - Geocode coordinates and addresses with the OpenCage Geoco
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 SYNOPSIS
 
@@ -175,7 +181,8 @@ It is recommended you read the L<best practices for using the OpenCage geocoder|
 
     my $Geocoder = Geo::Coder::OpenCage->new(api_key => $my_api_key);
 
-Get your API key from L<https://opencagedata.com>
+Get your API key from L<https://opencagedata.com>.
+Optionally "http => 1" can also be specified in which case API requests will NOT be made via https
 
 =head2 ua
 
@@ -196,7 +203,7 @@ Takes a single named parameter 'location' and returns a result hashref.
 warns and returns undef if the query fails for some reason.
 
 If you will be doing forward geocoding, please see the 
-L<OpenCage query formatting guidelines|https://github.com/OpenCageData/opencagedata-misc-docs/blob/master/query-formatting.md>
+L<OpenCage query formatting guidelines|https://opencagedata.com/guides/how-to-format-your-geocoding-query>
 
 The OpenCage Geocoder has a few optional parameters:
 
@@ -272,27 +279,11 @@ Ed Freyfogle from the OpenCage team gave L<an interview with Built in Perl about
 
 =head1 AUTHOR
 
-Ed Freyfogle
+Ed Freyfogle <cpan@opencagedata.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2019 OpenCage GmbH <cpan@opencagedata.com>
-
-Please check out all our open source work over at L<https://github.com/opencagedata> and our developer blog: L<https://blog.opencagedata.com>
-
-Thanks!
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.16 or,
-at your option, any later version of Perl 5 you may have available.
-
-=head1 AUTHOR
-
-edf <edf@opencagedata.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021 by OpenCage GmbH.
+This software is copyright (c) 2023 by OpenCage GmbH.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -10,6 +10,7 @@ use Text::Treesitter::Parser;
 use Text::Treesitter::Query;
 use Text::Treesitter::QueryCursor;
 use Text::Treesitter::QueryMatch;
+use Text::Treesitter::Tree;
 
 use File::Slurper qw( read_text );
 

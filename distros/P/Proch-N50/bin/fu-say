@@ -9,9 +9,14 @@ use FASTX::Reader;
 use File::Basename;
 use FindBin qw($RealBin);
 
+if (defined $ARGV[0] and $ARGV[0] =~/^-?-?version/) {
+    say "fu-say \$VERSION";
+    say STDERR "Using FASTX::Reader=", $FASTX::Reader::VERSION;
+    exit(0)
+}
 say STDERR $FASTX::Reader::VERSION;
 say STDOUT "OK";
-exit(1);
+defined $ARGV[0] ? exit(1) : exit(0);
 
 __END__
 
@@ -25,7 +30,7 @@ fu-say - Testing module
 
 =head1 VERSION
 
-version 1.5.4
+version 1.5.5
 
 =head1 AUTHOR
 

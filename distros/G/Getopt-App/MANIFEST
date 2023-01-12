@@ -6,7 +6,6 @@ example/lib/Test/Cool/commands/coffee.pl
 example/lib/Test/Cool/commands/help.pl
 example/lib/Test/Cool/commands/invalid.pl
 example/lib/Test/Cool/commands/unknown.pl
-Getopt-App-0.11.tar.gz
 lib/Getopt/App.pm
 lib/Getopt/App/Complete.pm
 Makefile.PL

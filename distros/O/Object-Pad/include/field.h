@@ -18,7 +18,7 @@ struct FieldMeta {
     for(hooki = 0; fieldmeta->hooks && hooki < av_count(fieldmeta->hooks); hooki++) {     \
       struct FieldHook *h = (struct FieldHook *)AvARRAY(fieldmeta->hooks)[hooki];         \
       if(*h->funcs->func)                                                                 \
-        (*h->funcs->func)(aTHX_ fieldmeta, h->hookdata, h->funcdata);                     \
+        (*h->funcs->func)(aTHX_ fieldmeta, h->attrdata, h->funcdata);                     \
     }                                                                                     \
   }
 
@@ -28,7 +28,7 @@ struct FieldMeta {
     for(hooki = 0; fieldmeta->hooks && hooki < av_count(fieldmeta->hooks); hooki++) {     \
       struct FieldHook *h = (struct FieldHook *)AvARRAY(fieldmeta->hooks)[hooki];         \
       if(*h->funcs->func)                                                                 \
-        (*h->funcs->func)(aTHX_ fieldmeta, h->hookdata, h->funcdata, __VA_ARGS__);        \
+        (*h->funcs->func)(aTHX_ fieldmeta, h->attrdata, h->funcdata, __VA_ARGS__);        \
     }                                                                                     \
   }
 

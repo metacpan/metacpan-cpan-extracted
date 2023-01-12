@@ -1,7 +1,7 @@
-use v5.10.0;
+use v5.14.0;
 use warnings;
 
-package JMAP::Tester 0.102;
+package JMAP::Tester 0.103;
 # ABSTRACT: a JMAP client made for testing JMAP servers
 
 use Moo;
@@ -128,10 +128,21 @@ has json_codec => (
   },
 );
 
+#pod =attr use_json_typists
+#pod
+#pod This attribute governs the conversion of JSON data into typed objects, using
+#pod L<JSON::Typist>.  This attribute is true by default.
+#pod
+#pod =cut
+
+has use_json_typist => (
+  is => 'ro',
+  default => 1,
+);
+
 has _json_typist => (
   is => 'ro',
   handles => {
-    apply_json_types => 'apply_types',
     strip_json_types => 'strip_types',
   },
   default => sub {
@@ -139,6 +150,13 @@ has _json_typist => (
     return JSON::Typist->new;
   },
 );
+
+sub apply_json_types {
+  my ($self, $data) = @_;
+
+  return $data unless $self->use_json_typist;
+  return $self->_json_typist->apply_types($data);
+}
 
 for my $type (qw(api authentication download upload)) {
   has "$type\_uri" => (
@@ -995,7 +1013,7 @@ JMAP::Tester - a JMAP client made for testing JMAP servers
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 OVERVIEW
 
@@ -1046,12 +1064,27 @@ Or more simply:
 
 There is also L<JMAP::Tester::Response/"as_stripped_pairs">.
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 ATTRIBUTES
 
 =head2 should_return_futures
 
 If true, this indicates that the various network-accessing methods should
 return L<Future> objects rather than immediate results.
+
+=head2 use_json_typists
+
+This attribute governs the conversion of JSON data into typed objects, using
+L<JSON::Typist>.  This attribute is true by default.
 
 =head2 default_using
 
@@ -1244,7 +1277,7 @@ byte string to be passed as the body.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
@@ -1266,7 +1299,15 @@ Matthew Horsfall <wolfsage@gmail.com>
 
 =item *
 
+Michael McClimon <michael@fastmailteam.com>
+
+=item *
+
 Michael McClimon <michael@mcclimon.org>
+
+=item *
+
+Ricardo Signes <rjbs@cpan.org>
 
 =item *
 
@@ -1280,7 +1321,7 @@ Ricardo Signes <rjbs@users.noreply.github.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by FastMail, Ltd.
+This software is copyright (c) 2016 by Fastmail Pty. Ltd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

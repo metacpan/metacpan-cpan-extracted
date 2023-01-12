@@ -1,8 +1,7 @@
-package Termbox::Event {
+package Termbox::Event 0.12 {
     use 5.020;
     use strictures 2;
     use warnings;
-    our $VERSION = "0.11";
     #
     use FFI::Platypus::Record;
     record_layout_1(
@@ -15,12 +14,10 @@ package Termbox::Event {
             int32_t  h
             int32_t  x
             int32_t  y
-            ]
+        ]
     );
 }
-
 1;
-
 __END__
 
 =encoding utf-8
@@ -45,7 +42,7 @@ This class represents an event or single interaction from the user.
 
 =item The C<key( )> value is valid if C<type( )> is either C<TB_EVENT_KEY> or C<TB_EVENT_MOUSE>.
 
-=item The C<key( )> and <ch( )> values are mutually exclusive; only one of them can be non-zero at a time.
+=item The C<key( )> and C<ch( )> values are mutually exclusive; only one of them can be non-zero at a time.
 
 =back
 
@@ -67,7 +64,7 @@ One of the C<TB_KEY_.+> constants imported from Termobx with the C<:key> tag.
 
 =head2 C<ch( )>
 
-A single unicode character, if available.
+A single Unicode character, if available.
 
 =head2 C<w( )>
 

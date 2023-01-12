@@ -16,6 +16,7 @@ use lib $RealBin;
 use TestFu;
 
 my $file = catfile($RealBin, "..", "data", "small_test.fa"); # "$RealBin/../data/small_test.fa";
+my $list = catfile($RealBin, "..", "data", "list.txt");
 my $bins  = catfile($RealBin, "..", "bin/");
 my $program = 'fu-extract';
 
@@ -41,9 +42,12 @@ SKIP: {
     ok($seqs == 5, "[$program] got $seqs sequences, expected 5");
     
     # Case insensitive: all sequences match (6)
-    my $icmd = qq($^X $script -i -p seq "$script" "$file" );
     my $iseqs = countseqs("fu-extract", ("-p", "seq", "-i", "$file"));
     ok($iseqs == 6, "[$program] got $iseqs sequences, expected 6");    
+
+    my $lseqs = countseqs("fu-extract", ("-l", "$list", "$file"));
+    ok($lseqs == 2, "[$program] got $lseqs sequences, expected 2");    
+
 }
 
 done_testing();

@@ -1,0 +1,58 @@
+NAME
+    rpm-spec-license - Tool for working with RPM spec file licenses.
+
+SYNOPSIS
+     rpm-spec-license [-f] [-g file_glob] [-h] [-s] [--version] [file_or_dir]
+
+ARGUMENTS
+    *       "-f"
+
+            Print spec file name before license information.
+
+    *       "-g file_glob"
+
+            File glob.
+
+            Default value is '*', which mean looking for '*.spec' files.
+
+    *       "-h"
+
+            Print help.
+
+    *       "-s"
+
+            Skip RPM spec file parsing errors. Only print information to
+            stderr.
+
+    *       "--version"
+
+            Print version of script.
+
+    *       "file_or_dir"
+
+            RPM spec file or directory with spec files.
+
+            Default value is actual directory.
+
+  EXAMPLE1
+     rpm-spec-license __dir_with_spec_files__
+
+EXAMPLE2
+     rpm-spec-license __file__.spec
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-RPM-Spec-License>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

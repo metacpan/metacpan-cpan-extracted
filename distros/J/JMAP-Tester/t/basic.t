@@ -388,6 +388,39 @@ subtest "interpreting HTTP responses" => sub {
   }
 };
 
+subtest "with optional typist" => sub {
+  my $new_hres = sub {
+    return HTTP::Response->new(
+      200,
+      "OK",
+      [ 'Content-Type', 'application/json' ],
+      q<{"methodResponses": [["foo", {"a":1}, "c"]] }>,
+    );
+  };
+
+  {
+    my $tester = JMAP::Tester->new;
+    my $jres = $tester->_jresponse_from_hresponse($new_hres->());
+    ok(
+      $jres->as_pairs->[0][1]{a}->isa('JSON::Typist::Number'),
+      'default to using a typist'
+    );
+  }
+
+  {
+    my $tester = JMAP::Tester->new(use_json_typist => 0);
+    my $jres = $tester->_jresponse_from_hresponse($new_hres->());
+
+    # cmp_deeply doesn't see through types, so we can use it to assert we
+    # don't have them.
+    cmp_deeply(
+      $jres->as_pairs,
+      [ [ "foo", {a=>1} ] ],
+      'with false use_json_typist, we do not'
+    );
+  }
+};
+
 sub aborts_ok {
   my ($code, $want, $desc);
   if (@_ == 2) {

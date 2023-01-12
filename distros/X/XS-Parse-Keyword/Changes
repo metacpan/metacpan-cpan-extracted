@@ -1,5 +1,10 @@
 Revision history for XS-Parse-Keyword
 
+0.32    2023-01-12
+        [BUGFIXES]
+         * Ensure that XPK_TERMEXPR acting as a fullexpr is OK with empty
+           parens (RT145618)
+
 0.31    2022-12-25
         [CHANGES]
          * PL_infix_plugin now exists in 5.37.7

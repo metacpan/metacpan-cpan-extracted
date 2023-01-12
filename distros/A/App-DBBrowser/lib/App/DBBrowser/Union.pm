@@ -27,7 +27,7 @@ sub union_tables {
     $sf->{i}{stmt_types} = [ 'Union' ];
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $tables = [ @{$sf->{d}{user_tables}}, @{$sf->{d}{sys_tables}} ];
+    my $tables = [ @{$sf->{d}{user_table_keys}}, @{$sf->{d}{sys_table_keys}} ];
     ( $sf->{d}{col_names}, $sf->{d}{col_types} ) = $ax->tables_column_names_and_types( $tables );
     my $union = {
         used_tables    => [],
@@ -180,7 +180,7 @@ sub __union_all_tables {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my @tables_union_auto;
-    for my $table ( @{$sf->{d}{user_tables}} ) {
+    for my $table ( @{$sf->{d}{user_table_keys}} ) {
         if ( $sf->{d}{tables_info}{$table}[3] ne 'TABLE' ) {
             next;
         }

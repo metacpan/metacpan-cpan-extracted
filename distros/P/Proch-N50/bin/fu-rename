@@ -121,9 +121,11 @@ END
 }
 
 sub version {
-	say STDERR "$BASENAME $VERSION";
-	exit 0;
+	say $BASENAME, " ", $VERSION;
+	say STDERR "Using Proch::Seqfu=", $Proch::Seqfu::VERSION, " and FASTX::Reader=", $FASTX::Reader::VERSION;
+	exit();
 }
+
 sub vprint {
 	say $_[0] if ($opt_verbose or $opt_debug) ;
 }
@@ -144,7 +146,7 @@ fu-rename - rename sequences
 
 =head1 VERSION
 
-version 1.5.4
+version 1.5.5
 
 =head1 SYNOPSIS
 

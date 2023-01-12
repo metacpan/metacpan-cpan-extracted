@@ -1,5 +1,8 @@
 Revision history for Quote-Ref
 
+0.04    2023-01-12
+        Fix a test failure with perl v5.37.4+.
+
 0.03    2013-08-31
         Run on 5.12 again.
 

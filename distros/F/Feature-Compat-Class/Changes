@@ -1,5 +1,10 @@
 Revision history for Feature-Compat-Class
 
+0.05    2023-01-12
+        [CHANGES]
+         * Don't enable the implied pragmata (strict, warnings, etc..) when
+           using Object::Pad, because core version won't do that
+
 0.04    2022-12-14
         [CHANGES]
          * Support field initialiser expressions, the `:param` field

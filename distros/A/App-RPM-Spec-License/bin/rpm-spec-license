@@ -1,0 +1,96 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::RPM::Spec::License;
+
+our $VERSION = 0.01;
+
+# Run.
+exit App::RPM::Spec::License->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+rpm-spec-license - Tool for working with RPM spec file licenses.
+
+=head1 SYNOPSIS
+
+ rpm-spec-license [-f] [-g file_glob] [-h] [-s] [--version] [file_or_dir]
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-f>
+
+Print spec file name before license information.
+
+=item * C<-g file_glob>
+
+File glob.
+
+Default value is '*', which mean looking for '*.spec' files.
+
+=item * C<-h>
+
+Print help.
+
+=item * C<-s>
+
+Skip RPM spec file parsing errors.
+Only print information to stderr.
+
+=item * C<--version>
+
+Print version of script.
+
+=item * C<file_or_dir>
+
+RPM spec file or directory with spec files.
+
+Default value is actual directory.
+
+=back
+
+=head2 EXAMPLE1
+
+ rpm-spec-license __dir_with_spec_files__
+
+=head1 EXAMPLE2
+
+ rpm-spec-license __file__.spec
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/App-RPM-Spec-License>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2023 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.01
+
+=cut

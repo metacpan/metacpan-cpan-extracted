@@ -23,6 +23,7 @@ my $opt_search_in_name;
 my $opt_search_in_comm;
 my $opt_stranded;
 my $opt_annotate;
+my $opt_version;
 
 my $_opt          = GetOptions(
 	'a|annotate'    => \$opt_annotate,
@@ -34,8 +35,14 @@ my $_opt          = GetOptions(
 	'cs|comment-separator=s'
 	                => \$opt_comment_separator,
 	'd|debug'		=> \$opt_debug,
+	'version'       => \$opt_version,
 );
-
+sub version {
+	say $BASENAME, " ", $VERSION;
+	say STDERR "Using Proch::Seqfu=", $Proch::Seqfu::VERSION, " and FASTX::Reader=", $FASTX::Reader::VERSION;
+	exit();
+}
+version() if ($opt_version);
 usage() unless (defined $ARGV[1]);
 
 if ($opt_debug) {
@@ -182,7 +189,7 @@ fu-grep - Extract sequences using patterns
 
 =head1 VERSION
 
-version 1.5.4
+version 1.5.5
 
 =head1 USAGE
 

@@ -15,7 +15,7 @@ use FindBin qw($RealBin);
 if ( -e "$RealBin/../lib/Proch/N50.pm" and -e "$RealBin/../Changes" ) {
     use lib "$RealBin/../lib";
 }
-my $EXE = basename($0);
+my $BASENAME = basename($0);
 use Proch::Seqfu;
 my $VERSION = $Proch::Seqfu::VERSION // "<Dev>";
 my $AUTHOR = 'Andrea Telatin';
@@ -25,15 +25,16 @@ my $opt_def_qual    = $ENV{'SEQFU_DEF_QUAL'}   // 33;     # Default quality if p
 my $opt_line_length = $ENV{'FU_LINE_LENGTH'} // 80;       # Default line length for FASTA files
 
 my( @Options,
-	$opt_ascending,
+	  $opt_ascending,
     $opt_comment_len,
-	$opt_fasta,
+	  $opt_fasta,
     $opt_fastq,
     $opt_strip_comm,
     $opt_upper,
     $opt_revcompl,
-	$opt_quiet,
+	  $opt_quiet,
     $opt_debug,
+    $opt_version,
 );
 
 
@@ -92,11 +93,7 @@ for my $size (sort $sorter keys %seqs ) {
 	}
 }
 
-sub ver {
- say "$EXE $VERSION";
- exit;
-}
-
+ 
 sub setOptions {
   use Getopt::Long;
 
@@ -106,7 +103,7 @@ sub setOptions {
 
   'General:',
     {OPT=>"help",             VAR=>\&usage ,                        DESC=>"This help"},
-    {OPT=>"version",          VAR=>\&ver,                           DESC=>"Print version and exit"},
+    {OPT=>"version",          VAR=>\&version,                           DESC=>"Print version and exit"},
     {OPT=>"citation",         VAR=>\&show_citation,                 DESC=>"Print citation for seqfu"},
     {OPT=>"quiet!",           VAR=>\$opt_quiet, DEFAULT=>0,         DESC=>"No screen output"},
     {OPT=>"debug!",           VAR=>\$opt_debug, DEFAULT=>0,         DESC=>"Debug mode"},
@@ -142,6 +139,11 @@ sub setOptions {
 }
 
 
+sub version {
+	say $BASENAME, " ", $VERSION;
+	say STDERR "Using Proch::Seqfu=", $Proch::Seqfu::VERSION, " and FASTX::Reader=", $FASTX::Reader::VERSION;
+	exit();
+}
 sub debug {
 	say STDERR '#' , $_[0] if ($opt_debug);
 }
@@ -153,9 +155,9 @@ sub usage {
   select STDERR if $exitcode;            # write to STDERR if exitcode is error
 
   print
-    "Name:\n  ", ucfirst($EXE), " $VERSION by $AUTHOR\n",
+    "Name:\n  ", ucfirst($BASENAME), " $VERSION by $AUTHOR\n",
     "Synopsis:\n  $DESC\n",
-    "Usage:\n  $EXE [options] filename (or '-' for STDIN)\n";
+    "Usage:\n  $BASENAME [options] filename (or '-' for STDIN)\n";
 
   foreach (@Options) {
     if (ref) {
@@ -187,7 +189,7 @@ fu-sort - Sort sequences by size
 
 =head1 VERSION
 
-version 1.5.4
+version 1.5.5
 
 =head1 EXAMPLES
 

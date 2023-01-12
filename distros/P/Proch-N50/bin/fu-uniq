@@ -17,7 +17,7 @@ if ( -e "$RealBin/../lib/Proch/N50.pm" and -e "$RealBin/../Changes" ) {
 }
 use Proch::Seqfu;
 my $VERSION = $Proch::Seqfu::VERSION // "<Dev>";
-my $EXE = basename($0);
+my $BASENAME = basename($0);
 
 my $AUTHOR = 'Andrea Telatin';
 my $DESC = 'Print unique sequence with USEARCH labels';
@@ -40,10 +40,18 @@ my( @Options,
 	$opt_debug, 				
 	$opt_citation,
 	$outdir,
+  $opt_version,
 	$force,
 );
 setOptions();
 
+
+sub version {
+	say $BASENAME, " ", $VERSION;
+	say STDERR "Using Proch::Seqfu=", $Proch::Seqfu::VERSION, " and FASTX::Reader=", $FASTX::Reader::VERSION;
+	exit();
+}
+version() if ($opt_version);
 my $optional_spacer = $opt_sep_size ? "\t" : ";";
 
 
@@ -84,7 +92,7 @@ for my $seq (sort { $counter{$b} <=> $counter{$a} } keys %counter ) {
 }
 
 sub ver {
- say "$EXE $VERSION";
+ say "$BASENAME $VERSION";
  exit;
 }
 
@@ -100,7 +108,7 @@ sub setOptions {
 		{OPT=>'size-as-comment!' ,VAR=>\$opt_sep_size,   DEFAULT=>0,    DESC=>"Add size as comment, not as part of sequence name" },
     'General:',
     {OPT=>"help",      VAR=>\&usage ,                DESC=>"This help"},
-    {OPT=>"version",   VAR=>\&ver,                   DESC=>"Print version and exit"},
+    {OPT=>"version",   VAR=>\&version,               DESC=>"Print version and exit"},
     {OPT=>"citation",  VAR=>\&show_citation,         DESC=>"Print citation for seqfu"},
     {OPT=>"quiet!",    VAR=>\$opt_quiet, DEFAULT=>0, DESC=>"No screen output"},
     {OPT=>"debug!",    VAR=>\$opt_debug, DEFAULT=>0, DESC=>"Debug mode: keep all temporary files"},
@@ -143,9 +151,9 @@ sub usage {
   select STDERR if $exitcode;            # write to STDERR if exitcode is error
 
   print
-    "Name:\n  ", ucfirst($EXE), " $VERSION by $AUTHOR\n",
+    "Name:\n  ", ucfirst($BASENAME), " $VERSION by $AUTHOR\n",
     "Synopsis:\n  $DESC\n",
-    "Usage:\n  $EXE [options] filename (or '-' for STDIN)\n";
+    "Usage:\n  $BASENAME [options] filename (or '-' for STDIN)\n";
   foreach (@Options) {
     if (ref) {
       my $def = defined($_->{DEFAULT}) ? " (default '$_->{DEFAULT}')" : "";
@@ -176,7 +184,7 @@ fu-uniq - Dereplicate sequences
 
 =head1 VERSION
 
-version 1.5.4
+version 1.5.5
 
 =head1 SYNOPSIS
 

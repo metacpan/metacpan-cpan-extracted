@@ -1,3 +1,13 @@
+0.203 2023-01-12
+- fix xyY_to_xyz to have Y of 1
+
+0.202 2023-01-12
+- no need to supply mstar for add_rgb_space
+- can supply add_rgb_space-format hash-ref to the relevant functions
+- add rgb_to_lab, lab_to_rgb, rgb_{to,from}_linear
+- add lsRGB colour space
+- operations can work inplace
+
 0.201 2022-02-14
 - more accurate dependencies
 - adjust so docs get generated for MetaCPAN benefit

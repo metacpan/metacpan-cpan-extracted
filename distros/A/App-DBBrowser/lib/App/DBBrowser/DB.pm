@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.310';
+our $VERSION = '2.312';
 
 #use bytes; # required
 use Scalar::Util qw( looks_like_number );
@@ -22,8 +22,7 @@ sub new {
 
 sub get_db_driver {
     my ( $sf ) = @_;
-    my $driver = $sf->{Plugin}->get_db_driver();
-    return $driver;
+    return $sf->{Plugin}->get_db_driver();
 }
 
 
@@ -160,12 +159,10 @@ sub get_databases {
 
 
 sub tables_info { # not public
-    my ( $sf, $dbh, $schema ) = @_;
-    my $tables_info = {};
-    # The table names in the $tables_info keys are used in the tables-menu but not in SQL code.
-    # To get the table names for SQL code it is used the 'quote_table' routine.
+    my ( $sf, $dbh, $schema, $is_system_schema ) = @_;
+    my $db_driver = $sf->get_db_driver();
     my ( $table_schem, $table_name );
-    if ( $sf->get_db_driver eq 'Pg' ) {
+    if ( $db_driver eq 'Pg' ) {
         $table_schem = 'pg_schema';
         $table_name  = 'pg_table';
         # DBD::Pg  3.16.0:
@@ -180,132 +177,51 @@ sub tables_info { # not public
         $table_name  = 'TABLE_NAME';
     }
     my @keys = ( 'TABLE_CAT', $table_schem, $table_name, 'TABLE_TYPE' );
+    if ( $db_driver eq 'SQLite' && $sf->{Plugin}{i}{db_attached} ) {
+        # If a SQLite database has databases attached, set $schema to 'undef'.
+        # If $schema is `undef` `$dbh->table_info( undef, $schema, '%', '' )` returns all schemas - main, temp, aliases
+        # of attached databases - with its tables.
+        $schema = undef;
+    }
     my $sth = $dbh->table_info( undef, $schema, '%', '' );
     my $info_tables = $sth->fetchall_arrayref( { map { $_ => 1 } @keys } );
+    my ( @user_table_keys, @sys_table_keys );
+    my $tables_info = {};
     for my $info_table ( @$info_tables ) {
-        next if $info_table->{TABLE_TYPE} eq 'INDEX';
-        next if $info_table->{TABLE_TYPE} =~ /^SYSTEM/ && ! $sf->{Plugin}{o}{G}{metadata};
-        my $table;
-        if ( $sf->get_db_driver eq 'SQLite' && ! defined $schema ) {
-            # The $schema is undefined if: SQLite + attached databases
+        if ( $info_table->{TABLE_TYPE} eq 'INDEX' ) {
+            next;
+        }
+        # The table name in $table_key is used in the tables-menu but not in SQL code.
+        # To get the table names for SQL code it is used the 'quote_table' routine in Auxil.pm.
+        my $table_key;
+        if ( $db_driver eq 'SQLite' && ! defined $schema ) {
+            # The $schema is `undef` if a SQLite database has attached databases.
+            next if $info_table->{$table_name} eq 'sqlite_temp_master'; # no 'create temp table'
             if ( $info_table->{$table_schem} =~ /^main\z/i ) {
-                $table = sprintf "[%s] %s", "\x{001f}" . $info_table->{$table_schem}, $info_table->{$table_name};
+                $table_key = sprintf "[%s] %s", "\x{001f}" . $info_table->{$table_schem}, $info_table->{$table_name};
                 # \x{001f} keeps the main tables on top of the tables menu.
             }
             else {
-                $table = sprintf "[%s] %s", $info_table->{$table_schem}, $info_table->{$table_name};
+                $table_key = sprintf "[%s] %s", $info_table->{$table_schem}, $info_table->{$table_name};
             }
         }
         else {
-            $table = $info_table->{$table_name};
+            $table_key = $info_table->{$table_name};
         }
-        $tables_info->{$table} = [ @{$info_table}{@keys} ];
-    }
-    return $tables_info;
-}
-
-
-sub first_column_is_autoincrement {
-    my ( $sf, $dbh, $schema, $table ) = @_;
-    if ( $sf->get_db_driver eq 'SQLite' ) {
-        my $sql = "SELECT sql FROM sqlite_master WHERE name = ?";
-        my ( $row ) = $dbh->selectrow_array( $sql, {}, $table );
-        my $qt_table = $dbh->quote_identifier( $table );
-        my $sth = $dbh->prepare( "SELECT * FROM " . $qt_table . " LIMIT 0" );
-        my $col = $sth->{NAME}[0];
-        my $qt_col = $dbh->quote_identifier( $col );
-        if ( $row =~ /^\s*CREATE\s+TABLE\s+(?:\Q$table\E|\Q$qt_table\E)\s+\(\s*(?:\Q$col\E|\Q$qt_col\E)\s+INTEGER\s+PRIMARY\s+KEY[^,]*,/i ) {
-            return 1;
-        }
-    }
-    elsif ( $sf->get_db_driver =~ /^(?:mysql|MariaDB)\z/ ) {
-        my $sql = "SELECT COUNT(*) FROM information_schema.columns WHERE
-                    TABLE_SCHEMA = ?
-                AND TABLE_NAME = ?
-                AND ORDINAL_POSITION = 1
-                AND DATA_TYPE = 'int'
-                AND COLUMN_DEFAULT IS NULL
-                AND IS_NULLABLE = 'NO'
-                AND EXTRA like '%auto_increment%'";
-        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $sql, {}, $schema, $table );
-        return $first_col_is_autoincrement;
-    }
-    elsif ( $sf->get_db_driver eq 'Pg' ) {
-        my $sql = "SELECT COUNT(*) FROM information_schema.columns WHERE
-                    TABLE_SCHEMA = ?
-                AND TABLE_NAME = ?
-                AND ORDINAL_POSITION = 1
-                AND DATA_TYPE = 'integer'
-                AND IS_NULLABLE = 'NO'
-                AND (
-                       UPPER(column_default) LIKE 'NEXTVAL%'
-                    OR UPPER(identity_generation) = 'BY DEFAULT'
-                )";
-        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $sql, {}, $schema, $table );
-        return $first_col_is_autoincrement;
-    }
-    elsif ( $sf->get_db_driver eq 'Firebird' ) {
-        my $sql = "SELECT COUNT(*) FROM RDB\$RELATION_FIELDS WHERE
-                RDB\$RELATION_NAME = ?
-            AND RDB\$FIELD_POSITION = 0
-            AND (
-                   RDB\$IDENTITY_TYPE = 0
-                OR RDB\$IDENTITY_TYPE = 1
-            )";
-        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $sql, {}, $table );
-        return $first_col_is_autoincrement;
-    }
-    #elsif ( $sf->get_db_driver eq 'DB2' ) {
-    #    my $sql = "SELECT COUNT(*) FROM SYSCAT.COLUMNS WHERE
-    #            TABSCHEMA = ?
-    #        AND TABNAME = ?
-    #        AND COLNO = 0
-    #        AND TYPENAME = 'INTEGER'
-    #        AND NULLS = 'N'
-    #        AND KEYSEQ = 1
-    #        AND GENERATED = 'A'
-    #        AND IDENTITY = 'Y'";
-    #    my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $sql, {}, $schema, $table );
-    #    return $first_col_is_autoincrement;
-    #}
-    return;
-}
-
-
-sub primary_key_autoincrement_constraint {
-    # provide "primary_key_autoincrement_constraint" only if also "first_col_is_autoincrement" is available
-    my ( $sf, $dbh ) = @_;
-    if ( $sf->get_db_driver eq 'SQLite' ) {
-        return "INTEGER PRIMARY KEY";
-    }
-    if ( $sf->get_db_driver =~ /^(?:mysql|MariaDB)\z/ ) {
-        return "INT NOT NULL AUTO_INCREMENT PRIMARY KEY";
-        # mysql: NOT NULL added automatically with AUTO_INCREMENT
-    }
-    if ( $sf->get_db_driver eq 'Pg' ) {
-        my ( $pg_version ) = $dbh->selectrow_array( "SELECT version()" );
-        if ( $pg_version =~ /^\S+\s+([0-9]+)(?:\.[0-9]+)*\s/ && $1 >= 10 ) {
-            # since PostgreSQL version 10
-            return "INT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY";
+        if ( $is_system_schema ) {
+            push @sys_table_keys, $table_key;
         }
         else {
-            return "SERIAL PRIMARY KEY";
+            if ( $info_table->{TABLE_TYPE} =~ /^SYSTEM/ || ( $db_driver eq 'SQLite' && $info_table->{TABLE_NAME} =~ /^sqlite_/ ) ) {
+                push @sys_table_keys, $table_key;
+            }
+            else {
+                push @user_table_keys, $table_key;
+            }
         }
+        $tables_info->{$table_key} = [ @{$info_table}{@keys} ];
     }
-    if ( $sf->get_db_driver eq 'Firebird' ) {
-        my ( $firebird_version ) = $dbh->selectrow_array( "SELECT RDB\$GET_CONTEXT('SYSTEM', 'ENGINE_VERSION') FROM RDB\$DATABASE" );
-        my $firebird_major_version = $firebird_version =~ s/^(\d+).+\z/$1/r;
-        if ( $firebird_major_version >= 4 ) {
-            return "INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY";
-        }
-        elsif ( $firebird_major_version >= 3 ) {
-            return "INT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY";
-        }
-    }
-    #if ( $sf->get_db_driver eq 'DB2' ) {
-    #    #return "INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) PRIMARY KEY";
-    #    return "INT NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY";
-    #}
+    return $tables_info, [ sort @user_table_keys ], [ sort @sys_table_keys ];
 }
 
 
@@ -327,7 +243,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.310
+Version 2.312
 
 =head1 DESCRIPTION
 
