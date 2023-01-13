@@ -9,6 +9,10 @@ use File::Path 'mkpath';
 use File::Basename 'dirname', 'basename';
 
 use SPVM::Builder::CC;
+use SPVM::Builder::Compiler;
+use SPVM::Builder::Runtime;
+use SPVM::Builder::Env;
+use SPVM::Builder::Stack;
 
 # This SPVM load is needed for SPVM::Builder XS method binding to Perl
 # because SPVM::Builder XS method is loaded when SPVM is loaded
@@ -26,17 +30,6 @@ sub build_dir {
   }
 }
 
-sub module_dirs {
-  my $self = shift;
-  if (@_) {
-    $self->{module_dirs} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{module_dirs};
-  }
-}
-
 sub compiler {
   my $self = shift;
   if (@_) {
@@ -48,37 +41,10 @@ sub compiler {
   }
 }
 
-sub runtime {
+sub module_dirs {
   my $self = shift;
-  if (@_) {
-    $self->{runtime} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{runtime};
-  }
-}
-
-sub env {
-  my $self = shift;
-  if (@_) {
-    $self->{env} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{env};
-  }
-}
-
-sub stack {
-  my $self = shift;
-  if (@_) {
-    $self->{stack} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{stack};
-  }
+  
+  return $self->compiler->module_dirs(@_);
 }
 
 sub dynamic_lib_files {
@@ -95,21 +61,33 @@ sub dynamic_lib_files {
 sub new {
   my $class = shift;
   
-  my $self = {
-    module_dirs => [map { "$_/SPVM" } @INC],
-    @_
-  };
+  my $self = {@_};
   
   bless $self, ref $class || $class;
   
   # Create the compiler
-  $self->create_compiler;
+  my $compiler = SPVM::Builder::Compiler->new(
+    module_dirs => [map { "$_/SPVM" } @INC],
+  );
+  
+  $self->compiler($compiler);
   
   $self->dynamic_lib_files({});
   
   return $self;
 }
 
+sub compile {
+  my $self = shift;
+  
+  return $self->compiler->compile(@_);
+}
+
+sub get_error_messages {
+  my $self = shift;
+  
+  return $self->compiler->get_error_messages;
+}
 sub print_error_messages {
   my ($self, $fh) = @_;
 
@@ -167,151 +145,27 @@ sub create_build_lib_path {
   return $build_lib_path;
 }
 
-sub get_dynamic_lib_file_dist {
-  my ($self, $class_name, $category) = @_;
-
-  my $module_module_file = $self->get_module_file($class_name);
-  
-  my $dynamic_lib_file = SPVM::Builder::Util::convert_module_file_to_dynamic_lib_file($module_module_file, $category);
-  
-  return $dynamic_lib_file;
-}
-
 sub build_dynamic_lib_dist {
   my ($self, $class_name, $category) = @_;
 
-  my $compile_success = $self->compile($class_name, '(build_dynamic_lib_dist)', 0);
-  unless ($compile_success) {
+  my $runtime = $self->compile($class_name, __FILE__, __LINE__);
+  unless ($runtime) {
     $self->print_error_messages(*STDERR);
     exit(255);
   }
-
-  # Build runtime information
-  $self->build_runtime;
 
   my $cc_native = SPVM::Builder::CC->new(
     build_dir => $self->{build_dir},
     builder => $self,
   );
   
-  my $method_names = $self->get_method_names($class_name, $category);
-  $cc_native->build_dist($class_name, {category => $category});
+  my $module_file = SPVM::Builder::Runtime->get_module_file($runtime, $class_name);
+  my $dl_func_list = SPVM::Builder::Runtime->create_dl_func_list($runtime, $class_name, {category => $category});
+  my $precompile_source = SPVM::Builder::Runtime->build_precompile_class_source($runtime, $class_name);
+  
+  $cc_native->build_dist($class_name, {category => $category, module_file => $module_file, dl_func_list => $dl_func_list, precompile_source => $precompile_source});
 }
 
-sub bind_methods {
-  my ($self, $dynamic_lib_file, $class_name, $category) = @_;
-
-  my $method_names = $self->get_method_names($class_name, $category);
-  if (@$method_names) {
-    my $method_infos = [];
-    for my $method_name (@$method_names) {
-      my $method_info = {};
-      $method_info->{class_name} = $class_name;
-      $method_info->{method_name} = $method_name;
-      push @$method_infos, $method_info;
-    }
-    
-    # Add anon class sub names if precompile
-    if ($category eq 'precompile') {
-      my $anon_class_names = $self->get_anon_class_names_by_parent_class_name($class_name);
-      for my $anon_class_name (@$anon_class_names) {
-        my $method_info = {};
-        $method_info->{class_name} = $anon_class_name;
-        $method_info->{method_name} = "";
-        push @$method_infos, $method_info;
-      }
-    }
-    
-    for my $method_info (@$method_infos) {
-      my $class_name = $method_info->{class_name};
-      my $method_name = $method_info->{method_name};
-
-      my $cfunc_address;
-      if ($dynamic_lib_file) {
-        my $dynamic_lib_libref = DynaLoader::dl_load_file($dynamic_lib_file);
-        
-        if ($dynamic_lib_libref) {
-
-          my $cfunc_name = SPVM::Builder::Util::create_cfunc_name($class_name, $method_name, $category);
-          $cfunc_address = DynaLoader::dl_find_symbol($dynamic_lib_libref, $cfunc_name);
-          unless ($cfunc_address) {
-            my $dl_error = DynaLoader::dl_error();
-            my $error = <<"EOS";
-Can't find native function \"$cfunc_name\" corresponding to ${class_name}->$method_name in \"$dynamic_lib_file\"
-
-You must write the following definition.
---------------------------------------------------
-#include <spvm_native.h>
-
-int32_t $cfunc_name(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  return 0;
-}
---------------------------------------------------
-
-$dl_error
-EOS
-            confess $error;
-          }
-        }
-        else {
-          my $dl_error = DynaLoader::dl_error();
-          confess "The DynaLoader::dl_load_file function failed:Can't load the \"$dynamic_lib_file\" file for the $category methods in the $class_name class: $dl_error";
-        }
-      }
-      else {
-        confess "DLL file is not specified";
-      }
-      
-      if ($category eq 'native') {
-        $self->set_native_method_address($class_name, $method_name, $cfunc_address);
-      }
-      elsif ($category eq 'precompile') {
-        $self->set_precompile_method_address($class_name, $method_name, $cfunc_address);
-      }
-    }
-  }
-}
-
-sub build_precompile_class_source_file {
-  my ($self, $class_name, $options) = @_;
-  
-  # Config
-  my $config = $options->{config};
-  
-  # Force
-  my $force = $options->{force};
-  
-  # Output - Precompile C source file
-  my $output_dir = $options->{output_dir};
-  my $source_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name, 'precompile.c');
-  my $source_file = "$output_dir/$source_rel_file";
-  
-  # Check if generating is needed
-  my $module_file = $self->get_module_file($class_name);
-  my $spvm_module_dir = $INC{'SPVM/Builder.pm'};
-  $spvm_module_dir =~ s/\.pm$//;
-  $spvm_module_dir .= '/src';
-  my $spvm_precompile_soruce_file = "$spvm_module_dir/spvm_precompile.c";
-  unless (-f $spvm_precompile_soruce_file) {
-    confess "Can't find $spvm_precompile_soruce_file";
-  }
-  my $need_generate = SPVM::Builder::Util::need_generate({
-    force => $force,
-    output_file => $source_file,
-    input_files => [$module_file, $spvm_precompile_soruce_file],
-  });
-  
-  # Generate precompile C source file
-  if ($need_generate) {
-    my $precompile_source = $self->build_precompile_class_source($class_name);
-    mkpath dirname $source_file;
-    open my $fh, '>', $source_file
-      or die "Can't create $source_file";
-    print $fh $precompile_source;
-    close $fh;
-  }
-}
 
 1;
 

@@ -2,7 +2,7 @@ NAME
     rpm-spec-license - Tool for working with RPM spec file licenses.
 
 SYNOPSIS
-     rpm-spec-license [-f] [-g file_glob] [-h] [-s] [--version] [file_or_dir]
+     rpm-spec-license [-f] [-g file_glob] [-h] [-s] [-u] [--version] [file_or_dir]
 
 ARGUMENTS
     *       "-f"
@@ -23,6 +23,10 @@ ARGUMENTS
 
             Skip RPM spec file parsing errors. Only print information to
             stderr.
+
+    *       "-u"
+
+            Print unique licenses only.
 
     *       "--version"
 
@@ -54,5 +58,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

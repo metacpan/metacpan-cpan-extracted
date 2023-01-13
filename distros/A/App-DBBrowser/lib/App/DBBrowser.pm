@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.312';
+our $VERSION = '2.313';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -472,21 +472,16 @@ sub run {
                     if ( $table eq $hidden ) {
                         require App::DBBrowser::CreateDropAttach;
                         my $cda = App::DBBrowser::CreateDropAttach->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                        my $ok = $cda->create_drop_or_attach();
-                        if ( $ok ) {
+                        my $changed = $cda->create_drop_or_attach();
+                        if ( $changed ) {
+                            # Loop to SCHEMA to update the list of tables and then automatically go back to the
+                            # create_drop_or_attach menu.
                             $sf->{redo_schema} = $sf->{d}{schema};
-                            $sf->{redo_table}  = $table;  # to go back automatically into the create_drop_or_attach menu after loop
-                            if ( $ok == 3 ) {
-                                $sf->{redo_db} = $db;
-                                $dbh->disconnect();
-                                next DATABASE; # loop to DATABASE to attach/detach databases
-                            }
-                            else {
-                                next SCHEMA; # loop to SCHEMA to update the list of tables
-                            }
+                            $sf->{redo_table}  = $table;
+                            next SCHEMA;
                         }
                         else {
-                            # leave 'create_drop_or_attach'-menu without reentering when the return value is false
+                            # leave without reentering to the create_drop_or_attach-menu
                             next TABLE
                         }
                     }
@@ -599,7 +594,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.312
+Version 2.313
 
 =head1 DESCRIPTION
 

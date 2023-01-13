@@ -144,7 +144,7 @@ struct spvm_compiler {
   SPVM_HASH* module_source_symtable;
   
   // SPVM 32bit codes
-  int32_t* spvm_32bit_codes;
+  int32_t* runtime_codes;
 };
 
 SPVM_COMPILER* SPVM_COMPILER_new();
@@ -155,12 +155,22 @@ void SPVM_COMPILER_error(SPVM_COMPILER* compiler, const char* message, ...);
 
 void SPVM_COMPILER_print_error_messages(SPVM_COMPILER* compiler, FILE* fh);
 
+const char* SPVM_COMPILER_get_start_file(SPVM_COMPILER* compiler);
+void SPVM_COMPILER_set_start_file(SPVM_COMPILER* compiler, const char* start_file);
+int32_t SPVM_COMPILER_get_start_line(SPVM_COMPILER* compiler);
+void SPVM_COMPILER_set_start_line(SPVM_COMPILER* compiler, int32_t start_line);
+
+void SPVM_COMPILER_add_module_dir(SPVM_COMPILER* compiler, const char* module_dir);
+int32_t SPVM_COMPILER_get_module_dirs_length(SPVM_COMPILER* compiler);
+const char* SPVM_COMPILER_get_module_dir(SPVM_COMPILER* compiler, int32_t index);
+void SPVM_COMPILER_clear_module_dirs(SPVM_COMPILER* compiler);
+
 int32_t SPVM_COMPILER_get_error_messages_length(SPVM_COMPILER* compiler);
 const char* SPVM_COMPILER_get_error_message(SPVM_COMPILER* compiler, int32_t index);
 
 int32_t SPVM_COMPILER_compile(SPVM_COMPILER* compiler, const char* class_name);
 
-int32_t SPVM_COMPILER_calculate_spvm_32bit_codes_length(SPVM_COMPILER* compiler);
-int32_t* SPVM_COMPILER_create_spvm_32bit_codes(SPVM_COMPILER* compiler, SPVM_ALLOCATOR* allocator);
+int32_t SPVM_COMPILER_calculate_runtime_codes_length(SPVM_COMPILER* compiler);
+int32_t* SPVM_COMPILER_create_runtime_codes(SPVM_COMPILER* compiler, SPVM_ALLOCATOR* allocator);
 
 #endif

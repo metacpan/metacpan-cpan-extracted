@@ -12,6 +12,7 @@ lib/App/pdfgrep.pm
 script/add-pdf-password
 script/compress-pdf
 script/grep-from-pdf
+script/less-pdf-text
 script/pdf-has-password
 script/pdfgrep
 script/pdfnopass

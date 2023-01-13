@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Parser;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '2.20210915'; # VERSION
+our $VERSION = '2.20230112'; # VERSION
 use Carp;
 
 use Mail::AuthenticationResults::Header;
@@ -19,6 +19,8 @@ use Mail::AuthenticationResults::Token::Comment;
 use Mail::AuthenticationResults::Token::QuotedString;
 use Mail::AuthenticationResults::Token::Separator;
 use Mail::AuthenticationResults::Token::String;
+
+use JSON;
 
 
 sub new {
@@ -47,6 +49,45 @@ sub parse {
 
     return $self->parsed();
 }
+
+
+sub from_authentication_results_json {
+    my ( $self, $json ) = @_;
+    my $j = JSON->new();
+    my $hashref = $j->decode( $json );
+    return $self->_from_hashref( $hashref );
+}
+
+sub _from_hashref {
+    my ( $self, $hashref ) = @_;
+    my $type = $hashref->{'type'};
+    my $object
+        = $type eq 'header'     ? Mail::AuthenticationResults::Header->new()
+        : $type eq 'authservid' ? Mail::AuthenticationResults::Header::AuthServID->new()
+        : $type eq 'entry'      ? Mail::AuthenticationResults::Header::Entry->new()
+        : $type eq 'subentry'   ? Mail::AuthenticationResults::Header::SubEntry->new()
+        : $type eq 'comment'    ? Mail::AuthenticationResults::Header::Comment->new()
+        : croak "unknown type $type";
+
+    if ( $type eq 'header' ) {
+        my $authserv_id = $self->_from_hashref( $hashref->{ 'authserv_id' } );
+        $object->set_value( $authserv_id );
+    }
+    else {
+        $object->set_key( $hashref->{'key'} ) if exists $hashref->{'key'};
+        $object->safe_set_value( $hashref->{'value'} ) if exists $hashref->{'value'};
+    }
+
+    if ( exists $hashref->{'children'} ) {
+        for my $child ( @{ $hashref->{'children'} } ) {
+            my $child_object = $self->_from_hashref( $child );
+            $object->add_child( $child_object );
+        }
+    }
+
+    return $object;
+}
+
 
 
 sub tokenise {
@@ -325,7 +366,7 @@ Mail::AuthenticationResults::Parser - Class for parsing Authentication Results H
 
 =head1 VERSION
 
-version 2.20210915
+version 2.20230112
 
 =head1 DESCRIPTION
 
@@ -344,6 +385,10 @@ If $header is supplied then parse it and return the parsed object.
 =head2 parse( $header )
 
 Parse $header and return the parsed object.
+
+=head2 from_authentication_results_json( $json )
+
+Parse $json as the json returned from an as_json method call and return the parsed object.
 
 =head2 tokenise( $header )
 

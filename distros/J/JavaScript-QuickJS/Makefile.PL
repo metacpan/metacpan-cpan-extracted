@@ -32,8 +32,11 @@ my $PERL_QJS_MAKEFILE_PATH = File::Spec->catfile( Cwd::getcwd(), 'Makefile.quick
 
 my $libpath = File::Spec->catfile('quickjs', 'libquickjs.a');
 
-# quickjs needs these; pre-5.20 perls didn’t include libpthread:
-my @libs = qw(-lm -ldl -lpthread);
+# quickjs needs these; pre-5.20 perls didn’t include libpthread.
+# Note that MSWin32, if given these, will try to compile them statically
+# rather than dynamically, which breaks compilation.
+#
+my @libs = ($^O eq 'MSWin32') ? () : qw(-lm -ldl -lpthread);
 
 if (_need_librt()) {
     push @libs, '-lrt';
@@ -44,6 +47,12 @@ _tweak_for_os();
 if (!_stdatomic_h_exists()) {
     _avoid_stdatomic_h();
 }
+
+# QuickJS’s Makefile uses the mkdir CLI tool to create this directory.
+# The problem is that it expects POSIX’s mkdir, which doesn’t match
+# Windows’s. To avoid that problem we pre-create the directory now:
+#
+mkdir( File::Spec->catdir( qw(quickjs .obj) ) );
 
 make_libquickjs_makefile();
 
@@ -345,7 +354,7 @@ sub postamble {
     # The leading “+” is to ensure that parallel builds work properly.
     return <<"MAKE_FRAG"
 
-quickjs/libquickjs.a:
+$libpath:
 \t+$make -C quickjs -f '$PERL_QJS_MAKEFILE_PATH' libquickjs.a
 MAKE_FRAG
 }

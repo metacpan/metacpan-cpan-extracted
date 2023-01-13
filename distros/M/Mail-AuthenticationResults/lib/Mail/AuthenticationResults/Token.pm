@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Token;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '2.20210915'; # VERSION
+our $VERSION = '2.20230112'; # VERSION
 use Carp;
 
 
@@ -69,7 +69,7 @@ Mail::AuthenticationResults::Token - Base class for modelling AuthenticationResu
 
 =head1 VERSION
 
-version 2.20210915
+version 2.20230112
 
 =head1 DESCRIPTION
 

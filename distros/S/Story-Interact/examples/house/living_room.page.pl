@@ -1,7 +1,10 @@
 at 'living_room';
 
-text "You are in the living room.";
-text "You can see open doors to a bedroom and a kitchen.";
+text q{
+	You are in the living room.
+	
+	You can see open doors to a bedroom and a kitchen.
+};
 
 next_page kitchen => 'Go to the kitchen';
 next_page bedroom => 'Go to the bedroom';

@@ -102,7 +102,7 @@ sub create_drop_or_attach {
                     $ax->print_error_message( $@ );
                 }
             }
-            return 2;
+            return 1;
         }
         elsif ( $choice =~ /^-\ (?:Attach|Detach)/ ) {
             require App::DBBrowser::CreateDropAttach::AttachDB;
@@ -123,7 +123,7 @@ sub create_drop_or_attach {
             if ( ! $changed ) {
                 next CREATE_DROP_ATTACH;
             }
-            return 3;
+            return 1;
         }
     }
 }

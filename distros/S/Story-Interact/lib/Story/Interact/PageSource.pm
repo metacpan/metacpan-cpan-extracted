@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact::PageSource;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001002';
+our $VERSION   = '0.001003';
 
 use Story::Interact::Page ();
 use Story::Interact::Syntax ();
@@ -25,7 +25,7 @@ sub get_page {
 	return Story::Interact::Page->new( id => ':end' ) unless $code;
 
 	Story::Interact::Syntax::START( $state, $page_id );
-	eval( "package Story::Interact::Syntax; use strict; $code; 1" )
+	eval( "package Story::Interact::Syntax; use strict; use warnings; no warnings qw( numeric uninitialized ); $code; 1" )
 		or croak( "Died on page '$page_id': $@" );
 	return Story::Interact::Syntax::FINISH( $state );
 }

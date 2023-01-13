@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact::Syntax;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001002';
+our $VERSION   = '0.001003';
 
 use Story::Interact::Page ();
 
@@ -23,6 +23,7 @@ our @EXPORT = qw(
 	visited
 	true
 	false
+	INTERNAL_STATE
 );
 
 my ( $page, $state );
@@ -103,6 +104,10 @@ sub true () {
 
 sub false () {
 	!!0;
+}
+
+sub INTERNAL_STATE () {
+	return $state;
 }
 
 1;

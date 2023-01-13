@@ -17,6 +17,9 @@ END
 barf(catfile($temp_dir, 'ex2.spec'), <<'END');
 License: MIT
 END
+barf(catfile($temp_dir, 'ex3.spec'), <<'END');
+License: MIT
+END
 
 # Arguments.
 @ARGV = (
@@ -28,4 +31,5 @@ exit App::RPM::Spec::License->new->run;
 
 # Output:
 # BSD
+# MIT
 # MIT

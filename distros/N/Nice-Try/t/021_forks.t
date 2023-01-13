@@ -3,6 +3,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    use vars qw( $has_forks );
     our $has_forks = 0;
     if( $INC{'forks.pm'} )
     {

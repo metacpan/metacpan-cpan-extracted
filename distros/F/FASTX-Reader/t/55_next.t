@@ -6,7 +6,7 @@ use FASTX::Reader;
 use FASTX::ReaderPaired;
 use Data::Dumper;
 use Scalar::Util;
-# TEST: Parse a regular file as interleaved (error)
+# TEST: use next() and getRead()
 
 my $seq_file = "$RealBin/../data/illumina_1.fq.gz";
 

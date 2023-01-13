@@ -23,6 +23,7 @@ is($spec->buildrequires->[0], 'perl >= 1:5.6.0',
   'First build requirement is correct');
 
 is($spec->exclusivearch, 'megaCPU', 'Correct exclusive architecture');
+is($spec->excludearch, 'crapCPU', 'Correct excluded architecture');
 
 dies_ok { Parse::RPM::Spec->new }
   'No spec file given';

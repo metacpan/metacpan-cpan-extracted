@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.312';
+our $VERSION = '2.313';
 
 #use bytes; # required
 use Scalar::Util qw( looks_like_number );
@@ -176,11 +176,13 @@ sub tables_info { # not public
         $table_schem = 'TABLE_SCHEM';
         $table_name  = 'TABLE_NAME';
     }
+    # DBD::Pg: TABLE_CAT: The name of the database that the table or view is in (always the current database).
+    # The others: nothing
     my @keys = ( 'TABLE_CAT', $table_schem, $table_name, 'TABLE_TYPE' );
     if ( $db_driver eq 'SQLite' && $sf->{Plugin}{i}{db_attached} ) {
-        # If a SQLite database has databases attached, set $schema to 'undef'.
-        # If $schema is `undef` `$dbh->table_info( undef, $schema, '%', '' )` returns all schemas - main, temp, aliases
-        # of attached databases - with its tables.
+        # If a SQLite database has databases attached, set $schema to `undef`.
+        # If $schema is `undef`, `$dbh->table_info( undef, $schema, '%', '' )` returns all schemas - main, temp and
+        # aliases of attached databases - with its tables.
         $schema = undef;
     }
     my $sth = $dbh->table_info( undef, $schema, '%', '' );
@@ -228,6 +230,7 @@ sub tables_info { # not public
 
 
 
+
 1;
 
 
@@ -243,7 +246,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.312
+Version 2.313
 
 =head1 DESCRIPTION
 

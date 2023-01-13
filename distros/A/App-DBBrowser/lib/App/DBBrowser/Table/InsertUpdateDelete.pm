@@ -212,7 +212,7 @@ sub __first_column_is_autoincrement {
                 AND COLUMN_DEFAULT IS NULL
                 AND IS_NULLABLE = 'NO'
                 AND EXTRA like '%auto_increment%'";
-        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $sql, {}, $schema, $table );
+        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, $schema, $table );
         return $first_col_is_autoincrement;
     }
     elsif ( $sf->{i}{driver} eq 'Pg' ) {
@@ -226,7 +226,7 @@ sub __first_column_is_autoincrement {
                        UPPER(column_default) LIKE 'NEXTVAL%'
                     OR UPPER(identity_generation) = 'BY DEFAULT'
                 )";
-        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $sql, {}, $schema, $table );
+        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, $schema, $table );
         return $first_col_is_autoincrement;
     }
     elsif ( $sf->{i}{driver} eq 'Firebird' ) {
@@ -237,22 +237,22 @@ sub __first_column_is_autoincrement {
                    RDB\$IDENTITY_TYPE = 0
                 OR RDB\$IDENTITY_TYPE = 1
             )";
-        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $sql, {}, $table );
+        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, $table );
         return $first_col_is_autoincrement;
     }
-    #elsif ( $sf->{i}{driver} eq 'DB2' ) {
-    #    my $stmt = "SELECT COUNT(*) FROM SYSCAT.COLUMNS WHERE
-    #            TABSCHEMA = ?
-    #        AND TABNAME = ?
-    #        AND COLNO = 0
-    #        AND TYPENAME = 'INTEGER'
-    #        AND NULLS = 'N'
-    #        AND KEYSEQ = 1
-    #        AND GENERATED = 'A'
-    #        AND IDENTITY = 'Y'";
-    #    my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $sql, {}, $schema, $table );
-    #    return $first_col_is_autoincrement;
-    #}
+    elsif ( $sf->{i}{driver} eq 'DB2' ) {
+        my $stmt = "SELECT COUNT(*) FROM SYSCAT.COLUMNS WHERE
+                TABSCHEMA = ?
+            AND TABNAME = ?
+            AND COLNO = 0
+            AND TYPENAME = 'INTEGER'
+            AND NULLS = 'N'
+            AND KEYSEQ = 1
+            AND GENERATED = 'A'
+            AND IDENTITY = 'Y'";
+        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, $schema, $table );
+        return $first_col_is_autoincrement;
+    }
     return;
 }
 

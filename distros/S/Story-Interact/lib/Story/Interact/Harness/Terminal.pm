@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact::Harness::Terminal;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001002';
+our $VERSION   = '0.001003';
 
 use Story::Interact::State ();
 use Term::Choose qw( choose );
@@ -104,11 +104,13 @@ sub _build_paragraph_formatter {
 			my $st   = String::Tagged::Markdown->parse_markdown( $p );
 			my $fmt  = String::Tagged::Terminal->new_from_formatting( $st->as_formatting );
 			my $term = $fmt->build_terminal( no_color => $ENV{NO_COLOR} );
+			local $Text::Wrap::columns = 78;
 			return Text::Wrap::wrap( q{}, q{}, $term ); # Gasp!
 		};
 	}
 	return sub {
 		my ( $p ) = @_;
+		local $Text::Wrap::columns = 78;
 		Text::Wrap::wrap( q{}, q{}, $p );
 	};
 }

@@ -30,6 +30,7 @@ t/02-comment.t
 t/02-get.t
 t/02-none.t
 t/02-parser-begin-dot.t
+t/02-parser-json.t
 t/02-parser-quoted.t
 t/02-parser.t
 t/02-safe_set.t

@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact::State;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001002';
+our $VERSION   = '0.001003';
 
 use Story::Interact::Character ();
 
@@ -58,6 +58,21 @@ sub update_from_page {
 	++$self->visited->{ $page->id };
 	$self->player->_set_location( $page->location );
 	return $self;
+}
+
+sub dump {
+	my ( $self ) = @_;
+	require Storable;
+	require MIME::Base64;
+	local $Storable::canonical = 1;
+	return MIME::Base64::encode_base64( Storable::nfreeze( $self ) );
+}
+
+sub load {
+	my ( $class, $data ) = @_;
+	require Storable;
+	require MIME::Base64;
+	return Storable::thaw( MIME::Base64::decode_base64( $data ) );
 }
 
 1;

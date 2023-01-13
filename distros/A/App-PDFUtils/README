@@ -2,8 +2,8 @@ NAME
     App::PDFUtils - Command-line utilities related to PDF files
 
 VERSION
-    This document describes version 0.011 of App::PDFUtils (from Perl
-    distribution App-PDFUtils), released on 2022-09-08.
+    This document describes version 0.012 of App::PDFUtils (from Perl
+    distribution App-PDFUtils), released on 2022-10-07.
 
 SYNOPSIS
     This distribution provides tha following command-line utilities related
@@ -14,6 +14,8 @@ SYNOPSIS
     *   compress-pdf
 
     *   grep-from-pdf
+
+    *   less-pdf-text
 
     *   pdf-has-password
 
@@ -131,6 +133,10 @@ FUNCTIONS
     *   pages => *uint_range*
 
         Only convert a range of pages.
+
+    *   raw => *bool*
+
+        If set to true, will run pdftotext with -raw option.
 
     *   return_output_file => *bool*
 

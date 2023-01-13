@@ -344,7 +344,7 @@ FASTX::ScriptHelper - Shared routines for binaries using FASTX::Reader and FASTX
 
 =head1 VERSION
 
-version 1.8.1
+version 1.9.0
 
 =head2 new()
 

@@ -201,7 +201,7 @@ FASTX::ReaderPaired - Warning, Experimental Paired-End FASTQ files reader, based
 
 =head1 VERSION
 
-version 1.8.1
+version 1.9.0
 
 =head1 SYNOPSIS
 

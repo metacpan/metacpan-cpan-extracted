@@ -5,7 +5,7 @@ use warnings;
 
 use App::RPM::Spec::License;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Run.
 exit App::RPM::Spec::License->new->run;
@@ -28,7 +28,7 @@ rpm-spec-license - Tool for working with RPM spec file licenses.
 
 =head1 SYNOPSIS
 
- rpm-spec-license [-f] [-g file_glob] [-h] [-s] [--version] [file_or_dir]
+ rpm-spec-license [-f] [-g file_glob] [-h] [-s] [-u] [--version] [file_or_dir]
 
 =head1 ARGUMENTS
 
@@ -52,6 +52,10 @@ Print help.
 
 Skip RPM spec file parsing errors.
 Only print information to stderr.
+
+=item * C<-u>
+
+Print unique licenses only.
 
 =item * C<--version>
 
@@ -91,6 +95,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

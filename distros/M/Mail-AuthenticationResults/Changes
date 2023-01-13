@@ -1,5 +1,9 @@
 Change log for Mail::AuthenticationResults
 
+2.20230112 2023-01-12 22:49:04+00:00 UTC
+  - Add parser method to parse json serialized object back
+    into the object(s) it represents
+
 2.20210915 2021-09-15 11:10:20+00:00 UTC
   - Fix for older versions of Perl
 

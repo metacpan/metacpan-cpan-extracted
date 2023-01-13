@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001002';
+our $VERSION   = '0.001003';
 
 use Story::Interact::Character ();
 use Story::Interact::Harness::Terminal ();
@@ -68,15 +68,23 @@ An example page:
   text "You are in the kitchen.";
   
   unless ( location->{apple_gone} ) {
-   text "There is an *apple* on the counter.";
-   next_page apple => 'Pick up apple';
+    text "There is an *apple* on the counter.";
+    next_page apple => 'Pick up apple';
   }
   
   next_page living_room => 'Go to the living room';
 
 The C<text> function is just to add a paragraph of text. (It may use simple
 Markdown for B<< **bold** >> and I<< *italics* >>.) Pages can of course contain
-multiple paragraphs.
+multiple paragraphs. From version 1.001003, C<text> allows you to provide
+multiple paragraphs in a single string (just add a blank line between them),
+and will trim whitespace from the beginning and end of each paragraphs.
+
+  text q{
+    You are in the living room.
+    
+    You can see open doors to a bedroom and a kitchen.
+  };
 
 The C<next_page> function defines a path the story can take after this page.
 It takes a page identifier followed by a description. It can be used multiple

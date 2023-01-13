@@ -1,0 +1,186 @@
+#!perl
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+#use Log::ger::Screen;
+
+use File::chdir;
+use File::Slurper qw(read_binary);
+use File::Temp qw(tempdir);
+use File::Which qw(which);
+use CLI::MetaUtil::Getopt::Long qw(GetOptionsCLIWrapper);
+use IPC::System::Options 'system', -log=>1, -die=>1;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-10-07'; # DATE
+our $DIST = 'App-PDFUtils'; # DIST
+our $VERSION = '0.012'; # VERSION
+
+my @files;
+Getopt::Long::Configure("gnu_getopt", "no_ignore_case", "pass_through");
+
+my $fail;
+my ($opt_pages, $opt_raw);
+
+GetOptionsCLIWrapper(
+    cli => 'less',
+    add_opts => {
+        'pdf-pages=s' => \$opt_pages,
+        'pdf-raw=s' => \$opt_raw,
+        '<>' => sub {
+            my $arg = shift;
+            if ($arg =~ /\A\+/) {
+                # less command, push to original command's arguments
+                goto PUSH;
+            }
+
+            my $filename = $arg;
+            unless (-f $filename) {
+                warn "less-pdf-text: No such file or not a file: '$filename'\n";
+                $fail++;
+                return;
+            }
+
+            require App::PDFUtils;
+            my $res = App::PDFUtils::convert_pdf_to_text(
+                file => $filename,
+                fmt => 0,
+                return_output_file => 1,
+                raw => $opt_raw,
+                (defined $opt_pages ? (pages => $opt_pages) : ()),
+            );
+            my $file;
+            if ($res->[0] == 304) {
+                $file = $_[0];
+            } elsif ($res->[0] == 200) {
+                $file = $res->[2];
+            } else {
+                die "Can't convert PDF '$_[0]' to text: $res->[0] - $res->[1]";
+            }
+            $arg = $file;
+
+          PUSH:
+            push @CLI::MetaUtil::Getopt::Long::cli_argv, $arg;
+        },
+    },
+);
+
+exit 1 if $fail;
+
+require File::Which;
+
+require IPC::System::Options;
+IPC::System::Options::system(
+    {log=>1},
+    "less", @ARGV,
+);
+
+# ABSTRACT: Less for seeing plaintext of PDF files
+# PODNAME: less-pdf-text
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+less-pdf-text - Less for seeing plaintext of PDF files
+
+=head1 VERSION
+
+This document describes version 0.012 of less-pdf-text (from Perl distribution App-PDFUtils), released on 2022-10-07.
+
+=head1 SYNOPSIS
+
+Use like you would use the Unix command B<less>:
+
+ % less-pdf-text [options] <PDF_FILE>...
+
+=head1 DESCRIPTION
+
+This is a wrapper for the Unix command B<less>. It assumes that each input file
+is a PDF file and tries to convert the file to text first using B<pdftotext> CLI
+utility first before passing it to C<less>.
+
+=head1 OPTIONS
+
+These are options that are interpreted by B<less-pdf-text> and not passed to
+B<less>.
+
+B<Please specify these options before file names.>
+
+=over
+
+=item * --pdf-pages
+
+Only diff a range of pages instead of the whole PDF. Example: 1,5-10,15.
+Requires B<pdftk> to extract the page range.
+
+=item * --pdf-raw
+
+If set, then C<pdftext> command will be run using the C<-raw> option.
+
+=back
+
+=head1 ENVIRONMENT
+
+=head2 DEBUG
+
+If set to true, do not cleanup temporary directories.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-PDFUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-PDFUtils>.
+
+=head1 SEE ALSO
+
+Unix command B<less>.
+
+B<pdftotext> utility.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2021, 2020, 2017 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PDFUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

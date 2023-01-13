@@ -20,17 +20,18 @@ perl_version 5.006;
 readme_from 'bin/rpm-spec-license';
 recursive_author_tests('xt');
 requires 'English' => 0;
-requires 'Error::Pure' => 0;
+requires 'Error::Pure' => 0.30;
 requires 'File::Find::Rule' => 0;
 requires 'Getopt::Std' => 0;
-requires 'Parse::RPM::Spec' => 0;
+requires 'List::Util' => 1.33;
+requires 'Parse::RPM::Spec' => 'v1.1.2';
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/App-RPM-Spec-License/issues',
 resources 'homepage' => 'https://github.com/michal-josef-spacek/App-RPM-Spec-License';
 resources 'repository' => 'git://github.com/michal-josef-spacek/App-RPM-Spec-License';
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.01';
+version '0.02';
 
 # Run.
 WriteAll();

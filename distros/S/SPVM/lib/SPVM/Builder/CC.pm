@@ -18,6 +18,7 @@ use SPVM::Builder::CompileInfo;
 use SPVM::Builder::ObjectFileInfo;
 use SPVM::Builder::LinkInfo;
 use SPVM::Builder::Resource;
+use SPVM::Builder::Runtime;
 
 sub global_before_compile {
   my $self = shift;
@@ -117,6 +118,10 @@ sub build_runtime {
   
   $options ||= {};
   
+  my $dl_func_list = $options->{dl_func_list};
+  my $module_file = $options->{module_file};
+  my $precompile_source = $options->{precompile_source};
+
   my $category = $options->{category};
   
   # Build directory
@@ -135,16 +140,19 @@ sub build_runtime {
     mkpath $build_src_dir;
     
     my $force = $self->detect_force;
-    $self->builder->build_precompile_class_source_file(
+    
+    $self->build_precompile_class_source_file(
       $class_name,
       {
         output_dir => $build_src_dir,
         force => $force,
+        precompile_source => $precompile_source,
+        module_file => $module_file,
       }
     );
   }
   elsif ($category eq 'native') {
-    my $module_file = $self->builder->get_module_file($class_name);
+    my $module_file = $options->{module_file};
     $build_src_dir = SPVM::Builder::Util::remove_class_part_from_file($module_file, $class_name);
   }
   
@@ -163,6 +171,8 @@ sub build_runtime {
       compile_output_dir => $build_object_dir,
       link_output_dir => $build_lib_dir,
       category => $category,
+      module_file => $module_file,
+      dl_func_list => $dl_func_list,
     }
   );
   
@@ -173,6 +183,10 @@ sub build_dist {
   my ($self, $class_name, $options) = @_;
   
   $options ||= {};
+
+  my $dl_func_list = $options->{dl_func_list};
+  my $module_file = $options->{module_file};
+  my $precompile_source = $options->{precompile_source};
   
   my $category = $options->{category};
   
@@ -182,11 +196,14 @@ sub build_dist {
     mkpath $build_src_dir;
     
     my $force = $self->detect_force;
-    $self->builder->build_precompile_class_source_file(
+    
+    $self->build_precompile_class_source_file(
       $class_name,
       {
         output_dir => $build_src_dir,
         force => $force,
+        precompile_source => $precompile_source,
+        module_file => $module_file,
       }
     );
   }
@@ -199,7 +216,6 @@ sub build_dist {
   
   my $build_lib_dir = 'blib/lib';
   
-  
   $self->build(
     $class_name,
     {
@@ -207,6 +223,8 @@ sub build_dist {
       compile_output_dir => $build_object_dir,
       link_output_dir => $build_lib_dir,
       category => $category,
+      module_file => $module_file,
+      dl_func_list => $dl_func_list,
     }
   );
 }
@@ -215,11 +233,13 @@ sub build {
   my ($self, $class_name, $options) = @_;
 
   $options ||= {};
+
+  my $dl_func_list = $options->{dl_func_list};
   
   my $category = $options->{category};
 
   # Module file
-  my $module_file = $self->builder->get_module_file($class_name);
+  my $module_file = $options->{module_file};
   unless (defined $module_file) {
     my $config_file = SPVM::Builder::Util::get_config_file_from_class_name($class_name);
     if ($config_file) {
@@ -254,6 +274,7 @@ sub build {
     output_dir => $options->{link_output_dir},
     config => $config,
     category => $category,
+    dl_func_list => $dl_func_list,
   };
   my $output_file = $self->link(
     $class_name,
@@ -641,42 +662,10 @@ EOS
   
 }
 
-sub create_dl_func_list {
-  my ($self, $class_name, $options) = @_;
-  
-  $options ||= {};
-  
-  my $category = $options->{category};
-  
-  # dl_func_list
-  # This option is needed Windows DLL file
-  my $dl_func_list = [];
-  my $method_names = $self->builder->get_method_names($class_name, $category);
-  for my $method_name (@$method_names) {
-    my $cfunc_name = SPVM::Builder::Util::create_cfunc_name($class_name, $method_name, $category);
-    push @$dl_func_list, $cfunc_name;
-  }
-  
-  if ($category eq 'precompile') {
-    # Add anon class sub names to dl_func_list
-    my $anon_class_names = $self->builder->get_anon_class_names_by_parent_class_name($class_name);
-    
-    for my $anon_class_name (@$anon_class_names) {
-      my $anon_method_cfunc_name = SPVM::Builder::Util::create_cfunc_name($anon_class_name, "", $category);
-      push @$dl_func_list, $anon_method_cfunc_name;
-    }
-  }
-
-  # This is bad hack to suppress boot strap function error.
-  unless (@$dl_func_list) {
-    push @$dl_func_list, '';
-  }
-
-  return $dl_func_list;
-}
-
 sub link {
   my ($self, $class_name, $object_file_infos, $options) = @_;
+  
+  my $dl_func_list = $options->{dl_func_list};
   
   my $category = $options->{category};
   
@@ -762,7 +751,6 @@ sub link {
     
     # Create a dynamic library
     if ($output_type eq 'dynamic_lib') {
-      my $dl_func_list = $self->create_dl_func_list($class_name, {category => $category});
       (undef, @tmp_files) = $cbuilder->link(
         objects => $link_info_object_files,
         module_name => $link_info_class_name,
@@ -1017,6 +1005,44 @@ sub create_link_info {
   );
   
   return $link_info;
+}
+
+sub build_precompile_class_source_file {
+  my ($self, $class_name, $options) = @_;
+
+  my $precompile_source = $options->{precompile_source};
+  my $module_file = $options->{module_file};
+  
+  # Force
+  my $force = $options->{force};
+  
+  # Output - Precompile C source file
+  my $output_dir = $options->{output_dir};
+  my $source_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name, 'precompile.c');
+  my $source_file = "$output_dir/$source_rel_file";
+  
+  # Check if generating is needed
+  my $spvm_module_dir = $INC{'SPVM/Builder.pm'};
+  $spvm_module_dir =~ s/\.pm$//;
+  $spvm_module_dir .= '/src';
+  my $spvm_precompile_soruce_file = "$spvm_module_dir/spvm_precompile.c";
+  unless (-f $spvm_precompile_soruce_file) {
+    confess "Can't find $spvm_precompile_soruce_file";
+  }
+  my $need_generate = SPVM::Builder::Util::need_generate({
+    force => $force,
+    output_file => $source_file,
+    input_files => [$module_file, $spvm_precompile_soruce_file],
+  });
+  
+  # Generate precompile C source file
+  if ($need_generate) {
+    mkpath dirname $source_file;
+    open my $fh, '>', $source_file
+      or die "Can't create $source_file";
+    print $fh $precompile_source;
+    close $fh;
+  }
 }
 
 1;

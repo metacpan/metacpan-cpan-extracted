@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
     "script/add-pdf-password",
     "script/compress-pdf",
     "script/grep-from-pdf",
+    "script/less-pdf-text",
     "script/pdf-has-password",
     "script/pdfgrep",
     "script/pdfnopass",
@@ -27,6 +28,7 @@ my %WriteMakefileArgs = (
   "NAME" => "App::PDFUtils",
   "PREREQ_PM" => {
     "AppBase::Grep" => "0.009",
+    "CLI::MetaUtil::Getopt::Long" => "0.002",
     "Data::Sah::Compiler::perl::TH::array" => "0.911",
     "Data::Sah::Compiler::perl::TH::bool" => "0.911",
     "Data::Sah::Compiler::perl::TH::code" => "0.911",
@@ -37,9 +39,11 @@ my %WriteMakefileArgs = (
     "File::Basename" => 0,
     "File::Copy" => 0,
     "File::Find::Rule" => 0,
+    "File::Slurper" => 0,
     "File::Temp" => "0.2307",
     "File::Temp::MoreUtils" => 0,
     "File::Which" => 0,
+    "File::chdir" => 0,
     "IPC::System::Options" => "0.339",
     "Log::ger" => "0.038",
     "Perinci::CmdLine::Any" => "0.152",
@@ -59,7 +63,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -68,6 +72,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "AppBase::Grep" => "0.009",
+  "CLI::MetaUtil::Getopt::Long" => "0.002",
   "Data::Sah::Compiler::perl::TH::array" => "0.911",
   "Data::Sah::Compiler::perl::TH::bool" => "0.911",
   "Data::Sah::Compiler::perl::TH::code" => "0.911",
@@ -78,10 +83,12 @@ my %FallbackPrereqs = (
   "File::Basename" => 0,
   "File::Copy" => 0,
   "File::Find::Rule" => 0,
+  "File::Slurper" => 0,
   "File::Spec" => 0,
   "File::Temp" => "0.2307",
   "File::Temp::MoreUtils" => 0,
   "File::Which" => 0,
+  "File::chdir" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "IPC::System::Options" => "0.339",

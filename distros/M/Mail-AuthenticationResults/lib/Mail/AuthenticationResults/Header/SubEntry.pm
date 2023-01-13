@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Header::SubEntry;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '2.20210915'; # VERSION
+our $VERSION = '2.20230112'; # VERSION
 use Carp;
 
 use base 'Mail::AuthenticationResults::Header::Base';
@@ -35,7 +35,7 @@ Mail::AuthenticationResults::Header::SubEntry - Class modelling Sub Entry parts 
 
 =head1 VERSION
 
-version 2.20210915
+version 2.20230112
 
 =head1 DESCRIPTION
 

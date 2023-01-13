@@ -39,15 +39,24 @@ DESCRIPTION
       text "You are in the kitchen.";
   
       unless ( location->{apple_gone} ) {
-       text "There is an *apple* on the counter.";
-       next_page apple => 'Pick up apple';
+        text "There is an *apple* on the counter.";
+        next_page apple => 'Pick up apple';
       }
   
       next_page living_room => 'Go to the living room';
 
     The `text` function is just to add a paragraph of text. (It may use simple
     Markdown for **bold** and **italics**.) Pages can of course contain
-    multiple paragraphs.
+    multiple paragraphs. From version 1.001003, `text` allows you to provide
+    multiple paragraphs in a single string (just add a blank line between
+    them), and will trim whitespace from the beginning and end of each
+    paragraphs.
+
+      text q{
+        You are in the living room.
+    
+        You can see open doors to a bedroom and a kitchen.
+      };
 
     The `next_page` function defines a path the story can take after this
     page. It takes a page identifier followed by a description. It can be used

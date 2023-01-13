@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact::Page;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001002';
+our $VERSION   = '0.001003';
 
 use Moo;
 use Types::Common -types;
@@ -49,7 +49,10 @@ has 'next_pages' => (
 
 sub add_text {
 	my ( $self, $text ) = @_;
-	push @{ $self->text }, $text;
+	my @chunks = split /\n\s*\n/sm, $text;
+	s/(?:^\s+|\s+$)//g for @chunks;
+	s/\s+/ /g for @chunks;
+	push @{ $self->text }, @chunks;
 	return;
 }
 

@@ -3,9 +3,9 @@
 package App::pdfgrep;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-08'; # DATE
+our $DATE = '2022-10-07'; # DATE
 our $DIST = 'App-PDFUtils'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use strict;
@@ -131,7 +131,7 @@ App::pdfgrep - Print lines matching text in PDF files
 
 =head1 VERSION
 
-This document describes version 0.011 of App::pdfgrep (from Perl distribution App-PDFUtils), released on 2022-09-08.
+This document describes version 0.012 of App::pdfgrep (from Perl distribution App-PDFUtils), released on 2022-10-07.
 
 =head1 FUNCTIONS
 

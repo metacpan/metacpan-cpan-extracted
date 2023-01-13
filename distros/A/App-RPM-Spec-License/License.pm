@@ -7,9 +7,10 @@ use English;
 use Error::Pure qw(err);
 use File::Find::Rule;
 use Getopt::Std;
+use List::Util qw(none);
 use Parse::RPM::Spec;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 $| = 1;
 
@@ -34,19 +35,23 @@ sub run {
 		'g' => '*',
 		'h' => 0,
 		's' => 0,
+		'u' => 0,
 	};
-	if (! getopts('fg:hs', $self->{'_opts'}) || $self->{'_opts'}->{'h'}) {
-		print STDERR "Usage: $0 [-f] [-g file_glog] [-h] [-s] [--version] [file_or_dir]\n";
+	if (! getopts('fg:hsu', $self->{'_opts'}) || $self->{'_opts'}->{'h'}) {
+		print STDERR "Usage: $0 [-f] [-g file_glog] [-h] [-s] [-u] [--version] [file_or_dir]\n";
 		print STDERR "\t-f\t\tPrint spec file name.\n";
 		print STDERR "\t-g file_glob\tFile glob (default is * = *.spec).\n";
 		print STDERR "\t-h\t\tPrint help.\n";
 		print STDERR "\t-s\t\tSkip errors.\n";
+		print STDERR "\t-u\t\tPrint unique only.\n";
 		print STDERR "\t--version\tPrint version.\n";
 		print STDERR "\tfile_or_dir\tFile or directory to check license in spec ".
 			"files (default is actual directory)\n";
 		return 1;
 	}
 	$self->{'_file_or_dir'} = shift @ARGV || '.';
+
+	$self->{'_license_printed'} = [];
 
 	if (-f $self->{'_file_or_dir'}) {
 		$self->_process_spec_file($self->{'_file_or_dir'});
@@ -82,10 +87,18 @@ sub _process_spec_file {
 		}
 	}
 	if (defined $rpm_spec->license) {
-		if ($self->{'_opts'}->{'f'}) {
-			print $spec_file.': ';
+		if (! $self->{'_opts'}->{'u'}
+			|| ($self->{'_opts'}->{'u'}
+			&& (none { $rpm_spec->license eq $_ } @{$self->{'_license_printed'}}))) {
+
+			if ($self->{'_opts'}->{'f'}) {
+				print $spec_file.': ';
+			}
+			print $rpm_spec->license."\n";
+			if ($self->{'_opts'}->{'u'}) {
+				push @{$self->{'_license_printed'}}, $rpm_spec->license;
+			}
 		}
-		print $rpm_spec->license."\n";
 	} else {
 		print STDERR "Skip spec file '$spec_file' (no license).\n";
 		return;
@@ -132,9 +145,9 @@ Run.
 
 Returns 1 for error, 0 for success.
 
-=head1 EXAMPLE
+=head1 EXAMPLE1
 
-=for comment filename=print_license.pl
+=for comment filename=print_licenses.pl
 
  use strict;
  use warnings;
@@ -153,9 +166,51 @@ Returns 1 for error, 0 for success.
  barf(catfile($temp_dir, 'ex2.spec'), <<'END');
  License: MIT
  END
+ barf(catfile($temp_dir, 'ex3.spec'), <<'END');
+ License: MIT
+ END
 
  # Arguments.
  @ARGV = (
+         $temp_dir,
+ );
+
+ # Run.
+ exit App::RPM::Spec::License->new->run;
+
+ # Output:
+ # BSD
+ # MIT
+ # MIT
+
+=head1 EXAMPLE2
+
+=for comment filename=print_unique_licenses.pl
+
+ use strict;
+ use warnings;
+
+ use App::RPM::Spec::License;
+ use File::Temp;
+ use File::Spec::Functions qw(catfile);
+ use IO::Barf qw(barf);
+
+ # Temp dir.
+ my $temp_dir = File::Temp->newdir;
+
+ barf(catfile($temp_dir, 'ex1.spec'), <<'END');
+ License: BSD
+ END
+ barf(catfile($temp_dir, 'ex2.spec'), <<'END');
+ License: MIT
+ END
+ barf(catfile($temp_dir, 'ex3.spec'), <<'END');
+ License: MIT
+ END
+
+ # Arguments.
+ @ARGV = (
+         '-u',
          $temp_dir,
  );
 
@@ -172,6 +227,7 @@ L<English>,
 L<Error::Pure>,
 L<File::Find::Rule>,
 L<Getopt::Std>.
+L<List::Util>,
 L<Parse::RPM::Spec>,
 
 =head1 REPOSITORY
@@ -192,6 +248,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

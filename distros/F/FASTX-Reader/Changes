@@ -2,12 +2,18 @@ This is the changelog for FASTX::Reader. Version prior to v 0.1 are preliminary 
 Some APIs *can change* with the release of the first stable release (v 1.0).
 Version 0.61 has been available via BioConda
 
+1.9.0 2023-01-12
+  * Added `slice(from, len)` method to FASTX::Seq (works as substr)
+  * Added `string()` method to get the sequence as a string (FASTQ or FASTA according to the record), with `as_string()` as alias
+  * Added `is_fasta()` and `is_fastq()` methods to FASTX::Seq
+  * Added `as_fasta()` and `as_fastq()` aliases to FASTX::Seq (for syntax consistency)
+  
 1.8.1 2023-01-09
   * Updated tests
   * Update POD documentation
 
 1.8.0 2023-01-08
-  * CRITICAL BUG FIX in next() method used in while loops
+  * **CRITICAL BUG FIX ** in `next()` method used in while loops
 
 1.7.0 2022-12-12
   * FASTX::Seq has more stringent requirements, undef seq not allowed (but empty are fine)
@@ -17,10 +23,10 @@ Version 0.61 has been available via BioConda
   
 1.6.0 2022-12-02
   * FASTX::Reader now uses FASTX::Seq internally
-  * Experimental FASTX::PE renamed FASTX::ReaderPaired. Remains experimental and not for use in production.
+  * Experimental FASTX::PE renamed FASTX::ReaderPaired. Remains **experimental** and not for use in production.
 
 1.5.1 2022-12-01
-  * Bug fixes, documentation and functionality update for C<fqlen.pl>
+  * Bug fixes, documentation and functionality update for `fqlen.pl`
   * Minor changes
 
 1.5.0 2022-06-24

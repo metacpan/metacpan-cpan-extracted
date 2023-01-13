@@ -22,5 +22,5 @@ eval {
 };
 
 ok($@, "error on quality length mismatch");
-
+ok(length($FASTX::Seq::DEFAULT_QUALITY) == 1, "default quality is 1 char long: " . $FASTX::Seq::DEFAULT_QUALITY);
 done_testing();

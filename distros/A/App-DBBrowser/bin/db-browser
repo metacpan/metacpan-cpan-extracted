@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.312';
+our $VERSION = '2.313';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -47,7 +47,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL>/C<Firebird>/C<DB2> datab
 
 =head1 VERSION
 
-Version 2.312
+Version 2.313
 
 =head1 SYNOPSIS
 

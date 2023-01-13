@@ -1,6 +1,10 @@
 Revision history for App-DBBrowser
 
 
+2.313    2023-01-13
+        - Bugfix in first_column_is_autoincrement.
+        - Update attach/detach SQLite databases.
+
 2.312    2023-01-12
         - Removed option 'auto_limit'.
 

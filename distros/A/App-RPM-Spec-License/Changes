@@ -1,2 +1,7 @@
+0.02 2023-01-13T13:50:20+01:00
+ - Add -u command option to print unique licenses only.
+ - Change example in doc to print duplicite license.
+ - Update minimal dependencies.
+
 0.01 2023-01-12T15:37:52+01:00
  - First version.

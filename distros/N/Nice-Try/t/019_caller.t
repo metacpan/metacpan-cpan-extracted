@@ -4,6 +4,7 @@ BEGIN
     use strict;
     use warnings;
     use Test::More qw( no_plan );
+    use lib './lib';
     use Nice::Try;
     our $DEBUG = 0;
 };

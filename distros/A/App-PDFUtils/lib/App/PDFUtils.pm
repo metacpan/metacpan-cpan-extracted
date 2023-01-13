@@ -8,9 +8,9 @@ use Log::ger;
 use Perinci::Object;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-08'; # DATE
+our $DATE = '2022-10-07'; # DATE
 our $DIST = 'App-PDFUtils'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 our %SPEC;
 
@@ -321,6 +321,10 @@ _
             summary => 'Run Unix fmt over the txt output',
             schema => 'bool*',
         },
+        raw => {
+            summary => 'If set to true, will run pdftotext with -raw option',
+            schema => 'bool*',
+        },
     },
 };
 sub convert_pdf_to_text {
@@ -371,7 +375,8 @@ sub convert_pdf_to_text {
 
         IPC::System::Options::system(
             {die=>1, log=>1},
-            "pdftotext", $temp_file, $temp_out_file);
+            "pdftotext", ($args{raw} ? ("-raw") : ()),
+            $temp_file, $temp_out_file);
 
       FMT: {
             last unless $args{fmt};
@@ -518,7 +523,7 @@ App::PDFUtils - Command-line utilities related to PDF files
 
 =head1 VERSION
 
-This document describes version 0.011 of App::PDFUtils (from Perl distribution App-PDFUtils), released on 2022-09-08.
+This document describes version 0.012 of App::PDFUtils (from Perl distribution App-PDFUtils), released on 2022-10-07.
 
 =head1 SYNOPSIS
 
@@ -532,6 +537,8 @@ files:
 =item * L<compress-pdf>
 
 =item * L<grep-from-pdf>
+
+=item * L<less-pdf-text>
 
 =item * L<pdf-has-password>
 
@@ -670,6 +677,10 @@ Output path.
 =item * B<pages> => I<uint_range>
 
 Only convert a range of pages.
+
+=item * B<raw> => I<bool>
+
+If set to true, will run pdftotext with -raw option.
 
 =item * B<return_output_file> => I<bool>
 

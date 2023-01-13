@@ -47,7 +47,7 @@ your system.
 
 use XSLoader;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 XSLoader::load( __PACKAGE__, $VERSION );
 
@@ -322,7 +322,8 @@ compile-time options mention long doubles or quad math.
 
 =head1 OS SUPPORT
 
-QuickJS supports Linux & macOS natively, so these work without issue.
+QuickJS supports Linux, macOS, and Windows natively, so these work without
+issue.
 
 FreeBSD, OpenBSD, & Cygwin work after a few patches that we apply when
 building this library. (Hopefully these will eventually merge into QuickJS.)

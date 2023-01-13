@@ -7,10 +7,8 @@ use FASTX::Reader;
 use FASTX::ReaderPaired;
 use FASTX::Seq;
 use Data::Dumper;
-# TEST: Parse a regular file as interleaved (error)
 
-
-
+# TEST: compare while next() and while getRead()
 my @files = qw(alpha.fa illumina_1.fq.gz file2.fa compressed.fasta.gz compressed.fastq.gz);
 
 for my $f (@files) {

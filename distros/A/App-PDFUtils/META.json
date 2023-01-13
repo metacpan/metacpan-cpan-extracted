@@ -34,6 +34,7 @@
       "runtime" : {
          "requires" : {
             "AppBase::Grep" : "0.009",
+            "CLI::MetaUtil::Getopt::Long" : "0.002",
             "Data::Sah::Compiler::perl::TH::array" : "0.911",
             "Data::Sah::Compiler::perl::TH::bool" : "0.911",
             "Data::Sah::Compiler::perl::TH::code" : "0.911",
@@ -44,9 +45,11 @@
             "File::Basename" : "0",
             "File::Copy" : "0",
             "File::Find::Rule" : "0",
+            "File::Slurper" : "0",
             "File::Temp" : "0.2307",
             "File::Temp::MoreUtils" : "0",
             "File::Which" : "0",
+            "File::chdir" : "0",
             "IPC::System::Options" : "0.339",
             "Log::ger" : "0.038",
             "Perinci::CmdLine::Any" : "0.152",
@@ -74,11 +77,11 @@
    "provides" : {
       "App::PDFUtils" : {
          "file" : "lib/App/PDFUtils.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "App::pdfgrep" : {
          "file" : "lib/App/pdfgrep.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       }
    },
    "release_status" : "stable",
@@ -93,7 +96,7 @@
          "web" : "https://github.com/perlancar/perl-App-PDFUtils"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

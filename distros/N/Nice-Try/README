@@ -135,7 +135,7 @@ SYNOPSIS
         }
 
 VERSION
-        v1.2.0
+        v1.3.3
 
 DESCRIPTION
     Nice::Try is a lightweight implementation of Try-Catch exception
@@ -304,7 +304,34 @@ DESCRIPTION
     *   Can be used with or without a "catch" block
 
     *   Supports a "finally" block called in void context for cleanup for
-        example
+        example. The "finally" block will always be called, if present.
+
+            #!/usr/local/bin/perl
+            use v5.36;
+            use strict;
+            use warnings;
+            use Nice::Try;
+    
+            try
+            {
+                die( "Oops" );
+            }
+            catch( $e )
+            {
+                say "Caught an error: $e";
+                die( "Oops again" );
+            }
+            finally
+            {
+                # Some code here that will be executed after the catch block dies
+                say "Got here in finally with \$\@ -> $@";
+            }
+
+        The above would yield something like:
+
+            Caught error: Oops at ./test.pl line 9.
+            Oops again at ./test.pl line 14.
+            Got here in finally with $@ -> Oops again at ./test.pl line 14.
 
     *   Nice::Try is rich context aware, which means it can provide you with
         a super granular context on how to return data back to the caller
@@ -640,7 +667,7 @@ CATCHING OR NOT CATCHING?
 
 EXCEPTION CLASS
     As mentioned above, you can use class when raising exceptions and you
-    can filter them in a variety of way when you catch them.
+    can filter them in a variety of ways when you catch them.
 
     Here are your options (replace "Exception::Class" with your favorite
     exception class):
@@ -919,7 +946,8 @@ CONTEXT AWARENESS
 
 LIMITATIONS
     Currently, the only known limitation is when one use experimental
-    subroutine attributes inside a try-catch block. For example:
+    subroutine attributes inside a try-catch block on an anonymous
+    subroutine. For example:
 
         use strict;
         use warnings;
@@ -997,7 +1025,29 @@ CLASS FUNCTIONS
     will return a perl code converted to support try-catch blocks.
 
     This is designed to be used for perl code you store, such as subroutines
-    dynamically loaded.
+    dynamically loaded or eval'ed.
+
+    For example:
+
+        my $code = Nice::Try->implement( <<EOT );
+        sub $method
+        {
+            my \$self = shift( \@_ );
+            try
+            {
+                # doing something that may die here
+            }
+            catch( \$e )
+            {
+                return( \$self->error( "Oops: \$e ) );
+            }
+        }
+        EOT
+
+    You can also pass an optional hash or hash reference of options to
+    "implement" and it will be used to instantiate a new Nice::Try method.
+    The options accepted are the same ones that can be passed when using
+    "use Nice::Try"
 
 CREDITS
     Credits to Stephen R. Scaffidi for his implementation of Try::Harder

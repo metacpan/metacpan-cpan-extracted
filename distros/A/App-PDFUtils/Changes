@@ -1,3 +1,10 @@
+0.012   2022-10-07  Released-By: PERLANCAR; Urgency: medium
+
+        - Add CLI: less-pdf-text.
+
+        - convert_pdf_to_text(): Add argument 'raw'.
+
+
 0.011   2022-09-08  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

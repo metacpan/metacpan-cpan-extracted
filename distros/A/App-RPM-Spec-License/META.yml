@@ -24,14 +24,15 @@ no_index:
     - xt
 requires:
   English: 0
-  Error::Pure: 0
+  Error::Pure: 0.3
   File::Find::Rule: 0
   Getopt::Std: 0
-  Parse::RPM::Spec: 0
+  List::Util: 1.33
+  Parse::RPM::Spec: v1.1.2
   perl: 5.6.0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/App-RPM-Spec-License/issues
   homepage: https://github.com/michal-josef-spacek/App-RPM-Spec-License
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-RPM-Spec-License
-version: '0.01'
+version: '0.02'

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## A real Try Catch Block Implementation Using Perl Filter - ~/lib/Nice/Try.pm
-## Version v1.3.1
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v1.3.3
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/05/17
-## Modified 2022/07/28
+## Modified 2023/01/13
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -28,7 +28,7 @@ BEGIN
     use Scalar::Util ();
     use List::Util ();
     use Want ();
-    our $VERSION = 'v1.3.1';
+    our $VERSION = 'v1.3.3';
     our $ERROR;
     our( $CATCH, $DIED, $EXCEPTION, $FINALLY, $HAS_CATCH, @RETVAL, $SENTINEL, $TRY, $WANTARRAY );
 }
@@ -78,7 +78,7 @@ sub caller($;$)
     my $map = 
     {
     try => 3,
-    catch => 2,
+    catch => 3,
     finally => 5,
     };
     my @info = defined( $n ) ? CORE::caller( int( $n ) + $map->{ $where } ) : CORE::caller( 1 + $map->{ $where } );
@@ -678,7 +678,7 @@ sub _parse
             my $finally_block = $self->_serialize( $fin_def->{block} );
             $finally_block =~ s/^\{[[:blank:]]*|[[:blank:]]*\}$//gs;
             $fin_block = <<EOT;
-CORE::local \$Nice::Try::FINALLY = Nice\::Try\::ScopeGuard->_new(sub __FINALLY_OPEN_NL__{ __BLOCK_PLACEHOLDER__ __FINALLY__CLOSE_NL__}, \@_);
+CORE::local \$Nice::Try::FINALLY = Nice\::Try\::ScopeGuard->_new(sub __FINALLY_OPEN_NL__{ __BLOCK_PLACEHOLDER__ __FINALLY__CLOSE_NL__}, [\@_], \$Nice::Try::CATCH_DIED);
 EOT
             $fin_block =~ s/\n/ /gs unless( $self->{debug_code} );
             $fin_block =~ s/__BLOCK_PLACEHOLDER__/$finally_block/gs;
@@ -735,7 +735,7 @@ if( \$INC{'threads.pm'} && !CORE::exists( \$INC{'forks.pm'} ) )
     \$Nice::Try::THREADED = threads->tid;
 }
 CORE::local \$Nice::Try::WANT;
-CORE::local ( \$Nice::Try::EXCEPTION, \$Nice::Try::DIED, \@Nice::Try::RETVAL, \@Nice::Try::VOID );
+CORE::local ( \$Nice::Try::EXCEPTION, \$Nice::Try::DIED, \$Nice::Try::CATCH_DIED, \@Nice::Try::RETVAL, \@Nice::Try::VOID );
 CORE::local \$Nice::Try::WANTARRAY = CORE::wantarray;
 CORE::local \$Nice::Try::TRY = CORE::sub
 {
@@ -993,65 +993,70 @@ EOT
                 CORE::return \$Nice::Try::SENTINEL;
             };
             
-            if( CORE::defined( \$Nice::Try::WANT ) && CORE::length( \$Nice::Try::WANT ) )
+            eval
             {
-                if( \$Nice::Try::WANT eq 'OBJECT' )
+                local \$\@ = \$Nice::Try::EXCEPTION;
+                if( CORE::defined( \$Nice::Try::WANT ) && CORE::length( \$Nice::Try::WANT ) )
                 {
-                    \$Nice::Try::RETVAL[0] = Nice::Try::ObjectContext->new( \&\$Nice::Try::CATCH )->callback();
+                    if( \$Nice::Try::WANT eq 'OBJECT' )
+                    {
+                        \$Nice::Try::RETVAL[0] = Nice::Try::ObjectContext->new( \&\$Nice::Try::CATCH )->callback();
+                    }
+                    elsif( \$Nice::Try::WANT eq 'CODE' )
+                    {
+                        \$Nice::Try::RETVAL[0] = \$Nice::Try::NOOP->( \&\$Nice::Try::CATCH )->();
+                    }
+                    elsif( \$Nice::Try::WANT eq 'HASH' )
+                    {
+                        \@Nice::Try::RETVAL = \%{ \&\$Nice::Try::CATCH };
+                    }
+                    elsif( \$Nice::Try::WANT eq 'ARRAY' )
+                    {
+                        \@Nice::Try::RETVAL = \@{ \&\$Nice::Try::CATCH };
+                    }
+                    elsif( \$Nice::Try::WANT eq 'REFSCALAR' )
+                    {
+                        \$Nice::Try::RETVAL[0] = \${\&\$Nice::Try::CATCH};
+                    }
+                    elsif( \$Nice::Try::WANT eq 'GLOB' )
+                    {
+                        \$Nice::Try::RETVAL[0] = \*{ \&\$Nice::Try::CATCH };
+                    }
+                    elsif( \$Nice::Try::WANT eq 'LIST' )
+                    {
+                        \@Nice::Try::RETVAL = \&\$Nice::Try::CATCH;
+                    }
+                    elsif( \$Nice::Try::WANT eq 'BOOLEAN' )
+                    {
+                        my \$this = \&\$Nice::Try::CATCH ? 1 : 0;
+                        \$Nice::Try::RETVAL[0] = \$Nice::Try::VOID[0] if( scalar( \@Nice::Try::VOID ) );
+                    }
+                    elsif( \$Nice::Try::WANT eq 'VOID' )
+                    {
+                        \$Nice::Try::VOID[0] = \&\$Nice::Try::CATCH;
+                    }
+                    elsif( \$Nice::Try::WANT eq 'SCALAR' )
+                    {
+                        \$Nice::Try::RETVAL[0] = \&\$Nice::Try::CATCH;
+                    }
                 }
-                elsif( \$Nice::Try::WANT eq 'CODE' )
+                else
                 {
-                    \$Nice::Try::RETVAL[0] = \$Nice::Try::NOOP->( \&\$Nice::Try::CATCH )->();
+                    if( \$Nice::Try::WANTARRAY ) 
+                    {
+                        \@Nice::Try::RETVAL = \&\$Nice::Try::CATCH;
+                    }
+                    elsif( defined( \$Nice::Try::WANTARRAY ) )
+                    {
+                        \$Nice::Try::RETVAL[0] = \&\$Nice::Try::CATCH;
+                    } 
+                    else 
+                    {
+                        \&\$Nice::Try::CATCH;
+                    }
                 }
-                elsif( \$Nice::Try::WANT eq 'HASH' )
-                {
-                    \@Nice::Try::RETVAL = \%{ \&\$Nice::Try::CATCH };
-                }
-                elsif( \$Nice::Try::WANT eq 'ARRAY' )
-                {
-                    \@Nice::Try::RETVAL = \@{ \&\$Nice::Try::CATCH };
-                }
-                elsif( \$Nice::Try::WANT eq 'REFSCALAR' )
-                {
-                    \$Nice::Try::RETVAL[0] = \${\&\$Nice::Try::CATCH};
-                }
-                elsif( \$Nice::Try::WANT eq 'GLOB' )
-                {
-                    \$Nice::Try::RETVAL[0] = \*{ \&\$Nice::Try::CATCH };
-                }
-                elsif( \$Nice::Try::WANT eq 'LIST' )
-                {
-                    \@Nice::Try::RETVAL = \&\$Nice::Try::CATCH;
-                }
-                elsif( \$Nice::Try::WANT eq 'BOOLEAN' )
-                {
-                    my \$this = \&\$Nice::Try::CATCH ? 1 : 0;
-                    \$Nice::Try::RETVAL[0] = \$Nice::Try::VOID[0] if( scalar( \@Nice::Try::VOID ) );
-                }
-                elsif( \$Nice::Try::WANT eq 'VOID' )
-                {
-                    \$Nice::Try::VOID[0] = \&\$Nice::Try::CATCH;
-                }
-                elsif( \$Nice::Try::WANT eq 'SCALAR' )
-                {
-                    \$Nice::Try::RETVAL[0] = \&\$Nice::Try::CATCH;
-                }
-            }
-            else
-            {
-                if( \$Nice::Try::WANTARRAY ) 
-                {
-                    \@Nice::Try::RETVAL = \&\$Nice::Try::CATCH;
-                }
-                elsif( defined( \$Nice::Try::WANTARRAY ) )
-                {
-                    \$Nice::Try::RETVAL[0] = \&\$Nice::Try::CATCH;
-                } 
-                else 
-                {
-                    \&\$Nice::Try::CATCH;
-                }
-            }
+            };
+            \$Nice::Try::CATCH_DIED = \$\@ if( \$\@ );
 EOT
                 if( $cdef->{var} )
                 {
@@ -1206,14 +1211,24 @@ EOT
             push( @$repl, $fin_block );
         }
         
+        # After the finally block has been registered, we will die if catch had a fatal error
+        my $catch_dies = <<EOT;
+if( defined( \$Nice::Try::CATCH_DIED ) )
+{
+    die( \$Nice::Try::CATCH_DIED );
+}
+EOT
+        $catch_dies =~ s/\n/ /gs unless( $self->{debug_code} );
+        push( @$repl, $catch_dies );
+        
         my $last_return_block = <<EOT;
-if( CORE::defined( \$Nice::Try::WANTARRAY ) and 
+if( ( CORE::defined( \$Nice::Try::WANTARRAY ) || ( defined( \$Nice::Try::BREAK ) && \$Nice::Try::BREAK eq 'return' ) ) and 
     (
       !Scalar::Util::blessed( \$Nice::Try::RETVAL[0] ) or 
       ( Scalar::Util::blessed( \$Nice::Try::RETVAL[0] ) && !\$Nice::Try::RETVAL[0]->isa( 'Nice::Try::SENTINEL' ) ) 
     ) ) 
 {
-    unless( CORE::defined( \$Nice::Try::BREAK ) )
+    if( !CORE::defined( \$Nice::Try::BREAK ) || \$Nice::Try::BREAK eq 'return' )
     {
         if( CORE::defined( \$Nice::Try::WANT ) && CORE::length( \$Nice::Try::WANT ) )
         {
@@ -1234,6 +1249,10 @@ if( CORE::defined( \$Nice::Try::WANTARRAY ) and
                 elsif( CORE::defined( \$Nice::Try::RETVAL[0] ) && \$Nice::Try::RETVAL[0] eq '__REDO__' )
                 {
                     \$Nice::Try::BREAK = 'redo';
+                }
+                elsif( defined( \$Nice::Try::BREAK ) && \$Nice::Try::BREAK eq 'return' )
+                {
+                    CORE::return( \$Nice::Try::RETVAL[0] );
                 }
             }
             elsif( \$Nice::Try::WANT eq 'OBJECT' )
@@ -1417,18 +1436,22 @@ sub _process_loop_breaks
             # $self->_browse( $e );
             # If we found a break word without a label, i.e. next, last, redo, 
             # we replace it with a special return statement
-            if( ( scalar( @$words ) == 1 ||
-                  ( scalar( @$words ) > 1 && $word2 =~ /^(for|foreach|given|if|unless|until|while)$/ )
+            if( (
+                  scalar( @$words ) == 1 ||
+                  ( scalar( @$words ) > 1 && $word2 =~ /^(for|foreach|given|if|unless|until|while)$/ ) ||
+                  $word1 eq 'return'
                 ) && 
                 (
                   $word1 eq 'next' ||
                   $word1 eq 'last' ||
-                  $word1 eq 'redo' ) )
+                  $word1 eq 'redo' ||
+                  $word1 eq 'return'
+                ) )
             {
                 # We add our special return value. Notice that we use 'return' and not 
                 # 'CORE::return'. See below why.
                 # my $break_code = qq{return( '__} . uc( $word1 ) . qq{__' )};
-                my $break_code = q{$Nice::Try::BREAK='} . $word1 . qq{', return};
+                my $break_code = q{$Nice::Try::BREAK='} . $word1 . ( $word1 eq 'return' ? "', $e" : qq{', return} );
                 # e.g. next if( $i == 2 );
                 # next and if are both treated as 'word' by PPI
                 if( scalar( @$words ) > 1 )
@@ -1448,8 +1471,8 @@ sub _process_loop_breaks
                 $new_elem->remove;
                 $self->_message( 5, "New element is object '", sub{ overload::StrVal( $new_elem ) }, "' -> $new_elem" ) if( $self->{debug} >= 5 );
                 # Not yet implemented as of 2021-05-11 dixit PPI, so we use a hack to make it available anyhow
-                $e->replace( $new_elem );
                 $self->_message( 5, "Updated element now is '$e' for class '", $e->class, "' and parent class '", $e->parent->class, "'." ) if( $self->{debug} >= 5 );
+                $e->replace( $new_elem );
                 # 2021-05-12 (Jacques): I have to do this workaround, because weirdly enough
                 # PPI (at least with PPI::Node version 1.270) will refuse to add our element
                 # if the 'return' word is 'CORE::return' so, we add it without and change it after
@@ -1605,6 +1628,7 @@ sub _serialize
 
 
 {
+    # NOTE: Nice::Try::ScopeGuard class
     package # hide from PAUSE
         Nice::Try::ScopeGuard;
 
@@ -1619,15 +1643,16 @@ sub _serialize
 
     sub DESTROY 
     {
-        my( $code, @args ) = @{ $_[0] };
+        my( $code, $args, $catch_err ) = @{ $_[0] };
         # save the current exception to make it available in the finally sub,
         # and to restore it after the eval
-        my $err = $@;
+        my $err = defined( $catch_err ) ? $catch_err : $@;
         local $@ if( UNSTABLE_DOLLARAT );
+        $@ = $catch_err if( defined( $catch_err ) );
         CORE::eval 
         {
             $@ = $err;
-            $code->( @args );
+            $code->( @$args );
             1;
         } 
         or do 
@@ -1828,7 +1853,7 @@ And you also have granular power in the catch block to filter which exception to
 
 =head1 VERSION
 
-    v1.3.1
+    v1.3.3
 
 =head1 DESCRIPTION
 
@@ -1993,7 +2018,34 @@ Would produce:
 
 =item * Can be used with or without a C<catch> block
 
-=item * Supports a C<finally> block called in void context for cleanup for example
+=item * Supports a C<finally> block called in void context for cleanup for example. The C<finally> block will always be called, if present.
+
+    #!/usr/local/bin/perl
+    use v5.36;
+    use strict;
+    use warnings;
+    use Nice::Try;
+    
+    try
+    {
+        die( "Oops" );
+    }
+    catch( $e )
+    {
+        say "Caught an error: $e";
+        die( "Oops again" );
+    }
+    finally
+    {
+        # Some code here that will be executed after the catch block dies
+        say "Got here in finally with \$\@ -> $@";
+    }
+
+The above would yield something like:
+
+    Caught error: Oops at ./test.pl line 9.
+    Oops again at ./test.pl line 14.
+    Got here in finally with $@ -> Oops again at ./test.pl line 14.
 
 =item * L<Nice::Try> is rich context aware, which means it can provide you with a super granular context on how to return data back to the caller based on the caller's expectation, by using a module like L<Want>.
 
@@ -2294,7 +2346,7 @@ Since, try-catch block can be nested, the following would work too:
 
 =head1 EXCEPTION CLASS
 
-As mentioned above, you can use class when raising exceptions and you can filter them in a variety of way when you catch them.
+As mentioned above, you can use class when raising exceptions and you can filter them in a variety of ways when you catch them.
 
 Here are your options (replace C<Exception::Class> with your favorite exception class):
 
