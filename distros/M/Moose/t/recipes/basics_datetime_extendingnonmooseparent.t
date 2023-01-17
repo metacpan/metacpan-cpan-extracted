@@ -8,7 +8,7 @@ $| = 1;
 
 
 # =begin testing SETUP
-use Test::Requires {
+use Test::Needs {
     'DateTime'                  => '0',
     'DateTime::Calendar::Mayan' => '0',
     'MooseX::NonMoose'          => '0.25',

@@ -6,17 +6,18 @@ use warnings;
 use Log::ger;
 #use Log::ger::Screen;
 
+use CLI::MetaUtil::Getopt::Long::Complete qw(GetOptionsCLIWrapper);
 use File::chdir;
 use File::Slurper qw(read_binary);
 use File::Temp qw(tempdir);
 use File::Which qw(which);
-use CLI::MetaUtil::Getopt::Long qw(GetOptionsCLIWrapper);
+use Getopt::Long ();
 use IPC::System::Options 'system', -log=>1, -die=>1;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-10-07'; # DATE
 our $DIST = 'App-PDFUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 my @files;
 Getopt::Long::Configure("gnu_getopt", "no_ignore_case", "pass_through");
@@ -28,7 +29,7 @@ GetOptionsCLIWrapper(
     cli => 'less',
     add_opts => {
         'pdf-pages=s' => \$opt_pages,
-        'pdf-raw=s' => \$opt_raw,
+        'pdf-raw' => \$opt_raw,
         '<>' => sub {
             my $arg = shift;
             if ($arg =~ /\A\+/) {
@@ -62,7 +63,12 @@ GetOptionsCLIWrapper(
             $arg = $file;
 
           PUSH:
-            push @CLI::MetaUtil::Getopt::Long::cli_argv, $arg;
+            push @CLI::MetaUtil::Getopt::Long::Complete::cli_argv, $arg;
+        },
+        arg_completion => sub {
+            require Complete::File;
+            my %args = @_;
+            Complete::File::complete_file(filter=>sub { $_[0] =~ /\.pdf\z/i }, word=>$args{word});
         },
     },
 );
@@ -92,7 +98,7 @@ less-pdf-text - Less for seeing plaintext of PDF files
 
 =head1 VERSION
 
-This document describes version 0.012 of less-pdf-text (from Perl distribution App-PDFUtils), released on 2022-10-07.
+This document describes version 0.014 of less-pdf-text (from Perl distribution App-PDFUtils), released on 2022-10-07.
 
 =head1 SYNOPSIS
 

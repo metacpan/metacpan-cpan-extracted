@@ -22,7 +22,7 @@
       "runtime" : {
          "requires" : {
             "Future" : "0",
-            "perl" : "5.010"
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -34,7 +34,7 @@
    "provides" : {
       "Future::Queue" : {
          "file" : "lib/Future/Queue.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       }
    },
    "release_status" : "stable",
@@ -43,6 +43,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.49",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.50",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

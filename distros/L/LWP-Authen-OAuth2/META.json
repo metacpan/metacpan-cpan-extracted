@@ -63,71 +63,71 @@
    "provides" : {
       "LWP::Authen::OAuth2" : {
          "file" : "lib/LWP/Authen/OAuth2.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "LWP::Authen::OAuth2::AccessToken" : {
          "file" : "lib/LWP/Authen/OAuth2/AccessToken.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "LWP::Authen::OAuth2::AccessToken::Bearer" : {
          "file" : "lib/LWP/Authen/OAuth2/AccessToken/Bearer.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "LWP::Authen::OAuth2::Args" : {
          "file" : "lib/LWP/Authen/OAuth2/Args.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "LWP::Authen::OAuth2::ServiceProvider" : {
          "file" : "lib/LWP/Authen/OAuth2/ServiceProvider.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "LWP::Authen::OAuth2::ServiceProvider::Dwolla" : {
          "file" : "lib/LWP/Authen/OAuth2/ServiceProvider/Dwolla.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "LWP::Authen::OAuth2::ServiceProvider::Google" : {
          "file" : "lib/LWP/Authen/OAuth2/ServiceProvider/Google.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "LWP::Authen::OAuth2::ServiceProvider::Google::Device" : {
          "file" : "lib/LWP/Authen/OAuth2/ServiceProvider/Google.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "LWP::Authen::OAuth2::ServiceProvider::Google::Installed" : {
          "file" : "lib/LWP/Authen/OAuth2/ServiceProvider/Google.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "LWP::Authen::OAuth2::ServiceProvider::Google::Login" : {
          "file" : "lib/LWP/Authen/OAuth2/ServiceProvider/Google.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "LWP::Authen::OAuth2::ServiceProvider::Google::Service" : {
          "file" : "lib/LWP/Authen/OAuth2/ServiceProvider/Google.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "LWP::Authen::OAuth2::ServiceProvider::Google::WebServer" : {
          "file" : "lib/LWP/Authen/OAuth2/ServiceProvider/Google.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "LWP::Authen::OAuth2::ServiceProvider::Line" : {
          "file" : "lib/LWP/Authen/OAuth2/ServiceProvider/Line.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "LWP::Authen::OAuth2::ServiceProvider::Line::AccessToken" : {
          "file" : "lib/LWP/Authen/OAuth2/ServiceProvider/Line/AccessToken.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "LWP::Authen::OAuth2::ServiceProvider::Strava" : {
          "file" : "lib/LWP/Authen/OAuth2/ServiceProvider/Strava.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "LWP::Authen::OAuth2::ServiceProvider::Withings" : {
          "file" : "lib/LWP/Authen/OAuth2/ServiceProvider/Withings.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "LWP::Authen::OAuth2::ServiceProvider::Yahoo" : {
          "file" : "lib/LWP/Authen/OAuth2/ServiceProvider/Yahoo.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       }
    },
    "release_status" : "stable",
@@ -142,7 +142,7 @@
          "web" : "https://github.com/domm/perl-oauth2"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

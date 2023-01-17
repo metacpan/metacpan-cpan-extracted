@@ -1795,6 +1795,10 @@ The guest is saving a crash dump
 
 The guest is performing a block backup
 
+=item Sys::Virt::Domain::JOB_OPERATION_SNAPSHOT_DELETE
+
+The guest is deleting a snapshot
+
 =back
 
 =item $dom->abort_job($flags=0)
@@ -2377,6 +2381,24 @@ Dirty bitmap mode
 =item Sys::Virt::Domain::DIRTYRATE_MODE_DIRTY_RING
 
 Dirty ring mode
+
+=back
+
+=item $dom->fd_associate($name, \@fds, $flags=0)
+
+Associate a set of file descriptors in C<@fds> with
+the domain, giving them the name C<$name>. If C<$flags>
+is non-zero, it can  take one or more of:
+
+=over 4
+
+=item Sys::Virt::Domain::FD_ASSOCIATE_SECLABEL_RESTORE
+
+Attempt to restore the label when shutting down
+
+=item Sys::Virt::Domain::FD_ASSOCIATE_SECLABEL_WRITABLE
+
+Label the FD to permit the guest to write to it.
 
 =back
 

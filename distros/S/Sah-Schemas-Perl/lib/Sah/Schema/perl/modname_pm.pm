@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-16'; # DATE
+our $DATE = '2023-01-14'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.046'; # VERSION
+our $VERSION = '0.047'; # VERSION
 
 use Regexp::Pattern::Perl::Module ();
 
@@ -54,7 +54,7 @@ Sah::Schema::perl::modname_pm - Perl module name in Foo/Bar.pm form
 
 =head1 VERSION
 
-This document describes version 0.046 of Sah::Schema::perl::modname_pm (from Perl distribution Sah-Schemas-Perl), released on 2022-12-16.
+This document describes version 0.047 of Sah::Schema::perl::modname_pm (from Perl distribution Sah-Schemas-Perl), released on 2023-01-14.
 
 =head1 SYNOPSIS
 
@@ -94,7 +94,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = "";
+ $data = "Foo|Bar";
  my $errmsg = $validator->($data); # => "Must match regex pattern \\A(?:[A-Za-z_][A-Za-z_0-9]*(/[A-Za-z_0-9]+)*\\.pm)\\z"
 
 Often a schema has coercion rule or default value, so after validation the
@@ -109,8 +109,8 @@ prefiltered) value:
  my $res = $validator->($data); # => ["","Foo/Bar.pm"]
  
  # a sample invalid data
- $data = "";
- my $res = $validator->($data); # => ["Must match regex pattern \\A(?:[A-Za-z_][A-Za-z_0-9]*(/[A-Za-z_0-9]+)*\\.pm)\\z",".pm"]
+ $data = "Foo|Bar";
+ my $res = $validator->($data); # => ["Must match regex pattern \\A(?:[A-Za-z_][A-Za-z_0-9]*(/[A-Za-z_0-9]+)*\\.pm)\\z","Foo|Bar.pm"]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like
@@ -231,7 +231,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

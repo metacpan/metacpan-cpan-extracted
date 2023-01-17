@@ -1,7 +1,7 @@
 package LWP::Authen::OAuth2::ServiceProvider::Yahoo;
 
 # ABSTRACT: Access Yahoo using OAuth2
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 our @ISA = qw(LWP::Authen::OAuth2::ServiceProvider);
 
@@ -62,7 +62,7 @@ LWP::Authen::OAuth2::ServiceProvider::Yahoo - Access Yahoo using OAuth2
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

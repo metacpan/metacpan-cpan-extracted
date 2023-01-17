@@ -5,7 +5,7 @@ use Test::More;
 subtest 'before start' => sub {
   my $run3 = Mojo::Run3->new;
   is $run3->bytes_waiting, 0,  'zero bytes waiting';
-  is $run3->pid,           0,  'pid';
+  is $run3->pid,           -1, 'pid';
   is $run3->status,        -1, 'status';
 
   $run3->write('foo');

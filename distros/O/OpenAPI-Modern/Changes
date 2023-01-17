@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Modern
 
+0.038     2023-01-15 18:51:02Z
+          - fix vocabulary tests with TJSA 1.018
+          - fix test for compatibility with JSM 0.561
+
 0.037     2022-11-27 23:57:29Z
           - added operation_path to the options hash returned from find_path,
             validate_response, find_path

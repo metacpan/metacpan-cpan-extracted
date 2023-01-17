@@ -64,7 +64,7 @@ like(
 		field 'Boost Software License 1.0'    => 'BSL-1.0';
 		field 'Boost Software License'        => 'BSL-1.0';         # list
 		field 'BSD-2-Clause-Patent'           => 'BSDplusPatent';
-		field 'BSD-3-Clause-LBNL'             =>
+		field 'BSD-3-Clause-LBNL' =>
 			'BSD-3-Clause-LBNL';    # list in BSD sublist
 		field 'BSD+Patent' => 'BSDplusPatent';
 
@@ -94,7 +94,7 @@ like(
 		field 'Educational Community License, Version 1.0' => 'ECL-1.0';
 		field 'Educational Community License, Version 2.0' => 'ECL-2.0';
 		field 'The Eiffel Forum License, version 1'        => 'EFL-1.0';
-		field 'Eiffel Forum License V1.0'         => 'EFL-1.0';         # list
+		field 'Eiffel Forum License V1.0' => 'EFL-1.0';                 # list
 		field 'Eiffel Forum License, version 1.0' =>
 			'EFL-1.0';    # do-not-use list
 		field 'Eiffel Forum License, Version 2'     => 'EFL-2.0';
@@ -113,10 +113,10 @@ like(
 		field 'GNU Affero General Public License version 3' => 'AGPL-3.0';
 		field 'GNU General Public License' => 'gpl-license';   # category list
 		field 'GPL'                        => 'gpl-license';   # shortname
-		field 'GNU General Public License version 2'  => 'GPL-2.0';
+		field 'GNU General Public License version 2' => 'GPL-2.0';
 		field 'GNU General Public License, version 2' =>
 			'GPL-2.0';                                         # category list
-		field 'GNU General Public License version 3'  => 'GPL-3.0';
+		field 'GNU General Public License version 3' => 'GPL-3.0';
 		field 'GNU General Public License, version 3' =>
 			'GPL-3.0';                                         # category list
 		field 'GNU LGPL' => 'lgpl-license';
@@ -147,7 +147,7 @@ like(
 		field
 			'Licence Libre du Québec – Réciprocité forte (LiLiQ-R+) version 1.1'
 			=> 'LiLiQ-Rplus-1.1';
-		field 'Lucent Public License, Plan 9, version 1.0'   => 'LPL-1.0';
+		field 'Lucent Public License, Plan 9, version 1.0' => 'LPL-1.0';
 		field 'Lucent Public License ("Plan9"), version 1.0' =>
 			'LPL-1.0';    # list
 		field 'Lucent Public License Version 1.02' => 'LPL-1.02';
@@ -155,7 +155,7 @@ like(
 		field 'Microsoft Reciprocal License'       => 'MS-RL';
 		field 'MirOS Licence'                      => 'MirOS';
 		field 'The MIT License'                    => 'MIT';
-		field 'MIT License'                        => 'MIT';         # list
+		field 'MIT License'                        => 'MIT';        # list
 		field 'MIT license'                        => 'MIT';   # category list
 		field 'MIT No Attribution License'         => 'MIT-0';
 		field 'The MITRE Collaborative Virtual Workspace License' => 'CVW';
@@ -163,10 +163,10 @@ like(
 		field 'Motosoto Open Source License - Version 0.9.1'  => 'Motosoto';
 		field 'Motosoto License' => 'Motosoto';                         # list
 		field 'The Mozilla Public License (MPL), version 1.0' => 'MPL-1.0';
-		field 'Mozilla Public License 1.0'          => 'MPL-1.0';       # list
+		field 'Mozilla Public License 1.0' => 'MPL-1.0';                # list
 		field 'Mozilla Public License, version 1.0' =>
 			'MPL-1.0';    # do-not-use list
-		field 'Mozilla Public License 1.1'          => 'MPL-1.1';
+		field 'Mozilla Public License 1.1' => 'MPL-1.1';
 		field 'Mozilla Public License, version 1.1' =>
 			'MPL-1.1';    # do-not-use list
 		field 'Mozilla Public License 2.0'           => 'MPL-2.0';
@@ -234,7 +234,7 @@ like(
 		field 'The Universal Permissive License (UPL), Version 1.0' => 'UPL';
 		field 'Universal Permissive License' => 'UPL';                  # list
 		field 'The University of Illinois/NCSA Open Source License' => 'NCSA';
-		field 'University of Illinois/NCSA Open Source License'     =>
+		field 'University of Illinois/NCSA Open Source License' =>
 			'NCSA';                                                     # list
 		field 'Upstream Compatibility License v1.0' => 'UCL-1.0';
 		field 'Unicode, Inc. License Agreement - Data Files and Software' =>

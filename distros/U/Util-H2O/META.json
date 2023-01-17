@@ -49,7 +49,7 @@
    "provides" : {
       "Util::H2O" : {
          "file" : "lib/Util/H2O.pm",
-         "version" : "0.18"
+         "version" : "0.20"
       }
    },
    "release_status" : "stable",
@@ -64,6 +64,6 @@
          "web" : "https://github.com/haukex/Util-H2O"
       }
    },
-   "version" : "0.18",
+   "version" : "0.20",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

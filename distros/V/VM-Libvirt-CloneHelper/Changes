@@ -1,4 +1,9 @@
 Revision history for VM-Libvirt-CloneHelper
 
+0.1.0	 2023-01-15/19:45
+		 -Auto fix perl path.
+		 -Add recreate action.
+		 -Add -n switch.
+
 0.0.1	 2022-6-24/13:45
 		 -Initial release.

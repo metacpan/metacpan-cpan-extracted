@@ -1,0 +1,977 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix dt:    <http://ontologi.es/pretdsl#dt/> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.10>
+	a                    doap:Version;
+	dc:issued            "2007-10-28"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Better detect 3-clause BSD licenses."@en;
+			doap-changeset:fixes <https://bugs.debian.org/442630>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Detect ISC style licenses."@en;
+			doap-changeset:blame <http://webid.debian.net/maintainers/schoenfeld>;
+			doap-changeset:fixes <https://bugs.debian.org/448000>;
+		], "Allow ISC and BSD licenses to co-exist in a single file."^^dt:Change, "Always check a single file argument even if it doesn't match the file pattern regex."^^dt:Bugfix;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/joeyh>;
+	doap:revision        "2.10.10"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.17>
+	a                    doap:Version;
+	dc:issued            "2008-02-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Detect a less common form of MIT license."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/myon>;
+	doap:revision        "2.10.17"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.18>
+	a                    doap:Version;
+	dc:issued            "2008-02-29"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Add missing $license and change spaces into tab in the middle."^^dt:Change, "Detect a less common form of GPL."^^dt:Change, "Fix broken elsif indentation."^^dt:Bugfix, "Fix detect GPL of unknown version."^^dt:Bugfix, "Fix indentation."^^dt:Change, "Layout and regex tweaks."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/myon>;
+	doap:revision        "2.10.18"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.26>
+	a                    doap:Version;
+	dc:issued            "2008-04-21"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Replace a literal copyright symbol with a hex escape so that the package builds using po4a in Etch."@en;
+			doap-changeset:fixes <https://bugs.debian.org/476251>;
+		];
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/myon>;
+	doap:revision        "2.10.26"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.27>
+	a                    doap:Version;
+	dc:issued            "2008-05-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Correctly detect LGPLv3+."@en;
+			doap-changeset:fixes <https://bugs.debian.org/477742>;
+		];
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/myon>;
+	doap:revision        "2.10.27"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.30>
+	a                    doap:Version;
+	dc:issued            "2008-06-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Detect if copyright statements are valid.";
+			doap-changeset:blame <https://alioth.debian.org/users/bignose-guest>;
+			doap-changeset:fixes <https://bugs.debian.org/486013>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Detect more forms of copyright statement.";
+			doap-changeset:blame <https://alioth.debian.org/users/bignose-guest>;
+			doap-changeset:fixes <https://bugs.debian.org/486216>;
+		], "Update copyright."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/myon>;
+	doap:revision        "2.10.30"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.31>
+	a                    doap:Version;
+	dc:issued            "2008-06-28"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Check .cxx and .hxx by default."@en;
+			doap-changeset:fixes <https://bugs.debian.org/487384>;
+		], "Exclude _MTN (monotone) by default."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/myon>;
+	doap:revision        "2.10.31"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.39>
+	a                    doap:Version;
+	dc:issued            "2008-10-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Parse Fortran and Scilab files and check them by default, and detect CeCILL and \"SGI Free B\" licenses."@en;
+			doap-changeset:blame <http://webid.debian.net/maintainers/sylvestre>;
+			doap-changeset:fixes <https://bugs.debian.org/501447>;
+		];
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/myon>;
+	doap:revision        "2.10.39"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.3>
+	a                    doap:Version;
+	dc:issued            "2007-04-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Make licensecheck configurable."^^dt:Addition;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/myon>;
+	doap:revision        "2.10.3"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.40>
+	a                    doap:Version;
+	dc:issued            "2008-11-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Detect a couple more variants on the wording of a 3-clause BSD license."@en;
+			doap-changeset:fixes <https://bugs.debian.org/503378>;
+		];
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/myon>;
+	doap:revision        "2.10.40"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.44>
+	a                    doap:Version;
+	dc:issued            "2009-01-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Check .cs (C# source files) by default."@en;
+			doap-changeset:fixes <https://bugs.debian.org/508163>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Detect the CDDL license. Thanks to Mike Hommey."@en;
+			doap-changeset:blame <http://webid.debian.net/maintainers/glandium>;
+			doap-changeset:fixes <https://bugs.debian.org/510574>;
+		];
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/myon>;
+	doap:revision        "2.10.44"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.46>
+	a                    doap:Version;
+	dc:issued            "2009-02-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Check .xs (Perl XS files) and .vala (GNOME Vala source files) by default."@en;
+			doap-changeset:fixes <https://bugs.debian.org/513770>, <https://bugs.debian.org/514337>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Identify yet another variant of GPL wording."@en;
+			doap-changeset:fixes <https://bugs.debian.org/514811>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Detect Boost, Python and zlib/libpng licenses."@en;
+			doap-changeset:blame <http://webid.debian.net/maintainers/cristian>;
+			doap-changeset:fixes <https://bugs.debian.org/514812>;
+		], "Fix check .h files by default."^^dt:Bugfix, "Identify another form of GPL wording."^^dt:Change, "Remove C /* */ comments. Thanks to Jörg Sommer."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/myon>;
+	doap:revision        "2.10.46"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.47>
+	a                    doap:Version;
+	dc:issued            "2009-03-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Fix an uninitialised variable warning when --no-conf is used."@en;
+			doap-changeset:blame <http://webid.debian.net/maintainers/cristian>;
+			doap-changeset:fixes <https://bugs.debian.org/515047>;
+		], "Document --no-conf."^^dt:Documentation;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/myon>;
+	doap:revision        "2.10.47"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.49>
+	a                    doap:Version;
+	dc:issued            "2009-05-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Detect AGPL."@en;
+			doap-changeset:blame <mailto:didier@raboud.homelinux.org>;
+			doap-changeset:fixes <https://bugs.debian.org/520903>;
+		];
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/myon>;
+	doap:revision        "2.10.49"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.51>
+	a                    doap:Version;
+	dc:issued            "2009-06-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Fix failures parsing some GPL headers."@en;
+			<http://ontologi.es/doap-changeset#blame:> <http://webid.debian.net/maintainers/jwilk>;
+			doap-changeset:fixes <https://bugs.debian.org/531059>;
+		];
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/myon>;
+	doap:revision        "2.10.51"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.53>
+	a                    doap:Version;
+	dc:issued            "2009-07-29"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Skip empty files instead of reporting that they have no copyright."@en;
+			doap-changeset:fixes <https://bugs.debian.org/535337>;
+		];
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/myon>;
+	doap:revision        "2.10.53"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.55>
+	a                    doap:Version;
+	dc:issued            "2009-09-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Add missing blank line in POD. Thanks to Nicolas Francois."^^dt:Documentation;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/myon>;
+	doap:revision        "2.10.55"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.5>
+	a                    doap:Version;
+	dc:issued            "2007-04-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Improve attribution of the original script."^^dt:Documentation, "Quote @kde otherwise build fails."^^dt:Bugfix;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.10.5"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.60>
+	a                    doap:Version;
+	dc:issued            "2010-01-02"^^xsd:date;
+	doap-changeset:changeset [
+		rdfs:label "Welcome to the New Year";
+		doap-changeset:item "Detect some common variants of the WTFPL."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.10.60"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.66>
+	a                    doap:Version;
+	dc:issued            "2010-08-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Check .pas, .inc, .dtd., .xsl, and .mod files by default."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.10.66"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.69>
+	a                    doap:Version;
+	dc:issued            "2010-09-21"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Replace occurences of old FSF address with the FSF recommendation what should be written inside of source files."@en;
+			doap-changeset:fixes <https://bugs.debian.org/502512>;
+		];
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.10.69"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.70>
+	a                    doap:Version;
+	dc:issued            "2011-02-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Manual pages conventions."^^dt:Documentation;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.10.70"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.72>
+	a                    doap:Version;
+	dc:issued            "2011-04-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Partial manual pages convention review."^^dt:Documentation, "Remove \"(the License)\" from check for Apache license."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.10.72"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.7>
+	a                    doap:Version;
+	dc:issued            "2007-08-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Add --recursive to help."^^dt:Change, "Add -r as an alternative for --recursive."^^dt:Change, "Optionally detect copyright statements."^^dt:Addition, "Support directories as well as files passed as arguments."^^dt:Addition, "Support ignoring files and directories (default regex borrowed from dpkg-source)."^^dt:Addition, "Support recursion into directories."^^dt:Addition, "Support setting files to check."^^dt:Addition, "Tidy up copyright output."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/adn>;
+	doap:revision        "2.10.7"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.8>
+	a                    doap:Version;
+	dc:issued            "2007-09-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Correctly handle metacharacters found in potential copyright statements."^^dt:Change, "Decruft // comments."^^dt:Change, "Decruft © as well as (C)."^^dt:Change, "Deduplicate copyright statements varying only in case."^^dt:Change, "Make the copyright regex more flexible."^^dt:Change, "Tidy up the pre-check regexes."^^dt:Change, "Unescape \"\\@\"s in copyright statements."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/adn>;
+	doap:revision        "2.10.8"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.10.9>
+	a                    doap:Version;
+	dc:issued            "2007-10-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Attempt to distinguish between versions of the BSD license."@en;
+			doap-changeset:fixes <https://bugs.debian.org/442630>;
+		];
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/adn>;
+	doap:revision        "2.10.9"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.11.0>
+	a                    doap:Version;
+	dc:issued            "2011-05-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Remove EOL whitespaces."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.11.0"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.11.2>
+	a                    doap:Version;
+	dc:issued            "2011-11-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Detect Microsoft Permissive License (Ms-PL)."^^dt:Change, "Detect another variant of libpng license."^^dt:Change, "Detect more types of generated files."^^dt:Change, "Detect more variations of MIT licenses."^^dt:Change, "Detect more variations of MIT/X11 license."^^dt:Change, "Remove the word \"of\" from the BSD 3 clause check."^^dt:Change, "Update scripts to use GNU getopt-compatible option parsing."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.11.2"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.11.3>
+	a                    doap:Version;
+	dc:issued            "2012-01-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Detect GPL version in notices without \"of the License\"."^^dt:Change, "Fix version output for GPL notices without \"as published by\"."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.11.3"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.11.8>
+	a                    doap:Version;
+	dc:issued            "2012-05-31"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Add first tests for licensecheck."^^dt:Addition, "Chech .m (Octave/Matlab), .tex (LaTeX), and .pyx (Python's pyrex) by default."^^dt:Change, "Detect Beerware license."^^dt:Change, "Detect LGPL more robustly."^^dt:Change, "test: Move runCommand to helper function file."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.11.8"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.12.2>
+	a                    doap:Version;
+	dc:issued            "2012-08-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item ".1: Consistency fix."^^dt:Documentation, "Check .ml, .mli (OCaml programs) by default."^^dt:Change, "Don't truncate other licenses on Public domain or WTFPL presence."^^dt:Bugfix, "Remove trailing spaces."^^dt:Change, "Replace tab by spaces in help message."^^dt:Documentation, "Spelling fixes."^^dt:Documentation, "Trim trailing comma from some GPL notices' versions."^^dt:Change, "Trim trailing period from some GPL notices' versions."^^dt:Change, "add --machine option that outputs results in a machine readable format."^^dt:Addition;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.12.2"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.12.4>
+	a                    doap:Version;
+	dc:issued            "2012-09-25"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Detect MPL v2.0."^^dt:Change, "Parse (fixed-form) Fortran code."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.12.4"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.12.5>
+	a                    doap:Version;
+	dc:issued            "2012-10-24"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Adapt code to some perl best practice."^^dt:Change, "Add comment removal test cases."^^dt:Change, "Add more GPL test cases."^^dt:Change, "Fix detect BSD-3-clause."^^dt:Change, "Fix detect GPL license version."^^dt:Change, "GetOptions is done right."^^dt:Change, "comments cleaning to dedicated function code to remove any regular comments pattern."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/bdrung>;
+	doap:revision        "2.12.5"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.13.0>
+	a                    doap:Version;
+	dc:issued            "2013-02-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Add autopkgtest."^^dt:Packaging, "Detect (L)GPL licenses more permissively."^^dt:Change, "Fix --check and --ignore options."^^dt:Bugfix, "Fix typos, changed the order in SEE ALSO, added punctuation marks."^^dt:Documentation, "Simplify LGPL pattern (already case-insensitive)."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/bdrung>;
+	doap:revision        "2.13.0"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.13.1>
+	a                    doap:Version;
+	dc:issued            "2013-03-22"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Fix clean_comments()."^^dt:Change, "Fix detect (L|A)GPL."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/bdrung>;
+	doap:revision        "2.13.1"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.13.2>
+	a                    doap:Version;
+	dc:issued            "2013-05-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Fix invalid regular expression syntax."^^dt:Bugfix, "Regex-escape file contents that are used as part of a pattern."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.13.2"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.13.3>
+	a                    doap:Version;
+	dc:issued            "2013-08-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Check .go (Go) files by default."@en;
+			doap-changeset:fixes <https://bugs.debian.org/711467>;
+		], "Allow plural: copyright notices."^^dt:Change, "Alternative BSD-3 wording \"authors\" and \"_any_ contributors\"."^^dt:Change, "Bogus recognition \"copyright holders\"."^^dt:Change, "Check Haskell files by default."^^dt:Change, "Detect more relaxed 3rd BSD clause."^^dt:Change, "Fix several false positives."^^dt:Change, "Handle differing lengths of comment leaders."^^dt:Change, "Ignore \"copyright holders\"."^^dt:Change, "Test copyright notice from freeswitch/libs/tiff-4.0.2."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.13.3"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.13.5>
+	a                    doap:Version;
+	dc:issued            "2013-12-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Fix various (potential) test failures."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.13.5"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.14.0>
+	a                    doap:Version;
+	dc:issued            "2014-01-25"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Add handling for a variation of 3 clause BSD."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.14.0"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.14.11>
+	a                    doap:Version;
+	dc:issued            "2015-12-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Update URLs in comments to https where possible."^^dt:Documentation;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.14.11"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.14.7>
+	a                    doap:Version;
+	dc:issued            "2014-09-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Check javascript by default."@en;
+			doap-changeset:fixes <https://bugs.debian.org/762070>;
+		];
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.14.7"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.15.10>
+	a                    doap:Version;
+	dc:issued            "2015-12-31"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Parse multi-line copyright block.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+			doap-changeset:fixes <https://bugs.debian.org/519080>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Detect 'and or' as well as 'and/or' in GPL licenses.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+			doap-changeset:fixes <https://bugs.debian.org/559429>;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Test for licensecheck versus Software::License.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Fix detect Artistic licenses as generated from Software::License.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add bash completion.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Detect variations of Mozilla licenses.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Check lisp, css, less, perl6 and markdown by default.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Detect LLGPL license.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Extract info from end of file (not only beginning).";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Move skip test into script and do not rely on shell string comparison for comparing versions.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Restore old tests.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Show skipped file with --skipped.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+			doap-changeset:fixes <https://bugs.debian.org/806424>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Check files without suffix by default.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Stop use \"file\" command MIME info to decide which files to check (use only internal list of file extensions by default).";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+			doap-changeset:fixes <https://bugs.debian.org/803724>;
+		], [
+			a doap-changeset:Removal;
+			rdfs:label "Deprecate --text option.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add --encoding option. By default, input files are handled as utf-8 and information is printed on STDOUT as utf-8.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Detect freetype license.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		];
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.15.10"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.15.1>
+	a                    doap:Version;
+	dc:issued            "2015-01-01"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Detect GPL version 2 or 3 (different from GPL-2+)."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.15.1"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.15.2>
+	a                    doap:Version;
+	dc:issued            "2015-04-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Ignore .pc directory."^^dt:Change, "Print copyrights in a non-random order."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.15.2"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.15.5>
+	a                    doap:Version;
+	dc:issued            "2015-06-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Check file encoding and decode properly when reading file.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+			doap-changeset:fixes <https://bugs.debian.org/784821>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Improve GPL LGPL extraction.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Optimize regex used to extract © info.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Check Groovy, Scala and Clojure by default.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+			doap-changeset:fixes <https://bugs.debian.org/771119>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Fix detect discussion about ©.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+			doap-changeset:fixes <https://bugs.debian.org/723723>;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix detect BSL.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+			doap-changeset:fixes <https://bugs.debian.org/690375>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Detect academic free license.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+			doap-changeset:fixes <https://bugs.debian.org/534987>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Allow © owner to mention \"and others\".";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Detect eclipse public license.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+			doap-changeset:fixes <https://bugs.debian.org/587892>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Detect LGPL as written by IBM.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+			doap-changeset:fixes <https://bugs.debian.org/587970>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Parse REM style comments.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+			doap-changeset:fixes <https://bugs.debian.org/748611>;
+		];
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.15.5"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.15.6>
+	a                    doap:Version;
+	dc:issued            "2015-07-28"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Fix detect BSD-2-clause.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Extract © owner when © and owners are specified on 2 or more lines.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix digia © and license extraction."@en;
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+			doap-changeset:fixes <https://bugs.debian.org/789074>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Check .S (assembly files) by default.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Warn if scanned file is not a text file."@en;
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+			doap-changeset:fixes <https://bugs.debian.org/791756>;
+		];
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.15.6"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.15.7>
+	a                    doap:Version;
+	dc:issued            "2015-08-01"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:SecurityFix;
+			rdfs:label "Use Dpkg::IPC to run file to avoid shell injection.";
+			doap-changeset:fixes <https://bugs.debian.org/794260>, <https://security-tracker.debian.org/tracker/CVE-2015-5704>;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Change whitelist of mime types to greylist of encodings.  Restores ability to check files with mime types like text/x-c++ and application/postscript.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/JONASS>;
+			doap-changeset:fixes <https://bugs.debian.org/794282>;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix an endless loop in parsing certain files.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/JONASS>;
+			doap-changeset:fixes <https://bugs.debian.org/794263>;
+		];
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.15.7"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.15.8>
+	a                    doap:Version;
+	dc:issued            "2015-08-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:SecurityFix;
+			rdfs:label "Avoid argument injection which may cause file to overwrite a file through symlink indirection.";
+			doap-changeset:fixes <https://bugs.debian.org/794365>, <https://security-tracker.debian.org/tracker/CVE-2015-5705>;
+		];
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.15.8"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.15.9>
+	a                    doap:Version;
+	dc:issued            "2015-10-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Filter scanned files by mime type.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Remove trailing '#' from copyright.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Store only first copyright block.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Remove '\\' from © information (for nroff files).";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add --text option to avoid binaries.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		];
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.15.9"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.16.1>
+	a                    doap:Version;
+	dc:issued            "2016-02-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Detect LGPL in files handled by Dist::Zilla.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		];
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.16.1"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.16.2>
+	a                    doap:Version;
+	dc:issued            "2016-03-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Parse (c) owner with email like info@foo.com.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		];
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.16.2"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.16.3>
+	a                    doap:Version;
+	dc:issued            "2016-04-21"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item "Detect files containing \"Do not hand edit!\" as generated."^^dt:Change, "Extract parse_file."^^dt:Change, "Fix test_licensecheck_SL failure."^^dt:Bugfix, "Gracefully handle wrong --encoding."^^dt:Bugfix, "Improve \"unable to access file\" error message."^^dt:Change;
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.16.3"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#devscripts_2.16.5>
+	a                    doap:Version;
+	dc:issued            "2016-06-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Bash completion: Normalise editor hints to preserve formatting.";
+			doap-changeset:blame <https://alioth.debian.org/users/bignose-guest>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Bash completion: Standardise explanatory header block.";
+			doap-changeset:blame <https://alioth.debian.org/users/bignose-guest>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Detect files containing \"do not modify\" as generated.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/pabs>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Detect files containing \"Generated data\" as generated.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/pabs>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Detect files containing \"edit the original\" as generated.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/pabs>;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add --deb-fmt option to use dep-5 license keywords. See #472199.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Parse \"copyright-holders: John Doe\".";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Parse \"license: BSD-x-Clause\" declaration.";
+			doap-changeset:blame <http://webid.debian.net/maintainers/dod>;
+			doap-changeset:fixes <https://bugs.debian.org/820798>;
+		];
+	];
+	doap-changeset:released-by <http://webid.debian.net/maintainers/jamessan>;
+	doap:revision        "2.16.5"^^xsd:string.
+
+<http://packages.qa.debian.org/devscripts#project>
+	doap:release         <http://packages.qa.debian.org/devscripts#devscripts_2.10.10>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.17>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.18>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.26>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.27>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.3>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.30>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.31>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.39>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.40>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.44>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.46>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.47>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.49>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.5>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.51>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.53>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.55>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.60>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.62>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.69>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.7>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.70>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.72>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.8>, <http://packages.qa.debian.org/devscripts#devscripts_2.10.9>, <http://packages.qa.debian.org/devscripts#devscripts_2.11.0>, <http://packages.qa.debian.org/devscripts#devscripts_2.11.2>, <http://packages.qa.debian.org/devscripts#devscripts_2.11.3>, <http://packages.qa.debian.org/devscripts#devscripts_2.11.8>, <http://packages.qa.debian.org/devscripts#devscripts_2.12.2>, <http://packages.qa.debian.org/devscripts#devscripts_2.12.4>, <http://packages.qa.debian.org/devscripts#devscripts_2.12.5>, <http://packages.qa.debian.org/devscripts#devscripts_2.13.0>, <http://packages.qa.debian.org/devscripts#devscripts_2.13.1>, <http://packages.qa.debian.org/devscripts#devscripts_2.13.2>, <http://packages.qa.debian.org/devscripts#devscripts_2.13.3>, <http://packages.qa.debian.org/devscripts#devscripts_2.13.5>, <http://packages.qa.debian.org/devscripts#devscripts_2.14.0>, <http://packages.qa.debian.org/devscripts#devscripts_2.14.11>, <http://packages.qa.debian.org/devscripts#devscripts_2.14.7>, <http://packages.qa.debian.org/devscripts#devscripts_2.15.1>, <http://packages.qa.debian.org/devscripts#devscripts_2.15.10>, <http://packages.qa.debian.org/devscripts#devscripts_2.15.2>, <http://packages.qa.debian.org/devscripts#devscripts_2.15.5>, <http://packages.qa.debian.org/devscripts#devscripts_2.15.6>, <http://packages.qa.debian.org/devscripts#devscripts_2.15.7>, <http://packages.qa.debian.org/devscripts#devscripts_2.15.8>, <http://packages.qa.debian.org/devscripts#devscripts_2.15.9>, <http://packages.qa.debian.org/devscripts#devscripts_2.16.1>, <http://packages.qa.debian.org/devscripts#devscripts_2.16.2>, <http://packages.qa.debian.org/devscripts#devscripts_2.16.3>, <http://packages.qa.debian.org/devscripts#devscripts_2.16.5>.
+
+<http://purl.org/NET/cpan-uri/dist/String-License/project>
+	a                    doap:Project;
+	cpan-uri:x_help_wanted <http://usefulinc.com/ns/doap#documenter>, <http://usefulinc.com/ns/doap#tester>;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap-deps:runtime-recommendation [ doap-deps:on "re::engine::RE2"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "Array::IntSpan"^^doap-deps:CpanId ], [
+		doap-deps:on "Feature::Compat::Class 0.04"^^doap-deps:CpanId;
+	], [ doap-deps:on "List::SomeUtils"^^doap-deps:CpanId ], [ doap-deps:on "Log::Any"^^doap-deps:CpanId ], [ doap-deps:on "namespace::clean"^^doap-deps:CpanId ], [ doap-deps:on "Path::Tiny 0.062"^^doap-deps:CpanId ], [
+		doap-deps:on "Regexp::Pattern 0.2.12"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Regexp::Pattern::License 3.4.0"^^doap-deps:CpanId;
+	], [ doap-deps:on "perl 5.012000"^^doap-deps:CpanId ];
+	doap-deps:test-recommendation [ doap-deps:on "File::BaseDir"^^doap-deps:CpanId ], [
+		doap-deps:on "Regexp::Pattern::License 3.9.0"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Software::LicenseUtils 0.103014"^^doap-deps:CpanId;
+	], [ doap-deps:on "YAML::XS"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [
+		doap-deps:on "Test::Without::Module"^^doap-deps:CpanId;
+	], [ doap-deps:on "Test2::V0 0.000060"^^doap-deps:CpanId ];
+	doap:bug-database    <https://rt.cpan.org/Dist/Display.html?Queue=String-License>;
+	doap:category        [ rdfs:label "Sourcecode" ], [ rdfs:label "Licensing" ];
+	doap:created         "2000-01-28"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:download-page   <https://metacpan.org/release/String-License>;
+	doap:homepage        <https://metacpan.org/pod/String::License>, <https://metacpan.org/release/String-License>;
+	doap:license         <http://www.gnu.org/licenses/agpl-3.0.txt>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:name            "String-License";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-1>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-2>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-3>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://salsa.debian.org/build-common-team/p5-string-license>;
+	];
+	doap:shortdesc       "detect source code license statements in a text string".
+
+<http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-1>
+	a                    doap:Version;
+	dc:identifier        "String-License-v0.0.1"^^xsd:string;
+	dc:issued            "2023-01-14"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Initial CPAN release (before that part of App::Licensecheck since 2016, Debian devscripts since 2007, and KDE SDK since 2000).";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-License-v0.0.1.tar.gz>;
+	doap:revision        "v0.0.1"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-2>
+	a                    doap:Version;
+	dc:identifier        "String-License-v0.0.2"^^xsd:string;
+	dc:issued            "2023-01-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "load namespace::clean before class definitions";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "fix plan count to work on older perls";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "use secure https protocol for bug-database URI";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "use correct URI for git repository";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "stop test-require Test::Command::Simple";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-License-v0.0.2.tar.gz>;
+	doap:revision        "v0.0.2"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-3>
+	a                    doap:Version;
+	dc:identifier        "String-License-v0.0.3"^^xsd:string;
+	dc:issued            "2023-01-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "update test Software-License.t: resolve plan from hash %LICENSE";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "update test Software-License.t: list licenses without fallback as undefined (not empty string)";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "update test Software-License.t: check license ISC since Software::License 0.104002";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "update test Software-License.t: uncruft license EUPL-1.1, apparently needed in some (test) scenarios";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-License-v0.0.3.tar.gz>;
+	doap:revision        "v0.0.3"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/dcantrell>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:david@cantrell.org.uk>, <mailto:dcantrell@cpan.org>;
+	foaf:name            "David Cantrell";
+	foaf:nick            "DCANTRELL";
+	foaf:page            <https://metacpan.org/author/DCANTRELL>.
+
+<http://purl.org/NET/cpan-uri/person/jonass>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:dr@jones.dk>, <mailto:jonass@cpan.org>;
+	foaf:name            "Jonas Smedegaard";
+	foaf:nick            "JONASS";
+	foaf:page            <https://metacpan.org/author/JONASS>.
+
+<http://purl.org/NET/cpan-uri/person/srezic>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:slaven@rezic.de>, <mailto:srezic@cpan.org>;
+	foaf:name            "Slaven Rezić";
+	foaf:nick            "SREZIC";
+	foaf:page            <https://metacpan.org/author/SREZIC>.
+
+<http://webid.debian.net/maintainers/abe>
+	foaf:mbox            <mailto:abe@debian.org>;
+	foaf:name            "Axel Beckert".
+
+<http://webid.debian.net/maintainers/bremner>
+	foaf:mbox            <mailto:bremner@debian.org>;
+	foaf:name            "David Bremner".
+
+<http://webid.debian.net/maintainers/bunk>
+	foaf:mbox            <mailto:bunk@debian.org>;
+	foaf:name            "Adrian Bunk".
+
+<http://webid.debian.net/maintainers/copyninja>
+	foaf:mbox            <mailto:copyninja@debian.org>;
+	foaf:name            "Vasudev Kamath".
+
+<http://webid.debian.net/maintainers/dod>
+	foaf:mbox            <mailto:dod@debian.org>;
+	foaf:name            "Dominique Dumont".
+
+<http://webid.debian.net/maintainers/elbrus>
+	foaf:mbox            <mailto:elbrus@debian.org>;
+	foaf:name            "Paul Gevers".
+
+<http://webid.debian.net/maintainers/gregoa>
+	foaf:mbox            <mailto:gregoa@debian.org>;
+	foaf:name            "Gregor Hermann".
+
+<http://webid.debian.net/maintainers/pabs>
+	foaf:mbox            <mailto:pabs@debian.org>;
+	foaf:name            "Paul Wise".
+
+<http://webid.debian.net/maintainers/stuart>
+	foaf:mbox            <mailto:stuart@debian.org>;
+	foaf:name            "Stuart Prescott".
+
+<http://www.gnu.org/licenses/agpl-3.0.txt>
+	dc:title             "GNU Affero General Public License version 3 or newer.".
+
+<https://badges.fedoraproject.org/user/smani>
+	foaf:mbox            <mailto:manisandro@gmail.com>;
+	foaf:name            "Sandro Mani".
+

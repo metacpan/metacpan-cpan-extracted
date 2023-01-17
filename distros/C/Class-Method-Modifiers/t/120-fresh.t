@@ -3,7 +3,6 @@ use warnings;
 
 use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Fatal;
 
 use B 'svref_2object';
 
@@ -62,28 +61,34 @@ for my $class (qw(P2 P3)) {
 {
     package P2;
 
-    ::like(::exception { fresh m1 => sub {} },
+    eval { fresh m1 => sub {} };
+    ::like($@,
            qr/^Class P2 already has a method named 'm1'/,
            'fresh: exception when inherited method exists');
 
-    ::like(::exception { fresh m6 => sub {} },
+    eval { fresh m6 => sub {} };
+    ::like($@,
            qr/^Class P2 already has a method named 'm6'/,
            'fresh: exception when local method exists');
 
-    ::like(::exception { fresh '=:=' => sub {} },
+    eval { fresh '=:=' => sub {} };
+    ::like($@,
            qr/^Invalid method name '=:='/,
            'fresh: exception when name invalid');
 }
 
-like(exception { install_modifier P3 => fresh => m1 => sub {} },
+eval { install_modifier P3 => fresh => m1 => sub {} };
+like($@,
      qr/^Class P3 already has a method named 'm1'/,
      'install_modifier: exception when inherited method exists');
 
-like(exception { install_modifier P3 => fresh => m6 => sub {} },
+eval { install_modifier P3 => fresh => m6 => sub {} };
+like($@,
      qr/^Class P3 already has a method named 'm6'/,
      'install_modifier: exception when local method exists');
 
-like(exception { install_modifier P3 => fresh => '=:=' => sub {} },
+eval { install_modifier P3 => fresh => '=:=' => sub {} };
+like($@,
      qr/^Invalid method name '=:='/,
      'install_modifier: exception when name invalid');
 

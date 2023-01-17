@@ -71,6 +71,8 @@ sub import {
 
 1;
 
+=pod
+
 =head1 Role::Tiny::MonkeyPatch
 
 =head2 NAME

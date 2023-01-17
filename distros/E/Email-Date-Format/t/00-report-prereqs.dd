@@ -8,15 +8,15 @@ do { my $x = {
                       'requires' => {
                                       'Encode' => '0',
                                       'Test::More' => '0',
-                                      'Test::Pod' => '1.41'
+                                      'Test::Pod' => '1.41',
+                                      'strict' => '0'
                                     }
                     },
        'runtime' => {
                       'requires' => {
                                       'Exporter' => '5.57',
-                                      'Time::Local' => '0',
+                                      'Time::Local' => '1.27',
                                       'perl' => '5.012',
-                                      'strict' => '0',
                                       'warnings' => '0'
                                     }
                     },
@@ -27,7 +27,8 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Test::More' => '0.96'
+                                   'Test::More' => '0.96',
+                                   'strict' => '0'
                                  }
                  }
      };

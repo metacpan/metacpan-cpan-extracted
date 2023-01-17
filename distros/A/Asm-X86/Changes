@@ -1,5 +1,28 @@
 Revision history for Asm-X86
 
+2023-01-08	Bogdan Drozdowski <bogdro \at\ cpan . org>
+
+	* Version 0.65
+	  Updated the instruction list. Simplified and updated the code in
+	  address validation, bringing back 100% test coverage. More unit
+	  tests. Other small updates.
+	* lib/Asm/X86.pm (@instr_intel): Updated the instruction list from
+	  NASM version 2.16.01.
+	* lib/Asm/X86.pm (_validate_16bit_addr_parts_intel,
+	  _validate_16bit_addr_parts_att, _validate_32bit_addr_parts_intel,
+	  _validate_32bit_addr_parts_att, _validate_64bit_addr_parts_intel,
+	  _validate_64bit_addr_parts_att): Commented-out parameters and
+	  statement tests which are always true or are not needed.
+	* lib/Asm/X86.pm (_validate_32bit_addr_parts_att,
+	  _validate_32bit_addr_parts_intel, _validate_64bit_addr_parts_att,
+	  _validate_64bit_addr_parts_intel): Changed testing the scale as a
+	  number to testing as a string to prevent errors.
+	* lib/Asm/X86.pm, README: Bump the year in the copyright notices.
+	* KEY.asc: renamed from "KEY" to help the web POD viewer.
+	* t/{zz_addr_att.t,zz_addr_intel.t}: More tests.
+	* t/zz_duplicates.t: Display the found duplicates, if any, and
+	  changed the message.
+
 2021-09-19	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.62
@@ -27,8 +50,8 @@ Revision history for Asm-X86
 
 	* Version 0.61
 	  Fixed compatibility issues.
-	* Makefile.PL: corrected hash keys and values to be strings
-	* t/zz_regs_{att,intel}.t: fix passing parameters and hash usage
+	* Makefile.PL: Corrected hash keys and values to be strings.
+	* t/zz_regs_{att,intel}.t: Fixed passing parameters and hash usage.
 
 2021-06-16	Bogdan Drozdowski <bogdro \at\ cpan . org>
 

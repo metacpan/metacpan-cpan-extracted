@@ -41,7 +41,7 @@ This module should work on any platform supported by these modules.
 Author, Copyright and License
 -----------------------------
 
-Copyright (c) 2020-2022 Hauke Daempfling <haukex@zero-g.net>.
+Copyright (c) 2020-2023 Hauke Daempfling <haukex@zero-g.net>.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl 5 itself.

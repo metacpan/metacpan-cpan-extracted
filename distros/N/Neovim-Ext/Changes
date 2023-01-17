@@ -1,5 +1,9 @@
 Revision history for Neovim-Ext
 
+0.06      2023-01-15 22:02:56+00:00 Europe/London
+
+ - Test fixes for newer versions of nvim
+
 0.05      2020-09-01 13:18:47+01:00 Europe/London
 
  - VIM compatibility layer fixes

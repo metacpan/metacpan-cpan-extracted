@@ -39,12 +39,13 @@ use Test::Most;
   sub named_uri :Local Args(0) {
     my ($self, $c) = @_;
     $c->res->body($c->uri("#hi"));
-    $c->detach("/#hi");
+    $c->detach("#hi");
   }
 
   package MyApp;
   use Catalyst 'URI';
-
+  
+  MyApp->config('Plugin::URI' => { version => 2 });
   MyApp->setup;
 }
 

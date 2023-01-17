@@ -4,8 +4,8 @@ package Sah::SchemaR::perl::filename;
 # preamble code
 no warnings 'experimental::regex_sets';
 
-our $DATE = '2022-12-16'; # DATE
-our $VERSION = '0.046'; # VERSION
+our $DATE = '2023-01-14'; # DATE
+our $VERSION = '0.047'; # VERSION
 
 our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nUse this schema if you want to accept a filesystem path containing Perl script,\nmodule, or POD. The value of this schema is in the convenience of CLI\ncompletion, as well as coercion from script or module name.\n\nString containing filename of a Perl script or module or POD. For convenience,\nwhen value is in the form of:\n\n    Foo\n    Foo.pm\n    Foo.pod\n    Foo::Bar\n    Foo/Bar\n    Foo/Bar.pm\n    Foo/Bar.pod\n\nand a matching .pod or .pm file is found in `\@INC`, then it will be coerced\n(converted) into the path of that .pod/.pm file, e.g.:\n\n    /home/ujang/perl5/perlbrew/perls/perl-5.24.0/lib/site_perl/5.24.0/Foo/Bar.pm\n    lib/Foo/Bar.pod\n\nTo prevent such coercion, you can use prefixing path, e.g.:\n\n    ./Foo::Bar\n    ../Foo/Bar\n    /path/to/Foo/Bar\n\nThis schema comes with convenience completion too.\n\n",summary=>"Filename of Perl script/module/POD, e.g. /path/Foo/Bar.pm","x.completion"=>sub{package Sah::Schema::perl::filename;use warnings;use strict;require Complete::File;require Complete::Module;require Complete::Util;my(%args) = @_;my $word = $args{'word'};my @answers;push @answers, Complete::File::complete_file('word', $word);if ($word =~ m[\A\w*((?:::|/)\w+)*\z]) {push @answers, Complete::Module::complete_module('word', $word);}Complete::Util::combine_answers(@answers)},"x.perl.coerce_rules"=>["From_str::convert_perl_pm_or_pod_to_path"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -24,7 +24,7 @@ Sah::SchemaR::perl::filename - Filename of Perl script/module/POD, e.g. /path/Fo
 
 =head1 VERSION
 
-This document describes version 0.046 of Sah::SchemaR::perl::filename (from Perl distribution Sah-Schemas-Perl), released on 2022-12-16.
+This document describes version 0.047 of Sah::SchemaR::perl::filename (from Perl distribution Sah-Schemas-Perl), released on 2023-01-14.
 
 =head1 DESCRIPTION
 
@@ -64,7 +64,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

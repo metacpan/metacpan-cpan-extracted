@@ -24,7 +24,7 @@ do { my $x = {
                                       'LWP::Protocol::https' => '1',
                                       'LWP::UserAgent' => '0',
                                       'Term::ReadKey' => '0',
-                                      'perl' => '5.012',
+                                      'perl' => 'v5.12.0',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -36,7 +36,9 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Test::More' => '0.96'
+                                   'File::Temp' => '0',
+                                   'Test::More' => '0.96',
+                                   'perl' => 'v5.12.0'
                                  }
                  }
      };

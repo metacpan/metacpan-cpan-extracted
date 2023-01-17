@@ -19,6 +19,8 @@ GetOptions(
    'use-theme|U'    => \( my $USE_THEME ),
 ) or exit 1;
 
+STDOUT->binmode( ':encoding(UTF-8)' );
+
 my $ts = Text::Treesitter->new(
    lang_name => $LANGUAGE,
    lang_dir  => $LANGUAGE_DIR,
@@ -33,7 +35,8 @@ my $tree = $ts->parse_string( $str );
 my %FORMATS = (
    # Names stolen from tree-sitter's highlight theme
    attribute  => { fg => "vga:cyan", italic => 1 },
-   comment    => { bg => "vga:blue", italic => 1 },
+   comment    => { fg => "xterm:15", bg => "xterm:54", italic => 1 },
+   function   => { fg => "xterm:147", },
    keyword    => { fg => "vga:yellow", bold => 1 },
    module     => { fg => "vga:green", bold => 1 },
    number     => { fg => "vga:magenta" },
@@ -43,9 +46,16 @@ my %FORMATS = (
    variable   => { fg => "vga:cyan" },
 
    'string.special' => { fg => "vga:red" },
+   'function.builtin' => { fg => "xterm:147", bold => 1 },
+
+   # For tree-sitter-perl
+   'variable.scalar' => { fg => "xterm:50" },
+   'variable.array'  => { fg => "xterm:43" },
+   'variable.hash'   => { fg => "xterm:81" },
 
    # Extra names
-   preproc    => { fg => "vga:blue", bold => 1 },
+   label      => { fg => "xterm:140", under => 1 },
+   preproc    => { fg => "xterm:140", bold => 1 },
 );
 
 if( $USE_THEME and my $config = $ts->treesitter_config ) {
@@ -73,19 +83,24 @@ $qc->exec( $query, $tree->root_node );
 my %UNRECOGNISED_CAPTURES;
 
 while( my $match = $qc->next_match ) {
-   foreach my $capture ( $match->captures ) {
+   CAPTURE: foreach my $capture ( $match->captures ) {
       my $node = $capture->node;
       my $capturename = $query->capture_name_for_id( $capture->capture_id );
 
-      my $start = $node->start_byte;
-      my $len   = $node->end_byte - $start;
+      my $start = $tree->byte_to_char( $node->start_byte );
+      my $len   = $tree->byte_to_char( $node->end_byte ) - $start;
 
-      if( my $format = $FORMATS{ $capturename } ) {
-         $str->apply_tag( $start, $len, $_, $format->{$_} ) for keys %$format;
+      my @nameparts = split m/\./, $capturename;
+      while( @nameparts ) {
+         if( my $format = $FORMATS{ join ".", @nameparts } ) {
+            $str->apply_tag( $start, $len, $_, $format->{$_} ) for keys %$format;
+            next CAPTURE;
+         }
+
+         pop @nameparts;
       }
-      else {
-         $UNRECOGNISED_CAPTURES{ $capturename }++;
-      }
+
+      $UNRECOGNISED_CAPTURES{ $capturename }++;
    }
 }
 

@@ -46,6 +46,7 @@ sub parent { return "WWW::Shopify::Model::Blog" }
 sub creation_minimal { return qw(title); }
 sub update_fields { return qw(author body_html summary_html published_at tags title metafields image); }
 sub included_in_parent { return 0; }
+# The docs say this should be 1, but embedded endpoints dont' pass the blog id, and you don't actually need this.
 sub get_through_parent { return 1; }
 sub update_through_parent { return 1; } 
 sub delete_through_parent { return 1; }

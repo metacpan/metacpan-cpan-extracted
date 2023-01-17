@@ -1,9 +1,8 @@
-#!perl
-
-use strict;
+use v5.12.0;
+use warnings;
 
 use IO::File;
-use Test::More tests => 8;
+use Test::More;
 
 # Check their perl version
 use_ok('Config::INI::Reader');
@@ -94,3 +93,5 @@ END
     "we can use 0 as a section name",
   );
 }
+
+done_testing;

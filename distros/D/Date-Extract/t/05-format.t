@@ -1,8 +1,7 @@
-#!perl -T
 use strict;
 use warnings;
 use Test::More tests => 3;
-use Test::MockTime 'set_fixed_time';
+use Test::MockTime::HiRes 'set_fixed_time';
 use Date::Extract;
 
 # a Thursday. The time I wrote this line of code, in fact (in UTC)

@@ -145,7 +145,7 @@ like(
 		field 'GNU Lesser General Public License v2.1 only'    => 'LGPL-2.1';
 		field 'GNU Lesser General Public License v2.1 or later' =>
 			'LGPL-2.1+';
-		field 'GNU Lesser General Public License v3.0 only'     => 'LGPL-3.0';
+		field 'GNU Lesser General Public License v3.0 only' => 'LGPL-3.0';
 		field 'GNU Lesser General Public License v3.0 or later' =>
 			'LGPL-3.0+';
 		field 'libpng License'                            => 'Libpng';

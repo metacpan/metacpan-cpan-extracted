@@ -1,7 +1,7 @@
 package LWP::Authen::OAuth2::ServiceProvider::Line::AccessToken;
 
 # ABSTRACT: Line AccessToken
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 use strict;
 use warnings;
@@ -39,7 +39,7 @@ LWP::Authen::OAuth2::ServiceProvider::Line::AccessToken - Line AccessToken
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 AUTHORS
 

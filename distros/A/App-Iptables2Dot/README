@@ -47,7 +47,7 @@ OPTIONS
             Possible tables are "nat", "raw", "mangle" and "filter".
             Defaults to table "filter".
 
-    -- se-numbered-nodes
+    --use-numbered-nodes
 
             With a true value the nodes in the dot file will be named node0,
             node1, .. noden and provided with a label showing their name froms

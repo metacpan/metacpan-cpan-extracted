@@ -8,7 +8,7 @@
 #   The Artistic License 2.0 (GPL Compatible)
 #
 package Redis;
-$Redis::VERSION = '1.999';
+$Redis::VERSION = '2.000';
 # ABSTRACT: Perl binding for Redis database
 # VERSION
 # AUTHORITY
@@ -79,9 +79,9 @@ sub new {
 
   defined $args{$_}
     and $self->{$_} = $args{$_} for 
-      qw(password on_connect name no_auto_connect_on_new cnx_timeout
-         write_timeout read_timeout sentinels_cnx_timeout sentinels_write_timeout
-         sentinels_read_timeout no_sentinels_list_update);
+      qw(username password on_connect name no_auto_connect_on_new cnx_timeout
+         write_timeout read_timeout sentinels_ssl sentinels_username sentinels_password
+         sentinels_cnx_timeout sentinels_write_timeout sentinels_read_timeout no_sentinels_list_update);
 
   $self->{reconnect}     = $args{reconnect} || 0;
   $self->{conservative_reconnect} = $args{conservative_reconnect} || 0;
@@ -114,13 +114,17 @@ sub new {
           foreach my $sentinel_address (@{$self->{sentinels}}) {
               my $sentinel = eval {
                   Redis::Sentinel->new(
-                      server => $sentinel_address,
+                      server    => $sentinel_address,
+                      username  => $self->{sentinels_username},
+                      password  => $self->{sentinels_password},
                       cnx_timeout   => (   defined $self->{sentinels_cnx_timeout}
-                                         ? $self->{sentinels_cnx_timeout}   : 0.1),
+                                         ? $self->{sentinels_cnx_timeout}   : 0.1   ),
                       read_timeout  => (   defined $self->{sentinels_read_timeout}
-                                         ? $self->{sentinels_read_timeout}  : 1  ),
+                                         ? $self->{sentinels_read_timeout}  : 1     ),
                       write_timeout => (   defined $self->{sentinels_write_timeout}
-                                         ? $self->{sentinels_write_timeout} : 1  ),
+                                         ? $self->{sentinels_write_timeout} : 1     ),
+                      ssl           => (   defined $self->{sentinels_ssl}
+                                         ? $self->{sentinels_ssl}           : 0     ),
                   )
               } or next;
               my $server_address = $sentinel->get_service_address($self->{service});
@@ -159,7 +163,13 @@ sub new {
               );
 
               if (exists $args{ssl} and $args{ssl}) {
-                  croak("Redis client does not support SSL with Redis Sentinel yet");
+                  if ( ! SSL_AVAILABLE ) {
+                      croak("IO::Socket::SSL is required for connecting to Redis using SSL");
+                  }
+
+                  $self->{ssl}  = 1;
+                  $socket_class = 'IO::Socket::SSL';
+                  $socket_args{SSL_verify_mode} = $args{SSL_verify_mode} // 1;
               }
               else {
                   $self->{ssl}  = 0;
@@ -670,12 +680,24 @@ sub connect {
 sub __build_sock {
   my ($self) = @_;
 
-  $self->{sock} = $self->{builder}->($self)
-    || croak("Could not connect to Redis server at $self->{server}: $!");
+  do {
+    $self->{sock} = $self->{builder}->($self);
+  } while (!$self->{sock} && $! == Errno::EINTR);
+
+  unless ($self->{sock}) {
+    croak("Could not connect to Redis server at $self->{server}: $!");
+  }
 
   $self->{__buf} = '';
 
-  if (defined $self->{password}) {
+  if (defined $self->{username} && defined $self->{password}) {
+    try { $self->auth($self->{username}, $self->{password}) }
+    catch {
+      my $error = $_;
+      $self->{reconnect} = 0;
+      croak('Redis server authentication error: ' . $error);
+    };
+  } elsif (defined $self->{password}) {
     try { $self->auth($self->{password}) }
     catch {
       my $error = $_;
@@ -986,7 +1008,7 @@ Redis - Perl binding for Redis database
 
 =head1 VERSION
 
-version 1.999
+version 2.000
 
 =head1 SYNOPSIS
 
@@ -2254,6 +2276,10 @@ Load the specified Lua script into the script cache. (see L<https://redis.io/com
   $r->auth(password)
 
 Authenticate to the server (see L<https://redis.io/commands/auth>)
+
+  $r->auth(username, password)
+
+Authenticate to the server using Redis 6.0+ ACL System (see L<https://redis.io/commands/auth>)
 
 =head2 echo
 

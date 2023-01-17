@@ -1,0 +1,256 @@
+NAME
+    Module::Release::Select - Notation to select release(s)
+
+VERSION
+    This document describes version 0.002 of Module::Release::Select (from
+    Perl distribution Module-Release-Select), released on 2023-01-15.
+
+SYNOPSIS
+     use Module::Release::Select qw(select_release select_releases);
+
+     my @releases = (0.005, 0.004, 0.003, 0.002, 0.001);
+
+     my $rel = select_release('0.002', \@releases);       # => 0.002
+     my $rel = select_release('0.002 + 1', \@releases);   # => 0.003
+     my $rel = select_release('> 0.002', \@releases);     # => 0.005
+     my $rel = select_release('latest', \@releases);      # => 0.005
+     my $rel = select_release('latest-1', \@releases);    # => 0.004
+
+     my @rels = select_releases('> oldest', \@releases);  # => (0.005, 0.004, 0.003, 0.002)
+
+DESCRIPTION
+    This module lets you select one or more releases via an expression. Some
+    example expressions:
+
+     # exact version number ('=')
+     0.002
+     =0.002     # ditto
+
+     # version number range with '>', '>=', '<', '<=', '!='. use '&' to join
+     # multiple conditions with "and" logic, use '|' or ',' to join with "or" logic.
+     >0.002
+     >=0.002
+     >=0.002 & <=0.015
+     <0.002 | >0.015
+     0.001, 0.002, 0.003
+
+     # "latest" and "oldest" can replace version number
+     latest
+     =latest
+     <latest           # all releases except the latest
+     != latest         # ditto
+     >oldest           # all releases except the oldest
+
+     # +n and -m to refer to n releases after and n releases before
+     latest-1       # the release before the latest
+     0.002 + 1      # the release after 0.002
+     > (oldest+1)   # all releases except the oldest and one after that (oldest+1)
+
+     # select by date, any date supported by DateTime::Format::Natural is supported
+     date < {yesterday}      # all releases released 2 days ago
+     date > {2 months ago}   # all releases after 2 months ago
+
+     # select by author
+     author="PERLANCAR"             # all releases released by PERLANCAR
+     author != "PERLANCAR"          # all releases not released by PERLANCAR
+     author="PERLANCAR" & > 0.005   # all releases after 0.005 that are released by PERLANCAR
+
+    To actually select releases, you provide a list of releases in the form
+    of version numbers in descending order. If you want to select by date or
+    author, each release will need to be a hashref containing "date" and
+    "author" keys. Below is an example of a list of releases for App::orgadb
+    distribution. This structure is returned by App::MetaCPANUtils'
+    "list_metacpan_release":
+
+     my @releases = (
+        {
+          abstract     => "An opinionated Org addressbook toolset",
+          author       => "PERLANCAR",
+          date         => "2022-11-04T12:57:07",
+          distribution => "App-orgadb",
+          first        => "",
+          maturity     => "released",
+          release      => "App-orgadb-0.015",
+          status       => "latest",
+          version      => 0.015,
+        },
+        ...
+        {
+          abstract     => "An opinionated Org addressbook tool",
+          author       => "PERLANCAR",
+          date         => "2022-06-23T23:21:58",
+          distribution => "App-orgadb",
+          first        => "",
+          maturity     => "released",
+          release      => "App-orgadb-0.002",
+          status       => "backpan",
+          version      => 0.002,
+        },
+        {
+          abstract     => "An opinionated Org addressbook tool",
+          author       => "PERLANCAR",
+          date         => "2022-06-13T00:15:18",
+          distribution => "App-orgadb",
+          first        => 1,
+          maturity     => "released",
+          release      => "App-orgadb-0.001",
+          status       => "backpan",
+          version      => 0.001,
+        },
+     );
+
+    Some examples on selecting release(s):
+
+     # select a single release, if notation selects multiple releases, the latest
+     # one will be picked. returns undef when no releases are selected.
+     my $rel = select_release('0.002', \@releases);       # => 0.002
+     my $rel = select_release('0.002 + 1', \@releases);   # => 0.003
+     my $rel = select_release('> 0.002', \@releases);     # => 0.015
+
+     # instead of returning the latest one when multiple releases are selected,
+     # select the oldest instead.
+     my $rel = select_release({oldest=>1}, '> 0.002', \@releases);     # => 0.003
+
+     # return detailed record instead of just version
+     my $rel = select_release({detail=>1}, '0.002', \@releases); # => {version=>0.002, date=>'2022-06-23T23:21:58', ...}
+
+     # select releases, returns empty list when no releases are selected
+     my $rel = select_releases('>= latest-2 & <= latest', \@releases);   # => 0.015, 0.014, 0.013
+
+  Expression grammar
+     EXPR ::= AND_EXPR ( ("," | "|") AND_EXPR )*
+
+     AND_EXPR ::= SIMPLE_EXPR ( "&" SIMPLE_EXPR )*
+
+     SIMPLE_EXPR ::= COMP
+
+     COMP ::= VER_COMP
+            | DATE_COMP
+            | AUTHOR_COMP
+
+     VER_COMP ::= "version" OP VER_VALUE
+                | OP VER_VALUE
+                | VER_VALUE              ; for when OP ='='
+
+     DATE_COMP ::= "date" OP DATE_VAL
+
+     AUTHOR_COMP ::= "author" OP STR_VAL
+
+     OP ::= "=" | "!=" | ">" | ">=" | "<" | "<=" | "=~" | "!~"
+
+     VER_VALUE ::= VER_LITERAL
+                 | VER_OFFSET
+
+     VER_OFFSET ::= VER_LITERAL ("+" | "-") [0-9]+
+
+     STR_VAL ::= STR_LITERAL
+
+     STR_LITERAL ::= '"' ( [^"\] | "\\" | "\" '"' )* '"'
+
+     DATE_VAL ::= DATE_LITERAL
+
+     DATE_LITERAL ::= "{" [^{]+ "}"
+
+     VER_LITERAL ::= ("v")? [0-9]+ ( "." [0-9]+ )*
+                   | ("v")? [0-9]+ ( "." [0-9]+ )+ ( "_" [0-9]+ )?
+                   | "latest"
+                   | "oldest"
+
+FUNCTIONS
+  parse_releases_expr
+     my $parsed = parse_releases_expr($expr_str);
+
+    Parse an expression string and return parsed structure. Mostly for
+    internal use only.
+
+  select_releases
+     my @rels = select_release( [ \%opts , ] $expr, \@releases );
+
+    Select releases from @releases using expression $expr. Will die on
+    invalid syntax in expression or on invalid entry in @releases.
+
+    Known options:
+
+    *   detail
+
+        Bool. If true, will return detailed release records instead of just
+        version numbers.
+
+    *   single
+
+        Bool. If true, will return only a single release instead of
+        multiple.
+
+    *   oldest
+
+        Bool. By default, when expression selects multiple releases and only
+        one is requested, the newest is returned. If this option is set to
+        true, then the oldest will be returned instead.
+
+  select_release
+    Usage:
+
+     my $rel = select_release( [ \%opts , ] $expr, \@releases );
+
+    Equivalent to "select_releases({%opts, single=>1}, $expr, \@releases)".
+    See "select_releases" for more details on list of known options.
+
+TODO
+    These notations are not yet supported but might be supported in the
+    future:
+
+     # "latest" & "oldest" can take argument
+     latest(author="PERLANCAR")       # the latest release by PERLANCAR
+     latest(author="PERLANCAR") + 1   # the release after the latest release by PERLANCAR
+     oldest(date > {2022-10-01})      # the oldest release after 2022-10-01
+
+     # functions
+
+     # abstract =~ /foo/              # all releases with abstract matching a regex
+
+     # distribution ne "App-orgadb"   # all releases with distribution not equal to "App-orgadb"
+
+     # first is true                  # all releases with "first" key being true
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Module-Release-Select>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Module-Release-Select>.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Release-Select
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

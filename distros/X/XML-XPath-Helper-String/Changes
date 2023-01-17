@@ -1,5 +1,8 @@
 Revision history for XML-XPath-Helper-String
 
+1.03    2023/01/15
+        Minor change in POD section.
+
 1.02    2022/10/27
         Adapted META.yml
 

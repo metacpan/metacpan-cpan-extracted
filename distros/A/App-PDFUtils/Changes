@@ -1,3 +1,14 @@
+0.014   2022-10-07  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] [cli less-pdf-text] --pdf-raw does not take argument.
+
+
+0.013   2022-10-07  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli less-pdf-text] Switch to
+          CLI::MetaUtil::Getopt::Long::Complete.
+
+
 0.012   2022-10-07  Released-By: PERLANCAR; Urgency: medium
 
         - Add CLI: less-pdf-text.

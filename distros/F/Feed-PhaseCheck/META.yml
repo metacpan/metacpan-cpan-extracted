@@ -7,21 +7,47 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  POSIX: '0'
   Test::CheckDeps: '0.010'
   Test::More: '0.94'
-  perl: '5.014000'
 configure_requires:
-  ExtUtils::MakeMaker: '6.48'
+  ExtUtils::MakeMaker: '7.64'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Feed-PhaseCheck
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Feed::PhaseCheck:
+    file: lib/Feed/PhaseCheck.pm
+    version: '0.07'
 requires:
-  perl: '5.014000'
+  Exporter: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 resources:
-  repository: git://github.com//Feed-PhaseCheck.git
-version: '0.06'
-x_serialization_backend: 'YAML::Tiny version 1.66'
+  bugtracker: https://github.com/binary-com/perl-feed-phasecheck/issues
+  homepage: https://github.com/binary-com/perl-feed-phasecheck
+  repository: https://github.com/binary-com/perl-feed-phasecheck.git
+version: '0.07'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'binary-maksym <maksym@binary.com>'
+  - 'Jean-Yves Sireau <jy@binary.com>'
+  - 'Chylli <chylli@binary.com>'
+  - 'shahronak47 <shahronak47@yahoo.in>'
+  - 'Chylli <chylli.email@gmail.com>'
+  - 'Tom Molesworth <tom@binary.com>'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

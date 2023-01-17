@@ -19,7 +19,7 @@ my %module_build_args = (
     "Thomas Klausner <domm\@plix.at>"
   ],
   "dist_name" => "LWP-Authen-OAuth2",
-  "dist_version" => "0.19",
+  "dist_version" => "0.20",
   "license" => "perl",
   "module_name" => "LWP::Authen::OAuth2",
   "recursive_test_files" => 1,

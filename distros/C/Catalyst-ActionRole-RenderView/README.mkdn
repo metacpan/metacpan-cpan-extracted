@@ -1,0 +1,49 @@
+# NAME
+
+Catalyst::ActionRole::RenderView - Call the default view
+
+# SYNOPSIS
+
+    package Example::Controller::Root;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends 'Catalyst::Controller';
+
+    sub end : Action Does(RenderView) {}
+
+# DESCRIPTION
+
+This is basically [Catalyst::Action::RenderView](https://metacpan.org/pod/Catalyst%3A%3AAction%3A%3ARenderView) done as an action role (basically a [Moose](https://metacpan.org/pod/Moose)
+role) rather than as a base class.  This is a bit more flexible if you plan to do fancy
+stuff with your end action.
+
+Two things it doesn't do that the classic [Catalyst::Action::RenderView](https://metacpan.org/pod/Catalyst%3A%3AAction%3A%3ARenderView) does is it doesn't
+set a default content type if none is found (old one just set `text/html` which was probably
+ok back in the 'Aughts but not always true now) and we don't support the `dump_info` when in
+debug mode since I really think something like that belongs in another part of the stack.
+
+I'm willing to be proven wrong, just send me your use cases and patches.
+
+# EXCEPTIONS
+
+This class can throw the following exceptions which are compatible with [CatalystX::Errors](https://metacpan.org/pod/CatalystX%3A%3AErrors)
+
+## No View found
+
+If there's no view found when calling '$c->view()' we throw [Catalyst::ActionRole::RenderView::Utils::NoView](https://metacpan.org/pod/Catalyst%3A%3AActionRole%3A%3ARenderView%3A%3AUtils%3A%3ANoView).
+You can use [CatalystX::Errors](https://metacpan.org/pod/CatalystX%3A%3AErrors) to catch and handle that or roll your own error handling.
+
+# AUTHOR
+
+     John Napiorkowski <jnapiork@cpan.org>
+    
+
+# COPYRIGHT
+
+Copyright (c) 2023 the above named AUTHOR
+
+# LICENSE
+
+You may distribute this code under the same terms as Perl itself.

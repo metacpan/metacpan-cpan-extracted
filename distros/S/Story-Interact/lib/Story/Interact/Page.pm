@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact::Page;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001003';
+our $VERSION   = '0.001004';
 
 use Moo;
 use Types::Common -types;
@@ -27,6 +27,18 @@ has 'location' => (
 	is        => 'rwp',
 	isa       => Str,
 	predicate => 1,
+);
+
+has 'abstract' => (
+	is        => 'rwp',
+	isa       => Str,
+	predicate => 1,
+);
+
+has 'todo' => (
+	is        => 'rwp',
+	isa       => Bool,
+	default   => 0,
 );
 
 has 'text' => (

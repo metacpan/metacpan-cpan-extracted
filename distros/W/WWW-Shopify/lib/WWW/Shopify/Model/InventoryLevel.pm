@@ -21,7 +21,7 @@ BEGIN { $queries = {
 }; }
 
 sub actions { qw(set connect adjust) }
-
+sub identifier { qw(inventory_item_id location_id) }
 sub read_scope { return "read_inventory"; }
 sub write_scope { return "write_inventory"; }
 

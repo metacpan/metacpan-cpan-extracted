@@ -1,5 +1,5 @@
 package Neovim::Ext::RemoteSequence;
-$Neovim::Ext::RemoteSequence::VERSION = '0.05';
+$Neovim::Ext::RemoteSequence::VERSION = '0.06';
 use strict;
 use warnings;
 use Class::Accessor;
@@ -83,7 +83,7 @@ Neovim::Ext::RemoteSequence - Neovim RemoteSequence class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

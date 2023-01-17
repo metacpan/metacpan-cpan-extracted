@@ -8,7 +8,7 @@ META.yml
 README
 lib/App/ModuleBuildTiny.pm
 lib/App/ModuleBuildTiny/Dist.pm
-prereqs.yml
+prereqs.json
 script/mbtiny
 t/00-compile.t
 t/release-kwalitee.t

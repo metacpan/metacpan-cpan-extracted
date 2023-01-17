@@ -14,20 +14,22 @@ use CLI::MetaUtil::Getopt::Long qw(GetOptionsCLIWrapper);
 use IPC::System::Options 'system', -log=>1, -die=>1;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-08'; # DATE
+our $DATE = '2022-10-07'; # DATE
 our $DIST = 'App-DiffPDFText'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 my @files;
 Getopt::Long::Configure("gnu_getopt", "no_ignore_case", "pass_through");
 
 my $fail;
 my $opt_pages;
+my $opt_fmt = 1;
 
 GetOptionsCLIWrapper(
     cli => 'diff',
     add_opts => {
         'pdf-pages=s' => \$opt_pages,
+        'pdf-fmt!' => \$opt_fmt,
         '<>' => sub {
             my $filename = $_[0];
             unless (-f $filename) {
@@ -39,7 +41,7 @@ GetOptionsCLIWrapper(
             require App::PDFUtils;
             my $res = App::PDFUtils::convert_pdf_to_text(
                 file => $filename,
-                fmt => 1,
+                fmt => $opt_fmt,
                 return_output_file => 1,
                 (defined $opt_pages ? (pages => $opt_pages) : ()),
             );
@@ -85,7 +87,7 @@ diff-pdf-text - Diff the text of two PDF documents
 
 =head1 VERSION
 
-This document describes version 0.004 of diff-pdf-text (from Perl distribution App-DiffPDFText), released on 2022-09-08.
+This document describes version 0.005 of diff-pdf-text (from Perl distribution App-DiffPDFText), released on 2022-10-07.
 
 =head1 SYNOPSIS
 
@@ -113,6 +115,11 @@ B<Please specify these options before file names.>
 
 Only diff a range of pages instead of the whole PDF. Example: 1,5-10,15.
 Requires B<pdftk> to extract the page range.
+
+=item * --(no-)pdf-fmt
+
+Whether to apply `fmt` formatting to the `pdftotext` output. The default is yes;
+use C<--no-pdf-fmt> to disable it.
 
 =back
 

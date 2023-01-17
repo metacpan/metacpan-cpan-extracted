@@ -1,6 +1,11 @@
 Revision history for Pg-Explain
 
-2.4     2022/11-12
+2.5     2023/01/16
+        - Fix handling of non-ascii characters in json and yaml plans
+          per report from James Courtney
+        - Update copyright
+
+2.4     2022/11/12
         - Allow easy anonymization of extra strings using built-in anonymizer
 
 

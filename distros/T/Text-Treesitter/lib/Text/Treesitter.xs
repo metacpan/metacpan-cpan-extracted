@@ -35,6 +35,36 @@ static SV *S_newSVquerymatch(pTHX_ TSQueryMatch *match)
 }
 #define newSVquerymatch(match)  S_newSVquerymatch(aTHX_ match)
 
+static void S_extract_line_col(pTHX_ const char *s, STRLEN len, STRLEN offset, int *line, int *col, SV *linebuf)
+{
+  (*line) = 0;
+  (*col)  = 0;
+
+  while(len && offset) {
+    (*col)++;
+    if(*s == '\n') {
+      (*line)++;
+      (*col) = 0;
+      SvCUR(linebuf) = 0;
+    }
+    else
+      sv_catpvn(linebuf, s, 1);
+
+    offset--;
+
+    s++, len--;
+  }
+  /* capture the rest of the line */
+  while(len) {
+    if(*s == '\n')
+      break;
+    sv_catpvn(linebuf, s, 1);
+
+    s++, len--;
+  }
+}
+#define extract_line_col(s, len, offset, line, col, linebuf)  S_extract_line_col(aTHX_ s, len, offset, line, col, linebuf)
+
 MODULE = Text::Treesitter  PACKAGE = Text::Treesitter::Language  PREFIX = ts_language_
 
 Text::Treesitter::Language load(const char *path, const char *name)
@@ -148,9 +178,8 @@ Text::Treesitter::_Tree _parse_string(Text::Treesitter::Parser self, SV *str)
   CODE:
     SvGETMAGIC(str);
 
-    /* TODO: upgrade if required */
     STRLEN len;
-    char *pv = SvPVbyte(str, len);
+    char *pv = SvPVutf8(str, len);
 
     RETVAL = ts_parser_parse_string(self, NULL, pv, len);
   OUTPUT:
@@ -166,14 +195,41 @@ Text::Treesitter::Query new(SV *cls, Text::Treesitter::Language lang, SV *src)
     SvGETMAGIC(src);
 
     STRLEN srclen;
-    char *srcstr = SvPVbyte(src, srclen);
+    char *srcstr = SvPVutf8(src, srclen);
 
     uint32_t error_offset;
     TSQueryError error_type;
 
     RETVAL = ts_query_new(lang, srcstr, srclen, &error_offset, &error_type);
     if(!RETVAL) {
-      croak("TODO: ts_query_new error=%d at offset=%d\n", error_type, error_offset);
+      const char *error_names[] = {
+        "none",
+        "Syntax",
+        "NodeType",
+        "Field",
+        "Capture",
+        "Structure",
+        "Language",
+      };
+      const char *error_name =
+        error_type < sizeof(error_names)/sizeof(error_names[0]) ? error_names[error_type] : "<unknown>";
+
+      int line = 0, col = 0;
+      SV *linebuf = newSVpvn("", 0);
+      SAVEFREESV(linebuf);
+
+      extract_line_col(srcstr, srclen, error_offset, &line, &col, linebuf);
+
+      SV *heremark = newSVpvn("", 0);
+      SAVEFREESV(heremark);
+      for(int i = 0; i < col; i++)
+        sv_catpvn(heremark, " ", 1);
+      sv_catpvn(heremark, "^", 1);
+
+      croak("ts_query_new: %s error at line=%d col=%d:\n: %" SVf "\n  %" SVf "\n",
+        error_name, line + 1, col + 1,
+        SVfARG(linebuf),
+        SVfARG(heremark));
     }
   }
   OUTPUT:

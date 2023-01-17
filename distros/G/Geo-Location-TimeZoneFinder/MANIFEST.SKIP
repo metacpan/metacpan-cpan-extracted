@@ -1,0 +1,11 @@
+cover_db
+~$
+\.swp$
+
+\bMakefile$
+\bautom4te.cache/
+\bconfig\.(h|log|status)$
+\bhtml/
+\bstamp-
+/test_\w+$
+/test[^/]*\.(log|trs)$

@@ -1,5 +1,5 @@
 package Class::MOP::Mixin::AttributeCore;
-our $VERSION = '2.2201';
+our $VERSION = '2.2202';
 
 use strict;
 use warnings;
@@ -62,7 +62,7 @@ Class::MOP::Mixin::AttributeCore - Core attributes shared by attribute metaclass
 
 =head1 VERSION
 
-version 2.2201
+version 2.2202
 
 =head1 DESCRIPTION
 

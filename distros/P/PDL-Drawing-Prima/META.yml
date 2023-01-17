@@ -25,17 +25,17 @@ no_index:
 provides:
   PDL::Drawing::Prima:
     file: lib/PDL/Drawing/Prima.pm.PL
-    version: '0.15'
+    version: '0.16'
   PDL::Drawing::Prima::Utils:
     file: lib/PDL/Drawing/Prima/Utils.pm.PL
-    version: '0.15'
+    version: '0.16'
 requires:
   PDL: '2.037'
   Prima: '1.57'
-  perl: v5.10.0
+  perl: v5.12.0
 resources:
   bugtracker: http://github.com/dk/PDL-Drawing-Prima/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/dk/PDL-Drawing-Prima
-version: '0.15'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

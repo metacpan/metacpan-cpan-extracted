@@ -76,7 +76,7 @@ use LWP::UserAgent;
 
 package WWW::Shopify;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use WWW::Shopify::Exception;
 use WWW::Shopify::Field;
@@ -105,13 +105,13 @@ Creates a new shop, without using the actual API, uses automated form submission
 sub new { 
 	my ($package, $shop_url, $email, $password, $api_version) = @_;
 	die new WWW::Shopify::Exception("Can't create a shop without a shop url.") unless $shop_url;
-	$api_version = '2020-07' unless $api_version && ($api_version =~ m/\d\d\d\d-\d\d/ || $api_version =~ m/^unstable$/);
+	$api_version = '2022-04' unless $api_version && ($api_version =~ m/\d\d\d\d-\d\d/ || $api_version =~ m/^unstable$/);
 	my $ua = LWP::UserAgent->new( ($^O eq' linux' ? (ssl_opts => {'SSL_version' => 'TLSv12' }) : ()) );
 	$ua->cookie_jar({ });
 	$ua->timeout(60);
 	$ua->agent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36");
 	$package = "WWW::Shopify::Login" if $package eq "WWW::Shopify";
-	my $self = bless { _shop_url => $shop_url, _ua => $ua, _url_handler => undef, _api_calls => 0, _sleep_for_limit => 0, _retry_on_errors => 0, _last_timestamp => undef, _decode_entities => 1, _api_version => $api_version }, $package;
+	my $self = bless { _shop_url => $shop_url, _ua => $ua, _url_handler => undef, _api_calls => 0, _sleep_for_limit => 0, _retry_on_errors => 0, _last_timestamp => undef, _decode_entities => 1, _api_version => $api_version, _max_call_limit => 40 }, $package;
 	$self->{_ql} = new WWW::Shopify::GraphQL($self);
 	$self->url_handler(new WWW::Shopify::URLHandler($self));
 	return $self;
@@ -120,6 +120,7 @@ sub new {
 
 sub version { $_[0]->{_version} = $_[1] if defined $_[1]; return $_[0]->{_version}; }
 sub api_calls { $_[0]->{_api_calls} = $_[1] if defined $_[1]; return $_[0]->{_api_calls}; }
+sub max_api_calls { $_[0]->{_max_call_limit} = $_[1] if defined $_[1]; return $_[0]->{_max_call_limit}; }
 sub url_handler { $_[0]->{_url_handler} = $_[1] if defined $_[1]; return $_[0]->{_url_handler}; }
 sub sleep_for_limit { $_[0]->{_sleep_for_limit} = $_[1] if defined $_[1]; return $_[0]->{_sleep_for_limit}; }
 sub retry_on_errors { $_[0]->{_retry_on_errors} = $_[1] if defined $_[1]; return $_[0]->{_retry_on_errors}; }
@@ -487,7 +488,7 @@ sub get_count {
 	if (!$package->countable) {
 		die new WWW::Shopify::Exception("Unable to count $package; it is not marked as countable in Shopify's API.")
 	}
-	my ($decoded, $response) = $self->use_url('get', $self->resolve_trailing_url($package, "get", $specs->{parent}, $specs) . "/count.json", $specs);
+	my ($decoded, $response) = $self->use_url('get', $self->resolve_trailing_url($package, "count", $specs->{parent}, $specs) . "/count.json", $specs);
 	return $decoded->{'count'};
 }
 
@@ -787,10 +788,10 @@ Follows this: http://wiki.shopify.com/Verifying_Webhooks.
 =cut
 
 use Exporter 'import';
-our @EXPORT_OK = qw(verify_webhook verify_login verify_proxy calc_webhook_signature calc_login_signature calc_hmac_login_signature calc_proxy_signature handleize);
+our @EXPORT_OK = qw(verify_webhook verify_login verify_proxy calc_webhook_signature calc_login_signature calc_hmac_login_signature calc_proxy_signature handleize calc_jwt_signature);
 use Digest::MD5 'md5_hex';
-use Digest::SHA qw(hmac_sha256_hex hmac_sha256_base64);
-use MIME::Base64;
+use Digest::SHA qw(hmac_sha256_hex hmac_sha256_base64 hmac_sha256);
+use MIME::Base64 qw(encode_base64url);
 
 sub calc_webhook_signature {
 	my ($shared_secret, $request_body) = @_;
@@ -800,10 +801,16 @@ sub calc_webhook_signature {
 	return $calc_signature;
 }
 
+
 sub verify_webhook {
 	my ($x_shopify_hmac_sha256, $request_body, $shared_secret) = @_;
 	return undef unless $x_shopify_hmac_sha256;
 	return $x_shopify_hmac_sha256 eq calc_webhook_signature($shared_secret, $request_body);
+}
+
+sub calc_jwt_signature {
+	my ($shared_secret, $header_and_body) = @_;
+	return  encode_base64url(hmac_sha256($header_and_body, $shared_secret));
 }
 
 =head2 calc_login_signature($shared_secret, $%params)
@@ -896,7 +903,7 @@ Adam Harrison (adamdharrison@gmail.com)
 
 =head1 LICENSE
 
-Copyright (C) 2016 Adam Harrison
+Copyright (C) 2020 Adam Harrison
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

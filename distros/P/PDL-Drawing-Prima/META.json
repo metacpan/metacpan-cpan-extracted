@@ -40,18 +40,18 @@
          "requires" : {
             "PDL" : "2.037",
             "Prima" : "1.57",
-            "perl" : "v5.10.0"
+            "perl" : "v5.12.0"
          }
       }
    },
    "provides" : {
       "PDL::Drawing::Prima" : {
          "file" : "lib/PDL/Drawing/Prima.pm.PL",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "PDL::Drawing::Prima::Utils" : {
          "file" : "lib/PDL/Drawing/Prima/Utils.pm.PL",
-         "version" : "0.15"
+         "version" : "0.16"
       }
    },
    "release_status" : "stable",
@@ -66,6 +66,6 @@
          "url" : "http://github.com/dk/PDL-Drawing-Prima"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

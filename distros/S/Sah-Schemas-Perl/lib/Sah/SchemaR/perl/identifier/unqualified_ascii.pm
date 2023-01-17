@@ -4,8 +4,8 @@ package Sah::SchemaR::perl::identifier::unqualified_ascii;
 # preamble code
 no warnings 'experimental::regex_sets';
 
-our $DATE = '2022-12-16'; # DATE
-our $VERSION = '0.046'; # VERSION
+our $DATE = '2023-01-14'; # DATE
+our $VERSION = '0.047'; # VERSION
 
 our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\n",examples=>[{summary=>"Empty",valid=>0,value=>""},{valid=>1,value=>"foo"},{valid=>1,value=>"_foo"},{summary=>"Cannot start with a digit",valid=>0,value=>"0foo"},{valid=>1,value=>"foo0"},{summary=>"Invalid character (dash)",valid=>0,value=>"foo-bar"},{summary=>"Qualified name not accepted",valid=>0,value=>"foo::bar"},{summary=>"Sigil not accepted",valid=>0,value=>"\$foo"},{summary=>"Non-latin letter not accepted",valid=>0,value=>"b\xC3\xA9b\xC3\xA9"}],match=>qr(\A[A-Za-z_][A-Za-z_0-9]{0,250}\z),summary=>"Unqualified identifier in Perl, without \"use utf8\" in effect"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -24,7 +24,7 @@ Sah::SchemaR::perl::identifier::unqualified_ascii - Unqualified identifier in Pe
 
 =head1 VERSION
 
-This document describes version 0.046 of Sah::SchemaR::perl::identifier::unqualified_ascii (from Perl distribution Sah-Schemas-Perl), released on 2022-12-16.
+This document describes version 0.047 of Sah::SchemaR::perl::identifier::unqualified_ascii (from Perl distribution Sah-Schemas-Perl), released on 2023-01-14.
 
 =head1 DESCRIPTION
 
@@ -64,7 +64,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

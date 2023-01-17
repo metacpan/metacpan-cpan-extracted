@@ -4,8 +4,8 @@ package Sah::SchemaR::perl::modname_with_optional_args;
 # preamble code
 no warnings 'experimental::regex_sets';
 
-our $DATE = '2022-12-16'; # DATE
-our $VERSION = '0.046'; # VERSION
+our $DATE = '2023-01-14'; # DATE
+our $VERSION = '0.047'; # VERSION
 
 our $rschema = do{my$var={base=>"any",clsets_after_base=>[{description=>"\nPerl module name with optional arguments which will be used as import arguments,\njust like the `-MMODULE=ARGS` shortcut that `perl` provides. Examples:\n\n    Foo\n    Foo::Bar\n    Foo::Bar=arg1,arg2\n\nSee also: `perl::modname`.\nA two-element array from (coercible from JSON string) is also allowed:\n\n    [\"Foo::Bar\", \\\@args]\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"Foo::Bar"},{valid=>1,value=>"Foo::Bar=arg1,arg2"},{valid=>1,validated_value=>"Foo::Bar=arg1,arg2",value=>"Foo-Bar=arg1,arg2"},{summary=>"No module name",valid=>0,value=>[]},{valid=>1,value=>["Foo"]},{summary=>"Invalid module name",valid=>0,value=>["Foo Bar"]},{summary=>"Args must be arrayref or hashref",valid=>0,value=>["Foo","arg"]},{valid=>1,value=>["Foo",{arg1=>1,arg2=>2}]},{valid=>1,value=>["Foo",["arg1","arg2"]]},{summary=>"Too many elements",valid=>0,value=>["Foo",["arg1","arg2"],{}]}],of=>[["array_from_json",{description=>"\nThese are valid values for this schema:\n\n    [\"Foo\"]                                      # just the module name\n    [\"Foo::Bar\", [\"arg1\",\"arg2\"]]                # with import arguments (array)\n    [\"Foo::Bar\", {\"arg1\"=>\"val\",\"arg2\"=>\"val\"}]  # with import arguments (hash)\n\n",elems=>[["perl::modname",{req=>1}],["any",{of=>[["array",{req=>1}],["hash",{req=>1}]],req=>1}]],examples=>['$var->{clsets_after_base}[0]{examples}[4]','$var->{clsets_after_base}[0]{examples}[5]','$var->{clsets_after_base}[0]{examples}[6]','$var->{clsets_after_base}[0]{examples}[7]','$var->{clsets_after_base}[0]{examples}[8]','$var->{clsets_after_base}[0]{examples}[9]','$var->{clsets_after_base}[0]{examples}[10]'],max_len=>2,min_len=>1,summary=>"A 1- or 2-element array containing Perl module name (e.g. [\"Foo::Bar\"]) with optional arguments (e.g. [\"Foo::Bar\", [\"arg1\",\"arg2\"]])"}],["str",{description=>"\nPerl module name with optional arguments which will be used as import arguments,\njust like the `-MMODULE=ARGS` shortcut that `perl` provides. Examples:\n\n    Foo\n    Foo::Bar\n    Foo::Bar=arg1,arg2\n\nSee also: `perl::modname`.\n\n",examples=>['$var->{clsets_after_base}[0]{examples}[0]','$var->{clsets_after_base}[0]{examples}[1]','$var->{clsets_after_base}[0]{examples}[2]','$var->{clsets_after_base}[0]{examples}[3]'],match=>"\\A(?:[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*(?:=.*)?)\\z",summary=>"Perl module name (e.g. Foo::Bar) with optional arguments (e.g. Foo::Bar=arg1,arg2)","x.completion"=>"perl_modname","x.perl.coerce_rules"=>["From_str::normalize_perl_modname"]}]],summary=>"Perl module name (e.g. Foo::Bar) with optional arguments (e.g. Foo::Bar=arg1,arg2)","x.completion"=>"perl_modname"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["any"],type=>"any",v=>2};$var->{clsets_after_base}[0]{of}[0][1]{examples}[0]=$var->{clsets_after_base}[0]{examples}[4];$var->{clsets_after_base}[0]{of}[0][1]{examples}[1]=$var->{clsets_after_base}[0]{examples}[5];$var->{clsets_after_base}[0]{of}[0][1]{examples}[2]=$var->{clsets_after_base}[0]{examples}[6];$var->{clsets_after_base}[0]{of}[0][1]{examples}[3]=$var->{clsets_after_base}[0]{examples}[7];$var->{clsets_after_base}[0]{of}[0][1]{examples}[4]=$var->{clsets_after_base}[0]{examples}[8];$var->{clsets_after_base}[0]{of}[0][1]{examples}[5]=$var->{clsets_after_base}[0]{examples}[9];$var->{clsets_after_base}[0]{of}[0][1]{examples}[6]=$var->{clsets_after_base}[0]{examples}[10];$var->{clsets_after_base}[0]{of}[1][1]{examples}[0]=$var->{clsets_after_base}[0]{examples}[0];$var->{clsets_after_base}[0]{of}[1][1]{examples}[1]=$var->{clsets_after_base}[0]{examples}[1];$var->{clsets_after_base}[0]{of}[1][1]{examples}[2]=$var->{clsets_after_base}[0]{examples}[2];$var->{clsets_after_base}[0]{of}[1][1]{examples}[3]=$var->{clsets_after_base}[0]{examples}[3];$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -24,7 +24,7 @@ Sah::SchemaR::perl::modname_with_optional_args - Perl module name (e.g. Foo::Bar
 
 =head1 VERSION
 
-This document describes version 0.046 of Sah::SchemaR::perl::modname_with_optional_args (from Perl distribution Sah-Schemas-Perl), released on 2022-12-16.
+This document describes version 0.047 of Sah::SchemaR::perl::modname_with_optional_args (from Perl distribution Sah-Schemas-Perl), released on 2023-01-14.
 
 =head1 DESCRIPTION
 
@@ -64,7 +64,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

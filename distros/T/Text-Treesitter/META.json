@@ -44,35 +44,35 @@
    "provides" : {
       "Text::Treesitter" : {
          "file" : "lib/Text/Treesitter.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Text::Treesitter::Language" : {
          "file" : "lib/Text/Treesitter/Language.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Text::Treesitter::Node" : {
          "file" : "lib/Text/Treesitter/Node.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Text::Treesitter::Parser" : {
          "file" : "lib/Text/Treesitter/Parser.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Text::Treesitter::Query" : {
          "file" : "lib/Text/Treesitter/Query.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Text::Treesitter::QueryCursor" : {
          "file" : "lib/Text/Treesitter/QueryCursor.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Text::Treesitter::QueryMatch" : {
          "file" : "lib/Text/Treesitter/QueryMatch.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Text::Treesitter::Tree" : {
          "file" : "lib/Text/Treesitter/Tree.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -81,6 +81,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

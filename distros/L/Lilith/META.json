@@ -48,6 +48,7 @@
             "Sys::Syslog" : "0",
             "TOML" : "0.97",
             "Text::ANSITable" : "0.608",
+            "YAML::PP" : "0",
             "perl" : "5.006"
          }
       },
@@ -64,6 +65,6 @@
          "web" : "https://github.com/LilithSec/Lilith"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.2.2",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

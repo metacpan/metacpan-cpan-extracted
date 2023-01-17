@@ -19,7 +19,7 @@ do { my $x = {
                                       'DateTime::Calendar::Mayan' => '0',
                                       'DateTime::Format::MySQL' => '0',
                                       'Declare::Constraints::Simple' => '0',
-                                      'Devel::PPPort' => '3.62',
+                                      'Devel::PPPort' => '3.68',
                                       'ExtUtils::MakeMaker::Dist::Zilla::Develop' => '0',
                                       'File::Find::Rule' => '0',
                                       'File::Spec' => '0',
@@ -67,7 +67,7 @@ do { my $x = {
                                       'Data::OptList' => '0.107',
                                       'Devel::GlobalDestruction' => '0',
                                       'Devel::OverloadInfo' => '0.005',
-                                      'Devel::PPPort' => '3.62',
+                                      'Devel::PPPort' => '3.68',
                                       'Devel::StackTrace' => '2.03',
                                       'Dist::Zilla' => '5',
                                       'Dist::Zilla::Plugin::BumpVersionAfterRelease' => '0',
@@ -202,7 +202,7 @@ do { my $x = {
                                    'Test::CleanNamespaces' => '0.13',
                                    'Test::Fatal' => '0.001',
                                    'Test::More' => '0.96',
-                                   'Test::Requires' => '0.05'
+                                   'Test::Needs' => '0'
                                  }
                  }
      };

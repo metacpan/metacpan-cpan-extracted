@@ -1,6 +1,6 @@
-use strict;
+use v5.12.0;
 use warnings;
-package Config::INI::Writer 0.028;
+package Config::INI::Writer 0.029;
 
 use Mixin::Linewise::Writers;
 # ABSTRACT: a subclassable .ini-file emitter
@@ -10,7 +10,7 @@ our @CARP_NOT = qw(Mixin::Linewise::Writers);
 
 #pod =head1 SYNOPSIS
 #pod
-#pod If <$hash> contains:
+#pod If C<$hash> contains:
 #pod
 #pod   {
 #pod     '_'  => { admin => 'rjbs' },
@@ -431,7 +431,7 @@ sub stringify_value_assignment {
 sub stringify_value {
   my ($self, $value) = @_;
 
-  $value = defined $value ? $value : '';
+  $value //= q{};
 
   return $value;
 }
@@ -511,11 +511,11 @@ Config::INI::Writer - a subclassable .ini-file emitter
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 SYNOPSIS
 
-If <$hash> contains:
+If C<$hash> contains:
 
   {
     '_'  => { admin => 'rjbs' },

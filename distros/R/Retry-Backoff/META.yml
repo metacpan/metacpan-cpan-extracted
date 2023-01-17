@@ -20,7 +20,7 @@ name: Retry-Backoff
 provides:
   Retry::Backoff:
     file: lib/Retry/Backoff.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Algorithm::Backoff::Exponential: '0.006'
   Exporter: '5.57'
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Retry-Backoff
   homepage: https://metacpan.org/release/Retry-Backoff
   repository: git://github.com/perlancar/perl-Retry-Backoff.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.036000'

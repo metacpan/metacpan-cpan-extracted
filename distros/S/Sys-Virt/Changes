@@ -1,5 +1,10 @@
 Revision history for perl module Sys::Virt
 
+9.0.0 2023-01-16
+
+ - Add VIR_DOMAIN_JOB_OPERATION_SNAPSHOT_DELETE constant
+ - Add virDomainFDAssociate and related constants
+
 8.10.0 2022-12-07
 
  - Add VIR_STORAGE_VOL_CREATE_VALIDATE constant

@@ -62,7 +62,7 @@ BEGIN {
 # Bootstrap
 #
 BEGIN {
-    our $VERSION = '6.0.28'; # VERSION
+    our $VERSION = '6.0.29'; # VERSION
 
     require XSLoader;
     # Modules that we depent on bootstrap
@@ -112,7 +112,7 @@ MarpaX::ESLIF - ESLIF is Extended ScanLess InterFace
 
 =head1 VERSION
 
-version 6.0.28
+version 6.0.29
 
 =head1 SYNOPSIS
 

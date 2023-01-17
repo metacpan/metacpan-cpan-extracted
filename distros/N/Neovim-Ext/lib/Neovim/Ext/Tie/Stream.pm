@@ -1,5 +1,5 @@
 package Neovim::Ext::Tie::Stream;
-$Neovim::Ext::Tie::Stream::VERSION = '0.05';
+$Neovim::Ext::Tie::Stream::VERSION = '0.06';
 use strict;
 use warnings;
 use base qw/Class::Accessor/;
@@ -48,7 +48,7 @@ Neovim::Ext::Tie::Stream - Tie STDOUT/STDERR
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =cut
 

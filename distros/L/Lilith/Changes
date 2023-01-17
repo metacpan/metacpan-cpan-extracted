@@ -1,8 +1,21 @@
 Revision history for Lilith
 
+0.2.2	 2023-01-17/12:30
+		 -Baphomet YAML name fix. No longer creates files with spaces in them.
+
+0.2.1	 2023-01-16/20:15
+		 -Baphomet YAML fix.
+		 -Minor doc cleanup.
+
+0.2.0	 2023-01-16/06:30
+		 -Baphomet YAML rule generation.
+		 -Add POD for script.
+		 -Misc doc cleanups.
+
 0.1.0	 2022-12-25/23:50
 		 -Log to syslog for run.
 		 -Add init/freebsd
+
 
 0.0.1	 2022-10-30/23:45
 		 -Initial release.

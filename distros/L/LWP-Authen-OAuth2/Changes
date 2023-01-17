@@ -1,5 +1,9 @@
 Revision history for LWP-Authen-OAuth2
 
+0.20      2023-01-16 17:29:43+01:00
+    - keep param default value in non strict mode (André Brás)
+
+
 0.19      2022-03-10 16:43:24+01:00
     - Add Withings Service Provider (Brian Foley)
     - replace explicit gibberisch with a hopeful better explanation (Thomas Klausner)
@@ -74,9 +78,9 @@ Revision history for LWP-Authen-OAuth2
     - Allow additional arguments to be passed to the save_tokens
       callback (Chris)
     - Fixed copying required/optional params in
-      collect_action_params (Alexander Dutton)
+      collect_action_params (Alex Dutton)
     - Added overridable methods for returing authz and token endpoints
-      (Alexander Dutton)
+      (Alex Dutton)
 
 
 0.07    20131128 - 7:47 AM PST

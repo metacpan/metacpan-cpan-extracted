@@ -1,3 +1,10 @@
+Revision history for Date-Extract
+
+0.07      2023-01-16 19:49:25Z
+ - Update tests to use Test::MockTime::HiRes to align with changes in
+   DateTime::Format::Natural.
+   Fixes: https://rt.cpan.org/Ticket/Display.html?id=145774
+
 0.06 2016-11-10
  - Fix a POD tag typo
  - Packaging updates, including fixing a missing META.yml

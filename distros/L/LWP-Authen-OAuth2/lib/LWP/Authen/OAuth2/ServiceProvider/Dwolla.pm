@@ -1,7 +1,7 @@
 package LWP::Authen::OAuth2::ServiceProvider::Dwolla;
 
 # ABSTRACT: Access Dwolla API v2
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 use strict;
 use warnings;
@@ -57,7 +57,7 @@ LWP::Authen::OAuth2::ServiceProvider::Dwolla - Access Dwolla API v2
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

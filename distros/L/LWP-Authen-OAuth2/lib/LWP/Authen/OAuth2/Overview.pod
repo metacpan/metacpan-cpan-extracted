@@ -13,7 +13,7 @@ LWP::Authen::OAuth2::Overview - Overview of accessing OAuth2 APIs with LWP::Auth
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 NAME
 

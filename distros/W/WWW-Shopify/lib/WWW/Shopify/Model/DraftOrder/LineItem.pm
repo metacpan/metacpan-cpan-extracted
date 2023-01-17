@@ -30,7 +30,7 @@ BEGIN { $fields = {
 	"gift_card" => new WWW::Shopify::Field::Boolean(),
 	"fulfillment_service" => new WWW::Shopify::Field::String::Enum(["automatic", "manual"]),
 	"tax_lines" => new WWW::Shopify::Field::Relation::Many("WWW::Shopify::Model::DraftOrder::LineItem::TaxLine"),
-	"applied_discount" => new WWW::Shopify::Field::Freeform::Hash(),
+	"applied_discount" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::DraftOrder::LineItem::AppliedDiscount"),
 	"properties" => new WWW::Shopify::Field::Relation::Many("WWW::Shopify::Model::DraftOrder::LineItem::Property"),
 	"custom" => new WWW::Shopify::Field::Boolean(),
 } }

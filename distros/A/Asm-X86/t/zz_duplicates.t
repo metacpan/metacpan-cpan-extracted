@@ -15,13 +15,20 @@ sub find_duplicates($$) {
 	my $arr = shift;
 	my %arr_hash;
 	my $arr_name = shift;
+	my %dupli;
 
 	foreach (@{$arr}) {
 
+		$dupli{$_} = 1 if defined $arr_hash{$_};
 		$arr_hash{$_} = 1;
 	}
 
-	is ( @{$arr}, keys %arr_hash, "No duplicates in array $arr_name" );
+	my $duplicates = '';
+	foreach (keys %dupli) {
+
+		$duplicates .= "[$_]";
+	}
+	is ( @{$arr}, keys %arr_hash, "No duplicates allowed in array $arr_name: $duplicates" );
 }
 
 find_duplicates(\@regs8_intel, '@regs8_intel');

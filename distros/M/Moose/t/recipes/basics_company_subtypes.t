@@ -17,7 +17,7 @@ BEGIN {
     }
 }
 
-use Test::Requires {
+use Test::Needs {
     'Locale::US'     => '0',
     'Regexp::Common' => '0',
 };

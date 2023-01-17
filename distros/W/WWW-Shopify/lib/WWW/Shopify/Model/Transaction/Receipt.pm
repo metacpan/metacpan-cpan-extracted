@@ -105,8 +105,12 @@ BEGIN { $fields = {
 	"x_signature" => new WWW::Shopify::Field::String(),
 	# hi_trust
 	"ordernumber" => new WWW::Shopify::Field::String(),
-    "orderdesc" => new WWW::Shopify::Field::String(),
-	
+	"orderdesc" => new WWW::Shopify::Field::String(),
+	# Afterpay
+	"payment_id" => new WWW::Shopify::Field::String(),
+	"refund_id" => new WWW::Shopify::Field::String(),
+	# FirstData
+	"reference_no" => new WWW::Shopify::Field::String()	
 }; }
 
 eval(__PACKAGE__->generate_accessors); die $@ if $@;

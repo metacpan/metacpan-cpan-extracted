@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 82 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 87 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Coerce/perl/To_array/From_str_or_array/expand_perl_modname_wildcard.pm',
@@ -22,6 +22,7 @@ my @module_files = (
     'Data/Sah/Coerce/perl/To_str/From_str/normalize_perl_modprefix.pm',
     'Data/Sah/Filter/perl/Perl/check_module_installed.pm',
     'Data/Sah/Filter/perl/Perl/check_module_not_installed.pm',
+    'Data/Sah/Filter/perl/Perl/check_module_release_expr.pm',
     'Data/Sah/Filter/perl/Perl/normalize_perl_modname.pm',
     'Data/Sah/Filter/perl/Perl/normalize_perl_modname_pm.pm',
     'Data/Sah/Value/perl/Perl/these_dists.pm',
@@ -51,6 +52,8 @@ my @module_files = (
     'Sah/Schema/perl/modnames.pm',
     'Sah/Schema/perl/modprefix.pm',
     'Sah/Schema/perl/modprefixes.pm',
+    'Sah/Schema/perl/module/release/version.pm',
+    'Sah/Schema/perl/module/release/versions.pm',
     'Sah/Schema/perl/pm_filename.pm',
     'Sah/Schema/perl/pod_filename.pm',
     'Sah/Schema/perl/pod_or_pm_filename.pm',
@@ -82,6 +85,8 @@ my @module_files = (
     'Sah/SchemaR/perl/modnames.pm',
     'Sah/SchemaR/perl/modprefix.pm',
     'Sah/SchemaR/perl/modprefixes.pm',
+    'Sah/SchemaR/perl/module/release/version.pm',
+    'Sah/SchemaR/perl/module/release/versions.pm',
     'Sah/SchemaR/perl/pm_filename.pm',
     'Sah/SchemaR/perl/pod_filename.pm',
     'Sah/SchemaR/perl/pod_or_pm_filename.pm',

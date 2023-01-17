@@ -2,7 +2,6 @@
 
 ## flexible patterns
 
-* test each pattern (not only the default combined pattern)
 * add option to generate either minimal or maximal pattern
   * minimal: shortest coverage decisive of one or more objects.
   * distinct: shortest coverage to disambiguate from unrelated objects
@@ -200,10 +199,8 @@ or scattered by pattern (like "autotools files except below foo/").
     * Gather statistics on files processed and objects detected,
       and emit progress during long-running scans,
       e.g. using Progress::Any or Time::Progress (see SeeAlso of Time::Progress).
-  * Check for cc:morePermissions and try decode surrounding RDF data.
-  * Detect non-commercial license.
-    (?i:(?:\w{4}|\W(?:[^oO]\w|\w[^rR]|[^aA]\w\w|\w[^nN]\w|\w\w[^dD])) non[-_ ]commercial)
-  * Detect bugroff license <http://tunes.org/legalese/bugroff.html>
+  * Inspect RDF content
+    * Check for cc:morePermissions and try decode surrounding RDF data.
 
 
 ## See also
@@ -226,7 +223,8 @@ or scattered by pattern (like "autotools files except below foo/").
 ## misc
 
   * Warn about licensing conflicts
-    + See adequate
+    + See %license_conflicts in tool adequate
+      <https://salsa.debian.org/debian/adequate/-/blob/master/adequate>
   * Sort Files sections to list common over exotic:
     + prefix of leftmost truncate wildcard (*)
     + suffix of leftmost truncate wildcard (*)
@@ -237,8 +235,6 @@ or scattered by pattern (like "autotools files except below foo/").
     + License inlined
     + Copyright
     + Filenames
-  * Optimize:
-    + Support detection reversion, and first scan for grants then licenses - reverting embedded grants
   * Test against challenging projects
     + ghostpdl
     + chromium

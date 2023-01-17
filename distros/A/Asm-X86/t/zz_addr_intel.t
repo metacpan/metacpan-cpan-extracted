@@ -555,6 +555,7 @@ foreach my $r1 ('bx', 'si', 'di', 'bp') {
 
 		push @invalid16, permute_disp_intel_all ('-', $r1, '', $r2, '', '11');
 		push @invalid16, permute_disp_intel_all ('', $r1, '-', $r2, '', '13');
+		push @invalid16, permute_disp_intel ('', $r1, '', $r2, '', $r1);
 		push @invalid16, permute_disp_intel ('', $r1, '', $r2, '', 'cx');
 	}
 	push @invalid16, permute_disp_intel_all ('', 'cx', '', $r1, '', '15');
@@ -579,6 +580,8 @@ push @valid16, permute_intel ('', '3', '', 'bp', '', '', '1');
 push @invalid16, permute_intel ('', '3', '-', 'bp', '', '', '1');
 push @valid16, permute_intel ('', '3', '', '2', '', '', '1');
 push @valid16, permute_intel ('', '3', '', '2', '', '-', '1');
+push @valid16, permute_intel ('', '3', '', '2', '', '', 'bx');
+push @invalid16, permute_intel ('', '3', '', '2', '', '-', 'bx');
 push @valid16, permute_intel ('', '3', '', '', '', '-', '1');
 push @valid16, permute_intel ('', '', '', '', '', '-', '1');
 push @valid16, permute_intel ('', '', '', '', '', '', '+1');

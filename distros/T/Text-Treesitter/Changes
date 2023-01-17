@@ -1,5 +1,17 @@
 Revision history for Text-Treesitter
 
+0.05    2023-01-17
+        [CHANGES]
+         * Added char-counting node start / end accessors
+         * Nicer error message on ts_query_new() failure
+         * Better config file search to closer match `tree-sitter-cli`
+         * Print field names in viewtree.pl for better grammar debugging
+
+        [BUGFIXES]
+         * Correctly implement Node->parent method
+         * Handle UTF-8 source and query strings correctly; count offsets in
+           chars not bytes
+
 0.04    2023-01-12
         [CHANGES]
          * Remember the original source text in a Tree instance

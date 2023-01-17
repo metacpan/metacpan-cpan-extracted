@@ -1,5 +1,434 @@
 #!perl
 
+=head1 NAME
+
+lilith - Forward EVE log alerts to Postgresql as well as make it searchable.
+
+=head1 SYNOPSIS
+
+lilith [B<-c> <config>] B<-a> run
+
+lilith [B<-c> <config>] B<-a> class_map
+
+lilith [B<-c> <config>] B<-a> create_tables
+
+lilith [B<-c> <config>] B<-a> dump_self
+
+lilith [B<-c> <config>] B<-a> event [B<-t> <table>] B<--id> <row_id>
+
+lilith [B<-c> <config>] B<-a> event [B<-t> <table>] B<--event> <event_id>
+
+lilith [B<-c> <config>] B<-a> generate_baphomet_yamls B<--dir> <dir>
+
+lilith [B<-c> <config>] B<-a> get_short_class_snmp_list
+
+lilith [B<-c> <config>] B<-a> search [B<--output> <return>] [B<-t> <table>]
+[B<-m> <minutes>] [B<--order> <clm>] [B<--limit> <int>] [B<--offset> <int>]
+[B<--orderdir> <dir>] [B<--si> <src_ip>] [B<--di> <<dst_ip>] [B<--ip> <ip>]
+[B<--sp> <<src_port>] [B<--dp> <<dst_port>] [B<--port> <<port>] [B<--host> <host>]
+[B<--hostl>] [B<--hosN>] [B<--ih> <host>] [B<--ihl>] [B<--ihN>] [B<-i> <instance>]
+[B<-il>] [B<-iN>] [B<-c> <class>] [B<--cl>] [B<--cN>] [B<-s> <sig>] [B<--sl>]
+[B<--sN>] [B<--if> <if>] [B<--ifl>] [B<--ifN>] [B<--ap> <proto>] [B<--apl>] [B<--apN>]
+[B<--gid> <gid>] [B<--sid> <sid>] [B<--rev> <rev>]
+
+=head1 DESCRIPTION
+
+This script runs various actions for Lilith, including search and the daemon.
+
+=head1 GENERAL SWITCHES
+
+=head2 -a <action>
+
+The action to perform.
+
+    - Default :: search
+
+=head2 -c <config>
+
+The config file to use.
+
+    - Default :: /usr/local/etc/lilith.toml
+
+=head2 -t <table>
+
+Table to operate on.
+
+    - Default :: suricata
+
+=head1 ACTIONS
+
+=head2 run
+
+Start processing the EVE logs and daemonize.
+
+=head2 class_map
+
+Print a table of class mapping from long name to the short name used for display in the search results.
+
+=head2 create_tables
+
+Create the tables in the DB.
+
+=head2 dump_self
+
+Initiate Lilith and then dump it via Data::Dumper.
+
+=head2 event
+
+Fetches a event. The table to use can be specified via -t.
+
+=head3 --id <row_id>
+
+Fetch event via row ID.
+
+=head3 --event <event_id>
+
+Fetch the event via the event ID.
+
+=head2 -a generate_baphomet_yamls
+
+Generate the YAMLs for Baphomet.
+
+=head3 -d <dir>
+
+The directory to write it out too.
+
+=head2 get_short_class_snmp_list
+
+Print a list of shorted class names for use wit SNMP.
+
+=head2 search
+
+Search the DB. The table may be specified via -t.
+
+The common option types for search are as below.
+
+    - Integer :: A comma seperated list of integers to check for. Any number
+                 prefixed with a ! will be negated.
+    - String :: A string to check for. May be matched using like or negated via
+                the proper options.
+    - Complex :: A item to match.
+
+=head3 General Search Options
+
+=head4 --output <return>
+
+The output type.
+
+    - Values :: table,json
+    - Default :: table
+
+=head4 -m <minute>
+
+How far back to to in minutes.
+
+    - Default :: 1440
+
+=head4 --order <column>
+
+Column to use for sorting by.
+
+    - Default :: timestamp
+
+=head4 --orderdir <direction>
+
+Direction to order in.
+
+    - Values :: ASC,DSC
+    - Default :: ASC
+
+=head3 IP Options
+
+=head4 --si <src IP>
+
+Source IP.
+
+    - Default :: undef
+    - Type :: string
+
+=head4  --di <dst IP>
+
+Destination IP.
+
+    - Default :: undef
+    - Type :: string
+
+=head4  --ip <IP>
+
+IP, either dst or src.
+
+    - Default :: undef
+    - Type :: complex
+
+=head3  Port Options
+
+=head4 --sp <src port>
+
+Source port.
+
+    - Default :: undef
+    - Type :: integer
+
+=head4  --dp <dst port>
+
+Destination port.
+
+    - Default :: undef
+    - Type :: integer
+
+=head4 -p <port>
+
+Port, either dst or src.
+
+    - Default :: undef
+    - Type :: complex
+
+=head3 Host Options
+
+    Sagan :: Host is the sending system and instance host is the host the
+             instance is running on.
+
+    Suricata :: Host is the system the instance is running on. There is no
+                instance host.
+
+=head4 --host <host>
+
+Host.
+
+    - Default :: undef
+    - Type :: string
+
+=head4 --hostl
+
+Use like for matching host.
+
+    - Default :: undef
+
+=head4 --hostN
+
+Invert host matching.
+
+    - Default :: undef
+
+=head3 Instance Options
+
+=head4 --ih <host>
+
+Instance host.
+
+    - Default :: undef
+    - Type :: string
+
+=head4 --ihl
+
+Use like for matching instance host.
+
+    - Default :: undef
+
+=head4 --ihN
+
+Invert instance host matching.
+
+    - Default :: undef
+
+=head3 Instance Options
+
+=head4 -i  <instance>
+
+Instance.
+
+    - Default :: undef
+    - Type :: string
+
+=head4 --il
+
+Use like for matching instance.
+
+    - Default :: undef
+
+=head4 --iN
+
+Invert instance matching.
+
+    - Default :: undef
+
+=head3 Class Options
+
+=head4 -c <class>
+
+Classification.
+
+    - Default :: undef
+    - Type :: string
+
+=head4 --cl
+
+Use like for matching classification.
+
+    - Default :: undef
+
+=head4 --cN
+
+Invert class matching.
+
+    - Default :: undef
+
+=head3 Signature Options
+
+=head4 -s <sig>
+
+Signature.
+
+    - Default :: undef
+    - Type :: string
+
+=head4 --sl
+
+Use like for matching signature.
+
+    - Default :: undef
+
+=head4 --sN
+
+Invert signature matching.
+
+    - Default :: undef
+
+=head3 In Interface Options
+
+=head4 --if <if>
+
+Interface.
+
+    - Default :: undef
+    - Type :: string
+
+=head4 --ifl
+
+Use like for matching interface.
+
+    - Default :: undef
+
+=head4 --ifN
+
+Invert interface matching.
+
+    - Default :: undef
+
+=head3 App Proto Options
+
+=head4 --ap <proto>
+
+App proto.
+
+    - Default :: undef
+    - Type :: string
+
+=head4 --apl
+
+Use like for matching app proto.
+
+    - Default :: undef
+
+=head4 --apN
+
+Invert app proto matching.
+
+    - Default :: undef
+
+=head3 Rule Options
+
+=head4 --gid <gid>
+
+GID.
+
+    - Default :: undef
+    - Type :: integer
+
+=head4 --sid <sid>
+
+SID.
+
+    - Default :: undef
+    - Type :: integer
+
+=head4 --rev <rev>
+
+Rev.
+
+    - Default :: undef
+    - Type :: integer
+
+=head1 ENVIROMENTAL VARIABLES
+
+=head2 Lilith_table_color
+
+The L<Text::ANSITable> table color to use.
+
+    - Default :: Text::ANSITable::Standard::NoGradation
+
+=head2 Lilith_table_border
+
+The L<Text::ANSITable> border type to use.
+
+    - Default :: ASCII::None
+
+=head2 Lilith_IP_color
+
+Perl boolean for if IPs should be colored or not.
+
+    - Default :: 1
+
+=head2 Lilith_IP_private_color
+
+ANSI color to use for private IPs.
+
+    - Default :: bright_green
+
+=head2 Lilith_IP_remote_color
+
+ANSI color to use for remote IPs.
+
+    - Default :: bright_yellow
+
+=head2 Lilith_IP_local_color
+
+ANSI color to use for local IPs.
+
+    - Default :: bright_red
+
+=head2 Lilith_timesamp_drop_micro
+
+Perl boolean for if microseconds should be dropped or not.
+
+    - Default :: 1
+
+=head2 Lilith_instance_color
+
+If the lilith instance colomn info should be colored.
+
+    - Default :: 1
+
+=head2 Lilith_instance_type_color
+
+Color for the instance name.
+
+    - Default :: bright_blue
+
+=head2 Lilith_instance_slug_color
+
+Color for the insance slug.
+
+    - Default :: bright_magenta
+
+=head2 Lilith_instance_loc_color
+
+Color for the insance loc.
+
+    - Default :: bright_cyan.
+
+=cut
+
 use strict;
 use warnings;
 use Getopt::Long;
@@ -16,7 +445,7 @@ use Data::Dumper;
 use Sys::Syslog;
 
 sub version {
-	print "lilith v. 0.1.0\n";
+	print "lilith v. 0.2.0\n";
 }
 
 sub help {
@@ -61,6 +490,11 @@ Description :: LibreNMS style SNMP extend.
 -Z              LibreNMS style compression, gzipped and
                 then base64 encoded.
                 Default :: undef
+
+Action :: generate_baphomet_yamls
+Description :: Generate Baphomet rule YAMLs.
+
+--dir <dir>     Dir to output to.
 
 Action :: search
 Description :: Searches the specified table returns the results.
@@ -120,6 +554,12 @@ Description :: Searches the specified table returns the results.
 
 * Host Options
 
+Sagan :: Host is the sending system and instance host is the host the
+         instance is running on.
+
+Suricata :: Host is the system the instance is running on. There is no
+            instance host.
+
 --host <host>   Host.
                 Default :: undef
                 Type :: string
@@ -143,7 +583,7 @@ Description :: Searches the specified table returns the results.
 
 * Instance Options
 
---i <instance>  Instance.
+-i  <instance>  Instance.
                 Default :: undef
                 Type :: string
 
@@ -160,7 +600,7 @@ Description :: Searches the specified table returns the results.
                 Default :: undef
                 Type :: string
 
--cl             Use like for matching classification.
+--cl            Use like for matching classification.
                 Default :: undef
 
 --cN            Invert class matching.
@@ -173,7 +613,7 @@ Description :: Searches the specified table returns the results.
                 Default :: undef
                 Type :: string
 
--sl             Use like for matching signature.
+--sl            Use like for matching signature.
                 Default :: undef
 
 --sN            Invert signature matching.
@@ -182,11 +622,11 @@ Description :: Searches the specified table returns the results.
 
 * In Interface Options
 
--if <if>        Interface.
+--if <if>       Interface.
                 Default :: undef
                 Type :: string
 
--ifl            Use like for matching interface.
+--ifl           Use like for matching interface.
                 Default :: undef
 
 --ifN           Invert interface matching.
@@ -195,11 +635,11 @@ Description :: Searches the specified table returns the results.
 
 * App Proto Options
 
--ap <proto>     App proto.
+--ap <proto>    App proto.
                 Default :: undef
                 Type :: string
 
--apl            Use like for matching app proto.
+--apl           Use like for matching app proto.
                 Default :: undef
 
 --apN           Invert app proto matching.
@@ -286,6 +726,7 @@ my $daemonize;
 my $user  = 0;
 my $group = 0;
 my $librenms_compress;
+my $dir;
 Getopt::Long::Configure('no_ignore_case');
 Getopt::Long::Configure('bundling');
 GetOptions(
@@ -345,6 +786,7 @@ GetOptions(
 	'user=s'      => \$user,
 	'group=s'     => \$user,
 	'Z'           => \$librenms_compress,
+	'dir=s'       => \$dir,
 );
 
 # print version or help if requested
@@ -929,12 +1371,27 @@ if ( $action eq 'class_map' ) {
 	exit 0;
 }
 
+#
+# print short SNMP class names
+#
+
+
 if ( $action eq 'get_short_class_snmp_list' ) {
 	my $class_list = $lilith->get_short_class_snmp_list;
 
 	foreach my $item ( @{$class_list} ) {
 		print $item. "\n";
 	}
+
+	exit 0;
+}
+
+#
+# generate Baphomet YAMLs
+#
+
+if ( $action eq 'generate_baphomet_yamls' ) {
+	$lilith->generate_baphomet_yamls($dir);
 
 	exit 0;
 }

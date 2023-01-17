@@ -1,4 +1,4 @@
-# Copyright © Jim Avera 2012-2022.  This software may be distributed,
+# Copyright © Jim Avera 2012-2023.  This software may be distributed,
 # at your option, under the GNU General Public License version 1 or 
 # any later version, or the Perl "Artistic License".
 #
@@ -19,7 +19,7 @@ use 5.020;
 use feature qw(say state lexical_subs);
 use feature 'lexical_subs'; no warnings "experimental::lexical_subs";
 package  Data::Dumper::Interp;
-$Data::Dumper::Interp::VERSION = '4.0';
+$Data::Dumper::Interp::VERSION = '4.102';
 
 package  # newline prevents Dist::Zilla::Plugin::PkgVersion from adding $VERSION
   DB;
@@ -540,12 +540,12 @@ sub _show_as_number(_) {
   # if the utf8 flag is on, it almost certainly started as a string
   return 0 if !ref($value) && utf8::is_utf8($value);
 
-  # Recently there is a bug where looks_like_number provokes a warning from BigRat.pm
-  # if it is called under 'use bigrat;'
-  # https://github.com/Perl/perl5/issues/20685
+  # Recently there was a Perl bug where looks_like_number() provoked a 
+  # warning from BigRat.pm if it is called under 'use bigrat;'
+  #   https://github.com/Perl/perl5/issues/20685
   #return 0 unless looks_like_number($value);
 
-  # JSON::PP uses these tricks.  We used to do that but no longer.
+  # JSON::PP uses these tricks.  We used to do similarly but no longer.
   # string & "" -> ""  # bitstring AND, truncating to shortest operand
   # number & "" -> 0 (with warning)
   # number * 0 -> 0 unless number is nan or inf
@@ -555,20 +555,28 @@ sub _show_as_number(_) {
     use warnings "FATAL" => "all"; # Convert warnings into exceptions
     # 'bitwise' is the default only in newer perls. So disable.
     BEGIN {
-      if ($] >= 5.022) { # no feature 'bitwise' won't compile on Perl 5.20
-        require feature;
+      eval { # no feature 'bitwise' won't compile on Perl 5.20
         feature->unimport( 'bitwise' ); 
-        require warnings;
         warnings->unimport("experimental::bitwise");
-      }
+      };
     }
     no warnings "once";
     my $dummy = ($value & "");
   };
   if ($@) {
-    die "bug($@) ",_dbvis($value) unless $@ =~ /"" isn't numeric/;
-    #say "DD (",_dbvis($value),"): Got $@ ...so must be numeric";
-    return 1;  # value must be numeric
+    if ($@ =~ /"" isn't numeric/) {
+      return 1; # Ergo $value must be numeric
+    }
+    if ($@ =~ /\& not supported/) {
+      # If it is an object then it probably (but not necessarily)
+      # is numeric but just doesn't support bitwise operators,
+      # for example BigRat.
+      return 1 if defined blessed($value);
+    } 
+    warn "### ".__PACKAGE__." : Unhandled warn/exception from unary &:\n $@"
+      if $Data::Dumper::Interp::Debug;
+    # Unknown problem, treat as a string
+    return 0;
   } 
   elsif (ref($and_result) && $and_result =~ /NaN|Inf/) {
     # unary & returned a an object representing Nan or Inf 
@@ -576,6 +584,8 @@ sub _show_as_number(_) {
     return 1;
   }
   else {
+    warn "### ".__PACKAGE__." : (value & \"\") succeeded so must be stringy\n"
+      if $Data::Dumper::Interp::Debug;
     return 0;  # (value & "") succeeded so value must be stringy
   }
 }

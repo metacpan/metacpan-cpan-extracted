@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Class::Method::Modifiers; # git description: v2.12-17-gbc38636
+package Class::Method::Modifiers; # git description: v2.13-4-g6e49964
 # ABSTRACT: Provides Moose-like method modifiers
 # KEYWORDS: method wrap modification patch
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 
-our $VERSION = '2.13';
+our $VERSION = '2.14';
 
 use base 'Exporter';
 
@@ -234,7 +234,7 @@ Class::Method::Modifiers - Provides Moose-like method modifiers
 
 =head1 VERSION
 
-version 2.13
+version 2.14
 
 =head1 SYNOPSIS
 
@@ -515,7 +515,7 @@ Shawn M Moore <sartak@gmail.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Shawn M Moore Graham Knop Aaron Crane Peter Rabbitson Justin Hunter David Steinbrunner gfx mannih
+=for stopwords Karen Etheridge Shawn M Moore Graham Knop Aaron Crane Peter Rabbitson David Steinbrunner gfx Justin Hunter mannih
 
 =over 4
 
@@ -541,15 +541,15 @@ Peter Rabbitson <ribasushi@cpan.org>
 
 =item *
 
-Justin Hunter <justin.d.hunter@gmail.com>
-
-=item *
-
 David Steinbrunner <dsteinbrunner@pobox.com>
 
 =item *
 
 gfx <gfuji@cpan.org>
+
+=item *
+
+Justin Hunter <justin.d.hunter@gmail.com>
 
 =item *
 

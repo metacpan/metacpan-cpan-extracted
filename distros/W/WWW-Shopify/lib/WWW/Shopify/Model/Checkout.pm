@@ -37,7 +37,9 @@ BEGIN { $fields = {
 	"line_items" => new WWW::Shopify::Field::Relation::Many('WWW::Shopify::Model::Checkout::LineItem'),
 	"billing_address" => new WWW::Shopify::Field::Relation::OwnOne('WWW::Shopify::Model::Checkout::BillingAddress'),
 	"shipping_address" => new WWW::Shopify::Field::Relation::OwnOne('WWW::Shopify::Model::Checkout::ShippingAddress'),
-	"customer" => new WWW::Shopify::Field::Relation::OwnOne('WWW::Shopify::Model::Customer')};
+	"customer" => new WWW::Shopify::Field::Relation::OwnOne('WWW::Shopify::Model::Customer'),
+	"customer_locale" => new WWW::Shopify::Field::String()
+	};
 }
 
 my $queries; sub queries { return $queries; }

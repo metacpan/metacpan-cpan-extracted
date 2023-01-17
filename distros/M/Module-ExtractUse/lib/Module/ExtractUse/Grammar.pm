@@ -12217,7 +12217,7 @@ Module::ExtractUse::Grammar
 
 =head1 VERSION
 
-version 0.344
+version 0.345
 
 =head1 AUTHORS
 

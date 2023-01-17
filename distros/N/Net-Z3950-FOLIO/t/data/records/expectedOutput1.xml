@@ -39,6 +39,13 @@
           <enumAndChron>42 29</enumAndChron>
           <temporaryLocation>Online Library Resources</temporaryLocation>
         </circulation>
+        <circulation>
+          <availableNow value="0" />
+          <itemId>9876543210</itemId>
+          <renewable value="" />
+          <onHold value="" />
+          <enumAndChron>3 March</enumAndChron>
+        </circulation>
       </circulations>
     </holding>
   </holdings>

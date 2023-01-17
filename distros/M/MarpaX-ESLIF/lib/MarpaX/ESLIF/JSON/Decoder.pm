@@ -27,7 +27,7 @@ sub _EQ {
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '6.0.28'; # VERSION
+our $VERSION = '6.0.29'; # VERSION
 
 
 
@@ -53,7 +53,7 @@ MarpaX::ESLIF::JSON::Decoder - ESLIF's JSON decoder interface
 
 =head1 VERSION
 
-version 6.0.28
+version 6.0.29
 
 =head1 DESCRIPTION
 
@@ -121,15 +121,15 @@ Returns a value containing decoded C<$string>. In relax mode, special floating p
 
 =item C<+Infinity>
 
-Positive infinity, either as a native floating point number if the underlying system supports that, or as a C<Math::BigInt->binf()> instance.
+Positive infinity, either as a native floating point number if the underlying system supports that, or as a C<< Math::BigInt->binf() >> instance.
 
 =item C<-Infinity>
 
-Negative infinity, either as a native floating point number if the underlying system supports that, or as a C<Math::BigInt->binf('-')> instance.
+Negative infinity, either as a native floating point number if the underlying system supports that, or as a C<< Math::BigInt->binf('-') >> instance.
 
 =item C<NaN>
 
-Not-a-Number, either as a native floating point number if the underlying system supports that, or as a C<Math::BigInt->bnan()> instance.
+Not-a-Number, either as a native floating point number if the underlying system supports that, or as a C<< Math::BigInt->bnan() >> instance.
 
 =back
 

@@ -18,23 +18,18 @@ my %available =
 (
 	'linux-64'   =>
 	{
-		url => 'https://github.com/neovim/neovim/releases/download/v0.4.3/nvim-linux64.tar.gz',
+		url => 'https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz',
 		binary => 'nvim-linux64/bin/nvim',
 	},
 	'darwin-64'  =>
 	{
-		url => 'https://github.com/neovim/neovim/releases/download/v0.4.3/nvim-macos.tar.gz',
-		binary => 'nvim-osx64/bin/nvim',
-	},
-	'MSWin32-32' =>
-	{
-		url => 'https://github.com/neovim/neovim/releases/download/v0.4.3/nvim-win32.zip',
-		binary => 'Neovim/bin/nvim.exe',
+		url => 'https://github.com/neovim/neovim/releases/download/nightly/nvim-macos.tar.gz',
+		binary => 'nvim-macos/bin/nvim',
 	},
 	'MSWin32-64' =>
 	{
-		url => 'https://github.com/neovim/neovim/releases/download/v0.4.3/nvim-win64.zip',
-		binary => 'Neovim/bin/nvim.exe',
+		url => 'https://github.com/neovim/neovim/releases/download/nightly/nvim-win64.zip',
+		binary => 'nvim-win64/bin/nvim.exe',
 	},
 );
 
@@ -164,10 +159,10 @@ sub start_socket
 
 	$ENV{NVIM_LISTEN_ADDRESS} = $socket;
 
-	my $proc = Proc::Background->new ({die_upon_destroy => 1}, "$binary -u NORC --embed --headless");
+	my $proc = Proc::Background->new ({die_upon_destroy => 1}, "$binary -u NORC --embed --headless --listen $socket");
 	$this->{proc} = $proc;
 
-	my $session = Neovim::Ext::MsgPack::RPC::socket_session ($ENV{NVIM_LISTEN_ADDRESS}, 50, 100);
+	my $session = Neovim::Ext::MsgPack::RPC::socket_session ($socket, 50, 100);
 	return _configure ($session);
 }
 

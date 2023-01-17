@@ -10,10 +10,6 @@ modulebuildtiny(@ARGV);
 
 mbtiny - A standalone authoring script for Module::Build::Tiny
 
-=head1 VERSION
-
-version 0.029
-
 =head1 SYNOPSIS
 
  mbtiny listdeps | cpanm
@@ -98,7 +94,7 @@ A C<metamerge.json> or C<metamerge.yml> file can be used to merge any additional
 
 =head1 WORKFLOWS
 
-It supports two different workflows, which I call Feedback and Generator. In both cases, additional tools are used for various other authoring tasks such as perl-reversion, scan-prereqs-cpanfile and cpan-upload.
+It supports two different workflows, which I call Feedback and Generator.
 
 =head2 Feedback
 
@@ -170,9 +166,49 @@ This creates a directory containing all of the files of the distribution.
 
 List all dependencies of this distribution. By default it prints a list of modules. If the C<json> option option is given, it's printed as JSON instead.
 
+=item * scan
+
+This will scan the C<lib/>, C<script/> and C<t/> directories for dependencies and writes them to C<prereqs.json>. It accepts the following option:
+
+=over 4
+
+=item * omit_core = version
+
+This allows you to set a minimum perl version (e.g. C<5.008001> or C<v5.8.1>) whose core-provided dependencies will not be explicitly included.
+
+=item * omit = module
+
+This will omit a specific from the dependencies, it can be specified multiple times.
+
+=back
+
 =item * regenerate <files>
 
 This regenerates the given files. If no files are given, it defaults to the six files it can regenerate: F<Build.PL>, F<MANIFEST>, F<META.json> F<META.yml>, F<LICENSE> and F<README>. You usually want to do this after bumping the version of a module, adding a dependency or adding a file.
+
+=over 4
+
+=item * bump
+
+If this flag is given the version of the modules will be bumped during this regeneration.
+
+=item * version = <version>
+
+When bumping this sets the new version to a specific value instead of deriving it from the current version.
+
+=item * trial
+
+This makes the new version a trial version.
+
+=item * verbose
+
+Enable progress messages to be printed to STDOUT.
+
+=item * dry_run
+
+This will prevent the modules from being modified, this is useful with the verbose option to verify expected functionality.
+
+=back
 
 =item * mint <distribution>
 
@@ -219,6 +255,10 @@ This asks you about all configuration items that are currently empty. This is th
 =item * all
 
 This asks you about all configuration items, even if they currently have a value.
+
+=item * list
+
+This lists your current configuration.
 
 =item * reset
 

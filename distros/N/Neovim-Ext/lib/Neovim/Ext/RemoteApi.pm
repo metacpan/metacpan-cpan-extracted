@@ -1,5 +1,5 @@
 package Neovim::Ext::RemoteApi;
-$Neovim::Ext::RemoteApi::VERSION = '0.05';
+$Neovim::Ext::RemoteApi::VERSION = '0.06';
 use strict;
 use warnings;
 use base qw/Class::Accessor/;
@@ -51,7 +51,7 @@ Neovim::Ext::RemoteApi - Neovim RemoteApi class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

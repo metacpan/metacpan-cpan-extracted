@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
   "NAME" => "App::DiffPDFText",
   "PREREQ_PM" => {
     "App::PDFUtils" => "0.007",
+    "CLI::Meta::diff" => 0,
     "CLI::MetaUtil::Getopt::Long" => "0.002",
     "File::Slurper" => 0,
     "File::Temp" => "0.2307",
@@ -38,7 +39,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,6 +48,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "App::PDFUtils" => "0.007",
+  "CLI::Meta::diff" => 0,
   "CLI::MetaUtil::Getopt::Long" => "0.002",
   "File::Slurper" => 0,
   "File::Spec" => 0,

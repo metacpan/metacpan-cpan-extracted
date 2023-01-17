@@ -1,3 +1,10 @@
+0.005   2023-01-08  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Update Synopsis.
+
+
 0.004   2023-01-08  Released-By: PERLANCAR; Urgency: medium
 
         - Add on_final_failure option (thanks Dave Baird, GH#2).

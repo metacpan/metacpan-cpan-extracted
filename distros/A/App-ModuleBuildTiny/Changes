@@ -1,5 +1,11 @@
 Revision history for App-ModuleBuildTiny
 
+0.030     Mon Jan 16 12:16:05 AM CET 2023
+          - Allow for multiple prereq files
+          - Add scan command for prereqs
+          - Add --bump option to regenerate subcommand
+          - Add list action to configure subcommand
+
 0.029
           - Extract license from metamerge file
           - Several documentation fixes

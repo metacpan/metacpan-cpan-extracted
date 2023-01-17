@@ -1,7 +1,7 @@
 package LWP::Authen::OAuth2::Args;
 
 # ABSTRACT: Args
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 use warnings;
 use strict;
@@ -94,7 +94,7 @@ LWP::Authen::OAuth2::Args - Args
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 AUTHORS
 

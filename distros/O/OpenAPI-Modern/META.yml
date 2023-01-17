@@ -51,13 +51,13 @@ no_index:
 provides:
   JSON::Schema::Modern::Document::OpenAPI:
     file: lib/JSON/Schema/Modern/Document/OpenAPI.pm
-    version: '0.037'
+    version: '0.038'
   JSON::Schema::Modern::Vocabulary::OpenAPI:
     file: lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm
-    version: '0.037'
+    version: '0.038'
   OpenAPI::Modern:
     file: lib/OpenAPI/Modern.pm
-    version: '0.037'
+    version: '0.038'
 requires:
   Carp: '0'
   Encode: '2.89'
@@ -90,10 +90,10 @@ resources:
   bugtracker: https://github.com/karenetheridge/OpenAPI-Modern/issues
   homepage: https://github.com/karenetheridge/OpenAPI-Modern
   repository: https://github.com/karenetheridge/OpenAPI-Modern.git
-version: '0.037'
+version: '0.038'
 x_Dist_Zilla:
   perl:
-    version: '5.037006'
+    version: '5.037007'
   plugins:
     -
       class: Dist::Zilla::Plugin::Run::BeforeRelease
@@ -140,6 +140,7 @@ x_Dist_Zilla:
             - INSTALL
             - LICENCE
             - README.pod
+            - TODO
             - pull_request_template.md
           exclude_match: []
           follow_symlinks: 0
@@ -302,7 +303,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@Author::ETHER/Test::ReportPrereqs'
-      version: '0.028'
+      version: '0.029'
     -
       class: Dist::Zilla::Plugin::Test::Portability
       config:
@@ -321,14 +322,14 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Git::Describe
       name: '@Author::ETHER/Git::Describe'
-      version: '0.007'
+      version: '0.008'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
         Dist::Zilla::Plugin::PodWeaver:
           finder:
             - ':InstallModules'
-            - ':ExecFiles'
+            - ':PerlExecFiles'
           plugins:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
@@ -435,7 +436,7 @@ x_Dist_Zilla:
               name: OverrideLegal
               version: '0.05'
       name: '@Author::ETHER/PodWeaver'
-      version: '4.009'
+      version: '4.010'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@Author::ETHER/GithubMeta'
@@ -524,7 +525,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.38.1
+          git_version: 2.38.2
           include_authors: 0
           include_releaser: 1
           order_by: commits
@@ -591,9 +592,9 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20221120'
+          Module::CoreList: '5.20221220'
       name: '@Author::ETHER/EnsureLatestPerl'
-      version: '0.009'
+      version: '0.010'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -616,7 +617,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.1
+          git_version: 2.38.2
           repo_root: .
       name: '@Author::ETHER/initial check'
       version: '2.048'
@@ -624,7 +625,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.1
+          git_version: 2.38.2
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -632,7 +633,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.1
+          git_version: 2.38.2
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -643,7 +644,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: '@Author::ETHER/CheckPrereqsIndexed'
-      version: '0.021'
+      version: '0.022'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Author::ETHER/TestRelease'
@@ -658,7 +659,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.1
+          git_version: 2.38.2
           repo_root: .
       name: '@Author::ETHER/after tests'
       version: '2.048'
@@ -742,7 +743,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.1
+          git_version: 2.38.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -755,11 +756,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.037
+          tag: v0.038
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.1
+          git_version: 2.38.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -796,7 +797,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.1
+          git_version: 2.38.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -818,7 +819,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.1
+          git_version: 2.38.2
           repo_root: .
       name: '@Author::ETHER/Git::Push'
       version: '2.048'
@@ -941,7 +942,7 @@ x_Dist_Zilla:
       is_trial: 0
     version: '6.029'
 x_authority: cpan:ETHER
-x_generated_by_perl: v5.37.6
+x_generated_by_perl: v5.37.7
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

@@ -8,7 +8,7 @@
 #   The Artistic License 2.0 (GPL Compatible)
 #
 package Redis::Hash;
-$Redis::Hash::VERSION = '1.999';
+$Redis::Hash::VERSION = '2.000';
 # ABSTRACT: tie Perl hashes to Redis hashes
 # VERSION
 # AUTHORITY
@@ -86,7 +86,7 @@ Redis::Hash - tie Perl hashes to Redis hashes
 
 =head1 VERSION
 
-version 1.999
+version 2.000
 
 =head1 DESCRIPTION
 

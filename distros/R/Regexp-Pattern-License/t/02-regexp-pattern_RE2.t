@@ -16,7 +16,7 @@ ok $re;
 isa_ok $re, ['Regexp'],          're object is a Regexp';
 isa_ok $re, ['re::engine::RE2'], 're object is an RE2 object';
 
-regexp_patterns_in_module_ok 'Regexp::Pattern::License',        $OPTS;
+regexp_patterns_in_module_ok 'Regexp::Pattern::License', $OPTS;
 regexp_patterns_in_module_ok 'Regexp::Pattern::License::Parts', 'parts',
 	$OPTS;
 

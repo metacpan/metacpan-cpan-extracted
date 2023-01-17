@@ -1,11 +1,13 @@
-package Date::Extract;
+package Date::Extract; # git description: 0.06-9-g11a9993
+# ABSTRACT: Extract probable dates from strings
+
 use strict;
 use warnings;
 use DateTime::Format::Natural;
 use List::Util 'reduce';
 use parent 'Class::Data::Inheritable';
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 __PACKAGE__->mk_classdata($_) for qw/scalar_downgrade handlers regex/;
 
@@ -222,9 +224,17 @@ sub _extract {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-Date::Extract - extract probable dates from strings
+Date::Extract - Extract probable dates from strings
+
+=head1 VERSION
+
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -249,7 +259,7 @@ set to 2019. This is what your users would probably expect.
 
 =head1 METHODS
 
-=head2 new PARAMHASH => C<Date::Extract>
+=head2 C<new(PARAMHASH)> => C<Date::Extract>
 
 =head3 arguments
 
@@ -334,7 +344,7 @@ Returns all dates found in the string, in chronological order.
 
 =back
 
-=head2 extract text, ARGS => dates
+=head2 C<extract(text, ARGS) => dates
 
 Takes an arbitrary amount of text and extracts one or more dates from it. The
 return value will be zero or more dates, which by default are L<DateTime>
@@ -354,23 +364,23 @@ method. Just C<< Date::Extract->extract($foo) >> will work.
 
 =over 4
 
-=item * today; tomorrow; yesterday
+=item * C<today>; C<tomorrow>; C<yesterday>
 
-=item * last Friday; next Monday; previous Sat
+=item * C<last Friday>; C<next Monday>; C<previous Sat>
 
-=item * Monday; Mon
+=item * C<Monday>; C<Mon>
 
-=item * November 13th, 1986; Nov 13, 1986
+=item * C<November 13th, 1986>; C<Nov 13, 1986>
 
-=item * 13 November 1986; 13 Nov 1986
+=item * C<13 November 1986>; C<13 Nov 1986>
 
-=item * November 13th; Nov 13
+=item * C<November 13th>; C<Nov 13>
 
-=item * 13 Nov; 13th November
+=item * C<13 Nov>; C<13th November>
 
-=item * 1986/11/13; 1986-11-13
+=item * C<1986/11/13>; C<1986-11-13>
 
-=item * 11-13-86; 11/13/1986
+=item * C<11-13-86>; C<11/13/1986>
 
 =back
 
@@ -383,21 +393,61 @@ here.
 
 L<DateTime::Format::Natural>, L<Time::ParseDate>, L<Date::Manip>
 
-=head1 AUTHOR
-
-Shawn M Moore, C<< <sartak at bestpractical dot com> >>
-
 =head1 ACKNOWLEDGEMENTS
+
+=for :stopwords Schubiger
 
 Thanks to Steven Schubiger for writing the fine L<DateTime::Format::Natural>.
 We still use it, but it doesn't quite fill all the particular needs we have.
 
-=head1 COPYRIGHT & LICENSE
+=head1 SUPPORT
 
-Copyright 2007-2009 Best Practical Solutions.
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Extract>
+(or L<bug-Date-Extract@rt.cpan.org|mailto:bug-Date-Extract@rt.cpan.org>).
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
+
+=head1 AUTHOR
+
+Shawn M Moore, <sartak@gmail.com>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Karen Etheridge Steven Haryanto Jim Brandt Alex Vandiver Jesse Vincent Thomas Sibley
+
+=over 4
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=item *
+
+Jim Brandt <jbrandt@bestpractical.com>
+
+=item *
+
+Alex Vandiver <alex@chmrr.net>
+
+=item *
+
+Jesse Vincent <jesse@bestpractical.com>
+
+=item *
+
+Thomas Sibley <trs@bestpractical.com>
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2007 by Best Practical Solutions.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

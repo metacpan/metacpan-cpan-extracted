@@ -6,7 +6,7 @@ use Regexp::Pattern;
 use Regexp::Pattern::License;
 use Test2::API qw(context run_subtest);
 use Test2::Todo;
-use Test2::Util::Ref qw(rtype);
+use Test2::Util::Ref      qw(rtype);
 use Test2::Tools::Compare qw(like unlike);
 use Try::Tiny;
 

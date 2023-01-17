@@ -3,36 +3,35 @@ abstract: 'Monitor the OpenVZ user_beancounters file'
 author:
   - 'Steven Schubiger <schubiger@cpan.org>'
 build_requires:
-  Test::More: 0
+  File::Temp: '0'
+  FindBin: '0'
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0.38
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: App-OpenVZ-BCWatch
 provides:
   App::OpenVZ::BCWatch:
     file: lib/App/OpenVZ/BCWatch.pm
-    version: 0.04
-recommends:
-  Test::Pod: 1.14
-  Test::Pod::Coverage: 1.04
+    version: '0.05'
 requires:
-  Carp: 0
-  Config::File: 0
-  Daemon::Generic: 0
-  File::Basename: 0
-  File::HomeDir: 0
-  File::Spec: 0
-  File::Temp: 0
-  FindBin: 0
-  Mail::Sendmail: 0
-  Storable: 0
-  Sys::Hostname: 0
-  boolean: 0
+  Carp: '0'
+  Config::File: '0'
+  Daemon::Generic: '0'
+  File::Basename: '0'
+  File::HomeDir: '0'
+  File::Spec: '0'
+  Mail::Sendmail: '0'
+  Storable: '0'
+  Sys::Hostname: '0'
+  boolean: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.04
+  repository: https://github.com/stsc/App-OpenVZ-BCWatch
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -15,24 +15,27 @@ my $build = Module::Build->new
                  'Carp' => 0,
                  'Config::File' => 0,
                  'Daemon::Generic' => 0,
-                 'FindBin' => 0,
                  'File::Basename' => 0,
                  'File::HomeDir' => 0,
                  'File::Spec' => 0,
-                 'File::Temp' => 0,
                  'Mail::Sendmail' => 0,
                  'Storable' => 0,
                  'Sys::Hostname' => 0,
                },
-   build_requires => { 'Test::More' => 0 },
-   recommends => {
-                   'Test::Pod' => '1.14',
-                   'Test::Pod::Coverage' => '1.04',
-                 },
+   test_requires => {
+                      'FindBin' => 0,
+                      'File::Temp' => 0,
+                      'Test::More' => 0,
+                    },
    script_files => [ 'scripts/vzwatchd' ],
    license => 'perl',
    create_readme => 1,
    create_makefile_pl => 'traditional',
+   meta_merge => {
+       resources => {
+           repository => 'https://github.com/stsc/App-OpenVZ-BCWatch',
+       },
+   },
   );
 
 $build->create_build_script;

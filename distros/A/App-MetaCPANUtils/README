@@ -2,11 +2,17 @@ NAME
     App::MetaCPANUtils - CLI utilities related to MetaCPAN
 
 VERSION
-    This document describes version 0.006 of App::MetaCPANUtils (from Perl
-    distribution App-MetaCPANUtils), released on 2022-02-24.
+    This document describes version 0.007 of App::MetaCPANUtils (from Perl
+    distribution App-MetaCPANUtils), released on 2023-01-15.
 
 DESCRIPTION
     This distribution contains CLI utilities related to MetaCPAN:
+
+    *   diff-metacpan-releases
+
+    *   download-metacpan-release
+
+    *   list-metacpan-distribution-versions
 
     *   list-metacpan-distributions
 
@@ -19,6 +25,138 @@ DESCRIPTION
     *   open-metacpan-module-page
 
 FUNCTIONS
+  diff_metacpan_releases
+    Usage:
+
+     diff_metacpan_releases(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Diff two release tarballs.
+
+    Examples:
+
+    *   What changed between App-orgadb 0.014 and 0.015?:
+
+         diff_metacpan_releases(distribution => "App-orgadb", version1 => 0.014, version2 => 0.015);
+
+    *   What changed in the latest version of App-orgadb?:
+
+         diff_metacpan_releases(
+             distribution => "App-orgadb",
+           version1     => "latest-1",
+           version2     => "latest"
+         );
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   distribution* => *perl::distname*
+
+        (No description)
+
+    *   version1* => *perl::module::release::version*
+
+        (No description)
+
+    *   version2* => *perl::module::release::version*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  download_metacpan_release
+    Usage:
+
+     download_metacpan_release(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Download a release to the current directory.
+
+    Examples:
+
+    *   Download latest release of App-orgadb distribution:
+
+         download_metacpan_release(distribution => "App-orgadb");
+
+    *   Download the second latest release of App-orgadb distribution:
+
+         download_metacpan_release(distribution => "App-orgadb", version => "latest-1");
+
+    Uses HTTP::Tiny::Plugin so you can customize download behavior using
+    e.g. "HTTP_TINY_PLUGINS" environment variable.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   distribution* => *perl::distname*
+
+        (No description)
+
+    *   overwrite => *true*
+
+        Whether to overwrite existing downloaded file.
+
+    *   version => *perl::module::release::version*
+
+        If unspecified, will select the latest release.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  list_metacpan_distribution_versions
+    Usage:
+
+     list_metacpan_distribution_versions(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    List all versions of a distribution.
+
+    The versions will be sorted in a descending order.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   distribution* => *perl::distname*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
   list_metacpan_distributions
     Usage:
 
@@ -30,9 +168,15 @@ FUNCTIONS
 
     *   author => *cpan::pause_id*
 
+        (No description)
+
     *   fields => *array[str]* (default: ["distribution"])
 
+        (No description)
+
     *   sort => *str* (default: "distribution")
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -59,17 +203,29 @@ FUNCTIONS
 
     *   author => *cpan::pause_id*
 
+        (No description)
+
     *   fields => *array[str]* (default:
         ["module","date","author","status","maturity","version","release","a
         bstract"])
 
+        (No description)
+
     *   from_date => *date*
+
+        (No description)
 
     *   sort => *str* (default: "module")
 
+        (No description)
+
     *   status => *str* (default: "latest")
 
+        (No description)
+
     *   to_date => *date*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -96,25 +252,41 @@ FUNCTIONS
 
     *   author => *cpan::pause_id*
 
+        (No description)
+
     *   date => *date*
 
         Select a single day, alternative to `from_date` + `to_date`.
 
     *   distribution => *cpan::distname*
 
+        (No description)
+
     *   fields => *array[str]* (default:
         ["release","date","author","status","maturity","version","first","di
         stribution","abstract"])
 
+        (No description)
+
     *   first => *bool*
+
+        (No description)
 
     *   from_date => *date*
 
+        (No description)
+
     *   sort => *str* (default: "-date")
+
+        (No description)
 
     *   status => *str*
 
+        (No description)
+
     *   to_date => *date*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -143,7 +315,11 @@ FUNCTIONS
         ["release","date","author","status","maturity","version","first","di
         stribution","abstract"])
 
+        (No description)
+
     *   n => *posint*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -168,7 +344,9 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   dist* => *perl::distname*
+    *   distribution* => *perl::distname*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -194,6 +372,8 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   module* => *perl::modname*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -246,13 +426,13 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2021, 2020 by perlancar
+    This software is copyright (c) 2023, 2022, 2021, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

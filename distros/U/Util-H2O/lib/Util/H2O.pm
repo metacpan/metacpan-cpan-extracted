@@ -40,7 +40,7 @@ Util::H2O - Hash to Object: turns hashrefs into objects with accessors for keys
 
 =cut
 
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 # For AUTHOR, COPYRIGHT, AND LICENSE see the bottom of this file
 
 our @EXPORT = qw/ h2o /;  ## no critic (ProhibitAutomaticExportation)
@@ -89,11 +89,23 @@ one will take effect.
 Nested hashes are objectified as well. The only options that are passed down to
 nested hashes are C<-lock> and C<-ro>. I<None> of the other options will be
 applied to the nested hashes, including C<@additional_keys>. Nested arrayrefs
-are not recursed into.
+are not recursed into, but see the C<-arrays> option for that.
 
 Versions of this module before v0.12 did not pass down the C<-lock> option,
 meaning that if you used C<-nolock, -recurse> on those versions, the nested
 hashes would still be locked.
+
+=item C<-arrays>
+
+Like C<-recurse>, but additionally, C<h2o> is applied to elements of
+nested arrays as well. The same options as with C<-recurse> are
+passed down to nested hashes and arrayrefs. Takes precedence over the
+C<-pass> option, i.e. if you use these two options together,
+arrayrefs are still descended into. Like hashrefs, the original
+arrays are modified!
+
+This option implies C<-recurse>.
+This option was added in v0.20.
 
 =item C<-meth>
 
@@ -120,7 +132,7 @@ memory accordingly, and since this function installs the accessors in
 the package every time it is called, if you re-use the same package
 name, you will get "redefined" warnings. Therefore, if you want to
 create multiple objects in the same package, you should probably use
-C<-new>.
+C<-new> or C<-classify>.
 
 If you wanted to generate a unique package name in a different package,
 you could use:
@@ -156,6 +168,11 @@ C<package>, or perhaps if you want to write your methods as regular C<sub>s:
 
 Note C<h2o> will remain in the package's namespace, one possibility is that you
 could load L<namespace::clean> after you load this module.
+
+You might also note that in the above example, one could write C<angle> as a
+regular C<sub> in the package. And at that point, one might recongize the
+similarity between the code and what one can do with e.g.
+L<Class::Tiny|Class::Tiny> or even L<Moo|Moo>.
 
 =item C<< -isa => I<arrayref or scalar> >>
 
@@ -239,6 +256,7 @@ When this option is set to the string C<"ref">, then any value other than a
 plain hashref that is a reference, including objects, plus C<undef> as above,
 will be passed through without modification. Any hashes nested inside of these
 references will not be descended into, even when C<-recurse> is specified.
+However, C<-arrays> takes precedence over this option, see its documentation.
 
 This option was added in v0.18.
 
@@ -246,15 +264,17 @@ This option was added in v0.18.
 
 =head3 C<$hashref>
 
-You must supply a plain (unblessed) hash reference here. Be aware
+You must supply a plain (unblessed) hash reference here, unless
+you've specified the C<-pass> and/or C<-arrays> options. Be aware
 that this function I<does> modify the original hashref(s) by blessing
 it and locking its keyset (the latter can be disabled with the
 C<-lock> option), and if you use C<-meth> or C<-classify>, keys whose
 values are code references will be removed.
+If you use C<-arrays>, the elements of those arrays may also be modified.
 
-An accessor will be set up for each key in the hash; note that the
+An accessor will be set up for each key in the hash(es); note that the
 keys must of course be valid Perl identifiers for you to be able to
-call the method normally.
+call the method normally (see also the L</Cookbook>).
 
 The following keys will be treated specially by this module. Please note that
 there are further keys that are treated specially by Perl and/or that other
@@ -323,9 +343,10 @@ The (now blessed and optionally locked) C<$hashref>.
 our $_PACKAGE_REGEX = qr/\AUtil::H2O::_[0-9A-Fa-f]+\z/;
 
 sub h2o {  ## no critic (RequireArgUnpacking, ProhibitExcessComplexity)
-	my ($recurse,$meth,$class,$isa,$destroy,$new,$clean,$lock,$ro,$pass);
+	my ($recurse,$arrays,$meth,$class,$isa,$destroy,$new,$clean,$lock,$ro,$pass);
 	while ( @_ && $_[0] && !ref$_[0] && $_[0]=~/^-/ ) {
 		if ($_[0] eq '-recurse' ) { $recurse = shift }  ## no critic (ProhibitCascadingIfElse)
+		elsif ($_[0] eq '-arrays'){ $arrays  = shift }
 		elsif ($_[0] eq '-meth' ) { $meth    = shift }
 		elsif ($_[0] eq '-clean') { $clean   = (shift, shift()?1:0) }
 		elsif ($_[0] eq '-lock' ) { $lock    = (shift, shift()?1:0) }
@@ -362,9 +383,16 @@ sub h2o {  ## no critic (RequireArgUnpacking, ProhibitExcessComplexity)
 	}
 	$clean = !defined $class unless defined $clean;
 	$lock = 1 unless defined $lock;
+	$recurse = 1 if $arrays;
 	my $hash = shift;
 	if ( ref $hash ne 'HASH' ) {
-		if ( $pass ) {
+		if ( $arrays && ref $hash eq 'ARRAY' ) {
+			for (@$hash)
+				{ h2o( -arrays, -lock=>$lock, ($ro?-ro:()), $_ )
+					if ref eq 'HASH' || ref eq 'ARRAY' }
+			return $hash;
+		}
+		elsif ( $pass ) {
 			if ( $pass eq 'ref' ) {
 				return $hash if !defined $hash || ref $hash;
 				croak "this h2o call only accepts references or undef";
@@ -384,7 +412,14 @@ sub h2o {  ## no critic (RequireArgUnpacking, ProhibitExcessComplexity)
 	croak "h2o hashref may not contain a key named new if you use the -new option"
 		if $new && exists $keys{new};
 	croak "h2o can't turn off -lock if -ro is on" if $ro && !$lock;
-	if ($recurse) { ref eq 'HASH' and h2o(-recurse,-lock=>$lock,($ro?-ro:()),$_) for values %$hash }
+	if ($recurse) {
+		for (values %$hash) {
+			if ( $arrays && ref eq 'ARRAY' )
+				{ h2o(-arrays,  -lock=>$lock, ($ro?-ro:()), $_) }
+			elsif ( ref eq 'HASH' )
+				{ h2o(-recurse, -lock=>$lock, ($ro?-ro:()), $_) }
+		}
+	}
 	my $pack = defined $class ? $class : sprintf('Util::H2O::_%x', $hash+0);
 	for my $k (keys %keys) {
 		my $sub = $ro
@@ -425,30 +460,63 @@ sub h2o {  ## no critic (RequireArgUnpacking, ProhibitExcessComplexity)
 	return $hash;
 }
 
-=head2 C<o2h I<$h2object>>
+=head2 C<o2h I<@opts>, I<$h2object>>
 
-This function takes an object as created by C<h2o> and turns it back into a
-hashref by making shallow copies of the object hash and any nested objects that
-may have been created via C<-recurse> (or created manually). This function is
-recursive by default because for a non-recursive operation you can simply
-write: C<{%$h2object}> (making a shallow copy). Unlike C<h2o>, this function
-returns a new hashref instead of modifying the given variable in place (unless
-what you give this function is not an C<h2o> object, in which case it will just
-be returned unchanged).
+This function takes an object as created by C<h2o> and turns it back
+into a hashref by making shallow copies of the object hash and any
+nested objects that may have been created via C<-recurse>,
+C<-arrays>, or created manually. This function is recursive by
+default because for a non-recursive operation you can simply write:
+C<{%$h2object}> (making a shallow copy).
 
-B<Note> that this function operates only on objects in the default package - it
-does not step into plain arrayrefs or hashrefs, nor does it operate on objects
-created with the C<-class> or C<-classify> options. Also be aware that because
-methods created via C<-meth> are removed from the object hash, these will
-disappear in the resulting hashref.
+Unlike C<h2o>, this function returns a new hashref instead of
+modifying the given variable in place (unless what you give this
+function is not an C<h2o> object, in which case it will just be
+returned unchanged). Similarly, if you specify the C<-arrays> option,
+shallow copies of arrays will be returned in place of the original
+ones, with C<o2h> applied to the elements.
+
+B<Note> that this function operates only on objects in the default
+package - it does not step into plain hashrefs, it does not step into
+arrayrefs unless you specify C<-arrays>, nor does it operate on
+objects created with the C<-class> or C<-classify> options. Also be
+aware that because methods created via C<-meth> are removed from the
+object hash, these will disappear in the resulting hashref.
 
 This function was added in v0.18.
 
+=head3 C<@opts>
+
+If you specify an option with a value multiple times, only the last
+one will take effect.
+
+=over
+
+=item C<-arrays>
+
+If you specify this option, nested arrayrefs are descended into as well.
+
+This option was added in v0.20.
+
+=back
+
 =cut
 
-sub o2h {
+sub o2h {  ## no critic (RequireArgUnpacking)
+	my ($arrays);
+	while ( @_ && $_[0] && !ref$_[0] && $_[0]=~/^-/ ) {
+		if ($_[0] eq '-arrays' ) { $arrays = shift }
+		else { croak "unknown option to o2h: '$_[0]'" }
+	}
+	croak "missing argument to o2h" unless @_;
 	my $h2o = shift;
-	return ref($h2o) =~ $_PACKAGE_REGEX ? { map { $_ => o2h($h2o->{$_}) } keys %$h2o } : $h2o;
+	croak "too many arguments to o2h" if @_;
+	my @args = ( $arrays ? (-arrays) : () );
+	if ( ref($h2o) =~ $_PACKAGE_REGEX )
+		{ return { map { $_ => o2h(@args, $h2o->{$_}) } keys %$h2o } }
+	elsif ( $arrays && ref $h2o eq 'ARRAY' )
+		{ return [ map { o2h(@args, $_) } @$h2o ] }
+	return $h2o;
 }
 
 1;
@@ -588,7 +656,7 @@ inspired a lot of the features in this module!
 
 =head1 Author, Copyright, and License
 
-Copyright (c) 2020-2022 Hauke Daempfling (haukex@zero-g.net).
+Copyright (c) 2020-2023 Hauke Daempfling (haukex@zero-g.net).
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl 5 itself.

@@ -1,5 +1,5 @@
 package Neovim::Ext::Common;
-$Neovim::Ext::Common::VERSION = '0.05';
+$Neovim::Ext::Common::VERSION = '0.06';
 use strict;
 use warnings;
 use Exporter 'import';
@@ -36,7 +36,7 @@ Neovim::Ext::Common - Common functions
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 FUNCTIONS
 

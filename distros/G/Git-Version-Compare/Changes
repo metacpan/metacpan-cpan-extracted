@@ -1,5 +1,8 @@
 Revision history for Git-Version-Compare
 
+1.005 2023-01-14 BOOK
+    - Accepts Git non-standard version suffixes (GNUSTAVO)
+
 1.004 2016-05-24 BOOK
     - Remove a dependency on namespace::clean
     - Update the cache using the normalized version string

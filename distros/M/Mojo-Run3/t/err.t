@@ -16,7 +16,7 @@ subtest 'prepare filehandles' => sub {
   $run3->on(finish => sub { $finish++ });
   $run3->start(sub { $start++ });
   $run3->ioloop->one_tick;
-  like $err, qr{Can't pipe}, 'error';
+  like $err, qr{Can't create pipe}, 'error';
   is $start,             0, 'start';
   is $finish,            1, 'finished';
   is int($run3->status), 2, 'status';

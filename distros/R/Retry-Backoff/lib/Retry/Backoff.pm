@@ -11,7 +11,7 @@ use Time::HiRes qw(time);
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-01-08'; # DATE
 our $DIST = 'Retry-Backoff'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our @EXPORT_OK = qw(retry);
 
@@ -133,7 +133,7 @@ Retry::Backoff - Retry a piece of code, with backoff strategies
 
 =head1 VERSION
 
-This document describes version 0.004 of Retry::Backoff (from Perl distribution Retry-Backoff), released on 2023-01-08.
+This document describes version 0.005 of Retry::Backoff (from Perl distribution Retry-Backoff), released on 2023-01-08.
 
 =head1 SYNOPSIS
 
@@ -151,10 +151,11 @@ This document describes version 0.004 of Retry::Backoff (from Perl distribution 
 
  # other available 'retry' arguments
  retry { ... }
-     on_success   => sub { my $h = shift; ... },
-     on_failure   => sub { my $h = shift; ... },
-     retry_if     => sub { my $h = shift; ... },
-     non_blocking => 0;
+     on_success       => sub { my $h = shift; ... },
+     on_failure       => sub { my $h = shift; ... },
+     on_final_failure => sub { my $h = shift; ... },
+     retry_if         => sub { my $h = shift; ... },
+     non_blocking     => 0;
 
 =head1 DESCRIPTION
 

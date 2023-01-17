@@ -19,11 +19,11 @@ Regexp::Pattern::License - Regular expressions for legal licenses
 
 =head1 VERSION
 
-Version v3.9.4
+Version v3.10.0
 
 =cut
 
-our $VERSION = version->declare("v3.9.4");
+our $VERSION = version->declare("v3.10.0");
 
 =head1 SYNOPSIS
 
@@ -14876,7 +14876,7 @@ my $gen_args_capture = {
 
 my $gen_args_engine = {
 	summary =>
-		'Enable custom regexp engine (perl module re::engine::* or none)',
+		'Enable custom regexp engine (perl module re::engine::* or pseudo or none)',
 	schema => ['str*'],
 };
 
@@ -14895,7 +14895,7 @@ for my $id ( grep {/^[a-z]/} keys %RE ) {
 			or next;
 		$_TYPE{$id} = $1;
 		if ( $2 and $1 eq 'singleversion' ) {
-			push @_OBJECTS, $id;
+			push @_OBJECTS,          $id;
 			push @{ $_SERIES{$id} }, $2;
 		}
 		else {
@@ -15408,8 +15408,12 @@ for my $id (@_OBJECTS) {
 			}
 		}
 
-		$pat =~ s/(?:\[|\(:)[^\]]+?(?:\]|:\))/
-			exists $_ANNOTATIONS{$&} ? $_ANNOTATIONS{$&} : $&/ego;
+		if ( defined $args{engine} and $args{engine} eq 'pseudo' ) {
+		}
+		else {
+			$pat =~ s/(?:\[|\(:)[^\]]+?(?:\]|:\))/
+				exists $_ANNOTATIONS{$&} ? $_ANNOTATIONS{$&} : $&/ego;
+		}
 
 		# TODO: document if not obsoleted
 		# by <https://github.com/perlancar/perl-Regexp-Pattern/issues/4>
@@ -15435,7 +15439,7 @@ for my $id (@_OBJECTS) {
 				}
 				return qr/$pat/;
 			}
-			elsif ( $args{engine} eq 'none' ) {
+			elsif ( $args{engine} eq 'none' or $args{engine} eq 'pseudo' ) {
 				return $pat;
 			}
 			else {

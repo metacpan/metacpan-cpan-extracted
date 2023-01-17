@@ -1,0 +1,77 @@
+NAME
+    String::License - detect source code license statements in a text string
+
+VERSION
+    Version v0.0.3
+
+SYNOPSIS
+        use String::License;
+        use String::License::Naming::Custom;
+
+        my $string = 'Licensed under same terms as Perl itself';
+
+        my $expressed  = String::License->new( string => $string );
+        my $expression = $expressed->as_text;  # => "Perl"
+
+        my $desc        = String::License::Naming::Custom->new;
+        my $described   = String::License->new( string => $string, naming => $desc );
+        my $description = $described->as_text;  # => "The Perl 5 License"
+
+DESCRIPTION
+    String::License identifies license statements in a string and serializes
+    them in a normalized format.
+
+CONSTRUCTOR
+    new
+            my $licensed = String::License->new( string => 'Licensed under GPLv2' );
+
+        Accepts named arguments, and constructs and returns a String::License
+        object.
+
+        The following options are recognized:
+
+        string => STRING
+            The scalar string to parse for licensing information.
+
+        naming => OBJ
+            A String::License::Naming object, used to define license naming
+            conventions.
+
+            By default uses String::License::Naming::SPDX.
+
+            Since instantiation of naming schemes is expensive, there can be a
+            significant speed boost in passing a pre-initialized naming object
+            when processing multiple strings.
+
+METHODS
+    as_text
+        Returns identified licensing patterns as a string, either structured
+        as SPDX License Expressions, or with scheme-less naming as a short
+        description.
+
+AUTHOR
+    Jonas Smedegaard `<dr@jones.dk>`
+
+COPYRIGHT AND LICENSE
+    This program is based on the script "licensecheck" from the KDE SDK,
+    originally introduced by Stefan Westerfeld `<stefan@space.twc.de>`.
+
+      Copyright © 2007, 2008 Adam D. Barratt
+
+      Copyright © 2016-2023 Jonas Smedegaard
+
+      Copyright © 2017-2022 Purism SPC
+
+    This program is free software: you can redistribute it and/or modify it
+    under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3, or (at your option) any
+    later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+    License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program. If not, see <https://www.gnu.org/licenses/>.
+

@@ -30,7 +30,9 @@ BEGIN { $fields = {
 	"payment_details" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::Transaction::PaymentDetails"),
 	"user_id" => new WWW::Shopify::Field::Relation::ReferenceOne("WWW::Shopify::Model::User"), 
 	"device_id" => new WWW::Shopify::Field::String(),
-	"currency_exchange_adjustment" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::Transaction::CurrencyExchangeAdjustment")
+	"currency_exchange_adjustment" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::Transaction::CurrencyExchangeAdjustment"),
+	"processed_at" => new WWW::Shopify::Field::Date(),
+	"authorization_expires_at" => new WWW::Shopify::Field::Date()
 	};
 }
 sub creation_minimal { return qw(kind); }

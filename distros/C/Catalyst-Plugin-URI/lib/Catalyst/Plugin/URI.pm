@@ -2,10 +2,11 @@ package Catalyst::Plugin::URI;
 
 use Moo::Role;
 use Scalar::Util ();
+use Moo::_Utils ();
 
 requires 'uri_for';
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 my $uri_v1 = sub {
   my ($c, $path, @args) = @_;
@@ -58,55 +59,94 @@ my $uri_v2 = sub {
     # Fallback to static
     $action = $action_proto;
   }
-  die "We can't create a URI from $action with the given arguements"
+  die "We can't create a URI from $action with the given arguments"
     unless my $uri = $c->uri_for($action, @args);
 
   return $uri;
 };
 
-*uri = $uri_v2;
+my $uri_v3 = sub {
+  my ($c, $action_proto, @args) = @_;
+
+  # already is an $action
+  if(Scalar::Util::blessed($action_proto) && $action_proto->isa('Catalyst::Action')) {
+    die "We can't create a URI from '$action_proto' with the given arguments"
+      unless my $uri = $c->uri_for($action_proto, @args);
+    return $uri;
+  }
+
+  # Hard error if the spec looks wrong...
+  die "$action_proto is not a string" unless ref \$action_proto eq 'SCALAR';
+
+  my $action;
+  if($action_proto =~/^\/?\*/) {
+    die "$action_proto is not a named action"
+      unless $action = $c->dispatcher->get_action_by_path($action_proto);
+  } elsif($action_proto=~m/^(.*)\:(.+)$/) {
+    die "$1 is not a controller"
+      unless my $controller = $c->controller($1||'');
+    die "$2 is not an action for controller ${\$controller->component_name}"
+      unless $action = $controller->action_for($2);
+  } elsif($action_proto =~/\//) {
+    my $path = $action_proto=~m/^\// ? $action_proto : $c->controller->action_for($action_proto)->private_path;
+    die "$action_proto is not a full or relative private action path" unless $path;
+    die "$path is not a private path" unless $action = $c->dispatcher->get_action_by_path($path);
+  } elsif($action = $c->controller->action_for($action_proto)) {
+    # Noop
+  } else {
+    # Fallback to static
+    $action = $action_proto;
+  }
+
+  die "We can't create a URI from $action with the given arguments"
+    unless my $uri = $c->uri_for($action, @args);
+
+  return $uri;
+};
+
 
 after 'setup_finalize', sub {
   my ($c) = @_;
+
+  my $version = 3;
   if (my $config = $c->config->{'Plugin::URI'}) {
-    if($config->{use_v1}) {
-      *uri = $uri_v1;
-    } else {
-      *uri = $uri_v2;
+    $version = $config->{version} if exists $config->{version};
+    $version = 1 if exists $config->{use_v1} and $config->{use_v1};
+  }
+
+  if($version == 1) {
+    Moo::_Utils::_install_tracked($c, 'uri', $uri_v1);
+  } elsif($version == 2) {
+    Moo::_Utils::_install_tracked($c, 'uri', $uri_v2);
+    
+    # V2 does its own version of named actions
+    my %action_hash = %{$c->dispatcher->_action_hash||+{}};
+    foreach my $key (keys %action_hash) {
+      if(my ($name) = @{$action_hash{$key}->attributes->{Name}||[]}) {
+        die "You can only name endpoint actions on a chain"
+          if defined$action_hash{$key}->attributes->{CaptureArgs};
+        die "Named action '$name' is already defined"
+          if $c->dispatcher->_action_hash->{"/#$name"};
+        $c->dispatcher->_action_hash->{"/#$name"} = $action_hash{$key};      
+      }
     }
-  } else {
-    *uri = $uri_v2;
+    foreach my $method(qw/detach forward visit go/) {
+      Moo::_Utils::_install_modifier($c, 'around', $method, sub { 
+        my ($orig, $c, $action_proto, @args) = @_;
+        my $action;
+        if(defined($action_proto) && $action_proto =~/^\/?#/) {
+          die "$action_proto is not a named action"
+            unless $action = $c->dispatcher->get_action_by_path($action_proto);
+        } else {
+          $action = $action_proto;
+        }
+        $c->$orig($action, @args);
+      });
+    }
+  } elsif($version == 3) {
+    Moo::_Utils::_install_tracked($c, 'uri', $uri_v3);
   }
 };
-
-after 'setup_actions', sub {
-  my ($c) = @_;
-  my %action_hash = %{$c->dispatcher->_action_hash||+{}};
-  foreach my $key (keys %action_hash) {
-    if(my ($name) = @{$action_hash{$key}->attributes->{Name}||[]}) {
-      die "You can only name endpoint actions on a chain"
-        if defined$action_hash{$key}->attributes->{CaptureArgs};
-      die "Named action '$name' is already defined"
-        if $c->dispatcher->_action_hash->{"/#$name"};
-      $c->dispatcher->_action_hash->{"/#$name"} = $action_hash{$key};      
-    }
-  }
-};
-
-foreach my $method(qw/detach forward visit go/) {
-  around $method, sub {
-    my ($orig, $c, $action_proto, @args) = @_;
-    my $action;
-    if(defined($action_proto) && $action_proto =~/^\/?#/) {
-      die "$action_proto is not a named action"
-        unless $action = $c->dispatcher->get_action_by_path($action_proto);
-    } else {
-      $action = $action_proto;
-    }
-
-    $c->$orig($action, @args);
-  };
-}
 
 1;
 
@@ -145,11 +185,20 @@ This is just a shortcut with stronger error messages for:
 
 =head1 DESCRIPTION
 
-B<NOTE> Starting with version '0.003' I changed that way this works.  If you want
+B<NOTE> Starting with version C<0.003> I changed that way this works.  If you want
 or need the old API for backcompatibility please set the following configuration
 flag:
 
-    MyApp->config('Plugin::URI' => { use_v1 => 1 });
+    MyApp->config('Plugin::URI' => { version => 1 });
+
+B<NOTE> Starting with version C<0.005> we removed support for the hack that gave
+partial support for named actions.  We are proposing this for L<Catalyst> core and
+this version in earlier versions of this code didn't properly work anyway (didn't
+support using an action name in a Chained declaration for example).  If you are using
+and older Catalyst without core support for named actions and need the old behavior
+you can set it like this:
+
+    MyApp->config('Plugin::URI' => { version => 1 });
 
 Currently if you want to create a URL to a controller's action properly the formal
 syntax is rather verbose:
@@ -214,7 +263,7 @@ current one":
 
     my $url = $c->uri("../foo");  # $c->uri($self->action_for("../foo"));
 
-Experimentally we support named actions so that you can specify a link with a custom
+Experimentally (in versions prior top C<0.005>) we support named actions so that you can specify a link with a custom
 name:
 
     sub name_action :Local Args(0) Name(hi) {
@@ -261,7 +310,7 @@ L<Catalyst>
 
 =head1 COPYRIGHT & LICENSE
  
-Copyright 2015, John Napiorkowski L<email:jjnapiork@cpan.org>
+Copyright 2023, John Napiorkowski L<email:jjnapiork@cpan.org>
  
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

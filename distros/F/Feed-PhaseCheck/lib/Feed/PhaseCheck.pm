@@ -24,7 +24,7 @@ The output consists of the delay found, and the error in delayed point.
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -56,7 +56,7 @@ our $VERSION = '0.06';
 
 sub compare_feeds {
     my $sample          = shift;
-    my $main            = shift;
+    my $main_data       = shift;
     my $max_delay_check = shift || 0;
 
     if ($max_delay_check !~ /^\d+$/) {
@@ -67,13 +67,13 @@ sub compare_feeds {
         return;
     }
 
-    if (ref $main ne 'HASH' || scalar keys %$main < 2) {
+    if (ref $main_data ne 'HASH' || scalar keys %$main_data < 2) {
         return;
     }
 
-    my @main_epoches = sort keys %$main;
+    my @main_epoches = sort keys %$main_data;
     foreach (@main_epoches) {
-        if (int($_) != $_ || abs($main->{$_}) != $main->{$_}) {
+        if (int($_) != $_ || abs($main_data->{$_}) != $main_data->{$_}) {
             return;
         }
     }
@@ -88,30 +88,29 @@ sub compare_feeds {
     if ($sample_epoches[0] < $main_epoches[0] || $sample_epoches[-1] > $main_epoches[-1]) {
         return;
     }
-
-    my %main  = %$main;
-    my %error = ();
+    my %main_data = %$main_data;
+    my %error     = ();
     my ($min_error, $delay_for_min_error);
     my $delay1 = $sample_epoches[0] - $main_epoches[0] < $max_delay_check   ? $sample_epoches[0] - $main_epoches[0]   : $max_delay_check;
     my $delay2 = $main_epoches[-1] - $sample_epoches[-1] < $max_delay_check ? $main_epoches[-1] - $sample_epoches[-1] : $max_delay_check;
     for (my $delay = -$delay1; $delay <= $delay2; $delay++) {
         $error{$delay} = 0;
         foreach my $epoch (@sample_epoches) {
-            my $sample_epoch = $epoch - $delay;
-            if (!defined $main{$sample_epoch}) {
+            my $sample_epoch = $epoch + $delay;
+            if (!defined $main_data{$sample_epoch}) {
                 for (my $i = 1; $i < scalar keys @main_epoches; $i++) {
                     if ($main_epoches[$i] > $sample_epoch) {
-                        $main{$sample_epoch} = _interpolate(
+                        $main_data{$sample_epoch} = _interpolate(
                             $main_epoches[$i - 1],
-                            $main{$main_epoches[$i - 1]},
-                            $main_epoches[$i], $main{$main_epoches[$i]},
+                            $main_data{$main_epoches[$i - 1]},
+                            $main_epoches[$i], $main_data{$main_epoches[$i]},
                             $sample_epoch
                         );
                         last;
                     }
                 }
             }
-            $error{$delay} += ($main{$sample_epoch} - $sample->{$epoch})**2;
+            $error{$delay} += ($main_data{$sample_epoch} - $sample->{$epoch})**2;
         }
         if (!defined $min_error || $error{$delay} < $min_error) {
             $min_error           = $error{$delay};

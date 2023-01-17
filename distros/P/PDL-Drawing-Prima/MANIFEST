@@ -9,6 +9,11 @@ examples/test4.pl
 examples/test_simple.pl
 examples/Kuramoto.pl
 examples/game-of-life.pl
+lib/PDL/Drawing/Prima/pod/sin.png
+lib/PDL/Drawing/Prima/pod/skip0.png
+lib/PDL/Drawing/Prima/pod/skip1.png
+lib/PDL/Drawing/Prima/pod/skip2.png
+lib/PDL/Drawing/Prima/pod/skip3.png
 lib/PDL/Drawing/Prima.pm.PL
 lib/PDL/Drawing/Prima/Utils.pm.PL
 MANIFEST

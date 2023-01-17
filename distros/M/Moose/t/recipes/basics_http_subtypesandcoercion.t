@@ -8,7 +8,7 @@ $| = 1;
 
 
 # =begin testing SETUP
-use Test::Requires {
+use Test::Needs {
     'HTTP::Headers'  => '0',
     'Params::Coerce' => '0',
     'URI'            => '0',

@@ -510,6 +510,7 @@ foreach my $r1 ('%bx', '%si', '%di', '%bp') {
 	push @invalid16, permute_disp_att_all ('-', $r1, '', '', '', '5');
 	push @invalid16, permute_disp_att_all ('-', $r1, '', '', '', 'varname');
 
+	push @invalid16, permute_disp_att_all ('', '', '', $r1, '1', '7');
 	push @invalid16, permute_disp_att_all ('', '', '', $r1, '2', '7');
 	push @invalid16, permute_att ('', '2', '', $r1, '', '', '');
 	push @invalid16, permute_att ('', '-2', '', $r1, '', '', '');
@@ -523,6 +524,8 @@ foreach my $r1 ('%bx', '%si', '%di', '%bp') {
 		}
 		else {
 			push @valid16, permute_disp_att_all ('', $r1, '', $r2, '', '9');
+			push @valid16, permute_disp_att_all ('', $r1, '', $r2, '1', '9');
+			push @invalid16, permute_disp_att_all ('', $r1, '', $r2, '2', '9');
 		}
 
 		push @invalid16, permute_disp_att_all ('-', $r1, '', $r2, '', '11');
@@ -552,6 +555,7 @@ foreach my $r1 ('%ax', '%cs', '%cl', '%eax', '%rax', '%mm0', '%xmm1', '%ymm2', '
 
 push @invalid16, permute_disp_att_all ('', 'b%x', '', '', '', '1');
 push @invalid16, permute_disp_att_all ('', '%bx', '', 's%i', '', '1');
+push @invalid16, permute_disp_att_all ('', '', '', '%bx', '', '');
 
 push @invalid16, permute_att ('-', '%bx-%si', '', '', '', '', '');
 push @invalid16, permute_att ('-', '%si-%ax', '', '', '', '', '');
@@ -645,6 +649,7 @@ foreach my $r1 ('%bx', '%si', '%di', '%bp') {
 	push @invalid32, permute_disp_att_all ('', '%bx', '', $extreg, '', '1');
 	push @invalid32, permute_disp_att_all ('', $extreg, '', '%bx', '', '1');
 }
+push @invalid32, permute_disp_att_all ('', '%eax', '', '%ebx', '%cx', '1');
 
 foreach my $r1 ('%cx', '%cs', '%st0', '%cl', '%cr0', '%dr2', '%rax', '%r9d',
 	'%mm0', '%xmm3', '%ymm2', '%zmm3', '%k1') {
@@ -780,6 +785,10 @@ push @invalid32, permute_disp_att_all ('', 'bsi', '', '%cx', '2', '6');
 push @invalid32, permute_disp_att_all ('', '%si', '', 'bcx', '2', '6');
 push @invalid32, permute_disp_att_all ('-', '%bx', '', '', '', '');
 
+# impossible to generate
+push @invalid32, '(%ebx,,2)';
+push @invalid32, '%cs:(%ebx,,2)';
+
 # ----------- 64-bit
 
 my @valid64 = ();
@@ -790,9 +799,10 @@ push @invalid64, permute_att ('', '%brax', '', '', '', '', '');
 push @invalid64, permute_att ('', '%raxd', '', '', '', '', '');
 push @invalid64, permute_att ('', '%rbx', '', 'r%ax', '', '', '');
 
-foreach my $r1 ('%bx', '%si', '%di', '%bp') {
+foreach my $r1 ('%bx', '%si', '%di', '%bp', '%abc') {
 
 	push @invalid64, permute_disp_att_all ('', $r1, '', '', '', '1');
+	push @invalid64, permute_disp_att_all ('', '', '', $r1, '', '1');
 }
 
 foreach my $r1 ('%cx', '%cs', '%st0', '%cl', '%cr0', '%dr2', '%mm0', '%xmm3',
@@ -906,6 +916,7 @@ push @valid64, permute_disp_att_all ('', '%rsp', '', '%rcx', '', '11');
 push @valid64, permute_disp_att_all ('', '%rsp', '', '%rcx', '1', '13');
 push @valid64, permute_disp_att_all ('', '%rsp', '', '%rbp', '1', '15');
 
+push @invalid64, permute_disp_att_all ('', '%rip', '', '', '', '9');
 push @invalid64, permute_disp_att_all ('', '%rip', '', '%rcx', '', '11');
 push @invalid64, permute_disp_att_all ('', '%rip', '', '%rcx', '1', '13');
 push @invalid64, permute_disp_att_all ('', '%rip', '', '%rbp', '1', '15');
@@ -972,6 +983,12 @@ push @invalid64, permute_disp_att_all ('', '%rax -', '', '%rbx', '4', '6');
 push @invalid64, permute_disp_att_all ('', 'bsi', '', '%cx', '2', '6');
 push @invalid64, permute_disp_att_all ('', '%si', '', 'bcx', '2', '6');
 push @invalid64, permute_disp_att_all ('-', '%bx', '', '', '', 'varname');
+
+# impossible to generate
+push @invalid64, '(%rbx,,2)';
+push @invalid64, '%cs:(%rbx,,2)';
+push @invalid64, '(%rax,,%bx)';
+push @invalid64, '%cs:(%rax,,%bx)';
 
 # ----------- mixed
 

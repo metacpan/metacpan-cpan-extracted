@@ -3,18 +3,32 @@ package File::Process;
 use strict;
 use warnings;
 
-use parent qw{ Exporter };
+use parent qw( Exporter );
 
-our @EXPORT = qw{ process_file };    ## no critic (Modules::ProhibitAutomaticExportation)
+our @EXPORT = qw( process_file ); ## no critic (ProhibitAutomaticExportation)
 
-our @EXPORT_OK   = qw{ post pre process filter next_line };
-our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
+our @EXPORT_OK = qw(
+  post
+  pre
+  process
+  filter
+  next_line
+  $TRUE
+  $FALSE
+  $SUCCESS
+  $FAILURE
+);
+
+our %EXPORT_TAGS = (
+  'booleans' => [qw($TRUE $FALSE $SUCCESS $FAILURE)],
+  'all'      => \@EXPORT_OK,
+);
 
 use Carp;
-use English qw{-no_match_vars};
+use English qw(-no_match_vars);
 use IO::Scalar;
 use ReadonlyX;
-use Scalar::Util qw{ reftype openhandle };
+use Scalar::Util qw( reftype openhandle );
 
 Readonly my $SUCCESS => 1;
 Readonly my $FAILURE => 0;
@@ -23,7 +37,7 @@ Readonly my $FALSE   => 0;
 Readonly my $EMPTY   => q{};
 Readonly my $NL      => "\n";
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 our %DEFAULT_PROCESSORS = (
   pre       => \&_pre,
@@ -35,7 +49,9 @@ our %DEFAULT_PROCESSORS = (
 
 caller or __PACKAGE__->main();
 
+########################################################################
 sub _pre {
+########################################################################
   my ( $file, $args ) = @_;
 
   my $fh;
@@ -43,14 +59,14 @@ sub _pre {
   if ( openhandle $file ) {
     $fh = $file;
 
-    $args->{file} = ref $fh;    # GLOB
+    $args->{file} = ref $fh; # GLOB
   }
   else {
-    open $fh, '<', $file        ## no critic [InputOutput::RequireBriefOpen]
+    open $fh, '<', $file     ## no critic (RequireBriefOpen)
       or croak 'could not open ' . $file . $NL;
 
     $args->{'file'} = $file;
-  } ## end else [ if ( openhandle $file )]
+  }
 
   $args->{'raw_count'}  = 0;
   $args->{'skipped'}    = 0;
@@ -59,10 +75,13 @@ sub _pre {
   my $lines = $args->{merge_lines} ? IO::Scalar->new : [];
 
   return ( $fh, $lines );
-} ## end sub _pre
+}
 
+########################################################################
 sub _next_line {
+########################################################################
   my ( $fh, $all_lines, $args ) = @_;
+
   my $current_line;
 
   if ( openhandle $fh ) {
@@ -70,12 +89,14 @@ sub _next_line {
       defined( $current_line = readline $fh )
         or croak "readline failed: $OS_ERROR\n";
     }
-  } ## end if ( openhandle $fh )
+  }
 
   return $current_line;
-} ## end sub _next_line
+}
 
+########################################################################
 sub _filter {
+########################################################################
   my ( $fh, $all_lines, $args, $current_line ) = @_;
 
   if ( $args->{'chomp'} ) {
@@ -107,20 +128,24 @@ sub _filter {
     if ( $args->{'skip_comments'} && $current_line =~ /^\#/xsm ) {
       $skip = $TRUE;
     }
-  } ## end if ( $args->{'skip_blank_lines'...})
+  }
 
   $args->{skipped} = $args->{skipped} + $skip ? 1 : 0;
 
   return $skip ? undef : $current_line;
-} ## end sub _filter
+}
 
+########################################################################
 sub _process {
+########################################################################
   my ( $fh, $all_lines, $args, $current_line ) = @_;
 
   return $current_line;
 }
 
+########################################################################
 sub _post {
+########################################################################
   my ( $fh, $all_lines, $args ) = @_;
 
   $args->{end_time} = time;
@@ -140,7 +165,7 @@ sub _post {
   }
 
   return $retval, %{$args};
-} ## end sub _post
+}
 
 sub process_file {
   my ( $file, %args ) = @_;
@@ -150,9 +175,9 @@ sub process_file {
   $args{'file'} = $file || $EMPTY;
 
   my %processors
-    = map { ( $_, $args{$_} ) } qw{ pre filter next_line process post };
+    = map { ( $_, $args{$_} ) } qw( pre filter next_line process post );
 
-  foreach (qw{ pre filter next_line process post}) {
+  foreach (qw( pre filter next_line process post)) {
     if ( !$processors{$_} ) {
       $processors{$_} = $DEFAULT_PROCESSORS{$_};
     }
@@ -172,12 +197,12 @@ sub process_file {
 
     $args{'raw_count'}++;
 
-    foreach my $p ( @processors{qw{ filter process }} ) {
+    foreach my $p ( @processors{qw( filter process )} ) {
       $current_line
         = eval { return $p->( $fh, $all_lines, \%args, $current_line ); };
       last LINE if $EVAL_ERROR;
       next LINE if !defined $current_line;
-    } ## end foreach my $p ( @processors...)
+    }
 
     if ( $args{merge_lines} ) {
       $all_lines->print($current_line);
@@ -185,36 +210,48 @@ sub process_file {
     else {
       push @{$all_lines}, $current_line;
     }
-  } ## end LINE: while (1)
+  }
 
   if ($EVAL_ERROR) {
     croak "$EVAL_ERROR";
   }
 
   return $processors{'post'}->( $fh, $all_lines, \%args );
-} ## end sub process_file
+}
 
-sub post {    ## no critic [Subroutines::RequireArgUnpacking]
+########################################################################
+sub post { ## no critic [Subroutines::RequireArgUnpacking]
+########################################################################
   return $_[2]->{default_processors}->{post}->(@_);
 }
 
-sub filter {    ## no critic [Subroutines::RequireArgUnpacking]
+########################################################################
+sub filter { ## no critic [Subroutines::RequireArgUnpacking]
+########################################################################
   return $_[2]->{default_processors}->{filter}->(@_);
 }
 
-sub pre {    ## no critic [Subroutines::RequireArgUnpacking]
+########################################################################
+sub pre { ## no critic [Subroutines::RequireArgUnpacking]
+########################################################################
   return $_[1]->{default_processors}->{pre}->(@_);
 }
 
-sub process {    ## no critic [Subroutines::RequireArgUnpacking]
+########################################################################
+sub process { ## no critic [Subroutines::RequireArgUnpacking]
+########################################################################
   return $_[2]->{default_processors}->{process}->(@_);
 }
 
-sub next_line {    ## no critic [Subroutines::RequireArgUnpacking]
+########################################################################
+sub next_line { ## no critic [Subroutines::RequireArgUnpacking]
+########################################################################
   return $_[2]->{default_processors}->{next_line}->(@_);
 }
 
+########################################################################
 sub main {
+########################################################################
   require IO::Scalar;
   require Data::Dumper;
   require JSON::PP;
@@ -328,7 +365,7 @@ END_OF_TEXT
   print Dumper($csv_lines);
 
   exit 0;
-} ## end sub main
+}
 
 1;
 
@@ -378,14 +415,16 @@ text file. The class exports 1 method (C<process_file>) which invokes
 multiple subroutines that you can override or use in conjunction with
 your custom processors.
 
+I<See L<File::Process::Utils> for additional recipes.>
+
 =head1 EXPORTED METHODS
 
 This module exports 1 method by default (C<process_file>). You can
 export all of the default processor methods using the tag ':all'.
 
- use File::Process qw{ pre post };
+ use File::Process qw( pre post );
 
- use File::Process qw{ :all };
+ use File::Process qw( :all );
 
 =head1 METHODS AND SUBROUTINES
 
@@ -448,6 +487,8 @@ whitespace from the front, back or both front and back of a line. Note
 that this operation is performed I<before> your custom processor is
 called and may result in the line being skipped if the
 C<skip_blank_lines> option is set to a true value.
+
+=back
 
 =back
 
@@ -633,34 +674,48 @@ processors.  Pass these methods the same list you receive.
 
 =item * Read CSV file
 
+ use File::Process qw(pre process_file);
+ use Text::CSV_XS;
+ use Data::Dumper;
+ 
  my $csv = Text::CSV_XS->new;
-
+  
+ my $file = shift;
+ 
  my ($csv_lines) = process_file(
-   'foo.csv',
+   $file,
    csv   => $csv,
    chomp => 1,
    has_headers => 1,
    pre   => sub {
      my ( $fh, $args ) = @_;
-
+  
+     my ($fh, $all_lines) = pre($file, $args);
+ 
      if ( $args->{'has_headers'} ) {
        my @column_names = $args->{csv}->getline($fh);
        $args->{csv}->column_names(@column_names);
      }
-
-     return (pre($fh, $args));
+  
+     return ($fh, $all_lines);
    },
    next_line => sub {
      my ( $fh, $all_lines, $args ) = @_;
      my $ref = $args->{csv}->getline_hr($fh);
      return $ref;
      }
- );
+ )
+
+=back
 
 =head1 LICENSE
 
 This module is free software. It may be used, redistributed and/or
 modified under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<File::Process:Utils>
 
 =head1 AUTHOR
 

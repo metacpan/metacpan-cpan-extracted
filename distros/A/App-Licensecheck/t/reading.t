@@ -3,13 +3,18 @@ use Test2::Require::Module 'Regexp::Pattern::License' => '3.9.0';
 
 use Log::Any::Test;
 use Log::Any qw($log);
+use String::License::Naming::Custom;
 
 use App::Licensecheck;
 
 plan 14;
 
+my $naming
+	= String::License::Naming::Custom->new(
+	schemes => [qw(debian spdx internal)] );
+
 my @defaults = (
-	schemes   => [qw(debian spdx)],
+	naming    => $naming,
 	top_lines => 10,
 );
 

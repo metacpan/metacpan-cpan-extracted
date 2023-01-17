@@ -10,6 +10,8 @@ use DBI;
 use Digest::SHA qw(sha256_base64);
 use File::ReadBackwards;
 use Sys::Syslog;
+use YAML::PP;
+use File::Slurp;
 
 =head1 NAME
 
@@ -17,11 +19,11 @@ Lilith - Work with Suricata/Sagan EVE logs and PostgreSQL.
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.2
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.2';
 
 =head1 SYNOPSIS
 
@@ -672,6 +674,56 @@ sub extend {
 	}
 
 	return $to_return;
+}
+
+=head2 generate_baphomet_yamls
+
+Geneartes fastlog parsing YAMLs for baphomet.
+
+One argument is required is required and that is the dir to write out to.
+
+If there are any errors, it will die.
+
+=cut
+
+sub generate_baphomet_yamls {
+	my ( $self, $dir ) = @_;
+
+	# run some basic checks prior to starting trying to write them all
+	if ( !defined($dir) ) {
+		die('No directory specified to write files to');
+	}
+	elsif ( !-d $dir ) {
+		die( '"' . $dir . '" is not a directory' );
+	}
+	elsif ( !-w $dir ) {
+		die( '"' . $dir . '" is not writable' );
+	}
+
+	my $ypp  = YAML::PP->new( schema => [qw/ + Perl /] );
+	my @keys = keys( %{ $self->{class_map} } );
+	foreach my $class (sort(@keys)) {
+		my $lc_key    = lc($class);
+		my $snmp_name = $self->{snmp_class_map}{$lc_key};
+
+		my $yaml = $ypp->dump_string(
+			{
+				vars => {
+					'fastlog_class_to_use' => $class,
+				},
+				start_chomp   => 1,
+				start_pattern => '[== fastlog_chomp ==]',
+				includes      => ['common.yaml'],
+				regexp        => ['[== fastlog_chomped_with_class  ==]'],
+			}
+		);
+
+		my $name = 'fastlog_' . $snmp_name;
+		$name=~s/\ /_/g;
+		write_file( $dir . '/' . $name . '.yaml', $yaml );
+	}
+
+	return 1;
 }
 
 =head2 get_short_class

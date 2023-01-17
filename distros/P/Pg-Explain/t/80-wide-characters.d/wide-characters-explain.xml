@@ -1,0 +1,59 @@
+                         QUERY PLAN                         
+------------------------------------------------------------
+ <explain xmlns="http://www.postgresql.org/2009/explain">  +
+   <Query>                                                 +
+     <Plan>                                                +
+       <Node-Type>Seq Scan</Node-Type>                     +
+       <Parallel-Aware>false</Parallel-Aware>              +
+       <Async-Capable>false</Async-Capable>                +
+       <Relation-Name>pg_class</Relation-Name>             +
+       <Alias>pg_class</Alias>                             +
+       <Startup-Cost>0.00</Startup-Cost>                   +
+       <Total-Cost>19.15</Total-Cost>                      +
+       <Plan-Rows>1</Plan-Rows>                            +
+       <Plan-Width>273</Plan-Width>                        +
+       <Actual-Startup-Time>0.228</Actual-Startup-Time>    +
+       <Actual-Total-Time>0.230</Actual-Total-Time>        +
+       <Actual-Rows>0</Actual-Rows>                        +
+       <Actual-Loops>1</Actual-Loops>                      +
+       <Filter>(relname ~ 'żółw'::text)</Filter>           +
+       <Rows-Removed-by-Filter>441</Rows-Removed-by-Filter>+
+       <Shared-Hit-Blocks>14</Shared-Hit-Blocks>           +
+       <Shared-Read-Blocks>0</Shared-Read-Blocks>          +
+       <Shared-Dirtied-Blocks>0</Shared-Dirtied-Blocks>    +
+       <Shared-Written-Blocks>0</Shared-Written-Blocks>    +
+       <Local-Hit-Blocks>0</Local-Hit-Blocks>              +
+       <Local-Read-Blocks>0</Local-Read-Blocks>            +
+       <Local-Dirtied-Blocks>0</Local-Dirtied-Blocks>      +
+       <Local-Written-Blocks>0</Local-Written-Blocks>      +
+       <Temp-Read-Blocks>0</Temp-Read-Blocks>              +
+       <Temp-Written-Blocks>0</Temp-Written-Blocks>        +
+       <I-O-Read-Time>0.000</I-O-Read-Time>                +
+       <I-O-Write-Time>0.000</I-O-Write-Time>              +
+       <Temp-I-O-Read-Time>0.000</Temp-I-O-Read-Time>      +
+       <Temp-I-O-Write-Time>0.000</Temp-I-O-Write-Time>    +
+     </Plan>                                               +
+     <Planning>                                            +
+       <Shared-Hit-Blocks>158</Shared-Hit-Blocks>          +
+       <Shared-Read-Blocks>0</Shared-Read-Blocks>          +
+       <Shared-Dirtied-Blocks>0</Shared-Dirtied-Blocks>    +
+       <Shared-Written-Blocks>0</Shared-Written-Blocks>    +
+       <Local-Hit-Blocks>0</Local-Hit-Blocks>              +
+       <Local-Read-Blocks>0</Local-Read-Blocks>            +
+       <Local-Dirtied-Blocks>0</Local-Dirtied-Blocks>      +
+       <Local-Written-Blocks>0</Local-Written-Blocks>      +
+       <Temp-Read-Blocks>0</Temp-Read-Blocks>              +
+       <Temp-Written-Blocks>0</Temp-Written-Blocks>        +
+       <I-O-Read-Time>0.000</I-O-Read-Time>                +
+       <I-O-Write-Time>0.000</I-O-Write-Time>              +
+       <Temp-I-O-Read-Time>0.000</Temp-I-O-Read-Time>      +
+       <Temp-I-O-Write-Time>0.000</Temp-I-O-Write-Time>    +
+     </Planning>                                           +
+     <Planning-Time>0.432</Planning-Time>                  +
+     <Triggers>                                            +
+     </Triggers>                                           +
+     <Execution-Time>0.296</Execution-Time>                +
+   </Query>                                                +
+ </explain>
+(1 row)
+

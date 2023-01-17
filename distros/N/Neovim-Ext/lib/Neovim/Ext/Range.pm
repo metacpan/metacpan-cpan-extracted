@@ -1,5 +1,5 @@
 package Neovim::Ext::Range;
-$Neovim::Ext::Range::VERSION = '0.05';
+$Neovim::Ext::Range::VERSION = '0.06';
 use strict;
 use warnings;
 use base qw/Class::Accessor Tie::Array/;
@@ -87,7 +87,7 @@ Neovim::Ext::Range - Neovim Buffer range class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNPOSIS
 

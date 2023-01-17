@@ -1,5 +1,5 @@
 package Neovim::Ext::Plugin::ScriptHost;
-$Neovim::Ext::Plugin::ScriptHost::VERSION = '0.05';
+$Neovim::Ext::Plugin::ScriptHost::VERSION = '0.06';
 use strict;
 use warnings;
 use List::Util qw/min/;
@@ -149,7 +149,7 @@ Neovim::Ext::Plugin::ScriptHost - Neovim Legacy perl Plugin
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

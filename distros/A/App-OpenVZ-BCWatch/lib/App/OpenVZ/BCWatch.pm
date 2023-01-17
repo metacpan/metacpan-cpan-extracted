@@ -12,7 +12,7 @@ use Mail::Sendmail qw(sendmail);
 use Storable qw(store retrieve);
 use Sys::Hostname qw(hostname);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub new
 {
@@ -274,7 +274,7 @@ sub _send_mail
         From    => $self->{Config}->{mail}->{from},
         To      => $self->{Config}->{mail}->{to},
         Subject => $self->{Config}->{mail}->{subject},
-        Message => <<EOT,
+        Message => <<"EOT",
 ${\hostname}
 
 $report

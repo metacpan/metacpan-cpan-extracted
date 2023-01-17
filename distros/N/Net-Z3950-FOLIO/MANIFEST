@@ -28,6 +28,7 @@ doc/srs/using-srs.md
 etc/config.able.json
 etc/config.chicago.json
 etc/config.dummy.json
+etc/config.fieldPerItem.json
 etc/config.include-suppressed.json
 etc/config.indexdata.json
 etc/config.invalidisbn.json
@@ -68,6 +69,7 @@ t/08-short-session.t
 t/data/config/dummy.graphql-query
 t/data/config/foo.bar.json
 t/data/config/foo.baz.json
+t/data/config/foo.fieldPerItem.json
 t/data/config/foo.json
 t/data/config/foo.marcHoldings.json
 t/data/config/foo.postProcess.json
@@ -81,9 +83,12 @@ t/data/fetch/marc1.usmarc
 t/data/fetch/marc1.xml
 t/data/fetch/sorted1.json
 t/data/records/expectedMarc1.marc
+t/data/records/expectedMarc1byItem.marc
 t/data/records/expectedOutput1.xml
 t/data/records/expectedOutput2.xml
+t/data/records/expectedOutput3.xml
 t/data/records/input1.json
 t/data/records/input2.json
+t/data/records/input3.json
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,3 +1,8 @@
+0.047   2023-01-14  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schemas: perl::module::release::version{,s}.
+
+
 0.046   2022-12-16  Released-By: PERLANCAR; Urgency: medium
 
         - Add schemas:

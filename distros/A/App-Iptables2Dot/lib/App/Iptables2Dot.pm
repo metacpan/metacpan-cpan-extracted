@@ -7,7 +7,7 @@ use strict;
 use Carp;
 use Getopt::Long qw(GetOptionsFromString);
 
-use version; our $VERSION = qv('v0.3.2');
+use version; our $VERSION = qv('v0.3.3');
 
 # Module implementation here
 
@@ -42,13 +42,16 @@ my @optdefs = qw(
     physdev-out=s
     protocol|p=s
     reject-with
+    socket-exists
     source|s=s
     sport=s
     state=s
+    suppl-groups
     tcp-flags=s
     to-destination=s
     to-ports=s
     to-source
+    uid-owner=s
     ulog-prefix=s
 );
 
@@ -325,7 +328,7 @@ App::Iptables2Dot - turn iptables-save output into graphs for GraphViz
 
 =head1 VERSION
 
-This document describes App::Iptables2Dot version v0.3.2
+This document describes App::Iptables2Dot version v0.3.3
 
 
 =head1 SYNOPSIS

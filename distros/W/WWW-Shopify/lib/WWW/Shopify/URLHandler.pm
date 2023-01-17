@@ -66,8 +66,9 @@ sub handle_response {
 	}
 	my $limit = $response->header('x-shopify-shop-api-call-limit');
 	if ($limit) {
-		die new WWW::Shopify::Exception("Unrecognized limit.") unless $limit =~ m/(\d+)\/\d+/;
+		die new WWW::Shopify::Exception("Unrecognized limit.") unless $limit =~ m/(\d+)\/(\d+)/;
 		$self->parent->api_calls($1);
+		$self->parent->max_api_calls($2);
 	}
 	my $content = $response->decoded_content;
 	# From JSON because decodec content is already a perl internal string.

@@ -29,7 +29,7 @@ BEGIN { $fields = {
 	"billing_address" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::DraftOrder::BillingAddress"),
 	"shipping_address" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::DraftOrder::ShippingAddress"),
 	"invoice_url" => new WWW::Shopify::Field::String::URL(),
-	"applied_discount" => new WWW::Shopify::Field::Money(),
+	"applied_discount" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::DraftOrder::AppliedDiscount"),
 	"order_id" => new WWW::Shopify::Field::Relation::ReferenceOne('WWW::Shopify::Model::Order'),
 	"line_items" => new WWW::Shopify::Field::Relation::Many('WWW::Shopify::Model::DraftOrder::LineItem'),
 	"shipping_line" => new WWW::Shopify::Field::Relation::OwnOne('WWW::Shopify::Model::DraftOrder::ShippingLine'),
@@ -46,7 +46,7 @@ BEGIN { $queries = {
 }; }
 
 sub creation_filled { return qw(invoice_url) }
-sub update_fields { return qw(note note_attributes email buyer_accepts_marketing customer tags name shipping_address metafields); };
+sub update_fields { return qw(note note_attributes email buyer_accepts_marketing customer tags name shipping_address metafields line_items applied_discount); };
 sub actions { return qw(send_invoice); }
 
 

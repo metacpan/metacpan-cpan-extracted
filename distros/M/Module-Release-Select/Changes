@@ -1,0 +1,8 @@
+0.002   2023-01-15  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix return value of select_release() (context trap).
+
+
+0.001   2023-01-13  Released-By: PERLANCAR
+
+        - First release.

@@ -22,9 +22,9 @@
 #
 
 package API::Octopart;
-$VERSION = 1.002;
+$VERSION = 1.003;
 
-use 5.006;
+use 5.010;
 use strict;
 use warnings;
 

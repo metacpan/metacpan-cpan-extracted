@@ -1,4 +1,18 @@
 Revision history for Perl extension ExtUtils::MakeMaker::META_MERGE::GitHub.
 
+0.04 2023-01-14
+  - Updated lib to add support for gitlab by adding host support
+  - Updated lib to add support for login and protocol
+  - Updated script to support host and login
+  - Updated script for pretty print
+  - Updated spec to fix license
+
+0.03 2022-10-02
+  - Removed author tests from CPAN distribution
+  - Updated spec file - added requirement for git command for script
+
+0.02 2022-05-22
+  - Added script perl-ExtUtils-MakeMaker-META_MERGE-GitHub.pl
+
 0.01 2022-05-19
   - original version; created by h2xs 1.23 with options

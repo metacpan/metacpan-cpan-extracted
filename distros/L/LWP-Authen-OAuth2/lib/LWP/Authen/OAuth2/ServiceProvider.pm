@@ -1,7 +1,7 @@
 package LWP::Authen::OAuth2::ServiceProvider;
 
 # ABSTRACT: ServiceProvider base class
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 use 5.006;
 use strict;
@@ -187,9 +187,10 @@ sub collect_action_params {
         my $result = {
             %$default,
             (
-                map {($_, $oauth2_args->{$_})}
-                    @{ $self->{"$action\_required_params"} },
-                    @{ $self->{"$action\_optional_params"} }
+                map {
+                    exists $oauth2_args->{$_} ? ($_, $oauth2_args->{$_}) : ()
+                } @{ $self->{"$action\_required_params"} },
+                  @{ $self->{"$action\_optional_params"} }
             ),
             %$opt
         };
@@ -423,7 +424,7 @@ LWP::Authen::OAuth2::ServiceProvider - ServiceProvider base class
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

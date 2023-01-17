@@ -1,0 +1,12 @@
+                                             QUERY PLAN                                              
+-----------------------------------------------------------------------------------------------------
+ Seq Scan on pg_class  (cost=0.00..19.15 rows=1 width=273) (actual time=0.220..0.221 rows=0 loops=1)
+   Filter: (relname ~ 'żółw'::text)
+   Rows Removed by Filter: 441
+   Buffers: shared hit=14
+ Planning:
+   Buffers: shared hit=158
+ Planning Time: 0.414 ms
+ Execution Time: 0.282 ms
+(8 rows)
+

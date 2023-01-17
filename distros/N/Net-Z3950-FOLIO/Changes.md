@@ -1,9 +1,21 @@
 # Revision history for Perl extension Net::Z3950::FOLIO.
 
+## [3.2.0](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v3.2.0) (Fri Jan 13 19:13:17 GMT 2023)
+
+* Loosen requirements for `search` interface to allow v0.7. Fixes ZF-71.
+* Restructure Dockerfile to be more efficient and reliable. Fixes ZF-72.
+* New `fieldPerItem` configuration entry allows each item to be placed in its own MARC holdings field rather than each item in a holding sharing the field. Fixes ZF-74.
+* Reinstate error-reporting for GraphQL errors (it seems that the way these are reported in the WSAPI response has changed). Fixes ZF-75.
+* Switch base image from perl:5 to perl:5-slim. Use signed-by indexdata.asc for apt. Fixes ZF-73.
+* Update definitions of access-points 7, 8 and 1211 (ISBN, ISSN and OCLC Number) for mod-search. Fixes ZF-77.
+* Remove literal '\n' sequence from between consecutive `<holding>` entries in OPAC XML records. Fixes ZF-78.
+
 ## [3.1.0](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v3.1.0) (Sun Nov 27 08:36:08 GMT 2022)
 
 * Generate ModuleDescriptor from template, avoiding the possibility of its version-number getting out of sync with that of `lib/Net/Z3950/FOLIO.pm`. Fixes ZF-64.
 * Extend post-processing capabilities to OPACXML records. Fixes ZF-68.
+* Use SSL for indexdata.asc to prevent supply-chain MitM attack. Fixes ZF-69.
+* Upgrade from perl:5.30 (EOL) to perl:5 (=latest 5). Fixes FZ-70.
 
 ## [3.0.1](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v3.0.1) (Mon 27 Jun 13:26:46 BST 2022)
 

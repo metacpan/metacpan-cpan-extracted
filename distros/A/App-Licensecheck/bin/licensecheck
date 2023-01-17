@@ -12,7 +12,7 @@ licensecheck - simple license checker for source files
 
 =head1 VERSION
 
-Version v3.3.3
+Version v3.3.7
 
 =head1 SYNOPSIS
 
@@ -57,16 +57,17 @@ use Pod::Constants
 	-trim                   => 1,
 	'COPYRIGHT AND LICENSE' =>
 	sub { ($COPYRIGHT) = s/C<< (.*) >>/$1/gr; $COPYRIGHT =~ s/Â©/©/g };
+use String::License::Naming::Custom;
 use Path::Tiny;
 use Path::Iterator::Rule;
 use String::Escape  qw(unbackslash);
-use List::SomeUtils qw(uniq);
+use List::Util 1.45 qw(uniqstr);
 use Log::Any        qw($log);
 use Log::Any::Adapter;
 
 use App::Licensecheck;
 
-our $VERSION = 'v3.3.3';
+our $VERSION = 'v3.3.7';
 
 my $progname = path($0)->basename;
 
@@ -352,30 +353,37 @@ else {
 pod2usage(1) if ( $OPT{help} );
 if ( $OPT{version} ) { version(); exit 0; }
 
-my @shortname_schemes;
+my @schemes;
 if ( $OPT{'shortname-scheme'} ) {
-	@shortname_schemes = split /[\s,]+/, $OPT{'shortname-scheme'};
+	@schemes = split /[\s,]+/, $OPT{'shortname-scheme'};
 }
-elsif ( $OPT{'deb-machine'} || $OPT{'deb-fmt'} ) {
-	@shortname_schemes = qw(debian spdx);
+elsif ($OPT{'deb-machine'}
+	|| $OPT{'deb-fmt'}
+	|| $OPT{'list-licenses'}
+	|| $OPT{'list-naming-schemes'} )
+{
+	@schemes = qw(debian spdx);
 }
-my %LIB_OPTS = (
 
-	# resolve patterns
-	schemes => \@shortname_schemes,
-);
+# TODO: skip when future option '--strict-schemes' is enabled
+push @schemes, 'internal'
+	if @schemes;
+
+my $naming;
+if (@schemes) {
+	$naming = String::License::Naming::Custom->new( schemes => \@schemes );
+}
+else {
+	$naming = String::License::Naming::Custom->new( schemes => \@schemes );
+}
 
 if ( $OPT{'list-licenses'} ) {
-	my $app = App::Licensecheck->new(%LIB_OPTS);
-
-	say for $app->list_licenses;
+	say for $naming->list_licenses;
 	exit 0;
 }
 
 if ( $OPT{'list-naming-schemes'} ) {
-	my $app = App::Licensecheck->new(%LIB_OPTS);
-
-	say for $app->list_naming_schemes;
+	say for $naming->list_schemes;
 	exit 0;
 }
 
@@ -393,12 +401,14 @@ pod2usage("$progname: No paths provided.")
 	unless @ARGV;
 
 my $app = App::Licensecheck->new(
-	%LIB_OPTS,
 
 	# parse
 	top_lines => $OPT{lines},
 	end_bytes => $OPT{tail},
 	encoding  => $OPT{encoding},
+
+	# report
+	naming => $naming,
 );
 
 my $default_check_regex = q!
@@ -505,7 +515,7 @@ foreach my $file ( $do->all( @paths, \%options ) ) {
 	my ( $license, $copyright ) = $app->parse($file);
 
 	# drop duplicates
-	my @copyrights = uniq sort { $b cmp $a } split /^/, $copyright;
+	my @copyrights = uniqstr sort { $b cmp $a } split /^/, $copyright;
 	chomp @copyrights;
 
 	if ( $OPT{'deb-machine'} ) {
@@ -563,7 +573,8 @@ HEADER
 		keys %patternfiles
 		)
 	{
-		my @ownerlines_unique = uniq sort @{ $patternownerlines{$pattern} };
+		my @ownerlines_unique
+			= uniqstr sort @{ $patternownerlines{$pattern} };
 		@ownerlines_unique = ('NONE') unless (@ownerlines_unique);
 		print 'Files: ',
 			join(

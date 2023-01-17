@@ -1,161 +1,149 @@
-{
-  "acquisitionFormat": null,
-  "acquisitionMethod": null,
-  "callNumber": "G1046.C3<L56>2009eb",
-  "callNumberPrefix": null,
-  "callNumberSuffix": null,
-  "callNumberTypeId": "95467209-6d7b-468b-94df-0f5d7ad2747d",
-  "copyNumber": null,
-  "digitizationPolicy": null,
-  "discoverySuppress": null,
-  "electronicAccess": [
-    {
-      "linkText": null,
-      "materialsSpecification": null,
-      "publicNote": "Access E-Book",
-      "relationshipId": "f5d0068e-6272-458e-8a81-b85e7b9a14aa",
-      "uri": "https://ezproxy.simmons.edu/login?url=http://www.jstor.org/stable/10.2307/j.ctt24hc08"
-    }
-  ],
-  "formerIds": [],
-  "bareHoldingsItems": [
-    {
-      "accessionNumber": null,
-      "barcode": "9876543210",
-      "chronology": "March",
-      "copyNumber": "1",
-      "descriptionOfPieces": null,
-      "discoverySuppress": true,
-      "electronicAccess": [
-        {
-          "linkText": null,
-          "materialsSpecification": null,
-          "publicNote": "Access E-Book",
-          "relationshipId": "f5d0068e-6272-458e-8a81-b85e7b9a14aa",
-          "uri": "https://ezproxy.simmons.edu/login?url=http://www.jstor.org/stable/10.2307/j.ctt24hc08"
-        }
-      ],
-      "enumeration": "3",
-      "formerIds": [],
-      "hrid": "i2036897",
-      "id": "69746298-a428-11ea-b7fc-94e55e224816",
-      "inTransitDestinationServicePointId": null,
-      "itemDamagedStatusDate": null,
-      "itemDamagedStatusId": null,
-      "itemIdentifier": null,
-      "itemLevelCallNumber": "G1046.C3 .L56 2009eb",
-      "itemLevelCallNumberPrefix": null,
-      "itemLevelCallNumberSuffix": null,
-      "itemLevelCallNumberTypeId": "95467209-6d7b-468b-94df-0f5d7ad2747d",
-      "metadata": null,
-      "missingPieces": null,
-      "missingPiecesDate": null,
-      "notes": [
-        {
-          "itemNoteType": {
-            "id": "8d0a5eca-25de-4391-81a9-236eeefdd20b",
-            "name": "Note",
-            "source": "folio"
-          },
-          "itemNoteTypeId": "8d0a5eca-25de-4391-81a9-236eeefdd20b",
-          "note": "Online",
-          "staffOnly": false
-        }
-      ],
-      "numberOfMissingPieces": null,
-      "numberOfPieces": null,
-      "permanentLocationId": null,
-      "statisticalCodeIds": [],
-      "status": {
-        "name": "Available"
-      },
-      "temporaryLoanTypeId": null,
-      "temporaryLocationId": null,
-      "volume": "",
-      "yearCaption": []
-    }
-  ],
-  "holdingsStatements": [],
-  "holdingsStatementsForIndexes": [],
-  "holdingsStatementsForSupplements": [],
-  "holdingsTypeId": null,
-  "hrid": "b2245518-elere",
-  "id": "697448a8-a428-11ea-b7fc-94e55e224816",
-  "illPolicyId": null,
-  "instanceId": "2ff48cb6-a41c-11ea-8d99-9ee25e224816",
-  "metadata": null,
-  "notes": [
-    {
-      "holdingsNoteType": {
-        "id": "a336ce03-f68a-4875-b82a-4f21df8139c5",
-        "name": "Bound with",
-        "source": "local"
-      },
-      "holdingsNoteTypeId": "a336ce03-f68a-4875-b82a-4f21df8139c5",
-      "note": "This is a holdings note",
-      "staffOnly": false
-    },
-    {
-      "holdingsNoteType": {
-        "id": "6a41b714-8574-4084-8d64-a9373c3fbb59",
-        "name": "Reproduction",
-        "source": "folio"
-      },
-      "holdingsNoteTypeId": "6a41b714-8574-4084-8d64-a9373c3fbb59",
-      "note": "May be freely copied",
-      "staffOnly": false
-    }
-  ],
-  "numberOfItems": null,
-  "permanentLocation": {
-    "campus": {
-      "code": "SIMC",
-      "id": "ad802880-d3c1-47ea-84d9-5f6574ec72a2",
-      "institutionId": "abc7866d-e53f-4da1-bcc0-84535a9a832e",
-      "name": "Main Campus"
-    },
-    "campusId": "ad802880-d3c1-47ea-84d9-5f6574ec72a2",
-    "code": "elere",
-    "description": null,
-    "discoveryDisplayName": "Online Library Resources",
-    "id": "b681f0f3-c5d3-434f-8c15-db3d8b074c43",
-    "institution": {
-      "code": "SIM",
-      "id": "abc7866d-e53f-4da1-bcc0-84535a9a832e",
-      "name": "Simmons University"
-    },
-    "institutionId": "abc7866d-e53f-4da1-bcc0-84535a9a832e",
-    "isActive": true,
-    "library": {
-      "code": "SIM",
-      "id": "2805564c-b9e2-45ba-9c6f-670b11b808e2",
-      "name": "Simmons University Library"
-    },
-    "libraryId": "2805564c-b9e2-45ba-9c6f-670b11b808e2",
-    "metadata": {
-      "createdByUserId": "7a16958e-af23-5002-8191-d7a96f5f8070",
-      "createdByUsername": null,
-      "createdDate": "2020-06-01T16:29:19.798+0000",
-      "updatedByUserId": "7a16958e-af23-5002-8191-d7a96f5f8070",
-      "updatedByUsername": null,
-      "updatedDate": "2020-06-01T16:29:19.798+0000"
-    },
-    "name": "Online Library Resources",
-    "primaryServicePoint": "7c5abc9f-f3d7-4856-b8d7-6712462ca007",
-    "primaryServicePointObject": {
-      "code": "Online",
-      "description": null,
-      "discoveryDisplayName": "Online",
-      "id": "7c5abc9f-f3d7-4856-b8d7-6712462ca007",
-      "name": "Online",
-      "pickupLocation": false,
-      "shelvingLagTime": 0
-    },
-    "servicePointIds": [
-      "7c5abc9f-f3d7-4856-b8d7-6712462ca007"
-    ],
-    "servicePoints": [
+[
+  {
+    "acquisitionFormat": null,
+    "acquisitionMethod": null,
+    "callNumber": "G1046.C3<L56>2009eb",
+    "callNumberPrefix": null,
+    "callNumberSuffix": null,
+    "callNumberTypeId": "95467209-6d7b-468b-94df-0f5d7ad2747d",
+    "copyNumber": null,
+    "digitizationPolicy": null,
+    "discoverySuppress": null,
+    "electronicAccess": [
       {
+        "linkText": null,
+        "materialsSpecification": null,
+        "publicNote": "Access E-Book",
+        "relationshipId": "f5d0068e-6272-458e-8a81-b85e7b9a14aa",
+        "uri": "https://ezproxy.simmons.edu/login?url=http://www.jstor.org/stable/10.2307/j.ctt24hc08"
+      }
+    ],
+    "formerIds": [],
+    "bareHoldingsItems": [
+      {
+        "accessionNumber": null,
+        "barcode": "9876543210",
+        "chronology": "March",
+        "copyNumber": "1",
+        "descriptionOfPieces": null,
+        "discoverySuppress": true,
+        "electronicAccess": [
+          {
+            "linkText": null,
+            "materialsSpecification": null,
+            "publicNote": "Access E-Book",
+            "relationshipId": "f5d0068e-6272-458e-8a81-b85e7b9a14aa",
+            "uri": "https://ezproxy.simmons.edu/login?url=http://www.jstor.org/stable/10.2307/j.ctt24hc08"
+          }
+        ],
+        "enumeration": "3",
+        "formerIds": [],
+        "hrid": "i2036897",
+        "id": "69746298-a428-11ea-b7fc-94e55e224816",
+        "inTransitDestinationServicePointId": null,
+        "itemDamagedStatusDate": null,
+        "itemDamagedStatusId": null,
+        "itemIdentifier": null,
+        "itemLevelCallNumber": "G1046.C3 .L56 2009eb",
+        "itemLevelCallNumberPrefix": null,
+        "itemLevelCallNumberSuffix": null,
+        "itemLevelCallNumberTypeId": "95467209-6d7b-468b-94df-0f5d7ad2747d",
+        "metadata": null,
+        "missingPieces": null,
+        "missingPiecesDate": null,
+        "notes": [
+          {
+            "itemNoteType": {
+              "id": "8d0a5eca-25de-4391-81a9-236eeefdd20b",
+              "name": "Note",
+              "source": "folio"
+            },
+            "itemNoteTypeId": "8d0a5eca-25de-4391-81a9-236eeefdd20b",
+            "note": "Online",
+            "staffOnly": false
+          }
+        ],
+        "numberOfMissingPieces": null,
+        "numberOfPieces": null,
+        "permanentLocationId": null,
+        "statisticalCodeIds": [],
+        "status": {
+          "name": "Available"
+        },
+        "temporaryLoanTypeId": null,
+        "temporaryLocationId": null,
+        "volume": "",
+        "yearCaption": []
+      }
+    ],
+    "holdingsStatements": [],
+    "holdingsStatementsForIndexes": [],
+    "holdingsStatementsForSupplements": [],
+    "holdingsTypeId": null,
+    "hrid": "b2245518-elere",
+    "id": "697448a8-a428-11ea-b7fc-94e55e224816",
+    "illPolicyId": null,
+    "instanceId": "2ff48cb6-a41c-11ea-8d99-9ee25e224816",
+    "metadata": null,
+    "notes": [
+      {
+        "holdingsNoteType": {
+          "id": "a336ce03-f68a-4875-b82a-4f21df8139c5",
+          "name": "Bound with",
+          "source": "local"
+        },
+        "holdingsNoteTypeId": "a336ce03-f68a-4875-b82a-4f21df8139c5",
+        "note": "This is a holdings note",
+        "staffOnly": false
+      },
+      {
+        "holdingsNoteType": {
+          "id": "6a41b714-8574-4084-8d64-a9373c3fbb59",
+          "name": "Reproduction",
+          "source": "folio"
+        },
+        "holdingsNoteTypeId": "6a41b714-8574-4084-8d64-a9373c3fbb59",
+        "note": "May be freely copied",
+        "staffOnly": false
+      }
+    ],
+    "numberOfItems": null,
+    "permanentLocation": {
+      "campus": {
+        "code": "SIMC",
+        "id": "ad802880-d3c1-47ea-84d9-5f6574ec72a2",
+        "institutionId": "abc7866d-e53f-4da1-bcc0-84535a9a832e",
+        "name": "Main Campus"
+      },
+      "campusId": "ad802880-d3c1-47ea-84d9-5f6574ec72a2",
+      "code": "elere",
+      "description": null,
+      "discoveryDisplayName": "Online Library Resources",
+      "id": "b681f0f3-c5d3-434f-8c15-db3d8b074c43",
+      "institution": {
+        "code": "SIM",
+        "id": "abc7866d-e53f-4da1-bcc0-84535a9a832e",
+        "name": "Simmons University"
+      },
+      "institutionId": "abc7866d-e53f-4da1-bcc0-84535a9a832e",
+      "isActive": true,
+      "library": {
+        "code": "SIM",
+        "id": "2805564c-b9e2-45ba-9c6f-670b11b808e2",
+        "name": "Simmons University Library"
+      },
+      "libraryId": "2805564c-b9e2-45ba-9c6f-670b11b808e2",
+      "metadata": {
+        "createdByUserId": "7a16958e-af23-5002-8191-d7a96f5f8070",
+        "createdByUsername": null,
+        "createdDate": "2020-06-01T16:29:19.798+0000",
+        "updatedByUserId": "7a16958e-af23-5002-8191-d7a96f5f8070",
+        "updatedByUsername": null,
+        "updatedDate": "2020-06-01T16:29:19.798+0000"
+      },
+      "name": "Online Library Resources",
+      "primaryServicePoint": "7c5abc9f-f3d7-4856-b8d7-6712462ca007",
+      "primaryServicePointObject": {
         "code": "Online",
         "description": null,
         "discoveryDisplayName": "Online",
@@ -163,14 +151,28 @@
         "name": "Online",
         "pickupLocation": false,
         "shelvingLagTime": 0
-      }
-    ]
-  },
-  "permanentLocationId": "b681f0f3-c5d3-434f-8c15-db3d8b074c43",
-  "receiptStatus": null,
-  "receivingHistory": null,
-  "retentionPolicy": null,
-  "shelvingTitle": null,
-  "statisticalCodeIds": [],
-  "temporaryLocationId": null
-}
+      },
+      "servicePointIds": [
+        "7c5abc9f-f3d7-4856-b8d7-6712462ca007"
+      ],
+      "servicePoints": [
+        {
+          "code": "Online",
+          "description": null,
+          "discoveryDisplayName": "Online",
+          "id": "7c5abc9f-f3d7-4856-b8d7-6712462ca007",
+          "name": "Online",
+          "pickupLocation": false,
+          "shelvingLagTime": 0
+        }
+      ]
+    },
+    "permanentLocationId": "b681f0f3-c5d3-434f-8c15-db3d8b074c43",
+    "receiptStatus": null,
+    "receivingHistory": null,
+    "retentionPolicy": null,
+    "shelvingTitle": null,
+    "statisticalCodeIds": [],
+    "temporaryLocationId": null
+  }
+]

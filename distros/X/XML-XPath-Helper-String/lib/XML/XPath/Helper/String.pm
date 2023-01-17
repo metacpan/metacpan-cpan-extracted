@@ -6,7 +6,7 @@ use warnings;
 
 use Exporter 'import';
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 our @EXPORT_OK = qw(quoted_string one_of_quoted not_one_of_quoted);
 
@@ -91,7 +91,7 @@ XML::XPath::Helper::String - Helper functions for xpath expression.
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 SYNOPSIS
 
@@ -198,8 +198,14 @@ prints:
 
    foo!=concat("'",'a',"'") and foo!=concat('b',"'''",'cd') and foo!='e'
 
-
 =back
+
+
+=head1 SEE ALSO
+
+L<XML::LibXML>,
+L<XML::XPath::Helper::Const>
+
 
 =head1 AUTHOR
 
@@ -244,11 +250,6 @@ This software is copyright (c) 2022 by Abdul al Hazred.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
-
-=head1 SEE ALSO
-
-L<XML::LibXML>
 
 
 =cut

@@ -1,5 +1,13 @@
 Revision history for DBI::Log
 
+0.10 Sat Jan 14 20:32:41 CST 2023
+    - Replace params in statements when given with $sth->bind_param()
+
+0.09 Sat Jan 14 20:30:11 CST 2023
+    - Show more precision in timings
+    - Add exclude option
+    - Show SQL when provided a $sth instead of a string
+
 0.08 Wed May 23 14:33:11 CDT 2018
     - Use options from use line
 

@@ -4,58 +4,58 @@
       "Steven Schubiger <schubiger@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-OpenVZ-BCWatch",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Test::More" : 0
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build" : "0.42"
          }
       },
       "runtime" : {
-         "recommends" : {
-            "Test::Pod" : "1.14",
-            "Test::Pod::Coverage" : "1.04"
-         },
          "requires" : {
-            "Carp" : 0,
-            "Config::File" : 0,
-            "Daemon::Generic" : 0,
-            "File::Basename" : 0,
-            "File::HomeDir" : 0,
-            "File::Spec" : 0,
-            "File::Temp" : 0,
-            "FindBin" : 0,
-            "Mail::Sendmail" : 0,
-            "Storable" : 0,
-            "Sys::Hostname" : 0,
-            "boolean" : 0
+            "Carp" : "0",
+            "Config::File" : "0",
+            "Daemon::Generic" : "0",
+            "File::Basename" : "0",
+            "File::HomeDir" : "0",
+            "File::Spec" : "0",
+            "Mail::Sendmail" : "0",
+            "Storable" : "0",
+            "Sys::Hostname" : "0",
+            "boolean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "App::OpenVZ::BCWatch" : {
          "file" : "lib/App/OpenVZ/BCWatch.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/stsc/App-OpenVZ-BCWatch"
+      }
    },
-   "version" : "0.04"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

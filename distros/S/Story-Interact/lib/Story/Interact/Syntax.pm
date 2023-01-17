@@ -5,9 +5,12 @@ use warnings;
 package Story::Interact::Syntax;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001003';
+our $VERSION   = '0.001004';
 
 use Story::Interact::Page ();
+
+use List::Util ();
+use match::simple qw( match );
 
 use Exporter::Shiny;
 
@@ -15,6 +18,8 @@ our @EXPORT = qw(
 	text
 	next_page
 	at
+	abstract
+	todo
 	world
 	location
 	player
@@ -23,6 +28,8 @@ our @EXPORT = qw(
 	visited
 	true
 	false
+	match
+	random
 	INTERNAL_STATE
 );
 
@@ -47,6 +54,25 @@ sub at {
 		$page->_set_location( $code );
 	}
 	return $page->location;
+}
+
+sub todo {
+	if ( @_ ) {
+		my ( $value ) = @_;
+		$page->_set_todo( $value );
+	}
+	else {
+		$page->_set_todo( 1 );
+	}
+	return;
+}
+
+sub abstract {
+	if ( @_ ) {
+		my ( $value ) = @_;
+		$page->_set_abstract( $value );
+	}
+	return $page->abstract;
 }
 
 sub world () {
@@ -108,6 +134,12 @@ sub false () {
 
 sub INTERNAL_STATE () {
 	return $state;
+}
+
+sub random ($) {
+	my ( $array ) = @_;
+	my ( $item ) = List::Util::sample( 1, @$array );
+	return $item;
 }
 
 1;

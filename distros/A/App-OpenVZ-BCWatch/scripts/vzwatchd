@@ -9,7 +9,7 @@ use App::OpenVZ::BCWatch;
 use Config::File qw(read_config_file);
 use Daemon::Generic;
 
-our $VERSION = '0.04'; # used by Daemon::Generic
+our $VERSION = '0.05'; # used by Daemon::Generic
 
 $| = true;
 
@@ -20,7 +20,7 @@ sub gd_preconfig
     my $self = shift;
 
     if (!-e $self->{configfile}) {
-print <<EOT;
+print <<"EOT";
 $self->{configfile} does not exist, creating one with defaults.
 EOT
         open(my $fh, '>', $self->{configfile})
@@ -35,7 +35,7 @@ monitor_fields = failcnt
 _active = 0
 EOT
         close($fh);
-        print <<EOT;
+        print <<"EOT";
 Edit $self->{configfile} to suit your needs and then start $0 again.
 EOT
         exit;

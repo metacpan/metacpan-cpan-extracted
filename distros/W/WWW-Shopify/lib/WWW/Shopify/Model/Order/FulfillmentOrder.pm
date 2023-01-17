@@ -28,6 +28,7 @@ sub write_scope { return "write_assigned_fulfillment_orders,"; }
 sub parent { return 'WWW::Shopify::Model::Order'; }
 sub countable { return 0; }
 sub creatable { return 0; }
+sub actions { return qw(cancel close hold move open release_hold reschedule set_fulfillment_orders_deadline); }
 
 sub included_in_parent { return 0; }
 

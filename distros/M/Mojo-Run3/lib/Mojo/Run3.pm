@@ -15,12 +15,12 @@ use Scalar::Util qw(blessed weaken);
 use constant DEBUG        => $ENV{MOJO_RUN3_DEBUG} && 1;
 use constant MAX_OPEN_FDS => sysconf(_SC_OPEN_MAX);
 
-our $VERSION = '0.07';
+our $VERSION = '1.01';
 
 our @SAFE_SIG
   = grep { !m!^(NUM\d+|__[A-Z0-9]+__|ALL|CATCHALL|DEFER|HOLD|IGNORE|MAX|PAUSE|RTMAX|RTMIN|SEGV|SETS)$! } keys %SIG;
 
-has driver => 'pipe';
+has driver => sub { +{stdin => 'pipe', stdout => 'pipe', stderr => 'pipe'} };
 has ioloop => sub { Mojo::IOLoop->singleton }, weak => 1;
 
 sub bytes_waiting {
@@ -39,10 +39,7 @@ sub close {
   $self->_d('close %s (%s)', $name, $fh->{$name} // 'undef') if DEBUG;
 
   for my $sibling (keys %$fh) {
-    next if $fh->{$sibling} ne $handle;
-    $self->{finish}{$name}++;
-    $reactor->remove($fh->{$sibling});
-    delete $fh->{$sibling};
+    $reactor->remove(delete $fh->{$sibling}) if $fh->{$sibling} and $fh->{$sibling} eq $handle;
   }
 
   $handle->close;
@@ -66,39 +63,34 @@ sub run_p {
   return $p;
 }
 
-sub pid    { shift->{pid}    // 0 }
+sub pid    { shift->{pid}    // -1 }
 sub status { shift->{status} // -1 }
 
 sub start {
   my ($self, $cb) = @_;
-
-  $self->ioloop->next_tick(sub {
-    $! = 0;
-    return $self->_fail("Can't pipe: $@", $!) unless my $fh = eval { $self->_prepare_filehandles };
-    return $self->_fail("Can't fork: $!", $!) unless defined($self->{pid} = fork);
-    return $self->{pid} ? $self->_start_parent($fh) : $self->_start_child($fh, $cb);
-  });
-
+  $self->ioloop->next_tick(sub { $self and $self->_start($cb) });
   return $self;
 }
 
 sub write {
-  my ($self, $chunk, $cb) = @_;
+  my $cb = ref $_[-1] eq 'CODE' && pop;
+  my ($self, $chunk, $conduit) = (@_, 'stdin');
   $self->once(drain => $cb) if $cb;
-  $self->{buffer}{stdin} .= $chunk;
-  $self->_write;
+  $self->{buffer}{$conduit} .= $chunk;
+  $self->_write($conduit);
   return $self;
 }
 
 sub _cleanup {
-  my ($self) = @_;
-  return if $self->{is_child};
+  my ($self, $signal) = @_;
+  return unless $self->{pid};
   $self->close($_) for qw(pty stdin stderr stdout);
+  $self->kill($signal) if $signal;
 }
 
 sub _close_other {
   my ($self) = @_;
-  croak "Cannot close 'other' in parent process!" unless $self->{is_child};
+  croak "Cannot close 'other' in parent process!" if $self->pid != 0;
 
   my $fh = delete $self->{fh};
   $fh->{$_}->close for keys %$fh;
@@ -116,7 +108,7 @@ sub _close_other {
 
 sub _d {
   my ($self, $format, @val) = @_;
-  warn sprintf "[run3:%s:%s] $format\n", $self->driver, $self->{pid} // 0, @val;
+  warn sprintf "[run3:%s] $format\n", $self->{pid} // 0, @val;
 }
 
 sub _fail {
@@ -127,42 +119,24 @@ sub _fail {
   $self->_cleanup;
 }
 
-sub _make_pipe {
-  my ($self) = @_;
-  pipe my $read, my $write or die $!;
-  $write->autoflush(1);
-  return $read, $write;
-}
-
 sub _maybe_finish {
-  my ($self, $event) = @_;
-  my $finish = $self->{finish} ||= {};
-  $finish->{$event}++;
-  $self->_d('finished %s', join ', ', sort keys %$finish) if DEBUG;
-  return 0 unless $finish->{child} and $finish->{stdout} and $finish->{stderr};
+  my ($self, $reason) = @_;
+  my $status = $self->status;
 
-  $self->_cleanup;
+  if (DEBUG) {
+    $self->_d('finish=%s status=%s stdout=%s stderr=%s pty=%s',
+      $reason, $status, map { ref $self->{fh}{$_} } qw(stdout stderr pty));
+  }
+
+  return 0 if $status == -1;
+  return 0 if grep { $self->{fh}{$_} } qw(pty stdout stderr);
+
+  $self->close('stdin');
   for my $cb (@{$self->subscribers('finish')}) {
     $self->emit(error => $@) unless eval { $self->$cb; 1 };
   }
 
   return 1;
-}
-
-sub _prepare_filehandles {
-  my ($self) = @_;
-  my %fh;
-  ($fh{parent}{stdout}, $fh{child}{stdout}) = $self->_make_pipe;
-  ($fh{parent}{stderr}, $fh{child}{stderr}) = $self->_make_pipe;
-
-  if ($self->driver eq 'pty') {
-    $fh{parent}{pty} = $fh{child}{pty} = IO::Pty->new;
-  }
-  else {
-    ($fh{child}{stdin}, $fh{parent}{stdin}) = $self->_make_pipe;
-  }
-
-  return \%fh;
 }
 
 sub _read {
@@ -177,92 +151,113 @@ sub _read {
     return $self->close($name)->_maybe_finish($name);    # EOF
   }
   else {
-    $self->_d('%s !!! %s (%i)', $name, $!, $!) if DEBUG;
-    return undef                               if $! == EAGAIN     || $! == EINTR || $! == EWOULDBLOCK;    # Retry
-    return $self->kill                         if $! == ECONNRESET || $! == EPIPE;                         # Error
-    return $self->_maybe_finish($name)         if $! == EIO;    # EOF on PTY raises EIO
+    $self->close($name);
+    $self->_d('op=read conduit=%s errstr="%s" errno=%s', $name, $!, int $!) if DEBUG;
+    return undef                       if $! == EAGAIN     || $! == EINTR || $! == EWOULDBLOCK;    # Retry
+    return $self->kill                 if $! == ECONNRESET || $! == EPIPE;                         # Error
+    return $self->_maybe_finish($name) if $! == EIO;    # EOF on PTY raises EIO
     return $self->emit(error => $!);
   }
 }
 
-sub _start_child {
-  my ($self, $fh, $code) = @_;
-  $self->{is_child} = 1;
-
-  if (my $pty = $fh->{parent}{pty}) {
-    $pty->make_slave_controlling_terminal;
-    $fh->{child}{stdin} = $pty->slave;
-  }
-
-  $fh->{parent}{$_}->close for keys %{$fh->{parent}};
-  $fh = $self->{fh} = $fh->{child};
-
-  open STDIN,  '<&=', fileno($fh->{stdin})  or die "Couldn't dup stdin: $!";
-  open STDOUT, '>&=', fileno($fh->{stdout}) or die "Couldn't dup stdout: $!";
-  open STDERR, '>&=', fileno($fh->{stderr}) or die "Couldn't dup stderr: $!";
-  STDOUT->autoflush(1);
-  STDERR->autoflush(1);
-
-  @SIG{@SAFE_SIG} = ('DEFAULT') x @SAFE_SIG;
-  ($@, $!) = ('', 0);
-  $self->{pid} = $$;
-
-  eval { $self->$code };
-  my ($err, $errno) = ($@, $@ ? 255 : $! || 0);
-  print STDERR $err if length $err;
-  POSIX::_exit($errno) || exit $errno;
+sub _redirect {
+  my ($self, $conduit, $real, $virtual) = @_;
+  return $real->close || die "Couldn't close $conduit: $!" unless $virtual;
+  $real->autoflush(1);
+  return open($real, ($conduit eq 'stdin' ? '<&=' : '>&='), fileno($virtual)) || die "Couldn't dup $conduit: $!";
 }
 
-sub _start_parent {
-  my ($self, $fh) = @_;
+sub _start {
+  my ($self, $cb) = @_;
 
-  $fh->{parent}{stdin} = delete $fh->{child}{pty} if $fh->{child}{pty};
-  $fh->{child}{$_}->close for keys %{$fh->{child}};
-  $fh = $self->{fh} = $fh->{parent};
+  my $options = $self->driver;
+  $options = {stdin => $options, stdout => 'pipe', stderr => 'pipe'} unless ref $options;
+
+  # Prepare IPC filehandles
+  my ($pty, %child, %parent);
+  for my $conduit (qw(pty stdin stdout stderr)) {
+    my $driver = $options->{$conduit} // 'close';
+    if ($driver eq 'pty') {
+      $pty ||= IO::Pty->new;
+      ($child{$conduit}, $parent{$conduit}) = ($pty->slave, $pty);
+    }
+    elsif ($driver eq 'pipe') {
+      pipe my $read, my $write or return $self->_fail("Can't create pipe: $!", $!);
+      ($child{$conduit}, $parent{$conduit}) = $conduit eq 'stdin' ? ($read, $write) : ($write, $read);
+    }
+
+    $self->_d('conduit=%s child=%s parent=%s', $conduit, $child{$conduit} // '', $parent{$conduit} // '') if DEBUG;
+  }
+
+  # Child
+  unless ($self->{pid} = fork) {
+    return $self->_fail("Can't fork: $!", $!) unless defined $self->{pid};
+    $self->{fh} = \%child;
+    $pty->make_slave_controlling_terminal if $pty and ($options->{make_slave_controlling_terminal} // 1);
+    $_->close for values %parent;
+
+    $self->_redirect(stdin  => \*STDIN,  $child{stdin});
+    $self->_redirect(stdout => \*STDOUT, $child{stdout});
+    $self->_redirect(stderr => \*STDERR, $child{stderr});
+
+    @SIG{@SAFE_SIG} = ('DEFAULT') x @SAFE_SIG;
+    ($@, $!) = ('', 0);
+
+    eval { $self->$cb };
+    my ($err, $errno) = ($@, $@ ? 255 : $! || 0);
+    print STDERR $err if length $err;
+    POSIX::_exit($errno) || exit $errno;
+  }
+
+  # Parent
+  $self->{fh} = \%parent;
+  ($pty->close_slave, ($self->{fh}{pty} = $pty)) if $pty;
+  $_->close for values %child;
 
   weaken $self;
   my $reactor = $self->ioloop->reactor;
-  for my $name (qw(pty stderr stdout)) {
-    my $h = $fh->{$name} or next;
-    $h->close_slave if $name eq 'pty';    # TODO: This is EXPERIMENTAL
-    $reactor->io($h, sub { $self ? $self->_read($name => $h) : $_[0]->remove($h) })->watch($h, 1, 0);
+  my %uniq;
+  for my $conduit (qw(pty stdout stderr)) {
+    next unless my $fh = $parent{$conduit};
+    next if $uniq{$fh}++;
+    $reactor->io($fh, sub { $self ? $self->_read($conduit => $fh) : $_[0]->remove($fh) });
+    $reactor->watch($fh, 1, 0);
   }
 
+  $self->_d('waitpid %s', $self->{pid}) if DEBUG;
   Mojo::IOLoop::ReadWriteFork::SIGCHLD->singleton->waitpid(
     $self->{pid} => sub {
       return unless $self;
       $self->{status} = $_[0];
-      $self->_maybe_finish('child');
+      $self->_maybe_finish('waitpid');
     }
   );
 
-  $self->{fh} = $fh;
-  $self->_d('waitpid %s', $self->{pid}) if DEBUG;
   $self->emit('spawn');
-  $self->_write;
+  $self->_write($_) for qw(pty stdin);
 }
 
 sub _write {
-  my $self = shift;
-  return unless length $self->{buffer}{stdin};
-  return unless my $stdin = $self->{fh}{stdin};
+  my ($self, $conduit) = @_;
+  return unless length $self->{buffer}{$conduit};
+  return unless my $fh = $self->{fh}{$conduit};
 
-  my $n_bytes = $stdin->syswrite($self->{buffer}{stdin});
+  my $n_bytes = $fh->syswrite($self->{buffer}{$conduit});
   if (defined $n_bytes) {
-    my $buf = substr $self->{buffer}{stdin}, 0, $n_bytes, '';
-    $self->_d('stdin <<< %s (%i)', term_escape($buf) =~ s!\n!\\n!gr, length $buf) if DEBUG;
-    return $self->emit('drain') unless length $self->{buffer}{stdin};
+    my $buf = substr $self->{buffer}{$conduit}, 0, $n_bytes, '';
+    $self->_d('%s <<< %s (%i)', $conduit, term_escape($buf) =~ s!\n!\\n!gr, length $buf) if DEBUG;
+    return $self->emit('drain') unless length $self->{buffer}{$conduit};
     return $self->ioloop->next_tick(sub { $self->_write });
   }
   else {
-    $self->_d('stdin !!! %s (%i)', $!, $!) if DEBUG;
-    return                                 if $! == EAGAIN     || $! == EINTR || $! == EWOULDBLOCK;
-    return $self->kill(9)                  if $! == ECONNRESET || $! == EPIPE;
+    $self->_d('op=write conduit=%s errstr="%s" errno=%s', $conduit, $!, $!) if DEBUG;
+    return                if $! == EAGAIN     || $! == EINTR || $! == EWOULDBLOCK;
+    return $self->kill(9) if $! == ECONNRESET || $! == EPIPE;
     return $self->emit(error => $!);
   }
 }
 
-sub DESTROY { shift->_cleanup unless ${^GLOBAL_PHASE} eq 'DESTRUCT' }
+sub DESTROY { shift->_cleanup(9) unless ${^GLOBAL_PHASE} eq 'DESTRUCT' }
 
 1;
 
@@ -276,14 +271,31 @@ Mojo::Run3 - Run a subprocess and read/write to it
 
   use Mojo::Base -strict, -signatures;
   use Mojo::Run3;
-  use IO::Handle;
 
+This example gets "stdout" events when the "ls" command emits output:
+
+  use IO::Handle;
   my $run3 = Mojo::Run3->new;
   $run3->on(stdout => sub ($run3, $bytes) {
     STDOUT->syswrite($bytes);
   });
 
   $run3->run_p(sub { exec qw(/usr/bin/ls -l /tmp) })->wait;
+
+This example does the same, but on a remote host using ssh:
+
+  my $run3 = Mojo::Run3->new
+    ->driver({pty => 'pty', stdin => 'pipe', stdout => 'pipe', stderr => 'pipe'});
+
+  $run3->once(pty => sub ($run3, $bytes) {
+    $run3->write("my-secret-password\n", "pty") if $bytes =~ /password:/;
+  });
+
+  $run3->on(stdout => sub ($run3, $bytes) {
+    STDOUT->syswrite($bytes);
+  });
+
+  $run3->run_p(sub { exec qw(ssh example.com ls -l /tmp) })->wait;
 
 =head1 DESCRIPTION
 
@@ -348,23 +360,27 @@ Emitted in the parent process after the subprocess has been forked.
 
 =head2 driver
 
-  $str  = $run3->driver;
-  $run3 = $run3->driver('pipe');
+  $hash_ref = $run3->driver;
+  $run3 = $self->driver({stdin => 'pipe', stdout => 'pipe', stderr => 'pipe'});
 
-Can be set to "pipe" (default) or "pty" to run the child process inside a
-pseudoterminal, using L<IO::Pty>.
+Used to set the driver for "pty", "stdin", "stdout" and "stderr".
 
-The "pty" will be the L<controlling terminal|IO::Pty/make_slave_controlling_terminal>
-of the child process and the slave will be closed in the parent process.
-If further setup of the pty should be done, it must be done in the child
-process. Example:
+Examples:
 
-  $run3->start(sub ($pty3) {
-    my $pty = $pty3->handle('stdin'); # stdin is a IO::Tty object
-    $pty->set_winsize($row, $col, $xpixel, $ypixel);
-    $pty->set_raw;
-    exec qw(ssh -t server.example.com);
-  });
+  # Open pipe for STDIN and STDOUT and close STDERR in child process
+  $self->driver({stdin => 'pipe', stdout => 'pipe'});
+
+  # Create a PTY and attach STDIN to it and open a pipe for STDOUT and STDERR
+  $self->driver({stdin => 'pty', stdout => 'pipe', stderr => 'pipe'});
+
+  # Create a PTY and pipes for STDIN, STDOUT and STDERR
+  $self->driver({pty => 'pty', stdin => 'pipe', stdout => 'pipe', stderr => 'pipe'});
+
+  # Create a PTY, but do not make the PTY slave the controlling terminal
+  $self->driver({pty => 'pty', stdout => 'pipe', make_slave_controlling_terminal => 0});
+
+  # It is not supported to set "pty" to "pipe"
+  $self->driver({pty => 'pipe'});
 
 =head2 ioloop
 
@@ -429,7 +445,8 @@ successfully sent.
 
   $int = $run3->pid;
 
-Process ID of the subprocess after L</start> has successfully started.
+Process ID of the child after L</start> has successfully started. The PID will
+be "0" in the child process and "-1" before the child process was started.
 
 =head2 run_p
 
@@ -460,9 +477,12 @@ instead to get the exit value from 0 to 255.
 
   $run3 = $run3->write($bytes);
   $run3 = $run3->write($bytes, sub ($run3) { ... });
+  $run3 = $run3->write($bytes, $conduit);
+  $run3 = $run3->write($bytes, $conduit, sub ($run3) { ... });
 
-Used to write C<$bytes> to the subprocess. The optional callback will be called
-on the next L</drain> event.
+Used to write C<$bytes> to the subprocess. C<$conduit> can be "pty" or "stdin",
+and defaults to "stdin". The optional callback will be called on the next
+L</drain> event.
 
 =head1 AUTHOR
 
@@ -475,6 +495,7 @@ the terms of the Artistic License version 2.0.
 
 =head1 SEE ALSO
 
+L<https://github.com/jhthorsen/mojo-run3/tree/main/examples>,
 L<Mojo::IOLoop::ReadWriteFork>, L<IPC::Run3>.
 
 =cut

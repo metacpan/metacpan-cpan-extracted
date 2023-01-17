@@ -35,7 +35,7 @@ resources:
   bugtracker: https://github.com/PerlRedis/perl-redis/issues
   homepage: https://github.com/PerlRedis/perl-redis
   repository: https://github.com/PerlRedis/perl-redis.git
-version: '1.999'
+version: '2.000'
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

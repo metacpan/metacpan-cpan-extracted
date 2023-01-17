@@ -9,7 +9,7 @@ use utf8;
 use open qw( :std :utf8 );
 use Unicode::Normalize qw( NFC );
 use Unicode::Collate;
-use Encode qw( decode );
+use Encode qw( encode decode );
 
 if ( grep /\P{ASCII}/ => @ARGV ) {
     @ARGV = map { decode( 'UTF-8', $_ ) } @ARGV;
@@ -29,11 +29,11 @@ Pg::Explain::FromJSON - Parser for explains in JSON format
 
 =head1 VERSION
 
-Version 2.4
+Version 2.5
 
 =cut
 
-our $VERSION = '2.4';
+our $VERSION = '2.5';
 
 =head1 SYNOPSIS
 
@@ -52,7 +52,7 @@ Returns Top node of query plan.
 
 sub parse_source {
     my $self   = shift;
-    my $source = shift;
+    my $source = encode( 'UTF-8', shift );
 
     # We need to remove things before and/or after explain
     # To do this, first - split explain into lines...
@@ -142,7 +142,7 @@ You can find documentation for this module with the perldoc command.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008-2021 hubert depesz lubaczewski, all rights reserved.
+Copyright 2008-2023 hubert depesz lubaczewski, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

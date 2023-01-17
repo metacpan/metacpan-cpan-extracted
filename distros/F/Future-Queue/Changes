@@ -1,4 +1,12 @@
 Revision history for Future-Queue
 
+0.50    2023-01-16
+        [CHANGES]
+         * Optional maximum size; push will return a pending future until
+           there's room
+         * Added bulk push and shift API for efficiently handling multiple
+           items at once
+         * Added concept of "finished" queue, where shift returns empty
+
 0.49    2022-10-17
         Extracted from Future distribution into its own

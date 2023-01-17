@@ -26,6 +26,10 @@ sub insertMARCHoldings {
 	    for (my $j = 0; $j < @$itemObjects; $j++) {
 		my $itemMap = _listOfPairs2map($itemObjects->[$j]);
 		$marcField = _addSubfields($marcField, $marcCfg, $marcCfg->{itemElements}, $itemMap);
+		if ($marcCfg->{fieldPerItem} && $marcField) {
+		    $marc->append_fields($marcField);
+		    $marcField = undef;
+		}
 	    }
 	}
 

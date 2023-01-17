@@ -4,7 +4,7 @@ author:
   - 'Jonas Smedegaard (JONASS) <jonass@cpan.org>'
 build_requires:
   Regexp::Pattern: '0'
-  Test2::V0: '0'
+  Test2::V0: '0.000078'
   Test::Regexp::Pattern: '0.003'
   Test::Without::Module: '0'
   Try::Tiny: '0'
@@ -33,10 +33,10 @@ optional_features: {}
 provides:
   Regexp::Pattern::License:
     file: lib/Regexp/Pattern/License.pm
-    version: v3.9.4
+    version: v3.10.0
   Regexp::Pattern::License::Parts:
     file: lib/Regexp/Pattern/License/Parts.pm
-    version: v3.9.4
+    version: v3.10.0
 recommends:
   re::engine::RE2: '0'
 requires:
@@ -47,7 +47,7 @@ resources:
   homepage: https://metacpan.org/pod/Regexp::Pattern::License
   license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: https://salsa.debian.org/build-common-team/regexp-pattern-license.git
-version: v3.9.4
+version: v3.10.0
 x_breaks:
   App::Licensecheck: '<= v3.2.6'
 x_help_wanted:

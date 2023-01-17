@@ -1,3 +1,10 @@
+0.005   2022-10-07  Released-By: PERLANCAR; Urgency: medium
+
+        - Allow disabling fmt using --no-pdf-fmt.
+
+        - Add missing dependency to CLI::Meta::diff.
+
+
 0.004   2022-09-08  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

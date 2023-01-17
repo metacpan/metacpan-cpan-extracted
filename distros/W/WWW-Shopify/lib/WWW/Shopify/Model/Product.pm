@@ -31,7 +31,9 @@ BEGIN { $fields = {
 	"created_at" => new WWW::Shopify::Field::Date(),
 	"published_at" => new WWW::Shopify::Field::Date(),
 	"published" => new WWW::Shopify::Field::Boolean(),
-	"updated_at" => new WWW::Shopify::Field::Date()};
+	"updated_at" => new WWW::Shopify::Field::Date(),
+	"status" => new WWW::Shopify::Field::String::Enum(["draft","active","archived"]) #this isn't 'working' yet, so we will leave it out for now.
+	};
 }
 my $queries; sub queries { return $queries; }
 BEGIN { $queries = {

@@ -7,6 +7,32 @@ Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.3.7	2023-01-17
+
+ [ Packaging ]
+ - test-require Test2::Tools::Command
+
+v3.3.6	2023-01-16
+
+ [ Packaging ]
+ - really use String::License
+
+v3.3.5	2023-01-15
+
+ - externalize license resolving: use String::License
+ - stop (directly) use re::engine::RE2 Array::IntSpan experimental
+   Regexp::Pattern Regexp::Pattern::License File::BaseDir File::Basename
+   Software::LicenseUtils YAML::XS Test::Without::Module
+ - use Test2::Tools::Command (not Test::Command::Simple)
+
+v3.3.4	2023-01-14
+
+ [ Bug Fixes ]
+ - use warnings, no longer done in Feature::Compat::Class since v0.05
+
+ [ Test Suite ]
+ - fix plan count to work on older perls
+
 v3.3.3	2023-01-09
 
  [ Bug Fixes ]

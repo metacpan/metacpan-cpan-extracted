@@ -372,13 +372,13 @@ like(
 # TODO		field 'xinetd License'             => 'xinetd';
 # TODO		field 'XPP License'                => 'xpp';
 # TODO		field 'XSkat License'              => 'XSkat';
-		field 'Yahoo! Public License v1.0'               => 'YPL-1.0';
-		field 'Yahoo! Public License v1.1'               => 'YPL-1.1';
-		field 'Zed License'                              => 'Zed';
-		field 'Zend License v2.0'                        => 'Zend-2.0';
-		field 'Zimbra Public License v1.3'               => 'Zimbra-1.3';
-		field 'Zimbra Public License v1.4'               => 'Zimbra-1.4';
-		field 'zlib License'                             => 'Zlib';
+		field 'Yahoo! Public License v1.0' => 'YPL-1.0';
+		field 'Yahoo! Public License v1.1' => 'YPL-1.1';
+		field 'Zed License'                => 'Zed';
+		field 'Zend License v2.0'          => 'Zend-2.0';
+		field 'Zimbra Public License v1.3' => 'Zimbra-1.3';
+		field 'Zimbra Public License v1.4' => 'Zimbra-1.4';
+		field 'zlib License'               => 'Zlib';
 		field 'zlib/libpng License with Acknowledgement' =>
 			'zlib-acknowledgement';
 		field 'Zope Public License 1.1' => 'ZPL-1.1';

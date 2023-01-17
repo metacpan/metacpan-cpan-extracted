@@ -37,7 +37,7 @@
             "JSON" : "2.97001",
             "LWP::Protocol::https" : "6.07",
             "LWP::UserAgent" : "6.34",
-            "perl" : "5.006"
+            "perl" : "5.010"
          }
       },
       "test" : {
@@ -57,6 +57,6 @@
          "web" : "https://github.com/KJ7LNW/perl-API-Octopart.git"
       }
    },
-   "version" : 1.002,
+   "version" : 1.003,
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

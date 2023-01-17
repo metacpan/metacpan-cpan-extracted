@@ -1,12 +1,16 @@
 use Test2::V0;
 use Test2::Require::Module 'Regexp::Pattern::License' => '3.7.0';
 
+use String::License::Naming;
+
 use App::Licensecheck;
 
-plan 11;
+plan 10;
+
+my $naming = String::License::Naming::SPDX->new;
 
 my @opts = (
-	schemes   => [qw(spdx)],
+	naming    => $naming,
 	top_lines => 0,
 );
 
@@ -64,10 +68,6 @@ like [ parse('t/devscripts/false-positives') ], array {
 	item 'public-domain';
 	item '2013 Devscripts developers';
 }, 'false positives';
-
-like [ parse('t/devscripts/regexp-killer.c') ], array {
-	item 'UNKNOWN';
-}, 'regexp killer';
 
 unlike parse('t/devscripts/info-at-eof.h'),
 	qr{notice and this},

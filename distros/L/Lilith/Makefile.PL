@@ -35,6 +35,8 @@ my %WriteMakefileArgs = (
 		'Text::ANSITable'        => '0.608',
 		'Net::Server::Daemonize' => '0',
 		'Sys::Syslog'            => '0',
+		'YAML::PP'               => '0',
+		'File::Slurp'            => '0',
 	},
 	dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean      => { FILES    => 'Lilith-*' },

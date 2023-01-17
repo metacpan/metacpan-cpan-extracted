@@ -6,7 +6,7 @@ no warnings;
 use DBI;
 use Time::HiRes;
 
-our $VERSION = "0.09";
+our $VERSION = "0.10";
 our %opts = (
     file => $file,
     trace => 0,
@@ -18,7 +18,7 @@ our %opts = (
 my $orig_execute = \&DBI::st::execute;
 *DBI::st::execute = sub {
     my ($sth, @args) = @_;
-    my $log = pre_query("execute", $sth->{Database}, $sth->{Statement}, \@args);
+    my $log = pre_query("execute", $sth->{Database}, $sth, $sth->{Statement}, \@args);
     my $retval = $orig_execute->($sth, @args);
     post_query($log);
     return $retval;
@@ -27,7 +27,7 @@ my $orig_execute = \&DBI::st::execute;
 my $orig_selectall_arrayref = \&DBI::db::selectall_arrayref;
 *DBI::db::selectall_arrayref = sub {
     my ($dbh, $query, $yup, @args) = @_;
-    my $log = pre_query("selectall_arrayref", $dbh, $query, \@args);
+    my $log = pre_query("selectall_arrayref", $dbh, undef, $query, \@args);
     my $retval = $orig_selectall_arrayref->($dbh, $query, $yup, @args);
     post_query($log);
     return $retval;
@@ -36,7 +36,7 @@ my $orig_selectall_arrayref = \&DBI::db::selectall_arrayref;
 my $orig_selectcol_arrayref = \&DBI::db::selectcol_arrayref;
 *DBI::db::selectcol_arrayref = sub {
     my ($dbh, $query, $yup, @args) = @_;
-    my $log = pre_query("selectcol_arrayref", $dbh, $query, \@args);
+    my $log = pre_query("selectcol_arrayref", $dbh, undef, $query, \@args);
     my $retval = $orig_selectcol_arrayref->($dbh, $query, $yup, @args);
     post_query($log);
     return $retval;
@@ -45,7 +45,7 @@ my $orig_selectcol_arrayref = \&DBI::db::selectcol_arrayref;
 my $orig_selectall_hashref = \&DBI::db::selectall_hashref;
 *DBI::db::selectall_hashref = sub {
     my ($dbh, $query, $yup, @args) = @_;
-    my $log = pre_query("selectall_hashref", $dbh, $query, \@args);
+    my $log = pre_query("selectall_hashref", $dbh, undef, $query, \@args);
     my $retval = $orig_selectall_hashref->($dbh, $query, $yup, @args);
     post_query($log);
     return $retval;
@@ -54,7 +54,7 @@ my $orig_selectall_hashref = \&DBI::db::selectall_hashref;
 my $orig_selectrow_arrayref = \&DBI::db::selectrow_arrayref;
 *DBI::db::selectrow_arrayref = sub {
     my ($dbh, $query, $yup, @args) = @_;
-    my $log = pre_query("selectrow_arrayref", $dbh, $query, \@args);
+    my $log = pre_query("selectrow_arrayref", $dbh, $sth, $query, \@args);
     my $retval = $orig_selectrow_arrayref->($dbh, $query, $yup, @args);
     post_query($log);
     return $retval;
@@ -63,7 +63,7 @@ my $orig_selectrow_arrayref = \&DBI::db::selectrow_arrayref;
 my $orig_selectrow_array = \&DBI::db::selectrow_array;
 *DBI::db::selectrow_array = sub {
     my ($dbh, $query, $yup, @args) = @_;
-    my $log = pre_query("selectrow_array", $dbh, $query, \@args);
+    my $log = pre_query("selectrow_array", $dbh, undef, $query, \@args);
     my $retval = $orig_selectrow_array->($dbh, $query, $yup, @args);
     post_query($log);
     return $retval;
@@ -72,7 +72,7 @@ my $orig_selectrow_array = \&DBI::db::selectrow_array;
 my $orig_selectrow_hashref = \&DBI::db::selectrow_hashref;
 *DBI::db::selectrow_hashref = sub {
     my ($dbh, $query, $yup, @args) = @_;
-    my $log = pre_query("selectrow_hashref", $dbh, $query, \@args);
+    my $log = pre_query("selectrow_hashref", $dbh, undef, $query, \@args);
     my $retval = $orig_selectrow_hashref->($dbh, $query, $yup, @args);
     post_query($log);
     return $retval;
@@ -81,7 +81,7 @@ my $orig_selectrow_hashref = \&DBI::db::selectrow_hashref;
 my $orig_do = \&DBI::db::do;
 *DBI::db::do = sub {
     my ($dbh, $query, $yup, @args) = @_;
-    my $log = pre_query("do", $dbh, $query, \@args);
+    my $log = pre_query("do", $dbh, undef, $query, \@args);
     my $retval = $orig_do->($dbh, $query, $yup, @args);
     post_query($log);
     return $retval;
@@ -107,7 +107,7 @@ sub import {
 }
 
 sub pre_query {
-    my ($name, $dbh, $query, $args) = @_;
+    my ($name, $dbh, $sth, $query, $args) = @_;
     my $log = {};
     my $mcount = 0;
 
@@ -166,10 +166,34 @@ sub pre_query {
         $stack .= "-- $short_sub $file $line\n";
     }
 
-    if ($dbh) {
-        my $i = 0;
-        $query =~ s{\?}{$dbh->quote($args->[$i++])}eg;
+    if (ref($query) && ref($query) eq "DBI::st") {
+        $sth = $query;
+        $query = $query->{Statement};
     }
+
+    if ($dbh) {
+        # When you use $sth->bind_param(1, "value") the params can be found in
+        # $sth->{ParamValues} and they override arguments sent in to
+        # $sth->execute()
+
+        my @args_copy = @$args;
+        my %values;
+        if ($sth && $sth->{ParamValues}) {
+            %values = %{$sth->{ParamValues}};
+        }
+        for my $key (keys %values) {
+            if (defined $key && $key =~ /^\d+$/) {
+                $args_copy[$key - 1] = $values{$key};
+            }
+        }
+
+        for my $i (0 .. @args_copy - 1) {
+            my $value = $args_copy[$i];
+            $value = $dbh->quote($value);
+            $query =~ s{\?}{$value}e;
+        }
+    }
+
     $query =~ s/^\s*\n|\s*$//g;
     $info = "-- " . scalar(localtime()) . "\n";
     print {$opts{fh}} "$info$stack$query\n";
@@ -204,35 +228,35 @@ DBI::Log - Log all DBI queries
 
 =head1 DESCRIPTION
 
-You can use this module to log all queries that are made with DBI.
-You just need to include it in your script and it will work
-automatically.  By default, it will send output to STDERR, which
-is useful for command line scripts and for CGI scripts since STDERR
-will appear in the error log.
+You can use this module to log all queries that are made with DBI. You just need
+to include it in your script and it will work automatically. By default, it will
+send output to STDERR, which is useful for command line scripts and for CGI
+scripts since STDERR will appear in the error log.
 
 If you want to log elsewhere, set the file option to a different location.
 
     use DBI::Log file => "~/querylog.sql";
 
-Each query in the log is prepended with the date and the place in
-the code where it was run from. You can add a full stack trace by
-setting the trace option.
+Each query in the log is prepended with the date and the place in the code where
+it was run from. You can add a full stack trace by setting the trace option.
 
     use DBI::Log trace => 1;
 
-If you want timing information about how long the queries took to
-run add the timing option.
+If you want timing information about how long the queries took to run add the
+timing option.
 
     use DBI::Log timing => 1;
 
-If you want to exclude function calls from within a certain package appearing in the stack trace, you can use the exclude option like this:
+If you want to exclude function calls from within a certain package appearing in
+the stack trace, you can use the exclude option like this:
 
     use DBI::Log exclude => ["DBIx::Class"];
 
-It will exclude any package starting with that name, for example DBIx::Class::ResultSet DBI::Log is excluded by default.
+It will exclude any package starting with that name, for example
+DBIx::Class::ResultSet DBI::Log is excluded by default.
 
-The log is formatted as SQL, so if you look at it in an editor, it
-might be highlighted. This is what the output may look like:
+The log is formatted as SQL, so if you look at it in an editor, it might be
+highlighted. This is what the output may look like:
 
     -- Fri Sep 11 17:31:18 2015
     -- execute t/test.t 18
@@ -254,8 +278,8 @@ might be highlighted. This is what the output may look like:
 There is a built-in way to log with DBI, which can be enabled with
 DBI->trace(1), but the output is not easy to read through.
 
-This module integrates placeholder values into the query, so the
-log will contain valid queries.
+This module integrates placeholder values into the query, so the log will
+contain valid queries.
 
 =head1 METACPAN
 
@@ -279,8 +303,9 @@ David Precious
 
 Copyright (C) 2015 by Jacob Gelbman
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.18.2 or,
-at your option, any later version of Perl 5 you may have available.
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself, either Perl version 5.18.2 or, at your option,
+any later version of Perl 5 you may have available.
 
 =cut
+

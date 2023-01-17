@@ -164,11 +164,11 @@ like(
 		field 'Creative Commons BSD' => 'BSD-2-Clause';
 		field 'BSD 2-Clause License' => 'BSD-2-Clause';    # default caption
 
-		field 'Creative Commons GNU GPL'              => 'GPL-2';
+		field 'Creative Commons GNU GPL' => 'GPL-2';
 		field 'GNU General Public License, Version 2' =>
 			'GPL-2';                                       # default caption
 
-		field 'Creative Commons GNU LGPL'                      => 'LGPL-2.1';
+		field 'Creative Commons GNU LGPL' => 'LGPL-2.1';
 		field 'GNU Lesser General Public License, Version 2.1' =>
 			'LGPL-2.1';                                    # default caption
 
@@ -386,7 +386,7 @@ like(
 
 		field 'MirOS License' => 'MirOS';
 
-		field 'MIT license (also X11)'                          => 'mit_new';
+		field 'MIT license (also X11)' => 'mit_new';
 		field 'MIT-style license, Modern Style with sublicense' =>
 			'mit_new';    # page
 
@@ -584,7 +584,7 @@ like(
 		field 'Zope Public License v 2.0' => 'ZPLv2.0';
 		field 'Zope Public License v 2.1' => 'ZPLv2.1';
 
-		field 'zlib/libpng License'                      => 'zlib';
+		field 'zlib/libpng License' => 'zlib';
 		field 'zlib/libpng License with Acknowledgement' =>
 			'zlib-acknowledgement';
 		field 'zlib with acknowledgement' => 'zlib-acknowledgement';   # short
@@ -825,7 +825,7 @@ like(
 		field 'BSD license'         => 'BSD';    # default caption
 
 		# Fedora use BSD-4-Clause-UC as proof but names are more general
-		field 'Original BSD License'                        => 'BSD-4-Clause';
+		field 'Original BSD License' => 'BSD-4-Clause';
 		field 'Original BSD License (BSD with advertising)' =>
 			'BSD-4-Clause';                      # page
 

@@ -6,7 +6,7 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Future::Queue',
    requires => {
-      'perl' => '5.010', # //
+      'perl' => '5.014',
       'Future' => 0,
    },
    test_requires => {

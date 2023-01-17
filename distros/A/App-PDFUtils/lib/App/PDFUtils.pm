@@ -10,7 +10,7 @@ use Perinci::Object;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-10-07'; # DATE
 our $DIST = 'App-PDFUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 our %SPEC;
 
@@ -523,7 +523,7 @@ App::PDFUtils - Command-line utilities related to PDF files
 
 =head1 VERSION
 
-This document describes version 0.012 of App::PDFUtils (from Perl distribution App-PDFUtils), released on 2022-10-07.
+This document describes version 0.014 of App::PDFUtils (from Perl distribution App-PDFUtils), released on 2022-10-07.
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Neovim::Ext::MsgPack::RPC::Response;
-$Neovim::Ext::MsgPack::RPC::Response::VERSION = '0.05';
+$Neovim::Ext::MsgPack::RPC::Response::VERSION = '0.06';
 use strict;
 use warnings;
 use base qw/Class::Accessor/;
@@ -42,7 +42,7 @@ Neovim::Ext::MsgPack::RPC::Response - Neovim::Ext::MsgPack::RPC::Response class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

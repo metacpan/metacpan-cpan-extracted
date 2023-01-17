@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 14;
+use Test::More tests => 20;
 BEGIN { use_ok('Net::Z3950::FOLIO::Config') };
 
 my $cfg = new Net::Z3950::FOLIO::Config('t/data/config/foo', 'bar');
@@ -19,3 +19,13 @@ is($cfg->{foo}, 42, "Base value, not overriden");
 is($cfg->{bar}, 4, "Overridden in first override");
 is($cfg->{baz}, 'thricken', "Overridden in second override");
 is($cfg->{quux}, 99, "Present only in second override");
+
+$cfg = new Net::Z3950::FOLIO::Config('t/data/config/foo', 'marcHoldings');
+ok(defined $cfg, 'parsed stacked foo->marcHoldings config');
+is($cfg->{marcHoldings}->{field}, "952", "Base value, not overriden");
+is($cfg->{marcHoldings}->{fieldPerItem}, undef, "Absent base value");
+
+$cfg = new Net::Z3950::FOLIO::Config('t/data/config/foo', 'marcHoldings', 'fieldPerItem');
+ok(defined $cfg, 'parsed stacked foo->marcHoldings->fieldPerItem config');
+is($cfg->{marcHoldings}->{field}, "952", "Base value, not overriden");
+is($cfg->{marcHoldings}->{fieldPerItem}, 1, "fieldPerItem overriden");

@@ -1,4 +1,5 @@
 use alienfile;
+use Config;
 use Path::Tiny qw(path);
 
 plugin 'PkgConfig' => 'libmaxminddb';
@@ -8,7 +9,7 @@ share {
   plugin 'Download';
   plugin 'Extract' => 'tar.gz';
   plugin 'Build::Autoconf';
-  patch \&patch_pkgconfig;
+  patch \&patch_build;
   build [
     '%{configure} --disable-binaries --disable-tests --disable-shared',
     '%{make}',
@@ -16,18 +17,30 @@ share {
   ];
 };
 
-sub patch_pkgconfig {
+sub patch_build {
   my $build = shift;
 
   my $extract = $build->install_prop->{extract};
-  my $pc = path($extract, 'src', 'libmaxminddb.pc.in');
+  my $configure = path($extract, 'configure');
+  my $pkgconfig = path($extract, 'src', 'libmaxminddb.pc.in');
 
   if ($^O eq 'MSWin32') {
     eval {
-      $pc->edit(sub {
+      $pkgconfig->edit(sub {
         s{-lmaxminddb\b}{-lmaxminddb -lws2_32}g;
       });
     };
+  }
+  elsif ($^O eq 'openbsd') {
+    my $gccversion = $Config{gccversion} // q{};
+    if ($gccversion =~ /Clang/i) {
+      eval {
+        $configure->edit(sub {
+          s{-fms-extensions\b}{-Wall}g;
+        });
+        $configure->chmod('a+x');
+      };
+    }
   }
 
   return;

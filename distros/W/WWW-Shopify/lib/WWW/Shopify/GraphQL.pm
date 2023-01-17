@@ -3,7 +3,7 @@ package WWW::Shopify::GraphQL;
 use strict;
 use warnings; 
 
-use JSON qw(from_json decode_json);
+use JSON qw(from_json decode_json encode_json);
 use Encode;
 use Scalar::Util qw(blessed);
 use Data::Dumper;
@@ -28,13 +28,14 @@ sub encode_hash {
 }
 
 sub internal_query {
-	my ($self, $hash) = @_;
-	my $request = HTTP::Request->new(POST => $self->sa->encode_url('/admin/api/graphql.json'));
+	my ($self, $hash, $json) = @_;
+	my $request = HTTP::Request->new(POST => $self->sa->encode_url('/admin/api/' . $self->sa->api_version . '/graphql.json'));
 	my $content = ref($hash) ? encode("UTF-8", $self->encode_hash({ query => $hash })) : encode("UTF-8", $hash);
-	$request->content($content);
-	$request->header('Content-Length' => length($content));
+	my $body = encode_json({ "query" => $content, "variables" => ($json || {}) });
+	$request->content($body);
+	$request->header('Content-Length' => length($body));
 	$request->header('Accept' => 'application/json');
-	$request->header('Content-Type' => 'application/graphql');
+	$request->header('Content-Type' => 'application/json; charset=UTF-8');
 	my $response = $self->sa->ua->request($request);
 	print STDERR "POST " . $response->request->uri . "\n" if $ENV{'SHOPIFY_LOG'} && $ENV{'SHOPIFY_LOG'} == 1;
 	print STDERR Dumper($response) if $ENV{'SHOPIFY_LOG'} && $ENV{'SHOPIFY_LOG'} > 1;
@@ -51,7 +52,7 @@ sub internal_query {
 	}
 	if ($content && $content->{errors}) {		
 		die WWW::Shopify::Exception::CallLimit->new($response) if int(grep { $_->{message} eq "Throttled" } @{$content->{errors}}) > 0;
-		die WWW::Shopify::Exception::ExceededCost->new($response) if int(grep { $_->{message} =~ m/Query has a cost of/i } @{$content->{errors}}) > 0;
+		die WWW::Shopify::Exception::ExceededCost->new($response) if int(grep { $_->{extensions} && $_->{extensions}->{code} && $_->{extensions}->{code} eq 'MAX_COST_EXCEEDED' } @{$content->{errors}}) > 0;
 		# Adding this in the hope tht they have reasonable error handling someday.
 		die WWW::Shopify::Exception::QueryParamTooLong->new($response) if int(grep { $_->{message} =~ m/query param length is too/i } @{$content->{errors}}) > 0;
 		die WWW::Shopify::Exception->new($response);
@@ -61,12 +62,12 @@ sub internal_query {
 }
 
 sub query {
-	my ($self, $hash) = @_;
+	my ($self, $hash, $variables) = @_;
 	
 	my @result;
 	while (int(@result) == 0) {
 		eval {
-			@result = $self->internal_query($hash);
+			@result = $self->internal_query($hash, $variables);
 		};
 		if (my $exp = $@) {
 			if ($self->sa->sleep_for_limit && blessed($exp) && $exp->isa('WWW::Shopify::Exception::CallLimit')) {
@@ -85,11 +86,39 @@ use List::Util qw(min max);
 use IO::Handle;
 use Fcntl qw(SEEK_SET SEEK_END SEEK_CUR);
 
+sub cancel_bulk_operation {
+	my ($self, $id) = @_;
+	my ($response, $result) = $self->query('mutation bulkOperationCancel($id: ID!) { bulkOperationCancel(id: $id) { bulkOperation { status } userErrors { field message } } }', { id => $id });
+	die WWW::Shopify::Exception->new($response) if int(@{$result->{bulkOperationCancel}->{userErrors}}) > 0;
+	return 1;
+}
+
+sub current_bulk_operation {
+	my ($self) = @_;
+	my ($response, $result) = $self->query('query { currentBulkOperation { id status errorCode createdAt completedAt objectCount fileSize url partialDataUrl } }');
+	return undef if !$result->{currentBulkOperation} || !$result->{currentBulkOperation}->{id};
+	return $result->{currentBulkOperation};
+}
+
 sub bulk_operation_query {
-	my ($self, $hash, $callback) = @_;
+	my ($self, $hash, $callback, $properties) = @_;
 	my $content = ref($hash) ? $self->encode_hash({ query => $hash }) : $hash;
 	my $query = "mutation { bulkOperationRunQuery(query: \"\"\"$content\"\"\") { bulkOperation { id status } userErrors { field message } } }";
-	my ($response,  $result) = $self->query($query);
+	my ($response, $result) = $self->query($query);
+	
+	if ($properties && $properties->{cancel_running_operation} && $result->{bulkOperationRunQuery} && $result->{bulkOperationRunQuery}->{userErrors} && int(@{$result->{bulkOperationRunQuery}->{userErrors}}) > 0 && 
+		$result->{bulkOperationRunQuery}->{userErrors}->[0]->{message} =~ m/already in progress/) {
+		my $bulk_operation = $self->current_bulk_operation;
+		die WWW::Shopify::Exception->new($response) unless $bulk_operation && $bulk_operation->{status} eq "RUNNING";
+		$self->cancel_bulk_operation($bulk_operation->{id});
+		my $max_wait = 10*60;
+		my $start = DateTime->now;
+		while ($bulk_operation->{status} ne "CANCELED" && DateTime->now->epoch - $start->epoch < $max_wait) {
+			$bulk_operation = $self->current_bulk_operation;
+			sleep(5);
+		}
+		($response, $result) = $self->query($query);
+	}
 	die WWW::Shopify::Exception->new($response) if !$result->{bulkOperationRunQuery} || !$result->{bulkOperationRunQuery}->{bulkOperation}->{status} || $result->{bulkOperationRunQuery}->{bulkOperation}->{status} ne "CREATED";
 	while (1) {
 		my ($response, $result) = $self->query('query { currentBulkOperation { id status errorCode createdAt completedAt objectCount fileSize url partialDataUrl } }');
@@ -121,12 +150,13 @@ sub bulk_operation_query {
 				$buffer = $chunk . $buffer;
 				while ((my $index = rindex($buffer, "\n")) != -1) {
 					my $line = substr($buffer, $index, length($buffer) - $index + 1, "");
-					$callback->(substr($line, 1));
+					$callback->(substr($line, 1)) if length($line) > 1;
 				}
 			}
-			$callback->($buffer);
+			$callback->($buffer) if length($buffer) > 0;
 			last;
 		} else {
+			die WWW::Shopify::Exception->new($response) if $result->{currentBulkOperation}->{status} !~ /(RUNNING|CREATED)/;
 			sleep(1);
 		}
 	}

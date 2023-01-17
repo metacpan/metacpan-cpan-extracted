@@ -1,5 +1,5 @@
 package Neovim::Ext::VIMCompat::Buffer;
-$Neovim::Ext::VIMCompat::Buffer::VERSION = '0.05';
+$Neovim::Ext::VIMCompat::Buffer::VERSION = '0.06';
 use strict;
 use warnings;
 use base qw/Class::Accessor/;
@@ -130,7 +130,7 @@ Neovim::Ext::VIMCompat::Buffer - Neovim legacy VIM perl compatibility layer
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNPOSIS
 

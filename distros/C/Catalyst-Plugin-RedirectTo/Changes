@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst::Plugin::RedirectTo.
 
+0.004 - 2023-01-13
+  - Fixed bugs with redirect_to_action
+  - Better error messages when you provide args that don't make a url
+
 0.003 - 2018-11-07
   - If the ::URI plugin exists, use that (for named actions).
 

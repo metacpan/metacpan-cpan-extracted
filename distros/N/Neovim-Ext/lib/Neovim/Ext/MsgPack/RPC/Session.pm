@@ -1,5 +1,5 @@
 package Neovim::Ext::MsgPack::RPC::Session;
-$Neovim::Ext::MsgPack::RPC::Session::VERSION = '0.05';
+$Neovim::Ext::MsgPack::RPC::Session::VERSION = '0.06';
 use strict;
 use warnings;
 use base qw/Class::Accessor/;
@@ -246,7 +246,7 @@ Neovim::Ext::MsgPack::RPC::Session - Neovim::Ext::MsgPack::RPC::Session class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

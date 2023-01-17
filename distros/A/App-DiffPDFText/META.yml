@@ -19,9 +19,10 @@ name: App-DiffPDFText
 provides:
   App::DiffPDFText:
     file: lib/App/DiffPDFText.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   App::PDFUtils: '0.007'
+  CLI::Meta::diff: '0'
   CLI::MetaUtil::Getopt::Long: '0.002'
   File::Slurper: '0'
   File::Temp: '0.2307'
@@ -36,7 +37,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-DiffPDFText
   homepage: https://metacpan.org/release/App-DiffPDFText
   repository: git://github.com/perlancar/perl-App-DiffPDFText.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

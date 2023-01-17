@@ -1,5 +1,5 @@
 package Neovim::Ext::VIMCompat;
-$Neovim::Ext::VIMCompat::VERSION = '0.05';
+$Neovim::Ext::VIMCompat::VERSION = '0.06';
 use strict;
 use warnings;
 use Exporter 'import';
@@ -170,7 +170,7 @@ Neovim::Ext::VIMCompat - Neovim legacy VIM perl compatibility layer
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNPOSIS
 

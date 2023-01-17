@@ -1,0 +1,77 @@
+<opacRecord>
+  <bibliographicRecord>
+    <record
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+        xmlns="http://www.loc.gov/MARC21/slim">
+    
+      <leader>03101cam a2200505Ii 4500</leader>
+      <controlfield tag="007">cr cnu---unuuu</controlfield>
+      <controlfield tag="008">1234567890123456789012345678901</controlfield>
+      <datafield tag="845" ind1=" " ind2=" ">
+        <subfield code="3">Bituminous Coal Division and National Bituminous Coal Commission Records</subfield>
+        <subfield code="a">"No information obtained from a producer disclosing cost of production or sales realization shall be made public without the consent of the producer from whom the same shall have been obtained";</subfield>
+        <subfield code="c">50 Stat.88.</subfield>
+      </datafield>
+    </record>
+  </bibliographicRecord>
+  <holdings>
+    <holding>
+      <typeOfRecord>c</typeOfRecord>
+      <encodingLevel>5</encodingLevel>
+      <format>cr</format>
+      <receiptAcqStatus>6</receiptAcqStatus>
+      <generalRetention>2</generalRetention>
+      <completeness>6</completeness>
+      <dateOfReport>678901</dateOfReport>
+      <callNumber>G1046.C3 .L56 2009eb</callNumber>
+      <shelvingData>The Amazing Adventures of Captain Gladys &quot;Stoat&quot; Pamphlet and Her Intrepid Spaniel Stig Among the Giant Pygmies of Beccles</shelvingData>
+      <copyNumber>3</copyNumber>
+      <publicNote>All Cretans are liars</publicNote>
+      <termsUseRepro>$3Bituminous Coal Division and National Bituminous Coal Commission Records$a&quot;No information obtained from a producer disclosing cost of production or sales realization shall be made public without the consent of the producer from whom the same shall have been obtained&quot;;$c50 Stat.88.</termsUseRepro>
+      <circulations>
+        <circulation>
+          <availableNow value="0" />
+          <restrictions>Missing</restrictions>
+          <itemId>01234567890</itemId>
+          <renewable value="" />
+          <onHold value="" />
+          <enumAndChron>42 29</enumAndChron>
+          <temporaryLocation>Online Library Resources</temporaryLocation>
+        </circulation>
+        <circulation>
+          <availableNow value="0" />
+          <itemId>9876543210</itemId>
+          <renewable value="" />
+          <onHold value="" />
+          <enumAndChron>3 March</enumAndChron>
+        </circulation>
+      </circulations>
+    </holding>
+    <holding>
+      <typeOfRecord>c</typeOfRecord>
+      <encodingLevel>5</encodingLevel>
+      <format>cr</format>
+      <receiptAcqStatus>6</receiptAcqStatus>
+      <generalRetention>2</generalRetention>
+      <completeness>6</completeness>
+      <dateOfReport>678901</dateOfReport>
+      <nucCode>Simmons University</nucCode>
+      <localLocation>Simmons University Library</localLocation>
+      <shelvingLocation>Online Library Resources</shelvingLocation>
+      <callNumber>G1046.C3&lt;L56&gt;2009eb</callNumber>
+      <reproductionNote>May be freely copied</reproductionNote>
+      <termsUseRepro>$3Bituminous Coal Division and National Bituminous Coal Commission Records$a&quot;No information obtained from a producer disclosing cost of production or sales realization shall be made public without the consent of the producer from whom the same shall have been obtained&quot;;$c50 Stat.88.</termsUseRepro>
+      <circulations>
+        <circulation>
+          <availableNow value="0" />
+          <itemId>9876543210</itemId>
+          <renewable value="" />
+          <onHold value="" />
+          <enumAndChron>3 March</enumAndChron>
+          <temporaryLocation>Online Library Resources</temporaryLocation>
+        </circulation>
+      </circulations>
+    </holding>
+  </holdings>
+</opacRecord>

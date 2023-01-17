@@ -15,7 +15,7 @@ if ($^O eq 'MSWin32')
 }
 
 my $tester = TestNvim->new;
-my $vim = $tester->start_socket ('nvim.sock');
+my $vim = $tester->start_socket ('t/nvim.sock');
 
 $vim->api->command ('let g:var = 3');
 is $vim->api->eval ('g:var'), 3;

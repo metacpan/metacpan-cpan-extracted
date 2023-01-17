@@ -7126,6 +7126,37 @@ start_dirty_rate_calc(dom, secs, flags = 0)
     if ((virDomainStartDirtyRateCalc(dom, secs, flags) < 0))
         _croak_error();
 
+
+void
+fd_associate(dom, name, fdssv, flags=0)
+    virDomainPtr dom;
+    const char *name;
+    SV *fdssv;
+    unsigned int flags;
+ PREINIT:
+    AV *fdsav;
+    unsigned int nfds;
+    int *fds;
+    int i;
+ PPCODE:
+    if (!SvROK(fdssv))
+        return;
+    fdsav = (AV*)SvRV(fdssv);
+    nfds = av_len(fdsav) + 1;
+    Newx(fds, nfds, int);
+
+    for (i = 0 ; i < nfds ; i++) {
+        SV **fd = av_fetch(fdsav, i, 0);
+        fds[i] = SvIV(*fd);
+    }
+
+    if (virDomainFDAssociate(dom, name, nfds, fds, flags) < 0) {
+        Safefree(fds);
+        _croak_error();
+    }
+
+    Safefree(fds);
+
 void
 destroy(dom_rv, flags=0)
     SV *dom_rv;
@@ -10405,6 +10436,7 @@ BOOT:
     REGISTER_CONSTANT(VIR_DOMAIN_JOB_OPERATION_SNAPSHOT_REVERT, JOB_OPERATION_SNAPSHOT_REVERT);
     REGISTER_CONSTANT(VIR_DOMAIN_JOB_OPERATION_DUMP, JOB_OPERATION_DUMP);
     REGISTER_CONSTANT(VIR_DOMAIN_JOB_OPERATION_BACKUP, JOB_OPERATION_BACKUP);
+    REGISTER_CONSTANT(VIR_DOMAIN_JOB_OPERATION_SNAPSHOT_DELETE, JOB_OPERATION_SNAPSHOT_DELETE);
 
     REGISTER_CONSTANT(VIR_DOMAIN_ABORT_JOB_POSTCOPY, DOMAIN_ABORT_JOB_POSTCOPY);
 
@@ -10477,6 +10509,9 @@ BOOT:
     REGISTER_CONSTANT(VIR_DOMAIN_DIRTYRATE_MODE_DIRTY_RING, DIRTYRATE_MODE_DIRTY_RING);
     REGISTER_CONSTANT_STR(VIR_DOMAIN_SAVE_PARAM_FILE, SAVE_PARAM_FILE);
     REGISTER_CONSTANT_STR(VIR_DOMAIN_SAVE_PARAM_DXML, SAVE_PARAM_DXML);
+
+    REGISTER_CONSTANT(VIR_DOMAIN_FD_ASSOCIATE_SECLABEL_RESTORE, FD_ASSOCIATE_SECLABEL_RESTORE);
+    REGISTER_CONSTANT(VIR_DOMAIN_FD_ASSOCIATE_SECLABEL_WRITABLE, FD_ASSOCIATE_SECLABEL_WRITABLE);
 
     stash = gv_stashpv( "Sys::Virt::DomainSnapshot", TRUE );
     REGISTER_CONSTANT(VIR_DOMAIN_SNAPSHOT_DELETE_CHILDREN, DELETE_CHILDREN);

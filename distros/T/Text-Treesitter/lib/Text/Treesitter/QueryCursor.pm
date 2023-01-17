@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package Text::Treesitter::QueryCursor 0.04;
+package Text::Treesitter::QueryCursor 0.05;
 
 use v5.14;
 use warnings;

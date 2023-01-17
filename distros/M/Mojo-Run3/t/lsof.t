@@ -46,7 +46,7 @@ subtest 'force run3 out of scope' => sub {
   local $TODO = $todo;
   is lsof(), $initial, 'lsof after undef';
   Mojo::Promise->timer(0.1)->wait;
-  is kill(0 => $pid), 0, 'kill';
+  is kill(0 => $pid), 0, 'killed nothing' or diag "kill $pid ($$)";
 };
 
 subtest 'close other' => sub {
@@ -57,9 +57,9 @@ subtest 'close other' => sub {
 
   $run3->run_p(sub {
     my ($run3) = @_;
-    system "lsof -p $$ | grep PIPE | grep $$ | wc -l 1>&2";
+    system "lsof -p $$ | grep 'PIPE\\|FIFO' | grep $$ | wc -l 1>&2";
     $run3->close('other');
-    system "lsof -p $$ | grep PIPE | grep $$ | wc -l";
+    system "lsof -p $$ | grep 'PIPE\\|FIFO' | grep $$ | wc -l";
   })->wait;
 
   chomp $read{stderr};

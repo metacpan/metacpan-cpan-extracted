@@ -10,11 +10,11 @@ Regexp::Pattern::License::Parts - Regular expressions for licensing sub-parts
 
 =head1 VERSION
 
-Version v3.9.4
+Version v3.10.0
 
 =cut
 
-our $VERSION = version->declare("v3.9.4");
+our $VERSION = version->declare("v3.10.0");
 
 =head STATUS
 
@@ -219,7 +219,7 @@ our %RE = (
 	},
 	asis_sw_name_discl => {
 		pat =>
-			'THE SOFTWARE IS PROVIDED [as is](?:,?|AND)[ word]{1,15} DISCLAIMS'
+			'THE SOFTWARE IS PROVIDED [as is](?:,?| AND)[ word]{1,15} DISCLAIMS'
 	},
 	asis_sw_warranty =>
 		{ pat => 'THE SOFTWARE IS PROVIDED [as is],? WITHOUT WARRANTY' },

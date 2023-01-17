@@ -44,11 +44,11 @@ Asm::X86 - List of instructions and registers of x86-compatible processors, vali
 
 =head1 VERSION
 
-Version 0.62
+Version 0.65
 
 =cut
 
-our $VERSION = '0.62';
+our $VERSION = '0.65';
 
 =head1 DESCRIPTION
 
@@ -177,11 +177,11 @@ between AT&T and Intel syntaxes.
 =cut
 
 # =head2 _add_percent
-# 
+#
 #  PRIVATE SUBROUTINE.
 #  Add a percent character ('%') in front of each element in the array given as a parameter.
 #  Returns the new array.
-# 
+#
 # =cut
 
 sub _add_percent(@) {
@@ -194,12 +194,12 @@ sub _add_percent(@) {
 }
 
 # =head2 _remove_duplicates
-# 
+#
 #  PRIVATE SUBROUTINE.
 #  Returns an array of the provided arguments with duplicate entries removed.
-# 
+#
 # =cut
-# 
+#
 sub _remove_duplicates(@) {
 
 	# Use a hash to remove the duplicates:
@@ -211,13 +211,13 @@ sub _remove_duplicates(@) {
 }
 
 # =head2 _nopluses
-# 
+#
 #  PRIVATE SUBROUTINE.
 #  Removes unnecessary '+' characters from the beginning of the given string.
 #  Returns the resulting string (or '+' if it was empty).
-# 
+#
 # =cut
-# 
+#
 sub _nopluses($) {
 
 	my $elem = shift;
@@ -470,25 +470,31 @@ our @regs_att = ( @regs8_att, @regs16_att, @regs32_att,
 =cut
 
 our @instr_intel = (
-	'aaa', 'aad', 'aam', 'aas', 'adc', 'adcx', 'add', 'addpd', 'addps', 'addsd', 'addss', 'addsubpd',
+	'aaa', 'aad', 'aadd', 'aam', 'aand', 'aas', 'adc', 'adcx', 'add', 'addpd', 'addps', 'addsd', 'addss', 'addsubpd',
 	'addsubps', 'adox', 'aesdec', 'aesdeclast', 'aesenc', 'aesenclast', 'aesimc', 'aeskeygenassist',
-	'and', 'andn', 'andnpd', 'andnps', 'andpd', 'andps', 'arpl', 'bb0_reset',
+	'and', 'andn', 'andnpd', 'andnps', 'andpd', 'andps', 'arpl', 'axor', 'bb0_reset',
 	'bb1_reset', 'bextr', 'blcfill', 'blci', 'blcic', 'blcmsk', 'blcs',
 	'blendpd', 'blendps', 'blendvpd', 'blendvps', 'blsfill', 'blsi', 'blsic', 'blsmsk', 'blsr',
 	'bnd', 'bndcl', 'bndcn', 'bndcu', 'bndldx', 'bndmk', 'bndmov', 'bndstx',
 	'bound', 'bsf', 'bsr', 'bswap', 'bt', 'btc', 'btr', 'bts', 'bzhi', 'call', 'cbw',
 	'cdq', 'cdqe', 'clac', 'clc', 'cld', 'cldemote', 'clflush', 'clflushopt',
-	'clgi', 'cli', 'clrssbsy','clts', 'clzero',
-	'clwb', 'cmc', 'cmova', 'cmovae', 'cmovb', 'cmovbe', 'cmovc', 'cmove', 'cmovg', 'cmovge',
+	'clgi', 'cli', 'clrssbsy','clts', 'clui', 'clwb', 'clzero',
+	'cmc', 'cmova', 'cmovae', 'cmovb', 'cmovbe', 'cmovc', 'cmove', 'cmovg', 'cmovge',
 	'cmovl', 'cmovle', 'cmovna', 'cmovnae', 'cmovnb', 'cmovnbe', 'cmovnc',
 	'cmovne', 'cmovng', 'cmovnge', 'cmovnl', 'cmovnle', 'cmovno', 'cmovnp',
 	'cmovns', 'cmovnz', 'cmovo', 'cmovp', 'cmovpe', 'cmovpo', 'cmovs', 'cmovz',
-	'cmp', 'cmpeqpd', 'cmpeqps', 'cmpeqsd', 'cmpeqss', 'cmplepd', 'cmpleps', 'cmplesd', 'cmpless',
-	'cmpltpd', 'cmpltps', 'cmpltsd', 'cmpltss', 'cmpneqpd', 'cmpneqps', 'cmpneqsd', 'cmpneqss',
-	'cmpnlepd', 'cmpnleps', 'cmpnlesd', 'cmpnless', 'cmpnltpd', 'cmpnltps', 'cmpnltsd',
-	'cmpnltss', 'cmpordpd', 'cmpordps', 'cmpordsd', 'cmpordss', 'cmppd', 'cmpps', 'cmpsb',
-	'cmpsd', 'cmpsq', 'cmpss', 'cmpsw', 'cmpunordpd', 'cmpunordps', 'cmpunordsd', 'cmpunordss',
-	'cmpxchg', 'cmpxchg16b', 'cmpxchg486', 'cmpxchg8b', 'comeqpd', 'comeqps', 'comeqsd',
+	'cmp', 'cmpaexadd', 'cmpaxadd', 'cmpbexadd', 'cmpbxadd', 'cmpcxadd',
+	'cmpeqpd', 'cmpeqps', 'cmpeqsd', 'cmpeqss', 'cmpexadd', 'cmpgexadd', 'cmpgxadd',
+	'cmplepd', 'cmpleps', 'cmplesd', 'cmpless', 'cmplexadd',
+	'cmpltpd', 'cmpltps', 'cmpltsd', 'cmpltss', 'cmplxadd', 'cmpnaexadd', 'cmpnaxadd',
+	'cmpnbexadd', 'cmpnbxadd', 'cmpncxadd', 'cmpneqpd', 'cmpneqps', 'cmpneqsd', 'cmpneqss',
+	'cmpnexadd', 'cmpngexadd', 'cmpngxadd','cmpnlepd', 'cmpnleps', 'cmpnlesd', 'cmpnless',
+	'cmpnlexadd', 'cmpnltpd', 'cmpnltps', 'cmpnltsd', 'cmpnltss', 
+	'cmpnlxadd', 'cmpnoxadd', 'cmpnpxadd', 'cmpnsxadd', 'cmpnzxadd',
+	'cmpordpd', 'cmpordps', 'cmpordsd', 'cmpordss', 'cmpoxadd',
+	'cmppd', 'cmppexadd', 'cmppoxadd', 'cmpps', 'cmppxadd', 'cmpsb',
+	'cmpsd', 'cmpsq', 'cmpss', 'cmpsw', 'cmpsxadd', 'cmpunordpd', 'cmpunordps', 'cmpunordsd', 'cmpunordss',
+	'cmpxchg', 'cmpxchg16b', 'cmpxchg486', 'cmpxchg8b', 'cmpzxadd', 'comeqpd', 'comeqps', 'comeqsd',
 	'comeqss', 'comfalsepd', 'comfalseps', 'comfalsesd', 'comfalsess', 'comisd', 'comiss',
 	'comlepd', 'comleps', 'comlesd', 'comless', 'comltpd', 'comltps', 'comltsd', 'comltss',
 	'comneqpd', 'comneqps', 'comneqsd', 'comneqss', 'comnlepd', 'comnleps', 'comnlesd', 'comnless',
@@ -529,7 +535,7 @@ our @instr_intel = (
 	'hint_nop46', 'hint_nop47', 'hint_nop48', 'hint_nop49', 'hint_nop5', 'hint_nop50', 'hint_nop51',
 	'hint_nop52', 'hint_nop53', 'hint_nop54', 'hint_nop55', 'hint_nop56', 'hint_nop57', 'hint_nop58',
 	'hint_nop59', 'hint_nop6', 'hint_nop60', 'hint_nop61', 'hint_nop62', 'hint_nop63', 'hint_nop7',
-	'hint_nop8', 'hint_nop9', 'hlt', 'hsubpd', 'hsubps', 'ibts', 'icebp', 'idiv', 'imul', 'in',
+	'hint_nop8', 'hint_nop9', 'hlt', 'hreset', 'hsubpd', 'hsubps', 'ibts', 'icebp', 'idiv', 'imul', 'in',
 	'inc', 'incsspd', 'incsspq', 'incbin', 'insb', 'insd', 'insertps', 'insertq', 'insw', 'int', 'int01', 'int03',
 	'int1', 'int3', 'into', 'invd', 'invept', 'invlpg', 'invlpga', 'invlpgb', 'invpcid', 'invvpid', 'iret', 'iretd',
 	'iretq', 'iretw', 'ja', 'jae', 'jb', 'jbe', 'jc', 'jcxz', 'je', 'jecxz', 'jg', 'jge', 'jl',
@@ -586,8 +592,9 @@ our @instr_intel = (
 	'pmovzxbd', 'pmovzxbq', 'pmovzxbw', 'pmovzxdq', 'pmovzxwd', 'pmovzxwq', 'pmuldq', 'pmulhriw',
 	'pmulhrsw', 'pmulhrwa', 'pmulhrw', 'pmulhrwc', 'pmulhuw', 'pmulhw', 'pmulld', 'pmullw', 'pmuludq',
 	'pmvgezb', 'pmvlzb', 'pmvnzb', 'pmvzb', 'pop', 'popd', 'popa', 'popad', 'popaw', 'popcnt', 'popf',
-	'popfd', 'popfq', 'popfw', 'popq', 'popw', 'por', 'pperm', 'prefetch', 'prefetchnta', 'prefetcht0',
-	'prefetcht1', 'prefetcht2', 'prefetchw', 'prefetchwt1', 'protb', 'protd', 'protq', 'protw', 'psadbw',
+	'popfd', 'popfq', 'popfw', 'popq', 'popw', 'por', 'pperm',
+	'prefetch', 'prefetchit0', 'prefetchit1', 'prefetchnta', 'prefetcht0', 'prefetcht1',
+	'prefetcht2', 'prefetchw', 'prefetchwt1', 'protb', 'protd', 'protq', 'protw', 'psadbw',
 	'pshab', 'pshad', 'pshaq', 'pshaw', 'pshlb', 'pshld', 'pshlq', 'pshlw', 'pshufb', 'pshufd',
 	'pshufhw', 'pshuflw', 'pshufw', 'psignb', 'psignd', 'psignw', 'pslld', 'pslldq', 'psllq',
 	'psllw', 'psmash', 'psrad', 'psraw', 'psrld', 'psrldq', 'psrlq', 'psrlw', 'psubb', 'psubd', 'psubq',
@@ -595,13 +602,14 @@ our @instr_intel = (
 	'punpckhdq', 'punpckhqdq', 'punpckhwd', 'punpcklbw', 'punpckldq', 'punpcklqdq', 'punpcklwd',
 	'push', 'pusha', 'pushad', 'pushaw', 'pushd', 'pushf', 'pushfd', 'pushfq', 'pushfw', 'pushq',
 	'pushw', 'pvalidate', 'pxor', 'rcl', 'rcpps', 'rcpss', 'rcr', 'rdfsbase', 'rdgsbase', 'rdm', 'rdmsr',
-	'rdmsrq', 'rdpid', 'rdpkru', 'rdpmc', 'rdpru', 'rdrand', 'rdseed', 'rdsspd', 'rdsspq', 'rdshr',
-	'rdtsc', 'rdtscp', 'rep', 'repe', 'repne', 'repnz',
+	'rdmsrlist', 'rdmsrq', 'rdpid', 'rdpkru', 'rdpmc', 'rdpru', 'rdrand',
+	'rdseed', 'rdsspd', 'rdsspq', 'rdshr', 'rdtsc', 'rdtscp', 'rep', 'repe', 'repne', 'repnz',
 	'repz', 'ret', 'retd', 'retf', 'retfd', 'retfq', 'retfw', 'retn', 'retnd', 'retnq', 'retnw', 'retq', 'retw',
 	'rmpadjust', 'rmpupdate', 'rol', 'ror', 'rorx', 'roundpd', 'roundps', 'roundsd', 'roundss', 'rsdc', 'rsldt', 'rsm',
 	'rsqrtps', 'rsqrtss', 'rstorssp', 'rsts', 'sahf', 'sal', 'salc', 'sar',
 	'sarx', 'saveprevssp', 'sbb', 'scasb', 'scasd', 'scasq',
-	'scasw', 'serialize', 'seta', 'setae', 'setalc', 'setb', 'setbe', 'setc', 'sete', 'setg', 'setge', 'setl',
+	'scasw', 'senduipi', 'serialize', 'seta', 'setae', 'setalc', 'setb',
+	'setbe', 'setc', 'sete', 'setg', 'setge', 'setl',
 	'setle', 'setna', 'setnae', 'setnb', 'setnbe', 'setnc', 'setne', 'setng', 'setnge',
 	'setnl', 'setnle', 'setno', 'setnp', 'setns', 'setnz', 'seto', 'setp', 'setpe', 'setpo',
 	'sets', 'setssbsy', 'setz', 'sfence', 'sgdt', 'sha1msg1',
@@ -609,17 +617,18 @@ our @instr_intel = (
 	'shl', 'shld', 'shlx', 'shr', 'shrd', 'shrx', 'shufpd', 'shufps', 'sidt',
 	'skinit', 'sldt', 'slwpcb', 'smi', 'smint', 'smintold', 'smsw', 'sqrtpd', 'sqrtps', 'sqrtsd',
 	'sqrtss', 'stac', 'stc', 'std', 'stgi', 'sti', 'stmxcsr', 'stosb', 'stosd', 'stosq', 'stosw',
-	'str', 'sttilecfg', 'sub',
+	'str', 'sttilecfg', 'stui', 'sub',
 	'subpd', 'subps', 'subsd', 'subss', 'svdc', 'svldt', 'svts', 'swapgs', 'syscall', 'sysenter',
 	'sysexit', 'sysexitq', 'sysret', 'sysretq', 't1mskc', 'tdpbf16ps', 'tdpbssd', 'tdpbsud', 'tdpbusd', 'tdpbuud',
-	'test', 'tileloadd', 'tileloaddt1', 'tilerelease', 'tilestored', 'tilezero', 'tlbsync', 'tpause', 'tzcnt', 'tzmsk',
-	'ucomisd', 'ucomiss', 'ud0', 'ud1', 'ud2', 'ud2a', 'ud2b', 'umonitor', 'umov',
+	'test', 'testui', 'tileloadd', 'tileloaddt1', 'tilerelease', 'tilestored',
+	'tilezero', 'tlbsync', 'tpause', 'tzcnt', 'tzmsk',
+	'ucomisd', 'ucomiss', 'ud0', 'ud1', 'ud2', 'ud2a', 'ud2b', 'uiret', 'umonitor', 'umov',
 	'umwait', 'unpckhpd', 'unpckhps', 'unpcklpd', 'unpcklps', 'useavx256', 'useavx512',
 	'v4dpwssd', 'v4dpwssds', 'v4fmaddps', 'v4fmaddss', 'v4fnmaddps', 'v4fnmaddss',
-	'vaddpd', 'vaddps', 'vaddsd', 'vaddss', 'vaddsubpd', 'vaddsubps', 'vaesdec',
+	'vaddpd', 'vaddph', 'vaddps', 'vaddsd', 'vaddsh', 'vaddss', 'vaddsubpd', 'vaddsubps', 'vaesdec',
 	'vaesdeclast', 'vaesenc', 'vaesenclast', 'vaesimc', 'vaeskeygenassist', 'valignd',
-	'valignq', 'vandnpd', 'vandnps', 'vandpd', 'vandps', 'vblendmpd',
-	'vblendmps', 'vblendpd', 'vblendps',
+	'valignq', 'vandnpd', 'vandnps', 'vandpd', 'vandps', 'vbcstnebf16ps',
+	'vbcstnesh2ps', 'vblendmpd', 'vblendmps', 'vblendpd', 'vblendps',
 	'vblendvpd', 'vblendvps', 'vbroadcastf128', 'vbroadcastf32x2', 'vbroadcastf32x4',
 	'vbroadcastf32x8', 'vbroadcastf64x2', 'vbroadcastf64x4', 'vbroadcasti128', 'vbroadcasti32x2',
 	'vbroadcasti32x4', 'vbroadcasti32x8', 'vbroadcasti64x2',
@@ -660,40 +669,52 @@ our @instr_intel = (
 	'vcmpnlt_uqss', 'vcmpnlt_uspd', 'vcmpnlt_usps', 'vcmpnlt_ussd', 'vcmpnlt_usss',
 	'vcmpordpd', 'vcmpordps', 'vcmpordsd', 'vcmpordss', 'vcmpord_qpd', 'vcmpord_qps',
 	'vcmpord_qsd', 'vcmpord_qss', 'vcmpord_spd', 'vcmpord_sps',
-	'vcmpord_ssd', 'vcmpord_sss', 'vcmppd', 'vcmpps', 'vcmpsd', 'vcmpss', 'vcmptruepd', 'vcmptrueps',
+	'vcmpord_ssd', 'vcmpord_sss', 'vcmppd', 'vcmpph', 'vcmpps',
+	'vcmpsd', 'vcmpsh', 'vcmpss', 'vcmptruepd', 'vcmptrueps',
 	'vcmptruesd', 'vcmptruess', 'vcmptrue_uqpd', 'vcmptrue_uqps', 'vcmptrue_uqsd', 'vcmptrue_uqss',
 	'vcmptrue_uspd', 'vcmptrue_usps', 'vcmptrue_ussd', 'vcmptrue_usss',
 	'vcmpunordpd', 'vcmpunordps', 'vcmpunordsd', 'vcmpunordss', 'vcmpunord_qpd', 'vcmpunord_qps',
 	'vcmpunord_qsd', 'vcmpunord_qss', 'vcmpunord_spd', 'vcmpunord_sps', 'vcmpunord_ssd',
-	'vcmpunord_sss', 'vcomisd', 'vcomiss', 'vcompresspd',
-	'vcompressps', 'vcvtdq2pd', 'vcvtdq2ps', 'vcvtpd2dq', 'vcvtne2ps2bf16',
-	'vcvtpd2ps', 'vcvtpd2qq', 'vcvtpd2udq', 'vcvtpd2uqq', 'vcvtph2ps', 'vcvtps2dq', 'vcvtps2pd', 'vcvtps2ph',
-	'vcvtps2qq', 'vcvtps2udq', 'vcvtps2uqq', 'vcvtqq2pd', 'vcvtqq2ps','vcvtsd2si', 'vcvtsd2ss', 'vcvtsd2usi',
-	'vcvtsi2sd', 'vcvtsi2ss', 'vcvtss2sd', 'vcvtss2si', 'vcvtss2usi', 'vcvttpd2dq',
-	'vcvttpd2qq', 'vcvttpd2udq', 'vcvttpd2uqq', 'vcvttps2dq', 'vcvttps2qq',
-	'vcvttps2uqq', 'vcvttps2udq', 'vcvttsd2si', 'vcvttsd2usi', 'vcvttss2si', 'vcvttss2usi',
-	'vcvtudq2pd', 'vcvtudq2ps', 'vcvtuqq2pd', 'vcvtuqq2ps','vcvtusi2sd', 'vcvtusi2ss', 'vdbpsadbw',
-	'vdivpd', 'vdivps', 'vdivsd', 'vdivss', 'vdpbf16ps', 'vdppd', 'vdpps', 'verr', 'verw', 'vexp2pd',
-	'vexp2ps', 'vexpandpd', 'vexpandps',
+	'vcmpunord_sss', 'vcomisd', 'vcomish', 'vcomiss', 'vcompresspd',
+	'vcompressps', 'vcvtdq2pd', 'vcvtdq2ph', 'vcvtdq2ps', 'vcvtne2ps2bf16',
+	'vcvtneebf162ps', 'vcvtneeph2ps', 'vcvtneobf162ps', 'vcvtneoph2ps', 'vcvtneps2bf16',
+	'vcvtpd2dq', 'vcvtpd2ph', 'vcvtpd2ps', 'vcvtpd2qq', 'vcvtpd2udq', 'vcvtpd2uqq',
+	'vcvtph2dq', 'vcvtph2pd', 'vcvtph2ps', 'vcvtph2psx', 'vcvtph2qq',
+	'vcvtph2udq', 'vcvtph2uqq', 'vcvtph2uw', 'vcvtph2w', 'vcvtps2dq', 'vcvtps2pd', 'vcvtps2ph',
+	'vcvtps2qq', 'vcvtps2udq', 'vcvtps2uqq', 'vcvtqq2pd', 'vcvtqq2ph', 'vcvtqq2ps',
+	'vcvtsd2sh', 'vcvtsd2si', 'vcvtsd2ss', 'vcvtsd2usi', 'vcvtsh2sd', 'vcvtsh2si',
+	'vcvtsh2ss', 'vcvtsh2usi', 'vcvtsi2sd', 'vcvtsi2sh', 'vcvtsi2ss', 'vcvtss2sd',
+	'vcvtss2sh', 'vcvtss2si', 'vcvtss2usi', 'vcvttpd2dq',
+	'vcvttpd2qq', 'vcvttpd2udq', 'vcvttpd2uqq', 'vcvttph2dq',
+	'vcvttph2qq', 'vcvttph2udq', 'vcvttph2uqq', 'vcvttph2uw', 'vcvttph2w', 'vcvttps2dq', 'vcvttps2qq',
+	'vcvttps2uqq', 'vcvttps2udq', 'vcvttsd2si', 'vcvttsd2usi',
+	'vcvttsh2si', 'vcvttsh2usi', 'vcvttss2si', 'vcvttss2usi',
+	'vcvtudq2pd', 'vcvtudq2ph', 'vcvtudq2ps', 'vcvtuqq2pd', 'vcvtuqq2ph',
+	'vcvtuqq2ps', 'vcvtusi2sd', 'vcvtusi2sh', 'vcvtusi2ss', 'vcvtuw2ph', 'vcvtw2ph', 'vdbpsadbw',
+	'vdivpd', 'vdivph', 'vdivps', 'vdivsd', 'vdivsh','vdivss', 'vdpbf16ps',
+	'vdppd', 'vdpps', 'vendscaleph', 'vendscalesh', 'verr', 'verw',
+	'vexp2pd', 'vexp2ps', 'vexpandpd', 'vexpandps',
 	'vextractf128', 'vextractf32x4', 'vextractf32x8', 'vextractf64x2',
 	'vextractf64x4', 'vextracti128', 'vextracti32x4', 'vextracti32x8', 'vextracti64x2',
-	'vextracti64x4', 'vextractps', 'vfixupimmpd', 'vfixupimmps', 'vfixupimmsd', 'vfixupimmss',
+	'vextracti64x4', 'vextractps', 'vfcmaddcph', 'vfcmaddcsh', 'vfcmulcpch', 'vfcmulcsh',
+	'vfixupimmpd', 'vfixupimmps', 'vfixupimmsd', 'vfixupimmss',
 	'vfmadd123pd', 'vfmadd123ps', 'vfmadd123sd', 'vfmadd123ss',
-	'vfmadd132pd', 'vfmadd132ps', 'vfmadd132sd', 'vfmadd132ss', 'vfmadd213pd', 'vfmadd213ps',
-	'vfmadd213sd', 'vfmadd213ss', 'vfmadd231pd', 'vfmadd231ps', 'vfmadd231sd', 'vfmadd231ss',
+	'vfmadd132pd', 'vfmadd132ph', 'vfmadd132ps', 'vfmadd132sd', 'vfmadd132ss', 'vfmadd213pd', 'vfmadd213ph', 'vfmadd213ps',
+	'vfmadd213sd', 'vfmadd213ss', 'vfmadd231pd', 'vfmadd231ph', 'vfmadd231ps', 'vfmadd231sd', 'vfmadd231ss',
 	'vfmadd312pd', 'vfmadd312ps', 'vfmadd312sd', 'vfmadd312ss', 'vfmadd321pd', 'vfmadd321ps',
-	'vfmadd321sd', 'vfmadd321ss', 'vfmaddpd', 'vfmaddps', 'vfmaddsd', 'vfmaddss', 'vfmaddsub123pd',
-	'vfmaddsub123ps', 'vfmaddsub132pd', 'vfmaddsub132ps', 'vfmaddsub213pd', 'vfmaddsub213ps',
-	'vfmaddsub231pd', 'vfmaddsub231ps', 'vfmaddsub312pd', 'vfmaddsub312ps', 'vfmaddsub321pd',
+	'vfmadd321sd', 'vfmadd321ss', 'vfmaddcph', 'vfmaddcsh', 'vfmaddpd', 'vfmaddps', 'vfmaddsd', 'vfmaddss', 'vfmaddsub123pd',
+	'vfmaddsub123ps', 'vfmaddsub132pd', 'vfmaddsub132ph', 'vfmaddsub132ps',
+	'vfmaddsub213pd', 'vfmaddsub213ph', 'vfmaddsub213ps',
+	'vfmaddsub231pd', 'vfmaddsub231ph','vfmaddsub231ps', 'vfmaddsub312pd', 'vfmaddsub312ps', 'vfmaddsub321pd',
 	'vfmaddsub321ps', 'vfmaddsubpd', 'vfmaddsubps', 'vfmsub123pd', 'vfmsub123ps',
-	'vfmsub123sd', 'vfmsub123ss', 'vfmsub132pd', 'vfmsub132ps', 'vfmsub132sd',
-	'vfmsub132ss', 'vfmsub213pd', 'vfmsub213ps', 'vfmsub213sd', 'vfmsub213ss',
-	'vfmsub231pd', 'vfmsub231ps', 'vfmsub231sd', 'vfmsub231ss', 'vfmsub312pd',
+	'vfmsub123sd', 'vfmsub123ss', 'vfmsub132pd', 'vfmsub132ph', 'vfmsub132ps', 'vfmsub132sd',
+	'vfmsub132ss', 'vfmsub213pd', 'vfmsub213ph', 'vfmsub213ps', 'vfmsub213sd', 'vfmsub213ss',
+	'vfmsub231pd', 'vfmsub231ph', 'vfmsub231ps', 'vfmsub231sd', 'vfmsub231ss', 'vfmsub312pd',
 	'vfmsub312ps', 'vfmsub312sd', 'vfmsub312ss', 'vfmsub321pd', 'vfmsub321ps',
-	'vfmsub321sd', 'vfmsub321ss', 'vfmsubadd123pd', 'vfmsubadd123ps', 'vfmsubadd132pd',
-	'vfmsubadd132ps', 'vfmsubadd213pd', 'vfmsubadd213ps', 'vfmsubadd231pd', 'vfmsubadd231ps',
+	'vfmsub321sd', 'vfmsub321ss', 'vfmsubadd123pd', 'vfmsubadd123ps', 'vfmsubadd132pd', 'vfmsubadd132ph',
+	'vfmsubadd132ps', 'vfmsubadd213pd', 'vfmsubadd213ph', 'vfmsubadd213ps', 'vfmsubadd231pd', 'vfmsubadd231ph', 'vfmsubadd231ps',
 	'vfmsubadd312pd', 'vfmsubadd312ps', 'vfmsubadd321pd', 'vfmsubadd321ps', 'vfmsubaddpd',
-	'vfmsubaddps', 'vfmsubpd', 'vfmsubps', 'vfmsubsd', 'vfmsubss', 'vfnmadd123pd', 'vfnmadd123ps',
+	'vfmsubaddps', 'vfmsubpd', 'vfmsubps', 'vfmsubsd', 'vfmsubss', 'vfmulcpch', 'vfmulcsh', 'vfnmadd123pd', 'vfnmadd123ps',
 	'vfnmadd123sd', 'vfnmadd123ss', 'vfnmadd132pd', 'vfnmadd132ps', 'vfnmadd132sd', 'vfnmadd132ss',
 	'vfnmadd213pd', 'vfnmadd213ps', 'vfnmadd213sd', 'vfnmadd213ss', 'vfnmadd231pd',
 	'vfnmadd231ps', 'vfnmadd231sd', 'vfnmadd231ss', 'vfnmadd312pd', 'vfnmadd312ps',
@@ -704,25 +725,26 @@ our @instr_intel = (
 	'vfnmsub213ss', 'vfnmsub231pd', 'vfnmsub231ps', 'vfnmsub231sd', 'vfnmsub231ss',
 	'vfnmsub312pd', 'vfnmsub312ps', 'vfnmsub312sd', 'vfnmsub312ss', 'vfnmsub321pd',
 	'vfnmsub321ps', 'vfnmsub321sd', 'vfnmsub321ss', 'vfnmsubpd', 'vfnmsubps', 'vfnmsubsd',
-	'vfnmsubss', 'vfpclasspd', 'vfpclassps', 'vfpclasssd', 'vfpclassss', 'vfrczpd',
+	'vfnmsubss', 'vfpclasspd', 'vfpclassph', 'vfpclassps', 'vfpclasssd', 'vfpclasssh', 'vfpclassss', 'vfrczpd',
 	'vfrczps', 'vfrczsd', 'vfrczss', 'vgatherdpd', 'vgatherdps',
 	'vgatherpf0dpd', 'vgatherpf0dps', 'vgatherpf0qpd', 'vgatherpf0qps',
 	'vgatherpf1dpd', 'vgatherpf1dps', 'vgatherpf1qpd', 'vgatherpf1qps',
-	'vgatherqpd', 'vgatherqps', 'vgetexppd', 'vgetexpps', 'vgetexpsd', 'vgetexpss',
-	'vgetmantpd', 'vgetmantps', 'vgetmantsd', 'vgetmantss', 'vgf2p8affineinvqb',
+	'vgatherqpd', 'vgatherqps', 'vgetexppd', 'vgetexpph', 'vgetexpps', 'vgetexpsd', 'vgetexpsh', 'vgetexpss',
+	'vgetmantpd', 'vgetmantph', 'vgetmantps', 'vgetmantsd', 'vgetmantsh', 'vgetmantss',
+	'vgetmaxph', 'vgetmaxsh', 'vgetminph', 'vgetminsh', 'vgf2p8affineinvqb',
 	'vgf2p8affineqb', 'vgf2p8mulb', 'vhaddpd', 'vhaddps', 'vhsubpd',
 	'vhsubps', 'vinsertf128', 'vinsertf32x4', 'vinsertf32x8',
 	'vinsertf64x2', 'vinsertf64x4', 'vinserti128', 'vinserti32x4', 'vinserti32x8', 'vinserti64x2',
 	'vinserti64x4', 'vinsertps', 'vlddqu', 'vldmxcsr', 'vldqqu', 'vmaskmovdqu',
 	'vmaskmovpd', 'vmaskmovps', 'vmaxpd', 'vmaxps', 'vmaxsd', 'vmaxss', 'vmcall', 'vmclear', 'vmfunc',
-	'vminpd', 'vminps', 'vminsd', 'vminss', 'vmlaunch', 'vmload', 'vmmcall', 'vmovapd', 'vmovaps',
+	'vmgexit', 'vminpd', 'vminps', 'vminsd', 'vminss', 'vmlaunch', 'vmload', 'vmmcall', 'vmovapd', 'vmovaps',
 	'vmovd', 'vmovddup', 'vmovdqa', 'vmovdqa32',
 	'vmovdqa64', 'vmovdqu', 'vmovdqu16', 'vmovdqu32',
 	'vmovdqu64', 'vmovdqu8', 'vmovhlps', 'vmovhpd', 'vmovhps', 'vmovlhps',
 	'vmovlpd', 'vmovlps', 'vmovmskpd', 'vmovmskps', 'vmovntdq', 'vmovntdqa', 'vmovntpd',
-	'vmovntps', 'vmovntqq', 'vmovq', 'vmovqqa', 'vmovqqu', 'vmovsd', 'vmovshdup', 'vmovsldup',
-	'vmovss', 'vmovupd', 'vmovups',  'vmpsadbw', 'vmptrld', 'vmptrst', 'vmread', 'vmresume',
-	'vmrun', 'vmsave', 'vmulpd', 'vmulps', 'vmulsd', 'vmulss', 'vmwrite', 'vmxoff', 'vmxon',
+	'vmovntps', 'vmovntqq', 'vmovq', 'vmovqqa', 'vmovqqu', 'vmovsd', 'vmovsh', 'vmovshdup', 'vmovsldup',
+	'vmovss', 'vmovupd', 'vmovups', 'vmovw', 'vmpsadbw', 'vmptrld', 'vmptrst', 'vmread', 'vmresume',
+	'vmrun', 'vmsave', 'vmulpd', 'vmulph', 'vmulps', 'vmulsd', 'vmulsh', 'vmulss', 'vmwrite', 'vmxoff', 'vmxon',
 	'vorpd', 'vorps', 'vp2intersectd', 'vp4dpwssd', 'vp4dpwssds', 'vpabsb', 'vpabsd',
 	'vpabsq', 'vpabsw', 'vpackssdw', 'vpacksswb', 'vpackusdw',
 	'vpackuswb', 'vpaddb', 'vpaddd', 'vpaddq', 'vpaddsb', 'vpaddsw', 'vpaddusb',
@@ -755,7 +777,8 @@ our @instr_intel = (
 	'vpcompressw', 'vpcomq', 'vpcomtrueb', 'vpcomtrued', 'vpcomtrueq',
 	'vpcomtrueub', 'vpcomtrueud', 'vpcomtrueuq', 'vpcomtrueuw', 'vpcomtruew',
 	'vpcomub', 'vpcomud', 'vpcomuq', 'vpcomuw', 'vpcomw', 'vpconflictd', 'vpconflictq',
-	'vpdpbusd', 'vpdpbusds', 'vpdpwssd', 'vpdpwssds', 'vperm2f128', 'vperm2i128',
+	'vpdpbssd', 'vpdpbssds', 'vpdpbsud', 'vpdpbsuds', 'vpdpbusd', 'vpdpbusds',
+	'vpdpbuud', 'vpdpbuuds', 'vpdpwssd', 'vpdpwssds', 'vperm2f128', 'vperm2i128',
 	'vpermb', 'vpermd', 'vpermi2b', 'vpermi2d', 'vpermi2pd', 'vpermi2w', 'vpermi2ps',
 	'vpermi2q', 'vpermil2pd', 'vpermil2ps', 'vpermilmo2pd',
 	'vpermilmo2ps', 'vpermilmz2pd', 'vpermilmz2ps', 'vpermilpd', 'vpermilps', 'vpermpd',
@@ -769,7 +792,8 @@ our @instr_intel = (
 	'vpinsrd', 'vpinsrq', 'vpinsrw', 'vplzcntd',
 	'vplzcntq', 'vpmacsdd', 'vpmacsdqh', 'vpmacsdql', 'vpmacssdd',
 	'vpmacssdqh', 'vpmacssdql', 'vpmacsswd', 'vpmacssww', 'vpmacswd', 'vpmacsww',
-	'vpmadcsswd', 'vpmadcswd', 'vpmadd52huq',
+	'vpmadcsswd', 'vpmadcswd', 'vpmadd132ph', 'vpmadd132sh', 'vpmadd213ph',
+	'vpmadd213sh', 'vpmadd231ph', 'vpmadd231sh', 'vpmadd52huq',
 	'vpmadd52luq', 'vpmaddubsw', 'vpmaddwd', 'vpmaskmovd', 'vpmaskmovq',
 	'vpmaxsb', 'vpmaxsd', 'vpmaxsq', 'vpmaxsw',
 	'vpmaxub', 'vpmaxud', 'vpmaxuq', 'vpmaxuw', 'vpminsb', 'vpminsd',
@@ -780,8 +804,10 @@ our @instr_intel = (
 	'vpmovsqw', 'vpmovswb', 'vpmovsxbd', 'vpmovsxbq', 'vpmovsxbw', 'vpmovsxdq',
 	'vpmovsxwd', 'vpmovsxwq', 'vpmovusdb', 'vpmovusdw', 'vpmovusqb', 'vpmovusqd',
 	'vpmovusqw', 'vpmovuswb', 'vpmovw2m', 'vpmovwb', 'vpmovzxbd', 'vpmovzxbq', 'vpmovzxbw', 'vpmovzxdq',
-	'vpmovzxwd', 'vpmovzxwq', 'vpmuldq', 'vpmulhrsw', 'vpmulhuw', 'vpmulhw', 'vpmulld', 'vpmullq',
-	'vpmullw', 'vpmultishiftqb', 'vpmuludq', 'vpopcntb', 'vpopcntd', 'vpopcntq', 'vpopcntw',
+	'vpmovzxwd', 'vpmovzxwq', 'vpmsub132ph', 'vpmsub132sh', 'vpmsub213ph',
+	'vpmsub213sh', 'vpmsub231ph', 'vpmsub231sh', 'vpmuldq', 'vpmulhrsw', 'vpmulhuw', 'vpmulhw', 'vpmulld', 'vpmullq',
+	'vpmullw', 'vpmultishiftqb', 'vpmuludq', 'vpnmadd132sh', 'vpnmadd213sh',
+	'vpnmadd231sh', 'vpnmsub132sh', 'vpnmsub213sh', 'vpnmsub231sh', 'vpopcntb', 'vpopcntd', 'vpopcntq', 'vpopcntw',
 	'vpor', 'vpord', 'vporq', 'vpperm', 'vprold',
 	'vprolq', 'vprolvd', 'vprolvq', 'vprord', 'vprorq', 'vprorvd',
 	'vprorvq','vprotb', 'vprotd', 'vprotq', 'vprotw',
@@ -799,19 +825,22 @@ our @instr_intel = (
 	'vpunpcklbw', 'vpunpckldq', 'vpunpcklqdq', 'vpunpcklwd', 'vpxor', 'vpxord',
 	'vpxorq', 'vrangepd', 'vrangeps', 'vrangesd', 'vrangess',
 	'vrcp14pd', 'vrcp14ps', 'vrcp14sd', 'vrcp14ss', 'vrcp28pd',
-	'vrcp28ps', 'vrcp28sd', 'vrcp28ss', 'vrcpps', 'vrcpss', 'vreducepd',
-	'vreduceps', 'vreducesd', 'vreducess', 'vrndscalepd', 'vrndscaleps', 'vrndscalesd', 'vrndscaless',
+	'vrcp28ps', 'vrcp28sd', 'vrcp28ss', 'vrcpph', 'vrcpps', 'vrcpsh', 'vrcpss', 'vreducepd',
+	'vreduceph', 'vreduceps', 'vreducesd', 'vreducesh', 'vreducess',
+	'vrndscalepd', 'vrndscaleps', 'vrndscalesd', 'vrndscaless',
 	'vroundpd', 'vroundps', 'vroundsd', 'vroundss', 'vrsqrt14pd',
 	'vrsqrt14ps', 'vrsqrt14sd', 'vrsqrt14ss', 'vrsqrt28pd', 'vrsqrt28ps',
-	'vrsqrt28sd', 'vrsqrt28ss','vrsqrtps', 'vrsqrtss', 'vscalefpd', 'vscalefps',
-	'vscalefsd', 'vscalefss', 'vscatterdpd', 'vscatterdps', 'vscatterpf0dpd',
+	'vrsqrt28sd', 'vrsqrt28ss', 'vrsqrtph', 'vrsqrtps', 'vrsqrtsh', 'vrsqrtss',
+	'vscalefpd', 'vscalefph', 'vscalefps', 'vscalefsd', 'vscalefsh', 'vscalefss',
+	'vscatterdpd', 'vscatterdps', 'vscatterpf0dpd',
 	'vscatterpf0dps', 'vscatterpf0qpd', 'vscatterpf0qps', 'vscatterpf1dpd',
 	'vscatterpf1dps', 'vscatterpf1qpd', 'vscatterpf1qps', 'vscatterqpd',
 	'vscatterqps', 'vshuff32x4', 'vshuff64x2', 'vshufi32x4', 'vshufi64x2','vshufpd',
-	'vshufps', 'vsqrtpd', 'vsqrtps', 'vsqrtsd', 'vsqrtss', 'vstmxcsr', 'vsubpd',
-	'vsubps', 'vsubsd', 'vsubss', 'vtestpd', 'vtestps', 'vucomisd', 'vucomiss', 'vunpckhpd',
+	'vshufps', 'vsqrtpd', 'vsqrtph', 'vsqrtps', 'vsqrtsd', 'vsqrtsh', 'vsqrtss', 'vstmxcsr', 'vsubpd',
+	'vsubph', 'vsubps', 'vsubsd', 'vsubsh', 'vsubss',
+	'vtestpd', 'vtestps', 'vucomisd', 'vucomish', 'vucomiss', 'vunpckhpd',
 	'vunpckhps', 'vunpcklpd', 'vunpcklps', 'vxorpd', 'vxorps', 'vzeroall', 'vzeroupper',
-	'wait', 'wbinvd', 'wbnoinvd', 'wrfsbase', 'wrgsbase', 'wrmsr', 'wrmsrq', 'wrpkru',
+	'wait', 'wbinvd', 'wbnoinvd', 'wrfsbase', 'wrgsbase', 'wrmsr', 'wrmsrlist', 'wrmsrns', 'wrmsrq', 'wrpkru',
 	'wrssd', 'wrssq', 'wrussd', 'wrussq', 'wrshr', 'xabort',
 	'xacquire', 'xadd', 'xbegin', 'xbts', 'xchg', 'xcryptcbc', 'xcryptcfb',
 	'xcryptctr', 'xcryptecb', 'xcryptofb', 'xend', 'xgetbv', 'xlat', 'xlatb', 'xor', 'xorpd',
@@ -1332,83 +1361,103 @@ sub _validate_16bit_addr_parts_intel($$$$$$$) {
 	my $disp = shift;
 
 	return 0 if defined $segreg && ! is_segreg_intel($segreg);
-	return 0 if defined $reg1 && is_reg_intel($reg1)
+	return 0 if #defined $reg1 && # always defined
+		is_reg_intel($reg1)
 		&& (! _is_valid_16bit_addr_reg_intel ($reg1));
 	return 0 if defined $reg2 && is_reg_intel($reg2)
 		&& (! _is_valid_16bit_addr_reg_intel ($reg2));
 	return 0 if defined $disp && is_reg_intel($disp)
 		&& (! _is_valid_16bit_addr_reg_intel ($disp));
 
-	return 0 if defined $reg1 && defined $reg1_sign
-		&& is_reg_intel($reg1) && $reg1_sign =~ /-/o;
-	return 0 if defined $reg2 && defined $reg2_sign
+	return 0 if #defined $reg1 && defined $reg1_sign && # always defined
+		is_reg_intel($reg1) && $reg1_sign =~ /-/o;
+	return 0 if defined $reg2 #&& defined $reg2_sign # always defined if $reg2 is defined
 		&& is_reg_intel($reg2) && $reg2_sign =~ /-/o;
-	return 0 if defined $disp && defined $disp_sign
+	return 0 if defined $disp #&& defined $disp_sign # always defined if $disp is defined
 		&& is_reg_intel($disp) && $disp_sign =~ /-/o;
-	return 0 if defined $reg1 && defined $reg2 && defined $disp
+	return 0 if # defined $reg1 && # always defined
+		defined $reg2 && defined $disp
 		&& is_reg_intel($reg1) && is_reg_intel($reg2) && is_reg_intel($disp);
 
-	if ( defined $reg1 && is_reg16_intel($reg1) ) {
+	if ( #defined $reg1 && # always defined
+		is_reg16_intel($reg1) ) {
 
-		return 0 if defined $reg1_sign && $reg1_sign =~ /-/o;
+		# taken care of above:
+		#return 0 if #defined $reg1_sign && # always defined
+		#	$reg1_sign =~ /-/o;
 		# must be one of predefined registers
-		if ( _is_valid_16bit_addr_reg_intel ($reg1) ) {
+		# taken care of above:
+		#if ( _is_valid_16bit_addr_reg_intel ($reg1) ) {
 
 			if ( defined $reg2 && is_reg16_intel($reg2) ) {
 
 				return 0 if _is_same_type_16bit_addr_reg_intel ($reg1, $reg2);
-				return 0 if defined $reg2_sign && $reg2_sign =~ /-/o;
-				return 0 if defined $disp && is_reg_intel($disp);
+				# taken care of above:
+				#return 0 if #defined $reg2_sign && # always defined if $reg2 is defined
+				#	$reg2_sign =~ /-/o;
+				# 3 registers - case already taken care of:
+				#return 0 if defined $disp && is_reg_intel($disp);
 
 				# must be one of predefined registers
-				return 1 if _is_valid_16bit_addr_reg_intel ($reg2)
+				# taken care of above:
+				#return 1 if _is_valid_16bit_addr_reg_intel ($reg2)
 					#&& $reg2 !~ /\b$reg1\b/i	# already checked
-					;
-				return 0;
+				#	;
+				return 1;
 
 			} elsif ( defined $disp && is_reg16_intel($disp) ) {
 
 				return 0 if _is_same_type_16bit_addr_reg_intel ($reg1, $disp);
-				return 0 if defined $disp_sign && $disp_sign =~ /-/o;
+				# taken care of above:
+				#return 0 if #defined $disp_sign && # always defined if $disp is defined
+				#	$disp_sign =~ /-/o;
 
 				# must be one of predefined registers
-				return 1 if _is_valid_16bit_addr_reg_intel ($disp)
+				# taken care of above:
+				#return 1 if _is_valid_16bit_addr_reg_intel ($disp)
 					#&& $disp !~ /\b$reg1\b/i	# already checked
 					#&& ! is_reg_intel($reg2)	# already checked
-					;
-				return 0;
+				#	;
+				return 1;
 			} else {
 				# variable/number/constant is OK
 				return 1;
 			}
-		}
-		return 0;
+		#}
+		#return 0;
 	} else {
 		if ( defined $reg2 && is_reg16_intel($reg2) ) {
 
-			return 0 if defined $reg2_sign && $reg2_sign =~ /-/o;
+			# taken care of above:
+			#return 0 if #defined $reg2_sign && # always defined if $reg2 is defined
+			#	$reg2_sign =~ /-/o;
 			# must be one of predefined registers
-			if ( _is_valid_16bit_addr_reg_intel ($reg2) )
-			{
+			# taken care of above:
+			#if ( _is_valid_16bit_addr_reg_intel ($reg2) ) {
+
 				if ( defined $disp && is_reg16_intel($disp) ) {
 
 					return 0 if _is_same_type_16bit_addr_reg_intel ($disp, $reg2);
-					return 0 if defined $disp_sign && $disp_sign =~ /-/o;
+					# taken care of above:
+					#return 0 if #defined $disp_sign && # always defined if $disp is defined
+					#	$disp_sign =~ /-/o;
 
 					# must be one of predefined registers
-					return 1 if _is_valid_16bit_addr_reg_intel ($disp)
+					# taken care of above:
+					#return 1 if _is_valid_16bit_addr_reg_intel ($disp)
 						#&& $disp !~ /\b$reg2\b/i	# already checked
-						;
-					return 0;
+					#	;
+					return 1;
 				} else {
 					# variable/number/constant is OK
 					return 1;
 				}
-			}
-			return 0;
+			#}
+			#return 0;
 		} else {
-			return 0 if defined $disp && defined $disp_sign
-				&& is_reg16_intel($disp) && $disp_sign =~ /-/o;
+			# already checked above:
+			#return 0 if defined $disp #&& defined $disp_sign # always defined if $disp is defined
+			#	&& is_reg16_intel($disp) && $disp_sign =~ /-/o;
 			# variable/number/constant is OK
 			return 1;
 		}
@@ -1502,12 +1551,12 @@ sub _is_same_type_16bit_addr_reg_att($$) {
 #
 # =cut
 #
-sub _validate_16bit_addr_parts_att($$$$$$$$) {
+sub _validate_16bit_addr_parts_att($$$$$$) {
 
 	my $segreg = shift;
-	my $basereg_sign = shift;
+	#my $basereg_sign = shift; # not allowed in the syntax at all
 	my $basereg = shift;
-	my $indexreg_sign = shift;
+	#my $indexreg_sign = shift; # not allowed in the syntax at all
 	my $indexreg = shift;
 	my $scale = shift;
 	my $disp_sign = shift;
@@ -1522,8 +1571,11 @@ sub _validate_16bit_addr_parts_att($$$$$$$$) {
 	if ( defined $indexreg ) {
 		return 0 if $indexreg =~ /%/o && ! is_reg16_att($indexreg);
 		return 0 if is_reg_att($indexreg) && ! _is_valid_16bit_addr_reg_att ($indexreg);
-		if ( ! defined $basereg && ! defined $scale ) {
-			# just one value inside - check for "(,1)
+		# '(, index, scale)' is not allowed in 16-bit addresses and eliminated by regexes,
+		# so $scale should not be defined here
+		if ( ! defined $basereg #&& ! defined $scale
+		) {
+			# just one value inside - check for "(,1)"
 			return 0 if $indexreg ne '1' || is_reg_att($disp);
 		}
 	}
@@ -1535,10 +1587,10 @@ sub _validate_16bit_addr_parts_att($$$$$$$$) {
 			|| ! _is_valid_16bit_addr_reg_att($indexreg);
 		return 0 if _is_same_type_16bit_addr_reg_att ($basereg, $indexreg);
 	}
-	return 0 if defined $basereg && defined $basereg_sign
-		&& is_reg_att($basereg) && $basereg_sign =~ /-/o;
-	return 0 if defined $indexreg && defined $indexreg_sign
-		&& is_reg_att($indexreg) && $indexreg_sign =~ /-/o;
+	#return 0 if defined $basereg #&& defined $basereg_sign
+	#	&& is_reg_att($basereg);# && $basereg_sign =~ /-/o;
+	#return 0 if defined $indexreg #&& defined $indexreg_sign
+	#	&& is_reg_att($indexreg);# && $indexreg_sign =~ /-/o;
 
 	return 1;
 }
@@ -1558,15 +1610,15 @@ sub is_valid_16bit_addr_att($) {
 	my $elem = shift;
 	if ( $elem =~ /^([%\w]+):\s*\(\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_16bit_addr_parts_att ($1, undef, $2, undef, undef, undef, undef, undef);
+		return _validate_16bit_addr_parts_att ($1, $2, undef, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/ ) {
 
-		return _validate_16bit_addr_parts_att ($1, undef, $2, undef, $3, undef, undef, undef);
+		return _validate_16bit_addr_parts_att ($1, $2, $3, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		return _validate_16bit_addr_parts_att ($1, undef, $2, undef, $3, $4, undef, undef);
+		return _validate_16bit_addr_parts_att ($1, $2, $3, $4, undef, undef);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
@@ -1575,15 +1627,15 @@ sub is_valid_16bit_addr_att($) {
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_16bit_addr_parts_att ($1, undef, $4, undef, undef, undef, $2, $3);
+		return _validate_16bit_addr_parts_att ($1, $4, undef, undef, $2, $3);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_16bit_addr_parts_att ($1, undef, $4, undef, $5, undef, $2, $3);
+		return _validate_16bit_addr_parts_att ($1, $4, $5, undef, $2, $3);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		return _validate_16bit_addr_parts_att ($1, undef, $4, undef, $5, $6, $2, $3);
+		return _validate_16bit_addr_parts_att ($1, $4, $5, $6, $2, $3);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
@@ -1592,19 +1644,19 @@ sub is_valid_16bit_addr_att($) {
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_16bit_addr_parts_att ($1, undef, undef, undef, $4, undef, $2, $3);
+		return _validate_16bit_addr_parts_att ($1, undef, $4, undef, $2, $3);
 	}
 	elsif ( $elem =~ /^\(\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_16bit_addr_parts_att (undef, undef, $1, undef, undef, undef, undef, undef);
+		return _validate_16bit_addr_parts_att (undef, $1, undef, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_16bit_addr_parts_att (undef, undef, $1, undef, $2, undef, undef, undef);
+		return _validate_16bit_addr_parts_att (undef, $1, $2, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		return _validate_16bit_addr_parts_att (undef, undef, $1, undef, $2, $3, undef, undef);
+		return _validate_16bit_addr_parts_att (undef, $1, $2, $3, undef, undef);
 	}
 	elsif ( $elem =~ /^\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
@@ -1613,15 +1665,15 @@ sub is_valid_16bit_addr_att($) {
 	}
 	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_16bit_addr_parts_att (undef, undef, $3, undef, undef, undef, $1, $2);
+		return _validate_16bit_addr_parts_att (undef, $3, undef, undef, $1, $2);
 	}
 	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_16bit_addr_parts_att (undef, undef, $3, undef, $4, undef, $1, $2);
+		return _validate_16bit_addr_parts_att (undef, $3, $4, undef, $1, $2);
 	}
 	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		return _validate_16bit_addr_parts_att (undef, undef, $3, undef, $4, $5, $1, $2);
+		return _validate_16bit_addr_parts_att (undef, $3, $4, $5, $1, $2);
 	}
 	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
@@ -1630,7 +1682,7 @@ sub is_valid_16bit_addr_att($) {
 	}
 	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_16bit_addr_parts_att (undef, undef, undef, undef, $3, undef, $1, $2);
+		return _validate_16bit_addr_parts_att (undef, undef, $3, undef, $1, $2);
 	}
 	return 0;
 }
@@ -1653,12 +1705,12 @@ sub is_valid_16bit_addr($) {
 }
 
 # =head2 _validate_32bit_addr_parts_intel
-# 
+#
 #  PRIVATE SUBROUTINE.
 #  Checks if the given address components give a valid x86 32-bit addressing
 #   mode in Intel syntax.
 #  Returns 1 if yes.
-# 
+#
 # =cut
 sub _validate_32bit_addr_parts_intel($$$$$$$$) {
 
@@ -1679,23 +1731,23 @@ sub _validate_32bit_addr_parts_intel($$$$$$$$) {
 
 	return 0 if defined $index_reg && defined $scale
 		&& is_reg_intel($index_reg) && is_reg_intel($scale);
-	return 0 if defined $base_reg && defined $base_reg_sign
+	return 0 if defined $base_reg #&& defined $base_reg_sign # always defined if $base_reg is defined
 		&& is_reg_intel($base_reg) && $base_reg_sign =~ /-/o;
-	return 0 if defined $index_reg && defined $index_reg_sign
+	return 0 if defined $index_reg #&& defined $index_reg_sign # always defined if $index_reg is defined
 		&& is_reg_intel($index_reg) && $index_reg_sign =~ /-/o;
-	return 0 if defined $scale && defined $index_reg_sign
+	return 0 if defined $scale #&& defined $index_reg_sign # always defined if we have enough parts to form a $scale
 		&& is_reg_intel($scale) && $index_reg_sign =~ /-/o;
-	return 0 if defined $disp && defined $disp_sign
+	return 0 if defined $disp #&& defined $disp_sign # always defined if $disp is defined
 		&& is_reg_intel($disp) && $disp_sign =~ /-/o;
 
 	if ( defined $index_reg && defined $scale ) {
 
-		return 0 if $index_reg =~ /\besp\b/io && $scale =~ /\b\d+\b/o && $scale != 1;
-		return 0 if $scale =~ /\besp\b/io && $index_reg =~ /\b\d+\b/o && $index_reg != 1;
-		return 0 if is_reg_intel($index_reg) && $scale =~ /\b\d+\b/o && $scale != 1
-			&& $scale != 2 && $scale != 4 && $scale != 8;
-		return 0 if is_reg_intel($scale) && $index_reg =~ /\b\d+\b/o && $index_reg != 1
-			&& $index_reg != 2 && $index_reg != 4 && $index_reg != 8;
+		return 0 if $index_reg =~ /\besp\b/io && $scale =~ /\b\d+\b/o && $scale ne '1';
+		return 0 if $scale =~ /\besp\b/io && $index_reg =~ /\b\d+\b/o && $index_reg ne '1';
+		return 0 if is_reg_intel($index_reg) && $scale =~ /\b\d+\b/o && $scale ne '1'
+			&& $scale ne '2' && $scale ne '4' && $scale ne '8';
+		return 0 if is_reg_intel($scale) && $index_reg =~ /\b\d+\b/o && $index_reg ne '1'
+			&& $index_reg ne '2' && $index_reg ne '4' && $index_reg ne '8';
 	}
 	return 0 if defined $base_reg && defined $index_reg && defined $disp
 		&& is_reg_intel($base_reg) && is_reg_intel($index_reg) && is_reg_intel($disp);
@@ -1804,19 +1856,19 @@ sub is_valid_32bit_addr_intel($) {
 }
 
 # =head2 _validate_32bit_addr_parts_att
-# 
+#
 #  PRIVATE SUBROUTINE.
 #  Checks if the given address components give a valid x86 32-bit addressing
 #   mode in AT&T syntax.
 #  Returns 1 if yes.
-# 
+#
 # =cut
-sub _validate_32bit_addr_parts_att($$$$$$$$) {
+sub _validate_32bit_addr_parts_att($$$$$$) {
 
 	my $segreg = shift;
-	my $base_reg_sign = shift;
+	#my $base_reg_sign = shift; # not allowed in the syntax at all
 	my $base_reg = shift;
-	my $index_reg_sign = shift;
+	#my $index_reg_sign = shift; # not allowed in the syntax at all
 	my $index_reg = shift;
 	my $scale = shift;
 	my $disp_sign = shift;
@@ -1824,21 +1876,22 @@ sub _validate_32bit_addr_parts_att($$$$$$$$) {
 
 	return 0 if defined $segreg && ! is_segreg_att ($segreg);
 	if ( defined $index_reg && ! defined $base_reg && ! defined $scale ) {
-		# just one value inside - check for "(,1)
+		# just one value inside - check for "(,1)"
 		return 1 if $index_reg eq '1' && ! is_reg_att($disp);
 	}
 	return 0 if defined $index_reg && (! is_reg_att($index_reg)
 		|| ! is_addressable32_att($index_reg) || $index_reg =~ /^%esp$/io);
-	return 0 if defined $scale && ! is_reg_att($scale) && $scale != 1
-		&& $scale != 2 && $scale != 4 && $scale != 8;
+	return 0 if defined $scale #&& ! is_reg_att($scale) # regexed out to be just digits in is_valid_32bit_addr_att()
+		&& $scale ne '1' && $scale ne '2' && $scale ne '4' && $scale ne '8';
 	return 0 if defined $disp && is_reg_att($disp);
-	if ( defined $base_reg && ! defined $index_reg && ! defined $scale ) {
+	if ( defined $base_reg && ! defined $index_reg #&& ! defined $scale # no index reg - no scale in is_valid_32bit_addr_att()
+	) {
 		# just one value inside - allow '(var)' and 'var(%reg)', disallow 'var(var)'
 		return 0 if ( (defined $disp || $base_reg =~ /%/o)
 			&& ! is_addressable32_att($base_reg)
 			&& $base_reg !~ /^%bx$/io && $base_reg !~ /^%bp$/io
-			&& $base_reg !~ /^%si$/io && $base_reg !~ /^%di$/io)
-			|| (defined $base_reg_sign && $base_reg_sign =~ /-/o);
+			&& $base_reg !~ /^%si$/io && $base_reg !~ /^%di$/io);
+			#|| (defined $base_reg_sign && $base_reg_sign =~ /-/o);
 	} else {
 		# more than one part - must be a 32-bit register
 		return 0 if defined $base_reg && ! is_addressable32_att($base_reg);
@@ -1861,83 +1914,83 @@ sub is_valid_32bit_addr_att($) {
 	my $elem = shift;
 	if ( $elem =~ /^([%\w]+):\s*\(\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_32bit_addr_parts_att ($1, undef, $2, undef, undef, undef, undef, undef);
+		return _validate_32bit_addr_parts_att ($1, $2, undef, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_32bit_addr_parts_att ($1, undef, $2, undef, $3, undef, undef, undef);
+		return _validate_32bit_addr_parts_att ($1, $2, $3, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		return _validate_32bit_addr_parts_att ($1, undef, $2, undef, $3, $4, undef, undef);
+		return _validate_32bit_addr_parts_att ($1, $2, $3, $4, undef, undef);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		return _validate_32bit_addr_parts_att ($1, undef, undef, undef, $2, $3, undef, undef);
+		return _validate_32bit_addr_parts_att ($1, undef, $2, $3, undef, undef);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*\(\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_32bit_addr_parts_att ($1, undef, undef, undef, $2, undef, undef, undef);
+		return _validate_32bit_addr_parts_att ($1, undef, $2, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_32bit_addr_parts_att ($1, undef, $4, undef, undef, undef, $2, $3);
+		return _validate_32bit_addr_parts_att ($1, $4, undef, undef, $2, $3);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_32bit_addr_parts_att ($1, undef, $4, undef, $5, undef, $2, $3);
+		return _validate_32bit_addr_parts_att ($1, $4, $5, undef, $2, $3);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		return _validate_32bit_addr_parts_att ($1, undef, $4, undef, $5, $6, $2, $3);
+		return _validate_32bit_addr_parts_att ($1, $4, $5, $6, $2, $3);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		return _validate_32bit_addr_parts_att ($1, undef, undef, undef, $4, $5, $2, $3);
+		return _validate_32bit_addr_parts_att ($1, undef, $4, $5, $2, $3);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_32bit_addr_parts_att ($1, undef, undef, undef, $4, undef, $2, $3);
+		return _validate_32bit_addr_parts_att ($1, undef, $4, undef, $2, $3);
 	}
 	elsif ( $elem =~ /^\(\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_32bit_addr_parts_att (undef, undef, $1, undef, undef, undef, undef, undef);
+		return _validate_32bit_addr_parts_att (undef, $1, undef, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_32bit_addr_parts_att (undef, undef, $1, undef, $2, undef, undef, undef);
+		return _validate_32bit_addr_parts_att (undef, $1, $2, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		return _validate_32bit_addr_parts_att (undef, undef, $1, undef, $2, $3, undef, undef);
+		return _validate_32bit_addr_parts_att (undef, $1, $2, $3, undef, undef);
 	}
 	elsif ( $elem =~ /^\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		return _validate_32bit_addr_parts_att (undef, undef, undef, undef, $1, $2, undef, undef);
+		return _validate_32bit_addr_parts_att (undef, undef, $1, $2, undef, undef);
 	}
 	elsif ( $elem =~ /^\(\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_32bit_addr_parts_att (undef, undef, undef, undef, $1, undef, undef, undef);
+		return _validate_32bit_addr_parts_att (undef, undef, $1, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_32bit_addr_parts_att (undef, undef, $3, undef, undef, undef, $1, $2);
+		return _validate_32bit_addr_parts_att (undef, $3, undef, undef, $1, $2);
 	}
 	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_32bit_addr_parts_att (undef, undef, $3, undef, $4, undef, $1, $2);
+		return _validate_32bit_addr_parts_att (undef, $3, $4, undef, $1, $2);
 	}
 	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		return _validate_32bit_addr_parts_att (undef, undef, $3, undef, $4, $5, $1, $2);
+		return _validate_32bit_addr_parts_att (undef, $3, $4, $5, $1, $2);
 	}
 	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		return _validate_32bit_addr_parts_att (undef, undef, undef, undef, $3, $4, $1, $2);
+		return _validate_32bit_addr_parts_att (undef, undef, $3, $4, $1, $2);
 	}
 	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_32bit_addr_parts_att (undef, undef, undef, undef, $3, undef, $1, $2);
+		return _validate_32bit_addr_parts_att (undef, undef, $3, undef, $1, $2);
 	}
 	return 0;
 }
@@ -1976,12 +2029,12 @@ sub _is_valid_64bit_addr_reg_intel($) {
 }
 
 # =head2 _validate_64bit_addr_parts_intel
-# 
+#
 #  PRIVATE SUBROUTINE.
 #  Checks if the given address components give a valid x86 64-bit addressing
 #   mode in Intel syntax.
 #  Returns 1 if yes.
-# 
+#
 # =cut
 sub _validate_64bit_addr_parts_intel($$$$$$$$) {
 
@@ -2025,23 +2078,23 @@ sub _validate_64bit_addr_parts_intel($$$$$$$$) {
 
 	return 0 if defined $index_reg && defined $scale
 		&& is_reg_intel($index_reg) && is_reg_intel($scale);
-	return 0 if defined $base_reg && defined $base_reg_sign
+	return 0 if defined $base_reg #&& defined $base_reg_sign # always defined if $base_reg is defined
 		&& is_reg_intel($base_reg) && $base_reg_sign =~ /-/o;
-	return 0 if defined $index_reg && defined $index_reg_sign
+	return 0 if defined $index_reg #&& defined $index_reg_sign # always defined if $index_reg is defined
 		&& is_reg_intel($index_reg) && $index_reg_sign =~ /-/o;
-	return 0 if defined $scale && defined $index_reg_sign
+	return 0 if defined $scale #&& defined $index_reg_sign # always defined if we have enough parts to form a $scale
 		&& is_reg_intel($scale) && $index_reg_sign =~ /-/o;
-	return 0 if defined $disp && defined $disp_sign
+	return 0 if defined $disp #&& defined $disp_sign # always defined if $disp is defined
 		&& is_reg_intel($disp) && $disp_sign =~ /-/o;
 	if ( defined $index_reg && defined $scale ) {
 		return 0 if ( $index_reg =~ /\brsp\b/io || $index_reg =~ /\brip\b/io )
-			&& $scale =~ /\b\d+\b/o && $scale != 1;
+			&& $scale =~ /\b\d+\b/o && $scale ne '1';
 		return 0 if ( $scale     =~ /\brsp\b/io || $scale     =~ /\brip\b/io )
-			&& $index_reg =~ /\b\d+\b/o && $index_reg != 1;
-		return 0 if is_reg_intel($index_reg) && $scale =~ /\b\d+\b/o && $scale != 1
-			&& $scale != 2 && $scale != 4 && $scale != 8;
-		return 0 if is_reg_intel($scale) && $index_reg =~ /\b\d+\b/o && $index_reg != 1
-			&& $index_reg != 2 && $index_reg != 4 && $index_reg != 8;
+			&& $index_reg =~ /\b\d+\b/o && $index_reg ne '1';
+		return 0 if is_reg_intel($index_reg) && $scale =~ /\b\d+\b/o && $scale ne '1'
+			&& $scale ne '2' && $scale ne '4' && $scale ne '8';
+		return 0 if is_reg_intel($scale) && $index_reg =~ /\b\d+\b/o && $index_reg ne '1'
+			&& $index_reg ne '2' && $index_reg ne '4' && $index_reg ne '8';
 	}
 	return 0 if defined $base_reg && defined $index_reg && defined $disp
 		&& is_reg_intel($base_reg) && is_reg_intel($index_reg) && is_reg_intel($disp);
@@ -2166,19 +2219,19 @@ sub _is_valid_64bit_addr_reg_att($) {
 }
 
 # =head2 _validate_64bit_addr_parts_att
-# 
+#
 #  PRIVATE SUBROUTINE.
 #  Checks if the given address components give a valid x86 64-bit addressing
 #   mode in AT&T syntax.
 #  Returns 1 if yes.
-# 
+#
 # =cut
-sub _validate_64bit_addr_parts_att($$$$$$$$) {
+sub _validate_64bit_addr_parts_att($$$$$$) {
 
 	my $segreg = shift;
-	my $base_reg_sign = shift;
+	#my $base_reg_sign = shift; # not allowed in the syntax at all
 	my $base_reg = shift;
-	my $index_reg_sign = shift;
+	#my $index_reg_sign = shift; # not allowed in the syntax at all
 	my $index_reg = shift;
 	my $scale = shift;
 	my $disp_sign = shift;
@@ -2189,12 +2242,13 @@ sub _validate_64bit_addr_parts_att($$$$$$$$) {
 	return 0 if defined $segreg && ! is_segreg_att($segreg);
 	if ( defined $base_reg ) {
 
-		if ( ! defined $index_reg && ! defined $scale ) {
+		if ( ! defined $index_reg #&& ! defined $scale # no index reg - no scale in is_valid_64bit_addr_att()
+		) {
 			# just one value inside - allow '(var)',
 			# disallow 'var(var)', allow 'var(%reg)'
 			return 0 if ( (defined $disp || $base_reg =~ /%/o)
-				&& (! _is_valid_64bit_addr_reg_att($base_reg) || $base_reg =~ /^%rip$/io))
-				|| (defined $base_reg_sign && $base_reg_sign =~ /-/o);
+				&& (! _is_valid_64bit_addr_reg_att($base_reg) || $base_reg =~ /^%rip$/io));
+				#|| (defined $base_reg_sign && $base_reg_sign =~ /-/o);
 		}
 		return 0 if is_reg_att($base_reg)
 			&& (! _is_valid_64bit_addr_reg_att($base_reg) || $base_reg =~ /^%rip$/io);
@@ -2215,22 +2269,26 @@ sub _validate_64bit_addr_parts_att($$$$$$$$) {
 	return 0 if defined $disp && is_reg_att($disp);
 	return 0 if $was64 != 0 && $was64 != $nregs;
 
-	return 0 if defined $index_reg && defined $scale
-		&& is_reg_att($index_reg) && is_reg_att($scale);
-	return 0 if defined $base_reg && defined $base_reg_sign
-		&& is_reg_att($base_reg) && $base_reg_sign =~ /-/o;
-	return 0 if defined $index_reg && defined $index_reg_sign
-		&& is_reg_att($index_reg) && $index_reg_sign =~ /-/o;
-	return 0 if defined $scale && defined $index_reg_sign
-		&& is_reg_att($scale) && $index_reg_sign =~ /-/o;
-	return 0 if defined $disp && defined $disp_sign
-		&& is_reg_att($disp) && $disp_sign =~ /-/o;
-	return 0 if defined $scale && (is_reg_att($scale)
-		|| ($scale != 1 && $scale != 2 && $scale != 4 && $scale != 8));
-	return 0 if defined $base_reg && defined $index_reg && defined $disp
-		&& is_reg_att($base_reg) && is_reg_att($index_reg) && is_reg_att($disp);
-	return 0 if defined $base_reg && defined $scale && defined $disp
-		&& is_reg_att($base_reg) && is_reg_att($scale) && is_reg_att($disp);
+	# taken care of above and below:
+	#return 0 if defined $index_reg && defined $scale
+	#	&& is_reg_att($index_reg) && is_reg_att($scale);
+	# useless after removing the conditions for the sign:
+	#return 0 if defined $base_reg #&& defined $base_reg_sign
+	#	&& is_reg_att($base_reg);# && $base_reg_sign =~ /-/o;
+	#return 0 if defined $index_reg #&& defined $index_reg_sign
+	#	&& is_reg_att($index_reg);# && $index_reg_sign =~ /-/o;
+	# regexed out to be just digits in is_valid_64bit_addr_att():
+	#return 0 if defined $scale #&& defined $index_reg_sign
+	#	&& is_reg_att($scale);# && $index_reg_sign =~ /-/o;
+	# taken care of above:
+	#return 0 if defined $disp #&& defined $disp_sign # always defined if $disp is defined
+	#	&& is_reg_att($disp) && $disp_sign =~ /-/o;
+	return 0 if defined $scale && ($scale ne '1' && $scale ne '2' && $scale ne '4' && $scale ne '8');
+	# taken care of above:
+	#return 0 if defined $base_reg && defined $index_reg && defined $disp
+	#	&& is_reg_att($base_reg) && is_reg_att($index_reg) && is_reg_att($disp);
+	#return 0 if defined $base_reg && defined $scale && defined $disp
+	#	&& is_reg_att($base_reg) && is_reg_att($scale) && is_reg_att($disp);
 
 	return 1;
 }
@@ -2250,83 +2308,83 @@ sub is_valid_64bit_addr_att($) {
 	my $elem = shift;
 	if ( $elem =~ /^([%\w]+):\s*\(\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_64bit_addr_parts_att ($1, undef, $2, undef, undef, undef, undef, undef);
+		return _validate_64bit_addr_parts_att ($1, $2, undef, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_64bit_addr_parts_att ($1, undef, $2, undef, $3, undef, undef, undef);
+		return _validate_64bit_addr_parts_att ($1, $2, $3, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		return _validate_64bit_addr_parts_att ($1, undef, $2, undef, $3, $4, undef, undef);
+		return _validate_64bit_addr_parts_att ($1, $2, $3, $4, undef, undef);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		return _validate_64bit_addr_parts_att ($1, undef, undef, undef, $2, $3, undef, undef);
+		return _validate_64bit_addr_parts_att ($1, undef, $2, $3, undef, undef);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*\(\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_64bit_addr_parts_att ($1, undef, undef, undef, $2, undef, undef, undef);
+		return _validate_64bit_addr_parts_att ($1, undef, $2, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_64bit_addr_parts_att ($1, undef, $4, undef, undef, undef, $2, $3);
+		return _validate_64bit_addr_parts_att ($1, $4, undef, undef, $2, $3);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_64bit_addr_parts_att ($1, undef, $4, undef, $5, undef, $2, $3);
+		return _validate_64bit_addr_parts_att ($1, $4, $5, undef, $2, $3);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		return _validate_64bit_addr_parts_att ($1, undef, $4, undef, $5, $6, $2, $3);
+		return _validate_64bit_addr_parts_att ($1, $4, $5, $6, $2, $3);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		return _validate_64bit_addr_parts_att ($1, undef, undef, undef, $4, $5, $2, $3);
+		return _validate_64bit_addr_parts_att ($1, undef, $4, $5, $2, $3);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_64bit_addr_parts_att ($1, undef, undef, undef, $4, undef, $2, $3);
+		return _validate_64bit_addr_parts_att ($1, undef, $4, undef, $2, $3);
 	}
 	elsif ( $elem =~ /^\(\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_64bit_addr_parts_att (undef, undef, $1, undef, undef, undef, undef, undef);
+		return _validate_64bit_addr_parts_att (undef, $1, undef, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_64bit_addr_parts_att (undef, undef, $1, undef, $2, undef, undef, undef);
+		return _validate_64bit_addr_parts_att (undef, $1, $2, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		return _validate_64bit_addr_parts_att (undef, undef, $1, undef, $2, $3, undef, undef);
+		return _validate_64bit_addr_parts_att (undef, $1, $2, $3, undef, undef);
 	}
 	elsif ( $elem =~ /^\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		return _validate_64bit_addr_parts_att (undef, undef, undef, undef, $1, $2, undef, undef);
+		return _validate_64bit_addr_parts_att (undef, undef, $1, $2, undef, undef);
 	}
 	elsif ( $elem =~ /^\(\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_64bit_addr_parts_att (undef, undef, undef, undef, $1, undef, undef, undef);
+		return _validate_64bit_addr_parts_att (undef, undef, $1, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_64bit_addr_parts_att (undef, undef, $3, undef, undef, undef, $1, $2);
+		return _validate_64bit_addr_parts_att (undef, $3, undef, undef, $1, $2);
 	}
 	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_64bit_addr_parts_att (undef, undef, $3, undef, $4, undef, $1, $2);
+		return _validate_64bit_addr_parts_att (undef, $3, $4, undef, $1, $2);
 	}
 	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		return _validate_64bit_addr_parts_att (undef, undef, $3, undef, $4, $5, $1, $2);
+		return _validate_64bit_addr_parts_att (undef, $3, $4, $5, $1, $2);
 	}
 	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		return _validate_64bit_addr_parts_att (undef, undef, undef, undef, $3, $4, $1, $2);
+		return _validate_64bit_addr_parts_att (undef, undef, $3, $4, $1, $2);
 	}
 	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		return _validate_64bit_addr_parts_att (undef, undef, undef, undef, $3, undef, $1, $2);
+		return _validate_64bit_addr_parts_att (undef, undef, $3, undef, $1, $2);
 	}
 	return 0;
 }
@@ -3462,7 +3520,7 @@ Bogdan Drozdowski, C<< <bogdro at cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright 2008-2021 Bogdan Drozdowski, all rights reserved.
+Copyright 2008-2023 Bogdan Drozdowski, all rights reserved.
 
 =head1 LICENSE
 

@@ -88,17 +88,21 @@ can be compared, returns -1, 0 or 1 as appropriate.
 =cut
 
 use Exporter 'import';
-our @EXPORT_OK = qw(scope_compare verify_install calc_hmac_install_signature);
+our @EXPORT_OK = qw(scope_compare scope_clean verify_install calc_hmac_install_signature);
+
+use List::MoreUtils qw(uniq);
 
 sub scope_compare {
 	my ($scope1, $scope2) = @_;
 	die new WWW::Shopify::Exception("Invalid scopes passed to compare.") unless ref($scope1) && ref($scope2) && ref($scope1) eq "ARRAY" && ref($scope2) eq "ARRAY";
+	
+	$scope1 = scope_clean($scope1);
+	$scope2 = scope_clean($scope2);
 	# If scope2 has more permission settings than scope1, we've jumped up in permissions.
 	return 1 if int(@$scope1) < int(@$scope2);
 	return -1 if (int(@$scope1) > int(@$scope2));
-	# Here, we should have exactly equal amounts of scopes in both arrays, sorted. So they should be the same types down.
-	$scope1 = [sort(@$scope1)];
-	$scope2 = [sort(@$scope2)];
+	# Here, we should have exactly equal amounts of scopes in both arrays, sorted. So they should be the same types down.	
+	
 	for (0..int(@$scope1)-1) {
 		die new WWW::Shopify::Exception("Invalid scope: $_") unless $scope1->[$_] =~ m/(read|write)_(\w+)/;
 		my ($scope1_permission, $scope1_type) = ($1, $2);
@@ -113,6 +117,25 @@ sub scope_compare {
 		return 1 if $scope1_permission eq "read" && $scope2_permission eq "write";
 	}
 	return 0;
+}
+
+# TODO There are probably still edge cases here. We should check this more thourghly 
+# namely we should probably be checking for string starts with write m/^write_.*/
+sub scope_clean {
+	my ($scope) = @_;
+	
+	my @writes = grep { $_ =~ m/write_.*/ } @$scope;
+	my @reads = grep { $_ =~ m/read_.*/ } @$scope;
+	
+	my @fscopes = @writes;
+	
+	for my $p (@reads) {
+		$p =~ m/read_(.*)/;
+		my $a = $1;
+		push(@fscopes, $p) unless (grep { $_ eq "write_" . $1 } @writes);
+	}
+	@fscopes = sort(@fscopes);
+	return \@fscopes;
 }
 
 =head2 refresh_token($new_secret, $refresh_token)

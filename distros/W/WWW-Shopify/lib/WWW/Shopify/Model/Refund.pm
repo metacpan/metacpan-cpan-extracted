@@ -19,7 +19,9 @@ BEGIN { $fields = {
 	"transactions" => new WWW::Shopify::Field::Relation::Many('WWW::Shopify::Model::Refund::Transaction'),
 	"user_id" => new WWW::Shopify::Field::Relation::ReferenceOne('WWW::Shopify::Model::User'),
 	"order_id" => new WWW::Shopify::Field::Relation::Parent('WWW::Shopify::Model::Order'),
-	"order_adjustments" => new WWW::Shopify::Field::Relation::Many('WWW::Shopify::Model::Refund::OrderAdjustment')
+	"order_adjustments" => new WWW::Shopify::Field::Relation::Many('WWW::Shopify::Model::Refund::OrderAdjustment'),
+	"duties" => new WWW::Shopify::Field::Relation::Many('WWW::Shopify::Model::Refund::Duties'),
+	"refund_duties" => new WWW::Shopify::Field::Relation::Many('WWW::Shopify::Model::Refund::RefundDuties'),
 }; }
 
 sub parent { return 'WWW::Shopify::Model::Order'; }

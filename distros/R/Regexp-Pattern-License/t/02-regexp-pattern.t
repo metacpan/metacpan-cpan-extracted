@@ -14,7 +14,7 @@ ok $re;
 isa_ok $re, ['Regexp'], 're object is a Regexp';
 ref_ok $re, 'REGEXP', 're object is a native Regexp object';
 
-regexp_patterns_in_module_ok 'Regexp::Pattern::License',        $OPTS;
+regexp_patterns_in_module_ok 'Regexp::Pattern::License', $OPTS;
 regexp_patterns_in_module_ok 'Regexp::Pattern::License::Parts', 'parts',
 	$OPTS;
 

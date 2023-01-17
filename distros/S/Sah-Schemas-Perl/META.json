@@ -64,331 +64,351 @@
    "provides" : {
       "Data::Sah::Coerce::perl::To_array::From_str_or_array::expand_perl_modname_wildcard" : {
          "file" : "lib/Data/Sah/Coerce/perl/To_array/From_str_or_array/expand_perl_modname_wildcard.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Data::Sah::Coerce::perl::To_array::From_str_or_array::expand_perl_modprefix_wildcard" : {
          "file" : "lib/Data/Sah/Coerce/perl/To_array/From_str_or_array/expand_perl_modprefix_wildcard.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Data::Sah::Coerce::perl::To_obj::From_str::perl_version" : {
          "file" : "lib/Data/Sah/Coerce/perl/To_obj/From_str/perl_version.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Data::Sah::Coerce::perl::To_str::From_str::convert_perl_pm_or_pod_to_path" : {
          "file" : "lib/Data/Sah/Coerce/perl/To_str/From_str/convert_perl_pm_or_pod_to_path.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Data::Sah::Coerce::perl::To_str::From_str::convert_perl_pm_to_path" : {
          "file" : "lib/Data/Sah/Coerce/perl/To_str/From_str/convert_perl_pm_to_path.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Data::Sah::Coerce::perl::To_str::From_str::convert_perl_pod_or_pm_to_path" : {
          "file" : "lib/Data/Sah/Coerce/perl/To_str/From_str/convert_perl_pod_or_pm_to_path.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Data::Sah::Coerce::perl::To_str::From_str::convert_perl_pod_to_path" : {
          "file" : "lib/Data/Sah/Coerce/perl/To_str/From_str/convert_perl_pod_to_path.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_distname" : {
          "file" : "lib/Data/Sah/Coerce/perl/To_str/From_str/normalize_perl_distname.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname" : {
          "file" : "lib/Data/Sah/Coerce/perl/To_str/From_str/normalize_perl_modname.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname_or_prefix" : {
          "file" : "lib/Data/Sah/Coerce/perl/To_str/From_str/normalize_perl_modname_or_prefix.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modprefix" : {
          "file" : "lib/Data/Sah/Coerce/perl/To_str/From_str/normalize_perl_modprefix.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Data::Sah::Filter::perl::Perl::check_module_installed" : {
          "file" : "lib/Data/Sah/Filter/perl/Perl/check_module_installed.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Data::Sah::Filter::perl::Perl::check_module_not_installed" : {
          "file" : "lib/Data/Sah/Filter/perl/Perl/check_module_not_installed.pm",
-         "version" : "0.046"
+         "version" : "0.047"
+      },
+      "Data::Sah::Filter::perl::Perl::check_module_release_expr" : {
+         "file" : "lib/Data/Sah/Filter/perl/Perl/check_module_release_expr.pm",
+         "version" : "0.047"
       },
       "Data::Sah::Filter::perl::Perl::normalize_perl_modname" : {
          "file" : "lib/Data/Sah/Filter/perl/Perl/normalize_perl_modname.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Data::Sah::Filter::perl::Perl::normalize_perl_modname_pm" : {
          "file" : "lib/Data/Sah/Filter/perl/Perl/normalize_perl_modname_pm.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Data::Sah::Value::perl::Perl::these_dists" : {
          "file" : "lib/Data/Sah/Value/perl/Perl/these_dists.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Data::Sah::Value::perl::Perl::these_mods" : {
          "file" : "lib/Data/Sah/Value/perl/Perl/these_mods.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Data::Sah::Value::perl::Perl::this_dist" : {
          "file" : "lib/Data/Sah/Value/perl/Perl/this_dist.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Data::Sah::Value::perl::Perl::this_mod" : {
          "file" : "lib/Data/Sah/Value/perl/Perl/this_mod.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::distname" : {
          "file" : "lib/Sah/Schema/perl/distname.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::distname::default_this_dist" : {
          "file" : "lib/Sah/Schema/perl/distname/default_this_dist.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::distname_with_optional_ver" : {
          "file" : "lib/Sah/Schema/perl/distname_with_optional_ver.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::distname_with_ver" : {
          "file" : "lib/Sah/Schema/perl/distname_with_ver.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::filename" : {
          "file" : "lib/Sah/Schema/perl/filename.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::funcname" : {
          "file" : "lib/Sah/Schema/perl/funcname.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::identifier::qualified_ascii" : {
          "file" : "lib/Sah/Schema/perl/identifier/qualified_ascii.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::identifier::qualified_unicode" : {
          "file" : "lib/Sah/Schema/perl/identifier/qualified_unicode.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::identifier::unqualified_ascii" : {
          "file" : "lib/Sah/Schema/perl/identifier/unqualified_ascii.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::identifier::unqualified_unicode" : {
          "file" : "lib/Sah/Schema/perl/identifier/unqualified_unicode.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::modargs" : {
          "file" : "lib/Sah/Schema/perl/modargs.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::modname" : {
          "file" : "lib/Sah/Schema/perl/modname.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::modname::default_this_mod" : {
          "file" : "lib/Sah/Schema/perl/modname/default_this_mod.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::modname::installed" : {
          "file" : "lib/Sah/Schema/perl/modname/installed.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::modname::not_installed" : {
          "file" : "lib/Sah/Schema/perl/modname/not_installed.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::modname_or_prefix" : {
          "file" : "lib/Sah/Schema/perl/modname_or_prefix.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::modname_pm" : {
          "file" : "lib/Sah/Schema/perl/modname_pm.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::modname_with_optional_args" : {
          "file" : "lib/Sah/Schema/perl/modname_with_optional_args.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::modname_with_optional_ver" : {
          "file" : "lib/Sah/Schema/perl/modname_with_optional_ver.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::modname_with_ver" : {
          "file" : "lib/Sah/Schema/perl/modname_with_ver.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::modnames" : {
          "file" : "lib/Sah/Schema/perl/modnames.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::modprefix" : {
          "file" : "lib/Sah/Schema/perl/modprefix.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::modprefixes" : {
          "file" : "lib/Sah/Schema/perl/modprefixes.pm",
-         "version" : "0.046"
+         "version" : "0.047"
+      },
+      "Sah::Schema::perl::module::release::version" : {
+         "file" : "lib/Sah/Schema/perl/module/release/version.pm",
+         "version" : "0.047"
+      },
+      "Sah::Schema::perl::module::release::versions" : {
+         "file" : "lib/Sah/Schema/perl/module/release/versions.pm",
+         "version" : "0.047"
       },
       "Sah::Schema::perl::pm_filename" : {
          "file" : "lib/Sah/Schema/perl/pm_filename.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::pod_filename" : {
          "file" : "lib/Sah/Schema/perl/pod_filename.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::pod_or_pm_filename" : {
          "file" : "lib/Sah/Schema/perl/pod_or_pm_filename.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::podname" : {
          "file" : "lib/Sah/Schema/perl/podname.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::qualified_funcname" : {
          "file" : "lib/Sah/Schema/perl/qualified_funcname.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::release::version" : {
          "file" : "lib/Sah/Schema/perl/release/version.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::unqualified_funcname" : {
          "file" : "lib/Sah/Schema/perl/unqualified_funcname.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schema::perl::version" : {
          "file" : "lib/Sah/Schema/perl/version.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::distname" : {
          "file" : "lib/Sah/SchemaR/perl/distname.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::distname::default_this_dist" : {
          "file" : "lib/Sah/SchemaR/perl/distname/default_this_dist.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::distname_with_optional_ver" : {
          "file" : "lib/Sah/SchemaR/perl/distname_with_optional_ver.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::distname_with_ver" : {
          "file" : "lib/Sah/SchemaR/perl/distname_with_ver.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::filename" : {
          "file" : "lib/Sah/SchemaR/perl/filename.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::funcname" : {
          "file" : "lib/Sah/SchemaR/perl/funcname.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::identifier::qualified_ascii" : {
          "file" : "lib/Sah/SchemaR/perl/identifier/qualified_ascii.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::identifier::qualified_unicode" : {
          "file" : "lib/Sah/SchemaR/perl/identifier/qualified_unicode.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::identifier::unqualified_ascii" : {
          "file" : "lib/Sah/SchemaR/perl/identifier/unqualified_ascii.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::identifier::unqualified_unicode" : {
          "file" : "lib/Sah/SchemaR/perl/identifier/unqualified_unicode.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::modargs" : {
          "file" : "lib/Sah/SchemaR/perl/modargs.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::modname" : {
          "file" : "lib/Sah/SchemaR/perl/modname.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::modname::default_this_mod" : {
          "file" : "lib/Sah/SchemaR/perl/modname/default_this_mod.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::modname::installed" : {
          "file" : "lib/Sah/SchemaR/perl/modname/installed.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::modname::not_installed" : {
          "file" : "lib/Sah/SchemaR/perl/modname/not_installed.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::modname_or_prefix" : {
          "file" : "lib/Sah/SchemaR/perl/modname_or_prefix.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::modname_pm" : {
          "file" : "lib/Sah/SchemaR/perl/modname_pm.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::modname_with_optional_args" : {
          "file" : "lib/Sah/SchemaR/perl/modname_with_optional_args.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::modname_with_optional_ver" : {
          "file" : "lib/Sah/SchemaR/perl/modname_with_optional_ver.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::modname_with_ver" : {
          "file" : "lib/Sah/SchemaR/perl/modname_with_ver.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::modnames" : {
          "file" : "lib/Sah/SchemaR/perl/modnames.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::modprefix" : {
          "file" : "lib/Sah/SchemaR/perl/modprefix.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::modprefixes" : {
          "file" : "lib/Sah/SchemaR/perl/modprefixes.pm",
-         "version" : "0.046"
+         "version" : "0.047"
+      },
+      "Sah::SchemaR::perl::module::release::version" : {
+         "file" : "lib/Sah/SchemaR/perl/module/release/version.pm",
+         "version" : "0.047"
+      },
+      "Sah::SchemaR::perl::module::release::versions" : {
+         "file" : "lib/Sah/SchemaR/perl/module/release/versions.pm",
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::pm_filename" : {
          "file" : "lib/Sah/SchemaR/perl/pm_filename.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::pod_filename" : {
          "file" : "lib/Sah/SchemaR/perl/pod_filename.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::pod_or_pm_filename" : {
          "file" : "lib/Sah/SchemaR/perl/pod_or_pm_filename.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::podname" : {
          "file" : "lib/Sah/SchemaR/perl/podname.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::qualified_funcname" : {
          "file" : "lib/Sah/SchemaR/perl/qualified_funcname.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::release::version" : {
          "file" : "lib/Sah/SchemaR/perl/release/version.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::unqualified_funcname" : {
          "file" : "lib/Sah/SchemaR/perl/unqualified_funcname.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::SchemaR::perl::version" : {
          "file" : "lib/Sah/SchemaR/perl/version.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       },
       "Sah::Schemas::Perl" : {
          "file" : "lib/Sah/Schemas/Perl.pm",
-         "version" : "0.046"
+         "version" : "0.047"
       }
    },
    "release_status" : "stable",
@@ -403,7 +423,7 @@
          "web" : "https://github.com/perlancar/perl-Sah-Schemas-Perl"
       }
    },
-   "version" : "0.046",
+   "version" : "0.047",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

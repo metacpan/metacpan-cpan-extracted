@@ -2,7 +2,6 @@ use strict;
 use warnings;
 use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Fatal;
 
 {
   package WithLvalue;
@@ -70,8 +69,9 @@ is(After->lvalue_method, 4, 'after maintains lvalue attribute');
 
 {
   local $TODO = "can't apply after to array lvalue method";
-  is exception { (After->array_lvalue) = (3,4) }, undef,
-    'assigning to array lvalue attribute causes no errors';
+  ok eval { (After->array_lvalue) = (3,4); 1 },
+    'assigning to array lvalue attribute causes no errors'
+    or diag 'error: ', $@;
   is_deeply([After->array_lvalue], [3,4],
     'after array lvalue attribute sets values');
 }
@@ -87,8 +87,9 @@ is(After->lvalue_method, 4, 'after maintains lvalue attribute');
   after lvalue_proto_method => sub {};
 }
 
-is exception { LvalueWithProto->lvalue_proto_method = 4 }, undef,
-  'after maintains lvalue attribute with prototype present';
+ok eval { LvalueWithProto->lvalue_proto_method = 4; 1 },
+  'after maintains lvalue attribute with prototype present'
+    or diag 'error: ', $@;
 is(LvalueWithProto->lvalue_proto_method, 4,
   'after with lvalue and prototype correctly assigns');
 

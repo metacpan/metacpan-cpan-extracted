@@ -1,3 +1,11 @@
+0.007   2023-01-15  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utilities: list-metacpan-distribution-versions,
+          download-metacpan-release, diff-metacpan-releases.
+
+        - [bugfix] download_url was not returned when requested.
+
+
 0.006   2022-02-19  Released-By: PERLANCAR; Urgency: medium
 
         - [cli list-metacpan-releases] Add option --date as an alternative

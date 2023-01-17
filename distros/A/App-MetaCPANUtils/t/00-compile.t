@@ -6,13 +6,16 @@ use warnings;
 
 use Test::More;
 
-plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/MetaCPANUtils.pm'
 );
 
 my @scripts = (
+    'script/diff-metacpan-releases',
+    'script/download-metacpan-release',
+    'script/list-metacpan-distribution-versions',
     'script/list-metacpan-distributions',
     'script/list-metacpan-releases',
     'script/list-recent-metacpan-releases',

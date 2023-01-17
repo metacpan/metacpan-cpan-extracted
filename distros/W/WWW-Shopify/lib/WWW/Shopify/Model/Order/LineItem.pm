@@ -43,8 +43,9 @@ BEGIN { $fields = {
 	
 	"pre_tax_price_set" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::Order::LineItem::PriceSet"),
 	"total_discount_set" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::Order::LineItem::PriceSet"),
-	"price_set" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::Order::LineItem::PriceSet") };
-}
+	"price_set" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::Order::LineItem::PriceSet"),
+	"duties" => new WWW::Shopify::Field::Relation::Many("WWW::Shopify::Model::Order::LineItem::Duties")
+}; }
 
 sub singular { return 'line_item'; }
 

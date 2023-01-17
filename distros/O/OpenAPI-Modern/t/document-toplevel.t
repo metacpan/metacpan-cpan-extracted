@@ -322,7 +322,7 @@ subtest 'top level document fields' => sub {
         specification_version => 'draft2020-12',
         document => ignore,
         vocabularies => ignore,
-        configs => { collect_annotations => 1 },
+        configs => { eval { JSON::Schema::Modern->VERSION('0.561'); 1 } ? () : ( collect_annotations => 1 ) },
       }), 'https://spec.openapis.org/oas/3.1/meta/base', 'https://spec.openapis.org/oas/3.1/meta/base#meta'),
     }),
     'resources are properly stored on the evaluator',

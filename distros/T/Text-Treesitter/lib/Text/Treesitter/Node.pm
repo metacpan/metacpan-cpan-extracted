@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.70;
 
-package Text::Treesitter::Node 0.04;
+package Text::Treesitter::Node 0.05;
 class Text::Treesitter::Node
    :strict(params);
 
@@ -28,6 +28,12 @@ The result of a parse operation is a tree of nodes represented by instances of
 this class, which are all stored in an instance of L<Text::Treesitter::Tree>.
 Most of the work of handling the result of a parse operation is done by
 operating on these tree nodes.
+
+Note that F<tree-sitter>'s C<struct TSNode> type is a structure directly and
+not a pointer to it. Therefore, every time the Perl binding wraps it, it has
+to create a new object instance for it. You cannot therefore rely on the
+identity of these objects to remain invariant as a means to keep track of a
+particular tree node.
 
 =cut
 
@@ -53,7 +59,7 @@ Returns the substring of the tree's stored text that is covered by this node.
 
 method text ()
 {
-   return $tree->text_substring_between_bytes( $self->start_byte, $self->end_byte );
+   return $tree->text_substring( $self->start_char, $self->end_char );
 }
 
 =head2 type
@@ -76,6 +82,17 @@ Returns the offset into the input string where this node's extent begins
 Returns the offset into the input string just past where this node's extent
 finishes (i.e. the first byte of the input string that is not part of this
 node).
+
+=head2 start_char
+
+=head2 end_char
+
+   $pos = $node->start_char;
+
+   $pos = $node->end_char;
+
+Returns the start and end offset position counted in characters (suitable for
+use with C<substr>, C<length>, etc...) rather than plain bytes.
 
 =head2 start_point
 
@@ -184,10 +201,13 @@ BEGIN {
    }
 }
 
-sub parent
+method start_char { return $tree->byte_to_char( $self->start_byte ) }
+
+method end_char   { return $tree->byte_to_char( $self->end_byte ) }
+
+method parent ()
 {
-   my $self = shift;
-   return Text::Treesitter::Node->new( $self->[0]->parent, $self->[1] );
+   return Text::Treesitter::Node->new( node => $node->parent, tree => $tree );
 }
 
 method child_nodes ()

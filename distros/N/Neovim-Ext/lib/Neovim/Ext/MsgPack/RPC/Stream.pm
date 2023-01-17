@@ -1,5 +1,5 @@
 package Neovim::Ext::MsgPack::RPC::Stream;
-$Neovim::Ext::MsgPack::RPC::Stream::VERSION = '0.05';
+$Neovim::Ext::MsgPack::RPC::Stream::VERSION = '0.06';
 use strict;
 use warnings;
 use base qw/Class::Accessor/;
@@ -99,7 +99,7 @@ Neovim::Ext::MsgPack::RPC::Stream - Neovim::Ext::MsgPack::RPC::Stream class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

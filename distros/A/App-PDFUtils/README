@@ -2,7 +2,7 @@ NAME
     App::PDFUtils - Command-line utilities related to PDF files
 
 VERSION
-    This document describes version 0.012 of App::PDFUtils (from Perl
+    This document describes version 0.014 of App::PDFUtils (from Perl
     distribution App-PDFUtils), released on 2022-10-07.
 
 SYNOPSIS

@@ -1,5 +1,9 @@
 Revision history for Class-Method-Modifiers
 
+2.14      2023-01-16 21:26:04Z
+        - remove Test::Fatal and Test::Needs from test prereqs (PRs #7, #8,
+          Graham Knop)
+
 2.13      2019-08-10 00:18:50Z
         - bypass prototypes when testing for lvalue attribute
         - fixed a class name in tests to avoid conflicting with a core module

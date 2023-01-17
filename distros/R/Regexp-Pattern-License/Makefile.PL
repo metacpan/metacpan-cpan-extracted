@@ -29,7 +29,7 @@ my $meta = {
                         test => {
                           requires => {
                             "Regexp::Pattern" => 0,
-                            "Test2::V0" => 0,
+                            "Test2::V0" => "0.000078",
                             "Test::Regexp::Pattern" => 0.003,
                             "Test::Without::Module" => 0,
                             "Try::Tiny" => 0,
@@ -37,8 +37,8 @@ my $meta = {
                         },
                       },
   "provides"       => {
-                        "Regexp::Pattern::License"        => { file => "lib/Regexp/Pattern/License.pm", version => "v3.9.4" },
-                        "Regexp::Pattern::License::Parts" => { file => "lib/Regexp/Pattern/License/Parts.pm", version => "v3.9.4" },
+                        "Regexp::Pattern::License"        => { file => "lib/Regexp/Pattern/License.pm", version => "v3.10.0" },
+                        "Regexp::Pattern::License::Parts" => { file => "lib/Regexp/Pattern/License/Parts.pm", version => "v3.10.0" },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -51,7 +51,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/project",
                       },
-  "version"        => "v3.9.4",
+  "version"        => "v3.10.0",
   "x_breaks"       => { "App::Licensecheck" => "<= v3.2.6" },
   "x_help_wanted"  => ["documenter", "tester"],
 };

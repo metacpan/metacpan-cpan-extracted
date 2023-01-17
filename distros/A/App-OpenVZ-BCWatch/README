@@ -8,7 +8,7 @@ SYNOPSIS
      $watch->process;
 
 DESCRIPTION
-    `App::OpenVZ::BCWatch' monitors the /proc/user_beancounters file and
+    "App::OpenVZ::BCWatch" monitors the /proc/user_beancounters file and
     sends mail notifications whenever important values change (as defined by
     the user).
 
@@ -21,7 +21,7 @@ CONSTRUCTOR
   new
      $watch = App::OpenVZ::BCWatch->new;
 
-    Instantiate an `App::OpenVZ::BCWatch' object.
+    Instantiate an "App::OpenVZ::BCWatch" object.
 
 METHODS
   process
@@ -36,7 +36,7 @@ DAEMON USAGE
 CONFIGURATION FILE
     When vzwatchd is *started* initially, the /etc/vzwatchd.conf file will
     be generated. The configuration will then subsequently remain inactive
-    until the `_active' flag is either set within or deleted from the
+    until the "_active" flag is either set within or deleted from the
     configuration file.
 
   Syntax
@@ -48,49 +48,61 @@ CONFIGURATION FILE
   Options
     Adjustable options with defaults are:
 
-    * `mail[from]'
-        Mail sender address. Defaults to `root@localhost'.
+    *   "mail[from]"
 
-    * `mail[to]'
-        Mail recipient address. Defaults to `root@localhost'.
+        Mail sender address. Defaults to "root@localhost".
 
-    * `mail[subject]'
-        Mail subject line. Defaults to: `vzwatchd: NOTICE'.
+    *   "mail[to]"
 
-    * `monitor_fields'
+        Mail recipient address. Defaults to "root@localhost".
+
+    *   "mail[subject]"
+
+        Mail subject line. Defaults to: "vzwatchd: NOTICE".
+
+    *   "monitor_fields"
+
         One or more field names to monitor for changes. Defaults to:
-        `failcnt'.
+        "failcnt".
 
-    * `sleep'
+    *   "sleep"
+
         Sleep interval in seconds. Defaults to 60.
 
-    * `verbose'
+    *   "verbose"
+
         Be verbose? Defaults to false.
 
-    * `_active'
+    *   "_active"
+
         Configuration active? Defaults to false.
 
     Additional options with defaults are:
 
-    * `input_file'
+    *   "input_file"
+
         Location of the user_beancounters file. Defaults to
         /proc/user_beancounters.
 
-    * `data_file'
+    *   "data_file"
+
         Location of the data file. Defaults to $HOME/vzwatchd.dat.
 
 CURRENT LIMITATIONS
-    * Cannot parse anything else than the user_beancounters file.
-    * Only version 2.5 of the user_beancounters file is known to work.
-    * Fixed mail report template.
-    * No more than one mail recipient.
+    *   Cannot parse anything else than the user_beancounters file.
+
+    *   Only version 2.5 of the user_beancounters file is known to work.
+
+    *   Fixed mail report template.
+
+    *   No more than one mail recipient.
 
 BUGS & CAVEATS
     Note that the sender and recipient mail address options with defaults
     might require adjustment in order for notifications to be delivered.
 
 SEE ALSO
-    OpenVZ::BC, http://openvz.org
+    OpenVZ::BC, <http://openvz.org>
 
 AUTHOR
     Steven Schubiger <schubiger@cpan.org>
@@ -99,5 +111,5 @@ LICENSE
     This program is free software; you may redistribute it and/or modify it
     under the same terms as Perl itself.
 
-    See http://dev.perl.org/licenses/
+    See <http://dev.perl.org/licenses/>
 

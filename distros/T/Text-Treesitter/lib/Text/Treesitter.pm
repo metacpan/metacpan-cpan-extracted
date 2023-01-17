@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.70 ':experimental(adjust_params)';
 
-package Text::Treesitter 0.04;
+package Text::Treesitter 0.05;
 class Text::Treesitter
    :strict(params);
 
@@ -129,10 +129,20 @@ This is usable as a class method.
 
       require JSON::MaybeUTF8;
 
-      my $path = "$ENV{HOME}/.config/tree-sitter/config.json";
-      next unless -f $path;
+      # Same path search used by
+      #   https://github.com/tree-sitter/tree-sitter/blob/master/cli/config/src/lib.rs
 
-      return $treesitter_config = JSON::MaybeUTF8::decode_json_text( read_text( $path ) );
+      my $XDG_CONFIG_HOME = $ENV{XDG_CONFIG_HOME} // "$ENV{HOME}/.config";
+
+      foreach my $path (
+         ( defined $ENV{TREE_SITTER_DIR} ? "$ENV{TREE_SITTER_DIR}/config.json" : () ),
+         "$XDG_CONFIG_HOME/tree-sitter/config.json",
+         "$ENV{HOME}/.tree-sitter/config.json",
+      ) {
+         next unless -f $path;
+
+         return $treesitter_config = JSON::MaybeUTF8::decode_json_text( read_text( $path ) );
+      }
    }
 }
 

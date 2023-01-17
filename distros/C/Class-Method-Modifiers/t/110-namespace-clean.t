@@ -4,16 +4,35 @@ use warnings;
 use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 
-use Test::Needs 'Moose';
+use B ();
+
+sub is_method {
+    my ($ns, $sub) = @_;
+    no strict 'refs';
+    my $cv = B::svref_2object(\&{"${ns}::${sub}"});
+    return
+        if !$cv->isa('B::CV');
+    my $gv = $cv->GV;
+    return
+        if $gv->isa('B::SPECIAL');
+
+    my $pack = $gv->STASH->NAME
+      or return;
+
+    return (
+        $pack eq $ns
+        || ($pack eq 'constant' && $gv->name eq '__ANON__')
+    );
+}
 
 # see also Test::CleanNamespaces::_remaining_imports
 sub imports
 {
     my $ns = shift;
-    my $meta = Class::MOP::class_of($ns) || Moose::Meta::Class->initialize($ns);
-    my %methods = map +($_ => 1), $meta->get_method_list;
-    my @symbols = keys %{ $meta->get_all_package_symbols('CODE') || {} };
-    my @imports = grep !$methods{$_}, @symbols;
+    no strict 'refs';
+
+    my @symbols = grep !/::\z/ && defined &{"${ns}::$_"}, keys %{"${ns}::"};
+    return grep !is_method($ns, $_), @symbols;
 }
 
 {

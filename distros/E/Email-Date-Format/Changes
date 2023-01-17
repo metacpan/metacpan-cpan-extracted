@@ -1,5 +1,11 @@
 Revision history for Email-Date-Format
 
+1.008     2023-01-13 21:44:14-05:00 America/New_York
+        - use the version of Time::Local that doesn't guess at whether a year
+          is 99 or 1999 🙂
+        - skip tests on Win32 that never pass
+        - modernize just a bit of code
+
 1.007     2022-12-31 21:19:59-05:00 America/New_York
         - update author info
 

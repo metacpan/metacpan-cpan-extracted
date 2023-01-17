@@ -1,5 +1,8 @@
 Revision history for API-Octopart
 
+1.003	2023-01-14T12:14:57-08:00
+	- Set minimum perl version to 5.10
+
 1.002	2023-01-11T16:44:52-08:00
 	- Added new options: query_limit, json_debug
 	- Added 3x auto-retry if the request fails

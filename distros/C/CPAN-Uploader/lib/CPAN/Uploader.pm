@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package CPAN::Uploader 0.103017;
+package CPAN::Uploader 0.103018;
 # ABSTRACT: upload things to the CPAN
 
 #pod =head1 ORIGIN
@@ -93,7 +93,7 @@ sub upload_file {
 sub _ua_string {
   my ($self) = @_;
   my $class   = ref $self || $self;
-  my $version = defined $class->VERSION ? $class->VERSION : 'dev';
+  my $version = $class->VERSION // 'dev';
 
   return "$class/$version";
 }
@@ -222,6 +222,32 @@ sub new {
 #pod
 #pod =cut
 
+sub _parse_dot_pause {
+  my ($class, $filename) = @_;
+  my %conf;
+  open my $pauserc, '<', $filename
+    or die "can't open $filename for reading: $!";
+
+  while (<$pauserc>) {
+    chomp;
+    if (/BEGIN PGP MESSAGE/ ) {
+      Carp::croak "$filename seems to be encrypted. "
+      . "Maybe you need to install Config::Identity?"
+    }
+
+    next unless $_ and $_ !~ /^\s*#/;
+
+    if (my ($k, $v) = /^\s*(\w+)\s+(.+)$/) {
+      Carp::croak "multiple entries for $k" if $conf{$k};
+      $conf{$k} = $v;
+    }
+    else {
+      Carp::croak qq#Line $. ($_) does not match the "key value" format.#;
+    }
+  }
+  return %conf;
+}
+
 sub read_config_file {
   my ($class, $filename) = @_;
 
@@ -240,22 +266,7 @@ sub read_config_file {
     $conf{user} = delete $conf{username} unless $conf{user};
   }
   else { # Process .pause manually
-    open my $pauserc, '<', $filename
-      or die "can't open $filename for reading: $!";
-
-    while (<$pauserc>) {
-      chomp;
-      if (/BEGIN PGP MESSAGE/ ) {
-        Carp::croak "$filename seems to be encrypted. "
-          . "Maybe you need to install Config::Identity?"
-      }
-
-      next unless $_ and $_ !~ /^\s*#/;
-
-      my ($k, $v) = /^\s*(\w+)\s+(.+)$/;
-      Carp::croak "multiple entries for $k" if $conf{$k};
-      $conf{$k} = $v;
-    }
+    %conf = $class->_parse_dot_pause($filename);
   }
 
   # minimum validation of arguments
@@ -309,7 +320,7 @@ CPAN::Uploader - upload things to the CPAN
 
 =head1 VERSION
 
-version 0.103017
+version 0.103018
 
 =head1 PERL VERSION
 
@@ -391,7 +402,7 @@ Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Barbie Christian Walde David Caldwell Golden fREW Schmidt Gabor Szabo Graham Knop Karen Etheridge Kent Fredric Marcus Ramberg Mark Fowler Mike Doherty perlancar Ricardo Signes Steven Haryanto (on Asus Zenbook) sungo Thibault DUPONCHELLE Torsten Raudssus Vincent Pit
+=for stopwords Barbie Christian Walde David Caldwell Golden fREW Schmidt Gabor Szabo Graham Knop Karen Etheridge Kent Fredric Marcus Ramberg Mark Fowler Mike Doherty perlancar Ricardo Signes Shlomi Fish Steven Haryanto (on Asus Zenbook) sungo Thibault DUPONCHELLE Torsten Raudssus Vincent Pit
 
 =over 4
 
@@ -453,6 +464,10 @@ Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 
+Shlomi Fish <shlomif@shlomifish.org>
+
+=item *
+
 Steven Haryanto (on Asus Zenbook) <stevenharyanto@gmail.com>
 
 =item *
@@ -475,7 +490,7 @@ Vincent Pit <perl@profvince.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Ricardo SIGNES.
+This software is copyright (c) 2023 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

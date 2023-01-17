@@ -33,6 +33,10 @@ my @ok = (
     '0.99.9h', '1.0.rc1', '0.99.9i', '1.0.rc2', '0.99.9j', '1.0.rc3',
     '0.99.9k', '0.99.9l', '1.0.rc4', '0.99.9m', '1.0.rc5', '0.99.9n',
     '1.0.rc6', '1.0.0a',  '1.0.0b',
+
+    # vendor specific versions
+    # GitLab embedded git
+    '2.37.1.gl1',
 );
 
 # non-git version

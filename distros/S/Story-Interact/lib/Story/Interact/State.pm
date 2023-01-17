@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact::State;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001003';
+our $VERSION   = '0.001004';
 
 use Story::Interact::Character ();
 
@@ -64,7 +64,6 @@ sub dump {
 	my ( $self ) = @_;
 	require Storable;
 	require MIME::Base64;
-	local $Storable::canonical = 1;
 	return MIME::Base64::encode_base64( Storable::nfreeze( $self ) );
 }
 

@@ -1,6 +1,6 @@
-use strict;
+use v5.12.0;
 use warnings;
-package Config::INI::Reader 0.028;
+package Config::INI::Reader 0.029;
 
 use Mixin::Linewise::Readers 0.110;
 # ABSTRACT: a subclassable .ini-file parser
@@ -140,7 +140,7 @@ sub read_handle {
 #pod =cut
 
 sub current_section {
-  defined $_[0]->{section} ? $_[0]->{section} : $_[0]->starting_section;
+  $_[0]->{section} // $_[0]->starting_section;
 }
 
 #pod =head2 parse_section_header
@@ -319,7 +319,7 @@ Config::INI::Reader - a subclassable .ini-file parser
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 SYNOPSIS
 

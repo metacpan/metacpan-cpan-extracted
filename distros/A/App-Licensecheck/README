@@ -3,7 +3,7 @@ NAME
     files
 
 VERSION
-    Version v3.3.3
+    Version v3.3.7
 
 SYNOPSIS
         use Path::Tiny;
@@ -22,7 +22,7 @@ SYNOPSIS
 
         my @output = $app->parse($tempfile);
 
-        my $license    = $output[0];  # => is "GNU General Public License v2.0 or later"
+        my $license    = $output[0];  # => is "GPL-2.0-or-later"
         my $copyrights = $output[1];  # => is "2020, 2022 Foo Bar."
 
 DESCRIPTION

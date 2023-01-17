@@ -8,7 +8,7 @@ if (($ENV{TRAVIS_PULL_REQUEST} || '') eq 'false') {
 
 note 'Checking Changes';
 my $changes_file = 'Changes';
-my $newver = '2.2201';
+my $newver = '2.2202';
 my $trial_token = '-TRIAL';
 my $encoding = 'UTF-8';
 

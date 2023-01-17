@@ -9,10 +9,11 @@
 ^Makefile$
 ^_MTN/*
 ^.mtn-ignore$
+^MYMETA\.json$
 ^MYMETA.yml$
 .pdf$
 .swp$
+^tags$
 ^tmp$
 ^TODO.otl$
-^MYMETA\.json$
-^tags$
+^.venv/*

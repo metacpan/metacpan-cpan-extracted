@@ -16,7 +16,8 @@ BEGIN { $fields = {
 	"height" => new WWW::Shopify::Field::Int(),
 	"src" => new WWW::Shopify::Field::String::URL::Image(),
 	"attachment" => new WWW::Shopify::Field::Text(),
-	"alt" => new WWW::Shopify::Field::String(),
+	# There are are alts definitely over 255.
+	"alt" => new WWW::Shopify::Field::Text(),
 	"filename" => new WWW::Shopify::Field::String(),
 	"product_id" => new WWW::Shopify::Field::Relation::Parent('WWW::Shopify::Model::Product'),
 	"created_at" => new WWW::Shopify::Field::Date(),

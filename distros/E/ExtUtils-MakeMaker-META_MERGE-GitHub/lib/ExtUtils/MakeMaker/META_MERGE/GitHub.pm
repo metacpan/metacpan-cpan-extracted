@@ -2,7 +2,7 @@ package ExtUtils::MakeMaker::META_MERGE::GitHub;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
@@ -91,6 +91,28 @@ sub META_MERGE {
 
 =head1 PROPERTIES
 
+=head2 login
+
+=cut
+
+sub login {
+  my $self         = shift;
+  $self->{'login'} = shift if @_;
+  $self->{'login'} = 'git' unless defined $self->{'login'};
+  return $self->{'login'};
+}
+
+=head2 host
+
+=cut
+
+sub host {
+  my $self        = shift;
+  $self->{'host'} = shift if @_;
+  $self->{'host'} = 'github.com' unless defined $self->{'host'};
+  return $self->{'host'};
+}
+
 =head2 owner
 
 Sets and returns the GitHub account owner login.
@@ -115,6 +137,18 @@ sub repo {
   $self->{'repo'} = shift if @_;
   die("Error: $PACKAGE property repo is required") unless $self->{'repo'};
   return $self->{'repo'};
+}
+
+=head2 protocol
+
+=cut
+
+sub protocol {
+  my $self            = shift;
+  $self->{'protocol'} = shift if @_;
+  $self->{'protocol'} = 'https' unless defined $self->{'protocol'};
+  return $self->{'protocol'};
+
 }
 
 =head2 version
@@ -157,9 +191,9 @@ Base URL for web client requests
 =cut
 
 sub base_url {
-  my $self        = shift;
+  my $self            = shift;
   $self->{'base_url'} = shift if @_;
-  $self->{'base_url'} = 'https://github.com' unless $self->{'base_url'};
+  $self->{'base_url'} = sprintf('%s://%s', $self->protocol, $self->host) unless $self->{'base_url'};
   return $self->{'base_url'};
 }
 
@@ -172,9 +206,9 @@ Base URL for ssh client requests
 =cut
 
 sub base_ssh {
-  my $self        = shift;
+  my $self            = shift;
   $self->{'base_ssh'} = shift if @_;
-  $self->{'base_ssh'} = 'git@github.com' unless $self->{'base_ssh'};
+  $self->{'base_ssh'} = sprintf('%s@%s', $self->login, $self->host) unless $self->{'base_ssh'};
   return $self->{'base_ssh'};
 }
 

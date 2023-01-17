@@ -19,7 +19,7 @@ use JSON::Schema::Modern::Document::OpenAPI;
 my $accepter = Test::JSON::Schema::Acceptance->new(
   include_optional => 1,
   verbose => 1,
-  test_schemas => -d '.git' || $ENV{AUTHOR_TESTING},
+  test_schemas => 0,  # some schemas are not valid, as we are testing error handling in traverse()
   specification => 'draft2020-12',
   include_optional => 0,
   test_dir => 't/oas-vocabulary',

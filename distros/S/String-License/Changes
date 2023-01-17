@@ -1,0 +1,38 @@
+String-License
+==============
+
+Created:      2000-01-28
+Home page:    <https://metacpan.org/pod/String::License>
+Home page:    <https://metacpan.org/release/String-License>
+Bug tracker:  <https://rt.cpan.org/Dist/Display.html?Queue=String-License>
+Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
+
+v0.0.3	2023-01-17
+
+ [ Test Suite ]
+ - update test Software-License.t: check license ISC since
+   Software::License 0.104002
+ - update test Software-License.t: list licenses without fallback as
+   undefined (not empty string)
+ - update test Software-License.t: resolve plan from hash %LICENSE
+ - update test Software-License.t: uncruft license EUPL-1.1, apparently
+   needed in some (test) scenarios
+
+v0.0.2	2023-01-15
+
+ [ Test Suite ]
+ - fix plan count to work on older perls
+
+ [ Packaging ]
+ - stop test-require Test::Command::Simple
+ - use correct URI for git repository
+ - use secure https protocol for bug-database URI
+
+ [ Other ]
+ - load namespace::clean before class definitions
+
+v0.0.1	2023-01-14
+
+ [ Packaging ]
+ - Initial CPAN release (before that part of App::Licensecheck since 2016,
+   Debian devscripts since 2007, and KDE SDK since 2000).

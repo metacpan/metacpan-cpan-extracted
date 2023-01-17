@@ -39,7 +39,7 @@ like(
 		field '4-Clause BSD'       => '4-clause-bsd';
 
 #		field '4k Video Downloader EULA' => '4k-video-downloader';
-		field 'Abstyles License'                    => 'abstyles-license';
+		field 'Abstyles License' => 'abstyles-license';
 		field 'Academic Free License 2.1 (AFL-2.1)' =>
 			'academic-free-license-v.-2.1';
 		field 'Academic Free License 3.0 (AFL)' =>
@@ -48,7 +48,7 @@ like(
 			'academy-of-motion-picture-arts-and-sciences-bsd';
 		field 'Adaptive Public License 1.0 (APL-1.0)' =>
 			'adaptive-public-license-1.0-(apl-1.0)';
-		field 'Adobe Glyph List License'     => 'adobe-glyph-list-license';
+		field 'Adobe Glyph List License' => 'adobe-glyph-list-license';
 		field 'Adobe Postscript AFM License' =>
 			'adobe-postscript-afm-license';
 		field 'Adobe Systems Incorporated Source Code License Agreement' =>
@@ -73,7 +73,7 @@ like(
 		field 'Apple MIT License (AML)' => 'apple-mit-license-(aml)';
 		field 'Apple Public Source License 2.0 (APSL)' =>
 			'apple-public-source-license-2.0-(apsl)';
-		field 'Artistic License 1.0'                => 'artistic-license-1.0';
+		field 'Artistic License 1.0' => 'artistic-license-1.0';
 		field 'Artistic License 2.0 (Artistic-2.0)' =>
 			'artistic-license-2.0-(artistic)';
 		field 'Attribution Assurance License (AAL)' =>
@@ -193,7 +193,7 @@ like(
 #		field 'Egreen Open Source ' => 'egreen-open-source-';
 		field 'Eiffel Forum License v2.0 (EFL-2.0)' =>
 			'eiffel-forum-license-v2.0-(efl-2.0)';
-		field 'enna License'                          => 'enna-license';
+		field 'enna License' => 'enna-license';
 		field 'Entessa Public License v1.0 (Entessa)' =>
 			'entessa-public-license-v1.0-(entessa)';
 		field 'Erlang Public License v1.1 (ErlPL-1.1)' =>
@@ -351,9 +351,9 @@ like(
 		field 'OpenSSL License (OpenSSL)' => 'openssl-license-(openssl)';
 
 #		field 'Oracle Binary Code License Agreement for the Java SE Platform Products and JavaFX' => 'oracle-binary-code-license-agreement-for-the-java-se-platform-products-and-javafx';
-		field 'Peer Production License'         => 'peer-production-license';
-		field 'PHP License 3.0.1'               => 'the-php-license-3.0.1';
-		field 'PHP License 3.0 (PHP)'           => 'php-license-3.0-(php)';
+		field 'Peer Production License' => 'peer-production-license';
+		field 'PHP License 3.0.1'       => 'the-php-license-3.0.1';
+		field 'PHP License 3.0 (PHP)'   => 'php-license-3.0-(php)';
 		field 'PostgreSQL License (PostgreSQL)' =>
 			'postgresql-license-(postgresql)';
 
@@ -374,7 +374,7 @@ like(
 			'red-hat-ecos-public-license-v1.1-(rhecos-1.1)';
 		field 'Ricoh Source Code Public License (RSCPL)' =>
 			'ricoh-source-code-public-license-(rscpl)';
-		field 'Ruby License (Ruby)'               => 'ruby-license-(ruby)';
+		field 'Ruby License (Ruby)' => 'ruby-license-(ruby)';
 		field 'Sax Public Domain Notice (SAX-PD)' =>
 			'sax-public-domain-notice-(sax-pd)';
 
@@ -462,7 +462,7 @@ like(
 			'yahoo!-public-license-v1.1-(ypl-1.1)';
 
 #		field 'Zebra SDK' => 'zebra-sdk';
-		field 'Zed License'                             => 'zed-license';
+		field 'Zed License' => 'zed-license';
 		field 'Zimbra Public License v1.3 (Zimbra-1.3)' =>
 			'zimbra-public-license-v1.3-(zimbra-1.3)';
 		field 'zimbra public license'      => 'zimbra-public-license';

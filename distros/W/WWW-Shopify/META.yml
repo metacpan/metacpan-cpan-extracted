@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150005'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,7 +15,7 @@ name: WWW-Shopify
 provides:
   WWW::Shopify:
     file: lib/WWW/Shopify.pm
-    version: '1.03'
+    version: '1.04'
   WWW::Shopify::Exception:
     file: lib/WWW/Shopify/Exception.pm
   WWW::Shopify::Exception::CallLimit:
@@ -218,6 +218,8 @@ provides:
     file: lib/WWW/Shopify/Model/Customer.pm
   WWW::Shopify::Model::Customer::Address:
     file: lib/WWW/Shopify/Model/Customer/Address.pm
+  WWW::Shopify::Model::Customer::SmsMarketingConsent:
+    file: lib/WWW/Shopify/Model/Customer/SmsMarketingConsent.pm
   WWW::Shopify::Model::CustomerGroup:
     file: lib/WWW/Shopify/Model/CustomerGroup.pm
   WWW::Shopify::Model::CustomerSavedSearch:
@@ -228,10 +230,14 @@ provides:
     file: lib/WWW/Shopify/Model/Dispute.pm
   WWW::Shopify::Model::DraftOrder:
     file: lib/WWW/Shopify/Model/DraftOrder.pm
+  WWW::Shopify::Model::DraftOrder::AppliedDiscount:
+    file: lib/WWW/Shopify/Model/DraftOrder/AppliedDiscount.pm
   WWW::Shopify::Model::DraftOrder::BillingAddress:
     file: lib/WWW/Shopify/Model/DraftOrder/BillingAddress.pm
   WWW::Shopify::Model::DraftOrder::LineItem:
     file: lib/WWW/Shopify/Model/DraftOrder/LineItem.pm
+  WWW::Shopify::Model::DraftOrder::LineItem::AppliedDiscount:
+    file: lib/WWW/Shopify/Model/DraftOrder/LineItem/AppliedDiscount.pm
   WWW::Shopify::Model::DraftOrder::LineItem::Property:
     file: lib/WWW/Shopify/Model/DraftOrder/LineItem/Property.pm
   WWW::Shopify::Model::DraftOrder::LineItem::TaxLine:
@@ -328,6 +334,12 @@ provides:
     file: lib/WWW/Shopify/Model/Order/LineItem/DiscountAllocation.pm
   WWW::Shopify::Model::Order::LineItem::DiscountAllocation::PriceSet:
     file: lib/WWW/Shopify/Model/Order/LineItem/DiscountAllocation/PriceSet.pm
+  WWW::Shopify::Model::Order::LineItem::Duties:
+    file: lib/WWW/Shopify/Model/Order/LineItem/Duties.pm
+  WWW::Shopify::Model::Order::LineItem::Duties::PriceSet:
+    file: lib/WWW/Shopify/Model/Order/LineItem/Duties/PriceSet.pm
+  WWW::Shopify::Model::Order::LineItem::Duties::TaxLine:
+    file: lib/WWW/Shopify/Model/Order/LineItem/Duties/TaxLine.pm
   WWW::Shopify::Model::Order::LineItem::Location:
     file: lib/WWW/Shopify/Model/Order/LineItem/Location.pm
   WWW::Shopify::Model::Order::LineItem::PriceSet:
@@ -392,6 +404,10 @@ provides:
     file: lib/WWW/Shopify/Model/Redirect.pm
   WWW::Shopify::Model::Refund:
     file: lib/WWW/Shopify/Model/Refund.pm
+  WWW::Shopify::Model::Refund::Duties:
+    file: lib/WWW/Shopify/Model/Refund/Duties.pm
+  WWW::Shopify::Model::Refund::Duties::PriceSet:
+    file: lib/WWW/Shopify/Model/Refund/Duties/PriceSet.pm
   WWW::Shopify::Model::Refund::LineItem:
     file: lib/WWW/Shopify/Model/Refund/LineItem.pm
   WWW::Shopify::Model::Refund::LineItem::PriceSet:
@@ -400,6 +416,8 @@ provides:
     file: lib/WWW/Shopify/Model/Refund/OrderAdjustment.pm
   WWW::Shopify::Model::Refund::OrderAdjustment::PriceSet:
     file: lib/WWW/Shopify/Model/Refund/OrderAdjustment/PriceSet.pm
+  WWW::Shopify::Model::Refund::RefundDuties:
+    file: lib/WWW/Shopify/Model/Refund/RefundDuties.pm
   WWW::Shopify::Model::Refund::Transaction:
     file: lib/WWW/Shopify/Model/Refund/Transaction.pm
   WWW::Shopify::Model::Refund::Transaction::PaymentDetails:
@@ -502,5 +520,5 @@ requires:
   URI::Escape: '3.31'
 resources:
   repository: https://bitbucket.org/bengmn/perl-shopify-api
-version: '1.03'
+version: '1.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

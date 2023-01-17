@@ -1,9 +1,10 @@
 #!/usr/bin/perl
-use strict; use warnings  FATAL => 'all'; use feature qw(state say); use utf8;
-use feature 'lexical_subs'; no warnings "experimental::lexical_subs";
+use strict; use warnings  FATAL => 'all'; use feature qw(state say); 
 srand(42);  # so reproducible
+use feature 'lexical_subs'; no warnings "experimental::lexical_subs";
 #use open IO => ':locale';
 use open ':std', ':encoding(UTF-8)';
+use utf8;
 select STDERR; $|=1; select STDOUT; $|=1;
 use Scalar::Util qw(blessed reftype looks_like_number);
 use Carp;
@@ -896,6 +897,7 @@ sub f($) {
   get_closure(1);
   get_closure(1);
   $code->(@_);
+  no warnings 'once';
   die "Punct save/restore imbalance" if @Data::Dumper::save_stack != 0;
 }
 sub g($) {

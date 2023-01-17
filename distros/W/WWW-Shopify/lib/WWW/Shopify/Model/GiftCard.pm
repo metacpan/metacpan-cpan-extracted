@@ -40,7 +40,7 @@ sub actions { return qw(disable enable); }
 sub needs_plus { return 1; }
 sub error_codes_if_unavailable { (403, 404) }
 
-
+sub searchable($) { return 1; }
 
 sub read_scope { return "read_gift_cards"; }
 sub write_scope { return "write_gift_cards"; }

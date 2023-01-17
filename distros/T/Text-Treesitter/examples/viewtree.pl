@@ -8,6 +8,7 @@ STDOUT->binmode( ":encoding(UTF-8)" );
 use Text::Treesitter;
 
 use Getopt::Long;
+use List::Util qw( pairs );
 use Term::ReadLine;
 use String::Tagged;
 use String::Tagged::Terminal;
@@ -60,11 +61,13 @@ sub build_leader_string
 
 sub print_tree_flamegraph
 {
-   my ( $line, @nodes ) = @_;
+   my ( $line, @namednodes ) = @_;
 
    my @children;
-   foreach my $node ( @nodes ) {
-      push @children, $node->child_nodes;
+   foreach my $p ( @namednodes ) {
+      my ( undef, $node ) = @$p;
+
+      push @children, pairs $node->field_names_with_child_nodes;
    }
 
    print_tree_flamegraph( $line, @children ) if @children;
@@ -73,14 +76,16 @@ sub print_tree_flamegraph
 
    my @positions;
 
-   foreach my $node ( @nodes ) {
+   foreach my $p ( @namednodes ) {
+      my ( $fieldname, $node ) = @$p;
+
       my $has_children = $node->child_count > 0;
 
       my ( undef, $col ) = $node->start_point;
       my ( undef, $endcol ) = $node->end_point;
 
-      my $len = $endcol - $col;
-      $len or next;
+      my $len = $endcol - $col
+         or next;
 
       my $str = String::Tagged::Terminal->new;
 
@@ -97,12 +102,13 @@ sub print_tree_flamegraph
                     $is_named     ? COLOUR_MAGENTA :
                                     COLOUR_YELLOW,
       );
-
-      if( $is_named ) {
+      if( defined $fieldname or $is_named ) {
          $str->append( " "x( length( $line ) - $endcol ) );
-         $str->append_tagged( sprintf( ' %s', $node->type ),
+
+         $str->append( " $fieldname:" ) if defined $fieldname;
+         $str->append_tagged( sprintf( ' (%s)', $node->type ),
             $node->type eq "ERROR" ? ( fgindex => COLOUR_RED ) : (),
-         );
+         ) if $is_named;
       }
 
       $str->say_to_terminal;
@@ -114,7 +120,7 @@ sub print_tree_flamegraph
 while( defined( my $line = $term->readline( "> " ) ) ) {
    my $tree = $ts->parse_string( $line );
 
-   print_tree_flamegraph( $line, $tree->root_node );
+   print_tree_flamegraph( $line, [ undef, $tree->root_node ] );
 
    print "$line\n";
 }

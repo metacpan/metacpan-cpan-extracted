@@ -15,6 +15,7 @@ do { my $x = {
                                         'File::Find' => '0',
                                         'File::Path' => '0',
                                         'File::Spec' => '0',
+                                        'File::Temp' => '0',
                                         'File::Which' => '1.23',
                                         'File::chdir' => '0',
                                         'IO::Handle' => '0',
@@ -26,7 +27,7 @@ do { my $x = {
                                         'strict' => '0'
                                       },
                         'suggests' => {
-                                        'ExtUtils::CppGuess' => '0'
+                                        'ExtUtils::CppGuess' => '0.26'
                                       }
                       },
        'develop' => {

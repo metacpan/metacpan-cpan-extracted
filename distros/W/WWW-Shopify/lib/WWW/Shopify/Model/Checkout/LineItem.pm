@@ -19,7 +19,7 @@ BEGIN {
 	$line_item_fields->{id} = new WWW::Shopify::Field::Identifier::String();
 	$line_item_fields->{id}->name('id');
 	
-	$line_item_fields->{properties} = new WWW::Shopify::Field::Relation::Many("WWW::Shopify::Model::Checkout::LineItem::Property");
+	$line_item_fields->{properties} = new WWW::Shopify::Field::Freeform("WWW::Shopify::Model::Checkout::LineItem::Property");
 	$line_item_fields->{properties}->name('properties');
 }
 

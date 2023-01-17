@@ -1,5 +1,9 @@
 Changelog for Config-INI
 
+0.029     2023-01-13 20:57:41-05:00 America/New_York
+        - fix typo in Pod
+        - slightly clean up some archaicisms in source
+
 0.028     2022-12-31 21:02:59-05:00 America/New_York
         - update author contact info
         - this library now requires perl v5.12

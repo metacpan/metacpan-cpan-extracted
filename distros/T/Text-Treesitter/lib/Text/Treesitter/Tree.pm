@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.70;
 
-package Text::Treesitter::Tree 0.04;
+package Text::Treesitter::Tree 0.05;
 class Text::Treesitter::Tree
    :strict(params);
 
@@ -44,22 +44,31 @@ Returns the original source text that was parsed to create the tree.
 
 =cut
 
+=head2 byte_to_char
+
+   $charpos = $tree->byte_to_char( $bytepos );
+
+Returns a position in characters (e.g. such that C<substr> or C<length>
+would count), corresponding to a position in the source text counted in bytes
+(such as returned by a Node's C<start_bytes> or C<end_bytes> accessor.
+
+=cut
+
 field $_text_bytes;
 field %_byte_to_char;
-method $byte_to_char ( $bytecount )
+method byte_to_char ( $bytecount )
 {
-   $_text_bytes //= Encode::encode_utf8( $text );
+   return $_byte_to_char{$bytecount} //= do {
+      $_text_bytes //= Encode::encode_utf8( $text );
 
-   # TODO: This can be done incrementally by finding the largest known
-   # precached position before $bytecount
-   return length( Encode::decode_utf8( substr $_text_bytes, 0, $bytecount ) );
+      # TODO: This can be done incrementally by finding the largest known
+      # precached position before $bytecount
+      length( Encode::decode_utf8( substr $_text_bytes, 0, $bytecount ) );
+   };
 }
 
-method text_substring_between_bytes ( $start_byte, $end_byte )
+method text_substring ( $start_char, $end_char )
 {
-   my $start_char = $_byte_to_char{$start_byte} //= $self->$byte_to_char( $start_byte );
-   my $end_char   = $_byte_to_char{$end_byte}   //= $self->$byte_to_char( $end_byte );
-
    return substr( $text, $start_char, $end_char - $start_char );
 }
 

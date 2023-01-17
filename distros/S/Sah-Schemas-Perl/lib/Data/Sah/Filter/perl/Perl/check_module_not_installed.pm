@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-16'; # DATE
+our $DATE = '2023-01-14'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.046'; # VERSION
+our $VERSION = '0.047'; # VERSION
 
 sub meta {
     +{
@@ -48,7 +48,7 @@ Data::Sah::Filter::perl::Perl::check_module_not_installed
 
 =head1 VERSION
 
-This document describes version 0.046 of Data::Sah::Filter::perl::Perl::check_module_not_installed (from Perl distribution Sah-Schemas-Perl), released on 2022-12-16.
+This document describes version 0.047 of Data::Sah::Filter::perl::Perl::check_module_not_installed (from Perl distribution Sah-Schemas-Perl), released on 2023-01-14.
 
 =for Pod::Coverage ^(meta|filter)$
 
@@ -84,7 +84,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

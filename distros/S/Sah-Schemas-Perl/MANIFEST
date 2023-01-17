@@ -21,6 +21,7 @@ lib/Data/Sah/Coerce/perl/To_str/From_str/normalize_perl_modname_or_prefix.pm
 lib/Data/Sah/Coerce/perl/To_str/From_str/normalize_perl_modprefix.pm
 lib/Data/Sah/Filter/perl/Perl/check_module_installed.pm
 lib/Data/Sah/Filter/perl/Perl/check_module_not_installed.pm
+lib/Data/Sah/Filter/perl/Perl/check_module_release_expr.pm
 lib/Data/Sah/Filter/perl/Perl/normalize_perl_modname.pm
 lib/Data/Sah/Filter/perl/Perl/normalize_perl_modname_pm.pm
 lib/Data/Sah/Value/perl/Perl/these_dists.pm
@@ -50,6 +51,8 @@ lib/Sah/Schema/perl/modname_with_ver.pm
 lib/Sah/Schema/perl/modnames.pm
 lib/Sah/Schema/perl/modprefix.pm
 lib/Sah/Schema/perl/modprefixes.pm
+lib/Sah/Schema/perl/module/release/version.pm
+lib/Sah/Schema/perl/module/release/versions.pm
 lib/Sah/Schema/perl/pm_filename.pm
 lib/Sah/Schema/perl/pod_filename.pm
 lib/Sah/Schema/perl/pod_or_pm_filename.pm
@@ -81,6 +84,8 @@ lib/Sah/SchemaR/perl/modname_with_ver.pm
 lib/Sah/SchemaR/perl/modnames.pm
 lib/Sah/SchemaR/perl/modprefix.pm
 lib/Sah/SchemaR/perl/modprefixes.pm
+lib/Sah/SchemaR/perl/module/release/version.pm
+lib/Sah/SchemaR/perl/module/release/versions.pm
 lib/Sah/SchemaR/perl/pm_filename.pm
 lib/Sah/SchemaR/perl/pod_filename.pm
 lib/Sah/SchemaR/perl/pod_or_pm_filename.pm

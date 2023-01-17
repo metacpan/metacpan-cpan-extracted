@@ -1,6 +1,6 @@
-use strict;
+use v5.12.0;
 use warnings;
-package Config::INI 0.028;
+package Config::INI 0.029;
 # ABSTRACT: simple .ini-file format
 
 #pod =head1 SYNOPSIS
@@ -93,7 +93,7 @@ Config::INI - simple .ini-file format
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 SYNOPSIS
 

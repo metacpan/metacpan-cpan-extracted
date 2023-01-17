@@ -38,7 +38,8 @@ BEGIN { $fields = {
 	"tax_exempt" => new WWW::Shopify::Field::Boolean(),
 	"tax_exemptions" => new WWW::Shopify::Field::String(),
 	"currency" => new WWW::Shopify::Field::Currency(),
-	"marketing_opt_in_level" => new WWW::Shopify::Field::String::Enum([qw(single_opt_in confirmed_opt_in unknown)])
+	"marketing_opt_in_level" => new WWW::Shopify::Field::String::Enum([qw(single_opt_in confirmed_opt_in unknown)]),
+	"sms_marketing_consent" => new WWW::Shopify::Field::Relation::OwnOne('WWW::Shopify::Model::Customer::SmsMarketingConsent'),
 }; }
 
 my $queries; sub queries { return $queries; }

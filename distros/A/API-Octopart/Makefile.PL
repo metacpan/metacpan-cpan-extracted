@@ -9,7 +9,7 @@ my %WriteMakefileArgs = (
 	VERSION_FROM       => 'lib/API/Octopart.pm',
 	ABSTRACT_FROM      => 'lib/API/Octopart.pm',
 	LICENSE            => 'gpl_3',
-	MIN_PERL_VERSION   => '5.006',
+	MIN_PERL_VERSION   => '5.010',
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => '0',
 	},

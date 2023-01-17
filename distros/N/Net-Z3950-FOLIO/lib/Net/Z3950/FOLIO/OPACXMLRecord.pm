@@ -51,7 +51,7 @@ sub _resolveHoldingsToXML {
     }
 
     my @holdingsXML = map { _makeXMLElement(4, 'holding', @$_) } @$holdingsObjects;
-    return join('\n', @holdingsXML);
+    return join('', @holdingsXML);
 }
 
 

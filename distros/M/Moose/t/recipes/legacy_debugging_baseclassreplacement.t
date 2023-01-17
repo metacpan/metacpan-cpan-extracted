@@ -34,7 +34,8 @@ $| = 1;
 
 
 # =begin testing SETUP
-use Test::Requires 'Test::Output';
+use Test::Needs 'Test::Output';
+use Test::Output;
 
 
 

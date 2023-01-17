@@ -4,8 +4,8 @@ package Sah::SchemaR::perl::modname::installed;
 # preamble code
 no warnings 'experimental::regex_sets';
 
-our $DATE = '2022-12-16'; # DATE
-our $VERSION = '0.046'; # VERSION
+our $DATE = '2023-01-14'; # DATE
+our $VERSION = '0.047'; # VERSION
 
 our $rschema = do{my$var={base=>"perl::modname",clsets_after_base=>[{description=>"\nThis schema is based on the `perl::modname` schema with an additional check that\nthe perl module is installed locally. Checking is done using\n<pm:Module::Installed::Tiny>. This check fetches the source code of the module\nfrom filesystem or %INC hooks, but does not actually load/execute the code.\n\n",examples=>[],prefilters=>["Perl::check_module_installed"],summary=>"Name of a Perl module that is installed locally"}],clsets_after_type=>[{description=>"\nThis is a schema you can use when you want to accept a Perl module name. It\noffers basic checking of syntax as well as a couple of conveniences. First, it\noffers completion from list of locally installed Perl modules. Second, it\ncontains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, `Foo/Bar.pm`\nor even 'Foo.Bar' and it will be normalized into `Foo::Bar`.\n\nTo see this schema in action on the CLI, you can try e.g. the `pmless` script\nfrom <pm:App::PMUtils> and activate its tab completion (see its manpage for more\ndetails). Then on the CLI try typing:\n\n    % pmless M/<tab>\n    % pmless dzp/<tab>\n    % pmless Module/List/Wildcard\n    % pmless Module::List::Wildcard\n\nNote that this schema does not check that the Perl module exists or is installed\nlocally. To check that, use the `perl::modname::installed` schema. And there's\nalso a `perl::modname::not_installed` schema.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"Foo::Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo-Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar.pm"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo.Bar"},{valid=>0,value=>"Foo|Bar"}],match=>"\\A(?:[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*)\\z",prefilters=>["Perl::normalize_perl_modname"],summary=>"Perl module name, e.g. Foo::Bar","x.completion"=>"perl_modname"},'$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_type}[0]','$var->{clsets_after_base}[0]'],resolve_path=>["str","perl::modname"],type=>"str",v=>2};$var->{clsets_after_type}[1]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_type}[0];$var->{"clsets_after_type.alt.merge.merged"}[1]=$var->{clsets_after_base}[0];$var};
 
@@ -24,7 +24,7 @@ Sah::SchemaR::perl::modname::installed - Name of a Perl module that is installed
 
 =head1 VERSION
 
-This document describes version 0.046 of Sah::SchemaR::perl::modname::installed (from Perl distribution Sah-Schemas-Perl), released on 2022-12-16.
+This document describes version 0.047 of Sah::SchemaR::perl::modname::installed (from Perl distribution Sah-Schemas-Perl), released on 2023-01-14.
 
 =head1 DESCRIPTION
 
@@ -64,7 +64,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

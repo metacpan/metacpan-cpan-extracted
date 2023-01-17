@@ -15,7 +15,7 @@ like(
 	license_org_metadata( 'cc', { date => 99999999 } ),
 	hash {
 		# Attribution
-		field 'Creative Commons Attribution'                     => 'CC-BY';
+		field 'Creative Commons Attribution' => 'CC-BY';
 		field 'Creative Commons Attribution 1.0 Generic License' =>
 			'CC-BY-1.0';    # grant
 		field 'Creative Commons Attribution 2.0 Generic License' =>

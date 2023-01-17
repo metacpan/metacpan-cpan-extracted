@@ -1,5 +1,9 @@
 Revision history for App-Iptables2Dot
 
+v0.3.3 Sat Jan 14 15:15:26 CET 2023
+	- added options for iptables-extension owner
+	- fixed GitHub issue #4
+
 v0.3.2 Tue Nov 30 16:24:58 CET 2021
 	- move on GitHub
 

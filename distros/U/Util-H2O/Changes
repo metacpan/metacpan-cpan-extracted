@@ -1,9 +1,13 @@
 Revision history for Perl extension Util::H2O.
 
-0.18	Sun, May  1 2022
+0.20	Sat, Jan 14 2023
+	- added "-arrays" option to h2o and o2h
+	- documentation updates
+
+0.18	Sun, May  1 2022	commit d2e49333cde8aa4e3a05d4f457b5b5e66781d6c9
 	- added "o2h" function
 	- added "-pass" option
-	- updated tests, Cookbook and other documentation
+	- updated tests, Cookbook, and other documentation
 
 0.16	Sun, Oct 17 2021	commit 99b3152f5617bfe9bf1b86bc4d4ce798ac21f11c
 	- allowed "-classify" into current package

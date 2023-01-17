@@ -63,10 +63,16 @@ pipeline_ok 'keys in pipelined mode',
 pipeline_ok 'info in pipelined mode',
   (
   [info => [], code(sub { ref $_[0] eq 'HASH' && keys %{ $_[0] } })],
-  [ info => [qw<oops oops>],
-    undef,
-    re(qr{^ERR (?:syntax error|wrong number of arguments for 'info' command)$})
-  ],
+  $r->info->{redis_version} ge '7.0.0' ? (
+    [ info => [qw<oops oops>],
+      {},
+    ],
+  ) : (
+    [ info => [qw<oops oops>],
+      undef,
+      re(qr{^ERR (?:syntax error|wrong number of arguments for 'info' command)$})
+    ],
+  )
   );
 
 pipeline_ok 'pipeline with multi-bulk reply',

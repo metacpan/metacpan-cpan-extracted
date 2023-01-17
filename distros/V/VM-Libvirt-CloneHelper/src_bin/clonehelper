@@ -1,0 +1,253 @@
+#!perl
+
+=head1 NAME
+
+clonehelper - Create a bunch of cloned VMs in via libvirt.
+
+=head1 SYNOPSIS
+
+clonehelper [B<-f> <config>] [B<-n> <name>] B<-a> <action>
+
+=head1 DESCRIPTION
+
+The basic work flow for this is like below.
+
+   delete
+   clone
+   start
+   wait a bit till they are all started
+   snapshot
+   shutdown
+
+This can automatically be done via using the
+action recreate. If you wish to do it for all, you likely
+want to use recreate_all.
+
+A single VM may be acted upon via using the -n switch.
+
+=head1 SWITCHES
+
+=head2 -a <action>
+
+The action to perform.
+
+=head2 -f <config>
+
+The config to use.
+
+=head2 -n <name>
+
+Act specifically on this VM instead of them all.
+
+=head1 ACTIONS
+
+=head2 list
+
+Print a JSON dump of VMs, maps, and IPs.
+
+=head2 start
+
+Start all the VM clones.
+
+=head2 stop
+
+Stop all the VM clones.
+
+=head2 clone
+
+Generate the VM clones.
+
+=head2 delete
+
+Delete all the VM clones.
+
+=head2 net_xml
+
+Generate the XML config and print it.
+
+=head2 net_redefine
+
+Remove and re-add the network using the generated config.
+
+=head2 recreate
+
+Recreate the VMs.
+
+=head2 recreate_all
+
+Recreate the VMs, doing them one at a time.
+
+=head2 snapshot
+
+Snapshot all the VM clones.
+
+=head1 CONFIG
+
+The config format is a INI file.
+
+The variable/value defaults are shown below.
+
+    net=default
+    # Name of the libvirt network in question.
+
+    blank_domains=/usr/local/etc/clonehelper/blank_domains
+    # List of domains to blank via setting 'dnsmasq:option value='address=/foo.bar/'.
+    # If not this file does not exist, it will be skipped.
+
+    net_head=/usr/local/etc/clonehelper/net_head
+    # The top part of the net XML config that that dnsmasq options will be
+    # sandwhiched between.
+
+    net_tail=/usr/local/etc/clonehelper/net_tail
+    # The bottom part of the net XML config that that dnsmasq options will
+    # be sandwhiched between.
+
+    windows_blank=1
+    # Blank commonly used MS domains. This is handy for reducing network noise
+    # when testing as well as making sure they any VMs don't do something like
+    # run updates when one does not want it to.
+
+    mac_base=00:08:74:2d:dd:
+    # Base to use for the MAC.
+
+    ipv4_base=192.168.1.
+    # Base to use for the IPs for adding static assignments.
+
+    start=100
+    # Where to start in set.
+
+    to_clone=baseVM
+    # The name of the VM to clone.
+
+    clone_name_base=cloneVM
+    # Base name to use for creating the clones. 'foo' will become 'foo$current', so
+    # for a start of 100, the first one would be 'foo100' and with a count of 10 the
+    # last will be 'foo109'.
+
+    count=10
+    # How many clones to create.
+
+    snapshot_name=clean
+    # The name to use for the snapshot.
+
+    wait=360
+    # How long to wait if auto-doing all.
+
+temp
+
+=cut
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Config::Tiny;
+use JSON;
+use VM::Libvirt::CloneHelper;
+
+sub version {
+	print "clonehelper v. 0.1.0\n";
+}
+
+sub help {
+	&version;
+
+	print '
+
+-f <file>        Config file.
+-a <action>      Action to perform.
+-n <name>        Name of a VM.
+
+-h               Print help.
+--help           Print help.
+-v               Print version.
+--version        Print version.
+
+
+"Actions...
+list           Print a JSON dump of VMs, maps, and IPs.
+start          Start all the VM clones.
+stop           Stop all the VM clones.
+clone          Generate the VM clones.
+delete         Delete all the VM clones.
+net_xml        Generate the XML config and print it.
+net_redefine   Remove and re-add the network using the generated config.
+snapshot       Snapshot all the VM clones.
+recreate       Recreate a VM specified via -n.
+recreate_all   Recreate all VMs.
+';
+
+}
+
+my $config_file = '/usr/local/etc/clonehelper/config.ini';
+my $action      = 'list';
+my $help        = 0;
+my $version     = 0;
+my $name        = undef;
+GetOptions(
+	'version' => \$version,
+	'v'       => \$version,
+	'help'    => \$help,
+	'h'       => \$help,
+	'f=s'     => \$config_file,
+	'a=s'     => \$action,
+	'n=s'     => \$name,
+);
+
+# print version or help if requested
+if ($help) {
+	&help;
+	exit 42;
+}
+if ($version) {
+	&version;
+	exit 42;
+}
+
+# die if the config file does not exist
+if ( !-f $config_file ) {
+	die $config_file . ' does not exist';
+}
+
+# read the config
+my $config = Config::Tiny->read( $config_file, 'utf8' )
+	or die( 'unable to read config("' . $config_file . '")... ' . $@ );
+
+my $clone_helper = VM::Libvirt::CloneHelper->new( $config->{_} );
+
+if ( $action eq 'list' ) {
+	my $json = JSON->new->allow_nonref->pretty(1)->canonical(1);
+	print $json->encode( $clone_helper->vm_list );
+}
+elsif ( $action eq 'start' ) {
+	$clone_helper->start_clones($name);
+}
+elsif ( $action eq 'stop' ) {
+	$clone_helper->stop_clones($name);
+}
+elsif ( $action eq 'delete' ) {
+	$clone_helper->delete_clones($name);
+}
+elsif ( $action eq 'snapshot' ) {
+	$clone_helper->snapshot_clones($name);
+}
+elsif ( $action eq 'net_xml' ) {
+	my $xml = $clone_helper->net_xml;
+	print $xml;
+}
+elsif ( $action eq 'net_redefine' ) {
+	$clone_helper->net_redefine;
+}
+elsif ( $action eq 'clone' ) {
+	$clone_helper->clone($name);
+}
+elsif ( $action eq 'recreate' ) {
+	$clone_helper->recreate($name);
+}
+elsif ( $action eq 'recreate_all' ) {
+	$clone_helper->recreate_all;
+}
+else {
+	die $action . ' is not a understood action';
+}
+
+exit 0;

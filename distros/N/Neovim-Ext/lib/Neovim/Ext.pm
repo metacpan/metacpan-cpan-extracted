@@ -1,5 +1,5 @@
 package Neovim::Ext;
-$Neovim::Ext::VERSION = '0.05';
+$Neovim::Ext::VERSION = '0.06';
 use strict;
 use warnings;
 use base qw/Class::Accessor/;
@@ -493,7 +493,7 @@ Neovim::Ext - Perl bindings for neovim
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 DESCRIPTION
 

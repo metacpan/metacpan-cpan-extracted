@@ -2,7 +2,7 @@ NAME
     Retry::Backoff - Retry a piece of code, with backoff strategies
 
 VERSION
-    This document describes version 0.004 of Retry::Backoff (from Perl
+    This document describes version 0.005 of Retry::Backoff (from Perl
     distribution Retry-Backoff), released on 2023-01-08.
 
 SYNOPSIS
@@ -20,10 +20,11 @@ SYNOPSIS
 
      # other available 'retry' arguments
      retry { ... }
-         on_success   => sub { my $h = shift; ... },
-         on_failure   => sub { my $h = shift; ... },
-         retry_if     => sub { my $h = shift; ... },
-         non_blocking => 0;
+         on_success       => sub { my $h = shift; ... },
+         on_failure       => sub { my $h = shift; ... },
+         on_final_failure => sub { my $h = shift; ... },
+         retry_if         => sub { my $h = shift; ... },
+         non_blocking     => 0;
 
 DESCRIPTION
     This module provides "retry" to retry a piece of code if it dies.

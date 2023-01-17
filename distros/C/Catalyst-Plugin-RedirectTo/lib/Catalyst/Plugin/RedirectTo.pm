@@ -1,16 +1,20 @@
 package Catalyst::Plugin::RedirectTo;
 
 use Moose::Role;
+use Carp;
 
 requires 'response', 'uri_for', 'uri_for_action';
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 our $DEFAULT_REDIRECT_STATUS = 303;
 
+sub _default_redirect_status { return $DEFAULT_REDIRECT_STATUS }
+
 my $normalize_status = sub {
+  my $c = shift;
   my @args = @_;
   my $code = ref($args[-1]) eq 'SCALAR' ?
-    ${ pop @args } : $DEFAULT_REDIRECT_STATUS;
+    ${ pop @args } : $c->_default_redirect_status;
 
   die "$code is not a redirect HTTP status" unless $code =~m/^3\d\d$/;
 
@@ -19,18 +23,23 @@ my $normalize_status = sub {
 
 sub redirect_to {
   my $c = shift;
-  my ($code, @args) = $normalize_status->(@_);
-  $c->response->redirect(
-    $c->uri_for(@args), $code);
+  my ($code, @args) = $normalize_status->($c, @_);
+  my $url = $c->uri_for(@args);
+  carp "Could not create a URI from the given arguments" unless $url;
+  $c->response->redirect($url, $code);
 }
 
 sub redirect_to_action {
   my $c = shift;
-  my ($code, $action_proto, @args) = $normalize_status->(@_);
+  my ($code, $action_proto, @args) = $normalize_status->($c, @_);
 
   # If its already an action object just use it.
-  return $c->uri_for($action_proto, @args)
-    if Scalar::Util::blessed($action_proto); 
+  if(Scalar::Util::blessed($action_proto)) {
+    my $url = $c->uri_for($action_proto, @args);
+    carp "Could not create a URI from '$action_proto' with the given arguments" unless $url;
+    $c->response->redirect($url, $code);
+    return $url;
+  }
 
   my $url;
   if($c->can('uri')) {
@@ -40,16 +49,18 @@ sub redirect_to_action {
     my $action;
     if($action_proto =~/\//) {
       my $path = $action_proto=~m/^\// ? $action_proto : $controller->action_for($action_proto)->private_path;
-      die "$action_proto is not an action for controller ${\$controller->catalyst_component_name}" unless $path;
-      die "$path is not a private path" unless $action = $c->dispatcher->get_action_by_path($path);
+      carp "$action_proto is not an action for controller ${\$controller->catalyst_component_name}" unless $path;
+      carp "$path is not a private path" unless $action = $c->dispatcher->get_action_by_path($path);
     } else {
-      die "$action_proto is not an action for controller ${\$controller->catalyst_component_name}"
+      carp "$action_proto is not an action for controller ${\$controller->catalyst_component_name}"
         unless $action = $controller->action_for($action_proto);
     }
-    die "Could not create a URI from '$action_proto' with the given arguments" unless $action;
+    carp "Could not create a URI from '$action_proto' with the given arguments" unless $action;
     $url = $c->uri_for($action, @args);
+    carp "Could not create a URI from '$action_proto' with the given arguments" unless $url;
   }
   $c->response->redirect($url, $code);
+  return $url;
 }
 
 1;

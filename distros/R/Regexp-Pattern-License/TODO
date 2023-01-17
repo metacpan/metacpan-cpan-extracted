@@ -40,6 +40,7 @@ Patterns:
     + linfo: http://www.linfo.org/main_index.html
     + ifross: https://github.com/LeChasseur/ifrOSS/blob/master/Lizenzcenter.md
     * copyfree: http://copyfree.org/standard/licenses
+    * ODRL: https://rdflicense.linkeddata.es/
   * Cover traits:
     + Comment styles (most possible):
       https://en.wikipedia.org/wiki/Comparison_of_programming_languages_(syntax)#Comments

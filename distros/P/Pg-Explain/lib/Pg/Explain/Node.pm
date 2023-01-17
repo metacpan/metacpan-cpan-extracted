@@ -31,11 +31,11 @@ Pg::Explain::Node - Class representing single node from query plan
 
 =head1 VERSION
 
-Version 2.4
+Version 2.5
 
 =cut
 
-our $VERSION = '2.4';
+our $VERSION = '2.5';
 
 # Start counter for all node ids.
 our $base_id = 1;
@@ -1136,7 +1136,7 @@ You can find documentation for this module with the perldoc command.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008-2021 hubert depesz lubaczewski, all rights reserved.
+Copyright 2008-2023 hubert depesz lubaczewski, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

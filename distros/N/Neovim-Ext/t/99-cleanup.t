@@ -11,7 +11,7 @@ unlink ('nvim.sock');
 remove_tree ('Neovim');
 remove_tree ('nvim-linux64');
 remove_tree ('nvim-linux32');
-remove_tree ('nvim-osx64');
+remove_tree ('nvim-macos');
 
 unlink ('nvim-linux64.tar.gz');
 unlink ('nvim-linux32.tar.gz');
@@ -24,7 +24,7 @@ unlink ('t/nvim.log');
 ok (!-e 'Neovim');
 ok (!-e 'nvim-linux64');
 ok (!-e 'nvim-linux64');
-ok (!-e 'nvim-osx64');
+ok (!-e 'nvim-macos');
 
 done_testing();
 

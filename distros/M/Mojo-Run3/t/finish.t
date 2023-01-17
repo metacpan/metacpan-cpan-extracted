@@ -47,13 +47,12 @@ subtest 'read eof' => sub {
   local $main::bytes_read = 0;
   local $main::errno      = 0;
   is $run3->_read(stdout => \*STDIN), 0, 'stdout eof';
-  is_deeply $run3->{finish}, {stdout => 1}, 'finish stdout';
 
   local $main::bytes_read = undef;
   local $main::errno      = EIO;
   is $run3->_read(stderr => \*STDERR), 0, 'stderr eio';
-  is_deeply $run3->{finish}, {stderr => 1, stdout => 1}, 'finish stderr';
 
+  $run3->{status} = 0;
   is $run3->_maybe_finish('child'), 1, 'finish';
   is $finished,                     1, 'finish event';
 };

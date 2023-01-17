@@ -3,8 +3,8 @@
     "default": "keyword",
     "1": "contributors/@name",
     "4": "title",
-    "7": "identifiers/@value/@identifierTypeId=\"8261054f-be78-422d-bd51-4ed9f33c3422\"",
-    "8": "identifiers/@value/@identifierTypeId=\"913300b2-03ed-469a-8179-c1092c991227\"",
+    "7": "isbn",
+    "8": "issn",
     "12": {
       "cql": "hrid",
       "relation": "==",
@@ -17,7 +17,7 @@
     "1019": "source",
     "1108": "source",
     "1155": "source",
-    "1211": "identifiers/@value/@identifierTypeId=\"439bfbae-75bc-4f74-9fc7-b2a2d47ce3ef\"",
+    "1211": "oclc",
     "9997": "allTitles",
     "9998": {
       "cql": "item.barcode",

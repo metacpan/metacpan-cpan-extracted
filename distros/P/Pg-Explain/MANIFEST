@@ -435,6 +435,11 @@ t/76-hinter-indexable-seqscan-simple.t
 t/77-hinter-indexable-seqscan-multi-equal-and.t
 t/78-settings-ignored-for-verbose-plans.t
 t/79-multiple-anonymizations.t
+t/80-wide-characters.d/wide-characters-explain.json
+t/80-wide-characters.d/wide-characters-explain.text
+t/80-wide-characters.d/wide-characters-explain.xml
+t/80-wide-characters.d/wide-characters-explain.yaml
+t/80-wide-characters.t
 t/99-manifest.t
 t/perlcriticrc
 t/perltidyrc

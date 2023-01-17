@@ -2,8 +2,8 @@ NAME
     App::DiffPDFText - Diff the text of two PDF documents
 
 VERSION
-    This document describes version 0.004 of App::DiffPDFText (from Perl
-    distribution App-DiffPDFText), released on 2022-09-08.
+    This document describes version 0.005 of App::DiffPDFText (from Perl
+    distribution App-DiffPDFText), released on 2022-10-07.
 
 SYNOPSIS
     See the included script diff-pdf-text.

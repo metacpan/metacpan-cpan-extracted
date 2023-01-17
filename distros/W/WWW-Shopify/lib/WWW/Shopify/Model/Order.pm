@@ -95,7 +95,18 @@ BEGIN { $fields = {
 	"send_receipt" => new WWW::Shopify::Field::Boolean(),
 	"send_fulfillment_receipt" => new WWW::Shopify::Field::Boolean(),
 	"inventory_behaviour" => new WWW::Shopify::Field::String::Enum(["bypass", "decrement_ignoring_policy", "decrement_obeying_policy"]),
-	"order_status_url" => new WWW::Shopify::Field::String::URL()
+	"order_status_url" => new WWW::Shopify::Field::String::URL(),
+	"current_total_price" => new WWW::Shopify::Field::Money(),
+	"current_total_discounts" => new WWW::Shopify::Field::Money(),
+	"current_subtotal_price" => new WWW::Shopify::Field::Money(),
+	"current_total_tax" => new WWW::Shopify::Field::Money(),
+	"current_total_tax_set" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::Order::PriceSet"),,
+	"current_subtotal_price_set" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::Order::PriceSet"),
+	"current_total_price_set" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::Order::PriceSet"),
+	"current_total_duties_set" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::Order::PriceSet"),
+	"current_total_discounts_set" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::Order::PriceSet"),
+	"original_total_duties_set" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::Order::PriceSet"),
+	"total_outstanding" => new WWW::Shopify::Field::Money()
 }; }
 my $queries; sub queries { return $queries; }
 BEGIN { $queries = {

@@ -8,17 +8,18 @@ use warnings;
 use 5.010;
 use ExtUtils::MakeMaker '7.20';
 
+my $have_cppguess;
 BEGIN {
   use File::Spec;                     # Formally it is not necessary I believe to do it here
-  # Make sure we have our 'inc' directory in the perl search path
+  # Make sure we have our 'inc' directory prepended the perl search path
   my $inc_dir = File::Spec->catdir(File::Spec->curdir, 'inc');
-  push(@INC, $inc_dir);
+  unshift(@INC, $inc_dir);
   #
   # ExtUtils::CppGuess does not install everywhere.
   # This is why we provide it explicitely, we are ok if it fails at run-time
-  # (eg. with Sun C compiler).
+  # by enclosing its usage in try/catch
   #
-  eval 'use ExtUtils::CppGuess; 1;' || die "$@";
+  $have_cppguess = eval 'use ExtUtils::CppGuess 0.26; 1;';
 }
 use Config;
 use Config::AutoConf;
@@ -185,9 +186,9 @@ if ($ac->link_if_else("#ifdef __SUNPRO_C\n#else\n#error \"this is not Sun C comp
 } else {
   $ac->msg_result('no');
 }
-if (! $sunc) {
+if ($have_cppguess && ! $sunc) {
   try {
-    my ($cxx_guess, $extra_cxxflags_guess, $extra_ldflags_guess) = guess_compiler();
+    my ($cxx_guess, $extra_cxxflags_guess, $extra_ldflags_guess) = guess_compiler($ac);
     if (defined($cxx_guess) && (length($cxx_guess) > 0) && which($cxx_guess)) {
       $ac->msg_notice("Setting CXX to $cxx_guess");
       $ENV{CXX} = $cxx_guess;
@@ -450,53 +451,20 @@ print "Linking ESLIF\$(OBJ_EXT) using: @ldfrom\n";
 # Inspired by Inline-CPP-0.74/inc/ILCPPConfig/CompilerGuess.pm
 #
 sub guess_compiler {
+  my ($ac) = @_;
 
-  my ($cxx_guess, $extra_cxxflags_guess, $extra_ldflags_guess, $guesser, %configuration);
+  my $guesser = ExtUtils::CppGuess->new(cc => $ENV{CC});
+  #
+  # We work quite like Module::Build in the sense that we are appending
+  # flags.
+  #
+  my %module_build_options = $guesser->module_build_options;
+  my $cxx_guess            = $module_build_options{config}->{cc} // '';
+  my $extra_cxxflags_guess = $module_build_options{extra_compiler_flags} // '';
+  my $extra_ldflags_guess  = $module_build_options{extra_linker_flags} // '';
+  $ac->msg_notice("ExtUtils::CppGuess says \$cxx_guess=$cxx_guess, \$extra_cxxflags_guess=$extra_cxxflags_guess, \$extra_ldflags_guess=$extra_ldflags_guess");
 
-  if( $Config::Config{osname} eq 'freebsd'
-    && $Config::Config{osvers} =~ /^(\d+)/
-    && $1 >= 10
-  ){
-    if( $ENV{CC} =~ /\bclang\b/ ) {
-      $cxx_guess = $ENV{CC};
-      $cxx_guess =~ s/\bclang\b/clang++/;
-    } else {
-      $cxx_guess = 'clang++';
-    }
-    $extra_cxxflags_guess = '';     # Extra compile flag moved to compiler command -;
-    $extra_ldflags_guess = '-lc++'; # Extra linker flag
-  }
-  else {
-    $guesser = ExtUtils::CppGuess->new(cc => $ENV{CC});
-    %configuration = $guesser->module_build_options;
-    $extra_cxxflags_guess = $configuration{extra_compiler_flags};
-    $extra_ldflags_guess = $configuration{extra_linker_flags};
-    if( $guesser->is_gcc ) {
-      if( $ENV{CC} =~ /\bclang\b/ ) {
-        $cxx_guess = $ENV{CC};
-        $cxx_guess =~ s/\bclang\b/clang++/;
-      } else {
-        if( $ENV{CC} =~ /\bgcc\b/ ) {
-          $cxx_guess = $ENV{CC};
-          $cxx_guess =~ s/\bgcc\b/g++/;
-        } else {
-          $cxx_guess = 'g++';
-        }
-      }
-      $extra_cxxflags_guess = '';    # Extra compile flag moved to compiler command, extra linker flag untouched -;
-    }
-
-    ( $cxx_guess, $extra_cxxflags_guess, $extra_ldflags_guess ) = map { _trim_whitespace($_) } ( $cxx_guess, $extra_cxxflags_guess, $extra_ldflags_guess );
-  }
-  return ( $cxx_guess, $extra_cxxflags_guess, $extra_ldflags_guess );
-}
-
-sub _trim_whitespace {
-  my $string = shift;
-  if (defined($string)) {
-    $string =~ s/^\s+|\s+$//g;
-  }
-  return $string;
+  return ($cxx_guess, $extra_cxxflags_guess, $extra_ldflags_guess);
 }
 
 sub try_compile {
@@ -574,6 +542,7 @@ my %WriteMakefileArgs = (
     "File::Find" => 0,
     "File::Path" => 0,
     "File::Spec" => 0,
+    "File::Temp" => 0,
     "File::Which" => "1.23",
     "File::chdir" => 0,
     "IO::Handle" => 0,
@@ -628,7 +597,7 @@ my %WriteMakefileArgs = (
     "threads::shared" => 0,
     "utf8" => 0
   },
-  "VERSION" => "6.0.28",
+  "VERSION" => "6.0.29",
   "test" => {
     "TESTS" => "t/*.t"
   }

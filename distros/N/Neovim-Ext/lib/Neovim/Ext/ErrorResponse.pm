@@ -1,5 +1,5 @@
 package Neovim::Ext::ErrorResponse;
-$Neovim::Ext::ErrorResponse::VERSION = '0.05';
+$Neovim::Ext::ErrorResponse::VERSION = '0.06';
 use strict;
 use warnings;
 
@@ -25,7 +25,7 @@ Neovim::Ext::ErrorResponse - ErrorResponse exception class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 FUNCTIONS
 

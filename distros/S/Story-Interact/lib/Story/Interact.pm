@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001003';
+our $VERSION   = '0.001004';
 
 use Story::Interact::Character ();
 use Story::Interact::Harness::Terminal ();
@@ -98,6 +98,14 @@ The C<at> function should be used at the top of a page to indicate what place
 this page occurs at. It is an arbitrary string, so could be a room name,
 grid co-ordinates, etc. Multiple pages may be written for the same location.
 
+The C<< abstract( $string ) >> function defines a title or concise summary for
+the page. It is not intended to be displayed to the reader, but may be useful
+for the writer as a quick reminder of the purpose of the page.
+
+The C<< todo( $bool ) >> function indicates whether a page still needs writing.
+Again, it  is not intended to be displayed to the reader, but may be useful
+for the writer.
+
 The C<location> function returns a hashref associated with this location.
 This can be used to store state for this location. You can use
 C<< location( $string ) >> to access another location's hashref; the
@@ -122,6 +130,11 @@ The C<visited> function returns the number of times this page has been visited
 as part of the narrative before.
 
 The C<true> and C<false> functions are just to make your code more readable.
+
+The C<< random( $arrayref ) >> function returns a random value from the
+arrayref, which can be useful for adding some randomness to stories.
+
+The C<< match( $a, $b ) >> function is re-exported from L<match::simple>.
 
 The first page always has id "main".
 

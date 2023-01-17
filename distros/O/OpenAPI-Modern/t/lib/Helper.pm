@@ -34,8 +34,6 @@ sub request ($method, $uri_string, $headers = [], $body_content = undef) {
   elsif ($TYPE eq 'mojo') {
     my $uri = Mojo::URL->new($uri_string);
     my $host = $uri->host;
-    $uri->scheme(undef);
-    $uri->host(undef);
     $req = Mojo::Message::Request->new(method => $method, url => Mojo::URL->new($uri_string));
     while (my ($name, $value) = splice(@$headers, 0, 2)) {
       $req->headers->header($name, $value);

@@ -23,4 +23,4 @@ resources:
   bugtracker: https://github.com/mrdvt92/perl-ExtUtils-MakeMaker-META_MERGE-GitHub/issues
   homepage: https://github.com/mrdvt92/perl-ExtUtils-MakeMaker-META_MERGE-GitHub
   repository: https://github.com/mrdvt92/perl-ExtUtils-MakeMaker-META_MERGE-GitHub.git
-version: '0.03'
+version: '0.04'

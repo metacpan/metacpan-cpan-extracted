@@ -8,7 +8,7 @@ Tests for the Perl module L<Util::H2O>.
 
 =head1 Author, Copyright, and License
 
-Copyright (c) 2020-2022 Hauke Daempfling (haukex@zero-g.net).
+Copyright (c) 2020-2023 Hauke Daempfling (haukex@zero-g.net).
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl 5 itself.
@@ -20,7 +20,7 @@ L<http://perldoc.perl.org/perlartistic.html>.
 
 =cut
 
-use Test::More tests => 291;
+use Test::More tests => 322;
 use Scalar::Util qw/blessed/;
 
 sub exception (&) { eval { shift->(); 1 } ? undef : ($@ || die) }  ## no critic (ProhibitSubroutinePrototypes, RequireFinalReturn, RequireCarping)
@@ -30,7 +30,7 @@ sub warns (&) { my @w; { local $SIG{__WARN__} = sub { push @w, shift }; shift->(
 
 diag "This is Perl $] at $^X on $^O";
 BEGIN { use_ok 'Util::H2O' }
-is $Util::H2O::VERSION, '0.18';
+is $Util::H2O::VERSION, '0.20';
 
 diag "If all tests pass, you can ignore the \"this Perl is too old\" warnings"
 	if $] lt '5.008009';
@@ -74,10 +74,13 @@ my $PACKRE = $Util::H2O::_PACKAGE_REGEX;  ## no critic (ProtectPrivateVars)
 }
 {
 	my $code = sub {};
-	my $o4 = h2o { a=>[], h=>{}, c=>$code };
+	my $o4 = h2o { a=>[], h=>{}, c=>$code, a2=>[ {x=>'y'} ] };
 	is ref $o4->a, 'ARRAY';
 	is ref $o4->h, 'HASH';
 	is ref $o4->c, 'CODE';
+	is ref $o4->a2, 'ARRAY';
+	is ref $o4->a2->[0], 'HASH';
+	is $o4->a2->[0]{x}, 'y';
 	is $o4->c, $code;
 }
 {
@@ -92,6 +95,53 @@ my $PACKRE = $Util::H2O::_PACKAGE_REGEX;  ## no critic (ProtectPrivateVars)
 	$o2->foo->{def} = 456;
 	is_deeply [sort keys %$o2], [qw/ abc foo /];
 	is_deeply [sort keys %{$o2->foo}], [qw/ bar def /];
+}
+
+# -arrays
+{
+	my $o1 = h2o -arrays, { foo => { bar => "quz" },
+		hello => [ { abc=>"def" }, { ghi=>{ jkl=>"mno" } } ] };
+	is $o1->foo->bar, 'quz';
+	is ref $o1->hello, 'ARRAY';
+	is $o1->hello->[0]->abc, 'def';
+	is $o1->hello->[1]->ghi->jkl, 'mno';
+	my $o2 = h2o -arrays, {
+		a=>[
+			{ b=>[ [
+				'c', { d=>[ { e=>'f' } ] }
+			] ] }
+		] };
+	is $o2->a->[0]->b->[0][0], 'c';
+	is $o2->a->[0]->b->[0][1]->d->[0]->e, 'f';
+	my $o3 = h2o -arrays, [
+			{ foo=>'bar' },
+			{ quz=>'baz' },
+		];
+	is $o3->[0]->foo, 'bar';
+	is $o3->[1]->quz, 'baz';
+}
+# -arrays + -pass
+{
+	my $obj = bless {}, "SomeClass";
+	my $aref = [ { xyz=>'abc' }, $obj ];
+	my $o = h2o(-arrays, -pass=>'ref', $aref);
+	is 0+$o, 0+$aref;
+	is $o->[0]->xyz, 'abc';
+	is ref $o->[1], 'SomeClass';
+}
+# -arrays + -lock + -ro
+{
+	my $o = h2o -arrays, -lock=>1, -ro, { abc => [ { def => 'ghi' } ] };
+	SKIP: {
+		skip "Won't work on old Perls", 2 if $] lt '5.008009';
+		ok exception { my $x = $o->{zzz} };
+		ok exception { my $y = $o->{abc}[0]{def}{yyy} };
+	}
+	is $o->abc->[0]->def, 'ghi';
+	ok exception { $o->abc(123) };
+	ok exception { $o->abc->[0]->def(123) };
+	push @{ $o->abc }, { xyz => 777 };
+	is $o->abc->[1]{xyz}, 777;
 }
 
 # o2h
@@ -138,6 +188,30 @@ my $PACKRE = $Util::H2O::_PACKAGE_REGEX;  ## no critic (ProtectPrivateVars)
 	is $o->quz, "baz";
 	my $h = o2h $o;
 	is_deeply $h, { foo => "bar" };
+}
+# o2h + -arrays
+{
+	my @x = (
+		{ foo => { bar => "quz" },
+			hello => [ { abc=>"def" }, { ghi=>{ jkl=>"mno" } } ] },
+		{
+			a=>[
+				{ b=>[ [
+					'c', { d=>[ { e=>'f' } ] }
+				] ] }
+			]
+		},
+		[
+			{ foo=>'bar' },
+			{ quz=>'baz' },
+		],
+	);
+	my @in = map { h2o -arrays, $_ } @x;
+	my @out = map { o2h -arrays, $_ } @in;
+	is_deeply $out[$_], $x[$_] for 0..$#x;
+	is ref $out[0]{hello}[0], 'HASH';
+	is 0+$in[2], 0+$x[2];
+	isnt 0+$out[2], 0+$x[2];
 }
 
 # -meth
@@ -572,10 +646,12 @@ SKIP: {
 	is_deeply [keys %$o], ["quz"];
 }
 
-ok !grep { /redefined/i } warns {
+my @redef_warns = warns {
 	h2o { abc => "def" }, qw/ abc /;
 	h2o {}, qw/ abc abc /;
 };
+#TODO: Spurious CPAN Testers failures here https://www.cpantesters.org/distro/U/Util-H2O.html?oncpan=1&distmat=1&version=0.18&grade=3
+ok !grep { /redefined/i } @redef_warns or diag explain \@redef_warns;  ## no critic (ProhibitMixedBooleanOperators)
 
 SKIP: {
 	skip "Tests only for old Perls", 4 if $] ge '5.008009';
@@ -626,6 +702,7 @@ ok exception { h2o() };
 ok exception { h2o("blah") };
 ok exception { h2o(undef) };
 ok exception { h2o([]) };
+ok exception { h2o(-arrays, undef) };
 ok exception { h2o(-meth,-recurse) };
 ok exception { h2o(bless {}, "SomeClass") };
 ok exception { h2o({DESTROY=>'foo'}) };
@@ -643,6 +720,10 @@ ok exception { h2o(-isa=>{}) };
 ok exception { h2o -pass=>undef, {} };
 ok exception { h2o -pass=>[], {} };
 ok exception { h2o -pass=>"foo", {} };
+ok exception { o2h(-foobar) };
+ok exception { o2h(-arrays) };
+ok exception { o2h(undef, undef) };
+ok exception { o2h({x=>1},{y=>2}) };
 
 diag "If all tests pass, you can ignore the \"this Perl is too old\" warnings"
 	if $] lt '5.008009';

@@ -1,0 +1,105 @@
+{
+   "abstract" : "detect source code license statements in a text string",
+   "author" : [
+      "Jonas Smedegaard (JONASS) <jonass@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "Licensing",
+      "Sourcecode"
+   ],
+   "license" : [
+      "agpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "String-License",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "re::engine::RE2" : "0"
+         },
+         "requires" : {
+            "Array::IntSpan" : "0",
+            "Feature::Compat::Class" : "0.04",
+            "List::SomeUtils" : "0",
+            "Log::Any" : "0",
+            "Path::Tiny" : "0.062",
+            "Regexp::Pattern" : "v0.2.12",
+            "Regexp::Pattern::License" : "v3.4.0",
+            "namespace::clean" : "0",
+            "perl" : "5.012000"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "File::BaseDir" : "0",
+            "Regexp::Pattern::License" : "v3.9.0",
+            "Software::LicenseUtils" : "0.103014",
+            "YAML::XS" : "0"
+         },
+         "requires" : {
+            "Test2::V0" : "0.000060",
+            "Test::Without::Module" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "String::License" : {
+         "file" : "lib/String/License.pm",
+         "version" : "v0.0.3"
+      },
+      "String::License::Naming" : {
+         "file" : "lib/String/License/Naming.pm",
+         "version" : "v0.0.3"
+      },
+      "String::License::Naming::Custom" : {
+         "file" : "lib/String/License/Naming/Custom.pm",
+         "version" : "v0.0.3"
+      },
+      "String::License::Naming::SPDX" : {
+         "file" : "lib/String/License/Naming/SPDX.pm",
+         "version" : "v0.0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Dist/Display.html?Queue=String-License"
+      },
+      "homepage" : "https://metacpan.org/pod/String::License",
+      "license" : [
+         "http://www.gnu.org/licenses/agpl-3.0.txt"
+      ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://salsa.debian.org/build-common-team/p5-string-license"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/String-License/project"
+   },
+   "version" : "v0.0.3",
+   "x_help_wanted" : [
+      "documenter",
+      "tester"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_static_install" : 1
+}

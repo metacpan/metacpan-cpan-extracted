@@ -93,10 +93,13 @@ sub _expandSingleVariableReference {
 	return _expandVariableReferences($val);
     } elsif (ref($val) eq 'ARRAY') {
 	return [ map { _expandSingleVariableReference($key, $_) } @$val ];
+    } elsif (ref($val) eq 'JSON::PP::Boolean') {
+	return $val;
     } elsif (!ref($val)) {
 	return _expandScalarVariableReference($key, $val);
     } else {
-	die "non-hash, non-array, non-scalar configuration key '$key'";
+	use Data::Dumper;
+	die "non-hash, non-array, non-boolean, non-scalar configuration key '$key' = ", Dumper($val);
     }
 }
 
@@ -131,7 +134,7 @@ sub _expandScalarVariableReference {
 sub _mergeConfig {
     my($base, $overlay) = @_;
 
-    my @known_keys = qw(okapi login indexMap);
+    my @known_keys = qw(okapi login indexMap marcHoldings);
     foreach my $key (@known_keys) {
 	if (defined $overlay->{$key}) {
 	    if (ref $base->{$key} eq 'HASH') {
@@ -409,6 +412,18 @@ holdings. There must be exactly two elements: blank indicators can
 be specified as a single space.
 
 information.
+
+=item C<fieldPerItem>
+
+If specified and set to a true value, then a separate MARC field is
+generated for each item in each holding. When this is absent or set to
+a false value (the default), one MARC field is generated for each
+holding, and multiple items within each holding are represented by
+repeating sets of subfields within that field.
+
+This setting makes it simpler to access information about individual
+items, at the cost of losing information about how they are grouped
+into holdings.
 
 =item C<holdingsElements>
 

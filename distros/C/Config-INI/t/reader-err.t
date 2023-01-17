@@ -1,10 +1,9 @@
-#!perl
-use strict;
+use v5.12.0;
 use warnings;
 
 use Config::INI::Reader;
 
-use Test::More tests => 9;
+use Test::More;
 
 eval { Config::INI::Reader->read_file; };
 like($@, qr/no filename specified/i, 'read_file without args');
@@ -78,3 +77,5 @@ like($@, qr/no string provided/i, 'read_string without args');
   ok( ! $ok, "we can't read a UTF-8 file that starts with a BOM");
   like($error, qr/BOM/, "the error message mentions a BOM");
 }
+
+done_testing;

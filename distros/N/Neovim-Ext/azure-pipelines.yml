@@ -44,30 +44,21 @@ pool:
 
 steps:
 - script: |
+    PATH=~/perl5/bin:~/perl5/perlbrew/bin:~/perl5/perlbrew/perls/perl-$(PERL_VERSION)/bin:$PATH
+    echo "##vso[task.setvariable variable=PATH]$PATH"
     wget -O - https://install.perlbrew.pl | bash
-    export PATH=~/perl5/bin:~/perl5/perlbrew/bin:$PATH
-    echo "##vso[task.setvariable variable=PATH]$PATH"
-  displayName: 'Install perlbrew'
-
-- script: |
-    export PATH=~/perl5/bin:~/perl5/perlbrew/bin:~/perl5/perlbrew/perls/perl-$(PERL_VERSION)/bin:$PATH
-    echo "##vso[task.setvariable variable=PATH]$PATH"
     perlbrew install --notest perl-$(PERL_VERSION)
     perl -V
     curl -L https://cpanmin.us | perl - App::cpanminus
-  displayName: 'Install perl'
+  condition: or(startsWith(variables['IMAGE'], 'ubuntu'), startsWith(variables['IMAGE'], 'macos'))
+  displayName: 'Install perl (Unix)'
 
 - script: |
-    export PATH=~/perl5/bin:~/perl5/perlbrew/bin:~/perl5/perlbrew/perls/perl-$(PERL_VERSION)/bin:$PATH
-    echo "##vso[task.setvariable variable=PATH]$PATH"
-    cpanm --quiet --notest Dist::Zilla~">= 5.0000, < 6.0000"
-    cpanm --quiet --notest Dist::Zilla::PluginBundle::Author::ALEXBIO
-    cpanm --quiet --notest Pod::Coverage::TrustPod
-    cpanm --quiet --notest Devel::Cover::Report::Coveralls
-    cpanm --quiet --notest Dist::Zilla::App::Command::cover
-    dzil authordeps --missing | cpanm --quiet --notest
+    cpanm --quiet --notest Dist::Zilla Dist::Zilla::PluginBundle::Author::JACQUESG App::Ack
+    dzil authordeps --missing | ack -v "inc::" | cpanm --quiet --notest
     dzil listdeps --missing | cpanm --quiet --notest
-  displayName: 'Install CPAN dependencies'
+  condition: or(startsWith(variables['IMAGE'], 'ubuntu'), startsWith(variables['IMAGE'], 'macos'))
+  displayName: 'Install CPAN dependencies (Unix)'
 
 - script: |
     dzil cover -ignore_re ^deps -ignore_re CORE -ignore_re ^const -test -report coveralls

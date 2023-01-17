@@ -8,7 +8,7 @@ BEGIN {
 	# PDL::PP expects to see, so massage it into the proper form:
 	$base_name = $ARGV[0];
 	$base_name =~ s/\.pm//;
-	
+
 	# Handle backslashes for Windows paths:
 	$base_name =~ s/\\/\\\\/g;
 }
@@ -69,6 +69,10 @@ pp_addpm({At=>'Top'},<<'ModuleMaterial');
 
 =head1 SYNOPSIS
 
+=for podview <img src="PDL/Drawing/Prima/pod/sin.png">
+
+=for html <p><img src="https://raw.githubusercontent.com/dk/PDL-Drawing-Prima/master/lib/PDL/Drawing/Prima/pod/sin.png">
+
 Each of the methods comes with a small sample snippet. To see how it
 looks, copy this synopsis and replace the code in the
 C<Example code goes here> block with the example code.
@@ -78,28 +82,29 @@ C<Example code goes here> block with the example code.
  use PDL;
  use PDL::Drawing::Prima;
  use Prima qw(Application);
- 
+
  my $window = Prima::MainWindow->create(
-     text    => 'PDL::Drawing::Prima Test',
-     onPaint => sub {
+     text      => 'PDL::Drawing::Prima Test',
+     antialias => 1,
+     onPaint   => sub {
          my ( $self, $canvas) = @_;
- 
+
          # wipe the canvas:
          $canvas->clear;
-         
+
          ### Example code goes here ###
-         
+
          # Draw a sine curve on the widget:
          my ($width, $height) = $canvas->size;
          my $x = sequence($width);
          my $y = ( sin($x / 20) + 1 ) * $height/2;
          $canvas->pdl_polylines($x, $y, lineWidths => 2);
-         
+
          ### Example code ends here ###
      },
      backColor => cl::White,
  );
- 
+
  run Prima;
 
 =head1 DESCRIPTION
@@ -157,14 +162,14 @@ This example creates the equivalent of lp::Dash:
 
 This example creates a piddle with four line types: lp::Solid, lp::Dash,
 lp::ShortDash, and lp::DashDot:
- 
+
  my $patterns = byte q[ 1; 9 3; 3 3; 9 3 1 3];
 
 and should be identical to
 
  my $patterns = piddle_of_patterns_for(
      lp::Solid, lp::Dash, lp::ShortDash, lp::DashDot);
- 
+
 When you create a byte piddle, all of the patterns must have the same number of
 bytes in their specification. Of course, different patterns have different
 lengths, so in that case simply pad the shorter specifications with zeroes.
@@ -182,9 +187,9 @@ sub piddle_of_patterns_for {
 	foreach(@_) {
 		$length = length($_) if $length < length($_);
 	}
-	
+
 	use PDL::NiceSlice;
-	
+
 	# Create the new byte array with the appropriate dimensions:
 	my $to_return = zeroes(byte, $length, scalar(@_));
 	$to_return .= $to_return->sequence;
@@ -192,13 +197,13 @@ sub piddle_of_patterns_for {
 		# Get a slice and update it:
 		my $slice = $to_return(:,$i);
 		substr ${$slice->get_dataref}, 0, length($_[$i]), $_[$i];
-		
+
 		# Make sure the modifications propogate back to the original:
 		$slice->upd_data;
 	}
-	
+
 	no PDL::NiceSlice;
-	
+
 	return $to_return;
 }
 
@@ -272,81 +277,41 @@ PDrawable_vmt CDrawable;
 Point Point_buffer;
 Rect Rect_buffer;
 
-#define DECLARE_POINT_DATA													\
-	Point * points_to_plot;													\
-	AV * array_to_plot;														\
-	SV ** array_elem_p
-
-#define INIT_POINT_DATA														\
-	do {																	\
-		points_to_plot = 0;													\
-		array_to_plot = 0;													\
-		array_elem_p = 0;													\
-	} while(0)
-
-#define ENSURE_POINT_STORAGE(function, n_points)							\
-	do {																	\
-		if (my-> function == CDrawable-> function) {						\
-			/* This is the direct raster drawing, so make sure we have */	\
-			/* memory allocated for points_to_plot 						*/	\
-			if (points_to_plot == 0) Newx(points_to_plot, n_points, Point);	\
-		}																	\
-		else {																\
-			/* This is the Perl-level drawing, so make sure we have an AV */\
-			/* and then ensure it is long enough */							\
-			if (array_to_plot == 0) array_to_plot = newAV();				\
-			av_fill(array_to_plot, (n_points) * 2);							\
-		}																	\
-	} while(0)
-
-#define FREE_POINT_STORAGE													\
-	do {																	\
-		if (points_to_plot != 0) Safefree(points_to_plot);					\
-		points_to_plot = 0;													\
-		if (array_to_plot != 0) av_undef(array_to_plot);					\
-		array_to_plot = 0;													\
-	} while (0)
-
-#define ADD_POINT(function, index, xval, yval)								\
-	do {																	\
-		if (my-> function == CDrawable-> function) {						\
-			points_to_plot[index].x = xval;									\
-			points_to_plot[index].y = yval;									\
-		}																	\
-		else {																\
-			/* Add the x value */											\
-			array_elem_p = av_fetch(array_to_plot, 2*(index), 1);			\
-			if (array_elem_p == 0) {										\
-				FREE_POINT_STORAGE;											\
-				barf("Internal error: could not access Perl array element");\
-			}																\
-			sv_setnv(*array_elem_p, xval);									\
-																			\
-			/* Add the y value */											\
-			array_elem_p = av_fetch(array_to_plot, 2*(index)+1, 1);			\
-			if (array_elem_p == 0) {										\
-				FREE_POINT_STORAGE;											\
-				barf("Internal error: could not access Perl array element");\
-			}																\
-			sv_setnv(*array_elem_p, yval);									\
-		}																	\
-	} while(0)
-
-#define DRAW_POINTS(function, apricot_function, n_to_plot)					\
-	do {																	\
-		if (my-> function == CDrawable-> function) {						\
-			/* Call apricot's function */									\
-		/*	printf("Drawing %s\n", #function);	*/							\
-			apricot_function (widget_handle, n_to_plot, points_to_plot);	\
-		}																	\
-		else {																\
-			/* Trim the array, in case any values were nan and therefore */	\
-			/* skipped */													\
-			av_fill(array_to_plot, 2*(n_to_plot) - 1);						\
-			/* working here - should I just use newRV? */					\
-			my-> function (widget_handle, newRV_noinc((SV*)array_to_plot));	\
-		}																	\
-	} while(0)
+#define DECLARE_POINT_DATA               \
+	SV     * points_to_plot;         \
+	SV     * points_tied;            \
+	NPoint * points_storage
+#define INIT_POINT_DATA                  \
+	points_to_plot = 0;              \
+	points_tied    = 0;              \
+	points_storage = 0
+#define ENSURE_POINT_STORAGE(n_points)   \
+	if (( points_to_plot = prima_array_new( n_points * sizeof(NPoint))) != NULL) { \
+		points_storage = (NPoint*) prima_array_get_storage( points_to_plot );  \
+		points_tied    = prima_array_tie( points_to_plot, sizeof(double), "d");\
+	}
+#define FREE_POINT_STORAGE               \
+	if ( points_to_plot ) {          \
+		if ( points_tied ) {     \
+			sv_free( points_tied ); \
+		} else {                 \
+			sv_free( points_to_plot ); \
+		}                        \
+		points_to_plot = 0;      \
+		points_storage = 0;      \
+		points_tied    = 0;      \
+	}
+#define ADD_POINT(i, a, b)               \
+	if ( points_storage ) {          \
+		points_storage[i].x = a; \
+		points_storage[i].y = b; \
+	}
+#define DRAW_POINTS(function, n_to_plot)                                           \
+	if ( points_tied ) {                                                       \
+		/* Trim the array, in case any values were nan and thus skipped */ \
+		prima_array_truncate( points_to_plot, n_to_plot * sizeof(NPoint)); \
+		my->function( widget_handle, points_tied );                        \
+	}
 
 
 /* This is based on Prima's maximum coordinate size, which is 16383. I have
@@ -370,12 +335,12 @@ typedef struct {
 	double x2;
 	double y1;
 	double y2;
-	
+
 	/* Temporary storage */
 	double tmp_xs[2];
 	double tmp_ys[2];
 	int offset;
-	
+
 	/* Dimensions of the widget */
 	int width;
 	int height;
@@ -419,13 +384,13 @@ int _check_for_big_numbers(big_number_container * d) {
 			, d->height);
 		d->height = MY_BIG_NUMBER;
 	}
-	
+
 	/* This line cannot be drawn if it is strictly above, below, to the left, or
 	 * to the right of the view box */
 	if (d->x1 < 0 && d->x2 < 0 || d->x1 > d->width && d->x2 > d->width
 			|| d->y1 < 0 && d->y2 < 0 || d->y1 > d->height && d->y2 > d->height)
 		return 0;
-	
+
 	if (_too_many_bad_values(d)) return 0;
 	if (_is_drawable_as_is(d)) return 1;
 
@@ -433,9 +398,9 @@ int _check_for_big_numbers(big_number_container * d) {
 	 * line actually falls within the box, and figure out where it enters or
 	 * leaves. */
 	d->offset = 0;
-	
+
 	_check_start_within_bounding_box(d);
-	
+
 	/* Before we go further, check for horizontal or vertical lines. */
 	if (d->y1 == d->y2 || is_inf(d->x1) || is_inf(d->x2))
 		_handle_horizontal_line(d);
@@ -453,13 +418,13 @@ int _check_for_big_numbers(big_number_container * d) {
 		_check_crosses_right_edge(d, y0, slope);
 		_check_crosses_top_edge(d, y0, slope);
 		_check_cross_error(d);
-		
+
 		/* At this point, if the offset is not 2, the line does not intersect
 		 * the view box, so the line will not be drawn and we can return 0 to
 		 * indicate that. */
 		if (d->offset != 2) return 0;
 	}
-	
+
 	_set_returns_preserving_order(d);
 	return 2;
 }
@@ -478,7 +443,7 @@ int _too_many_bad_values(big_number_container * d) {
 	/* One nan is one too many */
 	if (d->x1 != d->x1 || d->x2 != d->x2 || d->y1 != d->y1 || d->y2 != d->y2)
 		return 1;
-	
+
 	/* This line should be skipped if two or more of its values are inf */
 	int inf_count = 0;
 	if (is_inf(d->x1)) inf_count++;
@@ -486,7 +451,7 @@ int _too_many_bad_values(big_number_container * d) {
 	if (is_inf(d->y1)) inf_count++;
 	if (is_inf(d->y2)) inf_count++;
 	if (inf_count > 1) return 1;
-	
+
 	return 0;
 }
 
@@ -564,7 +529,7 @@ void _check_crosses_left_edge(big_number_container * d, double y0, double slope)
 void _check_crosses_bottom_edge(big_number_container * d, double y0, double slope) {
 	/* Can't cross bottom if both positive */
 	if (d->y1 > 0 && d->y2 > 0) return;
-	
+
 	double x0 = -y0 / slope;
 	/* x == 0 was handled by the left edge check, so this only succeeds if x0 is
 	 * strictly greater than zero. */
@@ -578,7 +543,7 @@ void _check_crosses_bottom_edge(big_number_container * d, double y0, double slop
 void _check_crosses_right_edge(big_number_container * d, double y0, double slope) {
 	/* Can't cross right edge if both x values are less than it */
 	if (d->x1 < d->width && d->x2 < d->width) return;
-	
+
 	double y_r = y0 + slope * d->width;
 	/* Note, y == 0 was handled by the bottom edge check, so this only succeeds
 	 * if  yr is strictly greater than zero. */
@@ -592,7 +557,7 @@ void _check_crosses_right_edge(big_number_container * d, double y0, double slope
 void _check_crosses_top_edge(big_number_container * d, double y0, double slope) {
 	/* Can't cross the top edge if both y values are less than it */
 	if (d->y1 > d->height && d->y2 > d->height) return;
-	
+
 	double x_t = (d->height - y0) / slope;
 	/* Note, x == 0 and x == width were handled above, so this checks for
 	 * strict inequality */
@@ -802,7 +767,7 @@ my %uncast_for = ();
 
 sub generate_property_declarations_for {
 	my $to_return = pp_line_numbers(__LINE__, "\t\t/* Declare the property variables */\n");
-		 
+
 	# Build the list:
 	for my $property (@_) {
 		if (exists $declare_args_for{$property}) {
@@ -823,7 +788,7 @@ sub generate_property_declarations_for {
 			$uncast_for{$property} = "($type)" if exists $cast_for{$property};
 		}
 	}
-	
+
 	return $to_return;
 }
 
@@ -890,10 +855,10 @@ sub generate_property_initializations_for {
 	# Make sure I handle an empty list correctly. I can't imagine
 	# calling this function with an empty list, but let's be safe:
 	return '' unless @_;
-	
+
 	# This is the string I will build up for my return value:
 	my $to_return = "\t\t/* Property initialization code */\n";
-	
+
 	# Set the variables:
 	for my $property (@_) {
 		if (exists $init_args_for{$property}) {
@@ -943,23 +908,23 @@ sub initialize_for {
 	my @properties = @_;
 	return pp_line_numbers(__LINE__, '
 		/* BEGIN AUTOGENERATED INITIALIZATION */
-		
+
 		HV* arg_hash_hv = (HV*)SvRV($COMP(arg_ref_sv));
-		
+
 		/* get the widget handle */
 		SV ** widget_sv_p = hv_fetch(arg_hash_hv, "widget", 6, 0);
 		if (widget_sv_p == NULL) {
 			croak("INTERNAL ERROR: widget key was not set!");
 		}
 		Handle widget_handle = gimme_the_mate(*(widget_sv_p));
-		
+
 		/* array of plural properties to check each iteration. The number
 		 * of properties for any given function cannot exceed the number
 		 * of properties available to all functions, so just allocate
 		 * an array large enough to hold everything, even if most functions
 		 * will never use this much. It canno be more than 20, I imagine. */
 		property_id_t prop_list [NUMBER_OF_PROPERTIES_PLUS_ONE];
-		
+
 		/* Create a counting variable, and track the number of active
 		 * properties that will change during the threadloop for *this*
 		 * invocation of the function. */
@@ -967,7 +932,7 @@ sub initialize_for {
 
 	') . generate_property_declarations_for(@properties)
 	  . generate_property_initializations_for(@properties) . '
-		
+
 		/* END AUTOGENERATED INITIALIZATION */
 	';
 }
@@ -1030,7 +995,7 @@ sub generate_switch_case_for {
 							my->set_$singular(widget_handle, $cast curr_$singular);
 						}\n";
 	}
-	
+
 	$to_return .= "\t\t\t\t\t\tbreak;";
 }
 
@@ -1072,7 +1037,7 @@ my %cleanup_code_for = ();
 sub generate_cleanup_code_for {
 	my $to_return = '
 		/* BEGIN AUTOGENERATED CLEANUP CODE */
-		
+
 ';
 	for my $property (@_) {
 		if (exists $cleanup_code_for{$property}) {
@@ -1088,7 +1053,7 @@ sub generate_cleanup_code_for {
 		}
 	}
 	return $to_return . '
-		
+
 		/* END AUTOGENERATED CLEANUP CODE */
 ';
 }
@@ -1109,7 +1074,7 @@ and the code will never get out of sync. :-)
 
 sub extract_properties_from {
 	my $doc_string = shift;
-	
+
 	# Find the discussion of properties
 	my $stars = '*' x 20;
 	my ($prop_string) = $doc_string =~ /Applicable properties include ([^.]*)/
@@ -1155,19 +1120,19 @@ $init_args_for{clipRects} = pp_line_numbers(__LINE__, q{
 		}
 		if (hv_exists(arg_hash_hv, "clipRect", 8)) {
 			orig_clipRect = my->get_clipRect(widget_handle);
-			
+
 			/* Get the AV that is the current clipRect */
 			AV * tmp_clipRect_AV = (AV*) (*(hv_fetch(arg_hash_hv, "clipRect", 8, 0)));
 			if (av_len(tmp_clipRect_AV) != 4) {
 				croak("clipRect expects a four-element array reference");
 			}
-			
+
 			/* Unpack the values in the AV into the current clipRect */
 			curr_clipRect.left   = SvIV(*(av_fetch(tmp_clipRect_AV, 0, 0)));
 			curr_clipRect.bottom = SvIV(*(av_fetch(tmp_clipRect_AV, 1, 0)));
 			curr_clipRect.right  = SvIV(*(av_fetch(tmp_clipRect_AV, 2, 0)));
 			curr_clipRect.top    = SvIV(*(av_fetch(tmp_clipRect_AV, 3, 0)));
-			
+
 			my->set_clipRect(widget_handle, curr_clipRect);
 		}
 });
@@ -1212,7 +1177,7 @@ $init_args_for{linePatterns} = pp_line_numbers(__LINE__, q{
 		orig_pattern = 0;
 		curr_pattern = 0;
 		tmp_pattern  = 0;
-		
+
 		if (hv_exists(arg_hash_hv, "linePatterns", 12)) {
 			prop_list[n_props++] = linePatterns_prop_id;
 			SV * pattern_to_copy = my->get_linePattern(widget_handle);
@@ -1225,13 +1190,13 @@ $init_args_for{linePatterns} = pp_line_numbers(__LINE__, q{
 				sv_setsv(orig_pattern, pattern_to_copy);
 			else
 				orig_pattern = newSVsv(pattern_to_copy);
-			
+
 			pattern_to_copy = *(hv_fetch(arg_hash_hv, "linePattern", 11, 0));
 			if (curr_pattern != 0)
 				sv_setsv(curr_pattern, pattern_to_copy);
 			else
 				curr_pattern = newSVsv(pattern_to_copy);
-			
+
 			my->set_linePattern(widget_handle, curr_pattern);
 		}
 		if (orig_pattern != 0) {
@@ -1244,7 +1209,7 @@ $set_code_for{linePatterns} = pp_line_numbers(__LINE__, q{
 						for (pat_len_to_copy = 0; pat_len_to_copy < $SIZE(patlen); pat_len_to_copy++)
 							if ($linePatterns(patlen => pat_len_to_copy) == 0)
 								break;
-						
+
 						sv_setpvn(tmp_pattern, (unsigned char *)$P(linePatterns), pat_len_to_copy);
 						if (sv_cmp(tmp_pattern, curr_pattern) != 0) {
 							sv_setsv(curr_pattern, tmp_pattern);
@@ -1257,7 +1222,7 @@ $cleanup_code_for{linePatterns} = pp_line_numbers(__LINE__, q{
 			if (sv_cmp(orig_pattern, curr_pattern) != 0) {
 				my->set_linePattern(widget_handle, orig_pattern);
 			}
-			
+
 			/* Ensure that these get cleaned up */
 			sv_2mortal(orig_pattern);
 			sv_2mortal(curr_pattern);
@@ -1329,7 +1294,7 @@ $init_args_for{fillPatterns} = pp_line_numbers(__LINE__, q{
 			/* Reference to the above array of int SVs, which is passed to
 			 * Prima drawing events */
 			fill_ref_sv = newRV_noinc((SV*)fill_av);
-			
+
 			/* These SVs hold the fill patterns for whatever were the original
 			 * and singular fill specifications. These can either be integer
 			 * (named) constants, or they can be arrays of bits (IVs). I would
@@ -1337,10 +1302,10 @@ $init_args_for{fillPatterns} = pp_line_numbers(__LINE__, q{
 			 * how to convert the constant to the char[8] representation. So
 			 * I store these instead. */
 			orig_fillSV = singular_fillSV = 0;
-			
+
 			/* Ensure there are eight rows */
 			av_fill(fill_av, 7);
-			
+
 			/* Check the singular and plural properties. */
 			if (hv_exists(arg_hash_hv, "fillPatterns", 12)) {
 				prop_list[n_props++] = fillPatterns_prop_id;
@@ -1379,7 +1344,7 @@ $set_code_for{fillPatterns} = pp_line_numbers(__LINE__, q{
 					else {
 						singular_fillSV = 0;
 					}
-					
+
 	/* working here - double-check this logic */
 					/* Copy the fill pattern into the array if anything is
 					 * different. */
@@ -1388,7 +1353,7 @@ $set_code_for{fillPatterns} = pp_line_numbers(__LINE__, q{
 							tmp_fill_sv = *(av_fetch(fill_av, fillPat_counter, 1));
 							sv_setiv(tmp_fill_sv, $fillPatterns(oct => fillPat_counter));
 						}
-						
+
 						/* Set the fill pattern */
 						my->set_fillPattern(widget_handle, fill_ref_sv);
 					}
@@ -1401,7 +1366,7 @@ $cleanup_code_for{fillPatterns} = pp_line_numbers(__LINE__, q{
 			if (orig_fillSV != 0) {
 				my->set_fillPattern(widget_handle, orig_fillSV);
 			}
-			
+
 			/* These are not used outside this function so I will
 			 * unconditionally free their memory now. */
 			av_undef(fill_av);
@@ -1477,10 +1442,10 @@ pp_addpm <<'DefaultArgumentHandling';
 
 sub get_sorted_args_with_defaults {
 	my ($self, $arg_names, $given) = @_;
-	
+
 	# Default to an empty list:
 	$given = {} unless ref($given) eq 'HASH';
-	
+
 	# Check that they supplied only allowed parameters (allowing both
 	# singular and plural forms)
 	for my $parameter (keys %$given) {
@@ -1490,7 +1455,7 @@ sub get_sorted_args_with_defaults {
 				$_ eq $parameter or $_ eq $parameter . 's'
 				} @$arg_names
 	}
-	
+
 	# Return the sorted list of supplied or default values
 	my @to_return = ();
 	for my $arg_name (@$arg_names) {
@@ -1514,7 +1479,7 @@ sub get_sorted_args_with_defaults {
 			# argument:
 			$N_args_for{$arg_name} == 1
 				or croak("Expected $N_args_for{$arg_name} arguments for $arg_name");
-			
+
 			push @to_return, $given->{$arg_name};
 		}
 	}
@@ -1554,7 +1519,7 @@ sub generate_PMCode_for {
 	# check the passed arguments and provide meaningful error messages:
 	my $to_return = "our $props_array_name = qw(@$props);\n"
 				. "our $args_array_name = qw(@arg_names);\n";
-	
+
 	# Define the drawable function in the Prima::Drawable namespace
 	# and check for arguments:
 	$to_return .= "sub Prima::Drawable::pdl_$func_name {
@@ -1573,24 +1538,24 @@ sub generate_PMCode_for {
 	# Check for an even number of remaining arguments (key-value pairs):
 	croak('pdl_$func_name expects optional parameters as key => value pairs')
 		unless \@_ % 2 == 0;
-	
+
 	my \%args = \@_;
-	
+
 	# Check for piddles as values for singular properties
 	for (keys \%args) {
 		if (\$_ !~ /s\$/ && eval { \$args{\$_}->isa('PDL') }) {
 			croak \"A piddle passed as singular \$_ property\";
 		}
 	}
-	
+
 	# Get the a full list of arguments suitable for the internal pp code
 	# in the correct order:
 	my \@args_with_defs
 		= get_sorted_args_with_defaults(\$self, \\$props_array_name, \\\%args);
-	
+
 	# Add the widget to the set of args
 	\$args{widget} = \$self;
-	
+
 	# Call the PP'd internal code. Always put the args hash last.
 	eval {
 		PDL::_prima_${func_name}_int(";
@@ -1601,14 +1566,14 @@ sub generate_PMCode_for {
 	# finish with self and the args list:
 	$to_return .= '@args_with_defs, \%args);
 	};
-	
+
 	if ($@) {
 		# die $@;
 		$@ =~ s/at (.*?) line \d+\.\n$//;
 		croak "Issues calling pdl_' . $func_name . ': $@";
 	}
 	' . "\n}\n";
-	 
+
 	return $to_return;
 }
 
@@ -1669,8 +1634,8 @@ linePatterns, lineWidths, rops, rop2s.
 The arcs go from the C<start_angle>s to the C<end_angle>s along the
 ellipses centered at the C<x>s and C<y>s, with the specified x- and
 y-diameters. The angles are measured in degrees, not radians.
-The difference between this command and L</chords> or L</sectors> is that
-C<arcs> does not connect the dangling ends.
+The difference between this command and L</pdl_chords> or L</pdl_sectors> is that
+C<pdl_arcs> does not connect the dangling ends.
 
 Here's a simple example:
 
@@ -1685,7 +1650,7 @@ Here's a simple example:
  my $dys = $xs->random * $y_max / 4;
  my $th_starts = $xs->random * 360;
  my $th_stops = $xs->random * 360;
- 
+
  # Now that we've generated the data, call the command:
  $canvas->pdl_arcs($xs, $ys, $dxs
                 , $dys, $th_starts, $th_stops);
@@ -1764,7 +1729,7 @@ fillPatterns, rops, rop2s.
  my $x2s = $x1s + $x1s->random * ($x_max - $x1s);
  my $y2s = $y1s + $x1s->random * ($y_max - $y1s);
  my $colors = $x1s->random * 2**24;
- 
+
  # Now that we've generated the data, call the command:
  $canvas->pdl_bars($x1s, $y1s, $x2s, $y2s
          , colors => $colors);
@@ -1826,7 +1791,7 @@ Draws arcs (i.e. incomplete ellipses) whose ends are connected by a line.
 
 The chord starts at C<start_angle> and runs to C<end_angle> along the ellipse
 centered at C<x>, C<y>, with their specified diameters C<x_diameter>,
-C<y_diameter>. Unlike L</arcs> or L</sectors>, it connects
+C<y_diameter>. Unlike L</pdl_arcs> or L</pdl_sectors>, it connects
 the ends of the arc with a straight line. The angles are
 measured in degrees, not radians.
 
@@ -1837,7 +1802,7 @@ linePatterns, lineWidths, rops, rop2s.
 
  # For this example, you will need:
  use PDL::Char;
- 
+
  # Draw a bunch of random arcs on $canvas:
  my $N_chords = 20;
  my ($x_max, $y_max) = $canvas->size;
@@ -1847,16 +1812,16 @@ linePatterns, lineWidths, rops, rop2s.
  my $dys = $xs->random * $y_max / 4;
  my $th_starts = $xs->random * 360;
  my $th_stops = $xs->random * 360;
- 
+
  # make a small list of patterns:
  my $patterns_list = PDL::Char->new(
           [lp::Solid, lp::Dash, lp::DashDot]);
- 
+
  # Randomly select 20 of those patterns:
  my $rand_selections = ($xs->random * 3)->byte;
  use PDL::NiceSlice;
  my $patterns = $patterns_list($rand_selections)->transpose;
- 
+
  # Now that we've generated the data, call the command:
  $canvas->pdl_chords($xs, $ys, $dxs
                 , $dys, $th_starts, $th_stops
@@ -1928,7 +1893,7 @@ Applicable properties include backColors, rop2s.
  # Begin by drawing a filled rectangle:
  $canvas->color(cl::Blue);
  $canvas->bar(0, 0, $width, $height);
- 
+
  # Now cut random rectangles out of it:
  my $N_chunks = 20;
  my $x1 = random($N_chunks) * $width;
@@ -2017,7 +1982,7 @@ To draw circles, just use the same x- and y-diameter.
  my $x_diameter = 15;
  # Increase the y-diameter
  my $y_diameter = $x->xlinvals(10, $height/1.3);
- 
+
  # Use the pdl_ellipses method to draw!
  $canvas->pdl_ellipses($x, $y, $x_diameter, $y_diameter, lineWidths => 2);
 
@@ -2165,7 +2130,7 @@ fillPatterns, rops, rop2s.
  my $x_diameter = 15;
  # Increase the y-diameter
  my $y_diameter = $x->xlinvals(10, $height/1.3);
- 
+
  # Use the pdl_ellipses method to draw!
  $canvas->pdl_fill_ellipses($x, $y, $x_diameter, $y_diameter);
 
@@ -2262,7 +2227,7 @@ For example:
  my ($width, $height) = $canvas->size;
  my $x = sequence(23)/4;
  my $y = $x->sin;
- 
+
  # Draw it in such a way that it fits the canvas nicely
  $canvas->pdl_fillpolys($x * $width / $x->max,
      ($y + 1) * $height / 2, fillModes => fm::Winding,
@@ -2292,7 +2257,7 @@ my $code = 	# Begin by declaring the non-autogenerated the variables I will need
 		/* Allocate an array of Points outside of the threadloop */
 		n_size = $SIZE(n);
 		INIT_POINT_DATA;
-		
+
 		/* All set. Start the threadloop with the setters. */
 		threadloop %{
 		])
@@ -2305,16 +2270,16 @@ my $code = 	# Begin by declaring the non-autogenerated the variables I will need
 			 * I simply skip over them.
 			 */
 			n_to_plot = 0;
-			
+
 			/* Ensure that we have the proper memory storage to communicate with
 			 * this widget's fillpoly routine. */
-			ENSURE_POINT_STORAGE (fillpoly, n_size);
-			
+			ENSURE_POINT_STORAGE(n_size);
+
 			i = -1;
 			while(1) {
 				NEXT_I: i++;
 				if (i >= n_size) break;
-				
+
 				xval = $x(n => i);
 				yval = $y(n => i);
 
@@ -2325,7 +2290,7 @@ my $code = 	# Begin by declaring the non-autogenerated the variables I will need
 
 				/* This is a hack, but I'm leaving it like this for now because
 				 * the full solution is very difficult */
-				
+
 				/* handle infinities */
 				if (xval * 0.0 != 0.0) {
 					if (xval < 0)
@@ -2344,16 +2309,16 @@ my $code = 	# Begin by declaring the non-autogenerated the variables I will need
 				if (xval > MY_BIG_NUMBER) xval = MY_BIG_NUMBER;
 				if (yval < -MY_BIG_NUMBER) yval = -MY_BIG_NUMBER;
 				if (xval < -MY_BIG_NUMBER) xval = -MY_BIG_NUMBER;
-				
-				ADD_POINT(fillpoly, n_to_plot, xval, yval);
+
+				ADD_POINT(n_to_plot, xval, yval);
 
 				/* Keep track of the number of points added */
 				n_to_plot++;
 			}
 			if (n_to_plot > 2)
-				DRAW_POINTS(fillpoly, apc_gp_fill_poly, n_to_plot);
+				DRAW_POINTS(fillpoly, n_to_plot);
 		%}
-		
+
 		/* Free the memory when done */
 		FREE_POINT_STORAGE;
 	])
@@ -2399,8 +2364,8 @@ fillPatterns, rops, rop2s.
 
 More specifically, this draws an arc from C<start_angle> to C<end_angle>
 along the ellipse centered at C<x>, C<y>, with specified x- and y-diameters.
-Like L</fill_chords>, this command connects the end points of the arc, but
-unlike L</fill_chords>, it does so by drawing two lines, both of which
+Like L</pdl_fill_chords>, this command connects the end points of the arc, but
+unlike L</pdl_fill_chords>, it does so by drawing two lines, both of which
 also connect to the ellipse's center. This results in shapes that look
 like pie pieces or pie remnants, depending of whether you're a glass-half-full
 or glass-half-empty sort of person.
@@ -2416,7 +2381,7 @@ or glass-half-empty sort of person.
  my $dys = $xs->random * $y_max / 4;
  my $th_starts = $xs->random * 360;
  my $th_stops = $xs->random * 360;
- 
+
  # Now that we've generated the data, call the command:
  $canvas->pdl_fill_sectors($xs, $ys, $dxs
                 , $dys, $th_starts, $th_stops);
@@ -2518,7 +2483,7 @@ piddle is given).
  my $y = random($N_items) * $width;
  $canvas->pdl_ellipses($x, $y, 20, 20, lineWidths => 3);
  $canvas->pdl_symbols($x, $y, 3, 0, 0, 10, 1, lineWidths => 3);
- 
+
  # Fill the interior of those circle/triangle intersections
  $canvas->pdl_flood_fills($x, $y, cl::Black, 0);
 
@@ -2630,7 +2595,7 @@ pp_def('prima_lines',
 			to_check.x2 = $x2();
 			to_check.y1 = $y1();
 			to_check.y2 = $y2();
-			
+
 			/* Call apricot's lines function if the line should be drawn */
 			if (_check_for_big_numbers(&to_check) > 0) {
 				my->line(widget_handle, to_check.x1, to_check.y1
@@ -2669,7 +2634,7 @@ pp_def('prima_lines',
 			to_check.x2 = $x2();
 			to_check.y1 = $y1();
 			to_check.y2 = $y2();
-			
+
 			/* Call apricot's lines function if the line should be drawn */
 			if (_check_for_big_numbers(&to_check) > 0) {
 				my->line(widget_handle, to_check.x1, to_check.y1
@@ -2865,20 +2830,20 @@ $code = 	# Begin by declaring the non-autogenerated variables I will need
 		/* Allocate the point data outside of the threadloop */
 		n_size = $SIZE(n);
 		INIT_POINT_DATA;
-		
+
 		/* All set. Start the threadloop with the setters. */
 		threadloop %{
 		])
 		. generate_switch_loop_for(@properties)
 		. pp_line_numbers(__LINE__, q[
 			/* Make sure that we have the proper point storage for this widget */
-			ENSURE_POINT_STORAGE(polyline, n_size);
-			
+			ENSURE_POINT_STORAGE(n_size);
+
 			/* Get the width and height of the widget */
 			Point p = my->get_size(widget_handle);
 			to_check.height = p.y;
 			to_check.width = p.x;
-			
+
 			i = 0;
 			NEXT_I: while(i < n_size - 1) {
 				to_check.x1 = $x(n => i);
@@ -2886,21 +2851,21 @@ $code = 	# Begin by declaring the non-autogenerated variables I will need
 				i++;
 				CHECK_FOR_BAD;
 				/* Add the first point to the collection */
-				ADD_POINT(polyline, 0, to_check.x1, to_check.y1);
-				
+				ADD_POINT(0, to_check.x1, to_check.y1);
+
 				for(n_to_plot = 1; i < n_size; i++, n_to_plot++) {
 					to_check.x2 = $x(n => i);
 					to_check.y2 = $y(n => i);
-					
+
 					check_result = IS_BAD ? 0 : _check_for_big_numbers(&to_check);
-					
+
 					if (check_result == 0) {
 						/* That means "don't plot this segment", which means
 						 * I should plot the other pieces and start over with
 						 * a new sub-segment. */
 						if (n_to_plot > 1)
-							DRAW_POINTS(polyline, apc_gp_draw_poly, n_to_plot);
-						
+							DRAW_POINTS(polyline, n_to_plot);
+
 						goto NEXT_I;
 					}
 					if (check_result > 1) {
@@ -2913,26 +2878,26 @@ $code = 	# Begin by declaring the non-autogenerated variables I will need
 							 * only trigger this if they are exotic, but the
 							 * n==1 could trigger this if the zeroeth point is
 							 * exotic */
-							ADD_POINT(polyline, 0, to_check.x1, to_check.y1);
+							ADD_POINT(0, to_check.x1, to_check.y1);
 						}
-						
-						ADD_POINT(polyline, n_to_plot, to_check.x2, to_check.y2);
-						DRAW_POINTS(polyline, apc_gp_draw_poly, n_to_plot+1);
+
+						ADD_POINT(n_to_plot, to_check.x2, to_check.y2);
+						DRAW_POINTS(polyline, n_to_plot+1);
 						goto NEXT_I;
 					}
-					
-					ADD_POINT(polyline, n_to_plot, to_check.x2, to_check.y2);
-					
+
+					ADD_POINT(n_to_plot, to_check.x2, to_check.y2);
+
 					to_check.x1 = to_check.x2;
 					to_check.y1 = to_check.y2;
 				}
-				
+
 				/* The only way we reach here is if the last segment was fine,
 				 * but was not drawn, so draw it. */
-				DRAW_POINTS(polyline, apc_gp_draw_poly, n_to_plot);
+				DRAW_POINTS(polyline, n_to_plot);
 			}
 		%}
-		
+
 		/* Free the memory when done */
 		FREE_POINT_STORAGE;
 	])
@@ -3011,7 +2976,7 @@ linePatterns, lineWidths, rops, rop2s.
  my $x2s = $x1s + $x1s->random * ($x_max - $x1s);
  my $y2s = $y1s + $x1s->random * ($y_max - $y1s);
  my $colors = $x1s->random * 2**24;
- 
+
  # Now that we've generated the data, call the command:
  $canvas->pdl_rectangles($x1s, $y1s, $x2s, $y2s
          , colors => $colors);
@@ -3078,8 +3043,8 @@ linePatterns, lineWidths, rops, rop2s.
 
 More specifically, this draws an arc from C<start_angle> to C<end_angle>
 along the ellipse centered at C<x>, C<y>, with specified x- and y-diameters.
-Like L</fill_chords>, this command connects the end points of the arc, but
-unlike L</fill_chords>, it does so by drawing two lines, both of which
+Like L</pdl_fill_chords>, this command connects the end points of the arc, but
+unlike L</pdl_fill_chords>, it does so by drawing two lines, both of which
 also connect to the ellipse's center. This results in shapes that look
 like pie pieces or pie remnants, depending of whether you're a glass-half-full
 or glass-half-empty sort of person.
@@ -3088,7 +3053,7 @@ or glass-half-empty sort of person.
 
  # For this example, you will need:
  use PDL::Char;
- 
+
  # Draw a bunch of random sectors on $canvas:
  my $N_chords = 20;
  my ($x_max, $y_max) = $canvas->size;
@@ -3098,16 +3063,16 @@ or glass-half-empty sort of person.
  my $dys = $xs->random * $y_max / 4;
  my $th_starts = $xs->random * 360;
  my $th_stops = $xs->random * 360;
- 
+
  # make a small list of patterns:
  my $patterns_list = PDL::Char->new(
           [lp::Solid, lp::Dash, lp::DashDot]);
- 
+
  # Randomly select 20 of those patterns:
  my $rand_selections = ($xs->random * 3)->byte;
  use PDL::NiceSlice;
  my $patterns = $patterns_list($rand_selections)->transpose;
- 
+
  # Now that we've generated the data, call the command:
  $canvas->pdl_sectors($xs, $ys, $dxs
                 , $dys, $th_starts, $th_stops
@@ -3240,6 +3205,14 @@ number of sides. Precisely what kind of polygon it draws is based on the
 value of C<skip>. For example, a five-sided polygon with a C<skip> of one
 would give you a pentagon:
 
+=for podview <img src="PDL/Drawing/Prima/pod/skip1.png" cut=1 title="skip = 1">
+
+=for html <p>
+<figure>
+<img src="https://raw.githubusercontent.com/dk/PDL-Drawing-Prima/master/lib/PDL/Drawing/Prima/pod/skip1.png">
+<figcaption>skip = 1</figcaption>
+</figure>
+<!--
 
                            second point
                                _
@@ -3256,10 +3229,23 @@ would give you a pentagon:
 
                            skip = 1
 
+=for html -->
+
+=for podview </cut>
+
 In contrast, a five-sided polygon with a skip of 2 will give you a star:
 
+=for podview <img src="PDL/Drawing/Prima/pod/skip2.png" cut=1 title="skip = 2">
+
+=for html <p>
+<figure>
+<img src="https://raw.githubusercontent.com/dk/PDL-Drawing-Prima/master/lib/PDL/Drawing/Prima/pod/skip2.png">
+<figcaption>skip = 2</figcaption>
+</figure>
+<!--
+
                            fourth point
-                           
+
               second          /|                
               point   \`~.._/  |            
                        `\ / `--|.__          
@@ -3267,16 +3253,29 @@ In contrast, a five-sided polygon with a skip of 2 will give you a star:
                        ,/ \_,--|'                
               fifth   /_~'' \  |                 
               point           \|
-                            
+
                            third point
- 
+
                            skip = 2
+
+=for html -->
+
+=for podview </cut>
 
 A skip of three would give visually identical results but the actual order
 in which the vertices are drawn is different:
 
+=for podview <img src="PDL/Drawing/Prima/pod/skip3.png" cut=1 title="skip = 3">
+
+=for html <p>
+<figure>
+<img src="https://raw.githubusercontent.com/dk/PDL-Drawing-Prima/master/lib/PDL/Drawing/Prima/pod/skip3.png">
+<figcaption>skip = 3</figcaption>
+</figure>
+<!--
+
                            third point
-                           
+
               fifth           /|                
               point   \`~.._/  |            
                        `\ / `--|.__          
@@ -3284,16 +3283,30 @@ in which the vertices are drawn is different:
                        ,/ \_,--|'                
               second  /_~'' \  |                 
               point           \|
-                            
+
                            fourth point
- 
+
                            skip = 3
+
+=for html -->
+
+=for podview </cut>
 
 A skip of zero is a special case, and means I<draw lines to each point from
 the center.> In other words, create an asterisk:
 
+=for podview <img src="PDL/Drawing/Prima/pod/skip0.png" cut=1 title="skip = 0">
+
+=for html <p>
+<figure>
+<img src="https://raw.githubusercontent.com/dk/PDL-Drawing-Prima/master/lib/PDL/Drawing/Prima/pod/skip0.png">
+<figcaption>skip = 0</figcaption>
+</figure>
+<!--
+
+
                            second point
-                               
+
                third            /
                point   `.      / 
                          `.   /   
@@ -3304,8 +3317,12 @@ the center.> In other words, create an asterisk:
               fourth            \
               point
                            fifth point
- 
+
                            skip = 0
+
+=for html -->
+
+=for podview </cut>
 
 In summary, a C<skip> of zero gives you an N-asterisk. A C<skip> of one gives
 you a regular polygon. A C<skip> of two gives you a star. And so forth.
@@ -3334,7 +3351,7 @@ line to determine the line width.
 =for example
 
  use PDL::NiceSlice;
- 
+
  # Generate a table of shapes:
  my @dims = (40, 1, 30);
  my $N_points = xvals(@dims)->clump(2) + 1;
@@ -3345,7 +3362,7 @@ line to determine the line width.
  my $x = $N_points->xvals * 25 + 25;
  my $y = $N_points->yvals * 25 + 25;
  my $lineWidths = $ARGV[0] || 1;
- 
+
  # Draw them:
  $canvas->pdl_symbols($x, $y, $N_points, 0, $filled, 10, $skip
 
@@ -3368,7 +3385,7 @@ $code = 	q{
 		int i, j, N_sides, N_steps, reduced_skip;
 		double angle;
 		double TWOPI = 8.0 * atan2(1,1);
-		
+
 	}
 	# add the auto-generated declaration and initialization code:
 	. initialize_for(@properties)
@@ -3384,7 +3401,7 @@ $code = 	q{
 			/* Figure out the reduced_skip */
 			reduced_skip = 0;
 			if ($N_points() > 2) reduced_skip = $skip() % $N_points();
-			
+
 			/* Skip bad values */
 			if(is_nan($x()) || is_nan($y()) || is_inf($x()) || is_inf($y())
 				BADCHECKS) {
@@ -3425,32 +3442,31 @@ $code = 	q{
 				/* Figure out the number of sides we'll be plotting at any
 				 * given moment */
 				N_sides = $N_points() / N_steps + 1;
-				
+
 				/* Allocate the memory needed for the Symbol */
-				if ($filled() == 0) ENSURE_POINT_STORAGE(polyline, N_sides);
-				else ENSURE_POINT_STORAGE(fillpoly, N_sides);
-				
+				ENSURE_POINT_STORAGE(N_sides);
+
 				for (j = 0; j < N_steps; j++) {
 					angle = TWOPI * ($orientation() / 360.0 + (double)j / $N_points());
 					/* Calculate the points for the Symbol */
 					for (i = 0; i < N_sides; ++i) {
-						ADD_POINT(polyline, i
+						ADD_POINT(i
 															/* crooked line hack */
 							, $x() + $size() * cos(angle) + 0.02
 							, $y() + $size() * sin(angle) + 0.02);
 						angle += TWOPI/$N_points() * reduced_skip;
 					}
-					
+
 					if ($filled() == 0) {
 						/* Draw a non-filled polygon */
-						DRAW_POINTS(polyline, apc_gp_draw_poly, N_sides);
+						DRAW_POINTS(polyline, N_sides);
 					}
 					else {
 						/* Draw a filled-in polygon */
-						DRAW_POINTS(fillpoly, apc_gp_fill_poly, N_sides);
+						DRAW_POINTS(fillpoly, N_sides);
 					}
 				}
-				
+
 				/* Free the memory when done */
 				FREE_POINT_STORAGE;
 			}
@@ -3516,7 +3532,7 @@ L<Prima::Drawable/stretch_image>, and L<Prima::Drawable/text_out>
 
 =item Bad Value Support
 
-Bad values are handled decently in L</polylines> and L</fillpolys>, but not for
+Bad values are handled decently in L</pdl_polylines> and L</pdl_fillpolys>, but not for
 the other functions. Bad x/y values should be skipped for almost all the drawing
 primitives, but what about bad colors for valid coordinates? I could not draw
 the primitive, defer to the widget's default color, or use the value associated
@@ -3594,7 +3610,7 @@ LINE: while (<$in>) {
 		$is_discarding = 1;
 		next LINE;
 	}
-	
+
 	# Remove the spurious =head1 FUNCTIONS documentation
 	if ($found_functions and /=head1 FUNCTIONS/) {
 		# Eat everything up to the =cut
@@ -3602,9 +3618,9 @@ LINE: while (<$in>) {
 		next LINE;
 	}
 	$found_functions++ if /=head1 FUNCTIONS/;
-	
+
 	s/(?<!_)prima_/pdl_/;
-	
+
 	print $out $_;
 }
 
