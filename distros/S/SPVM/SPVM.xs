@@ -31,8 +31,8 @@ SV* SPVM_XS_UTIL_new_sv_object(pTHX_ void* object, const char* class) {
   HV* hv_data = (HV*)sv_2mortal((SV*)newHV());
   (void)hv_store(hv_data, "object", strlen("object"), SvREFCNT_inc(sv_object), 0);
   SV* sv_data = sv_2mortal(newRV_inc((SV*)hv_data));
-
-  HV* hv_class = gv_stashpv(class, 0);
+  
+  HV* hv_class = gv_stashpv(class, GV_ADD);
   sv_bless(sv_data, hv_class);
   
   return sv_data;
@@ -52,7 +52,7 @@ SV* SPVM_XS_UTIL_new_sv_blessed_object(pTHX_ SV* sv_env, SV* sv_stack, void* obj
   (void)hv_store(hv_data, "env", strlen("env"), SvREFCNT_inc(sv_env), 0);
   (void)hv_store(hv_data, "stack", strlen("stack"), SvREFCNT_inc(sv_stack), 0);
 
-  HV* hv_class = gv_stashpv(class, 0);
+  HV* hv_class = gv_stashpv(class, GV_ADD);
   sv_bless(sv_data, hv_class);
   
   return sv_data;
@@ -200,40 +200,90 @@ xs_call_method(...)
   SV* sv_native_stack = sv_native_stack_ptr ? *sv_native_stack_ptr : &PL_sv_undef;
   SPVM_VALUE* stack = INT2PTR(SPVM_VALUE*, SvIV(SvRV(sv_native_stack)));
   
-  SV* sv_class_name = ST(2);
+  // Invocant
+  SV* sv_invocant = ST(2);
+  
+  // Method name
   SV* sv_method_name = ST(3);
+  const char* method_name = SvPV_nolen(sv_method_name);
+  
+  // Class Name
+  int32_t method_id;
+  const char* class_name;
+  int32_t class_method_call;
+  if (sv_isobject(sv_invocant)) {
+    class_method_call = 0;
+    if (!sv_derived_from(sv_invocant, "SPVM::BlessedObject::Class")) {
+      croak("The invocant must be a SPVM::BlessedObject::Class object");
+    }
+    
+    HV* hv_invocant = (HV*)SvRV(sv_invocant);
+    
+    // Env
+    SV** sv_env_ptr = hv_fetch(hv_invocant, "env", strlen("env"), 0);
+    SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
+    HV* hv_env = (HV*)SvRV(sv_env);
+    SV** sv_native_env_ptr = hv_fetch(hv_env, "object", strlen("object"), 0);
+    SV* sv_native_env = sv_native_env_ptr ? *sv_native_env_ptr : &PL_sv_undef;
+    SPVM_ENV* object_env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_native_env)));
+    
+    if (!(object_env == env)) {
+      croak("The env of the argument is differnt from the env of the invocant");
+    }
+    
+    // Stack
+    SV** sv_stack_ptr = hv_fetch(hv_invocant, "stack", strlen("stack"), 0);
+    SV* sv_stack = sv_stack_ptr ? *sv_stack_ptr : &PL_sv_undef;
+    HV* hv_stack = (HV*)SvRV(sv_stack);
+    SV** sv_native_stack_ptr = hv_fetch(hv_stack, "object", strlen("object"), 0);
+    SV* sv_native_stack = sv_native_stack_ptr ? *sv_native_stack_ptr : &PL_sv_undef;
+    SPVM_VALUE* object_stack = INT2PTR(SPVM_VALUE*, SvIV(SvRV(sv_native_stack)));
+    
+    if (!(object_stack == stack)) {
+      croak("The stack of the argument is differnt from the stack of the invocant");
+    }
+    
+    void* object = SPVM_XS_UTIL_get_object(aTHX_ sv_invocant);
+    int32_t object_basic_type_id = env->get_object_basic_type_id(env, stack, object);
+    int32_t object_basic_type_name_id = env->api->runtime->get_basic_type_name_id(env->runtime, object_basic_type_id);
+    class_name = env->api->runtime->get_name(env->runtime, object_basic_type_name_id);
+    method_id = env->get_instance_method_id(env, stack, object, method_name);
+    
+    ST(2) = sv_method_name;
+    ST(3) = sv_invocant;
+  }
+  else {
+    class_method_call = 1;
+    class_name = SvPV_nolen(sv_invocant);
+    method_id = env->get_class_method_id(env, stack, class_name, method_name);
+  }
   
   // Runtime
   void* runtime = env->runtime;
   
-  // Class Name
-  const char* class_name = SvPV_nolen(sv_class_name);
-  
-  // Method name
-  const char* method_name = SvPV_nolen(sv_method_name);
-  
   // Method not found
-  int32_t method_id = env->api->runtime->get_method_id_by_name(env->runtime, class_name, method_name);
   if (method_id < 0) {
     croak("The \"%s\" method in the \"%s\" class is not found at %s line %d\n", method_name, class_name, FILE_NAME, __LINE__);
   }
   
   // Base index of SPVM arguments
-  int32_t spvm_args_base = 4;
+  int32_t spvm_args_base;
+  if (class_method_call) {
+    spvm_args_base = 4;
+  }
+  else {
+    spvm_args_base = 3;
+  }
 
   int32_t method_is_class_method = env->api->runtime->get_method_is_class_method(env->runtime, method_id);
   int32_t method_args_length = env->api->runtime->get_method_args_length(env->runtime, method_id);
   int32_t method_required_args_length = env->api->runtime->get_method_required_args_length(env->runtime, method_id);
   int32_t method_args_base_id = env->api->runtime->get_method_args_base_id(env->runtime, method_id);
   int32_t method_return_type_id = env->api->runtime->get_method_return_type_id(env->runtime, method_id);
-
-  // If class method, first argument is ignored
-  if (method_is_class_method) {
-    spvm_args_base++;
-  }
   
   // Check argument count
   int32_t call_method_args_length = items - spvm_args_base;
+  
   if (call_method_args_length < method_required_args_length) {
     croak("Too few arguments. The length of the arguments of the \"%s\" method in the \"%s\" class must be less than %d at %s line %d\n", method_name, class_name, method_required_args_length, FILE_NAME, __LINE__);
   }
@@ -1144,9 +1194,7 @@ xs_call_method(...)
               }
               // Object
               else {
-                SV* sv_perl_class_name = sv_2mortal(newSVpv("SPVM::", 0));
-                sv_catpv(sv_perl_class_name, env->api->runtime->get_name(env->runtime, env->api->runtime->get_basic_type_name_id(env->runtime, return_value_basic_type_id)));
-                sv_return_value = SPVM_XS_UTIL_new_sv_blessed_object(aTHX_ sv_env, sv_stack, return_value, SvPV_nolen(sv_perl_class_name));
+                sv_return_value = SPVM_XS_UTIL_new_sv_blessed_object(aTHX_ sv_env, sv_stack, return_value, "SPVM::BlessedObject::Class");
               }
             }
           }
@@ -1180,9 +1228,7 @@ xs_call_method(...)
           }
           // Object
           else {
-            SV* sv_perl_class_name = sv_2mortal(newSVpv("SPVM::", 0));
-            sv_catpv(sv_perl_class_name, env->api->runtime->get_name(env->runtime, env->api->runtime->get_basic_type_name_id(env->runtime, return_value_basic_type_id)));
-            sv_return_value = SPVM_XS_UTIL_new_sv_blessed_object(aTHX_ sv_env, sv_stack, return_value, SvPV_nolen(sv_perl_class_name));
+            sv_return_value = SPVM_XS_UTIL_new_sv_blessed_object(aTHX_ sv_env, sv_stack, return_value, "SPVM::BlessedObject::Class");
           }
         }
       }
@@ -1196,10 +1242,7 @@ xs_call_method(...)
       sv_return_value = NULL;
       if (return_value != NULL) {
         env->inc_ref_count(env, stack, return_value);
-        int32_t return_value_basic_type_id = env->get_object_basic_type_id(env, stack, return_value);
-        SV* sv_perl_class_name = sv_2mortal(newSVpv("SPVM::", 0));
-        sv_catpv(sv_perl_class_name, env->api->runtime->get_name(env->runtime, env->api->runtime->get_basic_type_name_id(env->runtime, return_value_basic_type_id)));
-        sv_return_value = SPVM_XS_UTIL_new_sv_blessed_object(aTHX_ sv_env, sv_stack, return_value, SvPV_nolen(sv_perl_class_name));
+        sv_return_value = SPVM_XS_UTIL_new_sv_blessed_object(aTHX_ sv_env, sv_stack, return_value, "SPVM::BlessedObject::Class");
       }
       // undef
       else {
@@ -1474,9 +1517,7 @@ xs_array_to_elems(...)
               sv_value = SPVM_XS_UTIL_new_sv_blessed_object(aTHX_ sv_env, sv_stack, value, "SPVM::BlessedObject::Array");
             }
             else {
-              SV* sv_perl_class_name = sv_2mortal(newSVpv("SPVM::", 0));
-              sv_catpv(sv_perl_class_name, env->api->runtime->get_name(env->runtime, env->api->runtime->get_basic_type_name_id(env->runtime, env->get_object_basic_type_id(env, stack, array))));
-              sv_value = SPVM_XS_UTIL_new_sv_blessed_object(aTHX_ sv_env, sv_stack, value, SvPV_nolen(sv_perl_class_name));
+              sv_value = SPVM_XS_UTIL_new_sv_blessed_object(aTHX_ sv_env, sv_stack, value, "SPVM::BlessedObject::Class");
             }
             av_push(av_values, SvREFCNT_inc(sv_value));
           }
@@ -2022,12 +2063,10 @@ xs_array_get(...)
     }
     
     if (element_dimension == 0) {
-      SV* sv_perl_class_name = sv_2mortal(newSVpv("SPVM::", 0));
-      sv_catpv(sv_perl_class_name, env->api->runtime->get_name(env->runtime, env->api->runtime->get_basic_type_name_id(env->runtime, env->get_object_basic_type_id(env, stack, array))));
-      sv_value = SPVM_XS_UTIL_new_sv_blessed_object(aTHX_ sv_env, sv_stack, value, SvPV_nolen(sv_perl_class_name));
+      sv_value = SPVM_XS_UTIL_new_sv_blessed_object(aTHX_ sv_env, sv_stack, value, "SPVM::BlessedObject::Class");
     }
     else if (element_dimension > 0) {
-      sv_value = SPVM_XS_UTIL_new_sv_blessed_object(aTHX_ sv_env, sv_stack, value, "SPVM::Data::Array");
+      sv_value = SPVM_XS_UTIL_new_sv_blessed_object(aTHX_ sv_env, sv_stack, value, "SPVM::BlessedObject::Array");
     }
   }
   
@@ -3833,6 +3872,49 @@ DESTROY(...)
   XSRETURN(0);
 }
 
+MODULE = SPVM::BlessedObject::Class		PACKAGE = SPVM::BlessedObject::Class
+
+SV*
+get_class_name(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_object = ST(0);
+  HV* hv_object = (HV*)SvRV(sv_object);
+  
+  assert(SvOK(sv_object));
+  
+  // Get object
+  void* object = SPVM_XS_UTIL_get_object(aTHX_ sv_object);
+
+  // Stack
+  SV** sv_stack_ptr = hv_fetch(hv_object, "stack", strlen("stack"), 0);
+  SV* sv_stack = sv_stack_ptr ? *sv_stack_ptr : &PL_sv_undef;
+  HV* hv_stack = (HV*)SvRV(sv_stack);
+  SV** sv_native_stack_ptr = hv_fetch(hv_stack, "object", strlen("object"), 0);
+  SV* sv_native_stack = sv_native_stack_ptr ? *sv_native_stack_ptr : &PL_sv_undef;
+  SPVM_VALUE* stack = INT2PTR(SPVM_VALUE*, SvIV(SvRV(sv_native_stack)));
+  
+  // Env
+  SV** sv_env_ptr = hv_fetch(hv_object, "env", strlen("env"), 0);
+  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
+  HV* hv_env = (HV*)SvRV(sv_env);
+  SV** sv_native_env_ptr = hv_fetch(hv_env, "object", strlen("object"), 0);
+  SV* sv_native_env = sv_native_env_ptr ? *sv_native_env_ptr : &PL_sv_undef;
+  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_native_env)));
+  
+  int32_t object_basic_type_id = env->get_object_basic_type_id(env, stack, object);
+  int32_t object_basic_type_name_id = env->api->runtime->get_basic_type_name_id(env->runtime, object_basic_type_id);
+  const char* class_name = env->api->runtime->get_name(env->runtime, object_basic_type_name_id);
+  
+  SV* sv_class_name = sv_2mortal(newSVpv(class_name, 0));
+  
+  XPUSHs(sv_class_name);
+  XSRETURN(1);
+}
+
+
 MODULE = SPVM::Builder::Compiler		PACKAGE = SPVM::Builder::Compiler
 
 SV*
@@ -3946,26 +4028,50 @@ compile(...)
   // Compile SPVM
   int32_t compile_error_code = api_env->api->compiler->compile(compiler, class_name);
   
-  SV* sv_runtime = &PL_sv_undef;
+  SV* sv_success = &PL_sv_undef;
   if (compile_error_code == 0) {
-
-    // Build runtime information
-    void* runtime = api_env->api->runtime->new_object(api_env);
-
-    // Runtime allocator
-    void* runtime_allocator = api_env->api->runtime->get_allocator(runtime);
-    
-    // SPVM 32bit codes
-    int32_t* runtime_codes = api_env->api->compiler->create_runtime_codes(compiler, runtime_allocator);
-    
-    // Build runtime
-    api_env->api->runtime->build(runtime, runtime_codes);
-
-    // Prepare runtime
-    api_env->api->runtime->prepare(runtime);
-
-    sv_runtime = SPVM_XS_UTIL_new_sv_object(aTHX_ runtime, "SPVM::Builder::Runtime");
+    sv_success = sv_2mortal(newSViv(1));
   }
+
+  XPUSHs(sv_success);
+  
+  XSRETURN(1);
+}
+
+SV*
+build_runtime(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+  SV* sv_class_name = ST(1);
+  SV* sv_start_file = ST(2);
+  SV* sv_start_line = ST(3);
+  
+  HV* hv_self = (HV*)SvRV(sv_self);
+
+  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
+  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
+  void* compiler = INT2PTR(void*, SvIV(SvRV(sv_compiler)));
+  
+  SV** sv_api_env_ptr = hv_fetch(hv_self, "api_env", strlen("api_env"), 0);
+  SV* sv_api_env = sv_api_env_ptr ? *sv_api_env_ptr : &PL_sv_undef;
+  SPVM_ENV* api_env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_api_env)));
+
+  // Build runtime information
+  void* runtime = api_env->api->runtime->new_object(api_env);
+
+  // Runtime allocator
+  void* runtime_allocator = api_env->api->runtime->get_allocator(runtime);
+  
+  // SPVM 32bit codes
+  int32_t* runtime_codes = api_env->api->compiler->create_runtime_codes(compiler, runtime_allocator);
+  
+  // Build runtime
+  api_env->api->runtime->build(runtime, runtime_codes);
+
+  SV* sv_runtime = SPVM_XS_UTIL_new_sv_object(aTHX_ runtime, "SPVM::Builder::Runtime");
 
   XPUSHs(sv_runtime);
   
@@ -4008,6 +4114,41 @@ get_error_messages(...)
 }
 
 MODULE = SPVM::Builder::Runtime		PACKAGE = SPVM::Builder::Runtime
+
+SV*
+get_method_is_class_method(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_runtime = ST(1);
+  void* runtime = SPVM_XS_UTIL_get_object(aTHX_ sv_runtime);
+
+  SV* sv_class_name = ST(2);
+  SV* sv_method_name = ST(3);
+
+  SPVM_ENV* api_env = SPVM_NATIVE_new_env_raw();
+  
+  // Class name
+  const char* class_name = SvPV_nolen(sv_class_name);
+
+  // Method name
+  const char* method_name = SvPV_nolen(sv_method_name);
+  
+  // Method id
+  int32_t method_id = api_env->api->runtime->get_method_id_by_name(runtime, class_name, method_name);
+  
+  int32_t is_class_method = api_env->api->runtime->get_method_is_class_method(runtime, method_id);
+
+  // Free native_env
+  api_env->free_env_raw(api_env);
+  
+  SV* sv_is_class_method = sv_2mortal(newSViv(is_class_method));
+
+  XPUSHs(sv_is_class_method);
+  XSRETURN(1);
+}
+
 
 SV*
 get_method_names(...)

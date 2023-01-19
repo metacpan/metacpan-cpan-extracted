@@ -1,5 +1,8 @@
 package SPVM::BlessedObject;
 
+use strict;
+use warnings;
+
 sub env {
   my $self = shift;
   if (@_) {

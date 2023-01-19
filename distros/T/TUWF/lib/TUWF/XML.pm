@@ -10,7 +10,7 @@ use Exporter 'import';
 use Carp 'carp', 'croak';
 
 
-our $VERSION = '1.4';
+our $VERSION = '1.5';
 our(@EXPORT_OK, %EXPORT_TAGS, $OBJ);
 
 # List::Util provides a uniq() since 1.45, but for some reason my Perl comes
@@ -33,8 +33,8 @@ BEGIN {
     h3 h4 h5 h6 head header hr i iframe img input ins kbd label legend li Link
     main Map mark meta meter nav noscript object ol optgroup option output p
     param pre progress Q rp rt ruby samp script section Select small source
-    span strong style Sub sup table tbody td textarea tfoot th thead Time title
-    Tr ul var video
+    span strong style Sub summary sup table tbody td textarea tfoot th thead
+    Time title Tr ul var video
   |;
   my @Htmltags   = map ucfirst, @htmltags;
   my @Html5tags  = map ucfirst, @html5tags;
@@ -59,7 +59,7 @@ BEGIN {
 
   # functions to export
   @EXPORT_OK = (@all, qw(
-    xml mkclass xml_escape html_escape
+    xml mkclass xml_escape html_escape xml_string
     tag  html  lit  txt  end
     Tag  Html  Lit  Txt  End
     tag_ html_ lit_ txt_ end_
@@ -136,6 +136,15 @@ sub html_escape {
   return $_;
 }
 
+# Evaluate a function and return XML as a string
+sub xml_string {
+  my $f = pop;
+  my $buf = '';
+  local $OBJ = TUWF::XML->new(@_, write => sub { $buf .= shift });
+  $f->();
+  $buf
+}
+
 
 # output literal data (not HTML escaped)
 sub lit {
@@ -163,6 +172,8 @@ sub txt {
 #  'tagname', id => "main"             <tagname id="main">
 #  'tagname', '<bar>'                  <tagname>&lt;bar&gt;</tagname>
 #  'tagname', sub { .. }               <tagname>..</tagname>
+#  'tagname', class => undef           <tagname>
+#  'tagname', '+a' => 1, '+a' => 2     <tagname a="1 2">
 #  'tagname', id => 'main', '<bar>'    <tagname id="main">&lt;bar&gt;</tagname>
 #  'tagname', id => 'main', sub { .. } <tagname id="main">..</tagname>
 #  'tagname', id => 'main', undef      <tagname id="main" />
@@ -174,11 +185,19 @@ sub tag {
 
   my $indent = $s->{pretty} ? "\n".(' 'x($s->{nesting}*$s->{pretty})) : '';
   my $t = $indent.'<'.$name;
+  my %concat;
   while(@_ > 1) {
     my $attr = shift;
-    croak "Invalid XML attribute name" if !$attr || $attr =~ /^[^a-z]/i || $attr =~ / /;
-    $t .= qq{ $attr="}.xml_escape(shift).'"';
+    my $val = shift;
+    next if !defined $val;
+    croak "Invalid XML attribute name" if $attr =~ /[\s'"&<>=]/; # Not comprehensive, just enough to prevent XSS-by-fucking-up-XML-structure
+    if($attr =~ /^\+(.+)/) {
+      $concat{$1} .= (length $concat{$1} ? ' ' : '') . $val;
+    } else {
+      $t .= qq{ $attr="}.xml_escape($val).'"';
+    }
   }
+  $t .= qq{ $_="}.xml_escape($concat{$_}).'"' for sort keys %concat;
 
   if(!@_) {
     $s->lit($t.'>');

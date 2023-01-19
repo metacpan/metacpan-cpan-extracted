@@ -11,7 +11,6 @@ use File::Path 'mkpath';
 use File::Find 'find';
 use File::Basename 'dirname', 'basename';
 
-use SPVM::Builder;
 use SPVM::Builder::Util;
 use SPVM::Builder::Config;
 use SPVM::Builder::CompileInfo;
@@ -31,14 +30,14 @@ sub global_before_compile {
   }
 }
 
-sub builder {
+sub build_dir {
   my $self = shift;
   if (@_) {
-    $self->{builder} = $_[0];
+    $self->{build_dir} = $_[0];
     return $self;
   }
   else {
-    return $self->{builder};
+    return $self->{build_dir};
   }
 }
 
@@ -64,14 +63,14 @@ sub quiet {
   }
 }
 
-sub runtime {
+sub at_runtime {
   my $self = shift;
   if (@_) {
-    $self->{runtime} = $_[0];
+    $self->{at_runtime} = $_[0];
     return $self;
   }
   else {
-    return $self->{runtime};
+    return $self->{at_runtime};
   }
 }
 
@@ -113,7 +112,7 @@ sub new {
   return bless $self, $class;
 }
 
-sub build_runtime {
+sub build_at_runtime {
   my ($self, $class_name, $options) = @_;
   
   $options ||= {};
@@ -125,18 +124,18 @@ sub build_runtime {
   my $category = $options->{category};
   
   # Build directory
-  my $build_dir = $self->builder->build_dir;
+  my $build_dir = $self->build_dir;
   if (defined $build_dir) {
     mkpath $build_dir;
   }
   else {
-    confess "SPVM_BUILD_DIR environment variable must be set for build $category method in runtime";
+    confess "SPVM_BUILD_DIR environment variable must be set to build a $category method at runtime";
   }
   
   # Source directory
   my $build_src_dir;
   if ($category eq 'precompile') {
-    $build_src_dir = $self->builder->create_build_src_path;
+    $build_src_dir = SPVM::Builder::Util::create_build_src_path($self->build_dir);
     mkpath $build_src_dir;
     
     my $force = $self->detect_force;
@@ -157,11 +156,11 @@ sub build_runtime {
   }
   
   # Object directory
-  my $build_object_dir = $self->builder->create_build_object_path;
+  my $build_object_dir = SPVM::Builder::Util::create_build_object_path($self->build_dir);
   mkpath $build_object_dir;
   
   # Lib directory
-  my $build_lib_dir = $self->builder->create_build_lib_path;
+  my $build_lib_dir = SPVM::Builder::Util::create_build_lib_path($self->build_dir);
   mkpath $build_lib_dir;
   
   my $build_file = $self->build(
@@ -192,7 +191,7 @@ sub build_dist {
   
   my $build_src_dir;
   if ($category eq 'precompile') {
-    $build_src_dir = $self->builder->create_build_src_path;
+    $build_src_dir = SPVM::Builder::Util::create_build_src_path($self->build_dir);
     mkpath $build_src_dir;
     
     my $force = $self->detect_force;
@@ -211,7 +210,7 @@ sub build_dist {
     $build_src_dir = 'lib';
   }
 
-  my $build_object_dir = $self->builder->create_build_object_path;
+  my $build_object_dir = SPVM::Builder::Util::create_build_object_path($self->build_dir);
   mkpath $build_object_dir;
   
   my $build_lib_dir = 'blib/lib';
@@ -302,7 +301,7 @@ sub get_resource_object_dir_from_class_name {
 
   my $class_rel_dir = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name);
   
-  my $resource_object_dir = $self->builder->create_build_object_path("$class_rel_dir.resource");
+  my $resource_object_dir = SPVM::Builder::Util::create_build_object_path($self->build_dir, "$class_rel_dir.resource");
   
   return $resource_object_dir;
 }
@@ -366,7 +365,7 @@ sub detect_quiet {
   elsif (defined $config && defined $config->quiet) {
     $quiet = $config->quiet;
   }
-  elsif ($self->runtime) {
+  elsif ($self->at_runtime) {
     $quiet = 1;
   }
   else {
@@ -404,7 +403,7 @@ sub compile {
   my $category = $options->{category};
 
   # Build directory
-  my $build_dir = $self->builder->build_dir;
+  my $build_dir = $self->build_dir;
   if (defined $build_dir) {
     mkpath $build_dir;
   }
@@ -670,7 +669,7 @@ sub link {
   my $category = $options->{category};
   
   # Build directory
-  my $build_dir = $self->builder->build_dir;
+  my $build_dir = $self->build_dir;
   if (defined $build_dir) {
     mkpath $build_dir;
   }
@@ -910,8 +909,7 @@ sub create_link_info {
     
     # Build native classes
     my $builder_cc_resource = SPVM::Builder::CC->new(
-      build_dir => $self->builder->build_dir,
-      builder => $self->builder,
+      build_dir => $self->build_dir,
     );
     
     my $resource_src_dir = $self->resource_src_dir_from_class_name($resource);

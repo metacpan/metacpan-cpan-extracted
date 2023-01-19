@@ -1,3 +1,31 @@
+1.5 - 2023-01-18
+	- Add tuwf->req() method for storing request-local data
+	- Add tuwf->captures() as alternative to handler arguments
+	- Add support for Max-Age and SameSite properties in resCookie()
+	- Add support for JSON::PP and Cpanel::JSON::PP
+	- Add support for calling dbPage() in scalar context
+	- Add "onerror" and "undefbool" built-in validations
+	- Add support for subroutine arguments to 'default' validation option
+	- Add TUWF::Validate::Interop::elm_decoder() (undocumented)
+	- Add support for undef and concat attributes in TUWF::XML
+	- Add TUWF::XML::xml_string() function
+	- Add summary tag to TUWF::XML
+	- Add "db_connect" hook
+	- Add "fastcgi_max_requests" setting
+	- Add support for graceful process shutdown in FastCGI mode
+	- Add support for output compression for resJSON, resFile and resBinary
+	- Fix handling recursion from the log_format subroutine
+	- Fix encoding of HTTP response headers
+	- Fix calling error_404_handler before the "after" hooks.
+	- Fix handling of SIGCHLD when using the builtin HTTP server
+	- Fix logging during startup
+	- Fix input modification on TUWF::Validate with unknown=>"reject" hashes
+	- Fix handling of HTTP DELETE requests
+	- Fix handling for HTTP 204 responses
+	- Remove error on resFile() path traversal, just return a 404 instead
+	- Disallow IP address hosts as part of email validation
+	- Use Perl built-in utf8 functions instead of Encode module
+
 1.4 - 2019-07-06
 	- Version bump because CPAN doesn't like patch versions
 

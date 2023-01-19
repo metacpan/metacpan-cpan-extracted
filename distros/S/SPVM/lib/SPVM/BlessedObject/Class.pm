@@ -1,6 +1,23 @@
 package SPVM::BlessedObject::Class;
 
+use strict;
+use warnings;
+
 use base 'SPVM::BlessedObject';
+
+use SPVM::ExchangeAPI;
+
+our $AUTOLOAD;
+sub AUTOLOAD {
+  my $self = shift;
+  
+  my $method_name = $AUTOLOAD;
+  $method_name =~ s/^SPVM::BlessedObject::Class:://;
+  
+  my $ret = SPVM::ExchangeAPI::call_method($self->env, $self->stack, $self, $method_name, @_);
+  
+  return $ret;
+}
 
 1;
 

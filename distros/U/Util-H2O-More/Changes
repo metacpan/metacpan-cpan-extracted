@@ -75,3 +75,10 @@
 0.2.3 Tue Jan 02 15:00:04 2023
     - maintenance release, updating minimum requirement
       for Config::Tiny (2.28)
+
+0.2.4 Tue Jan 17 15:00:51 2023
+    - changed ini2o to ini2h2o, o2ini to h2o2ini to make
+      the naming more consistent with already existing
+      helper apps, like opt2h2o (sorry if this causes
+      anyone problems; I don't assume many people use
+      this too heavily atm).

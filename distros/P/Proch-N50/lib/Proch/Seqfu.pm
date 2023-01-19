@@ -8,7 +8,7 @@ use Data::Dumper;
 use Term::ANSIColor qw(:constants);
 require Exporter;
 
-$Proch::Seqfu::VERSION = '1.5.5';
+$Proch::Seqfu::VERSION = '1.5.6';
 $Proch::Seqfu::fu_linesize = 0;
 $Proch::Seqfu::fu_verbose  = 0;
 
@@ -118,7 +118,7 @@ Proch::Seqfu - Helper module to support Seqfu tools
 
 =head1 VERSION
 
-version 1.5.5
+version 1.5.6
 
 =head1 Proch::Seqfu
 

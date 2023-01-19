@@ -4,7 +4,7 @@ package Proch::N50;
 use 5.012;
 use warnings;
 my  $opt_digits = 2;
-$Proch::N50::VERSION = '1.5.5';
+$Proch::N50::VERSION = '1.5.6';
 use File::Spec;
 use JSON::PP;
 use FASTX::Reader;
@@ -189,7 +189,7 @@ Proch::N50 - a small module to calculate N50 (total size, and total number of se
 
 =head1 VERSION
 
-version 1.5.5
+version 1.5.6
 
 =head1 SYNOPSIS
 

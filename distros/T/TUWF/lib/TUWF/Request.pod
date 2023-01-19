@@ -82,8 +82,9 @@ is returned.
 Returns the decoded JSON object if the request body was of type
 C<application/json>; Returns C<undef> otherwise.
 
-This requires the L<JSON::XS> module. If this module is not available, any
-request with a JSON body will automatically get a 500 response.
+This requires either the L<JSON::XS>, L<Cpanel::JSON::XS> or L<JSON::PP>
+module. If none of these modules is not available, any request with a JSON body
+will automatically get a 500 response.
 
 =head2 reqUploadMIMEs(name)
 

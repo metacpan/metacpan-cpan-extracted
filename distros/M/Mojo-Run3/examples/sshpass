@@ -23,7 +23,8 @@ sub main {
 
   my $stdin = -t STDIN ? 'pty' : 'pipe';
   my $run3  = Mojo::Run3->new(driver => {pty => 'pty', stdin => $stdin, stdout => 'pipe', stderr => 'pipe'});
-  $run3->once(spawn => \&setup_stdin);
+  $run3->once(spawn  => \&setup_stdin);
+  $run3->once(stdout => \&logged_in);
   $run3->on(error  => sub { abort($_[1]) });
   $run3->on(pty    => \&maybe_write_ssh_password);
   $run3->on(stderr => sub { STDERR->binmode; STDERR->syswrite($_[1]) });
@@ -32,15 +33,14 @@ sub main {
   exit $run3->exit_status;
 }
 
+sub logged_in {
+  my ($run3) = @_;
+  $run3->unsubscribe(pty => \&maybe_write_ssh_password);
+  Term::ReadKey::ReadMode(4) if -t STDIN;
+}
+
 sub maybe_write_ssh_password {
   my ($run3, $chunk) = @_;
-
-  $run3->once(
-    stdout => sub {
-      $run3->unsubscribe(pty => \&maybe_write_ssh_password);
-      Term::ReadKey::ReadMode(4) if -t STDIN;
-    }
-  );
 
   if ($chunk =~ /password\s*:/i) {
     state $seen = 0;

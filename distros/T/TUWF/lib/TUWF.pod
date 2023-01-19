@@ -37,7 +37,8 @@ Some optional features, however, do require extra modules:
 
 =item * L<HTTP::Server::Simple>: To run the standalone HTTP server.
 
-=item * L<JSON::XS>: If you need to handle requests with a JSON body, or wish to output JSON yourself.
+=item * L<JSON::XS>, L<Cpanel::JSON::XS> or L<JSON::PP>: If you need to handle
+requests with a JSON body or wish to output JSON yourself.
 
 =item * L<PerlIO::gzip>: For output compression.
 
@@ -296,6 +297,11 @@ an exception).
 
 This replaces the L<post_request_handler|/post_request_handler> setting.
 
+=item db_connect
+
+Called after (re)connecting to the database. Can be used to load the correct
+session variables into the database connection.
+
 =back
 
 =head2 TUWF::load(@modules)
@@ -489,6 +495,13 @@ not be in a usable state. This handler may also be called before any of the
 hooks have been run. It's best to keep this handler as simple as possible, and
 only have it generate a friendly response.
 
+=item fastcgi_max_requests
+
+Maximum number of requests to handle when running in FastCGI mode. The process
+will gracefully exit when this number of requests has been processed. This
+option is useful when running under L<spawn-fcgi(1)> in combination with
+L<multiwatch(1)> or another supervisor that automatically respawns processes.
+
 =item http_server_port
 
 Port to listen on when running the standalone HTTP server. This defaults to the
@@ -668,6 +681,15 @@ named captures can be used, for example:
 Note that C<captures(0)> is not available; This would be equivalent to
 C<< tuwf->reqPath >>, save for the leading slash.
 
+=head2 captures(@keys)
+
+Multiple-argument version of C<capture()>, returns the a list of values
+associated with the given keys. Example:
+
+  TUWF::get qr{/user/([0-9]+)/file/(.+)} => sub {
+    my($user_id, $file) = tuwf->captures(1,2);
+  };
+
 =head2 debug()
 
 Returns the value of the I<debug> setting.
@@ -727,6 +749,18 @@ aborting that particular hook.
 
 This method calls C<die()>, so be sure to re-throw the error when run inside an
 eval block.
+
+=head2 req()
+
+Returns a hashref that is initialized to empty at the start of each request.
+This hashref can be used to store custom data specific to this request that you
+do not want to carry on to subsequent requests. Can be used to cache session or
+user data, for example:
+
+  sub is_user_logged_in() {
+    tuwf->req->{is_user_logged_in} //= expensive_session_validation_function();
+    return tuwf->req->{is_user_logged_in};
+  }
 
 =head1 SERVER CONFIGURATION
 

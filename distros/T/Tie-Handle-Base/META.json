@@ -1,0 +1,80 @@
+{
+   "abstract" : "A base class for tied filehandles",
+   "author" : [
+      "Hauke D <haukex@zero-g.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Tie-Handle-Base",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "recommends" : {},
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "Fcntl" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "Hash::Util" : "0",
+            "IO::Handle" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.008001",
+            "warnings::register" : "0"
+         },
+         "suggests" : {}
+      },
+      "test" : {
+         "requires" : {
+            "Encode" : "0",
+            "File::stat" : "0",
+            "FindBin" : "0",
+            "Test::More" : "1.302096"
+         }
+      }
+   },
+   "provides" : {
+      "Tie::Handle::Base" : {
+         "file" : "lib/Tie/Handle/Base.pm",
+         "version" : "0.16"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://bitbucket.org/haukex/tie-handle-base/issues"
+      },
+      "homepage" : "https://bitbucket.org/haukex/tie-handle-base",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://bitbucket.org/haukex/tie-handle-base.git",
+         "web" : "https://bitbucket.org/haukex/tie-handle-base"
+      }
+   },
+   "version" : "0.16",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

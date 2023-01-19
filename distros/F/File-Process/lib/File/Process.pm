@@ -3,41 +3,16 @@ package File::Process;
 use strict;
 use warnings;
 
-use parent qw( Exporter );
-
-our @EXPORT = qw( process_file ); ## no critic (ProhibitAutomaticExportation)
-
-our @EXPORT_OK = qw(
-  post
-  pre
-  process
-  filter
-  next_line
-  $TRUE
-  $FALSE
-  $SUCCESS
-  $FAILURE
-);
-
-our %EXPORT_TAGS = (
-  'booleans' => [qw($TRUE $FALSE $SUCCESS $FAILURE)],
-  'all'      => \@EXPORT_OK,
-);
-
 use Carp;
 use English qw(-no_match_vars);
+use File::Process::Utils qw(:booleans :chars);
 use IO::Scalar;
-use ReadonlyX;
-use Scalar::Util qw( reftype openhandle );
+use Scalar::Util qw( openhandle );
+use Data::Dumper;
 
-Readonly my $SUCCESS => 1;
-Readonly my $FAILURE => 0;
-Readonly my $TRUE    => 1;
-Readonly my $FALSE   => 0;
-Readonly my $EMPTY   => q{};
-Readonly my $NL      => "\n";
+use parent qw( Exporter );
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 our %DEFAULT_PROCESSORS = (
   pre       => \&_pre,
@@ -47,7 +22,91 @@ our %DEFAULT_PROCESSORS = (
   post      => \&_post,
 );
 
+use parent qw(Exporter);
+
+our @EXPORT = qw( process_file ); ## no critic (ProhibitAutomaticExportation)
+
+our @EXPORT_OK = qw(
+  post
+  pre
+  process
+  process_csv
+  filter
+  next_line
+);
+
+our %EXPORT_TAGS = (
+  'booleans' => [qw($TRUE $FALSE $SUCCESS $FAILURE)],
+  'all'      => \@EXPORT_OK,
+);
+
 caller or __PACKAGE__->main();
+
+########################################################################
+sub process_csv {
+########################################################################
+  require File::Process::Utils;
+
+  return File::Process::Utils::process_csv(@_);
+}
+
+########################################################################
+sub process_file {
+########################################################################
+  my ( $file, %args ) = @_;
+
+  my $chomp = $args{'chomp'};
+
+  $args{'file'} = $file || $EMPTY;
+
+  my %processors
+    = map { ( $_, $args{$_} ) } qw( pre filter next_line process post );
+
+  foreach (qw( pre filter next_line process post)) {
+    if ( !$processors{$_} ) {
+      $processors{$_} = $DEFAULT_PROCESSORS{$_};
+    }
+  }
+
+  $args{'default_processors'} = \%DEFAULT_PROCESSORS;
+
+  my ( $fh, $all_lines ) = $processors{'pre'}->( $file, \%args );
+
+  if ( !$fh || !ref $all_lines ) {
+    croak
+      "invalid pre processor return values: wanted file handle, array ref\n";
+  }
+
+  LINE: while (1) {
+    my $current_line = $processors{'next_line'}->( $fh, $all_lines, \%args );
+    last LINE if !defined $current_line;
+
+    $args{'raw_count'}++;
+
+    foreach my $p ( @processors{qw( filter process )} ) {
+
+      $current_line
+        = eval { return $p->( $fh, $all_lines, \%args, $current_line ); };
+
+      last LINE if $EVAL_ERROR;
+
+      next LINE if !defined $current_line;
+    }
+
+    if ( $args{merge_lines} ) {
+      $all_lines->print($current_line);
+    }
+    else {
+      push @{$all_lines}, $current_line;
+    }
+  }
+
+  if ($EVAL_ERROR) {
+    croak "$EVAL_ERROR";
+  }
+
+  return $processors{'post'}->( $fh, $all_lines, \%args );
+}
 
 ########################################################################
 sub _pre {
@@ -164,59 +223,7 @@ sub _post {
       or croak 'could not close' . $args->{file} . $NL;
   }
 
-  return $retval, %{$args};
-}
-
-sub process_file {
-  my ( $file, %args ) = @_;
-
-  my $chomp = $args{'chomp'};
-
-  $args{'file'} = $file || $EMPTY;
-
-  my %processors
-    = map { ( $_, $args{$_} ) } qw( pre filter next_line process post );
-
-  foreach (qw( pre filter next_line process post)) {
-    if ( !$processors{$_} ) {
-      $processors{$_} = $DEFAULT_PROCESSORS{$_};
-    }
-  }
-
-  $args{'default_processors'} = \%DEFAULT_PROCESSORS;
-
-  my ( $fh, $all_lines ) = $processors{'pre'}->( $file, \%args );
-
-  if ( !$fh || !ref $all_lines || !reftype($all_lines) eq 'ARRAY' ) {
-    croak "invalid pre processor return: wanted file handle, array ref\n";
-  }
-
-  LINE: while (1) {
-    my $current_line = $processors{'next_line'}->( $fh, $all_lines, \%args );
-    last LINE if !defined $current_line;
-
-    $args{'raw_count'}++;
-
-    foreach my $p ( @processors{qw( filter process )} ) {
-      $current_line
-        = eval { return $p->( $fh, $all_lines, \%args, $current_line ); };
-      last LINE if $EVAL_ERROR;
-      next LINE if !defined $current_line;
-    }
-
-    if ( $args{merge_lines} ) {
-      $all_lines->print($current_line);
-    }
-    else {
-      push @{$all_lines}, $current_line;
-    }
-  }
-
-  if ($EVAL_ERROR) {
-    croak "$EVAL_ERROR";
-  }
-
-  return $processors{'post'}->( $fh, $all_lines, \%args );
+  return ( $retval, %{$args} );
 }
 
 ########################################################################
@@ -408,10 +415,10 @@ script.
 
 This class provides a simple harness for processing files, taking
 the drudgery out of writing a simple text processor. It is most effect
-when used on relatively small files.
+when used on relatively small files (see L</CAVEATS>).
 
 In it's most basic form the class will return all of the lines in a
-text file. The class exports 1 method (C<process_file>) which invokes
+text file. The class exports one method (C<process_file>) which invokes
 multiple subroutines that you can override or use in conjunction with
 your custom processors.
 
@@ -419,8 +426,9 @@ I<See L<File::Process::Utils> for additional recipes.>
 
 =head1 EXPORTED METHODS
 
-This module exports 1 method by default (C<process_file>). You can
-export all of the default processor methods using the tag ':all'.
+This module exports one method by default (C<process_file>), since
+presumably you wanted to I<process> a file? You can export all of the
+default processor methods using the tag ':all'.
 
  use File::Process qw( pre post );
 
@@ -428,12 +436,17 @@ export all of the default processor methods using the tag ':all'.
 
 =head1 METHODS AND SUBROUTINES
 
+=head2 process_csv(file, options)
+
+See L<File::Process::Utils>
+
 =head2 process_file(file, options)
 
 You start the processing of the file by calling C<process_file> with
 the name of the file or a handle to an open file and a B<list> of
-options.  Note that the processors pass a B<reference> to this list of
-options during the processing of the file.
+options.  Note that the processors will pass and receive a
+B<reference> to this list of options during the processing of the
+file.
 
 The method returns a list containing a reference to an array that
 contains each line of the file followed by the list of elements in the
@@ -512,6 +525,20 @@ custom behaviors. They are executed in this order:
 
 =back
 
+=over 5
+
+=item * You can terminate processing of a file by returning an undefined value
+for the C<next_line()> hook
+
+=item * Returning undef for the C<filter()>, and
+C<process()> hooks will prevent a line from being accumulated in the
+line buffer
+
+=item *Any hook you define can terminate the process by throwing
+an exception.
+
+=back
+
 The default processors are described below.
 
 =head3 pre(file, options)
@@ -546,7 +573,7 @@ potentially useful statistics.
 The C<next_line> method is passed the file handle, the buffer of
 accumulated lines, and a reference to a hash of options passed to
 C<process_file>. It is expected to return the I<next line> of the
-file, however your custom processor however can return anything it
+file, however your custom processor can return anything it
 likes. That object returned will be sent to the C<process> subroutine
 for possible further processing.
 
@@ -577,7 +604,6 @@ The C<process> method is passed the file handle, the buffer of
 accumulated lines, a reference to a hash of options passed to
 C<process_file> and the next line of the the text file.  The default
 processor simply returns the C<current_line> value.
-
 
 =over 5
 
@@ -674,6 +700,9 @@ processors.  Pass these methods the same list you receive.
 
 =item * Read CSV file
 
+Presented here as example, however you can use the L</process_csv>
+method for processing CSV files.
+
  use File::Process qw(pre process_file);
  use Text::CSV_XS;
  use Data::Dumper;
@@ -707,6 +736,65 @@ processors.  Pass these methods the same list you receive.
  )
 
 =back
+
+=head1 CAVEATS
+
+Processing each line using hooks and callbacks can introduce
+inefficiencies in file processing. This class is meant to be used on
+moderately sized files. In it's basic forms, the methods will read all
+lines into memory as it iterates over the file. Your processing may
+not require that lines be accumulated at all. Your custom C<process()>
+or C<filter()> hook can choose to return an undefined value which
+prevents a line from being added to the buffer.
+
+Reading each line one-at-a-time may be inefficient as well, future
+version may introduce a slurp mode and/or the ability to send an array
+which represents a list of lines to process.
+
+Some example times:
+
+Timings were done a Linux system running on an I<11th Gen Intel(R)
+Core(TM) i7-1160G7 @ 1.20GHz (8 threads, 4.40GHz)>
+
+As a baseline:
+
+=over 5
+
+=item * Reading ~900K rows (pure Perl)
+
+ .22s
+
+=item * Slurping ~900K rows (pure Perl)
+
+ .03s
+
+=back
+
+Using C<File::Process::process_file()>
+
+=over 5
+
+=item * Reading ~900K rows (no processing)
+
+ ~1.6s
+
+=item * Reading ~900K rows from a CSV file with 5 columns
+
+=over
+
+=item * Returning an array of hashes:
+
+ 7-8s
+
+=item * Returning an array of arrays:
+
+ ~10s
+
+=back
+
+=back
+
+...so there's room for improving the speed of these calls...caveat emptor.
 
 =head1 LICENSE
 

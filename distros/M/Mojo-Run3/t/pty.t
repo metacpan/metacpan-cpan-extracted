@@ -59,6 +59,22 @@ subtest 'stdin=pty, stdout=pty, stderr=closed' => sub {
   is $read{stdout}, undef,     'stdout';
 };
 
+subtest 'internal test to check close-from-child.t mock state' => sub {
+  my $run3 = Mojo::Run3->new(driver => 'pty');
+  my (@fh, @watching);
+  $run3->on(
+    spawn => sub {
+      my ($run3) = @_;
+      @fh       = sort keys %{$run3->{fh}};
+      @watching = sort keys %{$run3->{watching}};
+    }
+  );
+
+  guard($run3->run_p(sub { exec qw(mojo-run3-hopefully-no-such-command --with --this) }));
+  is_deeply \@fh,       [qw(pty stderr stdin stdout)], 'fh';
+  is_deeply \@watching, [qw(pid pty stderr stdout)],   'watching';
+};
+
 subtest 'close stdin' => sub {
   my $run3 = Mojo::Run3->new(driver => 'pty');
   $run3->on(

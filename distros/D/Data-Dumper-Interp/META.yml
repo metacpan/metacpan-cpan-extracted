@@ -5,9 +5,9 @@ author:
 build_requires:
   Data::Compare: '0'
   English: '0'
-  Math::BigFloat: '1.999837'
-  Math::BigInt: '1.999837'
-  Math::BigRat: '0.2624'
+  Math::BigFloat: '1.999818'
+  Math::BigInt: '1.999818'
+  Math::BigRat: '0.2614'
   Test::More: '0.98'
   Tie::Array: '0'
   Tie::Handle: '0'
@@ -42,7 +42,7 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: '4.102'
+version: '4.103'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

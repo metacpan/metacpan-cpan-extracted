@@ -6,10 +6,10 @@ use strict;
 use warnings;
 use Exporter 'import';
 use POSIX 'strftime';
-use Carp 'croak';
+use Carp 'croak', 'carp';
 
 
-our $VERSION = '1.4';
+our $VERSION = '1.5';
 our @EXPORT = qw|
   resInit resHeader resCookie resBuffer resFd resStatus resRedirect
   resNotFound resJSON resBinary resFile resFinish
@@ -82,7 +82,7 @@ sub resHeader {
 # name, value, %options.
 # value = undef -> remove cookie,
 # options:
-#   expires, path, domain, secure, httponly
+#   expires, path, domain, secure, httponly, maxage, samesite
 sub resCookie {
   my $self = shift;
   my $name = shift;
@@ -93,11 +93,13 @@ sub resCookie {
   my @attr = (sprintf '%s=%s', $name, defined($value)?$value:'');
   $o{expires} = 0 if !defined $value;
 
-  push @attr, sprintf 'expires=%s', strftime("%a, %d %b %Y %H:%M:%S GMT", gmtime $o{expires}) if defined $o{expires};
-  push @attr, "path=$o{path}" if $o{path};
-  push @attr, "domain=$o{domain}" if $o{domain};
-  push @attr, 'secure'   if $o{secure};
-  push @attr, 'httponly' if $o{httponly};
+  push @attr, sprintf 'Expires=%s', strftime("%a, %d %b %Y %H:%M:%S GMT", gmtime $o{expires}) if defined $o{expires};
+  push @attr, "Max-Age=$o{maxage}" if defined $o{maxage};
+  push @attr, "Path=$o{path}" if $o{path};
+  push @attr, "Domain=$o{domain}" if $o{domain};
+  push @attr, "SameSite=$o{samesite}" if $o{samesite};
+  push @attr, 'Secure'   if $o{secure};
+  push @attr, 'HttpOnly' if $o{httponly};
   $self->{_TUWF}{Res}{cookies}{$name} = join '; ', @attr;
 }
 
@@ -111,8 +113,7 @@ sub resCookie {
 #  'auto'       Clears and autodetects output compression from request header
 # Enabling compression if PerlIO::gzip isn't installed will result in an error
 sub resBuffer {
-  my $self = shift;
-  my $act = shift;
+  my($self, $act, $noutf8) = @_;
   my $i = $self->{_TUWF}{Res};
 
   my $h = $self->resHeader('Content-Encoding');
@@ -141,7 +142,7 @@ sub resBuffer {
 
     # set output compression
     binmode $i->{fd}, $new eq 'gzip' ? ':gzip' : ':gzip(none)' if $new ne 'none';
-    binmode $i->{fd}, ':utf8';
+    binmode $i->{fd}, ':utf8' if !($noutf8 && $noutf8 eq 'noutf8');
     $self->resHeader('Content-Encoding', $new eq 'none' ? undef : $new);
   }
 
@@ -185,24 +186,26 @@ sub resNotFound {
 }
 
 
+my $_json_codec;
 sub resJSON {
   my($self, $obj) = @_;
-  croak "Unable to load JSON::XS, is it installed?\n"
-    unless eval { require JSON::XS; 1 };
+  $_json_codec ||= TUWF::Misc::_JSON()->new->utf8;
 
   $self->resHeader('Content-Type' => 'application/json; charset=UTF-8');
-  $self->resBuffer('clear');
-  $self->resBinary(JSON::XS::encode_json($obj));
+  $self->resBinary($_json_codec->encode($obj), 'clear');
 }
 
 
 sub resBinary {
-  my($self, $data) = @_;
-  $self->resBuffer('none');
+  my($self, $data, $buffer) = @_;
+  my $enc = $self->resBuffer($buffer//'none', 'noutf8');
 
-  # Write to the buffer directly, bypassing the fd. This avoids extra copying
-  # and bypasses the ':utf8' filter.
-  $self->{_TUWF}{Res}{content} = $data;
+  if($enc eq 'none') {
+    # Write to the buffer directly if we're not compressing, avoids extra copying.
+    $self->{_TUWF}{Res}{content} = $data;
+  } else {
+    print { $self->{_TUWF}{Res}{fd} } $data;
+  }
 }
 
 
@@ -212,18 +215,23 @@ sub resFile {
   # This also catches files with '..' somewhere in the middle of the name.
   # Let's just disallow that too to simplify this check, I'd err on the side of
   # caution.
-  croak "Possible path traversal attempt" if $fn =~ /\.\./;
+  if($fn =~ /\.\./) {
+      $self->resNotFound;
+      $self->done;
+  }
+
+  my $ext = $fn =~ m{\.([^/\.]+)$} ? lc $1 : '';
+  my $ctype = $self->{_TUWF}{mime_types}{$ext} || $self->{_TUWF}{mime_default};
+  my $compress = $ctype =~ /^text/;
 
   my $file = "$path/$fn";
   return 0 if !-f $file;
   open my $F, '<', $file or croak "Unable to open '$file': $!";
   {
       local $/=undef;
-      $self->resBinary(scalar <$F>);
+      $self->resBinary(scalar <$F>, $compress ? 'auto' : 'none');
   }
 
-  my $ext = $fn =~ m{\.([^/\.]+)$} ? lc $1 : '';
-  my $ctype = $self->{_TUWF}{mime_types}{$ext} || $self->{_TUWF}{mime_default};
   $self->resHeader('Content-Type' => "$ctype; charset=UTF-8"); # Adding a charset to binary formats should be safe, too.
   return 1;
 }
@@ -235,18 +243,24 @@ sub resFinish {
   my $i = $self->{_TUWF}{Res};
 
   close $i->{fd};
-  $self->resHeader('Content-Length' => length($i->{content}));
+  if($i->{status} == 204) {
+    $self->resHeader('Content-Type' => undef);
+    $self->resHeader('Content-Encoding' => undef);
+  } else {
+    $self->resHeader('Content-Length' => length($i->{content}));
+  }
 
   if($self->{_TUWF}{http}) {
     printf "HTTP/1.0 %d Hi, I am a HTTP response.\r\n", $i->{status};
   } else {
     printf "Status: %d\r\n", $i->{status};
   }
-  printf "%s: %s\r\n", $i->{headers}[$_*2], $i->{headers}[$_*2+1]
-    for (0..$#{$i->{headers}}/2);
-  printf "Set-Cookie: %s\r\n", $i->{cookies}{$_} for (keys %{$i->{cookies}});
-  print  "\r\n";
-  print  $i->{content} if $self->reqMethod() ne 'HEAD';
+  my $hdr = join "\r\n",
+    (map "$i->{headers}[$_*2]: $i->{headers}[$_*2+1]", @{$i->{headers}} ? 0..$#{$i->{headers}}/2 : ()),
+    (map "Set-Cookie: $i->{cookies}{$_}", keys %{$i->{cookies}});
+  utf8::encode $hdr;
+  print  "$hdr\r\n\r\n";
+  print  $i->{content} if $self->reqMethod() ne 'HEAD' && $i->{status} != 204;
 
   # free the memory used for the reponse data
   $self->resInit;

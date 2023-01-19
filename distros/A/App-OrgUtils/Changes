@@ -1,3 +1,8 @@
+0.483   2022-10-11  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utilities: org-to-ansi-text, org-to-text.
+
+
 0.482   2021-07-04  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Add orgstat as shortcut for stat-org-document.

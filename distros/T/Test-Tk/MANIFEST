@@ -1,0 +1,8 @@
+Changes
+lib/Test/Tk.pm
+Makefile.PL
+MANIFEST
+README.md
+t/Test-Tk.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -42,9 +42,12 @@ my $unicode_str = join "", map { chr($_) } (0x263A .. 0x2650);
 
 # Various bugs in Math::BigRat et al break tests on some platforms.
 # In an attempt to avoid these troubles, require known-good versions
-use Math::BigInt 1.999837 ();
-use Math::BigFloat 1.999837 ();
-use Math::BigRat 0.2624 ();
+#use Math::BigInt 1.999837 ();
+#use Math::BigFloat 1.999837 ();
+#use Math::BigRat 0.2624 ();
+use Math::BigInt 1.999818 ();
+use Math::BigFloat 1.999818 ();
+use Math::BigRat 0.2614 ();
 require Data::Dumper;
 for my $modname (qw/Data::Dumper Math::BigInt Math::BigFloat Math::BigRat/) {
   (my $modpath = "${modname}.pm") =~ s/::/\//g;

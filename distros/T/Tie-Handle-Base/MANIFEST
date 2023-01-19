@@ -1,0 +1,15 @@
+Changes
+lib/Tie/Handle/Base.pm
+lib/Tie/Handle/Base.pod
+LICENSE.txt
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00_smoke.t
+t/20_tie_handle_base.t
+t/90_author_critic.t
+t/91_author_pod.t
+t/perlcriticrc
+t/Tie_Handle_Base_Testlib.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

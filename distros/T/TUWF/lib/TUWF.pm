@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use Carp 'croak';
 
-our $VERSION = '1.4';
+our $VERSION = '1.5';
 
 
 # Store the object in a global variable for some functions that don't get it
@@ -22,6 +22,7 @@ our $OBJ = bless {
     hooks => {
       before => [],
       after => [],
+      db_connect => [],
     },
     # defaults
     import_modules => 1,
@@ -105,24 +106,26 @@ sub import {
 sub set {
   return $OBJ->{_TUWF}{$_[0]} if @_ == 1;
   $OBJ->{_TUWF} = { %{$OBJ->{_TUWF}}, @_ };
+  # Make sure to load TUWF::DB as soon as we have database settings.
+  $OBJ->_load_module('TUWF::DB', 1) if $OBJ->{_TUWF}{db_login};
 }
 
 
 sub run {
-  # load the database module if requested
-  $OBJ->_load_module('TUWF::DB', 1) if $OBJ->{_TUWF}{db_login};
-
   # install a warning handler to write to the log file
   $SIG{__WARN__} = sub { $TUWF::OBJ->log($_) for @_; };
 
   # load optional modules
   require Time::HiRes if $OBJ->debug || $OBJ->{_TUWF}{log_slow_pages};
 
-  # initialize DB connection
-  $OBJ->dbInit if $OBJ->{_TUWF}{db_login};
+  # roll back any transaction that is currently active, so we start with a
+  # clean slate for the next incoming request. Code running SQL queries during
+  # initialization is responsible for doing an explicit dbCommit() if changes
+  # should be kept.
+  $OBJ->dbRollBack if $OBJ->{_TUWF}{db_login};
 
   # In a FastCGI environment, STDIN will be a listen socket; getpeername() will
-  # return a ENOTCONN on those, giving us a reliably way to differentiate
+  # return a ENOTCONN on those, giving us a reliable way to differentiate
   # between CGI (env vars), FastCGI (STDIN socket), and others.
   my(undef) = (getpeername \*STDIN);
   my $isfastcgi = $!{ENOTCONN};
@@ -137,9 +140,11 @@ sub run {
     import FCGI;
     my $r = FCGI::Request();
     $OBJ->{_TUWF}{fcgi_req} = $r;
+    local $SIG{TERM} = local $SIG{INT} = sub { $r->LastCall() };
     while($r->Accept() >= 0) {
       $OBJ->_handle_request;
       $r->Finish();
+      last if $OBJ->{_TUWF}{fastcgi_max_requests} && !--$OBJ->{_TUWF}{fastcgi_max_requests};
     }
 
   # otherwise, run our own HTTP server
@@ -188,7 +193,7 @@ sub patch   ($&) { any ['patch'     ], @_ }
 
 sub hook ($&) {
   my($hook, $sub) = @_;
-  croak "Unknown hook: $hook" if $hook ne 'before' && $hook ne 'after';
+  croak "Unknown hook: $hook" if $hook ne 'before' && $hook ne 'after' && $hook ne 'db_connect';
   croak 'Hooks expect a subroutine as second argument' if ref $sub ne 'CODE';
   push @{$OBJ->{_TUWF}{hooks}{$hook}}, $sub;
 }
@@ -330,8 +335,14 @@ sub _load_module {
 sub _handle_request {
   my $self = shift;
 
+  # HTTP::Server::Simple modifies SIGCHLD in a way that breaks every approach
+  # to spawning a subprocess. Let's reset SIGCHLD to fix that.
+  # https://rt.cpan.org/Public/Bug/Display.html?id=71045
+  local $SIG{CHLD} = undef if $OBJ->{_TUWF}{http};
+
   my $start = [Time::HiRes::gettimeofday()] if $self->debug || $OBJ->{_TUWF}{log_slow_pages};
 
+  local $self->{_TUWF}{request_data} = {};
   $self->{_TUWF}{captures_pos} = [];
   $self->{_TUWF}{captures_named} = {};
 
@@ -387,7 +398,7 @@ sub _handle_request {
       }
     }
 
-    die TUWF::Exception->new(404) if !$han;
+    $self->resNotFound if !$han;
 
     # execute post request handler, if any (no need to bother doing this if the
     # handler threw a TUWF::Exception like with the after hooks. The
@@ -457,7 +468,6 @@ sub _handle_error {
     utf8        => 400,
     json        => 400,
     controlchar => 400,
-    404         => 404,
     method      => 405,
     maxpost     => 413,
   }->{$terr} || '500';
@@ -488,7 +498,7 @@ sub _handle_error {
     join('', map sprintf("  %s: %s\n", $_, $self->reqHeader($_)), $self->reqHeader).
     "POST dump:\n".
     ($self->reqJSON()
-      ? JSON::XS->new->pretty->encode($self->reqJSON())
+      ? TUWF::Misc::_JSON()->new->pretty->encode($self->reqJSON())
       : join('', map sprintf("  %s: %s\n", $_, join "\n    ", $self->reqPosts($_)), $self->reqPosts)
     ).
     "Error:\n  $err\n"
@@ -510,17 +520,28 @@ sub capture {
 }
 
 
+sub captures {
+  my $self = shift;
+  map $self->capture($_), @_;
+}
+
+
 # writes a message to the log file. date, time and URL are automatically added
+our $_recursive_log = 0;
 sub log {
   my($self, $msg) = @_;
 
   # temporarily disable the warnings-to-log, to avoid infinite recursion if
   # this function throws a warning.
+  my $recursive = $_recursive_log;
   local $SIG{__WARN__} = undef;
+  local $_recursive_log = 1;
 
+  my $uri = $self->{_TUWF}{Req} ? $self->reqURI : '[init]';
   chomp $msg;
   $msg =~ s/\n/\n  | /g;
-  $msg = $self->{_TUWF}{log_format}->($self, $self->{_TUWF}{Req} ? $self->reqURI : '[init]', $msg);
+  $msg = $recursive ? sprintf "[%s] [log_format] %s -> %s\n", scalar localtime(), $uri, $msg
+                    : $self->{_TUWF}{log_format}->($self, $uri, $msg);
 
   if($self->{_TUWF}{logfile} && open my $F, '>>:utf8', $self->{_TUWF}{logfile}) {
     flock $F, 2;
@@ -529,8 +550,8 @@ sub log {
     flock $F, 4;
     close $F;
   }
-  # Also always dump stuff to STDERR if we're running a standalone HTTP server.
-  warn $msg if $self->{_TUWF}{http};
+  # Also always dump stuff to STDERR during init or if we're running a standalone HTTP server.
+  warn $msg if $self->{_TUWF}{http} || !$self->{_TUWF}{Req};
 }
 
 
@@ -541,6 +562,11 @@ sub pass {
 
 sub done {
   die TUWF::Exception->new('done');
+}
+
+
+sub req {
+  shift->{_TUWF}{request_data}
 }
 
 

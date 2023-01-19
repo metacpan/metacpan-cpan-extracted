@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
     "Pod::Usage" => "1.61",
     "Text::ASCIITable" => 0
   },
-  "VERSION" => "1.5.5",
+  "VERSION" => "1.5.6",
   "test" => {
     "TESTS" => "t/*.t"
   }

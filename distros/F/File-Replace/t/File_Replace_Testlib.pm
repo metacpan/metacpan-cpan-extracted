@@ -11,7 +11,7 @@ Test support library for the Perl module File::Replace.
 
 =head1 Author, Copyright, and License
 
-Copyright (c) 2017 Hauke Daempfling (haukex@zero-g.net)
+Copyright (c) 2017-2023 Hauke Daempfling (haukex@zero-g.net)
 at the Leibniz Institute of Freshwater Ecology and Inland Fisheries (IGB),
 Berlin, Germany, L<http://www.igb-berlin.de/>
 
@@ -100,7 +100,7 @@ sub exception (&) {  ## no critic (ProhibitSubroutinePrototypes)
 sub warns (&) {  ## no critic (ProhibitSubroutinePrototypes)
 	my $sub = shift;
 	my @warns;
-	#TODO Later: can we (lexically) disable warning fatality in this block? (for author tests, at least)
+	# Possible To-Do for Later: can we (lexically) disable warning fatality in this block? (for author tests, at least)
 	{ local $SIG{__WARN__} = sub { push @warns, shift };
 		$sub->() }
 	return wantarray ? @warns : scalar @warns;
@@ -150,68 +150,6 @@ sub warns (&) {  ## no critic (ProhibitSubroutinePrototypes)
 	our @ISA = qw/ Tie::Handle::Base /;  ## no critic (ProhibitExplicitISA)
 	sub FILENO { return -1 }
 	sub CLOSE { return 1 }
-}
-{
-	package Tie::Handle::MockBinmode;
-	require Tie::Handle::Base;
-	our @ISA = qw/ Tie::Handle::Base /;  ## no critic (ProhibitExplicitISA)
-	# we can't mock CORE::binmode in Perl <5.16, so use a tied handle instead
-	sub new {  ## no critic (RequireArgUnpacking)
-		my $class = shift;
-		my $fh = $class->SUPER::new(shift);
-		tied(*$fh)->{mocks} = [@_];
-		return $fh;
-	}
-	sub BINMODE {
-		my $self = shift;
-		die "no more mocks left" unless @{ $self->{mocks} };
-		return shift @{ $self->{mocks} };
-	}
-	sub endmock {
-		my $self = shift;
-		return if @{ $self->{mocks} };
-		return 1;
-	}
-}
-{
-	package Tie::Handle::NeverEof;
-	require Tie::Handle::Base;
-	our @ISA = qw/ Tie::Handle::Base /;  ## no critic (ProhibitExplicitISA)
-	sub EOF { return !!0 }
-}
-{
-	package OverrideStdin;
-	# This overrides STDIN with a file, using the same code that
-	# IPC::Run3 uses, which seems to work well. Cleanup is performed
-	# on object destruction.
-	use Carp;
-	use File::Temp qw/tempfile/;
-	use POSIX qw/dup dup2/;
-	our $DEBUG;
-	BEGIN { $DEBUG = 0 }
-	sub new {
-		my $class = shift;
-		croak "$class->new: bad nr of args" unless @_==1;
-		my $string = shift;
-		my $fh = tempfile();
-		print $fh $string;
-		seek $fh, 0, 0 or die "seek: $!";
-		$DEBUG and print STDERR "Overriding STDIN\n";
-		my $saved_fd0 = dup( 0 ) or die "dup(0): $!";
-		dup2( fileno $fh, 0 ) or die "save dup2: $!";
-		return bless \$saved_fd0, $class;
-	}
-	sub restore {
-		my $self = shift;
-		my $saved_fd0 = $$self;
-		return unless defined $saved_fd0;
-		$DEBUG and print STDERR "Restoring STDIN\n";
-		dup2( $saved_fd0, 0 ) or die "restore dup2: $!";
-		POSIX::close( $saved_fd0 ) or die "close saved: $!";
-		$$self = undef;
-		return 1;
-	}
-	sub DESTROY { return shift->restore }
 }
 
 1;

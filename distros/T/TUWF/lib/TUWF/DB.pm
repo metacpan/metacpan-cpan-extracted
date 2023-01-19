@@ -7,7 +7,7 @@ use Carp 'croak';
 use Exporter 'import';
 use Time::HiRes 'time';
 
-our $VERSION = '1.4';
+our $VERSION = '1.5';
 our @EXPORT = qw|
   dbInit dbh dbCheck dbDisconnect dbCommit dbRollBack
   dbExec dbVal dbRow dbAll dbPage
@@ -40,24 +40,29 @@ sub dbInit {
     sql => $sql,
     queries => [],
   };
+
+  $_->() for @{$self->{_TUWF}{hooks}{db_connect}};
 }
 
 
 sub dbh {
-  return shift->{_TUWF}{DB}{sql};
+  my($self) = @_;
+  $self->dbInit if !$self->{_TUWF}{DB}{sql};
+  $self->{_TUWF}{DB}{sql};
 }
 
 
 sub dbCheck {
   my $self = shift;
   my $info = $self->{_TUWF}{DB};
+  return $self->dbInit if !$info || !$info->{sql};
 
   my $start = time;
   $info->{queries} = [];
 
   if(!$info->{sql}->ping) {
-    warn "Ping failed, reconnecting";
     $self->dbInit;
+    warn "Ping failed, reconnected to database";
   }
   $self->dbRollBack;
   push(@{$info->{queries}}, [ 'ping/rollback', {}, time-$start ]);
@@ -65,21 +70,21 @@ sub dbCheck {
 
 
 sub dbDisconnect {
-  shift->{_TUWF}{DB}{sql}->disconnect();
+  (shift->{_TUWF}{DB}{sql} // return)->disconnect();
 }
 
 
 sub dbCommit {
   my $self = shift;
   my $start = [Time::HiRes::gettimeofday()] if $self->debug || $self->{_TUWF}{log_slow_pages};
-  $self->{_TUWF}{DB}{sql}->commit();
+  ($self->{_TUWF}{DB}{sql} // return)->commit();
   push(@{$self->{_TUWF}{DB}{queries}}, [ 'commit', {}, Time::HiRes::tv_interval($start) ])
     if $self->debug || $self->{_TUWF}{log_slow_pages};
 }
 
 
 sub dbRollBack {
-  shift->{_TUWF}{DB}{sql}->rollback();
+  (shift->{_TUWF}{DB}{sql} // return)->rollback();
 }
 
 
@@ -114,9 +119,8 @@ sub dbAll {
 # indicating whether there is a next page
 sub dbPage {
   my($s, $o, $q, @a) = @_;
-  $q .= ' LIMIT ? OFFSET ?';
-  push @a, $o->{results}+1, $o->{results}*($o->{page}-1);
-  my $r = $s->dbAll($q, @a);
+  my $r = $s->dbAll($q.' LIMIT ? OFFSET ?', @a, $o->{results}+(wantarray?1:0), $o->{results}*($o->{page}-1));
+  return $r if !wantarray;
   return ($r, 0) if $#$r != $o->{results};
   pop @$r;
   return ($r, 1);

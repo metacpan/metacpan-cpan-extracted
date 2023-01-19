@@ -2,8 +2,8 @@ NAME
     App::shcompgen - Generate shell completion scripts
 
 VERSION
-    This document describes version 0.324 of App::shcompgen (from Perl
-    distribution App-shcompgen), released on 2022-08-11.
+    This document describes version 0.325 of App::shcompgen (from Perl
+    distribution App-shcompgen), released on 2022-10-07.
 
 FUNCTIONS
   detect_prog

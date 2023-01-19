@@ -1,0 +1,452 @@
+
+=head1 Name
+
+File::Replace - Perl extension for replacing files by renaming a temp file over
+the original
+
+=head1 Synopsis
+
+ use File::Replace 'replace3';
+ 
+ my ($infh,$outfh,$repl) = replace3($filename);
+ while (<$infh>) {
+     # write whatever you like to $outfh here
+     print $outfh "X: $_";
+ }
+ $repl->finish;  # closes the handles
+
+=head1 Description
+
+This module implements and hides the following pattern for you:
+
+=over
+
+=item 1.
+
+Open a temporary file for output
+
+=item 2.
+
+While reading from the original file, write output to the temporary file
+
+=item 3.
+
+C<rename> the temporary file over the original file
+
+=back
+
+In many cases, in particular on many UNIX filesystems, the C<rename> operation
+is atomic*. This means that in such cases, the original filename will always
+exist, and will always point to either the new or the old version of the file,
+so a user attempting to open and read the file will always be able to do so,
+and never see an unfinished version of the file while it is being written.
+
+* B<Warning:> Unfortunately, whether or not a rename will actually be atomic in
+your specific circumstances is not always an easy question to answer, as it
+depends on exact details of the operating system and file system. Consult your
+system's documentation and search the Internet for "atomic rename" for more
+details. This module's job is to perform the C<rename>, and it can make
+B<no guarantees> as to whether it will be atomic or not.
+
+=head2 Notice
+
+As of version 0.16, the distribution of this module has been split into
+several distributions: See the documentation of L</replace>,
+L</replace2>, and L</inplace> for details.
+
+=head2 Version
+
+This documentation describes version 0.16 of this module.
+
+=head1 Constructors and Overview
+
+The constructors C<< File::Replace->new() >>, C<replace3()>, C<replace2()>, and
+C<replace()> take exactly the same arguments, and differ only in their return
+values - C<replace2> and C<replace> require you to install
+L<File::Replace::Fancy|File::Replace::Fancy> and
+wrap the functionality of C<File::Replace> inside C<tie>d filehandles.
+
+Note that C<replace3()>, C<replace2()>, and
+C<replace()> are normal functions and not methods, don't attempt to call them
+as such. If you don't want to import them you can always call them as, for
+example, C<File::Replace::replace()>.
+
+ File::Replace->new( $filename );
+ File::Replace->new( $filename, $layers );
+ File::Replace->new( $filename, option => 'value', ... );
+ File::Replace->new( $filename, $layers, option => 'value', ... );
+ # replace3(...), replace2(...), and replace(...) take the same arguments
+
+The constructors will open the input file and the temporary output file (the
+latter via L<File::Temp|File::Temp>), and will C<die> in case of errors. The
+options are described in L</Constructor Options>. It is strongly recommended
+that you C<use warnings;>, as then this module will issue warnings which may be
+of interest to you.
+
+=head2 C<new>
+
+ use File::Replace;
+ my $replace_object = File::Replace->new($filename, ...);
+
+Returns a new C<File::Replace> object. The central methods provided are
+C<< ->in_fh >> and C<< ->out_fh >>, which return the input resp. output
+filehandle which you can read resp. write, and C<< ->finish >>, which causes
+the files to be closed and the replace operation to be performed. There is also
+C<< ->cancel >>, which just discards the temporary output file without touching
+the input file. Additional helper methods are mentioned below.
+
+C<finish> will C<die> on errors, while C<cancel> will only return a false value
+on errors. This module will try to clean up after itself (remove temporary
+files) as best it can, even when things go wrong.
+
+Please don't re-C<open> the C<in_fh> and C<out_fh> handles, as this may lead to
+confusion.
+
+The method C<< ->is_open >> will return a false value if the replace operation
+has been C<finish>ed or C<cancel>ed, or a true value if it is still active
+(note that this method does I<not> check the state of the underlying
+filehandles). The method C<< ->filename >> returns the filename passed to the
+constructor. The method C<< ->options >> in list context returns the options
+this object has set (including defaults) as a list of key/value pairs, in
+scalar context it returns a hashref of these options.
+
+=head2 C<replace3>
+
+This is a convenience function for shorter code:
+
+ use File::Replace 'replace3';
+ my ($in_fh,$out_fh,$repl_obj) = replace3($filename, ...);
+
+is the same as
+
+ use File::Replace;
+ my $repl_obj = File::Replace->new($filename, ...);
+ my $in_fh    = $repl_obj->in_fh;
+ my $out_fh   = $repl_obj->out_fh;
+
+=head2 C<replace2>
+
+**Note** As of version 0.16, if you want to use this function, you must
+install L<File::Replace::Fancy|File::Replace::Fancy>!
+
+ use File::Replace 'replace2';
+ 
+ my ($infh,$outfh) = replace2($filename);
+ while (<$infh>) {
+     print $outfh "Y: $_";
+ }
+ close $infh;   # closing both handles will
+ close $outfh;  # trigger the replace
+
+In list context, returns a two-element list of two tied filehandles, the first
+being the input filehandle, and the second the output filehandle, and the
+replace operation (C<finish>) is performed when both handles are C<close>d. In
+scalar context, it returns only the output filehandle, and the replace
+operation is performed when this handle is C<close>d. This means that C<close>
+may C<die> instead of just returning a false value.
+
+You cannot re-C<open> these tied filehandles.
+
+You can access the underlying C<File::Replace> object via
+C<< tied(*$handle)->replace >> on both the input and output handle. You can
+also access the original, untied filehandles via C<< tied(*$handle)->in_fh >>
+and C<< tied(*$handle)->out_fh >>, but please don't C<close> or re-C<open>
+these handles as this may lead to confusion.
+
+=head2 C<replace>
+
+**Note** As of version 0.16, if you want to use this function, you must
+install L<File::Replace::Fancy|File::Replace::Fancy>!
+
+ use File::Replace 'replace';
+ 
+ my $fh = replace($filename);
+ while (<$fh>) {
+     # can read _and_ write from/to $fh
+     print $fh "Z: $_";
+ }
+ close $fh;
+
+Returns a single, "magical" tied filehandle. The operations C<print>,
+C<printf>, and C<syswrite> are passed through to the output filehandle,
+C<binmode> operates on both the input and output handle, and C<fileno> only
+reports C<-1> if the C<File::Replace> object is still active or C<undef> if the
+replace operation has C<finish>ed or been C<cancel>ed. All other I/O functions,
+such as C<< <$handle> >>, C<readline>, C<sysread>, C<seek>, C<tell>, C<eof>,
+etc. are passed through to the input handle. You can still access these
+operations on the output handle via e.g. C<< eof( tied(*$handle)->out_fh ) >>
+or C<< tied(*$handle)->out_fh->tell() >>. The replace operation (C<finish>) is
+performed when you C<close> the handle, which means that C<close> may C<die>
+instead of just returning a false value.
+
+Re-C<open>ing the handle causes a new underlying C<File::Replace> object to be
+created. You should explicitly C<close> the filehandle first so that the
+previous replace operation is performed (or C<cancel> that operation). The
+"mode" argument (or filename in the case of a two-argument C<open>) may not
+contain a read/write indicator (C<< < >>, C<< > >>, etc.), only PerlIO layers.
+
+You can access the underlying C<File::Replace> object via
+C<< tied(*$handle)->replace >>. You can also access the original, untied
+filehandles via C<< tied(*$handle)->in_fh >> and C<< tied(*$handle)->out_fh >>,
+but please don't C<close> or re-C<open> these handles as this may lead to
+confusion.
+
+=head2 C<inplace>
+
+**Warning:** As of version 0.16, if you want to use this function, you
+must install the **experimental** module
+L<File::Replace::Inplace|File::Replace::Inplace>.
+
+This is a shorthand for the constructor of
+L<File::Replace::Inplace|File::Replace::Inplace>. That is:
+
+ use File::Replace qw/inplace/;
+ my $inplace = inplace(...);
+
+is the same as
+
+ use File::Replace::Inplace;
+ my $inplace = File::Replace::Inplace->new(...);
+
+As a special feature, if the import list contains a string beginning with
+C<-i>, then a global L<File::Replace::Inplace|File::Replace::Inplace>
+object will be set up, so C<ARGV> will be tied from the beginning of the
+script. Anything following the C<-i> will be used for the L</backup> option.
+The purpose of this feature is to provide a replacement for Perl's C<-i>
+command-line switch in oneliners. For example, you can say:
+
+ perl -MFile::Replace=-i.bak -pe 's/foo/bar/g' file1.txt file2.txt
+
+and those files will be edited in-place using this module. In addition,
+you may specify a C<-D> "switch" in the import list to enable debugging
+output, as in:
+
+ perl -MFile::Replace=-i,-D -pe 's/x/y/g' foo.txt bar.txt
+
+The C<-D> switch currently only affects the "inplace" operations described here,
+but this may be expanded upon in the future to enable debugging everywhere.
+
+=head1 Constructor Options
+
+=head2 Filename
+
+A filename. The temporary output file will be created in the same directory as
+this file, its name will be based on the original filename, but prefixed with a
+dot (C<.>) and suffixed with a random string and an extension of C<.tmp>. If
+the input file does not exist (C<ENOENT>), then the behavior will depend on the
+L</create> option.
+
+=head2 C<layers>
+
+This option can either be specified as the second argument to the constructors,
+or as the C<< layers => '...' >> option in the options hash, but not both. It
+is a list of PerlIO layers such as C<":utf8">, C<":raw:crlf">, or
+C<":encoding(UTF-16)">. Note that the default layers differ based on operating
+system, see L<perlfunc/open>.
+
+=head2 C<create>
+
+This option configures the behavior of the module when the input file does not
+exist (C<ENOENT>). There are three modes, which you specify as one of the
+following strings. If you need more precise control of the input file, see the
+L</in_fh> option - note that C<create> is ignored when you use that option.
+
+=over
+
+=item C<"later"> (default when C<create> omitted or C<undef>)
+
+Instead of the input file, F</dev/null> or its equivalent is opened. This means
+that while the output file is being written, the input file name will not
+exist, and only come into existence when the rename operation is performed.
+
+=item C<"now">
+
+If the input file does not exist, it is immediately created and opened. There
+is currently a potential race condition: if the file is created by another
+process before this module can create it, then the behavior is undefined - the
+file may be emptied of its contents, or you may be able to read its contents.
+This behavior may be fixed and specified in a future version. The race
+condition is discussed some more in L</Concurrency and File Locking>.
+
+Currently, this option is implemented by opening the file with a mode of
+C<< +> >>, meaning that it is created (clobbered) and opened in read-write
+mode. I<However>, that should be considered an implementation detail that is
+subject to change. Do not attempt to take advantage of the read-write mode by
+writing to the input file - that contradicts the purpose of this module anyway.
+Instead, the input file will exist and remain empty until the replace
+operation.
+
+=item C<"off"> (or C<"no">)
+
+Attempting to open a nonexistent input file will cause the constructor to
+C<die>.
+
+=back
+
+Previous versions of this module included support for other values of the
+C<create> option, as well as the C<devnull> option. These were replaced by the
+above C<create> options and deprecated in 0.06, and removed as of 0.08. Using
+unrecognized options will result in a fatal error. Note that in 0.06,
+specifying C<undef> for the C<create> option resulted in a deprecation warning,
+that behavior has now been changed so that C<undef> is equivalent to the
+C<create> option not being set.
+
+=head2 C<backup>
+
+If you set this option to a non-empty string, then immediately after successfully
+opening the input file, it is copied to a file with the same name and the
+extension specified by this option (unless you use C<*> characters in the string,
+see below). For example, C<< File::Replace->new("test.txt", backup=>".bak") >>
+results in a copy of F<test.txt> being made to F<test.txt.bak>. If that file
+already exists or something goes wrong with the copy operation, then the
+constructor will C<die>.
+
+As with Perl's C<-i> option, if the string contains C<*> characters, then
+instead of the string being appended to the filename, each C<*> character is
+replaced with the original filename. So for example, if you specify
+C<< backup=>'orig_*' >>, then the backup of F<test.txt> will be
+F<orig_test.txt> in the same path - I<unlike> Perl's C<-i> option, this
+feature cannot be used to move files into a different directory.
+
+B<Warning:> If there is another process writing to the input file or creating files
+in the same directory as the input file, there is a potential for race conditions
+when using this option!
+
+This option was introduced in version 0.10.
+
+=head2 C<in_fh>
+
+This option allows you to pass an existing input filehandle to this module,
+instead of having the constructors open the input file for you. Use this option
+if you need more precise control over how the input file is opened, e.g. if you
+want to use C<sysopen> to open it. The handle must be open, which will be
+checked by calling C<fileno> on the handle. The module makes no attempt to
+check that the filename you pass to the module matches the filehandle. The
+module will attempt to C<stat> the handle to get its permissions, except when
+you have specified the L</perms> option or disabled the L</chmod> option. The
+L</create> option is ignored when you use this option.
+
+=head2 C<perms>
+
+ perms => 0640       # ok
+ perms => oct("640") # ok
+ perms => "0640"     # WRONG!
+
+Normally, just before the C<rename> is performed, C<File::Replace> will
+C<chmod> the temporary file to those permissions that the original file had
+when it was opened, or, if the original file did not yet exist, default
+permissions based on the current C<umask>. Setting this option to an octal
+value (a number, not a string!) will override those permissions. See also
+L</chmod>, which can be used to disable the C<chmod> operation.
+
+=head2 C<chmod>
+
+This option is enabled by default, unless you set
+C<$File::Replace::DISABLE_CHMOD> to a true value. When you disable this option,
+the C<chmod> operation that is normally performed just before the C<rename>
+will not be attempted. This is mostly intended for systems where you know the
+C<chmod> will fail. See also L</perms>, which allows you to define what
+permissions will be used.
+
+Note that the temporary files created with L<File::Temp|File::Temp> will have
+0600 permissions if left unchanged (except of course on systems that don't
+support these kind of restrictive permissions).
+
+=head2 C<autocancel>
+
+If the C<File::Replace> object is destroyed (e.g. when it goes out of scope),
+and the replace operation has not been performed yet, normally it will
+C<cancel> the replace operation and issue a warning. Enabling this option makes
+that implicit canceling explicit, silencing the warning.
+
+This option cannot be used together with C<autofinish>.
+
+=head2 C<autofinish>
+
+When set, causes the C<finish> operation to be attempted when the object is
+destroyed (e.g. when it goes out of scope).
+
+However, using this option is actually B<not recommended> unless you know what
+you are doing. This is because the replace operation will also be attempted
+when your script is C<die>ing, in which case the output file may be incomplete,
+and you may not want the original file to be replaced. A second reason is that
+the replace operation may be attempted during global destruction, and it is not
+a good idea to rely on this always going well. In general it is better to
+C<finish> the replace operation explicitly.
+
+This option cannot be used together with C<autocancel>.
+
+=head2 C<debug>
+
+If set to a true value, this option enables some debug output for C<new>,
+C<finish>, and C<cancel>. You may also set this to a filehandle, and debug
+output will be sent there.
+
+=head1 Additional Methods
+
+=head2 C<copy>
+
+This method copies a certain number of "characters" from the input handle to
+the output handle, that is, the temporary file. Depending on the status of the
+filehandle, either (8-bit) bytes or characters are read, see L<perlfunc/read>.
+The option C<bufsize> lets you adjust the read buffer size, and the option
+C<< less=>'ignore' >> or C<< less=>'ok' >> suppresses the warning that less
+characters than you requested could be read. The method returns the number of
+characters copied and dies on errors.
+
+ use File::Replace;
+ my $repl = File::Replace->new($filename, ...);
+ $repl->copy(8);                   # copy eight characters
+ $repl->copy(1024, bufsize=>256);  # copy 1024 chars, 256 at a time
+ $repl->copy(2048, less=>'ok');    # copy 2048, but don't warn if less
+ $repl->finish;
+
+This method was added in version 0.08.
+
+=head1 Notes and Caveats
+
+=head2 Concurrency and File Locking
+
+This module is very well suited for situations where a file has one writer and
+one or more readers.
+
+Among other things, this is reflected in the case of a nonexistent file, where
+the L</create> settings C<now> and C<later> (the default) are currently
+implemented as a two-step process, meaning there is the potential of the input
+file being created in the short period of time between the first and second
+C<open> attempts, which this module currently will not notice.
+
+Having multiple writers is possible, but care must be taken to ensure proper
+coordination of the writers!
+
+For example, a simple L<flock|perlfunc/flock> of the input file is B<not>
+enough: if there are multiple processes, remember that each process will
+I<replace> the original input file by a new and different file! One possible
+solution would be a separate lock file that does not change and is only used
+for C<flock>ing. There are other possible methods, but that is currently beyond
+the scope of this documentation.
+
+(For the sake of completeness, note that you cannot C<flock> the C<tie>d
+handles, only the underlying filehandles.)
+
+=head1 Author, Copyright, and License
+
+Copyright (c) 2017-2023 Hauke Daempfling (haukex@zero-g.net)
+at the Leibniz Institute of Freshwater Ecology and Inland Fisheries (IGB),
+Berlin, Germany, L<http://www.igb-berlin.de/>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see L<http://www.gnu.org/licenses/>.
+
+=cut
+

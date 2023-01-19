@@ -6,6 +6,7 @@ use warnings;
 use Getopt::Long;
 use FindBin qw($RealBin);
 use FASTX::Reader;
+
 # The following placeholder is to be programmatically replaced with 'use lib "$RealBin/../lib"' if needed
 #~loclib~
 if ( -e "$RealBin/../lib/Proch/N50.pm" and -e "$RealBin/../Changes" ) {
@@ -37,6 +38,9 @@ my $_opt          = GetOptions(
 	's|separator=s' => \$opt_separator,
 );
 
+version() if ($opt_version);
+usage() unless (defined $ARGV[0]);
+
 if (defined $opt_list) {
 	open(my $I, '<', "$opt_list") || die " FATAL ERROR:\n Unable to read list file <$opt_list>.\n";
 	while (my $line = readline($I) ) {
@@ -50,15 +54,16 @@ if (defined $opt_list) {
 		$seq_names{ $name } = 1;
 	}
 	say STDERR Dumper \%seq_names if $opt_debug;
+	say STDERR "Loaded ", scalar keys %seq_names, " names from ", $opt_list;
 }
 
 
-version() if ($opt_version);
-usage() unless (defined $ARGV[0]);
+
 
 for my $file (@ARGV) {
-	next unless (-e "$file");
-	vprint(" - Processing $file");
+	$file = "{{STDIN}}" if ($file eq "-");
+	next if (! -e "$file" and $file ne "{{STDIN}}");
+	vprint("Processing file: $file");
 	my $Fasta = FASTX::Reader->new( { filename => "$file"});
 	my $tot   = 0;
 	my $pass  = 0;
@@ -123,7 +128,7 @@ fu-extract - Get sequences by name (also using lists)
 
 =head1 VERSION
 
-version 1.5.5
+version 1.5.6
 
 =head1 PARAMETERS
 

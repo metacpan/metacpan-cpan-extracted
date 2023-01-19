@@ -1,0 +1,11 @@
+Revision history for Perl extension Test::Tk.
+
+0.01  Sun Jan 15 10:03:22 2023
+	- original version; created by h2xs 1.23 with options
+		-X Test::Tk
+
+1.00  Tue Jan 17
+	- Initial release.
+
+1.01  Tue Jan 17
+	- Corrected some pod formatting errors.

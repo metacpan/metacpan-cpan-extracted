@@ -8,11 +8,8 @@ Tests for the Perl module File::Replace.
 
 =begin comment
 
-How to run coverage tests (there is a custom target in F<Makefile.PL>):
-
- perl Makefile.PL && make authorcover
- firefox cover_db/coverage.html
- git clean -dxn  # change to -dxf to actually clean
+The coverage tests can be run via the C<cover_suite.sh> script,
+assuming your directory layout matches what is documented there.
 
 Running tests on all Perl versions: Install the required Perl versions (see
 list below), note that some test failures in Perl <5.10 can be ignored. In each
@@ -29,7 +26,7 @@ below for this). Then:
 
 =head1 Author, Copyright, and License
 
-Copyright (c) 2017 Hauke Daempfling (haukex@zero-g.net)
+Copyright (c) 2017-2023 Hauke Daempfling (haukex@zero-g.net)
 at the Leibniz Institute of Freshwater Ecology and Inland Fisheries (IGB),
 Berlin, Germany, L<http://www.igb-berlin.de/>
 
@@ -58,21 +55,19 @@ our @PERLFILES;
 BEGIN {
 	@PERLFILES = (
 		catfile($FindBin::Bin,qw/ .. lib File Replace.pm /),
-		catfile($FindBin::Bin,qw/ .. lib File Replace Inplace.pm /),
-		catfile($FindBin::Bin,qw/ .. lib File Replace DualHandle.pm /),
-		catfile($FindBin::Bin,qw/ .. lib File Replace SingleHandle.pm /),
-		catfile($FindBin::Bin,qw/ .. lib Tie Handle Base.pm /),
-		catfile($FindBin::Bin,qw/ .. lib Tie Handle Argv.pm /),
 		bsd_glob("$FindBin::Bin/*.t"),
 		bsd_glob("$FindBin::Bin/*.pm"),
 	);
 }
 
-use Test::More $AUTHOR_TESTS ? (tests=>2*@PERLFILES)
+use Test::More $AUTHOR_TESTS ? (tests=>2*@PERLFILES+1)
 	: (skip_all=>'author Perl::Critic tests (set $ENV{FILE_REPLACE_AUTHOR_TESTS} to enable)');
 
 use Test::Perl::Critic -profile=>catfile($FindBin::Bin,'perlcriticrc');
 use Test::MinimumVersion;
+use Test::DistManifest;
+
+subtest 'MANIFEST' => sub { manifest_ok() };
 
 my @tasks;
 for my $file (@PERLFILES) {

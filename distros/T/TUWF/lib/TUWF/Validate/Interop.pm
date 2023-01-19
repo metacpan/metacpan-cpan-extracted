@@ -7,7 +7,7 @@ use Exporter 'import';
 use Carp 'croak';
 
 our @EXPORT_OK = ('analyze');
-our $VERSION = '1.4';
+our $VERSION = '1.5';
 
 
 # Analyzed ("flattened") object:
@@ -22,7 +22,7 @@ sub _merge_type {
 
   return if $o->{type} eq 'int' || $o->{type} eq 'bool';
   $o->{type} = 'int'    if $n eq 'int'     || $n eq 'uint';
-  $o->{type} = 'bool'   if $n eq 'anybool' || $n eq 'jsonbool';
+  $o->{type} = 'bool'   if $n eq 'anybool' || $n eq 'undefbool' || $n eq 'jsonbool';
   $o->{type} = 'num'    if $n eq 'num';
 }
 
@@ -219,5 +219,84 @@ sub elm_encoder {
 
   croak "Unknown type '$o->{type}' or missing option";
 }
+
+
+# Elm JSON decoder for values of elm_type()
+# options: elm_type() options + json_decode var_prefix
+sub elm_decoder {
+  my($o, %opt) = @_;
+  $opt{json_decode} //= '';
+  $opt{var_prefix} //= 'd';
+
+  return sprintf '(%snullable %s)',
+    $opt{json_decode}, $opt{values} || $o->elm_decoder(%opt, required => 1)
+    if !$o->{required} && !defined $o->{default} && !$opt{required};
+
+  delete $opt{required};
+  return "$opt{json_decode}string" if $o->{type} eq 'scalar';
+  return "$opt{json_decode}bool"   if $o->{type} eq 'bool';
+  return "$opt{json_decode}float"  if $o->{type} eq 'num';
+  return "$opt{json_decode}int"    if $o->{type} eq 'int';
+  return $opt{any}                 if $o->{type} eq 'any' && $opt{any};
+  return "$opt{json_decode}value"  if $o->{type} eq 'any';
+  return sprintf '(%slist %s)', $opt{json_decode}, $opt{values} || $o->{values}->elm_decoder(%opt)
+    if $o->{type} eq 'array' && ($opt{values} || $o->{values});
+
+  if($o->{type} eq 'hash' && ($o->{keys} || $opt{keys})) {
+    $opt{indent} //= 2;
+    $opt{level}  //= 1;
+    my $len = 0;
+    $len = length $_ > $len ? length $_ : $len for keys %{$o->{keys}};
+
+    my $r;
+    my $num = keys %{$o->{keys}};
+    my $varnum = 1;
+    my $getvar = sub { $opt{var_prefix}.($varnum++) };
+
+    # For 8 members or less we can use the simple Json.Decode.map* functions.
+    if($num <= 8) {
+      my(@fnarg, @assign, @fetch);
+      for (sort keys %{$o->{keys}}) {
+        my $var = $getvar->();
+        push @fnarg, $var;
+        push @assign, "$_ = $var";
+        push @fetch, sprintf '(%sfield "%s"%s %s)', $opt{json_decode}, $_,
+          ' 'x($len-(length $_)),
+          $opt{keys}{$_} || $o->{keys}{$_}->elm_decoder(%opt, var_prefix => $var, level => $opt{level}+1);
+      }
+      $r = sprintf "(%smap%s\n(\\%s -> { %s })\n%s)",
+        $opt{json_decode}, $num == 1 ? '' : $num, join(' ', @fnarg), join(', ', @assign), join("\n", @fetch);
+
+    # For larger hashes we go through Json.Decode.dict and a little custom decoding logic.
+    # Json.Decode only allows failing with an error string, so the error messages aren't as good.
+    } else {
+      my($dict, $fn, $name, $dec, $next, $cap) = map $getvar->(), 1..6;
+      my(@assign, @fn);
+      for (sort keys %{$o->{keys}}) {
+        my $var = $getvar->();
+        push @assign, "$_ = $var";
+        push @fn, sprintf '%s "%s"%s %s (\%s ->', $fn, $_,
+          ' 'x($len-(length $_)),
+          $opt{keys}{$_} || $o->{keys}{$_}->elm_decoder(%opt, var_prefix => "${var}_", level => $opt{level}+1),
+          $var;
+      }
+      my $spc = ' 'x(12 + length($fn) + length($name) + length($dec) + length($next));
+      $r = "($opt{json_decode}andThen (\\$dict -> \n"
+          ."let $fn $name $dec $next = case Maybe.map ($opt{json_decode}decodeValue $dec) (Dict.get $name $dict) of\n"
+          ."${spc}Nothing -> $opt{json_decode}fail (\"Missing key '\"++$name++\"'\")\n"
+          ."${spc}Just (Err $cap) -> $opt{json_decode}fail (\"Error decoding value of '\"++$name++\"': \"++($opt{json_decode}errorToString $cap))\n"
+          ."${spc}Just (Ok $cap) -> $next $cap\n"
+          ."in ".join("\n   ", @fn)."\n"
+          ."   $opt{json_decode}succeed { ".join(', ', @assign)." }\n"
+          .')'.(')'x@fn)." ($opt{json_decode}dict $opt{json_decode}value))";
+    }
+
+    $r =~ s/\n/$opt{indent} ? "\n" . (' 'x($opt{indent}*$opt{level})) : ''/eg;
+    return $r;
+  }
+
+  croak "Unknown type '$o->{type}' or missing option";
+}
+
 
 1;

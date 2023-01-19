@@ -1,10 +1,5 @@
 #!perl
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-04'; # DATE
-our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.482'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -12,6 +7,11 @@ use Log::ger;
 
 use Scalar::Util qw(refaddr);
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-10-11'; # DATE
+our $DIST = 'App-OrgUtils'; # DIST
+our $VERSION = '0.483'; # VERSION
 
 our %SPEC;
 
@@ -263,36 +263,15 @@ move-done-org-todos - Move done todos from one Org file to another
 
 =head1 VERSION
 
-This document describes version 0.482 of move-done-org-todos (from Perl distribution App-OrgUtils), released on 2021-07-04.
+This document describes version 0.483 of move-done-org-todos (from Perl distribution App-OrgUtils), released on 2022-10-11.
 
 =head1 SYNOPSIS
 
-Usage:
+B<move-done-org-todos> [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--exclude-pat>=I<re>] [B<--format>=I<name>|B<--json>] [B<--include-pat>=I<re>] [B<--(no)naked-res>] [B<--no-dry-run>|B<-N>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- E<lt>I<undone_file>E<gt> [I<done_file>]
 
- % move-done-org-todos [--config-path=path | -c] [--config-profile=profile
-     | -P] [--debug] [--exclude-pat=s] [--format=name] [--include-pat=s]
-     [--json] [--log-level=level] [--(no)naked-res] [--no-config | -C]
-     [--no-dry-run | -N] [--no-env] [--page-result[=program]] [--quiet]
-     [--trace] [--verbose] [--view-result[=program]] -- <undone_file>
-     [done_file]
 
-Examples:
 
-Strip done items from todo.org into done.org (simulation mode, the default mode):
-
- % move-done-org-todos todo.org done.org
-
-Strip done items from todo.org into done.org:
-
- % move-done-org-todos todo.org done.org --no-dry-run
-
-Strip done items from todo.org and put it into a new file done1.org:
-
- % move-done-org-todos todo.org --no-dry-run >done1.org
-
-Strip done items from todo.org and print it to stdout (NOTE: you might want to save the stdout output because they are stripped from todo.org):
-
- % move-done-org-todos todo.org --no-dry-run
+See examples in the L</EXAMPLES> section.
 
 =head1 DESCRIPTION
 
@@ -364,13 +343,37 @@ Can also be specified as the 1st command-line argument.
 
 Set path to configuration file.
 
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+
 =item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+ [profile=dev]
+ username=foo
+ pass=beaver
+ 
+ [profile=production]
+ username=bar
+ pass=honey
+
+When you specify C<--config-profile=dev>, C<username> will be set to C<foo> and
+C<password> to C<beaver>. When you specify C<--config-profile=production>,
+C<username> will be set to C<bar> and C<password> to C<honey>.
+
+
 =item B<--no-config>, B<-C>
 
 Do not use any configuration file.
+
+If you specify C<--no-config>, the application will not read any configuration
+file.
+
 
 =back
 
@@ -381,6 +384,10 @@ Do not use any configuration file.
 =item B<--no-env>
 
 Do not read environment for default options.
+
+If you specify C<--no-env>, the application wil not read any environment
+variable.
+
 
 =back
 
@@ -395,6 +402,17 @@ Shortcut for --log-level=debug.
 =item B<--log-level>=I<s>
 
 Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
 
 =item B<--quiet>
 
@@ -422,6 +440,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -436,24 +460,33 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--page-result>
 
 Filter output through a pager.
 
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 
@@ -513,7 +546,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/move-done-org-todos.conf>, F<~/move-done-org-todos.conf>, or F</etc/move-done-org-todos.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/move-done-org-todos.conf>, F</home/u1/move-done-org-todos.conf>, or F</etc/move-done-org-todos.conf>.
 
 All found files will be read and merged.
 
@@ -552,17 +585,35 @@ List of available configuration parameters:
 
 =head1 ENVIRONMENT
 
-=head2 MOVE_DONE_ORG_TODOS_OPT => str
+=head2 MOVE_DONE_ORG_TODOS_OPT
 
-Specify additional command-line options.
+String. Specify additional command-line options.
 
 =head1 FILES
 
-F<~/.config/move-done-org-todos.conf>
+=head2 /home/u1/.config/move-done-org-todos.conf
 
-F<~/move-done-org-todos.conf>
+=head2 /home/u1/move-done-org-todos.conf
 
-F</etc/move-done-org-todos.conf>
+=head2 /etc/move-done-org-todos.conf
+
+=head1 EXAMPLES
+
+=head2 Strip done items from todo.org into done.org (simulation mode, the default mode)
+
+ % move-done-org-todos todo.org done.org
+
+=head2 Strip done items from todo.org into done.org
+
+ % move-done-org-todos todo.org done.org --no-dry-run
+
+=head2 Strip done items from todo.org and put it into a new file done1.org
+
+ % move-done-org-todos todo.org --no-dry-run >done1.org
+
+=head2 Strip done items from todo.org and print it to stdout (NOTE: you might want to save the stdout output because they are stripped from todo.org)
+
+ % move-done-org-todos todo.org --no-dry-run
 
 =head1 HOMEPAGE
 
@@ -572,6 +623,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-OrgUti
 
 Source repository is at L<https://github.com/perlancar/perl-App-OrgUtils>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-OrgUtils>
@@ -579,16 +659,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

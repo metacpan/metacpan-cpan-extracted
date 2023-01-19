@@ -7,17 +7,16 @@ use strict;
 use warnings;
 use Carp 'croak';
 use Exporter 'import';
-use Encode 'encode_utf8';
 use Scalar::Util 'looks_like_number';
 use TUWF::Validate;
 
 
-our $VERSION = '1.4';
+our $VERSION = '1.5';
 our @EXPORT_OK = ('uri_escape', 'kv_validate');
 
 
 sub uri_escape {
-  local $_ = encode_utf8 shift;
+  utf8::encode(local $_ = shift);
   s/([^A-Za-z0-9._~-])/sprintf '%%%02X', ord $1/eg;
   return $_;
 }
@@ -229,6 +228,19 @@ sub TUWF::Object::validate {
 
   # Multi-value, separate params
   _compile({ type => 'hash', keys => { @_ } })->validate($source);
+}
+
+
+# Internal function used by other TUWF modules to find an appropriate JSON
+# module. Kinda like JSON::MaybeXS, but without an extra dependency.
+sub _JSON {
+    return 'JSON::XS'         if $INC{'JSON/XS.pm'};
+    return 'Cpanel::JSON::XS' if $INC{'Cpanel/JSON/XS.pm'};
+    return 'JSON::PP'         if $INC{'JSON/PP.pm'};
+    return 'JSON::XS'         if eval { require JSON::XS; 1 };
+    return 'Cpanel::JSON::XS' if eval { require Cpanel::JSON::XS; 1 };
+    die "Unable to load a suitable JSON module: $@" if !eval { require JSON::PP; 1 };
+    'JSON::PP'
 }
 
 1;

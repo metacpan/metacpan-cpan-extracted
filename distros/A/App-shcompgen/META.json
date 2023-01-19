@@ -40,7 +40,7 @@
             "Complete::Util" : "0.608",
             "Complete::Zsh::Gen::FromGetoptLongDescriptive" : "0",
             "Complete::Zsh::Gen::FromPerinciCmdLine" : "0",
-            "Data::Dmp" : "0.241",
+            "Data::Dmp" : "0.242",
             "Data::Sah::Compiler::perl::TH::array" : "0.911",
             "Data::Sah::Compiler::perl::TH::bool" : "0.911",
             "Data::Sah::Compiler::perl::TH::str" : "0.911",
@@ -76,7 +76,7 @@
    "provides" : {
       "App::shcompgen" : {
          "file" : "lib/App/shcompgen.pm",
-         "version" : "0.324"
+         "version" : "0.325"
       }
    },
    "release_status" : "stable",
@@ -91,7 +91,7 @@
          "web" : "https://github.com/perlancar/perl-App-shcompgen"
       }
    },
-   "version" : "0.324",
+   "version" : "0.325",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

@@ -58,7 +58,8 @@
       },
       "test" : {
          "recommends" : {
-            "Regexp::Pattern::License" : "v3.9.0"
+            "Regexp::Pattern::License" : "v3.9.0",
+            "String::Copyright" : "0.003009"
          },
          "requires" : {
             "Encode" : "0",
@@ -72,7 +73,7 @@
    "provides" : {
       "App::Licensecheck" : {
          "file" : "lib/App/Licensecheck.pm",
-         "version" : "v3.3.7"
+         "version" : "v3.3.8"
       }
    },
    "release_status" : "stable",
@@ -90,13 +91,13 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/App-Licensecheck/project"
    },
-   "version" : "v3.3.7",
+   "version" : "v3.3.8",
    "x_contributors" : [
       "Paul Wise <pabs@debian.org>"
    ],
    "x_help_wanted" : [
-      "tester",
-      "documenter"
+      "documenter",
+      "tester"
    ],
    "x_provides_scripts" : {
       "licensecheck" : {

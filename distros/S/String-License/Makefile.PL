@@ -36,17 +36,17 @@ my $meta = {
                             recommends => {
                                             "File::BaseDir" => 0,
                                             "Regexp::Pattern::License" => "v3.9.0",
-                                            "Software::LicenseUtils" => 0.103014,
+                                            "Software::LicenseUtils" => 0.104002,
                                             "YAML::XS" => 0,
                                           },
                             requires   => { "Test2::V0" => "0.000060", "Test::Without::Module" => 0 },
                           },
                         },
   "provides"         => {
-                          "String::License"                 => { file => "lib/String/License.pm", version => "v0.0.3" },
-                          "String::License::Naming"         => { file => "lib/String/License/Naming.pm", version => "v0.0.3" },
-                          "String::License::Naming::Custom" => { file => "lib/String/License/Naming/Custom.pm", version => "v0.0.3" },
-                          "String::License::Naming::SPDX"   => { file => "lib/String/License/Naming/SPDX.pm", version => "v0.0.3" },
+                          "String::License"                 => { file => "lib/String/License.pm", version => "v0.0.4" },
+                          "String::License::Naming"         => { file => "lib/String/License/Naming.pm", version => "v0.0.4" },
+                          "String::License::Naming::Custom" => { file => "lib/String/License/Naming/Custom.pm", version => "v0.0.4" },
+                          "String::License::Naming::SPDX"   => { file => "lib/String/License/Naming/SPDX.pm", version => "v0.0.4" },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -61,7 +61,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/String-License/project",
                         },
-  "version"          => "v0.0.3",
+  "version"          => "v0.0.4",
   "x_help_wanted"    => ["documenter", "tester"],
   "x_static_install" => 1,
 };

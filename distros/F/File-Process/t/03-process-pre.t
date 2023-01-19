@@ -3,11 +3,7 @@ use warnings;
 
 use Data::Dumper;
 use Text::CSV_XS;
-use ReadonlyX;
 use Test::More tests => 4;
-
-Readonly my $TRUE  => 1;
-Readonly my $EMPTY => q{};
 
 use_ok('File::Process');
 
@@ -21,8 +17,8 @@ my $csv = Text::CSV_XS->new;
 my ($csv_lines) = process_file(
   $fh,
   csv         => $csv,
-  chomp       => $TRUE,
-  has_headers => $TRUE,
+  chomp       => 1,
+  has_headers => 1,
   pre         => sub {
     my ( $csv_fh, $args ) = @_;
 

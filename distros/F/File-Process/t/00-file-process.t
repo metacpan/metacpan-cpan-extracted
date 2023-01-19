@@ -2,10 +2,7 @@ use strict;
 use warnings;
 
 use Test::More tests => 2;
-use ReadonlyX;
 use Data::Dumper;
-
-Readonly my $TRUE => 1;
 
 use_ok('File::Process');
 
@@ -13,12 +10,14 @@ my $fh = *DATA;
 
 my ( $lines, %args ) = process_file(
   $fh,
-  chomp     => $TRUE,
-  keep_open => $TRUE,
+  chomp     => 1,
+  keep_open => 1,
 );
 
 ok( @{$lines} == 6, 'read all lines' )
   or diag( Dumper [$lines] );
+
+1;
 
 __DATA__
 # comment

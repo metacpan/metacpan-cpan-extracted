@@ -15,10 +15,10 @@ name: Proch-N50
 provides:
   Proch::N50:
     file: lib/Proch/N50.pm
-    version: v1.5.5
+    version: v1.5.6
   Proch::Seqfu:
     file: lib/Proch/Seqfu.pm
-    version: v1.5.5
+    version: v1.5.6
 requires:
   FASTX::Reader: v1.8.0
   Getopt::Long: '2.39'
@@ -30,5 +30,5 @@ requires:
 resources:
   homepage: https://metacpan.org/release/Proch-N50
   repository: https://github.com/telatin/proch-n50.git
-version: 1.5.5
+version: 1.5.6
 x_serialization_backend: 'YAML::Tiny version 1.70'

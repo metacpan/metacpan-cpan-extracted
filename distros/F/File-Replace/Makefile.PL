@@ -6,33 +6,15 @@ WriteMakefile(
 	AUTHOR         => 'Hauke D <haukex@zero-g.net>',
 	LICENSE        => 'gpl_3',
 	VERSION_FROM   => 'lib/File/Replace.pm', # finds $VERSION
-	ABSTRACT_FROM  => 'lib/File/Replace.pm',
+	ABSTRACT_FROM  => 'lib/File/Replace.pod',
 	MIN_PERL_VERSION => '5.8.1',
 	META_MERGE     => {
 		'meta-spec'  => { version => 2 },
 		provides     => {
 			'File::Replace' => {
 				file    => 'lib/File/Replace.pm',
-				version => '0.14',
+				version => '0.16',
 			},
-			'File::Replace::Inplace' => {
-				file    => 'lib/File/Replace/Inplace.pm',
-				version => '0.14',
-			},
-			'Tie::Handle::Base' => {
-				file    => 'lib/Tie/Handle/Base.pm',
-				version => '0.14',
-			},
-			'Tie::Handle::Argv' => {
-				file    => 'lib/Tie/Handle/Argv.pm',
-				version => '0.14',
-			},
-		},
-		no_index     => {
-			file      => [
-					'lib/File/Replace/DualHandle.pm',
-					'lib/File/Replace/SingleHandle.pm',
-				],
 		},
 		resources    => {
 			homepage    => 'https://bitbucket.org/haukex/file-replace',
@@ -51,6 +33,7 @@ WriteMakefile(
 				recommends => { # "strongly encouraged and should be satisfied except in resource constrained environments"
 				},
 				suggests   => { # "optional, but are suggested for enhanced operation"
+					'File::Replace::Fancy' => '0.16',
 				},
 			},
 		},
@@ -75,7 +58,7 @@ WriteMakefile(
 	},
 	TEST_REQUIRES  => {
 		# CPAN
-		'IPC::Run3::Shell'       => '0.56',
+		'Tie::Handle::Base'      => '0.16',
 		# Perl core modules
 		'Encode'                 => 0,
 		'Test::More'             => '1.302096',
@@ -84,11 +67,3 @@ WriteMakefile(
 		# note I haven't included modules needed for author tests here
 	},
 );
-sub MY::postamble {
-	return <<'MAKE_FRAG';
-.PHONY: authorcover
-authorcover: test
-	cpanm Devel::Cover
-	cover -test -coverage default,-pod
-MAKE_FRAG
-}

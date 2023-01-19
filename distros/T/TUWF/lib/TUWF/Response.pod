@@ -69,6 +69,11 @@ A UNIX timestamp indicating when this cookie should expire. A value before the
 current C<time()> means the cookie should be immediately removed, which is
 equivalent to setting I<value> to undef.
 
+=item maxage
+
+Number of seconds until the cookie expires. May be used instead of or together
+with C<expires>. Older browsers do not support this option.
+
 =item domain
 
 The domain name for which this cookie should be used.
@@ -87,7 +92,16 @@ will only be present if the client is connected through HTTPS.
 Set to true to only allow the cookie to be read using HTTP. That is, disallow
 the cookie to be used within Javascript.
 
+=item samesite
+
+Set to C<'Strict'> or C<'Lax'> to prevent this cookie to be included in
+requests originating from other domains, as a measure against CSRF attacks. Set
+to C<'None'> to disable such protections.
+
 =back
+
+For more information about the meaning and interpretation of those options, see
+L<the MDN documentation|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie>.
 
 It is possible to set defaults for these options with the
 L<cookie_defaults|TUWF/cookie_defaults> setting.
@@ -178,12 +192,15 @@ you had to set these B<after> calling C<resRedirect()>. In TUWF versions after
 Sets the content type to C<application/json> and sends the encoded JSON object
 to the client.
 
-=head2 resBinary(data)
+=head2 resBinary(data, buffer_action)
 
-Send binary data to the client. This method throws away any data currently
-written to the buffer. This method also disables output compression to prevent
-additional copies of the data. Make sure to set the right content type as well,
-for example:
+Send raw/binary data to the client. This method throws away any data currently
+written to the buffer. The optional I<buffer_action> argument is passed to
+C<resBuffer()> and can be used to control output compression. C<'none'> is
+assumed when absent. This method can prevent additional copies of the data when
+output compression is disabled.
+
+Make sure to set the right content type as well, for example:
 
   tuwf->resHeader('Content-Type' => 'image/jpeg');
   tuwf->resBinary($image_data);
@@ -218,9 +235,9 @@ change much:
 
   tuwf->resHeader('Cache-Control' => 'max-age=31536000');
 
-C<resFile()> uses C<resBinary()> internally, so output compression will be
-disabled for these files. Furthermore, this method is not really suitable for
-sending large files, as the entire files contents will be copied into RAM.
+C<resFile()> uses C<resBinary()> internally, output compression is only enabled
+if the file's mime type starts with C<text>. This method is not really suitable
+for sending large files, as the entire files contents will be copied into RAM.
 Range requests, I<If-Modified-Since>, I<ETag> and such are also not supported.
 If any of this is a concern, it's recommended to configure your webserver to
 serve static files directly - without involvement of TUWF.

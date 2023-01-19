@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,34 +15,34 @@ name: TUWF
 provides:
   TUWF:
     file: lib/TUWF.pm
-    version: '1.4'
+    version: '1.5'
   TUWF::DB:
     file: lib/TUWF/DB.pm
-    version: '1.4'
+    version: '1.5'
   TUWF::Exception:
     file: lib/TUWF.pm
   TUWF::Misc:
     file: lib/TUWF/Misc.pm
-    version: '1.4'
+    version: '1.5'
   TUWF::Object:
     file: lib/TUWF.pm
   TUWF::Request:
     file: lib/TUWF/Request.pm
-    version: '1.4'
+    version: '1.5'
   TUWF::Response:
     file: lib/TUWF/Response.pm
-    version: '1.4'
+    version: '1.5'
   TUWF::Validate:
     file: lib/TUWF/Validate.pm
-    version: '1.4'
+    version: '1.5'
   TUWF::Validate::Interop:
     file: lib/TUWF/Validate/Interop.pm
-    version: '1.4'
+    version: '1.5'
   TUWF::Validate::Result:
     file: lib/TUWF/Validate.pm
   TUWF::XML:
     file: lib/TUWF/XML.pm
-    version: '1.4'
+    version: '1.5'
   TUWF::func:
     file: lib/TUWF.pm
   TUWF::http:
@@ -59,5 +59,5 @@ resources:
   homepage: https://dev.yorhel.nl/tuwf
   license: http://opensource.org/licenses/mit-license.php
   repository: https://code.blicky.net/yorhel/tuwf
-version: '1.4'
+version: '1.5'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

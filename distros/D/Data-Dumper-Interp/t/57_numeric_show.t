@@ -16,11 +16,9 @@ use Data::Dumper::Interp;
 use Scalar::Util qw(blessed);
 use Carp;
 
-# Various bugs in Math::BigRat et al break tests on some platforms.
-# In an attempt to avoid these troubles, require known-good versions
-use Math::BigInt 1.999837 ();
-use Math::BigFloat 1.999837 ();
-use Math::BigRat 0.2624 ();
+use Math::BigInt;
+use Math::BigFloat;
+use Math::BigRat;
 require Data::Dumper;
 for my $modname (qw/Data::Dumper Math::BigInt Math::BigFloat Math::BigRat/) {
   (my $modpath = "${modname}.pm") =~ s/::/\//g;
@@ -32,14 +30,17 @@ my $inf = 9**9**9;
 my $nan = -sin($inf);
 my $minf = -$inf;
 
+sub show_empty_string($) {
+  $_[0] eq "" ? "<empty string>" : $_[0]
+}
+
 sub fmt($) {
   my $value = shift;
   return "undef" unless defined($value);
-  my $pfx = blessed($value) ? "(".blessed($value).")" : "";
-  if (defined($value) && $value eq "") {
-    return $pfx . "\"${value}\"";
+  if (my $class = blessed($value)) {
+    return "($class)".show_empty_string($value.""); # let it stringify
   } else {
-    return $pfx . u($value)
+    return Data::Dumper::Interp::_dbvis($value);
   }
 }
 
@@ -51,7 +52,8 @@ sub check_numeric($$) { # calls ok(...)
   my $desc = ($expected ? "":"non-")."numeric ".fmt($value);
   my $ok = (!!$san == !!$expected);
   if (!$ok) {
-    my @msgs = ("Failing test, got ".u($san)." expecting ".u($expected)."\n",
+    my $lno = (caller)[2];
+    my @msgs = ("----- Failing test at line $lno, got ".u($san)." expecting ".u($expected)."\n",
                 "Dump of value:".Data::Dumper::Interp::_dbvis($value)."\n",
                 "Repeating with Debug enabled...\n");
     my $san2 = do{ 

@@ -57,6 +57,7 @@ $regex = rc_pattern($pattern) if (not defined $opt_stranded);
 
 for my $file (@ARGV) {
 	my $seq_filename = $file;
+	
 
 
 	vprint(" - Processing \"$file\"");
@@ -64,6 +65,7 @@ for my $file (@ARGV) {
 		$seq_filename = '{{STDIN}}';
 		$file = 'stream'
 	}
+	my $filename_string = (scalar @ARGV > 1) ? "filename=$file;" : "";
 	my $reader = FASTX::Reader->new({ filename => "$seq_filename" });
 
 	# Prepare {b} or {B}
@@ -103,8 +105,8 @@ for my $file (@ARGV) {
 						}
 					}
 
-					$annotation = "$opt_comment_separator#matches=$matches;";
-					$annotation .= "for=$pattern:$for;rev=$rc:$rev" if not defined $opt_stranded;
+					$annotation = "${opt_comment_separator}#${filename_string}matches=${matches};";
+					$annotation .= "for=${pattern}:${for};rev=${rc}:${rev}" if not defined $opt_stranded;
 				}
 			}
 		}
@@ -189,7 +191,7 @@ fu-grep - Extract sequences using patterns
 
 =head1 VERSION
 
-version 1.5.5
+version 1.5.6
 
 =head1 USAGE
 
@@ -201,7 +203,9 @@ version 1.5.5
 
 =item C<-a>, C<--annotate>
 
-Add comments to the sequence when match is found
+Add comments to the sequence when match is found.
+This includes the number of matches (total, forward and reverse)
+and the file the sequence was found when more than one is parsed.
 
 =item C<n>, C<--name>
 

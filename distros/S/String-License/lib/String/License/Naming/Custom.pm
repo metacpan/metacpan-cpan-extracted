@@ -10,7 +10,7 @@ String::License::Naming - names of licenses and license naming schemes
 
 =head1 VERSION
 
-Version v0.0.3
+Version v0.0.4
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,7 @@ or as fallback by an internal name.
 
 =cut
 
-package String::License::Naming::Custom v0.0.3;
+package String::License::Naming::Custom v0.0.4;
 
 use Carp            qw(croak);
 use Log::Any        ();

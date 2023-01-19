@@ -1,0 +1,52 @@
+---
+abstract: 'Perl extension that extends the File::Replace module'
+author:
+  - 'Hauke D <haukex@zero-g.net>'
+build_requires:
+  Encode: '0'
+  ExtUtils::MakeMaker: '0'
+  File::stat: '0'
+  FindBin: '0'
+  Test::More: '1.302096'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Replace-Fancy
+no_index:
+  directory:
+    - t
+    - inc
+  file:
+    - lib/File/Replace/DualHandle.pm
+    - lib/File/Replace/SingleHandle.pm
+provides:
+  File::Replace::Fancy:
+    file: lib/File/Replace/Fancy.pm
+    version: '0.16'
+recommends: {}
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Replace: '0.16'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  Hash::Util: '0'
+  IO::Handle: '0'
+  Scalar::Util: '0'
+  Tie::Handle::Base: '0.16'
+  perl: '5.008001'
+  warnings::register: '0'
+resources:
+  bugtracker: https://bitbucket.org/haukex/file-replace-fancy/issues
+  homepage: https://bitbucket.org/haukex/file-replace-fancy
+  repository: https://bitbucket.org/haukex/file-replace-fancy.git
+version: '0.16'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -141,11 +141,13 @@ I<page>, a number indicating the currently requested page, counting from 1.
 This method automatically adds a C<LIMIT> and C<OFFSET> to the end of the
 query, so these should be omitted from the I<query> argument.
 
-This method returns two values: the first value identical to the return value
-of C<dbAll()> with the proper C<LIMIT> and C<OFFSET> clauses. The second value
-is either 0 or 1, and indicates whether there are more rows. That is, if the
-second value is true, calling the this method with the same arguments but with
-the I<page> option increased with one will return at least one more row.
+In scalar context, this method returns an arrayref of hashrefs, the same as
+C<dbAll()> except with the proper C<LIMIT> and C<OFFSET> clauses applied. In
+array context, this method returns two values: the first value is the arrayref,
+the second value is either 0 or 1, indicating whether there are more rows.
+That is, if the second value is true, calling the this method with the same
+arguments but with the I<page> option increased with one will return at least
+one more row.
 
   my($rows, $nextpage) = tuwf->dbPage(
     {page => 2, results => 10},

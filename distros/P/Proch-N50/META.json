@@ -43,11 +43,11 @@
    "provides" : {
       "Proch::N50" : {
          "file" : "lib/Proch/N50.pm",
-         "version" : "v1.5.5"
+         "version" : "v1.5.6"
       },
       "Proch::Seqfu" : {
          "file" : "lib/Proch/Seqfu.pm",
-         "version" : "v1.5.5"
+         "version" : "v1.5.6"
       }
    },
    "release_status" : "stable",
@@ -57,7 +57,7 @@
          "url" : "https://github.com/telatin/proch-n50.git"
       }
    },
-   "version" : "1.5.5",
+   "version" : "1.5.6",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

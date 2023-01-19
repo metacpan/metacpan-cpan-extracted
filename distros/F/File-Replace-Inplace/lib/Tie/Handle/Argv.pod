@@ -1,0 +1,245 @@
+
+=head1 Name
+
+Tie::Handle::Argv - A base class for tying Perl's magic ARGV handle
+
+=head1 Synopsis
+
+=for comment
+REMEMBER to keep these examples in sync with 91_author_pod.t
+
+ package Tie::Handle::MyDebugArgv;
+ use parent 'Tie::Handle::Argv';
+ sub OPEN {
+     my $self = shift;
+     print STDERR "Debug: Open '@_'\n";
+     return $self->SUPER::OPEN(@_);
+ }
+
+Then use your custom tied handle:
+
+ tie *ARGV, 'Tie::Handle::MyDebugArgv';
+ while (<>) {
+     chomp;
+     print "<$_>\n";
+ }
+ untie *ARGV;
+
+=head1 Description
+
+This is a base class for tied filehandles that reproduces the behavior
+of Perl's C<ARGV> filehandle, more commonly known as the magic C<< <> >>
+C<readline> operator. By itself, this class attempts to reproduce the
+behavior of the magical C<ARGV> and its associated variables (C<$ARGV>,
+C<@ARGV>, and C<$.>) as faithfully as possible.
+
+B<This documentation is somewhat sparse>, because I assume that if you
+want to subclass this class, you will probably have to look at its code
+anyway. I will expand on it as necessary (patches and suggestions welcome).
+
+=head2 Experimental Status of this Module
+
+**Warning:** As of 0.16, this module was split out of the distribution of
+L<File::Replace|File::Replace> because a C<tie>d C<ARGV> has proven to be
+very difficult to reliably test due to small changes in Perl's behavior
+across various Perl versions. For this reason, unfortunately, it may or
+may not work reliably on your system, independently of whether the test
+suite passes or not, and so I have had to declare this module
+**experimental**. Use at your own risk.
+
+=head2 Constructor
+
+The constructor C<TIEHANDLE> takes several optional arguments as key/value
+pairs:
+
+=over
+
+=item C<files>
+
+If you set this to an array reference, that array will be used instead of
+the default global C<@ARGV>.
+
+=item C<filename>
+
+If you set this to a reference to a scalar, then that scalar will be
+populated with the current filename instead of the default global C<$ARGV>.
+
+=item C<debug>
+
+Described in L</Debugging>; set this to either a true value or a reference
+to a filehandle to enable debugging.
+
+=back
+
+=head2 Subclassing
+
+You should first study L<Tie::Handle::Base>, of which this class is a
+subclass. In particular, note that this class wraps an "inner handle",
+which is the underlying handle which is typically the "real" filehandle
+that is being read from (but could in theory itself be a tied handle -
+hint: see the C<set_inner_handle> method in L<Tie::Handle::Base>).
+
+There are several methods that have been abstracted out so that you may
+override their default behavior in subclasses, as follows. When overriding
+methods from this class, I<make sure> you first understand their behavior,
+and when you might need to call the superclass method.
+
+=over
+
+=item C<inner_close>
+
+Override this if you want to intercept a call to
+L<Tie::Handle::Base|Tie::Handle::Base>'s C<CLOSE> method.
+Takes no arguments and, like C<CLOSE>, should always return a scalar
+(typically true/false).
+
+=item C<inner_eof>
+
+Override this if you want to intercept a call to
+L<Tie::Handle::Base|Tie::Handle::Base>'s C<EOF> method.
+Takes zero or one arguments (see L<perltie>) and should always return
+a scalar (typically true/false).
+
+=item C<read_one_line>
+
+Override this if you want to intercept a call to
+L<Tie::Handle::Base|Tie::Handle::Base>'s C<READLINE> method.
+Will only ever be called in scalar context and therefore should read
+one line (as with Perl's C<readline>, the definition of "line" varies
+depending on the current setting of the input record separator C<$/>).
+Takes no arguments and should always return a scalar.
+
+=item C<init_empty_argv>
+
+This method is called when the magic C<ARGV> filehandle is read from the
+first time and C<@ARGV> is empty. If you want the read to succeed, this
+method needs to modify C<@ARGV> so that it is no longer empty.
+The default implementation is Perl's normal behavior, which is
+C<unshift @ARGV, '-';>.
+Takes no arguments and should return nothing ("C<return;>").
+
+=item C<advance_argv>
+
+This method should modify C<$ARGV> so that it contains the next filename
+to pass to the C<OPEN> method, and also return that filename.
+The default implementation is Perl's normal behavior, which is
+C<$ARGV = shift @ARGV;>.
+Takes no arguments and should always return a scalar (the filename).
+
+=item C<OPEN>
+
+You may override this method to modify its behavior. Make sure you understand
+its arguments and expected behavior - see L<Tie::Handle::Base/OPEN>
+and L<perltie>.
+
+=item C<sequence_end>
+
+Override this if you want to take action after the last file in C<@ARGV>
+has been closed.
+Takes no arguments and should return nothing ("C<return;>").
+
+=item Other methods: C<TIEHANDLE>, C<UNTIE>, C<DESTROY>
+
+You may override these methods if needed, making sure to call the
+superclass methods!
+
+=item B<Don't> override: C<READLINE>, C<CLOSE>, or C<EOF>
+
+These methods contain much of the logic of this class. I recommend using
+the hooks provided above instead. If you are missing a hook, please report
+the issue (with sample code and expected behavior) in the issue tracker.
+
+In particular, note the source code of C<CLOSE> in this class: This method
+is called when the user of the tied handle explicitly calls e.g.
+C<close ARGV;>, which should have the effect of resetting the line number
+counter C<$.>, whereas a C<close> operation that may occur when advancing
+to the next file in the sequence should not. This is why there is an internal
+C<_close> method to abstract out this behavior. If you do plan on overriding
+C<CLOSE>, then make sure you call the appropriate method in this class.
+
+=item Object Storage
+
+Subclasses may store whatever they like in this hashref, I<except> that keys
+beginning with two underscores (C<__>) are reserved for this base class
+and for L<Tie::Handle::Base|Tie::Handle::Base>.
+
+=back
+
+This documentation describes version 0.16 of this module.
+
+=head2 Warning About Perls Older Than v5.16 and Windows
+
+Perl versions before 5.12 did not support C<eof()> (with an empty parameter
+list) on tied handles. See also L<perltie/Tying FileHandles>
+and L<perl5120delta/Other potentially incompatible changes>.
+
+Also, Perl 5.14 had several regressions regarding, among other things,
+C<eof> on tied handles. See L<perl5160delta/Filehandle, last-accessed>.
+
+It is therefore B<strongly recommended> to use this module on Perl 5.16
+and up. On older versions, be aware of the aforementioned issues.
+
+In addition, there are some slight behavioral differences on Windows
+up to and including Perl 5.16, and not all features of this module can
+currently be tested on Windows, in particular in regards to opening anything
+other than regular files, such as C<STDIN> via the special filename F<->.
+
+=head2 Caveats and Known Differences to Perl's C<< <> >>
+
+=over
+
+=item *
+
+Perl's C<tie> mechanism currently does not allow a tied C<ARGV> to
+distinguish between a regular C<< <> >> operator and the newer double-diamond
+C<<< <<>> >>> operator (introduced in Perl 5.22), which uses the three-argument
+C<open>. When using this module, C<<< <<>> >>> will currently act the same
+as C<< <> >>.
+
+If a newer version of Perl is released which allows for tied filehandles
+to make use of C<<< <<>> >>>, this module can be updated correspondingly.
+(At the time of writing, all released versions of Perl, up to and including
+5.28, do not support special treatment of C<<< <<>> >>> on tied filehandles.)
+
+Note: On the other hand, this class can be used to change C<< <> >> to
+work like C<<< <<>> >>> even on older Perls, for instance:
+
+ package Tie::Handle::ThreeArgOpenArgv;
+ use parent 'Tie::Handle::Argv';
+ sub OPEN {
+     my $self = shift;
+     return $self->SUPER::OPEN('<',shift);
+ }
+
+=back
+
+=head2 Debugging
+
+This class contains a C<_debug> method that may be called by subclasses
+to provide debug output (when enabled). C<TIEHANDLE> takes an argument
+C<< debug => $debug >>, where C<$debug> is either a scalar with a true value,
+in which case debugging messages will be sent to C<STDERR>, or a reference
+to a filehandle, in which case debugging messages will be sent to that
+filehandle.
+
+=head1 Author, Copyright, and License
+
+Copyright (c) 2018-2023 Hauke Daempfling (haukex@zero-g.net)
+at the Leibniz Institute of Freshwater Ecology and Inland Fisheries (IGB),
+Berlin, Germany, L<http://www.igb-berlin.de/>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see L<http://www.gnu.org/licenses/>.
+
+=cut
+

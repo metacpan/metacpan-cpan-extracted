@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "Complete::Util" => "0.608",
     "Complete::Zsh::Gen::FromGetoptLongDescriptive" => 0,
     "Complete::Zsh::Gen::FromPerinciCmdLine" => 0,
-    "Data::Dmp" => "0.241",
+    "Data::Dmp" => "0.242",
     "Data::Sah::Compiler::perl::TH::array" => "0.911",
     "Data::Sah::Compiler::perl::TH::bool" => "0.911",
     "Data::Sah::Compiler::perl::TH::str" => "0.911",
@@ -55,7 +55,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.324",
+  "VERSION" => "0.325",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -70,7 +70,7 @@ my %FallbackPrereqs = (
   "Complete::Util" => "0.608",
   "Complete::Zsh::Gen::FromGetoptLongDescriptive" => 0,
   "Complete::Zsh::Gen::FromPerinciCmdLine" => 0,
-  "Data::Dmp" => "0.241",
+  "Data::Dmp" => "0.242",
   "Data::Sah::Compiler::perl::TH::array" => "0.911",
   "Data::Sah::Compiler::perl::TH::bool" => "0.911",
   "Data::Sah::Compiler::perl::TH::str" => "0.911",

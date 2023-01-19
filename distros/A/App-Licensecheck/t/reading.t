@@ -1,5 +1,6 @@
 use Test2::V0;
 use Test2::Require::Module 'Regexp::Pattern::License' => '3.9.0';
+use Test2::Require::Module 'String::Copyright'        => '0.003009';
 
 use Log::Any::Test;
 use Log::Any qw($log);

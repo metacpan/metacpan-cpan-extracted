@@ -10,9 +10,9 @@ use Perinci::Object;
 use Perinci::Sub::Util qw(err);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-11'; # DATE
+our $DATE = '2022-10-07'; # DATE
 our $DIST = 'App-shcompgen'; # DIST
-our $VERSION = '0.324'; # VERSION
+our $VERSION = '0.325'; # VERSION
 
 our %SPEC;
 
@@ -255,7 +255,10 @@ sub _gen_completion_script {
     my $script;
     my @helper_scripts;
 
-    if (($detres->[3]{'func.completer_type'} // '') =~ /\AGetopt::Long(?:::EvenLess|::Descriptive)?\z/) {
+    if (($detres->[3]{'func.completer_type'} // '') =~ /\A(?:
+                                                            CLI::MetaUtil::Getopt::Long |
+                                                            Getopt::Long(?:::EvenLess|::Descriptive)?
+                                                        )\z/x) {
         require Data::Dmp;
 
         my $content;
@@ -628,6 +631,7 @@ sub _detect_prog {
                                   (
                                       Getopt::Std|
                                       Getopt::Long(?:::Complete|::Less|::EvenLess|::Subcommand|::More|::Descriptive)?|
+                                      CLI::MetaUtil::Getopt::Long(?::Complete)?|
                                       Perinci::CmdLine(?:::Any|::Lite|::Classic)
                               ))\b/x) {
                     return [200, "OK", 1, {
@@ -1156,7 +1160,7 @@ App::shcompgen - Generate shell completion scripts
 
 =head1 VERSION
 
-This document describes version 0.324 of App::shcompgen (from Perl distribution App-shcompgen), released on 2022-08-11.
+This document describes version 0.325 of App::shcompgen (from Perl distribution App-shcompgen), released on 2022-10-07.
 
 =head1 FUNCTIONS
 

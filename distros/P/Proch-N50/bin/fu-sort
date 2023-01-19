@@ -44,7 +44,7 @@ my %seqs = ();
 
 foreach my $file (@ARGV) {
 	debug("Reading $file");
-	$file = undef if ($file eq '-');
+	$file = "{{STDIN}}" if ($file eq '-');
 	my $FASTX = FASTX::Reader->new({ filename => "$file" });
   while (my $seq = $FASTX->getRead() ) {
 	    my $len = length($seq->{seq});
@@ -189,7 +189,7 @@ fu-sort - Sort sequences by size
 
 =head1 VERSION
 
-version 1.5.5
+version 1.5.6
 
 =head1 EXAMPLES
 

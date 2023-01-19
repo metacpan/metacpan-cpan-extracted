@@ -118,7 +118,7 @@ like it so please fix it!" fashion.
 Returns I<undef> if validation succeeded, an error object otherwise.
 
 An error object is a hashref containing at least one key: I<validation>, which
-indicates the name of the that validation failed. Additional keys with more
+indicates the name of the validation that failed. Additional keys with more
 detailed information may be present, depending on the validation. These are
 documented in L</SCHEMA DEFINITION> below.
 
@@ -173,6 +173,18 @@ Default: true.
 =item default => $val
 
 The value to return if I<required> is false and the input is empty or undef.
+If C<$val> is a CODE reference, the subroutine will be called with the original
+input as first argument and its return value will be used for this validation.
+
+=item onerror => $val
+
+Instead of reporting an error, return C<$val> if this input fails validation
+for whatever reason. Setting this option in the top-level schema ensures that
+the validation will always succeed regardless of the input.
+
+If C<$val> is a CODE reference, the subroutine will be called with the result
+object for this validation as its first argument. The return value of the
+subroutine will be returned for this validation.
 
 =item rmwhitespace => 0/1
 
@@ -349,10 +361,10 @@ On success, the subroutine should return a true value. On failure, it should
 return either a false value or a hashref. The hashref will have the
 I<validation> key set to I<func>, and this will be returned as error object.
 
-(Note that, when I<func> is used inside a custom validation, the returned error
-object will have its I<validation> field set to the name of the custom
-validation. This makes custom validations to behave as first-class validations
-in terms of error reporting).
+When I<func> is used inside a custom validation, the returned error object will
+have its I<validation> field set to the name of the custom validation. This
+makes custom validations to behave as first-class validations in terms of error
+reporting.
 
 
 =back
@@ -397,6 +409,12 @@ C<[$minlength,$maxlength]>.
 
 Accept any value of any type as input, and normalize it to either a C<0> or a
 C<1> according to Perl's idea of truth.
+
+=item undefbool => 1
+
+Like C<anybool>, but missing or empty values are normalized to C<undef>. All
+other values are normalized to either C<0> or C<1> according to Perl's idea of
+truth.
 
 =item jsonbool => 1
 

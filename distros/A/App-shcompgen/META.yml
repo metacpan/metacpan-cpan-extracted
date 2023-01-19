@@ -19,7 +19,7 @@ name: App-shcompgen
 provides:
   App::shcompgen:
     file: lib/App/shcompgen.pm
-    version: '0.324'
+    version: '0.325'
 requires:
   Complete::File: '0.440'
   Complete::Fish::Gen::FromGetoptLongDescriptive: '0'
@@ -28,7 +28,7 @@ requires:
   Complete::Util: '0.608'
   Complete::Zsh::Gen::FromGetoptLongDescriptive: '0'
   Complete::Zsh::Gen::FromPerinciCmdLine: '0'
-  Data::Dmp: '0.241'
+  Data::Dmp: '0.242'
   Data::Sah::Compiler::perl::TH::array: '0.911'
   Data::Sah::Compiler::perl::TH::bool: '0.911'
   Data::Sah::Compiler::perl::TH::str: '0.911'
@@ -54,7 +54,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-shcompgen
   homepage: https://metacpan.org/release/App-shcompgen
   repository: git://github.com/perlancar/perl-App-shcompgen.git
-version: '0.324'
+version: '0.325'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

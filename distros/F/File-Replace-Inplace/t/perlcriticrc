@@ -1,0 +1,16 @@
+
+severity = 3
+verbose = 9
+
+[ErrorHandling::RequireCarping]
+severity = 4
+
+[RegularExpressions::RequireExtendedFormatting]
+severity = 2
+
+[Variables::ProhibitReusedNames]
+severity = 4
+
+[Modules::ProhibitExcessMainComplexity]
+severity = 2
+

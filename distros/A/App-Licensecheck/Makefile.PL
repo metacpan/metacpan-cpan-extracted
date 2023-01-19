@@ -42,7 +42,10 @@ my $meta = {
                               },
                             },
                             test => {
-                              recommends => { "Regexp::Pattern::License" => "v3.9.0" },
+                              recommends => {
+                                              "Regexp::Pattern::License" => "v3.9.0",
+                                              "String::Copyright"        => 0.003009,
+                                            },
                               requires   => {
                                               "Encode" => 0,
                                               "Encode::Locale" => 0,
@@ -53,7 +56,7 @@ my $meta = {
                             },
                           },
   "provides"           => {
-                            "App::Licensecheck" => { file => "lib/App/Licensecheck.pm", version => "v3.3.7" },
+                            "App::Licensecheck" => { file => "lib/App/Licensecheck.pm", version => "v3.3.8" },
                           },
   "release_status"     => "stable",
   "resources"          => {
@@ -68,9 +71,9 @@ my $meta = {
                                             },
                             x_identifier => "http://purl.org/NET/cpan-uri/dist/App-Licensecheck/project",
                           },
-  "version"            => "v3.3.7",
+  "version"            => "v3.3.8",
   "x_contributors"     => ["Paul Wise <pabs\@debian.org>"],
-  "x_help_wanted"      => ["tester", "documenter"],
+  "x_help_wanted"      => ["documenter", "tester"],
   "x_provides_scripts" => { licensecheck => { file => "bin/licensecheck" } },
 };
 

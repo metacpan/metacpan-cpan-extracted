@@ -1,6 +1,6 @@
 # -*-Perl-*-
 
-# Copyright (c) 1996-2021   Michael Peppler
+# Copyright (c) 1996-2023   Michael Peppler
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -24,7 +24,7 @@
 
   $hostname  = Sys::Hostname::hostname();
   $init_done = 0;
-  $VERSION   = '1.20';
+  $VERSION   = '1.21';
   
   require_version DBI 1.30;
 
@@ -136,6 +136,16 @@
       or return undef;
 
     $sth;
+  }
+
+  # prepare_cached doesn't really work correctly with Sybase, given that you can't easily have
+  # more than one active statement handle for a given database handle.
+  # You only get the advantage of not having to re-parse/compile
+  # the statement *if* you have placeholders in the statement. 
+  # In other cases the driver will attempt to open a new connection if more than one statement handle is needed
+  # which will cause things like transactions to behave incorrectly.
+  sub prepare_cached {
+    return prepare(@_);
   }
 
   sub tables {
@@ -1529,6 +1539,20 @@ is B<NOT> supported. This is to avoid various deadlock problems that
 can crop up in this situation, and because you will not get real transactional
 integrity using multiple statement handles simultaneously as these in 
 reality refer to different physical connections.
+
+=head2 prepare_cached
+
+DBD::Sybase maps B<prepare_cached()> to B<prepare()> to avoid possible issues with 
+having a statement handle being kept active outside of the driver's control.
+
+DBD::Sybase (and the underlying TDS protocol) doesn't easily support having more than one active
+SQL statement on a given connection (database handle). Caching a statement handle is only useful if
+it can be reused without reparsing and recompiling it, which is only possible with Sybase if
+you use ?-style placeholders (see below).
+
+In addition, as DBD::Sybase will attempt to emulate the ability to have more than one active
+SQL statement on a database handle by opening addition connections this has significant side
+effects on transaction management. See also the B<syb_no_child_con> attribute.
 
 
 =head1 Working with IMAGE and TEXT columns

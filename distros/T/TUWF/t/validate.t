@@ -15,7 +15,12 @@ my %validations = (
   hex => { regex => qr/^[0-9a-f]*$/i },
   prefix => sub { my $p = shift; { func => sub { $_[0] =~ /^$p/ } } },
   bool => { required => 0, default => 0, func => sub { $_[0] = $_[0]?1:0; 1 } },
+  setundef => { func => sub { $_[0] = undef; 1 } },
+  defaultsub1 => { default => sub { 2 } },
+  defaultsub2 => { default => sub { defined $_[0] } },
+  onerrorsub => { onerror => sub { ref $_[0] } },
   collapsews => { rmwhitespace => 0, func => sub { $_[0] =~ s/\s+/ /g; 1 } },
+  neverfails => { onerror => 'err' },
   revnum => { type => 'array', sort => sub { $_[1] <=> $_[0] } },
   uniquelength => { type => 'array', values => { type => 'array' }, unique => sub { scalar @{$_[0]} } },
   person => {
@@ -61,6 +66,10 @@ t {}, undef, undef, { validation => 'required' };
 t { required => 0 }, undef, undef, undef;
 t { required => 0 }, '', '', undef;
 t { required => 0, default => '' }, undef, '', undef;
+t { required => 0, defaultsub1 => 1 }, undef, 2, undef;
+t { required => 0, defaultsub2 => 1 }, undef, '', undef;
+t { required => 0, defaultsub2 => 1 }, '', 1, undef;
+t { onerrorsub => 1 }, undef, 'TUWF::Validate::Result', undef;
 
 # rmwhitespace
 t {}, " Va\rl id \n ", 'Val id', undef;
@@ -85,6 +94,8 @@ t { type => 'array', unique => 1 }, [qw/3 1 2/], [qw/3 1 2/], undef;
 t { type => 'array', unique => 1 }, [qw/3 1 3/], [qw/3 1 3/], { validation => 'unique', index_a => 0, value_a => 3, index_b => 2, value_b => 3, key => 3 };
 t { uniquelength => 1 }, [[],[1],[1,2]], [[],[1],[1,2]], undef;
 t { uniquelength => 1 }, [[],[1],[2]], [[],[1],[2]], { validation => 'unique', index_a => 1, value_a => [1], index_b => 2, value_b => [2], key => 1 };
+t { type => 'array', setundef => 1 }, [], undef, undef;
+t { type => 'array', values => { type => 'any', setundef => 1 } }, [[]], [undef], undef;
 
 # hashes
 t { type => 'hash' }, [], [], { validation => 'type', expected => 'hash', got => 'array' };
@@ -97,6 +108,8 @@ t { type => 'hash', keys => { a=>{} } }, {a=>' a '}, {a=>'a'}, undef; # Test aga
 t { type => 'hash', keys => { a=>{} }, unknown => 'remove' }, { a=>1,b=>1 }, { a=>1 }, undef;
 t { type => 'hash', keys => { a=>{} }, unknown => 'reject' }, { a=>1,b=>1 }, { a=>1,b=>1 }, { validation => 'unknown', keys => ['b'], expected => ['a'] };
 t { type => 'hash', keys => { a=>{} }, unknown => 'accept' }, { a=>1,b=>1 }, { a=>1,b=>1 }, undef;
+t { type => 'hash', setundef => 1 }, {}, undef, undef;
+t { type => 'hash', unknown => 'reject', keys => { a=>{ type => 'any', setundef => 1}} }, {a=>[]}, {a=>undef}, undef;
 
 # default validations
 t { minlength => 3 }, 'ab', 'ab', { validation => 'minlength', expected => 3, got => 2 };
@@ -159,6 +172,9 @@ t { person => 1, keys => {extra => {}} }, {name => 'x', extra => 1}, { name => '
 t { person => 1, keys => {extra => {}} }, {name => 'x', extra => ''}, { name => 'x', extra => '' }, { validation => 'keys', errors => [{ key => 'extra', validation => 'required' }] };
 t { person => 1 }, {name => 'x', extra => 1}, {name => 'x', extra => 1}, undef;
 t { person => 1, unknown => 'remove' }, {name => 'x', extra => 1}, {name => 'x'}, undef;
+t { neverfails => 1, int => 1 }, undef, 'err', undef;
+t { neverfails => 1, int => 1 }, 'x', 'err', undef;
+t { neverfails => 1, int => 1, onerror => undef }, 'x', undef, undef; # XXX: no way to 'unset' an inherited onerror clause, hmm.
 
 # numbers
 sub nerr { +{ validation => 'num', got => $_[0] } }
@@ -200,10 +216,10 @@ t { email => 1 }, $_->[1], $_->[1], $_->[0] ? undef : { validation => 'email', g
   [ 0, 'a @a.com' ],
   [ 0, 'a"@a.com' ],
   [ 0, 'a@[:]' ],
+  [ 0, 'a@127.0.0.1' ],
+  [ 0, 'a@[::1]' ],
   [ 1, 'a@a.com' ],
   [ 1, 'a@a.com.' ],
-  [ 1, 'a@127.0.0.1' ],
-  [ 1, 'a@[::1]' ],
   [ 1, 'é@yörhel.nl' ],
   [ 1, 'a+_0-c@yorhel.nl' ],
   [ 1, 'é@x-y_z.example' ],

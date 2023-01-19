@@ -1,3 +1,53 @@
+0.9682 2022-01-18
+  [New Feature]
+    * Added get_class_name in the SPVM::BlessedObject::Class.
+    * Added the AUTOLOAD method in the SPVM::BlessedObject::Class to call methods dinamically.
+  [Internal Compatible Changes]
+    * The runtime field in the SPVM::Builder::CC is renamed to the at_runtime field.
+    * The build_runtime method in the SPVM::Builder::CC is renamed to the build_at_runtime method.
+    * The module_dirs method in the SPVM::Builder save the field to its instance instead of the compiler object.
+    * Removed the get_error_messages, print_error_messages, compile methods in the SPVM::Builder.
+    * Removed the print_error_messages in the SPVM::Builder::Compiler.
+    * Removed the builder accessor method in the SPVM::Builder::CC class.
+    * Moved the create_build_src_path method in the SPVM::Builder class to SPVM::Builder::Util.
+    * Moved the create_build_include_path method in the SPVM::Builder class to SPVM::Builder::Util.
+    * Moved the create_build_object_path method in the SPVM::Builder class to SPVM::Builder::Util.
+    * Moved the create_build_lib_path method in the SPVM::Builder class to SPVM::Builder::Util.
+    * SPVM::Builder::CC doesn't depend on SPVM::Builder.
+    * Removed the builder method in the SPVM::Builder::CC.
+    * Removed the build_dir method in the SPVM::Builder::Exe.
+    * Removed the compiler accessor method in the SPVM::Builder.
+    * The compile method in the SPVM::Builder::Compiler returns the success flag instead of the runtime
+    * Added the build_runtime method in the SPVM::Builder::Compiler.
+    * Removed the dynamic_lib_files field in the SPVM::Builder.
+    * Initialization is done in the INIT block.
+  [Incompatible Changes]
+    * Removed the prepare Runtime Native API. This method is called in the build Runtime Native API automatically.
+    * Removed the following method in the SPVM::Builder::API class.
+      sub compile;
+      sub get_error_messages;
+      sub get_class_names;
+      sub get_method_names;
+      sub build_shared_lib_dist_precompile;
+      sub build_shared_lib_dist_native;
+    * "use SPVM()" occurs runtime error. "use SPVM(MyClass) or "use SPVM" is valid.
+    * SPVM::ExchangeAPI::call_method doesn't need the class name of the first argument.
+    * A object is blessed to SPVM::BlessedObject::Class always.
+    * Changed the arguments of the SPVM::ExchangeAPI::call_method function of the instance method call.
+      [Before]
+      SPVM::ExchangeAPI::call_method ($BOOT_ENV, $BOOT_STACK, $class_name, $method_name, $int_obj, @rest_args);
+      [After]
+      SPVM::ExchangeAPI::call_method ($BOOT_ENV, $BOOT_STACK, $int_obj, $method_name, @rest_args);
+      
+  [Bug Fix]
+    * Fixed the bug that segmentation fault occurs in the following codes.
+      use SPVM;
+
+      SPVM::get_memory_blocks_count();
+
+      my $obj_int = SPVM::ExchangeAPI::call_method(SPVM::GET_ENV(), SPVM::GET_STACK(), "Int", "new", 1);
+      my $value = $obj_int->value;
+
 0.9681 2022-01-13
   [New Features]
     * Added the following Compiler Native APIs.

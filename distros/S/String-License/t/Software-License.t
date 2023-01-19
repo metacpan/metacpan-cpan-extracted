@@ -1,6 +1,6 @@
 use Test2::V0;
 use Test2::Require::Module 'Regexp::Pattern::License' => '3.9.0';
-use Test2::Require::Module 'Software::LicenseUtils'   => '0.103014';
+use Test2::Require::Module 'Software::LicenseUtils'   => '0.104002';
 
 use Software::LicenseUtils;
 use Path::Tiny 0.053;
@@ -27,6 +27,7 @@ my %LICENSES = (
 	'GPL-1.0-only'         => 'GPL-1.0',
 	'GPL-2.0-only'         => 'GPL-2',
 	'GPL-3.0-only'         => 'GPL-3',
+	'ISC'                  => undef,
 	'LGPL-2.1'             => undef,
 	'LGPL-3.0'             => 'LGPL-3',
 	'MIT'                  => undef,
@@ -53,6 +54,7 @@ my %crufty = (
 	'GFDL-1.2-or-later and/or GFDL-1.3'       => 'GFDL-1.2-or-later',
 	'GPL-1.0'                                 => 'GPL',
 	'GPL-2'                                   => 'GPL',
+	'ISC'                                     => 'UNKNOWN',
 	'LGPL-3'                                  => 'UNKNOWN',
 	'MIT'                                     => 'UNKNOWN',
 	'MPL-1.0'                                 => 'UNKNOWN',
@@ -63,11 +65,6 @@ my %crufty = (
 	'SISSL'                                   => 'UNKNOWN',
 	'Zlib'                                    => 'UNKNOWN',
 );
-
-if ( Software::LicenseUtils->VERSION('0.104002') ) {
-	$LICENSES{ISC} = undef;
-	$crufty{ISC}   = 'UNKNOWN';
-}
 
 plan 0 + keys %LICENSES;
 

@@ -110,6 +110,20 @@ the control on where to (not) insert whitespace. Default: 0 (disabled).
 
 =back
 
+=head2 xml_string(%options, &func)
+
+Convenience function to construct an XML string using the functional interface
+without affecting an existing globally set I<default> object. The I<default>
+object will be set to a newly constructed TUWF::XML object only for the
+duration of C<&func>.  The given C<%options> are the same as listed for
+C<new()>, though only the I<pretty> option makes sense for this function.
+Example:
+
+    my $str = xml_string sub {
+        b class => 'hello', 'Hello!';
+    };
+    # $str is '<b class="hello">Hello!</b>'
+
 =head2 mkclass(%classes)
 
 Dynamically constructs a I<class> attribute, which can be passed to C<tag()>
@@ -127,6 +141,10 @@ This is convenient when the classes are dependant on other variables, e.g.:
   #  $is_hidden && $is_warning:    <div class="hidden warning">Text</div>
 
 Note that the order in which classes are returned may be somewhat random.
+The above example can also be written as follows:
+
+  tag 'div', '+class' => $is_hidden ? 'hidden' : undef,
+             '+class' => $is_warning ? 'warning' : undef, 'Text';
 
 =head2 xml_escape(string)
 
@@ -203,8 +221,11 @@ reference, the subroutine will be called in between the start tag and the
 closing tag.
 
 The tag name and attribute names are outputted as-is, after some very basic
-validation. The attribute values and contents are passed through
-C<xml_escape()>.
+validation. If the attribute value is C<undef>, the attribute is ignored. If
+the attribute name starts with a C<+> sign, then multiple attributes with the
+same name are concatenated together with a space.
+
+The attribute values and tag contents are passed through C<xml_escape()>.
 
 Some example function calls and their output:
 
@@ -233,6 +254,9 @@ Some example function calls and their output:
     tag 'a', href => '/', 'Home';
   };
   # <div><a href="/">Home</a></div>
+
+  tag 'span', '+class', 'strikethrough', '+class', undef, '+class', 'bold', 'text';
+  # <span class="strikethrough bold">text</span>
 
 =head2 end(name)
 
@@ -334,8 +358,8 @@ functions:
   h3 h4 h5 h6 head header hr i iframe img input ins kbd label legend li Link
   main Map mark meta meter nav noscript object ol optgroup option output p
   param pre progress Q rp rt ruby samp script section Select small source
-  span strong style Sub sup table tbody td textarea tfoot th thead Time title
-  Tr ul var video
+  span strong style Sub summary sup table tbody td textarea tfoot th thead Time
+  title Tr ul var video
 
 =item B<:Html> and B<:Html5>
 

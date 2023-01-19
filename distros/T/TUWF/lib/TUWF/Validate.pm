@@ -7,13 +7,14 @@ use Exporter 'import';
 use Scalar::Util 'blessed';
 
 our @EXPORT_OK = qw/compile validate/;
-our $VERSION = '1.4';
+our $VERSION = '1.5';
 
 
 # Unavailable as custom validation names
 my %builtin = map +($_,1), qw/
   type
   required default
+  onerror
   rmwhitespace
   values scalar sort unique
   keys unknown
@@ -48,7 +49,7 @@ my  $re_ip6       = qr/(?:[0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]
 my  $re_ip        = qr/(?:$re_ip4|$re_ip6)/;
 my  $re_domain    = qr/(?:$re_fqdn|$re_ip4|\[$re_ip6\])/;
 # Also used by the TUWF::Misc::kv_validate()
-our $re_email     = qr/^[-\+\.#\$=\w]+\@$re_domain$/;
+our $re_email     = qr/^[-\+\.#\$=\w]+\@$re_fqdn$/;
 our $re_weburl    = qr/^https?:\/\/$re_domain(?::[1-9][0-9]{0,5})?(?:\/[^\s<>"]*)$/;
 
 
@@ -71,6 +72,7 @@ our %default_validations = (
   length    => sub { _length($_[0], ref $_[0] eq 'ARRAY' ? @{$_[0]} : ($_[0], $_[0])) },
 
   anybool   => { type => 'any', required => 0, default => 0, func => sub { $_[0] = $_[0] ? 1 : 0; 1 } },
+  undefbool => { type => 'any', required => 0, default => undef, func => sub { $_[0] = $_[0] ? 1 : 0; 1 } },
   jsonbool  => { type => 'any', func => sub {
     my $r = $_[0];
     blessed $r && (
@@ -141,7 +143,8 @@ sub _compile {
       croak "Incompatible types, the schema specifies '$top{type}' but validation '$t->{name}' requires '$t->{schema}{type}'" if $schema->{type};
       croak "Incompatible types, '$t->[0]' requires '$t->{schema}{type}', but another validation requires '$top{type}'";
     }
-    exists $t->{schema}{$_} and $top{$_} //= delete $t->{schema}{$_} for qw/required default rmwhitespace type scalar unknown sort unique/;
+    exists $t->{schema}{$_} and !exists $top{$_} and $top{$_} = delete $t->{schema}{$_}
+        for qw/required default onerror rmwhitespace type scalar unknown sort unique/;
 
     push @keys, keys %{ delete $t->{known_keys} };
     push @keys, keys %{ $t->{schema}{keys} } if $t->{schema}{keys};
@@ -284,7 +287,7 @@ sub _validate_array {
 }
 
 
-sub _validate {
+sub _validate_input {
   my($c, $input) = @_;
 
   # rmwhitespace (needs to be done before the 'required' test)
@@ -297,7 +300,7 @@ sub _validate {
   # required & default
   if(!defined $input || (!ref $input && $input eq '')) {
     # XXX: This will return undef if !required and no default is set, even for hash and array types. Should those get an empty hash or array?
-    return [exists $c->{schema}{default} ? $c->{schema}{default} : $input] if !$c->{schema}{required};
+    return [ref $c->{schema}{default} eq 'CODE' ? $c->{schema}{default}->($input) : exists $c->{schema}{default} ? $c->{schema}{default} : $input] if !$c->{schema}{required};
     return [$input, { validation => 'required' }];
   }
 
@@ -308,15 +311,16 @@ sub _validate {
     return [$input, { validation => 'type', expected => 'hash', got => lc ref $input || 'scalar' }] if ref $input ne 'HASH';
 
     # unknown
+    # Each branch below makes a shallow copy of the hash, so that further
+    # validations can perform in-place modifications without affecting the
+    # input.
     if($c->{schema}{unknown} eq 'remove') {
       $input = { map +($_, $input->{$_}), grep $c->{known_keys}{$_}, keys %$input };
     } elsif($c->{schema}{unknown} eq 'reject') {
       my @err = grep !$c->{known_keys}{$_}, keys %$input;
       return [$input, { validation => 'unknown', keys => \@err, expected => [ sort keys %{$c->{known_keys}} ] }] if @err;
+      $input = { %$input };
     } else {
-      # Make a shallow copy of the hash, so that further validations can
-      # perform in-place modifications without affecting the input.
-      # (The other two if clauses above also ensure this)
       $input = { %$input };
     }
 
@@ -337,6 +341,13 @@ sub _validate {
   $input = $r->[0];
 
   _validate_array($c, $input);
+}
+
+
+sub _validate {
+  my($c, $input) = @_;
+  my $r = _validate_input($c, $input);
+  $r->[1] && exists $c->{schema}{onerror} ? [ref $c->{schema}{onerror} eq 'CODE' ? $c->{schema}{onerror}->(bless $r, 'TUWF::Validate::Result') : $c->{schema}{onerror}] : $r
 }
 
 

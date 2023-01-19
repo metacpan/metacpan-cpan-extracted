@@ -1,3 +1,6 @@
+1.5.6	2023-01-18
+	* Uniform support for "-" as Standard Input in accessory utilities
+	
 1.5.5	2023-01-11
 	* Fixing tests for non verbose continuous integration systems
 	* Testing fu-extract with a list file

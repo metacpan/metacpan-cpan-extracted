@@ -35,8 +35,6 @@
       "runtime" : {
          "requires" : {
             "IO::Scalar" : "2.111",
-            "JSON::PP" : "0",
-            "List::Util" : "1.29",
             "ReadonlyX" : "1.04",
             "Text::CSV_XS" : "0",
             "perl" : "5.010"
@@ -44,8 +42,6 @@
       },
       "test" : {
          "requires" : {
-            "JSON::PP" : "4.10",
-            "ReadonlyX" : "1.04",
             "Text::CSV_XS" : "1.48"
          }
       }
@@ -53,14 +49,14 @@
    "provides" : {
       "File::Process" : {
          "file" : "lib/File/Process.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "File::Process::Utils" : {
          "file" : "lib/File/Process/Utils.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.10"
 }

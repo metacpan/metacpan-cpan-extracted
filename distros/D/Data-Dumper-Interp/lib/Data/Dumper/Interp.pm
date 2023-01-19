@@ -19,7 +19,7 @@ use 5.020;
 use feature qw(say state lexical_subs);
 use feature 'lexical_subs'; no warnings "experimental::lexical_subs";
 package  Data::Dumper::Interp;
-$Data::Dumper::Interp::VERSION = '4.102';
+$Data::Dumper::Interp::VERSION = '4.103';
 
 package  # newline prevents Dist::Zilla::Plugin::PkgVersion from adding $VERSION
   DB;
@@ -40,6 +40,11 @@ use Regexp::Common qw/RE_balanced/;
 use Term::ReadKey ();
 use overload ();
 
+sub _dbshow(_) {  # for our internal debugging messages
+  my $v = shift;
+  blessed($v) ? "(".blessed($v).")".$v   # stringify with (classname) prefix
+              : _dbvis($v)               # number or "string"
+}
 sub _dbvis(_) {  # for our internal debugging messages
   chomp( my $s = Data::Dumper->new([shift])->Useqq(1)->Terse(1)->Indent(0)->Dump );
   $s
@@ -545,26 +550,27 @@ sub _show_as_number(_) {
   #   https://github.com/Perl/perl5/issues/20685
   #return 0 unless looks_like_number($value);
 
-  # JSON::PP uses these tricks.  We used to do similarly but no longer.
+  # JSON::PP uses these tricks:
   # string & "" -> ""  # bitstring AND, truncating to shortest operand
   # number & "" -> 0 (with warning)
   # number * 0 -> 0 unless number is nan or inf
 
-  # Attempt uniary & and see what happens
-  my $and_result = eval { 
+  # Attempt uniary & with "string" and see what happens
+  my $uand_str_result = eval { 
     use warnings "FATAL" => "all"; # Convert warnings into exceptions
     # 'bitwise' is the default only in newer perls. So disable.
     BEGIN {
-      eval { # no feature 'bitwise' won't compile on Perl 5.20
+      eval { # "no feature 'bitwise'" won't compile on Perl 5.20
         feature->unimport( 'bitwise' ); 
         warnings->unimport("experimental::bitwise");
       };
     }
     no warnings "once";
-    my $dummy = ($value & "");
+    # Use FF so we can see what $value was in debug messages below
+    my $dummy = ($value & "\x{FF}\x{FF}\x{FF}\x{FF}\x{FF}\x{FF}\x{FF}\x{FF}");
   };
   if ($@) {
-    if ($@ =~ /"" isn't numeric/) {
+    if ($@ =~ /".*" isn't numeric/) {
       return 1; # Ergo $value must be numeric
     }
     if ($@ =~ /\& not supported/) {
@@ -573,20 +579,37 @@ sub _show_as_number(_) {
       # for example BigRat.
       return 1 if defined blessed($value);
     } 
-    warn "### ".__PACKAGE__." : Unhandled warn/exception from unary &:\n $@"
+    warn "### ".__PACKAGE__." : value=",_dbshow($value),
+         "\n    Unhandled warn/exception from unary & :$@\n"
       if $Data::Dumper::Interp::Debug;
     # Unknown problem, treat as a string
     return 0;
   } 
-  elsif (ref($and_result) && $and_result =~ /NaN|Inf/) {
+  elsif (ref($uand_str_result) && $uand_str_result =~ /NaN|Inf/) {
     # unary & returned a an object representing Nan or Inf 
     # (e.g. Math::BigFloat) so $value must be numberish.
     return 1;
   }
-  else {
-    warn "### ".__PACKAGE__." : (value & \"\") succeeded so must be stringy\n"
+  warn "### ".__PACKAGE__." : (value & \"...\") succeeded\n",
+       "    value=", _dbshow($value), "\n",
+       "    uand_str_result=", _dbvis($uand_str_result),"\n"
+    if $Data::Dumper::Interp::Debug;
+  # Sigh.  With Perl 5.32 (at least) $value & "..." stringifies $value
+  # or so it seems.
+  if (blessed($value)) {
+    if (blessed($value + 42)) {
+      warn "    Object and value+42 is still an object, so probably numberish\n"
+        if $Data::Dumper::Interp::Debug;
+      return 1
+    } else {
+      warn "    Object and value+42 is NOT an object, so it must be stringish\n"
+        if $Data::Dumper::Interp::Debug;
+      return 0
+    }
+  } else {
+    warn "    NOT an object, so must be a string\n",
       if $Data::Dumper::Interp::Debug;
-    return 0;  # (value & "") succeeded so value must be stringy
+    return 0;
   }
 }
 

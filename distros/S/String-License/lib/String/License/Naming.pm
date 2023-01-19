@@ -10,7 +10,7 @@ String::License::Naming - base class for names of licenses and license naming sc
 
 =head1 VERSION
 
-Version v0.0.3
+Version v0.0.4
 
 =head1 DESCRIPTION
 
@@ -23,7 +23,7 @@ e.g. L<String::License::Naming::SPDX>.
 
 =cut
 
-package String::License::Naming v0.0.3;
+package String::License::Naming v0.0.4;
 
 use namespace::clean;
 

@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojo-Run3
 
+1.02 2023-01-18T17:58:48
+ - Fix keeping filehandles open until the whole process has ended
+
 1.01 2023-01-17T19:48:15
  - Made the bash output test a bit sloppy
 

@@ -1,0 +1,383 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /Org/To/ANSIText/org_to_ansi_text
+# and generated automatically using Perinci::CmdLine::Gen version 0.501
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-10-11'; # DATE
+our $DIST = 'App-OrgUtils'; # DIST
+our $VERSION = '0.483'; # VERSION
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/Org/To/ANSIText/org_to_ansi_text",
+    program_name => "org-to-ansi-text",
+);
+
+$cmdline->run;
+
+# ABSTRACT: Export Org document to text with ANSI color codes
+# PODNAME: org-to-ansi-text
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+org-to-ansi-text - Export Org document to text with ANSI color codes
+
+=head1 VERSION
+
+This document describes version 0.483 of org-to-ansi-text (from Perl distribution App-OrgUtils), released on 2022-10-11.
+
+=head1 SYNOPSIS
+
+B<org-to-ansi-text> [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [(B<--exclude-tags>=I<str>)+|B<--exclude-tags-json>=I<json>] [B<--format>=I<name>|B<--json>] [B<--ignore-unknown-settings>|B<--no-ignore-unknown-settings>|B<--noignore-unknown-settings>] [(B<--include-tags>=I<str>)+|B<--include-tags-json>=I<json>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--source-file>=I<str>] [B<--source-str>=I<str>] [B<--target-file>=I<str>]
+
+=head1 DESCRIPTION
+
+This is the non-OO interface. For more customization, consider subclassing
+Org::To::ANSIText.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--exclude-tags-json>=I<s>
+
+Exclude trees that carry one of these tags (JSON-encoded).
+
+See C<--exclude-tags>.
+
+=item B<--exclude-tags>=I<s@>
+
+Exclude trees that carry one of these tags.
+
+If the whole document doesn't have any of these tags, then the whole document
+will be exported. Otherwise, trees that do not carry one of these tags will be
+excluded. If a selected tree is a subtree, the heading hierarchy above it will
+also be selected for export, but not the text below those headings.
+
+exclude_tags is evaluated after include_tags.
+
+
+Can be specified multiple times.
+
+=item B<--ignore-unknown-settings>
+
+=item B<--include-tags-json>=I<s>
+
+Include trees that carry one of these tags (JSON-encoded).
+
+See C<--include-tags>.
+
+=item B<--include-tags>=I<s@>
+
+Include trees that carry one of these tags.
+
+Works like Org's 'org-export-select-tags' variable. If the whole document
+doesn't have any of these tags, then the whole document will be exported.
+Otherwise, trees that do not carry one of these tags will be excluded. If a
+selected tree is a subtree, the heading hierarchy above it will also be selected
+for export, but not the text below those headings.
+
+
+Can be specified multiple times.
+
+=item B<--source-file>=I<s>
+
+Source Org file to export.
+
+=item B<--source-str>=I<s>
+
+Alternatively you can specify Org string directly.
+
+=item B<--target-file>=I<s>
+
+Text file to write to.
+
+If not specified, text string will be returned.
+
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<s>, B<-c>
+
+Set path to configuration file.
+
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+ [profile=dev]
+ username=foo
+ pass=beaver
+ 
+ [profile=production]
+ username=bar
+ pass=honey
+
+When you specify C<--config-profile=dev>, C<username> will be set to C<foo> and
+C<password> to C<beaver>. When you specify C<--config-profile=production>,
+C<username> will be set to C<bar> and C<password> to C<honey>.
+
+
+=item B<--no-config>, B<-C>
+
+Do not use any configuration file.
+
+If you specify C<--no-config>, the application will not read any configuration
+file.
+
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+If you specify C<--no-env>, the application wil not read any environment
+variable.
+
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C org-to-ansi-text org-to-ansi-text
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete org-to-ansi-text 'p/*/`org-to-ansi-text`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/org-to-ansi-text.conf>, F</home/u1/org-to-ansi-text.conf>, or F</etc/org-to-ansi-text.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
+
+ [plugin=DumpArgs]
+ -event=before_validate_args
+ -prio=99
+ 
+ [plugin=Foo]
+ -event=after_validate_args
+ arg1=val1
+ arg2=val2
+
+ 
+
+which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
+
+List of available configuration parameters:
+
+ exclude_tags (see --exclude-tags)
+ format (see --format)
+ ignore_unknown_settings (see --ignore-unknown-settings)
+ include_tags (see --include-tags)
+ naked_res (see --naked-res)
+ source_file (see --source-file)
+ source_str (see --source-str)
+ target_file (see --target-file)
+
+=head1 ENVIRONMENT
+
+=head2 ORG_TO_ANSI_TEXT_OPT
+
+String. Specify additional command-line options.
+
+=head1 FILES
+
+=head2 /home/u1/.config/org-to-ansi-text.conf
+
+=head2 /home/u1/org-to-ansi-text.conf
+
+=head2 /etc/org-to-ansi-text.conf
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-OrgUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-OrgUtils>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-OrgUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

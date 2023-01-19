@@ -1,10 +1,5 @@
 package App::OrgUtils;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-04'; # DATE
-our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.482'; # VERSION
-
 use 5.010;
 use strict;
 use warnings;
@@ -13,6 +8,11 @@ use Log::ger;
 use File::Slurper::Dash 'read_text';
 use Org::Parser::Tiny;
 use Sort::Sub;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-10-11'; # DATE
+our $DIST = 'App-OrgUtils'; # DIST
+our $VERSION = '0.483'; # VERSION
 
 our %SPEC;
 
@@ -56,13 +56,13 @@ our $_complete_state = sub {
     my %args = @_;
 
     # only return answer under CLI
-    return undef unless my $cmdline = $args{cmdline};
+    return unless my $cmdline = $args{cmdline};
     my $r = $args{r};
 
     # force read config
     $r->{read_config} = 1;
     my $res = $cmdline->parse_argv($r);
-    return undef unless $res->[0] == 200;
+    return unless $res->[0] == 200;
     my $args = $res->[2];
 
     # read org
@@ -88,13 +88,13 @@ our $_complete_priority = sub {
     my %args = @_;
 
     # only return answer under CLI
-    return undef unless my $cmdline = $args{cmdline};
+    return unless my $cmdline = $args{cmdline};
     my $r = $args{r};
 
     # force read config
     $r->{read_config} = 1;
     my $res = $cmdline->parse_argv($r);
-    return undef unless $res->[0] == 200;
+    return unless $res->[0] == 200;
     my $args = $res->[2];
 
     # read org
@@ -120,13 +120,13 @@ our $_complete_tags = sub {
     my %args = @_;
 
     # only return answer under CLI
-    return undef unless my $cmdline = $args{cmdline};
+    return unless my $cmdline = $args{cmdline};
     my $r = $args{r};
 
     # force read config
     $r->{read_config} = 1;
     my $res = $cmdline->parse_argv($r);
-    return undef unless $res->[0] == 200;
+    return unless $res->[0] == 200;
     my $args = $res->[2];
 
     # read org
@@ -287,7 +287,7 @@ App::OrgUtils - Some utilities for Org documents
 
 =head1 VERSION
 
-This document describes version 0.482 of App::OrgUtils (from Perl distribution App-OrgUtils), released on 2021-07-04.
+This document describes version 0.483 of App::OrgUtils (from Perl distribution App-OrgUtils), released on 2022-10-11.
 
 =head1 DESCRIPTION
 
@@ -336,12 +336,6 @@ following are the included scripts:
 =item * L<stat-org-document>
 
 =back
-
-=head1 CONTRIBUTOR
-
-=for stopwords Steven Haryanto
-
-Steven Haryanto <sharyanto@cpan.org>
 
 =head1 FUNCTIONS
 
@@ -418,14 +412,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-OrgUti
 
 Source repository is at L<https://github.com/perlancar/perl-App-OrgUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-OrgUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Org::Parser>
@@ -436,11 +422,43 @@ L<orgsel> in L<App::orgsel>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-OrgUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

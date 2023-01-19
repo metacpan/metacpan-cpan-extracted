@@ -1,0 +1,87 @@
+{
+   "abstract" : "Emulation of Perl's C<-i> switch via L<File::Replace|File::Replace>",
+   "author" : [
+      "Hauke D <haukex@zero-g.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "File-Replace-Inplace",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "recommends" : {},
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "Fcntl" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Replace" : "0.16",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "Hash::Util" : "0",
+            "IO::Handle" : "0",
+            "Scalar::Util" : "0",
+            "Tie::Handle::Base" : "0.16",
+            "perl" : "5.008001",
+            "warnings::register" : "0"
+         },
+         "suggests" : {}
+      },
+      "test" : {
+         "requires" : {
+            "Encode" : "0",
+            "File::stat" : "0",
+            "FindBin" : "0",
+            "IPC::Run3::Shell" : "0.56",
+            "Test::More" : "1.302096"
+         }
+      }
+   },
+   "provides" : {
+      "File::Replace::Inplace" : {
+         "file" : "lib/File/Replace/Inplace.pm",
+         "version" : "0.16"
+      },
+      "Tie::Handle::Argv" : {
+         "file" : "lib/Tie/Handle/Argv.pm",
+         "version" : "0.16"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://bitbucket.org/haukex/file-replace-inplace/issues"
+      },
+      "homepage" : "https://bitbucket.org/haukex/file-replace-inplace",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://bitbucket.org/haukex/file-replace-inplace.git",
+         "web" : "https://bitbucket.org/haukex/file-replace-inplace"
+      }
+   },
+   "version" : "0.16",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

@@ -1,0 +1,47 @@
+---
+abstract: 'A base class for tied filehandles'
+author:
+  - 'Hauke D <haukex@zero-g.net>'
+build_requires:
+  Encode: '0'
+  ExtUtils::MakeMaker: '0'
+  File::stat: '0'
+  FindBin: '0'
+  Test::More: '1.302096'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-Handle-Base
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Tie::Handle::Base:
+    file: lib/Tie/Handle/Base.pm
+    version: '0.16'
+recommends: {}
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  Hash::Util: '0'
+  IO::Handle: '0'
+  Scalar::Util: '0'
+  perl: '5.008001'
+  warnings::register: '0'
+resources:
+  bugtracker: https://bitbucket.org/haukex/tie-handle-base/issues
+  homepage: https://bitbucket.org/haukex/tie-handle-base
+  repository: https://bitbucket.org/haukex/tie-handle-base.git
+version: '0.16'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

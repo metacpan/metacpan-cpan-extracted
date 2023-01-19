@@ -4,9 +4,9 @@ use warnings;
 package Util::H2O::More;
 use parent q/Exporter/;
 
-our $VERSION = q{0.2.3};
+our $VERSION = q{0.2.4};
 
-our @EXPORT_OK = (qw/baptise opt2h2o h2o o2h d2o o2d o2h2o ini2o o2ini/);
+our @EXPORT_OK = (qw/baptise opt2h2o h2o o2h d2o o2d o2h2o ini2h2o h2o2ini/);
 
 use Util::H2O ();
 
@@ -69,28 +69,28 @@ sub opt2h2o(@) {
 # general form of method used to give accessors to Config::Tiny in Util::H2O's
 # POD documentation
 sub o2h2o ($) {
-   my $ref = shift;
-   return h2o -recurse, {%{ $ref }};
+    my $ref = shift;
+    return h2o -recurse, { %{$ref} };
 }
 
 # more specific helper app that uses Config::Tiny->read and o2h2o to get a config
 # object back from an .ini; requries Config::Tiny
-sub ini2o ($) {
-   my $filename = shift;
-   require Config::Tiny;
-   return o2h2o( Config::Tiny->read($filename) );
+sub ini2h2o ($) {
+    my $filename = shift;
+    require Config::Tiny;
+    return o2h2o( Config::Tiny->read($filename) );
 }
 
 # write out the INI file
-sub o2ini ($$) {
-  my ($config, $filename) = @_;
-  require Config::Tiny;
-  return Config::Tiny->new(Util::H2O::o2h $config)->write($filename);
+sub h2o2ini ($$) {
+    my ( $config, $filename ) = @_;
+    require Config::Tiny;
+    return Config::Tiny->new( Util::H2O::o2h $config)->write($filename);
 }
 
 # return a dereferences hash (non-recursive); reverse of `h2o'
 sub o2h($) {
-    $Util::H2O::_PACKAGE_REGEX = qr/::_[0-9A-Fa-f]+\z/; # makes internal package name more generic for baptise created references
+    $Util::H2O::_PACKAGE_REGEX = qr/::_[0-9A-Fa-f]+\z/;    # makes internal package name more generic for baptise created references
     my $ref = Util::H2O::o2h @_;
     if ( ref $ref ne q{HASH} ) {
         die qq{Could not fully remove top-level reference. Probably an issue with \$Util::H2O_PACKAGE_REGEX\n};
@@ -171,7 +171,6 @@ sub a2o($) {
     return $array_ref;
 }
 
-
 # includes internal dereferencing so to be compatible
 # with the behavior of Util::H2O::o2h
 sub o2d($);    # forward declaration to get rid of "too early" warning
@@ -182,7 +181,7 @@ sub o2d($) {
     my $isa = ref $thing;
     if ( $isa =~ m/^Util::H2O::More::__a2o/ ) {
         my @_thing = @$thing;
-        $thing     = \@_thing;
+        $thing = \@_thing;
         foreach my $element (@$thing) {
             $element = o2d $element;
         }
@@ -369,7 +368,7 @@ C<baptise> and friends.
     # now $o can be used to query all possible options, even if they were
     # never passed at the commandline 
 
-=head2 C<ini2o FILENAME>
+=head2 C<ini2h2o FILENAME>
 
 Takes the name of a file, uses L<Config::Tiny> to open it, then gives it
 accessors using internally, C<o2h2o>, described below.
@@ -386,25 +385,25 @@ Given some configuration file using INI:
 
 We can parse it with L<Config::Tiny> and objectify it with C<h2o>:
 
-  use Util::H2O::More qw/ini2o/;
-  my $config = ini2o qq{/path/to/my/config.ini}
+  use Util::H2O::More qw/ini2h2o/;
+  my $config = ini2h2o qq{/path/to/my/config.ini}
   # ... $config now has accessors based Config::Tiny's read of config.ini
 
-=head2 C<o2ini REF, FILENAME>
+=head2 C<h2o2ini REF, FILENAME>
 
-Takes and object created via C<ini2o> and writes it back out to C<FILENAME>
+Takes and object created via C<ini2h2o> and writes it back out to C<FILENAME>
 in the proper I<INI> format, using L<Config::Tiny>.
 
-Given the example in C<ini2o>, we can go a step further and writ eout a new
+Given the example in C<ini2h2o>, we can go a step further and writ eout a new
 configuration file after reading it and modifying a value.
 
-  use Util::H2O::More qw/ini2o o2ini/;
+  use Util::H2O::More qw/ini2h2o h2o2ini/;
 
-  my $config = ini2o q{/path/to/my/config.ini}
+  my $config = ini2h2o q{/path/to/my/config.ini}
 
   # update $config, write it out as a different file
   $config->section1->var1("some new value");
-  o2ini $config, q{/path/to/my/other-config.ini};
+  h2o2ini $config, q{/path/to/my/other-config.ini};
 
 =head2 C<o2h2o REF>
 

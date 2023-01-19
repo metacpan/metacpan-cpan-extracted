@@ -55,6 +55,14 @@ my $ULONG_MAX = 18446744073709551615;
 # Start objects count
 my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
+# call_method
+{
+  my $obj_int = SPVM::ExchangeAPI::call_method(SPVM::GET_ENV(), SPVM::GET_STACK(), "Int", "new", 1);
+  isa_ok($obj_int, "SPVM::BlessedObject");
+  my $value = $obj_int->value;
+  is($value, 1);
+}
+
 # Argument general exception
 {
   # Argument general exception - too few arguments
@@ -878,7 +886,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
     # Return object
     {
       my $value = SPVM::TestCase::ExchangeAPI->return_object;
-      is(ref $value, 'SPVM::TestCase::Minimal');
+      is($value->get_class_name, 'TestCase::Minimal');
       isa_ok($value, 'SPVM::BlessedObject::Class');
       is($value->x, 1);
       is($value->y, 2);
@@ -896,7 +904,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
     # Return any object
     {
       my $value = SPVM::TestCase::ExchangeAPI->return_any_object;
-      is(ref $value, 'SPVM::TestCase::Minimal');
+      is($value->get_class_name, 'TestCase::Minimal');
       isa_ok($value, 'SPVM::BlessedObject::Class');
       is($value->x, 1);
       is($value->y, 2);
@@ -1082,7 +1090,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
     my $get_int = $hash->get("int");
     
     is(ref $get_biases, 'SPVM::BlessedObject::Array');
-    is(ref $get_int, 'SPVM::Int');
+    is($get_int->get_class_name, 'Int');
   }
 
   # Numeric value to numeric object
