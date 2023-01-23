@@ -1,6 +1,6 @@
 package Net::OpenSSH;
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 use strict;
 use warnings;
@@ -562,21 +562,31 @@ sub _is_secure_path {
     return 1;
 }
 
+_sub_options _capture_local_ssh => qw(stderr_to_stdout stderr_discard stderr_fh stderr_file);
+
+sub _capture_local_ssh {
+    my $self = shift;
+    my %opts = (ref $_[0] eq 'HASH' ? %{shift()} : ());
+    _croak_bad_options %opts;
+    my (undef, $out, undef, $pid) = $self->open_ex({ %opts,
+                                                     _cmd => 'raw',
+                                                     _no_master_required => 1,
+                                                     stdout_pipe => 1,
+                                                     stdin_discard => 1 },
+                                                   $self->{_ssh_cmd}, @_);
+    my ($txt) = $self->_io3($out, undef, undef, undef, 10, 'bytes');
+    local $self->{_kill_ssh_on_timeout} = 1;
+    $self->_waitpid($pid, 10);
+    return $txt
+}
+
 sub _detect_ssh_version {
     my $self = shift;
     if (defined $self->{_ssh_version}) {
         $debug and $debug & 4 and _debug "ssh version given as $self->{_ssh_version}";
     }
     else {
-        my (undef, $out, undef, $pid) = $self->open_ex({_cmd => 'raw',
-                                                        _no_master_required => 1,
-                                                        stdout_pipe => 1,
-                                                        stdin_discard => 1,
-                                                        stderr_to_stdout => 1 },
-                                                       $self->{_ssh_cmd}, '-V');
-        my ($txt) = $self->_io3($out, undef, undef, undef, 10, 'bytes');
-        local $self->{_kill_ssh_on_timeout} = 1;
-        $self->_waitpid($pid, 10);
+        my $txt = $self->_capture_local_ssh({stderr_to_stdout => 1}, '-V');
         if (my ($full, $num) = $txt =~ /^OpenSSH_((\d+\.\d+)\S*)/mi) {
             $debug and $debug & 4 and _debug "OpenSSH version is $full";
             $self->{_ssh_version} = $num;
@@ -586,6 +596,11 @@ sub _detect_ssh_version {
             $debug and $debug & 4 and _debug "unable to determine version, '$self->{_ssh_cmd} -V', output:\n$txt"
         }
     }
+}
+
+sub default_ssh_configuration {
+    my $self = shift;
+    $self->_capture_local_ssh('-qG', $self->{_host})
 }
 
 sub _make_ssh_call {
@@ -3887,7 +3902,7 @@ passphrase from the user.
 
 In asynchronous mode, this method requires the connection to be
 terminated before it gets called. Afterwards, C<wait_for_master>
-should be called repeaptly until the new connection is stablished.
+should be called repeatedly until the new connection is established.
 For instance:
 
   my $async = 1;
@@ -3990,6 +4005,24 @@ For instance:
   $ssh->disown_master;
   $ssh->stop; # tells the master to stop accepting requests
   exit(0);
+
+
+=item $ssh->default_ssh_configuration
+
+Allows one to retrieve the default SSH configuration for the target
+host from system files (i.e. C</etc/ssh/ssh_config>) and user files
+(C<~/.ssh/config>).
+
+Under the hood, this method just calls C<ssh -G $host> and returns the
+output unprocessed.
+
+Example:
+
+  my $ssh = Net::OpenSSH->new($host, connect => 0);
+  my $txt = $ssh->default_ssh_configuration;
+  my @lines = split /^/m, $txt;
+  chomp @lines;
+  my %def_cfg = map split(/\s+/, $_, 2), @lines;
 
 =back
 
@@ -5071,6 +5104,15 @@ pipes).
 If for whatever reason the methods described above fail, you can
 always revert to using Expect to talk to the remote C<sudo>. See the
 C<examples/expect.pl> script from this module distribution.
+
+=item Interactive sessions
+
+B<Q>: How can I start an interactive remote session?
+
+B<A>: Just call the C<system> method with an empty argument list:
+
+   my $ssh = Net::OpenSSH->new(...);
+   $ssh->system;
 
 =back
 

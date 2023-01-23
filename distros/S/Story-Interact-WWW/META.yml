@@ -1,0 +1,49 @@
+---
+abstract: 'mojolicious app to read interactive stories'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test2::Require::AuthorTesting: '0'
+  Test2::Require::Module: '0'
+  Test2::Tools::Spec: '0'
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  File::ShareDir::Install: '0.02'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Story-Interact-WWW
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Story::Interact::WWW:
+    file: lib/Story/Interact/WWW.pm
+    version: '0.001001'
+requires:
+  Mojo::ShareDir: '0'
+  Mojolicious: '0'
+  Story::Interact: '0.001004'
+  Text::Markdown::Hoedown: '0'
+  perl: '5.024000'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Story-Interact-WWW/project
+  bugtracker: https://github.com/tobyink/p5-story-interact-www/issues
+  homepage: https://metacpan.org/release/Story-Interact-WWW
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-story-interact-www.git
+version: '0.001001'
+x_provides_scripts:
+  si_www:
+    file: bin/si_www
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

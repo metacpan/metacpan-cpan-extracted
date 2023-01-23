@@ -1,11 +1,13 @@
 #
-# Copyright (c) 2003-2021 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2003-2022 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
 # MIT License (Expat version). See the file COPYING.md that came
 # bundled with this file.
 #
+
+# Depends: () ; right? Haven't verified closely.
 
 =head1 NAME
 
@@ -265,6 +267,7 @@ our @EXPORT_OK = qw(
     min max
     fstype_for_device
     xgetfile_utf8 xslurp
+    maybe_getfile_utf8
 );
 
 # would we really want to export these?:
@@ -309,10 +312,10 @@ sub xfork_(&) {
             &$thunk();
 
             # drop return value (transfer via pipe? 'No.')
-            exit 0;
+            exit 0;    # POSIX::_exit ? no? Anyway docs say otherwise.
         } || do {
             warn "uncaught exception in subprocess $$, exiting: $@";
-            exit 1;
+            exit 1;    # POSIX::_exit ? no?
         }
     }
 }
@@ -332,29 +335,33 @@ sub xexec_safe {
 sub xspawn {
     croak "xspawn: too few arguments" unless @_;
     local $^F = 0;
-    pipe READ, WRITE or die "pipe: $!";
+    pipe my $read, my $write or die "pipe: $!";
     if (my $pid = xfork) {
-        close WRITE;
-        local $_;    #local $/; not really necessary
-        while (<READ>) {
-            close READ;
-            croak "xspawn: can't exec \"$_[0]\": $_";
+        close $write or die $!;
+        local $/;
+        my $errstr = <$read>;
+        chomp $errstr;
+        close $read or die $!;
+        if (length $errstr) {
+            croak "xspawn: can't exec \"$_[0]\": $errstr";
+        } else {
+            return $pid;
         }
-        close READ;
-        return $pid;
     } else {
         no warnings;
-        close READ;
+        close $read or die $!;
         exec @_;
-        select WRITE;
+        select $write or die $!;
         $| = 1;
         print $!;
-        exit;
+        require POSIX;
+        POSIX::_exit(127);
     }
 }
 
 sub xlaunch
 { ## NA: todo: noch nicht fertig, insbesondere geht kommunikation exec failure nich bis zum parent.
+    require POSIX;
     my $pid = xfork;
     if ($pid) {
         waitpid $pid, 0;    # !
@@ -362,7 +369,7 @@ sub xlaunch
 
         # evtl. set session zeugs.
         xspawn @_;
-        exit;               # !
+        POSIX::_exit(0);    # !
     }
 }
 
@@ -424,7 +431,7 @@ sub xwait {
     @_ == 0 or fp_croak_arity 0;
     my $kid = wait;
     defined $kid or die "xwait: $!";    # when can this happen? EINTR?
-    wantarray ? ($kid, $?) : $kid
+    wantarray ? ($kid, $?) : $kid       ## no critic
 }
 
 sub xxwait {
@@ -604,27 +611,34 @@ sub lstat_possiblyhires {
     }
 }
 
+# XX: should provide a newly named function to give the object,
+# instead of using wantarray. Have xstat behave like the Perl builtin
+# (and then possibly drop and replace by another solution from
+# core/CPAN).
 sub xstat {
     my @r;
     @_ <= 1 or croak "xstat: too many arguments";
     @r = stat_possiblyhires(@_ ? @_ : $_);
     @r or croak(@_ ? "xstat: '@_': $!" : "xstat: '$_': $!");
-    if (wantarray) {
+    my $wantarray = wantarray;    ## no critic
+    if ($wantarray) {
         @r
-    } elsif (defined wantarray) {
+    } elsif (defined $wantarray) {
         my $self = \@r;
         bless $self, 'Chj::xperlfunc::xstat'
     }
 }
 
+# XX ditto
 sub xlstat {
     my @r;
     @_ <= 1 or croak "xlstat: too many arguments";
     @r = lstat_possiblyhires(@_ ? @_ : $_);
     @r or croak(@_ ? "xlstat: '@_': $!" : "xlstat: '$_': $!");
-    if (wantarray) {
+    my $wantarray = wantarray;    ## no critic
+    if ($wantarray) {
         @r
-    } elsif (defined wantarray) {
+    } elsif (defined $wantarray) {
         my $self = \@r;
         bless $self, 'Chj::xperlfunc::xstat'
     }
@@ -632,6 +646,7 @@ sub xlstat {
 
 use Carp 'cluck';
 
+# XX ditto
 sub Xstat {
     my @r;
     @_ <= 1 or croak "Xstat: too many arguments";
@@ -643,16 +658,18 @@ sub Xstat {
             croak(@_ ? "Xstat: '@_': $!" : "Xstat: '$_': $!");
         }
     };
-    if (wantarray) {
+    my $wantarray = wantarray;    ## no critic
+    if ($wantarray) {
         cluck "Xstat call in array context doesn't make sense";
         @r
-    } elsif (defined wantarray) {
+    } elsif (defined $wantarray) {
         bless \@r, 'Chj::xperlfunc::xstat'
     } else {
         cluck "Xstat call in void context doesn't make sense";
     }
 }
 
+# XX ditto
 sub Xlstat {
     @_ <= 2 or croak "Xlstat: too many arguments";
     my ($path, $accept_errors) = @_;
@@ -665,10 +682,11 @@ sub Xlstat {
             croak("Xlstat: '$path': $!");
         }
     };
-    if (wantarray) {
+    my $wantarray = wantarray;    ## no critic
+    if ($wantarray) {
         cluck "Xlstat call in array context doesn't make sense";
         @r
-    } elsif (defined wantarray) {
+    } elsif (defined $wantarray) {
         bless \@r, 'Chj::xperlfunc::xstat'
     } else {
         cluck "Xlstat call in void context doesn't make sense";
@@ -689,7 +707,7 @@ sub mk_caching_getANYid {
                 $v = [&$function($id)];
                 $cache{$id} = $v;
             }
-            wantarray ? @$v : $$v[$scalarindex]
+            wantarray ? @$v : $$v[$scalarindex]    ## no critic
         } else {
             croak "$methodname: got undefined value";
         }
@@ -712,7 +730,8 @@ sub fstype_for_device_init {
     open my $mounts, "<", "/proc/mounts" or die "/proc/mounts: $!";
     local $/ = "\n";
     my %t;
-    while (<$mounts>) {
+    local $_;
+    while (<$mounts>) {    ## no critic, $_ is localized
         my @f = split / /, $_;
         my ($_dev, $mountpoint, $fstype) = @f;
         if (
@@ -764,9 +783,7 @@ sub fstype_for_device {
     $t
 }
 
-{
-
-    package Chj::xperlfunc::xstat;
+package Chj::xperlfunc::xstat {
 
     # (Alternative to arrays: hashes, so that slices like
     # ->{"dev","ino"} could be done? But so what.)
@@ -1018,9 +1035,8 @@ sub fstype_for_device {
 use FP::Div qw(min max);    # min just for the backwards-compatible
                             # re-export
 
-{
+package Chj::xperlfunc::mtimed {
 
-    package Chj::xperlfunc::mtimed;
     sub path       { shift->[0] }
     sub mtime      { shift->[1] }
     sub lstat      { shift->[2] }
@@ -1090,9 +1106,8 @@ sub XLmtime {
     }
 }
 
-{
+package Chj::xperlfunc::xlocaltime {
 
-    package Chj::xperlfunc::xlocaltime;
     sub sec   { shift->[0] }
     sub min   { shift->[1] }
     sub hour  { shift->[2] }
@@ -1125,7 +1140,32 @@ sub XLmtime {
 
     sub unixtime {
         my $s = shift;
-        &Time::Local::timelocal(@$s)
+        Time::Local::timelocal(@$s)
+    }
+
+    sub iso_week_number {
+        my $s = shift;
+
+        # On which yday does week 01 start for `Year`?
+
+        my $wDay = $s->wDay;
+        my $yday = $s->yday;
+
+        my $weekstart_day = $yday - $wDay;
+
+        my ($offset, $weeks) = ($weekstart_day % 7, int($weekstart_day / 7));
+
+        my $week = ($offset >= 4) ? $weeks + 2 : $weeks + 1;
+        $yday < $offset ? "LASTYEAR" : $week
+
+            # XX needs to give the year, actually! Buggy.
+    }
+
+    sub Year_and_iso_week_number {
+        my $s = shift;
+        $s->Year . "-W" . $s->iso_week_number
+
+            # XX needs to give the year with the week, actually! Buggy.
     }
 }
 
@@ -1155,9 +1195,7 @@ sub xmkdir_with_paragon {
     xchmod $mode, $_[0];
 }
 
-{
-
-    package Chj::xperlfunc::tmpdir;
+package Chj::xperlfunc::tmpdir {
 
     sub DESTROY {
         my $self = shift;
@@ -1242,8 +1280,9 @@ sub xchroot {
 sub xeval {    # meant for string eval only, of course.
     @_ == 1 or die "wrong number of arguments";
     ## hm ps should one localize $@ here?
-    if (defined wantarray) {
-        if (wantarray) {
+    my $wantarray = wantarray;    ## no critic
+    if (defined $wantarray) {
+        if ($wantarray) {
             my @res = eval $_[0];
             if (ref $@ or $@) {
                 die $@
@@ -1413,9 +1452,8 @@ sub xlink_p {
 #       or die "xuser_uid: '$user' not in passwd file";
 #     $uid
 # }
-{
+package Chj::xperlfunc::Getpwnam {
 
-    package Chj::xperlfunc::Getpwnam;
     use Chj::Class::Array -fields => -publica =>
         qw(name passwd uid gid quota comment gcos dir shell expire);
 
@@ -1424,7 +1462,7 @@ sub xlink_p {
         my ($user) = @_;
         my $s      = bless [getpwnam($user)], $class;
         if (@$s) {
-            wantarray ? @$s : $s
+            wantarray ? @$s : $s    ## no critic
         } else {
             return
         }
@@ -1435,7 +1473,7 @@ sub xlink_p {
 sub xgetpwnam {
     @_ == 1 or fp_croak_arity 1;
     my ($user) = @_;
-    if (wantarray) {
+    if (wantarray) {                ## no critic
         my @f = Chj::xperlfunc::Getpwnam->perhaps_get($user);
         @f or croak "xgetpwnam: '$user' not in passwd file";
         @f
@@ -1445,9 +1483,8 @@ sub xgetpwnam {
     }
 }
 
-{
+package Chj::xperlfunc::Getgrnam {
 
-    package Chj::xperlfunc::Getgrnam;
     use Chj::Class::Array -fields => -publica => qw(name passwd gid members);
 
     sub perhaps_get {
@@ -1455,7 +1492,7 @@ sub xgetpwnam {
         my ($user) = @_;
         my $s      = bless [getgrnam($user)], $class;
         if (@$s) {
-            wantarray ? @$s : $s
+            wantarray ? @$s : $s    ## no critic
         } else {
             return
         }
@@ -1466,7 +1503,7 @@ sub xgetpwnam {
 sub xgetgrnam {
     @_ == 1 or fp_croak_arity 1;
     my ($group) = @_;
-    if (wantarray) {
+    if (wantarray) {                ## no critic
         my @f = Chj::xperlfunc::Getgrnam->perhaps_get($group);
         @f or croak "xgetgrnam: '$group' not in group file";
         @f
@@ -1490,12 +1527,17 @@ sub xprintln {
     print $fh @_, "\n" or die "printing to $fh: $!"
 }
 
-sub xgetfile_utf8 {
-    @_ == 1 or fp_croak_arity 1;
-    my ($path) = @_;
+sub _getfile_utf8 {
+    my ($path, $do_throw, $myname) = @_;
 
     # using PerlIO::utf8_strict
-    open my $in, '<:utf8_strict', $path or die "xgetfile_utf8($path): open: $!";
+    open my $in, '<:utf8_strict', $path or do {
+        if ($do_throw or $! != ENOENT) {
+            die "$myname($path): open: $!";
+        } else {
+            return undef;
+        }
+    };
     my $cnt;
     eval {
         local $/;
@@ -1504,10 +1546,24 @@ sub xgetfile_utf8 {
     } || do {
         my $e = $@;
         close $in;
-        die "xgetfile_utf8($path): $e"
+        die "$myname($path): $e"
     };
-    close $in or die "xgetfile_utf8($path): close: $!";
+    close $in or die "$myname($path): close: $!";
     $cnt
+}
+
+sub xgetfile_utf8 {
+    @_ == 1 or fp_croak_arity 1;
+    my ($path) = @_;
+    _getfile_utf8($path, 1, "xgetfile_utf8")
+}
+
+# Return undef if the file does not exist, throw errors for other
+# issues.
+sub maybe_getfile_utf8 {
+    @_ == 1 or fp_croak_arity 1;
+    my ($path) = @_;
+    _getfile_utf8($path, 0, "maybe_getfile_utf8")
 }
 
 sub xslurp;

@@ -12,7 +12,7 @@ use Date::Calc            qw/Delta_Days/;
 use Carp                  qw/croak/;
 use Encode                qw/encode_utf8/;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 #======================================================================
 # GLOBALS
@@ -34,6 +34,10 @@ my %params_spec = (
                                | (?<y>\d\d\d\d) -  (?<m>\d\d?) -  (?<d>\d\d?)     # yyyy-mm-dd
                                | (?<m>\d\d?)    /  (?<d>\d\d?) /  (?<y>\d\d\d\d)) # mm/dd/yyyy
                              $]x},
+
+  # bool_regex : for identifying booleans in data cells. If true, should capture into $1
+  bool_regex        => {type => SCALARREF|UNDEF, optional => 1, default => qr[^(?:(TRUE)|FALSE)$]},
+
   compression_level => {type => SCALAR, regex => qr/^\d$/, optional => 1, default => COMPRESSION_LEVEL_DEFAULT},
 
  );
@@ -89,8 +93,9 @@ sub add_sheet {
   none {$sheet_name eq $_} @{$self->{sheets}}
     or croak "this workbook already has a sheet named '$sheet_name'";
 
-  # local copy for convenience
+  # local copies for convenience
   my $date_regex = $self->{date_regex};
+  my $bool_regex = $self->{bool_regex};
 
   # iterator for generating rows; either received as argument or built as a closure upon an array
   my $next_row 
@@ -138,6 +143,7 @@ sub add_sheet {
       (my $tag, my $attrs, $val)
         = looks_like_number $val             ? (v => ""                  , $val                          )
         : $date_regex && $val =~ $date_regex ? (v => qq{ s="$DATE_STYLE"}, n_days($+{y}, $+{m}, $+{d})   )
+        : $bool_regex && $val =~ $bool_regex ? (v => qq{ t="b"}          , $1 ? 1 : 0                    )
         : $val =~ /^=/                       ? (f => "",                   escape_formula($val)          )
         :                                      (v => qq{ t="s"}          , $self->add_shared_string($val));
 
@@ -539,11 +545,15 @@ Excel::ValueWriter::XLSX - generating data-only Excel workbooks in XLSX format, 
 
   my $writer = Excel::ValueWriter::XLSX->new;
   $writer->add_sheet($sheet_name1, $table_name1, [qw/a b tot/], [[1, 2, '=[a]+[b]'],
-                                                                 [3, 4]
+                                                                 [3, 4],
+                                                                 ['TRUE', 'FALSE'],
                                                                 ]);
   $writer->add_sheet($sheet_name2, $table_name2, \@headers, $row_generator);
   $writer->add_sheets_from_database($dbh);
   $writer->save_as($filename);
+  
+  $writer = Excel::ValueWriter::XLSX->new(bool_regex => qr[^(?:(VRAI)|FAUX)$]);
+  $writer->add_sheet($sheet_name1, $table_name1, [qw/a b/], [['I like Perl:', 'VRAI']]);
 
 
 =head1 DESCRIPTION
@@ -598,6 +608,16 @@ The default implementation recognizes dates in C<dd.mm.yyyy>, C<yyyy-mm-dd>
 and C<mm/dd/yyyy> formats. User-supplied regular expressions should use
 named captures so that the day, month and year values can be found respectively
 in C<< $+{d} >>, C<< $+{m} >> and C<< $+{y} >>.
+
+=item bool_regex
+
+A compiled regular expression for detecting data cells that contain boolean values.
+The default implementation recognizes uppercase strings 'TRUE' or 'FALSE' as booleans.
+User-supplied regular expressions should put the word corresponding to 'TRUE' within
+parenthesis so that the content is captured in C<$1>. Here is an example for french :
+
+  $writer = Excel::ValueWriter::XLSX->new(bool_regex => qr[^(?:(VRAI)|FAUX)$]);
+
 
 =item compression_level
 

@@ -265,6 +265,50 @@ SV *string_value_for_id(Text::Treesitter::Query self, U32 id)
   OUTPUT:
     RETVAL
 
+void predicates_for_pattern(Text::Treesitter::Query self, U32 pattern_index)
+  PPCODE:
+  {
+    U32 count;
+    const TSQueryPredicateStep *predicates = ts_query_predicates_for_pattern(self, pattern_index, &count);
+
+    /* predicates is a *flat* list of steps; each step being Capture, String
+     * or Done. We need to turn this into a 2D list of arrayrefs storing each
+     * predicate's strings and captures in a new arrayref
+     */
+    AV *predicate = NULL;
+    U32 retcount = 0;
+
+    const char *pv;
+    uint32_t len;;
+
+    for(U32 i = 0; i < count; i++) {
+      const TSQueryPredicateStep *step = predicates + i;
+      if(!predicate)
+        predicate = newAV();
+
+      switch(step->type) {
+        case TSQueryPredicateStepTypeDone:
+          mPUSHs(newRV_noinc((SV *)predicate));
+          retcount++;
+
+          predicate = NULL;
+          break;
+
+        case TSQueryPredicateStepTypeCapture:
+          /* Indicate that it's a capture by pushing a SCALAR ref to IV */
+          av_push(predicate, newRV_noinc(newSViv(step->value_id)));
+          break;
+
+        case TSQueryPredicateStepTypeString:
+          pv = ts_query_string_value_for_id(self, step->value_id, &len);
+          av_push(predicate, newSVpvf(pv, len, SVf_UTF8));
+          break;
+      }
+    }
+
+    XSRETURN(retcount);
+  }
+
 MODULE = Text::Treesitter  PACKAGE = Text::Treesitter::QueryCursor  PREFIX = ts_query_cursor_
 
 Text::Treesitter::QueryCursor new(SV *cls)

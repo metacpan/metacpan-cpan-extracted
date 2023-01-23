@@ -8,7 +8,7 @@ use File::Temp ':POSIX';
 use Test::More tests => 11;
 
 my $tmpfile = tmpnam();
-open(my $fh, '>', $tmpfile) or die "Cannot open $tmpfile: $!\n";
+open(my $fh, '>', $tmpfile) or die "Cannot open `$tmpfile': $!\n";
 print {$fh} do { local $/; <DATA> };
 close($fh);
 

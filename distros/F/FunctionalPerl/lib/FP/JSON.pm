@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2021 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2021-2022 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -19,6 +19,8 @@ FP::JSON
         output_format => "JSON", # or "Mint"
         auto_numbers  => 1,
         auto_integers => 0,
+        # converter => sub ($obj) { ... convert to accepted data .. },
+        # pretty => 1, # extra re-parsing step at the end
     };
 
     use FP::List;
@@ -30,10 +32,25 @@ FP::JSON
     30
     ],
     {
-    _40: "foo",
-    bar: 50
+    "40": "foo",
+    "bar": 50
     }
     ]';
+
+    $settings->{pretty} = 1;
+    is to_json([10, list(20,30), {40=> "foo", bar=> 50}], $settings),
+       '[
+       10,
+       [
+          20,
+          30
+       ],
+       {
+          "40" : "foo",
+          "bar" : 50
+       }
+    ]
+    ';
 
 =head1 DESCRIPTION
 
@@ -71,13 +88,13 @@ use Scalar::Util qw(looks_like_number);
 use Scalar::Util qw(blessed);
 use FP::PureArray qw(purearray array_to_purearray);
 use Chj::TEST;
-
-our $output_formats = {
-    JSON => { hashmap_pair_op => ": " },
-    Mint => { hashmap_pair_op => " = " },
-};
+use FP::Show;
 
 sub fieldname_to_json($str) {
+    '"' . $str . '"'    # XXXX
+}
+
+sub fieldname_to_mint($str) {
     my $s = lcfirst($str);
     $s =~ s/^\s+//;
     $s =~ s/\s+\z//;
@@ -89,7 +106,14 @@ sub fieldname_to_json($str) {
     $s
 }
 
-TEST { fieldname_to_json "Quadrat 'o'Hara" } 'quadrat__o_Hara';
+TEST { fieldname_to_mint "Quadrat 'o'Hara" } 'quadrat__o_Hara';
+
+our $output_formats = {
+    JSON =>
+        { hashmap_pair_op => ": ", fieldname_convert => \&fieldname_to_json, },
+    Mint =>
+        { hashmap_pair_op => " = ", fieldname_convert => \&fieldname_to_mint, },
+};
 
 my $json = JSON->new->allow_nonref;
 
@@ -127,13 +151,15 @@ TEST { scalar_to_json "foo bar", {} } "\"foo bar\"";
 #run_tests __PACKAGE__
 
 sub hashmap_to_json ($hashmap, $settings) {
+    my $output_format     = $output_formats->{ $settings->{output_format} };
+    my $fieldname_convert = $output_format->{fieldname_convert};
+    my $hashmap_pair_op   = $output_format->{hashmap_pair_op};
     "{\n" . purearray(sort keys %$hashmap)->map(
         sub ($title) {
             my $value = $hashmap->{$title};
-            fieldname_to_json($title)
-                . $output_formats->{ $settings->{output_format} }
-                ->{hashmap_pair_op}
-                . to_json($value, $settings)
+            $fieldname_convert->($title)
+                . $hashmap_pair_op
+                . _to_json($value, $settings)
         }
     )->strings_join(",\n")
         . "\n}"
@@ -141,14 +167,20 @@ sub hashmap_to_json ($hashmap, $settings) {
 
 sub sequence_to_json ($l, $settings) {
     "[\n"
-        . $l->map(sub($v) { to_json($v, $settings) })->strings_join(",\n")
+        . $l->map(sub($v) { _to_json($v, $settings) })->strings_join(",\n")
         . "\n]"
 }
 
-sub to_json ($value, $settings) {
+sub _to_json ($value, $settings) {
     if (defined(my $class = blessed $value)) {
         if ($value->isa("FP::Abstract::Sequence")) {
             return sequence_to_json($value->purearray, $settings)
+        } else {
+            if (defined(my $c = $settings->{converter})) {
+                return _to_json($c->($value), $settings)    # XX tail
+            } else {
+                die "to_json: don't know how to map this: " . show($value)
+            }
         }
     } elsif (my $r = ref($value)) {
         if ($r eq "ARRAY") {
@@ -159,7 +191,19 @@ sub to_json ($value, $settings) {
     } else {
         return scalar_to_json($value, $settings)
     }
-    die "don't know how to map this to Mint: " . show($value)
+    die "bug"
+}
+
+sub to_json ($value, $settings) {
+    if ($settings->{pretty}) {
+
+        # Our non-pretty variant is sorted, thus enable canonical
+        # here, too.
+        my $json = JSON->new->allow_nonref->pretty->canonical;
+        $json->encode($json->decode(_to_json($value, $settings)))
+    } else {
+        _to_json($value, $settings)
+    }
 }
 
 1

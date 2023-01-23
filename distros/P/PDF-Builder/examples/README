@@ -169,6 +169,9 @@ Boxes.pl         demonstrates PDF "boxes".
 ShowFont.pl      list glyphs in a font. output varies by font, encoding(s),
                  and font type.
 
+FontManager.pl   show the usage of the Font Manager, with some sample PDF
+                 output.
+
 Windows/
   027_winfont  demo Windows registry access
   Win32.pm     glue routine (lib/PDF/Builder/Win32.pm) only used in 027_winfont.

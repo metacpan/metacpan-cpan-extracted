@@ -26,8 +26,6 @@
 
 #Build-related
 ^version$
-^.perl-version$
-^.perlcriticrc$
 ^RoadMap$
 
 

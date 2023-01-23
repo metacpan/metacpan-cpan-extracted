@@ -13,7 +13,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 keywords:
   - uri
   - title
@@ -25,19 +25,19 @@ name: URI-Title
 provides:
   URI::Title:
     file: lib/URI/Title.pm
-    version: '1.902'
+    version: '1.903'
   URI::Title::HTML:
     file: lib/URI/Title/HTML.pm
-    version: '1.902'
+    version: '1.903'
   URI::Title::Image:
     file: lib/URI/Title/Image.pm
-    version: '1.902'
+    version: '1.903'
   URI::Title::MP3:
     file: lib/URI/Title/MP3.pm
-    version: '1.902'
+    version: '1.903'
   URI::Title::PDF:
     file: lib/URI/Title/PDF.pm
-    version: '1.902'
+    version: '1.903'
 requires:
   Carp: '0'
   Encode: '0'
@@ -60,7 +60,7 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=URI-Title
   repository: http://github.com/book/URI-Title.git
-version: '1.902'
+version: '1.903'
 x_contributors:
   - 'Philippe Bruhat (BooK) <book@cpan.org>'
   - 'Neil Bowers <neilb@cpan.org>'
@@ -70,5 +70,8 @@ x_contributors:
   - 'Scott Martin <thatguyhex@live.com>'
   - 'Jotam Jr. Trejo <jotamjr@gmail.com>'
   - 'Dagfinn Ilmari Mannsåker <ilmari@cpan.org>'
-x_generated_by_perl: v5.28.1
+  - 'Kevin Ryde <kryde@cpan.org>'
+  - 'Håkon Hægland <hakonh@cpan.org>'
+x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

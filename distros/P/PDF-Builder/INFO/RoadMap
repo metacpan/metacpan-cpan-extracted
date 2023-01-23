@@ -1,4 +1,4 @@
-Road Map for Future Development of PDF::Builder                   20 Aug 2022
+Road Map for Future Development of PDF::Builder                   27 Nov 2022
 
 In order to encourage others to contribute code and/or algorithms to the
 effort, I am publishing this road map of where I would like the product to go.
@@ -253,6 +253,14 @@ V. Add calls to insert Javascript actions for various objects. Not all Readers
    may support the same Javascript level, so be careful. There are many actions
    and many triggers that are supported. There may be some overlap with 
    annotation links (such as opening files or links on a click).
+
+W. Per #187, some PDF Writers produce PDFs with /StructTreeRoot. Check to see
+   if this item is properly handled (not lost or corrupted) by Builder. Issue
+   was PDF::API2 accused of producing bad PDF, but turned out to be referencing
+   a /StructTreeRoot but that object was missing (so apparently not a bug in 
+   API2 or Builder). See if newly-created PDF should include a STR, or at least
+   check if it is referenced but not present (in general, check if any
+   referenced object does not exist).
 
 =============================================================================
 II. Items to add to a separate area (new module or sub-module)

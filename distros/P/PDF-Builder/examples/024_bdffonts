@@ -92,7 +92,7 @@ my $sy = 45;  # cell height
 my $fx = 20;  # ascender max
 
 my $f1 = $pdf->corefont('Helvetica');
-my $f2 = $pdf->corefont('Times');
+my $f2 = $pdf->corefont('Times-Roman');
 
 #my $font = $pdf->bdfont($ARGV[0]);  # default block style
 #my $font = $pdf->bdfont($ARGV[0], -style=>'block'); # explicit block style

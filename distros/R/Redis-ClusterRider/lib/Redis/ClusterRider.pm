@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use base qw( Exporter );
 
-our $VERSION = '0.24';
+our $VERSION = '0.26';
 
 use Redis;
 use List::MoreUtils qw( bsearch );
@@ -104,7 +104,7 @@ sub new {
 
   my %node_params;
   foreach my $name ( qw( conservative_reconnect cnx_timeout read_timeout
-    write_timeout password name debug ) )
+    write_timeout password username name debug ) )
   {
     next unless defined $params{$name};
     $node_params{$name} = $params{$name};
@@ -611,6 +611,7 @@ L<http://redis.io/topics/cluster-spec>
       'localhost:7001',
       'localhost:7002',
     ],
+    username         => 'yourname',
     password         => 'yourpass',
     fallback         => 1,
     cnx_timeout      => 5,
@@ -646,6 +647,10 @@ try to connect to another random node from the list.
 
 If the password is specified, the C<AUTH> command is sent to all nodes
 of the cluster after connection.
+
+=item username => $username
+
+Authenticate to the server using Redis 6.0+ ACL System (see https://redis.io/commands/auth)
 
 =item allow_slaves => $boolean
 
@@ -824,7 +829,7 @@ Sponsored by SMS Online, E<lt>dev.opensource@sms-online.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2017-2022, Eugene Ponizovsky, SMS Online. All rights reserved.
+Copyright (c) 2017-2023, Eugene Ponizovsky, SMS Online. All rights reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

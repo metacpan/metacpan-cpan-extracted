@@ -17,7 +17,7 @@ my $mode = 'graphics';  # use Unicode chess glyphs from DejaVu-Sans
 
 # Demonstrate a chessboard using even and odd row bg and fg color definitions
 #  on a per-column ($column_props) basis.
-# Gray bg shows move of White Knight to catpure Black King's Bishop (both red),
+# Gray bg shows move of White Knight to capture Black King's Bishop (both red),
 #  with $cell_props.
 # Once images are supported, will change to pictures of pieces (or maybe both).
 
@@ -27,11 +27,13 @@ my $mode = 'graphics';  # use Unicode chess glyphs from DejaVu-Sans
 # then look for PDFpref file and read A or B forms
 my ($PDFpref, $rcA, $rcB); # which is available?
 my $prefFile = "./PDFpref";
+my $prefix = 0;  # by default, do not add a prefix to the output name
 my $prefDefault = "B"; # PDF::Builder default if no prefFile, or both installed
 if (@ARGV) {
     # A or -A argument: set PDFpref to A else B
     if ($ARGV[0] =~ m/^-?([AB])/i) {
 	$PDFpref = uc($1);
+	$prefix = 1;
     } else {
 	print STDERR "Unknown command line flag $ARGV[0] ignored.\n";
     }
@@ -86,14 +88,22 @@ foreach (1 .. 2) {
 if (!$rcA && !$rcB) {
     die "Neither PDF::API2 nor PDF::Builder is installed!\n";
 }
+
+# appears to work as of 2.044
+#if ($PDFpref eq 'A') {
+#    print STDERR "chess example fails due to PDF::API2 bug, and is not run.\n";
+#    exit(0);
+#}
 # -------------
 
-our $VERSION = '1.003'; # VERSION
-our $LAST_UPDATE = '1.000'; # manually update whenever code is changed
+our $VERSION = '1.004'; # VERSION
+our $LAST_UPDATE = '1.004'; # manually update whenever code is changed
 
 my $outfile = $0;
 if ($outfile =~ m#[\\/]([^\\/]+)$#) { $outfile = $1; }
 $outfile =~ s/\.pl$/.pdf/;
+# command line -A or -B adds A_ or B_ to outfile
+if ($prefix) { $outfile = $PDFpref . "_" . $outfile; }
 
 my $pdftable = PDF::Table->new();
 # -------------
@@ -148,6 +158,7 @@ if ($mode eq 'text') {
 } else {
     $font = $pdf->ttfont('/Windows/Fonts/dejavusans.ttf');
     $font_size = 30;
+    # $font_size /= 2.11 if $PDFpref eq 'A';  # work around one of the bugs
 }
 my $text = $page->text();
 $text->font($font, $font_size);
@@ -155,8 +166,6 @@ if ($mode eq 'text') {
    $min_width = $text->advancewidth('WKR');
 } else {
     $min_width = 1.7*$text->advancewidth($chessboard->[0][0]);   
-    # TEMP
-    $min_width /= 2 if $PDFpref eq 'A';
 }
 $min_width += 2 * 2;  # L + R padding
 

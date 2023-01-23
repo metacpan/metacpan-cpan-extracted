@@ -24,9 +24,11 @@ use Test::More 0.96 tests => 8 + 1;
 use Test::Exception;
 use Test::Warnings qw(warnings);
 
-use Neo4j_Test::MockHTTP qw(response_for);
-
 use Neo4j::Driver;
+use Neo4j_Test::MockHTTP;
+
+my $mock_plugin = Neo4j_Test::MockHTTP->new;
+sub response_for { $mock_plugin->response_for(undef, @_) }
 
 
 my ($q, $r, @a, $a);
@@ -47,7 +49,7 @@ response_for 'three keys' => { jolt => [qw(
 subtest 'result keys() wantarray' => sub {
 	plan tests => 1 + 3*3;
 	my $d = Neo4j::Driver->new('http:');
-	$d->plugin('Neo4j_Test::MockHTTP');
+	$d->plugin($mock_plugin);
 	my $sx;
 	lives_and { ok $sx = $d->session(database => 'dummy') } 'session';
 	lives_and { $r = 0; ok $r = $sx->run('no keys') } 'run 0';
@@ -77,7 +79,7 @@ response_for 'two notes' => { jolt => [qw(
 subtest 'summary notifications() wantarray' => sub {
 	plan tests => 1 + 3*3;
 	my $d = Neo4j::Driver->new('http:');
-	$d->plugin('Neo4j_Test::MockHTTP');
+	$d->plugin($mock_plugin);
 	my $sx;
 	lives_and { ok $sx = $d->session(database => 'dummy') } 'session';
 	lives_and { $r = 0; ok $r = $sx->run('zero notes')->summary } 'run 0';
@@ -134,7 +136,7 @@ response_for 'path two' => { jolt => single_column( { '..' => [
 subtest 'types node/path wantarray' => sub {
 	plan tests => 1 + 4*3 + 3*7;
 	my $d = Neo4j::Driver->new('http:');
-	$d->plugin('Neo4j_Test::MockHTTP');
+	$d->plugin($mock_plugin);
 	my $sx;
 	lives_and { ok $sx = $d->session(database => 'dummy') } 'session';
 	

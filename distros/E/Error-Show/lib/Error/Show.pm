@@ -23,7 +23,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} });
 our @EXPORT = qw();
 
 
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.1.1';
 use constant DEBUG=>0;
 use enum ("PACKAGE=0",qw<FILENAME LINE SUBROUTINE 
   HASARGS WANTARRAY EVALTEXT IS_REQUIRE HINTS BITMASK 

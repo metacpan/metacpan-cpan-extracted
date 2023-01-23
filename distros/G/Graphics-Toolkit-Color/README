@@ -10,12 +10,15 @@ SYNOPSIS
         $red->complementary( 3 );                       # get fitting red green and blue
 
 DESCRIPTION
-    Each object has 7 attributes, which are its RGB and HSL values and if
-    possible a name. This is because humans access colors on hardware level
-    (eye) in RGB, on cognition level in HSL (brain) and on cultural level
-    (language) with names. Having easy access to all three and some color
-    math should enable you to get the color palette you desire quickly and
-    with no additional dependencies.
+    Read only color holding objects with no additional dependencies. Create
+    them in many different ways (see section *CONSTRUCTOR*). Access its
+    values via methods from section *GETTER* or create related color objects
+    via methods listed under *METHODS*.
+
+    Humans access colors on hardware level (eye) in RGB, on cognition level
+    in HSL (brain) and on cultural level (language) with names. Having easy
+    access to all three and some color math should enable you to get the
+    color palette you desire quickly.
 
 CONSTRUCTOR
     There are many options to create a color objects. In short you can
@@ -100,9 +103,9 @@ GETTER / ATTRIBUTES
     "NAMES" in Graphics::Toolkit::Color::Constant
 
   string
-    String to reproduce (serialize) color object by:
-    Graphics::Toolkit::Color->new (eval $string). It is either the name (if
-    color has one) or the stringified triplet: "[ $red, $green, $blue ]".
+    Returns string that can be serialized back into a color object
+    (recreated by Graphics::Toolkit::Color-&gt;new( $string )). It is either
+    the color name (if color has one) or result of "rgb_hex".
 
   red
     Integer between 0 .. 255 describing the red portion in RGB space.
@@ -114,7 +117,7 @@ GETTER / ATTRIBUTES
     Integer between 0 .. 255 describing the blue portion in RGB space.
 
   rgb
-    Three values of red, green and blue (see above).
+    List with values of red, green and blue (see above), no refeerence.
 
   rgb_hex
     String starting with '#', followed by six hexadecimal figures. Two
@@ -127,6 +130,9 @@ GETTER / ATTRIBUTES
   hsl_hash
     Reference to a *HASH* containing the keys 'hue', 'saturation' and
     'lightness' with their respective values as defined below.
+
+  hsl
+    List of three values of hue, saturation and lightness (see below).
 
   hue
     Integer between 0 .. 359 describing the angle (in degrees) of the
@@ -144,9 +150,6 @@ GETTER / ATTRIBUTES
     Integer between 0 .. 100 describing percentage of lightness in HSL
     space. 0 is always black, 100 is always white and 50 the most colorful
     (depending on hue value) (or grey - if saturation = 0).
-
-  hsl
-    Three values of hue, saturation and lightness (see above).
 
 METHODS
     create new, related color (objects) or compute similarity of colors

@@ -21,7 +21,7 @@ my $trimbox_adj = 1/mm;  # in from bleed box
 my $bleedbox_adj = 36/pt;  # in from crop box on top and right for printer inst.
 my $cropbox_adj = 0.25/in;  # in from media edge
 
-our $VERSION = '3.024'; # VERSION
+our $VERSION = '3.025'; # VERSION
 our $LAST_UPDATE = '3.023'; # manually update whenever code is changed
 
 my $PDFname = $0;

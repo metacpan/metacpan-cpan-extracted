@@ -62,10 +62,8 @@
             "Test::More" : "0.96",
             "autobox" : "0",
             "base" : "0",
-            "overload" : "0",
             "perl" : "5.016004",
-            "utf8" : "0",
-            "warnings" : "0"
+            "utf8" : "0"
          }
       },
       "test" : {
@@ -74,6 +72,7 @@
             "Capture::Tiny" : "0",
             "DBD::CSV" : "0",
             "DBI" : "0",
+            "File::chdir" : "0",
             "Sub::Util" : "0",
             "Test::Pod::Snippets" : "0",
             "Test::Requires" : "0",
@@ -90,6 +89,6 @@
          "web" : "https://github.com/pflanze/functional-perl"
       }
    },
-   "version" : "v0.72.66",
+   "version" : "v0.72.76",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

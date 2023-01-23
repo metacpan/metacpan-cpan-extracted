@@ -8,7 +8,7 @@ use lib 't';
 use _test;
 use strict;
 
-use Test::More tests => 43;
+use Test::More tests => 49;
 
 #use Test::More qw(no_plan);
 
@@ -34,7 +34,7 @@ ok( defined($dbh), 'Connect' );
 if ( !$dbh ) {
   warn
 "No connection - did you set the user, password and server name correctly in PWD?\n";
-  for ( 4 .. 43 ) {
+  for ( 4 .. 49 ) {
     ok(0);
   }
   exit(0);
@@ -47,6 +47,7 @@ test4($dbh);
 test5($dbh);
 test6($dbh);
 
+test_cached($dbh);
 # Vanilla test - do the "correct" prepare/execute handling.
 sub test1 {
   my $dbh = shift;
@@ -347,5 +348,41 @@ sub test6 {
   ok( $rc == 0, "test6 fetch3" );
 
   $dbh->{syb_no_child_con} = 0;
+
+}
+
+sub test_cached {
+  my $dbh = shift;
+
+  my $sth1 = $dbh->prepare_cached("select * from master..sysprocesses", undef, 0);
+  ok( defined($sth1), "test_cache prepare1");
+  my $rc = $sth1->execute();
+  ok( defined($rc), "test_cache execute1");
+  $rc = 0;
+  while ( my $d = $sth1->fetch ) {
+    if ( $sth1->err ) {
+      $rc = $sth1->err;
+    }
+  }
+  if ( $sth1->err ) {
+    $rc = $sth1->err;
+  }
+  ok( $rc == 0, "test_cache fetch1" );
+
+
+  my $sth2 = $dbh->prepare_cached("select * from master..sysprocesses", undef, 0);
+  ok( defined($sth2), "test_cache prepare2");
+  $rc = $sth2->execute();
+  ok( defined($rc), "test_cache execute2");
+  $rc = 0;
+  while ( my $d = $sth2->fetch ) {
+    if ( $sth2->err ) {
+      $rc = $sth2->err;
+    }
+  }
+  if ( $sth2->err ) {
+    $rc = $sth2->err;
+  }
+  ok( $rc == 0, "test_cache fetch2" );
 
 }

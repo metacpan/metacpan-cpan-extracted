@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+LICENSE
+t/ConstantCalculus-CircleConstant.t
+lib/ConstantCalculus/CircleConstant.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

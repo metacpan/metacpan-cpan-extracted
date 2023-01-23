@@ -1,3 +1,5 @@
+use strict;
+use warnings;
 use Test::More;
 BEGIN {
     plan skip_all => 'Need perl v5.16.0: no \N{}'

@@ -1,8 +1,8 @@
-use strict;
+use v5.12.0;
 use warnings;
-package Data::Rx;
+package Data::Rx 0.200008;
 # ABSTRACT: perl implementation of Rx schema system
-$Data::Rx::VERSION = '0.200007';
+
 use Data::Rx::Util;
 use Data::Rx::TypeBundle::Core;
 
@@ -33,8 +33,8 @@ use Data::Rx::TypeBundle::Core;
 #pod =head1 COMPLEX CHECKS
 #pod
 #pod Note that a "schema" can be represented either as a name or as a definition.
-#pod In the L</SYNOPSIS> above, note that we have both, '//str' and 
-#pod C<{ type =E<gt> '//int', value =E<gt> 201 }>.  
+#pod In the L</SYNOPSIS> above, note that we have both, '//str' and
+#pod C<{ type =E<gt> '//int', value =E<gt> 201 }>.
 #pod With the L<collection types|http://rx.codesimply.com/coretypes.html#collect>
 #pod provided by Rx, you can validate many complex structures.  See L</learn_types>
 #pod for how to teach your Rx schema object about the new types you create.
@@ -86,7 +86,7 @@ sub _expand_uri {
 
   if ($str =~ m{\A/(.*?)/(.+)\z}) {
     my ($prefix, $rest) = ($1, $2);
-  
+
     my $lookup = $self->{prefix};
     Carp::croak "unknown prefix '$prefix' in type name '$str'"
       unless exists $lookup->{$prefix};
@@ -207,7 +207,7 @@ sub register_type_plugin {
 
       Carp::confess("a type plugin is already registered for $uri")
         if $self->{handler}{ $uri };
-        
+
       $self->{handler}{ $uri } = $plugin;
     }
   }
@@ -288,7 +288,7 @@ sub core_bundle {
   return 'Data::Rx::TypeBundle::Core';
 }
 
-sub core_type_plugins { 
+sub core_type_plugins {
   my ($self) = @_;
 
   Carp::cluck("core_type_plugins deprecated; use Data::Rx::TypeBundle::Core");
@@ -310,7 +310,7 @@ Data::Rx - perl implementation of Rx schema system
 
 =head1 VERSION
 
-version 0.200007
+version 0.200008
 
 =head1 SYNOPSIS
 
@@ -335,6 +335,16 @@ version 0.200007
   my $reply = $json->decode( $agent->get($http_request) );
 
   die "invalid reply" unless $schema->check($reply);
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -414,8 +424,8 @@ produced in a consistent order.
 =head1 COMPLEX CHECKS
 
 Note that a "schema" can be represented either as a name or as a definition.
-In the L</SYNOPSIS> above, note that we have both, '//str' and 
-C<{ type =E<gt> '//int', value =E<gt> 201 }>.  
+In the L</SYNOPSIS> above, note that we have both, '//str' and
+C<{ type =E<gt> '//int', value =E<gt> 201 }>.
 With the L<collection types|http://rx.codesimply.com/coretypes.html#collect>
 provided by Rx, you can validate many complex structures.  See L</learn_types>
 for how to teach your Rx schema object about the new types you create.
@@ -461,13 +471,17 @@ L<http://rx.codesimply.com/>
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Hakim Cassimally Ronald J Kimball
+=for stopwords Daniel Lucraft Hakim Cassimally Jeremy Vonderfecht Ricardo Signes Ronald J Kimball
 
 =over 4
+
+=item *
+
+Daniel Lucraft <dan@fluentradical.com>
 
 =item *
 
@@ -475,21 +489,25 @@ Hakim Cassimally <hakim@mysociety.org>
 
 =item *
 
+Jeremy Vonderfecht <CesiumLifeJacket@gmail.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=item *
+
 Ronald J Kimball <rjk@tamias.net>
 
 =item *
 
-Ronald J Kimball <rkimball@pangeamedia.com>
-
-=item *
-
-Ronald J Kimball <rkimball@snapapp.com>
+Vonderfecht <vond085@we19772.pnl.gov>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Ricardo SIGNES.
+This software is copyright (c) 2023 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

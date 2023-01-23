@@ -3,8 +3,8 @@ package PDF::Builder::Docs;
 use strict;
 use warnings;
 
-our $VERSION = '3.024'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.025'; # VERSION
+our $LAST_UPDATE = '3.025'; # manually update whenever code is changed
 
 # originally part of Builder.pm, it was split out due to its length
 
@@ -83,11 +83,22 @@ kerning. HarfBuzz::Shaper is based on a set of HarfBuzz libraries, which it
 will attempt to build if they are not found. See C<textHS> for more 
 information.
 
-Note that the installation process B<will> attempt to install these 
+B<*> Text::Markdown -- This library is used if you want to format "Markdown"
+style code in PDF::Builder, via the C<column()> method. It translates a certain
+dialect of Markdown into HTML, which is then further processed.
+
+B<*> HTML::TreeBuilder -- This library is used to format HTML input into a 
+data structure which PDF::Builder can interpret, via the C<column()> method.
+Note that if Markdown input is used, it will also need HTML::TreeBuilder to
+handle the HTML the Markdown is translated to.
+
+Note that the installation process will B<not> attempt to install these 
 libraries automatically. If you don't wish to use one or more of them, you are
-free to uninstall the optional librarie(s). If one or more failed to install,
-no need to panic -- you simply won't be able to use some advanced features,
-unless you are able to manually install the modules (e.g., with "cpan install").
+free to not install the optional librarie(s). If you may want to make use of
+one or more, consider installing them I<before> installing PDF::Builder, so
+that any t-tests and/or examples that make use of these libraries may be run
+during installation and checkout of PDF::Builder. Remember, you can I<always>
+install an optional library later, if you want to make use of it.
 
 =head2 Strings (Character Text)
 
@@ -473,6 +484,14 @@ probably be a major code bloat for very little benefit. However, it could be
 considered in the future if there is a demonstrated need for it, such as 
 serious PDF file size bloat due to the extra object overhead when interleaving
 text and graphics output.
+
+There is not currently a general facility for mixed-use objects, but a limited 
+example is the current implementation of underline, line-through, and overline 
+text (within C<column()> markup); which are performed within the text object, 
+temporarily exiting (ET) to graphics mode to draw the lines, and then returning 
+(BT) to text mode. This was done so that baseline coordinate adjustments could
+be easily made. Since "BT" resets some text settings, this needs to be done
+with care!
 
 =head2 PDF Versions Supported
 

@@ -106,7 +106,7 @@ which have the form B<I<KW>=I<VAL>>, grouped into sections, declared
 as B<[I<NAME>]> (square brackets are part of the syntax). Empty lines
 and comments (introduced by a hash sign) are ignored.
 
-There are three main use cases
+There are four main use cases:
 
 =head2 APACHE
 
@@ -266,6 +266,62 @@ directory:
 	...
 
 Finally, define the backends.
+
+=back
+
+=head2 Pound
+
+B<Pound> is a light-weight proxy server available from L<https://github.com/graygnuorg/pound>.  It is supported by the B<acmeman> source B<pound>, which
+scans the B<pound> configuration file F</etc/pound.cfg>, and extracts domain
+names from the B<Host> directives in B<ListenHTTP> sections that contain
+the B<ACME> statement.  Below is a short usage instruction for this source
+module.  For a detailed discussion, refer to the section B<SOURCE>, subsection
+B<pound>.
+
+=over 4
+
+=item 1. Prepare the B<pound> HTTP listener for serving ACME challenges.
+
+Add the B<ACME> directive to the B<ListenHTTP> section of your F</etc/pound.cfg>
+file.  Its argument is a directory on local file system where ACME challenge
+files will be stored.  Make sure that this directory is the
+F<.well-known/acme-challenge> subdirectory of the B<rootdir> in your
+B<acmeman> configuration file.
+
+=item 2
+
+In the same B<ListenHTTP> section, define hostnames which will obtain
+ACME certificates.  Make sure to use B<Host> statements with exact string
+matching algorithm.  If serving several host names, use the B<Match OR> block.
+
+=back
+
+After these two steps, your listener section will look like:
+
+    ListenHTTP
+        Address 0.0.0.0
+        Port 80
+        ACME "/var/lib/pound/acme/.well-known/acme-challenge"
+	Service
+	    Match OR
+		Host "www.example.org"
+		Host "example.org"
+	    End
+            ...
+        End
+    End
+
+=over 4
+
+=item 3. Configure B<acmeman>.
+
+Use the B<pound> source and make sure B<rootdir> is synchronized with
+the B<ACME> statement in F<pound.cfg>, as described in point 1.  E.g.:
+
+    [core]
+	source = pound
+	rootdir = /var/lib/pound/acme
+	postrenew = /usr/bin/systemctl restart pound
 
 =back
 
@@ -765,6 +821,38 @@ names.
 If the B<--host> (B<-h>) option is used, only one certificate will be
 issued. The I<HOST> will be used as its B<CN>. All the domain names read
 from the input files will form the list of its alternative names.
+
+=head2 pound
+
+    [core]
+	source = pound [FILE]
+
+Domain names will be read from I<FILE> or, if it is not supplied, from
+the default B<pound> configuration file F</etc/pound.cfg>.  The module
+scans the B<ListenHTTP> section where the B<ACME> directive is used and
+extracts the domain names from the B<Host> statements in its services.
+
+Notice the limitations of this module:
+
+=over 4
+
+=item 1. Only B<Host> statements with exact string matching can be used.
+When declaring multiple hosts it might be tempting to use regular expression
+matching instead.  Due to obvious reasons, the module won't be able to
+cope with it.  When declaring multiple hosts, always use the B<Match OR>
+section, like this:
+
+    Match OR
+	Host "host1"
+	Host "host2"
+	Host "host3"
+    End
+
+=item 2. These B<Host> statements (or the enclosing B<Match OR> section)
+must be declared in the B<Service> sections located under the B<ListenHTTP>
+section.  Global B<Service> sections are not scanned.
+
+=back
 
 =head1 OPTIONS
 

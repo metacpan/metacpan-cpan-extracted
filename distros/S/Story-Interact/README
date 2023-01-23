@@ -119,6 +119,8 @@ BUGS
 SEE ALSO
     Pod::CYOA, <https://en.wikipedia.org/wiki/Choose_Your_Own_Adventure>.
 
+    Story::Interact::WWW: Mojo-based web interface for Story::Interact.
+
 AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 

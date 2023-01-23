@@ -3,11 +3,11 @@ package App::cpanminus::reporter;
 use warnings;
 use strict;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Carp ();
 use File::Spec     3.19;
-use File::HomeDir  0.58 ();
+use File::HomeDir::Tiny ();
 use Test::Reporter 1.54;
 use CPAN::Testers::Common::Client 0.13;
 use CPAN::Testers::Common::Client::Config;
@@ -42,7 +42,7 @@ sub new {
 
   $self->build_dir(
     $params{build_dir}
-      || File::Spec->catdir( File::HomeDir->my_home, '.cpanm' )
+      || File::Spec->catdir( File::HomeDir::Tiny::home(), '.cpanm' )
   );
 
   $self->build_logfile(
@@ -447,7 +447,7 @@ sub make_report {
   );
 
   if ($self->dry_run) {
-    print "not sending (drun run)\n" unless $self->quiet;
+    print "not sending (dry run)\n" unless $self->quiet;
     return;
   }
 
@@ -455,7 +455,7 @@ sub make_report {
     $reporter->send() || die $reporter->errstr();
   }
   catch {
-    print "Error while sending this report, continuing with the next one...\n" unless $self->quiet;
+    print "Error while sending this report, continuing with the next one ($_)...\n" unless $self->quiet;
     print "DEBUG: @_" if $self->verbose;
   } finally{
     $client->record_history unless $self->skip_history;
@@ -465,9 +465,9 @@ sub make_report {
 
 sub get_meta_for {
   my ($self, $dist) = @_;
-  my $distdir = File::Spec->catdir( $self->build_dir, $dist );
+  my $distdir = File::Spec->catdir( $self->build_dir, 'latest-build', $dist );
 
-  foreach my $meta_file ( qw( META.json META.yml META.yaml ) ) {
+  foreach my $meta_file ( qw( MYMETA.json MYMETA.yml META.json META.yml ) ) {
     my $meta_path = File::Spec->catfile( $distdir, $meta_file );
     if (-e $meta_path) {
       my $meta = eval { Parse::CPAN::Meta->load_file( $meta_path ) };
@@ -503,7 +503,7 @@ documentation instead. Please look there for a B<much more> comprehensive docume
 
     $tester->run;
 
-  
+
 =head1 DESCRIPTION
 
 See L<cpanm-reporter>.
@@ -516,7 +516,7 @@ Breno G. de Oliveira  C<< <garu@cpan.org> >>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2012-2015, Breno G. de Oliveira C<< <garu@cpan.org> >>. All rights reserved.
+Copyright (c) 2012-2023, Breno G. de Oliveira C<< <garu@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.

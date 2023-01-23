@@ -8,6 +8,7 @@ my $test_count = 2;
 use PDF::Builder;
 
 my @possible_locations = (
+    '/usr/share/fonts/dejavu-sans-fonts/DejaVuSans.ttf',
     '/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf',
     '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
     '/var/lib/defoma/gs.d/dirs/fonts/DejaVuSans.ttf',

@@ -4,13 +4,13 @@
       "Ruben Westerberg <drclaw@mac.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Error-Show",
    "no_index" : {
@@ -37,6 +37,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.1.0",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/drclaw1394/perl-error-show/issues"
+      },
+      "homepage" : "https://github.com/drclaw1394/perl-error-show",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/drclaw1394/perl-error-show.git"
+      }
+   },
+   "version" : "v0.1.1",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

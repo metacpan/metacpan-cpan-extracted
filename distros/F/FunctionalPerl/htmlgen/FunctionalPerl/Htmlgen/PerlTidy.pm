@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2019-2021 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -33,14 +33,10 @@ use warnings;
 use warnings FATAL => 'uninitialized';
 use experimental "signatures";
 
-use Sub::Call::Tail;
-use FP::Docstring;
 use FP::Show;
 use Perl::Tidy;
 use FunctionalPerl::Htmlgen::Htmlparse ":all";
 use FunctionalPerl::Htmlgen::Sourcelang;
-
-use FunctionalPerl ":all";    ##xx
 
 sub tidyhtml {
     my ($source) = @_;
@@ -65,7 +61,10 @@ sub match_element_names($self) { [qw(code)] }
 
 sub map_element ($self, $e, $uplist) {
 
-#warn "hm: ".show($e->name). ", uplist= ".show($uplist->map(the_method "name"));
+    # warn "hm: "
+    #     . show($e->name)
+    #     . ", uplist= "
+    #     . show($uplist->map(the_method "name"));
     if (not $uplist->is_null and $uplist->first->lcname eq "pre") {
         my $txt = $e->text;
         if (sourcelang($txt) eq "Perl") {

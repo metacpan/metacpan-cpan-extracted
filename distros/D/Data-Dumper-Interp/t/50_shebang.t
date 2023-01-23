@@ -2,6 +2,7 @@
 use strict; use warnings  FATAL => 'all'; use feature qw(state say); 
 srand(42);  # so reproducible
 use feature 'lexical_subs'; no warnings "experimental::lexical_subs";
+use version 0.77;
 #use open IO => ':locale';
 use open ':std', ':encoding(UTF-8)';
 use utf8;
@@ -348,8 +349,12 @@ $_ = "GroupA.GroupB";
 { my $code = q(my $v = \"abc"; dvis('$v')); check $code, 'v=\\"abc"', eval $code; }
 { my $code = q(my $v = \"abc"; dvisq('$v')); check $code, "v=\\'abc'", eval $code; }
 { my $code = q(my $v = \*STDOUT; dvisq('$v')); check $code, "v=\\*::STDOUT", eval $code; }
-{ my $code = q(open my $fh, "</dev/null" or die; dvis('$fh')); 
-  check $code, "fh=\\*{\"::\\\$fh\"}", eval $code; }
+SKIP: {
+  skip "because Data::Dumper too old", 1 
+    if version->parse($Data::Dumper::VERSION) <= version->parse(2.179);
+  { my $code = q(open my $fh, "</dev/null" or die; dvis('$fh')); 
+    check $code, "fh=\\*{\"::\\\$fh\"}", eval $code; }
+}
 { my $code = q(open my $fh, "</dev/null" or die; dvisq('$fh')); 
   check $code, "fh=\\*{'::\$fh'}", eval $code; }
 
@@ -759,7 +764,7 @@ EOF
 
         ( $] >= 5.022001 && $] <= 5.022001
             ?  (do{ state $warned = 0;
-                    warn "\n\n** obj->method() tests disabled ** due to Perl v5.22.1 segfault!\n\n"
+                    diag "\n\n** obj->method() tests disabled ** due to Perl v5.22.1 segfault!\n\n"
                      unless $warned++; ()
                   },())
             : (
@@ -793,8 +798,11 @@ EOF
     ), #map ($LQ,$RQ)
   );
   for my $test (@dvis_tests) {
-    my ($lno, $dvis_input, $expected) = @$test;
+    my ($lno, $dvis_input, $expected, $skip_condition) = @$test;
     #warn "##^^^^^^^^^^^ lno=$lno dvis_input='$dvis_input' expected='$expected'\n";
+    
+    # FUTURE: wrap in subtest with plan skip_all => $skip_condition if skip_condition is true
+    die "skip_condition not impl" if $skip_condition;
 
     { local $@;  # check for bad syntax first, to avoid uncontrolled die later
       # For some reason we can't catch exceptions from inside package DB.

@@ -3,7 +3,6 @@ use HTML::Blitz::pragma;
 use HTML::Blitz::Template ();
 use HTML::Blitz::RuleSet ();
 use HTML::Blitz::SSSelector ();
-use HTML::Blitz::SelectorGroup ();
 use HTML::Blitz::SelectorType qw(
     ST_FALSE
     ST_TAG_NAME
@@ -16,6 +15,11 @@ use HTML::Blitz::SelectorType qw(
     ST_ATTR_LANG_PREFIX
     ST_NTH_CHILD
     ST_NTH_CHILD_OF_TYPE
+
+    LT_DESCENDANT
+    LT_CHILD
+    LT_SIBLING
+    LT_ADJACENT_SIBLING
 );
 use HTML::Blitz::ActionType qw(
     AT_REMOVE_IF
@@ -40,7 +44,7 @@ use Carp qw(croak);
 use Scalar::Util qw(blessed);
 use overload ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 method new($class: @rules) {
     my $self = bless {
@@ -135,6 +139,13 @@ my %attr_op_type = (
     '*' => ST_ATTR_INFIX,
     '~' => ST_ATTR_LIST_HAS,
     '|' => ST_ATTR_LANG_PREFIX,
+);
+
+my %comb_type = (
+    ' ' => LT_DESCENDANT,
+    '>' => LT_CHILD,
+    '~' => LT_SIBLING,
+    '+' => LT_ADJACENT_SIBLING,
 );
 
 fun _try_parse_simple_selector($src_ref, :$allow_tag_name) {
@@ -244,8 +255,10 @@ fun _try_parse_simple_selector($src_ref, :$allow_tag_name) {
 
 fun _parse_selector($src) {
     croak "Invalid selector: $src" if ref $src;
-    my @sequences;
-    my @simples;
+
+    my @alternatives;
+    my $sequences = [];
+    my $simples = [];
 
     pos($src) = 0;
     $src =~ /\G$ws++/gc;
@@ -260,14 +273,28 @@ fun _parse_selector($src) {
             $src =~ /\G\)/gc
                 or croak "Missing ')' after argument to ':not(': " . substr($src, pos($src), 100);
             $simple->{negated} = 1;
-            push @simples, $simple;
-        } elsif (defined(my $simple = _try_parse_simple_selector \$src, allow_tag_name => !@simples)) {
-            push @simples, $simple;
+            push @$simples, $simple;
+        } elsif (defined(my $simple = _try_parse_simple_selector \$src, allow_tag_name => !@$simples)) {
+            push @$simples, $simple;
+        } elsif ($src =~ /\G(?>$ws*([>~+])|$ws)$ws*+/gc) {
+            my $comb = $1 // ' ';
+            @$simples
+                or croak "Selector list before '$comb' cannot be empty: " . substr($src, $-[0], 100);
+            push @$sequences, HTML::Blitz::SSSelector->new(
+                simple_selectors => $simples,
+                link_type        => $comb_type{$comb},
+            );
+            $simples = [];
         } elsif ($src =~ /\G,$ws*+/gc) {
-            @simples
+            @$simples
                 or croak "Selector list before ',' cannot be empty: " . substr($src, $-[0], 100);
-            push @sequences, HTML::Blitz::SSSelector->new(@simples);
-            @simples = ();
+            push @$sequences, HTML::Blitz::SSSelector->new(
+                simple_selectors => $simples,
+                link_type        => undef,
+            );
+            $simples = [];
+            push @alternatives, $sequences;
+            $sequences = [];
         } else {
             last;
         }
@@ -275,12 +302,18 @@ fun _parse_selector($src) {
 
     $src =~ /\G$ws*+\z/
         or croak "Unparsable selector: " . substr($src, pos($src), 100);
-    @simples
-        or croak @sequences ? "Trailing comma after last selector list" : "Selector cannot be empty";
+    @$simples
+        or croak
+            @$sequences ? "Trailing combinator after last selector list" :
+            @alternatives ? "trailing comma after last selector list" :
+            "Selector cannot be empty";
 
-    push @sequences, HTML::Blitz::SSSelector->new(@simples);
-
-    HTML::Blitz::SelectorGroup->new(@sequences)
+    push @$sequences, HTML::Blitz::SSSelector->new(
+        simple_selectors => $simples,
+        link_type        => undef,
+    );
+    push @alternatives, $sequences;
+    \@alternatives
 }
 
 fun _text($str) {
@@ -702,6 +735,8 @@ HTML::Blitz - high-performance, selector-based, content-aware HTML template engi
 
 =head1 SYNOPSIS
 
+=for highlighter language=perl
+
     use HTML::Blitz ();
     my $blitz = HTML::Blitz->new;
 
@@ -849,9 +884,13 @@ second phase, all matching actions are applied.
 
 Consider the following document fragment:
 
+=for highlighter language=html
+
     <div class="foo"> ... </div>
 
 And these rules:
+
+=for highlighter language=perl
 
     [ 'div' => ['remove_all_attributes'] ],
     [ '.foo' => ['replace_inner_text', 'Hello!'] ],
@@ -862,6 +901,8 @@ these rules: Both selectors are matched first, and then both actions are
 applied together. The attribute removal does not prevent the second rule from
 matching. The result will always come out as:
 
+=for highlighter language=html
+
     <div>Hello!</div>
 
 In cases where multiple actions apply to the same element, all actions are run,
@@ -871,12 +912,16 @@ but their order is unspecified. Consider the following document fragment:
 
 And these rules:
 
+=for highlighter language=perl
+
     [ 'div' => ['replace_inner_text', 'A'], ['replace_inner_text', 'B'] ],
     [ '.foo' => ['replace_inner_text', 'B'] ],
 
 All three actions will run and replace the contents of the C<div> element, but
 since their order is unspecified, you may end up with any of the following
 three results (depending on which action runs last):
+
+=for highlighter language=html
 
     <div class="foo">A</div>
 
@@ -900,6 +945,8 @@ document fragment:
 
 And these actions:
 
+=for highlighter language=perl
+
     ['remove_all_attributes'],                                          #1
     ['set_attribute_text', src => 'kitten.jpg'],                        #2
     ['set_attribute_text', alt => "Photo of a sleeping kitten"],        #3
@@ -909,6 +956,8 @@ Clearly the most sensible way to arrange these actions is from #1 to #4; first
 removing all existing attributes, giving C<< <img> >>, then gradually setting
 new attributes, giving C<< <img src="kitten.jpg" alt="Photo of a sleeping kitten"> >>,
 and finally transforming them. This would result in:
+
+=for highlighter language=html
 
     <img src="/media/images/kitten.jpg" alt="Photo of a sleeping kitten">
 
@@ -930,6 +979,8 @@ And that's what HTML::Blitz actually does.
 =head1 METHODS
 
 =head2 new
+
+=for highlighter language=perl
 
     my $blitz = HTML::Blitz->new;
     my $blitz = HTML::Blitz->new(\%options);
@@ -1057,18 +1108,43 @@ A I<rule> is an array reference whose first element is a selector and whose
 remaining elements are processing actions. The actions will be applied to all
 HTML elements in the template document that match the selector.
 
-A I<selector> is a CSS selector in the form of a string.
+A I<selector> is a CSS selector group in the form of a string.
 
 An I<action> is an array reference whose first element is a string that
 specifies the type of the action; the remaining elements are arguments.
 Different types of actions take different kinds of arguments.
 
-In the current implementation, only a subset of the full CSS selector
-specification is supported. In particular, anything involving selector
-combinators (i.e. C<S1 S2>, C<< S1 > S2 >>, C<S1 ~ S2>, or C<S1 + S2>) is not
-implemented. A supported selector is a comma-separated list of one or more
-simple selector sequences. It matches any element matched by any of the
-sequences in the list.
+A selector group is a comma-separated list of one or more selectors. It matches
+any element matched by any of the selectors in the list.
+
+A selector is one or more simple selector sequences separated by a combinator.
+
+The available combinators are whitespace, C<< > >>, C<~>, and C<+>. For all
+simple selector sequences I<S1>, I<S2>:
+
+=over
+
+=item *
+
+The descendant combinator C<S1 S2> matches any element I<S2> that has an
+ancestor matching I<S1>.
+
+=item *
+
+The child combinator C<< S1 > S2 >> matches any element I<S2> that has an
+immediate parent element matching I<S1>.
+
+=item *
+
+The sibling combinator C<S1 ~ S2> matches any element I<S2> that has a
+preceding sibling element matching I<S1>.
+
+=item *
+
+The adjacent sibling combinator C<S1 + S2> matches any element I<S2> that has
+an immediately preceding sibling element matching I<S1>.
+
+=back
 
 A simple selector sequence is a sequence of one or more simple selectors
 separated by nothing (not even whitespace). If a universal or type selector is
@@ -1167,6 +1243,8 @@ whole C<An> part can be omitted; if C<B> is 0, the C<+B> (or C<-B>) part can be
 omitted unless the C<An> part is also gone; C<n> can also be written C<N>.
 
 In short, all of these are valid arguments to C<:nth-child>:
+
+=for highlighter language=css
 
     3n+1
     3n-2
@@ -1336,6 +1414,8 @@ value as a string, or the string C<var>, in which case the second element is a
 variable name and the attribute value is substituted in at runtime.
 
 For example:
+
+=for highlighter language=perl
 
     ['replace_all_attributes', {
         class => [text => 'button cta-1'],
@@ -1580,6 +1660,8 @@ matched element is the first child of the parent whose contents are repeated.
 
 For example, consider the following template code:
 
+=for highlighter language=html
+
     <div id="list">
         <hr class="sep">
         <p class="c1">other stuff</p>
@@ -1587,6 +1669,8 @@ For example, consider the following template code:
     </div>
 
 ... with this set of rules:
+
+=for highlighter language=perl
 
     ['#list' =>
         ['repeat_inner', 'things',
@@ -1600,6 +1684,8 @@ Since the C<hr> element targeted by the C<separator> action occurs at the
 beginning of the section, it acts as a separator: It will not appear in the
 first copy of the section, but every following copy will include it. The
 result will look Like this:
+
+=for highlighter language=html
 
     <div id="list">
         
@@ -1620,6 +1706,8 @@ result will look Like this:
 
 =head2 apply_to_html
 
+=for highlighter language=perl
+
     my $template = $blitz->apply_to_html($name, $html_code);
 
 Applies the processing rules (added in L<the constructor|/new> or via
@@ -1631,6 +1719,8 @@ returned value is an instance of L<HTML::Blitz::Template>, which see.
 There are some restrictions on the HTML code you can pass in. This module does
 not implement the full HTML specification; in particular, implicit tags of any
 kind are not supported. For example, the following fragment is valid HTML:
+
+=for highlighter language=html
 
     <div>
         <p> A
@@ -1702,6 +1792,17 @@ follow slightly different rules:
     <!-- this is a syntax error: attempt to self-close a non-void tag outside of svg/math -->
     <circle />
 
+Similarly, within C<math> and C<svg> elements you can use C<CDATA> blocks with
+raw text inside:
+
+    <math>
+        <!-- OK: equivalent to "a&lt;b&amp;b&lt;c" -->
+        <![CDATA[a<b&b<c]]>
+    </math>
+
+    <!-- syntax error: CDATA outside of math/svg -->
+    <![CDATA[...]]>
+
 The (utterly bonkers) special parsing rules for C<script> elements are
 faithfully implemented:
 
@@ -1734,6 +1835,8 @@ Attributes without values are allowed (and implicitly assigned the empty string 
     <input disabled="" class="">
 
 =head2 apply_to_file
+
+=for highlighter language=perl
 
     my $template = $blitz->apply_to_file($filename);
 
@@ -1801,6 +1904,8 @@ The following is a complete program:
     print $html;
 
 It produces the following output:
+
+=for highlighter language=html
 
     <!DOCTYPE html>
     <html lang=en>
@@ -1965,7 +2070,7 @@ Lukas Mai, C<< <lmai at web.de> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2022 Lukas Mai.
+Copyright 2022-2023 Lukas Mai.
 
 This module is free software: you can redistribute it and/or modify it under
 the terms of the L<GNU Affero General Public License|https://www.gnu.org/licenses/agpl-3.0.txt>

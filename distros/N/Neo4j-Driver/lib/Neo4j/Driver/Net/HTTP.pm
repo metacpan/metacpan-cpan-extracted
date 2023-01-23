@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::HTTP;
 # ABSTRACT: Network controller for Neo4j HTTP
-$Neo4j::Driver::Net::HTTP::VERSION = '0.33';
+$Neo4j::Driver::Net::HTTP::VERSION = '0.34';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -40,7 +40,7 @@ sub new {
 		my $net_module = $driver->{net_module} || 'Neo4j::Driver::Net::HTTP::LWP';
 		return $net_module->new($driver);
 	};
-	my $http_adapter = $driver->{plugins}->trigger_event('http_adapter_factory', $driver);
+	my $http_adapter = $driver->{plugins}->trigger('http_adapter_factory', $driver);
 	
 	my $self = bless {
 		die_on_error => $driver->{die_on_error},

@@ -60,7 +60,7 @@
    "provides" : {
       "Tie::Handle::Base" : {
          "file" : "lib/Tie/Handle/Base.pm",
-         "version" : "0.16"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -75,6 +75,6 @@
          "web" : "https://bitbucket.org/haukex/tie-handle-base"
       }
    },
-   "version" : "0.16",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

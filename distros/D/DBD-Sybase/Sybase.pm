@@ -24,7 +24,7 @@
 
   $hostname  = Sys::Hostname::hostname();
   $init_done = 0;
-  $VERSION   = '1.21';
+  $VERSION   = '1.22';
   
   require_version DBI 1.30;
 
@@ -126,13 +126,13 @@
   use Carp;
 
   sub prepare {
-    my ( $dbh, $statement, @attribs ) = @_;
+    my ( $dbh, $statement, $attribs ) = @_;
 
     # create a 'blank' sth
 
     my $sth = DBI::_new_sth( $dbh, { 'Statement' => $statement, } );
 
-    DBD::Sybase::st::_prepare( $sth, $statement, @attribs )
+    DBD::Sybase::st::_prepare( $sth, $statement, $attribs )
       or return undef;
 
     $sth;
@@ -145,7 +145,10 @@
   # In other cases the driver will attempt to open a new connection if more than one statement handle is needed
   # which will cause things like transactions to behave incorrectly.
   sub prepare_cached {
-    return prepare(@_);
+    my ( $dbh, $statement, $attribs, $if_active ) = @_;
+    # We ignore the $if_active attribute...
+    # always prepare a new statement
+    return prepare($dbh, $statement, $attribs);
   }
 
   sub tables {
@@ -1551,7 +1554,7 @@ it can be reused without reparsing and recompiling it, which is only possible wi
 you use ?-style placeholders (see below).
 
 In addition, as DBD::Sybase will attempt to emulate the ability to have more than one active
-SQL statement on a database handle by opening addition connections this has significant side
+SQL statement on a database handle by opening additional connections this has significant side
 effects on transaction management. See also the B<syb_no_child_con> attribute.
 
 
@@ -2338,7 +2341,7 @@ DBD::Sybase by Michael Peppler
 
 =head1 COPYRIGHT
 
-The DBD::Sybase module is Copyright (c) 1996-2007 Michael Peppler.
+The DBD::Sybase module is Copyright (c) 1996-2023 Michael Peppler.
 The DBD::Sybase module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 

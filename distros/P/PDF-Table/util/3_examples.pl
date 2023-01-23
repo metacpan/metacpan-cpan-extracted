@@ -8,8 +8,8 @@
 use strict;
 use warnings;
 
-our $VERSION = '1.003'; # VERSION
-our $LAST_UPDATE = '1.003'; # manually update whenever code is changed
+our $VERSION = '1.004'; # VERSION
+our $LAST_UPDATE = '1.004'; # manually update whenever code is changed
 
 # dependent on optional packages:
 
@@ -47,6 +47,9 @@ my (@example_list, @example_results);
 
   push @example_list, "size.pl";
   push @example_results, "illustrate using size setting for column widths.\n";
+
+  push @example_list, "vsizes.pl";
+  push @example_results, "illustrate getting table size in advance.\n";
 
 # run with perl examples/<file> [args]
 

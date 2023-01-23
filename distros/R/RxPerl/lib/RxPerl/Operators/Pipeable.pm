@@ -12,15 +12,15 @@ use Scalar::Util 'reftype', 'refaddr', 'blessed', 'weaken';
 
 use Exporter 'import';
 our @EXPORT_OK = qw/
-    op_audit_time op_buffer_count op_catch_error op_combine_latest_with op_concat_map op_debounce_time op_delay
-    op_distinct_until_changed op_distinct_until_key_changed op_end_with op_exhaust_map op_filter op_finalize op_first
-    op_ignore_elements op_map op_map_to op_merge_map op_multicast op_pairwise op_pluck op_ref_count op_repeat op_retry
-    op_sample_time op_scan op_share op_skip op_skip_until op_start_with op_switch_map op_take op_take_until
+    op_audit_time op_buffer op_buffer_count op_catch_error op_combine_latest_with op_concat_map op_debounce_time
+    op_delay op_distinct_until_changed op_distinct_until_key_changed op_end_with op_exhaust_map op_filter op_finalize
+    op_first op_ignore_elements op_map op_map_to op_merge_map op_multicast op_pairwise op_pluck op_ref_count op_repeat
+    op_retry op_sample_time op_scan op_share op_skip op_skip_until op_start_with op_switch_map op_take op_take_until
     op_take_while op_tap op_throttle_time op_with_latest_from
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.13.1";
+our $VERSION = "v6.14.0";
 
 sub op_audit_time {
     my ($duration) = @_;
@@ -57,6 +57,50 @@ sub op_audit_time {
             });
         });
     };
+}
+
+sub op_buffer {
+    my ($notifier) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my @buffer;
+
+            my $own_subscriber = {
+                %$subscriber,
+                next     => sub {
+                    push @buffer, $_[0];
+                },
+                error    => sub {
+                    $subscriber->{error}->($_[0]) if defined $subscriber->{error};
+                },
+                complete => sub {
+                    $subscriber->{next}->([@buffer]) if @buffer and defined $subscriber->{next};
+                    undef @buffer;
+                    $subscriber->{complete}->() if defined $subscriber->{complete};
+                },
+            };
+
+            my $notifier_subscriber = {
+                next  => sub {
+                    $subscriber->{next}->([@buffer]) if defined $subscriber->{next};
+                    undef @buffer;
+                },
+                error => sub {
+                    $subscriber->{error}->($_[0]) if defined $subscriber->{error};
+                },
+            };
+
+            my $s1 = $source->subscribe($own_subscriber);
+            my $s2 = $notifier->subscribe($notifier_subscriber);
+
+            return [$s1, $s2], sub { undef @buffer };
+        })
+    }
 }
 
 sub op_buffer_count {
@@ -469,7 +513,7 @@ sub op_filter {
 
             my $own_subscriber = { %$subscriber };
             my $idx = 0;
-            $own_subscriber->{next} &&= sub {
+            $own_subscriber->{next} = sub {
                 my ($value) = @_;
                 my $passes = eval {
                     local $_ = $value;
@@ -550,7 +594,7 @@ sub op_map {
 
             my $own_subscriber = { %$subscriber };
             my $idx = 0;
-            $own_subscriber->{next} &&= sub {
+            $own_subscriber->{next} = sub {
                 my ($value) = @_;
                 my $result = eval {
                     local $_ = $value;

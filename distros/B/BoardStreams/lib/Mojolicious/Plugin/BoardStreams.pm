@@ -40,7 +40,7 @@ use constant {
     MAX_WEBSOCKET_SIZE         => 262_144,
 };
 
-our $VERSION = "v0.0.30";
+our $VERSION = "v0.0.31";
 
 has _listener_observables => sub { +{} };
 
@@ -801,7 +801,7 @@ sub register ($self, $app, $config) {
                     },
                     {
                         order_by => { -desc, 'id' },
-                        limit    => $limit,
+                        $limit ne 'all' ? (limit => $limit) : (),
                     }
                 ))->expand->hashes->reverse;
 

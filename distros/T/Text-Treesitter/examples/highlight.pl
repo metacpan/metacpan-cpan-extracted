@@ -53,9 +53,17 @@ my %FORMATS = (
    'variable.array'  => { fg => "xterm:43" },
    'variable.hash'   => { fg => "xterm:81" },
 
+   # For markup languages; e.g. used by tree-sitter-pod
+   'text.emphasis' => { italic => 1 },
+   'text.literal'  => { monospace => 1 },
+   'text.quote'    => { italic => 1, bg => "xterm:236", },
+   'text.strong'   => { bold => 1 },
+   'text.uri'      => { fg => "vga:blue", under => 1 },
+
    # Extra names
    label      => { fg => "xterm:140", under => 1 },
    preproc    => { fg => "xterm:140", bold => 1 },
+   verbatim   => { fg => "xterm:251", monospace => 1 },
 );
 
 if( $USE_THEME and my $config = $ts->treesitter_config ) {
@@ -83,7 +91,11 @@ $qc->exec( $query, $tree->root_node );
 my %UNRECOGNISED_CAPTURES;
 
 while( my $match = $qc->next_match ) {
-   CAPTURE: foreach my $capture ( $match->captures ) {
+   my @captures = $match->captures;
+
+   next unless $query->test_predicates_for_match( $tree, $match, \@captures );
+
+   CAPTURE: foreach my $capture ( @captures ) {
       my $node = $capture->node;
       my $capturename = $query->capture_name_for_id( $capture->capture_id );
 

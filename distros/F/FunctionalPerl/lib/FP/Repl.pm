@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2004-2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2004-2022 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -27,7 +27,7 @@ FP::Repl - read-eval-print loop
                      # uses readline defaults (which is somewhat broken?)
           # also, any fields of the FP::Repl::Repl class are possible:
           maxHistLen => 100, maybe_prompt => "foo>", maybe_package => "Foo::Bar",
-          maybe_historypath => ".foo_history", pager => "more"
+          maybe_historypath => ".foo_history", pager => ["more"]
           # etc.
          );
 
@@ -64,7 +64,7 @@ sub repl {
     my $maybe_skip = delete $args{skip};
     my $maybe_tty  = delete $args{tty};
 
-    my $r = new FP::Repl::Repl;
+    my $r = FP::Repl::Repl->new;
 
     if (exists $args{maybe_settingspath}) {
         $r->set_maybe_settingspath(delete $args{maybe_settingspath});

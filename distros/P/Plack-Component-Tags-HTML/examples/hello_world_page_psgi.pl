@@ -41,4 +41,6 @@ $runner->run($app);
 
 # Output by GET to http://localhost:5000/:
 # <!DOCTYPE html>
-# <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>My app</title></head><body>Hello world</body></html>
+# <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>My app</title><style type="text/css">
+# *{box-sizing:border-box;margin:0;padding:0;}
+# </style></head><body>Hello world</body></html>

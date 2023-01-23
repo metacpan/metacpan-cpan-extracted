@@ -11,6 +11,22 @@ WriteMakefile(
     ABSTRACT_FROM     => 'lib/Error/Show.pod', # retrieve abstract from module
     AUTHOR            => 'Ruben Westerberg <drclaw@mac.com>',
     LICENSE           => 'mit',
+    META_MERGE        => {
+                           'resources' => {
+                             'repository' => {
+                               'web' => 'https://github.com/drclaw1394/perl-error-show.git',
+                               'url' => 'git@github.com:drclaw1394/perl-error-show.git',
+                               'type' => 'git',
+                             },
+                             'homepage' => 'https://github.com/drclaw1394/perl-error-show',
+                             'bugtracker' => {
+                               'web' => 'https://github.com/drclaw1394/perl-error-show/issues',
+                             }
+                           },
+                           'meta-spec' => {
+                             'version' => 2,
+                           },
+                         },
     #Value must be from legacy list of licenses here
     #https://metacpan.org/pod/Module::Build::API
 );

@@ -3,7 +3,7 @@ use HTML::Blitz::pragma;
 use Exporter qw(import);
 use Carp qw(croak);
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 our @EXPORT_OK = qw(
     mk_doctype

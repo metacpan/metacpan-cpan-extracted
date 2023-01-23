@@ -7,7 +7,7 @@ use PerlIO::encoding;
 $Data::Dumper::Sortkeys = 1;
 use FASTX::Seq;
 use File::Basename;
-$FASTX::Reader::VERSION = '1.9.0';
+$FASTX::Reader::VERSION = '1.10.0';
 require Exporter;
 our @ISA = qw(Exporter);
 
@@ -18,18 +18,42 @@ use constant GZIP_SIGNATURE => pack('C3', 0x1f, 0x8b, 0x08);
 
 sub new {
     # Instantiate object
-    my ($class, $args) = @_;
+    my $class = shift @_;
     my $self = bless {} => $class;
-
+    my $args = {};
+    
+    # Named parameters: undefined $_[0] will read STDIN!
+    if (defined $_[0] and substr($_[0], 0, 1) eq '-') {
+      my %data = @_;
+        # Try parsing
+        for my $i (keys %data) {
+            if ($i =~ /^-(file|filename)/i) {
+                $args->{filename} = $data{$i};
+            } elsif ($i =~ /^-(loadseqs)/i) {
+                $args->{loadseqs} = $data{$i};
+            } else {
+                confess "[FASTX::Reader]: Unknown parameter `$i`\n";
+            }
+        }
+    } else {
+      # Legacy instantiation
+      ($args) = @_;
+    }
+      
+      
+      
     if (defined $args->{loadseqs}) {
       if ($args->{loadseqs} eq 'name' or $args->{loadseqs} eq 'names' ) {
         $args->{loadseqs} = 'name';
-      } elsif ($args->{loadseqs} eq 'seq' or $args->{loadseqs} eq 'seqs' or $args->{loadseqs} == 1) {
+      } elsif ($args->{loadseqs} eq 'seq' or $args->{loadseqs} eq 'seqs' or $args->{loadseqs} eq "1") {
         $args->{loadseqs} = 'seq';
+      } elsif ($args->{loadseqs} eq 'records') {
+        $args->{loadseqs} = 'records';
       } else {
         confess("attribute <loadseqs> should be 'name' or 'seq' to specify the key of the hash.");
       }
     }
+    
     $self->{filename} = $args->{filename};
     $self->{loadseqs} = $args->{loadseqs};
     $self->{aux}      = [undef];
@@ -41,7 +65,7 @@ sub new {
     # uncoverable branch false
 
     if ( defined $self->{filename} and -d $self->{filename} ) {
-      confess "Directory provide where file was expected\n";
+      confess __PACKAGE__, " Directory provide where file was expected\n";
     }
 
     if (defined $self->{filename} and $self->{filename} ne '{{STDIN}}') {
@@ -55,10 +79,12 @@ sub new {
          our $GZIP_BIN = _which('pigz', 'gzip');
          #close $fh;
          if (! defined $GZIP_BIN) {
+           $self->{decompressor} = 'IO::Uncompress::Gunzip';
            require IO::Uncompress::Gunzip;
            my $fh = IO::Uncompress::Gunzip->new($self->{filename}, MultiStream => 1);
            $self->{fh} = $fh;
          } else {
+           $self->{decompressor} = $GZIP_BIN;
 	         open  my $fh, '-|', "$GZIP_BIN -dc $self->{filename}" or confess "Error opening gzip file ", $self->{filename}, ": $!\n";
            $self->{fh} = $fh;
          }
@@ -96,6 +122,12 @@ sub new {
 
 }
 
+
+sub records {
+  my $self = shift;
+  confess "No records loaded with -loadseqs => records!\n" unless $self->{loadseqs} eq 'records';
+  return $self->{seqs};
+}
 
 
 sub getRead {
@@ -401,8 +433,16 @@ sub _load_seqs {
       my ($name, $seq) = ($s->{name}, $s->{seq});
       if ($self->{loadseqs} eq 'name') {
         $seqs->{$name} = $seq;
-      } else {
+      } elsif ($self->{loadseqs} eq 'seq') {
         $seqs->{$seq} = $name;
+      } else {
+        my $r = FASTX::Seq->new(
+          -name => $name,
+          -seq => $seq,
+          -comment => $s->{comments},
+          -qual => $s->{qual},
+        );
+        push(@{$seqs}, $r);
       }
 
   }
@@ -419,8 +459,12 @@ sub _which {
 		}
 	} else {
 		foreach my $cmd (@_) {
-			`which $cmd  2> /dev/null`;
-			return $cmd if (not $?);
+      my $exit;
+      eval {
+			  `which $cmd  2> /dev/null`;
+        $exit = $?;
+      };
+			return $cmd if ($exit == 0 and not $@);
 		}
 	}
 	return;
@@ -439,7 +483,7 @@ FASTX::Reader - A simple module to parse FASTA and FASTQ files, supporting compr
 
 =head1 VERSION
 
-version 1.9.0
+version 1.10.0
 
 =head1 SYNOPSIS
 
@@ -470,12 +514,24 @@ To read from STDIN either pass C<{{STDIN}}> as filename, or don't pass a filenam
   my $seq_from_stdin = FASTX::Reader->new();
 
 The parameter C<loadseqs> will preload all sequences in a hash having the sequence
-name as key and its sequence as value.
+name as key and its sequence as value (or the sequences, if passing 'seq' or 1 as value)
 
-  my $seq_from_file = FASTX::Reader->new({
-    filename => "$file",
-    loadseqs => 1,
+  my $seq_from_file = FASTX::Reader->new(
+    -filename => "$file",
+    -loadseqs => 'name',  # can be "seqs" or "records"
   });
+
+=head2 records() 
+
+Return the records in a single array (FASTX::Seq)
+
+  my $data = FASTX::Reader->new(
+    -filename => 'file.fa',
+    -loadseqs => 'records');
+
+  for my $i ($data->records()->@*) {
+      print $i->as_fasta() if $i->length() > 100;
+  }
 
 =head2 getRead()
 

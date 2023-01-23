@@ -3,7 +3,6 @@ abstract: 'high-performance, selector-based, content-aware HTML template engine'
 author:
   - 'Lukas Mai <l.mai@web.de>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
   Fcntl: '0'
   File::Temp: '0.2307'
   FindBin: '0'
@@ -11,10 +10,12 @@ build_requires:
   Test::Fatal: '0'
   Test::More: '0.88'
 configure_requires:
-  ExtUtils::MakeMaker: '6.76'
+  ExtUtils::MakeMaker: '0'
+  File::Find: '0'
+  File::Spec: '0'
   strict: '0'
   warnings: '0'
-dynamic_config: 1
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
@@ -25,6 +26,7 @@ no_index:
   directory:
     - t
     - inc
+    - xt
 requires:
   Carp: '0'
   Exporter: '5.57'
@@ -38,5 +40,7 @@ requires:
   perl: '5.024000'
   strict: '0'
   warnings: '0'
-version: '0.02'
+resources:
+  repository: git://github.com/mauke/HTML-Blitz
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -10,11 +10,13 @@ use PDF::Table;
 # then look for PDFpref file and read A or B forms
 my ($PDFpref, $rcA, $rcB); # which is available?
 my $prefFile = "./PDFpref";
+my $prefix = 0;  # by default, do not add a prefix to the output name
 my $prefDefault = "B"; # PDF::Builder default if no prefFile, or both installed
 if (@ARGV) {
     # A or -A argument: set PDFpref to A else B
     if ($ARGV[0] =~ m/^-?([AB])/i) {
 	$PDFpref = uc($1);
+	$prefix = 1;
     } else {
 	print STDERR "Unknown command line flag $ARGV[0] ignored.\n";
     }
@@ -71,12 +73,14 @@ if (!$rcA && !$rcB) {
 }
 # -------------
 
-our $VERSION = '1.003'; # VERSION
-our $LAST_UPDATE = '1.000'; # manually update whenever code is changed
+our $VERSION = '1.004'; # VERSION
+our $LAST_UPDATE = '1.004'; # manually update whenever code is changed
 
 my $outfile = $0;
 if ($outfile =~ m#[\\/]([^\\/]+)$#) { $outfile = $1; }
 $outfile =~ s/\.pl$/.pdf/;
+# command line -A or -B adds A_ or B_ to outfile
+if ($prefix) { $outfile = $PDFpref . "_" . $outfile; }
 
 my $pdftable = PDF::Table->new();
 # -------------

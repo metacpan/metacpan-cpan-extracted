@@ -3,7 +3,7 @@ package Firefox::Marionette::Timeouts;
 use strict;
 use warnings;
 
-our $VERSION = '1.34';
+our $VERSION = '1.35';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -35,7 +35,7 @@ Firefox::Marionette::Timeouts - Represents the timeouts for page loading, search
 
 =head1 VERSION
 
-Version 1.34
+Version 1.35
 
 =head1 SYNOPSIS
 
@@ -106,7 +106,7 @@ David Dick  C<< <ddick@cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2021, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
+Copyright (c) 2023, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic/perlartistic>.

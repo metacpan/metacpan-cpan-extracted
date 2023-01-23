@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2021 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2014-2022 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -46,6 +46,31 @@ FP::Hash
                         on hashkey("a"), \&real_cmp),
              [ {a=> 2, b=> "b"}, {a=> 3, b=> "a"} ];
 
+    is_equal hash_map({a=> 1, b=> 2, c=> 33, d=> 4},
+                      sub {
+                          my ($k, $v)= @_;
+                          $v > 10 ? () : (uc $k, $v*2)
+                      }),
+             {A=> 2, B=> 4, D=> 8};
+    is_equal hash_filter({a=> 1, b=> 2, c=> 33, d=> 4},
+                      sub {
+                          my ($k, $v)= @_;
+                          $v >= 2 and $k lt 'd'
+                      }),
+             {b=> 2, c=> 33};
+    is_equal hash_key_filter({a=> 1, b=> 2, c=> 33, d=> 4},
+                      sub {
+                          my ($k)= @_;
+                          $k lt 'b'
+                      }),
+             {a=> 1};
+    is_equal hash_value_filter({a=> 1, b=> 2, c=> 33, d=> 4},
+                      sub {
+                          my ($v)= @_;
+                          $v <= 4
+                      }),
+             {a=> 1, b=> 2, d=> 4};
+
     # NOTE: `mesh` might be added to List::Util, too
     is_equal +{ mesh [qw(a b c)], [2,3,4] },
             { a=> 2, b=> 3, c=> 4 };
@@ -74,13 +99,18 @@ use warnings;
 use warnings FATAL => 'uninitialized';
 use Exporter "import";
 
+# XX should not export all of those by default?
 our @EXPORT = qw(hash_set hash_perhaps_ref hash_maybe_ref hash_xref
     hash_ref_or hashkey mesh ziphash hash_cache hash_delete
     hash_update hash_diff hash_length subhash hashes_keys $empty_hash
-    hash2_set );
+    hash_map hash_filter hash_key_filter hash_value_filter
+    hash2_set
+    hash_to_maybefunction hash_to_perhapsfunction hash_to_function
+);
 our @EXPORT_OK   = qw();
 our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
+use FP::Docstring;
 use Chj::TEST;
 use FP::Carp;
 
@@ -293,11 +323,78 @@ sub hashes_keys {
     keys %{ array_to_hashset([map { keys %$_ } @_]) }
 }
 
+sub hash_map {
+    @_ == 2 or fp_croak_arity 2;
+    my ($h, $fn) = @_;
+    +{ map { $fn->($_, $$h{$_}) } keys %$h }
+}
+
+sub hash_filter {
+    __ 'only keep k=>v entries for which $pred->($k, $v) is true';
+    @_ == 2 or fp_croak_arity 2;
+    my ($hash, $pred) = @_;
+    +{
+        map {
+            my $v = $hash->{$_};
+            $pred->($_, $v) ? ($_ => $v) : ()
+        } keys %$hash
+    }
+}
+
+sub hash_key_filter {
+    __ 'only keep k=>v entries for which $pred->($k) is true';
+    @_ == 2 or fp_croak_arity 2;
+    my ($hash, $pred) = @_;
+    +{ map { $pred->($_) ? ($_ => $hash->{$_}) : () } keys %$hash }
+}
+
+sub hash_value_filter {
+    __ 'only keep k=>v entries for which $pred->($v) is true';
+    @_ == 2 or fp_croak_arity 2;
+    my ($hash, $pred) = @_;
+    +{
+        map {
+            my $v = $hash->{$_};
+            $pred->($v) ? ($_ => $v) : ()
+        } keys %$hash
+    }
+}
+
 # set leafs in 2-level hash structure:
 sub hash2_set {
     @_ == 4 or fp_croak_arity 4;
     my ($h, $k0, $k1, $v) = @_;
     hash_update $h, $k0, sub { my ($h1) = @_; hash_set $h1, $k1, $v }
+}
+
+sub hash_to_maybefunction {
+    @_ == 1 or fp_croak_arity 1;
+    my ($h) = @_;
+    sub {
+        @_ == 1 or fp_croak_arity 1;
+        my ($k) = @_;
+        $h->{$k}
+    }
+}
+
+sub hash_to_perhapsfunction {
+    @_ == 1 or fp_croak_arity 1;
+    my ($h) = @_;
+    sub {
+        @_ == 1 or fp_croak_arity 1;
+        my ($k) = @_;
+        exists $h->{$k} ? $h->{$k} : ()
+    }
+}
+
+sub hash_to_function {
+    @_ == 1 or fp_croak_arity 1;
+    my ($h) = @_;
+    sub {
+        @_ == 1 or fp_croak_arity 1;
+        my ($k) = @_;
+        exists $h->{$k} ? $h->{$k} : die "unknown key"
+    }
 }
 
 1

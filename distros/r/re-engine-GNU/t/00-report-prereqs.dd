@@ -16,7 +16,7 @@ do { my $x = {
        'develop' => {
                       'requires' => {
                                       'Pod::Coverage::TrustPod' => '0',
-                                      'Pod::Wordlist' => '0',
+                                      'Pod::Weaver::PluginBundle::RJBS' => '0',
                                       'Test::CPAN::Changes' => '0.19',
                                       'Test::CPAN::Meta' => '0',
                                       'Test::CPAN::Meta::JSON' => '0.16',
@@ -31,7 +31,6 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Pod::LinkCheck' => '0',
                                       'Test::Portability::Files' => '0',
-                                      'Test::Spelling' => '0.12',
                                       'Test::Synopsis' => '0',
                                       'Test::Version' => '1'
                                     }
@@ -56,7 +55,6 @@ do { my $x = {
                                    'IPC::Open3' => '0',
                                    'Test::More' => '0',
                                    'Thread' => '0',
-                                   'blib' => '1.01',
                                    'perl' => '5.010000'
                                  }
                  }

@@ -1,5 +1,5 @@
 package URI::Title;
-$URI::Title::VERSION = '1.902';
+$URI::Title::VERSION = '1.903';
 use 5.006;
 use warnings;
 use strict;
@@ -119,7 +119,7 @@ sub title {
   my $type;
   my $cset = "iso-8859-1"; # default
 
-  # we can be passed a hashref. Keys are url, or data.  
+  # we can be passed a hashref. Keys are url, or data.
   if (ref($param)) {
     if ($param->{data}) {
       $data = $param->{data};
@@ -152,7 +152,7 @@ sub title {
       }
       $data = <DATA>;
       close DATA;
-      
+
     # If not, assume it's an url
     } else {
       # special case for itms
@@ -193,7 +193,7 @@ URI::Title - get the titles of things on the web in a sensible way
 
 =head1 VERSION
 
-version 1.902
+version 1.903
 
 =head1 SYNOPSIS
 
@@ -228,6 +228,16 @@ So, let's solve these issues once.
 only one, the title(url) method. Call it with an url, get the title if possible,
 undef if it wasn't. Very simple.
 
+=head1 SEE ALSO
+
+L<WWW::GetPageTitle> - similar this module, but just handles web pages.
+The author of that module suggests you should use C<URI::Title>.
+
+=head1 NOTES
+
+Embedded title metadata of png files can be extracted if you have installed
+either L<Image::ExifTool> or L<Image::PNG::Libpng>.
+
 =head1 TODO
 
 Many, many, many things. Still unimplemented:
@@ -247,6 +257,10 @@ Many, many, many things. Still unimplemented:
 Tom Insam E<lt>tom@jerakeen.orgE<gt>, original author, 2004-2012.
 
 Philippe Bruhat (BooK) E<lt>book@cpan.orgE<gt>, maintainer, 2014.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2004 Tom Insam.
 
 This program is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.

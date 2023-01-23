@@ -11,7 +11,7 @@ echo off
 echo === 021_psfonts needs T1 glyph and metrics files (not included)
 echo     here, assuming metrics file (.afm or .pfm) is in same directory
 echo on
-perl examples\021_psfonts \Users\Phil\T1fonts\URWPalladioL-Roma.pfb
+perl examples\021_psfonts \Users\Phil\fonts\T1fonts\URWPalladioL-Roma.pfb
 perl examples\021_synfonts
 perl examples\022_truefonts C:\WINDOWS\fonts\times.ttf
 perl examples\022_truefonts_diacrits_utf8 C:\WINDOWS\fonts\tahoma.ttf
@@ -23,7 +23,7 @@ perl examples\023_cjkfonts
 echo off
 echo === 024 needs a sample BDF font (not included with distribution)
 echo on
-perl examples\024_bdffonts \Users\Phil\BDFfonts\codec\codec.bdf
+perl examples\024_bdffonts \Users\Phil\fonts\BDFfonts\codec\codec.bdf
 perl examples\025_unifonts
 perl examples\026_unifont2
 REM perl examples\027_winfont

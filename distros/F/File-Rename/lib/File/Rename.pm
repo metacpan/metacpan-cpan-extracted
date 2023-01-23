@@ -1,13 +1,13 @@
 package File::Rename;
 
 use strict;
-BEGIN { eval { require warnings; warnings->import } }
+use warnings;
 
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( rename );
 
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 
 sub import {
     my $pack = shift;
@@ -306,7 +306,7 @@ Errors from the code argument are not trapped.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2004, 2005, 2006, 2011, 2018, 2021, 2022 
+Copyright (C) 2004, 2005, 2006, 2011, 2018, 2021, 2022, 2023
 by Robin Barker
 
 This library is free software; you can redistribute it and/or modify

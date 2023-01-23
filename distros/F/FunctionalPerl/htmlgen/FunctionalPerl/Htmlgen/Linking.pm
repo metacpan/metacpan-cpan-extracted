@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2020 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2014-2021 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -70,15 +70,18 @@ package FunctionalPerl::Htmlgen::Linking::code {
     use PXML::XHTML ":all";
     use Chj::CPAN::ModulePODUrl 'perhaps_module_pod_url';
     use FP::Memoizing 'memoizing_to_dir';
+    use FunctionalPerl::Indexing qw(identifierInfos_by_name);
     use FP::Carp;
 
     our $podurl_cache = ".ModulePODUrl-cache";
     mkdir $podurl_cache;
+
+    # NOTE: ignores are handled further down, see $ignore_module_name
     *xmaybe_module_pod_url = memoizing_to_dir $podurl_cache, sub {
         print STDERR "perhaps_module_pod_url(@_)..";
         my @res = perhaps_module_pod_url @_;
         print STDERR "@res\n";
-        wantarray ? @res : $res[-1]
+        wantarray ? @res : $res[-1] ## no critic
     };
 
     sub maybe_module_pod_url($v) {
@@ -100,27 +103,42 @@ package FunctionalPerl::Htmlgen::Linking::code {
         $res
     }
 
-    # things that *do* exist as modules on CPAN but which we do not want
-    # to link since those are a different thing. ("CPAN-exception")
-    our $ignore_module_name = +{
-        map { $_ => 1 }
-            qw(map tail grep fold car cdr first rest head join primes test
-            all list Square Point),
+    sub is_likely_class_name($str) {
 
-        # these are not currently finding anything on CPAN, but let's
-        # add them for future safety:
-        qw(force length shift F strictlist cons inverse)
-    };
-
-    # XX most of those would simply go to local scripts and functions if
-    # these were checked for.
-    $$ignore_module_name{ "X" x 3 } = 1;  # avoid tripping search for to-do tags
-
-    sub ignore_module_name($name) {
-        $$ignore_module_name{$name}
+        # If $str contains an underscore but no "::" then it's much
+        # more likely to be a function or method name than a class
+        # name:
+        is_valid_class_name($str) and ($str =~ /::/ or not $str =~ /_/)
     }
 
-    use FP::Struct [] => "FunctionalPerl::Htmlgen::PXMLMapper";
+    use FP::Struct [
+        [\&is_string, "functional_perl_base_dir"],
+        [\&is_array,  "static_ignore_names"]
+    ] => "FunctionalPerl::Htmlgen::PXMLMapper";
+
+    sub _ignore_module_name($self) {
+        $self->{_ignore_module_name} //= do {
+            my $ignore_module_name
+                = identifierInfos_by_name($self->functional_perl_base_dir,
+                instance_of("FunctionalPerl::Indexing::Subroutine"));
+
+            for (@{ $self->static_ignore_names }) {
+                push @{ $ignore_module_name->{$_} },
+                    1;    # that is  not of the same type (Subroutine),
+                          # but we just need a boolean.
+            }
+
+            # To avoid tripping the search for to-do tags, this isn't part of
+            # the list above:
+            $$ignore_module_name{ "X" x 3 } = 1;
+
+            $ignore_module_name
+        }
+    }
+
+    sub ignore_module_name ($self, $name) {
+        $self->_ignore_module_name->{$name}
+    }
 
     sub match_element_names($self) { ["code"] }
 
@@ -151,7 +169,7 @@ package FunctionalPerl::Htmlgen::Linking::code {
             &$mapped_e()
         } else {
             my $t = $e->text;
-            if (is_class_name($t)) {
+            if (is_likely_class_name($t)) {
                 my $module_subpath = $t;
                 $module_subpath =~ s/::/\//sg;
                 $module_subpath .= ".pm";
@@ -170,7 +188,9 @@ package FunctionalPerl::Htmlgen::Linking::code {
                 };
 
                 my $maybe_cpan_url
-                    = ignore_module_name($t) ? undef : maybe_module_pod_url($t);
+                    = $self->ignore_module_name($t)
+                    ? undef
+                    : maybe_module_pod_url($t);
 
                 if (defined $maybe_cpan_url) {
                     &$wrap_with_link($maybe_cpan_url)

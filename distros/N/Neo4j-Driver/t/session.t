@@ -87,7 +87,7 @@ subtest 'error handling' => sub {
 	plan skip_all => "(subtest not supported with Neo4j::Bolt)" if $Neo4j_Test::bolt;
 	throws_ok {
 		Neo4j_Test->driver_no_connect->session->run('');
-	} qr/\bConnection refused\b|\bCan't connect\b|\bUnknown host\b/i, 'no connection';
+	} qr/\b(?:Connection refused|Can't connect|Unknown host|Address family not supported)\b/i, 'no connection';
 	return unless $Neo4j_Test::sim || $ENV{TEST_NEO4J_PASSWORD};  # next test requires a real or simulated server with auth enabled
 	throws_ok {
 		Neo4j_Test->driver_no_auth->session->run('');

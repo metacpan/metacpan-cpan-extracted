@@ -54,6 +54,7 @@ END
 	throws_ok {
 		$r = $s->run( $q, sub { return (a => $a, b => $b) } );
 	} qr/parameters must be .* hash or hashref/i, 'sub returning param list';
+	# Note: syntax errors / missing params might not always be reported as errors by Neo4j::Bolt 0.40+ for Bolt v1
 };
 
 

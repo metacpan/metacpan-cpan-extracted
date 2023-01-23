@@ -46,7 +46,7 @@
             "Dist::Zilla::Plugin::Prereqs" : "0",
             "Dist::Zilla::Plugin::PruneFiles" : "0",
             "Dist::Zilla::Plugin::RemovePrereqs" : "0",
-            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.71",
+            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.75",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitBooleanGrep" : "0",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitStringyEval" : "0",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitStringySplit" : "0",
@@ -165,7 +165,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "2.76",
+   "version" : "2.77",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Diab Jerius (DJERIUS)",

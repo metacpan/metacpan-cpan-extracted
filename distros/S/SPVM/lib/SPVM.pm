@@ -1,6 +1,6 @@
 package SPVM;
 
-our $VERSION = '0.9682';
+our $VERSION = $SPVM::Builder::VERSION;
 
 use 5.008007;
 use strict;
@@ -22,67 +22,58 @@ use SPVM::ExchangeAPI;
 use Carp 'confess';
 
 my $BUILDER;
-my $BOOT_COMPILER;
-my $BOOT_RUNTIME;
-my $BOOT_DYNAMIC_LIB_FILES = {};
-my $BOOT_ENV;
-my $BOOT_STACK;
+my $BUILDER_ENV;
+my $BUILDER_STACK;
 my $COMPILER;
 my $RUNTIME;
 my $DYNAMIC_LIB_FILES = {};
 my $ENV;
 my $STACK;
-my $SPVM_COMPILER;
-my $SPVM_RUNTIME;
-my $SPVM_DYNAMIC_LIB_FILES = {};
-my $SPVM_ENV;
-my $SPVM_STACK;
 
 sub GET_ENV { $ENV }
 sub GET_STACK { $STACK }
 
-require XSLoader;
-XSLoader::load('SPVM', $VERSION);
-
-my $loaded_spvm_modules = {};
-
-sub use_spvm_module {
-  my ($compiler, $class_name, $file, $line) = @_;
-  
-  my $success = $compiler->compile($class_name, __FILE__, __LINE__);
-  unless ($success) {
-    $compiler->print_error_messages(*STDERR);
-    exit(255);
-  }
-}
-
 sub load_dynamic_libs {
   my ($runtime, $dynamic_lib_files) = @_;
 
-  my $class_names = SPVM::Builder::Runtime->get_class_names($runtime);
+  my $class_names = [map { "$_" } @{$runtime->get_class_names}];
 
   # Set addresses of native methods and precompile methods
   for my $class_name (@$class_names) {
     next if $class_name =~ /::anon/;
     
     for my $category ('precompile', 'native') {
+
       my $cc = SPVM::Builder::CC->new(
         build_dir => $BUILDER->build_dir,
         at_runtime => 1,
       );
+
+      my $get_method_names_options = SPVM::ExchangeAPI::new_any_object_array(
+        $runtime->env,
+        $runtime->stack,
+        [
+          SPVM::ExchangeAPI::new_string($runtime->env, $runtime->stack, $category)
+          =>
+          SPVM::ExchangeAPI::call_method($runtime->env, $runtime->stack, 'Int', 'new', 1)
+        ]
+      );
       
-      my $method_names = SPVM::Builder::Runtime->get_method_names($runtime, $class_name, $category);
+      my $method_names = [map { "$_" } @{$runtime->get_method_names($class_name, $get_method_names_options)}];
       
       if (@$method_names) {
         # Build classs - Compile C source codes and link them to SPVM precompile method
         # Shared library which is already installed in distribution directory
-        my $dynamic_lib_file = SPVM::Builder::Runtime->get_dynamic_lib_file_dist($runtime, $class_name, $category);
+        my $module_file = $runtime->get_module_file($class_name);
+        my $dynamic_lib_file = SPVM::Builder::Util::get_dynamic_lib_file_dist($module_file, $category);
         
         # Try to build the shared library at runtime if shared library is not found
         unless (-f $dynamic_lib_file) {
-          my $module_file = SPVM::Builder::Runtime->get_module_file($runtime, $class_name);
-          my $dl_func_list = SPVM::Builder::Runtime->create_dl_func_list($runtime, $class_name, {category => $category});
-          my $precompile_source = SPVM::Builder::Runtime->build_precompile_class_source($runtime, $class_name);
+          my $module_file = $runtime->get_module_file($class_name);
+          my $method_names = $runtime->get_method_names($class_name, $get_method_names_options);
+          my $anon_class_names = $runtime->get_anon_class_names($class_name);
+          my $dl_func_list = SPVM::Builder::Util::create_dl_func_list($class_name, $method_names, $anon_class_names, {category => $category});
+          my $precompile_source = $runtime->build_precompile_class_source($class_name);
           $dynamic_lib_file = $cc->build_at_runtime($class_name, {module_file => $module_file, category => $category, dl_func_list => $dl_func_list, precompile_source => $precompile_source});
         }
         
@@ -95,9 +86,33 @@ sub load_dynamic_libs {
 
   # Set function addresses of native and precompile methods
   for my $category ('precompile', 'native') {
+    my $get_method_names_options = SPVM::ExchangeAPI::new_any_object_array(
+      $runtime->env,
+      $runtime->stack,
+      [
+        SPVM::ExchangeAPI::new_string($runtime->env, $runtime->stack, $category)
+        =>
+        SPVM::ExchangeAPI::call_method($runtime->env, $runtime->stack, 'Int', 'new', 1)
+      ]
+    );
+    
     for my $class_name (keys %{$dynamic_lib_files->{$category}}) {
+      next unless grep { "$_" eq $class_name } @$class_names;
+      
       my $dynamic_lib_file = $dynamic_lib_files->{$category}{$class_name};
-      SPVM::Builder::Runtime->bind_methods($runtime, $dynamic_lib_file, $class_name, $category);
+      my $method_names = $runtime->get_method_names($class_name, $get_method_names_options);
+      my $anon_class_names = $runtime->get_anon_class_names($class_name);
+      my $method_addresses = SPVM::Builder::Util::get_method_addresses($dynamic_lib_file, $class_name, $method_names, $anon_class_names, $category);
+      
+      for my $method_name (sort keys %$method_addresses) {
+        my $cfunc_address = $method_addresses->{$method_name};
+        if ($category eq 'native') {
+          $runtime->set_native_method_address($class_name, $method_name, SPVM::ExchangeAPI::new_address_object($runtime->env, $runtime->stack, $cfunc_address));
+        }
+        elsif ($category eq 'precompile') {
+          $runtime->set_precompile_method_address($class_name, $method_name, SPVM::ExchangeAPI::new_address_object($runtime->env, $runtime->stack, $cfunc_address));
+        }
+      }
     }
   }
 }
@@ -108,15 +123,43 @@ sub init_runtime {
       my $build_dir = $ENV{SPVM_BUILD_DIR};
       $BUILDER = SPVM::Builder->new(build_dir => $build_dir);
     }
-    $COMPILER = SPVM::Builder::Compiler->new(
+    
+    my $builder_compiler = SPVM::Builder::Compiler->new(
       module_dirs => $BUILDER->module_dirs
     );
-    my $success = $COMPILER->compile('Int', __FILE__, __LINE__);
+    # Load SPVM Compilers
+    $builder_compiler->use("Compiler", __FILE__, __LINE__);
+    $builder_compiler->use("Runtime", __FILE__, __LINE__);
+    $builder_compiler->use("Env", __FILE__, __LINE__);
+    $builder_compiler->use("Stack", __FILE__, __LINE__);
+    
+    my $builder_runtime = $builder_compiler->build_runtime;
+
+    $builder_runtime->load_dynamic_libs;
+
+    # Build an environment
+    $BUILDER_ENV = $builder_runtime->build_env;
+    
+    # Set command line info
+    $BUILDER_ENV->set_command_info($0, \@ARGV);
+    
+    # Call INIT blocks
+    $BUILDER_ENV->call_init_blocks;
+    
+    $BUILDER_STACK = $BUILDER_ENV->build_stack;
+    
+    $COMPILER = SPVM::ExchangeAPI::call_method($BUILDER_ENV, $BUILDER_STACK, "Compiler", "new");
+    for my $module_dir (@{$BUILDER->module_dirs}) {
+      $COMPILER->add_module_dir($module_dir);
+    }
+    $COMPILER->set_start_file(__FILE__);
+    $COMPILER->set_start_line(__LINE__ + 1);
+    my $success = $COMPILER->compile('Int');
     unless ($success) {
       confess "Unexpcted Error:the compiliation must be always successful";
     }
     $RUNTIME = $COMPILER->build_runtime;
-    
+
     &load_dynamic_libs($RUNTIME, $DYNAMIC_LIB_FILES);
   }
 }
@@ -129,60 +172,63 @@ sub import {
     $BUILDER = SPVM::Builder->new(build_dir => $build_dir);
   }
 
-  my $start_classes_length = SPVM::Builder::Runtime->get_classes_length($RUNTIME);
-  
-  # This is needed in the case that INIT block is not called in "perl -c script.pl"
-  &init_runtime();
-  
-  my ($file, $line) = (caller)[1, 2];
-
-  # Add class informations
-  my $build_success;
-  if (defined $class_name) {
-
-    # Compile SPVM source code and create runtime env
-    my $success = $COMPILER->compile($class_name, $file, $line);
-    unless ($success) {
-      $COMPILER->print_error_messages(*STDERR);
-      exit(255);
+  {
+    my $start_classes_length = 0;
+    if ($RUNTIME) {
+      $start_classes_length = $RUNTIME->get_classes_length;
     }
-    $RUNTIME = $COMPILER->build_runtime;
+    
+    &init_runtime();
+    
+    my ($file, $line) = (caller)[1, 2];
+    
+    # Add class informations
+    my $build_success;
+    if (defined $class_name) {
+      
+      $COMPILER->set_start_file(__FILE__);
+      $COMPILER->set_start_line(__LINE__ + 1);
+      my $success = $COMPILER->compile($class_name);
+      unless ($success) {
+        my $error_messages = $COMPILER->get_error_messages;
+        for my $error_message (@$error_messages) {
+          printf STDERR "[CompileError]$error_message\n";
+        }
+        $COMPILER = undef;
+        exit(255);
+      }
+      $RUNTIME = $COMPILER->build_runtime;
 
-    &load_dynamic_libs($RUNTIME, $DYNAMIC_LIB_FILES);
+      &load_dynamic_libs($RUNTIME, $DYNAMIC_LIB_FILES);
+    }
   }
 }
 
 INIT {
-  # This is needed in the case that SPVM->import is not called.
   &init_runtime();
   
-  # Class names added at this compilation
-  my $class_names = SPVM::Builder::Runtime->get_class_names($RUNTIME);
-  bind_to_perl($RUNTIME, $class_names);
+  my $class_names = $RUNTIME->get_class_names;
+  &bind_to_perl($RUNTIME, $class_names);
   
-  # Build an environment
-  $ENV = SPVM::Builder::Runtime->build_env($RUNTIME);
+  $ENV = $RUNTIME->build_env;
   
-  # Set command line info
-  SPVM::Builder::Runtime->set_command_info($ENV, $0, \@ARGV);
+  $ENV->set_command_info($0, \@ARGV);
   
-  # Call INIT blocks
-  SPVM::Builder::Runtime->call_init_blocks($ENV);
+  $ENV->call_init_blocks;
   
-  $STACK = SPVM::Builder::Runtime->build_stack($ENV);
-
+  $STACK = $ENV->build_stack;
+  
   $BUILDER = undef;
-  $BOOT_COMPILER = undef;
   $COMPILER = undef;
 }
 
 END {
-  $BOOT_STACK = undef;
-  $BOOT_ENV = undef;
-  $BOOT_RUNTIME = undef;
   $STACK = undef;
   $ENV = undef;
   $RUNTIME = undef;
+  $DYNAMIC_LIB_FILES = undef;
+  $BUILDER_STACK = undef;
+  $BUILDER_ENV = undef;
 }
 
 my $BIND_TO_PERL_CLASS_NAME_H = {};
@@ -195,9 +241,9 @@ sub bind_to_perl {
     my $perl_class_name_base = "SPVM::";
     my $perl_class_name = "$perl_class_name_base$class_name";
     
-    unless ($BIND_TO_PERL_CLASS_NAME_H->{$perl_class_name_base}{$perl_class_name}) {
+    unless ($BIND_TO_PERL_CLASS_NAME_H->{$perl_class_name}) {
       
-      my $parent_class_name = SPVM::Builder::Runtime->get_parent_class_name($runtime, $class_name);
+      my $parent_class_name = $runtime->get_parent_class_name($class_name);
       my $parent_class_name_str = defined $parent_class_name ? "($parent_class_name)" : "()";
       
       # The inheritance
@@ -217,9 +263,10 @@ sub bind_to_perl {
       $BIND_TO_PERL_CLASS_NAME_H->{$perl_class_name_base}{$perl_class_name} = 1;
     }
 
-    my $method_names = SPVM::Builder::Runtime->get_method_names($runtime, $class_name);
+    my $method_names = $runtime->get_method_names($class_name);
 
     for my $method_name (@$method_names) {
+      
       # Destrutor is skip
       if ($method_name eq 'DESTROY') {
         next;
@@ -230,17 +277,22 @@ sub bind_to_perl {
       }
       
       my $perl_method_abs_name = "${perl_class_name}::$method_name";
-      my $is_class_method = SPVM::Builder::Runtime->get_method_is_class_method($runtime, $class_name, $method_name);
+      my $is_class_method = $runtime->get_method_is_class_method($class_name, $method_name);
       
       if ($is_class_method) {
         # Define Perl method
         no strict 'refs';
+        
+        # Suppress refer to objects
+        my $class_name_string = "$class_name";
+        my $method_name_string = "$method_name";
+        
         *{"$perl_method_abs_name"} = sub {
           my $perl_class_name = shift;
           
           my $return_value;
           
-          eval { $return_value = SPVM::ExchangeAPI::call_method($ENV, $STACK, $class_name, $method_name, @_) };
+          eval { $return_value = SPVM::ExchangeAPI::call_method($ENV, $STACK, $class_name_string, $method_name_string, @_) };
           my $error = $@;
           if ($error) {
             confess $error;
@@ -379,6 +431,10 @@ sub get_memory_blocks_count {
 
 sub call_method {
   SPVM::ExchangeAPI::call_method($ENV, $STACK, @_);
+}
+
+sub new_address_object {
+  SPVM::ExchangeAPI::new_address_object($ENV, $STACK, @_);
 }
 
 1;

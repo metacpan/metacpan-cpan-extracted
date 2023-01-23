@@ -22,7 +22,7 @@ sub main {
   @winsize = map { $winsize[$_] } (1, 0, 2, 3);                                     # row, col, xpixel, ypixel
 
   my $stdin = -t STDIN ? 'pty' : 'pipe';
-  my $run3  = Mojo::Run3->new(driver => {pty => 'pty', stdin => $stdin, stdout => 'pipe', stderr => 'pipe'});
+  my $run3  = Mojo::Run3->new(driver => {close_slave => 0, pipe => 1, pty => 'pty', stdin => $stdin});
   $run3->once(spawn  => \&setup_stdin);
   $run3->once(stdout => \&logged_in);
   $run3->on(error  => sub { abort($_[1]) });
@@ -36,6 +36,7 @@ sub main {
 sub logged_in {
   my ($run3) = @_;
   $run3->unsubscribe(pty => \&maybe_write_ssh_password);
+  $run3->close('slave');
   Term::ReadKey::ReadMode(4) if -t STDIN;
 }
 
@@ -45,12 +46,12 @@ sub maybe_write_ssh_password {
   if ($chunk =~ /password\s*:/i) {
     state $seen = 0;
     abort("Can't retry same password") if $seen++;
-    $run3->write("$password\n", "pty");
+    $run3->write("$password\n", "pty", sub { shift->close('slave') });
   }
   elsif ($chunk =~ /Enter passphrase for key/i) {
     state $seen = 0;
     abort("Can't retry same passphrase") if $seen++;
-    $run3->write("$password\n", "pty");
+    $run3->write("$password\n", "pty", sub { shift->close('slave') });
   }
 }
 

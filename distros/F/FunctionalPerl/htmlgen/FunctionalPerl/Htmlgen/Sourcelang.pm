@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2019-2021 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -56,6 +56,9 @@ sub sourcelang {
     $perl += 1
         if $str
         =~ /\b(?:func?|sub)\b\s*(?:\w+\s*)?\((?:(?:\s*\$\w+\s*,)*\s*\$\w+\s*)?\)\s*\{/s;
+    $perl += 1
+        if $str
+        =~ /sub maybe_/;   # hack, should properly fix the regex above for HEAD^
     $perl += 0.5 if $str =~ /\@\{\s*/;
     $perl += 0.5 if $str =~ /\bcompose\s*\(/;
     $perl += 0.5 if $str =~ /\\\&\w+/;
@@ -68,29 +71,81 @@ sub sourcelang {
     $perl += 1 if $str =~ /\$VAR\d+\b/;
     $perl += 1 if $str =~ /(?:perlrepl|fperl)(?: *\d+)?>.*\bF\b/;
     $perl += 1 if $str =~ /\blazy\s*\{/;
-    $sh   += 2 if $str =~ /(?:^|\n)\s*(?:#\s*)?(?:git|gpg|ls|chmod|cd) /;
+    $perl += 1
+        if $str =~ /\bnot \$/;    # shell doesn't have "not"; except if custom
+    $perl += 1 if $str =~ /\}\s*elsif\s*\{/;
+    $perl += 1 if $str =~ /\bexists\s*\$\w+\s*\{/;
+    $perl += 1 if $str =~ /\bcons\s*\$/;
+
+    $sh += 2
+        if $str =~ m{(?:^|\n)\s*(?:[#\$]\s*)?(?:git |gpg |ls |chmod |cd |\./)};
+
+    # Want repl sessions to be non highlighted? Do I ?
+    $sh += 10 if $str =~ m{(?:^|\n) *main> };
+
     ($perl >= 1 and $perl > $sh) ? "Perl" : "shell"
 }
 
 use Chj::TEST;
-use FP::PureArray;
+use FP::List;
+use FP::Either ":all";
+
+sub test ($lang, $l) {
+    lefts $l->map(
+        sub ($c) {
+            my $l = sourcelang $c;
+            $l eq $lang ? Right undef : Left [$c, $l]
+        }
+    )
+}
 
 TEST {
-    purearray(
-        'Foo::bar;',
-        'Foo;',
-        'use Foo;',
-        'my $a',
-        'my $a;',
-        'my $abc = 2+ 2;',
-        'tar -xzf foo.tgz',
-        'fun inverse ($x) { 1 / $x }',
-        'sub inverse ($x) { 1 / $x }'
-    )->map(\&sourcelang)
+    test "Perl", list(
+        'Foo::bar;', 'use Foo;', 'my $a;', 'my $abc = 2+ 2;',
+        'fun inverse ($x) { 1 / $x }',          'sub inverse ($x) { 1 / $x }',
+        'PFLANZE::Node::constructors->import;', q{
+    sub maybe_representable ($N, $D, $prefer_large = 1,
+        $maybe_choose = $MAYBE_CHOOSE)
+    {
+        __ 'Returns the numbers containing $D that sum up to $N, or undef.
+            If $prefer_large is true, tries to use large numbers,
+            otherwise small (which is (much) less efficient).';
+        ...
+    }
+        }, '
+            if (not $missing) {
+                $chosen
+            } elsif ($missing < 0) {
+                undef
+            } else {
+                if (exists $ns{$missing}) {
+        ', '
+                    cons $missing, $chosen
+                } else {
+        ',
+    )
 }
-purearray(
-    "Perl",  "shell", "Perl", "shell", "Perl", "Perl",
-    "shell", "Perl",  "Perl"
-);
+null;
+
+TEST {
+    test "shell", list(
+        'Foo;', 'my $a', 'tar -xzf foo.tgz', q{
+$ ./113-1-represent_integer --repl
+main> docstring \&maybe_representable 
+$VAR1 = 'Returns the numbers containing $D that sum up to $N, or undef.
+        If $prefer_large is true, tries to use large numbers,
+        otherwise small (which is (much) less efficient).';
+main> 
+                       }, q{
+main> \&maybe_representable 
+$VAR1 = sub { 'DUMMY: main::maybe_representable at "./113-1-represent_integer" line 221'; __ 'Returns the numbers containing $D that sum up to $N, or undef.
+        If $prefer_large is true, tries to use large numbers,
+        otherwise small (which is (much) less efficient).' };
+main> 
+        },
+
+    )
+}
+null;
 
 1

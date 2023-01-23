@@ -7,7 +7,7 @@ use Mojo::Log;
 use Exporter 'import';
 our @EXPORT_OK = qw/ debug unique_id /;
 
-our $VERSION = "v0.0.30";
+our $VERSION = "v0.0.31";
 
 my $log = Mojo::Log->new;
 sub debug (@args) { $log->info(@args) }

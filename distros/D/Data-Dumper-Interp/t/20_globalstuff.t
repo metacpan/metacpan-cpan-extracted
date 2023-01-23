@@ -40,19 +40,24 @@ sub unix_compatible_os() {
 
 my $unicode_str = join "", map { chr($_) } (0x263A .. 0x2650);
 
-# Various bugs in Math::BigRat et al break tests on some platforms.
+# Certain combinations of Math::Big* are incompatible (undefined BigInt::_register_callback):
+#   Math::BigInt 1.999829
+#   Math::BigFloat 1.999829
+#   Math::BigRat 0.2614
+#
 # In an attempt to avoid these troubles, require known-good versions
-#use Math::BigInt 1.999837 ();
-#use Math::BigFloat 1.999837 ();
-#use Math::BigRat 0.2624 ();
-use Math::BigInt 1.999818 ();
-use Math::BigFloat 1.999818 ();
-use Math::BigRat 0.2614 ();
+use Math::BigInt 1.999837 ();
+use Math::BigFloat 1.999837 ();
+use Math::BigRat 0.2624 ();
+
 require Data::Dumper;
-for my $modname (qw/Data::Dumper Math::BigInt Math::BigFloat Math::BigRat/) {
-  (my $modpath = "${modname}.pm") =~ s/::/\//g;
+my @modnames = (qw/Data::Dumper Math::BigInt Math::BigFloat Math::BigRat/);
+for my $modname (@modnames) {
+  diag "Loaded ", $INC{ "${modname}.pm" =~ s/::/\//gr }, "\n";
+}
+for my $modname (@modnames) {
   no strict 'refs';
-  diag "Loaded ", $INC{$modpath}, " VERSION=",u(${"${modname}::VERSION"}), "\n";
+  diag sprintf "%-14s %s\n", $modname, u(${"${modname}::VERSION"});
 }
 
 # Has Data::Dumper::Useqq('utf8') been fixed?

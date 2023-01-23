@@ -5,18 +5,19 @@ use utf8;
 use ExtUtils::MakeMaker;
 use File::ShareDir::Install;
 
-my $GITHUB_URL = 'https://github.com/jhthorsen/mojo-file-share';
+my $GITHUB_URL = 'https://github.com/jhthorsen/mojo-sharedir';
 
 my %WriteMakefileArgs = (
-  AUTHOR        => 'Jan Henning Thorsen <jhthorsen@cpan.org>',
-  LICENSE       => 'artistic_2',
-  NAME          => 'Mojo::ShareDir',
-  ABSTRACT_FROM => 'lib/Mojo/ShareDir.pm',
-  VERSION_FROM  => 'lib/Mojo/ShareDir.pm',
-  EXE_FILES     => [],
-  TEST_REQUIRES => {'Test::More'              => '0.30'},
-  PREREQ_PM     => {'File::ShareDir::Install' => '0.14', 'Mojolicious' => '9.00'},
-  META_MERGE    => {
+  AUTHOR             => 'Jan Henning Thorsen <jhthorsen@cpan.org>',
+  LICENSE            => 'artistic_2',
+  NAME               => 'Mojo::ShareDir',
+  ABSTRACT_FROM      => 'lib/Mojo/ShareDir.pm',
+  VERSION_FROM       => 'lib/Mojo/ShareDir.pm',
+  EXE_FILES          => [],
+  CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker'     => '6.00', 'File::ShareDir::Install' => '0.14'},
+  TEST_REQUIRES      => {'Test::More'              => '0.30'},
+  PREREQ_PM          => {'File::ShareDir::Install' => '0.14', 'Mojolicious' => '9.00'},
+  META_MERGE         => {
     'dynamic_config' => 0,
     'meta-spec'      => {version   => 2},
     'no_index'       => {directory => [qw(examples t)]},

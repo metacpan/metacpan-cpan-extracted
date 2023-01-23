@@ -7,7 +7,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.024'; # VERSION
+our $VERSION = '3.025'; # VERSION
 our $LAST_UPDATE = '3.018'; # manually update whenever code is changed
 
 # dependent on optional packages:
@@ -89,7 +89,7 @@ my (@example_list, @example_results);
   push @example_results, "create examples/050_pagelabels.pdf, showing a number of pages, each with its\n own page label in different formats. You will see them when you drag the\n vertical scroll thumb and you see a thumbnail of each page,\n each with its own label.\n";
 
   push @example_list, "055_outlines";
-  push @example_results, "create examples/055_outlines_sample_55.pdf, showing a 12 page document.\n Click on the \"bookmark\" icon to see three pages in the outline, where you\n can click to jump to any of them.\n";
+  push @example_results, "create examples/055_outlines.sample_55.pdf, showing a 12 page document.\n Click on the \"bookmark\" icon to see three pages in the outline, where you\n can click to jump to any of them.\n";
 
   push @example_list, "060_transparency";
   push @example_results, "create examples/060_transparency.pdf, showing 2 pages with red opaque text\n partly covered by 40% transparent black text.\n";
@@ -103,11 +103,14 @@ my (@example_list, @example_results);
   push @example_list, "Bspline.pl";
   push @example_results, "create examples/Bspline.pdf, showing 4 pages with some annotated examples of\n using (cubic) B-splines to draw smoothly-connected lines through all the\n given points.\n";
 
+  push @example_list, "Column.pl";
+  push @example_results, "create examples/Column.pdf, showing multiple pages demonstrating the\n capabilities of the Content/Text.pm column() library methods\n";
+
   push @example_list, "Content.pl";
   push @example_results, "create examples/Content.pdf, showing multiple pages demonstrating the\n capabilities of the Content.pm library methods (graphics and text).\n";
 
   push @example_list, "ContentText.pl";
-  push @example_results, "create examples/ContentText.pdf, showing multiple pages demonstrating the\n capabilities of the Content/Text.pm library advanced text methods.\n";
+  push @example_results, "create examples/ContentText.pdf, showing multiple pages demonstrating the\n capabilities of the Content/Text.pm library advanced text methods.\nAlso see Column.pl for additional material.\n";
 
  if ($HS_installed) {
   push @example_list, "HarfBuzz.pl";
@@ -124,6 +127,10 @@ my (@example_list, @example_results);
   push @example_list, "ShowFont.pl";
   push @example_results, "create examples/ShowFont.<type>.<font name>.pdf, showing multiple pages\n demonstrating the display of various encodings.\n";
  
+  # hard coded with a number of fonts you may need to change
+  push @example_list, "FontManager.pl";
+  push @example_results, "create examples/FontManager.pdf to demonstrate some switching between\n declared fonts within paragraphs.\n";
+
 # push @example_list, "examples/Windows/027_winfont.pl";
 # push @example_results, "create examples/Windows/027_winfont.<type>.<font name>.pdf, showing multiple pages\n demonstrating the display of various encodings.\n";
  
@@ -135,7 +142,7 @@ my %args;
 #
 # 021_psfonts needs T1 glyph and metrics files (not included)
 # assuming metrics file (.afm or .pfm) is in same directory
-  $args{'021_psfonts'} = "/Users/Phil/T1fonts/URWPalladioL-Roma.pfb";
+  $args{'021_psfonts'} = "/Users/Phil/fonts/T1fonts/URWPalladioL-Roma.pfb";
 # 022_truefonts needs a TTF or OTF font to do its thing
   $args{'022_truefonts'} = "/WINDOWS/fonts/times.ttf";
 # 022_truefonts_diacrits_utf8 needs a TTF or OTF font that includes a
@@ -143,7 +150,7 @@ my %args;
   $args{'022_truefonts_diacrits_utf8'} = "/WINDOWS/fonts/tahoma.ttf";
 # 024_bdffonts needs a sample BDF (bitmapped font), which is not
 # included with the distribution
-  $args{'024_bdffonts'} = "/Users/Phil/BDFfonts/codec/codec.bdf";
+  $args{'024_bdffonts'} = "/Users/Phil/fonts/BDFfonts/codec/codec.bdf";
 # ShowFont.pl needs a corefont (by default) font name
   $args{'ShowFont.pl'} = "Helvetica";
 

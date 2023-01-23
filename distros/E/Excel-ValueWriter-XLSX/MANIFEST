@@ -8,3 +8,4 @@ README.md
 t/basic.t
 t/filehandle.t
 t/from_database.t
+t/booleans.t

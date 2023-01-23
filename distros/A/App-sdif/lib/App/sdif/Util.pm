@@ -7,7 +7,7 @@ use Carp;
 use Exporter 'import';
 
 our @EXPORT = qw(
-    &read_line
+    &read_line &read_until
     &read_unified_sub &read_unified &read_unified_2
     &range &terminal_width
     );

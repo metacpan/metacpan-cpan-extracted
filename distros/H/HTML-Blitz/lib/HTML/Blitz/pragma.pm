@@ -12,6 +12,8 @@ no indirect ':fatal';
 
 use Carp ();
 
+our $VERSION = '0.03';
+
 method import($class: @items) {
     for my $item (@items) {
         Carp::croak qq("$item" is not exported by the $class module);

@@ -1,3 +1,6 @@
+Wed Dec 28 22:14:19 2022 -0500
+257bd8553b2790eb96a17a562e53ab9ef2c8a7dc
+Updating alienfile to print details on the HTTP error. Bump version to 0.12 for release
 52611b5efd57f7daef8264bb3e290139709658ca - Adding documentation to the library - Updating version
 6bc134c486aa7b9ddb3ae095cb8882c804802110 Updating the version.
 353e459aa5ec946d52fc719b5263ee75bc7ab7f4 Adding a basic unit test so that cpan-testers shows that Alien::TALib is supported across various systems

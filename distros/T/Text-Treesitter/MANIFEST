@@ -4,6 +4,7 @@ examples/highlight.pl
 examples/viewtree.pl
 languages/tree-sitter-fourfunc/grammar.js
 languages/tree-sitter-fourfunc/queries/highlights.scm
+languages/tree-sitter-fourfunc/queries/zero.scm
 languages/tree-sitter-fourfunc/src/parser.c
 languages/tree-sitter-fourfunc/src/tree_sitter/parser.h
 lib/Text/Treesitter.pm
@@ -27,6 +28,8 @@ t/01parse-fourfunc.t
 t/02reset.t
 t/03language.t
 t/10query-fourfunc.t
+t/11query-predicate-funcs.t
+t/12query-predicates.t
 t/60treesitter.t
 t/99pod.t
 typemap

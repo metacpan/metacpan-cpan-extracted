@@ -1,6 +1,6 @@
 Begin.pm
 Changes
-examples/ex1.pl
+examples/html_page.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

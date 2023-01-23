@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::PkgVersionBlock 2.74 {
+package Dist::Zilla::Plugin::Author::Plicease::PkgVersionBlock 2.75 {
 
   use Moose;
   extends 'Dist::Zilla::Plugin::PkgVersion::Block';
@@ -41,7 +41,7 @@ Dist::Zilla::Plugin::Author::Plicease::PkgVersionBlock
 
 =head1 VERSION
 
-version 2.74
+version 2.75
 
 =head1 SYNOPSIS
 

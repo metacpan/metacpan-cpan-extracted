@@ -24,7 +24,7 @@ requires 'Error::Pure' => 0;
 requires 'Plack::Component' => 0;
 requires 'Plack::Util::Accessor' => 0;
 requires 'Scalar::Util' => 0;
-requires 'Tags::HTML::Page::Begin' => 0.13;
+requires 'Tags::HTML::Page::Begin' => 0.14;
 requires 'Tags::HTML::Page::End' => 0;
 requires 'Readonly' => 0;
 requires 'Tags::Output::Raw' => 0;
@@ -36,7 +36,7 @@ test_requires 'Plack::Test' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.09';
+version '0.10';
 
 # Run.
 WriteAll();

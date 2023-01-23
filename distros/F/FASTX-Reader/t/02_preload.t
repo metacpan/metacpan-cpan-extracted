@@ -14,10 +14,10 @@ if (! -e $seq_file) {
   exit 0;
 }
 
-my $data = FASTX::Reader->new({
-	filename => "$seq_file",
-	loadseqs => 'name'
-});
+my $data = FASTX::Reader->new(
+	-filename => "$seq_file",
+	-loadseqs => 'name'
+);
 
 ok(defined $data->{seqs}, 'Retrieved sequences');
 
@@ -39,9 +39,20 @@ $data = FASTX::Reader->new({
 
 for my $seq (keys %{ $data->{seqs} }) {
 	ok(defined ${ $data->{seqs} }{$seq}, "Sequence $seq has a defined value");
-	ok($seq =~/^[ACGTN]+$/i, "Sequence key is a SEQUENCE");
+	ok($seq =~/^[ACGTN]+$/i, "Sequence key is a SEQUENCE: " . $seq);
 }
 ok(defined $data->{seqs}, 'Retrieved sequences');
 
+$data = FASTX::Reader->new({
+	filename => "$seq_file",
+	loadseqs => 'name'
+});
+
+
+for my $name (keys %{ $data->{seqs} }) {
+	ok(defined ${ $data->{seqs} }{$name}, "Sequence $name has a defined value");
+	ok($name =~/seq/i, "Hash key is a NAME: " . $name);
+}
+ok(defined $data->{seqs}, 'Retrieved sequences');
 
 done_testing();

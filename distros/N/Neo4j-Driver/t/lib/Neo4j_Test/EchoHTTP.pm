@@ -2,10 +2,7 @@ use strict;
 use warnings;
 package Neo4j_Test::EchoHTTP;
 
-use parent 'Neo4j::Driver::Plugin';
-
-use JSON::MaybeXS;
-use Neo4j::Driver::Net::HTTP::LWP;
+use parent 'Neo4j_Test::MockHTTP';
 
 sub new {
 	my ($class, %params) = @_;
@@ -16,53 +13,6 @@ sub new {
 			shift->{statements}[0]
 		},
 	}, $class;
-}
-
-sub register {
-	my ($self, $manager) = @_;
-	
-	$manager->add_event_handler(
-		http_adapter_factory => sub {
-			my ($continue, $driver) = @_;
-			$self->{base} = $driver->{uri};
-			return $self;
-		},
-	);
-}
-
-my $coder = JSON::MaybeXS->new(utf8 => 1, allow_nonref => 1);
-sub json_coder { $coder }
-
-sub _prep_response {
-	my ($self, $r) = @_;
-	unless (defined $r->{content}) {
-		if ($r->{json}) {
-			if ('HASH' eq ref $r->{json}) {
-				$r->{content} = encode_json $r->{json};
-			}
-			else {
-				$r->{content} = $r->{json};
-			}
-		}
-		if ($r->{jolt}) {
-			if ('ARRAY' eq ref $r->{jolt}) {
-				my @json_texts = map { 'HASH' eq ref $_ ? encode_json $_ : $_ } @{$r->{jolt}};
-				$r->{content} = join '', map { "\x{1e}$_\x{0a}" } @json_texts;
-				# https://tools.ietf.org/html/rfc7464#section-2.2
-			}
-			else {
-				$r->{content} = $r->{jolt};
-			}
-		}
-	}
-	$r->{content_type} //= 'application/json' if $r->{json};
-	$r->{content_type} //= 'application/vnd.neo4j.jolt+json-seq' if $r->{jolt};
-	$r->{content_type} //= 'application/octet-stream';
-	$r->{content} //= '';
-	$r->{status} //= '200';
-	$r->{success} //= $r->{status} =~ m/^2/;
-	$r->{method} //= 'POST';
-	return $self->{r} = $r;
 }
 
 # Return the appropriate response.
@@ -107,39 +57,11 @@ sub _r {
 	]});
 }
 
-sub fetch_all { '' . shift->_r->{content} }
-
-# Use the exact same Jolt split implementation that is
-# normally used, so that we get to test that one, too.
-sub fetch_event { &Neo4j::Driver::Net::HTTP::LWP::fetch_event }
-
 sub request {
-	my ($self, $method, $url, $json, $accept) = @_;
-	$self->{method}  = $method;
-	$self->{url}     = $url;
-	$self->{request} = $json;
-	$self->{accept}  = $accept;
-	$self->{buffer}  = undef;   # for ::LWP::fetch_event
-	$self->{r}       = undef;   # response cache
+	my $self = shift;
+	$self->SUPER::request(@_);
+	$self->{r} = undef;   # response cache
 }
-
-sub date_header { shift->_r->{date} || '' }
-
-sub http_header {
-	my $r = shift->_r;
-	return {
-		content_type => $r->{content_type} // '',
-		location => $r->{location} // '',
-		status => $r->{status} // '',
-		success => $r->{success} // '',
-	}
-}
-
-sub http_reason { shift->_r->{reason} // '' }
-
-sub protocol { 'EchoHTTP' }
-
-sub uri { shift->{base} }
 
 
 1;

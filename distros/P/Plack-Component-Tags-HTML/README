@@ -7,6 +7,12 @@ SYNOPSIS
 
      use base qw(Plack::Component::Tags::HTML);
 
+     sub _cleanup {
+            my $self = shift;
+            # Cleanup about call().
+            return;
+     }
+
      sub _css {
             my $self = shift;
             $self->{'css'}->put(
@@ -51,6 +57,16 @@ ACCESSOR METHODS
     CSS::Struct::Output object. Default value is
     CSS::Struct::Output::Raw->new.
 
+  "css_init"
+    Reference to array with CSS::Struct structure. Default value is CSS
+    initialization from Tags::HTML::Page::Begin like
+
+     * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+     }
+
   "encoding"
     Set encoding for output. Default value is 'utf-8'.
 
@@ -94,6 +110,9 @@ ACCESSOR METHODS
      ));
 
 METHODS TO OVERWRITE
+  "_cleanup"
+    Method to cleanup after "call()". Argument is $self only.
+
   "_css"
     Method to set css via "$self->{'css'}" object. Argument is $self only.
 
@@ -115,6 +134,7 @@ METHODS IMPLEMENTED
      $self->_process_actions($env);
      $self->_css;
      $self->_tags;
+     $self->_cleanup;
 
     After it Generate and encode output from Tags to output with HTTP code.
     HTTP status code is defined by "status_code()" method and Content-Type
@@ -178,7 +198,9 @@ EXAMPLE1
 
      # Output by GET to http://localhost:5000/:
      # <!DOCTYPE html>
-     # <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>My app</title></head><body>Hello world</body></html>
+     # <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>My app</title><style type="text/css">
+     # *{box-sizing:border-box;margin:0;padding:0;}
+     # </style></head><body>Hello world</body></html>
 
 EXAMPLE2
      package App;
@@ -242,10 +264,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2020-2022 Michal Josef Špaček
+    © 2020-2023 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.09
+    0.10
 

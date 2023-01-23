@@ -1,5 +1,9 @@
 Revision history for Alien::libmaxminddb
 
+1.012  2023-01-19 11:28:04 CET
+
+  - Revise the workaround for OpenBSD Clang
+
 1.011  2023-01-15 19:37:32 CET
 
   - OpenBSD Clang does not support -fms-extensions

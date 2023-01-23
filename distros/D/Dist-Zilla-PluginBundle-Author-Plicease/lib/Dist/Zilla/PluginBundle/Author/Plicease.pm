@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.74 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.75 {
 
   use 5.020;
   use Moose;
@@ -22,6 +22,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.74 {
     diag_preamble
     workflow
     clean
+    clean_keep
 
     diag
     allow_dirty ) }
@@ -320,7 +321,10 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.74 {
       $self->_my_add_plugin(['ArchiveTar']);
     }
 
-    $self->_my_add_plugin(['Author::Plicease::Cleaner' => { maybe clean => $self->payload->{clean} }]);
+    $self->_my_add_plugin(['Author::Plicease::Cleaner' => {
+      maybe clean      => $self->payload->{clean},
+      maybe clean_keep => $self->payload->{clean_keep}
+    }]);
 
   }
 
@@ -341,7 +345,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.74
+version 2.75
 
 =head1 SYNOPSIS
 

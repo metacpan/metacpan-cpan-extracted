@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact::PageSource;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001004';
+our $VERSION   = '0.001005';
 
 use Story::Interact::Page ();
 use Story::Interact::Syntax ();
@@ -17,6 +17,7 @@ use Safe ();
 use namespace::clean;
 
 requires 'get_source_code';
+requires 'all_page_ids';
 
 sub get_page {
 	my ( $self, $state, $page_id ) = @_;

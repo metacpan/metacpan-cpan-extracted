@@ -1,16 +1,16 @@
 package App::CSelUtils;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-27'; # DATE
-our $DIST = 'App-CSelUtils'; # DIST
-our $VERSION = '0.088'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 use Data::Dmp;
 use Scalar::Util qw(refaddr);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-10-17'; # DATE
+our $DIST = 'App-CSelUtils'; # DIST
+our $VERSION = '0.089'; # VERSION
 
 our %SPEC;
 
@@ -91,6 +91,14 @@ _
             },
             eval => {
                 summary => '--eval E is shortcut for --action eval:E',
+                code => sub {
+                    my ($args, $val) = @_;
+                    $args->{node_actions} //= [];
+                    push @{ $args->{node_actions} }, "eval:$val";
+                },
+            },
+            e => {
+                summary => '-e E is shortcut for --action eval:E',
                 code => sub {
                     my ($args, $val) = @_;
                     $args->{node_actions} //= [];
@@ -277,7 +285,7 @@ sub foosel {
             } elsif ($action =~ /\Aeval:(.+)/) {
                 my $string_code = $1;
                 my $compiled_code =
-                    eval "package main; no strict; no warnings; sub { $string_code }";
+                    eval "package main; no strict; no warnings; sub { $string_code }"; ## no critic: BuiltinFunctions::ProhibitStringyEval
                 if ($@) {
                     die "Can't compile code in eval: $@\n";
                 }
@@ -307,7 +315,7 @@ sub foosel {
                     push @{ $res->[2] }, $node_res;
                 }
             } elsif ($action =~ /\Aprint_func:(.+)\z/) {
-                no strict 'refs';
+                no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
                 my @funcs = split /\./, $1;
                 for my $node (@action_targets) {
                     my $node_res = $node;
@@ -321,7 +329,7 @@ sub foosel {
                     push @{ $res->[2] }, $node_res;
                 }
             } elsif ($action =~ /\Aprint_func_or_meth:(.+)\z/) {
-                no strict 'refs';
+                no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
                 my @entries = split /\./, $1;
                 for my $node (@action_targets) {
                     my $node_res = $node;
@@ -385,11 +393,11 @@ sub ddsel {
             my $data;
             if ($args->{file} eq '-') {
                 binmode STDIN, ":encoding(utf8)";
-                $data = eval join("", <>);
+                $data = eval join("", <>); ## no critic: BuiltinFunctions::ProhibitStringyEval
                 die if $@;
             } else {
                 require File::Slurper;
-                $data = eval File::Slurper::read_text($args->{file});
+                $data = eval File::Slurper::read_text($args->{file}); ## no critic: BuiltinFunctions::ProhibitStringyEval
                 die if $@;
             }
 
@@ -430,7 +438,7 @@ App::CSelUtils - Utilities related to Data::CSel
 
 =head1 VERSION
 
-This document describes version 0.088 of App::CSelUtils (from Perl distribution App-CSelUtils), released on 2021-06-27.
+This document describes version 0.089 of App::CSelUtils (from Perl distribution App-CSelUtils), released on 2022-10-17.
 
 =head1 DESCRIPTION
 
@@ -475,7 +483,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<expr> => I<str>
 
+(No description)
+
 =item * B<file> => I<filename> (default: "-")
+
+(No description)
 
 =item * B<node_actions> => I<array[str]> (default: ["print_as_string"])
 
@@ -577,6 +589,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<expr>* => I<str>
 
+(No description)
+
 
 =back
 
@@ -601,14 +615,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-CSelUt
 
 Source repository is at L<https://github.com/perlancar/perl-App-CSelUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSelUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<htmlsel>, L<orgsel>, L<jsonsel>, L<yamlsel>, L<podsel>, L<ppisel>
@@ -617,11 +623,37 @@ L<htmlsel>, L<orgsel>, L<jsonsel>, L<yamlsel>, L<podsel>, L<ppisel>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSelUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

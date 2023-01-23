@@ -5,7 +5,7 @@
 # if add or delete a contribution, also update tools/4_contrib.pl
 .perlcriticrc
 Changes
-CONTRIBUTING
+CONTRIBUTING.md
 LICENSE
 Makefile.PL
 MANIFEST
@@ -16,7 +16,7 @@ tools/1_pc.pl
 tools/2_t-tests.pl
 tools/3_examples.pl
 tools/4_contrib.pl
-tools/optional_update.pl
+#tools/optional_update.pl
 tools/TTFdump.pl
 INFO/Changes_2017
 INFO/Changes_2018
@@ -29,6 +29,7 @@ INFO/DEPRECATED
 INFO/KNOWN_INCOMP
 INFO/PATENTS
 INFO/RoadMap
+INFO/SPONSORS
 INFO/SUPPORT
 INFO/old/contrib.bat
 INFO/old/dist.ini.old
@@ -41,11 +42,11 @@ contrib/pdf-deoptimize.pl
 contrib/pdf-optimize.pl
 contrib/text2pdf.pl
 docs/buildDoc.pl
+examples/resources/040_annotation.pdf
 examples/resources/aptfrontview.jpg
 examples/resources/sample_55.pdf
 examples/resources/sample.txt
 examples/resources/pod2htmd.temp
-examples/resources/HarfBuzz_example.pdf
 examples/011_open_update
 examples/012_pages
 examples/020_corefonts
@@ -72,6 +73,7 @@ examples/060_transparency
 examples/BarCode.pl
 examples/Boxes.pl
 examples/Bspline.pl
+examples/Column.pl
 examples/Content.pl
 examples/ContentText.pl
 examples/examples.output
@@ -80,6 +82,7 @@ examples/README
 examples/RMtutorial.pl
 examples/Rotated.pl
 examples/ShowFont.pl
+examples/FontManager.pl
 examples/Windows/027_winfont
 examples/Windows/Win32.pm
 lib/PDF/Builder.pm
@@ -197,6 +200,7 @@ lib/PDF/Builder/Resource/XObject.pm
 lib/PDF/Builder/Annotation.pm
 lib/PDF/Builder/Content.pm
 lib/PDF/Builder/Docs.pm
+lib/PDF/Builder/FontManager.pm
 lib/PDF/Builder/Lite.pm
 lib/PDF/Builder/Matrix.pm
 lib/PDF/Builder/NamedDestination.pm
@@ -222,8 +226,6 @@ t/01-basic.t
 t/02-xrefstm.t
 t/03-xrefstm-index.t
 t/annotate.t
-t/author-critic.t
-t/author-pod-syntax.t
 t/barcode.t
 t/bbox.t
 t/circular-references.t
@@ -264,3 +266,5 @@ t/text.t
 t/tiff.t
 t/version.t
 t/viewer-preferences.t
+xt/author-critic.t
+xt/author-pod-syntax.t

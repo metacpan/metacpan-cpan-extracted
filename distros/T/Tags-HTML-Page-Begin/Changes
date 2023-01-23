@@ -1,3 +1,11 @@
+0.15 2023-01-23T13:30:57+01:00
+ - Fix example in doc.
+ - Rename example file to better name.
+
+0.14 2023-01-23T13:08:50+01:00
+ - API change: Add default cleanup of CSS.
+ - Update copyright years.
+
 0.13 2022-07-07T20:30:52+02:00
  - Add 'width=device-width, initial-scale=1.0' to viewport as default
    value.

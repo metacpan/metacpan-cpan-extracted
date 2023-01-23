@@ -274,7 +274,7 @@ subtest 'op_buffer_count' => sub {
 
     $o = cold('abcde')->pipe(op_buffer_count(3, 1));
     obs_is $o, ['--ab(cde)', { a => [ 'a', 'b', 'c' ], b => [ 'b', 'c', 'd' ], c => [ 'c', 'd', 'e' ],
-        d                        => [ 'd', 'e' ], e => ['e'],
+                               d => [ 'd', 'e' ], e => ['e'],
     }];
 
     $o = cold('abcde')->pipe(op_buffer_count(1));
@@ -415,6 +415,18 @@ subtest 'op_delay' => sub {
     $source = cold('5----');
     $o = $source->pipe(op_delay(2));
     obs_is $o, ['--5--'], 'completes correctly';
+};
+
+subtest 'op_buffer' => sub {
+    my $source = cold('01-23-45-67-89');
+    my $notifier = cold('--1--2--3');
+    my $o = $source->pipe(op_buffer($notifier));
+    obs_is $o, ['--a--b--c----d', {
+        a => [ 0, 1 ],
+        b => [ 2, 3 ],
+        c => [ 4, 5 ],
+        d => [ 6, 7, 8, 9 ],
+    }], 'works';
 };
 
 done_testing();

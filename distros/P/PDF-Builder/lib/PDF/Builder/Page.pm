@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Pages';
 use strict;
 use warnings;
 
-our $VERSION = '3.024'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.025'; # VERSION
+our $LAST_UPDATE = '3.025'; # manually update whenever code is changed
 
 use Carp;
 use POSIX qw(floor);
@@ -427,6 +427,12 @@ X will increase to the right, and Y will increase downward.
 (This allows you to auto-rotate to landscape without changing the mediabox!
 There are other ways to accomplish this end, such as using the C<size()>
 method, which will not change the coordinate system (move the origin).)
+
+B<Note> that some users have reported problems with using C<rotate>, that
+the dimensions were limited to the smaller of the original height or width. If
+you experience this, be sure to check whether you are doing some sort of I<crop
+box> or other clipping, that might not rotate as expected with the rest of the
+page. In other words, you might need to manually adjust the crop box dimensions.
 
 Do not confuse this C<rotate()> call with the I<graphics context> rotation 
 (Content.pm) C<rotate()>, which permits any angle, is of opposite direction, 

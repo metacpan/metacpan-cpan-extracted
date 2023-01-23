@@ -22,7 +22,7 @@ WriteMakefile(
       #   Pod::Simple::HTML (for POD->HTML generation, optional) (is core)
       #   Carp (required) (is core)
       #  And of course, PDF::API2 *OR* PDF::Builder (both can be installed)
-    ABSTRACT_FROM     => 'lib/PDF/Table.pm', # retrieve abstract from module
+    ABSTRACT_FROM     => 'lib/PDF/Table.pod', # retrieve abstract from module
     AUTHOR            => 'Phil Perry',
     META_MERGE        => {
         resources => {

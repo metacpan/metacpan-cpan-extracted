@@ -1,20 +1,68 @@
 use strict;
 use warnings;
 no warnings 'once';
-use Test::More;
-use Data::Dumper;
-use B;
+my %opts;
 BEGIN {
-  $ENV{SUB_QUOTE_NO_HEX_FLOAT} = $::SUB_QUOTE_NO_HEX_FLOAT ? 1 : 0;
+  for my $arg (@ARGV) {
+    if ($arg =~ /\A--(perfect|5_10_0|5_6|no-hex|b-perlstring|no-xstring)\z/) {
+      $opts{$1} = 1;
+    }
+    else {
+      die "Invalid option: $arg\n";
+    }
+  }
+
+  $ENV{SUB_QUOTE_NO_HEX_FLOAT} = 0+!!$opts{'no-hex'};
+
+  {
+    my $v;
+
+    $opts{'5_6'} || $opts{'5_10_0'} || $opts{'no-xstring'} and
+      (eval { require XString }),
+      (local $XString::VERSION = '0.001'),
+    ;
+
+    $opts{'5_6'} and
+      (require B),
+      (local $B::{perlstring}),
+      (local $utf8::{is_utf8}),
+      ($v = 5.006),
+    ;
+
+    $opts{'5_10_0'} and
+      ($v = 5.010000),
+    ;
+
+    $opts{'b-perlstring'} and
+      (require B),
+    ;
+
+    $v and
+      ($v = sprintf "%.6f", $v),
+      (my $t = $v + 0),
+      (Internals::SvREADONLY($], 0)),
+      (local $] = $v),
+      (Internals::SvREADONLY($], 1)),
+    ;
+
+    require Sub::Quote;
+  }
+
+  Internals::SvREADONLY($], 1);
 }
 
 use Sub::Quote qw(
   quotify
 );
 
+use Test::More;
+use Data::Dumper;
+use B;
+
 use constant HAVE_UTF8       => Sub::Quote::_HAVE_IS_UTF8;
 use constant FLOAT_PRECISION => Sub::Quote::_FLOAT_PRECISION;
 use constant HAVE_HEX_FLOAT  => Sub::Quote::_HAVE_HEX_FLOAT;
+use constant CAN_TRACK_BOOLEANS => Sub::Quote::_CAN_TRACK_BOOLEANS;
 use constant INF => 9**9**9**9;
 use constant NAN => INF * 0;
 use constant MAXUINT => ~0;
@@ -40,10 +88,22 @@ sub _dump {
   $d;
 }
 
+sub _is_diag {
+  my ($got, $expect) = map _dump($_), @_;
+  diag sprintf <<'END_DIAG', $got, $expect;
+         got: %s
+    expected: %s
+END_DIAG
+}
+
 sub is_numeric {
   my $flags = B::svref_2object(\($_[0]))->FLAGS;
   !!( $flags & ( B::SVp_IOK | B::SVp_NOK ) )
 }
+die "ASSERT: is_numeric broken for numbers"
+  if !is_numeric(1);
+die "ASSERT: is_numeric broken for strings"
+  if is_numeric("1");
 
 sub is_float {
   my $num = shift;
@@ -51,6 +111,36 @@ sub is_float {
   || $num > ~0
   || $num < -(~0>>1)-1;
 }
+die "ASSERT: is_float broken for integers"
+  if is_float(1);
+die "ASSERT: is_float broken for floats"
+  if !is_float(1.1);
+
+sub is_bool {
+  my $bool = shift;
+  if (CAN_TRACK_BOOLEANS) {
+    BEGIN { CAN_TRACK_BOOLEANS && warnings->unimport(qw(experimental::builtin)) }
+    return builtin::is_bool($bool);
+  }
+  else {
+    if (is_numeric($bool) && $bool == 0 && $bool eq '') {
+      return !!1;
+    }
+    else {
+      # can't detect true
+      return !!0;
+    }
+  }
+}
+die "ASSERT: is_bool broken for integers"
+  if is_bool(1) || is_bool(0);
+die "ASSERT: is_bool broken for floats"
+  if is_bool(1.0);
+die "ASSERT: is_bool broken for strings"
+  if is_bool("1") || is_bool("0");
+die "ASSERT: is_bool broken for booleans"
+  if !is_bool(!!0) || (CAN_TRACK_BOOLEANS && !is_bool(!!1));
+
 
 sub is_strict_numeric {
   my $flags = B::svref_2object(\($_[0]))->FLAGS;
@@ -59,7 +149,7 @@ sub is_strict_numeric {
 }
 
 my %flags;
-{
+BEGIN {
   no strict 'refs';
   for my $flag (qw(
     SVs_TEMP
@@ -165,10 +255,15 @@ my @quotify = (
   undef,
   @booleans,
   (map {
-    my $indeterminate = $_;
-    my $number = $indeterminate + 0;
-    my $string = $indeterminate . "";
-    ($number, $indeterminate, $string);
+    my $number = $_;
+    $number += 0;
+    my $string = $_;
+    $string .= "";
+    my $started_as_number = $number;
+    my $void = $started_as_number . "";
+    my $started_as_string = $string;
+    $void = $started_as_string + 0;
+    ($number, $started_as_number, $string, $started_as_string);
   } @numbers),
   @strings,
   @utf8_strings,
@@ -186,7 +281,8 @@ for my $value (_uniq @quotify) {
     = _dump($value)
     . (HAVE_UTF8 && utf8::is_utf8($value) ? ' utf8' : '')
     . (is_strict_numeric($value) ? ' pure' : '')
-    . (is_numeric($value) ? ' num' : '');
+    . (is_numeric($value) ? ' num' : '')
+    . (is_bool($value) ? ' bool' : '');
 
   my $quoted = quotify(my $copy = $value);
   utf8::downgrade($quoted, 1)
@@ -218,7 +314,7 @@ for my $value (_uniq @quotify) {
     if (is_numeric($value)) {
       if ($value == $value) {
         my $todo;
-        if (!HAVE_HEX_FLOAT && $check_value != $value && is_float($value)) {
+        if (!$opts{perfect} && !HAVE_HEX_FLOAT && $check_value != $value && is_float($value)) {
           my $diff = abs($check_value - $value);
           my $accuracy = abs($value)/$diff;
           my $precision = FLOAT_PRECISION + 1;
@@ -243,12 +339,14 @@ for my $value (_uniq @quotify) {
     }
 
     if (defined $value) {
-      cmp_ok $check_value, 'eq', $value,
-        "$value_name: string value maintained$suffix";
+      ok $check_value eq $value,
+        "$value_name: string value maintained$suffix"
+        or _is_diag($check_value, $value);
     }
     else {
       is $check_value, undef,
-        "$value_name: undef maintained$suffix";
+        "$value_name: undef maintained$suffix"
+        or _is_diag($check_value, $value);
     }
   }
 }

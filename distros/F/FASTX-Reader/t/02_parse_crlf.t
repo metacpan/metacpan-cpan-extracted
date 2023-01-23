@@ -25,4 +25,18 @@ while (my $r = $data->getRead() ) {
   ok(length($w->{seq}) eq length($r->{seq}), "Sequence $c has the same length $w->{name}");
 
 }
+
+
+$data = FASTX::Reader->new(    -filename => "$seq_file" );
+$windata = FASTX::Reader->new( -filename => "$win_file" );
+
+#Reset counter
+$c = 0;
+while (my $r = $data->getRead() ) {
+  $c++;
+  my $w = $windata->getRead();
+  ok($w->{name} eq $r->{name}, "[new instance] Sequence $c has the same name $w->{name}");
+  ok(length($w->{seq}) eq length($r->{seq}), "[new instance] Sequence $c has the same length $w->{name}");
+
+}
 done_testing();

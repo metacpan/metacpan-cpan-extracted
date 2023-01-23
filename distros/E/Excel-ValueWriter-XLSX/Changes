@@ -1,6 +1,9 @@
 Revision history for Excel-ValueWriter-XLSX
 
-1.00     05.01.203
+1.01     23.01.2023
+  - added support for booleans
+
+1.00     05.01.2023
   - test_requires DBD::SQLite
 
 0.9      03.01.2023
@@ -28,6 +31,5 @@ Revision history for Excel-ValueWriter-XLSX
   - fix UTF8 support
   - new optional parameter: $headers
   
-
 0.1      14.01.2022
   - initial release

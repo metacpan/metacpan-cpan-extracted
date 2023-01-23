@@ -1,5 +1,52 @@
 Change history for Perl extension PDF::Table.
 
+=== Version 1.004 (2023-01-21)
+
+  lib/PDF/Table.pm, lib/PDF/Table.pod, INFO/SPONSORS (new), INFO/Table.html,
+    MANIFEST
+   For PDF::Builder ONLY, allow specification of cell 'markup' (Markdown
+    or HTML), to permit great flexibility in cell content. See PDF::Builder's
+    examples/Column.pl for an example of usage.
+
+   This work (as well as markup changes for PDF::Builder) has been kindly
+    sponsored by Amtivo Group (see INFO/SPONSORS).
+
+  lib/PDF/Table.pm, examples/sample1-size-vsizes.pl
+   The 'Times' font should be named 'Times-Roman', to conform with the correct
+    core font naming. PDF::Builder no longer silently accepts 'Times' as an
+    alias for 'Times-Roman', and now gives a warning.
+
+  xt/manifest.t, xt/pod.t, MANIFEST, util/2_t-tests.pl
+   Move author tests from t/ to xt/
+
+  examples/chess.pl
+   PDF::API2 (PREVIOUS to release 2.044) has a bug in its TTF
+    handling, where it fails to translate some Unicode points ("U+nnnn" number)
+    to the appropriate font glyph entry, and instead puts the Unicode point
+    in the glyph list. This is incorrect, and usually results in a mismapping.
+    
+    As of PDF::API2 v 2.044, chess.pl seems to be working again.
+
+  examples/*.pl
+   If command line -A or -B, add prefix A_ or B_ to the output file name. This
+    can be useful when using -A or -B with util/3_examples.pl to generate
+    different output PDFs for PDF::API2 and PDF::Builder. Keep in mind that an
+    example given without -A or -B will not add the prefix.
+
+  lib/PDF/Table.pm, lib/PDF/Table.pod, INFO/Table.html, 
+    examples/vsizes.pl (new), util/3_examples.pl
+   Dry run to return vertical size (overall, header, [footer], each row),
+    no output to PDF, with "ink" set to 0.
+
+  lib/PDF/Table.pod (moved), MANIFEST, util/pod2cpanhtml.pl, Makefile.PL
+   Move .pod up a level (thanks to "perlpunk")
+
+  lib/PDF/Table/Table.pod, INFO/Table.html, examples/chess.pl,
+    INFO/Changes_2019, lib/PDF/Table.pm
+   Typos caught by lintian (via emollier) and codespell (via mdeweerd).
+
+ CONTRIBUTING, MANIFEST  add Contribution guide
+
 === Version 1.003 (2022-07-05)
 
  lib/PDF/Table/ColumnWidth.pm, lib/PDF/Table/Table.pod, examples/size.pl,
@@ -18,7 +65,7 @@ Change history for Perl extension PDF::Table.
 
  examples/chess.pl
   PDF::API2 work-around added for font-handling change in 2.043. The problem
-  is being investigated, but the chess example almost works for now.
+   is being investigated, but the chess example almost works for now.
 
  lib/PDF/Table.pm, lib/PDF/Table/Table.pod, MANIFEST
   Split out documentation into separate POD file.
@@ -31,7 +78,7 @@ Change history for Perl extension PDF::Table.
 
  Makefile.PL, LICENSE, MANIFEST.SKIP
   Build (at install) META.* with "provides" member. Add separate license file.
-  Add some items to MANIFEST SKIP file to clean up.
+   Add some items to MANIFEST SKIP file to clean up.
 
  lib/PDF/Table.pm
   $LAST_UPDATE changed from 'my' storage class to 'our', so can be accessed

@@ -1,5 +1,5 @@
 package Net::Cisco::FMC::v1;
-$Net::Cisco::FMC::v1::VERSION = '0.006002';
+$Net::Cisco::FMC::v1::VERSION = '0.007001';
 # ABSTRACT: Cisco Firepower Management Center (FMC) API version 1 client library
 
 use 5.024;
@@ -19,17 +19,20 @@ no warnings "experimental::signatures";
 
 
 has 'domains' => (
-    is => 'rwp',
-    isa => ArrayRef[Dict[name => Str, uuid => Str]],
+    is      => 'rwp',
+    isa     => ArrayRef[Dict[name => Str, uuid => Str]],
+    clearer => 1,
 );
 
 
 has 'domain_uuid' => (
-    is => 'rw',
+    is      => 'rw',
+    clearer => 1,
 );
 
 has '_refresh_token' => (
-    is => 'rw',
+    is      => 'rw',
+    clearer => 1,
 );
 
 with 'Net::Cisco::FMC::v1::Role::REST::Client';
@@ -249,6 +252,20 @@ sub relogin($self) {
     $self->login;
     $self->domain_uuid($domain_uuid)
         if defined $domain_uuid && $domain_uuid ne '';
+}
+
+
+sub logout($self) {
+    my $res = $self->post('/api/fmc_platform/v1/auth/revokeaccess');
+    if ($res->code == 204) {
+        $self->clear_domains;
+        $self->clear_domain_uuid;
+        $self->_clear_refresh_token;
+        $self->clear_persistent_headers;
+    }
+    else {
+        croak($res->data->{error}->{messages}[0]->{description});
+    }
 }
 
 
@@ -682,7 +699,7 @@ Net::Cisco::FMC::v1 - Cisco Firepower Management Center (FMC) API version 1 clie
 
 =head1 VERSION
 
-version 0.006002
+version 0.007001
 
 =head1 SYNOPSIS
 
@@ -734,6 +751,10 @@ authentication.
 
 Refreshes the session by loging in again (not using the refresh token) and
 restores the currently set domain_uuid.
+
+=head2 logout
+
+Logs out of the FMC.
 
 =head2 create_accessrule
 
@@ -887,7 +908,7 @@ Alexander Hartmaier <abraxxa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 - 2022 by Alexander Hartmaier.
+This software is copyright (c) 2018 - 2023 by Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

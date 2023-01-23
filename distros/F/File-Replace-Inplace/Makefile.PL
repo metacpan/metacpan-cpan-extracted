@@ -13,11 +13,11 @@ WriteMakefile(
 		provides     => {
 			'File::Replace::Inplace' => {
 				file    => 'lib/File/Replace/Inplace.pm',
-				version => '0.16',
+				version => '0.18',
 			},
 			'Tie::Handle::Argv' => {
 				file    => 'lib/Tie/Handle/Argv.pm',
-				version => '0.16',
+				version => '0.18',
 			},
 		},
 		resources    => {
@@ -46,8 +46,8 @@ WriteMakefile(
 	},
 	PREREQ_PM      => {
 		# CPAN
-		'Tie::Handle::Base'      => '0.16',
-		'File::Replace'          => '0.16',
+		'Tie::Handle::Base'      => '0.18',
+		'File::Replace'          => '0.18',
 		# Perl core modules
 		'Carp'                   => 0,
 		'warnings::register'     => 0,

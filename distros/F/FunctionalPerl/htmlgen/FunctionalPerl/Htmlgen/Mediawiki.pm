@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2014-2023 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -42,17 +42,43 @@ use Chj::chompspace;
 use Chj::TEST ":all";
 use PXML::XHTML ":all";
 use FP::Show;
+use URI;
 
 # and for text display we need to *decode* URIs..
-# COPY from chj-bin's `urldecode`
-use URI;
+# COPY from chj-bin's `urldecode`, now modified by having our own
+# uri_escape
 use Encode;
+
+# Adapted copy from URI::Escape
+sub uri_unescape($str) {
+
+    # Note from RFC1630:  "Sequences which start with a percent sign
+    # but are not followed by two hexadecimal characters are reserved
+    # for future extension"
+    $str =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg if defined $str;
+    $str;
+}
 
 sub url_decode {
     my ($str) = @_;
-    my $u     = URI->new($str);
-    my $str2  = $u->uri_unescape;
+    my $str2 = uri_unescape($str);
     decode("utf-8", $str2, Encode::FB_CROAK)
+}
+
+# Hack to avoid failing tests because of changed URI behaviour. The
+# new URI behaviour is probably the correct one but don't want to fail
+# with older versions.
+sub possibly_unescape_brackets {
+    my ($str) = @_;
+
+    # warn "URI $URI::VERSION";
+    $URI::VERSION < 5.11
+        ? do {
+        $str =~ s{\%5B}{\[}sg;
+        $str =~ s{\%5D}{\]}sg;
+        $str
+        }
+        : $str
 }
 
 # escape [ ] for markdown; XX is this correct?
@@ -199,11 +225,21 @@ TEST {
 ];
 
 TEST { mediawiki_expand ' [[Foo#yah_Hey\\[1\\]]] ' }
-[' ', A({ href => '//Foo.md#yah_Hey[1]' }, 'Foo (yah Hey[1])'), ' '];
+[
+    ' ',
+    A(
+        { href => possibly_unescape_brackets '//Foo.md#yah_Hey%5B1%5D' },
+        'Foo (yah Hey[1])'
+    ),
+    ' '
+];
 
 TEST { mediawiki_expand ' [[Foo#(yah_Hey)\\[1\\]|Some \\[text\\]]] ' }
-[' ', A({ href => 'Foo#(yah_Hey)[1]' }, 'Some [text]'), ' ']
-;    # note: no // and .md added to Foo!
+[
+    ' ',
+    A({ href => possibly_unescape_brackets 'Foo#(yah_Hey)[1]' }, 'Some [text]'),
+    ' '
+];    # note: no // and .md added to Foo!
 
 TEST { mediawiki_expand 'foo [[bar]]' }
 ['foo ', A { href => "//bar.md" }, "bar"];

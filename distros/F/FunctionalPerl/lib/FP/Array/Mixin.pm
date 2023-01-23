@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2021 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2014-2023 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -74,7 +74,7 @@ sub blessing_snd {
     my ($m) = @_;
     sub {
         my $class = ref $_[0];
-        wantarray
+        wantarray    ## no critic
             ? do {
             my ($v, $a) = &$m(@_);
             ($v, $class->new_from_array($a))
@@ -206,6 +206,7 @@ sub FP_Sequence_length {
 *for_each             = flip \&array_for_each;
 *for_each_with_islast = flip \&array_for_each_with_islast;
 *map                  = blessing flip \&array_map;
+*filtermap            = blessing flip \&array_filtermap;
 *map_with_index       = blessing flip \&array_map_with_index;
 *map_with_islast      = blessing flip \&array_map_with_islast;
 *filter               = blessing flip \&array_filter;
@@ -230,6 +231,7 @@ sub FP_Sequence_length {
 *perhaps_find_tail = blessing flip \&array_perhaps_find_tail;
 *perhaps_find      = flip \&array_perhaps_find;
 *find              = perhaps_to_maybe(\&array_perhaps_find);
+*merge             = blessing \&array_merge;
 
 sub group {
     @_ >= 2 and @_ <= 3 or fp_croak_arity "2-3";

@@ -12,7 +12,7 @@ our @EXPORT_OK = qw/
     last_value_from first_value_from
 /;
 
-our $VERSION = "v6.13.1";
+our $VERSION = "v6.14.0";
 
 sub _promise_class {
     my $fn = (caller(1))[3];

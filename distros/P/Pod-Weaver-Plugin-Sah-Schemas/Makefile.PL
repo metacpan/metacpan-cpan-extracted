@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Pod::Weaver::Plugin::Sah::Schemas",
   "PREREQ_PM" => {
     "Data::Dmp" => "0.242",
-    "Data::Sah" => "0.911",
+    "Data::Sah" => "0.914",
     "Markdown::To::POD" => 0,
     "Module::List" => 0,
     "Moose" => 0,
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.071",
+  "VERSION" => "0.072",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Data::Dmp" => "0.242",
-  "Data::Sah" => "0.911",
+  "Data::Sah" => "0.914",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

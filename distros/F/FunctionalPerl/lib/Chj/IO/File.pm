@@ -1,11 +1,13 @@
 #
-# Copyright (c) 2003-2020 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2003-2022 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
 # MIT License (Expat version). See the file COPYING.md that came
 # bundled with this file.
 #
+
+# Depends: ()
 
 =head1 NAME
 
@@ -286,9 +288,9 @@ sub perhaps_open {
     my $rv;
     $! = undef;
     if (@_ == 1) {
-        $rv = open $self->fh, $_[0];
+        $rv = open $self->fh, $_[0];    ## no critic
     } elsif (@_ >= 2) {
-        $rv = open $self->fh, $_[0], @_[1 .. $#_];
+        $rv = open $self->fh, $_[0], @_[1 .. $#_];    ## no critic
     } else {
         croak "xopen @_: wrong number of arguments";
     }
@@ -578,8 +580,8 @@ LP: {
 
 sub xreadline {    # XX: test error case (difficult to do)
     my $self = shift;
-    undef $!;      # needed!
-    if (wantarray) {
+    undef $!;           # needed!
+    if (wantarray) {    ## no critic
         my $lines = [CORE::readline($self->fh)];
         if ($!) {
             croak "xreadline from " . ($self->quotedname) . ": $!";
@@ -596,7 +598,7 @@ sub xreadline {    # XX: test error case (difficult to do)
 
 sub xreadline_chomp {
     my $s = shift;
-    if (wantarray) {
+    if (wantarray) {                                         ## no critic
         map {
             chomp;
             $_
@@ -641,7 +643,7 @@ sub xreadline0_chop {
 
     # yes really *have* to check context. or it would give the number
     # of items
-    if (wantarray) {
+    if (wantarray) {    ## no critic
         map {
             chop;
             $_
@@ -1090,13 +1092,14 @@ sub xdup {    # (return objects)
     #  which works like:     open($io, _open_mode_string($mode) . '&' . $fd)
     # XX HACK:
     my $new = ref($self)->new;
-    open $new, ">& = $fd" or die "xdup: error building perl fh from fd $fd";
+    open $new, ">& = $fd"    ## no critic
+        or die "xdup: error building perl fh from fd $fd";
     $new
 
         # XX hm IO::Handle::fdopen is checkint if it's a glob already
 }
 
-sub xdupfd {    # return integers
+sub xdupfd {                 # return integers
     my $s = shift;
     require POSIX;
     my $myfileno = CORE::fileno $s;
@@ -1118,7 +1121,7 @@ sub autoflush {
         select $old;
         $oldv
     } else {
-        defined wantarray
+        defined wantarray    ## no critic
             or croak
             "autoflush: used in void context without arguments (note that this is "
             . __PACKAGE__

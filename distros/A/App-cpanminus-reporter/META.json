@@ -4,13 +4,13 @@
       "Breno G. de Oliveira <garu@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-cpanminus-reporter",
    "no_index" : {
@@ -37,7 +37,7 @@
             "Capture::Tiny" : "0",
             "Carp" : "0",
             "Config::Tiny" : "2.08",
-            "File::HomeDir" : "0.58",
+            "File::HomeDir::Tiny" : "0",
             "File::Spec" : "3.19",
             "Getopt::Long" : "0",
             "IO::Prompt::Tiny" : "0",
@@ -60,5 +60,6 @@
          "url" : "http://github.com/garu/App-cpanminus-reporter"
       }
    },
-   "version" : "0.17"
+   "version" : "0.18",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

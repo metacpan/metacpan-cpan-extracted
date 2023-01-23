@@ -40,7 +40,7 @@
    "provides" : {
       "BioX::Seq" : {
          "file" : "lib/BioX/Seq.pm",
-         "version" : "0.008006"
+         "version" : "0.008007"
       },
       "BioX::Seq::Fetch" : {
          "file" : "lib/BioX/Seq/Fetch.pm"
@@ -70,6 +70,6 @@
          "url" : "https://github.com/jvolkening/p5-BioX-Seq"
       }
    },
-   "version" : "0.008006",
+   "version" : "0.008007",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

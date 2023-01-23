@@ -1,5 +1,5 @@
 package URI::Title::MP3;
-$URI::Title::MP3::VERSION = '1.902';
+$URI::Title::MP3::VERSION = '1.903';
 use warnings;
 use strict;
 
@@ -40,7 +40,7 @@ sub title {
   }
   return unless $tag;
   return unless ($tag->{ARTIST} or $tag->{TITLE});
-  
+
   $tag->{ARTIST} ||= "Unknown Artist";
   $tag->{TITLE} ||= "Unknown Title";
   my $title = "$tag->{ARTIST} - $tag->{TITLE}";
@@ -66,6 +66,6 @@ URI::Title::MP3 - get titles of MP3 files
 
 =head1 VERSION
 
-version 1.902
+version 1.903
 
 =cut

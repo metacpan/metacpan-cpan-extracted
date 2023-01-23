@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -55,6 +55,6 @@
          "web" : "https://github.com/perl/perl5"
       }
    },
-   "version" : "1.52",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.53",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

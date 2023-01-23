@@ -14,7 +14,6 @@ my %META = (
     test => {
       requires => {
         'Test::More'  => 0.94,
-        'Test::Fatal' => 0.003,
       },
     },
     runtime => {
@@ -23,7 +22,7 @@ my %META = (
         'perl'                      => 5.006,
       },
       recommends => {
-        'Sub::Name'                 => 0.08,
+        'Sub::Util'                 => 0,
       },
     },
     develop   => {

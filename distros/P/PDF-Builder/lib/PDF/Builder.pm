@@ -5,13 +5,15 @@ use warnings;
 
 # $VERSION defined here so developers can run PDF::Builder from git.
 # it should be automatically updated as part of the CPAN build.
-our $VERSION = '3.024'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.025'; # VERSION
+our $LAST_UPDATE = '3.025'; # manually update whenever code is changed
 
 # updated during CPAN build
-my $GrTFversion = 19;    # minimum version of Graphics::TIFF
-my $HBShaperVer = 0.024; # minimum version of HarfBuzz::Shaper
-my $LpngVersion = 0.57;  # minimum version of Image::PNG::Libpng
+my $GrTFversion  = 19;       # minimum version of Graphics::TIFF
+my $HBShaperVer  = 0.024;    # minimum version of HarfBuzz::Shaper
+my $LpngVersion  = 0.57;     # minimum version of Image::PNG::Libpng
+my $TextMarkdown = 1.000031; # minimum version of Text::Markdown
+my $HTMLTreeBldr = 5.07;     # minimum version of HTML::TreeBuilder
 
 use Carp;
 use Encode qw(:all);
@@ -32,15 +34,25 @@ use PDF::Builder::Resource::Pattern;
 use PDF::Builder::Resource::Shading;
 
 use PDF::Builder::NamedDestination;
+use PDF::Builder::FontManager;
 
 use List::Util qw(max);
 use Scalar::Util qw(weaken);
 
+# Note that every Linux distribution seems to put font files in a different
+# place, and even Windows is consistent only for TTF/OTF font files.
 my @font_path = __PACKAGE__->set_font_path(
+	          '.',  # could a font ever be a security risk?
                   '/usr/share/fonts',
 		  '/usr/local/share/fonts',
-		  'C:/Windows/Fonts',
-		  'C:/WinNT/Fonts'
+		  '/usr/share/fonts/type1/gsfonts',
+		  '/usr/share/X11/fonts/urw-fonts',
+		  '/usr/share/fonts/dejavu-sans-fonts',
+		  '/usr/share/fonts/truetype/ttf-dejavu',
+		  '/usr/share/fonts/truetype/dejavu',
+		  '/var/lib/defoma/gs.d/dirs/fonts',
+		  '/Windows/Fonts',
+		  '/WinNT/Fonts'
 	                                  );
 
 our @MSG_COUNT = (0,  # [0] Graphics::TIFF not installed
@@ -51,6 +63,8 @@ our $outVer = 1.4; # desired PDF version for output, bump up w/ warning on read 
 our $msgVer = 1;   # 0=don't, 1=do issue message when PDF output version is bumped up
 our $myself;       # holds self->pdf
 our $global_pdf;   # holds self ($pdf)
+
+require PDF::Builder::FontManager;
 
 =head1 NAME
 
@@ -142,6 +156,11 @@ The intent is to avoid expending unnecessary effort in supporting very old
 
 =head3 Anticipated Support Cutoff Dates
 
+B<Note that these are I<not> hard and fast dates. In particular, we develop
+on Strawberry Perl, which is currently stuck at release 5.32! We'll have to
+see whether we can get around this problem in the summer of 2023, if Strawberry
+hasn't yet gotten up to at least 5.36 by then.>
+
 =over
 
 =item * 5.24 current minimum supported version, until next PDF::Builder release after 30 May, 2023
@@ -213,7 +232,7 @@ may give the go-ahead. Unsolicited PRs may be closed without further action.
 
 =head2 LICENSE
 
-This software is Copyright (c) 2017-2022 by Phil M. Perry.
+This software is Copyright (c) 2017-2023 by Phil M. Perry.
 
 This is free software, licensed under:
 
@@ -388,6 +407,10 @@ sub new {
                 "https://github.com/PhilterPaper/Perl-PDF-Builder/blob/master/INFO/SUPPORT]");
 
     $global_pdf = $self;
+    # initialize Font Manager
+    require PDF::Builder::FontManager;
+    $self->{' FM'} = PDF::Builder::FontManager->new($self);  
+
     return $self;
 } # end of new()
 
@@ -523,11 +546,11 @@ sub open {  ## no critic
 
     my $content;
     my $scalar_fh = FileHandle->new();
-    CORE::open($scalar_fh, '+<', \$content) or die "Can't begin scalar IO";
+    CORE::open($scalar_fh, '+<', \$content) or croak "Can't begin scalar IO";
     binmode $scalar_fh, ':raw';
 
     my $disk_fh = FileHandle->new();
-    CORE::open($disk_fh, '<', $file) or die "Can't open $file for reading: $!";
+    CORE::open($disk_fh, '<', $file) or croak "Can't open $file for reading: $!";
     binmode $disk_fh, ':raw';
     $disk_fh->seek(0, 0);
     my $data;
@@ -565,7 +588,7 @@ where possible. See L<PDF::Builder::Basic::PDF::File> for more information.
 B<Example:>
 
     # Read a PDF into a string, for the purpose of demonstration
-    open $fh, 'our/old.pdf' or die $@;
+    open $fh, 'our/old.pdf' or croak $@;
     undef $/;  # Read the whole file at once
     $pdf_string = <$fh>;
 
@@ -610,14 +633,14 @@ sub from_string {
     if (defined $newVer) {
 	my ($verStr, $currentVer, $pos);
 	$pos = index $content, "%PDF-";
-	if ($pos < 0) { die "no PDF version found in PDF input!\n"; }
+	if ($pos < 0) { croak "no PDF version found in PDF input!"; }
 	# assume major and minor PDF version numbers max 2 digits each for now
 	# (are 1 or 2 and 0-7 at this writing)
 	$verStr = substr($content, $pos, 10);
 	if ($verStr =~ m#^%PDF-(\d+)\.(\d+)#) {
 	    $currentVer = "$1.$2";
 	} else {
-	    die "unable to get PDF input's version number.\n";
+	    croak "unable to get PDF input's version number.";
         }
         if ($newVer > $currentVer) {
 	    if (length($newVer) > length($currentVer)) {
@@ -636,7 +659,7 @@ sub from_string {
     }
 
     my $fh;
-    CORE::open($fh, '+<', \$content) or die "Can't begin scalar IO";
+    CORE::open($fh, '+<', \$content) or croak "Can't begin scalar IO";
 
     # this would replace any existing self->pdf with a new one
     $self->{'pdf'} = PDF::Builder::Basic::PDF::File->open($fh, 1, %opts);
@@ -725,7 +748,7 @@ sub to_string {
     } else {
         my $fh = FileHandle->new();
         # we should be writing to the STRING $str
-        CORE::open($fh, '>', \$string) || die "Can't begin scalar IO";
+        CORE::open($fh, '>', \$string) || croak "Can't begin scalar IO";
         $self->{'pdf'}->out_file($fh);
         $fh->close();
     }
@@ -767,11 +790,11 @@ sub finishobjects {
     my ($self, @objs) = @_;
 
     if ($self->{'opened_scalar'}) {
-        die "invalid method invocation: no file, use 'saveas' instead.";
+        croak "invalid method invocation: no file, use 'saveas' instead.";
     } elsif ($self->{'partial_save'}) {
         $self->{'pdf'}->ship_out(@objs);
     } else {
-        die "invalid method invocation: no file, use 'saveas' instead.";
+        croak "invalid method invocation: no file, use 'saveas' instead.";
     }
 
     return;
@@ -853,7 +876,7 @@ sub saveas {
     if ($self->{'opened_scalar'}) {
         $self->{'pdf'}->append_file();
         my $fh;
-        CORE::open($fh, '>', $file) or die "Can't open $file for writing: $!";
+        CORE::open($fh, '>', $file) or croak "Can't open $file for writing: $!";
         binmode($fh, ':raw');
         print $fh ${$self->{'content_ref'}};
         CORE::close($fh);
@@ -905,11 +928,11 @@ sub save {
     # a consequence of merging save() and saveas(). Let's give this unchanged
     # version a try.
     if      ($self->{'opened_scalar'}) {
-        die "Invalid method invocation: use 'saveas' instead of 'save'.";
+        croak "Invalid method invocation: use 'saveas' instead of 'save'.";
     } elsif ($self->{'partial_save'}) {
         $self->{'pdf'}->close_file();
     } else {
-        die "Invalid method invocation: use 'saveas' instead of 'save'.";
+        croak "Invalid method invocation: use 'saveas' instead of 'save'.";
     }
 
     $self->end();
@@ -1535,31 +1558,33 @@ sub outline {
     return $obj;
 }
 
-=item $pdf = $pdf->open_action($page, $location, @args);
-
-Set the destination in the PDF that should be displayed when the document is
-opened.
-
-C<$page> may be either a page number or a page object.  The other parameters are
-as described in L<PDF::Builder::NamedDestination>.
-
-This has been split out from C<preferences()> for compatibility with PDF::API2.
-It also can both set (assign) and get (query) the settings used.
-
-=cut
-
-sub open_action {
-    my ($self, $page, @args) = @_;
-
-    # $page can be either a page number or a page object
-    $page = PDFNum($page) unless ref($page);
-
-    require PDF::Builder::NamedDestination;
-    my $array = PDF::Builder::NamedDestination::_destination($page, @args);
-    $self->{'catalog'}->{'OpenAction'} = $array;
-    $self->{'pdf'}->out_obj($self->{'catalog'});
-    return $self;
-}
+#=item $pdf = $pdf->open_action($page, $location, @args);
+#
+#Set the destination in the PDF that should be displayed when the document is
+#opened.
+#
+#C<$page> may be either a page number or a page object. The other parameters are
+#as described in L<PDF::Builder::NamedDestination>.
+#
+#This has been split out from C<preferences()> for compatibility with PDF::API2.
+#It also can both set (assign) and get (query) the settings used.
+#
+#=cut
+#
+#sub open_action {
+#    my ($self, $page, @args) = @_;
+#
+#    # $page can be either a page number or a page object
+#    $page = PDFNum($page) unless ref($page);
+#
+#    require PDF::Builder::NamedDestination;
+#   # PDF::API2 code incompatible with Builder!
+#   #my $array = PDF::Builder::NamedDestination::_destination($page, @args);
+#
+#    $self->{'catalog'}->{'OpenAction'} = $array;
+#    $self->{'pdf'}->out_obj($self->{'catalog'});
+#    return $self;
+#}
 
 =item $layout = $pdf->page_layout();
 
@@ -1627,7 +1652,7 @@ sub page_layout {
                   $name eq 'two_page_right'   ? 'TwoPageRight'   : '');
 
     croak "Invalid page layout: $name" unless $layout;
-    $self->{'catalog'}->{'PageMode'} = PDFName($layout);
+    $self->{'catalog'}->{'PageLayout'} = PDFName($layout);
     $self->{'pdf'}->out_obj($self->{'catalog'});
     return $self;
 }
@@ -1742,6 +1767,7 @@ It is preferred that you use these specific methods.
 
 sub preferences {
     my ($self, %opts) = @_;
+
     # copy dashed option names to the preferred undashed format
     # Page Mode Options
     if (defined $opts{'-fullscreen'} && !defined $opts{'fullscreen'}) { $opts{'fullscreen'} = delete($opts{'-fullscreen'}); }
@@ -1965,21 +1991,39 @@ sub page {
     } else {
         $page = PDF::Builder::Page->new($self->{'pdf'}, $self->{'pages'}, $index-1);
     }
+
     $page->{' apipdf'} = $self->{'pdf'};
     $page->{' api'} = $self;
     weaken $page->{' apipdf'};
     weaken $page->{' api'};
     $self->{'pdf'}->out_obj($page);
     $self->{'pdf'}->out_obj($self->{'pages'});
-    if ($index == 0) {
+
+    # fix any bad $index value
+    my $pgs_size = @{$self->{'pagestack'}};
+    if      ($pgs_size == 0) { # empty page list, can only add at end
+	warn "page($index) on empty page stack is out of range, use page() or page(0)"
+	    if ($index != 0);
+	$index = 0;
+    } elsif ($pgs_size < -$index) { # index < 0
+        warn "page($index) out of range, set to page(1) (before first)";
+        $index = 1;
+    } elsif ($pgs_size < $index) { # index > 0
+        warn "page($index) out of range, set to page(0) (after last)";
+        $index = 0;
+    }
+
+    if      ($index == 0) {
         push @{$self->{'pagestack'}}, $page;
         weaken $self->{'pagestack'}->[-1];
     } elsif ($index < 0) {
+	# note that the new element's number is one less than $index,
+	# since we inserted _before_ $index value!
         splice @{$self->{'pagestack'}}, $index, 0, $page;
-        weaken $self->{'pagestack'}->[$index];
-    } else {
+        weaken $self->{'pagestack'}->[$index-1];
+    } else { # index > 0
         splice @{$self->{'pagestack'}}, $index-1, 0, $page;
-        weaken $self->{'pagestack'}->[$index - 1];
+        weaken $self->{'pagestack'}->[$index-1];
     }
 
     #   $page->{'Resources'}=$self->{'pages'}->{'Resources'};
@@ -1992,8 +2036,9 @@ Returns the L<PDF::Builder::Page> object of page $page_number.
 This is similar to C<< $page = $pdf->page() >>, except that C<$page> is 
 I<not> a new, empty page; but contains the contents of that existing page.
 
-If $page_number is 0 or -1, it will return the last page in the
-document.
+If C<$page_number> is 0, -1, or unspecified, 
+it will return the last page in the document.
+If the requested page is out of range, the C<$page> returned will be undefined.
 
 B<Example:>
 
@@ -2002,6 +2047,8 @@ B<Example:>
     $page = $pdf->open_page(99);  # returns the last page
     $page = $pdf->open_page(-1);  # returns the last page
     $page = $pdf->open_page(999); # returns undef
+    $page = $pdf->open_page(0);   # returns the last page
+    $page = $pdf->open_page();    # returns the last page
 
 B<Alternate name:> C<openpage>
 
@@ -2149,14 +2196,14 @@ sub import_page {
     my ($s_page, $t_page);
 
     unless (ref($s_pdf) and $s_pdf->isa('PDF::Builder')) {
-        die "Invalid usage: first argument must be PDF::Builder instance, not: " . ref($s_pdf);
+        croak "Invalid usage: first argument must be PDF::Builder instance, not: " . ref($s_pdf);
     }
 
     if (ref($s_idx) eq 'PDF::Builder::Page') {
         $s_page = $s_idx;
     } else {
         $s_page = $s_pdf->open_page($s_idx);
-	die "Unable to open page '$s_idx' in source PDF" unless defined $s_page;
+	croak "Unable to open page '$s_idx' in source PDF" unless defined $s_page;
     }
 
     if (ref($t_idx) eq 'PDF::Builder::Page') {
@@ -2304,7 +2351,7 @@ sub embed_page {
     $s_idx ||= 0;
 
     unless (ref($s_pdf) and $s_pdf->isa('PDF::Builder')) {
-        die "Invalid usage: first argument must be PDF::Builder instance, not: " . ref($s_pdf);
+        croak "Invalid usage: first argument must be PDF::Builder instance, not: " . ref($s_pdf);
     }
 
     my ($s_page, $xo);
@@ -2315,7 +2362,7 @@ sub embed_page {
         $s_page = $s_idx;
     } else {
         $s_page = $s_pdf->open_page($s_idx);
-	die "Unable to open page '$s_idx' in source PDF" unless defined $s_page;
+	croak "Unable to open page '$s_idx' in source PDF" unless defined $s_page;
     }
 
     $self->{'apiimportcache'} ||= {};
@@ -2353,11 +2400,9 @@ sub embed_page {
     # create a whole content stream
     ## technically it is possible to submit an unfinished
     ## (e.g., newly created) source-page, but that's nonsense,
-    ## so we expect a page fixed by open_page and die otherwise
+    ## so we expect a page fixed by open_page and croak otherwise
     unless ($s_page->{' opened'}) {
-        croak join(' ',
-		   "Pages may only be imported from a complete PDF.",
-		   "Save and reopen the source PDF object first.");
+        croak "Pages may only be imported from a complete PDF. Save and reopen the source PDF object first.";
     }
 
     if (defined $s_page->{'Contents'}) {
@@ -2392,7 +2437,7 @@ sub _walk_obj {
     }
 
     return $object_cache->{scalar $source_object} if defined $object_cache->{scalar $source_object};
-   #die "infinite loop while copying objects" if $source_object->{' copied'};
+   #croak "infinite loop while copying objects" if $source_object->{' copied'};
 
     my $target_object = $source_object->copy($source_pdf); ## thanks to: yaheath // Fri, 17 Sep 2004
 
@@ -2884,6 +2929,14 @@ sub corefont {
     if (defined $opts{'-unicodemap'} && !defined $opts{'unicodemap'}) { $opts{'unicodemap'} = delete($opts{'-unicodemap'}); }
 
     require PDF::Builder::Resource::Font::CoreFont;
+    if (!PDF::Builder::Resource::Font::CoreFont->is_standard($name)) {
+        if ($name =~ /^Times$/i) {
+	    # Accept Times as an alias for Times-Roman to follow the pattern 
+	    # set by Courier and Helvetica
+	    carp "Times is not a standard font; substituting Times-Roman";
+            $name = 'Times-Roman';
+        }
+    }
     my $obj = PDF::Builder::Resource::Font::CoreFont->new($self->{'pdf'}, $name, %opts);
     $self->{'pdf'}->out_obj($self->{'pages'});
     $obj->tounicodemap() if $opts{'unicodemap'}; # UTF-8 not usable
@@ -3093,9 +3146,15 @@ sub font {
     }
     $opts{'dokern'} //= 1; # kerning ON by default for font()
 
+    # see if it's a plain core font first
     require PDF::Builder::Resource::Font::CoreFont;
     if (PDF::Builder::Resource::Font::CoreFont->is_standard($name)) {
         return $self->corefont($name, %opts);
+    } elsif ($name =~ /^Times$/i and not $opts{'format'}) {
+	# Accept Times as an alias for Times-Roman to follow the pattern set by
+	# Courier and Helvetica
+	carp "Times is not a standard font; substituting Times-Roman";
+        return $self->corefont('Times-Roman', %opts);
     }
 
     my $format = $opts{'format'};
@@ -3179,7 +3238,8 @@ sub set_font_path {
     shift() if ref($_[0]);
     shift() if $_[0] eq __PACKAGE__;
 
-    @font_path = ((map { "$_/PDF/Builder/fonts" } @INC), @_);
+   #@font_path = ((map { "$_/PDF/Builder/fonts" } @INC), @_);
+    @font_path = @_;
 
     return @font_path;
 }
@@ -3281,6 +3341,94 @@ sub unifont {
 
 =back
 
+=head2 Font Manager methods
+
+The Font Manager is automatically initialized.
+
+=over
+
+=item @list = $pdf->font_settings()  # Get
+
+=item $pdf->font_settings(%info)  # Set
+
+Change one or more default settings. 
+See L<PDF::Builder::FontManager>/font_settings for details.
+
+=back
+
+=cut
+
+sub font_settings {
+    my $self = shift;
+    return $self->{' FM'}->font_settings(@_);
+}
+
+=over
+
+=item $rc = $pdf->add_font_path("a directory path", %opts)
+
+Add a search path for Font Manager font entries.
+See L<PDF::Builder::FontManager>/add_font_path for details.
+
+=back
+
+=cut
+
+sub add_font_path {
+    my $self = shift;
+    return $self->{' FM'}->add_font_path(@_);
+}
+
+=over
+
+=item $rc = $pdf->add_font(%info)
+
+Add a font (face) definition to the Font Manager list.
+See L<PDF::Builder::FontManager>/add_font for details.
+
+=back
+
+=cut
+
+sub add_font {
+    my $self = shift;
+    return $self->{' FM'}->add_font(@_);
+}
+
+=over
+
+=item @current = $pdf->get_font()  # Get
+
+=item $font = $pdf->get_font(%info)  # Set
+
+Retrieve a ready-to-use font, or find out what the current one is.
+See L<PDF::Builder::FontManager>/get_font for details.
+
+=back
+
+=cut
+
+sub get_font {
+    my $self = shift;
+    return $self->{' FM'}->get_font(@_);
+}
+
+=over
+
+=item $pdf->dump_font_tables()
+
+Dump all known font information to STDOUT.
+See L<PDF::Builder::FontManager>/dump_font_tables for details.
+
+=back
+
+=cut
+
+sub dump_font_tables {
+    my $self = shift;
+    return $self->{' FM'}->dump_font_tables(@_);
+}
+
 =head1 IMAGE METHODS
 
 =over
@@ -3303,7 +3451,7 @@ C<$file> may be either a file name, a filehandle, or a
 L<PDF::Builder::Resource::XObject::Image::GD> object.
 
 B<Caution:> Do not confuse this C<image> ($pdf-E<gt>) with the image method 
-found in the graphics (gfx) class ($gfx-E<gt>), used to actually place a
+found in the graphics (gfx) class ($gfx-E<gt>), used to actually I<place> a
 read-in or decoded image on the page!
 
 See L<PDF::Builder::Content/image> for details about placing images on a page

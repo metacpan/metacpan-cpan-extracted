@@ -14,7 +14,7 @@ my $xs = <<'END';
 #include "perl.h"
 #include "XSUB.h"
 
-#include "ta_libc.h"
+#include "ta-lib/ta_libc.h"
 
 const char* version(const char* class) {
   return TA_GetVersionString();

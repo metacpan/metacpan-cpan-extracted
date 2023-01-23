@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Transaction;
 # ABSTRACT: Logical container for an atomic unit of work
-$Neo4j::Driver::Transaction::VERSION = '0.33';
+$Neo4j::Driver::Transaction::VERSION = '0.34';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(
@@ -113,7 +113,12 @@ sub _begin {
 	
 	croak "Concurrent transactions are unsupported in Bolt (there is already an open transaction in this session)" if $self->{net}->{active_tx};
 	
-	$self->{bolt_txn} = $self->{net}->_new_tx;
+	try {
+		$self->{bolt_txn} = $self->{net}->_new_tx;
+	}
+	catch {
+		die $_ if $_ !~ m/\bprotocol version\b/i;  # Bolt v1/v2
+	};
 	$self->{net}->{active_tx} = 1;
 	$self->run('BEGIN') unless $self->{bolt_txn};
 	return $self;
@@ -283,7 +288,7 @@ Neo4j::Driver::Transaction - Logical container for an atomic unit of work
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 SYNOPSIS
 
@@ -507,7 +512,7 @@ If you contact me by email, please make sure you include the word
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2022 by Arne Johannessen.
+This software is Copyright (c) 2016-2023 by Arne Johannessen.
 
 This is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0 or (at your option) the same terms

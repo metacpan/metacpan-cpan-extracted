@@ -11,7 +11,7 @@ use Scalar::Util ();
 {
 	package Type::Tie;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '2.002000';
+	our $VERSION   = '2.002001';
 	our @ISA       = qw( Exporter::Tiny );
 	our @EXPORT    = qw( ttie );
 	
@@ -40,7 +40,7 @@ use Scalar::Util ();
 {
 	package Type::Tie::BASE;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '2.002000';
+	our $VERSION   = '2.002001';
 	
 	$VERSION =~ tr/_//d;
 	
@@ -144,17 +144,16 @@ use Scalar::Util ();
 		$tmp_clone_types{$refaddr} ||= [ $type, 0 ];
 		++$tmp_clone_types{$refaddr}[1];
 		
-		return ( pack( 'j', $refaddr ), $o->_REF );
+		return ( $refaddr, $o->_REF );
 	}
 	
 	sub STORABLE_thaw {
-		my ( $o, $cloning, $packedRefaddr, $o2 ) = @_;
+		my ( $o, $cloning, $refaddr, $o2 ) = @_;
 		Carp::croak( "Storable::thaw only supported for dclone-ing" )
 			unless $cloning;
 		
 		$o->_THAW( $o2 ); # implement in child classes
 		
-		my $refaddr = unpack( 'j', $packedRefaddr );
 		my $type = $tmp_clone_types{$refaddr}[0];
 		--$tmp_clone_types{$refaddr}[1]
 			or delete $tmp_clone_types{$refaddr};
@@ -165,7 +164,7 @@ use Scalar::Util ();
 {
 	package Type::Tie::ARRAY;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '2.002000';
+	our $VERSION   = '2.002001';
 	our @ISA       = qw( Type::Tie::BASE );
 	
 	$VERSION =~ tr/_//d;
@@ -203,7 +202,7 @@ use Scalar::Util ();
 {
 	package Type::Tie::HASH;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '2.002000';
+	our $VERSION   = '2.002001';
 	our @ISA       = qw( Type::Tie::BASE );
 	
 	$VERSION =~ tr/_//d;
@@ -229,7 +228,7 @@ use Scalar::Util ();
 {
 	package Type::Tie::SCALAR;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '2.002000';
+	our $VERSION   = '2.002001';
 	our @ISA       = qw( Type::Tie::BASE );
 	
 	$VERSION =~ tr/_//d;

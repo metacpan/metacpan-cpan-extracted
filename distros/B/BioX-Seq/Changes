@@ -1,5 +1,9 @@
 Revision history for BioX-Seq
 
+0.008007 2023-01-20
+         Use multi-argument form of piped opens, for security and to handle
+         filenames with spaces
+
 0.008006 2022-05-26
          Fix fatal error in Bio::Seq::Fetch where description is requested and
          contains the greater-than sign

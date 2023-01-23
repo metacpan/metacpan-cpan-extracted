@@ -4,7 +4,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 # VERSION
 
-Version 1.34
+Version 1.35
 
 # SYNOPSIS
 
@@ -2157,7 +2157,7 @@ Thanks also to the authors of the documentation in the following sources;
 
 # LICENSE AND COPYRIGHT
 
-Copyright (c) 2021, David Dick `<ddick@cpan.org>`. All rights reserved.
+Copyright (c) 2023, David Dick `<ddick@cpan.org>`. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See ["perlartistic" in perlartistic](https://metacpan.org/pod/perlartistic#perlartistic).

@@ -6,9 +6,10 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0.30'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.00'
+  File::ShareDir::Install: '0.14'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,10 +29,10 @@ resources:
   IRC:
     url: irc://irc.libera.chat/#convos
     web: https://web.libera.chat/#convos
-  bugtracker: https://github.com/jhthorsen/mojo-file-share/issues
-  homepage: https://github.com/jhthorsen/mojo-file-share
+  bugtracker: https://github.com/jhthorsen/mojo-sharedir/issues
+  homepage: https://github.com/jhthorsen/mojo-sharedir
   license: http://www.opensource.org/licenses/artistic-license-2.0
-  repository: https://github.com/jhthorsen/mojo-file-share.git
-version: '0.01'
+  repository: https://github.com/jhthorsen/mojo-sharedir.git
+version: '0.02'
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

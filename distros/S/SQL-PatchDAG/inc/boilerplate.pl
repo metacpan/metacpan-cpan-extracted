@@ -2,7 +2,7 @@ use strict; use warnings;
 
 use CPAN::Meta;
 use Software::LicenseUtils 0.103011;
-use Pod::Readme::Brief 1.001;
+use Pod::Readme::Brief 1.003;
 
 sub slurp { open my $fh, '<', $_[0] or die "Couldn't open $_[0] to read: $!\n"; local $/; readline $fh }
 sub trimnl { s/\A\s*\n//, s/\s*\z/\n/ for @_; wantarray ? @_ : $_[-1] }
@@ -35,7 +35,7 @@ my ( $main_module ) = map { s!-!/!g; s!^!lib/! if -d 'lib'; -f "$_.pod" ? "$_.po
 ) }me;
 
 die unless -e 'Makefile.PL';
-$file{'README'} = Pod::Readme::Brief->new( $file{ $main_module } )->render( installer => 'eumm' );
+$file{'README'} = Pod::Readme::Brief->new( $file{ $main_module } )->render( installer => 'eumm', width => 72 );
 
 my @manifest = split /\n/, slurp 'MANIFEST';
 my %manifest = map /\A([^\s#]+)()/, @manifest;

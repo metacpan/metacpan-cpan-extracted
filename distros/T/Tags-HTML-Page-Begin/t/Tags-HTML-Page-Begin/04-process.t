@@ -155,7 +155,7 @@ is_deeply(
 
 		['b', 'style'],
 		['a', 'type', 'text/css'],
-		['d', "body{color:red;}\n"],
+		['d', "body{color:red;}*{box-sizing:border-box;margin:0;padding:0;}\n"],
 		['e', 'style'],
 
 		['e', 'head'],
@@ -803,6 +803,7 @@ is_deeply(
 $css = CSS::Struct::Output::Raw->new;
 $obj = Tags::HTML::Page::Begin->new(
 	'css' => $css,
+	'css_init' => [],
 	'generator' => undef,
 	'tags' => $tags,
 	'viewport' => undef,

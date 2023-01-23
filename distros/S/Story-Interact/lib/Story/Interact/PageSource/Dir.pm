@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact::PageSource::Dir;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001004';
+our $VERSION   = '0.001005';
 
 use Moo;
 use Types::Common -types;
@@ -26,6 +26,11 @@ sub get_source_code {
 	my $file = $self->dir->child( join q[.], $page_id, 'page.pl' );
 	return unless $file->exists;
 	return $file->slurp_utf8;
+}
+
+sub all_page_ids {
+	my ( $self ) = @_;
+	map $_->basename( '.page.pl' ), $self->dir->children( qr/\.page\.pl\z/ );
 }
 
 1;

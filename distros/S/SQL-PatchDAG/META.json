@@ -49,10 +49,10 @@
          "web" : "https://github.com/ap/SQL-PatchDAG"
       }
    },
-   "version" : "0.103",
+   "version" : "0.110",
    "x_copyright" : {
       "holder" : "Aristotle Pagaltzis",
-      "year" : 2020
+      "year" : 2023
    },
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

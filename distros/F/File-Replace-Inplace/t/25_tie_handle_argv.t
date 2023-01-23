@@ -42,7 +42,6 @@ our $FE = $] ge '5.012' && $] lt '5.029007' ? !!0 : !!1; # FE="first eof", see h
 #TODO Later: Why is $BE needed here, but not in the ::Inplace tests?
 our $BE; # BE="buggy eof", Perl 5.14.x had several regressions regarding eof (and a few others) (gets set below)
 our $CE; # CE="can't eof()", Perl <5.12 doesn't support eof() on tied filehandles (gets set below)
-         # plus try to work around https://github.com/Perl/perl5/issues/20207 on >5.36
 our $FL = undef; # FL="First Line"
 # Apparently there are some versions of Perl on Win32 where the following two appear to work slightly differently.
 # I've seen differing results on different systems and I'm not sure why, so I set it dynamically... not pretty, but this test isn't critical.
@@ -68,7 +67,7 @@ sub testboth {  ## no critic (RequireArgUnpacking)
 	}
 	{
 		local (*ARGV, $.);  ## no critic (RequireInitializationForLocalVars)
-		local $CE = $] lt '5.012' || $] gt '5.036';
+		local $CE = $] lt '5.012';
 		local $BE = $] ge '5.014' && $] lt '5.016';
 		tie *ARGV, 'Tie::Handle::Argv', debug=>$DEBUG;
 		my $osi = defined($stdin) ? OverrideStdin->new($stdin) : undef;
@@ -97,7 +96,7 @@ testboth 'basic test' => sub { plan tests=>1;
 };
 
 testboth 'basic test with eof()' => sub {
-	plan $CE ? ( skip_all=>"eof() not supported on tied handles on Perl<5.12 or >5.36" ) : (tests=>1);
+	plan $CE ? ( skip_all=>"eof() not supported on tied handles on Perl<5.12" ) : (tests=>1);
 	my @tf = (newtempfn("Foo\nBar"), newtempfn("Quz\nBaz\n"));
 	my @states;
 	local @ARGV = @tf; # this also tests "local"ization after constructing the object
@@ -269,7 +268,7 @@ testboth 'restart with emptied @ARGV (STDIN)' => sub {
 	push @states, [[@ARGV], $ARGV, defined(fileno ARGV), $., eof, $_] while <>;
 	push @states, [[@ARGV], $ARGV, defined(fileno ARGV), $., eof];
 	SKIP: {
-		skip "eof() not supported on tied handles on Perl<5.12 or >5.36", 1 if $CE;
+		skip "eof() not supported on tied handles on Perl<5.12", 1 if $CE;
 		ok !eof(), 'eof() is false';
 	}
 	push @states, [[@ARGV], $ARGV, defined(fileno ARGV), $., eof];

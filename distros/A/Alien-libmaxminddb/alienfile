@@ -32,15 +32,13 @@ sub patch_build {
     };
   }
   elsif ($^O eq 'openbsd') {
-    my $gccversion = $Config{gccversion} // q{};
-    if ($gccversion =~ /Clang/i) {
-      eval {
-        $configure->edit(sub {
-          s{-fms-extensions\b}{-Wall}g;
-        });
-        $configure->chmod('a+x');
-      };
-    }
+    eval {
+      $configure->edit(sub {
+        s{(-fms-extensions.*?)^(EOF)}
+        {$1#ifdef __clang__\n#error unsupported\n#endif\n$2}ms;
+      });
+      $configure->chmod('a+x');
+    };
   }
 
   return;

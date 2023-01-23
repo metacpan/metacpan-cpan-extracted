@@ -8,6 +8,7 @@ build_requires:
   DBD::CSV: '0'
   DBI: '0'
   ExtUtils::MakeMaker: '0'
+  File::chdir: '0'
   Sub::Util: '0'
   Test::Pod::Snippets: '0'
   Test::Requires: '0'
@@ -56,11 +57,9 @@ requires:
   Test::More: '0.96'
   autobox: '0'
   base: '0'
-  overload: '0'
   perl: '5.016004'
   utf8: '0'
-  warnings: '0'
 resources:
   repository: https://github.com/pflanze/functional-perl.git
-version: v0.72.66
+version: v0.72.76
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

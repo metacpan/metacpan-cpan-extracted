@@ -32,7 +32,7 @@ requires:
   Plack::Util::Accessor: 0
   Readonly: 0
   Scalar::Util: 0
-  Tags::HTML::Page::Begin: 0.13
+  Tags::HTML::Page::Begin: 0.14
   Tags::HTML::Page::End: 0
   Tags::Output::Raw: 0
   perl: 5.8.0
@@ -41,4 +41,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Plack-Component-Tags-HTML
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Plack-Component-Tags-HTML
-version: '0.09'
+version: '0.10'

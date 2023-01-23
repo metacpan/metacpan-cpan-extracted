@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Lingua/RU/Numeral.pm
+t/00-pod.t
+t/01-num2cardinal.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

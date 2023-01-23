@@ -14,7 +14,7 @@ Alien::Build::Manual::FAQ - Frequently Asked Questions about Alien::Build
 
 =head1 VERSION
 
-version 2.76
+version 2.77
 
 =head1 SYNOPSIS
 
@@ -428,6 +428,17 @@ and L<Alien::Build::Plugin::Fetch::HTTPTiny> will make sure that the appropriate
 to your prerequisites for you if you specify a C<https> URL.  Some websites allow an initial request
 from C<http> but then redirect to C<https>.  If you can it is better to specify C<https>, if you
 cannot, then you can instead use the C<ssl> property on either of those two plugins.
+
+=head2 Does not detect system package even though it is installed
+
+This could just be because the alien requires a more recent package that what is provided by your
+operating system.
+
+It could also be because you do not have the development package installed.  Many Linux vendors
+in particular separate packages into runtime and development pages.  On RPM based systems these
+development packages usually have C<-devel> suffix (example runtime: C<libffi> and development:
+C<libffi-devel>).  On Debian based systems these development packages usually have a C<-dev>
+suffix (example runtime: C<libffi> and development: C<libffi-dev>).
 
 =head2 Network fetch is turned off
 

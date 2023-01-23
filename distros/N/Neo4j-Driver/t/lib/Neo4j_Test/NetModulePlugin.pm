@@ -13,7 +13,7 @@ sub register {
 	my ($self, $manager) = @_;
 	my $net_module = $$self;
 	
-	$manager->add_event_handler(
+	$manager->add_handler(
 		http_adapter_factory => sub {
 			my ($continue, $driver) = @_;
 			return $net_module->new($driver);

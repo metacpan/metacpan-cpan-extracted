@@ -6,6 +6,7 @@ use warnings;
 use feature 'state';
 
 use File::Find;
+no warnings 'File::Find';
 use File::Spec;
 use File::stat;
 use IO::Async::Function;
@@ -509,9 +510,8 @@ sub get_packages
         my $end_line = $class->get_line_by_offset($line_offsets, $end);
         $end -= $line_offsets->[$end_line];
 
-        $name =~ s/package//;
-        $name =~ s/;\s*$//g;
-        $name =~ s/^\s+|\s+$//g;
+        ($name) = $name =~ /package\s*(\S+)/;
+        $name =~ s/;$//;
 
         push @{$packages{$name}},
           {

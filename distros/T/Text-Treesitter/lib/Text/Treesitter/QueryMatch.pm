@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package Text::Treesitter::QueryMatch 0.05;
+package Text::Treesitter::QueryMatch 0.06;
 
 use v5.14;
 use warnings;

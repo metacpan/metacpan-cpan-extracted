@@ -22,5 +22,7 @@ requires 'Unicode::UTF8';
 requires 'CryptX';
 
 # Testing
-requires 'Test2::V0';
-requires 'Test2::Harness';
+on 'test' => sub {
+    requires 'Test2::V0';
+    requires 'Test2::Harness';
+};

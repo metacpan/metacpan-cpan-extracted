@@ -133,7 +133,10 @@ subtest 'open/chmod/rename failure tests' => sub {
 		'close permission denied (chmod fail)';
 	
 	checked_chmod('500',$tmpdir);
-	is slurp($tfn), "Blah", 'not replaced after chmod fail';
+	SKIP: {
+		skip 'cygwin deletes both files on failed rename', 1 if $^O eq 'cygwin';
+		is slurp($tfn), "Blah", 'not replaced after chmod fail';
+	}
 	
 	# temp file creation will fail
 	like exception { my $r = File::Replace->new($tfn) }, qr/\bte?mp/i, 'tempfile fail';
@@ -145,9 +148,12 @@ subtest 'open/chmod/rename failure tests' => sub {
 	checked_chmod('500',$tmpdir);
 	like exception { $r2->finish }, qr/\brenam(?:e|ing)\b/i,
 		'close permission denied (rename fail)';
-	is slurp($tfn), "Blah", 'not replaced after rename fail';
+	SKIP: {
+		skip 'cygwin deletes both files on failed rename', 1 if $^O eq 'cygwin';
+		is slurp($tfn), "Blah", 'not replaced after rename fail';
+	}
 	
 	checked_chmod('700',$tmpdir);
-	checked_chmod('600',$tfn);
+	checked_chmod('600',$tfn) unless $^O eq 'cygwin';
 };
 

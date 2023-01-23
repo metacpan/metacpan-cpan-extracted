@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 my $copyright = <<'COPYRIGHT';
-# Copyright 2021 by Christian Jaeger <ch@christianjaeger.ch>
+# Copyright 2021-2023 by Christian Jaeger <ch@christianjaeger.ch>
 # Published under the same terms as perl itself
 COPYRIGHT
 
@@ -40,6 +40,8 @@ use FP::Ops qw(the_method);
 use Chj::xperlfunc qw(xprint);
 use Chj::TEST;
 
+#use FP::Repl::Trap;
+
 use Getopt::Long;
 our ($debug, $opt_repl);
 GetOptions("debug" => \$debug, "repl" => \$opt_repl, "help" => sub {usage})
@@ -51,9 +53,14 @@ $in .= "\n" unless $in =~ /\n\z/;
 package PFLANZE::Test {
     use FP::Struct ["input", "results"];
 
-    sub string ($self) {
+    # Includes the 0-case, too
+    sub is_multiple_values($self) {
+        $self->results->length != 1
+    }
+
+    sub string ($self, $force_multiple_values) {
         my $results = $self->results;
-        if ($results->length > 1) {
+        if ($force_multiple_values or $results->length != 1) {
             my $input = $self->input;
             my $inp2  = $input =~ /;/ ? "do { $input }" : $input;
             "TEST { [ $inp2 ] } [ " . $results->strings_join(", ") . " ];\n"
@@ -68,7 +75,7 @@ PFLANZE::Test::constructors->import;
 my $Namespace  = qr/[a-zA-Z_]\w*(?:::[a-zA-Z_]\w*)*/s;
 my $Prompt     = qr/${Namespace}>/s;
 my $Result     = qr/\n\$VAR\d+ = (.*?); */s;
-my $Invocation = qr/${Prompt}\s*(.*?)($Result(?:$Result)*)\n/s;
+my $Invocation = qr/${Prompt}\s*(.*?)($Result*)\n/s;
 
 sub matches($in) {
     my $a = fullmatching(\&all_continuous_matches_whole)->($in, $Invocation);
@@ -108,7 +115,7 @@ main> all_continuous_matches_whole "BoOo barO", qr/o/i
 $VAR1 = [];
 $VAR2 = 0;
     &;
-    matches($in)->map(the_method "string")->join("")
+    matches($in)->map(the_method "string", 0)->join("")
 }
 q&TEST { all_matches1 "foo barO", qr/(o)/i } [
           'o',
@@ -128,11 +135,55 @@ TEST { [ all_continuous_matches_whole "oOo barO", qr/o/i ] } [ [
 TEST { [ all_continuous_matches_whole "BoOo barO", qr/o/i ] } [ [], 0 ];
 &;
 
+TEST {
+    my $in = q&main> extract_urls1 "foo"
+main> extract_urls1 "<foo.ch>"
+$VAR1 = 'foo.ch';
+main> extract_urls1 "<foo.ch.ch>"
+$VAR1 = 'foo.ch.ch';
+main> extract_urls1 "<foo.ch.chh>"
+$VAR1 = 'foo.ch';
+main> extract_urls1 "<foo.chh>"
+main> 
+&;
+    matches($in)->map(the_method "string", 0)->join("")
+}
+'TEST { [ extract_urls1 "foo" ] } [  ];
+TEST { extract_urls1 "<foo.ch>" } \'foo.ch\';
+TEST { extract_urls1 "<foo.ch.ch>" } \'foo.ch.ch\';
+TEST { extract_urls1 "<foo.ch.chh>" } \'foo.ch\';
+TEST { [ extract_urls1 "<foo.chh>" ] } [  ];
+TEST { [  ] } [  ];
+';
+
+TEST {
+    my $in = q&main> extract_urls1 "foo"
+main> extract_urls1 "<foo.ch>"
+$VAR1 = 'foo.ch';
+main> extract_urls1 "<foo.ch.ch>"
+$VAR1 = 'foo.ch.ch';
+main> extract_urls1 "<foo.ch.chh>"
+$VAR1 = 'foo.ch';
+main> extract_urls1 "<foo.chh>"
+main> 
+&;
+    matches($in)->map(the_method "string", 1)->join("")
+}
+'TEST { [ extract_urls1 "foo" ] } [  ];
+TEST { [ extract_urls1 "<foo.ch>" ] } [ \'foo.ch\' ];
+TEST { [ extract_urls1 "<foo.ch.ch>" ] } [ \'foo.ch.ch\' ];
+TEST { [ extract_urls1 "<foo.ch.chh>" ] } [ \'foo.ch\' ];
+TEST { [ extract_urls1 "<foo.chh>" ] } [  ];
+TEST { [  ] } [  ];
+';
+
 if ($opt_repl) {
     require FP::Repl;
     FP::Repl::repl();
 } else {
-    my $strs = matches($in)->map(the_method "string");
+    my $matches               = matches($in);
+    my $force_multiple_values = $matches->any(the_method "is_multiple_values");
+    my $strs = $matches->map(the_method("string", $force_multiple_values));
     $strs = $strs->intersperse("----") if $debug;
     $strs->for_each(\&xprint);
 }

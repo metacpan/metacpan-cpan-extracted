@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker 6.66;
 my $PERL_version = '5.024000';  # Both here and in "use" statement above,
                                 # PDFbuild.pl updates from 'version' file
 my $MakeMaker_version = '6.66';
-my $version = '3.024';          # PDFbuild.pl updates from 'version' file
+my $version = '3.025';          # PDFbuild.pl updates from 'version' file
 
 # optional libraries... most users will attempt to install full set. they are
 # nice to have but not vital for many users. if one fails to install, it might 
@@ -98,15 +98,19 @@ my %WriteMakefileArgs =
 
     # recommends (optional prereqs) goes here
     # if remove or comment out any, also do so in META.json and META.yml
-    "recommends" => {
-      # fast TIFF image processing.
-      "Graphics::TIFF" => 19, 
-      # advanced/fast PNG image processing.
-      "Image::PNG::Libpng" => 0.57,
-      # text shaping for Latin script ligatures and kerning, and for 
-      # many complex scripts both LTR and RTL directions.
-      "HarfBuzz::Shaper" => 0.024,
-    },     
+    #"recommends" => {
+    #  # fast TIFF image processing.
+    #  "Graphics::TIFF" => 19, 
+    #  # advanced/fast PNG image processing.
+    #  "Image::PNG::Libpng" => 0.57,
+    #  # text shaping for Latin script ligatures and kerning, and for 
+    #  # many complex scripts both LTR and RTL directions.
+    #  "HarfBuzz::Shaper" => 0.024,
+    #  # 'md1' markup
+    #  Text::Markdown => 1.000031,
+    #  # 'md1' and 'html' markup
+    #  HTML::TreeBuilder => 5.07,
+    #},     
 
   }
 
@@ -122,13 +126,13 @@ my %WriteMakefileArgs =
 #	$WriteMakefileArgs{PREREQ_PM}{'MacPerl'} = '0';
 #}
 
-print <<'END';
-===========================================================================
-The installation process will attempt to install or update several OPTIONAL
-prerequisite packages. If one or more should fail to install, Don't Panic
--- you will still be able to run PDF::Builder, but may not be able to use 
-some advanced features. See the README file for more information.
-===========================================================================
-END
+#print <<'END';
+#===========================================================================
+#The installation process will attempt to install or update several OPTIONAL
+#prerequisite packages. If one or more should fail to install, Don't Panic
+#-- you will still be able to run PDF::Builder, but may not be able to use 
+#some advanced features. See the README.md file for more information.
+#===========================================================================
+#END
 
 WriteMakefile(%WriteMakefileArgs);

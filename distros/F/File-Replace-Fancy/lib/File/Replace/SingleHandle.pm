@@ -9,7 +9,7 @@ use Scalar::Util qw/blessed weaken/;
 
 # For AUTHOR, COPYRIGHT, AND LICENSE see the bottom of this file
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 ## no critic (RequireFinalReturn, RequireArgUnpacking)
 

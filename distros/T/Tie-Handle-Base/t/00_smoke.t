@@ -44,7 +44,7 @@ BEGIN {
 	use_ok('Tie::Handle::Base')
 		or BAIL_OUT("failed to use Tie::Handle::Base");
 }
-is $Tie::Handle::Base::VERSION, '0.16', 'Tie::Handle::Base version matches tests';
+is $Tie::Handle::Base::VERSION, '0.18', 'Tie::Handle::Base version matches tests';
 
 if (my $cnt = grep {!$_} Test::More->builder->summary)
 	{ BAIL_OUT("$cnt smoke tests failed") }

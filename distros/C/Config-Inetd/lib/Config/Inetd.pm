@@ -11,7 +11,7 @@ use Tie::File ();
 
 our ($VERSION, $INETD_CONF);
 
-$VERSION = '0.31';
+$VERSION = '0.32';
 $INETD_CONF = '/etc/inetd.conf';
 
 validation_options(
@@ -45,9 +45,9 @@ sub _tie_conf
     my $conf_tied = tie(
         @{$self->{CONF}}, 'Tie::File', $conf_file,
         mode => O_RDWR, autochomp => false
-    ) or croak "Cannot tie $conf_file: $!";
+    ) or croak "Cannot tie `$conf_file': $!";
     $conf_tied->flock(LOCK_EX)
-      or croak "Cannot lock $conf_file: $!";
+      or croak "Cannot lock `$conf_file': $!";
 }
 
 sub _parse_enabled

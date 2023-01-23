@@ -71,9 +71,11 @@ share {
         }
 
         my $lib = $prefix->child('lib')->stringify;
-        my $include = $prefix->child('include', 'ta-lib');
+        my $include = $prefix->child('include');
+        ## handle pre-installed TA-lib 0.4 and self built TA-lib 0.6
+        my $include2 = $prefix->child('include', 'ta-lib');
         my $dynamic = $prefix->child('dynamic');
-        $build->runtime_prop->{cflags} = "-I$include";
+        $build->runtime_prop->{cflags} = "-I$include -I$include2";
         $build->runtime_prop->{libs} = "-L$dynamic -lta_lib -lm";
         $build->runtime_prop->{libs_static} = "-L$lib -lta_lib -lm";
 

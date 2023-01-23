@@ -8,7 +8,7 @@ use Alien::Build::Util qw( _has_ssl );
 use Carp ();
 
 # ABSTRACT: Download negotiation plugin
-our $VERSION = '2.76'; # VERSION
+our $VERSION = '2.77'; # VERSION
 
 
 has '+url' => undef;
@@ -134,6 +134,17 @@ sub init
     }
   }
 
+  if($self->url =~ /^http.*github.com.*releases$/)
+  {
+    Alien::Build->log('!! WARNING !! WARNING !!');
+    Alien::Build->log('!! WARNING !! It looks like this alien is using the regular download negotiator');
+    Alien::Build->log('plugin on a GitHub release page.  This will typically not work due to changes');
+    Alien::Build->log('in the way GitHub release page works now.  The Alien should instead be updated');
+    Alien::Build->log('to use the Download::GitHub plugin, which uses the GitHub API to find available');
+    Alien::Build->log('releases.  See: https://metacpan.org/pod/Alien::Build::Plugin::Download::GitHub');
+    Alien::Build->log('!! WARNING !! WARNING !!');
+  }
+
   $meta->add_requires('share' => 'Alien::Build::Plugin::Download::Negotiate' => '0.61')
     if $self->passive;
 
@@ -195,7 +206,7 @@ Alien::Build::Plugin::Download::Negotiate - Download negotiation plugin
 
 =head1 VERSION
 
-version 2.76
+version 2.77
 
 =head1 SYNOPSIS
 

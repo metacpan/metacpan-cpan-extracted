@@ -4,7 +4,7 @@
       "Jean-Damien Durand <jeandamiendurand@free.fr>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -37,7 +37,7 @@
       "develop" : {
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
-            "Pod::Wordlist" : "0",
+            "Pod::Weaver::PluginBundle::RJBS" : "0",
             "Test::CPAN::Changes" : "0.19",
             "Test::CPAN::Meta" : "0",
             "Test::CPAN::Meta::JSON" : "0.16",
@@ -52,7 +52,6 @@
             "Test::Pod::Coverage" : "1.08",
             "Test::Pod::LinkCheck" : "0",
             "Test::Portability::Files" : "0",
-            "Test::Spelling" : "0.12",
             "Test::Synopsis" : "0",
             "Test::Version" : "1"
          }
@@ -77,7 +76,6 @@
             "IPC::Open3" : "0",
             "Test::More" : "0",
             "Thread" : "0",
-            "blib" : "1.01",
             "perl" : "5.010000"
          }
       }
@@ -85,7 +83,7 @@
    "provides" : {
       "re::engine::GNU" : {
          "file" : "lib/re/engine/GNU.pm",
-         "version" : "0.024"
+         "version" : "0.025"
       }
    },
    "release_status" : "stable",
@@ -101,8 +99,13 @@
          "web" : "https://github.com/jddurand/re-engine-gnu"
       }
    },
-   "version" : "0.024",
+   "version" : "0.025",
    "x_authority" : "cpan:JDDPAUSE",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+   "x_contributors" : [
+      "Yves Orton <demerphq@gmail.com>"
+   ],
+   "x_generated_by_perl" : "v5.37.8",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

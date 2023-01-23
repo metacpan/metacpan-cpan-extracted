@@ -1,4 +1,4 @@
-Release 1.21
+Release 1.22
 
     Map prepare_cached as prepare to avoid various issues with
     transactions.

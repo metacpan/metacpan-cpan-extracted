@@ -27,7 +27,7 @@ no_index:
 provides:
   File::Replace::Fancy:
     file: lib/File/Replace/Fancy.pm
-    version: '0.16'
+    version: '0.18'
 recommends: {}
 requires:
   Carp: '0'
@@ -35,18 +35,18 @@ requires:
   Fcntl: '0'
   File::Basename: '0'
   File::Copy: '0'
-  File::Replace: '0.16'
+  File::Replace: '0.18'
   File::Spec::Functions: '0'
   File::Temp: '0'
   Hash::Util: '0'
   IO::Handle: '0'
   Scalar::Util: '0'
-  Tie::Handle::Base: '0.16'
+  Tie::Handle::Base: '0.18'
   perl: '5.008001'
   warnings::register: '0'
 resources:
   bugtracker: https://bitbucket.org/haukex/file-replace-fancy/issues
   homepage: https://bitbucket.org/haukex/file-replace-fancy
   repository: https://bitbucket.org/haukex/file-replace-fancy.git
-version: '0.16'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

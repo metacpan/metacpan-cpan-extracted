@@ -8,7 +8,7 @@ use Test::Exception;
 use Test::Warnings;
 
 use Neo4j_Test::EchoHTTP;
-use Neo4j_Test::MockHTTP qw(response_for);
+use Neo4j_Test::MockHTTP;
 
 
 # Confirm that the Jolt MIME type logic works correctly.
@@ -17,6 +17,9 @@ use Neo4j::Driver;
 
 plan tests => 5 + 1;
 
+
+my $mock_plugin = Neo4j_Test::MockHTTP->new;
+sub response_for { $mock_plugin->response_for(undef, @_) }
 
 my %empty_json = ( json => {
 	results => [],
@@ -162,7 +165,6 @@ subtest 'deprecated/internal jolt option' => sub {
 
 subtest 'acceptable' => sub {
 	plan tests => 7 + 5;
-	my $mock_plugin = Neo4j_Test::MockHTTP->new;
 	my $s = Neo4j::Driver->new('http:')->plugin($mock_plugin)->session(database => 'dummy');
 	lives_and { isa_ok $s->run('json'), 'Neo4j::Driver::Result::JSON' } 'json';
 	lives_and { isa_ok $s->run('json params'), 'Neo4j::Driver::Result::JSON' } 'json params';

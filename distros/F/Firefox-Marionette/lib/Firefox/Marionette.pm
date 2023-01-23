@@ -63,7 +63,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.34';
+our $VERSION = '1.35';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -186,7 +186,7 @@ sub BY_PARTIAL {
 
 sub _prefs_interface_preamble {
     my ($self) = @_;
-    return <<'_JS_';    # security/manager/ssl/nsIPK11Token.idl
+    return <<'_JS_';    # modules/libpref/nsIPrefService.idl
 let prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
 let branch = prefs.getBranch("");
 _JS_
@@ -10305,7 +10305,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.34
+Version 1.35
 
 =head1 SYNOPSIS
 
@@ -12658,7 +12658,7 @@ Thanks also to the authors of the documentation in the following sources;
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2021, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
+Copyright (c) 2023, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic/perlartistic>.

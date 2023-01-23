@@ -6,9 +6,9 @@ use Carp;
 use warnings::register;
 use Scalar::Util qw/blessed/;
 
-# For AUTHOR, COPYRIGHT, AND LICENSE see the bottom of this file
+# For AUTHOR, COPYRIGHT, AND LICENSE see Base.pod
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 ## no critic (RequireFinalReturn, RequireArgUnpacking)
 

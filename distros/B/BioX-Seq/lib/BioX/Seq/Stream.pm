@@ -65,7 +65,7 @@ sub new {
                     $fh = IO::Uncompress::Gunzip->new($fn, MultiStream => 1);
                 }
                 else {
-                    open $fh, '-|', "$GZIP_BIN -dc $fn"
+                    open $fh, '-|', $GZIP_BIN, '-dc', $fn
                         or die "Error opening gzip stream: $!\n";
                 }
             }
@@ -77,32 +77,32 @@ sub new {
                     $fh = IO::Uncompress::Bunzip2->new($fn, MultiStream => 1);
                 }
                 else {
-                    open $fh, '-|', "$BZIP_BIN -dc $fn"
+                    open $fh, '-|', $BZIP_BIN, '-dc', $fn
                         or die "Error opening bzip2 stream: $!\n";
                 }
             }
             elsif (substr($magic,0,4) eq MAGIC_ZSTD) {
                 die "no zstd backend found\n" if (! defined $ZSTD_BIN);
                 close $fh;
-                open $fh, '-|', "$ZSTD_BIN -dc $fn"
+                open $fh, '-|', $ZSTD_BIN, '-dc', $fn
                     or die "Error opening zstd stream: $!\n";
             }
             elsif (substr($magic,0,2) eq MAGIC_DSRC) {
                 die "no dsrc backend found\n" if (! defined $DSRC_BIN);
                 close $fh;
-                open $fh, '-|', "$DSRC_BIN d -s $fn"
+                open $fh, '-|', $DSRC_BIN, 'd', '-s', $fn
                     or die "Error opening dsrc stream: $!\n";
             }
             elsif (substr($magic,0,4) eq MAGIC_FQZC) {
                 die "no fqz backend found\n" if (! defined $FQZC_BIN);
                 close $fh;
-                open $fh, '-|', "$FQZC_BIN -d $fn"
+                open $fh, '-|', $FQZC_BIN, '-d', $fn
                     or die "Error opening fqz_comp stream: $!\n";
             }
             elsif (substr($magic,0,6) eq MAGIC_XZ) {
                 die "no xz backend found\n" if (! defined $XZ_BIN);
                 close $fh;
-                open $fh, '-|', "$XZ_BIN -dc $fn"
+                open $fh, '-|', $XZ_BIN, '-dc', $fn
                     or die "Error opening xz stream: $!\n";
             }
             else {

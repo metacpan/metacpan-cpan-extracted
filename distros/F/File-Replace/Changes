@@ -1,5 +1,9 @@
 Revision history for Perl extension File::Replace.
 
+0.18	Sun, Jan 22 2023
+	- fix tests on cygwin
+	- documentation updates
+
 0.16	Wed, Jan 18 2023
 	- split the modules Tie::Handle::Base, File::Replace::Inplace into
 	  separate distributions

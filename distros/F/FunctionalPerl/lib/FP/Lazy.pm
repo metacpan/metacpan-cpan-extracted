@@ -230,16 +230,21 @@ code that evaluates a promise runs is not the same context in which
 the promise was captured. There are two approaches to make this
 easier:
 
-C<$ENV{DEBUG_FP_LAZY} = "1"> or C<local $FP::Lazy::debug=1> -- captures
-a backtrace in every promise (slow, of course!). Use the optionally
-exported C<lazy_backtrace> function to get the backtrace (or look at
-it via the repl's :d (Data::Dumper) mode).
+C<$ENV{DEBUG_FP_LAZY} = "1"> or C<local $FP::Lazy::debug=1> --
+captures a backtrace in every promise (slow, of course!). Use the
+optionally exported C<lazy_backtrace> function to get the backtrace
+(you can also see it in the C<FP::Repl>).
 
 C<$ENV{DEBUG_FP_LAZY} = "eager"> or C<local $FP::Lazy::eager=1> --
 completely turns of any lazyness (except for lazyLight, currently);
 easy stack traces and flow logic but of course the program behaves
-differently; beware of infinite lists!
+differently; beware of infinite lists, they will be created
+immediately now "in full length" and thus make the program use up all
+the memory instead of finishing!
 
+C<use>ing L<FP::noLazy> instead of L<FP::Lazy> turns off laziness for
+the current module, only. See the L<FP::noLazy> docs for more
+information.
 
 =head1 SEE ALSO
 
@@ -250,6 +255,8 @@ Alternative Data::Thunk, but see note in TODO file about problems.
 Alternative Scalar::Defer?
 
 L<FP::TransparentLazy>
+
+L<FP::noLazy>
 
 L<FP::Mixin::Utils> -- Lazy implements this as a fallback (lower
 priority than forcing the promise and finding the method on the
@@ -411,6 +418,8 @@ LP: {
                 # NOTE: there is a COPY-PASTE of this part in
                 # TransparentLazy!
                 if (defined(my $thunk = $$perhaps_promise[0])) {
+                    no warnings
+                        'recursion';    # XXX leave something for debugging?
                     my $v = force(&$thunk(), $nocache);
                     if ($$perhaps_promise[2]) {
 
@@ -465,7 +474,7 @@ sub FORCE {
     for (@_) {
         $_ = force $_
     }
-    wantarray ? @_ : $_[-1]
+    wantarray ? @_ : $_[-1]    ## no critic
 }
 
 # XX because show did lead to endless loop, (why?) sgh
@@ -522,10 +531,18 @@ package FP::Lazy::AnyPromise {
 
 }
 
-use FP::Show qw(subprefix_to_show_coderef);
+sub dummy_modifier_for {
+    my ($s) = @_;
+    sub {
+        my ($dummystr) = @_;
+        $dummystr . "\nContext:\n" . $$s[3]
+    }
+}
 
-my $lazy_thunk_show  = subprefix_to_show_coderef("lazy ");
-my $lazyT_thunk_show = subprefix_to_show_coderef("lazyT ");
+use FP::Show qw(parameterized_show_coderef);
+
+my $lazy_thunk_show  = parameterized_show_coderef("lazy ");
+my $lazyT_thunk_show = parameterized_show_coderef("lazyT ");
 
 package FP::Lazy::Promise {
     our @ISA = 'FP::Lazy::AnyPromise';
@@ -542,9 +559,19 @@ package FP::Lazy::Promise {
         # do not force unforced promises
         if (defined $$s[0]) {
             if (defined(my $cl = $$s[2])) {
-                &$lazyT_thunk_show($$s[0]) . " " . &$show($cl)
+                my $thunk_show
+                    = $$s[3]
+                    ? FP::Lazy::parameterized_show_coderef("lazyT ",
+                    FP::Lazy::dummy_modifier_for($s))
+                    : $lazyT_thunk_show;
+                $thunk_show->($$s[0]) . " " . $show->($cl)
             } else {
-                &$lazy_thunk_show($$s[0])
+                my $thunk_show
+                    = $$s[3]
+                    ? FP::Lazy::parameterized_show_coderef("lazy ",
+                    FP::Lazy::dummy_modifier_for($s))
+                    : $lazy_thunk_show;
+                $thunk_show->($$s[0])
             }
         } else {
             &$show($$s[1])
@@ -645,7 +672,7 @@ package FP::Lazy::Promise {
     }
 }
 
-my $lazyLight_thunk_show = subprefix_to_show_coderef("lazyLight ");
+my $lazyLight_thunk_show = parameterized_show_coderef("lazyLight ");
 
 package FP::Lazy::PromiseLightBase {
 

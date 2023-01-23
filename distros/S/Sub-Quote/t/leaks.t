@@ -2,8 +2,6 @@ use strict;
 use warnings;
 no warnings 'once';
 use Test::More;
-use Test::Fatal;
-use Data::Dumper;
 
 use Sub::Quote qw(
   quote_sub
@@ -40,7 +38,9 @@ use Sub::Quote qw(
   my $foo_info = quoted_from_sub($foo_string);
   undef $foo;
 
-  is exception { Sub::Quote->CLONE }, undef,
+  my $e;
+  eval { Sub::Quote->CLONE; 1 } or $e = $@;
+  is $e, undef,
     'CLONE works when quoted info saved externally';
   ok exists $Sub::Quote::QUOTED{$foo_string},
     'CLONE keeps entries that had info saved';
@@ -52,7 +52,9 @@ use Sub::Quote qw(
   my $foo_info = $Sub::Quote::QUOTED{$foo_string};
   undef $foo;
 
-  is exception { Sub::Quote->CLONE }, undef,
+  my $e;
+  eval { Sub::Quote->CLONE; 1 } or $e = $@;
+  is $e, undef,
     'CLONE works when quoted info kept alive externally';
   ok !exists $Sub::Quote::QUOTED{$foo_string},
     'CLONE removes expired entries that were kept alive externally';

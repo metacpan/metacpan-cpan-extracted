@@ -18,16 +18,20 @@ my $s = $driver->session;
 # functionality. If the behaviour of such functionality changes, we
 # want it to be a conscious decision, hence we test for it.
 
-use Test::More 0.96 tests => 18 + 3;
+use Test::More 0.94;
 use Test::Exception;
 use Test::Warnings qw(warning warnings);
-use Neo4j_Test::MockHTTP qw(response_for);
+use Neo4j_Test::MockHTTP;
 use Neo4j_Test::Sim;
 my $transaction = $driver->session->begin_transaction;
 $transaction->{return_stats} = 0;  # optimise sim
 
+my $mock_plugin = Neo4j_Test::MockHTTP->new;
+sub response_for { $mock_plugin->response_for(undef, @_) }
 
 my ($d, $w, @w, $r);
+
+plan tests => 20 + 3;
 
 
 # query from types.t
@@ -82,7 +86,7 @@ END
 subtest 'deleted()' => sub {
 	plan tests => 8;
 	my $d = Neo4j::Driver->new('http:');
-	$d->plugin('Neo4j_Test::MockHTTP');
+	$d->plugin($mock_plugin);
 	lives_and { $r = 0; ok $r = $d->session(database => 'dummy')->run('deleted') } 'run';
 	lives_and { $w = warning { ok $r->fetch->get->deleted }; } 'deleted true';
 	like $w, qr/\bdeleted\b.* deprecated\b/i, 'deleted true deprecated'
@@ -106,6 +110,19 @@ subtest 'close()' => sub {
 	$w = '';
 	lives_ok { $w = warning { $s->close; }; } 'Session close()';
 	(like $w, qr/\bdeprecate/, 'Session close deprecated') or diag 'got warning(s): ', explain($w);
+};
+
+
+subtest 'direct Neo4j::Driver hash access' => sub {
+	# Direct hash access is known to have been used in the wild,
+	# even though it was not officially supported at the time.
+	plan tests => 3;
+	$d = Neo4j::Driver->new()->plugin($mock_plugin);
+	$d->{http_timeout} = 0.5;
+	lives_ok { $w = ''; $w = warning { $d->session(database => 'dummy') }; } 'session';
+	is $d->config('timeout'), 0.5, 'http_timeout set';
+	like $w, qr/\bhttp_timeout\b.* deprecated\b/i, 'http_timeout deprecated'
+		or diag 'got warning(s): ', explain $w;
 };
 
 
@@ -183,6 +200,40 @@ subtest 'net_module config option' => sub {
 };
 
 
+{
+	package Neo4j_Test::Plugin::NoNew;
+	use parent 'Neo4j::Driver::Plugin';
+	sub register { die }
+}
+
+
+subtest 'plug-in manager' => sub {
+	plan tests => 9;
+	my $m;
+	lives_and { ok $m = Neo4j::Driver::Events->new } 'new';
+	lives_ok { $w = ''; $w = warning {
+		$m->_register_plugin( Neo4j_Test::MockHTTP:: );
+	}} 'plugin by name';
+	like $w, qr/\bplugin\b.*\bname\b.*\bdeprecated\b/i, 'plugin by name deprecated 1'
+		or diag 'got warning(s): ', explain $w;
+	throws_ok { warning {
+		$m->_register_plugin( Neo4j_Test::Plugin::NoNew:: );
+	}} qr/\bCan't locate\b.*\bmethod new\b.*\bNeo4j_Test::Plugin::NoNew\b/i, 'no new';
+	
+	lives_ok {
+		$w = ''; $w = warning { $m->add_event_handler(x_test => sub {'foo'}); };
+	} 'add_event_handler';
+	like $w, qr/\badd_event_handler\b.*\bdeprecated\b/i, 'add_event_handler deprecated'
+		or diag 'got warning(s): ', explain $w;
+	lives_ok {
+		$w = ''; $w = warning { $r = $m->trigger_event('x_test'); };
+	} 'trigger_event lives';
+	is $r, 'foo', 'trigger_event';
+	like $w, qr/\btrigger_event\b.*\bdeprecated\b/i, 'trigger_event deprecated'
+		or diag 'got warning(s): ', explain $w;
+};
+
+
 subtest 'cypher_filter' => sub {
 	plan tests => 13;
 	my ($t, @q);
@@ -210,13 +261,8 @@ subtest 'cypher_filter' => sub {
 };
 
 
-{
-package Neo4j_Test::MockHTTP::NoProtocol;
-use parent 'Neo4j_Test::MockHTTP';
-sub can { return if $_[1] eq 'protocol'; return shift->SUPER::can(@_); }
-}
 subtest 'ServerInfo protocol()' => sub {
-	plan tests => 10;
+	plan tests => 8;
 	my ($si, $w);
 	my %uri = (uri => URI->new('http:'));
 	lives_and { ok $si = Neo4j::Driver::ServerInfo->new({%uri}) } 'new undef';
@@ -229,10 +275,6 @@ subtest 'ServerInfo protocol()' => sub {
 	lives_and { is $si->protocol(), 'Bolt' } 'protocol empty';
 	lives_and { ok $si = Neo4j::Driver::ServerInfo->new({%uri, protocol => '2.2'}) } 'new version';
 	lives_and { is $si->protocol(), 'Bolt/2.2' } 'protocol version';
-	my $d = Neo4j::Driver->new('http:');
-	$d->plugin('Neo4j_Test::MockHTTP::NoProtocol');
-	lives_and { $si = 0; ok $si = $d->session(database => 'dummy')->server } 'no protocol()';
-	lives_and { is $si->protocol(), 'HTTP' } 'no protocol() string';
 };
 
 

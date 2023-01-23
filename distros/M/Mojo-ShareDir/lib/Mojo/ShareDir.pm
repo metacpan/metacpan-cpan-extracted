@@ -6,7 +6,7 @@ use Carp qw(croak);
 use constant DEBUG => $ENV{MOJO_FILE_SHARE_DEBUG} || 0;
 
 our @EXPORT_OK = qw(dist_path);
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our @AUTO_SHARE_DIST   = qw(auto share dist);
 our @AUTO_SHARE_MODULE = qw(auto share module);

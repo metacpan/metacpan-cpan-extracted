@@ -46,10 +46,6 @@ my @fns=qw{
     Times-BoldItalic
     Symbol
     ZapfDingbats
-    bankgothic
-    bankgothicbold
-    bankgothicbolditalic
-    bankgothicitalic
     georgia
     georgiaitalic
     georgiabold
@@ -65,6 +61,14 @@ my @fns=qw{
     wingdings
     webdings
 };
+# It's not clear what is being shown for Bank Gothic.
+#  1. There is only Regular and Italic -- no bold variants
+#  2. It doesn't look like the Bank Gothic shown on sample font pages --
+#     perhaps it's some other sans serif font being substituted
+#   bankgothic
+#   bankgothicbold
+#   bankgothicbolditalic
+#   bankgothicitalic
 
 # use only with single byte encodings, as multibyte (including UTF-8) don't
 # appear to be compatible with these core fonts

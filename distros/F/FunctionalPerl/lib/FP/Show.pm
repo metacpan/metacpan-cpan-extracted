@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015-2020 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2015-2021 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -116,7 +116,7 @@ use warnings FATAL => 'uninitialized';
 use Exporter "import";
 
 our @EXPORT      = qw(show);
-our @EXPORT_OK   = qw(show_many subprefix_to_show_coderef);
+our @EXPORT_OK   = qw(show_many parameterized_show_coderef);
 our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use Chj::TerseDumper qw(terseDumper);
@@ -144,8 +144,8 @@ sub keyshow {
 
 our $show_details = $ENV{RUN_TESTS} ? 0 : 1;
 
-sub subprefix_to_show_coderef {
-    my ($subprefix) = @_;
+sub parameterized_show_coderef {
+    my ($subprefix, $maybe_dummy_modifier) = @_;
     sub {
         my ($v, $show) = @_;
         if ($show_details) {
@@ -184,9 +184,16 @@ sub subprefix_to_show_coderef {
                 : "";
 
             my $dummystr = "DUMMY: $name $location";
+            if (defined($maybe_dummy_modifier)) {
+                $dummystr = $maybe_dummy_modifier->($dummystr);
+            }
             $subprefix . $prototypestr . "{ " . show($dummystr) . "$docstr }"
         } else {
-            $subprefix . '{ "DUMMY" }'
+            my $dummystr = "DUMMY";
+            if (defined($maybe_dummy_modifier)) {
+                $dummystr = $maybe_dummy_modifier->($dummystr);
+            }
+            $subprefix . "{ " . show($dummystr) . " }"
         }
     }
 }
@@ -218,7 +225,7 @@ our $primitive_show = +{
         my ($v, $show) = @_;
         (terseDumper($v), 1)
     },
-    CODE => subprefix_to_show_coderef("sub "),
+    CODE => parameterized_show_coderef("sub "),
 
     # Don't really have any sensible serialization for these either,
     # but at least prevent them from hitting Data::Dumper which issues

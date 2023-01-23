@@ -181,6 +181,7 @@ use FP::Show;
 use FP::fix;
 use Carp;
 use FP::Carp;
+use FP::Docstring;
 
 sub stream_iota {
     @_ <= 2 or fp_croak_arity 2;
@@ -956,11 +957,16 @@ sub stream_group;
 *stream_group = FP::List::make_group(1);
 
 sub FP::List::List::stream_group {
+    __
+        'group($self, $equal, $maybe_tail): build groups of subsequent items that are $equal.';
     @_ >= 2 and @_ <= 3 or fp_croak_arity "2-3";
     my ($self, $equal, $maybe_tail) = @_;
     weaken $_[0];
     stream_group($equal, $self, $maybe_tail)
 }
+
+sub stream_split;
+*stream_split = FP::List::make_split(1);
 
 sub stream_mixed_flatten {
     @_ >= 1 and @_ <= 3 or fp_croak_arity "1-3";

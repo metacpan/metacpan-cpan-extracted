@@ -7,7 +7,7 @@ use Alien::Build::Plugin;
 use Carp ();
 
 # ABSTRACT: Plugin for fetching files using LWP
-our $VERSION = '2.76'; # VERSION
+our $VERSION = '2.77'; # VERSION
 
 
 has '+url' => '';
@@ -108,7 +108,7 @@ Alien::Build::Plugin::Fetch::LWP - Plugin for fetching files using LWP
 
 =head1 VERSION
 
-version 2.76
+version 2.77
 
 =head1 SYNOPSIS
 

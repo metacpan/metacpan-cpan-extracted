@@ -14,7 +14,9 @@ if (! -e $seq_file) {
   exit 0;
 }
 
-my $data = FASTX::Reader->new({ filename => "$seq_file" });
+my $data = FASTX::Reader->new(
+    -filename => "$seq_file" 
+);
 my $seq = $data->getRead();
 
 ok(defined $seq->{seq}, "[FASTA] sequence is defined");
@@ -29,5 +31,30 @@ $copy =~s/[ACGTNacgtn]//g;
 # Check that sequence only containse expected chars
 ok(length($copy) == 0, '[FASTA] Sequence does not contain unexcpected chars');
 
+# Test parameter validation
 
+eval {
+ FASTX::Reader->new(
+	-filename => "$seq_file",
+	-loadseqs => 'name'
+  );
+};
+ok($@ eq "", "[new()] No error with valid parameters: " . $@);
+
+
+eval {
+ FASTX::Reader->new(
+	-file => "$seq_file",
+	-loadseqs => 'name'
+  );
+};
+ok($@ eq "", "[new()] No error with valid parameters (synonym): " . $@);
+
+eval {
+ FASTX::Reader->new(
+	-file => "$seq_file",
+	-loadseq => 'name'
+  );
+};
+ok($@ ne "", "[new()] Crash on invalid parameter: " . $@);
 done_testing();

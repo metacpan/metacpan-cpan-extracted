@@ -6,7 +6,7 @@ use Carp;
 use POSIX;
 use base 'PDF::Builder::Basic::PDF::Filter::FlateDecode';
 
-our $VERSION = '3.024'; # VERSION
+our $VERSION = '3.025'; # VERSION
 our $LAST_UPDATE = '3.023'; # manually update whenever code is changed
 
 =head1 NAME

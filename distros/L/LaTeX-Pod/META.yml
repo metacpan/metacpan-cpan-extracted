@@ -3,29 +3,31 @@ abstract: 'Transform LaTeX source files to POD (Plain old documentation)'
 author:
   - 'Steven Schubiger <schubiger@cpan.org>'
 build_requires:
-  File::Spec: 0
-  FindBin: 0
-  Test::More: 0
+  File::Spec: '0'
+  FindBin: '0'
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0.38
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110930'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: LaTeX-Pod
 provides:
   LaTeX::Pod:
     file: lib/LaTeX/Pod.pm
-    version: 0.21
+    version: '0.22'
 requires:
-  Carp: 0
-  Getopt::Long: 0
-  LaTeX::TOM: 0
-  List::MoreUtils: 0
-  Params::Validate: 0
-  boolean: 0
+  Carp: '0'
+  Getopt::Long: '0'
+  LaTeX::TOM: '0'
+  List::MoreUtils: '0'
+  Params::Validate: '0'
+  boolean: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.21
+  repository: https://github.com/stsc/LaTeX-Pod
+version: '0.22'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

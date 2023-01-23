@@ -92,7 +92,7 @@ issues, bugs and wishlists :)
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2012-2015, Breno G. de Oliveira
+Copyright (C) 2012-2023, Breno G. de Oliveira
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013-2021 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2013-2022 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -83,6 +83,7 @@ our @EXPORT_OK = qw(array
     array_for_each
     array_for_each_with_islast
     array_map
+    array_filtermap
     array_map_with_index
     array_map_with_islast
     array_to_hash_map
@@ -98,6 +99,7 @@ our @EXPORT_OK = qw(array
     array_sum
     array_last
     array_to_hash_group_by
+    array_merge
 );
 our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
@@ -108,6 +110,7 @@ use FP::Div qw(min);
 use FP::Ops 'add';
 use FP::Equal 'equal';
 use Scalar::Util qw(blessed);
+use FP::Docstring;
 
 sub array { [@_] }
 
@@ -431,6 +434,26 @@ TEST {
 }
 [0, 6];
 
+sub array_filtermap {
+    __ 'array_filtermap($fn, $array0, ...) -> array:
+        For each given input array, $fn receives one value from each
+        as an argument each. If $fn returns a value, it is inserted into
+        the resulting array.
+        If $fn returns (), the position is discarded in the resulting
+        sequence. $fn cannot return multiple values, though.';
+    @_ > 1 or fp_croak_arity "> 1";
+    my $fn  = shift;
+    my $len = min(map { scalar @$_ } @_);
+    my @res;
+    for (my ($i, $j) = (0, 0); $i < $len; $i++) {
+        if (my ($v) = $fn->(map { $$_[$i] } @_)) {
+            $res[$j] = $v;
+            $j++;
+        }
+    }
+    \@res
+}
+
 # (should one use multi-arg stream_map with stream_iota instead?..)
 sub array_map_with_index {
     @_ > 1 or fp_croak_arity "> 1";
@@ -529,7 +552,7 @@ TEST {
 
 TEST {
     require FP::List;
-    array_fold(\&FP::List::cons, &FP::List::null, array(1, 2))->array
+    array_fold(\&FP::List::cons, FP::List::null(), array(1, 2))->array
 }
 [2, 1];
 
@@ -588,7 +611,8 @@ sub array_every {
     @_ == 2 or fp_croak_arity 2;
     my ($fn, $ary) = @_;
     for (@$ary) {
-        return 0 unless &$fn($_);
+        my $r = &$fn($_);
+        return $r unless $r;
     }
     1
 }
@@ -596,7 +620,7 @@ sub array_every {
 TEST {
     array_every sub { ($_[0] % 2) == 0 }, [1, 2, 3]
 }
-0;
+'';
 TEST {
     array_every sub { ($_[0] % 2) == 0 }, [2, 4, -6]
 }
@@ -691,5 +715,57 @@ sub array_perhaps_find {
         ()
     }
 }
+
+sub array_merge {
+    @_ == 3 or fp_croak_arity 3;
+    my ($A, $B, $cmp) = @_;
+    my $aend = $#$A;
+    my $bend = $#$B;
+    my $ia   = 0;
+    my $ib   = 0;
+    my @r;
+    while (1) {
+        if ($ia <= $aend) {
+            if ($ib <= $bend) {
+                my $a   = $A->[$ia];
+                my $b   = $B->[$ib];
+                my $dir = $cmp->($a, $b);
+                if ($dir < 0) {
+                    push @r, $a;
+                    $ia++;
+                } elsif ($dir == 0) {
+                    push @r, $a, $b;
+                    $ia++;
+                    $ib++;
+                } else {
+                    push @r, $b;
+                    $ib++;
+                }
+            } else {
+                push @r, @$A[$ia .. $aend];
+                last;
+            }
+        } else {
+            if ($ib <= $bend) {
+                push @r, @$B[$ib .. $bend];
+                last;
+            } else {
+                last;
+            }
+        }
+    }
+    \@r
+}
+
+TEST {
+    require FP::Ops;
+    array_merge [-3, 1, 1, 3, 4], [-6, -4, -3, 0, 1, 2, 5, 6, 7],
+        \&FP::Ops::real_cmp
+}
+[-6, -4, -3, -3, 0, 1, 1, 1, 2, 3, 4, 5, 6, 7];
+TEST { array_merge [-3, 10], [1], \&FP::Ops::real_cmp }
+[-3, 1, 10];
+TEST { array_merge [-3], [1], \&FP::Ops::real_cmp }
+[-3, 1];
 
 1

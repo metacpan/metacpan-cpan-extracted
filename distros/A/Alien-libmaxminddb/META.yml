@@ -14,7 +14,7 @@ configure_requires:
   Alien::Build::MM: '0.32'
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,7 +23,7 @@ name: Alien-libmaxminddb
 provides:
   Alien::libmaxminddb:
     file: lib/Alien/libmaxminddb.pm
-    version: '1.011'
+    version: '1.012'
 requires:
   Alien::Base: '0'
   parent: '0'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/voegelas/Alien-libmaxminddb/issues
   homepage: https://github.com/voegelas/Alien-libmaxminddb/wiki
   repository: https://github.com/voegelas/Alien-libmaxminddb.git
-version: '1.011'
+version: '1.012'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:

@@ -25,7 +25,9 @@ package main;
 use HTTP::Request::Common;
 use Plack::Test;
 
-my $app = App->new;
+my $app = App->new(
+	'css_init' => [],
+);
 test_psgi($app, sub {
 	my $cb = shift;
 

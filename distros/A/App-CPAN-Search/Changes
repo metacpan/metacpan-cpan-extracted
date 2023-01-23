@@ -1,3 +1,7 @@
+0.09 2023-01-23T18:24:20+01:00
+ - Rename example to better name.
+ - Update copyright years.
+
 0.08 2022-08-28T08:45:08+02:00
  - Fix test of run on Windows.
 

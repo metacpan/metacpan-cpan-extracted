@@ -2,7 +2,6 @@ use strict;
 use warnings;
 no warnings 'once';
 use Test::More;
-use Test::Fatal;
 
 use Sub::Quote qw(
   quote_sub
@@ -58,10 +57,11 @@ my $three = quote_sub 'Foo::three' => q{
 is(Foo->three, 'spoon', 'get ok (named method)');
 is(Foo->three('fork'), 'fork', 'set ok (named method)');
 is(Foo->three, 'fork', 're-get ok (named method)');
-like(
-  exception { Foo->three(qw(full cutlery set)) }, qr/Foo::three/,
-  'exception contains correct name'
-);
+my $e;
+eval { Foo->three(qw(full cutlery set)); 1 } or $e = $@;
+like $e,
+  qr/Foo::three/,
+  'exception contains correct name';
 
 quote_sub 'Foo::four' => q{
   return 5;
@@ -84,39 +84,66 @@ ok defined &Bar::blorp,
   'bare sub name installed in current package';
 
 my $long = "a" x 251;
-is exception {
+undef $e;
+eval {
   (quote_sub "${long}a::${long}", q{ return 1; })->();
-}, undef,
+  1;
+} or $e = $@;
+is $e, undef,
   'long names work if package and sub are short enough';
 
-like exception {
+undef $e;
+eval {
   quote_sub "${long}${long}::${long}", q{ return 1; };
-}, qr/^package name "$long$long" too long/,
+  1;
+} or $e = $@;
+like $e,
+  qr/^package name "$long$long" too long/,
   'over long package names error';
 
-like exception {
+undef $e;
+eval {
   quote_sub "${long}::${long}${long}", q{ return 1; };
-}, qr/^sub name "$long$long" too long/,
+  1;
+} or $e = $@;
+like $e,
+  qr/^sub name "$long$long" too long/,
   'over long sub names error';
 
-like exception {
+undef $e;
+eval {
   quote_sub "got a space::gorp", q{ return 1; };
-}, qr/^package name "got a space" is not valid!/,
+  1;
+} or $e = $@;
+like $e,
+  qr/^package name "got a space" is not valid!/,
   'packages with spaces are invalid';
 
-like exception {
+undef $e;
+eval {
   quote_sub "Gorp::got a space", q{ return 1; };
-}, qr/^sub name "got a space" is not valid!/,
+  1;
+} or $e = $@;
+like $e,
+  qr/^sub name "got a space" is not valid!/,
   'sub names with spaces are invalid';
 
-like exception {
+undef $e;
+eval {
   quote_sub "0welp::gorp", q{ return 1; };
-}, qr/^package name "0welp" is not valid!/,
+  1;
+} or $e = $@;
+like $e,
+  qr/^package name "0welp" is not valid!/,
   'package names starting with numbers are not valid';
 
-like exception {
+undef $e;
+eval {
   quote_sub "Gorp::0welp", q{ return 1; };
-}, qr/^sub name "0welp" is not valid!/,
+  1;
+} or $e = $@;
+like $e,
+  qr/^sub name "0welp" is not valid!/,
   'sub names starting with numbers are not valid';
 
 my $broken_quoted = quote_sub q{
@@ -124,20 +151,29 @@ my $broken_quoted = quote_sub q{
   Guh
 };
 
-my $err = exception { $broken_quoted->() };
+undef $e;
+eval {
+  $broken_quoted->();
+  1;
+} or $e = $@;
 like(
-  $err, qr/Eval went very, very wrong/,
+  $e, qr/Eval went very, very wrong/,
   "quoted sub with syntax error dies when called"
 );
 
-my ($location) = $err =~ /syntax error at .+? line (\d+)/;
+my ($location) = $e =~ /syntax error at .+? line (\d+)/;
 like(
-  $err, qr/$location:\s*return 5<;/,
+  $e, qr/$location:\s*return 5<;/,
   "syntax errors include usable line numbers"
 );
 
 sub in_main { 1 }
-is exception { quote_sub(q{ in_main(); })->(); }, undef,
+undef $e;
+eval {
+  quote_sub(q{ in_main(); })->();
+  1;
+} or $e = $@;
+is $e, undef,
   'package preserved from context';
 
 {
@@ -145,7 +181,12 @@ is exception { quote_sub(q{ in_main(); })->(); }, undef,
   sub in_arf { 1 }
 }
 
-is exception { quote_sub(q{ in_arf(); }, {}, { package => 'Arf' })->(); }, undef,
+undef $e;
+eval {
+  quote_sub(q{ in_arf(); }, {}, { package => 'Arf' })->();
+  1;
+} or $e = $@;
+is $e, undef,
   'package used from options';
 
 

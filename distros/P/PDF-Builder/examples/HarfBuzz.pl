@@ -1,7 +1,4 @@
 #!/usr/bin/perl
-##########################
-# Note to maintainer: don't forget to refresh HarfBuzz_example.pdf
-##########################
 # demonstrate some usage of HarfBuzz::Shaper and related text calls
 # outputs HarfBuzz.pdf
 # author: Phil M Perry
@@ -9,7 +6,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.024'; # VERSION
+our $VERSION = '3.025'; # VERSION
 our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 my $PDFname = $0;

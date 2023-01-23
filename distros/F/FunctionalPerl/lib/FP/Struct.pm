@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013-2020 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2013-2022 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -70,34 +70,51 @@ FP::Struct - classes for functional perl
       _END_ # generate accessors for methods of given name which don't
             # exist yet *in either Bar or any super class*. (Does that
             # make sense?)
+            # and export the constructors to the packages given here:
+         "main"; 
     }
 
-    my $bar = new FPStructExample::Bar2 ("Franz", ["Barney"], "some aa", 1,2);
-    # same thing, but with sub instead of method call interface:
-    my $baz = FPStructExample::Bar2::c::Bar2 ("Franz", ["Barney"], "some aa", 1,2);
-    # or:
-    import FPStructExample::Bar2::constructors;
-    my $baz = Bar2 ("Franz", ["Barney"], "some aa", 1,2);
+    package main {
+        use FP::Equal 'is_equal';
 
-    is $bar->div, 1/2;
+        my $bar = new FPStructExample::Bar2 ("Franz", ["Barney"], "some aa", 1,2);
+        # same thing, but with sub instead of method call interface:
+        my $baz = FPStructExample::Bar2::c::Bar2 ("Franz", ["Barney"], "some aa", 1,2);
+        # or:
+        #FPStructExample::Bar2::constructors->import;
+        # or in fact, we already exported them via _END_("main")
+        my $baz = Bar2 ("Franz", ["Barney"], "some aa", 1,2);
 
-    is(Bar2_(a => 1,b => 2)->div, 1/2);
-    is(FPStructExample::Bar2::c::Bar2_(a => 1, b => 2)->div, 1/2);
-    is(new__ FPStructExample::Bar2({a => 1,b => 2})->div, 1/2);
-    is(unsafe_new__ FPStructExample::Bar2({a => 1,b => 2})->div, 1/2);
-    # NOTE: unsafe_new__ returns the argument hash after checking and
-    # blessing it, it doesn't copy it! Be careful. `new__` does copy it.
+        is $bar->div, 1/2;
 
-    is $bar->b_set(3)->div, 1/3;
+        is(Bar2_(a => 1,b => 2)->div, 1/2);
+        is(FPStructExample::Bar2::c::Bar2_(a => 1, b => 2)->div, 1/2);
+        is(new__ FPStructExample::Bar2({a => 1,b => 2})->div, 1/2);
+        is(unsafe_new__ FPStructExample::Bar2({a => 1,b => 2})->div, 1/2);
+        # NOTE: unsafe_new__ returns the argument hash after checking and
+        # blessing it, it doesn't copy it! Be careful. `new__` does copy it.
 
-    use FP::Div 'inc';
-    is $bar->b_update(\&inc)->div, 1/3;
+        is $bar->b_set(3)->div, 1/3;
 
-    is $bar->hum, "Franz hums 1 over 2";
+        use FP::Div 'inc';
+        is $bar->b_update(\&inc)->div, 1/3;
 
-    is Chj::TEST::run_tests("FPStructExample::Bar2")->successes, 1;
-    is (FPStructExample::Bar2->can("TEST"), undef);
-    # ^ it was removed by namespace cleaning
+        is $bar->hum, "Franz hums 1 over 2";
+
+        is Chj::TEST::run_tests("FPStructExample::Bar2")->successes, 1;
+        is (FPStructExample::Bar2->can("TEST"), undef);
+        # ^ it was removed by namespace cleaning
+
+        # Meta information: what was given in the field definitions,
+        # for the class and all FP::Struct based super classes:
+        my @fd = FP::Struct::all_fields(["FPStructExample::Bar2"]);
+        my @fieldnames = map { ref $_ ? $_->[1] : $_ } @fd;
+        is_equal \@fieldnames,
+                 [ 'name', 'animals', 'aa', 'a', 'b' ];
+        # Just the field names, directly:
+        is_equal [ FP::Struct::all_field_names(["FPStructExample::Bar2"]) ],
+                 [ 'name', 'animals', 'aa', 'a', 'b' ];
+    }
 
 =for test ignore
 
@@ -120,7 +137,7 @@ C<Foo::Bar::c::Bar_()> for named arguments for package Foo::Bar. These
 are also in C<Foo::Bar::constructors::> and can be imported using
 (without arguments, it imports both):
 
-    import Foo::Bar::constructors qw(Bar Bar_);
+    Foo::Bar::constructors->import(qw(Bar Bar_));
 
 C<_END_> does namespace cleaning: any sub that was defined before the C<use
 FP::Struct> call is removed by the C<_END_> call (those that are not the
@@ -131,12 +148,15 @@ definition of the methods, that the imported procedures can be used
 from within the defined methods, but are not around afterwards,
 i.e. they will not shadow super class methods. (Thanks to Matt S Trout
 for pointing out the idea.) To avoid the namespace cleaning, write
-C<_END__> instead of C<_END_>.
+C<_END__> instead of C<_END_>. Both of these optionally take any number
+of packages, to which they will export the constructors.
 
 See L<FP::Predicates> for some useful predicates (others are in the
 respective modules that define them, like C<is_pair> in L<FP::List>).
 
-=head1 PURITY
+=head1 UTILITY BASE CLASSES
+
+=head2 PURITY
 
 It is recommended to use L<FP::Abstract::Pure> as a base class. This
 means objects from classes based on FP::Struct are automatically
@@ -145,6 +165,20 @@ treated as pure by C<is_pure> from L<FP::Predicates>.
 If C<$FP::Struct::immutable> is true (default), then if
 L<FP::Abstract::Pure> is inherited the objects are made immutable to
 ensure purity.
+
+=head2 FP::Struct specific
+
+To avoid having to implement some protocols manually, some base
+classes are provided to auto-derive those protocols automatically:
+<FP::Struct::Show>, <FP::Struct::Equal>. They use the knowledge that
+<FP::Struct> has about the fields in the class to make the protocol
+consider all the fields automatically.
+
+=head2 :defaults
+
+If ":defaults" is given as a base class, it is expanded to those base
+classes that should always work and should always be
+useful. Currently, these are <FP::Struct::Show>, <FP::Struct::Equal>.
 
 =head1 ALSO SEE
 
@@ -176,6 +210,7 @@ use Chj::NamespaceClean;
 use FP::Show qw(show);
 use FP::Interface qw(require_package package_check_possible_interface);
 use FP::Carp;
+use Safe::Isa;    # $_can
 
 sub all_fields {
     my ($isa) = @_;
@@ -191,6 +226,11 @@ sub all_fields {
             }
         } @$isa
     )
+}
+
+sub all_field_names {
+    my ($isa) = @_;
+    map { ref $_ ? $_->[1] : $_ } all_fields($isa)
 }
 
 sub field_maybe_predicate {
@@ -220,6 +260,33 @@ sub field_has_predicate {
 
 our $immutable = 1;    # only used if also is_pure
 
+my $warned_once;
+
+sub unacceptable_value_error {
+    my ($failure, $fieldname, $value) = @_;
+    my $failstr = ref($failure)
+        ? do {
+
+        # quack like a duck, as long as there's no
+        # `FP::Abstract::Failure` protocol
+        if (my $message = $failure->$_can("message")) {
+            my $str = $message->($failure);
+            chomp $str;
+            " ($str)"
+        } else {
+            unless ($warned_once) {
+                warn
+                    "warning once: got an falsey object with no `message` method: $failure";
+                $warned_once++;
+            }
+            ""
+        }
+        }
+        : "";
+    @_ = ("unacceptable value for field '$fieldname'$failstr: " . show($value));
+    goto \&fp_croak;
+}
+
 sub import {
     my $_importpackage = shift;
     return unless @_;
@@ -232,10 +299,17 @@ sub import {
         ($package, $fields, @perhaps_isa) = @_;
         $is_expandedvariant = 0;
     }
-    my @isa
+    my @_isa
         = (@perhaps_isa == 1 and ref($perhaps_isa[0]))
         ? $perhaps_isa[0]
         : @perhaps_isa;
+
+    my @isa = map {
+        (     $_ eq ":defaults" ? qw(FP::Struct::Show FP::Struct::Equal)
+            : $_ eq ":default" ? fp_croak
+                "base class ':default' is invalid, did you mean ':defaults'?"
+            : $_)
+    } @_isa;
 
     require_package $_ for @isa;
     no strict 'refs';
@@ -275,9 +349,9 @@ sub import {
         @_ <= @$allfields or fp_croak "too many arguments to ${package}::new";
         for (@$allfields_i_with_predicate) {
             my ($pred, $name, $i) = @$_;
-            &$pred($_[$i])
-                or fp_croak "unacceptable value for field '$name': "
-                . show($_[$i]);
+            my $possibly_fail = &$pred($_[$i]);
+            $possibly_fail
+                or unacceptable_value_error($possibly_fail, $name, $_[$i]);
         }
         my %s;
         for (my $i = 0; $i < @_; $i++) {
@@ -296,9 +370,9 @@ sub import {
         @_ <= @$allfields or fp_croak "too many arguments to ${package}::new";
         for (@$allfields_i_with_predicate) {
             my ($pred, $name, $i) = @$_;
-            &$pred($_[$i])
-                or fp_croak "unacceptable value for field '$name': "
-                . show($_[$i]);
+            my $possibly_fail = &$pred($_[$i]);
+            $possibly_fail
+                or unacceptable_value_error($possibly_fail, $name, $_[$i]);
         }
         my %s;
         for (my $i = 0; $i < @_; $i++) {
@@ -346,9 +420,9 @@ sub import {
         }
         for (@$allfields_with_predicate) {
             my ($pred, $name) = @$_;
-            &$pred($$s{$name})
-                or fp_croak "unacceptable value for field '$name': "
-                . show($$s{$name});
+            my $possibly_fail = &$pred($$s{$name});
+            $possibly_fail
+                or unacceptable_value_error($possibly_fail, $name, $$s{$name});
         }
         bless $s, $class;
         Internals::SvREADONLY %$s, 1 if $is_pure && $immutable;
@@ -365,6 +439,7 @@ sub import {
     *{"${package}::constructors::EXPORT_TAGS"} = +{ all => $exports };
 
     my $end = sub {
+        my (@exportpackages) = @_;
 
         #warn "_END_ called for package '$package'";
         for my $_field (@$fields) {
@@ -398,10 +473,10 @@ sub import {
                 ? sub {
                     my $s = shift;
                     @_ == 1 or fp_croak "${name}_set: need 1 argument";
-                    my $v = shift;
-                    &$maybe_predicate($v)
-                        or fp_croak "unacceptable value for field '$name': "
-                        . show($v);
+                    my $v             = shift;
+                    my $possibly_fail = &$maybe_predicate($v);
+                    $possibly_fail
+                        or unacceptable_value_error($possibly_fail, $name, $v);
                     my $new = +{%$s};
                     $$new{$name} = $v;
                     bless $new, ref $s
@@ -421,10 +496,10 @@ sub import {
                 ? sub {
                     @_ == 2 or fp_croak "${name}_update: need 2 arguments";
                     my ($s, $fn) = @_;
-                    my $v = &$fn($s->{$name});
-                    &$maybe_predicate($v)
-                        or fp_croak "unacceptable value for field '$name': "
-                        . show($v);
+                    my $v             = &$fn($s->{$name});
+                    my $possibly_fail = &$maybe_predicate($v);
+                    $possibly_fail
+                        or unacceptable_value_error($possibly_fail, $name, $v);
                     my $new = +{%$s};
                     $$new{$name} = $v;
                     bless $new, ref $s
@@ -440,6 +515,14 @@ sub import {
             );
         }
 
+        # Optionally export to packages:
+        for my $exportpackage (@exportpackages) {
+
+            # warn "exporting constructors from $package to $exportpackage";
+            *{"${exportpackage}::${package_lastpart}"}  = $constructor;
+            *{"${exportpackage}::${package_lastpart}_"} = $constructor_;
+        }
+
         # Check any interfaces:
         package_check_possible_interface($package, $_) for @isa;
 
@@ -450,7 +533,7 @@ sub import {
 
         #warn "_END_ called for package '$package'";
         package_delete $package, $nonmethods;
-        &$end;
+        goto $end;
     };
 
     unless ($is_expandedvariant) {

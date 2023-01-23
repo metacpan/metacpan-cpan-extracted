@@ -4,22 +4,14 @@ author:
   - 'Vikas N. Kumar <vikas@cpan.org>'
 build_requires:
   Alien::Build::MB: '0.01'
-  Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
-  Alien::cmake3: '0.02'
-  Archive::Zip: '0'
-  Config: '0'
-  HTTP::Tiny: '0.044'
-  IO::Socket::SSL: '1.56'
+  HTTP::Tiny: '0'
   Module::Build: '0.36'
-  Mozilla::CA: '0'
-  Net::SSLeay: '1.49'
   Path::Tiny: '0'
   Software::License: '0'
   Test2::V0: '0'
   Test::Alien: '0'
   Test::Alien::Diag: '0'
   Test::More: '0'
-  URI: '0'
 configure_requires:
   Alien::Build: '1.40'
   Alien::Build::MB: '0.01'
@@ -28,7 +20,7 @@ configure_requires:
   Module::Build: '0.36'
   Software::License: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -37,14 +29,14 @@ name: Alien-TALib
 provides:
   Alien::TALib:
     file: lib/Alien/TALib.pm
-    version: '0.12'
+    version: '0.14'
 requires:
   perl: v5.10.0
 resources:
   bugtracker: https://github.com/vikasnkumar/Alien-TALib/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/vikasnkumar/Alien-TALib
-version: '0.12'
+version: '0.14'
 x_alienfile:
   generated_by: 'Alien::Build::MB version 0.09'
   requires:

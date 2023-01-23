@@ -1,5 +1,13 @@
 Revision history for Perl extension Redis::ClusterRider.
 
+0.26 Sun Jan 22 20:19:00 MSK 2023
+  - Added username for ACL in Redis 6.0+. Thanks for Mikhail Zakharenko
+    (zhmylove).
+
+0.24 Wed Feb 16 19:42:00 MSK 2022
+  - Added Redis fallback unless cluster enabled. Thanks for Mikhail Zakharenko
+    (zhmylove).
+
 0.22 Wed Feb 24 15:40:00 MSK 2021
   - Send 'READONLY' command to all nodes using 'on_connect' attribute of 'Redis'
     package. Thanks for Sawasa (plainbanana).

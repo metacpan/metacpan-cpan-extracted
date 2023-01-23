@@ -202,7 +202,7 @@ do { my $x = {
                                    'Test::CleanNamespaces' => '0.13',
                                    'Test::Fatal' => '0.001',
                                    'Test::More' => '0.96',
-                                   'Test::Needs' => '0'
+                                   'Test::Needs' => '0.002010'
                                  }
                  }
      };

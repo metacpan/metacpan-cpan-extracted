@@ -6,8 +6,9 @@ use warnings;
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use Pod::Abstract;
+use String::UpdateYears qw(update_years);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Constructor.
 sub new {
@@ -99,23 +100,9 @@ sub _change_years {
 	my ($self, $pod_node, $year) = @_;
 
 	my $text = $pod_node->pod;
-	if ($text =~ m/^(.*)(\d{4})-(\d{4})(.*)$/ms) {
-		my $pre = $1;
-		my $first_year = $2;
-		my $last_year = $3;
-		my $post = $4;
-		if ($last_year != $year) {
-			my $new_text = $pre.$first_year.'-'.$year.$post;
-			$pod_node->body($new_text);
-		}
-	} elsif ($text =~ m/^(.*)(\d{4})(.*)$/ms) {
-		my $pre = $1;
-		my $first_year = $2;
-		my $post = $3;
-		if ($first_year != $year) {
-			my $new_text = $pre.$first_year.'-'.$year.$post;
-			$pod_node->body($new_text);
-		}
+	my $updated = update_years($text, {}, $year);
+	if ($updated) {
+		$pod_node->body($updated);
 	}
 
 	return;
@@ -253,6 +240,20 @@ Returns string.
  # 
  # =cut
 
+=head1 SEE ALSO
+
+=over
+
+=item L<perl-module-copyright-years>
+
+Tool for update copyright years in Perl distribution.
+
+=item L<App::Perl::Module::CopyrightYears>
+
+Base class for perl-module-copyright-years tool.
+
+=back
+
 =head1 DEPENDENCIES
 
 L<Class::Utils>,
@@ -277,6 +278,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

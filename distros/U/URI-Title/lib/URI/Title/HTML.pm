@@ -1,5 +1,5 @@
 package URI::Title::HTML;
-$URI::Title::HTML::VERSION = '1.902';
+$URI::Title::HTML::VERSION = '1.903';
 use warnings;
 use strict;
 use HTML::Entities;
@@ -115,6 +115,6 @@ URI::Title::HTML - get titles of html files
 
 =head1 VERSION
 
-version 1.902
+version 1.903
 
 =cut

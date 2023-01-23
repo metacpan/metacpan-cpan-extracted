@@ -29,10 +29,11 @@ requires:
   Class::Utils: 0
   Error::Pure: 0.3
   Pod::Abstract: 0
+  String::UpdateYears: 0
   perl: 5.6.2
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Pod-CopyrightYears/issues
   homepage: https://github.com/michal-josef-spacek/Pod-CopyrightYears
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Pod-CopyrightYears
-version: '0.01'
+version: '0.02'

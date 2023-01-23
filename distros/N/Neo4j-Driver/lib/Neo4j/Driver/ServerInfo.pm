@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::ServerInfo;
 # ABSTRACT: Provides Neo4j server address and version
-$Neo4j::Driver::ServerInfo::VERSION = '0.33';
+$Neo4j::Driver::ServerInfo::VERSION = '0.34';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Session);
@@ -76,7 +76,7 @@ Neo4j::Driver::ServerInfo - Provides Neo4j server address and version
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 SYNOPSIS
 
@@ -161,7 +161,7 @@ If you contact me by email, please make sure you include the word
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2022 by Arne Johannessen.
+This software is Copyright (c) 2016-2023 by Arne Johannessen.
 
 This is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0 or (at your option) the same terms

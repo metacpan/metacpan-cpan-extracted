@@ -1,5 +1,6 @@
 acmeman
 Changes
+inc/ExtUtils/AutoInstall.pm
 lib/App/Acmeman.pm
 lib/App/Acmeman/Apache/Layout.pm
 lib/App/Acmeman/Apache/Layout/debian.pm
@@ -14,6 +15,7 @@ lib/App/Acmeman/Source/Apache.pm
 lib/App/Acmeman/Source/Default.pm
 lib/App/Acmeman/Source/File.pm
 lib/App/Acmeman/Source/Null.pm
+lib/App/Acmeman/Source/Pound.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

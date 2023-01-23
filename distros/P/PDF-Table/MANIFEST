@@ -1,6 +1,7 @@
 .perlcriticrc
 .perl-version
 Changes
+CONTRIBUTING.md
 examples/010_fonts.pl
 examples/colspan.pl
 examples/chess.pl
@@ -13,9 +14,10 @@ examples/sample1.pl
 examples/size.pl
 INFO/Changes_2019
 INFO/Deprecated
+INFO/SPONSORS
 INFO/Table.html
 lib/PDF/Table.pm
-lib/PDF/Table/Table.pod
+lib/PDF/Table.pod
 lib/PDF/Table/ColumnWidth.pm
 lib/PDF/Table/Settings.pm
 LICENSE
@@ -23,20 +25,18 @@ Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 PDFpref
-README
 README.md
 t/Basics.t
 t/Colspan.t
 t/lib/PDFAPI2Mock.pm
 t/lib/TestData.pm
 t/PDF-Table.t
-t/pod.t
-t/manifest.t
 t/table.t
+xt/pod.t
+xt/manifest.t
 util/1_pc.pl
 util/2_t-tests.pl
 util/3_examples.pl
 util/pod2cpanhtml.pl
-version
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -9,7 +9,7 @@ use Path::Tiny ();
 use File::Temp ();
 
 # ABSTRACT: Autoconf plugin for Alien::Build
-our $VERSION = '2.76'; # VERSION
+our $VERSION = '2.77'; # VERSION
 
 
 has with_pic       => 1;
@@ -190,7 +190,7 @@ Alien::Build::Plugin::Build::Autoconf - Autoconf plugin for Alien::Build
 
 =head1 VERSION
 
-version 2.76
+version 2.77
 
 =head1 SYNOPSIS
 

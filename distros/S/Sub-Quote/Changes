@@ -1,5 +1,16 @@
 Revision history for Sub::Quote
 
+2.006008 - 2023-01-20
+  - drop Test::Fatal prereq
+  - recommend Sub::Util rather than Sub::Name
+  - use XString for quoting strings where possible
+  - move tests for quotify on perl 5.6 to author only
+
+2.006_007 - 2022-04-05
+  - accurately detect numbers vs strings in quotify on perl 5.36
+  - accurately detect booleans in quotify on perl 5.36
+  - add workaround for float formatting for perls compiled to use gcvd
+
 2.006006 - 2019-10-01
   - change quotify to use longest form of floating point numbers if unable to
     find a perfectly accurate representation

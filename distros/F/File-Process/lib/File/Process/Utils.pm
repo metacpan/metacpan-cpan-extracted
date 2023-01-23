@@ -43,7 +43,7 @@ our %EXPORT_TAGS = (
   'all'      => \@EXPORT_OK,
 );
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 ########################################################################
 sub _is_array { push @_, 'ARRAY'; goto &_is_type; }

@@ -3,7 +3,7 @@
    "author" : [
       "Lukas Mai <l.mai@web.de>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "agpl_3"
@@ -16,20 +16,28 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "xt"
       ]
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.76",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
             "strict" : "0",
             "warnings" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Markdown" : "3.005",
+            "Pod::Text" : "4.09",
+            "Test::Pod" : "1.22"
          }
       },
       "runtime" : {
@@ -60,6 +68,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mauke/HTML-Blitz",
+         "web" : "https://github.com/mauke/HTML-Blitz"
+      }
+   },
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

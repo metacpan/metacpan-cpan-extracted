@@ -10,6 +10,7 @@ Makefile.PL
 README
 SIGNATURE
 bin/story-interact
+bin/story-interact-analyze
 bin/story-interact-dir2sqlite
 dist.ini
 doap.ttl
@@ -21,6 +22,7 @@ examples/house/living_room.page.pl
 examples/house/main.page.pl
 examples/house/sleep.page.pl
 lib/Story/Interact.pm
+lib/Story/Interact/Analyze.pm
 lib/Story/Interact/Character.pm
 lib/Story/Interact/Harness/Terminal.pm
 lib/Story/Interact/Page.pm

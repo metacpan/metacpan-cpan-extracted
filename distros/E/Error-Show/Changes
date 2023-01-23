@@ -1,5 +1,17 @@
 Revision history for Perl extension Error::Show.
 
+v0.1.1  2023-01-22
+  [tests]
+  - fixed failing frame test on perl 5.26/5.24
+  
+  [pod]
+  - Fixed up eval example
+  - Fixed typos reported by W.Braswell
+
+  [other]
+  - updated Makefile.PL and .gitignore with repo settings. Thankyou to mrdvt92
+    via github.
+
 v0.1.0  2023-01-18
 	- original version
 

@@ -506,7 +506,7 @@ sub have_library {
 #include <windows.h>
 #endif
 #include <${header}.h>
-blank() { return 0; }
+int blank() { return 0; }
 int t() { ${func}(); return 0; }
 SRC
             unless ($result) {
@@ -515,7 +515,7 @@ SRC
 #include <windows.h>
 #endif
 #include <${header}.h>
-blank() { return 0; }
+int blank() { return 0; }
 int t() { void ((*p)()); p = (void ((*)()))${func}; return 0; }
 SRC
             }
@@ -523,7 +523,7 @@ SRC
         } else {
             $result = try_link(<<"SRC", undef);
 #include <${header}.h>
-blank() { return 0; }
+int blank() { return 0; }
 int t() { ${func}(); return 0; }
 SRC
         }
@@ -540,7 +540,7 @@ SRC
 #include <windows.h>
 #endif
 #include <${header}.h>
-blank() { return 0; }
+int blank() { return 0; }
 SRC
         }
     }

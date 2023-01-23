@@ -4,7 +4,7 @@
       "Lukas Mai <l.mai@web.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -51,7 +51,7 @@
       },
       "test" : {
          "requires" : {
-            "Dir::Self" : "0",
+            "FindBin" : "0",
             "Hash::Util" : "0.07",
             "Test::Fatal" : "0",
             "Test::More" : "0",
@@ -69,6 +69,6 @@
          "web" : "https://github.com/mauke/Function-Parameters"
       }
    },
-   "version" : "2.001003",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "2.001004",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

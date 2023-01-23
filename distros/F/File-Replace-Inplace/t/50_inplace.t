@@ -47,7 +47,6 @@ use warnings FATAL => qw/ io inplace /;
 our $DEBUG = 0;
 our $FE = $] ge '5.012' && $] lt '5.029007' ? !!0 : !!1; # FE="first eof", see https://github.com/Perl/perl5/issues/16786
 our $CE; # CE="can't eof()", Perl <5.12 doesn't support eof() on tied filehandles (gets set below)
-         # plus try to work around https://github.com/Perl/perl5/issues/20207 on >5.36
 our $FL = undef; # FL="First Line"
 # Apparently there are some versions of Perl on Win32 where the following two appear to work slightly differently.
 # I've seen differing results on different systems and I'm not sure why, so I set it dynamically... not pretty, but this test isn't critical.
@@ -87,7 +86,7 @@ sub testboth {  ## no critic (RequireArgUnpacking)
 	{
 		local $TESTMODE = 'Inplace';
 		local (*ARGV, *ARGVOUT, $., $^I);  ## no critic (RequireInitializationForLocalVars)
-		local $CE = $] lt '5.012' || $] gt '5.036';
+		local $CE = $] lt '5.012';
 		my $inpl = File::Replace::Inplace->new(debug=>$DEBUG, %$args);
 		my $osi = defined($stdin) ? OverrideStdin->new($stdin) : undef;
 		subtest "$name - ::Inplace" => $sub;
@@ -122,8 +121,9 @@ testboth 'basic test' => sub { plan tests=>9;
 };
 
 testboth 'basic test with eof()' => sub {
-	if ($CE) { plan skip_all=>"eof() not supported on tied handles on Perl<5.12 or >5.36" }
+	if ($CE) { plan skip_all=>"eof() not supported on tied handles on Perl<5.12" }
 	elsif ($^O eq 'MSWin32') { plan skip_all=>"eof() acts differently on Win32" }
+	elsif ($^O eq 'cygwin') { plan skip_all=>"this test doesn't work on cygwin" }
 	else { plan tests=>9 }
 	my @tf = (newtempfn("Foo\nBar"), newtempfn("Quz\nBaz\n"));
 	local @ARGV = @tf; # this also tests "local"ization after constructing the object
@@ -371,7 +371,7 @@ testboth 'restart with emptied @ARGV (STDIN)' => sub {
 	push @states, [[@ARGV], $ARGV, defined(fileno ARGV), defined(fileno ARGVOUT), $., eof];
 	is select(), 'main::STDOUT', 'STDOUT is selected in between';
 	SKIP: {
-		skip "eof() not supported on tied handles on Perl<5.12 or >5.36", 2 if $CE;
+		skip "eof() not supported on tied handles on Perl<5.12", 2 if $CE;
 		ok !eof(), 'eof() is false';
 		is select(), 'main::STDOUT', 'STDOUT is still selected';
 	}
@@ -474,7 +474,7 @@ subtest 'create option' => sub { plan tests=>9;
 
 subtest 'premature destroy' => sub { plan tests=>7;
 	local (*ARGV, *ARGVOUT, $., $^I);  ## no critic (RequireInitializationForLocalVars)
-	local $CE = $] lt '5.012' || $] gt '5.036';
+	local $CE = $] lt '5.012';
 	is grep( {/\bunclosed file\b.+\bnot replaced\b/i} warns {
 		my $tfn = newtempfn("IJK\nMNO");
 		@ARGV = ($tfn);  ## no critic (RequireLocalizedPunctuationVars)

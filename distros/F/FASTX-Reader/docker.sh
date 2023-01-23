@@ -1,1 +1,2 @@
-docker run --rm -v $PWD:/tmp  perldocker/perl-tester bash t/docker.sh "$@"
+#!/bin/bash
+docker run --rm -v "$PWD":/tmp  perldocker/perl-tester bash t/docker.sh "$@"

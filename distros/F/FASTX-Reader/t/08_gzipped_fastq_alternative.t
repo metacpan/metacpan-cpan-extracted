@@ -12,7 +12,9 @@ if (! -e $seq) {
   exit 0;
 }
 
-my $data = FASTX::Reader->new({ filename => "$seq" });
+my $data = FASTX::Reader->new(
+  -filename => "$seq" 
+);
 
 # Retrieve first sequence
 $seq = $data->getFastqRead();

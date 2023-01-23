@@ -4,50 +4,54 @@
       "Steven Schubiger <schubiger@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "LaTeX-Pod",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "File::Spec" : 0,
-            "FindBin" : 0,
-            "Test::More" : 0
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build" : "0.42"
          }
       },
       "runtime" : {
          "requires" : {
-            "Carp" : 0,
-            "Getopt::Long" : 0,
-            "LaTeX::TOM" : 0,
-            "List::MoreUtils" : 0,
-            "Params::Validate" : 0,
-            "boolean" : 0
+            "Carp" : "0",
+            "Getopt::Long" : "0",
+            "LaTeX::TOM" : "0",
+            "List::MoreUtils" : "0",
+            "Params::Validate" : "0",
+            "boolean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "LaTeX::Pod" : {
          "file" : "lib/LaTeX/Pod.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/stsc/LaTeX-Pod"
+      }
    },
-   "version" : "0.21"
+   "version" : "0.22",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

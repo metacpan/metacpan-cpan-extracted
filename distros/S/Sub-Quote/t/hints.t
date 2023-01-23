@@ -14,7 +14,6 @@ use strict;
 use warnings;
 no warnings 'once';
 use Test::More;
-use Test::Fatal;
 
 use Sub::Quote qw(
   quote_sub
@@ -27,7 +26,10 @@ use Sub::Quote qw(
   no strict 'subs';
   local $TODO = "hints from caller not available on perl < 5.8"
     if "$]" < 5.008_000;
-  like exception { quote_sub(q{ my $f = SomeBareword; ${"string_ref"} })->(); },
+
+  my $e;
+  eval { quote_sub(q{ my $f = SomeBareword; ${"string_ref"} })->(); 1 } or $e = $@;
+  like $e,
     qr/strict refs/,
     'hints preserved from context';
 }
@@ -39,7 +41,9 @@ use Sub::Quote qw(
     no strict 'subs';
     BEGIN { $hints = $^H }
   }
-  like exception { quote_sub(q{ my $f = SomeBareword; ${"string_ref"} }, {}, { hints => $hints })->(); },
+  my $e;
+  eval { quote_sub(q{ my $f = SomeBareword; ${"string_ref"} }, {}, { hints => $hints })->(); 1 } or $e = $@;
+  like $e,
     qr/strict refs/,
     'hints used from options';
 }
@@ -78,7 +82,9 @@ use Sub::Quote qw(
     1;
   } or die $@;
   no warnings 'uninitialized';
-  like exception { quote_sub(q{ 0 + undef }, {}, { warning_bits => $warn_bits })->(); },
+  my $e;
+  eval { quote_sub(q{ 0 + undef }, {}, { warning_bits => $warn_bits })->(); 1 } or $e = $@;
+  like $e,
     qr/uninitialized/,
     'warnings used from options';
 }
@@ -172,7 +178,9 @@ TODO: {
   todo_skip "refs in hints hash not yet implemented", 4;
   {
     my $context_val;
-    is exception { $context_val = $context_sub->() }, undef,
+    my $e;
+    eval { $context_val = $context_sub->(); 1 } or $e = $@;
+    is $e, undef,
       'hints hash refs from context not broken';
     local $TODO = 'hints hash from context not available on perl 5.8'
       if !$TODO && "$]" < 5.010_000;
@@ -182,7 +190,9 @@ TODO: {
 
   {
     my $options_val;
-    is exception { $options_val = $options_sub->() }, undef,
+    my $e;
+    eval { $options_val = $options_sub->(); 1 } or $e = $@;
+    is $e, undef,
       'hints hash refs from options not broken';
     is $options_val, 11,
       'hints hash refs used from options';
@@ -206,7 +216,9 @@ TODO: {
 
   {
     my $context_val;
-    is exception { $context_val = $context_sub->() }, undef,
+    my $e;
+    eval { $context_val = $context_sub->(); 1 } or $e = $@;
+    is $e, undef,
       'hints hash closure refs from context not broken';
     local $TODO = 'hints hash from context not available on perl 5.8'
       if !$TODO && "$]" < 5.010_000;
@@ -216,7 +228,9 @@ TODO: {
 
   {
     my $options_val;
-    is exception { $options_val = $options_sub->() }, undef,
+    my $e;
+    eval { $options_val = $options_sub->(); 1 } or $e = $@;
+    is $e, undef,
       'hints hash closure refs from options not broken';
     is $options_val, 12,
       'hints hash closure refs used from options';

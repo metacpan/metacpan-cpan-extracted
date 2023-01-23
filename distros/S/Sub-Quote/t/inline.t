@@ -2,7 +2,6 @@ use strict;
 use warnings;
 no warnings 'once';
 use Test::More;
-use Test::Fatal;
 use Data::Dumper;
 
 use Sub::Quote qw(
@@ -23,9 +22,14 @@ my $prelude = capture_unroll '$captures', $captures, 4;
   is_deeply $sub->(), [ 1, 2 ], 'unrolled variables get correct values';
 }
 
-like exception {
+my $e;
+eval {
   capture_unroll '$captures', { '&foo' => \sub { 5 } }, 4;
-}, qr/^capture key should start with @, % or \$/,
+  1;
+} or $e = $@;
+
+like $e,
+  qr/^capture key should start with @, % or \$/,
   'capture_unroll rejects vars other than scalar, hash, or array';
 
 {

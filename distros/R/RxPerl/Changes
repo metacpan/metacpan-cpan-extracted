@@ -1,5 +1,10 @@
 Revision history for Perl extension RxPerl
 
+v6.14.0 2023-01-23T18:19:03Z
+
+    - added op_buffer
+    - fixed bugs in op_map and op_filter
+
 v6.13.1 2023-01-04T17:14:49Z
 
     - Started the CreatingObservables Guide

@@ -5,12 +5,12 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Neo4j community graph database driver for Bolt and HTTP
-$Neo4j::Driver::VERSION = '0.33';
+$Neo4j::Driver::VERSION = '0.34';
 
 use Carp qw(croak);
 
 use URI 1.25;
-use Neo4j::Driver::PluginManager;
+use Neo4j::Driver::Events;
 use Neo4j::Driver::Session;
 
 use Neo4j::Driver::Type::Node;
@@ -36,7 +36,7 @@ my %OPTIONS = (
 	jolt => 'jolt',
 	concurrent_tx => 'concurrent_tx',
 	net_module => 'net_module',
-	timeout => 'http_timeout',
+	timeout => 'timeout',
 	tls => 'tls',
 	tls_ca => 'tls_ca',
 	trust_ca => 'tls_ca',
@@ -59,7 +59,7 @@ sub new {
 	my ($class, $config, @extra) = @_;
 	
 	my $self = bless { %DEFAULTS }, $class;
-	$self->{plugins} = Neo4j::Driver::PluginManager->new;
+	$self->{plugins} = Neo4j::Driver::Events->new;
 	
 	croak __PACKAGE__ . "->new() with multiple arguments unsupported" if @extra;
 	$config = { uri => $config } if ref $config ne 'HASH';
@@ -150,6 +150,8 @@ sub session {
 	my ($self, @options) = @_;
 	
 	warnings::warnif deprecated => __PACKAGE__ . "->{die_on_error} is deprecated" unless $self->{die_on_error};
+	warnings::warnif deprecated => __PACKAGE__ . "->{http_timeout} is deprecated; use config()" if defined $self->{http_timeout};
+	$self->{timeout} //= $self->{http_timeout};
 	
 	@options = %{$options[0]} if @options == 1 && ref $options[0] eq 'HASH';
 	my %options = $self->_parse_options('session', ['database'], @options);
@@ -229,7 +231,7 @@ Neo4j::Driver - Neo4j community graph database driver for Bolt and HTTP
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 SYNOPSIS
 
@@ -405,15 +407,12 @@ features.
 
 =head2 Plug-in modules
 
- $driver->plugin( 'Local::MyPlugin' );
  $driver->plugin(  Local::MyPlugin->new );
 
 The driver offers a simple plug-in interface. Plug-ins are modules
 providing handlers for events that may be triggered by the driver.
 Plug-ins are loaded by calling the C<plugin()> method with the
-module name as parameter. Your code must C<use> or C<require> the
-module it specifies here. Alternatively, the blessed instance of
-a plug-in may be given.
+the blessed instance of a plug-in as parameter.
 
 Details on the implementation of plug-ins including descriptions of
 individual events are provided in L<Neo4j::Driver::Plugin>.
@@ -538,10 +537,6 @@ not defined here and is subject to change.
 For details, see L<LWP::UserAgent/"timeout"> when using HTTP or
 L<select(2)> when using Bolt.
 
-The old C<< $driver->{http_timeout} >> syntax remains supported
-for the time being in order to ensure backwards compatibility,
-but its use is discouraged and it may be deprecated in future.
-
 =head2 trust_ca
 
  $driver->config(trust_ca => 'neo4j/certificates/neo4j.cert');
@@ -658,7 +653,7 @@ If you contact me by email, please make sure you include the word
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2022 by Arne Johannessen.
+This software is Copyright (c) 2016-2023 by Arne Johannessen.
 
 This is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0 or (at your option) the same terms

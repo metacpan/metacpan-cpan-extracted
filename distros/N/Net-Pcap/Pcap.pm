@@ -5,18 +5,18 @@
 # bootstraps the extensions defined in Pcap.xs
 #
 # Copyright (C) 2005-2009 Sebastien Aperghis-Tramoni. All rights reserved.
-# Copyright (C) 2003 Marco Carnut. All rights reserved. 
-# Copyright (C) 1999, 2000 Tim Potter. All rights reserved. 
-# Copyright (C) 1998 Bo Adler. All rights reserved. 
-# Copyright (C) 1997 Peter Lister. All rights reserved. 
-# 
-# This program is free software; you can redistribute it and/or modify 
+# Copyright (C) 2003 Marco Carnut. All rights reserved.
+# Copyright (C) 1999, 2000 Tim Potter. All rights reserved.
+# Copyright (C) 1998 Bo Adler. All rights reserved.
+# Copyright (C) 1997 Peter Lister. All rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
 package Net::Pcap;
 use strict;
 use warnings;
-use Exporter ();
+use Exporter 'import';
 use Carp;
 
 
@@ -49,16 +49,13 @@ my @func_long_names = map { "pcap_$_" } @func_short_names;
 
 
 {
-    no strict "vars";
-    $VERSION = '0.20';
+    our $VERSION = '0.21';
 
-    @ISA = qw(Exporter);
-
-    %EXPORT_TAGS = (
+    our %EXPORT_TAGS = (
         'bpf' => [qw(
             BPF_ALIGNMENT  BPF_MAJOR_VERSION  BPF_MAXBUFSIZE  BPF_MAXINSNS
             BPF_MEMWORDS  BPF_MINBUFSIZE  BPF_MINOR_VERSION  BPF_RELEASE
-        )], 
+        )],
         'datalink' => [qw(
             DLT_AIRONET_HEADER  DLT_APPLE_IP_OVER_IEEE1394  DLT_ARCNET
             DLT_ARCNET_LINUX  DLT_ATM_CLIP  DLT_ATM_RFC1483  DLT_AURORA
@@ -77,7 +74,7 @@ my @func_long_names = map { "pcap_$_" } @func_short_names;
             DLT_USER3  DLT_USER4  DLT_USER5  DLT_USER6  DLT_USER7  DLT_USER8
             DLT_USER9  DLT_USER10  DLT_USER11  DLT_USER12  DLT_USER13
             DLT_USER14  DLT_USER15
-        )], 
+        )],
         mode => [qw(
             MODE_CAPT  MODE_MON  MODE_STAT
         )],
@@ -87,7 +84,7 @@ my @func_long_names = map { "pcap_$_" } @func_short_names;
         pcap => [qw(
             PCAP_ERRBUF_SIZE    PCAP_IF_LOOPBACK
             PCAP_VERSION_MAJOR  PCAP_VERSION_MINOR
-        )], 
+        )],
         rpcap => [qw(
             RMTAUTH_NULL  RMTAUTH_PWD
         )],
@@ -104,7 +101,7 @@ my @func_long_names = map { "pcap_$_" } @func_short_names;
             compile  compile_nopcap  setfilter  freecode
             offline_filter  setnonblock  getnonblock
             dispatch  next_ex  loop  breakloop
-            datalink  set_datalink  datalink_name_to_val  
+            datalink  set_datalink  datalink_name_to_val
             datalink_val_to_name  datalink_val_to_description
             snapshot  get_selectable_fd
             stats  is_swapped  major_version  minor_version
@@ -112,21 +109,21 @@ my @func_long_names = map { "pcap_$_" } @func_short_names;
             createsrcstr  parsesrcstr
             setbuff  setuserbuffer  setmode  setmintocopy  getevent  sendpacket
             sendqueue_alloc  sendqueue_queue  sendqueue_transmit
-        )], 
+        )],
     );
 
-    @EXPORT = (
-        @{$EXPORT_TAGS{pcap}}, 
-        @{$EXPORT_TAGS{datalink}}, 
+    our @EXPORT = (
+        @{$EXPORT_TAGS{pcap}},
+        @{$EXPORT_TAGS{datalink}},
         @func_long_names,
         "UNSAFE_SIGNALS",
     );
 
-    @EXPORT_OK = (
-        @{$EXPORT_TAGS{functions}}, 
-        @{$EXPORT_TAGS{mode}}, 
-        @{$EXPORT_TAGS{openflag}}, 
-        @{$EXPORT_TAGS{bpf}}, 
+    our @EXPORT_OK = (
+        @{$EXPORT_TAGS{functions}},
+        @{$EXPORT_TAGS{mode}},
+        @{$EXPORT_TAGS{openflag}},
+        @{$EXPORT_TAGS{bpf}},
     );
 
     eval {
@@ -135,7 +132,7 @@ my @func_long_names = map { "pcap_$_" } @func_short_names;
         1
     } or do {
         require DynaLoader;
-        push @ISA, 'DynaLoader';
+        push our @ISA, 'DynaLoader';
         bootstrap Net::Pcap $VERSION;
     };
 }
@@ -145,9 +142,8 @@ sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
     # XS function.
 
-    no strict "vars";
     my $constname;
-    ($constname = $AUTOLOAD) =~ s/.*:://;
+    ($constname = our $AUTOLOAD) =~ s/.*:://;
     return if $constname eq "DESTROY";
     croak "Net::Pcap::constant() not defined" if $constname eq 'constant';
     my ($error, $val) = constant($constname);
@@ -179,7 +175,7 @@ sub findalldevs {
 
     # findalldevs(\$err), legacy from Marco Carnut 0.05
     my %devinfo = ();
-    ( ref $_[0] eq 'SCALAR' and return findalldevs_xs(\%devinfo, $_[0]) ) 
+    ( ref $_[0] eq 'SCALAR' and return findalldevs_xs(\%devinfo, $_[0]) )
         or croak "arg1 not a scalar ref"
         if @_ == 1;
 
@@ -212,7 +208,7 @@ Net::Pcap - Interface to the pcap(3) LBL packet capture library
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =head1 SYNOPSIS
 
@@ -239,13 +235,13 @@ Version 0.20
 =head1 DESCRIPTION
 
 C<Net::Pcap> is a Perl binding to the LBL pcap(3) library and its
-Win32 counterpart, the WinPcap library. Pcap (packet capture) is 
-a portable API to capture network packet: it allows applications 
-to capture packets at link-layer, bypassing the normal protocol 
+Win32 counterpart, the WinPcap library. Pcap (packet capture) is
+a portable API to capture network packet: it allows applications
+to capture packets at link-layer, bypassing the normal protocol
 stack. It also provides features like kernel-level packet filtering
 and access to internal statistics.
 
-Common applications include network statistics collection, 
+Common applications include network statistics collection,
 security monitoring, network debugging, etc.
 
 
@@ -254,7 +250,7 @@ security monitoring, network debugging, etc.
 =head2 Signals handling
 
 Since version 5.7.3, Perl uses a mechanism called "deferred signals"
-to delay signals delivery until "safe" points in the interpreter. 
+to delay signals delivery until "safe" points in the interpreter.
 See L<perlipc/"Deferred Signals (Safe Signals)"> for a detailed
 explanation.
 
@@ -286,20 +282,20 @@ C<UNSAFE_SIGNALS> pseudo-bloc:
 
 =head1 EXPORTS
 
-C<Net::Pcap> supports the following C<Exporter> tags: 
+C<Net::Pcap> supports the following C<Exporter> tags:
 
 =over
 
 =item *
 
-C<:bpf> exports a few BPF related constants: 
+C<:bpf> exports a few BPF related constants:
 
     BPF_ALIGNMENT  BPF_MAJOR_VERSION  BPF_MAXBUFSIZE  BPF_MAXINSNS
     BPF_MEMWORDS  BPF_MINBUFSIZE  BPF_MINOR_VERSION  BPF_RELEASE
 
 =item *
 
-C<:datalink> exports the data link types macros: 
+C<:datalink> exports the data link types macros:
 
     DLT_AIRONET_HEADER  DLT_APPLE_IP_OVER_IEEE1394  DLT_ARCNET
     DLT_ARCNET_LINUX  DLT_ATM_CLIP  DLT_ATM_RFC1483  DLT_AURORA
@@ -321,7 +317,7 @@ C<:datalink> exports the data link types macros:
 
 =item *
 
-C<:pcap> exports the following C<pcap> constants: 
+C<:pcap> exports the following C<pcap> constants:
 
     PCAP_ERRBUF_SIZE    PCAP_IF_LOOPBACK
     PCAP_VERSION_MAJOR  PCAP_VERSION_MINOR
@@ -358,16 +354,16 @@ C<:rpcap> exports the following constants:
 
 =item *
 
-C<:functions> short names of the functions (without the C<"pcap_"> prefix) 
+C<:functions> short names of the functions (without the C<"pcap_"> prefix)
 for those which would not cause a clash with an already defined name.
-Namely, the following functions are not available in short form: 
-C<open()>, C<close()>, C<next()>, C<dump()>, C<file()>, C<fileno()>. 
+Namely, the following functions are not available in short form:
+C<open()>, C<close()>, C<next()>, C<dump()>, C<file()>, C<fileno()>.
 Using these short names is now discouraged, and may be removed in the future.
 
 =back
 
-By default, this module exports the symbols from the C<:datalink> and 
-C<:pcap> tags, and all the functions, with the same names as the C library. 
+By default, this module exports the symbols from the C<:datalink> and
+C<:pcap> tags, and all the functions, with the same names as the C library.
 
 
 =head1 FUNCTIONS
@@ -387,7 +383,7 @@ compatibility with previous versions of C<Net::Pcap>.
 =item B<pcap_lookupdev(\$err)>
 
 Returns the name of a network device that can be used with
-C<pcap_open_live()> function.  On error, the C<$err> parameter 
+C<pcap_open_live()> function.  On error, the C<$err> parameter
 is filled with an appropriate error message else it is undefined.
 
 B<Example>
@@ -398,7 +394,7 @@ B<Example>
 =item B<pcap_findalldevs(\%devinfo, \$err)>
 
 Returns a list of all network device names that can be used with
-C<pcap_open_live()> function.  On error, the C<$err> parameter 
+C<pcap_open_live()> function.  On error, the C<$err> parameter
 is filled with an appropriate error message else it is undefined.
 
 B<Example>
@@ -410,22 +406,22 @@ B<Example>
 
 =over
 
-=item B<Note> 
+=item B<Note>
 
-For backward compatibility reasons, this function can also 
-be called using the following signatures: 
+For backward compatibility reasons, this function can also
+be called using the following signatures:
 
     @devs = pcap_findalldevs(\$err);
 
     @devs = pcap_findalldevs(\$err, \%devinfo);
 
-The first form was introduced by Marco Carnut in C<Net::Pcap> version 0.05 
-and kept intact in versions 0.06 and 0.07. 
-The second form was introduced by Jean-Louis Morel for the Windows only, 
-ActivePerl port of C<Net::Pcap>, in versions 0.04.01 and 0.04.02. 
+The first form was introduced by Marco Carnut in C<Net::Pcap> version 0.05
+and kept intact in versions 0.06 and 0.07.
+The second form was introduced by Jean-Louis Morel for the Windows only,
+ActivePerl port of C<Net::Pcap>, in versions 0.04.01 and 0.04.02.
 
-The new syntax has been introduced for consistency with the rest of the Perl 
-API and the C API of C<libpcap(3)>, where C<$err> is always the last argument. 
+The new syntax has been introduced for consistency with the rest of the Perl
+API and the C API of C<libpcap(3)>, where C<$err> is always the last argument.
 
 =back
 
@@ -450,8 +446,8 @@ network.  The C<$dev> parameter specifies which network interface to
 capture packets from.  The C<$snaplen> and C<$promisc> parameters specify
 the maximum number of bytes to capture from each packet, and whether
 to put the interface into promiscuous mode, respectively.  The C<$to_ms>
-parameter specifies a read timeout in milliseconds.  The packet descriptor 
-will be undefined if an error occurs, and the C<$err> parameter will be 
+parameter specifies a read timeout in milliseconds.  The packet descriptor
+will be undefined if an error occurs, and the C<$err> parameter will be
 set with an appropriate error message.
 
 B<Example>
@@ -463,9 +459,9 @@ B<Example>
 
 =item B<pcap_open_dead($linktype, $snaplen)>
 
-Creates and returns a new packet descriptor to use when calling the other 
-functions in C<libpcap>. It is typically used when just using C<libpcap> 
-for compiling BPF code. 
+Creates and returns a new packet descriptor to use when calling the other
+functions in C<libpcap>. It is typically used when just using C<libpcap>
+for compiling BPF code.
 
 B<Example>
 
@@ -488,11 +484,11 @@ B<Example>
 =item B<pcap_loop($pcap, $count, \&callback, $user_data)>
 
 Read C<$count> packets from the packet capture descriptor C<$pcap> and call
-the perl function C<&callback> with an argument of C<$user_data>.  
-If C<$count> is negative, then the function loops forever or until an error 
-occurs. Returns 0 if C<$count> is exhausted, -1 on error, and -2 if the 
-loop terminated due to a call to pcap_breakloop() before any packets were 
-processed. 
+the perl function C<&callback> with an argument of C<$user_data>.
+If C<$count> is negative, then the function loops forever or until an error
+occurs. Returns 0 if C<$count> is exhausted, -1 on error, and -2 if the
+loop terminated due to a call to pcap_breakloop() before any packets were
+processed.
 
 The callback function is also passed packet header information and
 packet data like so:
@@ -508,13 +504,13 @@ following fields.
 
 =over
 
-=item * 
+=item *
 
 C<len> - the total length of the packet.
 
-=item * 
+=item *
 
-C<caplen> - the actual captured length of the packet data.  This corresponds 
+C<caplen> - the actual captured length of the packet data.  This corresponds
 to the snapshot length parameter passed to C<open_live()>.
 
 =item *
@@ -539,16 +535,16 @@ B<Example>
 
 =item B<pcap_breakloop($pcap)>
 
-Sets a flag  that will force C<pcap_dispatch()> or C<pcap_loop()> 
-to return rather than looping; they will return the number of packets that 
-have been processed so far, or -2 if no packets have been processed so far. 
+Sets a flag  that will force C<pcap_dispatch()> or C<pcap_loop()>
+to return rather than looping; they will return the number of packets that
+have been processed so far, or -2 if no packets have been processed so far.
 
-This routine is safe to use inside a signal handler on UNIX or a console 
-control handler on Windows, as it merely sets a flag that is checked within 
-the loop. 
+This routine is safe to use inside a signal handler on UNIX or a console
+control handler on Windows, as it merely sets a flag that is checked within
+the loop.
 
-Please see the section on C<pcap_breakloop()> in L<pcap(3)> for more 
-information. 
+Please see the section on C<pcap_breakloop()> in L<pcap(3)> for more
+information.
 
 
 =item B<pcap_close($pcap)>
@@ -560,7 +556,7 @@ Close the packet capture device associated with the descriptor C<$pcap>.
 
 Collect C<$count> packets and process them with callback function
 C<&callback>.  if C<$count> is -1, all packets currently buffered are
-processed.  If C<$count> is 0, process all packets until an error occurs. 
+processed.  If C<$count> is 0, process all packets until an error occurs.
 
 
 =item B<pcap_next($pcap, \%header)>
@@ -573,19 +569,19 @@ header is undefined.
 
 =item B<pcap_next_ex($pcap, \%header, \$packet)>
 
-Reads the next available packet on the interface associated with packet 
-descriptor C<$pcap>, stores its header in C<\%header> and its data in 
-C<\$packet> and returns a success/failure indication: 
+Reads the next available packet on the interface associated with packet
+descriptor C<$pcap>, stores its header in C<\%header> and its data in
+C<\$packet> and returns a success/failure indication:
 
 =over
 
 =item *
 
-C<1> means that the packet was read without problems; 
+C<1> means that the packet was read without problems;
 
 =item *
 
-C<0> means that packets are being read from a live capture, and the 
+C<0> means that packets are being read from a live capture, and the
 timeout expired;
 
 =item *
@@ -594,7 +590,7 @@ C<-1> means that an error occurred while reading the packet;
 
 =item *
 
-C<-2> packets are being read from a dump file, and there are no more 
+C<-2> packets are being read from a dump file, and there are no more
 packets to read from the savefile.
 
 =back
@@ -605,17 +601,17 @@ packets to read from the savefile.
 Compile the filter string contained in C<$filter_str> and store it in
 C<$filter>.  A description of the filter language can be found in the
 libpcap source code, or the manual page for tcpdump(8) .  The filter
-is optimized if the C<$optimize> variable is true.  The netmask of the 
-network device must be specified in the C<$netmask> parameter.  The 
-function returns 0 if the compilation was successful, or -1 if there 
+is optimized if the C<$optimize> variable is true.  The netmask of the
+network device must be specified in the C<$netmask> parameter.  The
+function returns 0 if the compilation was successful, or -1 if there
 was a problem.
 
 
 =item B<pcap_compile_nopcap($snaplen, $linktype, \$filter, $filter_str, $optimize, $netmask)>
 
-Similar to C<compile()> except that instead of passing a C<$pcap> descriptor, 
-one passes C<$snaplen> and C<$linktype> directly. Returns -1 if there was an 
-error, but the error message is not available. 
+Similar to C<compile()> except that instead of passing a C<$pcap> descriptor,
+one passes C<$snaplen> and C<$linktype> directly. Returns -1 if there was an
+error, but the error message is not available.
 
 
 =item B<pcap_setfilter($pcap, $filter)>
@@ -626,8 +622,8 @@ capture descriptor C<$pcap>.
 
 =item B<pcap_freecode($filter)>
 
-Used to free the allocated memory used by a compiled filter, as created 
-by C<pcap_compile()>. 
+Used to free the allocated memory used by a compiled filter, as created
+by C<pcap_compile()>.
 
 
 =item B<pcap_offline_filter($filter, \%header, $packet)>
@@ -638,22 +634,22 @@ and packet data C<$packet>. Returns true if the packet matches.
 
 =item B<pcap_setnonblock($pcap, $mode, \$err)>
 
-Set the I<non-blocking> mode of a live capture descriptor, depending on the 
-value of C<$mode> (zero to activate and non-zero to deactivate). It has no 
-effect on offline descriptors. If there is an error, it returns -1 and sets 
-C<$err>. 
+Set the I<non-blocking> mode of a live capture descriptor, depending on the
+value of C<$mode> (zero to activate and non-zero to deactivate). It has no
+effect on offline descriptors. If there is an error, it returns -1 and sets
+C<$err>.
 
-In non-blocking mode, an attempt to read from the capture descriptor with 
-C<pcap_dispatch()> will, if no packets are currently available to be read, 
-return 0  immediately rather than blocking waiting for packets to arrive. 
-C<pcap_loop()> and C<pcap_next()> will not work in non-blocking mode. 
+In non-blocking mode, an attempt to read from the capture descriptor with
+C<pcap_dispatch()> will, if no packets are currently available to be read,
+return 0  immediately rather than blocking waiting for packets to arrive.
+C<pcap_loop()> and C<pcap_next()> will not work in non-blocking mode.
 
 
 =item B<pcap_getnonblock($pcap, \$err)>
 
-Returns the I<non-blocking> state of the capture descriptor C<$pcap>. 
-Always returns 0 on savefiles. If there is an error, it returns -1 and 
-sets C<$err>. 
+Returns the I<non-blocking> state of the capture descriptor C<$pcap>.
+Always returns 0 on savefiles. If there is an error, it returns -1 and
+sets C<$err>.
 
 =back
 
@@ -671,7 +667,7 @@ retrieve the error text.
 
 =item B<pcap_dump($dumper, \%header, $packet)>
 
-Dump the packet described by header C<%header> and packet data C<$packet> 
+Dump the packet described by header C<%header> and packet data C<$packet>
 to the savefile associated with C<$dumper>.  The packet header has the
 same format as that passed to the C<pcap_loop()> callback.
 
@@ -699,8 +695,8 @@ C<pcap_dump_open()>.
 
 =item B<pcap_dump_flush($dumper)>
 
-Flushes the output buffer to the corresponding save file, so that any 
-packets written with C<pcap_dump()> but not yet written to the save 
+Flushes the output buffer to the corresponding save file, so that any
+packets written with C<pcap_dump()> but not yet written to the save
 file will be written. Returns -1 on error, 0 on success.
 
 
@@ -726,15 +722,15 @@ B<Example>
 
 =item B<pcap_set_datalink($pcap, $linktype)>
 
-Sets the data link type of the given pcap descriptor to the type specified 
-by C<$linktype>. Returns -1 on failure. 
+Sets the data link type of the given pcap descriptor to the type specified
+by C<$linktype>. Returns -1 on failure.
 
 
 =item B<pcap_datalink_name_to_val($name)>
 
-Translates a data link type name, which is a C<DLT_> name with the C<DLT_> 
-part removed, to the corresponding data link type value. The translation is 
-case-insensitive. Returns -1 on failure. 
+Translates a data link type name, which is a C<DLT_> name with the C<DLT_>
+part removed, to the corresponding data link type value. The translation is
+case-insensitive. Returns -1 on failure.
 
 B<Example>
 
@@ -743,7 +739,7 @@ B<Example>
 
 =item B<pcap_datalink_val_to_name($linktype)>
 
-Translates a data link type value to the corresponding data link type name. 
+Translates a data link type value to the corresponding data link type name.
 
 B<Example>
 
@@ -788,8 +784,8 @@ currently open savefile.
 Returns a hash containing information about the status of packet
 capture device C<$pcap>.  The hash contains the following fields.
 
-This function is supported only on live captures, not on savefiles; 
-no statistics are stored in savefiles, so no statistics are available 
+This function is supported only on live captures, not on savefiles;
+no statistics are stored in savefiles, so no statistics are available
 when reading from a savefile.
 
 =over
@@ -812,7 +808,7 @@ C<ps_ifdrop> - the number of packets dropped by the network interface.
 =item B<pcap_file($pcap)>
 
 Returns the filehandle associated with a savefile opened with
-C<pcap_open_offline()> or C<undef> if the device was opened 
+C<pcap_open_offline()> or C<undef> if the device was opened
 with C<pcap_open_live()>.
 
 
@@ -823,12 +819,12 @@ Returns the file number of the network device opened with C<pcap_open_live()>.
 
 =item B<pcap_get_selectable_fd($pcap)>
 
-Returns, on Unix, a file descriptor number for a file descriptor on which 
-one can do a C<select()> or C<poll()> to wait for it to be possible to read 
-packets without blocking, if such a descriptor exists, or -1, if no such 
-descriptor exists. Some network devices opened with C<pcap_open_live()> 
+Returns, on Unix, a file descriptor number for a file descriptor on which
+one can do a C<select()> or C<poll()> to wait for it to be possible to read
+packets without blocking, if such a descriptor exists, or -1, if no such
+descriptor exists. Some network devices opened with C<pcap_open_live()>
 do not support C<select()> or C<poll()>, so -1 is returned for those devices.
-See L<pcap(3)> for more details. 
+See L<pcap(3)> for more details.
 
 =back
 
@@ -860,8 +856,8 @@ standard error, prefixed by C<$prefix>.
 
 =item B<pcap_lib_version()>
 
-Returns the name and version of the C<pcap> library the module was linked 
-against. 
+Returns the name and version of the C<pcap> library the module was linked
+against.
 
 =back
 
@@ -898,46 +894,46 @@ B<Example:>
 
 =head2 WinPcap specific functions
 
-The following functions are only available with WinPcap, the Win32 port 
-of the Pcap library.  If a called function is not available, it will cleanly 
-C<croak()>. 
+The following functions are only available with WinPcap, the Win32 port
+of the Pcap library.  If a called function is not available, it will cleanly
+C<croak()>.
 
 =over
 
 =item B<pcap_createsrcstr(\$source, $type, $host, $port, $name, \$err)>
 
-Accepts a set of strings (host name, port, ...), and stores the complete 
-source string according to the new format (e.g. C<"rpcap://1.2.3.4/eth0">) 
+Accepts a set of strings (host name, port, ...), and stores the complete
+source string according to the new format (e.g. C<"rpcap://1.2.3.4/eth0">)
 in C<$source>.
 
-This function is provided in order to help the user creating the source 
-string according to the new format. An unique source string is used in 
-order to make easy for old applications to use the remote facilities. 
-Think about B<tcpdump(1)>, for example, which has only one way to specify 
-the interface on which the capture has to be started. However, GUI-based 
-programs can find more useful to specify hostname, port and interface name 
-separately. In that case, they can use this function to create the source 
+This function is provided in order to help the user creating the source
+string according to the new format. An unique source string is used in
+order to make easy for old applications to use the remote facilities.
+Think about B<tcpdump(1)>, for example, which has only one way to specify
+the interface on which the capture has to be started. However, GUI-based
+programs can find more useful to specify hostname, port and interface name
+separately. In that case, they can use this function to create the source
 string before passing it to the C<pcap_open()> function.
 
-Returns 0 if everything is fine, -1 if some errors occurred. The string 
+Returns 0 if everything is fine, -1 if some errors occurred. The string
 containing the complete source is returned in the C<$source> variable.
 
 
 =item B<pcap_parsesrcstr($source, \$type, \$host, \$port, \$name, \$err)>
 
-Parse the source string and stores the pieces in which the source can be split 
+Parse the source string and stores the pieces in which the source can be split
 in the corresponding variables.
 
-This call is the other way round of C<pcap_createsrcstr()>. It accepts a 
-null-terminated string and it returns the parameters related to the source. 
+This call is the other way round of C<pcap_createsrcstr()>. It accepts a
+null-terminated string and it returns the parameters related to the source.
 This includes:
 
 =over
 
 =item *
 
-the type of the source (file, WinPcap on a remote adapter, WinPcap on local 
-adapter), which is determined by the source prefix (C<PCAP_SRC_IF_STRING> 
+the type of the source (file, WinPcap on a remote adapter, WinPcap on local
+adapter), which is determined by the source prefix (C<PCAP_SRC_IF_STRING>
 and so on);
 
 =item *
@@ -946,17 +942,17 @@ the host on which the capture has to be started (only for remote captures);
 
 =item *
 
-the raw name of the source (file name, name of the remote adapter, name of 
-the local adapter), without the source prefix. The string returned does not 
-include the type of the source itself (i.e. the string returned does not 
+the raw name of the source (file name, name of the remote adapter, name of
+the local adapter), without the source prefix. The string returned does not
+include the type of the source itself (i.e. the string returned does not
 include C<"file://"> or C<"rpcap://"> or such).
 
 =back
 
 The user can omit some parameters in case it is not interested in them.
 
-Returns 0 if everything is fine, -1 if some errors occurred. The requested 
-values (host name, network port, type of the source) are returned into the 
+Returns 0 if everything is fine, -1 if some errors occurred. The requested
+values (host name, network port, type of the source) are returned into the
 proper variables passed by reference.
 
 
@@ -964,18 +960,18 @@ proper variables passed by reference.
 
 Open a generic source in order to capture / send (WinPcap only) traffic.
 
-The C<pcap_open()> replaces all the C<pcap_open_xxx()> functions with a single 
+The C<pcap_open()> replaces all the C<pcap_open_xxx()> functions with a single
 call.
 
-This function hides the differences between the different C<pcap_open_xxx()> 
-functions so that the programmer does not have to manage different opening 
-function. In this way, the I<true> C<open()> function is decided according 
-to the source type, which is included into the source string (in the form of 
+This function hides the differences between the different C<pcap_open_xxx()>
+functions so that the programmer does not have to manage different opening
+function. In this way, the I<true> C<open()> function is decided according
+to the source type, which is included into the source string (in the form of
 source prefix).
 
-Returns a pointer to a pcap descriptor which can be used as a parameter to 
-the following calls (C<compile()> and so on) and that specifies an opened 
-WinPcap session. In case of problems, it returns C<undef> and the C<$err> 
+Returns a pointer to a pcap descriptor which can be used as a parameter to
+the following calls (C<compile()> and so on) and that specifies an opened
+WinPcap session. In case of problems, it returns C<undef> and the C<$err>
 variable keeps the error message.
 
 
@@ -1005,8 +1001,8 @@ from the application to return (unless the timeout expires).
 
 =item B<pcap_getevent($pcap)>
 
-Returns the C<Win32::Event> object associated with the interface 
-C<$pcap>. Can be used to wait until the driver's buffer contains some 
+Returns the C<Win32::Event> object associated with the interface
+C<$pcap>. Can be used to wait until the driver's buffer contains some
 data without performing a read. See L<Win32::Event>.
 
 
@@ -1022,19 +1018,19 @@ interface driver. The return value is 0 if the packet is successfully sent,
 
 =item B<pcap_sendqueue_alloc($memsize)>
 
-This function allocates and returns a send queue, i.e. a buffer containing 
-a set of raw packets that will be transmitted on the network with 
+This function allocates and returns a send queue, i.e. a buffer containing
+a set of raw packets that will be transmitted on the network with
 C<sendqueue_transmit()>.
 
-C<$memsize> is the size, in bytes, of the queue, therefore it determines 
-the maximum amount of data that the queue will contain. This memory is 
+C<$memsize> is the size, in bytes, of the queue, therefore it determines
+the maximum amount of data that the queue will contain. This memory is
 automatically deallocated when the queue ceases to exist.
 
 
 =item B<pcap_sendqueue_queue($queue, \%header, $packet)>
 
 Adds a packet at the end of the send queue pointed by C<$queue>. The packet
-header C<%header> has the same format as that passed to the C<loop()> 
+header C<%header> has the same format as that passed to the C<loop()>
 callback. C<$ackekt> is a buffer with the data of the packet.
 
 The C<%headerr> header structure is the same used by WinPcap and libpcap to
@@ -1064,12 +1060,12 @@ queue.
 
 =head1 CONSTANTS
 
-C<Net::Pcap> exports by default the names of several constants in order to 
-ease the development of programs. See L</"EXPORTS"> for details about which 
-constants are exported. 
+C<Net::Pcap> exports by default the names of several constants in order to
+ease the development of programs. See L</"EXPORTS"> for details about which
+constants are exported.
 
-Here are the descriptions of a few data link types. See L<pcap(3)> for a more 
-complete description and semantics associated with each data link. 
+Here are the descriptions of a few data link types. See L<pcap(3)> for a more
+complete description and semantics associated with each data link.
 
 =over
 
@@ -1150,7 +1146,7 @@ C<DLT_APPLE_IP_OVER_IEEE1394> - Apple IP-over-IEEE 1394 (a.k.a. Firewire)
 
 =item C<arg%d not a reference>
 
-B<(F)> These errors occur if you forgot to give a reference to a function 
+B<(F)> These errors occur if you forgot to give a reference to a function
 which expect one or more of its arguments to be references.
 
 =back
@@ -1163,7 +1159,7 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Net-Pcap>.
 I will be notified, and then you'll automatically be notified
 of progress on your bug as I make changes.
 
-Currently known bugs: 
+Currently known bugs:
 
 =over
 
@@ -1173,20 +1169,20 @@ the C<ps_recv> field is not correctly set; see F<t/07-stats.t>
 
 =item *
 
-C<pcap_file()> seems to always returns C<undef> for live 
-connection and causes segmentation fault for dump files; 
+C<pcap_file()> seems to always returns C<undef> for live
+connection and causes segmentation fault for dump files;
 see F<t/10-fileno.t>
 
 =item *
 
-C<pcap_fileno()> is documented to return -1 when called 
-on save file, but seems to always return an actual file number. 
+C<pcap_fileno()> is documented to return -1 when called
+on save file, but seems to always return an actual file number.
 See F<t/10-fileno.t>
 
 
 =item *
 
-C<pcap_dump_file()> seems to corrupt something somewhere, 
+C<pcap_dump_file()> seems to corrupt something somewhere,
 and makes scripts dump core. See F<t/05-dump.t>
 
 =back
@@ -1194,7 +1190,7 @@ and makes scripts dump core. See F<t/05-dump.t>
 
 =head1 EXAMPLES
 
-See the F<eg/> and F<t/> directories of the C<Net::Pcap> distribution 
+See the F<eg/> and F<t/> directories of the C<Net::Pcap> distribution
 for examples on using this module.
 
 
@@ -1220,15 +1216,15 @@ and L<NetPacket>.
 
 L<pcap(3)>, L<tcpdump(8)>
 
-The source code for the C<pcap(3)> library is available from 
+The source code for the C<pcap(3)> library is available from
 L<http://www.tcpdump.org/>
 
-The source code and binary for the Win32 version of the pcap library, 
+The source code and binary for the Win32 version of the pcap library,
 WinPcap, is available from L<http://www.winpcap.org/>
 
 =head2 Articles
 
-I<Hacking Linux Exposed: Sniffing with Net::Pcap to stealthily managing iptables 
+I<Hacking Linux Exposed: Sniffing with Net::Pcap to stealthily managing iptables
 rules remotely>, L<http://www.hackinglinuxexposed.com/articles/20030730.html>
 
 I<PerlMonks node about Net::Pcap>, L<http://perlmonks.org/?node_id=170648>
@@ -1310,17 +1306,17 @@ David Morel, Scott Lanning, Rafael Garcia-Suarez, Karl Y. Pradene.
 =head1 COPYRIGHT & LICENSE
 
 Copyright (C) 2005-2016 Sébastien Aperghis-Tramoni and contributors.
-All rights reserved. 
+All rights reserved.
 
-Copyright (C) 2003 Marco Carnut. All rights reserved. 
+Copyright (C) 2003 Marco Carnut. All rights reserved.
 
-Copyright (C) 1999, 2000 Tim Potter. All rights reserved. 
+Copyright (C) 1999, 2000 Tim Potter. All rights reserved.
 
-Copyright (C) 1998 Bo Adler. All rights reserved. 
+Copyright (C) 1998 Bo Adler. All rights reserved.
 
-Copyright (C) 1997 Peter Lister. All rights reserved. 
+Copyright (C) 1997 Peter Lister. All rights reserved.
 
-This program is free software; you can redistribute it and/or modify 
+This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut

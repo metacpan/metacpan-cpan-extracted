@@ -1,0 +1,16 @@
+#!perl
+
+use strict;
+use warnings;
+
+use Carp qw( croak );
+use Story::Interact ();
+use Story::Interact::Analyze ();
+
+my $story = shift
+	or croak( 'Usage: story-interact-analyze [STORY]' );
+
+my $src = Story::Interact->new_page_source( $story );
+
+my $report = Story::Interact::Analyze->new( page_source => $src );
+print $report->to_tabbed();

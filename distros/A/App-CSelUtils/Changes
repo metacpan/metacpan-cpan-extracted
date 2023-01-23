@@ -1,3 +1,8 @@
+0.089   2022-10-17  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add -e as alias for --eval (--action eval:E).
+
+
 0.088   2021-06-27  Released-By: PERLANCAR; Urgency: medium
 
 	- Update prereq (renamed module Tree::{To,To::}TextLines).

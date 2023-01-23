@@ -19,7 +19,7 @@ name: Excel-ValueWriter-XLSX
 provides:
   Excel::ValueWriter::XLSX:
     file: lib/Excel/ValueWriter/XLSX.pm
-    version: '1.00'
+    version: '1.01'
 requires:
   Archive::Zip: '0'
   Carp: '0'
@@ -33,5 +33,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/Excel-ValueWriter-XLSX
-version: '1.00'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

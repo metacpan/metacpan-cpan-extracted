@@ -3,12 +3,15 @@ lib/Test/Needs.pm
 maint/Makefile.PL.include
 Makefile.PL
 MANIFEST			This list of files
-t/basic.t
 t/find_missing.t
 t/lib/BrokenModule.pm
 t/lib/ModuleWithVersion.pm
+t/lib/TestAPI.pm
 t/lib/TestScript.pm
 t/numify_version.t
+t/standalone.t
+t/test-builder.t
+t/test2.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 README                                   README file (added by Distar)

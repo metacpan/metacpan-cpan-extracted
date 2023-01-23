@@ -17,10 +17,15 @@ my $build = Module::Build->new
                  'Params::Validate' => 0,
                  'Tie::File' => 0,
                },
-   build_requires => { 'Test::More' => 0 },
+   test_requires => { 'Test::More' => 0 },
    license => 'perl',
    create_readme => 1,
    create_makefile_pl => 'traditional',
+   meta_merge => {
+       resources => {
+           repository => 'https://github.com/stsc/Config-Inetd',
+       },
+   },
   );
 
 $build->create_build_script;

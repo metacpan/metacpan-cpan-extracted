@@ -26,6 +26,8 @@ if ($OSname eq 'MSWin32') {
     # Unix/Linux systems assumed. is this a standard location everyone has?
     push @pfb_list, '/usr/share/fonts/type1/gsfonts/a010013l.pfb';
     push @pfm_list, '/usr/share/fonts/type1/gsfonts/a010013l.pfm';
+    push @pfb_list, '/usr/share/X11/fonts/urw-fonts/a010013l.pfb';
+    push @pfm_list, '/usr/share/X11/fonts/urw-fonts/a010013l.pfm';
 }
 
 # This may or may not work on Macs ("darwin" string) and other platforms

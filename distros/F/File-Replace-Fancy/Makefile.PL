@@ -5,7 +5,7 @@ WriteMakefile(
 	NAME           => 'File::Replace::Fancy',
 	AUTHOR         => 'Hauke D <haukex@zero-g.net>',
 	LICENSE        => 'gpl_3',
-	VERSION        => '0.16',
+	VERSION        => '0.18',
 	ABSTRACT_FROM  => 'lib/File/Replace/Fancy.pm',
 	MIN_PERL_VERSION => '5.8.1',
 	META_MERGE     => {
@@ -13,7 +13,7 @@ WriteMakefile(
 		provides     => {
 			'File::Replace::Fancy' => {
 				file    => 'lib/File/Replace/Fancy.pm',
-				version => '0.16',
+				version => '0.18',
 			},
 		},
 		no_index     => {
@@ -48,8 +48,8 @@ WriteMakefile(
 	},
 	PREREQ_PM      => {
 		# CPAN
-		'Tie::Handle::Base'      => '0.16',
-		'File::Replace'          => '0.16',
+		'Tie::Handle::Base'      => '0.18',
+		'File::Replace'          => '0.18',
 		# Perl core modules
 		'Carp'                   => 0,
 		'warnings::register'     => 0,

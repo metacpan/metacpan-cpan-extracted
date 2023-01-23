@@ -1,7 +1,7 @@
 use strict; use warnings;
 
 package SQL::PatchDAG;
-our $VERSION = '0.103';
+our $VERSION = '0.110';
 
 use File::Spec ();
 use Fcntl ();
@@ -30,8 +30,8 @@ sub open :method {
 	die "Bad patch name '$name'\n" if $name !~ /\A[a-z0-9_][a-z0-9_-]*\z/;
 	my $fn = File::Spec->catfile( $self->dir, "$name.sql" );
 	my $mode = $do_rw ? Fcntl::O_RDWR() | Fcntl::O_CREAT() : Fcntl::O_RDONLY();
-	sysopen my $fh, $fn, $mode  or die "Couldn't open '$fn': $!\n";
-	binmode $fh, $self->binmode or die "Couldn't binmode '$fn': $!\n";
+	my $fh; eval q{ use open IO => $self->binmode; sysopen $fh, $fn, $mode }
+		or die "Couldn't open '$fn': $!\n";
 	( $fn, $fh );
 }
 
@@ -333,7 +333,7 @@ Aristotle Pagaltzis <pagaltzis@gmx.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Aristotle Pagaltzis.
+This software is copyright (c) 2023 by Aristotle Pagaltzis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

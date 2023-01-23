@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013-2021 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2013-2023 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -132,12 +132,12 @@ use Exporter "import";
 
 our @EXPORT = qw(
     cons cons_ is_pair null is_null is_pair_of is_pair_or_null
-    list_of  is_null_or_pair_of null_or_pair_of is_list
+    list_of nonempty_list_of is_null_or_pair_of null_or_pair_of is_list
     car cdr first rest
     car_and_cdr first_and_rest perhaps_first_and_rest
     list);
 our @EXPORT_OK = qw(
-    pair improper_list
+    pair improper_list improper_map improper_filtermap improper_last
     first_set first_update
     is_pair_noforce is_null_noforce
     unsafe_cons unsafe_car unsafe_cdr
@@ -147,7 +147,7 @@ our @EXPORT_OK = qw(
     write_sexpr
     array_to_list array_to_list_reverse mixed_flatten
     list_strings_join list_strings_join_reverse
-    list_filter list_map list_mapn list_map_with_islast
+    list_filter list_map list_filtermap list_mapn list_map_with_islast
     list_map_with_index_ list_map_with_index
     list_fold list_fold_right list_to_perlstring
     unfold unfold_right
@@ -162,6 +162,9 @@ our @EXPORT_OK = qw(
     list_perhaps_find_tail list_perhaps_find
     list_find_tail list_find
     list_insertion_variants
+    list_merge
+    cartesian_product_2
+    cartesian_product
     is_charlist ldie
     cddr
     cdddr
@@ -199,6 +202,7 @@ use FP::Weak qw(Weakened);
 use FP::Interfaces;
 use Carp;
 use FP::Carp;
+use FP::Docstring;
 
 our $immutable = 1;    # whether pairs are to be made immutable
 
@@ -981,6 +985,19 @@ TEST { list_of(\&is_natural)->(list 1,  2, 3) } 1;
 TEST { list_of(\&is_natural)->(list -1, 2, 3) } 0;
 TEST { list_of(\&is_natural)->(list 1,  2, " 3") } 0;
 TEST { list_of(\&is_natural)->(1) } 0;
+TEST { list_of(\&is_natural)->(list()) } 1;
+
+sub nonempty_list_of {
+    @_ == 1 or fp_croak_arity 1;
+    my ($p) = @_;
+    is_pair_of($p, delayed { list_of($p) })
+}
+
+TEST { nonempty_list_of(\&is_natural)->(list 1,  2, 3) } 1;
+TEST { nonempty_list_of(\&is_natural)->(list -1, 2, 3) } 0;
+TEST { nonempty_list_of(\&is_natural)->(list 1,  2, " 3") } 0;
+TEST { nonempty_list_of(\&is_natural)->(1) } undef;      # XX vs. above
+TEST { nonempty_list_of(\&is_natural)->(list()) } '';    # vs. 0 ?
 
 sub make_length {
     my ($is_stream) = @_;
@@ -1435,6 +1452,143 @@ sub list_map_with_tail {
 
 *FP::List::List::map_with_tail = flip2of3 \&list_map_with_tail;
 
+sub improper_last {
+    @_ == 1 or fp_croak_arity "1";
+    my ($l) = @_;
+    while (is_pair($l)) {
+        $l = cdr($l);
+    }
+    $l
+}
+
+*FP::List::List::improper_last = \&improper_last;
+
+sub improper_map {
+    @_ == 2 or @_ == 3 or fp_croak_arity "2-3";
+    my ($fn, $l, $maybe_tail) = @_;
+    FORCE $l;    # be careful as usual, right?
+    if (is_null($l)) {
+        $maybe_tail // $l
+    } elsif (is_pair($l)) {
+        cons($fn->(car $l), improper_map($fn, cdr($l), $maybe_tail))
+    } else {
+        $fn->($l)
+    }
+}
+
+sub FP::List::List::improper_map {
+    @_ == 2 or @_ == 3 or fp_croak_arity "2-3";
+    my ($l, $fn, $maybe_tail) = @_;
+    @_ = ($fn, $l, $maybe_tail);
+    goto \&improper_map
+}
+
+TEST_STDOUT {
+    write_sexpr cons(1, cons(2, 3))->improper_map(sub { $_[0] * 2 })
+}
+'("2" "4" . "6")';
+
+sub improper_filtermap {
+    __ 'improper_filtermap($fn, $l, $maybe_tail):
+        If $fn returns (), the position is discarded in the resulting
+        sequence. $fn cannot return multiple values, though.';
+    @_ == 2 or @_ == 3 or fp_croak_arity "2-3";
+    my ($fn, $l, $maybe_tail) = @_;
+    FORCE $l;    # be careful as usual, right?
+    if (is_null($l)) {
+        $maybe_tail // $l
+    } elsif (is_pair($l)) {
+        my @v = $fn->(car $l);
+        my $r = improper_filtermap($fn, cdr($l), $maybe_tail);
+        if (@v == 1) {
+            cons($v[0], $r)
+        } elsif (!@v) {
+            $r
+        } else {
+            die "not supporting multiple value returns from \$fn";
+        }
+    } else {
+        my @v = $fn->($l);
+        if (@v == 1) {
+            $v[0]
+        } elsif (!@v) {
+
+            # Converting a possibly single input item into an empty
+            # list. (Only if improper_filtermap were itself perhaps_*,
+            # we could handle this case otherwise. Perl list context
+            # is magic?)
+            $maybe_tail // null
+        } else {
+            die "not supporting multiple value returns from \$fn";
+        }
+    }
+}
+
+sub FP::List::List::improper_filtermap {
+    @_ == 2 or @_ == 3 or fp_croak_arity "2-3";
+    my ($l, $fn, $maybe_tail) = @_;
+    @_ = ($fn, $l, $maybe_tail);
+    goto \&improper_filtermap
+}
+
+TEST_STDOUT {
+    write_sexpr cons(1, cons(2, cons(3, 4)))
+        ->improper_filtermap(sub { $_[0] * 2 })
+}
+'("2" "4" "6" . "8")';
+
+TEST_STDOUT {
+    write_sexpr cons(1, cons(2, cons(3, 4)))->improper_filtermap(
+        sub {
+            my $v = $_[0] * 2;
+            $v == 6 ? () : $v
+        }
+    )
+}
+'("2" "4" . "8")';
+
+TEST_STDOUT {
+    write_sexpr cons(1, cons(2, cons(3, 4)))->improper_filtermap(
+        sub {
+            my $v = $_[0] * 2;
+            $v == 8 ? () : $v
+        }
+    )
+}
+'("2" "4" "6")';
+
+# mostly COPY-PASTE from improper_filtermap
+sub list_filtermap {
+    __ 'list_filtermap($fn, $l, $maybe_tail):
+        If $fn returns (), the position is discarded in the resulting
+        sequence. $fn cannot return multiple values, though.';
+    @_ == 2 or @_ == 3 or fp_croak_arity "2-3";
+    my ($fn, $l, $maybe_tail) = @_;
+    FORCE $l;    # be careful as usual, right?
+    if (is_null($l)) {
+        $maybe_tail // $l
+    } elsif (is_pair($l)) {
+        my @v = $fn->(car $l);
+        my $r = improper_filtermap($fn, cdr($l), $maybe_tail);
+        if (@v == 1) {
+            cons($v[0], $r)
+        } elsif (!@v) {
+            $r
+        } else {
+            die "not supporting multiple value returns from \$fn";
+        }
+    } else {
+        die "improper list"
+    }
+}
+
+sub FP::List::List::filtermap {
+    @_ == 2 or @_ == 3 or fp_croak_arity "2-3";
+    my ($l, $fn, $maybe_tail) = @_;
+    @_ = ($fn, $l, $maybe_tail);
+    goto \&list_filtermap
+}
+
 sub list_zip2 {
     @_ == 2 or fp_croak_arity 2;
     my ($l, $m) = @_;
@@ -1473,6 +1627,7 @@ sub make_filter {
         my ($fn, $l) = @_;
         weaken $_[1] if $is_stream;
         lazy_if {
+            no warnings 'recursion';    # XXX this should be tail calling???
             $l = force $l;
             is_null($l) ? $l : do {
                 my ($a, $r) = $l->first_and_rest;
@@ -1938,9 +2093,12 @@ sub list_every {
     my ($pred, $l) = @_;
 LP: {
         if (is_pair $l) {
-            (&$pred(car $l)) and do {
+            my $r = &$pred(car $l);
+            if ($r) {
                 $l = cdr $l;
                 redo LP;
+            } else {
+                $r
             }
         } elsif (is_null $l) {
             1
@@ -2105,7 +2263,7 @@ TEST { [list(3, 1, 37, -5)->find_tail(\&is_even)] }
 
 sub make_group {
     my ($is_stream) = @_;
-    my $group = sub {
+    sub {
         @_ >= 2 and @_ <= 3 or fp_croak_arity "2-3";
         my ($equal, $s, $maybe_tail) = @_;
         weaken $_[1] if $is_stream;
@@ -2153,6 +2311,8 @@ sub list_group;
 *list_group = make_group(0);
 
 sub FP::List::List::group {
+    __
+        'group($self, $equal, $maybe_tail): build groups of subsequent items that are $equal.';
     @_ >= 2 and @_ <= 3 or fp_croak_arity "2-3";
     my ($self, $equal, $maybe_tail) = @_;
     list_group($equal, $self, $maybe_tail)
@@ -2162,6 +2322,77 @@ TEST {
     list(3, 4, 4, 5, 6, 8, 5, 5)->group(\&FP::Ops::number_eq)
 }
 list(list(3), list(4, 4), list(5), list(6), list(8), list(5, 5));
+
+# Split on items for which the predicate returns true:
+
+sub make_split {
+    my ($is_stream) = @_;
+    sub {
+        __
+            'split($self, $pred, $retain_item, $maybe_tail): split on items for which $pred returns true. If $retain_item is true, the item that matched will be included in the previous group.';
+        @_ >= 2 and @_ <= 4 or fp_croak_arity "2-4";
+
+        require FP::PureArray;
+
+        my ($s, $pred, $retain_item, $maybe_tail) = @_;
+        weaken $_[1] if $is_stream;
+        lazy_if {
+            FORCE $s;
+            if (is_null $s) {
+                $maybe_tail // null
+            } else {
+                my $rec;
+                $rec = sub {
+                    my ($s) = @_;
+                    lazy_if {
+                        my $s = $s;
+                        my @group;
+                    LP: {
+                            FORCE $s;
+                            if (is_null $s) {
+                                if (@group) {
+                                    cons(
+                                        FP::PureArray::array_to_purearray(
+                                            \@group),
+                                        ($maybe_tail // null)
+                                    )
+                                } else {
+                                    ($maybe_tail // null)
+                                }
+                            } else {
+                                my ($a, $r) = $s->first_and_rest;
+                                if ($pred->($a)) {
+                                    if ($retain_item) {
+                                        push @group, $a;
+                                    }
+                                    cons(
+                                        FP::PureArray::array_to_purearray(
+                                            \@group),
+                                        $rec->($r)
+                                    )
+                                } else {
+                                    $s = $r;
+                                    push @group, $a;
+                                    redo LP;
+                                }
+                            }
+                        }
+                    }
+                    $is_stream;
+                };
+                $rec->($s)
+            }
+        }
+        $is_stream
+    }
+}
+
+sub list_split;
+*list_split = make_split(0);
+
+*FP::List::List::split = \&list_split;
+
+# For split tests see FP::List::t.
 
 # Turn a mix of (nested) arrays and lists into a flat list.
 
@@ -2329,6 +2560,94 @@ list(
 TEST { list_insertion_variants list(qw(a)), 0, list "END" }
 list(list(0, 'a'), list('a', 0), 'END');
 TEST { list_insertion_variants list(), 0, list "END" } list(list(0), 'END');
+
+sub list_merge {
+    @_ == 3 or fp_croak_arity 3;
+    my ($A, $B, $cmp) = @_;
+    if (is_null $A) {
+        $B
+    } elsif (is_null $B) {
+        $A
+    } else {
+        my ($a, $ar) = $A->first_and_rest;
+        my ($b, $br) = $B->first_and_rest;
+        my $dir = $cmp->($a, $b);
+        if ($dir < 0) {
+            cons($a, list_merge($ar, $B, $cmp))
+        } elsif ($dir == 0) {
+            cons($a, cons($b, list_merge($ar, $br, $cmp)))
+        } else {
+            cons($b, list_merge($A, $br, $cmp))
+        }
+    }
+}
+*FP::List::List::merge = \&list_merge;
+
+TEST {
+    require FP::Ops;
+    list_merge list(-3, 1, 1, 3, 4), list(-6, -4, -3, 0, 1, 2, 5, 6, 7),
+        \&FP::Ops::real_cmp
+}
+list(-6, -4, -3, -3, 0, 1, 1, 1, 2, 3, 4, 5, 6, 7);
+
+# Adapted copy-paste from FP/Stream.pm
+
+sub cartesian_product_2 {
+    @_ == 2 or fp_croak_arity 2;
+    my ($a, $orig_b) = @_;
+    my $rec;
+    $rec = sub {
+        my ($a, $b) = @_;
+        my $rec = $rec;
+        {
+            if (is_null $a) {
+                null
+            } elsif (is_null $b) {
+                &$rec(cdr($a), $orig_b);
+            } else {
+                cons(cons(car($a), car($b)), &$rec($a, cdr $b))
+            }
+        }
+    };
+    Weakened($rec)->($a, $orig_b)
+}
+
+*FP::List::List::cartesian_product_2 = \&cartesian_product_2;
+
+TEST { cartesian_product_2 list("A", "B"), list(list(1), list(2)) }
+list(list('A', 1), list('A', 2), list('B', 1), list('B', 2));
+
+TEST {
+    cartesian_product_2 list("E", "F"), cartesian_product_2 list("C", "D"),
+        list(list("A"), list("B"))
+}
+list(
+    list("E", "C", "A"),
+    list("E", "C", "B"),
+    list("E", "D", "A"),
+    list("E", "D", "B"),
+    list("F", "C", "A"),
+    list("F", "C", "B"),
+    list("F", "D", "A"),
+    list("F", "D", "B")
+);
+
+sub cartesian_product {
+    my @v = @_;
+    if (!@v) {
+        die "cartesian_product: need at least 1 argument"
+    } elsif (@v == 1) {
+        list_map \&list, $v[0]
+    } else {
+        my $first = shift @v;
+        cartesian_product_2($first, cartesian_product(@v))
+    }
+}
+
+*FP::List::List::cartesian_product = \&cartesian_product;
+
+TEST { cartesian_product list("A", "B"), list(1, 2) }
+list(list('A', 1), list('A', 2), list('B', 1), list('B', 2));
 
 use FP::Char 'is_char';
 

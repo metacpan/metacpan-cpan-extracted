@@ -1,0 +1,52 @@
+NAME
+    perl-module-copyright-years - Tool for update copyright years in Perl
+    distribution.
+
+SYNOPSIS
+     perl-module-copyright-years [-d] [-h] [-s section(s)] [-y last_year] [--version]
+
+DESCRIPTION
+    Tool to update copyright years in Perl distribution. It's changing years
+    in *.pm, *.pod, LICENSE and bin/* files.
+
+ARGUMENTS
+    *       "-d"
+
+            Turn on debug mode.
+
+    *       "-h"
+
+            Print help.
+
+    *       "-s section(s)"
+
+            Section(s) to look. Default value is 'LICENSE AND COPYRIGHT'
+            section in pod.
+
+    *       "-y last_year"
+
+            Last year. Default value is actual year,
+
+    *       "--version"
+
+            Print version of script.
+
+EXAMPLE
+     perl-module-copyright-years -h
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-Perl-Module-CopyrightYears>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

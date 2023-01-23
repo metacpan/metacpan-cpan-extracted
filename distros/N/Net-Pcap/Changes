@@ -1,5 +1,26 @@
 The revision history for Net-Pcap
 
+0.21 - 2023-01-19 - Max Maischein (CORION)
+  [Configure]
+  - Avoid implicit ints during feature probing
+    This is required for compatibility with future compilers as (for example)
+    Fedora is moving to stricter C compiler versions.
+    This is merely a cleanup of the C code probing for Pcap functionality,
+    no need to upgrade.
+
+  [Code]
+  - use "our" for global variable declaration
+
+  - Don't inherit from Exporter anymore
+
+    This might break modules that rely on Net::Pcap isa Exporter, but that
+    was never documented.
+
+0.20 - 2021-12-17 - Max Maischein (CORION)
+  [Bugfixes]
+  - CPAN RT #118727 Spelling fixes
+    Reported by Gregor Herrmann
+
 0.19 - 2021-11-27 - Max Maischein (CORION)
   [Bugfixes]
   - CPAN RT #127685 Restore compilation with libpcap 1.9+

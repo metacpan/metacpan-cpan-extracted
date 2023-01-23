@@ -48,7 +48,7 @@ system's documentation and search the Internet for "atomic rename" for more
 details. This module's job is to perform the C<rename>, and it can make
 B<no guarantees> as to whether it will be atomic or not.
 
-=head2 Notice
+=head2 Important Notice
 
 As of version 0.16, the distribution of this module has been split into
 several distributions: See the documentation of L</replace>,
@@ -56,7 +56,7 @@ L</replace2>, and L</inplace> for details.
 
 =head2 Version
 
-This documentation describes version 0.16 of this module.
+This documentation describes version 0.18 of this module.
 
 =head1 Constructors and Overview
 
@@ -126,7 +126,7 @@ is the same as
 
 =head2 C<replace2>
 
-**Note** As of version 0.16, if you want to use this function, you must
+B<Note:> As of version 0.16, if you want to use this function, you must
 install L<File::Replace::Fancy|File::Replace::Fancy>!
 
  use File::Replace 'replace2';
@@ -155,7 +155,7 @@ these handles as this may lead to confusion.
 
 =head2 C<replace>
 
-**Note** As of version 0.16, if you want to use this function, you must
+B<Note:> As of version 0.16, if you want to use this function, you must
 install L<File::Replace::Fancy|File::Replace::Fancy>!
 
  use File::Replace 'replace';
@@ -193,8 +193,8 @@ confusion.
 
 =head2 C<inplace>
 
-**Warning:** As of version 0.16, if you want to use this function, you
-must install the **experimental** module
+B<Warning:> As of version 0.16, if you want to use this function, you
+must install the B<experimental> module
 L<File::Replace::Inplace|File::Replace::Inplace>.
 
 This is a shorthand for the constructor of

@@ -229,7 +229,7 @@ to see when the resulting PDFs are displayed.
    page display on the scrollbar thumb.
 
 055_outlines
-  055_outlines_sample_55.pdf
+  055_outlines.sample_55.pdf
    12 pages (like 012_pages output) with three bookmarks (outlines) to logical
    pages 1 ("i"), 4 ("1"), and 11 ("7"). you may need to click on your reader's
    bookmark icon to display the list of bookmarks available.
@@ -243,9 +243,17 @@ BarCode.pl
   BarCode.pdf
    1 page x 11 barcodes, NOT VERIFIED AS CORRECT (need scanners!)
 
+Boxes.pl
+  Boxes.pdf
+   demonstrate interactions of PDF "boxes" building document
+
 Bspline.pl
   Bspline.pdf
    4 pages of showing the use of b-splines
+
+Column.pl
+  Column.pdf
+   12 pages demonstrating column() method with markup
 
 Content.pl
   Content.pdf
@@ -315,18 +323,33 @@ ContentText.pl
             camelCase, punctuation, letter runs, slashes
             same, but outdented to force splits at different points
 
-HarfBuzz.pl  one page showing various scripts (Latin, Middle Eastern, and
-               South Asian) LTR and RTL, with ligatures and kerning (Latin)
-               in two lines: a raw output of the UTF-8 script using text(),
-               and a line processed through HarfBuzz::Shaper and textHS(). A
-               copy of the output file is provided for your convenience in
-               examples/resources/HarfBuzz_example.pdf.
+FontManager.pl
+  FontManager.pdf
+   One page showing how to easily switch among fonts
 
-RMtutorial.pl  one page Lorem Ipsum, photo, simple graphics as a demo
+HarfBuzz.pl
+  HarfBuzz.pdf
+   Page 1: showing various scripts (Latin, Middle Eastern, and
+           South Asian) LTR and RTL, with ligatures and kerning (Latin)
+           in two lines: a raw output of the UTF-8 script using text(),
+           and a line processed through HarfBuzz::Shaper and textHS(). 
+   Page 2: showing various alphabets in vertical writing mode.
 
-Rotated.pl  pp 1 and 4 portrait mode Lorem Ipsum text
-            pp 2 and 3 landscape mode two column Lorem Ipsum text
+   A copy of the output file is provided for your convenience (in case
+           you don't have HarfBuzz::Shaper installed) on the CTS
+           website https://www.catskilltech.com/.
 
-Boxes.pl  demonstrate interactions of PDF "boxes"
+RMtutorial.pl
+  RMtutorial.pdf
+   one page Lorem Ipsum, photo, simple graphics as a demo
 
-ShowFont.pl   run without command line arguments to get help
+Rotated.pl
+  Rotated.pdf
+   pp 1 and 4 portrait mode Lorem Ipsum text
+   pp 2 and 3 landscape mode two column Lorem Ipsum text
+
+ShowFont.pl
+  ShowFont.pdf
+   15 pages each of Helvetica in 10 different Latin encodings
+   run without command line arguments to get help
+

@@ -1,13 +1,24 @@
+1.07    2023-01-20    lichtkind
+-------
+    * = POD fixes
+
+1.06    2023-01-20    lichtkind
+
+-------
+    * = maintenance release
+    * + simplified string serialisation method (->new(eval $string) => ->new($string))
+    * ? small POD fixes
+
 1.05    2022-12-31    lichtkind
 -------
-    * = fixes
+    * = small enhancements
     * + added getters for data hashes
     * ? cleaned some sentences and comments
     * ? synopsis cleanup
 
 1.04    2022-11-04  lichtkind
 -------
-    * = fixes
+    * = small fixes
     * & fixing meta files
     * ? typos
 

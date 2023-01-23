@@ -1,2 +1,6 @@
+0.02 2023-01-23T18:37:50+01:00
+ - Add SEE ALSO section to doc.
+ - Use String::UpdateYears helper.
+
 0.01 2023-01-05T14:28:49+01:00
  - First version.  

@@ -1,3 +1,5 @@
+.perlcriticrc
+.perlfiles
 .perltidyrc
 COPYING.md
 Changes
@@ -10,10 +12,12 @@ bin/expand-tail
 bin/fperl
 bin/perlrepl
 bin/repl2test
+critic-todo
 docs/HACKING.md
 docs/TODO.md
 docs/blog/index.md
 docs/blog/perl-weekly-challenges-113.md
+docs/blog/perl_weekly_challenges_114.md
 docs/contact.md
 docs/design.md
 docs/howto.md
@@ -48,6 +52,7 @@ examples/perl-weekly-challenges/111-1-search_matrix
 examples/perl-weekly-challenges/113-1-represent_integer
 examples/perl-weekly-challenges/113-1-represent_integer_haskell.hs
 examples/perl-weekly-challenges/113-2-recreate_binary_tree
+examples/perl-weekly-challenges/114-1-Next_Palindrome_Number
 examples/perl-weekly-challenges/Makefile
 examples/predicates
 examples/primes
@@ -107,6 +112,7 @@ lib/Chj/Linux/LmSensors.pm
 lib/Chj/NamespaceClean.pm
 lib/Chj/NamespaceCleanAbove.pm
 lib/Chj/Package/OfPath.pm
+lib/Chj/Packages.pm
 lib/Chj/Serialize.pm
 lib/Chj/TEST.pm
 lib/Chj/TerseDumper.pm
@@ -129,6 +135,7 @@ lib/Chj/xopen.pm
 lib/Chj/xopendir.pm
 lib/Chj/xoutpipe.pm
 lib/Chj/xperlfunc.pm
+lib/Chj/xperlfunc/t.pm
 lib/Chj/xpipe.pm
 lib/Chj/xtmpfile.pm
 lib/FP/AST/Perl.pm
@@ -147,6 +154,7 @@ lib/FP/Array_sort.pm
 lib/FP/BigInt.pm
 lib/FP/Carp.pm
 lib/FP/Char.pm
+lib/FP/Cmp.pm
 lib/FP/Collection.pm
 lib/FP/Combinators.pm
 lib/FP/Combinators2.pm
@@ -167,10 +175,12 @@ lib/FP/IOStream.pm
 lib/FP/Id.pm
 lib/FP/Interface.pm
 lib/FP/Interfaces.pm
+lib/FP/Iptables/Rules.pm
 lib/FP/JSON.pm
 lib/FP/Lazy.pm
 lib/FP/Lazy/t.pm
 lib/FP/List.pm
+lib/FP/List/t.pm
 lib/FP/Memoizing.pm
 lib/FP/Mixin/Utils.pm
 lib/FP/MutableArray.pm
@@ -212,6 +222,7 @@ lib/FP/Weak.pm
 lib/FP/Weak/t.pm
 lib/FP/autobox.pm
 lib/FP/fix.pm
+lib/FP/noLazy.pm
 lib/FP/url_.pm
 lib/FunctionalPerl.pm
 lib/PXML.pm
@@ -227,9 +238,10 @@ lib/PXML/Util.pm
 lib/PXML/XHTML.pm
 licenses/artistic_license_2.0.md
 meta/FunctionalPerl/Dependencies.pm
+meta/FunctionalPerl/Dependencies/ChjBin.pm
+meta/FunctionalPerl/Indexing.pm
 meta/FunctionalPerl/ModuleList.pm
 meta/FunctionalPerl/TailExpand.pm
-meta/_critic.out
 meta/bin/gpg
 meta/bisect-modules
 meta/check-hardcoded-perl
@@ -239,6 +251,7 @@ meta/critic
 meta/dependencycheck
 meta/find-perl.pl
 meta/install-development-dependencies-on-debian
+meta/perlfiles
 meta/pre-commit
 meta/readin.pl
 meta/t-check

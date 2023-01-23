@@ -13,7 +13,7 @@ use Params::Validate ':all';
 
 our ($VERSION, $DEBUG);
 
-$VERSION = '0.21';
+$VERSION = '0.22';
 $DEBUG   = false;
 
 validation_options(
@@ -199,8 +199,7 @@ sub _init_tom
 {
     my $self = shift;
 
-    # silently discard warnings about unparseable LaTeX
-    my $parser   = LaTeX::TOM->new(2);
+    my $parser   = LaTeX::TOM->new(2); # silently discard warnings about unparseable LaTeX
     my $document = $parser->parseFile($self->{file});
     my $nodes    = $document->getAllNodes;
 
@@ -636,8 +635,7 @@ sub _is_set_previous
     my $self = shift;
     my @items = @_;
 
-    # eval in order to avoid fatal errors on some older perls
-    my $ok = eval true;
+    my $ok = eval true; # eval in order to avoid fatal errors on some older perls
 
     foreach my $item (@items) {
         $ok &= $self->{previous}{$item} ? true : false;

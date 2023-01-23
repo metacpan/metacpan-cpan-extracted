@@ -6,9 +6,9 @@ with 'Pod::Weaver::Role::AddTextToSection';
 with 'Pod::Weaver::Role::Section';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-29'; # DATE
+our $DATE = '2022-10-19'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Sah-Schemas'; # DIST
-our $VERSION = '0.071'; # VERSION
+our $VERSION = '0.072'; # VERSION
 
 sub weave_section {
     no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
@@ -317,6 +317,24 @@ _
 
             $self->log(["Generated POD for '%s'", $filename]);
 
+            # add POD section: SEE ALSO
+            {
+                my $links = $sch->[1]{links};
+                next unless $links && @$links;
+
+                my @pod;
+
+                require String::PodQuote;
+                for my $link (@$links) {
+                    my $url = $link->{url}; $url =~ s/^(prog|pm)://;
+                    push @pod, "L<$url>", ($link->{summary} ? " - ".String::PodQuote::pod_quote($link->{summary}) : ""), "\n\n";
+                }
+                $self->add_text_to_section(
+                    $document, join('', @pod), 'SEE ALSO',
+                    {after_section => ['DESCRIPTION']},
+                );
+            }
+
         } # Sah::Schema::*
     }
 }
@@ -336,7 +354,7 @@ Pod::Weaver::Plugin::Sah::Schemas - Plugin to use when building Sah::Schemas::* 
 
 =head1 VERSION
 
-This document describes version 0.071 of Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution Pod-Weaver-Plugin-Sah-Schemas), released on 2022-09-29.
+This document describes version 0.072 of Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution Pod-Weaver-Plugin-Sah-Schemas), released on 2022-10-19.
 
 =head1 SYNOPSIS
 

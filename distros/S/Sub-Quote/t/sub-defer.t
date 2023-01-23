@@ -1,7 +1,6 @@
 use strict;
 use warnings;
 use Test::More;
-use Test::Fatal;
 use Sub::Defer qw(defer_sub undefer_sub undefer_all undefer_package defer_info);
 use Scalar::Util qw(refaddr weaken);
 
@@ -30,13 +29,17 @@ is($one_defer->(), 'one', 'one (deferred) still runs');
 
 is(Foo->one, 'one', 'one (undeferred) runs');
 
-like exception { defer_sub 'welp' => sub { sub { 1 } } },
+my $e;
+eval { defer_sub 'welp' => sub { sub { 1 } }; 1 } or $e = $@;
+like $e,
   qr/^welp is not a fully qualified sub name!/,
   'correct error for defer_sub with unqualified name';
 
 is(my $two_made = undefer_sub($two_defer), $made{'Foo::two'}, 'make two');
 
-is exception { undefer_sub($two_defer) }, undef,
+undef $e;
+eval { undefer_sub($two_defer); 1 } or $e = $@;
+is $e, undef,
   "repeated undefer doesn't regenerate";
 
 is($two_made, \&Foo::two, 'two installed');
@@ -134,7 +137,9 @@ is( $made{'Bar::Baz::one'}, undef, 'sub-package not undefered by undefer_package
   my $foo_info = defer_info($foo_string);
   undef $foo;
 
-  is exception { Sub::Defer->CLONE }, undef,
+  my $e;
+  eval { Sub::Defer->CLONE; 1 } or $e = $@;
+  is $e, undef,
     'CLONE works when quoted info saved externally';
 }
 
@@ -144,7 +149,9 @@ is( $made{'Bar::Baz::one'}, undef, 'sub-package not undefered by undefer_package
   my $foo_info = $Sub::Defer::DEFERRED{$foo_string};
   undef $foo;
 
-  is exception { Sub::Defer->CLONE }, undef,
+  my $e;
+  eval { Sub::Defer->CLONE; 1 } or $e = $@;
+  is $e, undef,
     'CLONE works when quoted info kept alive externally';
   ok !exists $Sub::Defer::DEFERRED{$foo_string},
     'CLONE removes expired entries that were kept alive externally';
@@ -155,7 +162,9 @@ is( $made{'Bar::Baz::one'}, undef, 'sub-package not undefered by undefer_package
   my $foo_string = "$foo";
   undef $foo;
   Sub::Defer::undefer_package 'Unused';
-  is exception { undefer_sub $foo_string }, undef,
+  my $e;
+  eval { undefer_sub $foo_string; 1 } or $e = $@;
+  is $e, undef,
     "undeferring expired sub (or reused refaddr) after undefer_package lives";
 }
 

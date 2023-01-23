@@ -1,12 +1,10 @@
-File-Rename version 2.00
+File-Rename version 2.01
 ========================
 
-**** INCOMPATIBLE CHANGES IN THIS VERSION ****
-
-* rename script requires options to appear before code/files
-* new script 'unsafe-rename' allows options and other arguments
-    to be mixed
-* Build.PL has been removed - it did not build 'unsafe-rename' 
+This release is a step towards C<use v5.32> or C<use v7> compatibilty:
+* use warnings
+* avoid indirect syntax
+* avoid bareword handles 
 
 RENAME COMMAND
 
@@ -48,6 +46,9 @@ https://rt.cpan.org/Ticket/Display.html?id=145711
 
 In 2.00, Build.PL does not build unsafe-rename, and was removed 
 
+In 2.01: the min perl version is 5.8.0, and 
+added source/rename source of rename script   
+
 INSTALLATION
 
 To install this module type the following:
@@ -70,9 +71,10 @@ available with perl 5.6.0.  I have successfully installed
 those modules for perl 5.005_05 and tested this module.
 
 Testing on earlier versions of Perl is now only done
-on CPAN Testers.  The earlist Perl version which is
-known to work with recent versions of File::Rename is
-Perl version 5.8.9.
+on CPAN Testers.  The minimum perl version for this 
+distribution is 5.8.0 - the earlist Perl version which  
+is known to work with recent versions of File::Rename 
+is 5.8.8.
 
 UNICODE SUPPORT
 
@@ -94,10 +96,11 @@ upgrade filenames to unicode (encoded as utf8) by default.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2005, 2006, 2007, 2011, 2018, 2020, 2021, 2022
+Copyright (C) 2005, 2006, 2007, 2011, 2018, 2020, 2021, 2022, 2023
 by Robin Barker
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,
 at your option, any later version of Perl 5 you may have available.
+
 

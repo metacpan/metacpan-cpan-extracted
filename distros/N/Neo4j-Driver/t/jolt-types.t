@@ -7,7 +7,10 @@ use Test::More 0.88;
 use Test::Exception;
 use Test::Warnings;
 
-use Neo4j_Test::MockHTTP qw(response_for);
+use Neo4j_Test::MockHTTP;
+
+my $mock_plugin = Neo4j_Test::MockHTTP->new;
+sub response_for { $mock_plugin->response_for(undef, @_) }
 
 sub single_column {[
 	{ header => { fields => [0] } },
@@ -114,7 +117,7 @@ plan tests => 1 + 9 + 1;
 
 
 lives_and { ok $s = Neo4j::Driver->new('http:')
-                    ->plugin('Neo4j_Test::MockHTTP')
+                    ->plugin($mock_plugin)
                     ->session(database => 'dummy') } 'session';
 
 

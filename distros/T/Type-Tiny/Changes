@@ -7,6 +7,11 @@ Home page:    <https://metacpan.org/release/Type-Tiny>
 Bug tracker:  <https://github.com/tobyink/p5-type-tiny/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+2.002001	2023-01-20
+
+ [ Bug Fixes ]
+ - Bugfix for Type::Tie+Storable issue affecting 32-bit builds of Perl.
+
 2.002000	2023-01-01	Happy Fibonacci Day! 1/1/23
 
  [ Bug Fixes ]

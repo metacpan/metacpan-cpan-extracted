@@ -1,5 +1,9 @@
 Revision history for Test::Needs
 
+0.002010 - 2023-01-22
+  - split main test into three separate scripts
+  - avoid outputting multiple plans if used with no_plan
+
 0.002009 - 2021-05-25
   - fix warnings from Test::Builder if Test::Needs is loaded first, and is
     used to check for a Test module.

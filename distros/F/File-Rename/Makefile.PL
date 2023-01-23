@@ -1,6 +1,8 @@
+use 5.008;
 # Based on earlier h2xs output and
 # output from Module::Build::Compat version 0.03
 use strict;
+use warnings;
 use File::Spec;
 use ExtUtils::MakeMaker 7.36;
 my $EUMM_REQUIRES = { 'ExtUtils::MakeMaker' => 7.36 };
@@ -16,13 +18,14 @@ my $script = File::Spec->catfile( 'script',
                 $is_win ? 'file-rename' : 'rename' );
 my $unsafe = File::Spec->catfile( 'script',
                                     'unsafe-rename');
-
+my $source = File::Spec->catfile( 'source', 'rename');
+                               
 WriteMakefile(
           NAME          => 'File::Rename',
           VERSION_FROM  => 'lib/File/Rename.pm',
           INSTALLDIRS   => 'site',
           PREREQ_PM     => {
-            'Getopt::Long'  => 0,   # recommend 2.24 for posix_default
+            'Getopt::Long'  => 2.24,    # for posix_default
           },
           BUILD_REQUIRES        => $EUMM_REQUIRES,
           CONFIGURE_REQUIRES    => $EUMM_REQUIRES,
@@ -31,9 +34,8 @@ WriteMakefile(
             'Test::More'    => 0,   # for testing(!)
           },
           EXE_FILES     => [ $script, $unsafe ],
-          PL_FILES      => { 'rename.PL' => $script,
-                        # see comment about ExtUtils::MakeMaker above 
-                             'unsafe.PL' => {$unsafe => $script},
+          PL_FILES      => { 'rename.PL' => {$script => $source},
+                             'unsafe.PL' => {$unsafe => $source},
                         },
           ABSTRACT_FROM => 'lib/File/Rename.pm',
                             # retrieve abstract from module
@@ -42,5 +44,5 @@ WriteMakefile(
     
           NORECURS      => 1,
           test          => { RECURSIVE_TEST_FILES => 1 },
-          MIN_PERL_VERSION  => 5.6.0,
+          MIN_PERL_VERSION  => 5.008,
 );

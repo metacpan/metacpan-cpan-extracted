@@ -38,13 +38,13 @@
             "Fcntl" : "0",
             "File::Basename" : "0",
             "File::Copy" : "0",
-            "File::Replace" : "0.16",
+            "File::Replace" : "0.18",
             "File::Spec::Functions" : "0",
             "File::Temp" : "0",
             "Hash::Util" : "0",
             "IO::Handle" : "0",
             "Scalar::Util" : "0",
-            "Tie::Handle::Base" : "0.16",
+            "Tie::Handle::Base" : "0.18",
             "perl" : "5.008001",
             "warnings::register" : "0"
          },
@@ -63,11 +63,11 @@
    "provides" : {
       "File::Replace::Inplace" : {
          "file" : "lib/File/Replace/Inplace.pm",
-         "version" : "0.16"
+         "version" : "0.18"
       },
       "Tie::Handle::Argv" : {
          "file" : "lib/Tie/Handle/Argv.pm",
-         "version" : "0.16"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -82,6 +82,6 @@
          "web" : "https://bitbucket.org/haukex/file-replace-inplace"
       }
    },
-   "version" : "0.16",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

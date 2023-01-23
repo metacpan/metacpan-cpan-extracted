@@ -6,7 +6,7 @@ use warnings;
 use CPAN;
 use Getopt::Std;
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Constructor.
 sub new {
@@ -86,6 +86,8 @@ Returns 1 for error, 0 for success.
 
 =head1 EXAMPLE
 
+=for comment filename=search_library.pl
+
  use strict;
  use warnings;
 
@@ -127,12 +129,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2015-2022 Michal Josef Špaček
+© 2015-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013-2020 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2013-2022 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -16,23 +16,23 @@ FP::HashSet - set operations for hash tables
     use FP::Equal 'is_equal';
     use FP::HashSet; # ":all";
 
-    my $A = array_to_hashset ["a","b","c"];
-    my $B = array_to_hashset ["a","c","d"];
-    is_equal hashset_to_array(hashset_union($A,$B)),
-             ["a","b","c","d"];
-    is_equal hashset_to_array(hashset_intersection($A,$B)),
-             ["a","c"];
-    is_equal hashset_to_array(hashset_difference($A,$B)),
+    my $A = hashset "a", "b", "c";
+    my $B = array_to_hashset ["a", "c", "d"];
+    is_equal hashset_to_array(hashset_union($A, $B)), 
+             ["a", "b", "c", "d"];
+    is_equal hashset_to_array(hashset_intersection($A, $B)), 
+             ["a", "c"];
+    is_equal hashset_to_array(hashset_difference($A, $B)), 
              ["b"];
-    ok not hashset_is_subset($B,$A);
-    ok hashset_is_subset(+{b => 1},$A);
+    ok not hashset_is_subset($B, $A);
+    ok hashset_is_subset(+{b => 1}, $A);
     is hashset_size($A), 3;
     ok not hashset_empty($A);
     ok hashset_empty(+{});
-    #hashset_keys_unsorted($A) # ("a","b","c") or in another sort order;
+    #hashset_keys_unsorted($A) # ("a", "b", "c") or in another sort order;
                                # *keys* not values, hence always strings.
     is_equal [hashset_keys ($A)],
-             [("a","b","c")]; # (always sorted)
+             [("a", "b", "c")]; # (always sorted)
 
     # a la diff tool:
     is_equal hashset_diff($A,$B), +{ b => "-", d => "+" };
@@ -70,13 +70,20 @@ use warnings;
 use warnings FATAL => 'uninitialized';
 use Exporter "import";
 
-our @EXPORT = qw(array_to_hashset
+our @EXPORT = qw(
+    hashset
+    is_hashset
+    is_uhashset
+    array_to_hashset
     array_to_countedhashset
     array_to_lchashset
     hashset_to_array
     hashset_to_predicate
     hashset_keys
     hashset_keys_unsorted
+    hashset_values
+    hashset_map
+    hashset_filter
     hashset_union
     hashset_union_defined
     hashset_intersection
@@ -91,6 +98,46 @@ our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use Chj::TEST;
 use FP::Carp;
+use FP::Docstring;
+
+sub hashset {
+    my %h;
+    for (@_) {
+
+        # detect duplicates?
+        $h{$_} = $_;
+    }
+    \%h
+}
+
+sub is_hashset {
+    __ 'is_hashset($v):
+        true if $v is a hash, in which every key is the stringification
+        of the value.
+        Also see: is_uhashset.';
+    @_ == 1 or fp_croak_arity 1;
+    my ($v) = @_;
+    ref($v) eq "HASH" and do {
+        for my $k (keys %$v) {
+            $v->{$k} eq $k or return 0;
+        }
+        1
+    }
+}
+
+sub is_uhashset {
+    __ 'is_uhashset($v):
+        true if $v is a hash, in which every value is `undef`.
+        Also see: is_hashset.';
+    @_ == 1 or fp_croak_arity 1;
+    my ($v) = @_;
+    ref($v) eq "HASH" and do {
+        for my $k (keys %$v) {
+            (not defined $v->{$k}) or return 0;
+        }
+        1
+    }
+}
 
 sub array_to_hashset {
     @_ == 1 or fp_croak_arity 1;
@@ -133,6 +180,27 @@ sub hashset_keys_unsorted {
 sub hashset_keys {
     @_ == 1 or fp_croak_arity 1;
     sort keys %{ $_[0] }
+}
+
+sub hashset_values {
+    __ 'The values, sorted according to the keys (i.e. stringification).';
+    @_ == 1 or fp_croak_arity 1;
+    my ($s) = @_;
+    map { $s->{$_} } hashset_keys $s
+}
+
+sub hashset_map {
+    __ 'hashset_map($s, $fn): $fn takes 1 argument, the value';
+    @_ == 2 or fp_croak_arity 2;
+    my ($s, $fn) = @_;
+    +{ map { my $v = $fn->($_); ("$v" => $v) } values %$s }
+}
+
+sub hashset_filter {
+    __ 'hashset_filter($s, $fn): $fn takes 1 argument, the value';
+    @_ == 2 or fp_croak_arity 2;
+    my ($s, $fn) = @_;
+    +{ map { my $v = $_; $fn->($v) ? ("$v" => $v) : () } values %$s }
 }
 
 sub hashset_add_hashset_d {

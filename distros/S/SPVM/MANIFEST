@@ -45,6 +45,7 @@ examples/spvmcc/basic/myapp
 examples/spvmcc/basic/README.txt
 examples/spvmcc/basic/SPVM/MyApp.spvm
 lib/SPVM.pm
+lib/SPVM/Address.pm
 lib/SPVM/Array.c
 lib/SPVM/Array.config
 lib/SPVM/Array.pm
@@ -197,6 +198,10 @@ lib/SPVM/Comparator/Long.pm
 lib/SPVM/Comparator/Long.spvm
 lib/SPVM/Comparator/String.pm
 lib/SPVM/Comparator/String.spvm
+lib/SPVM/Compiler.c
+lib/SPVM/Compiler.config
+lib/SPVM/Compiler.pm
+lib/SPVM/Compiler.spvm
 lib/SPVM/Complex_2d.pm
 lib/SPVM/Complex_2d.spvm
 lib/SPVM/Complex_2f.pm
@@ -220,6 +225,10 @@ lib/SPVM/Document/Tutorial/Complex.pm
 lib/SPVM/Double.pm
 lib/SPVM/DoubleList.pm
 lib/SPVM/DoubleList.spvm
+lib/SPVM/Env.c
+lib/SPVM/Env.config
+lib/SPVM/Env.pm
+lib/SPVM/Env.spvm
 lib/SPVM/EqualityChecker.pm
 lib/SPVM/EqualityChecker.spvm
 lib/SPVM/EqualityChecker/Address.pm
@@ -259,6 +268,10 @@ lib/SPVM/Point/Interface.pm
 lib/SPVM/Point/Interface.spvm
 lib/SPVM/Point3D.pm
 lib/SPVM/Point3D.spvm
+lib/SPVM/Runtime.c
+lib/SPVM/Runtime.config
+lib/SPVM/Runtime.pm
+lib/SPVM/Runtime.spvm
 lib/SPVM/Scope/Guard.pm
 lib/SPVM/Scope/Guard.spvm
 lib/SPVM/Scope/Guard/Handler.pm
@@ -268,6 +281,10 @@ lib/SPVM/ShortList.pm
 lib/SPVM/ShortList.spvm
 lib/SPVM/Sort.pm
 lib/SPVM/Sort.spvm
+lib/SPVM/Stack.c
+lib/SPVM/Stack.config
+lib/SPVM/Stack.pm
+lib/SPVM/Stack.spvm
 lib/SPVM/Stringable.pm
 lib/SPVM/Stringable.spvm
 lib/SPVM/StringBuffer.pm
@@ -553,6 +570,7 @@ t/02_vm/05_op/warn.t
 t/02_vm/05_op/weaken.t
 t/02_vm/06_native_api/compile_native_api.pl
 t/02_vm/06_native_api/native_api.t
+t/02_vm/06_native_api/native_api2.t
 t/02_vm/06_native_api/native_api_cached.t
 t/02_vm/06_native_api/native_api_cpp.t
 t/02_vm/06_native_api/resource.t

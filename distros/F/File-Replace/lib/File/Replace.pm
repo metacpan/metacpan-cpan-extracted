@@ -24,11 +24,11 @@ BEGIN {
 	else { *lock_ref_keys = sub {} }  # uncoverable statement
 }
 
-# For AUTHOR, COPYRIGHT, AND LICENSE see the bottom of this file
+# For AUTHOR, COPYRIGHT, AND LICENSE see Replace.pod
 
 ## no critic (RequireArgUnpacking)
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 our @EXPORT_OK = qw/ replace replace2 replace3 inplace /;
 our @CARP_NOT = qw/ File::Replace::SingleHandle File::Replace::DualHandle File::Replace::Inplace /;

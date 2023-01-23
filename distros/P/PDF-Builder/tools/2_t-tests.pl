@@ -7,8 +7,8 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.024'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.025'; # VERSION
+our $LAST_UPDATE = '3.025'; # manually update whenever code is changed
 
 # command line flags, mutually exclusive:
 # -raw   show full output of each t-test run
@@ -22,8 +22,6 @@ my @test_list = qw(
  02-xrefstm
  03-xrefstm-index
  annotate
- author-critic
- author-pod-syntax
  barcode
  bbox
  circular-references
@@ -66,6 +64,10 @@ my @test_list = qw(
                   );
 # override full list above, and run just one or two tests
 #@test_list = qw( barcode );
+
+# moved to xt/
+#   author-critic
+#   author-pod-syntax
 
 # perl t/<name>.t will run it
 

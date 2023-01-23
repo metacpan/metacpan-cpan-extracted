@@ -1,5 +1,75 @@
 Revision history for FunctionalPerl
 
+0.72.76 2023-1-22
+    - really do not depend on 'less' for tests
+
+0.72.75 2023-1-22
+    - do not depend on 'less' for tests
+
+0.72.74 2023-1-22
+    - fix https://rt.cpan.org/Public/Bug/Display.html?id=144932 this
+      time?
+
+0.72.73 2023-1-22
+    - fix https://rt.cpan.org/Public/Bug/Display.html?id=144932
+    - fix tests: Indexing: do not attempt to run meta/perlfiles
+
+0.72.72 2023-1-22
+    - Repl: add :S mode with Perl::Tidy
+    - Struct: allow to export constructors via _END_
+    - Struct: add all_field_names
+    - Struct: add ":defaults" base class feature
+    - Struct: display FP::Failure values from predicates
+    - List: add cartesian_product, nonempty_list_of, improper_map,
+        improper_filtermap, filtermap, improper_last, list_merge
+    - Array,Array/Mixin: add filtermap, merge
+    - List,Stream: add split
+    - HashSet: add hashset, is_hashset, is_uhashset, hashset_values,
+        hashset_map, hashset_filter, hash_to_...function
+    - Hash: add hash_map, hash_filter, hash_key_filter, hash_value_filter
+    - Abstract/Sequence: add hashset, uhashset
+    - Predicates: add is_path_string, is_path_segment_string, sequence_of
+    - Create FP::Cmp, move cmp_complement to it, add cmp_then
+    - xperlfunc: add maybe_getfile_utf8, improve spawn
+    - xopen: add stdin, stdout, stderr
+    - Htmlparse: handle XML namespaces (hack)
+    - Text/CSV: various improvements
+    - various fixes
+    - unfinished: Chj::xperlfunc::xlocaltime: add iso_week_number + more
+
+0.72.71 2021-6-1
+    - revive meta/critic (perlcritic), apply fixes, leave
+      `critic-todo` file for remaining issues to work on (and prevent
+      release on new (or fixed) issues without explicit update)
+
+0.72.70 2021-5-31
+    - Fixes for testing and dependency issues, including removing
+      some unused imports.
+    - A fix in FunctionalPerl::Indexing
+
+0.72.69 2021-5-30
+    - Silence two recursion warnings, one of which is an indication of
+      a bug so will have to be investigated later.
+    - Create perl-weekly-challenges/114-1-Next_Palindrome_Number
+    - Website: add blog post on the new challenge
+
+0.72.68 2021-5-28
+    - SortedPureArray: add `checks_ok`, docs/tests
+    - Lazy,Show: show now shows the backtrace information in promises
+      if present
+    - Create FP::noLazy
+    - some docs improvements
+    - Blog perl-weekly-challenges-113: go into lazy debugging
+    - fix test failure / add FunctionalPerl::Dependencies::ChjBin
+
+0.72.67 2021-5-27
+    - website: various blog post fixes, and other
+    - Predicates: rename is_class_name to is_valid_class_name
+    - Create Chj::Packages, probably pointless but let me see
+    - Create FunctionalPerl::Indexing, for indexing the code base
+    - Htmlgen/Linking: auto-exclude identifiers from CPAN linking that
+      are in the local code base
+
 0.72.66 2021-5-23
     - website: add blog, with post about perl weekly challenge
     - 113-1*: improvements

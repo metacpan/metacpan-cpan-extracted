@@ -9,12 +9,12 @@ README
 cpanfile
 lib/Neo4j/Driver.pm
 lib/Neo4j/Driver/Deprecations.pod
+lib/Neo4j/Driver/Events.pm
 lib/Neo4j/Driver/Net.pod
 lib/Neo4j/Driver/Net/Bolt.pm
 lib/Neo4j/Driver/Net/HTTP.pm
 lib/Neo4j/Driver/Net/HTTP/LWP.pm
 lib/Neo4j/Driver/Plugin.pm
-lib/Neo4j/Driver/PluginManager.pm
 lib/Neo4j/Driver/Record.pm
 lib/Neo4j/Driver/Result.pm
 lib/Neo4j/Driver/Result/Bolt.pm

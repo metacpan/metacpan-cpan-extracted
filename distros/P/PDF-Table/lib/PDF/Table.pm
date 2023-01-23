@@ -7,6 +7,10 @@ use warnings;
 
 package PDF::Table;
 
+# portions (c) copyright 2004 Stone Environmental Inc.
+# (c) copyright 2006 Daemmon Hughes
+# (c) copyright 2020 - 2023 by Phil M. Perry
+ 
 use Carp;
 use List::Util qw[min max];  # core
 
@@ -14,8 +18,8 @@ use PDF::Table::ColumnWidth;
 use PDF::Table::Settings;
 # can't move text_block() b/c many globals referenced
 
-our $VERSION = '1.003'; # fixed, read by Makefile.PL
-our $LAST_UPDATE = '1.003'; # manually update whenever code is changed
+our $VERSION = '1.004'; # fixed, read by Makefile.PL
+our $LAST_UPDATE = '1.004'; # manually update whenever code is changed
 # don't forget to update VERSION down in POD area
 
 my $compat_mode = 0; # 0 = new behaviors, 1 = compatible with old
@@ -46,6 +50,7 @@ my $empty_cell_text    = '-'; # something to put in an empty cell
 my $dashed_rule_default = 2;  # dash/space pattern length for broken rows
 my $min_col_width      = 2;  # absolute minimum width of a column, > 0
 # ==================================================================
+my $ink = 1;  # by default, actually make PDF output
 
 print __PACKAGE__.' is version: '.$VERSION.$/ if ($ENV{'PDF_TABLE_DEBUG'});
 
@@ -178,6 +183,10 @@ sub table {
     # set some defaults  !!!!
     $arg{'cell_render_hook' } ||= undef; 
 
+    # $ink is whether or not to output PDF, as opposed to sizing
+    $ink = $arg{'ink'} if defined $arg{'ink'}; # 1 yes, 0 no (size)
+    my @vsizes;
+
     # Validate settings key
     my %valid_settings_key = (
         'x'                     => 1,  # global, mandatory
@@ -186,6 +195,7 @@ sub table {
           'start_y'             => 1,  #  deprecated
         'h'                     => 1,  # global, mandatory
           'start_h'             => 1,  #  deprecated
+        'ink'                   => 1,  # global
         'next_y'                => 1,  # global
         'next_h'                => 1,  # global
         'leading'               => 1,  #         text_block
@@ -282,6 +292,7 @@ sub table {
         carp "Error: Height of Table is NOT defined!\n";
         return ($page, 0, $ybase);
     }
+    my $bottom_margin = $ybase - $height;
 
     my $pg_cnt      = 1;
     my $cur_y       = $ybase;
@@ -299,7 +310,14 @@ sub table {
     my $size    = $arg{'size'}   || undef;
 
     # Create Text Object
-    my $txt     = $page->text();
+    my $txt     = $page->text();  # $ink==0 still needs for font size, etc.
+    # doing sizing or actual output?
+    if (!$ink) {
+        @vsizes = (0, 0, 0);  # overall, header, footer (future)
+        # push each row onto @vsizes as defined
+        # override y,h to nearly infinitely large (will never paginate)
+        $ybase = $height = 2147000000;
+    }
 
     #=====================================
     # Table Header Section
@@ -347,7 +365,7 @@ sub table {
     #=====================================
     # geometry-related global settings checked, last value for find_value()
     my $fnt_obj        = $arg{'font'            } ||
-                         $pdf->corefont('Times',-encode => 'latin1');
+                         $pdf->corefont('Times-Roman',-encode => 'latin1');
     my $fnt_size       = $arg{'font_size'       } || $font_size_default;
     my $min_leading    = $fnt_size * $leading_ratio;
     my $leading        = $arg{'leading'} || $min_leading;
@@ -391,7 +409,7 @@ sub table {
         $cell_fg_color, $cell_bg_color_even, $cell_bg_color_odd,
         $cell_fg_color_even, $cell_fg_color_odd, $cell_min_w, $cell_max_w,
         $cell_h_rule_w, $cell_v_rule_w, $cell_h_rule_c, $cell_v_rule_c,
-        $cell_def_text);
+        $cell_def_text, $cell_markup);
 
     # for use by find_value()
     my $GLOBALS = [$cell_props, $col_props, $row_props, -1, -1, \%arg];
@@ -420,6 +438,49 @@ sub table {
             # initialize min and max column content widths to 0
             $col_min_width->[$col_idx]=0 if !defined $col_min_width->[$col_idx];
             $col_max_content->[$col_idx]=0 if !defined $col_max_content->[$col_idx];
+
+            # determine if this content is a simple string for normal usage,
+            # or it is markup
+            my $bad_markup = ''; 
+            if (ref($data->[$row_idx][$col_idx]) eq '') {
+                # it is a scalar string for normal usage
+                # (or some data easily stringified)
+                $cell_markup = '';
+            } elsif (ref($data->[$row_idx][$col_idx]) eq 'ARRAY') {
+                # it is an array for markup usage. exact type is the first 
+                # element.
+                if (!defined $data->[$row_idx][$col_idx]->[0]) {
+                    $bad_markup = 'array has no data';
+                } else {
+                    $cell_markup = $data->[$row_idx][$col_idx]->[0];
+
+                    # [0] should be none, md1, html, or pre
+                    if ($cell_markup ne 'none' && $cell_markup ne 'md1' &&
+                        $cell_markup ne 'html' && $cell_markup ne 'pre') {
+                        $bad_markup = "markup type '$cell_markup' unsupported";
+                    # [1] should be string or array of strings
+                    } elsif (defined $data->[$row_idx][$col_idx]->[1] &&
+                             ref($data->[$row_idx][$col_idx]->[1]) ne ''  &&
+                             ref($data->[$row_idx][$col_idx]->[1]) ne 'ARRAY') {
+                        $bad_markup = 'data not string or array of strings';
+                    # [2] should be hash reference (possibly empty)
+                    } elsif (defined $data->[$row_idx][$col_idx]->[2] &&
+                             ref($data->[$row_idx][$col_idx]->[2]) ne 'HASH') {
+                        $bad_markup = 'options not hash ref';
+                    }
+                    # [3+] additional elements ignored
+                }
+            } else {
+                # um, is not a legal data type for this purpose, even if it
+                # IS able to stringify to something reasonable
+                $bad_markup = 'is not a string or array reference';
+            }
+            if ($bad_markup ne '') {
+                # replace bad markup with a simple string
+                carp "Cell $row_idx,$col_idx $bad_markup.\n";
+                $data->[$row_idx][$col_idx] = '(invalid)';
+                $cell_markup = '';
+            }
 
             if ( !$row_idx && $do_headers ) {
                 # header row
@@ -578,7 +639,9 @@ sub table {
             # hyphen (dash) at split. would have to track split words (by
             # index numbers?) and glue them back together when there's space
             # to do so (including hyphen).
-            if ( $cell_max_word_len > 0 && $data->[$row_idx][$col_idx]) {
+            # update: split words only if simple strings (not calling column())
+            if ( $cell_max_word_len > 0 && $data->[$row_idx][$col_idx] &&
+                 ref($data->[$row_idx][$col_idx]) eq '') {
                 $data->[$row_idx][$col_idx] =~ s#(\S{$cell_max_word_len})(?=\S)#$1 #g;
             }
 
@@ -784,19 +847,19 @@ sub table {
 
         # order is important -- cell background layer must be rendered
         # before text layer and then other graphics (rules, borders)
-        $gfx_bg = $page->gfx();
+        $gfx_bg = $page->gfx() if $ink;
         $txt = $page->text();
 
         $cur_y = $table_top_y;
 
         # let's just always go ahead and create $gfx (for drawing borders
         # and rules), as it will almost always be needed
-        $gfx = $page->gfx();  # for borders, rules, etc.
-        $gfx->strokecolor($border_c);
+        $gfx = $page->gfx() if $ink;  # for borders, rules, etc.
+        $gfx->strokecolor($border_c) if $ink;
 
         # Draw the top line (border), only if h_border_w > 0, as we
         # don't know what rules are doing
-        if ($h_border_w) {
+        if ($ink && $h_border_w) {
             if      ($next_top_border == 0) {
                 # first top border (page 1), use specified border
                 $gfx->linewidth($h_border_w);
@@ -1065,7 +1128,7 @@ sub table {
 
                 # Initialize cell font object
                 $txt->font( $cell_font, $cell_font_size );
-                $txt->fillcolor($fg_color);
+                $txt->fillcolor($fg_color) if $ink;
 
                 # make sure cell's text is never undef
                 $data_row->[$col_idx] //= $cell_def_text;
@@ -1093,28 +1156,74 @@ sub table {
                 # we need to add the text as a text block
                 # Otherwise just use the $page->text() method
                 my $content = $data_row->[$col_idx];
-                $content = $cell_def_text if $content eq '';
+                $content = $cell_def_text if (ref($content) eq '' && 
+                                              $content eq '');
                 # empty content? doesn't seem to do any harm
-                if ( $content !~ m/(.\n.)/ and
-                     $data_row_widths->[$col_idx] and
-                     $data_row_widths->[$col_idx] <= 
-                         $actual_column_widths[$row_idx][$col_idx] ) {
+                if ( ref($content) eq 'ARRAY') {
+                    # it's a markup cell
+                    $cell_markup = $content->[0];
+                    # if it's "leftover" content, markup is 'pre'
+                     
+                    my ($rc, $next_y, $remainder);
+                    # upper left corner, width, and max height of this column?
+                    my $ULx = $cur_x + $cell_pad_left;
+                    my $ULy = $cur_y - $cell_pad_top;
+                    my $width = $actual_column_widths[$row_idx][$col_idx] - 
+                                $cell_pad_right - $cell_pad_left;
+                    my $max_h = $cur_y - $bottom_margin - 
+                                $cell_pad_top - $cell_pad_bot;
+                    ($rc,  $next_y, $remainder) =
+                        $txt->column($page, $txt, $gfx, $cell_markup,
+                                     $content->[1],
+                                     'rect'=>[$ULx, $ULy, $width, $max_h],
+                                     'font_size'=>$cell_font_size,
+                                     %{$content->[2]});
+                    if ($rc) {
+                        # splitting cell
+                        $actual_row_height = max($actual_row_height,
+                            $cur_y - $bottom_margin);
+                    } else {
+                        # got entire content onto this page
+                        $actual_row_height = max($actual_row_height,
+                           $cur_y - $next_y + $cell_pad_bot +
+                           ($cell_leading - $cell_font_size)*1.0);
+                    }
+                    # 1.0 multiplier is a good-looking fudge factor to add a 
+                    # little space between bottom of text and bottom of cell
+
+                    # at this point, actual_row_height is the used
+                    # height of this row, for purposes of background cell
+                    # color and left rule drawing. current_min_rh is left as
+                    # the height of one line + padding.
+
+                    if ( $rc ) {
+                        $leftovers->[$col_idx] = [ 'pre', $remainder, 
+                            $content->[2] ];
+                        $do_leftovers = 1;
+                    }
+
+                } elsif ( $content !~ m/(.\n.)/ and
+                          $data_row_widths->[$col_idx] and
+                          $data_row_widths->[$col_idx] <= 
+                              $actual_column_widths[$row_idx][$col_idx] ) {
                     # no embedded newlines (no multiple lines)
                     # and the content width is <= calculated column width?
                     # content will fit on one line, use text_* calls
-                    if      ($cell_justify eq 'right') {
-                        # right justified before right padding
-                        $txt->translate($cur_x + $actual_column_widths[$row_idx][$col_idx] - $cell_pad_right, $text_start_y);
-                        $txt->text_right($content, %text_options);
-                    } elsif ($cell_justify eq 'center') {
-                        # center text within the margins (padding)
-                        $txt->translate($cur_x + $cell_pad_left + ($actual_column_widths[$row_idx][$col_idx] - $cell_pad_left - $cell_pad_right)/2, $text_start_y);
-                        $txt->text_center($content, %text_options);
-                    } else { 
-                        # left justified after left padding
-                        # (text_left alias for text, in PDF::Builder only)
-                        $txt->translate($cur_x + $cell_pad_left, $text_start_y);
-                        $txt->text($content, %text_options);
+                    if ($ink) {
+                        if      ($cell_justify eq 'right') {
+                            # right justified before right padding
+                            $txt->translate($cur_x + $actual_column_widths[$row_idx][$col_idx] - $cell_pad_right, $text_start_y);
+                            $txt->text_right($content, %text_options);
+                        } elsif ($cell_justify eq 'center') {
+                            # center text within the margins (padding)
+                            $txt->translate($cur_x + $cell_pad_left + ($actual_column_widths[$row_idx][$col_idx] - $cell_pad_left - $cell_pad_right)/2, $text_start_y);
+                            $txt->text_center($content, %text_options);
+                        } else { 
+                            # left justified after left padding
+                            # (text_left alias for text, in PDF::Builder only)
+                            $txt->translate($cur_x + $cell_pad_left, $text_start_y);
+                            $txt->text($content, %text_options);
+                        }
                     }
                     
                 } else {
@@ -1212,40 +1321,52 @@ sub table {
                 $cell_h_rule_c = $save_h_rule_c[$col_idx];
 
         # TBD rowspan!
-                if (defined $bg_color && 
-                    !$colspanned{$row_idx.'_'.$col_idx}) {
-                    $gfx_bg->rect( $cur_x, $cur_y-$actual_row_height,  
-                                   $actual_column_widths[$row_idx][$col_idx], $actual_row_height);
-                    $gfx_bg->fillcolor($bg_color);
-                    $gfx_bg->fill();
-                }
+                if ($ink) {
+                    if (defined $bg_color && 
+                        !$colspanned{$row_idx.'_'.$col_idx}) {
+                        $gfx_bg->rect( $cur_x, $cur_y-$actual_row_height,  
+                                       $actual_column_widths[$row_idx][$col_idx], $actual_row_height);
+                        $gfx_bg->fillcolor($bg_color);
+                        $gfx_bg->fill();
+                    }
 
-                # draw left vertical border of this cell unless leftmost
-                if ($gfx && $cell_v_rule_w && $col_idx &&
-                    !$colspanned{$row_idx.'_'.$col_idx}) {
-                    $gfx->linewidth($cell_v_rule_w);
-                    $gfx->strokecolor($cell_v_rule_c);
-                    $gfx->move($cur_x, $cur_y-$actual_row_height);
-                    $gfx->vline( $cur_y - ($row_idx? 0: $h_border_w/2));
-                    $gfx->stroke(); # don't confuse different widths and colors
-                }
+                    # draw left vertical border of this cell unless leftmost
+                    if ($gfx && $cell_v_rule_w && $col_idx &&
+                        !$colspanned{$row_idx.'_'.$col_idx}) {
+                        $gfx->linewidth($cell_v_rule_w);
+                        $gfx->strokecolor($cell_v_rule_c);
+                        $gfx->move($cur_x, $cur_y-$actual_row_height);
+                        $gfx->vline( $cur_y - ($row_idx? 0: $h_border_w/2));
+                        $gfx->stroke(); # don't confuse different widths and colors
+                    }
 
-                # draw bottom horizontal rule of this cell unless bottom
-                # of page (no more data or not room for at least one line).
-                # TBD fix up when implement rowspan
-                if ($gfx && $cell_h_rule_w && scalar(@{$data}) && 
-                    $cur_y-$actual_row_height-$current_min_rh > $bot_margin ) {
-                    $gfx->linewidth($cell_h_rule_w);
-                    $gfx->strokecolor($cell_h_rule_c);
-                    $gfx->move($cur_x, $cur_y-$actual_row_height);
-                    $gfx->hline( $cur_x + $actual_column_widths[$row_idx][$col_idx] );
-                    $gfx->stroke(); # don't confuse different widths and colors
+                    # draw bottom horizontal rule of this cell unless bottom
+                    # of page (no more data or not room for at least one line).
+                    # TBD fix up when implement rowspan
+                    if ($gfx && $cell_h_rule_w && scalar(@{$data}) && 
+                        $cur_y-$actual_row_height-$current_min_rh > $bot_margin ) {
+                        $gfx->linewidth($cell_h_rule_w);
+                        $gfx->strokecolor($cell_h_rule_c);
+                        $gfx->move($cur_x, $cur_y-$actual_row_height);
+                        $gfx->hline( $cur_x + $actual_column_widths[$row_idx][$col_idx] );
+                        $gfx->stroke(); # don't confuse different widths and colors
+                    }
                 }
 
                 $cur_x += $calc_column_widths->[$col_idx];
             } # End of for (my $col_idx....
 
             $cur_y -= $actual_row_height;
+            if (!$ink) {
+                if ($first_row && $do_headers) {
+                    # this was a header row
+                    $vsizes[1] = $actual_row_height;
+                } else {
+                    # this was a non-header row
+                    push @vsizes, $actual_row_height;
+                }
+                # if implement footer, it will go in [2]
+            }
 
             if ($do_leftovers) {
                 # a row has been split across pages. undo bg toggle
@@ -1262,45 +1383,56 @@ sub table {
         # The line overlays and hides any odd business with vertical rules
         # in the last row
         if (!scalar(@{$data})) { $next_top_border = 0; }
-        if ($gfx && $h_border_w) {
-            if      ($next_top_border == 0) {
-                # last bottom border, use specified border
-                $gfx->linewidth($h_border_w);
-            } elsif ($next_top_border == 1) {
-                # solid thin line at start of a row
-                $gfx->linewidth($border_w_default);
-            } else {  # == 2
-                # dashed thin line at contination in middle of row
-                $gfx->linewidth($border_w_default);
-                $gfx->linedash($dashed_rule_default);
-            }
-            # leave next_top_border for next page top of continued table
-            $gfx->strokecolor($border_c);
-            $gfx->move( $xbase-$v_border_w/2 , $cur_y );
-            $gfx->hline($xbase + $width + $v_border_w/2);
-            $gfx->stroke();
-            $gfx->linedash();
-        }
-
-        if ($gfx) {
-            if ($v_border_w) {
-                # Draw left and right table borders
-                # These overlay and hide any odd business with horizontal 
-                # rules at the left or right edge
-                $gfx->linewidth($v_border_w);
-                $gfx->move(  $xbase,          $table_top_y);
-                $gfx->vline( $cur_y );
-                $gfx->move(  $xbase + $width, $table_top_y);
-                $gfx->vline( $cur_y );
+        if ($ink) {
+            if ($gfx && $h_border_w) {
+                if      ($next_top_border == 0) {
+                    # last bottom border, use specified border
+                    $gfx->linewidth($h_border_w);
+                } elsif ($next_top_border == 1) {
+                    # solid thin line at start of a row
+                    $gfx->linewidth($border_w_default);
+                } else {  # == 2
+                    # dashed thin line at continuation in middle of row
+                    $gfx->linewidth($border_w_default);
+                    $gfx->linedash($dashed_rule_default);
+                }
+                # leave next_top_border for next page top of continued table
+                $gfx->strokecolor($border_c);
+                $gfx->move( $xbase-$v_border_w/2 , $cur_y );
+                $gfx->hline($xbase + $width + $v_border_w/2);
+                $gfx->stroke();
+                $gfx->linedash();
             }
 
-            # draw all the unrendered lines
-            $gfx->stroke();
+            if ($gfx) {
+                if ($v_border_w) {
+                    # Draw left and right table borders
+                    # These overlay and hide any odd business with horizontal 
+                    # rules at the left or right edge
+                    $gfx->linewidth($v_border_w);
+                    $gfx->move(  $xbase,          $table_top_y);
+                    $gfx->vline( $cur_y );
+                    $gfx->move(  $xbase + $width, $table_top_y);
+                    $gfx->vline( $cur_y );
+                }
+
+                # draw all the unrendered lines
+                $gfx->stroke();
+            }
         }
         $pg_cnt++;  # on a spillover page
     } # End of while (scalar(@{$data}))   next row, adding new page if necessary
 
-    return ($page, --$pg_cnt, $cur_y);
+    if ($ink) {
+        return ($page, --$pg_cnt, $cur_y);
+    } else {
+        # calculate overall table height as sum of 1..$#vsizes
+        for (my $i = 1; $i < @vsizes; $i++) {
+            $vsizes[0] += $vsizes[$i];
+        }
+        # might need to account for really thick horizontal border rules
+        return @vsizes;
+    }
 } # end of table()
 
 ############################################################
@@ -1509,8 +1641,8 @@ $text = ' ';
             #  max_word_len, and other indents could make line too wide for col!
             my $hang_width = $text_object->advancewidth($arg{'hang'});
 
-            $text_object->translate( $xpos, $ypos );
-            $text_object->text( $arg{'hang'} );
+            $text_object->translate( $xpos, $ypos ) if $ink;
+            $text_object->text( $arg{'hang'} ) if $ink;
 
             $xpos         += $hang_width;
             $line_width   += $hang_width;
@@ -1587,8 +1719,8 @@ $text = ' ';
 
         if ( $align eq 'justify') {
             foreach my $word (@line) {
-                $text_object->translate( $xpos, $ypos );
-                $text_object->text( $word );
+                $text_object->translate( $xpos, $ypos ) if $ink;
+                $text_object->text( $word ) if $ink;
                 $xpos += ($word_width{$word} + $wordspace) if (@line);
             }
             $endw = $width;
@@ -1600,16 +1732,18 @@ $text = ' ';
 #               $xpos += ( $width - $line_width ) / 2;
 #           }
 
-            # render the line. TBD This may not work right with indents!
-            if      ($align eq 'right') {
-                $text_object->translate( $xpos+$width, $ypos );
-                $endw = $text_object->text_right(join(' ', @line), %text_options);
-            } elsif ($align eq 'center') {
-                $text_object->translate( $xpos + $width/2, $ypos );
-                $endw = $text_object->text_center(join(' ', @line), %text_options);
-            } else {
-                $text_object->translate( $xpos, $ypos );
-                $endw = $text_object->text(join(' ', @line), %text_options);
+            if ($ink) {
+                # render the line. TBD This may not work right with indents!
+                if      ($align eq 'right') {
+                    $text_object->translate( $xpos+$width, $ypos );
+                    $endw = $text_object->text_right(join(' ', @line), %text_options);
+                } elsif ($align eq 'center') {
+                    $text_object->translate( $xpos + $width/2, $ypos );
+                    $endw = $text_object->text_center(join(' ', @line), %text_options);
+                } else {
+                    $text_object->translate( $xpos, $ypos );
+                    $endw = $text_object->text(join(' ', @line), %text_options);
+                }
             }
         }
         $first_line = 0;

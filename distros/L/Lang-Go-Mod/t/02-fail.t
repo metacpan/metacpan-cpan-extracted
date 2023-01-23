@@ -13,7 +13,7 @@ ok(
     dies {
         parse_go_mod($missing_module);
     }
-) or note($@);
+  ) or note($@);
 
 my $missing_go = <<"MISSING_GO";
 $module
@@ -22,7 +22,7 @@ ok(
     dies {
         parse_go_mod($missing_go);
     }
-) or note($@);
+  ) or note($@);
 
 # this doesn't fail but demonstrates the "minimum viable go.mod"
 my $minimal = <<"MINIMAL";
@@ -33,7 +33,7 @@ ok(
     lives {
         parse_go_mod($minimal);
     }
-) or note($@);
+  ) or note($@);
 
 my $typo_exclude = <<"TYPO_EXCLUDE";
 $minimal
@@ -43,7 +43,7 @@ ok(
     dies {
         parse_go_mod($typo_exclude);
     }
-) or note($@);
+  ) or note($@);
 
 my $typo_replace = <<"TYPO_REPLACE";
 $minimal
@@ -53,7 +53,7 @@ ok(
     dies {
         parse_go_mod($typo_replace);
     }
-) or note($@);
+  ) or note($@);
 
 my $typo_require = <<"TYPO_REQUIRE";
 $minimal
@@ -63,7 +63,7 @@ ok(
     dies {
         parse_go_mod($typo_require);
     }
-) or note($@);
+  ) or note($@);
 
 my $malformed_exclude = <<"MALFORMED_EXCLUDE";
 $minimal
@@ -73,7 +73,7 @@ ok(
     dies {
         parse_go_mod($malformed_exclude);
     }
-) or note($@);
+  ) or note($@);
 
 my $malformed_replace = <<"MALFORMED_REPLACE";
 $minimal
@@ -83,7 +83,7 @@ ok(
     dies {
         parse_go_mod($malformed_replace);
     }
-) or note($@);
+  ) or note($@);
 
 my $malformed_require = <<"MALFORMED_REQUIRE";
 $minimal
@@ -93,7 +93,7 @@ ok(
     dies {
         parse_go_mod($malformed_require);
     }
-) or note($@);
+  ) or note($@);
 
 my $malformed_multi_exclude = <<"MALFORMED_MULTI_EXCLUDE";
 $minimal
@@ -105,7 +105,7 @@ ok(
     dies {
         parse_go_mod($malformed_multi_exclude);
     }
-) or note($@);
+  ) or note($@);
 
 my $malformed_multi_replace = <<"MALFORMED_MULTI_REPLACE";
 $minimal
@@ -117,7 +117,7 @@ ok(
     dies {
         parse_go_mod($malformed_multi_replace);
     }
-) or note($@);
+  ) or note($@);
 
 my $malformed_multi_require = <<"MALFORMED_MULTI_REQUIRE";
 $minimal
@@ -129,7 +129,7 @@ ok(
     dies {
         parse_go_mod($malformed_multi_require);
     }
-) or note($@);
+  ) or note($@);
 
 done_testing;
 

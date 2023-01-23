@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Brad Clawsie, 2021 -- brad.clawsie@gmail.com
+#  (C) Brad Clawsie, 2023 -- brad.clawsie@gmail.com
 
 package Lang::Go::Mod;
 use warnings;
@@ -13,10 +13,10 @@ use Path::Tiny qw(path);
 
 # ABSTRACT: parse and model go.mod files
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 our $AUTHORITY = 'cpan:bclawsie';
 
-our @EXPORT_OK = qw(read_go_mod parse_go_mod);
+our @EXPORT_OK = qw(read_go_mod parse_go_mod _parse_retract);
 
 sub read_go_mod {
     my $use_msg     = 'use: read_go_mod(go_mod_path)';
@@ -31,18 +31,18 @@ sub parse_go_mod {
     my $go_mod_content = shift || croak 'use: parse_go_mod(go_mod_content)';
 
     my $m = {};
-    $m->{exclude}   = {};
-    $m->{replace}   = {};
-    $m->{'require'} = {};
-    my ( $excludes, $replaces, $requires ) = ( 0, 0, 0 );
+    for my $k ( 'exclude', 'replace', 'require', 'retracts' ) {
+        $m->{$k} = {};
+    }
+    my ( $excludes, $replaces, $requires, $retracts ) = ( 0, 0, 0, 0 );
 
-  LINE: for my $line ( split /\n/msx, $go_mod_content ) {
-        next LINE if ( $line =~ /^\s*$/msx );
+    LINE: for my $line ( split /\n/x, $go_mod_content ) {
+        next LINE if ( $line =~ /^\s*$/x );
         if ($excludes) {
-            if ( $line =~ /^\s*[)]\s*$/msx ) {
+            if ( $line =~ /^\s*[)]\s*$/x ) {
                 $excludes = 0;
             }
-            elsif ( $line =~ /\s*(\S+)\s+(\S+)/msx ) {
+            elsif ( $line =~ /\s*(\S+)\s+(\S+)/x ) {
                 $m->{exclude}->{$1} = [] unless ( defined $m->{exclude}->{$1} );
                 push @{ $m->{exclude}->{$1} }, $2;
             }
@@ -52,10 +52,10 @@ sub parse_go_mod {
             next LINE;
         }
         if ($replaces) {
-            if ( $line =~ /^\s*[)]\s*$/msx ) {
+            if ( $line =~ /^\s*[)]\s*$/x ) {
                 $replaces = 0;
             }
-            elsif ( $line =~ /^\s*(\S+)\s+=>\s+(\S+)\s*$/msx ) {
+            elsif ( $line =~ /^\s*(\S+)\s+=>\s+(\S+)\s*$/x ) {
                 croak "duplicate replace for $1"
                   if ( defined $m->{replace}->{$1} );
                 $m->{replace}->{$1} = $2;
@@ -66,10 +66,10 @@ sub parse_go_mod {
             next LINE;
         }
         if ($requires) {
-            if ( $line =~ /^\s*[)]\s*$/msx ) {
+            if ( $line =~ /^\s*[)]\s*$/x ) {
                 $requires = 0;
             }
-            elsif ( $line =~ /^\s*(\S+)\s+(\S+).*$/msx ) {
+            elsif ( $line =~ /^\s*(\S+)\s+(\S+).*$/x ) {
                 croak "duplicate require for $1"
                   if ( defined $m->{'require'}->{$1} );
                 $m->{'require'}->{$1} = $2;
@@ -79,55 +79,93 @@ sub parse_go_mod {
             }
             next LINE;
         }
+        if ($retracts) {
+            if ( $line =~ /^\s*[)]\s*$/x ) {
+                $retracts = 0;
+            }
+            elsif ( $line =~ /^\s*(\S+)(.*)$/x ) {
+                my $retract = _parse_retract( $1 . $2 );
+                croak "unparseable retract content: $line"
+                  unless ( defined($retract) );
+                croak "duplicate retract for $retract"
+                  if ( defined $m->{retract}->{$retract} );
+                $m->{retract}->{$retract} = 1;
+            }
+            else {
+                croak "malformed retract line $line";
+            }
+            next LINE;
+        }
 
-        if ( $line =~ /^module\s+(\S+)$/msx ) {
+        # single-line directives
+        if ( $line =~ /^module\s+(\S+)$/x ) {
             $m->{module} = $1;
         }
-        elsif ( $line =~ /^go\s+(\S+)$/msx ) {
+        elsif ( $line =~ /^go\s+(\S+)$/x ) {
             $m->{go} = $1;
         }
-        elsif ( $line =~ /^exclude\s+[(]\s*$/msx ) {
 
-            # beginning of exclude block
-            $excludes = 1;
-        }
-        elsif ( $line =~ /^replace\s+[(]\s*$/msx ) {
+        # multi-line directive
+        elsif ( $line =~ /^exclude\s+[(]\s*$/x ) {
 
-            # beginning of replace block
-            $replaces = 1;
+         # toggle beginning of exclude block (and negate the other block checks)
+            ( $excludes, $replaces, $requires, $retracts ) = ( 1, 0, 0, 0 );
         }
-        elsif ( $line =~ /^require\s+[(]\s*$/msx ) {
+        elsif ( $line =~ /^replace\s+[(]\s*$/x ) {
 
-            # beginning of require block
-            $requires = 1;
+         # toggle beginning of replace block (and negate the other block checks)
+            ( $excludes, $replaces, $requires, $retracts ) = ( 0, 1, 0, 0 );
         }
-        elsif ( $line =~ /^exclude\s+(\S+)\s+(\S+)\s*$/msx ) {
+        elsif ( $line =~ /^require\s+[(]\s*$/x ) {
+
+         # toggle beginning of require block (and negate the other block checks)
+            ( $excludes, $replaces, $requires, $retracts ) = ( 0, 0, 1, 0 );
+        }
+        elsif ( $line =~ /^retract\s+[(]\s*$/x ) {
+
+         # toggle beginning of retract block (and negate the other block checks)
+            ( $excludes, $replaces, $requires, $retracts ) = ( 0, 0, 0, 1 );
+        }
+
+        # single-line forms of multi-line directives
+        elsif ( $line =~ /^exclude\s+(\S+)\s+(\S+)\s*$/x ) {
 
             # single exclude
             $m->{$1} = [] unless ( defined $m->{exclude}->{$1} );
             push @{ $m->{exclude}->{$1} }, $2;
         }
-        elsif ( $line =~ /^replace\s+(\S+)\s+=>\s+(\S+)\s*$/msx ) {
+        elsif ( $line =~ /^replace\s+(\S+)\s+=>\s+(\S+)\s*$/x ) {
 
             # single replace
             croak "duplicate replace for $1"
               if ( defined $m->{replace}->{$1} );
             $m->{replace}->{$1} = $2;
         }
-        elsif ( $line =~ /^require\s+(\S+)+\s+(\S+).*$/msx ) {
+        elsif ( $line =~ /^require\s+(\S+)+\s+(\S+).*$/x ) {
 
             # single require
             croak "duplicate require for $1"
               if ( defined $m->{'require'}->{$1} );
             $m->{'require'}->{$1} = $2;
         }
+        elsif ( $line =~ /^retract\s+(.+)/x ) {
+
+            # single retract
+            my $retract = _parse_retract($1);
+            croak "unparseable retract content: $line"
+              unless ( defined($retract) );
+            croak "duplicate retract for $retract"
+              if ( defined $m->{retract}->{$retract} );
+            $m->{retract}->{$retract} = 1;
+        }
         elsif ( $line =~ m{^\s*//.*$}mx ) {
 
-            # comment
+            # comment - strip
+            # (can also be part of a multi-line retract rationale)
 
         }
         else {
-            croak "unknown line content: $line";
+            croak "unparseable line content: $line";
         }
     }
 
@@ -137,13 +175,61 @@ sub parse_go_mod {
     return $m;
 }
 
+# 'private' sub to extract individual retract lines and strip off the rationale comments
+# see: https://go.dev/ref/mod#go-mod-file-retract
+#
+# rationale comments are stripped out
+#
+# this sub should only see one line; if a retract rational had multiple lines, like:
+# retract v1.0.0 // why
+#                // oh why
+#
+# then the second comment line is caught by the comment match in the loop of parse_go_mod
+sub _parse_retract {
+    my $retract = shift || croak 'missing retract string';
+
+    if ( $retract =~ /^\s*\[(.+?)\](.*)$/x ) {    # version-range
+        my $range = $1;
+        my $rest  = $2;
+
+        # trim whitespace from range
+        $range =~ s/\s+//gx;
+        my @versions = split( /,/x, $range );
+        my $count    = 0;
+        for my $version (@versions) {
+            return undef unless ( $version =~ /\S+/x );
+            $count++;
+        }
+        return undef if ( $count != 2 );
+
+        # if there is a comment, it must be properly formatted
+        if ( $rest =~ /\S/x ) {
+            return undef unless ( $rest =~ m{^\s+//}ox );
+        }
+        return '[' . $range . ']';
+    }
+    elsif ( $retract =~ /^\s*(\S+)(.*)$/x ) {    # single version
+        my $version = $1;
+        my $rest    = $2;
+
+        # if there is a comment, it must be properly formatted
+        if ( $rest =~ /\S/x ) {
+            return undef unless ( $rest =~ m{^\s+//}ox );
+        }
+        return $version;
+    }
+
+    # unparseable retract string
+    return undef;
+}
+
 1;
 
 __END__
 
 =head1 NAME
 
-C<Lang::Go::Mod> - parse and model go.mod files
+Lang::Go::Mod - parse and model go.mod files
 
 =head1 SYNOPSIS
 
@@ -201,10 +287,10 @@ return the hash representation of the contents. All errors C<croak>.
 
 Lang::Go::Mod is licensed under the same terms as Perl itself.
 
-https://opensource.org/licenses/artistic-license-2.0
+L<https://opensource.org/licenses/artistic-license-2.0>
 
 =head1 CONTRIBUTORS
 
-Ben Bullock (https://github.com/benkasminbullock)
+Ben Bullock (L<https://github.com/benkasminbullock>)
 
 =cut

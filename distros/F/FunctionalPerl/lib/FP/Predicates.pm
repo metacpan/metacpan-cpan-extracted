@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2020 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2014-2022 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -54,7 +54,7 @@ FP::Predicates
         is is_pure_class("FP:: Array")->message,
            "failure: is_pure_class\n".
            "  because:\n".
-           "  failure: is_class_name: 'FP:: Array'\n";
+           "  failure: is_valid_class_name: 'FP:: Array'\n";
     }
 
 =head1 DESCRIPTION
@@ -95,6 +95,8 @@ our @EXPORT = qw(
     is_pure_object
     is_pure_class
     is_string
+    is_path_string
+    is_path_segment_string
     is_nonnumeric_string
     is_nonnullstring
     is_natural0
@@ -106,7 +108,7 @@ our @EXPORT = qw(
     is_hash
     is_array
     is_procedure
-    is_class_name
+    is_valid_class_name
     instance_of
     is_instance_of
     is_subclass_of
@@ -115,6 +117,7 @@ our @EXPORT = qw(
 
     is_filename
     is_sequence
+    sequence_of
     is_proper_sequence
     is_seq
 
@@ -136,10 +139,12 @@ our @EXPORT = qw(
 );
 our @EXPORT_OK = qw(
     is_coderef
+    $package_re
 );
 our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use Chj::TEST;
+use FP::Carp;
 use FP::Abstract::Pure;
 use Chj::BuiltinTypePredicates 'is_filehandle';
 
@@ -187,7 +192,7 @@ sub is_pure_object {
 }
 
 sub is_pure_class {
-    my $r = is_class_name($_[0]);
+    my $r = is_valid_class_name($_[0]);
     $r or return failwith [$r], "is_pure_class";
     $_[0]->isa("FP::Abstract::Pure") or fail "is_pure_class", $_[0]
 }
@@ -198,10 +203,31 @@ sub is_string {
         or fail "is_string", $v
 }
 
+sub is_path_string {
+    my ($v) = @_;
+    (
+        defined $v and not ref $v              # relax?
+            and length $v and not $v =~ /\0/
+        )
+        or fail "is_path_string", $v
+}
+
+sub is_path_segment_string {
+    my ($v) = @_;
+    (
+        defined $v and not ref $v              # relax?
+            and length $v
+            and not $v =~ m{[\0/]}
+            and not $v eq ".."
+            and not $v eq "."
+        )
+        or fail "is_path_segment_string", $v
+}
+
 sub is_nonnumeric_string {
     my ($v) = @_;
     (
-        defined $v and not ref $v    # relax?
+        defined $v and not ref $v              # relax?
             and not looks_like_number($v)
         )
         or fail "is_string", $v
@@ -210,7 +236,7 @@ sub is_nonnumeric_string {
 sub is_nonnullstring {
     my ($v) = @_;
     (
-        defined $v and not ref $v    # relax?
+        defined $v and not ref $v              # relax?
             and length $v
         )
         or fail "is_nonnullstring", $v
@@ -219,7 +245,7 @@ sub is_nonnullstring {
 sub is_natural0 {
     my ($v) = @_;
     (
-        defined $v and not ref $v    # relax?
+        defined $v and not ref $v              # relax?
             and $v =~ /^\d+\z/
         )
         or fail "is_natural0", $v
@@ -228,7 +254,7 @@ sub is_natural0 {
 sub is_natural {
     my ($v) = @_;
     (
-        defined $v and not ref $v       # relax?
+        defined $v and not ref $v              # relax?
             and $v =~ /^\d+\z/ and $v
         )
         or fail "is_natural", $v
@@ -360,17 +386,27 @@ TEST { is_procedure \&is_procedure } 1;
 TEST { is_procedure *is_procedure } 1;
 TEST { is_procedure *fifu } 0;
 
-my $classpart_re = qr/\w+/;
+my $classpart_re = qr/[a-zA-Z_]\w*/;
 
-sub is_class_name {
+our $package_re = qr/(?:${classpart_re}::)*$classpart_re/;
+
+sub is_valid_class_name {
     my ($v) = @_;
-    !length ref($v) and $v =~ /^(?:${classpart_re}::)*$classpart_re\z/
-        or fail "is_class_name", $v
+    !length ref($v) and $v =~ /^$package_re\z/
+        or fail "is_valid_class_name", $v
 }
+
+TEST {
+    [
+        map { is_valid_class_name $_ } "foo ",
+        qw(foo foo_bar Foo::Bar Foo:Bar Foo123 123 Foo::123)
+    ]
+}
+[0, 1, 1, 1, 0, 1, 0, 0];
 
 sub instance_of {
     my ($class) = @_;
-    is_class_name $class or die "need class name string, got: $class";
+    is_valid_class_name $class or die "need class name string, got: $class";
 
     sub {
         ((defined blessed $_[0]) ? $_[0]->isa($class) : '')
@@ -381,7 +417,7 @@ sub instance_of {
 sub is_instance_of {
     my ($v, $class) = @_;
 
-    # is_class_name $class or die "need class name string, got: $class";
+    # is_valid_class_name $class or die "need class name string, got: $class";
     ((defined blessed $v) ? $v->isa($class) : '')
         or fail "is_instance_of", $v, $class
 }
@@ -389,7 +425,7 @@ sub is_instance_of {
 sub is_subclass_of {
     my ($v, $class) = @_;
 
-    # is_class_name $class or die "need class name string, got: $class";
+    # is_valid_class_name $class or die "need class name string, got: $class";
     (!length ref $v and $v->isa($class)) or fail "is_subclass_of", $v, $class
 }
 
@@ -426,6 +462,7 @@ TEST {
 
 # should probably be in a filesystem lib instead?
 sub is_filename {
+    @_ == 1 or fp_croak_arity 1;
     my ($v) = @_;
     (is_nonnullstring($v) and !($v =~ m|/|) and !($v eq ".") and !($v eq ".."))
         or fail "is_filename", $v
@@ -434,24 +471,42 @@ sub is_filename {
 # can't be in `FP::Abstract::Sequence` since that package is for OO, well, what
 # to do about it?
 use FP::Lazy;    # sigh dependency, too.
-use FP::Carp;
 
 sub is_sequence {
+    @_ == 1 or fp_croak_arity 1;
     my $v = force $_[0];
     blessed($v) // return;
     $v->isa("FP::Abstract::Sequence") or fail "is_sequence", $v
 }
 
 sub is_proper_sequence {
+    @_ == 1 or fp_croak_arity 1;
     my $v = force $_[0];
     blessed($v) // return;
     ($v->isa("FP::Abstract::Sequence") and $v->is_proper_sequence)
         or fail "is_sequence", $v
 }
 
+sub sequence_of {
+    @_ == 1 or fp_croak_arity 1;
+    my ($pred) = @_;
+    sub {
+        @_ == 1 or fp_croak_arity 1;
+        my $v = force $_[0];
+        blessed($v) // return;
+
+        # Since `list_every` dies on improper lists, we have to check
+        # for is_proper_sequence here, too:
+        ($v->isa("FP::Abstract::Sequence") and $v->is_proper_sequence)
+            or return fail "sequence_of", $v;
+        $v->every($pred)    # should return a fail itself, so, OK?
+    }
+}
+
 # Like is_sequence but only returns true when the sequence isn't empty
 # (similar to Clojure's `(seq? (seq v))`)
 sub is_seq {
+    @_ == 1 or fp_croak_arity 1;
     my $v = force $_[0];
     blessed($v) // return;
     ($v->isa("FP::Abstract::Sequence") && (not $v->is_null))
@@ -475,10 +530,12 @@ sub maybe {
 
 # (this would also be a candidate for FP::Ops)
 sub is_defined {
+    @_ == 1 or fp_croak_arity 1;
     defined $_[0] or fail "is_defined", $_[0]
 }
 
 sub is_true {
+    @_ == 1 or fp_croak_arity 1;
     $_[0] or fail "is_true", $_[0]
 }
 

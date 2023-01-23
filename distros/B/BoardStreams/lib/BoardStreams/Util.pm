@@ -21,7 +21,7 @@ our @EXPORT_OK = qw/
 /;
 our %EXPORT_TAGS = (bool => [qw/ true false /]);
 
-our $VERSION = "v0.0.30";
+our $VERSION = "v0.0.31";
 
 sub make_one_line :prototype(_) ($text) {
     return trim(

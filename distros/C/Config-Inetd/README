@@ -16,7 +16,7 @@ SYNOPSIS
      print $inetd->config->[6];
 
 DESCRIPTION
-    `Config::Inetd' provides an interface to inetd's configuration file
+    "Config::Inetd" provides an interface to inetd's configuration file
     (usually named inetd.conf); it basically simplifies checking and setting
     the enabled/disabled status of services and also allows for dumping them
     by a given status.
@@ -45,7 +45,7 @@ METHODS
     Returns true if the service has been enabled, false if no action has
     been taken.
 
-    It is recommended to precedingly call `is_enabled()' with according
+    It is recommended to precedingly call "is_enabled()" with according
     arguments supplied to determine whether a service is disabled.
 
   disable
@@ -56,7 +56,7 @@ METHODS
     Returns true if the service has been disabled, false if no action has
     been taken.
 
-    It is recommended to precedingly call `is_enabled()' with according
+    It is recommended to precedingly call "is_enabled()" with according
     arguments supplied to determine whether a service is enabled.
 
   dump_enabled
@@ -84,15 +84,15 @@ METHODS
 
 INSTANCE DATA
     The inetd configuration file is tied as instance data with newlines
-    preserved; it may be accessed via `$inetd->config'.
+    preserved; it may be accessed via "$inetd->config".
 
 BUGS & CAVEATS
     It is strongly advised that the configuration file is backuped first if
     one is intending to work with the default (i.e., system-wide)
     configuration file and not a customized one.
 
-    Accessing `@{$inetd->{CONF}}' is deprecated and superseded by
-    `$inetd->config'.
+    Accessing "@{$inetd->{CONF}}" is deprecated and superseded by
+    "$inetd->config".
 
 SEE ALSO
     Tie::File, inetd.conf(5)
@@ -104,5 +104,5 @@ LICENSE
     This program is free software; you may redistribute it and/or modify it
     under the same terms as Perl itself.
 
-    See http://dev.perl.org/licenses/
+    See <http://dev.perl.org/licenses/>
 

@@ -12,7 +12,7 @@ use Data::Dumper;
 
 use parent qw( Exporter );
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 our %DEFAULT_PROCESSORS = (
   pre       => \&_pre,

@@ -4,7 +4,7 @@ use warnings;
 
 package Neo4j::Driver::Plugin;
 # ABSTRACT: Plug-in interface for Neo4j::Driver
-$Neo4j::Driver::Plugin::VERSION = '0.33';
+$Neo4j::Driver::Plugin::VERSION = '0.34';
 
 1;
 
@@ -20,7 +20,7 @@ Neo4j::Driver::Plugin - Plug-in interface for Neo4j::Driver
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 DESCRIPTION
 
@@ -38,7 +38,7 @@ is triggered. Events triggered by the driver are specified in
 L</"EVENTS"> below. Plug-ins can also define custom events.
 
 I<The plug-in interface as described in this document is available
-since version 0.31.>
+since version 0.34.>
 
 =head1 SYNPOSIS
 
@@ -48,8 +48,8 @@ since version 0.31.>
  sub new { bless {}, shift }
  
  sub register {
-   my ($self, $manager) = @_;
-   $manager->add_event_handler( http_adapter_factory => sub {
+   my ($self, $events) = @_;
+   $events->add_handler( http_adapter_factory => sub {
      my ($continue, $driver) = @_;
      
      # Get and modify the default adapter
@@ -94,7 +94,7 @@ Future versions may introduce new events or remove existing ones.
 
 =item http_adapter_factory
 
- $manager->add_event_handler(
+ $events->add_handler(
    http_adapter_factory => sub {
      my ($continue, $driver) = @_;
      my $adapter;
@@ -125,53 +125,44 @@ are reserved for use by the driver itself.
 
 =head1 METHODS
 
-All plug-ins must implement the following methods, which are
+All plug-ins must implement the following method, which is
 required for the L<Neo4j::Driver::Plugin> role.
 
 =over
 
-=item new
-
- sub new {
-   my ($class) = @_;
-   bless {}, $class;
- }
-
-Plug-in constructor. Returns a blessed reference. Parameters
-given are the plug-in package name.
-
 =item register
 
  sub register {
-   my ($self, $manager) = @_;
+   my ($self, $events) = @_;
    ...
  }
 
 Called by the driver when a plug-in is loaded. Parameters given
-are the plug-in and a plug-in manager.
+are the plug-in and an event manager.
 
 This method is expected to attach this plug-in's event handlers
-by calling the plug-in manager's L</"add_event_handler"> method.
+by calling the event manager's L</"add_handler"> method.
 See L</"EVENTS"> for a list of events supported by this version
 of the driver.
 
 =back
 
-=head1 THE PLUG-IN MANAGER
+=head1 THE EVENT MANAGER
 
-The job of the plug-in manager is to invoke the appropriate
+The job of the event manager (formerly known as the "plug-in
+manager") is to invoke the appropriate
 event handlers when events are triggered. It also allows clients
 to modify the list of registered handlers. A reference to the
-plug-in manager is provided to your plug-in when it is loaded;
+event manager is provided to your plug-in when it is loaded;
 see L</"register">.
 
-The plug-in manager implements the following methods.
+The event manager implements the following methods.
 
 =over
 
-=item add_event_handler
+=item add_handler
 
- $manager->add_event_handler( event_name => sub {
+ $events->add_handler( event_name => sub {
    ...
  });
 
@@ -187,7 +178,7 @@ event. Depending on what a plug-in's purpose is, it may be useful
 to either invoke this callback and work with the results, or to
 ignore it entirely and handle the event independently.
 
- $manager->add_event_handler( get_value => sub {
+ $events->add_handler( get_value => sub {
    my ($continue) = @_;
    my $default = $continue->();
    return eval { maybe_value() } // $default;
@@ -198,9 +189,12 @@ to provide additional arguments. Because subroutine signatures
 perform strict checks of the number of arguments, they are not
 recommended for event handlers.
 
-=item trigger_event
+This method used to be named C<add_event_handler()>.
+There is a compatibility alias, but its use is deprecated.
 
- $manager->trigger_event( 'event_name', @parameters );
+=item trigger
+
+ $events->trigger( 'event_name', @parameters );
 
 Called by the driver to trigger an event and invoke any registered
 handlers for it. May be given an arbitrary number of parameters,
@@ -223,6 +217,9 @@ ignored. This will likely change in a future version of the driver.
 Calling this method in list context is discouraged, because doing
 so might be treated specially by a future version of the driver.
 Use C<scalar> to be safe.
+
+This method used to be named C<trigger_event()>.
+There is a compatibility alias, but its use is deprecated.
 
 =back
 
@@ -377,6 +374,14 @@ headers and status of the last response.
 All of these entries must exist and be defined scalars.
 Unavailable values must use the empty string.
 Blocks until the response headers have been fully received.
+
+For error responses generated internally by the networking
+library, for example because the connection failed, C<status>
+and C<content_type> should both be the empty string, with
+the C<http_reason()> method providing the error message.
+Optionally, additional information may be made available in
+a plain text response content; in this case, the C<status>
+should preferably be C<"599">.
 
 =item http_reason
 
@@ -552,7 +557,7 @@ If you contact me by email, please make sure you include the word
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2022 by Arne Johannessen.
+This software is Copyright (c) 2016-2023 by Arne Johannessen.
 
 This is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0 or (at your option) the same terms

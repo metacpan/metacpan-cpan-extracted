@@ -13,6 +13,8 @@ use HTML::Blitz::TokenType qw(
     TT_DOCTYPE
 );
 
+our $VERSION = '0.03';
+
 method _fail(
     $msg,
     :$pos       = pos(${$self->{src_ref}}),
@@ -265,6 +267,17 @@ method parse() {
                 return {
                     type => TT_DOCTYPE,
                     pos  => $pos,
+                };
+            }
+
+            if ($self->{in_foreign_elem} && $$src_ref =~ /\G\[CDATA\[/gc) {
+                my $text_start = $+[0];
+                $$src_ref =~ /\]\]>/gc or $self->_fail("missing ']]>' after '<![CDATA['");
+                my $text_end = $-[0];
+                return {
+                    type    => TT_TEXT,
+                    pos     => $text_start,
+                    content => substr($$src_ref, $text_start, $text_end - $text_start),
                 };
             }
 

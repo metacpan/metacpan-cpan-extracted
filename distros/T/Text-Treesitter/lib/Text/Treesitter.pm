@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.70 ':experimental(adjust_params)';
 
-package Text::Treesitter 0.05;
+package Text::Treesitter 0.06;
 class Text::Treesitter
    :strict(params);
 

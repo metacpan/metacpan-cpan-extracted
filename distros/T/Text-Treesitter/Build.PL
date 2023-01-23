@@ -9,6 +9,7 @@ my $build = Module::Build::Using::PkgConfig->new(
    requires => {
       'perl' => '5.026',
       'Object::Pad' => 0,
+      'Syntax::Keyword::Match' => 0,
 
       'ExtUtils::CppGuess' => 0,
       'JSON::MaybeUTF8' => 0,

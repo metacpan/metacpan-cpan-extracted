@@ -10,7 +10,7 @@
 #
 
 use 5.024 ; use strict ; use warnings ;  # s/のr修飾子は v5.14を要求
-use Getopt::Std ; getopts 'a:cD:fg:IM:QT:y:%2:5:' , \my%o ; 
+use Getopt::Std ; getopts 'a:cD:fg:IL:M:QT:y:%2:5:' , \my%o ; 
 use POSIX qw[ ceil floor ] ; 
 use Term::ANSIColor qw[ :constants color ] ; $Term::ANSIColor::AUTORESET = 1 ;
 use Math::BigInt qw[ bgcd ] ; # -Qの指定時に必要となる。
@@ -54,7 +54,8 @@ sub test () {
     $cmd = "$0 -D5 -I -Q -g150,-inf -% 2.0 13.5 21.6" when 's21' ; 
     $cmd = "$0 -y1.. -g75,20 -D0,----- -Q -% 81.4 63.3 54.6 51.0 46.9 45.9 28.6 17.3 13.3 11.3 10.3" when 's24' ;
     # 機能追加に合わせてテストパターン
-    $cmd = "$0 -M0 -D9 33.3% 50.0% 57.1%" ; # -% 以外に%を直接数値に付けることを可能とした。%から&への誤字に注意。
+    $cmd = "$0 -M0 -D9 33.3% 50.0% 57.1%" when 'D9' ; # -% 以外に%を直接数値に付けることを可能とした。%から&への誤字に注意。
+    $cmd = "$0 -y, -L1 -% 3.2 59.0 17.5 20.3" when 'L1' ; # -L の実装の伴うテスト
   } for $o{T} ; 
   say STDERR BOLD ITALIC YELLOW " >> " , $cmd ; 
   system $cmd ; 
@@ -86,8 +87,9 @@ my $denom = do { $o{g} =~ s/(.+),// && $1 } || 1 ; #　開始する分母の値 
 END{
   exit unless $count ; # 1個も分母を探索していないなら、すぐ終了。
   exit if 0 eq ($o{2}//'') ;
-  my $sum = 0 ; $sum = "$sum" + "$_" for @nums ;
-  print STDERR BOLD FAINT @nums . " ratios are given (sum=$sum)." if @nums > 1 ; #&& 0 ne ($o{2}//'') ;
+  my $sum = 0 ; $sum = "$sum" + "$_" for @nums ; 
+  my $bf = color 'bold faint white' ;
+  print STDERR $bf . scalar @nums . " ratios are given (sum=" . color('reset bold yellow').($sum) . $bf .")." if @nums > 1 ; 
   my $ud = [ 'down to','from','up to' ] -> [ ( $o{g} <=> 0 ) + 1 ] ; # 'from' はかなり無理矢理である。正常な使用の想定外。
   $denom += $o{g} > 0 ? -1 : $o{g} < 0 ? 1 : 0 ; # 1個戻す。
   say STDERR BOLD FAINT " $count denominators have found $ud $denom. ($Script)" ; 
@@ -107,6 +109,7 @@ sub main ( ) {
       push @out , "numerators_$_" if $o{I} ; # unless $o{v} eq "0" ; 
     }
     push @out , "dividends" if $o{Q} ;
+    push @out, BLUE "likelihood ratio" if ($o{L}//'') ne '0' ; 
     say join "\t" , map { UNDERLINE $_ } @out ;
   } ;
   
@@ -133,14 +136,15 @@ sub main ( ) {
     sub sect($$$){
       return $_[0] < $_[1] ? "[$_[0] $_[1])" : "($_[1] $_[0]]" if $_[2] == 1 ;
       return $_[2] ?  "[$_[0] $_[1]]" : "($_[0] $_[1])" ; #unless $_[2] & 2 ; 
-      
     } ; 
 
-    next unless yfilter ( $kosu ) ; 
+    next unless yfilter ( $kosu ) ;
+    state $den1 = $denom ; #print RED $den1;
     my $t = scalar @nums - $kosu ; 
     $kosu = $t==0 ? BRIGHT_RED BOLD $kosu : $t==1 ? YELLOW BOLD $kosu : $t==2 ? $kosu : FAINT $kosu ; 
     splice @out , 1 , 0 , $kosu ; # 出力配列文字列に、個数表記を挿入。
     push @out , procQ( @nu ) if $o{Q} ; # ( $o{Q} ) {    }
+    splice @out , @out, 0 , BLUE sprintf '%0.5g', ($den1 / $denom ) ** ( scalar @nums - ($o{L}//0) ) if ($o{L}//'') ne '0' ;
     ( $o{M} // '' ) eq 0? next : ($out[0] .= '.') if @nu && bgcd ($denom, @nu) > 1 ; # 分母にピリオドを付加。
     say join "\t" , map { $_ // '' } @out ; 
     $count ++ ; 
@@ -323,6 +327,10 @@ sub HELP_MESSAGE {
   -Q : 分子の候補値全て表示。2q+1とか5q+3 など表示(qは何かの整数を意味する)。Math::Prime::Utilが導入済みなら素因数分解もする(割合の数が1個の場合)。
   -2 0 : 二次情報の出力を抑制する。
   -M 0 : ある分母に対して、全ての候補の分子が分母と同じ整数で割れる場合(≒約分可能)は、出力を抑制。
+
+  -L 0 : 尤度比を表示しない
+  -L N : 制約(合計が100%など)の個数がN個と仮定して、尤度比を算出する。
+
   -T testname : このプログラムのテスト。testname は1,2,3, v1,v2,v3, o1,o2,o3,o4, m1 がある。
   --help : このヘルプを表示する。(ただしPod::PerldocJp を一度インストールすると perldoc $0 でも可能。)
 

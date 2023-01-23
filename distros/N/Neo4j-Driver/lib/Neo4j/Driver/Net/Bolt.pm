@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::Bolt;
 # ABSTRACT: Network controller for Neo4j Bolt
-$Neo4j::Driver::Net::Bolt::VERSION = '0.33';
+$Neo4j::Driver::Net::Bolt::VERSION = '0.34';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -174,9 +174,10 @@ sub _run {
 sub _new_tx {
 	my ($self) = @_;
 	
+	my $params = {};
 	my $transaction = "$self->{net_module}::Txn";
 	return unless $transaction->can('new');
-	return $transaction->new( $self->{connection} );
+	return $transaction->new( $self->{connection}, $params, $self->{database} );
 }
 
 

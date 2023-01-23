@@ -1,5 +1,9 @@
 Revision history for Excel-ValueReader-XLSX
 
+
+1.09 22.01.2023
+  - fix bug on parsing empty string nodes with LibXML (ulibuck++)
+
 1.08 11.02.2022
   - added support to parse Excel tables
 

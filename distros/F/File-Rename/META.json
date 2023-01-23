@@ -32,8 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Getopt::Long" : "0",
-            "perl" : "5.006000"
+            "Getopt::Long" : "2.24",
+            "perl" : "5.008"
          }
       },
       "test" : {
@@ -44,6 +44,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.00",
+   "version" : "2.01",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

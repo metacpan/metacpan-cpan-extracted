@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 #
-# Copyright (c) 2014-2020 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2014-2021 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -24,6 +24,7 @@ BEGIN {
     ($mydir, $myname) = ($1, $2);
 }
 use lib "$mydir/../lib";
+use lib "$mydir/../meta";    # for FunctionalPerl::Indexing
 
 # and the htmlgen/ directory
 use lib $mydir;
@@ -126,26 +127,68 @@ use FunctionalPerl::Htmlgen::Linking;
 use FunctionalPerl::Htmlgen::PerlTidy;
 
 # XX make configurable
+
+# (This is getting a bit too layered now. Still Ok?)
+
+# normal simply gives a keyword arg based constructor that creates it
+sub normal($classname) {
+    sub {
+        $classname->new_(@_)
+    }
+}
+
+# This one adds in the functional_perl_base_dir argument:
+sub with_args ($classname, @args) {
+    sub {
+        $classname->new_(@_, @args)
+    }
+}
+
 our $pxml_mappers =
 
     # These implement FunctionalPerl::Htmlgen::PXMLMapper; subarray
     # for those that match on the same tagname, in order of preference
     # (the chain exits once an element has been replaced).
     [
-    "FunctionalPerl::Htmlgen::Linking::Anchors",
-    "FunctionalPerl::Htmlgen::Toc",    # <with_toc>
+    normal("FunctionalPerl::Htmlgen::Linking::Anchors"),
+    normal("FunctionalPerl::Htmlgen::Toc"),    # <with_toc>
     [
-        "FunctionalPerl::Htmlgen::PerlTidy",
-        "FunctionalPerl::Htmlgen::Linking::code"
+        normal("FunctionalPerl::Htmlgen::PerlTidy"),
+        with_args(
+            "FunctionalPerl::Htmlgen::Linking::code",
+
+            # For names that we never want to auto-link as modules to
+            # CPAN since they are something else ("CPAN-exceptions"):
+
+            # This directory is scanned for all sub definitions (not
+            # package names), including method names, and they are all
+            # excluded from being auto-linked to CPAN. (Note: this is
+            # relative to cwd which is set by website/gen to be inside
+            # website/; this is a hack, should be passed as an
+            # argument instead.)
+            functional_perl_base_dir => "..",
+
+            # These names are also being ignored (things which do not
+            # exist as a subroutine but still shouldn't be linked):
+            static_ignore_names => [
+                qw( map tail grep head join test shift inverse Maybe
+                    Just Nothing Int Integer undef let my our foo bar
+                    baz sub return open all )
+            ]
+        )
     ],
-    "FunctionalPerl::Htmlgen::Linking::a_href",
+    normal("FunctionalPerl::Htmlgen::Linking::a_href"),
     ];
 
 sub pxml_name_to_mapper(@PXMLMapper_args) {
     purehash(
         map {
-            if (ref $_) {    # subarray given (autobox coming into play)
-                my $ms      = $_->map(the_method "new_", @PXMLMapper_args);
+            my $ref = ref $_ or die "bug";
+            if (not $ref eq "CODE") {
+
+                # subarray given (autobox coming into play; can be
+                # "ARRAY" or purearray depending on time...)
+                my $ms = $_->map(sub ($constr) { $constr->(@PXMLMapper_args) });
                 my $elnames = $ms->first->match_element_names;
                 $ms->rest->every(
                     sub($v) {
@@ -172,7 +215,7 @@ sub pxml_name_to_mapper(@PXMLMapper_args) {
             } else {
 
                 # instantiate a mapper
-                my $m = $_->new_(@PXMLMapper_args);
+                my $m = $_->(@PXMLMapper_args);
 
                 # register it for all the element names it wants to see
                 map {

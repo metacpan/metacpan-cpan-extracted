@@ -1,0 +1,45 @@
+{
+   "abstract" : "Perl extension for generate Russian wording of numerals from the natural numbers and 0 (zero).",
+   "author" : [
+      "Alessandro Gorohovski <an.gorohovski@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Lingua-RU-Numeral",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::More::UTF8" : "0.05",
+            "Test::Pod" : "1.52",
+            "perl" : "5.010000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.031",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

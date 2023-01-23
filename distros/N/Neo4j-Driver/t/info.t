@@ -52,36 +52,28 @@ subtest 'default database' => sub {
 	plan tests => 3 + 3 + 10;
 	my ($d, $s, $si, $db);
 	
-	lives_ok { $d = 0; $d = Neo4j::Driver->new('http:')->plugin('Neo4j_Test::MockHTTP') } 'driver 1';
+	my $mock_plugin_err = Neo4j_Test::MockHTTP->new(no_default_db => 1);
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('http:')->plugin($mock_plugin_err) } 'driver 1';
 	lives_ok { $si = 0; $si = $d->session(database => 'dummy')->server } 'ServerInfo 1';
 	throws_ok { $si->_default_database($d) } qr/\bdefault database\b/i, 'default database failed';
 	
-	$Neo4j_Test::MockHTTP::res[0]->{json}{neo4j_version} = '3.5.0';
-	$Neo4j_Test::MockHTTP::res[0]->{content} = undef;
-	lives_ok { $d = 0; $d = Neo4j::Driver->new('http:')->plugin('Neo4j_Test::MockHTTP') } 'driver 2';
+	my $mock_plugin_v3 = Neo4j_Test::MockHTTP->new(neo4j_version => '3.5.0');
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('http:')->plugin($mock_plugin_v3) } 'driver 2';
 	lives_ok { $si = 0; $si = $d->session->server } 'ServerInfo 2';
 	lives_and { is $si->_default_database($d), undef } 'no default database';
-	$Neo4j_Test::MockHTTP::res[0]->{json}{neo4j_version} = '4.2.5';
-	$Neo4j_Test::MockHTTP::res[0]->{content} = undef;
 	
-	Neo4j_Test::MockHTTP::response_for 'SHOW DEFAULT DATABASE' => { jolt => [
-		{ header => { fields => ['name'] } },
-		{ data => [ { 'U' => 'mock' } ] },
-		{ summary => {} },
-		{ info => {} },
-	]};
-	lives_ok { $d = 0; $d = Neo4j::Driver->new('http:')->plugin('Neo4j_Test::MockHTTP') } 'driver 3';
+	my $mock_plugin_v4 = Neo4j_Test::MockHTTP->new(neo4j_version => '4.2.5');
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('http:')->plugin($mock_plugin_v4) } 'driver 3';
 	lives_ok { $si = 0; $si = $d->session(database => 'dummy')->server } 'ServerInfo 3';
 	isa_ok $si, 'Neo4j::Driver::ServerInfo', 'ServerInfo type';
 	is $si->{default_database}, undef, 'default database not cached';
 	lives_ok { $db = $si->_default_database($d) } 'default database mock lives';
-	is $db, 'mock', 'default database mock';
+	is $db, 'dummy', 'default database mock';
 	is $si->{default_database}, $db, 'default database mock cached';
 	$si->{default_database} = 'cache';
 	# corrupt the mocked server response to verify that the server is NOT queried again
-	my $res = $#Neo4j_Test::MockHTTP::res;
-	$Neo4j_Test::MockHTTP::res[$res]->{jolt}[1]{data} = {'dead beef' => 1};
-	$Neo4j_Test::MockHTTP::res[$res]->{content} = undef;
+	my $corrupt = {jolt => [{data => {'dead beef' => 1}}]};
+	$mock_plugin_v4->response_for('/db/system/tx/commit', 'SHOW DEFAULT DATABASE' => $corrupt);
 	lives_ok { $si = 0; $si = $d->session->server } 'ServerInfo cache lives';
 	lives_ok { $db = $si->_default_database($d) } 'default database cache lives';
 	is $db, 'cache', 'default database cache';

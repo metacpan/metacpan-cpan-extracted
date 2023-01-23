@@ -13,7 +13,7 @@ Neo4j::Driver::Deprecations - Explains features that have been deprecated, but n
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 OVERVIEW
 
@@ -111,7 +111,7 @@ Insert the following code into your module:
  
  sub register {
    my ($self, $manager) = @_;
-   $manager->add_event_handler(
+   $manager->add_handler(
      http_adapter_factory => sub {
        my ($continue, $driver) = @_;
        __PACKAGE__->_net_module_new($driver);
@@ -162,6 +162,20 @@ because you use driver internals to access the raw server response,
 you can use a plug-in to manipulate the HTTP
 C<Accept> header according to your needs. See L<Neo4j::Driver::Net>.
 
+=head2 HTTP timeout setting by direct hash access
+
+I<Deprecated in version 0.34 and to be removed in 1.00.
+Originally added in 0.05 as an experimental feature.>
+
+ $driver->{http_timeout} = 10;  # seconds
+
+A timeout for making HTTP connections to the Neo4j server.
+The equivalent config option "timeout" was introduced in
+S<version 0.14>. Using the internal setting "http_timeout"
+has been discouraged since that time.
+
+ $driver->config(timeout => 10);  # seconds
+
 =head2 Mutable auth credentials
 
 I<Deprecated in version 0.15 and to be removed in 1.00.
@@ -198,6 +212,21 @@ Instead of this option, L<Neo4j::Driver/"cypher_params"> should
 be used.
 
  $driver->config( cypher_params => v2 );
+
+=head2 Plug-in modules by name
+
+I<Deprecated in version 0.34 and to be removed in 1.00.
+Originally added in 0.31 as an experimental feature.>
+
+ $driver->plugin( 'Local::MyPlugin' );
+
+As an alternative to the blessed instance of a plug-in,
+the module name may be given as parameter. However, because
+your code must still C<use> or C<require> the module it
+specifies here, this style offers no significant advantage.
+Just pass a new plug-in instance instead.
+
+ $driver->plugin( Local::MyPlugin->new );
 
 =head2 Suppress exceptions
 
@@ -292,7 +321,7 @@ Instead of the C<cypher_types> option, users should consider a
 custom networking module that provides a custom result handler.
 This approach offers even more flexibility (albeit at the cost
 of some degree of convenience).
-See L<Neo4j::Driver::Net/"Custom result handlers"> for details.
+See L<Neo4j::Driver::Plugin/"Result handler API"> for details.
 
 =head1 Neo4j::Driver::Net::HTTP::LWP
 
@@ -331,6 +360,25 @@ in 1.00. Originally added in 0.21 as an experimental feature.>
 Returns the HTTP version of the last response (typically
 C<"HTTP/1.1">). Since version 0.26, this method was no longer
 required for a net module and using it was discouraged.
+
+=head1 Neo4j::Driver::Plugin
+
+=head2 Plug-in manager
+
+I<Deprecated in version 0.34 and to be removed in 1.00.
+Originally added in 0.31 as an experimental feature.>
+
+ $plugin_mgr->add_event_handler( event_name => sub {...} );
+ $plugin_mgr->trigger_event( event_name => @parameters );
+
+The plug-in manager has been replaced by the 
+L<event manager|Neo4j::Driver::Plugin/"THE EVENT MANAGER">.
+This is a name change only. Calls to methods of the plug-in
+manager should simply be replaced by equivalent calls to those
+of the event manager.
+
+ $event_mgr->add_handler( event_name => sub {...} );
+ $event_mgr->trigger( event_name => @parameters );
 
 =head1 Neo4j::Driver::Record
 
@@ -740,7 +788,7 @@ If you contact me by email, please make sure you include the word
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2022 by Arne Johannessen.
+This software is Copyright (c) 2016-2023 by Arne Johannessen.
 
 This is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0 or (at your option) the same terms

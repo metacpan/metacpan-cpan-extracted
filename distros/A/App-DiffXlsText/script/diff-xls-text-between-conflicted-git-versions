@@ -11,9 +11,9 @@ use File::Temp qw(tempdir);
 use IPC::System::Options 'system', -log=>1, -die=>1;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-08'; # DATE
+our $DATE = '2022-11-26'; # DATE
 our $DIST = 'App-DiffXlsText'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 # XXX duplication with diff-xls-text
 my $opt_transpose_csv;
@@ -82,7 +82,7 @@ diff-xls-text-between-conflicted-git-versions - Diff the text of Office spreadsh
 
 =head1 VERSION
 
-This document describes version 0.011 of diff-xls-text-between-conflicted-git-versions (from Perl distribution App-DiffXlsText), released on 2022-09-08.
+This document describes version 0.012 of diff-xls-text-between-conflicted-git-versions (from Perl distribution App-DiffXlsText), released on 2022-11-26.
 
 =head1 SYNOPSIS
 

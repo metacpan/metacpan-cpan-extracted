@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,7 +23,7 @@ requires:
   Capture::Tiny: '0'
   Carp: '0'
   Config::Tiny: '2.08'
-  File::HomeDir: '0.58'
+  File::HomeDir::Tiny: '0'
   File::Spec: '3.19'
   Getopt::Long: '0'
   IO::Prompt::Tiny: '0'
@@ -39,4 +39,5 @@ requires:
   perl: '5.008001'
 resources:
   repository: http://github.com/garu/App-cpanminus-reporter
-version: '0.17'
+version: '0.18'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

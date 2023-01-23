@@ -1,0 +1,15 @@
+NAME
+
+    HTML::Blitz - high-performance, selector-based, content-aware HTML
+    template engine
+
+COPYRIGHT & LICENSE
+
+    Copyright 2022-2023 Lukas Mai.
+
+    This module is free software: you can redistribute it and/or modify it
+    under the terms of the GNU Affero General Public License
+    <https://www.gnu.org/licenses/agpl-3.0.txt> as published by the Free
+    Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+

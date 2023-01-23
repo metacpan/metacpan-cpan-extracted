@@ -40,6 +40,7 @@ For more information about Redis Cluster see here:
         'localhost:7001',
         'localhost:7002',
       ],
+      username         => 'yourname',
       password         => 'yourpass',
       cnx_timeout      => 5,
       read_timeout     => 5,
@@ -72,6 +73,10 @@ For more information about Redis Cluster see here:
 
     If the password is specified, the `AUTH` command is sent to all nodes
     of the cluster after connection.
+
+- username => $username
+
+    Authenticate to the server using Redis 6.0+ ACL System (see https://redis.io/commands/auth)
 
 - allow\_slaves => $boolean
 

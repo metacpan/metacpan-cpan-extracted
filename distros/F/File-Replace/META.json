@@ -47,7 +47,7 @@
             "warnings::register" : "0"
          },
          "suggests" : {
-            "File::Replace::Fancy" : "0.16"
+            "File::Replace::Fancy" : "0.18"
          }
       },
       "test" : {
@@ -56,14 +56,14 @@
             "File::stat" : "0",
             "FindBin" : "0",
             "Test::More" : "1.302096",
-            "Tie::Handle::Base" : "0.16"
+            "Tie::Handle::Base" : "0.18"
          }
       }
    },
    "provides" : {
       "File::Replace" : {
          "file" : "lib/File/Replace.pm",
-         "version" : "0.16"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -78,6 +78,6 @@
          "web" : "https://bitbucket.org/haukex/file-replace"
       }
    },
-   "version" : "0.16",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

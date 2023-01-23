@@ -1,6 +1,20 @@
 Changelog for re-engine-GNU
 
-0.024 2017-08-01T12:49:20
+0.025 2023-01-19T18:30:45
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - engine/GNU.pm: =for Pod::Coverage
+ - dist.ini: Remove Test::Vars (unmaintained?), Test::DistManifest (not ok
+   for us)
+ - engine/GNU.pm: no critic
+ - dist.ini: Added Pod::Weaver::PluginBundle::RJBS to develop requires
+ - ppport.h: Upgrade to version 3.68
+ - GNU.xs: Removed #ifdef REGEXP_LOGICAL_NPARENS_SET, setter macro is a
+   no-op if engine do not have logical_nparens member
+
+ [Yves Orton <demerphq@gmail.com>]
+ - Update to support and logical_nparens on 5.37.7 and later
+
+0.024 2017-08-01T12:49:20Z
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - Use SvCANCOW() - fixes #5
 

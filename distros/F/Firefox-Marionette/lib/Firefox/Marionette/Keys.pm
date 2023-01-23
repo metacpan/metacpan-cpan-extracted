@@ -53,7 +53,7 @@ our @EXPORT_OK = qw(
 
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK, );
 
-our $VERSION = '1.34';
+our $VERSION = '1.35';
 
 sub CANCEL          { return chr hex '0xE001' }
 sub HELP            { return chr hex '0xE002' }
@@ -108,7 +108,7 @@ Firefox::Marionette::Keys - Human readable special keys for the Marionette proto
 
 =head1 VERSION
 
-Version 1.34
+Version 1.35
 
 =head1 SYNOPSIS
 
@@ -333,7 +333,7 @@ David Dick  C<< <ddick@cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2021, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
+Copyright (c) 2023, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic/perlartistic>.

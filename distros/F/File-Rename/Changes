@@ -1,5 +1,38 @@
 Revision history for Perl extension File::Rename.
 
+2.01    Robin Barker 2023-01-17
+    min perl version 5.8.0
+
+    use warnings
+
+    use Getopt::Long 2.24
+
+    source/rename source of rename script   
+
+2.00_4  Robin Barker 2023-01-16
+    Min perl version 5.8.0
+
+    Move rename source file to source/ - to avoid
+    rename being found when @INC includes '.'
+
+    Revert regex for $INC values
+
+    Initialize C<our $print> for v5.10
+
+2.00_3  Robin Barker 2023-01-15
+    Restore indirect print in t/testlib.pl
+
+    Change regex for $INC values
+
+    2.00_2 deleted
+
+2.00_1  Robin Barker 2023-01-14
+    min perl version 5.6.1 
+
+    use warnings
+
+    use Getopt::Long 2.24
+
 2.00    Robin Barker 2022-12-31
     rename script requires options before code/files
 

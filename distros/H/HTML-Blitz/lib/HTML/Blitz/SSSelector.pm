@@ -18,10 +18,17 @@ use HTML::Blitz::SelectorType qw(
     ST_NTH_CHILD_OF_TYPE
 );
 
-method new($class: @simplesel) {
+our $VERSION = '0.03';
+
+method new($class: :$simple_selectors, :$link_type) {
     bless {
-        simplesel => \@simplesel,
+        simplesel => \@$simple_selectors,
+        link_type => $link_type,
     }, $class
+}
+
+method link_type() {
+    $self->{link_type}
 }
 
 method matches($tag, $attributes, $nth, $nth_of_type) {

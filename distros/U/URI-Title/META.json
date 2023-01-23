@@ -4,7 +4,7 @@
       "Tom Insam <tomi@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "uri",
       "title"
@@ -14,7 +14,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "URI-Title",
    "prereqs" : {
@@ -51,6 +51,10 @@
             "strict" : "0",
             "utf8" : "0",
             "warnings" : "0"
+         },
+         "suggests" : {
+            "Image::ExifTool" : "0",
+            "Image::PNG::Libpng" : "0"
          }
       },
       "test" : {
@@ -71,23 +75,23 @@
    "provides" : {
       "URI::Title" : {
          "file" : "lib/URI/Title.pm",
-         "version" : "1.902"
+         "version" : "1.903"
       },
       "URI::Title::HTML" : {
          "file" : "lib/URI/Title/HTML.pm",
-         "version" : "1.902"
+         "version" : "1.903"
       },
       "URI::Title::Image" : {
          "file" : "lib/URI/Title/Image.pm",
-         "version" : "1.902"
+         "version" : "1.903"
       },
       "URI::Title::MP3" : {
          "file" : "lib/URI/Title/MP3.pm",
-         "version" : "1.902"
+         "version" : "1.903"
       },
       "URI::Title::PDF" : {
          "file" : "lib/URI/Title/PDF.pm",
-         "version" : "1.902"
+         "version" : "1.903"
       }
    },
    "release_status" : "stable",
@@ -102,7 +106,7 @@
          "web" : "http://github.com/book/URI-Title"
       }
    },
-   "version" : "1.902",
+   "version" : "1.903",
    "x_contributors" : [
       "Philippe Bruhat (BooK) <book@cpan.org>",
       "Neil Bowers <neilb@cpan.org>",
@@ -111,9 +115,12 @@
       "Zakariyya Mughal <zmughal@cpan.org>",
       "Scott Martin <thatguyhex@live.com>",
       "Jotam Jr. Trejo <jotamjr@gmail.com>",
-      "Dagfinn Ilmari Manns\u00e5ker <ilmari@cpan.org>"
+      "Dagfinn Ilmari Manns\u00e5ker <ilmari@cpan.org>",
+      "Kevin Ryde <kryde@cpan.org>",
+      "H\u00e5kon H\u00e6gland <hakonh@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

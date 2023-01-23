@@ -1,0 +1,87 @@
+NAME
+    String::UpdateYears - Look for year or years range in string and update
+    years
+
+SYNOPSIS
+     use String::UpdateYears qw(update_years);
+
+     my $updated_or_undef = update_years($string_with_year, $opts_hr, $new_last_year);
+
+SUBROUTINES
+  "update_years"
+     my $updated_or_undef = update_years($string_with_year, $opts_hr, $new_last_year);
+
+    Look for year or years range in string and update them.
+
+    Parameters:
+
+     C<$string_with_year> - Input string with year or range years.
+     C<$opts_hr> - Reference to hash with options. Possible options:
+       C<prefix_glob> - Prefix glob from begin of string to year(s) part (default '.*').
+       C<postfix_glob> - Postfix glob from year(s) part to end of string (default '.*').
+     C<$new_last_year> - New last year to update.
+
+    Returns undef if year or years range not found in string. Returns
+    updated string if year or years range found in string.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use String::UpdateYears qw(update_years);
+
+     my $input = '1900';
+     my $output = update_years($input, {}, 2023);
+
+     # Print input and output.
+     print "Input: $input\n";
+     print "Output: $output\n";
+
+     # Output:
+     # Input: 1900
+     # Output: 1900-2023
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use String::UpdateYears qw(update_years);
+     use Unicode::UTF8 qw(decode_utf8 encode_utf8);
+
+     my $input = decode_utf8('© 1977-2022 Michal Josef Špaček');
+     my $output = update_years($input, {}, 2023);
+
+     # Print input and output.
+     print 'Input: '.encode_utf8($input)."\n";
+     print 'Output: '.encode_utf8($output)."\n";
+
+     # Output:
+     # Input: © 1987-2022 Michal Josef Špaček
+     # Output: © 1987-2023 Michal Josef Špaček
+
+SEE ALSO
+    perl-module-copyright-years
+        Tool for update copyright years in Perl distribution.
+
+    Pod::CopyrightYears
+        Object for copyright years changing in POD.
+
+DEPENDENCIES
+    Exporter, Readonly.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/String-UpdateYears>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

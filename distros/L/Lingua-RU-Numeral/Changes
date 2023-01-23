@@ -1,0 +1,9 @@
+Revision history for Perl extension Lingua::RU::Numeral.
+
+0.03  Fri Nov 25 16:21:37 2022
+	- original version; created by h2xs 1.23 with options
+		-XAn Lingua::RU::Numeral
+
+0.031 Mon Jan 23 08:22:15 2023
+    - add to Makefile.PL module Test::More::UTF8
+    - POD, README, and Makefile.PL revised

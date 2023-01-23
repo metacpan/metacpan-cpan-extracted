@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact::PageSource::DBI;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001004';
+our $VERSION   = '0.001005';
 
 use Moo;
 use Types::Common -types;
@@ -31,7 +31,6 @@ sub _build_sth {
 	return $self->dbh->prepare('SELECT content FROM page WHERE id=?');
 }
 
-
 sub get_source_code {
 	my ( $self, $page_id ) = @_;
 	my $sth = $self->sth;
@@ -40,6 +39,11 @@ sub get_source_code {
 		return $content;
 	}
 	return;
+}
+
+sub all_page_ids {
+	my ( $self ) = @_;
+	map $_->[0], @{ $self->dbh->selectall_arrayref('SELECT id FROM page') };
 }
 
 1;

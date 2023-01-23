@@ -109,6 +109,10 @@ is run('p:nth-child(2N+3)', '<div> <p>A</p> <p>B</p> <p>C</p> <p>D</p> <p>E</p> 
 is run('p:nth-child( -n + 2 )', '<div> <p>A</p> <p>B</p> <p>C</p> <p>D</p> <p>E</p> </div>'), wrapped('<div> <p>xyzzy</p> <p>xyzzy</p> <p>C</p> <p>D</p> <p>E</p> </div>'),
     'nth child selector ( -n + 2 )';
 
+is run('p:nth-child(-n+3)', '<div> <p>A1</p> </div> <div> <p>B1</p> <p>B2</p> </div> <div> <p>C1</p> <p>C2</p> <p>C3</p> </div> <div> <p>D1</p> <p>D2</p> <p>D3</p> <p>D4</p> </div>'),
+    wrapped('<div> <p>xyzzy</p> </div> <div> <p>xyzzy</p> <p>xyzzy</p> </div> <div> <p>xyzzy</p> <p>xyzzy</p> <p>xyzzy</p> </div> <div> <p>xyzzy</p> <p>xyzzy</p> <p>xyzzy</p> <p>D4</p> </div>'),
+    'nth child selector (-n+3)';
+
 is run('p:nth-child(n+3)', '<div> <p>A</p> <p>B</p> <p>C</p> <p>D</p> <p>E</p> </div>'), wrapped('<div> <p>A</p> <p>B</p> <p>xyzzy</p> <p>xyzzy</p> <p>xyzzy</p> </div>'),
     'nth child selector (n+3)';
 

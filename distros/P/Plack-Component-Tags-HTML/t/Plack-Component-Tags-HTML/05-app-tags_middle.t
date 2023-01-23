@@ -27,6 +27,7 @@ use Plack::Test;
 
 my $app = App->new(
         'title' => 'My app',
+	'css_init' => [],
 );
 test_psgi($app, sub {
 	my $cb = shift;

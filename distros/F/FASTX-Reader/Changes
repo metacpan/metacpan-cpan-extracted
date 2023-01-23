@@ -2,6 +2,17 @@ This is the changelog for FASTX::Reader. Version prior to v 0.1 are preliminary 
 Some APIs *can change* with the release of the first stable release (v 1.0).
 Version 0.61 has been available via BioConda
 
+1.10.0 2023-01-13
+  * `new()` FASTX::Reader method now supports a named parameter instantiation, e.g. `FASTX::Reader->new(-file => 'file.fastq')`
+  * `new()` FASTX::Seq method now supports a named parameter instantiation, e.g. `FASTX::Seq->new(-seq => 'CACCA')`
+  * Added `copy()` method to FASTX::Seq
+  * Added quality methods to FASTX::Seq:
+    * `qualities()` to get an array of scores, `trim_until(int)` and `trim_after(int)`
+    * functions like `char2qual()` and `qual2char()` to convert between ASCII and integer scores
+    * `$record->offset(new)` to change offset (default is 33)
+  * Test updates, minor changes
+  
+
 1.9.0 2023-01-12
   * Added `slice(from, len)` method to FASTX::Seq (works as substr)
   * Added `string()` method to get the sequence as a string (FASTQ or FASTA according to the record), with `as_string()` as alias

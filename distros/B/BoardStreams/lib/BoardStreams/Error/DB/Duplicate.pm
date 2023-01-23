@@ -5,7 +5,7 @@ extends 'BoardStreams::Error::DB';
 
 use experimental 'signatures';
 
-our $VERSION = "v0.0.30";
+our $VERSION = "v0.0.31";
 
 has '+code' => (
     default => 'duplicate_key',

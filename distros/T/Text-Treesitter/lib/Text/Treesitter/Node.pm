@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.70;
 
-package Text::Treesitter::Node 0.05;
+package Text::Treesitter::Node 0.06;
 class Text::Treesitter::Node
    :strict(params);
 

@@ -41,7 +41,7 @@ BEGIN not safe after errors--compilation aborted at examples/synopsis.pl line 15
 With `Error::Show` enabled with the `-M` switch, this instead looks like this:
 
 ```perl
-->perl -I lib -MError::Show=warn  examples/synopsis.pl
+->perl -MError::Show=warn  examples/synopsis.pl
 examples/synopsis.pl
  3   use Time::HiRes;
  4
@@ -140,7 +140,7 @@ A handful of options are available for basic configuration of how many lines of
 code to print before and after the error line, indenting of stack trace
 context, etc.
 
-No symbols are exported and as such they must be accesses via the package name.
+No symbols are exported and as such they must be accessed via the package name.
 
 # USAGE
 
@@ -155,12 +155,13 @@ the input program. If the syntax is OK, normal execution continues in a
 transparent fashion.  Otherwise, detailed code context surrounding the source
 of the error is generated and printed on STDERR.
 
-**NOTE:**It is important that it's the first `-M` switch.
+**NOTE:** It is important that it's the first `-M` switch.
 
 If the **-c** flag is specified, only a syntax check will be performed,
 mimicking normal perl behaviour.
 
-Additional `@INC` directories using the **-I** switch are supported.
+Additional `@INC` directories using the **-I** switch are supported as are
+additional modules via the **-M** switch.
 
 ### CLI Syntax Checking Options
 
@@ -471,18 +472,23 @@ catch($e){
 }
 ```
 
-### Syntax Checking String `eval`, without execution
+### Syntax Checking String `eval`, Without Execution
 
 A block eval will have it's syntax checked during normal compilation time. A
 string eval is checked at run time and it uses the same variable `$@` to
-report syntax errors and run time errors. In addition it executes the code
-immediately on success, so you don not have the ability to simply check the
-syntax directly and actually distinguish between syntax and runtime errors, and
-also not cause side effects of executing the eval.
+report syntax errors and run time errors. 
 
-To work around it, and have `Error::Show` still provide context information,
-wrap your eval string with an anonymous subroutine. The eval result will be
-code ref  which you can execute if the syntax was correct.
+Together these limitation make it impossible to distinguish between syntax
+errors and runtime errors (without some kind of heavy error lookup). The code
+is also executed immediately.
+
+To work around these limitations, and have `Error::Show` still provide context
+information, start by wrapping your eval string with "sub { ... }.  The eval
+result will be code ref if syntactically correct. Otherwise the error in `$@`
+is the syntax error string, which can be feed directly into `Error::Show`.
+The code ref is executed in a block eval, which if dies from an exception will
+place the runtime error in `$@`, which again can be used in `Error::Show`.
+As an example:
 
 ```perl
 Example: Separate compiling/syntax checking from eval execution

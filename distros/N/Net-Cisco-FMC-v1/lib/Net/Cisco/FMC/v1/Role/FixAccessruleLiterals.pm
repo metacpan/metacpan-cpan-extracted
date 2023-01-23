@@ -1,5 +1,5 @@
 package Net::Cisco::FMC::v1::Role::FixAccessruleLiterals;
-$Net::Cisco::FMC::v1::Role::FixAccessruleLiterals::VERSION = '0.006002';
+$Net::Cisco::FMC::v1::Role::FixAccessruleLiterals::VERSION = '0.007001';
 # ABSTRACT: Role for Cisco Firepower Management Center (FMC) API version 1 method generation
 
 use 5.024;
@@ -68,7 +68,7 @@ Net::Cisco::FMC::v1::Role::FixAccessruleLiterals - Role for Cisco Firepower Mana
 
 =head1 VERSION
 
-version 0.006002
+version 0.007001
 
 =head1 SYNOPSIS
 
@@ -242,7 +242,7 @@ Alexander Hartmaier <abraxxa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 - 2022 by Alexander Hartmaier.
+This software is copyright (c) 2018 - 2023 by Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

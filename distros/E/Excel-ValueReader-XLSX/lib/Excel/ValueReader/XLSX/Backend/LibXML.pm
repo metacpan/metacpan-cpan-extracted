@@ -7,7 +7,7 @@ use XML::LibXML::Reader qw/XML_READER_TYPE_END_ELEMENT/;
 
 extends 'Excel::ValueReader::XLSX::Backend';
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 #======================================================================
 # LAZY ATTRIBUTE CONSTRUCTORS
@@ -19,22 +19,24 @@ sub _strings {
   my $reader = $self->_xml_reader_for_zip_member('xl/sharedStrings.xml');
 
   my @strings;
-  my $last_string = '';
+  #  my $last_string = '';
+  my $last_string;
  NODE:
   while ($reader->read) {
     next NODE if $reader->nodeType == XML_READER_TYPE_END_ELEMENT;
     my $node_name = $reader->name;
 
     if ($node_name eq 'si') {
-      push @strings, $last_string if $last_string;
+      push @strings, $last_string if defined $last_string;
       $last_string = '';
     }
     elsif ($node_name eq '#text') {
       $last_string .= $reader->value;
     }
+#    elsif ($reader->isEmptyElement) { push @strings, ''; }
   }
 
-  push @strings, $last_string if $last_string;
+  push @strings, $last_string if defined $last_string;
 
   return \@strings;
 }

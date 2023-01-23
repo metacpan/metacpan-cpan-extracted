@@ -3,7 +3,7 @@ package PDF::Builder::Lite;
 use strict;
 use warnings;
 
-our $VERSION = '3.024'; # VERSION
+our $VERSION = '3.025'; # VERSION
 our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 # NOTE that this sub-package has not been tested and is not well documented!
 #      It is possible that it will be deprecated and removed.

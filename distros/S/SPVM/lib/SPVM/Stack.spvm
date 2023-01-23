@@ -1,0 +1,9 @@
+class Stack : pointer {
+  use Env;
+  
+  # Fields
+  has env : ro Env;
+  
+  # Instance Methods
+  native method DESTROY : void ();
+}

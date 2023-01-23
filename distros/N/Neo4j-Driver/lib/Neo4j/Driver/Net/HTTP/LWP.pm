@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::HTTP::LWP;
 # ABSTRACT: HTTP network adapter for libwww-perl
-$Neo4j::Driver::Net::HTTP::LWP::VERSION = '0.33';
+$Neo4j::Driver::Net::HTTP::LWP::VERSION = '0.34';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Net::HTTP);
@@ -92,12 +92,17 @@ sub date_header { scalar shift->{response}->header('Date') // '' }
 
 sub http_header {
 	my $response = shift->{response};
-	return {
+	my $header = {
 		content_type => scalar $response->header('Content-Type') // '',
 		location     => scalar $response->header('Location') // '',
 		status       => $response->code // '',
 		success      => $response->is_success,
 	};
+	if ( ! $header->{success} && $response->header('Client-Warning') // '' eq 'Internal response' ) {
+		$header->{content_type} = '';
+		$header->{status}       = '';
+	}
+	return $header;
 }
 
 
@@ -152,7 +157,7 @@ Neo4j::Driver::Net::HTTP::LWP - HTTP network adapter for libwww-perl
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 SYNOPSIS
 
@@ -160,7 +165,7 @@ version 0.33
  
  sub register {
    my ($self, $manager) = @_;
-   $manager->add_event_handler(
+   $manager->add_handler(
      http_adapter_factory => sub {
        my ($continue, $driver) = @_;
        my $adapter = Neo4j::Driver::Net::HTTP::LWP->new($driver);
@@ -256,7 +261,7 @@ If you contact me by email, please make sure you include the word
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2022 by Arne Johannessen.
+This software is Copyright (c) 2016-2023 by Arne Johannessen.
 
 This is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0 or (at your option) the same terms

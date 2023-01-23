@@ -2,6 +2,131 @@ See also INFO/Changes-ver_2 for changes released for PDF::API2, and
 incorporated into PDF::Builder.
 See also INFO/Changes_2021 for earlier version 3 release logs.
 
+3.025     2023-01-19
+
+    ===== many thanks to Amtivo Group for sponsoring this work!
+          see INFO/SPONSORS for more information
+    lib/PDF/Builder/Content/Text.pm, examples/README, examples/examples_output,
+      examples/Column.pl (new), MANIFEST, tools/3_examples.pl
+     Add column() function to Content::Text, to support markup (none, Markdown,
+      and HTML) in arbitrary columns. Note that PDF::Table will also support
+      column(), but only when using PDF::Builder.
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/FontManager.pm (new), examples/README,
+      examples/examples_output, examples/FontManager.pl (new), MANIFEST,
+      tools/3_examples.pl
+     Add a Font Manager to be able to select a font simply by giving the "face"
+      and whether bold and/or italics are to be used. The actual font setting
+      (with font size) is still done with $text->font($font, $size), but
+      instead of having to explicitly create (or reuse) a $font, that part is
+      all handled for you. It does not depend on any OS-provided font manager
+      libraries (such as Linux provides, but Windows does not). Except for
+      the core fonts, your application has to specify the base font and the
+      files to use for italic, bold, etc.
+    ===== end of sponsored work
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/FontManager.pm
+     Update "font path" in Builder, make use of it in Font Manager. Note that
+      at this time, only FontManager.pm makes use of the global font path
+      settings (font_path() method). All other code, examples, and t tests 
+      give full paths to font files. At some point in the future, this may be 
+      changed, but the problem is that Linux and other non-Windows systems 
+      seem to store their font files all over the place, and even Windows is 
+      consistent only for TrueType files (it doesn't ship with any Type1 or 
+      other format fonts). Note that if you wish to modify the default font
+      path list, you need to edit Builder.pm.
+
+    lib/PDF/Builder/Content.pm, examples/042_links, examples/HarfBuzz.pl, 
+      examples/examples.output; MANIFEST, 040_annotation.pdf (new),
+      examples/resources/HarfBuzz_example.pdf (removed) 
+     Remove the output of HarfBuzz Shaper's example from examples/resources 
+      (examples/resources/HarfBuzz_example.pdf), as this file is now available
+      on the CTS website (Examples/PDF/Builder/HarfBuzz.pdf) and substitute a
+      much smaller PDF, the output from 040_annotation, as the PDF sample for
+      042_links. This will cut the package size of PDF::Builder by about half!
+      References to HarfBuzz_example.pdf as a sample to look at (should you
+      not be able to run HarfBuzz.pl due to HarfBuzz::Shaper not being 
+      installed) have been updated to refer to the CTS website examples.
+
+    README.md, LICENSE, lib/PDF/Builder.pm, examples/Column.pl
+     Change copyright to 2023.
+
+    META.json, META.yml
+     Remove "provides" entries because 1) they do not seem to survive the
+      packaging process, 2) no one seems to be able to state what this inform-
+      ation is actually used for -- I see something vague about "search", and 
+      3) how do I make "provides" entries that are better at doing whatever 
+      they're supposed to do better than what CPAN does by default? Also, 
+      there may be a META_ADD provides that I'm supposed to add to Makefile.PL, 
+      but again, documentation is quite scarce. I think I'll just ignore the
+      whole "provides" thing until there's good documentation on it. 
+
+    README.md, Makefile.PL, META.json, META.yml, tools/optional_update.pl,
+      t/00-all-usable.t, lib/PDF/Builder.pm, MANIFEST
+     No longer automatically install Graphics::TIFF, Image::PNG::Libpng, and
+      HarfBuzz::Shaper. This should lighten the installation and testing load
+      on users, if they do not plan to use TIFF or PNG images, or do text
+      shaping. Also list the new prerequisites for markup processing 
+      (HTML::TreeBuilder, Text::Markdown). optional_update.pl no longer needed
+      and has been removed from the distribution.
+
+    xt/author-critic.t, xt/author-pod-syntax.t, MANIFEST, tools/2_t-tests.pl
+     Move a couple of specialty t tests from t/ to xt/
+
+    lib/PDF/Builder/Content/Hyphenate_basic.pm
+     Add ability to split a word on Required Blanks (non-breaking spaces), as 
+      a last-ditch way to do basic hyphenation. Add ability to split a word to
+      fit a given width (regardless of where the split ends up), as an even
+      more last-ditch way.
+
+    lib/PDF/Builder.pm
+     Per PDF::API2 change, allow 'Times' as an alias for core font 
+      'Times-Roman'. This was also done for 'corefont()', as well as the
+      original 'font()'. A warning is given if Times is used. Also, change
+      'die' on errors to 'croak'.
+
+    INFO/RoadMap, examples/020_corefonts
+     Add discussion of /StructTreeRoot, remove Bank Gothic examples from
+      core fonts (it appears to be just a partial alias for some other
+      sans-serif font).
+
+    LICENSE   remove superfluous "59" from FSF address in license. From
+      PDF::API2 #59.
+
+    lib/PDF/Builder.pm  open_page() clarify that default index is last page.
+
+    lib/PDF/Builder/ViewerPreferences.pm
+     Fix glitch in $pdf->viewer_preferences() for non-full-screen-page-mode.
+      From PDF::API2 #50.
+
+    lib/PDF/Builder.pm
+     Fix page mode "SinglePage" unsupported. From PDF::API2 #49.
+
+    lib/PDF/Builder/Page.pm
+     Add documentation reminding users of rotation problems when using a
+      crop box or other clipping. From PDF::API2 #58.
+
+    lib/PDF/Builder.pm
+     Add checks to page() method to see if the application is attempting to 
+      add a new page number that is too negative (more than one before the
+      existing first page) or too positive (beyond the existing last page). 
+      The index value (page number) is clamped to be within possible values, 
+      with a warning. Ref: #190.
+
+    lib/PDF/Builder/Annotation-NamedDestination-Outline.pm,
+      lib/PDF/Builder.pm, t/named-destinations.t, t/042_links
+     Remove new PDF::API2-style location+args interfaces, as I don't like the
+      way they work, and that they are not backwards compatible with the old
+      methods. Unfortunately, this may break any application changed (or
+      recently written) to use the new PDF::API2 2.043 interfaces. If the
+      new location+args list notation were to be used, only if the number of
+      args was even could this be detected. An odd number of args, plus the
+      location string, would be indistinguishable from a hash list, one of 
+      which may follow (as options) the location+args list. Ref: #190.
+
+    lib/PDF/Builder/Resource/CIDFont/TrueType/FontFile.pm
+     Typo fixed.
+
 3.024     2022-09-12
 
     lib/PDF/Builder/Resource/CIDFont/TrueType/FontFile.pm

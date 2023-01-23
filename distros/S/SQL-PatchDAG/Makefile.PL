@@ -3,10 +3,10 @@ use 5.008001; use strict; use warnings;
 my $sc = q<https://github.com/ap/SQL-PatchDAG>;
 my $bt = q<https://rt.cpan.org/Public/Dist/Display.html?Name=SQL-PatchDAG>;
 
-my %META = (
+our %META = (
 	name        => 'SQL-PatchDAG',
 	author      => 'Aristotle Pagaltzis <pagaltzis@gmx.de>',
-	x_copyright => { holder => 'Aristotle Pagaltzis', year => 2020 },
+	x_copyright => { holder => 'Aristotle Pagaltzis', year => 2023 },
 	license     => 'perl_5',
 	resources   => {
 		license    => [ 'http://dev.perl.org/licenses/' ],

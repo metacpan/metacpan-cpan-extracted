@@ -3,7 +3,7 @@ package PDF::Builder::Util;
 use strict;
 use warnings;
 
-our $VERSION = '3.024'; # VERSION
+our $VERSION = '3.025'; # VERSION
 our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 # note: $a and $b are "Magic variables" according to perlcritic, and so it

@@ -9,9 +9,12 @@ use Clone                     qw/clone/;
 use Module::Load::Conditional qw/check_install/;
 use Excel::ValueReader::XLSX;
 
-(my $xl_file    = $0) =~ s/\.t$/.xlsx/;         # 'valuereader.xlsx' in the same directory
-(my $xl_1904    = $0) =~ s/\.t$/1904.xlsx/;     # 'valuereader1904.xlsx'
+note "testing Excel::ValueReader::XLSX version $Excel::ValueReader::XLSX::VERSION";
+
+(my $xl_file    = $0) =~ s/\.t$/.xlsx/;          # 'valuereader.xlsx' in the same directory
+(my $xl_1904    = $0) =~ s/\.t$/1904.xlsx/;      # 'valuereader1904.xlsx'
 (my $xl_ulibuck = $0) =~ s/\w+.t$/ulibuck.xlsx/; # 'ulibuck.xlsx'
+(my $xl_mappe   = $0) =~ s/\w+.t$/Mappe1.xlsx/;  # 'Mappe1.xlsx'
 
 my @expected_sheet_names = qw/Test Empty Entities Tab_entities Dates Tables/;
 my @expected_values      = (  ["Hello", undef, undef, 22, 33, 55],
@@ -116,6 +119,33 @@ my @expected_dates_1904 = (
   ['11.07.2024',                            ],
   ['11.07.2024',                            ],
   ['11.07.2024',                            ],
+);
+
+
+my @expected_mappe = (
+  [qw/a	b	c	d	e	a                                           /],
+  [qw/a	b	c	d	e	b                                           /],
+  [qw/a	b	c	d	e	c                                           /],
+  [qw/a	b	c	d	e	d                                           /],
+  [qw/a	b	c	d	e	e                                           /],
+  [qw/a	b	bla-bla-bla	bla-bla-bla	bla-bla-bla	f                   /],
+  [qw/a	b	bla-bla-bla	bla-bla-bla	bla-bla-bla	1                   /],
+  [qw/a	b	bla-bla-bla	bla-bla-bla	bla-bla-bla	2                   /],
+  [qw/a	b	bla-bla-bla	d	e	3                                   /],
+  [qw/a	b	bla-bla-bla	d	e	5                                   /],
+  [qw/a	b	c	d	e	6                                           /],
+  [qw/1	11	bla-bla-bla	bla-bla-bla	bla-bla-bla	z                   /],
+  [qw/2	12	bla-bla-bla	bla-bla-bla	bla-bla-bla	v                   /],
+  [qw/3	13	bla-bla-bla	bla-bla-bla	bla-bla-bla	bla-bla-bla         /],
+  [qw/4	14	c	d	e	bla-bla-bla                                 /],
+  [qw/5	15	c	d	e	bla-bla-bla                                 /],
+  [qw/6	16	c	d	e	bla-bla-bla                                 /],
+  [qw/7	17	bla-bla-bla	bla-bla-bla	bla-bla-bla	bla-bla-bla         /],
+  [qw/8	18	bla-bla-bla	bla-bla-bla	bla-bla-bla	bla-bla-bla         /],
+  [qw/9	19	bla-bla-bla	bla-bla-bla	bla-bla-bla	bla-bla-bla         /],
+  [qw/10	20	bla-bla-bla	bla-bla-bla	bla-bla-bla	bla-bla-bla /],
+  [qw/11	21	bla-bla-bla	bla-bla-bla	bla-bla-bla	bla-bla-bla /],
+  [qw/12	22	bla-bla-bla	bla-bla-bla	bla-bla-bla	bla-bla-bla /],
 );
 
 
@@ -237,6 +267,11 @@ foreach my $backend (@backends) {
   is($example1->[3][2], '30.12.2021', "date1904=\"false\", using $backend");
   my $example2       = $reader_ulibuck->values('Example two');
   is($example2->[12][2], '# Dummy', "# Dummy, using $backend");
+
+  # https://github.com/damil/Excel-ValueReader-XLSX/issues/2 : empty string (ulibuck++)
+  my $reader_mappe = Excel::ValueReader::XLSX->new(xlsx => $xl_mappe, using => $backend);
+  my $strings      = $reader_mappe->values('Tabelle2');
+  is_deeply $strings, \@expected_mappe, "empty string nodes, using $backend";
 }
 
 done_testing();

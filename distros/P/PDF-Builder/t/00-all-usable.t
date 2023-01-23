@@ -5,9 +5,12 @@ use strict;
 use Test::More;
 use File::Find;
 
-my $GrTFversion = 19;    # minimum version of Graphics::TIFF
-my $HBShaperVer = 0.024; # minimum version of HarfBuzz::Shaper
-my $LpngVersion = 0.57;  # minimum version of Image::PNG::Libpng
+# minimum versions, **if used**
+my $GrTFversion  = 19;       # minimum version of Graphics::TIFF
+my $HBShaperVer  = 0.024;    # minimum version of HarfBuzz::Shaper
+my $LpngVersion  = 0.57;     # minimum version of Image::PNG::Libpng
+my $TextMarkdown = 1.000031; # minimum version of Text::Markdown
+my $HTMLTreeBldr = 5.07;     # minimum version of HTML::TreeBuilder
 
 # Test all of the modules to make sure that a simple "use Module"
 # won't result in a crash.
@@ -77,6 +80,8 @@ foreach my $file (@files) {
 	}
     }
     # HarfBuzz::Shaper is built into Content.pm, doesn't have its own module
+    # Text::Markdown is built into Content/Text.pm, doesn't have its own module
+    # HTML::TreeBuilder is built into Content/Text.pm, doesn't have its own module
     use_ok($file);
 }
 

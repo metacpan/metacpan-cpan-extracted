@@ -7,9 +7,11 @@ Files: Changes
  META.json
  META.yml
  bin/story-interact
+ bin/story-interact-analyze
  bin/story-interact-dir2sqlite
  dist.ini
  doap.ttl
+ lib/Story/Interact/Analyze.pm
  lib/Story/Interact/Character.pm
  lib/Story/Interact/Harness/Terminal.pm
  lib/Story/Interact/Page.pm

@@ -4,12 +4,17 @@
 # See the "COPYING" file for details.
 package HTML::Blitz::Matcher;
 use HTML::Blitz::pragma;
+use HTML::Blitz::SelectorType qw(LT_DESCENDANT LT_CHILD LT_SIBLING LT_ADJACENT_SIBLING);
 use Scalar::Util ();
+
+our $VERSION = '0.03';
 
 method new($class: $rules) {
     bless {
-        rules     => $rules,
-        ctx_stack => [
+        slices    => [
+            map [ $_, { cur => 0, stack => [{ extra_bits => 0 }] } ], @$rules
+        ],
+        doc_state => [
             {
                 nth_child         => 0,
                 nth_child_of_type => {},
@@ -31,42 +36,101 @@ fun _guniq(@values) {
 }
 
 method enter($tag, $attributes) {
-    my $sp = $self->{ctx_stack}[-1];
-    my $nth_child = ++$sp->{nth_child};
-    my $nth_child_of_type = ++$sp->{nth_child_of_type}{$tag};
-    push @{$self->{ctx_stack}}, {
+    my $doc_state = $self->{doc_state};
+    my $dsp = $doc_state->[-1];
+    my $nth_child = ++$dsp->{nth_child};
+    my $nth_child_of_type = ++$dsp->{nth_child_of_type}{$tag};
+    push @$doc_state, {
         nth_child         => 0,
         nth_child_of_type => {},
         on_leave          => [],
     };
 
-    my @r;
-    for my $rule (@{$self->{rules}}) {
-        if ($rule->{selector}->matches($tag, $attributes, $nth_child, $nth_child_of_type)) {
-            push @r, $rule->{result};
+    my @ret;
+
+    for my $slice (@{$self->{slices}}) {
+        my ($glass, $goop) = @$slice;
+        my $cur = $goop->{cur};
+        my $stack = $goop->{stack};
+        my $sp = $stack->[-1];
+        my $extra_volatile = $sp->{extra_volatile};
+        $sp->{extra_volatile} = [];
+
+        push @$stack, my $sp_next = {
+            extra_bits => 0,
+        };
+        my $cur_next;
+
+        for my $i ($cur, @{$sp->{extra}}, @$extra_volatile) {
+            my $sss = $glass->[$i];
+            $sss->matches($tag, $attributes, $nth_child, $nth_child_of_type)
+                or next;
+
+            my $link = $sss->link_type;
+            my $k = $i + 1;
+            my $bit = 1 << ($k - $cur - 1);
+
+            if (!defined $link) {
+                push @ret, $glass->[$k];
+            } elsif ($link eq LT_DESCENDANT) {
+                $cur_next = $k;
+            } elsif ($link eq LT_CHILD) {
+                if (!($sp_next->{extra_bits} & $bit)) {
+                    $sp_next->{extra_bits} |= $bit;
+                    push @{$sp_next->{extra}}, $k;
+                }
+            } elsif ($link eq LT_SIBLING) {
+                if (!($sp->{extra_bits} & $bit)) {
+                    $sp->{extra_bits} |= $bit;
+                    push @{$sp->{extra}}, $k;
+                }
+            } elsif ($link eq LT_ADJACENT_SIBLING) {
+                push @{$sp->{extra_volatile}}, $k;
+            } else {
+                die "Internal error: unexpected selector combinator '$link'";
+            }
+        }
+
+        if (defined $cur_next) {
+            $stack->[-1] = {
+                cur        => $cur,
+                extra_bits => 0,
+            };
+            $goop->{cur} = $cur_next;
         }
     }
-    _guniq @r
-}
 
-method on_leave($callback) {
-    push @{$self->{ctx_stack}[-1]{on_leave}}, $callback;
+    _guniq @ret
 }
 
 method leave(@args) {
-    my $ctx = pop @{$self->{ctx_stack}};
-    if (defined(my $marker = $ctx->{marker})) {
-        splice @{$self->{rules}}, $marker;
+    my $dsp = pop @{$self->{doc_state}};
+    if (defined(my $marker = $dsp->{marker})) {
+        splice @{$self->{slices}}, $marker;
     }
-    for my $cb (reverse @{$ctx->{on_leave}}) {
+
+    for my $slice (@{$self->{slices}}) {
+        my $goop = $slice->[1];
+        my $stack = $goop->{stack};
+        my $sp_prev = pop @$stack;
+        if (defined(my $cur = $sp_prev->{cur})) {
+            $goop->{cur} = $cur;
+        }
+    }
+
+    for my $cb (reverse @{$dsp->{on_leave}}) {
         $cb->(@args);
     }
 }
 
+method on_leave($callback) {
+    push @{$self->{doc_state}[-1]{on_leave}}, $callback;
+}
+
 method add_temp_rule(@temp_rules) {
-    my $rules = $self->{rules};
-    $self->{ctx_stack}[-1]{marker} //= @$rules;
-    push @$rules, @temp_rules;
+    my $slices = $self->{slices};
+    $self->{doc_state}[-1]{marker} //= @$slices;
+    push @$slices, map [ $_, { cur => 0, stack => [{ extra_bits => 0 }] } ], @temp_rules;
 }
 
 1

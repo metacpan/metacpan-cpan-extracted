@@ -21,14 +21,14 @@ Version 0.9.10 Changes by contributors on GitHub - azawawi, joenio
 
 6fab323 Modernize hashbang #! to be more perlbrew friendly
 58c36df Add relative link to Changes file
-efaf173 Simple installation/development commmands
+efaf173 Simple installation/development commands
 cfbcf48 More README.md simplification
 a7889bc Fix README.md
 43c2182 Fix warning: Useless use of greediness modifier '?' in regex
 db4bc44 Fix #17, page parameter should be optional
 f93ed16 "utf8" pragma solves issue with characters rendered wrong
 e69524e fix script that test issue #15
-5d5628f avoid warnind about use of greediness modifier
+5d5628f avoid warning about use of greediness modifier
 
 Version 0.9.8/9
 
@@ -37,7 +37,7 @@ Added some utility methods to new()
 
 Version 0.9.7 - for a detailed log and changed files visit GitHub
 
-Added a few initialisation methods to the help new() and later on accomodate static initialisation within table() textblock()
+Added a few initialisation methods to the help new() and later on accommodate static initialisation within table() textblock()
 
 Repackaged to fix Issue #16
 
@@ -129,7 +129,7 @@ Version 0.9.5 - 18.Oct.2011
 ----------------------------
 MANIFEST was missing sample pdf file.
 
-Accidently left alternative code for infinite loop fix commented out.
+Accidentally left alternative code for infinite loop fix commented out.
 Fixed.  Added a test for that.
 
 
@@ -171,13 +171,13 @@ Added backward compatibility and now again params with '-' front are supported.
   Both params with '-'and without are valid and can be even mixed together.
   I excuse for changing the interface before.
 
-Added cell_props parameter wich can define properties for a single cell as specified by user.
+Added cell_props parameter which can define properties for a single cell as specified by user.
 Thanks for cell_props patch to Bodo Bauer.
 
-Removed Version requirement of Perl 5.8.7 and only version ot 5.6.0 is required.
+Removed Version requirement of Perl 5.8.7 and only version to 5.6.0 is required.
 Thanks to Jonas Pasche for reporting it.
 
-Updated examples/sample1.pl file to try the capabilities of the module immidiately after download.
+Updated examples/sample1.pl file to try the capabilities of the module immediately after download.
 
 Documentation Update.
 
@@ -188,13 +188,13 @@ Thanks to Jonas Pasche for reporting it.
 Fixed documentation inacuracy for text_block(). It is called as $pdftable->text_block() of course.
 Thanks to Jonas Pasche for reporting it.
 
-Fixed bug with first_line overlaping with former paragraph last line.
+Fixed bug with first_line overlapping with former paragraph last line.
 Thanks to Jonas Pasche for reporting it and contributing a patch.
 
 
 Version 0.9.2 - 02.Oct.2006
 ----------------------------
-Fixed bug with 'col_props->bg_color' overiding 'header_props->bg_color'
+Fixed bug with 'col_props->bg_color' overriding 'header_props->bg_color'
 Thanks to Giulio Di Giuliomaria
 
 Fixed some documentation inacuracys.
@@ -231,7 +231,7 @@ Optimization for min row height calculations
 
 Added 'new_page_func parameter'. This is should be a reference to function which is called every time when a new page needs to be created so the table can span.See online manual for more info how to use it.
 
-Added Check if any text in sub text_block before spliting the parameter.
+Added Check if any text in sub text_block before splitting the parameter.
 
 Fixed bug with infinite loop when spanning to a new page.
 
@@ -245,7 +245,7 @@ Undocumented Parameter in text_block() 'flindent'  indent of first line
 Undocumented Parameter in text_block() 'fpindent'  indent of first paragraph
 
 The Above parameters are excluding each other in the following order: parspace,flindent,fpindent,indent 
-The one that is found first and has valid value is beeing used
+The one that is found first and has valid value is being used
 
 Added Header Row support with repeat on every new page and different layout than the other rows
 
@@ -257,6 +257,6 @@ Default values for many options
 
 Better source formatting
 
-Fixed incorect y position returned from text_block()
+Fixed incorrect y position returned from text_block()
 
-Others that i dont remeber.
+Others that i dont remember.

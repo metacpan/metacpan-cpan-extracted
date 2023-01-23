@@ -38,11 +38,12 @@ my @clist2 = (@list1, [@list2], \%hash1);
 
 
 @tests = (
-	[sub { return 'one' }, 'one', 'Scalar testing'],
-	[sub { return \%hash1 }, \%hash2, 'Hash testing'],
-	[sub { return \@list1 }, \@list2, 'List testing'],
-	[sub { return \%chash1 }, \%chash2, 'Complex hash testing'],
-	[sub { return \@clist1 }, \@clist2, 'Complex list testing'],
+	[sub { return 'one' }, 'one', 'scalar testing'],
+	[sub { return \%hash1 }, \%hash2, 'hash testing'],
+	[sub { return \@list1 }, \@list2, 'list testing'],
+	[sub { return \%chash1 }, \%chash2, 'complex hash testing'],
+	[sub { return \@clist1 }, \@clist2, 'complex list testing'],
 );
 
-$app->MainLoop;
+starttesting;
+

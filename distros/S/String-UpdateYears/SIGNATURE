@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 1cafb74b65f1f0f91aa523064817d0f654afcdf98f108253d550d2afc96fb4e6 CONCEPT
+SHA256 6eaac4a7facc25acbf4d1a2667e5ca5cd1087b34ffdc8b40ef9e34fff64e804d Changes
+SHA256 e9ae42c89b2f406c60c950a2a41695eabc2d324c0a9cd90d165e87c4e8a731bd LICENSE
+SHA256 fca1cdc80a61138c7622e21b43310d35f01f0a2bae2a589f2b2821f197c326a4 MANIFEST
+SHA256 29c3c614830815d1abe7e3bca99f567e6b9c678561e821f1e5993a0b093247c3 META.yml
+SHA256 4e194a8dd9e0a2fc1ef259bb3c0c1fe13ee3cf8a9d8876e6f46debb5629e6281 Makefile.PL
+SHA256 bc248c2f777d5a8fc038328e35373007a4952d303e974be713aecd40144f48ec README
+SHA256 350103d7c9320a2e1724f2beb66a608c1e0dc1c226ba801383da2b13899d04f8 UpdateYears.pm
+SHA256 5dd5b3a745e3d87ca1076858d66b556ecb34457a44d037564b0db6ac4ee02c71 examples/update_years.pl
+SHA256 789cf45f0f87ee138d3319dbc3a7a3ce860bd733c82f71dd771aebdab79569ba examples/update_years_copyright.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 da9c44f34686317491626b142b2964b0bd789c08c4d332d2d3cfb5aebc5affb0 t/String-UpdateYears/01-use.t
+SHA256 b8d413714d74ae7b6001c0e5155fe392aae68a0b9d172a53c43d28c2bb55bfe7 t/String-UpdateYears/02-version.t
+SHA256 1beb6b997483aec4267797310b1327bec666c1c5e8ebf514b369a0bac4b1205f t/String-UpdateYears/03-update_years.t
+SHA256 a9187c5dc3a6cbe77df9111ba20953be596edb8fdb9e02227bb3dd10c5660a1e xt/String-UpdateYears/01-pod_coverage.t
+SHA256 cd6d0520a974219affd787a3a6be77a9272eda34a90f1d90ccda71b518560ae7 xt/String-UpdateYears/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmPOuZYACgkQojV9Rpe/
+B8uD/w//aNVz/O9uBFV67aOsXQlyqe2HxLqGaeaiUjGDMa+CwNhGkoUtcA8hXz3o
+ZOjP7osrgEA7L5WhgRHdHdiIRD+d/fRH0XQ7sY6s/ImoORiQ8EssXfkvsvK5YcSL
+fhowM5oyHPinHioyoC5sWfzkxQfpudSwtSdV3zvF31RPH+wW1TFJZlmR6L2wJFce
+xpyO7Uch8ZgSxr3i3Duop1wXSRUQo0MZ15Qrq1lkDb89ra0CwjJUBFOhOC3zxMxp
+wZ8VoJmICaWiCuTqzBqDmQtoibTHdhppz8r7bAW6yjjmmT515kHDyaRhVzFgkIt7
+uY6n2iYQ/owguVK4cASrKtAp0b9tE6Rs8I3gl8jzFX2hIIQfD3FgjysHFMgR6LMa
+njtWY7M4/hJYOynej/YD5dJ8XZjTOKugfZlFDv8dpcQJ/kf3drxvxvMvwkYIhdIE
+Epd7ogj32pFctUbWkgX+oq8Qe+2Q/T4r/4ZeMDwuZhQcqfgw/+aGhLkraSwyHQJD
+vMRgJJo4tkCyYlBCvJjv/Hk1esVn7jXE232IR1EWCFf7aBAa+ZILTUkznLrU85ex
+vooUsD4NIci4sC8H4nVcIikGBaaTlmg2uZqeyL+F7dfExsdJKs5Adj6i1HqV8n19
+jNShw5jiA/mpsKqq9NbRmXheS7XoF1wJ3/KViMn40r/S/NKsGLI=
+=prOU
+-----END PGP SIGNATURE-----

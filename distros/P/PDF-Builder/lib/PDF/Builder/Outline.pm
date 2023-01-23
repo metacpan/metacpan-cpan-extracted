@@ -5,7 +5,7 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 use warnings;
 
-our $VERSION = '3.024'; # VERSION
+our $VERSION = '3.025'; # VERSION
 our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 use Carp qw(croak);
@@ -24,7 +24,7 @@ PDF::Builder::Outline - Manage PDF outlines (a.k.a. I<bookmarks>)
     # Add an entry
     my $item = $outlines->outline();
     $item->title('First Page');
-    $item->destination($pdf->open_page(1)); # or dest(...)
+    $item->dest($pdf->open_page(1), fit-def);
 
 =head1 METHODS
 
@@ -470,42 +470,6 @@ sub _fit {
     return $self;
 }
 
-=item $outline = $outline->destination($destination, $location, @args)
-
-Set the destination page and optional position of the outline.  C<$location> and
-C<@args> are as defined in L<PDF::Builder::NamedDestination/"destination">.
-
-C<$destination> can optionally be the name of a named destination defined
-elsewhere.
-
-This is an B<alternative method> for changes made in PDF::API2; it maintains
-compatibility with the new PDF::API2 version.
-
-=cut
-
-sub _destination {
-    require PDF::Builder::NamedDestination;
-    return PDF::Builder::NamedDestination::_destination(@_);
-}
-
-sub destination {
-    my ($self, $destination, $location, @args) = @_;
-
-    # Remove an existing action dictionary
-    delete $self->{'A'};
-
-    if (ref($destination)) {
-        # Page Destination
-        $self->{'Dest'} = _destination($destination, $location, @args);
-    }
-    else {
-        # Named Destination
-        $self->{'Dest'} = PDFStr($destination);
-    }
-
-    return $self;
-}
-
 =back
 
 =head2 Destination targets
@@ -525,7 +489,8 @@ Either C<uri> or C<url> may be used; C<uri> is for compatibility with PDF::API2.
 sub url { return uri(@_); }  # alternate name
 
 sub uri {
-    my ($self, $url) = @_;
+    my ($self, $url, %opts) = @_;
+    # no current opts
 
     delete $self->{'Dest'};
     $self->{'A'}          = PDFDict();
@@ -549,7 +514,8 @@ Either C<launch> or C<file> may be used; C<launch> is for compatibility with PDF
 sub file { return launch(@_); } # alternate name
 
 sub launch {
-    my ($self, $file) = @_;
+    my ($self, $file, %opts) = @_;
+    # no current opts
 
     delete $self->{'Dest'};
     $self->{'A'}        = PDFDict();
@@ -570,9 +536,7 @@ C<$pdffile>, on page C<$pagenum> (default 0), and position C<%position>
 B<Alternate names:> C<pdf_file> and C<pdfile>
 
 Either C<pdf> or C<pdf_file> (or the older C<pdfile>) may be used; C<pdf> is 
-for compatibility with PDF::API2. B<Note> that PDF::API2 now uses a string name 
-for the location, and an array of dimensions, etc., rather than the old hash
-element name => dimensions (as still used here in PDF::Builder).
+for compatibility with PDF::API2. 
 
 =cut
 

@@ -107,6 +107,13 @@ EXAMPLE
      # 
      # =cut
 
+SEE ALSO
+    perl-module-copyright-years
+        Tool for update copyright years in Perl distribution.
+
+    App::Perl::Module::CopyrightYears
+        Base class for perl-module-copyright-years tool.
+
 DEPENDENCIES
     Class::Utils, Error::Pure, Pod::Abstract.
 
@@ -124,5 +131,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

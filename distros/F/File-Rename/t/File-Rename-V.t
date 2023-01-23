@@ -1,3 +1,5 @@
+use strict;
+use warnings;
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as
 # `perl -I/usr/local/bin t/File-Rename-script.t'
@@ -24,12 +26,12 @@ die $@ unless $require_ok;
 # test 2
 
 my $buffer;
-close STDOUT;
-open STDOUT, '>', \$buffer or diag $!;
+open my $stdout, '>', \$buffer or diag $!;
+select $stdout;
 main_argv('-V'); 
 
-END{ 
-    close STDOUT or diag $!;
+END{
+    close $stdout or diag $!;
     like( $buffer, qr{
 	\b $script 
 	\s+ using 

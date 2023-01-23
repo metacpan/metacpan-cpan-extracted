@@ -7,7 +7,7 @@ use warnings;
 use PDF::Builder;
 
 my $infile  = 'examples/resources/sample_55.pdf';
-my $outfile = 'examples/055_outlines_sample_55.pdf';
+my $outfile = 'examples/055_outlines.sample_55.pdf';
 
 my $doc = PDF::Builder-> open($infile);
 

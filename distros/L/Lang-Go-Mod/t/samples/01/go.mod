@@ -2,6 +2,14 @@ module github.com/example/my-project
 
 go 1.16
 
+retract [v1.0.0, v1.2.0] // rationale
+retract v1.3.0 // rationale
+
+retract (
+	v1.4.0 // rationale
+	[v1.5.0, v1.6.0] // rationale
+)
+
 // these are comments
 
 exclude (

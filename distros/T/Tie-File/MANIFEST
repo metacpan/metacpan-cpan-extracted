@@ -42,5 +42,6 @@ t/33_defer_vs.t
 t/40_abs_cache.t
 t/41_heap.t
 t/42_offset.t
+t/43_synopsis.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

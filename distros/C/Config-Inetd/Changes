@@ -1,5 +1,17 @@
 Revision history for Perl extension Config::Inetd.
 
+0.32  2023-01-21  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.31_01  2023-01-20  <schubiger@cpan.org>
+
+ - Move testing modules to test_requires.
+
+ - When failing, enclose filenames in quotes.
+
+ - Add metadata repository link.
+
 0.31  2011-08-16  <schubiger@cpan.org>
 
  - Merged development version to stable.

@@ -38,7 +38,7 @@ if($@){
 ok $result =~ /24=>   subc/;
 ok $result =~ /27=>   subb/;
 ok $result =~ /32=>   suba/;
-ok $result =~ /31=> eval {/;
+ok $result =~ /31=> eval \{/;
 #ok ($result =~ /(ouch)/g);
 
 my @a= $result =~ /ouch/g;

@@ -17,5 +17,13 @@ use HTML::Blitz::Atom our @EXPORT_OK = qw(
     ST_ATTR_LANG_PREFIX
     ST_NTH_CHILD
     ST_NTH_CHILD_OF_TYPE
+
+    LT_DESCENDANT
+    LT_CHILD
+    LT_SIBLING
+    LT_ADJACENT_SIBLING
 );
+
+our $VERSION = '0.03';
+
 1

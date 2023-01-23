@@ -13,7 +13,7 @@ Neo4j::Driver::Net - Explains the design of the networking modules
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 OVERVIEW
 
@@ -42,7 +42,7 @@ hand is an internal implementation detail of the driver and as such
 is B<subject to unannounced change.> While some of those details are
 explained in this document, this is done only to help contributors
 and users of I<public> APIs better understand the driver's design.
-See L<Neo4j:::Driver::Plugin/"USE OF INTERNAL APIS"> for more
+See L<Neo4j::Driver::Plugin/"USE OF INTERNAL APIS"> for more
 information on this topic.
 
 =head1 SYNPOSIS
@@ -61,7 +61,7 @@ information on this topic.
  $json_coder->decode( $helper->{http_agent}->fetch_all );
 
 B<WARNING:> Some of these calls are private APIs.
-See L<Neo4j:::Driver::Plugin/"USE OF INTERNAL APIS">.
+See L<Neo4j::Driver::Plugin/"USE OF INTERNAL APIS">.
 
 =head1 FEATURES
 
@@ -279,7 +279,7 @@ option internally, so it will remain available for the time being.
 The module name provided will be used in place of
 L<Neo4j::Bolt> and will have to match its API I<exactly.>
 Note that there is no support for this approach. For details,
-see L<Neo4j:::Driver::Plugin/"USE OF INTERNAL APIS">.
+see L<Neo4j::Driver::Plugin/"USE OF INTERNAL APIS">.
 
 =head2 Custom HTTP networking modules
 
@@ -291,7 +291,7 @@ L<REST::Client>.
 The driver's test suite still uses the former C<net_module>
 option internally. Modules to be used as C<net_module> must
 implement the API for an HTTP adapter; see
-L<Neo4j:::Driver::Plugin/"Network adapter API for HTTP">.
+L<Neo4j::Driver::Plugin/"Network adapter API for HTTP">.
 Additionally, they must implement the following method:
 
 =over
@@ -312,12 +312,12 @@ method L<Neo4j::Driver/"config"> only.
 =head2 Custom result handlers
 
 This section has been replaced by
-L<Neo4j:::Driver::Plugin/"Result handler API">.
+L<Neo4j::Driver::Plugin/"Result handler API">.
 
 =head1 USE OF INTERNAL APIS
 
 This section has been replaced by
-L<Neo4j:::Driver::Plugin/"USE OF INTERNAL APIS">.
+L<Neo4j::Driver::Plugin/"USE OF INTERNAL APIS">.
 
 =head1 AUTHOR
 
@@ -328,7 +328,7 @@ If you contact me by email, please make sure you include the word
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2022 by Arne Johannessen.
+This software is Copyright (c) 2016-2023 by Arne Johannessen.
 
 This is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0 or (at your option) the same terms

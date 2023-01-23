@@ -3,7 +3,7 @@ package Firefox::Marionette::Certificate;
 use strict;
 use warnings;
 
-our $VERSION = '1.34';
+our $VERSION = '1.35';
 
 sub _NUMBER_OF_MICROSECOND_DIGITS { return -6 }
 
@@ -177,7 +177,7 @@ Firefox::Marionette::Certificate - Represents a x509 Certificate from Firefox
 
 =head1 VERSION
 
-Version 1.34
+Version 1.35
 
 =head1 SYNOPSIS
 
@@ -336,7 +336,7 @@ David Dick  C<< <ddick@cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2021, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
+Copyright (c) 2023, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic/perlartistic>.

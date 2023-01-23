@@ -6,7 +6,7 @@ use URI::URL();
 
 use base qw(Firefox::Marionette::Element);
 
-our $VERSION = '1.34';
+our $VERSION = '1.35';
 
 sub new {
     my ( $class, $element ) = @_;
@@ -89,7 +89,7 @@ Firefox::Marionette::Image - Represents an image from the images method
 
 =head1 VERSION
 
-Version 1.34
+Version 1.35
 
 =head1 SYNOPSIS
 
@@ -184,7 +184,7 @@ David Dick  C<< <ddick@cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2021, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
+Copyright (c) 2023, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic/perlartistic>.

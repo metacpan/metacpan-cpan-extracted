@@ -5,7 +5,7 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 use warnings;
 
-our $VERSION = '3.024'; # VERSION
+our $VERSION = '3.025'; # VERSION
 our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
@@ -83,26 +83,22 @@ sub new {
 
 =over
 
-=item $annotation->goto($page, %opts)
+=item $annotation->link($page, %opts)
 
 Defines the annotation as a launch-page with page C<$page> (within I<this>
 document) and opts %opts (rect, border, color, I<fit>: see 
 descriptions below).
 
 B<Note> that C<$page> is I<not> a simple page number, but is a page structure
-such as C<$pdf-E<gt>openpage(page_number)>. 
-
-B<Alternate name:> C<link>
-
-Originally this method was named C<link>, but a recent PDF::API2 change made it
-C<goto>. For compatibility, it has been changed to C<goto>, with C<link> 
-still available as an alias.
+such as C<$pdf-E<gt>openpage(page_number)>, I<or> a Named Destination defined
+elsewhere. 
 
 =cut
 
-sub link { return goto(@_); } ## no critic
+# consider goto() as alias, for consistency with NamedDestination
+#sub goto { return link(@_); }  ## no critic
 
-sub goto {  ## no critic
+sub link { 
     my ($self, $page, %opts) = @_;
     # copy dashed names over to preferred non-dashed names
     if (defined $opts{'-rect'} && !defined $opts{'rect'}) { $opts{'rect'} = delete($opts{'-rect'}); }
@@ -111,8 +107,13 @@ sub goto {  ## no critic
 
     $self->{'Subtype'} = PDFName('Link');
     if (ref($page)) {
+	# page structure
         $self->{'A'}        = PDFDict();
         $self->{'A'}->{'S'} = PDFName('GoTo');
+    } else {
+	# named destination
+	$self->{'Dest'} = PDFString($page, 'n');
+	# PDF::API2 returns $self at this point!
     }
     $self->dest($page, %opts);
     $self->rect(@{$opts{'rect'}}) if defined $opts{'rect'};
@@ -126,7 +127,7 @@ sub goto {  ## no critic
 
 Defines the annotation as a PDF-file with filepath C<$pdffile>, on page 
 C<$page_number>, and opts %opts (rect, border, color, I<fit>: see 
-descriptions below). This differs from the C<goto> (C<link> call in that the target 
+descriptions below). This differs from the C<link> call in that the target 
 is found in a different PDF file, not the current document.
 
 C<$page_number> is the physical page number, starting at 1: 1, 2,...
@@ -192,6 +193,7 @@ sub launch {
     $self->{'A'}        = PDFDict();
     $self->{'A'}->{'S'} = PDFName('Launch');
     $self->{'A'}->{'F'} = PDFString($file, 'f');
+
     $self->rect(@{$opts{'rect'}}) if defined $opts{'rect'};
     $self->Color(@{$opts{'color'}}) if defined $opts{'color'};
     $self->border(@{$opts{'border'}}) if defined $opts{'border'};
@@ -226,6 +228,7 @@ sub uri {
     $self->{'A'}          = PDFDict();
     $self->{'A'}->{'S'}   = PDFName('URI');
     $self->{'A'}->{'URI'} = PDFString($url, 'u');
+
     $self->rect(@{$opts{'rect'}}) if defined $opts{'rect'};
     $self->Color(@{$opts{'color'}}) if defined $opts{'color'};
     $self->border(@{$opts{'border'}}) if defined $opts{'border'};
@@ -806,8 +809,9 @@ sub dest {
     if (defined $position{'-xyz'} && !defined $position{'xyz'}) { $position{'xyz'} = delete($position{'-xyz'}); }
 
     if (ref $page) {
-        $self->{'A'} ||= PDFDict();
+        $self->{'A'} //= PDFDict();
 
+        # old-fashioned 'fittype' => value
         if      (defined $position{'fit'}) {
             $self->{'A'}->{'D'} = PDFArray($page, PDFName('Fit'));
         } elsif (defined $position{'fith'}) {

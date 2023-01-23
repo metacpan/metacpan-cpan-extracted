@@ -13,7 +13,7 @@ Readonly::Hash my %LANG => (
 	'title' => 'Page title',
 );
 
-our $VERSION = 0.13;
+our $VERSION = 0.15;
 
 # Constructor.
 sub new {
@@ -34,6 +34,15 @@ sub new {
 
 	# 'CSS::Struct' object.
 	$self->{'css'} = undef;
+
+	# Init CSS style.
+	$self->{'css_init'} = [
+		['s', '*'],
+		['d', 'box-sizing', 'border-box'],
+		['d', 'margin', 0],
+		['d', 'padding', 0],
+		['e'],
+	];
 
 	# CSS links.
 	$self->{'css_src'} = [];
@@ -145,6 +154,9 @@ sub process {
 
 	my $css;
 	if ($self->{'css'}) {
+		$self->{'css'}->put(
+			@{$self->{'css_init'}},
+		);
 		$css = $self->{'css'}->flush(1);
 		if ($css ne '') {
 			$css .= "\n";
@@ -532,6 +544,8 @@ Returns undef.
 
 =head1 EXAMPLE1
 
+=for comment filename=html_page.pl
+
  use strict;
  use warnings;
 
@@ -572,13 +586,13 @@ Returns undef.
  # Print out.
  print $tags->flush;
 
- # Output:
+ # Output like:
  # <!DOCTYPE html>
  # <html lang="en">
  #   <head>
  #     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
  #     <meta name="generator" content=
- #       "Perl module: Tags::HTML::Page::Begin, Version: 0.06" />
+ #       "Perl module: Tags::HTML::Page::Begin, Version: 0.15" />
  #     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
  #     <title>
  #       Page title
@@ -587,6 +601,11 @@ Returns undef.
  # div {
  # 	color: red;
  # 	background-color: black;
+ # }
+ # * {
+ # 	box-sizing: border-box;
+ # 	margin: 0;
+ # 	padding: 0;
  # }
  # </style>
  #   </head>
@@ -626,12 +645,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020
+© Michal Josef Špaček 2020-2023
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.13
+0.15
 
 =cut

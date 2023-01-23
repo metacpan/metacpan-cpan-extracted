@@ -1,0 +1,35 @@
+---
+abstract: 'Look for year or years range in string and update years'
+author:
+  - 'Michal Josef Spacek <skim@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+  Test::NoWarnings: 0
+  Unicode::UTF8: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.19'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: String-UpdateYears
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  Exporter: 0
+  Readonly: 0
+  perl: 5.6.2
+resources:
+  bugtracker: https://github.com/michal-josef-spacek/String-UpdateYears/issues
+  homepage: https://github.com/michal-josef-spacek/String-UpdateYears
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: git://github.com/michal-josef-spacek/String-UpdateYears
+version: '0.01'

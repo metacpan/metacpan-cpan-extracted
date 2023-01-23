@@ -85,17 +85,12 @@ SUPPORT AND DOCUMENTATION
 
     You can also look for information at:
 
-        Search CPAN
-            http://search.cpan.org/dist/Net-Pcap
+        Meta::CPAN
+            https://metacpan.org/dist/Net-Pcap
 
         CPAN Request Tracker:
             http://rt.cpan.org/Dist/Display.html?Name=Net-Pcap
 
-        AnnoCPAN, annotated CPAN documentation:
-            http://annocpan.org/dist/Net-Pcap
-
-        CPAN Ratings:
-            http://cpanratings.perl.org/d/Net-Pcap
 
     See also the examples scripts provided in the distribution, in the
     examples/ subdirectory.

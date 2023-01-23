@@ -11,7 +11,6 @@ t/leaks.t
 t/lib/ErrorLocation.pm
 t/lib/InlineModule.pm
 t/lib/ThreadsCheck.pm
-t/quotify-5.6.t
 t/quotify-no-hex.t
 t/quotify.t
 t/sub-defer-no-subname.t
@@ -23,6 +22,10 @@ t/subname-none.t
 t/subname-sub-name-preload.t
 t/subname-sub-name.t
 t/subname-sub-util.t
+xt/quotify-5.10.0.t
+xt/quotify-5.6.t
+xt/quotify-b.t
+xt/quotify-no-xstring.t
 xt/release/kwalitee.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

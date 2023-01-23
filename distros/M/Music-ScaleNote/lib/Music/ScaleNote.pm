@@ -3,12 +3,12 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Manipulate the position of a note in a scale
 
-our $VERSION = '0.0704';
+our $VERSION = '0.0705';
 
+use Moo;
 use strictures 2;
 use Carp qw(croak);
 use List::Util qw( first );
-use Moo;
 use Music::Note ();
 use Music::Scales qw(get_scale_notes);
 use namespace::clean;
@@ -170,7 +170,7 @@ Music::ScaleNote - Manipulate the position of a note in a scale
 
 =head1 VERSION
 
-version 0.0704
+version 0.0705
 
 =head1 SYNOPSIS
 
@@ -184,8 +184,8 @@ version 0.0704
     verbose     => 1,
   );
 
-  my $note = $msn->get_offset( note_name => 'C4' );
-  print $note->format('ISO'), "\n"; # D#4
+  my $note = $msn->get_offset(note_name => 'C4');
+  say $note->format('ISO'); # D#4
 
   $msn = Music::ScaleNote->new(
     scale_note => 'C',
@@ -197,14 +197,14 @@ version 0.0704
     note_format => 'midinum',
     offset      => -1,
   );
-  print $note->format('midinum'), "\n"; # 58
+  say $note->format('midinum'); # 58
 
   $note = $msn->step(
     note_name => 'D3',
     steps     => -1,
     flat      => 1,
   );
-  print $note->format('ISO'), "\n"; # Db3
+  say $note->format('ISO'); # Db3
 
 =head1 DESCRIPTION
 
@@ -360,7 +360,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Gene Boggs.
+This software is copyright (c) 2023 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

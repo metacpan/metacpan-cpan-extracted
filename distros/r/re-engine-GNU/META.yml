@@ -12,13 +12,12 @@ build_requires:
   IPC::Open3: '0'
   Test::More: '0'
   Thread: '0'
-  blib: '1.01'
   perl: '5.010000'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010000'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,7 +30,7 @@ no_index:
 provides:
   re::engine::GNU:
     file: lib/re/engine/GNU.pm
-    version: '0.024'
+    version: '0.025'
 requires:
   XSLoader: '0'
   perl: '5.010000'
@@ -41,6 +40,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=re-engine-GNU
   homepage: https://metacpan.org/release/re-engine-GNU
   repository: git://github.com/jddurand/re-engine-gnu.git
-version: '0.024'
+version: '0.025'
 x_authority: cpan:JDDPAUSE
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_contributors:
+  - 'Yves Orton <demerphq@gmail.com>'
+x_generated_by_perl: v5.37.8
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

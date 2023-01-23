@@ -1,11 +1,13 @@
 #
-# Copyright (c) 2004-2021 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2004-2022 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
 # MIT License (Expat version). See the file COPYING.md that came
 # bundled with this file.
 #
+
+# Depends: () ; well it does depend on a pager, but which one? It's optional.
 
 =head1 NAME
 
@@ -41,7 +43,7 @@ If the 'Maybe_keepResultIn' field is set to a string, the scalar with the
 given mae is set to either an array holding all the result values (in
 :l mode) or the result value (in :1 mode).
 
-By default, in the :d and :s modes the results of a calculation are
+By default, in the :d / :s / :S modes the results of a calculation are
 carried over to the next entry in $VAR1 etc. as shown by the display
 of the result. Those are lexical variables.
 
@@ -119,7 +121,7 @@ use Chj::xoutpipe();
 use Chj::xtmpfile;
 use Chj::xperlfunc qw(xexec xstat);
 use Chj::xopen qw(fh_to_fh perhaps_xopen_read);
-use POSIX;
+use POSIX qw(sigaction SIGINT);
 use Chj::xhome qw(xsafehome);
 use Chj::singlequote 'singlequote';
 use FP::HashSet qw(hashset_union);
@@ -178,8 +180,10 @@ our $maybe_settingspath = lazyLight { force($HOME) . "/.fp-repl_settings" };
 our $maxHistLen         = 500;
 our $doCatchINT         = 1;
 our $doRepeatWhenEmpty  = 1;
-our $doKeepResultsInVARX      = 1;
-our $pager                    = lazyLight { $ENV{PAGER} || "less" };
+our $doKeepResultsInVARX = 1;
+our $pager               = lazyLight {
+    $ENV{PAGER} ? [split /\s+/, $ENV{PAGER}] : ["less"]
+};
 our $mode_context             = 'l';
 our $mode_formatter           = 'd';
 our $mode_viewer              = 'a';
@@ -333,6 +337,15 @@ our $term;    # local'ized but old value is reused if present.
 
 our $current_history;    # local'ized; array(s).
 
+my $pagercmd_a = lazyLight {
+    my $p = force($pager);
+    if ($p->[0] =~ m{(^|/)less$}) {
+        [@$p, qw(--quit-if-one-screen --no-init)];
+    } else {
+        $pager
+    }
+};
+
 sub print_help {
     my $self      = shift;
     my ($out)     = @_;
@@ -345,6 +358,7 @@ sub print_help {
     my $l = &$selection(context             => 'l');
     my $p = &$selection(formatter           => 'p');
     my $s = &$selection(formatter           => 's');
+    my $S = &$selection(formatter           => 'S');
     my $d = &$selection(formatter           => 'd');
     my $V = &$selection(viewer              => 'V');
     my $v = &$selection(viewer              => 'v');
@@ -353,6 +367,8 @@ sub print_help {
     my $M = &$selection(lexical_persistence => 'M');
     my $x = &$selection(lexical_persistence => 'x');
     my $X = &$selection(lexical_persistence => 'X');
+    my $pagercmd_pager_str = join(" ", @{ $$self[Pager] });
+    my $pagercmd_a_str     = join(" ", @{ force $pagercmd_a });
     print $out qq{Repl help:
 If a command line starts with a ':' or ',', then the remainder of the
 line is interpreted as follows:
@@ -384,11 +400,12 @@ $l l  use list context (default)
   formatter:
 $p P  print stringification
 $s s  show from FP::Show (experimental, does not show data sharing)
+$S S  show from FP::Show (ditto), but reformatted via Perl::Tidy
 $d d  Data::Dumper (default)
   viewer:
 $V V  no pager
-$v v  pipe to pager ($$self[Pager])
-$a a  pipe to 'less --quit-if-one-screen --no-init' (default)
+$v v  pipe to pager ('$pagercmd_pager_str')
+$a a  pipe to '$pagercmd_a_str' (default)
   lexical persistence:
    (Persisting lexicals means to carry over variables introduced with
    "my" into subsequent entries in the same repl. It prevents their
@@ -416,23 +433,38 @@ sub formatter {
     my ($terse) = @_;                      # true for :e viewing
     my $mode    = $self->mode_formatter;
     $mode = "d" if ($terse and $mode eq "p");
+    my $s_formatter = sub {
+        my $z   = 1;
+        my $str = join "", map {
+            my $VARX
+                = ($$self[DoKeepResultsInVARX] and not $terse)
+                ? '$VAR' . $z++ . ' = '
+                : '';
+            $VARX . show($_) . ";\n"
+        } @_;
+
+        # HACK to avoid having to use Data::Dumper::AutoEncode
+        require Encode;
+        $str = Encode::decode('UTF-8', $str, Encode::FB_CROAK());
+        $str =~ s/(?<!\\)\\x\{(\w+)\}/chr hex $1/sge;
+        $str
+    };
     hash_xref(
         +{
             p => sub {
-                (join "", map { (defined $_ ? $_ : 'undef') . "\n" } @_)
+                join "", map { (defined $_ ? $_ : 'undef') . "\n" } @_
             },
-            s => sub {
-                my $z = 1;
-                (
-                    join "",
-                    map {
-                        my $VARX
-                            = ($$self[DoKeepResultsInVARX] and not $terse)
-                            ? '$VAR' . $z++ . ' = '
-                            : '';
-                        $VARX . show($_) . ";\n"
-                    } @_
-                )
+            s => $s_formatter,
+            S => sub {
+                my $str = $s_formatter->(@_);
+                require Perl::Tidy;
+                my $str2;
+                Perl::Tidy::perltidy(
+                    source      => \$str,
+                    destination => \$str2,
+                    argv        => ["--character-encoding=utf8"],
+                );
+                $str2
             },
             d => sub {
                 my @v = @_;    # to survive into
@@ -460,20 +492,17 @@ sub formatter {
 sub viewers {
     my $self = shift;
     my ($OUTPUT, $ERROR) = @_;
-    my $port_pager_with_options = sub {
-        my ($maybe_pager, @options) = @_;
+    my $port_pager_with_perhaps_pagercmd = sub {
+        my (@perhaps_pagercmd) = @_;
         sub {
-            my ($printto) = @_;
+            my ($print_value_to) = @_;
 
             local $SIG{PIPE} = "IGNORE";
 
-            my $pagercmd = $maybe_pager // $self->pager;
+            my @pagercmd
+                = @perhaps_pagercmd ? @perhaps_pagercmd : @{ $self->pager };
 
             eval {
-                # XX this now means that no options
-                # can be passed in $ENV{PAGER} !
-                # (stupid Perl btw). Ok hard code
-                # 'less' instead perhaps!
                 my $o = Chj::xoutpipe(
                     sub {
 
@@ -484,28 +513,30 @@ sub viewers {
                         $out->xdup2(2);
                         $ENV{PATH} = $self->maybe_env_PATH
                             if defined $self->maybe_env_PATH;
-                        xexec $pagercmd, @options
+                        xexec @pagercmd
                     }
                 );
-                &$printto($o);
+                $o->xbinmode(":encoding(utf-8)");
+                &$print_value_to($o);
                 $o->xfinish;
                 1
             } || do {
                 my $estr = show($@);
                 unless ($estr =~ /broken pipe/i) {
-                    print $ERROR "error piping to pager "
-                        . "$pagercmd: $estr\n"
+                    print $ERROR "error piping to pager, "
+                        . join(" ", @pagercmd)
+                        . ": $estr\n"
                         or die $!;
                 }
             };
         }
     };
 
-    my $string_pager_with_options = sub {
-        my $port_pager = &$port_pager_with_options(@_);
+    my $string_pager_with_perhaps_pagercmd = sub {
+        my $port_pager = $port_pager_with_perhaps_pagercmd->(@_);
         sub {
             my ($v) = @_;
-            &$port_pager(
+            $port_pager->(
                 sub {
                     my ($o) = @_;
                     $o->xprint($v);
@@ -515,29 +546,31 @@ sub viewers {
     };
 
     my $choosepager = sub {
-        my ($pager_with_options) = @_;
+        my ($pager_with_pagercmd) = @_;
         hash_xref(
             +{
                 V => sub {
                     print $OUTPUT $_[0] or die "print: $!";
                 },
-                v => &$pager_with_options(),
-                a => &$pager_with_options(
-                    qw(less --quit-if-one-screen --no-init)),
+                v => $pager_with_pagercmd->(),
+                a => $pager_with_pagercmd->(@{ force $pagercmd_a}),
             },
             $self->mode_viewer
         );
     };
 
     my $pager = sub {
-        my ($pager_with_options) = @_;
+        my ($pager_with_pagercmd) = @_;
         sub {
             my ($v) = @_;
-            &$choosepager($pager_with_options)->($v);
+            $choosepager->($pager_with_pagercmd)->($v);
         }
     };
 
-    (&$pager($port_pager_with_options), &$pager($string_pager_with_options))
+    (
+        &$pager($port_pager_with_perhaps_pagercmd),
+        &$pager($string_pager_with_perhaps_pagercmd)
+    )
 }
 
 our $use_warnings = q{use warnings; use warnings FATAL => 'uninitialized';};
@@ -587,11 +620,11 @@ sub eval_code {
         if (defined $maybe_lexicals) {
             $lp->lexicals(hashset_union($lp->lexicals, $maybe_lexicals))
         }
-        my $context = wantarray ? "list" : "scalar";
+        my $context = wantarray ? "list" : "scalar";    ## no critic
         $lp->context($context);
         WithRepl_eval { $lp->eval($allcode) }
     } else {
-        my @v = sort keys %$maybe_lexicals if defined $maybe_lexicals;
+        my @v = sort keys %{ $maybe_lexicals // {} };
         my $allcode
             = $prelude
             . (@v ? 'my (' . join(", ", @v) . '); ' : '') . 'sub {'
@@ -904,7 +937,8 @@ sub run {
 
         # It seems this is the only way to make signal handlers work in
         # both perl 5.6 and 5.8:
-        sigaction SIGINT, new POSIX::SigAction __PACKAGE__ . '::__signalhandler'
+        sigaction SIGINT,
+            POSIX::SigAction->new(__PACKAGE__ . '::__signalhandler')
             or die "Error setting SIGINT handler: $!\n";
         1
     } || do {
@@ -924,7 +958,7 @@ sub run {
 
     # only start one readline instance, do not nest (doing otherwise
     # seems to lead to segfaults). okay?.
-    local our $term = $term || new Term::ReadLine 'Repl';
+    local our $term = $term || Term::ReadLine->new('Repl');
 
     # This means that the history from nested repls will also show up
     # in the history of the parent repl. Not saved, but within the
@@ -1245,6 +1279,9 @@ sub run {
                                 ),
                                 s => saving(
                                     $self, sub { $$self[Mode_formatter] = "s" }
+                                ),
+                                S => saving(
+                                    $self, sub { $$self[Mode_formatter] = "S" }
                                 ),
                                 d => saving(
                                     $self, sub { $$self[Mode_formatter] = "d" }

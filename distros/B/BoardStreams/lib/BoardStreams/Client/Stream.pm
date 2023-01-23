@@ -8,7 +8,7 @@ use BoardStreams::Util 'eqq';
 use RxPerl::Mojo ':all';
 use Storable 'dclone';
 
-our $VERSION = "v0.0.30";
+our $VERSION = "v0.0.31";
 
 has name => sub { die 'missing name' };
 has manager => sub { die 'missing manager' };

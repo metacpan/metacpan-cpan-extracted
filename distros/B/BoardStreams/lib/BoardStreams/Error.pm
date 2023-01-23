@@ -17,7 +17,7 @@ use overload '""' => sub {
     return make_one_line $text;
 };
 
-our $VERSION = "v0.0.30";
+our $VERSION = "v0.0.31";
 
 has code => (
     is       => 'ro',

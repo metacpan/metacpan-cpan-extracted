@@ -35,6 +35,8 @@ use HTML::Blitz::ActionType qw(
 );
 use List::Util qw(all reduce);
 
+our $VERSION = '0.03';
+
 method new($class:) {
     bless {
         rules            => [],
@@ -372,9 +374,16 @@ fun _skip_children($name, $parser, :$collect_content = undef) {
     $collect_content ? $content : undef
 }
 
+fun _with_stopper($alternatives, $result) {
+    map [ @$_, $result ], @$alternatives
+}
+
 method compile($name, $html) {
     my $codegen = HTML::Blitz::CodeGen->new;
-    my $matcher = HTML::Blitz::Matcher->new([map +{ selector => $_->{selector}, result => _bind_scope($codegen->scope, $_->{result}) }, @{$self->{rules}}]);
+    my $matcher = HTML::Blitz::Matcher->new([
+        map _with_stopper($_->{selector}, _bind_scope($codegen->scope, $_->{result})),
+            @{$self->{rules}}
+    ]);
     my $parser  = HTML::Blitz::Parser->new($name, $html);
 
     while (my $token = $parser->parse) {
@@ -464,7 +473,7 @@ method compile($name, $html) {
                 for my $proto_rule (@{$action->{rules}}) {
                     my ($selector, @actions) = @$proto_rule;
                     my $action = _bind_scope $loop_gen->scope, _reduce_actions @actions;
-                    $matcher->add_temp_rule({ selector => $selector, result => $action });
+                    $matcher->add_temp_rule(_with_stopper($selector, $action));
                 }
 
                 my $inplace = _reduce_actions @{$action->{inplace}};
@@ -562,7 +571,7 @@ method compile($name, $html) {
                 for my $proto_rule (@{$repeat->{rules}}) {
                     my ($selector, @actions) = @$proto_rule;
                     my $action = _bind_scope $loop_gen->scope, _reduce_actions @actions;
-                    $matcher->add_temp_rule({ selector => $selector, result => $action });
+                    $matcher->add_temp_rule(_with_stopper($selector, $action));
                 }
 
                 my $outer_gen = $codegen;

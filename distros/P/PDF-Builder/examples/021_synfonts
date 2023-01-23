@@ -99,15 +99,15 @@ if ($type == 3) {
 # is no obvious pattern, so for now it can't be fixed. suspect a bad font
 # "encoding map" resulting is mismapping by BaseFont::strByUtf to wrong 
 # character in BaseFont::textByStr returned to BaseFont::text
-   #C:\\T1fonts\\URWPalladioL-Roma.pfb
+   #C:\\Users\\Phil\\fonts\\T1fonts\\URWPalladioL-Roma.pfb
   @font_list = qw( 
-    C:\\Users\\Phil\\T1fonts\\gfsneohellenic\\type1\\GFSNeohellenic-Regular.pfb
-    C:\\Users\\Phil\\T1fonts\\URWPalladioL-Roma.pfb
+    C:\\Users\\Phil\\fonts\\T1fonts\\gfsneohellenic\\type1\\GFSNeohellenic-Regular.pfb
+    C:\\Users\\Phil\\fonts\\T1fonts\\URWPalladioL-Roma.pfb
 		 );
    #C:\\Program~Files~(x86)\\MiKTeX~2.9\\fonts\\type1\\urw\\avantgar\\uagd8a.pfb
   @T1_metrics = qw(
-    C:\\Users\\Phil\\T1fonts\\gfsneohellenic\\afm\\GFSNeohellenic-Regular.afm
-    C:\\Users\\Phil\\T1fonts\\URWPalladioL-Roma.afm
+    C:\\Users\\Phil\\fonts\\T1fonts\\gfsneohellenic\\afm\\GFSNeohellenic-Regular.afm
+    C:\\Users\\Phil\\fonts\\T1fonts\\URWPalladioL-Roma.afm
 		  );
    #C:\\Program~Files~(x86)\\MiKTeX~2.9\\fonts\\type1\\urw\\avantgar\\uagd8a.pfm
   @short_name = qw(

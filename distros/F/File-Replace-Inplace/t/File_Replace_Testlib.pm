@@ -143,6 +143,7 @@ sub warns (&) {  ## no critic (ProhibitSubroutinePrototypes)
 		$DEBUG and print STDERR "Restoring STDIN\n";
 		dup2( $saved_fd0, 0 ) or die "restore dup2: $!";
 		POSIX::close( $saved_fd0 ) or die "close saved: $!";
+		STDIN->clearerr;
 		$$self = undef;
 		return 1;
 	}

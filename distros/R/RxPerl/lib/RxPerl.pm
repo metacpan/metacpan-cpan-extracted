@@ -15,7 +15,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.13.1";
+our $VERSION = "v6.14.0";
 
 1;
 __END__
@@ -61,7 +61,7 @@ The documentation in this POD applies to all three adapter modules as well.
 This module is an implementation of L<Reactive Extensions|http://reactivex.io/> in Perl. It replicates the
 behavior of L<rxjs 6|https://www.npmjs.com/package/rxjs> which is the JavaScript implementation of ReactiveX.
 
-Currently 57 of the 100+ operators in rxjs are implemented in this module.
+Currently 58 of the 100+ operators in rxjs are implemented in this module.
 
 =head1 EXPORTABLE FUNCTIONS
 
@@ -356,6 +356,15 @@ Works like rxjs's "auditTime", except the parameter is in seconds instead of ms.
         rx_EMPTY->pipe( op_delay(5) ),
     )->pipe(
         op_audit_time(1),
+    )->subscribe($observer);
+
+=item op_buffer
+
+L<https://rxjs.dev/api/operators/buffer>
+
+    # [0, 1, 2], [3, 4, 5], [6, 7, 8, 9], ...
+    rx_interval(0.3)->pipe(
+        op_buffer(rx_interval(1.001)),
     )->subscribe($observer);
 
 =item op_buffer_count

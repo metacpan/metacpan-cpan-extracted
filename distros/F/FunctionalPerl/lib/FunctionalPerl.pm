@@ -1,11 +1,13 @@
 #
-# Copyright (c) 2015-2020 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2015-2023 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
 # MIT License (Expat version). See the file COPYING.md that came
 # bundled with this file.
 #
+
+# Depends: ()
 
 =head1 NAME
 
@@ -20,7 +22,7 @@ FunctionalPerl - functional programming in Perl
     use FP::List;
 
     # But you can also import sets of modules from here, e.g.:
-    use FunctionalPerl qw(:sequences :repl);
+    #use FunctionalPerl qw(:sequences :repl);
 
 =head1 DESCRIPTION
 
@@ -46,7 +48,7 @@ Tags can be expanded via:
     my ($modules, $unused_tags, $nontags) = expand_import_tags(qw(:dev :most not_a_tag));
     is $$modules{"FP::Failure"}, 2; # number of times used.
     is_deeply $unused_tags,
-              [':all', ':ast', ':csv', ':dbi', ':fix', ':git', ':io', ':paths', ':pxml', ':rare', ':trampolines', ':transparentlazy'];
+              [':all', ':all_sequences', ':ast', ':csv', ':dbi', ':fix', ':git', ':io', ':paths', ':pxml', ':rare', ':trampolines', ':transparentlazy'];
     is_deeply $nontags, ['not_a_tag'];
 
 =head1 SEE ALSO
@@ -54,6 +56,8 @@ Tags can be expanded via:
 This is the list of supported import tags and the modules and other tags that they import:
 
 C<:all> -> C<:dev>, C<:io>, C<:most>, C<:rare>
+
+C<:all_sequences> -> C<:primary_sequences>, L<FP::SortedPureArray>, L<FP::StrictList>
 
 C<:ast> -> L<FP::AST::Perl>
 
@@ -79,7 +83,7 @@ C<:failures> -> L<FP::Either>, L<FP::Failure>
 
 C<:fix> -> L<FP::fix>
 
-C<:functions> -> C<:equal>, C<:failures>, C<:show>, L<FP::Combinators>, L<FP::Combinators2>, L<FP::Currying>, L<FP::Div>, L<FP::Memoizing>, L<FP::Ops>, L<FP::Optional>, L<FP::Predicates>, L<FP::Untainted>, L<FP::Values>
+C<:functions> -> C<:equal>, C<:failures>, C<:show>, L<FP::Cmp>, L<FP::Combinators>, L<FP::Combinators2>, L<FP::Currying>, L<FP::Div>, L<FP::Memoizing>, L<FP::Ops>, L<FP::Optional>, L<FP::Predicates>, L<FP::Untainted>, L<FP::Values>
 
 C<:git> -> L<FP::Git::Repository>
 
@@ -101,7 +105,7 @@ C<:rare> -> C<:csv>, C<:dbi>, C<:fix>, C<:git>, C<:paths>, C<:trampolines>
 
 C<:repl> -> L<FP::Repl>, L<FP::Repl::AutoTrap>
 
-C<:sequences> -> C<:streams>, L<FP::Array>, L<FP::Array_sort>, L<FP::List>, L<FP::MutableArray>, L<FP::PureArray>, L<FP::SortedPureArray>, L<FP::StrictList>
+C<:sequences> -> C<:streams>, L<FP::Array>, L<FP::Array_sort>, L<FP::List>, L<FP::MutableArray>, L<FP::PureArray>
 
 C<:sets> -> L<FP::HashSet>, L<FP::OrderedCollection>
 
@@ -137,7 +141,7 @@ our @EXPORT      = ();
 our @EXPORT_OK   = qw(expand_import_tags);
 our %EXPORT_TAGS = ();
 
-our $VERSION = "0.72.66";
+our $VERSION = "0.72.76";
 
 # Export tag to modules and/or other tags; each module will be
 # imported with ":all" by default. Where a module name contains " = ",
@@ -163,6 +167,7 @@ our $export_desc = +{
 
     ":functions" => [
         qw(FP::Combinators FP::Combinators2
+            FP::Cmp
             FP::Ops FP::Div
             FP::Predicates
             FP::Optional FP::Values
@@ -177,11 +182,15 @@ our $export_desc = +{
     ":numbers"   => [qw(FP::BigInt)],
     ":chars"     => [qw(FP::Char)],
     ":sequences" => [
-        qw(FP::List FP::StrictList FP::MutableArray
+        qw(FP::List FP::MutableArray
             FP::Array FP::Array_sort
             FP::PureArray
-            FP::SortedPureArray
             :streams)
+    ],
+    ":all_sequences" => [
+        qw(:primary_sequences
+            FP::StrictList
+            FP::SortedPureArray)
     ],
     ":maps"           => [qw(FP::Hash FP::PureHash)],
     ":sets"           => [qw(FP::HashSet FP::OrderedCollection)],

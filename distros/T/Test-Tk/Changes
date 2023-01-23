@@ -9,3 +9,14 @@ Revision history for Perl extension Test::Tk.
 
 1.01  Tue Jan 17
 	- Corrected some pod formatting errors.
+
+2.00  Sat Jan 21
+	- Corrected some pod typos and errors.
+	- Now skips tests if not on Windows and no XServer running.
+
+2.01  Sun Jan 22
+	- Updated documentation
+
+2.02  Mon Jan 23
+	- Fixed documentation
+	- Added use strict and use warnings to Makefile.PL

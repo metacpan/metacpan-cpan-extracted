@@ -7,7 +7,7 @@ use warnings;
 use CSS::Struct::Output::Raw;
 use Encode qw(encode);
 use Error::Pure qw(err);
-use Plack::Util::Accessor qw(author content_type css encoding
+use Plack::Util::Accessor qw(author content_type css css_init encoding
 	favicon flag_begin flag_end generator psgi_app script_js script_js_src
 	status_code title tags);
 use Scalar::Util qw(blessed);
@@ -15,7 +15,7 @@ use Tags::HTML::Page::Begin;
 use Tags::HTML::Page::End;
 use Tags::Output::Raw;
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 sub call {
 	my ($self, $env) = @_;
@@ -144,6 +144,9 @@ sub _tags {
 		Tags::HTML::Page::Begin->new(
 			'author' => $self->author,
 			'css' => $self->css,
+			defined $self->css_init ? (
+				'css_init' => $self->css_init,
+			) : (),
 			'charset' => $self->encoding,
 			'favicon' => $self->favicon,
 			'generator' => $self->generator,
@@ -240,6 +243,17 @@ Default value is 'text/html; charset=__ENCODING__'.
 
 CSS::Struct::Output object.
 Default value is CSS::Struct::Output::Raw->new.
+
+=head2 C<css_init>
+
+Reference to array with CSS::Struct structure.
+Default value is CSS initialization from Tags::HTML::Page::Begin like
+
+ * {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+ }
 
 =head2 C<encoding>
 
@@ -411,7 +425,9 @@ and run _prepare_app().
 
  # Output by GET to http://localhost:5000/:
  # <!DOCTYPE html>
- # <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>My app</title></head><body>Hello world</body></html>
+ # <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>My app</title><style type="text/css">
+ # *{box-sizing:border-box;margin:0;padding:0;}
+ # </style></head><body>Hello world</body></html>
 
 =head1 EXAMPLE2
 
@@ -493,12 +509,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2022 Michal Josef Špaček
+© 2020-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

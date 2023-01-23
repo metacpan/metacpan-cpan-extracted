@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Encode qw(:all);
 
-our $VERSION = '3.024'; # VERSION
+our $VERSION = '3.025'; # VERSION
 our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 # TBD: do rect and border apply to Named Destinations (link, url, file)? 
@@ -49,7 +49,7 @@ sub new {
     $pdf->new_obj($self);
 
     if (@_) { # leftover arguments?
-	return $self->destination(@_);
+	return $self->dest(@_);
     }
 
     return $self;
@@ -67,7 +67,7 @@ sub new_api {
     return $destination;
 }
 
-=item $dest->dest($page, $location, @args)
+=item $dest->dest($page, %opts)
 
 A destination (dest) is a particular view of a PDF, consisting of a page 
 object, the
@@ -90,94 +90,11 @@ the same as the calling page's.
 
 =back
 
-B<Alternate name:> C<destination>
-
-This method was originally C<dest()>, which PDF::API2 renamed to 
-C<destination()>. We are keeping the original name, and for partial 
-compatibility, allow C<destination> as an alias. B<Note that> the old PDF::API2
-(and still, for PDF::Builder), uses a hash element for the location and 
-dimension/zoom information, while the new PDF::API2 uses a string and an array 
-(I<not> supported in PDF::Builder).
-
 =cut
 
-# new in PDF::API2
-#sub _array {
-#    my $page = shift();
-#    my $location = shift();
-#    return PDFArray($page, PDFName($location),
-#                    map { defined($_) ? PDFNum($_) : PDFNull() } @_);
-#}
-#
-#sub _destination {
-#    my ($page, $location, @args) = @_;
-#    return _array($page, 'XYZ', undef, undef, undef) unless $location;
-#
-#    my %arg_counts = (
-#        xyz   => 3,
-#        fit   => 0,
-#        fith  => 1,
-#        fitv  => 1,
-#        fitr  => 4,
-#        fitb  => 0,
-#        fitbh => 1,
-#        fitbv => 1,
-#    );
-#    my $arg_count = $arg_counts{$location};
-#    croak "Invalid location $location" unless defined $arg_count;
-#
-#    if      ($arg_count == 0 and @args) {
-#        croak "$location doesn't take any arguments";
-#    } elsif ($arg_count == 1 and @args != 1) {
-#        croak "$location requires one argument";
-#   #} elsif ($arg_count == 2 and @args != 2) {
-#   #    croak "$location requires two arguments";
-#    } elsif ($arg_count == 3 and @args != 3) {
-#        croak "$location requires three arguments";
-#    } elsif ($arg_count == 4 and @args != 4) {
-#        croak "$location requires four arguments";
-#    }
-#
-#    return _array($page, 'XYZ', @args) if $location eq 'xyz';
-#    $location =~ s/^fit(.*)$/'Fit' . uc($1 or '')/e;
-#    return _array($page, $location, @args);
-#}
-#
-#sub destination {
-#    my ($self, $page, $location, @args) = @_;
-#    $self->{'D'} = _destination($page, $location, @args);
-#    return $self;
-#}
-
-sub destination { return dest(@_); } ## no critic
-
-# deprecated by PDF::API2, allowed here for compatibility
 sub dest {
-    my $self = shift();
-    my $page = shift();
-    my %opts;
-    if      (scalar(@_) == 1) {
-	# just one name. if [-]fit[b], assign a value of 1
-	if ($_[0] =~ m/^-?fitb?$/) {
-	    $opts{$_[0]} = 1;
-	} else {
-	    # don't know what to do with it
-	    croak "Unknown location value ";
-	}
-    } elsif (scalar(@_)%2) {
-	# odd number 3+, presumably just 'fit' or 'fitb'. add a value
-	# assuming first element is fit name without value, remainder = options
-	$opts{$_[0]} = 1;
-	shift();
-	# probably shouldn't be additional items (options), but just in case...
-	while(@_) {
-	    $opts{$_[0]} = $_[1];
-	    shift(); shift();
-	}
-    } else {
-	# even number, presumably the %opts hash
-	%opts = @_;  # might be empty!
-    }
+    my ($self, $page, %opts) = @_;
+
     # copy dashed names over to preferred non-dashed names
     if (defined $opts{'-fit'} && !defined $opts{'fit'}) { $opts{'fit'} = delete($opts{'-fit'}); }
     if (defined $opts{'-fith'} && !defined $opts{'fith'}) { $opts{'fith'} = delete($opts{'-fith'}); }
@@ -242,21 +159,25 @@ sub dest {
 
 =over
 
-=item $dest->goto($page, $location, @args)
+=item $dest->link($page, %opts)
 
-A go-to action changes the view to a specified destination (page, location, and
-magnification factor).
+A go-to (link) action changes the view to a specified destination (page, 
+location, and magnification factor).
 
-Parameters are as described in C<destination>.
+Parameters are as described in C<dest>.
 
-B<Alternate name:> C<link>
+B<Alternate name:> C<goto>
 
 Originally this method was C<link>, but recently PDF::API2 changed the name
-to C<goto>. "link" is retained for compatibility.
+to C<goto>. "goto" is added for compatibility.
 
 =cut
 
-sub link { return goto(@_); } ## no critic
+sub link { 
+    my $self = shift();
+    $self->{'S'} = PDFName('GoTo');
+    return $self->dest(@_);
+}
 
 sub goto {
     my $self = shift();
@@ -264,10 +185,9 @@ sub goto {
     return $self->dest(@_);
 }
 
-=item $dest->uri($page, $location, @args)
+=item $dest->uri($url)
 
-Defines the destination as launch-url with uri C<$url> and
-page-fit options %opts.
+Defines the destination as launch-url with uri C<$url>.
 
 B<Alternate name:> C<url>
 
@@ -280,6 +200,7 @@ sub url { return uri(@_); } ## no critic
 
 sub uri {
     my ($self, $uri, %opts) = @_;
+    # currently no opts
 
     $self->{'S'} = PDFName('URI');
     $self->{'URI'} = PDFString($uri, 'u');
@@ -287,10 +208,11 @@ sub uri {
     return $self;
 }
 
-=item $dest->launch($file, %opts)
+=item $dest->launch($file)
 
 Defines the destination as launch-file with filepath C<$file> and
-page-fit options %opts. The target application is run.
+page-fit options %opts. The target application is run. Note that this is
+B<not> a PDF I<or> a browser file -- it is a local application.
 
 B<Alternate name:> C<file>
 
@@ -303,6 +225,7 @@ sub file { return launch(@_); } ## no critic
 
 sub launch {
     my ($self, $file, %opts) = @_;
+    # currently no opts
 
     $self->{'S'} = PDFName('Launch');
     $self->{'F'} = PDFString($file, 'u');

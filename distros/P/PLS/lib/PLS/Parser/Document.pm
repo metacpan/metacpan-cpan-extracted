@@ -147,7 +147,23 @@ sub go_to_definition_of_closest_subroutine
     }
 
     return if (not blessed($word) or not $word->isa('PLS::Parser::Element') or not $word->element->isa('PPI::Token::Word'));
-    my $definitions = $self->search_elements_for_definition($line_number, $column_number, $word);
+
+    my $fully_qualified = $word->name;
+    my @parts           = split /::/, $fully_qualified;
+    my $subroutine      = pop @parts;
+
+    my $definitions;
+
+    if (scalar @parts and $parts[-1] ne 'SUPER')
+    {
+        my $package = join '::', @parts;
+        $definitions = $self->{index}->find_package_subroutine($package, $subroutine);
+    }
+    else
+    {
+        $definitions = $self->{index}->find_subroutine($subroutine);
+    }
+
     return $definitions, $word if wantarray;
     return $definitions;
 } ## end sub go_to_definition_of_closest_subroutine
@@ -995,7 +1011,8 @@ sub get_packages_fast
 
     while ($$text =~ /$package_rx/g)
     {
-        my ($package) = $1 =~ /^package\s+(\S+)\s*;\s*$/;
+        my ($package) = $1 =~ /^package\s+(\S+)/;
+        $package =~ s/;$//;
         next unless (length $package);
 
         push @packages, $package;
@@ -1023,13 +1040,12 @@ sub get_subroutines_fast
 
     while ($$text =~ /$sub_rx/g)
     {
+        my $sub = $1;
+        $sub =~ s/^\s+|\s+$//;
         push @subroutine_declarations, $1;
-    }
+    } ## end while ($$text =~ /$sub_rx/g...)
 
-    return [
-            map  { s/^\s+|\s+$//r }
-            grep { defined } @subroutine_declarations
-           ];
+    return \@subroutine_declarations;
 } ## end sub get_subroutines_fast
 
 =head2 get_constants_fast
@@ -1379,27 +1395,43 @@ sub find_word_under_cursor
     @elements = map { $_->tokens } @elements;
     @elements =
       sort { (abs $character - $a->lsp_column_number) <=> (abs $character - $b->lsp_column_number) } @elements;
-    my @in_range = grep { $_->lsp_column_number <= $character and $_->lsp_column_number + length($_->content) >= $character } @elements;
-    my $element  = first
-    {
+    my @in_range  = grep { $_->lsp_column_number <= $character and $_->lsp_column_number + length($_->content) >= $character } @elements;
+    my $predicate = sub {
              $_->type eq 'PPI::Token::Word'
           or $_->type eq 'PPI::Token::Label'
           or $_->type eq 'PPI::Token::Symbol'
           or $_->type eq 'PPI::Token::Magic'
-          or $_->type eq 'PPI::Token::Operator'
           or $_->type eq 'PPI::Token::Quote::Double'
           or $_->type eq 'PPI::Token::Quote::Interpolate'
           or $_->type eq 'PPI::Token::QuoteLike::Regexp'
           or $_->type eq 'PPI::Token::QuoteLike::Command'
-          or $_->element->isa('PPI::Token::Regexp')
-    } @in_range;
-    my $closest_operator = first { $_->type eq 'PPI::Token::Operator' } @elements;
+          or $_->element->isa('PPI::Token::Regexp');
+    };
+    my $element          = first { $predicate->() or $_->type eq 'PPI::Token::Operator' } @in_range;
+    my $closest_operator = first { $_->type eq 'PPI::Token::Operator' } grep { $_->lsp_column_number < $character } @elements;
 
+    # Handle -X operators
     if (blessed($element) and $element->isa('PLS::Parser::Element') and $element->type eq 'PPI::Token::Operator')
     {
-        return $element->range(), 0, '', '-' if ((not blessed($element->element->previous_sibling) or $element->element->previous_sibling->isa('PPI::Token::Whitespace')) and $element->content eq '-');
+        if (
+            # -X operators must be preceded by whitespace
+            (not blessed($element->element->previous_sibling) or $element->element->previous_sibling->isa('PPI::Token::Whitespace'))
+
+            # -X operators must not be subroutine declarations
+            and (   not blessed($element->previous_sibling)
+                 or not $element->previous_sibling->isa('PLS::Parser::Element')
+                 or not $element->previous_sibling->element->isa('PPI::Token::Word')
+                 or not $element->previous_sibling->name eq 'sub')
+            and $element->content eq '-'
+           )
+        {
+            return $element->range(), 0, '', '-';
+        } ## end if ( (not blessed($element...)))
+
         undef $element;
-    }
+    } ## end if (blessed($element) ...)
+
+    $element = first { $predicate->() } @in_range;
 
     if (
             blessed($element)
@@ -1429,8 +1461,8 @@ sub find_word_under_cursor
             my $end_delimiter = $delimiter;
             $end_delimiter = '}' if ($delimiter eq '{');
             $end_delimiter = ')' if ($delimiter eq '(');
-            $end_delimiter = '>' if ($delimiter eq '>');
-            $end_delimiter = ']' if ($delimiter eq ']');
+            $end_delimiter = '>' if ($delimiter eq '<');
+            $end_delimiter = ']' if ($delimiter eq '[');
 
             if ($string =~ /\Q$end_delimiter\E$/)
             {
@@ -1448,11 +1480,11 @@ sub find_word_under_cursor
         {
             return {
                     start => {
-                              line      => $line,
+                              line      => $line - 1,
                               character => $character - length $1
                              },
                     end => {
-                            line      => $line,
+                            line      => $line - 1,
                             character => $character
                            }
                    },
@@ -1557,9 +1589,15 @@ sub find_word_under_cursor
 
     if ($element->type eq 'PPI::Token::Magic')
     {
-        my $range = $element->range;
-        $range->{end}{character}--;
-        return $range, 0, '', '$';
+        if ($element->name =~ /^[\$\@\%]/)
+        {
+            my $sigil = substr $element->name, 0, 1;
+            my $range = $element->range;
+            $range->{end}{character}--;
+            return $range, 0, '', $sigil;
+        } ## end if ($element->name =~ ...)
+
+        return;
     } ## end if ($element->type eq ...)
 
     # If we're typing right before a sigil, return the previous element.
@@ -1677,6 +1715,11 @@ sub find_word_under_cursor
     {
         $package = $element->name;
     } ## end if ($element->type eq ...)
+
+    # Don't suggest anything when this is a subroutine declaration.
+    return if (    blessed($element->parent)
+               and $element->parent->isa('PLS::Parser::Element')
+               and $element->parent->element->isa('PPI::Statement::Sub'));
 
     my $name = $element->name;
     $name =~ s/:?:$//;

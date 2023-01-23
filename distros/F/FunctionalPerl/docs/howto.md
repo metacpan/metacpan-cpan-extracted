@@ -804,13 +804,20 @@ interrupted, or purity will break.
   inspect the context and experiment with local function calls.
 
 * Use `Chj::Backtrace` in your program to see errors with stack
-  traces. Or use `FP::Repl::Trap` to trap uncatched exceptions in a
-  repl.
+  traces. Or use `FP::Repl::Trap` or better `FP::Repl::AutoTrap` to
+  trap uncaught exceptions in a repl.
 
 * Disable tail call optimizations to see the history of function calls
   (TODO: implement a `Sub::Call::Tail` variant that ignores the tail
   call declarations or lets them be turned on/off at runtime?)
 
+* To get more detail on why predicates don't accept a value
+  (e.g. those used to restrict `FP::Struct` fields), run this son
+  startup (should we make this more convenient via a wrapper loader
+  module?):
+  
+        use FP::Failure; 
+        $FP::Failure::use_failure=1;
 
 ### Lazy code
 
@@ -819,9 +826,9 @@ appears pretty chaotic and at least unexpected. Hence, in addition to
 the tips above:
 
 * Try to get the code working without lazyness first (don't use `lazy`
-  forms, use `FP::List` instead of `FP::Stream`). (TODO: write a
-  `FP::noLazy` that ignores `lazy` forms or lets them be turned on/off
-  at runtime?)
+  forms, use `FP::List` instead of `FP::Stream`). There's also
+  `FP::noLazy` that makes `lazy` a no-op in the current module. See
+  the documentation in this module.
 
 * If you're getting `undef` in some place (like a subtree in a `PXML`
   document missing (maybe triggering an undef warning in the

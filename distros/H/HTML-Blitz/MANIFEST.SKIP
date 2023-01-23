@@ -1,7 +1,9 @@
 (?<![^/])\.
-^unused/
-^blib/
-^Makefile(?![^.])
+^MANIFEST\.(?!SKIP\z)
 ^MYMETA\.
-^pm_to_blib\z
+^Makefile(?![^.])(?!\.PL\z)
 ^[^/]*\.(?:tar|gz)\z
+^blib/
+^maint/
+^pm_to_blib\z
+^unused/

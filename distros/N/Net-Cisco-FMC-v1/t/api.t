@@ -18,6 +18,26 @@ my $fmc = Net::Cisco::FMC::v1->new(
 
 ok($fmc->login, 'login to FMC successful');
 
+is($fmc->domains,
+    array {
+        etc();
+    },
+    'domains are populated');
+is($fmc->domain_uuid, D(), 'domain_uuid is defined');
+is($fmc->_refresh_token, D(), '_refresh_token is defined');
+
+ok(lives { $fmc->logout }, 'logout of FMC successful')
+    or note($@);
+
+is($fmc->domains, U(), 'domains are cleared');
+is($fmc->domain_uuid, U(), 'domain_uuid is cleared');
+is($fmc->_refresh_token, U(), '_refresh_token is cleared');
+
+# all currently supported API calls require domain_uuid which is cleared so
+# we can't use any for a useful test
+
+ok($fmc->login, 're-login to FMC successful');
+
 ok(my $policy = $fmc->create_accesspolicy({
     name => $ENV{NET_CISCO_FMC_V1_POLICY},
     defaultAction => {
@@ -30,6 +50,8 @@ ok(my $policy = $fmc->create_accesspolicy({
 END {
     $fmc->delete_accesspolicy($policy->{id})
         if defined $policy;
+    $fmc->logout
+        if defined $fmc;
 }
 
 ok(my $accessrules = $fmc->list_accessrules($policy->{id}),

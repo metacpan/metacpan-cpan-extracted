@@ -14,9 +14,9 @@ use CLI::MetaUtil::Getopt::Long qw(GetOptionsCLIWrapper);
 use IPC::System::Options 'system', -log=>1, -die=>1;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-08'; # DATE
+our $DATE = '2022-11-26'; # DATE
 our $DIST = 'App-DiffXlsText'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 unless (which "xlsx2csv") {
     die "diff-xls-text: This tool requires xlsx2csv from CPAN module Spreadsheet::Read\n";
@@ -113,7 +113,7 @@ diff-xls-text - Diff the text of two Office spreadsheets (.ods, .xls, .xlsx) as 
 
 =head1 VERSION
 
-This document describes version 0.011 of diff-xls-text (from Perl distribution App-DiffXlsText), released on 2022-09-08.
+This document describes version 0.012 of diff-xls-text (from Perl distribution App-DiffXlsText), released on 2022-11-26.
 
 =head1 SYNOPSIS
 
@@ -121,13 +121,78 @@ Use like you would use the Unix command B<diff>:
 
  % diff-xls-text [options] <FILE>...
 
+Sample F<old.xlsx> (C<*foo*> marks bolded text):
+
+ # sheet 1: en_id
+ |  english  |  indonesian    |
+ |-----------+----------------|
+ | boy       | anak laki-laki |
+ | girl      | anak wanita    |
+ | man       | Laki-laki      |
+ | lad       | pemuda         |
+
+ # sheet 2: id_en
+ |  indonesian  |  english    |
+ |--------------+-------------|
+ | pemuda       | young man   |
+ | pemudi       | young woman |
+
+Sample F<new.xlsx>:
+
+ # sheet 1: en_id
+ | *English*  | *Indonesian*   |
+ |------------+----------------|
+ | boy        | anak laki-laki |
+ | girl       | anak perempuan |
+ | man        | laki-laki      |
+ | woman      | perempuan      |
+
+ # sheet 2: en_su
+ |  English   |  Sundanese     |
+ |------------+----------------|
+ | man        | lalaki         |
+
+Sample session:
+
+ % diff-xls-text old.xlsx new.xlsx
+ Saving sheet to /tmp/IZxMSeSyr_/old.xlsx/workbook-en_id.csv ...
+ Saving sheet to /tmp/IZxMSeSyr_/old.xlsx/workbook-id_en.csv ...
+ Saving sheet to /tmp/IZxMSeSyr_/new.xlsx/workbook-en_id.csv ...
+ Saving sheet to /tmp/IZxMSeSyr_/new.xlsx/workbook-en_su.csv ...
+ diff -ruN /tmp/IZxMSeSyr_/old.xlsx/workbook-en_id.csv /tmp/IZxMSeSyr_/new.xlsx/workbook-en_id.csv
+ --- /tmp/IZxMSeSyr_/old.xlsx/workbook-en_id.csv 2022-11-26 07:43:56.293111001 +0700
+ +++ /tmp/IZxMSeSyr_/new.xlsx/workbook-en_id.csv 2022-11-26 07:43:56.661107387 +0700
+ @@ -1,5 +1,5 @@
+ -english,indonesian
+ +English,Indonesian
+  boy,"anak laki-laki"
+ -girl,"anak wanita"
+ -man,Laki-laki
+ -lad,pemuda
+ +girl,"anak perempuan"
+ +man,laki-laki
+ +woman,perempuan
+ diff -ruN /tmp/IZxMSeSyr_/old.xlsx/workbook-en_su.csv /tmp/IZxMSeSyr_/new.xlsx/workbook-en_su.csv
+ --- /tmp/IZxMSeSyr_/old.xlsx/workbook-en_su.csv 1970-01-01 07:00:00.000000000 +0700
+ +++ /tmp/IZxMSeSyr_/new.xlsx/workbook-en_su.csv 2022-11-26 07:43:56.661107387 +0700
+ @@ -0,0 +1,2 @@
+ +English,Sundanese
+ +man,lalaki
+ diff -ruN /tmp/IZxMSeSyr_/old.xlsx/workbook-id_en.csv /tmp/IZxMSeSyr_/new.xlsx/workbook-id_en.csv
+ --- /tmp/IZxMSeSyr_/old.xlsx/workbook-id_en.csv 2022-11-26 07:43:56.293111001 +0700
+ +++ /tmp/IZxMSeSyr_/new.xlsx/workbook-id_en.csv 1970-01-01 07:00:00.000000000 +0700
+ @@ -1,3 +0,0 @@
+ -indonesian,english
+ -pemuda,"young man"
+ -pemudi,"young woman"
+
 =head1 DESCRIPTION
 
 This is a wrapper for the Unix command B<diff>. It assumes that each input file
 is an Office spreadsheet (.ods, .xls, or .xlsx) and tries to convert the file to
 a directory of CSV files (where each CSV file is converted from a single
 worksheet) using L<xlsx2csv>. It then passes the converted directories to C<<
-diff -ruN >> command.
+diff -ruN >> command. Thus, formatting differences will not be diff'ed.
 
 =head1 OPTIONS
 

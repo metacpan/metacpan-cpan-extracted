@@ -7,7 +7,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '1.003'; # VERSION
+our $VERSION = '1.004'; # VERSION
 our $LAST_UPDATE = '0.12'; # manually update whenever code is changed
 
 my $perl = 'perl';  # run Perl command. add path, etc. if needed
@@ -19,13 +19,15 @@ my $perl = 'perl';  # run Perl command. add path, etc. if needed
 my @test_list = qw(
  Basics
  Colspan
- manifest
  PDF-Table
- pod
  table
                   );
 # override full list above, and run just one or two tests
 #@test_list = qw( Colspan );
+		  
+# moved to xt/
+#   manifest
+#   pod
 
 my @need_T = qw(
  Colspan

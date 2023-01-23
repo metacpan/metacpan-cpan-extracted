@@ -19,7 +19,7 @@ use 5.020;
 use feature qw(say state lexical_subs);
 use feature 'lexical_subs'; no warnings "experimental::lexical_subs";
 package  Data::Dumper::Interp;
-$Data::Dumper::Interp::VERSION = '4.103';
+$Data::Dumper::Interp::VERSION = '4.106';
 
 package  # newline prevents Dist::Zilla::Plugin::PkgVersion from adding $VERSION
   DB;
@@ -30,7 +30,13 @@ sub DB_Vis_Evalwrapper { # Must appear before any variables are declared
 package Data::Dumper::Interp;
 # POD documentation follows __END__
 
-use Data::Dumper v2.174 ();
+# Old versions of Data::Dumper did not honor useqq when showing globs
+# so filehandles came out as \*{'::fh'} instead of \*{"::\$fh"}
+# I'm not sure whether we actually care here but the tests do care
+#Now I think I've configured the testers to skip based on VERSION
+#use Data::Dumper v2.174 ();
+use Data::Dumper ();
+
 use Carp;
 use POSIX qw(INT_MAX);
 use Encode ();
@@ -242,6 +248,15 @@ sub dvisq(_){ @_=(&__getobj->Useqq(0),shift,'d');goto &_Interpolate }
 
 ############# only internals follow ############
 
+BEGIN {
+  if (! Data::Dumper->can("Maxrecurse")) { 
+    eval q(sub Maxrecurse { # Supply if missing in older Data::Dumper 
+             my($s, $v) = @_;
+             @_ == 2 ? (($s->{Maxrecurse} = $v), return $s) : $s->{Maxrecurse}//0;
+           });
+    die $@ if $@;
+  }
+}
 sub _config_defaults {
   my $self = shift;
 

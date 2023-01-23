@@ -32,7 +32,7 @@ A few limitations that exist in L<Tie::StdHandle|Tie::StdHandle> (at least
 versions up to and including 4.4) have been lifted: C<BINMODE> accepts the
 C<LAYER> argument, and C<WRITE> will return the length of the string written.
 
-This documentation describes version 0.16 of this module.
+This documentation describes version 0.18 of this module.
 
 B<See Also:> L<perltie>, L<perlfunc/tie>, L<Tie::Handle>, L<Tie::StdHandle>
 
@@ -214,11 +214,6 @@ C<DESTROY>.
 L<prototype|perlfunc/prototype> function as of Perl 5.26. Note that C<print>
 and C<printf> get special handling by Perl and therefore do not report a
 standard prototype.
-
-=head1 See Also
-
-L<Tie::Handle::Argv> (part of this distribution),
-a base class for tying to Perl's magic C<ARGV> handle.
 
 =head1 Author, Copyright, and License
 

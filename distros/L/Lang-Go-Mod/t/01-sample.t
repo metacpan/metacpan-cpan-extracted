@@ -4,17 +4,22 @@ use Test2::V0;
 use Lang::Go::Mod qw(read_go_mod);
 
 my $samples_path = File::Spec->catfile( File::Spec->curdir(), 't',  'samples' );
-my $go_mod_path  = File::Spec->catfile( $samples_path,        '01', 'go.mod' );
+my $go_mod_path  = File::Spec->catfile( $samples_path, '01', 'go.mod' );
 my $m;
 ok(
     lives {
         $m = read_go_mod($go_mod_path);
     }
-) or note($@);
+  ) or note($@);
 
-is( ref($m),      'HASH',                          'returned ref is hash' );
+is( ref($m), 'HASH', 'returned ref is hash' );
 is( $m->{module}, 'github.com/example/my-project', 'module label' );
-is( $m->{go},     '1.16',                          'go version label' );
+is( $m->{go}, '1.16', 'go version label' );
+
+is( $m->{retract}->{'[v1.0.0,v1.2.0]'}, 1, 'retract' );
+is( $m->{retract}->{'v1.3.0'}, 1, 'retract' );
+is( $m->{retract}->{'v1.4.0'}, 1, 'retract' );
+is( $m->{retract}->{'[v1.5.0,v1.6.0]'}, 1, 'retract' );
 
 is( $m->{exclude}->{'example.com/whatmodule'}, ['v1.4.0'], 'exclude' );
 is( $m->{exclude}->{'example.com/thismodule'}, ['v1.3.0'], 'exclude' );

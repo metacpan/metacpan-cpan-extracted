@@ -10,18 +10,22 @@ lib/HTML/Blitz/ParseError.pm
 lib/HTML/Blitz/Parser.pm
 lib/HTML/Blitz/pragma.pm
 lib/HTML/Blitz/RuleSet.pm
-lib/HTML/Blitz/SelectorGroup.pm
 lib/HTML/Blitz/SelectorType.pm
 lib/HTML/Blitz/SSSelector.pm
 lib/HTML/Blitz/Template.pm
 lib/HTML/Blitz/TokenType.pm
 Makefile.PL
+Makefile_PL_settings.plx
 MANIFEST			This list of files
 MANIFEST.SKIP
 t/actions.t
 t/marshal.t
 t/methods.t
+t/selector-combinators.t
 t/selectors.t
 t/template/doc.html
+t/xmlish.t
+xt/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   generated from HTML::Blitz POD (added by maint/eumm-fixup.pl)

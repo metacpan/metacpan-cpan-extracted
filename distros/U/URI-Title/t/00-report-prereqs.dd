@@ -32,6 +32,10 @@ do { my $x = {
                                       'strict' => '0',
                                       'utf8' => '0',
                                       'warnings' => '0'
+                                    },
+                      'suggests' => {
+                                      'Image::ExifTool' => '0',
+                                      'Image::PNG::Libpng' => '0'
                                     }
                     },
        'test' => {

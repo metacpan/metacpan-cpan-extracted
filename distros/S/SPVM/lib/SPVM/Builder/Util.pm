@@ -596,6 +596,115 @@ sub create_build_lib_path {
   return $build_lib_path;
 }
 
+sub create_dl_func_list {
+  my ($class_name, $method_names, $anon_class_names, $options) = @_;
+  
+  $options ||= {};
+  
+  my $category = $options->{category} || '';
+  
+  # dl_func_list
+  # This option is needed Windows DLL file
+  my $dl_func_list = [];
+  for my $method_name (@$method_names) {
+    my $cfunc_name = SPVM::Builder::Util::create_cfunc_name($class_name, $method_name, $category);
+    push @$dl_func_list, $cfunc_name;
+  }
+  
+  if ($category eq 'precompile') {
+    for my $anon_class_name (@$anon_class_names) {
+      my $anon_method_cfunc_name = SPVM::Builder::Util::create_cfunc_name($anon_class_name, "", $category);
+      push @$dl_func_list, $anon_method_cfunc_name;
+    }
+  }
+
+  # This is bad hack to suppress boot strap function error.
+  unless (@$dl_func_list) {
+    push @$dl_func_list, '';
+  }
+
+  return $dl_func_list;
+}
+
+sub get_dynamic_lib_file_dist {
+  my ($module_file, $category) = @_;
+
+  my $dynamic_lib_file = SPVM::Builder::Util::convert_module_file_to_dynamic_lib_file($module_file, $category);
+  
+  return $dynamic_lib_file;
+}
+
+sub get_method_addresses {
+  my ($dynamic_lib_file, $class_name, $method_names, $anon_class_names, $category) = @_;
+  
+  my $method_addresses = {};
+  if (@$method_names) {
+    my $method_infos = [];
+    for my $method_name (@$method_names) {
+      my $method_info = {};
+      $method_info->{class_name} = $class_name;
+      $method_info->{method_name} = $method_name;
+      push @$method_infos, $method_info;
+    }
+    
+    # Add anon class sub names if precompile
+    if ($category eq 'precompile') {
+      for my $anon_class_name (@$anon_class_names) {
+        my $method_info = {};
+        $method_info->{class_name} = $anon_class_name;
+        $method_info->{method_name} = "";
+        push @$method_infos, $method_info;
+      }
+    }
+    
+    for my $method_info (@$method_infos) {
+      my $class_name = $method_info->{class_name};
+      my $method_name = $method_info->{method_name};
+
+      my $cfunc_address;
+      if ($dynamic_lib_file) {
+        my $dynamic_lib_libref = DynaLoader::dl_load_file($dynamic_lib_file);
+        
+        if ($dynamic_lib_libref) {
+
+          my $cfunc_name = SPVM::Builder::Util::create_cfunc_name($class_name, $method_name, $category);
+          $cfunc_address = DynaLoader::dl_find_symbol($dynamic_lib_libref, $cfunc_name);
+          unless ($cfunc_address) {
+            my $dl_error = DynaLoader::dl_error();
+            my $error = <<"EOS";
+Can't find native function \"$cfunc_name\" corresponding to ${class_name}->$method_name in \"$dynamic_lib_file\"
+
+You must write the following definition.
+--------------------------------------------------
+#include <spvm_native.h>
+
+int32_t $cfunc_name(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  return 0;
+}
+--------------------------------------------------
+
+$dl_error
+EOS
+            confess $error;
+          }
+        }
+        else {
+          my $dl_error = DynaLoader::dl_error();
+          confess "The DynaLoader::dl_load_file function failed:Can't load the \"$dynamic_lib_file\" file for the $category methods in the $class_name class: $dl_error";
+        }
+      }
+      else {
+        confess "DLL file is not specified";
+      }
+      
+      $method_addresses->{$method_name} = $cfunc_address;
+    }
+  }
+  
+  return $method_addresses;
+}
+
 1;
 
 =head1 Name

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Unevaluated;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Unevaluated vocabulary
 
-our $VERSION = '0.561';
+our $VERSION = '0.562';
 
 use 5.020;
 use Moo;
@@ -37,7 +37,8 @@ sub _traverse_keyword_unevaluatedItems ($self, $schema, $state) {
 }
 
 sub _eval_keyword_unevaluatedItems ($self, $data, $schema, $state) {
-  abort($state, 'EXCEPTION: "unevaluatedItems" keyword present, but annotation collection is disabled')
+  # this should never happen
+  die '"unevaluatedItems" keyword present, but annotation collection is disabled'
     if not $state->{collect_annotations};
 
   abort($state, 'EXCEPTION: "unevaluatedItems" keyword present, but short_circuit is enabled: results unreliable')
@@ -98,7 +99,8 @@ sub _traverse_keyword_unevaluatedProperties ($self, $schema, $state) {
 }
 
 sub _eval_keyword_unevaluatedProperties ($self, $data, $schema, $state) {
-  abort($state, 'EXCEPTION: "unevaluatedProperties" keyword present, but annotation collection is disabled')
+  # this should never happen
+  die '"unevaluatedProperties" keyword present, but annotation collection is disabled'
     if not $state->{collect_annotations};
 
   abort($state, 'EXCEPTION: "unevaluatedProperties" keyword present, but short_circuit is enabled: results unreliable')
@@ -155,7 +157,7 @@ JSON::Schema::Modern::Vocabulary::Unevaluated - Implementation of the JSON Schem
 
 =head1 VERSION
 
-version 0.561
+version 0.562
 
 =head1 DESCRIPTION
 

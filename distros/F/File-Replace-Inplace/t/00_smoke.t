@@ -50,10 +50,10 @@ BEGIN {
 	use_ok 'File::Replace::Inplace'
 		or BAIL_OUT("failed to use File::Replace::Inplace");
 }
-is $Tie::Handle::Base::VERSION, '0.16', 'Tie::Handle::Base version matches tests';
-is $Tie::Handle::Argv::VERSION, '0.16', 'Tie::Handle::Argv version matches tests';
-is $File::Replace::VERSION, '0.16', 'File::Replace version matches tests';
-is $File::Replace::Inplace::VERSION, '0.16', 'File::Replace::Inplace version matches tests';
+is $Tie::Handle::Base::VERSION, '0.18', 'Tie::Handle::Base version matches tests';
+is $Tie::Handle::Argv::VERSION, '0.18', 'Tie::Handle::Argv version matches tests';
+is $File::Replace::VERSION, '0.18', 'File::Replace version matches tests';
+is $File::Replace::Inplace::VERSION, '0.18', 'File::Replace::Inplace version matches tests';
 
 $File::Replace::DISABLE_CHMOD and diag "\n",
 	"it appears a simple chmod failed on your system,\n",

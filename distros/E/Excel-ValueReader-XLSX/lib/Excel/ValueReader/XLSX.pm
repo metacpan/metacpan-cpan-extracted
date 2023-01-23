@@ -7,7 +7,7 @@ use POSIX                 qw/strftime modf/;
 use Carp                  qw/croak/;
 use feature 'state';
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 #======================================================================
 # ATTRIBUTES

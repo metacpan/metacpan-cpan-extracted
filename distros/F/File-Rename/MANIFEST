@@ -30,6 +30,7 @@ t/u/rename-examples.t
 lib/File/Rename.pm
 lib/File/Rename/Options.pm
 lib/File/Rename/Unicode.pm
+source/rename
 rename.PL
 unsafe.PL
 examples/rename.pl

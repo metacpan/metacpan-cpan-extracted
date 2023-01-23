@@ -3,22 +3,32 @@ use warnings;
 package Neo4j_Test::MockHTTP;
 
 use parent 'Neo4j::Driver::Plugin';
-use parent 'Exporter';
-
-our @EXPORT_OK = qw(response_for);
 
 use JSON::MaybeXS;
 use Neo4j::Driver::Net::HTTP::LWP;
 
 sub new {
-	my ($class) = @_;
-	bless {}, $class;
+	my ($class, %params) = @_;
+	my $self = bless {}, $class;
+	$self->response_for('/', 'GET' => {
+		json => {
+			neo4j_version => $params{neo4j_version} // '5.1.0',
+			transaction => 'http://localhost:7474/db/{databaseName}/tx',
+		},
+	});
+	$self->response_for('/db/system/tx/commit', 'SHOW DEFAULT DATABASE' => { jolt => [
+		{ header => { fields => ['name'] } },
+		{ data => [ $self->default_db ] },
+		{ summary => {} },
+		{ info => {} },
+	]}) unless $params{no_default_db};
+	return $self;
 }
 
 sub register {
 	my ($self, $manager) = @_;
 	
-	$manager->add_event_handler(
+	$manager->add_handler(
 		http_adapter_factory => sub {
 			my ($continue, $driver) = @_;
 			$self->{base} = $driver->{uri};
@@ -30,24 +40,17 @@ sub register {
 my $coder = JSON::MaybeXS->new(utf8 => 1, allow_nonref => 1);
 sub json_coder { $coder }
 
-our @res = (
-	{
-		method => 'GET',  # Discovery API (the only GET request)
-		json => {
-			neo4j_version => '4.2.5',
-			transaction => 'http://localhost:7474/db/{databaseName}/tx',
-		},
-	},
-);
+sub default_db { 'dummy' }
 
 sub response_for {
-    my ($query, $response) = @_;
-    $response->{query} = $query;
-    push @res, $response;
+	my ($self, $url, $query, $response) = @_;
+	$url //= '/db/' . $self->default_db . '/tx/commit';
+	$self->{res}{$url}{$query} = $self->_prep_response($response);
 }
 
-sub _prep_responses {
-	for my $r (@res) {
+sub _prep_response {
+	my ($self, $r) = @_;
+	{
 		unless (defined $r->{content}) {
 			if ($r->{json}) {
 				if ('HASH' eq ref $r->{json}) {
@@ -74,24 +77,26 @@ sub _prep_responses {
 		$r->{content} //= '';
 		$r->{status} //= '200';
 		$r->{success} //= $r->{status} =~ m/^2/;
-		$r->{method} //= 'POST';
 	}
+	return $r;
 }
 
 # Return the appropriate response (or a 501 if none could be found).
 sub _r {
 	my $self = shift;
-	$self->_prep_responses;
-	for my $r (@res) {
-		return $r if $self->{method} eq 'GET' && $r->{method} eq 'GET';
-		return $r if ($self->{request}{statements}[0]{statement} // '') eq ($r->{query} // "\0");
-	}
-	return {
+	my $url = $self->{url};
+	my $key = $self->{method} eq 'GET'
+		? "GET"
+		: $self->{request}{statements}[0]{statement} // '';
+	my $response = $self->{res}{$url}{$key} // $self->res($url, $key);
+	return $response // {
 		content_type => 'text/plain',
 		status => '501',
 		content => 'response unimplemented',
 	};
 }
+
+sub res {}
 
 sub fetch_all { '' . shift->_r->{content} }
 
@@ -122,10 +127,6 @@ sub http_header {
 
 sub http_reason { shift->_r->{reason} // '' }
 
-sub protocol { 'MockHTTP' }
-
-sub result_handlers { }
-
 sub uri { shift->{base} }
 
 
@@ -133,7 +134,7 @@ sub uri { shift->{base} }
 
 __END__
 
-This is a small net_module that allows injecting tailored Jolt
+This is a small plugin that allows injecting tailored Jolt
 or JSON responses into the driver. Users can provide the actual
 response content that would have been received from Neo4j as a
 string. They can also provide a Perl hashref or arrayref, in
@@ -144,18 +145,17 @@ testing of _all_ parts of the driver's result parsing logic.
 
 Basic usage example:
 
-package Neo4j_Test::Foo;
-use parent 'Neo4j_Test::MockHTTP';
-sub response_for { &Neo4j_Test::MockHTTP::response_for }
+use Neo4j_Test::MockHTTP;
+my $mock_plugin = Neo4j_Test::MockHTTP->new;
 
-response_for 'working jolt' => { jolt => [
+$mock_plugin->response_for( undef, 'working jolt' => { jolt => [
 	{ header => { fields => ['greeting'] } },
 	{ data => [ { 'U' => 'hello' } ] },
 	{ summary => {} },
 	{ info => {} },
-]};
+]});
 
-response_for 'broken json' => { json => <<END };
+$mock_plugin->response_for( undef, 'broken json' => { json => <<END });
 :-[ this ain't json
 END
 
@@ -164,7 +164,7 @@ use Test::More;
 use Test::Exception;
 
 my $s = Neo4j::Driver->new('http:')
-        ->config(net_module => 'Neo4j_Test::Foo')
+        ->plugin($mock_plugin)
         ->session(database => 'dummy');
 
 lives_and { is $s->run('working jolt')->single->get(0), 'hello' };

@@ -36,10 +36,14 @@ for my $driver (@drivers) {
 }
 
 subtest 'force run3 out of scope' => sub {
-  my $run3 = Mojo::Run3->new(driver => 'pty');
-  $run3->on(stdout => sub { Mojo::IOLoop->stop });
-  $run3->start(sub { print 'started'; sleep 2 });
+  my $run3 = Mojo::Run3->new(driver => {close_slave => 0, pipe => 1, pty => 1});
+  my $stdout;
+  $run3->on(stdout => sub { $stdout = $_[1]; Mojo::IOLoop->stop });
+  $run3->start(sub { print "started\n"; sleep 2 });
   Mojo::IOLoop->start;
+  is $stdout, "started\n",  'stdout';
+  is lsof(),  $initial + 5, 'lsof before undef';
+
   my $pid = $run3->pid;
   undef $run3;
 

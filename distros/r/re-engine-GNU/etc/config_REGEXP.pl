@@ -22,7 +22,7 @@ sub do_config_REGEXP {
     print STDERR "... regexp structure configuration\n";
     print STDERR "... ------------------------------\n";
     $ac->check_cc;
-    my @regexpMembers = qw/engine mother_re paren_names extflags minlen minlenret gofs substrs nparens intflags pprivate lastparen lastcloseparen swap offs subbeg saved_copy sublen suboffset subcoffset maxlen pre_prefix compflags prelen precomp wrapped wraplen seen_evals refcnt/;
+    my @regexpMembers = qw/engine mother_re paren_names extflags minlen minlenret gofs substrs nparens intflags pprivate lastparen lastcloseparen logical_nparens swap offs subbeg saved_copy sublen suboffset subcoffset maxlen pre_prefix compflags prelen precomp wrapped wraplen seen_evals refcnt/;
     foreach (@regexpMembers) {
         $ac->check_member("regexp.$_", { prologue => "#include \"EXTERN.h\"
 #include \"perl.h\"

@@ -218,10 +218,10 @@ REGEXP * GNU_comp(pTHX_ SV * const pattern, const U32 flags)
       a_syntax = av_fetch(av, 0, 1);
 
       if (a_pattern == NULL || get_type(aTHX_ (SV *)*a_pattern) != SCALAR) {
-        croak("%s: array ref must have a scalar as second element, got %d", logHeader, get_type(aTHX_ (SV *)a_pattern));
+        croak("%s: array ref must have a scalar as second element, got %" IVdf, logHeader, get_type(aTHX_ (SV *)a_pattern));
       }
       if (a_syntax == NULL || get_type(aTHX_ (SV *)*a_syntax) != SCALAR) {
-        croak("%s: array ref must have a scalar as first element, got %d", logHeader, get_type(aTHX_ (SV *)a_syntax));
+        croak("%s: array ref must have a scalar as first element, got %" IVdf, logHeader, get_type(aTHX_ (SV *)a_syntax));
       }
 
       sv_pattern = newSVsv(*a_pattern);
@@ -448,6 +448,8 @@ REGEXP * GNU_comp(pTHX_ SV * const pattern, const U32 flags)
     REGEXP_LASTPAREN_SET(r, 0);
     REGEXP_LASTCLOSEPAREN_SET(r, 0);
     REGEXP_NPARENS_SET(r, (U32)ri->regex.re_nsub); /* cast from size_t */
+    REGEXP_LOGICAL_NPARENS_SET(r, (U32)ri->regex.re_nsub);
+
     if (isDebug) {
       fprintf(stderr, "%s: ... %d () detected\n", logHeader, (int) ri->regex.re_nsub);
     }
@@ -539,26 +541,26 @@ GNU_exec_set_capture_string(pTHX_ REGEXP * const rx,
                 " subbeg=%p"
 #endif
 #if REGEXP_SUBLEN_CAN
-                " sublen=%d"
+                " sublen=%" IVdf
 #endif
 #if REGEXP_SUBOFFSET_CAN
-                " suboffset=%d"
+                " suboffset=%" IVdf
 #endif
 #if REGEXP_SUBCOFFSET_CAN
-                " subcoffset=%d"
+                " subcoffset=%" IVdf
 #endif
                 "\n", logHeader
 #if REGEXP_SUBBEG_CAN
                 , REGEXP_SUBBEG_GET(r)
 #endif
 #if REGEXP_SUBLEN_CAN
-                , REGEXP_SUBLEN_GET(r)
+                , (IV)REGEXP_SUBLEN_GET(r)
 #endif
 #if REGEXP_SUBOFFSET_CAN
-                , REGEXP_SUBOFFSET_GET(r)
+                , (IV)REGEXP_SUBOFFSET_GET(r)
 #endif
 #if REGEXP_SUBCOFFSET_CAN
-                , REGEXP_SUBCOFFSET_GET(r)
+                , (IV)REGEXP_SUBCOFFSET_GET(r)
 #endif
                 );
       }
@@ -646,26 +648,26 @@ GNU_exec_set_capture_string(pTHX_ REGEXP * const rx,
                   " subbeg=%p"
 #endif
 #if REGEXP_SUBLEN_CAN
-                  " sublen=%d"
+                  " sublen=%" IVdf
 #endif
 #if REGEXP_SUBOFFSET_CAN
-                  " suboffset=%d"
+                  " suboffset=%" IVdf
 #endif
 #if REGEXP_SUBCOFFSET_CAN
-                  " subcoffset=%d"
+                  " subcoffset=%" IVdf
 #endif
                   "\n", logHeader
 #if REGEXP_SUBBEG_CAN
                   , REGEXP_SUBBEG_GET(r)
 #endif
 #if REGEXP_SUBLEN_CAN
-                  , REGEXP_SUBLEN_GET(r)
+                  , (IV)REGEXP_SUBLEN_GET(r)
 #endif
 #if REGEXP_SUBOFFSET_CAN
-                  , REGEXP_SUBOFFSET_GET(r)
+                  , (IV)REGEXP_SUBOFFSET_GET(r)
 #endif
 #if REGEXP_SUBCOFFSET_CAN
-                  , REGEXP_SUBCOFFSET_GET(r)
+                  , (IV)REGEXP_SUBCOFFSET_GET(r)
 #endif
                   );
         }
@@ -699,7 +701,8 @@ GNU_exec_set_capture_string(pTHX_ REGEXP * const rx,
                                                 (U8*)(strbeg + REGEXP_SUBOFFSET_GET(r))));
       }
       if (isDebug) {
-        fprintf(stderr, "%s: ... suboffset=%d and utf8target=%d => subcoffset=%d\n", logHeader, REGEXP_SUBOFFSET_GET(r), (int) utf8_target, REGEXP_SUBCOFFSET_GET(r));
+        fprintf(stderr, "%s: ... suboffset=%" IVdf " and utf8target=%" IVdf " => subcoffset=%" IVdf "\n", 
+            logHeader, (IV)REGEXP_SUBOFFSET_GET(r), (IV)utf8_target, (IV)REGEXP_SUBCOFFSET_GET(r));
       }
 #endif /* REGEXP_SUBCOFFSET_CAN && REGEXP_SUBOFFSET_CAN */
     }

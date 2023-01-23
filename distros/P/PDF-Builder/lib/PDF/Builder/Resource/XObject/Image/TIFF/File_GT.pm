@@ -3,7 +3,7 @@ package PDF::Builder::Resource::XObject::Image::TIFF::File_GT;
 use strict;
 use warnings;
 
-our $VERSION = '3.024'; # VERSION
+our $VERSION = '3.025'; # VERSION
 our $LAST_UPDATE = '3.023'; # manually update whenever code is changed
 
 use IO::File;

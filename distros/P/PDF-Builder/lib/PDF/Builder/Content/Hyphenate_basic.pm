@@ -5,8 +5,8 @@ use base 'PDF::Builder::Content::Text';
 use strict;
 use warnings;
 
-our $VERSION = '3.024'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.025'; # VERSION
+our $LAST_UPDATE = '3.025'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -45,10 +45,12 @@ sub splitWord {
     my ($leftWord, $rightWord, @splitLoc, @chars, $i, $j, $len);
 
     # various settings, some of which may be language-specific
-    my $minBegin = 2;  # minimum 2 characters before split
-    my $minEnd   = 2;  # minimum 2 characters to next line
-   #my $hyphen = '-';
-    my $hyphen = "\xAD";  # add a hyphen at split, unless splitting at -
+    my $minBegin = 2;  # minimum 2 characters before split (English rules)
+    if (defined $opts{'min_prefix'}) { $minBegin = $opts{'min_prefix'}; }
+    my $minEnd   = 3;  # minimum 3 characters to next line (English rules)
+    if (defined $opts{'min_suffix'}) { $minEnd = $opts{'min_suffix'}; }
+    my $hyphen = '-';
+   #my $hyphen = "\xAD";  # add a hyphen at split, unless splitting at -
                        # or other dash character
     # NOTE: PDF-1.7 14.8.2.2.3 suggests using a soft hyphen (\AD) when splitting
     #       a word at the end of the line, so that when text is extracted for
@@ -63,6 +65,13 @@ sub splitWord {
     my $digitRun = defined($opts{'spDR'})? $opts{'spDR'}: 1;  # 1=OK to split after run of digit(s)
     my $letterRun = defined($opts{'spLR'})? $opts{'spLR'}: 1;  # 1=OK to split after run of ASCII letter(s)
     my $camelCase = defined($opts{'spCC'})? $opts{'spCC'}: 1;  # 1=OK to split camelCase on ASCII lc-to-UC transition
+    my $splitReqBlnk = defined($opts{'spRB'})? $opts{'spRB'}: 0; # 1=OK to split on required blank (NBSP) -- desperation move
+    my $splitAnywhere = defined($opts{'spFS'})? $opts{'spFS'}: 0; # 1=OK to split to fit available space -- super desperation move
+    if ($splitAnywhere) {
+	# if requesting to split within a certain length, suppress all other flags
+	$splitHardH = $otherPunc = $digitRun = $letterRun = $camelCase =
+	    $splitReqBlnk = 0;
+    }
 
     # note that we are ignoring U+2010 "hyphen" and U+2011 "non-splitting 
     # hyphen". The first is probably rare enough to not be worth the bother,
@@ -171,6 +180,31 @@ sub splitWord {
 	# TBD
    #}
 
+   if (!@splitLoc && $splitReqBlnk) {
+      # remember any break points due to desperation split at NBSP
+      @chars = split //, $word;
+      for ($i=0; $i<scalar(@chars); $i++) {
+	  if ($chars[$i] eq "\xA0") { push @splitLoc, $i; }
+	  # note that NBSP converted to regular space (x20). we will need
+	  # to overwrite the split one with the hyphen
+      }
+   }
+	
+   if (!@splitLoc && $splitAnywhere) {
+      # remember any break point due to desperation split at available length
+      @chars = split //, $word;
+      my $trial = '';
+      for ($i=0; $i<scalar(@chars); $i++) {
+	  $trial .= $chars[$i];
+	  if ($self->advancewidth("$trial$hyphen") > $width) { last; }
+      }
+      # nothing fit? force one letter, even though it overflows
+      if ($i == 0) { $i = 1; }
+      push @splitLoc, $i-1;
+      # disable minimum prefix and suffix for this
+      $minBegin = $minEnd = 1;
+   }
+
     # sort final @splitLoc, remove any split points violating "min" settings
     # set $leftWord and $rightWord if find successful split
     if (@splitLoc) {
@@ -200,7 +234,7 @@ sub splitWord {
 	    my $trial = substr($word, 0, $j+1);
 	    # this is the left fragment at the end of the line. make sure
 	    # there is room for the space before it, the hyphen (if added), 
-	    # and any letter doubling (e.g., in German)
+	    # and any letter doubling (e.g., in German or Dutch)
 
 	    # does the left fragment already end in -, etc.?
 	    # if it does, don't add a $hyphen. 
@@ -209,6 +243,13 @@ sub splitWord {
 	    foreach (@suppressHyphen) {
 		if ($i == $_) { $h = ''; last; }
 	    }
+	    # left fragment ends in a space (used to be an NBSP)?
+	    # remove space, and no hyphen
+	    if ($i eq ' ') {
+		chop($trial);
+		$h = '';
+	    }
+
 	    # $width should already count the trailing space in the existing
 	    # line, or full width if empty
 	    $len = $self->advancewidth("$trial$h", %opts);

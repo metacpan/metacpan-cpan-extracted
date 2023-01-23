@@ -1,6 +1,10 @@
 # PDF::Builder
 
-`A Perl library to facilitate the creation and modification of PDF files`
+A Perl library to facilitate the creation and modification of PDF files
+
+[![Open Issues](https://img.shields.io/github/issues/PhilterPaper/Perl-PDF-Builder)](https://github.com/PhilterPaper/Perl-PDF-Builder/issues)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://makeapullrequest.com)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/PhilterPaper/Perl-PDF-Builder/graphs/commit-activity)
 
 This archive contains the distribution PDF::Builder.
 See **Changes** file for the version.
@@ -23,10 +27,7 @@ compiles at this time).
 Note that there are several "optional" libraries (Perl modules) used to extend
 and improve PDF::Builder. Read about the list of optional libraries in
 PDF::Builder::Docs, and decide whether or not you want to install any of them.
-By default, all are installed (as "recommended", so failure to install will
-not fail the overall PDF::Builder installation). You may choose which ones to
-install by modifying certain installation files with 
-"tools/optional\_update.pl".
+By default, none are installed.
 
 ## Requirements
 
@@ -58,7 +59,7 @@ edited directory back into a `.tar.gz` installable. YMMV.
 If all goes well, PDF::Builder will be installed on your system. Whether or
 not it will RUN is another matter. Please do NOT open a bug report (ticket)
 unless you're absolutely sure that the problem is not a result of using an old
-Perl release, e.g., PDF::Builder is using a feature introduced in Perl 5.008
+Perl release, e.g., PDF::Builder is using a feature introduced in Perl 5.018
 and you're trying to run Perl 5.002!
 
 ### Libraries used
@@ -77,14 +78,23 @@ These libraries should be automatically installed...
 #### OPTIONAL
 
 These libraries are _recommended_ for improved functionality and performance.
-The default behavior is to attempt to install all of them during PDF::Builder
-installation. If you use tools/optional\_update.pl to _not_ to install any of
-them, or they fail to install automatically, you can always manually install 
-them later.
+The default behavior is **not** to attempt to install them during PDF::Builder
+installation, in order to speed up the testing process and not clutter up 
+matters, especially if an optional package fails to install. You can always 
+manually install them later, if you desire to make use of their added 
+functionality.
 
-* Graphics::TIFF (recommended if using TIFF image functions)
-* Image::PNG::Libpng (recommended for enhanced PNG image function processing)
-* HarfBuzz::Shaper (recommended for Latin script ligatures and kerning, as well as for any complex script such as Arabic, Indic scripts, or Khmer)
+* Graphics::TIFF (19 or higher, recommended if using TIFF image functions)
+* Image::PNG::Libpng (0.57 or higher, recommended for enhanced PNG image function processing)
+* HarfBuzz::Shaper (0.024 or higher, needed for Latin script ligatures and kerning, as well as for any complex script such as Arabic, Indic scripts, or Khmer)
+* Text::Markdown (1.000031 or higher, needed if using 'md1' markup)
+* HTML::TreeBuilder (5.07 or higher, needed if using 'html' or 'md1' markup)
+
+If an optional package is needed, but not installed, sometimes PDF::Builder
+will be able to fall back to built-in partial functionality (TIFF and PNG 
+images), but other times will fail. After installing the missing package, you 
+may wish to then run the t-test suite for that library to confirm that it is 
+properly running, as well as running the examples.
 
 Other than an installer for standard CPAN packages (such as 'cpan' on
 Strawberry Perl for Windows), no other tools or manually-installed prereqs are
@@ -108,12 +118,12 @@ is the generic command to run (it feeds on the Makefile), but your system may
 have it under a different name, such as dmake (Strawberry Perl on Windows), 
 gmake, or nmake.
 
-PDF::Builder does not currently compile and link anything, so gcc, g++, etc.
-will not be used. The build process merely copies .pm files around.
+PDF::Builder does not currently compile and link anything, so `gcc`, `g++`,
+etc. will not be used. The build process merely copies .pm files around.
 
 ## Copyright
 
-This software is Copyright (c) 2017-2022 by Phil M. Perry.
+This software is Copyright (c) 2017-2023 by Phil M. Perry.
 
 Previous copyrights are held by others (Steve Simms, Alfred Reibenschuh, et al.). See The HISTORY section of the documentation for more information.
 
@@ -160,4 +170,4 @@ We admit that the documentation is a bit light on "how to" task orientation.
 We hope to more fully address this in the future, but for now, get the full
 installation and look at the `examples/` and `contrib/` directories for sample
 code that may help you figure out how to do things. The installation tests in
-the `t/` directory might also be useful to you.
+the `t/` and `xt/` directories might also be useful to you.

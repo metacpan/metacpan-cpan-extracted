@@ -1,4 +1,8 @@
 Revision history for perl distribution Mojo-ShareDir
 
+0.02 2023-01-23T11:05:25
+ - Add File::ShareDir::Install to CONFIGURE_REQUIRES #1
+ - Fix github repo URL #2
+
 0.01 2022-10-23T01:00:34
  - Started project

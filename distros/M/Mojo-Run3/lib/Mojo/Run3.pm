@@ -15,7 +15,7 @@ use Scalar::Util qw(blessed weaken);
 use constant DEBUG        => $ENV{MOJO_RUN3_DEBUG} && 1;
 use constant MAX_OPEN_FDS => sysconf(_SC_OPEN_MAX);
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 our @SAFE_SIG
   = grep { !m!^(NUM\d+|__[A-Z0-9]+__|ALL|CATCHALL|DEFER|HOLD|IGNORE|MAX|PAUSE|RTMAX|RTMIN|SEGV|SETS)$! } keys %SIG;
@@ -31,6 +31,7 @@ sub bytes_waiting {
 sub close {
   my ($self, $conduit) = @_;
   return $self->_close_other if $conduit eq 'other';
+  return $self->_close_slave if $conduit eq 'slave';
 
   my $fh = $self->{fh};
   return $self unless my $handle = $fh->{$conduit};
@@ -79,7 +80,7 @@ sub write {
 sub _cleanup {
   my ($self, $signal) = @_;
   return unless $self->{pid};
-  $self->close($_) for qw(pty stdin stderr stdout);
+  $self->close($_) for qw(slave pty stdin stderr stdout);
   $self->kill($signal) if $signal;
 }
 
@@ -112,6 +113,14 @@ sub _close_other {
     POSIX::close($fileno);
   }
 
+  return $self;
+}
+
+sub _close_slave {
+  my ($self) = @_;
+  my $pty = $self->{fh}{pty};
+  $self->_d('close slave (%s)', $pty && ${*$pty}{io_pty_slave} || 'undef') if DEBUG;
+  $pty->close_slave                                                        if $pty;
   return $self;
 }
 
@@ -175,7 +184,9 @@ sub _start {
   my ($self, $cb) = @_;
 
   my $options = $self->driver;
-  $options = {stdin => $options, stdout => 'pipe', stderr => 'pipe'} unless ref $options;
+  $options        = {stdin => $options, stdout => 'pipe', stderr => 'pipe'} unless ref $options;
+  $options->{pty} = 'pty' if $options->{pty};
+  map { $options->{$_} //= 'pipe' } qw(stdin stdout stderr) if $options->{pipe};
 
   # Prepare IPC filehandles
   my ($pty, %child, %parent);
@@ -215,8 +226,17 @@ sub _start {
 
   # Parent
   $self->{fh} = \%parent;
-  ($pty->close_slave, ($self->{fh}{pty} = $pty)) if $pty;
-  $_->close for values %child;
+  $self->{fh}{pty} = $pty if $pty;
+
+  # Close child filehandles unless we want to keep the tty open for a bit
+  for my $fh (values %child) {
+    if (blessed $fh and $fh->can('set_raw')) {
+      $self->close('slave') if $options->{close_slave} // 1;
+    }
+    else {
+      $fh->close;
+    }
+  }
 
   weaken $self;
   my $reactor = $self->ioloop->reactor;
@@ -290,8 +310,7 @@ This example gets "stdout" events when the "ls" command emits output:
 
 This example does the same, but on a remote host using ssh:
 
-  my $run3 = Mojo::Run3->new
-    ->driver({pty => 'pty', stdin => 'pipe', stdout => 'pipe', stderr => 'pipe'});
+  my $run3 = Mojo::Run3->new->driver({pty => 1, pipe => 1}});
 
   $run3->once(pty => sub ($run3, $bytes) {
     $run3->write("my-secret-password\n", "pty") if $bytes =~ /password:/;
@@ -367,26 +386,28 @@ Emitted in the parent process after the subprocess has been forked.
 =head2 driver
 
   $hash_ref = $run3->driver;
-  $run3 = $self->driver({stdin => 'pipe', stdout => 'pipe', stderr => 'pipe'});
+  $run3 = $run3->driver({stdin => 'pipe', stdout => 'pipe', stderr => 'pipe'});
 
-Used to set the driver for "pty", "stdin", "stdout" and "stderr".
+Used to set the driver for "pty", "stdin", "stdout" and "stderr". The "pipe" key
+is a shortcut for setting "stdin", "stdout" and "stderr" to "pipe" unless
+specified.
 
 Examples:
 
   # Open pipe for STDIN and STDOUT and close STDERR in child process
-  $self->driver({stdin => 'pipe', stdout => 'pipe'});
+  $run3->driver({pipe => 1, stderr => 'close'});
 
   # Create a PTY and attach STDIN to it and open a pipe for STDOUT and STDERR
-  $self->driver({stdin => 'pty', stdout => 'pipe', stderr => 'pipe'});
+  $run3->driver({stdin => 'pty', stdout => 'pipe', stderr => 'pipe'});
 
   # Create a PTY and pipes for STDIN, STDOUT and STDERR
-  $self->driver({pty => 'pty', stdin => 'pipe', stdout => 'pipe', stderr => 'pipe'});
+  $run3->driver({pty => 1, stdin => 'pipe', stdout => 'pipe', stderr => 'pipe'});
+
+  # Create a PTY, and require the slave to to be manually closed
+  $run3->driver({pty => 1, stdout => 'pipe', close_slave => 0});
 
   # Create a PTY, but do not make the PTY slave the controlling terminal
-  $self->driver({pty => 'pty', stdout => 'pipe', make_slave_controlling_terminal => 0});
-
-  # It is not supported to set "pty" to "pipe"
-  $self->driver({pty => 'pipe'});
+  $run3->driver({pty => 1, stdout => 'pipe', make_slave_controlling_terminal => 0});
 
 =head2 ioloop
 
@@ -406,23 +427,37 @@ written to the child process.
 
 =head2 close
 
-  $run3 = $run3->close('other');
-  $run3 = $run3->close('stdin');
+  $run3 = $run3->close($conduit);
 
-Can be used to close C<STDIN> or other filehandles that are not in use in a sub
-process.
+Used to close open filehandles. This method can be called in both parent and
+child process. C<$conduit> can be:
 
-Closing "stdin" is useful after piping data into a process like C<cat>.
+=over 2
 
-Here is an example of closing "other":
+=item * stdin, stdout, stderr
+
+Close STDIN, STDOUT or STDERR in parent or child process. Closing "stdin" is
+useful after piping data into a process like C<cat>.
+
+=item * pty, slave
+
+If L</driver> opens a "pty", there will be one filehandle opened for the child
+and one for the parent. The actual "pty" can be closed in both parent and child,
+while the "slave" can only be closed from the parent process if C<close_slave>
+was set to "0" (zero) in L</driver>.
+
+=item * other
+
+This is useful in the child process to close every filehandle that is not
+L<STDIN>, L<STDOUT> or L<STDERR>. This is required when opening programs that
+does not automatically do this for you, like "telnet":
 
   $run3->start(sub ($run3, @) {
     $run3->close('other');
     exec telnet => '127.0.0.1';
   });
 
-Closing "other" is currently EXPERIMENTAL and might be changed later on, but it
-is unlikely it will get removed.
+=back
 
 =head2 exit_status
 

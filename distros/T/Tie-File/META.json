@@ -4,7 +4,7 @@
       "Mark Jason Dominus <MJD@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -43,6 +43,6 @@
          "url" : "https://github.com/toddr/Tie-File"
       }
    },
-   "version" : "1.05",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "1.06",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

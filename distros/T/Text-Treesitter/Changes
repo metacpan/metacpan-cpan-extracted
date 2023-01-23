@@ -1,5 +1,14 @@
 Revision history for Text-Treesitter
 
+0.06    2023-01-19
+        [CHANGES]
+         * Handle query predicates
+         * Recognise several common ones - `eq?`, `match?`, `contains?`,
+           `any-of?` and the `not-` prefixed inverted versions of them
+         * Further improvements to highlight.pl:
+            + skip matches on failed predicate tests
+            + define more highlight groups as used by tree-sitter-{perl,pod}
+
 0.05    2023-01-17
         [CHANGES]
          * Added char-counting node start / end accessors

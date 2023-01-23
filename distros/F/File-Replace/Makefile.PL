@@ -13,7 +13,7 @@ WriteMakefile(
 		provides     => {
 			'File::Replace' => {
 				file    => 'lib/File/Replace.pm',
-				version => '0.16',
+				version => '0.18',
 			},
 		},
 		resources    => {
@@ -33,7 +33,7 @@ WriteMakefile(
 				recommends => { # "strongly encouraged and should be satisfied except in resource constrained environments"
 				},
 				suggests   => { # "optional, but are suggested for enhanced operation"
-					'File::Replace::Fancy' => '0.16',
+					'File::Replace::Fancy' => '0.18',
 				},
 			},
 		},
@@ -58,7 +58,7 @@ WriteMakefile(
 	},
 	TEST_REQUIRES  => {
 		# CPAN
-		'Tie::Handle::Base'      => '0.16',
+		'Tie::Handle::Base'      => '0.18',
 		# Perl core modules
 		'Encode'                 => 0,
 		'Test::More'             => '1.302096',

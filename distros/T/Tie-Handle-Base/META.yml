@@ -24,7 +24,7 @@ no_index:
 provides:
   Tie::Handle::Base:
     file: lib/Tie/Handle/Base.pm
-    version: '0.16'
+    version: '0.18'
 recommends: {}
 requires:
   Carp: '0'
@@ -43,5 +43,5 @@ resources:
   bugtracker: https://bitbucket.org/haukex/tie-handle-base/issues
   homepage: https://bitbucket.org/haukex/tie-handle-base
   repository: https://bitbucket.org/haukex/tie-handle-base.git
-version: '0.16'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

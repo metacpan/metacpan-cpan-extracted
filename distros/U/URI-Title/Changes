@@ -1,5 +1,9 @@
 Revision history for Perl module URI::Title
 
+1.903 2023-01-21 BOOK
+  - Extract title from PNG images (RT#57066, thanks to Håkon Hægland (HAKONH))
+  - Restored some minor documentation items that were lost in a botched merge
+
 1.902 2019-09-30 BOOK
   - Show the filename for image files, in addition to format and size (RT#57067)
   - Avoid https URL in tests (RT#128544)

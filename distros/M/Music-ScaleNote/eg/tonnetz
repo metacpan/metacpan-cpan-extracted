@@ -1,0 +1,53 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Music::ScaleNote ();
+
+my $row_offset = shift || 4; # major 3rd
+my $col_offset = shift || 7; # major 5th
+
+my $msn = Music::ScaleNote->new(scale_name => 'chromatic');
+
+my $note_name = 'C4';
+
+# compute the row notes
+my @notes = ($note_name);
+my $name = $note_name;
+for my $i (1 .. 5) {
+    my $n = $msn->get_offset(
+        note_name => $name,
+        offset    => $row_offset,
+    );
+    $name = $n->format('ISO');
+    push @notes, $name;
+}
+
+my $row = 0;
+my $width = 2;
+
+for my $note (@notes) {
+    $row++;
+
+    for my $i (-4 .. -1) {
+        my $n = $msn->get_offset(
+            note_name => $note,
+            offset    => $i * $col_offset,
+        );
+        printf '%-*s  ', $width, $n->format('isobase');
+    }
+
+    ($name = $note) =~ s/\d+//;
+    printf '%-*s  ', $width, $name;
+
+    for my $i (1 .. 4) {
+        my $n = $msn->get_offset(
+            note_name => $note,
+            offset    => $i * $col_offset,
+        );
+        printf '%-*s  ', $width, $n->format('isobase');
+    }
+
+    print "\n";
+    print ' ' x ($row * $width);
+}

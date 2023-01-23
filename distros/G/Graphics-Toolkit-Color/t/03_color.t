@@ -54,7 +54,7 @@ is( $red->hsl_hash->{'hue'},          0, 'named red has correct hue value in hsl
 is( $red->hsl_hash->{'saturation'}, 100, 'named red has correct saturation value in hsl HASH');
 is( $red->hsl_hash->{'lightness'},   50, 'named red has correct lightness value in hsl HASH');
 is( $red->string,      'red', 'named red does stringify correctly');
-is( Graphics::Toolkit::Color->new(15,12,13)->string, '[ 15, 12, 13 ]', 'random color does stringify correctly');
+is( Graphics::Toolkit::Color->new(15,12,13)->string, '#0f0c0d', 'random color does stringify correctly');
 
 
 $red = Graphics::Toolkit::Color->new('#FF0000');

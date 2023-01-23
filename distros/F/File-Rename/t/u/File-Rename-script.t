@@ -6,6 +6,8 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
+use strict;
+use warnings;
 use Test::More tests => 4;
 push @INC, qw(blib/script blib/bin) if -d 'blib';
 unshift @INC, 't' if -d 't';

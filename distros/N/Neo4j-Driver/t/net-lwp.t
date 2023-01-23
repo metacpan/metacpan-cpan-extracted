@@ -11,7 +11,7 @@ use Mock::Quick;
 
 # Unit tests for Neo4j::Driver::Net::HTTP::LWP
 
-plan tests => 1 + 11 + 1;
+plan tests => 1 + 12 + 1;
 
 use Neo4j::Driver::Net::HTTP::LWP;
 use HTTP::Headers;
@@ -138,6 +138,21 @@ subtest 'response error' => sub {
 		lives_and { ok ! $m->http_header->{success} } 'no success empty';
 	}
 	lives_and { is $m->http_reason(), '' } 'reason empty';
+};
+
+
+subtest 'libwww-perl error' => sub {
+	plan tests => 4;
+	my $msg = "No towel!";
+	my $hdr = HTTP::Headers->new(
+		Content_Type => 'text/plain',
+		Client_Warning => 'Internal response',
+	);
+	$m->{response} = HTTP::Response->new( '500', $msg, $hdr, "$msg in content" );
+	lives_and { is $m->fetch_all(), "$msg in content" } 'fetch_all unaffected';
+	lives_and { is $m->http_header->{content_type}, '' } 'content_type empty';
+	lives_and { is $m->http_header->{status}, '' } 'status empty';
+	lives_and { is $m->http_reason(), $msg } 'reason message';
 };
 
 

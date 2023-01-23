@@ -27,7 +27,7 @@ $page       = $pdf->page();
 $annotation = $page->annotation();
 
 my $page2 = $pdf->page();
-$annotation->goto($page2);
+$annotation->link($page2);
 
 $string = $pdf->to_string();
 like($string,

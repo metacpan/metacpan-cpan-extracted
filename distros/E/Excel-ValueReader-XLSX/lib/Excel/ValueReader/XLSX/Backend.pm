@@ -5,7 +5,7 @@ use Moose;
 use Archive::Zip          qw(AZ_OK);
 use Carp                  qw/croak/;
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 #======================================================================
 # ATTRIBUTES

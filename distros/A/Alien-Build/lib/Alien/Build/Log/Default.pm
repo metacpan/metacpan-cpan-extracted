@@ -6,7 +6,7 @@ use 5.008004;
 use parent qw( Alien::Build::Log );
 
 # ABSTRACT: Default Alien::Build log class
-our $VERSION = '2.76'; # VERSION
+our $VERSION = '2.77'; # VERSION
 
 
 sub log
@@ -31,7 +31,7 @@ Alien::Build::Log::Default - Default Alien::Build log class
 
 =head1 VERSION
 
-version 2.76
+version 2.77
 
 =head1 SYNOPSIS
 

@@ -1,11 +1,10 @@
 package File::Rename::Options;
-
 use strict;
-BEGIN { eval { require warnings; warnings->import } }
+use warnings;
 
-use Getopt::Long ();
+use Getopt::Long 2.24 ();
 
-our $VERSION = 1.99;
+our $VERSION = 2.01;
 our $IMPORTED;
 
 sub import {
@@ -19,8 +18,7 @@ sub import {
       no_ignore_case
     );
     push @config, @_;
-    eval{ Getopt::Long::Configure(@config); 1; }
-        or do { require Carp; Carp::carp($@) };
+    Getopt::Long::Configure(@config); 
 }
 
 sub GetOptions {
@@ -144,7 +142,7 @@ Returns C<undef> when there is an error in the options.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018, 2022 by Robin Barker
+Copyright (C) 2018, 2022, 2023 by Robin Barker
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8 or,

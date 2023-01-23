@@ -43,7 +43,7 @@ use File_Replace_Testlib;
 BEGIN {
 	use_ok 'File::Replace' or BAIL_OUT("failed to use File::Replace");
 }
-is $File::Replace::VERSION, '0.16', 'File::Replace version matches tests';
+is $File::Replace::VERSION, '0.18', 'File::Replace version matches tests';
 
 $File::Replace::DISABLE_CHMOD and diag "\n",
 	"it appears a simple chmod failed on your system,\n",

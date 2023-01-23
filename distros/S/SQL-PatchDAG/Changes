@@ -4,6 +4,10 @@ TODO user manual
 TODO tests and more tests
 TODO DBIx::Deployer comparison?
 
+0.110 Fri 20 Jan 2023
+	- Updated packaging
+	- Correct application of PerlIO layers in constructor
+
 0.103 Wed 10 Aug 2022
 	- No functional changes
 	- Packaging fix to stop installing boilerplate.pl

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013-2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2013-2021 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -40,6 +40,7 @@ Chj::TEST
     my $result = run_tests(__PACKAGE__);
     is $result->failures, 0; # 0 failures
     is $result->successes > 0, 1;
+    is $result->exit_code, 0; # usable for passing to `exit`
 
     #run_tests;
     #  or
@@ -247,7 +248,7 @@ package Chj::TEST::Test::Builder {
     sub caller {
         my ($self, $height) = @_;
         if ($fake_caller) {
-            wantarray ? @$fake_caller : $$fake_caller[0]
+            wantarray ? @$fake_caller : $$fake_caller[0]    ## no critic
         } else {
             my $m = $self->can("SUPER::caller") or die "bug";
             goto $m
@@ -440,6 +441,14 @@ package Chj::TEST::Result {
     };
     *failures  = $accessor->("failures");
     *successes = $accessor->("successes");
+
+    sub exit_code {
+        my $self = shift;
+        my $n    = $self->failures;
+
+        # arbitrary use of exit codes up to 99, OK?
+        $n < 100 ? $n : 100
+    }
 }
 
 sub run_tests_ {

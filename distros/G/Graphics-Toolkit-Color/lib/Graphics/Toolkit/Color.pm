@@ -4,7 +4,7 @@
 use v5.12;
 
 package Graphics::Toolkit::Color;
-our $VERSION = '1.05';
+our $VERSION = '1.07';
 
 use Carp;
 use Graphics::Toolkit::Color::Constant ':all';
@@ -93,7 +93,7 @@ sub blue        { $_[0][3] }
 sub hue         { $_[0][4] }
 sub saturation  { $_[0][5] }
 sub lightness   { $_[0][6] }
-sub string      { $_[0][0] ? $_[0][0] : "[ $_[0][1], $_[0][2], $_[0][3] ]" }
+sub string      { $_[0][0] ? $_[0][0] : $_[0]->rgb_hex }
 
 sub rgb         { @{$_[0]}[1 .. 3] }
 sub hsl         { @{$_[0]}[4 .. 6] }
@@ -269,13 +269,19 @@ Graphics::Toolkit::Color - color palette creation helper
     $red->gradient_to( '#0000FF', 10);              # 10 colors from red to blue
     $red->complementary( 3 );                       # get fitting red green and blue
 
+
 =head1 DESCRIPTION
 
-Each object has 7 attributes, which are its RGB and HSL values and if possible a name.
-This is because humans access colors on hardware level (eye) in RGB,
-on cognition level in HSL (brain) and on cultural level (language) with names.
+Read only color holding objects with no additional dependencies.
+Create them in many different ways (see section I<CONSTRUCTOR>).
+Access its values via methods from section I<GETTER> or create related
+color objects via methods listed under I<METHODS>.
+
+Humans access colors on hardware level (eye) in RGB, on cognition level
+in HSL (brain) and on cultural level (language) with names.
 Having easy access to all three and some color math should enable you to get the color
-palette you desire quickly and with no additional dependencies.
+palette you desire quickly.
+
 
 =head1 CONSTRUCTOR
 
@@ -376,10 +382,9 @@ at: L<Graphics::Toolkit::Color::Constant/NAMES>
 
 =head2 string
 
-String to reproduce (serialize) color object by:
-Graphics::Toolkit::Color->new (eval $string).
-It is either the name (if color has one) or the stringified triplet:
-"[ $red, $green, $blue ]".
+Returns string that can be serialized back into a color object
+(recreated by Graphics::Toolkit::Color-&gt;new( $string )).
+It is either the color name (if color has one) or result of L</rgb_hex>.
 
 =head2 red
 
@@ -395,7 +400,7 @@ Integer between 0 .. 255 describing the blue portion in RGB space.
 
 =head2 rgb
 
-Three values of red, green and blue (see above).
+List with values of red, green and blue (see above), no refeerence.
 
 =head2 rgb_hex
 
@@ -411,6 +416,10 @@ with their respective values as defined above.
 
 Reference to a I<HASH> containing the keys C<'hue'>, C<'saturation'> and C<'lightness'>
 with their respective values as defined below.
+
+=head2 hsl
+
+List of three values of hue, saturation and lightness (see below).
 
 =head2 hue
 
@@ -430,10 +439,6 @@ Integer between 0 .. 100 describing percentage of saturation in HSL space.
 Integer between 0 .. 100 describing percentage of lightness in HSL space.
 0 is always black, 100 is always white and 50 the most colorful
 (depending on hue value) (or grey - if saturation = 0).
-
-=head2 hsl
-
-Three values of hue, saturation and lightness (see above).
 
 =head1 METHODS
 
