@@ -1,0 +1,15 @@
+Changes
+cpanfile
+lib/MooX/Role/HasLogger.pm
+lib/MooX/Role/HasLogger.pod
+lib/MooX/Role/HasLogger/Types.pm
+lib/MooX/Role/HasLogger/Types.pod
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+t/custom.t
+t/default.t
+t/override.t
+t/override_log_any_logger.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

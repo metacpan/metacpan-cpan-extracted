@@ -5,7 +5,7 @@
       "Greg Ward <gward@python.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "perl_5"
    ],
@@ -18,7 +18,7 @@
       "build" : {
          "requires" : {
             "Capture::Tiny" : "0.06",
-            "Config::AutoConf" : "0.16",
+            "Config::AutoConf" : "0.320",
             "Cwd" : "0",
             "ExtUtils::CBuilder" : "0.27",
             "ExtUtils::LibBuilder" : "0.02",
@@ -44,7 +44,7 @@
    "provides" : {
       "Text::BibTeX" : {
          "file" : "lib/Text/BibTeX.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       },
       "Text::BibTeX::BibEntry" : {
          "file" : "lib/Text/BibTeX/Bib.pm",
@@ -104,6 +104,6 @@
          "url" : "http://github.com/ambs/Text-BibTeX"
       }
    },
-   "version" : "0.88",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.89",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

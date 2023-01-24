@@ -4,13 +4,15 @@ use strict;
 use warnings;
 
 package Math::Matrix::MaybeGSL;
-$Math::Matrix::MaybeGSL::VERSION = '0.007';
+$Math::Matrix::MaybeGSL::VERSION = '0.008';
 use parent 'Exporter';
 our @EXPORT = qw{Matrix};
 
 use overload
        '*=' => '_assign_multiply',
         '*' => '_multiply',
+       '+=' => '_assign_add',
+        '+' => '_add',
  'fallback' =>   undef;
 
 sub _choose_matrix_module {
@@ -83,6 +85,9 @@ BEGIN {
                     return scalar(_call(min => @_));
                 };
             },
+            row           => sub { _new(_call(row => $_[0], $_[1]-1)) },
+            find_zeros    => sub { _gsl_find_zeros(@_) },
+            transpose     => sub { _gsl_transpose(@_) },
            },
          'Math::MatrixReal' => {
             assign        => sub { _call(assign        => @_); },
@@ -95,6 +100,9 @@ BEGIN {
             read          => sub { _mreal_read($_[1]) },
             max           => sub { _mreal_max($_[0]{matrix}) },
             min           => sub { _mreal_min($_[0]{matrix}) },
+            row           => sub { _new( $_[0]{matrix}->row($_[1]) ) },
+            find_zeros    => sub { _mreal_find_zeros(@_) },
+            transpose     => sub { _new( ~$_[0]{matrix} ) },
                                },
 	);
 
@@ -211,6 +219,21 @@ sub _multiply {
     }
 }
 
+sub _assign_add {
+    my($object,$argument) = @_;
+
+    return( &_add($object,$argument) );
+}
+
+sub _add {
+    my ($object, $argument) = @_;
+
+    $object   = $object->{matrix}   if ref $object   eq __PACKAGE__;
+    $argument = $argument->{matrix} if ref $argument eq __PACKAGE__;
+
+    return _new($object + $argument);
+}
+
 sub _mreal_write {
     my ($m, $filename) = @_;
 
@@ -246,6 +269,20 @@ sub _mreal_read {
     }
 
     return _new( Math::MatrixReal->new_from_rows($m) );
+}
+
+sub _mreal_find_zeros {
+    my ($matrix) = @_;
+    my ($rs, $cs) = $matrix->dim();
+
+    my @matches;
+    my $pos = 0;
+    for ($matrix->as_list()) {
+        push @matches, [int($pos/$cs)+1, ($pos % $cs)+1] unless $_;
+        $pos++;
+    }
+
+    return @matches;
 }
 
 sub _gsl_read {
@@ -296,6 +333,31 @@ sub _gsl_write {
 
 }
 
+sub _gsl_find_zeros {
+    my ($matrix) = @_;
+    my ($rs, $cs) = $matrix->dim();
+
+    my $raw_matrix = $matrix->{matrix}->raw;
+    my @matches;
+    for my $i (0..$rs-1) {
+        for my $j (0..$cs-1) {
+            next if Math::GSL::Matrix::gsl_matrix_get($raw_matrix, $i, $j);
+            push @matches, [$i+1, $j+1];
+        }
+    }
+    return @matches;
+}
+
+sub _gsl_transpose {
+    my ($matrix) = @_;
+    my ($rs, $cs) = $matrix->dim();
+
+    my $result = Math::GSL::Matrix::gsl_matrix_alloc($cs, $rs);
+    Math::GSL::Matrix::gsl_matrix_transpose_memcpy($result, $matrix->{matrix}->raw());
+
+    return _new(Math::GSL::Matrix->new($result));
+}
+
 
 
 
@@ -313,7 +375,7 @@ Math::Matrix::MaybeGSL - Uniform use of Math::MatrixReal and Math::GSL::Matrix.
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -470,13 +532,31 @@ written by the same back-end that is being used for reading.
 
      my $matrix = Matrix->load("my_matrix.dat");
 
+=head2 C<row>
+
+Returns the selected row in a matrix as a new matrix object. Note that B<indexes start at 1>
+unlike Perl and some other programming languages.
+
+    my $row = $matrix->row(1);
+
+=head2 C<find_zeros>
+
+Given a matrix, returns a nested list of indices corresponding to zero values in the
+given matrix. Note that B<indexes start at 1> unlike Perl and some other programming languages.
+
+    my @indices = $matrix->find_zeros();
+
+=head2 C<transpose>
+
+Returns transposed matrix.
+
 =head1 OVERLOAD
 
-For now only the matrix multiplication is overloaded, in the usual operator, C<*>.
-Take attention that matrix multiplication only works if the matrix dimensions are
-compatible.
+For now only matrix multiplication and addition are overloaded, in the usual operators, C<*> and C<+>, correspondingly.
+Take attention that these operations only work if the matrix dimensions are compatible.
 
     $m = $a * $b;
+    $n = $a + $b;
 
 =head1 BUGS
 
@@ -489,13 +569,25 @@ modules support it).
 
 Check C<Math::MatrixReal> and C<Math::GSL::Matrix> documentation.
 
+=head1 CONTRIBUTORS
+
+=over 4
+
+=item * Andrius Merkys <merkys@cpan.org>
+
+=item * Ivan Baidakou
+
+=item * Gabor Szabo
+
+=back
+
 =head1 AUTHOR
 
 Alberto Simões <ambs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Alberto Simões.
+This software is copyright (c) 2014-2023 by Alberto Simões.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,27 @@
+=pod
+
+=head1 NAME
+
+MooX::Role::HasLogger::Types - Type library that exports the Logger type
+
+=head1 DESCRIPTION
+
+This type library exports the C<Logger> type. This type inherits from the
+C<HasMethods> type that is a parameterized type defined in the
+L<Types::Standard> type library. The parameter is the list of methods that a
+class has to implement to conform to the C<Logger> type. The list contains the
+log methods C<trace()>, C<debug()>, C<info()>, C<warn()>, C<error()>, C<fatal>,
+and the corresponding C<is_> prefixed log level detection methods.
+
+=head1 AUTHOR
+
+Sven Willenbuecher <sven.willenbuecher@gmx.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by Sven Willenbuecher.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.
+
+=cut

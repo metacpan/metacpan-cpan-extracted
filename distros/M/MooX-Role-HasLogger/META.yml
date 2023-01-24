@@ -1,0 +1,33 @@
+---
+abstract: 'Moo role that provides a logger attribute'
+author:
+  - 'Sven Willenbuecher <sven.willenbuecher@gmx.de>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Log::Log4perl: '0'
+  Test::More: '0'
+  Test::Output: '0'
+configure_requires:
+  Config: '0'
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooX-Role-HasLogger
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Log::Any: '0'
+  Moo: '0'
+  MooX::TypeTiny: '0'
+  Type::Tiny: '0'
+  namespace::clean: '0'
+resources:
+  bugtracker: https://github.com/XSven/MooX-Role-HasLogger/issues
+  repository: git://github.com/XSven/MooX-Role-HasLogger.git
+version: '0.001'

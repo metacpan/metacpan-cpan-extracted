@@ -13,7 +13,7 @@ Neo4j::Driver::Deprecations - Explains features that have been deprecated, but n
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 OVERVIEW
 

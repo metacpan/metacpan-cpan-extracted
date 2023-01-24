@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::Bolt;
 # ABSTRACT: Network controller for Neo4j Bolt
-$Neo4j::Driver::Net::Bolt::VERSION = '0.34';
+$Neo4j::Driver::Net::Bolt::VERSION = '0.35';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -146,16 +146,18 @@ sub _run {
 			# transactions should already have been rolled back and
 			# closed automatically at this point due to the server error.
 			# This is usually what happens on HTTP (but see neo4j#12651).
-			# However, on Bolt, the transaction tends to remain open
-			# (albeit marked as failed, thus uncommittable). Just
-			# attempting an explicit rollback whenever the Neo4j server
-			# reports any errors should fix that. If there are additional
-			# errors during the rollback, those must be ignored.
-			eval { $tx->{failed} = 1; $tx->rollback; } unless $tx->{failed};
+			# However, on Bolt, the transaction might remain open (marked
+			# as failed, thus uncommittable and ignoring rollback messages;
+			# but see perlbolt#51). An explicit reset seems sensible here,
+			# although in practice perlbolt currently resets automatically.
 			$tx->{closed} = 1;
 			$self->{active_tx} = 0;
 			
-			croak sprintf "%s:\n%s\n%s", $stream->server_errcode, $stream->server_errmsg, $self->_bolt_error( $stream );
+			my $error = sprintf "%s:\n%s\n%s",
+				$stream->server_errcode, $stream->server_errmsg, $self->_bolt_error( $stream );
+			$tx->{bolt_txn} = undef;
+			$self->{connection}->reset_cxn if $self->{connection}->can('reset_cxn');
+			croak $error;
 		}
 		
 		$result = $self->{result_module}->new({

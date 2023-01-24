@@ -16,11 +16,13 @@ my $s = $driver->session;  # only for autocommit transactions
 
 # These tests are about the REST and transaction implementation.
 
-use Test::More 0.96 tests => 5 + 4;
+use Test::More 0.94;
 use Test::Exception;
 use Test::Warnings;
 use URI;
 my $undo_id;
+
+plan tests => 6 + 4;
 
 
 my ($q, $r);
@@ -88,6 +90,20 @@ subtest 'transaction status on error (HTTP)' => sub {
 	$session->{net}->{http_agent}->{client}->{auth} = 1 if $Neo4j_Test::sim;
 	throws_ok { $t->run('praise be to the dartmakers.') } qr/syntax/i, 'Neo4j server error';
 	ok ! $t->is_open, 'server error closes';
+};
+
+
+subtest 'transaction status on error (Bolt)' => sub {
+	plan skip_all => '(currently testing HTTP)' unless $Neo4j_Test::bolt;
+	plan tests => 4;
+	# Verify that running a bad statement inside a tx doesn't corrupt the Bolt connection
+	my $session = $driver->session; 
+	my $t1 = $session->begin_transaction;
+	throws_ok { $t1->run('Bolt syntax error!') } qr/\.SyntaxError\b/i, 'Neo4j server error';
+	ok ! $t1->is_open, 'server error closed tx';
+	my $t2 = $session->begin_transaction;
+	lives_and { is $t2->run('RETURN "Reset ok"')->single->get, 'Reset ok' } 'session usable after server error in tx';
+	lives_ok { $t2->rollback } 'rollback';
 };
 
 

@@ -1,5 +1,5 @@
 package CPAN::Upload::Tiny;
-$CPAN::Upload::Tiny::VERSION = '0.009';
+$CPAN::Upload::Tiny::VERSION = '0.010';
 use strict;
 use warnings;
 
@@ -8,6 +8,7 @@ use File::Basename ();
 use MIME::Base64 ();
 use HTTP::Tiny;
 use HTTP::Tiny::Multipart;
+use Term::ReadKey 'ReadMode';
 
 my $UPLOAD_URI = $ENV{CPAN_UPLOADER_UPLOAD_URI} || 'https://pause.perl.org/pause/authenquery?ACTION=add_uri';
 
@@ -26,9 +27,6 @@ sub new_from_config {
 	return $class->new(read_config_file($filename));
 }
 
-my $has_readkey = eval { require Term::ReadKey };
-*read_key = $has_readkey ? \&Term::ReadKey::ReadMode : sub {};
-
 sub prompt {
 	my ($mess, $mode) = @_;
 
@@ -36,10 +34,10 @@ sub prompt {
 	local $\;
 	print "$mess? ";
 
-	read_key($mode);
+	ReadMode($mode);
 	my $ans = <STDIN> // '';
-	read_key(0);
-	print "\n" if $mode > 1 && $has_readkey;
+	ReadMode(0);
+	print "\n" if $mode > 1;
 	chomp $ans;
 	return $ans;
 }
@@ -47,8 +45,8 @@ sub prompt {
 sub new_from_config_or_stdin {
 	my ($class, $filename) = @_;
 	my ($user, $pass) = read_config_file($filename);
-	$user ||= prompt("What is your PAUSE ID", 1);
-	$pass ||= prompt("What is your PAUSE password", 2);
+	$user ||= prompt("What is your PAUSE ID"      , 'normal');
+	$pass ||= prompt("What is your PAUSE password", 'noecho');
 	return $class->new($user, $pass);
 }
 
@@ -126,7 +124,7 @@ CPAN::Upload::Tiny - A tiny CPAN uploader
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -147,6 +145,10 @@ This creates a new C<CPAN::Upload::Tiny> object. It requires a C<$username> and 
 =head2 new_from_config($filename)
 
 This creates a new C<CPAN::Upload::Tiny> based on a F<.pause> configuration file. It will use C<Config::Identity> if available.
+
+=head2 new_from_config_or_stdin($filename)
+
+This creates a new C<CPAN::Upload::Tiny> much like C<new_from_config>, but if a C<.pause> file doesn't exist will prompt for the username and password.
 
 =head2 upload_file($filename)
 

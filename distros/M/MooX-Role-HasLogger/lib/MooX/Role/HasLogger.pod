@@ -1,0 +1,101 @@
+=pod
+
+=head1 NAME
+
+MooX::Role::HasLogger - Moo role that provides a logger attribute
+
+=head1 SYNOPSIS
+
+  package Foo;
+
+  use Moo;
+  use MooX::TypeTiny;
+  use namespace::clean;
+
+  with qw( MooX::Role::HasLogger );
+
+  sub bar {
+    my ( $self ) = @_;
+    $self->logger->info( 'log something' );
+  }
+
+  1;
+
+=head1 DESCRIPTION
+
+This L<Moo::Role> based role provides a C<logger> attribute to the consuming
+class.  The attribute is read-only and its value is grabbed lazily. The type
+library L<MooX::Role::HasLogger::Types> exports the C<Logger> type that defines
+the interface of the attribute. The C<build_logger()> builder method returns a
+L<Log::Any> logger object with the consuming class as its category.
+
+This example
+
+  package Bar;
+
+  use Moo;
+  use MooX::TypeTiny;
+  use Types::Standard              qw( HasMethods );
+  use MooX::Role::HasLogger::Types qw( Logger );
+  use namespace::clean;
+
+  with qw( MooX::Role::HasLogger );
+
+  has '+logger' => ( isa => ( Logger ) & ( HasMethods [ qw( tracef debugf infof warnf errorf fatalf ) ] ) );
+
+  sub build_logger {
+    return Log::Any->get_logger( category => ref shift, default_adapter => 'Stderr' );
+  }
+
+  1;
+
+shows
+
+=over 2
+
+=item *
+
+how to override the C<isa> option of the C<logger> attribute using the C<+>
+notation.
+
+=item *
+
+how to extend the C<Logger> type using a L<Type::Tiny> intersection. Now a
+logger has to be an object of a class that implements the C<Logger> type
+methods and additionally the C<f> suffixed log methods.
+
+=item *
+
+how to override the C<build_logger()> builder method. This time the builder
+returns a L<Log::Any> logger object with the consuming class as its category
+and with a default adapter that refers to the L<Log::Any::Adapter::Stderr>
+adapter class.
+
+=back
+
+=head1 SEE ALSO
+
+=over 2
+
+=item *
+
+L<MooX::Role::Logger>
+
+=item *
+
+L<MooX::Log::Any>
+
+=back
+
+=head1 AUTHOR
+
+Sven Willenbuecher <sven.willenbuecher@gmx.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by Sven Willenbuecher.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.
+
+=cut

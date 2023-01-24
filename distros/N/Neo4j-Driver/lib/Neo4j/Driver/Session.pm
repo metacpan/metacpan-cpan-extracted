@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Session;
 # ABSTRACT: Context of work for database interactions
-$Neo4j::Driver::Session::VERSION = '0.34';
+$Neo4j::Driver::Session::VERSION = '0.35';
 
 use Carp qw();
 our @CARP_NOT = qw(Neo4j::Driver);
@@ -128,7 +128,7 @@ Neo4j::Driver::Session - Context of work for database interactions
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 SYNOPSIS
 

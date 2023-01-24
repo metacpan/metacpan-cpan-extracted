@@ -23,7 +23,7 @@ my $FLOAT_PRECICE = 16384.5;
 my $DOUBLE_PRECICE = 65536.5;
 
 # Start objects count
-my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
+my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 
 {
   ok(SPVM::TestCase::Method->call_keyword_name_method);
@@ -137,46 +137,46 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 {
   # call_method barray
   {
-    my $sp_values = SPVM::new_byte_array([1, 2, 3]);
+    my $sp_values = SPVM::api->new_byte_array([1, 2, 3]);
     is(SPVM::TestCase::Method->call_method_byte_array($sp_values), 6);
   }
 
   # call_method sarray
   {
-    my $sp_values = SPVM::new_short_array([1, 2, 3]);
+    my $sp_values = SPVM::api->new_short_array([1, 2, 3]);
     is(SPVM::TestCase::Method->call_method_short_array($sp_values), 6);
   }
 
   # call_method iarray
   {
-    my $sp_values = SPVM::new_int_array([1, 2, 3]);
+    my $sp_values = SPVM::api->new_int_array([1, 2, 3]);
     is(SPVM::TestCase::Method->call_method_int_array($sp_values), 6);
   }
 
   # call_method larray
   {
-    my $sp_values = SPVM::new_long_array([1, 2, 3]);
+    my $sp_values = SPVM::api->new_long_array([1, 2, 3]);
     is(SPVM::TestCase::Method->call_method_long_array($sp_values), 6);
   }
 
   # call_method farray
   {
-    my $sp_values = SPVM::new_float_array([0.5, 0.5, 1.0]);
+    my $sp_values = SPVM::api->new_float_array([0.5, 0.5, 1.0]);
     is(SPVM::TestCase::Method->call_method_float_array($sp_values), 2.0);
   }
 
   # call_method darray
   {
-    my $sp_values = SPVM::new_double_array([0.5, 0.5, 1.0]);
+    my $sp_values = SPVM::api->new_double_array([0.5, 0.5, 1.0]);
     is(SPVM::TestCase::Method->call_method_double_array($sp_values), 2.0);
   }
 }
 
 {
   {
-    my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
+    my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
     SPVM::TestCase::Method->call_method_assign();
-    my $end_memory_blocks_count = SPVM::get_memory_blocks_count();
+    my $end_memory_blocks_count = SPVM::api->get_memory_blocks_count();
     is($start_memory_blocks_count, $end_memory_blocks_count);
   }
 }
@@ -253,7 +253,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 }
 
 # All object is freed
-my $end_memory_blocks_count = SPVM::get_memory_blocks_count();
+my $end_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 is($end_memory_blocks_count, $start_memory_blocks_count);
 
 done_testing;

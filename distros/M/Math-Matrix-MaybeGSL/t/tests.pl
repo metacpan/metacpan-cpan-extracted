@@ -1,6 +1,6 @@
 #!perl
 
-use Test::More tests => 67;
+use Test::More tests => 110;
 use Math::Matrix::MaybeGSL;
 
 my $m = Matrix->new(10, 20);
@@ -120,5 +120,77 @@ is $m9->element(1,2), 2;
 is $m9->element(2,2), 4;
 
 unlink "tmp-mat" if -f "tmp-mat";
+
+my $m10 = Matrix->new_from_rows( [[1, 2], [3, 4]]);
+isa_ok($m10, 'Math::Matrix::MaybeGSL');
+
+my $m11 = $m10->row(1);
+isa_ok($m11, 'Math::Matrix::MaybeGSL');
+
+is $m11->element(1,1), 1;
+is $m11->element(1,2), 2;
+
+my $m12 = Matrix->new_from_rows( [[0, 0, 1], [0, 1, 0]]);
+isa_ok($m12, 'Math::Matrix::MaybeGSL');
+
+my @zeros = $m12->find_zeros();
+
+is scalar(@zeros), 4;
+is $zeros[0]->[0], 1;
+is $zeros[0]->[1], 1;
+is $zeros[1]->[0], 1;
+is $zeros[1]->[1], 2;
+is $zeros[2]->[0], 2;
+is $zeros[2]->[1], 1;
+is $zeros[3]->[0], 2;
+is $zeros[3]->[1], 3;
+
+my $m13 = $m2 + $m3;
+isa_ok($m13, 'Math::Matrix::MaybeGSL');
+#     6   10
+#     8   12
+is $m13->element(1,1),  6;
+is $m13->element(1,2), 10;
+is $m13->element(2,1),  8;
+is $m13->element(2,2), 12;
+
+my $m14 = Matrix->new_from_rows( [[1, 2], [3, 4]]);
+isa_ok($m14, 'Math::Matrix::MaybeGSL');
+
+my $m15 = $m14->transpose();
+isa_ok($m15, 'Math::Matrix::MaybeGSL');
+
+is $m15->element(1,1), 1;
+is $m15->element(1,2), 3;
+is $m15->element(2,1), 2;
+is $m15->element(2,2), 4;
+
+my $m16 = Matrix->new_from_rows( [[1, 2, 3], [4, 5, 6]]);
+isa_ok($m16, 'Math::Matrix::MaybeGSL');
+
+my $m17 = $m16->transpose();
+isa_ok($m17, 'Math::Matrix::MaybeGSL');
+
+is join(',', $m17->dim()), '3,2';
+is $m17->element(1,1), 1;
+is $m17->element(1,2), 4;
+is $m17->element(2,1), 2;
+is $m17->element(2,2), 5;
+is $m17->element(3,1), 3;
+is $m17->element(3,2), 6;
+
+my $m18 = Matrix->new_from_cols( [[1, 2, 3], [4, 5, 6]]);
+isa_ok($m18, 'Math::Matrix::MaybeGSL');
+
+my $m19 = $m18->transpose();
+isa_ok($m19, 'Math::Matrix::MaybeGSL');
+
+is join(',', $m19->dim()), '2,3';
+is $m19->element(1,1), 1;
+is $m19->element(1,2), 2;
+is $m19->element(1,3), 3;
+is $m19->element(2,1), 4;
+is $m19->element(2,2), 5;
+is $m19->element(2,3), 6;
 
 1;

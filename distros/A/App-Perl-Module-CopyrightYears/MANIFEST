@@ -23,5 +23,7 @@ README
 SIGNATURE
 t/App-Perl-Module-CopyrightYears/01-use.t
 t/App-Perl-Module-CopyrightYears/02-version.t
+t/App-Perl-Module-CopyrightYears/03-new.t
+t/App-Perl-Module-CopyrightYears/04-run.t
 xt/App-Perl-Module-CopyrightYears/01-pod_coverage.t
 xt/App-Perl-Module-CopyrightYears/02-pod.t

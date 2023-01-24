@@ -1,5 +1,11 @@
 Revision history for Neo4j::Driver
 
+0.35  2023-01-24
+
+ - Fix an issue which could cause a Bolt v3/v4 session to report
+   "Bolt error -1" and become unusable after a server-side statement
+   evaluation failure inside an explicit transaction.
+
 0.34  2023-01-22
 
  - Refactor experimental plug-in API:

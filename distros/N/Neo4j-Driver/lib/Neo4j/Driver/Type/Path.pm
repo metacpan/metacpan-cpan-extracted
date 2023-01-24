@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Path;
 # ABSTRACT: Directed sequence of relationships between two nodes
-$Neo4j::Driver::Type::Path::VERSION = '0.34';
+$Neo4j::Driver::Type::Path::VERSION = '0.35';
 
 use parent 'Neo4j::Types::Path';
 use overload '@{}' => \&_array, fallback => 1;
@@ -76,7 +76,7 @@ Neo4j::Driver::Type::Path - Directed sequence of relationships between two nodes
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 SYNOPSIS
 

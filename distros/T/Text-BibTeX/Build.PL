@@ -31,7 +31,7 @@ my $builder = MyBuilder->new(
     },
     build_requires => {
         'File::Copy'           => '0',
-        'Config::AutoConf'     => '0.16',
+        'Config::AutoConf'     => '0.320',
         'ExtUtils::LibBuilder' => '0.02',
         'Capture::Tiny'        => '0.06',
         'ExtUtils::CBuilder'   => '0.27',

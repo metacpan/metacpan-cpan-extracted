@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 8b9230b0e6327dab409228aa803429fb9abde9937bf8f71099b72d89b077180f COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 1c9bd982cdb72ae6b41db0299f51b777f2e2db90d09a794aa43dec3c754c9765 Changes
+SHA256 5ffcc96b1a73367e78ae9548eee60a43d85a30a700b29dbe5af29333a733f714 INSTALL
+SHA256 1a2929dacaef239beca27a85f7f97b793628dfb22f07fdfb406cb6f3f0d22a6b LICENSE
+SHA256 ef650b717abfb2b0d8f91fc7a856d8ea37b66e94ea48877824a22e3ce4a7588b MANIFEST
+SHA256 504560cf38c969678340bf2286ce8c66ff09669d5ea5585a9202ee51deb08fa7 META.json
+SHA256 3258748868cda136f41d28ed264267bd99a0b14ec1fb5c6cfdd60fa5ea99589c META.yml
+SHA256 b013f9a8c694f77d3c463ba15339b6a022d80760d61eeddbb96884dcca20a3a7 Makefile.PL
+SHA256 8432aa6ed3661e5b935f4cd2d3ffa5ae5408b6a20b5278a7cd76c22c4099a354 README
+SHA256 80c0048d12854d89f63ecc3ec940d5a09b10519a3dad99ebde7b24ef46f61997 dist.ini
+SHA256 73c3b40968358ba27d357867d71e88672414d8161402d93466b63091aba6b391 doap.ttl
+SHA256 d90a12861bf03015e958b3474c0fed35d309f42f8027c00a84abc3c931508e6b lib/TOBYINK/Test/Template.pm
+SHA256 78812ac93375b707ce758f9288df14975cae30da5b8a0ac7e9bbf3695d702d62 t/00start.t
+SHA256 34c1ce40e9dcfce8aa3e9672476a9ea7d0f479f30ff4969bd799b8491a7b794b t/01basic.t
+SHA256 514bdcee78b228b0bc20426d6df7dd4750d37c00d8074bc2332d4bffb91e109a t/integration/synopsis.t
+SHA256 85e56c53ec3032f638c16da33274b1c82e3e7e2c0383228ec821f6f5d1dc7431 t/unit/TOBYINK/Test/Template.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCY9AZXAAKCRDOv4Eoaip9
+OZDrAJ0Z6HudDLOFEoPa5SEGYoIVSvvU4ACfQJXRr90xxS68wUm/f9zyzlpbqFE=
+=Chod
+-----END PGP SIGNATURE-----

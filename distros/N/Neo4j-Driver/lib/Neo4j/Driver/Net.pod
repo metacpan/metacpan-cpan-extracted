@@ -13,7 +13,7 @@ Neo4j::Driver::Net - Explains the design of the networking modules
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 OVERVIEW
 

@@ -3,25 +3,14 @@ package SPVM::BlessedObject;
 use strict;
 use warnings;
 
-sub env {
+sub api {
   my $self = shift;
   if (@_) {
-    $self->{env} = $_[0];
+    $self->{api} = $_[0];
     return $self;
   }
   else {
-    return $self->{env};
-  }
-}
-
-sub stack {
-  my $self = shift;
-  if (@_) {
-    $self->{stack} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{stack};
+    return $self->{api};
   }
 }
 

@@ -1,5 +1,8 @@
 Revision history for Perl module Text::BibTeX
 
+0.89 2023-01-24
+ * Fix Config::AutoConf dependency version
+
 0.88 2019-04-29
  * Make namebug.c compile with non std99 compiler.
 

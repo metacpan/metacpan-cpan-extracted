@@ -237,6 +237,7 @@ lib/SPVM/Error.pm
 lib/SPVM/Error/NotSupported.pm
 lib/SPVM/Error/System.pm
 lib/SPVM/ExchangeAPI.pm
+lib/SPVM/ExchangeAPI/Class.pm
 lib/SPVM/Float.pm
 lib/SPVM/FloatList.pm
 lib/SPVM/FloatList.spvm
@@ -248,6 +249,7 @@ lib/SPVM/Format.c
 lib/SPVM/Format.config
 lib/SPVM/Format.pm
 lib/SPVM/Format.spvm
+lib/SPVM/Global.pm
 lib/SPVM/Hash.c
 lib/SPVM/Hash.config
 lib/SPVM/Hash.pm

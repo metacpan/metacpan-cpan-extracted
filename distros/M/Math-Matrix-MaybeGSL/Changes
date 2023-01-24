@@ -2,6 +2,13 @@
  Math::Matrix::MaybeGSL Changes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+0.008  2023-01-24
+
+    * Added row method (thanks to Andrius Merkys).
+    * Added find_zeros method (thanks to Andrius Merkys). 
+    * Added transpose method (thanks to Andrius Merkys).
+    * Overloaded plus operator (thanks to Andrius Merkys).
+
 0.007  2014-12-28
 
     * Added as_list method (thanks to Ivan Baidakou).

@@ -35,6 +35,7 @@
          "requires" : {
             "CPAN::DistnameInfo" : "0",
             "IO::Interactive" : "0",
+            "JSON" : "0",
             "Module::CPANfile" : "0",
             "Module::CoreList" : "5.20181020",
             "Module::Extract::VERSION" : "0",
@@ -46,8 +47,8 @@
       "test" : {
          "requires" : {
             "Capture::Tiny" : "0",
+            "File::Temp" : "0",
             "HTTP::Tiny" : "0",
-            "JSON" : "0",
             "Test::More" : "0.98"
          }
       }
@@ -60,10 +61,10 @@
       "homepage" : "https://github.com/briandfoy/cpan-audit",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/briandfoy/cpan-audit.git",
+         "url" : "https://github.com/briandfoy/cpan-audit",
          "web" : "https://github.com/briandfoy/cpan-audit"
       }
    },
-   "version" : "20220817.001",
+   "version" : "20230104.001",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

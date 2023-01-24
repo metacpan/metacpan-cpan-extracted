@@ -1,3 +1,71 @@
+0.9684 2022-01-24
+  [New Features]
+    * Added the api function in the SPVM class.
+    * Added the feature that creating SVPM::ExchangeAPI object
+    * Added the SPVM::ExchangeAPI::Class class.
+    * Added the class method in the SPVM::ExchangeAPI.
+    * The compile method in the Compiler class support undef class name.
+  [Bug Fix]
+    * Fixed the bug that the build_runtime method in the Compiler class can't be called only after the compile method is called.
+  [Document Change]
+    * SPVM::Document::ExchangeAPI is rewritten by way to using the SVPM::ExchangeAPI object.
+      and its content is moved into the document of SPVM and SPVM::ExchangeAPI.
+  [Deprecation]
+
+    The following SPVM::xxx functions are deprecated. These functions will be removed in the future. Use the methods in the L<SPVM::ExchangeAPI> directly.
+
+      new_byte_array
+      new_byte_array_unsigne
+      new_byte_array_len
+      new_byte_array_from_bin
+      new_byte_array_from_string
+      new_short_array
+      new_short_array_unsigned
+      new_short_array_len
+      new_short_array_from_bin
+      new_int_array
+      new_int_array_unsigned
+      new_int_array_len
+      new_int_array_from_bin
+      new_long_array
+      new_long_array_unsigned
+      new_long_array_len
+      new_long_array_from_bin
+      new_float_array
+      new_float_array_len
+      new_float_array_from_bin
+      new_double_array
+      new_double_array_len
+      new_double_array_from_bin
+      new_string
+      new_string_from_bin
+      new_object_array
+      new_object_array_len
+      new_any_object_array
+      new_mulnum_array
+      new_mulnum_array_from_bin
+      new_string_array
+      new_string_array_len
+      get_exception
+      set_exception
+      get_memory_blocks_count
+      call_method
+      new_address_object
+
+    How to rewrite the code:
+      
+      # Before
+      my $int_array = SPVM::new_int_array([1, 2, 3]);
+      
+      # After
+      my $api = SPVM::api();
+      my $int_array = $api->new_int_array([1, 2, 3]);
+    [Incompatible Changes]
+      * The new_byte_array_from_string method in the SPVM::ExchangeAPI class doesn't perform C<utf8::encode>.
+        This method becomes the same as the new_byte_array_from_bin method.
+    [Document Bug Fix]
+      * Fixed the document bug that currently the methods in the SPVM::ExchangeAPI doesn't perform any encodeing/decoding using utf8::encode/utf8::decode
+        to create strings, but the doc of Exchange API remains this.
 0.9683 2022-01-21
   [New Features]
     * Added the Compiler class.

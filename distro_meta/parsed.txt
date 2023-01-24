@@ -83315,3 +83315,14 @@ B/BO/BOOK/URI-Title-1.903.tar.gz
 S/SC/SCHROEDER/App-jupiter-1.06.tar.gz
 P/PE/PERLANCAR/Sah-Schemas-Float-0.013.tar.gz
 T/TO/TOMHRR/Net-IP-XS-0.22.tar.gz
+B/BI/BIGFOOT/Amazon-Credentials-1.1.18.tar.gz
+S/SK/SKIM/App-Perl-Module-CopyrightYears-0.02.tar.gz
+B/BD/BDFOY/CPAN-Audit-20230104.001.tar.gz
+L/LE/LEONT/CPAN-Upload-Tiny-0.010.tar.gz
+A/AM/AMBS/Math-Matrix-MaybeGSL-0.008.tar.gz
+S/SV/SVW/MooX-Role-HasLogger-0.001.tar.gz
+A/AJ/AJNN/Neo4j-Driver-0.35.tar.gz
+K/KI/KIMOTO/SPVM-0.9684.tar.gz
+C/CH/CHOROBA/Syntax-Construct-1.031.tar.gz
+A/AM/AMBS/Text-BibTeX-0.89.tar.gz
+T/TO/TOBYINK/TOBYINK-Test-Template-0.001000.tar.gz

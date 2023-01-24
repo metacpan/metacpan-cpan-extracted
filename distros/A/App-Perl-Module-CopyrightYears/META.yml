@@ -29,6 +29,7 @@ requires:
   File::Find::Rule: 0
   File::Spec::Functions: 0
   Getopt::Std: 0
+  IO::Barf: 0
   Perl6::Slurp: 0
   Pod::CopyrightYears: 0
   String::UpdateYears: 0
@@ -38,4 +39,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-Perl-Module-CopyrightYears
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-Perl-Module-CopyrightYears
-version: '0.01'
+version: '0.02'

@@ -1,5 +1,9 @@
 Revision history for CPAN-Upload-Tiny
 
+0.010     2023-01-24 17:14:30+01:00 Europe/Amsterdam
+          - Assume Term::ReadKey is always present
+          - Add missing documentation for new_from_config_or_stdin
+
 0.009     2018-12-16 16:31:13+01:00 Europe/Amsterdam
           - Add fallback to ask for credentials on command line
 

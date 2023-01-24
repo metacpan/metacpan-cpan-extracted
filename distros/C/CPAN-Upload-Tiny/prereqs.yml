@@ -1,0 +1,7 @@
+runtime:
+  requires:
+    Mozilla::CA: 0
+    IO::Socket::SSL: 1.56
+    Net::SSLeay: 1.49
+  suggests:
+    Config::Identity: 0

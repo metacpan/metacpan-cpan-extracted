@@ -1,0 +1,58 @@
+#<<<
+use strict; use warnings;
+#>>>
+
+use Config                        qw( %Config );
+use ExtUtils::MakeMaker::CPANfile qw( WriteMakefile );
+
+my %WriteMakefileArgs = (
+  NAME          => 'MooX::Role::HasLogger',
+  AUTHOR        => 'Sven Willenbuecher <sven.willenbuecher@gmx.de>',
+  VERSION_FROM  => 'lib/MooX/Role/HasLogger.pm',
+  ABSTRACT_FROM => 'lib/MooX/Role/HasLogger.pod',
+  LICENSE       => 'Perl_5',
+  META_MERGE    => {
+    'meta-spec' => { version => 2 },
+    resources   => {
+      repository => {
+        type => 'git',
+        url  => 'git://github.com/XSven/MooX-Role-HasLogger.git',
+        web  => 'https://github.com/XSven/MooX-Role-HasLogger',
+      },
+      bugtracker => {
+        web => 'https://github.com/XSven/MooX-Role-HasLogger/issues',
+      },
+    },
+  },
+  dist      => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+  clean     => { FILES    => 'MooX-Role-HasLogger-* cover_db' },
+  realclean => { FILES    => 'local' },
+);
+
+unless ( $Config{ osname } =~ m/\A(?:freebsd|openbsd|solaris)\z/ or exists( $ENV{ MAKELEVEL } ) ) {
+  my $local_lib = "$ENV{ PWD }/local/lib/perl5";
+  require lib; lib->import( $local_lib );
+
+  no warnings 'once';
+  *MY::postamble = sub {
+    my $make_fragment .= <<"MAKE_FRAGMENT";
+ifdef PERL5LIB
+  PERL5LIB := $local_lib:\$(PERL5LIB)
+else
+  export PERL5LIB := $local_lib
+endif
+
+.PHONY: installdeps
+installdeps: cpanfile
+	cpanm --no-man-pages --local-lib-contained $local_lib/../.. --installdeps .
+
+.PHONY: cover
+cover:
+	cover -test -ignore local -report vim
+MAKE_FRAGMENT
+
+    return $make_fragment;
+  }
+}
+
+WriteMakefile( %WriteMakefileArgs );
