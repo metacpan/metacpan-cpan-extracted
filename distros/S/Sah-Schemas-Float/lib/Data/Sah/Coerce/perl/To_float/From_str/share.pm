@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-22'; # DATE
+our $DATE = '2022-10-20'; # DATE
 our $DIST = 'Sah-Schemas-Float'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 sub meta {
     +{
@@ -55,7 +55,7 @@ Data::Sah::Coerce::perl::To_float::From_str::share
 
 =head1 VERSION
 
-This document describes version 0.012 of Data::Sah::Coerce::perl::To_float::From_str::share (from Perl distribution Sah-Schemas-Float), released on 2022-09-22.
+This document describes version 0.013 of Data::Sah::Coerce::perl::To_float::From_str::share (from Perl distribution Sah-Schemas-Float), released on 2022-10-20.
 
 =head1 DESCRIPTION
 

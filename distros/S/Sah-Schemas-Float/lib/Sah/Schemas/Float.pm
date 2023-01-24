@@ -3,9 +3,9 @@ package Sah::Schemas::Float;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-22'; # DATE
+our $DATE = '2022-10-20'; # DATE
 our $DIST = 'Sah-Schemas-Float'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas for various floating types
@@ -22,7 +22,7 @@ Sah::Schemas::Float - Sah schemas for various floating types
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schemas::Float (from Perl distribution Sah-Schemas-Float), released on 2022-09-22.
+This document describes version 0.013 of Sah::Schemas::Float (from Perl distribution Sah-Schemas-Float), released on 2022-10-20.
 
 =head1 SAH SCHEMAS
 

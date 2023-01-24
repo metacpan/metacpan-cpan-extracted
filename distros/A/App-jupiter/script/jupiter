@@ -591,6 +591,7 @@ sub entries {
   my $feeds = shift;
   my $limit = shift;
   my $date = DateTime->now(time_zone => 'UTC')->subtract( days => 90 ); # compute once
+  my $now =  DateTime->now(time_zone => 'UTC');
   my @entries;
   for my $feed (@$feeds) {
     next unless -r $feed->{cache_file};
@@ -615,6 +616,7 @@ sub entries {
       $entry->{date} = updated($_) || $undefined_date;
       $entry;
     } @nodes;
+    @candidates = grep { DateTime->compare($_->{date}, $now) <= 0 } @candidates;
     @candidates = unique(sort { DateTime->compare( $b->{date}, $a->{date} ) } @candidates);
     @candidates = @candidates[0 .. min($#candidates, $limit - 1)];
     # now that we have limited the candidates, let's add more metadata from the feed
@@ -654,7 +656,7 @@ sub add_age_warning {
 sub updated {
   my $node = shift;
   return unless $node;
-  my @nodes = $xpc->findnodes('pubDate | atom:updated', $node) or return;
+  my @nodes = $xpc->findnodes('pubDate | atom:published | atom:updated', $node) or return;
   my $date = $nodes[0]->textContent;
   my $dt = eval { DateTime::Format::Mail->parse_datetime($date) }
   || eval { DateTime::Format::ISO8601->parse_datetime($date) }

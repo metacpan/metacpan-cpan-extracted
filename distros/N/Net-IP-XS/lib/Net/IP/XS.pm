@@ -8,7 +8,7 @@ use 5.006;
 use Math::BigInt;
 use Tie::Simple;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 our $IP_NO_OVERLAP      = 0;
 our $IP_PARTIAL_OVERLAP = 1;
@@ -367,7 +367,7 @@ L<Net::IP|Net::IP>, L<IP::Authority|IP::Authority>.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (C) 2010-2018 Tom Harrison <tomhrr@cpan.org>.
+Copyright (C) 2010-2023 Tom Harrison <tomhrr@cpan.org>.
 
 Original inet_pton4 and inet_pton6 functions are copyright (C) 2006 
 Free Software Foundation.

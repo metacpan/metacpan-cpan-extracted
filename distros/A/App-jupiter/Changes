@@ -1,3 +1,12 @@
+1.06
+
+- atom:published takes precedence over atom:updated
+- Ignore blog posts with dates in the future
+
+1.05
+
+- Fix dependencies
+
 1.04
 
 - Add filters to the command line so that you can update just one

@@ -1,5 +1,8 @@
 Revision history for Net-IP-XS
 
+0.22    24 January 2023
+        - Fix uninitialised buffer problem (Github #4).
+
 0.21    5 February 2018
         - Avoid unnecessary calls to NI_ip_get_version when
           constructing objects (Github #2).

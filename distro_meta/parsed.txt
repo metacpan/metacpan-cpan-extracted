@@ -83312,3 +83312,6 @@ P/PE/PEVANS/Text-Treesitter-0.06.tar.gz
 T/TO/TODDR/Tie-File-1.06.tar.gz
 H/HA/HAUKEX/Tie-Handle-Base-0.18.tar.gz
 B/BO/BOOK/URI-Title-1.903.tar.gz
+S/SC/SCHROEDER/App-jupiter-1.06.tar.gz
+P/PE/PERLANCAR/Sah-Schemas-Float-0.013.tar.gz
+T/TO/TOMHRR/Net-IP-XS-0.22.tar.gz

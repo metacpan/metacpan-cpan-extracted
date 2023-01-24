@@ -1,10 +1,10 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::posint_or_posinf;
 
-our $DATE = '2022-09-22'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2022-10-20'; # DATE
+our $VERSION = '0.013'; # VERSION
 
-our $rschema = do{my$var={base=>"any",clsets_after_base=>[{description=>"\nCan be used to check value for number of items in a (possibly infinite)\nsequence.\n\n",examples=>[{valid=>0,value=>0},{valid=>0,value=>0.1},{valid=>1,value=>1},{valid=>0,value=>-0.1},{valid=>0,value=>-1},{valid=>1,value=>"Inf"},{valid=>0,value=>"-Inf"},{valid=>0,value=>"NaN"}],of=>[["posint",{},{}],["posinf",{},{}]],summary=>"Positive integer, or Inf"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["any"],type=>"any",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
+our $rschema = do{my$var={base=>"any",clsets_after_base=>[{description=>"\nCan be used to check value for number of items in a (possibly infinite)\nsequence.\n\n",examples=>[{valid=>0,value=>0},{valid=>0,value=>0.1},{valid=>1,value=>1},{valid=>0,value=>-0.1},{valid=>0,value=>-1},{valid=>1,value=>"Inf"},{valid=>0,value=>"-Inf"},{valid=>0,value=>"NaN"}],of=>[["posint",{}],["posinf",{}]],summary=>"Positive integer, or Inf"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["any"],type=>"any",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: Positive integer, or Inf
@@ -21,7 +21,7 @@ Sah::SchemaR::posint_or_posinf - Positive integer, or Inf
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::SchemaR::posint_or_posinf (from Perl distribution Sah-Schemas-Float), released on 2022-09-22.
+This document describes version 0.013 of Sah::SchemaR::posint_or_posinf (from Perl distribution Sah-Schemas-Float), released on 2022-10-20.
 
 =head1 DESCRIPTION
 

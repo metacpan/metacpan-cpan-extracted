@@ -1,7 +1,7 @@
 /*
 object.c - Functions for Net::IP::XS's object-oriented interface.
 
-Copyright (C) 2010-2018 Tom Harrison <tomhrr@cpan.org>
+Copyright (C) 2010-2023 Tom Harrison <tomhrr@cpan.org>
 Original inet_pton4, inet_pton6 are Copyright (C) 2006 Free Software
 Foundation.
 Original interface, and the auth and ip_auth functions, are Copyright
@@ -472,6 +472,7 @@ NI_print(SV *ipo, char *buf, int maxlen)
     const char *second_ip;
     int res;
     char mybuf[MAX_IPV6_STR_LEN];
+    mybuf[0] = '\0';
 
     is_prefix = NI_hv_get_iv(ipo, "is_prefix", 9);
 

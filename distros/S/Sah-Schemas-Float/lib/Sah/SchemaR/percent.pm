@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::percent;
 
-our $DATE = '2022-09-22'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2022-10-20'; # DATE
+our $VERSION = '0.013'; # VERSION
 
 our $rschema = do{my$var={base=>"float",clsets_after_base=>[{description=>"\nThis type is basically `float`, with `str_as_percent` coerce rule. So the\npercent sign is optional, but the number is always interpreted as percent, e.g.\n\"1\" is interpreted as 1% (0.01).\n\nIn general, instead of using this schema, I recommend just using the `float`\ntype (which by default includes coercion rule to convert from percent notation\ne.g. '1%' -> 0.01). Use this schema if your argument really needs to be\nexpressed in percents.\n\n",examples=>[{valid=>1,validated_value=>0,value=>0},{valid=>1,validated_value=>0.005,value=>0.5},{valid=>1,validated_value=>0.05,value=>5},{valid=>1,validated_value=>0.05,value=>"5%"}],summary=>"A float","x.perl.coerce_rules"=>["From_str::as_percent"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["float"],type=>"float",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::percent - A float
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::SchemaR::percent (from Perl distribution Sah-Schemas-Float), released on 2022-09-22.
+This document describes version 0.013 of Sah::SchemaR::percent (from Perl distribution Sah-Schemas-Float), released on 2022-10-20.
 
 =head1 DESCRIPTION
 

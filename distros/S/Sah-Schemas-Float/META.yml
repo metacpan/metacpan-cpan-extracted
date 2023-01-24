@@ -19,85 +19,85 @@ name: Sah-Schemas-Float
 provides:
   Data::Sah::Coerce::perl::To_float::From_str::as_percent:
     file: lib/Data/Sah/Coerce/perl/To_float/From_str/as_percent.pm
-    version: '0.012'
+    version: '0.013'
   Data::Sah::Coerce::perl::To_float::From_str::share:
     file: lib/Data/Sah/Coerce/perl/To_float/From_str/share.pm
-    version: '0.012'
+    version: '0.013'
   Sah::Schema::inf:
     file: lib/Sah/Schema/inf.pm
-    version: '0.012'
+    version: '0.013'
   Sah::Schema::int_or_inf:
     file: lib/Sah/Schema/int_or_inf.pm
-    version: '0.012'
+    version: '0.013'
   Sah::Schema::nan:
     file: lib/Sah/Schema/nan.pm
-    version: '0.012'
+    version: '0.013'
   Sah::Schema::negfloat:
     file: lib/Sah/Schema/negfloat.pm
-    version: '0.012'
+    version: '0.013'
   Sah::Schema::neginf:
     file: lib/Sah/Schema/neginf.pm
-    version: '0.012'
+    version: '0.013'
   Sah::Schema::percent:
     file: lib/Sah/Schema/percent.pm
-    version: '0.012'
+    version: '0.013'
   Sah::Schema::posfloat:
     file: lib/Sah/Schema/posfloat.pm
-    version: '0.012'
+    version: '0.013'
   Sah::Schema::posinf:
     file: lib/Sah/Schema/posinf.pm
-    version: '0.012'
+    version: '0.013'
   Sah::Schema::posint_or_posinf:
     file: lib/Sah/Schema/posint_or_posinf.pm
-    version: '0.012'
+    version: '0.013'
   Sah::Schema::share:
     file: lib/Sah/Schema/share.pm
-    version: '0.012'
+    version: '0.013'
   Sah::Schema::ufloat:
     file: lib/Sah/Schema/ufloat.pm
-    version: '0.012'
+    version: '0.013'
   Sah::Schema::uint_or_posinf:
     file: lib/Sah/Schema/uint_or_posinf.pm
-    version: '0.012'
+    version: '0.013'
   Sah::SchemaR::inf:
     file: lib/Sah/SchemaR/inf.pm
-    version: '0.012'
+    version: '0.013'
   Sah::SchemaR::int_or_inf:
     file: lib/Sah/SchemaR/int_or_inf.pm
-    version: '0.012'
+    version: '0.013'
   Sah::SchemaR::nan:
     file: lib/Sah/SchemaR/nan.pm
-    version: '0.012'
+    version: '0.013'
   Sah::SchemaR::negfloat:
     file: lib/Sah/SchemaR/negfloat.pm
-    version: '0.012'
+    version: '0.013'
   Sah::SchemaR::neginf:
     file: lib/Sah/SchemaR/neginf.pm
-    version: '0.012'
+    version: '0.013'
   Sah::SchemaR::percent:
     file: lib/Sah/SchemaR/percent.pm
-    version: '0.012'
+    version: '0.013'
   Sah::SchemaR::posfloat:
     file: lib/Sah/SchemaR/posfloat.pm
-    version: '0.012'
+    version: '0.013'
   Sah::SchemaR::posinf:
     file: lib/Sah/SchemaR/posinf.pm
-    version: '0.012'
+    version: '0.013'
   Sah::SchemaR::posint_or_posinf:
     file: lib/Sah/SchemaR/posint_or_posinf.pm
-    version: '0.012'
+    version: '0.013'
   Sah::SchemaR::share:
     file: lib/Sah/SchemaR/share.pm
-    version: '0.012'
+    version: '0.013'
   Sah::SchemaR::ufloat:
     file: lib/Sah/SchemaR/ufloat.pm
-    version: '0.012'
+    version: '0.013'
   Sah::SchemaR::uint_or_posinf:
     file: lib/Sah/SchemaR/uint_or_posinf.pm
-    version: '0.012'
+    version: '0.013'
   Sah::Schemas::Float:
     file: lib/Sah/Schemas/Float.pm
-    version: '0.012'
+    version: '0.013'
 requires:
   perl: '5.010001'
   strict: '0'
@@ -106,7 +106,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Float
   homepage: https://metacpan.org/release/Sah-Schemas-Float
   repository: git://github.com/perlancar/perl-Sah-Schemas-Float.git
-version: '0.012'
+version: '0.013'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -420,7 +420,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Sah::Schemas
               name: -Sah::Schemas
-              version: '0.070'
+              version: '0.072'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -

@@ -3,9 +3,9 @@ package Sah::Schema::posinf;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-22'; # DATE
+our $DATE = '2022-10-20'; # DATE
 our $DIST = 'Sah-Schemas-Float'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = [float => {
     summary   => 'Inf but not -Inf',
@@ -17,7 +17,7 @@ our $schema = [float => {
         {value=>"-Inf", valid=>0},
         {value=>"NaN", valid=>0},
     ],
-}, {}];
+}];
 
 1;
 # ABSTRACT: Inf but not -Inf
@@ -34,7 +34,7 @@ Sah::Schema::posinf - Inf but not -Inf
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schema::posinf (from Perl distribution Sah-Schemas-Float), released on 2022-09-22.
+This document describes version 0.013 of Sah::Schema::posinf (from Perl distribution Sah-Schemas-Float), released on 2022-10-20.
 
 =head1 SYNOPSIS
 
@@ -70,7 +70,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = 0;
+ $data = "-Inf";
  my $errmsg = $validator->($data); # => "Must a positive infinity"
 
 Often a schema has coercion rule or default value, so after validation the
@@ -85,8 +85,8 @@ prefiltered) value:
  my $res = $validator->($data); # => ["","Inf"]
  
  # a sample invalid data
- $data = 0;
- my $res = $validator->($data); # => ["Must a positive infinity",0]
+ $data = "-Inf";
+ my $res = $validator->($data); # => ["Must a positive infinity","-Inf"]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like
@@ -148,6 +148,23 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
+
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema:
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('$sch_name*', name=>'Posinf')
+     );
+ }
+
+ use My::Types qw(Posinf);
+ Posinf->assert_valid($data);
 
 =head1 HOMEPAGE
 

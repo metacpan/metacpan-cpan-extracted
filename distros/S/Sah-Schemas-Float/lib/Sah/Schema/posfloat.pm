@@ -3,9 +3,9 @@ package Sah::Schema::posfloat;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-22'; # DATE
+our $DATE = '2022-10-20'; # DATE
 our $DIST = 'Sah-Schemas-Float'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = [float => {
     summary   => 'Positive float',
@@ -22,7 +22,10 @@ _
         {value=>1, valid=>1},
         {value=>-0.1, valid=>0},
     ],
-}, {}];
+    links => [
+        {url=>'pm:Types::Numbers', summary=>'Equivalent Type::Tiny constraints: PositiveNum'},
+    ],
+}];
 
 1;
 # ABSTRACT: Positive float
@@ -39,7 +42,7 @@ Sah::Schema::posfloat - Positive float
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schema::posfloat (from Perl distribution Sah-Schemas-Float), released on 2022-09-22.
+This document describes version 0.013 of Sah::Schema::posfloat (from Perl distribution Sah-Schemas-Float), released on 2022-10-20.
 
 =head1 SYNOPSIS
 
@@ -69,11 +72,11 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = 0.1;
+ $data = 1;
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = -0.1;
+ $data = 0;
  my $errmsg = $validator->($data); # => "Must be larger than 0"
 
 Often a schema has coercion rule or default value, so after validation the
@@ -84,12 +87,12 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = 0.1;
- my $res = $validator->($data); # => ["",0.1]
+ $data = 1;
+ my $res = $validator->($data); # => ["",1]
  
  # a sample invalid data
- $data = -0.1;
- my $res = $validator->($data); # => ["Must be larger than 0",-0.1]
+ $data = 0;
+ my $res = $validator->($data); # => ["Must be larger than 0",0]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like
@@ -152,6 +155,23 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
 
  % ./myapp.pl --arg1 ...
 
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema:
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('$sch_name*', name=>'Posfloat')
+     );
+ }
+
+ use My::Types qw(Posfloat);
+ Posfloat->assert_valid($data);
+
 =head1 DESCRIPTION
 
 See also C<ufloat> for floats that are equal or larger than 0.
@@ -163,6 +183,10 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Float>.
+
+=head1 SEE ALSO
+
+L<Types::Numbers> - Equivalent Type::Tiny constraints: PositiveNum
 
 =head1 AUTHOR
 

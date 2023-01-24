@@ -3,14 +3,14 @@ package Sah::Schema::posint_or_posinf;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-22'; # DATE
+our $DATE = '2022-10-20'; # DATE
 our $DIST = 'Sah-Schemas-Float'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = [any => {
     of => [
-        ['posint', {}, {}],
-        ['posinf', {}, {}],
+        ['posint', {}],
+        ['posinf', {}],
     ],
     summary => 'Positive integer, or Inf',
     description => <<'_',
@@ -29,7 +29,7 @@ _
         {value=>"-Inf", valid=>0},
         {value=>"NaN", valid=>0},
     ],
-}, {}];
+}];
 
 1;
 # ABSTRACT: Positive integer, or Inf
@@ -46,7 +46,7 @@ Sah::Schema::posint_or_posinf - Positive integer, or Inf
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schema::posint_or_posinf (from Perl distribution Sah-Schemas-Float), released on 2022-09-22.
+This document describes version 0.013 of Sah::Schema::posint_or_posinf (from Perl distribution Sah-Schemas-Float), released on 2022-10-20.
 
 =head1 SYNOPSIS
 
@@ -166,6 +166,23 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
+
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema:
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('$sch_name*', name=>'PosintOrPosinf')
+     );
+ }
+
+ use My::Types qw(PosintOrPosinf);
+ PosintOrPosinf->assert_valid($data);
 
 =head1 DESCRIPTION
 

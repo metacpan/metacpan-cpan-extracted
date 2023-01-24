@@ -4,7 +4,7 @@
       "Alex Schroeder"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "agpl_3"
    ],
@@ -58,6 +58,6 @@
          "web" : "https://alexschroeder.ch/cgit/planet-jupiter/about/"
       }
    },
-   "version" : 1.05,
+   "version" : 1.06,
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

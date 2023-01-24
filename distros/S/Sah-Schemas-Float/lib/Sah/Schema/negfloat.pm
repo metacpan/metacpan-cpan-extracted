@@ -3,9 +3,9 @@ package Sah::Schema::negfloat;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-22'; # DATE
+our $DATE = '2022-10-20'; # DATE
 our $DIST = 'Sah-Schemas-Float'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = [float => {
     summary   => 'Negative float',
@@ -19,7 +19,11 @@ our $schema = [float => {
         {value=>-1, valid=>1},
     ],
 
-}, {}];
+    links => [
+        {url=>'pm:Types::Numbers', summary=>'Equivalent Type::Tiny constraints: NegativeNum'},
+    ],
+
+}];
 
 1;
 # ABSTRACT: Negative float
@@ -36,7 +40,7 @@ Sah::Schema::negfloat - Negative float
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schema::negfloat (from Perl distribution Sah-Schemas-Float), released on 2022-09-22.
+This document describes version 0.013 of Sah::Schema::negfloat (from Perl distribution Sah-Schemas-Float), released on 2022-10-20.
 
 =head1 SYNOPSIS
 
@@ -149,6 +153,23 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
 
  % ./myapp.pl --arg1 ...
 
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema:
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('$sch_name*', name=>'Negfloat')
+     );
+ }
+
+ use My::Types qw(Negfloat);
+ Negfloat->assert_valid($data);
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schemas-Float>.
@@ -156,6 +177,10 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Float>.
+
+=head1 SEE ALSO
+
+L<Types::Numbers> - Equivalent Type::Tiny constraints: NegativeNum
 
 =head1 AUTHOR
 

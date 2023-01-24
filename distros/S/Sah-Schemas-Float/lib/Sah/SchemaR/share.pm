@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::share;
 
-our $DATE = '2022-09-22'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2022-10-20'; # DATE
+our $VERSION = '0.013'; # VERSION
 
 our $rschema = do{my$var={base=>"float",clsets_after_base=>[{description=>"\nAccepted in one of these forms:\n\n    0.5      # a normal float between 0 and 1\n    10       # a float between 1 (exclusive) and 100, interpreted as percent\n    10%      # a percentage string, between 0% and 100%\n\nDue to different interpretations, particularly \"1\" (some people might expect it\nto mean \"0.01\" or \"1%\") use of this type is discouraged. Use\n<pm:Sah::Schema::percent> instead.\n\n",examples=>[{valid=>1,validated_value=>0,value=>0},{valid=>1,validated_value=>0.5,value=>0.5},{valid=>1,validated_value=>1,value=>1},{valid=>1,validated_value=>0.012,value=>1.2},{valid=>1,validated_value=>0.012,value=>"1.2%"},{valid=>0,value=>"102%"}],max=>1,min=>0,summary=>"A float between 0 and 1","x.perl.coerce_rules"=>["From_str::share"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["float"],type=>"float",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::share - A float between 0 and 1
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::SchemaR::share (from Perl distribution Sah-Schemas-Float), released on 2022-09-22.
+This document describes version 0.013 of Sah::SchemaR::share (from Perl distribution Sah-Schemas-Float), released on 2022-10-20.
 
 =head1 DESCRIPTION
 

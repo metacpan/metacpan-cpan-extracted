@@ -3,14 +3,14 @@ package Sah::Schema::int_or_inf;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-22'; # DATE
+our $DATE = '2022-10-20'; # DATE
 our $DIST = 'Sah-Schemas-Float'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = [any => {
     of => [
-        ['int', {}, {}],
-        ['inf', {}, {}],
+        ['int', {}],
+        ['inf', {}],
     ],
     summary => 'Integer, or Inf/-Inf',
     examples => [
@@ -23,7 +23,7 @@ our $schema = [any => {
         {value=>"-Inf", valid=>1},
         {value=>"NaN", valid=>0},
     ],
-}, {}];
+}];
 
 1;
 # ABSTRACT: Integer, or Inf/-Inf
@@ -40,7 +40,7 @@ Sah::Schema::int_or_inf - Integer, or Inf/-Inf
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schema::int_or_inf (from Perl distribution Sah-Schemas-Float), released on 2022-09-22.
+This document describes version 0.013 of Sah::Schema::int_or_inf (from Perl distribution Sah-Schemas-Float), released on 2022-10-20.
 
 =head1 SYNOPSIS
 
@@ -160,6 +160,23 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
+
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema:
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('$sch_name*', name=>'IntOrInf')
+     );
+ }
+
+ use My::Types qw(IntOrInf);
+ IntOrInf->assert_valid($data);
 
 =head1 HOMEPAGE
 

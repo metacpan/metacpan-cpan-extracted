@@ -3,9 +3,9 @@ package Sah::Schema::ufloat;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-22'; # DATE
+our $DATE = '2022-10-20'; # DATE
 our $DIST = 'Sah-Schemas-Float'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = [float => {
     summary   => 'Non-negative float',
@@ -22,7 +22,10 @@ _
         {value=>1, valid=>1},
         {value=>-0.1, valid=>0},
     ],
-}, {}];
+    links => [
+        {url=>'pm:Types::Numbers', summary=>'Equivalent Type::Tiny constraints: NegativeOrZeroNum'},
+    ],
+}];
 
 1;
 # ABSTRACT: Non-negative float
@@ -39,7 +42,7 @@ Sah::Schema::ufloat - Non-negative float
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schema::ufloat (from Perl distribution Sah-Schemas-Float), released on 2022-09-22.
+This document describes version 0.013 of Sah::Schema::ufloat (from Perl distribution Sah-Schemas-Float), released on 2022-10-20.
 
 =head1 SYNOPSIS
 
@@ -152,6 +155,23 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
 
  % ./myapp.pl --arg1 ...
 
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema:
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('$sch_name*', name=>'Ufloat')
+     );
+ }
+
+ use My::Types qw(Ufloat);
+ Ufloat->assert_valid($data);
+
 =head1 DESCRIPTION
 
 See also C<posfloat> for floats that are larger than 0.
@@ -163,6 +183,10 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Float>.
+
+=head1 SEE ALSO
+
+L<Types::Numbers> - Equivalent Type::Tiny constraints: NegativeOrZeroNum
 
 =head1 AUTHOR
 

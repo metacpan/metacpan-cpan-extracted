@@ -33,7 +33,7 @@ You can also look for information at:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2010-2018 Tom Harrison <tomhrr@cpan.org>.
+Copyright (C) 2010-2023 Tom Harrison <tomhrr@cpan.org>.
 
 Original inet_pton4 and inet_pton6 functions are copyright (C) 2006
 Free Software Foundation.

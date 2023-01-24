@@ -3,14 +3,14 @@ package Sah::Schema::uint_or_posinf;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-22'; # DATE
+our $DATE = '2022-10-20'; # DATE
 our $DIST = 'Sah-Schemas-Float'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = [any => {
     of => [
-        ['uint', {}, {}],
-        ['posinf', {}, {}],
+        ['uint', {}],
+        ['posinf', {}],
     ],
     summary => 'Unsigned integer, or Inf',
     description => <<'_',
@@ -29,7 +29,7 @@ _
         {value=>"-Inf", valid=>0},
         {value=>"NaN", valid=>0},
     ],
-}, {}];
+}];
 
 1;
 # ABSTRACT: Unsigned integer, or Inf
@@ -46,7 +46,7 @@ Sah::Schema::uint_or_posinf - Unsigned integer, or Inf
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schema::uint_or_posinf (from Perl distribution Sah-Schemas-Float), released on 2022-09-22.
+This document describes version 0.013 of Sah::Schema::uint_or_posinf (from Perl distribution Sah-Schemas-Float), released on 2022-10-20.
 
 =head1 SYNOPSIS
 
@@ -84,7 +84,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "Inf";
+ $data = 0;
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
@@ -99,8 +99,8 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "Inf";
- my $res = $validator->($data); # => ["","Inf"]
+ $data = 0;
+ my $res = $validator->($data); # => ["",0]
  
  # a sample invalid data
  $data = -0.1;
@@ -166,6 +166,23 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
+
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema:
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('$sch_name*', name=>'UintOrPosinf')
+     );
+ }
+
+ use My::Types qw(UintOrPosinf);
+ UintOrPosinf->assert_valid($data);
 
 =head1 DESCRIPTION
 

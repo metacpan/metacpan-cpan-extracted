@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::Float - Sah schemas for various floating types
 
 VERSION
-    This document describes version 0.012 of Sah::Schemas::Float (from Perl
-    distribution Sah-Schemas-Float), released on 2022-09-22.
+    This document describes version 0.013 of Sah::Schemas::Float (from Perl
+    distribution Sah-Schemas-Float), released on 2022-10-20.
 
 SAH SCHEMAS
     The following schemas are included in this distribution:

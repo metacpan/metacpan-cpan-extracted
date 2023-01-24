@@ -3,9 +3,9 @@ package Sah::Schema::share;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-22'; # DATE
+our $DATE = '2022-10-20'; # DATE
 our $DIST = 'Sah-Schemas-Float'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = ['float', {
     summary => 'A float between 0 and 1',
@@ -36,7 +36,7 @@ _
         {value=>'1.2%', valid=>1, validated_value=>0.012},
         {value=>'102%', valid=>0},
     ],
-}, {}];
+}];
 
 1;
 # ABSTRACT: A float between 0 and 1
@@ -53,7 +53,7 @@ Sah::Schema::share - A float between 0 and 1
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schema::share (from Perl distribution Sah-Schemas-Float), released on 2022-09-22.
+This document describes version 0.013 of Sah::Schema::share (from Perl distribution Sah-Schemas-Float), released on 2022-10-20.
 
 =head1 SYNOPSIS
 
@@ -87,7 +87,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = 0;
+ $data = "1.2%";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
@@ -102,8 +102,8 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = 0;
- my $res = $validator->($data); # => ["",0]
+ $data = "1.2%";
+ my $res = $validator->($data); # => ["",0.012]
  
  # a sample invalid data
  $data = "102%";
@@ -169,6 +169,23 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
+
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema:
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('$sch_name*', name=>'Share')
+     );
+ }
+
+ use My::Types qw(Share);
+ Share->assert_valid($data);
 
 =head1 DESCRIPTION
 
