@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-RJBS
 
+5.023     2023-01-26 09:49:07-05:00 America/New_York
+        - improvements to workflow installed by "dzil workflower"
+
 5.022     2023-01-08 21:02:28-05:00 America/New_York
         - require a newer [ReportPrereqs] to get perl version in report
         - add experimental "dzil workflower" to install a GitHub Actions

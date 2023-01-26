@@ -1,6 +1,6 @@
 package Lab::Connection::VISA;
 #ABSTRACT: VISA-type connection
-$Lab::Connection::VISA::VERSION = '3.840';
+$Lab::Connection::VISA::VERSION = '3.841';
 use v5.20;
 
 use strict;
@@ -50,7 +50,7 @@ Lab::Connection::VISA - VISA-type connection
 
 =head1 VERSION
 
-version 3.840
+version 3.841
 
 =head1 SYNOPSIS
 
@@ -112,7 +112,7 @@ Probably few. Mostly because there's not a lot to be done here. Please report.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2010       Andreas K. Huettel
             2011       Andreas K. Huettel, Florian Olbrich

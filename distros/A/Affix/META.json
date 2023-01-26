@@ -44,7 +44,7 @@
             "IO::Uncompress::Unzip" : "0",
             "JSON::PP" : "2",
             "Module::Build::Tiny" : "0.035",
-            "Path::Tiny" : "0"
+            "Path::Tiny" : "0.144"
          }
       },
       "develop" : {
@@ -87,7 +87,11 @@
    "provides" : {
       "Affix" : {
          "file" : "lib/Affix.pm",
-         "version" : "0.08"
+         "version" : "0.09"
+      },
+      "Affix::Feature" : {
+         "file" : "lib/Affix.pm",
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -102,7 +106,7 @@
          "web" : "https://github.com/sanko/Affix.pm"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_authority" : "cpan:SANKO",
    "x_serialization_backend" : "JSON::PP version 4.12",
    "x_static_install" : 0

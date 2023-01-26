@@ -31,9 +31,9 @@ my $meta = {
                                          },
                           },
   "provides"           => {
-                            "Dist::Inktly::Bovine"  => { file => "lib/Dist/Inktly/Bovine.pm", version => 0.004 },
-                            "Dist::Inktly::Cervine" => { file => "lib/Dist/Inktly/Cervine.pm", version => 0.004 },
-                            "Dist::Inktly::Minty"   => { file => "lib/Dist/Inktly/Minty.pm", version => 0.004 },
+                            "Dist::Inktly::Bovine"  => { file => "lib/Dist/Inktly/Bovine.pm", version => 0.005 },
+                            "Dist::Inktly::Cervine" => { file => "lib/Dist/Inktly/Cervine.pm", version => 0.005 },
+                            "Dist::Inktly::Minty"   => { file => "lib/Dist/Inktly/Minty.pm", version => 0.005 },
                           },
   "release_status"     => "stable",
   "resources"          => {
@@ -47,7 +47,7 @@ my $meta = {
                                             },
                             x_identifier => "http://purl.org/NET/cpan-uri/dist/Dist-Inktly-Minty/project",
                           },
-  "version"            => 0.004,
+  "version"            => 0.005,
   "x_provides_scripts" => { "distinkt-mint" => { file => "bin/distinkt-mint" } },
 };
 

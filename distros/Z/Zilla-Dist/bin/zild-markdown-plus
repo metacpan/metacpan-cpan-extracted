@@ -7,7 +7,6 @@ use Zilla::Dist;
 use IO::All;
 
 my $o = Zilla::Dist->get_meta;
-$o->{name_underline} = '=' x length($o->{name});
 
 sub main {
     my $text = io('-')->utf8->all;
@@ -44,9 +43,13 @@ sub macro {
 }
 
 sub do_doc_head {
+    my ($class, $name) = (@_);
+    $name //= $o->{name};
+    my $name_underline = '=' x length($name);
+
     return <<"...";
-$o->{name}
-$o->{name_underline}
+$name
+$name_underline
 
 $o->{abstract}
 ...

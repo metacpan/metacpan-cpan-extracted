@@ -21,6 +21,6 @@ tmux new-window -d -n test -t "${project_name}"
 
 tmux send-keys -t "${project_name}:git" "git status" Enter
 tmux send-keys -t "${project_name}:edit" "vim -c NERDTree" Enter
-tmux send-keys -t "${project_name}:test" "export TEST_AUTHOR=1; export RELEASE_TESTING=1; [[ -f ./Build ]] && ./Build distclean; perl ./Build.PL && ./Build && run.prove" Enter
+tmux send-keys -t "${project_name}:test" "export TEST_AUTHOR=1; export RELEASE_TESTING=1; [[ -f ./Build ]] && ./Build distclean; perl ./Build.PL && ./Build && scripts/run.prove" Enter
 
 tmux attach-session -t "${project_name}"

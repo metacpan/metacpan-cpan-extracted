@@ -3,9 +3,9 @@ package Sah::Schema::hexbuf;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-25'; # DATE
+our $DATE = '2022-10-20'; # DATE
 our $DIST = 'Sah-Schemas-Binary'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 our $schema = [str => {
     summary => 'Binary data encoded in hexdigits, e.g. "fafafa" or "ca fe 00"',
@@ -17,7 +17,9 @@ our $schema = [str => {
 
 Whitespaces are allowed and will be removed.
 
-Note that this schema does not decode the hex encoding for you.
+Note: that this schema does not decode the hex encoding for you.
+
+Note: if you add clauses like `leng`, `min_len`, `max_len`
 
 _
 
@@ -28,6 +30,9 @@ _
         {value=>'FAFAFA', valid=>1, summary=>'Uppercase digits are allowed, not coerced to lowercase'},
         {value=>'fa fa  fa', valid=>1, summary=>'Whitespaces allowed, will be removed', validated_value=>'fafafa'},
         {value=>'fafafg', valid=>0},
+    ],
+    links => [
+        {url=>'pm:Types::XSD', summary=>"Equivalent Type::Tiny constraints: HexBinary (doesn't allow whitespace; length, minLength, maxLength params checks the /decoded/ length)"},
     ],
 }];
 
@@ -47,7 +52,7 @@ Sah::Schema::hexbuf - Binary data encoded in hexdigits, e.g. "fafafa" or "ca fe 
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::Schema::hexbuf (from Perl distribution Sah-Schemas-Binary), released on 2022-09-25.
+This document describes version 0.008 of Sah::Schema::hexbuf (from Perl distribution Sah-Schemas-Binary), released on 2022-10-20.
 
 =head1 SYNOPSIS
 
@@ -81,7 +86,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "fafafa";
+ $data = "FAFAFA";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
@@ -96,8 +101,8 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "fafafa";
- my $res = $validator->($data); # => ["","fafafa"]
+ $data = "FAFAFA";
+ my $res = $validator->($data); # => ["","FAFAFA"]
  
  # a sample invalid data
  $data = "fafafg";
@@ -164,11 +169,30 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
 
  % ./myapp.pl --arg1 ...
 
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema:
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('$sch_name*', name=>'Hexbuf')
+     );
+ }
+
+ use My::Types qw(Hexbuf);
+ Hexbuf->assert_valid($data);
+
 =head1 DESCRIPTION
 
 Whitespaces are allowed and will be removed.
 
-Note that this schema does not decode the hex encoding for you.
+Note: that this schema does not decode the hex encoding for you.
+
+Note: if you add clauses like C<leng>, C<min_len>, C<max_len>
 
 =head1 HOMEPAGE
 
@@ -177,6 +201,10 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Binary>.
+
+=head1 SEE ALSO
+
+L<Types::XSD> - Equivalent Type::Tiny constraints: HexBinary (doesn't allow whitespace; length, minLength, maxLength params checks the E<sol>decodedE<sol> length)
 
 =head1 AUTHOR
 

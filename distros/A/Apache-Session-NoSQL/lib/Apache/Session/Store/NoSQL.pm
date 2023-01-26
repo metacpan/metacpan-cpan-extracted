@@ -55,6 +55,8 @@ __END__
 
 Apache::Session::Store::NoSQL
 
+Note: this module is deprecated, Prefer L<Apache::Session::Browseable>
+
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION

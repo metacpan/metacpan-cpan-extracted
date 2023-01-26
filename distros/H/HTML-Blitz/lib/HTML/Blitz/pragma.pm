@@ -12,7 +12,7 @@ no indirect ':fatal';
 
 use Carp ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 method import($class: @items) {
     for my $item (@items) {

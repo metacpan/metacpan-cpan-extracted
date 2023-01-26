@@ -1,5 +1,5 @@
 package Lab::Moose::DataFile;
-$Lab::Moose::DataFile::VERSION = '3.840';
+$Lab::Moose::DataFile::VERSION = '3.841';
 #ABSTRACT: Base class for data file types
 
 use v5.20;
@@ -174,7 +174,7 @@ Lab::Moose::DataFile - Base class for data file types
 
 =head1 VERSION
 
-version 3.840
+version 3.841
 
 =head1 METHODS
 
@@ -237,7 +237,7 @@ path relative to the current working directory.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt

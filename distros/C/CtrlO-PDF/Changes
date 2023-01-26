@@ -1,8 +1,11 @@
 Revision history for CtrlO::PDF
 
-0.21 Tues Sep 14 2021
+0.30 Mon Jan 20 2023
 
-    * Fix exception when logo has fractional dimensions
+    * Remove support for PDF::API2, greatly simplifying the code
+    * Remove requirement for PDF::TextBlock, use PDF::Builder instead
+    * Fix inability to use negative values when setting y position
+    * Round top margin to whole number
 
 0.20 Mon Feb 1 2021
 

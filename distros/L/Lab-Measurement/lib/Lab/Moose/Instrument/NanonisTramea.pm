@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::NanonisTramea;
-$Lab::Moose::Instrument::NanonisTramea::VERSION = '3.840';
+$Lab::Moose::Instrument::NanonisTramea::VERSION = '3.841';
 #ABSTRACT: Nanonis Tramea
 
 use v5.20;
@@ -10,6 +10,8 @@ use MooseX::Params::Validate;
 use Carp;
 use PDL::Core;
 use PDL::IO::CSV ":all";
+use List::Util qw(max);
+use Lab::Moose;
 use Lab::Moose::Instrument qw/
     validated_getter validated_setter/;
 extends 'Lab::Moose::Instrument';
@@ -68,12 +70,24 @@ sub  nt_header {
 sub _end_of_com
 {
   my $self = shift;
-  my $response = $self->binary_read();
-  my $response_bodysize = unpack("N!",substr($response,36,4));
-  if($response_bodysize>0)
-  {
-    print(substr($response,40,$response_bodysize)."\n");
+  my $response = $self->tramea_read();
+  if(length($response)==40){
+    my $response_bodysize = unpack("N!",substr($response,32,4));
+    if($response_bodysize>0)
+    {
+      print(substr($response,40,$response_bodysize)."\n");
+      die  "(Proto) Error returned by nanonis software"
+    }
   }
+  return $response
+}
+
+sub tramea_read {
+  my $self = shift;
+  my $head = $self->binary_read(read_length=>40);
+  my $body_length = unpack("N!", substr $head,32,4);
+  my $body = $self->binary_read(read_length=>$body_length);
+  return $head.$body;
 }
 
 
@@ -126,7 +140,7 @@ sub oneDSwp_AcqChsSet {
         push @channels,$_;
     }
     my $command_name="1dswp.acqchsset";
-    my $bodysize= (2 + $#channels)*4;
+    my $bodysize= (1 + scalar(@channels))*4;
     my $head= $self->nt_header($command_name,$bodysize,0);
     #Create body
     my $body= nt_int($#channels+1);
@@ -144,7 +158,7 @@ sub oneDSwp_AcqChsGet {
     my $head= $self->nt_header($command_name,$bodysize,1);
     $self->write(command=>$head);
 
-    my $return = $self->binary_read();
+    my $return = $self->tramea_read();
     my $channelNum = unpack("N!",substr $return,40,4);
     my @channels = $self->intArrayUnpacker($channelNum,(substr $return,44));
     return(@channels);
@@ -169,12 +183,12 @@ sub oneDSwp_SwpSignalGet {
     my $command_name="1dswp.swpsignalget";
     my $head= $self->nt_header($command_name,0,1);
     $self->write(command=>$head);
-    my $response = $self->binary_read();
+    my $response = $self->tramea_read();
     my $strlen= unpack("N!",substr $response,40,4);
 
     if (($option eq "select") == 1){
         my $selected = substr $response,44,$strlen;
-        print($selected,"\n");
+        # print($selected,"\n");
     }
     elsif (($option eq "info")==1){
       my $elementNum = unpack("N!", substr $response,48+$strlen,4);
@@ -205,8 +219,8 @@ sub oneDSwp_LimitsGet {
   my $rbodysize = 8;
   my $head= $self->nt_header($command_name,$bodysize,1);
   $self->write(command=>$head);
-  my $return = $self->binary_read();
-  $return = $self->binary_read();
+  my $return = $self->tramea_read();
+  $return = $self->tramea_read();
   my $Lower_limit= substr $return,40,4;
   $Lower_limit= unpack("f>",$Lower_limit);
   my $Upper_limit= substr $return,44,4;
@@ -237,7 +251,7 @@ sub oneDSwp_PropsGet {
   my $head= $self->nt_header($command_name,$bodysize,1);
   $self->write(command=>$head);
 
-  my $return = $self->binary_read(); 
+  my $return = $self->tramea_read(); 
   my $Initial_Settling_time_ms= substr $return,40,4;
   $Initial_Settling_time_ms= unpack("f>",$Initial_Settling_time_ms);
   my $s= substr $return,44,4;
@@ -348,10 +362,6 @@ sub threeDSwp_AcqChsSet {
   }
   $self->write(command=>$header.$body);
   $self->_end_of_com();
-  #This sleep here solves "some issue" with threeDSwp_AcqChsSet, 
-  #even if it sends a response baclo, software bhaves wierdly if another command is sent too soon
-  #sleep(0.1);
-
 }
 
 sub threeDSwp_AcqChsGet {
@@ -360,7 +370,7 @@ sub threeDSwp_AcqChsGet {
   my $command_name = "3dswp.acqchsget";
   $self->write(command=>$self->nt_header($command_name,0,1));
 
-  my $return= $self->binary_read();
+  my $return= $self->tramea_read();
   my $Number_of_Channels = unpack("N!", substr($return,40,4));
   my $pos = 4*($Number_of_Channels);
   my @indexes = $self->intArrayUnpacker($Number_of_Channels,substr($return,44,$pos));
@@ -426,13 +436,12 @@ sub threeDSwp_SaveOptionsSet {
     $body = $body.nt_int($buffer_size);
     $body = $body.nt_int(scalar(@Modules_Names));
     $body = $body.$buffer_body;
-    $bodysize += 8 + $buffer_size;
+    $bodysize += $buffer_size;
   }
   else
   {
     $body= $body.nt_int(0).nt_int(0);
   }
-  
   $self->write(command=>$self->nt_header($command_name,$bodysize,1).$body);
   $self->_end_of_com();
 }
@@ -442,7 +451,7 @@ sub threeDSwp_SaveOptionsGet {
     my $command_name = "3dswp.saveoptionsget";
     $self->write(command=>$self->nt_header($command_name,0,1));
 
-    my $return = $self->binary_read();
+    my $return = $self->tramea_read();
     my $pos = unpack("N!",substr($return,40,4));
     my $Series_Name = substr($return,44,$pos);
     $pos+=44;
@@ -490,7 +499,7 @@ sub threeDSwp_StatusGet {
   my $bodysize = 0;
   my $head= $self->nt_header($command_name,$bodysize,1);
   $self->write(command=>$head);
-  my $return = $self->binary_read(); 
+  my $return = $self->tramea_read(); 
   my $Status= substr $return,40,4;
   $Status= unpack("N",$Status);
   return($Status);
@@ -525,7 +534,7 @@ sub threeDSwp_SwpChLimitsGet {
   my $bodysize = 0;
   my $head= $self->nt_header($command_name,$bodysize,1);
   $self->write(command=>$head);
-  my $return = $self->binary_read(); 
+  my $return = $self->tramea_read(); 
   my $Start= substr $return,40,4;
   $Start= unpack("f>",$Start);
   my $Stop= substr $return,44,4;
@@ -555,7 +564,7 @@ sub threeDSwp_SwpChPropsGet {
   my $bodysize = 0;
   my $head= $self->nt_header($command_name,$bodysize,1);
   $self->write(command=>$head);
-  my $return = $self->binary_read(); 
+  my $return = $self->tramea_read(); 
   my $Number_of_points= substr $return,40,4;
   $Number_of_points= unpack("N!",$Number_of_points);
   my $Number_of_sweeps= substr $return,44,4;
@@ -576,13 +585,14 @@ sub threeDSwp_SwpChTimingSet {
   my ($Initial_settling_time_s,$Settling_time_s,$Integration_time_s,$End_settling_time_s,$Maximum_slw_rate)= @_;
   my $command_name= "3dswp.swpchtimingset";
   my $bodysize = 20;
-  my $head= $self->nt_header($command_name,$bodysize,0);
+  my $head= $self->nt_header($command_name,$bodysize,1);
   my $body=nt_float32($Initial_settling_time_s);
   $body=$body.nt_float32($Settling_time_s);
   $body=$body.nt_float32($Integration_time_s);
   $body=$body.nt_float32($End_settling_time_s);
   $body=$body.nt_float32($Maximum_slw_rate);
   $self->write(command=>$head.$body);
+  $self->_end_of_com();
 }
 
 sub threeDSwp_SwpChTimingGet {
@@ -591,7 +601,7 @@ sub threeDSwp_SwpChTimingGet {
   my $bodysize = 0;
   my $head= $self->nt_header($command_name,$bodysize,1);
   $self->write(command=>$head);
-  my $return = $self->binary_read(); 
+  my $return = $self->tramea_read(); 
   my $Initial_settling_time_s= substr $return,40,4;
   $Initial_settling_time_s= unpack("f>",$Initial_settling_time_s);
   my $Settling_time_s= substr $return,44,4;
@@ -620,7 +630,7 @@ sub threeDSwp_SwpChModeGet {
   my $command_name = "3dswp.swpchmodeget";
   my $head = $self->nt_header($command_name,0,1);
   $self->write(command=>$head);
-  my $return= $self->binary_read();
+  my $return= $self->tramea_read();
   return substr($return,44,unpack("N!",substr($return,40,4)));
 }
 
@@ -653,7 +663,7 @@ sub threeDSwp_StpCh1LimitsGet {
   my $bodysize = 0;
   my $head= $self->nt_header($command_name,$bodysize,1);
   $self->write(command=>$head);
-  my $return = $self->binary_read(); 
+  my $return = $self->tramea_read(); 
   my $Start= substr $return,40,4;
   $Start= unpack("f>",$Start);
   my $Stop= substr $return,44,4;
@@ -681,7 +691,7 @@ sub threeDSwp_StpCh1PropsGet {
   my $bodysize = 0;
   my $head= $self->nt_header($command_name,$bodysize,1);
   $self->write(command=>$head);
-  my $return = $self->binary_read(); 
+  my $return = $self->tramea_read(); 
   my $Number_of_points= substr $return,40,4;
   $Number_of_points= unpack("N!",$Number_of_points);
   my $Backward_sweep= substr $return,44,4;
@@ -703,6 +713,7 @@ sub threeDSwp_StpCh1TimingSet {
   $body=$body.nt_float32($End_settling_time_s);
   $body=$body.nt_float32($Maximum_slw_rate);
   $self->write(command=>$head.$body);
+  $self->_end_of_com();
 }
 
 sub threeDSwp_StpCh1TimingGet {
@@ -711,7 +722,7 @@ sub threeDSwp_StpCh1TimingGet {
   my $bodysize = 0;
   my $head= $self->nt_header($command_name,$bodysize,1);
   $self->write(command=>$head);
-  my $return = $self->binary_read(); 
+  my $return = $self->tramea_read(); 
   my $Initial_settling_time_s= substr $return,40,4;
   $Initial_settling_time_s= unpack("f>",$Initial_settling_time_s);
   my $End_settling_time_s= substr $return,44,4;
@@ -739,7 +750,7 @@ sub threeDSwp_StpCh2SignalGet {
   my $command_name = "3dswp.stpch2signalget";
   my $head = $self->nt_header($command_name,0,1);
   $self->write(command=>$head);
-  my $return= $self->binary_read();
+  my $return= $self->tramea_read();
   return substr($return,44,unpack("N!",substr($return,40,4)));
 }
 
@@ -761,7 +772,7 @@ sub threeDSwp_StpCh2LimitsGet {
   my $bodysize = 0;
   my $head= $self->nt_header($command_name,$bodysize,1);
   $self->write(command=>$head);
-  my $return = $self->binary_read(); 
+  my $return = $self->tramea_read(); 
   my $Start= substr $return,40,4;
   $Start= unpack("f>",$Start);
   my $Stop= substr $return,44,4;
@@ -789,7 +800,7 @@ sub threeDSwp_StpCh2PropsGet {
   my $bodysize = 0;
   my $head= $self->nt_header($command_name,$bodysize,1);
   $self->write(command=>$head);
-  my $return = $self->binary_read(); 
+  my $return = $self->tramea_read(); 
   my $Number_of_points= substr $return,40,4;
   $Number_of_points= unpack("N!",$Number_of_points);
   my $Backward_sweep= substr $return,44,4;
@@ -819,7 +830,7 @@ sub threeDSwp_StpCh2TimingGet {
   my $bodysize = 0;
   my $head= $self->nt_header($command_name,$bodysize,1);
   $self->write(command=>$head);
-  my $return = $self->binary_read(); 
+  my $return = $self->tramea_read(); 
   my $Initial_settling_time_s= substr $return,40,4;
   $Initial_settling_time_s= unpack("f>",$Initial_settling_time_s);
   my $End_settling_time_s= substr $return,44,4;
@@ -851,7 +862,7 @@ sub threeDSwp_TimingRowLimitGet {
   my $head= $self->nt_header($command_name,$bodysize,1);
   $self->write(command=>$head.nt_int($Row_index));
 
-  my $return = $self->binary_read();
+  my $return = $self->tramea_read();
   my $Maximum_time= unpack("f>",substr($return,40,4));
   my $Channel_index = unpack("N!",substr($return,44,4));
   my $Channel_names_size = unpack("N!",substr($return,48,4));
@@ -884,7 +895,7 @@ sub threeDSwp_TimingRowMethodsGet {
   my $head= $self->nt_header($command_name,$bodysize,1);
   my $body=nt_int($Row_index);
   $self->write(command=>$head.$body);
-  my $return = $self->binary_read(); 
+  my $return = $self->tramea_read(); 
   my $Method_lower= substr $return,40,4;
   $Method_lower= unpack("N!",$Method_lower);
   my $Method_middle= substr $return,44,4;
@@ -923,14 +934,13 @@ sub threeDSwp_TimingRowValsGet {
   my $head= $self->nt_header($command_name,$bodysize,1);
   my $body=nt_int($Row_index);
   $self->write(command=>$head.$body);
-  my $return = $self->binary_read(); 
+  my $return = $self->tramea_read(); 
   my $MR_from= unpack("d>",substr($return,40,8));
   my $LR_value = unpack("d>",substr($return,48,8));
   my $MR_value = unpack("d>",substr($return,56,8));
   my $MR_to = unpack("d>",substr($return,64,8));
   my $UR_value = unpack("d>",substr($return,72,8));
   my $AR_value = unpack("d>",substr($return,80,8));
-  print(unpack("d>",substr($return,88,8))."\n");
   return($MR_from,$LR_value,$MR_value,$MR_to,$UR_value,$AR_value);
 
 }
@@ -959,7 +969,7 @@ sub threeDSwp_FilePathsGet {
   my $command_name = "3dswp.filepathsget";
   my $head = 
   $self->write(command=>$self->nt_header($command_name,0,1));
-  my $response = $self->binary_read();
+  my $response = $self->tramea_read();
   my $strArraySize = unpack("N!", substr $response,40,4);
   my $strNumber = unpack("N!", substr $response, 44, 4 );
   my $strArray = substr $response,48,$strArraySize;
@@ -975,7 +985,7 @@ sub Signals_NamesGet {
 
   $self->write(command=>$head);
 
-  my $response =$self->read();
+  my $response =$self->tramea_read();
   my $strArraySize = unpack("N!", substr $response,40,4);
   my $strNumber = unpack("N!", substr $response, 44, 4 );
   my $strArray = substr $response,48,$strArraySize;
@@ -1000,7 +1010,7 @@ sub Signals_InSlotsGet {
   my $head = $self->nt_header($command_name,0,1);
   $self->write(command=>$head);
 
-  my $response = $self->binary_read();
+  my $response = $self->tramea_read();
   my $namesSize= unpack("N!",substr $response,40,4);
   my $namesNumber= unpack("N!",substr $response,44,4);
   my %Strings = $self->strArrayUnpacker($namesNumber,substr($response,48,$namesSize));
@@ -1020,7 +1030,7 @@ sub Signals_CalibrGet {
   my $head= $self->nt_header($command_name,$bodysize,1);
   my $body=nt_int($Signal_index);
   $self->write(command=>$head.$body);
-  my $return = $self->binary_read(); 
+  my $return = $self->tramea_read(); 
   my $Calibration_per_volt= substr $return,40,4;
   $Calibration_per_volt= unpack("f>",$Calibration_per_volt);
   my $Offset_in_physical_units= substr $return,44,4;
@@ -1036,7 +1046,7 @@ sub Signals_RangeGet {
   my $head= $self->nt_header($command_name,$bodysize,1);
   my $body=nt_int($Signal_index);
   $self->write(command=>$head.$body);
-  my $return = $self->binary_read(); 
+  my $return = $self->tramea_read(); 
   my $Maximum_limit= substr $return,40,4;
   $Maximum_limit= unpack("f>",$Maximum_limit);
   my $Minimum_limit= substr $return,44,4;
@@ -1053,7 +1063,7 @@ sub Signals_ValGet {
   my $body=nt_int($Signal_index);
   $body=$body.nt_uint32($Wait_for_newest_data);
   $self->write(command=>$head.$body);
-  my $return = $self->binary_read(); 
+  my $return = $self->tramea_read(); 
   my $Signal_value= substr $return,40,4;
   $Signal_value= unpack("f>",$Signal_value);
   return($Signal_value);
@@ -1085,7 +1095,7 @@ sub Signals_ValsGet {
 
   $self->write(command=>$head.$body);
 
-  my $response = $self->binary_read();
+  my $response = $self->tramea_read();
   my $valuesSize = unpack("N!", substr $response,40,4);
   my @floatArray = $self->float32ArrayUnpacker($valuesSize,substr($response,44,$valuesSize*4));
   return @floatArray;
@@ -1097,7 +1107,7 @@ sub Signals_MeasNamesGet {
   my $bodysize = 0;
   my $head= $self->nt_header($command_name,$bodysize,1);
   $self->write(command=>$head);
-  my $response = $self->read();
+  my $response = $self->tramea_read();
   my $channelSize= unpack("N!",substr $response,40,4);
   my $channelNum= unpack("N!",substr $response,44,4);
   my $strArray = substr $response,48,$channelSize;
@@ -1112,7 +1122,7 @@ sub Signals_AddRTGet() {
   my $head = $self->nt_header($command_name,0,1);
   $self->write(command=>$head);
 
-  my $response = $self->binary_read();
+  my $response = $self->tramea_read();
   my $namesSize = unpack("N!",substr $response,40,4);
   my $namesNumber = unpack("N!",substr $response,44,4);
   my %addRtArray = $self->strArrayUnpacker($namesNumber,substr($response,48,$namesSize));
@@ -1163,7 +1173,7 @@ sub UserOut_ModeGet {
   my $head= $self->nt_header($command_name,$bodysize,1);
   my $body=nt_int($Output_index);
   $self->write(command=>$head.$body);
-  my $return = $self->binary_read(); 
+  my $return = $self->tramea_read(); 
   my $Output_mode= substr $return,40,2;
   $Output_mode= unpack("n",$Output_mode);
   return($Output_mode);
@@ -1189,7 +1199,7 @@ sub UserOut_MonitorChGet {
   my $head= $self->nt_header($command_name,$bodysize,1);
   my $body=nt_int($Output_index);
   $self->write(command=>$head.$body);
-  my $return = $self->binary_read(); 
+  my $return = $self->tramea_read(); 
   my $Monitor_channel_index= substr $return,40,4;
   $Monitor_channel_index= unpack("N!",$Monitor_channel_index);
   return($Monitor_channel_index);
@@ -1239,7 +1249,7 @@ sub UserOut_CalcSignalNameGet {
 
   $self->write(command=>$self->nt_header($command_name,4,1).nt_int($output_index));
 
-  my $return = $self->binary_read();
+  my $return = $self->tramea_read();
   my $strLen = unpack("N!",substr($return,40,4));
   return substr $return,44,$strLen;
 
@@ -1271,7 +1281,7 @@ sub UserOut_CalcSignalConfigGet {
   my $head= $self->nt_header($command_name,$bodysize,1);
   my $body=nt_int($Output_index);
   $self->write(command=>$head.$body);
-  my $return = $self->binary_read(); 
+  my $return = $self->tramea_read(); 
   my $Operation_1= substr $return,40,2;
   $Operation_1= unpack("n",$Operation_1);
   my $Value_1= substr $return,42,4;
@@ -1310,7 +1320,7 @@ sub UserOut_LimitsGet {
   my $head= $self->nt_header($command_name,$bodysize,1);
   my $body=nt_int($Output_index);
   $self->write(command=>$head.$body);
-  my $return = $self->binary_read(); 
+  my $return = $self->tramea_read(); 
   my $Upper_limit= substr $return,40,4;
   $Upper_limit= unpack("f>",$Upper_limit);
   my $Lower_limit= substr $return,44,4;
@@ -1336,7 +1346,7 @@ sub UserOut_SlewRateGet {
   my $head= $self->nt_header($command_name,$bodysize,1);
   my $body=nt_int($Output_index);
   $self->write(command=>$head.$body);
-  my $return = $self->binary_read(); 
+  my $return = $self->tramea_read(); 
   my $Slew_Rate= substr $return,40,8;
   $Slew_Rate= unpack("d>",$Slew_Rate);
   return($Slew_Rate);
@@ -1377,7 +1387,7 @@ sub DigLines_TTLValGet {
 
   $self->write(command=>$head.nt_uint16($port));
 
-  my $return = $self->binary_read();
+  my $return = $self->tramea_read();
 
   my $intArraySize = unpack("N!",substr($return,40,4));
   my @intArray = $self->intArrayUnpacker($intArraySize,substr($return,44,$intArraySize*4));
@@ -1411,7 +1421,7 @@ sub Util_SessionPathGet {
     my $head = $self->nt_header($command_name,0,1);
     $self->write(command=>$head);
 
-    my $response = $self->binary_read();
+    my $response = $self->tramea_read();
     return substr $response,44,unpack("N!",substr $response,40,4);
 }
 
@@ -1460,7 +1470,7 @@ sub Util_SettingsSave {
   my $head = $self->nt_header($command_name,$bodysize,1);
   my $body = pack("N!",length($path)).$path.pack("N",$Automatic_save);
   $self->write( command => $head.$body);
-  print($self->binary_read());
+  $self->_end_of_com();
 }
 
 sub Util_LayoutLoad {
@@ -1495,7 +1505,7 @@ sub Util_LayoutSave {
   my $head = $self->nt_header($command_name,$bodysize,1);
   my $body = pack("N!",length($path)).$path.pack("N",$Automatic_save);
   $self->write( command => $head.$body);
-  print($self->binary_read());
+  $self->_end_of_com()
 }
 
 sub Util_Lock {
@@ -1530,7 +1540,7 @@ sub Util_RTFreqGet {
   my $bodysize = 0;
   my $head= $self->nt_header($command_name,$bodysize,1);
   $self->write(command=>$head);
-  my $return = $self->binary_read(); 
+  my $return = $self->tramea_read(); 
   my $RT_frequency= substr $return,40,4;
   $RT_frequency= unpack("f>",$RT_frequency);
   return($RT_frequency);
@@ -1552,7 +1562,7 @@ sub Util_AcqPeriodGet {
   my $bodysize = 0;
   my $head= $self->nt_header($command_name,$bodysize,1);
   $self->write(command=>$head);
-  my $return = $self->binary_read(); 
+  my $return = $self->tramea_read(); 
   my $Acquisition_Period_s= substr $return,40,4;
   $Acquisition_Period_s= unpack("f>",$Acquisition_Period_s);
   return($Acquisition_Period_s);
@@ -1574,7 +1584,7 @@ sub Util_RTOversamplGet {
   my $bodysize = 0;
   my $head= $self->nt_header($command_name,$bodysize,1);
   $self->write(command=>$head);
-  my $return = $self->binary_read(); 
+  my $return = $self->tramea_read(); 
   my $RT_oversampling= substr $return,40,4;
   $RT_oversampling= unpack("N!",$RT_oversampling);
   return($RT_oversampling);
@@ -1588,10 +1598,60 @@ sub File_datLoad {
   my $command_name = "file.datload";
   my $bodysize = 8 + length($file_path);
   my $head = $self->nt_header($command_name,$bodysize,1);
+  # MISSING: Do not try to read column names and data if you are not asking for it 
   $self->write(command=>$head.nt_int(length($file_path)).$file_path.nt_int($header_only));
-  print($self->binary_read());
+
+  my $result_head = $self->read(read_length=>40);
+  my $result_size = unpack("N!",substr $result_head,32,4);
+
+  my $result = $self->read(read_length=>$result_size);
+  my $Channel_names_size = unpack('N!', substr $result,0,4);
+  my $Name_number = unpack('N!', substr $result,4,4);
+  my $raw_names = substr $result,8,$Channel_names_size;
+  my %Channel_names = $self->strArrayUnpacker($Name_number,$raw_names);
+
+  $result = substr($result,-1*(length($result)-8-$Channel_names_size));
+
+  my $Data_rows  = unpack("N!",substr($result,0,4));
+  my $Data_cols  = unpack ("N!",substr($result,4,8));
+  my $Data_size  = 4*$Data_cols*$Data_rows;
+  my @float2Darray = $self->float32ArrayUnpacker($Data_cols*$Data_rows,substr($result,8,$Data_size));
+
+  my @channel_names;
+  my $pdl = zeros($Data_rows,$Data_cols);
+  for(my $index = 0;$index <=max(keys %Channel_names);$index++){  
+    push @channel_names,$Channel_names{$index};
+  }
+  my $row_num = 0 ;
+  my $col_num = 0 ;
+  for (my $index = 0; $index< scalar(@float2Darray);$index++){
+    $pdl->slice("$row_num,$col_num") .=$float2Darray[$index];
+    $col_num+=1;
+    if(($index+1)%$Data_cols == 0){
+      $row_num+=1;
+      $col_num = 0 ;
+    }
+  }
 
 
+  # Header Stuff
+  #Return hash (?)
+  my %head;
+
+  $result = substr($result,-1*(length($result)-8-$Data_size));
+  my $Header_rows = unpack("N!", substr $result,0,4);
+  my $Header_col = unpack("N!", substr $result,4,4);
+  my %strings = $self->strArrayUnpacker($Header_rows*$Header_col-1,substr $result,-1*(length($result)-8));
+  my $value_buffer="";
+  for(my $index = 0; $index <= max(keys %strings)-1;$index+=$Header_col)
+  {
+    for(my $idx2 = 1; $idx2<$Header_col;$idx2++){
+      $value_buffer = $value_buffer.$strings{$index+$idx2};
+    }
+    $head{$strings{$index}} = $value_buffer;
+    $value_buffer ="";
+  }
+  return $pdl,\@channel_names,\%head,
 }
 
 
@@ -1617,6 +1677,29 @@ has sweep_prop_configuration => (
     writer => '_sweep_prop_configuration',
     builder => '_build_sweep_prop_configuration',
 );
+
+has sweep_timing_configuration =>(
+    is=>'rw',
+    isa => 'HashRef',
+    reader => 'sweep_timing_configuration',
+    writer => '_sweep_timing_configuration',
+    builder => '_build_sweep_timing_configuration',
+    clearer =>'reset_swp_timing',
+    lazy => 1
+
+);
+
+sub _build_sweep_timing_configuration {
+  my $self = shift ;
+  my %hash;
+  my @values = $self->threeDSwp_SwpChTimingGet();
+  $hash{initial_settling_time} = $values[0];
+  $hash{settling_time} = $values[1];
+  $hash{integration_time} = $values[2];
+  $hash{end_settling_time} = $values[3];
+  $hash{Maximum_slew_rate} = $values[4];
+  return \%hash;
+}
 
 sub _build_sweep_prop_configuration {
   my $self = shift;
@@ -1684,6 +1767,28 @@ sub _build_step1_prop_configuration {
   return \%hash;
 }
 
+has step1_timing_configuration =>(
+    is=>'rw',
+    isa => 'HashRef',
+    reader => 'step1_timing_configuration',
+    writer => '_step1_timing_configuration',
+    builder => '_build_step1_timing_configuration',
+    clearer =>'reset_stp1_timing',
+    lazy => 1
+
+);
+
+sub _build_step1_timing_configuration {
+  my $self = shift ;
+  my %hash;
+  my @values = $self->threeDSwp_StpCh1TimingGet;
+  $hash{initial_settling_time} = $values[0];
+  $hash{end_settling_time} = $values[1];
+  $hash{Maximum_slew_rate} = $values[2];
+  return \%hash;
+}
+
+
 has step2_prop_configuration => (
     is=>'rw',
     isa => 'HashRef',
@@ -1701,6 +1806,28 @@ sub _build_step2_prop_configuration {
   $hash{at_end_val}=0;
   return \%hash;
 }
+
+has step2_timing_configuration =>(
+    is=>'rw',
+    isa => 'HashRef',
+    reader => 'step2_timing_configuration',
+    writer => '_step2_timing_configuration',
+    builder => '_build_step2_timing_configuration',
+    clearer =>'reset_stp2_timing',
+    lazy => 1
+
+);
+
+sub _build_step2_timing_configuration {
+  my $self = shift ;
+  my %hash;
+  my @values = $self->threeDSwp_StpCh2TimingGet;
+  $hash{initial_settling_time} = $values[0];
+  $hash{end_settling_time} = $values[1];
+  $hash{Maximum_slew_rate} = $values[2];
+  return \%hash;
+}
+
 
 has sweep_save_configuration => (
     is=>'rw',
@@ -1745,49 +1872,46 @@ sub set_Session_Path {
   }
 }
 
-#Prototype for a file cat
 
-sub get_filenames {
-  my($self,%params)= validated_hash(
-    \@_,
-    series_name=> {isa=>"Str", optional=>1},
-    session_path => {isa=>"Str",optional=>1}, 
-    );
-  	if(exists($params{session_path}))
-    {
-      $self->set_Session_Path(value=>$params{session_path});
-    } 
-    if($self->Session_Path() ne '')
-    {
-      opendir my $filedir, $self->Session_Path or die "Can not open directory";
-      my @files = readdir $filedir;
-      my @selected_files;
-      if(exists($params{series_name}))
-      {
-        foreach(@files)
-        {
-          if($_ =~ /^($params{series_name})\d{5}(.dat)/)
-           {
-            push  @selected_files, $_;
-           }
-        }
-        return @selected_files; 
-      }
-      else
-      {
-        foreach(@files)
-        {
-          if($_ =~ /[\w\d]\d{5}(.dat)/)
-           {
-            push  @selected_files, $_;
-           }
-        }
-        return @selected_files;
-      }
-  }
-  else
-  {
-    die "Error: Session_Path is not set";
+sub load_data {
+ my($self,%params) = validated_hash(
+  \@_,
+  file_origin => {isa=>"Str"},
+  return_head => {isa=>"Bool", default => 0},
+  return_colnames => {isa=>"Bool", default => 1},
+  return_raw => {isa =>"Bool",default =>0}
+ );
+ my %to_return;
+ my ($pdl,$cols_ref,$head) = $self->File_datLoad($params{file_origin},0);
+
+ if($params{return_raw} == 1){
+  #this shall return a string version of the parsed data
+ }
+ else{
+    $to_return{pdl}= $pdl;
+    if ($params{return_head} == 1){
+
+      $to_return{cols}=$cols_ref;
+    }
+    if ($params{return_colnames} == 1){
+
+      $to_return{header}=$head;
+
+    }
+    return \%to_return;  
+ }
+
+}
+
+sub parse_last_measurement {
+  my ($self,%params) = validated_hash(\@_,
+      folder=>{isa=>'Lab::Moose::DataFolder'});
+  my %files = $self->threeDSwp_FilePathsGet();
+  foreach(keys %files){
+    my ($filename) = $files{$_} =~ m/([ \w-]+\.dat)/g;
+    my $data_hash = $self->load_data(file_origin => $files{$_},return_head=>1,return_colnames=>1);
+    my $new_datafile = datafile(filename => $filename,folder=>$params{folder},columns=>$data_hash->{cols});
+    $new_datafile->log_block(block=>$data_hash->{pdl});
   }
 }
 
@@ -1812,11 +1936,94 @@ sub sweep_save_configure {
     die "Invalid create_date value in sweep_save_configure: value must be -1,0 or 1!"
   }
 
-  $self->_sweep_save_configuration(\%params); 
+  $self->_sweep_save_configuration(\%params);
   $self->threeDSwp_SaveOptionsSet($params{series_name},
                                   $params{create_datetime},
                                   $params{comment})
 }
+
+sub sweep_timing_configure {
+  my ($self, %params) =  validated_hash(
+  \@_,
+  initial_settling_time =>{isa=>"Num",optional =>1},
+  settling_time => {isa =>"Num",optional =>1}, 
+  integration_time=> {isa=>"Num",optional =>1},
+  end_settling_time => {isa =>"Num",optional =>1},
+  maximum_slew_rate =>{isa =>"Num",optional =>1}
+  );
+  # NOTE : Here some validation may be necessary, Nanonis does not returrn error if Value is invalid 
+  if(!exists($params{initial_settling_time})){
+      $params{initial_settling_time} = $self->sweep_timing_configuration()->{initial_settling_time};
+  };
+  if(!exists($params{settling_time})){
+      $params{settling_time} = $self->sweep_timing_configuration()->{settling_time};
+  };
+  if(!exists($params{integration_time})){
+      $params{integration_time} = $self->sweep_timing_configuration()->{integration_time};
+  };
+  if(!exists($params{end_settling_time})){
+      $params{end_settling_time} = $self->sweep_timing_configuration()->{end_settling_time};
+  };
+  if(!exists($params{maximum_slew_rate})){
+      $params{maximum_slew_rate} = $self->sweep_timing_configuration()->{maximum_slew_rate};
+  };
+  $self->reset_swp_timing;
+  $self->threeDSwp_SwpChTimingSet( $params{initial_settling_time},
+                                   $params{settling_time},
+                                   $params{integration_time},
+                                   $params{end_settling_time}, 
+                                   $params{maximum_slew_rate})
+
+}
+
+sub step1_timing_configure {
+  my ($self, %params) =  validated_hash(
+  \@_,
+  initial_settling_time =>{isa=>"Num",optional =>1},
+  end_settling_time => {isa =>"Num",optional =>1},
+  maximum_slew_rate =>{isa =>"Num",optional =>1}
+  );
+  # NOTE : Here some validation may be necessary, Nanonis does not returrn error if Value is invalid 
+  if(!exists($params{initial_settling_time})){
+      $params{initial_settling_time} = $self->step1_timing_configuration()->{initial_settling_time};
+  };
+  if(!exists($params{end_settling_time})){
+      $params{end_settling_time} = $self->step1_timing_configuration()->{end_settling_time};
+  };
+  if(!exists($params{maximum_slew_rate})){
+      $params{maximum_slew_rate} = $self->step1_timing_configuration()->{maximum_slew_rate};
+  };
+  $self->reset_stp1_timing;
+  $self->threeDSwp_StpCh1TimingSet( $params{initial_settling_time},
+                                   $params{end_settling_time}, 
+                                   $params{maximum_slew_rate})
+}
+
+sub step2_timing_configure {
+  my ($self, %params) =  validated_hash(
+  \@_,
+  initial_settling_time =>{isa=>"Num",optional =>1},
+  end_settling_time => {isa =>"Num",optional =>1},
+  maximum_slew_rate =>{isa =>"Num",optional =>1}
+  );
+  # NOTE : Here some validation may be necessary, Nanonis does not returrn error if Value is invalid 
+  if(!exists($params{initial_settling_time})){
+      $params{initial_settling_time} = $self->step2_timing_configuration()->{initial_settling_time};
+  };
+  if(!exists($params{end_settling_time})){
+      $params{end_settling_time} = $self->step2_timing_configuration()->{end_settling_time};
+  };
+  if(!exists($params{maximum_slew_rate})){
+      $params{maximum_slew_rate} = $self->step2_timing_configuration()->{maximum_slew_rate};
+  };
+  $self->reset_stp2_timing;
+  $self->threeDSwp_StpCh1TimingSet( $params{initial_settling_time},
+                                   $params{end_settling_time}, 
+                                   $params{maximum_slew_rate})
+}
+
+
+
 
 sub sweep_prop_configure {
   my $self= shift;
@@ -1955,7 +2162,7 @@ sub step2_prop_configure {
                                   $params{at_end_val});  
 }
 
-sub sweep {
+sub nanonis_sweep {
   my ($self, %params) = validated_hash(
     \@_,
     sweep_channel => {isa => "Int"},
@@ -2027,7 +2234,7 @@ sub sweep {
 
 
   # PARAMETER CONTROLL FOR Step channel 2
-  if(exists($params{step2_channel_idx})&&exists($params{step2_channel_name}))
+  if(exists($params{step2_channel_idx}) && exists($params{step2_channel_name}))
   {
     croak "Supply either step2_channel_idx or step2_channel_name";
   }
@@ -2092,79 +2299,82 @@ sub sweep {
     $self->sweep_save_configure(comment=>$params{comment});
   }
   $self->threeDSwp_AcqChsSet($params{aquisition_channels});
+  # Still unclear what is happenig here  ://///// 
+  # Can not find it, report may be needed
+  sleep(1);
   $self->threeDSwp_Start();
-
   while($self->threeDSwp_StatusGet()!=0 && $self->threeDSwp_StatusGet()!=2)
   {
     sleep(0.1);
   }
 }
+### To be deprecated!
 
-sub to_pdl_1D{
-    my ($self,%params) =  validated_hash(
-      \@_,
-      file_name=>{isa => "Str"},
-      session_path=>{isa => "Str", optional =>1},
-    );
+# sub to_pdl_1D{
+#     my ($self,%params) =  validated_hash(
+#       \@_,
+#       file_name=>{isa => "Str"},
+#       session_path=>{isa => "Str", optional =>1},
+#     );
 
-    #check for file existence
-    if(exists($params{session_path}))
-    {
-      $self->set_Session_Path(value=>$params{session_path});
-    } 
-    if($self->Session_Path() ne '')
-    {
-      if(-s $self->Session_Path().'/'.$params{file_name})
-      {
-        my $startdata = 0;
-        my @x_col = ();
-        my @y_col  = ();
-        my $EOF=1; 
-        my $buffer_line;
-        my @col_names;
-        my @cols;
-        open(my $fa,'<',$self->Session_Path().'/'.$params{file_name});
-        while($EOF)
-        {
-          $buffer_line=<$fa>;
-          if($buffer_line)
-          {
-              if ($buffer_line =~ /(\[DATA])/){
-                  $buffer_line = <$fa>;
-                  @col_names = (split "\t",$buffer_line);
-                  $buffer_line=<$fa>;
-                  $startdata = 1;
-              }
-              if ($startdata==1){ 
-                  my @buffer = split(" ",$buffer_line);
+#     #check for file existence
+#     if(exists($params{session_path}))
+#     {
+#       $self->set_Session_Path(value=>$params{session_path});
+#     } 
+#     if($self->Session_Path() ne '')
+#     {
+#       if(-s $self->Session_Path().'/'.$params{file_name})
+#       {
+#         my $startdata = 0;
+#         my @x_col = ();
+#         my @y_col  = ();
+#         my $EOF=1; 
+#         my $buffer_line;
+#         my @col_names;
+#         my @cols;
+#         open(my $fa,'<',$self->Session_Path().'/'.$params{file_name});
+#         while($EOF)
+#         {
+#           $buffer_line=<$fa>;
+#           if($buffer_line)
+#           {
+#               if ($buffer_line =~ /(\[DATA])/){
+#                   $buffer_line = <$fa>;
+#                   @col_names = (split "\t",$buffer_line);
+#                   $buffer_line=<$fa>;
+#                   $startdata = 1;
+#               }
+#               if ($startdata==1){ 
+#                   my @buffer = split(" ",$buffer_line);
 
-                  for(my $index=0;$index<scalar(@buffer);$index++)
-                  {
-                    push(@{$cols[$index]},$buffer[$index]);
-                  }
-              }
-          }
-          else
-          {
-              $EOF=0;
-          }
-        }
-        close($fa);
-        #my $new_pdl = pdl(pdl(@x_col),pdl(@y_col));
-        my $new_pdl = pdl(@cols);
-        return $new_pdl,@col_names; 
-      }
-      else
-      {
-        die "File not found at ".$self->Session_Path()."/".$params{file_name};
-      }
-    }
-    else
-    {
-      die "Error: Session_Path is not set";
-    }
-  return 0;
-  }
+#                   for(my $index=0;$index<scalar(@buffer);$index++)
+#                   {
+#                     push(@{$cols[$index]},$buffer[$index]);
+#                   }
+#               }
+#           }
+#           else
+#           {
+#               $EOF=0;
+#           }
+#         }
+#         close($fa);
+#         #my $new_pdl = pdl(pdl(@x_col),pdl(@y_col));
+#         my $new_pdl = pdl(@cols);
+#         return $new_pdl,@col_names; 
+#       }
+#       else
+#       {
+#         die "File not found at ".$self->Session_Path()."/".$params{file_name};
+#       }
+#     }
+#     else
+#     {
+#       die "Error: Session_Path is not set";
+#     }
+#   return 0;
+#   }
  
 __PACKAGE__->meta()->make_immutable();
 
@@ -2182,7 +2392,7 @@ Lab::Moose::Instrument::NanonisTramea - Nanonis Tramea
 
 =head1 VERSION
 
-version 3.840
+version 3.841
 
 =head1 SYNOPSIS
 
@@ -2277,7 +2487,7 @@ C<float32_array> refers to float32 array binary.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2022       Andreas K. Huettel, Erik Fabrizzi, Simon Reinhardt
 

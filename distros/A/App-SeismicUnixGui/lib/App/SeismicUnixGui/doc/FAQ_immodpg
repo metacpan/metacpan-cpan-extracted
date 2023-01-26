@@ -1,0 +1,146 @@
+ Notes: 
+ 1- We omit the *.pm extensions from perl classes.
+  2- We use indentations to suggest order of succession among classes and methods.
+ 
+ Q. Where is configuration file (imodpg.config)  created?
+ A1. When immodpg is selected in GUI
+ A2. When immodpg.pl is run from command line (TODO)
+ 
+ Q. What sequence of methods is followed to read the configuration file?
+     immodpg.pl
+     	immodpg_config
+     		get_values
+     			config_superflows
+     				get_values 
+     				get_local_or_defaults
+     					big_streams_param,get
+							get extends su_param,get
+                      			su_param reads variables using readfiles.pm
+               						readfiles.pm,configs reads in values
+               						
+    Q.  What sequence of methods is followed to write/save the configuration file?
+    A. the sequence is:  
+    	main; 
+    		L_SU,save_button; 
+    			save_button,director,_Save_pre_built_superflow
+    				config_superflows,save;
+ 			   			save 
+ 			   			  files_LSU,check2write,
+ 			   			            ,_write or copy_default_config
+ 			   			
+ 	Q. How many windows are used by immodpg?
+ 	A. Two. One window is a PerlTk-based gui and the other is handled independently by a 
+ 	fortran program (immodpg1.1).  The fortran program uses the pgplot library to interactively
+ 	update the image of the seismic data.
+ 			   			
+ 	Q. Are immpodpg.pl (PerlTkgui) and immodpg1.1 (fortran executable) dependent? 
+ 	A. Yes, indirectly, via messages contained in files within an invisible work directory (.immodpg)
+ 	However, changes in the PerlTk gui generate messages that the fortran program can read.
+ 	These messages instruct the ray-tracing calculations and interactive pgplot screen 
+ 	
+ 	Q. What method sequence is followed to check for changes to the PerlTk gui values, 
+ 	
+ 	e.g., when there is a change in Vincrement:
+ 	
+ 	mmodpg:
+ 	     setVincrement
+ 	   	_setVincrement( $immodpg->{_Vincrement_current} );
+		_set_option($changeVincrement_opt);
+		_set_change($yes);
+	
+		
+	e.g., when there is a change in the number of the working layer:
+	(Note that the layer number can only be changed manually)
+	
+	main
+		_setlayer
+ 	
+ 		mmodpg:
+ 	    	set_layer
+				_check_layer();
+				_update_layer_in_gui();
+				_update_upper_layer_in_gui();
+				_update_lower_layer_in_gui();
+			
+	e.g., In 4 instances, for the case of Vbot:
+		a. Then we either enter or leave the Vbot Entry widget in main
+		main
+			_setVbot
+				immodpg
+	      	   		setVbot
+	      	   			_checkVbot();
+		                _updateVbot();
+
+	           			If there is a change in Vbot value,
+	           			we write out message files for fortran program
+	           				_setVbot
+	           				_set_option
+	           				_set_change
+	           				
+	      b. When we change Vbot by clicking the "+" or "-" buttons e.g., 
+	      for the case of Vbot minus or Vbot plus:
+	      main
+	      	_setVbot_plus
+	   			immodpg
+	      	   		setVbot_plus
+	      	   			_updateVbot()
+	      	   			
+Q. Where do you control for errors in the model?
+
+a. When the model is first read in
+	immodpg in both 
+	   _get_initial_model4gui as well as  _get_initial_model. In both cases:
+	   error checking is achieved by:
+	   
+			_set_model_control
+			$error_switch = _get_model_control();
+
+b. Each time a user updates the value in the gui. These values can be the 
+parameters that control the image appearance and rates of change (e.g.
+velocity increment, or image clip, or the thickness increment). For example
+if  the clip value is altered:
+	main
+	_set_clip
+		immodpg
+			set_clip
+				_check_clip();
+				_update_clip();
+				_write_config();
+				
+				(if there is a change detected, the value is update in a private hash
+				and a message is written out for the
+				fortran program which is  listening)
+				_set_clip( $immodpg->{_clip4plot_current} );
+				_set_option($change_clip_opt);
+				_set_change($yes);
+
+These values can also be the values for the velocity and layer thickness.
+For example, if the Vbot value is changed:
+
+	main
+		_setVbot
+			immodpg
+				setVbot
+					( check for changes to Vbot ...)
+					_checkVbot();
+					_updateVbot();
+						(check for errors ...
+						_set_control
+						_get_control
+						( before updating the values in
+						an extra name space ...)
+							_setVp_dz
+							
+			    ( ... if there is a change detected, 				
+				   check for errors again ...)
+					_set_control
+					_get_control
+					
+			    ( ... and write a message to the
+				  fortran program which is  listening.)			 
+				_setVbot( $immodpg->{_Vbot_current} );
+				_set_option($Vbot_opt);
+				_set_change($yes);
+				
+Q. How is the binary image created?
+A. in premmod

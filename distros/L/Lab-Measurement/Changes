@@ -4,6 +4,10 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.841 2023-01-25
+  * Nanonis Tramea: More functionality (timing, data transfer)
+  * Lakeshore 372: Fixes
+
 3.840 2022-12-12
   * New driver (work in progress): ProStep4 step motor
   * New driver (work in progress): HP83732A signal generator

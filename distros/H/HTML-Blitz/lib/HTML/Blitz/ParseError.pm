@@ -6,7 +6,7 @@ package HTML::Blitz::ParseError;
 use HTML::Blitz::pragma;
 use overload fallback => 1, '""' => method (@) { $self->to_string };
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 method new($class:
     :$src_name,

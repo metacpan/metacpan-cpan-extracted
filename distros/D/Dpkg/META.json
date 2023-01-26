@@ -76,7 +76,7 @@
       },
       "Dpkg::BuildFlags" : {
          "file" : "lib/Dpkg/BuildFlags.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       },
       "Dpkg::BuildInfo" : {
          "file" : "lib/Dpkg/BuildInfo.pm",
@@ -411,6 +411,6 @@
          "web" : "https://git.dpkg.org/cgit/dpkg/dpkg.git"
       }
    },
-   "version" : "v1.21.14",
+   "version" : "v1.21.19",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

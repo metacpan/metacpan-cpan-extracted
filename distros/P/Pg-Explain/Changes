@@ -1,5 +1,9 @@
 Revision history for Pg-Explain
 
+2.6     2023/01/26
+        - Fix handling of Planning I/O timings
+          per report from Christoph Berg
+
 2.5     2023/01/16
         - Fix handling of non-ascii characters in json and yaml plans
           per report from James Courtney

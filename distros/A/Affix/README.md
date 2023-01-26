@@ -20,6 +20,8 @@ print $bar->( 'Baz', 3.14 );
 
 sub bar : Native('libfoo') : Signature([Str, Float] => Double);
 print bar( 'Baz', 10.9 );
+
+# bind to exported values
 ```
 
 # DESCRIPTION
@@ -840,6 +842,21 @@ declaration is straightforward:
 ```
 TODO
 ```
+
+# Features
+
+Not all features of dyncall are supported on all platforms, for those, the
+underlying library defines macros you can use to detect support. These values
+are exposed under the `Affix::Feature` package:
+
+- `Affix::Feature::Syscall()`
+
+    If true, your platform supports a syscall calling conventions.
+
+- `Affix::Feature::AggrByVal()`
+
+    If true, your platform supports passing around aggregates (struct, union) by
+    value.
 
 # See Also
 

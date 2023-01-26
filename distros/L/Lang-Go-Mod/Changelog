@@ -8,5 +8,11 @@
   - Add some metadata for metacpan
 
 0.004 2021-07-29
-- Merge https://github.com/bradclawsie/Lang-Go-Mod/pull/1 for
-  comment processing
+  - Merge https://github.com/bradclawsie/Lang-Go-Mod/pull/1 for
+    comment processing
+
+0.006 2023-01-16
+  - Add support for "retract" sections
+
+0.007 2023-01-25
+  - Documentation updates

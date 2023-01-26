@@ -3,7 +3,7 @@ use base qw{DBIx::Array};
 use strict;
 use warnings;
 
-our $VERSION='0.64';
+our $VERSION='0.65';
 our $PACKAGE=__PACKAGE__;
 
 =head1 NAME
@@ -169,27 +169,17 @@ Switch out L<XML::Simple> for L<XML::LibXML::LazyBuilder>
 
 =head1 BUGS
 
-Send email to author and log on RT.
-
-=head1 SUPPORT
-
-DavisNetworks.com supports all Perl applications big or small.
+Please open on GitHub
 
 =head1 AUTHOR
 
   Michael R. Davis
-  CPAN ID: MRDVT
-  STOP, LLC
-  domain=>stopllc,tld=>com,account=>mdavis
-  http://www.stopllc.com/
 
 =head1 COPYRIGHT
 
-This program is free software licensed under the...
+MIT License
 
-  The BSD License
-
-The full text of the license can be found in the LICENSE file included with this module.
+Copyright (c) 2023 Michael R. Davis
 
 =head1 SEE ALSO
 

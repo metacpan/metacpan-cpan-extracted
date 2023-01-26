@@ -4,7 +4,7 @@
 use v5.12;
 
 package Graphics::Toolkit::Color;
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Carp;
 use Graphics::Toolkit::Color::Constant ':all';
@@ -195,8 +195,10 @@ sub blend_with {
     new( __PACKAGE__, { H => $hsl[0], S => $hsl[1], L => $hsl[2] });
 }
 
+# for compatibility
+sub gradient_to { hsl_gradient_to( @_ ) }
 
-sub gradient_to {
+sub hsl_gradient_to {
     my ($self, $c2, $steps, $power) = @_;
     return carp "need color object or definition as first argument" unless defined $c2;
     $c2 = (ref $c2 eq __PACKAGE__) ? $c2 : _new_from_scalar( $c2 );
@@ -217,6 +219,27 @@ sub gradient_to {
                     $self->lightness  + ($pos * $delta_hsl[2]));
         @hsl = trim_hsl( @hsl );
         push @colors, new( __PACKAGE__, { H => $hsl[0], S => $hsl[1], L => $hsl[2] });
+    }
+    $self, @colors, $c2;
+}
+
+sub rgb_gradient_to {
+    my ($self, $c2, $steps, $power) = @_;
+    return carp "need color object or definition as first argument" unless defined $c2;
+    $c2 = (ref $c2 eq __PACKAGE__) ? $c2 : _new_from_scalar( $c2 );
+    return unless ref $c2 eq __PACKAGE__;
+    $steps //= 3;
+    $power //= 1;
+    return carp "third argument (dynamics), has to be positive (>= 0)" if $power <= 0;
+    return $self if $steps == 1;
+    my @colors = ();
+    my @delta_rgb = ($c2->red - $self->red, $c2->green - $self->green, $c2->blue - $self->blue );
+    for my $i (1 .. $steps-2){
+        my $pos = ($i / ($steps-1)) ** $power;
+        my @rgb = ( $self->red   + ($pos * $delta_rgb[0]),
+                    $self->green + ($pos * $delta_rgb[1]),
+                    $self->blue  + ($pos * $delta_rgb[2]));
+        push @colors, new( __PACKAGE__, @rgb);
     }
     $self, @colors, $c2;
 }
@@ -266,7 +289,7 @@ Graphics::Toolkit::Color - color palette creation helper
     say $red->add('blue')->name;                    # mix in RGB: 'magenta'
     Graphics::Toolkit::Color->new( 0, 0, 255)->hsl; # 240, 100, 50 = blue
     $blue->blend_with({H=> 0, S=> 0, L=> 80}, 0.1); # mix blue with a little grey in HSL
-    $red->gradient_to( '#0000FF', 10);              # 10 colors from red to blue
+    $red->rgb_gradient_to( '#0000FF', 10);          # 10 colors from red to blue
     $red->complementary( 3 );                       # get fitting red green and blue
 
 
@@ -369,57 +392,37 @@ all the same arguments as described above.
 
 =head1 GETTER / ATTRIBUTES
 
-are all read only methods - giving access to different parts of the
+are read only methods - giving access to different parts of the
 objects data.
 
 =head2 name
 
-Name of the color in the X11 or HTML (SVG) standard or the Pantone report.
-The name will be found and filled in, even when the object is created
-with RGB or HSL values. If the color is not found in any of the mentioned
-standards, it returns an empty string. All names are
-at: L<Graphics::Toolkit::Color::Constant/NAMES>
+String with name of the color in the X11 or HTML (SVG) standard or the
+Pantone report. The name will be found and filled in, even when the object
+is created with RGB or HSL values. If the color is not found in any of
+the mentioned standards, it returns an empty string. All names are at:
+L<Graphics::Toolkit::Color::Constant/NAMES>
 
 =head2 string
 
-Returns string that can be serialized back into a color object
-(recreated by Graphics::Toolkit::Color-&gt;new( $string )).
-It is either the color name (if color has one) or result of L</rgb_hex>.
+String that can be serialized back into a color object
+(recreated by Graphics::Toolkit::Color->new( $string )).
+It is either the color L</name> (if color has one) or result of L</rgb_hex>.
 
 =head2 red
 
 Integer between 0 .. 255 describing the red portion in RGB space.
+Higher value means more color and an lighter color.
 
 =head2 green
 
 Integer between 0 .. 255 describing the green portion in RGB space.
+Higher value means more color and an lighter color.
 
 =head2 blue
 
 Integer between 0 .. 255 describing the blue portion in RGB space.
-
-=head2 rgb
-
-List with values of red, green and blue (see above), no refeerence.
-
-=head2 rgb_hex
-
-String starting with '#', followed by six hexadecimal figures.
-Two digits for each of red, green and blue value - the format used in CSS.
-
-=head2 rgb_hash
-
-Reference to a I<HASH> containing the keys C<'red'>, C<'green'> and C<'blue'>
-with their respective values as defined above.
-
-=head2 hsl_hash
-
-Reference to a I<HASH> containing the keys C<'hue'>, C<'saturation'> and C<'lightness'>
-with their respective values as defined below.
-
-=head2 hsl
-
-List of three values of hue, saturation and lightness (see below).
+Higher value means more color and an lighter color.
 
 =head2 hue
 
@@ -427,7 +430,8 @@ Integer between 0 .. 359 describing the angle (in degrees) of the
 circular dimension in HSL space named hue.
 0 approximates red, 30 - orange, 60 - yellow, 120 - green, 180 - cyan,
 240 - blue, 270 - violet, 300 - magenta, 330 - pink.
-0 and 360 point to the same coordinate, but this module only deals with 0.
+0 and 360 point to the same coordinate. This module only outputs 0,
+even if accepting 360 as input.
 
 =head2 saturation
 
@@ -438,7 +442,32 @@ Integer between 0 .. 100 describing percentage of saturation in HSL space.
 
 Integer between 0 .. 100 describing percentage of lightness in HSL space.
 0 is always black, 100 is always white and 50 the most colorful
-(depending on hue value) (or grey - if saturation = 0).
+(depending on L</hue> value) (or grey - if saturation = 0).
+
+=head2 rgb
+
+List (no I<ARRAY> reference) with values of L</red>, L</green> and L</blue>.
+
+=head2 hsl
+
+List (no I<ARRAY> reference) with values of L</hue>, L</saturation> and L</lightness>.
+
+=head2 rgb_hex
+
+String starting with character '#', followed by six hexadecimal lower case figures.
+Two digits for each of L</red>, L</green> and L</blue> value -
+the format used in CSS (#rrggbb).
+
+=head2 rgb_hash
+
+Reference to a I<HASH> containing the keys C<'red'>, C<'green'> and C<'blue'>
+with their respective values as defined above.
+
+=head2 hsl_hash
+
+Reference to a I<HASH> containing the keys C<'hue'>, C<'saturation'> and C<'lightness'>
+with their respective values as defined above.
+
 
 =head1 METHODS
 
@@ -501,13 +530,13 @@ RGB (unless told so), while this method always operates in HSL space.
     my $difference = $color->blend_with( $c2, -1 );
 
 
-=head2 gradient_to
+=head2 rgb_gradient_to
 
 Creates a gradient (a list of colors that build a transition) between
 current (C1) and a second, given color (C2).
 
 The first argument is C2. Either as an Graphics::Toolkit::Color object or a
-scalar (name, hex or reference), which is acceptable to the method new.
+scalar (name, hex or reference), which is acceptable to a constructor.
 
 Second argument is the number $n of colors, which make up the gradient
 (including C1 and C2). It defaults to 3. These 3 colors C1, C2 and a
@@ -515,16 +544,20 @@ color in between, which is the same as the result of method blend_with.
 
 Third argument is also a positive number $p, which defaults to one.
 It defines the dynamics of the transition between the two colors.
-If $p == 1 you get a linear transition - meaning the distance in HSL
-space (distance_hsl) is equal from one color to the next. If $p != 1,
+If $p == 1 you get a linear transition - meaning the distance in RGB
+space is equal from one color to the next. If $p != 1,
 the formula $n ** $p starts to create a parabola function, which defines
 a none linear mapping. For values $n > 1 the transition starts by sticking
 to C1 and slowly getting faster and faster toward C2. Values $n < 1 do
 the opposite: starting by moving fastest from C1 to C2 (big distances)
 and becoming slower and slower.
 
-    my @colors = $c->gradient_to( $grey, 5 );         # we turn to grey
-    @colors = $c1->gradient_to( [14,10,222], 10, 3 ); # none linear gradient
+    my @colors = $c->rgb_gradient_to( $grey, 5 );         # we turn to grey
+    @colors = $c1->rgb_gradient_to( [14,10,222], 10, 3 ); # none linear gradient
+
+=head2 hsl_gradient_to
+
+Same as L</rgb_gradient_to> (what you normally want), but in HSL space.
 
 =head2 complementary
 

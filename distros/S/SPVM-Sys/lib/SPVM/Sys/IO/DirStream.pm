@@ -22,6 +22,14 @@ C<Sys::IO::DirStream> is the class for the C<DIR> type in C<C language>.
 
 This is a L<pointer class|SPVM::Document::Language/"Pointer Class">.
 
+=head1 Fields
+
+=head2 closed
+
+  has closed : ro byte;
+
+The directory stream is closed.
+
 =head1 Instance Methods
 
   method DESTROY : void ();

@@ -1,6 +1,11 @@
 Revision history for MsOffice-Word-Surgeon
 
 
+2.01     25.01.2023
+  - index images by either title or description field in alternative text
+     (because recent versions of MsWord no longer have a 'title' field)
+  - avoid making assumptions about attribute order in XML nodes
+
 2.0      01.05.2022
   - major refactoring
   - support for multiple package parts (main document, headers and footers)

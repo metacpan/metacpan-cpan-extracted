@@ -96,11 +96,11 @@ gate-vna.pl - Gate voltage sweep with VNA spectrum at each point
 
 =head1 VERSION
 
-version 3.840
+version 3.841
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2022       Andreas K. Huettel, Simon Reinhardt
 

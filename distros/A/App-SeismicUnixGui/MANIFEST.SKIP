@@ -1,0 +1,22 @@
+\.git$
+\.metadata
+\.project
+\.FileHistory.txt
+\.Makefile.PL.swp
+\chain.sh
+\tbd.pl
+\cpan-upload.sh
+
+# Skip temporary and backup files.
+\.itemp_
+\.tbd
+\.num_samples
+\/archive
+\/tbd
+\/bck
+
+# Skip git-related files
+\.git
+
+# Skip Makemaker generated and utility files.
+blib\/

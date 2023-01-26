@@ -39,8 +39,8 @@
             "Image::Info" : "0",
             "Moo" : "0",
             "MooX::Types::MooseLike::Base" : "0",
-            "PDF::Table" : "0",
-            "PDF::TextBlock" : "0.13"
+            "PDF::Builder" : "3.025",
+            "PDF::Table" : "0"
          }
       }
    },
@@ -54,6 +54,6 @@
          "url" : "https://github.com/ctrlo/CtrlO-PDF"
       }
    },
-   "version" : "0.21",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.30",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

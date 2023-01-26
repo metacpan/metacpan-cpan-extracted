@@ -72,8 +72,11 @@ sub visFoldwidth() {
  ." Foldwidth1=".u($Data::Dumper::Interp::Foldwidth1)
  .($Data::Dumper::Interp::Foldwidth ? ("\n".("." x $Data::Dumper::Interp::Foldwidth)) : "")
 }
+
+# Nicer alternative to check() when 'expected' is a literal string, not regex
 sub checkeq_literal($$$) {
-  my ($testdesc, $exp, $act) = @_;
+  my ($desc, $exp, $act) = @_;
+  #confess "'exp' is not plain string in checkeq_literal" if ref($exp); #not re!
   $exp = show_white($exp); # stringifies undef
   $act = show_white($act);
   return unless $exp ne $act;
@@ -84,23 +87,40 @@ sub checkeq_literal($$$) {
     $posn = $c eq "\n" ? 0 : ($posn + 1);
   }
   @_ = ( "\n**************************************\n"
-        ."${testdesc}\n"
+        ."${desc}\n"
         ."Expected:\n".displaystr($exp)."\n"
-        ."Actual  :\n".displaystr($act)."\n"
+        ."Actual:\n".displaystr($act)."\n"
         .(" " x ($posn+1))."^\n" # +1 for the opening « in the displayed str
         .visFoldwidth()."\n" ) ;
   goto &Carp::confess;
 }
 
-# USAGE: check $code_display, qr/$exp/, $doeval->($code, $item) ;
-# { my $code="Data::Dumper::Interp->new->hvis(k=>'v');"; check $code, '(k => "v")',eval $code }
+# Convert a literal "expected" string check() which contains qr/.../ sequences
+# into a regex which matches the same string but allows various regex representations
+# used by various versions of Perl.
+sub expstr2re($) {
+  local $_ = shift;
+  confess "bug" if ref($_);
+  s#/#\\/#g;
+  $_ = '\Q' . $_ . '\E';
+  s#([\$\@\%])#\\E\\$1\\Q#g;
+  s#qr\\/([^\/]+)\\/([msixpodualngcer]*)
+   #\\E\(qr\\/$1\\/$2|qr\\/\\(\\?\\^$2:$1\\)\\/\)\\Q#xg
+    or confess "No qr/.../ found in input string";
+  my $saved_dollarat = $@;
+  my $re = eval "qr/${_}/"; die "$@ " if $@;
+  $@ = $saved_dollarat;
+  $re
+}
+
+# check $test_desc, string_or_regex, result
 sub check($$@) {
-  my ($code, $expected_arg, @actual) = @_;
+  my ($desc, $expected_arg, @actual) = @_;
   local $_;  # preserve $1 etc. for caller
   my @expected = ref($expected_arg) eq "ARRAY" ? @$expected_arg : ($expected_arg);
   die "ARE WE USING THIS FEATURE?" if @actual > 1;
   die "ARE WE USING THIS FEATURE?" if @expected > 1;
-  confess "\nTESTa FAILED: $code\n"
+  confess "\nTESTa FAILED: $desc\n"
          ."Expected ".scalar(@expected)." results, but got ".scalar(@actual).":\n"
          ."expected=(@expected)\n"
          ."actual=(@actual)\n"
@@ -109,14 +129,24 @@ sub check($$@) {
   foreach my $i (0..$#actual) {
     my $actual = $actual[$i];
     my $expected = $expected[$i];
+    if (!ref($expected) && $expected =~ /qr\//) {
+      # Work around different Perl versions stringifying regexes differently
+      $expected = expstr2re($expected);
+    }
     if (ref($expected) eq "Regexp") {
-      confess "\nTESTb FAILED: ",$code,"\n"
-             ."Expected (Regexp):u\n".${expected}."«end»\n"
-             ."Got:\n".displaystr($actual)."\n"
-             .visFoldwidth()
-        unless $actual =~ ($expected // "Never Matched");
+      unless ($actual =~ $expected) {
+        @_ = ( "\n**************************************\n"
+              ."TESTb FAILED: ".$desc."\n"
+              ."Expected (Regexp):u\n".${expected}."«end»\n"
+              ."Got:\n".displaystr($actual)."\n"
+              .visFoldwidth()."\n" ) ;
+        goto &Carp::confess;
+      }
     } else {
-      checkeq_literal "TESTc FAILED: $code", $expected, $actual;
+      unless ($expected eq $actual) {
+        @_ = ("TESTc FAILED: $desc", $expected, $actual);
+        goto &checkeq_literal
+      }
     }
   }
 }
@@ -762,9 +792,9 @@ EOF
           (['$','r'],['',''])
         ), #map [$dollar,$r]
 
-        ( $] >= 5.022001 && $] <= 5.022001
+        ( $] >= 5.022000 && $] <= 5.022001
             ?  (do{ state $warned = 0;
-                    diag "\n\n** obj->method() tests disabled ** due to Perl v5.22.1 segfault!\n\n"
+                    diag "\n\n** obj->method() tests disabled to avoid segfault (using Perl $^V)\n\n"
                      unless $warned++; ()
                   },())
             : (
@@ -831,8 +861,8 @@ EOF
 
     for my $use_oo (0,1) {
       my $actual;
-      my $dolatval = $@;
-      eval { $@ = $dolatval;
+      my $dollarat_val = $@;
+      eval { $@ = $dollarat_val;
         # Verify that special vars are preserved and don't affect Data::Dumper::Interp
         # (except if testing a punctuation var, then don't change it's value)
 
@@ -867,13 +897,13 @@ EOF
         # Restore
         ($@, $/, $\, $,, $!, $^E, $^W)
           = ($origAt,$origFs,$origBs,$origComma,$origBang,$origCarE,$origCarW);
-        $dolatval = $@;
+        $dollarat_val = $@;
       }; #// do{ $actual  = $@ };
       $actual = $@ if $@;
-      $@ = $dolatval;
+      $@ = $dollarat_val;
 
-      checkeq_literal(
-        "dvis (oo=$use_oo) lno $lno failed: input «"
+      check(
+        "Test case lno $lno, (use_oo=$use_oo) dvis input «"
                                               . show_white($dvis_input)."»",
         $expected,
         $actual);

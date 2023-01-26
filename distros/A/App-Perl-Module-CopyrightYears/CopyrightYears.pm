@@ -12,7 +12,7 @@ use Pod::CopyrightYears;
 use Perl6::Slurp qw(slurp);
 use String::UpdateYears qw(update_years);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -237,6 +237,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

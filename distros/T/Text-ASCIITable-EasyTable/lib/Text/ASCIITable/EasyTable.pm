@@ -13,7 +13,7 @@ use parent qw(Exporter);
 
 our @EXPORT = qw(easy_table); ## no critic (ProhibitAutomaticExportation)
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 ########################################################################
 sub is_array { push @_, 'ARRAY'; goto &_is_type; }
@@ -55,12 +55,7 @@ sub easy_table {
 
   $options{columns} = \@columns;
 
-  my $data = _render_data(
-    data     => $options{data},
-    rows     => $options{rows},
-    columns  => \@columns,
-    sort_key => $options{sort_key},
-  );
+  my $data = _render_data( %options, columns => \@columns, );
 
   return _render_table( %options, data => $data )
     if !$options{json};
@@ -128,7 +123,12 @@ sub _render_data {
 
   my @rendered_data;
 
+  my $row_count = 0;
+
   for my $row ( @{$data} ) {
+    last
+      if defined $options{max_rows} && ++$row_count > $options{max_rows};
+
     if ($rows) {
       push @rendered_data, [
         map {
@@ -309,6 +309,10 @@ to transform the column names and column values in a table.
 be efficient when larger data sets are used.>
 
 =back
+
+=item max_rows
+
+Maximum number of rows to render.
 
 =item sort_key
 

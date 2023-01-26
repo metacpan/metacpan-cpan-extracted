@@ -2,7 +2,7 @@ package App::Yath::Command;
 use strict;
 use warnings;
 
-our $VERSION = '1.000141';
+our $VERSION = '1.000142';
 
 use File::Spec;
 use Carp qw/croak/;
@@ -20,6 +20,11 @@ sub summary         { "No Summary" }
 sub description     { "No Description" }
 sub group           { "Z-UNFINISHED" }
 sub doc_args        { () }
+sub only_cmd_opts   { 0 }
+
+sub handle_invalid_option { 0 }
+
+sub munge_opts { }
 
 sub name { $_[0] =~ m/([^:=]+)(?:=.*)?$/; $1 || $_[0] }
 

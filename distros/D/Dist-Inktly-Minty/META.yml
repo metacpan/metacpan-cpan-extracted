@@ -24,13 +24,13 @@ optional_features: {}
 provides:
   Dist::Inktly::Bovine:
     file: lib/Dist/Inktly/Bovine.pm
-    version: '0.004'
+    version: '0.005'
   Dist::Inktly::Cervine:
     file: lib/Dist/Inktly/Cervine.pm
-    version: '0.004'
+    version: '0.005'
   Dist::Inktly::Minty:
     file: lib/Dist/Inktly/Minty.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   File::chdir: '0'
   Getopt::ArgvFile: '0'
@@ -45,7 +45,7 @@ resources:
   homepage: https://metacpan.org/release/Dist-Inktly-Minty
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-dist-inktly-minty.git
-version: '0.004'
+version: '0.005'
 x_provides_scripts:
   distinkt-mint:
     file: bin/distinkt-mint

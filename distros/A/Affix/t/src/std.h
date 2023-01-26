@@ -12,7 +12,7 @@
 
 #if defined _WIN32 || defined __CYGWIN__
 #include <BaseTsd.h>
-typedef SSIZE_T ssize_t;
+// typedef SSIZE_T ssize_t;
 typedef signed __int64 int64_t;
 #ifdef __GNUC__
 #define DLLEXPORT __attribute__((dllexport))

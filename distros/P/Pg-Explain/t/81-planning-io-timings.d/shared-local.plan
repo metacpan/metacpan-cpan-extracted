@@ -1,0 +1,14 @@
+                                                         QUERY PLAN
+----------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=0.00..48.27 rows=100 width=1974) (actual time=0.127..1.602 rows=100 loops=1)
+   Buffers: shared hit=323
+   ->  Seq Scan on pipe_table_1006  (cost=0.00..24384.00 rows=50521 width=1974) (actual time=0.125..1.585 rows=100 loops=1)
+         Filter: ((field_150630 ~~* '%and%'::text) OR (field_150666 ~~* '%and%'::text))
+         Rows Removed by Filter: 34
+         Buffers: shared hit=323
+ Planning:
+   Buffers: shared hit=990 read=1
+   I/O Timings: shared/local read=0.645
+ Planning Time: 3.692 ms
+ Execution Time: 1.666 ms
+(11 rows)

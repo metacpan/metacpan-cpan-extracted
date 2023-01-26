@@ -111,14 +111,15 @@ sub alien {
                 for my $lib ( keys %libs ) {
 
                     #chdir $kid->child($lib)->absolute;
-                    warn $kid->child( $lib, 'lib' . $lib . '_s' . $opt{config}->get('_a') );
+                    #warn $kid->child( $lib, 'lib' . $lib . '_s' . $opt{config}->get('_a') );
                     $kid->child( $lib, 'lib' . $lib . '_s' . $opt{config}->get('_a') )
                         ->copy( $pre->child('lib')->absolute );
                     for ( @{ $libs{$lib} } ) {
-                        warn sprintf '%s => %s', $kid->child( $lib, $_ ),
-                            $pre->child( 'include', $_ )->absolute;
-                        warn $kid->child( $lib, $_ )
-                            ->copy( $pre->child( 'include', $_ )->absolute );
+
+                        #warn sprintf '%s => %s', $kid->child( $lib, $_ ),
+                        #    $pre->child( 'include', $_ )->absolute;
+                        #warn
+                        $kid->child( $lib, $_ )->copy( $pre->child( 'include', $_ )->absolute );
                     }
                 }
             }
@@ -346,11 +347,8 @@ sub process_xs {
         'C++'        => 1,
         source       => $c_file,
         defines      => { VERSION => qq/"$version"/, XS_VERSION => qq/"$version"/ },
-        include_dirs => [
-            curdir,                                                dirname($source),
-            $pre->child( $opt{meta}->name, 'include' )->stringify, dirname('dyncall/dyncall'),
-            dirname('dyncall/dynload'),                            dirname('dyncall/dyncallback')
-        ],
+        include_dirs =>
+            [ curdir, dirname($source), $pre->child( $opt{meta}->name, 'include' )->stringify ],
         extra_compiler_flags => (
             '-fPIC ' . ( $opt{config}->get('osname') =~ /bsd/ ? '' : $CFLAGS ) .
                 ( $DEBUG ? ' -ggdb3 ' : '' )

@@ -4,10 +4,19 @@
 # See the "COPYING" file for details.
 package HTML::Blitz::Matcher;
 use HTML::Blitz::pragma;
-use HTML::Blitz::SelectorType qw(LT_DESCENDANT LT_CHILD LT_SIBLING LT_ADJACENT_SIBLING);
+use HTML::Blitz::SelectorType qw(
+    LT_DESCENDANT
+    LT_CHILD
+    LT_SIBLING
+    LT_ADJACENT_SIBLING
+);
 use Scalar::Util ();
 
-our $VERSION = '0.03';
+use constant {
+    INTBITS => length(sprintf '%b', ~0),
+};
+
+our $VERSION = '0.04';
 
 method new($class: $rules) {
     bless {
@@ -68,7 +77,10 @@ method enter($tag, $attributes) {
 
             my $link = $sss->link_type;
             my $k = $i + 1;
-            my $bit = 1 << ($k - $cur - 1);
+            my $bit_shift = $k - $cur - 1;
+            $bit_shift < INTBITS
+                or die "Internal error: Too many combinators in a single selector (" . ($bit_shift + 1) . " exceeds limit of " . INTBITS . ")";
+            my $bit = 1 << $bit_shift;
 
             if (!defined $link) {
                 push @ret, $glass->[$k];

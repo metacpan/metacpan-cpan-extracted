@@ -97,3 +97,30 @@ Revision history for Perl extension Tk::HListbox.
 	- Fix minor isues with user-set color options.
 	- Fix anchorSet() and a few other minor Listbox-compatability issues.
 	- Numerous code cleanups and documentation improvements.
+2.70   Wed Jan 25, 2023
+	- Merge more patches & fixups from Jeff Stephens.  Most involving hardening 
+	  against undefined variable-references.
+	- WARNING: Fixed selectionSet() to work properly in all valid cases - the 
+	  main negative side-effect of this is that it must be called with either 
+	  1 or 2 index arguments (specifying a range) - Passing a list (>2) 
+	  arguments is no longer valid and will return with a warning.  
+	  Users must update any programs that use this (or Tk::HMListbox) affected 
+	  by this!
+	- Fix yview() which is completely broken in the underlying Tk::HList 
+	  module, which also seems to fix a known TK::HMListbox scrollbar issue.
+	  This should also resolve reported issues with Tk::HMListbox set to use 
+	  dual, optional scrollbars having issues with specific size settings.
+	- Add xview() which is also completely broken in Tk::HList.
+	  When called with no arguments, now properly return 2 real numbers 
+	  between 0 and 1 inclusive (same as Tk::Listbox).  NOTE:  For xview(), 
+	  these values are only approximate, not precise due to Tk::HList issues.
+	- Fix scan('mark') to use object variables to prevent issues when 
+	  multiple HListboxes are active.
+	- All methods except indexOF() now take indices (0..'end'), not the 
+	  underlying Tk::HList "entry-path" numbers, and the docs have been 
+	  updated to clarify previous ambiguity.  Note also that selectionGet() 
+	  still returns entry-paths.  The proper reverse of selectionSet() is 
+	  (as has always been the case in Tk::Listbox) curselection().
+	- Switch messaging to (and require) the Carp module.
+	- Numerous fixups to ensure compatability with Tk::Listbox.
+	- Numerous other minor code & doc. cleanups and clarifications.

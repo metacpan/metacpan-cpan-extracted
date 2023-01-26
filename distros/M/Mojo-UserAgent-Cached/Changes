@@ -1,3 +1,5 @@
+1.25 (2023-01-25)
+    (nicomen) Restrict key length to 140 chars by default to work on eCryptFS out of the box
 
 1.24 (2022-12-07)
     (nicomen) Use unsafe string representation for caching

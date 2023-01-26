@@ -17,3 +17,6 @@ Revision history for Perl extension Apache::Session::NoSQL.
 
 0.2   Wed Jul 22 2015
     - Bug: [RT#94613] Bug in Apache::Session::NoSQL when trying to use Apache::Session::Redis #2
+
+0.3 Thu Jan 26 2023
+    - Mark as deprecated

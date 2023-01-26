@@ -1,5 +1,8 @@
 Revision history for HV-Monitor
 
+0.0.6   2023-01-25/16:15
+		-MANIFEST fix
+
 0.0.5   2022-12-27/14:30
 		-Fix seconds on low VM machines for bhyve.
 

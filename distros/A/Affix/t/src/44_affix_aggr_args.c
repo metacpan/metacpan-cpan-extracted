@@ -1,11 +1,9 @@
 #include "std.h"
 
-typedef struct intstruct
-{
+typedef struct intstruct {
     int i;
 } IntStruct;
-typedef struct intintstruct
-{
+typedef struct intintstruct {
     int i, j;
 } IntIntStruct;
 
@@ -24,8 +22,14 @@ DLLEXPORT int TakeIntIntStruct(IntIntStruct x) {
     return x.i + x.j;
 }
 
-struct twoshortstruct
-{
+DLLEXPORT int TakeIntArray(int ints[3]) {
+    int retval = 0;
+    for (int i = 0; i < 3; ++i)
+        retval += ints[i];
+    return retval;
+}
+
+struct twoshortstruct {
     short x, y;
 };
 typedef struct twoshortstruct TwoShortStruct;
@@ -39,16 +43,14 @@ DLLEXPORT int TakeTwoShortsStruct(TwoShortStruct x) {
     return retval;
 }
 
-struct intshortcharstruct
-{
+struct intshortcharstruct {
     int x;
     short y;
     char z;
 };
 typedef struct intshortcharstruct IntShortCharStruct;
 
-struct i_
-{
+struct i_ {
     char d;
     char a;
     short f;
@@ -65,23 +67,20 @@ struct i_
     // long long fdd;
     // short v2;
 };
-struct is_
-{
+struct is_ {
     int x;
     short y;
 };
-struct isc_
-{
+struct isc_ {
     int x;
     short y;
     char z;
 };
 
-#include <stdio.h>
 #include <stddef.h>
+#include <stdio.h>
 
-typedef struct
-{
+typedef struct {
     char c1;
     char c2;
     short s1;
@@ -93,7 +92,7 @@ typedef struct
     char c5;
 } gappy_t;
 
-#define Pt(struct, field, tchar) printf("------------ @%d%s ", offsetof(struct, field), #tchar);
+#define Pt(struct, field, tchar) printf("# ------------ @%zu%s ", offsetof(struct, field), #tchar);
 
 int pppp() {
     Pt(gappy_t, c1, c);
@@ -110,10 +109,10 @@ int pppp() {
     Pt(gappy_t, c4, c);
     Pt(gappy_t, c5, c);
     printf("\n");
+    return 0;
 }
 
-struct test
-{
+struct test {
     char a[5];
     char b;
     short c;

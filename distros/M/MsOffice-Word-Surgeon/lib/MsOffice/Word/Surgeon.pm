@@ -15,7 +15,7 @@ sub has_inner ($@) {my $attr = shift; has_lazy($attr => @_, init_arg => undef)}
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.0';
+our $VERSION = '2.01';
 
 
 #======================================================================
@@ -97,7 +97,7 @@ sub _parts {
                                                       part_name => 'document');
 
   # gather names of headers and footers related to that document
-  my @headers_footers = map  {$_->{target} =~ s/\.xml$//r}
+  my @headers_footers = map  {$_->{Target} =~ s/\.xml$//r}
                         grep {$_ && $_->{short_type} =~ /^(header|footer)$/}
                         $doc->relationships->@*;
 
@@ -203,10 +203,16 @@ sub clone {
 #======================================================================
 
 
+sub _update_contents_in_zip {
+  my $self = shift;
+  $_->_update_contents_in_zip foreach values $self->parts->%*;
+}
+
+
 sub overwrite {
   my $self = shift;
 
-  $_->_update_contents_in_zip foreach values $self->parts->%*;
+  $self->_update_contents_in_zip;
   $self->zip->overwrite == AZ_OK
     or croak "error overwriting zip archive " . $self->docx;
 }
@@ -214,7 +220,7 @@ sub overwrite {
 sub save_as {
   my ($self, $docx) = @_;
 
-  $_->_update_contents_in_zip foreach values $self->parts->%*;
+  $self->_update_contents_in_zip;
   $self->zip->writeToFileNamed($docx) == AZ_OK
     or croak "error writing zip archive to $docx";
 }
@@ -262,30 +268,22 @@ MsOffice::Word::Surgeon - tamper with the guts of Microsoft docx documents, with
                                             );
     return $replacement;
   };
-  $surgeon->document->replace(qr[$pattern], $replacement_callback);
+  $surgeon->all_parts_do(replace => qr[$pattern], $replacement_callback);
 
   # save the result
   $surgeon->overwrite; # or ->save_as($new_filename);
 
 
-=head1 VERSION
-
-WARNING: this is version 2.0. Due to internal refactorings, some
-changes made to the application programming interface (API) are
-incompatible with version 1.  Client programs may need some minor
-adaptations.
-
 =head1 DESCRIPTION
 
 =head2 Purpose
 
-This module supports a few operations for modifying or extracting text
-from Microsoft Word documents in '.docx' format -- therefore the name
+This module supports a few operations for inspecting or modifying contents
+in Microsoft Word documents in '.docx' format -- therefore the name
 'surgeon'. Since a surgeon does not give life, there is no support for
 creating fresh documents; if you have such needs, use one of the other
-packages listed in the L<SEE ALSO> section. To my knowledge, this is the
-only solution (even in other languages) for applying regular expressions
-to the contents of Word documents.
+packages listed in the L<SEE ALSO> section -- or use the companion module
+L<MsOffice::Word::Template>.
 
 Some applications for this module are :
 
@@ -318,9 +316,16 @@ templating, i.e. replacement of special markup by contents coming from a data tr
 
 =item *
 
-pretty-printing the internal XML structure
+insertion of generated images (for example barcodes) -- see L<MsOffice::Word::Surgeon::PackagePart/images>;
+
+=item *
+
+pretty-printing the internal XML structure.
 
 =back
+
+
+
 
 =head2 Operating mode
 
@@ -392,7 +397,6 @@ Returns the ordered list of names of header members stored in the ZIP file.
 Returns the ordered list of names of footer members stored in the ZIP file.
 
 
-
 =head2 Other methods
 
 
@@ -408,14 +412,15 @@ Returns the L<MsOffice::Word::Surgeon::PackagePart> object corresponding to the 
   my $result = $surgeon->all_parts_do($method_name => %args);
 
 Calls the given method on all part objects. Results are accumulated
-in a hash, with part names as keys to the results.
+in a hash, with part names as keys to the results. In most cases this is
+used to invoqke the L<MsOffice::Word::Surgeon::PackagePart/replace> method.
 
 
 =head3 xml_member
 
-  my $xml = $surgeon->xml_member($member_name);
+  my $xml = $surgeon->xml_member($member_name); # reading
   # or
-  $surgeon->xml_member($member_name, $new_xml);
+  $surgeon->xml_member($member_name, $new_xml); # writing
 
 Reads or writes the given member name in the ZIP file, with utf8 decoding or encoding.
 

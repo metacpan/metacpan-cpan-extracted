@@ -1,0 +1,62 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 1f02b4c3d277d481eb489d9f3380734666645edf6a5793729974fb14de414cd8 CONCEPT
+SHA256 4e9ee7d0364dee24baabceb6b58b87d258ed3097822ee12c99af1f5de23a61ce Changes
+SHA256 e9ae42c89b2f406c60c950a2a41695eabc2d324c0a9cd90d165e87c4e8a731bd LICENSE
+SHA256 6ab16ae04abc58c7c5d8350b27e8f7a3d53873e5e26eaae2aa271afb5b540bc8 MANIFEST
+SHA256 45b9e81c299988b6bc9b7fdd9ee4874218c11ceae0e5bf3908c630e6729b687f META.yml
+SHA256 3c0e7f5cb10db4309468df1d2076e7f8839331eab44f3722de67dc6a627f558a Makefile.PL
+SHA256 2496607b71b8b8557b99ff47d1b5c48483756b8c5870877606bb0b09ab996bbd README
+SHA256 0b62c8ddce9dd48c71d65cfb620e3220701f82ea9187f075d3c9e0ac91be53f5 SPDX.pm
+SHA256 c40968cdc88f8303bf87157b39bb725bfcd2ef92d009ad27ff78276a7cb297de examples/check_license_id.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 b0d80f32f3ac7d93202dc831046c55cff967832806ef2b76936aab54352a52ea inc/Module/Install/Share.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 27d5dfcb0450a6750c9b603cc0a7d26e0c0afbc614cbff89f9acbdd4d94729e4 share/licenses.json
+SHA256 8105d0245f884db04a00c298ecf3c7d5bc43b0992307c8c34b58e61acc05ed6b t/License-SPDX/01-use.t
+SHA256 87e4866fc06d2efa18d5818a729c3fd876455d99d1d975dde73ddb0476565cec t/License-SPDX/02-version.t
+SHA256 d3b325780ce949a34b3eb4c3654798807d1dad541ece971575d2e4750be81921 t/License-SPDX/03-check_license.t
+SHA256 718a147c726ba3d3771f583067cc84139eb26813eb16d4c5665799946c832802 t/License-SPDX/04-license.t
+SHA256 3a3f88aef4e1f91f07100e2d589ca294bb74ab14ce5e70e6c43a46a7d20a9ba0 t/License-SPDX/05-spdx_release_date.t
+SHA256 79c82b8e3c9f62a7f995d5159b615b42f7b753a452c2931749461df3ac1834bb t/License-SPDX/06-spdx_version.t
+SHA256 d84e236e571452d58eba21c38981b913c59ef7e432d64a73d5d5c0fc88ad6a56 xt/License-SPDX/01-pod_coverage.t
+SHA256 b4a84703cea47d45d309db5866bbd176f8e2593bb0fe0cf36dcb62d64c7fc9f5 xt/License-SPDX/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmPSXsoACgkQojV9Rpe/
+B8tnDA//YjdLbPu+d9Tt4AyPbn75DGf7MUq3g0fVk39LhTK07L2vt002Q1kj+K5k
+pxgv103h6YPQgpiK7s7aqEFCjq4EeYSYy26t2wqhREDNKP3RhCNGuxPtUzeTRCyR
+i3GyWQnKCnhjXlnWop4cRrg/jGPiejgX12PItfBD12iq/RpxMai3PLca1DTkXJM4
+fgPNTkj6E+t3MwwwbWVRDbmMM1XNqvpNWlBhi+dmPvoHQusqYe7MUmtjqrNhM0D5
+IC/fTofNrqRz7vmGmGE1IVbqX3o0YwEScpZqe6Ww0R9TtAiTINUsOEG1OSKRXaGC
+SjNy3WXNTE22ZPGUMXlyeOcdwHucwd9hI2Rh9EA89zfTd766V6/fHP64nDQbM7mp
+jxHILtAnCCHYdALiZL2qOExWpYme187CY7b6vUfs/HCdaImiI3f81j8HQfYvxewu
+90/k7N3sE1Pq9IF+hujyJ8SlNJqxZ+zNMt1l6BZhDoPBC/3tC19JgLi7M6aySXxZ
+TbBID7EL7/dDGGMUSrbg/4JhHwrV68dOptjbQufVs6vsirrTFtdKrigG6PcHtoR4
+Zzdp4fI89RELNmYlznLikkPUn2XdJsWU0Aa1m4VCG7bx9juoMaEBGJDEKIJaEyE2
++0zXDJ2yyoUPfR3oXT+dkYQw4s2y74szSVnrsTYXseQNpeIz5xg=
+=B/Ss
+-----END PGP SIGNATURE-----

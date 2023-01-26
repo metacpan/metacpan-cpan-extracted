@@ -116,6 +116,7 @@ WIDGET-SPECIFIC OPTIONS
         entry (the one the text cursor is on). This entry is also shown with
         a hashed box around it. The "activebackground" color, however, is
         always fixed as the same color as the the widget's background.
+
         Default: same color as the widget's foreground color.
 
     Name: browsecmd
@@ -166,14 +167,16 @@ WIDGET-SPECIFIC OPTIONS
 
     Name: -ipadx
         Specify horizontal padding style in pixels around the image for the
-        rows in the listbox which are type *image* or *imagetext*. Default:
-        0
+        rows in the listbox which are type *image* or *imagetext*.
+
+        Default: 0
 
     Name: -ipady
         Specify vertical padding style in pixels around the image for the
         rows in the listbox which are type *image* or *imagetext*. NOTE:
-        This changes the height of the affected rows. Default: 1 (and
-        setting to 0 is the same as 1).
+        This changes the height of the affected rows.
+
+        Default: 1 (and setting to 0 is the same as 1).
 
     Name: itemType
     Class: ItemType
@@ -200,14 +203,18 @@ WIDGET-SPECIFIC OPTIONS
     Class: SelectBackground
     Switch: -selectbackground
         Specifies an alternate background color for item(s) currently
-        "selected". Default: a slightly brighter shade of the widget's
-        current background color.
+        "selected".
+
+        Default: a slightly brighter shade of the widget's current
+        background color.
 
     Name: selectForeground
     Class: SelectForeground
     Switch: -selectforeground
         Specifies an alternate foreground color for item(s) currently
-        "selected". Default: the widget's current foreground color.
+        "selected".
+
+        Default: the widget's current foreground color.
 
     Name: selectMode
     Class: SelectMode
@@ -249,21 +256,24 @@ WIDGET-SPECIFIC OPTIONS
 
     Name: -tpadx => *number*
         Specify horizontal padding style in pixels around the text for the
-        rows in the listbox which are type *text*. Default: 2
+        rows in the listbox which are type *text*.
+
+        Default: 2
 
     Name: -tpady => *number*
         Specify vertical padding style in pixels around the text for the
         rows in the listbox which are type *text*. NOTE: This changes the
-        height of the affected rows. Default (seems to be): 2 (and setting
-        to 0 is the same as 2).
+        height of the affected rows.
+
+        Default (seems to be): 2 (and setting to 0 is the same as 2).
 
     Name: width
     Class: Width
     Switch: -width
         Specifies the desired width for the window in characters. If the
         font doesn't have a uniform width then the width of the character
-        ``0'' is used in translating from character units to screen units.
-        If zero or less, then the desired width for the window is made just
+        "0" is used in translating from character units to screen units. If
+        zero or less, then the desired width for the window is made just
         large enough to hold all the elements in the listbox.
 
 LISTBOX OPTIONS AND METHODS NOT (YET?) SUPPORTED BY HLISTBOX
@@ -306,8 +316,9 @@ INDICES
         specified by *x* and *y* (in pixel coordinates). If no element
         covers that point, then the closest element to that point is used.
 
-    In the method descriptions below, arguments named *index*, *first*, and
-    *last* always contain text indices in one of the above forms.
+    In the method descriptions below, arguments named *index*,
+    *first-index*, and *last-index* always contain text indices in one of
+    the above forms.
 
 WIDGET METHODS
     The HListbox method creates a widget object. This object supports the
@@ -322,8 +333,10 @@ WIDGET METHODS
         indicated by *index*. If *index* is outside the range of elements in
         the listbox then the closest element is activated. The active
         element is drawn similar to a "selected" element with a thin hashed
-        border, and its index may be retrieved with the index active or
-        anchor.
+        border (similar to an underlined element in *Tk::Listbox*, and its
+        index may be retrieved with the index "active".
+
+        NOTE: Not supported by *Tk::HList*.
 
     *$listbox*->bbox(*index*)
         Returns a list of four numbers describing the bounding box of the
@@ -342,22 +355,28 @@ WIDGET METHODS
         elements in the HListbox that are currently selected. If there are
         no elements selected in the listbox then an empty list is returned.
 
-    *$listbox*->delete(*first, *?*last*?)
-        Deletes one or more elements of the HListbox. *First* and *last* are
-        indices specifying the first and last elements in the range to
-        delete. If *last* isn't specified it defaults to *first*, i.e. a
-        single element is deleted.
+        NOTE: Not supported by *Tk::HList*.
+
+    *$listbox*->delete(*first-index, *?*last-index*?)
+        Deletes one or more elements of the HListbox. *First-index* and
+        *last-index* are indices specifying the first and last elements in
+        the range to delete. If *last-index* isn't specified it defaults to
+        *first-index*, i.e. a single element is deleted.
 
     *$listbox*->findIndex(*string*?)
         Given the text of an entry, return the index of the first entry
         whose text matches the string, or *<undef*> if no matches.
 
-    $listbox->fixListSize(*width*, *height*)
+        NOTE: Not supported by *Tk::Listbox*.
+
+    *$listbox*->fixListSize(*width*, *height*)
         Will fix the height and width of the HListbox, caused by the
         underlying HList, when non-default fonts are used.
 
         The *width* and *height* values are the required character width and
         the number of rows in the listbox.
+
+        NOTE: Not supported by *Tk::HList* or *Tk::Listbox*.
 
     *$listbox*->fixPalette()
         Under certain situations, changing the color theme via
@@ -366,43 +385,64 @@ WIDGET METHODS
         fully update everything in the widget that have not been
         individually set by the user.
 
-    *$listbox*->get(*first, *?*last*?)
-        If *last* is omitted, returns the contents of the listbox element
-        indicated by *first*, or an empty string if *first* refers to a
-        non-existent element. If *last* is specified, the command returns a
-        list whose elements are all of the listbox elements between *first*
-        and *last*, inclusive. Both *first* and *last* may have any of the
-        standard forms for indices.
+    *$listbox*->get(*first-index, *?*last-index*?)
+        If *last-index* is omitted, returns the contents of the listbox
+        element indicated by *first-index*, or an empty string if
+        *first-index* refers to a non-existent element. If *last-index* is
+        specified, the command returns a list whose elements are all of the
+        listbox elements between *first-index* and *last-index*, inclusive.
+        Both *first-index* and *last-index* may have any of the standard
+        forms for indices.
 
     *$listbox*->getEntry(*index*?)
         Given an index, returns the HList "entry" value, only useful with
-        lower-level HList functions. Returns *<undef*> if no matches.
+        lower-level HList functions. Returns *<undef*> if no matches. This
+        method is the complement (opposite) of *indexOf()* in functionality.
 
-    $listbox->getListHeight(*height*)
+        NOTE: Not supported by *Tk::HList* or *Tk::Listbox*.
+
+    *$listbox*->getListHeight(*height*)
         Will return the correct height in pixels, of the HListbox, when a
         non-default -listfont is used.
 
         *height* is the required number of rows for the listbox.
 
-    $listbox->getListWidth(*width*)
+        NOTE: Not supported by *Tk::HList* or *Tk::Listbox*.
+
+    *$listbox*->getListWidth(*width*)
         Will return the correct width, in pixels, of the HListbox, when a
         non-default -listfont is used.
 
         *width* is the required width in characters for the listbox.
+
+        NOTE: Not supported by *Tk::HList* or *Tk::Listbox*.
 
     *$listbox*->hide([*-entry* => ] *index*)
         Given an index, sets the entry to "hidden" so that it does not
         display in the listbox (but maintains it's index. The "-entry"
         argument is unnecessary, but retained for Tk::HList compatability.
 
+        NOTE: Not supported by *Tk::Listbox*.
+
     *$listbox*->show([*-entry* => ] *index*)
         Given an index, sets the entry to "not hidden" (the default) so that
         it is displayed in the listbox.
 
+        NOTE: Not supported by *Tk::Listbox*.
+
     *$listbox*->index(*index*)
         Returns the integer index value that corresponds to *index*. If
         *index* is end the return value is a count of the number of elements
-        in the listbox (not the index of the last element).
+        in the listbox (not the index of the last element). If the index is
+        out of range or invalid, *undef* is returned. If the index is
+        *"end"* and the list is empty, *-1* is returned.
+
+    *$listbox*->indexOf(*entry-path*)
+        Returns the integer index value that corresponds to *entry-path*, or
+        *undef* if the *entry-path* does not exist. This method is the
+        complement (opposite) of *getEntry()* in functionality.
+
+        NOTE: Not supported by *Tk::HList* or *Tk::Listbox*.
 
     *$listbox*->insert(*index, *?*element, element, ...*?)
         Inserts zero or more new elements (entries) in the list just before
@@ -412,91 +452,95 @@ WIDGET METHODS
         inserted in reverse order so that the entire list is inserted in the
         proper order before the element currently identified by the *index*.
 
-    *$listbox*->itemcget(*index*, *option*)
-        Returns the current value of the item configuration option given by
-        *option*. Option may have any of the values accepted by the listbox
-        itemconfigure command or by HList, including ItemStyles.
+    *$listbox*->item(*option, index, *?*arg(s), ...*?)
+        Creates and configures the display items at individual columns the
+        entries. The form of additional of arguments depends on the choice
+        of option:
 
-    *$listbox*->itemconfigure(*index, *?*option, value, option, value,
-    ...*?)
-        Query or modify the configuration options of an item in the
-        HListbox. If no option is specified, returns a list describing all
-        of the available options for the item (see Tk_ConfigureInfo for
-        information on the format of this list). If option is specified with
-        no value, then the command returns a list describing the one named
-        option (this list will be identical to the corresponding sublist of
-        the value returned if no option is specified). If one or more
-        option-value pairs are specified, then the command modifies the
-        given widget option(s) to have the given value(s); in this case the
-        command returns an empty string. The following options are currently
-        supported for items:
+        NOTE: Not supported by *Tk::Listbox*.
 
-    *$listbox*->ItemStyle(*itemtype, *?*option, value, ...*?)
-        HList method to create a display style for the *-style* entry
-        option. NOTE: It's better to change most display properties by
-        listing them and their values when inserting entries since any
-        HListbox-wide style options specified when creating the HListbox
-        widget, ie. *-foreground*, etc. are NOT copied over into the style
-        object.
+        *$listbox*->itemcget(*index*, *option*)
+            Returns the current value of the item configuration option given
+            by *option*. Option may have any of the values accepted by the
+            listbox itemconfigure command or by HList, including ItemStyles.
 
-        -background => *color*
-            *Color* specifies the background color to use when displaying
-            the item. It may have any of the forms accepted by Tk_GetColor.
+        *$listbox*->itemconfigure(*index, *?*option, value, option, value,
+        ...*?)
+            Query or modify the configuration options of an item in the
+            HListbox. If no option is specified, returns a list describing
+            all of the available options for the item (see Tk_ConfigureInfo
+            for information on the format of this list). If option is
+            specified with no value, then the command returns a list
+            describing the one named option (this list will be identical to
+            the corresponding sublist of the value returned if no option is
+            specified). If one or more option-value pairs are specified,
+            then the command modifies the given widget option(s) to have the
+            given value(s); in this case the command returns an empty
+            string. The following options are currently supported for items:
 
-        -foreground => *color*
-            *Color* specifies the foreground color to use when displaying
-            the item. It may have any of the forms accepted by Tk_GetColor.
-            NOTE: may be returned as "-fg".
+        *$listbox*->ItemStyle(*itemtype, *?*option, value, ...*?)
+            HList method to create a display style for the *-style* entry
+            option. NOTE: It's better to change most display properties by
+            listing them and their values when inserting entries since any
+            HListbox-wide style options specified when creating the HListbox
+            widget, ie. *-foreground*, etc. are NOT copied over into the
+            style object.
 
-        -selectbackground => *color*
-            *Color* specifies the background color to use when displaying
-            the item while it is selected. It may have any of the forms
-            accepted by Tk_GetColor.
+            -background => *color*
+                *Color* specifies the background color to use when
+                displaying the item. It may have any of the forms accepted
+                by Tk_GetColor.
 
-        -selectforeground => *color*
-            *Color* specifies the foreground color to use when displaying
-            the item while it is selected. It may have any of the forms
-            accepted by Tk_GetColor.
+            -foreground => *color*
+                *Color* specifies the foreground color to use when
+                displaying the item. It may have any of the forms accepted
+                by Tk_GetColor. NOTE: may be returned as "-fg".
+
+            -selectbackground => *color*
+                *Color* specifies the background color to use when
+                displaying the item while it is selected. It may have any of
+                the forms accepted by Tk_GetColor.
+
+            -selectforeground => *color*
+                *Color* specifies the foreground color to use when
+                displaying the item while it is selected. It may have any of
+                the forms accepted by Tk_GetColor.
 
     *$listbox*->nearest(*y*)
         Given a y-coordinate within the listbox window, this command returns
         the index of the (visible) listbox element nearest to that
         y-coordinate.
 
+        NOTE: Not supported by *Tk::Listbox*.
+
     $listbox->nearestToIndex(*index*)
         Given a zero based *index* within the listbox window, this command
         returns the index of the (visible) listbox element nearest to the
         *index*.
 
-        If there is no visible bounding box associated with the zero based
+        If there is no visible bounding box associated with the zero-based
         *index*, then *undef* is returned.
 
-    $listbox->nearestToHListIndex(*index*)
-        Given a HList *index* within the listbox window, this command
-        returns the index of the (visible) listbox element nearest to the
-        HList *index*.
-
-        If there is no visible bounding box associated with the HList
-        *index*, then *undef* is returned.
-
-    *$listbox*->scan(*option, args*)
+    *$listbox*->scan(*option, *?*arg(s), ...*?)
         This command is used to implement scanning on listboxes. It has two
         forms, depending on *option*:
 
-        *$listbox*->scanMark(*x, y*)
-                Records *x* and *y* and the current view in the listbox
-                window; used in conjunction with later scan dragto commands.
-                Typically this command is associated with a mouse button
-                press in the widget. It returns an empty string.
+        NOTE: Not supported by *Tk::HList*.
 
-        *$listbox*->scanDragto(*x, y*.)
-                This command computes the difference between its *x* and *y*
-                arguments and the *x* and *y* arguments to the last scan
-                mark command for the widget. It then adjusts the view by 10
-                times the difference in coordinates. This command is
-                typically associated with mouse motion events in the widget,
-                to produce the effect of dragging the list at high speed
-                through the window. The return value is an empty string.
+        *$listbox*->scanMark(*x, y*)
+            Records *x* and *y* and the current view in the listbox window;
+            used in conjunction with later scan dragto commands. Typically
+            this command is associated with a mouse button press in the
+            widget. It returns an empty string.
+
+        *$listbox*->scanDragto(*x, y*)
+            This command computes the difference between its *x* and *y*
+            arguments and the *x* and *y* arguments to the last scan mark
+            command for the widget. It then adjusts the view by 10 times the
+            difference in coordinates. This command is typically associated
+            with mouse motion events in the widget, to produce the effect of
+            dragging the list at high speed through the window. The return
+            value is an empty string.
 
     *$listbox*->see(*index*)
         Adjust the view in the HListbox so that the element given by *index*
@@ -505,109 +549,133 @@ WIDGET METHODS
         listbox scrolls to bring the element into view at the edge;
         otherwise the listbox scrolls to center the element.
 
-    *$listbox*->selection(*option, arg*)
+    *$listbox*->selection(*option, *?*arg(s), ...*?)
         This command is used to adjust the selection within a listbox. It
         has several forms, depending on *option*:
 
         *$listbox*->selectionAnchor(*index*)
-                Sets the selection anchor to the element given by *index*.
-                If *index* refers to a non-existent element, then the
-                closest element is used. The selection anchor is the end of
-                the selection that is fixed while dragging out a selection
-                with the mouse. The index anchor may be used to refer to the
-                anchor element.
+            Sets the selection anchor to the element given by *index*. If
+            *index* refers to a non-existent element, then the closest
+            element is used. The selection anchor is the end of the
+            selection that is fixed while dragging out a selection with the
+            mouse. The index anchor may be used to refer to the anchor
+            element.
 
-        *$listbox*->selectionClear(*first, *?*last*?)
-                If any of the elements between *first* and *last*
-                (inclusive) are selected, they are deselected. The selection
-                state is not changed for elements outside this range.
+        *$listbox*->selectionClear(*first-index, *?*last-index*?)
+            If any of the elements between *first-index* and *last-index*
+            (inclusive) are selected, they are deselected. The selection
+            state is not changed for elements outside this range.
+
+        *$listbox*->selectionGet
+            NOTE: Not recommended, nor supported by *Tk::Listbox*.
+
+            Returns a list containing the actual *elements* of all of the
+            elements in the HListbox that are currently selected. If there
+            are no elements selected in the listbox then an empty list is
+            returned. NOTE: The opposite method of this (*selectionSet()*)
+            is called with *indices*. Reason is that *selectionGet* is not
+            supported by Tk::Listbox, but is a direct call to the
+            corresponding method in Tk::HList.
+
+            The recommended method for fetching back the indicies selected
+            (either by the user or by *selectionSet()*) is to call the
+            *curselection()* method provided both here and in *Tk::Listbox*.
 
         *$listbox*->selectionIncludes(*index*)
-                Returns 1 if the element indicated by *index* is currently
-                selected, 0 if it isn't.
+            Returns 1 (true) if the element indicated by *index* is
+            currently selected, 0 (false) if it isn't.
 
-        *$listbox*->selectionSet(*first, *?*last*?)
-                Selects all of the elements in the range between *first* and
-                *last*, inclusive, without affecting the selection state of
-                elements outside that range.
+            The recommended method for fetching back the indicies selected
+            (either by the user or by *selectionSet()*) is to call the
+            *curselection()* method provided both here and in *Tk::Listbox*.
+
+        *$listbox*->selectionSet(*first-index, *?*last-index*?)
+            Selects all of the elements in the range between *first-index*
+            and *last-index*, inclusive, without affecting the selection
+            state of elements outside that range.
+
+            NOTE: Prior to v2.7, if more than two indices were passed to
+            *selectionSet()*, then the element of each index in the list
+            would be selected. Starting with v2.7, the list is limited to
+            one or two indices (as is the case with both *Tk::Listbox* and
+            *Tk::HList*). Two indices represents a range, causing all
+            elements with indices between the two specified (inclusive)
+            being selected.
 
     *$listbox*->size
         Returns a decimal string indicating the total number of elements in
         the listbox.
 
-    *$listbox*->xview(*args*)
+    *$listbox*->xview(*option, *?*arg(s), ...*?)
         This command is used to query and change the horizontal position of
         the information in the widget's window. It can take any of the
         following forms:
 
         *$listbox*->xview
-                Returns a list containing two elements. Each element is a
-                real fraction between 0 and 1; together they describe the
-                horizontal span that is visible in the window. For example,
-                if the first element is .2 and the second element is .6, 20%
-                of the listbox's text is off-screen to the left, the middle
-                40% is visible in the window, and 40% of the text is
-                off-screen to the right. These are the same values passed to
-                scrollbars via the -xscrollcommand option.
+            Returns a list containing two elements. Each element is a real
+            fraction between 0 and 1; together they describe the horizontal
+            span that is visible in the window. For example, if the first
+            element is .2 and the second element is .6, 20% of the listbox's
+            text is off-screen to the left, the middle 40% is visible in the
+            window, and 40% of the text is off-screen to the right. These
+            are the same values passed to scrollbars via the -xscrollcommand
+            option.
 
         *$listbox*->xview(*index*)
-                Adjusts the view in the window so that the character
-                position given by *index* is displayed at the left edge of
-                the window. Character positions are defined by the width of
-                the character 0.
+            Adjusts the view in the window so that the character position
+            given by *index* is displayed at the left edge of the window.
+            Character positions are defined by the width of the character 0.
 
-        *$listbox*->xviewMoveto( *fraction* );
-                Adjusts the view in the window so that *fraction* of the
-                total width of the listbox text is off-screen to the left.
-                *fraction* must be a fraction between 0 and 1.
+        *$listbox*->xviewMoveto(*fraction*);
+            Adjusts the view in the window so that *fraction* of the total
+            width of the listbox text is off-screen to the left. *fraction*
+            must be a fraction between 0 and 1.
 
-        *$listbox*->xviewScroll( *number, what* );
-                This command shifts the view in the window left or right
-                according to *number* and *what*. *Number* must be an
-                integer. *What* must be either units or pages or an
-                abbreviation of one of these. If *what* is units, the view
-                adjusts left or right by *number* character units (the width
-                of the 0 character) on the display; if it is pages then the
-                view adjusts by *number* screenfuls. If *number* is negative
-                then characters farther to the left become visible; if it is
-                positive then characters farther to the right become
-                visible.
+        *$listbox*->xviewScroll(*number, what*);
+            This command shifts the view in the window left or right
+            according to *number* and *what*. *Number* must be an integer.
+            *What* must be either units or pages or an abbreviation of one
+            of these. If *what* is units, the view adjusts left or right by
+            *number* character units (the width of the 0 character) on the
+            display; if it is pages then the view adjusts by *number*
+            screenfuls. If *number* is negative then characters farther to
+            the left become visible; if it is positive then characters
+            farther to the right become visible.
 
-    *$listbox*->yview(*?args*?)
+    *$listbox*->yview(*option, *?*arg(s), ...*?)
         This command is used to query and change the vertical position of
         the text in the widget's window. It can take any of the following
         forms:
 
         *$listbox*->yview
-                Returns a list containing two elements, both of which are
-                real fractions between 0 and 1. The first element gives the
-                position of the listbox element at the top of the window,
-                relative to the listbox as a whole (0.5 means it is halfway
-                through the listbox, for example). The second element gives
-                the position of the listbox element just after the last one
-                in the window, relative to the listbox as a whole. These are
-                the same values passed to scrollbars via the -yscrollcommand
-                option.
+            Returns a list containing two elements, both of which are real
+            fractions between 0 and 1. The first element gives the position
+            of the listbox element at the top of the window, relative to the
+            listbox as a whole (0.5 means it is halfway through the listbox,
+            for example). The second element gives the position of the
+            listbox element just after the last one in the window, relative
+            to the listbox as a whole. These are the same values passed to
+            scrollbars via the -yscrollcommand option.
 
         *$listbox*->yview(*index*)
-                Adjusts the view in the window so that the element given by
-                *index* is displayed at the top of the window.
+            Adjusts the view in the window so that the element given by
+            *index* is displayed at the top of the window.
 
-        *$listbox*->yviewMoveto( *fraction* );
-                Adjusts the view in the window so that the element given by
-                *fraction* appears at the top of the window. *Fraction* is a
-                fraction between 0 and 1; 0 indicates the first element in
-                the listbox, 0.33 indicates the element one-third the way
-                through the listbox, and so on.
+        *$listbox*->yviewMoveto(*fraction*);
+            Adjusts the view in the window so that the element given by
+            *fraction* appears at the top of the window. *Fraction* is a
+            fraction between 0 and 1; 0 indicates the first element in the
+            listbox, 0.33 indicates the element one-third the way through
+            the listbox, and so on.
 
         *$listbox*->yviewScroll( *number, what* );
-                This command adjusts the view in the window up or down
-                according to *number* and *what*. *Number* must be an
-                integer. *What* must be either units or pages. If *what* is
-                units, the view adjusts up or down by *number* lines; if it
-                is pages then the view adjusts by *number* screenfuls. If
-                *number* is negative then earlier elements become visible;
-                if it is positive then later elements become visible.
+            This command adjusts the view in the window up or down according
+            to *number* and *what*. *Number* must be an integer. *What* must
+            be either units or pages. If *what* is units, the view adjusts
+            up or down by *number* lines; if it is pages then the view
+            adjusts by *number* screenfuls. If *number* is negative then
+            earlier elements become visible; if it is positive then later
+            elements become visible.
 
 EXAMPLES
     #!/usr/bin/perl
@@ -622,20 +690,20 @@ EXAMPLES
             my $licon=$MW->Photo(-file => '/usr/share/pixmaps/smallicons/Penguin.xpm');  #ICON IMAGE
             my $wicon=$MW->Photo(-file => '/usr/share/pixmaps/smallicons/tiny_windowsxp.xpm');  #ICON IMAGE
             my $lbox = $MW->Scrolled('HListbox',
-                            -scrollbars => 'se', 
+                            -scrollbars => 'se',
                             -selectmode => 'extended',
                             -itemtype => 'imagetext',
                             -indicator => 1,
                             -indicatorcmd => sub {
                                     print STDERR "---indicator clicked---(".join('|',@_).")\n";
                             },
-                            -browsecmd => sub { 
+                            -browsecmd => sub {
                                     print STDERR "---browsecmd!---(".join('|',@_).")\n";
                             },
             )->pack(-fill => 'y', -expand => 1);
 
             $MW->Button(   #MAIN WINDOW BUTTON TO QUIT.
-                            -text => 'Bonus Tests', 
+                            -text => 'Bonus Tests',
                             -underline => 0,
                             -command => sub
             {
@@ -687,7 +755,7 @@ EXAMPLES
                             -side => 'bottom'
             );
             $MW->Button(   #MAIN WINDOW BUTTON TO QUIT.
-                            -text => 'Quit', 
+                            -text => 'Quit',
                             -underline => 0,
                             -command => sub { print "ok 5\n..done: 5 tests completed.\n"; exit(0) }
             )->pack(
@@ -695,7 +763,7 @@ EXAMPLES
             );
 
             #ADD SOME ITEMS (IMAGE+TEXT) TO OUR LISTBOX THE TRADITIONAL WAY:
-                    my @list = ( 
+                    my @list = (
                             {-image => $licon, -text => 'a' },
                             {-image => $wicon, -text => 'bbbbbbbbbbbbbbbbbbbB', -foreground => '#0000FF' },
                             {-text => 'c', -image => $licon },
@@ -724,7 +792,7 @@ EXAMPLES
             #SET THE 3RD AND 5TH ITEMS AS INITIALLY-SELECTED:
                     $lbox->selectionSet(2,4);
             #AND ONE WITH AN "INDICATOR IMAGE" JUST BEFORE THE 4TH ITEM:
-                    $lbox->insert(3, 'TextOnly at 3', 
+                    $lbox->insert(3, 'TextOnly at 3',
                                     {'-text' => '<Click Indicator Icon', '-indicatoritemtype', 'image', '-indicatorimage' => $wicon});
             #DISPLAY A LIST OF ALL THE CURRENT ITEMS IN THE LISTBOX:
                     print "--current choices=".join('|',$lbox->get(0, 'end'))."=\n";
@@ -937,14 +1005,14 @@ TIED INTERFACE
     Tied Scalars
         Unlike tied arrays, if you tie a scalar to the HListbox you can
         retrieve the currently selected elements in the box as an array
-        referenced by the scalar, for instance
+        referenced by the scalar, for instance:
 
             my @list = ( "a", "b", "c", "d", "e", "f" );
             $lbox->insert('end', sort @list );
             $lbox->selectionSet(1);
 
         inserts @list as elements in an already existing listbox and selects
-        the element at index 1, which is "b". If we then
+        the element at index 1, which is "b". If we then:
 
              print @$selected;
 
@@ -959,7 +1027,7 @@ TIED INTERFACE
 
         Importantly, if a value "both" is given the scalar will not be tied
         to an array, but instead to a hash, with keys being the indices and
-        values being the elements at those indices
+        values being the elements at those indices.
 
         You can also manipulate the selected items using the scalar.
         Equating the scalar to an array reference will select any elements
@@ -971,7 +1039,7 @@ TIED INTERFACE
             $lbox->selectionSet(1);
 
         would insert the array @list into an already existing HListbox and
-        select element at index 1, i.e. "b"
+        select element at index 1, i.e. "b":
 
             @array = ( "a", "b", "f" );
             $selected = \@array;
@@ -1005,7 +1073,7 @@ AUTHOR
     Jim Turner, "<https://metacpan.org/author/TURNERJW>".
 
 COPYRIGHT
-    Copyright (c) 2015-2022 Jim Turner "<mailto://turnerjw784@yahoo.com>".
+    Copyright (c) 2015-2023 Jim Turner "<mailto://turnerjw784@yahoo.com>".
     All rights reserved.
 
     This program is free software; you can redistribute it and/or modify it

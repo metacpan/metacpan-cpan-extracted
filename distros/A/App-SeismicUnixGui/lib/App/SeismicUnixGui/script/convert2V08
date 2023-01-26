@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# see if global variable is set
+# SeismicUnixGui_script is a global variable for locating the script folder
+
+ if [ -z "${SeismicUnixGui_script}" ]; then
+
+ 	echo "global variable SeismicUnixGui_script must be set"
+ 	echo "e.g. in .bashrc: "
+ 	echo " export SeismicUnixGui_script=/Location/of/script/folder "
+ 	
+ else
+	perl $SeismicUnixGui_script/../developer/code/sunix/convert2V07.pl
+ fi

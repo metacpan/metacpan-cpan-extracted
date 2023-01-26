@@ -1,6 +1,5 @@
 #include "std.h"
 
-//
 typedef int (*pii_i)(void *, int, int);
 DLLEXPORT int cb_pii_i(pii_i cb) {
     return ((*cb)(NULL, 100, 200));
@@ -12,9 +11,11 @@ DLLEXPORT bool cb_dZb_b(dZb_b cb) {
     return ((*cb)(9.9, "Hi", false));
 }
 
+//
 typedef void (*v_v)(void);
 DLLEXPORT bool cb_v_v(v_v cb) {
     ((*cb)());
+    return true;
 }
 
 //
@@ -99,4 +100,23 @@ DLLEXPORT double cb_d_d(d_d cb) {
 typedef char *(*Z_Z)(char *);
 DLLEXPORT char *cb_Z_Z(Z_Z cb) {
     return ((*cb)("Ready!"));
+}
+
+//
+struct A {
+    Z_Z cb;
+    int i;
+};
+DLLEXPORT char *cb_A(struct A a) {
+    return ((*a.cb)("Ready!"));
+}
+
+//
+typedef char *(*sub)();
+typedef char *(*CV_Z)(char *, sub code);
+DLLEXPORT char *cb_CV_Z(CV_Z cb, sub code) {
+    warn("# here at %s line %d", __FILE__, __LINE__);
+    (*code)();
+    warn("# here at %s line %d", __FILE__, __LINE__);
+    return ((*cb)("Ready!", code));
 }

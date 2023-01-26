@@ -1,26 +1,30 @@
 ---
 abstract: 'DBI Wrapper with Perl style data structure interfaces'
 author:
-  - 'Michael R. Davis (domain=>stopllc,tld=>com,account=>mdavis)'
+  - 'Michael R. Davis'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001'
+license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: DBIx-Array
 no_index:
   directory:
     - t
     - inc
 requires:
-  DBD::CSV: 0
-  DBI: 0
-  File::Basename: 0
-  Test::Simple: 0
-  Tie::Cache: 0
-version: 0.64
+  DBD::CSV: '0'
+  DBI: '0'
+  File::Basename: '0'
+  Test::Simple: '0'
+  Tie::Cache: '0'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-DBIx-Array/issues
+  homepage: https://github.com/mrdvt92/perl-DBIx-Array
+  repository: https://github.com/mrdvt92/perl-DBIx-Array.git
+version: '0.65'

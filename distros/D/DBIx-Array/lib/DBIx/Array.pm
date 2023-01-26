@@ -8,7 +8,7 @@ use List::Util qw(sum);
 use DBI;
 use DBIx::Array::Session::Action;
 
-our $VERSION = '0.64';
+our $VERSION = '0.65';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
@@ -1572,27 +1572,17 @@ Improve error messages
 
 =head1 BUGS
 
-Send email to author and log on RT.
-
-=head1 SUPPORT
-
-DavisNetworks.com supports all Perl applications including this package.
+Please open on GitHub
 
 =head1 AUTHOR
 
   Michael R. Davis
-  CPAN ID: MRDVT
-  STOP, LLC
-  domain=>stopllc,tld=>com,account=>mdavis
-  http://www.stopllc.com/
 
 =head1 COPYRIGHT
 
-This program is free software licensed under the...
+MIT License
 
-  The BSD License
-
-The full text of the license can be found in the LICENSE file included with this module.
+Copyright (c) 2023 Michael R. Davis
 
 =head1 SEE ALSO
 

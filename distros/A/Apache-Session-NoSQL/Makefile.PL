@@ -10,6 +10,7 @@ WriteMakefile(
             'Net::Cassandra' => 0,
             'Redis'          => 0,
         },
+        'x_deprecated' => 1,
     },
     PREREQ_PM => { 'Apache::Session' => 0, },    # e.g., Module::Name => 1.1
     (

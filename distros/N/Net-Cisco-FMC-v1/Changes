@@ -1,4 +1,7 @@
-Revision history for Net-Cisco-FMC-v1: 0.007001
+Revision history for Net-Cisco-FMC-v1: 0.008000
+
+0.008000  2023-01-26 16:10:57+01:00 Europe/Vienna
+    - add methods for FQDNs
 
 0.007001  2023-01-20 08:24:02+01:00 Europe/Vienna
     - fix api.t when FMC environment variables aren't set

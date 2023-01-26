@@ -6,7 +6,7 @@ SYNOPSIS
         say $red->add('blue')->name;                    # mix in RGB: 'magenta'
         Graphics::Toolkit::Color->new( 0, 0, 255)->hsl; # 240, 100, 50 = blue
         $blue->blend_with({H=> 0, S=> 0, L=> 80}, 0.1); # mix blue with a little grey in HSL
-        $red->gradient_to( '#0000FF', 10);              # 10 colors from red to blue
+        $red->rgb_gradient_to( '#0000FF', 10);          # 10 colors from red to blue
         $red->complementary( 3 );                       # get fitting red green and blue
 
 DESCRIPTION
@@ -92,54 +92,39 @@ CONSTRUCTOR
         my $darkblue = color([20, 20, 250]);
 
 GETTER / ATTRIBUTES
-    are all read only methods - giving access to different parts of the
-    objects data.
+    are read only methods - giving access to different parts of the objects
+    data.
 
   name
-    Name of the color in the X11 or HTML (SVG) standard or the Pantone
-    report. The name will be found and filled in, even when the object is
-    created with RGB or HSL values. If the color is not found in any of the
-    mentioned standards, it returns an empty string. All names are at:
-    "NAMES" in Graphics::Toolkit::Color::Constant
+    String with name of the color in the X11 or HTML (SVG) standard or the
+    Pantone report. The name will be found and filled in, even when the
+    object is created with RGB or HSL values. If the color is not found in
+    any of the mentioned standards, it returns an empty string. All names
+    are at: "NAMES" in Graphics::Toolkit::Color::Constant
 
   string
-    Returns string that can be serialized back into a color object
-    (recreated by Graphics::Toolkit::Color-&gt;new( $string )). It is either
-    the color name (if color has one) or result of "rgb_hex".
+    String that can be serialized back into a color object (recreated by
+    Graphics::Toolkit::Color->new( $string )). It is either the color "name"
+    (if color has one) or result of "rgb_hex".
 
   red
-    Integer between 0 .. 255 describing the red portion in RGB space.
+    Integer between 0 .. 255 describing the red portion in RGB space. Higher
+    value means more color and an lighter color.
 
   green
     Integer between 0 .. 255 describing the green portion in RGB space.
+    Higher value means more color and an lighter color.
 
   blue
     Integer between 0 .. 255 describing the blue portion in RGB space.
-
-  rgb
-    List with values of red, green and blue (see above), no refeerence.
-
-  rgb_hex
-    String starting with '#', followed by six hexadecimal figures. Two
-    digits for each of red, green and blue value - the format used in CSS.
-
-  rgb_hash
-    Reference to a *HASH* containing the keys 'red', 'green' and 'blue' with
-    their respective values as defined above.
-
-  hsl_hash
-    Reference to a *HASH* containing the keys 'hue', 'saturation' and
-    'lightness' with their respective values as defined below.
-
-  hsl
-    List of three values of hue, saturation and lightness (see below).
+    Higher value means more color and an lighter color.
 
   hue
     Integer between 0 .. 359 describing the angle (in degrees) of the
     circular dimension in HSL space named hue. 0 approximates red, 30 -
     orange, 60 - yellow, 120 - green, 180 - cyan, 240 - blue, 270 - violet,
-    300 - magenta, 330 - pink. 0 and 360 point to the same coordinate, but
-    this module only deals with 0.
+    300 - magenta, 330 - pink. 0 and 360 point to the same coordinate. This
+    module only outputs 0, even if accepting 360 as input.
 
   saturation
     Integer between 0 .. 100 describing percentage of saturation in HSL
@@ -149,7 +134,27 @@ GETTER / ATTRIBUTES
   lightness
     Integer between 0 .. 100 describing percentage of lightness in HSL
     space. 0 is always black, 100 is always white and 50 the most colorful
-    (depending on hue value) (or grey - if saturation = 0).
+    (depending on "hue" value) (or grey - if saturation = 0).
+
+  rgb
+    List (no *ARRAY* reference) with values of "red", "green" and "blue".
+
+  hsl
+    List (no *ARRAY* reference) with values of "hue", "saturation" and
+    "lightness".
+
+  rgb_hex
+    String starting with character '#', followed by six hexadecimal lower
+    case figures. Two digits for each of "red", "green" and "blue" value -
+    the format used in CSS (#rrggbb).
+
+  rgb_hash
+    Reference to a *HASH* containing the keys 'red', 'green' and 'blue' with
+    their respective values as defined above.
+
+  hsl_hash
+    Reference to a *HASH* containing the keys 'hue', 'saturation' and
+    'lightness' with their respective values as defined above.
 
 METHODS
     create new, related color (objects) or compute similarity of colors
@@ -210,13 +215,13 @@ METHODS
         $color->blend_with( [192, 192, 192] );                 # still same
         my $difference = $color->blend_with( $c2, -1 );
 
-  gradient_to
+  rgb_gradient_to
     Creates a gradient (a list of colors that build a transition) between
     current (C1) and a second, given color (C2).
 
     The first argument is C2. Either as an Graphics::Toolkit::Color object
-    or a scalar (name, hex or reference), which is acceptable to the method
-    new.
+    or a scalar (name, hex or reference), which is acceptable to a
+    constructor.
 
     Second argument is the number $n of colors, which make up the gradient
     (including C1 and C2). It defaults to 3. These 3 colors C1, C2 and a
@@ -224,16 +229,19 @@ METHODS
 
     Third argument is also a positive number $p, which defaults to one. It
     defines the dynamics of the transition between the two colors. If $p ==
-    1 you get a linear transition - meaning the distance in HSL space
-    (distance_hsl) is equal from one color to the next. If $p != 1, the
-    formula $n ** $p starts to create a parabola function, which defines a
-    none linear mapping. For values $n > 1 the transition starts by sticking
-    to C1 and slowly getting faster and faster toward C2. Values $n < 1 do
-    the opposite: starting by moving fastest from C1 to C2 (big distances)
-    and becoming slower and slower.
+    1 you get a linear transition - meaning the distance in RGB space is
+    equal from one color to the next. If $p != 1, the formula $n ** $p
+    starts to create a parabola function, which defines a none linear
+    mapping. For values $n > 1 the transition starts by sticking to C1 and
+    slowly getting faster and faster toward C2. Values $n < 1 do the
+    opposite: starting by moving fastest from C1 to C2 (big distances) and
+    becoming slower and slower.
 
-        my @colors = $c->gradient_to( $grey, 5 );         # we turn to grey
-        @colors = $c1->gradient_to( [14,10,222], 10, 3 ); # none linear gradient
+        my @colors = $c->rgb_gradient_to( $grey, 5 );         # we turn to grey
+        @colors = $c1->rgb_gradient_to( [14,10,222], 10, 3 ); # none linear gradient
+
+  hsl_gradient_to
+    Same as "rgb_gradient_to" (what you normally want), but in HSL space.
 
   complementary
     Creates a set of complementary colors. It accepts 3 numerical arguments:

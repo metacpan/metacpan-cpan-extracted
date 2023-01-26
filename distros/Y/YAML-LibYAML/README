@@ -1,6 +1,6 @@
 NAME
 
-    YAML-LibYAML - Perl YAML Serialization using XS and libyaml
+    YAML::XS - Perl YAML Serialization using XS and libyaml
 
 SYNOPSIS
 
@@ -161,7 +161,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    Copyright 2007-2022 - Ingy döt Net
+    Copyright 2007-2023 - Ingy döt Net
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

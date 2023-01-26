@@ -5,7 +5,8 @@ lib/DBIx/Array/Session/Action.pm
 LICENSE
 Makefile.PL
 MANIFEST
-README
+README.md
+CONTRIBUTING.md
 t/001_use.t
 t/001_connection.t
 t/002_sql_functions.t
@@ -19,7 +20,6 @@ t/011_bulk_updates.t
 t/012_bulk_inserts_cursor.t
 t/013_sqlwhere.t
 t/014_AutoCommit.t
-Todo
 scripts/DBIx-Array-tablename.pl
 scripts/DBIx-Array-bind_param.pl
 scripts/DBIx-Array-export-xls.pl

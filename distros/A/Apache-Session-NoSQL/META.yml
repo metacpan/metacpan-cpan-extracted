@@ -1,25 +1,27 @@
---- #YAML:1.0
-name:               Apache-Session-NoSQL
-version:            0.1
-abstract:           An implementation of Apache::Session module for NoSQL databases
+---
+abstract: 'An implementation of Apache::Session module for NoSQL databases'
 author:
-    - Thomas Chemineau <thomas.chemineau@gmail.com>
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Thomas Chemineau <thomas.chemineau@gmail.com>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Apache::Session:  0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.55_02
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Apache-Session-NoSQL
+no_index:
+  directory:
+    - t
+    - inc
 recommends:
-    Net::Cassandra:  0
-    Redis:           0
+  Net::Cassandra: '0'
+  Redis: '0'
+requires:
+  Apache::Session: '0'
+version: '0.3'
+x_deprecated: 1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

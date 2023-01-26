@@ -13,7 +13,7 @@ use Path::Tiny qw(path);
 
 # ABSTRACT: parse and model go.mod files
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 our $AUTHORITY = 'cpan:bclawsie';
 
 our @EXPORT_OK = qw(read_go_mod parse_go_mod _parse_retract);
@@ -246,28 +246,34 @@ Lang::Go::Mod - parse and model go.mod files
    # require (
    #    golang.org/x/sys v0.0.0-20210510120138-977fb7262007 // indirect
    # )
+   # retract (
+   #    v1.0.0 // this version should not be used
+   # )
 
    use Lang::Go::Mod qw(read_go_mod parse_go_mod);
 
    my $go_mod_path = '/path/to/go.mod';
 
    # read and parse the go.mod file
+   #
    # all errors croak, so wrap this in your favorite variant of try/catch
    # to gracefully manage errors
    my $m = read_go_mod($go_mod_path);
    # use parse_go_mod to parse the go.mod content if it is already in a scalar
+   # my $m = parse_go_mod($go_mod_file_content);
 
    print $m->{module}; # github.com/example/my-project
    print $m->{go}; # 1.16
    print $m->{exclude}->{'example.com/whatmodule'}; # [v1.4.0]
    print $m->{replace}->{'github.com/example/my-project/pkg/app'}; # ./pkg/app
    print $m->{'require'}->{'golang.org/x/sys'}; # v0.0.0-20210510120138-977fb7262007
+   print $m->{retract}->{'v1.0.0'}; # 1
 
 =head1 DESCRIPTION
 
 This module creates a hash representation of a C<go.mod> file.
-Both single line and multiline C<exclude>, C<replace>, and C<require>
-sections are supported. For a full reference of the C<go.mod> format, see 
+Both single line and multiline C<exclude>, C<replace>, C<require> and C<retract>
+sections are supported. For a full reference of the C<go.mod> format, see
 
 L<https://golang.org/doc/modules/gomod-ref>
 
@@ -280,10 +286,10 @@ return the hash representation of the contents. All errors C<croak>.
 
 =head2 C<parse_go_mod>
 
-Given a scalar of the contents of a C<go.mod> file, parse it and 
+Given a scalar of the contents of a C<go.mod> file, parse it and
 return the hash representation of the contents. All errors C<croak>.
 
-=head1 LICENSE 
+=head1 LICENSE
 
 Lang::Go::Mod is licensed under the same terms as Perl itself.
 
@@ -292,5 +298,6 @@ L<https://opensource.org/licenses/artistic-license-2.0>
 =head1 CONTRIBUTORS
 
 Ben Bullock (L<https://github.com/benkasminbullock>)
+Brad Clawsie (L<https://b7j0c.org>)
 
 =cut

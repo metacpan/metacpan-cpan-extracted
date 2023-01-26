@@ -1,6 +1,6 @@
 package Lab::Measurement::KeyboardHandling;
 #ABSTRACT: Minimal keyboard input handling
-$Lab::Measurement::KeyboardHandling::VERSION = '3.840';
+$Lab::Measurement::KeyboardHandling::VERSION = '3.841';
 use v5.20;
 
 use Term::ReadKey;
@@ -81,11 +81,11 @@ Lab::Measurement::KeyboardHandling - Minimal keyboard input handling
 
 =head1 VERSION
 
-version 3.840
+version 3.841
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2012       Andreas K. Huettel, Hermann Kraus
             2016       Simon Reinhardt

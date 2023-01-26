@@ -25,6 +25,21 @@ is run('p', '<p title=a>b</p>'), wrapped('<p title=a>xyzzy</p>'),
 is run('[title]', '<p title>b</p>'), '<div id=irrelevant>1 2 3</div> <div class="x y"><p title>xyzzy</p></div> <div class=x title="eng glo oxy">xyzzy</div>',
     'attribute presence selector';
 
+is run('[\\t\\i\\t\\le]', '<p title>b</p>'), '<div id=irrelevant>1 2 3</div> <div class="x y"><p title>xyzzy</p></div> <div class=x title="eng glo oxy">xyzzy</div>',
+    'attribute presence selector (with literal escape)';
+
+is run('[ti\\74le]', '<p title>b</p>'), '<div id=irrelevant>1 2 3</div> <div class="x y"><p title>xyzzy</p></div> <div class=x title="eng glo oxy">xyzzy</div>',
+    'attribute presence selector (with short hex escape)';
+
+is run('[tit\\00006ce]', '<p title>b</p>'), '<div id=irrelevant>1 2 3</div> <div class="x y"><p title>xyzzy</p></div> <div class=x title="eng glo oxy">xyzzy</div>',
+    'attribute presence selector (With long hex escape)';
+
+is run('[tit\\6c e]', '<p title>b</p>'), '<div id=irrelevant>1 2 3</div> <div class="x y"><p title>xyzzy</p></div> <div class=x title="eng glo oxy">xyzzy</div>',
+    'attribute presence selector (With short hex escape and space)';
+
+is run('[tit\\00006c e]', '<p title>b</p>'), '<div id=irrelevant>1 2 3</div> <div class="x y"><p title>xyzzy</p></div> <div class=x title="eng glo oxy">xyzzy</div>',
+    'attribute presence selector (With long hex escape and space)';
+
 is run('[title=a]', '<p title=a>b</p>'), wrapped('<p title=a>xyzzy</p>'),
     'attribute value selector (unquoted)';
 
@@ -40,8 +55,38 @@ is run('[title^=""]', '<p title=a>b</p>'), wrapped('<p title=a>b</p>'),
 is run('[title^=xy]', '<p title=xylophone>b</p>'), wrapped('<p title=xylophone>xyzzy</p>'),
     'attribute prefix selector (unquoted)';
 
+is run('[title^=\\x\\y]', '<p title=xylophone>b</p>'), wrapped('<p title=xylophone>xyzzy</p>'),
+    'attribute prefix selector (unquoted with literal escape)';
+
+is run('[title^=\\78y]', '<p title=xylophone>b</p>'), wrapped('<p title=xylophone>xyzzy</p>'),
+    'attribute prefix selector (unquoted with short hex escape)';
+
+is run('[title^=\\000078y]', '<p title=xylophone>b</p>'), wrapped('<p title=xylophone>xyzzy</p>'),
+    'attribute prefix selector (unquoted with long hex escape)';
+
+is run('[title^=\\78 y]', '<p title=xylophone>b</p>'), wrapped('<p title=xylophone>xyzzy</p>'),
+    'attribute prefix selector (unquoted with short hex escape and space)';
+
+is run('[title^=\\000078 y]', '<p title=xylophone>b</p>'), wrapped('<p title=xylophone>xyzzy</p>'),
+    'attribute prefix selector (unquoted with long hex escape and space)';
+
 is run('[title^="xy"]', '<p title=xylophone>b</p>'), wrapped('<p title=xylophone>xyzzy</p>'),
     'attribute prefix selector (double quoted)';
+
+is run('[title^="\\x\\y"]', '<p title=xylophone>b</p>'), wrapped('<p title=xylophone>xyzzy</p>'),
+    'attribute prefix selector (double quoted with literal escape)';
+
+is run('[title^="\\78y"]', '<p title=xylophone>b</p>'), wrapped('<p title=xylophone>xyzzy</p>'),
+    'attribute prefix selector (double quoted with short hex escape)';
+
+is run('[title^="\\000078y"]', '<p title=xylophone>b</p>'), wrapped('<p title=xylophone>xyzzy</p>'),
+    'attribute prefix selector (double quoted with long hex escape)';
+
+is run('[title^="\\78 y"]', '<p title=xylophone>b</p>'), wrapped('<p title=xylophone>xyzzy</p>'),
+    'attribute prefix selector (double quoted with short hex escape and space)';
+
+is run('[title^="\\000078 y"]', '<p title=xylophone>b</p>'), wrapped('<p title=xylophone>xyzzy</p>'),
+    'attribute prefix selector (double quoted with long hex escape and space)';
 
 is run("[title^='xy']", '<p title=xylophone>b</p>'), wrapped('<p title=xylophone>xyzzy</p>'),
     'attribute prefix selector (single quoted)';
@@ -91,8 +136,38 @@ is run('[title|="en"]', '<p title=en-fr>b</p>'), wrapped('<p title=en-fr>xyzzy</
 is run('.glow', '<p class="static glow">b</p>'), wrapped('<p class="static glow">xyzzy</p>'),
     'class selector';
 
+is run('.\\gl\\ow', '<p class="static glow">b</p>'), wrapped('<p class="static glow">xyzzy</p>'),
+    'class selector (with literal escape)';
+
+is run('.\\67l\\6fw', '<p class="static glow">b</p>'), wrapped('<p class="static glow">xyzzy</p>'),
+    'class selector (with short hex escape)';
+
+is run('.\\000067l\\00006fw', '<p class="static glow">b</p>'), wrapped('<p class="static glow">xyzzy</p>'),
+    'class selector (with long hex escape)';
+
+is run('.\\67 l\\6f w', '<p class="static glow">b</p>'), wrapped('<p class="static glow">xyzzy</p>'),
+    'class selector (with short hex escape and space)';
+
+is run('.\\000067 l\\00006f w', '<p class="static glow">b</p>'), wrapped('<p class="static glow">xyzzy</p>'),
+    'class selector (with long hex escape and space)';
+
 is run('#it', '<p id=it>b</p>'), wrapped('<p id=it>xyzzy</p>'),
     'identity selector';
+
+is run('#\\i\\t', '<p id=it>b</p>'), wrapped('<p id=it>xyzzy</p>'),
+    'identity selector (with literal escape)';
+
+is run('#\\69t', '<p id=it>b</p>'), wrapped('<p id=it>xyzzy</p>'),
+    'identity selector (with short hex escape)';
+
+is run('#\\000069t', '<p id=it>b</p>'), wrapped('<p id=it>xyzzy</p>'),
+    'identity selector (with long hex escape)';
+
+is run('#\\69 t', '<p id=it>b</p>'), wrapped('<p id=it>xyzzy</p>'),
+    'identity selector (with short hex escape and space)';
+
+is run('#\\000069 t', '<p id=it>b</p>'), wrapped('<p id=it>xyzzy</p>'),
+    'identity selector (with long hex escape and space)';
 
 is run('p:nth-child(2)', '<div> <p>A</p> <p>B</p> <p>C</p> <p>D</p> <p>E</p> </div>'), wrapped('<div> <p>A</p> <p>xyzzy</p> <p>C</p> <p>D</p> <p>E</p> </div>'),
     'nth child selector (fixed)';

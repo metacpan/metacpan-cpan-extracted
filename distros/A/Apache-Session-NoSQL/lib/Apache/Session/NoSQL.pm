@@ -9,7 +9,7 @@ use Apache::Session::Serialize::Base64;
 #use Apache::Session::Serialize::Storable;
 
 use vars qw($VERSION);
-$VERSION = '0.2';
+$VERSION = '0.3';
 
 sub populate {
     my $self = shift;
@@ -33,6 +33,8 @@ __END__
 =head1 NAME
 
 Apache::Session::NoSQL - An implementation of Apache::Session module for NoSQL databases
+
+Note: this module is deprecated, Prefer L<Apache::Session::Browseable>
 
 =head1 SYNOPSIS
 

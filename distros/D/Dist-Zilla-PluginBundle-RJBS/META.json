@@ -94,7 +94,7 @@
          "web" : "https://github.com/rjbs/Dist-Zilla-PluginBundle-RJBS"
       }
    },
-   "version" : "5.022",
+   "version" : "5.023",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.037002"
@@ -122,7 +122,7 @@
          {
             "class" : "Dist::Zilla::Plugin::CheckPrereqsIndexed",
             "name" : "@RJBS/CheckPrereqsIndexed",
-            "version" : "0.021"
+            "version" : "0.022"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckExtraTests",
@@ -309,7 +309,7 @@
                   ],
                   "finder" : [
                      ":InstallModules",
-                     ":ExecFiles"
+                     ":PerlExecFiles"
                   ],
                   "plugins" : [
                      {
@@ -416,12 +416,12 @@
                }
             },
             "name" : "@RJBS/PodWeaver",
-            "version" : "4.009"
+            "version" : "4.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::RJBSMisc",
             "name" : "@RJBS/RJBSMisc",
-            "version" : "5.022"
+            "version" : "5.023"
          },
          {
             "class" : "Dist::Zilla::Plugin::GithubMeta",
@@ -484,7 +484,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "5.022",
+                  "tag" : "5.023",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

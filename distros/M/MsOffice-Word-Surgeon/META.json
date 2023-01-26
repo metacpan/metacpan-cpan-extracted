@@ -43,27 +43,27 @@
    "provides" : {
       "MsOffice::Word::Surgeon" : {
          "file" : "lib/MsOffice/Word/Surgeon.pm",
-         "version" : "2.0"
+         "version" : "2.01"
       },
       "MsOffice::Word::Surgeon::PackagePart" : {
          "file" : "lib/MsOffice/Word/Surgeon/PackagePart.pm",
-         "version" : "2.0"
+         "version" : "2.01"
       },
       "MsOffice::Word::Surgeon::Revision" : {
          "file" : "lib/MsOffice/Word/Surgeon/Revision.pm",
-         "version" : "2.0"
+         "version" : "2.01"
       },
       "MsOffice::Word::Surgeon::Run" : {
          "file" : "lib/MsOffice/Word/Surgeon/Run.pm",
-         "version" : "2.0"
+         "version" : "2.01"
       },
       "MsOffice::Word::Surgeon::Text" : {
          "file" : "lib/MsOffice/Word/Surgeon/Text.pm",
-         "version" : "2.0"
+         "version" : "2.01"
       },
       "MsOffice::Word::Surgeon::Utils" : {
          "file" : "lib/MsOffice/Word/Surgeon/Utils.pm",
-         "version" : "2.0"
+         "version" : "2.01"
       }
    },
    "release_status" : "stable",
@@ -75,6 +75,6 @@
          "url" : "https://github.com/damil/MsOffice-Word-Surgeon"
       }
    },
-   "version" : "2.0",
+   "version" : "2.01",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

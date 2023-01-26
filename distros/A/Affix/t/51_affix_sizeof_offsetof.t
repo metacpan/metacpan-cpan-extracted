@@ -8,8 +8,7 @@ $|++;
 #
 use t::lib::nativecall;
 #
-compile_test_lib('51_affix_sizeof_offsetof');
-my $lib = 't/51_affix_sizeof_offsetof';
+my $lib = compile_test_lib('51_affix_sizeof_offsetof');
 subtest 'fundamental types' => sub {
 
     #diag sizeof(Double);

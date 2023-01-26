@@ -14,7 +14,7 @@ Lab::Measurement::Tutorial - Lab::Measurement tutorial
 
 =head1 VERSION
 
-version 3.840
+version 3.841
 
 =head1 How to read the documentation
 
@@ -1060,7 +1060,7 @@ L<Lab::Measurement::Developer>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2006       Daniel Schroeer
             2010       Daniel Schroeer

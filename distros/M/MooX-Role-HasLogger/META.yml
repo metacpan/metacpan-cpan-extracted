@@ -22,12 +22,12 @@ no_index:
     - t
     - inc
 requires:
-  Log::Any: '0'
-  Moo: '0'
-  MooX::TypeTiny: '0'
+  Log::Any: '1.711'
+  Moo: '2.004000'
+  MooX::TypeTiny: '0.002003'
   Type::Tiny: '0'
   namespace::clean: '0'
 resources:
   bugtracker: https://github.com/XSven/MooX-Role-HasLogger/issues
   repository: git://github.com/XSven/MooX-Role-HasLogger.git
-version: '0.001'
+version: '0.001001'

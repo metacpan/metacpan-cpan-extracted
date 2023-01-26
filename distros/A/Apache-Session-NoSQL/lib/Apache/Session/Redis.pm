@@ -20,6 +20,8 @@ __END__
 
 Apache::Session::Redis - An implementation of Apache::Session
 
+Note: this module is deprecated, Prefer L<Apache::Session::Browseable>
+
 =head1 SYNOPSIS
 
  use Apache::Session::Redis;

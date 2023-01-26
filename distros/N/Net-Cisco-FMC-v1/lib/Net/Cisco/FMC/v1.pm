@@ -1,5 +1,5 @@
 package Net::Cisco::FMC::v1;
-$Net::Cisco::FMC::v1::VERSION = '0.007001';
+$Net::Cisco::FMC::v1::VERSION = '0.008000';
 # ABSTRACT: Cisco Firepower Management Center (FMC) API version 1 client library
 
 use 5.024;
@@ -165,6 +165,11 @@ Net::Cisco::FMC::v1::Role::ObjectMethods->apply([
         path     => 'object',
         object   => 'ranges',
         singular => 'range',
+    },
+    {
+        path     => 'object',
+        object   => 'fqdns',
+        singular => 'fqdn',
     },
     {
         path     => 'object',
@@ -699,7 +704,7 @@ Net::Cisco::FMC::v1 - Cisco Firepower Management Center (FMC) API version 1 clie
 
 =head1 VERSION
 
-version 0.007001
+version 0.008000
 
 =head1 SYNOPSIS
 

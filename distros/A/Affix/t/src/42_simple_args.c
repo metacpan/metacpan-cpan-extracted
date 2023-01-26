@@ -59,7 +59,6 @@ DLLEXPORT int wrapped(int n) {
 }
 
 DLLEXPORT int TakeInt64(int64_t x) {
-    warn("%ld", x);
     if (x == 0xFFFFFFFFFF) return 9;
     return 0;
 }

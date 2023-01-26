@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-YAML-LibYAML - Perl YAML Serialization using XS and libyaml
+YAML::XS - Perl YAML Serialization using XS and libyaml
 
 =for html
 <a href="https://github.com/ingydotnet/yaml-libyaml-pm/actions/workflows/linux.yml"><img src="https://github.com/ingydotnet/yaml-libyaml-pm/actions/workflows/linux.yml/badge.svg" alt="linux"></a>
@@ -146,7 +146,7 @@ Ingy döt Net L<ingy@ingy.net|mailto:ingy@ingy.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2007-2022 - Ingy döt Net
+Copyright 2007-2023 - Ingy döt Net
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

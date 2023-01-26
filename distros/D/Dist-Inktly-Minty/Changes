@@ -6,6 +6,14 @@ Home page:    <https://metacpan.org/release/Dist-Inktly-Minty>
 Bug tracker:  <https://github.com/tobyink/p5-dist-inktly-minty/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.005	2022-11-06
+
+ [ Bug Fixes ]
+ - Fix bug tracker links in generated pod.
+
+ [ Other ]
+ - Use Test2::Plugin::BailOnFail in generated test suite.
+
 0.004	2022-11-06
 
  [ Bug Fixes ]

@@ -23,7 +23,7 @@ requires:
 resources:
   bugtracker: https://github.com/bradclawsie/Lang-Go-Mod/issues
   repository: git://github.com/bradclawsie/Lang-Go-Mod.git
-version: '0.006'
+version: '0.007'
 x_contributors:
   - 'Ben Bullock <benkasminbullock@gmail.com>'
   - 'Brad Clawsie <brad@b7j0c.org>'

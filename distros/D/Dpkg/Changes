@@ -1,3 +1,114 @@
+dpkg (1.21.19) unstable; urgency=medium
+
+  [ Guillem Jover ]
+  * Architecture support:
+    - Revert "arch: Add support for loong64 CPU". See #1028654.
+  * Perl modules:
+    - Dpkg::OpenPGP::Backend::GnuPG: Set secure signing preferred algorithms.
+      Closes: #1028961
+    - Dpkg::OpenPGP::Backend::GnuPG: Touch trustedkeys.gpg on temporary gpg
+      home.
+    - Dpkg::OpenPGP::Backend::GnuPG: Fallback to use «gpg dearmor» if
+      present. Reported by Sven Joachim <svenjoac@gmx.de> (on IRC).
+    - Dpkg::Vendor::Ubuntu: Fix lto feature to honor DEB_BUILD_OPTIONS.
+  * Test suite:
+    - Set the permissions explicitly for the copied ChangeLog.old file.
+    - Add unit tests for lto build flags handling in Ubuntu.
+      Thanks to Shengjing Zhu <shengjing.zhu@canonical.com>.
+      See https://bugs.launchpad.net/bugs/2002582.
+  * Localization:
+    - Update Catalan translation.
+    - Update Portuguese man pages translation.
+      Thanks to Américo Monteiro <a_monteiro@gmx.com>. Closes: #1028981
+
+  [ Sven Joachim ]
+  * Localization:
+    - Update German programs translation.
+
+  [ Helge Kreutzmann ]
+  * Localization:
+    - Update German man pages translation.
+
+ -- Guillem Jover <guillem@debian.org>  Tue, 24 Jan 2023 23:39:50 +0100
+
+dpkg (1.21.18) unstable; urgency=medium
+
+  [ Guillem Jover ]
+  * Perl modules:
+    - Dpkg::BuildFlags: Fix strip method to always work with duplicates.
+      Closes: #1028044
+  * Documentation:
+    - man: Add a note to dpkg-fsys-usrunmess(8) about Debian support.
+      Closes: #1008486
+  * Code internals:
+    - libdpkg: Move compression level max bound check from dpkg-deb.
+    - libdpkg: Switch dpkg_lzma_strerror() to use struct io_lzma.
+    - libdpkg: Split compression filter operation tracking from its status.
+    - libdpkg: Generalize compression stream action handling.
+    - libdpkg: Abstract compression stream status tracking.
+    - libdpkg: Add zstd support for .deb archives. Closes: #892664
+  * Build system:
+    - Update .mailmap mappings.
+  * Packaging:
+    - Update copyright years.
+  * Test suite:
+    - Add dpkg-deb build and extract tests.
+
+ -- Guillem Jover <guillem@debian.org>  Tue, 10 Jan 2023 18:46:37 +0100
+
+dpkg (1.21.17) unstable; urgency=medium
+
+  [ Guillem Jover ]
+  * dpkg-genbuildinfo: Do not fail if the cross-compiler cannot compile.
+    Closes: #1027966
+  * Code internals:
+    - dpkg-buildinfo: Fix indentation.
+  * Packaging:
+    - Stop shipping the «git log» changelog in exchange for no trimming.
+      Closes: #1027716
+
+ -- Guillem Jover <guillem@debian.org>  Thu, 05 Jan 2023 12:34:05 +0100
+
+dpkg (1.21.16) unstable; urgency=medium
+
+  [ Guillem Jover ]
+  * dpkg-deb: Fix buffer overflow on long directory names with old deb formats.
+    Reported by Georgy Yakovlev <gyakovlev@gentoo.org>.
+  * Perl modules:
+    - Dpkg::Compression: Pass --no-adjust to xz to force compression threaded
+      mode.
+    - Dpkg::Compression: Make xz not emit warnings nor exit non-zero on
+      warnings.
+    - Dpkg::OpenPGP::Backend::SOP: Add sqop as an alternative SOP
+      implementation.
+    - Dpkg::Source::Package::V3::Git: Move error() argument out of g_() call.
+  * Code internals:
+    - libdpkg: Make xz not emit warnings nor exit non-zero on warnings.
+
+  [ Helge Kreutzmann ]
+  * Localization:
+    - Update German man pages translation.
+    - Update German scripts translation.
+
+ -- Guillem Jover <guillem@debian.org>  Wed, 04 Jan 2023 23:57:40 +0100
+
+dpkg (1.21.15) unstable; urgency=medium
+
+  [ Guillem Jover ]
+  * Perl modules:
+    - Dpkg::BuildFlags: Add new get_feature() method.
+    - Dpkg::Vendor::Debian: Use get_feature() instead of use_feature() for PIE.
+      Reported by Helmut Grohne <helmut@subdivi.de>.
+    - Dpkg: Temporarily silence deprecation warnings.
+  * Test suite:
+    - Improve TAP descriptions to clarify we are testing patch(1).
+
+  [ Sven Joachim ]
+  * Localization:
+    - Update German programs translation.
+
+ -- Guillem Jover <guillem@debian.org>  Mon, 02 Jan 2023 12:44:53 +0100
+
 dpkg (1.21.14) unstable; urgency=medium
 
   [ Guillem Jover ]

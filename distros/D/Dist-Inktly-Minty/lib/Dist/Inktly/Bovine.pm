@@ -5,7 +5,7 @@ use warnings;
 package Dist::Inktly::Bovine;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.004';
+our $VERSION   = '0.005';
 
 use Text::Template;
 
@@ -50,7 +50,7 @@ use namespace::autoclean;
 {}=head1 BUGS
 
 Please report any bugs to
-<https://github.com/{lc $author->{cpanid}}/p5-{lc URI::Escape::uri_escape($dist_name)}/issues>.
+L<https://github.com/{lc $author->{cpanid}}/p5-{lc URI::Escape::uri_escape($dist_name)}/issues>.
 
 {}=head1 SEE ALSO
 
@@ -84,6 +84,7 @@ EOF
 	:test-requirement       [ :on "Test2::Tools::Spec"^^:CpanId ];
 	:test-requirement       [ :on "Test2::Require::AuthorTesting"^^:CpanId ];
 	:test-requirement       [ :on "Test2::Require::Module"^^:CpanId ];
+	:test-requirement       [ :on "Test2::Plugin::BailOnFail"^^:CpanId ];
 	:develop-recommendation [ :on "Dist::Inkt 0.001"^^:CpanId ];
 	.
 EOF
@@ -115,7 +116,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2022 by Toby Inkster.
+This software is copyright (c) 2013-2023 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

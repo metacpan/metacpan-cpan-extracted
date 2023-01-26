@@ -1,6 +1,6 @@
 package Lab::Instrument::Agilent34410A;
 #ABSTRACT: HP/Agilent/Keysight 34410A or 34411A digital multimeter
-$Lab::Instrument::Agilent34410A::VERSION = '3.840';
+$Lab::Instrument::Agilent34410A::VERSION = '3.841';
 use v5.20;
 
 
@@ -720,7 +720,7 @@ Lab::Instrument::Agilent34410A - HP/Agilent/Keysight 34410A or 34411A digital mu
 
 =head1 VERSION
 
-version 3.840
+version 3.841
 
 =head1 SYNOPSIS
 
@@ -1006,7 +1006,7 @@ Issue a single beep immediately.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2012       Andreas K. Huettel, Stefan Geissler
             2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Stefan Geissler

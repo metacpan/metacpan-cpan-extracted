@@ -8,8 +8,7 @@ $|++;
 #
 use t::lib::nativecall;
 #
-compile_test_lib('70_affix_varargs');
-my $lib = 't/70_affix_varargs';
+my $lib = compile_test_lib('70_affix_varargs');
 #
 #int min(int arg_count, ...)
 subtest 'ellipsis varargs' => sub {

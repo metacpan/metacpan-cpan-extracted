@@ -3,7 +3,7 @@ package Module::ScanDeps::Static;
 use strict;
 use warnings;
 
-our $VERSION = '0.9';
+our $VERSION = '1.001';
 
 use 5.010;
 
@@ -159,7 +159,7 @@ sub is_core {
     # test modules against Perls that are older than 5.8.9 - however,
     # some modules like JSON::PP did not appear until > 5.10
 
-    # print {*STDERR} "$first_release_version $min_core_version";
+    # print {*STDERR} "$module: $first_release_version $min_core_version\n";
 
     $core = version->parse($first_release_version)
       <= version->parse($min_core_version) ? 1 : 0;
@@ -172,7 +172,7 @@ sub is_core {
 }
 
 ########################################################################
-sub parse_line {  ## no critic (Subroutines::ProhibitExcessComplexity)
+sub parse_line { ## no critic (Subroutines::ProhibitExcessComplexity)
 ########################################################################
   my ( $self, $line ) = @_;
 
@@ -284,7 +284,7 @@ sub parse_line {  ## no critic (Subroutines::ProhibitExcessComplexity)
   #   eval "require Term::Rendezvous;" or die $@;
   #   eval { require Carp } if defined $^S; # If error/warning during compilation,
 
-  ## no critic (RegularExpressions::ProhibitComplexRegexes, RegularExpressions::RequireBracesForMultiline)
+  ## no critic (ProhibitComplexRegexes, RequireBracesForMultiline)
   if (
     ( $line =~ /\A(\s*) # we hope the inclusion starts the line
          (require|use)\s+(?![{])      # do not want 'do {' loops
@@ -302,7 +302,7 @@ sub parse_line {  ## no critic (Subroutines::ProhibitExcessComplexity)
 
     $version //= $EMPTY;
 
-    # print {*STDERR} "$whitespace, $statement, $module, $version\n";
+    #print {*STDERR} "$whitespace, $statement, $module, $version\n";
 
     # fix misidentification of version when use parent qw{ Foo };
     #
@@ -320,6 +320,9 @@ sub parse_line {  ## no critic (Subroutines::ProhibitExcessComplexity)
         $version = $EMPTY;
       }
     }
+
+    #print {*STDERR} "$whitespace, $statement, $module, $version\n";
+
     #
 
     # we only consider require statements that are flushed against
@@ -331,7 +334,7 @@ sub parse_line {  ## no critic (Subroutines::ProhibitExcessComplexity)
       return $line if $whitespace ne $EMPTY && $statement eq 'require';
     }
     elsif ( $statement eq 'require' ) {
-      return $line if $line =~ /\$/xsm;  # eval?
+      return $line if $line =~ /\$/xsm; # eval?
     }
 
     # if there is some interpolation of variables just skip this
@@ -409,6 +412,8 @@ sub parse_line {  ## no critic (Subroutines::ProhibitExcessComplexity)
     if ( $statement eq 'use'
       && ( $module eq 'base' || $module eq 'parent' ) ) {
       $self->add_require( $module, $version );
+      #print {*STDERR}
+      #  "statement: $statement module: $module, version: $version\n";
 
       if ( $version =~ /\Aqw\s*[{(\/'"]\s*([^)}\/"']+?)\s*[})\/"']/xsm ) {
         foreach ( split $SPACE, $1 ) {
@@ -425,8 +430,19 @@ sub parse_line {  ## no critic (Subroutines::ProhibitExcessComplexity)
     if ( $version && $version !~ /\A$modver_re\z/oxsm ) {
       $version = undef;
     }
+    #print {*STDERR}
+    #  "statement: $statement module: $module, version: $version\n";
 
-    $self->add_require( $module, $version );
+    my @module_list = split /\s+/xsm, $module;
+
+    if ( @module_list > 1 ) {
+      for (@module_list) {
+        $self->add_require( $_, $EMPTY );
+      }
+    }
+    else {
+      $self->add_require( $module, $version );
+    }
   }
 
   return $line;
@@ -440,7 +456,7 @@ sub parse {
   if ( my $file = $self->get_path ) {
     chomp $file;
 
-    open my $fh, '<', $file  ## no critic (InputOutput::RequireBriefOpen)
+    open my $fh, '<', $file ## no critic (InputOutput::RequireBriefOpen)
       or croak "could not open file '$file' for reading: $OS_ERROR";
 
     $self->set_handle($fh);
@@ -450,7 +466,7 @@ sub parse {
     $self->set_handle( IO::Scalar->new($script) );
   }
   elsif ( !$self->get_handle ) {
-    open my $fh, '<&STDIN'   ## no critic (InputOutput::RequireBriefOpen)
+    open my $fh, '<&STDIN'  ## no critic (InputOutput::RequireBriefOpen)
       or croak 'could not open STDIN';
 
     $self->set_handle($fh);

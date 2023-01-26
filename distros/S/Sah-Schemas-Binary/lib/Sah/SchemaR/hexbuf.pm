@@ -1,10 +1,10 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::hexbuf;
 
-our $DATE = '2022-09-25'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2022-10-20'; # DATE
+our $VERSION = '0.008'; # VERSION
 
-our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nWhitespaces are allowed and will be removed.\n\nNote that this schema does not decode the hex encoding for you.\n\n",examples=>[{valid=>1,value=>""},{summary=>"Odd number of digits",valid=>0,value=>"f"},{valid=>1,value=>"fafafa"},{summary=>"Uppercase digits are allowed, not coerced to lowercase",valid=>1,value=>"FAFAFA"},{summary=>"Whitespaces allowed, will be removed",valid=>1,validated_value=>"fafafa",value=>"fa fa  fa"},{valid=>0,value=>"fafafg"}],match=>qr(\A([0-9A-fa-f][0-9A-fa-f])*\z),prefilters=>["Str::remove_whitespace"],summary=>"Binary data encoded in hexdigits, e.g. \"fafafa\" or \"ca fe 00\""}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
+our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nWhitespaces are allowed and will be removed.\n\nNote: that this schema does not decode the hex encoding for you.\n\nNote: if you add clauses like `leng`, `min_len`, `max_len`\n\n",examples=>[{valid=>1,value=>""},{summary=>"Odd number of digits",valid=>0,value=>"f"},{valid=>1,value=>"fafafa"},{summary=>"Uppercase digits are allowed, not coerced to lowercase",valid=>1,value=>"FAFAFA"},{summary=>"Whitespaces allowed, will be removed",valid=>1,validated_value=>"fafafa",value=>"fa fa  fa"},{valid=>0,value=>"fafafg"}],links=>[{summary=>"Equivalent Type::Tiny constraints: HexBinary (doesn't allow whitespace; length, minLength, maxLength params checks the /decoded/ length)",url=>"pm:Types::XSD"}],match=>qr(\A([0-9A-fa-f][0-9A-fa-f])*\z),prefilters=>["Str::remove_whitespace"],summary=>"Binary data encoded in hexdigits, e.g. \"fafafa\" or \"ca fe 00\""}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: Binary data encoded in hexdigits, e.g. "fafafa" or "ca fe 00"
@@ -21,7 +21,7 @@ Sah::SchemaR::hexbuf - Binary data encoded in hexdigits, e.g. "fafafa" or "ca fe
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::SchemaR::hexbuf (from Perl distribution Sah-Schemas-Binary), released on 2022-09-25.
+This document describes version 0.008 of Sah::SchemaR::hexbuf (from Perl distribution Sah-Schemas-Binary), released on 2022-10-20.
 
 =head1 DESCRIPTION
 

@@ -67,7 +67,8 @@ print $MW ? "ok 3\n" : "not ok 3 ($@$? - image object not created (icon.xpm MISS
 		for (my $i=0;$i<=$#v;$i++)
 		{
 			my $ent = $lbox->get($v[$i]);
-			print "--selected($i)=$ent= TEXT=".$ent->{'-text'}."=\n";
+			print "--selected($i)=$ent=\n";
+			print "-----TEXT=".$ent->{'-text'}."=\n"  if (defined $ent->{'-text'});
 		}
 	#PRINT WHETHER THE LAST ITEM IS CURRENTLY SELECTED (2 WAYS):
 		print "--select includes last one =".$lbox->selectionIncludes('end')."=\n";
@@ -88,12 +89,14 @@ print $MW ? "ok 3\n" : "not ok 3 ($@$? - image object not created (icon.xpm MISS
 	#FETCH THE INDEX OF THE LAST ITEM:
 		#FETCH AND DISPLAY SOME ATTRIBUTES:
 		print "--anchor was=$anchorWas= now=$anchorNow= yview=".join('|',@yview)."=\n";
+		print "--active=".$lbox->index('active')."=\n";
 		print "-reqheight=".$lbox->reqheight."= height=".$lbox->cget('-height')."= size=".$lbox->size."=\n";
 	#PRINT OUT THE VALUES OF THE TIED VARIABLES:
 		print "-scalar=".join('|',@{$scalar})."=\n-array=".join('|',@array)."=\n-other=".join('|',@{$other})."=\n";
 		foreach my $e (@{$other}) {
 			my $ent = $lbox->get($e);
-			print "----selected index($e) text=".$ent->{'-text'}."=\n";
+			print "----selected index($e)=$ent=\n";
+			print "-----TEXT=".$ent->{'-text'}."=\n"  if (defined $ent->{'-text'});
 		}
 	#RECONFIGURE 2ND ITEM TO FOREGROUND:=GREEN:
 		$lbox->itemconfigure(1,'-fg', 'green');
@@ -109,8 +112,6 @@ print $MW ? "ok 3\n" : "not ok 3 ($@$? - image object not created (icon.xpm MISS
 		pop @array;
 	#ADD IT BACK VIA THE TIED ARRAY:
 		push @array, {-image => $licon, -text => 'ArrayAdd!'};
-	#FIND AND DISPLAY THE INDEX OF THE TEXT ENTRY "Y":
-		print "-Index of 'Y' =".$lbox->findIndex('Y')."=\n";
 	}
 	)->pack(
 			-side => 'bottom'

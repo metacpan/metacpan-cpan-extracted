@@ -18,6 +18,14 @@ C<Sys::Poll::PollfdArray> is the class for the array of C<struct pollfd> in C<C 
 
 This is a L<pointer class|SPVM::Document::Language/"Pointer Class">.
 
+=head1 Fields
+
+=head2 length
+
+  has length : ro int;
+
+The length of the array.
+
 =head1 Class Methods
 
 =head2 new

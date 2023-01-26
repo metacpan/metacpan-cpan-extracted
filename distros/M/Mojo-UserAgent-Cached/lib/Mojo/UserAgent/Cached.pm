@@ -26,7 +26,7 @@ use Time::HiRes qw/time/;
 Readonly my $HTTP_OK => 200;
 Readonly my $HTTP_FILE_NOT_FOUND => 404;
 
-our $VERSION = '1.24';
+our $VERSION = '1.25';
 
 # TODO: Timeout, fallback
 # TODO: Expected result content (json etc)
@@ -51,6 +51,7 @@ has 'cache_agent'        => sub {
     namespace          => $ENV{MUAC_CACHE_NAMESPACE}          || 'MUAC_Client',
     expires_in         => $ENV{MUAC_CACHE_EXPIRES_IN}         // '1 minute',
     expires_on_backend => $ENV{MUAC_CACHE_EXPIRES_ON_BACKEND} // 1,
+    max_key_length     => 140,
     %{ shift->cache_opts || {} },
   )
 };

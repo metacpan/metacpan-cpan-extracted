@@ -18,7 +18,7 @@ use constant XML_SIMPLE_INDENT => 1;
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.0';
+our $VERSION = '2.01';
 
 
 #======================================================================
@@ -123,19 +123,14 @@ sub _relationships {
   # xml that describes the relationships for this package part
   my $rel_xml = $self->_rels_xml;
 
-  state $rx_relationship = qr[<Relationship     \s+
-                               Id="(\w+)"       \s+
-                               Type="([^"]+?)"  \s+
-                               Target="([^"]+?)"/>]x;
-
   # parse the relationships and assemble into a sparse array indexed by relationship ids
   my @relationships;
-  while ($rel_xml =~ /$rx_relationship/g) {
-    my %r;
-    @r{qw/rId type target/} = ($1, $2, $3);
-    ($r{num}        = $r{rId})  =~ s[^\D+][];
-    ($r{short_type} = $r{type}) =~ s[^.*/][];
-    $relationships[$r{num}] = \%r;
+  while ($rel_xml =~ m[<Relationship\s+(.*?)/>]g) {
+    my %attrs = parse_attrs($1);
+    $attrs{$_} or croak "missing attribute '$_' in <Relationship> node" for qw/Id Type Target/;
+    ($attrs{num}        = $attrs{Id})  =~ s[^\D+][];
+    ($attrs{short_type} = $attrs{Type}) =~ s[^.*/][];
+    $relationships[$attrs{num}] = \%attrs;
   }
 
   return \@relationships;
@@ -146,21 +141,26 @@ sub _images {
   my $self = shift;
 
   # get relationship ids associated with images
-  my %rel_image  = map  {$_->{rId} => $_->{target}}
+  my %rel_image  = map  {$_->{Id} => $_->{Target}}
                    grep {$_ && $_->{short_type} eq 'image'}
                    $self->relationships->@*;
 
   # get titles and relationship ids of images found within the part contents
   my %image;
   my @drawings = $self->contents =~ m[<w:drawing>(.*?)</w:drawing>]g;
+ DRAWING:
   foreach my $drawing (@drawings) {
-    if ($drawing =~ m[<wp:docPr [^>]*? title="([^"]+)"/>
+    if ($drawing =~ m[<wp:docPr \s+ (.*?) />
                       .*?
                       <a:blip \s+ r:embed="(\w+)"]x) {
-      my ($title, $rId) = ($1, $2);
-      $image{$title} = "word/$rel_image{$rId}"
-                       # NOTE: targets in the rels XML miss the "word/" prefix, I don't know why.
-        or die "couldn't find image for relationship '$rId' associated with image '$title'";
+      my ($lst_attrs, $rId) = ($1, $2);
+      my %attrs = parse_attrs($lst_attrs);
+      my $img_id = $attrs{title} || $attrs{descr}
+        or next DRAWING;
+
+      $image{$img_id} = "word/$rel_image{$rId}"
+        or die "couldn't find image for relationship '$rId' associated with image '$img_id'";
+        # NOTE: targets in the rels XML miss the "word/" prefix, I don't know why.
     }
   }
 
@@ -455,6 +455,39 @@ sub add_image {
 }
 
 
+
+#======================================================================
+# UTILITY FUNCTIONS
+#======================================================================
+
+
+sub parse_attrs {  # cheap parsing of attribute lists in an XML node
+  my ($lst_attrs) = @_;
+
+  state $attr_pair_regex = qr[
+     ([^=\s"'&<>]+)     # attribute name
+     \h* = \h*          # Eq
+     (?:                # attribute value
+        " ([^<"]*) "    # .. enclosed in double quotes
+       |
+        ' ([^<']*) '    # .. or enclosed in single quotes
+     )
+   ]x;
+
+  state $entity       = {quot => '"', amp => '&', 'lt' => '<', gt => '>'};
+  state $entity_names = join "|", keys %$entity;
+
+  my %attr;
+  while ($lst_attrs =~ /$attr_pair_regex/g) {
+    my ($name, $val) = ($1, $2 // $3);
+    $val =~ s/&(entity_names);/$entity->{$1}/eg;
+    $attr{$name} = $val;
+  }
+
+  return %attr;
+}
+
+
 1;
 
 __END__
@@ -526,7 +559,7 @@ keys
 
 =over
 
-=item rId
+=item Id
 
 the full relationship id
 
@@ -534,7 +567,7 @@ the full relationship id
 
 the numeric part of C<rId>
 
-=item type
+=item Type
 
 the full reference to the XML schema for this relationship
 
@@ -542,7 +575,7 @@ the full reference to the XML schema for this relationship
 
 only the last word of the type, e.g. 'image', 'style', etc.
 
-=item target
+=item Target
 
 designation of the target within the ZIP file. The prefix 'word/' must be
 added for having a complete Zip member name.
@@ -553,10 +586,15 @@ added for having a complete Zip member name.
 
 =item images
 
-a hashref of images within this package part. Keys of the hash are image I<titles>, because
-this is the only information visible to MsWord users : when in Word, within the image formatting panel,
-the "properties" tab has a field for editing the image title. Images without title will not be 
-accessible through the current Perl module. Values of the hash are zip member names for the corresponding
+a hashref of images within this package part. Keys of the hash are image I<alternative texts>.
+If present, the alternative I<title> will be prefered; otherwise the alternative I<description> will be taken
+(note : the I<title> field was displayed in Office 2013 and 2016, but more recent versions only display
+the I<description> field -- see
+L<https://support.microsoft.com/en-us/office/add-alternative-text-to-a-shape-picture-chart-smartart-graphic-or-other-object-44989b2a-903c-4d9a-b742-6a75b451c669|MsOffice documentation>).
+
+Images without alternative text will not be accessible through the current Perl module.
+
+Values of the hash are zip member names for the corresponding
 image representations in C<.png> format.
 
 
@@ -746,16 +784,22 @@ replacements is merely returned to the caller.
 =back
 
 
-
 =head3 replace_image
 
-  $part->replace_image($image_title, $image_PNG_content);
+  $part->replace_image($image_alt_text, $image_PNG_content);
 
 Replaces an existing PNG image by a new image. All features of the old image will
 be preserved (size, positioning, border, etc.) -- only the image itself will be
-replaced. The C<$image_title> must correspond to the title set in Word
-through the image formatting panel, "properties" tab, "title" field.
+replaced. The C<$image_alt_text> must correspond to the I<alternative text> set in Word
+for this image.
 
+This operation replaces a ZIP member within the C<.docx> file. If several XML
+nodes refer to the I<same> ZIP member, i.e. if the same image is displayed at several
+locations, the new image will appear at all locations, even if they do not have the
+same alternative text -- unfortunately this module currently has no facility for
+duplicating an existing image into separate instances. So if your intent is to only replace
+one image, your original document should contain several distinct images, coming from
+several distinct C<.PNG> file copies.
 
 
 =head3 add_image
@@ -768,8 +812,6 @@ to  make the image visible in Word : it just stores the image, but you still
 have to insert a proper C<drawing> node in the contents XML, using the C<$rId>.
 Future versions of this module may offer helper methods for that purpose;
 currently it must be done by hand.
-
-
 
 
 =head1 AUTHOR

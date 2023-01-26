@@ -3,6 +3,11 @@ Revision history for Perl module DBIx-Array
 TODO:
   - Do we need to $dbh->quote_identifier($column) in bulkinsert methods?
 
+0.65 2023-01-24
+  - Move to GitHub repository
+  - Changed license from BSD to MIT
+  - Cleaned up author tests
+
 0.64 2020-04-06
   - Updates to add test coverage - No operatonal changes
 

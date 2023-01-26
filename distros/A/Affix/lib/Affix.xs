@@ -13,7 +13,7 @@ int get_pin(pTHX_ SV *sv, MAGIC *mg) {
 
 int set_pin(pTHX_ SV *sv, MAGIC *mg) {
     var_ptr *ptr = (var_ptr *)mg->mg_ptr;
-    DCpointer val = SvOK(sv) ? sv2ptr(aTHX_ ptr->type, sv, ptr->ptr, 0, 0) : NULL;
+    if (SvOK(sv)) sv2ptr(aTHX_ ptr->type, sv, ptr->ptr, false);
     return 0;
 }
 
@@ -34,211 +34,6 @@ static MGVTBL pin_vtbl = {
     NULL,     // dup
     NULL      // local
 };
-
-typedef struct CoW {
-    DCCallback *cb;
-    struct CoW *next;
-} CoW;
-
-static CoW *cow;
-
-typedef struct {
-    char *sig;
-    size_t sig_len;
-    char ret;
-    void *fptr;
-    char *perl_sig;
-    DLLib *lib;
-    AV *args;
-    SV *retval;
-    bool reset;
-} Call;
-
-typedef struct {
-    char *sig;
-    size_t sig_len;
-    char ret;
-    char *perl_sig;
-    SV *cv;
-    AV *args;
-    SV *retval;
-    dTHXfield(perl)
-} Callback;
-
-char cbHandler(DCCallback *cb, DCArgs *args, DCValue *result, DCpointer userdata) {
-    Callback *cbx = (Callback *)userdata;
-    /*warn("Triggering callback: %c (%s [%d] return: %c) at %s line %d", cbx->ret,
-       cbx->sig, cbx->sig_len, cbx->ret, __FILE__, __LINE__);*/
-    dTHXa(cbx->perl);
-
-    dSP;
-    int count;
-
-    ENTER;
-    SAVETMPS;
-
-    PUSHMARK(SP);
-
-    EXTEND(SP, cbx->sig_len);
-    char type;
-    for (int i = 0; i < cbx->sig_len; ++i) {
-        type = cbx->sig[i];
-        // warn("type : %c", type);
-        switch (type) {
-        case DC_SIGCHAR_VOID:
-            // TODO: push undef?
-            break;
-        case DC_SIGCHAR_BOOL:
-            mPUSHs(boolSV(dcbArgBool(args)));
-            break;
-        case DC_SIGCHAR_CHAR:
-            mPUSHi((IV)dcbArgChar(args));
-            break;
-        case DC_SIGCHAR_UCHAR:
-            mPUSHu((UV)dcbArgChar(args));
-            break;
-        case DC_SIGCHAR_SHORT:
-            mPUSHi((IV)dcbArgShort(args));
-            break;
-        case DC_SIGCHAR_USHORT:
-            mPUSHu((UV)dcbArgShort(args));
-            break;
-        case DC_SIGCHAR_INT:
-            mPUSHi((IV)dcbArgInt(args));
-            break;
-        case DC_SIGCHAR_UINT:
-            mPUSHu((UV)dcbArgInt(args));
-            break;
-        case DC_SIGCHAR_LONG:
-            mPUSHi((IV)dcbArgLong(args));
-            break;
-        case DC_SIGCHAR_ULONG:
-            mPUSHu((UV)dcbArgLong(args));
-            break;
-        case DC_SIGCHAR_LONGLONG:
-            mPUSHi((IV)dcbArgLongLong(args));
-            break;
-        case DC_SIGCHAR_ULONGLONG:
-            mPUSHu((UV)dcbArgLongLong(args));
-            break;
-        case DC_SIGCHAR_FLOAT:
-            mPUSHn((NV)dcbArgFloat(args));
-            break;
-        case DC_SIGCHAR_DOUBLE:
-            mPUSHn((NV)dcbArgDouble(args));
-            break;
-        case DC_SIGCHAR_POINTER: {
-            mPUSHs(sv_setref_pv(newSV(1), "Affix::Pointer", dcbArgPointer(args)));
-            // mPUSHs(newSVpv((char *)ptr, 0));
-        } break;
-        case DC_SIGCHAR_STRING: {
-            DCpointer ptr = dcbArgPointer(args);
-            PUSHs(newSVpv((char *)ptr, 0));
-        } break;
-        case DC_SIGCHAR_BLESSED: {
-            DCpointer ptr = dcbArgPointer(args);
-            HV *blessed = MUTABLE_HV(SvRV(*av_fetch(cbx->args, i, 0)));
-            SV **package = hv_fetchs(blessed, "package", 0);
-            PUSHs(sv_setref_pv(newSV(1), SvPV_nolen(*package), ptr));
-        } break;
-        case DC_SIGCHAR_ENUM:
-        case DC_SIGCHAR_ENUM_UINT: {
-            PUSHs(enum2sv(*av_fetch(cbx->args, i, 0), dcbArgInt(args)));
-        } break;
-        case DC_SIGCHAR_ENUM_CHAR: {
-            PUSHs(enum2sv(*av_fetch(cbx->args, i, 0), dcbArgChar(args)));
-        } break;
-        case DC_SIGCHAR_ANY: {
-            DCpointer ptr = dcbArgPointer(args);
-            SV *sv = newSV(0);
-            if (ptr != NULL && SvOK(MUTABLE_SV(ptr))) {
-                // DumpHex(ptr, sizeof(SV));
-                // warn("SvOK");
-                sv = MUTABLE_SV(ptr);
-                // sv_dump(sv);
-            }
-            PUSHs(sv);
-        } break;
-        default:
-            croak("Unhandled callback arg. Type: %c [%s]", cbx->sig[i], cbx->sig);
-            break;
-        }
-    }
-    PUTBACK;
-    if (cbx->ret == DC_SIGCHAR_VOID) { call_sv(cbx->cv, G_VOID); }
-    else {
-        count = call_sv(cbx->cv, G_SCALAR);
-        if (count != 1) croak("Big trouble: %d returned items", count);
-        SPAGAIN;
-        switch (cbx->ret) {
-        case DC_SIGCHAR_VOID:
-            break;
-        case DC_SIGCHAR_BOOL:
-            result->B = SvTRUEx(POPs);
-            break;
-        case DC_SIGCHAR_CHAR:
-            result->c = POPu;
-            break;
-        case DC_SIGCHAR_UCHAR:
-            result->C = POPu;
-            break;
-        case DC_SIGCHAR_SHORT:
-            result->s = POPu;
-            break;
-        case DC_SIGCHAR_USHORT:
-            result->S = POPi;
-            break;
-        case DC_SIGCHAR_INT:
-            result->i = POPi;
-            break;
-        case DC_SIGCHAR_UINT:
-            result->I = POPu;
-            break;
-        case DC_SIGCHAR_LONG:
-            result->j = POPl;
-            break;
-        case DC_SIGCHAR_ULONG:
-            result->J = POPul;
-            break;
-        case DC_SIGCHAR_LONGLONG:
-            result->l = POPi;
-            break;
-        case DC_SIGCHAR_ULONGLONG:
-            result->L = POPu;
-            break;
-        case DC_SIGCHAR_FLOAT:
-            result->f = POPn;
-            break;
-        case DC_SIGCHAR_DOUBLE:
-            result->d = POPn;
-            break;
-        case DC_SIGCHAR_POINTER: {
-            SV *sv_ptr = POPs;
-            if (SvOK(sv_ptr)) {
-                if (sv_derived_from(sv_ptr, "Affix::Pointer")) {
-                    IV tmp = SvIV((SV *)SvRV(sv_ptr));
-                    result->p = INT2PTR(DCpointer, tmp);
-                }
-                else
-                    croak("Returned value is not a Affix::Pointer or subclass");
-            }
-            else
-                result->p = NULL; // ha.
-        } break;
-        case DC_SIGCHAR_STRING:
-            result->Z = POPp;
-            break;
-        default:
-            croak("Unhandled return from callback: %c", cbx->ret);
-        }
-        PUTBACK;
-    }
-
-    FREETMPS;
-    LEAVE;
-
-    return cbx->ret;
-}
 
 XS_INTERNAL(Types_wrapper) {
     dVAR;
@@ -284,7 +79,7 @@ XS_INTERNAL(Types) {
 
     HV *RETVAL_HV = newHV();
     //
-    //  warn("ix == %c", ix);
+    //  //warn("ix == %c", ix);
     switch (ix) {
     case DC_SIGCHAR_ENUM:
     case DC_SIGCHAR_ENUM_UINT:
@@ -323,7 +118,8 @@ XS_INTERNAL(Types) {
                                 size = (strlen(eval) > (size + strlen(line))) ? size + strlen(line)
                                                                               : size;
                                 Renewc(eval, size, char, char);
-                                Copy(line, (DCpointer)(PTR2IV(eval) + pos), strlen(line) + 1, char);
+                                Copy(line, INT2PTR(DCpointer, PTR2IV(eval) + pos), strlen(line) + 1,
+                                     char);
                                 pos += strlen(line);
                             }
                             current_value = eval_pv(form("package Affix::Enum::eval{no warnings "
@@ -385,10 +181,11 @@ XS_INTERNAL(Types) {
             size_t type_sizeof = _sizeof(aTHX_ type);
             for (int i = 0; i < array_length; ++i) {
                 array_sizeof += type_sizeof;
-                array_sizeof += packed ? 0
-                                       : padding_needed_for(array_sizeof, ALIGNBYTES > type_sizeof
-                                                                              ? type_sizeof
-                                                                              : ALIGNBYTES);
+                array_sizeof +=
+                    packed ? 0
+                           : padding_needed_for(array_sizeof, AFFIX_ALIGNBYTES > type_sizeof
+                                                                  ? type_sizeof
+                                                                  : AFFIX_ALIGNBYTES);
                 offset = array_sizeof;
             }
         } break;
@@ -430,7 +227,9 @@ XS_INTERNAL(Types) {
                 croak("Given type for return value is not a subclass of "
                       "Affix::Type::Base");
 
-            char signature[field_count];
+            char *signature;
+            Newxz(signature, field_count + 1, char);
+
             for (int i = 0; i < field_count; i++) {
                 SV **type_ref = av_fetch(fields, i, 0);
                 char *str = SvPVbytex_nolen(*type_ref);
@@ -449,10 +248,13 @@ XS_INTERNAL(Types) {
                     break;
                 }
             }
+            signature[field_count] = ')';
+            signature[field_count + 1] = (char)*SvPV_nolen(retval);
+
             hv_stores(RETVAL_HV, "args", SvREFCNT_inc(*av_fetch(args, 0, 0)));
             hv_stores(RETVAL_HV, "return", SvREFCNT_inc(retval));
             hv_stores(RETVAL_HV, "sig_len", newSViv(field_count));
-            hv_stores(RETVAL_HV, "signature", newSVpv(signature, field_count));
+            hv_stores(RETVAL_HV, "signature", newSVpv(signature, field_count + 2));
         }
     } break;
     case DC_SIGCHAR_STRUCT:
@@ -477,15 +279,16 @@ XS_INTERNAL(Types) {
                 size_t __sizeof = _sizeof(aTHX_ type);
                 if (ix == DC_SIGCHAR_STRUCT) {
                     size += packed ? 0
-                                   : padding_needed_for(size, ALIGNBYTES > __sizeof ? __sizeof
-                                                                                    : ALIGNBYTES);
+                                   : padding_needed_for(size, AFFIX_ALIGNBYTES > __sizeof
+                                                                  ? __sizeof
+                                                                  : AFFIX_ALIGNBYTES);
                     size += __sizeof;
                     (void)hv_stores(MUTABLE_HV(SvRV(type)), "offset", newSVuv(size - __sizeof));
                 }
                 else {
                     if (size < __sizeof) size = __sizeof;
-                    if (!packed && field_count > 1 && __sizeof > ALIGNBYTES)
-                        size += padding_needed_for(__sizeof, ALIGNBYTES);
+                    if (!packed && field_count > 1 && __sizeof > AFFIX_ALIGNBYTES)
+                        size += padding_needed_for(__sizeof, AFFIX_ALIGNBYTES);
                     (void)hv_stores(MUTABLE_HV(SvRV(type)), "offset", newSVuv(0));
                 }
                 (void)hv_stores(MUTABLE_HV(SvRV(type)), "sizeof", newSVuv(__sizeof));
@@ -498,8 +301,8 @@ XS_INTERNAL(Types) {
             }
 
             if (ix == DC_SIGCHAR_STRUCT) {
-
-                if (!packed && size > ALIGNBYTES * 2) size += padding_needed_for(size, ALIGNBYTES);
+                if (!packed && size > AFFIX_ALIGNBYTES * 2)
+                    size += padding_needed_for(size, AFFIX_ALIGNBYTES);
             }
             hv_stores(RETVAL_HV, "sizeof", newSVuv(size));
             hv_stores(RETVAL_HV, "fields", newRV(MUTABLE_SV(fields)));
@@ -521,7 +324,7 @@ XS_INTERNAL(Types) {
         else
             croak("Pointer[...] expects a single type. e.g. Pointer[Int]");
     } break;
-    case DC_SIGCHAR_BLESSED: {
+    case DC_SIGCHAR_INSTANCEOF: {
         AV *packages_in = MUTABLE_AV(SvRV(ST(1)));
         if (av_count(packages_in) != 1) croak("InstanceOf[...] expects a single package name");
         SV **package_ptr = av_fetch(packages_in, 0, 0);
@@ -597,9 +400,9 @@ XS_INTERNAL(Affix_call) {
     bool pointers = false;
 
     /*warn("Calling at %s line %d", __FILE__, __LINE__);
-    warn("%d items at %s line %d", items, __FILE__, __LINE__);
-    warn("sig_len: %d at %s line %d", call->sig_len, __FILE__, __LINE__);
-    warn("sig: %s at %s line %d", call->sig, __FILE__, __LINE__);*/
+    //warn("%d items at %s line %d", items, __FILE__, __LINE__);
+    //warn("sig_len: %d at %s line %d", call->sig_len, __FILE__, __LINE__);
+    //warn("sig: %s at %s line %d", call->sig, __FILE__, __LINE__);*/
 
     if (call->sig_len != items) {
         if (call->sig_len < items && !call->reset) croak("Too many arguments");
@@ -624,8 +427,8 @@ XS_INTERNAL(Affix_call) {
     SV *value;
     SV *type;
     char _type;
-    DCpointer pointer[call->sig_len];
-    bool l_pointer[call->sig_len];
+    DCpointer pointer[items];
+    bool l_pointer[items];
     for (size_t pos_arg = 0, pos_csig = 0, pos_psig = 0; pos_arg < items;
          ++pos_arg, ++pos_csig, ++pos_psig) {
         /*warn("Working on element %d of %d (type: %c, pos_arg: %d, pos_csig: %d,
@@ -672,10 +475,10 @@ XS_INTERNAL(Affix_call) {
             dcArgLong(MY_CXT.cvm, (unsigned long)(SvUV(value)));
             break;
         case DC_SIGCHAR_LONGLONG:
-            dcArgLongLong(MY_CXT.cvm, (long long)(SvIV(value)));
+            dcArgLongLong(MY_CXT.cvm, (I64)(SvIV(value)));
             break;
         case DC_SIGCHAR_ULONGLONG:
-            dcArgLongLong(MY_CXT.cvm, (unsigned long long)(SvUV(value)));
+            dcArgLongLong(MY_CXT.cvm, (U64)(SvUV(value)));
             break;
         case DC_SIGCHAR_FLOAT:
             dcArgFloat(MY_CXT.cvm, (float)SvNV(value));
@@ -684,40 +487,66 @@ XS_INTERNAL(Affix_call) {
             dcArgDouble(MY_CXT.cvm, (double)SvNV(value));
             break;
         case DC_SIGCHAR_POINTER: {
+            //~ warn("here at %s line %d", __FILE__, __LINE__);
             SV **subtype_ptr = hv_fetchs(MUTABLE_HV(SvRV(type)), "type", 0);
+            //~ warn("here at %s line %d", __FILE__, __LINE__);
+
             if (SvOK(value)) {
+                //~ warn("here at %s line %d", __FILE__, __LINE__);
+
                 if (sv_derived_from(value, "Dyn::Call::Pointer")) {
+                    //~ warn("here at %s line %d", __FILE__, __LINE__);
+
                     IV tmp = SvIV((SV *)SvRV(value));
                     pointer[pos_arg] = INT2PTR(DCpointer, tmp);
                     l_pointer[pos_arg] = false;
                     pointers = true;
+                    //~ warn("here at %s line %d", __FILE__, __LINE__);
                 }
                 else {
-                    if (sv_isobject(SvRV(value))) croak("Unexpected pointer to blessed object");
-                    SV *type = *subtype_ptr;
-                    size_t size = _sizeof(aTHX_ type);
-                    Newxz(pointer[pos_arg], size, char);
-                    (void)sv2ptr(aTHX_ type, value, pointer[pos_arg], false, 0);
+                    //~ warn("here at %s line %d", __FILE__, __LINE__);
+
+                    if (sv_isobject(value)) croak("Unexpected pointer to blessed object");
+                    //~ warn("here at %s line %d", __FILE__, __LINE__);
+
+                    pointer[pos_arg] = safemalloc(_sizeof(aTHX_ * subtype_ptr));
+                    //~ warn("here at %s line %d", __FILE__, __LINE__);
+
+                    sv2ptr(aTHX_ * subtype_ptr, value, pointer[pos_arg], false);
+                    //~ warn("here at %s line %d", __FILE__, __LINE__);
+
                     l_pointer[pos_arg] = true;
+                    //~ warn("here at %s line %d", __FILE__, __LINE__);
+
                     pointers = true;
+                    //~ warn("here at %s line %d", __FILE__, __LINE__);
                 }
             }
             else if (SvREADONLY(value)) { // explicit undef
+                //~ warn("here at %s line %d", __FILE__, __LINE__);
+
                 pointer[pos_arg] = NULL;
+                //~ warn("here at %s line %d", __FILE__, __LINE__);
+
                 l_pointer[pos_arg] = false;
+                //~ warn("here at %s line %d", __FILE__, __LINE__);
             }
             else { // treat as if it's an lvalue
+                //~ warn("here at %s line %d", __FILE__, __LINE__);
+
                 SV **subtype_ptr = hv_fetchs(MUTABLE_HV(SvRV(type)), "type", 0);
                 SV *type = *subtype_ptr;
                 size_t size = _sizeof(aTHX_ type);
                 Newxz(pointer[pos_arg], size, char);
                 l_pointer[pos_arg] = true;
                 pointers = true;
+                //~ warn("here at %s line %d", __FILE__, __LINE__);
             }
+            //~ warn("here at %s line %d", __FILE__, __LINE__);
 
             dcArgPointer(MY_CXT.cvm, pointer[pos_arg]);
         } break;
-        case DC_SIGCHAR_BLESSED: { // Essentially the same as DC_SIGCHAR_POINTER
+        case DC_SIGCHAR_INSTANCEOF: { // Essentially the same as DC_SIGCHAR_POINTER
             SV **package_ptr = hv_fetchs(MUTABLE_HV(SvRV(type)), "package", 0);
             DCpointer ptr;
             if (SvROK(value) &&
@@ -728,7 +557,7 @@ XS_INTERNAL(Affix_call) {
             else if (!SvOK(value)) // Passed us an undef
                 ptr = NULL;
             else
-                croak("Type of arg %d must be an instance or subclass of %s", pos_arg + 1,
+                croak("Type of arg %lu must be an instance or subclass of %s", pos_arg + 1,
                       SvPVbytex_nolen(*package_ptr));
             // DCpointer ptr = sv2ptr(aTHX_ field, MUTABLE_SV(value), false);
             dcArgPointer(MY_CXT.cvm, ptr);
@@ -736,8 +565,6 @@ XS_INTERNAL(Affix_call) {
         } break;
         case DC_SIGCHAR_ANY: {
             if (!SvOK(value)) sv_set_undef(value);
-            // sv_dump(value);
-            //   croak("here");
             dcArgPointer(MY_CXT.cvm, SvREFCNT_inc(value));
         } break;
         case DC_SIGCHAR_STRING: {
@@ -745,69 +572,19 @@ XS_INTERNAL(Affix_call) {
         } break;
         case DC_SIGCHAR_CODE: {
             if (SvOK(value)) {
-                DCCallback *cb = NULL;
-                {
-                    CoW *p = cow;
-                    while (p != NULL) {
-                        if (p->cb) {
-                            Callback *_cb = (Callback *)dcbGetUserData(p->cb);
-                            if (SvRV(_cb->cv) == SvRV(value)) {
-                                cb = p->cb;
-                                break;
-                            }
-                        }
-                        p = p->next;
-                    }
-                }
+                CoW *hold;
+                Newx(hold, 1, CoW);
+                //~ warn("here at %s line %d", __FILE__, __LINE__);
 
-                if (!cb) {
-                    HV *field = MUTABLE_HV(SvRV(type)); // Make broad assumptions
-                    SV **sig = hv_fetchs(field, "signature", 0);
-                    SV **sig_len = hv_fetchs(field, "sig_len", 0);
-                    SV **ret = hv_fetchs(field, "return", 0);
-                    SV **args = hv_fetchs(field, "args", 0);
-
-                    Callback *callback;
-                    Newxz(callback, 1, Callback);
-
-                    callback->args = MUTABLE_AV(SvRV(*args));
-                    callback->sig = SvPV_nolen(*sig);
-                    callback->sig_len = strlen(callback->sig);
-                    callback->ret = (char)*SvPV_nolen(*ret);
-
-                    /*CV *coderef;
-                    STMT_START {
-                        HV *st;
-                        GV *gvp;
-                        SV *const xsub_tmp_sv = ST(i);
-                        SvGETMAGIC(xsub_tmp_sv);
-                        coderef = sv_2cv(xsub_tmp_sv, &st, &gvp, 0);
-                        if (!coderef) croak("Type of arg %d must be code ref", i + 1);
-                    }
-                    STMT_END;
-                    if (callback->cv) SvREFCNT_dec(callback->cv);
-                    callback->cv = SvREFCNT_inc(MUTABLE_SV(coderef));*/
-
-                    callback->cv = SvREFCNT_inc(value);
-                    storeTHX(callback->perl);
-
-                    cb = dcbNewCallback(callback->sig, cbHandler, callback);
-                    {
-                        CoW *hold;
-                        Newxz(hold, 1, CoW);
-                        hold->cb = cb;
-                        hold->next = cow;
-                        cow = hold;
-                    }
-                }
-                dcArgPointer(MY_CXT.cvm, cb);
+                sv2ptr(aTHX_ type, value, hold, false);
+                dcArgPointer(MY_CXT.cvm, hold->cb);
             }
             else
                 dcArgPointer(MY_CXT.cvm, NULL);
         } break;
         case DC_SIGCHAR_ARRAY: {
             if (!SvROK(value) || SvTYPE(SvRV(value)) != SVt_PVAV)
-                croak("Type of arg %d must be an array ref", pos_arg + 1);
+                croak("Type of arg %lu must be an array ref", pos_arg + 1);
             AV *elements = MUTABLE_AV(SvRV(value));
             HV *hv_ptr = MUTABLE_HV(SvRV(type));
             SV **type_ptr = hv_fetchs(hv_ptr, "type", 0);
@@ -841,17 +618,15 @@ XS_INTERNAL(Affix_call) {
                 sv_setref_pv(RETVALSV, "Affix::Pointer", ptr);
                 hv_stores(hv_ptr, "pointer", RETVALSV);
             }
-            DCaggr *ag = sv2ptr(aTHX_ type, value, ptr, false, 0);
-            // DumpHex(ptr, size * av_len);
-            dcArgAggr(MY_CXT.cvm, ag, ptr);
+            sv2ptr(aTHX_ type, value, ptr, false);
+            dcArgPointer(MY_CXT.cvm, ptr);
         } break;
         case DC_SIGCHAR_STRUCT: {
             if (!SvROK(value) || SvTYPE(SvRV(value)) != SVt_PVHV)
-                croak("Type of arg %d must be a hash ref", pos_arg + 1);
-            // DCaggr *agg = _aggregate(aTHX_ field);
+                croak("Type of arg %lu must be a hash ref", pos_arg + 1);
+            DCaggr *agg = _aggregate(aTHX_ type);
             DCpointer ptr = safemalloc(_sizeof(aTHX_ type));
-            DCaggr *agg = sv2ptr(aTHX_ type, value, ptr, false, 0);
-            // DumpHex(ptr, _sizeof(aTHX_ field));
+            sv2ptr(aTHX_ type, value, ptr, false);
             dcArgAggr(MY_CXT.cvm, agg, ptr);
         } break;
         case DC_SIGCHAR_ENUM:
@@ -881,10 +656,10 @@ XS_INTERNAL(Affix_call) {
             break;
         }
         default:
-            croak("--> Unfinished: [%c/%d]%s", call->sig[pos_csig], pos_arg, call->sig);
+            croak("--> Unfinished: [%c/%lu]%s", call->sig[pos_csig], pos_arg, call->sig);
         }
     }
-    // warn("Return type: %c at %s line %d", call->ret, __FILE__, __LINE__);
+    //~ warn("Return type: %c at %s line %d", call->ret, __FILE__, __LINE__);
     SV *RETVAL;
     {
         switch (call->ret) {
@@ -921,10 +696,10 @@ XS_INTERNAL(Affix_call) {
             RETVAL = newSVuv((unsigned long)dcCallLong(MY_CXT.cvm, call->fptr));
             break;
         case DC_SIGCHAR_LONGLONG:
-            RETVAL = newSViv((long long)dcCallLongLong(MY_CXT.cvm, call->fptr));
+            RETVAL = newSViv((I64)dcCallLongLong(MY_CXT.cvm, call->fptr));
             break;
         case DC_SIGCHAR_ULONGLONG:
-            RETVAL = newSVuv((unsigned long long)dcCallLongLong(MY_CXT.cvm, call->fptr));
+            RETVAL = newSVuv((U64)dcCallLongLong(MY_CXT.cvm, call->fptr));
             break;
         case DC_SIGCHAR_FLOAT:
             RETVAL = newSVnv((float)dcCallFloat(MY_CXT.cvm, call->fptr));
@@ -933,23 +708,15 @@ XS_INTERNAL(Affix_call) {
             RETVAL = newSVnv((double)dcCallDouble(MY_CXT.cvm, call->fptr));
             break;
         case DC_SIGCHAR_POINTER: {
-            if (1) {
-                SV *RETVALSV;
-                RETVALSV = newSV(1);
-                sv_setref_pv(RETVALSV, "Affix::Pointer", dcCallPointer(MY_CXT.cvm, call->fptr));
-                RETVAL = RETVALSV;
-            }
-            else {
-                size_t si = _sizeof(aTHX_ call->retval);
-                DCpointer ret_ptr = safemalloc(si);
-                DCpointer out = dcCallAggr(MY_CXT.cvm, call->fptr, agg, ret_ptr);
-                RETVAL = agg2sv(aTHX_ agg, SvRV(call->retval), out, si);
-            }
+            SV *RETVALSV;
+            RETVALSV = newSV(1);
+            sv_setref_pv(RETVALSV, "Affix::Pointer", dcCallPointer(MY_CXT.cvm, call->fptr));
+            RETVAL = RETVALSV;
         } break;
         case DC_SIGCHAR_STRING:
             RETVAL = newSVpv((char *)dcCallPointer(MY_CXT.cvm, call->fptr), 0);
             break;
-        case DC_SIGCHAR_BLESSED: {
+        case DC_SIGCHAR_INSTANCEOF: {
             // warn("here at %s line %d", __FILE__, __LINE__);
 
             DCpointer ptr = dcCallPointer(MY_CXT.cvm, call->fptr);
@@ -975,27 +742,24 @@ XS_INTERNAL(Affix_call) {
         case DC_SIGCHAR_AGGREGATE:
         case DC_SIGCHAR_STRUCT:
         case DC_SIGCHAR_UNION: {
-            size_t si = _sizeof(aTHX_ call->retval);
-            DCpointer ret_ptr = safemalloc(si);
-            // warn("agg.size == %d at %s line %d", agg->size, __FILE__, __LINE__);
-            // warn("agg.n_fields == %d at %s line %d", agg->n_fields, __FILE__,
-            // __LINE__); DumpHex(agg, 16);
-            DCpointer out = dcCallAggr(MY_CXT.cvm, call->fptr, agg, ret_ptr);
-            RETVAL = agg2sv(aTHX_ agg, SvRV(call->retval), out, si);
+            DCpointer ret_ptr = safemalloc(_sizeof(aTHX_ call->retval));
+            dcCallAggr(MY_CXT.cvm, call->fptr, agg, ret_ptr);
+            // warn("here at %s line %d", __FILE__, __LINE__);
+            RETVAL = ptr2sv(aTHX_ ret_ptr, SvRV(call->retval));
         } break;
         case DC_SIGCHAR_ENUM:
         case DC_SIGCHAR_ENUM_UINT: {
-            RETVAL = enum2sv(call->retval, (int)dcCallInt(MY_CXT.cvm, call->fptr));
+            RETVAL = enum2sv(aTHX_ call->retval, (int)dcCallInt(MY_CXT.cvm, call->fptr));
         } break;
         case DC_SIGCHAR_ENUM_CHAR: {
-            RETVAL = enum2sv(call->retval, (char)dcCallChar(MY_CXT.cvm, call->fptr));
+            RETVAL = enum2sv(aTHX_ call->retval, (char)dcCallChar(MY_CXT.cvm, call->fptr));
         } break;
         default:
             croak("Unhandled return type: %c", call->ret);
         }
-
+        //~ warn("here at %s line %d", __FILE__, __LINE__);
         if (pointers) {
-            // warn("pointers! at %s line %d", __FILE__, __LINE__);
+            //~ warn("pointers! at %s line %d", __FILE__, __LINE__);
             for (int i = 0; i < call->sig_len; ++i) {
                 switch (call->sig[i]) {
                 case DC_SIGCHAR_POINTER: {
@@ -1017,18 +781,15 @@ XS_INTERNAL(Affix_call) {
                         case DC_SIGCHAR_AGGREGATE:
                         case DC_SIGCHAR_STRUCT:
                         case DC_SIGCHAR_ARRAY: {
-
-                            // warn("aggregate! at %s line %d", __FILE__, __LINE__);
-                            // sv_dump((type));
-                            DCaggr *agg = _aggregate(aTHX_ type);
-                            size_t si = _sizeof(aTHX_ type);
-                            SvSetMagicSV(ST(i), agg2sv(aTHX_ agg, SvRV(type), pointer[i], si));
+                            // warn("here at %s line %d", __FILE__, __LINE__);
+                            SvSetMagicSV(ST(i), ptr2sv(aTHX_ pointer[i], type));
                         } break;
                         default: {
                             // warn("pointers! at %s line %d", __FILE__, __LINE__);
                             // sv_dump(SvRV(*type_ptr));
 
                             // DumpHex(pointer[i], 56);
+                            // warn("here at %s line %d", __FILE__, __LINE__);
                             SV *sv = ptr2sv(aTHX_ pointer[i], type);
                             // sv_dump(sv);
                             //  if (SvOK(ST(i))) {
@@ -1049,7 +810,7 @@ XS_INTERNAL(Affix_call) {
                 }
             }
         }
-
+        //~ warn("here at %s line %d", __FILE__, __LINE__);
         if (call->ret == DC_SIGCHAR_VOID) XSRETURN_EMPTY;
         RETVAL = sv_2mortal(RETVAL);
         ST(0) = RETVAL;
@@ -1181,7 +942,7 @@ BOOT:
     TYPE(ArrayRef, DC_SIGCHAR_ARRAY, DC_SIGCHAR_AGGREGATE);
     TYPE(Union, DC_SIGCHAR_UNION, DC_SIGCHAR_AGGREGATE);
     TYPE(CodeRef, DC_SIGCHAR_CODE, DC_SIGCHAR_AGGREGATE);
-    TYPE(InstanceOf, DC_SIGCHAR_BLESSED, DC_SIGCHAR_POINTER);
+    TYPE(InstanceOf, DC_SIGCHAR_INSTANCEOF, DC_SIGCHAR_POINTER);
     TYPE(Any, DC_SIGCHAR_ANY, DC_SIGCHAR_POINTER);
     TYPE(SSize_t, DC_SIGCHAR_SSIZE_T, DC_SIGCHAR_SSIZE_T);
     TYPE(Size_t, DC_SIGCHAR_SIZE_T, DC_SIGCHAR_SIZE_T);
@@ -1528,20 +1289,20 @@ CODE :
 void
 sv_dump(SV * sv)
 CODE :
-    sv_dump(sv);
+    //sv_dump(sv);
 
 DCpointer
 sv2ptr( SV * data, SV * type)
 CODE:
-    size_t size = _sizeof(aTHX_ type);
-    Newxz(RETVAL, size, char);
-    sv2ptr(aTHX_ type, data, RETVAL, false, 0);
+    RETVAL = safemalloc(_sizeof(aTHX_ type));
+    sv2ptr(aTHX_ type, data, RETVAL, false);
 OUTPUT:
     RETVAL
 
 SV *
 ptr2sv(DCpointer ptr, SV * type)
 CODE:
+    //warn("here at %s line %d", __FILE__, __LINE__);
     RETVAL = ptr2sv(aTHX_ ptr, type);
 OUTPUT:
     RETVAL
@@ -2021,5 +1782,19 @@ BOOT:
     export_function("Affix", "DC_SIGCHAR_CC_SYSCALL", "sigchar");
     export_function("Affix", "DEFAULT_ALIGNMENT", "vars");
 
-    newCONSTSUB(stash, "ALIGNBYTES", newSViv(ALIGNBYTES));
+    newCONSTSUB(stash, "ALIGNBYTES", newSViv(AFFIX_ALIGNBYTES));
+    export_constant("Affix::Feature", "Syscall", "feature",
+#ifdef DC__Feature_Syscall
+                    1
+#else
+                    0
+#endif
+    );
+    export_constant("Affix::Feature", "AggrByVal", "feature",
+#ifdef DC__Feature_AggrByVal
+                    1
+#else
+                    0
+#endif
+    );
 }

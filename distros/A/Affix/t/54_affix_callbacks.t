@@ -8,8 +8,14 @@ $|++;
 #
 use t::lib::nativecall;
 #
-compile_test_lib('54_affix_callbacks');
-my $lib = 't/54_affix_callbacks';
+my $lib = compile_test_lib('54_affix_callbacks');
+diag $lib;
+
+#~ {
+#~ use Data::Dump;
+#~ ddx CodeRef [ [ Pointer [Void], Int, Int ] => Int ];
+#~ ddx CodeRef [ [ Double, Str, Bool ] => Bool ];
+#~ }
 #
 is wrap( $lib, 'cb_pii_i', [ CodeRef [ [ Pointer [Void], Int, Int ] => Int ] ] => Int )->(
     sub {
@@ -166,4 +172,24 @@ is wrap( $lib, 'cb_Z_Z', [ CodeRef [ [Str] => Str ] ] => Str )->(
     ),
     'Go!', '    => Str';
 #
+is wrap( $lib, 'cb_A', [ Struct [ cb => CodeRef [ [Str] => Str ], i => Int ] ] => Str )->(
+    {   cb => sub {
+            is_deeply( \@_, ['Ready!'], '[ Str ]' );
+            return 'Go!';
+        },
+        i => 100
+    }
+    ),
+    'Go!', 'Callback inside struct';
+#
+Affix::typedef cv => CodeRef [ [] => Str ];
+my $cv = sub { pass 'Callback!'; };
+is wrap( $lib, 'cb_CV_Z', [ CodeRef [ [ Str, cv() ] => Str ], cv() ] => Str )->(
+    sub {
+        is_deeply( \@_, [ 'Ready!', $cv ], '[ Str, CodeRef ]' );
+        return 'Go!';
+    },
+    $cv
+    ),
+    'Go!', '    => Str';
 done_testing;

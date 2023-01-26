@@ -4,7 +4,7 @@
       "BIGFOOT <bigfoot@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,13 +22,13 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
             "File::ShareDir::Install" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
             "File::ShareDir::Install" : "0"
          }
       },
@@ -51,10 +51,10 @@
    "provides" : {
       "Module::ScanDeps::Static" : {
          "file" : "lib/Module/ScanDeps/Static.pm",
-         "version" : "0.9"
+         "version" : "1.001"
       }
    },
    "release_status" : "stable",
-   "version" : "0.9",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "1.001",
+   "x_serialization_backend" : "JSON::PP version 4.10"
 }

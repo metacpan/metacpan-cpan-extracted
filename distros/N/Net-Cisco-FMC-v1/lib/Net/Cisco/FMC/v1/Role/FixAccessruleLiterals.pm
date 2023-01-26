@@ -1,5 +1,5 @@
 package Net::Cisco::FMC::v1::Role::FixAccessruleLiterals;
-$Net::Cisco::FMC::v1::Role::FixAccessruleLiterals::VERSION = '0.007001';
+$Net::Cisco::FMC::v1::Role::FixAccessruleLiterals::VERSION = '0.008000';
 # ABSTRACT: Role for Cisco Firepower Management Center (FMC) API version 1 method generation
 
 use 5.024;
@@ -68,7 +68,7 @@ Net::Cisco::FMC::v1::Role::FixAccessruleLiterals - Role for Cisco Firepower Mana
 
 =head1 VERSION
 
-version 0.007001
+version 0.008000
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Lab::Moose::DataFile::Gnuplot::Compressed;
-$Lab::Moose::DataFile::Gnuplot::Compressed::VERSION = '3.840';
+$Lab::Moose::DataFile::Gnuplot::Compressed::VERSION = '3.841';
 #ABSTRACT: Text based data file ('Gnuplot style'), auto-compressed
 
 use v5.20;
@@ -89,7 +89,7 @@ Lab::Moose::DataFile::Gnuplot::Compressed - Text based data file ('Gnuplot style
 
 =head1 VERSION
 
-version 3.840
+version 3.841
 
 =head1 SYNOPSIS
 
@@ -136,7 +136,7 @@ This datafile type does not support any plots.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Andreas K. Huettel, Simon Reinhardt
             2020       Andreas K. Huettel

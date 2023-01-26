@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::workflower 5.022;
+package Dist::Zilla::App::Command::workflower 5.023;
 # ABSTRACT: install rjbs's usual GitHub Actions workflow
 
 use Dist::Zilla::Pragmas;
@@ -64,7 +64,7 @@ sub _perl_versions_to_test ($self) {
 
   my $merged = $prereqs->merged_requires;
 
-  my @test = qw(latest);
+  my @test = ('devel');
 
   for (my $i = 36; $i >= 8; $i -= 2) {
     last unless $merged->accepts_module(perl => "v5.$i");
@@ -86,7 +86,7 @@ Dist::Zilla::App::Command::workflower - install rjbs's usual GitHub Actions work
 
 =head1 VERSION
 
-version 5.022
+version 5.023
 
 =head1 SYNOPSIS
 
@@ -125,7 +125,11 @@ the same terms as the Perl 5 programming language system itself.
 __DATA__
 ___[ workflow.yml ]___
 name: "multiperl test"
-on: [ push, pull_request ]
+on:
+  push:
+    branches: "*"
+    tags-ignore: "*"
+  pull_request: ~
 
 # FUTURE ENHANCEMENT(s):
 # * install faster (see below)

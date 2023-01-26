@@ -9,9 +9,8 @@ use Image::Info qw(image_info image_type);
 use Moo;
 use MooX::Types::MooseLike::Base qw(:all);
 use PDF::Table;
-use PDF::TextBlock 0.13;
 
-our $VERSION = '0.21';
+our $VERSION = '0.30';
 
 =head1 NAME
 
@@ -32,7 +31,6 @@ CtrlO::PDF - high level PDF creator
       top_padding  => 0,                 # Default
       header       => "My PDF document header",  # optional
       footer       => "My PDF document footer",  # optional
-      PDFlib       => "API2",            # Default is Builder
   );
   # width, height page dimensions in points (default A4 paper)
   # orientation defaults to portrait (taller than wide)
@@ -90,9 +88,9 @@ pagination, headings, paragraph text, images and tables. Although there are a
 number of other modules to create PDFs with a high-level interface, I found
 that these each lack certain features (e.g. image insertion, paragraph text).
 This module tries to include each of those features through another existing
-module. Also, it is built on either PDF::Builder or PDF::API2, and provides
-access to that object, so content can also be added directly using that,
-thereby providing any powerful features required.
+module. Also, as it is built on PDF::Builder, it provides access to that
+object, so content can also be added directly using that, thereby providing any
+powerful features required.
 
 B<Updates in v0.20> Note that version 0.20 contains a number breaking changes
 to improve the default layout and spacing of a page. This better ensures that
@@ -103,13 +101,19 @@ differently to those produced with earlier versions. In the main, old code
 should be able to be updated by simply removing any manual spacing fudges (e.g.
 manual spacing for headers).
 
+B<Updates in v0.30> Version 0.30 has some fairly major changes, dropping
+support of PDF::API2 and requiring use of PDF::Builder version 3.025. The
+latter contains many updates and powerful new features to create feature-rich
+PDF documents and means that PDF::TextBlock is no longer required for this
+module, which uses PDF::Builder's new column() method instead.
+
 =head1 METHODS
 
 =cut
 
 =head2 pdf
 
-Returns the C<PDF::Builder> or C<PDF::API2> object used to create the PDF.
+Returns the C<PDF::Builder> object used to create the PDF.
 
 =cut
 
@@ -120,54 +124,36 @@ has pdf => (
 sub _build_pdf
 {   my $self = shift;
 
-    # what's available?
-    my ($rc);
-    if (lc($self->PDFlib) =~ m/b/) {
-        # PDF::Builder preferred, try to see if it's installed
-        $rc = eval {
-            require PDF::Builder;
-            1;
-        };
-        if (!defined $rc) {
-            # PDF::Builder not available, try PDF::API2
-            $rc = eval {
-                require PDF::API2;
-                1;
-            };
-            if (!defined $rc) {
-                die "Neither PDF::Builder nor PDF::API2 is installed!\n";
-            } else {
-                #print "PDF::Builder requested, but was not available. Using PDF::API2\n";
-                PDF::API2->new;
-            }
-        } else {
-            PDF::Builder->new;
-        }
+    # Now only supports PDF::Builder
+    croak "Sorry, CtrlO::PDF no longer supports use of PDF::API2"
+        if $self->PDFlib && $self->PDFlib =~ /api2/i;
 
-    } else {
-        # PDF::API2 preferred, try to see if it's installed
-        $rc = eval {
-            require PDF::API2;
-            1;
-        };
-        if (!defined $rc) {
-            # PDF::API2 not available, try PDF::Builder
-            $rc = eval {
-                require PDF::Builder;
-                1;
-            };
-            if (!defined $rc) {
-                die "Neither PDF::API2 nor PDF::Builder is installed!\n";
-            } else {
-                #print "PDF::API2 requested, but was not available. Using PDF::Builder\n";
-                PDF::Builder->new;
-            }
-        } else {
-            PDF::API2->new;
-        }
+    my $rc = eval {
+        require PDF::Builder;# 3.025;
+        1;
+    };
+    croak "CtrlO::PDF requires PDF::Builder 3.025"
+        if !$rc;
 
-    }
+    my $pdf = PDF::Builder->new;
 
+    $pdf->add_font_path('/usr/share/fonts');
+    # Retained for backwards compatibility and moved from being built in the
+    # font() and fontbold() properties
+    $pdf->add_font(
+        face  => 'liberation-sans',
+        type  => 'ttf',
+        style => 'sans-serif',
+        width => 'proportional',
+        file  => {
+            'roman'       => 'truetype/liberation/LiberationSans-Regular.ttf',
+            'italic'      => 'truetype/liberation/LiberationSans-Italic.ttf',
+            'bold'        => 'truetype/liberation/LiberationSans-Bold.ttf',
+            'bold-italic' => 'truetype/liberation/LiberationSans-BoldItalic.ttf'
+        },
+    );
+
+    $pdf;
 }
 
 =head2 page
@@ -405,7 +391,7 @@ has font => (
 
 sub _build_font
 {   my $self = shift;
-    $self->pdf->ttfont('truetype/liberation/LiberationSans-Regular.ttf');
+    $self->pdf->get_font(face => 'liberation-sans', 'italic' => 0, bold => 0);
 }
 
 =head2 fontbold
@@ -420,7 +406,7 @@ has fontbold => (
 
 sub _build_fontbold
 {   my $self = shift;
-    $self->pdf->ttfont('truetype/liberation/LiberationSans-Bold.ttf');
+    $self->pdf->get_font(face => 'liberation-sans', 'italic' => 0, bold => 1);
 }
 
 =head2 logo
@@ -520,7 +506,7 @@ Sets the current Y position. See L</y_position>.
 
 sub set_y_position
 {   my ($self, $y) = @_;
-    $y && $y =~ /^[0-9]+(\.[0-9]+)?$/
+    $y && $y =~ /^-?[0-9]+(\.[0-9]+)?$/
         or croak "Invalid y value for set_y_position: $y";
     $self->_set__y($y);
 }
@@ -534,7 +520,7 @@ will move the cursor up the page, negative values down. See L</y_position>.
 
 sub move_y_position
 {   my ($self, $y) = @_;
-    $y && $y =~ /^[0-9]+(\.[0-9]+)?$/
+    $y && $y =~ /^-?[0-9]+(\.[0-9]+)?$/
         or croak "Invalid y value for move_y_position: $y";
     $self->_set__y($self->_y + $y);
 }
@@ -596,9 +582,9 @@ sub _line_spacing {
 sub heading
 {   my ($self, $string, %options) = @_;
 
-    $self->page; # Ensure that page is built and cursor adjusted for first use
+    my $page = $self->page; # Ensure that page is built and cursor adjusted for first use
 
-    $self->add_page if $self->_y < 150; # Make sure there is room for following paragraph text
+    $page = $self->add_page if $self->_y < 150; # Make sure there is room for following paragraph text
     my $size = $options{size} || 16;
 
     if ($options{topmargin}) {
@@ -616,46 +602,37 @@ sub heading
         # spacing ratio than normal text
         $self->_down($self->_line_height($size, 1.8));
     }
-    my $tb  = PDF::TextBlock->new({
-        pdf  => $self->pdf,
-        page => $self->page,
-        x    => $self->_x + ($options{indent} || 0),
-        y    => $self->_y,
-        lead => $self->_line_height($size, 1.6),
-        fonts => {
-            # Workaround a bug in PDF::TextBlock which defines word spacing
-            # based on the default font. This can lead to spacing that is too
-            # small if only using a bold font with a large font size. Define
-            # the default font to be the same as the bold font that we will
-            # use.
-            default => PDF::TextBlock::Font->new({
-                pdf  => $self->pdf,
-                font => $self->fontbold,
-                size => $size,
-            }),
-            b => PDF::TextBlock::Font->new({
-                pdf  => $self->pdf,
-                font => $self->fontbold,
-                size => $size,
-            }),
-        },
-    });
-    $tb->text('<b>'.$string.'</b>');
-    my ($endw, $ypos) = $tb->apply;
-    $self->_set__y($ypos + $self->_line_height($size)); # Move cursor back to end of last line printed
+
+    my $text   = $page->text;
+    my $grfx   = $page->gfx;
+    my $x      = $self->_x + ($options{indent} || 0),
+    my $height = $self->_y - $self->margin_bottom;
+    $text->font($self->fontbold, $size);
+    $text->translate($x, $self->_y);
+    $text->text($string);
 
     # Unless otherwise defined, add a bottom margin relative to the font size,
     # but smaller than the top margin
-    my $bottommargin = defined $options{bottommargin} ? $options{bottommargin} : $self->_line_height($size, 0.4);;
+    my $bottommargin = defined $options{bottommargin}
+        ? $options{bottommargin}
+        : $self->_line_height($size, 0.4);;
 
     $self->_down($bottommargin);
 }
 
 =head2 text($text, %options)
 
-Add paragraph text. This will automatically paginate. Options available are:
+Add paragraph text. This will automatically paginate. Available options are
+shown below. Any unrecogised options will be passed to C<PDF::Builder>'s Column
+method.
 
 =over
+
+=item format I<name>
+
+C<name> is the format of the text, in accordance with available formats in
+C<PDF::Builder>. At the time of writing, supported options are C<none>, C<pre>,
+C<md1> and C<html>. If unspecified defaults to C<none>.
 
 =item size I<n>
 
@@ -664,6 +641,11 @@ C<n> is the font size in points, B<default 10>
 =item indent I<n>
 
 C<n> is the amount (in points) to indent the paragraph first line, B<default 0>
+
+=item top_padding I<n>
+
+C<n> is the amount (in points) of padding above the paragraph, only applied if
+not at the top of a page. Defaults to half the line height.
 
 =item color I<name>
 
@@ -675,116 +657,62 @@ C<name> is the string giving the text color, B<default 'black'>
 
 sub text
 {   my ($self, $string, %options) = @_;
-    my $text = $self->page->text;
-    my $size = $options{size} || 10;
-    my $color = $options{color} || 'black';
 
-    $self->page; # Ensure that page is built and cursor adjusted for first use
+    $string or return;
 
+    my $size = delete $options{size} || 10;
+    my $color = delete $options{color} || 'black';
+    my $format = delete $options{format} || 'none';
+
+    my $page = $self->page; # Ensure that page is built and cursor adjusted for first use
+
+
+    my $text   = $page->text;
+    my $grfx   = $page->gfx;
+    my $x      = $self->_x + ($options{indent} || 0),
+    my $height = $self->_y - $self->margin_bottom;
+
+    $text->font($self->font, 10); # Any size, overridden below
+
+    my $top_padding = defined $options{top_padding}
+        ? $options{top_padding}
+        : $self->_line_height($size) - $size;
+
+    # Only create spacing if below other content
     if ($self->is_new_page)
     {
         $self->_set_is_new_page(0);
     }
     else {
-        # Only create spacing if below other content
-        $self->_down($self->_line_spacing($size));
+        $self->_down($top_padding);
     }
 
-    # Line spacing already accounted for above, now allow enough room for actual font size
-    $self->_down($size);
+    my ($rc, $next_y, $unused) = $text->column(
+        $page, $text, $grfx, $format, $string,
+        rect => [$x, $self->_y, $self->_width_print, $height],
+        para => [0, $top_padding],
+        font_size => $size,
+        %options
+    );
 
-    my $tb  = PDF::TextBlock->new({
-        pdf   => $self->pdf,
-        page  => $self->page,
-        x     => $self->_x + ($options{indent} || 0),
-        y     => $self->_y,
-        w     => $self->_width_print,
-        h     => $self->_y - $self->margin_bottom,
-        lead  => $self->_line_height($size),
-        align => 'left',
-        fonts => {
-            default => PDF::TextBlock::Font->new({
-                pdf       => $self->pdf,
-                font      => $self->font,
-                size      => $size,
-                fillcolor => $color,
-            }),
-            b => PDF::TextBlock::Font->new({
-                pdf       => $self->pdf,
-                font      => $self->fontbold,
-                size      => $size,
-                fillcolor => $color,
-            }),
-        },
-    });
-    while (1)
-    {
-        # First check whether there is any room on the page for the text. If
-        # not, start a new page. This code is copied directly from the same
-        # check in PDF::TextBlock, with 15 being the default lead. We can no
-        # longer rely on PDF::TextBlock returning the same $string to know to
-        # insert a new page, as we now use that to check for words that are too
-        # long
-        if ($tb->y >= $tb->y - $tb->h + 15) # Same condition as PDF::TextBlock
-        {
-            # For reasons I do not understand, $string manages to gain newlines
-            # between the end and beginning of this loop. Chop them off, and end if
-            # there's nothing left
-            $string =~ s/\s+$//;
-            !$string and last;
-            $tb->text($string);
-            my $endw; my $ypos;
-            my $string_before = $string;
-            ($endw, $ypos, $string) = $tb->apply;
-            # Check whether no text has been added to the page. This happens if the
-            # word is too long. If so, warn, chop-off and retry, otherwise an
-            # infinite loop occurs. Ideally the word would be broken - issue will
-            # be raised in PDF::TextBlock to see if this is possible.
-            if ($string_before eq $string)
-            {
-                carp "Unable to fit text onto line: $string";
-                # If no more breaks then skip
-                last if $string !~ /\s/;
-                # Otherwise start from after next break
-                $string =~ s/\S+\s//;
-                $tb->text($string);
-                ($endw, $ypos, $string) = $tb->apply;
-            }
+    while ($rc) {
+        # new page
+        $page   = $self->add_page;
+        $height = $self->_y - $self->margin_bottom;
+        $text   = $page->text;
+        $grfx   = $page->gfx;
 
-            # Set y cursor to be where the textblock finished, but move cursor
-            # back up to remove new line
-            $self->_set__y($ypos + $tb->lead);
-            # Now shift down the actual line spacing distance
-            $self->_down($self->_line_spacing($size));
-            last unless $string; # while loop does not work with $string
-        }
-        $self->add_page;
-        $self->_down($size);
-        $tb  = PDF::TextBlock->new({
-            pdf   => $self->pdf,
-            page  => $self->page,
-            x     => $self->_x,
-            y     => $self->_y,
-            w     => $self->_width_print,
-            h     => $self->_y - $self->margin_bottom,
-            lead  => $self->_line_height($size),
-            align => 'left',
-            fonts => {
-                default => PDF::TextBlock::Font->new({
-                    pdf       => $self->pdf,
-                    font      => $self->font,
-                    size      => $size,
-                    fillcolor => $color,
-                }),
-                b => PDF::TextBlock::Font->new({
-                    pdf       => $self->pdf,
-                    font      => $self->fontbold,
-                    size      => $size,
-                    fillcolor => $color,
-                }),
-            },
-        });
+        ($rc, $next_y, $unused) = $text->column($page, $text, $grfx, 'pre', $unused,
+            rect => [$x, $self->_y, $self->_width_print, $height],
+            para => [0, $top_padding],
+            font_size => $size,
+            %options,
+        );
+        $self->_set_is_new_page(0);
+        last unless grep $_->{text}, @$unused;
     }
+
+    $self->_set__y($next_y);
 }
 
 =head2 table(%options)

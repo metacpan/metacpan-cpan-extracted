@@ -604,6 +604,7 @@ lib/clutter.h
 lib/typemap
 minil.toml
 t/00_compile.t
+t/01_types_and_pointers.t
 t/02_affix_wrap_sin.t
 t/06_affix_synopsis.t
 t/07_affix_locate_lib.t

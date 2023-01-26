@@ -1,6 +1,6 @@
 Changes
 Day.pm
-examples/ex1.pl
+examples/get_random_day.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

@@ -1,0 +1,51 @@
+---
+abstract: 'Lookup in a database of wills'
+author:
+  - 'Nigel Horne <njh@bandsman.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  IPC::System::Simple: '0'
+  Test::Carp: '0'
+  Test::Most: '0'
+  Test::NoWarnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Genealogy-Wills
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  DBD::SQLite: '0'
+  DBD::SQLite::Constants: '0'
+  DBI: '0'
+  Error::Simple: '0'
+  File::Basename: '0'
+  File::HomeDir: '0'
+  File::Slurp: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  File::pfopen: '0'
+  HTML::Entities: '0'
+  HTTP::Cache::Transparent: '0'
+  LWP::ConnCache: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent::WithCache: '0'
+  Lingua::EN::NameCase: '0'
+  Module::Info: '0'
+  Try::Tiny: '0'
+  autodie: '0'
+  perl: '5.006002'
+resources:
+  bugtracker: https://github.com/nigelhorne/Genealogy-Wills/issues
+  homepage: https://sites.rootsweb.com/~obituary
+  repository: git://github.com/nigelhorne/Genealogy-Wills.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

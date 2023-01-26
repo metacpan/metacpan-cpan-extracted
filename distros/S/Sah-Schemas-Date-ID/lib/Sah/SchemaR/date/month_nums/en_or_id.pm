@@ -1,12 +1,13 @@
+## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::date::month_nums::en_or_id;
 
-our $DATE = '2021-08-04'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2022-10-20'; # DATE
+our $VERSION = '0.008'; # VERSION
 
-our $rschema = do{my$var={base=>"array",clsets_after_base=>[{description=>"\nSee also related schemas for other locales, e.g.\n<pm:Sah::Schema::date::month_nums> (English),\n<pm:Sah::Schema::date::month_nums::id> (Indonesian), etc.\n\n",examples=>[{valid=>1,validated_value=>[],value=>""},{valid=>1,validated_value=>[1],value=>"jan"},{valid=>1,validated_value=>[8],value=>"AGU"},{valid=>1,validated_value=>[8],value=>"aug"},{summary=>"Has number not in 1-12",valid=>0,value=>0},{summary=>"Has undef",valid=>0,value=>[1,undef]},{valid=>1,validated_value=>[1,8],value=>"1,agu"},{summary=>"Has unknown month name",valid=>0,value=>"1,foo"},{valid=>1,validated_value=>[1,8],value=>[1,"agu"]},{valid=>1,validated_value=>[1,12],value=>"1,12"},{summary=>"Has number not in 1-12",valid=>0,value=>"1,12,13"},{summary=>"Has number not in 1-12",valid=>0,value=>[1,12,13]}],of=>["date::month_num::en_or_id",{req=>1}],summary=>"Array of required month numbers, coercible from English/Indonesian full/abbreviated month names","x.perl.coerce_rules"=>["From_str::comma_sep"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["array"],type=>"array",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
+our $rschema = do{my$var={base=>"array",clsets_after_base=>[{description=>"\nSee also related schemas for other locales, e.g.\n<pm:Sah::Schema::date::month_nums> (English),\n<pm:Sah::Schema::date::month_nums::id> (Indonesian), etc.\n\n",examples=>[{valid=>1,validated_value=>[],value=>""},{valid=>1,validated_value=>[1],value=>"jan"},{valid=>1,validated_value=>[8],value=>"AGU"},{valid=>1,validated_value=>[8],value=>"aug"},{summary=>"Has number not in 1-12",valid=>0,value=>0},{summary=>"Has undef",valid=>0,value=>[1,undef]},{valid=>1,validated_value=>[1,8],value=>"1,agu"},{summary=>"Has unknown month name",valid=>0,value=>"1,foo"},{valid=>1,validated_value=>[1,8],value=>[1,"agu"]},{valid=>1,validated_value=>[1,12],value=>"1,12"},{summary=>"Has number not in 1-12",valid=>0,value=>"1,12,13"},{summary=>"Has number not in 1-12",valid=>0,value=>[1,12,13]}],of=>["date::month_num::en_or_id",{req=>1}],summary=>"Array of required month numbers, coercible from English/Indonesian full/abbreviated month names, e.g. [1,\"May\",\"AGU\"]","x.perl.coerce_rules"=>["From_str::comma_sep"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["array"],type=>"array",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
-# ABSTRACT: Array of required month numbers, coercible from English/Indonesian full/abbreviated month names
+# ABSTRACT: Array of required month numbers, coercible from English/Indonesian full/abbreviated month names, e.g. [1,"May","AGU"]
 
 __END__
 
@@ -16,11 +17,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::date::month_nums::en_or_id - Array of required month numbers, coercible from English/Indonesian full/abbreviated month names
+Sah::SchemaR::date::month_nums::en_or_id - Array of required month numbers, coercible from English/Indonesian full/abbreviated month names, e.g. [1,"May","AGU"]
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::SchemaR::date::month_nums::en_or_id (from Perl distribution Sah-Schemas-Date-ID), released on 2021-08-04.
+This document describes version 0.008 of Sah::SchemaR::date::month_nums::en_or_id (from Perl distribution Sah-Schemas-Date-ID), released on 2022-10-20.
 
 =head1 DESCRIPTION
 
@@ -36,6 +37,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Date-ID>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Date-ID>
@@ -43,16 +73,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

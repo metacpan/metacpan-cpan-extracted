@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Rigol_DSA815;
-$Lab::Moose::Instrument::Rigol_DSA815::VERSION = '3.840';
+$Lab::Moose::Instrument::Rigol_DSA815::VERSION = '3.841';
 #ABSTRACT: Rigol DSA815 Spectrum Analyzer
 
 use v5.20;
@@ -94,7 +94,7 @@ Lab::Moose::Instrument::Rigol_DSA815 - Rigol DSA815 Spectrum Analyzer
 
 =head1 VERSION
 
-version 3.840
+version 3.841
 
 =head1 Driver for Rigol DSA800 series spectrum analyzers
 
@@ -137,7 +137,7 @@ This driver consumes the following roles:
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Eugeniy E. Mikhailov
             2020       Andreas K. Huettel

@@ -30,6 +30,9 @@ DLLEXPORT enum TV TakeEnum(enum TV value) {
             return offsetof(structure, c);
         case 'j':
             return offsetof(structure, j);*/
+    default:
+        break;
     }
+
     return -1;
 }

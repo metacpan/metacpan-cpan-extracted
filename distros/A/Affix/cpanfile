@@ -32,7 +32,7 @@ on 'configure' => sub {
     requires 'Module::Build::Tiny';
 
     #requires 'Net::SSLeay' => 1.49;
-    requires 'Path::Tiny';
+    requires 'Path::Tiny' => 0.144;
 };
 on 'develop' => sub {
     requires 'CPAN::Uploader';

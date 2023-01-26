@@ -94,6 +94,10 @@ sub run_hook {
     }
 }
 
+sub init_build_features {
+    my ($self, $use_feature, $builtin_feature) = @_;
+}
+
 sub set_build_features {
     my ($self, $flags) = @_;
 
@@ -138,6 +142,8 @@ sub set_build_features {
             pie => 1,
         },
     );
+
+    $self->init_build_features(\%use_feature, \%builtin_feature);
 
     ## Setup
 
@@ -427,7 +433,7 @@ sub _add_build_flags {
     ## Area: hardening
 
     # PIE
-    my $use_pie = $flags->use_feature('hardening', 'pie');
+    my $use_pie = $flags->get_feature('hardening', 'pie');
     my %hardening_builtins = $flags->get_builtins('hardening');
     if (defined $use_pie && $use_pie && ! $hardening_builtins{pie}) {
 	my $flag = "-specs=$Dpkg::DATADIR/pie-compile.specs";

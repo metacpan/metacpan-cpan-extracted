@@ -72,12 +72,12 @@ subtest 'typedef' => sub {
     is TV::FOX(),     'FOX', 'typedef makes dualvar constants of enum values [str]';
     is int TV::FOX(), 11,    'typedef makes dualvar constants of enum values [num]';
     subtest ':Native' => sub {
-        sub TakeEnum : Native('t/55_affix_enum') : Signature([TV]=>Int);
+        sub TakeEnum : Native('t/src/55_affix_enum') : Signature([TV]=>Int);
         is TakeEnum( TV::FOX() ),  -11, 'FOX';
         is TakeEnum( TV::ESPN() ), -1,  'ESPN';
     };
     subtest 'wrapped function' => sub {
-        my $cv = wrap 't/55_affix_enum', 'TakeEnum', [ TV() ], TV();
+        my $cv = wrap 't/src/55_affix_enum', 'TakeEnum', [ TV() ], TV();
         isa_ok( TV(), 'Affix::Type::Enum', 'typedef TV' );
         is TV::FOX(),            'FOX',   'typedef Enum results in dualvars [FOX string]';
         is int TV::FOX(),        11,      'typedef Enum results in dualvars [FOX numeric]';

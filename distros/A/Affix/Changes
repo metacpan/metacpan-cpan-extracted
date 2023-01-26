@@ -1,5 +1,15 @@
 Revision history for Perl extension Affix.pm
 
+0.09 2023-01-26T01:36:55Z
+
+    - Structs may now contain a CodeRef
+    - CodeRef, Any, etc. are now properly handled as aggregate members
+    - Nesting CodeRefs used as callbacks work now
+    - Bind to exported values with pin()
+    - Expose aggregate by value and syscall support in Affix::Feature
+    - Survive callbacks with unexpectedly empty return values
+    - Delayed type resolution with InstanceOf
+
 0.08 2022-12-19T22:29:53Z
 
     - Correct struct alignment for perls with quadmath and/or longdouble enabled

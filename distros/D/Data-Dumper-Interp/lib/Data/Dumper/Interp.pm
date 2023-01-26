@@ -15,11 +15,12 @@
 ##FIXME: Blessed structures are not formatted because we treat bless(...) as an atom
 
 use strict; use warnings FATAL => 'all'; use utf8; 
-use 5.020; 
+use 5.010;  # say, state
+use 5.018;  # lexical_subs
 use feature qw(say state lexical_subs);
 use feature 'lexical_subs'; no warnings "experimental::lexical_subs";
 package  Data::Dumper::Interp;
-$Data::Dumper::Interp::VERSION = '4.106';
+$Data::Dumper::Interp::VERSION = '4.107';
 
 package  # newline prevents Dist::Zilla::Plugin::PkgVersion from adding $VERSION
   DB;
@@ -612,7 +613,8 @@ sub _show_as_number(_) {
   # Sigh.  With Perl 5.32 (at least) $value & "..." stringifies $value
   # or so it seems.
   if (blessed($value)) {
-    if (blessed($value + 42)) {
+    # +42 might throw if object is not numberish e.g. a DateTime
+    if (blessed(eval{ $value + 42 })) {
       warn "    Object and value+42 is still an object, so probably numberish\n"
         if $Data::Dumper::Interp::Debug;
       return 1
@@ -670,15 +672,16 @@ sub __unesc_unicode() {  # edits $_
   if (/^"/) {
     # Data::Dumper with Useqq(1) outputs wide characters as hex escapes 
   
-    s{ \G (?: [^\\]++ | \\[^x] )*+ \K (?<w> \\x\{ (?<hex>[a-fA-F0-9]+) \} )
-     }{
-        my $orig = $+{w};
-        local $_ = hex( length($+{hex}) > 6 ? '0' : $+{hex} );
-        $_ = $_ > 0x10FFFF ? "\0" : chr($_); # 10FFFF is Unicode limit
-        # Using 'lc' so regression tests do not depend on Data::Dumper's
-        # choice of case when escaping wide characters.
-        m<\P{XPosixGraph}|[\0-\177]> ? lc($orig) : $_
-      }xesg;
+    s/
+       \G (?: [^\\]++ | \\[^x] )*+ \K (?<w> \\x\x{7B} (?<hex>[a-fA-F0-9]+) \x{7D} )
+     / 
+       my $orig = $+{w};
+       local $_ = hex( length($+{hex}) > 6 ? '0' : $+{hex} );
+       $_ = $_ > 0x10FFFF ? "\0" : chr($_); # 10FFFF is Unicode limit
+       # Using 'lc' so regression tests do not depend on Data::Dumper's
+       # choice of case when escaping wide characters.
+       m<\P{XPosixGraph}|[\0-\177]> ? lc($orig) : $_
+     /xesg;
   } 
 }
 

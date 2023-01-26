@@ -1,7 +1,6 @@
 #include "std.h"
 
-typedef struct
-{
+typedef struct {
     bool B;
     char c;
     unsigned char C;
@@ -17,15 +16,13 @@ typedef struct
     double d;
     int *p;
     char *Z;
-    struct
-    {
+    struct {
         int i;
     } A;
     union
     {
         int i;
-        struct
-        {
+        struct {
             void *ptr;
             long l;
         } structure;
@@ -52,17 +49,17 @@ massive retval = {.B = true,
                   .A = {.i = 50}};
 
 DLLEXPORT massive *massive_ptr() {
-    warn("    # sizeof in C:    %d", sizeof(massive));
-    warn("    # offset.B:       %d", offsetof(massive, B));
-    warn("    # offset.c:       %d", offsetof(massive, c));
-    warn("    # offset.C:       %d", offsetof(massive, C));
-    warn("    # offset.s:       %d", offsetof(massive, s));
-    warn("    # offset.S:       %d", offsetof(massive, S));
-    warn("    # offset.i:       %d", offsetof(massive, i));
-    warn("    # offset.I:       %d", offsetof(massive, I));
-    warn("    # offset.j:       %d", offsetof(massive, j));
-    warn("    # offset.J:       %d", offsetof(massive, J));
-    warn("    # offset.Z:       %d", offsetof(massive, Z));
+    warn("    # sizeof in C:    %zu", sizeof(massive));
+    warn("    # offset.B:       %zu", offsetof(massive, B));
+    warn("    # offset.c:       %zu", offsetof(massive, c));
+    warn("    # offset.C:       %zu", offsetof(massive, C));
+    warn("    # offset.s:       %zu", offsetof(massive, s));
+    warn("    # offset.S:       %zu", offsetof(massive, S));
+    warn("    # offset.i:       %zu", offsetof(massive, i));
+    warn("    # offset.I:       %zu", offsetof(massive, I));
+    warn("    # offset.j:       %zu", offsetof(massive, j));
+    warn("    # offset.J:       %zu", offsetof(massive, J));
+    warn("    # offset.Z:       %zu", offsetof(massive, Z));
 
     /*retval.c = -100;
     retval.C = 100;
@@ -80,7 +77,8 @@ DLLEXPORT bool sptr(massive *sptr) {
 }
 
 DLLEXPORT char *dbl_ptr(double *dbl) {
-    warn("# dbl == %f", *dbl);
+    // warn("# dbl_ptr( ... )");
+    // warn("# dbl == %f", *dbl);
     if (dbl == NULL)
         return "NULL";
     else if (*dbl == 0) {
@@ -127,14 +125,13 @@ DLLEXPORT double pointer_test(double *dbl, int arr[5], int size,
     return 900;
 }
 
-typedef struct
-{
+typedef struct {
     int i;
     char *Z;
 
 } test;
 DLLEXPORT bool demo(test in) {
-    warn("#offsetof: %d", offsetof(test, Z));
+    warn("# offsetof: %zu", offsetof(test, Z));
     warn("# i: %d", in.i);
     warn("# Z: %s", in.Z);
     return !strcmp(in.Z, "Here. There. Everywhere.");

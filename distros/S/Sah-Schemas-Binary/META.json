@@ -45,15 +45,15 @@
    "provides" : {
       "Sah::Schema::hexbuf" : {
          "file" : "lib/Sah/Schema/hexbuf.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       },
       "Sah::SchemaR::hexbuf" : {
          "file" : "lib/Sah/SchemaR/hexbuf.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       },
       "Sah::Schemas::Binary" : {
          "file" : "lib/Sah/Schemas/Binary.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       }
    },
    "release_status" : "stable",
@@ -68,7 +68,7 @@
          "web" : "https://github.com/perlancar/perl-Sah-Schemas-Binary"
       }
    },
-   "version" : "0.007",
+   "version" : "0.008",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -466,7 +466,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Sah::Schemas",
                         "name" : "-Sah::Schemas",
-                        "version" : "0.070"
+                        "version" : "0.072"
                      }
                   ]
                }

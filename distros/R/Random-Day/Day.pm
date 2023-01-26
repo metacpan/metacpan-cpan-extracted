@@ -10,7 +10,7 @@ use DateTime::Event::Recurrence;
 use English;
 use Error::Pure qw(err);
 
-our $VERSION = 0.11;
+our $VERSION = 0.12;
 
 # Constructor.
 sub new {
@@ -393,6 +393,8 @@ Returns DateTime object for date.
 
 =head1 EXAMPLE
 
+=for comment filename=get_random_day.pl
+
  use strict;
  use warnings;
 
@@ -441,12 +443,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2013-2022 Michal Josef Špaček
+© 2013-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.11
+0.12
 
 =cut

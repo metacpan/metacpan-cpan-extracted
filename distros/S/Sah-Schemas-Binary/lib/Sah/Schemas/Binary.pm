@@ -3,9 +3,9 @@ package Sah::Schemas::Binary;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-25'; # DATE
+our $DATE = '2022-10-20'; # DATE
 our $DIST = 'Sah-Schemas-Binary'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas related to binary data
@@ -22,7 +22,7 @@ Sah::Schemas::Binary - Sah schemas related to binary data
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::Schemas::Binary (from Perl distribution Sah-Schemas-Binary), released on 2022-09-25.
+This document describes version 0.008 of Sah::Schemas::Binary (from Perl distribution Sah-Schemas-Binary), released on 2022-10-20.
 
 =head1 SAH SCHEMAS
 
@@ -36,7 +36,9 @@ Binary data encoded in hexdigits, e.g. "fafafa" or "ca fe 00".
 
 Whitespaces are allowed and will be removed.
 
-Note that this schema does not decode the hex encoding for you.
+Note: that this schema does not decode the hex encoding for you.
+
+Note: if you add clauses like C<leng>, C<min_len>, C<max_len>
 
 
 =back

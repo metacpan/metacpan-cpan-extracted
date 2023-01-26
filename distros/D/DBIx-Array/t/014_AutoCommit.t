@@ -1,7 +1,7 @@
 # -*- perl -*-
 use strict;
 use warnings;
-use Test::More tests => 33;
+use Test::More tests => 39;
 use File::Temp qw/tempfile/;
 
 BEGIN { use_ok( 'DBIx::Array' ); }
@@ -11,7 +11,7 @@ eval 'use DBD::SQLite';
 my $no_driver = $@;
 
 SKIP: {
-  skip 'Database driver DBD::SQLite not installed', 32 if $no_driver;
+  skip 'Database driver DBD::SQLite not installed', 38 if $no_driver;
 
   my $db1             = DBIx::Array->new;
   my $db2             = DBIx::Array->new;
@@ -70,6 +70,17 @@ SKIP: {
     is($db2->sqlscalar('SELECT COUNT(*) FROM mytable'), '5', 'count');
   }
   ok($db1->AutoCommit, 'AutoCommit');
+
+  {
+    local $db1->{'dbh'}->{'AutoCommit'} = 0;
+    is($db1->insert($sql, 4, 5, 7), 1, 'insert 6');
+    is($db1->sqlscalar('SELECT COUNT(*) FROM mytable'), '6', 'count');
+    is($db2->sqlscalar('SELECT COUNT(*) FROM mytable'), '5', 'count');
+
+    ok($db1->rollback, 'rollback');
+    is($db1->sqlscalar('SELECT COUNT(*) FROM mytable'), '5', 'count');
+    is($db2->sqlscalar('SELECT COUNT(*) FROM mytable'), '5', 'count');
+  }
 
   #cleanup
   unlink  $filename;

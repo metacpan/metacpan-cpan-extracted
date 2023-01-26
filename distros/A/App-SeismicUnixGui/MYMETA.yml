@@ -1,0 +1,36 @@
+---
+abstract: 'A graphical user interface for Seismic Unix'
+author:
+  - 'Juan Lorenzo <gllore@lsu.edu>'
+build_requires:
+  Test::Compile::Internal: v3.1.0
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-SeismicUnixGui
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Clone: '0.45'
+  File::ShareDir: '1.118'
+  File::Slurp: '9999.32'
+  MIME::Base64: '3.16'
+  Module::Refresh: '0.18'
+  Moose: '2.2015'
+  PDL: '2.080'
+  Shell: v0.73.1
+  Time::HiRes: '1.9764'
+  Tk: '804.036'
+  Tk::JBrowseEntry: '5.25'
+  Tk::JFileDialog: '2.20'
+  aliased: '0.34'
+  namespace::autoclean: '0.29'
+version: v0.81.4
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

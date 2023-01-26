@@ -20,20 +20,20 @@ no_index:
 provides:
   Graphics::Toolkit::Color:
     file: lib/Graphics/Toolkit/Color.pm
-    version: '1.07'
+    version: '1.08'
   Graphics::Toolkit::Color::Constant:
     file: lib/Graphics/Toolkit/Color/Constant.pm
-    version: '1.07'
+    version: '1.08'
   Graphics::Toolkit::Color::Value:
     file: lib/Graphics/Toolkit/Color/Value.pm
-    version: '1.07'
+    version: '1.08'
 requires:
   Carp: '1.35'
   Exporter: '5'
   perl: v5.12.0
 resources:
   repository: git://github.com/lichtkind/Graphics-Color-Toolkit.git
-version: '1.07'
+version: '1.08'
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

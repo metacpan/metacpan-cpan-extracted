@@ -7,20 +7,21 @@
 
 const char* FILE_NAME = "Sys/IO/DirStream.c";
 
-static const int DIR_STREAM_CLOSED_INDEX = 0;
-
 int32_t SPVM__Sys__IO__DirStream__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
-
+  
+  int32_t e = 0;
+  
   // File handle
   void* obj_self = stack[0].oval;
   
-  int32_t dir_stream_is_closed = env->get_pointer_field_int(env, stack, obj_self, DIR_STREAM_CLOSED_INDEX);
+  int32_t closed = env->get_field_byte_by_name(env, stack, obj_self, "closed", &e, FILE_NAME, __LINE__);
+  if (e) { return e; }
   
   DIR* dir_stream = (DIR*)env->get_pointer(env, stack, obj_self);
   
   assert(dir_stream);
   
-  if (!dir_stream_is_closed) {
+  if (!closed) {
     int32_t status = closedir(dir_stream);
     if (status == -1) {
       env->die(env, stack, "[System Error]closedir failed:%s.", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);

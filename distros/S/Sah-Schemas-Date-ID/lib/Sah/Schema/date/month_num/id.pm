@@ -1,12 +1,14 @@
 package Sah::Schema::date::month_num::id;
 
+use strict;
+
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-04'; # DATE
+our $DATE = '2022-10-20'; # DATE
 our $DIST = 'Sah-Schemas-Date-ID'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 our $schema = [int => {
-    summary => 'Month number (1-12), coercible from Indonesian full/abbreviated month name (Des/DeSEMBER)',
+    summary => 'Month number (1-12), coercible from Indonesian full/abbreviated month name (Des/DeSEMBER), e.g. 1 or "agu"',
     min => 1,
     max => 12,
     'x.perl.coerce_rules' => ['From_str::convert_id_month_name_to_num'],
@@ -31,7 +33,7 @@ _
 
 1;
 
-# ABSTRACT: Month number (1-12), coercible from Indonesian full/abbreviated month name (Des/DeSEMBER)
+# ABSTRACT: Month number (1-12), coercible from Indonesian full/abbreviated month name (Des/DeSEMBER), e.g. 1 or "agu"
 
 __END__
 
@@ -41,31 +43,31 @@ __END__
 
 =head1 NAME
 
-Sah::Schema::date::month_num::id - Month number (1-12), coercible from Indonesian full/abbreviated month name (Des/DeSEMBER)
+Sah::Schema::date::month_num::id - Month number (1-12), coercible from Indonesian full/abbreviated month name (Des/DeSEMBER), e.g. 1 or "agu"
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::Schema::date::month_num::id (from Perl distribution Sah-Schemas-Date-ID), released on 2021-08-04.
+This document describes version 0.008 of Sah::Schema::date::month_num::id (from Perl distribution Sah-Schemas-Date-ID), released on 2022-10-20.
 
 =head1 SYNOPSIS
 
 =head2 Sample data and validation results against this schema
 
- ""  # INVALID ()
+ ""  # INVALID
 
  "jan"  # valid, becomes 1
 
  "AGU"  # valid, becomes 8
 
- "aug"  # INVALID (English)
+ "aug"  # INVALID
 
- 0  # INVALID (Not in 1-12)
+ 0  # INVALID
 
  1  # valid
 
  12  # valid
 
- 13  # INVALID (Not in 1-12)
+ 13  # INVALID
 
 =head2 Using with Data::Sah
 
@@ -75,7 +77,7 @@ To check data against this schema (requires L<Data::Sah>):
  my $validator = gen_validator("date::month_num::id*");
  say $validator->($data) ? "valid" : "INVALID!";
 
-The above schema returns a boolean value (true if data is valid, false if
+The above schema returns a boolean result (true if data is valid, false if
 otherwise). To return an error message string instead (empty string if data is
 valid, a non-empty error message otherwise):
 
@@ -87,8 +89,8 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = 0;
- my $errmsg = $validator->($data); # => "Must be at least 1"
+ $data = "";
+ my $errmsg = $validator->($data); # => "Not of type integer"
 
 Often a schema has coercion rule or default value, so after validation the
 validated value is different. To return the validated (set-as-default, coerced,
@@ -102,10 +104,10 @@ prefiltered) value:
  my $res = $validator->($data); # => ["",8]
  
  # a sample invalid data
- $data = 0;
- my $res = $validator->($data); # => ["Must be at least 1",0]
+ $data = "";
+ my $res = $validator->($data); # => ["Not of type integer",""]
 
-Data::Sah can also create validator that returns a hash of detaild error
+Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like
 JavaScript, from the same schema. Other things Data::Sah can do: show source
 code for validator, generate a validator code with debug comments and/or log
@@ -166,6 +168,23 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
 
  % ./myapp.pl --arg1 ...
 
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema:
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('$sch_name*', name=>'DateMonthNumId')
+     );
+ }
+
+ use My::Types qw(DateMonthNumId);
+ DateMonthNumId->assert_valid($data);
+
 =head1 DESCRIPTION
 
 Like the L<date::month_num|Sah::Schema::date::month_num> schema, except with
@@ -179,14 +198,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Date-ID>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Date-ID>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Sah::Schema::date::month_num>
@@ -197,11 +208,37 @@ L<Sah::Schema::date::month_num::en_or_id>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Date-ID>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

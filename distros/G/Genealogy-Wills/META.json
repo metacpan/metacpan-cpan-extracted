@@ -1,0 +1,83 @@
+{
+   "abstract" : "Lookup in a database of wills",
+   "author" : [
+      "Nigel Horne <njh@bandsman.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Genealogy-Wills",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DBD::SQLite" : "0",
+            "DBD::SQLite::Constants" : "0",
+            "DBI" : "0",
+            "Error::Simple" : "0",
+            "File::Basename" : "0",
+            "File::HomeDir" : "0",
+            "File::Slurp" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "File::pfopen" : "0",
+            "HTML::Entities" : "0",
+            "HTTP::Cache::Transparent" : "0",
+            "LWP::ConnCache" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent::WithCache" : "0",
+            "Lingua::EN::NameCase" : "0",
+            "Module::Info" : "0",
+            "Try::Tiny" : "0",
+            "autodie" : "0",
+            "perl" : "5.006002"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IPC::System::Simple" : "0",
+            "Test::Carp" : "0",
+            "Test::Most" : "0",
+            "Test::NoWarnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Genealogy-Wills@rt.cpan.org",
+         "web" : "https://github.com/nigelhorne/Genealogy-Wills/issues"
+      },
+      "homepage" : "https://sites.rootsweb.com/~obituary",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Genealogy-Wills.git",
+         "web" : "https://github.com/nigelhorne/Genealogy-Wills",
+         "x_repository" : "https://github.com/nigelhorne/Genealogy-Wills"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

@@ -33,7 +33,7 @@ provides:
     version: '0.01'
   Dpkg::BuildFlags:
     file: lib/Dpkg/BuildFlags.pm
-    version: '1.05'
+    version: '1.06'
   Dpkg::BuildInfo:
     file: lib/Dpkg/BuildInfo.pm
     version: '1.00'
@@ -282,5 +282,5 @@ resources:
   homepage: https://wiki.debian.org/Teams/Dpkg
   license: http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
   repository: https://git.dpkg.org/git/dpkg/dpkg.git
-version: v1.21.14
+version: v1.21.19
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

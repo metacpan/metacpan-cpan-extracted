@@ -19,7 +19,7 @@ package Dpkg::BuildFlags;
 use strict;
 use warnings;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 use Dpkg ();
 use Dpkg::Gettext;
@@ -280,6 +280,22 @@ sub set_feature {
     $self->{features}{$area}{$feature} = $enabled;
 }
 
+=item $bf->get_feature($area, $feature)
+
+Returns the value for the given feature within a known feature area.
+This is relevant for builtin features where the feature has a ternary
+state of true, false and undef, and where the latter cannot be retrieved
+with use_feature().
+
+=cut
+
+sub get_feature {
+    my ($self, $area, $feature) = @_;
+
+    return if ! $self->has_features($area);
+    return $self->{features}{$area}{$feature};
+}
+
 =item $bf->use_feature($area, $feature)
 
 Returns true if the given feature within a known feature areas has been
@@ -362,12 +378,12 @@ if $maint is defined and true.
 
 sub strip {
     my ($self, $flag, $value, $src, $maint) = @_;
-    foreach my $tostrip (split(/\s+/, $value)) {
-	next unless length $tostrip;
-	$self->{flags}->{$flag} =~ s/(^|\s+)\Q$tostrip\E(\s+|$)/ /g;
-    }
-    $self->{flags}->{$flag} =~ s/^\s+//g;
-    $self->{flags}->{$flag} =~ s/\s+$//g;
+
+    my %strip = map { $_ => 1 } split /\s+/, $value;
+
+    $self->{flags}->{$flag} = join q{ }, grep {
+        ! exists $strip{$_}
+    } split q{ }, $self->{flags}{$flag};
     $self->{origin}->{$flag} = $src if defined $src;
     $self->{maintainer}->{$flag} = $maint if $maint;
 }
@@ -551,6 +567,10 @@ sub list {
 =back
 
 =head1 CHANGES
+
+=head2 Version 1.06 (dpkg 1.21.15)
+
+New method: $bf->get_feature().
 
 =head2 Version 1.05 (dpkg 1.21.14)
 

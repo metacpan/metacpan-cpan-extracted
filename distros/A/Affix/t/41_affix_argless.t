@@ -8,13 +8,13 @@ use t::lib::nativecall;
 #
 compile_test_lib('41_argless');
 #
-sub Nothing : Native('t/41_argless');
-sub Argless : Native('t/41_argless') : Signature([]=>Int);
-sub ArglessChar : Native('t/41_argless') : Signature([]=>Char);
-sub ArglessLongLong : Native('t/41_argless') : Signature([]=>LongLong);
-sub ArglessPointer : Native('t/41_argless') : Signature([]=>Pointer[Int]);    # Pointer[int32]
-sub ArglessUTF8String : Native('t/41_argless') : Signature([]=>Str);
-sub short : Native('t/41_argless') : Signature([]=>Short) : Symbol('long_and_complicated_name');
+sub Nothing : Native('t/src/41_argless');
+sub Argless : Native('t/src/41_argless') : Signature([]=>Int);
+sub ArglessChar : Native('t/src/41_argless') : Signature([]=>Char);
+sub ArglessLongLong : Native('t/src/41_argless') : Signature([]=>LongLong);
+sub ArglessPointer : Native('t/src/41_argless') : Signature([]=>Pointer[Int]);    # Pointer[int32]
+sub ArglessUTF8String : Native('t/src/41_argless') : Signature([]=>Str);
+sub short : Native('t/src/41_argless') : Signature([]=>Short) : Symbol('long_and_complicated_name');
 #
 Nothing();
 pass 'survived the call';

@@ -32,11 +32,11 @@ Pg::Explain::Buffers - Object to store buffers information about node in Postgre
 
 =head1 VERSION
 
-Version 2.5
+Version 2.6
 
 =cut
 
-our $VERSION = '2.5';
+our $VERSION = '2.6';
 
 =head1 SYNOPSIS
 
@@ -117,6 +117,10 @@ sub add_timing {
         \A
         \s*
         I/O \s Timings:
+        (?:
+            \s+
+            shared/local
+        )?
         (
             \s+
             (?: read | write )

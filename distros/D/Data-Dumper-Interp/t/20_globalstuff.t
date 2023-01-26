@@ -51,6 +51,9 @@ use Math::BigFloat 1.999837 ();
 use Math::BigRat 0.2624 ();
 
 require Data::Dumper;
+
+diag "Perl version ",u($^V),"\n";
+
 my @modnames = (qw/Data::Dumper Math::BigInt Math::BigFloat Math::BigRat/);
 for my $modname (@modnames) {
   diag "Loaded ", $INC{ "${modname}.pm" =~ s/::/\//gr }, "\n";

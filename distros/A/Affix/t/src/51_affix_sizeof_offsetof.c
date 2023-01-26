@@ -93,9 +93,9 @@ DLLEXPORT size_t s_struct5() {
     return sizeof(struct5);
 }
 DLLEXPORT size_t s_struct6() {
-    warn("offsetof(struct6, s) == %d", offsetof(struct6, s));
-    warn("offsetof(struct6, c) == %d", offsetof(struct6, c));
-    warn("sizeof(struct4) == %d", sizeof(struct4));
+    warn("offsetof(struct6, s) == %zu", offsetof(struct6, s));
+    warn("offsetof(struct6, c) == %zu", offsetof(struct6, c));
+    warn("sizeof(struct4) == %zu", sizeof(struct4));
     return sizeof(struct6);
 }
 
@@ -141,11 +141,12 @@ DLLEXPORT size_t s_massive() {
 }
 
 //
+typedef struct {
+    double d;
+    int c[4];
+} array_struct;
 DLLEXPORT size_t s_array1(int length) {
-    return sizeof(struct {
-        double d;
-        int c[4];
-    }[length]);
+    return sizeof(array_struct[length]);
 }
 
 //

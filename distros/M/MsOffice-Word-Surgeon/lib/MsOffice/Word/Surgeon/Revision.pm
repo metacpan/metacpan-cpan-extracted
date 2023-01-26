@@ -8,7 +8,7 @@ use POSIX                          qw(strftime);
 use MsOffice::Word::Surgeon::Utils qw(maybe_preserve_spaces);
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.0';
+our $VERSION = '2.01';
 
 subtype 'Date_ISO',
   as      'Str',

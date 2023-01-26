@@ -43,6 +43,8 @@ __END__
 
 Apache::Session::Store::NoSQL::Redis - An implementation of Apache::Session::Store
 
+Note: this module is deprecated, Prefer L<Apache::Session::Browseable>
+
 =head1 SYNOPSIS
 
  use Apache::Session::Redis;

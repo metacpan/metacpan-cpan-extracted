@@ -1,8 +1,8 @@
 Name:           perl-DBIx-Array
-Version:        0.64
+Version:        0.65
 Release:        1%{?dist}
 Summary:        DBI Wrapper with Perl style data structure interfaces
-License:        BSD
+License:        MIT
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/DBIx-Array/
 Source0:        http://www.cpan.org/modules/by-module/DBIx/DBIx-Array-%{version}.tar.gz
@@ -52,20 +52,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc Changes LICENSE README Todo
+%doc LICENSE README.md
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 
 %changelog
-* Sun Apr 22 2012 Michael R. Davis (mdavis@stopllc.com) 0.24
-- Updated for new version
-
-* Fri Nov 25 2011 Michael R. Davis (mdavis@stopllc.com) 0.23-2
-- Updated changelog (#754892)
-
-* Mon Nov 21 2011 Michael R. Davis (mdavis@stopllc.com) 0.23-1
-- Updated for version 0.23
-- Removed hard coded requires for DBI since rpmbuild finds them from sources (#754892)
-
-* Sun Aug 28 2011 Michael R. Davis (mdavis@stopllc.com) 0.22-1
-- Created spec file with cpanspec

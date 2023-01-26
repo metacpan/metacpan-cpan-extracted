@@ -1,10 +1,13 @@
 class Sys::Poll::PollfdArray {
+  
+  # Fields
+  has length : ro int;
+  
+  # Class Methods
   native static method new : Sys::Poll::PollfdArray ($length : int);
 
-  # Instance methods
+  # Instance Methods
   native method DESTROY : void ();
-  
-  native method length : int ();
   
   native method fd : int ($index : int);
   native method set_fd : void ($index : int, $fd : int);

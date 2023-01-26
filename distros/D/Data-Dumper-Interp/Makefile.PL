@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.020;
+use 5.018;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Data-Dumper-Interp",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.020",
+  "MIN_PERL_VERSION" => "5.018",
   "NAME" => "Data::Dumper::Interp",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -49,7 +49,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "version" => "0.77"
   },
-  "VERSION" => "4.106",
+  "VERSION" => "4.107",
   "test" => {
     "TESTS" => "t/*.t"
   }

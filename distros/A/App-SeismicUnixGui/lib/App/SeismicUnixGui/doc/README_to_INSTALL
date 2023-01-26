@@ -1,0 +1,31 @@
+NOTES: July 14, 2022
+Author: Juan M. Lorenzo
+Version: 1.00.00 
+
+PURPOSE: Help install application manually
+
+
+PRE-REQUISITE packages: 
+
+Perl  (>= 5.26.1)
+Moose
+Cwd
+ExtUtils::MakeMaker
+File::ShareDir
+
+
+STEP 1: 
+
+Run the following commands, preferably as sudo.
+
+sudo perl Makefile.PL
+sudo make all
+sudo make install
+sudo make clean
+
+
+STEP 2:
+
+Run the application at the command line:
+
+SeismicUnixGui

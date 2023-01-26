@@ -1,3 +1,6 @@
+0.03 2023-01-25T08:40:57+01:00
+ - Fix test dependencies.
+
 0.02 2023-01-24T08:18:36+01:00
  - Add tests.
  - Fix dependencies.

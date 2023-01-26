@@ -60,7 +60,7 @@ resources:
   bugtracker: https://github.com/rjbs/Dist-Zilla-PluginBundle-RJBS/issues
   homepage: https://github.com/rjbs/Dist-Zilla-PluginBundle-RJBS
   repository: https://github.com/rjbs/Dist-Zilla-PluginBundle-RJBS.git
-version: '5.022'
+version: '5.023'
 x_Dist_Zilla:
   perl:
     version: '5.037002'
@@ -83,7 +83,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: '@RJBS/CheckPrereqsIndexed'
-      version: '0.021'
+      version: '0.022'
     -
       class: Dist::Zilla::Plugin::CheckExtraTests
       name: '@RJBS/CheckExtraTests'
@@ -229,7 +229,7 @@ x_Dist_Zilla:
             - '@RJBS'
           finder:
             - ':InstallModules'
-            - ':ExecFiles'
+            - ':PerlExecFiles'
           plugins:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
@@ -312,11 +312,11 @@ x_Dist_Zilla:
               name: '@RJBS/List'
               version: '4.018'
       name: '@RJBS/PodWeaver'
-      version: '4.009'
+      version: '4.010'
     -
       class: Dist::Zilla::Plugin::RJBSMisc
       name: '@RJBS/RJBSMisc'
-      version: '5.022'
+      version: '5.023'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@RJBS/GithubMeta'
@@ -364,7 +364,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '5.022'
+          tag: '5.023'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

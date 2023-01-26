@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::Binary - Sah schemas related to binary data
 
 VERSION
-    This document describes version 0.007 of Sah::Schemas::Binary (from Perl
-    distribution Sah-Schemas-Binary), released on 2022-09-25.
+    This document describes version 0.008 of Sah::Schemas::Binary (from Perl
+    distribution Sah-Schemas-Binary), released on 2022-10-20.
 
 SAH SCHEMAS
     The following schemas are included in this distribution:
@@ -14,7 +14,9 @@ SAH SCHEMAS
 
         Whitespaces are allowed and will be removed.
 
-        Note that this schema does not decode the hex encoding for you.
+        Note: that this schema does not decode the hex encoding for you.
+
+        Note: if you add clauses like "leng", "min_len", "max_len"
 
 HOMEPAGE
     Please visit the project's homepage at

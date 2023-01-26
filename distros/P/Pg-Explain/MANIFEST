@@ -440,6 +440,13 @@ t/80-wide-characters.d/wide-characters-explain.text
 t/80-wide-characters.d/wide-characters-explain.xml
 t/80-wide-characters.d/wide-characters-explain.yaml
 t/80-wide-characters.t
+t/81-planning-io-timings.d/read-and-write.plan
+t/81-planning-io-timings.d/read-and-write.timings
+t/81-planning-io-timings.d/read.plan
+t/81-planning-io-timings.d/read.timings
+t/81-planning-io-timings.d/shared-local.plan
+t/81-planning-io-timings.d/shared-local.timings
+t/81-planning-io-timings.t
 t/99-manifest.t
 t/perlcriticrc
 t/perltidyrc

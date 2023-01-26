@@ -1,4 +1,4 @@
-package Affix 0.08 {    # 'FFI' is my middle name!
+package Affix 0.09 {    # 'FFI' is my middle name!
     use strict;
     use warnings;
     no warnings 'redefine';
@@ -10,8 +10,6 @@ package Affix 0.08 {    # 'FFI' is my middle name!
     use Text::ParseWords;
     use Carp qw[];
     use vars qw[@EXPORT_OK @EXPORT %EXPORT_TAGS];
-
-    # our $VERSION = '0.08';
     use XSLoader;
     XSLoader::load( __PACKAGE__, our $VERSION );
     #
@@ -266,6 +264,12 @@ package Affix 0.08 {    # 'FFI' is my middle name!
         return $_lib_cache->{ $name . ';' . ( $version // '' ) }
             // Carp::croak( 'Cannot locate symbol: ' . $name );
     }
+
+    # define packages that are otherwise XS-only so PAUSE will find them in META.json
+    {
+
+        package Affix::Feature 0.09;
+    }
 };
 1;
 __END__
@@ -292,6 +296,10 @@ Affix - A Foreign Function Interface eXtension
 
     sub bar : Native('libfoo') : Signature([Str, Float] => Double);
     print bar( 'Baz', 10.9 );
+
+    # bind to exported values
+
+
 
 =head1 DESCRIPTION
 
@@ -1067,6 +1075,25 @@ declaration is straightforward:
 
     TODO
 
+=head1 Features
+
+Not all features of dyncall are supported on all platforms, for those, the
+underlying library defines macros you can use to detect support. These values
+are exposed under the C<Affix::Feature> package:
+
+=over
+
+=item C<Affix::Feature::Syscall()>
+
+If true, your platform supports a syscall calling conventions.
+
+=item C<Affix::Feature::AggrByVal()>
+
+If true, your platform supports passing around aggregates (struct, union) by
+value.
+
+=back
+
 =head1 See Also
 
 Check out L<FFI::Platypus> for a more robust and mature FFI.
@@ -1093,7 +1120,7 @@ Sanko Robinson E<lt>sanko@cpan.orgE<gt>
 
 dyncall OpenBSD FreeBSD macOS DragonFlyBSD NetBSD iOS ReactOS mips mips64 ppc32
 ppc64 sparc sparc64 co-existing varargs variadic struct enum eXtension rvalue
-dualvars libsomething versioned errno
+dualvars libsomething versioned errno syscall
 
 =end stopwords
 
