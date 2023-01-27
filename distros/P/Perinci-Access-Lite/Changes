@@ -1,27 +1,31 @@
-Revision history for Perinci-Access-Lite
+0.150   2022-10-28  Released-By: PERLANCAR; Urgency: medium
 
-0.14    2016-09-25 (PERLANCAR)
+        - Downgrade HTTP::Tiny, HTTP::Tiny::UNIX, Progress::Any as runtime
+          recommends for fewer dependencies.
+
+
+0.14    2016-09-25  Released-By: PERLANCAR
 
 	- Revert from using JSON::MaybeXS to JSON because JSON::MaybeXS is
 	  currently not depakable (hard dependency to XS module
 	  Cpanel::JSON::XS).
 
 
-0.13    2016-03-16 (PERLANCAR)
+0.13    2016-03-16  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace JSON with JSON::MaybeXS.
 
 
-0.12    2015-12-17 (PERLANCAR)
+0.12    2015-12-17  Released-By: PERLANCAR
 
 	- meta action: set result_naked to 0 & args_as to 'hash' like in
 	  Perinci::Access::Perl, and also set _orig_result_naked &
 	  _orig_args_as.
 
 
-0.11    2015-09-03 (PERLANCAR)
+0.11    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -30,7 +34,7 @@ Revision history for Perinci-Access-Lite
 	  requirement.
 
 
-0.10    2015-07-10 (PERLANCAR)
+0.10    2015-07-10  Released-By: PERLANCAR
 
         - [Experimental] Previously, a module was assumed to be loaded when its
           package exists. However, this presents a problem because declaring a
@@ -41,42 +45,42 @@ Revision history for Perinci-Access-Lite
           false negatives, but for proper modules this will not be a problem.
 
 
-0.09    2015-01-22 (PERLANCAR)
+0.09    2015-01-22  Released-By: PERLANCAR
 
 	- Add -progress special argument when function expects it, like in
 	  Perinci::Access::Perl.
 
 
-0.08    2014-12-31 (PERLANCAR)
+0.08    2014-12-31  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Add more helpful error message for 'No metadata for ...'.
 
 
-0.07    2014-10-28 (PERLANCAR)
+0.07    2014-10-28  Released-By: PERLANCAR
 
 	- Support info action for local (pm) URL scheme.
 
 	- Document about x.hint.result_binary.
 
 
-0.06    2014-10-24 (PERLANCAR)
+0.06    2014-10-24  Released-By: PERLANCAR
 
 	- Give hint in result metadata when result is binary (buf).
 
 
-0.05    2014-10-24 (PERLANCAR)
+0.05    2014-10-24  Released-By: PERLANCAR
 
 	- Add attribute: riap_version.
 
 
-0.04     2014-10-23 (PERLANCAR)
+0.04     2014-10-23  Released-By: PERLANCAR
 
          - Support Riap 1.2 (check and strip 'riap.*' keys).
 
 
-0.03     2014-09-21 (PERLANCAR)
+0.03     2014-09-21  Released-By: PERLANCAR
 
          - Support 'list' action (not completely).
 
@@ -85,11 +89,11 @@ Revision history for Perinci-Access-Lite
          - Some minor tweaks to responses.
 
 
-0.02     2014-09-03 (PERLANCAR)
+0.02     2014-09-03  Released-By: PERLANCAR
 
          - Add HTTP(S) support.
 
 
-0.01     2014-09-03 (PERLANCAR)
+0.01     2014-09-03  Released-By: PERLANCAR
 
          - First, early release. No tests yet.

@@ -24,7 +24,7 @@ configure_requires:
   Module::Build: '0'
   perl: '5.006'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,14 +33,14 @@ name: Data-Dump-Streamer
 provides:
   Data::Dump::Streamer:
     file: lib/Data/Dump/Streamer.pm
-    version: '2.40'
+    version: '2.41'
   Data::Dump::Streamer::Deparser:
     file: lib/Data/Dump/Streamer.pm
-    version: '2.40'
+    version: '2.41'
 recommends:
   Algorithm::Diff: '0'
   Compress::Zlib: '0'
-  JSON::XS: '0'
+  Cpanel::JSON::XS: '0'
   MIME::Base64: '0'
   PadWalker: '0.99'
 requires:
@@ -64,5 +64,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/demerphq/Data-Dump-Streamer
-version: '2.40'
+version: '2.41'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

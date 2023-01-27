@@ -1,5 +1,5 @@
 package Log::Progress::Parser;
-$Log::Progress::Parser::VERSION = '0.12';
+$Log::Progress::Parser::VERSION = '0.13';
 use Moo 2;
 use JSON;
 
@@ -50,8 +50,9 @@ sub parse {
 			if (defined $denom) {
 				$state->{current}= $num;
 				$state->{total}= $denom;
-				$state->{progress} /= $denom;
+				$state->{progress} /= $denom if $denom;
 			}
+			$state->{progress}= 1 if $state->{progress} > 1;
 			if ($state->{contribution}) {
 				# Need to apply progress to parent nodes at end
 				$parent_cleanup{$state_parent[$_]}= [ $_, $state_parent[$_] ]
@@ -116,10 +117,6 @@ __END__
 
 Log::Progress::Parser - Parse progress data from a file
 
-=head1 VERSION
-
-version 0.12
-
 =head1 SYNOPSIS
 
   open my $fh, "<", $logfile or die;
@@ -182,6 +179,8 @@ Substeps may additionally have the keys:
     title        => $name_of_this_step,
     contribution => $percent_of_parent_task, # can be undef
 
+=for Pod::Coverage status
+
 =head2 sticky_message
 
 Defaults to false.  If set to true, then progress lines lacking a message will
@@ -229,9 +228,13 @@ parent nodes of the returned state node.
 
 Michael Conrad <mike@nrdvana.net>
 
+=head1 VERSION
+
+version 0.13
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Michael Conrad.
+This software is copyright (c) 2023 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

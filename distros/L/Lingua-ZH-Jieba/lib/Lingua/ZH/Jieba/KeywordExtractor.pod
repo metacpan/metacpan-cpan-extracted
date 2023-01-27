@@ -1,7 +1,19 @@
-=encoding utf8
+# ABSTRACT: Keyword extractor
+# PODNAME: Lingua::ZH::Jieba::KeywordExtractor
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Lingua::ZH::Jieba::KeywordExtractor - Keyword extractor
+
+=head1 VERSION
+
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -46,16 +58,15 @@ Extract C<$top_n> keywords from C<$sentence>.
 
 L<Lingua::ZH::Jieba>
 
-=head1 AUTHORS
+=head1 AUTHOR
 
 Stephan Loyd <stephanloyd9@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-CppJieba is copyright by YanYi Wu under the MIT license. Visit
-L<https://yanyiwu.mit-license.org/> for a copy of the license.
+This software is copyright (c) 2017-2023 by Stephan Loyd.
 
-The Perl extension of CppJieba is copyright (c) 2017 by Stephan Loyd.
-This is free software; you can redistribute it and/or modify it under the
-same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
+=cut

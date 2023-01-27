@@ -5,7 +5,7 @@ package Chart::GGPlot::Scale::ContinuousIdentity;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.002001'; # VERSION
+our $VERSION = '0.002002'; # VERSION
 
 use Chart::GGPlot::Util qw(:all);
 
@@ -42,7 +42,7 @@ Chart::GGPlot::Scale::ContinuousIdentity - Continuous identity scale
 
 =head1 VERSION
 
-version 0.002001
+version 0.002002
 
 =head1 AUTHOR
 
@@ -50,7 +50,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2022 by Stephan Loyd.
+This software is copyright (c) 2019-2023 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

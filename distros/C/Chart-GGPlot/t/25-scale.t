@@ -71,12 +71,12 @@ subtest scale_color_hue => sub {
 
     pdl_is(
         $s->palette->(2),
-        PDL::SV->new([qw(#7e5250 #13686a)]),
+        PDL::SV->new([qw(#7f5350 #13696a)]),
         '$s->palette->(2)'
     );
     pdl_is(
         $s->palette->(4),
-        PDL::SV->new([qw(#7e5250 #536436 #13686a #6a567d)]),
+        PDL::SV->new([qw(#7f5350 #536436 #13696a #6a567e)]),
         '$s->palette->(4)'
     );
 };

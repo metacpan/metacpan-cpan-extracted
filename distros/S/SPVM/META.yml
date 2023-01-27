@@ -23,5 +23,5 @@ requires:
   Time::Piece: '1.12'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM.git
-version: '0.9685'
+version: '0.9686'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

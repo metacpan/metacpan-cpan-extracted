@@ -1,0 +1,61 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.012"^^doap-deps:CpanId ], [ doap-deps:on "Eval::TypeTiny"^^doap-deps:CpanId ], [
+		doap-deps:on "Exporter::Shiny 1.006000"^^doap-deps:CpanId;
+	], [ doap-deps:on "Import::Into"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ], [ doap-deps:on "Type::Registry"^^doap-deps:CpanId ], [
+		doap-deps:on "Type::Tiny::Enum 2.002001"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Types::Common 2.002001"^^doap-deps:CpanId;
+	];
+	doap-deps:test-requirement [
+		doap-deps:on "Test2::Require::AuthorTesting"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Test2::Require::Module"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Test2::Plugin::BailOnFail"^^doap-deps:CpanId;
+	], [ doap-deps:on "Test2::V0"^^doap-deps:CpanId ], [ doap-deps:on "Test2::Tools::Spec"^^doap-deps:CpanId ];
+	doap:bug-database    <https://github.com/tobyink/p5-exporter-almighty/issues>;
+	doap:created         "2023-01-26"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Exporter-Almighty>;
+	doap:homepage        <https://metacpan.org/release/Exporter-Almighty>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Exporter-Almighty";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/v_0-001000>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-exporter-almighty>;
+	];
+	doap:shortdesc       "combining Exporter::Tiny with some other stuff for added power".
+
+<http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/v_0-001000>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Exporter-Almighty-0.001000"^^xsd:string;
+	dc:issued            "2023-01-27"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Exporter-Almighty-0.001000.tar.gz>;
+	doap:revision        "0.001000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

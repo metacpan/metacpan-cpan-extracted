@@ -1,3 +1,8 @@
+Version 0.13 - 2023-01-26
+  - Never divide by 0 in Parser, even if stream says 0/0
+  - Parser will never return >100% progress value
+  - Various dist packaging improvements, and longer timeout for tests
+
 Version 0.12 - 2020-10-02
   - Fix a test failure when TERM not defined (by skipping it)
 

@@ -1,0 +1,219 @@
+NAME
+    Exporter::Almighty - combining Exporter::Tiny with some other stuff for
+    added power
+
+SYNOPSIS
+      package Your::Package;
+  
+      use Exporter::Almighty -setup => {
+        tag => {
+          foo => [ 'foo1', 'foo2' ],
+          bar => [ 'bar1' ],
+        },
+        const => {
+          colours => { RED => 'red', BLUE => 'blue', GREEN => 'green' },
+        },
+        enum => {
+          Status => [ 'dead', 'alive' ],
+        },
+        also => [
+          'strict',
+          'Scalar::Util' => [ 'refaddr' ],
+          'warnings',
+        ],
+      };
+  
+      sub foo1 { ... }
+      sub foo2 { ... }
+      sub bar1 { ... }
+  
+      1;
+
+DESCRIPTION
+    This module aims to make building exporters easier. It is based on
+    Exporter::Tiny, but helps you avoid manually setting @EXPORT_OK,
+    %EXPORT_TAGS, etc.
+
+  Setup Options
+    Exporter::Almighty's own setup happens through its import. A setup hashref
+    is passed as per the example in the "SYNOPSIS". Each key in this hash is a
+    setup option.
+
+    The names are all short, singular names, in case you forget whether to use
+    `tag` or `tags`!
+
+   `tag`
+    This is a hashref where the keys are tag names and the values are
+    arrayrefs of function names.
+
+      use Exporter::Almighty -setup => {
+        tag => {
+          foo => [ 'foo1', 'foo2' ],
+          bar => [ 'bar1' ],
+        }
+      };
+
+    A user of the package defined in the "SYNOPSIS" could import:
+
+      use Your::Package qw( foo1 foo2 bar1 );   # import functions by name
+      use Your::Package qw( :foo );             # import 'foo1' and 'foo2'
+      use Your::Package qw( -foo );             # same!
+
+    If you have a tag called `default`, that is special. It will be
+    automatically exported if your caller doesn't provide an explicit list of
+    things they want to import.
+
+    The following other tags also have special meanings: `constants`, `types`,
+    `assert`, `is`, `to`, and `all`.
+
+    By convention, tags names should be snake_case.
+
+   `const`
+    Similar to `tag` this is a hashref where keys are tag names, but instead
+    of the values being arrayrefs of function names, they are hashrefs which
+    define constants.
+
+      use Exporter::Almighty -setup => {
+        const => {
+          colours => { RED => 'red', BLUE => 'blue', GREEN => 'green' },
+        },
+      };
+
+    A user of the package defined in the "SYNOPSIS" could import:
+
+      use Your::Package qw( RED GREEN BLUE );   # import constants by name
+      use Your::Package qw( :colours );         # import 'colours' constants
+      use Your::Package qw( :constants );       # import ALL constants
+
+    By convention, the tag names should be snake_case, but constant names
+    should be SHOUTING_SNAKE_CASE.
+
+   `enum`
+    This is a hashref where keys are enumerated type names, and the values are
+    arrayrefs of strings.
+
+      use Exporter::Almighty -setup => {
+        enum => {
+          Status => [ 'dead', 'alive' ],
+        },
+      };
+
+    A user of the package defined in the "SYNOPSIS" could import:
+
+      use Your::Package qw(
+        Status
+        is_Status
+        assert_Status
+        to_Status
+        STATUS_ALIVE
+        STATUS_DEAD
+      );
+      use Your::Package qw( :status );          # shortcut for the above
+
+    The `:type`, `:is`, `:assert`, `:to`, and `:constants` tags will also
+    automatically include the relevent exports.
+
+    By convention, enum types should be UpperCamelCase.
+
+   `also`
+    A list of other packages to also export to your caller. Each package name
+    can optionally be followed by an arrayerf of import arguments.
+
+      use Exporter::Almighty -setup => {
+        also => [
+          'strict',
+          'Scalar::Util' => [ 'refaddr' ],
+          'warnings',
+        ],
+      };
+
+    Your caller isn't given any options allowing them to opt in or out of
+    this, so it is recommended that this be used sparingly. strict, warnings,
+    feature, experimental, and namespace::autoclean are good packages to
+    consider listing here. Packages that export named functions are less good.
+
+  API
+    Instead of:
+
+      package Your::Package;
+      use Exporter::Almighty -setup => \%setup;
+
+    It is possible to do this at run-time:
+
+      Exporter::Almighty->setup_for( 'Your::Package', \%setup );
+
+    This may allow slightly more flexibility in some cases.
+
+    Exporter::Almighty is also designed to be easily subclassable.
+
+  Exporter::Tiny features you get for free
+   Features for you
+    You can export package variables, though it's rarely a good idea:
+
+      package Your::Package;
+  
+      use Exporter::Almighty -setup => {
+        tag => { default => [ 'xxx', '$YYY' ] },
+      };
+  
+      our $YYY = 42;
+
+    You can use generators:
+
+      package Your::Package;
+  
+      use Exporter::Almighty -setup => {
+        tag => { default => [ 'xxx' ] },
+      };
+  
+      sub _generate_xxx {
+        my ( $me, $name, $vals, $opts ) = @_;
+        my $caller = $opts->{into};
+    
+        # Return the sub which will be installed into caller as 'xxx'.
+        return sub {
+        };
+      }
+  
+      ...;
+  
+      package main;
+      use Your::Package 'xxx' => \%vals;
+  
+      xxx( ... );
+
+   Features for your caller
+    Your caller can do lexical imports:
+
+      use Your::Package -lexical, qw( ... );
+
+    Your caller can rename imported functions:
+
+      use Your::Package foo => { -as => 'foofoo' };
+
+    And everything else described in Exporter::Tiny::Manual::Importing.
+
+BUGS
+    Please report any bugs to
+    <https://github.com/tobyink/p5-exporter-almighty/issues>.
+
+SEE ALSO
+    Exporter::Tiny, Exporter::Shiny.
+
+    CXC::Exporter::Util was an inspiration for this module and the features
+    overlap a bit.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2023 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

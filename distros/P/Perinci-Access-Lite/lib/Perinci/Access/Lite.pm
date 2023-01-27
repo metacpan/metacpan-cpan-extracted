@@ -1,13 +1,15 @@
 package Perinci::Access::Lite;
 
-our $DATE = '2016-09-25'; # DATE
-our $VERSION = '0.14'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::AccessUtil qw(strip_riap_stuffs_from_res);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-10-28'; # DATE
+our $DIST = 'Perinci-Access-Lite'; # DIST
+our $VERSION = '0.150'; # VERSION
 
 sub new {
     my ($class, %args) = @_;
@@ -17,7 +19,7 @@ sub new {
 
 # copy-pasted from SHARYANTO::Package::Util
 sub __package_exists {
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
     my $pkg = shift;
 
@@ -30,7 +32,7 @@ sub __package_exists {
 }
 
 sub request {
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
     my ($self, $action, $url, $extra) = @_;
 
@@ -67,7 +69,7 @@ sub request {
             return [501, "Action 'list' not implemented for ".
                         "non-package entities"]
                 if length($func);
-            no strict 'refs';
+            no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
             my $spec = \%{"$pkg\::SPEC"};
             return [200, "OK (list)", [grep {/\A\w+\z/} sort keys %$spec]];
         } elsif ($action eq 'info') {
@@ -84,7 +86,7 @@ sub request {
                 if !length($func) && $action eq 'call';
             my $meta;
             {
-                no strict 'refs';
+                no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
                 if (length $func) {
                     $meta = ${"$pkg\::SPEC"}{$func}
                         or return [
@@ -139,7 +141,7 @@ sub request {
 
             # call!
             {
-                no strict 'refs';
+                no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
                 $res = &{"$pkg\::$func"}(@args);
             }
 
@@ -216,7 +218,7 @@ Perinci::Access::Lite - A lightweight Riap client library
 
 =head1 VERSION
 
-This document describes version 0.14 of Perinci::Access::Lite (from Perl distribution Perinci-Access-Lite), released on 2016-09-25.
+This document describes version 0.150 of Perinci::Access::Lite (from Perl distribution Perinci-Access-Lite), released on 2022-10-28.
 
 =head1 DESCRIPTION
 
@@ -245,7 +247,10 @@ Differences with Perinci::Access:
 
 =item * For network access, uses HTTP::Tiny module family instead of LWP
 
-This results in fewer dependencies.
+This results in fewer dependencies. L<HTTP::Tiny> (and L<HTTP::Tiny::UNIX>) are
+even specified as runtime recommends dependencies instead of runtime requires,
+so if your script or downstream library requires HTTP access, you'll need to
+specify the dependencies explicitly.
 
 =item * No wrapping, no argument checking
 
@@ -287,14 +292,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Ac
 
 Source repository is at L<https://github.com/perlancar/perl-Perinci-Access-Lite>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Access-Lite>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Perinci::Access>
@@ -303,11 +300,37 @@ L<Perinci::Access>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Access-Lite>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

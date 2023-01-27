@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
     NAME             => 'Date::Parse::Modern',
-    AUTHOR           => q{Scott Baker <scott@perturb.org>},
+    AUTHOR           => 'Scott Baker <bakerscot@cpan.org>',
     VERSION_FROM     => 'lib/Date/Parse/Modern.pm',
     ABSTRACT_FROM    => 'lib/Date/Parse/Modern.pm',
     LICENSE          => 'mit',
@@ -22,6 +22,17 @@ my %WriteMakefileArgs = (
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Date-Parse-Modern-*' },
+
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                url => 'https://github.com/scottchiefbaker/perl-Date-Parse-Modern.git',
+                web => 'https://github.com/scottchiefbaker/perl-Date-Parse-Modern',
+                type => 'git'
+            }
+        }
+    },
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker

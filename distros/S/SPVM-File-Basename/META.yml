@@ -1,0 +1,27 @@
+---
+abstract: 'Parsing File Path into Directory and Base Name.'
+author:
+  - USER_NAME<USER_MAIL>
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  SPVM: '0.9685'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SPVM-File-Basename
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  SPVM: '0.9685'
+  SPVM::Regex: '0.17'
+  SPVM::Sys: '0.34'
+resources:
+  repository: https://github.com/yuki-kimoto/SPVM-File-Basename.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

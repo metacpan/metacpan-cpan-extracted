@@ -9,7 +9,7 @@ build_requires:
   strict: '0'
   utf8: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.70'
   File::Find: '0'
   File::Spec: '0'
   strict: '0'
@@ -33,5 +33,5 @@ requires:
   warnings: '0'
 resources:
   repository: git://github.com/mauke/Quote-Code
-version: '1.0103'
+version: '1.0104'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

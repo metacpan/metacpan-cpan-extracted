@@ -1,0 +1,7 @@
+class TestCase::File::Basename {
+  use File::Basename;
+  static method test : int () {
+    
+    return 1;
+  }
+}

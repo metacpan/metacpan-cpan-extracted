@@ -1,11 +1,11 @@
 Changes
+Code.xs
 lib/Quote/Code.pm
 Makefile.PL
-Makefile_PL_settings
+Makefile_PL_settings.plx
 MANIFEST
 MANIFEST.SKIP
 README
-Code.xs
 t/00-load.t
 t/01-bare.t
 t/02-unload.t

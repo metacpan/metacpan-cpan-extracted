@@ -1,6 +1,6 @@
 package Test::Instruction;
 
-use 5.006; use strict; use warnings; our $VERSION = '0.02';
+use 5.006; use strict; use warnings; our $VERSION = '0.03';
 use Compiled::Params::OO qw/cpo/;
 use Types::Standard qw/Optional Str Int Bool Any CodeRef ArrayRef HashRef/;
 use B qw/svref_2object/;
@@ -282,6 +282,23 @@ sub instruction {
 				$instruction->expected
 			);
 		},
+		code => sub {
+			return is(
+				ref $test[0],
+				'CODE',
+				sprintf "%s is a CODE block",
+				$test_name
+			);
+		},
+		code_execute => sub {
+			return is_deeply(
+				$test[0]->($instruction->args ? @{$instruction->args} : ()),
+				$instruction->expected,
+				sprintf "%s is deeply %s",
+				$test_name,
+				$instruction->expected
+			);
+		},
 		like => sub {
 			my $like = $instruction->expected;
 			return like(
@@ -457,12 +474,14 @@ Version 0.02
 	instructions(
 		name => 'Checking Many Things',
 		build => {
-			class => 'Foo',
+			class => 'London',
 		},
 		run => [
 			{
 				test => 'hash',
-				expected => {}
+				expected => {
+					booking => '66/68',
+				}
 			},
 			{
 				test => 'true',
@@ -479,7 +498,7 @@ Version 0.02
 					{
 						test => 'hash',
 						expected => {
-							a => "b"
+							paddington => "sleep"
 						}
 					}
 				]
@@ -561,7 +580,11 @@ over
 =item count_ref - is - ''
  
 =item skip - ok(1)
- 
+
+=item code - is - 'CODE'
+
+=item code_execute - is_deeply - ''
+
 =back
 
 =head3 catch

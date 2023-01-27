@@ -1,5 +1,8 @@
 Revision history for Lingua::ZH::Jieba
 
+0.006 - 2023-01-27
+    - Use latest cppjieba.
+
 0.004 - 2017-05-27
     - Support returning word offset and length from the cut methods.
 

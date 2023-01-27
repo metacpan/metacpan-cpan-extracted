@@ -1,5 +1,9 @@
 Revision history for Quote-Code
 
+1.0104  2023-01-26
+        Make test more robust against future perl changes by not depending on exact syntax error messages.
+        Update build infrastructure and add a github README.
+
 1.0103  2023-01-11
         Fix a test failure with perl v5.37.7.
 

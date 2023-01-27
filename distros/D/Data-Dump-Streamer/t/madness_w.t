@@ -14,8 +14,7 @@ SKIP:{
         unless eval { weaken($_ref) };
 
 # imports same()
-(my $helper=$0)=~s/\w+\.\w+$/test_helper.pl/;
-require $helper;
+require "./t/test_helper.pl";
 # use this one for simple, non evalable tests. (GLOB)
 #   same ( $got,$expected,$name,$obj )
 #

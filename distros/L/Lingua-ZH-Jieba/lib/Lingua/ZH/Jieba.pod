@@ -1,7 +1,19 @@
-=encoding utf8
+# ABSTRACT: Perl wrapper for CppJieba (Chinese text segmentation)
+# PODNAME: Lingua::ZH::Jieba
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Lingua::ZH::Jieba - Perl wrapper for CppJieba (Chinese text segmentation)
+
+=head1 VERSION
+
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -178,9 +190,9 @@ the form of C<[ $word, $part_of_speech ]>.
 Dynamically inserts a user word.
 
 =head2 extractor
-    
+
     my $extractor = $jieba->extractor();
-    
+
 Get the keyword extractor object. For more about the extractor, see
 L<Lingua::ZH::Jieba::KeywordExtractor>.
 
@@ -193,21 +205,20 @@ L<https://github.com/yanyiwu/cppjieba> - CppJieba, Jieba implemented in C++
 
 L<http://www.swig.org> - SWIG, the Simplified Wrapper and Interface Generator
 
-=head1 AUTHORS
-
-Stephan Loyd <stephanloyd9@gmail.com>
-
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Junyi Sun, and Yanyi Wu. This piece of Perl library would not be
 existing without their work on jieba and CppJieba. 
 
+=head1 AUTHOR
+
+Stephan Loyd <stephanloyd9@gmail.com>
+
 =head1 COPYRIGHT AND LICENSE
 
-CppJieba is copyright by YanYi Wu under the MIT license. Visit
-L<https://yanyiwu.mit-license.org/> for a copy of the license.
+This software is copyright (c) 2017-2023 by Stephan Loyd.
 
-The Perl extension of CppJieba is copyright (c) 2017 by Stephan Loyd.
-This is free software; you can redistribute it and/or modify it under the
-same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
+=cut

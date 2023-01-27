@@ -3,17 +3,16 @@ use strict;
 use warnings;
 use Data::Dumper;
 BEGIN {
-    if (eval"require JSON::XS; 1") {
+    if (eval"require Cpanel::JSON::XS; 1") {
         plan tests => 7;
     } else {
-        plan skip_all => "No JSON::XS";
+        plan skip_all => "No Cpanel::JSON::XS";
         exit; # not sure if this is needed
     }
 };
 BEGIN { use_ok( 'Data::Dump::Streamer', qw(:undump) ); }
 # imports same()
-(my $helper=$0)=~s/\w+\.\w+$/test_helper.pl/;
-require $helper;
+require "./t/test_helper.pl";
 # use this one for simple, non evalable tests. (GLOB)
 #   same ( $got,$expected,$name,$obj )
 #
@@ -230,7 +229,7 @@ format STDOUT =
     else {
         $expected_dot = 'undef';
     }
-    my $jstrue= JSON::XS::decode_json("[true]")->[0];
+    my $jstrue= Cpanel::JSON::XS::decode_json("[true]")->[0];
     my %hash = (
         UND => undef,
         IV  => 1,
@@ -287,7 +286,7 @@ _EOF_FORMAT_
            RV  => \do { my $v = expected_dot },
            UND => undef
          };
-bless( $HASH1->{JSB}, 'JSON::XS::Boolean' );
+bless( $HASH1->{JSB}, 'Cpanel::JSON::XS::Boolean' );
 EXPECT
         require B::Deparse;
         if (new B::Deparse -> coderef2text (
@@ -327,7 +326,7 @@ _EOF_FORMAT_
            RV  => \do { my $v = expected_dot },
            UND => undef
          };
-bless( $HASH1->{JSB}, 'JSON::XS::Boolean' );
+bless( $HASH1->{JSB}, 'Cpanel::JSON::XS::Boolean' );
 EXPECT
     }
     elsif ( $] >= 5.008_000 ) {
@@ -361,7 +360,7 @@ _EOF_FORMAT_
            RV  => \do { my $v = expected_dot },
            UND => undef
          };
-bless( $HASH1->{JSB}, 'JSON::XS::Boolean' );
+bless( $HASH1->{JSB}, 'Cpanel::JSON::XS::Boolean' );
 EXPECT
     }
     else {
@@ -387,13 +386,13 @@ $HASH1 = {
            RV  => \do { my $v = expected_dot },
            UND => undef
          };
-bless( $HASH1->{JSB}, 'JSON::XS::Boolean' );
+bless( $HASH1->{JSB}, 'Cpanel::JSON::XS::Boolean' );
 EXPECT
     }
-    # In JSON::XS < 3, the boolean class is JSON::XS::Boolean
-    # In JSON::XS >= 3, the boolean class is JSON::PP::Boolean
-    my $json_boolean_class = ref JSON::XS::decode_json("[true]")->[0];
-    $expect =~ s{JSON::XS::Boolean}{$json_boolean_class}g;
+    # In Cpanel::JSON::XS before 3.0201, the boolean class is JSON::XS::Boolean
+    # and thereafter it is JSON::PP::Boolean
+    my $json_boolean_class = ref Cpanel::JSON::XS::decode_json("[true]")->[0];
+    $expect =~ s{Cpanel::JSON::XS::Boolean}{$json_boolean_class}g;
     same( $dump= $o->Data(\%hash)->Out, template( $expect, expected_dot => $expected_dot ), "", $o);
 }
 

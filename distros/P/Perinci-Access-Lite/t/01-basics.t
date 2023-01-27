@@ -55,8 +55,9 @@ subtest "local (pl)" => sub {
     );
 };
 
-# XXX test http
-# XXX test http over unix socket
+# XXX test http (needs HTTP::Tiny)
+# XXX test http over unix socket (needs HTTP::Tiny::Unix)
+# XXX test progress (needs Progres::Any)
 
 done_testing;
 

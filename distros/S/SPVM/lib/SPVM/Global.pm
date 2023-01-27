@@ -8,6 +8,7 @@ use SPVM::BlessedObject::Array;
 use SPVM::BlessedObject::Class;
 use SPVM::BlessedObject::String;
 
+use SPVM ();
 use SPVM::Builder;
 use SPVM::Builder::Runtime;
 use SPVM::ExchangeAPI;
@@ -35,7 +36,7 @@ sub load_dynamic_libs {
     for my $category ('precompile', 'native') {
 
       my $cc = SPVM::Builder::CC->new(
-        build_dir => $SPVM::Global::BUILDER->build_dir,
+        build_dir => $BUILDER->build_dir,
         at_runtime => 1,
       );
       
@@ -104,14 +105,14 @@ sub load_dynamic_libs {
 }
 
 sub init_runtime {
-  unless ($SPVM::Global::RUNTIME) {
-    unless ($SPVM::Global::BUILDER) {
+  unless ($RUNTIME) {
+    unless ($BUILDER) {
       my $build_dir = $ENV{SPVM_BUILD_DIR};
-      $SPVM::Global::BUILDER = SPVM::Builder->new(build_dir => $build_dir);
+      $BUILDER = SPVM::Builder->new(build_dir => $build_dir);
     }
     
     my $builder_compiler = SPVM::Builder::Compiler->new(
-      module_dirs => $SPVM::Global::BUILDER->module_dirs
+      module_dirs => $BUILDER->module_dirs
     );
     # Load SPVM Compilers
     $builder_compiler->use("Compiler", __FILE__, __LINE__);
@@ -124,97 +125,93 @@ sub init_runtime {
     $builder_runtime->load_dynamic_libs;
 
     # Build an environment
-    $SPVM::Global::BUILDER_ENV = $builder_runtime->build_env;
+    $BUILDER_ENV = $builder_runtime->build_env;
     
     # Set command line info
-    $SPVM::Global::BUILDER_ENV->set_command_info($0, \@ARGV);
+    $BUILDER_ENV->set_command_info($0, \@ARGV);
     
     # Call INIT blocks
-    $SPVM::Global::BUILDER_ENV->call_init_blocks;
+    $BUILDER_ENV->call_init_blocks;
     
-    $SPVM::Global::BUILDER_STACK = $SPVM::Global::BUILDER_ENV->build_stack;
+    $BUILDER_STACK = $BUILDER_ENV->build_stack;
     
-    $SPVM::Global::BUILDER_API = SPVM::ExchangeAPI->new(env => $SPVM::Global::BUILDER_ENV, stack => $SPVM::Global::BUILDER_STACK);
+    $BUILDER_API = SPVM::ExchangeAPI->new(env => $BUILDER_ENV, stack => $BUILDER_STACK);
     
-    $SPVM::Global::COMPILER = $SPVM::Global::BUILDER_API->class("Compiler")->new;
-    for my $module_dir (@{$SPVM::Global::BUILDER->module_dirs}) {
-      $SPVM::Global::COMPILER->add_module_dir($module_dir);
+    $COMPILER = $BUILDER_API->class("Compiler")->new;
+    for my $module_dir (@{$BUILDER->module_dirs}) {
+      $COMPILER->add_module_dir($module_dir);
     }
-    $SPVM::Global::RUNTIME = $SPVM::Global::COMPILER->build_runtime;
+    $RUNTIME = $COMPILER->build_runtime;
 
-    &load_dynamic_libs($SPVM::Global::RUNTIME, $SPVM::Global::DYNAMIC_LIB_FILES);
+    &load_dynamic_libs($RUNTIME, $DYNAMIC_LIB_FILES);
   }
 }
 
 my $BIND_TO_PERL_CLASS_NAME_H = {};
 sub bind_to_perl {
-  my ($runtime, $class_names) = @_;
-
-  for my $class_name (@$class_names) {
-    next if $class_name =~ /::anon/;
-
-    my $perl_class_name_base = "SPVM::";
-    my $perl_class_name = "$perl_class_name_base$class_name";
+  my ($class_name) = @_;
+  
+  my $perl_class_name_base = "SPVM::";
+  my $perl_class_name = "$perl_class_name_base$class_name";
+  
+  unless ($BIND_TO_PERL_CLASS_NAME_H->{$perl_class_name}) {
     
-    unless ($BIND_TO_PERL_CLASS_NAME_H->{$perl_class_name}) {
-      
-      my $parent_class_name = $runtime->get_parent_class_name($class_name);
-      my $parent_class_name_str = defined $parent_class_name ? "($parent_class_name)" : "()";
-      
-      # The inheritance
-      my @isa;
-      if (defined $parent_class_name) {
-        push @isa, "$perl_class_name_base$parent_class_name";
-      }
-      push @isa, 'SPVM::BlessedObject::Class';
-      my $isa = "our \@ISA = (" . join(',', map { "'$_'" } @isa) . ");";
-      
-      my $code = "package $perl_class_name; $isa";
-      eval $code;
-      
-      if (my $error = $@) {
-        confess $error;
-      }
-      $BIND_TO_PERL_CLASS_NAME_H->{$perl_class_name_base}{$perl_class_name} = 1;
+    my $parent_class_name = $RUNTIME->get_parent_class_name($class_name);
+    my $parent_class_name_str = defined $parent_class_name ? "($parent_class_name)" : "()";
+    
+    # The inheritance
+    my @isa;
+    if (defined $parent_class_name) {
+      push @isa, "$perl_class_name_base$parent_class_name";
     }
+    push @isa, 'SPVM::BlessedObject::Class';
+    my $isa = "our \@ISA = (" . join(',', map { "'$_'" } @isa) . ");";
+    
+    my $code = "package $perl_class_name; $isa";
+    eval $code;
+    
+    if (my $error = $@) {
+      confess $error;
+    }
+    $BIND_TO_PERL_CLASS_NAME_H->{$perl_class_name_base}{$perl_class_name} = 1;
+  }
 
-    my $method_names = $runtime->get_method_names($class_name);
+  my $method_names = $RUNTIME->get_method_names($class_name);
 
-    for my $method_name (@$method_names) {
+  for my $method_name (@$method_names) {
+    
+    # Destrutor is skip
+    if ($method_name eq 'DESTROY') {
+      next;
+    }
+    # Anon method is skip
+    elsif (length $method_name == 0) {
+      next;
+    }
+    
+    my $perl_method_abs_name = "${perl_class_name}::$method_name";
+    my $is_class_method = $RUNTIME->get_method_is_class_method($class_name, $method_name);
+    
+    if ($is_class_method) {
+      # Define Perl method
+      no strict 'refs';
       
-      # Destrutor is skip
-      if ($method_name eq 'DESTROY') {
-        next;
-      }
-      # Anon method is skip
-      elsif (length $method_name == 0) {
-        next;
-      }
+      # Suppress refer to objects
+      my $class_name_string = "$class_name";
+      my $method_name_string = "$method_name";
       
-      my $perl_method_abs_name = "${perl_class_name}::$method_name";
-      my $is_class_method = $runtime->get_method_is_class_method($class_name, $method_name);
-      
-      if ($is_class_method) {
-        # Define Perl method
-        no strict 'refs';
+      *{"$perl_method_abs_name"} = sub {
+        my $perl_class_name = shift;
         
-        # Suppress refer to objects
-        my $class_name_string = "$class_name";
-        my $method_name_string = "$method_name";
+        my $return_value;
         
-        *{"$perl_method_abs_name"} = sub {
-          my $perl_class_name = shift;
-          
-          my $return_value;
-          
-          eval { $return_value = $SPVM::Global::API->call_method($class_name_string, $method_name_string, @_) };
-          my $error = $@;
-          if ($error) {
-            confess $error;
-          }
-          $return_value;
-        };
-      }
+        eval { $return_value = SPVM::api()->call_method($class_name_string, $method_name_string, @_) };
+        my $error = $@;
+        if ($error) {
+          confess $error;
+        }
+        $return_value;
+      };
     }
   }
 }
@@ -223,14 +220,14 @@ sub bind_to_perl {
 sub build_class {
   my ($class_name, $file, $line) = @_;
   
-  unless ($SPVM::Global::BUILDER) {
+  unless ($BUILDER) {
     my $build_dir = $ENV{SPVM_BUILD_DIR};
-    $SPVM::Global::BUILDER = SPVM::Builder->new(build_dir => $build_dir);
+    $BUILDER = SPVM::Builder->new(build_dir => $build_dir);
   }
   
   my $start_classes_length = 0;
-  if ($SPVM::Global::RUNTIME) {
-    $start_classes_length = $SPVM::Global::RUNTIME->get_classes_length;
+  if ($RUNTIME) {
+    $start_classes_length = $RUNTIME->get_classes_length;
   }
   
   &init_runtime();
@@ -239,51 +236,46 @@ sub build_class {
   my $build_success;
   if (defined $class_name) {
     
-    $SPVM::Global::COMPILER->set_start_file($file);
-    $SPVM::Global::COMPILER->set_start_line($line);
-    my $success = $SPVM::Global::COMPILER->compile($class_name);
+    $COMPILER->set_start_file($file);
+    $COMPILER->set_start_line($line);
+    my $success = $COMPILER->compile($class_name);
     unless ($success) {
-      my $error_messages = $SPVM::Global::COMPILER->get_error_messages;
+      my $error_messages = $COMPILER->get_error_messages;
       for my $error_message (@$error_messages) {
         printf STDERR "[CompileError]$error_message\n";
       }
-      $SPVM::Global::COMPILER = undef;
+      $COMPILER = undef;
       exit(255);
     }
-    $SPVM::Global::RUNTIME = $SPVM::Global::COMPILER->build_runtime;
+    $RUNTIME = $COMPILER->build_runtime;
 
-    &load_dynamic_libs($SPVM::Global::RUNTIME, $SPVM::Global::DYNAMIC_LIB_FILES);
+    &load_dynamic_libs($RUNTIME, $DYNAMIC_LIB_FILES);
   }
 }
 
-INIT {
+sub init_api {
   &init_runtime();
   
-  my $class_names = $SPVM::Global::RUNTIME->get_class_names;
-  &bind_to_perl($SPVM::Global::RUNTIME, $class_names);
+  $ENV = $RUNTIME->build_env;
   
-  $SPVM::Global::ENV = $SPVM::Global::RUNTIME->build_env;
+  $ENV->set_command_info($0, \@ARGV);
   
-  $SPVM::Global::ENV->set_command_info($0, \@ARGV);
+  $ENV->call_init_blocks;
   
-  $SPVM::Global::ENV->call_init_blocks;
+  $STACK = $ENV->build_stack;
   
-  $SPVM::Global::STACK = $SPVM::Global::ENV->build_stack;
-  
-  $SPVM::Global::API = SPVM::ExchangeAPI->new(env => $SPVM::Global::ENV, stack => $SPVM::Global::STACK);
-    
-  $SPVM::Global::BUILDER = undef;
-  $SPVM::Global::COMPILER = undef;
+  $API = SPVM::ExchangeAPI->new(env => $ENV, stack => $STACK);
 }
 
 END {
-  $SPVM::Global::API = undef;
-  $SPVM::Global::STACK = undef;
-  $SPVM::Global::ENV = undef;
-  $SPVM::Global::RUNTIME = undef;
-  $SPVM::Global::DYNAMIC_LIB_FILES = undef;
-  $SPVM::Global::BUILDER_API = undef;
-  $SPVM::Global::BUILDER_STACK = undef;
-  $SPVM::Global::BUILDER_ENV = undef;
+  $BUILDER = undef;
+  $COMPILER = undef;
+  $API = undef;
+  $STACK = undef;
+  $ENV = undef;
+  $RUNTIME = undef;
+  $DYNAMIC_LIB_FILES = undef;
+  $BUILDER_API = undef;
+  $BUILDER_STACK = undef;
+  $BUILDER_ENV = undef;
 }
-

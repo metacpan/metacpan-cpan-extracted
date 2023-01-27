@@ -11,11 +11,12 @@ use Time::Local;
 use Exporter 'import';
 our @EXPORT = ('strtotime');
 
-our $VERSION = 0.2;
+###############################################################################
 
-# If we use state the variables doesn't get instantiated EVERY time and it's much faster
+our $VERSION = 0.3;
+
 # https://timezonedb.com/download
-our $TZ_OFFSET = {
+my $TZ_OFFSET = {
 	'ACDT'  =>  10, 'ACST'  =>   9, 'ACT'   =>  -5, 'ACWST' =>   8, 'ADT'   =>  -3, 'AEDT'  =>  11, 'AEST'  =>  10, 'AFT'   =>   4,
 	'AKDT'  =>  -8, 'AKST'  =>  -9, 'ALMT'  =>   6, 'AMST'  =>   5, 'AMT'   =>   4, 'ANAST' =>  12, 'ANAT'  =>  12, 'AQTT'  =>   5,
 	'ART'   =>  -3, 'AST'   =>  -4, 'AWDT'  =>   9, 'AWST'  =>   8, 'AZOST' =>   0, 'AZOT'  =>  -1, 'AZST'  =>   5, 'AZT'   =>   4,
@@ -43,24 +44,33 @@ our $TZ_OFFSET = {
 	'YAPT'  =>  10, 'YEKST' =>   6, 'YEKT'  =>   5, 'Z'     =>   0,
 };
 
+# Separator between dates pieces: '-' or '/' or '\'
+my $sep = qr/[\/\\-]/;
+
+# Force a local timezone offset (used for unit tests)
 our $LOCAL_TZ_OFFSET = undef;
 
+# Use caching for repeated lookups for the same TZ offset
+our $USE_TZ_CACHE = 1;
+
+# These are undocumented package variables. They could be changed to support
+# alternate languages but there are caveats. These are cached and changing
+# them after strtotime() is called won't affect anything. No one has requested
+# alternate languages, so I'm leaving this undocumented for now.
 our $MONTH_MAP = {
 	'jan' => 1, 'feb' => 2, 'mar' => 3, 'apr' => 4 , 'may' => 5 , 'jun' => 6 ,
 	'jul' => 7, 'aug' => 8, 'sep' => 9, 'oct' => 10, 'nov' => 11, 'dec' => 12,
 };
 
-our $MONTH_REGEXP = qr/Jan|January|Feb|February|Mar|March|Apr|April|May|Jun|June|Jul|July|Aug|August|Sep|September|Oct|October|Nov|November|Dec|December/i;
+# See above
+our $MONTH_REGEXP = qr/
+	Jan|January|Feb|February|Mar|March|Apr|April|May|Jun|June|
+	Jul|July|Aug|August|Sep|September|Oct|October|Nov|November|Dec|December
+/ix;
 
-# Cache repeated lookups for the same TZ offset
-our $USE_TZ_CACHE = 1;
-
-# Separator between dates pieces: '-' or '/' or '\'
-our $sep = qr/[\/\\-]/;
-
-######################################################################################################
-######################################################################################################
-######################################################################################################
+###############################################################################
+###############################################################################
+###############################################################################
 
 =head1 NAME
 
@@ -68,26 +78,15 @@ C<Date::Parse::Modern> - Provide string to unixtime conversions
 
 =head1 DESCRIPTION
 
-C<Date::Parse::Modern> provides a single function C<strtotime()> which takes a textual datetime string
-and returns a unixtime. Initial tests shows that C<Date::Parse::Modern> is about 40% faster than
-C<Date::Parse>. Part of this speed increase may be due to the fact that we don't support as many
-"unique" string formats.
-
-Care was given to support the most modern style strings that you would commonly run in to in log
-files or on the internet. Some "weird" examples that C<Date::Parse> supports but C<Date::Parse::Modern>
-does B<not> would be:
-
-  21 dec 17:05
-  2000 10:02:18 "GMT"
-  20020722T100000Z
-  2002-07-22 10:00 Z
-
-Corner cases like this were purposely not implemented because they're not commonly used and it would
-affect performance of the more common strings.
+C<Date::Parse::Modern> provides a single function C<strtotime()> which takes a datetime string
+and returns a unixtime.  Care was given to support the most modern style strings that you would
+commonly find in log files or on the internet.
 
 =head1 USAGE
 
   use Date::Parse::Modern;
+
+C<Date::Parse::Modern> exports the C<strtotime()> function automatically.
 
 =head1 FUNCTIONS
 
@@ -95,34 +94,38 @@ affect performance of the more common strings.
 
   my $unixtime = strtotime('1979-02-24'); # 288691200
 
-C<Date::Parse::Modern> exports the C<strtotime()> function automatically.
-
 Simply feed C<strtotime()> a string with some type of date or time in it, and it will return an
 integer unixtime. If the string is unparseable, or a weird error occurs, it will return C<undef>.
 
-All the "magic" in C<Date::Parse::Modern> is done using regular expressions that look for common datetime
+All the "magic" in C<strtotime()> is done using regular expressions that look for common datetime
 formats. Common formats like YYYY-MM-DD and HH:II:SS are easily detected and converted to the
 appropriate formats. This allows the date or time to be found anywhere in the string, in (almost) any
 order. In all cases, the day of the week is ignored in the input string.
 
 B<Note:> Strings without a year are assumed to be in the current year. Example: C<May 15th, 10:15am>
 
-B<Note:> Strings with only a date are assumed to be at the midnight. Example: C<2023-01-15>
+B<Note:> Strings with only a date are assumed to occur at the midnight. Example: C<2023-01-15>
 
 B<Note:> Strings with only time are assumed to be the current day. Example: C<10:15am>
 
 B<Note:> In strings with numeric B<and> textual time zone offsets, the numeric is used. Example:
 C<14 Nov 1994 11:34:32 -0500 (EST)>
 
+=head1 Bugs/Features
+
+Please submit bugs and feature requests on Github:
+
+  https://github.com/scottchiefbaker/perl-Date-Parse-Modern
+
 =head1 AUTHORS
 
-Scott Baker <scott@perturb.org>
+Scott Baker - https://www.perturb.org/
 
 =cut
 
-######################################################################################################
-######################################################################################################
-######################################################################################################
+###############################################################################
+###############################################################################
+###############################################################################
 
 # The logic here is that we use regular expressions to pull out various patterns
 # YYYY/MM/DD, H:I:S, DD MonthWord YYYY
@@ -133,14 +136,21 @@ sub strtotime {
 		return undef;
 	}
 
-	my ($year, $month, $day)    = (0,0,0);
-	my ($hour, $min, $sec, $ms) = (0,0,0,0);
+	my ($year, $month, $day) = (0, 0, 0);
+	my ($hour, $min  , $sec) = (0, 0, 0);
 
-	####################################################################################################
-	####################################################################################################
+	###########################################################################
+	###########################################################################
+
+	state $rule_1 = qr/
+		\b
+		((\d{4})$sep(\d{2})$sep(\d{2}) # YYYY-MM-DD
+		|
+		(\d{2})$sep(\d{2})$sep(\d{4})) # DD-MM-YYYY
+	/x;
 
 	# First we look to see if we have anything that mathches YYYY-MM-DD (numerically)
-	if ($str =~ m/\b((\d{4})$sep(\d{2})$sep(\d{2})|(\d{2})$sep(\d{2})$sep(\d{4}))/) {
+	if ($str =~ $rule_1) {
 		# YYYY-MM-DD: 1999-12-24
 		if ($2 || $3) {
 			$year  = $2;
@@ -161,16 +171,26 @@ sub strtotime {
 		}
 	}
 
-	# The year may be on the end of the string like: Sat May  8 21:24:31 2021
+	# The year may be on the end of the string: Sat May  8 21:24:31 2021
 	if (!$year) {
 		($year) = $str =~ m/\s(\d{4})\b/;
 	}
 
-	####################################################################################################
+	###########################################################################
+
+	state $rule_2 = qr/
+		(\d{1,2})?       # Maybe some digits before month
+		\s*
+		($MONTH_REGEXP)  # A textual month
+		\s+
+		(\d{1,4})        # Digits
+		[\s\$]           # Whitespace OR end of line
+		((\d+?) )?       # If there are digits ater the space it's 'Jan 13 2000'
+	/x;
 
 	# Next we look for alpha months followed by a digit if we didn't find a numeric month above
 	# This will find: "April 13" and also "13 April 1995"
-	if (!$month && $str =~ m/(\d{1,2})?\s*($MONTH_REGEXP)\s+(\d{1,4})/) {
+	if (!$month && $str =~ $rule_2) {
 
 		# Get the numerical number for this month
 		my $month_name = lc(substr($2,0,3));
@@ -180,21 +200,26 @@ sub strtotime {
 		if ($1) {
 			$day  = int($1);
 			$year = int($3);
+		# April 13 or April 13 94
 		} else {
 			$day = int($3);
+
+			# *IF* there is a $5 it's a year
+			$year ||= int($5 || 0);
 		}
 	}
 
-	####################################################################################################
+	###########################################################################
 
-	# Alternate date string like like: 21/dec/93 or dec/21/93 (much less common) not sure if it's worth supporting this)
+	# Alternate date string like like: 21/dec/93 or dec/21/93 much less common
 	if (!$month && $str =~ /(.*)($MONTH_REGEXP)(.*)/) {
 		my $before = $1;
 		my $after  = $3;
 
-		$month = $MONTH_MAP->{lc($2)};
+		# Lookup the numeric month based on the string name
+		$month = $MONTH_MAP->{lc($2)} || 0;
 
-		# Month starts string: dec/21/93
+		# Month starts string: dec/21/93 or feb/14/1999
 		if ($before eq "") {
 			$after =~ m/(\d{2})$sep(\d{2,4})/;
 
@@ -203,24 +228,37 @@ sub strtotime {
 
 		# Month in the middle: 21/dec/93
 		} elsif ($before && $after) {
-			$before =~ s/(\d+)\D/$1/g;
-			$after  =~ s/\D(\d{2,4}).*/$1/g;
+			$before =~ m/(\d+)\D/; # Just the digits
+			$day    = $1 || 0;
 
-			$day  = $before;
-			$year = $after;
+			$after  =~ m/\D(\d{2,4})(.)/; # Get the digits AFTER the separator
+
+			# If it's not a time (has a colon) it's the year
+			if ($2 ne ":") {
+				$year = $1;
+			}
 		}
 	}
 
-	####################################################################################################
+	###########################################################################
+
+	state $rule_3 = qr/
+		(\b|T)             # Anchor point
+		(\d{1,2}):         # Hours
+		(\d{1,2}):?        # Minutes
+		(\d{2}(Z|\.\d+)?)? # Seconds (optional)
+		\ ?(am|pm|AM|PM)?  # AMPM (optional)
+	/x;
 
 	# Now we look for times: 10:14, 10:14:17, 08:15pm
-	if ($str =~ m/(\b|T)(\d{1,2}):(\d{1,2}):?(\d{2}(Z|\.\d+)?)?( ?am|pm|AM|PM)?\b/) {
+	if ($str =~ $rule_3) {
 		$hour = int($2);
 		$min  = int($3);
 		$sec  = $4 || 0; # Not int() cuz it might be float for milliseconds
 
 		$sec =~ s/Z$//;
 
+		# The string of AM or PM
 		my $ampm = lc($6 || "");
 
 		# PM means add 12 hours
@@ -234,20 +272,33 @@ sub strtotime {
 		}
 	}
 
-	my $has_time = ($hour || $min || $sec);
+	# Just some basic sanity checking
+	my $has_time = ($hour || $min   || $sec);
 	my $has_date = ($year || $month || $day);
 
 	if (!$has_time && !$has_date) {
-		return undef;
+		# One final check if NOTHING else has matched, we lookup a weird format: 20020722T100000Z
+		if ($str =~ m/(\d{4})(\d{2})(\d{2})T(\d\d)(\d\d)(\d\d)Z/) {
+			$year  = $1;
+			$month = $2;
+			$day   = $3;
+
+			$hour = $4;
+			$min  = $5;
+			$sec  = $6;
+		} else {
+			return undef;
+		}
 	}
 
-	####################################################################################################
-	####################################################################################################
+	###########################################################################
+	###########################################################################
 
 	# Sanity check some basic boundaries
-	if ($month > 12 || $day > 31 || $hour > 23 || $min > 60 || $sec > 61) {
-		return undef;
-	}
+	# I don't think we need this any more since we eval() and timegm_modern() will barf and return undef
+	#if ($month > 12 || $day > 31 || $hour > 23 || $min > 60 || $sec > 61) {
+	#    return undef;
+	#}
 
 	$month ||= (localtime())[4] + 1; # If there is no month, we assume the current month
 	$day   ||= (localtime())[3];     # If there is no day, we assume the current day
@@ -268,43 +319,55 @@ sub strtotime {
 	# If we find a timezone offset we take that in to account now
 	# Either: +1000 or -0700
 	# or
-	# 11:53 PST (Three or four chars after a time)
+	# 11:53 PST (One to four chars after a time)
 	my $tz_offset_seconds = 0;
-	my $tz_str = '';
-	if ($ret && $str =~ m/(\s([+-])(\d{1,2})(\d{2})|:\d{2} ([A-Z]{1,4})\b|\d{2}(Z)$)/) {
+	my $tz_str            = '';
+	state $tz_rule        = qr/
+		(\s([+-])(\d{1,2})(\d{2}) # +1000 or -700 (three or four digits)
+		|
+		\d{2}\                    # Only match chars if they're AFTER a time
+		([A-Z]{1,4})\b            # Capitalized TZ at end of string
+		|
+		\d{2}(Z)$)                # Just a simple Z at the end
+	/x;
 
+	if ($ret && $str =~ $tz_rule) {
 		my $str_offset = 0;
+
+		# String timezone: 11:53 PST
 		if ($5 || $6)  {
+			# Whichever form matches, the TZ is that one
 			my $tz_code = $5 || $6 || '';
 
+			# Lookup the timezone offset in the table
+			$str_offset  = $TZ_OFFSET->{$tz_code} || 0;
 			# Timezone offsets are in hours, so we convert to seconds
-			$str_offset  = $TZ_OFFSET ->{$tz_code} || 0;
 			$str_offset *= 3600;
 
-			#k("$tz_code = $str_offset");
 			$tz_str = $tz_code;
+		# Numeric format: +1000 or -0700
 		} else {
 			# Break the input string into parts so we can do math
+			# +1000 = 10 hours, -0700 = 7 hours, +0430 = 4.5 hours
 			$str_offset = ($3 + ($4 / 60)) * 3600;
+
 			if ($2 eq "-") {
 				$str_offset *= -1;
 			}
+
 			$tz_str = "$2$3$4";
 		}
 
 		$tz_offset_seconds = $str_offset;
-	# No timezone to account for so we assume the local timezone
+	# No timezone info found so we assume the local timezone
 	} elsif ($ret) {
-		my $local_offset = 0;
-
-		# We get the local timezone by creating local time obj and a UTC time obj
-		# and comparing the two
-		$local_offset = get_local_offset($ret);
+		my $local_offset = get_local_offset($ret);
 
 		$tz_offset_seconds = $local_offset;
-		$tz_str = 'No Timezone found';
+		$tz_str            = 'UNSPECIFIED';
 	}
 
+	# Subtract the timezone offset from the unixtime
 	$ret -= $tz_offset_seconds;
 
 	if ($debug) {
@@ -321,8 +384,16 @@ sub strtotime {
 	return $ret;
 }
 
+# Return the timezone offset for the local machine
 sub get_local_offset {
 	my $unixtime = $_[0];
+
+	# Since timezones only change on the half-hour (at most), we
+	# round down the nearest half hour "bucket" and then cache
+	# that result. We probably could get away with a full hour
+	# here but we don't gain much performance/memory by doing that
+	my $bucket_size = 1800;
+	my $cache_key   = $unixtime - ($unixtime % $bucket_size);
 
 	# If we have a forced LOCAL_TZ_OFFSET we use that (unit tests)
 	if (defined($LOCAL_TZ_OFFSET)) {
@@ -332,8 +403,8 @@ sub get_local_offset {
 	# Simple memoizing (improves repeated performance a LOT)
 	# Note: this is even faster than `use Memoize`
 	state $x = {};
-	if ($USE_TZ_CACHE && $x->{$unixtime}) {
-		return $x->{$unixtime};
+	if ($USE_TZ_CACHE && $x->{$cache_key}) {
+		return $x->{$cache_key};
 	}
 
 	# Get a time obj for this local timezone and UTC for the Unixtime
@@ -343,7 +414,7 @@ sub get_local_offset {
 
 	# Cache the result
 	if ($USE_TZ_CACHE) {
-		$x->{$unixtime} = $ret;
+		$x->{$cache_key} = $ret;
 	}
 
 	return $ret;
@@ -355,11 +426,13 @@ __END__
 
 Performance varies depending on string input
 
-Running the entire test suite through both strtotime() (mine) and
+Running the entire test suite through both this module and
 Date::Parse::str2time() via --bench gets the following output:
 
 $ perl -I lib compare.pl --bench
-Comparing 31 strings
+Comparing 24 strings
                       Rate         Date::Parse Date::Parse::Modern
-Date::Parse         1208/s                  --                -26%
-Date::Parse::Modern 1623/s                 34%                  --
+Date::Parse         1590/s                  --                -57%
+Date::Parse::Modern 3663/s                130%                  --
+
+# vim: tabstop=4 shiftwidth=4 autoindent softtabstop=4

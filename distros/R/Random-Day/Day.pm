@@ -10,7 +10,7 @@ use DateTime::Event::Recurrence;
 use English;
 use Error::Pure qw(err);
 
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 
 # Constructor.
 sub new {
@@ -149,6 +149,28 @@ sub random_day_month_year {
 			'Error', $EVAL_ERROR;
 	}
 
+	if (DateTime->compare($self->{'dt_from'}, $dt) == 1) {
+		err "Begin of expected month is lesser than minimal date.",
+			'Expected year', $year,
+			'Expected month', $month,
+			'Expected day', $day,
+			'Minimal year', $self->{'dt_from'}->year,
+			'Minimal month', $self->{'dt_from'}->month,
+			'Minimal day', $self->{'dt_from'}->day,
+		;
+	}
+
+	if (DateTime->compare($dt, $self->{'dt_to'}) == 1) {
+		err "End of expected month is greater than maximal date.",
+			'Expected year', $year,
+			'Expected month', $month,
+			'Expected day', $day,
+			'Maximal year', $self->{'dt_to'}->year,
+			'Maximal month', $self->{'dt_to'}->month,
+			'Maximal day', $self->{'dt_to'}->day,
+		;
+	}
+
 	return $dt;
 }
 
@@ -177,8 +199,26 @@ sub random_month_year {
 			'Error', $EVAL_ERROR;
 	}
 
+	if (DateTime->compare($self->{'dt_from'}, $after) == 1) {
+		err "Begin of expected month is lesser than minimal date.",
+			'Expected year', $year,
+			'Expected month', $month,
+			'Minimal year', $self->{'dt_from'}->year,
+			'Minimal month', $self->{'dt_from'}->month,
+		;
+	}
+
 	my $before = $after->clone;
 	$before->add(months => 1)->subtract(days => 1);
+
+	if (DateTime->compare($before, $self->{'dt_to'}) == 1) {
+		err "End of expected month is greater than maximal date.",
+			'Expected year', $year,
+			'Expected month', $month,
+			'Maximal year', $self->{'dt_to'}->year,
+			'Maximal month', $self->{'dt_to'}->month,
+		;
+	}
 
 	my $daily = DateTime::Event::Recurrence->daily;
 	return $daily->next(DateTime::Event::Random->datetime(
@@ -190,6 +230,19 @@ sub random_month_year {
 # Random DateTime object for day defined by year.
 sub random_year {
 	my ($self, $year) = @_;
+
+	if ($self->{'dt_from'}->year > $year) {
+		err "Year is lesser than minimal year.",
+			'Expected year', $year,
+			'Minimal year', $self->{'dt_from'}->year,
+		;
+	}
+	if ($self->{'dt_to'}->year < $year) {
+		err "Year is greater than maximal year.",
+			'Expected year', $year,
+			'Maximal year', $self->{'dt_to'}->year,
+		;
+	}
 
 	my $daily = DateTime::Event::Recurrence->daily;
 
@@ -378,18 +431,50 @@ Returns DateTime object for date.
          Day isn't number.
 
  random_day_month_year():
+         Begin of expected month is lesser than minimal date.
+                 Expected year: %s
+                 Expected month: %s
+                 Expected day: %s
+                 Minimal year: %s
+                 Minimal month: %s
+                 Minimal day: %s
          Cannot create DateTime object.
                  Error: %s
          Day cannot be a zero.
          Day isn't number.
+         End of expected month is greater than maximal date.
+                 Expected year: %s
+                 Expected month: %s
+                 Expected day: %s
+                 Maximal year: %s
+                 Maximal month: %s
+                 Maximal day: %s
 
  random_month():
          Cannot create DateTime object.
                  Error: %s
 
  random_month_year():
+         Begin of expected month is lesser than minimal date.
+                 Expected year: %s
+                 Expected month: %s
+                 Minimal year: %s
+                 Minimal month: %s
          Cannot create DateTime object.
                  Error: %s
+         End of expected month is greater than maximal date.
+                 Expected year: %s
+                 Expected month: %s
+                 Maximal year: %s
+                 Maximal month: %s
+
+ random_year():
+         Year is greater than maximal year.
+                 Expected year: %s
+                 Maximal year: %s
+         Year is lesser than minimal year.
+                 Expected year: %s
+                 Minimal year: %s
 
 =head1 EXAMPLE
 
@@ -429,6 +514,14 @@ L<Error::Pure>.
 
 Perl module to generate random data
 
+=item L<Random::Day::InTheFuture>
+
+Class for random day generation in the future.
+
+=item L<Random::Day::InThePast>
+
+Class for random day generation in the past.
+
 =back
 
 =head1 REPOSITORY
@@ -449,6 +542,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.12
+0.13
 
 =cut

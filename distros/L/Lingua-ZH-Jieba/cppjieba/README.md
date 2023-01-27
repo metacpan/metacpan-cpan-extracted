@@ -1,13 +1,12 @@
 # CppJieba [English](README_EN.md)
 
-[![Build Status](https://travis-ci.org/yanyiwu/cppjieba.png?branch=master)](https://travis-ci.org/yanyiwu/cppjieba) 
+[![CMake](https://github.com/yanyiwu/cppjieba/actions/workflows/cmake.yml/badge.svg)](https://github.com/yanyiwu/cppjieba/actions/workflows/cmake.yml)
 [![Author](https://img.shields.io/badge/author-@yanyiwu-blue.svg?style=flat)](http://yanyiwu.com/) 
 [![Platform](https://img.shields.io/badge/platform-Linux,%20OS%20X,%20Windows-green.svg?style=flat)](https://github.com/yanyiwu/cppjieba)
 [![Performance](https://img.shields.io/badge/performance-excellent-brightgreen.svg?style=flat)](http://yanyiwu.com/work/2015/06/14/jieba-series-performance-test.html) 
+[![Tag](https://img.shields.io/github/v/tag/yanyiwu/cppjieba.svg)](https://github.com/yanyiwu/cppjieba/releases)
 [![License](https://img.shields.io/badge/license-MIT-yellow.svg?style=flat)](http://yanyiwu.mit-license.org)
 [![Build status](https://ci.appveyor.com/api/projects/status/wl30fjnm2rhft6ta/branch/master?svg=true)](https://ci.appveyor.com/project/yanyiwu/cppjieba/branch/master)
-
-[![logo](http://7viirv.com1.z0.glb.clouddn.com/CppJiebaLogo-v1.png)](https://github.com/yanyiwu/cppjieba)
 
 ## 简介
 
@@ -223,12 +222,16 @@ Query方法先使用Mix方法切词，对于切出来的较长的词再使用Ful
 + [iosjieba] iOS 版本的结巴分词。
 + [SqlJieba] MySQL 全文索引的结巴中文分词插件。
 + [pg_jieba] PostgreSQL 数据库的分词插件。
++ [simple] SQLite3 FTS5 数据库的分词插件。
 + [gitbook-plugin-search-pro] 支持中文搜索的 gitbook 插件。
 + [ngx_http_cppjieba_module] Nginx 分词插件。
 + [cppjiebapy] 由 [jannson] 开发的供 python 模块调用的项目 [cppjiebapy], 相关讨论 [cppjiebapy_discussion] .
++ [cppjieba-py] 由 [bung87] 基于 pybind11 封装的 python 模块,使用体验上接近于原jieba。
 + [KeywordServer] 50行搭建一个中文关键词抽取服务。
 + [cppjieba-server] CppJieba HTTP 服务器。
 + [phpjieba] php版本的结巴分词扩展。
++ [perl5-jieba] Perl版本的结巴分词扩展。
++ [jieba-dlang] D 语言的结巴分词 Deimos Bindings。
 
 ## 线上演示
 
@@ -239,29 +242,23 @@ Query方法先使用Mix方法切词，对于切出来的较长的词再使用Ful
 
 [Jieba中文分词系列性能评测]
 
-## 客服
+## Sponsorship
 
-+ Email: `i@yanyiwu.com`
-+ QQ: 64162451
-+ WeChat: ![image](http://7viirv.com1.z0.glb.clouddn.com/5a7d1b5c0d_yanyiwu_personal_qrcodes.jpg)
+[![sponsorship](http://images.gitads.io/cppjieba)](https://tracking.gitads.io/?campaign=gitads&repo=cppjieba&redirect=gitads.io)
 
-## 鸣谢
+## Contributors
 
-"结巴"中文分词作者: [SunJunyi](https://github.com/fxsjy)
+### Code Contributors
 
-## 许可证
-
-[MIT](http://yanyiwu.mit-license.org)
-
-## 作者
-
-- [yanyiwu](yanyiwu.com)
-- [aholic](https://github.com/aholic)
+This project exists thanks to all the people who contribute.
+<a href="https://github.com/yanyiwu/cppjieba/graphs/contributors"><img src="https://opencollective.com/cppjieba/contributors.svg?width=890&button=false" /></a>
 
 [GoJieba]:https://github.com/yanyiwu/gojieba
 [CppJieba]:https://github.com/yanyiwu/cppjieba
 [jannson]:https://github.com/jannson
 [cppjiebapy]:https://github.com/jannson/cppjiebapy
+[bung87]:https://github.com/bung87
+[cppjieba-py]:https://github.com/bung87/cppjieba-py
 [cppjiebapy_discussion]:https://github.com/yanyiwu/cppjieba/issues/1
 [NodeJieba]:https://github.com/yanyiwu/nodejieba
 [jiebaR]:https://github.com/qinwf/jiebaR
@@ -281,7 +278,8 @@ Query方法先使用Mix方法切词，对于切出来的较长的词再使用Ful
 [gitbook-plugin-search-pro]:https://plugins.gitbook.com/plugin/search-pro
 [cppjieba-server]:https://github.com/yanyiwu/cppjieba-server
 [phpjieba]:https://github.com/jonnywang/phpjieba
+[perl5-jieba]:https://metacpan.org/pod/distribution/Lingua-ZH-Jieba/lib/Lingua/ZH/Jieba.pod
+[jieba-dlang]:https://github.com/shove70/jieba
+[simple]:https://github.com/wangfenjin/simple
 
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/yanyiwu/cppjieba/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 

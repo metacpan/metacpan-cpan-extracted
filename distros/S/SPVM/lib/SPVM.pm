@@ -8,17 +8,28 @@ use Carp 'cluck';
 use SPVM::Builder;
 use SPVM::Global;
 
-our $VERSION = $SPVM::Builder::VERSION;
+our $VERSION = '0.9686';
+
+require XSLoader;
+XSLoader::load('SPVM', $VERSION);
 
 sub import {
   my ($class, $class_name) = @_;
 
   my ($file, $line) = (caller)[1, 2];
   
-  SPVM::Global::build_class($class_name, $file, $line);
+  if (defined $class_name) {
+    SPVM::Global::build_class($class_name, $file, $line);
+    SPVM::Global::bind_to_perl($class_name);
+  }
 }
 
-sub api { $SPVM::Global::API }
+sub api {
+  unless ($SPVM::Global::API) {
+    SPVM::Global::init_api();
+  }
+  return $SPVM::Global::API;
+}
 
 # The following SPVM::xxx functions are deprecated. Use SPVM::api->xxx instead.
 my @deprecated_func_names = qw(
@@ -65,7 +76,7 @@ for my $func_name (@deprecated_func_names) {
   no strict 'refs';
   *{"$func_name"} = sub {
     # cluck "The SPVM::$func_name function is deprecated";
-    $SPVM::Global::API->$func_name(@_);
+    SPVM::api()->$func_name(@_);
   };
 }
 

@@ -1,3 +1,15 @@
+0.13 2023-01-26T19:13:52+01:00
+ - Add check for year in interval of 'dt_from' and 'dt_to' in
+   random_year().
+ - Add check for year/month in interval of 'dt_from' and 'dt_to' in
+   random_year_month().
+ - Add check for year/month/day in interval of 'dt_from' and 'dt_to' in
+   random_year_month_day().
+ - Add Random::Day::InTheFuture object.
+ - Add Random::Day::InThePast object.
+ - Fix test dependencies.
+ - Remove obsolete code from t/Random-Day/05-random.t .
+
 0.12 2023-01-26T11:46:23+01:00
  - Rename example to better name.
  - Update copyright years.

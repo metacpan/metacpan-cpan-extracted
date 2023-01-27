@@ -3,6 +3,7 @@ Makefile.PL
 MANIFEST
 README
 LICENSE
+CONTRIBUTING.md
 t/ConstantCalculus-CircleConstant.t
 lib/ConstantCalculus/CircleConstant.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)

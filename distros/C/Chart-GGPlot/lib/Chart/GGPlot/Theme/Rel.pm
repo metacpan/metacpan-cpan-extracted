@@ -5,7 +5,7 @@ package Chart::GGPlot::Theme::Rel;
 use Chart::GGPlot::Setup;
 use Function::Parameters qw(classmethod);
 
-our $VERSION = '0.002001'; # VERSION
+our $VERSION = '0.002002'; # VERSION
 
 use overload '*' => fun( $self, $other, $swap ) { $self->value * $other },
   fallback       => 1;
@@ -33,7 +33,7 @@ Chart::GGPlot::Theme::Rel - To specify sizes relative to the parent
 
 =head1 VERSION
 
-version 0.002001
+version 0.002002
 
 =head1 AUTHOR
 
@@ -41,7 +41,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2022 by Stephan Loyd.
+This software is copyright (c) 2019-2023 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 package Log::Progress;
-$Log::Progress::VERSION = '0.12';
+$Log::Progress::VERSION = '0.13';
 use Moo 2;
 use Carp;
 use IO::Handle; # for 'autoflush'
@@ -155,10 +155,6 @@ __END__
 =head1 NAME
 
 Log::Progress - Conveniently write progress messages to logger or file handle
-
-=head1 VERSION
-
-version 0.12
 
 =head1 SYNOPSIS
 
@@ -320,9 +316,13 @@ this method, but it isn't harmful to do so multiple times for the same step.
 
 Michael Conrad <mike@nrdvana.net>
 
+=head1 VERSION
+
+version 0.13
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Michael Conrad.
+This software is copyright (c) 2023 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

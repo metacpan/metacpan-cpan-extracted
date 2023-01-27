@@ -78,7 +78,7 @@ my $build = My::Builder->new(
         'PadWalker'       => '0.99',
 
         # optional for testing
-        'JSON::XS'           => 0,
+        'Cpanel::JSON::XS' => 0,
     },
     meta_merge => {
         resources => {

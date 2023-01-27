@@ -1,5 +1,30 @@
 # CppJieba ChangeLog
 
+## v5.1.0
+
++ Merged [feature: add RemoveWord api from gojieba/pull/99 #172](https://github.com/yanyiwu/cppjieba/pull/172)
+
+## v5.0.5
+
++ Merged [pr-171 submodule update limonp to v0.6.6 #171](https://github.com/yanyiwu/cppjieba/pull/171)
+
+## v5.0.4
+
++ Merged [pr-168 limonp as submodule #168](https://github.com/yanyiwu/cppjieba/pull/168)
+
+## v5.0.3
+
++ Upgrade [limonp](https://github.com/yanyiwu/limonp) -> v0.6.3
+
+## v5.0.2
+
++ Upgrade [limonp](https://github.com/yanyiwu/limonp) -> v0.6.1
+
+## v5.0.1
+
++ Make Compiler Happier.
++ Add PHP, DLang Links.
+
 ## v5.0.0
 
 + Notice(**api changed**) : Jieba class 3 arguments -> 5 arguments, and use KeywordExtractor in Jieba

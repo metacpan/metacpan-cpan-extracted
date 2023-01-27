@@ -1,9 +1,9 @@
-ConstantCalculus-CircleConstant version 0.01
+ConstantCalculus-CircleConstant version 0.02
 ============================================
 
 VERSION 
 
-    version 0.01
+    version 0.02
 
 INTRODUCTION
 
@@ -33,7 +33,7 @@ This module requires these other modules and libraries:
 
 ABSTRACT
 
-The module can be used to calculate the circle constant in hight accuracy.
+The module can be used to calculate the circle constant with high accuracy.
 
 COPYRIGHT AND LICENCE
 

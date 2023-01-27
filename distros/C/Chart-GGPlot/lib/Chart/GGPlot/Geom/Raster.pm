@@ -8,7 +8,7 @@ use MooseX::Singleton;
 
 with qw(Chart::GGPlot::Geom);
 
-our $VERSION = '0.002001'; # VERSION
+our $VERSION = '0.002002'; # VERSION
 
 use Machine::Epsilon qw(machine_epsilon);
 use Types::Standard qw(Num);
@@ -151,7 +151,7 @@ Chart::GGPlot::Geom::Raster - Class for raster geom
 
 =head1 VERSION
 
-version 0.002001
+version 0.002002
 
 =head1 SEE ALSO
 
@@ -164,7 +164,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2022 by Stephan Loyd.
+This software is copyright (c) 2019-2023 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

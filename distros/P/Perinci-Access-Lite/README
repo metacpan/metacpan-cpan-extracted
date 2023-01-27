@@ -1,58 +1,101 @@
+NAME
+    Perinci::Access::Lite - A lightweight Riap client library
+
+VERSION
+    This document describes version 0.150 of Perinci::Access::Lite (from
+    Perl distribution Perinci-Access-Lite), released on 2022-10-28.
+
 DESCRIPTION
+    This module is a lightweight alternative to Perinci::Access. It has less
+    prerequisites but does fewer things. The things it supports:
 
-    This module is a lightweight alternative to Perinci::Access. It has
-    less prerequisites but does fewer things. The things it supports:
+    *   Local (in-process) access to Perl modules and functions
 
-      * Local (in-process) access to Perl modules and functions
+        Currently only "call", "meta", and "list" actions are implemented.
+        Variables and other entities are not yet supported.
 
-      Currently only call, meta, and list actions are implemented.
-      Variables and other entities are not yet supported.
+        The "list" action only gathers keys from %SPEC and do not yet list
+        subpackages.
 
-      The list action only gathers keys from %SPEC and do not yet list
-      subpackages.
+    *   HTTP/HTTPS
 
-      * HTTP/HTTPS
-
-      * HTTP over Unix socket
+    *   HTTP over Unix socket
 
     Differences with Perinci::Access:
 
-      * For network access, uses HTTP::Tiny module family instead of LWP
+    *   For network access, uses HTTP::Tiny module family instead of LWP
 
-      This results in fewer dependencies.
+        This results in fewer dependencies. HTTP::Tiny (and
+        HTTP::Tiny::UNIX) are even specified as runtime recommends
+        dependencies instead of runtime requires, so if your script or
+        downstream library requires HTTP access, you'll need to specify the
+        dependencies explicitly.
 
-      * No wrapping, no argument checking
+    *   No wrapping, no argument checking
 
-      For 'pl' or schemeless URL, no wrapping (Perinci::Sub::Wrapper) is
-      done, only normalization (using Perinci::Sub::Normalize).
+        For 'pl' or schemeless URL, no wrapping (Perinci::Sub::Wrapper) is
+        done, only normalization (using Perinci::Sub::Normalize).
 
-      * No transaction or logging support
+    *   No transaction or logging support
 
-      * No support for some schemes
+    *   No support for some schemes
 
-      This includes: Riap::Simple over pipe/TCP socket.
-
-ATTRIBUTES
-
- riap_version => float (default: 1.1)
-
-METHODS
-
- new(%attrs) => obj
-
- $pa->request($action, $url, $extra) => hash
+        This includes: Riap::Simple over pipe/TCP socket.
 
 ADDED RESULT METADATA
-
     This class might add the following property/attribute in result
     metadata:
 
- x.hint.result_binary => bool
+  x.hint.result_binary => bool
+    If result's schema type is "buf", then this class will set this
+    attribute to true, to give hints to result formatters.
 
-    If result's schema type is buf, then this class will set this attribute
-    to true, to give hints to result formatters.
+ATTRIBUTES
+  riap_version => float (default: 1.1)
+METHODS
+  new(%attrs) => obj
+  $pa->request($action, $url, $extra) => hash
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Access-Lite>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-Access-Lite>.
 
 SEE ALSO
-
     Perinci::Access
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022, 2016, 2015, 2014 by perlancar
+    <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Access-Lite>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

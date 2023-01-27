@@ -1,4 +1,19 @@
 Revision history for Date-Parse-Modern
 
+0.3    2023-01-26
+       99% format parity with Date::Parse
+       Better debugging
+       Better memory usage for caching
+       Tons of code cleanup and comments
+
+0.2    2023-01-14
+       Documentation updates
+       Debug cleanup and normalizing
+       Support more string formats
+       Make the unit tests more verbose for failures
+       Add an option to benchmark individual strings against Date::Parse
+       Add GitHub CI testing
+       Cache local TZ offset lookups for a major speed increase
+
 0.1    2023-01-13
        First version, released on an unsuspecting world.

@@ -114,7 +114,7 @@ subtest geom_point_2 => sub {
                 $mtcars->at('cyl')->unpdl->map(
                     sub {
                         state $mapping =
-                          { 6 => '#00b938', 4 => '#f7766c', 8 => '#609bff' };
+                          { 6 => '#00ba38', 4 => '#f8766d', 8 => '#619cff' };
                         $mapping->{$_};
                     }
                 )

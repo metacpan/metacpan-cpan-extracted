@@ -1,8 +1,6 @@
 use strict;
 use warnings;
 
-use English qw(-no_match_vars);
-use Error::Pure::Utils qw(clean);
 use Random::Day;
 use Test::More 'tests' => 2;
 use Test::NoWarnings;

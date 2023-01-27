@@ -121,13 +121,20 @@ subtest hue_pal => sub {
     no warnings 'qw';
 
     pdl_is( hue_pal()->(4),
-        PDL::SV->new( [qw(#f7766c #7bae00 #00bfc4 #c77cff)] ), 'hue_pal()' );
+        PDL::SV->new(
+            [
+                #qw(#f7766c #7bae00 #00bfc4 #c77cff)
+                qw(#f8766d #7cae00 #00bfc5 #c77cff)
+            ]
+        ),
+        'hue_pal()'
+    );
     pdl_is(
         hue_pal( l => 90 )->(9),
         PDL::SV->new(
             [
-                qw(#ffbbb3 #ffd64c #d6ef16 #54ff8a #00ffe4
-                  #00fdff #b0e0ff #ffbcff #ffadff)
+                #qw(#ffbcb4 #ffd74c #d6ef16 #55ff8a #00ffe5 #00fdff #b0e0ff #ffbcff #ffadff)
+                qw(#ffbcb4 #ffd74c #d7f016 #55ff8a #00ffe5 #00feff #b0e1ff #ffbdff #ffadff)
             ]
         ),
         'hue_pal()'
@@ -136,8 +143,8 @@ subtest hue_pal => sub {
         hue_pal( h => [ 0, 90 ] )->(9),
         PDL::SV->new(
             [
-                qw(#ff6c90 #fa7376 #f27b57 #e9832d #de8b00
-                  #d19300 #c29a00 #b1a000 #9da600)
+                #qw(#ff6c90 #fa7376 #f27b57 #e9832d #de8b00 #d19300 #c29a00 #b1a000 #9da600)
+                qw(#ff6c91 #fb7477 #f37c58 #ea842d #df8c00 #d29300 #c39a00 #b1a100 #9da700)
             ]
         ),
         'hue_pal()'
@@ -147,24 +154,20 @@ subtest hue_pal => sub {
 subtest gradient_n_pal => sub {
     no warnings 'qw';
 
-    # NOTE: R's gradient_n_pal gives #777777 for 0.5, but we get #7f7f7f,
-    #  This is because R's interpolation is in the CIELab space.
     pdl_is(
         gradient_n_pal( PDL::SV->new( [qw(black white)] ) )
           ->( pdl( 0, 0.5, 1 ) ),
-        PDL::SV->new( [qw(#000000 #7f7f7f #ffffff)] ),
+        PDL::SV->new( [qw(#000000 #777777 #ffffff)] ),
         'gradient_n_pal($colors)'
     );
-    my $colors =
-      gradient_n_pal( PDL::SV->new( [qw(red green blue)] ), [ 1, 2, 4 ] )
-      ->( pdl( 1, 2, 4 ) );
 
-    # NOTE: This gets different result from R so we check only the end
-    # colors for now. Probably Perl Math::Gradient::multi_gradient is
-    # different from R's algorithm..
-    diag( sprintf( q{gradient_n_pal($colors, $values) : %s}, $colors ) );
-    ok( ($colors->at(0) eq '#ff0000' and $colors->at(2) eq '#0000ff'),
-        'gradient_n_pal($colors, $values)' );
+    # R's "green" is #00ff00. We use Color::Library which gives #008000 for "green".
+    pdl_is(
+      gradient_n_pal( PDL::SV->new( [qw(red green blue)] ), pdl( 1, 2, 4 ) )
+      ->( pdl( 1, 2, 4 ) ),
+        PDL::SV->new( [qw(#ff0000 #008000 #0000ff)] ),
+        'gradient_n_pal($colors, $values)'
+    );
 };
 
 subtest viridis_pal => sub {
@@ -173,7 +176,12 @@ subtest viridis_pal => sub {
     # NOTE: This is now slightly different from R's viridis_pal but fine.
     pdl_is(
         viridis_pal()->(5),
-        PDL::SV->new( [qw(#440154 #3a528b #20908c #5bc862 #fde724)] ),
+        PDL::SV->new(
+            [
+                #qw(#440154 #3a528b #20908c #5bc862 #fde724)
+                qw(#440154 #3a528b #20918c #5cc963 #fee724)
+            ]
+        ),
         'viridis_pal()'
     );
 };

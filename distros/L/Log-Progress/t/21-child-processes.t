@@ -44,7 +44,7 @@ my $in_fh= IO::File->new("$fh", "<");
 my $parser= Log::Progress::Parser->new(input => $in_fh);
 my $w= 0;
 while (($parser->parse->{progress}||0) < 1) {
-	if (++$w > 10) {
+	if (++$w > 60) {
 		warn "Progress did not reach 100% within timeout. tmpfile= $fh";
 		$fh->unlink_on_destroy(0);
 		kill TERM => $writer_a_pid, $writer_b_pid;

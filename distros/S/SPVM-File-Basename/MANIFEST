@@ -1,0 +1,25 @@
+.github/workflows/linux-ubuntu-latest-32bit.yml
+.github/workflows/linux-ubuntu-latest-perl-5.8.9.yml
+.github/workflows/linux-ubuntu-latest.yml
+.github/workflows/macos-latest.yml
+.github/workflows/windows-2019.yml
+.github/workflows/windows-latest.yml
+.gitignore
+Basename.pm.original
+Changes
+lib/SPVM/File/Basename.pm
+lib/SPVM/File/Basename.spvm
+lib/SPVM/File/Basename/Interface.pm
+lib/SPVM/File/Basename/Interface.spvm
+lib/SPVM/File/Basename/Unix.pm
+lib/SPVM/File/Basename/Unix.spvm
+lib/SPVM/File/Basename/Win32.pm
+lib/SPVM/File/Basename/Win32.spvm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/basic.t
+t/lib/SPVM/TestCase/File/Basename.spvm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

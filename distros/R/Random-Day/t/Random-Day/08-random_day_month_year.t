@@ -4,7 +4,7 @@ use warnings;
 use English qw(-no_match_vars);
 use Error::Pure::Utils qw(clean);
 use Random::Day;
-use Test::More 'tests' => 7;
+use Test::More 'tests' => 9;
 use Test::NoWarnings;
 
 # Test.
@@ -48,4 +48,22 @@ eval {
 };
 is($EVAL_ERROR, "Cannot create DateTime object.\n",
 	'Cannot create DateTime object.');
+clean();
+
+# Test.
+$obj = Random::Day->new;
+eval {
+	$obj->random_day_month_year(10, 10, 1899);
+};
+is($EVAL_ERROR, "Begin of expected month is lesser than minimal date.\n",
+	'Begin of expected month is lesser than minimal date (10-10-1899).');
+clean();
+
+# Test.
+$obj = Random::Day->new;
+eval {
+	$obj->random_day_month_year(10, 10, 2100);
+};
+is($EVAL_ERROR, "End of expected month is greater than maximal date.\n",
+	'End of expected month is greater than maximal date (10-10-2100).');
 clean();

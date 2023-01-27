@@ -4,13 +4,13 @@
       "Yves Orton <yves@cpan.org>, Joshua ben Jore <jjore@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Data-Dump-Streamer",
    "prereqs" : {
@@ -45,7 +45,7 @@
          "recommends" : {
             "Algorithm::Diff" : "0",
             "Compress::Zlib" : "0",
-            "JSON::XS" : "0",
+            "Cpanel::JSON::XS" : "0",
             "MIME::Base64" : "0",
             "PadWalker" : "0.99"
          },
@@ -73,11 +73,11 @@
    "provides" : {
       "Data::Dump::Streamer" : {
          "file" : "lib/Data/Dump/Streamer.pm",
-         "version" : "2.40"
+         "version" : "2.41"
       },
       "Data::Dump::Streamer::Deparser" : {
          "file" : "lib/Data/Dump/Streamer.pm",
-         "version" : "2.40"
+         "version" : "2.41"
       }
    },
    "release_status" : "stable",
@@ -89,6 +89,6 @@
          "url" : "https://github.com/demerphq/Data-Dump-Streamer"
       }
    },
-   "version" : "2.40",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "2.41",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

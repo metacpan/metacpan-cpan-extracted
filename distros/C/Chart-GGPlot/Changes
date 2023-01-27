@@ -1,5 +1,9 @@
 Revision history for Chart::GGPlot
 
+0.002002    2023-01-27
+  - gradient_n_pal now interpolates in the CIELab space. (gh-12)
+  - improve rgb 0-1 to rgb 255 conversion.
+
 0.002001    2022-09-02
   - Adapt to changes in PDL to avoid exception computing date time scales.
     (Thanks pablrod !)

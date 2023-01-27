@@ -7,8 +7,7 @@ use Data::Dumper;
 #$Id: dump.t 40 2007-12-22 00:37:55Z demerphq $#
 
 # imports same()
-(my $helper=$0)=~s/\w+\.\w+$/test_helper.pl/;
-require $helper;
+require "./t/test_helper.pl";
 # use this one for simple, non evalable tests. (GLOB)
 #   same ( $got,$expected,$name,$obj )
 #

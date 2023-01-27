@@ -36,8 +36,12 @@
    "resources" : {
       "bugtracker" : {
          "web" : "https://github.com/dgl/re-engine-RE2/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/dgl/re-engine-RE2"
       }
    },
-   "version" : "0.14",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.17",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

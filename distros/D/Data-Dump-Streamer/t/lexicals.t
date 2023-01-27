@@ -5,8 +5,7 @@ use warnings;
 
 use Data::Dump::Streamer;
 use Test::More tests => 14;
-(my $helper=$0)=~s/\w+\.\w+$/test_helper.pl/;
-require $helper;
+require "./t/test_helper.pl";
 diag "\nPadWalker ",
     eval "use PadWalker 0.99; 1" ? qq($PadWalker::VERSION is) : "isn't",
     " installed";

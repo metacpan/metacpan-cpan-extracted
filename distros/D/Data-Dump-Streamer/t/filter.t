@@ -7,8 +7,7 @@ use Data::Dumper;
 #$Id: filter.t 26 2006-04-16 15:18:52Z demerphq $#
 
 # imports same()
-(my $helper=$0)=~s/\w+\.\w+$/test_helper.pl/;
-require $helper;
+require "./t/test_helper.pl";
 # use this one for simple, non evalable tests. (GLOB)
 #   same ( $got,$expected,$name,$obj )
 #

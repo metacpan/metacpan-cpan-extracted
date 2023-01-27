@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use utf8;
 
-use Data::Dumper;
 use File::ShareDir qw(dist_file);
 use Lingua::ZH::Jieba;
 use List::Util qw(reduce);

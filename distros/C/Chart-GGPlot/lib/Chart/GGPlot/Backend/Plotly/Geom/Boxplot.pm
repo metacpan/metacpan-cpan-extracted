@@ -4,7 +4,7 @@ package Chart::GGPlot::Backend::Plotly::Geom::Boxplot;
 
 use Chart::GGPlot::Class qw(:pdl);
 
-our $VERSION = '0.002001'; # VERSION
+our $VERSION = '0.002002'; # VERSION
 
 with qw(Chart::GGPlot::Backend::Plotly::Geom);
 
@@ -134,7 +134,7 @@ Chart::GGPlot::Backend::Plotly::Geom::Boxplot - Chart::GGPlot's Plotly implement
 
 =head1 VERSION
 
-version 0.002001
+version 0.002002
 
 =head1 SEE ALSO
 
@@ -147,7 +147,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2022 by Stephan Loyd.
+This software is copyright (c) 2019-2023 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

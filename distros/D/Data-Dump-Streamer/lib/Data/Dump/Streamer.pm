@@ -35,7 +35,7 @@ $DEBUG=0;
 BEGIN{ $HasPadWalker=eval "use PadWalker 0.99; 1"; }
 
 BEGIN {
-    $VERSION   ='2.40';
+    $VERSION   ='2.41';
     $XS_VERSION = $VERSION;
     $VERSION = eval $VERSION; # used for beta stuff.
     @ISA       = qw(Exporter DynaLoader);
@@ -757,6 +757,8 @@ sub new {
             eclipsename  => "%s_eclipse_%d",
 
             purity       => 1,         # test
+
+            terse        => 0,
 
             # use this if deparse is 0
             codestub     => 'sub { Carp::confess "Dumped code stub!" }',
@@ -1926,7 +1928,7 @@ sub _dump_apply_fix { #handle fix statements and GLOB's here.
                     next;
                 }
 
-                $self->{fh}->print("$name = ");
+                $self->{fh}->print("$name = ") unless $self->{style}{terse};
                 my $ret=$self->_dump_sv(*$lhs{$t},$depth,\$dumped,$name,length($name)+3);
                 Carp::confess "\nUnhandled alias value '$ret' returned to _dump_apply_fix()!"
                     if $ret;
@@ -2122,15 +2124,6 @@ sub Out {
 }
 
 
-sub print_token {
-    my ($self, $str)=@_;
-    $self->{fh}->print($str);
-}
-sub print_quoted {
-    my ( $self, $str )=@_;
-    $self->{fh}->print($str);
-}
-
 # sqz(str,begin,end)
 sub sqz {
     require Compress::Zlib;
@@ -2283,7 +2276,7 @@ sub _dump_sv {
         }
         #push @{$self->{out_names}},$name; #must
         #push @{$self->{declare}},$name;
-        unless ($name=~/^\&/) { # XXX
+        unless ($self->{style}{terse} || $name=~/^\&/) { # XXX
             my $str=(($self->{style}{declare} && $name!~/^\*/
                      && !$self->{lexicals}{added}{$name}
                      ) ? "my$optspace" : ""
@@ -2329,7 +2322,7 @@ sub _dump_sv {
             $self->{buf}+=5;
         } else {
             my $is_ro=($self->{style}{ro} && $ro && !$is_ref);
-            if ($is_ro and !$self->{style}{purity}) {
+            if ($is_ro and !$self->{style}{purity} and !$self->{style}{terse}) {
                 $self->{fh}->print("make_ro($optspace");
             }
             if ($glob) {
@@ -2370,10 +2363,12 @@ sub _dump_sv {
                 $self->{buf}=length($1) if $quoted=~/\n([^\n]*)\s*\z/;
                 $self->{fh}->print($quoted); #;
             }
-            if ($is_ro && $self->{style}{purity}) {
-                $self->_add_fix('sub call','make_ro',$name);
-            } elsif ($is_ro) {
-                $self->{fh}->print("$optspace)");
+            if( !$self->{style}{terse} ) {
+                if ($is_ro && $self->{style}{purity}) {
+                    $self->_add_fix('sub call','make_ro',$name);
+                } elsif ($is_ro) {
+                    $self->{fh}->print("$optspace)");
+                }
             }
             #return
         }
@@ -3073,6 +3068,8 @@ or undef. In void context with no arguments the names are cleared.
 B<NOTE:>
 Must be called before C<Data()> is called.
 
+If you wish to have no names, use L<Terse>.
+
 =cut
 
 sub Names {
@@ -3098,6 +3095,30 @@ sub Names {
 
     return wantarray ? @{$self->{unames}||[]} : $self->{unames}
 }
+
+=item Terse
+
+=item Terse BOOL
+
+When true, no variable names will be created.  Data will be dumped as
+anonymous references or values.
+
+    Dump([])->Out;              # $ARRAY1 = []
+    Dump([])->Terse(1)->Out;    # []
+
+=cut
+
+sub Terse {
+    my $self = shift->_safe_self;
+    if( @_ ) {
+        $self->{style}{terse} = shift;
+        return $self;
+    }
+    else {
+        return $self->{style}{terse};
+    }
+}
+
 
 =for UEDIT
 sub Purity {}
@@ -3750,7 +3771,7 @@ use B::Deparse;
 our @ISA=qw(B::Deparse);
 my %cache;
 
-our $VERSION = '2.40';
+our $VERSION = '2.41';
 $VERSION= eval $VERSION;
 if ( $VERSION ne $Data::Dump::Streamer::VERSION ) {
     die "Incompatible Data::Dump::Streamer::Deparser v$VERSION vs Data::Dump::Streamer v$Data::Dump::Streamer::VERSION";

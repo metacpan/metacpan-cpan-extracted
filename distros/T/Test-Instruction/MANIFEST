@@ -8,6 +8,7 @@ t/00-load.t
 t/01-odea.t
 t/02-object.t
 t/03-instructions.t
+t/04-code.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
