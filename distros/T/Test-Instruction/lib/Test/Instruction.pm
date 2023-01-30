@@ -1,6 +1,6 @@
 package Test::Instruction;
 
-use 5.006; use strict; use warnings; our $VERSION = '0.03';
+use 5.006; use strict; use warnings; our $VERSION = '0.04';
 use Compiled::Params::OO qw/cpo/;
 use Types::Standard qw/Optional Str Int Bool Any CodeRef ArrayRef HashRef/;
 use B qw/svref_2object/;
@@ -27,24 +27,38 @@ BEGIN {
 			catch     => Optional->of(Bool),
 			key       => Optional->of(Str),
 			index     => Optional->of(Int),
+			debug 	  => Optional->of(Bool),
 		},
 		instructions => {
 			name => Str,
 			run => ArrayRef,
 			build => Optional->of(HashRef),
-			instance => Optional->of(Any)
+			instance => Optional->of(Any),
+			debug => Optional->of(Bool)
 		},
 		build => {
 			class => Str,
 			new => Optional->of(Str),
 			args => Optional->of(Any),
 			args_list => Optional->of(Bool)
+		},
+		debug => {
+			name => Str,
+			message => Str,
+			out => Optional->of(Any),
 		}
 	);
 }
 
 sub instruction {
 	my $instruction = $validate->instruction->(@_);
+	
+	debug (
+		name => 'Test instruction',
+		message => 'Run the test instruction',
+		out => $instruction
+	) if $instruction->debug;
+
 	my ($test_name, @test) = ("", ());
 	if ( $instruction->catch ) {
 		$test_name = 'catch';
@@ -61,10 +75,15 @@ sub instruction {
 		return;
 	}
 
+	debug (
+		name => $test_name,
+		message => 'Code for the test instruction has been executed', 
+		out => \@test
+	) if $instruction->debug;
+
 	switch $instruction->test, 
 		"ref" => sub { 
 			return is_deeply( $test[0], $instruction->expected, "${test_name} is ref - is_deeply" );
-
 		},
 		ref_key_scalar => sub {
 			return ok(0, "No key passed to test - ref_key_scalar - testing - ${test_name}") 
@@ -333,9 +352,20 @@ sub instruction {
 sub instructions { 
 	my $instructions = $validate->instructions->(@_);
 
+	debug (
+		name => $instructions->name,
+		message => 'running test instructions: ' + caller() 
+	) if $instructions->debug;
+
 	ok(1, sprintf "instructions: %s", $instructions->name);
 
 	my $instance = $instructions->build ? _build($instructions->build) : $instructions->instance;
+
+	debug (
+		name => $instructions->name,
+		message => 'Built the test instance object', 
+		out => $instance
+	) if $instructions->debug;
 
 	my %test_info = (
 		fail => 0,
@@ -344,25 +374,41 @@ sub instructions {
 
 	for my $instruction (@{$instructions->run}) {
 		$test_info{tested}++;
+		
+		debug (
+			name => $instructions->name,
+			message => 'Run the next test instruction', 
+			out => $instruction
+		) if $instructions->debug;
+		
 		if (my $subtests = delete $instruction->{instructions}) {
 			my ($test_name, $new_instance) = _run_the_code(
 				$validate->instruction->(
 					instance => $instance,
+					($instructions->debug ? (debug => $instructions->debug) : ()),
 					%{$instruction}
 				)
 			);
+			
+			debug (
+				name => sprintf("%s -> %s", $instructions->name, $test_name),
+				message => 'Run the subtests of the test instruction', 
+				out => $instruction
+			) if $instructions->debug;
 			
 			$test_info{fail}++
 				unless instruction(
 					instance => $new_instance,
 					test => $instruction->{test},
+					($instructions->debug ? (debug => $instructions->debug) : ()),
 					expected => $instruction->{expected}
 				);
 
 			instructions(
 				instance => $new_instance,
 				run => $subtests,
-				name => sprintf "Subtest -> %s -> %s", $instructions->name, $test_name
+				name => sprintf("Subtest -> %s -> %s", $instructions->name, $test_name),
+				($instructions->debug ? (debug => $instructions->debug) : ()),
 			);
 			next;
 		}
@@ -370,6 +416,7 @@ sub instructions {
 		$test_info{fail}++
 			unless instruction(
 				instance => $instance,
+				($instructions->debug ? (debug => $instructions->debug) : ()),
 				%{$instruction}
 			);
 	}
@@ -392,11 +439,10 @@ sub finish {
 	return $done_testing;
 }
 
-
 sub _build {
 	my $build = $validate->build->(@_);
 	my $new = $build->new || 'new';
-	return $build->class->$new($build->args_list ? @{ $build->args } : $build->args);
+	return $build->class->$new($build->args_list ? @{ $build->args } : defined $build->args ? $build->args : ());
 }
 
 sub _run_the_code {
@@ -424,6 +470,33 @@ sub _run_the_code {
 	die(
 		'instruction passed to _run_the_code must have a func, meth or instance key'
 	);
+}
+
+sub caller_stack {
+	my @caller; my $i = 0; my @stack;
+        while(@caller = caller($i++)){
+                next if $caller[0] eq 'Log::JSON::Lines';
+                $stack[$i+1]->{module} = $caller[0];
+                $stack[$i+1]->{file} = $1 if $caller[1] =~ /([^\/]+)$/;;
+                $stack[$i+1]->{line} = $1 if $caller[2] =~ /(\d+)/;
+                $stack[$i]->{sub} = $1 if $caller[3] =~ /([^:]+)$/;
+        }
+        my $stacktrace = join '->', reverse map {
+                my $module = $_->{module} !~ m/^main$/ ? $_->{module} : $_->{file};
+                $_->{sub} 
+                        ? $module . '::' . $_->{sub} . ':' . $_->{line}
+                        : $module . ':' . $_->{line} 
+        } grep {
+                $_ && $_->{module} && $_->{line} && $_->{file}
+        } @stack;
+	return $stacktrace;
+}
+
+sub debug {
+	my $debug = $validate->debug->(@_);
+	diag explain $debug->name . ' ~ ' . caller_stack();
+	diag explain $debug->message;
+	diag explain $debug->out;
 }
 
 __END__
@@ -473,6 +546,7 @@ Version 0.02
 
 	instructions(
 		name => 'Checking Many Things',
+		debug => 1,
 		build => {
 			class => 'London',
 		},

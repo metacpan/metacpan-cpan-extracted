@@ -1,3 +1,21 @@
+0.0.6 2023-01-30 15:22:04-0500
+
+  - Documentation
+
+      - Fix NAME for Notebook POD.
+
+0.0.5 2023-01-30 11:46:31-0500
+
+  - Features
+
+      - Docker images with dependencies for notebooks.
+      - Support for running notebooks in Binder.
+
+  - Documentation
+
+      - Add manual index and quickstart guide.
+      - Add InferenceUsingTFHubEnformerGeneExprPredModel tutorial.
+
 0.0.4 2022-12-21 15:57:53-0500
 
   - Features

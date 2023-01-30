@@ -3,6 +3,7 @@ BEGIN { $^W = 1 }
 
 use Test::More tests => 34;
 use DateTime::Calendar::Pataphysical;
+use utf8;
 
 #########################
 
@@ -53,11 +54,11 @@ is( $d->datetime, '130-10-09EP', 'ymd' );
 is($d->feast, 'Vidange', 'feast Vidange');
 is($d->type_of_feast, 'v');
 
-is($d2->feast, 'Défaite du Mufle', 'feast Défaite du Mufle');
+is($d2->feast, 'DÃ©faite du Mufle', 'feast DÃ©faite du Mufle');
 is($d2->type_of_feast, 'v');
 
 is($d3->feast, "Nom d'Ubu", "feast Nom d'Ubu");
 is($d3->type_of_feast, '2');
 
-is($d4->feast, 'Ste Giborgne, vénérable', 'feast Sainte Giborgne, vénérable');
+is($d4->feast, 'Ste Giborgne, vÃ©nÃ©rable', 'feast Sainte Giborgne, vÃ©nÃ©rable');
 is($d4->type_of_feast, '3');

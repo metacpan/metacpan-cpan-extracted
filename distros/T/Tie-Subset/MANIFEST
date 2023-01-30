@@ -2,16 +2,17 @@ Changes
 lib/Tie/Subset.pm
 lib/Tie/Subset/Array.pm
 lib/Tie/Subset/Hash.pm
+lib/Tie/Subset/Hash/Masked.pm
 LICENSE.txt
 Makefile.PL
 MANIFEST			This list of files
 README.md
 t/00_smoke.t
 t/10_hash.t
+t/15_hash_masked.t
 t/20_array.t
 t/80_alias.t
 t/90_author.t
-t/perlcriticrc
 t/Tie_Subset_Testlib.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

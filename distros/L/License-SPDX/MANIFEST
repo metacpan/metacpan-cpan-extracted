@@ -25,7 +25,8 @@ t/License-SPDX/01-use.t
 t/License-SPDX/02-version.t
 t/License-SPDX/03-check_license.t
 t/License-SPDX/04-license.t
-t/License-SPDX/05-spdx_release_date.t
-t/License-SPDX/06-spdx_version.t
+t/License-SPDX/05-licenses.t
+t/License-SPDX/06-spdx_release_date.t
+t/License-SPDX/07-spdx_version.t
 xt/License-SPDX/01-pod_coverage.t
 xt/License-SPDX/02-pod.t

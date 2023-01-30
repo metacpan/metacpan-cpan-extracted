@@ -38,8 +38,48 @@ use File::Spec;
 use lib File::Spec->catdir('devel','lib');
 use MyGraphs;
 
-plan tests => 9;
+plan tests => 53;
 
+
+#------------------------------------------------------------------------------
+# K=2 Versus Circular Ladder
+
+sub Graph_circular_adder {
+  my ($rungs) = @_;
+  # its top 1..R, bottom R+1..2*R
+  require Graph::Maker::Ladder;
+  my $graph = Graph::Maker->new('ladder',
+                                rungs => $rungs,
+                                undirected => 1);
+  if ($rungs) {
+    $graph->add_edge(1, $rungs);
+    $graph->add_edge(1+$rungs, 2*$rungs);
+  }
+  return $graph;
+}
+
+# K=1 is circular ladder
+foreach my $N (0 .. 10) {
+  my $petersen = Graph::Maker->new('Petersen', undirected => 1,
+                                   N => $N, K => 1);
+  my $ladder = Graph_circular_adder($N);
+  ok (scalar($ladder->vertices), 2*$N);
+  my $got = MyGraphs::Graph_is_isomorphic($petersen, $ladder) ? 1 : 0;
+  my $want = 1;
+  ok ($got, $want, "Ladder $N");
+}
+
+# K=2
+foreach my $N (0 .. 10) {
+  my $petersen = Graph::Maker->new('Petersen', undirected => 1,
+                                   N => $N, K => 2);
+  my $ladder = Graph_circular_adder($N);
+  ok (scalar($ladder->vertices), 2*$N);
+  my $got = MyGraphs::Graph_is_isomorphic($petersen, $ladder) ? 1 : 0;
+  my $want = ($N==0 || $N==1 || $N==3  ? 1 : 0);
+  ok ($got, $want, "Ladder $N");
+}
+    
 
 #------------------------------------------------------------------------------
 

@@ -1,34 +1,45 @@
 #! perl
 
 use Test2::V0;
-use Import::Into;
-
-use feature 'state';
-use experimental 'signatures';
-
-sub my::export ( $src, @args ) {
-    state $package = 'Package000';
-    ++$package;
-    $src->import::into( $package, @args );
-    $package;
-}
+use Test::Lib;
+use My::Test::Utils 'export_from';
 
 package My::Exporter {
     use CXC::Exporter::Util 'install_CONSTANTS', 'install_EXPORTS';
     use Exporter 'import';
 
-    install_CONSTANTS( {
-            DETECTOR => [
-                ACIS => 'acis',
-                HRC  => 'hrc',
-            ],
-
-            AGGREGATE => {
-                ALL  => 'all',
-                NONE => 'none',
-                ANY  => 'any',
+    BEGIN {
+        install_CONSTANTS( {
+                DETECTORS => [
+                    ACIS => 'acis',
+                ],
             },
-        } );
+            [
+                [ 'Tag', 'EnumFunc' ] => {
+                    ALL  => 'all',
+                    NONE => 'none',
+                    ANY  => 'any',
+                },
+            ] );
+    }
+
+    # check for proper merge
+    install_CONSTANTS( {
+            DETECTORS => [    # add a bunch to increase the probability that the
+                              # enumerating function will return the wrong order
+                              # if this is treated as a hash
+                HRC => 'hrc',
+                do {
+                    my $detname = "DET000";
+                    map { ( ++$detname ) x 2 } 0 .. 10;
+                }
+            ] } );
+
+    # check for alternate id, func_name
+    install_CONSTANTS( [
+            [ 'Tag' => 'FryingPan' ] => {
+                MAYBE => 'maybe',
+            } ] );
 
     install_EXPORTS;
 }
@@ -37,20 +48,44 @@ package My::Exporter {
 
 use constant class => 'My::Exporter';
 
-is( [ class->my::export( 'DETECTORS' )->DETECTORS ], [ 'acis', 'hrc' ] );
-is( class->my::export( ':detector' )->ACIS,          'acis' );
-is( class->my::export( ':detector' )->HRC,           'hrc' );
+# DETECTOR must return the detectors in the order specified
+is(
+    [ export_from( class, 'DETECTORS' )->DETECTORS ],
+    array {
+        item 'acis';
+        item 'hrc';
+        do {
+            my $detname = "DET000";
+            item ++$detname for 0 .. 10;
+        }
+    } );
+
+is( export_from( class, ':detectors' )->ACIS, 'acis' );
+is( export_from( class, ':detectors' )->HRC,  'hrc' );
 
 is(
-    [ class->my::export( 'AGGREGATES' )->AGGREGATES ],
+    [ export_from( class, 'EnumFunc' )->EnumFunc ],
     bag {
         item 'all';
         item 'none';
         item 'any';
+        item 'maybe';
         end;
     } );
-is( class->my::export( ':aggregate' )->ALL,  'all' );
-is( class->my::export( ':aggregate' )->NONE, 'none' );
-is( class->my::export( ':aggregate' )->ANY,  'any' );
+
+is(
+    [ export_from( class, 'FryingPan' )->FryingPan ],
+    bag {
+        item 'all';
+        item 'none';
+        item 'any';
+        item 'maybe';
+        end;
+    } );
+
+is( export_from( class, ':Tag' )->ALL,   'all' );
+is( export_from( class, ':Tag' )->NONE,  'none' );
+is( export_from( class, ':Tag' )->ANY,   'any' );
+is( export_from( class, ':Tag' )->MAYBE, 'maybe' );
 
 done_testing;

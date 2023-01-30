@@ -3,10 +3,11 @@
    "author" : [
       "Martien Verbruggen <mgjv@tradingpost.com.au>",
       "Benjamin Warfield <bwarfield@cpan.org>",
-      "Ruslan Zakirov <Ruslan.Zakirov@gmail.com>"
+      "Ruslan Zakirov <Ruslan.Zakirov@gmail.com>",
+      "Best Practical Solutions <modules@bestpractical.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.2, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -55,10 +56,10 @@
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ruz/GDGraph.git",
-         "web" : "https://github.com/ruz/GDGraph"
+         "url" : "git://github.com/bestpractical/gdgraph.git",
+         "web" : "https://github.com/bestpractical/gdgraph"
       }
    },
-   "version" : "1.54",
+   "version" : "1.56",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

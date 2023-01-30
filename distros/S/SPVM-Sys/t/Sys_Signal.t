@@ -11,6 +11,7 @@ use Config;
 use POSIX q(:sys_wait_h);
 
 use SPVM 'Sys::Signal';
+use SPVM 'Sys::Signal::Constant';
 
 use SPVM 'TestCase::Sys::Signal';
 

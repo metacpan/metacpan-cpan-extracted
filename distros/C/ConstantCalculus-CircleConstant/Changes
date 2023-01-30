@@ -1,9 +1,14 @@
 Revision history for Perl extension ConstantCalculus::CircleConstant.
 
+0.03  27.01.2023
+        - Minor changes in program code
+        - Minor changes in documentation
+
 0.02  22.01.2023 
         - Major changes in POD documentation.
         - Major changes in program code.
-        - Prepare program code for adding more calculation formulas.
+        - Added Borwein algorith
+        - Added BBP algorithm
 
 0.01  Sat Jan 21 08:54:15 2023
 	- original version; created by h2xs 1.23 with options

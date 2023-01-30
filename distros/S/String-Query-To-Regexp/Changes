@@ -1,3 +1,10 @@
+0.003   2022-11-02  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Show usage of 're' option in Synopsis.
+
+
 0.002   2022-11-02  Released-By: PERLANCAR; Urgency: medium
 
         - Add option: re.

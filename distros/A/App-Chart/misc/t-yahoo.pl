@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2015, 2016, 2017, 2018, 2019, 2020, 2023 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -30,6 +30,17 @@ use Date::Parse;
 # uncomment this to run the ### lines
 use Smart::Comments;
 
+{
+  require HTTP::Response;
+  my $filename = "$ENV{HOME}/chart/samples/yahoo/history?p=BHP.AX";
+  my $resp = HTTP::Response->new();
+  my $content = slurp ($filename);
+  $resp->content($content);
+  $resp->content_type('text/html; charset=utf-8');
+  my @ret = App::Chart::Yahoo::daily_cookie_parse($content,$resp);
+  ### @ret
+  exit 0;
+}
 {
   # Date,Dividends
   # 2014-05-14,1.41429

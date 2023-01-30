@@ -4,7 +4,7 @@ use warnings;
 ############################################################################
                        package PDL::Graphics::Prima;
 ############################################################################
-our $VERSION = 0.17;   # do not delete these spaces; run update-version.pl
+our $VERSION = 0.18;   # do not delete these spaces; run update-version.pl
                        # if you change this
 
 # Add automatic support for PDL terminal interactivity
@@ -22,8 +22,8 @@ sub import {
 ############################################################################
 
 # Prima
-use Prima qw(noX11 Application ImageDialog MsgBox Utils Buttons InputLine
-			Label);
+use Prima qw(noX11 Application Dialog::ImageDialog MsgBox Utils Buttons
+	InputLine Label Dialog::ColorDialog);
 use base 'Prima::Widget';
 
 # Error reporting
@@ -75,6 +75,9 @@ sub profile_default {
 		
 		backColor => cl::White,
 		
+		# default color map
+		color_map => pal::BlackToWhite,
+		
 		# replot duration in milliseconds
 		replotDuration => 30,
 		# Blank profiles for the axes:
@@ -84,8 +87,25 @@ sub profile_default {
 		# Other important and basic settings
 		selectable => 1,
 		buffered => 1,
+
+		popupItems => default_popup_items(),
 	};
 }
+
+sub default_popup_items
+{[
+	['~Copy'           => 'copy_to_clipboard'     ],
+	['P~rint'          => 'print'                 ],
+	['~Export to'      => [
+		[ '~Image'         => 'save_to_image' ],
+		[ '~Postscript'    => 'save_to_ps'    ],
+		[ '~EPS'           => 'save_to_eps'   ],
+		[ 'P~DF'           => 'save_to_pdf'   ],
+	]],
+	['~Autoscale'      => 'autoscale'             ],
+	['~Properties'     => 'set_properties_dialog' ]
+]}
+
 
 ######################################
 # Usage        : Not used directly; this is invoked by Prima's inherited
@@ -112,6 +132,10 @@ sub init {
 	$self->_title($profile{title});
 	$self->_titleSpace($profile{titleSpace});
 	$self->_titleFont(%{$profile{titleFont}});
+	
+	# Set the default save-as data
+	$self->default_save_dir($profile{default_save_dir});
+	$self->default_save_format($profile{default_save_format});
 	
 	# Create the x- and y-axis objects, overriding the owner and axis name
 	# properties if they are set in the profile.
@@ -166,6 +190,11 @@ sub init {
 		# working here - catch errors?
 		$self->dataSets->{$1} = $value;
 	}
+	
+	# set up the color map after having initialized the data
+	my $cm = $self->{color_map} = $profile{color_map};
+	$cm->widget($self);
+	$self->compute_color_map_extrema;
 	
 	# Turn the axis autoscaling back on:
 	$self->{x}->{initializing} = 0;
@@ -379,6 +408,10 @@ sub get_pixel_extent_for {
 # example, the title requests exclusive space (a height of titleSpace),
 # which is added to that shared max shared space requested by both of the
 # axes. The return values should be left, bottom, right, top
+#
+# XXX make this accept a canvas argument in case we want the margins for Drawables
+# other than the plot widget (which happens whenever we generate figures, for
+# example)
 sub get_edge_requirements {
 	my $self = shift;
 	my @x_req = $self->x->get_edge_requirements;
@@ -395,6 +428,11 @@ sub get_edge_requirements {
 	
 	$requirement[3] += $self->titleSpace
 		if defined $self->{title} and $self->{title} ne '';
+	
+	# Add room for the color map. For now the color map will only live on the
+	# right of the figure, but that will eventually be configurable.
+	$requirement[2] += $self->color_map->get_width($self)
+		if $self->is_drawing_color_map;
 	
 	return @requirement;
 }
@@ -603,6 +641,72 @@ sub dataSets {
 	#$self->notify('ChangeData');
 }
 
+######################################
+# Usage        : my $dir = $plot->default_save_dir   # get
+#              : $plot->default_save_dir('some/dir') # set
+#              : $plot->default_save_dir(undef)      # clear
+# Purpose      : Gets or sets the starting directory for the plot
+#              : save-as dialog(s)
+# Arguments    : $self
+#              : optional new directory to set; optional undef to clear
+# Returns      : In get mode, the current dir
+#              : in set mode, the new dir
+#              : in clear mode, the old dir
+# Side Effects : none
+# Throws       : no exceptions
+# Comments     : none
+# See Also     : default_save_format, save_to_file
+sub default_save_dir {
+	return $_[0]->{default_save_dir} if @_ == 1;
+	my ($self, $new_dir) = @_;
+	if (defined $new_dir) {
+		$self->{default_save_dir} = $new_dir;
+	}
+	else {
+		delete $self->{default_save_dir};
+	}
+}
+
+######################################
+# Usage        : my $format = $plot->default_save_format # get
+#              : $plot->default_save_format('png')       # set
+#              : $plot->default_save_format(undef)       # clear
+# Purpose      : Gets or sets the default file format for save-as dialogs
+# Arguments    : $self
+#              : optional new format to set; optional undef to clear
+#              :   new format can be a regex reference
+# Returns      : In get mode, the current format
+#              : in set mode, the new format
+#              : in clear mode, the old format
+# Side Effects : none
+# Throws       : no exceptions
+# Comments     : none
+# See Also     : default_save_dir, save_to_file
+sub default_save_format {
+	return $_[0]->{default_save_format} if @_ == 1;
+	my ($self, $new_format) = @_;
+	if (defined $new_format) {
+		# See if we can find the new format in the list of codecs
+		for my $codec (@{Prima::Image->codecs}) {
+			for my $ext (@{$codec->{fileExtensions}}) {
+				if ($ext eq $new_format) {
+					$self->{default_save_fileShortType} = $codec->{fileShortType};
+					return $self->{default_save_format} = $new_format;
+				}
+			}
+		}
+		# Couldn't find it; warn and do not change anything
+		print "Could not find an image codec with file extension '$new_format'\n";
+		print "Available extensions include:\n";
+		print "  $_\n" foreach map @{$_->{fileExtensions}}, @{Prima::Image->codecs};
+		return;
+	}
+	else {
+		delete $self->{default_save_fileShortType};
+		delete $self->{default_save_format};
+	}
+}
+
 sub get_image {
 	my $self = shift;
 	
@@ -620,51 +724,45 @@ sub get_image {
 	return $image;
 }
 
-use Prima::PS::Drawable;
-use Prima::FileDialog;
+use Prima::PS::Printer;
+use Prima::Dialog::FileDialog;
+use Prima::Dialog::PrintDialog;
 use Prima::Drawable::Subcanvas;
 
-sub save_to_postscript {
-	# Get the filename as an argument, or from the save-as dialog.
-	my ($self, $filename) = @_;
-	
-	unless ($filename) {
-		my $save_dialog = Prima::SaveDialog-> new(
-			defaultExt => 'eps',
-			filter => [
-				['Encapsulated Postscript files' => '*.eps'],
-				['All files' => '*'],
-			],
-		);
-		# Return if they cancel out:
-		return unless $save_dialog->execute;
-		# Otherwise get the filename:
-		$filename = $save_dialog->fileName;
-		# Provide a default extension
-		$filename .= '.eps' unless $filename =~ /\.eps$/;
-	}
-	unlink $filename if -f $filename;
-	
-	# Calculate width and height using the (hopefully standard) rule that
-	# 100px = 72pt = 1in. This doesn't quite work right, still. Compare the
-	# output of the pathological-sizing.pl script to the original raster window.
-	my $scaling_ratio = 72.27 / 100;
-	my $width = $self->width * $scaling_ratio;
-	my $height = $self->height * $scaling_ratio;
+sub save_to_ps
+{
+	shift->save_to_generic_ps( 'Prima::PS::File', 'ps', 'Postscript files')
+}
+
+sub save_to_eps
+{
+	shift->save_to_generic_ps( 'Prima::PS::File', 'eps', 'Encapsulated Postscript files', isEPS => 1)
+}
+
+sub save_to_pdf
+{
+	shift->save_to_generic_ps( 'Prima::PS::PDF::File', 'pdf', 'Portable Document Format files')
+}
+
+sub export_to_ps
+{
+	my ( $self, $class, $filename, %ps_opt ) = @_;
+
 	# Create the postscript canvas and plot to it:
-	my $ps = Prima::PS::Drawable-> create( onSpool => sub {
-			open my $fh, ">>", $filename;
-			print $fh $_[1];
-			close $fh;
-		},
-		pageSize => [$width, $height],
-		pageMargins => [0, 0, 0, 0],
-		isEPS => 1,
-		useDeviceFontsOnly => 1,
-	);
-	$ps->resolution($self->resolution);
+	my $ps = $class->new( file => $filename);
+	$ps->pageMargins(0, 0, 0, 0);
+	$ps->resolution( $self-> resolution );
+
+	# Calculate width and height using the (hopefully standard) rule that
+	# 96px (or whatever screen dpi is ) = 72pt = 1in. This doesn't quite work right, still. Compare the
+	# output of the pathological-sizing.pl script to the original raster window.
+	$ps->pageSize( $ps-> pixel2point( $self-> size ));
+
 	$ps->font(height => $self->font->height);
-	
+	while ( my ( $k, $v ) = each %ps_opt ) {
+		$ps->$k($v);
+	}
+
 	$ps->begin_doc
 		or do {
 			my $message = "Error generating Postscript output: $@";
@@ -676,12 +774,46 @@ sub save_to_postscript {
 				croak($message);
 			}
 		};
-	
+
 	$self->paint_with_widgets($ps);
 	$ps->end_doc;
 }
 
+sub save_to_generic_ps
+{
+	# Get the filename as an argument, or from the save-as dialog.
+	my ($self, $class, $extension, $ext_description, %ps_opt) = @_;
+	
+	my $save_dialog = Prima::Dialog::SaveDialog-> new(
+		system     => 1,
+		defaultExt => $extension,
+		filter => [
+			[ $ext_description => '*.' . $extension],
+			['All files' => '*'],
+		],
+		$self->{default_save_dir}
+			? (directory => $self->{default_save_dir})
+			: (),
+	);
+	# Return if they cancel out:
+	return unless $save_dialog->execute;
+	# Otherwise get the filename:
+	my $filename = $save_dialog->fileName;
+	unlink $filename if -f $filename;
+
+	$self->export_to_ps( $class, $filename, %ps_opt );
+}
+
+sub save_to_postscript {
+	# Get the filename as an argument, or from the save-as dialog.
+	my ($self, $filename) = @_;
+	return defined($filename) ?
+		$self-> export_to_ps( 'Prima::PS::File', $filename, isEPS => 1 ) :
+		$self-> save_to_eps;
+}
+
 # A routine to save the current plot to a rasterized file:
+sub save_to_image { shift->save_to_file }
 sub save_to_file {
 	# Get the filename as an argument or from a save-as dialog.
 	my ($self, $filename) = @_;
@@ -689,11 +821,32 @@ sub save_to_file {
 	# Get the image
 	my $image = $self->get_image;
 	
-	# If they didn't specify a filename, run a dialog to get it:
+	# If they didn't specify a filename, run a dialog to get it. Use
+	# the specified configuration, if given
 	unless ($filename) {
-		my $dlg = Prima::ImageSaveDialog-> create;
+		my %args;
+		$args{directory} = $self->{default_save_dir}
+			if exists $self->{default_save_dir};
+		my $dlg = Prima::Dialog::ImageSaveDialog-> create(%args);
+		
+		if ($self->{default_save_format}) {
+			my $found;
+			my $i = 0;
+			my @types = $dlg->filter;
+			for (my $i = 0; $i < @types; $i++) {
+				if ($types[$i][0] =~ /$self->{default_save_fileShortType}/) {
+					$found++;
+					$dlg->filterIndex($i);
+					last;
+				}
+			}
+			# Should have already gotten a warning about this...
+			warn "Preferred image format [$self->{default_save_format}] is not available\n"
+				if not $found;
+		}
 	
 		$dlg->save($image);
+		$dlg->destroy;
 		return;
 	}
 	
@@ -722,6 +875,31 @@ sub copy_to_clipboard {
 	$clipboard->close;
 }
 
+sub print
+{
+	my $self = shift;
+
+	my $print_dialog = Prima::Dialog::PrintDialog-> new;
+	unless ($print_dialog-> execute) {
+		$print_dialog->destroy;
+		return;
+	}
+
+	my $ps = $print_dialog-> printer;
+
+	$ps->font(height => $self->font->height);
+
+	$ps->begin_doc or do {
+		my $msg = "$@";
+		Prima::MsgBox::message($msg, mb::Ok);
+		carp($msg);
+	};
+
+	$self->paint_with_widgets($ps);
+	$ps->end_doc;
+	$print_dialog->destroy;
+}
+
 # For a change in title, recompute the autoscaling and issue an immediate
 # repaint. Replotting is not appropriate here as replotting issues a timer
 # event that may not get triggered if the event loop isn't running (i.e.
@@ -743,8 +921,13 @@ sub on_replot {
 	$self->{timer}->start;
 }
 
-# for now, this is a replica of the above:
-*on_changedata = \&on_changetitle;
+# Just like changetitle, but we also need to check for changes to the color
+# map's extrema
+sub on_changedata {
+	my $self = shift;
+	$self->compute_color_map_extrema;
+	$self->on_changetitle;
+}
 
 #################
 # Notifications #
@@ -788,6 +971,58 @@ sub on_paint {
 	# Otherwise, clear the canvas and invoke our plot drawing routine on ourself
 	$self->clear;
 	$self->draw_plot($self);
+}
+
+sub is_drawing_color_map { shift->{is_drawing_color_map} }
+sub color_map {
+	my $self = shift;
+	
+	# When called as getter, return the map
+	return $self->{color_map} if @_ == 0;
+	
+	# Set a new color map
+	my $new_map = shift;
+	
+	# undef is not an option: must be a Palette
+	croak("new color map must be a descendant of PDL::Graphics::Prima::Palette")
+		unless eval {$new_map->isa('PDL::Graphics::Prima::Palette')};
+	
+	# tie the map to this widget
+	$self->{color_map} = $new_map;
+	$new_map->widget($self);
+	
+	# recompute the color map extrema and repaint
+	$self->compute_color_map_extrema;
+	$self->on_changetitle;
+}
+
+sub compute_color_map_extrema {
+	my $self = shift;
+	
+	# Iterate through all datasets
+	my @minmax;
+	for my $dataset (values %{$self->dataSets}) {
+		next if $dataset->isa('Prima::Plot');
+		my @curr_minmax = $dataset->compute_color_map_extrema;
+		if (@curr_minmax) {
+			if (@minmax) {
+				$minmax[0] = $curr_minmax[0] if $minmax[0] > $curr_minmax[0];
+				$minmax[1] = $curr_minmax[1] if $minmax[1] < $curr_minmax[1];
+			}
+			else {
+				@minmax = @curr_minmax;
+			}
+		}
+	}
+	
+	# Store the min/max in the color map. If @minmax is empty, this will
+	# effectively clear the color map's autoscaling minmax, which is what we
+	# want.
+	$self->color_map->set_autoscaling_minmax(@minmax);
+	
+	# A non-empty minmax array indicates that at least one PlotType will utilize
+	# the color map, and therefore it should be drawn.
+	$self->{is_drawing_color_map} = (0 < @minmax);
 }
 
 # This is the actual functionality for drawing on the canvas. This was once part
@@ -853,10 +1088,15 @@ sub draw_plot {
 		# Reset the font characteristics:
 		$canvas->font($backup_font);
 	}
+	
+	# draw the color map
+	$self->color_map->draw($canvas, $clip_left, $clip_bottom, $clip_right,
+		$clip_top, $ratio) if $self->is_drawing_color_map;
 }
 
 # For mousewheel events, we zoom in or out. However, if they're over the axes,
 # only zoom in or out for that axis.
+# XXX add mouse-wheel capabilities for the color map
 sub on_mousewheel {
 	return unless $_[0]->enabled;
 	my ($self, $mods, $x, $y, $dir) = @_;
@@ -868,6 +1108,12 @@ sub on_mousewheel {
 	my $rel_x = $self->x->pixels_to_relatives($x);
 	my $rel_y = $self->y->pixels_to_relatives($y);
 	
+	# Zoom algebra. If I zoom in by 20%, how much should I zoom out by?
+	# For zoom-in I have
+	# z = o - o/5 = 4/5 * o
+	# For zoom-out, I invert
+	# 5/4 * z = o
+	
 	# if the mouse is over the data or the x-axis, zoom in the x-direction,
 	# preserving the position of the mouse's x-value:
 	if ($rel_x > 0 and $rel_x < 1) {
@@ -878,8 +1124,8 @@ sub on_mousewheel {
 			$rel_max -= (1 - $rel_x) / 5;
 		}
 		else {
-			$rel_min -= $rel_x/5;
-			$rel_max += (1 - $rel_x) / 5;
+			$rel_min -= $rel_x/4;
+			$rel_max += (1 - $rel_x) / 4;
 		}
 		
 		# Compute the new min/max values from the axis scaling:
@@ -896,8 +1142,8 @@ sub on_mousewheel {
 			$rel_max -= (1 - $rel_y) / 5;
 		}
 		else {
-			$rel_min -= $rel_y/5;
-			$rel_max += (1 - $rel_y) / 5;
+			$rel_min -= $rel_y/4;
+			$rel_max += (1 - $rel_y) / 4;
 		}
 		
 		# Compute the new min/max values from the axis scaling:
@@ -974,11 +1220,7 @@ sub on_mousemove {
 			my $new_min = $self->x->relatives_to_reals(-$dx);
 			my $new_max = $self->x->relatives_to_reals(1 - $dx);
 			
-			# Call the non-notifying version. The notifying version causes an
-			# immediate redraw that causes the plot to accelerate away in
-			# perldl.
-			$self->x->_min($new_min);
-			$self->x->_max($new_max);
+			$self->x->minmax($new_min, $new_max);
 		}
 		# If the initial click was within the y-boundaries, then the y-values
 		# should be adjusted:
@@ -988,11 +1230,7 @@ sub on_mousemove {
 			my $new_min = $self->y->relatives_to_reals(-$dy);
 			my $new_max = $self->y->relatives_to_reals(1 - $dy);
 			
-			# Call the non-notifying version. The notifying version causes an
-			# immediate redraw that causes the plot to accelerate away in
-			# perldl.
-			$self->y->_min($new_min);
-			$self->y->_max($new_max);
+			$self->y->minmax($new_min, $new_max);
 		}
 	}
 	
@@ -1037,45 +1275,24 @@ sub on_mouseup {
 			$max_real = $self->y->relatives_to_reals($max_rel);
 			# Set the new min/max values:
 			$self->y->minmax($min_real, $max_real);
+			$self->clear_event;
 		}
-		# Call the popup menu if it 'looks' like a right-click:
 		elsif ($x_stop_rel == $x_start_rel and $y_stop_rel == $y_start_rel) {
-			$self->popup(Prima::Popup->new(
-				items => [
-					['~Copy' => sub {
-						Prima::Timer->create(
-							timeout => 250,
-							onTick => sub {
-								$_[0]->stop;
-								$self->copy_to_clipboard;
-							},
-						)->start;
-					}],
-					['Save As ~Postscript...' => sub {
-						$self->save_to_postscript;
-					}],
-					['~Save As...' => sub {
-						Prima::Timer->create(
-							timeout => 250,
-							onTick => sub {
-								$_[0]->stop;
-								$self->save_to_file;
-							},
-						)->start;
-					}],
-					['~Autoscale' => sub {
-						$self->x->minmax(lm::Auto, lm::Auto);
-						$self->y->minmax(lm::Auto, lm::Auto);
-					}],
-					['~Properties' => sub {
-						$self->set_properties_dialog;
-					}],
-				],
-			));
+			# Call the popup menu if it 'looks' like a right-click
+			# by not clearing the event
+		} else {
+			$self->clear_event;
 		}
 		# Remove the previous button record, so a zoom rectangle is not drawn:
 		delete $self->{mouse_down_rel}->{mb::Right};
 	}
+}
+
+sub autoscale
+{
+	my $self = shift;
+	$self->x->minmax(lm::Auto, lm::Auto);
+	$self->y->minmax(lm::Auto, lm::Auto);
 }
 
 use Scalar::Util qw(looks_like_number);
@@ -1083,7 +1300,7 @@ use Scalar::Util qw(looks_like_number);
 sub insert_minmax_input {
 	my ($group_box, $method, $axis, $y_pos) = @_;
 	$group_box->insert(Label =>
-		place => { x => 45, y => $y_pos, height => 25, width => 60, anchor => 'sw' },
+		place => { x => 45, y => $y_pos, height => 25, width => 60, anchor => 'sw', pad => 10 },
 		height => 30,
 		text => ucfirst($method) . ':',
 	);
@@ -1097,7 +1314,7 @@ sub insert_minmax_input {
 	
 	# Attach an event listener to the axis min/max methods to keep is_auto
 	# up-to-date, and ensure that the input line is accurate
-	my $notification_idx = $axis->add_notification(ChangeBounds => sub {
+	$axis->add_notification(ChangeBounds => sub {
 		# get the new min or max
 		(my $curr_val, $is_auto) = $axis->$method;
 		
@@ -1113,6 +1330,7 @@ sub insert_minmax_input {
 		place => { x => 110, y => $y_pos, height => 30, width => 280, anchor => 'sw' },
 		height => 30,
 		text => ($is_auto ? "$init_val (Auto)" : $init_val),
+		backColor => cl::White,
 		onEnter => sub {
 			if ($is_auto) {
 				$_[0]->text(scalar($axis->$method));
@@ -1157,13 +1375,11 @@ sub insert_minmax_input {
 	
 	$auto_button = $group_box->insert(Button =>
 		text => 'Autoscale',
-		place => { x => 395, y => $y_pos, height => 30, width => 100, anchor => 'sw' },
+		place => { x => 395, y => $y_pos, height => 30, width => 100, anchor => 'sw', pad => 10 },
 		height => 30,
 		onClick => sub { $axis->$method(lm::Auto) },
 	);
 	$auto_button->enabled(!$is_auto);
-	
-	return $notification_idx;
 }
 
 sub insert_label_input {
@@ -1178,6 +1394,7 @@ sub insert_label_input {
 		text => $label_text,
 		place => { x => 110, y => 40, height => 30, width => 380, anchor => 'sw' },
 		height => 30,
+		backColor => cl::White,
 		onKeyUp => sub {
 			my $new_label = shift->text;
 			if ($new_label ne $label_text) {
@@ -1219,7 +1436,7 @@ sub insert_scaling_radios {
 	);
 	$log_radio->enabled(0) unless $init_max > 0 && $init_min > 0;
 	
-	my $bounds_notification = $axis->add_notification(ChangeBounds => sub {
+	$axis->add_notification(ChangeBounds => sub {
 		# Can't go negative if log scaling is enabled, so negative means
 		# we must have linear scaling. As such, only enable/disable the
 		# log radio based on negative signs, don't change the radios
@@ -1235,7 +1452,7 @@ sub insert_scaling_radios {
 			$update_radios = 1;
 		}
 	});
-	my $scaling_notification = $axis->add_notification(ChangeScaling => sub {
+	$axis->add_notification(ChangeScaling => sub {
 		return unless $update_radios;
 		if ($axis->scaling eq sc::Linear) {
 			$update_radios = 0;
@@ -1248,8 +1465,40 @@ sub insert_scaling_radios {
 			$update_radios = 1;
 		}
 	});
-	
-	return ($bounds_notification, $scaling_notification);
+}
+
+sub insert_color_widgets
+{
+	my ($box, $ref) = @_;
+
+	$box-> insert( Widget => 
+		pack      => { side => 'left', pad => 10 },
+		size      => [30, 1],
+	);
+	$box-> insert( Label => 
+		pack      => { side => 'left', pad => 10 },
+		text      => '~Color',
+		focusLink => 'Color1',
+	);
+	$box-> insert( ColorComboBox =>
+		name      => 'Color1',
+		pack      => { side => 'left', pad => 10 },
+		value     => $ref->color,
+		onChange  => sub { $ref->color( shift->value ) },
+	);
+
+	$box-> insert( Label => 
+		pack      => { side => 'left', pad => 10 },
+		text      => '~Background',
+		focusLink => 'Color2',
+	);
+
+	$box-> insert( ColorComboBox =>
+		name      => 'Color2',
+		pack      => { side => 'left', pad => 10 },
+		value     => $ref->backColor,
+		onChange  => sub { $ref->backColor( shift->value ) },
+	);
 }
 
 # Builds a modal window to set plotting properties
@@ -1258,6 +1507,7 @@ sub set_properties_dialog {
 	
 	# If one already exists, bring it back to the front
 	if (exists $self->{prop_window}) {
+		$self->{prop_window}->show;
 		$self->{prop_window}->select;
 		$self->{prop_window}->bring_to_front;
 		return;
@@ -1265,7 +1515,7 @@ sub set_properties_dialog {
 	
 	my $total_height = 0;
 	$self->{prop_window} = my $prop_win = Prima::Window->new(
-		text => 'Plot Properties', width => 500, height => 380,
+		text => 'Plot Properties', sizeMin => [520, 380],
 		visible => 0,
 	);
 	$prop_win->insert(Widget =>
@@ -1274,20 +1524,23 @@ sub set_properties_dialog {
 	);
 	
 	# Title input
+	my $fh = $prop_win->font->height;
 	my $title_box = $prop_win->insert(GroupBox =>
 		pack => { side => 'top', fill => 'x', padx => 10 },
-		height => 50,
+		height => $fh * 2 + 20,
 		text => 'Title',
 	);
 	my $title_text = $self->title || '';
 	$title_box->insert(InputLine =>
 		text => $title_text,
 		place => {
-			x => 5, y => 5,
+			x => 10, y => 10,
 			relwidth => 1,
-			width => -10,
+			width => -20,
 			anchor => 'sw',
+			height => $fh,
 		},
+		backColor => cl::White,
 		onKeyUp => sub {
 			my $new_title = shift->text;
 			if ($new_title ne $title_text) {
@@ -1297,22 +1550,20 @@ sub set_properties_dialog {
 		},
 	);
 	
-	my (@x_notifications, @y_notifications);
-	
 	# x axis input
 	$prop_win->insert(Widget =>
 		pack => { side => 'top', fill => 'x' },
 		height => 10,
 	);
 	my $x_box = $prop_win->insert(GroupBox =>
-		pack => { side => 'top', fill => 'x' },
+		pack => { side => 'top', fill => 'x', pad => 10 },
 		height => 160,
 		text => 'X Axis',
 	);
-	push @x_notifications, insert_minmax_input($x_box, 'min', $self->x, 110);
-	push @x_notifications, insert_minmax_input($x_box, 'max', $self->x, 75);
+	insert_minmax_input($x_box, 'min', $self->x, 110);
+	insert_minmax_input($x_box, 'max', $self->x, 75);
 	insert_label_input($x_box, $self->x);
-	push @x_notifications, insert_scaling_radios($x_box, $self->x);
+	insert_scaling_radios($x_box, $self->x);
 	
 	# y axis input
 	$prop_win->insert(Widget =>
@@ -1320,14 +1571,21 @@ sub set_properties_dialog {
 		height => 10,
 	);
 	my $y_box = $prop_win->insert(GroupBox =>
-		pack => { side => 'top', fill => 'x' },
+		pack => { side => 'top', fill => 'x', pad => 10 },
 		height => 160,
 		text => 'Y Axis',
 	);
-	push @y_notifications, insert_minmax_input($y_box, 'min', $self->y, 110);
-	push @y_notifications, insert_minmax_input($y_box, 'max', $self->y, 75);
+	insert_minmax_input($y_box, 'min', $self->y, 110);
+	insert_minmax_input($y_box, 'max', $self->y, 75);
 	insert_label_input($y_box, $self->y);
-	push @y_notifications, insert_scaling_radios($y_box, $self->y);
+	insert_scaling_radios($y_box, $self->y);
+
+	my $color_box = $prop_win->insert( GroupBox => 
+		pack => { side => 'top', fill => 'x', pad => 10 },
+		sizeMin => [ 200, 60 ],
+		text => 'Colors',
+	);
+	insert_color_widgets($color_box, $self);
 	
 	# Close button
 	$prop_win->insert(Widget =>
@@ -1337,15 +1595,15 @@ sub set_properties_dialog {
 	my $close_button = $prop_win->insert(Button =>
 		text => 'Close',
 		onClick => sub { $prop_win->close },
-		pack => { side => 'right' }
+		pack => { side => 'right',pad => 10 }
 	);
-	
-	$prop_win->height(10 + 50 + 10 + 160 + 10 + 160 + 10 + 30);
+
+	$prop_win->packPropagate(1);
 	
 	$prop_win->onClose(sub {
-		$self->x->remove_notification($_) foreach (@x_notifications);
-		$self->y->remove_notification($_) foreach (@y_notifications);
-		delete $self->{prop_window};
+		# Do not actually close, but rather simply hide this window
+		$prop_win->clear_event;
+		$prop_win->hide;
 		# Bring the figure back to the foreground
 		$self->select;
 		$self->bring_to_front;
@@ -1365,16 +1623,20 @@ PDL::Graphics::Prima - an interactive plotting widget and library for PDL and Pr
 
 =head1 SIMPLE SYNOPSIS
 
+=for podview <img src="PDL/Graphics/Prima/pod/lineplot.png">
+
+=for html <p><img src="https://raw.githubusercontent.com/PDLPorters/PDL-Graphics-Prima/master/lib/PDL/Graphics/Prima/pod/lineplot.png">
+
  use PDL::Graphics::Prima::Simple;
  use PDL;
- 
- 
+
+
  # --( Super simple line and symbol plots )--
- 
+
  # Generate some data - a sine curve
  my $x = sequence(100) / 20 + 1;
  my $y = sin($x);
- 
+
  # Draw x/y pairs. Default x-value are sequential:
  line_plot($y);        line_plot($x, $y);
  circle_plot($y);      circle_plot($x, $y);
@@ -1384,39 +1646,39 @@ PDL::Graphics::Prima - an interactive plotting widget and library for PDL and Pr
  X_plot($y);           X_plot($x, $y);
  cross_plot($y);       cross_plot($x, $y);
  asterisk_plot($y);    asterisk_plot($x, $y);
- 
+
  # Sketch the sine function for x initially from 0 to 10:
  func_plot(0 => 10, \&PDL::sin);
- 
- 
+
+
  # --( Super simple histogram )--
- 
+
  # PDL hist method returns x/y data
  hist_plot($y->hist);
  my ($bin_centers, $heights) = $y->hist;
  hist_plot($bin_centers, $heights);
  # Even simpler, if of limited use:
  hist_plot($heights);
- 
- 
+
+
  # --( Super simple matrix plots )--
- 
+
  # Generate some data - a wavy pattern
  my $image = sin(sequence(100)/10)
              + sin(sequence(100)/20)->transpose;
- 
+
  # Generate a grayscale image:
  matrix_plot($image);  # smallest is white
  imag_plot($image);    # smallest is black
- 
+
  # Set the x and y coordinates for the image boundaries
  #            left, right,  bottom, top
  matrix_plot([ 0,     1  ], [ 0,     2 ],  $image);
  imag_plot(  [ 0,     1  ], [ 0,     2 ],  $image);
- 
- 
+
+
  # --( More complex plots )--
- 
+
  # Use the more general 'plot' function for
  # multiple DataSets and more plotting features:
  my $colors = pal::Rainbow()->apply($x);
@@ -1428,7 +1690,7 @@ PDL::Graphics::Prima - an interactive plotting widget and library for PDL and Pr
          colors   => $colors,
          plotType => ppair::Squares(filled => 1),
      ),
-     
+
      x => 'Time',
      y => {
          label   => 'Sine',
@@ -1436,26 +1698,30 @@ PDL::Graphics::Prima - an interactive plotting widget and library for PDL and Pr
      },
  );
 
+=for podview <img src="PDL/Graphics/Prima/pod/exp.png">
+
+=for html <p><img src="https://raw.githubusercontent.com/PDLPorters/PDL-Graphics-Prima/master/lib/PDL/Graphics/Prima/pod/exp.png">
+
 =head1 WIDGET SYNOPSIS
 
  use PDL;
  use Prima qw(Application);
  use PDL::Graphics::Prima;
- 
+
  my $t_data = sequence(6) / 0.5 + 1;
  my $y_data = exp($t_data);
- 
+
  my $wDisplay = Prima::MainWindow->create(
      text  => 'Graph Test',
      size  => [300, 300],
  );
- 
+
  $wDisplay->insert('Plot',
      -function => ds::Func(\&PDL::exp, color => cl::Blue),
      -data => ds::Pair($t_data, $y_data, color => cl::Red),
      pack => { fill => 'both', expand => 1},
  );
- 
+
  run Prima;
 
 =head1 IF YOU ARE NEW
@@ -1672,10 +1938,10 @@ For example:
  $plot->dataSets->{new_data} = ds::Pair(
      $x, $y, plotType => ppair::Squares
  );
- 
+
  # Remove a DataSet
  delete $plot->dataSets->{model};
- 
+
  # Clear the DataSets
  %{$plot->dataSets} = ();
 
@@ -1685,7 +1951,7 @@ that you add will be validated as you add them.
 
 =head1 METHODS
 
-PDL::Graphics::Prima provides a number of methods. Most of these focuse on
+PDL::Graphics::Prima provides a number of methods. Most of these focus on
 generating images of the plot.
 
 =head2 get_image
@@ -1694,10 +1960,10 @@ Returns a L<Prima::Image> of the plot with same dimensions as the plot widget.
 
 =head2 save_to_postscript
 
-Saves the plot with current axis limits to an encapsulated postscript figure.
-This method takes an optional filename argument. If no filename is specified,
-it pops-up a dialog box to ask the user where and under what name they want
-to save the postscript figure.
+Saves the plot with current axis limits to an encapsulated postscript figure or
+to a PDF file. This method takes an optional filename argument. If no filename
+is specified, it pops-up a dialog box to ask the user where and under what name
+they want to save the figure.
 
 This functionality will likely be merged into save_to_file, though this
 method will remain for backwards compatibility.
@@ -1755,16 +2021,16 @@ want to do this: first if you are creating many raster images from plots and
 want to avoid memory re-allocations, and second if you have in image with some
 annotations on it already. (Beware the first reason: it is likely a premature
 optimization.) To draw the plot on an already-formed image, you can use the
-L<draw_image|PDL::Graphics::Prima/draw_image> method like so:
+C<paint_with_widgets> method like so:
 
  $some_image->begin_paint;
  $some_image->clear;
  ... other painting here ...
- $plot->draw_image($some_image);
+ $plot->paint_with_widgets($some_image);
  ... more painting ...
  $some_image->end_paint;
 
-The L<draw_image|PDL::Graphics::Prima/draw_image> method is the preferred way to
+The C<paint_with_widgets> method is the preferred way to
 draw a plot onto a pre-existing image. It gives you a bit more control on how
 the painting is invoked: for example, it does not clear the canvas for you. But
 with the increased control comes increased manual manipulation: you need to set
@@ -1782,7 +2048,7 @@ into a canvas. In that case, you should be able to say this:
  $::application->yield;
 
 Painting on an image by invoking the L<Paint Event|Prima::Widget/Paint> is
-similar to the L<draw_image|PDL::Graphics::Prima/draw_image> method, but it
+similar to the C<paint_with_widgets> method, but it
 also ensures that your image is in a paint-enabled state, clears the canvas,
 and returns the image in a paint-disabled state if that's how it started.
 This is usually what you want and expect when invoking the Paint event on a
@@ -1926,6 +2192,10 @@ Specifies different kinds of scaling, including linear and logarithmic
 
 Defines a number of useful functions for generating simple and not-so-simple
 plots
+
+=item L<PDL::Graphics::Prima::SizeSpec|PDL::Graphics::Prima::SizeSpec/>
+
+Compute pixel distances from meaningful units
 
 =back
 

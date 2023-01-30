@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::OperationDescription;
 # ABSTRACT: Operation being built
-$AI::TensorFlow::Libtensorflow::OperationDescription::VERSION = '0.0.4';
+$AI::TensorFlow::Libtensorflow::OperationDescription::VERSION = '0.0.6';
 use strict;
 use warnings;
 use namespace::autoclean;
@@ -335,7 +335,7 @@ Zakariyya Mughal <zmughal@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Auto-Parallel Technologies, Inc.
+This software is Copyright (c) 2022-2023 by Auto-Parallel Technologies, Inc.
 
 This is free software, licensed under:
 

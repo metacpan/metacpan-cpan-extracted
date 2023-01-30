@@ -3,7 +3,7 @@ use warnings;
 use Config;
 use IO::All;
 
-my $version = '0.05';
+my $version = '0.06';
 
 # Look for HDF4 includes/libs
 # default locations:
@@ -17,6 +17,7 @@ my @HDF_lib_locations = (
     '/usr/lib',
     '/usr/lib/hdf',
     '/opt/lib',
+    '/opt/hdf4/lib',
     split(/ /, $Config{libpth}),
 );
 my @HDF_inc_locations = (
@@ -26,6 +27,7 @@ my @HDF_inc_locations = (
     '/usr/include',
     '/usr/include/hdf',
     '/opt/include',
+    '/opt/hdf4/include',
     $Config{usrinc},
 );
 

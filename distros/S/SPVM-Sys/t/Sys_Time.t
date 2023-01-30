@@ -8,6 +8,7 @@ BEGIN { $ENV{SPVM_BUILD_DIR} = "$FindBin::Bin/.spvm_build"; }
 
 use SPVM 'Sys::Time';
 use SPVM 'Sys';
+use SPVM 'Int';
 
 use SPVM 'TestCase::Sys::Time';
 

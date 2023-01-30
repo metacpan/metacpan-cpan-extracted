@@ -7,7 +7,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '1.004'; # VERSION
+our $VERSION = '1.005'; # VERSION
 our $LAST_UPDATE = '0.12'; # manually update whenever code is changed
 
 my $perl = 'perl';  # run Perl command. add path, etc. if needed

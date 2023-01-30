@@ -13,15 +13,15 @@ WriteMakefile(
 		provides     => {
 			'Tie::Subset' => {
 				file    => 'lib/Tie/Subset.pm',
-				version => '0.01',
+				version => '0.02',
 			},
 			'Tie::Subset::Hash' => {
 				file    => 'lib/Tie/Subset/Hash.pm',
-				version => '0.01',
+				version => '0.02',
 			},
 			'Tie::Subset::Array' => {
 				file    => 'lib/Tie/Subset/Array.pm',
-				version => '0.01',
+				version => '0.02',
 			},
 		},
 		resources    => {
@@ -63,3 +63,11 @@ WriteMakefile(
 		# note I haven't included modules needed for author tests here
 	},
 );
+sub MY::postamble {
+	return <<'MAKE_FRAG';
+.PHONY: authorcover
+authorcover: test
+	cpanm Devel::Cover Pod::Coverage::CountParents
+	cover -test
+MAKE_FRAG
+}

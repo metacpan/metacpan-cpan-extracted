@@ -17,7 +17,7 @@ more welcome.
 The public repository for this code is managed with git and is hosted at GitLab.
 It is available via the web at:
 
-  https://gitlab.com/djerius/cxc-exporter-tagged
+  https://gitlab.com/djerius/cxc-exporter-util
 
 You can submit code changes by forking the repository, pushing your code
 changes to your clone, and then submitting a merge request. Detailed
@@ -115,7 +115,7 @@ at this website:
 
 or via email to:
 
-  bug-cxc-exporter-tagged@rt.cpan.org
+  bug-cxc-exporter-util@rt.cpan.org
 
 or via email to:
 

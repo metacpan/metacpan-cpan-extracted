@@ -37,6 +37,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
   ok(SPVM::TestCase::Regex->match_zero_more);
   ok(SPVM::TestCase::Regex->match_forward);
   ok(SPVM::TestCase::Regex->match);
+  ok(SPVM::TestCase::Regex->split);
 
   # Extra
   {

@@ -12,7 +12,7 @@
 @copying
 This manual describes how to install and use Chart, version @value{VERSION}.
 
-Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2019 Kevin Ryde
+Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2019, 2023 Kevin Ryde
 
 Chart is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software
@@ -5312,7 +5312,8 @@ include derived forms like the graphs drawn by Chart).
 
 @uref{http://finance-quote.sourceforge.net}
 
-If you have the @code{Finance::Quote} package installed Chart can use it for
+If you have the @code{Finance::Quote} package installed then Chart can use it
+for
 
 @itemize
 @item
@@ -5320,15 +5321,18 @@ Quotes for all stocks on all FQ methods.
 @end itemize
 
 @cindex @code{.FQ}
-In Chart symbols are of the form @samp{CODE.method.FQ}, for example
-@samp{FBGRX.fidelity.FQ} for Fidelity fund @samp{FBGRX} using the
-Finance-Quote @code{fidelity} method.
-@c SYMBOL: FBGRX.fidelity.FQ
+In Chart, symbols are of the form @samp{CODE.method.FQ}, for example common
+stock fund ``C'' from the tsp method (@code{Finance::Quote::TSP})
 
-A number of the FQ methods are covered by Chart natively (like US shares and
-indexes from Yahoo for instance).
+@example
+C.tsp.FQ
+@end example
+@c SYMBOL: C.tsp.FQ
 
-When using an FQ method not in the builtin defaults, you can add it to the
+Some of the FQ methods are covered by Chart natively (like US shares and
+indexes from Yahoo).
+
+An FQ method not in the default builtin packages must be added to the
 @env{FQ_LOAD_QUOTELET} environment variable in the usual way.  Chart also
 tries a module of the same name as the method (case insensitive), so for
 simple add-ons you might not need to configure anything.

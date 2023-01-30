@@ -9,6 +9,7 @@ BEGIN { $ENV{SPVM_BUILD_DIR} = "$FindBin::Bin/.spvm_build"; }
 use File::Temp;
 
 use SPVM 'TestCase::Sys::IO';
+use SPVM 'Sys::IO';
 
 use IO::Poll;
 

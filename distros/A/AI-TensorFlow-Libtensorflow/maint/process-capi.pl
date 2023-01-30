@@ -271,6 +271,14 @@ package TF::CAPI::Extract {
 		die "Duplicated functions @dupes" if @dupes;
 
 		my @data = $self->fdecl_data->@*;
+
+		say <<~STATS;
+		Statistics:
+		==========
+		Attached functions: @{[ scalar keys %$functions ]}
+		Total CAPI functions: @{[ scalar @data ]}
+		STATS
+
 		my $first_missing_function = first {
 			! exists $functions->{$_->{func_name}}
 			&&
@@ -279,6 +287,7 @@ package TF::CAPI::Extract {
 				$_->{fdecl} =~ /\(\s*\Q$first_arg\E\s*\*/
 			)
 		} @data;
+		say "Missing function:";
 		use DDP; p $first_missing_function;
 	}
 

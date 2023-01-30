@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2020, 2021 Kevin Ryde
+# Copyright 2020, 2021, 2022 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -31,7 +31,8 @@ use MyGraphs;
 
 use Graph::Maker::Keller;
 
-# GP-DEFINE  read("my-oeis.gp");
+# GP-DEFINE  read("OEIS-data.gp");
+# GP-DEFINE  read("OEIS-data-wip.gp");
 
 
 #------------------------------------------------------------------------------
@@ -70,7 +71,7 @@ MyOEIS::compare_values
 
 # GP-DEFINE  NumVertices(n) = 4^n;
 # GP-Test  NumVertices(2) == 16
-# GP-DEFINE  A292056 = OEIS_bfile_func("A292056");
+# GP-DEFINE  A292056 = OEIS_data_func("A292056");
 # GP-DEFINE  W(n) = A292056(n);
 # GP-Test  W(2) == 200
 # vector(10,n,n++; 2*W(n) / NumVertices(n))

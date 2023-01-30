@@ -33,7 +33,7 @@ use GT::DateTime;
 # uncomment this to run the ### lines
 #use Smart::Comments;
 
-our $VERSION = 269;
+our $VERSION = 270;
 
 # extra appended to GT::Prices elements giving the tdate etc corresponding
 # to the $DATE element
@@ -189,7 +189,7 @@ as many as available).  For example to get the last 250 trading days,
 
 Return the company name for the stock C<$symbol>, or C<undef> if unknown.
 
-For most applications use C<< $db->get_name() >> instead (see C<GT::DB>),
+For most applications, use C<< $db->get_name() >> instead (see C<GT::DB>),
 since it tries your F<~/.gt/sharenames> file if nothing from
 C<get_db_name()>.
 

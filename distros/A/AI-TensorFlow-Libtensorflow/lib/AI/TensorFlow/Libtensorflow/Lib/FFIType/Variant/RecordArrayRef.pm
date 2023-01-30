@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Lib::FFIType::Variant::RecordArrayRef;
 # ABSTRACT: Turn FFI::Platypus::Record into packed array (+ size)?
-$AI::TensorFlow::Libtensorflow::Lib::FFIType::Variant::RecordArrayRef::VERSION = '0.0.4';
+$AI::TensorFlow::Libtensorflow::Lib::FFIType::Variant::RecordArrayRef::VERSION = '0.0.6';
 use strict;
 use warnings;
 use FFI::Platypus::Buffer qw(scalar_to_buffer buffer_to_scalar);
@@ -75,7 +75,7 @@ Zakariyya Mughal <zmughal@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Auto-Parallel Technologies, Inc.
+This software is Copyright (c) 2022-2023 by Auto-Parallel Technologies, Inc.
 
 This is free software, licensed under:
 

@@ -16,7 +16,7 @@ sdif - side-by-side diff viewer for ANSI terminal
 
 =head1 VERSION
 
-Version 4.23.1
+Version 4.24.0
 
 =head1 SYNOPSIS
 
@@ -45,6 +45,7 @@ Version 4.23.1
     --mark=position	mark position (right, left, center, side) or no
     --column=order	set column order (default ONM)
     --view, -v		viewer mode
+    --parallel, -V	treat unknown text as common part
     --ambiguous=s	ambiguous character width (detect, wide, narrow)
     --[no]command	print diff control command (default on)
     --[no]prefix	process git --graph output (default on)
@@ -132,6 +133,7 @@ use Getopt::EX::Hashed; {
     has runin          => '  =i ' ;
     has runout         => '  =i ' ;
     has view           => 'v !  ' ;
+    has parallel       => 'V !  ' ;
     has ambiguous      => '  =s ' , default => 'narrow' ;
     has command        => '  !  ' , default => 1 ;
     has diff           => '  =s ' , default => 'diff' ;
@@ -587,8 +589,41 @@ while (<DIFF>) {
 	my @buf = $read_unified_3->(*DIFF, $2 // 1, $4 // 1, $6 // 1);
 	flush_buffer_3(@buf);
     }
+    #
+    # conflict marker
+    #
+    elsif (/^<<<<<<<\s+(.*)/) {
+      CONFLICT:
+	{
+	    my $c1 = $_;
+
+	    my @old = read_until { /^=======$/ } *DIFF;
+	    my $c2 = pop @old // do {
+		flush_unknown($c1, @old);
+		last;
+	    };
+
+	    my @new = read_until { /^>>>>>>>\s+(.*)/ } *DIFF;
+	    my $c3 = pop @new // do {
+		flush_unknown($c1, @old, $c2, @new);
+		last;
+	    };
+
+	    my $mrg = first { $old[$_] eq "|||||||\n" } 0 .. $#old;
+	    if (defined $mrg) {
+		my($mark, @mrg) = splice @old, $mrg;
+		s/^/--/ for @old, @new;
+		s/^/++/ for @mrg;
+		flush_buffer_3([], \@old, \@new, \@mrg);
+	    } else {
+		s/^/-/ for @old;
+		s/^/+/ for @new;
+		flush_buffer([], \@old, \@new);
+	    }
+	}
+    }
     else {
-	print $painter->('UNKNOWN', $_);
+	flush_unknown($_);
     }
 }
 continue {
@@ -644,6 +679,14 @@ sub merge_diffc {
     }
 
     @buf;
+}
+
+sub flush_unknown {
+    if ($app->parallel) {
+	flush_buffer( [ map s/^/ /r, @_ ] );
+    } else {
+	print $painter->('UNKNOWN', $_) for @_;
+    }
 }
 
 sub flush_buffer {
@@ -1089,6 +1132,13 @@ Show table of ANSI 216 colors.
 
 Viewer mode.  Display each files in straightforward order.  Without
 this option, unchanged lines are placed at the same position.
+
+=item B<-V>, B<--parallel>
+
+B<sdif> processes only looks-like-diff-output data and print anything
+else as is to standard out.  Option C<-V> or C<--parralel> makes
+unknown text as common to old and new data.  This is useful to see
+file including conflict marker data compatible with L<git(1)>.
 
 =item B<--ambiguous>=I<width_spec>
 

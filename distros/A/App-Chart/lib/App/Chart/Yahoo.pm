@@ -1,4 +1,4 @@
-# Copyright 2007, 2008, 2009, 2010, 2011, 2015, 2016, 2017, 2019, 2020 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2015, 2016, 2017, 2019, 2020, 2023 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -74,8 +74,8 @@ App::Chart::setup_source_help
 #
 # Eg. http://finance.yahoo.com/q?s=BHP.AX
 #
-# The accelerator is "_Y" so as not to clash with "_S" for stock on various
-# stock exchange links like "ASX IRM _Stock Information"
+# The accelerator key is "_Y" so as not to clash with "_S" for shares on
+# various stock exchange links like "ASX IRM _Stock Information"
 
 App::Chart::Weblink->new
   (pred => $yahoo_pred,
@@ -89,28 +89,6 @@ App::Chart::Weblink->new
          . "/q?s="
            . URI::Escape::uri_escape($symbol);
    });
-
-
-#-----------------------------------------------------------------------------
-# misc
-
-
-# 	    (if (and (yahoo-futures-symbol? symbol)
-# 		     (not (chart-symbol-mdate symbol)))
-# 		(let* ((want-tdate (adate->tdate
-# 				    (first
-# 				     (yahoo-quote-adate-time symbol ""))))
-# 		       (mdate (or (latest-symbol-mdate-nodownload symbol
-# 								  want-tdate)
-# 				  (begin
-# 				    (weblink-message
-# 				     (_ "Finding front month ..."))
-# 				    (latest-symbol-mdate symbol want-tdate)))))
-# 		  (if mdate # might still be unknown
-# 		      (set! symbol
-# 			    (string-append (chart-symbol-commodity symbol)
-# 					   (mdate->MYY-str mdate)
-# 					   (chart-symbol-suffix symbol))))))
 
 
 #-----------------------------------------------------------------------------
@@ -207,7 +185,7 @@ sub exchanges_parse {
 
 
 #------------------------------------------------------------------------------
-# latest
+# Latest
 #
 # https://stackoverflow.com/questions/47076404/currency-helper-of-yahoo-sorry-unable-to-process-request-at-this-time-erro
 # ->
@@ -294,7 +272,7 @@ sub latest_parse {
             = crunch_trailing_nines($aref->[$#$timestamps]);
 
           # "change" from second last timestamp, if there is one.
-          # As of Nov 17, XAUUSD=X only ever gives a single latest quote
+          # As of Nov 2017, XAUUSD=X only ever gives a single latest quote
           # from v7, no previous day to compare.
           #
           if (defined $last
@@ -322,7 +300,7 @@ sub latest_parse {
 
 
 #-----------------------------------------------------------------------------
-# download
+# Download Data
 #
 # This uses the historical prices page like
 #
@@ -332,13 +310,13 @@ sub latest_parse {
 #
 #     Set-Cookie: B=fab5sl9cqn2rd&b=3&s=i3; expires=Sun, 03-Sep-2018 04:56:13 GMT; path=/; domain=.yahoo.com
 #
-# and contains buried within a mountain of hideous script
+# and contains buried within a megabyte mountain of hideous script
 #
-#     "CrumbStore":{"crumb":"hdDX\u002FHGsZ0Q"}
+#     "user":{"crumb":"hdDX\u002FHGsZ0Q",
 #
-# The \u002F is backslash character (etc) which is script string for "/"
-# character.  The crumb is included in a CSV download query like (alas can't
-# use http, it redirects to https)
+# The \u002F is backslash escape for "/" character.
+# The crumb is included in a CSV download query like the following
+# (alas can't use http, it redirects to https)
 #
 #     https://query1.finance.yahoo.com/v7/finance/download/AMP.AX?period1=1503810440&period2=1504415240&interval=1d&events=history&crumb=hdDX/HGsZ0Q
 #
@@ -366,16 +344,17 @@ sub latest_parse {
 #     2017-05-22,1/5
 #
 #----------------
-# For reference, there's a similar further which is json format (%7C = "|")
+# For reference, there's a "v8" which is json format (%7C = "|")
 #
 #     https://query2.finance.yahoo.com/v8/finance/chart/IBM?formatted=true&lang=en-US&region=US&period1=1504028419&period2=1504428419&interval=1d&events=div%7Csplit&corsDomain=finance.yahoo.com
 #
 # This doesn't require a cookie and crumb, has some info like symbol
-# timezone.  The numbers look like they're rounded through 32-bit floating
-# point, for example "142.55999755859375" which is 142.55 in a 23-bit
-# mantissa.  log(14255000)/log(2) = 23.76 bits
+# timezone.  The numbers look like they're rounded through 32-bit single
+# precision floating point, for example "142.55999755859375" which is 142.55
+# in a 23-bit mantissa.  log(14255000)/log(2) = 23.76 bits
+# Are they about the same precision as the CSV ?
 #
-# FIXME: All prices look like they are split-adjusted, which is ok if that's
+# FIXME: All prices look like they're split-adjusted, which is ok if that's
 # what you want and are downloading a full data set, but bad for incremental
 # since you don't know when a change is applied.
 #
@@ -705,16 +684,18 @@ sub daily_cookie_parse {
   my ($content, $resp) = @_;
 
   # script like, with backslash escaping on "\uXXXX"
-  #"CrumbStore":{"crumb":"hdDX\u002FHGsZ0Q"}
+  #   "user":{"crumb":"hdDX\u002FHGsZ0Q",
+  # The form prior to about January 2023 was
+  #   "CrumbStore":{"crumb":"hdDX\u002FHGsZ0Q"}
   #
-  $content =~ /"CrumbStore":\{"crumb":"([^"]*)"}/
-    or die "Yahoo daily data: CrumbStore not found";
+  $content =~ /"user":\{"crumb":"([^"]*)"/
+    or die "Yahoo daily data: CrumbStore not found in parse";
   my $crumb = App::Chart::Yahoo::javascript_string_unquote($1);
 
   # header like
   # Set-Cookie: B=fab5sl9cqn2rd&b=3&s=i3; expires=Sun, 03-Sep-2018 04:56:13 GMT; path=/; domain=.yahoo.com
   #
-  # Expiry time is +1 year, but dunno if would really work that long.
+  # Expiry time is +1 year.  Who knows whether would really work that long.
   # 
   require HTTP::Cookies;
   my $jar = HTTP::Cookies->new;

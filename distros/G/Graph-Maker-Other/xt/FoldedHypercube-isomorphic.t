@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2019 Kevin Ryde
+# Copyright 2019, 2022 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -38,9 +38,12 @@ use MyGraphs;
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-plan tests => 26;
+plan tests => 38;
 
 require Graph::Maker::FoldedHypercube;
+
+# /m/graph/hypercube-folded
+# A295921 Number of (not necessarily maximum) cliques in the n-folded cube graph.
 
 
 #------------------------------------------------------------------------------
@@ -97,17 +100,51 @@ foreach my $N (3,5,7,9) {
 
 #------------------------------------------------------------------------------
 # Cliques
+#
+# Clique number 2 means the cliques are an empty (1 of), each vertex a
+# clique size 1, and each edge a clique size 2.
+#
+# That the clique number is only 2 is since two neighbours by flipping a
+# single bit don't have an edge between (to make a triangle) as that would
+# be 2 bits flipped.  For N=3, the all bits flip is 2 bits, but not
+# otherwise.
 
+
+# A295921
+my @want_total_cliques = (2, 2, 4, 16, 25, 57, 129, 289);
+# GP-DEFINE  num_cliques(n) = {
+# GP-DEFINE    if(n <= 1, num_vertices(n) + 1,
+# GP-DEFINE       n == 3, 16, \
+# GP-DEFINE       num_vertices(n) + num_edges(n) + 1);
+# GP-DEFINE  }
+#  vector(8,n,n--;  num_cliques(n)) == [2, 2, 4, 16, 25, 57, 129, 289]
+# vector(20,n,n--;  num_cliques(n))
+
+# clique number = / 1     if N=0 or 1
+#                 | 4     if N=3
+#                 \ 2     otherwise
+#               = 1, 1, 2, 4, 2, 2, 2, ...
+# not in OEIS: 1,1,2,4,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2
 sub want_clique_number {
   my ($N) = @_;
   return ($N <= 1 ? 1
           : $N == 3 ? 4
           : 2);
 }
+
+my @want_indnum       = (1,1,1, 1,4, 5);
+my @want_indnum_count = (1,1,2, 4,2,16);
+
 foreach my $N (0 .. 8) {
   my $graph = Graph::Maker->new('folded_hypercube', undirected => 1,
-                                 N => $N);
+                                N => $N);
   ok (MyGraphs::Graph_clique_number($graph), want_clique_number($N));
+
+  if ($N <= 5) {
+    my ($indnum,$count) = MyGraphs::Graph_indnum_and_count($graph);
+    ok ($indnum, $want_indnum[$N]);
+    ok ($count, $want_indnum_count[$N]);
+  }
 }
 
 
@@ -157,7 +194,7 @@ foreach my $N (0 .. 8) {
     my $content = File::Slurp::read_file
       (File::Spec->catfile($FindBin::Bin,
                            File::Spec->updir,
-                           'devel','lib','Graph','Maker','FoldedHypercube.pm'));
+                           'lib','Graph','Maker','FoldedHypercube.pm'));
     $content =~ /=head1 HOUSE OF GRAPHS.*?=head1/s or die;
     $content = $&;
     my $count = 0;
@@ -168,9 +205,9 @@ foreach my $N (0 .. 8) {
         $shown{"N=$N"} = $+{'id'};
       }
     }
-    ok ($count, 6, 'HOG ID number lines');
+    ok ($count, 8, 'HOG ID number lines');
   }
-  ok (scalar(keys %shown), 7);
+  ok (scalar(keys %shown), 9);
   ### %shown
 
   my $extras = 0;

@@ -33,7 +33,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Story-Interact";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001002>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001003>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001004>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001005>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001002>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001003>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001004>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001005>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001006>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-story-interact>;
@@ -88,6 +88,20 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Story-Interact-0.001005.tar.gz>;
 	doap:revision        "0.001005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001006>
+	a                    doap:Version;
+	dc:identifier        "Story-Interact-0.001006"^^xsd:string;
+	dc:issued            "2023-01-28"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Regexp fixes.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Story-Interact-0.001006.tar.gz>;
+	doap:revision        "0.001006"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

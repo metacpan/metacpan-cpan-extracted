@@ -1,0 +1,36 @@
+NAME
+    Alien::Font::Vera - Access to Vera truetype file
+
+SYNOPSIS
+        use Alien::Font::Vera;
+    
+        my $path = Alien::Font::Vera::path;
+
+DESCRIPTION
+    This module was created as an optional dependency of Project2::Gantt to
+    have access to a ttf font file.
+
+    Thus only the .ttf file is provided since this is what Imager can read.
+
+    Distros might redirect to pre-existing resources.
+
+FONT
+    Vera font is provided using the Bitstream license (share/License.txt)
+    also present in this package.
+
+AUTHOR
+    Bruno Ramos <bramos@cpan.org>
+
+ACKNOWLEDGEMENTS
+    This module is inspired by Alien::Font::Uni from Herbert Breunung
+
+COPYRIGHT
+    Copyright(c) 2023 by Bruno Ramos
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+    The included Vera font is licensed under the Bitstream License (see
+    share/License.txt)
+

@@ -20,11 +20,6 @@ use Math::BigInt;
 use Math::BigFloat;
 use Math::BigRat;
 require Data::Dumper;
-for my $modname (qw/Data::Dumper Math::BigInt Math::BigFloat Math::BigRat/) {
-  (my $modpath = "${modname}.pm") =~ s/::/\//g;
-  no strict 'refs';
-  diag "Loaded ", $INC{$modpath}, " VERSION=",u(${"${modname}::VERSION"}), "\n";
-}
 
 my $inf = 9**9**9;
 my $nan = -sin($inf);

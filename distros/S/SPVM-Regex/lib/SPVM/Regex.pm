@@ -1,6 +1,6 @@
 package SPVM::Regex;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 1;
 
@@ -223,6 +223,12 @@ The offset must be greater than or equal to 0. Otherwise an exception will be th
 The offset + the length must be less than or equal to the length of the string. Otherwise an exception will be thrown.
 
 Internally L<match_forward|/"match_forward"> is used for the pattern matching.
+
+=head2 split
+
+  method split : string[] ($string : string, $limit = 0 : int);
+
+The same as the L<split||SPVM::Fn/"split"> method in the L<Fn|SPVM::Fn> class, but the separator is a regular expression.
 
 =head3 Options of replace_common
 

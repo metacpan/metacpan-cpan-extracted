@@ -2026,7 +2026,7 @@ our $echo_eating = 0;                             # Older versions of gnuplot on
 our $debug_echo = 0;                              # If set, mock up Losedows half-duplex pipes
 
 
-our $VERSION = '2.021';
+our $VERSION = '2.023';
 $VERSION = eval $VERSION;
 
 our $gp_version = undef;    # eventually gets the extracted gnuplot(1) version number.
@@ -2386,7 +2386,7 @@ FOO
 	    }
 
 	    ### Terminals that support anti-aliasing all broadcast their format so that rpic can handle them.
-	    if( defined $termTab->{terminal}->{image_format}) {
+	    if( defined $termTab->{$terminal}->{image_format}) {
 		$this->{image_format}= $termTab->{$terminal}->{image_format};
 	    } else {
 		delete($this->{image_format});
@@ -2448,6 +2448,10 @@ sub close
     restart($this);
     if(defined $this->{aa} && $this->{aa} && $this->{aa} != 1 && $this->{aa_ready}) {
 	eval "use PDL::Transform; use PDL::IO::Pic;";  # load when needed
+	unless( rpiccan($this->{image_format}) and wpiccan($this->{image_format})  ) {
+		carp "Can not read/write $this->{image_format} for anti-aliasing. Skipping aa operation.";
+		return;
+	}
 	my $im = rpic($this->{options}->{output},{FORMAT=>$this->{image_format}});
 	if($im->ndims==3) {
 	    $im = $im->mv(0,-1);
@@ -2455,6 +2459,7 @@ sub close
 	# gamma-correct before scaling, and put back after.
 	my $imf = ((float $im)/255.0)->clip(0,1) ** 2.2;
 	$imf = $imf->match( [ $im->dim(0)/$this->{aa}, $im->dim(1)/$this->{aa} ], {method=>'h',blur=>0.5});
+	$imf->check_badflag;
 	$im = byte(($imf ** (1/2.2)) * 255);
 	if($im->ndims==3){
 	    $im = $im->mv(-1,0);
@@ -3981,45 +3986,44 @@ FOO
 		}
 	    }
 	    return @data;
-	} else {
-	    # At least one of the data columns is a non-PDL.  Force them to be simple columns, and
-	    # require exact dimensional match.
-	    #
-	    # Also, convert any contained PDLs to list refs.
-
-	    my $nelem;
-	    my @out = ();
-
-	    for(@data) {
-		barf "plot(): only 1-D PDLs are allowed to be mixed with array ref data\n"
-		    if( $_->$_isa('PDL')   and   $_->ndims > 1 );
-
-		if((ref $_) eq 'ARRAY') {
-		    barf "plot(): row count mismatch:  ".(0+@$_)." != $nelem\n"
-			if( (defined $nelem) and (@$_ != $nelem) );
-		    $nelem = @$_;
-
-		    for (@$_) {
-			barf "plot(): nested references not allowed in list data\n"
-			    if( ref($_) );
-		    }
-
-		    push(@out, $_);
-
-		} elsif(  $_->$_isa('PDL')  ) {
-		    barf "plot(): nelem disagrees with row count: ".$_->nelem." != $nelem\n"
-			if( (defined $nelem) and ($_->nelem != $nelem) );
-		    $nelem = $_->nelem;
-
-		    push(@out, [ $_->list ]);
-
-		} else {
-		    barf "plot(): problem with dim checking.  This should never happen.";
-		}
-	    }
-
-	    return @out;
 	}
+	# At least one of the data columns is a non-PDL.  Force them to be simple columns, and
+	# require exact dimensional match.
+	#
+	# Also, convert any contained PDLs to list refs.
+
+	my $nelem;
+	my @out = ();
+
+	for(@data) {
+	    barf "plot(): only 1-D PDLs are allowed to be mixed with array ref data\n"
+		if( $_->$_isa('PDL')   and   $_->ndims > 1 );
+
+	    if((ref $_) eq 'ARRAY') {
+		barf "plot(): row count mismatch:  ".(0+@$_)." != $nelem\n"
+		    if( (defined $nelem) and (@$_ != $nelem) );
+		$nelem = @$_;
+
+		for (@$_) {
+		    barf "plot(): nested references not allowed in list data\n"
+			if( ref($_) );
+		}
+
+		push(@out, $_);
+
+	    } elsif(  $_->$_isa('PDL')  ) {
+		barf "plot(): nelem disagrees with row count: ".$_->nelem." != $nelem\n"
+		    if( (defined $nelem) and ($_->nelem != $nelem) );
+		$nelem = $_->nelem;
+
+		push(@out, [ $_->list ]);
+
+	    } else {
+		barf "plot(): problem with dim checking.  This should never happen.";
+	    }
+	}
+
+	return @out;
     } # end of matchDims (nested in plot)
 }  # end of plot
 
@@ -4491,23 +4495,14 @@ EOC
 	}
     }
 
-
-    if(wantarray) {
-	return ($x,$y, ($ch>=32)?chr($ch):undef,
-		{
-		    'b'=>$b,
-		    'm'=>($sft?"S":"").($alt?"A":"").($ctl?"C":"")
-		}
-	    );
-    } else {
-	return {
+    my $bm = { b=>$b, m=>($sft?"S":"").($alt?"A":"").($ctl?"C":"") };
+    return wantarray ? ($x,$y, ($ch>=32)?chr($ch):undef, $bm) :
+	{
 	    'x' => $x,
 	    'y' => $y,
-            'b' => $b,
 	    'k' => ($ch<0) ? "" : ($ch > 32 && $ch != 127) ? chr($ch) : sprintf("#%3.3d",$ch),
-	    'm' => ($sft?"S":"").($alt?"A":"").($ctl?"C":"")
+            %$bm,
 	};
-    }
 }
 
 =pod
@@ -4713,10 +4708,9 @@ EOMSG
 
     return $poly;
 
-use PDL::NiceSlice;
     sub __del { my($w, $c, $p) = @_;
 	   return unless( ($$p)->$_isa('PDL')  and  (($$p)->dim(1)>0) );
-	   $$p = $$p->(:,xvals($$p->dim(1)-1))->sever;
+	   $$p = $$p->slice(',0:-2')->sever;
 	   return;
     }
 
@@ -4725,9 +4719,6 @@ use PDL::NiceSlice;
     sub __add { my($w,$c,$p,$x,$y,$m) = @_;
 		$$p = $$p->glue(1,pdl($x,$y));
     }
-
-no PDL::NiceSlice;
-
 }
 
 =pod
@@ -4810,20 +4801,10 @@ sub _expand_abbrev {
 	}
     }
 
-    if(exists($abbrevs->{$sl})) {
-	if(@{$abbrevs->{$sl}}>1) {
-	    barf "Error: ambiguous $name: '$s' could be one of { ".join(", ",@{$abbrevs->{$sl}})." }\n";
-	} else {
-	    if(wantarray) {
-		return ($abbrevs->{$sl}->[0],$snum);
-	    } else {
-		return $abbrevs->{$sl}->[0];
-	    }
-	}
-    } else {
-	die "No $name found that matches '$s'\n";
-    }
-    barf "This can't happen";
+    die "No $name found that matches '$s'\n" if !exists $abbrevs->{$sl};
+    barf "Error: ambiguous $name: '$s' could be one of { ".join(", ",@{$abbrevs->{$sl}})." }\n"
+	if @{$abbrevs->{$sl}}>1;
+    return wantarray ? ($abbrevs->{$sl}->[0],$snum) : $abbrevs->{$sl}->[0];
 }
 
 ##########
@@ -4902,12 +4883,10 @@ our $pOptionsTable =
                     '[pseudo] Antonym for "binary" (default is 0 for non-Microsoft platforms).'    ],
     'device'     => [ sub { my ($old, $new, $hash) = @_;
 			    barf "Can't set device while in multiplot mode!\n" if($hash->{multiplot});
-			    if( $new =~ m/^(.*)\/([^\/]*)$/ ) {
-				$hash->{terminal} = $2;
-				$hash->{output}   = $1 || undef;
-			    } else {
-				barf("Device option format: [<filename>]/<terminal-type>\n");
-			    }
+			    barf "Device option format: [<filename>]/<terminal-type>\n"
+				if $new !~ m/^(.*)\/([^\/]*)$/;
+			    $hash->{terminal} = $2;
+			    $hash->{output}   = $1 || undef;
 			    return undef;
 		      },
 		      sub { "" }, undef, undef,
@@ -4915,18 +4894,14 @@ our $pOptionsTable =
 
     'hardcopy'  => [ sub { my ($old, $new, $hash) = @_;
 			   barf "Can't set hardcopy while in multiplot mode!\n" if($hash->{multiplot});
-			   if( $new =~ m/\.([a-z]+)$/i) {
-			       my $suffix = lc $1;
-			       if($hardCopySuffixes->{$suffix}) {
-				   $hash->{terminal} = $hardCopySuffixes->{$suffix};
-				   $hash->{output} = $new;
-				   return undef;
-			       } else {
-				   die "hardcopy: couldn't identify file type from '$new'\n";
-			       }
-			   } else {
-			       die "hardcopy: need a file suffix to infer file type\n";
-			   }
+			   die "hardcopy: need a file suffix to infer file type\n"
+			       if $new !~ m/\.([a-z]+)$/i;
+			   my $suffix = lc $1;
+			   die "hardcopy: couldn't identify file type from '$new'\n"
+			       if !$hardCopySuffixes->{$suffix};
+			   $hash->{terminal} = $hardCopySuffixes->{$suffix};
+			   $hash->{output} = $new;
+			   return undef;
 		     }, sub {""},undef,undef,
 		     '[pseudo] Shorthand for device spec.: standard image formats inferred by suffix'    ],
 
@@ -4972,21 +4947,16 @@ our $pOptionsTable =
 
 
     'perceptual'=>[sub { my($old,$new,$this) = @_;
-			  eval "use PDL::Transform::Color";
+			  eval { require PDL::Transform::Color };
 			  barf("pseudocolor option requires PDL::Transform::Color, which is not present")
 			      unless($PDL::Transform::Color::VERSION);
 			  return $new;
 		    },
 		    sub { my($k, $v, $h) = @_;
-			  my $s = "";
-			  my $t;
 			  return unless (defined($v));
-			  eval {
-			      if(ref($v) eq 'ARRAY') {
-				  $t = PDL::Transform::Color::t_pcp(@$v);
-			      } else {
-				  $t = PDL::Transform::Color::t_pcp($v);
-			      }
+			  my $s = "";
+			  my $t = eval {
+			      PDL::Transform::Color::t_pcp(ref($v) eq 'ARRAY' ? @$v : $v);
 			  };
 			  if($@){
 			      my $a=$@;
@@ -5012,25 +4982,20 @@ our $pOptionsTable =
 		    '[pseudo] Use PDL::Transform::Color photometric palette: "pseudocolor=>\'heat\'"' ],
 
     'pseudocolor'=>[sub { my($old,$new,$this) = @_;
-			  eval "use PDL::Transform::Color";
+			  eval { require PDL::Transform::Color };
 			  barf("pseudocolor option requires PDL::Transform::Color, which is not present")
 			      unless($PDL::Transform::Color::VERSION);
 			  return $new;
 		    },
 		    sub { my($k, $v, $h) = @_;
-			  my $s = "";
-			  my $t;
 			  return unless(defined($v));
 			  if(defined($h->{'perceptual'})){
 			      print STDERR "Warning: 'perceptual'/'pcp' pseudocolor option overriding 'pseudocolor'/'pc'\n";
 			      return;
 			  }
-			  eval {
-			      if(ref($v) eq 'ARRAY') {
-				  $t = PDL::Transform::Color::t_pc(@$v);
-			      } else {
-				  $t = PDL::Transform::Color::t_pc($v);
-			      }
+			  my $s = "";
+			  my $t = eval {
+			      PDL::Transform::Color::t_pc(ref($v) eq 'ARRAY' ? @$v : $v);
 			  };
 			  if($@){
 			      my $a = $@;
@@ -5042,7 +5007,6 @@ our $pOptionsTable =
 
 			  my $grey = xvals(2049)/2048;
 			  my $rgb = $grey->apply($t);
-
 
 			  my $last_str = "";
 			  my @s = ();
@@ -5100,20 +5064,16 @@ use warnings;
 		    '[pseudo] marker for the global plot object'    ],
 
     'justify'   => [sub { my($old,$new,$opt) = @_;
-			  if(!defined($new)){
-			      return undef;
-			  }
+			  return undef if !defined $new;
 			  if($new > 0) {
 			      $opt->{'size'} = ["ratio ".(-$new)];
 			      return undef;
-			  } elsif($new<0) {
-			      die "justify: positive value needed\n";
-			  } else {
-			      if(defined($opt->{'size'}) and $opt->{'size'}->[0] =~ m/ratio/) {
-				  $opt->{'size'} = undef;
-			      }
-			      return undef;
 			  }
+			  die "justify: positive value needed\n" if $new<0;
+			  if(defined($opt->{'size'}) and $opt->{'size'}->[0] =~ m/ratio/) {
+			      $opt->{'size'} = undef;
+			  }
+			  return undef;
 		    },
 		    sub { '' }, undef, undef,
 		    '[pseudo] Set aspect ratio (equivalent to: size=>["ratio",<r>])'    ],
@@ -5123,10 +5083,8 @@ use warnings;
 			      $opt->{'view'} = [] unless defined($opt->{'view'});
 			      @{$opt->{'view'}}[2..5] = ($new, $new, "equal", "xyz");
 			      return undef;
-                          } else {
-			      delete($opt->{'size'}) if(exists($opt->{'size'}));
-			      delete $opt->{'view'} if(exists($opt->{'view'}));
-			  }
+                          }
+			  delete @$opt{qw(size view)};
 		    },
                     sub { return '' }, undef, undef,
 		    '[pseudo] Set aspect ratio to square (equivalent to: size=["ratio",1])'    ],
@@ -5440,11 +5398,8 @@ our $cOptionsTable = {
          # the output string just specifies STDIN.   The magic output string gets replaced post facto with the test and
          # real output format specifiers.
     'cdims'     => [sub { my $s = _def($_[1], 0);  # Number of dimensions in a column
-			  if($s==0 or $s==1 or $s==2) {
-			      return $s;
-			  } else {
-			      barf "Curve option 'cdims' must be one of 0, 1, or 2\n";
-			  }
+			  barf "Curve option 'cdims' must be one of 0, 1, or 2\n" unless $s==0 or $s==1 or $s==2;
+			  return $s;
 		    },
 		    sub { return ""}],
     'data'     => [sub { barf "mustn't specify data as a curve option...\n" },
@@ -5758,15 +5713,11 @@ sub _parseOptHash {
 	    } elsif (  0+@$parser == 1 )  {
 		# A list ref with a single element - it's a regexp to match
 		my $a = $parser->[0];
-		my $p = sub {
+		$parser = sub {
 		    my ($old, $newparam, $hash) = @_;
-		    if($newparam =~ m/$a/) {
-			return $newparam;
-		    } else {
-			barf("Unknown field $newparam (must match m/$a/)\n");
-		    }
+		    barf("Unknown field $newparam (must match m/$a/)\n") if $newparam !~ m/$a/;
+		    return $newparam;
 		};
-		$parser = $p;
 	    } else {
 		# A list ref with multiple elements - they are enums.
 		# Make a temporary abbrev list for 'em.
@@ -5817,12 +5768,9 @@ $_pOHInputs = {
 		 return "" unless(length($_[1]));                                 # false value yields false
 		 return $_[1] if( (!ref($_[1])) && "$_[1]" =~ m/^\s*\-?\d+\s*$/); # nonzero integers yield true
 		 # Not setting a boolean value - it's a list (or a trivial list).
-		 if(ref $_[1] eq 'ARRAY') {
-		     return $_[1];
-		 } else {
-		     # anything that's not an array ref (and not a number) gets put in the array
-		     return [$_[1]];
-		 }
+		 return $_[1] if ref $_[1] eq 'ARRAY';
+		 # anything that's not an array ref (and not a number) gets put in the array
+		 return [$_[1]];
     },
 
     ## one-line list (no booleanity: scalars always get copied to the list)
@@ -5837,12 +5785,8 @@ $_pOHInputs = {
 		 return "" unless(length($_[1]));                                 # false value yields false
 		 return $_[1] if( (!ref($_[1])) && "$_[1]" =~ m/^\s*\-?\d+\s*$/); # nonzero integers yield true
 		 # Not setting a boolean value - it's a list (or a trivial list).
-		 if(ref $_[1] eq 'ARRAY'   or   ref $_[1] eq 'HASH') {
-		     return $_[1];
-		 } else {
-#		     return [ split( /\s+/, $_[1] ) ];
-		     return [$_[1]];
-		 }
+		 return $_[1] if ref $_[1] eq 'ARRAY' or ref $_[1] eq 'HASH';
+		 return [$_[1]];
                 },
 
     ## list or 2-PDL for a range parameter
@@ -5850,16 +5794,11 @@ $_pOHInputs = {
 		 return "" unless(length($_[1]));                                 # false value yields false
 		 return $_[1] if( (!ref($_[1])) && "$_[1]" =~ m/^\s*\-?\d+\s*$/); # nonzero integers yield true
 		 # Not setting a boolean value - it's a list (or a trivial list).
-		 if(ref $_[1] eq 'ARRAY') {
-		     return $_[1];
-		 } elsif( $_[1]->$_isa('PDL') ) {
-		     barf "PDL::Graphics::Gnuplot: range parser found a PDL, but it wasn't a 2-PDL (max,min)"
-			 unless( $_[1]->dims==1 and $_[1]->nelem==2 );
-		     return [$_[1]->list];
-		 } else {
-#		     return [ split( /\s+/, $_[1] ) ];
-		     return [$_[1]];
-		 }
+		 return $_[1] if ref $_[1] eq 'ARRAY';
+		 return [$_[1]] if !$_[1]->$_isa('PDL');
+		 barf "PDL::Graphics::Gnuplot: range parser found a PDL, but it wasn't a 2-PDL (max,min)"
+		     unless( $_[1]->dims==1 and $_[1]->nelem==2 );
+		 return [$_[1]->list];
                 },
 
     ## cumulative list (delete on "undef")
@@ -5868,11 +5807,7 @@ $_pOHInputs = {
 		 return 1 if( $_[1] && "$_[1]" =~ m/^\s*-?\d+\s*$/); # nonzero integers yield true
 		 # Not setting a boolean value - it's a list, so append it.
 		 my $out = (ref $_[0] eq 'ARRAY') ? $_[0] : [];
-		 if(ref $_[1] eq 'ARRAY') {
-		     push( @$out, $_[1] );
-		 } else {
-		     push( @$out, [ split ( /\s+/, $_[1] ) ] );
-		 }
+		 push @$out, ref $_[1] eq 'ARRAY' ? $_[1] : [ split ( /\s+/, $_[1] ) ];
 		 return $out;
                 },
 
@@ -6114,23 +6049,19 @@ sub _emit_colorspec {
 	$s .= " ".join(" ",@words);
 	return $s;
     }
-    elsif($PDL::Graphics::Gnuplot::colornames->{lc($words[0])}) {
+    if($PDL::Graphics::Gnuplot::colornames->{lc($words[0])}) {
 	$s .= " rgb " unless($s =~ m/rgb/);
 	$s .= " \"$words[0] \" ";
 	shift @words;
 	$s .= join(" ",@words)." ";
 	return $s;
-    } elsif($words[0] =~ m/(^[0-9]+$)|(variable)|(palette)/) {
-	return join(" ",($s,@words,""));
-    } else {
-	my $ww = join(" ",@words);
-	die <<"EOD";
-PDL::Graphics::Gnuplot: Unknown color spec '$ww'.
+    }
+    return join(" ",($s,@words,"")) if $words[0] =~ m/(^[0-9]+$)|(variable)|(palette)/;
+    die <<"EOD";
+PDL::Graphics::Gnuplot: Unknown color spec '@{[join(" ",@words)]}'.
   Use an integer, an '#RRGGBB' spec, 'variable', 'palette', or a name from
   the list in \@PDL::Graphics::Gnuplot::colornames.
 EOD
-    }
-    die "Can't get here!  (colorspec parser)";
 }
 
 ##############################
@@ -6154,25 +6085,19 @@ our $_OptionEmitters = {
     #### Default output -- a collection of terms with spaces between them as a plot option
     ' ' => sub { my($k,$v,$h) = @_;
 		 return "" unless(defined($v));
-		 if(ref $v eq 'ARRAY') {
-		     return join(" ",("set",$k,map { (defined $_)?$_:"" } @$v))."\n";
-		 } elsif(ref $v eq 'HASH') {
-		     return join(" ",("set",$k,%$v))."\n";
-		 } else {
-		     return join(" ",("set",$k,$v))."\n";
-		 }
+		 join(" ","set",$k,
+		     ref $v eq 'ARRAY' ? (grep defined, @$v) :
+		     ref $v eq 'HASH' ? %$v : $v
+		 )."\n";
                 },
 
     #### nomulti -- a default style plot option that is ignored in multiplot mode
     'nomulti' => sub { my($k,$v,$h) = @_;
 		 return "" unless((defined($v)) and !($h->{multiplot}));
-		 if(ref $v eq 'ARRAY') {
-		     return join(" ",("set",$k,map { (defined $_)?$_:"" } @$v))."\n";
-		 } elsif(ref $v eq 'HASH') {
-		     return join(" ",("set",$k,%$v))."\n";
-		 } else {
-		     return join(" ",("set",$k,$v))."\n";
-		 }
+		 join(" ","set",$k,
+		     ref $v eq 'ARRAY' ? (grep defined, @$v) :
+		     ref $v eq 'HASH' ? %$v : $v
+		 )."\n";
                 },
 
     #### Empty output - return nothing.
@@ -6190,7 +6115,7 @@ our $_OptionEmitters = {
     'qnm' => sub { my($k,$v,$h) = @_;
 		   return "" unless((defined($v) and !($h->{multiplot})));
 		   return "unset $k\n" unless(length($v));
-		   $v = quote_scape($v);
+		   $v = quote_escape($v);
 		   return "set $k \"$v\"\n";
                 },
 
@@ -6288,11 +6213,9 @@ our $_OptionEmitters = {
 		    my @v = @$v;
 		    my $conv = 1;
 		    if($h->{__unit__}) {
-			if($lConv->{$h->{__unit__}}) {
-			    $conv *= $lConv->{$h->{__unit__}};
-			} else {
-			    die "Uh-oh -- csize parser found an error -- table says default units are '$h->{__unit__}' but that's no unit!\n";
-			}
+			die "Uh-oh -- csize parser found an error -- table says default units are '$h->{__unit__}' but that's no unit!\n"
+			    if !$lConv->{$h->{__unit__}};
+			$conv *= $lConv->{$h->{__unit__}};
 		    }
 		    # If there's a unit spec at the end, pop if off and accumulate the conversion factor
 		    if($lConv->{$v[$#v]}) {
@@ -6327,7 +6250,7 @@ our $_OptionEmitters = {
 
     #### A boolean value as an inline option (e.g. curve, terminal)
     'byn' => sub { my($k,$v,$g) = @_;
-		  return "" unless defined($v);
+		   return "" unless defined($v);
 		   return $v ? " $k " : " no$k ";
     },
 
@@ -6340,13 +6263,9 @@ our $_OptionEmitters = {
     #### A space-separated collection of terms as a plot option
     'l' => sub { my($k,$v,$h) = @_;
 		 return "" unless(defined($v));
-		 if(ref($v) eq 'ARRAY') {
-		     return "set $k ".join(" ",@$v)."\n";
-		 } elsif(ref($v) eq 'HASH') {
-		     barf "hash value found for comma-separated list option '$k' -- not allowed";
-		 } else {
-		     return $v ? "set $k\n" : "unset $k\n";
-		 }
+		 return "set $k ".join(" ",@$v)."\n" if ref($v) eq 'ARRAY';
+		 barf "hash value found for comma-separated list option '$k' -- not allowed" if ref($v) eq 'HASH';
+		 return $v ? "set $k\n" : "unset $k\n";
                 },
 
     #### Special emitter for ticks that can deal with hashes
@@ -6355,138 +6274,98 @@ our $_OptionEmitters = {
 		  my @l = ();
 		  my @l2= ();
 
-		  unless(ref($v)) {
-		      return $v ? "set $k $v\n" : "unset $k\n";
-		  } elsif(ref($v) eq 'ARRAY') {
+		  return $v ? "set $k $v\n" : "unset $k\n" unless ref $v;
+		  if(ref($v) eq 'ARRAY') {
 		      @l = @$v;
-		  } elsif(ref($v) eq 'HASH') {
-		      my %h = %$v;
-		      push(@l, 'axis')   if($h{axis});   delete $h{axis};
-		      push(@l, 'border') if($h{border}); delete $h{border};
-		      push(@l, $h{mirror}?'mirror':'nomirror') if(defined($h{mirror})); delete $h{mirror};
-		      if($h{in} && $h{out}) {
-			  barf("<foo>tics: you set both the 'in' and 'out' options. Oops.");
-		      }
-		      push(@l, 'in')     if($h{in});     delete $h{in};
-		      push(@l, 'out')    if($h{out});    delete $h{out};
-
-
-
-		      unless($k =~ m/^m/) {
-			  push(@l, 'scale');
-			  if( defined( $h{scale} ) ) {
-			      if( ref($h{scale}) eq 'ARRAY' ) {
-				  push(@l, join(",",@{$h{scale}}));
-			      } else {
-				  push(@l, $h{scale});
-			      }
-			  } else {
-			      push(@l, 'default');
-			  }
-			  delete $h{scale};
-			  if(defined($h{rotate})) {
-			      unless($h{rotate}) {
-				  push(@l,'norotate');
-			      } else {
-				  push(@l, 'rotate by '.$h{rotate});
-			      }
-			  }
-			  delete $h{rotate};
-		      }
-		      if(defined $h{offset}) {
-			  unless($h{offset}){
-			      push(@l,'noofset');
-			  } else {
-			      if(ref($h{offset}) eq 'ARRAY') {
-				  push(@l, "offset", join(",",@{$h{offset}}));
-			      } else {
-				  barf "<foo>tics option: 'offset' suboption must be a list ref or zero";
-			      }
-			  }
-		      }
-		      delete $h{offset};
-
-		      barf("<foo>tics: you set two or more of 'left','right', and 'center'. Oops.")
-			  if( defined($h{left}) + defined($h{right}) + defined($h{center}) > 1 );
-
-		      push(@l,'left')   if($h{left});   delete $h{left};
-		      push(@l,'right')  if($h{right});  delete $h{right};
-		      push(@l,'center') if($h{center}); delete $h{center};
-
-
-		      ##############################
-		      # Deal with complex add/labels/locations logic.
-		      # If you specify locations *or* labels then that style gets
-		      # emitted.  if you specify both, then the labels get appended
-		      # to the end of the plot command as a *separate* "set <foo>tics"
-		      # gnuplot command with "add" marked.
-
-		      if(defined($h{locations})) {
-			  if(ref($h{locations}) eq 'ARRAY'){
-			      if(@{$h{locations}}) {
-				  push(@l, join(',', @{$h{locations}}));
-			      } else {
-				  push(@l, "autofreq");
-			      }
-			  } elsif(!ref($h{locations})) {
-			      if($h{locations}) {
-				  push(@l, $h{locations});
-			      } else {
-				  push(@l, "autofreq");
-			      }
-			  } else {
-			      barf("<foo>tics: 'locations' elements must be scalar or list ref");
-			  }
-			  # Workaround for bug in gnuplot parser (documented in xtics section of gnuplot manual):
-			  # if the first number in the start/incr/end sequence is negative, subtract it from 0
-			  # to avoid problems with binary subtraction.
-			  $l[$#l] =~ s/^\s*\-/0\-/;
-		      }
-		      if(defined($h{labels})) {
-			  my $line;
-			  if( ref($h{labels}) eq 'ARRAY' ) {
-			      $line =   "(".
-					(join(", ",
-					      map {
-						  barf "<foo>tics: labels list elements must be duals or triples as list refs"  unless(ref $_ eq 'ARRAY');
-						  sprintf('"%s" %s %s', _def($_->[0],""), _def($_->[1],0), _def($_->[2],"") );
-					      } @{$h{labels}}
-					 )).
-					")"
-					;
-			  } else {
-			      barf("<foo>tics: 'labels' elements must be list refs containing [label, val, flag]");
-			  }
-
-			  if(defined($h{locations})) {
-			      push(@l2, "\nset $k add ",$line);
-			  } else {
-			      push(@l, $line);
-			  }
-		      }
-		      delete $h{locations};
-		      delete $h{labels};
-
-
-		      push(@l,'format',"\"".quote_escape($h{format})."\"") if(defined($h{format})); delete $h{format};
-
-		      if(defined $h{font}) {
-			  if(ref($h{font}) eq 'ARRAY'){
-			      push(@l,"font",'"'.join(',',@{$h{font}}).'"');
-			  } else {
-			      push(@l,"font",'"'.$h{font}.'"');
-			  }
-		      }
-		      delete $h{font};
-
-		      push(@l,'rangelimited') if(defined($h{rangelimited})); delete $h{rangelimited};
-
-		      if(defined $h{textcolor}) {
-			  push(@l,"textcolor", _emit_colorspec($h{textcolor}));
-		      }
-		      delete $h{textcolor};
-		  } else {
+		  } elsif(ref($v) ne 'HASH') {
 		      die "<foo>tics spec must be scalar or hash\n";
+		  }
+		  my %h = %$v;
+		  push(@l, 'axis')   if($h{axis});   delete $h{axis};
+		  push(@l, 'border') if($h{border}); delete $h{border};
+		  push(@l, $h{mirror}?'mirror':'nomirror') if(defined($h{mirror})); delete $h{mirror};
+		  if($h{in} && $h{out}) {
+		      barf("<foo>tics: you set both the 'in' and 'out' options. Oops.");
+		  }
+		  push(@l, 'in')     if delete $h{in};
+		  push(@l, 'out')    if delete $h{out};
+
+		  unless($k =~ m/^m/) {
+		      push(@l, 'scale');
+		      if( defined( my $v = delete $h{scale} ) ) {
+			  push @l, ref($v) eq 'ARRAY' ? join(",",@$v) : $v;
+		      } else {
+			  push(@l, 'default');
+		      }
+		      if( defined( my $v = delete $h{rotate} ) ) {
+			  push @l, $v ? "rotate by $v" : 'norotate';
+		      }
+		  }
+		  if( defined( my $v = delete $h{offset} ) ) {
+		      barf "<foo>tics option: 'offset' suboption must be a list ref or false"
+			if $v and ref($v) ne 'ARRAY';
+		      push @l, $v ? ("offset", join(",",@$v)) : 'nooffset';
+		  }
+
+		  barf("<foo>tics: you set two or more of 'left','right', and 'center'. Oops.")
+		      if( defined($h{left}) + defined($h{right}) + defined($h{center}) > 1 );
+
+		  push(@l,'left')   if delete $h{left};
+		  push(@l,'right')  if delete $h{right};
+		  push(@l,'center') if delete $h{center};
+
+
+		  ##############################
+		  # Deal with complex add/labels/locations logic.
+		  # If you specify locations *or* labels then that style gets
+		  # emitted.  if you specify both, then the labels get appended
+		  # to the end of the plot command as a *separate* "set <foo>tics"
+		  # gnuplot command with "add" marked.
+
+		  if(defined( my $v = $h{locations} )) {
+		      barf "<foo>tics: 'locations' elements must be scalar or list ref"
+			if ref($v) and ref($v) ne 'ARRAY';
+		      if(ref($v) eq 'ARRAY'){
+			  push @l, @$v ? join(',', @$v) : 'autofreq';
+		      } elsif(!ref($v)) {
+			  push @l, $v || 'autofreq';
+		      }
+		      # Workaround for bug in gnuplot parser (documented in xtics section of gnuplot manual):
+		      # if the first number in the start/incr/end sequence is negative, subtract it from 0
+		      # to avoid problems with binary subtraction.
+		      $l[$#l] =~ s/^\s*\-/0\-/;
+		  }
+		  if(defined( my $v = $h{labels} )) {
+		      barf "<foo>tics: 'labels' elements must be list refs containing [label, val, flag]"
+			  if ref($v) ne 'ARRAY';
+		      barf "<foo>tics: labels list elements must be duals or triples as list refs"
+			  if grep ref() ne 'ARRAY', @$v;
+		      my $line =   "(".
+				    join(", ",
+					  map sprintf('"%s" %s %s', _def($_->[0],""), _def($_->[1],0), _def($_->[2],"") ),
+					  @$v
+				    ).
+				    ")"
+				    ;
+		      if(defined($h{locations})) {
+			  push(@l2, "\nset $k add ",$line);
+		      } else {
+			  push(@l, $line);
+		      }
+		  }
+		  delete $h{locations};
+		  delete $h{labels};
+
+		  push(@l,'format',"\"".quote_escape($h{format})."\"") if(defined($h{format})); delete $h{format};
+
+		  if( defined( my $v = delete $h{font} ) ) {
+		      push @l, "font", '"'.join(',', ref($v) eq 'ARRAY' ? @$v : $v).'"';
+		  }
+
+		  push(@l,'rangelimited') if defined(delete $h{rangelimited});
+
+		  if(defined( my $v = delete $h{textcolor})) {
+		      push(@l,"textcolor", _emit_colorspec($v));
 		  }
 
 		  push(@l, @l2);
@@ -6516,10 +6395,10 @@ our $_OptionEmitters = {
     #### A comma-separated (rather than space-separated) collection of terms
     ',' => sub { my($k,$v,$h) = @_;
 		 return "" unless(defined($v));
+		 barf "hash value found for comma-separated list option '$k' -- not allowed"
+		     if ref $v eq 'HASH';
 		 if(ref $v eq 'ARRAY') {
 		     return "set $k ".join(",",@$v)."\n";
-		 } elsif(ref $v eq 'HASH') {
-		     barf "hash value found for comma-separated list option '$k' -- not allowed";
 		 } else {
 		     return $v ? "set $k\n" : "unset $k\n";
 		 }
@@ -6528,19 +6407,16 @@ our $_OptionEmitters = {
     #### A comma-separated collection of terms as a curve option
     'c,' => sub { my($k,$v,$h) = @_;
 		 return "" unless(defined($v));
-		 if(ref $v eq 'ARRAY') {
-		     return " ".join(",",@$v)." ";
-		 }
-		 return " $v ";
+		 return " ".join(",", ref($v) eq 'ARRAY' ? @$v : $v)." ";
     },
 
     #### A collection of values, reported one per line
     '1' => sub { my($k,$v,$h) = @_;
 		 return "" unless(defined $v);
+		 barf "hash value found for one-per-line list option '$k' -- not allowed"
+		     if ref $v eq 'HASH';
 		 if((ref $v) eq 'ARRAY') {
 		     return join("", map { defined($_) ? "set $k $_\n" : "" } @$v);
-		 } elsif((ref $v) eq 'HASH') {
-		     barf "hash value found for one-per-line list option '$k' -- not allowed";
 		 } else {
 		     return $v ? "set $k\n" : "unset $k\n";
 		 }
@@ -6578,112 +6454,71 @@ our $_OptionEmitters = {
     #### A set of sub-keywords each of which may contain a list of terms, sort-of.
     #### This is used for autoscale -- there's no space between keyword and value, and a missing hash causes "unset" to be emitted.
     "H2" => sub { my($k,$v,$h) = @_;
-		  unless($v) {
-		      return "unset $k\n";
-		  }
-		  if(ref $v eq 'ARRAY') {
-		      # Note list form doesn't allow unsetting.  Such is life - lists are deprecated in most contexts.
-		      return join("", map { defined($_) ? "set $k $_\n" : "" } @$v);
-		  } elsif(ref($v) eq 'HASH') {
-		      return "set $k\n" unless(keys(%$v));
-		      return join("", map { my $l = "";
-					    if(defined($v->{$_})) {
-						unless($v->{$_}) {
-						    $l = "unset $k $_\n";
-						} elsif(ref $v->{$_} eq 'ARRAY') {
-						    $l = "set $k $_ ".join(" ",@{$v->{$_}})."\n";
-						} elsif(ref $v->{$_} eq 'HASH') {
-						    barf "Nested hashes not allowed in hash option '$k'";
-						} else {
-						    $l = "set $k $_$v->{$_}\n";
-						}
-					    }
-					    $l;
-				  }
-				  sort keys %$v
-			  );
-		  } else {
-		      barf "scalar value '$v' not allowed for hash option '$k'";
-		  }
+		  return "unset $k\n" unless $v;
+		  return join("", map { defined($_) ? "set $k $_\n" : "" } @$v)
+		      if ref $v eq 'ARRAY'; # Note list form doesn't allow unsetting.  Such is life - lists are deprecated in most contexts.
+		  barf "scalar value '$v' not allowed for hash option '$k'"
+		      if ref($v) ne 'HASH';
+		  return "set $k\n" unless(keys(%$v));
+		  barf "Nested hashes not allowed in hash option '$k'" if grep ref() eq 'HASH', values %$v;
+		  return join("", map
+		      !$v->{$_} ? "unset $k $_\n" :
+		      ref $v->{$_} ne 'ARRAY' ? "set $k $_$v->{$_}\n" :
+		      "set $k $_ ".join(" ",@{$v->{$_}})."\n",
+		    grep defined($v->{$_}),
+		    sort keys %$v
+		  );
     },
 
     #### Terminal options hash
     "HNM" => sub { my($k,$v,$h) = @_;
 		   return "" unless((defined $v) and !($h->{multiplot}));
-		   if(ref $v eq 'ARRAY') {
-		       barf "array value found for hash option '$k' -- not allowed";
-		   } elsif(ref($v) eq 'HASH') {
-		       return "set $k\n" unless(keys(%$v));
-		       return join("", map { my $l = "";
-					     if(defined($v->{$_})) {
-						 unless($v->{$_}) {
-						     $l = "unset $k $_\n";
-						 } elsif(ref $v->{$_} eq 'ARRAY') {
-						     $l = "set $k $_ ".join(" ",@{$v->{$_}})."\n";
-						 } elsif(ref $v->{$_} eq 'HASH') {
-						     barf "Nested hashes not allowed in hash option '$k'";
-						 } else {
-						     $l = "set $k $_ $v->{$_}\n";
-						 }
-					     }
-					     $l;
-				   }
-				   sort keys %$v
-			   );
-		   } else {
-		       barf "scalar value '$v' not allowed for hash option '$k'";
-		   }
+		   barf "array value found for hash option '$k' -- not allowed"
+		       if ref $v eq 'ARRAY';
+		   barf "scalar value '$v' not allowed for hash option '$k'"
+		       if ref($v) ne 'HASH';
+		   return "set $k\n" unless(keys(%$v));
+		   barf "Nested hashes not allowed in hash option '$k'" if grep ref() eq 'HASH', values %$v;
+		   return join("", map
+		       !$v->{$_} ? "unset $k $_\n" :
+		       ref $v->{$_} ne 'ARRAY' ? "set $k $_ $v->{$_}\n" :
+		       "set $k $_ ".join(" ",@{$v->{$_}})."\n",
+		     grep defined($v->{$_}),
+		     sort keys %$v
+		   );
     },
 
     #### A collection of numbered specifiers (e.g. "arrow"), each with a collection of terms
     "N" => sub { my($k,$v,$h) = @_;
 		 return "" unless(defined $v);
-		 if(ref $v ne 'ARRAY') {
-		     barf "non-array value '$v' found for numeric-indexed option '$k' -- not allowed";
-		 }
-		 return join ("", map { my $l;
-					if(defined($v->[$_])) {
-					    $l = "set   $k $_ ";
-					    if(ref $v->[$_] eq 'ARRAY') {
-						$l .= join(" ",@{$v->[$_]});
-					    } elsif(ref $v->[$_] eq 'HASH') {
-						$l .= join(" ",(%{$v->[$_]}));
-					    } else {
-						$l .= $v->[$_];
-					    }
-					    $l .= "\n";
-					} else {
-					    $l = "unset $k $_\n";
-					}
-					$l;
-			      } (1..$#$v)
-		     );
-                 },
+		 barf "non-array value '$v' found for numeric-indexed option '$k' -- not allowed"
+		     if ref $v ne 'ARRAY';
+		 return join "", map
+		   !defined($v->[$_]) ? "unset $k $_\n" :
+		   "set   $k $_ " .
+		   join(" ",
+		     ref $v->[$_] eq 'ARRAY' ? @{$v->[$_]} :
+		     ref $v->[$_] eq 'HASH' ? %{$v->[$_]} : $v->[$_]
+		   ) .
+		   "\n",
+		 1..$#$v;
+    },
 
     #### A collection of numbered specifiers for "object" types - requires a special case for
     #### "set object polygon"
     "NO" => sub { my($k,$v,$h) = @_;
 		 return "" unless(defined $v);
-		 if(ref $v ne 'ARRAY') {
-		     barf "non-array value '$v' found for numeric-indexed option '$k' -- not allowed";
-		 }
-		 my $s = join ("", map { my $l;
-					if(defined($v->[$_])) {
-					    $l = "set   $k $_ ";
-					    if(ref $v->[$_] eq 'ARRAY') {
-						$l .= join(" ",@{$v->[$_]});
-					    } elsif(ref $v->[$_] eq 'HASH') {
-						$l .= join(" ",(%{$v->[$_]}));
-					    } else {
-						$l .= $v->[$_];
-					    }
-					    $l .= "\n";
-					} else {
-					    $l = "unset $k $_\n";
-					}
-					$l;
-			      } (1..$#$v)
-		     );
+		 barf "non-array value '$v' found for numeric-indexed option '$k' -- not allowed"
+		     if ref $v ne 'ARRAY';
+		 my $s = join "", map
+		   !defined($v->[$_]) ? "unset $k $_\n" :
+		   "set   $k $_ " .
+		   join(" ",
+		     ref $v->[$_] eq 'ARRAY' ? @{$v->[$_]} :
+		     ref $v->[$_] eq 'HASH' ? %{$v->[$_]} : $v->[$_]
+		   ) .
+		   "\n",
+		 1..$#$v;
 		  #Split polygon lines after the polygon spec - yuck.
 		  my @s = split ("\n",$s);
 		  for my $i(0..$#s){
@@ -6697,31 +6532,24 @@ our $_OptionEmitters = {
     #### A collection of numbered specifiers, the first word of which is quoted (for labels).
     "NL" => sub { my($k,$v,$h) = @_;
 		 return "" unless(defined $v);
-		 if(ref $v ne 'ARRAY') {
-		     barf "non-array value '$v' found for numeric-indexed option '$k' -- not allowed";
-		 }
-		 return join ("", map { my $l;
-					if(defined($v->[$_])) {
-					    $l = "set   $k ".($_+1)." ";
-					    if(ref $v->[$_] eq 'ARRAY') {                      # It's an array
-						$v->[$_]->[0] = "\"".quote_escape($v->[$_]->[0])."\"" # quote the first element
-						    unless($v->[$_]->[0] =~ m/^\".*\"$/);      # unless it's already quoted
-						$l .= join(" ", map {
-						    (ref($_) eq 'ARRAY') ? join(",",@$_) : $_; # Nested arrays get connected with ','
-							   } @{$v->[$_]});
-					    } elsif(ref $v->[$_] eq 'HASH') {
-						$l .= join(" ",(%{$v->[$_]}));
-					    } else {
-						$l .= $v->[$_];
-					    }
-					    $l .= "\n";
-					} else {
-					    $l = "unset $k $_\n";
-					}
-					$l;
-			      } (0..$#$v)
-		     );
-                 },
+		 barf "non-array value '$v' found for numeric-indexed option '$k' -- not allowed"
+		     if ref $v ne 'ARRAY';
+		 return join "", map
+		   !defined($v->[$_]) ? "unset $k $_\n" :
+		   "set   $k ".($_+1)." " .
+		   join(" ",
+		     ref $v->[$_] eq 'ARRAY' ? (
+		       map ref($_) eq 'ARRAY' ? join(",",@$_) : $_, # Nested arrays get connected with ','
+			 $v->[$_][0] !~ m/^\".*\"$/ # unless already quoted
+			   ? "\"".quote_escape($v->[$_][0])."\"" : # quote the first element
+			   $v->[$_][0],
+			 @{$v->[$_]}[1..$#{$v->[$_]}]
+		     ) :
+		     ref $v->[$_] eq 'HASH' ? %{$v->[$_]} : $v->[$_]
+		   ) .
+		   "\n",
+		 0..$#$v;
+    },
 
     #### Ranges can either be given as a list, the first two elements
     #### of which are the range and the rest of which are options, or
@@ -7242,7 +7070,10 @@ for my $k(keys %$termTabSource) {
 				 undef, # This gets filled in on first use in the constructor.
 				 "$k terminal options"
 			   ],
-		       default_output=> $v->{default_output}
+		       default_output=> $v->{default_output},
+		       ( exists $v->{image_format}
+			       ? ( image_format => $v->{image_format} )
+			       : () ),
                      };
 }
 
@@ -7886,159 +7717,155 @@ sub _checkpoint {
     # happens if($dump)
     return "" unless defined $pipeerr;
 
+    return "" if $this->{dumping}; # dumping - never generate an error.
+
+    my $int = $SIG{INT};
+    local $SIG{INT} = $int;
+
+    # Queue up a SIGINT handler, with passthrough...
+    unless($MS_io_braindamage) {
+	$SIG{INT} =
+	    sub {
+		kill 'INT', $this->{"pid-$suffix"};
+		if(ref $int eq 'CODE') {
+		    &$int;
+		}
+		die "^C received during PDL::Graphics::Gnuplot checkpoint operation\n";
+	};
+    }
+
+    _logEvent($this, "Trying to read from gnuplot (suffix $suffix)") if $this->{options}{tee};
+
+    my $terminal =$this->{options}->{terminal};
+    my $delay = (_def($this->{'wait'}, 0) + 0) || 10;
     my $fromerr = '';
 
-    if( !($this->{dumping}) ) {
-	my $int = $SIG{INT};
-	local $SIG{INT} = $int;
+    if($this->{"echobuffer-$suffix"}) {
+	$fromerr = $this->{"echobuffer-$suffix"};
+	$this->{"echobuffer-$suffix"} = "";
+    }
 
-	# Queue up a SIGINT handler, with passthrough...
-	unless($MS_io_braindamage) {
-	    $SIG{INT} =
-		sub {
-		    kill 'INT', $this->{"pid-$suffix"};
-		    if(ref $int eq 'CODE') {
-			&$int;
-		    }
-		    die "^C received during PDL::Graphics::Gnuplot checkpoint operation\n";
-	    };
-	}
+    my $subproc_gone = 0 ;
 
-	_logEvent($this, "Trying to read from gnuplot (suffix $suffix)") if $this->{options}{tee};
+    local($SIG{PIPE}) = sub { $subproc_gone = 1; };
 
-	my $terminal =$this->{options}->{terminal};
-	my $delay = (_def($this->{'wait'}, 0) + 0) || 10;
+    do
+    {
+	# if no data received in a few seconds, the gnuplot
+	# process is stuck. This usually happens if the gnuplot
+	# process is not in a command mode, but in a
+	# data-receiving mode. I'm careful to avoid this
+	# situation, but bugs in this module and/or in gnuplot
+	# itself can make this happen
+	#
+	# Note that the nice asynchronous part of this loop won't
+	# work on Microsoft Windows, since that OS doesn't have a
+	# working asynchronous read, and can_read doesn't work
+	# either.
 
-	if($this->{"echobuffer-$suffix"}) {
-	    $fromerr = $this->{"echobuffer-$suffix"};
-	    $this->{"echobuffer-$suffix"} = "";
-	}
-
-	my $subproc_gone = 0 ;
-
-	local($SIG{PIPE}) = sub { $subproc_gone = 1; };
-
-	do
+	if( $MS_io_braindamage or
+	    $this->{"errSelector-$suffix"}->can_read($notimeout ? undef : $delay )
+	    )
 	{
-	    # if no data received in a few seconds, the gnuplot
-	    # process is stuck. This usually happens if the gnuplot
-	    # process is not in a command mode, but in a
-	    # data-receiving mode. I'm careful to avoid this
-	    # situation, but bugs in this module and/or in gnuplot
-	    # itself can make this happen
-	    #
-	    # Note that the nice asynchronous part of this loop won't
-	    # work on Microsoft Windows, since that OS doesn't have a
-	    # working asynchronous read, and can_read doesn't work
-	    # either.
-
-	    if( $MS_io_braindamage or
-		$this->{"errSelector-$suffix"}->can_read($notimeout ? undef : $delay )
-		)
-	    {
-		my $byte;
-		sysread $pipeerr, $byte, ($MS_io_braindamage ? 1 : 100);
-		$fromerr .= $byte;
-		if($byte eq \004 or $byte eq \000 or !length($byte)) {
-		    $subproc_gone = 1;
-		}
+	    my $byte;
+	    sysread $pipeerr, $byte, ($MS_io_braindamage ? 1 : 100);
+	    $fromerr .= $byte;
+	    if($byte eq \004 or $byte eq \000 or !length($byte)) {
+		$subproc_gone = 1;
 	    }
-	    else
-	    {
-		_logEvent($this, "Gnuplot $suffix read timed out") if $this->{options}{tee};
-		$this->{"stuck-$suffix"} = 1;
-		kill 'INT', $this->{"pid-$suffix"};
-		barf <<"EOM";
+	}
+	else
+	{
+	    _logEvent($this, "Gnuplot $suffix read timed out") if $this->{options}{tee};
+	    $this->{"stuck-$suffix"} = 1;
+	    kill 'INT', $this->{"pid-$suffix"};
+	    barf <<"EOM";
 Hmmm, my $suffix Gnuplot process didn't respond for $delay seconds.
 I've kicked it with an interrupt signal, which should help with the
 next thing you try to do.  If you expect slow response from gnuplot,
 you can adjust the timeout with the "wait" terminal option.
 EOM
-	    }
-	} until ($fromerr =~ m/^$checkpoint/ms or $subproc_gone);
-
-	if($MS_io_braindamage) {
-	    # Fix newline braindamage too
-	    $fromerr =~ s/\r\n/\n/g;
 	}
+    } until ($fromerr =~ m/^$checkpoint/ms or $subproc_gone);
 
-	if($subproc_gone) {
-	    _killGnuplot($this, undef, 1);
-	    barf "PDL::Graphics::Gnuplot: the gnuplot process seems to have died.\n";
-	}
-
-	_logEvent($this, "Read string '$fromerr' from gnuplot $suffix process") if $this->{options}{tee};
-
-	# Discard prompt-and-command lines up to the last prompt seen.
-	# This is necessary for MS Windows support: MS Windows doesn't have
-	# a notion of a tty versus other kind of pipe, so gnuplot always
-	# prints prompts and echoes commands.  Since there isn't much in the
-	# way of error syntax, we might miss a few errors this way.  Oh well.
-	if($MS_io_braindamage) {
-	    $fromerr =~ s/[\s\n\r]*(gnu|multi)plot\>[^\n\r]*$//msg;
-	    $fromerr =~ s/[\s\n\r]*input data \(\'e\' ends\) \>[^\n\r]*$//msg;
-	}
-
-	# Strip the checkpoint message.
-	$fromerr =~ s/\s*(.*?)\s*$checkpoint.*$/$1/ms;
-
-	# Replace non-printable ASCII characters with '?'
-	# (preserve ^I [tab], ^J [newline], and ^M [return])
-	$fromerr =~ s/[\000-\010\013-\014\016-\037\200-\377]/\?/g;
-
-	# Find, report, and strip warnings. This is complicated by the fact
-	# that some warnings come with a line specifier and others don't.
-
-      WARN: while( $fromerr =~ m/^(\s*(line \d+\:\s*)?[wW]arning\:.*)$/m or
-		   $fromerr =~ m/^Populating font family aliases took/m     # CED - Quicktime on MacOS Catalina throws a warning marked as an error.  Stupid.
-	    ) {
-	  if($2){
-	      # it's a warning with a line specifier. Break off two more lines before it.
-	      last WARN unless($fromerr =~ s/^((gnu|multi)plot\>.*\n\s*\^\s*\n\s*(line \d+\:\s*)?[wW]arning\:.*(\n|$))//m);
-	      my $a = $1;
-	      $a =~ s/^\s*line \d+\:/Gnuplot:/m;
-	      carp $a if($printwarnings);
-	  } else {
-	      last WARN unless($fromerr =~ s/^(\s*(line \d+\:\s*)?[wW](arning\:.*(\n|$)))//m);
-	      carp "Gnuplot w$3\n" if($printwarnings);
-	  }
-
-	}
-
-	# Anything else is an error -- except on Microsoft Windows where we
-	# get additional chaff on the channel.  Try to take it out.
-	if($MS_io_braindamage) {
-	    $fromerr =~ s/^\s*Terminal type set to \'[^\']*\'.*Options are \'[^\']*\'//s;
-	} else {
-	    # Hack to avoid spurious the pdfcairo errors in MacOS 10.5 - strip out obsolete-function errors.
-	    while( $fromerr =~ s/^.*obsolete\s*function.*system\s*performance.\s*//s or
-		   $fromerr =~ s/^.*Populating font family aliases took.*cost\.//s
-		) {
-		# do nothing
-	    }
-	}
-
-	if((!$ignore_errors) and (($fromerr =~ m/^\s+\^\s*$/ms or $fromerr=~ m/^\s*line/ms) or
-	    # This is really stupid -- many error messages from gnuplot aren't labeled as such, so we can't mark
-	    # them as errors.  Try some common keywords for genuine error messages.
-	    $fromerr =~ m/(fail(ed|s)?)|(error)|(expected \w+ driver)/io
-	   )
-	    ) {
-	    if($this->{early_gnuplot}) {
-		barf "PDL::Graphics::Gnuplot: ERROR: the deprecated pre-v$gnuplot_dep_v gnuplot backend issued an error:\n$fromerr\n";
-	    } else {
-	        barf "PDL::Graphics::Gnuplot: ERROR: the gnuplot backend issued an error:\n$fromerr\n";
-	    }
-	}
-
-	# strip whitespace
-	$fromerr =~ s/^\s*//s;
-	$fromerr =~ s/\s*$//s;
-	return $fromerr;
-    } else {
-	# dumping - never generate an error.
-	return "";
+    if($MS_io_braindamage) {
+	# Fix newline braindamage too
+	$fromerr =~ s/\r\n/\n/g;
     }
+
+    if($subproc_gone) {
+	_killGnuplot($this, undef, 1);
+	barf "PDL::Graphics::Gnuplot: the gnuplot process seems to have died.\n";
+    }
+
+    _logEvent($this, "Read string '$fromerr' from gnuplot $suffix process") if $this->{options}{tee};
+
+    # Discard prompt-and-command lines up to the last prompt seen.
+    # This is necessary for MS Windows support: MS Windows doesn't have
+    # a notion of a tty versus other kind of pipe, so gnuplot always
+    # prints prompts and echoes commands.  Since there isn't much in the
+    # way of error syntax, we might miss a few errors this way.  Oh well.
+    if($MS_io_braindamage) {
+	$fromerr =~ s/[\s\n\r]*(gnu|multi)plot\>[^\n\r]*$//msg;
+	$fromerr =~ s/[\s\n\r]*input data \(\'e\' ends\) \>[^\n\r]*$//msg;
+    }
+
+    # Strip the checkpoint message.
+    $fromerr =~ s/\s*(.*?)\s*$checkpoint.*$/$1/ms;
+
+    # Replace non-printable ASCII characters with '?'
+    # (preserve ^I [tab], ^J [newline], and ^M [return])
+    $fromerr =~ s/[\000-\010\013-\014\016-\037\200-\377]/\?/g;
+
+    # Find, report, and strip warnings. This is complicated by the fact
+    # that some warnings come with a line specifier and others don't.
+
+  WARN: while( $fromerr =~ m/^(\s*(line \d+\:\s*)?[wW]arning\:.*)$/m or
+	       $fromerr =~ m/^Populating font family aliases took/m     # CED - Quicktime on MacOS Catalina throws a warning marked as an error.  Stupid.
+	) {
+      if($2){
+	  # it's a warning with a line specifier. Break off two more lines before it.
+	  last WARN unless($fromerr =~ s/^((gnu|multi)plot\>.*\n\s*\^\s*\n\s*(line \d+\:\s*)?[wW]arning\:.*(\n|$))//m);
+	  my $a = $1;
+	  $a =~ s/^\s*line \d+\:/Gnuplot:/m;
+	  carp $a if($printwarnings);
+      } else {
+	  last WARN unless($fromerr =~ s/^(\s*(line \d+\:\s*)?[wW](arning\:.*(\n|$)))//m);
+	  carp "Gnuplot w$3\n" if($printwarnings);
+      }
+
+    }
+
+    # Anything else is an error -- except on Microsoft Windows where we
+    # get additional chaff on the channel.  Try to take it out.
+    if($MS_io_braindamage) {
+	$fromerr =~ s/^\s*Terminal type set to \'[^\']*\'.*Options are \'[^\']*\'//s;
+    } else {
+	# Hack to avoid spurious the pdfcairo errors in MacOS 10.5 - strip out obsolete-function errors.
+	while( $fromerr =~ s/^.*obsolete\s*function.*system\s*performance.\s*//s or
+	       $fromerr =~ s/^.*Populating font family aliases took.*cost\.//s
+	    ) {
+	    # do nothing
+	}
+    }
+
+    if((!$ignore_errors) and (($fromerr =~ m/^\s+\^\s*$/ms or $fromerr=~ m/^\s*line/ms) or
+	# This is really stupid -- many error messages from gnuplot aren't labeled as such, so we can't mark
+	# them as errors.  Try some common keywords for genuine error messages.
+	$fromerr =~ m/(fail(ed|s)?)|(error)|(expected \w+ driver)/io
+       )
+	) {
+	if($this->{early_gnuplot}) {
+	    barf "PDL::Graphics::Gnuplot: ERROR: the deprecated pre-v$gnuplot_dep_v gnuplot backend issued an error:\n$fromerr\n";
+	} else {
+	    barf "PDL::Graphics::Gnuplot: ERROR: the gnuplot backend issued an error:\n$fromerr\n";
+	}
+    }
+
+    # strip whitespace
+    $fromerr =~ s/^\s*//s;
+    $fromerr =~ s/\s*$//s;
+    return $fromerr;
 }
 
 ##############################

@@ -1,3 +1,10 @@
+2.023 2023-01-29
+- Fix over-enthusiastic code tidying - thanks @zmughal
+
+2.022 2023-01-28
+- Fix so that 'aa' option does not pass badflag to `wpic`.
+- Check if terminal image format I/O is available when using 'aa'.
+
 2.021 2022-03-01
 - add demo for use by PDL 2.077+
 

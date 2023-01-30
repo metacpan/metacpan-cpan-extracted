@@ -44,7 +44,7 @@
    "provides" : {
       "Excel::ValueWriter::XLSX" : {
          "file" : "lib/Excel/ValueWriter/XLSX.pm",
-         "version" : "1.01"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "url" : "https://github.com/damil/Excel-ValueWriter-XLSX"
       }
    },
-   "version" : "1.01",
+   "version" : "1.03",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

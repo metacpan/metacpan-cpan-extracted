@@ -21,14 +21,14 @@ my $meta = {
                         develop   => { recommends => { "Dist::Inkt" => 0.001 } },
                         runtime   => {
                                        requires => {
-                                         "Eval::TypeTiny"   => 0,
-                                         "Exporter::Shiny"  => "1.006000",
-                                         "Import::Into"     => 0,
-                                         "Module::Runtime"  => 0,
-                                         "perl"             => 5.012,
-                                         "Type::Registry"   => 0,
-                                         "Type::Tiny::Enum" => 2.002001,
-                                         "Types::Common"    => 2.002001,
+                                         "Eval::TypeTiny"  => 0,
+                                         "Exporter::Shiny" => "1.006000",
+                                         "Import::Into"    => 0,
+                                         "Module::Runtime" => 0,
+                                         "perl"            => 5.012,
+                                         "Type::Library"   => 0,
+                                         "Type::Registry"  => 0,
+                                         "Types::Common"   => 2.002001,
                                        },
                                      },
                         test      => {
@@ -42,7 +42,7 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Exporter::Almighty" => { file => "lib/Exporter/Almighty.pm", version => "0.001000" },
+                        "Exporter::Almighty" => { file => "lib/Exporter/Almighty.pm", version => 0.001003 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -56,7 +56,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/project",
                       },
-  "version"        => "0.001000",
+  "version"        => 0.001003,
 };
 
 my %dynamic_config;

@@ -12,32 +12,67 @@ PDL::Graphics::Prima::DataSet - the way we think about data
 
 =head1 SYNOPSIS
 
- -distribution => ds::Dist(
-     $data, plotType => ppair::Lines,
+ use PDL;
+ use PDL::Graphics::Prima::Simple;
+
+ my $x = sequence(100)/10 + 0.1;
+ my $y = $x->sin + $x->grandom / 10;
+
+=for podview <img src="PDL/Graphics/Prima/pod/ds-dist.png">
+
+=for html <p><img src="https://raw.githubusercontent.com/PDLPorters/PDL-Graphics-Prima/master/lib/PDL/Graphics/Prima/pod/ds-dist.png">
+
+ plot( -distribution => ds::Dist(
+     $y, plotType => ppair::Lines,
      binning => bt::Linear,
- ),
- -lines => ds::Pair(
+ ));
+
+=for podview <img src="PDL/Graphics/Prima/pod/ds-pair.png">
+
+=for html <p><img src="https://raw.githubusercontent.com/PDLPorters/PDL-Graphics-Prima/master/lib/PDL/Graphics/Prima/pod/ds-pair.png">
+
+ plot( -lines => ds::Pair(
      $x, $y, plotTypes => [ppair::Lines, ppair::Diamonds]
- ),
- -contour => ds::Grid(
-     $matrix,
+ ));
+
+=for podview <img src="PDL/Graphics/Prima/pod/ds-grid.png">
+
+=for html <p><img src="https://raw.githubusercontent.com/PDLPorters/PDL-Graphics-Prima/master/lib/PDL/Graphics/Prima/pod/ds-grid.png">
+
+ plot( -contour => ds::Grid(
+     $x,
+     bounds => [0,0,10,10],
      # Specify your bounds in one of these three ways
-     bounds => [$left, $bottom, $right, $top],
-     y_edges => $ys, x_edges => $xs, 
-     x_bounds => [$left, $right], y_bounds => [$bottom, $top],
+     # bounds => [$left, $bottom, $right, $top],
+     # y_edges => $ys, x_edges => $xs, 
+     # x_bounds => [$left, $right], y_bounds => [$bottom, $top],
      # Unnecessary if you want the default palette
-     plotType => pgrid::Matrix(palette => $palette),
- ),
- -image => ds::Image(
-     $image, format => 'string',
-     ... ds::Grid bounder options ...
+     plotType => pgrid::Matrix(palette => pal::RainbowSV(1.0, 0.8)),
+ ));
+
+=for podview <img src="PDL/Graphics/Prima/pod/ds-image.png">
+
+=for html <p><img src="https://raw.githubusercontent.com/PDLPorters/PDL-Graphics-Prima/master/lib/PDL/Graphics/Prima/pod/ds-image.png">
+
+ plot( -image => ds::Image(
+     rvals(3, 256*2),
+     format => 'string',
+     # ... ds::Grid bounder options ...
+     bounds => [0,0,10,10],
      # Unnecessary at the moment
      plotType => pimage::Basic,
- ),
- -function => ds::Func(
-     $func_ref, xmin => $left, xmax => $right, N_points => 200,
- ),
- 
+ ));
+
+=for podview <img src="PDL/Graphics/Prima/pod/ds-func.png">
+
+=for html <p><img src="https://raw.githubusercontent.com/PDLPorters/PDL-Graphics-Prima/master/lib/PDL/Graphics/Prima/pod/ds-func.png">
+
+ plot( -function => ds::Func( \&PDL::sin,
+     color => cl::LightRed,
+     xmin => 0, xmax => 1,
+     N_points => 200,
+ ));
+
 
 =head1 DESCRIPTION
 
@@ -59,7 +94,7 @@ histogram.
 
 So, we have two fundamental ways to represent data, but many possible
 data sets. For pairwise representations, we have L<ds::Pair|/Pair>, the
-basic pairwise DataSet. L<ds::Dist|/Dist> is a derived DataSet which
+basic pairwise DataSet. L<ds::Dist|/Distribution> is a derived DataSet which
 includes a binning specification that bins the distribution into bin centers
 (x) and heights (y) to get a pairwise representation. L<ds::Func|/Func>
 is another derived DataSet that generates evenly sampled data based on the
@@ -82,7 +117,7 @@ package PDL::Graphics::Prima::DataSet;
 use Carp;
 use Scalar::Util;
 
-our $VERSION = 0.17;   # update with update-version.pl
+our $VERSION = 0.18;   # update with update-version.pl
 
 =item widget
 
@@ -186,8 +221,8 @@ sub compute_collated_min_max_for {
 
 This is the universal constructor that is called by the short-name constructors
 introduced below. This handles the uniform packaging of plotTypes (for
-example, allowing the user to say C<plotType => ppair::Diamonds> instead of
-the more verbose C<plotTypes => [ppair::Diamonds]>). In general, you (the
+example, allowing the user to say C<< plotType => ppair::Diamonds >> instead of
+the more verbose C<< plotTypes => [ppair::Diamonds] >>). In general, you (the
 user) will not need to invoke this constructor directly.
 
 =cut
@@ -311,6 +346,62 @@ sub change_data {
 	$self->_change_data(@_);
 	$self->widget->notify('ChangeData', $self);
 }
+
+=item compute_color_map_extrema
+
+Multiple datasets and plot types can use the plot-wide color map. In that case,
+the color map needs to figure out the minimum and maximum values from the data.
+All datasets must run through their collection of plotTypes and ask each one for
+its color map extrema. PlotTypes should either return an empty list (indicating
+they are not using the plot-wide color map) or the lowest minimum value and the
+largest maximum value needed to render their data.
+
+=cut
+
+sub compute_color_map_extrema {
+	my $self = shift;
+	# If we have an explicit palette, then we're not using the system palette
+	return if $self->has_custom_color_map;
+	# Iterate through all plot types
+	my @minmax;
+	for my $plotType (@{$self->{plotTypes}}) {
+		my @curr_minmax = $plotType->compute_color_map_extrema;
+		if (@curr_minmax) {
+			if (@minmax) {
+				$minmax[0] = $curr_minmax[0] if $minmax[0] > $curr_minmax[0];
+				$minmax[1] = $curr_minmax[1] if $minmax[1] < $curr_minmax[1];
+			}
+			else {
+				@minmax = @curr_minmax;
+			}
+		}
+	}
+	return @minmax;
+}
+
+=item has_custom_color_map
+
+Returns true if the dataset has its own color map, false otherwise.
+
+=cut
+
+sub has_custom_color_map {
+	my $self = shift;
+	return 1 if $self->{color_map};
+}
+
+=item color_map
+
+Returns the color map of either the dataset or, if the dataset does not have a
+custom color map, the plot-wide color map.
+
+=cut
+
+sub color_map {
+	my $self = shift;
+	return $self->{color_map} // $self->widget->color_map;
+}
+
 
 =back
 
@@ -1031,7 +1122,7 @@ is C<pgrid::Color>.
 This is the least well thought-out dataSet. As such, it may change in the
 future. All such changes will, hopefully, be backwards compatible.
 
-At the moment, there is only one way to visualize grid data: C<pseq::Matrix>.
+At the moment, there is only one way to visualize grid data: C<pgrid::Matrix>.
 Although I can conceive of a contour plot, it has yet to be implemented. As
 such, it is hard to specify the dimension requirements for dataset-wide
 properties. There are a few dataset-wide properties discussed in the
@@ -1358,15 +1449,19 @@ sub guess_scaling_for {
 	croak("Cannot determine scaling with only one point!")
 		if $data->dim(0) == 1;
 	
-	# Assume linear if there are only two points of data:
-	return ('linear', $data(1) - $data(0)) if $data->dim(0) == 2;
+	# Assume linear if there are only two points of data, or if any of
+	# the data are zero. Logarithmically spaced bins cannot have a
+	# center of zero!
+	return ('linear', $data(1) - $data(0))
+		if $data->dim(0) == 2 or any($data == 0);
+	# XXX use averaging approach below if any data == 0?
 	
 	# Now we can really say something about linear vs logarithmic scaling:
 	my $lin_spaces = $data(1:-1) - $data(0:-2);
 	my $lin_space = $lin_spaces->average;
 	my $lin_score = (($lin_spaces - $lin_space)**2)->sum / $lin_spaces->nelem;
 	
-	my $log_spaces = $data(1:-1) / $data(0:-2);
+	my $log_spaces = $data->slice('1:-1') / $data(0:-2);
 	my $log_space = $log_spaces->average;
 	my $log_score = (($log_spaces - $log_space)**2)->sum / $log_spaces->nelem;
 	
@@ -1503,6 +1598,7 @@ sub get_prima_color_data {
 ##############################################################################
 #                                    Func                                    #
 ##############################################################################
+=back
 
 =head2 Func
 
@@ -1540,7 +1636,7 @@ a reference to a subroutine, or an anonymous sub. For example,
  # Reference to a subroutine,
  # PDL's exponential function:
  ds::Func (\&PDL::exp)
- 
+
  # Using an anonymous subroutine:
  ds::Func ( sub {
      my $xs = shift;
@@ -2020,6 +2116,10 @@ Specifies different kinds of scaling, including linear and logarithmic
 
 Defines a number of useful functions for generating simple and not-so-simple
 plots
+
+=item L<PDL::Graphics::Prima::SizeSpec|PDL::Graphics::Prima::SizeSpec/>
+
+Compute pixel distances from meaningful units
 
 =back
 

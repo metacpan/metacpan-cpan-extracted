@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2020, 2021 Kevin Ryde
+# Copyright 2020, 2021, 2022 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -33,7 +33,8 @@ use MyGraphs;
 use lib File::Spec->catdir('devel','lib');
 require Graph::Maker::SierpinskiTriangles;
 
-# GP-DEFINE  read("my-oeis.gp");
+# GP-DEFINE  read("OEIS-data.gp");
+# GP-DEFINE  read("OEIS-data-wip.gp");
 
 # A193256 Number of spanning trees in the n-Sierpinski sieve graph.
 # A234634 Numbers of undirected cycles in the n-Sierpinski sieve graph.
@@ -119,7 +120,7 @@ MyOEIS::compare_values
 # GP-DEFINE       - 2^n);
 # GP-DEFINE  }
 # GP-Test  vector(5,n,n--; cornerW(n)) == [2,8,40,224,1312]
-# GP-Test  my(v=OEIS_samples("A074601")); vector(#v,n,n--; cornerW(n)) == v
+# GP-Test  OEIS_check_func("A074601",cornerW)
 #
 # top vertices NumVertices(n-1)-1
 # left to top cornerW(n-1) for each those
@@ -150,9 +151,8 @@ MyOEIS::compare_values
 # GP-DEFINE    * 3^((3^n     + 2*n - 1)/4)
 # GP-DEFINE    * 5^((3^(n-1) - 2*n + 1)/4);
 # GP-DEFINE  }
-# OEIS_samples("A193256")
-# GP-Test  my(v=OEIS_samples("A193256")); \
-# GP-Test    vector(#v,n, NumSpanningTrees(n)) == v
+# OEIS_data("A193256")
+# GP-Test  OEIS_check_func("A193256",NumSpanningTrees)
 # recurrence_guess(vector(12,n, NumSpanningTrees(n)))
 
 

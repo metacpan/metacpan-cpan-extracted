@@ -8,7 +8,7 @@ Tests for the Perl modules L<Tie::Subset::Array>.
 
 =head1 Author, Copyright, and License
 
-Copyright (c) 2018 Hauke Daempfling (haukex@zero-g.net).
+Copyright (c) 2018-2023 Hauke Daempfling (haukex@zero-g.net).
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl 5 itself.
@@ -64,6 +64,15 @@ is $subset[7], undef;
 is $subset[8], undef;
 is $subset[-1], undef;
 
+# Exists
+ok exists $subset[0];
+ok !exists $subset[20];
+SKIP: {
+	skip "work around some kind of apparent regression in 5.14 and 5.16", 1
+		if $] ge '5.014' && $] lt '5.018';
+	ok !exists $subset[-1];
+}
+
 # Storing
 ok $subset[1]=42;
 {
@@ -84,6 +93,50 @@ is_deeply \@array, [11,22,33,42,55,66,77,88,99,undef,undef,123];
 is_deeply \@subset, [33,42,55,undef,88,456,123] or diag explain \@subset;
 is_deeply \@array, [11,22,33,42,55,undef,77,88,99,456,undef,123];
 
-#TODO Later: Tests for "not supported" features
+# Errors
+ok exception { tie my @foo, 'Tie::Subset::Array', [1..3], [0], 'foo' };
+ok exception { tie my @foo, 'Tie::Subset::Array', {}, [0] };
+ok exception { tie my @foo, 'Tie::Subset::Array', [1..3], {} };
+ok exception { tie my @foo, 'Tie::Subset::Array', [1..3], ['a'] };
+ok exception { tie my @foo, 'Tie::Subset::Array', [1..3], [\0] };
+ok exception { tie my @foo, 'Tie::Subset' };
+ok exception { Tie::Subset::TIEARRAY('Tie::Subset::Foobar', []) };
+
+# Not Supported
+{
+	no warnings FATAL=>'all'; use warnings;  ## no critic (ProhibitNoWarnings)
+	ok 1==grep { /\b\Qnot (yet) supported\E\b/ } warns {
+		$#subset = 1;
+	};
+	SKIP: {
+		skip "test fails on pre-5.24 Perls", 1 if $] lt '5.024';
+		# Since it's only here for code coverage, it's ok to skip it
+		ok 1==grep { /\b\Qnot (yet) supported\E\b/ } warns {
+			@subset = ();
+		};
+	}
+	ok 1==grep { /\b\Qnot (yet) supported\E\b/ } warns {
+		push @subset, 'a';
+	};
+	ok 1==grep { /\b\Qnot (yet) supported\E\b/ } warns {
+		pop @subset;
+	};
+	ok 1==grep { /\b\Qnot (yet) supported\E\b/ } warns {
+		shift @subset;
+	};
+	ok 1==grep { /\b\Qnot (yet) supported\E\b/ } warns {
+		unshift @subset, 'z';
+	};
+	ok 1==grep { /\b\Qnot (yet) supported\E\b/ } warns {
+		splice @subset, 0, 2, 'x';
+	};
+	ok 1==grep { /\b\Qnot (yet) supported\E\b/ } warns {
+		delete $subset[0];
+	};
+}
+
+# Untie
+untie @subset;
+is_deeply \@subset, [];
 
 done_testing;

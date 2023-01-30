@@ -5,7 +5,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '1.004'; # VERSION
+our $VERSION = '1.005'; # VERSION
 our $LAST_UPDATE = '1.003'; # manually update whenever code is changed
 
 ###########################################################

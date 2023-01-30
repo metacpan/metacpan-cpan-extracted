@@ -60,6 +60,7 @@ devel/run-vacuum-dialog.pl
 devel/run-watchlist.pl
 devel/run-weblink-menu.pl
 devel/scandeps-to-makefile.pl
+devel/t-font.pl
 devel/VacuumDialog.t
 devel/warnings-unused.pl
 devel/weblinks-samples.pl
@@ -545,6 +546,7 @@ misc/t-intraday-image.pl
 misc/t-latest-handler.pl
 misc/t-latest.pl
 misc/t-line-drawer.pl
+misc/t-linreg.pl
 misc/t-list-of-lists.pl
 misc/t-listseq.pl
 misc/t-lj.pl

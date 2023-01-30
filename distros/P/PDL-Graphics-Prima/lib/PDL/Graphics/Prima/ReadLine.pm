@@ -3,13 +3,11 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = 0.17;   # update with update-version.pl
+our $VERSION = 0.18;   # update with update-version.pl
 
 my $is_setup = 0;
 
 sub is_happy_with {
-	# Stop-gap until I figure out better readline support for Windows
-	return 0 if $^O =~ /Win/ or $^O =~ /cygwin/;
 	my ($class, $readline_obj) = @_;
 	return eval{ $readline_obj->can('event_loop')
 		and not $readline_obj->tkRunning };
@@ -17,9 +15,9 @@ sub is_happy_with {
 
 sub setup {
 	my ($class, $readline_obj) = @_;
-	
+
 	return if $is_setup;
-	
+
 	# Make sure we have a readline object that knows how to work with the
 	# event loop:
 	if (not $class->is_happy_with($readline_obj)) {
@@ -28,26 +26,40 @@ sub setup {
 		croak("PDL::Graphics::Prima::ReadLine expects a readline object that knows how to event_loop.\n"
 				. "This is provided in Term::ReadLine v1.09 or newer");
 	}
-	
+
 	# We must call the import method for this to work, even though we don't need
 	# need any functions imported. The reason is that Prima sets up the
 	# application object during the import if it hasn't already been set up (by
 	# a previous call to Prima::Application::import).
 	require Prima::Application;
 	Prima::Application->import;
-	
-	# This io watcher will (eventually) watch whatever the readline is
-	# monitoring. That will be established later in the call to event_loop.
-	# Die'ing is a simple way to exit the "go" method invoked during the
-	# event loop
+
+	# Except on Windows, this io watcher will (eventually) watch whatever the
+	# readline is monitoring. That will be established later in the call to
+	# event_loop. Die'ing is a simple way to exit the "go" method invoked
+	# during the event loop
 	my $prima_io_watcher = Prima::File->new(
 		onRead => sub { die 'user pressed a key' },
 	);
-	
+	# On Windows, use this timer instead
+	my $fh;
+	Prima::Timer->new(
+		timeout => 30,
+		onTick => sub {
+			die 'user pressed a key' if Term::ReadKey::ReadKey(-1);#PeekKey();
+		}
+	)->start if $^O =~ /Win/;
+
+#	setup_readkey();
+
 	$readline_obj->event_loop( sub {
 			local $@;
 			# Run the event loop. If a key is pressed, the io watcher's
 			# callback will get called, throwing an exception.
+#if (PeekKey()) {
+#print "PeekKey is already true\n" if PeekKey();
+#print "OldReadKey returns ", OldReadKey(-1), "\n";
+#}
 			eval { $::application->go };
 			# Rethrow the exception if it's not one that we threw
 			die unless $@ =~ /user pressed a key/;
@@ -55,8 +67,8 @@ sub setup {
 		sub {
 			# Register the event loop, which means associating the io
 			# watcher with the specific io handle the readline wants
-			my $fh = shift;
-			$prima_io_watcher->file($fh);
+			$fh = shift;
+			$prima_io_watcher->file($fh) unless $^O =~ /Win32/;
 		},
 	);
 	$is_setup = 1;
@@ -64,6 +76,41 @@ sub setup {
 
 # Status method
 sub is_setup { $is_setup }
+
+1;
+__END__
+# My own version of ReadKey that lets me peek using PeakKey. This is ONLY
+# used on Windows, though I suppose it could work on other OSes too. I feel
+# rather dirty monkey-patching Term::ReadKey like this, but I really need to be
+# able to peek without obliterating the keystroke from the ReadKey buffer. :-(
+sub OldReadKey;
+sub ReadKey;
+sub PeekKey;
+sub setup_readkey {
+	print "PDL::Graphics::Prima::ReadLine patching Term::ReadKey\n";
+	require Term::ReadKey;
+	*OldReadKey = \&Term::ReadKey::ReadKey;
+	no warnings 'redefine';
+	*Term::ReadKey::ReadKey = \&ReadKey;
+}
+my $last_key;
+my $counter = 1;
+sub PeekKey {
+print "$counter time peeking at key\n" if $counter % 100 == 0;
+$counter++;
+	return $last_key if defined $last_key;
+	return $last_key = OldReadKey(-1);
+}
+sub ReadKey {
+print "Called new ReadKey\n";
+	if (defined $last_key) {
+		my $to_return = $last_key;
+		$last_key = undef;
+		return $to_return;
+	}
+	return OldReadKey(@_);
+}
+
 
 1;
 
@@ -80,17 +127,17 @@ together
  # associate's the PDL Shell's readline object if it
  # exists:
  use PDL::Graphics::Prima;
- 
+
  # Did it set up the readline event loop callback?
  print "Set up Prima/ReadLine interaction\n"
      if PDL::Graphics::Prima::ReadLine->is_setup;
- 
+
  # If you are not in the PDL shell, you can supply
  # your own ReadLine object.
  if (PDL::Graphics::Prima::ReadLine->is_happy_with($my_readline) {
      PDL::Graphics::Prima::ReadLine->setup($my_readline);
  }
- 
+
  # If you don't validate first, setup() may croak.
  # In other words, instead of this:
  if (PDL::Graphics::Prima::ReadLine->is_happy_with($my_readline) {
@@ -205,6 +252,10 @@ Specifies different kinds of scaling, including linear and logarithmic
 
 Defines a number of useful functions for generating simple and not-so-simple
 plots
+
+=item L<PDL::Graphics::Prima::SizeSpec|PDL::Graphics::Prima::SizeSpec/>
+
+Compute pixel distances from meaningful units
 
 =back
 

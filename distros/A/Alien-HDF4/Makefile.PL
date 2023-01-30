@@ -67,3 +67,7 @@ WriteMakefile(
     },
   },
 );
+
+sub MY::postamble {
+  join "\n", map "lib/$_ :: common.pl\n\t\$(PERLRUN) \$@.PL \$@\n", @pms;
+}

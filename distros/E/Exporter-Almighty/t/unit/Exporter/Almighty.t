@@ -23,10 +23,11 @@ use Test2::V0 -target => 'Exporter::Almighty';
 use Test2::Tools::Spec;
 use Data::Dumper;
 
-use if $] lt '5.036000',
-	'builtins::compat' => qw( is_bool created_as_string created_as_number );
-use if $] ge '5.036000',
-	'builtin'          => qw( is_bool created_as_string created_as_number );
+my @builtins;
+BEGIN { @builtins = qw( is_bool created_as_string created_as_number ) };
+use if $] lt '5.036000', 'builtins::compat' => @builtins;
+use if $] ge '5.036000', 'builtin' => @builtins;
+no if $] ge '5.036000', 'warnings' => qw( experimental::builtin );
 
 use FindBin qw( $Bin );
 use lib "$Bin/../../lib";
@@ -188,6 +189,42 @@ describe "method `steps`" => sub {
 		];
 	};
 	
+	case 'when setup_classes_for needs to be called' => sub {
+		$setup     = { class => [] };
+		$expected  = [
+			'setup_exporter_for',
+			'setup_classes_for',
+			'finalize_export_variables_for',
+		];
+	};
+	
+	case 'when setup_roles_for needs to be called' => sub {
+		$setup     = { role => [] };
+		$expected  = [
+			'setup_exporter_for',
+			'setup_roles_for',
+			'finalize_export_variables_for',
+		];
+	};
+	
+	case 'when setup_ducks_for needs to be called' => sub {
+		$setup     = { duck => [] };
+		$expected  = [
+			'setup_exporter_for',
+			'setup_ducks_for',
+			'finalize_export_variables_for',
+		];
+	};
+	
+	case 'when setup_types_for needs to be called' => sub {
+		$setup     = { type => [] };
+		$expected  = [
+			'setup_exporter_for',
+			'setup_types_for',
+			'finalize_export_variables_for',
+		];
+	};
+	
 	case 'when setup_constants_for needs to be called' => sub {
 		$setup     = { const => {} };
 		$expected  = [
@@ -197,7 +234,7 @@ describe "method `steps`" => sub {
 		];
 	};
 	
-	case 'when all optional calls are needed' => sub {
+	case 'when multiple optional calls are needed' => sub {
 		$setup     = { also => [], const => {}, enum => {} };
 		$expected  = [
 			'setup_exporter_for',
@@ -261,7 +298,7 @@ describe "method `setup_exporter_for`" => sub {
 	};
 };
 
-describe "method `setup_exporter_for`" => sub {
+describe "method `setup_reexports_for`" => sub {
 	
 	tests 'it works' => sub {
 		
@@ -326,16 +363,6 @@ describe "method `setup_enums_for`" => sub {
 		is(
 			\%Local::TestPkg14::EXPORT_TAGS,
 			hash {
-				field colour => bag {
-					item string 'Colour';
-					item string 'assert_Colour';
-					item string 'is_Colour';
-					item string 'to_Colour';
-					item string 'COLOUR_RED';
-					item string 'COLOUR_GREEN';
-					item string 'COLOUR_BLUE';
-					end;
-				};
 				field types => bag {
 					item string 'Colour';
 					end;
@@ -362,6 +389,200 @@ describe "method `setup_enums_for`" => sub {
 			},
 			'%EXPORT_TAGS',
 		) or diag Dumper( \%Local::TestPkg14::EXPORT_TAGS );
+	};
+};
+
+describe "method `setup_classes_for`" => sub {
+	
+	tests 'it works' => sub {
+		
+		$CLASS->setup_classes_for(
+			'Local::TestPkg19',
+			{ class => [ 'JSON::PP' => { name => 'JsonEncoder' } ] },
+		);
+		
+		is(
+			Local::TestPkg19::JsonEncoder(),
+			object {
+				prop isa => 'Type::Tiny';
+				prop isa => 'Type::Tiny::Class';
+				call class => 'JSON::PP';
+			},
+			'JsonEncoder()',
+		);
+		
+		is(
+			\%Local::TestPkg19::EXPORT_TAGS,
+			hash {
+				field types => bag {
+					item string 'JsonEncoder';
+					end;
+				};
+				field assert => bag {
+					item string 'assert_JsonEncoder';
+					end;
+				};
+				field is => bag {
+					item string 'is_JsonEncoder';
+					end;
+				};
+				field to => bag {
+					item string 'to_JsonEncoder';
+					end;
+				};
+				end;
+			},
+			'%EXPORT_TAGS',
+		) or diag Dumper( \%Local::TestPkg19::EXPORT_TAGS );
+	};
+};
+
+describe "method `setup_roles_for`" => sub {
+	
+	tests 'it works' => sub {
+		
+		$CLASS->setup_roles_for(
+			'Local::TestPkg20',
+			{ role => [ 'Abc::Def' ] },
+		);
+		
+		is(
+			Local::TestPkg20::AbcDef(),
+			object {
+				prop isa => 'Type::Tiny';
+				prop isa => 'Type::Tiny::Role';
+				call role => 'Abc::Def';
+			},
+			'AbcDef()',
+		);
+		
+		is(
+			\%Local::TestPkg20::EXPORT_TAGS,
+			hash {
+				field types => bag {
+					item string 'AbcDef';
+					end;
+				};
+				field assert => bag {
+					item string 'assert_AbcDef';
+					end;
+				};
+				field is => bag {
+					item string 'is_AbcDef';
+					end;
+				};
+				field to => bag {
+					item string 'to_AbcDef';
+					end;
+				};
+				end;
+			},
+			'%EXPORT_TAGS',
+		) or diag Dumper( \%Local::TestPkg20::EXPORT_TAGS );
+	};
+};
+
+describe "method `setup_ducks_for`" => sub {
+	
+	tests 'it works' => sub {
+		
+		$CLASS->setup_ducks_for(
+			'Local::TestPkg21',
+			{ duck => { InputOutput => [ qw/ read write / ] } },
+		);
+		
+		is(
+			Local::TestPkg21::InputOutput(),
+			object {
+				prop isa => 'Type::Tiny';
+				prop isa => 'Type::Tiny::Duck';
+				call methods => bag {
+					item string 'read';
+					item string 'write';
+					end;
+				};
+			},
+			'InputOutput()',
+		);
+		
+		is(
+			\%Local::TestPkg21::EXPORT_TAGS,
+			hash {
+				field types => bag {
+					item string 'InputOutput';
+					end;
+				};
+				field assert => bag {
+					item string 'assert_InputOutput';
+					end;
+				};
+				field is => bag {
+					item string 'is_InputOutput';
+					end;
+				};
+				field to => bag {
+					item string 'to_InputOutput';
+					end;
+				};
+				end;
+			},
+			'%EXPORT_TAGS',
+		) or diag Dumper( \%Local::TestPkg21::EXPORT_TAGS );
+	};
+};
+
+describe "method `setup_types_for`" => sub {
+	
+	tests 'it works with an explicit list of types' => sub {
+		
+		$CLASS->setup_types_for(
+			'Local::TestPkg22',
+			{ type => [ 'Types::Common::Numeric', [ 'SingleDigit' ] ] },
+		);
+		
+		is(
+			Local::TestPkg22::SingleDigit(),
+			object { prop isa => 'Type::Tiny' },
+			'SingleDigit()',
+		);
+		
+		is(
+			\%Local::TestPkg22::EXPORT_TAGS,
+			hash {
+				field types => bag {
+					item string 'SingleDigit';
+					end;
+				};
+				field assert => bag {
+					item string 'assert_SingleDigit';
+					end;
+				};
+				field is => bag {
+					item string 'is_SingleDigit';
+					end;
+				};
+				field to => bag {
+					item string 'to_SingleDigit';
+					end;
+				};
+				end;
+			},
+			'%EXPORT_TAGS',
+		) or diag Dumper( \%Local::TestPkg22::EXPORT_TAGS );
+	};
+	
+	tests 'it works with just a list of libraries' => sub {
+		
+		$CLASS->setup_types_for(
+			'Local::TestPkg23',
+			{ type => [ 'Types::Common::Numeric' ] },
+		);
+		
+		is(
+			Local::TestPkg23::SingleDigit(),
+			object { prop isa => 'Type::Tiny' },
+			'SingleDigit()',
+		);
 	};
 };
 
@@ -508,6 +729,5 @@ describe "method `make_constant_subs`" => sub {
 		) or diag Dumper( \@Local::TestPkg17::EXPORT );
 	};
 };
-
 
 done_testing;

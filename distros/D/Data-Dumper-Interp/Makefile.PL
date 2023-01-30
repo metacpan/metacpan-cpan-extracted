@@ -44,12 +44,13 @@ my %WriteMakefileArgs = (
     "Tie::Hash" => 0,
     "Tie::Scalar" => 0,
     "Time::HiRes" => 0,
+    "bigint" => 0,
     "bignum" => 0,
     "bigrat" => 0,
     "open" => 0,
     "version" => "0.77"
   },
-  "VERSION" => "4.107",
+  "VERSION" => "4.110",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -77,6 +78,7 @@ my %FallbackPrereqs = (
   "Tie::Hash" => 0,
   "Tie::Scalar" => 0,
   "Time::HiRes" => 0,
+  "bigint" => 0,
   "bignum" => 0,
   "bigrat" => 0,
   "feature" => 0,

@@ -46,6 +46,8 @@ BEGIN {
 	1;
 };
 
+isa_ok( 'Local::Package', 'Type::Library' );
+
 {
 	use Local::Package -all, -lexical;
 	is( RED, 'red' );

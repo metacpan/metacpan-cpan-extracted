@@ -1,5 +1,5 @@
 This archive contains the distribution Util-H2O-More,
-version 0.2.4:
+version 0.2.7:
 
   provides C<baptise>, a drop-in replacement for C<bless>; like if C<bless> created accessors for you. This module also provides additional methods built using C<h2o> or C<o2h> from Util::H2O that allow for the incremental addition of OOP into existing or small scale Perl code without having to fully commit to a Perl OOP framework or compromise one's personal Perl style.
 

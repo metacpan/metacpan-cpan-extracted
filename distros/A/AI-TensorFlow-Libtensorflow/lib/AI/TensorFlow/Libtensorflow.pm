@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow;
 # ABSTRACT: Bindings for Libtensorflow deep learning library
-$AI::TensorFlow::Libtensorflow::VERSION = '0.0.4';
+$AI::TensorFlow::Libtensorflow::VERSION = '0.0.6';
 use strict;
 use warnings;
 
@@ -59,6 +59,9 @@ __END__
 
 AI::TensorFlow::Libtensorflow - Bindings for Libtensorflow deep learning library
 
+=for html <a href="https://mybinder.org/v2/gh/EntropyOrg/perl-AI-TensorFlow-Libtensorflow/master"><img src="https://mybinder.org/badge_logo.svg" alt="Binder" /></a>
+<a href="https://quay.io/repository/entropyorg/perl-ai-tensorflow-libtensorflow"><img src="https://img.shields.io/badge/quay.io-images-red.svg" alt="quay.io images" /></a>
+
 =head1 SYNOPSIS
 
   use aliased 'AI::TensorFlow::Libtensorflow' => 'Libtensorflow';
@@ -93,7 +96,7 @@ Zakariyya Mughal <zmughal@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Auto-Parallel Technologies, Inc.
+This software is Copyright (c) 2022-2023 by Auto-Parallel Technologies, Inc.
 
 This is free software, licensed under:
 

@@ -28,7 +28,7 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.9661"
+            "SPVM" : "0.9686"
          }
       },
       "runtime" : {
@@ -36,6 +36,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

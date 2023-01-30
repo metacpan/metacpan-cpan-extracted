@@ -1,0 +1,79 @@
+NAME
+    App::SpreadsheetUtils - CLI utilities related to spreadsheet (XLS, XLSX,
+    ODS, ...)
+
+VERSION
+    This document describes version 0.003 of App::SpreadsheetUtils (from
+    Perl distribution App-SpreadsheetUtils), released on 2023-01-29.
+
+DESCRIPTION
+    This distribution contains the following CLI utilities:
+
+    *   ss-info
+
+    *   ss-list-sheets
+
+    *   ss2csv
+
+    *   ss2ss
+
+FUNCTIONS
+  compile_eval_code
+    Usage:
+
+     $coderef = compile_eval_code($str, $label);
+
+    Compile string code $str to coderef in 'main' package, without "use
+    strict" or "use warnings". Die on compile error.
+
+  eval_code
+    Usage:
+
+     $res = eval_code($coderef, $r, $topic_var_value, $return_topic_var);
+
+FAQ
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-SpreadsheetUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-SpreadsheetUtils>.
+
+SEE ALSO
+    Spreadsheet::Read
+
+    App::CSVUtils
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-SpreadsheetUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

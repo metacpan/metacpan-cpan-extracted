@@ -1,3 +1,6 @@
+1.009 2023-01-28
+- Prima driver now working again - thanks @dk
+
 1.008 2022-12-29
 - fix precedence error in PDL::Graphics::Simple::PGPLOT
 

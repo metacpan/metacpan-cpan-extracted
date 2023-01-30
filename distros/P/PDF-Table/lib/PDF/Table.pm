@@ -18,8 +18,8 @@ use PDF::Table::ColumnWidth;
 use PDF::Table::Settings;
 # can't move text_block() b/c many globals referenced
 
-our $VERSION = '1.004'; # fixed, read by Makefile.PL
-our $LAST_UPDATE = '1.004'; # manually update whenever code is changed
+our $VERSION = '1.005'; # fixed, read by Makefile.PL
+our $LAST_UPDATE = '1.005'; # manually update whenever code is changed
 # don't forget to update VERSION down in POD area
 
 my $compat_mode = 0; # 0 = new behaviors, 1 = compatible with old
@@ -472,8 +472,15 @@ sub table {
                 }
             } else {
                 # um, is not a legal data type for this purpose, even if it
-                # IS able to stringify to something reasonable
-                $bad_markup = 'is not a string or array reference';
+                # IS able to stringify to something reasonable.
+                # See if we can stringify it... better than a total failure?
+                my $string = '';  # in case stringification fails
+                $bad_markup = ''; # in case stringification succeeds
+                eval { $string = ''.$data->[$row_idx][$col_idx]; };
+                    $bad_markup = 'is not a string or array reference' if $@;
+                $data->[$row_idx][$col_idx] = $string;
+                # if fatal error in eval, $string will be empty, and $bad_markup
+                #   will cause it to be ignored anyway
             }
             if ($bad_markup ne '') {
                 # replace bad markup with a simple string

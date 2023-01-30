@@ -7,13 +7,13 @@ use PDL::Graphics::Prima::Limits;
 # Here's a package to handle the axes for me:
 package PDL::Graphics::Prima::Axis;
 
-our $VERSION = 0.17;   # update with update-version.pl
+our $VERSION = 0.18;   # update with update-version.pl
 
 use PDL::Graphics::Prima::Limits;
 use PDL::Graphics::Prima::Scaling;
 use Carp;
 
-use PDL;
+use PDL::Lite;
 use Prima;
 our @ISA = qw(Prima::Component);
 
@@ -147,6 +147,7 @@ sub update_edges {
 	# bad values or something), we will get undef. We need to be careful to not
 	# be thrown off by that possible return value.
 	if (defined $min and defined $max) {
+		# XXX handle degenerate case XXX
 		$self->{minValue} = $min if $self->{minAuto};
 		$self->{maxValue} = $max if $self->{maxAuto};
 	}
@@ -196,6 +197,7 @@ sub _min {
 			unless ($self->{scaling}->is_valid_extremum($new_value));
 		# Check for degeneracy
 		if ($self->_max == $new_value) {
+			# XXX What does this actually do? Does this have side-effects I do not see?
 			my ($min, $max) = $self->owner->compute_min_max_for($self->name);
 		}
 		else {
@@ -375,7 +377,18 @@ sub repaint_parent {
 	# immediately
 	$::application->yield if defined $PERLDL::TERM;
 }
-*on_changebounds = \&repaint_parent;
+sub on_changebounds {
+	my $axis = shift;
+	$axis->owner->notify('Paint');
+	
+	# If running in the PDL shell and not due to a mouse drag, clear the
+	# event queue so this hits immediately. If this change is due to a
+	# mouse drag (evidenced by the parent tracking mouse coordinates),
+	# then clearing the queue causes the plot to accelerate away. Guard
+	# against that.
+	$::application->yield if defined $PERLDL::TERM
+		and not exists $axis->owner->{mouse_down_rel};
+}
 *on_changescaling = \&repaint_parent;
 sub on_changelabel {
 	my $self = shift;
@@ -435,22 +448,19 @@ sub get_Ticks_and_ticks {
 	my ($em_width, $em_height) = $axis->em_dims;
 	my ($padded_min, $padded_max);
 	
-	if ($axis->name =~ /^x/) {
-		$padded_min = $axis->pixels_to_reals(
-			$axis->reals_to_pixels(scalar ($axis->min), $ratio) - $em_width,
-			$ratio);
-		$padded_max = $axis->pixels_to_reals(
-			$axis->reals_to_pixels(scalar ($axis->max), $ratio) + $em_width,
-			$ratio);
-	}
-	else {
-		$padded_min = $axis->pixels_to_reals(
-			$axis->reals_to_pixels(scalar ($axis->min), $ratio) - $em_height/2,
-			$ratio);
-		$padded_max = $axis->pixels_to_reals(
-			$axis->reals_to_pixels(scalar ($axis->max), $ratio) + $em_height/2,
-			$ratio);
-	}
+	my $padding = $axis->name =~ /^x/ ? $em_width : $em_height/2;
+	warn("Zero padding in get_Ticks_and_ticks") if $padding == 0;
+	
+	$padded_min = $axis->pixels_to_reals(
+		$axis->reals_to_pixels(scalar ($axis->min), $ratio) - $padding,
+		$ratio);
+	$padded_max = $axis->pixels_to_reals(
+		$axis->reals_to_pixels(scalar ($axis->max), $ratio) + $padding,
+		$ratio);
+	
+	# Indicate trouble if the min and max are the same
+	die("Padded axis min/max for " . $axis->name . " are the same")
+		if $padded_min == $padded_max;
 	
 	# Get the locations for the major and minor ticks:
 	my ($Ticks, $ticks) = $axis->{scaling}->compute_ticks($padded_min, $padded_max);
@@ -485,12 +495,12 @@ sub draw {
 	# some such. In the meantime, just draw it on the edges:
 	# working here - make this prettier
 	my ($canv_width, $canv_height) = $canvas->size;
-	my $tick_length = 8 * $ratio; #0.8 * sqrt($canv_width < $canv_height ? $canv_height : $canv_width);
-	my $Tick_size = pdl($tick_length, -$tick_length)->transpose;
+	my $tick_length = 8 * $ratio;
+	my $Tick_size = PDL->new($tick_length, -$tick_length)->transpose;
 	my $tick_size = $Tick_size / 2;
 	
-	my $top_bottom = pdl($clip_bottom, $clip_top)->transpose;
-	my $left_right = pdl($clip_left, $clip_right)->transpose;
+	my $top_bottom = PDL->new($clip_bottom, $clip_top)->transpose;
+	my $left_right = PDL->new($clip_left, $clip_right)->transpose;
 	
 	if ($axis->name =~ /^x/) {
 		# Ensure the tick marks are exactly clipped:
@@ -502,15 +512,15 @@ sub draw {
 			if $canvas->isa('Prima::PS::Drawable');
 
 		# Draw the minor tick marks:
-		$canvas->pdl_lines($ticks_pixels, $top_bottom, $ticks_pixels, $top_bottom + $tick_size
-				, lineWidth => 2);
+		$canvas->pdl_lines($ticks_pixels, $top_bottom,
+			$ticks_pixels, $top_bottom + $tick_size);
 		# Draw the major tick marks:
-		$canvas->pdl_lines($Ticks_pixels, $top_bottom, $Ticks_pixels, $top_bottom + $Tick_size
-				, lineWidth => 2);
+		$canvas->pdl_lines($Ticks_pixels, $top_bottom,
+			$Ticks_pixels, $top_bottom + $Tick_size);
 		# Draw lines on the top/bottom, drawing wider so that the edges are
 		# correctly handled by the clipping
-		$canvas->pdl_lines($left_right->at(0,0)-3, $top_bottom, $left_right->at(0,1)+1, $top_bottom
-				, lineWidth => 2);
+		$canvas->pdl_lines($left_right->at(0,0)-3, $top_bottom,
+			$left_right->at(0,1)+1, $top_bottom);
 		
 		# Figure out the top of the axis labels:
 		my $label_top = $clip_bottom - $em_height/4;
@@ -553,14 +563,14 @@ sub draw {
 		$canvas->clipRect(0, $clip_bottom, $canvas->width, $clip_top);
 		
 		# draw the minor tick marks:
-		$canvas->pdl_lines($left_right, $ticks_pixels, $left_right + $tick_size, $ticks_pixels
-				, lineWidth => 2);
+		$canvas->pdl_lines($left_right, $ticks_pixels,
+			$left_right + $tick_size, $ticks_pixels);
 		# draw the major tick marks:
-		$canvas->pdl_lines($left_right, $Ticks_pixels, $left_right + $Tick_size, $Ticks_pixels
-				, lineWidth => 2);
+		$canvas->pdl_lines($left_right, $Ticks_pixels,
+			$left_right + $Tick_size, $Ticks_pixels);
 		# Draw lines on the left/right:
-		$canvas->pdl_lines($left_right, $top_bottom->at(0,0), $left_right, $top_bottom->at(0,1)
-				, lineWidth => 2);
+		$canvas->pdl_lines($left_right, $top_bottom->at(0,0),
+			$left_right, $top_bottom->at(0,1));
 		
 		# Figure out the right edge of the axis labels:
 		my $label_right = $clip_left - $em_height/4;
@@ -634,12 +644,19 @@ PDL::Graphics::Prima::Axis - class for axis handling
 
 =head1 SYNOPSIS
 
+=for podview <img src="PDL/Graphics/Prima/pod/axis.png">
+
+=for html <p><img src="https://raw.githubusercontent.com/PDLPorters/PDL-Graphics-Prima/master/lib/PDL/Graphics/Prima/pod/axis.png">
+
+ use PDL;
  use PDL::Graphics::Prima::Simple;
- 
+
  # Specify details for an axis during plot construction:
- plot(
+ my $x = sequence(100)/10 + 0.1;
+ my $y = $x->sin + $x->grandom / 10;
+ my $plot = plot(
      -data => ds::Pair($x, $y),
-     
+
      # Details for x-axis:
      x => {
          # Scaling can be either sc::Log or sc::Linear (the default)
@@ -647,59 +664,58 @@ PDL::Graphics::Prima::Axis - class for axis handling
          # Labels are optional:
          label => 'Time [s]',
          format_tick => sub {
-            sprintf("%lf", $_[0])
+            sprintf("[%g]", $_[0])
          },
      },
      # Details for y-axis:
      y => {
          # explicitly specify min/max if you like
-         min => 0,
-         max => 100,
+         min => -2,
+         max => 2,
          onChangeLabel => sub {
              my $self = shift;
              print "You changed the label to ", $self->label, "\n";
          },
      },
  );
- 
- # Get the current x-min:
- my $x_min = $plot->x->min;
+
  # Get the x-max and inquire if it's autoscaling:
  my ($x_min, $is_auto) = $plot->x->min;
  # Set the current y-min to -5:
- $plot->y->min(-5);
+ $plot->y->min(5);
  # Turn on x min autoscaling:
  $plot->x->min(lm::Auto);
  # Stop autoscaling, use the current max (deprecated):
  $plot->x->max($plot->x->max);
- 
+
  # Note: All changes to min/max values
  # fire the ChangeBounds notification
- 
+
  # Get the x-label:
  my $x_label = $plot->x->label;
  # Set the x-label:
- $plot->x->label($new_label);
- 
+ $plot->x->label('new_label');
+
  # Note: All changes to the label
  # fire the ChangeLabel notification
- 
+
  # Conversion among real, relative, and pixel positions,
  # useful for plotType drawing operations
- $x_rels = $plot->x->reals_to_relatives($xs);
- $xs = $plot->x->relatives_to_reals($x_rels);
- $x_pixels = $plot->x->relatives_to_pixels($x_rels);
+ my $x_rels = $plot->x->reals_to_relatives($x);
+ my $xs = $plot->x->relatives_to_reals($x_rels);
+ my $x_pixels = $plot->x->relatives_to_pixels($x_rels);
  $x_rels = $plot->x->pixels_to_relatives($x_pixels);
  $x_pixels = $plot->x->reals_to_pixels($xs);
  $xs = $plot->x->pixels_to_reals($x_pixels);
- 
+
  # Get the current scaling object/class:
- $x_scaling = $plot->x->scaling;
+ my $x_scaling = $plot->x->scaling;
  # Set the current scaling object/class:
  $plot->x->scaling(sc::Log);
 
  # Note: All changes to the scaling
  # fire the ChangeScaling notification
+ line_plot($x, $y);
 
 =head1 DESCRIPTION
 
@@ -740,9 +756,9 @@ and you will get a two-element list if you call it as a getter. For example:
 
  my $piddle = get_data;
  $graph_widget->x->minmax($piddle->minmax);
- 
+
  # ...
- 
+
  print "The x min/max values are ", join(', ', $graph_widget->x->minmax), "\n";
 
 Note that if you are setting both the min and the max to autoscaling, 
@@ -780,8 +796,8 @@ user or other interaction.
 =head2 ChangeBounds
 
 This event is fired immediately after the bounds are changed, whether the
-change is due to the user's mouse interaction or by a setter call of L</min>,
-L</max>, or L</minmax>.
+change is due to the user's mouse interaction or by a setter call of C<min>,
+C<max>, or L</minmax>.
 
 =head2 ChangeScaling
 
@@ -980,6 +996,10 @@ Specifies different kinds of scaling, including linear and logarithmic
 
 Defines a number of useful functions for generating simple and not-so-simple
 plots
+
+=item L<PDL::Graphics::Prima::SizeSpec|PDL::Graphics::Prima::SizeSpec/>
+
+Compute pixel distances from meaningful units
 
 =back
 

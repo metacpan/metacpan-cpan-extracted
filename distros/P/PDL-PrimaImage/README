@@ -1,0 +1,4 @@
+
+PDL::PrimaImage - interface between PDL scalars and Prima images 
+
+Author: Dmitry Karasik <dmitry@karasik.eu.org>

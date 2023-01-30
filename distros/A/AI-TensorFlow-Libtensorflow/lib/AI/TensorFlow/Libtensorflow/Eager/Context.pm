@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Eager::Context;
 # ABSTRACT: Eager context
-$AI::TensorFlow::Libtensorflow::Eager::Context::VERSION = '0.0.4';
+$AI::TensorFlow::Libtensorflow::Eager::Context::VERSION = '0.0.6';
 use strict;
 use warnings;
 use AI::TensorFlow::Libtensorflow::Lib qw(arg);
@@ -41,7 +41,7 @@ Zakariyya Mughal <zmughal@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Auto-Parallel Technologies, Inc.
+This software is Copyright (c) 2022-2023 by Auto-Parallel Technologies, Inc.
 
 This is free software, licensed under:
 

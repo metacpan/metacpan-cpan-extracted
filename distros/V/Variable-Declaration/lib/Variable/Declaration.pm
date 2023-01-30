@@ -3,7 +3,7 @@ use v5.12.0;
 use strict;
 use warnings;
 
-our $VERSION = "0.04";
+our $VERSION = "0.06";
 
 use Keyword::Simple;
 use PPR;
@@ -60,10 +60,32 @@ sub type_tie(\[$@%]@);
     *type_tie = \&Type::Tie::ttie;
 }
 
+our %metadata;
+sub info {
+    my $variable_ref = shift;
+    die 'argument must be reference' unless ref $variable_ref;
+    my $info = $metadata{$variable_ref} or return undef;
+    require Variable::Declaration::Info;
+    Variable::Declaration::Info->new(
+        declaration      => $info->{declaration},
+        type             => $info->{type},
+        attributes       => $info->{attributes},
+    )
+}
+
+sub register_info {
+    my ($variable_ref, $info) = @_;
+    $metadata{$variable_ref} = {
+        declaration      => $info->{declaration},
+        type             => $info->{type},
+        attributes       => $info->{attributes},
+    };
+}
+
 sub _valid {
     my ($declaration, $match) = @_;
 
-    croak "variable declaration is required'"
+    croak "variable declaration is required"
         unless $match->{type_varlist};
 
     my ($eq, $assign) = ($match->{eq}, $match->{assign});
@@ -83,6 +105,7 @@ sub _render_declaration {
     my $args = shift;
     my @lines;
     push @lines => _lines_declaration($args);
+    push @lines => _lines_register_info($args);
     push @lines => _lines_type_check($args) if $args->{level} >= 1;
     push @lines => _lines_type_tie($args)   if $args->{level} == 2;
     push @lines => _lines_data_lock($args)  if $args->{declaration} eq 'const';
@@ -128,6 +151,20 @@ sub _lines_data_lock {
     my @lines;
     for my $type_var (@{$args->{type_vars}}) {
         push @lines => "Variable::Declaration::data_lock($type_var->{var})";
+    }
+    return @lines;
+}
+
+sub _lines_register_info {
+    my $args = shift;
+    my @lines;
+    for my $type_var (@{$args->{type_vars}}) {
+        push @lines => sprintf("Variable::Declaration::register_info(\\%s, { declaration => '%s', attributes => %s, type => %s })",
+            $type_var->{var},
+            $args->{declaration},
+            ($args->{attributes} ? "'$args->{attributes}'" : 'undef'),
+            ($type_var->{type} or 'undef'),
+        );
     }
     return @lines;
 }
@@ -189,8 +226,9 @@ sub _parse_type_var {
     return unless $expression =~ m{
         \A
         (?&PerlOWS)
-        (?<type>(?&PerlIdentifier))? (?&PerlOWS)
+        (?<type>(?&PerlIdentifier) | (?&PerlCall) )? (?&PerlOWS)
         (?<var>(?:(?&PerlVariable)))
+        (?&PerlOWS)
         \Z
         $PPR::GRAMMAR
     }x;
@@ -238,6 +276,19 @@ Variable::Declaration provides new variable declarations, i.e. C<let>, C<static>
 C<let> is equivalent to C<my> with type constraint.
 C<static> is equivalent to C<state> with type constraint.
 C<const> is equivalent to C<let> with data lock.
+
+=head2 INTROSPECTION
+
+The function Variable::Declaration::info lets you introspect return values like L<Variable::Declaration::Info>:
+
+    use Variable::Declaration;
+    use Types::Standard -types;
+
+    let Str $foo = "HELLO";
+    my $vinfo = Variable::Declaration::info \$foo;
+
+    $vinfo->declaration; # let
+    $vinfo->type; # Str
 
 =head2 LEVEL
 

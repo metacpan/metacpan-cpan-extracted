@@ -4,7 +4,7 @@
       "AWNCORP <awncorp@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -45,7 +45,7 @@
          "web" : "http://github.com/awncorp/venus"
       }
    },
-   "version" : "1.85",
+   "version" : "1.90",
    "x_authority" : "cpan:AWNCORP",
    "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",

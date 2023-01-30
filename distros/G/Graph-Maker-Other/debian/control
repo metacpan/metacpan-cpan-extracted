@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022 Kevin Ryde
 
 # This file is part of Graph-Maker-Other.
 
@@ -32,8 +32,8 @@ Depends: libgraph-perl, libgraph-maker-perl, perl (>= 5.004), ${perl:Depends}, $
 Description: Create Graph.pm graphs of various kinds
  Graph types include: Beineke, BinaryBeanstalk, BinomialTree,
  BinomialBoth, BiStar, BulgarianSolitaire, Catalans, Circulant, Crown,
- ExcessConfigurations, FibonacciTree, GosperIsland, Hanoi,
- HanoiExchange, HexGrid, Johnson, Keller, Kneser, KnightGrid,
- MostMaximumMatchingsTree, NoughtsAndCrosses, Petersen (and
- generalized), QuartetTree, RookGrid, TwinAlternateAreaTree,
- TwindragonAreaTree.
+ ExcessConfigurations, FibonacciTree, FoldedHypercube, GosperIsland,
+ HalvedHypercube, Hanoi, HanoiExchange, HexGrid, Johnson, Keller,
+ Kneser, KnightGrid, MostMaximumMatchingsTree, NoughtsAndCrosses,
+ Petersen (and generalized), QuartetTree, RookGrid,
+ TwinAlternateAreaTree, TwindragonAreaTree.

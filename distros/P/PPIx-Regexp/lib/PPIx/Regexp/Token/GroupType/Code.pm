@@ -43,7 +43,7 @@ use base qw{ PPIx::Regexp::Token::GroupType };
 
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.086';
+our $VERSION = '0.087';
 
 sub __match_setup {
     my ( undef, $tokenizer ) = @_;	# Invocant unused
@@ -64,6 +64,14 @@ use constant DEF	=> {
     '?'		=> {
 	expl	=> 'Evaluate code. Always matches.',
 	intro	=> '5.005',
+    },
+    '**'	=> {
+	expl	=> 'Evaluate code, use as regexp at this point. Optimized.',
+	intro	=> '5.037008',
+    },
+    '*'		=> {
+	expl	=> 'Evaluate code. Always matches. Optimized.',
+	intro	=> '5.037008',
     },
 };
 
@@ -90,7 +98,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2022 by Thomas R. Wyant, III
+Copyright (C) 2009-2023 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

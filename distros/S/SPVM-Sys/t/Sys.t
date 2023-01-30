@@ -7,6 +7,9 @@ use lib "$FindBin::Bin/lib";
 BEGIN { $ENV{SPVM_BUILD_DIR} = "$FindBin::Bin/.spvm_build"; }
 
 use SPVM 'Sys';
+use SPVM 'Int';
+use SPVM 'Long';
+use SPVM 'Double';
 
 # Start objects count
 my $start_memory_blocks_count = SPVM::get_memory_blocks_count();

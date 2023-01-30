@@ -5,24 +5,24 @@ use warnings;
 package Exporter::Almighty;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001000';
+our $VERSION   = '0.001003';
 
-use parent           qw( Exporter::Tiny );
+use parent qw( Exporter::Tiny );
 
-use if $] lt '5.036000',
-	'builtins::compat' => qw( is_bool created_as_string created_as_number );
-use if $] ge '5.036000',
-	'builtin'          => qw( is_bool created_as_string created_as_number );
+my @builtins;
+BEGIN { @builtins = qw( is_bool created_as_string created_as_number ) };
+use if $] lt '5.036000', 'builtins::compat' => @builtins;
+use if $] ge '5.036000', 'builtin' => @builtins;
+no if $] ge '5.036000', 'warnings' => qw( experimental::builtin );
 
-use B                qw( perlstring );
-use Carp             qw( croak );
-use Eval::TypeTiny   qw( eval_closure set_subname );
-use Exporter::Tiny   qw( mkopt );
+use B                 qw( perlstring );
+use Carp              qw( croak );
+use Eval::TypeTiny    qw( eval_closure set_subname );
+use Exporter::Tiny    qw( mkopt );
 use Import::Into;
-use Module::Runtime  qw( require_module module_notional_filename );
-use Type::Registry   qw();
-use Type::Tiny::Enum qw();
-use Types::Common    qw(
+use Module::Runtime   qw( require_module module_notional_filename );
+use Type::Registry    qw();
+use Types::Common     qw(
 	-sigs
 	-types
 	assert_Ref       is_Ref
@@ -57,15 +57,17 @@ sub standard_package_variables {
 }
 
 signature_for setup_for => (
-	method     => 1,
-	positional => [
-		NonEmptySimpleStr,
-		Dict[
-			tag    => Optional[HashRef],
-			const  => Optional[HashRef],
-			enum   => Optional[HashRef[ArrayRef]],
-			also   => Optional[ArrayRef],
-		],
+	method  => 1,
+	head    => [ NonEmptySimpleStr ],
+	named   => [
+		tag    => Optional[HashRef],
+		also   => Optional[ArrayRef],
+		enum   => Optional[HashRef[ArrayRef]],
+		class  => Optional[ArrayRef],
+		role   => Optional[ArrayRef],
+		duck   => Optional[HashRef[ArrayRef]],
+		type   => Optional[ArrayRef],
+		const  => Optional[HashRef],
 	],
 );
 
@@ -86,6 +88,10 @@ sub steps {
 	push @steps, 'setup_exporter_for';
 	push @steps, 'setup_reexports_for'            if $setup->{also};
 	push @steps, 'setup_enums_for'                if $setup->{enum};
+	push @steps, 'setup_classes_for'              if $setup->{class};
+	push @steps, 'setup_roles_for'                if $setup->{role};
+	push @steps, 'setup_ducks_for'                if $setup->{duck};
+	push @steps, 'setup_types_for'                if $setup->{type};
 	push @steps, 'setup_constants_for'            if $setup->{const};
 	push @steps, 'finalize_export_variables_for';
 	return @steps;
@@ -98,8 +104,8 @@ sub setup_exporter_for {
 		$me->standard_package_variables( $into );
 	
 	# Set up @ISA in caller package.
-	push @$into_ISA, $me->base_exporter
-		unless $into->isa( 'Exporter::Tiny' );
+	my $base = $me->base_exporter( $into, $setup );
+	push @$into_ISA, $base unless $into->isa( $base );
 	
 	# Set up %EXPORT_TAGS in caller package.
 	my %tags = %{ $setup->{tag} // {} };
@@ -115,6 +121,8 @@ sub setup_exporter_for {
 sub setup_reexports_for {
 	my ( $me, $into, $setup ) = @_;
 	
+	my $next = $into->can( '_exporter_validate_opts' );
+	
 	my $optlist = mkopt( $setup->{also} );
 	require_module( $_->[0] ) for @$optlist;
 	
@@ -126,6 +134,7 @@ sub setup_reexports_for {
 			my ( $module, $args ) = @$also;
 			$module->import::into( $caller, @{ $args // [] } );
 		}
+		goto $next if $next;
 	};
 	no strict 'refs';
 	*$method_name = set_subname $method_name => $method_code;
@@ -134,9 +143,9 @@ sub setup_reexports_for {
 sub setup_enums_for {
 	my ( $me, $into, $setup ) = @_;
 	
-	my ( $into_ISA, undef, undef, $into_EXPORT_TAGS ) =
-		$me->standard_package_variables( $into );
+	require Type::Tiny::Enum;
 	my $reg = Type::Registry->for_class( $into );
+	$me->_ensure_isa_type_library( $into );
 	
 	my %tags = %{ assert_HashRef $setup->{enum} // {} };
 	for my $tag_name ( keys %tags ) {
@@ -146,16 +155,106 @@ sub setup_enums_for {
 		$tag_name = lc $tag_name;
 		
 		Type::Tiny::Enum->import( { into => $into }, $type_name, $values );
-		my @exportables = @{ $reg->lookup( $type_name )->exportables };
-		for my $e ( @exportables ) {
-			for my $t ( @{ $e->{tags} } ) {
-				push @{ $into_EXPORT_TAGS->{$t} //= [] }, $e->{name};
-			}
-		}
-		push @{ $into_EXPORT_TAGS->{$tag_name} //= [] }, map $_->{name}, @exportables;
+		$into->add_type( $reg->lookup( $type_name ) );
 	}
 	
 	return;
+}
+
+sub setup_classes_for {
+	my ( $me, $into, $setup ) = @_;
+	require Type::Tiny::Class;
+	$me->_setup_classes_or_roles_for( $into, $setup, 'class', 'Type::Tiny::Class' );
+}
+
+sub setup_roles_for {
+	my ( $me, $into, $setup ) = @_;
+	require Type::Tiny::Role;
+	$me->_setup_classes_or_roles_for( $into, $setup, 'role', 'Type::Tiny::Role' );
+}
+
+sub _setup_classes_or_roles_for {
+	my ( $me, $into, $setup, $kind, $tt_class ) = @_;
+	
+	my $reg = Type::Registry->for_class( $into );
+	$me->_ensure_isa_type_library( $into );
+	
+	my $optlist = mkopt( $setup->{$kind} );
+	for my $dfn ( @$optlist ) {
+		( my $pkg_name  = ( $dfn->[1] //= {} )->{$kind} // $dfn->[0] );
+		( my $type_name = ( $dfn->[1] //= {} )->{name}  // $dfn->[0] ) =~ s/:://g;
+		$tt_class->import( { into => $into }, @$dfn );
+		$into->add_type( $reg->lookup( $type_name ) );
+		eval { require_module( $pkg_name ) };
+	}
+	
+	return;
+}
+
+sub setup_ducks_for {
+	my ( $me, $into, $setup ) = @_;
+	
+	require Type::Tiny::Duck;
+	my $reg = Type::Registry->for_class( $into );
+	$me->_ensure_isa_type_library( $into );
+	
+	my %types = %{ assert_HashRef $setup->{duck} // {} };
+	for my $type_name ( keys %types ) {
+		my $values = $types{$type_name};
+		Type::Tiny::Duck->import( { into => $into }, $type_name, $values );
+		$into->add_type( $reg->lookup( $type_name ) );
+	}
+	
+	return;
+}
+
+sub setup_types_for {
+	my ( $me, $into, $setup ) = @_;
+	
+	my $reg = Type::Registry->for_class( $into );
+	$me->_ensure_isa_type_library( $into );
+	
+	my $optlist = mkopt( $setup->{type} );
+	my @extends = ();
+	for my $dfn ( @$optlist ) {
+		my ( $lib, $list ) = @$dfn;
+		eval { require_module( $lib ) };
+		if ( is_ArrayRef $list ) {
+			for my $type_name ( @$list ) {
+				$into->add_type( $lib->get_type( $type_name ) );
+			}
+		}
+		else {
+			push @extends, $lib;
+		}
+	}
+	
+	if ( @extends ) {
+		require Type::Utils;
+		my $wrapper = eval "sub { package $into; &Type::Utils::extends; }";
+		$wrapper->( @extends );
+	}
+	
+	return;
+}
+
+sub _ensure_isa_type_library {
+	my ( $me, $into ) = @_;
+	return if $into->isa( 'Type::Library' );
+	my ( $old_isa ) = $me->standard_package_variables( $into );
+	my $new_isa = [];
+	my $saw_exporter_tiny = 0;
+	for my $pkg ( @$old_isa ) {
+		if ( $pkg eq 'Exporter::Tiny' ) {
+			push @$new_isa, 'Type::Library';
+			$saw_exporter_tiny++;
+		}
+		else {
+			push @$new_isa, $pkg;
+		}
+	}
+	push @$new_isa, 'Type::Library' unless $saw_exporter_tiny;
+	@$old_isa = @$new_isa;
 }
 
 sub setup_constants_for {
@@ -242,6 +341,7 @@ Exporter::Almighty - combining Exporter::Tiny with some other stuff for added po
 
   package Your::Package;
   
+  use v5.12;
   use Exporter::Almighty -setup => {
     tag => {
       foo => [ 'foo1', 'foo2' ],
@@ -271,6 +371,14 @@ Exporter::Almighty - combining Exporter::Tiny with some other stuff for added po
 This module aims to make building exporters easier. It is based on
 L<Exporter::Tiny>, but helps you avoid manually setting C<< @EXPORT_OK >>,
 C<< %EXPORT_TAGS >>, etc.
+
+Exporter::Almighty supports lexical exports, even on Perl versions as old
+as 5.12.
+
+Exporter::Almighty indeed requires Perl 5.12, so it's strongly recommended
+you add C<< use v5.12 >> (or higher) before C<< use Exporter::Almighty >>
+so that your package can benefit from features which don't exist in legacy
+versions of Perl.
 
 =head2 Setup Options
 
@@ -329,6 +437,44 @@ A user of the package defined in the L</SYNOPSIS> could import:
 By convention, the tag names should be snake_case, but constant names
 should be SHOUTING_SNAKE_CASE.
 
+=head3 C<< type >>
+
+This is an arrayref of type libraries. Each library listed will be I<imported>
+into your exporter, and then the types in it will be I<re-exported> to the
+people who use your package. Each type library can optionally be followed by an
+arrayref of type names if you don't want to just import all types.
+
+  package Your::Package;
+  
+  use Exporter::Almighty -setup => {
+    tags => {
+      foo => [ 'foo1', 'foo2' ],
+    },
+    type => [
+      'Types::Standard',
+      'Types::Common::String'  => [ 'NonEmptyStr' ],
+      'Types::Common::Numeric' => [ 'PositiveInt', 'PositiveOrZeroInt' ],
+    ],
+  };
+  
+  sub foo1 { ... }
+  sub foo2 { ... }
+  
+  ...;
+  
+  package main;
+  
+  use Your::Package qw( -foo is_NonEmptyStr );
+  
+  my $got = foo1();
+  if ( is_NonEmptyStr( $got ) ) {
+    foo2();
+  }
+
+If you re-export types like this, then your module will be "promoted" to being
+a subclass of L<Type::Library> instead of L<Exporter::Tiny>. (Type::Library is
+itself a subclass of Exporter::Tiny, so you don't miss out on any features.)
+
 =head3 C<< enum >>
 
 This is a hashref where keys are enumerated type names, and the values are
@@ -350,17 +496,77 @@ A user of the package defined in the L</SYNOPSIS> could import:
     STATUS_ALIVE
     STATUS_DEAD
   );
-  use Your::Package qw( :status );          # shortcut for the above
+  use Your::Package qw( +Status );  # shortcut for the above
 
-The C<< :type >>, C<< :is >>, C<< :assert >>, C<< :to >>, and C<< :constants >>
+The C<Status> function exported by the above will return a L<Type::Tiny::Enum>
+object.
+
+The C<< :types >>, C<< :is >>, C<< :assert >>, C<< :to >>, and C<< :constants >>
 tags will also automatically include the relevent exports.
 
+If you export any enums then your module will be "promoted" from being an
+L<Exporter::Tiny> to being a L<Type::Library>.
+
 By convention, enum types should be UpperCamelCase.
+
+=head3 C<< class >>
+
+This is an arrayref of class names.
+
+  use Exporter::Almighty -setup => {
+    class => [
+      'HTTP::Tiny',
+      'LWP::UserAgent',
+    ],
+  };
+
+People can import:
+
+  use Your::Package qw( +HTTPTiny +LWPUserAgent );
+  
+  unless ( is_HTTPTiny($x) or is_LWPUserAgent($x) ) {
+    $x = HTTPTiny->new();
+  }
+
+These create L<Type::Tiny::Class> type constraints similar to how C<enum>
+works. It will similarly promote your exporter to a L<Type::Library>.
+
+Notice that the C<new> method will be proxied through to the underlying
+class, so these can also work as useful aliases for long class names.
+
+  use Exporter::Almighty -setup => {
+    class => [
+      'ShortName' => { class => 'Very::Long::Class::Name' },
+      'TinyName'  => { class => 'An::Even::Longer::Class::Name' },
+    ],
+  };
+
+Exporter::Almighty will attempt to pre-emptively load modules mentioned here,
+so you don't need to do it yourself. However if the modules don't exist, it
+won't complain.
+
+=head3 C<< role >>
+
+This works the same as C<class>, except for roles.
+
+=head3 C<< duck >>
+
+This is a hashref where keys are "duck type" type names, and the values are
+arrayrefs of method names.
+
+  use Exporter::Almighty -setup => {
+    duck => [
+      'UserAgent' => [ 'head', 'get', 'post' ],
+    ],
+  };
+
+These create L<Type::Tiny::Duck> type constraints similar to how C<enum>
+works. It will similarly promote your exporter to be a L<Type::Library>.
 
 =head3 C<< also >>
 
 A list of other packages to also export to your caller. Each package name
-can optionally be followed by an arrayerf of import arguments.
+can optionally be followed by an arrayref of import arguments.
 
   use Exporter::Almighty -setup => {
     also => [
@@ -384,7 +590,7 @@ Instead of:
 
 It is possible to do this at run-time:
 
-  Exporter::Almighty->setup_for( 'Your::Package', \%setup );
+  Exporter::Almighty->setup_for( 'Your::Package', %setup );
 
 This may allow slightly more flexibility in some cases.
 
@@ -393,6 +599,8 @@ Exporter::Almighty is also designed to be easily subclassable.
 =head2 Exporter::Tiny features you get for free
 
 =head3 Features for you
+
+Exporter::Almighty will import L<strict> and L<warnings> into your package.
 
 You can export package variables, though it's rarely a good idea:
 

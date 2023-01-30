@@ -22,5 +22,5 @@ requires:
 resources:
   bugtracker: https://github.com/PhilterPaper/PDF-Table/issues
   repository: https://github.com/PhilterPaper/PDF-Table
-version: '1.004'
+version: '1.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

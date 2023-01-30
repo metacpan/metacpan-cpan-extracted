@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Exception.pm
-## Version v1.2.1
+## Version v1.2.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/08/05
+## Modified 2023/01/11
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -29,7 +29,7 @@ BEGIN
     $CALLER_LEVEL = 0;
     $CALLER_INTERNAL->{'Module::Generic'}++;
     $CALLER_INTERNAL->{'Module::Generic::Exception'}++;
-    our $VERSION = 'v1.2.1';
+    our $VERSION = 'v1.2.2';
 };
 
 BEGIN
@@ -150,7 +150,11 @@ sub init
             $p2 =~ tr/-/_/;
             $p2 =~ s/[^a-zA-Z0-9\_]+//g;
             $p2 =~ s/^\d+//g;
-            $self->$p2( $copy->{ $p } );
+            # We do not want to trigger an error by calling non-existing subroutines
+            if( my $subref = $self->can( $p2 ) )
+            {
+                $subref->( $self => $copy->{ $p } );
+            }
         }
     }
     $self->{file} = $frame->filename;

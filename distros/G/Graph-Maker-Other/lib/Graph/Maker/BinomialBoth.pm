@@ -1,4 +1,4 @@
-# Copyright 2019, 2020, 2021 Kevin Ryde
+# Copyright 2019, 2020, 2021, 2022 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -24,11 +24,12 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 18;
+$VERSION = 19;
 @ISA = ('Graph::Maker');
 
 # GP-DEFINE  default(strictargs,1);
-# GP-DEFINE  read("my-oeis.gp");
+# GP-DEFINE  read("OEIS-data.gp");
+# GP-DEFINE  read("OEIS-data-wip.gp");
 # GP-DEFINE  read("memoize.gp");
 
 # uncomment this to run the ### lines
@@ -430,8 +431,7 @@ paths 2 shorter than the other paths (4L+2 rather than 4L+4),
 
 # GP-DEFINE  num_vertices(k) = 2^k;
 # GP-DEFINE  Wpairs(k) = binomial(num_vertices(k),2);
-# GP-Test  my(want=OEIS_samples("A006516"));  /* OFFSET=0 */ \
-# GP-Test    vector(#want,k,k--; Wpairs(k)) == want
+# GP-Test  OEIS_check_func("A006516","Wpairs")
 # GP-Test  vector(7,k,k--; Wpairs(k)) == [0, 1, 6, 28, 120, 496, 2016]
 # GP-Test  vector(100,k,k--; Wpairs(k)) == \
 # GP-Test  vector(100,k,k--; 1/2*( 4^k - 2^k ))
@@ -543,8 +543,7 @@ convolution, this gives the Wnew paths as
 # GP-Test  vector(100,k,k--; (k+1)*4^k - k*binomial(2*k,k))
 
 # GP-DEFINE  Apery(k) = k*binomial(2*k,k);
-# GP-Test  my(want=OEIS_samples("A005430"));  /* OFFSET=0 */ \
-# GP-Test    vector(#want,k,k--; Apery(k)) == want
+# GP-Test  OEIS_check_func("A005430","Apery")
 # GP-Test  sum(k=0,20, x^k*Apery(k) ) == 2*x /(1-4*x + O(x^20))^(3/2)
 
 =pod
@@ -599,7 +598,7 @@ L<http://user42.tuxfamily.org/graph-maker-other/index.html>
 
 =head1 LICENSE
 
-Copyright 2019, 2020, 2021 Kevin Ryde
+Copyright 2019, 2020, 2021, 2022 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

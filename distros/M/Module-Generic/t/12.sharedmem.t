@@ -7,6 +7,8 @@ BEGIN
     use Test2::V0;
     use lib './lib';
     use vars qw( $DEBUG $IS_SUPPORTED );
+    use Config;
+    use Data::Dump ();
     use Errno;
     use POSIX ":sys_wait_h";
     use ok( 'Module::Generic::SharedMem' ) || bail_out( "Unable to load Module::Generic::SharedMem" );
@@ -22,6 +24,11 @@ BEGIN
 
 use strict;
 use warnings;
+
+if( $ENV{AUTOMATED_TESTING} )
+{
+    Data::Dump::dd( \%Config::Config );
+}
 
 SKIP:
 {

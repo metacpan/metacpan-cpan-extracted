@@ -1,0 +1,90 @@
+{
+   "abstract" : "Dates in the Pataphysical calendar",
+   "author" : [
+      "Eugene van der Pijll <pijll@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "datetime",
+      "calendar",
+      "pataphysical",
+      "pataphysics"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DateTime-Calendar-Pataphysical",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime::Duration" : "0",
+            "DateTime::Locale" : "0",
+            "Params::Validate" : "0.52",
+            "constant" : "0",
+            "overload" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "DateTime" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::MockTime" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DateTime::Calendar::Pataphysical" : {
+         "file" : "lib/DateTime/Calendar/Pataphysical.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-datetime-calendar-pataphysical@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=DateTime-Calendar-Pataphysical"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/book/DateTime-Calendar-Pataphysical.git",
+         "web" : "http://github.com/book/DateTime-Calendar-Pataphysical"
+      }
+   },
+   "version" : "0.07",
+   "x_contributors" : [
+      "Philippe Bruhat (BooK) <book@cpan.org>",
+      "Jean Forget <jforget@cpan.org>",
+      "Paul Cochrane <ptc@cpan.org>"
+   ],
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

@@ -1,5 +1,39 @@
 Revision history for Perl application 'greple'.
 
+9.01 2023-01-29T04:59:38Z
+
+    - Release 9.01
+
+9.00_03 2023-01-27T05:19:34Z
+
+    - Require Getopt::EX@2.1.2
+    - Update -Mperl module
+
+9.00_02 2022-12-26T09:48:38Z
+
+    - Introduce --colorsub/--cs option
+
+9.00_01 2022-12-25T11:39:02Z
+
+    - Now `?' means optional keyword in the --le pattern
+    - Option --may was introduced
+    - Option --or was deprecated
+
+8.60 2022-12-21T08:42:41Z
+
+    - Mainly document update.
+    - Possiblly the final release of Version 8.
+
+8.59 2022-11-22T08:56:56Z
+
+    - Deprecate --require option.
+
+8.58 2022-06-15T11:21:50Z
+
+    - Deprecate --conceal option.
+    - Improve command option description.
+    - Add SJIS test.
+
 8.5702 2022-03-27T01:32:48Z
 
     - Fix a bug of reading non-utf8 files.

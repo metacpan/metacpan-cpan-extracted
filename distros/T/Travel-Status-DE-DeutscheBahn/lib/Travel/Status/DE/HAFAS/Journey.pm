@@ -10,13 +10,13 @@ no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
 use parent 'Class::Accessor';
 
-our $VERSION = '4.02';
+our $VERSION = '4.03';
 
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime
 	  is_cancelled is_partially_cancelled
-	  platform sched_platform rt_platform operator
-	  id name type type_long class number line load delay
+	  station station_uic platform sched_platform rt_platform operator
+	  id name type type_long class number line line_no load delay
 	  route_end route_start origin destination direction)
 );
 
@@ -160,7 +160,7 @@ sub new {
 	}
 
 	if ( $journey->{stbStop} ) {
-		shift @stops;
+		shift(@stops);
 	}
 
 	my $ref = {
@@ -168,7 +168,8 @@ sub new {
 		id                     => $jid,
 		name                   => $name,
 		number                 => $train_no,
-		line                   => $line_no,
+		line                   => $name,
+		line_no                => $line_no,
 		type                   => $cat,
 		type_long              => $catlong,
 		class                  => $class,
@@ -196,6 +197,8 @@ sub new {
 	bless( $ref, $obj );
 
 	if ( $journey->{stbStop} ) {
+		$ref->{station}     = $locL[ $journey->{stbStop}{locX} ]->{name};
+		$ref->{station_uic} = 0 + $locL[ $journey->{stbStop}{locX} ]->{extId};
 		$ref->{sched_platform} = $journey->{stbStop}{dPlatfS};
 		$ref->{rt_platform}    = $journey->{stbStop}{dPlatfR};
 		$ref->{platform}       = $ref->{rt_platform} // $ref->{sched_platform};
@@ -292,6 +295,65 @@ sub route {
 	return;
 }
 
+sub route_interesting {
+	my ( $self, $max_parts ) = @_;
+
+	my @via = $self->route;
+	my ( @via_main, @via_show, $last_stop );
+	$max_parts //= 3;
+
+	# Centraal: dutch main station (Hbf in .nl)
+	# HB:  swiss main station (Hbf in .ch)
+	# hl.n.: czech main station (Hbf in .cz)
+	for my $stop (@via) {
+		if ( $stop->{name}
+			=~ m{ HB $ | hl\.n\. $ | Hbf | Hauptbahnhof | Bf | Bahnhof | Centraal | Flughafen }x
+		  )
+		{
+			push( @via_main, $stop );
+		}
+	}
+	$last_stop = pop(@via);
+
+	if ( @via_main and $via_main[-1]{name} eq $last_stop->{name} ) {
+		pop(@via_main);
+	}
+	if ( @via and $via[-1]{name} eq $last_stop->{name} ) {
+		pop(@via);
+	}
+
+	if ( @via_main and @via and $via[0]{name} eq $via_main[0]{name} ) {
+		shift(@via_main);
+	}
+
+	if ( @via < $max_parts ) {
+		@via_show = @via;
+	}
+	else {
+		if ( @via_main >= $max_parts ) {
+			@via_show = ( $via[0] );
+		}
+		else {
+			@via_show = splice( @via, 0, $max_parts - @via_main );
+		}
+
+		while ( @via_show < $max_parts and @via_main ) {
+			my $stop = shift(@via_main);
+			if ( $stop ~~ \@via_show or $stop->{name} eq $last_stop->{name} ) {
+				next;
+			}
+			push( @via_show, $stop );
+		}
+	}
+
+	for my $stop (@via_show) {
+		$stop->{name} =~ s{ \s? Hbf .* }{}x;
+	}
+
+	return @via_show;
+
+}
+
 sub TO_JSON {
 	my ($self) = @_;
 
@@ -350,7 +412,7 @@ journey received by Travel::Status::DE::HAFAS
 
 =head1 VERSION
 
-version 4.02
+version 4.03
 
 =head1 DESCRIPTION
 
@@ -386,13 +448,22 @@ Returns the long type of this journey, e.g. "S-Bahn" or "Regional-Express".
 
 Returns an integer identifying the the mode of transport class.
 Semantics depend on backend, e.g. "1" and "2" for long-distance trains and
-"4" and "8" for region trains.
+"4" and "8" for regional trains.
 
 =item $journey->line
+
+Returns the journey or line name, either in a format like "Bus SB16" (Bus line
+SB16), "RE 42" (RegionalExpress train 42) or "IC 2901" (InterCity train 2901,
+no line information).  May contain extraneous whitespace characters.  Note that
+this accessor does not return line informatikn for IC/ICE/EC services, even if
+it is available. Use B<line_no> for those.
+
+=item $journey->line_no
 
 Returns the line identifier, or undef if it is unknown.
 The line identifier may be a single number such as "11" (underground train
 line U 11), a single word (e.g. "AIR") or a combination (e.g. "SB16").
+May also provide line numbers of IC/ICE services.
 
 =item $journey->number
 
@@ -469,6 +540,15 @@ service notices (e.g. "missing carriage") or detailed delay reasons
 Returns the operator responsible for this journey. Returns undef
 if the backend does not provide an operator.
 
+=item $journey->station (station only)
+
+Name of the station at which this journey was requested.
+
+=item $journey->station_uic (station only)
+
+UIC/EVA ID of the station at which this journey was requested.
+May be renamed in future releases.
+
 =item $journey->route
 
 Returns a list of hashes; each hash describes a single journey stop.
@@ -515,6 +595,12 @@ entire route. Each hash contains the following keys:
 =back
 
 Individual entries may be undef.
+
+=item $journey->route_interesting([I<count>])
+
+Return up to I<count> (default: B<3>) parts of C<< $journey->route >> that may
+be particularly helpful, e.g. main stations or airports.
+Returns a list of hashes, see above for the layout.
 
 =item $journey->route_end
 

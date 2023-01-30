@@ -1,5 +1,36 @@
 Revision history for CXC-Exporter-Util
 
-0.01      2022-04-23 16:21:57-04:00 America/New_York
+0.05      2023-01-28 11:04:59-05:00 America/New_York
+
+    * promote to production. no functional changes from 0.04
+
+0.04      2023-01-27 16:25:21-05:00 America/New_York (TRIAL RELEASE)
+
+  [API CHANGE]
+
+    * All enumerating functions for a set return values for the entire
+      set.  Previously only the last one specified returned the entire
+      set of values.
+
+  [BUG FIX]
+
+    * multiple calls to install_CONSTANTS for a tag set could lead
+      to unsuppressable "constant function redefined" warnings.
+
+0.03      2023-01-24 11:33:14-05:00 America/New_York (TRIAL RELEASE)
+
+  [TEST FIX]
+
+    * specify minimum Type::Tiny version to avoid bareword error in tests ++SREZIC
+
+0.02      2023-01-23 21:44:37-05:00 America/New_York (TRIAL RELEASE)
+
+  [ENHANCEMENT]
+
+    * make behavior when adding constants to an existing export tag deterministic
+    * updated documentation.
+
+
+0.01      2023-01-23 00:21:13-05:00 America/New_York (TRIAL RELEASE)
 
 * First release upon an unsuspecting world.

@@ -50,7 +50,7 @@
          "web" : "https://github.com/merkys/data-validate-openapi"
       }
    },
-   "version" : "0.1.0",
+   "version" : "0.2.0",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }

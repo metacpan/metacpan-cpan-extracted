@@ -1,0 +1,19 @@
+0.003   2023-01-29  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Tweak so Description from Rinci metadata is rendered.
+
+        - Fix some typos.
+
+
+0.002   2023-01-29  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] [cli ss2csv] Mention xlsx2csv from Spreadsheet-Read.
+
+
+0.001   2023-01-29  Released-By: PERLANCAR
+
+         - First release.

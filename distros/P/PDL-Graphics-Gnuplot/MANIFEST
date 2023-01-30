@@ -10,5 +10,6 @@ MANIFEST.SKIP
 README.pod
 t/pdfcairo-output.t
 t/plot.t
+t/aa.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

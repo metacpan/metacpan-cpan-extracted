@@ -6,6 +6,10 @@ Home page:    <https://metacpan.org/release/Story-Interact>
 Bug tracker:  <https://github.com/tobyink/p5-story-interact/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.001006	2023-01-28
+
+ - Regexp fixes.
+
 0.001005	2023-01-18
 
 0.001004	2023-01-16

@@ -1,5 +1,8 @@
 Revision history for Test-Instruction
 
+0.04    [2023-01-28]
+	- extend to allow debugging of instruction/s by setting debug => 1.
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

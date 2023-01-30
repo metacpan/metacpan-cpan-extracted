@@ -10,7 +10,7 @@ Test support library for the Perl modules L<Tie::Subset::Array> and L<Tie::Subse
 
 =head1 Author, Copyright, and License
 
-Copyright (c) 2018 Hauke Daempfling (haukex@zero-g.net).
+Copyright (c) 2018-2023 Hauke Daempfling (haukex@zero-g.net).
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl 5 itself.

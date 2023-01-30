@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Validate and untaint input parameters via OpenAPI schema
-our $VERSION = '0.1.0'; # VERSION
+our $VERSION = '0.2.0'; # VERSION
 
 use OpenAPI::Render;
 use parent OpenAPI::Render::;
@@ -15,6 +15,39 @@ use Data::Validate::IP qw( is_ipv4 is_ipv6 );
 use Data::Validate::URI qw( is_uri );
 use DateTime::Format::RFC3339;
 use Scalar::Util qw( blessed );
+
+# Global variable for reporter subroutine
+our $reporter;
+
+=head1 SYNOPSIS
+
+    use CGI;
+    use Data::Validate::OpenAPI;
+
+    my $validator = Data::Validate::OpenAPI->new( $parsed_openapi_json );
+    my $params = $validator->validate( '/', 'post', CGI->new );
+
+=head1 DESCRIPTION
+
+C<Data::Validate::OpenAPI> validates and untaints CGI parameters using a supplied OpenAPI schema.
+It applies format-specific validation and untainting using appropriate L<Data::Validate> subclasses, including email, IP, URI and other.
+Also it checks values against enumerators and patterns, if provided.
+
+=head1 SUBROUTINES
+
+=method C<new>
+
+Takes a parsed OpenAPI schema as returned by L<JSON> module's C<decode_json()>.
+Returns validator ready to validate CGI parameters.
+
+=method C<validate>
+
+Takes a call path, HTTP method and a CGI object.
+Returns a hash of validated pairs of CGI parameter keys and their values.
+At this point values failing to validate are not reported.
+Keys for parameters having no valid values are omitted from the returned hash.
+
+=cut
 
 sub validate
 {
@@ -51,20 +84,36 @@ sub validate
         }
 
         if( $schema && $schema->{type} eq 'array' ) {
-            my @values = grep { defined $_ }
-                         map { validate_value( $_, $schema ) }
-                         ref $par_hash->{$name} eq 'ARRAY'
-                            ? @{$par_hash->{$name}}
-                            : split "\0", $par_hash->{$name};
-            $par->{$name} = \@values if @values;
+            my( @good_values, @bad_values );
+            for (ref $par_hash->{$name} eq 'ARRAY' ? @{$par_hash->{$name}} : split "\0", $par_hash->{$name}) {
+                my $value = validate_value( $_, $schema );
+                push @good_values, $value if defined $value;
+                push @bad_values, $value unless defined $value;
+            }
+            $par->{$name} = \@good_values if @good_values;
+            $reporter->( $name, @bad_values ) if $reporter && @bad_values;
         } else {
             my $value = validate_value( $par_hash->{$name}, $schema );
             $par->{$name} = $value if defined $value;
+            if( $reporter ) {
+                $reporter->( $name, $par_hash->{$name} );
+            }
         }
     }
 
     return $par;
 }
+
+=head1 VALIDATION ERROR REPORTING
+
+By default validation errors are silent by default.
+However, this can be overridden by setting module variable C<$Data::Validate::OpenAPI::reporter> to a subroutine reference to be called upon validation failure with the following signature:
+
+    $reporter->( $parameter_name, @bad_values );
+
+At this point the module does not indicate which particular check failed during the validation.
+
+=cut
 
 sub validate_value
 {

@@ -27,7 +27,7 @@ This class for tied arrays provides a "view" of a subset of an array.
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =item C<tie>ing
 
@@ -35,7 +35,7 @@ our $VERSION = '0.01';
 
 You must specify which subset of indices from the original array
 should be part of the new array. (Indices that do not yet exist in
-the original hash may be specified.) The subset (tied array) will
+the original array may be specified.) The subset (tied array) will
 be the same size as C<@indices>, and is indexed by the usual 0 to
 C<$#subset>.
 
@@ -65,7 +65,9 @@ the underlying array is returned, otherwise returns nothing (undef).
 
 sub FETCH {
 	my ($self,$i) = @_;
-	return if $i < 0 || $i > $#{ $self->{idx} };
+	# uncoverable branch true
+	return if $i < 0;
+	return if $i > $#{ $self->{idx} };
 	return $self->{arr}[ $self->{idx}[$i] ];
 }
 
@@ -79,7 +81,8 @@ ignored and a warning issued.
 
 sub STORE {
 	my ($self,$i,$v) = @_;
-	if ( $i < 0 || $i > $#{ $self->{idx} } ) {
+	return if $i < 0; # uncoverable branch true
+	if ( $i > $#{ $self->{idx} } ) {
 		warnings::warnif("storing values outside of the subset not (yet) supported in ".ref($self));
 		return;
 	}
@@ -170,9 +173,10 @@ sub SPLICE {
 }
 
 sub EXTEND {
-	my ($self,$s) = @_;
-	warnings::warnif("extending ".ref($self)." not (yet) supported");
-	return;
+	# uncoverable subroutine
+	my ($self,$s) = @_;  # uncoverable statement
+	warnings::warnif("extending ".ref($self)." not (yet) supported");  # uncoverable statement
+	return;  # uncoverable statement
 }
 
 sub DELETE {
@@ -192,7 +196,7 @@ L<Tie::Subset/"See Also">
 
 =head1 Author, Copyright, and License
 
-Copyright (c) 2018 Hauke Daempfling (haukex@zero-g.net).
+Copyright (c) 2018-2023 Hauke Daempfling (haukex@zero-g.net).
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl 5 itself.

@@ -4,6 +4,7 @@ use 5.010001;
 use strict;
 use warnings;
 
+use IPC::System::Options;
 use Proc::ChildError qw(explain_child_error);
 
 use Moose;
@@ -18,12 +19,19 @@ has make_verbatim => (is => 'rw', default => sub{1}); # DEPRECATED
 
 has indent => (is => 'rw', default => sub{1});
 
+has include_command => (is => 'rw', default => sub{0});
+
+has substitute_template => (is => 'rw', default => sub{0});
+
+has capture_stdout => (is => 'rw', default => sub{1});
+has capture_stderr => (is => 'rw', default => sub{0});
+
 use namespace::autoclean;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-10'; # DATE
+our $DATE = '2022-10-28'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-InsertCommandOutput'; # DIST
-our $VERSION = '0.056'; # VERSION
+our $VERSION = '0.057'; # VERSION
 
 sub munge_files {
     my $self = shift;
@@ -35,7 +43,7 @@ sub munge_file {
     my ($self, $file) = @_;
     my $content_as_bytes = $file->encoded_content;
     if ($content_as_bytes =~ s{^#\s*COMMAND:\s*(.*)[ \t]*(\R|\z)}{
-        my $output = $self->_command_output($1);
+        my $output = $self->_command_output($file, $1);
         $output .= "\n" unless $output =~ /\R\z/;
         $output;
     }egm) {
@@ -46,12 +54,53 @@ sub munge_file {
 }
 
 sub _command_output {
-    my($self, $cmd) = @_;
+    my($self, $file, $cmd) = @_;
 
-    my $res = `$cmd`;
+    my $cmd_for_display = $cmd;
+
+    if ($self->substitute_template) {
+        my %vars;
+        my %vars_for_display;
+
+      VAR_PROG: {
+            require String::ShellQuote;
+            (my $prog = $file->name) =~ s!.*/!!;
+            $vars{prog} = String::ShellQuote::shell_quote($^X) . " " . String::ShellQuote::shell_quote($file->name);
+            $vars_for_display{prog} = $prog;
+        }
+
+      VAR_MODULE: {
+            require String::ShellQuote;
+            my $module = $file->name;
+            if ($module =~ m!^(?:lib/)?(.+)\.pm$!) {
+                $module = $1;
+                $module =~ s!/!::!g;
+            } else {
+                $module = "";
+            }
+
+            $vars{module} = $module;
+            $vars_for_display{module} = $module;
+        }
+
+        $cmd             =~ s/\[\[(\w+)\]\]/exists $vars            {$1} ? $vars            {$1} : do {$self->log("Undefined template variable $1"); ""}/eg;
+        $cmd_for_display =~ s/\[\[(\w+)\]\]/exists $vars_for_display{$1} ? $vars_for_display{$1} : do {$self->log("Undefined template variable (for display) $1"); ""}/eg;
+    }
+
+    my $res;
+    my $capture_key =
+        $self->capture_stdout  && $self->capture_stderr ? "capture_merged" :
+        !$self->capture_stdout && $self->capture_stderr ? "capture_stderr" :
+        "capture_stdout";
+
+    IPC::System::Options::system({shell=>1, log=>1, $capture_key=>\$res}, $cmd);
 
     if ($?) {
         die "Command '$cmd' failed: " . explain_child_error();
+    }
+
+    if ($self->include_command) {
+        $res = "% $cmd_for_display\n$res";
     }
 
     my $indent = " " x $self->indent;
@@ -76,14 +125,16 @@ Dist::Zilla::Plugin::InsertCommandOutput - Insert the output of command into you
 
 =head1 VERSION
 
-This document describes version 0.056 of Dist::Zilla::Plugin::InsertCommandOutput (from Perl distribution Dist-Zilla-Plugin-InsertCommandOutput), released on 2022-06-10.
+This document describes version 0.057 of Dist::Zilla::Plugin::InsertCommandOutput (from Perl distribution Dist-Zilla-Plugin-InsertCommandOutput), released on 2022-10-28.
 
 =head1 SYNOPSIS
 
-In dist.ini:
+In F<dist.ini>:
 
  [InsertCommandOutput]
  ;indent=4
+ ;include_command=0
+ ;substitute_template=0
 
 In your POD:
 
@@ -104,6 +155,38 @@ inserted as-is). If command fails (C<$?> is non-zero), build will be aborted.
 
 Uint. Default: 1. Number of spaces to indent each line of output with. Can be
 set to 0 to not indent at all.
+
+=head2 include_command
+
+Bool, default false. If set to true, will also show the command in the output.
+
+=head2 capture_stdout
+
+Bool, default true.
+
+=head2 capture_stderr
+
+Bool, default false.
+
+=head2 substitute_template
+
+Bool, default false. If set to true, will substitute some template variables in
+the command with their actual values:
+
+=over
+
+=item * [[prog]]
+
+The name of the program (guessed from the current filename, and in the actual
+command to execute will be quoted($^X) + " " + quoted(filename)). Empty if
+current filename is not a script.
+
+=item * [[module]]
+
+The name of the module (guessed from the current filename). Empty if current
+filename is not a module.
+
+=back
 
 =head1 HOMEPAGE
 
@@ -141,9 +224,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

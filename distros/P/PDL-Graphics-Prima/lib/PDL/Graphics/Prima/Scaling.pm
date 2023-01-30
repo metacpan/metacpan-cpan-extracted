@@ -3,7 +3,7 @@ use warnings;
 
 package PDL::Graphics::Prima::Scaling;
 
-our $VERSION = 0.17;   # update with update-version.pl
+our $VERSION = 0.18;   # update with update-version.pl
 
 package
 sc;
@@ -505,6 +505,10 @@ Specifies different kinds of scaling, including linear and logarithmic
 
 Defines a number of useful functions for generating simple and not-so-simple
 plots
+
+=item L<PDL::Graphics::Prima::SizeSpec|PDL::Graphics::Prima::SizeSpec/>
+
+Compute pixel distances from meaningful units
 
 =back
 

@@ -1,0 +1,627 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/CheckDigitsUtils/list_check_digits_methods
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-01-28'; # DATE
+our $DIST = 'App-CheckDigitsUtils'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/CheckDigitsUtils/list_check_digits_methods",
+    program_name => "list-check-digits-methods",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+    use_utf8 => 1,
+);
+
+$cmdline->run;
+
+# ABSTRACT: List methods supported by Algorithm::CheckDigits
+# PODNAME: list-check-digits-methods
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+list-check-digits-methods - List methods supported by Algorithm::CheckDigits
+
+=head1 VERSION
+
+This document describes version 0.001 of list-check-digits-methods (from Perl distribution App-CheckDigitsUtils), released on 2023-01-28.
+
+=head1 SYNOPSIS
+
+B<list-check-digits-methods> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<list-check-digits-methods> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<list-check-digits-methods> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
+
+
+
+See examples in the L</EXAMPLES> section.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--detail>, B<-l>
+
+(No description)
+
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C list-check-digits-methods list-check-digits-methods
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete list-check-digits-methods 'p/*/`list-check-digits-methods`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 EXAMPLES
+
+=head2 List methods
+
+ % list-check-digits-methods
+ 2aus5
+ aba_rn
+ ahv_ch
+ amex
+ bahncard
+ betriebsnummer
+ blutbeutel
+ bwpk_de
+ bzue_de
+ cas
+ ccc_es
+ code_39
+ cpf
+ cusip
+ dem
+ diners
+ discover
+ dni_es
+ ean
+ ecno
+ einecs
+ elincs
+ enroute
+ esr5_ch
+ esr9_ch
+ eurocard
+ euronote
+ happydigits
+ hkid
+ iban
+ identcode_dp
+ iln
+ imei
+ imeisv
+ isan
+ isbn
+ isbn13
+ isin
+ ismn
+ issn
+ jcb
+ klubkarstadt
+ leitcode_dp
+ mastercard
+ miles&more
+ nhs_gb
+ nip
+ nric_sg
+ nve
+ pa_de
+ pkz
+ postcheckkonti
+ pzn
+ rentenversicherung
+ sedol
+ sici
+ siren
+ siret
+ tin_ie
+ titulo_eleitor
+ upc
+ ups
+ ustid_at
+ ustid_be
+ ustid_de
+ ustid_dk
+ ustid_fi
+ ustid_gr
+ ustid_ie
+ ustid_lu
+ ustid_nl
+ ustid_pl
+ ustid_pt
+ vat_sl
+ vatrn_at
+ vatrn_be
+ vatrn_dk
+ vatrn_fi
+ vatrn_gr
+ vatrn_ie
+ vatrn_lu
+ vatrn_nl
+ vatrn_pl
+ vatrn_pt
+ verhoeff
+ visa
+ wagonnr_br
+ 2aus5
+ aba_rn
+ ahv_ch
+ amex
+ bahncard
+ betriebsnummer
+ blutbeutel
+ bwpk_de
+ bzue_de
+ cas
+ ccc_es
+ code_39
+ cpf
+ cusip
+ dem
+ diners
+ discover
+ dni_es
+ ean
+ ecno
+ einecs
+ elincs
+ enroute
+ esr5_ch
+ esr9_ch
+ eurocard
+ euronote
+ happydigits
+ hkid
+ iban
+ identcode_dp
+ iln
+ imei
+ imeisv
+ isan
+ isbn
+ isbn13
+ isin
+ ismn
+ issn
+ jcb
+ klubkarstadt
+ leitcode_dp
+ mastercard
+ miles&more
+ nhs_gb
+ nip
+ nric_sg
+ nve
+ pa_de
+ pkz
+ postcheckkonti
+ pzn
+ rentenversicherung
+ sedol
+ sici
+ siren
+ siret
+ tin_ie
+ titulo_eleitor
+ upc
+ ups
+ ustid_at
+ ustid_be
+ ustid_de
+ ustid_dk
+ ustid_fi
+ ustid_gr
+ ustid_ie
+ ustid_lu
+ ustid_nl
+ ustid_pl
+ ustid_pt
+ vat_sl
+ vatrn_at
+ vatrn_be
+ vatrn_dk
+ vatrn_fi
+ vatrn_gr
+ vatrn_ie
+ vatrn_lu
+ vatrn_nl
+ vatrn_pl
+ vatrn_pt
+ verhoeff
+ visa
+ wagonnr_br
+
+=head2 List methods with their summaries/descriptions
+
+ % list-check-digits-methods -l
+ +--------------------+-----------------------------------------------------------------------------+
+ | method             | summary                                                                     |
+ +--------------------+-----------------------------------------------------------------------------+
+ | 2aus5              | 2 aus 5, 2 of 5, 2/5                                                        |
+ | aba_rn             | American Bankers Association routing number (ABA RN)                        |
+ | ahv_ch             | Alters- und Hinterlassenenversicherungsnummer, AHV (CH)                     |
+ | amex               | American Express credit cards                                               |
+ | bahncard           | DB Bahncard (DE)                                                            |
+ | betriebsnummer     | Betriebsnummer (DE)                                                         |
+ | blutbeutel         | Eurocode, blood bags                                                        |
+ | bwpk_de            | Personenkennummer der Bundeswehr (DE)                                       |
+ | bzue_de            | Beleglose ZahlscheinÃ¼berweisung, BZÃ (DE)                                 |
+ | cas                | Chemical abstract service, CAS                                              |
+ | ccc_es             | CÃ³digo de Cuenta Corriente, CCC (ES)                                       |
+ | code_39            | Code39, 3 of 9                                                              |
+ | cpf                | Cadastro de Pessoas FÃ­sicas, CPF (BR)                                      |
+ | cusip              | Committee on Uniform Security Identification Procedures, CUSIP (US)         |
+ | dem                | Deutsche Mark Banknoten, DEM                                                |
+ | diners             | Diner's club credit cards                                                   |
+ | discover           | Discover credit cards                                                       |
+ | dni_es             | Documento nacional de identidad (ES)                                        |
+ | ean                | European Article Number, EAN                                                |
+ | ecno               | European Commission number, EC-No (for chemicals)                           |
+ | einecs             | European Inventory of Existing Commercial Chemical Substances, EINECS       |
+ | elincs             | European List of Notified Chemical Substances, ELINCS                       |
+ | enroute            | EnRoute credit cards                                                        |
+ | esr5_ch            | Einzahlungsschein mit Referenz, ESR5 (CH)                                   |
+ | esr9_ch            | Einzahlungsschein mit Referenz, ESR9 (CH)                                   |
+ | eurocard           | Eurocard credit cards                                                       |
+ | euronote           | Euro bank notes, EUR                                                        |
+ | happydigits        | Happy Digits (DE)                                                           |
+ | hkid               | Hong Kong Identity Card, HKID (HK)                                          |
+ | iban               | International Bank Account Number (IBAN)                                    |
+ | identcode_dp       | Identcode Deutsche Post AG (DE)                                             |
+ | iln                | Global Location Number, GLN                                                 |
+ | imei               | International Mobile Station Equipment Identity, IMEI                       |
+ | imeisv             | International Mobile Station Equipment Identity and Software Version Number |
+ | isan               | International Standard Audiovisual Number, ISAN                             |
+ | isbn               | International Standard Book Number, ISBN10                                  |
+ | isbn13             | International Standard Book Number, ISBN13                                  |
+ | isin               | International Securities Identifikation Number, ISIN                        |
+ | ismn               | International Standard Music Number, ISMN                                   |
+ | issn               | International Standard Serial Number, ISSN                                  |
+ | jcb                | JCB credit cards                                                            |
+ | klubkarstadt       | Klub Karstadt (DE)                                                          |
+ | leitcode_dp        | Leitcode Deutsche Post AG (DE)                                              |
+ | mastercard         | Mastercard credit cards                                                     |
+ | miles&more         | Miles & More, Lufthansa (DE)                                                |
+ | nhs_gb             | National Health Service, NHS (GB)                                           |
+ | nip                | numer identyfikacji podatkowej, NIP                                         |
+ | nric_sg            | National Registration Identity Card, NRIC (SG)                              |
+ | nve                | Nummer der Versandeinheit, NVE, SSCC                                        |
+ | pa_de              | Personalausweis (DE)                                                        |
+ | pkz                | Personenkennzahl der DDR                                                    |
+ | postcheckkonti     | Postscheckkonti (CH)                                                        |
+ | pzn                | Pharmazentralnummer (DE)                                                    |
+ | rentenversicherung | Rentenversicherungsnummer, VSNR (DE)                                        |
+ | sedol              | Stock Exchange Daily Official List, SEDOL (GB)                              |
+ | sici               | Value Added Tax number, VAT (DE)                                            |
+ | siren              | SIREN (FR)                                                                  |
+ | siret              | SIRET (FR)                                                                  |
+ | tin_ie             | Tax Identification Number (IE)                                              |
+ | titulo_eleitor     | TÃ­tulo Eleitoral (BR)                                                      |
+ | upc                | Universal Product Code, UPC (US, CA)                                        |
+ | ups                | United Parcel Service, UPS                                                  |
+ | ustid_at           | Umsatzsteuer-Identifikationsnummer (AT)                                     |
+ | ustid_be           | Umsatzsteuer-Identifikationsnummer (BE)                                     |
+ | ustid_de           | Umsatzsteuer-Identifikationsnummer (DE)                                     |
+ | ustid_dk           | Umsatzsteuer-Identifikationsnummer (DK)                                     |
+ | ustid_fi           | Umsatzsteuer-Identifikationsnummer (FI)                                     |
+ | ustid_gr           | Umsatzsteuer-Identifikationsnummer (GR)                                     |
+ | ustid_ie           | Umsatzsteuer-Identifikationsnummer (IE)                                     |
+ | ustid_lu           | Umsatzsteuer-Identifikationsnummer (LU)                                     |
+ | ustid_nl           | Umsatzsteuer-Identifikationsnummer (NL)                                     |
+ | ustid_pl           | Umsatzsteuer-Identifikationsnummer (PL)                                     |
+ | ustid_pt           | Umsatzsteuer-Identifikationsnummer (PT)                                     |
+ | vat_sl             | Value Added Tax number, VAT (SL)                                            |
+ | vatrn_at           | Value Added Tax number, VAT (AT)                                            |
+ | vatrn_be           | Value Added Tax number, VAT (BE)                                            |
+ | vatrn_dk           | Value Added Tax number, VAT (DK)                                            |
+ | vatrn_fi           | Value Added Tax number, VAT (FI)                                            |
+ | vatrn_gr           | Value Added Tax number, VAT (GR)                                            |
+ | vatrn_ie           | Value Added Tax number, VAT (IE)                                            |
+ | vatrn_lu           | Value Added Tax number, VAT (LU)                                            |
+ | vatrn_nl           | Value Added Tax number, VAT (NL)                                            |
+ | vatrn_pl           | Value Added Tax number, VAT (PL)                                            |
+ | vatrn_pt           | Value Added Tax number, VAT (PT)                                            |
+ | verhoeff           | Verhoeff scheme                                                             |
+ | visa               | VISA credit cards                                                           |
+ | wagonnr_br         | CodificaÃ§Ã£o dos vagÃµes (BR)                                              |
+ | 2aus5              | 2 aus 5, 2 of 5, 2/5                                                        |
+ | aba_rn             | American Bankers Association routing number (ABA RN)                        |
+ | ahv_ch             | Alters- und Hinterlassenenversicherungsnummer, AHV (CH)                     |
+ | amex               | American Express credit cards                                               |
+ | bahncard           | DB Bahncard (DE)                                                            |
+ | betriebsnummer     | Betriebsnummer (DE)                                                         |
+ | blutbeutel         | Eurocode, blood bags                                                        |
+ | bwpk_de            | Personenkennummer der Bundeswehr (DE)                                       |
+ | bzue_de            | Beleglose ZahlscheinÃ¼berweisung, BZÃ (DE)                                 |
+ | cas                | Chemical abstract service, CAS                                              |
+ | ccc_es             | CÃ³digo de Cuenta Corriente, CCC (ES)                                       |
+ | code_39            | Code39, 3 of 9                                                              |
+ | cpf                | Cadastro de Pessoas FÃ­sicas, CPF (BR)                                      |
+ | cusip              | Committee on Uniform Security Identification Procedures, CUSIP (US)         |
+ | dem                | Deutsche Mark Banknoten, DEM                                                |
+ | diners             | Diner's club credit cards                                                   |
+ | discover           | Discover credit cards                                                       |
+ | dni_es             | Documento nacional de identidad (ES)                                        |
+ | ean                | European Article Number, EAN                                                |
+ | ecno               | European Commission number, EC-No (for chemicals)                           |
+ | einecs             | European Inventory of Existing Commercial Chemical Substances, EINECS       |
+ | elincs             | European List of Notified Chemical Substances, ELINCS                       |
+ | enroute            | EnRoute credit cards                                                        |
+ | esr5_ch            | Einzahlungsschein mit Referenz, ESR5 (CH)                                   |
+ | esr9_ch            | Einzahlungsschein mit Referenz, ESR9 (CH)                                   |
+ | eurocard           | Eurocard credit cards                                                       |
+ | euronote           | Euro bank notes, EUR                                                        |
+ | happydigits        | Happy Digits (DE)                                                           |
+ | hkid               | Hong Kong Identity Card, HKID (HK)                                          |
+ | iban               | International Bank Account Number (IBAN)                                    |
+ | identcode_dp       | Identcode Deutsche Post AG (DE)                                             |
+ | iln                | Global Location Number, GLN                                                 |
+ | imei               | International Mobile Station Equipment Identity, IMEI                       |
+ | imeisv             | International Mobile Station Equipment Identity and Software Version Number |
+ | isan               | International Standard Audiovisual Number, ISAN                             |
+ | isbn               | International Standard Book Number, ISBN10                                  |
+ | isbn13             | International Standard Book Number, ISBN13                                  |
+ | isin               | International Securities Identifikation Number, ISIN                        |
+ | ismn               | International Standard Music Number, ISMN                                   |
+ | issn               | International Standard Serial Number, ISSN                                  |
+ | jcb                | JCB credit cards                                                            |
+ | klubkarstadt       | Klub Karstadt (DE)                                                          |
+ | leitcode_dp        | Leitcode Deutsche Post AG (DE)                                              |
+ | mastercard         | Mastercard credit cards                                                     |
+ | miles&more         | Miles & More, Lufthansa (DE)                                                |
+ | nhs_gb             | National Health Service, NHS (GB)                                           |
+ | nip                | numer identyfikacji podatkowej, NIP                                         |
+ | nric_sg            | National Registration Identity Card, NRIC (SG)                              |
+ | nve                | Nummer der Versandeinheit, NVE, SSCC                                        |
+ | pa_de              | Personalausweis (DE)                                                        |
+ | pkz                | Personenkennzahl der DDR                                                    |
+ | postcheckkonti     | Postscheckkonti (CH)                                                        |
+ | pzn                | Pharmazentralnummer (DE)                                                    |
+ | rentenversicherung | Rentenversicherungsnummer, VSNR (DE)                                        |
+ | sedol              | Stock Exchange Daily Official List, SEDOL (GB)                              |
+ | sici               | Value Added Tax number, VAT (DE)                                            |
+ | siren              | SIREN (FR)                                                                  |
+ | siret              | SIRET (FR)                                                                  |
+ | tin_ie             | Tax Identification Number (IE)                                              |
+ | titulo_eleitor     | TÃ­tulo Eleitoral (BR)                                                      |
+ | upc                | Universal Product Code, UPC (US, CA)                                        |
+ | ups                | United Parcel Service, UPS                                                  |
+ | ustid_at           | Umsatzsteuer-Identifikationsnummer (AT)                                     |
+ | ustid_be           | Umsatzsteuer-Identifikationsnummer (BE)                                     |
+ | ustid_de           | Umsatzsteuer-Identifikationsnummer (DE)                                     |
+ | ustid_dk           | Umsatzsteuer-Identifikationsnummer (DK)                                     |
+ | ustid_fi           | Umsatzsteuer-Identifikationsnummer (FI)                                     |
+ | ustid_gr           | Umsatzsteuer-Identifikationsnummer (GR)                                     |
+ | ustid_ie           | Umsatzsteuer-Identifikationsnummer (IE)                                     |
+ | ustid_lu           | Umsatzsteuer-Identifikationsnummer (LU)                                     |
+ | ustid_nl           | Umsatzsteuer-Identifikationsnummer (NL)                                     |
+ | ustid_pl           | Umsatzsteuer-Identifikationsnummer (PL)                                     |
+ | ustid_pt           | Umsatzsteuer-Identifikationsnummer (PT)                                     |
+ | vat_sl             | Value Added Tax number, VAT (SL)                                            |
+ | vatrn_at           | Value Added Tax number, VAT (AT)                                            |
+ | vatrn_be           | Value Added Tax number, VAT (BE)                                            |
+ | vatrn_dk           | Value Added Tax number, VAT (DK)                                            |
+ | vatrn_fi           | Value Added Tax number, VAT (FI)                                            |
+ | vatrn_gr           | Value Added Tax number, VAT (GR)                                            |
+ | vatrn_ie           | Value Added Tax number, VAT (IE)                                            |
+ | vatrn_lu           | Value Added Tax number, VAT (LU)                                            |
+ | vatrn_nl           | Value Added Tax number, VAT (NL)                                            |
+ | vatrn_pl           | Value Added Tax number, VAT (PL)                                            |
+ | vatrn_pt           | Value Added Tax number, VAT (PT)                                            |
+ | verhoeff           | Verhoeff scheme                                                             |
+ | visa               | VISA credit cards                                                           |
+ | wagonnr_br         | CodificaÃ§Ã£o dos vagÃµes (BR)                                              |
+ +--------------------+-----------------------------------------------------------------------------+
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-CheckDigitsUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-CheckDigitsUtils>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CheckDigitsUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

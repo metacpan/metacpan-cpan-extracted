@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Lib::FFIType::TFPtrPtrLenSizeArrayRefScalar;
 # ABSTRACT: Type to hold string list as void** strings, size_t* lengths, int num_items
-$AI::TensorFlow::Libtensorflow::Lib::FFIType::TFPtrPtrLenSizeArrayRefScalar::VERSION = '0.0.4';
+$AI::TensorFlow::Libtensorflow::Lib::FFIType::TFPtrPtrLenSizeArrayRefScalar::VERSION = '0.0.6';
 use strict;
 use warnings;
 # TODO implement this
@@ -40,7 +40,7 @@ Zakariyya Mughal <zmughal@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Auto-Parallel Technologies, Inc.
+This software is Copyright (c) 2022-2023 by Auto-Parallel Technologies, Inc.
 
 This is free software, licensed under:
 

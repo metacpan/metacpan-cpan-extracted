@@ -33,6 +33,7 @@ devel/dudeney.pl
 devel/equimatchable.pl
 devel/even-odd-tree.pl
 devel/excess-configurations.pl
+devel/Fibonacci-cube.pl
 devel/fibonacci-lattice.pl
 devel/fibonacci-tree.pl
 devel/fibonacci-wiener-full.gp
@@ -44,7 +45,9 @@ devel/four-colour-hoax.pl
 devel/gardner-digit-placing.pl
 devel/graph6-to-gp-adjacency.pl
 devel/grid-layout.pl
+devel/halved-hypercube.pl
 devel/hampton-court.pl
+devel/Hanoi-config-sequence.gp
 devel/Hanoi-equal-shortest.pl
 devel/Hanoi-exchange.pl
 devel/Hanoi-switching.pl
@@ -68,10 +71,10 @@ devel/lib/Graph/Maker/Dragon.pm
 devel/lib/Graph/Maker/Dragon.t
 devel/lib/Graph/Maker/DragonByPath.pm
 devel/lib/Graph/Maker/EvenOddTree.pm
+devel/lib/Graph/Maker/FibonacciCube.pm
+devel/lib/Graph/Maker/FibonacciCube.t
 devel/lib/Graph/Maker/FibonacciLattice.pm
 devel/lib/Graph/Maker/Firecracker.pm
-devel/lib/Graph/Maker/FoldedHypercube.pm
-devel/lib/Graph/Maker/FoldedHypercube.t
 devel/lib/Graph/Maker/HanoiSwitching.pm
 devel/lib/Graph/Maker/OliveTree.pm
 devel/lib/Graph/Maker/PartitionSum.pm
@@ -134,7 +137,9 @@ lib/Graph/Maker/Circulant.pm
 lib/Graph/Maker/Crown.pm
 lib/Graph/Maker/ExcessConfigurations.pm
 lib/Graph/Maker/FibonacciTree.pm
+lib/Graph/Maker/FoldedHypercube.pm
 lib/Graph/Maker/GosperIsland.pm
+lib/Graph/Maker/HalvedHypercube.pm
 lib/Graph/Maker/Hanoi.pm
 lib/Graph/Maker/HanoiExchange.pm
 lib/Graph/Maker/HexGrid.pm
@@ -165,7 +170,9 @@ t/Circulant.t
 t/Crown.t
 t/ExcessConfigurations.t
 t/FibonacciTree.t
+t/FoldedHypercube.t
 t/GosperIsland.t
+t/HalvedHypercube.t
 t/Hanoi.t
 t/HanoiExchange.t
 t/HexGrid.t
@@ -209,10 +216,12 @@ xt/FibonacciLattice-isomorphic.t
 xt/FibonacciTree-isomorphic.t
 xt/FoldedHypercube-isomorphic.t
 xt/GosperIsland-isomorphic.t
+xt/HalvedHypercube-isomorphic.t
 xt/Hanoi-slow.t
 xt/HanoiExchange-slow.t
 xt/HanoiSwitching-slow.t
 xt/HexGrid-isomorphic.t
+xt/Hypercube-isomorphic.t
 xt/Johnson-slow.t
 xt/Keller-isomorphic.t
 xt/Keller-slow.t
@@ -229,6 +238,7 @@ xt/oeis/BulgarianSolitaire-oeis.t
 xt/oeis/Catalans-oeis.t
 xt/oeis/CatalansUpto-oeis.t
 xt/oeis/ExcessConfigurations-oeis.t
+xt/oeis/FibonacciCube-oeis.t
 xt/oeis/FibonacciLattice-oeis.t
 xt/oeis/FibonacciTree-oeis.t
 xt/oeis/Hanoi-oeis.t

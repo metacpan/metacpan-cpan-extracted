@@ -12,7 +12,7 @@ use File::stat;
 use IO::Handle;
 use Pod::Usage;
 use Text::ParseWords qw(shellwords);
-use List::Util qw(min max first sum uniq shuffle notall pairmap);
+use List::Util qw(min max first sum uniq shuffle notall pairs);
 use Cwd qw(getcwd abs_path);
 use Carp;
 
@@ -51,6 +51,8 @@ use App::Greple::Filter;
 
 my $version = $App::Greple::VERSION;
 
+=encoding utf8
+
 =head1 NAME
 
 
@@ -60,7 +62,7 @@ greple - extensible grep with lexical expression and region control
 =head1 VERSION
 
 
-Version 8.5702
+Version 9.01
 
 
 =head1 SYNOPSIS
@@ -69,12 +71,12 @@ Version 8.5702
 B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
 
   PATTERN
-    pattern              'and +must -not ?alternative &function'
+    pattern              'and +must -not ?optional &function'
     -x, --le   pattern   lexical expression (same as bare pattern)
     -e, --and  pattern   pattern match across line boundary
     -r, --must pattern   pattern cannot be compromised
+    -t, --may  pattern   pattern may be exist
     -v, --not  pattern   pattern not to be matched
-        --or   pattern   alternative pattern group
         --re   pattern   regular expression
         --fe   pattern   fixed expression
     -f, --file file      file contains search pattern
@@ -100,6 +102,9 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
     --linestyle=style    how line number printed (separate, line)
     --separate           set filestyle and linestyle both "separate"
     --format LABEL=...   define line number and file name format
+    --frame-top          top frame
+    --frame-middle       middle frame
+    --frame-bottom       bottom frame
   FILE
     --glob=glob          glob target files
     --chdir=dir          change directory before search
@@ -108,6 +113,7 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
     --color=when         use terminal color (auto, always, never)
     --nocolor            same as --color=never
     --colormap=color     R, G, B, C, M, Y etc.
+    --colorsub=...       shortcut for --colormap="sub{...}"
     --colorful           use default multiple colors
     --colorindex=flags   color index method: Ascend/Descend/Block/Random
     --ansicolor=s        ANSI color 16, 256 or 24bit
@@ -150,7 +156,7 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
     --norc               skip reading startup file
     --man                display command or module manual page
     --show               display module file
-    --require=file       include perl program
+    --path               show module file path
     --persist            same as --error=retry
     --error=action       action after read error
     --warn=type          run time error control
@@ -163,194 +169,161 @@ my @baseclass = qw( App::Greple Getopt::EX );
 my $rcloader = Getopt::EX::Loader
     ->new(BASECLASS => \@baseclass);
 
+my @optargs;
+
+sub newopt {
+    my @args = @_;
+    for (@args) {
+	next if ref;
+	s/\s+//g;
+	s/^(?=\w+-)([-\w]+)/$1 =~ tr[-][_]r . "|$1"/e; # "a-b" -> "a_b|a-b"
+    }
+    push @optargs, @args;
+}
+
 my @opt_pattern;
-
-my @opt_if;
-my @opt_of;
-my @opt_pf;
-my @opt_glob;
-my @opt_icode;
-my $opt_border;
-my @opt_block;
-my @opt_inside;
-my @opt_outside;
-my @opt_include;
-my @opt_exclude;
-my @opt_chdir;
-my @opt_begin;
-my @opt_end;
-my @opt_prologue;
-my @opt_epilogue;
-my @opt_callback;
-my $opt_noif;
-my $opt_all;
-my $opt_frame_top    = '';
-my $opt_frame_middle = '';
-my $opt_frame_bottom = '';
-my $opt_blockend;
-my $opt_join_blocks = 0;
-my $opt_color = 'auto';
-my $opt_ansicolor = '256';
-my @opt_colormap;
-my $opt_colorful = 1;
-my $opt_colorindex = '';
-my @opt_face;
-my $opt_uniqcolor;
-my @opt_uniqsub;
-my $opt_random;
-my $opt_regioncolor;
-my $opt_icode;
-my $opt_ocode;
-my $opt_man;
-my $opt_show;
-my $opt_path;
-my $opt_join;
-my $opt_joinby = "";
-my $opt_newline = 1;
-my $opt_clean;
-my $opt_readlist;
-my @opt_need;
-my @opt_allow;
-my $opt_matchcount;
-my $opt_strict = 0;
-my @opt_print;
-my $opt_continue;
-my $opt_filestyle = 'line';
-my $opt_linestyle = 'line';
-my %opt_warn = (read => 0, skip => 1, retry => 0, begin => 0);
-my %opt_format = (LINE => '%d:', FILE => '%s:');
-my %opt_alert = (size => 512 * 1024, time => 2);
-my $opt_error = 'skip';
-my $opt_usage;
-my $opt_exit;
-
-my $opt_c;
-my @opt_d = ();
-my @opt_f;
-my $opt_select;
-my $opt_h;
-my $opt_i;
-my $opt_n;
-my $opt_o;
-my $opt_m;
-my $opt_p;
-my $opt_l;
-my $opt_A = 0;
-my $opt_B = 0;
-my $opt_C = 0;
-my $opt_H;
-#my $opt_M;
-
 sub opt_pattern {
     push @opt_pattern, [ map "$_", @_ ];
     $opt_pattern[-1];
 }
 
-my @optargs = (
-    'and|e=s'            => \&opt_pattern,
-    'must|r=s'           => \&opt_pattern,
-    'not|v=s'            => \&opt_pattern,
-    'le|x=s'             => \&opt_pattern,
-    're=s'               => \&opt_pattern,
-    'fe=s'               => \&opt_pattern,
-    'or=s'               => sub {
-	state $or = opt_pattern('or');
-	push @$or, $_[1];
-    },
-    'need=s'             => \@opt_need,
-    'allow=s'            => \@opt_allow,
-    'matchcount|mc=s'    => \$opt_matchcount,
-    'i|ignore-case!'     => \$opt_i,
-    'l'                  => \$opt_l,
-    'c|count'            => \$opt_c,
-    'n|line-number!'     => \$opt_n,
-    'h|no-filename'      => \$opt_h,
-    'H'                  => \$opt_H,
-    'filestyle|fs=s'     => \$opt_filestyle,
-    'linestyle|ls=s'     => \$opt_linestyle,
-    'separate'           => sub {
-	$opt_filestyle = $opt_linestyle = $_[0]
-    },
-    'o|only-matching!'   => \$opt_o,
-    'm|max-count=s'      => \$opt_m,
-    'p|paragraph!'       => \$opt_p,
-    'A|after-context:2'  => \$opt_A,
-    'B|before-context:2' => \$opt_B,
-    'C|context:2'        => \$opt_C,
-    'all'                => \$opt_all,
-    'f|file=s'           => \@opt_f,
-    'select=s'           => \$opt_select,
-    'readlist!'          => \$opt_readlist,
-    'd=s'                => \@opt_d,
-    'man|doc'            => \$opt_man,
-    'show|less'          => \$opt_show,
-    'path'               => \$opt_path,
-    'icode=s'            => \@opt_icode,
-    'ocode=s'            => \$opt_ocode,
-    'join!'              => \$opt_join,
-    'joinby=s'           => \$opt_joinby,
-    'newline!'           => \$opt_newline,
-    'if=s'               => \@opt_if,
-    'of=s'               => \@opt_of,
-    'pf=s'               => \@opt_pf,
-    'noif'               => \$opt_noif,
-    'border=s'           => \$opt_border,
-    'block=s'            => \@opt_block,
-    'frame-top:s'        => \$opt_frame_top,
-    'frame-middle:s'     => \$opt_frame_middle,
-    'frame-bottom:s'     => \$opt_frame_bottom,
-    'blockend:s'         => \$opt_blockend,
-    'join-blocks!'       => \$opt_join_blocks,
-    'inside=s'           => \@opt_inside,
-    'outside=s'          => \@opt_outside,
-    'include=s'          => \@opt_include,
-    'exclude=s'          => \@opt_exclude,
-    'strict!'            => \$opt_strict,
-    'chdir=s'            => \@opt_chdir,
-    'glob=s'             => \@opt_glob,
-    'begin=s'            => \@opt_begin,
-    'end=s'              => \@opt_end,
-    'prologue=s'         => \@opt_prologue,
-    'epilogue=s'         => \@opt_epilogue,
-    'callback=s'         => \@opt_callback,
-    'clean!'             => \$opt_clean,
-    'color=s'            => \$opt_color,
-    'colormap|cm=s'      => \@opt_colormap,
-    'nocolor|no-color'   => sub { $opt_color = 'never' },
-    'colorful!'          => \$opt_colorful,
-    'colorindex|ci=s'    => \$opt_colorindex,
-    'face=s'             => \@opt_face,
-    'uniqcolor|uc!'      => \$opt_uniqcolor,
-    'uniqsub|us=s'       => \@opt_uniqsub,
-    'random!'            => sub {
-	if ($_[1]) { $opt_colorindex .= 'R' }
-	else       { $opt_colorindex =~ s/R//gi }
-    },
-    'ansicolor=s'        => \$opt_ansicolor,
-    '256!'               => sub { $opt_ansicolor = $_[1] ? '256' : '16' },
-    'regioncolor|rc!'    => \$opt_regioncolor,
-    'print=s'            => \@opt_print,
-    'continue!'          => \$opt_continue,
-    'w|warn:1%'          => sub {
-	map { $opt_warn{$_} = $_[2] }
-	map { $_ eq 'all' ? keys %opt_warn : $_ }
-	$_[1] =~ /\w+/g;
-    },
-    'conceal:1%'         => sub {
-	warn "Option --conceal will be deprecated.  Use --warn.\n";
-	map { $opt_warn{$_} = $_[2] ? 0 : 1 }
-	map { $_ eq 'all' ? keys %opt_warn : $_ }
-	$_[1] =~ /\w+/g;
-    },
-    'persist!'           => sub {
-	$opt_error = $_[1] ? 'retry' : 'skip';
-    },
-    'format=s'           => \%opt_format,
-    'alert=i'            => \%opt_alert,
-    'error=s'            => \$opt_error,
-    'usage:s'            => \$opt_usage,
-    'exit=i'             => \$opt_exit,
-    'M:s'                => sub {
+my @opt_colormap;
+sub opt_colormap { push @opt_colormap, $_[1] }
+sub opt_colorsub { push @opt_colormap, "sub{ $_[1] }" }
+
+newopt
+
+    ##
+    ## PATTERN
+    ##
+    ' and    |e =s ' => \&opt_pattern ,
+    ' must   |r =s ' => \&opt_pattern ,
+    ' may    |t =s ' => \&opt_pattern ,
+    ' not    |v =s ' => \&opt_pattern ,
+    ' le     |x =s ' => \&opt_pattern ,
+    ' re        =s ' => \&opt_pattern ,
+    ' fe        =s ' => \&opt_pattern ,
+    ' file   |f =s ' => \ my @opt_f ,
+    ' select    =s ' => \ my $opt_select ,
+
+    ##
+    ## MATCH
+    ##
+    ' ignore-case        |i  !  ' => \ my $opt_i ,
+    ' need                   =s ' => \ my @opt_need ,
+    ' allow                  =s ' => \ my @opt_allow ,
+    ' matchcount         |mc =s ' => \ my $opt_matchcount ,
+
+    ##
+    ## STYLE
+    ##
+    ' files-with-matches |l     ' => \ my $opt_l ,
+    ' count              |c     ' => \ my $opt_c ,
+    ' line-number        |n  !  ' => \ my $opt_n ,
+    ' filename           |H     ' => \ my $opt_H ,
+    ' no-filename        |h     ' => \ my $opt_h ,
+    ' only-matching      |o  !  ' => \ my $opt_o ,
+    ' all                       ' => \ my $opt_all ,
+    ' max-count          |m  =s ' => \ my $opt_m ,
+    ' after-context      |A  :2 ' => \(my $opt_A = 0) ,
+    ' before-context     |B  :2 ' => \(my $opt_B = 0) ,
+    ' context            |C  :2 ' => \(my $opt_C = 0) ,
+    ' join                   !  ' => \ my $opt_join ,
+    ' joinby                 =s ' => \(my $opt_joinby = "") ,
+    ' newline                !  ' => \(my $opt_newline = 1) ,
+    ' filestyle          |fs =s ' => \(my $opt_filestyle = 'line') ,
+    ' linestyle          |ls =s ' => \(my $opt_linestyle = 'line') ,
+    # separate
+    ' format                 =s ' => \ my %opt_format ,
+    ' frame-top              :s ' => \(my $opt_frame_top    = '') ,
+    ' frame-middle           :s ' => \(my $opt_frame_middle = '') ,
+    ' frame-bottom           :s ' => \(my $opt_frame_bottom = '') ,
+
+    ##
+    ## FILE
+    ##
+    ' glob                   =s ' => \ my @opt_glob ,
+    ' chdir                  =s ' => \ my @opt_chdir ,
+    ' readlist               !  ' => \ my $opt_readlist ,
+
+    ##
+    ## COLOR
+    ##
+    ' color                  =s ' => \(my $opt_color = 'auto') ,
+    ' colormap           |cm =s ' => \&opt_colormap ,
+    ' colorsub           |cs =s ' => \&opt_colorsub ,
+    ' colorful              !   ' => \(my $opt_colorful = 1) ,
+    ' colorindex         |ci =s ' => \(my $opt_colorindex = '') ,
+    ' ansicolor              =s ' => \(my $opt_ansicolor = '256') ,
+    # 256
+    ' regioncolor        |rc !  ' => \ my $opt_regioncolor ,
+    ' uniqcolor          |uc !  ' => \(my $opt_uniqcolor) ,
+    ' uniqsub            |us =s ' => \ my @opt_uniqsub ,
+    # random
+    ' face                   =s ' => \ my @opt_face ,
+
+    ##
+    ## BLOCK
+    ##
+    ' paragraph          |p  !  ' => \ my $opt_p ,
+    ' border                 =s ' => \ my $opt_border ,
+    ' block                  =s ' => \ my @opt_block ,
+    ' blockend               :s ' => \(my $opt_blockend) ,
+    ' join-blocks            !  ' => \(my $opt_join_blocks = 0) ,
+
+    ##
+    ## REGION
+    ##
+    ' inside                 =s ' => \ my @opt_inside ,
+    ' outside                =s ' => \ my @opt_outside ,
+    ' include                =s ' => \ my @opt_include ,
+    ' exclude                =s ' => \ my @opt_exclude ,
+    ' strict                 !  ' => \(my $opt_strict = 0) ,
+
+    ##
+    ## CHARACTER CODE
+    ##
+    ' icode                  =s ' => \ my @opt_icode ,
+    ' ocode                  =s ' => \ my $opt_ocode ,
+
+    ##
+    ## FILTER
+    ##
+    ' if                     =s ' => \ my @opt_if ,
+    ' of                     =s ' => \ my @opt_of ,
+    ' pf                     =s ' => \ my @opt_pf ,
+    ' noif                      ' => \ my $opt_noif ,
+
+    ##
+    ## RUNTIME FUNCTION
+    ##
+    ' print                  =s ' => \ my @opt_print ,
+    ' continue               !  ' => \ my $opt_continue ,
+    ' callback               =s ' => \ my @opt_callback ,
+    ' begin                  =s ' => \ my @opt_begin ,
+    ' end                    =s ' => \ my @opt_end ,
+    ' prologue               =s ' => \ my @opt_prologue ,
+    ' epilogue               =s ' => \ my @opt_epilogue ,
+
+    ##
+    ## OTHERS
+    ##
+    ' usage                  :s ' => \ my $opt_usage ,
+    ' exit                   =i ' => \ my $opt_exit ,
+    # norc
+    ' man  | doc                ' => \ my $opt_man ,
+    ' show | less               ' => \ my $opt_show ,
+    ' path                      ' => \ my $opt_path ,
+    # persist
+    ' error                  =s ' => \(my $opt_error = 'skip') ,
+    # warn
+    ' alert                  =i ' => \ my %opt_alert ,
+    ' debug              |d  =s ' => \ my @opt_d ,
+
+    ##
+    ## MODULE
+    ##
+    'M:s' => sub {
 	warn "Use -M option at the beginning with module name.\n";
 	if (my @modules = uniq($rcloader->modules())) {
 	    warn "Available modules:\n";
@@ -358,17 +331,57 @@ my @optargs = (
 	}
 	exit 2;
     },
-);
 
-sub newopt {
-    push @optargs, @_;
-}
+    ##
+    ## UNDOCUMENTED
+    ##
+    ' clean                  !  ' => \ my $opt_clean ,
+
+;
+
+my %opt_warn = (read => 0, skip => 1, retry => 0, begin => 0);
+%opt_format  = (LINE => '%d:', FILE => '%s:');
+%opt_alert   = (size => 512 * 1024, time => 2);
+
+newopt
+
+    'separate' => sub {
+	$opt_filestyle = $opt_linestyle = $_[0];
+    },
+
+    'nocolor | no-color' => sub {
+	$opt_color = 'never';
+    },
+    '256!' => sub {
+	$opt_ansicolor = $_[1] ? '256' : '16';
+    },
+    'random!' => sub {
+	if ($_[1]) { $opt_colorindex .= 'R' }
+	else       { $opt_colorindex =~ s/R//gi }
+    },
+
+    'warn|w:1%' => sub {
+	map { $opt_warn{$_} = $_[2] }
+	map { $_ eq 'all' ? keys %opt_warn : $_ }
+	$_[1] =~ /\w+/g;
+    },
+    'conceal:1%' => sub {
+	warn "Option --conceal will be deprecated.  Use --warn.\n";
+	map { $opt_warn{$_} = $_[2] ? 0 : 1 }
+	map { $_ eq 'all' ? keys %opt_warn : $_ }
+	$_[1] =~ /\w+/g;
+    },
+    'persist !' => sub {
+	$opt_error = $_[1] ? 'retry' : 'skip';
+    },
+
+;
 
 my %optargs;
 sub setopt {
     unless (%optargs) {
-	for (my $i = 0; $i <= $#optargs; $i += 2) {
-	    my($spec, $ref) = @optargs[$i, $i + 1];
+	for (pairs @optargs) {
+	    my($spec, $ref) = @$_;
 	    while ($spec =~ /\G(\w+)\|?/g) {
 		$optargs{$1} = $ref;
 	    }
@@ -444,20 +457,19 @@ if ($opt_d{o}) {
 ## -m option
 my @splicer = (not defined $opt_m) ? () : do {
     my @param = split /,/, $opt_m, -1;
+    push @param, '' if @param % 2;
     if (notall { /^(-?\d+)?$/ } @param) {
 	die "$opt_m: option format error.\n";
     }
-    pairmap {
-	do { # this block is necessary to escape pairmap bug
-	    my($offset, $length) = ($a, $b);
-	    if ($length ne '') {
-		sub { splice @{+shift}, $offset || 0, $length }
-	    } else {
-		sub { splice @{+shift}, $offset || 0 }
-	    }
-	};
+    map {
+	my($offset, $length) = @$_;
+	if ($length ne '') {
+	    sub { splice @{+shift}, $offset || 0, $length }
+	} else {
+	    sub { splice @{+shift}, $offset || 0 }
+	}
     }
-    (@param, @param % 2 ? '' : ());
+    pairs @param;
 };
 
 my $file_code;
@@ -472,7 +484,7 @@ binmode STDOUT, ":encoding($output_code)";
 ## show unused option characters
 if ($opt_d{u}) {
     my $s = join('','0'..'9',"\n",'a'..'z',"\n",'A'..'Z',"\n");
-    map { /^([0-9a-zA-Z])(?:\|[^=]+)*(?:=[is])?$/ && $s =~ s/$1/./ } @optargs;
+    map { /\|([0-9a-zA-Z])\b/ && $s =~ s/$1/./ } @optargs;
     die $s;
 }
 
@@ -560,8 +572,8 @@ if (@opt_f) {
 my %pat_flag = (
     must => FLAG_REGEX | FLAG_COOK | FLAG_REQUIRED,
     not  => FLAG_REGEX | FLAG_COOK | FLAG_NEGATIVE,
+    may  => FLAG_REGEX | FLAG_COOK | FLAG_OPTIONAL,
     le   => FLAG_REGEX | FLAG_COOK | FLAG_LEXICAL,
-    or   => FLAG_REGEX | FLAG_COOK | FLAG_OR,
     and  => FLAG_REGEX | FLAG_COOK,
     re   => FLAG_REGEX,
     fe   => FLAG_NONE,
@@ -572,6 +584,20 @@ for (@opt_pattern) {
     $pat_holder->append({ flag => $flag, type => 'pattern' }, @opt);
 }
 # $pat_holder->optimize;
+
+##
+## if optional pattern exist, make all non-optional pattern as required
+##
+{
+    my @patterns = $pat_holder->patterns;
+    my @posi = grep { $_->is_positive } @patterns;
+    my @opti = grep { $_->is_optional } @posi;
+    if (@opti > 0) {
+	for my $p (grep { !$_->is_optional } @posi) {
+	    $p->flag($p->flag | FLAG_REQUIRED);
+	}
+    }
+}
 
 ##
 ## set $count_must, $count_need and $opt_allow
@@ -758,9 +784,9 @@ if (defined $opt_blockend) {
     $blockend = $opt_blockend =~ s/\\n/\n/gr;
 }
 
-my $_file     = sub { $color_handler->color('FILE'    , sprintf($opt_format{FILE}, $_[0])) };
-my $_line     = sub { $color_handler->color('LINE'    , sprintf($opt_format{LINE}, $_[0])) };
-my $_text     = sub { $color_handler->color('TEXT'    , $_[0]) };
+my $_file     = sub { $color_handler->color('FILE' , sprintf($opt_format{FILE}, $_[0])) };
+my $_line     = sub { $color_handler->color('LINE' , sprintf($opt_format{LINE}, $_[0])) };
+my $_text     = sub { $color_handler->color('TEXT' , $_[0]) };
 my $_blockend = $color_handler->color('BLOCKEND', $blockend);
 my $_top      = $color_handler->color('TOP'     , $opt_frame_top);
 my $_middle   = $color_handler->color('MIDDLE'  , $opt_frame_middle);
@@ -1249,7 +1275,7 @@ sub grep_data {
 	@opt_of && push_output_filter(
 	    { &FILELABEL => $current_file },
 	    \*STDOUT, @opt_of);
-	display_result($grep);
+	output($grep);
 	@opt_of && recover_stdout;
     }
 
@@ -1265,7 +1291,7 @@ sub grep_data {
     $matched;
 }
 
-sub display_result {
+sub output {
     my $grep = shift;
     my $file = $grep->{filename};
 
@@ -1427,8 +1453,6 @@ __END__
 =head2 CPANMINUS
 
     $ cpanm App::Greple
-    or
-    $ curl -sL http://cpanmin.us | perl - App::Greple
 
 
 =head1 DESCRIPTION
@@ -1436,13 +1460,14 @@ __END__
 
 =head2 MULTIPLE KEYWORDS
 
+=head3 AND
 
-B<greple> has almost same function as Unix command L<egrep(1)> but
-search is done in a manner similar to Internet search engine.  For
-example, next command print lines those contain all of `foo' and bar'
-and `baz'.
+B<greple> can take multiple search patterns with the C<-e> option, but
+unlike the L<egrep(1)> command, it will searches them in an AND
+context.  For example, the next command print lines those containing
+all of C<foo> and C<bar> and C<baz>.
 
-    greple 'foo bar baz' ...
+    greple -e foo -e bar -e baz ...
 
 Each word can appear in any order and any place in the string.  So
 this command find all of following lines.
@@ -1451,50 +1476,74 @@ this command find all of following lines.
     baz bar foo
     the foo, bar and baz
 
-If you want to use OR syntax, prepend question mark (`?') on each
-token, or use regular expression.
+If you want to use OR syntax, use regular expression.
 
-    greple 'foo bar baz ?yabba ?dabba ?doo'
-    greple 'foo bar baz yabba|dabba|doo'
+    greple -e foo -e bar -e baz -e 'yabba|dabba|doo'
 
-This command will print lines those contains all of `foo', `bar' and
-`baz' and one or more of `yabba', `dabba' or `doo'.
+This command will print lines those contains all of C<foo>, C<bar> and
+C<baz> and one or more of C<yabba>, C<dabba> or C<doo>.
 
-NOT operator can be specified by prefixing the token by minus sign
-(`-').  Next example will show lines those contain both `foo' and bar'
-but none of `yabba', `dabba' or `doo'.
+=head3 NOT
 
-    greple 'foo bar -yabba -dabba -doo'
-
-This can be written as this using B<-e> and B<-v> option.
+Use option C<-v> to specify keyword which should not found in the data
+record.  Next example will show lines those contain both C<foo> and
+C<bar> but none of C<yabba>, C<dabba> or C<doo>.
 
     greple -e foo -e bar -v yabba -v dabba -v doo
     greple -e foo -e bar -v 'yabba|dabba|doo'
 
-If `+' is placed to positive matching pattern, that pattern is marked
-as required, and required match count is automatically set to the
-number of required patterns.  So
+=head3 MAY
 
-    greple '+foo bar baz'
+When you are focusing on multiple words, there may be words those are
+not necessary but would be of interest if there were.
 
-commands implicitly set the option C<--need 1>, and consequently print
-all lines including `foo'.  In other words, it makes other patterns
-optional, but they are highlighted if exist.  If you want to search
-lines which includes `foo' and either or both of `bar' and `baz', use
-like this:
+Use option C<--may> or C<-t> (tentative) to specify that kind of
+words.  They will be a subject of search, and highlighted if exist,
+but are optional.
 
-    greple '+foo bar baz' --need 2
-    greple '+foo bar baz' --need +1
-    greple 'foo bar|baz'
+Next command print all lines including C<foo> and C<bar>, and
+highlight C<baz> as well.
+
+    greple -e foo -e bar -t baz
+
+=head3 MUST
+
+Option C<--must> or C<-r> is another way to specify optional keyword.
+If required keyword exists, all other positive match keyword becomes
+optional.  Next command is equivalent to the above example.
+
+    greple -r foo -r bar -e baz
+
+=head2 LEXICAL EXPRESSION
+
+B<greple> takes the first argument as a search pattern specified by
+C<--le> option.  In C<--le> pattern, you can set multiple keywords in
+a single parameter.  Each keyword is separated by spaces, and the
+first character describe the type.
+
+    none  And pattern            : --and  -e
+    +     Required pattern       : --must -r
+    -     Negative match pattern : --not  -v
+    ?     Optional pattern       : --may  -t
+
+Just like internet search engine, you can simply provide C<foo bar
+baz> to search lines including all words.
+
+    greple 'foo bar baz'
+
+Next command show lines which include C<foo>, but does not include
+C<bar>, and highlight C<baz> if exists.
+
+    greple 'foo -bar ?baz'
 
 
 =head2 FLEXIBLE BLOCKS
 
 
 Default data block B<greple> search and print is a line.  Using
-B<--paragraph> (or B<-p> in short) option, series of text separated
-by empty line is taken as a record block.  So next command will print
-whole paragraph which contains the word `foo', `bar' and `baz'.
+C<--paragraph> (or C<-p> in short) option, series of text separated by
+empty line is taken as a record block.  So next command will print
+whole paragraph which contains the word C<foo>, C<bar> and C<baz>.
 
     greple -p 'foo bar baz'
 
@@ -1511,7 +1560,7 @@ You can also define arbitrary complex blocks by writing script.
 =head2 MATCH AREA CONTROL
 
 
-Using option B<--inside> and B<--outside>, you can specify the text
+Using option C<--inside> and C<--outside>, you can specify the text
 area to be matched.  Next commands search only in mail header and body
 area respectively.  In these cases, data block is not changed, so
 print lines which contains the pattern in the specified area.
@@ -1520,9 +1569,9 @@ print lines which contains the pattern in the specified area.
 
     greple --outside '\A(.+\n)+' pattern
 
-Option B<--inside>/B<--outside> can be used repeatedly to enhance the
+Option C<--inside>/C<--outside> can be used repeatedly to enhance the
 area to be matched.  There are similar option
-B<--include>/B<--exclude>, but they are used to trim down the area.
+C<--include>/C<--exclude>, but they are used to trim down the area.
 
 These four options also take user defined function and any complex
 region can be used.
@@ -1539,13 +1588,13 @@ lines.
 
 As for ascii word list, space character in the pattern matches any
 kind of space including newline.  Next example will search the word
-sequence of `foo', `bar' and 'baz', even they spread out to multiple
-lines.
+sequence of C<foo>, C<bar> and C<baz>, even they spread out to
+multiple lines.
 
     greple -e 'foo bar baz'
 
-Option B<-e> is necessary because space is taken as a token separator
-in the bare or B<--le> pattern.
+Option C<-e> is necessary because space is taken as a token separator
+in the bare or C<--le> pattern.
 
 
 =head2 MODULE AND CUSTOMIZATION
@@ -1563,11 +1612,11 @@ macro processing.
     option --newopt --inside :re1 --exclude :re2 --re :re3
 
 Specific set of function and option interface can be implemented as
-module.  Modules are invoked by B<-M> option immediately after command
+module.  Modules are invoked by C<-M> option immediately after command
 name.
 
 For example, B<greple> does not have recursive search option, but it
-can be implemented by B<--readlist> option which accept target file
+can be implemented by C<--readlist> option which accept target file
 list from standard input.  Using B<find> module, it can be written
 like this:
 
@@ -1590,9 +1639,12 @@ but this command is finally translated into following option list.
 =head2 INCLUDED MODUES
 
 This release include some sample modules.  Read document in each
-modules for detail.  You can read the document by B<--man> option.
+modules for detail.  You can read the document by C<--man> option or
+L<perldoc> command.
 
     greple -Mdig --man
+
+    perldoc App::Greple::dig
 
 When it does not work, use C<perldoc App::Greple::dig>.
 
@@ -1610,8 +1662,8 @@ See L<App::Greple::find>.
 
 =item B<dig>
 
-Module for recursive search using B<find> module.  Defines B<--dig>,
-B<--git> and B<--git-r> options. See L<App::Greple::dig>.
+Module for recursive search using B<find> module.  Defines C<--dig>,
+C<--git> and C<--git-r> options. See L<App::Greple::dig>.
 
 =item B<pgp>
 
@@ -1641,7 +1693,7 @@ L<https://github.com/kaz-utashiro/>.
 
 
 If no specific option is given, B<greple> takes the first argument as
-a search pattern specified by B<--le> option.  All of these patterns
+a search pattern specified by C<--le> option.  All of these patterns
 can be specified multiple times.
 
 Command itself is written in Perl, and any kind of Perl style regular
@@ -1659,32 +1711,88 @@ S<< C<(\w)\1> >>.
 
 =over 7
 
+=item B<-e> I<pattern>, B<--and>=I<pattern>
+
+Specify the positive match pattern.  Next command print lines contains
+all of C<foo>, C<bar> and C<baz>.
+
+    greple -e foo -e bar -e baz
+
+=item B<-t> I<pattern>, B<--may>=I<pattern>
+
+Specify the optional (tentative) match pattern.  Next command print
+lines contains C<foo> and C<bar>, and highlight C<baz> if exists.
+
+    greple -e foo -e bar -t baz
+
+=item B<-r> I<pattern>, B<--must>=I<pattern>
+
+Specify the required match pattern.  If one or more required pattern
+exist, other positive match pattern becomes optional.
+
+    greple -r foo -r bar -e baz
+
+Because C<-t> promote all other C<-e> patterns required, next command
+do the same thing.  Mixing C<-r>, C<-e> and C<-t> is not recommended,
+though.
+
+    greple -r foo -e bar -t baz
+
+=item B<-v> I<pattern>, B<--not>=I<pattern>
+
+Specify the negative match pattern.  Because it does not affect to the
+bare pattern argument, you can narrow down the search result like
+this.
+
+    greple foo file
+    greple foo file -v bar
+    greple foo file -v bar -v baz
+
+=back
+
+In the above pattern options, space characters are treated specially.
+They are replaced by the pattern which matches any number of white
+spaces including newline.  So the pattern can expand to multiple
+lines.  Next commands search the series of word C<foo> C<bar> C<baz>
+even if they are separated by newlines.
+
+    greple -e 'foo bar baz'
+
+This is done by converting pattern C<foo bar baz> to
+C<foo\s+bar\+baz>, so that word separator can match one or more white
+spaces.
+
+As for Asian wide characters, pattern is cooked as zero or more white
+spaces can be allowed between any characters.  So Japanese string
+pattern C<日本語> will be converted to C<< 日\s*本\s*語 >>.
+
+If you don't want these conversion, use C<--re> option.
+
+=over 4
+
 =item B<-x> I<pattern>, B<--le>=I<pattern>
 
-Treat the string as a collection of tokens separated by spaces.  Each
-token is interpreted by the first character.  Token start with `-'
-means negative pattern, `?' means alternative, and `+' does required.
+Treat the pattern string as a collection of tokens separated by
+spaces.  Each token is interpreted by the first character.  Token
+start with C<-> means B<negative> pattern, C<?> means B<optional>, and
+C<+> does B<required>.
 
-Next example print lines which contains `foo' and `bar', and one or
-more of `yabba' and 'dabba', and none of `baz' and `doo'.
+Next example print lines which contain C<foo> and C<yabba>, and none
+of C<bar> and C<dabba>, with highlighting C<baz> and C<doo> if they
+exist.
 
-    greple --le='foo bar -baz ?yabba ?dabba -doo'
+    greple --le='foo -bar ?baz yabba -dabba ?doo'
 
-Multiple C<?> preceded tokens are treated all mixed together.  That
-means S<< C<?A|B ?C|D> >> is equivalent to S<< C<?A|B|C|D> >>.  If you
-want to mean S<< C<(A or B)> >> and S<< C<(C or D)> >>, use AND syntax
-instead: S<< C<A|B C|D> >>.
-
-This is the summary of start character for B<--le> option:
+This is the summary of start character for C<--le> option:
 
     +  Required pattern
     -  Negative match pattern
-    ?  Alternative pattern
+    ?  Optional pattern
     &  Function call (see next section)
 
-=item B<-x>=[B<+->]B<&>I<function>, B<--le>=[B<+->]B<&>I<function>
+=item C<-x> [B<+?->]B<&>I<function>, C<--le>=[B<+?->]B<&>I<function>
 
-If the pattern start with ampersand (`&'), it is treated as a
+If the pattern start with ampersand (C<&>), it is treated as a
 function, and the function is called instead of searching pattern.
 Function call interface is same as the one for block/region options.
 
@@ -1694,70 +1802,15 @@ lines like this:
 
     greple -n '&odd_line' file
 
-Required (C<+>) and negative (C<->) mark can be used for function
-pattern.
+Required (C<+>), optional (C<?>) and negative (C<->) mark can be used
+for function pattern.
 
-This version experimentally support callback function for each
-pattern.  Region list returned by function can have two extra element
-besides start/end position.  Third element is index.  Fourth element
-is callback function pointer which is called to produce string to be
-shown in command output.  Callback function takes four argument (start
-position, end position, index, matched string) and returns replacement
-string.
-
-=item B<-e> I<pattern>, B<--and>=I<pattern>
-
-Specify positive match token.  Next two commands are equivalent.
-
-    greple 'foo bar baz'
-    greple -e foo -e bar -e baz
-
-First character is not interpreted, so next commands will search the
-pattern `-baz'.
-
-    greple -e -baz
-
-Space characters are treated specially by B<-e> and B<-v> options.
-They are replaced by the pattern which matches any number of
-white spaces including newline.  So the pattern can be expand to
-multiple lines.  Next commands search the series of word `foo', `bar'
-and `baz' even if they are separated by newlines.
-
-    greple -e 'foo bar baz'
-
-=item B<-r> I<pattern>, B<--must>=I<pattern>
-
-Specify required match token.  Next two commands are equivalent.
-
-    greple '+foo bar baz'
-    greple -r foo -e bar -e baz
-
-=item B<-v> I<pattern>, B<--not>=I<pattern>
-
-Specify negative match token.  Because it does not affect to the bare
-pattern argument, you can narrow down the search result like this.
-
-    greple foo file
-    greple foo file -v bar
-    greple foo file -v bar -v baz
-
-=item B<--or>=I<pattern>
-
-Specify logical-or match token group.  Same as C<?> marked token in
-B<--le> option.  Next commands are all equivalent.
-
-    greple --le 'foo bar ?yabba ?dabba'
-    greple --and foo --and bar --or yabba --or dabba
-    greple -e foo -e bar -e 'yabba|dabba'
-
-Option B<--or> group and each B<--le> pattern makes individual
-pattern.  So
-
-    greple --le '?foo ?yabba' --le '?bar ?dabba' --or baz --or doo
-
-is same as:
-
-    greple -e 'foo|yabba' -e 'bar|dabba' -e 'baz|doo'
+B<CALLBACK FUNCTION>: Region list returned by function can have two
+extra elements besides start/end position.  Third element is index.
+Fourth element is a callback function pointer which will be called to
+produce string to be shown in command output.  Callback function is
+called with four arguments (start position, end position, index,
+matched string) and expected to return replacement string.
 
 =item B<--re>=I<pattern>
 
@@ -1766,7 +1819,7 @@ characters.
 
 =item B<--fe>=I<pattern>
 
-Specify fixed string pattern, like fgrep.
+Specify the fixed string pattern, like fgrep.
 
 =item B<-i>, B<--ignore-case>
 
@@ -1776,17 +1829,17 @@ Ignore case.
 
 =item B<--allow>=I<n>
 
-Option to compromise matching condition.  Option B<--need> specifies
-the required match count, and B<--allow> the number of negative
+Option to compromise matching condition.  Option C<--need> specifies
+the required match count, and C<--allow> the number of negative
 condition to be overlooked.
 
     greple --need=2 --allow=1 'foo bar baz -yabba -dabba -doo'
 
-Above command prints the line which contains two or more from `foo',
-`bar' and `baz', and does not include more than one of `yabba',
-`dabba' or `doo'.
+Above command prints the line which contains two or more from C<foo>,
+C<bar> and C<baz>, and does not include more than one of C<yabba>,
+C<dabba> or C<doo>.
 
-Using option B<--need>=I<1>, B<greple> produces same result as B<grep>
+Using option C<--need=1>, B<greple> produces same result as B<grep>
 command.
 
     grep   -e foo -e bar -e baz
@@ -1795,12 +1848,14 @@ command.
 When the count I<n> is negative value, it is subtracted from default
 value.
 
-If the option B<--need=0> is specified and no pattern was found,
+If the option C<--need=0> is specified and no pattern was found,
 entire data is printed.  This is true even for required pattern.
 
-=item B<--matchcount>=I<count>|I<min>,I<max>, B<--mc>=...
+=item B<--matchcount>=I<count> B<--mc>=...
 
-When option B<--matchcount> is specified, only blocks which have given
+=item B<--matchcount>=I<min>,I<max> B<--mc>=...
+
+When option C<--matchcount> is specified, only blocks which have given
 match count will be shown.  Minimum and maximum number can be given,
 connecting by comma, and they can be omitted.  Next commands print
 lines including semicolons; 3 or more, exactly 3, and 3 or less,
@@ -1821,8 +1876,7 @@ match count 0 to 10, 20 to 30, and 40-or-greater.
 =item B<-f> I<file>, B<--file>=I<file>
 
 Specify the file which contains search pattern.  When file contains
-multiple lines, patterns on each lines are mixed together by OR
-context.
+multiple lines, patterns are mixed together by OR context.
 
 Blank line and the line starting with sharp (#) character is ignored.
 Two slashes (//) and following string are taken as a comment and
@@ -1830,8 +1884,8 @@ removed with preceding spaces.
 
 When multiple files specified, each file produces individual pattern.
 
-If the file name is followed by `[index]` string, it is treated as
-specified by B<--select> option.  Next two commands are equivalent.
+If the file name is followed by C<[index]> string, it is treated as
+specified by C<--select> option.  Next two commands are equivalent.
 
     greple -f pattern_file'[1,5:7]'
 
@@ -1842,8 +1896,8 @@ See L<App::Greple::subst> module.
 =item B<--select>=I<index>
 
 When you want to choose specific pattern in the pattern file provided
-by B<-f> option, use B<--select> option.  I<index> is number list
-separated by comma (,) character and each numbers are interpreted by
+by C<-f> option, use C<--select> option.  I<index> is number list
+separated by comma (,) character and each number is interpreted by
 L<Getopt::EX::Numbers> module.  Take a look at the module document for
 detail.
 
@@ -1882,7 +1936,7 @@ Display filename always.
 =item B<-o>, B<--only-matching>
 
 Print matched string only.  Newline character is printed after matched
-string if it does not end with newline.  Use B<--no-newline> option if
+string if it does not end with newline.  Use C<--no-newline> option if
 you don't need extra newline.
 
 =item B<--all>
@@ -1908,7 +1962,7 @@ status.
 
 Note that B<grep> command also has same option, but it's behavior is
 different when invoked to multiple files.  B<greple> produces given
-number of output for each files, while B<grep> takes it as a total
+number of output for each file, while B<grep> takes it as a total
 number of output.
 
 =item B<-m> I<*>, B<--max-count>=I<*>
@@ -1932,8 +1986,8 @@ I<length> and zero for I<offset>.
 =item B<-C>[I<n>], B<--context>[=I<n>]
 
 Print I<n>-blocks before/after matched string.  The value I<n> can be
-omitted and the default is 2.  When used with B<--paragraph> or
-B<--block> option, I<n> means number of paragraph or block.
+omitted and the default is 2.  When used with C<--paragraph> or
+C<--block> option, I<n> means number of paragraph or block.
 
 Actually, these options expand the area of logical operation.  It
 means
@@ -1950,15 +2004,15 @@ Moreover
 
     greple -C1 'foo baz'
 
-also matches this text, because matching blocks around `foo' and `bar'
-overlaps each other and makes single block.
+also matches this text, because matching blocks around C<foo> and
+C<bar> overlaps each other and makes single block.
 
 =item B<--join>
 
 =item B<--joinby>=I<string>
 
 Convert newline character found in matched string to empty or specified
-I<string>.  Using B<--join> with B<-o> (only-matching) option, you can
+I<string>.  Using C<--join> with C<-o> (only-matching) option, you can
 collect searching sentence list in one per line form.  This is
 sometimes useful for Japanese text processing.  For example, next
 command prints the list of KATAKANA words, including those spread
@@ -1966,8 +2020,8 @@ across multiple lines.
 
     greple -ho --join '\p{InKatakana}+(\n\p{InKatakana}+)*'
 
-Space separated word sequence can be processed with B<--joinby>
-option.  Next example prints all `for *something*' pattern in pod
+Space separated word sequence can be processed with C<--joinby>
+option.  Next example prints all C<for *something*> pattern in pod
 documents within Perl script.
 
     greple -Mperl --pod -ioe '\bfor \w+' --joinby ' '
@@ -1975,19 +2029,19 @@ documents within Perl script.
 =item B<--[no]newline>
 
 Since B<greple> can handle arbitrary blocks other than normal text
-lines, they sometimes do not end with newline character.  Option B<-o>
+lines, they sometimes do not end with newline character.  Option C<-o>
 makes similar situation.  In that case, extra newline is appended at
-the end of block to be shown.  Option B<--no-newline> disables this
+the end of block to be shown.  Option C<--no-newline> disables this
 behavior.
 
-=item B<--filestyle>=I<line>|I<once>|I<separate>, B<--fs>
+=item B<--filestyle>=[C<line>,C<once>,C<separate>], B<--fs>
 
 Default style is I<line>, and B<greple> prints filename at the
 beginning of each line.  Style I<once> prints the filename only once
 at the first time.  Style I<separate> prints filename in the separate
 line before each line or block.
 
-=item B<--linestyle>=I<line>|I<separate>, B<--ls>
+=item B<--linestyle>=[C<line>,C<separate>], B<--ls>
 
 Default style is I<line>, and B<greple> prints line numbers at the
 beginning of each line.  Style I<separate> prints line number in the
@@ -1995,7 +2049,7 @@ separate line before each line or block.
 
 =item B<--separate>
 
-Shortcut for B<--filestyle>=I<separate> B<--linestyle>=I<separate>.
+Shortcut for C<--filestyle=separate> C<--linestyle=separate>.
 This is convenient to use block mode search and visiting each location
 from supporting tool, such as Emacs.
 
@@ -2021,9 +2075,9 @@ Next example will show line numbers in five digits with tab space:
 
 =item B<--frame-bottom>=I<string>
 
-Print surrounding frames before and after each blocks.  C<top> frame
-is printed at the beginning, C<bottom> frame at the end, C<middle>
-frame between each blocks.
+Print surrounding frames before and after each block.  C<top> frame is
+printed at the beginning, C<bottom> frame at the end, C<middle> frame
+between blocks.
 
 =back
 
@@ -2036,14 +2090,14 @@ frame between each blocks.
 =item B<--glob>=I<pattern>
 
 Get files matches to specified pattern and use them as a target files.
-Using B<--chdir> and B<--glob> makes easy to use B<greple> for fixed
+Using C<--chdir> and C<--glob> makes easy to use B<greple> for fixed
 common job.
 
 =item B<--chdir>=I<directory>
 
 Change directory before processing files.  When multiple directories
-are specified in B<--chdir> option, by using wildcard form or
-repeating option, B<--glob> file expansion will be done for every
+are specified in C<--chdir> option, by using wildcard form or
+repeating option, C<--glob> file expansion will be done for every
 directories.
 
     greple --chdir '/usr/man/man?' --glob '*.[0-9]' ...
@@ -2069,19 +2123,19 @@ Using B<find> module, this can be done like:
 
 =over 7
 
-=item B<--color>=I<auto>|I<always>|I<never>, B<--nocolor>
+=item B<--color>=[C<auto>,C<always>,C<never>], B<--nocolor>
 
 Use terminal color capability to emphasize the matched text.  Default
-is `auto': effective when STDOUT is a terminal and option B<-o> is not
-given, not otherwise.  Option value `always' and `never' will work as
-expected.
+is C<auto>: effective when STDOUT is a terminal and option C<-o> is
+not given, not otherwise.  Option value C<always> and C<never> will
+work as expected.
 
 Option B<--nocolor> is alias for B<--color>=I<never>.
 
 When color output is disabled, ANSI terminal sequence is not produced,
 but functional colormap, such as C<--cm sub{...}>, still works.
 
-=item B<--colormap>=I<spec>
+=item B<--colormap>=I<spec>, B<--cm>=...
 
 Specify color map.  Because this option is mostly implemented by
 L<Getopt::EX::Colormap> module, consult its document for detail and
@@ -2163,8 +2217,8 @@ Example:
 
 Multiple colors can be specified separating by white space or comma,
 or by repeating options.  Those colors will be applied for each
-pattern keywords.  Next command will show word `foo' in red, `bar' in
-green and `baz' in blue.
+pattern keywords.  Next command will show word C<foo> in red, C<bar>
+in green and C<baz> in blue.
 
     greple --colormap='R G B' 'foo bar baz'
 
@@ -2188,9 +2242,9 @@ the line with background color.  This effect uses irregular escape
 sequence, and you may need to define C<LESSANSIENDCHARS> environment
 as "mK" to see the result with L<less> command.
 
-=item B<--colormap>=I<&func>
+=item B<--colormap>=C<&func>
 
-=item B<--colormap>=I<sub{...}>
+=item B<--colormap>=C<sub{...}>
 
 You can also set the name of perl subroutine name or definition to be
 called handling matched words.  Target word is passed as variable
@@ -2201,7 +2255,7 @@ Next command convert all words in C comment to upper case.
     greple --all '/\*(?s:.*?)\*/' --cm 'sub{uc}'
 
 You can quote matched string instead of coloring (this emulates
-deprecated option B<--quote>):
+deprecated option C<--quote>):
 
     greple --cm 'sub{"<".$_.">"}' ...
 
@@ -2211,7 +2265,7 @@ print line numbers in seven digits.
     greple -n --cm 'LINE=sub{s/(\d+)/sprintf("%07d",$1)/e;$_}'
 
 Experimentally, function can be combined with other normal color
-specifications.  Also the form I<&func;> can be repeated.
+specifications.  Also the form C<&func;> can be repeated.
 
     greple --cm 'BF/544;sub{uc}'
 
@@ -2221,23 +2275,39 @@ When color for 'TEXT' field is specified, whole text including matched
 part is passed to the function, exceptionally.  It is not recommended
 to use user defined function for 'TEXT' field.
 
+=item B<--colorsub>=C<...>, B<--cs>=C<...>
+
+C<--colorsub> or C<--cs> is a shortcut for subroutine colormap.  It
+simply enclose the argument by C<sub{ ... }> expression.  So
+
+    greple -cm 'sub{uc}'
+
+can be written as simple as this.
+
+    greple -cs uc
+
+You can not use this option for labeled color.
+
 =item B<--[no]colorful>
 
-Shortcut for B<--colormap>='I<RD GD BD CD MD YD>' in ANSI 16 colors
-mode, and B<--colormap>='I<D/544 D/454 D/445 D/455 D/454 D/554>' and
+Shortcut for C<--colormap>='C<RD GD BD CD MD YD>' in ANSI 16 colors
+mode, and C<--colormap>='C<D/544 D/454 D/445 D/455 D/454 D/554>' and
 other combination of 3, 4, 5 for 256 colors mode.  Enabled by default.
 
 When single pattern is specified, first color in colormap is used for
 the pattern.  If multiple patterns and multiple colors are specified,
-each patterns are colored with corresponding colors cyclically.
+each pattern is colored with corresponding color cyclically.
 
-Option B<--regioncolor>, B<--uniqcolor> and B<--colorindex> change
+Option C<--regioncolor>, C<--uniqcolor> and C<--colorindex> change
 this behavior.
 
 =item B<--colorindex>=I<spec>, B<--ci>=I<spec>
 
-Specify color index method by combination of spec characters.
-Meaningful combinations are B<A>, B<D>, B<AB>, B<DB> and B<R>.
+Specify color index method by combination of spec characters.  B<A>
+(ascend) and B<D> (descend) can be mixed with B<B> (block) and/or B<S>
+(shuffle) like C<--ci=ABS>.  B<R> (random) can be too but it does not
+make sense.  When B<S> is used alone, colormap is shuffled with normal
+behavior.
 
 =over 4
 
@@ -2248,48 +2318,48 @@ appearance.
 
 =item D (Descending)
 
-Apply different color sequentially according to the reversed order of
+Apply different color sequentially according to the reverse order of
 appearance.
 
 =item B (Block)
 
 Reset sequential index on every block.
 
-=item R (Random)
-
-Use random color index every time.
-
 =item S (Shuffle)
 
 Shuffle indexed color.
 
+=item R (Random)
+
+Use random color index every time.
+
 =item N (Normal)
 
 Reset to normal behavior.  Because the last option takes effect,
-B<--ci=N> can be used to reset the behavior set by previous options.
+C<--ci=N> can be used to reset the behavior set by previous options.
 
 =back
 
 =item B<--random>
 
-Shortcut for B<--colorindex=R>.
+Shortcut for C<--colorindex=R>.
 
-=item B<--ansicolor>=I<16>|I<256>|I<24bit>
+=item B<--ansicolor>=[C<16>,C<256>,C<24bit>]
 
-If set as I<16>, use ANSI 16 colors as a default color set, otherwise
-ANSI 256 colors.  When set as I<24bit>, 6 hex digits notation produces
-24bit color sequence.  Default is I<256>.
+If set as C<16>, use ANSI 16 colors as a default color set, otherwise
+ANSI 256 colors.  When set as C<24bit>, 6 hex digits notation produces
+24bit color sequence.  Default is C<256>.
 
 =item B<--[no]256>
 
-Shortcut for B<--ansicolor>=I<256> or I<16>.
+Shortcut for C<--ansicolor>=C<256> or C<16>.
 
 =item B<--[no]regioncolor>, B<--[no]rc>
 
-Use different colors for each B<--inside>/B<outside> regions.
+Use different colors for each C<--inside> and C<--outside> region.
 
 Disabled by default, but automatically enabled when only single search
-pattern is specified.  Use B<--no-regioncolor> to cancel automatic
+pattern is specified.  Use C<--no-regioncolor> to cancel automatic
 action.
 
 =item B<--[no]uniqcolor>, B<--[no]uc>
@@ -2297,19 +2367,19 @@ action.
 Use different colors for different string matched.
 Disabled by default.
 
-Next example prints all words start by `color' and display them all in
-different colors.
+Next example prints all words start by C<color> and display them all
+in different colors.
 
     greple --uniqcolor 'colou?r\w*'
 
-When used with option B<-i>, color is selected still in case-sensitive
+When used with option C<-i>, color is selected still in case-sensitive
 fashion.  If you want case-insensitive color selection, use next
-B<--uniqsub> option.
+C<--uniqsub> option.
 
 =item B<--uniqsub>=I<function>, B<--us>=I<function>
 
-Above option B<--uniqcolor> set same color for same literal string.
-Option B<--uniqsub> specify the preprocessor code applied before
+Above option C<--uniqcolor> set same color for same literal string.
+Option C<--uniqsub> specify the preprocessor code applied before
 comparison.  I<function> get matched string by C<$_> and returns the
 result.  For example, next command will choose unique colors for each
 word by their length.
@@ -2327,10 +2397,10 @@ color for each entire line by their commit ids.
 
 =item B<--face>=[-+]I<effect>
 
-Set or unset specified I<effect> for all indexed color specs.  Use `+'
-(optional) to set, and `-' to unset.  Effect is a single character
-expressing S (Stand-out), U (Underline), D (Double-struck), F (Flash)
-and such.
+Set or unset specified I<effect> for all indexed color specs.  Use
+C<+> (optional) to set, and C<-> to unset.  Effect is a single
+character expressing S (Stand-out), U (Underline), D (Double-struck),
+F (Flash) and such.
 
 Next example remove D (double-struck) effect.
 
@@ -2359,12 +2429,13 @@ space characters.  Example:
 
     greple -pe '^struct sockaddr' /usr/include/sys/socket.h
 
-It changes the unit of context specified by B<-A>, B<-B>, B<-C>
-options.  Space gap between paragraphs are also treated as block
-unit.  Thus, option B<-pC2> will print with previous and next
-paragraph, while B<-pC1> will print with just surrounding spaces.
+It changes the unit of context specified by C<-A>, C<-B>, C<-C>
+options.  Space gap between paragraphs are also treated as a block
+unit.  Thus, option C<-pC2> will print target paragraph along with
+previous and next paragraph.  Option C<-pC1> causes consecutive
+paragraphs to be output as the same block in an easy-to-read format.
 
-You can create original paragraph pattern by B<--border> option.
+You can create original paragraph pattern by C<--border> option.
 
 =item B<--border>=I<pattern>
 
@@ -2381,7 +2452,7 @@ Next command treat the data as a series of 10-line unit.
 
     greple -n --border='(.*\n){1,10}'
 
-Contrary to the next B<--block> option, B<--border> never produce
+Contrary to the next C<--block> option, C<--border> never produce
 disjoint records.
 
 If you want to treat entire file as a single block, setting border to
@@ -2408,7 +2479,7 @@ because it finds all blocks before processing.
 
 =item B<--blockend>=I<string>
 
-Change the end mark displayed after B<-pABC> or B<--block> options.
+Change the end mark displayed after C<-pABC> or C<--block> options.
 Default value is "--".
 
 =item B<--join-blocks>
@@ -2429,9 +2500,9 @@ them single block for final output.
 
 =item B<--outside>=I<pattern>
 
-Option B<--inside> and B<--outside> limit the text area to be matched.
-For simple example, if you want to find string `and' not in the word
-`command', it can be done like this.
+Option C<--inside> and C<--outside> limit the text area to be matched.
+For simple example, if you want to find string C<and> not in the word
+C<command>, it can be done like this.
 
     greple --outside=command and
 
@@ -2448,9 +2519,9 @@ When multiple B<inside> and B<outside> regions are specified, those
 regions are mixed up in union way.
 
 In multiple color environment, and if single keyword is specified,
-matches in each B<--inside>/B<outside> regions are printed in
-different colors.  Forcing this operation with multiple keywords, use
-B<--regioncolor> option.
+matches in each C<--inside>/C<--outside> region is printed in different
+color.  Forcing this operation with multiple keywords, use
+C<--regioncolor> option.
 
 =item B<--inside>=I<&function>
 
@@ -2470,11 +2541,11 @@ F<.greplerc> file or by module option.
 
 =item B<--exclude>=I<&function>
 
-B<--include>/B<exclude> option behave exactly same as
-B<--inside>/B<outside> when used alone.
+C<--include>/C<--exclude> option behave exactly same as
+C<--inside>/C<--outside> when used alone.
 
-When used in combination, B<--include>/B<exclude> are mixed in AND
-manner, while B<--inside>/B<outside> are in OR.
+When used in combination, C<--include>/C<--exclude> are mixed in AND
+manner, while C<--inside>/C<--outside> are in OR.
 
 Thus, in the next example, first line prints all matches, and second
 does none.
@@ -2483,22 +2554,22 @@ does none.
 
     greple --include PATTERN --exclude PATTERN
 
-You can make up desired matches using B<--inside>/B<outside> option,
-then remove unnecessary part by B<--include>/B<exclude>
+You can make up desired matches using C<--inside>/C<--outside> option,
+then remove unnecessary part by C<--include>/C<--exclude>
 
 =item B<--strict>
 
 Limit the match area strictly.
 
-By default, B<--block>, B<--inside>/B<outside>,
-B<--include>/B<exclude> option allows partial match within the
+By default, C<--block>, C<--inside>/C<outside>,
+C<--include>/C<--exclude> option allows partial match within the
 specified area.  For instance,
 
     greple --inside and command
 
 matches pattern C<command> because the part of matched string is
 included in specified inside-area.  Partial match fails when option
-B<--strict> provided, and longer string never matches within shorter
+C<--strict> provided, and longer string never matches within shorter
 area.
 
 Interestingly enough, above example
@@ -2508,7 +2579,7 @@ Interestingly enough, above example
 produces output, as a matter of fact.  Think of the situation
 searching, say, C<' PATTERN '> with this condition.  Matched area
 includes surrounding spaces, and satisfies both conditions partially.
-This match does not occur when option B<--strict> is given, either.
+This match does not occur when option C<--strict> is given, either.
 
 =back
 
@@ -2525,7 +2596,7 @@ option to set specific encoding.  When handling Japanese text, you may
 choose from 7bit-jis (jis), euc-jp or shiftjis (sjis).  Multiple code
 can be supplied using multiple option or combined code names with
 space or comma, then file encoding is guessed from those code sets.
-Use encoding name `guess' for automatic recognition from default code
+Use encoding name C<guess> for automatic recognition from default code
 list which is euc-jp and 7bit-jis.  Following commands are all
 equivalent.
 
@@ -2557,7 +2628,7 @@ Specify output code.  Default is utf8.
 
 =item B<--if>=I<filter>, B<--if>=I<EXP>:I<filter>
 
-You can specify filter command which is applied to each files before
+You can specify filter command which is applied to each file before
 search.  If only one filter command is specified, it is applied to all
 files.  If filter information include colon, first field will be perl
 expression to check the filename saved in variable $_.  If it
@@ -2572,13 +2643,13 @@ may be able to use special device:
     greple --if='nm /dev/stdin' crypt /usr/lib/lib*
 
 Filters for compressed and gzipped file is set by default unless
-B<--noif> option is given.  Default action is like this:
+C<--noif> option is given.  Default action is like this:
 
     greple --if='s/\.Z$//:zcat' --if='s/\.g?z$//:gunzip -c'
 
-File with I<.gpg> suffix is filtered by B<gpg> command.  In that case,
+File with C<.gpg> suffix is filtered by B<gpg> command.  In that case,
 pass-phrase is asked for each file.  If you want to input pass-phrase
-only once to find from multiple files, use B<-Mpgp> module.
+only once to find from multiple files, use C<-Mpgp> module.
 
 If the filter start with C<&>, perl subroutine is called instead of
 external command.  You can define the subroutine in F<.greplerc> or
@@ -2597,7 +2668,7 @@ be decompressed automatically.
 Specify output filter which process the output of B<greple> command.
 Filter command can be specified in multiple times, and they are
 invoked for each file to be processed.  So next command reset the line
-number for each files.
+number for each file.
 
     greple --of 'cat -n' string file1 file2 ...
 
@@ -2607,13 +2678,13 @@ modules.
 
 Output filter command is executed only when matched string exists to
 avoid invoking many unnecessary processes.  No effect for option
-B<-l> and B<-c>.
+C<-l> and C<-c>.
 
 =item B<--pf>=I<filter>
 
 =item B<--pf>=I<&func>
 
-Similar to B<--of> filter but invoked just once and takes care of
+Similar to C<--of> filter but invoked just once and takes care of
 entire output from B<greple> command.
 
 =back
@@ -2634,15 +2705,15 @@ can be defined in F<.greplerc> file or module.  Matched data is placed
 in variable C<$_>.  Filename is passed by C<&FILELABEL> key, as
 described later.
 
-It is possible to use multiple B<--print> options.  In that case,
+It is possible to use multiple C<--print> options.  In that case,
 second function will get the result of the first function.  The
 command will print the final result of the last function.
 
 =item B<--continue>
 
-When B<--print> option is given, B<greple> will immediately print the
+When C<--print> option is given, B<greple> will immediately print the
 result returned from print function and finish the cycle.  Option
-B<--continue> forces to continue normal printing process after print
+C<--continue> forces to continue normal printing process after print
 function called.  So please be sure that all data being consistent.
 
 =item B<--callback>=I<function>(I<...>)
@@ -2657,7 +2728,7 @@ by returned string from the function.
 
 =item B<--begin>=I<function>=I<...>
 
-Option B<--begin> specify the function executed at the beginning of
+Option C<--begin> specify the function executed at the beginning of
 each file processing.  This I<function> have to be called from B<main>
 package.  So if you define the function in the module package, use the
 full package name or export properly.
@@ -2665,7 +2736,7 @@ full package name or export properly.
 If the function dies with a message starting with a word "SKIP"
 (C</^SKIP/i>), that file is simply skipped.  So you can control if the
 file is to be processed using the file name or content.  To see the
-message, use B<--warn begin=1> option.
+message, use C<--warn begin=1> option.
 
 For example, using next function, only perl related files will be
 processed.
@@ -2690,7 +2761,7 @@ processed.
 
 =item B<--end>=I<function>=I<...>
 
-Option B<--end> is almost same as B<--begin>, except that the function
+Option C<--end> is almost same as C<--begin>, except that the function
 is called after the file processing.
 
 =item B<--prologue>=I<function>(I<...>)
@@ -2701,7 +2772,7 @@ is called after the file processing.
 
 =item B<--epilogue>=I<function>=I<...>
 
-Option B<--prologue> and B<--epilogue> specify functions called before
+Option C<--prologue> and C<--epilogue> specify functions called before
 and after processing.  During the execution, file is not opened and
 therefore, file name is not given to those functions.
 
@@ -2763,10 +2834,10 @@ interpreted as a bare word.
 
 =item B<--usage>[=I<expand>]
 
-B<Greple> print usage and exit with option B<--usage>, or no valid
+B<Greple> print usage and exit with option C<--usage>, or no valid
 parameter is not specified.  In this case, module option is displayed
 with help information if available.  If you want to see how they are
-expanded, supply something not empty to B<--usage> option, like:
+expanded, supply something not empty to C<--usage> option, like:
 
     greple -Mmodule --usage=expand
 
@@ -2780,25 +2851,21 @@ execution.  It still exits with non-zero status when error occurred.
 =item B<--man>, B<--doc>
 
 Show manual page.
-Display module's manual page when used with B<-M> option.
+Display module's manual page when used with C<-M> option.
 
 =item B<--show>, B<--less>
 
-Show module file contents.  Use with B<-M> option.
+Show module file contents.  Use with C<-M> option.
 
 =item B<--path>
 
-Show module file path.  Use with B<-M> option.
+Show module file path.  Use with C<-M> option.
 
 =item B<--norc>
 
 Do not read startup file: F<~/.greplerc>.  This option have to be
-placed before any other options including B<-M> module options.
+placed before any other options including C<-M> module options.
 Setting C<GREPLE_NORC> environment have same effect.
-
-=item B<--require>=I<filename>
-
-Include arbitrary perl program.
 
 =begin comment
 
@@ -2823,13 +2890,13 @@ information can be display by giving appropriate flag to -d option.
 
 =item B<--conceal> I<type>=I<val>
 
-Use following B<--warn> option in reverse context.  This option
+Use following C<--warn> option in reverse context.  This option
 remains for backward compatibility and will be deprecated in the near
 future.
 
 =item B<--persist>
 
-Same as B<--error=retry>.  It may be deprecated in the future.
+Same as C<--error=retry>.  It may be deprecated in the future.
 
 =item B<--error>=I<action>
 
@@ -2869,15 +2936,15 @@ will work like L<string(1)> command.
 
     greple -o --re '(?a)\w{4,}' --error=retry --uc /bin/*
 
-If you want read all files as binary data, use B<--icode=binary>
+If you want read all files as binary data, use C<--icode=binary>
 instead.
 
-=item B<-w>, B<--warn> I<type>=[I<0>,I<1>]
+=item B<-w>, B<--warn> I<type>=[C<0>,C<1>]
 
 Control runtime message mainly about file operation related to
-B<--error> option.  Repeatable.  Value is optional and 1 is assumed
-when omitted.  So B<-wall> option enables all messages and B<-wall=0>
-disables them.
+C<--error> option.  Repeatable.  Value is optional and 1 is assumed
+when omitted.  So C<-wall> option is same as C<-wall=1> and enables
+all messages, and C<-wall=0> disables all.
 
 Types are:
 
@@ -2898,8 +2965,8 @@ errors when reading binary or ambiguous text file.
 
 =item B<begin>
 
-(Default 0) When B<--begin> function died with "SKIP" message, the
-file is skipped without any notice.  Enables this to see the dying
+(Default 0) When C<--begin> function died with C</^SKIP/i> message,
+the file is skipped without any notice.  Enables this to see the dying
 message.
 
 =item B<all>
@@ -2908,7 +2975,7 @@ Set same value for all types.
 
 =back
 
-=item B<--alert> [ I<size>=# | I<time>=# ]
+=item B<--alert> [ C<size>=#, C<time>=# ]
 
 Set alert parameter for large file.  B<Greple> scans whole file
 content to know line borders, and it takes several seconds or more if
@@ -2958,15 +3025,15 @@ disabled.  See L<https://no-color.org/>.
 
 =back
 
-Before starting execution, I<greple> reads the file named F<.greplerc>
+Before starting execution, B<greple> reads the file named F<.greplerc>
 on user's home directory.  Following directives can be used.
 
 =over 7
 
 =item B<option> I<name> string
 
-Argument I<name> of `option' directive is user defined option name.
-The rest are processed by I<shellwords> routine defined in
+Argument I<name> of B<option> directive is user defined option name.
+The rest are processed by C<shellwords> routine defined in
 Text::ParseWords module.  Be sure that this module sometimes requires
 escape backslashes.
 
@@ -3026,9 +3093,9 @@ use in command line,
 
 =item B<help> I<name>
 
-If `help' directive is used for same option name, it will be printed
-in usage message.  If the help message is `ignore', corresponding line
-won't show up in the usage.
+If B<help> directive is used for same option name, it will be printed
+in usage message.  If the help message is C<ignore>, corresponding
+line won't show up in the usage.
 
 =item B<builtin> I<spec> I<variable>
 
@@ -3048,19 +3115,19 @@ For example,
 
     autoload -Mdig --dig --git
 
-replaces option "I<--dig>" to "I<-Mdig --dig>", so that I<dig> module
-is loaded before processing I<--dig> option.
+replaces option "C<--dig>" to "C<-Mdig --dig>", so that B<dig> module
+is loaded before processing C<--dig> option.
 
 =back
 
 Environment variable substitution is done for string specified by
-`option' and `define' directives.  Use Perl syntax B<$ENV{NAME}> for
+C<option> and C<define> directives.  Use Perl syntax B<$ENV{NAME}> for
 this purpose.  You can use this to make a portable module.
 
-When I<greple> found C<__PERL__> line in F<.greplerc> file, the rest
+When B<greple> found C<__PERL__> line in F<.greplerc> file, the rest
 of the file is evaluated as a Perl program.  You can define your own
-subroutines which can be used by B<--inside>/B<outside>,
-B<--include>/B<exclude>, B<--block> options.
+subroutines which can be used by C<--inside>/C<--outside>,
+C<--include>/C<--exclude>, C<--block> options.
 
 For those subroutines, file content will be provided by global
 variable C<$_>.  Expected response from the subroutine is the list of
@@ -3102,10 +3169,10 @@ you can declare the module specific options there.  Functions declared
 in the module can be used from those options, it makes highly
 expandable option/programming interaction possible.
 
-Using B<-M> without module argument will print available module list.
-Option B<--man> will display module document when used with B<-M>
-option.  Use B<--show> option to see the module itself.  Option
-B<--path> will print the path of module file.
+Using C<-M> without module argument will print available module list.
+Option C<--man> will display module document when used with C<-M>
+option.  Use C<--show> option to see the module itself.  Option
+C<--path> will print the path of module file.
 
 See this sample module code.  This sample defines options to search
 from pod, comment and other segment in Perl script.  Those capability
@@ -3192,7 +3259,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 1991-2022 Kazumasa Utashiro
+Copyright 1991-2023 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

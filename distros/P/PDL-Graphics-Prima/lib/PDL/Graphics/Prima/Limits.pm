@@ -3,7 +3,7 @@ use warnings;
 
 package PDL::Graphics::Prima::Limits;
 
-our $VERSION = 0.17;   # update with update-version.pl
+our $VERSION = 0.18;   # update with update-version.pl
 
 # Defines the lm (limits) package in a way that CPAN won't index it
 package
@@ -53,7 +53,7 @@ autoscaling:
 
  # Set the x-min to -5 for now...
  $plot->x->min(-5);
- 
+
  # Turn on autoscaling for x-min:
  $plot->x->min(lm::Auto);
 
@@ -182,6 +182,10 @@ Specifies different kinds of scaling, including linear and logarithmic
 
 Defines a number of useful functions for generating simple and not-so-simple
 plots
+
+=item L<PDL::Graphics::Prima::SizeSpec|PDL::Graphics::Prima::SizeSpec/>
+
+Compute pixel distances from meaningful units
 
 =back
 

@@ -31,22 +31,20 @@ Please see the documentation of those modules.
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub TIEHASH {  ## no critic (RequireArgUnpacking)
 	require Tie::Subset::Hash;
 	@_>1 or croak "bad number of arguments to tie";
-	my $class = shift;
-	$class = 'Tie::Subset::Hash' if $class eq __PACKAGE__;
-	return Tie::Subset::Hash::TIEHASH($class, @_);
+	croak "Tie::Subset can't (yet) be subclassed" unless shift eq __PACKAGE__;
+	return Tie::Subset::Hash::TIEHASH('Tie::Subset::Hash', @_);
 }
 
 sub TIEARRAY {  ## no critic (RequireArgUnpacking)
 	require Tie::Subset::Array;
 	@_>1 or croak "bad number of arguments to tie";
-	my $class = shift;
-	$class = 'Tie::Subset::Array' if $class eq __PACKAGE__;
-	return Tie::Subset::Array::TIEARRAY($class, @_);
+	croak "Tie::Subset can't (yet) be subclassed" unless shift eq __PACKAGE__;
+	return Tie::Subset::Array::TIEARRAY('Tie::Subset::Array', @_);
 }
 
 1;
@@ -88,7 +86,7 @@ module's distribution.
 
 =head1 Author, Copyright, and License
 
-Copyright (c) 2018 Hauke Daempfling (haukex@zero-g.net).
+Copyright (c) 2018-2023 Hauke Daempfling (haukex@zero-g.net).
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl 5 itself.

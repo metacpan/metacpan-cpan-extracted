@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Buffer;
 # ABSTRACT: Buffer that holds pointer to data with length
-$AI::TensorFlow::Libtensorflow::Buffer::VERSION = '0.0.4';
+$AI::TensorFlow::Libtensorflow::Buffer::VERSION = '0.0.6';
 use strict;
 use warnings;
 use namespace::autoclean;
@@ -178,7 +178,7 @@ Zakariyya Mughal <zmughal@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Auto-Parallel Technologies, Inc.
+This software is Copyright (c) 2022-2023 by Auto-Parallel Technologies, Inc.
 
 This is free software, licensed under:
 

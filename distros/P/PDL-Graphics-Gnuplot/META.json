@@ -63,6 +63,6 @@
          "url" : "git://github.com/PDLPorters/PDL-Graphics-Gnuplot.git"
       }
    },
-   "version" : "2.021",
+   "version" : "2.023",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

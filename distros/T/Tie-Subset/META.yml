@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,13 +23,13 @@ no_index:
 provides:
   Tie::Subset:
     file: lib/Tie/Subset.pm
-    version: '0.01'
+    version: '0.02'
   Tie::Subset::Array:
     file: lib/Tie/Subset/Array.pm
-    version: '0.01'
+    version: '0.02'
   Tie::Subset::Hash:
     file: lib/Tie/Subset/Hash.pm
-    version: '0.01'
+    version: '0.02'
 recommends: {}
 requires:
   Carp: '0'
@@ -39,5 +39,5 @@ resources:
   bugtracker: https://github.com/haukex/Tie-Subset/issues
   homepage: https://github.com/haukex/Tie-Subset
   repository: https://github.com/haukex/Tie-Subset.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

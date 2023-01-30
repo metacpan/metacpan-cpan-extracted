@@ -1,0 +1,45 @@
+#! /usr/bin/env perl
+
+# PODNAME: domain
+# ABSTRACT: Get DNS/SSL/WHOIS information on a domain
+
+use v5.36;
+use lib '/home/regular/IdeaProjects/Domain-Details/lib';
+use Domain::Details;
+
+my $domain = Domain::Details -> new( domain => $ARGV[0] );
+
+printf "WHOIS: %s\n", $domain -> expiration;
+# printf "SSL: %s\n", $domain -> ssl_expiration;
+
+# say $domain -> comment( 'my new domain' );
+
+Domain::Details -> print_ssl( $ARGV[0] );
+Domain::Details -> print_dns( $ARGV[0] );
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+domain - Get DNS/SSL/WHOIS information on a domain
+
+=head1 VERSION
+
+version 1.230280
+
+=head1 AUTHOR
+
+Elvin Aslanov <rwp.primary@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by Elvin Aslanov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

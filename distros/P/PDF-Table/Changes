@@ -1,5 +1,17 @@
 Change history for Perl extension PDF::Table.
 
+=== Version 1.005 (2023-01-28)
+
+  lib/PDF/Table.pm
+   Update cell checking when using markup, so that anything which CAN be by
+    default stringified, will be. Some customers are using default or implicit
+    stringification of objects, which was being caught as an unsupported data
+    type, and rendered as "(invalid)" in a cell. The downside is that if you 
+    send something nonsensical (e.g., reference to a SCALAR), you will see the 
+    stringified reference (address), as done in the 1.003 and earlier versions.
+
+  Makefile.PL remove PROVIDES clause, as was getting build warnings about it.
+
 === Version 1.004 (2023-01-21)
 
   lib/PDF/Table.pm, lib/PDF/Table.pod, INFO/SPONSORS (new), INFO/Table.html,

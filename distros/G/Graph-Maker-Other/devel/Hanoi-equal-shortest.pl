@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2020, 2021 Kevin Ryde
+# Copyright 2020, 2021, 2022 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -127,7 +127,9 @@ $|=1;
 #-------------
 # Other Setups
 
-# GP-DEFINE  read("my-oeis.gp");
+# GP-DEFINE  read("OEIS-data.gp");
+# GP-DEFINE  read("OEIS-data-wip.gp");
+# GP-DEFINE  OEIS_check_verbose = 1;
 
 # GP-DEFINE  A107839_formula(n) = \
 # GP-DEFINE    polcoeff(lift(Mod('x,'x^2-5*'x+2)^(n+1)),1);
@@ -135,24 +137,18 @@ $|=1;
 # GP-DEFINE    n>=0 || error("A107839() is for n>=0");
 # GP-DEFINE    A107839_formula(n);
 # GP-DEFINE  }
-# GP-Test  my(v=OEIS_samples("A107839"));   /* OFFSET=0 */ \
-# GP-Test    vector(#v,n,n--; A107839(n)) == v
-# GP-Test  my(g=OEIS_bfile_gf("A107839")); \
-# GP-Test    g==Polrev(vector(poldegree(g)+1,n,n--;A107839(n)))
-# poldegree(OEIS_bfile_gf("A107839"))
+# GP-Test  OEIS_check_func("A107839")
+# OEIS_check_func("A107839",'bfile)
 
 # GP-DEFINE  A052984_formula(n) = vecsum(Vec(lift(Mod('x,'x^2-5*'x+2)^(n+1))));
 # GP-DEFINE  A052984(n) = {
 # GP-DEFINE    n>=0 || error("A052984() is for n>=0");
 # GP-DEFINE    A052984_formula(n);
 # GP-DEFINE  }
-# GP-Test  my(v=OEIS_samples("A052984"));  /* OFFSET=0 */ \
-# GP-Test    vector(#v,n,n--; A052984(n)) == v
-# GP-Test  my(g=OEIS_bfile_gf("A052984")); \
-# GP-Test    g==Polrev(vector(poldegree(g)+1,n,n--;A052984(n)))
-# poldegree(OEIS_bfile_gf("A052984"))
+# GP-Test  OEIS_check_func("A052984")
+# OEIS_check_func("A052984",,'bfile)
 
-# my(v=OEIS_samples("A052984")); \
+# my(v=OEIS_data("A052984")); \
 # lindep([v, vector(#v,n,n--; polcoeff(lift(Mod('x,'x^2-5*'x+2)^(n+1)), 0)), \
 #            vector(#v,n,n--; polcoeff(lift(Mod('x,'x^2-5*'x+2)^(n+1)), 1)) ])
 
@@ -170,10 +166,10 @@ $|=1;
 # GP-Test  subst( (2*x-5)^2 - 17, x, P ) == 0
 # (5 + sqrt(17))/2
 # 4.5615528128088 = A082486
-# GP-Test  my(v=OEIS_samples("A082486"), \
+# GP-Test  my(v=OEIS_data("A082486"), \
 # GP-Test    x=fromdigits(v)/10^(#v-1)); \
 # GP-Test    PM_poly(x) < 0
-# GP-Test  my(v=OEIS_samples("A082486")); v[#v]++; \
+# GP-Test  my(v=OEIS_data("A082486")); v[#v]++; \
 # GP-Test    my(x=fromdigits(v)/10^(#v-1)); \
 # GP-Test    PM_poly(x) > 0
 
@@ -186,8 +182,10 @@ $|=1;
 #---
 # GP-DEFINE  \\ powers formula by Hinz et al, x_n for n+1 discs
 # GP-DEFINE  xx(n) = {
+# GP-DEFINE    simplify(
 # GP-DEFINE    3/(4*sqrt17)
-# GP-DEFINE    * ((sqrt17+1)*P^(n+1) - 2*3^(n+1)*sqrt17 + (sqrt17-1)*M^(n+1));
+# GP-DEFINE    * ((sqrt17+1)*P^(n+1) - 2*3^(n+1)*sqrt17 + (sqrt17-1)*M^(n+1))
+# GP-DEFINE    );
 # GP-DEFINE  }
 # GP-Test  /* in x_n, A107839 across one pair n within n+1 */ \
 # GP-Test  vector(10,n,n--; (xx(n+1) - 3*xx(n))/6) == \
@@ -207,11 +205,7 @@ $|=1;
 # GP-Test    1566620022,7157423256,32682574050,149184117180,680813718126,3106475197248, \
 # GP-Test    14173073072922,64659388538916,294971717255142,1345602571317096,6138257708432850 ]); \
 # GP-Test    vector(#want,n, a(n)) == want
-# GP-Test  my(want=OEIS_samples("A340309")); \
-# GP-Test    vector(#want,n, a(n)) == want
-# GP-Test  my(g=OEIS_bfile_gf("A340309")); \
-# GP-Test    g==x*Polrev(vector(poldegree(g),n, a(n)))
-# poldegree(OEIS_bfile_gf("A340309"))
+# GP-Test  OEIS_check_func("A340309",a)
 
 # GP-Test  /* powers by Hinz et al (offset adjusted to a(n)) */ \
 # GP-Test  vector(100,n, a(n)) == \

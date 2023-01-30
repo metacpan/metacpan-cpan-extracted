@@ -1,5 +1,5 @@
 ---
-abstract: 'Dates in the pataphysical calendar'
+abstract: 'Dates in the Pataphysical calendar'
 author:
   - 'Eugene van der Pijll <pijll@cpan.org>'
 build_requires:
@@ -11,12 +11,21 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - datetime
+  - calendar
+  - pataphysical
+  - pataphysics
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: DateTime-Calendar-Pataphysical
+provides:
+  DateTime::Calendar::Pataphysical:
+    file: lib/DateTime/Calendar/Pataphysical.pm
+    version: '0.07'
 requires:
   DateTime::Duration: '0'
   DateTime::Locale: '0'
@@ -30,7 +39,11 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=DateTime-Calendar-Pataphysical
   repository: http://github.com/book/DateTime-Calendar-Pataphysical.git
-version: '0.06'
+version: '0.07'
 x_contributors:
   - 'Philippe Bruhat (BooK) <book@cpan.org>'
   - 'Jean Forget <jforget@cpan.org>'
+  - 'Paul Cochrane <ptc@cpan.org>'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

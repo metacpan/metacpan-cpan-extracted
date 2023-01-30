@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Lib::_Alloc;
 # ABSTRACT: [private] Allocation utilities
-$AI::TensorFlow::Libtensorflow::Lib::_Alloc::VERSION = '0.0.4';
+$AI::TensorFlow::Libtensorflow::Lib::_Alloc::VERSION = '0.0.6';
 use strict;
 use warnings;
 use AI::TensorFlow::Libtensorflow::Lib;
@@ -138,7 +138,7 @@ Zakariyya Mughal <zmughal@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Auto-Parallel Technologies, Inc.
+This software is Copyright (c) 2022-2023 by Auto-Parallel Technologies, Inc.
 
 This is free software, licensed under:
 

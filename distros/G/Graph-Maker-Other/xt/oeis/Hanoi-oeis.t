@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2020, 2021 Kevin Ryde
+# Copyright 2020, 2021, 2022 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -38,7 +38,11 @@ require Graph::Maker::Hanoi;
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-# GP-DEFINE  read("my-oeis.gp");
+# GP-DEFINE  read("OEIS-data.gp");
+# GP-DEFINE  read("OEIS-data-wip.gp");
+# GP-DEFINE  to_ternary(n)=fromdigits(digits(n,3))*sign(n);
+# GP-DEFINE  from_ternary(n)=fromdigits(digits(n),3);
+
 
 sub discs_to_num_vertices {
   my ($discs) = @_;
@@ -52,9 +56,6 @@ sub num_vertices_to_discs {
   while ($num_vertices > discs_to_num_vertices($discs)) { $discs++; }
   return $discs;
 }
-
-# GP-DEFINE  to_ternary(n)=fromdigits(digits(n,3))*sign(n);
-# GP-DEFINE  from_ternary(n)=fromdigits(digits(n),3);
 
 
 #------------------------------------------------------------------------------
@@ -157,14 +158,24 @@ MyOEIS::compare_values
 
 
 #------------------------------------------------------------------------------
-# A055662 - path vertices 000 to 11111 etc solution, in ternary
+# A055662 - path vertices 00000 to 11111 etc solution, in ternary
 
-foreach my $elem (['A055661', radix => 10],  # configurations in decimal
-                  ['A055662', radix => 3],   # configurations in ternary digits
-                  ['A060573', spindle => 0],   # smallest on spindle
-                  ['A060574', spindle => 1],   #
-                  ['A060575', spindle => 2],   #
-                 ) {
+# opposite
+# 0,2,5,4,22,21,24,26,53,52,46,45,36,38,41,40,202,201,204,206,197,196,190,189,216,218,221,220,238,237,240,242,485,484,478,477,468,470,473,472,418,417,420,422,413,412,406,405,324,326,329,328,346,345,348,350
+
+foreach my $elem
+  (['A055661', radix => 10],  # configurations in decimal
+   ['A055662', radix => 3],   # configurations in ternary digits
+   ['A060573', spindle => 0],   # smallest on spindle
+   ['A060574', spindle => 1],   #
+   ['A060575', spindle => 2],   #
+
+   # FIXME: bad data values in A128202 ...
+   # ['A128202', radix => 10, opposite => 1],
+
+   # [  'A123456', radix => 3, opposite => 1],
+   # not in OEIS: 0,2,12,11,211,210,220,222,1222,1221,1201
+  ) {
   my ($anum, %options) = @$elem;
   MyOEIS::compare_values
       (anum => $anum,
@@ -174,19 +185,21 @@ foreach my $elem (['A055661', radix => 10],  # configurations in decimal
          my @got;
          my $discs = 1;
          while (2**$discs < $count) { $discs *=2; }
-         
+
          my $graph = Graph::Maker->new('hanoi',
                                        discs => $discs,
                                        undirected => 1);
          my $from = min($graph->vertices);  # centre
          my $to   = max($graph->vertices);  # outer spindle
-         if ($discs % 2) { $to /= 2; }  # to 111 or 2222
+         if (($discs % 2) ^ ($options{'opposite'} ? 1 : 0)) {
+           $to /= 2;   # to 1111, versus leave unchanged 2222
+         }
          $graph->has_vertex($from) or die;
          $graph->has_vertex($to)   or die;
          ### $from
          ### to: "$to = ".cnv($to,10,3)
          my @path = $graph->SP_Dijkstra($from,$to);
-         
+
          if (defined $options{'spindle'}) {
            # which is the smallest disc on spindle, smallest disc number 1
            foreach my $i (0 .. $#path) {
@@ -211,88 +224,45 @@ foreach my $elem (['A055661', radix => 10],  # configurations in decimal
 
 # GP-DEFINE  \\ formula in A055662
 # GP-DEFINE  A055662(n) = {
+# GP-DEFINE    n>=0 || error();
 # GP-DEFINE    sum(j=0,if(n,logint(n,2)),
-# GP-DEFINE        10^j * (floor((n/2^j + 1)/2)*(-1)^j % 3));
+# GP-DEFINE      10^j * (floor((n/2^j + 1)/2)*(-1)^j % 3));
 # GP-DEFINE  }
-# GP-Test  my(v=OEIS_samples("A055662")); /* OFFSET=0 */ \
-# GP-Test    vector(#v,n,n--; A055662(n)) == v
+# GP-Test  OEIS_check_func("A055662")
+# GP-DEFINE  A055661(n) = from_ternary(A055662(n));
+#  vector(1024,n,n--; A055661(n)) == \
+#  vector(1024,n,n--; OH_value(n,1))
 #
-# x x x . x x
-#    +1
-#    |floor
-# vector(20,n,hammingweight(n)%2)
-# GP-Test  vector(20,k, (2^k)%3) == \
-# GP-Test  vector(20,k, k%2 + 1)
+# GP-DEFINE  flip12(n) = {
+# GP-DEFINE    n>=0 || error();
+# GP-DEFINE    fromdigits(apply(t->if(t,3-t),digits(n,3)),3);
+# GP-DEFINE  }
+# GP-DEFINE  A004488(n) = flip12(n);
+# GP-Test  OEIS_check_func("A004488")
 
-# 6 periodic, 12 periodic, etc 6*2^k, opposite ways
-# low digit: 0, 1, 1, 2, 2, 0
-# 2nd digit: 0, 0, 2, 2, 2, 2, 1, 1, 1, 1, 0, 0
-# vector(20,n,n--; A055662(n)%10)
-# vector(20,n,n--; A055662(n)\10%10)
-# vector(20,n,n--; A055662(n)\100%10)
-
-# matrix(80,8,n,j,j--; (floor((n/2^j + 1)/2)*(-1)^j % 3)) == \
-# matrix(80,8,n,j,j--; n>>=j; ( -(-1)^j * ( n + bittest(n,0) ) % 3))
-# row(n) = Vecrev(vector(12,j,j--; my(n=n>>j); ( -(-1)^j * ( n + bittest(n,0) ) % 3)))
-# R(n) = my(v=binary(n),t=0); while(#v<12,v=concat(0,v)); \
-#   for(i=1,#v, [t,v[i]] = [ t=v[i]+2*t, (2*v[i]+2*t)*(-1)^(#v-i) % 3 ] ); v;
-# R(n) = my(v=binary(n),t=Mod(0,3)); \
-#   while(#v<12,v=concat(0,v)); \
-#   my(s=-Mod(-1,3)^#v, T=s*t); \
-#   for(i=1,#v, t=-t-v[i]; T-=s*v[i]; v[i] = lift(T - s*v[i]); s=-s ); v;
-# R(n) = my(v=binary(n),T=Mod(0,3)); \
-#   while(#v<12,v=concat(0,v)); \
-#   my(s=Mod(-1,3)^#v); \
-#   for(i=1,#v, T += s*v[i]; v[i] = lift(T + s*v[i]); s=-s ); v;
-# R(n) = my(v=binary(n)); \
-#   while(#v<12,v=concat(0,v)); \
-#   my(t=Mod(0,3), s=Mod(-1,3)^#v); \
-#   for(i=1,#v, t=v[i]-t; v[i]=lift((t+v[i])*s); s=-s); v;
-# R(340)
-# row(340)
-# R(140)
-# row(140)
-# vector(1000,n,R(n)) == \
-# vector(1000,n,row(n))
-# binary(350)
-# n=350; n>>=7; [n, n+bittest(n,0), (n+bittest(n,0))%3, ( -(-1)^j * ( n + bittest(n,0) ) % 3)]
-
-# GP-Test  vector(10000,n,n--; A055662(n)) == \
-# GP-Test  vector(10000,n,n--; my(v=binary(n)); \
-# GP-Test    my(t=Mod(0,3), s=(-1)^#v); \
-# GP-Test    for(i=1,#v, t=v[i]-t; v[i]=lift((t+v[i])*s); s=-s); \
-# GP-Test    fromdigits(v))
+#  vector(1024,n,n--; OH_value(n,0)) == \
+#  vector(1024,n,n--; flip12(OH_value(n,1)))
 #
-# GP-Test  vector(10000,n,n--; A055662(n)) == \
-# GP-Test  vector(10000,n,n--; \
-# GP-Test    my(v=binary(n)); my(t=0, s=(-1)^#v); \
-# GP-Test    for(i=1,#v, t=v[i]-t; v[i]=s*(t+v[i])%3; s=-s); \
-# GP-Test    fromdigits(v))
+# vector(12,n,n++; OH_value(n,0))
+# vector(12,n,n++; to_ternary(OH_value(n,0)))
+# not in OEIS: 5, 4, 22, 21, 24, 26, 53, 52, 46, 45, 36, 38
+# not in OEIS: 12, 11, 211, 210, 220, 222, 1222, 1221, 1201, 1200, 1100, 1102
 #
-# vector(10,n,n--; A055662(2*n)) - \
-# vector(10,n,n--; (10^(#digits(A055662(n))+1)-1)/3 - 10*A055662(n))
-
-# vector(100,n,n--; valuation(A055662(n+1) - A055662(n),10))
-# vector(10,n,n--; A055662(n+1) - A055662(n))
-# vector(10,n,n--; my(d=A055662(n+1) - A055662(n)); \
-#                  if(d<0, d+=3*10^logint(abs(d),10)); d)
-
-# GP-Test  /* +1 or -1 as bit position and num transitions so far */ \
-# GP-Test  vector(2^12,n,n--; A055662(n)) == \
-# GP-Test  vector(2^12,n,n--; \
-# GP-Test    my(v=binary(bitxor(n,n>>1))); \
-# GP-Test    my(t=0, c=#v); \
-# GP-Test    for(i=1,#v, if(v[i], t-=(-1)^(i+(c--))); v[i]=t%3); \
-# GP-Test    fromdigits(v))
+# vector(20,n,n--; my(v=binary(n)); \
+#   my(t=Mod(0,3), s=(-1)^#v); \
+#   for(i=1,#v, s=-s; t=v[i]-t; v[i]=lift((t+v[i])*s)); \
+#   fromdigits(v,3))
+#     1/1      1/1      0/0
+# q01 ---> q21 ---> q01 ---> q21
+# apply(to_ternary,[0,1,7,8,17,15,12,13]) == [0, 1, 21, 22, 122, 120, 110, 111]
 #
-# GP-Test  /* arithmetic, alternating digits */ \
-# GP-Test  vector(2^12,n,n--; A055662(n)) == \
-# GP-Test  vector(2^12,n,n--; \
-# GP-Test    my(v=binary(bitxor(n,n>>1)), t=Mod(0,3), c=(-1)^#v); \
-# GP-Test    for(i=1,#v, if(v[i],t-=c,c=-c); v[i]=lift(t)); \
-# GP-Test    fromdigits(v))
+# FIXME:
+#   vector(8,n,n--; A055662(n))
+#   vector(7,n,n--; my(v=binary(n)); if(#v%2==0,v=concat(0,v)); \
+#     my(t=0,s=1); \
+#     for(i=1,#v, print("i="i" t="t" s="s" v="v[i]); v[i]=t=(t+v[i]*s)%3; s=-s); \
+#     fromdigits(v))
 
-# vector(30,n,n--; A055662(n+1) - A055662(n))
 
 #------------------------------------------------------------------------------
 # A060592 - square array path length m to n
@@ -393,8 +363,10 @@ MyOEIS::compare_values
    });
 
 #------------------------------------------------------------------------------
-# A060583 ternary code
-# A060587 inverse
+# A060583 ternary code   permutation
+# A060587 inverse        permutation
+#
+# used in A060586 distance to perfect state by ternary->binary
 
 # GP-DEFINE  \\ x,y are 0,1,2 and different, return the term not x and not y
 # GP-DEFINE  other3(x,y) = {
@@ -405,20 +377,49 @@ MyOEIS::compare_values
 # GP-Test  matrix(3,3,x,y,x--;y--; if(x!=y, other3(x,y))) == \
 # GP-Test  matrix(3,3,x,y,x--;y--; if(x!=y, 3-x-y))
 
-# GP-DEFINE  A060583(n) = {
-# GP-DEFINE    my(v=digits(n,3),p=0);
-# GP-DEFINE    for(i=1,#v, if(v[i]!=p, p=3-p-v[i]; v[i]=p));
-# GP-DEFINE    fromdigits(v,3);
-# GP-DEFINE  }
+# GP-DEFINE  A060582(n) = if(n==0,0, (- A060582(n\3) - n)%3);
+# GP-Test  OEIS_check_func("A060582")
+# GP-Test  /* formula in A060582 */ \
+# GP-Test  vector(3^6,n,n--; A060582(n)) == \
+# GP-Test  vector(3^6,n,n--; (-A060582(floor(n/3)) - n)%3)
+# GP-Test  vector(3^6,n,n--; A060582(n)) == \
+# GP-Test  vector(3^6,n,n--; (-subst(Pol(digits(n,3)),'x,-1))%3)
+# OEIS_data("A060582")
+# GP-Test  vector(3^6,n,n--; A060582(9*n+0)) == \
+# GP-Test  vector(3^6,n,n--; A060582(n))
+# GP-Test  vector(3^6,n,n--; A060582(9*n+4)) == \
+# GP-Test  vector(3^6,n,n--; A060582(n))
+# GP-Test  vector(3^6,n,n--; A060582(9*n+8)) == \
+# GP-Test  vector(3^6,n,n--; A060582(n))
+# vector(200,n,n--; A060582(9*n+8))
+# vector(20,n,n--; A060582(9*n+4))
+# vector(20,n,n--; (-subst(Pol(digits(n,3)),'x,-1))%3)
+#
+# A060588
+# vector(20,n,n--; my(p=n%3,q=(n\3)%3); if(p==q,p, (-p-q)%3))
+# recurrence_guess(OEIS_data("A060588"))
+
 # GP-DEFINE  A060583(n) = {
 # GP-DEFINE    my(v=digits(n,3),p=0);
 # GP-DEFINE    if(#v, v[1]=3-v[1];
 # GP-DEFINE           for(i=2,#v, if(v[i]!=v[i-1], v[i]=3-v[i-1]-v[i])));
 # GP-DEFINE    fromdigits(v,3);
 # GP-DEFINE  }
-# GP-Test  my(v=OEIS_samples("A060583")); /* OFFSET=0 */ \
-# GP-Test    vector(#v,n,n--; A060583(n)) == v
+# GP-DEFINE  A060583(n) = {
+# GP-DEFINE    my(v=digits(n,3),p=0);
+# GP-DEFINE    for(i=1,#v, if(v[i]!=p, p=v[i]=3-p-v[i]));
+# GP-DEFINE    fromdigits(v,3);
+# GP-DEFINE  }
+# GP-Test  OEIS_check_func("A060583")
 # GP-Test  A060583(46) == 76
+# #OEIS_bfile_samples("A060583")
+# vector(10,n,n+=80; A060583(n))
+# vector(10,n,n+=80; my(v=digits(n,3),p=0); for(k=1,#v, p=v[k]=(-v[k]-p)%3); v) == \
+# vector(10,n,n+=80; my(v=digits(n,3),p=0); for(i=1,#v, if(v[i]!=p, p=v[i]=3-p-v[i])); v)
+# GP-Test  vector(3^6,n,n--; A060583(n)) == \
+# GP-Test  vector(3^6,n,n--; 3*A060583(floor(n/3)) + ((-A060583(floor(n/3))-n) % 3))
+# GP-Test  vector(3^6,n,n--; A060583(n)) == \
+# GP-Test  vector(3^6,n,n--; 3*A060583(floor(n/3)) + A060582(n))
 
 # GP-DEFINE  A060587(n) = {
 # GP-DEFINE    my(v=digits(n,3),p=0);
@@ -432,8 +433,7 @@ MyOEIS::compare_values
 # GP-DEFINE       v[1]=3-v[1]);
 # GP-DEFINE    fromdigits(v,3);
 # GP-DEFINE  }
-# GP-Test  my(v=OEIS_samples("A060587")); /* OFFSET=0 */ \
-# GP-Test    vector(#v,n,n--; A060587(n)) == v
+# GP-Test  OEIS_check_func("A060587")
 # GP-Test  A060587(76) == 46
 # GP-Test  /* inverses */ \
 # GP-Test  vector(1000,n, A060587(A060583(n))) == \
@@ -533,13 +533,10 @@ MyOEIS::compare_values
 # A089280 - num pegs occupied after n moves (by discs moved so far)
 
 # GP-DEFINE  ternary_num_diff_digits(n) = #Set(digits(n,3));
-# GP-Test  my(v=OEIS_samples("A043530")); /* OFFSET=1 */ \
-# GP-Test    vector(#v,n, ternary_num_diff_digits(n)) == v
-# vector(50,n, ternary_num_diff_digits(n))
+# GP-Test  OEIS_check_func("A043530","ternary_num_diff_digits")
 
 # GP-DEFINE  num_diff_digits(n) = #Set(digits(n));
-# GP-Test  my(v=OEIS_samples("A043537")); /* OFFSET=1 */ \
-# GP-Test    vector(#v,n, num_diff_digits(n)) == v
+# GP-Test  OEIS_check_func("A043537",num_diff_digits)
 # vector(50,n, num_diff_digits(n))
 
 # num diff digits in A055662
@@ -552,48 +549,9 @@ MyOEIS::compare_values
 # GP-DEFINE                    if(k%2,return(3))); 2,
 # GP-DEFINE       1);
 # GP-DEFINE  }
-# GP-Test  my(v=OEIS_samples("A089280")); /* OFFSET=1 */ \
-# GP-Test    vector(#v,n, A089280(n)) == v
+# GP-Test  OEIS_check_func("A089280")
 # GP-Test  vector(2^14,n, num_diff_digits(A055662(n))) == \
 # GP-Test  vector(2^14,n, A089280(n))
-
-# digit      0,1,2
-# prev bit   0,1
-# num diffs and pos parity  0,1
-# 3*2*2 == 12 \\ states
-#
-# GP-DEFINE  {
-# GP-DEFINE    my(table=[7,8, 2,12,1, 12,1,2, 7,8,6, 6;
-# GP-DEFINE              3,4, 9,10,11, 10,11,9, 3,4,5, 5]);
-# GP-DEFINE    A055662_by_transitions_mat(n) =
-# GP-DEFINE      my(v=binary(n), state=if(#v%2,6,12));
-# GP-DEFINE      for(i=1,#v,
-# GP-DEFINE        state=table[1+v[i],state];
-# GP-DEFINE        v[i]=state%3);
-# GP-DEFINE      fromdigits(v);
-# GP-DEFINE  }
-# GP-Test  vector(2^14,n, A055662_by_transitions_mat(n)) == \
-# GP-Test  vector(2^14,n, A055662(n))
-# GP-DEFINE  {
-# GP-DEFINE    my(table=[13,9,15,11,17,7,3,19,5,21,1,23,
-# GP-DEFINE              1,23,3,19,5,21,17,7,13,9,15,11]);
-# GP-DEFINE    A055662_by_transitions(n) =
-# GP-DEFINE      my(v=binary(n), state=if(#v%2,15,3));
-# GP-DEFINE      for(i=1,#v, state=table[state+v[i]]; v[i]=state%3);
-# GP-DEFINE      fromdigits(v);
-# GP-DEFINE  }
-# GP-Test  vector(2^14,n, A055662_by_transitions(n)) == \
-# GP-Test  vector(2^14,n, A055662(n))
-#
-# by_transitions(0)
-# by_transitions(1)
-# my(n=from_binary(11111100001111001110110000000)); \
-#   printf("%7d\n%7d\n%7d\n\n", to_binary(n), A055662(n), by_transitions(n));
-
-# GP-DEFINE  to_binary(n)=fromdigits(binary(n))*sign(n);
-# GP-DEFINE  from_binary(n)=fromdigits(digits(n),2);
-# for(n=16,32, printf("%7d\n%7d\n%7d\n\n", to_binary(n), A055662(n), by_transitions(n)));
-
 
 
 #------------------------------------------------------------------------------

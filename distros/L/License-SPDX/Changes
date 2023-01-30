@@ -1,2 +1,11 @@
+0.03 2023-01-30T08:58:58+01:00
+ - Add test for licenses() method.
+ - Add tests for check_license() method.
+ - Fix dependency to JSON::PP::Boolean (is test dependency).
+ - Fix minimal dependencies.
+
+0.02 2023-01-29T11:00:36+01:00
+ - Fix comparison of JSON boolean.
+
 0.01 2023-01-26T12:06:48+01:00
  - First version.

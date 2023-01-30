@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2016 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2016, 2020 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Chart.  If not, see <http://www.gnu.org/licenses/>.
 
+# BEGIN { push @INC, '/usr/share/perl5'; }
+
 use strict;
 use warnings;
 use GT::Prices;
@@ -31,26 +33,29 @@ GT::Conf::load();
 
 {
   my $symbol = 'IIF.AX';
-  $symbol = 'CA.LME';
-
-  my $db = GT::DB::Chart->new;
-  print "db name of $symbol ", $db->get_name($symbol), "\n";
-
-  # my $prices = $db->get_prices ($symbol, $DAY);
+  $symbol = 'GXY.AX';
 
 
-  #my $indicator = create_standard_object("I:BOL");
-  #my $indicator = create_standard_object("I:SMA", 10);
+  # my $indicator = create_standard_object("I:BOL");
+  # my $indicator = create_standard_object("I:SMA", 10);
 
   require GT::Indicators::LinearRegression;
-  #my $indicator = create_standard_object("I:LinearRegression", 10);
-  my $indicator = GT::Indicators::LinearRegression->new([10,10]);
+  # my $indicator = create_standard_object("I:LinearRegression", 10);
+  #
+  # FIXME: Is this one supposed to work?
+   my $indicator = GT::Indicators::LinearRegression->new([10,10]);
 
   # require GT::Indicators::SMA;
   # my $indicator = GT::Indicators::SMA->new;
 
   print "indicator $indicator\n";
   print "indicator name ",$indicator->get_name,"\n";
+
+
+  my $db = GT::DB::Chart->new;
+  print "db name of $symbol ", $db->get_name($symbol), "\n";
+
+  # my $prices = $db->get_prices ($symbol, $DAY);
 
   # my $indicator = GT::Eval::create_standard_object("I:SMA",
   #                                                  "12 {I:Prices CLOSE\}");

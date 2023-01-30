@@ -150,5 +150,59 @@ class Regex {
     
     return $result;
   }
+
+  precompile method split : string[] ($string : string, $limit = 0 : int) {
+    unless ($string) {
+      die "The \$string must be defined";
+    }
+    
+    my $string_length = length $string;
+    
+    my $parts_list = StringList->new_len(0);
+    
+    my $offset = 0;
+    my $match_count = 0;
+    for (my $i = 0; $i < $string_length; $i++) {
+      if ($limit > 0 && $match_count >= $limit - 1) {
+        last;
+      }
+      
+      my $current_offset = $offset;
+      my $match = $self->match_forward($string, \$offset);
+      if ($match) {
+        $match_count++;
+
+        my $match_start = $self->match_start;
+        my $match_length = $self->match_length;
+        
+        my $part = Fn->substr($string, $current_offset, $match_start - $current_offset);
+        $parts_list->push($part);
+        my $match_legnth = $self->match_length;
+        $offset = $match_start + $match_legnth;
+      }
+    }
+    if ($offset == $string_length) {
+      $parts_list->push("");
+    }
+    else {
+      my $part = Fn->substr($string, $offset, $string_length - $offset);
+      $parts_list->push($part);
+    }
+
+    if ($limit == 0) {
+      while ($parts_list->length > 0) {
+        if ($parts_list->get($parts_list->length - 1) eq "") {
+          $parts_list->pop;
+        }
+        else {
+          last;
+        }
+      }
+    }
+    
+    my $parts = $parts_list->to_array;
+    
+    return $parts;
+  }
 }
 

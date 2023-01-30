@@ -7,5 +7,6 @@ README.md
 t/Util-H2O.t
 xt/author.t
 xt/mem.t
+xt/redef.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -4,6 +4,7 @@ author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: 6.59
+  JSON::PP::Boolean: 0
   Test::More: 0
   Test::NoWarnings: 0
 configure_requires:
@@ -24,9 +25,9 @@ no_index:
     - t
     - xt
 requires:
-  Class::Utils: 0
+  Class::Utils: 0.14
   Cpanel::JSON::XS: 0
-  Error::Pure: 0
+  Error::Pure: 0.3
   File::Share: 0
   List::Util: 0
   Perl6::Slurp: 0
@@ -36,4 +37,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/License-SPDX
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/License-SPDX
-version: '0.01'
+version: '0.03'

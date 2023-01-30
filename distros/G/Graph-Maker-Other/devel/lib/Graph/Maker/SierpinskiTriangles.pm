@@ -29,7 +29,7 @@ use Graph::Maker;
 use Graph::Maker::Hypercube;
 
 use vars '$VERSION','@ISA';
-$VERSION = 18;
+$VERSION = 19;
 @ISA = ('Graph::Maker');
 
 

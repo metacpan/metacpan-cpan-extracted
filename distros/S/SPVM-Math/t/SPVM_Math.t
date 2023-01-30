@@ -7,6 +7,8 @@ use lib "$FindBin::Bin/lib";
 BEGIN { $ENV{SPVM_BUILD_DIR} = "$FindBin::Bin/.spvm_build"; }
 
 use SPVM 'TestCase::Lib::Math';
+use SPVM 'Math';
+
 
 use POSIX();
 use Math::Complex;

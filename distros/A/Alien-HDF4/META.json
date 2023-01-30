@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -46,7 +46,7 @@
    "provides" : {
       "Alien::HDF4" : {
          "file" : "lib/Alien/HDF4.pm.PL",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -60,6 +60,6 @@
          "web" : "https://github.com/PDLPorters/Alien-HDF4"
       }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

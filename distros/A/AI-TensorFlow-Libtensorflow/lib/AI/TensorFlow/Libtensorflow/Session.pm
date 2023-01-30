@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Session;
 # ABSTRACT: Session for driving ::Graph execution
-$AI::TensorFlow::Libtensorflow::Session::VERSION = '0.0.4';
+$AI::TensorFlow::Libtensorflow::Session::VERSION = '0.0.6';
 use strict;
 use warnings;
 use namespace::autoclean;
@@ -273,21 +273,21 @@ AI::TensorFlow::Libtensorflow::Session - Session for driving ::Graph execution
 
 =head2 New
 
-TODO
-
 B<Parameters>
 
 =over 4
 
 =item L<TFGraph|AI::TensorFlow::Libtensorflow::Lib::Types/TFGraph> $graph
 
-TODO
+Graph to associate with the session.
 
 =item L<TFSessionOptions|AI::TensorFlow::Libtensorflow::Lib::Types/TFSessionOptions> $opt
 
-TODO
+Session options.
 
 =item L<TFStatus|AI::TensorFlow::Libtensorflow::Lib::Types/TFStatus> $status
+
+Status.
 
 =back
 
@@ -295,9 +295,10 @@ B<Returns>
 
 =over 4
 
-=item L<TFSession|AI::TensorFlow::Libtensorflow::Lib::Types/TFSession>
+=item Maybe[TFSession]
 
-TODO
+A new execution session with the associated graph, or C<undef> on
+error.
 
 =back
 
@@ -311,7 +312,11 @@ B<C API>: L<< C<TF_LoadSessionFromSavedModel>|AI::TensorFlow::Libtensorflow::Man
 
 =head2 Run
 
-TODO
+Run the graph associated with the session starting with the supplied
+C<$inputs> with corresponding values in C<$input_values>.
+
+The values at the outputs given by C<$outputs> will be placed in
+C<$output_values>.
 
 B<Parameters>
 
@@ -319,23 +324,23 @@ B<Parameters>
 
 =item Maybe[TFBuffer] $run_options
 
-TODO
+Optional C<TFBuffer> containing serialized representation of a `RunOptions` protocol buffer.
 
 =item ArrayRef[TFOutput] $inputs
 
-TODO
+Inputs to set.
 
 =item ArrayRef[TFTensor] $input_values
 
-TODO
+Values to assign to the inputs given by C<$inputs>.
 
 =item ArrayRef[TFOutput] $outputs
 
-TODO
+Outputs to get.
 
-=item ArrayRef[TFTensor] $output
+=item ArrayRef[TFTensor] $output_values
 
-TODO
+Reference to where the output values for C<$outputs> will be placed.
 
 =item ArrayRef[TFOperation] $target_opers
 
@@ -343,11 +348,12 @@ TODO
 
 =item Maybe[TFBuffer] $run_metadata
 
-TODO
+Optional empty C<TFBuffer> which will be updated to contain a serialized
+representation of a `RunMetadata` protocol buffer.
 
 =item L<TFStatus|AI::TensorFlow::Libtensorflow::Lib::Types/TFStatus> $status
 
-TODO
+Status
 
 =back
 
@@ -385,7 +391,7 @@ Zakariyya Mughal <zmughal@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Auto-Parallel Technologies, Inc.
+This software is Copyright (c) 2022-2023 by Auto-Parallel Technologies, Inc.
 
 This is free software, licensed under:
 

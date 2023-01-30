@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Util::H2O::More",
   "PREREQ_PM" => {
     "Config::Tiny" => "2.28",
-    "Util::H2O" => "0.18"
+    "Util::H2O" => "0.22"
   },
   "TEST_REQUIRES" => {
     "Config::Tiny" => "2.28",
@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.2.4",
+  "VERSION" => "0.2.7",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,7 +38,7 @@ my %FallbackPrereqs = (
   "File::Temp" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
-  "Util::H2O" => "0.18"
+  "Util::H2O" => "0.22"
 );
 
 

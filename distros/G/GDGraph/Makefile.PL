@@ -23,6 +23,7 @@ WriteMakefile(
                  'Martien Verbruggen <mgjv@tradingpost.com.au>',
                  'Benjamin Warfield <bwarfield@cpan.org>',
                  'Ruslan Zakirov <Ruslan.Zakirov@gmail.com>',
+                 'Best Practical Solutions <modules@bestpractical.com>',
             ]
             ):()
         ),
@@ -65,8 +66,8 @@ WriteMakefile(
                 },
                 repository => {
                     type => 'git',
-                    url  => 'git://github.com/ruz/GDGraph.git',
-                    web  => 'https://github.com/ruz/GDGraph',
+                    url  => 'git://github.com/bestpractical/gdgraph.git',
+                    web  => 'https://github.com/bestpractical/gdgraph',
                 },
             },
 
@@ -105,8 +106,13 @@ before installing it.  You can run the examples in the samples
 directory with `make samples` or by going into that directory, and
 just running `make`.
 If that fails, please read samples/Makefile.
-UPDATE: Running the examples is part of the test procedure now. You
+
+UPDATE 1: Running the examples is part of the test procedure now. You
 are still encouraged to run check them out to learn from them and
 to see the ouput images.
-END
 
+UPDATE 2 (2023-0-13): The samples fail if libgd is installed without
+image support enabled, which is the default starting with version 2.3.3.
+The samples should be automatically skipped if this is detected. To
+run the tests from samples, install libgd with image support enabled.
+END

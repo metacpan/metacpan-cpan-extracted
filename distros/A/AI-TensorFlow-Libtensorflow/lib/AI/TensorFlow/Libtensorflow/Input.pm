@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Input;
 # ABSTRACT: Input of operation as (operation, index) pair
-$AI::TensorFlow::Libtensorflow::Input::VERSION = '0.0.4';
+$AI::TensorFlow::Libtensorflow::Input::VERSION = '0.0.6';
 # See L<AI::TensorFlow::Libtensorflow::Output> for similar.
 # In fact, they are mostly the same, but keeping the classes separate for now
 # in case the upstream API changes.
@@ -106,7 +106,7 @@ Zakariyya Mughal <zmughal@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Auto-Parallel Technologies, Inc.
+This software is Copyright (c) 2022-2023 by Auto-Parallel Technologies, Inc.
 
 This is free software, licensed under:
 

@@ -6,6 +6,7 @@ MANIFEST			This list of files
 README.md
 script/apperlm
 t/tests.t
+xt/author/build.t
 xt/author/pod_linkcheck.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

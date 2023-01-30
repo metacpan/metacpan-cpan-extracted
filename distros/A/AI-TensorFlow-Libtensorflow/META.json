@@ -34,11 +34,14 @@
       "develop" : {
          "requires" : {
             "Moose" : "0",
+            "Moose::Role" : "0",
+            "Pod::Simple::Search" : "0",
             "Test::More" : "0.88",
             "Test::Perl::Critic" : "0",
             "Test::Pod::LinkCheck::Lite" : "0",
             "Test::Pod::Snippets" : "0",
-            "Test::Pod::Snippets::Parser" : "0"
+            "Test::Pod::Snippets::Parser" : "0",
+            "With::Roles" : "0"
          },
          "suggests" : {
             "CLI::Osprey" : "0",
@@ -123,7 +126,7 @@
          "web" : "https://github.com/EntropyOrg/perl-AI-TensorFlow-Libtensorflow"
       }
    },
-   "version" : "0.0.4",
+   "version" : "0.0.6",
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.28",
    "x_spdx_expression" : "Apache-2.0"

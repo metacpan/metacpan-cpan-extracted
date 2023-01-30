@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Output;
 # ABSTRACT: Output of operation as (operation, index) pair
-$AI::TensorFlow::Libtensorflow::Output::VERSION = '0.0.4';
+$AI::TensorFlow::Libtensorflow::Output::VERSION = '0.0.6';
 # See L<AI::TensorFlow::Libtensorflow::Input> for similar.
 # In fact, they are mostly the same, but keeping the classes separate for now
 # in case the upstream API changes.
@@ -135,7 +135,7 @@ Zakariyya Mughal <zmughal@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Auto-Parallel Technologies, Inc.
+This software is Copyright (c) 2022-2023 by Auto-Parallel Technologies, Inc.
 
 This is free software, licensed under:
 

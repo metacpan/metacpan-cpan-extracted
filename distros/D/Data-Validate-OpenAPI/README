@@ -1,9 +1,9 @@
 This archive contains the distribution Data-Validate-OpenAPI,
-version 0.1.0:
+version 0.2.0:
 
   Validate and untaint input parameters via OpenAPI schema
 
-This software is Copyright (c) 2022 by Andrius Merkys.
+This software is Copyright (c) 2022-2023 by Andrius Merkys.
 
 This is free software, licensed under:
 

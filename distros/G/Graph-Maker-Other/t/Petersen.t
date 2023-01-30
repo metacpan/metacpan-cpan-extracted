@@ -36,7 +36,7 @@ use Graph::Maker::Petersen;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 18;
+  my $want_version = 19;
   ok ($Graph::Maker::Petersen::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::Petersen->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::Petersen->VERSION($want_version); 1 }, 1,

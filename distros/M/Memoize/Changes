@@ -1,5 +1,9 @@
 Release history for Memoize
 
+1.16  Sun 29 Jan 2023
+  * Protection against @_ mutation by the normalizer (reported by Mithun Bhattacharya).
+    This was a backcompat breakage in 1.10
+
 1.15  Sun 23 Oct 2022
   * Cleaner initialization logic in memoize(), with some added tests
   * No more double wrapping of memoized functions, at the cost of loading Scalar::Util

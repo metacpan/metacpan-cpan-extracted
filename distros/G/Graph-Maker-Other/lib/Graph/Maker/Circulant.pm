@@ -23,7 +23,7 @@ use Graph::Maker;
 use List::Util 'min';
 
 use vars '$VERSION','@ISA';
-$VERSION = 18;
+$VERSION = 19;
 @ISA = ('Graph::Maker');
 
 

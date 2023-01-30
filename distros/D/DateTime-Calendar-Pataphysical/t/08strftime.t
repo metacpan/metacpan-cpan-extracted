@@ -5,6 +5,7 @@ BEGIN { $^W = 1 }
 
 use Test::More tests => 40;
 use DateTime::Calendar::Pataphysical;
+use utf8;
 
 #########################
 
@@ -90,6 +91,6 @@ year => 124, month => 6, day => 29
 %W	  
 %y	24
 %Y	124
-%*	Mouvement Perpétuel
+%*	Mouvement PerpÃ©tuel
 %z	z
 %-	%-

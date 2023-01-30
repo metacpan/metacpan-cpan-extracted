@@ -1,6 +1,20 @@
 Revision history for autodie
 
-2.34      2021-01-22 11:03:19-06:00 America/Chicago
+2.36      2023-01-30 16:48:23+00:00 UTC
+
+	* Remove the use of ' as a package separator.
+
+	* Fix spelling errors in POD.
+
+2.35      2023-01-27 16:00:26+00:00 UTC
+
+        * Prepare for 5.38 changes to deprecate smartmatch
+
+	* Remove +x bit from pm and t files
+
+	* CI - Turn off Pod coverage and critic tests below 5.12
+
+2.34
 
         * Remove rt.cpan.org reference.
 

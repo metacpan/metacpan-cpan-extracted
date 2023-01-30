@@ -25,7 +25,7 @@ use Graph::Maker::Star;
 use Graph::Maker::Wheel;
 
 use vars '$VERSION','@ISA';
-$VERSION = 18;
+$VERSION = 19;
 @ISA = ('Graph::Maker');
 
 

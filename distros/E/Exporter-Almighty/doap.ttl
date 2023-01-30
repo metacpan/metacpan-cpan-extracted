@@ -15,9 +15,7 @@
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
 	doap-deps:runtime-requirement [ doap-deps:on "perl 5.012"^^doap-deps:CpanId ], [ doap-deps:on "Eval::TypeTiny"^^doap-deps:CpanId ], [
 		doap-deps:on "Exporter::Shiny 1.006000"^^doap-deps:CpanId;
-	], [ doap-deps:on "Import::Into"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ], [ doap-deps:on "Type::Registry"^^doap-deps:CpanId ], [
-		doap-deps:on "Type::Tiny::Enum 2.002001"^^doap-deps:CpanId;
-	], [
+	], [ doap-deps:on "Import::Into"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ], [ doap-deps:on "Type::Library"^^doap-deps:CpanId ], [ doap-deps:on "Type::Registry"^^doap-deps:CpanId ], [
 		doap-deps:on "Types::Common 2.002001"^^doap-deps:CpanId;
 	];
 	doap-deps:test-requirement [
@@ -36,7 +34,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Exporter-Almighty";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/v_0-001000>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/v_0-001002>, <http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/v_0-001003>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-exporter-almighty>;
@@ -51,6 +49,63 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Exporter-Almighty-0.001000.tar.gz>;
 	doap:revision        "0.001000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/v_0-001001>
+	a                    doap:Version;
+	dc:identifier        "Exporter-Almighty-0.001001"^^xsd:string;
+	dc:issued            "2023-01-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Adding any enums to an exporter now makes your package a subclass of Type::Library instead of Exporter::Tiny.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Rely on Type::Library's grouping/tagging for any type constraints in the exporter.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Avoid experimental::builtin warnings on Perl 5.36+.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Exporter-Almighty-0.001001.tar.gz>;
+	doap:revision        "0.001001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/v_0-001002>
+	a                    doap:Version;
+	dc:identifier        "Exporter-Almighty-0.001002"^^xsd:string;
+	dc:issued            "2023-01-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Class, role, and duck types can now be defined as easily as enum types.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Your exporter can re-export types from type libraries.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Exporter-Almighty-0.001002.tar.gz>;
+	doap:revision        "0.001002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/v_0-001003>
+	a                    doap:Version;
+	dc:identifier        "Exporter-Almighty-0.001003"^^xsd:string;
+	dc:issued            "2023-01-28"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Correct minor errors in the pod for the `type` option.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Improved description.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Allow `setup_for` to take a hash instead of a hashref.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Exporter-Almighty-0.001003.tar.gz>;
+	doap:revision        "0.001003"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

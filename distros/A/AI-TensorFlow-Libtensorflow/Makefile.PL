@@ -63,7 +63,7 @@ my %WriteMakefileArgs = (
     "aliased" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.0.4",
+  "VERSION" => "0.0.6",
   "test" => {
     "TESTS" => "t/*.t t/AI/TensorFlow/*.t t/upstream/CAPI/*.t"
   }

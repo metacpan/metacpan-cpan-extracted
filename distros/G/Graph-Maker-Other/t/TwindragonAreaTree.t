@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -37,7 +37,7 @@ require Graph::Maker::TwindragonAreaTree;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 18;
+  my $want_version = 19;
   ok ($Graph::Maker::TwindragonAreaTree::VERSION, $want_version,
       'VERSION variable');
   ok (Graph::Maker::TwindragonAreaTree->VERSION,  $want_version,

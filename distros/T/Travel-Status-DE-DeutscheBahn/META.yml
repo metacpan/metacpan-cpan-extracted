@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,22 +19,22 @@ name: Travel-Status-DE-DeutscheBahn
 provides:
   Travel::Status::DE::DeutscheBahn:
     file: lib/Travel/Status/DE/DeutscheBahn.pm
-    version: '4.02'
+    version: '4.03'
   Travel::Status::DE::HAFAS:
     file: lib/Travel/Status/DE/HAFAS.pm
-    version: '4.02'
+    version: '4.03'
   Travel::Status::DE::HAFAS::Journey:
     file: lib/Travel/Status/DE/HAFAS/Journey.pm
-    version: '4.02'
+    version: '4.03'
   Travel::Status::DE::HAFAS::Message:
     file: lib/Travel/Status/DE/HAFAS/Message.pm
-    version: '4.02'
+    version: '4.03'
   Travel::Status::DE::HAFAS::Polyline:
     file: lib/Travel/Status/DE/HAFAS/Polyline.pm
-    version: '4.02'
+    version: '4.03'
   Travel::Status::DE::HAFAS::StopFinder:
     file: lib/Travel/Status/DE/HAFAS/StopFinder.pm
-    version: '4.02'
+    version: '4.03'
 requires:
   Carp: '0'
   Class::Accessor: '0.16'
@@ -51,5 +51,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/derf/Travel-Status-DE-DeutscheBahn
-version: '4.02'
+version: '4.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

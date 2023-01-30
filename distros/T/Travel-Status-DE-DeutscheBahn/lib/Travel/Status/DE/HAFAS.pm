@@ -21,7 +21,7 @@ use Travel::Status::DE::HAFAS::Polyline qw(decode_polyline);
 use Travel::Status::DE::HAFAS::Journey;
 use Travel::Status::DE::HAFAS::StopFinder;
 
-our $VERSION = '4.02';
+our $VERSION = '4.03';
 
 # {{{ Endpoint Definition
 
@@ -659,6 +659,42 @@ sub similar_stops {
 	return;
 }
 
+sub station {
+	my ($self) = @_;
+
+	if ( $self->{station_info} ) {
+		return $self->{station_info};
+	}
+
+	my @locL = @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL} // [] };
+
+	my %prefc_by_loc;
+
+	for my $i ( 0 .. $#locL ) {
+		my $loc = $locL[$i];
+		if ( $loc->{pRefL} ) {
+			$prefc_by_loc{$i} = $#{ $loc->{pRefL} };
+		}
+	}
+
+	my @prefcounts = sort { $b->[0] <=> $a->[0] }
+	  map { [ $_, $prefc_by_loc{$_} ] } keys %prefc_by_loc;
+
+	my $loc = $locL[ $prefcounts[0][0] ];
+
+	if ($loc) {
+		$self->{station_info} = {
+			name => $loc->{name},
+			uic  => $loc->{extId},
+		};
+	}
+	else {
+		$self->{station_info} = {};
+	}
+
+	return $self->{station_info};
+}
+
 sub messages {
 	my ($self) = @_;
 	return @{ $self->{messages} };
@@ -739,7 +775,7 @@ monitors
 
 =head1 VERSION
 
-version 4.02
+version 4.03
 
 =head1 DESCRIPTION
 
@@ -891,6 +927,18 @@ If no result was found or the parser / http request failed, returns undef.
 
 Returns a list of Travel::Status::DE::HAFAS::Message(3pm) objects with
 service messages. Each message belongs to at least one arrival/departure.
+
+=item $status->station
+
+Returns a hashref describing the most common departure station in all requested
+journeys. Note that this may be different from the station for which departures
+were requested, as HAFAS uses different identifiers for train stations, bus
+stops, and other modes of transit even if they are interlinked.
+
+The hashref contains two entries: B<name> (station name) and B<uic> (UIC / EVA
+ID). These are subject to change.
+
+Not available in journey mode.
 
 =item $status->similar_stops
 

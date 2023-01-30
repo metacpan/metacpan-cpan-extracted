@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.20, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   App::Greple:
     file: lib/App/Greple.pm
-    version: '8.5702'
+    version: '9.01'
   App::Greple::Common:
     file: lib/App/Greple/Common.pm
   App::Greple::Filter:
@@ -61,14 +61,8 @@ provides:
     file: lib/App/Greple/pgp.pm
   App::Greple::select:
     file: lib/App/Greple/select.pm
-  Indexer:
-    file: lib/App/Greple/Util.pm
-  UniqIndex:
-    file: lib/App/Greple/Util.pm
-  filter_ent:
-    file: lib/App/Greple/select.pm
 requires:
-  Getopt::EX: v1.26.0
+  Getopt::EX: v2.1.2
   Hash::Util: '0'
   List::BinarySearch: '0'
   List::Util: '1.45'
@@ -76,8 +70,8 @@ requires:
 resources:
   bugtracker: https://github.com/kaz-utashiro/greple/issues
   homepage: https://github.com/kaz-utashiro/greple
-  repository: git://github.com/kaz-utashiro/greple.git
-version: '8.5702'
+  repository: https://github.com/kaz-utashiro/greple.git
+version: '9.01'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

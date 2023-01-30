@@ -1,3 +1,6 @@
+0.06 2023-01-27
+- support AUR packaging - thanks @micwoj92
+
 0.05 2019-04-27
  - apparently both BUILD_REQUIRES *and* CONFIGURE_REQUIRES are needed
 

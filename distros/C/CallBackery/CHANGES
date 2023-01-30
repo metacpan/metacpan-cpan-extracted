@@ -1,3 +1,10 @@
+0.42.5 2023-01-30 18:59:37 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - revert 0.42.2 do NOT catch instanciation errors as this will
+   remove the ability to detect problems up the call stack
+   the error fixed in 0.42.2 must be fixed by catching the exception
+   further up the chain ... 
+
 0.42.4 2022-10-25 16:52:58 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
   - Fix broken qxObjectIds for Auto.js form elements

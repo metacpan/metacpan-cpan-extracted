@@ -20,8 +20,9 @@ L<http://perldoc.perl.org/perlartistic.html>.
 
 =cut
 
-use Test::More tests => 322;
+use Test::More tests => 332;
 use Scalar::Util qw/blessed/;
+use Symbol qw/delete_package/;
 
 sub exception (&) { eval { shift->(); 1 } ? undef : ($@ || die) }  ## no critic (ProhibitSubroutinePrototypes, RequireFinalReturn, RequireCarping)
 sub warns (&) { my @w; { local $SIG{__WARN__} = sub { push @w, shift }; shift->() } @w }  ## no critic (ProhibitSubroutinePrototypes, RequireFinalReturn)
@@ -30,7 +31,7 @@ sub warns (&) { my @w; { local $SIG{__WARN__} = sub { push @w, shift }; shift->(
 
 diag "This is Perl $] at $^X on $^O";
 BEGIN { use_ok 'Util::H2O' }
-is $Util::H2O::VERSION, '0.20';
+is $Util::H2O::VERSION, '0.22';
 
 diag "If all tests pass, you can ignore the \"this Perl is too old\" warnings"
 	if $] lt '5.008009';
@@ -108,17 +109,37 @@ my $PACKRE = $Util::H2O::_PACKAGE_REGEX;  ## no critic (ProtectPrivateVars)
 	my $o2 = h2o -arrays, {
 		a=>[
 			{ b=>[ [
-				'c', { d=>[ { e=>'f' } ] }
+				'c', { d=>{ e=>[ { f=>'g' } ] } }
 			] ] }
 		] };
 	is $o2->a->[0]->b->[0][0], 'c';
-	is $o2->a->[0]->b->[0][1]->d->[0]->e, 'f';
+	is $o2->a->[0]->b->[0][1]->d->e->[0]->f, 'g';
 	my $o3 = h2o -arrays, [
 			{ foo=>'bar' },
 			{ quz=>'baz' },
 		];
 	is $o3->[0]->foo, 'bar';
 	is $o3->[1]->quz, 'baz';
+}
+# -arrays with various ref types
+{
+	my $sref = \"foo";
+	my $obj = bless { foo=>['hello', {bar=>'world'}] }, "SomeClass";
+	my $aref = [ { xyz=>'abc', obj=>$obj }, $obj ];
+	my $o1 = h2o -arrays, {
+		sref => $sref,
+		aref => $aref,
+		oref => $obj,
+	};
+	like blessed($o1), $PACKRE;
+	is 0+$o1->sref, 0+$sref;
+	is $o1->aref, $aref;
+	like blessed($o1->aref->[0]), $PACKRE;
+	is $o1->aref->[0]->obj, $obj;
+	is $o1->aref->[1], $obj;
+	is ref $o1->oref->{foo}, 'ARRAY';
+	is ref $o1->oref->{foo}[1], 'HASH';
+
 }
 # -arrays + -pass
 {
@@ -195,12 +216,11 @@ my $PACKRE = $Util::H2O::_PACKAGE_REGEX;  ## no critic (ProtectPrivateVars)
 		{ foo => { bar => "quz" },
 			hello => [ { abc=>"def" }, { ghi=>{ jkl=>"mno" } } ] },
 		{
-			a=>[
-				{ b=>[ [
-					'c', { d=>[ { e=>'f' } ] }
-				] ] }
-			]
-		},
+		a=>[
+			{ b=>[ [
+				'c', { d=>{ e=>[ { f=>'g' } ] } }
+			] ] }
+		] },
 		[
 			{ foo=>'bar' },
 			{ quz=>'baz' },
@@ -334,6 +354,8 @@ sub checksym {
 	ok checksym $c;
 	$o = undef;
 	ok checksym $c;
+	delete_package($c);
+	ok !checksym $c;
 }
 {
 	my $o = h2o -class=>'TestClean1', {};
@@ -597,7 +619,12 @@ SKIP: {
 # DESTROY
 {
 	ok h2o -class=>'DestroyTest1', -meth, { DESTROY=>sub{} };
-	ok h2o -clean=>0, -meth, { DESTROY=>sub{} };
+	# make sure to clean up after ourselves!
+	ok my $o = h2o -clean=>0, -meth, { DESTROY=>sub{} };
+	my $c = ref $o;
+	undef $o;
+	delete_package($c);
+	ok !checksym($c);
 	ok exception { h2o -class=>'DestroyTest2', -clean=>1, -meth, { DESTROY=>sub{} } };
 	ok exception { h2o -class=>'DestroyTest3', -meth, { DESTROY=>'' } };
 	ok exception { h2o -class=>'DestroyTest4', -meth, { DESTROY=>undef } };
@@ -650,7 +677,7 @@ my @redef_warns = warns {
 	h2o { abc => "def" }, qw/ abc /;
 	h2o {}, qw/ abc abc /;
 };
-#TODO: Spurious CPAN Testers failures here https://www.cpantesters.org/distro/U/Util-H2O.html?oncpan=1&distmat=1&version=0.18&grade=3
+# There were spurious CPAN Testers failures here, see xt/redef.t for details
 ok !grep { /redefined/i } @redef_warns or diag explain \@redef_warns;  ## no critic (ProhibitMixedBooleanOperators)
 
 SKIP: {

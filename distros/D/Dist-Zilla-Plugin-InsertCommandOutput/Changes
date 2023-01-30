@@ -1,3 +1,9 @@
+0.057   2022-10-28  Released-By: PERLANCAR; Urgency: medium
+
+        - Add configuration options: capture_stdout, capture_stderr,
+          substitute_template, include_command.
+
+
 0.056   2022-06-10  Released-By: PERLANCAR; Urgency: medium
 
         - Add configuration 'indent' (like in DZP:InsertExample), deprecate

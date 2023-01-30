@@ -13,7 +13,7 @@ use parent qw(Exporter);
 
 our @EXPORT = qw(easy_table); ## no critic (ProhibitAutomaticExportation)
 
-our $VERSION = '0.03';
+our $VERSION = '1.001';
 
 ########################################################################
 sub is_array { push @_, 'ARRAY'; goto &_is_type; }
@@ -157,7 +157,7 @@ __END__
 
 =head1 NAME
 
-Text::ASCIITable::EasyTable - create ASCII tables from hashes
+Text::ASCIITable::EasyTable - create ASCII tables from an array of hashes
 
 =head1 SYNOPSIS
 
@@ -193,24 +193,33 @@ Text::ASCIITable::EasyTable - create ASCII tables from hashes
  # easiest 
  print easy_table( data => $data );
 
+
 =head1 DESCRIPTION
 
-L<Text::ASCIITable> is one of my favorite modules when I am writing
-command line scripts that sometimes need to output data. It's so
-useful that I wanted to encourage myself to use it more
-often. Although, it is quite easy to use already I thought it could
-easier.
+L<Text::ASCIITable> is one of my favorite modules when I'm writing
+command line scripts that sometimes need to output data in tabular
+format. It's so useful that I wanted to encourage myself to use it
+more often. Although, it is quite easy to use already I thought it
+could be easier.
 
-Easily create ASCII tables using L<Text::ASCIITable> from arrays of
-hashes.  Custom columns names (instead of the key names) can be
-defined that allow you to set the order of the data to be displayed in
-the table. Use an array of subroutines to transform each element of
-the hash prior to insertion into the table. Rows can be sorted by one
-of the keys in the hash or you can provide a custom sort routine that
-will be called prior to rendering the table.
+=head2 Features
 
-Instead of rendering a table, C<easy_table> can apply the same type of
+=over
+
+=item * Easily create ASCII tables using L<Text::ASCIITable> from
+arrays of hashes.
+
+=item * Define custom columns names (instead of the key names) that
+also allow you to set the order of the data to be displayed in the table.
+
+=item * Transform each element of the hash prior to insertion into the table.
+
+=item * Sort rows by individual columns in the hashes
+
+=item * Output JSON instead of a tableInstead of rendering a table, C<easy_table> can apply the same type of
 transformations to arrays of hashes and subsequently output JSON.
+
+=back
 
 Exports one method C<easy_table>. 
 
@@ -252,7 +261,7 @@ the order of the columns.>
 
 =item columns
 
-Array of column names that represent both the keys that will be used to
+Array of column names that can represent both the keys that will be used to
 extract data from the hash for each row and the labels for each column.
 
 =item data

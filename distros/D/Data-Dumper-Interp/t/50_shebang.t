@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use strict; use warnings  FATAL => 'all'; use feature qw(state say); 
+use strict; use warnings  FATAL => 'all'; use feature qw(state say);
 srand(42);  # so reproducible
 use feature 'lexical_subs'; no warnings "experimental::lexical_subs";
 use version 0.77;
@@ -21,18 +21,20 @@ confess "Non-zero CHILD_ERROR ($?)" if $? != 0;
 use Test::More;
 
 use Data::Dumper::Interp;
-diag "Loaded ", $INC{"Data::Dumper::Interp.pm" =~ s/::/\//gr}, 
-     " VERSION=", ($Data::Dumper::Interp::VERSION // "undef"),"\n"; 
+diag "Loaded ", $INC{"Data::Dumper::Interp.pm" =~ s/::/\//gr},
+     " VERSION=", ($Data::Dumper::Interp::VERSION // "undef"),"\n";
 
 confess "Non-zero CHILD_ERROR ($?)" if $? != 0;
 
 # Format a Unicode string in «french quotes» and also with hex escapes
 # (so we can still see something useful on non-Unicode platforms).
+#my @quotes = ("«", "»");
+my @quotes = ("<<", ">>");
 sub displaystr($) {
   my ($input) = @_;
   return "undef" if ! defined($input);
-  chomp( my $s = Data::Dumper->new([$input])->Useqq(1)->Terse(1)->Indent(0)->Dump );
-  "«${input}»($s)"
+  chomp( my $dd = Data::Dumper->new([$input])->Useqq(1)->Terse(1)->Indent(0)->Dump );
+  $quotes[0].$input.$quotes[1]."($dd)"
 }
 
 # Do an initial read of $[ so arybase will be autoloaded
@@ -55,9 +57,9 @@ sub timed_run(&$@) {
   my ($code, $maxcpusecs, @codeargs) = @_;
 
   eval { require Time::HiRes };
-  my $getcpu = defined(eval{ &Time::HiRes::clock() }) 
+  my $getcpu = defined(eval{ &Time::HiRes::clock() })
     ? \&Time::HiRes::clock : sub{ my @t = times; $t[0]+$t[1] };
-  
+
   my $startclock = &$getcpu();
   my (@result, $result);
   if (wantarray) {@result = &$code(@codeargs)} else {$result = &$code(@codeargs)};
@@ -90,14 +92,15 @@ sub checkeq_literal($$$) {
         ."${desc}\n"
         ."Expected:\n".displaystr($exp)."\n"
         ."Actual:\n".displaystr($act)."\n"
-        .(" " x ($posn+1))."^\n" # +1 for the opening « in the displayed str
+        # + for opening « or << in the displayed str
+        .(" " x ($posn+length($quotes[0])))."^\n"
         .visFoldwidth()."\n" ) ;
   goto &Carp::confess;
 }
 
-# Convert a literal "expected" string check() which contains qr/.../ sequences
-# into a regex which matches the same string but allows various regex representations
-# used by various versions of Perl.
+# Convert a literal "expected" string which contains qr/.../ismx sequences
+# into a regex which matches the same string but allows various representations
+# of the regex (which differs among Perl versions).
 sub expstr2re($) {
   local $_ = shift;
   confess "bug" if ref($_);
@@ -137,10 +140,10 @@ sub check($$@) {
       unless ($actual =~ $expected) {
         @_ = ( "\n**************************************\n"
               ."TESTb FAILED: ".$desc."\n"
-              ."Expected (Regexp):u\n".${expected}."«end»\n"
-              ."Got:\n".displaystr($actual)."\n"
+              ."Expected (Regexp):\n".${expected}."<<end>>\n"
+              ."Got:\n".displaystr($actual)."<<end>>\n"
               .visFoldwidth()."\n" ) ;
-        goto &Carp::confess;
+        Carp::confess(@_); #goto &Carp::confess;
       }
     } else {
       unless ($expected eq $actual) {
@@ -197,7 +200,7 @@ sub check($$@) {
 # double-quoted; a single-quoted version is derived internally.
 sub checklit(&$$) {
   my ($doeval, $item, $dq_expected_re) = @_;
-  (my $sq_expected_re = $dq_expected_re) 
+  (my $sq_expected_re = $dq_expected_re)
     =~ s{ ( [^\\"]++|(\\.) )*+ \K " }{'}xsg
        or do{ die "bug" if $dq_expected_re =~ /(?<![^\\])'/; }; #probably
   foreach (
@@ -222,7 +225,7 @@ sub checklit(&$$) {
     my $exp = quotemeta $exp_template;
     $exp =~ s/_Q_/$dq_expected_re/g;
     $exp =~ s/_q_/$sq_expected_re/g;
-    my $code_display = $code . " with \$_[1]=«$item»";
+    my $code_display = $code . " with \$_[1]=$quotes[0].$item.$quotes[1]";
     local $Data::Dumper::Interp::Foldwidth = 0;  # disable wrapping
     check $code_display, qr/$exp/, $doeval->($code, $item) ;
   }
@@ -289,7 +292,7 @@ $. = 1234;
 $ENV{EnvVar} = "Test EnvVar Value";
 
 
-my %toplex_h = ("" => "Emp", A=>111,"B B"=>222,C=>{d=>888,e=>999},D=>{},EEEEEEEEEEEEEEEEEEEEEEEEEE=>\42,F=>\\\43, G=>qr/foo.*bar/xsi);
+my %toplex_h = ("" => "Emp", A=>111,"B B"=>222,C=>{d=>888,e=>999},D=>{},EEEEEEEEEEEEEEEEEEEEEEEEEE=>\42,F_long_enough_to_force_wrap_FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF=>\\\43, G=>qr/foo.*bar/xsi);
    # EEE... identifer is long to force linewrap
 my @toplex_a = (0,1,"C",\%toplex_h,[],[0..9]);
 my $toplex_ar = \@toplex_a;
@@ -373,37 +376,37 @@ $_ = "GroupA.GroupB";
   check $code, '2 3 a=3 b=2', eval $code;
 }
 
-# Vis v1.147ish+ : Check corner cases of re-parsing code 
+# Vis v1.147ish+ : Check corner cases of re-parsing code
 { my $code = q(my $v = undef; dvis('$v')); check $code, "v=undef", eval $code; }
 { my $code = q(my $v = \undef; dvis('$v')); check $code, "v=\\undef", eval $code; }
 { my $code = q(my $v = \"abc"; dvis('$v')); check $code, 'v=\\"abc"', eval $code; }
 { my $code = q(my $v = \"abc"; dvisq('$v')); check $code, "v=\\'abc'", eval $code; }
 { my $code = q(my $v = \*STDOUT; dvisq('$v')); check $code, "v=\\*::STDOUT", eval $code; }
 SKIP: {
-  skip "because Data::Dumper too old", 1 
+  skip "because Data::Dumper too old", 1
     if version->parse($Data::Dumper::VERSION) <= version->parse(2.179);
-  { my $code = q(open my $fh, "</dev/null" or die; dvis('$fh')); 
+  { my $code = q(open my $fh, "</dev/null" or die; dvis('$fh'));
     check $code, "fh=\\*{\"::\\\$fh\"}", eval $code; }
 }
-{ my $code = q(open my $fh, "</dev/null" or die; dvisq('$fh')); 
+{ my $code = q(open my $fh, "</dev/null" or die; dvisq('$fh'));
   check $code, "fh=\\*{'::\$fh'}", eval $code; }
 
 # Data::Dumper::Interp 2.12 : hex escapes including illegal code points:
 #   10FFFF is the highest legal Unicode code point which will ever be assigned.
 # Perl (v5.34 at least) mandates code points be <= max signed integer,
 # which on 32 bit systems is 7FFFFFFF.
-{ my $code = q(my $v = "beyondmax:\x{110000}\x{FFFFFF}\x{7FFFFFFF}"; dvis('$v')); 
+{ my $code = q(my $v = "beyondmax:\x{110000}\x{FFFFFF}\x{7FFFFFFF}"; dvis('$v'));
   check $code, 'v="beyondmax:\x{110000}\x{ffffff}\x{7fffffff}"', eval $code; }
 
 # Check that $1 etc. can be passed (this was once a bug...)
 # The duplicated calls are to check that $1 is preserved
-{ my $code = '" a~b" =~ / (.*)()/ && qsh($1); die unless $1 eq "a~b";qsh($1)'; 
+{ my $code = '" a~b" =~ / (.*)()/ && qsh($1); die unless $1 eq "a~b";qsh($1)';
   check $code, '"a~b"', eval $code; }
-{ my $code = '" a~b" =~ / (.*)()/ && qshpath($1); die unless $1 eq "a~b";qshpath($1)'; 
+{ my $code = '" a~b" =~ / (.*)()/ && qshpath($1); die unless $1 eq "a~b";qshpath($1)';
   check $code, '"a~b"', eval $code; }
-{ my $code = '" a~b" =~ / (.*)()/ && vis($1); die unless $1 eq "a~b";vis($1)'; 
+{ my $code = '" a~b" =~ / (.*)()/ && vis($1); die unless $1 eq "a~b";vis($1)';
   check $code, '"a~b"', eval $code; }
-{ my $code = 'my $vv=123; \' a $vv b\' =~ / (.*)/ && dvis($1); die unless $1 eq "a \$vv b"; dvis($1)'; 
+{ my $code = 'my $vv=123; \' a $vv b\' =~ / (.*)/ && dvis($1); die unless $1 eq "a \$vv b"; dvis($1)';
   check $code, 'a vv=123 b', eval $code; }
 
 # Check Deparse support
@@ -437,11 +440,11 @@ my $ratstr  = '1/9';
   local $Data::Dumper::Interp::Overloads = 1;  # NOTE: the '1' will be a BigInt !
 
   my $bigf = eval $bigfstr // die;
-  die unless blessed($bigf) =~ /^Math::BigFloat/;
+  die(u(blessed($bigf))," <<$bigfstr>> ",u($bigf)," $@") unless blessed($bigf) =~ /^Math::BigFloat/;
   checklit(sub{eval $_[0]}, $bigf, qr/(?:\(Math::BigFloat[^\)]*\))?${bigfstr}/);
 
   my $bigi = eval $bigistr // die;
-  die unless blessed($bigi) =~ /^Math::BigInt/;
+  die(u(blessed($bigi))," <<$bigistr>> ",u($bigi)," $@") unless blessed($bigi) =~ /^Math::BigInt/;
   checklit(sub{eval $_[0]}, $bigi, qr/(?:\(Math::BigInt[^\)]*\))?${bigistr}/);
 
   # Confirm that various Overloads values disable
@@ -475,7 +478,7 @@ my $ratstr  = '1/9';
 
 {
   # There is a new (with bigrat 0.51) bug where "use bigrat" immediately and
-  # permanently causes math operations on Math::BitFloat to produce BigRats in all 
+  # permanently causes math operations on Math::BitFloat to produce BigRats in all
   # scopes, not just in the scope of the 'use bigrat'.   This breaks Math::BigFloat
   # tests which execute after the bigrat package is loaded.
   #
@@ -499,7 +502,7 @@ EOF
     # hand-truncate to create "expected result" data
     (my $exp_str = $orig_str) =~ s{("?)([a-zA-Z]{$MSw})([a-zA-Z]*+)(\1)}{
                                     local $_ = $1
-                                             . $2 
+                                             . $2
                                              . (length($3) > 3 ? "..." : $3)
                                              . $4 ;
                                     $_ = "\"$_\"" if m{^\w.*\.\.\.$}; #bareword
@@ -513,11 +516,14 @@ EOF
 }
 
 # There was a bug for s/dvis called direct from outer scope, so don't use eval:
-check 
+#WAS BUG HERE: qr/.../ can visualize in a longer form on some platorms,
+## changing wrap.  I increased "F" to super-long to force wrap b4 the regex.
+check
   'global divs %toplex_h',
 q(%toplex_h=( "" => "Emp",A => 111,"B B" => 222,C => {d => 888,e => 999},
-  D => {},EEEEEEEEEEEEEEEEEEEEEEEEEE => \\42,F => \\\\\\43,
-  G => qr/foo.*bar/six
+  D => {},EEEEEEEEEEEEEEEEEEEEEEEEEE => \\42,
+  F_long_enough_to_force_wrap_FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+    => \\\\\\43,G => qr/foo.*bar/six
 )),
   dvis('%toplex_h');
 check 'global divs @ARGV', q(@ARGV=("fake","argv")), dvis('@ARGV');
@@ -563,7 +569,7 @@ sub doquoting($$) {
     }
     my $unicode = delete $subopts{unicode} || delete $subopts{utf8};
     if (!$unicode) {
-      $quoted = join("", map{ ord($_) > 127 ? sprintf("\\x{%x}", ord($_)) : $_ } 
+      $quoted = join("", map{ ord($_) > 127 ? sprintf("\\x{%x}", ord($_)) : $_ }
                            split //,$quoted);
     }
     if (my $arg = delete $subopts{qq}) {
@@ -715,8 +721,9 @@ sub get_closure(;$) {
 @_=( 42,
   [ 0,1,"C",
     { "" => "Emp",A => 111,"B B" => 222,C => {d => 888,e => 999},
-      D => {},EEEEEEEEEEEEEEEEEEEEEEEEEE => \42,F => \\\43,
-      G => qr/foo.*bar/six
+      D => {},EEEEEEEEEEEEEEEEEEEEEEEEEE => \42,
+      F_long_enough_to_force_wrap_FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        => \\\43,G => qr/foo.*bar/six
     },[],[0,1,2,3,4,5,6,7,8,9]
   ]
 )
@@ -739,30 +746,33 @@ EOF
           my $pfx = substr($spfx,0,length($spfx)-1);
           #state $depth=0;
           #say "##($depth) spfx=<$spfx> pfx=<$pfx> dollar=<$dollar> r=<$r> dns=<$dolname_scalar> n=<$name>"; $depth++;
-          
+
           #my $p = " " x length("?${dollar}${name}_?${r}");
           my $p = "";
 
           [__LINE__, qq(${pfx}%${dollar}${name}_h${r}\n), <<EOF ],
 ${pfx}\%${dollar}${name}_h${r}=( "" => "Emp",A => 111,"B B" => 222,
 ${p}  C => {d => 888,e => 999},D => {},EEEEEEEEEEEEEEEEEEEEEEEEEE => \\42,
-${p}  F => \\\\\\43,G => qr/foo.*bar/six
+${p}  F_long_enough_to_force_wrap_FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+${p}    => \\\\\\43,G => qr/foo.*bar/six
 ${p})
 EOF
 
           [__LINE__, qq(${pfx}\@${dollar}${name}_a${r}\n), <<EOF ],
 ${pfx}\@${dollar}${name}_a${r}=( 0,1,"C",
 ${p}  { "" => "Emp",A => 111,"B B" => 222,C => {d => 888,e => 999},D => {},
-${p}    EEEEEEEEEEEEEEEEEEEEEEEEEE => \\42,F => \\\\\\43,G => qr/foo.*bar/six
+${p}    EEEEEEEEEEEEEEEEEEEEEEEEEE => \\42,
+${p}    F_long_enough_to_force_wrap_FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+${p}      => \\\\\\43,G => qr/foo.*bar/six
 ${p}  },[],[0,1,2,3,4,5,6,7,8,9]
 ${p})
 EOF
 
-          [__LINE__, qq(${pfx}\$#${dollar}${name}_a${r}),    
-            qq(${pfx}\$#${dollar}${name}_a${r}=5)   
+          [__LINE__, qq(${pfx}\$#${dollar}${name}_a${r}),
+            qq(${pfx}\$#${dollar}${name}_a${r}=5)
           ],
-          [__LINE__, qq(${pfx}\$#${dollar}${name}_a${r}\n), 
-            qq(${pfx}\$#${dollar}${name}_a${r}=5\n) 
+          [__LINE__, qq(${pfx}\$#${dollar}${name}_a${r}\n),
+            qq(${pfx}\$#${dollar}${name}_a${r}=5\n)
           ],
 
           [__LINE__, qq(${spfx}\$${dollar}${name}_a${r}[3]{C}{e}\n),
@@ -821,7 +831,7 @@ EOF
         } (['$','r',''], ['','r','->'])
         ), #map [$dollar,$r,$arrow]
         }
-        qw(closure sublexx toplex global subglobal 
+        qw(closure sublexx toplex global subglobal
            maskedglobal local A::B::C::ABC)
       ), #map $name
       } ('""', "''")
@@ -830,7 +840,7 @@ EOF
   for my $test (@dvis_tests) {
     my ($lno, $dvis_input, $expected, $skip_condition) = @$test;
     #warn "##^^^^^^^^^^^ lno=$lno dvis_input='$dvis_input' expected='$expected'\n";
-    
+
     # FUTURE: wrap in subtest with plan skip_all => $skip_condition if skip_condition is true
     die "skip_condition not impl" if $skip_condition;
 
@@ -838,7 +848,7 @@ EOF
       # For some reason we can't catch exceptions from inside package DB.
       # undef is returned but $@ is not set
       # 3/5/22: The above comment may not longer be true; there might have been
-      #  a bug where $@ was not saved properly.  
+      #  a bug where $@ was not saved properly.
       #  BUT VERIFY b4 deleting this comment.
       my $ev = eval { "$dvis_input" };
       die "Bad test string:$dvis_input\nPerl can't interpolate it (lno=$lno)"
@@ -879,7 +889,7 @@ EOF
              $dvis_input =~ /(?<!\\)\$^E/   ? $origCarE : 6,  # $^E aliases $! on most OSs
              $dvis_input =~ /(?<!\\)\$^W/   ? $origCarW : 0); # $^W can only be 0 or 1
 
-        ($@, $/, $\, $,, $!, $^E, $^W) 
+        ($@, $/, $\, $,, $!, $^E, $^W)
           = ($fakeAt,$fakeFs,$fakeBs,$fakeCom,$fakeBang,$fake_cE,$fake_cW);
 
         $actual = $use_oo
@@ -903,8 +913,8 @@ EOF
       $@ = $dollarat_val;
 
       check(
-        "Test case lno $lno, (use_oo=$use_oo) dvis input «"
-                                              . show_white($dvis_input)."»",
+        "Test case lno $lno, (use_oo=$use_oo) dvis input "
+                              . $quotes[0].show_white($dvis_input).$quotes[1],
         $expected,
         $actual);
     }

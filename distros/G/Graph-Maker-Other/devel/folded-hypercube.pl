@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2019 Kevin Ryde
+# Copyright 2019, 2022 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -40,26 +40,28 @@ use Graph::Maker::FoldedHypercube;
   # N=5  Clebsch
   # N=6  Kummer
   #      https://hog.grinvin.org/ViewGraphInfo.action?id=1206
-
+  # N=7  https://hog.grinvin.org/ViewGraphInfo.action?id=49239
+  # N=8  https://hog.grinvin.org/ViewGraphInfo.action?id=49241
   my @graphs;
-  foreach my $N (0) {
-    # my $graph = make_folded_hypercube($N);
-    my $graph = Graph::Maker->new('folded_hypercube', undirected => 1,
+  foreach my $N (8) {
+    my $graph = Graph::Maker->new('folded_hypercube',
+                                  undirected => 1,
                                   N => $N);
-    # print $graph->vertices,"\n";
+    MyGraphs::Graph_hypercube_layout($graph);
     push @graphs, $graph;
-    if ($N == 5) {
+    if ($N == 0) {
+      MyGraphs::Graph_view($graph);
     }
-     MyGraphs::Graph_view($graph);
     # $graph->vertices == 2**($N-1) or die;
     # if ($N >= 3) {
     #   scalar($graph->edges) == $N*2**($N-2) or die;
     # }
     # print scalar($graph->edges),",";
-    print scalar($graph->diameter),",";
+    # print scalar($graph->diameter),",";
   }
   print "\n";
   MyGraphs::hog_searches_html(@graphs);
+  MyGraphs::hog_upload_html($graphs[0]);
   exit 0;
 }
 

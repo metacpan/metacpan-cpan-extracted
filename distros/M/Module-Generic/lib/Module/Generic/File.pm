@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.5.5
+## Version v0.5.6
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2022/11/12
+## Modified 2023/01/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -127,7 +127,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.5.5';
+    our $VERSION = 'v0.5.6';
 };
 
 use strict;
@@ -391,7 +391,7 @@ sub baseinfo
         my $suff;
         foreach my $ext ( @$exts )
         {
-            $ext = ref( $ext ) eq 'Regexp' ? $ext : qr/$ext$/i;
+            $ext = ref( $ext ) eq 'Regexp' ? $ext : qr/\Q$ext\E$/i;
             if( $file =~ s/($ext)// )
             {
                 $suff = $1;
@@ -4237,7 +4237,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.5.5
+    v0.5.6
 
 =head1 DESCRIPTION
 

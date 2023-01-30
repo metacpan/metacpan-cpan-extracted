@@ -20,7 +20,7 @@ name: String-Query-To-Regexp
 provides:
   String::Query::To::Regexp:
     file: lib/String/Query/To/Regexp.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Exporter: '5.57'
   Regexp::From::String: '0.003'
@@ -31,7 +31,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=String-Query-To-Regexp
   homepage: https://metacpan.org/release/String-Query-To-Regexp
   repository: git://github.com/perlancar/perl-String-Query-To-Regexp.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

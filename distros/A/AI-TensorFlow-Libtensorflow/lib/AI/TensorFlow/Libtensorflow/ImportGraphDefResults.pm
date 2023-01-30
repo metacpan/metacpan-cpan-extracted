@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::ImportGraphDefResults;
 # ABSTRACT: Results from importing a graph definition
-$AI::TensorFlow::Libtensorflow::ImportGraphDefResults::VERSION = '0.0.4';
+$AI::TensorFlow::Libtensorflow::ImportGraphDefResults::VERSION = '0.0.6';
 use strict;
 use warnings;
 use namespace::autoclean;
@@ -112,7 +112,7 @@ Zakariyya Mughal <zmughal@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Auto-Parallel Technologies, Inc.
+This software is Copyright (c) 2022-2023 by Auto-Parallel Technologies, Inc.
 
 This is free software, licensed under:
 

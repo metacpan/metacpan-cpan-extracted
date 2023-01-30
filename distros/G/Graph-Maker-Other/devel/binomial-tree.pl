@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2017, 2019, 2020 Kevin Ryde
+# Copyright 2015, 2017, 2019, 2020, 2022 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -30,6 +30,9 @@ $|=1;
 
 # uncomment this to run the ### lines
 use Smart::Comments;
+
+# GP-DEFINE  read("OEIS-data.gp");
+# GP-DEFINE  read("OEIS-data-wip.gp");
 
 {
   # BinomialTree by n
@@ -177,7 +180,7 @@ use Smart::Comments;
   # A000788 total 1s in 0 .. n
   # cf Wtop total in 0 .. n-1 which is n many vertices
   # GP-DEFINE  A000788(n) = sum(i=0,n, hammingweight(i));
-  # my(v=OEIS_samples("A000788")); vector(#v,n,n--; A000788(n)) == v
+  # GP-Test  OEIS_check_func("A000788")
   #
   # GP-DEFINE  A000788_by_bits(n) = {   \\ Shreevatsa R in A000788
   # GP-DEFINE    my(ret=0);

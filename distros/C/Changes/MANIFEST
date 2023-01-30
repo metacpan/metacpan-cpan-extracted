@@ -1,0 +1,41 @@
+lib/Changes.pm
+lib/Changes/Change.pm
+lib/Changes/Group.pm
+lib/Changes/NewLine.pm
+lib/Changes/Release.pm
+lib/Changes/Version.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+README.md
+t/001_load.t
+t/002_change.t
+t/003_group.t
+t/004_release.t
+t/005_main.t
+t/006_version.t
+t/007_basic.t
+t/008_different_indentation.t
+t/009_distzilla.t
+t/010_group.t
+t/011_change_wrapped_line.t
+t/012_multiple_release.t
+t/013_release_no_date.t
+t/014_no_leading_space_change.t
+t/015_preamble.t
+t/016_space_before_date.t
+t/017_datetimes.t
+t/018_unknown_release_date.t
+t/019_separators.t
+t/020_sort_groups.t
+t/021_utf8.t
+t/022_build_write.t
+t/900.pod.t
+t/901.coverage.t
+t/902.signature.t
+t/999.kwalitee.t
+t/sample/basic.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

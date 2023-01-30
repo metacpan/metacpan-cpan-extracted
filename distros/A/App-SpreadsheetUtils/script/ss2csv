@@ -1,0 +1,353 @@
+#!perl
+
+use 5.010001;
+use strict;
+use warnings;
+
+use App::SpreadsheetUtils;
+
+our %SPEC;
+
+$SPEC{ss2csv} = {
+    v => 1.1,
+    summary => 'Convert spreadsheet to CSV',
+    description => <<'_',
+
+**Some examples**
+
+Convert first worksheet of `foo.xlsx` to `foo.csv`:
+
+    % ss2csv foo.xlsx foo.csv
+
+Convert worksheet named `Sheet2` in `foo.xlsx` to CSV, output to stdout:
+
+    % ss2csv foo.xlsx -s Sheet2
+
+_
+    args => {
+        %App::SpreadsheetUtils::argspecopt0_input_filename,
+        %App::SpreadsheetUtils::argspecopt_output_filename,
+        %App::SpreadsheetUtils::argspecopt_sheet,
+        %App::SpreadsheetUtils::argspecopt_overwrite,
+    },
+};
+sub ss2csv {
+    my %args = @_;
+
+    my $book = App::SpreadsheetUtils::_get_book($args{input_filename});
+    my ($sheetidx, $sheetname, $sheet) = App::SpreadsheetUtils::_select_sheet($book, $args{sheet});
+
+    require Text::CSV_XS;
+    my $csv = Text::CSV_XS->new({binary=>1});
+
+    my $res = [200, "OK", ""];
+    my $i = -1;
+    for my $row ($sheet->rows) {
+        $i++;
+        my $combres = $csv->combine(@$row);
+        die "Can't combine CSV fields for row[$i]" unless $combres;
+        $res->[2] .= $csv->string."\n";
+    }
+
+    App::SpreadsheetUtils::_return_or_write_file($res, $args{output_filename}, $args{overwrite});
+}
+
+use Perinci::CmdLine::Any;
+Perinci::CmdLine::Any->new(
+    url => '/main/ss2csv',
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+)->run;
+
+# ABSTRACT: Convert spreadsheet to CSV
+# PODNAME: ss2csv
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ss2csv - Convert spreadsheet to CSV
+
+=head1 VERSION
+
+This document describes version 0.003 of ss2csv (from Perl distribution App-SpreadsheetUtils), released on 2023-01-29.
+
+=head1 SYNOPSIS
+
+B<ss2csv> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<ss2csv> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<ss2csv> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--output-filename|/"--output-filename=s, -o">>=I<L<filename|Sah::Schema::filename>>|B<L<-o|/"--output-filename=s, -o">>=I<L<filename|Sah::Schema::filename>>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>|B<L<--no-overwrite|/"--overwrite, -O">>|B<L<--nooverwrite|/"--overwrite, -O">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--sheet|/"--sheet=s, -s">>=I<str>|B<L<-s|/"--sheet=s, -s">>=I<str>] -- [I<L<input_filename|/"--input-filename=s">>]
+
+=head1 DESCRIPTION
+
+B<Some examples>
+
+Convert first worksheet of C<foo.xlsx> to C<foo.csv>:
+
+ % ss2csv foo.xlsx foo.csv
+
+Convert worksheet named C<Sheet2> in C<foo.xlsx> to CSV, output to stdout:
+
+ % ss2csv foo.xlsx -s Sheet2
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Filtering options
+
+=over
+
+=item B<--sheet>=I<s>, B<-s>
+
+Select specified worksheet in a workbook.
+
+Sheet can be selected by name, or by number (0 means the first sheet, 1 the
+second, and so on). For CSV, the single worksheet name is the filename/path
+itself. To quickly list the sheets of a workbook file, you can use
+L<ss-list-sheets>.
+
+
+=back
+
+=head2 Input options
+
+=over
+
+=item B<--input-filename>=I<s>
+
+Input spreadsheet file.
+
+Default value:
+
+ "-"
+
+Use C<-> to read from stdin.
+
+Encoding of input file is assumed to be UTF-8.
+
+
+Can also be specified as the 1st command-line argument.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--output-filename>=I<s>, B<-o>
+
+Output filename.
+
+Use C<-> to output to stdout (the default if you don't specify this option).
+
+
+=item B<--overwrite>, B<-O>
+
+Whether to override existing output file.
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C ss2csv ss2csv
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete ss2csv 'p/*/`ss2csv`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-SpreadsheetUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-SpreadsheetUtils>.
+
+=head1 SEE ALSO
+
+L<Spreadsheet::Read> is the backend that does all the magic.
+
+L<xlsx2csv> (from L<Spreadsheet::Read> distribution) also converts from
+spreadsheet to CSV, but it does not allow outputting to stdout or letting you
+specify the sheet you want. I<ss2csv> also offers conveniences like tab
+completion (e.g. for C<--sheet> (C<-s>)).
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-SpreadsheetUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

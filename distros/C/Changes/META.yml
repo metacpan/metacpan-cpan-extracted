@@ -1,0 +1,42 @@
+---
+abstract: 'Changes file management'
+author:
+  - 'Jacques Deguest <jack@deguest.jp>'
+build_requires:
+  DateTime::Format::JP: v0.1.3
+  DateTime::Format::Strptime: '1.79'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.302162'
+  Test::Time: '0'
+  open: '0'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Changes
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DateTime: '1.57'
+  Module::Generic: v0.29.1
+  Nice::Try: v1.3.1
+  Want: '0.29'
+  overload: '0'
+  parent: '0'
+  perl: '5.026001'
+  strict: '0'
+  vars: '0'
+  version: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://gitlab.com/jackdeguest/Changes/issues
+  repository: https://gitlab.com/jackdeguest/Changes
+version: v0.2.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

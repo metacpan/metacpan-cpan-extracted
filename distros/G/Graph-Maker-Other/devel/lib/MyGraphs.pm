@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Hyde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022 Kevin Hyde
 #
 # This file is shared by a couple of distributions.
 #
@@ -128,7 +128,8 @@ sub postscript_view_file {
   my ($filename, %options) = @_;
   require IPC::Run;
   my @command = ('gv',
-                 '--scale=.7',
+                 # '--scale=.7',
+                 '--scale=4',
                  $filename);
   if ($options{'synchronous'}) {
     IPC::Run::run(\@command);
@@ -3420,7 +3421,7 @@ sub Graph_subdivide {
 }
 
 #------------------------------------------------------------------------------
-# Independence Number
+# Independent Sets and Independence Number
 
 # $graph is a Graph.pm undirected tree or forest.
 # Return its independence number.
@@ -3484,6 +3485,24 @@ sub Graph_is_indset {
     }
   }
   return 1;
+}
+
+sub Graph_indset_sizes {
+  my ($graph) = @_;
+  # always have >=1 set of indnum downwards just by removing vertices from
+  # the largest set
+
+  require Algorithm::ChooseSubsets;
+  my @vertices = sort $graph->vertices;
+  my $it = Algorithm::ChooseSubsets->new(\@vertices);
+  my @ret;
+  while (my $aref = $it->next) {
+    if (Graph_is_indset($graph,$aref)) {
+      ### set: join(', ',@$aref)
+      $ret[scalar(@$aref)]++;
+    }
+  }
+  return @ret;
 }
 
 sub Graph_indnum_and_count {
@@ -4402,6 +4421,89 @@ sub Graph_num_maximal_paths {
   }
   return $ret;
 }
+
+
+#------------------------------------------------------------------------------
+
+# $graph is a Graph.pm
+# Replace its edges with edges between vertices which were originally
+# distance $n apart.
+#
+sub Graph_distance_n {
+  my ($graph,$n) = @_;
+  my @new_edges = Graph_pairs_distance_n($graph,$n);
+  $graph->delete_edges(map {@$_} $graph->edges);
+  $graph->add_edges(@new_edges);
+  return $graph;
+
+  # return Graph->new
+  #   (vertices => [$graph->vertices],
+  #    edges => [Graph_pairs_distance_n($graph)],
+  #    undirected => $graph->is_undirected);
+}
+
+# $graph is a Graph.pm and $n is an integer >= 1.
+# Return a list of arrayrefs [$u,$v], [$u,$v], ...
+# which are all pairs of vertices $u,$v in $graph which distance $n apart.
+#
+sub Graph_pairs_distance_n {
+  my ($graph,$n) = @_;
+  if ($n==1) { return $graph->edges; }
+  if ($n==2) {
+    my @ret;
+    my @vertices = $graph->vertices;
+    foreach my $v ($graph->vertices) {
+      foreach my $to (map {$graph->neighbours($_)}
+                      $graph->neighbours($v)) {
+        if ($v lt $to) {
+          push @ret, [$v,$to];
+        }
+      }
+    }
+    return @ret;
+  }
+  die "n>=3 not implemented";
+}
+
+
+# $graph is a Graph.pm and $vertices is an arrayref of vertex names.
+# FIXME: Not sure about this.  May be enough to clone and delete the
+# unwanted vertices.  Might take arg list of vertex names anyway.
+#
+sub Graph_induced_subgraph {
+  my ($graph, $vertices) = @_;
+  my %vertices; @vertices{@$vertices} = ();
+  return Graph->new
+    (vertices => $vertices,
+     edges => [grep {exists $vertices{$_->[0]}
+                       && exists $vertices{$_->[1]}}
+               $graph->edges],
+     undirected => $graph->is_undirected);
+}
+
+
+#------------------------------------------------------------------------------
+# Huypercube
+
+sub Graph_hypercube_layout {
+  my ($graph) = @_;
+  my @vertices = Graph_sorted_vertices($graph);
+  my $N;
+  { my $v = @vertices;
+    while ($v>>=1) { $N++; }
+  }
+  my $a = (3.141592/2)/($N-1);
+  my @x = map {cos($_*$a)} 0 .. $N-1;
+  my @y = map {sin($_*$a)} 0 .. $N-1;
+  foreach my $i (0 .. $#vertices) {
+    my $x = sum(map {$i & (1<<$_) ? $x[$_] : 0} 0 .. $N-1);
+    my $y = sum(map {$i & (1<<$_) ? $y[$_] : 0} 0 .. $N-1);
+    Graph_set_xy_points($graph, $vertices[$i] => [$x,$y]);
+    ### layout: "i=$i $vertices[$i] to $x,$y"
+  }
+}
+
+
 
 
 #------------------------------------------------------------------------------

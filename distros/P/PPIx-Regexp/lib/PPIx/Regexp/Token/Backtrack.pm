@@ -35,7 +35,7 @@ use base qw{ PPIx::Regexp::Token };
 
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.086';
+our $VERSION = '0.087';
 
 # Return true if the token can be quantified, and false otherwise
 sub can_be_quantified { return };
@@ -114,8 +114,12 @@ sub perl_version_introduced {
 # Note that we have to require a non-lowercase letter after the asterisk
 # to avoid grabbing the so-caled alpha_assertions introduced with
 # 5.27.9.
+# Optimized code ( (*{...}) and (**{...}) ), introduced in 5.37.8, broke
+# the non-lowercase requirement. I replaced that with requiring an
+# uppercase or a colon (the latter because in (*MARK:foo) you can omit
+# the 'MARK').
 sub __PPIX_TOKEN__recognize {
-    return ( [ qr{ \A \( \* (?! [[:lower:]] ) [^\)]* \) }smx ] );
+    return ( [ qr{ \A \( \* [[:upper:]:] [^\)]* \) }smx ] );
 }
 
 # This class gets recognized by PPIx::Regexp::Token::Structure as part
@@ -150,7 +154,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2022 by Thomas R. Wyant, III
+Copyright (C) 2009-2023 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

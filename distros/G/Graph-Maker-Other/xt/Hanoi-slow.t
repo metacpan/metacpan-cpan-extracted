@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017, 2019, 2020, 2021 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2019, 2020, 2021, 2022 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -25,6 +25,7 @@ use FindBin;
 use File::Spec;
 use File::Slurp;
 use Graph::Maker::Grid;
+use List::Util 'min','max','sum';
 
 # before warnings checking since Graph.pm 0.96 is not safe to non-numeric
 # version number from Storable.pm
@@ -40,7 +41,7 @@ use File::Spec;
 use lib File::Spec->catdir('devel','lib');
 use MyGraphs 'Graph_is_isomorphic','Graph_is_subgraph';
 
-plan tests => 77;
+plan tests => 85;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -61,6 +62,55 @@ sub Graph_is_edge_subset {
     }
   }
   return 1;
+}
+
+
+#------------------------------------------------------------------------------
+# Star Solution Length
+#
+# N=1  2  3   4   5
+#   1  4  7  14  
+#
+# A259823
+#   0, 1, 3, 6, 10, 16, 24, 33, 45, 61, 79, 103, 130, 162, 198, 246, 300,
+{
+  #
+  my @A291876 = (undef, 2, 6, 12, 20, 32, 48);
+  my $spindles = 4;
+  foreach my $N (1 .. 4) {
+    my $graph = Graph::Maker->new('hanoi',
+                                  discs => $N,
+                                  spindles => $spindles,
+                                  adjacency => 'star',
+                                  undirected => 1,
+                                  vertex_names => 'digits');
+    my @vertices = $graph->vertices;
+    my $centre = min(@vertices);
+    my $max    = max(@vertices);       # all (S-1)'s
+    my $first  = $max / ($spindles-1); # all 1s
+    my @path_vertices = $graph->path_vertices($max,$first);
+    my $path_length = scalar(@path_vertices)-1;
+    ok ($path_length, $A291876[$N]);
+  }
+}
+
+{
+  # centre to outer
+  my @A259823 = (undef, 1, 4, 7, 14, 23, 32);
+  my $spindles = 4;
+  foreach my $N (1 .. 4) {
+    my $graph = Graph::Maker->new('hanoi',
+                                  discs => $N,
+                                  spindles => $spindles,
+                                  adjacency => 'star',
+                                  undirected => 1,
+                                  vertex_names => 'digits');
+    my @vertices = $graph->vertices;
+    my $centre = min(@vertices);
+    my $max    = max(@vertices);
+    ok ($graph->path_length($centre,$max),
+        $A259823[$N]);
+  }
 }
 
 #------------------------------------------------------------------------------

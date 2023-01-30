@@ -1,0 +1,151 @@
+# ABSTRACT: Start here for an overview of the library
+# PODNAME: AI::TensorFlow::Libtensorflow::Manual::Quickstart
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+AI::TensorFlow::Libtensorflow::Manual::Quickstart - Start here for an overview of the library
+
+=head1 DESCRIPTION
+
+This provides a tour of C<libtensorflow> to help get started with using the
+library.
+
+=head1 CONVENTIONS
+
+The library uses UpperCamelCase naming convention for method names in order to
+match the underlying C library (for compatibility with future API changes) and
+to make translating code from C easier as this is a low-level API.
+
+As such, constructors for objects that correspond to C<libtensorflow> data
+structures are typically called C<New>. For example, a new
+L<AI::TensorFlow::Libtensorflow::Status> object can be created as follows
+
+  use AI::TensorFlow::Libtensorflow::Status;
+  my $status = AI::TensorFlow::Libtensorflow::Status->New;
+
+  ok defined $status, 'Created new Status';
+
+These C<libtensorflow> data structures use L<destructors|perlobj/Destructors> where necessary.
+
+=head1 OBJECT TYPES
+
+=over 4
+
+=item L<AI::TensorFlow::Libtensorflow::Status>
+
+Used for error-handling. Many methods take this as the final argument which is
+then checked after the method call to ensure that it completed successfully.
+
+=item L<AI::TensorFlow::Libtensorflow::Tensor>, L<AI::TensorFlow::Libtensorflow::DataType>
+
+A C<TFTensor> is a multi-dimensional data structure that stores the data for inputs and outputs.
+Each element has the same data type
+which is defined by L<AI::TensorFlow::Libtensorflow::DataType>
+thus a C<TFTensor> is considered to be "homogeneous data structure".
+See L<Introduction to Tensors|https://www.tensorflow.org/guide/tensor> for more.
+
+=item L<AI::TensorFlow::Libtensorflow::OperationDescription>, L<AI::TensorFlow::Libtensorflow::Operation>
+
+An operation is a function that has inputs and outputs. It has a user-defined
+name (such as C<MyAdder>) and library-defined type (such as C<AddN>).
+L<AI::TensorFlow::Libtensorflow::OperationDescription> is used to build an
+operation that will be added to a graph of other operations where those other
+operations can set the operation's inputs and get the operation's outputs.
+These inputs and outputs have types and dimension specifications, so that the
+operations only accept and emit certain C<TFTensor>s.
+
+=item L<AI::TensorFlow::Libtensorflow::Graph>
+
+A set of operations with inputs and outputs linked together. This computation
+can be serialized along with parameters as part of
+a L<SavedModel|https://www.tensorflow.org/guide/saved_model>.
+
+=item L<AI::TensorFlow::Libtensorflow::Session>, L<AI::TensorFlow::Libtensorflow::SessionOptions>
+
+A session drives the execution of a L<AI::TensorFlow::Libtensorflow::Graph>.
+Specifics of how the session executes can be set via L<AI::TensorFlow::Libtensorflow::SessionOptions>.
+
+=back
+
+=head1 TUTORIALS
+
+The object types in L</OBJECT TYPES> are used in the following tutorials:
+
+=over 4
+
+=item L<InferenceUsingTFHubMobileNetV2Model|AI::TensorFlow::Libtensorflow::Manual::Notebook::InferenceUsingTFHubMobileNetV2Model>: image classification tutorial
+
+This tutorial demonstrates using a pre-trained SavedModel and creating a L<AI::TensorFlow::Libtensorflow::Session> with the
+L<LoadFromSavedModel|AI::TensorFlow::Libtensorflow::Session/LoadFromSavedModel>
+method. It also demonstrates how to prepare image data for use as an input C<TFTensor>.
+
+=item L<InferenceUsingTFHubEnformerGeneExprPredModel|AI::TensorFlow::Libtensorflow::Manual::Notebook::InferenceUsingTFHubEnformerGeneExprPredModel>: gene expression prediction tutorial
+
+This tutorial builds on L<InferenceUsingTFHubMobileNetV2Model|AI::TensorFlow::Libtensorflow::Manual::Notebook::InferenceUsingTFHubMobileNetV2Model>.
+It shows how to convert a pre-trained SavedModel from one that does not have a
+usable signature to a new model that does. It also demonstrates how to prepare
+genomic data for use as an input C<TFTensor>.
+
+=back
+
+=head1 DOCKER IMAGES
+
+Docker (or equivalent runtime) images for the library along with all the
+dependencies to run the above tutorials are available at
+L<Quay.io|https://quay.io/repository/entropyorg/perl-ai-tensorflow-libtensorflow>
+under various tags which can be run as
+
+C<<
+  docker run --rm -it -p 8888:8888 quay.io/entropyorg/perl-ai-tensorflow-libtensorflow:latest-nb-omnibus
+>>
+
+and when the links come up on the terminal, click the link to
+C<http://127.0.0.1:8888/> in order to connect to the Jupyter Notebook interface
+via the web browser. In the browser, click on the C<notebook> folder to access
+the notebooks.
+
+=over 4
+
+=item C<latest>: base image with only C<libtensorflow> installed.
+
+=item C<latest-nb-image-class>: image containing dependencies needed to run
+
+L<InferenceUsingTFHubMobileNetV2Model|AI::TensorFlow::Libtensorflow::Manual::Notebook::InferenceUsingTFHubMobileNetV2Model>.
+
+=item C<latest-nb-gene-expr-pred>: image containing dependencies needed to run
+
+L<InferenceUsingTFHubEnformerGeneExprPredModel|AI::TensorFlow::Libtensorflow::Manual::Notebook::InferenceUsingTFHubEnformerGeneExprPredModel>.
+
+=item C<latest-nb-omnibus>: image containing dependencies for both of the above
+
+notebooks.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<TensorFlow|https://www.tensorflow.org/> home page
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2022-2023 by Auto-Parallel Technologies, Inc.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut

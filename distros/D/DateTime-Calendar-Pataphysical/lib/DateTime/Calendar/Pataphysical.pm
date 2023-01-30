@@ -1,5 +1,5 @@
 package DateTime::Calendar::Pataphysical;
-$DateTime::Calendar::Pataphysical::VERSION = '0.06';
+$DateTime::Calendar::Pataphysical::VERSION = '0.07';
 use strict;
 use warnings;
 use utf8;
@@ -900,27 +900,7 @@ v Le Termès
 EOF
 
 1;
-__END__
 
-sub add_duration {
-    my ($self, $dur) = @_;
-
-    my $dm = $dur->delta_months;
-    my $dd = $dur->delta_days;
-
-    $self->{day}   += $dd;
-    $self->{month} += _floor(($self->{day}-1)/29);
-    $self->{day}    = ($self->{day}-1)%29 + 1;
-
-    $self->{month} += $dm;
-    $self->{year}  += _floor(($self->{year}-1)/13);
-    $self->{month}  = ($self->{month}-1)%13 + 1;
-
-    return $self;
-}
-
-
-1;
 __END__
 
 =for Pod::Coverage::TrustPod
@@ -939,7 +919,11 @@ __END__
 
 =head1 NAME
 
-DateTime::Calendar::Pataphysical - Dates in the pataphysical calendar
+DateTime::Calendar::Pataphysical - Dates in the Pataphysical calendar
+
+=head1 VERSION
+
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -952,146 +936,180 @@ DateTime::Calendar::Pataphysical - Dates in the pataphysical calendar
 =head1 DESCRIPTION
 
 DateTime::Calendar::Pataphysical is the implementation of the
-pataphysical calendar. Each year in this calendar contains 13 months of
+Pataphysical calendar. Each year in this calendar contains 13 months of
 29 days. This regularity makes this a convenient alternative for the
 irregular Gregorian calendar.
 
 This module is designed to be easy to use in combination with
-DateTime. Most of its methods correspond to a DateTime method of the
+L<DateTime>. Most of its methods correspond to a L<DateTime> method of the
 same name.
+
+=head1 CLASS METHODS
+
+=head2 new
+
+    my $dt = DateTime::Calendar::Pataphysical-new(
+        year  => $year_in_the_pataphysical_era,
+        month => $pataphysical_month_number,
+        day   => $pataphysical_day_number,
+    );
+
+This class method accepts parameters for each date and time component:
+C<year>, C<month>, C<day>.  Additionally, it accepts a C<locale>
+parameter.
+
+The C<rd_secs> parameter is also accepted. This parameter is only useful
+in conversions to other calendars; this calendar does not use its value.
+
+=head2 from_epoch
+
+    my $dt = DateTime::Calendar::Pataphysical->from_epoch( epoch => $epoch, ... );
+
+This class method can be used to construct a new object from an epoch
+time instead of components. Just as with the L<new> constructor, it
+accepts a C<locale> parameter.
+
+=head2 now
+
+    my $dt = DateTime::Calendar::Pataphysical->now;
+
+This class method is equivalent to calling C<from_epoch()> with the
+value returned from Perl's L<time|perlfunc/time> function.
+
+=head2 from_object
+
+    my $dt = DateTime::Calendar::Pataphysical->from_object( object => $object, ... );
+
+This class method can be used to construct a new object from
+any object that implements the L<utc_rd_values> method.  All
+L<DateTime::Calendar> modules must implement this method in order to
+provide cross-calendar compatibility.  This method accepts a
+C<locale> parameter.
+
+The time part of C<$object> is stored, and will only be used if the created
+object is converted to another calendar. Only the date part of C<$object>
+is used to calculate the pataphysical date. This calculation is based on
+the local time and date of C<$object>.
+
+=head2 last_day_of_month
+
+    my $dt = DateTime::Calendar::Pataphysical->last_day_of_month( ... );
+
+This constructor takes the same arguments as can be given to the
+L<now> method, except for C<day>.  Additionally, both C<year> and
+C<month> are required.
 
 =head1 METHODS
 
-=over 4
+=head2 clone
 
-=item * new( ... )
-
-This class method accepts parameters for each date and time component:
-"year", "month", "day".  Additionally, it accepts a "locale"
-parameter.
-
-The "rd_secs" parameter is also accepted. This parameter is only useful
-in conversions to other calendars; this calendar does not use its value.
-
-=item * from_epoch( epoch => $epoch, ... )
-
-This class method can be used to construct a new object from
-an epoch time instead of components.  Just as with the C<new()>
-method, it accepts a "locale" parameter.
-
-=item * now( ... )
-
-This class method is equivalent to calling C<from_epoch()> with the
-value returned from Perl's C<time()> function.
-
-=item * from_object( object => $object, ... )
-
-This class method can be used to construct a new object from
-any object that implements the C<utc_rd_values()> method.  All
-C<DateTime::Calendar> modules must implement this method in order to
-provide cross-calendar compatibility.  This method accepts a
-"locale" parameter.
-
-The time part of $object is stored, and will only be used if the created
-object is converted to another calendar. Only the date part of $object
-is used to calculate the Pataphysical date. This calculation is based on
-the local time and date of $object.
-
-=item * last_day_of_month( ... )
-
-This constructor takes the same arguments as can be given to the
-C<now()> method, except for "day".  Additionally, both "year" and
-"month" are required.
-
-=item * clone
+    my $clone = $dt->clone;
 
 This object method returns a replica of the given object.
 
-=item * year
+=head2 year
 
 Returns the year.
 
-=item * month
+=head2 month
 
-Returns the month of the year, from 1..13.
+Returns the month of the year, from C<1 .. 13>.
 
-=item * month_name
+=head2 month_name
 
 Returns the name of the current month.
 
-=item * day_of_month, day, mday
+=head2 day_of_month
 
-Returns the day of the month, from 1..29.
+=head2 day
 
-=item * day_of_week, wday, dow
+=head2 mday
 
-Returns the day of the week as a number, from 1..7, with 1 being
-Sunday and 7 being Saturday.
+Returns the day of the month, from C<1 .. 29>.
 
-=item * day_name
+=head2 day_of_week
+
+=head2 wday
+
+=head2 dow
+
+Returns the day of the week as a number, from C<1 .. 7>, with C<1> being
+Sunday and C<7> being Saturday. Returns C<undef> if the day is a "hunyadi".
+
+=head2 day_name
 
 Returns the name of the current day of the week.
 
-=item * day_of_year, doy
+=head2 day_of_year
+
+=head2 doy
 
 Returns the day of the year.
 
-=item * ymd( $optional_separator ), date
+=head2 ymd
 
-=item * mdy( $optional_separator )
+=head2 mdy
 
-=item * dmy( $optional_separator )
+=head2 dmy
+
+     my $string = $dt->ymd( $optional_separator );
 
 Each method returns the year, month, and day, in the order indicated
-by the method name.  Years are zero-padded to four digits.  Months and
+by the method name.  Years are zero-padded to three digits.  Months and
 days are 0-padded to two digits.
 
-By default, the values are separated by a dash (-), but this can be
+By default, the values are separated by a dash (C<->), but this can be
 overridden by passing a value to the method.
 
-=item * datetime
+=head2 date
+
+Alias for L<ymd>.
+
+=head2 datetime
 
 Equivalent to
 
-  $dt->ymd('-') . 'EP'
+    $dt->ymd('-') . 'EP'
 
-=item * is_leap_year
+=head2 is_leap_year
 
 This method returns a true or false indicating whether or not the
-datetime object is in a leap year.
+L<DateTime> object is in a leap year.
 
-=item * week
+=head2 week
 
- ($week_year, $week_number) = $dt->week
+    my ( $week_year, $week_number ) = $dt->week;
 
 Returns information about the calendar week which contains this
-datetime object. The values returned by this method are also available
-separately through the week_year and week_number methods.
+L<DateTime> object. The values returned by this method are also available
+separately through the L<week_year> and L<week_number> methods.
 
-=item * week_year
+=head2 week_year
 
-Returns the year of the week. In the pataphysical calendar, this is
+Returns the year of the week. In the Pataphysical calendar, this is
 equal to the year of the date, as all weeks fall in one year only.
 
-=item * week_number
+=head2 week_number
 
-Returns the week of the year, from 1..53.
+Returns the week of the year, from C<1 .. 53>.
 
-The 29th of each month falls outside of any week; week_number returns
-undef for these dates.
+The 29th of each month falls outside of any week; C<week_number> returns
+C<undef> for these dates.
 
-=item * utc_rd_values
+=head2 utc_rd_values
 
 Returns the current UTC Rata Die days and seconds as a two element
 list.  This exists primarily to allow other calendar modules to create
 objects based on the values provided by this object.
 
-=item * utc_rd_as_seconds
+=head2 utc_rd_as_seconds
 
 Returns the current UTC Rata Die days and seconds purely as seconds.
 This is useful when you need a single number to represent a date.
 
-=item * strftime( $format, ... )
+=head2 strftime
+
+    my $string = $dt->strftime( $format, ... );
 
 This method implements functionality similar to the C<strftime()>
 method in C.  However, if given multiple format strings, then it will
@@ -1101,11 +1119,11 @@ See L<DateTime> for a list of all possible format specifiers. This
 module implements all specifiers related to dates. There is one
 additional specifier: C<%*> represents the feast of that date.
 
-=item * feast
+=head2 feast
 
 Returns the feast or vacuation of the given date.
 
-=item * type_of_feast
+=head2 type_of_feast
 
 Returns the type of feast or vacuation.
 
@@ -1116,84 +1134,96 @@ Returns the type of feast or vacuation.
   '4' means Fête Suprème Quarte
   'v' means Vacuation
 
-=item * is_imaginary
+=head2 is_imaginary
 
-Returns true or false indicating whether the datetime object represents an
+Returns true or false indicating whether the L<DateTime> object represents an
 imaginary date.
 
-=item * set( .. )
+=head2 set
 
 This method can be used to change the local components of a date time,
-or its locale.  This method accepts any parameter allowed by the
-C<new()> method.
+or its locale.  This method accepts any parameter allowed by L<new>.
 
-=item * truncate( to => ... )
+=head2 truncate
+
+    $dt->truncate( to => ... );
 
 This method allows you to reset some of the local time components in
-the object to their "zero" values.  The "to" parameter is used to
-specify which values to truncate, and it may be one of "year",
-"month", or "day".
+the object to their C<zero> values.  The C<to> parameter is used to
+specify which values to truncate, and it may be one of C<year>,
+C<month>, or C<day>.
 
-=item * add_duration( $duration_object )
+=head2 add_duration
 
-This method adds a C<DateTime::Duration> to the current datetime.  See
-the L<DateTime::Duration|DateTime::Duration> docs for more detais.
+    $dt->add_duration( $duration_object );
 
-=item * add( DateTime::Duration->new parameters )
+This method adds a C<DateTime::Duration> to the current L<DateTime>.
+See the L<DateTime::Duration> documentation for more details.
 
-This method is syntactic sugar around the C<add_duration()> method.  It
-simply creates a new C<DateTime::Duration> object using the parameters
-given, and then calls the C<add_duration()> method.
+=head2 add
 
-=item * subtract_duration( $duration_object )
+    $dt->add( %arguments );
 
-When given a C<DateTime::Duration> object, this method simply calls
-C<invert()> on that object and passes that new duration to the
-C<add_duration> method.
+This method is syntactic sugar around the L<add_duration> method.  It
+simply creates a new L<DateTime::Duration> object using the parameters
+given, and then calls the L<add_duration> method.
 
-=item * subtract( DateTime::Duration->new parameters )
+=head2 subtract_duration
 
-Like C<add()>, this is syntactic sugar for the C<subtract_duration()>
-method.
+    $dt->subtract_duration( $duration_object );
 
-=item * subtract_datetime( $datetime )
+When given a L<DateTime::Duration> object, this method simply calls
+C<invert> on that object and passes that new duration to the
+L<add_duration> method.
 
-This method returns a new C<DateTime::Duration> object representing
+=head2 subtract
+
+    $dt->subtract( %arguments );
+
+Like L<add>, this is syntactic sugar for the L<subtract_duration> method.
+
+=head2 subtract_datetime
+
+    $dt->subtract_datetime( $datetime );
+
+This method returns a new L<DateTime::Duration> object representing
 the difference between the two dates.
 
-=item * compare
+=head2 compare
 
-  $cmp = DateTime->compare($dt1, $dt2);
+    $cmp = DateTime->compare( $dt1, $dt2 );
 
-  @dates = sort { DateTime->compare($a, $b) } @dates;
+    @dates = sort { DateTime->compare( $a, $b ) } @dates;
 
-Compare two DateTime objects.  The semantics are compatible with
-Perl's C<sort()> function; it returns -1 if $a < $b, 0 if $a == $b, 1
-if $a > $b.
+Compare two DateTime objects.  The semantics are compatible with Perl's
+L<sort|perlfunc/sort> function; it returns C<-1> if C<< $a < $b >>, C<0>
+if C<$a == $b>, and C<1> if C<< $a > $b >>.
 
-Of course, since DateTime objects overload comparison operators, you
+Of course, since L<DateTime> objects overload comparison operators, you
 can just do this anyway:
 
-  @dates = sort @dates;
-
-=back
+    @dates = sort @dates;
 
 =head1 BUGS
 
 =over 4
 
-=item * Adding a week to a date is exactly equivalent to adding seven days
-in this module because of the way DateTime::Duration is implemented.
+=item *
+
+Adding a week to a date is exactly equivalent to adding seven days in
+this module because of the way L<DateTime::Duration> is implemented.
 The Hunyadis are not taken into account.
 
-=item * from_epoch() and now() probably only work on Unix.
+=item *
+
+L<from_epoch> and L<now> probably only work on Unix.
 
 =back
 
 =head1 SUPPORT
 
 Support for this module is provided via the datetime@perl.org email
-list. See http://lists.perl.org/ for more details.
+list. See L<http://lists.perl.org/> for more details.
 
 =head1 SEE ALSO
 

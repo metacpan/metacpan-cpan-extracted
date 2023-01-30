@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017, 2020, 2021 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2020, 2021, 2022 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -32,9 +32,141 @@ $|=1;
 # uncomment this to run the ### lines
 use Smart::Comments;
 
+# GP-DEFINE  read("OEIS-data.gp");
 
 
+{
+  # Hanoi Graph Wiener Index = A290004
 
+  # GP-DEFINE  sqrt17 = quadgen(17*4);
+  # GP-Test  sqrt17^2 == 17
+  # GP-DEFINE  P = (5 + sqrt17)/2;
+  # GP-DEFINE  M = (5 - sqrt17)/2;
+
+  # GP-DEFINE  \\ Hinz and ...
+  # GP-DEFINE  \\ 2*Hanoi Wiener index
+  # GP-DEFINE  delta(n) = {
+  # GP-DEFINE    466/885 * 18^n
+  # GP-DEFINE    - 1/3 * 9^n
+  # GP-DEFINE    + 6/59*(2 + 3/17*sqrt17)*P^n
+  # GP-DEFINE    - 3/5 * 3^n
+  # GP-DEFINE    + 6/59*(2 - 3/17*sqrt17)*M^n;
+  # GP-DEFINE  }
+  # GP-Test  my(v=OEIS_data("A290004")); /* OFFSET=1 */ \
+  # GP-Test    vector(#v,n, delta(n)/2) == v
+  #
+  # recurrence_guess(vector(100,n, delta(n)/2))
+  # x^5 - 35*x^4 + 395*x^3 - 1761*x^2 + 2916*x - 972
+  # = factors
+  # x - 18           roots 18.0000
+  # x - 9            roots 9.00000
+  # x - 3            roots 3.00000
+  # x^2 - 5*x + 2    roots 0.438447, 4.56155
+  # (35,-395,1761,-2916,972)
+  # cf A290004 same recurrence
+  # 3, 72, 1419, 26580, 487839, 8867088, 160391235, 2894149932,
+  #
+  # GP-DEFINE  gHW(x) = {
+  # GP-DEFINE    3 * (1 - 11*x + 28*x^2 + 24*x^3)
+  # GP-DEFINE    / ((1-3*x) * (1-9*x) * (1-18*x) * (1-5*x+2*x^2));
+  # GP-DEFINE  }
+  # GP-Test  gHW(x) == \
+  # GP-Test    -9/10/(1-3*x) - 3/2/(1-9*x) + 1398/295/(1-18*x) \
+  # GP-Test    + (39/59 - 24/59*x)/(1-5*x+2*x^2)
+  exit 0;
+}
+{
+  # Sergey Benditkis, Ilya Safro, "Generalizations of the Hanoi Towers
+  # Problem", 2006
+  
+  # 3 spindles      3
+  #                ^ ^          1->2->3 and 1<->3
+  #               /   \
+  #              /     v
+  #             2 <---- 1
+  #
+  # GP-DEFINE  sqrt17 = quadgen(4*17);
+  # GP-Test  sqrt17^2 == 17
+  # GP-DEFINE  N12(n) = {  \\ and N23
+  # GP-DEFINE    simplify(
+  # GP-DEFINE    -3/4 - (11-3*sqrt17)/(8*sqrt17) * ((1-sqrt17)/2)^n
+  # GP-DEFINE         + (11+3*sqrt17)/(8*sqrt17) * ((1+sqrt17)/2)^n
+  # GP-DEFINE    );
+  # GP-DEFINE  }
+  # vector(12,n,N12(n))
+  # 1, 4, 11, 30, 77, 200, 511, 1314, 3361, 8620, 22067, 56550
+  # A026583
+  # Ser((1+2*x)/((1-x)*(1-x-4*x^2)))
+  # x*(1+2*x)/((1-x)*(1-x-4*x^2))
+  #
+  # n=1  31 12 31 23 31     5 moves
+  # GP-DEFINE  N31(n) = {  \\ and N23
+  # GP-DEFINE    simplify(
+  # GP-DEFINE    1/2*(
+  # GP-DEFINE      -3 + (4+sqrt17)/sqrt17 * ((1+sqrt17)/2)^n
+  # GP-DEFINE         - (4-sqrt17)/sqrt17 * ((1-sqrt17)/2)^n
+  # GP-DEFINE    ));
+  # GP-DEFINE  }
+  # vector(11,n,N31(n))
+  # not in OEIS: 1, 5, 15, 41, 107, 277, 711, 1825, 4675, 11981, 30687
+  #
+  # GP-DEFINE  N21(n) = {  \\ and N32
+  # GP-DEFINE    simplify(
+  # GP-DEFINE      -5/4 - (21-5*sqrt17)/(8*sqrt17) * ((1-sqrt17)/2)^n
+  # GP-DEFINE           + (21+5*sqrt17)/(8*sqrt17) * ((1+sqrt17)/2)^n
+  # GP-DEFINE    );
+  # GP-DEFINE  }
+  # vector(11,n,N21(n))
+  # not in OEIS: 2, 7, 20, 53, 138, 355, 912, 2337, 5990, 15343, 39308
+  #
+  # GP-DEFINE  N13(n) = {  \\ and N32
+  # GP-DEFINE    simplify(
+  # GP-DEFINE      -1/2 - (5-sqrt17)/(4*sqrt17) * ((1-sqrt17)/2)^n
+  # GP-DEFINE           + (5+sqrt17)/(4*sqrt17) * ((1+sqrt17)/2)^n
+  # GP-DEFINE    );
+  # GP-DEFINE  }
+  # vector(11,n,n--; N13(n))
+  # 1, 3, 9, 23, 61, 155, 401, 1023, 2629, 6723, 17241
+  # A026599
+
+
+  exit 0;
+}
+{
+  require MyATT;
+  require FLAT;
+  require MyFLAT;
+  {
+    my $att = MyATT->read_file('/tmp/trip.att');
+    my $f = $att->as_FLAT(transducer=>1);
+    $f->MyFLAT::view;
+  }
+  {
+    my $att = MyATT->read_file('/tmp/trip-rev.att');
+    my $f = $att->as_FLAT(transducer=>1);
+    $f->MyFLAT::view;
+  }
+  exit 0;
+}
+
+{
+  require MyFSM;
+  my @table = ([0,0],
+               [1,2],
+               [1,3],
+               [4,5],
+               [1,5],
+               [4,3] );
+  my $fsm = MyFSM->new(table_aref => \@table,
+                       initial => '1',
+                       accepting => { 1=>1, 2=>2, 3=>3, 4=>4, 5=>5 },
+                       flow => 'east',
+                      );
+  $fsm->simplify (verbose => 1);
+  $fsm = $fsm->reverse;
+  $fsm->view;
+  exit 0;
+}
 
 {
   # Hanoi spindles=3, any
@@ -60,13 +192,13 @@ use Smart::Comments;
   #   discs=2  https://hog.grinvin.org/ViewGraphInfo.action?id=21152
   #
   my @graphs;
-  foreach my $N (4) {
-    my $spindles = 3;
+  foreach my $N (3) {
+    my $spindles = 5;
     my $graph = Graph::Maker->new('hanoi',
                                   discs => $N,
                                   spindles => $spindles,
                                   # adjacency => 'cyclic',
-                                  vertex_names => 'digits',
+                                  # vertex_names => 'digits',
                                   # adjacency => 'star',
                                   # adjacency => 'linear',
                                   undirected => 1,
@@ -134,6 +266,59 @@ use Smart::Comments;
   }
 
 }
+{
+  # l=List([]); \
+  # my(limit=100); \
+  # for(a=0,limit, \
+  #   my(t=2^a); \
+  #   if(t>limit,break); \
+  #   for(b=0,limit, \
+  #     my(t=t*3^b); \
+  #     if(t>limit,break); \
+  #     listput(l,t))); \
+  # v=vecsort(Vec(l))
+  # A003586 3-smooth 2^i*3^j with i,j >= 0.
+  #
+  # s=v;for(i=2,#s,s[i]+=s[i-1]); s
+  # A259823 a(0)=0, a(1)=1, a(n)=min{3 a(k) + 2^(n-k)-1, k=0..(n-1)} for n>=2.
+  #
+  # S(N) = if(N==0,0, N==1,1, \
+  #          vecmin(vector(N-1,M, 2*S(M) + 1/2*(3^(N-M) - 1))));
+  # moves(N) = 2*S(N);
+  # vector(10,n, S(n))
+  # vector(10,n, moves(n))
+  # A291876 = moves outer to outer
+  # 
+  # A291877 = moves outer to outer
+
+  exit 0;
+}
+{
+  # Yefim Dinitz, Shay Solomon
+  # Optimality of an Algorithm Solving the K-Relaxed Hanoi Towers Problem
+  # https://www.cs.bgu.ac.il/~dinitz/Course/SS-12/BottleneckP.pdf
+  
+  # GP-DEFINE  read("memoize.gp");
+  # GP-DEFINE  relaxed_b(k,r) = if(r<=k, r, 2*relaxed_b(k,r-k) + k);
+  # GP-DEFINE  relaxed_b = memoize(relaxed_b);
+  # GP-DEFINE  relaxed(k,r) = 2*relaxed_b(k,r-1) + 1;
+  # GP-Test  vector(10,r, relaxed(1,r)) == \
+  # GP-Test  vector(10,r, 2^r-1)
+  #
+  # k=2
+  # A136252
+  # recurrence_guess(vector(50,r, relaxed(2,r)))
+  # vector_modulo([4, 6],n) * 2^floor(n/2) - 3
+  # vector(10,r, 2^r-1)
+  #
+  # k=3
+  # not in OEIS: 1, 3, 5, 7, 11, 15, 19, 27, 35, 43, 59
+  # recurrence_guess(vector(50,r, relaxed(3,r)))
+  # vector_modulo([6, 8, 10],n) * 2^floor(n/3) - 5
+  exit 0;
+}
+
+
 {
   # permutations
   #                 0                                      0

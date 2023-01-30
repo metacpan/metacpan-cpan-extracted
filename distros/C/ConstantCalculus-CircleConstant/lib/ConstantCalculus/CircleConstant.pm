@@ -1,7 +1,7 @@
 package ConstantCalculus::CircleConstant;
 
 # Set the VERSION.
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 # Load the Perl pragmas.
 use 5.008009;
@@ -12,7 +12,7 @@ use warnings;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
 use Exporter 'import';
 
-# Base class of this (tron_addr) module.
+# Base class of this module.
 our @ISA = qw(Exporter);
 
 # Exporting the implemented subroutine.
@@ -31,7 +31,7 @@ our @EXPORT = qw(
     $PI_HEX
 );
 
-# Exporting the multiply and divide  routine on demand basis.
+# Exporting subroutines on demand basis.
 @EXPORT_OK = qw(
     factorial
     sqrtroot
@@ -79,7 +79,7 @@ sub modexp {
     my $y = 1;
     # Perfom the modular exponentiation. 
     do {
-        ($y *= $b) %= $m if $e % 2;
+        ($y *= $b) %= $m if ($e % 2);
         ($b *= $b) %= $m;
     } while ($e = ($e/2) - (($e/2) % 1));
     # Return the result of the modular exponentiation.
@@ -108,9 +108,9 @@ sub sqrtroot {
     while ($run == 1) {
         # Calculate the approximation.
         $y -= ($y * $y - $x) / (2 * $y);
-        # Check termination criterion.
+        # Check the exit condition.
         $run = ($y0 == $y ? 0 : 1);
-        # Store the approximation.
+        # Save the approximation.
         $y0 = $y;
         # Increment the running variable.
         $i++; 
@@ -216,14 +216,14 @@ sub S {
     my ($j, $n, $p) = @_;
     # Set the precision for bignum.
     bignum -> precision(-$p);
-    # Initialise the variables for the left sum as well as the right sum.
-    my ($l, $r) = (0, 0);
-    # Initialise the variables for the total sum.
+    # Initialise the local variables.
     my $sum = 0;
-    # Initialise the variable for the denominator.
+    my $l = 0;
+    my $r = 0;
     my $d = 0;
-    # Initialise the loop counter.
     my $k = 0;
+    my $r0 = 0;
+    my $run = 1;
     # Calculate the left sum.
     while ($k <= $n) {
         # Calculate the value of the denominator.
@@ -233,12 +233,8 @@ sub S {
         # Increment the loop counter $k.
         $k += 1;
     };
-    # Initialise the variables for the right sum calculation.
-    my $r0 = 0;
-    # Reinitialise the loop counter.
+    # Reset the loop counter.
     $k = $n + 1;
-    # Initialise the run variable.
-    my $run = 1;
     # Calculate the right sum.
     while ($run == 1) {
         # Calculate the value of the denominator.
@@ -271,7 +267,7 @@ sub bbp_digit {
     # Calculate the fraction with the hex numbers from the nth digit upwards.
     my $dec = (4*S(1, $n, $p) - 2*S(4, $n, $p) -
                S(5, $n, $p) - S(6, $n, $p)) % 1;
-    # Get the decimal representation of the digit..
+    # Get the decimal representation of the digit.
     $dec = ($dec * 16) - ($dec * 16) % 1;
     # Get the hexadecimal representation of the digit. 
     my $hex = $HX[$dec];
@@ -487,7 +483,7 @@ sub chudnovsky_caller {
 };
 
 # ---------------------------------------------------------------------------- #
-# Subroutine borwein1989_caller()                                              #
+# Subroutine borwein25_caller()                                                #
 # ---------------------------------------------------------------------------- #
 sub borwein25_caller {
     # Assign the subroutine arguments to the local variables.
@@ -688,19 +684,19 @@ Calculate the value of the circle constant C<Tau>:
   ]);
   print $tau . "\n";
 
-Use BBP for calculation w.r.t. C<Pi>:
+Use BBP for calculation with respect to C<Pi>:
 
   # Print the nth hexadecimal digit of Pi.
   my $nth = 1;
-  print bbp_digit($nth, 14);
+  print bbp_digit($nth, 14);  # Use precision 14
 
   # Print the nth hexadecimal digit of Pi upwards.
   my $nth = 1;
-  print bbp_digits($nth, 32, 128);
+  print bbp_digits($nth, 32, 128);  # Output 32 digits and use precision 128
 
   # Print Pi using BBP.
   my $places = 1;
-  print bbp_algorithm($places, 14);
+  print bbp_algorithm($places, 14); # Use precision 14
 
 Use predefined values of Pi and Tau.
 
@@ -932,37 +928,69 @@ of places.
    
 =head3 chudnovsky_algorithm()
 
+Implementation of the Chudnovsky formula.
+
 =head3 borwein25_algorithm()
 
-=head3 chudnovsky()   
+Implementation of the Borwein 25 formula.
 
 =head3 pi_borwein25()
 
+Calculate Pi with the Borwein 25 algorithm.
+
 =head3 tau_borwein25()
+
+Calculate Tau with the Borwein 25 algorithm.
 
 =head3 pi_chudnovsky()
 
+Calculate Pi with the Chudnovsky algorithm.
+
 =head3 tau_chudnovsky()
+
+Calculate Tau with the Chudnovsky algorithm.
 
 =head3 bbp_algorithm()
 
+Apply the BBP algorithm.
+
 =head3 bbp_digits()
+
+Calculate as much as possible hexadecimal digits.
 
 =head3 bbp_digit()
 
+Calculate one hexadecimal digit.
+
 =head3 S()
+
+Calculate the S terms of the BBP algorithm
 
 =head2 Other Methods
 
 =head3 factorial()
 
+The subroutine calculates the factorial of given number.
+
 =head3 sqrtroot()
+
+The subroutine calculates the square root of given number.
 
 =head3 modexp()
 
+The subroutine returns the result of a modular exponentiation. A modular 
+exponentiation is an exponentiation applied over a modulus. The result
+of the modular exponentiation is the remainder when an integer b (base) 
+is exponentiated by e (exponent) and divided by a positive integer m
+(modulus).
+
 =head3 estimate_terms()
 
+Estimates the terms or iterations to get the correct number of place.
+
 =head3 truncate_places()
+
+Truncate the number of places to a given value.
 
 =head1 MODULE EXPORT
 
@@ -973,8 +1001,6 @@ of places.
 =item * chudnovsky_algorithm
 
 =item * borwein25_algorithm
-
-=item * chudnovsky   
 
 =item * pi_borwein25
 

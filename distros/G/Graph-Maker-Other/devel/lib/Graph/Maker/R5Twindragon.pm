@@ -23,7 +23,7 @@ use Graph::Maker;
 use Math::PlanePath::R5DragonCurve 117; # v.117 for level_to_n_range()
 
 use vars '$VERSION','@ISA';
-$VERSION = 18;
+$VERSION = 19;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines

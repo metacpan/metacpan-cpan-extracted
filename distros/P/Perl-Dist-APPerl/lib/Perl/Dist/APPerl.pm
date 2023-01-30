@@ -1,6 +1,6 @@
 package Perl::Dist::APPerl;
 # Copyright (c) 2022 Gavin Hayes, see LICENSE in the root of the project
-use version 0.77; our $VERSION = qv(v0.2.1);
+use version 0.77; our $VERSION = qv(v0.3.0);
 use strict;
 use warnings;
 use JSON::PP 2.0104 qw(decode_json);
@@ -10,6 +10,7 @@ use Data::Dumper qw(Dumper);
 use File::Basename qw(basename dirname);
 use File::Copy qw(copy move cp);
 use FindBin qw();
+use Fcntl qw(SEEK_SET);
 use Getopt::Long qw(GetOptionsFromArray);
 Getopt::Long::Configure qw(gnu_getopt);
 
@@ -693,30 +694,31 @@ my %defconfig = (
             cosmo_id => '9c5a7795add7add5a214afce27d896084e0861c5',
             dest => 'perl-small-vista.com',
         },
-        'full' => { desc => 'moving target: full', base => 'v5.36.0-full-v0.1.0' },
-        'full-vista' => { desc => 'moving target: full for vista', base => 'v5.36.0-full-v0.1.0-vista' },
-        'small' => { desc => 'moving target: small', base => 'v5.36.0-small-v0.1.0' },
-        'small-vista' => { desc => 'moving target: small for vista', base => 'v5.36.0-small-v0.1.0-vista' },
+        'full' => { desc => 'moving target: full', base => 'v5.36.0-full-v0.1.0', perl_id => 'ca87f329eeb075c0fe7ac803eb933f36af45a69b', cosmo_id => 'eb69a42863ef602a951249b801ceed5f74cbb11c', '+perl_extra_flags' => ['-Dprivlib=/zip/lib/perl5', '-Darchlib=/zip/lib/perl5/x86_64-cosmo', '-Dsitelib=/zip/lib/perl5/site_perl', '-Dsitearch=/zip/lib/perl5/site_perl/x86_64-cosmo']},
+        'full-vista' => { desc => 'moving target: full for vista', base => 'v5.36.0-full-v0.1.0-vista', perl_id => 'ca87f329eeb075c0fe7ac803eb933f36af45a69b', cosmo_id => '0740e68ea0e801168a5e354be5ad237a4795549a', '+perl_extra_flags' => ['-Dprivlib=/zip/lib/perl5', '-Darchlib=/zip/lib/perl5/x86_64-cosmo', '-Dsitelib=/zip/lib/perl5/site_perl', '-Dsitearch=/zip/lib/perl5/site_perl/x86_64-cosmo']},
+        'small' => { desc => 'moving target: small', base => 'v5.36.0-small-v0.1.0', perl_id => 'ca87f329eeb075c0fe7ac803eb933f36af45a69b', cosmo_id => 'eb69a42863ef602a951249b801ceed5f74cbb11c', '+perl_extra_flags' => ['-Dprivlib=/zip/lib/perl5', '-Darchlib=/zip/lib/perl5/x86_64-cosmo', '-Dsitelib=/zip/lib/perl5/site_perl', '-Dsitearch=/zip/lib/perl5/site_perl/x86_64-cosmo']},
+        'small-vista' => { desc => 'moving target: small for vista', base => 'v5.36.0-small-v0.1.0-vista', perl_id => 'ca87f329eeb075c0fe7ac803eb933f36af45a69b', cosmo_id => '0740e68ea0e801168a5e354be5ad237a4795549a', '+perl_extra_flags' => ['-Dprivlib=/zip/lib/perl5', '-Darchlib=/zip/lib/perl5/x86_64-cosmo', '-Dsitelib=/zip/lib/perl5/site_perl', '-Dsitearch=/zip/lib/perl5/site_perl/x86_64-cosmo']},
         # development configs
+        'dbg' => { base => 'full', perl_extra_flags => ['-Doptimize=-g3 -gdwarf-4', '-de'], cosmo_mode => 'dbg', cosmo_id => '52f1db7220935cfcf2c8e583678f5ccc4b5bbacd'},
         dontuse_threads => {
             desc => "not recommended, threaded build is buggy",
-            base => 'v5.36.0-full-v0.1.0',
+            base => 'full',
             perl_extra_flags => ['-Doptimize=-Os', '-Dusethreads', '-de'],
             perl_id => 'cosmo-apperl'
         },
         perl_cosmo_dev => {
             desc => "For developing cosmo platform perl without apperl additions",
-            base => 'v5.36.0-full-v0.1.0',
+            base => 'full',
             perl_id => 'cosmo'
         },
         perl_cosmo_dev_on_vista => {
             desc => "For developing cosmo platform perl without apperl additions on vista",
             base => "perl_cosmo_dev",
-            cosmo_id => '9c5a7795add7add5a214afce27d896084e0861c5',
+            cosmo_id => '0740e68ea0e801168a5e354be5ad237a4795549a',
         },
         perl_apperl_dev => {
             desc => "For developing apperl",
-            base => 'v5.36.0-full-v0.1.0',
+            base => 'full',
             perl_id => 'cosmo-apperl'
         }
     }
@@ -897,7 +899,7 @@ sub Set {
         chdir($SiteConfig->{perl_repo}) or die "Failed to enter perl repo";
         print "make veryclean\n";
         system("make", "veryclean");
-        foreach my $todelete ('miniperl.com', 'perl.com', 'miniperl.elf', 'perl.elf') {
+        foreach my $todelete ('miniperl.com', 'perl.com', 'miniperl.elf', 'miniperl.com.dbg', 'perl.elf', 'perl.com.dbg') {
             print "rm $todelete\n";
             unlink($todelete) || $!{ENOENT} or die "failed to delete $todelete";
         }
@@ -964,9 +966,10 @@ sub Configure {
 }
 
 sub _fix_bases {
-    my ($in, $PERL_VERSION, $PERL_ARCHNAME) = @_;
-    $in =~ s/^__perllib__/lib\/perl5\/$PERL_VERSION/;
-    $in =~ s/^__perlarchlib__/lib\/perl5\/$PERL_VERSION\/$PERL_ARCHNAME/;
+    my ($in, $aliasmap) = @_;
+    foreach my $key (keys %{$aliasmap}) {
+        $in =~ s/^$key/$aliasmap->{$key}/;
+    }
     return $in;
 }
 
@@ -991,6 +994,7 @@ sub Build {
     my $UserProjectConfig = _load_valid_user_project_config_with_default($Configs) or die "cannot Build without valid UserProjectConfig";
     my $CurAPPerlName = $UserProjectConfig->{current_apperl};
     my $itemconfig = _load_apperl_config($Configs->{apperl_configs}, $CurAPPerlName);
+    my $startdir = abs_path('./');
 
     my $PERL_APE;
     my @perl_config_cmd;
@@ -1021,18 +1025,26 @@ sub Build {
     my $TEMPDIR = "$OUTPUTDIR/tmp";
     print "mkdir -p $TEMPDIR\n";
     make_path($TEMPDIR);
-    my $PERL_PREFIX = _cmdoutput_or_die(@perl_config_cmd, '-e', 'use Config; print $Config{prefix}');
-    my $PREFIX_NOZIP = $PERL_PREFIX;
-    $PREFIX_NOZIP =~ s/^\/zip\/*//;
-    my $PERL_VERSION = _cmdoutput_or_die(@perl_config_cmd, '-e', 'use Config; print $Config{version}');
-    my $PERL_ARCHNAME = _cmdoutput_or_die(@perl_config_cmd, '-e', 'use Config; print $Config{archname}');
-    my @zipfiles = map { "$PREFIX_NOZIP"._fix_bases($_, $PERL_VERSION, $PERL_ARCHNAME) } @{$itemconfig->{MANIFEST}};
-    my $ZIP_ROOT = "$TEMPDIR/zip";
+    my %proxyConfig;
+    foreach my $item (qw(prefix version archname cc installprivlib installarchlib installsitelib installsitearch installprefixexp installbin installman1dir installman3dir)) {
+        $proxyConfig{$item} = _cmdoutput_or_die(@perl_config_cmd, '-e', "use Config; print \$Config{$item}");
+    }
+    my %aliasmap = (
+        '__perllib__' => $proxyConfig{installprivlib},
+        '__perlarchlib__' => $proxyConfig{installarchlib},
+        '__sitelib__' => $proxyConfig{installsitelib},
+        '__sitearchlib__' => $proxyConfig{installsitearch}
+    );
+    foreach my $libdir (keys %aliasmap) {
+        $aliasmap{$libdir} =~ s/$proxyConfig{installprefixexp}\///;
+    }
+    my @zipfiles = map { _fix_bases($_, \%aliasmap) } @{$itemconfig->{MANIFEST}};
+    my $ZIP_ROOT = "$TEMPDIR$proxyConfig{installprefixexp}";
 
     # install cosmo perl if this isn't a nobuild config
     if(! exists $UserProjectConfig->{nobuild_perl_bin}){
         _command_or_die('make', "DESTDIR=$TEMPDIR", 'install');
-        my @toremove = ("$TEMPDIR$PERL_PREFIX/bin/perl", "$TEMPDIR$PERL_PREFIX/bin/perl$PERL_VERSION");
+        my @toremove = ("$TEMPDIR$proxyConfig{installbin}/perl", "$TEMPDIR$proxyConfig{installbin}/perl$proxyConfig{version}");
         print 'rm '.join(' ', @toremove)."\n";
         unlink(@toremove) == scalar(@toremove) or die "Failed to unlink some files";
     }
@@ -1040,34 +1052,163 @@ sub Build {
         make_path($ZIP_ROOT);
     }
 
-    # pack
-    my $APPNAME = basename($PERL_APE);
-    my $APPPATH = "$TEMPDIR/$APPNAME";
-    print "cp $PERL_APE $APPPATH\n";
-    copy($PERL_APE, $APPPATH) or die "copy failed: $!";
-    print "chmod 755 $APPPATH\n";
-    chmod(0755, $APPPATH) or die $!;
-    if((! exists $UserProjectConfig->{nobuild_perl_bin}) || scalar(keys %{$itemconfig->{zip_extra_files}})) {
-        print "cd $ZIP_ROOT\n";
-        chdir($ZIP_ROOT) or die "failed to enter ziproot";
-        foreach my $destkey (keys %{$itemconfig->{zip_extra_files}}) {
-            my $dest = _fix_bases($destkey, $PERL_VERSION, $PERL_ARCHNAME);
-            foreach my $file (@{$itemconfig->{zip_extra_files}{$destkey}}) {
-                _copy_recursive($file, $dest);
-            }
+    # add zip_extra_files to the tree
+    foreach my $destkey (keys %{$itemconfig->{zip_extra_files}}) {
+        my $dest = "$ZIP_ROOT/"._fix_bases($destkey, \%aliasmap);
+        foreach my $file (@{$itemconfig->{zip_extra_files}{$destkey}}) {
+            _copy_recursive($file, $dest);
         }
-        _command_or_die($zippath // _find_zip(), '-r', $APPPATH, @zipfiles);
     }
-    print "mv $APPPATH $OUTPUTDIR/perl.com\n";
-    move($APPPATH, "$OUTPUTDIR/perl.com") or die "move failed: $!";
+
+    # pack
+    my $APPPATH = "$TEMPDIR/".basename($PERL_APE);
+    my $packAPE = sub {
+        my $copyexe = sub {
+            my ($srcpath, $destpath) = @_;
+            print "cp $srcpath $destpath\n";
+            copy($srcpath, $destpath) or die "copy failed: $!";
+            print "chmod 755 $destpath\n";
+            chmod(0755, $destpath) or die $!;
+        };
+        $copyexe->($PERL_APE, $APPPATH);
+        my $srcdbg = "$PERL_APE.dbg";
+        for(1..2) {
+            if(-f $srcdbg) {
+                $copyexe->($srcdbg, "$APPPATH.dbg");
+                last;
+            }
+            $srcdbg = $PERL_APE;
+            $srcdbg =~ s/com$/elf/;
+        }
+        if((! exists $UserProjectConfig->{nobuild_perl_bin}) || scalar(keys %{$itemconfig->{zip_extra_files}})) {
+            print "cd $ZIP_ROOT\n";
+            chdir($ZIP_ROOT) or die "failed to enter ziproot";
+            _command_or_die($zippath // _find_zip(), '-r', $APPPATH, @zipfiles);
+        }
+    };
+    $packAPE->();
+
+    # install modules
+    if(exists $itemconfig->{install_modules}) {
+        my $perlman1 = "$TEMPDIR$proxyConfig{installman1dir}";
+        my $perlman3 = "$TEMPDIR$proxyConfig{installman3dir}";
+        my $perlbin = "$TEMPDIR$proxyConfig{installbin}";
+        my $perllib = "$TEMPDIR$proxyConfig{installprivlib}";
+        my $perlarchlib = "$TEMPDIR$proxyConfig{installarchlib}";
+        my $mmopt = sub {
+            my @mmopt = ("PERL_LIB=$perllib", "PERL_ARCHLIB=$perlarchlib", "MAP_TARGET=perl.com.dbg",
+                "INSTALLDIRS=perl",
+                "INSTALLARCHLIB=$perlarchlib",
+                "INSTALLPRIVLIB=$perllib",
+                "INSTALLBIN=$perlbin",
+                "INSTALLSCRIPT=$perlbin",
+                "INSTALLMAN1DIR=$perlman1",
+                "INSTALLMAN3DIR=$perlman3"
+            );
+            my $str;
+            $str .= qq["$_" ] foreach @mmopt;
+            chop $str;
+            return $str;
+        }->();
+        my $mbopt = sub {
+            my %mbinstall_path = (
+                lib => $perllib,
+                arch => $perlarchlib,
+                script => $perlbin,
+                bin => $perlbin,
+                bindoc => $perlman1,
+                libdoc => $perlman3
+            );
+            my $mbopt;
+            foreach my $key (keys %mbinstall_path) {
+                $mbopt .= qq[--install_path $key=$mbinstall_path{$key} ];
+            };
+            chop $mbopt;
+            return $mbopt;
+        }->();
+        local $ENV{PERL_MB_OPT} = $mbopt;
+        local $ENV{PERL_MM_OPT} = $mmopt;
+        local $ENV{PERL5LIB} = $perllib;
+        local $ENV{PERL_LOCAL_LIB_ROOT} = '';
+        foreach my $module (@{$itemconfig->{install_modules}}) {
+            my $modulepath = "$startdir/$module";
+            if(-d $modulepath) {
+                _copy_recursive($modulepath, $TEMPDIR);
+                $modulepath = "$TEMPDIR/".basename($modulepath);
+            }
+            elsif( -f _) {
+                _command_or_die('tar', 'xvf', $modulepath, '-C', $TEMPDIR);
+                $modulepath = "$TEMPDIR/".basename($modulepath);
+                $modulepath =~ s/\.tar.*$//;
+            }
+            else {
+                die "Module must be a directory or tarball";
+            }
+
+            print "cd $modulepath\n";
+            chdir($modulepath) or die "Failed to enter module dir";
+            # Module::Build (including installing Module::Build)
+            # Beware, Module::Build has no support for relinking the Perl binary like EU::MM - https://rt.cpan.org/Public/Bug/Display.html?id=47282
+            if(-f 'Build.PL') {
+                _command_or_die($APPPATH, 'Build.PL');
+                _command_or_die($APPPATH, 'Build');
+                _command_or_die($APPPATH, 'Build', 'install');
+            }
+            # ExtUtils::MakeMaker
+            elsif( -f 'Makefile.PL') {
+                # build
+                _command_or_die($APPPATH, 'Makefile.PL');
+                _command_or_die('make');
+                # install into the src tree
+                _command_or_die('make', 'install');
+                # build a new perl binary, convert to APE, and repack zip
+                _command_or_die('make', 'perl.com.dbg');
+                _command_or_die(dirname($proxyConfig{cc})."/x86_64-linux-musl-objcopy", '-S', '-O', 'binary', 'perl.com.dbg', 'perl.com');
+                $PERL_APE = abs_path('./perl.com');
+            }
+            else {
+                die "No Makefile.PL or Build.PL found, unable to install module";
+            }
+            $packAPE->();
+        }
+    }
+
+    # patch default script
+    if(exists $itemconfig->{default_script}) {
+        length($itemconfig->{default_script}) <= 255 or die "default script path is too long";
+        open(my $fh, '+<:raw', $APPPATH) or die "$!";
+        my $fsize = (stat($fh))[7];
+        my $bread = read($fh, my $outdata, $fsize);
+        $bread && $bread == $fsize or die "failed to read full file $APPPATH";
+        my $sentinel = "APPERL_DEFAULT_SCRIPT";
+        my $sentinelpos = index($outdata, $sentinel);
+        $sentinelpos != -1 or die "Failed to find APPERL_DEFAULT_SCRIPT, is this an old APPerl binary?";
+        print "patching default script at " . ($sentinelpos+length($sentinel)+1) . "\n";
+        seek($fh, $sentinelpos+length($sentinel)+1, SEEK_SET) or die "$!";
+        print $fh $itemconfig->{default_script}."\0" or die "$!";
+        close($fh);
+    }
+
+    foreach my $file ('perl.com', 'perl.com.dbg') {
+        my $srcpath = "$TEMPDIR/$file";
+        -e $srcpath or next;
+        my $destpath = "$OUTPUTDIR/$file";
+        print "mv $srcpath $destpath\n";
+        move($srcpath, $destpath) or die "move failed: $!";
+    }
 
     # copy to user specified location
     if(exists $itemconfig->{dest}) {
         print "cd ".START_WD."\n";
         chdir(START_WD) or die "Failed to restore cwd";
-        my @args = ("$UserProjectConfig->{apperl_output}/$CurAPPerlName/perl.com", $itemconfig->{dest});
-        print 'cp '.join(' ', @args)."\n";
-        cp(@args) or die "copy failed: $!";
+        foreach my $srcfile ('perl.com', 'perl.com.dbg') {
+            my $destfile = $itemconfig->{dest};
+            $destfile .= '.dbg' if ($srcfile =~ /dbg$/);
+            my @args = ("$UserProjectConfig->{apperl_output}/$CurAPPerlName/$srcfile", $destfile);
+            -e $args[0] or next;
+            print 'cp '.join(' ', @args)."\n";
+            cp(@args) or die "copy failed: $!";
+        }
     }
 }
 
@@ -1211,6 +1352,7 @@ END_USAGE
     else {
         die($generic_usage);
     }
+    1;
 }
 
 sub _command_or_die {
@@ -1279,7 +1421,7 @@ sub _load_apperl_config {
             if($key =~ /^(\+|\-)(.+)/) {
                 my $append = $1 eq '+';
                 my $realkey = $2;
-                exists $itemconfig{$realkey} or die("cannot append without existing key");
+                exists $itemconfig{$realkey} or die "cannot append without existing key: $realkey";
                 my $rtype = ref($itemconfig{$realkey});
                 $rtype or die("not ref");
                 if($append) {
@@ -1314,8 +1456,8 @@ sub _load_apperl_config {
     foreach my $destdir (keys %{$itemconfig{zip_extra_files}}) {
         foreach my $path (@{$itemconfig{zip_extra_files}{$destdir}}) {
             $path = abs_path($path);
-            $path or die;
-            -e $path or die("missing file $path");
+            $path or die "zip_extra_files: check that all files exist for destdir: $destdir";
+            -e $path or die "zip_extra_files: missing file $path";
         }
     }
 
@@ -1324,7 +1466,13 @@ sub _load_apperl_config {
         my $thispath = abs_path(__FILE__);
         defined($thispath) or die(__FILE__.'issues?');
         push @{$itemconfig{zip_extra_files}{"__perllib__/Perl/Dist"}}, $thispath;
-        my @additionalfiles = map { "$FindBin::Bin/$_" } ('apperlm');
+        my $apperlm = $0;
+        if(basename($0) ne 'apperlm') {
+            $apperlm = dirname($thispath)."/../../../script/apperlm";
+        }
+        $apperlm = abs_path($apperlm);
+        defined($apperlm) or die "error getting path to apperlm";
+        my @additionalfiles = ($apperlm);
         -e $_ or die("$_ $!") foreach @additionalfiles;
         push @{$itemconfig{zip_extra_files}{bin}}, @additionalfiles;
     }
@@ -1465,7 +1613,7 @@ To start an APPerl project from an existing APPerl and build it:
 To start an APPerl project and build from scratch:
 
     apperlm install-build-deps
-    apperlm init --name your_config_name --base v5.36.0-small-v0.1.0
+    apperlm init --name your_config_name --base small
     apperlm configure
     apperlm build
 
@@ -1550,29 +1698,56 @@ the current environment.
 For the most part, APPerl works like normal perl, however it has a
 couple additional features.
 
+=head2 EMBEDDED SCRIPTS
+
+The APPerl binary is also a ZIP file. Paths starting with C</zip/>
+refer to files compressed in the binary itself. At runtime the zip
+filesystem is readonly, but additional modules and scripts can be added
+just by adding them to the zip file. For example, perldoc and the other
+standard scripts are shipped inside of C</zip/bin>
+
+  ./perl.com /zip/bin/perldoc perlcosmo
+
+For convenience, APPerl has some other ways of invoking embedded
+scripts:
+
 =over 4
 
 =item *
 
-C</zip/> filesystem - The APPerl binary is also a ZIP file. Paths
-starting with C</zip/> refer to files compressed in the binary itself.
-At runtime the zip filesystem is readonly, but additional modules and
-scripts can be added just by adding them to the zip file. For example,
-perldoc and the other standard scripts are shipped inside of /zip/bin
+C<APPERL_SCRIPTNAME> - When the environment variable C<APPERL_SCRIPTNAME>
+is set, APPerl attempts to load the basename of C<APPERL_SCRIPTNAME>
+without file extension from C</zip/bin> or opens the perl interpreter
+like normal if it is C<perl>.
 
-  ./perl.com /zip/bin/perldoc perlcosmo
+  APPERL_SCRIPTNAME=perldoc ./perl.com perlcosmo
 
 =item *
 
-C<argv[0]> script execution - this allows making single binary perl
-applications! APPerl built with the APPerl additions
-(found in cosmo-apperl branches) attempts to load the argv[0] basename
-without extension from /zip/bin
+C<argv[0]> - If C<APPERL_SCRIPTNAME> is not set, APPerl attempts to
+load the basename of C<argv[0]> without file extension from C</zip/bin>
+or opens the perl interpreter like normal if it is C<perl>. This
+enables making single binary perl applications, with a symlink, move,
+or copy!
 
   ln -s perl.com perldoc.com
   ./perldoc.com perlcosmo
 
+=item *
+
+C<APPERL_DEFAULT_SCRIPT> - If C<argv[0]> doesn't yield a valid target
+either, if the C<APPERL_DEFAULT_SCRIPT> field inside of the binary
+is set, APPerl will attempt to load that. This way is meant for APPerl
+application authors to protect against accidental rename messing up
+C<argv[0]> script execution. L</BUILDING AN APPLICATION FROM EXISTING APPERL>
+shows how to set it with C<"default_script">, but you could also
+set/change it, by searching for C<APPERL_DEFAULT_SCRIPT> in a hex
+editor and modifying it.
+
 =back
+
+If a valid target is not found via the script execution methods, the
+perl interpreter is invoked like normal.
 
 =head1 CREATING APPLICATIONS WITH APPERL
 
@@ -1636,42 +1811,86 @@ Rebuild and try loading the newly added script
 
 You have embedded a script inside APPerl, however running it is a
 little awkward. What if you could run it by the name of the script?
+APPerl has argv[0] script execution, enabling the following:
 
   ln -s perl.com hello
   ./hello
 
-More details on the argv[0] script execution is in L</USAGE>. Now,
-what about Perl modules? Perl modules can be packed in the same way,
-but to ease setting the correct directory to packing them into, the
-magic prefix __perllib__ can be used in the destination. Note, you may
-have to add items to the MANIFEST key if the MANIFEST isn't set
+Now, you may still wish for your application to be run, even if the
+executable is renamed. Add C<default_script> to your config to set a
+fallback script:
+
+  "default_script" : "/zip/bin/hello"
+
+Now, what about Perl modules? Perl modules can be packed in the same
+way, but to ease setting the correct directory to packing them into,
+the magic prefix __perllib__ can be used in the destination. Note, you
+may have to add items to the MANIFEST key if the MANIFEST isn't set
 permissively already.
 
   "zip_extra_files" : { "__perllib__/Your" : ["Module.pm"] }
 
 =head2 BUILDING AN APPLICATION FROM SCRATCH
 
-If your application requires non-standard C or XS extensions, APPerl
-must be built from scratch as it does not support dynamic libraries,
-only static linking. Note, this process can only be completed on
-Linux as building the Cosmopolitan Libc from scratch is only supported
-on Linux and APPerl uses the unix-like C<Configure> to configure perl.
-This tutorial assumes you already have an APPerl project, possibly from
-following the L</BUILDING AN APPLICATION FROM EXISTING APPERL> tutorial.
+If your application requires non-standard C or XS extensions, or you
+would like to install CPAN distributions through their standard
+mechanisms (C<Makefile.PL> or C<Build.PL>), APPerl must be built from
+scratch as it only supports static linking and installing distributions
+may require adding in extensions. Note, this process can only be
+completed on Linux as building the Cosmopolitan Libc from scratch is
+only supported on Linux and APPerl uses the unix-like C<Configure> to
+configure perl. This tutorial assumes you already have an APPerl
+project, possibly from following the L</BUILDING AN APPLICATION FROM EXISTING APPERL>
+tutorial.
 
 First install the APPerl build dependencies and create a new config
-based on the current small config, checkout, configure, and build.
+based on the current full config, checkout, configure, and build.
 
   apperlm install-build-deps
-  apperlm new-config --name my_src_build_config --base v5.36.0-small-v0.1.0
+  apperlm new-config --name my_src_build_config --base full
   apperlm checkout my_src_build_config
   apperlm configure
   apperlm build
 
 If all goes well you should have compiled APPerl from source!
 
-  ./perl-small.com -V
-  stat perl-small.com
+  ./perl.com -V
+  stat perl.com
+
+=head3 ADDING CPAN DISTRIBUTIONS
+
+The recommended way of adding CPAN distributions or C or XS extensions
+is via the C<"install_modules"> mechanism.
+
+Currently, no CPAN client is used, so you must download or make
+available or disk otherwise the needed distributions for C<apperlm>
+to be able to build and install them into your APPerl. It supports
+folder paths and paths to tarballs such as the one's directly
+downloaded from CPAN.
+
+For example to install B<Geo::Calc:XS>, download its tarball from CPAN
+and add to to my_src_build_config in apperl-project.json:
+
+  "install_modules" : ["Geo-Calc-XS-0.33.tar.gz"]
+
+Then, build and test it:
+
+  apperlm build
+  ./perl.com -MGeo::Calc::XS -e 'print $Geo::Calc::XS::VERSION'
+
+Distributions in C<"install_modules"> are installed in order, so
+modules with dependencies just need them to be installed before in
+order for them to be added.
+
+=cut
+
+=head3 ADDING VIA PERL BUILD
+
+This method is B<NOT RECOMMENDED> as many modules/extensions cannot be
+built this way, it only works for modules that can be built with
+C<miniperl>, do not have dependencies, and requires reconfiguring Perl.
+The method listed in L</ADDING CPAN DISTRIBUTIONS> supersedes this
+method.
 
 Now let's create a very basic C extension.
 
@@ -1738,6 +1957,26 @@ Build and test it.
 
   apperlm build
   ./helloext.com
+
+=head1 DEBUGGING
+
+APPerl binaries as with other Actually Portable Executables built with
+the Cosmopolitan Libc have some nice debug features:
+
+Syscall logging can be performed just by running with C<--strace> as
+the first argument:
+
+  ./perl.com --strace /zip/bin/perldoc perlcosmo
+
+Function call logging can be performed if you have the accompanying
+C<.com.dbg> file in the same directory as your APPerl binary:
+
+  ./perl.com --ftrace /zip/bin/perldoc perlcosmo
+
+In theory, it should be possible to use C<gdb> with APPerl binaries,
+but the author has had great difficulty getting this to work. The
+C<dbg> APPerl config is available to build Cosmopolitan with C<MODE=dbg>
+and Perl with C<-Doptimize=-g3 -gdwarf-4>.
 
 =head1 SUPPORT AND DOCUMENTATION
 

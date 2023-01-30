@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-use Venus::Role 'with';
+use Venus::Role 'catch', 'error', 'with';
 
 # METHODS
 
@@ -42,7 +42,7 @@ sub reset {
 sub BUILD {
   my ($self, $data) = @_;
 
-  for my $name ($self->META->attrs) {
+  for my $name (@{$self->META->attrs}) {
     my @data = (exists $data->{$name} ? $data->{$name} : ());
 
     # option: default
@@ -54,11 +54,20 @@ sub BUILD {
     # option: require
     option_require($self, $name, @data);
 
+    # option: build
+    @data = option_builder($self, $name, @data) if exists $data->{$name};
+
     # option: coerce
     @data = option_coerce($self, $name, @data) if exists $data->{$name};
 
+    # option: self-coerce
+    @data = option_self_coerce($self, $name, @data) if exists $data->{$name};
+
     # option: check
     option_check($self, $name, @data);
+
+    # option: self-assert
+    option_self_assert($self, $name, @data);
 
     # option: assert
     option_assert($self, $name, @data);
@@ -81,6 +90,9 @@ sub ITEM {
  # option: check
   option_check($self, $name, @data);
 
+  # option: self-assert
+  option_self_assert($self, $name, @data);
+
   # option: assert
   option_assert($self, $name, @data);
 
@@ -99,8 +111,14 @@ sub READ {
   # option: builder
   option_builder($self, $name, @data);
 
+  # option: lazy-builder
+  option_lazy_builder($self, $name, @data);
+
   # option: coerce
   option_coerce($self, $name, @data);
+
+  # option: self-coerce
+  option_self_coerce($self, $name, @data);
 
   # option: reader
   return option_reader($self, $name, @data);
@@ -116,10 +134,16 @@ sub WRITE {
   option_readonly($self, $name, @data);
 
   # option: builder
-  option_builder($self, $name, @data);
+  @data = option_builder($self, $name, @data);
+
+  # option: lazy-builder
+  @data = option_lazy_builder($self, $name, @data);
 
   # option: coerce
   @data = option_coerce($self, $name, @data);
+
+  # option: self-coerce
+  @data = option_self_coerce($self, $name, @data);
 
   # option: writer
   return option_writer($self, $name, @data);
@@ -160,7 +184,7 @@ sub option_assert {
     }
     elsif (length($return)) {
       $assert->name($label);
-      $assert->accept($return)->validate($value);
+      $assert->expression($return)->validate($value);
     }
     else {
       require Venus::Throw;
@@ -183,7 +207,7 @@ sub option_builder {
     my @return = $code->($self, (@data ? @data : $self->{$name}));
     $self->{$name} = $return[0] if @return;
   }
-  return;
+  return @data ? $data[0] : ();
 }
 
 sub option_check {
@@ -219,7 +243,7 @@ sub option_coerce {
       if !Scalar::Util::blessed($value)
       || (Scalar::Util::blessed($value) && !$value->isa($return));
   }
-  return $data[0];
+  return @data ? $data[0] : ();
 }
 
 sub option_default {
@@ -238,6 +262,16 @@ sub option_initial {
     $self->{$name} = $code->($self, @data) if !exists $self->{$name};
   }
   return;
+}
+
+sub option_lazy_builder {
+  my ($self, $name, @data) = @_;
+
+  if (my $code = $self->can("lazy_build_${name}")) {
+    my @return = $code->($self, (@data ? @data : $self->{$name}));
+    $self->{$name} = $return[0] if @return;
+  }
+  return @data ? $data[0] : ();
 }
 
 sub option_reader {
@@ -303,6 +337,31 @@ sub option_require {
     }
   }
   return;
+}
+
+sub option_self_assert {
+  my ($self, $name, @data) = @_;
+
+  if (my $code = $self->can("self_assert_${name}")) {
+    if (my $error = catch {$code->($self, (@data ? $data[0] : $self->{$name}))}) {
+      if (do {require Scalar::Util; Scalar::Util::blessed($error)}) {
+        return $error->isa('Venus::Error') ? $error->throw : die $error;
+      }
+      else {
+        return error {message => $error};
+      }
+    }
+  }
+  return;
+}
+
+sub option_self_coerce {
+  my ($self, $name, @data) = @_;
+
+  if ((my $code = $self->can("self_coerce_${name}")) && (@data || exists $self->{$name})) {
+    return $self->{$name} = $code->($self, @data ? $data[0] : $self->{$name});
+  }
+  return @data ? $data[0] : ();
 }
 
 sub option_trigger {
@@ -545,7 +604,8 @@ This package provides the following features:
 This library provides a mechanism for automatically validating class attributes
 using L<Venus::Assert> based on the return value of the attribute callback. The
 callback should be in the form of C<assert_${name}>, and should return a
-L<Venus::Assert> object or the name of any of its predefined valildations.
+L<Venus::Assert> object or a "validation expression" (string) to be passed to
+the L<Venus::Assert/expression> method.
 
 B<example 1>
 
@@ -634,6 +694,40 @@ B<example 3>
 
   # Exception! (isa Venus::Assert::Error)
 
+B<example 4>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'progress';
+
+  sub assert_progress {
+    return 'number | float';
+  }
+
+  package main;
+
+  my $person = Person->new(
+    progress => 1,
+  );
+
+  # bless({progress => 1}, 'Person')
+
+  # my $person = Person->new(
+  #   progress => 7.89,
+  # );
+
+  # bless({progress => 7.89}, 'Person')
+
+  # my $person = Person->new(
+  #   progress => '1',
+  # );
+
+  # Exception! (isa Venus::Assert::Error)
+
 =back
 
 =over 4
@@ -641,9 +735,10 @@ B<example 3>
 =item building
 
 This library provides a mechanism for automatically building class attributes
-during getting and setting its value, after any default values are processed,
-based on the return value of the attribute callback. The callback should be in
-the form of C<build_${name}>, and is passed any arguments provided.
+on construction, and during getting and setting its value, after any default
+values are processed, based on the return value of the attribute callback. The
+callback should be in the form of C<build_${name}>, and is passed any arguments
+provided.
 
 B<example 1>
 
@@ -677,10 +772,10 @@ B<example 1>
   my $person = Person->new(
     fname => 'elliot',
     lname => 'alderson',
-    email => 'E.ALDERSON@E-CORP.com',
+    email => 'E.ALDERSON@E-CORP.org',
   );
 
-  # bless({fname => 'elliot', lname => 'alderson', ...}, 'Person')
+  # bless({fname => 'Elliot', lname => 'Alderson', ...}, 'Person')
 
   # $person->fname;
 
@@ -692,7 +787,7 @@ B<example 1>
 
   # $person->email;
 
-  # "e.alderson@e-corp.com"
+  # "e.alderson@e-corp.org"
 
 B<example 2>
 
@@ -726,7 +821,7 @@ B<example 2>
   sub build_email {
     my ($self, $value) = @_;
     return lc join '@', (join '.', substr($self->fname, 0, 1), $self->lname),
-      'e-corp.com';
+      'e-corp.org';
   }
 
   package main;
@@ -740,7 +835,102 @@ B<example 2>
 
   # $person->email;
 
-  # "e.alderson@e-corp.com"
+  # "e.alderson@e-corp.org"
+
+B<example 3>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+
+  sub build_fname {
+    my ($self, $value) = @_;
+    return $value ? ucfirst $value : undef;
+  }
+
+  sub coerce_fname {
+    return 'Venus::String';
+  }
+
+  sub build_lname {
+    my ($self, $value) = @_;
+    return $value ? ucfirst $value : undef;
+  }
+
+  sub coerce_lname {
+    return 'Venus::String';
+  }
+
+  package main;
+
+  my $person = Person->new(
+    fname => 'elliot',
+    lname => 'alderson',
+  );
+
+  # bless({
+  #   fname => bless({value => 'Elliot'}, 'Venus::String'),
+  #   lname => bless({value => 'Alderson'}, 'Venus::String')
+  # }, 'Person')
+
+B<example 4>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'email';
+
+  sub build_email {
+    my ($self, $value) = @_;
+    return $value ? lc $value : undef;
+  }
+
+  sub coerce_email {
+    return 'Venus::String';
+  }
+
+  package main;
+
+  my $person = Person->new(
+    email => 'Elliot.Alderson@e-corp.org',
+  );
+
+  # bless({
+  #   email => bless({value => 'elliot.alderson@e-corp.org'}, 'Venus::String'),
+  # }, 'Person')
+
+B<example 5>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'email';
+
+  sub build_email {
+    my ($self, $value) = @_;
+    return $value ? lc $value : undef;
+  }
+
+  sub default_email {
+    return 'NO-REPLY@E-CORP.ORG';
+  }
+
+  package main;
+
+  my $person = Person->new;
+
+  # bless({email => 'no-reply@e-corp.org'}, 'Person')
 
 =back
 
@@ -923,11 +1113,41 @@ B<example 2>
   package main;
 
   my $person = Person->new(
-    email => 'e.alderson@e-corp.com',
+    email => 'e.alderson@e-corp.org',
   );
 
   # bless({
-  #   'email' => bless({'value' => 'e.alderson@e-corp.com'}, 'Venus::String'),
+  #   'email' => bless({'value' => 'e.alderson@e-corp.org'}, 'Venus::String'),
+  # }, 'Person')
+
+B<example 3>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'email';
+
+  sub coerce_email {
+    my ($self, $value) = @_;
+
+    return 'Venus::String';
+  }
+
+  sub default_email {
+    my ($self, $value) = @_;
+
+    return 'no-reply@e-corp.org';
+  }
+
+  package main;
+
+  my $person = Person->new;
+
+  # bless({
+  #   'email' => bless({'value' => 'no-reply@e-corp.org'}, 'Venus::String'),
   # }, 'Person')
 
 =back
@@ -1035,6 +1255,100 @@ B<example 1>
 
 =over 4
 
+=item lazy-building
+
+This library provides a mechanism for automatically building class attributes
+during getting and setting its value, after any default values are processed,
+based on the return value of the attribute callback. The callback should be in
+the form of C<lazy_build_${name}>, and is passed any arguments provided.
+
+B<example 1>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'email';
+
+  sub lazy_build_email {
+    my ($self, $value) = @_;
+    return $value ? lc $value : 'no-reply@e-corp.org';
+  }
+
+  package main;
+
+  my $person = Person->new;
+
+  # bless({}, 'Person')
+
+  # $person->email;
+
+  # "no-reply@e-corp.org"
+
+B<example 2>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'email';
+
+  sub coerce_email {
+    return 'Venus::String';
+  }
+
+  sub lazy_build_email {
+    my ($self, $value) = @_;
+    return $value ? lc $value : 'no-reply@e-corp.org';
+  }
+
+  package main;
+
+  my $person = Person->new;
+
+  # bless({}, 'Person')
+
+  # $person->email;
+
+  # bless({value => 'no-reply@e-corp.org'}, 'Venus::String')
+
+B<example 3>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'email';
+
+  sub default_email {
+    return 'NO-REPLY@E-CORP.ORG';
+  }
+
+  sub lazy_build_email {
+    my ($self, $value) = @_;
+    return $value ? lc $value : undef;
+  }
+
+  package main;
+
+  my $person = Person->new;
+
+  # bless({}, 'Person')
+
+  # $person->email;
+
+  # "no-reply@e-corp.org"
+
+=back
+
+=over 4
+
 =item reading
 
 This library provides a mechanism for hooking into the class attribute reader
@@ -1131,6 +1445,201 @@ B<example 1>
   # $person->lname('alderson');
 
   # "Alderson"
+
+=back
+
+=over 4
+
+=item self-asserting
+
+This library provides a mechanism for automatically validating class attributes
+using the attribute callback provided. The author is resposible for validating
+the state of the attribute and raising an exception when an attribute fails
+validation. The callback should be in the form of C<self_assert_${name}>.
+
+B<example 1>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+
+  sub self_assert_fname {
+    my ($self, $value) = @_;
+    die 'Bad fname' if $value && $value !~ '^[a-zA-Z]';
+  }
+
+  sub self_assert_lname {
+    my ($self, $value) = @_;
+    die 'Bad lname' if $value && $value !~ '^[a-zA-Z]';
+  }
+
+  package main;
+
+  my $person = Person->new(
+    fname => 'Elliot',
+    lname => 'Alderson',
+  );
+
+  # bless({fname => 'Elliot', lname => 'Alderson'}, 'Person')
+
+  # my $person = Person->new(fname => '@ElliotAlderson');
+
+  # Exception! (isa Venus::Error)
+
+B<example 2>
+
+  package Person;
+
+  use Venus::Class 'attr', 'raise', 'with';
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+
+  sub self_assert_fname {
+    my ($self, $value) = @_;
+    raise 'Person::Error::BadFname' if $value && $value !~ '^[a-zA-Z]';
+  }
+
+  sub self_assert_lname {
+    my ($self, $value) = @_;
+    raise 'Person::Error::BadLname' if $value && $value !~ '^[a-zA-Z]';
+  }
+
+  package main;
+
+  my $person = Person->new(
+    fname => 'Elliot',
+    lname => 'Alderson',
+  );
+
+  # bless({fname => 'Elliot', lname => 'Alderson'}, 'Person')
+
+  # my $person = Person->new(lname => '@AldersonElliot');
+
+  # Exception! (isa Person::Error::BadLname, isa Venus::Error)
+
+B<example 3>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+
+  sub self_assert_fname {
+    my ($self, $value) = @_;
+    die $self if $value && $value !~ '^[a-zA-Z]';
+  }
+
+  sub self_assert_lname {
+    my ($self, $value) = @_;
+    die $self if $value && $value !~ '^[a-zA-Z]';
+  }
+
+  package main;
+
+  my $person = Person->new(
+    fname => 'Elliot',
+    lname => 'Alderson',
+  );
+
+  # bless({fname => 'Elliot', lname => 'Alderson'}, 'Person')
+
+  # my $person = Person->new(fname => rand);
+
+  # Exception! (isa Person)
+
+=back
+
+=over 4
+
+=item self-coercing
+
+This library provides a mechanism for automatically coercing class attributes
+using the attribute callback provided. The author is resposible for any
+transformations to the attribute and value. The callback should be in the form
+of C<self_coerce_${name}>.
+
+B<example 1>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+
+  sub self_coerce_fname {
+    my ($self, $value) = @_;
+
+    require Venus::String;
+
+    return Venus::String->new($value || '');
+  }
+
+  sub self_coerce_lname {
+    my ($self, $value) = @_;
+
+    require Venus::String;
+
+    return Venus::String->new($value || '');
+  }
+
+  package main;
+
+  my $person = Person->new(
+    fname => 'Elliot',
+    lname => 'Alderson',
+  );
+
+  # bless({
+  #   fname => bless({value => 'Elliot'}, 'Venus::String'),
+  #   lname => bless({value => 'Alderson'}, 'Venus::String')
+  # }, 'Person')
+
+B<example 2>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'email';
+
+  sub default_email {
+    my ($self, $value) = @_;
+
+    return 'no-reply@e-corp.org';
+  }
+
+  sub self_coerce_email {
+    my ($self, $value) = @_;
+
+    require Venus::String;
+
+    return Venus::String->new($value || '');
+  }
+
+  package main;
+
+  my $person = Person->new;
+
+  # bless({
+  #   'email' => bless({'value' => 'no-reply@e-corp.org'}, 'Venus::String'),
+  # }, 'Person')
 
 =back
 

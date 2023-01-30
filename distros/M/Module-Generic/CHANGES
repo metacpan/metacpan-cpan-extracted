@@ -1,5 +1,9 @@
 Revision history for Perl module Module::Generic
 
+v0.29.4 2023-01-11T06:39:03+0900
+    - Minor improvement in Module::Generic::Exception
+    - Minor improvement in baseinfo()
+
 v0.29.3 2022-12-18T13:03:04+0900
     - Correcting unit test for Module::Generic::Number
 

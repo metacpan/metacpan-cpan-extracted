@@ -1,9 +1,9 @@
 This archive contains the distribution AI-TensorFlow-Libtensorflow,
-version 0.0.4:
+version 0.0.6:
 
   Bindings for Libtensorflow deep learning library
 
-This software is Copyright (c) 2022 by Auto-Parallel Technologies, Inc.
+This software is Copyright (c) 2022-2023 by Auto-Parallel Technologies, Inc.
 
 This is free software, licensed under:
 

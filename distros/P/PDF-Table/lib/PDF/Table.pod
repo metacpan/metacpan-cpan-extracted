@@ -1247,7 +1247,7 @@ The return value is a 3 item list where
 
 =head1 VERSION
 
-1.004
+1.005
 
 =head1 AUTHOR
 
@@ -1261,7 +1261,7 @@ Further development since Ver: 0.12 - Phil Perry
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006 by Daemmon Hughes, portions Copyright 2004 Stone
+Copyright (C) 2006 by Daemmon Hughes, portions Copyright (C) 2004 Stone
 Environmental Inc. (www.stone-env.com) All Rights Reserved.
 
 Copyright (C) 2020-2023 by Phil M Perry.

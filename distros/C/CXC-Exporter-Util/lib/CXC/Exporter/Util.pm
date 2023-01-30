@@ -2,13 +2,16 @@ package CXC::Exporter::Util;
 
 # ABSTRACT: Tagged Based Exporting
 
+use v5.20;
+
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.05';
 
 use Scalar::Util 'reftype';
 use List::Util 1.45 'uniqstr';
+use Import::Into;
 use experimental 'signatures', 'postderef';
 
 use Exporter 'import';
@@ -19,6 +22,8 @@ our %EXPORT_TAGS = (
     utils     => [qw( install_constant_tag install_constant_func )],
 );
 
+our %HOOK;
+
 install_EXPORTS();
 
 sub _croak {
@@ -28,12 +33,14 @@ sub _croak {
 
 sub _EXPORT_TAGS ( $caller = scalar caller ) {
     no strict 'refs';    ## no critic
-    *${ \"${caller}::EXPORT_TAGS" }{HASH} // \%{ *${ \"${caller}::EXPORT_TAGS" } = {} };
+    *${ \"${caller}::EXPORT_TAGS" }{HASH}
+      // \%{ *${ \"${caller}::EXPORT_TAGS" } = {} };
 }
 
 sub _EXPORT_OK ( $caller = scalar caller ) {
     no strict 'refs';    ## no critic
-    *${ \"${caller}::EXPORT_OK" }{ARRAY} // \@{ *${ \"${caller}::EXPORT_OK" } = [] };
+    *${ \"${caller}::EXPORT_OK" }{ARRAY}
+      // \@{ *${ \"${caller}::EXPORT_OK" } = [] };
 }
 
 sub _EXPORT ( $caller = scalar caller ) {
@@ -68,26 +75,186 @@ sub _EXPORT ( $caller = scalar caller ) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 sub install_EXPORTS {
 
-    my $export_tags = ( reftype( $_[0] ) // '' ) eq 'HASH' ? shift : undef;
-    my $caller      = shift // scalar caller;
+    my $export_tags = ( reftype( $_[0] )  // '' ) eq 'HASH' ? shift : undef;
+    my $u_opts      = ( reftype( $_[-1] ) // '' ) eq 'HASH' ? shift : {};
+
+    my %options = (
+        overwrite => 0,
+        all       => 'auto',
+        package   => shift // scalar caller,
+        %$u_opts
+    );
+
     _croak( "too many arguments to INSTALL_EXPORTS" ) if @_;
 
-    my $EXPORT_TAGS = _EXPORT_TAGS( $caller );
+    my $package     = delete $options{package};
+    my $install_all = delete $options{all};
 
-    $EXPORT_TAGS->%* = $export_tags->%*
-      if defined $export_tags;
+    # run hooks.
+    if ( defined( my $hooks = delete $HOOK{$package}{pre} ) ) {
+        $_->() for values $hooks->%*;
+    }
 
-    # Assign the all tag in two steps to avoid the situation
-    # where $EXPORT_TAGS->{all} is created with an undefined value
-    # before running values on $EXPORT_TAGS->%*;
-    my @all = map { $_->@* } values $EXPORT_TAGS->%*;
-    $EXPORT_TAGS->{all} //= \@all;
+    my $EXPORT_TAGS = _EXPORT_TAGS( $package );
 
-    _EXPORT( $caller )->@*    = ( $EXPORT_TAGS->{default} // [] )->@*;
-    _EXPORT_OK( $caller )->@* = uniqstr map { $_->@* } values $EXPORT_TAGS->%*;
+    if ( defined $export_tags ) {
 
+        if ( delete $options{overwrite} ) {
+            $EXPORT_TAGS->%* = $export_tags->%*;
+        }
+
+        else {
+            # cheap one layer deep hash merge
+            for my $tag ( keys $export_tags->%* ) {
+                push(
+                    ( $EXPORT_TAGS->{$tag} //= [] )->@*,
+                    $export_tags->{$tag}->@*
+                );
+            }
+        }
+    }
+
+    # Exporter::Tiny handles the 'all' tag, as does Sub::Exporter, but
+    # I don't know how to detect when the latter is being used.
+    $install_all = !$package->isa( 'Exporter::Tiny' )
+      if $install_all eq 'auto';
+
+    if ( $install_all ) {
+        # Assign the all tag in two steps to avoid the situation
+        # where $EXPORT_TAGS->{all} is created with an undefined value
+        # before running values on $EXPORT_TAGS->%*;
+
+        my @all = map { $_->@* } values $EXPORT_TAGS->%*;
+        $EXPORT_TAGS->{all} //= \@all;
+    }
+
+    _EXPORT( $package )->@*    = ( $EXPORT_TAGS->{default} // [] )->@*;
+    _EXPORT_OK( $package )->@* = uniqstr map { $_->@* } values $EXPORT_TAGS->%*;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub install_CONSTANTS {
+    my $package = !defined reftype( $_[-1] ) ? pop : scalar caller;
+
+    for my $spec ( @_ ) {
+        my $type = reftype( $spec );
+
+        if ( 'HASH' eq $type ) {
+            install_constant_tag( $_, $spec->{$_}, $package )
+              for keys $spec->%*;
+        }
+
+        elsif ( 'ARRAY' eq $type ) {
+            my $idx = $spec->@*;
+            _croak(
+                "constant spec passed as array has an odd number of elements" )
+              unless 0 == $idx % 2;
+
+            while ( $idx ) {
+                my $hash = $spec->[ --$idx ];
+                my $id   = $spec->[ --$idx ];
+                install_constant_tag( $id, $hash, $package );
+            }
+        }
+
+        else {
+            _croak( "expect a HashRef or an ArrayRef" );
+        }
+    }
 }
 
 
@@ -160,9 +327,6 @@ sub install_EXPORTS {
 
 
 
-sub install_CONSTANTS ( $constants, $caller = scalar caller ) {
-    install_constant_tag( $_, $constants->{$_}, $caller ) for keys $constants->%*;
-}
 
 
 
@@ -220,44 +384,46 @@ sub install_CONSTANTS ( $constants, $caller = scalar caller ) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-sub install_constant_tag ( $tag, $constants, $caller = scalar caller ) {
+sub install_constant_tag ( $id, $constants, $package = scalar caller ) {
 
     my ( @names, @values );
     if ( reftype( $constants ) eq 'HASH' ) {
         @names  = keys $constants->%*;
         @values = values $constants->%*;
     }
-    else {
-        my @constants = $constants->@*;
-        $constants = { @constants };
-        while ( @constants ) {
-            push @names,  shift @constants;
-            push @values, shift @constants;
+    elsif ( reftype( $constants ) eq 'ARRAY' ) {
+        my @copy = $constants->@*;
+        while ( my ( $name, $value ) = splice( @copy, 0, 2 ) ) {
+            push @names,  $name;
+            push @values, $value;
         }
+        $constants = { $constants->@* };
+    }
+    else {
+        _croak(
+            '$constants argument should be either a hashref or an arrayref' );
     }
 
-    constant->import::into( $caller, $constants );
-    _EXPORT_TAGS( $caller )->{ lc $tag } = \@names;
-    install_constant_func( $tag . 'S', \@values, $caller );
+    constant->import::into( $package, $constants );
+
+    # caller may specify distinct tag and enumeration function names.
+    my ( $tag, $fname )
+      = 'ARRAY' eq ( reftype( $id ) // '' )
+      ? ( $id->[0], $id->[1] )
+      : ( lc( $id ), $id );
+
+
+    push( ( _EXPORT_TAGS( $package )->{$tag} //= [] )->@*, @names );
+
+    my $fqdn = join '::', $package, $fname;
+    $HOOK{$package}{pre}{$fname} //= sub {
+        no strict 'refs';    ## no critic
+        _croak( "Error: attempt to redefine enumerating function $fqdn" )
+          if exists &{$fqdn};
+        my @values
+          = map { &{"${package}::${_}"} } _EXPORT_TAGS( $package )->{$tag}->@*;
+        install_constant_func( $fname, \@values, $package );
+    };
 }
 
 
@@ -325,7 +491,7 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory mistyped
 
 =head1 NAME
 
@@ -333,78 +499,86 @@ CXC::Exporter::Util - Tagged Based Exporting
 
 =head1 VERSION
 
-version 0.01
+version 0.05
 
 =head1 SYNOPSIS
 
-  package My::Constants;
+In the exporting code:
+
+  package My::Exporter;
   use CXC::Exporter::Util ':all';
 
+  use parent 'Exporter' # or Exporter::Tiny
+
+  # install sets of constants, with automatically generated
+  # enumerating functions
   install_CONSTANTS( {
-        DETECTOR => {
+        DETECTORS => {
             ACIS => 'ACIS',
             HRC  => 'HRC',
         },
 
-        AGGREGATE => {
+        AGGREGATES => {
             ALL  => 'all',
             NONE => 'none',
             ANY  => 'any',
         },
     } );
 
-  install_EXPORTS;
+  # install some functions
+  install_EXPORTS(
+            { fruit => [ 'tomato', 'apple' ],
+              nut   => [ 'almond', 'walnut' ],
+            } );
 
-  # in an importer;
+In importing code:
 
-  # import ACIS & HRC constants, and DETECTORS function
-  use My::Constants '-detector', 'DETECTORS';
+  # import all of the fruit functions, all of the DETECTORS constants,
+  # as well as a function enumerating the DETECTORS constants
+  use My::Exporter ':fruit', ':detector', 'DETECTORS';
 
-  # print the DETECTOR constants' values;
+  # print the DETECTORS constants' values;
   say $_ for DETECTORS;
 
 =head1 DESCRIPTION
 
-C<CXC::Exporter::Util> provides tag-centric utilities for
-modules which export symbols.
+C<CXC::Exporter::Util> provides I<tag-centric> utilities for modules
+which export symbols.  It doesn't provide exporting services; its sole
+purpose is to manipulate the data structures used by exporting modules
+which follow the API provided by Perl's core L<Exporter> module
+(e.g. L<Exporter::Tiny>).
 
-In this approach, C<%EXPORT_TAGS> is the definitive source for
-information about exportable symbols and is used to generate both
+In particular, it treats C<%EXPORT_TAGS> as the definitive source for
+information about exportable symbols and uses it to generate
 C<@EXPORT_OK> and C<@EXPORT>.  Consolidation of symbol information in
 one place avoids errors of omission.
 
-The standard export interface provided by Perl's core L<Exporter> (and
-emulated by others such as L<Exporter::Tiny>) uses three structures in
-the exporting module's namespace:
+=head2 Exporting Symbols
 
-=over
+At it simplest, the exporting module calls L</install_EXPORTS> with a
+hash specifying tags and their symbols sets, e.g.,
 
-=item @EXPORT
-
-Symbols in this array are automatically exported.
-
-=item @EXPORT_OK
-
-Symbols in this array are available for export.
-
-=item %EXPORT_TAGS
-
-This hash associates sets of symbols with tags. L<Exporter> allows the
-importing module to import a set of symbols by specifying
-a set's tag rather than each of the symbols individually.
-
-=back
-
-=head2 Standard Usage
-
-At it simplest, the exporting module calls L</install_EXPORTS> with a hash:
-
-  package My::ExportingModule;
+  package My::Exporter;
   use CXC::Exporter::Util;
 
-  use parent 'Exporter';
+  use parent 'Exporter'; # or your favorite compatible exporter
 
-  install_EXPORTS( { tag => [ 'Symbol1', 'Symbol2' ] } );
+  install_EXPORTS(
+            { fruit => [ 'tomato', 'apple' ],
+              nut   => [ 'almond', 'walnut' ],
+            } );
+
+  sub tomato {...}
+  sub apple  {...}
+  sub almond {...}
+  sub walnut {...}
+
+An importing module could use this via
+
+  use My::ExportingModule ':fruit'; # import tomato, apple
+  use My::ExportingModule ':nut';   # import almond, walnut
+  use My::ExportingModule ':all';   # import tomato, apple,
+                                    #        almond, walnut,
 
 For more complicated setups, C<%EXPORT_TAGS> may be specified first:
 
@@ -415,57 +589,67 @@ For more complicated setups, C<%EXPORT_TAGS> may be specified first:
   our %EXPORT_TAGS = ( tag => [ 'Symbol1', 'Symbol2' ] );
   install_EXPORTS;
 
-=head2 Handling Constant values
+C<install_EXPORTS> may be called multiple times
+
+=head2 Exporting Constants
 
 L<CXC::Exporter::Util> provides additional support for creating,
 organizing and installing constants via L</install_CONSTANTS>.
 Constants are created via Perl's L<constant> pragma.
 
-L</install_CONSTANTS> is passed a hash containing sets of constants
-grouped by tags, e.g.:
+L</install_CONSTANTS> is passed sets of constants grouped by tags,
+e.g.:
 
   install_CONSTANTS( {
-        DETECTOR => {
+        DETECTORS => {
             ACIS => 'ACIS',
             HRC  => 'HRC',
         },
 
-        AGGREGATE => {
+        AGGREGATES => {
             ALL  => 'all',
             NONE => 'none',
             ANY  => 'any',
         },
    });
+
+   # A call to install_EXPORTS (with or without arguments) must follow
+   # install_CONSTANTS;
    install_EXPORTS;
 
-In addition to the constants, it generates constant functions which
-return all of the constant values in each set.
+For each set an enumerating function is created which returns the
+set's values.
 
-For the above example, it creates constants C<ACIS>, C<HRC>, C<ALL>,
-C<NONE>, C<ANY>, and constant functions C<DETECTORS> and C<AGGREGATES>
-(note the trailing upper-case C<S>).  The latter are useful for generating
-enumerated types via e.g. L<Type::Tiny>:
+In the above example, constant functions C<ACIS>, C<HRC>, C<ALL>,
+C<NONE>, C<ANY>, tags C<detectors> and C<aggregates>, and constant
+functions C<DETECTORS> and C<AGGREGATES> are created.
 
-  Enum( DETECTORS )
+The enumerating functions are useful for generating enumerated types
+via e.g. L<Type::Tiny>:
+
+  Enum[ DETECTORS ]
 
 or iterating:
 
   say $_ for DETECTORS;
 
-The top level keys (C<DETECTOR>, C<AGGREGATE>) are transformed into
-tags by lower casing them, e.g.
-
-  $EXPORT_TAGS{detector} = [ qw( ACIS HRC ) ];
-  $EXPORT_TAGS{aggregate} = [ qw( ALL NONE ANY ) ];
-
-The constant functions are assigned the C<constant_funcs> tag, e.g.
-
-  $EXPORT_TAGS{constant_funcs} = [ qw( DETECTORS AGGREGATES ) ];
-
-If the constants are used later in the module for other purposes, constant definition
+C<install_CONSTANTS> may be called multiple times. If the constants
+are used later in the module for other purposes, constant definition
 should be done in a L<BEGIN> block:
 
-  BEGIN { install_CONSTANTS( \%CONSTANTS ) }
+  BEGIN {
+      install_CONSTANTS( {
+          CCD => {nCCDColumns  => 1024, minCCDColumn => 0,},
+      } );
+  }
+
+  install_CONSTANTS( {
+      CCD => {
+          maxCCDColumn => minCCDColumn + nCCDColumns - 1,
+      } }
+  );
+
+  install_EXPORTS;
 
 For more complex situations, the lower level L</install_constant_tag>
 and L</install_constant_func> routines may be useful.
@@ -474,22 +658,55 @@ and L</install_constant_func> routines may be useful.
 
 =head2 install_EXPORTS
 
-  install_EXPORT( [\%export_tags], [$package],   );
+  install_EXPORTS( [\%export_tags], [$package], [\%options]  );
 
 Populate C<$package>'s C<@EXPORT> and C<@EXPORT_OK> arrays based upon
-C<%export_tags>. C<$package> defaults to the caller's package.
+C<%EXPORT_TAGS> and C<%export_tags>.
 
-If not specified, C<%export_tags> defaults to C<%EXPORT_TAGS> in C<$package>.
-If specified, the contents of C<%export_tags> will overwrite C<%EXPORT_TAGS>;
+If not specified,  C<$package> defaults to the caller's package.
 
-This routine does the following in C<$package>, which defaults to the
-caller's package.
+Available Options:
+
+=over
+
+=item overwrite => [Boolean]
+
+If the C<overwrite> option is true, the contents of C<%export_tags>
+will overwrite C<%EXPORT_TAGS> in C<$package>, otherwise
+C<%export_tags> is merged into C<%EXPORT_TAGS>.
+
+Note that overwriting will remove the tags and symbols installed into
+C<%EXPORT_TAGS> by previous calls to L</install_CONSTANTS>.
+
+This defaults to false.
+
+=item package => [Package Name]
+
+This provides another means of indicating which package to install into.
+Setting this overrides the optional C<$package> argument.
+
+=item all => [Boolean | 'auto' ]
+
+This determines whether L</install_EXPORTS> creates an C<all> tag
+based on the contents of C<%EXPORT_TAGS> in C<$package>.  Some exporters, such as
+L<Exporter::Tiny> and L<Sub::Exporter> automatically handle the C<all>
+tag, but Perl's default L<Exporter> does not.
+
+If set to C<auto> (the default), it will install the C<all> tag if
+C<$package> is I<not> a subclass of L<Exporter::Tiny>.
+
+(At present I don't know how to determine if L<Sub::Exporter> is used).
+
+=back
+
+This routine does the following in C<$package> based upon
+C<%EXPORT_TAGS> in C<$package>:
 
 =over
 
 =item *
 
-Install the symbols specified via the C<default> tag into C<$package>'s C<@EXPORT>.
+Install the symbols specified via the C<$EXPORT_TAGS{default}> tag into C<@EXPORT>.
 
 =item *
 
@@ -499,145 +716,187 @@ Install all of the symbols in C<%EXPORT_TAGS> into C<@EXPORT_OK>.
 
 =head2 install_CONSTANTS
 
-  install_CONSTANTS( \%hash, [$package]  );
+  install_CONSTANTS( @specs, ?$package  );
 
-Create constants from a nested hash of constants names and values and
-make them available for export.
+Create sets of constants and make them available for export in
+C<$package>.
 
-C<%hash> should be a two level nested structure.  The keys in the top
-level are tag names, the second level structures are either hashes or
-arrays ( of I<name-value> pairs )and contain the constant names and
-values, e.g.
+If not specified,  C<$package> defaults to the caller's package.
 
-     %hash = (
-        DETECTOR => {
-            ACIS => 'ACIS',
-            HRC  => 'HRC',
-        },
+The passed C<@specs> arguments are either hashrefs or arrayrefs and
+contain one or more set specifications.  A set specification
+consists of a unique identifier and a list of name-value pairs,
+specified either as a hash or an array.  For example,
 
-        AGGREGATE => {
-            ALL  => 'all',
-            NONE => 'none',
-            ANY  => 'any',
-        },
-     );
+  @spec = ( { $id1 => \%set1, $id2 => \@set2 },
+            [ $id3 => \%set3, $id4 => \@set4 ],
+          );
 
-This routine does the following in C<$package>, which defaults to the
-caller's package.
+The identifier is used to create an export tag for the set, as
+well as to name an enumerating function which returns the set's values.
+The individual C<$id>, C<$set> pairs are passed to L<install_constant_tag>;
+see that function for more information on how the identifiers are used.
+
+A call to L<install_EXPORTS> I<must> be made after the last call to
+C<install_CONSTANTS> or
+
+=over
+
+=item *
+
+The constants won't be added to the exports.
+
+=item *
+
+The enumerating functions won't be created.
+
+=back
+
+L</install_CONSTANTS> may be called more than once to add symbols to a tag,
+but don't split those calls across a call to L</install_EXPORTS>.
+
+In other words,
+
+  # DON'T DO THIS, IT'LL THROW
+  install_CONSTANTS( { Foo => { bar => 1 } } );
+  install_EXPORTS;
+  install_CONSTANTS( { Foo => { baz => 1 } } );
+  install_EXPORTS;
+
+  # DO THIS
+  install_CONSTANTS( { Foo => { bar => 1 } } );
+  install_CONSTANTS( { Foo => { baz => 1 } } );
+  install_EXPORTS;
+
+Each call to L</install_EXPORTS> installs the enumerating functions for
+sets modified since the last call to it, and each enumerating function
+can only be added once.
+
+=head2 install_constant_tag
+
+Create and install constant functions for a set of constants.  Called either
+as
+
+  install_constant_tag( [ $tag, $fname], $constants, [$package] )
+
+or as
+
+  install_constant_tag( $string, $constants, [$package] )
+
+in which case
+
+  ( $tag, $fname ) = ( lc($string), $string );
+
+C<$constants> specifies the constants' names and values, and may be
+either a hashref or an arrayref containing I<name> - I<value> pairs.
+
+C<$package> is the name of the package (the eventual exporter) into
+which the constants will be installed. It defaults to the package of
+the caller.
+
+L</install_constant_tag> will
 
 =over
 
 =item 1
 
-Create constants for each of the entries in the inner hashes, and
-add tags to C<%EXPORT_TAGS> for them.
+use Perl's L<constant> pragma to create a function named I<name>
+returning I<value> for each I<name>-I<value> pair in C<$constants>.
+
+The functions are installed in C<$package> and their names appended to
+the symbols in C<%EXPORT_TAGS> with export tag C<$tag>.  If C<$constants>
+is an arrayref they are appended in the ordered specified in the array,
+otherwise they are appended in random order.
 
 =item 2
 
-Create constant functions for each of the inner hashes which return
-the hash values, and add them to the export tag C<constant_funcs>
-in C<%EXPORT_TAGS>
+Add a hook so that the next time L</install_EXPORTS> is called, Perl's
+L<constant> pragma will be used to create an enumerating function
+named C<$fname> which returns a list of the I<values> of the constants
+associated with C<$tag>, in the order they were added to
+C<$EXPORT_TAGS{$tag}>.
 
-=back
+The enumerating function C<$fname> is added to the symbols in
+C<%EXPORT_TAGS> tagged with C<contant_funcs>.
 
-For example, given the above value for C<%hash>,
-
-=over
-
-=item *
-
-constants C<ACIS>, and C<HRC> will be created and assigned the export
-tag C<detector>.
-
-=item *
-
-constants C<ALL>, C<NONE>, and C<ANY> will be created and assigned
-the export tag C<aggregate>.
-
-=item *
-
-Constant functions C<DETECTORS> and C<AGGREGATES> will be created
-and assigned to the C<constant_funcs> export tag.
-
-=back
-
-L<install_EXPORTS> uses L</install_constant_tag> to install the individual
-tagged sets.
-
-=head2 install_constant_tag( $tag, $constants, [$package] )
-
-C<$constants> may be either a hashref or an arrayref ( composed of I<name-value> pairs ).
-Specifying constant names and their values, e.g.
-
-    (
-            NAME1     => VALUE1,
-            NAME2     => VALUE2,
-   );
-
-This routine does the following in C<$package>, which defaults to the
-caller's package.
-
-=over
-
-=item 1
-
-installs the constants in C<$package>,
-
-=item 2
-
-installs a constant function C<${tag}S> which returns the constant
-values
-
-=item 3
-
-adds the constant names to C<%EXPORT_TAGS> with the
-lower-cased tag C<$tag>
-
-=item 4
-
-adds C<${tag}S> in the C<$EXPORT_TAGS{contant_funcs}> tag.
+Just as you shouldn't interleave calls to L</install_CONSTANTS> for a
+single tag with calls to L</install_EXPORTS>, don't interleave calls
+to L</install_constant_tag> with calls to L</install_EXPORTS>.
 
 =back
 
 For example, after
 
-  install_constant_tag( 'AGGREGATE',
-                        { ALL => 'all', NONE => 'none', ANY => 'any' } );
+  $id = 'AGGREGATES';
+  $constants = { ALL => 'all', NONE => 'none', ANY => 'any' };
+  install_constant_tag( $id, $constants );
+  install_EXPORTS:
 
 =over
 
 =item 1
 
-The constants, C<ALL>, C<NONE>, C<ANY> will be created.
+The constant functions, C<ALL>, C<NONE>, C<ANY> will be created and
+installed in the calling package.
+
+A new element will be added to C<%EXPORT_TAGS> with an export tag of C<aggregates>.
+
+  $EXPORT_TAGS{aggregates} = [ 'ALL', 'NONE', 'ANY ];
 
 =item 2
 
-The function C<AGGREGATES> will return C<all>, C<none>, C<any>.
+A function named C<AGGREGATES> will be created and installed in the
+calling package. C<AGGREGATES> will return the values
 
-=item 3
+  'all', 'none', 'any'
 
-A package importing from C<$package> can import the constants
-C<ALL>, C<NONE>, C<ANY> via the C<aggregate> tag:
+(in a random order, as C<$constants> is a hashref).
 
-   use Package ':aggregate';
-
-=item 4
-
-A package importing from C<$package> can import the C<AGGREGATE>
-constant function via the C<constant_funcs> tag:
-
-  use Package ':constant_funcs';
-
-or directly
-
-  use Package 'AGGREGATES';
+C<AGGREGATES> will be added to the symbols tagged by C<constant_funcs> in C<%EXPORT_TAGS>
 
 =back
 
-L<install_constant_tag> uses L</install_constant_func> to create and install
+After this, a package importing from C<$package> can
+
+=over
+
+=item * import the constant functions C<ALL>, C<NONE>, C<ANY> via the C<aggregate> tag:
+
+   use Package ':aggregate';
+
+=item * import the enumerating function C<AGGREGATES> directly, via
+
+  use Package 'AGGREGATES';
+
+=item * import C<AGGREGATES> via the C<constant_funcs> tag:
+
+  use Package ':constant_funcs';
+
+=back
+
+As mentioned above, if the first argument to L</install_constant_tag> is an
+arrayref, C<$tag> and C<$fname> may be specified directly. For example,
+
+  $id = [ 'Critters', 'Animals' ];
+  $constants = { HORSE => 'horse', GOAT   => 'goat' };
+  install_constant_tag( $id, $constants );
+
+will create the export tag C<Critters> for the C<GOAT> and C<HORSE>
+constant functions and an enumerating function called C<Animals>.
+
+C<install_constant_tag> uses L</install_constant_func> to create and install
 the constant functions which return the constant values.
 
-=head2 install_constant_func( $name, \@values )
+Because of when enumerating functions are created, all enumerating functions
+associated with a set will return all of the set's values, regardless of when
+the function was specified.  For example,
+
+  install_constant_tag( 'TAG', { HIGH => 'high' }  );
+  install_constant_tag( [ 'TAG', 'ATAG' ], { LOW => 'low' } );
+
+will create functions C<TAG> and C<ATAG> which both return C<high>, C<low>.
+
+=head2 install_constant_func( $name, \@values, $caller )
 
 This routine does the following in C<$package>, which defaults to the
 caller's package.
@@ -656,7 +915,7 @@ Adds C<$name> to the C<constant_funcs> tag in C<%EXPORT_TAGS>.
 
 For example, after calling
 
-  install_constant_func( 'AGGREGATE', [ 'all', 'none', 'any' ]  );
+  install_constant_func( 'AGGREGATES', [ 'all', 'none', 'any' ]  );
 
 =over
 
@@ -677,21 +936,91 @@ or directly
 
 =back
 
+=head1 BUGS
+
+No attempt is made to complain if enumerating functions' names clash
+with constant function names.
+
+=head1 EXAMPLES
+
+=over
+
+=item Alternate constant generation modules.
+
+To use an alternate constant generation function bypass
+L<install_CONSTANTS> and load things manually.
+
+For example,  using L<enum>:
+
+  package My::Exporter;
+
+  use CXC::Exporter::Util ':all';
+
+  our @DaysOfWeek;
+  BEGIN{ @DaysOfWeek = qw( Sun Mon Tue Wed Thu Fri Sat ) }
+  use enum @DaysOfWeek;
+  use constant DaysOfWeek => map { &$_ } @DaysOfWeek;
+  install_EXPORTS( { days_of_week => \@DaysOfWeek,
+                     constant_funcs => [ 'DaysOfWeek' ],
+                    });
+
+and then
+
+  use My::Exporter -days_of_week;
+
+  say Sun | Mon;
+
+=item Using a constant in the exporting module
+
+When a constant is used in an exporting module (to create another constant, for example),
+it's tempting to do something like this:
+
+  # DON'T DO THIS
+  %CCD = ( minCCDColumn => 0, nCCDColumns = 1024 );
+  $CCD{maxCCDColumn} = $CCD{minCCDColumn} + $CCD{nCCDColumns} - 1;
+  install_CONSTANTS( { CCD => \%CCD } );
+  install_EXPORTS;
+
+Not only is this noisy code, if the hash keys are mistyped, there's an
+error, which is exactly what constants are supposed to avoid.
+
+Instead, create an initial set of constants in a BEGIN block, which
+will make them available for the rest of the code:
+
+  BEGIN {
+      install_CONSTANTS( {
+          CCD => {nCCDColumns  => 1024, minCCDColumn => 0,},
+      } );
+  }
+
+  install_CONSTANTS( {
+      CCD => {
+          maxCCDColumn => minCCDColumn + nCCDColumns - 1,
+      } }
+  );
+
+  install_EXPORTS;
+
+A bit more verbose, but it uses the generated constant functions and
+avoids errors.
+
+=back
+
 =head1 SUPPORT
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-cxc-exporter-tagged@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Exporter-Util
+Please report any bugs or feature requests to bug-cxc-exporter-util@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Exporter-Util
 
 =head2 Source
 
 Source is available at
 
-  https://gitlab.com/djerius/cxc-exporter-tagged
+  https://gitlab.com/djerius/cxc-exporter-util
 
 and may be cloned from
 
-  https://gitlab.com/djerius/cxc-exporter-tagged.git
+  https://gitlab.com/djerius/cxc-exporter-util.git
 
 =head1 SEE ALSO
 
@@ -702,6 +1031,14 @@ Please see those modules/websites for more information related to this module.
 =item *
 
 L<Exporter|Exporter>
+
+=item *
+
+L<Exporter::Tiny|Exporter::Tiny>
+
+=item *
+
+L<Exporter::Almighty|Exporter::Almighty>
 
 =back
 

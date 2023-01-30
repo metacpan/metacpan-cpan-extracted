@@ -4,7 +4,7 @@
       "kfly8 <kfly@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.2",
+   "generated_by" : "Minilla/v3.1.20",
    "license" : [
       "perl_5"
    ],
@@ -35,7 +35,7 @@
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -46,21 +46,25 @@
             "Data::Lock" : "0",
             "Import::Into" : "0",
             "Keyword::Simple" : "0.04",
-            "PPR" : "0",
+            "PPR" : "0.001006",
             "Type::Tie" : "0.010",
             "perl" : "v5.12.0"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.98"
+            "Test::More" : "0.98",
+            "Type::API" : "1.001"
          }
       }
    },
    "provides" : {
       "Variable::Declaration" : {
          "file" : "lib/Variable/Declaration.pm",
-         "version" : "0.04"
+         "version" : "0.06"
+      },
+      "Variable::Declaration::Info" : {
+         "file" : "lib/Variable/Declaration/Info.pm"
       }
    },
    "release_status" : "stable",
@@ -70,15 +74,16 @@
       },
       "homepage" : "https://github.com/kfly8/p5-Variable-Declaration",
       "repository" : {
-         "url" : "git://github.com/kfly8/p5-Variable-Declaration.git",
+         "type" : "git",
+         "url" : "https://github.com/kfly8/p5-Variable-Declaration.git",
          "web" : "https://github.com/kfly8/p5-Variable-Declaration"
       }
    },
-   "version" : "0.04",
+   "version" : "0.06",
    "x_authority" : "cpan:KFLY",
    "x_contributors" : [
-      "Kenta Kobayashi <kentafly88@gmail.com>"
+      "kobaken <kentafly88@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

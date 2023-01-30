@@ -1,5 +1,12 @@
 Revision history for Excel-ValueWriter-XLSX
 
+
+1.03     28.01.2023
+  - fixed bug : sheet content was not properly UTF8-encoded
+
+1.02     28.01.2023
+  - added support for defined names
+
 1.01     23.01.2023
   - added support for booleans
 

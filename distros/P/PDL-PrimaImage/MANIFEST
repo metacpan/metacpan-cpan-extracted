@@ -1,0 +1,9 @@
+Makefile.PL
+primaimage.pd
+README
+MANIFEST
+test.pl
+examples/mandelbrot.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+GENERATED/PDL/PrimaImage.pm              mod=PDL::PrimaImage pd=primaimage.pd (added by pdlpp_mkgen)

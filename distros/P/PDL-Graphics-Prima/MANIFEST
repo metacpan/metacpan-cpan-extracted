@@ -2,6 +2,7 @@ MANIFEST
 Build.PL
 README.pod
 Changes
+lib/PDL/Demos/Prima.pm
 lib/PDL/Graphics/Prima.pm
 lib/PDL/Graphics/Prima/Axis.pm
 lib/PDL/Graphics/Prima/DataSet.pm
@@ -11,6 +12,17 @@ lib/PDL/Graphics/Prima/PlotType.pm
 lib/PDL/Graphics/Prima/Scaling.pm
 lib/PDL/Graphics/Prima/Simple.pm
 lib/PDL/Graphics/Prima/ReadLine.pm
+lib/PDL/Graphics/Prima/pod/axis.png
+lib/PDL/Graphics/Prima/pod/dandelions.png
+lib/PDL/Graphics/Prima/pod/exp.png
+lib/PDL/Graphics/Prima/pod/ds-dist.png
+lib/PDL/Graphics/Prima/pod/ds-func.png
+lib/PDL/Graphics/Prima/pod/ds-grid.png
+lib/PDL/Graphics/Prima/pod/ds-image.png
+lib/PDL/Graphics/Prima/pod/ds-pair.png
+lib/PDL/Graphics/Prima/pod/lineplot.png
+lib/PDL/Graphics/Prima/pod/lines-diamonds.png
+lib/PDL/Graphics/Prima/pod/palette.png
 examples/Symbols.pl
 examples/Trendlines.pl
 examples/Triangles.pl

@@ -1653,4 +1653,231 @@ class TestCase::Regex {
     
     return $output;
   }
+
+  static method split : int () {
+    {
+      my $string = "foo  bar   baz";
+      my $splited_strings = Regex->new("\s+")->split($string);
+      unless (Array->equals_string($splited_strings, ["foo", "bar", "baz"])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "foo\\bar/baz";
+      my $splited_strings = Regex->new("[/\\\\]")->split($string);
+      unless (Array->equals_string($splited_strings, ["foo", "bar", "baz"])) {
+        return 0;
+      }
+    }
+
+    {
+      my $string = "foo,bar,baz";
+      my $splited_strings = Regex->new(",")->split($string);
+      unless (Array->equals_string($splited_strings, ["foo", "bar", "baz"])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "foo,bar,";
+      my $splited_strings = Regex->new(",")->split($string);
+      unless (Array->equals_string($splited_strings, ["foo", "bar"])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = ",foo,,bar,,";
+      my $splited_strings = Regex->new(",")->split($string);
+      unless (Array->equals_string($splited_strings, ["", "foo", "", "bar"])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "foo : bar : baz";
+      my $splited_strings = Regex->new(" : ",)->split($string);
+      unless (Array->equals_string($splited_strings, ["foo", "bar", "baz"])) {
+        return 0;
+      }
+    }
+    {
+      my $string = "foo : bar : ";
+      my $splited_strings = Regex->new(" : ",)->split($string);
+      unless (Array->equals_string($splited_strings, ["foo", "bar"])) {
+        return 0;
+      }
+    }
+    {
+      my $string = " : foo :  : bar :  : ";
+      my $splited_strings = Regex->new(" : ",)->split($string);
+      unless (Array->equals_string($splited_strings, ["", "foo", "", "bar"])) {
+        return 0;
+      }
+    }
+    {
+      my $string = "foo---bar---baz";
+      my $splited_strings = Regex->new("---",)->split($string);
+      unless (Array->equals_string($splited_strings, ["foo", "bar", "baz"])) {
+        return 0;
+      }
+    }
+    {
+      my $string = "foo---bar---";
+      my $splited_strings = Regex->new("---",)->split($string);
+      unless (Array->equals_string($splited_strings, ["foo", "bar"])) {
+        return 0;
+      }
+    }
+    {
+      my $string = "---foo------bar------";
+      my $splited_strings = Regex->new("---",)->split($string);
+      unless (Array->equals_string($splited_strings, ["", "foo", "", "bar"])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "foo--!bar---baz";
+      my $splited_strings = Regex->new("---",)->split($string);
+      unless (Array->equals_string($splited_strings, ["foo--!bar", "baz"])) {
+        return 0;
+      }
+    }
+
+    {
+      my $string = "foo,bar,baz";
+      my $splited_strings = Regex->new(",")->split($string, -1);
+      unless (Array->equals_string($splited_strings, ["foo", "bar", "baz"])) {
+        return 0;
+      }
+    }
+    {
+      my $string = "foo,bar,baz";
+      my $splited_strings = Regex->new(",")->split($string);
+      unless (Array->equals_string($splited_strings, ["foo", "bar", "baz"])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "foo,bar,";
+      my $splited_strings = Regex->new(",")->split($string, -1);
+      unless (Array->equals_string($splited_strings, ["foo", "bar", ""])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = ",foo,,bar,,";
+      my $splited_strings = Regex->new(",")->split($string, -1);
+      unless (Array->equals_string($splited_strings, ["", "foo", "", "bar", "", ""])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "foo : bar : baz";
+      my $splited_strings = Regex->new(" : ",)->split($string, -1);
+      unless (Array->equals_string($splited_strings, ["foo", "bar", "baz"])) {
+        return 0;
+      }
+    }
+    {
+      my $string = "foo : bar : ";
+      my $splited_strings = Regex->new(" : ",)->split($string, -1);
+      unless (Array->equals_string($splited_strings, ["foo", "bar", ""])) {
+        return 0;
+      }
+    }
+    {
+      my $string = " : foo :  : bar :  : ";
+      my $splited_strings = Regex->new(" : ",)->split($string, -1);
+      unless (Array->equals_string($splited_strings, ["", "foo", "", "bar", "", ""])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "foo---bar---baz";
+      my $splited_strings = Regex->new("---",)->split($string, -1);
+      unless (Array->equals_string($splited_strings, ["foo", "bar", "baz"])) {
+        return 0;
+      }
+    }
+    {
+      my $string = "foo---bar---";
+      my $splited_strings = Regex->new("---",)->split($string, -1);
+      unless (Array->equals_string($splited_strings, ["foo", "bar", ""])) {
+        return 0;
+      }
+    }
+    {
+      my $string = "---foo------bar------";
+      my $splited_strings = Regex->new("---",)->split($string, -1);
+      unless (Array->equals_string($splited_strings, ["", "foo", "", "bar", "", ""])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "foo--!bar---baz";
+      my $splited_strings = Regex->new("---",)->split($string, -1);
+      unless (Array->equals_string($splited_strings, ["foo--!bar", "baz"])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "foo,bar,baz";
+      my $splited_strings = Regex->new(",")->split($string, 1);
+      unless (Array->equals_string($splited_strings, ["foo,bar,baz"])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "foo,bar,baz";
+      my $splited_strings = Regex->new(",")->split($string, 2);
+      unless (Array->equals_string($splited_strings, ["foo", "bar,baz"])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "foo,bar,baz";
+      my $splited_strings = Regex->new(",")->split($string, 3);
+      unless (Array->equals_string($splited_strings, ["foo", "bar", "baz"])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "foo,bar,baz";
+      my $splited_strings = Regex->new(",")->split($string, 4);
+      unless (Array->equals_string($splited_strings, ["foo", "bar", "baz"])) {
+        return 0;
+      }
+    }
+
+    # Exceptions
+    {
+      {
+        my $sep = ",";
+        my $string = (string)undef;
+        my $limit = -1;
+        eval {
+          Regex->new($sep)->split($string, $limit);
+        };
+        unless (Fn->contains($@, "The \$string must be defined")) {
+          return 0;
+        }
+      }
+      
+      $@ = undef;
+    }
+
+    return 1;
+  }
 }

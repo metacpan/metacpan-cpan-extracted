@@ -64,7 +64,7 @@ perlbrew if you're on Linux or Mac.
 =head1 DEVELOPMENT STATUS AND REPOSITORY
 
 This project is being actively developed at Github. Find the latest at
-L<https://github.com/run4flat/PDL-Graphics-Prima>.
+L<https://github.com/PDLPorters/PDL-Graphics-Prima>.
 
 This project is currently in alpha. I say this not because the software is
 unstable to execute but because the API is likely to undergo some

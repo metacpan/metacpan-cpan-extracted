@@ -28,7 +28,7 @@ use Graph::Maker::Catalans;
 *_balanced_next = \&Graph::Maker::Catalans::_balanced_next;
 
 use vars '$VERSION','@ISA';
-$VERSION = 18;
+$VERSION = 19;
 @ISA = ('Graph::Maker');
 
 

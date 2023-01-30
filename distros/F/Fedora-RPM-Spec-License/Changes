@@ -1,0 +1,7 @@
+0.02 2023-01-30T09:36:04+01:00
+ - Add check for SPDX license id.
+ - Fix license SPDX string in test.
+ - Regen example.
+
+0.01 2023-01-27T17:52:51+01:00
+ - First version.

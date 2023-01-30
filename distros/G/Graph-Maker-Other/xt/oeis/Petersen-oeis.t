@@ -34,6 +34,11 @@ use Graph::Maker::Petersen;
 
 #------------------------------------------------------------------------------
 # A077105   number of non-isomorphic K for given N
+
+
+
+#------------------------------------------------------------------------------
+# A077105   number of non-isomorphic K for given N
 # K <= floor((N-1)/2), so excludes N=K/2 when K even which is paths across
 # opposite outer vertices
 

@@ -40,7 +40,7 @@ sub num_children {
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 18;
+  my $want_version = 19;
   ok ($Graph::Maker::NoughtsAndCrosses::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::NoughtsAndCrosses->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::NoughtsAndCrosses->VERSION($want_version); 1 }, 1,

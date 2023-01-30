@@ -19,12 +19,14 @@ name: Dist-Zilla-Plugin-InsertCommandOutput
 provides:
   Dist::Zilla::Plugin::InsertCommandOutput:
     file: lib/Dist/Zilla/Plugin/InsertCommandOutput.pm
-    version: '0.056'
+    version: '0.057'
 requires:
   Dist::Zilla::Role::FileFinderUser: '0'
   Dist::Zilla::Role::FileMunger: '0'
+  IPC::System::Options: '0.339'
   Moose: '0'
   Proc::ChildError: '0'
+  String::ShellQuote: '0'
   namespace::autoclean: '0'
   perl: '5.010001'
   strict: '0'
@@ -33,7 +35,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-InsertCommandOutput
   homepage: https://metacpan.org/release/Dist-Zilla-Plugin-InsertCommandOutput
   repository: git://github.com/perlancar/perl-Dist-Zilla-Plugin-InsertCommandOutput.git
-version: '0.056'
+version: '0.057'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -311,7 +313,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::PERLANCAR::Contributing
               name: '@Author::PERLANCAR/PERLANCAR/Contributing'
-              version: '0.292'
+              version: '0.293'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
@@ -319,7 +321,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.780'
+              version: '0.784'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

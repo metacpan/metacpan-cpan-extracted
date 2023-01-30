@@ -3,9 +3,10 @@ use strict;
 use warnings;
 use Carp 'croak';
 
-our $VERSION = 0.17;   # update with update-version.pl
+our $VERSION = 0.18;   # update with update-version.pl
 
 use PDL::Graphics::Prima;
+use Prima::IniFile;
 
 =head1 NAME
 
@@ -14,16 +15,20 @@ PDL::Graphics::Prima
 
 =head1 SYNOPSIS
 
+=for podview <img src="PDL/Graphics/Prima/pod/lineplot.png">
+
+=for html <p><img src="https://raw.githubusercontent.com/PDLPorters/PDL-Graphics-Prima/master/lib/PDL/Graphics/Prima/pod/lineplot.png">
+
  use PDL::Graphics::Prima::Simple;
  use PDL;
- 
- 
+
+
  # --( Super simple line and symbol plots )--
- 
+
  # Generate some data - a sine curve
  my $x = sequence(100) / 20;
  my $y = sin($x);
- 
+
  # Draw x/y pairs. Default x-value are sequential:
  line_plot($y);        line_plot($x, $y);
  circle_plot($y);      circle_plot($x, $y);
@@ -33,37 +38,37 @@ PDL::Graphics::Prima
  X_plot($y);           X_plot($x, $y);
  cross_plot($y);       cross_plot($x, $y);
  asterisk_plot($y);    asterisk_plot($x, $y);
- 
+
  # Sketch the sine function for x initially from 0 to 10:
  func_plot(0 => 10, \&PDL::sin);
- 
- 
+
+
  # --( Super simple histogram )--
- 
+
  # Plot a distribution
  hist_plot($distribution);
  # Tweak the binning
  hist_plot($distribution, bt::Linear(normalize => 0));
- 
- 
+
+
  # --( Super simple matrix plots )--
- 
+
  # Generate some data - a wavy pattern
  my $image = sin(sequence(100)/10)
              + sin(sequence(100)/20)->transpose;
- 
+
  # Generate a grayscale image:
  matrix_plot($image);  # smallest is white
  imag_plot($image);    # smallest is black
- 
+
  # Set the x and y coordinates for the image boundaries
  #            left, right,  bottom, top
  matrix_plot([ 0,     1  ], [ 0,     2 ],  $image);
  imag_plot(  [ 0,     1  ], [ 0,     2 ],  $image);
- 
- 
+
+
  # --( More complex plots )--
- 
+
  # Use the more general 'plot' function for
  # multiple DataSets and more plotting features:
  my $colors = pal::Rainbow()->apply($x);
@@ -75,19 +80,19 @@ PDL::Graphics::Prima
          , colors   => $colors,
          , plotType => ppair::Squares(filled => 1)
      ),
-     
+
      x => { label   => 'Time' },
      y => { label   => 'Sine' },
  );
- 
- 
+
+
  # --( Managing window interaction )--
- 
+
  # In scripts and older Term::ReadLine, if you press
  # the letter 'q' when viewing a plot, you can
  # re-invoke interaction with:
  twiddle;
- 
+
  # query auto-twiddling
  my $is_auto_twiddline = auto_twiddle;
  # Turn auto-twiddling on or off
@@ -98,7 +103,7 @@ PDL::Graphics::Prima
 
 One of Perl's mottos is to "make easy things easy, and hard things possible."
 The bulk of the modules provided by the
-L<PDL::Graphics::Prima|PDL::Graphics::Prima/> distribution
+L<PDL::Graphics::Prima> distribution
 focus on the latter half, making hard but very powerful things possible.
 This module tackles the other half: making easy things easy. This module
 provides a number of simple functions for quick data plotting so that you can
@@ -109,12 +114,12 @@ can look at this as providing a handy collection of plot (and window)
 constructors for the standard use cases. Either perspective is basically correct.
 
 In addition to making easy plots easy, this module and its documentation are
-meant to serve as an introduction to L<PDL::Graphics::Prima|PDL::Graphics::Prima/>.
+meant to serve as an introduction to L<PDL::Graphics::Prima>.
 If you are new to the libarary, this is where you should start.
 
 This module is built on L<the Perl Data Language|PDL> and
 L<the Prima GUI toolkit|Prima>. You do not need to know much about
-L<Prima|Prima> to use this tutorial, but you should know
+L<Prima> to use this tutorial, but you should know
 L<the basics of PDL|PDL::QuickStart>.
 
 When you use this library, you get a handful of functions for quick data
@@ -124,15 +129,15 @@ plotting that include
 
 =item lines
 
-L<line_plot|/line_plot> takes one or two L<piddle|PDL::Core/pdl>s, one for y and optionally one for
+L</line_plot> takes one or two L<piddle|PDL::Core/pdl>s, one for y and optionally one for
 x, and makes a L<line plot|PDL::Graphics::Prima::PlotType/ppair::Lines> with
 them; if you don't give an x L<piddle|PDL::Core/pdl>, it uses
 L<sequential integers starting from zero|PDL::Basic/xvals>. 
 
 =item symbols
 
-Various symbol plots, like L<cross_plot|/cross_plot> and
-L<diamond_plot|/diamond_plot>, take one or two L<piddle|PDL::Core/pdl>s, one
+Various symbol plots, like L</cross_plot> and
+L</diamond_plot>, take one or two L<piddle|PDL::Core/pdl>s, one
 for y and optionally one for
 x, and and plots the L<symbol|PDL::Graphics::Prima::PlotType/ppair::Symbols>
 at the given points; if you don't give an x L<piddle|PDL::Core/pdl>, it uses
@@ -140,14 +145,14 @@ L<sequential integers starting from zero|PDL::Basic/xvals>.
 
 =item functions
 
-L<func_plot|/func_plot> takes an I<initial> plot min/max and a L<function reference|perlsub> and
+L</func_plot> takes an I<initial> plot min/max and a L<function reference|perlsub> and
 makes a L<line plot|PDL::Graphics::Prima::PlotType/ppair::Lines> of the
 L<function|perlsub>; it can optionally take the number of points to evaluate
 on each drawing operation; see L<PDL::Graphics::Prima::DataSet/ds::Func>
 
 =item histograms
 
-L<hist_plot|/hist_plot> takes a L<piddle|PDL::Core/pdl> of data to be plotted and an optional
+L</hist_plot> takes a L<piddle|PDL::Core/pdl> of data to be plotted and an optional
 L<bin type|PDL::Graphics::Prima::DataSet/Sets> and plots a
 L<histogram|PDL::Graphics::Prima::PlotType/ppair::Histogram>. If no bin
 type is supplied, L<linear binning|PDL::Graphics::Prima::DataSet/bt::Linear>
@@ -155,7 +160,7 @@ is used.
 
 =item images
 
-Both L<matrix_plot|/matrix_plot> and L<imag_plot|/imag_plot> take one or
+Both L</matrix_plot> and L</imag_plot> take one or
 three arguments, the first two of which specify the x-bounds and the
 y-bounds, the third (or only) of which is the matrix to plot
 
@@ -199,7 +204,7 @@ this in a non-blocking fashion, in a little bit.
 
 For now, turn your attention to the plot. This is a highly interactive
 plot, as are all plots made with
-L<PDL::Graphics::Prima|PDL::Graphics::Prima/>. In particular,
+L<PDL::Graphics::Prima>. In particular,
 your plot responds to the following user interactions:
 
 =over
@@ -260,19 +265,19 @@ auto-fitting... well... it's on my todo list. :-)
 Having played around with the plot widget, you probably want to know how to
 modify it programatically, by adding a L<title|PDL::Graphics::Prima/title> or
 L<axis labels|PDL::Graphics::Prima::Axis/label>, perhaps. "What sort of
-options," you ask, "does L<line_plot|/line_plot> accept for me to specify
+options," you ask, "does L</line_plot> accept for me to specify
 these things?" Well, you can't specify those in your call to
-L<line_plot|/line_plot>. You either add them to the object after
-L<line_plot|/line_plot> builds something for you, or you use the more
+L</line_plot>. You either add them to the object after
+L</line_plot> builds something for you, or you use the more
 powerful but verbose L<plot function|/"PLOT FUNCTION">.
 
 "But WHY?" you ask. "WHY can't I just specify a plot title in
-L<line_plot|/line_plot> and be done with it?" The reason is simple. The
+L</line_plot> and be done with it?" The reason is simple. The
 underlying library is built on a very clean and well-thought-out object and
 I would rather not waste my time creating or your time learning some
 intermediate API. A means for specifying the plot title in
-L<line_plot|/line_plot> is the first step down the road of confused mental
-models. So, it's really in your best interst. Honest. :-)
+L</line_plot> is the first step down the road of confused mental
+models. So, it's really in your best interest. Honest. :-)
 
 "But WHY?" you ask again. OK, OK, I'll tell you how to essentially get what
 you want.
@@ -288,17 +293,17 @@ L<specifically choose when to view the plot|Prima::Window/execute> like so:
 
  use PDL;
  use PDL::Graphics::Prima::Simple;
- 
+
  # Non-blocking
  auto_twiddle(0);
- 
+
  # Build the plot
  my $x = sequence(100)/10;
  my $plot = line_plot($x, $x->sin);
- 
+
  # Add a title
  $plot->title('The sine wave');
- 
+
  # Display the plot
  twiddle();
 
@@ -310,8 +315,7 @@ L<axes|PDL::Graphics::Prima::Axis/> are sub-objects of the
 L<plot|PDL::Graphics::Prima/>, accessed with
 L<like-named accessors|PDL::Graphics::Prima/x, y>: $plot->x. The
 properties of the axes that you can modify include the
-L<min|PDL::Graphics::Prima::Axis/min, max>,
-L<max|PDL::Graphics::Prima::Axis/min, max>,
+L<min, max|PDL::Graphics::Prima::Axis/min, max>,
 L<scaling type|PDL::Graphics::Prima::Axis/scaling>, and
 L<axis label|PDL::Graphics::Prima::Axis/label>, and are discussed
 in greater detail
@@ -322,17 +326,17 @@ L<labels|PDL::Graphics::Prima::Axis/label>:
 
  use PDL;
  use PDL::Graphics::Prima::Simple;
- 
+
  # Build the plot
  auto_twiddle(0);
  my $x = sequence(100)/10;
  my $plot = line_plot($x, $x->sin);
- 
+
  # Add a title and axis labels
  $plot->title('The Harmonic Oscillator');
  $plot->x->label('time (s)');
  $plot->y->label('displacement (cm)');
- 
+
  # Display the plot
  twiddle();
 
@@ -369,8 +373,7 @@ new element or feature.
 =head2 Axis minima and maxima
 
 If you want to set the axis bounds, you can use the
-L<min|PDL::Graphics::Prima::Axis/min, max>,
-L<max|PDL::Graphics::Prima::Axis/min, max> and
+L<min, max|PDL::Graphics::Prima::Axis/min, max>, and
 L<minmax|PDL::Graphics::Prima::Axis/minmax> functions. For example,
 continuing from the PDL shell, this sets the x-minimum to zero:
 
@@ -405,7 +408,7 @@ you would want to use a histogram:
 
  use PDL;
  use PDL::Graphics::Prima::Simple;
- 
+
  # Generate 100 samples with mean 0 and standard deviation 1
  my $distribution = grandom(100);
  hist_plot($distribution);
@@ -414,8 +417,8 @@ Or, you may have an image of data that you want to view.
 
  use PDL;
  use PDL::Graphics::Prima::Simple;
- 
- # Generate 100 samples with mean 0 and standard deviation 1
+
+ # Generate an image of the distance of each pixel from image center.
  my $image = rvals(100, 100)
  matrix_plot($image);
 
@@ -431,15 +434,15 @@ slightly different x-range:
 
  use PDL;
  use PDL::Graphics::Prima::Simple;
- 
+
  # Build the plot
  my $x = sequence(100)/10;
  my ($window, $plot) = line_plot($x, $x->sin);
- 
+
  # Add a new dataset
  my $x2 = sequence(100)/10 + 1;
  $plot->dataSets{'cosine'} = ds::Pair($x2, $x2->cos);
- 
+
  # Display the plot
  $window->execute;
 
@@ -458,7 +461,7 @@ for a constructor with an enormous name:
  # Long form
  my $ds = PDL::Graphics::Prima::DataSet::Pair->new(x => $x, y => $y);
 
-If you actually run that example, you will notice that the sine cureve is
+If you actually run that example, you will notice that the sine curve is
 plotted as a line, just as before, but the cosine curve is plotted with a
 collection of unconnected diamonds. If you want to plot the cosine curve
 with a line, you need to specify the line plot type:
@@ -508,7 +511,7 @@ y-label:
 
  use PDL;
  use PDL::Graphics::Prima::Simple;
- 
+
  # Build the plot
  my $x = sequence(100)/10;
  plot(
@@ -516,7 +519,7 @@ y-label:
      -data => ds::Pair($x, $x->sin,
          plotType => ppair::Lines
      ),
-     
+
      # Set the title and axis labels
      title => 'The Harmonic Oscillator',
      x     => { label => 'time (s)' },
@@ -524,7 +527,7 @@ y-label:
  );
 
 Notice that all arguments to L<plot|/"PLOT FUNCTION"> are key/value pairs.
-There is a clean, heierarchical structure to the function call, and it is
+There is a clean, hierarchical structure to the function call, and it is
 clear simply by examining the punctuation which settings go with which piece.
 For example, the L<ppair::Lines|PDL::Graphics::Prima::PlotType/ppair::Lines>
 argument clearly belongs to the L<ds::Pair>. In this case, we use data
@@ -560,9 +563,9 @@ like this:
 
  my $was_auto_twiddling = auto_twiddle;
  auto_twiddle(0);
- 
+
  # ... plotting operations ...
- 
+
  # All done; restore previous autotwiddling
  # state and let the use interact:
  auto_twiddle($was_auto_twiddling);
@@ -606,12 +609,12 @@ compare three sets of data that have the exact same x-values:
 
  my $x = sequence(100)/10;
  my $y = sequence(3)->transpose + sin($x);
- 
+
  # Add mild linear trends to the first and second:
  use PDL::NiceSlice;
  $y(:, 0) += $x/5;
  $y(:, 1) -= $x/6;
- 
+
  line_plot($x, $y);
 
 The x-values do not need to be sorted. For example, this plots a sine wave sine
@@ -640,24 +643,46 @@ For the one-argument form, you would type this:
 
 =cut
 
-sub _get_pairwise_data {
-	# If one arg, and it's a piddle, return a sequence and that piddle as x/y
-	if (@_ == 1 and eval { $_[0]->isa('PDL') } ) {
-		return (PDL->sequence($_[0]->dim(0)), $_[0]);
-	}
-	# If two args, and both are piddles, return them as x/y
-	elsif (@_ == 2 and eval{$_[0]->isa('PDL') and $_[1]->isa('PDL')} ) {
-		return @_;
-	}
-	
-	# Neither of the above conditions applied: determine the function name, croak
+sub piddleish {
+	my $arg = shift;
+	return if not defined $arg;
+	return (
+		(eval { $arg->isa('PDL') })
+		or (ref($arg) and ref($arg) eq 'ARRAY')
+		or Scalar::Util::looks_like_number($arg)
+	);
+}
+
+sub _get_x_y_and_args {
 	my $function_name = (caller(1))[3];
 	$function_name =~ s/.*:://;
-	croak("$function_name expects either one piddle (y-data) or two piddles (x- and y-data)");
+	my $croak_string = "$function_name expects either one piddle "
+		. "(y-data) or two piddles (x- and y-data), optionally followed "
+		. "by key/value pairs";
+
+	croak($croak_string) if @_ == 0;
+
+	# First argument *must* be a piddleish thing; pop off second arg
+	# as well if it is piddleish.
+	croak($croak_string) if not piddleish($_[0]);
+	my @data_args = (PDL::Core::topdl(shift @_));
+	push @data_args, PDL::Core::topdl(shift @_) 
+		if piddleish($_[0]);
+	# At this point we should only have key value pairs, i.e. an even
+	# number of elememnts
+	croak($croak_string) if @_ % 2 == 1;
+
+	# If only one piddleish argument, then it is y-values; compute a
+	# sequence for the x-values
+	unshift @data_args, PDL->sequence($data_args[0]->dim(0))
+		if @data_args == 1;
+
+	return @data_args, @_;
 }
 
 sub line_plot {
-	@_ = (-data => ds::Pair(_get_pairwise_data(@_), plotType => ppair::Lines));
+	my ($x, $y, @args) = _get_x_y_and_args(@_);
+	@_ = (-data => ds::Pair($x, $y, plotType => ppair::Lines), @args);
 	goto &plot;
 }
 
@@ -679,7 +704,8 @@ Equivalent L<plot|/"PLOT FUNCTION"> commands for the two-argument forms include:
 =cut
 
 sub circle_plot {
-	@_ = (-data => ds::Pair(_get_pairwise_data(@_), plotType => ppair::Blobs));
+	my ($x, $y, @args) = _get_x_y_and_args(@_);
+	@_ = (-data => ds::Pair($x, $y, plotType => ppair::Blobs), @args);
 	goto &plot;
 }
 
@@ -707,14 +733,15 @@ form include:
 =cut
 
 sub triangle_plot {
-	@_ = (-data => ds::Pair(_get_pairwise_data(@_)
-		, plotType => ppair::Triangles(filled => 1)));
+	my ($x, $y, @args) = _get_x_y_and_args(@_);
+	@_ = (-data => ds::Pair($x, $y,
+		plotType => ppair::Triangles(filled => 1)), @args);
 	goto &plot;
 }
 
 =item square_plot ([$x], $y)
 
-Plots filled squares at (x, y). (See L<line_plot|/line_plot> for a more detailed description.)
+Plots filled squares at (x, y). (See L</line_plot> for a more detailed description.)
 Equivalent L<plot|/"PLOT FUNCTION"> commands for the two-argument form include:
 
  plot(-data => ds::Pair(
@@ -735,14 +762,15 @@ Equivalent L<plot|/"PLOT FUNCTION"> commands for the two-argument form include:
 =cut
 
 sub square_plot {
-	@_ = (-data => ds::Pair(_get_pairwise_data(@_)
-		, plotType => ppair::Squares(filled => 1)));
+	my ($x, $y, @args) = _get_x_y_and_args(@_);
+	@_ = (-data => ds::Pair($x, $y,
+		plotType => ppair::Squares(filled => 1)), @args);
 	goto &plot;
 }
 
 =item diamond_plot ([$x], $y)
 
-Plots filled diamonds at (x, y). (See L<line_plot|/line_plot> for a more detailed description.)
+Plots filled diamonds at (x, y). (See L</line_plot> for a more detailed description.)
 Equivalent L<plot|/"PLOT FUNCTION"> commands for the two-argument form include:
 
  plot(-data => ds::Pair($x, $y));
@@ -763,13 +791,14 @@ Equivalent L<plot|/"PLOT FUNCTION"> commands for the two-argument form include:
 =cut
 
 sub diamond_plot {
-	@_ = (-data => ds::Pair(_get_pairwise_data(@_)));
+	my ($x, $y, @args) = _get_x_y_and_args(@_);
+	@_ = (-data => ds::Pair($x, $y), @args);
 	goto &plot;
 }
 
 =item cross_plot ([$x], $y)
 
-Plots crosses (i.e. plus symbols) at (x, y). (See L<line_plot|/line_plot> for a more detailed
+Plots crosses (i.e. plus symbols) at (x, y). (See L</line_plot> for a more detailed
 description.) Equivalent L<plot|/"PLOT FUNCTION"> commands for the two-argument
 form include:
 
@@ -786,13 +815,14 @@ form include:
 =cut
 
 sub cross_plot {
-	@_ = (-data => ds::Pair(_get_pairwise_data(@_), plotType => ppair::Crosses));
+	my ($x, $y, @args) = _get_x_y_and_args(@_);
+	@_ = (-data => ds::Pair($x, $y, plotType => ppair::Crosses), @args);
 	goto &plot;
 }
 
 =item X_plot ([$x], $y)
 
-Plots X symbols at (x, y). (See L<line_plot|/line_plot> for a more detailed description.)
+Plots X symbols at (x, y). (See L</line_plot> for a more detailed description.)
 Equivalent L<plot|/"PLOT FUNCTION"> commands for the two-argument form include:
 
  plot(-data => ds::Pair($x, $y, plotType => ppair::Xs));
@@ -809,13 +839,14 @@ Equivalent L<plot|/"PLOT FUNCTION"> commands for the two-argument form include:
 =cut
 
 sub X_plot {
-	@_ = (-data => ds::Pair(_get_pairwise_data(@_), plotType => ppair::Xs));
+	my ($x, $y, @args) = _get_x_y_and_args(@_);
+	@_ = (-data => ds::Pair($x, $y, plotType => ppair::Xs), @args);
 	goto &plot;
 }
 
 =item asterisk_plot ([$x], $y)
 
-Plots five-pointed asterisks at (x, y). (See L<line_plot|/line_plot> for a more detailed
+Plots five-pointed asterisks at (x, y). (See L</line_plot> for a more detailed
 description.) Equivalent L<plot|/"PLOT FUNCTION"> commands for the two-argument
 form include:
 
@@ -837,8 +868,9 @@ form include:
 =cut
 
 sub asterisk_plot {
-	@_ = (-data => ds::Pair(_get_pairwise_data(@_)
-		, plotType => ppair::Asterisks(N_points => 5)));
+	my ($x, $y, @args) = _get_x_y_and_args(@_);
+	@_ = (-data => ds::Pair($x, $y,
+		plotType => ppair::Asterisks(N_points => 5)), @args);
 	goto &plot;
 }
 
@@ -860,7 +892,7 @@ y-points to be plotted. Here are some examples:
  func_plot (1, 5, \&PDL::exp);
  # this time with higher resolution:
  func_plot (1, 5, \&PDL::exp, 1000);
- 
+
  # Plot a rescaled tangent function:
  func_plot (1, 5, sub {
      my $xs = shift;
@@ -1052,7 +1084,7 @@ sub matrix_plot {
 		croak("matrix_plot expects an image, optionally preceeded by its x- and y-limits:\n"
 			. "matrix_plot ([x0, xf], [y0, yf], \$image)")
 	}
-	
+
 	@_ = (-image => ds::Grid(
 		$matrix,
 		x_bounds => $x,
@@ -1116,7 +1148,7 @@ sub imag_plot {
 		croak("imag_plot expects an image, optionally preceeded by its x- and y-limits:\n"
 			. "imag_plot ([x0, xf], [y0, yf], \$image)")
 	}
-	
+
 	@_ = (-image => ds::Grid(
 		$matrix,
 		x_bounds => $x,
@@ -1135,8 +1167,8 @@ sub imag_plot {
 The C<plot> function is the real workhorse of this module. Not only does it
 provide the functionality behind all of the above simple functions, but it
 also lets you plot multiple L<DataSet|PDL::Graphics::Prima::DataSet/>s, specify
-axis labels and a plot title, direct the axis scaling (linear or logarithmic), and set many other properties
-of the plot.
+axis labels and a plot title, direct the axis scaling (linear or logarithmic), 
+and set many other properties of the plot.
 
 Arguments that you pass to this function are almost identical to the arguments
 that you would use to create a Plot widget, so it serves as an excellent sandbox
@@ -1205,7 +1237,7 @@ You can specify multiple plotTypes by passing them in an anonymous array:
 interchangeable. Use whichever is appropriate.)
 
 All the plotTypes take key/value paired arguments. You can specify various
-L<Prima::Drawable|Prima::Drawable/> properties like
+L<Prima::Drawable> properties like
 L<lineWidth|Prima::Drawable/lineWidth> or L<color|Prima::Drawable/color>; you
 can pass plotType-specific options like symbol size
 (for L<ppair::Symbol|PDL::Graphics::Prima::PlotType/ppair::Symbol> and its
@@ -1269,8 +1301,8 @@ summarized below:
                      baseline
  ppair::Histogram  - histograms with specifiable baseline and top padding
  ppair::ErrorBars  - error bars with specified x/y errors and cap sizes
- 
- 
+
+
  Grid plotTypes
  ==============
  pgrid::Matrix     - colored rectangles, i.e. images
@@ -1346,7 +1378,7 @@ a L<Func DataSet|PDL::Graphics::Prima::DataSet/Func>.
 
 The Grid DataSet is what you would use to visualize matrices or images. It
 takes a single piddle which represents a matrix of data,
-followed by key/value pairs the specify how you want the data plotted. In
+followed by key/value pairs that specify how you want the data plotted. In
 particular, there are many ways to specify the grid centers or boundaries.
 
  -terrain => ds::Grid($landscape, ...options...)
@@ -1386,7 +1418,7 @@ with code like so:
              ppair::Squares(filled => 1),
          ],
      ),
-     
+
      # The model:
      -model => ds::Func(
          \&my_model,
@@ -1451,10 +1483,10 @@ one DataSet, and it has only two plotTypes:
  use warnings;
  use PDL::Graphics::Prima::Simple;
  use PDL;
- 
+
  my $x = sequence(100)/10;
  my $y = sin($x);
- 
+
  plot(
      -data => ds::Pair(
          $x,
@@ -1476,11 +1508,11 @@ properties for the plotTypes:
  use warnings;
  use PDL::Graphics::Prima::Simple;
  use PDL;
- 
+
  my $x = sequence(100)/10;
  my $y = sin($x);
  my $colors = pal::Rainbow->apply($y);
- 
+
  plot(
      -data => ds::Pair(
          $x,
@@ -1505,12 +1537,12 @@ plotTypes---Lines then Blobs.
  use warnings;
  use PDL::Graphics::Prima::Simple;
  use PDL;
- 
+
  my $x = sequence(100)/10;
  my $y = sin($x);
  my $colors = pal::Rainbow->apply($y);
  my $radius = 1 + $x->random*4;
- 
+
  plot(
      -data => ds::Pair(
          $x,
@@ -1537,12 +1569,12 @@ of the Blobs plotType because it's a bit more flexible:
  use warnings;
  use PDL::Graphics::Prima::Simple;
  use PDL;
- 
+
  my $x = sequence(100)/10;
  my $y = sin($x);
  my $colors = pal::Rainbow->apply($y);
  my $radius = 1 + $x->random*4;
- 
+
  plot(
      -data => ds::Pair(
          $x,
@@ -1575,7 +1607,7 @@ only using one Blobs plotType instead of two.
  use warnings;
  use PDL::Graphics::Prima::Simple;
  use PDL;
- 
+
  my $x = sequence(100)/10;
  my $y = sin($x);
  my $rainbow_colors = pal::Rainbow->apply($y);
@@ -1583,7 +1615,7 @@ only using one Blobs plotType instead of two.
  my $colors = cat($whites, $rainbow_colors);
  my $inner_radius = 1 + $x->random*4;
  my $radius = cat($inner_radius + 1, $inner_radius);
- 
+
  plot(
      -data => ds::Pair(
          $x,
@@ -1613,11 +1645,11 @@ ErrorBars plotType and the use of function-based data sets.
  use strict;
  use warnings;
  use PDL;
- 
+
  my $x = sequence(100)/10;
  my $y = $x/2 - 3 + $x->grandom*3;
  my $y_err = 2*$x->grandom->abs + 1;
- 
+
  # Calculate the slope and intercept:
  my $S = sum(1/$y_err);
  my $S_x = sum($x/$y_err);
@@ -1626,10 +1658,10 @@ ErrorBars plotType and the use of function-based data sets.
  my $S_xy = sum($x*$y/$y_err);
  my $slope = ($S_xy * $S - $S_x * $S_y) / ($S_xx * $S - $S_x * $S_x);
  my $y0 = ($S_xy - $slope * $S_xx) / $S_x;
- 
- 
+
+
  use PDL::Graphics::Prima::Simple;
- 
+
  plot(
      -data => ds::Pair(
          $x,
@@ -1655,13 +1687,13 @@ end of the data.
  use strict;
  use warnings;
  use PDL;
- 
+
  my $x = sequence(100)/10;
  my $y = $x/2 - 3 + $x->grandom*3;
  my $y_err = 2*$x->grandom->abs + 1;
- 
+
  use PDL::Graphics::Prima::Simple;
- 
+
  plot(
      -data => ds::Pair(
          $x,
@@ -1685,7 +1717,7 @@ method for this Prima widget. There are many ways of setting, overriding, or
 adding callbacks in relation to all sorts of GUI events, but when using the
 C<plot> command, your only option is to specify it as OnEventName.
 
-In this example, I add (that's B<add>, not override, becaus Prima rocks) a
+In this example, I add (that's B<add>, not override, because Prima rocks) a
 method that prints out the mouse position to the console. I also use logarithmic
 scaling in the x direction (and specify x- and y-axes labels) to make things
 interesting:
@@ -1694,13 +1726,13 @@ interesting:
  use warnings;
  use PDL::Graphics::Prima::Simple;
  use PDL;
- 
+
  # Turn on autoflush:
  $|++;
- 
+
  my $x = sequence(100)/10 + 1;
  my $y = sin($x);
- 
+
  plot(
      -data => ds::Pair(
          $x,
@@ -1737,6 +1769,9 @@ written) L<PDL::Graphics::Prima::InteractiveTut>.
 
 =cut
 
+# Load default settings from the prima-simple.ini file
+our %default_plot_args = do 'prima-simple.ini' if -f 'prima-simple.ini';
+
 # A function that allows for quick one-off plots by packing a plot widget
 # into a window. In void context and no readline support, it builds and
 # executes the window. In void context and readline support it returns
@@ -1749,14 +1784,14 @@ written) L<PDL::Graphics::Prima::InteractiveTut>.
 # A function that allows for quick one-off plots:
 *plot = \&default_plot;
 our $auto_twiddling = 1;
-our $is_twiddling = 0;
+my $is_twiddling = 0;
 our $N_windows = 0;
 sub default_plot {
 	# Make sure they sent key/value pairs:
 	croak("Arguments to plot must be in key => value pairs")
 		unless @_ % 2 == 0;
-	my %args = @_;
-	
+	my %args = (%default_plot_args, @_);
+
 	# Create a new window and pack the plot into said window
 	unless (defined $::application) {
 		require Prima::Application;
@@ -1768,7 +1803,7 @@ sub default_plot {
 		# Add a stop-twiddling listener
 		onKeyDown => sub {
 			my (undef, $key) = @_;
-			$is_twiddling = 0 if chr($key) =~ /q/i;
+			twiddling(0) if chr($key) =~ /q/i;
 		},
 		# Pair of functions to note when windows are created and destroyed
 		# for purposes of quitting twiddling when the last window is closed.
@@ -1777,7 +1812,7 @@ sub default_plot {
 		},
 		onDestroy => sub {
 			$N_windows--;
-			$is_twiddling = 0 if $N_windows == 0;
+			twiddling(0) if $N_windows == 0;
 		},
 	);
 	my $plot = $window->insert('Plot',
@@ -1786,11 +1821,11 @@ sub default_plot {
 	);
 	$plot->onKeyDown(sub {
 		my (undef, $key) = @_;
-		$is_twiddling = 0 if chr($key) =~ /q/i;
+		twiddling(0) if chr($key) =~ /q/i;
 	});
 	# make sure it shows up on top.
 	$window->bring_to_front;
-	
+
 	# Twiddle, then return. Note that twiddling (defined below) may be a
 	# no-op for configurations where the application loop is already running.
 	twiddle() if $auto_twiddling;
@@ -1800,6 +1835,14 @@ sub default_plot {
 sub auto_twiddle {
 	$auto_twiddling = $_[0] if @_;
 	return $auto_twiddling;
+}
+
+sub twiddling
+{
+	return $is_twiddling unless @_;
+	return if ($_[0] ? 1 : 0) == $is_twiddling;
+	$is_twiddling = $_[0];
+	$::application->stop if !$is_twiddling and $::application;
 }
 
 # Make twiddling a no-op if we're in the perldl shell and have event_loop
@@ -1814,36 +1857,16 @@ else {
 		# twiddling should be a no-op if the plot function is not default_plot,
 		# which is the case for App::Prima::REPL
 		return if refaddr(\&plot) != refaddr(\&default_plot);
-		
+
 		# No event looping if we don't have any open windows. Otherwise,
 		# they won't be able to exit the loop!
 		print "No open plots\n" and return if $N_windows == 0;
 		# Print a notice explaining what's going on:
-		print "Twiddling plot; close window or press q or Q to resume\n";
-		
-		# We will use Prima's nice exception handling to exit the go()
-		# method. In order to prevent undue error propogation, localize
-		# the error message:
-		local $@;
-		
-		$is_twiddling = 1;
-		# Start the timer that will check for the exit condition. There
-		# are a number of ways in which the loop will want to exit; placing
-		# the exit excption here centralizes the exception handling.
-		Prima::Timer->create(
-			onTick => sub {
-				if (not $is_twiddling) {
-					$_[0]->stop;
-					# die in order to exit the application loop
-					die 'done with event loop';
-				}
-			},
-			timeout => 500, # milliseconds
-		)->start;
-		# Run go() in an eval so we catch the exit exception
-		eval { $::application->go };
-		# Rethrow the error unless it was the exit exception
-		die unless $@ =~ /^done with event loop/;
+		print "Twiddling plot; close window or press q or Q to resume\n"
+			unless $default_plot_args{quiet};
+
+		twiddling(1);
+		$::application->go;
 	};
 }
 # Add the twiddle method to the Prima window
@@ -1873,10 +1896,10 @@ element anonymous array:
 
  # default to 800 x 800 window:
  use PDL::Graphics::Prima::Simple [800, 800];
- 
+
  # default to 800 wide by 600 tall, import nothing:
  use PDL::Graphics::Prima::Simple [800, 600], '';
- 
+
  # default to 300 wide by 450 tall, import 'plot' function:
  use PDL::Graphics::Prima::Simple [300, 450], 'plot';
 
@@ -1918,7 +1941,7 @@ sub import {
 			croak("Array references passed to PDL::Graphics::Prima::Simple indicate the\n"
 				. "desired plot window size and must contain two elements")
 				unless @$arg == 2;
-			
+
 			# Apparently we're good to go so save the sizes:
 			@default_sizes = @$arg;
 		}
@@ -1934,7 +1957,7 @@ sub import {
 			push @args, $arg;
 		}
 	}
-	
+
 	$package->export_to_level(1, $package, @args);
 }
 
@@ -1958,7 +1981,7 @@ how to sign-up, see L<http://pdl.perl.org/?page=mailing-lists>.
 =item Github
 
 The best place to report problems that you are sure are problems is at
-L<http://github.com/run4flat/PDL-Graphics-Prima/issues>.
+L<http://github.com/PDLPorters/PDL-Graphics-Prima/issues>.
 
 =back
 
@@ -1976,43 +1999,47 @@ Here is the full list of modules in this distribution:
 
 =over
 
-=item L<PDL::Graphics::Prima|PDL::Graphics::Prima/>
+=item L<PDL::Graphics::Prima>
 
 Defines the Plot widget for use in Prima applications
 
-=item L<PDL::Graphics::Prima::Axis|PDL::Graphics::Prima::Axis/>
+=item L<PDL::Graphics::Prima::Axis>
 
 Specifies the behavior of axes (but not the scaling)
 
-=item L<PDL::Graphics::Prima::DataSet|PDL::Graphics::Prima::DataSet/>
+=item L<PDL::Graphics::Prima::DataSet>
 
 Specifies the behavior of DataSets
 
-=item L<PDL::Graphics::Prima::Limits|PDL::Graphics::Prima::Limits/>
+=item L<PDL::Graphics::Prima::Limits>
 
 Defines the lm:: namespace
 
-=item L<PDL::Graphics::Prima::Palette|PDL::Graphics::Prima::Palette/>
+=item L<PDL::Graphics::Prima::Palette>
 
 Specifies a collection of different color palettes
 
-=item L<PDL::Graphics::Prima::PlotType|PDL::Graphics::Prima::PlotType/>
+=item L<PDL::Graphics::Prima::PlotType>
 
 Defines the different ways to visualize your data
 
-=item L<PDL::Graphics::Prima::ReadLine|PDL::Graphics::Prima::ReadLine/>
+=item L<PDL::Graphics::Prima::ReadLine>
 
 Encapsulates all interaction with the L<Term::ReadLine> family of
 modules.
 
-=item L<PDL::Graphics::Prima::Scaling|PDL::Graphics::Prima::Scaling/>
+=item L<PDL::Graphics::Prima::Scaling>
 
 Specifies different kinds of scaling, including linear and logarithmic
 
-=item L<PDL::Graphics::Prima::Simple|PDL::Graphics::Prima::Simple/>
+=item L<PDL::Graphics::Prima::Simple>
 
 Defines a number of useful functions for generating simple and not-so-simple
 plots
+
+=item L<PDL::Graphics::Prima::SizeSpec>
+
+Compute pixel distances from meaningful units
 
 =back
 

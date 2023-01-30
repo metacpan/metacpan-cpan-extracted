@@ -1,5 +1,8 @@
 Revision history for the Perl distribution Tie-Subset.
 
-0.01	Sun, Oct 28 2018
+0.02	Sat, Jan 28 2023
+	- added Tie::Subset::Hash::Masked
+
+0.01	Sun, Oct 28 2018	commit 205c2721053f3ba059416e2d1c78ea106c226892
 	- first release
 

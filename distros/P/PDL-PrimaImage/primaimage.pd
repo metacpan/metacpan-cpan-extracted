@@ -1,0 +1,295 @@
+use strict;
+use warnings;
+pp_addpm({At=>'Top'},<<'EOD');
+
+BEGIN { $VERSION = '1.03'; }
+
+*image2piddle = \&PDL::image2piddle;
+
+sub image
+{
+	my ( $piddle, %options) = @_;
+	die "image: invalid parameter\n" unless defined $piddle;
+	my $i = Prima::Image-> create();
+	my ( $t0, $t2) = ( $piddle->getdim(0), $piddle->getdim(2));
+	my $mpixel = 0;
+	$mpixel = 1 if
+		( $t2 == 1 && $t0 < 3 && ( $options{complex} || $options{rgb})) ||
+		$t2 > 1;
+	PDL::PrimaImage::image2piddle( $piddle, $i, 0, $mpixel);
+	return $i;
+}
+
+no warnings 'redefine';
+sub piddle
+{
+	my ( $image, %options) = @_;
+	die "piddle: invalid parameter\n" unless defined $image;
+	my $piddle;
+	my ( $x, $y) = $image-> size;
+	my $itype = $image-> type;
+	my $z = 1;
+	my $ptype;
+	if ( $itype & (im::ComplexNumber|im::TrigComplexNumber)) {
+		$ptype = ( $itype == im::Complex || $itype == im::TrigComplex) ? float : double;
+		$z = 2;
+	} elsif ( $itype & im::RealNumber) {
+		$ptype = ( $itype == im::Float) ? float : double;
+	} elsif ( $itype & im::GrayScale) {
+		if ( $itype == im::Long) {
+			$ptype = long;
+		} elsif ( $itype == im::Short) {
+			$ptype = short;
+		} elsif ( $itype == im::Byte) {
+			$ptype = byte;
+		} else {
+			$image = $image-> dup;
+			$image-> type( im::Byte);
+			$ptype = byte;
+		}
+	} elsif ( $itype == im::RGB) {
+		$ptype = byte;
+		$z = 3;
+	} elsif ( $itype == 8) {
+		$ptype = byte;
+	} else {
+		if ( $options{raw}) {
+			$x = int(( $x * ( $itype & im::BPP) + 31) / 32) * 4;
+		} else {
+			$image = $image-> dup;
+			$image-> type( im::bpp8);
+		}
+		$ptype = byte;
+	}
+
+	$piddle = ( $z > 1) ? zeroes( $ptype, $z, $x, $y) : zeroes( $ptype, $x, $y);
+	PDL::PrimaImage::image2piddle( $piddle, $image, 1, ( $z > 1) ? 1 : 0);
+	return $piddle;
+}
+
+=pod
+
+=head1 NAME
+
+PDL::PrimaImage - interface between PDL scalars and Prima images 
+
+=head1 DESCRIPTION
+
+Converts a 2D or 3D PDL scalar into Prima image and vice versa.
+
+=head1 SYNOPSIS
+
+  use PDL;
+  use Prima;
+  use PDL::PrimaImage;
+
+  my $x = byte([ 10, 111, 2, 3], [4, 115, 6, 7]);
+  my $i = PDL::PrimaImage::image( $x);
+  $i-> type( im::RGB);
+  $x = PDL::PrimaImage::piddle( $i);
+
+
+=head2 image PDL, %OPTIONS
+
+Converts a 2D or 3D piddle into a Prima image. The resulting image pixel format
+depends on the piddle type and dimension.  The 2D array is converted into one
+of C<im::Byte>, C<im::Short>, C<im::Long>, C<im::Float>, or C<im::Double> pixel
+types.
+
+For the 3D arrays each pixel is expected to be an array of values.  C<image>
+accepts arrays with 2 and 3 values.  For an array with 2 values, the resulting
+pixel format is complex ( with C<im::ComplexNumber> bit set), where each pixel
+contains 2 values, either C<float> or C<double>, correspondingly to
+<im::Complex> and C<im::DComplex> pixel formats.
+
+For an array with 3 values, the C<im::RGB> pixel format is assumed. In this
+format, each image pixel is represented as a single combined RGB value.
+
+To distinguish between degenerate cases, like f ex ([1,2,3],[4,5,6]), where it
+is impossible to guess whether the piddle is a 3x2 gray pixel image or a 1x2
+RGB image, C<%OPTIONS> hash can be used. When either C<rgb> or C<complex>
+boolean value is set, C<image> assumes the piddle is a 3D array.  If neither
+option is set, C<image> favors 2D array semantics.
+
+NB: These hints are neither useful nor are checked when piddle format is
+explicit, and should only be used for hinting an ambiguous data representation.
+
+=head2 piddle IMAGE, %OPTIONS
+
+Converts Prima image into a piddle. Depending on image pixel type,
+the piddle type and dimension is selected. The following table depicts
+how different image pixel formats affect the piddle type:
+
+
+	Pixel format     PDL type  PDL dimension
+	----------------------------------------
+	im::bpp1          byte         2
+	im::bpp4          byte         2
+	im::bpp8          byte         2
+	im::Byte          byte         2
+	im::Short         short        2
+	im::Long          long         2
+	im::Float         float        2
+	im::Double        double       2
+	im::RGB           byte         3
+	im::Complex       float        3
+	im::DComplex      double       3
+	im::TrigComplex   float        3
+	im::TrigDComplex  double       3
+
+Images in the pixel formats C<im::bpp1> and C<im::bpp4> are converted to
+C<im::bpp8> before conversion to piddle, so if raw, non-converted data stream
+is needed, in correspondingly 8- and 2- pixels perl byte format, C<raw> boolean
+option must be specified in C<%OPTIONS>. In this case, the resulting piddle
+width is aligned to a 4-byte boundary.
+
+=head1 Considerations
+
+Prima image coordinate origin is located in lower left corner.  That means,
+that an image created from a 2x2 piddle ([0,0],[0,1]) will contain pixel with
+value 1 in the upper right corner.
+
+See L<Prima::Image> for more.
+
+=head1 Troubleshooting
+
+=over
+
+=item Undefinedned symbol "gimme_the_vmt"
+
+The symbol is contained in Prima toolkit. Include 'use Prima;' in your code. If
+the error persists, it is probably Prima error; try to re-install Prima. If the
+problem continues, try to change manually value in 'sub dl_load_flags { 0x00 }'
+string to 0x01 in Prima.pm - this flag is used to control namespace export (
+see L<Dynaloader> for more ).
+
+=back
+
+=head1 AUTHOR
+
+Dmitry Karasik, E<lt>dmitry@karasik.eu.orgE<gt>.
+
+=head1 SEE ALSO
+
+PDL-PrimaImage page, http://www.prima.eu.org/PDL-PrimaImage/
+
+The Prima toolkit, http://www.prima.eu.org/
+
+L<PDL>, L<Prima>, L<Prima::Image>.
+
+=cut
+
+
+EOD
+
+pp_addpm({At=>'Bot'},<<'EOD');
+
+=head1 TROUBLESHOOTING
+
+=over
+
+=item Undefinedned symbol "gimme_the_vmt"
+
+The symbol is contained in Prima toolkit. Include 'use Prima;' 
+in your code. If the error persists, it is probably Prima
+error; try to re-install Prima. If the problem continues,
+try to change manually value in 'sub dl_load_flags { 0x00 }'
+string to 0x01 in Prima.pm - this flag is used to control
+namespace export ( see L<Dynaloader> for more ).
+
+=item 
+
+=back
+
+=head1 AUTHOR
+
+Dmitry Karasik, E<lt>dmitry@karasik.eu.orgE<gt>.
+
+=head1 SEE ALSO
+
+PDL-PrimaImage page, http://www.prima.eu.org/PDL-PrimaImage/
+
+The Prima toolkit, http://www.prima.eu.org/
+
+L<PDL>, L<Prima>, L<Prima::Image>.
+
+=cut
+
+EOD
+
+pp_addhdr(<<HEADER);
+
+#undef WORD
+#include <apricot.h>
+#include <Image.h>
+
+PImage_vmt CImage;
+
+static void
+repad( Byte * source, Byte * dest, int h, int srcLineSize, int dstLineSize)
+{
+	int bsc = srcLineSize > dstLineSize ? dstLineSize : srcLineSize;
+	for ( ; h > 0; h--, source += srcLineSize, dest += dstLineSize)
+		memcpy(dest, source, bsc); 
+}
+
+
+static void
+prima_image_convert( SV * imagesv, void * data, int w, int h, int image2piddle, int z, int mpixel, int type)
+{
+	int bsz = (type & imBPP)/8;
+	PImage image;
+	if ( !(( image = ( PImage) gimme_the_mate( imagesv)) && kind_of(( Handle) image, CImage)))
+		croak("Invalid image object passed");
+	if ( !mpixel) {
+		h = w;
+		w = z;
+		z = 1;
+	}
+	if ( image2piddle) {
+		repad(image-> data, ( Byte *) data, h, image-> lineSize, bsz * w * z);
+	} else {
+		if ( w * z != image-> w || h != image-> h || image-> type != type)
+			image-> self-> create_empty(( Handle) image, w * z, h, type);
+		repad(( Byte *) data, image-> data, h, bsz * w * z, image-> lineSize); 
+		if ( z == 2) {
+			if ( type != imFloat && type != imComplex)
+				image-> self-> reset(( Handle) image, imFloat, nil, 0);
+			image-> type = imComplexNumber | imGrayScale | ( image-> type & imBPP) * 2;
+			image-> w /= 2;
+		} else if ( z == 3) {
+			if ( type != imByte)
+				image-> self-> reset(( Handle) image, imByte, nil, 0);
+			image-> type = imRGB;
+			image-> w /= 3;
+		}
+		image-> self-> update_change((Handle)image);
+	}
+}
+
+
+#define byte_prima_image_convert(a,b,c,d,e,f,g) prima_image_convert(a,b,c,d,e,f,g,imByte)
+#define short_prima_image_convert(a,b,c,d,e,f,g) prima_image_convert(a,b,c,d,e,f,g,imShort)
+#define long_prima_image_convert(a,b,c,d,e,f,g) prima_image_convert(a,b,c,d,e,f,g,imLong)
+#define float_prima_image_convert(a,b,c,d,e,f,g) prima_image_convert(a,b,c,d,e,f,g,imFloat)
+#define double_prima_image_convert(a,b,c,d,e,f,g) prima_image_convert(a,b,c,d,e,f,g,imDouble)
+HEADER
+
+
+pp_add_boot(<<'BOOT');
+PRIMA_VERSION_BOOTCHECK;
+CImage = (PImage_vmt)gimme_the_vmt( "Prima::Image");
+BOOT
+
+pp_def('image2piddle',
+	Pars => 'data(z,w,h)',
+	OtherPars => 'SV * imagesv; int image2piddle; int mpixel',
+	GenericTypes => ['B','S','L','F','D'],
+	Code => <<CODE,
+\$TBSLFD(byte,short,long,float,double)_prima_image_convert(
+	\$COMP(imagesv),\$P(data),\$SIZE(w),\$SIZE(h),
+	\$COMP(image2piddle),\$SIZE(z),\$COMP(mpixel));
+CODE
+);
+
+pp_done();

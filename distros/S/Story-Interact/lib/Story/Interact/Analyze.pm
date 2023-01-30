@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact::Analyze;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001005';
+our $VERSION   = '0.001006';
 
 use Story::Interact::State;
 
@@ -41,13 +41,13 @@ sub _build_data {
 		
 		my $page_source = $self->page_source->get_source_code( $page_id ) or next;
 		my @naive_links;
-		while ( $page_source =~ /^ \s* next_page \s* \(? \s* (\S+) \s* [,=] /xg ) {
+		while ( $page_source =~ /^ \s* next_page \s* \(? \s* (\S+) \s* [,=] /mxg ) {
 			push @naive_links, $1;
 		}
 		@naive_links = map { /\A\w+\z/ ? $1 : scalar( eval $_ ) } @naive_links;
 		
 		my $naive_todo = 0;
-		if ( $page_source =~ /^ \s* todo \b /x ) {
+		if ( $page_source =~ /^ \s* todo \b /mx ) {
 			$naive_todo = 1;
 		}
 		

@@ -6,4 +6,29 @@ Home page:    <https://metacpan.org/release/Exporter-Almighty>
 Bug tracker:  <https://github.com/tobyink/p5-exporter-almighty/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.001003	2023-01-28
+
+ [ Documentation ]
+ - Correct minor errors in the pod for the `type` option.
+ - Improved description.
+
+ [ Other ]
+ - Allow `setup_for` to take a hash instead of a hashref.
+
+0.001002	2023-01-27
+
+ - Class, role, and duck types can now be defined as easily as enum types.
+ - Your exporter can re-export types from type libraries.
+
+0.001001	2023-01-27
+
+ [ Bug Fixes ]
+ - Avoid experimental::builtin warnings on Perl 5.36+.
+
+ [ Other ]
+ - Adding any enums to an exporter now makes your package a subclass of
+   Type::Library instead of Exporter::Tiny.
+ - Rely on Type::Library's grouping/tagging for any type constraints in the
+   exporter.
+
 0.001000	2023-01-27	Initial release

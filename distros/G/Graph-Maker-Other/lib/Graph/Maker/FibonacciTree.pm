@@ -23,7 +23,7 @@ use Graph::Maker;
 use Carp 'croak';
 
 use vars '$VERSION','@ISA';
-$VERSION = 18;
+$VERSION = 19;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines

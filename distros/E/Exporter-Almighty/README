@@ -5,6 +5,7 @@ NAME
 SYNOPSIS
       package Your::Package;
   
+      use v5.12;
       use Exporter::Almighty -setup => {
         tag => {
           foo => [ 'foo1', 'foo2' ],
@@ -33,6 +34,14 @@ DESCRIPTION
     This module aims to make building exporters easier. It is based on
     Exporter::Tiny, but helps you avoid manually setting @EXPORT_OK,
     %EXPORT_TAGS, etc.
+
+    Exporter::Almighty supports lexical exports, even on Perl versions as old
+    as 5.12.
+
+    Exporter::Almighty indeed requires Perl 5.12, so it's strongly recommended
+    you add `use v5.12` (or higher) before `use Exporter::Almighty` so that
+    your package can benefit from features which don't exist in legacy
+    versions of Perl.
 
   Setup Options
     Exporter::Almighty's own setup happens through its import. A setup hashref
@@ -88,6 +97,45 @@ DESCRIPTION
     By convention, the tag names should be snake_case, but constant names
     should be SHOUTING_SNAKE_CASE.
 
+   `type`
+    This is an arrayref of type libraries. Each library listed will be
+    *imported* into your exporter, and then the types in it will be
+    *re-exported* to the people who use your package. Each type library can
+    optionally be followed by an arrayref of type names if you don't want to
+    just import all types.
+
+      package Your::Package;
+  
+      use Exporter::Almighty -setup => {
+        tags => {
+          foo => [ 'foo1', 'foo2' ],
+        },
+        type => [
+          'Types::Standard',
+          'Types::Common::String'  => [ 'NonEmptyStr' ],
+          'Types::Common::Numeric' => [ 'PositiveInt', 'PositiveOrZeroInt' ],
+        ],
+      };
+  
+      sub foo1 { ... }
+      sub foo2 { ... }
+  
+      ...;
+  
+      package main;
+  
+      use Your::Package qw( -foo is_NonEmptyStr );
+  
+      my $got = foo1();
+      if ( is_NonEmptyStr( $got ) ) {
+        foo2();
+      }
+
+    If you re-export types like this, then your module will be "promoted" to
+    being a subclass of Type::Library instead of Exporter::Tiny.
+    (Type::Library is itself a subclass of Exporter::Tiny, so you don't miss
+    out on any features.)
+
    `enum`
     This is a hashref where keys are enumerated type names, and the values are
     arrayrefs of strings.
@@ -108,16 +156,73 @@ DESCRIPTION
         STATUS_ALIVE
         STATUS_DEAD
       );
-      use Your::Package qw( :status );          # shortcut for the above
+      use Your::Package qw( +Status );  # shortcut for the above
 
-    The `:type`, `:is`, `:assert`, `:to`, and `:constants` tags will also
+    The `Status` function exported by the above will return a Type::Tiny::Enum
+    object.
+
+    The `:types`, `:is`, `:assert`, `:to`, and `:constants` tags will also
     automatically include the relevent exports.
+
+    If you export any enums then your module will be "promoted" from being an
+    Exporter::Tiny to being a Type::Library.
 
     By convention, enum types should be UpperCamelCase.
 
+   `class`
+    This is an arrayref of class names.
+
+      use Exporter::Almighty -setup => {
+        class => [
+          'HTTP::Tiny',
+          'LWP::UserAgent',
+        ],
+      };
+
+    People can import:
+
+      use Your::Package qw( +HTTPTiny +LWPUserAgent );
+  
+      unless ( is_HTTPTiny($x) or is_LWPUserAgent($x) ) {
+        $x = HTTPTiny->new();
+      }
+
+    These create Type::Tiny::Class type constraints similar to how `enum`
+    works. It will similarly promote your exporter to a Type::Library.
+
+    Notice that the `new` method will be proxied through to the underlying
+    class, so these can also work as useful aliases for long class names.
+
+      use Exporter::Almighty -setup => {
+        class => [
+          'ShortName' => { class => 'Very::Long::Class::Name' },
+          'TinyName'  => { class => 'An::Even::Longer::Class::Name' },
+        ],
+      };
+
+    Exporter::Almighty will attempt to pre-emptively load modules mentioned
+    here, so you don't need to do it yourself. However if the modules don't
+    exist, it won't complain.
+
+   `role`
+    This works the same as `class`, except for roles.
+
+   `duck`
+    This is a hashref where keys are "duck type" type names, and the values
+    are arrayrefs of method names.
+
+      use Exporter::Almighty -setup => {
+        duck => [
+          'UserAgent' => [ 'head', 'get', 'post' ],
+        ],
+      };
+
+    These create Type::Tiny::Duck type constraints similar to how `enum`
+    works. It will similarly promote your exporter to be a Type::Library.
+
    `also`
     A list of other packages to also export to your caller. Each package name
-    can optionally be followed by an arrayerf of import arguments.
+    can optionally be followed by an arrayref of import arguments.
 
       use Exporter::Almighty -setup => {
         also => [
@@ -140,7 +245,7 @@ DESCRIPTION
 
     It is possible to do this at run-time:
 
-      Exporter::Almighty->setup_for( 'Your::Package', \%setup );
+      Exporter::Almighty->setup_for( 'Your::Package', %setup );
 
     This may allow slightly more flexibility in some cases.
 
@@ -148,6 +253,8 @@ DESCRIPTION
 
   Exporter::Tiny features you get for free
    Features for you
+    Exporter::Almighty will import strict and warnings into your package.
+
     You can export package variables, though it's rarely a good idea:
 
       package Your::Package;

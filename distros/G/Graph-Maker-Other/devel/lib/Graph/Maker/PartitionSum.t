@@ -42,7 +42,7 @@ require Graph::Maker::PartitionSum;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 18;
+  my $want_version = 19;
   ok ($Graph::Maker::PartitionSum::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::PartitionSum->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::PartitionSum->VERSION($want_version); 1 }, 1,

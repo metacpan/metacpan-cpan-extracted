@@ -23,7 +23,7 @@ use Graph::Maker;
 use List::Util 'min';
 
 use vars '$VERSION','@ISA';
-$VERSION = 18;
+$VERSION = 19;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -45,13 +45,15 @@ sub _default_graph_maker {
 
 sub init {
   my ($self, %params) = @_;
-  my $N = delete($params{'N'}) || 5;
-  my $K = delete($params{'K'}) || 2;
+  my $N = delete($params{'N'});
+  my $K = delete($params{'K'});
+  if (! defined $N) { $N = 5; }
+  if (! defined $K) { $K = 2; }
 
   my $graph = $self->make_graph(%params);
   $graph->set_graph_attribute (name => ($N==5 && $K==2 ? "Petersen" : "Petersen $N,$K"));
 
-  $K = min($K%$N, (-$K)%$N);
+  if ($N) { $K = min($K%$N, (-$K)%$N); }
   ### K reduced: $K
   ### cf N/2: $N/2
 

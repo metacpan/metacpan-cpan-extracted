@@ -1,39 +1,42 @@
 CXC::Exporter::Util
 
-"CXC::Exporter::Util" provides tag-centric utilities for modules which
-export symbols.
+"CXC::Exporter::Util" provides *tag-centric* utilities for modules which
+export symbols. It doesn't provide exporting services; its sole purpose
+is to manipulate the data structures used by exporting modules which
+follow the API provided by Perl's core Exporter module (e.g.
+Exporter::Tiny).
 
-In this approach, %EXPORT_TAGS is the definitive source for information
-about exportable symbols and is used to generate both @EXPORT_OK and
-@EXPORT. Consolidation of symbol information in one place avoids errors
-of omission.
+In particular, it treats %EXPORT_TAGS as the definitive source for
+information about exportable symbols and uses it to generate @EXPORT_OK
+and @EXPORT. Consolidation of symbol information in one place avoids
+errors of omission.
 
-The standard export interface provided by Perl's core Exporter (and
-emulated by others such as Exporter::Tiny) uses three structures in the
-exporting module's namespace:
+  Exporting Symbols
 
-@EXPORT
-    Symbols in this array are automatically exported.
+At it simplest, the exporting module calls "install_EXPORTS" with a hash
+specifying tags and their symbols sets, e.g.,
 
-@EXPORT_OK
-    Symbols in this array are available for export.
-
-%EXPORT_TAGS
-    This hash associates sets of symbols with tags. Exporter allows the
-    importing module to import a set of symbols by specifying a set's
-    tag rather than each of the symbols individually.
-
-  Standard Usage
-
-At it simplest, the exporting module calls "install_EXPORTS" with a
-hash:
-
-  package My::ExportingModule;
+  package My::Exporter;
   use CXC::Exporter::Util;
 
-  use parent 'Exporter';
+  use parent 'Exporter'; # or your favorite compatible exporter
 
-  install_EXPORTS( { tag => [ 'Symbol1', 'Symbol2' ] } );
+  install_EXPORTS(
+            { fruit => [ 'tomato', 'apple' ],
+              nut   => [ 'almond', 'walnut' ],
+            } );
+
+  sub tomato {...}
+  sub apple  {...}
+  sub almond {...}
+  sub walnut {...}
+
+An importing module could use this via
+
+  use My::ExportingModule ':fruit'; # import tomato, apple
+  use My::ExportingModule ':nut';   # import almond, walnut
+  use My::ExportingModule ':all';   # import tomato, apple,
+                                    #        almond, walnut,
 
 For more complicated setups, %EXPORT_TAGS may be specified first:
 
@@ -44,57 +47,66 @@ For more complicated setups, %EXPORT_TAGS may be specified first:
   our %EXPORT_TAGS = ( tag => [ 'Symbol1', 'Symbol2' ] );
   install_EXPORTS;
 
-  Handling Constant values
+"install_EXPORTS" may be called multiple times
+
+  Exporting Constants
 
 CXC::Exporter::Util provides additional support for creating, organizing
 and installing constants via "install_CONSTANTS". Constants are created
 via Perl's constant pragma.
 
-"install_CONSTANTS" is passed a hash containing sets of constants
-grouped by tags, e.g.:
+"install_CONSTANTS" is passed sets of constants grouped by tags, e.g.:
 
   install_CONSTANTS( {
-        DETECTOR => {
+        DETECTORS => {
             ACIS => 'ACIS',
             HRC  => 'HRC',
         },
 
-        AGGREGATE => {
+        AGGREGATES => {
             ALL  => 'all',
             NONE => 'none',
             ANY  => 'any',
         },
    });
+
+   # A call to install_EXPORTS (with or without arguments) must follow
+   # install_CONSTANTS;
    install_EXPORTS;
 
-In addition to the constants, it generates constant functions which
-return all of the constant values in each set.
+For each set an enumerating function is created which returns the set's
+values.
 
-For the above example, it creates constants "ACIS", "HRC", "ALL",
-"NONE", "ANY", and constant functions "DETECTORS" and "AGGREGATES" (note
-the trailing upper-case "S"). The latter are useful for generating
-enumerated types via e.g. Type::Tiny:
+In the above example, constant functions "ACIS", "HRC", "ALL", "NONE",
+"ANY", tags "detectors" and "aggregates", and constant functions
+"DETECTORS" and "AGGREGATES" are created.
 
-  Enum( DETECTORS )
+The enumerating functions are useful for generating enumerated types via
+e.g. Type::Tiny:
+
+  Enum[ DETECTORS ]
 
 or iterating:
 
   say $_ for DETECTORS;
 
-The top level keys ("DETECTOR", "AGGREGATE") are transformed into tags
-by lower casing them, e.g.
+"install_CONSTANTS" may be called multiple times. If the constants are
+used later in the module for other purposes, constant definition should
+be done in a BEGIN block:
 
-  $EXPORT_TAGS{detector} = [ qw( ACIS HRC ) ];
-  $EXPORT_TAGS{aggregate} = [ qw( ALL NONE ANY ) ];
+  BEGIN {
+      install_CONSTANTS( {
+          CCD => {nCCDColumns  => 1024, minCCDColumn => 0,},
+      } );
+  }
 
-The constant functions are assigned the "constant_funcs" tag, e.g.
+  install_CONSTANTS( {
+      CCD => {
+          maxCCDColumn => minCCDColumn + nCCDColumns - 1,
+      } }
+  );
 
-  $EXPORT_TAGS{constant_funcs} = [ qw( DETECTORS AGGREGATES ) ];
-
-If the constants are used later in the module for other purposes,
-constant definition should be done in a BEGIN block:
-
-  BEGIN { install_CONSTANTS( \%CONSTANTS ) }
+  install_EXPORTS;
 
 For more complex situations, the lower level "install_constant_tag" and
 "install_constant_func" routines may be useful.

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2017, 2019, 2020, 2021 Kevin Ryde
+# Copyright 2015, 2017, 2019, 2020, 2021, 2022 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -29,7 +29,8 @@ use Graph::Maker::BinomialBoth;
 use MyGraphs;
 $|=1;
 # GP-DEFINE  default(strictargs,1);
-# GP-DEFINE  read("my-oeis.gp");
+# GP-DEFINE  read("OEIS-data.gp");
+# GP-DEFINE  read("OEIS-data-wip.gp");
 # GP-DEFINE  read("memoize.gp");
 
 # uncomment this to run the ### lines
@@ -43,7 +44,7 @@ $|=1;
   #  vector(9,k,k--; (k+1)*4^k - Wnew_by_min(k)) == \
   #    [0, 2, 12, 60, 280, 1260, 5544, 24024, 102960]
   # A005430 Apery numbers n*binomial(2n,n).
-  #  my(want=OEIS_samples("A005430"));  /* OFFSET=0 */ \
+  #  my(want=OEIS_data("A005430"));  /* OFFSET=0 */ \
   #    vector(#want,k,k--; (k+1)*4^k - Wnew_by_min(k)) == want
   # GP-Test  sum(k=0,20, x^k* k*binomial(2*k,k) ) == \
   # GP-Test  2*x/sqrt((1-4*x + O(x^20))^3)     /* Apery gf */
@@ -64,7 +65,7 @@ $|=1;
   # GP-Test  vector(9,k,k--; (k+1)*4^k)
   # GP-Test  vector(9,k,k--; (k+1)*4^k) == \
   # GP-Test    [1, 8, 48, 256, 1280, 6144, 28672, 131072, 589824]
-  # GP-Test  my(want=OEIS_samples("A002697"));  /* OFFSET=0 */ \
+  # GP-Test  my(want=OEIS_data("A002697"));  /* OFFSET=0 */ \
   # GP-Test    vector(#want,k,k-=2; (k+1)*4^k) == want
   # A002697   Wiener index of hypercube
 

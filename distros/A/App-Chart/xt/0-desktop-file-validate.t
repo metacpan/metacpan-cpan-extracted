@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012 Kevin Ryde
+# Copyright 2011, 2012, 2023 Kevin Ryde
 
 # 0-desktop-file-validate.t is shared by several distributions.
 #
@@ -19,6 +19,8 @@
 
 BEGIN { require 5 }
 use strict;
+use File::Spec;
+$|=1;
 
 use lib 't';
 use MyTestHelpers;
@@ -31,51 +33,47 @@ BEGIN { MyTestHelpers::nowarnings() }
   package Test::DesktopFile::Validate;
   use strict;
   use Carp;
-  use IPC::Cmd;
   use Test::More;
   use ExtUtils::Manifest;
 
   sub skip_reason {
-    eval { require IPC::Cmd; 1 }
-      or return 'IPC::Cmd not available';
-    my ($success, $error_message, $buffer)
-      = IPC::Cmd::run (command => ['desktop-file-validate','--help'],
-                       verbose => 0);
-    ### $buffer
-    if ($success) {
+    ### skip_reason() ...
+    eval { require IPC::Run; 1 }
+      or return 'IPC::Run not available';
+  
+    ### try desktop-file-validate ...
+    if (IPC::Run::run (['desktop-file-validate','--help'],
+                       '<', File::Spec->devnull,
+                       '>', \my $output,
+                       '2>&1')) {
       return undef;
     }
-    my $skip = "desktop-file-validate program not available: $error_message";
-    if (defined $buffer) {
-      $skip .= join('',$buffer);
-    }
+    my $skip = "desktop-file-validate program not available";
     return $skip;
   }
-
+  
   sub desktop_file_validate {
     my ($filename) = @_;
-    require IPC::Cmd;
-    my ($success, $error_message, $buffer)
-      = IPC::Cmd::run(command => ['desktop-file-validate',
-                                  '--no-warn-deprecated',
-                                  $filename],
-                      verbose => 0);
-    if ($success) {
+    my $output;
+    if (IPC::Run::run(['desktop-file-validate',
+                       '--no-warn-deprecated',
+                       $filename],
+                      '>', \$output,
+                      '2>&1')) {
       return undef;
-    } else {
-      return "$error_message\n$buffer";
     }
+    return "desktop-file-validate error\n$output";
   }
-
+  
   sub check_all_desktop_files {
     ### check_all_desktop_files() ...
-
+  
   SKIP: {
       my $skip = skip_reason();
       if (defined $skip) {
         skip $skip, 1;
       }
-
+  
       my $manifest = ExtUtils::Manifest::maniread();
       my @filenames = grep /\.desktop$/, keys %$manifest;
       ### @filenames

@@ -12,7 +12,7 @@ use Date::Calc            qw/Delta_Days/;
 use Carp                  qw/croak/;
 use Encode                qw/encode_utf8/;
 
-our $VERSION = '1.01';
+our $VERSION = '1.03';
 
 #======================================================================
 # GLOBALS
@@ -66,6 +66,7 @@ sub new {
   $self->{shared_string}         = {}; # ($string => $string_index)
   $self->{n_strings_in_workbook} = 0;  # total nb of strings (including duplicates)
   $self->{last_string_id}        = 0;  # index for the next shared string
+  $self->{defined_names}         = {}; # ($name => [$formula, $comment])
 
   # immediately open a Zip archive
   $self->{zip} = Archive::Zip->new;
@@ -174,7 +175,7 @@ sub add_sheet {
   # insert the sheet and its rels into the zip archive
   my $sheet_id   = $self->n_sheets;
   my $sheet_file = "sheet$sheet_id.xml";
-  $self->{zip}->addString(join("", @xml),
+  $self->{zip}->addString(encode_utf8(join("", @xml)),
                           "xl/worksheets/$sheet_file",
                           $self->{compression_level});
   $self->{zip}->addString($self->worksheet_rels(@table_rels),
@@ -265,6 +266,15 @@ sub add_table {
 }
 
 
+sub add_defined_name {
+  my ($self, $name, $formula, $comment) = @_;
+
+  $name && $formula                        or croak 'add_defined_name($name, $formula): empty argument'; 
+  not exists $self->{defined_names}{$name} or croak "add_defined_name(): name '$name' already in use";
+  $self->{defined_names}{$name} = [$formula, $comment];
+}
+
+
 sub worksheet_rels {
   my ($self, $table_id) = @_;
 
@@ -327,18 +337,31 @@ sub workbook {
     qq{<?xml version="1.0" encoding="UTF-8" standalone="yes"?>},
     qq{<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"},
              qq{ xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">},
-    qq{<sheets>},
     );
 
   # references to the worksheets
+  push @xml, q{<sheets>};
   my $sheet_id = 1;
   foreach my $sheet_name (@{$self->{sheets}}) {
     push @xml, qq{<sheet name="$sheet_name" sheetId="$sheet_id" r:id="rId$sheet_id"/>};
     $sheet_id++;
   }
+  push @xml, q{</sheets>};
+
+  if (my $names = $self->{defined_names}) {
+    push @xml, q{<definedNames>};
+    while (my ($name, $content) = each %$names) {
+      my $attrs = qq{name="$name"};
+      $attrs   .= qq{ comment="$content->[1]"} if $content->[1];
+      $content->[0] =~ s/($entity_regex)/$entity{$1}/g;
+      push @xml, qq{<definedName $attrs>$content->[0]</definedName>};
+    }
+    push @xml, q{</definedNames>};
+  }
+
 
   # closing XML
-  push @xml, q{</sheets>}, q{</workbook>};
+  push @xml, q{</workbook>};
 
   return encode_utf8(join "", @xml);
 }
@@ -550,6 +573,7 @@ Excel::ValueWriter::XLSX - generating data-only Excel workbooks in XLSX format, 
                                                                 ]);
   $writer->add_sheet($sheet_name2, $table_name2, \@headers, $row_generator);
   $writer->add_sheets_from_database($dbh);
+  $writer->add_defined_name($name, $formula, $comment);
   $writer->save_as($filename);
   
   $writer = Excel::ValueWriter::XLSX->new(bool_regex => qr[^(?:(VRAI)|FAUX)$]);
@@ -711,6 +735,40 @@ If empty, table names are retrieved automatically from the database
 through the L<DBI/table_info> method.
 
 =back
+
+=head2 add_defined_name
+
+  $writer->add_defined_name($name, $formula, $comment);
+
+Adds a "defined name" to the workbook. Defined names can be used
+in any formula within the workbook, and will be replaced by
+the corresponding content.
+
+=over
+
+=item *
+
+C<$name> is mandatory and must be unique
+
+=item *
+
+C<$formula> is mandatory and will be interpreted by Excel like a formula.
+References to ranges should include the sheet name and use absolute coordinates;
+for example for concatenating two cells in sheet 's1', the formula is :
+
+  $writer->add_defined_name(cells_1_and_2 => q{'s1'!$A$1&'s1'!$A$2});
+
+If the intended content is just a constant string, it must be enclosed in double quotes, i.e.
+
+  $writer->add_defined_name(my_string => q{"my_constant_value"});
+
+=item *
+
+C<$comment> is optional; it will appear when users consult the 
+L<name manager|https://support.microsoft.com/en-us/office/use-the-name-manager-in-excel-4d8c4c2b-9f7d-44e3-a3b4-9f61bd5c64e4> in the Formulas tab.
+
+=back
+
 
 =head2 save_as
 

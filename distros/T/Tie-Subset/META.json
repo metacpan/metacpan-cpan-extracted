@@ -4,13 +4,13 @@
       "Hauke D <haukex@zero-g.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Tie-Subset",
    "no_index" : {
@@ -50,15 +50,15 @@
    "provides" : {
       "Tie::Subset" : {
          "file" : "lib/Tie/Subset.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Tie::Subset::Array" : {
          "file" : "lib/Tie/Subset/Array.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Tie::Subset::Hash" : {
          "file" : "lib/Tie/Subset/Hash.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -73,6 +73,6 @@
          "web" : "https://github.com/haukex/Tie-Subset"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

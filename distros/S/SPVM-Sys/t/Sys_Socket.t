@@ -14,6 +14,7 @@ use TestUtil::Socket;
 
 use SPVM 'Sys::Socket';
 use SPVM 'TestCase::Sys::Socket';
+use SPVM 'Sys::Socket::Constant';
 
 my $localhost = "127.0.0.1";
 

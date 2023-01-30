@@ -11,30 +11,20 @@ my $build = Module::Build->new(
 		'Module::Build' => 0.28,
 	},
 	requires => {
-		# No I will not support 5.6
-		perl					=> '5.8.0',
-		'PDL::Drawing::Prima'	=> 0.07,
-		PDL						=> '2.4.0',
-		Prima					=> 1.40,
+		perl                    => '5.12.0', # Prima is minimum 5.12
+		'PDL::Drawing::Prima'	  => 0.15,
+		PDL                     => '2.4.0',
+		Prima                   => 1.67,
 		# Needed for event_loop
 #		'Term::ReadLine'       => '1.09',
 	},
 	meta_merge => {
 		resources => {
-			repository
-				=> 'http://github.com/run4flat/PDL-Graphics-Prima',
-#				=> {
-#					web => 'http://github.com/run4flat/PDL-Graphics-Prima',
-#					url => 'git://github.com/run4flat/PDL-Graphics-Prima.git',
-#					type => 'git',
-#				},
-			bugtracker
-				=> 'http://github.com/run4flat/PDL-Graphics-Prima/issues',
-#				=> {
-#					web => 'http://github.com/run4flat/PDL-Graphics-Prima/issues',
-#				},
+			repository => 'http://github.com/PDLPorters/PDL-Graphics-Prima',
+			bugtracker => 'http://github.com/PDLPorters/PDL-Graphics-Prima/issues',
 		},
 	},
 );
 
+$build->add_build_element('png');
 $build->create_build_script;

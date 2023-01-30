@@ -40,7 +40,7 @@ require Graph::Maker::KnightGrid;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 18;
+  my $want_version = 19;
   ok ($Graph::Maker::KnightGrid::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::KnightGrid->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::KnightGrid->VERSION($want_version); 1 }, 1,

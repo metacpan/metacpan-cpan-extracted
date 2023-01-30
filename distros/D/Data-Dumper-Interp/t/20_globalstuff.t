@@ -51,17 +51,29 @@ use Math::BigFloat 1.999837 ();
 use Math::BigRat 0.2624 ();
 
 require Data::Dumper;
+require bigint;
+#require bigfloat;
+require bigrat;
 
-diag "Perl version ",u($^V),"\n";
+diag "Perl ",u($^V),"\n\n";
 
-my @modnames = (qw/Data::Dumper Math::BigInt Math::BigFloat Math::BigRat/);
-for my $modname (@modnames) {
-  diag "Loaded ", $INC{ "${modname}.pm" =~ s/::/\//gr }, "\n";
+for my $modname ( qw/bigint bigfloat bigrat bignum 
+                     bogon
+                     Data::Dumper Math::BigInt Math::BigFloat Math::BigRat/) {
+  # Not all these modules are explicitly used (e.g. bigfloat) 
+  # but if present, show their verions.
+  eval "require $modname;";
+  my $modpath = "${modname}.pm" =~ s/::/\//gr;
+  if ($INC{$modpath}) {
+    no strict 'refs';
+    diag sprintf "%-24s %s\n", 
+                 $modname . '@' . u(${"${modname}::VERSION"}),
+                 $INC{$modpath} ;
+  } else {
+    diag "(Module '$modname' is not available)\n";
+  }
 }
-for my $modname (@modnames) {
-  no strict 'refs';
-  diag sprintf "%-14s %s\n", $modname, u(${"${modname}::VERSION"});
-}
+diag "";
 
 # Has Data::Dumper::Useqq('utf8') been fixed?
 { my $s = Data::Dumper->new([$unicode_str],['unicode_str'])->Terse(1)->Useqq('utf8')->Dump;

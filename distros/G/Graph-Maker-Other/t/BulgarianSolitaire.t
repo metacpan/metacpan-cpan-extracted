@@ -39,7 +39,7 @@ require Graph::Maker::BulgarianSolitaire;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 18;
+  my $want_version = 19;
   ok ($Graph::Maker::BulgarianSolitaire::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::BulgarianSolitaire->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::BulgarianSolitaire->VERSION($want_version); 1 }, 1,

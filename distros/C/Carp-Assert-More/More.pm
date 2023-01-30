@@ -1,10 +1,11 @@
 package Carp::Assert::More;
 
-use warnings;
+use 5.010;
 use strict;
+use warnings;
 
 use Exporter;
-use Scalar::Util;
+use Scalar::Util qw( looks_like_number );;
 
 use vars qw( $VERSION @ISA @EXPORT );
 
@@ -14,18 +15,19 @@ Carp::Assert::More - Convenience assertions for common situations
 
 =head1 VERSION
 
-Version 2.1.0
+Version 2.2.0
 
 =cut
 
 BEGIN {
-    $VERSION = '2.1.0';
+    $VERSION = '2.2.0';
     @ISA = qw(Exporter);
     @EXPORT = qw(
         assert_all_keys_in
         assert_aoh
         assert_arrayref
         assert_arrayref_nonempty
+        assert_cmp
         assert_coderef
         assert_context_nonvoid
         assert_context_scalar
@@ -137,6 +139,105 @@ sub assert_isnt($$;$) {
 
     require Carp;
     &Carp::confess( _failure_msg($name) );
+}
+
+
+=head2 assert_cmp( $x, $op, $y [,$name] )
+
+Asserts that the relation C<$x $op $y> is true. For example:
+
+    assert_cmp( $divisor, '!=', 0, 'Divisor must not be zero' );
+
+is the same as:
+
+    assert( $divisor != 0, 'Divisor must not be zero' );
+
+but with better error reporting.
+
+The following operators are supported:
+
+=over 4
+
+=item * == numeric equal
+
+=item * != numeric not equal
+
+=item * > numeric greater than
+
+=item * >= numeric greater than or equal
+
+=item * < numeric less than
+
+=item * <= numeric less than or equal
+
+=item * lt string less than
+
+=item * le string less than or equal
+
+=item * gt string less than
+
+=item * ge string less than or equal
+
+=back
+
+There is no support for C<eq> or C<ne> because those already have
+C<assert_is> and C<assert_isnt>, respectively.
+
+If either C<$x> or C<$y> is undef, the assertion will fail.
+
+If the operator is numeric, and C<$x> or C<$y> are not numbers, the assertion will fail.
+
+=cut
+
+sub assert_cmp($$$;$) {
+    my $x    = shift;
+    my $op   = shift;
+    my $y    = shift;
+    my $name = shift;
+
+    my $why;
+
+    if ( !defined($op) ) {
+        $why = 'Invalid operator <undef>';
+    }
+    elsif ( $op eq '==' ) {
+        return if looks_like_number($x) && looks_like_number($y) && ($x == $y);
+    }
+    elsif ( $op eq '!=' ) {
+        return if looks_like_number($x) && looks_like_number($y) && ($x != $y);
+    }
+    elsif ( $op eq '<' ) {
+        return if looks_like_number($x) && looks_like_number($y) && ($x < $y);
+    }
+    elsif ( $op eq '<=' ) {
+        return if looks_like_number($x) && looks_like_number($y) && ($x <= $y);
+    }
+    elsif ( $op eq '>' ) {
+        return if looks_like_number($x) && looks_like_number($y) && ($x > $y);
+    }
+    elsif ( $op eq '>=' ) {
+        return if looks_like_number($x) && looks_like_number($y) && ($x >= $y);
+    }
+    elsif ( $op eq 'lt' ) {
+        return if defined($x) && defined($y) && ($x lt $y);
+    }
+    elsif ( $op eq 'le' ) {
+        return if defined($x) && defined($y) && ($x le $y);
+    }
+    elsif ( $op eq 'gt' ) {
+        return if defined($x) && defined($y) && ($x gt $y);
+    }
+    elsif ( $op eq 'ge' ) {
+        return if defined($x) && defined($y) && ($x ge $y);
+    }
+    else {
+        $why = qq{Invalid operator "$op"};
+    }
+
+    $why //= "Failed: " . ($x // 'undef') . ' ' . $op . ' ' . ($y // 'undef');
+
+    require Carp;
+    &Carp::confess( _failure_msg($name, $why) );
 }
 
 
@@ -995,7 +1096,7 @@ sub assert_all_keys_in($$;$) {
     my $keys = shift;
     my $name = shift;
 
-    my $why;
+    my @why;
     my $ok = 0;
     if ( ref($hash) eq 'HASH' || (Scalar::Util::blessed( $hash ) && $hash->isa( 'HASH' )) ) {
         if ( ref($keys) eq 'ARRAY' ) {
@@ -1004,23 +1105,22 @@ sub assert_all_keys_in($$;$) {
             for my $key ( keys %{$hash} ) {
                 if ( !exists $keys{$key} ) {
                     $ok = 0;
-                    $why = qq{Key "$key" is not a valid key.};
-                    last;
+                    push @why, qq{Key "$key" is not a valid key.};
                 }
             }
         }
         else {
-            $why = 'Argument for array of keys is not an arrayref.';
+            push @why, 'Argument for array of keys is not an arrayref.';
         }
     }
     else {
-        $why = 'Argument for hash is not a hashref.';
+        push @why, 'Argument for hash is not a hashref.';
     }
 
     return if $ok;
 
     require Carp;
-    &Carp::confess( _failure_msg($name, $why) );
+    &Carp::confess( _failure_msg($name, @why) );
 }
 
 
@@ -1035,7 +1135,7 @@ sub assert_keys_are($$;$) {
     my $keys = shift;
     my $name = shift;
 
-    my $why;
+    my @why;
     my $ok = 0;
     if ( ref($hash) eq 'HASH' || (Scalar::Util::blessed( $hash ) && $hash->isa( 'HASH' )) ) {
         if ( ref($keys) eq 'ARRAY' ) {
@@ -1046,8 +1146,7 @@ sub assert_keys_are($$;$) {
             for my $key ( keys %{$hash} ) {
                 if ( !exists $keys{$key} ) {
                     $ok = 0;
-                    $why = qq{Key "$key" is not a valid key.};
-                    last;
+                    push @why, qq{Key "$key" is not a valid key.};
                 }
             }
 
@@ -1055,23 +1154,22 @@ sub assert_keys_are($$;$) {
             for my $key ( @{$keys} ) {
                 if ( !exists $hash->{$key} ) {
                     $ok = 0;
-                    $why = qq{Key "$key" is not in the hash.};
-                    last;
+                    push @why, qq{Key "$key" is not in the hash.};
                 }
             }
         }
         else {
-            $why = 'Argument for array of keys is not an arrayref.';
+            push @why, 'Argument for array of keys is not an arrayref.';
         }
     }
     else {
-        $why = 'Argument for hash is not a hashref.';
+        push @why, 'Argument for hash is not a hashref.';
     }
 
     return if $ok;
 
     require Carp;
-    &Carp::confess( _failure_msg($name, $why) );
+    &Carp::confess( _failure_msg($name, @why) );
 }
 
 
@@ -1173,13 +1271,12 @@ sub assert_fail(;$) {
 
 # Can't call confess() here or the stack trace will be wrong.
 sub _failure_msg {
-    my $name = shift;
-    my $why  = shift;
+    my ($name, @why) = @_;
 
     my $msg = 'Assertion';
     $msg   .= " ($name)" if defined $name;
     $msg   .= " failed!\n";
-    $msg   .= "$why\n" if defined($why);
+    $msg   .= "$_\n" for @why;
 
     return $msg;
 }
@@ -1187,7 +1284,7 @@ sub _failure_msg {
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2005-2022 Andy Lester.
+Copyright 2005-2023 Andy Lester
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License version 2.0.

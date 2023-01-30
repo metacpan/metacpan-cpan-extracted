@@ -1,5 +1,11 @@
 Revision history for Perl extension Variable-Declaration
 
+0.06 2023-01-29T22:57:54Z
+    - use GitHub Actions #11
+
+0.05 2023-01-29T22:49:56Z
+    - fixed tests #10
+
 0.04 2019-01-02T14:02:10Z
     - specify Keyword::Simple, Carp version
 

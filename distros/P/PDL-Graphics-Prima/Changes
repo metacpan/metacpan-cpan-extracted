@@ -2,6 +2,107 @@ Put changes under the appropriate header. Headers can include API CHANGES,
 DIFFERENT BEHAVIOR, BUG FIXES, DEPENDENCIES, ENHANCEMENTS, NEW FEATURES, and
 OTHER. Entries should be in chronological order, i.e. oldest at the top
 
+0.18 2023-01-23
+
+  [MAJOR CHANGES]
+  
+  - New capability: color map support. PDL::Graphics::Prima has been able to
+    use color to visualize data, especially heat maps, for  quite some time.
+    However, apart from printing information to the terminal, there was no way
+    to know what quantities the different colors represented. This meant that
+    heat maps and other uses of palettes were, at best, only good for relative
+    comparisons or meticulously crafted plots that depicted the color scaling
+    on their own. The new changes make it possible (and fairly easy) to render
+    and quantitatively label a color bar. This is made possible by a significant
+    extension to the capabilities of Palettes.  Note that because Prima itself
+    uses the term "Palette" in its gradient API, these are called color maps.
+  
+  [API CHANGES]
+  
+  - The Simple interface now accepts additional arguments that can be used to
+    configure all elements of the plot command.
+  
+  - New plot widget keys default_save_dir and default_save_format. When a user
+    right-clicks and chooses to save the figure, these settings will be used as
+    the starting points rather than the defaults of the current directory and
+    .bmp format.
+  
+  - Although plotTypes that have historically expected a palette (ppair::Matrix)
+    will continue to accept them under that keyword, it is now officially
+    discouraged. The preferred keyword is color_map.
+  
+  - Palettes no longer have the copy method. Having removed their association
+    with a given plotType, this seems to be unnecessary capability, and
+    extending it with the newer features seemed fraught with potential errors.
+
+  - Update to newer Prima greatly simplifies the event loop management, but breaks
+    the old loop management API. Use twiddling() call instead of $twiddling semaphore
+  
+  [DIFFERENT BEHAVIOR]
+  
+  - Change zoom-out factor so that a zoom-in/zoom-out pair takes us back to
+    to starting zoom level.
+  
+  - When using a Grid datatype, if no palette is explicitly specified, the grid
+    activates the new plot-wide color map. Activating the color map causes it to
+    be rendered, which can significantly alter the appearance of the plot.
+  
+  [DEPENDENCIES]
+  
+  - updated Prima minimal version to 1.59 for new Dialog namespace names.
+
+  [ENHANCEMENTS]
+  
+  - Palettes have always determined the mapping from values to color using the
+    minimum and maximum values of the data. They now give you the option of
+    specifying explicit minimum and maximum values.
+  
+  - Palettes now accept a scaling parameter that can be any valid scaling type.
+    Palettes always used to do linear, so basically this means it is now easy
+    to get logarithmic color palettes.
+  
+  - Palettes now take a whole range of new (optional) arguments related to
+    rendering. Only the plot-wide palette---called the color map---is rendered
+    in the new changes, though it may be possible and useful to render a palette
+    in a different context. In that case it should be possible to use all of
+    these to tweak that rendering.
+  
+  - Palettes now have a property for specifying a color to use if they
+    encounter bad data. Ideally this color should fall somewhere outside of
+    the palette's range. The default value, brown, was chosen specifically for
+    this reason.
+  
+  - For the above enhancements, note that Palettes that implement their
+    functionality via a custom "apply" method do not have access to the palette
+    object, and so do now have access to any of these new parameters.
+  
+  - It is possible to specify the color map for a dataset or the plot as a whole
+    via the color_map key. It is possible to specify a color map at each level;
+    the level closest to the data is the one that is used. Also, only the plot's
+    color map is rendered.
+  
+  [NEW FEATURES]
+  
+  - New module PDL::Graphics::Prima::SizeSpec facilitates expressing, parsing,
+    and computing pixel equivalents for sophisticated combinations of distances
+    in terms of multiple, meaningful units of measure.
+  
+  - PDL::Graphics::Prima::Simple now looks for a prima-simple.ini file for
+    default settings for simple plots.
+  
+
+0.17 2014-08-25
+
+  [BUG FIXES]
+  
+  - Fixed minor bug in logic for determining if error bars are specified.
+    Previously I had returned two checks combined with "or", but the return
+    keyword has higher precedence than the "or" boolean operator! So now it
+    uses ||. The upshot was that if only lower error bars were specified, the
+    library determined that no error bars were present.
+  
+
+
 0.16 2014-08-25
 
   - Fixed Changes file to conform to the spec

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2020, 2021 Kevin Ryde
+# Copyright 2020, 2021, 2022 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -659,12 +659,13 @@ use Graph::Maker::SierpinskiTriangles;
 
 {
   # Sierpinski Triangles - Wiener Index
-  # A290129    3, 21, 246, 3765, 64032
+  # A290129  Wiener index of the n-Sierpinski sieve graph.
+  # 3, 21, 246, 3765, 64032
   #
   # GP-DEFINE  A290129_samples = \
   # GP-DEFINE  [3,21,246,3765,64032,1130463,20215254,363069729,6530385420];
   # vector(6,i, A290129_samples[i+1] - 18*A290129_samples[i])
-  # recurrence_guess(OEIS_samples("A290129"))
+  # recurrence_guess(OEIS_data("A290129"))
 
   # GP-DEFINE  NumVertices(N) = {
   # GP-DEFINE    N>=0 || error();
@@ -948,7 +949,7 @@ use Graph::Maker::SierpinskiTriangles;
     # GP-Test  vector(10,n,n--; polcoeff(two(n,'d),1,'d)) == \
     # GP-Test  vector(10,n,n--; NumVertices(n)^2)
     # FIXME:
-    #  vector(6,n,n--; two(n,1)) 
+    #  vector(6,n,n--; two(n,1))
     #  [17,106,1149,16582,271285,4681542]
     #
     # 2*9 -1 + 2*4

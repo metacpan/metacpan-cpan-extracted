@@ -5,6 +5,7 @@ META.json
 README.md
 cpanfile
 lib/Variable/Declaration.pm
+lib/Variable/Declaration/Info.pm
 minil.toml
 t/00_compile.t
 t/01_define.t
@@ -16,9 +17,9 @@ t/03_level/01_level_2.t
 t/04_croak.t
 t/05_data_lock.t
 t/06_type_tie.t
-t/10_render_declaration.t
-t/20_parse.t
-t/21_parse_type_varlist.t
-t/22_parse_type_var.t
+t/07_info.t
+t/10_parse.t
+t/11_parse_type_varlist.t
+t/12_parse_type_var.t
 META.yml
 MANIFEST

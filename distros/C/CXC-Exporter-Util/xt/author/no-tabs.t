@@ -11,8 +11,11 @@ my @files = (
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
+    't/all.t',
     't/basic.t',
-    't/constants.t'
+    't/constants.t',
+    't/lib/My/Test/Utils.pm',
+    't/types.t'
 );
 
 notabs_ok($_) foreach @files;

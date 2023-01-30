@@ -1,4 +1,4 @@
-# Copyright 2021 Kevin Ryde
+# Copyright 2021, 2022 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -23,7 +23,7 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 18;
+$VERSION = 19;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -293,7 +293,8 @@ L<http://oeis.org/A341579> (etc)
 
 =cut
 
-# GP-DEFINE  read("my-oeis.gp");
+# GP-DEFINE  read("OEIS-data.gp");
+# GP-DEFINE  read("OEIS-data-wip.gp");
 # vector(10,n,f(n))
 # not in OEIS: 1, 3, 7, 13, 25, 47, 89, 165, 307, 569
 # abs(polroots(polrecip(1 - x - x^2 - 2*x^4)))
@@ -312,11 +313,7 @@ L<http://oeis.org/A341579> (etc)
 # GP-DEFINE  f_poly(x) = x^5 - 2*x^4 + x^2 - 2*x + 2;  \\ charpoly of f
 # GP-Test  f_poly(x) == polrecip(denominator(gf(x)))
 #
-# GP-Test  my(want=OEIS_samples("A341579")); /* OFFSET=0 */ \
-# GP-Test    vector(#want,n,n--; A341579(n)) == want
-# GP-Test  my(want=OEIS_bfile_samples("A341579")); /* OFFSET=0 */ \
-# GP-Test    print("b341579  ",#want); \
-# GP-Test    vector(#want,n,n--; A341579(n)) == want
+# GP-Test  OEIS_check_func("A341579")
 #
 # GP-Test-Last  /* Stockmeyer et al, f in terms of g equation (1) */ \
 # GP-Test-Last  vector(100,n, f(n)) == \
@@ -379,11 +376,7 @@ L<http://oeis.org/A341579> (etc)
 # OEIS_recurrence_guess(vector(20,n,n--;g(n)))
 # for(n=0,35,print1(g(n),",");if(n==18||n==28,print()))
 #
-# GP-Test  my(want=OEIS_samples("A341580")); /* OFFSET=0 */ \
-# GP-Test    vector(#want,n,n--; A341580(n)) == want
-# GP-Test  my(want=OEIS_bfile_samples("A341580")); /* OFFSET=0 */ \
-# GP-Test    print("b341580  ",#want); \
-# GP-Test    vector(#want,n,n--; A341580(n)) == want
+# GP-Test  OEIS_check_func("A341580")
 #
 # GP-Test-Last  /* Stockmeyer et al, g in terms of h equation (2) */ \
 # GP-Test-Last  vector(100,n, g(n)) == \
@@ -422,11 +415,7 @@ L<http://oeis.org/A341579> (etc)
 # OEIS_recurrence_guess(vector(20,n,n--;h(n)))
 # for(n=0,35,print1(h(n),",");if(n==18||n==28,print()))
 #
-# GP-Test  my(want=OEIS_samples("A341581")); /* OFFSET=0 */ \
-# GP-Test    vector(#want,n,n--; A341581(n)) == want
-# GP-Test  my(want=OEIS_bfile_samples("A341581")); /* OFFSET=0 */ \
-# GP-Test    print("b341581  ",#want); \
-# GP-Test    vector(#want,n,n--; A341581(n)) == want
+# GP-Test  OEIS_check_func("A341581")
 #
 # GP-Test  /* Stockmeyer et al, g in terms of h equation (2) */ \
 # GP-Test  vector(20,n,n++; h(n)) == \
@@ -463,11 +452,7 @@ L<http://oeis.org/A341579> (etc)
 # not in OEIS: 1, 2, 4, 6, 12, 22, 42, 76, 142, 262
 # vector(10,n, g(n))
 #
-# GP-Test  my(want=OEIS_samples("A341582")); /* OFFSET=0 */ \
-# GP-Test    vector(#want,n,n--; A341582(n)) == want
-# GP-Test  my(want=OEIS_bfile_samples("A341582")); /* OFFSET=0 */ \
-# GP-Test    print("b341582  ",#want); \
-# GP-Test    vector(#want,n,n--; A341582(n)) == want
+# GP-Test  OEIS_check_func("A341582")
 #
 # GP-Test  /* diffs of f */ \
 # GP-Test  my(a=fmoves); \
@@ -530,11 +515,7 @@ L<http://oeis.org/A341579> (etc)
 # OEIS_recurrence_guess(vector(100,n,n--;d(n)))
 # for(n=0,36,print1(fmoves(n),",");if(n==19||n==29,print()))
 #
-# GP-Test  my(want=OEIS_samples("A341583")); /* OFFSET=0 */ \
-# GP-Test    vector(#want,n,n--; A341583(n)) == want
-# GP-Test  my(want=OEIS_bfile_samples("A341583")); /* OFFSET=0 */ \
-# GP-Test    print("b341583  ",#want); \
-# GP-Test    vector(#want,n,n--; A341583(n)) == want
+# GP-Test  OEIS_check_func("A341583")
 #
 # GP-Test  /* d in terms of f */ \
 # GP-Test  vector(100,n,n--; d(n)) == \
@@ -660,7 +641,7 @@ L<http://user42.tuxfamily.org/graph-maker-other/index.html>
 
 =head1 LICENSE
 
-Copyright 2021 Kevin Ryde
+Copyright 2021, 2022 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

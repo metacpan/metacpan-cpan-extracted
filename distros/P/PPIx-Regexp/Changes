@@ -1,3 +1,11 @@
+0.087		2023-01-28	T. R. Wyant
+    Add support for code in optimized regex, a.k.a. (*{...}).  This
+    involved making the recognition of backtracking control more
+    specific, since it also uses (?*...).
+
+    If (*{...}) and (**{...}) are removed from Perl before Perl 5.38.0,
+    support for them will be removed from this package.
+
 0.086		2022-12-13	T. R. Wyant
     Add width(), which returns the number of characters matched. Note
     that an indefinite upper boumd is represented as IEEE 754 Inf if

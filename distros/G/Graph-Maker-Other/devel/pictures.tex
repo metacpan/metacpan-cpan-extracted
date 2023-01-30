@@ -93,6 +93,58 @@
 
 %------------------------------------------------------------------------------
 \clearpage
+\section{A045898 Triplets of Hanoi Moves}
+
+Bits of $n$, high to low
+
+\begin{tikzpicture}
+    [scale=1.8,
+     my box/.style={draw,ellipse,minimum size=1em,inner sep=.15em,outer sep=.2em},
+    ]
+
+  \node (1)  at (0,0) [my box] {1};
+  \node (2)  at (1.5,0)  [my box] {2};
+  \node (3)  at (1.5,-1) [my box] {3};
+  \node (4)  at (0,-1) [my box] {4};
+  \node (5)  at (.75,-2) [my box] {5};
+
+% GP-DEFINE  expand=[ 1,2; \
+% GP-DEFINE           1,3; \
+% GP-DEFINE           4,5; \
+% GP-DEFINE           1,5; \
+% GP-DEFINE           4,3 ];
+
+  \draw [<-,loop left] (1) to node[pos=.5,auto=left] {0} ();
+  \draw [->,bend left=10] (1) to node[pos=.5,auto=left] {1} (2);
+% GP-Test  expand[1,1] == 1
+% GP-Test  expand[1,2] == 2
+
+  \draw [->,bend left=10] (2) to node[pos=.5,auto=left] {0} (1);
+  \draw [->] (2) to node[pos=.4,auto=left] {1} (3);
+% GP-Test  expand[2,1] == 1
+% GP-Test  expand[2,2] == 3
+
+  \draw [->] (3) to node[pos=.5,auto=right] {0} (4);
+  \draw [->,bend left=10] (3) to node[pos=.5,auto=left] {1} (5);
+% GP-Test  expand[3,1] == 4
+% GP-Test  expand[3,2] == 5
+
+  \draw [->] (4) to node[pos=.5,auto=left] {0} (1);
+  \draw [->,bend left=10] (4) to node[pos=.5,auto=left] {1} (5);
+% GP-Test  expand[4,1] == 1
+% GP-Test  expand[4,2] == 5
+
+  \draw [->,bend left=10] (5) to node[pos=.5,auto=left] {0} (4);
+  \draw [->,bend left=10] (5) to node[pos=.5,auto=left] {1} (3);
+% GP-Test  expand[5,1] == 4
+% GP-Test  expand[5,2] == 3
+
+\end{tikzpicture}
+
+
+
+%------------------------------------------------------------------------------
+\clearpage
 \section{Hanoi Exchange 4}
 
 \begin{tikzpicture}

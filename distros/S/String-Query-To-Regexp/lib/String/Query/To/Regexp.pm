@@ -10,7 +10,7 @@ our @EXPORT_OK = qw(query2re);
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-11-02'; # DATE
 our $DIST = 'String-Query-To-Regexp'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 sub query2re {
     my $opts = ref($_[0]) eq 'HASH' ? {%{shift()}} : {};
@@ -63,7 +63,7 @@ String::Query::To::Regexp - Convert query to regular expression
 
 =head1 VERSION
 
-This document describes version 0.002 of String::Query::To::Regexp (from Perl distribution String-Query-To-Regexp), released on 2022-11-02.
+This document describes version 0.003 of String::Query::To::Regexp (from Perl distribution String-Query-To-Regexp), released on 2022-11-02.
 
 =head1 SYNOPSIS
 
@@ -77,6 +77,8 @@ This document describes version 0.002 of String::Query::To::Regexp (from Perl di
  $re = query2re("foo", "-bar");               # => qr/\A(?=.*foo)(?!.*bar).*\z/s   -> string must contain 'foo' but must not contain 'bar'
  $re = query2re({bool=>"or"}, "foo", "bar");  # => qr/\A(?:(?=.*foo)|(?!.*bar)).*\z/s  -> string must contain 'foo' or 'bar'
  $re = query2re({word=>1}, "foo", "bar");     # => qr/\A(?=.*\bfoo\b)(?!.*\bbar\b).*\z/s  -> string must contain words 'foo' and 'bar'; 'food' or 'lumbar' won't match
+
+ $re = query2re({re=>1}, "foo", "/bar+/", qr/baz/i);  # => qr/(?^s:\A(?=.*foo\+)(?=.*(?^i:bar+))(?=.*(?^u:baz+)).*\z)/  -> allow regexes in queries
 
 =head1 DESCRIPTION
 

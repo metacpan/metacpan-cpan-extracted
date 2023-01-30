@@ -28,34 +28,34 @@ optional_features: {}
 provides:
   Story::Interact:
     file: lib/Story/Interact.pm
-    version: '0.001005'
+    version: '0.001006'
   Story::Interact::Analyze:
     file: lib/Story/Interact/Analyze.pm
-    version: '0.001005'
+    version: '0.001006'
   Story::Interact::Character:
     file: lib/Story/Interact/Character.pm
-    version: '0.001005'
+    version: '0.001006'
   Story::Interact::Harness::Terminal:
     file: lib/Story/Interact/Harness/Terminal.pm
-    version: '0.001005'
+    version: '0.001006'
   Story::Interact::Page:
     file: lib/Story/Interact/Page.pm
-    version: '0.001005'
+    version: '0.001006'
   Story::Interact::PageSource:
     file: lib/Story/Interact/PageSource.pm
-    version: '0.001005'
+    version: '0.001006'
   Story::Interact::PageSource::DBI:
     file: lib/Story/Interact/PageSource/DBI.pm
-    version: '0.001005'
+    version: '0.001006'
   Story::Interact::PageSource::Dir:
     file: lib/Story/Interact/PageSource/Dir.pm
-    version: '0.001005'
+    version: '0.001006'
   Story::Interact::State:
     file: lib/Story/Interact/State.pm
-    version: '0.001005'
+    version: '0.001006'
   Story::Interact::Syntax:
     file: lib/Story/Interact/Syntax.pm
-    version: '0.001005'
+    version: '0.001006'
 recommends:
   String::Tagged::Markdown: '0'
   String::Tagged::Terminal: '0'
@@ -79,7 +79,7 @@ resources:
   homepage: https://metacpan.org/release/Story-Interact
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-story-interact.git
-version: '0.001005'
+version: '0.001006'
 x_provides_scripts:
   story-interact:
     file: bin/story-interact

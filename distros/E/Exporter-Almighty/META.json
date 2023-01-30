@@ -41,8 +41,8 @@
             "Exporter::Shiny" : "1.006000",
             "Import::Into" : "0",
             "Module::Runtime" : "0",
+            "Type::Library" : "0",
             "Type::Registry" : "0",
-            "Type::Tiny::Enum" : "2.002001",
             "Types::Common" : "2.002001",
             "perl" : "5.012"
          }
@@ -60,7 +60,7 @@
    "provides" : {
       "Exporter::Almighty" : {
          "file" : "lib/Exporter/Almighty.pm",
-         "version" : "0.001000"
+         "version" : "0.001003"
       }
    },
    "release_status" : "stable",
@@ -79,6 +79,6 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/project"
    },
-   "version" : "0.001000",
+   "version" : "0.001003",
    "x_serialization_backend" : "JSON::PP version 4.09"
 }

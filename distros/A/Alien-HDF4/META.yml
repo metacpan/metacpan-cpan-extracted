@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::Depends: '0.402'
   IO::All: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,11 +23,11 @@ no_index:
 provides:
   Alien::HDF4:
     file: lib/Alien/HDF4.pm.PL
-    version: '0.05'
+    version: '0.06'
 requires:
   perl: '5.010'
 resources:
   bugtracker: https://github.com/PDLPorters/Alien-HDF4/issues
   repository: git://github.com/PDLPorters/Alien-HDF4
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

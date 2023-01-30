@@ -10,6 +10,24 @@ use Test::More;
 
 use Data::Dumper::Interp;
 
+# Convert a literal "expected" string which contains qr/.../ismx sequences
+# into a regex which matches the same string but allows various representations
+# of the regex (which differs among Perl versions).
+sub expstr2re($) {
+  local $_ = shift;
+  confess "bug" if ref($_);
+  s#/#\\/#g;
+  $_ = '\Q' . $_ . '\E';
+  s#([\$\@\%])#\\E\\$1\\Q#g;
+  s#qr\\/([^\/]+)\\/([msixpodualngcer]*)
+   #\\E\(qr\\/$1\\/$2|qr\\/\\(\\?\\^$2:$1\\)\\/\)\\Q#xg
+    or confess "No qr/.../ found in input string";
+  my $saved_dollarat = $@;
+  my $re = eval "qr/${_}/"; die "$@ " if $@;
+  $@ = $saved_dollarat;
+  $re
+}
+
 #$Data::Dumper::Interp::Debug = 1;
 $Data::Dumper::Interp::Foldwidth = 12;
 
@@ -96,9 +114,9 @@ for my $fw (1..5) {
 EOF
 }
 
-is( Data::Dumper::Interp->new()->Foldwidth(72)
+like( Data::Dumper::Interp->new()->Foldwidth(72)
      ->vis({ "" => "Emp", A=>111,BBBBB=>222,C=>{d=>888,e=>999},D=>{},EEEEEEEEEEEEEEEEEEEEEEEEEE=>\42,F=>\\\43, G=>qr/foo.*bar/xsi}), 
-     do{chomp($_=<<'EOF'); $_} );
+    expstr2re(do{chomp($_=<<'EOF'); $_}) );
 { "" => "Emp",A => 111,BBBBB => 222,C => {d => 888,e => 999},D => {},
   EEEEEEEEEEEEEEEEEEEEEEEEEE => \42,F => \\\43,G => qr/foo.*bar/six
 }

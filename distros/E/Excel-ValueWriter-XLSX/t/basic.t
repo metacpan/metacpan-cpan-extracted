@@ -36,6 +36,10 @@ $writer->add_sheet(With_header => t_header => [qw/col1 col2/], [[33, 44], [11, 2
 $writer->add_sheet(Empty1 => t_empty => []);
 $writer->add_sheet(Empty2 => (undef) => []);
 
+# defined names
+$writer->add_defined_name(my_formula  => q{'s1'!$A$1&'s1'!$A$2}, "no comment");
+$writer->add_defined_name(my_constant => q{"constant_value"});
+
 # save the worksheet
 $writer->save_as($filename);
 
@@ -48,6 +52,7 @@ like $content_types, qr[<Override PartName="/xl/worksheets/sheet1.xml"], 'conten
 
 my $workbook = $zip->contents('xl/workbook.xml');
 like $workbook, qr[<sheets><sheet name="s1" sheetId="1" r:id="rId1"/>.+</sheets>], 'workbook';
+like $workbook, qr[<definedName name="my_formula" comment="no comment">'s1'!\$A\$1&amp;'s1'!\$A\$2</], 'defined name';
 
 my $sheet1 = $zip->contents('xl/worksheets/sheet1.xml');
 like $sheet1, qr[<sheetData><row r="1" spans="1:4"><c r="A1" t="s"><v>0</v></c><c r="B1" t="s"><v>1</v>],  'sheet1';

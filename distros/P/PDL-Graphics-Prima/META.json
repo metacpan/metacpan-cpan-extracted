@@ -4,13 +4,13 @@
       "David Mertens (dcmertens.perl@gmail.com)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4208",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PDL-Graphics-Prima",
    "prereqs" : {
@@ -22,24 +22,27 @@
       "runtime" : {
          "requires" : {
             "PDL" : "v2.4.0",
-            "PDL::Drawing::Prima" : "0.07",
-            "Prima" : "1.4",
-            "perl" : "v5.8.0"
+            "PDL::Drawing::Prima" : "0.15",
+            "Prima" : "1.67",
+            "perl" : "v5.12.0"
          }
       }
    },
    "provides" : {
+      "PDL::Demos::Prima" : {
+         "file" : "lib/PDL/Demos/Prima.pm"
+      },
       "PDL::Graphics::Prima" : {
          "file" : "lib/PDL/Graphics/Prima.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "PDL::Graphics::Prima::Axis" : {
          "file" : "lib/PDL/Graphics/Prima/Axis.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "PDL::Graphics::Prima::DataSet" : {
          "file" : "lib/PDL/Graphics/Prima/DataSet.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "PDL::Graphics::Prima::DataSet::Annotation" : {
          "file" : "lib/PDL/Graphics/Prima/DataSet.pm"
@@ -64,18 +67,18 @@
       },
       "PDL::Graphics::Prima::Limits" : {
          "file" : "lib/PDL/Graphics/Prima/Limits.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "PDL::Graphics::Prima::Palette" : {
          "file" : "lib/PDL/Graphics/Prima/Palette.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "PDL::Graphics::Prima::Palette::HSVrange" : {
          "file" : "lib/PDL/Graphics/Prima/Palette.pm"
       },
       "PDL::Graphics::Prima::PlotType" : {
          "file" : "lib/PDL/Graphics/Prima/PlotType.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "PDL::Graphics::Prima::PlotType::Annotation" : {
          "file" : "lib/PDL/Graphics/Prima/PlotType.pm"
@@ -145,11 +148,11 @@
       },
       "PDL::Graphics::Prima::ReadLine" : {
          "file" : "lib/PDL/Graphics/Prima/ReadLine.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "PDL::Graphics::Prima::Scaling" : {
          "file" : "lib/PDL/Graphics/Prima/Scaling.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "PDL::Graphics::Prima::Scaling::Linear" : {
          "file" : "lib/PDL/Graphics/Prima/Scaling.pm"
@@ -159,7 +162,7 @@
       },
       "PDL::Graphics::Prima::Simple" : {
          "file" : "lib/PDL/Graphics/Prima/Simple.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "Prima::Plot" : {
          "file" : "lib/PDL/Graphics/Prima.pm"
@@ -168,14 +171,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/run4flat/PDL-Graphics-Prima/issues"
+         "web" : "http://github.com/PDLPorters/PDL-Graphics-Prima/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "http://github.com/run4flat/PDL-Graphics-Prima"
+         "url" : "http://github.com/PDLPorters/PDL-Graphics-Prima"
       }
    },
-   "version" : "0.17"
+   "version" : "0.18",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

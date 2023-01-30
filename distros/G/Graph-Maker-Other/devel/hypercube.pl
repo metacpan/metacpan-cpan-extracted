@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017, 2019, 2020 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2019, 2020, 2021, 2022 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -28,7 +28,42 @@ use lib File::Spec->catdir($FindBin::Bin, File::Spec->updir, 'devel', 'lib');
 use MyGraphs;
 
 # uncomment this to run the ### lines
-use Smart::Comments;
+# use Smart::Comments;
+
+{
+  # Hypercube
+  # N=3 cube      https://hog.grinvin.org/ViewGraphInfo.action?id=1022
+  # N=4 tesseract https://hog.grinvin.org/ViewGraphInfo.action?id=1340
+  # N=5           https://hog.grinvin.org/ViewGraphInfo.action?id=28533
+  #     32 vertices 80 edges
+  # N=6           https://hog.grinvin.org/ViewGraphInfo.action?id=33768
+  # N=7           https://hog.grinvin.org/ViewGraphInfo.action?id=33770
+
+  require Graph::Maker::Hypercube;
+  my @graphs;
+  for (my $N = 3; $N<=8; $N++) {
+    # my $graph = Graph::Maker->new('hypercube', N => $N, undirected=>1);
+    my $graph = make_merged_hypercube($N);
+    ### $graph
+    MyGraphs::Graph_hypercube_layout($graph);
+    push @graphs, $graph;
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  # MyGraphs::hog_upload_html($graphs[0]);
+  # MyGraphs::Graph_view($graphs[-1]);
+  exit 0;
+}
+
+{
+  foreach my $N (3..3) {
+    my $graph = Graph::Maker->new('hypercube', N => $N, undirected=>1);
+    my @vertices = $graph->vertices;
+    my @edges = $graph->edges;
+    print "vertices ", join(' ',@vertices),"\n";
+    print "edges ", join(' ',map {join(',',@$_)} @edges),"\n";
+  }
+  exit 0;
+}
 
 {
   # Hypercube plus complete graph clique for each N-1 dimension face
@@ -39,6 +74,8 @@ use Smart::Comments;
   my @graphs;
   foreach my $N (3..5) {
     my $graph = Graph::Maker->new('hypercube', N => $N, undirected=>1);
+    MyGraphs::hypercube_layout($graph);
+
     my @vertices = $graph->vertices;
     # print "vertices ", join(' ',@vertices),"\n";
     foreach my $pos (0 .. $N-1) {
@@ -73,41 +110,7 @@ use Smart::Comments;
     }
   }
 }
-{
-  # Hypercube
-  # N=3 cube      https://hog.grinvin.org/ViewGraphInfo.action?id=1022
-  # N=4 tesseract https://hog.grinvin.org/ViewGraphInfo.action?id=1340
-  # N=5           https://hog.grinvin.org/ViewGraphInfo.action?id=28533
-  #     32 vertices 80 edges
-  # N=6           https://hog.grinvin.org/ViewGraphInfo.action?id=33768
-  # N=7
-  require Graph::Maker::Hypercube;
-  my @graphs;
-  for (my $N = 6; @graphs < 2; $N++) {
-    my $graph = Graph::Maker->new('hypercube', N => $N, undirected=>1);
 
-    my $a = pi/2/($N-1);
-    ### $a
-    my @basis = map { [sin($_*$a), cos($_*$a)] } 0 .. $N-1;
-    foreach my $n ($graph->vertices) {
-      my $x = 0;
-      my $y = 0;
-      foreach my $i (0 .. $N-1) {
-        if (($n-1) & (1<<$i)) {
-          ### add: "n=$n i=$i $basis[$i]->[0] $basis[$i]->[1]"
-          $x += $basis[$i]->[0];
-          $y += $basis[$i]->[1];
-        }
-      }
-      MyGraphs::Graph_set_xy_points($graph, $n => [$x,$y]);
-    }
-    push @graphs, $graph;
-  }
-  MyGraphs::hog_searches_html(@graphs);
-  MyGraphs::hog_upload_html($graphs[1]);
-  # MyGraphs::Graph_view($graphs[-1]);
-  exit 0;
-}
 
 {
   # Tesseract cospectral with Hoffman

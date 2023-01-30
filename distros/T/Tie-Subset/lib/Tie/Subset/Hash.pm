@@ -27,7 +27,7 @@ This class for tied hashes provides a "view" of a subset of a hash.
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =item C<tie>ing
 
@@ -44,7 +44,7 @@ sub TIEHASH {  ## no critic (RequireArgUnpacking)
 	my ($class, $hash, $keys) = @_;
 	ref $hash eq 'HASH' or croak "must provide hashref to tie";
 	ref $keys eq 'ARRAY' or croak "must provide key list to tie";
-	for (@$keys) { croak "bad hash key '$_'" if ref || !defined }
+	for (@$keys) { croak "bad hash key '$_'" if ref; croak "bad hash key undef" if !defined }
 	my $self = { hash => $hash, keys => { map {$_=>1} @$keys } };
 	return bless $self, $class;
 }
@@ -88,13 +88,18 @@ in the underlying hash.
 
 sub EXISTS {
 	my ($self,$key) = @_;
-	return exists $self->{keys}{$key} && exists $self->{hash}{$key};
+	# need to write this in this slightly strange way because otherwise
+	# the code coverage tool isn't picking it up correctly...
+	if ( exists $self->{keys}{$key} && exists $self->{hash}{$key} )
+		{ return !!1 } else { return !!0 }
 }
 
 =item Iterating (C<each>, C<keys>, etc.)
 
-Only keys that exist are both in the subset I<and> the underlying
-hash are iterated over.
+Only keys that exist both in the subset I<and> the underlying hash
+are iterated over. The iterator of the underlying hash is utilized,
+so iterating over the tied hash will affect the state of the iterator
+of the underlying hash.
 
 =cut
 
@@ -151,7 +156,12 @@ sub CLEAR {
 
 sub SCALAR {
 	my ($self) = @_;
-	return scalar %{$self->{keys}};
+	# I'm not sure why the following counts as two statements in the coverage tool
+	# uncoverable branch true
+	# uncoverable statement count:2
+	return scalar %{$self->{keys}} if $] lt '5.026';
+	my %keys = map {$_=>1} grep {exists $self->{hash}{$_}} keys %{$self->{keys}};
+	return scalar keys %keys;
 }
 
 sub UNTIE {
@@ -168,11 +178,13 @@ __END__
 
 =head1 See Also
 
+L<Tie::Subset::Hash::Masked>
+
 L<Tie::Subset/"See Also">
 
 =head1 Author, Copyright, and License
 
-Copyright (c) 2018 Hauke Daempfling (haukex@zero-g.net).
+Copyright (c) 2018-2023 Hauke Daempfling (haukex@zero-g.net).
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl 5 itself.
