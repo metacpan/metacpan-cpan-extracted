@@ -53,8 +53,11 @@ sub mydeatails {
      if ( $self->req->method eq 'GET' ) {
 
          $self->render( json => { status => 200 } );
+         
     }
+    else{
      $self->render( json => { status => 404 } );
+    }
 }
 
 sub view_users {
@@ -63,7 +66,9 @@ sub view_users {
 
          $self->render( json => { status => 200 } );
     }
+    else{
      $self->render( json => { status => 404 } );
+ }
 }
 
 sub planning {
@@ -72,7 +77,9 @@ sub planning {
 
          $self->render( json => { status => 200 } );
     }
+    else{
      $self->render( json => { status => 404 } );
+ }
 }
 
 

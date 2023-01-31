@@ -1,0 +1,61 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# Use a circular list ("necklace") of Neo-Riemannian transformations,
+# plus "X" meaning "make no transformation." Starting at position zero
+# move forward or backward along the necklace, transforming the
+# current chord, and render the resulting progression as MIDI.
+
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util Music-Chord-Progression-NRO Music-MelodicDevice-Transposition);
+use MIDI::Util qw(setup_score midi_format);
+use Music::Chord::Progression::NRO ();
+use Music::MelodicDevice::Transposition ();
+
+my $max       = shift || 8;
+my $bpm       = shift || 100;
+my $note      = shift || 'G';
+my $octave    = shift || 4;
+my $transform = shift || 'X,PRL,R,L,R,L,R'; # Mostly diatonic
+                                            # integer = random
+
+print "Initial: $note$octave\nTransforms: $transform\n";
+
+my @bass; # collected by top
+
+if ($transform =~ /[A-Z,]/) {
+    $transform = [ split /,/, $transform ];
+}
+
+my $score = setup_score(bpm => $bpm);
+
+$score->synch(
+    \&top,
+    \&bottom,
+);
+
+$score->write_score("$0.mid");
+
+sub bottom {
+    my $md = Music::MelodicDevice::Transposition->new;
+    my $transposed = $md->transpose(-24, \@bass);
+    for my $note (@$transposed) {
+        $score->n('wn', midi_format($note));
+    }
+}
+
+sub top {
+    my $nro = Music::Chord::Progression::NRO->new(
+        base_note   => $note,
+        base_octave => $octave,
+        transform   => $transform,
+        max         => $max,
+        verbose     => 1,
+    );
+    my $chords = $nro->circular;
+
+    for my $chord (@$chords) {
+        $score->n('wn', midi_format(@$chord));
+        push @bass, $chord->[0];
+    }
+}

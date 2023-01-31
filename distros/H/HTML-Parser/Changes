@@ -1,5 +1,9 @@
 Change history for HTML-Parser
 
+3.81      2023-01-30
+    - Stop depending on "Test" (GH#34) (James Raspass)
+    - fix test scripts after conversion to Test::More (GH#35) (Graham Knop)
+
 3.80      2022-11-01
   * Fix compatibility with ancient perl by avoiding index in test (GH#33)
     (Graham Knop)

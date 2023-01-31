@@ -1,7 +1,7 @@
 package PICA::Data;
 use v5.14.1;
 
-our $VERSION = '2.05';
+our $VERSION = '2.06';
 
 use Exporter 'import';
 our @EXPORT_OK
@@ -43,6 +43,10 @@ sub pica_data {
     PICA::Data->new(@_);
 }
 
+sub pica_field {
+    PICA::Data::Field->new(@_);
+}
+
 sub pica_match {
     my ($record, $path, %args) = @_;
 
@@ -59,59 +63,6 @@ sub pica_values {
     return                                unless ref $path;
 
     return $path->record_subfields($record);
-}
-
-sub pica_field {
-    my $tag = shift;
-
-    # simplify migration from PICA::Record
-    return pica_field($tag->{_tag}, $tag->{_occurrence},
-        @{$tag->{_subfields}})
-        if ref $tag eq 'PICA::Field';
-
-    my $occ = '';
-
-    if (@_ % 2) {
-        $occ = shift // '';
-        croak "invalid tag: $tag"        if $tag !~ qr/^[0-2]\d{2}[A-Z@]$/;
-        croak "invalid occurrence: $occ" if $occ !~ qr/^\d+$/;
-    }
-    elsif ($tag =~ m/^([0-2]\d{2}[A-Z@])(\/(\d+))?$/) {
-        $tag = $1;
-        $occ = $3;
-    }
-
-    if ($occ > 0) {
-        if ($occ < 99) {
-            $occ = sprintf('%02d', $occ);
-        }
-        elsif (substr($tag, 0, 1) eq '2') {
-            $occ = sprintf('%03d', $occ);
-        }
-        else {
-            croak "invalid occurrence: $occ";
-        }
-    }
-    else {
-        $occ = undef;
-    }
-
-    croak "missing subfields" unless @_;
-
-    my @field = ($tag, $occ);
-
-    while (@_) {
-        my $code  = shift;
-        my $value = shift;
-
-        croak "invalid subfield code: $code" if $code !~ /^[A-Za-z0-9]$/;
-
-        if (defined $value and $value ne '') {
-            push @field, $code, $value;
-        }
-    }
-
-    return \@field;
 }
 
 sub pica_fields {
@@ -389,25 +340,7 @@ sub pica_empty {
 }
 
 sub pica_annotation {
-    my $field = shift;
-
-    my $len = scalar @$field;
-    if (@_) {
-        if (@$field % 2) {
-            if (defined $_[0]) {
-                $field->[$len - 1] = $_[0];
-            }
-            else {
-                pop @$field;
-            }
-        }
-        elsif (defined $_[0]) {
-            push @$field, $_[0];
-        }
-    }
-    else {
-        return $len % 2 ? $field->[$len - 1] : undef;
-    }
+    return PICA::Data::Field::annotation(@_);
 }
 
 *parse_subfield_schedule = *PICA::Schema::parse_subfield_schedule;
@@ -458,6 +391,7 @@ sub pica_sort_subfields {
 *remove    = *pica_remove;
 *update    = *pica_update;
 
+use PICA::Data::Field;
 use PICA::Patch;
 use PICA::Parser::XML;
 use PICA::Parser::Plus;
@@ -561,7 +495,7 @@ sub write {
 sub TO_JSON {
     my $record = shift;
     $record = $record->{record} if reftype $record eq 'HASH';
-    return [@$record];
+    return [map {blessed $_ ? $_->TO_JSON : $_} @$record];
 }
 
 sub pica_xml_struct {
@@ -696,6 +630,11 @@ get all of them):
 =head2 pica_data( [ $data ] )
 
 Return a new PICA::Data object from any guessable serialization form (or die).
+
+=head2 pica_field( $tag, [$occ,] [ @subfields ] )
+
+Return a new PICA+ field as blessed L<PICA::Data::Field> array reference (or
+die).
 
 =head2 pica_parser( $type [, @options] )
 

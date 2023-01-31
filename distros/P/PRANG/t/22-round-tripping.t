@@ -16,6 +16,7 @@ use Octothorpe;
 use XMLTests;
 use XML::Compare;
 use YAML;
+$YAML::LoadBlessed = 1;
 
 getopt;
 

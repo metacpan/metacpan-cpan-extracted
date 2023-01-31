@@ -1,7 +1,7 @@
 package Factory::Sub;
 use 5.006; use strict; use warnings;
 use Import::Into; use Carp qw/croak/; use Coerce::Types::Standard qw//;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use overload 
 	"&{}" => sub {my $self = shift; sub { $self->call(@_) }},
@@ -63,7 +63,7 @@ Factory::Sub - Generate a factory of subs
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -93,10 +93,11 @@ Perhaps a little code snippet.
 		return $_[1];
 	});
 	
-	$factory->('you', 'got'); # 1
-	$factory->('the', { money => 'i' }); # 2
-	$factory->([qw/g o t/], { the => 'feeling' }); # 3
-	$factory->('t, h, a, t', 'you got something to', { say => 'to me honey' }); # { you => 'got', something => 'to' }
+	$factory->('go', 'tell'); # 1
+	$factory->('all', { your => 'friends' }); # 2
+	$factory->([qw/t h a t/], { this => 'is' }); # 3
+	$factory->('t, h, e', 'end', { name => 'day ender' }); 
+	# destiny
 
 =head1 SUBROUTINES/METHODS
 

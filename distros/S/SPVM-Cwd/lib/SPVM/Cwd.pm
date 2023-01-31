@@ -1,6 +1,6 @@
 package SPVM::Cwd;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 1;
 
@@ -28,9 +28,9 @@ This module is the Perl's L<Cwd> porting to L<SPVM>.
 
   static method getcwd : string ();
 
-Calls the L<getcwd|SPVM::Sys::IO/"getcwd"> method in the L<Sys::IO|SPVM::Sys::IO> class.
+Calls the L<getcwd|SPVM::Sys::IO/"getcwd"> method in the L<Sys::IO|SPVM::Sys::IO> class and returns the return value.
 
-On Windows, the path separaters C<\> are replaced with C</>.
+On Windows, the path separaters C<\> of the return value are replaced with C</>.
 
 =head2 abs_path
 
@@ -42,9 +42,11 @@ The alias for the L</"realpath"> method.
 
   static method realpath : string ($file : string)
 
-Calls the L<realpath|SPVM::Sys::IO/"realpath"> method in the L<Sys::IO|SPVM::Sys::IO> class except for Windows.
+Calls the L<realpath|SPVM::Sys::IO/"realpath"> method in the L<Sys::IO|SPVM::Sys::IO> class except for Windows and returns the return value.
 
-On Windows, Calls the L<_fullpath|SPVM::Sys::IO/"_fullpath"> method in the L<Sys::IO|SPVM::Sys::IO> class.
+On Windows, Calls the L<_fullpath|SPVM::Sys::IO/"_fullpath"> method in the L<Sys::IO|SPVM::Sys::IO> class and returns the return value.
+
+On Windows, the path separaters C<\> of the return value are replaced with C</>.
 
 =head2 getdcwd
 
@@ -52,9 +54,19 @@ On Windows, Calls the L<_fullpath|SPVM::Sys::IO/"_fullpath"> method in the L<Sys
 
 The C<$drive> is a drive letter such as C<C:>, C<D:>. It is converted to the drive id.
 
-And calls the L<_getdcwd|SPVM::Sys::IO/"_getdcwd"> method in the L<Sys::IO|SPVM::Sys::IO>.
+And calls the L<_getdcwd|SPVM::Sys::IO/"_getdcwd"> method in the L<Sys::IO|SPVM::Sys::IO> returns the return value.
 
-The OS must be Windows. Otherwise an exception will be thrown.
+On Windows, the path separaters C<\> of the return value are replaced with C</>
+
+Exceptions:
+
+The getdcwd is not supported on this system(_WIN32).
+
+The length of the $drive must be 2.
+
+The first character of the $drive must be [a-zA-Z].
+
+The second character of the $drive must be ":".
 
 =head1 Repository
 
@@ -76,7 +88,7 @@ Yuki Kimoto C<kimoto.yuki@gmail.com>
 
 =head1 Copyright & License
 
-Copyright 2022-2022 Yuki Kimoto, all rights reserved.
+Copyright 2022-2023 Yuki Kimoto, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

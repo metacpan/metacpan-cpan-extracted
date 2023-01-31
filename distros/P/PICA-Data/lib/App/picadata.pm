@@ -1,12 +1,12 @@
 package App::picadata;
 use v5.14.1;
 
-our $VERSION = '2.05';
+our $VERSION = '2.06';
 
 use Getopt::Long qw(GetOptionsFromArray :config bundling);
 use Pod::Usage;
-use PICA::Data qw(pica_parser pica_writer pica_annotation);
-use PICA::Patch qw(pica_diff pica_patch);
+use PICA::Data   qw(pica_parser pica_writer pica_annotation);
+use PICA::Patch  qw(pica_diff pica_patch);
 use PICA::Schema qw(field_identifier);
 use PICA::Schema::Builder;
 use Getopt::Long qw(:config bundling);
@@ -411,10 +411,10 @@ sub run {
         }
     }
     else {
+        my $split = $command eq 'levels' || ($level // -1) >= 0;
     RECORD: foreach my $in (@{$self->{input}}) {
             my $parser = $self->parser_from_input($in);
             while (my $next = $parser->next) {
-                my $split = $command eq 'levels' || $level >= 0;
                 for ($split ? $next->split($level) : $next) {
                     $process->($_);
                     last RECORD if $number and $stats->{records} >= $number;

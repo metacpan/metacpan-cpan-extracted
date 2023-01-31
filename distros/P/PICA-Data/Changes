@@ -1,5 +1,9 @@
 Revision history for PICA::Data
 
+2.06 2023-01-31T09:15:07Z
+    - Fix default --level value in command line interface
+    - Add PICA::Data::Field
+
 2.05 2022-11-15T07:41:31Z
     - Add functions pica_sort_subfields and parse_subfield_schedule
 

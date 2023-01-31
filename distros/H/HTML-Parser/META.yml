@@ -9,7 +9,6 @@ build_requires:
   FileHandle: '0'
   IO::File: '0'
   SelectSaver: '0'
-  Test: '0'
   Test::More: '0'
   URI: '0'
   perl: '5.008'
@@ -35,26 +34,26 @@ no_index:
 provides:
   HTML::Entities:
     file: lib/HTML/Entities.pm
-    version: '3.80'
+    version: '3.81'
   HTML::Filter:
     file: lib/HTML/Filter.pm
-    version: '3.80'
+    version: '3.81'
     x_deprecated: 1
   HTML::HeadParser:
     file: lib/HTML/HeadParser.pm
-    version: '3.80'
+    version: '3.81'
   HTML::LinkExtor:
     file: lib/HTML/LinkExtor.pm
-    version: '3.80'
+    version: '3.81'
   HTML::Parser:
     file: lib/HTML/Parser.pm
-    version: '3.80'
+    version: '3.81'
   HTML::PullParser:
     file: lib/HTML/PullParser.pm
-    version: '3.80'
+    version: '3.81'
   HTML::TokeParser:
     file: lib/HTML/TokeParser.pm
-    version: '3.80'
+    version: '3.81'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -70,7 +69,7 @@ resources:
   bugtracker: https://github.com/libwww-perl/HTML-Parser/issues
   homepage: https://github.com/libwww-perl/HTML-Parser
   repository: https://github.com/libwww-perl/HTML-Parser.git
-version: '3.80'
+version: '3.81'
 x_contributors:
   - 'Antonio Radici <antonio@dyne.org>'
   - 'Barbie <barbie@missbarbell.co.uk>'

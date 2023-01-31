@@ -34,12 +34,11 @@ my %WriteMakefileArgs = (
     "FileHandle" => 0,
     "IO::File" => 0,
     "SelectSaver" => 0,
-    "Test" => 0,
     "Test::More" => 0,
     "URI" => 0,
     "strict" => 0
   },
-  "VERSION" => "3.80",
+  "VERSION" => "3.81",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,7 +61,6 @@ my %FallbackPrereqs = (
   "HTTP::Headers" => 0,
   "IO::File" => 0,
   "SelectSaver" => 0,
-  "Test" => 0,
   "Test::More" => 0,
   "URI" => 0,
   "URI::URL" => 0,

@@ -5,6 +5,7 @@ use warnings;
 
 use Test::More tests => 1;
 
-BEGIN {
+BEGIN
+{
     use_ok('LaTeX::TOM');
 }

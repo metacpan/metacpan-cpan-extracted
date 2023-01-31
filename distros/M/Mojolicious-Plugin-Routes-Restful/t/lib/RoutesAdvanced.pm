@@ -90,7 +90,7 @@ sub startup {
                             API => {
                                 CONTROLLER => 'projects-user',
                                 RESOURCE   => 'view_users',
-                                #DEBUG => 1,
+                               #DEBUG => 1,
                                 VERBS => {
                                     RETRIEVE => 1,
                                 }

@@ -1,6 +1,6 @@
 
 package PRANG::Cookbook::Role::Location;
-$PRANG::Cookbook::Role::Location::VERSION = '0.20';
+$PRANG::Cookbook::Role::Location::VERSION = '0.21';
 use Moose::Role;
 use PRANG::Graph;
 use Moose::Util::TypeConstraints;

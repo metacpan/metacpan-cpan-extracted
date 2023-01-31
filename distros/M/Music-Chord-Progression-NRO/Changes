@@ -1,0 +1,23 @@
+Revision history for Music-Chord-Progression-NRO
+
+0.0203 2023-01-31 06:00:00
+    - Improve documentation.
+
+0.0202 2023-01-31 05:33:22
+    - Define the initial chord quality (major or minor).
+    - Updated tests.
+
+0.0201 2023-01-31 05:15:32
+    - Build attributes for computed things.
+    - Reduce code redundancy.
+
+0.0200 2023-01-31 04:44:31
+    - Add the return format attribute.
+    - Add the max attribute for circular transformations.
+    - Add the ability to perform circular transformations.
+    - Port the nro-chain program from my Music repo.
+    - Update tests.
+
+0.0100 2023-01-31 03:22:02
+    - Port the nro program from my Music repo.
+    - Mint with Dist::Zilla.

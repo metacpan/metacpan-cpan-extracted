@@ -21,7 +21,6 @@ on 'test' => sub {
     requires 'File::Spec';
     requires 'IO::File';
     requires 'SelectSaver';
-    requires 'Test';
     requires 'Test::More';
     requires 'URI';
 };

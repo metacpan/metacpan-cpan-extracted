@@ -1,7 +1,7 @@
 {
    "abstract" : "Getting Pathname of Current Working Directory",
    "author" : [
-      "USER_NAME<USER_MAIL>"
+      "Yuki Kimoto<kimoto.yuki@gmail.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
@@ -27,21 +27,25 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.9662"
+            "SPVM" : "0.9688",
+            "SPVM::Sys" : "0.35"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM::Sys" : "0.27"
+            "SPVM" : "0.9688",
+            "SPVM::Sys" : "0.35"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "type" : "git"
+         "type" : "git",
+         "url" : "https://github.com/yuki-kimoto/SPVM-Cwd.git",
+         "web" : "https://github.com/yuki-kimoto/SPVM-Cwd"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

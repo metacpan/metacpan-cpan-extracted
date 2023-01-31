@@ -15,3 +15,12 @@ Revsion History for Mojolicious::Plugin::Routes::Restful
     New "ROUTE" Directive Fix: John Scoles
     POD fix 'Via' to 'VIA' Fix: John Scoles
     Bug fix for API UPDATE directive Fix: John Scoles
+
+0.04 Update for Removed subs in Mojolicious::Routes::Route for Mojolicious 9.0+ Version 0.03 will work up to Version 8.73
+    Mojolicious::Routes::Route::via now Mojolicious::Routes::Route::methods
+    Mojolicious::Routes::Route::route now Mojolicious::Routes::Route::any
+    All code changes are internal.  No need to adjust your code just update to this Version.
+    Fixed a Bug in the test suite where some of the API packages where rendering twice on the same call so now tests correctly for 
+    Mojolicious 9.31+ 
+    Fixed a few typos in the POD
+ 

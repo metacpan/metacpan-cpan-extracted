@@ -92,8 +92,8 @@ class Fn {
     return $utf8_char;
   }
   
-  static method contains : int ($string : string, $substring : string, $offset = 0 : int, $length = -1 : int) {
-    return &index($string, $substring, $offset, $length) >= 0;
+  static method contains : int ($string : string, $substring : string, $string_offset = 0 : int, $string_length = -1 : int) {
+    return &index($string, $substring, $string_offset, $string_length) >= 0;
   }
   
   static method copy_string : string ($string : string) {
@@ -101,6 +101,46 @@ class Fn {
   }
   
   native static method crand : int ($seed : int*);
+
+  precompile static method equals_string_range : int ($string1 : string, $string1_offset : int, $string2 : string, $string2_offset : int, $length : int) {
+    unless ($string1) {
+      die "The \$string1 must be defined";
+    }
+    
+    unless ($string2) {
+      die "The \$string2 must be defined";
+    }
+    
+    unless ($string1_offset >= 0) {
+      die "The \$string1_offset must be greater than or equal to 0";
+    }
+    
+    unless ($string2_offset >= 0) {
+      die "The \$string2_offset must be greater than or equal to 0";
+    }
+    
+    my $string1_length = length $string1;
+    unless ($string1_offset + $length <= $string1_length) {
+      return 0;
+    }
+    
+    my $string2_length = length $string2;
+    unless ($string1_offset + $length <= $string2_length) {
+      return 0;
+    }
+    
+    my $match = 1;
+    for (my $i = 0; $i < $length; $i++) {
+      my $char1 = $string1->[$string1_offset + $i];
+      my $char2 = $string2->[$string2_offset + $i];
+      unless ($char1 == $char2) {
+        $match = 0;
+        last;
+      }
+    }
+    
+    return $match;
+  }
   
   native static method get_code_point : int ($string : string, $offset_ref : int*);
   
@@ -142,7 +182,7 @@ class Fn {
     return $value;
   }
   
-  precompile static method index : int ($string : string, $substring : string, $offset = 0 : int, $length = -1 : int) {
+  precompile static method index : int ($string : string, $substring : string, $string_offset = 0 : int, $string_length = -1 : int) {
     
     unless ($string) {
       die "The \$string must be defined";
@@ -152,17 +192,16 @@ class Fn {
       die "The \$substring must be defined";
     }
     
-    unless ($offset >= 0) {
-      die "The \$offset must be greater than or equal to 0";
+    unless ($string_offset >= 0) {
+      die "The \$string_offset must be greater than or equal to 0";
     }
     
-    my $string_length = length $string;
-    if ($length < 0) {
-      $length = $string_length - $offset;
+    if ($string_length < 0) {
+      $string_length = length $string - $string_offset;
     }
     
-    unless ($offset + $length <= $string_length) {
-      die "The \$offset + the \$length must be less than or equal to the length of the \$string";
+    unless ($string_offset + $string_length <= length $string) {
+      die "The \$string_offset + the \$string_length must be less than or equal to the length of the \$string";
     }
     
     my $substring_length = length $substring;
@@ -172,9 +211,9 @@ class Fn {
     }
     
     my $first : byte  = $substring->[0];
-    my $max : int = ($length - $substring_length);
+    my $max : int = ($string_offset + $string_length - $substring_length);
     
-    for (my $i = $offset; $i <= $max; $i++) {
+    for (my $i = $string_offset; $i <= $max; $i++) {
       if ($string->[$i] != $first) {
         while (++$i <= $max && $string->[$i] != $first) {}
       }
@@ -667,56 +706,38 @@ class Fn {
       die "The length of the \$separator must be greater than 0";
     }
     
-    my $separated_strings_list = StringList->new_len(0);
+    my $parts_list = StringList->new_len(0);
     
-    my $match_start = 0;
-    my $string_base = 0;
+    my $offset = 0;
     my $match_count = 0;
     for (my $i = 0; $i < $string_length; $i++) {
       if ($limit > 0 && $match_count >= $limit - 1) {
         last;
       }
       
-      if ($string->[$i] == $separator->[0]) {
-        $match_start = 1;
-      }
-      
-      if ($match_start) {
-        my $match = 1;
-        for (my $separator_index = 0; $separator_index < $separator_length; $separator_index++) {
-          if ($i + $separator_index > $string_length - 1) {
-            $match = 0;
-            last;
-          }
-          else {
-            unless ($string->[$i + $separator_index] == $separator->[$separator_index]) {
-              $match = 0;
-              last;
-            }
-          }
-        }
-        if ($match) {
-          $match_count++;
-          
-          my $separated_string = &substr($string, $string_base, $i - $string_base);
-          $separated_strings_list->push($separated_string);
-          $string_base = $i + $separator_length;
-          $i += $separator_length - 1;
-        }
+      my $match_offset = &index($string, $separator, $offset);
+      my $match = $match_offset >= 0;
+      if ($match) {
+        $match_count++;
+        
+        my $part = &substr($string, $offset, $match_offset - $offset);
+        $parts_list->push($part);
+        my $match_legnth = $separator_length;
+        $offset = $match_offset + $match_legnth;
       }
     }
-    if ($string_base == $string_length) {
-      $separated_strings_list->push("");
+    if ($offset == $string_length) {
+      $parts_list->push("");
     }
     else {
-      my $separated_string = &substr($string, $string_base, $string_length - $string_base);
-      $separated_strings_list->push($separated_string);
+      my $part = &substr($string, $offset, $string_length - $offset);
+      $parts_list->push($part);
     }
 
     if ($limit == 0) {
-      while ($separated_strings_list->length > 0) {
-        if ($separated_strings_list->get($separated_strings_list->length - 1) eq "") {
-          $separated_strings_list->pop;
+      while ($parts_list->length > 0) {
+        if ($parts_list->get($parts_list->length - 1) eq "") {
+          $parts_list->pop;
         }
         else {
           last;
@@ -724,10 +745,9 @@ class Fn {
       }
     }
     
+    my $parts = $parts_list->to_array;
     
-    my $separated_strings = $separated_strings_list->to_array;
-    
-    return $separated_strings;
+    return $parts;
   }
   
   static method substr : string ($string : string, $offset : int, $length = -1 : int) {
@@ -785,6 +805,71 @@ class Fn {
       $code_point = $code_point - 0x20;
     }
     return $code_point;
+  }
+  
+  precompile static method tr : string ($string : string, $pattern : string, $replace : string) {
+    
+    unless ($string) {
+      die "The \$string must be defined";
+    }
+    
+    unless ($pattern) {
+      die "The \$pattern must be defined";
+    }
+    
+    unless ($replace) {
+      die "The \$replace must be defined";
+    }
+    
+    my $replace_length = length $pattern;
+    
+    my $pattern_range = &_parse_range($pattern, "$pattern");
+    
+    my $replace_range = &_parse_range($replace, "$replace");
+    
+    my $string_length = length $string;
+    my $offset = 0;
+    my $buffer = StringBuffer->new;
+    while ($offset < $string_length) {
+      
+      my $code_point = &get_code_point($string, \$offset);
+      if ($code_point < 0) {
+        if ($code_point == &GET_CODE_POINT_ERROR_INVALID_UTF8) {
+          die "The \$string contains a invalid Unicode code point";
+        }
+        else {
+          die "Calling the get_code_point method in the Fn class to the \$string returns an error code: $code_point";
+        }
+      }
+      
+      my $pattern_offset = 0;
+      my $match = 0;
+      my $replace_pos = 0;
+      my $match_pattern_index = -1;
+      my $match_code_point_offset = -1;
+      
+      my $min_code_point = $pattern_range->[0];
+      my $max_code_point = $pattern_range->[1];
+      
+      if ($code_point >= $min_code_point && $code_point <= $max_code_point) {
+        $match = 1;
+        $match_code_point_offset = $code_point - $min_code_point;
+      }
+      
+      if ($match) {
+        my $replace_code_point = $replace_range->[0] + $match_code_point_offset;
+        my $char = &chr($replace_code_point);
+        $buffer->push($char);
+      }
+      else {
+        my $char = &chr($code_point);
+        $buffer->push($char);
+      }
+    }
+    
+    my $ret = $buffer->to_string;
+    
+    return $ret;
   }
   
   precompile static method trim : string ($string : string) {
@@ -935,68 +1020,4 @@ class Fn {
     return [$min_code_point, $max_code_point];
   }
   
-  precompile static method tr : string ($string : string, $pattern : string, $replace : string) {
-    
-    unless ($string) {
-      die "The \$string must be defined";
-    }
-    
-    unless ($pattern) {
-      die "The \$pattern must be defined";
-    }
-    
-    unless ($replace) {
-      die "The \$replace must be defined";
-    }
-    
-    my $replace_length = length $pattern;
-    
-    my $pattern_range = &_parse_range($pattern, "$pattern");
-    
-    my $replace_range = &_parse_range($replace, "$replace");
-    
-    my $string_length = length $string;
-    my $offset = 0;
-    my $buffer = StringBuffer->new;
-    while ($offset < $string_length) {
-      
-      my $code_point = &get_code_point($string, \$offset);
-      if ($code_point < 0) {
-        if ($code_point == &GET_CODE_POINT_ERROR_INVALID_UTF8) {
-          die "The \$string contains a invalid Unicode code point";
-        }
-        else {
-          die "Calling the get_code_point method in the Fn class to the \$string returns an error code: $code_point";
-        }
-      }
-      
-      my $pattern_offset = 0;
-      my $match = 0;
-      my $replace_pos = 0;
-      my $match_pattern_index = -1;
-      my $match_code_point_offset = -1;
-      
-      my $min_code_point = $pattern_range->[0];
-      my $max_code_point = $pattern_range->[1];
-      
-      if ($code_point >= $min_code_point && $code_point <= $max_code_point) {
-        $match = 1;
-        $match_code_point_offset = $code_point - $min_code_point;
-      }
-      
-      if ($match) {
-        my $replace_code_point = $replace_range->[0] + $match_code_point_offset;
-        my $char = &chr($replace_code_point);
-        $buffer->push($char);
-      }
-      else {
-        my $char = &chr($code_point);
-        $buffer->push($char);
-      }
-    }
-    
-    my $ret = $buffer->to_string;
-    
-    return $ret;
-  }
 }

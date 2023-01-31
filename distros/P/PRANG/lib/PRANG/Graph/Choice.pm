@@ -1,6 +1,6 @@
 
 package PRANG::Graph::Choice;
-$PRANG::Graph::Choice::VERSION = '0.20';
+$PRANG::Graph::Choice::VERSION = '0.21';
 use 5.010;
 use Moose;
 use MooseX::Params::Validate;

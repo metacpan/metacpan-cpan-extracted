@@ -10,7 +10,7 @@ use Test::More tests => 8;
 
 my $file = File::Spec->catfile($Bin, 'data', 'tex.in');
 my $tex = do {
-    open(my $fh, '<', $file) or die "Cannot open $file: $!\n";
+    open(my $fh, '<', $file) or die "Cannot open `$file': $!\n";
     local $/; <$fh>;
 };
 
@@ -27,7 +27,7 @@ is_deeply($tree->plainText, [
     "\n",
 ], 'Tree as plain text');
 is($tree->indexableText, 'Some Test Doc ', 'Tree as indexable text');
-is($tree->toLaTeX, do { $_ = $tex; $_ =~ s/\[.*?pt\]//; $_ }, 'Tree to LaTeX');
+is($tree->toLaTeX, $tex, 'Tree to LaTeX');
 is(@{$tree->getAllNodes}, 19, 'Amount of all nodes');
 is($tree->getTopLevelNodes, 9, 'Amount of top level nodes');
 is(@{$tree->getCommandNodesByName('title')}, 1, "Amount of 'title' command nodes");

@@ -105,6 +105,11 @@ get all of them):
 
 Return a new PICA::Data object from any guessable serialization form (or die).
 
+## pica\_field( $tag, \[$occ,\] \[ @subfields \] )
+
+Return a new PICA+ field as blessed [PICA::Data::Field](https://metacpan.org/pod/PICA%3A%3AData%3A%3AField) array reference (or
+die).
+
 ## pica\_parser( $type \[, @options\] )
 
 Create a PICA parsers object (see [PICA::Parser::Base](https://metacpan.org/pod/PICA%3A%3AParser%3A%3ABase)). Case of the type is

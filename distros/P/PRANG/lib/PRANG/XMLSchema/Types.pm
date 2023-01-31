@@ -1,6 +1,6 @@
 
 package PRANG::XMLSchema::Types;
-$PRANG::XMLSchema::Types::VERSION = '0.20';
+$PRANG::XMLSchema::Types::VERSION = '0.21';
 use strict;
 use warnings;
 use Moose::Util::TypeConstraints;

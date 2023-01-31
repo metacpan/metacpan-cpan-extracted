@@ -1,6 +1,6 @@
 
 package PRANG::Cookbook::Book;
-$PRANG::Cookbook::Book::VERSION = '0.20';
+$PRANG::Cookbook::Book::VERSION = '0.21';
 use Moose;
 use PRANG::Graph;
 use PRANG::XMLSchema::Types;

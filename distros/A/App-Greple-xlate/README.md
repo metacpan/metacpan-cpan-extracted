@@ -20,15 +20,26 @@ this:
     greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
 
 Pattern `^(\w.*\n)+` means consecutive lines starting with
-alpha-numeric character.  This command will find and replace them by
-the **deepl** command output.
-
+alpha-numeric letter.  This command show the area to be translated.
 Option **--all** is used to produce entire text.
+
+<div>
+
+    <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/select-area.png"></p>
+</div>
+
+Then add `--xlate` option to translate the selected area.  It will
+find and replace them by the **deepl** command output.
 
 By default, original and translated text is printed in the conflict
 marker format compatible with [git(1)](http://man.he.net/man1/git).  Using `ifdef` format, you
 can get desired part by [unifdef(1)](http://man.he.net/man1/unifdef) command easily.  Format can be
 specified by **--deepl-format** option.
+
+<div>
+
+    <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/format-conflict.png"></p>
+</div>
 
 If you want to translate entire text, use **--match-entire** option.
 This is a short-cut to specify the pattern matches entire text
@@ -102,12 +113,6 @@ This is a short-cut to specify the pattern matches entire text
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 
     See the tranlsation result in real time in the STDERR output.
-
-- **--**\[**no-**\]**xlate-join** (Default: True)
-
-    By default, continuous non-space lines are connected together to make
-    a single line paragraph.  If you don't need this operation, use
-    **--no-deepl-join** option.
 
 - **--xlate-fold**
 - **--xlate-fold-width**=_n_ (Default: 70)

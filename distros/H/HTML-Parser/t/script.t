@@ -29,7 +29,7 @@ $p->parse(
 );
 $p->eof;
 
-ok($TEXT, <<'EOT');
+is($TEXT, <<'EOT');
 [start_document,<undef>,]
 [start,tr,<tr>]
 [start,td,<td align="center" height="100">]

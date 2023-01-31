@@ -1,11 +1,12 @@
 package PICA::Parser::Base;
 use v5.14.1;
 
-our $VERSION = '2.05';
+our $VERSION = '2.06';
 
-use Carp qw(croak);
+use PICA::Data::Field;
+use Carp         qw(croak);
 use Scalar::Util qw(reftype);
-use Encode qw(encode);
+use Encode       qw(encode);
 
 sub _new {
     my $class = shift;
@@ -64,7 +65,9 @@ sub next {
                 }
             }
         }
-        return bless {record => $record, _id => $id}, 'PICA::Data';
+
+        my @fields = map {bless $_, 'PICA::Data::Field'} @$record;
+        return bless {record => \@fields, _id => $id}, 'PICA::Data';
     }
 
     return;

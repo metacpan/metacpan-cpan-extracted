@@ -16,7 +16,7 @@ use constant 1.03; # hash ref, perl 5.7.2
 # - Time::y2038 or Time::Local
 # - IO::Socket::SSL
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 our @EXPORT_OK = qw(
 	open stat open_at open_stream slurp_stream get post
@@ -156,7 +156,13 @@ sub stat ($) {
 		}
 	}
 	elsif ($arg =~ m!^https?://!i) {
-		(TIEHANDLE(__PACKAGE__, $arg, 0) || return undef)->STAT
+		my $self = TIEHANDLE(__PACKAGE__, $arg, 0, \(my $err));
+		if ($self) {
+			$self->STAT
+		} else {
+			$! = $err;
+			()
+		}
 	}
 	else {
 		CORE::stat($arg)
@@ -173,11 +179,15 @@ sub _e ($) {
 
 sub opendir_slash ($$) {
 	my $dir = pop;
-	
+
 	if (($dir||'') =~ m!^https?://!) {
 		$_[0] ||= Symbol::gensym();
-		my $self = tie(*{$_[0]}, __PACKAGE__, $dir, undef) || return;
-		
+		my $self = tie(*{$_[0]}, __PACKAGE__, $dir, undef, \(my $err));
+		unless ($self) {
+			$! = $err;
+			return;
+		}
+
 		my $path = $self->[REAL_PATH];
 		$path =~ s/\?.*$//;
 	
@@ -197,7 +207,11 @@ sub opendir ($$) {
 	
 	if (($dir||'') =~ m!^https?://!) {
 		$_[0] ||= Symbol::gensym();
-		my $self = tie(*{$_[0]}, __PACKAGE__, $dir, undef) || return;
+		my $self = tie(*{$_[0]}, __PACKAGE__, $dir, undef, \(my $err));
+		unless ($self) {
+			$! = $err;
+			return;
+		}
 		
 		my $path = $self->[REAL_PATH];
 		$path =~ s/\?.*$//;
@@ -294,7 +308,9 @@ sub open ($;$$) {
 	if (($file||'') =~ m!^https?://!) {
 		if ($mode =~ /^\s*<(?:\s*\:raw)?\s*$/) {
 			$_[0] ||= Symbol::gensym();
-			return tie(*{$_[0]}, __PACKAGE__, $file, 0) && 1
+			tie(*{$_[0]}, __PACKAGE__, $file, 0, \(my $err)) && return 1;
+			$! = $err;
+			return;
 		}
 		elsif ($mode =~ /<|\+/) {
 			$! = &Errno::EROFS; # Read-only file system
@@ -316,7 +332,9 @@ sub open_at ($$;$) {
 
 	if (($file||'') =~ m!^https?://!) {
 		$_[0] ||= Symbol::gensym();
-		return tie(*{$_[0]}, __PACKAGE__, $file, $offset) && 1
+		tie(*{$_[0]}, __PACKAGE__, $file, $offset, \(my $err)) && return 1;
+		$! = $err;
+		return;
 	} else {
 		CORE::open($_[0], '<', $file);
 		no warnings;
@@ -328,7 +346,11 @@ sub open_at ($$;$) {
 sub open_stream ($;$) {
 	my ($url, $offset) = @_;
 	$url = "http://$url" unless $url =~ m!^https?://!i;
-	my $self = TIEHANDLE(__PACKAGE__, $url, $offset, 1) || return undef;
+	my $self = TIEHANDLE(__PACKAGE__, $url, $offset, \(my $err), 1);
+	unless ($self) {
+		$! = $err;
+		return;
+	}
 	@$self[CONTENT_LENGTH, FH]
 }
 
@@ -552,13 +574,13 @@ sub _initiate {
 			} else {
 				$! = $HTTP2FS_error{$code} || &Errno::ENOSYS; # ENOSYS: Function not implemented
 				$VERBOSE && $code==200 && carp "Server does not support range queries. Consider using open_stream() instead of open()";
-				die "error: $!\n";
+				die "error: ", 0+$!, "\n";
 			}
 		}
 	}
 	if ($RESPONSE_HEADERS =~ m!\015?\012Transfert-Encoding: +chunked!i && $self->[HTTP_VERSION] <= 1) {
 		$! = $HTTP2FS_error{$code} || &Errno::ENOSYS; # ENOSYS: Function not implemented
-		die "error: $!\n";
+		die "error: ", 0+$!, "\n";
 	}
 	
 	unless (defined $self->[CONTENT_LENGTH]) {
@@ -609,7 +631,7 @@ sub _read {
 }
 
 sub TIEHANDLE {
-	my ($class, $url, $offset, $no_close_on_destroy) = @_;
+	my ($class, $url, $offset, $err_ref, $no_close_on_destroy) = @_;
 	my $self = bless [], $class;
 	my $redirections = 0;
 
@@ -625,7 +647,7 @@ sub TIEHANDLE {
 		if ($self->[AUTH]) {
 			require MIME::Base64;
 			#$VERBOSE && carp "authentication in URI is not supported";
-			#$! = &Errno::EFAULT; # Bad address
+			#$$err_ref = &Errno::EFAULT; # Bad address
 			#return undef;
 		}
 		$self->[PROTO] = uc($self->[PROTO]);
@@ -652,7 +674,7 @@ sub TIEHANDLE {
 				# apply proxy
 				if ($proxy =~ m!^https://!) {
 					$VERBOSE && carp "proxies with HTTPS address are not supported";
-					$! = &Errno::EFAULT; # Bad address
+					$$err_ref = &Errno::EFAULT; # Bad address
 					return undef;
 				}
 				$self->[CONNECT_NETLOC] = "$self->[HOST]:$self->[PORT]";
@@ -671,7 +693,7 @@ sub TIEHANDLE {
 				my $location = $1;
 				if (++$redirections > $MAX_REDIRECTIONS) {
 					$VERBOSE && carp "too many redirections";
-					$! = &Errno::EFAULT; # Bad address
+					$$err_ref = &Errno::EFAULT; # Bad address
 					return undef;
 				}
 				if ($location =~ m!^https?://!i) {
@@ -694,7 +716,7 @@ sub TIEHANDLE {
 			}
 			elsif ($@ =~ /^error: (\d+)/) {
 				$VERBOSE && carp $@;
-				$! = $1;
+				$$err_ref = $1;
 				return undef;
 			}
 			elsif ($@ =~ /^HTTPS support/) {
@@ -702,13 +724,13 @@ sub TIEHANDLE {
 			}
 			else {
 				$VERBOSE && carp $@;
-				$! = &Errno::EIO; # Input/output error
+				$$err_ref = &Errno::EIO; # Input/output error
 				return undef;
 			}			
 		}
 		
 		if (defined($self->[OFFSET]) && not defined $self->[CONTENT_LENGTH]) {
-			$! = &Errno::ENOSYS; # Function not implemented
+			$$err_ref = &Errno::ENOSYS; # Function not implemented
 			return undef;
 		}
 	}

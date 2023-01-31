@@ -14,11 +14,11 @@ use warnings;
 use constant true  => 1;
 use constant false => 0;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # Make a new Node: turn input hash into object.
 #
-sub new {
+sub _new {
     my $class = shift;
     my ($node) = @_;
 
@@ -52,14 +52,14 @@ sub split {
     my $left_text  = substr $node->{content}, 0, $a;
     my $right_text = substr $node->{content}, $b + 1, length($node->{content}) - $b;
 
-    my $left_node = LaTeX::TOM::Node->new({
+    my $left_node = LaTeX::TOM::Node->_new({
          type    => 'TEXT',
          start   => $node->{start},
          end     => $node->{start} + $a - 1,
          content => $left_text,
     });
 
-    my $right_node = LaTeX::TOM::Node->new({
+    my $right_node = LaTeX::TOM::Node->_new({
          type    => 'TEXT',
          start   => $node->{start} + $b + 1,
          end     => $node->{start} + length $node->{content},

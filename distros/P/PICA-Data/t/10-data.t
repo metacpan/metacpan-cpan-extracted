@@ -3,7 +3,7 @@ use Test::More;
 use Test::Exception;
 
 use PICA::Data ':all';
-
+use Scalar::Util 'blessed';
 use PICA::Parser::Plain;
 my $record = PICA::Parser::Plain->new('./t/files/pica.plain')->next;
 
@@ -41,15 +41,18 @@ is $record->id, '12345', '->id';
 
 is_deeply $record->fields('?!*~'), [], 'invalid PICA path';
 # throws_ok { $record->fields('?!*~') } qr/invalid pica path/, 'invalid PICA Path';
-is scalar @{pica_fields($record, '1.../*')}, 5, 'pica_fields';
+my $fields = pica_fields($record, '1.../*');
+is blessed($fields->[0]), 'PICA::Data::Field', 'PICA::Data::Field';
+is scalar @$fields, 5, 'pica_fields';
 
 my $field = ['000@', '', '0', '0'];
 my $annotated = [@$field, ' '];
 is pica_annotation($field), undef, 'no annotation';
 is pica_annotation($annotated), ' ', 'get annotation';
 
-pica_annotation($annotated, 'x');
-is pica_annotation($annotated), 'x', 'set annotation';
+dies_ok { pica_annotation($annotated, 'x') };
+pica_annotation($annotated, '-'), '-', 'set annotation';
+is pica_annotation($annotated), '-', 'set annotation';
 pica_annotation($field, ' ');
 pica_annotation($annotated, undef);
 is pica_annotation($field), ' ', 'added annotation';
@@ -96,6 +99,5 @@ $record->update('123X$x', '');
 is_deeply $record->fields, [ ['123X', undef, y => 1] ], 'remove subfield';
 $record->update('123X$y', undef);
 is_deeply $record->fields, [ ], 'remove last subfield';
-
 
 done_testing;

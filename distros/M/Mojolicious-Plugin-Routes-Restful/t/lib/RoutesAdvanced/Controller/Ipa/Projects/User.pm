@@ -39,6 +39,8 @@ sub get {
 
          $self->render( json => { status => 200 } );
     }
+    else {
      $self->render( json => { status => 404 } );
+    } 
 }
 1;

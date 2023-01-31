@@ -1,6 +1,6 @@
 
 package PRANG::Graph;
-$PRANG::Graph::VERSION = '0.20';
+$PRANG::Graph::VERSION = '0.21';
 use Moose::Role;
 use Moose::Meta::TypeConstraint;
 

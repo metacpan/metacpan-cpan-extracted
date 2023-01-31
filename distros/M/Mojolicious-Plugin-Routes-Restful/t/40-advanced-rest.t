@@ -89,13 +89,13 @@ my $project_new = {
 
 
 
-  # $t->get_ok("/V_1/myapp/paper")->status_is(200); #->json_is( '/1' => $project->{2} );
-  # $t->get_ok("/V_1/myapp/paper/1")->status_is(200);#->json_is( $project->{1} );
+  $t->get_ok("/V_1/myapp/paper")->status_is(200); #->json_is( '/1' => $project->{2} );
+  $t->get_ok("/V_1/myapp/paper/1")->status_is(200);#->json_is( $project->{1} );
 
-  # $t->get_ok("/V_1/myapp/project/1/my_details")->status_is(200); #->json_is( '/1' => $project->{2} );
-  # $t->get_ok("/V_1/myapp/project/1/my_details/2")->status_is(404);#->json_is( $project->{1} );
-  # $t->get_ok("/V_1/myapp/project/1/planning")->status_is(200);#->json_is( $project->{1} );
-  # $t->get_ok("/V_1/myapp/project/1/planning/2")->status_is(404);#->json_is( $project->{1} );
+  $t->get_ok("/V_1/myapp/project/1/my_details")->status_is(200); #->json_is( '/1' => $project->{2} );
+  $t->get_ok("/V_1/myapp/project/1/my_details/2")->status_is(404);#->json_is( $project->{1} );
+  $t->get_ok("/V_1/myapp/project/1/planning")->status_is(200);#->json_is( $project->{1} );
+  $t->get_ok("/V_1/myapp/project/1/planning/2")->status_is(404);#->json_is( $project->{1} );
   
   $t->get_ok("/V_1/myapp/project/1/view_users")->status_is(200);#->json_is( $project->{1} );
 

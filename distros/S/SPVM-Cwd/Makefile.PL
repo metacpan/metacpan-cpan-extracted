@@ -5,6 +5,10 @@ use warnings;
 use Config;
 use SPVM::Builder::Util::API;
 
+my %configure_and_runtime_requires = (
+  'SPVM' => '0.9688',
+  'SPVM::Sys' => '0.35'
+);
 WriteMakefile(
   NAME              => 'SPVM::Cwd',
   VERSION_FROM      => 'lib/SPVM/Cwd.pm',
@@ -14,7 +18,7 @@ WriteMakefile(
   LICENSE           => 'perl_5',
   ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
     (ABSTRACT_FROM  => 'lib/SPVM/Cwd.pm',
-     AUTHOR         => 'USER_NAME<USER_MAIL>') : ()),
+     AUTHOR         => 'Yuki Kimoto<kimoto.yuki@gmail.com>') : ()),
   test => {TESTS => 't/*.t'},
   clean => {FILES => ['.spvm_build', 't/.spvm_build']},
   META_MERGE => {
@@ -22,14 +26,16 @@ WriteMakefile(
     resources => {
       repository => {
         type => 'git',
-        url  => '',
-        web  => '',
+        url  => 'https://github.com/yuki-kimoto/SPVM-Cwd.git',
+        web  => 'https://github.com/yuki-kimoto/SPVM-Cwd',
       },
     },
   },
-  # SPVM::Builder::Util::API is needed for Makefile.PL
   CONFIGURE_REQUIRES => {
-    'SPVM'              => '0.9662',
+    %configure_and_runtime_requires,
+  },
+  PREREQ_PM         => {
+    %configure_and_runtime_requires,
   },
 );
 

@@ -3,7 +3,9 @@ use warnings;
 use alienfile;
 use Path::Tiny qw(path);
 
-### let's probe by compiling the code
+### let's probe by compiling the code. on FreeBSD force the download and build
+### the latest code since the pkg version is old
+if ($^O !~ /freebsd|openbsd|netbsd/i) {
 plugin 'Probe::CBuilder' => (
     lang => 'C',
     cflags => $ENV{TALIB_INCLUDES} ? "-I$ENV{TALIB_INCLUDES}": "",
@@ -17,6 +19,7 @@ int main(int argc, char **argv)
   return 0;
 }
 EOF
+}
 
 share {
     my $REV = '1562';
@@ -78,7 +81,6 @@ share {
         $build->runtime_prop->{cflags} = "-I$include -I$include2";
         $build->runtime_prop->{libs} = "-L$dynamic -lta_lib -lm";
         $build->runtime_prop->{libs_static} = "-L$lib -lta_lib -lm";
-
         $build->runtime_prop->{inline_auto_include} = [ 'ta_libc.h' ];
     };
 };

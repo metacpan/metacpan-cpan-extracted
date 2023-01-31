@@ -12,11 +12,11 @@ use strict;
 
 use Carp qw(croak);
 
-our $VERSION = '0.04';
+our $VERSION = '0.07';
 
 # "constructor"
 #
-sub new {
+sub _new {
     my $class = shift;
     my $nodes = shift || []; # empty array for tree structure
 
@@ -52,7 +52,7 @@ sub copy {
     }
 
     # each subtree is a tree
-    return __PACKAGE__->new([@output]);
+    return __PACKAGE__->_new([@output]);
 }
 
 sub print {
@@ -197,20 +197,23 @@ sub toLaTeX {
         }
 
         elsif ($node->{type} eq 'COMMAND') {
+            my $cmd = "\\$node->{command}";
+            $cmd .= "[$node->{opts}]" if (defined $node->{opts});
+
             if ($node->{position} eq 'outer') {
-                $str .= "\\$node->{command}" . '{' . $node->{children}->toLaTeX($node) . '}';
+                $str .= $cmd . '{' . $node->{children}->toLaTeX($node) . '}';
             }
             elsif ($node->{position} eq 'inner') {
                 if (defined $parent && # dont add superfluous braces
                         $parent->{start} == $node->{start} &&
                         $parent->{end} == $node->{end}) {
-                    $str .= "\\$node->{command}" . ' ' . $node->{children}->toLaTeX($node);
+                    $str .= $cmd . ' ' . $node->{children}->toLaTeX($node);
                 } else {
-                    $str .= '{' . "\\$node->{command}" . $node->{children}->toLaTeX($node) . '}';
+                    $str .= '{' . $cmd . $node->{children}->toLaTeX($node) . '}';
                 }
             }
             elsif ($node->{braces} == 0) {
-                $str .= "\\$node->{command}" . ' ' . $node->{children}->toLaTeX($node);
+                $str .= $cmd . ' ' . $node->{children}->toLaTeX($node);
             }
         }
 
@@ -232,7 +235,7 @@ sub toLaTeX {
     return $str;
 }
 
-# Augment the nodes in the tree with pointers to all neighboring nodes, so 
+# Augment the nodes in the tree with pointers to all neighboring nodes, so
 # traversal is easier for the user who is given a lone node.	This is a hack,
 # we should really be maintaining this all along.
 #

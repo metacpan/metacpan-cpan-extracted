@@ -4,14 +4,22 @@ author:
   - 'Vikas N. Kumar <vikas@cpan.org>'
 build_requires:
   Alien::Build::MB: '0.01'
-  HTTP::Tiny: '0'
+  Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
+  Alien::cmake3: '0.02'
+  Archive::Zip: '0'
+  Config: '0'
+  HTTP::Tiny: '0.044'
+  IO::Socket::SSL: '1.56'
   Module::Build: '0.36'
+  Mozilla::CA: '0'
+  Net::SSLeay: '1.49'
   Path::Tiny: '0'
   Software::License: '0'
   Test2::V0: '0'
   Test::Alien: '0'
   Test::Alien::Diag: '0'
   Test::More: '0'
+  URI: '0'
 configure_requires:
   Alien::Build: '1.40'
   Alien::Build::MB: '0.01'
@@ -29,14 +37,14 @@ name: Alien-TALib
 provides:
   Alien::TALib:
     file: lib/Alien/TALib.pm
-    version: '0.14'
+    version: '0.15'
 requires:
   perl: v5.10.0
 resources:
   bugtracker: https://github.com/vikasnkumar/Alien-TALib/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/vikasnkumar/Alien-TALib
-version: '0.14'
+version: '0.15'
 x_alienfile:
   generated_by: 'Alien::Build::MB version 0.09'
   requires:

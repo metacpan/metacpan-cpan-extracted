@@ -5,7 +5,7 @@ use Data::Dumper;
 #Oh dear, she's stuck in an infinite loop and he's an idiot! Oh well, that's love
 
 BEGIN {
-    $Mojolicious::Plugin::Routes::Restful::VERSION = '0.03';
+    $Mojolicious::Plugin::Routes::Restful::VERSION = '0.04';
 }
 use Mojo::Base 'Mojolicious::Plugin';
 
@@ -121,20 +121,20 @@ sub _make_routes {
     if ( $type eq 'PARENT' ) {
 
         unless ( exists( $route->{NO_ROOT} ) || exists( $route->{API_ONLY} ) ) {
-            $rapp->route("/$key")->via($methods)
+            $rapp->any("/$key")->methods($methods)
               ->to( "$controller#$action", $route_stash );
 
             warn(
-"$type  Route = /$key->Via->[$methods_desc]->$controller#$action"
+"$type  Route = /$key->methods->[$methods_desc]->$controller#$action"
             ) if ( $route->{DEBUG} );
         }
 
         unless ( exists( $route->{NO_ID} ) || exists( $route->{API_ONLY} ) ) {
-            $rapp->route("/$key/:id")->via($methods)
+            $rapp->any("/$key/:id")->methods($methods)
               ->to( "$controller#$action", $route_stash );
 
             warn(
-"$type  Route = /$key/:id->Via->[$methods_desc]->$controller#$action"
+"$type  Route = /$key/:id->methods->[$methods_desc]->$controller#$action"
             ) if ( $route->{DEBUG} );
         }
 
@@ -163,20 +163,20 @@ sub _make_routes {
           if ( exists( $route->{API_ONLY} ) );
 
         warn(
-"$type Route = /$parent/:id/$key->Via->[$methods_desc]->$controller#$action"
+"$type Route = /$parent/:id/$key->methods->[$methods_desc]->$controller#$action"
         ) if ( $route->{DEBUG} );
 
         if ( exists( $route->{NO_ID} ) ) {
 
             warn(
-"$type    Route = /$parent/$key->Via->[$methods_desc]->$controller#$action"
+"$type    Route = /$parent/$key->methods->[$methods_desc]->$controller#$action"
             ) if ( $route->{DEBUG} );
-            $rapp->route("/$parent/$key")->via($methods)
+            $rapp->any("/$parent/$key")->methods($methods)
               ->to( "$parent#$key", $route_stash );
 
         }
         else {
-            $rapp->route("/$parent/:id/$key")->via($methods)
+            $rapp->any("/$parent/:id/$key")->methods($methods)
               ->to( "$controller#$action", $route_stash );
         }
     }
@@ -190,16 +190,16 @@ sub _make_routes {
         return
           if ( exists( $route->{API_ONLY} ) );
 
-        $rapp->route("/$parent/:id/$key")->via($methods)
+        $rapp->any("/$parent/:id/$key")->methods($methods)
           ->to( "$controller#$action", $route_stash );
-        $rapp->route("/$parent/:id/$key/:child_id")->via($methods)
+        $rapp->any("/$parent/:id/$key/:child_id")->methods($methods)
           ->to( "$controller#$action", $route_stash );
 
         warn(
-"$type    Route = /$parent/:id/$key->Via->[$methods_desc]->$controller#$action"
+"$type    Route = /$parent/:id/$key->methods->[$methods_desc]->$controller#$action"
         ) if ( $route->{DEBUG} );
         warn(
-"$type    Route = /$parent/:id/$key/:child_id->Via->[$methods_desc]->$controller#$action"
+"$type    Route = /$parent/:id/$key/:child_id->methods->[$methods_desc]->$controller#$action"
         ) if ( $route->{DEBUG} );
 
     }
@@ -230,61 +230,61 @@ sub _api_routes {
 
     warn(   "API PARENT  ->/" 
           . $url
-          . "->Via->GET-> $contoller_prefix-$contoller#get" )
+          . "->methods->GET-> $contoller_prefix-$contoller#get" )
       if ( $verbs->{RETRIEVE} )
       and ( $api->{DEBUG} );
 
-    $rapi->route( "/" . $url )->via('GET')
+    $rapi->any( "/" . $url )->methods('GET')
       ->to( "$contoller_prefix-$contoller#get", $stash )
       if ( $verbs->{RETRIEVE} );
 
     warn(   "API PARENT  ->/" 
           . $url
-          . "/:id->Via->GET-> $contoller_prefix-$contoller#get" )
+          . "/:id->methods->GET-> $contoller_prefix-$contoller#get" )
       if ( $verbs->{RETRIEVE} )
       and ( $api->{DEBUG} );
 
-    $rapi->route( "/" . $url . "/:id" )->via('GET')
+    $rapi->any( "/" . $url . "/:id" )->methods('GET')
       ->to( "$contoller_prefix-$contoller#get", $stash )
       if ( $verbs->{RETRIEVE} );
 
     warn(   "API PARENT  ->/" 
           . $url
-          . "/:id->Via->POST-> $contoller_prefix-$contoller#create" )
+          . "/:id->methods->POST-> $contoller_prefix-$contoller#create" )
       if ( $verbs->{CREATE} )
       and ( $api->{DEBUG} );
 
-    $rapi->route( "/" . $url )->via('POST')
+    $rapi->any( "/" . $url )->methods('POST')
       ->to( "$contoller_prefix-$contoller#create", $stash )
       if ( $verbs->{CREATE} );
 
     warn(   "API PARENT  ->/" 
           . $url
-          . "/:id->Via->PATCH-> $contoller_prefix-$contoller#update" )
+          . "/:id->methods->PATCH-> $contoller_prefix-$contoller#update" )
       if ( $verbs->{UPDATE} )
       and ( $api->{DEBUG} );
 
-    $rapi->route( "/" . $url . "/:id" )->via('PATCH')
+    $rapi->any( "/" . $url . "/:id" )->methods('PATCH')
       ->to( "$contoller_prefix-$contoller#update", $stash )
       if ( $verbs->{UPDATE} );
 
     warn(   "API PARENT  ->/" 
           . $url
-          . "/:id->Via->PUT-> $contoller_prefix-$contoller#replace" )
+          . "/:id->methods->PUT-> $contoller_prefix-$contoller#replace" )
       if ( $verbs->{REPLACE} )
       and ( $api->{DEBUG} );
 
-    $rapi->route( "/" . $url . "/:id" )->via('PUT')
+    $rapi->any( "/" . $url . "/:id" )->methods('PUT')
       ->to( "$contoller_prefix-$contoller#replace", $stash )
       if ( $verbs->{REPLACE} );
 
     warn(   "API PARENT  ->/" 
           . $url
-          . "/:id->Via->DELETE-> $contoller_prefix-$contoller#delete" )
+          . "/:id->methods->DELETE-> $contoller_prefix-$contoller#delete" )
       if ( $verbs->{DELETE} )
       and ( $api->{DEBUG} );
 
-    $rapi->route( "/" . $url . "/:id" )->via('DELETE')
+    $rapi->any( "/" . $url . "/:id" )->methods('DELETE')
       ->to( "$contoller_prefix-$contoller#delete", $stash )
       if ( $verbs->{DELETE} );
 
@@ -307,68 +307,68 @@ sub _sub_api_routes {
     my $url = $self->_api_url( $parent, $config );
 
     warn(
-"API CHILD   ->/$url/:id/$child_resource ->Via->GET-> $contoller_prefix-$parent#$child_resource"
+"API CHILD   ->/$url/:id/$child_resource ->methods->GET-> $contoller_prefix-$parent#$child_resource"
       )
       if ( $verbs->{RETRIEVE} )
       and ( $api->{DEBUG} );
 
-    $rapi->route( "/" . $url . "/:id/" . $child_resource )->via('GET')
+    $rapi->any( "/" . $url . "/:id/" . $child_resource )->methods('GET')
       ->to( "$contoller_prefix-$parent#$child_resource", $stash )
       if ( $verbs->{RETRIEVE} );
 
     warn(   "API CHILD   ->/" 
           . $url
-          . "/:id/$child_resource/:child_id->Via->GET-> $contoller_prefix-$child_controller#get"
+          . "/:id/$child_resource/:child_id->methods->GET-> $contoller_prefix-$child_controller#get"
       )
       if ( $verbs->{RETRIEVE} )
       and ( $api->{DEBUG} );
 
-    $rapi->route( "/" . $url . "/:id/" . $child_resource . "/:child_id" )
-      ->via('GET')->to( "$contoller_prefix-$child_controller#get", $stash )
+    $rapi->any( "/" . $url . "/:id/" . $child_resource . "/:child_id" )
+      ->methods('GET')->to( "$contoller_prefix-$child_controller#get", $stash )
       if ( $verbs->{RETRIEVE} );
 
     warn(   "API CHILD   ->/" 
           . $url
-          . "/:id/$child_resource ->Via->POST-> $contoller_prefix-$child_controller#create"
+          . "/:id/$child_resource ->methods->POST-> $contoller_prefix-$child_controller#create"
       )
       if ( $verbs->{CREATE} )
       and ( $api->{DEBUG} );
 
-    $rapi->route( "/" . $url . "/:id/" . $child_resource )->via('POST')
+    $rapi->any( "/" . $url . "/:id/" . $child_resource )->methods('POST')
       ->to( "$contoller_prefix-$child_controller#create", $stash )
       if ( $verbs->{CREATE} );
 
     warn(   "API CHILD   ->/" 
           . $url
-          . "/:id/$child_resource/:child_id->Via->PUT-> $contoller_prefix-$child_controller#replace"
+          . "/:id/$child_resource/:child_id->methods->PUT-> $contoller_prefix-$child_controller#replace"
       )
       if ( $verbs->{REPLACE} )
       and ( $api->{DEBUG} );
 
-    $rapi->route( "/" . $url . "/:id/" . $child_resource . "/:child_id" )
-      ->via('PUT')->to( "$contoller_prefix-$child_controller#replace", $stash )
+    $rapi->any( "/" . $url . "/:id/" . $child_resource . "/:child_id" )
+      ->methods('PUT')->to( "$contoller_prefix-$child_controller#replace", $stash )
       if ( $verbs->{REPLACE} );
 
     warn(   "API CHILD   ->/" 
           . $url
-          . "/:id/$child_resource/:child_id->Via->PATCH-> $contoller_prefix-$child_controller#update"
+          . "/:id/$child_resource/:child_id->methods->PATCH-> $contoller_prefix-$child_controller#update"
       )
       if ( $verbs->{UPDATE} )
       and ( $api->{DEBUG} );
 
-    $rapi->route( "/" . $url . "/:id/" . $child_resource . "/:child_id" )
-      ->via('PATCH')->to( "$contoller_prefix-$child_controller#update", $stash )
+    $rapi->any( "/" . $url . "/:id/" . $child_resource . "/:child_id" )
+      ->methods('PATCH')->to( "$contoller_prefix-$child_controller#update", $stash )
       if ( $verbs->{UPDATE} );
 
     warn(   "API CHILD   ->/" 
           . $url
-          . "/:id/$child_resource/:child_id->Via->DELETE-> $contoller_prefix-$child_controller#delete"
+          . "/:id/$child_resource/:child_id->methods->DELETE-> $contoller_prefix-$child_controller#delete"
       )
       if ( $verbs->{DELETE} )
       and ( $api->{DEBUG} );
 
-    $rapi->route( "/" . $url . "/:id/" . $child_resource . "/:child_id" )
-      ->via('DELETE')
+    $rapi->any( "/" . $url . "/:id/" . $child_resource . "/:child_id" )
+      ->methods('DELETE')
       ->to( "$contoller_prefix-$child_controller#delete", $stash )
       if ( $verbs->{DELETE} );
 
@@ -391,19 +391,19 @@ sub _inline_api_routes {
 
     warn(   "API INLINE->/" 
           . $url
-          . "/:id/$child_resource->Via->GET-> $contoller_prefix-$parent#$action"
+          . "/:id/$child_resource->methods->GET-> $contoller_prefix-$parent#$action"
     ) if ( $verbs->{RETRIEVE} and $api->{DEBUG} );
 
-    $rapi->route( "/" . $url . "/:id/" . $child_resource )->via('GET')
+    $rapi->any( "/" . $url . "/:id/" . $child_resource )->methods('GET')
       ->to( "$contoller_prefix-$parent#$action", $stash )
       if ( $verbs->{RETRIEVE} );
 
     warn(   "API INLINE->/" 
           . $url
-          . "/:id/$child_resource->Via->PATCH-> $contoller_prefix-$parent#$action"
+          . "/:id/$child_resource->methods->PATCH-> $contoller_prefix-$parent#$action"
     ) if ( $verbs->{UPDATE} and $api->{DEBUG} );
 
-    $rapi->route( "/" . $url . "/:id/" . $child_resource )->via('PATCH')
+    $rapi->any( "/" . $url . "/:id/" . $child_resource )->methods('PATCH')
       ->to( "$contoller_prefix-$parent#$action", $stash )
       if ( $verbs->{UPDATE} );
 
@@ -420,7 +420,7 @@ or just routes or just a RESTful API.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -813,10 +813,10 @@ So to create the routes for the example page above one would use this hash
               INLINE => { abstract=>{
                                    STASH=>{tab=>'abstract'}
                                    },
-                                 detail=>{
+                          detail=>{
                                    STASH=>{tab=>'detail'},
                                   },
-                                 admin=>{
+                          admin=>{
                                    STASH=>{tab=>'admin'},
                                    }
                                  }
@@ -955,7 +955,7 @@ This opens the 'PUT' method of your API resource and always points to a 'replace
 
 =head4 UPDATE
 
-This opens the 'GET' method of your API resource and always points to an 'update' sub in the resource controller.
+This opens the 'PATCH' method of your API resource and always points to an 'update' sub in the resource controller.
 
 =head4 DELETE
 

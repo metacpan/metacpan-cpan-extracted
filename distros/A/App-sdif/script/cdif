@@ -94,7 +94,8 @@ use Getopt::EX::Hashed; {
     has colordump      => '        ' ;
     has sdif           => '        ' ;
     has stat           => '    !   ' ;
-    has unit           => ' by =s  ' , default => $unit_default ;
+    has unit           => ' by :s  ' , default => $unit_default ,
+				     , any => [ qw(char word letter mecab 0), '' ];
     has show_old       => '    !   ' , default => 1 , alias => 'old' ;
     has show_new       => '    !   ' , default => 1 , alias => 'new' ;
     has command        => '    !   ' , default => 1 ;
@@ -359,7 +360,7 @@ while (<DIFF>) {
 	print_command($command_line);
 
 	if ($cmd eq 'c') {
-	    compare(\$old, \$new, qr/<[ \t]/, qr/>[ \t]/);
+	    compare(\$old, \$new, qr/<[ \t]/, qr/>[ \t]/) if $app->unit;
 	}
 
 	if ($app->color) {
@@ -405,7 +406,7 @@ while (<DIFF>) {
 	    for my $i (0 .. $#old) {
 		my $cmark = "! ";
 		if ($i % 2) {
-		    compare(\$old[$i], \$new[$i], $mark_re);
+		    compare(\$old[$i], \$new[$i], $mark_re) if $app->unit;
 		}
 		if ($app->color) {
 		    $old[$i] =~ s{^([\-\!][ \t])(.*)}{
@@ -501,9 +502,15 @@ while (<DIFF>) {
 
 	    my $old = join '', @old;
 	    my $new = join '', @new;
-	    compare(\$old, \$new);
+	    compare(\$old, \$new) if $app->unit;
 
-	    print $c1, $old, @org, $c2, $new, $c3;
+	    print
+		$c1,
+		color("OTEXT", $old),
+		@org,
+		$c2,
+		color("NTEXT", $new),
+		$c3;
 	}
     }
     else {
@@ -564,7 +571,7 @@ sub compare_unified_generic {
     my $c = $buf->collect(qr/^[\t ]+$/);
     my $o = $buf->collect(qr/[-]/);
     my $n = $buf->collect(qr/[+]/);
-    compare(\$o, \$n, $mark_re);
+    compare(\$o, \$n, $mark_re) if $app->unit;
     if ($app->color) {
 	$c =~ s/^$mark_re//mg if not $app->mark;
 	map {
@@ -586,6 +593,8 @@ sub compare_unified_3 {
     my @mark = ( "  ", "--", "- ", " -", "+ ", " +", "++" );
     my %buf = map { $_ => scalar($buf->collect($_)) } @mark;
 
+    goto SKIP unless $app->unit;
+
     my @r;
     $r[0] =     compare(\@buf{q/--/, q/++/}, $mark_re);
     $r[1] =     compare(\@buf{q/- /, q/ -/}, $mark_re);
@@ -599,6 +608,8 @@ sub compare_unified_3 {
 	$r[6] = compare(\@buf{q/--/, q/+ /}, $mark_re);
 	$r[7] = compare(\@buf{q/--/, q/ +/}, $mark_re) unless $r[6];
     }
+
+  SKIP:
 
     if ($app->color) {
 	map { s/^$mark_re//mg } $buf{q/  /} if not $app->mark;
@@ -877,7 +888,7 @@ cdif - word context diff
 
 =head1 VERSION
 
-Version 4.24.0
+Version 4.25.0
 
 =head1 SYNOPSIS
 
@@ -911,7 +922,7 @@ Options:
 	--[no]unknown	    print unknown line      (default true)
 	--[no]mark	    print mark or not       (default true)
 	--[no]prefix	    read git --graph output (default true)
-	--unit=s            word, char or mecab     (default word)
+	--unit=s            word/letter/char/mecab  (default word)
 	--[no]mecab	    use mecab tokenizer     (default false)
 	--prefix-pattern    prefix pattern
 	--visible char=?    set visible attributes
@@ -1013,6 +1024,9 @@ does not include underscore.
 When C<mecab> is given as an unit, B<mecab> command is called as a
 tokenizer for non-ASCII text.  ASCII text is compared word-by-word.
 External B<mecab> command has to been installed.
+
+If you give empty string like C<--unit=>, B<cdif> does not compare
+text in any way.  You'll still get colorization effect.
 
 =item B<--mecab>
 

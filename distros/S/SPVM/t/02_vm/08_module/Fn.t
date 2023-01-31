@@ -84,6 +84,7 @@ my $nan_re = qr/(nan|ind)/i;
     ok(SPVM::TestCase::Module::Fn->contains);
     ok(SPVM::TestCase::Module::Fn->copy_string);
     ok(SPVM::TestCase::Module::Fn->crand);
+    ok(SPVM::TestCase::Module::Fn->equals_string_range);
     ok(SPVM::TestCase::Module::Fn->get_code_point);
     ok(SPVM::TestCase::Module::Fn->hex);
     ok(SPVM::TestCase::Module::Fn->index);
@@ -138,10 +139,10 @@ my $nan_re = qr/(nan|ind)/i;
     ok(SPVM::TestCase::Module::Fn->to_long_with_base);
     ok(SPVM::TestCase::Module::Fn->to_lower);
     ok(SPVM::TestCase::Module::Fn->to_upper);
+    ok(SPVM::TestCase::Module::Fn->tr);
     ok(SPVM::TestCase::Module::Fn->trim);
     ok(SPVM::TestCase::Module::Fn->uc);
     ok(SPVM::TestCase::Module::Fn->ucfirst);
-    ok(SPVM::TestCase::Module::Fn->tr);
   }
   
   # Extra
@@ -180,11 +181,11 @@ my $nan_re = qr/(nan|ind)/i;
       my $sep = ",";
       my $string = "foo,bar,baz,,";
       {
-        is_deeply([split $sep, $string, -1], SPVM::Fn->split($sep, $string, -1)->to_elems);
-        is_deeply([split $sep, $string, 0], SPVM::Fn->split($sep, $string)->to_elems);
-        is_deeply([split $sep, $string, 1], SPVM::Fn->split($sep, $string, 1)->to_elems);
-        is_deeply([split $sep, $string, 2], SPVM::Fn->split($sep, $string, 2)->to_elems);
-        is_deeply([split $sep, $string, 3], SPVM::Fn->split($sep, $string, 3)->to_elems);
+        is_deeply(SPVM::Fn->split($sep, $string, -1)->to_elems, [split $sep, $string, -1]);
+        is_deeply(SPVM::Fn->split($sep, $string)->to_elems, [split $sep, $string, 0]);
+        is_deeply(SPVM::Fn->split($sep, $string, 1)->to_elems, [split $sep, $string, 1]);
+        is_deeply(SPVM::Fn->split($sep, $string, 2)->to_elems, [split $sep, $string, 2]);
+        is_deeply(SPVM::Fn->split($sep, $string, 3)->to_elems, [split $sep, $string, 3]);
       }
     }
   }

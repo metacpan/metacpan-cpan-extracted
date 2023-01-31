@@ -1,6 +1,6 @@
 
 package PRANG::Graph::Node;
-$PRANG::Graph::Node::VERSION = '0.20';
+$PRANG::Graph::Node::VERSION = '0.21';
 use Moose::Role;
 
 sub accept_many {0}

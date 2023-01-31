@@ -34,8 +34,8 @@ SYNOPSIS
 DESCRIPTION
     This module provides a parser which parses and interprets (though not
     fully) LaTeX documents and returns a tree-based representation of what
-    it finds. This tree is a `LaTeX::TOM::Tree'. The tree contains
-    `LaTeX::TOM::Node' nodes.
+    it finds. This tree is a "LaTeX::TOM::Tree". The tree contains
+    "LaTeX::TOM::Node" nodes.
 
     This module should be especially useful to anyone who wants to do
     processing of LaTeX documents that requires extraction of plain-text
@@ -44,56 +44,56 @@ DESCRIPTION
 
 COMPONENTS
   LaTeX::TOM::Parser
-    The parser recognizes 3 parameters upon creation. The parameters, in
-    order, are
+    The parser recognizes 3 parameters upon creation by "LaTeX::TOM->new".
+    The parameters, in order, are
 
     parse error handling (= 0 || 1 || 2)
-        Determines what happens when a parse error is encountered. `0'
-        results in a warning. `1' results in a die. `2' results in silence.
-        Note that particular groupings in LaTeX (i.e. newcommands and the
-        like) contain invalid TeX or LaTeX, so you nearly always need this
-        parameter to be `0' or `2' to completely parse the document.
+        Determines what happens when a parse error is encountered. 0 results
+        in a warning. 1 results in a die. 2 results in silence. Note that
+        particular groupings in LaTeX (i.e. newcommands and the like)
+        contain invalid TeX or LaTeX, so you nearly always need this
+        parameter to be 0 or 2 to completely parse the document.
 
     read inputs flag (= 0 || 1)
-        This flag determines whether a scan for `\input' and `\input-like'
+        This flag determines whether a scan for "\input" and "\input-like"
         commands is performed, and the resulting called files parsed and
-        added to the parent parse tree. `0' means no, `1' means do it. Note
-        that this will happen recursively if it is turned on. Also,
+        added to the parent parse tree. 0 means no, 1 means do it. Note that
+        this will happen recursively if it is turned on. Also,
         bibliographies (.bbl files) are detected and included.
 
     apply mappings flag (= 0 || 1)
         This flag determines whether (most) user-defined mappings are
-        applied. This means `\defs', `\newcommands', and `\newenvironments'.
+        applied. This means "\defs", "\newcommands", and "\newenvironments".
         This is critical for properly analyzing the content of the document,
         as this must be phrased in terms of the semantics of the original
         TeX and LaTeX commands, not ad hoc user macros. So, for instance, do
         not expect plain-text extraction to work properly with this option
         off.
 
-    The parser returns a `LaTeX::TOM::Tree' ($document in the SYNOPSIS).
+    The parser returns a "LaTeX::TOM::Tree" ($document in the SYNOPSIS).
 
   LaTeX::TOM::Node
     Nodes may be of the following types:
 
     TEXT
-        `TEXT' nodes can be thought of as representing the plain-text
+        "TEXT" nodes can be thought of as representing the plain-text
         portions of the LaTeX document. This includes math and anything else
         that is not a recognized TeX or LaTeX command, or user-defined
-        command. In reality, `TEXT' nodes contain commands that this parser
+        command. In reality, "TEXT" nodes contain commands that this parser
         does not yet recognize the semantics of.
 
     COMMAND
-        A `COMMAND' node represents a TeX command. It always has child nodes
+        A "COMMAND" node represents a TeX command. It always has child nodes
         in a tree, though the tree might be empty if the command operates on
         zero parameters. An example of a command is
 
          \textbf{blah}
 
-        This would parse into a `COMMAND' node for `textbf', which would
-        have a subtree containing the `TEXT' node with text ``blah.''
+        This would parse into a "COMMAND" node for "textbf", which would
+        have a subtree containing the "TEXT" node with text ``blah.''
 
     ENVIRONMENT
-        Similarly, TeX environments parse into `ENVIRONMENT' nodes, which
+        Similarly, TeX environments parse into "ENVIRONMENT" nodes, which
         have metadata about the environment, along with a subtree
         representing what is contained in the environment. For example,
 
@@ -101,35 +101,35 @@ COMPONENTS
            r = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
          \end{equation}
 
-        Would parse into an `ENVIRONMENT' node of the class ``equation''
-        with a child tree containing the result of parsing ```r = \frac{-b
-        \pm \sqrt{b^2 - 4ac}}{2a}.'''
+        Would parse into an "ENVIRONMENT" node of the class ``equation''
+        with a child tree containing the result of parsing ``r = \frac{-b
+        \pm \sqrt{b^2 - 4ac}}{2a}.''
 
     GROUP
-        A `GROUP' is like an anonymous `COMMAND'. Since you can put whatever
-        you want in curly-braces (`{}') in TeX in order to make semantically
+        A "GROUP" is like an anonymous "COMMAND". Since you can put whatever
+        you want in curly-braces ("{}") in TeX in order to make semantically
         isolated regions, this separation is preserved by the parser. A
-        `GROUP' is just the subtree of the parsed contents of plain
+        "GROUP" is just the subtree of the parsed contents of plain
         curly-braces.
 
-        It is important to note that currently only the first `GROUP' in a
-        series of `GROUP's following a LaTeX command will actually be parsed
-        into a `COMMAND' node. The reason is that, for the initial purposes
+        It is important to note that currently only the first "GROUP" in a
+        series of "GROUP"s following a LaTeX command will actually be parsed
+        into a "COMMAND" node. The reason is that, for the initial purposes
         of this module, it was not necessary to recognize additional
-        `GROUP's as additional parameters to the `COMMAND'. However, this is
+        "GROUP"s as additional parameters to the "COMMAND". However, this is
         something that this module really should do eventually. Currently if
         you want all the parameters to a multi-parametered command, you'll
-        need to pick out all the following `GROUP' nodes yourself.
+        need to pick out all the following "GROUP" nodes yourself.
 
         Eventually this will become something like a list which is stored in
-        the `COMMAND' node, much like XML::DOM's treatment of attributes.
+        the "COMMAND" node, much like XML::DOM's treatment of attributes.
         These are, in a sense, apart from the rest of the document tree.
-        Then `GROUP' nodes will become much more rare.
+        Then "GROUP" nodes will become much more rare.
 
     COMMENT
-        A `COMMENT' node is very similar to a `TEXT' node, except it is
-        specifically for lines beginning with ```%''' (the TeX comment
-        delimeter) or the right-hand portion of a line that has ```%''' at
+        A "COMMENT" node is very similar to a "TEXT" node, except it is
+        specifically for lines beginning with ``%'' (the TeX comment
+        delimiter) or the right-hand portion of a line that has ``%'' at
         some internal point.
 
   LaTeX::TOM::Trees
@@ -143,171 +143,170 @@ COMPONENTS
 
 METHODS
   LaTeX::TOM
-    new
-        Instantiate a new parser object.
+   new
+    ""  Instantiate a new parser object.
 
     In this section all of the methods for each of the components are listed
     and described.
 
   LaTeX::TOM::Parser
-    The methods for the parser (aside from the constructor, discussed above)
-    are :
+    The methods for the parser are:
 
-    parseFile (filename)
-        Read in the contents of *filename* and parse them, returning a
-        `LaTeX::TOM::Tree'.
+   parseFile (filename)
+    ""  Read in the contents of *filename* and parse them, returning a
+        "LaTeX::TOM::Tree".
 
-    parse (string)
-        Parse the string *string* and return a `LaTeX::TOM::Tree'.
+   parse (string)
+    ""  Parse the string *string* and return a "LaTeX::TOM::Tree".
 
   LaTeX::TOM::Tree
     This section contains methods for the Trees returned by the parser.
 
-    copy
-        Duplicate a tree into new memory.
+   copy
+    ""  Duplicate a tree into new memory.
 
-    print
-        A debug print of the structure of the tree.
+   print
+    ""  A debug print of the structure of the tree.
 
-    plainText
-        Returns an arrayref which is a list of strings representing the text
-        of all `getNodePlainTextFlag = 1' `TEXT' nodes, in an inorder
+   plainText
+    ""  Returns an arrayref which is a list of strings representing the text
+        of all "getNodePlainTextFlag = 1" "TEXT" nodes, in an inorder
         traversal.
 
-    indexableText
-        A method like the above but which goes one step further; it cleans
+   indexableText
+    ""  A method like the above but which goes one step further; it cleans
         all of the returned text and concatenates it into a single string
         which one could consider having all of the standard information
         retrieval value for the document, making it useful for indexing.
 
-    toLaTeX
-        Return a string representing the LaTeX encoded by the tree. This is
+   toLaTeX
+    ""  Return a string representing the LaTeX encoded by the tree. This is
         especially useful to get a normal document again, after modifying
         nodes of the tree.
 
-    getTopLevelNodes
-        Return a list of `LaTeX::TOM::Nodes' at the top level of the Tree.
+   getTopLevelNodes
+    ""  Return a list of "LaTeX::TOM::Nodes" at the top level of the Tree.
 
-    getAllNodes
-        Return an arrayref with all nodes of the tree. This "flattens" the
+   getAllNodes
+    ""  Return an arrayref with all nodes of the tree. This "flattens" the
         tree.
 
-    getCommandNodesByName (name)
-        Return an arrayref with all `COMMAND' nodes in the tree which have a
+   getCommandNodesByName (name)
+    ""  Return an arrayref with all "COMMAND" nodes in the tree which have a
         name matching *name*.
 
-    getEnvironmentsByName (name)
-        Return an arrayref with all `ENVIRONMENT' nodes in the tree which
+   getEnvironmentsByName (name)
+    ""  Return an arrayref with all "ENVIRONMENT" nodes in the tree which
         have a class matching *name*.
 
-    getNodesByCondition (code reference)
-        This is a catch-all search method which can be used to pull out
+   getNodesByCondition (code reference)
+    ""  This is a catch-all search method which can be used to pull out
         nodes that match pretty much any perl expression, without manually
         having to traverse the tree. *code reference* is a perl code
         reference which receives as its first argument the node of the tree
         that is currently scrutinized and is expected to return a boolean
         value. See the SYNOPSIS for examples.
 
-    getFirstNode
-        Returns the first node of the tree. This is useful if you want to
+   getFirstNode
+    ""  Returns the first node of the tree. This is useful if you want to
         walk the tree yourself, starting with the first node.
 
   LaTeX::TOM::Node
     This section contains the methods for nodes of the parsed Trees.
 
-    getNodeType
-        Returns the type, one of `TEXT', `COMMAND', `ENVIRONMENT', `GROUP',
-        or `COMMENT', as described above.
+   getNodeType
+    ""  Returns the type, one of "TEXT", "COMMAND", "ENVIRONMENT", "GROUP",
+        or "COMMENT", as described above.
 
-    getNodeText
-        Applicable for `TEXT' or `COMMENT' nodes; this returns the document
+   getNodeText
+    ""  Applicable for "TEXT" or "COMMENT" nodes; this returns the document
         text they contain. This is undef for other node types.
 
-    setNodeText
-        Set the node text, also for `TEXT' and `COMMENT' nodes.
+   setNodeText
+    ""  Set the node text, also for "TEXT" and "COMMENT" nodes.
 
-    getNodeStartingPosition
-        Get the starting character position in the document of this node.
-        For `TEXT' and `COMMENT' nodes, this will be where the text begins.
-        For `ENVIRONMENT', `COMMAND', or `GROUP' nodes, this will be the
+   getNodeStartingPosition
+    ""  Get the starting character position in the document of this node.
+        For "TEXT" and "COMMENT" nodes, this will be where the text begins.
+        For "ENVIRONMENT", "COMMAND", or "GROUP" nodes, this will be the
         position of the *last* character of the opening identifier.
 
-    getNodeEndingPosition
-        Same as above, but for last character. For `GROUP', `ENVIRONMENT',
-        or `COMMAND' nodes, this will be the *first* character of the
+   getNodeEndingPosition
+    ""  Same as above, but for last character. For "GROUP", "ENVIRONMENT",
+        or "COMMAND" nodes, this will be the *first* character of the
         closing identifier.
 
-    getNodeOuterStartingPosition
-        Same as getNodeStartingPosition, but for `GROUP', `ENVIRONMENT', or
-        `COMMAND' nodes, this returns the *first* character of the opening
+   getNodeOuterStartingPosition
+    ""  Same as getNodeStartingPosition, but for "GROUP", "ENVIRONMENT", or
+        "COMMAND" nodes, this returns the *first* character of the opening
         identifier.
 
-    getNodeOuterEndingPosition
-        Same as getNodeEndingPosition, but for `GROUP', `ENVIRONMENT', or
-        `COMMAND' nodes, this returns the *last* character of the closing
+   getNodeOuterEndingPosition
+    ""  Same as getNodeEndingPosition, but for "GROUP", "ENVIRONMENT", or
+        "COMMAND" nodes, this returns the *last* character of the closing
         identifier.
 
-    getNodeMathFlag
-        This applies to any node type. It is `1' if the node sets, or is
-        contained within, a math mode region. `0' otherwise. `TEXT' nodes
-        which have this flag as `1' can be assumed to be the actual
+   getNodeMathFlag
+    ""  This applies to any node type. It is 1 if the node sets, or is
+        contained within, a math mode region. 0 otherwise. "TEXT" nodes
+        which have this flag as 1 can be assumed to be the actual
         mathematics contained in the document.
 
-    getNodePlainTextFlag
-        This applies only to `TEXT' nodes. It is `1' if the node is non-math
+   getNodePlainTextFlag
+    ""  This applies only to "TEXT" nodes. It is 1 if the node is non-math
         and is visible (in other words, will end up being a part of the
-        output document). One would only want to index `TEXT' nodes with
+        output document). One would only want to index "TEXT" nodes with
         this property, for information retrieval purposes.
 
-    getEnvironmentClass
-        This applies only to `ENVIRONMENT' nodes. Returns what class of
-        environment the node represents (the `X' in `\begin{X}' and
-        `\end{X}').
+   getEnvironmentClass
+    ""  This applies only to "ENVIRONMENT" nodes. Returns what class of
+        environment the node represents (the "X" in "\begin{X}" and
+        "\end{X}").
 
-    getCommandName
-        This applies only to `COMMAND' nodes. Returns the name of the
-        command (the `X' in `\X{...}').
+   getCommandName
+    ""  This applies only to "COMMAND" nodes. Returns the name of the
+        command (the "X" in "\X{...}").
 
-    getChildTree
-        This applies only to `COMMAND', `ENVIRONMENT', and `GROUP' nodes: it
-        returns the `LaTeX::TOM::Tree' which is ``under'' the calling node.
+   getChildTree
+    ""  This applies only to "COMMAND", "ENVIRONMENT", and "GROUP" nodes: it
+        returns the "LaTeX::TOM::Tree" which is ``under'' the calling node.
 
-    getFirstChild
-        This applies only to `COMMAND', `ENVIRONMENT', and `GROUP' nodes: it
+   getFirstChild
+    ""  This applies only to "COMMAND", "ENVIRONMENT", and "GROUP" nodes: it
         returns the first node from the first level of the child subtree.
 
-    getLastChild
-        Same as above, but for the last node of the first level.
+   getLastChild
+    ""  Same as above, but for the last node of the first level.
 
-    getPreviousSibling
-        Return the prior node on the same level of the tree.
+   getPreviousSibling
+    ""  Return the prior node on the same level of the tree.
 
-    getNextSibling
-        Same as above, but for following node.
+   getNextSibling
+    ""  Same as above, but for following node.
 
-    getParent
-        Get the parent node of this node in the tree.
+   getParent
+    ""  Get the parent node of this node in the tree.
 
-    getNextGroupNode
-        This is an interesting function, and kind of a hack because of the
+   getNextGroupNode
+    ""  This is an interesting function, and kind of a hack because of the
         way the parser makes the current tree. Basically it will give you
-        the next sibling that is a `GROUP' node, until it either hits the
-        end of the tree level, a `TEXT' node which doesn't match `/^\s*$/',
-        or a `COMMAND' node.
+        the next sibling that is a "GROUP" node, until it either hits the
+        end of the tree level, a "TEXT" node which doesn't match "/^\s*$/",
+        or a "COMMAND" node.
 
-        This is useful for finding all `GROUP'ed parameters after a
-        `COMMAND' node (see comments for `GROUP' in the `COMPONENTS' /
-        `LaTeX::TOM::Node' section). You can just have a while loop that
-        calls this method until it gets `undef', and you'll know you've
+        This is useful for finding all "GROUP"ed parameters after a
+        "COMMAND" node (see comments for "GROUP" in the "COMPONENTS" /
+        "LaTeX::TOM::Node" section). You can just have a while loop that
+        calls this method until it gets "undef", and you'll know you've
         found all the parameters to a command.
 
-        Note: this may be bad, but `TEXT' Nodes matching `/^\s*\[[0-9]+\]$/'
+        Note: this may be bad, but "TEXT" Nodes matching "/^\s*\[[0-9]+\]$/"
         (optional parameter groups) are treated as if they were 'blank'.
 
 CAVEATS
     Due to the lack of tree-modification methods, currently this module is
     mostly useful for minor modifications to the parsed document, for
-    instance, altering the text of `TEXT' nodes but not deleting the nodes.
+    instance, altering the text of "TEXT" nodes but not deleting the nodes.
     Of course, the user can still do this by breaking abstraction and
     directly modifying the Tree.
 
@@ -335,6 +334,9 @@ CREDITS
      Moritz Lenz
      James Bowlin
      Jesse S. Bangs
+     Cord Merrell
+     Debian Perl Group
+     Eli Billauer
 
 AUTHORS
     Written by Aaron Krowne <akrowne@vt.edu>
@@ -345,5 +347,5 @@ LICENSE
     This program is free software; you may redistribute it and/or modify it
     under the same terms as Perl itself.
 
-    See http://dev.perl.org/licenses/
+    See <http://dev.perl.org/licenses/>
 

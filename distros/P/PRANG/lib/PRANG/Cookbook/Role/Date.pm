@@ -1,6 +1,6 @@
 
 package PRANG::Cookbook::Role::Date;
-$PRANG::Cookbook::Role::Date::VERSION = '0.20';
+$PRANG::Cookbook::Role::Date::VERSION = '0.21';
 use Moose::Role;
 use PRANG::Graph;
 use Moose::Util::TypeConstraints;

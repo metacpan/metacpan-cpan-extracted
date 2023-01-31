@@ -1,6 +1,6 @@
 
 package PRANG::Marshaller;
-$PRANG::Marshaller::VERSION = '0.20';
+$PRANG::Marshaller::VERSION = '0.21';
 use Moose;
 use MooseX::Params::Validate;
 use Moose::Util::TypeConstraints;

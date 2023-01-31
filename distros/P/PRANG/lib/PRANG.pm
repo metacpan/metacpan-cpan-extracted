@@ -1,6 +1,6 @@
 
 package PRANG;
-$PRANG::VERSION = '0.20';
+$PRANG::VERSION = '0.21';
 use strict;
 use warnings;
 

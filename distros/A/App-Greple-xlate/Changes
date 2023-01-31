@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-deepl
 
+0.02 2023-01-31T12:39:26Z
+
+    - convert all \s+ to single space for normalization
+
 0.01 2023-01-29T15:04:13Z
 
     - original version

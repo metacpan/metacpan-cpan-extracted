@@ -11,30 +11,30 @@ my $p
 
 $events = "";
 $p->eof;
-ok($events, "start_document\nend_document\n");
+is($events, "start_document\nend_document\n");
 
 $events = "";
 $p->parse_file(File::Spec->devnull);
-ok($events, "start_document\nend_document\n");
+is($events, "start_document\nend_document\n");
 
 $events = "";
 $p->parse("");
 $p->eof;
-ok($events, "start_document\nend_document\n");
+is($events, "start_document\nend_document\n");
 
 $events = "";
 $p->parse("");
 $p->parse("");
 $p->eof;
-ok($events, "start_document\nend_document\n");
+is($events, "start_document\nend_document\n");
 
 $events = "";
 $p->parse("");
 $p->parse("<a>");
 $p->eof;
-ok($events, "start_document\nstart\nend_document\n");
+is($events, "start_document\nstart\nend_document\n");
 
 $events = "";
 $p->parse("<a> ");
 $p->eof;
-ok($events, "start_document\nstart\ntext\nend_document\n");
+is($events, "start_document\nstart\ntext\nend_document\n");

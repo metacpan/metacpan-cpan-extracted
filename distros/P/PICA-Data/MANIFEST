@@ -9,6 +9,7 @@ cpanfile
 dist.ini
 lib/App/picadata.pm
 lib/PICA/Data.pm
+lib/PICA/Data/Field.pm
 lib/PICA/Error.pm
 lib/PICA/Parser/Base.pm
 lib/PICA/Parser/Binary.pm
@@ -39,6 +40,7 @@ t/10-data.t
 t/12-clean.t
 t/13-sort-subfields.t
 t/14-sort.t
+t/15-field.t
 t/15-path.t
 t/16-match.t
 t/16-path-examples.t

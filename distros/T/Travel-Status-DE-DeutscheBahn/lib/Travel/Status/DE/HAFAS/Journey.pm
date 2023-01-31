@@ -10,7 +10,7 @@ no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
 use parent 'Class::Accessor';
 
-our $VERSION = '4.03';
+our $VERSION = '4.04';
 
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime
@@ -185,9 +185,11 @@ sub new {
 	if ( $journey->{stbStop} ) {
 		if ( $hafas->{arrivals} ) {
 			$ref->{origin} = $ref->{route_end};
+			$ref->{is_cancelled} ||= $journey->{stbStop}{aCncl};
 		}
 		else {
 			$ref->{destination} = $ref->{route_end};
+			$ref->{is_cancelled} ||= $journey->{stbStop}{dCncl};
 		}
 	}
 	else {
@@ -412,7 +414,7 @@ journey received by Travel::Status::DE::HAFAS
 
 =head1 VERSION
 
-version 4.03
+version 4.04
 
 =head1 DESCRIPTION
 

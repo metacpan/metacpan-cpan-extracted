@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use ExtUtils::MakeMaker 6.30;
+use ExtUtils::MakeMaker 7.44; 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Have a Hash make some Mojo routes",
   "AUTHOR" => "John Scoles <byterock\@hotmail.com>",
@@ -13,7 +13,7 @@ my %WriteMakefileArgs = (
     "Lingua::EN::Inflect"=>1,
   },
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => "6.30",
+    "ExtUtils::MakeMaker" => "7.44",
     "Module::Build" => "0.38"
   },
   "DISTNAME" => "Mojolicious-Plugin-Routes-Restful",
@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Mojo::Base" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   },
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     },
   },
 );
-unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
+unless ( eval { ExtUtils::MakeMaker->VERSION(7.44) } ) {
   my $br = delete $WriteMakefileArgs{BUILD_REQUIRES};
   my $pp = $WriteMakefileArgs{PREREQ_PM};
   for my $mod ( keys %$br ) {
@@ -48,5 +48,5 @@ unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
   }
 }
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
-  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+  unless eval { ExtUtils::MakeMaker->VERSION(7.44) };
 WriteMakefile(%WriteMakefileArgs);

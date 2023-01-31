@@ -24,7 +24,7 @@ ok($valid_foo, "parse_fh(\*FOO)");
     eval {Octothorpe->parse_fh( 'blah' )};
     my $error = $@;
     ok( ($error =~ qr{Parameter #1 \("blah"\) to PRANG::Graph::parse_fh did not pass the 'checking type constraint for GlobRef' callback})
-    ||  ($error =~ qr{Parameter #1 does not pass the type constraint because: Validation failed for 'GlobRef' with value "blah"}) );
+    ||  ($error =~ qr{Parameter #1 does not pass the type constraint because: Validation failed for 'GlobRef' with value "?blah"?}) ) or diag "'$error'";
 }
 
 my $parser = XML::LibXML->new;

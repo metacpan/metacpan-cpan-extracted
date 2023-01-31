@@ -7,7 +7,7 @@ use File::Find;
 use FindBin qw($Bin);
 use strict;
 use YAML qw(Load Dump);
-
+$YAML::LoadBlessed = 1;
 our $grep;
 getopt_lenient( "test-grep|t=s" => \$grep );
 

@@ -16,6 +16,8 @@ class Cwd {
   static method realpath : string ($file : string) {
     if (Sys->defined("_WIN32")) {
       my $realpath = Sys::IO->_fullpath(undef, $file, 0);
+
+      Fn->replace_chars($realpath, '\\', '/');
       
       return $realpath;
     }
@@ -36,24 +38,25 @@ class Cwd {
     my $drive_id = 0;
     if ($drive) {
       unless (length $drive == 2) {
-        die "The length of the drive must be 2";
+        die "The length of the \$drive must be 2";
+      }
+      
+      my $drive_char = $drive->[0];
+      unless (($drive_char >= 'A' && $drive_char <= 'Z') || ($drive_char >= 'a' && $drive_char <= 'z')) {
+        die "The first character of the \$drive must be [a-zA-Z]";
+      }
+      unless ($drive->[1]) {
+        die "The second character of the \$drive must be \":\"";
       }
       
       my $drive_upper = Fn->ucfirst($drive);
-      my $drive_char = $drive_upper->[0];
-      
-      unless ($drive_char >= 'A' && $drive_char <= 'Z') {
-        die "The character that the first character of the drive is coverted to the upper case must be between 'A' and 'Z'";
-      }
-
-      unless ($drive_upper->[1]) {
-        die "The second character of the drive must be \":\"";
-      }
       
       $drive_id = $drive_char - 'A' + 1;
     }
     
-    my $cwd = Sys::IO->_getdcwd($drive_id, undef, 0);
+    my $cwd = Sys::IO->_getdcwd($drive_id, undef, 1);
+    
+    Fn->replace_chars($cwd, '\\', '/');
     
     return $cwd;
   }

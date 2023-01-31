@@ -7,3 +7,6 @@ static_install = "auto"
 
 [release]
 branch = "main"
+
+[FileGatherer]
+exclude_match = [ '^images/.*' ]

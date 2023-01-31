@@ -1,3 +1,8 @@
+0.21 - 2022-01-29
+
+- Fix tests for security change to YAML (rt#132030) [Thanks to YVES for patch]
+- Add missing test dependency (rt#122301)
+
 0.20 - 2017-05-21
 
 - Move Changes file to the correct directory
