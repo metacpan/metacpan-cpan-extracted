@@ -1,6 +1,14 @@
 Changelog for HealthCheck-Diagnostic-DBHCheck
 
-v0.500.3 2020-04-29T22:05:50
+v1.0.0 2023-01-31T18:03:48
+ - Update README and LICENSE (Andrew Hewus Fresh)
+ - Pull in Makefile updates from PluginBundle (Andrew Hewus Fresh)
+ - Fix POD syntax (Andrew Hewus Fresh)
+ - Pull request #6: SM-3868 (Mitch McCracken)
+ - Skip strict tests for t/author-pod-coverage.t (Mitch McCracken)
+ - Add timeout support (Mitch McCracken)
+
+v0.500.3 2020-04-29T21:56:46
  - No changes found
 
 v0.500.2 2020-04-29T21:56:46

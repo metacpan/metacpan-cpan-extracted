@@ -28,6 +28,7 @@ extends 'Business::GoCardless::Resource';
     reference
     scheme
     status
+    verified_at
     
 =cut
 
@@ -42,6 +43,7 @@ has [ qw/
     reference
     scheme
     status
+    verified_at
 / ] => (
     is => 'rw',
 );

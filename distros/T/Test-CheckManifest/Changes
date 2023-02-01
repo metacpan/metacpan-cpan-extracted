@@ -1,6 +1,15 @@
 Revision history for Perl extension Test::CheckManifest.
 ========================================================
 
+1.43    2023-02-01 08:32:00
+
+      * $home is usually given without trailing slash,
+        the $files_in_skip is taken from MANIFEST.SKIP which usually contain regexes
+        for files relative the $home. Therefore the remaining leading slashes in $localfile (thanks to bschmalhofer)
+      * Fix home removal on Win32 (thanks to E. Choroba)
+      * Replace string eval with block eval (thanks to Paul Cochrane)
+      * various "infrastructure" changes (thanks to Paul Cochrane)
+
 1.42    2019-02-22 17:41:00
 
       * add section in doc that explains how to replace test scripts using Test::CheckManifest
@@ -163,7 +172,7 @@ Revision history for Perl extension Test::CheckManifest.
 
 0.6   2006-11-21
         Test scripts improved
-      
+
 0.5   2006-11-18
       - bugfix: T::CM now works under taint mode (http://rt.cpan.org/Public/Bug/Display.html?id=22927)
       + added : ok_manifest accepts hashref where specific dirs can be excluded
@@ -175,7 +184,7 @@ Revision history for Perl extension Test::CheckManifest.
 0.3   2006-10-18
       - bugfix: CheckManifest works under Solaris now
 
-0.2   2006-10-03 
+0.2   2006-10-03
       - bugfix: some files excluded from test
 
 0.1   2006-09-29

@@ -130,6 +130,27 @@ checkCorsPolicy($res);
 
 $client->logout($id);
 
+subtest "Test cspGetHost function" => sub {
+    my @cases = (
+        [ undef                             => undef ],
+        [ ""                                => undef ],
+        [ "invalid"                         => undef ],
+        [ "/relative/url"                   => undef ],
+        [ "http://test.com/test"            => "http://test.com" ],
+        [ "http://test.com:80/test"         => "http://test.com" ],
+        [ "http://test.com:81/test"         => "http://test.com:81" ],
+        [ "https://test.com/test"           => "https://test.com" ],
+        [ "https://test.com:443/test"       => "https://test.com" ],
+        [ "custom.scheme://something?param" => "custom.scheme:" ],
+    );
+    while ( my $case = shift @cases ) {
+        my ( $input, $output ) = @$case;
+        is( $client->p->cspGetHost($input),
+            $output, "Correct CSP source for $input" );
+    }
+};
+count(1);
+
 clean_sessions();
 
 done_testing( count() );

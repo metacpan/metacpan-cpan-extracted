@@ -4,8 +4,11 @@ use strict;
 use Mouse;
 use URI::Escape;
 use Lemonldap::NG::Common::FormEncode;
-use Lemonldap::NG::Portal::Main::Constants
-  qw(PE_OK PE_BADURL PE_GET_SERVICE_NOT_ALLOWED URIRE);
+use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_OK
+  PE_UNAUTHORIZEDURL
+  PE_GET_SERVICE_NOT_ALLOWED URIRE
+);
 
 our $VERSION = '2.0.15';
 
@@ -65,7 +68,7 @@ sub run {
     }
     else {
         $self->logger->error("IssuerGet: bad url");
-        return PE_BADURL;
+        return PE_UNAUTHORIZEDURL;
     }
 }
 

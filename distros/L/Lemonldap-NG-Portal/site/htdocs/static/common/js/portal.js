@@ -60,6 +60,18 @@ LemonLDAP::NG Portal jQuery scripts
           return $(this).parent().hide();
         }
       });
+      $("[trattribute]").each(function() {
+        var attribute, l, len1, ref2, trattribute, trattributes, value;
+        trattributes = $(this).attr('trattribute').trim().split(/\s+/);
+        for (l = 0, len1 = trattributes.length; l < len1; l++) {
+          trattribute = trattributes[l];
+          ref2 = trattribute.split(':'), attribute = ref2[0], value = ref2[1];
+          if (attribute && value) {
+            $(this).attr(attribute, translate(value));
+          }
+        }
+        return true;
+      });
       $("[trplaceholder]").each(function() {
         var tmp;
         tmp = translate($(this).attr('trplaceholder'));
@@ -454,6 +466,7 @@ LemonLDAP::NG Portal jQuery scripts
       }
       if (window.datas.ppolicy.allowedspechar) {
         nonwhitespechar = window.datas.ppolicy.allowedspechar.replace(/\s/g, '');
+        nonwhitespechar = nonwhitespechar.replace(/<space>/g, ' ');
         hasforbidden = false;
         i = 0;
         len = password.length;
@@ -472,6 +485,7 @@ LemonLDAP::NG Portal jQuery scripts
       if (window.datas.ppolicy.minspechar > 0 && window.datas.ppolicy.allowedspechar) {
         numspechar = 0;
         nonwhitespechar = window.datas.ppolicy.allowedspechar.replace(/\s/g, '');
+        nonwhitespechar = nonwhitespechar.replace(/<space>/g, ' ');
         i = 0;
         while (i < password.length) {
           if (nonwhitespechar.indexOf(password.charAt(i)) >= 0) {
@@ -545,39 +559,6 @@ LemonLDAP::NG Portal jQuery scripts
     if ((window.datas.ppolicy != null) && $('#newpassword').length) {
       $('#reset').change(togglecheckpassword);
     }
-    if (datas['enablePasswordDisplay']) {
-      field = '';
-      if (datas['dontStorePassword']) {
-        $(".toggle-password").mousedown(function() {
-          field = $(this).attr('id');
-          field = field.replace(/^toggle_/, '');
-          console.log('Display', field);
-          $(this).toggleClass("fa-eye fa-eye-slash");
-          return $("input[name=" + field + "]").attr('class', 'form-control');
-        });
-        $(".toggle-password").mouseup(function() {
-          $(this).toggleClass("fa-eye fa-eye-slash");
-          if ($("input[name=" + field + "]").get(0).value) {
-            return $("input[name=" + field + "]").attr('class', 'form-control key');
-          }
-        });
-      } else {
-        $(".toggle-password").mousedown(function() {
-          field = $(this).attr('id');
-          field = field.replace(/^toggle_/, '');
-          console.log('Display', field);
-          $(this).toggleClass("fa-eye fa-eye-slash");
-          return $("input[name=" + field + "]").attr("type", "text");
-        });
-        $(".toggle-password").mouseup(function() {
-          $(this).toggleClass("fa-eye fa-eye-slash");
-          return $("input[name=" + field + "]").attr("type", "password");
-        });
-      }
-    }
-    if (datas['pingInterval'] && datas['pingInterval'] > 0) {
-      window.setTimeout(ping, datas['pingInterval']);
-    }
     $(".localeDate").each(function() {
       var s;
       s = new Date($(this).attr("val") * 1000);
@@ -585,6 +566,59 @@ LemonLDAP::NG Portal jQuery scripts
     });
     $('.oidcConsent').on('click', function() {
       return removeOidcConsent($(this).attr('partner'));
+    });
+    if (datas['pingInterval'] && datas['pingInterval'] > 0) {
+      window.setTimeout(ping, datas['pingInterval']);
+    }
+    if (datas['enablePasswordDisplay']) {
+      field = '';
+      if (datas['dontStorePassword']) {
+        $(".toggle-password").on('mousedown touchstart', function() {
+          field = $(this).attr('id');
+          field = field.replace(/^toggle_/, '');
+          console.log('Display', field);
+          $(this).toggleClass("fa-eye fa-eye-slash");
+          return $("input[name=" + field + "]").attr('class', 'form-control');
+        });
+        $(".toggle-password").on('mouseup touchend', function() {
+          $(this).toggleClass("fa-eye fa-eye-slash");
+          if ($("input[name=" + field + "]").get(0).value) {
+            return $("input[name=" + field + "]").attr('class', 'form-control key');
+          }
+        });
+      } else {
+        $(".toggle-password").on('mousedown touchstart', function() {
+          field = $(this).attr('id');
+          field = field.replace(/^toggle_/, '');
+          console.log('Display', field);
+          $(this).toggleClass("fa-eye fa-eye-slash");
+          return $("input[name=" + field + "]").attr("type", "text");
+        });
+        $(".toggle-password").on('mouseup touchend', function() {
+          $(this).toggleClass("fa-eye fa-eye-slash");
+          return $("input[name=" + field + "]").attr("type", "password");
+        });
+      }
+    }
+    $('#reset').change(function() {
+      var checked, ref3, ref4, ref5, ref6, ref7;
+      checked = $(this).prop('checked');
+      console.log('Reset is checked', checked);
+      if (checked === true) {
+        $('#newpasswords').hide();
+        $('#newpassword').removeAttr('required');
+        $('#confirmpassword').removeAttr('required');
+        return (ref3 = $('#confirmpassword').get(0)) != null ? ref3.setCustomValidity('') : void 0;
+      } else {
+        $('#newpasswords').show();
+        $('#newpassword').attr('required', true);
+        $('#confirmpassword').attr('required', true);
+        if (((ref4 = $('#confirmpassword').get(0)) != null ? ref4.value : void 0) === ((ref5 = $('#newpassword').get(0)) != null ? ref5.value : void 0)) {
+          return (ref6 = $('#confirmpassword').get(0)) != null ? ref6.setCustomValidity('') : void 0;
+        } else {
+          return (ref7 = $('#confirmpassword').get(0)) != null ? ref7.setCustomValidity(translate('PE34')) : void 0;
+        }
+      }
     });
     $('#passwordfield').on('input', function() {
       if ($('#passwordfield').get(0).value && datas['dontStorePassword']) {
@@ -671,13 +705,15 @@ LemonLDAP::NG Portal jQuery scripts
       document.body.scrollTop = 0;
       return document.documentElement.scrollTop = 0;
     });
-    return $(window).on('scroll', function() {
+    $(window).on('scroll', function() {
       if (datas['scrollTop'] && (document.body.scrollTop > Math.abs(datas['scrollTop']) || document.documentElement.scrollTop > Math.abs(datas['scrollTop']))) {
         return $('#btn-back-to-top').css("display", "block");
       } else {
         return $('#btn-back-to-top').css("display", "none");
       }
     });
+    $(document).trigger("portalLoaded");
+    return true;
   });
 
 }).call(this);

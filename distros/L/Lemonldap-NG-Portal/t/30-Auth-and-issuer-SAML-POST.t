@@ -11,8 +11,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 27;
-my $debug     = 'error';
+my $debug = 'error';
 my ( $issuer, $sp, $res );
 
 # Redefine LWP methods for tests
@@ -28,234 +27,397 @@ LWP::Protocol::PSGI->register(
 SKIP: {
     eval "use Lasso";
     if ($@) {
-        skip 'Lasso not found', $maintests;
+        skip 'Lasso not found';
     }
 
     # Initialization
     $issuer = register( 'issuer', \&issuer );
     $sp     = register( 'sp',     \&sp );
 
-    # Try to authenticate
-    # -------------------
-    switch ('issuer');
-    my $res;
-    ok(
-        $res = $issuer->_post(
-            '/', IO::String->new('user=french&password=french'),
-            length => 27
-        ),
-        'Auth query'
-    );
-    expectOK($res);
-    my $id = expectCookie($res);
+    subtest "SP-initiated flow, unauthorized user" => sub {
 
-    # Simple SP access
-    switch ('sp');
-    ok(
-        $res = $sp->_get(
-            '/', accept => 'text/html',
-        ),
-        'Unauth SP request'
-    );
-    expectOK($res);
-    my ( $host, $url, $s ) =
-      expectAutoPost( $res, 'auth.idp.com', '/saml/singleSignOn',
-        'SAMLRequest' );
-    my $pdata_hash = expectPdata($res);
-    is( $pdata_hash->{genRequestHookCalled},
-        1, 'samlGenerateRequestHook called' );
+        # SP-initiated flow
+        my $res;
+        switch ('sp');
+        ok(
+            $res = $sp->_get(
+                '/', accept => 'text/html',
+            ),
+            'Unauth SP request'
+        );
+        expectOK($res);
+        my ( $host, $url, $s ) =
+          expectAutoPost( $res, 'auth.idp.com', '/saml/singleSignOn',
+            'SAMLRequest' );
+        my $pdata_hash = expectPdata($res);
+        is( $pdata_hash->{genRequestHookCalled},
+            1, 'samlGenerateRequestHook called' );
 
-    # Push SAML request to IdP
-    switch ('issuer');
-    ok(
-        $res = $issuer->_post(
-            $url,
-            IO::String->new($s),
-            accept => 'text/html',
-            length => length($s)
-        ),
-        'Post SAML request to IdP'
-    );
-    expectOK($res);
-    my $pdata     = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
-    my $rawCookie = getHeader( $res, 'Set-Cookie' );
-    ok( $rawCookie =~ /;\s*SameSite=None/, 'Found SameSite=None' );
+        # Push SAML request to IdP
+        switch ('issuer');
+        ok(
+            $res = $issuer->_post(
+                $url,
+                IO::String->new($s),
+                accept => 'text/html',
+                length => length($s)
+            ),
+            'Post SAML request to IdP'
+        );
+        expectOK($res);
+        my $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
+        my $rawCookie = getHeader( $res, 'Set-Cookie' );
+        ok( $rawCookie =~ /;\s*SameSite=None/, 'Found SameSite=None' );
 
-    # Try to authenticate with an unauthorized user to IdP
-    $s = "user=dwho&password=dwho&$s";
-    ok(
-        $res = $issuer->_post(
-            $url,
-            IO::String->new($s),
-            accept => 'text/html',
-            cookie => $pdata,
-            length => length($s),
-        ),
-        'Post authentication'
-    );
-    ok( $res->[2]->[0] =~ /trmsg="89"/, 'Reject reason is 89' )
-      or print STDERR Dumper( $res->[2]->[0] );
+        # Try to authenticate with an unauthorized user to IdP
+        $s = "user=dwho&password=dwho&$s";
+        ok(
+            $res = $issuer->_post(
+                $url,
+                IO::String->new($s),
+                accept => 'text/html',
+                cookie => $pdata,
+                length => length($s),
+            ),
+            'Post authentication'
+        );
+        ok( $res->[2]->[0] =~ /trmsg="89"/, 'Reject reason is 89' )
+          or print STDERR Dumper( $res->[2]->[0] );
+    };
 
-    # Simple SP access
-    ok(
-        $res = $sp->_get(
-            '/', accept => 'text/html',
-        ),
-        'Unauth SP request'
-    );
-    expectOK($res);
-    ( $host, $url, $s ) =
-      expectAutoPost( $res, 'auth.idp.com', '/saml/singleSignOn',
-        'SAMLRequest' );
+    subtest "SP-initiated flow, authorized user" => sub {
 
-    # Push SAML request to IdP
-    ok(
-        $res = $issuer->_post(
-            $url,
-            IO::String->new($s),
-            accept => 'text/html',
-            length => length($s)
-        ),
-        'Post SAML request to IdP'
-    );
-    expectOK($res);
-    $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
+        my $res;
 
-    # Try to authenticate with an authorized user to IdP
-    $s = "user=french&password=french&$s";
-    ok(
-        $res = $issuer->_post(
-            $url,
-            IO::String->new($s),
-            accept => 'text/html',
-            cookie => $pdata,
-            length => length($s),
-        ),
-        'Post authentication'
-    );
-    my $idpId = expectCookie($res);
+        # Simple SP access
+        ok(
+            $res = $sp->_get(
+                '/', accept => 'text/html',
+            ),
+            'Unauth SP request'
+        );
+        expectOK($res);
+        my ( $host, $url, $s ) =
+          expectAutoPost( $res, 'auth.idp.com', '/saml/singleSignOn',
+            'SAMLRequest' );
 
-    # Expect pdata to be cleared
-    $pdata = expectCookie( $res, 'lemonldappdata' );
-    ok( $pdata !~ 'issuerRequestsaml', 'SAML request cleared from pdata' )
-      or explain( $pdata, 'not issuerRequestsaml' );
+        # Push SAML request to IdP
+        ok(
+            $res = $issuer->_post(
+                $url,
+                IO::String->new($s),
+                accept => 'text/html',
+                length => length($s)
+            ),
+            'Post SAML request to IdP'
+        );
+        expectOK($res);
+        my $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
 
-    ( $host, $url, $s ) =
-      expectAutoPost( $res, 'auth.sp.com', '/saml/proxySingleSignOnPost',
-        'SAMLResponse' );
+        # Try to authenticate with an authorized user to IdP
+        $s = "user=french&password=french&$s";
+        ok(
+            $res = $issuer->_post(
+                $url,
+                IO::String->new($s),
+                accept => 'text/html',
+                cookie => $pdata,
+                length => length($s),
+            ),
+            'Post authentication'
+        );
+        my $idpId = expectCookie($res);
 
-    my $resp = expectSamlResponse($s);
-    like(
-        $resp,
-        qr/AuthnInstant="2000-01-01T00:00:01Z"/,
-        "Found AuthnInstant modified by hook"
-    );
+        # Expect pdata to be cleared
+        $pdata = expectCookie( $res, 'lemonldappdata' );
+        ok( $pdata !~ 'issuerRequestsaml', 'SAML request cleared from pdata' )
+          or explain( $pdata, 'not issuerRequestsaml' );
 
-    $pdata_hash = expectPdata($res);
-    is( $pdata_hash->{gotRequestHookCalled},
-        1, 'samlGotRequestHookCalled called' );
+        ( $host, $url, $s ) =
+          expectAutoPost( $res, 'auth.sp.com', '/saml/proxySingleSignOnPost',
+            'SAMLResponse' );
 
-    # Post SAML response to SP
-    switch ('sp');
-    ok(
-        $res = $sp->_post(
-            $url, IO::String->new($s),
-            accept => 'text/html',
-            length => length($s),
-        ),
-        'Post SAML response to SP'
-    );
+        my $resp = expectSamlResponse($s);
+        like(
+            $resp,
+            qr/AuthnInstant="2000-01-01T00:00:01Z"/,
+            "Found AuthnInstant modified by hook"
+        );
 
-    # Verify authentication on SP
-    expectRedirection( $res, 'http://auth.sp.com' );
-    my $spId = expectCookie($res);
-    $rawCookie = getHeader( $res, 'Set-Cookie' );
-    ok( $rawCookie =~ /;\s*SameSite=None/, 'Found SameSite=None' );
+        my $pdata_hash = expectPdata($res);
+        is( $pdata_hash->{gotRequestHookCalled},
+            1, 'samlGotRequestHookCalled called' );
 
-    ok( $res = $sp->_get( '/', cookie => "lemonldap=$spId" ), 'Get / on SP' );
-    expectOK($res);
-    expectAuthenticatedAs( $res, 'fa@badwolf.org@idp' );
+        # Post SAML response to SP
+        switch ('sp');
+        ok(
+            $res = $sp->_post(
+                $url, IO::String->new($s),
+                accept => 'text/html',
+                length => length($s),
+            ),
+            'Post SAML response to SP'
+        );
 
-    # Verify UTF-8
-    ok( $res = $sp->_get("/sessions/global/$spId"), 'Get UTF-8' );
-    expectOK($res);
-    ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
-      or print STDERR $@;
-    is( $res->{gotResponseHookCalled}, 1, 'samlGotResponseHook called' );
-    ok( $res->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
-      or explain( $res, 'cn => Frédéric Accents' );
+        # Verify authentication on SP
+        expectRedirection( $res, 'http://auth.sp.com' );
+        my $spId      = expectCookie($res);
+        my $rawCookie = getHeader( $res, 'Set-Cookie' );
+        ok( $rawCookie =~ /;\s*SameSite=None/, 'Found SameSite=None' );
 
-    # Logout initiated by SP
-    ok(
-        $res = $sp->_get(
-            '/',
-            query  => 'logout',
-            cookie => "lemonldap=$spId",
-            accept => 'text/html'
-        ),
-        'Query SP for logout'
-    );
-    ( $host, $url, $s ) =
-      expectAutoPost( $res, 'auth.idp.com', '/saml/singleLogout',
-        'SAMLRequest' );
+        ok( $res = $sp->_get( '/', cookie => "lemonldap=$spId" ),
+            'Get / on SP' );
+        expectOK($res);
+        expectAuthenticatedAs( $res, 'fa@badwolf.org@idp' );
 
-    # Push SAML logout request to IdP
-    switch ('issuer');
-    ok(
-        $res = $issuer->_post(
-            $url,
-            IO::String->new($s),
-            accept => 'text/html',
-            cookie => "lemonldap=$idpId",
-            length => length($s)
-        ),
-        'Post SAML logout request to IdP'
-    );
-    ( $host, $url, $s ) =
-      expectAutoPost( $res, 'auth.sp.com', '/saml/proxySingleLogoutReturn',
-        'SAMLResponse' );
+        # Verify UTF-8
+        ok( $res = $sp->_get("/sessions/global/$spId"), 'Get UTF-8' );
+        expectOK($res);
+        ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
+          or print STDERR $@;
+        is( $res->{gotResponseHookCalled}, 1, 'samlGotResponseHook called' );
+        ok( $res->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
+          or explain( $res, 'cn => Frédéric Accents' );
 
-    my $removedCookie = expectCookie($res);
-    is( $removedCookie, 0, "IDP Cookie removed" );
+        # Logout initiated by SP
+        ok(
+            $res = $sp->_get(
+                '/',
+                query  => 'logout',
+                cookie => "lemonldap=$spId",
+                accept => 'text/html'
+            ),
+            'Query SP for logout'
+        );
+        ( $host, $url, $s ) =
+          expectAutoPost( $res, 'auth.idp.com', '/saml/singleLogout',
+            'SAMLRequest' );
 
-    # Post SAML response to SP
-    switch ('sp');
-    ok(
-        $res = $sp->_post(
-            $url, IO::String->new($s),
-            accept => 'text/html',
-            length => length($s),
-        ),
-        'Post SAML response to SP'
-    );
-    expectRedirection( $res, 'http://auth.sp.com' );
+        # Push SAML logout request to IdP
+        switch ('issuer');
+        ok(
+            $res = $issuer->_post(
+                $url,
+                IO::String->new($s),
+                accept => 'text/html',
+                cookie => "lemonldap=$idpId",
+                length => length($s)
+            ),
+            'Post SAML logout request to IdP'
+        );
+        ( $host, $url, $s ) =
+          expectAutoPost( $res, 'auth.sp.com', '/saml/proxySingleLogoutReturn',
+            'SAMLResponse' );
 
-    # Test if logout is done
-    switch ('issuer');
-    ok(
-        $res = $issuer->_get(
-            '/', cookie => "lemonldap=$idpId",
-        ),
-        'Test if user is reject on IdP'
-    );
-    expectReject($res);
+        my $removedCookie = expectCookie($res);
+        is( $removedCookie, 0, "IDP Cookie removed" );
 
-    switch ('sp');
-    ok(
-        $res = $sp->_get(
-            '/',
-            accept => 'text/html',
-            cookie => "lemonldap=$spId"
-        ),
-        'Test if user is reject on SP'
-    );
-    expectOK($res);
-    expectAutoPost( $res, 'auth.idp.com', '/saml/singleSignOn', 'SAMLRequest' );
+        # Post SAML response to SP
+        switch ('sp');
+        ok(
+            $res = $sp->_post(
+                $url, IO::String->new($s),
+                accept => 'text/html',
+                length => length($s),
+            ),
+            'Post SAML response to SP'
+        );
+        expectRedirection( $res, 'http://auth.sp.com' );
+
+        # Test if logout is done
+        switch ('issuer');
+        ok(
+            $res = $issuer->_get(
+                '/', cookie => "lemonldap=$idpId",
+            ),
+            'Test if user is reject on IdP'
+        );
+        expectReject($res);
+
+        switch ('sp');
+        ok(
+            $res = $sp->_get(
+                '/',
+                accept => 'text/html',
+                cookie => "lemonldap=$spId"
+            ),
+            'Test if user is reject on SP'
+        );
+        expectOK($res);
+        expectAutoPost( $res, 'auth.idp.com', '/saml/singleSignOn',
+            'SAMLRequest' );
+    };
+
+    subtest "SP-initiated flow, authorized user" => sub {
+
+        my $res;
+
+        # Simple SP access
+        ok(
+            $res = $sp->_get(
+                '/', accept => 'text/html',
+            ),
+            'Unauth SP request'
+        );
+        expectOK($res);
+        my ( $host, $url, $s ) =
+          expectAutoPost( $res, 'auth.idp.com', '/saml/singleSignOn',
+            'SAMLRequest' );
+
+        # Push SAML request to IdP
+        ok(
+            $res = $issuer->_post(
+                $url,
+                IO::String->new($s),
+                accept => 'text/html',
+                length => length($s)
+            ),
+            'Post SAML request to IdP'
+        );
+        expectOK($res);
+        my $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
+
+        # Try to authenticate with an authorized user to IdP
+        $s = "user=french&password=french&$s";
+        ok(
+            $res = $issuer->_post(
+                $url,
+                IO::String->new($s),
+                accept => 'text/html',
+                cookie => $pdata,
+                length => length($s),
+            ),
+            'Post authentication'
+        );
+        my $idpId = expectCookie($res);
+
+        # Expect pdata to be cleared
+        $pdata = expectCookie( $res, 'lemonldappdata' );
+        ok( $pdata !~ 'issuerRequestsaml', 'SAML request cleared from pdata' )
+          or explain( $pdata, 'not issuerRequestsaml' );
+
+        ( $host, $url, $s ) =
+          expectAutoPost( $res, 'auth.sp.com', '/saml/proxySingleSignOnPost',
+            'SAMLResponse' );
+
+        my $resp = expectSamlResponse($s);
+        like(
+            $resp,
+            qr/AuthnInstant="2000-01-01T00:00:01Z"/,
+            "Found AuthnInstant modified by hook"
+        );
+
+        my $pdata_hash = expectPdata($res);
+        is( $pdata_hash->{gotRequestHookCalled},
+            1, 'samlGotRequestHookCalled called' );
+
+        # Post SAML response to SP
+        switch ('sp');
+        ok(
+            $res = $sp->_post(
+                $url, IO::String->new($s),
+                accept => 'text/html',
+                length => length($s),
+            ),
+            'Post SAML response to SP'
+        );
+
+        # Verify authentication on SP
+        expectRedirection( $res, 'http://auth.sp.com' );
+        my $spId      = expectCookie($res);
+        my $rawCookie = getHeader( $res, 'Set-Cookie' );
+        ok( $rawCookie =~ /;\s*SameSite=None/, 'Found SameSite=None' );
+
+        ok( $res = $sp->_get( '/', cookie => "lemonldap=$spId" ),
+            'Get / on SP' );
+        expectOK($res);
+        expectAuthenticatedAs( $res, 'fa@badwolf.org@idp' );
+
+        # Verify UTF-8
+        ok( $res = $sp->_get("/sessions/global/$spId"), 'Get UTF-8' );
+        expectOK($res);
+        ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
+          or print STDERR $@;
+        is( $res->{gotResponseHookCalled}, 1, 'samlGotResponseHook called' );
+        ok( $res->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
+          or explain( $res, 'cn => Frédéric Accents' );
+
+        # Logout initiated by SP
+        ok(
+            $res = $sp->_get(
+                '/',
+                query => buildForm( {
+                        logout => 1,
+                        url    => encodeUrl("http://test1.example.com")
+                    }
+                ),
+                cookie => "lemonldap=$spId",
+                accept => 'text/html'
+            ),
+            'Query SP for logout'
+        );
+        ( $host, $url, $s ) =
+          expectAutoPost( $res, 'auth.idp.com', '/saml/singleLogout',
+            'SAMLRequest' );
+
+        # Push SAML logout request to IdP
+        switch ('issuer');
+        ok(
+            $res = $issuer->_post(
+                $url,
+                IO::String->new($s),
+                accept => 'text/html',
+                cookie => "lemonldap=$idpId",
+                length => length($s)
+            ),
+            'Post SAML logout request to IdP'
+        );
+        ( $host, $url, $s ) =
+          expectAutoPost( $res, 'auth.sp.com', '/saml/proxySingleLogoutReturn',
+            'SAMLResponse' );
+
+        my $removedCookie = expectCookie($res);
+        is( $removedCookie, 0, "IDP Cookie removed" );
+
+        # Post SAML response to SP
+        switch ('sp');
+        ok(
+            $res = $sp->_post(
+                $url, IO::String->new($s),
+                accept => 'text/html',
+                length => length($s),
+            ),
+            'Post SAML response to SP'
+        );
+        expectRedirection( $res, 'http://test1.example.com' );
+
+        # Test if logout is done
+        switch ('issuer');
+        ok(
+            $res = $issuer->_get(
+                '/', cookie => "lemonldap=$idpId",
+            ),
+            'Test if user is reject on IdP'
+        );
+        expectReject($res);
+
+        switch ('sp');
+        ok(
+            $res = $sp->_get(
+                '/',
+                accept => 'text/html',
+                cookie => "lemonldap=$spId"
+            ),
+            'Test if user is reject on SP'
+        );
+        expectOK($res);
+        expectAutoPost( $res, 'auth.idp.com', '/saml/singleSignOn',
+            'SAMLRequest' );
+    };
 }
 
-count($maintests);
 clean_sessions();
-done_testing( count() );
+done_testing();
 
 sub issuer {
     return LLNG::Manager::Test->new( {

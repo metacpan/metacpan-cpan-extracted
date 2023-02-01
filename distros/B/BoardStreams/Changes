@@ -1,5 +1,9 @@
 Revision history for Perl extension BoardStreams
 
+v0.0.32 2023-02-01T13:13:48Z
+
+    - updated to allow running with RxPerl v6.18.0
+
 v0.0.31 2023-01-22T22:04:48Z
 
     - allow { limit => 'all' } in join handler return value

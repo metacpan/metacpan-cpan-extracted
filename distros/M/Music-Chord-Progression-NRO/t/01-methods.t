@@ -5,33 +5,35 @@ use warnings;
 use Test::More;
 use Test::Exception;
 
-use_ok 'Music::Chord::Progression::NRO';
+my $module = 'Music::Chord::Progression::NRO';
+
+use_ok $module;
 
 subtest throws => sub {
-    throws_ok { Music::Chord::Progression::NRO->new(base_note => 'X') }
+    throws_ok { $module->new(base_note => 'X') }
         qr/not a valid note/, 'bogus base_note';
 
-    throws_ok { Music::Chord::Progression::NRO->new(base_octave => -1) }
+    throws_ok { $module->new(base_octave => -1) }
         qr/not a valid octave/, 'bogus base_octave';
 
-    throws_ok { Music::Chord::Progression::NRO->new(base_scale => 'foo') }
+    throws_ok { $module->new(base_scale => 'foo') }
         qr/not a valid scale/, 'bogus base_scale';
 
-    throws_ok { Music::Chord::Progression::NRO->new(format => 'foo') }
+    throws_ok { $module->new(format => 'foo') }
         qr/not a valid format/, 'bogus format';
 
-    throws_ok { Music::Chord::Progression::NRO->new(max => -1) }
+    throws_ok { $module->new(max => -1) }
         qr/not a valid maximum/, 'bogus max';
 
-    throws_ok { Music::Chord::Progression::NRO->new(transform => 'foo') }
+    throws_ok { $module->new(transform => 'foo') }
         qr/not a valid transform/, 'bogus transform';
 
-    throws_ok { Music::Chord::Progression::NRO->new(transform => {}) }
+    throws_ok { $module->new(transform => {}) }
         qr/not a valid transform/, 'bogus transform';
 };
 
 subtest default => sub {
-    my $obj = new_ok 'Music::Chord::Progression::NRO';
+    my $obj = new_ok $module;
     my $got = $obj->generate;
     my $expect = 4;
     is @$got, $expect, "generated $expect chords";
@@ -40,8 +42,8 @@ subtest default => sub {
 };
 
 subtest transform_array => sub {
-    my $obj = new_ok 'Music::Chord::Progression::NRO' => [
-        transform => [qw(P P)],
+    my $obj = new_ok $module => [
+        transform => [qw(X P P)],
     ];
     my $got = $obj->generate;
     no warnings qw(qw);
@@ -51,7 +53,7 @@ subtest transform_array => sub {
 
 subtest transform_integer => sub {
     my $expect = 3;
-    my $obj = new_ok 'Music::Chord::Progression::NRO' => [
+    my $obj = new_ok $module => [
         transform => $expect,
     ];
     my $got = $obj->generate;
@@ -61,7 +63,7 @@ subtest transform_integer => sub {
 };
 
 subtest transform_base => sub {
-    my $obj = new_ok 'Music::Chord::Progression::NRO' => [
+    my $obj = new_ok $module => [
         base_note   => 'G',
         base_octave => 5,
     ];
@@ -73,7 +75,7 @@ subtest transform_base => sub {
 };
 
 subtest midinum_format => sub {
-    my $obj = new_ok 'Music::Chord::Progression::NRO' => [
+    my $obj = new_ok $module => [
         format => 'midinum',
     ];
     my $got = $obj->generate;
@@ -83,14 +85,14 @@ subtest midinum_format => sub {
 
 subtest circular => sub {
     my $expect = 4;
-    my $obj = new_ok 'Music::Chord::Progression::NRO' => [
+    my $obj = new_ok $module => [
         transform => [qw(X P P)],
         max       => $expect,
     ];
     my $got = $obj->circular;
     is @$got, $expect, "generated $expect chords";
     $expect = [qw(C4 E4 G4)];
-    is_deeply $got->[0], $expect, 'circular';
+    is_deeply $got->[0], $expect, 'generated 0th chord';
 };
 
 done_testing();

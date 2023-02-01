@@ -36,6 +36,7 @@ can_ok(
 		reference
 		scheme
 		status
+        verified_at
     /,
 );
 
@@ -50,6 +51,7 @@ ok( ! $Mandate->failed,'failed' );
 ok( ! $Mandate->cancelled,'cancelled' );
 ok( ! $Mandate->expired,'expired' );
 ok( ! $Mandate->consent_parameters,'consent_parameters' );
+ok( ! $Mandate->verified_at,'verified_at' );
 
 $Mandate->id( 123 );
 is( $Mandate->uri,'https://api.gocardless.com/mandates/123','->uri' );

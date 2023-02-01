@@ -4,7 +4,8 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   ExtUtils::CBuilder: '0'
-  Test::More: '0.88'
+  Test2::V0: '0'
+  Test::Refcount: '0'
 configure_requires:
   Module::Build: '0.4004'
   XS::Parse::Keyword::Builder: '0.05'
@@ -18,12 +19,12 @@ name: List-Keywords
 provides:
   List::Keywords:
     file: lib/List/Keywords.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   XS::Parse::Keyword: '0.05'
   perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

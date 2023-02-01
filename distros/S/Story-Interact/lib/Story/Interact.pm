@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001006';
+our $VERSION   = '0.001007';
 
 use Story::Interact::Analyze ();
 use Story::Interact::Character ();

@@ -3,14 +3,14 @@ package Lemonldap::NG::Portal::2F::Radius;
 use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_BADOTP
-  PE_ERROR
-  PE_MALFORMEDUSER
   PE_OK
+  PE_ERROR
+  PE_BADOTP
   PE_SENDRESPONSE
+  PE_MALFORMEDUSER
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.16';
 
 extends 'Lemonldap::NG::Portal::Main::SecondFactor';
 
@@ -22,63 +22,57 @@ has radius => ( is => 'rw' );
 sub init {
     my ($self) = @_;
 
+    eval { require Authen::Radius };
+    if ($@) {
+        $self->logger->error("Can't load Radius library: $@");
+        $self->error("Can't load Radius library: $@");
+        return 0;
+    }
+
     foreach (qw(radius2fSecret radius2fServer)) {
         unless ( $self->conf->{$_} ) {
-            $self->error("Missing $_ parameter, aborting");
+            $self->error(
+                $self->prefix . "2f: missing \"$_\" parameter, aborting" );
             return 0;
         }
     }
 
-    eval { require Authen::Radius };
-    if ($@) {
-        $self->error("Unable to load Authen::Radius: $@");
-        return 0;
-    }
-
-    $self->error('Radius connect failed')
+    $self->error( $self->prefix . '2f: connection to server failed' )
       unless (
         $self->radius(
             Authen::Radius->new(
                 Host    => $self->conf->{radius2fServer},
                 Secret  => $self->conf->{radius2fSecret},
-                TimeOut => $self->conf->{radius2fTimeout},
+                TimeOut => $self->conf->{radius2fTimeout}
             )
         )
       );
 
-    $self->prefix( $self->conf->{sfPrefix} )
-      if ( $self->conf->{sfPrefix} );
     return $self->SUPER::init();
 }
 
 sub run {
     my ( $self, $req, $token ) = @_;
-
-    my $checkLogins = $req->param('checkLogins');
-    $self->logger->debug("Radius2F: checkLogins set") if $checkLogins;
-
-    my $stayconnected = $req->param('stayconnected');
-    $self->logger->debug("Radius2F: stayconnected set") if $stayconnected;
+    $self->logger->debug( $self->prefix . '2f: generate form' );
 
     # Prepare form
+    my ( $checkLogins, $stayConnected ) = $self->getFormParams($req);
     my $tmp = $self->p->sendHtml(
         $req,
         'ext2fcheck',
         params => {
-            MAIN_LOGO => $self->conf->{portalMainLogo},
-            SKIN      => $self->p->getSkin($req),
-            TOKEN     => $token,
-            PREFIX    => $self->prefix,
-            TARGET    => '/'
+            TOKEN  => $token,
+            PREFIX => $self->prefix,
+            TARGET => '/'
               . $self->prefix
               . '2fcheck?skin='
               . $self->p->getSkin($req),
             LEGEND        => 'enterRadius2fCode',
             CHECKLOGINS   => $checkLogins,
-            STAYCONNECTED => $stayconnected
+            STAYCONNECTED => $stayConnected
         }
     );
-    $self->logger->debug("Prepare Radius 2F verification");
+    $self->logger->debug( $self->prefix . '2f: prepare verification' );
 
     $req->response($tmp);
     return PE_SENDRESPONSE;
@@ -96,23 +90,27 @@ sub verify {
       $self->conf->{radius2fUsernameSessionKey} || $self->conf->{whatToTrace};
     my $username = $session->{$userAttr};
     unless ($username) {
-        $self->logger->error(
-            "Could not find Radius username from session attribute $userAttr");
+        $self->logger->error( $self->prefix
+              . "2f: unable to find username from session attribute $userAttr"
+        );
         return PE_MALFORMEDUSER;
     }
 
-    $self->logger->debug("Checking Radius credentials $username:$code");
-
+    $self->logger->debug(
+        $self->prefix . "2f: checking credentials $username:$code" );
     my $res = $self->radius->check_pwd( $username, $code );
     unless ( $res == 1 ) {
-        $self->userLogger->warn( "Radius second factor failed for "
+        $self->userLogger->warn( $self->prefix
+              . '2f: failed for '
               . $session->{ $self->conf->{whatToTrace} } );
-        $self->logger->warn(
-            "Radius server replied: " . $self->radius->get_error );
+        $self->logger->warn( $self->prefix
+              . '2f: server replied -> '
+              . $self->radius->get_error );
         return PE_BADOTP;
     }
 
-    $self->logger->debug("Radius server accepted 2F credentials");
+    $self->logger->debug(
+        $self->prefix . '2f: credentials accepted by server' );
     return PE_OK;
 }
 

@@ -4,7 +4,9 @@ author:
   - 'Xavier Guimard <x.guimard@free.fr>, Clement Oudot <clement@oodo.net>, Christophe Maudoux <chrmdx@gmail.com>, Maxime Besson <maxime.besson@worteks.com>'
 build_requires:
   Email::Sender: '0'
+  Hash::Merge::Simple: '0'
   IO::String: '0'
+  Net::SSLeay: '0'
   Regexp::Common: '0'
   Test::Output: '0'
   Test::Pod: '1'
@@ -27,13 +29,13 @@ requires:
   Convert::PEM: '0'
   Crypt::OpenSSL::RSA: '0'
   LWP::UserAgent: '0'
-  Lemonldap::NG::Common: v2.0.15.1
-  Lemonldap::NG::Handler: v2.0.15.1
+  Lemonldap::NG::Common: v2.0.16
+  Lemonldap::NG::Handler: v2.0.16
 resources:
   MailingList: mailto:lemonldap-ng-dev@ow2.org
   X_twitter: https://twitter.com/lemonldapng
   bugtracker: https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues
   homepage: https://lemonldap-ng.org/
   license: http://opensource.org/licenses/GPL-2.0
-version: v2.0.15.1
+version: v2.0.16
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

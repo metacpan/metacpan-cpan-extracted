@@ -9,7 +9,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 extends 'Lemonldap::NG::Portal::Password::Base';
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.16';
 
 sub init {
     my ($self) = @_;
@@ -22,7 +22,6 @@ sub confirm {
 }
 
 sub modifyPassword {
-    my ( $self, $req, $pwd ) = @_;
 
     # Nothing to do here, all new passwords are accepted
     return PE_PASSWORD_OK;

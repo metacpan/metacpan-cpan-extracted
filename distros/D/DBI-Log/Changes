@@ -1,5 +1,8 @@
 Revision history for DBI::Log
 
+0.11 Tue Jan 31 10:20:54 CST 2023
+    - Add JSON output format
+
 0.10 Sat Jan 14 20:32:41 CST 2023
     - Replace params in statements when given with $sth->bind_param()
 

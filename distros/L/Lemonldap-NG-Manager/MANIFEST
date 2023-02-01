@@ -139,7 +139,7 @@ site/htdocs/static/forms/postContainer.html
 site/htdocs/static/forms/README.md
 site/htdocs/static/forms/restore.html
 site/htdocs/static/forms/RSACertKey.html
-site/htdocs/static/forms/RSAKeyNoPassword.html
+site/htdocs/static/forms/RSACertKeyNoPassword.html
 site/htdocs/static/forms/rule.html
 site/htdocs/static/forms/ruleContainer.html
 site/htdocs/static/forms/samlAssertion.html
@@ -277,3 +277,4 @@ t/lemonldap-ng-dbi.ini
 t/lemonldap-ng-noDiff.ini
 t/lemonldap-ng.ini
 t/test-lib.pm
+t/test-merge.json

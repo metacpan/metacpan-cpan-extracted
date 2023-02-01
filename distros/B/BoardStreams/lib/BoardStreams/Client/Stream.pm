@@ -8,7 +8,7 @@ use BoardStreams::Util 'eqq';
 use RxPerl::Mojo ':all';
 use Storable 'dclone';
 
-our $VERSION = "v0.0.31";
+our $VERSION = "v0.0.32";
 
 has name => sub { die 'missing name' };
 has manager => sub { die 'missing manager' };
@@ -167,7 +167,7 @@ sub new ($class, $name, $manager) {
                 my ($present, $future) = @$_;
                 return $present == $future ? $present : undef;
             }),
-            op_switch_map(sub ($x) {
+            op_switch_map(sub ($x, @) {
                 if (! defined $x) {
                     return rx_of(undef);
                 } else {
@@ -185,7 +185,7 @@ sub new ($class, $name, $manager) {
                 $manager->connected_o,
                 $self->{desired_join_state_o},
             ),
-            op_switch_map(sub ($quad) {
+            op_switch_map(sub ($quad, @) {
                 my ($present, $future, $connected, $desired) = @$quad;
                 return $desired ? rx_of(undef) : rx_of(0)->pipe(op_delay(0.1)) if ! $connected;
                 return $present == $future ? rx_of($present)->pipe(op_delay(0.1)) : rx_of(undef);
@@ -196,7 +196,7 @@ sub new ($class, $name, $manager) {
         # send join or leave requests at the right times, and process results
         $self->{desired_join_state_o}->pipe(
             op_combine_latest_with($manager->connected_o),
-            op_concat_map(sub ($pair) {
+            op_concat_map(sub ($pair, @) {
                 my ($desired, $connected) = @$pair;
 
                 $connected or return rx_EMPTY;

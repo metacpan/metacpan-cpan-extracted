@@ -34,11 +34,14 @@ our @pList = (
     decryptValueRule                    => '::Plugins::DecryptValue',
     findUser                            => '::Plugins::FindUser',
     newLocationWarning                  => '::Plugins::NewLocationWarning',
+    checkHIBP                           => '::Plugins::CheckHIBP',
     adaptativeAuthenticationLevelRules  =>
       '::Plugins::AdaptativeAuthenticationLevel',
-    refreshSessions  => '::Plugins::Refresh',
-    crowdsec         => '::Plugins::CrowdSec',
-    globalLogoutRule => '::Plugins::GlobalLogout',
+    refreshSessions     => '::Plugins::Refresh',
+    crowdsec            => '::Plugins::CrowdSec',
+    locationDetect      => '::Plugins::LocationDetect',
+    globalLogoutRule    => '::Plugins::GlobalLogout',
+    samlFederationFiles => '::Plugins::SamlFederation',
 );
 
 ##@method list enabledPlugins

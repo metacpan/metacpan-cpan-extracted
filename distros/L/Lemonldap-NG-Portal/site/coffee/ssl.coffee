@@ -8,9 +8,12 @@ tryssl = () ->
 		dataType: 'json',
 		xhrFields:
 			withCredentials: true
-		# If request succeed, cookie is set, posting form to get redirection
+		# If request succeed, posting form to get redirection
 		# or menu
 		success: (data) ->
+		    # If we contain a ajax_auth_token, add it to form
+			if data.ajax_auth_token
+				$('#lform').find('input[name="ajax_auth_token"]').attr("value", data.ajax_auth_token)
 			sendUrl path
 			console.log 'Success -> ', data
 		# Case else, will display PE_BADCREDENTIALS or fallback to next auth

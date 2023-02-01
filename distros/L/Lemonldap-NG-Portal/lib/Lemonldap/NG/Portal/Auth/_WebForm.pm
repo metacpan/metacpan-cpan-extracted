@@ -19,7 +19,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_PASSWORDFORMEMPTY
 );
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.0.16';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Auth
@@ -183,6 +183,19 @@ sub setSecurity {
     elsif ( $self->ottRule->( $req, {} ) ) {
         $self->ott->setToken($req);
     }
+}
+
+sub getFormParams {
+    my ( $self, $req ) = @_;
+    my $checkLogins = $req->param('checkLogins');
+    $self->logger->debug( $self->prefix . '2f: checkLogins set' )
+      if $checkLogins;
+
+    my $stayConnected = $req->param('stayconnected');
+    $self->logger->debug( $self->prefix . '2f: stayConnected set' )
+      if $stayConnected;
+
+    return ( $checkLogins, $stayConnected );
 }
 
 1;

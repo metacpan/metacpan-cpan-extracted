@@ -120,7 +120,7 @@ sub get_access_token_code {
 
     my $id = login( $portal, 'dwho' );
 
-    my $code = authorize(
+    my $code = codeAuthorize(
         $portal, $id,
         {
             response_type => "code",
@@ -190,7 +190,7 @@ sub portal {
                     },
                 },
                 oidcServicePrivateKeySig => oidc_key_op_private_sig,
-                oidcServicePublicKeySig  => oidc_key_op_public_sig,
+                oidcServicePublicKeySig  => oidc_cert_op_public_sig,
             }
         }
     );

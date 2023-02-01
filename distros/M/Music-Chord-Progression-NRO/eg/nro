@@ -2,24 +2,25 @@
 use strict;
 use warnings;
 
-use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util Music-Chord-Progression-NRO);
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util Music-Chord-Progression-NRO); # local author libs
+
 use MIDI::Util qw(setup_score midi_format);
 use Music::Chord::Progression::NRO ();
 
 my $bpm       = shift || 100;
 my $note      = shift || 'C';
 my $octave    = shift || 4;
+my $scale     = shift || 'major';
 my $transform = shift || 'P,L,R,P,L,R'; # giving an integer = random
 
-print "Initial: $note$octave\nTransforms: $transform\n";
-
-if ($transform =~ /[A-Z,]/) {
+if ($transform =~ /^[HLNPRSX,]+$/) {
     $transform = [ split /,/, $transform ];
 }
 
 my $nro = Music::Chord::Progression::NRO->new(
     base_note   => $note,
     base_octave => $octave,
+    base_scale  => $scale,
     transform   => $transform,
     verbose     => 1,
 );

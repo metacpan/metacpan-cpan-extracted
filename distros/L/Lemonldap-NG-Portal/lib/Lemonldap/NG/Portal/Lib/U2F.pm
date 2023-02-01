@@ -3,14 +3,15 @@ package Lemonldap::NG::Portal::Lib::U2F;
 use strict;
 use Mouse;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.16';
 
 has origin => ( is => 'rw', );
 
 sub init {
     my ($self) = @_;
-    eval 'use Crypt::U2F::Server::Simple';
+    eval { require Crypt::U2F::Server::Simple };
     if ($@) {
+        $self->logger->error("Can't load U2F library: $@");
         $self->error("Can't load U2F library: $@");
         return 0;
     }

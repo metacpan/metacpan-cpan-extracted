@@ -1,16 +1,17 @@
 # Try to launch an LDAP server
 
+use URI::Escape qw/uri_escape/;
 use Time::HiRes qw/usleep/;
+use Test::More;
+use Net::LDAP;
 
-sub _ldap_cleanup {
-    system 'rm -rf t/testslapd/slapd.d';
-    system 'rm -rf t/testslapd/data';
-    system 'rm -rf t/testslapd/slapd-test.ldif';
-}
+use File::Copy "cp";
 
 my $slapd_bin;
 my $slapadd_bin;
 my $slapd_schema_dir;
+our $slapd_url = 'ldapi://' . uri_escape( $main::tmpDir . '/ldap_socket' );
+our $slapd_pid;
 
 if ( $ENV{LLNGTESTLDAP} ) {
     $slapd_bin        = $ENV{LLNGTESTLDAP_SLAPD_BIN}   || '/usr/sbin/slapd';
@@ -22,77 +23,73 @@ if ( $ENV{LLNGTESTLDAP} ) {
         :                             '/etc/ldap/schema'
     );
 
-    eval { mkdir 't/testslapd/slapd.d' };
-    eval { mkdir 't/testslapd/data' };
-    system('cp t/testslapd/slapd.ldif t/testslapd/slapd-test.ldif');
+    eval { mkdir "$main::tmpDir/slapd.d" };
+    eval { mkdir "$main::tmpDir/data" };
+    cp( "t/testslapd/slapd.ldif", "$main::tmpDir/slapd-test.ldif" );
     system(
-"/bin/sed -i 's:__SCHEMA_DIR__:$slapd_schema_dir:' t/testslapd/slapd-test.ldif"
+        "/bin/sed", "-i",
+        "s:__SCHEMA_DIR__:$slapd_schema_dir:",
+        "$main::tmpDir/slapd-test.ldif"
     );
-    system( $slapadd_bin
-          . ' -F t/testslapd/slapd.d -n 0 -l t/testslapd/slapd-test.ldif' );
-    system( $slapadd_bin
-          . ' -F t/testslapd/slapd.d -n 1 -l t/testslapd/users.ldif' );
-    system( $slapd_bin
-          . ' -s 256 -h "ldap://127.0.0.1:19389/" -F t/testslapd/slapd.d' );
+    system(
+        "/bin/sed",                       "-i",
+        "s:t/testslapd/:$main::tmpDir/:", "$main::tmpDir/slapd-test.ldif"
+    );
+    system( $slapadd_bin, "-F", "$main::tmpDir/slapd.d", "-n", "0",
+        "-l", "$main::tmpDir/slapd-test.ldif" );
+    system( $slapadd_bin, "-F", "$main::tmpDir/slapd.d", "-n", "1",
+        "-l", "t/testslapd/users.ldif" );
+    startLdapServer();
+}
+
+sub waitForLdap {
+    my $waitloop = 0;
+    note "Waiting for LDAP server to be available";
+    while ( $waitloop < 100 and !Net::LDAP->new($slapd_url) ) {
+        $waitloop++;
+        usleep 100000;
+    }
+    die "Timed out waiting for LDAP server to start" if $waitloop == 100;
+    open F, "$main::tmpDir/slapd.pid";
+    $slapd_pid = join '', <F>;
+    chomp $slapd_pid;
+    close F;
+    die "Could not find LDAP server PID" unless $slapd_pid;
+    note "LDAP server ($slapd_pid) available at $slapd_url";
 }
 
 sub stopLdapServer {
     if ( $ENV{LLNGTESTLDAP} ) {
-        open F, 't/testslapd/slapd.pid';
-        my $pid = join '', <F>;
-        my $die = 0;
-        close F;
-        if ($pid) {
-            kill 15, $pid;
+        note "Stopping LDAP server ($slapd_pid)";
+        my $pid = $slapd_pid;
+        kill 15, $pid;
 
-            # give the PID 10 seconds to stop
-            my $waitloop = 0;
-            while ( $waitloop < 1000 and kill 0, $pid ) {
-                $waitloop++;
-                usleep 10000;
-            }
-            if ( kill 0, $pid ) {
-                kill 9, $pid;
-            }
+        # give the PID 10 seconds to stop
+        my $waitloop = 0;
+        while ( $waitloop < 1000 and kill 0, $pid ) {
+            $waitloop++;
+            usleep 10000;
+        }
+        if ( kill 0, $pid ) {
+            note "Could not kill LDAP server normally, sending SIGKILL";
+            kill 9, $pid;
         }
         else {
-
-            $die = "Could not stop slapd";
-        }
-        _ldap_cleanup();
-        die($die) if $die;
-    }
-}
-
-sub tempStopLdapServer {
-    if ( $ENV{LLNGTESTLDAP} ) {
-        open F, 't/testslapd/slapd.pid';
-        my $pid = join '', <F>;
-        close F;
-        if ($pid) {
-            kill 15, $pid;
-
-            # give the PID 10 seconds to stop
-            my $waitloop = 0;
-            while ( $waitloop < 1000 and kill 0, $pid ) {
-                $waitloop++;
-                usleep 10000;
-            }
-            if ( kill 0, $pid ) {
-                kill 9, $pid;
-            }
-        }
-        else {
-            _ldap_cleanup();
-            die("Could not stop slapd");
+            note "LDAP server stopped successfully";
         }
     }
 }
 
-sub tempStartLdapServer {
+sub startLdapServer {
+    note "Starting LDAP server";
     if ( $ENV{LLNGTESTLDAP} ) {
-        system( $slapd_bin
-              . ' -s 256 -h "ldap://127.0.0.1:19389/" -F t/testslapd/slapd.d' );
+        system( $slapd_bin, '-s', '256', '-h', $slapd_url,
+            '-F', "$main::tmpDir/slapd.d" );
     }
+    waitForLdap();
+}
+
+END {
+    stopLdapServer();
 }
 1;

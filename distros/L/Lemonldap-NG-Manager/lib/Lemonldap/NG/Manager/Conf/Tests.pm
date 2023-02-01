@@ -357,22 +357,19 @@ sub tests {
             my $res = 1;
             my %entityIds;
             foreach my $idpId ( keys %{ $conf->{samlIDPMetaDataXML} } ) {
-                unless (
+                if (
                     $conf->{samlIDPMetaDataXML}->{$idpId}->{samlIDPMetaDataXML}
                     =~ /entityID=(['"])(.+?)\1/si )
                 {
-                    push @msg, "$idpId SAML metadata has no EntityID";
-                    $res = 0;
-                    next;
+                    my $eid = $2;
+                    if ( defined $entityIds{$eid} ) {
+                        push @msg,
+"$idpId and $entityIds{$eid} have the same SAML EntityID";
+                        $res = 0;
+                        next;
+                    }
+                    $entityIds{$eid} = $idpId;
                 }
-                my $eid = $2;
-                if ( defined $entityIds{$eid} ) {
-                    push @msg,
-                      "$idpId and $entityIds{$eid} have the same SAML EntityID";
-                    $res = 0;
-                    next;
-                }
-                $entityIds{$eid} = $idpId;
             }
             return ( $res, join( ', ', @msg ) );
         },
@@ -384,22 +381,19 @@ sub tests {
             my $res = 1;
             my %entityIds;
             foreach my $spId ( keys %{ $conf->{samlSPMetaDataXML} } ) {
-                unless (
+                if (
                     $conf->{samlSPMetaDataXML}->{$spId}->{samlSPMetaDataXML} =~
                     /entityID=(['"])(.+?)\1/si )
                 {
-                    push @msg, "$spId SAML metadata has no EntityID";
-                    $res = 0;
-                    next;
+                    my $eid = $2;
+                    if ( defined $entityIds{$eid} ) {
+                        push @msg,
+"$spId and $entityIds{$eid} have the same SAML EntityID";
+                        $res = 0;
+                        next;
+                    }
+                    $entityIds{$eid} = $spId;
                 }
-                my $eid = $2;
-                if ( defined $entityIds{$eid} ) {
-                    push @msg,
-                      "$spId and $entityIds{$eid} have the same SAML EntityID";
-                    $res = 0;
-                    next;
-                }
-                $entityIds{$eid} = $spId;
             }
             return ( $res, join( ', ', @msg ) );
         },
@@ -688,8 +682,10 @@ sub tests {
             return 1 unless ( defined $conf->{issuersTimeout} );
             return ( 0, "Issuers token TTL must be higher than 30s" )
               unless ( $conf->{issuersTimeout} > 30 );
-            return ( 1, "Issuers token TTL should not be higher than 2mn" )
-              if ( $conf->{issuersTimeout} > 120 );
+
+            # because of issue #2186
+            return ( 1, "Issuers token TTL should not be higher than 10mn" )
+              if ( $conf->{issuersTimeout} > 600 );
             return 1;
         },
 
@@ -867,6 +863,33 @@ sub tests {
             return 1;
         },
 
+        # Public OIDC clients require a public key algorithm
+        oidcRPPublicNeedPubAlg => sub {
+            return 1
+              unless ( $conf->{oidcRPMetaDataOptions}
+                and %{ $conf->{oidcRPMetaDataOptions} || {} } );
+            my @clients;
+            for ( keys %{ $conf->{oidcRPMetaDataOptions} || {} } ) {
+                if ( $conf->{oidcRPMetaDataOptions}->{$_}
+                    ->{oidcRPMetaDataOptionsPublic}
+                    and $conf->{oidcRPMetaDataOptions}->{$_}
+                    ->{oidcRPMetaDataOptionsIDTokenSignAlg} =~ /^HS/ )
+                {
+                    push @clients, $_;
+                }
+            }
+            if (@clients) {
+                my $msg =
+                    join( ", ", @clients )
+                  . ": public clients should use a public key algorithm"
+                  . " for ID token signature";
+                return 1, $msg;
+            }
+            else {
+                return 1;
+            }
+        },
+
         # OIDC RP Client ID must exist and be unique
         oidcRPClientIdUniqueness => sub {
             return 1
@@ -878,7 +901,8 @@ sub tests {
             foreach
               my $clientConfKey ( keys %{ $conf->{oidcRPMetaDataOptions} } )
             {
-                my $clientId = $conf->{oidcRPMetaDataOptions}->{$clientConfKey}
+                my $clientId =
+                  $conf->{oidcRPMetaDataOptions}->{$clientConfKey}
                   ->{oidcRPMetaDataOptionsClientID};
                 unless ($clientId) {
                     push @msg,
@@ -1085,6 +1109,30 @@ sub tests {
             return ( 0, 'Safe jail must be enabled with CheckDevOps plugin' )
               if ( $conf->{checkDevOps}
                 and !$conf->{useSafeJail} );
+            return 1;
+        },
+
+        # Work around for #1740
+        corruptApplicationConfig => sub {
+            for my $cat ( keys %{ $conf->{applicationList} || {} } ) {
+                if ( ref( $conf->{applicationList}->{$cat} ) eq "HASH" ) {
+                    for my $app (
+                        keys %{ $conf->{applicationList}->{$cat} || {} } )
+                    {
+                        if (
+                            ref( $conf->{applicationList}->{$cat}->{$app} ) eq
+                            "HASH"
+                            and
+                            $conf->{applicationList}->{$cat}->{$app}->{type} eq
+                            "menuApp" )
+                        {
+                            return ( 0,
+                                    'Error saving application list.'
+                                  . ' Reload the manager and try again' );
+                        }
+                    }
+                }
+            }
             return 1;
         }
     };

@@ -3,11 +3,11 @@ package String::Util;
 use strict;
 use warnings;
 use Carp;
-use 5.014;
+use v5.14;
 
 # version
-our $VERSION = '1.32';
-
+our $VERSION  = '1.33';
+our $FGC_MODE = 'UTF-8';
 
 #------------------------------------------------------------------------------
 # opening POD
@@ -15,11 +15,11 @@ our $VERSION = '1.32';
 
 =head1 NAME
 
-String::Util -- String processing utility functions
+B<String::Util> -- String processing utility functions
 
 =head1 DESCRIPTION
 
-String::Util provides a collection of small, handy functions for processing
+B<String::Util> provides a collection of small, handy functions for processing
 strings in various ways.
 
 =head1 INSTALLATION
@@ -55,20 +55,17 @@ use vars qw[@EXPORT_OK %EXPORT_TAGS];
 # the following functions accept a value and return a modified version of
 # that value
 push @EXPORT_OK, qw[
-	collapse     crunch     htmlesc    trim      ltrim
-	rtrim        define     repeat     unquote   no_space
-	nospace      fullchomp  randcrypt  jsquote   cellfill
-	crunchlines  file_get_contents
+	collapse     htmlesc    trim      ltrim
+	rtrim        repeat     unquote   no_space
+	nospace      jsquote    crunchlines
+	file_get_contents
 ];
 
 # the following functions return true or false based on their input
 push @EXPORT_OK, qw[
-	hascontent  nocontent eqq equndef neqq neundef
-	startswith  endswith  contains    sanitize
+	hascontent  nocontent eqq      neqq
+	startswith  endswith  contains sanitize
 ];
-
-# the following function returns a random string of some type
-push @EXPORT_OK, qw[ randword ];
 
 # the following function returns the unicode values of a string
 push @EXPORT_OK, qw[ ords deords ];
@@ -89,9 +86,6 @@ C<collapse()> collapses all whitespace in the string down to single spaces.
 Also removes all leading and trailing whitespace.  Undefined input results in
 undefined output.
 
-B<Note:> C<crunch()> is an alias to this function. It is considered deprecated.
-It may be removed in future versions.
-
   $var = collapse("  Hello     world!    "); # "Hello world!"
 
 =cut
@@ -108,9 +102,6 @@ sub collapse {
 	return $val;
 }
 
-sub crunch {
-	return collapse(@_);
-}
 #
 # collapse
 #------------------------------------------------------------------------------
@@ -122,7 +113,7 @@ sub crunch {
 
 =head2 hascontent($scalar), nocontent($scalar)
 
-hascontent() returns true if the given argument is defined and contains
+C<hascontent()> returns true if the given argument is defined and contains
 something besides whitespace.
 
 An undefined value returns false.  An empty string returns false.  A value
@@ -177,13 +168,12 @@ sub nocontent {
 =head2 trim($string), ltrim($string), rtrim($string)
 
 Returns the string with all leading and trailing whitespace removed.
-Trim on undef returns "".
 
   $var = trim(" my string  "); # "my string"
 
-ltrim() trims B<leading> whitespace only.
+C<ltrim()> trims B<leading> whitespace only.
 
-rtrim() trims B<trailing> whitespace only.
+C<rtrim()> trims B<trailing> whitespace only.
 
 =cut
 
@@ -307,28 +297,6 @@ sub htmlesc {
 
 
 #------------------------------------------------------------------------------
-# cellfill
-#
-
-sub cellfill{
-	my ($val) = @_;
-
-	carp("cellfill() is deprecated and will be removed in future versions");
-
-	if (hascontent($val)) {
-		$val = htmlesc($val);
-	} else {
-		$val = '&nbsp;';
-	}
-
-	return $val;
-}
-#
-# cellfill
-#------------------------------------------------------------------------------
-
-
-#------------------------------------------------------------------------------
 # jsquote
 #
 
@@ -419,30 +387,6 @@ sub unquote {
 
 
 #------------------------------------------------------------------------------
-# define
-#
-
-sub define {
-	carp("define() is deprecated and may be removed in future version");
-
-	my ($val) = @_;
-
-	# if overloaded object, get return value and
-	# concatenate with string (which defines it).
-	if (ref($val) && overload::Overloaded($val)) {
-		local $^W = 0;
-		$val = $val . '';
-	}
-
-	defined($val) or $val = '';
-	return $val;
-}
-#
-# define
-#------------------------------------------------------------------------------
-
-
-#------------------------------------------------------------------------------
 # repeat
 #
 
@@ -453,8 +397,8 @@ command outputs "Fred" three times:
 
   print repeat('Fred', 3), "\n";
 
-Note that repeat() was created a long time based on a misunderstanding of how
-the perl operator 'x' works.  The following command using 'x' would perform
+Note that C<repeat()> was created a long time based on a misunderstanding of how
+the perl operator 'x' works.  The following command using C<x> would perform
 exactly the same as the above command.
 
   print 'Fred' x 3, "\n";
@@ -473,195 +417,6 @@ sub repeat {
 
 
 #------------------------------------------------------------------------------
-# randword
-#
-
-=head2 randword($length, %options)
-
-Returns a random string of characters. String will not contain any vowels (to
-avoid distracting dirty words). First argument is the length of the return
-string. So this code:
-
-  foreach my $idx (1..3) {
-      print randword(4), "\n";
-  }
-
-would output something like this:
-
-  kBGV
-  NCWB
-  3tHJ
-
-If the string 'dictionary' is sent instead of an integer, then a word is
-randomly selected from a dictionary file.  By default, the dictionary file
-is assumed to be at /usr/share/dict/words and the shuf command is used to
-pull out a word.  The hash %String::Util::PATHS sets the paths to the
-dictionary file and the shuf executable.  Modify that hash to change the paths.
-So this code:
-
-  foreach my $idx (1..3) {
-      print randword('dictionary'), "\n";
-  }
-
-would output something like this:
-
-  mustache
-  fronds
-  browning
-
-B<option:> alpha
-
-If the alpha option is true, only alphabetic characters are returned, no
-numerals. For example, this code:
-
-  foreach my $idx (1..3) {
-      print randword(4, alpha=>1), "\n";
-  }
-
-would output something like this:
-
-  qrML
-  wmWf
-  QGvF
-
-B<option:> numerals
-
-If the numerals option is true, only numerals are returned, no alphabetic
-characters. So this code:
-
-  foreach my $idx (1..3) {
-      print randword(4, numerals=>1), "\n";
-  }
-
-would output something like this:
-
-  3981
-  4734
-  2657
-
-B<option:> strip_vowels
-
-This option is true by default.  If true, vowels are not included in the
-returned random string. So this code:
-
-  foreach my $idx (1..3) {
-      print randword(4, strip_vowels=>1), "\n";
-  }
-
-would output something like this:
-
-  Sk3v
-  pV5z
-  XhSX
-
-=cut
-
-# path information for WC
-our %PATHS = (
-	wc    => '/usr/bin/wc',
-	shuf  => '/usr/bin/shuf',
-	words => '/usr/share/dict/words',
-	head  => '/usr/bin/head',
-	tail  => '/usr/bin/tail',
-);
-
-sub randword {
-	my ($count, %opts) = @_;
-	my ($rv, $char, @chars, $paths);
-	$rv = '';
-
-	# check syntax
-	defined($count) or croak 'syntax: randword($count)';
-
-	# dictionary word
-	if ($count =~ m|^dict|si) {
-		# loop until acceptable word is found
-		DICTIONARY:
-		while (1) {
-			my ($cmd, $line_count, $line_num, $word);
-
-			# use Encode module
-			require Encode;
-
-			# get line count
-			$cmd = qq|$PATHS{'wc'} -l "$PATHS{'words'}"|;
-			($line_count) = `$cmd`;
-			$line_count =~ s|\s.*||s;
-
-			# get random line
-			$line_num = rand($line_count);
-
-			# untaint line number
-			unless ($line_num =~ m|^([0-9]+)$|s) { die "invalid line number: $line_num" }
-			$line_num = $1;
-
-			# get random word
-			$cmd = qq[$PATHS{'head'} -$line_num "$PATHS{'words'}" | $PATHS{'tail'} -1];
-			($word) = `$cmd`;
-			$word =~ s|\s.*||si;
-			$word =~ s|'.*||si;
-			$word = lc($word);
-
-			# only allow words that are all letters
-			if ($opts{'letters_only'}) {
-				unless ($word =~ m|^[a-z]+$|s)
-					{ next DICTIONARY }
-			}
-
-			# check for max length
-			if ($opts{'maxlength'}) {
-				if ( length($word) > $opts{'maxlength'} )
-					{ next DICTIONARY }
-			}
-
-			# encode unless specifically opted not to do so
-			unless ( defined($opts{'encode'}) && (! $opts{'encode'}) )
-				{ $word = Encode::encode_utf8($word) }
-
-			# return
-			return $word;
-		}
-	}
-
-	# alpha only
-	if ($opts{'alpha'})
-		{ @chars = ('a' .. 'z', 'A' .. 'Z') }
-
-	# else alpha and numeral
-	else
-		{ @chars = ('a' .. 'z', 'A' .. 'Z', '0' .. '9') }
-
-	# defaults
-	defined($opts{'strip_vowels'}) or $opts{'strip_vowels'} = 1;
-
-	while (length($rv) < $count) {
-		$char = rand();
-
-		# numerals only
-		if ($opts{'numerals'}) {
-			$char =~ s|^0.||;
-			$char =~ s|\D||g;
-		}
-
-		# character random word
-		else {
-			$char = int( $char * ($#chars + 1) );
-			$char = $chars[$char];
-			next if($opts{'strip_vowels'} && $char =~ m/[aeiouy]/i);
-		}
-
-		$rv .= $char;
-	}
-
-	return substr($rv, 0, $count);
-}
-#
-# randword
-#------------------------------------------------------------------------------
-
-
-
-#------------------------------------------------------------------------------
 # eqq
 # formerly equndef
 #
@@ -669,20 +424,14 @@ sub randword {
 =head2 eqq($scalar1, $scalar2)
 
 Returns true if the two given values are equal.  Also returns true if both
-are undef.  If only one is undef, or if they are both defined but different,
+are C<undef>.  If only one is C<undef>, or if they are both defined but different,
 returns false. Here are some examples and what they return.
 
   $var = eqq('x', 'x');     # True
   $var = eqq('x', undef);   # False
   $var = eqq(undef, undef); # True
 
-B<Note:> equndef() is an alias to this function. It is considered deprecated.
-It may be removed in future versions.
-
 =cut
-
-# alias equndef to eqq
-sub equndef { return eqq(@_) }
 
 sub eqq {
 	my ($str1, $str2) = @_;
@@ -712,62 +461,20 @@ sub eqq {
 
 =head2 neqq($scalar1, $scalar2)
 
-The opposite of neqq, returns true if the two values are *not* the same.
+The opposite of C<neqq>, returns true if the two values are *not* the same.
 Here are some examples and what they return.
 
   $var = neqq('x', 'x');     # False
   $var = neqq('x', undef);   # True
   $var = neqq(undef, undef); # False
 
-B<Note:> neundef() is an alias to this function. It is considered deprecated.
-It may be removed in future versions.
-
 =cut
-
-sub neundef {
-	return eqq(@_) ? 0 : 1;
-}
 
 sub neqq {
 	return eqq(@_) ? 0 : 1;
 }
 #
 # neqq
-#------------------------------------------------------------------------------
-
-
-#------------------------------------------------------------------------------
-# fullchomp
-#
-
-sub fullchomp {
-	carp("fullchomp() is deprecated and may be removed in future versions");
-
-	my ($line) = @_;
-	defined($line) and $line =~ s|[\r\n]+$||s;
-	defined(wantarray) and return $line;
-	$_[0] = $line;
-}
-#
-# fullchomp
-#------------------------------------------------------------------------------
-
-
-#------------------------------------------------------------------------------
-# randcrypt
-#
-
-sub randcrypt {
-	carp("randcrypt() is deprecated and may be removed in future versions");
-
-	my $pw = shift();
-	my $ret;
-	$ret = crypt($pw, randword(2));
-
-	return $ret;
-}
-#
-# randcrypt
 #------------------------------------------------------------------------------
 
 
@@ -864,7 +571,7 @@ sub ords {
 
 =head2 deords($string)
 
-Takes the output from ords() and returns the string that original created that
+Takes the output from C<ords()> and returns the string that original created that
 output.
 
   $var = deords('{72}{101}{110}{100}{114}{105}{120}'); # 'Hendrix'
@@ -1064,23 +771,37 @@ lines.
   $str   = file_get_contents("/tmp/file.txt");    # Return a string
   @lines = file_get_contents("/tmp/file.txt", 1); # Return an array
 
+B<Note:> If you opt to return an array, carriage returns and line feeds are
+removed from the end of each line.
+
+B<Note:> File is read in B<UTF-8> mode, unless C<$FGC_MODE> is set to an
+appropriate encoding.
+
 =cut
 
 sub file_get_contents {
 	my ($file, $ret_array) = @_;
 
 	open (my $fh, "<", $file) or return undef;
-
-	my $ret;
-	while (<$fh>) {
-		$ret .= $_;
-	}
+	binmode($fh, ":encoding($FGC_MODE)");
 
 	if ($ret_array) {
-		return split(/\r?\n/,$ret);
-	}
+		my @ret;
 
-	return $ret;
+		while (my $line = readline($fh)) {
+			$line =~ s/[\r\n]*$//; # Remove CR/LF
+			push(@ret, $line);
+		}
+
+		return @ret;
+	} else {
+		my $ret = '';
+		while (my $line = readline($fh)) {
+			$ret .= $line;
+		}
+
+		return $ret;
+	}
 }
 
 # return true

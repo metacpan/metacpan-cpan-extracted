@@ -94,8 +94,8 @@ my $ep = $logouturl;
 $ep =~ s/https?:\/\/[^\/]+//;
 
 ## Forward logout
-## TODO: handler behaviour is incomplete here, because it does not check:
-##       - locationRules
+## TODO: handler behaviour is incomplete here, because it does not check:
+##       - locationRules
 ##       - presence of resource in the server (404,...)
 ok(
     $res = $app->( {

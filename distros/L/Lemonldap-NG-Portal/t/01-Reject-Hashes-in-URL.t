@@ -19,7 +19,7 @@ ok(
     'Try http://bad.com#test.example.llng'
 );
 expectReject($res);
-ok( $res->[2]->[0] =~ /37/, 'Rejected with PE_BADURL' )
+ok( $res->[2]->[0] =~ /109/, 'Rejected with PE_UNPROTECTEDURL' )
   or print STDERR Dumper( $res->[2]->[0] );
 
 count(2);

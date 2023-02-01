@@ -15,12 +15,13 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.0.16';
 
 extends qw(
   Lemonldap::NG::Portal::Main::SecondFactor
   Lemonldap::NG::Common::TOTP
 );
+with 'Lemonldap::NG::Portal::Lib::2fDevices';
 
 # INITIALIZATION
 
@@ -42,27 +43,20 @@ sub init {
 
 sub run {
     my ( $self, $req, $token ) = @_;
-    $self->logger->debug('Generate TOTP form');
-
-    my $checkLogins = $req->param('checkLogins');
-    $self->logger->debug("TOTP: checkLogins set") if $checkLogins;
-
-    my $stayconnected = $req->param('stayconnected');
-    $self->logger->debug("TOTP: stayconnected set") if $stayconnected;
+    $self->logger->debug( $self->prefix . '2f: generate form' );
 
     # Prepare form
+    my ( $checkLogins, $stayConnected ) = $self->getFormParams($req);
     my $tmp = $self->p->sendHtml(
         $req,
         'totp2fcheck',
         params => {
-            MAIN_LOGO     => $self->conf->{portalMainLogo},
-            SKIN          => $self->p->getSkin($req),
             TOKEN         => $token,
             CHECKLOGINS   => $checkLogins,
-            STAYCONNECTED => $stayconnected
+            STAYCONNECTED => $stayConnected
         }
     );
-    $self->logger->debug("Prepare TOTP 2F verification");
+    $self->logger->debug( $self->prefix . '2f: prepare verification' );
 
     $req->response($tmp);
     return PE_SENDRESPONSE;
@@ -70,33 +64,18 @@ sub run {
 
 sub verify {
     my ( $self, $req, $session ) = @_;
-    $self->logger->debug('TOTP verification');
-    my $code;
+    my ( $code, $secret, @totp2f );
+    $self->logger->debug( $self->prefix . '2f: verification' );
+
     unless ( $code = $req->param('code') ) {
-        $self->userLogger->error('TOTP 2F: no code');
+        $self->userLogger->error( $self->prefix . '2f: no code provided' );
         return PE_FORMEMPTY;
     }
 
-    my ( $secret, $_2fDevices );
-    if ( $session->{_2fDevices} ) {
-        $self->logger->debug("Loading 2F Devices ...");
-
-        # Read existing 2FDevices
-        $_2fDevices =
-          eval { from_json( $session->{_2fDevices}, { allow_nonref => 1 } ); };
-        if ($@) {
-            $self->logger->error("Bad encoding in _2fDevices: $@");
-            return PE_ERROR;
-        }
-        $self->logger->debug("2F Device(s) found");
-        $self->logger->debug("Reading TOTP secret if exists...");
-
-        $secret = $_->{_secret}
-          foreach grep { $_->{type} eq 'TOTP' } @$_2fDevices;
-    }
-
+    @totp2f = $self->find2fDevicesByType( $req, $session, $self->type );
+    $secret = $_->{_secret} foreach @totp2f;
     unless ($secret) {
-        $self->logger->debug("No TOTP secret found");
+        $self->logger->debug( $self->prefix . '2f: no secret found' );
         return PE_BADOTP;
     }
 
@@ -106,15 +85,16 @@ sub verify {
         $self->conf->{totp2fDigits},
         $secret, $code
     );
-    return PE_ERROR if ( $r == -1 );
+    return PE_ERROR if $r == -1;
 
     if ($r) {
-        $self->userLogger->info('TOTP succeed');
+        $self->userLogger->info( $self->prefix . '2f: succeed' );
         return PE_OK;
     }
     else {
-        $self->userLogger->notice(
-            'Invalid TOTP for ' . $session->{ $self->conf->{whatToTrace} } );
+        $self->userLogger->notice( $self->prefix
+              . '2f: invalid attempt for '
+              . $session->{ $self->conf->{whatToTrace} } );
         return PE_BADOTP;
     }
 }

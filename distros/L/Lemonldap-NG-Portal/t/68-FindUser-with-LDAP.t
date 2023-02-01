@@ -20,7 +20,7 @@ SKIP: {
                 authentication   => 'LDAP',
                 portal           => 'http://auth.example.com/',
                 userDB           => 'Same',
-                ldapServer       => 'ldap://127.0.0.1:19389/',
+                ldapServer       => $main::slapd_url,
                 ldapBase         => 'ou=users,dc=example,dc=com',
                 managerDn        => 'cn=admin,dc=example,dc=com',
                 managerPassword  => 'admin',
@@ -257,8 +257,7 @@ m%<input id="findUser_cn" name="cn" type="text" autocomplete="off" class="form-c
     ok( $json->{user} =~ /^(reset|rtyler)$/, " Good user ($1)" )
       or explain( $json, "user => ?" );
 
-    clean_sessions();
 }
 count($maintests);
-stopLdapServer() if $ENV{LLNGTESTLDAP};
+clean_sessions();
 done_testing( count() );

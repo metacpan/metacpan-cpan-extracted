@@ -294,7 +294,8 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
     my $devices;
     ok(
         $devices =
-          $res->[2]->[0] =~ s%<span device=\'(?:TOTP|U2F)\' epoch=\'\d{10}\'%%g,
+          $res->[2]->[0] =~
+          s%<span\s*device=\'(?:TOTP|U2F)\'\s*epoch=\'\d{10}\'%%mg,
         '2F device found'
     ) or print STDERR Dumper( $res->[2]->[0] );
     ok( $devices == 2, '2F devices found' )
@@ -414,7 +415,7 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
       or print STDERR Dumper( $res->[2]->[0] );
     ok(
         $devices =
-          $res->[2]->[0] =~ s%<span device=\'TOTP\' epoch=\'\d{10}\'%%g,
+          $res->[2]->[0] =~ s%<span\s*device=\'TOTP\'\s*epoch=\'\d{10}\'%%mg,
         '2F device found'
     ) or print STDERR Dumper( $res->[2]->[0] );
     ok( $devices == 1, '2F device found' )
@@ -539,14 +540,14 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
     ok( $res->[2]->[0] =~ /<span id="msg" trspan="choose2f">/,
         'Found choose 2F' )
       or print STDERR Dumper( $res->[2]->[0] );
-    ok( $res->[2]->[0] =~ m%<span device=\'TOTP\' epoch=\'(\d{10})\'%,
+    ok( $res->[2]->[0] =~ m%<span\s*device=\'TOTP\'\s*epoch=\'(\d{10})\'%m,
         'TOTP found' )
       or print STDERR Dumper( $res->[2]->[0] );
     $epoch = $1;
     ok(
         $devices =
           $res->[2]->[0] =~
-          s%<span device=\'(?:TOTP|U2F)\' epoch=\'(?:\d{10})\'%%g,
+          s%<span\s*device=\'(?:TOTP|U2F)\'\s*epoch=\'(?:\d{10})\'%%mg,
         '2F devices found'
     ) or print STDERR Dumper( $res->[2]->[0] );
     ok( $devices == 2, '2F devices registered' )
@@ -585,7 +586,7 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
     ok(
         $devices =
           $res->[2]->[0] =~
-          s%<span device=\'(?:TOTP|U2F)\' epoch=\'(\d{10})\'%%g,
+          s%<span\s*device=\'(?:TOTP|U2F)\'\s*epoch=\'(\d{10})\'%%mg,
         '2F device found'
     ) or print STDERR Dumper( $res->[2]->[0] );
     ok( $devices == 1, '2F device registered' )

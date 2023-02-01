@@ -27,12 +27,25 @@
       <tbody>
         <TMPL_LOOP NAME="SFDEVICES">
           <tr id='delete-<TMPL_VAR NAME="epoch">'>
-            <td class="align-middle"><TMPL_VAR NAME="type"></td>
+            <td class="align-middle">
+            <TMPL_IF name="label">
+                <TMPL_VAR NAME="label">
+            <TMPL_ELSE>
+                <TMPL_VAR NAME="type">
+            </TMPL_IF>
+            </td>
             <td class="align-middle"><TMPL_VAR NAME="name"></td>
             <td class="data-epoch"><TMPL_VAR NAME="epoch"></td>
             <td>
               <TMPL_IF NAME="delAllowed">
-                <span device='<TMPL_VAR NAME="type">' epoch='<TMPL_VAR NAME="epoch">' class="btn btn-danger" role="button" data-toggle="modal" data-target="#remove2fModal">
+                <span
+                    device='<TMPL_VAR NAME="type">'
+                    epoch='<TMPL_VAR NAME="epoch">'
+                    prefix='<TMPL_VAR NAME="prefix">'
+                    class="btn btn-danger"
+                    role="button"
+                    data-toggle="modal"
+                    data-target="#remove2fModal">
                   <span class="fa fa-minus-circle"></span>
                   <span trspan="unregister">Unregister</span>
   	            </span>
@@ -71,7 +84,7 @@
     </div>
   </div>
 
-  <div class="text-center mb-3 row"> 
+  <div class="text-center mb-3 row">
     <TMPL_LOOP NAME="MODULES">
     <div class="col">
     <div class="card border-secondary">

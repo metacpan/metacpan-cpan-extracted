@@ -24,7 +24,9 @@ examples/house/sleep.page.pl
 lib/Story/Interact.pm
 lib/Story/Interact/Analyze.pm
 lib/Story/Interact/Character.pm
+lib/Story/Interact/Harness.pm
 lib/Story/Interact/Harness/Terminal.pm
+lib/Story/Interact/Harness/Test.pm
 lib/Story/Interact/Page.pm
 lib/Story/Interact/PageSource.pm
 lib/Story/Interact/PageSource/DBI.pm
@@ -33,4 +35,5 @@ lib/Story/Interact/State.pm
 lib/Story/Interact/Syntax.pm
 t/00start.t
 t/01basic.t
+t/integration/house-story.t
 t/unit/Story/Interact.t

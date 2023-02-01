@@ -57,6 +57,7 @@ use strict;
 use Data::Dumper;
 use File::Find;
 use JSON;
+use XML::LibXML;
 use LWP::UserAgent;
 use Time::Fake;
 use URI::Escape;
@@ -307,7 +308,7 @@ sub expectForm {
     if (
         ok(
             $res->[2]->[0] =~
-m@<form.+?action="(?:(?:http://([^/]+))?(/.*?)?|(#))".+method="(post|get)"@is,
+m@<form.+?action="(?:(?:https?://([^/]+))?(/.*?)?|(#))".+method="(post|get)"@is,
             ' Page contains a form'
         )
       )
@@ -487,9 +488,12 @@ Verify that an error is displayed on the portal
 sub expectPortalError {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $res, $errnum, $message ) = @_;
-    $errnum ||= 9;
-    like( $res->[2]->[0], qr/<span trmsg="$errnum">/, $message );
-    count(1);
+    $errnum  ||= 9;
+    $message ||= "Expected portal error code";
+    my ($error) = $res->[2]->[0] =~ qr/<span trmsg="(\d+)">/;
+    ok( $error, "$message: code found on page" ) or explain $res->[2]->[0];
+    is( $error, $errnum, $message );
+    count(2);
 }
 
 =head4 expectReject( $res, $status, $code )
@@ -593,6 +597,17 @@ sub expectCspChildOK {
     count(1);
     like( $csp, qr/child-src[^;]*\Q$host\E/, "Found $host in CSP child-src" );
     count(1);
+}
+
+sub getHtmlElement {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    my ( $res, $xpath ) = @_;
+
+    # Use recover to ignore parsing errors
+    my $doc =
+      XML::LibXML->new->load_html( string => $res->[2]->[0], recover => 2 );
+
+    return $doc->findnodes($xpath);
 }
 
 =head4 getCookies($res)
@@ -710,7 +725,7 @@ Encode URL like the handler would, see ::Handler::Main
 
 sub encodeUrl {
     my ($url) = @_;
-    return uri_escape( encode_base64( $url, '' ) );
+    return encode_base64( $url, '' );
 }
 
 =head2 LLNG::Manager::Test Class
@@ -721,6 +736,7 @@ package LLNG::Manager::Test;
 
 use strict;
 use Mouse;
+use IO::String;
 
 extends 'Lemonldap::NG::Common::PSGI::Cli::Lib';
 
@@ -820,6 +836,7 @@ has p => ( is => 'rw' );
 
 =cut
 
+has accept => ( is => 'rw', default => 'application/json, text/plain, */*' );
 has confFailure => ( is => 'rw' );
 
 has ini => (
@@ -882,6 +899,35 @@ has ini => (
 =back
 
 =head3 Methods
+
+=head4 login($client, $uid, $getParams)
+Do a simple login using the Demo backend
+=cut
+
+sub login {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    my ( $self, $uid, $getParams ) = @_;
+    my $res;
+    $getParams ||= {};
+
+    my $query = main::buildForm( {
+            user     => $uid,
+            password => $uid,
+            %$getParams,
+        }
+    );
+    main::ok(
+        $res = $self->_post(
+            '/',
+            IO::String->new($query),
+            length => length($query),
+        ),
+        'Auth query'
+    );
+    main::expectOK($res);
+    my $id = main::expectCookie($res);
+    return $id;
+}
 
 =head4 logout($id)
 
@@ -962,9 +1008,14 @@ to test content I<(to launch a C<expectForm()> for example)>.
 
 sub _get {
     my ( $self, $path, %args ) = @_;
+
+    # Automatically serialize query if given as HASHREF
+    if ( ref( $args{query} ) eq "HASH" ) {
+        $args{query} = main::buildForm( $args{query} );
+    }
+
     my $res = $self->app->( {
-            'HTTP_ACCEPT' => $args{accept}
-              || 'application/json, text/plain, */*',
+            'HTTP_ACCEPT'          => $args{accept} // $self->accept,
             'HTTP_ACCEPT_LANGUAGE' => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
             'HTTP_CACHE_CONTROL'   => 'max-age=0',
             ( $args{cookie} ? ( HTTP_COOKIE => $args{cookie} ) : () ),
@@ -1013,11 +1064,24 @@ Example with IO::String:
 
 sub _post {
     my ( $self, $path, $body, %args ) = @_;
+
+    # If $body is a HASHREF, serialize as string
+    if ( ref($body) eq "HASH" ) {
+        $body = main::buildForm($body);
+    }
+
+    # If $body is a string, wrap in IO::Handle
+    unless ( ref($body) ) {
+        $args{length} = length($body);
+
+        # We must force a string copy here to avoid circular references
+        $body = IO::String->new("$body");
+    }
+
     die "$body must be a IO::Handle"
       unless ( ref($body) and $body->can('read') );
     my $res = $self->app->( {
-            'HTTP_ACCEPT' => $args{accept}
-              || 'application/json, text/plain, */*',
+            'HTTP_ACCEPT'          => $args{accept} // $self->accept,
             'HTTP_ACCEPT_LANGUAGE' => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
             'HTTP_CACHE_CONTROL'   => 'max-age=0',
             ( $args{cookie} ? ( HTTP_COOKIE => $args{cookie} ) : () ),
@@ -1045,8 +1109,8 @@ sub _post {
             ( $args{custom} ? %{ $args{custom} } : () ),
             'psgix.input.buffered' => 0,
             'psgi.input'           => $body,
-            'CONTENT_LENGTH' => $args{length} // scalar( ( stat $body )[7] ),
-            'CONTENT_TYPE'   => $args{type}
+            'CONTENT_LENGTH'       => $args{length},
+            'CONTENT_TYPE'         => $args{type}
               || 'application/x-www-form-urlencoded',
         }
     );

@@ -99,6 +99,7 @@ sub newCertificate {
     my $keys = {
         'private' => $private,
         'public'  => $cert,
+        'hash'    => md5_base64($cert),
     };
     return $self->sendJSONresponse( $req, $keys );
 }

@@ -62,7 +62,6 @@ my $cid = expectCookie( $res, 'llngconnection' );
 ok( $res->[1]->[5] =~ /\bHttpOnly=1\b/, ' HTTP cookie found' )
   or explain( $res->[1]->[5], 'HTTP cookie found' );
 count(2);
-$client->logout($id);
 
 # Try to connect with persistent connection cookie
 ok(

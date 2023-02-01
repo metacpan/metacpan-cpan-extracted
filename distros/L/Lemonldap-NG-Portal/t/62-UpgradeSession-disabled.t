@@ -12,27 +12,27 @@ count(1);
 my $res;
 my $client = LLNG::Manager::Test->new( {
         ini => {
-            logLevel            => 'error',
-            upgradeSession      => 0,
-            authentication      => 'Choice',
-            apacheAuthnLevel    => 5,
-            userDB              => 'Same',
-            'authChoiceModules' => {
+            logLevel          => 'error',
+            upgradeSession    => 0,
+            authentication    => 'Choice',
+            apacheAuthnLevel  => 5,
+            userDB            => 'Same',
+            authChoiceModules => {
                 'strong' => 'Apache;Demo;Null;;;{}',
                 'weak'   => 'Demo;Demo;Null;;;{}'
             },
-            'vhostOptions' => {
+            vhostOptions => {
                 'test1.example.com' => {
                     'vhostAuthnLevel' => 3
-                },
+                }
             },
-            "locationRules" => {
+            locationRules => {
                 "test1.example.com" => {
                     'default'                      => 'accept',
                     '^/AuthWeak(?#AuthnLevel=2)'   => 'deny',
-                    '^/AuthStrong(?#AuthnLevel=5)' => 'deny',
-                },
-            },
+                    '^/AuthStrong(?#AuthnLevel=5)' => 'deny'
+                }
+            }
         }
     }
 );

@@ -2,7 +2,7 @@ package Lemonldap::NG::Manager::Conf::Zero;
 
 use strict;
 
-our $VERSION = '2.0.13';
+our $VERSION = '2.0.16';
 
 sub zeroConf {
     my ( $domain, $sessionDir, $persistentSessionDir, $notificationDir,
@@ -36,7 +36,7 @@ sub zeroConf {
                         'uri'         => "http://manager.$domain/sessions.html",
                         'description' => 'Explore WebSSO sessions',
                         'logo'        => 'database.png',
-                        'name'        => 'Sessions explorer'
+                        'name'        => 'Sessions Explorer'
                     }
                 },
                 'catname'       => 'Administration',
@@ -47,7 +47,7 @@ sub zeroConf {
                         'uri' => "http://manager.$domain/notifications.html",
                         'display' => 'auto',
                         'logo'    => 'database.png',
-                        'name'    => 'Notifications explorer'
+                        'name'    => 'Notifications Explorer'
                     }
                 },
                 'type' => 'category'
@@ -68,7 +68,7 @@ sub zeroConf {
                 'officialwebsite' => {
                     'options' => {
                         'description' => 'Official LemonLDAP::NG Website',
-                        'uri'         => 'http://lemonldap-ng.org/',
+                        'uri'         => 'https://lemonldap-ng.org/',
                         'display'     => 'on',
                         'logo'        => 'network.png',
                         'name'        => 'Official Website'
@@ -196,6 +196,7 @@ sub zeroConf {
             'cache_root'         => "$cacheDir",
             'cache_depth'        => 3,
         },
+        "oidcServiceIgnoreScopeForClaims" => 1,
     };
 }
 

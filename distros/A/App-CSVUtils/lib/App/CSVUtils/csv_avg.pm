@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-11'; # DATE
+our $DATE = '2023-02-01'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.003'; # VERSION
+our $VERSION = '1.004'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -96,7 +96,7 @@ App::CSVUtils::csv_avg - Output a summary row which are arithmetic averages of d
 
 =head1 VERSION
 
-This document describes version 1.003 of App::CSVUtils::csv_avg (from Perl distribution App-CSVUtils), released on 2023-01-11.
+This document describes version 1.004 of App::CSVUtils::csv_avg (from Perl distribution App-CSVUtils), released on 2023-02-01.
 
 =head1 FUNCTIONS
 

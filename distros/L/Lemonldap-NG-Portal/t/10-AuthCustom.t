@@ -21,7 +21,6 @@ my $client = LLNG::Manager::Test->new( {
 # Test normal first access
 # ------------------------
 ok( $res = $client->_get('/'), 'Unauth JSON request' );
-count(1);
 expectReject($res);
 
 # Test "first access" with an unprotected url
@@ -33,8 +32,7 @@ ok(
     ),
     'Get Menu'
 );
-ok( $res->[2]->[0] =~ /<span trmsg="37">/, 'Rejected with PE_BADURL' )
-  or print STDERR Dumper( $res->[2]->[0] );
+expectPortalError( $res, 109, 'Rejected with PE_UNPROTECTEDURL' );
 ok( $res->[2]->[0] =~ m%<span id="languages"></span>%, ' Language icons found' )
   or print STDERR Dumper( $res->[2]->[0] );
 count(3);

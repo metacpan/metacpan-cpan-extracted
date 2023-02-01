@@ -68,14 +68,14 @@ my $op = LLNG::Manager::Test->new( {
                 }
             },
             oidcServicePrivateKeySig => oidc_key_op_private_sig,
-            oidcServicePublicKeySig  => oidc_key_op_public_sig,
+            oidcServicePublicKeySig  => oidc_cert_op_public_sig,
         }
     }
 );
 
 my $idpId = login( $op, "french" );
 
-my $code = authorize(
+my $code = codeAuthorize(
     $op, $idpId,
     {
         response_type => "code",
@@ -107,7 +107,23 @@ ok(
     "Try introspection without authentication"
 );
 
-expectReject($res);
+expectReject( $res, 400, 'invalid_client' );
+
+# Bad HTTP authorization
+ok(
+    $res = $op->_post(
+        "/oauth2/introspect",
+        IO::String->new($query),
+        accept => 'text/html',
+        length => length $query,
+        custom => {
+            HTTP_AUTHORIZATION => "Basic " . encode_base64("oauth:servic2e"),
+        },
+    ),
+    "Post introspection"
+);
+expectReject( $res, 401, 'invalid_client' );
+is( getHeader( $res, "WWW-Authenticate" ), "Basic" );
 
 ok(
     $res = $op->_post(

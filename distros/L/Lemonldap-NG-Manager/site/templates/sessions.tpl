@@ -1,6 +1,9 @@
 <TMPL_INCLUDE NAME="header.tpl">
-
-  <title>LemonLDAP::NG Sessions explorer</title>
+  <TMPL_IF NAME="INSTANCE_NAME">
+    <title><TMPL_VAR NAME="INSTANCE_NAME"> Sessions</title>
+  <TMPL_ELSE>
+    <title>LemonLDAP::NG Sessions</title>
+  </TMPL_IF>
 </head>
 
 <body ng-app="llngSessionsExplorer" ng-controller="SessionsExplorerCtrl" ng-csp>

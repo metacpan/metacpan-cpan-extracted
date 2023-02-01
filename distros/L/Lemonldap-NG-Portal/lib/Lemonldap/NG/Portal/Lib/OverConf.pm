@@ -8,15 +8,15 @@ our @overC;
 
 # Override portal loadPlugin() to use a wrapped configuration
 sub loadPlugin {
-    my ( $self, $plugin, $over ) = @_;
-    my $obj = $self->loadModule( $plugin, $over );
+    my ( $self, $plugin, $over, %args ) = @_;
+    my $obj = $self->loadModule( $plugin, $over, %args );
     return 0
       unless ( $obj and $obj = $self->p->findEP( $plugin, $obj ) );
     return $obj;
 }
 
 sub loadModule {
-    my ( $self, $plugin, $over ) = @_;
+    my ( $self, $plugin, $over, %args ) = @_;
     my $obj;
     my $nc;
     if ($over) {
@@ -28,7 +28,7 @@ sub loadModule {
         $nc = $self->conf;
     }
     return 0
-      unless ( $obj = $self->p->loadModule( "$plugin", $nc ) );
+      unless ( $obj = $self->p->loadModule( "$plugin", $nc, %args ) );
     return $obj;
 }
 

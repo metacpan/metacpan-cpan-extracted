@@ -1,3 +1,53 @@
+0.9689 2023-02-01
+  [New Features]
+    * Support the static method call in Exchange API
+      my $list = SPVM::FloatList->new([]);
+      $list->SPVM::FloatList::push(1);
+    * Added the utf8_length method in the Fn class.
+
+      static method utf8_length : int ($string : string)
+
+      Gets the length as a UTF-8 string from the $string, and returns it.
+
+      Examples:
+
+        # 3
+        my $utf8_length = Fn->utf8_length("あいう");
+        
+    * Added the to_code_points method in the Fn class.
+
+      static method to_code_points : int[] ($string : string)
+
+      Converts the $string to the Unicode code points, and returns it.
+
+    * Added the to_utf8_chars method in the Fn class.
+
+      static method to_utf8_chars : string[] ($string : string);
+
+      Converts the $string to UTF-8 characters, and returns it.
+
+    * Added the utf8_substr method in the Fn class.
+
+      static method utf8_substr : string ($string : string, $utf8_offset : int, $utf8_length = -1 : int);
+
+      Gets the substring from the $string. The extracting range of the string is from the $utf8_offset to the position proceeded by the $utf8_length, and returns it.
+
+=head2 to_utf8_chars
+
+  static method to_utf8_chars : string[] ($string : string);
+
+Converts the $string to UTF-8 characters, and returns it.
+
+  [Exception Message Fix]
+    * Fixed the exception message of the call_method in the SPVM::ExchangeAPI class.
+      [Before]
+      The 2th argument of the "push" method in the "IntList" class must be a number
+      [After]
+      The 1th argument of the "push" method in the "IntList" class must be a number
+      
+  [Doc Simplification]
+    * Argument names are not wraped by <code></code> tag.
+    
 0.9688 2023-01-30
   [New Features]
     * Added the equals_string_range method in the Fn class.

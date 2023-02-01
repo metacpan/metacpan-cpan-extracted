@@ -14,7 +14,7 @@ use strict;
 use Cache::Memcached;
 use Apache::Session::Generate::MD5;
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.16';
 
 # Shared variables
 our $secureTokenMemcachedConnection;
@@ -63,25 +63,25 @@ sub run {
     }
 
     # Display found values in debug mode
-    $class->logger->debug(
-        "secureTokenMemcachedServers: @$secureTokenMemcachedServers");
+    $class->logger->debug( 'secureTokenMemcachedServers: ' . join ', ',
+        @$secureTokenMemcachedServers );
     $class->logger->debug("secureTokenExpiration: $secureTokenExpiration");
     $class->logger->debug("secureTokenAttribute: $secureTokenAttribute");
-    $class->logger->debug("secureTokenUrls: @$secureTokenUrls");
+    $class->logger->debug( 'secureTokenUrls: ' . join ', ', @$secureTokenUrls );
     $class->logger->debug("secureTokenHeader: $secureTokenHeader");
     $class->logger->debug("secureTokenAllowOnError: $secureTokenAllowOnError");
 
     # Return if we are not on a secure token URL
-    my $checkurl = 0;
+    my $checkurl;
     foreach (@$secureTokenUrls) {
         if ( $uri =~ m#$_# ) {
             $checkurl = 1;
             $class->logger->debug(
-                "URL $uri detected as an Secure Token URL (rule $_)");
+                "URL $uri detected as an SecureToken URL (rule: $_)");
             last;
         }
     }
-    return $class->OK unless ($checkurl);
+    return $class->OK unless $checkurl;
 
     # Test Memcached connection
     unless ( $class->_isAlive() ) {
@@ -172,11 +172,11 @@ sub _deleteToken {
     my ( $class, $key ) = @_;
     my $res = $secureTokenMemcachedConnection->delete($key);
 
-    unless ($res) {
-        $class->logger->error("Unable to delete secure token $key");
+    if ($res) {
+        $class->logger->info("Token $key deleted");
     }
     else {
-        $class->logger->info("Token $key deleted");
+        $class->logger->error("Unable to delete secure token $key");
     }
 
     return $res;
@@ -201,7 +201,7 @@ sub _isAlive {
         return 1;
     }
 
-    $class->logger->error("Memcached connection is not alive");
+    $class->logger->error('Memcached connection is down');
 
     return 0;
 }

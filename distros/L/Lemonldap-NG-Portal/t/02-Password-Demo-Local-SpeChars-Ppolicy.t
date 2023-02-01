@@ -88,6 +88,20 @@ ok(
 expectOK($res);
 count(1);
 
+$query = 'oldpassword=dwho&newpassword=-_&confirmpassword=-_';
+ok(
+    $res = $client->_post(
+        '/',
+        IO::String->new($query),
+        cookie => "lemonldap=$id",
+        accept => 'application/json',
+        length => length($query)
+    ),
+    'Password min special char with underscore respected'
+);
+expectOK($res);
+count(1);
+
 # Test $client->logout
 $client->logout($id);
 

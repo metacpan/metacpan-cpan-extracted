@@ -52,30 +52,22 @@ sub setSessionInfo {
 
     # Force UTF-8
     my $force_utf8 =
-      $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
-      ->{samlIDPMetaDataOptionsForceUTF8}
+      $self->idpOptions->{$idpConfKey}->{samlIDPMetaDataOptionsForceUTF8}
       if $idpConfKey;
 
     # Get all required attributes, not already set
     # in setAuthSessionInfo()
     if ($idpConfKey) {
-        foreach (
-            keys
-            %{ $self->conf->{samlIDPMetaDataExportedAttributes}->{$idpConfKey} }
-          )
-        {
+        foreach ( keys %{ $self->idpAttributes->{$idp} } ) {
 
             # Extract fields from exportedAttr value
             my ( $mandatory, $name, $format, $friendly_name ) =
-              split( /;/,
-                $self->conf->{samlIDPMetaDataExportedAttributes}->{$idpConfKey}
-                  ->{$_} );
+              split( /;/, $self->idpAttributes->{$idp}->{$_} );
 
             # Keep mandatory attributes not sent in authentication response
             if ( $mandatory and not defined $req->{sessionInfo}->{$_} ) {
                 $exportedAttr->{$_} =
-                  $self->conf->{samlIDPMetaDataExportedAttributes}
-                  ->{$idpConfKey}->{$_};
+                  $self->idpAttributes->{$idp}->{$_};
                 $self->logger->debug(
                     "Attribute $_ will be requested to $idpConfKey");
             }

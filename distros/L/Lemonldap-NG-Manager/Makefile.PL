@@ -8,11 +8,13 @@ WriteMakefile(
     VERSION_FROM   => 'lib/Lemonldap/NG/Manager.pm',    # finds $VERSION
     LICENSE        => 'gpl',
     BUILD_REQUIRES => {
-        'Email::Sender'  => 0,
-        'IO::String'     => 0,
-        'Regexp::Common' => 0,
-        'Test::Pod'      => 1.00,
-        'Test::Output'   => 0,
+        'Email::Sender'       => 0,
+        'Hash::Merge::Simple' => 0,
+        'IO::String'          => 0,
+        'Net::SSLeay'         => 0,
+        'Regexp::Common'      => 0,
+        'Test::Pod'           => 1.00,
+        'Test::Output'        => 0,
     },
     META_MERGE => {
         recommends => {
@@ -35,8 +37,8 @@ WriteMakefile(
     PREREQ_PM => {
         'Convert::PEM'           => 0,
         'Crypt::OpenSSL::RSA'    => 0,
-        'Lemonldap::NG::Common'  => '2.0.15.1',
-        'Lemonldap::NG::Handler' => '2.0.15.1',
+        'Lemonldap::NG::Common'  => '2.0.16',
+        'Lemonldap::NG::Handler' => '2.0.16',
         'LWP::UserAgent'         => 0,
     },    # e.g., Module::Name => 1.1
     (

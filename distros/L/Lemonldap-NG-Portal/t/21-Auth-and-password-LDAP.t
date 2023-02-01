@@ -20,7 +20,7 @@ SKIP: {
                 userDB                   => 'Same',
                 passwordDB               => 'LDAP',
                 portalRequireOldPassword => '$uid eq "dwho"',
-                ldapServer               => 'ldap://127.0.0.1:19389/',
+                ldapServer               => $main::slapd_url,
                 ldapBase                 => 'ou=users,dc=example,dc=com',
                 managerDn                => 'cn=admin,dc=example,dc=com',
                 managerPassword          => 'admin',
@@ -35,7 +35,7 @@ SKIP: {
     # Try to authenticate with
     # the server temporarily offline (#2018)
     # --------------------------------------
-    tempStopLdapServer();
+    stopLdapServer();
     ok(
         $res = $client->_post(
             '/', IO::String->new($postString),
@@ -49,7 +49,7 @@ SKIP: {
     # Try to authenticate with the
     # server back online
     # ----------------------------
-    tempStartLdapServer();
+    startLdapServer();
     ok(
         $res = $client->_post(
             '/', IO::String->new($postString),
@@ -86,8 +86,7 @@ SKIP: {
     $id = expectCookie($res);
 
     $client->logout($id);
-    clean_sessions();
 }
 count($maintests);
-stopLdapServer() if $ENV{LLNGTESTLDAP};
+clean_sessions();
 done_testing( count() );

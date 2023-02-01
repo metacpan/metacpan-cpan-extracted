@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.42
+    version 1.43
 
 SYNOPSIS
 
@@ -51,8 +51,8 @@ METHODS
     You can also combine "filter" and "exclude" with 'and' or 'or' default
     is 'or':
 
-      ok_manifest({exclude => ['/var/test'], 
-                   filter  => [qr/\.svn/], 
+      ok_manifest({exclude => ['/var/test'],
+                   filter  => [qr/\.svn/],
                    bool    => 'and'});
 
     These files have to be named in the MANIFEST:
@@ -91,7 +91,7 @@ REPLACE THIS MODULE
 
         use Test::More tests => 2;
         use ExtUtils::Manifest;
-        
+    
         is_deeply [ ExtUtils::Manifest::manicheck() ], [], 'missing';
         is_deeply [ ExtUtils::Manifest::filecheck() ], [], 'extra';
 

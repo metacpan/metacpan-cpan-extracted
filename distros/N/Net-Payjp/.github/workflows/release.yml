@@ -1,0 +1,29 @@
+name: release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish-cpan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.30'
+      - run: cpanm --installdeps .
+      - name: build for upload
+        run: |
+            perl Makefile.PL && make && make manifest
+            make disttest
+            make dist
+      - name: install cpan-upload
+        uses: perl-actions/install-with-cpanm@v1
+        with:
+          install: CPAN::Uploader
+      - name: cpan upload
+        env:
+          USER: ${{ secrets.PAUSE_USER }}
+          PASSWORD: ${{ secrets.PAUSE_PASSWORD }}
+        run: cpan-upload --user $USER --password $PASSWORD ./Net-Payjp-`perl -Ilib -MNet::Payjp -e 'print $Net::Payjp::VERSION'`.tar.gz

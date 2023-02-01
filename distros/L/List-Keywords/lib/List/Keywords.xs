@@ -4,6 +4,8 @@
  *  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
  */
 #define PERL_NO_GET_CONTEXT
+/* needed on latest perl to get optimize_optree/finalize_optree */
+#define PERL_USE_VOLATILE_API
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -12,6 +14,23 @@
 #include "XSParseKeyword.h"
 
 #include "perl-backcompat.c.inc"
+#include "op_sibling_splice.c.inc"
+
+#ifndef optimize_optree
+#  if HAVE_PERL_VERSION(5,28,0)
+#    define optimize_optree(op)  Perl_optimize_optree(aTHX_ op)
+#  else
+#    define optimize_optree(op)
+#  endif
+#endif
+
+#ifndef finalize_optree
+#  if HAVE_PERL_VERSION(5,16,0)
+#    define finalize_optree(op)  Perl_finalize_optree(aTHX_ op)
+#  else
+#    define finalize_optree(op)
+#  endif
+#endif
 
 /* We can't newLOGOP because that will force scalar context */
 #define allocLOGOP_CUSTOM(func, flags, first, other)  MY_allocLOGOP_CUSTOM(aTHX_ func, flags, first, other)
@@ -29,7 +48,7 @@ static LOGOP *MY_allocLOGOP_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags, OP *first
   return logop;
 }
 
-static OP *build_blocklist(pTHX_ OP *block, OP *list,
+static OP *build_blocklist(pTHX_ PADOFFSET varix, OP *block, OP *list,
   OP *(*pp_start)(pTHX), OP *(*pp_while)(pTHX), U8 op_private)
 {
   /* Follow the same optree shape as grep:
@@ -59,13 +78,21 @@ static OP *build_blocklist(pTHX_ OP *block, OP *list,
   op_sibling_splice(startop, cLISTOPx(startop)->op_first, 0, block);
   startop->op_type = OP_CUSTOM;
   startop->op_ppaddr = pp_start;
+  startop->op_targ = varix;
 
   LOGOP *whileop = allocLOGOP_CUSTOM(pp_while, 0, startop, blockstart);
   whileop->op_private = startop->op_private = op_private;
+  whileop->op_targ = varix;
 
   OpLASTSIB_set(startop, (OP *)whileop);
 
-  whileop->op_next = LINKLIST(startop);
+  /* Temporarily set the whileop's op_next to NULL so as not to confuse
+   * a custom RPEEP that might be set. We'll store the real start value in
+   * there afterwards. See also
+   *   https://rt.cpan.org/Ticket/Display.html?id=142471
+   */
+  OP *whilestart = LINKLIST(startop);
+  whileop->op_next = NULL;
   startop->op_next = (OP *)whileop;
   cUNOPx(block)->op_first->op_next = (OP *)whileop;
 
@@ -75,6 +102,7 @@ static OP *build_blocklist(pTHX_ OP *block, OP *list,
   PL_rpeepp(aTHX_ blockstart);
   finalize_optree(block);
 
+  whileop->op_next = whilestart;
   return (OP *)whileop;
 }
 
@@ -96,6 +124,7 @@ static OP *pp_firststart(pTHX)
 {
   /* Insired by perl core's pp_grepstart() */
   dSP;
+  PADOFFSET targ = PL_op->op_targ;
 
   if(PL_stack_base + TOPMARK == SP) {
     /* Empty */
@@ -112,8 +141,6 @@ static OP *pp_firststart(pTHX)
 
   ENTER_with_name("first");
 
-  SAVE_DEFSV;
-
   SV *src = PL_stack_base[TOPMARK];
 
   if(SvPADTMP(src)) {
@@ -121,7 +148,16 @@ static OP *pp_firststart(pTHX)
     PL_tmps_floor++;
   }
   SvTEMP_off(src);
-  DEFSV_set(src);
+
+  if(targ) {
+    SV **padentry = &PAD_SVl(targ);
+    save_clearsv(padentry);
+    sv_setsv(*padentry, src);
+  }
+  else {
+    SAVE_DEFSV;
+    DEFSV_set(src);
+  }
 
   PUTBACK;
 
@@ -135,6 +171,8 @@ static OP *pp_firstwhile(pTHX)
   dSP;
   dPOPss;
   U8 mode = PL_op->op_private;
+  PADOFFSET targ = PL_op->op_targ;
+  SV *targsv = targ ? PAD_SVl(targ) : DEFSV;
 
   bool ret = SvTRUE_NN(sv);
 
@@ -151,7 +189,7 @@ static OP *pp_firstwhile(pTHX)
      */
     SV *ret = (mode & FIRST_RET_NO ) ? &PL_sv_no :
               (mode & FIRST_RET_YES) ? &PL_sv_yes :
-                                       sv_mortalcopy(DEFSV);
+                                       sv_mortalcopy(targsv);
     LEAVE_with_name("first");
     (void)POPMARK;
     SP = PL_stack_base + POPMARK;
@@ -177,7 +215,11 @@ static OP *pp_firstwhile(pTHX)
     PL_tmps_floor++;
   }
   SvTEMP_off(src);
-  DEFSV_set(src);
+
+  if(targ)
+    sv_setsv(targsv, src);
+  else
+    DEFSV_set(src);
 
   PUTBACK;
 
@@ -186,13 +228,26 @@ static OP *pp_firstwhile(pTHX)
 
 static int build_first(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
 {
-  *out = build_blocklist(aTHX_ args[0]->op, args[1]->op,
+  size_t argi = 0;
+  PADOFFSET varix = 0;
+
+  bool has_optvar = args[argi++]->i;
+  if(has_optvar) {
+    varix = args[argi++]->padix;
+  }
+
+  OP *block = op_contextualize(op_scope(args[argi++]->op), G_SCALAR);
+  OP *list  = args[argi++]->op;
+
+  *out = build_blocklist(aTHX_ varix, block, list,
     &pp_firststart, &pp_firstwhile, SvIV((SV *)hookdata));
   return KEYWORD_PLUGIN_EXPR;
 }
 
-static const struct XSParseKeywordPieceType pieces_blocklist[] = {
-  XPK_BLOCK_SCALARCTX,
+static const struct XSParseKeywordPieceType pieces_optvar_blocklist[] = {
+  XPK_PREFIXED_BLOCK(
+    XPK_OPTIONAL(XPK_KEYWORD("my"), XPK_LEXVAR_MY(XPK_LEXVAR_SCALAR))
+  ),
   XPK_LISTEXPR_LISTCTX,
   {0},
 };
@@ -200,31 +255,31 @@ static const struct XSParseKeywordPieceType pieces_blocklist[] = {
 static const struct XSParseKeywordHooks hooks_first = {
   .permit_hintkey = "List::Keywords/first",
 
-  .pieces = pieces_blocklist,
+  .pieces = pieces_optvar_blocklist,
   .build = &build_first,
 };
 
 static const struct XSParseKeywordHooks hooks_any = {
   .permit_hintkey = "List::Keywords/any",
-  .pieces = pieces_blocklist,
+  .pieces = pieces_optvar_blocklist,
   .build = &build_first,
 };
 
 static const struct XSParseKeywordHooks hooks_all = {
   .permit_hintkey = "List::Keywords/all",
-  .pieces = pieces_blocklist,
+  .pieces = pieces_optvar_blocklist,
   .build = &build_first,
 };
 
 static const struct XSParseKeywordHooks hooks_none = {
   .permit_hintkey = "List::Keywords/none",
-  .pieces = pieces_blocklist,
+  .pieces = pieces_optvar_blocklist,
   .build = &build_first,
 };
 
 static const struct XSParseKeywordHooks hooks_notall = {
   .permit_hintkey = "List::Keywords/notall",
-  .pieces = pieces_blocklist,
+  .pieces = pieces_optvar_blocklist,
   .build = &build_first,
 };
 
@@ -368,10 +423,16 @@ static int build_reduce(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t narg
   GvMULTI_on(secondgv);
 #endif
 
-  *out = build_blocklist(aTHX_ args[0]->op, args[1]->op,
+  *out = build_blocklist(aTHX_ 0, args[0]->op, args[1]->op,
     &pp_reducestart, &pp_reducewhile, SvIV((SV *)hookdata));
   return KEYWORD_PLUGIN_EXPR;
 }
+
+static const struct XSParseKeywordPieceType pieces_blocklist[] = {
+  XPK_BLOCK_SCALARCTX,
+  XPK_LISTEXPR_LISTCTX,
+  {0},
+};
 
 static const struct XSParseKeywordHooks hooks_reduce = {
   .permit_hintkey = "List::Keywords/reduce",

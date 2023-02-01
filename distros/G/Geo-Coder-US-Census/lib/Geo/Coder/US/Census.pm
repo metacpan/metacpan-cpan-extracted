@@ -5,7 +5,7 @@ use warnings;
 
 use Carp;
 use Encode;
-use JSON;
+use JSON::MaybeXS;
 use HTTP::Request;
 use LWP::UserAgent;
 use LWP::Protocol::https;
@@ -18,11 +18,11 @@ Geo::Coder::US::Census - Provides a Geo-Coding functionality for the US using L<
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -51,8 +51,12 @@ Geo::Coder::US::Census provides an interface to geocoding.geo.census.gov.  Geo::
 sub new {
 	my($class, %param) = @_;
 
-	my $ua = delete $param{ua} || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
-	my $host = delete $param{host} || 'geocoding.geo.census.gov/geocoder/locations/address';
+	my $ua = $param{ua};
+	if(!defined($ua)) {
+		$ua = LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
+		$ua->default_header(accept_encoding => 'gzip,deflate');
+	}
+	my $host = $param{host} || 'geocoding.geo.census.gov/geocoder/locations/address';
 
 	return bless { ua => $ua, host => $host }, $class;
 }
@@ -96,15 +100,26 @@ sub geocode {
 	# Assumes not more than one town in a state with the same name
 	# in different counties - but the census Geo-Coding doesn't support that
 	# anyway
-	if($location =~ /^(\d+\s+[\w\s]+),\s*([\w\s]+),\s*[\w\s]+,\s*([A-Za-z]+)$/) {
+	# Some full state names include spaces, e.g South Carolina
+	# Some roads include full stops, e.g. S. West Street
+	if($location =~ /^(\d+\s+[\w\s\.]+),\s*([\w\s]+),\s*[\w\s]+,\s*([A-Za-z\s]+)$/) {
 		$location = "$1, $2, $3";
 	}
 
 	my $uri = URI->new("https://$self->{host}");
-	$location =~ s/\s/+/g;
 	my $hr = Geo::StreetAddress::US->parse_address($location);
 
-	my %query_parameters = ('format' => 'json', 'benchmark' => 'Public_AR_Current');
+	if((!defined($hr->{'city'})) || (!defined($hr->{'state'}))) {
+		Carp::carp(__PACKAGE__ . ": city and state are mandatory ($location)");
+		return;
+	}
+
+	my %query_parameters = (
+		'benchmark' => 'Public_AR_Current',
+		'city' => $hr->{'city'},
+		'format' => 'json',
+		'state' => $hr->{'state'},
+	);
 	if($hr->{'street'}) {
 		if($hr->{'number'}) {
 			$query_parameters{'street'} = $hr->{'number'} . ' ' . $hr->{'street'} . ' ' . $hr->{'type'};
@@ -115,8 +130,6 @@ sub geocode {
 			$query_parameters{'street'} .= ' ' . $hr->{'suffix'};
 		}
 	}
-	$query_parameters{'city'} = $hr->{'city'};
-	$query_parameters{'state'} = $hr->{'state'};
 
 	$uri->query_form(%query_parameters);
 	my $url = $uri->as_string();
@@ -124,12 +137,12 @@ sub geocode {
 	my $res = $self->{ua}->get($url);
 
 	if($res->is_error()) {
-		Carp::croak("$url API returned error: " . $res->status_line());
+		Carp::carp("$url API returned error: " . $res->status_line());
 		return;
 	}
 
-	my $json = JSON->new->utf8();
-	return $json->decode($res->content());
+	my $json = JSON::MaybeXS->new->utf8();
+	return $json->decode($res->decoded_content());
 
 	# my @results = @{ $data || [] };
 	# wantarray ? @results : $results[0];
@@ -231,7 +244,7 @@ https://www.census.gov/data/developers/data-sets/Geocoding-services.html
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017,2018 Nigel Horne.
+Copyright 2017-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

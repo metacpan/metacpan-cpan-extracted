@@ -13,6 +13,30 @@ please see the Encoder and Decoder changelogs:
 *          Sereal package and instead install the Encoder or   *
 *          Decoder independently.                              *
 ****************************************************************
+5.002
+    * Fixup Decoder tests to run on perl 5.8 which has no defined-or.
+    - Consolidated changes from 5.001_00x:
+    * Ensure that Encoder depends on the correct version of the Decoder.
+      Gracious thanks to Slaven Rezic for being so patient in helping
+      me get this release working properly.
+    * Test compatibility fixes when no perl is already installed.
+    * Add t/195_backcompat.t to check if the latest decoder will
+      seamlessly handle reading output from older versions.
+    * Test compatibility fixes with version 3 and earlier.
+
+5.001_003
+    * Ensure that Encoder depends on the correct version of the Decoder.
+      Gracious thanks to Slaven Rezic for being so patient in helping
+      me get 5.001_00x working properly.
+
+5.001_002
+    * Test compatibility fixes when no perl is already installed.
+    * Decoder: Add t/195_backcompat.t to check if the latest decoder 
+      will seamlessly handle reading output from older versions. 
+
+5.001_001
+    * Test compatibility fixes with version 3 and earlier.
+
 5.001
     * First official release of protocol 5. Better support for non
       standard NV types. Support for the new Perl 5.36 bools.
@@ -147,7 +171,7 @@ please see the Encoder and Decoder changelogs:
   * Fix builds under 5.8.9
 
 3.012 Dec  6 2015
-  * Yet another release related to broken META files. 
+  * Yet another release related to broken META files.
     ExtUtils::MakeMaker and CPAN::Meta need to be up to date
     or the META files miss stuff.
 

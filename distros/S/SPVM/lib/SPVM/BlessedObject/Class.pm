@@ -12,7 +12,9 @@ sub AUTOLOAD {
   my $self = shift;
   
   my $method_name = $AUTOLOAD;
-  $method_name =~ s/^SPVM::BlessedObject::Class:://;
+  
+  $method_name =~ s/^SPVM:://;
+  $method_name =~ s/^BlessedObject::Class:://;
   
   my $ret = $self->api->call_method($self, $method_name, @_);
   

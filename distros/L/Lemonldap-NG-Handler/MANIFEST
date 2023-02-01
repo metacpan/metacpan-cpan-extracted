@@ -8,6 +8,7 @@ lib/Lemonldap/NG/Handler/ApacheMP2.pm
 lib/Lemonldap/NG/Handler/ApacheMP2/AuthBasic.pm
 lib/Lemonldap/NG/Handler/ApacheMP2/CDA.pm
 lib/Lemonldap/NG/Handler/ApacheMP2/DevOps.pm
+lib/Lemonldap/NG/Handler/ApacheMP2/DevOpsCDA.pm
 lib/Lemonldap/NG/Handler/ApacheMP2/DevOpsST.pm
 lib/Lemonldap/NG/Handler/ApacheMP2/Fail.pm
 lib/Lemonldap/NG/Handler/ApacheMP2/FCGIClient.pm
@@ -48,6 +49,7 @@ lib/Lemonldap/NG/Handler/Server.pm
 lib/Lemonldap/NG/Handler/Server/AuthBasic.pm
 lib/Lemonldap/NG/Handler/Server/CDA.pm
 lib/Lemonldap/NG/Handler/Server/DevOps.pm
+lib/Lemonldap/NG/Handler/Server/DevOpsCDA.pm
 lib/Lemonldap/NG/Handler/Server/DevOpsST.pm
 lib/Lemonldap/NG/Handler/Server/Fail.pm
 lib/Lemonldap/NG/Handler/Server/Main.pm
@@ -55,6 +57,7 @@ lib/Lemonldap/NG/Handler/Server/Nginx.pm
 lib/Lemonldap/NG/Handler/Server/OAuth2.pm
 lib/Lemonldap/NG/Handler/Server/SecureToken.pm
 lib/Lemonldap/NG/Handler/Server/ServiceToken.pm
+lib/Lemonldap/NG/Handler/Server/Traefik.pm
 lib/Lemonldap/NG/Handler/Server/ZimbraPreAuth.pm
 lib/Lemonldap/NG/SSOaaS/Apache/Client.pm
 lib/Plack/Middleware/Auth/LemonldapNG.pm
@@ -74,6 +77,7 @@ t/51-Lemonldap-NG-Handler-Zimbra.t
 t/60-Lemonldap-NG-Handler-PSGI.t
 t/61-Lemonldap-NG-Handler-PSGI-Server.t
 t/62-Lemonldap-NG-Handler-Nginx.t
+t/62-Lemonldap-NG-Handler-Traefik.t
 t/63-Lemonldap-NG-Handler-PSGI-Try.t
 t/64-Lemonldap-NG-Handler-PSGI-DevOps-vhostOptions.t
 t/64-Lemonldap-NG-Handler-PSGI-DevOps-with-param.t
@@ -91,5 +95,6 @@ t/99-pod.t
 t/custom.pm
 t/lmConf-1.json
 t/sessions/lock/.exists
+t/test-psgi-lib-traefik.pm
 t/test-psgi-lib.pm
 t/test.pm

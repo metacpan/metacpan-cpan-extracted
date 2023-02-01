@@ -3,7 +3,7 @@ package Net::Payjp::Account;
 use strict;
 use warnings;
 
-use base 'Net::Payjp::Resource';
+use base 'Net::Payjp';
 
 sub retrieve{
   my $self = shift;

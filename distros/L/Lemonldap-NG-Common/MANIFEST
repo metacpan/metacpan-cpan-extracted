@@ -93,10 +93,13 @@ t/35-Common-Crypto.t
 t/36-Common-Regexp.t
 t/37-Common-TOTP.pm
 t/40-Common-Session.t
+t/45-importMetadata-config.t
+t/45-importMetadata.t
 t/50-Combination-Parser.t
 t/60-Session-Cli.t
 t/60-U2F-Migrate.t
 t/99-pod.t
+t/data/preview-all-test-metadata.xml
 tools/apache-session-mysql.sql
 tools/lmConfig.CDBI.mysql
 tools/lmConfig.RDBI.mysql

@@ -1,13 +1,13 @@
 [![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/7736847150242974/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/7736847150242974/heads/master/)
 [![Linux Build Status](https://travis-ci.org/nigelhorne/Geo-Coder-US-Census.svg?branch=master)](https://travis-ci.org/nigelhorne/Geo-Coder-US-Census)
 
-# Geo::Coder::US::Census
+# NAME
 
-Provides a Geo-Coding functionality for the US using [https://geocoding.geo.census.gov](https://geocoding.geo.census.gov)
+Geo::Coder::US::Census - Provides a Geo-Coding functionality for the US using [https://geocoding.geo.census.gov](https://geocoding.geo.census.gov)
 
 # VERSION
 
-Version 0.05
+Version 0.06
 
 # SYNOPSIS
 
@@ -69,7 +69,7 @@ You can also run this module from the command line:
 
 Nigel Horne <njh@bandsman.co.uk>
 
-Based on [Geo::Coder::GooglePlaces](https://metacpan.org/pod/Geo::Coder::GooglePlaces).
+Based on [Geo::Coder::GooglePlaces](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AGooglePlaces).
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -82,12 +82,12 @@ Should be called Geo::Coder::NA for North America.
 
 # SEE ALSO
 
-[Geo::Coder::GooglePlaces](https://metacpan.org/pod/Geo::Coder::GooglePlaces), [HTML::GoogleMaps::V3](https://metacpan.org/pod/HTML::GoogleMaps::V3)
+[Geo::Coder::GooglePlaces](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AGooglePlaces), [HTML::GoogleMaps::V3](https://metacpan.org/pod/HTML%3A%3AGoogleMaps%3A%3AV3)
 
 https://www.census.gov/data/developers/data-sets/Geocoding-services.html
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2017,2018 Nigel Horne.
+Copyright 2017-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2

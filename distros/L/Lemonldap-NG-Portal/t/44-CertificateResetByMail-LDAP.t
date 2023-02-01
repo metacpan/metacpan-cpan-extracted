@@ -41,7 +41,7 @@ use DateTime::Format::RFC3339;';
                 userDB                => 'LDAP',
                 passwordDB            => 'LDAP',
                 registerDB            => 'LDAP',
-                ldapServer            => 'ldap://127.0.0.1:19389/',
+                ldapServer            => $main::slapd_url,
                 ldapBase              => 'ou=users,dc=example,dc=com',
                 managerDn             => 'cn=admin,dc=example,dc=com',
                 managerPassword       => 'admin',
@@ -363,8 +363,8 @@ lkRrWfQftwmLyNIu3HfSgXlgAZS30ymfbzBU
     $trmsg = $trmsg[0];                 # get the first one only
     $trmsg =~ s/.*trmsg="([0-9]+)".*/$1/g;    # get error code number
     ok( $trmsg == PE_RESETCERTIFICATE_INVALID, 'Invalid certificate' );
-    stopLdapServer() if $ENV{LLNGTESTLDAP};
 }
 
+clean_sessions();
 count($maintests);
 done_testing( count() );

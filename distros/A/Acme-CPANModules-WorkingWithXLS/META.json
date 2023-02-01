@@ -48,6 +48,7 @@
          "x_lists" : {
             "App::XLSUtils" : "0",
             "App::XLSperl" : "0",
+            "Data::XLSX::Parser" : "0",
             "Spreadsheet::ParseExcel" : "0",
             "Spreadsheet::ParseXLSX" : "0",
             "Spreadsheet::Read" : "0",
@@ -58,6 +59,7 @@
          "x_mentions" : {
             "App::XLSUtils" : "0",
             "App::XLSperl" : "0",
+            "Data::XLSX::Parser" : "0",
             "Spreadsheet::ParseExcel" : "0",
             "Spreadsheet::ParseXLSX" : "0",
             "Spreadsheet::Read" : "0",
@@ -68,7 +70,7 @@
    "provides" : {
       "Acme::CPANModules::WorkingWithXLS" : {
          "file" : "lib/Acme/CPANModules/WorkingWithXLS.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -83,7 +85,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModules-WorkingWithXLS"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -475,7 +477,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Acme::CPANModules",
                         "name" : "-Acme::CPANModules",
-                        "version" : "0.012"
+                        "version" : "0.013"
                      }
                   ]
                }

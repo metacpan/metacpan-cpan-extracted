@@ -9,5 +9,6 @@ Makefile.PL
 README
 dist.ini
 lib/experimental.pm
+lib/stable.pm
 t/basic.t
 xt/author/pod-syntax.t

@@ -18,6 +18,7 @@ taint_checking_ok();
 
 my $api = Data::Validate::OpenAPI->new( decode_json '
 {
+  "openapi": "3.0.2",
   "paths": {
     "/": {
       "get": {

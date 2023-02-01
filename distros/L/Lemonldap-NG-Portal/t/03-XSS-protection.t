@@ -80,6 +80,11 @@ my @tests = (
       => 0,
     'base64 encoded HTML tags',
 
+    # Make sure userinfo does not confuse URL parsing (#2832)
+    # https://test1.example.com:test@hacker.com
+    'aHR0cHM6Ly90ZXN0MS5leGFtcGxlLmNvbTp0ZXN0QGhhY2tlci5jb20=' => 0,
+    'userinfo trick',
+
     # LOGOUT TESTS
     'LOGOUT',
 

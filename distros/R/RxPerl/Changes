@@ -1,5 +1,29 @@
 Revision history for Perl extension RxPerl
 
+v6.19.0 2023-02-01T14:48:40Z
+
+    - added op_find, op_find_index, rx_iif and op_is_empty
+
+v6.18.0 2023-02-01T13:05:04Z
+
+    - BREAKING CHANGE: op_switch_map, op_merge_map, op_concat_map and op_exhaust_map accept
+        a second index argument in their callbacks.
+    - added op_switch_all, op_merge_all, op_concat_all and op_exhaust_all
+
+v6.17.0 2023-02-01T00:29:42Z
+
+    - added op_zip_with, rx_generate, is_observable, op_merge_with and op_skip_while
+    - added rx_on_error_resume_next and op_on_error_resume_next_with
+
+v6.16.0 2023-01-31T21:08:48Z
+
+    - added op_reduce, rx_zip, op_every and op_element_at
+
+v6.15.0 2023-01-31T17:14:35Z
+
+    - added op_buffer_time, op_concat_with, op_count and op_default_if_empty
+    - added rx_range
+
 v6.14.0 2023-01-23T18:19:03Z
 
     - added op_buffer

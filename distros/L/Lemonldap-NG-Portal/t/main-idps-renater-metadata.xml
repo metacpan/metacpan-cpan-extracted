@@ -1,0 +1,159 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<md:EntitiesDescriptor xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:eidas="http://eidas.europa.eu/saml-extensions" xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:mdattr="urn:oasis:names:tc:SAML:metadata:attribute" xmlns:mdrpi="urn:oasis:names:tc:SAML:metadata:rpi" xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui" xmlns:pyff="http://pyff.io/NS" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:ser="http://eidas.europa.eu/metadata/servicelist" xmlns:shibmd="urn:mace:shibboleth:metadata:1.0" xmlns:xrd="http://docs.oasis-open.org/ns/xri/xrd-1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Name="https://federation.renater.fr/" ID="_20230113T161036Z" validUntil="2023-01-22T16:10:36Z" cacheDuration="PT1H"><ds:Signature><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/><ds:Reference URI="#_20230113T161036Z"><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#WithComments"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>PQ8ApFBcC9GbgwPtuzDC5Dy1pdSTezsYQ+vqZto4l4k=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>xCz97CBjp+CSjd+aXFolk8kS96JJS80C/32Idtd8LMB3fdiUw2Q0H7cdnV8xwEdXQkSgsSoi6GM5YAOUzmzmNTHHfblv1v9nE7LHO2D58tXUm/FyzRXW29X6D6ljvzX8ZK6+xeegRNgfsAUg+J7WafXA0VRA1V+Yb96uawWZPsUDF3Kdl9h+IA2ONYQ4kX54+T1DXSA4MaynQIkQii1bT2qeNloPZgVJi0cvfivqVF+SIUNyS54jA5JHsg9irxjvx1x66jYIk7qS+fQFU3FAAS0AF3V+IRm5/P19KSvT2WloA/u4NhYqwnWQn2S1j2jwxI0ChSPpY3uFFO1Ff+oDHA==</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIC9zCCAd+gAwIBAgIEfe6j3jANBgkqhkiG9w0BAQsFADAsMSowKAYDVQQDEyFT
+QU1MIE1ldGFkYXRhIFNpZ25pbmcgQ2VydGlmaWNhdGUwHhcNMTYwNzI5MDczNjM4
+WhcNMjYwNjA3MDczNjM4WjAsMSowKAYDVQQDEyFTQU1MIE1ldGFkYXRhIFNpZ25p
+bmcgQ2VydGlmaWNhdGUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDv
+X69N/roE+BhQXuybhP75br2oxXIZCf3A2qkEtzqynnd6r8lFM5QPbph6GOyV3mo3
+nYG/avlAbujhVTXbdqRdRjO6m+rV/62YX03Bhrsw8Q8XMLMkeE1eNk1HFyxbVYtb
+fh+FAKbShqTehI+g2jmp4aKM2xNKSBK3WY8fQ/x33lp/ZUmdPrNutyXG8fh6aqlP
+2gYuxaopYuUhtnu7U9SO41XAse6P3T39qmYLXdEEilXnZ97Lip7LfhudEd0JOSdl
+439MktMn2ExbPP1Nt2N8gVqIXsx5j45hFfNQl5C4ccy7/Yh6aShHbqZiLqKu+bHw
+B09w8LBxErDYJrjEuFs3AgMBAAGjITAfMB0GA1UdDgQWBBTT88iZzWO+hN9SBUkp
+x871lmTuLTANBgkqhkiG9w0BAQsFAAOCAQEABoPpODryXwiM5jjtqk6veR02FevC
+KHpZP6Od7Kqcfs6lg5LcQmGUOgpmW3Gg4UMjBYkgARsT2Nsnah1CJqa8cjvv8p5K
+EIhY0hVS8iMJnrb3PDeiFSeP4xSfct/6z/ebV4+QFl22bsm2zpAC6BpFz8+IJ/jA
+mQzTVob4MAUeQPnwwzm3xz6yanLZx7BK5cfrTCa+hrarNQCboRjXPwiejF8WRCxp
+gRHH6yNs5QH/Z6o5e3tUP7uEpn2Ob+kcLsEMGb9DghkoDAgkHCOZeTy+7hgxt+/T
+94cLTa58gVtvEOnd0GuL7Vfd+IVdXgSard8RfR3OyZlf6M4aSGQA73sskQ==</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature>
+    <md:EntityDescriptor entityID="https://auth.centrale-marseille.fr/idp/shibboleth">
+        <md:Extensions>
+            <mdrpi:RegistrationInfo registrationAuthority="https://federation.renater.fr/" registrationInstant="2015-03-18T19:08:09Z">
+                <mdrpi:RegistrationPolicy xml:lang="en">https://services.renater.fr/federation/en/documentation/engagement-conformite/metadata_registration_practice_statement</mdrpi:RegistrationPolicy>
+            </mdrpi:RegistrationInfo>
+            <mdattr:EntityAttributes>
+                <saml:Attribute Name="http://macedir.org/entity-category-support" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+                    <saml:AttributeValue>http://refeds.org/category/research-and-scholarship</saml:AttributeValue>
+                    <saml:AttributeValue>https://myacademicid.org/entity-categories/esi</saml:AttributeValue>
+                </saml:Attribute>
+                <saml:Attribute Name="https://federation.renater.fr/member-of" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+                    <saml:AttributeValue>https://federation.renater.fr/</saml:AttributeValue>
+                </saml:Attribute>
+                <saml:Attribute Name="urn:oasis:names:tc:SAML:attribute:assurance-certification" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+                    <saml:AttributeValue>https://refeds.org/sirtfi</saml:AttributeValue>
+                </saml:Attribute>
+            </mdattr:EntityAttributes>
+        </md:Extensions>
+        <md:IDPSSODescriptor protocolSupportEnumeration="urn:mace:shibboleth:1.0 urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:2.0:protocol">
+            <md:Extensions>
+                <shibmd:Scope regexp="false">centrale-marseille.fr</shibmd:Scope>
+                <shibmd:Scope regexp="false">centrale-med.fr</shibmd:Scope>
+                <mdui:UIInfo>
+                    <mdui:DisplayName xml:lang="fr">Ecole Centrale de Marseille</mdui:DisplayName>
+                    <mdui:DisplayName xml:lang="en">Ecole Centrale de Marseille</mdui:DisplayName>
+                    <mdui:Description xml:lang="fr">Centrale Mediterranée</mdui:Description>
+                    <mdui:Description xml:lang="en">Centrale Mediterranée</mdui:Description>
+                    <mdui:Logo height="16" width="16">data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAACXBIWXMAAAABAAAAAQBPJcTWAAADAFBMVEUAAAAkAABIAABsAACQAAC0AADYAAD8AAAAJAAkJABIJABsJACQJAC0JADYJAD8JAAASAAkSABISABsSACQSAC0SADYSAD8SAAAbAAkbABIbABsbACQbAC0bADYbAD8bAAAkAAkkABIkABskACQkAC0kADYkAD8kAAAtAAktABItABstACQtAC0tADYtAD8tAAA2AAk2ABI2ABs2ACQ2AC02ADY2AD82AAA/AAk/ABI/ABs/ACQ/AC0/ADY/AD8/AAAAFUkAFVIAFVsAFWQAFW0AFXYAFX8AFUAJFUkJFVIJFVsJFWQJFW0JFXYJFX8JFUASFUkSFVISFVsSFWQSFW0SFXYSFX8SFUAbFUkbFVIbFVsbFWQbFW0bFXYbFX8bFUAkFUkkFVIkFVskFWQkFW0kFXYkFX8kFUAtFUktFVItFVstFWQtFW0tFXYtFX8tFUA2FUk2FVI2FVs2FWQ2FW02FXY2FX82FUA/FUk/FVI/FVs/FWQ/FW0/FXY/FX8/FUAAKokAKpIAKpsAKqQAKq0AKrYAKr8AKoAJKokJKpIJKpsJKqQJKq0JKrYJKr8JKoASKokSKpISKpsSKqQSKq0SKrYSKr8SKoAbKokbKpIbKpsbKqQbKq0bKrYbKr8bKoAkKokkKpIkKpskKqQkKq0kKrYkKr8kKoAtKoktKpItKpstKqQtKq0tKrYtKr8tKoA2Kok2KpI2Kps2KqQ2Kq02KrY2Kr82KoA/Kok/KpI/Kps/KqQ/Kq0/KrY/Kr8/KoAAP8kAP9IAP9sAP+QAP+0AP/YAP/8AP8AJP8kJP9IJP9sJP+QJP+0JP/YJP/8JP8ASP8kSP9ISP9sSP+QSP+0SP/YSP/8SP8AbP8kbP9IbP9sbP+QbP+0bP/YbP/8bP8AkP8kkP9IkP9skP+QkP+0kP/YkP/8kP8AtP8ktP9ItP9stP+QtP+0tP/YtP/8tP8A2P8k2P9I2P9s2P+Q2P+02P/Y2P/82P8A/P8k/P9I/P9s/P+Q/P+0/P/Y/P/8/P+BTFLuAAAAjElEQVR4nGWPMQ4DIQwE+VbygrR5AiXu7G5dkS7XHaI6XZWUlHlhMJERUmRhyYuZXQIAXU+AKtYKpvtgzQQhEsjovw2qza5bJRdkPLh+XBAbpRPKnjpD4sup97xx4GcubnIkIChKvkVmYeXOMtvLO+fHHqHU+taA1pJ6Xjqni5ixtBls5vbof59bivEFaKd5QEd3vx0AAAAASUVORK5CYII=</mdui:Logo>
+                    <mdui:InformationURL xml:lang="fr">https://www.centrale-marseille.fr</mdui:InformationURL>
+                </mdui:UIInfo>
+            </md:Extensions>
+            <md:KeyDescriptor use="signing">
+                <ds:KeyInfo>
+                    <ds:X509Data>
+                        <ds:X509Certificate>MIIDVDCCAjygAwIBAgIVAIXPHZ3UF1uopseaVJtC6GfpVUo7MA0GCSqGSIb3DQEB
+BQUAMCUxIzAhBgNVBAMMGmF1dGguY2VudHJhbGUtbWFyc2VpbGxlLmZyMB4XDTE1
+MDMxNjIwNTQyOFoXDTM1MDMxNjIwNTQyOFowJTEjMCEGA1UEAwwaYXV0aC5jZW50
+cmFsZS1tYXJzZWlsbGUuZnIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIB
+AQCIi4zEBXUYAS9Ti7HQojxfj7lHM1bCRoT8lgLALEWSwNTCVCkzQl+DS0FPDZ0v
+8a9FaT1HjfocwZ1XdwoDxDCrqQFwxRA30iM6/uuh9/0HVZCFhQK2/Ikn1Pj6MLIF
+F/pLQWYSdUJurfRjf3St97Rbaq9ONiMXyNR2l2WZEG49cg1DfGA5+lP+uU5F5zSs
+rUzrJpPuf4T2AQSnki++OeyGM1/tY4/NjswbSZlTzmPicFulrRXj4tNi7bOX6yzi
+JGb/ziQHVqDU4vQQcE1R6KOWZuGhvlZSzGZeh1J2WlaqgyH9IeeknriOFqw3LcOR
+tZV9FqbuYNOFw9/EIxBS79NtAgMBAAGjezB5MB0GA1UdDgQWBBSeGwSZ7BVXmyys
+YKVg8WZHfkxurDBYBgNVHREEUTBPghphdXRoLmNlbnRyYWxlLW1hcnNlaWxsZS5m
+coYxaHR0cHM6Ly9hdXRoLmNlbnRyYWxlLW1hcnNlaWxsZS5mci9pZHAvc2hpYmJv
+bGV0aDANBgkqhkiG9w0BAQUFAAOCAQEAMs7S8ihpctE3q4ALf/iKvFNEfDxEggwu
+Q7N4uEG5HWiBBlalVagxWnXf3pJDd4ol/S5evquXaqede0q4Fdc3dg29v/sI319R
+n2z8hBEohWeBs/o4LuIsfkyyvRJTT6JzJJIcoxYthk6vt5KOAKQD9Q1YWihw6mfr
+iLV1efef406mrFp+fI/wlk4gj+h35b0Y0lBIah8z09mo8rwiXwOQc9k6rOc5PQOQ
+x1SkY7gFvgEwa1vQqKLuP+nIdkl93oZKD7mqLSIbR6bB4DM4bzD0W1Qw1yPvTGgs
+c9UsyilhfC2LFkhv/O9OaTuk0Wy9R+P5q6J0ma7UyWfq8Rc1fxZZIA==</ds:X509Certificate>
+                    </ds:X509Data>
+                </ds:KeyInfo>
+            </md:KeyDescriptor>
+            <md:NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</md:NameIDFormat>
+            <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat>
+            <md:SingleSignOnService Binding="urn:mace:shibboleth:1.0:profiles:AuthnRequest" Location="https://auth.centrale-marseille.fr/idp/profile/Shibboleth/SSO"/>
+            <md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://auth.centrale-marseille.fr/idp/profile/SAML2/POST/SSO"/>
+            <md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://auth.centrale-marseille.fr/idp/profile/SAML2/Redirect/SSO"/>
+        </md:IDPSSODescriptor>
+        <md:Organization>
+            <md:OrganizationName xml:lang="en">Ecole Centrale de Marseille</md:OrganizationName>
+            <md:OrganizationDisplayName xml:lang="en">Ecole Centrale de Marseille</md:OrganizationDisplayName>
+            <md:OrganizationURL xml:lang="en">https://www.centrale-marseille.fr</md:OrganizationURL>
+        </md:Organization>
+        <md:ContactPerson contactType="technical">
+            <md:EmailAddress>mailto:idp@centrale-marseille.fr</md:EmailAddress>
+        </md:ContactPerson>
+        <md:ContactPerson xmlns:remd="http://refeds.org/metadata" contactType="other" remd:contactType="http://refeds.org/metadata/contactType/security">
+            <md:GivenName>DSI Centrale Mediterranée</md:GivenName>
+            <md:EmailAddress>mailto:ssi@centrale-marseille.fr</md:EmailAddress>
+        </md:ContactPerson>
+    </md:EntityDescriptor>
+    <md:EntityDescriptor entityID="https://idp4.crous-lorraine.fr/idp/shibboleth">
+        <md:Extensions>
+            <mdrpi:RegistrationInfo registrationAuthority="https://federation.renater.fr/" registrationInstant="2021-08-02T16:07:54Z">
+                <mdrpi:RegistrationPolicy xml:lang="en">https://services.renater.fr/federation/en/documentation/engagement-conformite/metadata_registration_practice_statement</mdrpi:RegistrationPolicy>
+            </mdrpi:RegistrationInfo>
+            <mdattr:EntityAttributes>
+                <saml:Attribute Name="https://federation.renater.fr/member-of" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+                    <saml:AttributeValue>https://federation.renater.fr/</saml:AttributeValue>
+                </saml:Attribute>
+            </mdattr:EntityAttributes>
+        </md:Extensions>
+        <md:IDPSSODescriptor protocolSupportEnumeration="urn:mace:shibboleth:1.0 urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:2.0:protocol">
+            <md:Extensions>
+                <shibmd:Scope regexp="false">crous-nancy-metz.fr</shibmd:Scope>
+                <mdui:UIInfo>
+                    <mdui:DisplayName xml:lang="fr">CROUS Lorraine v4 (ne pas utiliser)</mdui:DisplayName>
+                    <mdui:DisplayName xml:lang="en">CROUS Lorraine v4</mdui:DisplayName>
+                    <mdui:Description xml:lang="fr">Idp v4</mdui:Description>
+                    <mdui:Description xml:lang="en">Idp v4</mdui:Description>
+                    <mdui:Logo height="16" width="16">data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAKDSURBVDhPfVNNaxNRFD1vZvLVtCRtTVtTNDZVqyB10eqiLrqLCCJC/SkBF/4AXRTdqSAI4kYs+EkRFy4EqwjVhVKUxBhrDGmy0CZN0k5mMs/zZlKaqnjDnTe5955zv94IScEfUnvzHlsPFmF9yUE4AvrBBALnUojOzsBRAdKBJjQ31iVwaNb4a3z4jLXpFAzrBwT6qAYknxpsRtRgYgixpUVEZ6Zop0cqH0WBq/ceo3T8KAKWCR1xWvroCfEMMDTMM85/wM9T0yjfuENaARbnVbCRyaI0cZhho8ykctLzT3Hzsp4i+t8uI3pyyiPIRyegV9fpMv4D3hZFYqMlDIw7RWgbn7IQ1QxL9LnQ3RNVI2t7r65HqUphQJcVrC8tQzMfPev065W3nV9lafuDcGJDfG9SW9QGKU16t0hhwFp4CMPJFWjQqd3FKzITvbevo/XiFeyVFdjBMPrOn0bz7n1I3QctGoE9eYzJif3rIlBs0mlqpAa3dGEORtAHKxiE/2wK4cuX0EqMoj81C1GZvynNdJokka7y1WrbsIUO29ChW3XmqcGJJN15tSNHgGoWoStXIer5VVkZS3CEcQK9NrxRqa6bCF5Mo1lbhxbwoz0Yg09aENduQfzKYuDdR2+Nuf0nECh8I8y/i0RqvKHOFt9US5Jeh6fqWocZHkCynuFVJ0FjrYzy3hHeuWGGsmkGby+sezferNQeSohncug5lIRGPHpHhrHn5WsWXGbQJoMUZAfs0Skx2VYJ/U+eI0SwwqqHbKsyKJulisztm5ZfaV5FWH5HtKO9ri03OCkb+YIX3BHvc1ZEYqfUZqGI+sJTyGzezaInxxCeO4Oe8QOuXyUWbijwGzPxNPDk+sFxAAAAAElFTkSuQmCC</mdui:Logo>
+                    <mdui:InformationURL xml:lang="fr">http://www.crous-lorraine.fr</mdui:InformationURL>
+                </mdui:UIInfo>
+            </md:Extensions>
+            <md:KeyDescriptor use="signing">
+                <ds:KeyInfo>
+                    <ds:X509Data>
+                        <ds:X509Certificate>MIIEQzCCAqugAwIBAgIUX9AaPLX/Qc9AEC5vIkafgQCS6PgwDQYJKoZIhvcNAQEL
+BQAwITEfMB0GA1UEAwwWaWRwNC5jcm91cy1sb3JyYWluZS5mcjAeFw0yMTAxMTEx
+MzM0MDBaFw00MTAxMTExMzM0MDBaMCExHzAdBgNVBAMMFmlkcDQuY3JvdXMtbG9y
+cmFpbmUuZnIwggGiMA0GCSqGSIb3DQEBAQUAA4IBjwAwggGKAoIBgQCoeNUz1sAV
+VCaZvFptT7Ur9rjhOze/ZdXL+ExZKlm2l6gpjBvHtQIDDMiP3Irusj/XhKSPnw60
+Kr3ITjXzwfKBVSlK4tUR7H7cdMM9NtDIXkhzVzo120uMhj+qMOacJ6rIBpSa56qy
+fbx0lkOknmbpfR4WJ3+IbIk00Q0XLOhMITgxw8Hi8xVReNnIj/kQrkkQie052hXg
+8ctXa3D420L0G+FpqU8EMELOrhE3LE7WTpiLDl5DdJtkF5m+d8gNxpSN3oWVCfuT
+zrnlYEP5kHkELXKXMN2cjJmzkuujR5g1wsD7Yojkh4vSHvb/KPvqkWrm8Y/gDI0r
+BD7a6mkAsn99BI9RdjfMYxDyUBTxonzbz1BWxCUILsdhinSAZSteAv4h0ku4gdLZ
+OiYKa88D0JTlqGAC/jUO748eZJlrdQO92slS3y+u7s9lNqrY3pHEv0yAVwHmy55C
+DfwCJf2+jKNb54ye8j1hD2QyhM8gx8dFVGt2q/skyOye7fSxzmgdagMCAwEAAaNz
+MHEwHQYDVR0OBBYEFKS2uMmA5znFfJPn8Fu0sourVohNMFAGA1UdEQRJMEeCFmlk
+cDQuY3JvdXMtbG9ycmFpbmUuZnKGLWh0dHBzOi8vaWRwNC5jcm91cy1sb3JyYWlu
+ZS5mci9pZHAvc2hpYmJvbGV0aDANBgkqhkiG9w0BAQsFAAOCAYEAUWf8URqlo8n/
+4UJcjxanBkCjyDkfJibV3JdVRZvTjZ2iNIMQpBzRahH2J8PaESIDK2eLGLhJTxPV
+H7ZnP3Q1tT0HBbNMgE4prbqBMsVyfY3PuwiJHMUEAz6UgnFrfV8hMMoACiW0kmmt
+GwXCLm7S0j+DaeSgS5awp5TfQr7eBqjPlLYs0trJ3/EZAV842O7j5QSCsjMNoqxP
+e0JX5Fh2zXF652VuMjrydhWcgYObTBpfyJatDyWs/Kde8HMU6bENI1H5MT7dlRhx
+SLfVWCGPMJ8LTTw/9CZGnryXv/HY/0lnMtFwtIikpdD8pm8KLaqTv7ug1yawQJ8H
+PTyhTdXn4o1d2MQ7B+QNJkP/hgJM0wy5PjnHgkpP6bIjVxW7ukYKmGyicvuX+3hR
+6nQ40G+yJkL5Ak8fDbxd+7Xlzpzn9Rxhr//aUbmb6oIUq5apqQ2VuYFTATDEK8SE
+RS4NruJwHov6M5WEytZ7n6C7Chc7kc+tYIsfYXgCvx+phgJYen15</ds:X509Certificate>
+                    </ds:X509Data>
+                </ds:KeyInfo>
+            </md:KeyDescriptor>
+            <md:NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</md:NameIDFormat>
+            <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat>
+            <md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://idp4.crous-lorraine.fr/idp/profile/SAML2/POST/SSO"/>
+            <md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://idp4.crous-lorraine.fr/idp/profile/SAML2/Redirect/SSO"/>
+            <md:SingleSignOnService Binding="urn:mace:shibboleth:1.0:profiles:AuthnRequest" Location="https://idp4.crous-lorraine.fr/idp/profile/Shibboleth/SSO"/>
+        </md:IDPSSODescriptor>
+        <md:Organization>
+            <md:OrganizationName xml:lang="en">CROUS de  Nancy-Metz</md:OrganizationName>
+            <md:OrganizationDisplayName xml:lang="en">CROUS de  Nancy-Metz</md:OrganizationDisplayName>
+            <md:OrganizationURL xml:lang="en">http://www.crous-lorraine.fr</md:OrganizationURL>
+        </md:Organization>
+        <md:ContactPerson contactType="technical">
+            <md:EmailAddress>mailto:informatique@crous-lorraine.fr</md:EmailAddress>
+        </md:ContactPerson>
+    </md:EntityDescriptor>
+</md:EntitiesDescriptor>

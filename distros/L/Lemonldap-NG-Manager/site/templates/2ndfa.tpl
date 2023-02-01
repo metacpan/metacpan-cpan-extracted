@@ -1,6 +1,9 @@
 <TMPL_INCLUDE NAME="header.tpl">
-
-  <title>LemonLDAP::NG 2nd Factor sessions explorer</title>
+  <TMPL_IF NAME="INSTANCE_NAME">
+    <title><TMPL_VAR NAME="INSTANCE_NAME"> 2nd Factor</title>
+  <TMPL_ELSE>
+    <title>LemonLDAP::NG 2nd Factor</title>
+  </TMPL_IF>
 </head>
 
 <body ng-app="llngSessionsExplorer" ng-controller="SessionsExplorerCtrl" ng-csp>

@@ -7,6 +7,7 @@
       <tr>
         <th trspan="name"></th>
         <th trspan="type"></th>
+        <th trspan="registerextra"></th>
         <th trspan="label"></th>
         <th trspan="logo"></th>
         <th trspan="level"></th>
@@ -23,6 +24,9 @@
           <select class="form-control" ng-model="currentNode.data.type">
             <option ng-repeat="item in _findContainer().select" ng-selected="item.k===currentNode.data.type" value="{{item.k}}">{{item.v}}</option>
           </select>
+        </td>
+        <td class="form-horizontal">
+          <input type="checkbox" class="form-control checkbox-inline" ng-model="currentNode.data.register" />
         </td>
         <td>
           <input class="form-control" ng-model="currentNode.data.label" />

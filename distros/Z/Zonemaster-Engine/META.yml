@@ -41,10 +41,10 @@ requires:
   Net::IP::XS: 0.21
   Readonly: 0
   Text::CSV: 0
-  Zonemaster::LDNS: 3
+  Zonemaster::LDNS: 3.001
   perl: 5.14.2
 resources:
   bugtracker: https://github.com/zonemaster/zonemaster-engine/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/zonemaster/zonemaster-engine
-version: '4.006000'
+version: '4.006001'

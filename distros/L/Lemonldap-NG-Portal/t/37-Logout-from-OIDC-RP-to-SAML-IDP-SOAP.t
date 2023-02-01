@@ -350,7 +350,7 @@ sub op {
                     'loa-3' => 3
                 },
                 oidcServicePrivateKeySig => oidc_key_op_private_sig,
-                oidcServicePublicKeySig  => oidc_key_op_public_sig,
+                oidcServicePublicKeySig  => oidc_cert_op_public_sig,
 
                 samlOrganizationDisplayName => "SP",
                 samlOrganizationName        => "SP",
@@ -372,7 +372,6 @@ sub op {
                     'idp' => {
                         'samlIDPMetaDataOptionsAdaptSessionUtime'        => 0,
                         'samlIDPMetaDataOptionsAllowLoginFromIDP'        => 0,
-                        'samlIDPMetaDataOptionsAllowProxiedAuthn'        => 0,
                         'samlIDPMetaDataOptionsCheckAudience'            => 1,
                         'samlIDPMetaDataOptionsCheckSLOMessageSignature' => 1,
                         'samlIDPMetaDataOptionsCheckSSOMessageSignature' => 1,

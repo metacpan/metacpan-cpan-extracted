@@ -1,19 +1,43 @@
 Revision history for Date-Parse-Modern
 
+0.4    2023-02-01
+
+	- Support for two new string forms
+
+	- Require Time::Local 1.26 because that's where timegm_local() was introduced
+
+	- Handle error messages a little better
+
+	- Better handle milliseconds, because they were breaking on Windows
+
+	- Lots of work done on unit tests to make them work on older Perl's and Windows
+
 0.3    2023-01-26
-       99% format parity with Date::Parse
-       Better debugging
-       Better memory usage for caching
-       Tons of code cleanup and comments
+
+	- 99% format parity with Date::Parse
+
+	- Better debugging
+
+	- Better memory usage for caching
+
+	- Tons of code cleanup and comments
 
 0.2    2023-01-14
-       Documentation updates
-       Debug cleanup and normalizing
-       Support more string formats
-       Make the unit tests more verbose for failures
-       Add an option to benchmark individual strings against Date::Parse
-       Add GitHub CI testing
-       Cache local TZ offset lookups for a major speed increase
+
+    - Documentation updates
+
+	- Debug cleanup and normalizing
+
+	- Support more string formats
+
+	- Make the unit tests more verbose for failures
+
+	- Add an option to benchmark individual strings against Date::Parse
+
+	- Add GitHub CI testing
+
+	- Cache local TZ offset lookups for a major speed increase
 
 0.1    2023-01-13
-       First version, released on an unsuspecting world.
+
+	- First version, released on an unsuspecting world.

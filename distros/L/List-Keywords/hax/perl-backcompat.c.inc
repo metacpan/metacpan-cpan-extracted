@@ -1,10 +1,18 @@
-/* vi: set ft=c */
+/* vi: set ft=c : */
 
 #define HAVE_PERL_VERSION(R, V, S) \
     (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
 
+#ifndef NOT_REACHED
+#  define NOT_REACHED  assert(0)
+#endif
+
 #ifndef SvTRUE_NN
 #  define SvTRUE_NN(sv)  SvTRUE(sv)
+#endif
+
+#ifndef G_LIST
+#  define G_LIST  G_ARRAY
 #endif
 
 #if !HAVE_PERL_VERSION(5, 18, 0)
@@ -15,12 +23,21 @@ typedef AV PADNAMELIST;
 typedef SV PADNAME;
 #  define PadnamePV(pn)           (SvPOKp(pn) ? SvPVX(pn) : NULL)
 #  define PadnameLEN(pn)          SvCUR(pn)
+#  define PadnameIsSTATE(pn)      (!!SvPAD_STATE(pn))
 #  define PadnameOUTER(pn)        (SvFAKE(pn) && !SvPAD_STATE(pn))
 #  define PadnamelistARRAY(pnl)   AvARRAY(pnl)
 #  define PadnamelistMAX(pnl)     AvFILLp(pnl)
 
 #  define PadARRAY(p)             AvARRAY(p)
 #  define PadMAX(pad)             AvFILLp(pad)
+#endif
+
+#if !HAVE_PERL_VERSION(5, 22, 0)
+#  define CvPADLIST_set(cv, padlist)  (CvPADLIST(cv) = padlist)
+#endif
+
+#ifndef av_count
+#  define av_count(av)           (AvFILL(av) + 1)
 #endif
 
 #ifndef av_top_index
@@ -43,6 +60,10 @@ typedef SV PADNAME;
 #  define intro_my()             Perl_intro_my(aTHX)
 #endif
 
+#ifndef pad_alloc
+#  define pad_alloc(a,b)         Perl_pad_alloc(aTHX_ a,b)
+#endif
+
 #ifndef CX_CUR
 #  define CX_CUR() (&cxstack[cxstack_ix])
 #endif
@@ -54,7 +75,7 @@ typedef SV PADNAME;
 #endif
 
 #ifndef OpSIBLING
-#  define OpSIBLING(op)  (op->op_sibling)
+#  define OpSIBLING(op)  ((op)->op_sibling)
 #endif
 
 #ifndef OpMORESIB_set
@@ -71,69 +92,31 @@ typedef SV PADNAME;
 static OP *S_op_convert_list(pTHX_ I32 type, I32 flags, OP *o)
 {
   /* A minimal recreation just for our purposes */
+  assert(
+    /* A hardcoded list of the optypes we know this will work for */
+    type == OP_ENTERSUB ||
+    type == OP_JOIN ||
+    type == OP_PUSH ||
+    0);
+
   o->op_type = type;
   o->op_flags |= flags;
   o->op_ppaddr = PL_ppaddr[type];
 
   o = PL_check[type](aTHX_ o);
 
+  /* op_std_init() */
+  if(PL_opargs[type] & OA_RETSCALAR)
+    o = op_contextualize(o, G_SCALAR);
+  if(PL_opargs[type] & OA_TARGET && !o->op_targ)
+    o->op_targ = pad_alloc(type, SVs_PADTMP);
+
   return o;
 }
 #endif
 
-#ifndef op_sibling_splice
-#  define op_sibling_splice(parent, start, del_count, insert)  S_op_sibling_splice(aTHX_ parent, start, del_count, insert)
-static OP *S_op_sibling_splice(pTHX_ OP *parent, OP *start, int del_count, OP *insert)
-{
-  OP *deleted = NULL;
-
-  if(!insert && !del_count)
-    return NULL;
-
-  OP **prevp;
-  if(start)
-    prevp = &(start->op_sibling);
-  else
-    prevp = &(cLISTOPx(parent)->op_first);
-
-  OP *after = *prevp;
-
-  if(del_count) {
-    croak("Back-compat op_sibling_splice with del_count != 0 not yet implemented");
-    /* THIS IS AS YET UNTESTED
-    deleted = *prevp;
-    OP *o = deleted;
-    while(del_count > 1)
-      o = o->op_sibling, del_count--;
-    after = o->op_sibling;
-    o->op_sibling = NULL;
-    */
-  }
-
-  if(insert) {
-    *prevp = insert;
-    OP *o = insert;
-    while(o->op_sibling)
-      o = o->op_sibling;
-    o->op_sibling = after;
-  }
-  else
-    *prevp = after;
-
-  return deleted;
-}
-#endif
-
-#if HAVE_PERL_VERSION(5,28,0)
-#  define optimize_optree(op)  Perl_optimize_optree(aTHX_ op)
-#else
-#  define optimize_optree(op)
-#endif
-
-#if HAVE_PERL_VERSION(5,16,0)
-#  define finalize_optree(op)  Perl_finalize_optree(aTHX_ op)
-#else
-#  define finalize_optree(op)
+#ifndef newMETHOP_named
+#  define newMETHOP_named(type, flags, name)  newSVOP(type, flags, name)
 #endif
 
 #ifndef PARENT_PAD_INDEX_set
@@ -149,11 +132,71 @@ static OP *S_op_sibling_splice(pTHX_ OP *parent, OP *start, int del_count, OP *i
 /* On Perl 5.14 this had a different name */
 #ifndef pad_add_name_pvn
 #define pad_add_name_pvn(name, len, flags, typestash, ourstash)  MY_pad_add_name(aTHX_ name, len, flags, typestash, ourstash)
-PADOFFSET MY_pad_add_name(pTHX_ const char *name, STRLEN len, U32 flags, HV *typestash, HV *ourstash)
+static PADOFFSET MY_pad_add_name(pTHX_ const char *name, STRLEN len, U32 flags, HV *typestash, HV *ourstash)
 {
   /* perl 5.14's Perl_pad_add_name requires a NUL-terminated name */
   SV *namesv = sv_2mortal(newSVpvn(name, len));
 
   return Perl_pad_add_name(aTHX_ SvPV_nolen(namesv), SvCUR(namesv), flags, typestash, ourstash);
+}
+#endif
+
+#if !HAVE_PERL_VERSION(5, 26, 0)
+#  define isIDFIRST_utf8_safe(s, e)  (PERL_UNUSED_ARG(e), isIDFIRST_utf8(s))
+#  define isIDCONT_utf8_safe(s, e)   (PERL_UNUSED_ARG(e), isIDCONT_utf8(s))
+#endif
+
+#ifndef CXp_EVALBLOCK
+/* before perl 5.34 this was called CXp_TRYBLOCK */
+#  define CXp_EVALBLOCK CXp_TRYBLOCK
+#endif
+
+#if !HAVE_PERL_VERSION(5, 26, 0)
+#  define sv_set_undef(sv)  sv_setsv(sv, &PL_sv_undef)
+#endif
+
+#ifndef newAVav
+#  define newAVav(av)  S_newAVav(aTHX_ av)
+static AV *S_newAVav(pTHX_ AV *av)
+{
+  AV *ret = newAV();
+  U32 count = av_count(av);
+  U32 i;
+  for(i = 0; i < count; i++)
+    av_push(ret, newSVsv(AvARRAY(av)[i]));
+  return ret;
+}
+#endif
+
+#if !defined(sv_derived_from_hv) && HAVE_PERL_VERSION(5, 16, 0)
+#  define sv_derived_from_hv(sv, hv)  MY_sv_derived_from_hv(aTHX_ sv, hv)
+static bool MY_sv_derived_from_hv(pTHX_ SV *sv, HV *hv)
+{
+  char *hvname = HvNAME(hv);
+  if(!hvname)
+    return FALSE;
+
+  return sv_derived_from_pvn(sv, hvname, HvNAMELEN(hv), HvNAMEUTF8(hv) ? SVf_UTF8 : 0);
+}
+#endif
+
+#ifdef PERL_USE_GCC_BRACE_GROUPS
+#  define xV_FROM_REF(XV, ref)  \
+  ({ SV *_ref = ref; assert(SvROK(_ref)); assert(SvTYPE(SvRV(_ref)) == SVt_PV ## XV); (XV *)(SvRV(_ref)); })
+#else
+#  define xV_FROM_REF(XV, ref)  ((XV *)SvRV(ref))
+#endif
+
+#define AV_FROM_REF(ref)  xV_FROM_REF(AV, ref)
+#define CV_FROM_REF(ref)  xV_FROM_REF(CV, ref)
+#define HV_FROM_REF(ref)  xV_FROM_REF(HV, ref)
+
+#ifndef newPADxVOP
+#  define newPADxVOP(type, flags, padix)  S_newPADxVOP(aTHX_ type, flags, padix)
+static OP *S_newPADxVOP(pTHX_ I32 type, I32 flags, PADOFFSET padix)
+{
+  OP *op = newOP(type, flags);
+  op->op_targ = padix;
+  return op;
 }
 #endif

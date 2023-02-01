@@ -81,7 +81,7 @@ FUNCTIONS
     Default: 64
 
   w
-      w('filename.mid')
+      w("filename.mid")
 
     Write score to a file.
 

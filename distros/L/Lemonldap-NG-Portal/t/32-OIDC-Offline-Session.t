@@ -26,7 +26,7 @@ sub runTest {
     $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{french}->{cn} =
       'Frédéric Accents';
 
-    my $code = authorize(
+    my $code = codeAuthorize(
         $op, $idpId,
         {
             response_type => "code",
@@ -203,7 +203,7 @@ my $baseConfig = {
             }
         },
         oidcServicePrivateKeySig => oidc_key_op_private_sig,
-        oidcServicePublicKeySig  => oidc_key_op_public_sig,
+        oidcServicePublicKeySig  => oidc_cert_op_public_sig,
     }
 };
 

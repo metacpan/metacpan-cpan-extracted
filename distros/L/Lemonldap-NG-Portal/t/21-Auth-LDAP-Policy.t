@@ -22,7 +22,7 @@ SKIP: {
                 userDB                   => 'Same',
                 passwordDB               => 'LDAP',
                 portalRequireOldPassword => 1,
-                ldapServer               => 'ldap://127.0.0.1:19389/',
+                ldapServer               => $main::slapd_url,
                 ldapBase                 => 'ou=users,dc=example,dc=com',
                 managerDn       => 'cn=lemonldapng,ou=dsa,dc=example,dc=com',
                 managerPassword => 'lemonldapng',
@@ -255,5 +255,4 @@ m%<input id="staticUser" type="text" readonly class="form-control" value="$user"
 }
 count($maintests);
 clean_sessions();
-stopLdapServer() if $ENV{LLNGTESTLDAP};
 done_testing( count() );

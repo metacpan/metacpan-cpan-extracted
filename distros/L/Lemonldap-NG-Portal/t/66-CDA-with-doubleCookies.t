@@ -50,7 +50,7 @@ my $httpid = expectCookie( $res, 'lemonldaphttp' );
 ok(
     $res = $client->_get(
         '/',
-        query  => 'url=' . encodeUrl('http://test.example.org/'),
+        query  => buildForm( { url => encodeUrl('http://test.example.org/') } ),
         accept => 'text/html',
         cookie => "lemonldap=$id, lemonldaphttp=$httpid",
         secure => 1,
@@ -68,7 +68,7 @@ validateCda( $query, 'http' );
 ok(
     $res = $client->_get(
         '/',
-        query  => 'url=' . encodeUrl('https://test.example.org/'),
+        query => buildForm( { url => encodeUrl('https://test.example.org/') } ),
         accept => 'text/html',
         cookie => "lemonldap=$id, lemonldaphttp=$httpid",
         secure => 1,
@@ -86,7 +86,7 @@ validateCda( $query, 'https' );
 ok(
     $res = $client->_get(
         '/',
-        query  => 'url=' . encodeUrl('http://test.example.org/'),
+        query  => buildForm( { url => encodeUrl('http://test.example.org/') } ),
         accept => 'text/html',
         cookie => "lemonldap=$id, lemonldaphttp=$httpid",
         secure => 0,

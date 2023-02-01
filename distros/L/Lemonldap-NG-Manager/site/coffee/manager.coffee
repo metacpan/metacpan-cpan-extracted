@@ -486,7 +486,7 @@ llapp.controller 'TreeCtrl', [
 			_getAll($scope.currentNode).then ->
 				while cs.$modelValue.title != "#{type}s"
 					cs = cs.$parentNodeScope
-				t = JSON.parse JSON.stringify($scope.currentNode).replace(new RegExp(idkey, 'g'), 'new__' + name)
+				t = JSON.parse JSON.stringify($scope.currentNode).replace(/[*]/g, '').replace(new RegExp(idkey, 'g'), 'new__' + name)
 				t.id = "#{type}s/new__#{name}"
 				t.title = name
 				cs.$modelValue.nodes.push(t)
@@ -716,6 +716,17 @@ llapp.controller 'TreeCtrl', [
 				, readError
 			, ->
 				console.log('New key cancelled')
+
+		$scope.newCertificateNoPassword = ->
+			$scope.waiting = true
+			currentNode = $scope.currentNode
+			$http.post("#{window.confPrefix}/newCertificate", {"password": ''}).then (response) ->
+				currentNode.data[0].data = response.data.private
+				currentNode.data[1].data = response.data.public
+				currentNode.data[2].data = response.data.hash
+				$scope.waiting = false
+			, readError
+
 		$scope.newRSAKey = ->
 			$scope.showModal('password.html').then ->
 				$scope.waiting = true
@@ -730,17 +741,6 @@ llapp.controller 'TreeCtrl', [
 			, ->
 				console.log('New key cancelled')
 
-		$scope.newRSAKeyNoPassword = ->
-			$scope.waiting = true
-			currentNode = $scope.currentNode
-			$http.post("#{window.confPrefix}/newRSAKey", {"password": ''}).then (response) ->
-				currentNode.data[0].data = response.data.private
-				currentNode.data[1].data = response.data.public
-				currentNode.data[2].data = response.data.hash
-				$scope.waiting = false
-			, readError
-
-		# method `getKey()`:
 		# - return a promise with the data:
 		# 	- from node when set
 		# 	- after downloading else

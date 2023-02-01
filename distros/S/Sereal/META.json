@@ -32,8 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Sereal::Decoder" : "5.001",
-            "Sereal::Encoder" : "5.001",
+            "Sereal::Decoder" : "5.002",
+            "Sereal::Encoder" : "5.002",
             "perl" : "5.008"
          }
       },
@@ -42,8 +42,8 @@
             "Data::Dumper" : "0",
             "File::Spec" : "0",
             "Scalar::Util" : "0",
-            "Sereal::Decoder" : "5.001",
-            "Sereal::Encoder" : "5.001",
+            "Sereal::Decoder" : "5.002",
+            "Sereal::Encoder" : "5.002",
             "Test::Deep" : "0",
             "Test::Differences" : "0",
             "Test::LongString" : "0",
@@ -62,6 +62,6 @@
          "url" : "git://github.com/Sereal/Sereal.git"
       }
    },
-   "version" : "5.001",
-   "x_serialization_backend" : "JSON::PP version 4.11"
+   "version" : "5.002",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

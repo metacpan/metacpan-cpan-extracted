@@ -40,7 +40,7 @@ use constant {
     MAX_WEBSOCKET_SIZE         => 262_144,
 };
 
-our $VERSION = "v0.0.31";
+our $VERSION = "v0.0.32";
 
 has _listener_observables => sub { +{} };
 
@@ -904,7 +904,7 @@ sub register ($self, $app, $config) {
             };
         })->pipe(
             # wait until all clients have been sent their message before going on to the next msg
-            op_concat_map(sub ($payload) {
+            op_concat_map(sub ($payload, @) {
                 my @conns = $registry->get_conns_of_stream($stream_name)->@*;
                 my $msg = {
                     type   => 'eventPatch',

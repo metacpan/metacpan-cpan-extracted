@@ -218,7 +218,7 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
     expectOK($res);
     ok(
         $res->[2]->[0] =~
-qr%<h3 trspan="oneExpired2Fremoved, \d{10}">oneExpired2Fremoved, \d{10}</h3>%,
+qr%<h3 trspan="oneExpired2Fremoved, MyU2F">oneExpired2Fremoved, MyU2F</h3>%,
         'Found expired 2F message'
     ) or print STDERR Dumper( $res->[2]->[0] );
     my $c = getCookies($res);

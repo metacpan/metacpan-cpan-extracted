@@ -6,7 +6,7 @@ use warnings;
 use Carp 'croak';
 use Module::Load 'load';
 
-our $VERSION = "v6.14.0";
+our $VERSION = "v6.19.0";
 
 # Abstract base class for RxPerl::AnyEvent, RxPerl::IOAsync and RxPerl::Mojo
 

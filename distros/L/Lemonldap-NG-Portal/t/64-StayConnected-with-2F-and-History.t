@@ -191,7 +191,6 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
     ok( not($@), 'Content is JSON' )
       or explain( $res->[2]->[0], 'JSON content' );
     ok( $res->{result} == 1, 'TOTP is registered' );
-    $client->logout($id);
 
     # Try to authenticate with TOTP
     # -----------------------------
@@ -271,8 +270,6 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
     ok( $res->[2]->[0] =~ m%<span trspan="yourApps">Your applications</span>%,
         ' Apps menu found' )
       or print STDERR Dumper( $res->[2]->[0] );
-
-    $client->logout($id);
 
     # Try to authenticate with U2F
     # ----------------------------
@@ -388,8 +385,6 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
         ' Apps menu found' )
       or explain( $res->[2]->[0], 'Apps menu' );
 
-    $client->logout($id);
-
     # Try to connect with persistent connection cookie
     ok(
         $res = $client->_get(
@@ -453,7 +448,6 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
     ok( $res->[2]->[0] =~ m%<span trspan="yourApps">Your applications</span>%,
         ' Apps menu found' )
       or print STDERR Dumper( $res->[2]->[0] );
-    $client->logout($id);
 
     # Try to connect with persistent connection cookie
     ok(
@@ -553,7 +547,6 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
         ' Apps menu found' )
       or print STDERR Dumper( $res->[2]->[0] );
 
-    $client->logout($id);
 }
 
 count($maintests);

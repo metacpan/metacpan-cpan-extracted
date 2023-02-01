@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
 
-package Future::IO::ImplBase;
+package Future::IO::ImplBase 0.12;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.11';
 
 use Errno qw( EAGAIN EWOULDBLOCK EINPROGRESS );
 use Socket qw( SOL_SOCKET SO_ERROR );

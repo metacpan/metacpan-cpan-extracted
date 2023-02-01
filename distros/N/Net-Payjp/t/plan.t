@@ -3,123 +3,48 @@
 use strict;
 use warnings;
 
+use Test::Mock::LWP;
+use Test::More tests => 15;
+
 use Net::Payjp;
-use Test::More tests => 11;
 
-my $api_key = 'sk_test_c62fade9d045b54cd76d7036';
-my $payjp = Net::Payjp->new(api_key => $api_key);
-my $res;
-
-
+my $payjp = Net::Payjp->new(api_key => 'api_key');
 isa_ok($payjp->plan, 'Net::Payjp::Plan');
+can_ok($payjp->plan, qw(retrieve create all save delete));
 
+$Mock_resp->mock( content => sub { '{"id":"res1"}' } );
+$Mock_resp->mock( code => sub {200}  );
+$Mock_ua->mock( timeout => sub {} );
+$Mock_ua->mock( default_header => sub {}  );
 
 #Create
-can_ok($payjp->plan, 'create');
-#$res = $payjp->plan->create(
-#  amount => 500,
-#  currency => "jpy",
-#  interval => "month",
-#  trial_days => 30,
-#  name => 'test_plan'
-#);
-$res = $payjp->_to_object(JSON->new->decode(q(
-{
-  "amount": 500,
-  "billing_day": null,
-  "created": 1433127983,
-  "currency": "jpy",
-  "id": "pln_45dd3268a18b2837d52861716260",
-  "interval": "month",
-  "livemode": false,
-  "name": null,
-  "object": "plan",
-  "trial_days": 30
-}
-)));
-is($res->object, 'plan', 'got a plan object back');
+my $plan = $payjp->plan;
+$plan->create();
+is($Mock_req->{new_args}[1], 'POST');
+is($Mock_req->{new_args}[2], 'https://api.pay.jp/v1/plans');
+is($plan->id, 'res1');
 
+#retrieve
+$payjp->plan->retrieve;
+is($Mock_req->{new_args}[1], 'GET');
+is($Mock_req->{new_args}[2], 'https://api.pay.jp/v1/plans/');
 
-#Set pln_id.
-$payjp->id($res->id);
-
-
-#Retrieve
-can_ok($payjp->plan, 'retrieve');
-#$res = $payjp->plan->retrieve;
-$res = $payjp->_to_object(JSON->new->decode(q(
-{
-  "amount": 500,
-  "billing_day": null,
-  "created": 1433127983,
-  "currency": "jpy",
-  "id": "pln_45dd3268a18b2837d52861716260",
-  "interval": "month",
-  "livemode": false,
-  "name": null,
-  "object": "plan",
-  "trial_days": 30
-}
-)));
-is($res->object, 'plan', 'got a plan object back');
-
+$plan->retrieve;
+is($Mock_req->{new_args}[1], 'GET');
+is($Mock_req->{new_args}[2], 'https://api.pay.jp/v1/plans/res1');
 
 #Update
-can_ok($payjp->plan, 'save');
-#$res = $payjp->plan->save(name => 'update plan');
-$res = $payjp->_to_object(JSON->new->decode(q(
-{
-  "amount": 500,
-  "billing_day": null,
-  "created": 1433127983,
-  "currency": "jpy",
-  "id": "pln_45dd3268a18b2837d52861716260",
-  "interval": "month",
-  "livemode": false,
-  "name": "NewPlan",
-  "object": "plan",
-  "trial_days": 30
-})));
-is($res->object, 'plan', 'got a plan object back');
-
+$plan->save();
+is($Mock_req->{new_args}[1], 'POST');
+is($Mock_req->{new_args}[2], 'https://api.pay.jp/v1/plans/res1');
 
 #Delete
-can_ok($payjp->plan, 'delete');
-#$res = $payjp->plan->delete;
-$res = $payjp->_to_object(JSON->new->decode(q(
-{
-  "deleted": true,
-  "id": "pln_45dd3268a18b2837d52861716260",
-  "livemode": false
-}
-)));
-ok($res->deleted, 'delete was successful');
-
+$plan->delete;
+is($Mock_req->{new_args}[1], 'DELETE');
+is($Mock_req->{new_args}[2], 'https://api.pay.jp/v1/plans/res1');
 
 #List
-can_ok($payjp->plan, 'all');
-#$res = $payjp->plan->all("limit" => 5, "offset" => 0);
-$res = $payjp->_to_object(JSON->new->decode(q(
-{
-  "count": 3,
-  "data": [
-    {
-      "amount": 1000,
-      "billing_day": null,
-      "created": 1432965397,
-      "currency": "jpy",
-      "id": "pln_acfbc08ae710da03ac2a3fcb2334",
-      "interval": "month",
-      "livemode": false,
-      "name": "test plan",
-      "object": "plan",
-      "trial_days": 0
-    }
-  ],
-  "has_more": true,
-  "object": "list",
-  "url": "/v1/plans"
-}
-)));
-is($res->object, 'list', 'got a list object back');
+$payjp->plan->all(limit => 3);
+is($Mock_req->{new_args}[1], 'GET');
+is($Mock_req->{new_args}[2], 'https://api.pay.jp/v1/plans?limit=3');
 

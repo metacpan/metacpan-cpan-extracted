@@ -26,7 +26,7 @@ use JSON;
 
 requires qw(p conf logger);
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.0.16';
 
 =item update2fDevice
 
@@ -104,7 +104,7 @@ sub add2fDevice {
 
     push @{$_2fDevices}, $device;
     $self->logger->debug(
-        "Append 2F Device: { type => $device->{type}, name => $device->{name} }"
+        "Append 2F device: { type => $device->{type}, name => $device->{name} }"
     );
     $self->p->updatePersistentSession( $req,
         { _2fDevices => to_json($_2fDevices) } );
@@ -136,7 +136,7 @@ Returns true if the update was sucessful
 sub del2fDevices {
     my ( $self, $req, $info, $devices ) = @_;
 
-    return 0 unless ( ref($devices) eq "ARRAY" );
+    return 0 unless ( ref($devices) eq 'ARRAY' );
 
     my $_2fDevices = $self->get2fDevices( $req, $info );
     return 0 unless $_2fDevices;
@@ -145,7 +145,7 @@ sub del2fDevices {
     my $need_update       = 0;
 
     for my $device_spec (@$devices) {
-        next unless ( ref($device_spec) eq "HASH" );
+        next unless ( ref($device_spec) eq 'HASH' );
         my $type  = $device_spec->{type};
         my $epoch = $device_spec->{epoch};
         next unless ( $type and $epoch );
@@ -157,14 +157,14 @@ sub del2fDevices {
         if ( @updated_2fDevices < $size_before ) {
             $need_update = 1;
             $self->logger->debug(
-                "Deleted 2F Device: { type => $type, epoch => $epoch }");
+                "Deleted 2F device: { type => $type, epoch => $epoch }");
         }
     }
 
-    if ($need_update) {
-        $self->p->updatePersistentSession( $req,
-            { _2fDevices => to_json( [@updated_2fDevices] ) } );
-    }
+    $self->p->updatePersistentSession( $req,
+        { _2fDevices => to_json( [@updated_2fDevices] ) } )
+      if $need_update;
+
     return 1;
 }
 
@@ -250,8 +250,9 @@ Returns an arrayref of all registrable devices, or undef if an error occured
 
 sub get2fDevices {
     my ( $self, $req, $info ) = @_;
-
     my $_2fDevices;
+
+    $self->logger->debug("Looking for 2F devices...");
     if ( $info->{_2fDevices} ) {
         $_2fDevices =
           eval { from_json( $info->{_2fDevices}, { allow_nonref => 1 } ); };
@@ -264,12 +265,7 @@ sub get2fDevices {
         # Return new ArrayRef
         return [];
     }
-    if ( ref($_2fDevices) eq "ARRAY" ) {
-        return $_2fDevices;
-    }
-    else {
-        return;
-    }
+    return ref($_2fDevices) eq 'ARRAY' ? $_2fDevices : undef;
 }
 
 =item find2fDevicesByType
@@ -295,14 +291,15 @@ Returns an array of all matching devices
 
 sub find2fDevicesByType {
     my ( $self, $req, $info, $type ) = @_;
-
     my $_2fDevices = $self->get2fDevices( $req, $info );
-    return unless $_2fDevices;
-
+    return                unless $_2fDevices;
     return @{$_2fDevices} unless $type;
+
     my @found = grep { $_->{type} eq $type } @{$_2fDevices};
+    $self->logger->debug("Return $type");
     return @found;
 }
+
 1;
 
 =back

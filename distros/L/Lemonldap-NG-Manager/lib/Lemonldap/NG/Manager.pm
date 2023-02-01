@@ -17,7 +17,7 @@ use JSON;
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::PSGI::Constants;
 
-our $VERSION = '2.0.15.1';
+our $VERSION = '2.0.16';
 
 extends qw(
   Lemonldap::NG::Handler::PSGI::Router
@@ -126,6 +126,7 @@ sub init {
         'notifications' => 'bell',
         '2ndFA'         => 'wrench',
         'viewer'        => 'eye-open',
+        'api'           => 'flash'
     };
 
     $self->links( [] );
@@ -147,6 +148,7 @@ sub init {
         : $conf->{portal}
       )
     {
+        $portal = $self->customPortalUrl || $portal;
         push @{ $self->menuLinks },
           {
             target => $portal,

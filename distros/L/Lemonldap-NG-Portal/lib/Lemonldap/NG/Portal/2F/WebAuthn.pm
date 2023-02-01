@@ -17,7 +17,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
 );
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.0.16';
 
 extends 'Lemonldap::NG::Portal::Main::SecondFactor';
 with 'Lemonldap::NG::Portal::Lib::WebAuthn';
@@ -36,9 +36,7 @@ sub init {
     $self->conf->{webauthn2fActivation} = 'has2f("WebAuthn")'
       if $self->conf->{webauthn2fActivation} eq '1';
 
-    return 0 unless $self->SUPER::init();
-
-    return 1;
+    return $self->SUPER::init() ? 1 : 0;
 }
 
 # RUNNING METHODS
@@ -46,34 +44,25 @@ sub init {
 # Main method
 sub run {
     my ( $self, $req, $token ) = @_;
-
-    my $user        = $req->user;
-    my $checkLogins = $req->param('checkLogins');
-    $self->logger->debug("WebAuthn: checkLogins set") if $checkLogins;
-
-    my $stayconnected = $req->param('stayconnected');
-    $self->logger->debug("WebAuthn: stayconnected set") if $stayconnected;
-
     my $request = $self->generateChallenge( $req, $req->sessionInfo );
-
     unless ($request) {
         $self->logger->error(
-            "No registered WebAuthn devices for " . $req->user );
+            $self->prefix . '2f: no registered device for ' . $req->user );
         return PE_ERROR;
     }
 
     $self->ott->updateToken( $token, _webauthn_request => $request );
 
+    # Prepare form
+    my ( $checkLogins, $stayConnected ) = $self->getFormParams($req);
     my $tmp = $self->p->sendHtml(
         $req,
         'webauthn2fcheck',
         params => {
-            MAIN_LOGO     => $self->conf->{portalMainLogo},
-            SKIN          => $self->p->getSkin($req),
             DATA          => to_json( { request => $request } ),
             TOKEN         => $token,
             CHECKLOGINS   => $checkLogins,
-            STAYCONNECTED => $stayconnected
+            STAYCONNECTED => $stayConnected
         }
     );
 
@@ -83,13 +72,12 @@ sub run {
 
 sub verify {
     my ( $self, $req, $session ) = @_;
-
-    my $user = $session->{ $self->conf->{whatToTrace} };
-
+    my $user            = $session->{ $self->conf->{whatToTrace} };
     my $credential_json = $req->param('credential');
 
     unless ($credential_json) {
-        $self->logger->error('Missing signature parameter');
+        $self->logger->error(
+            $self->prefix . '2f: missing signature parameter' );
         return PE_ERROR;
     }
 
@@ -101,7 +89,8 @@ sub verify {
             $credential_json );
     };
     if ($@) {
-        $self->logger->error("Webauthn validation error for $user: $@");
+        $self->logger->error(
+            $self->prefix . "2f: validation error for $user ($@)" );
         return PE_ERROR;
     }
 
@@ -110,7 +99,7 @@ sub verify {
     }
     else {
         $self->logger->error(
-            "Webauthn validation did not return success for $user");
+            $self->prefix . "2f: validation did not return success for $user" );
         return PE_ERROR;
     }
 }

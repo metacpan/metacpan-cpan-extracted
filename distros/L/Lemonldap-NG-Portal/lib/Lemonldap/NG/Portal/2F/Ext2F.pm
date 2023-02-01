@@ -4,15 +4,15 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
-  PE_NOTOKEN
-  PE_TOKENEXPIRED
   PE_ERROR
   PE_BADOTP
+  PE_NOTOKEN
   PE_FORMEMPTY
   PE_SENDRESPONSE
+  PE_TOKENEXPIRED
 );
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.0.16';
 
 extends 'Lemonldap::NG::Portal::Lib::Code2F';
 
@@ -21,29 +21,29 @@ extends 'Lemonldap::NG::Portal::Lib::Code2F';
 # Prefix can overriden by sfExtra and is used for routes
 has prefix => ( is => 'rw', default => 'ext' );
 
-# Type is used to lookup config
-has type   => ( is => 'ro', default => 'ext' );
-has legend => ( is => 'rw', default => 'enterExt2fCode' );
+# Used to lookup config
+has conf_type => ( is => 'ro', default => 'ext' );
+has legend    => ( is => 'rw', default => 'enterExt2fCode' );
 
 sub init {
     my ($self) = @_;
 
     if ( $self->code_activation ) {
         unless ( $self->conf->{ext2FSendCommand} ) {
-            $self->error("Missing 'ext2FSendCommand' parameter, aborting");
+            $self->error( $self->prefix
+                  . '2f: missing "ext2FSendCommand" parameter, aborting' );
             return 0;
         }
     }
     else {
         foreach (qw(ext2FSendCommand ext2FValidateCommand)) {
             unless ( $self->conf->{$_} ) {
-                $self->error("Missing $_ parameter, aborting");
+                $self->error(
+                    $self->prefix . "2f: missing \"$_\" parameter, aborting" );
                 return 0;
             }
         }
     }
-
-    $self->prefix( $self->conf->{sfPrefix} ) if ( $self->conf->{sfPrefix} );
     return $self->SUPER::init();
 }
 
@@ -53,15 +53,18 @@ sub verify_external {
     my ( $self, $req, $session, $code ) = @_;
 
     # Prepare command and launch it
-    $self->logger->debug( 'Launching "Validate" external 2F command -> '
+    $self->logger->debug( $self->prefix
+          . '2f: launching "Validate" command -> '
           . $self->conf->{ext2FValidateCommand} );
     $self->logger->debug(" code -> $code");
     if ( my $c =
         $self->launch( $session, $self->conf->{ext2FValidateCommand}, $code ) )
     {
-        $self->userLogger->warn( 'Second factor failed for '
+        $self->userLogger->warn( $self->prefix
+              . '2f: validation failed for '
               . $session->{ $self->conf->{whatToTrace} } );
-        $self->logger->error("External verify command failed (code $c)");
+        $self->logger->error(
+            $self->prefix . "2f: validate command failed ($c)" );
         return PE_BADOTP;
     }
     return PE_OK;
@@ -71,12 +74,13 @@ sub sendCode {
     my ( $self, $req, $sessionInfo, $code ) = @_;
 
     # Prepare command and launch it
-    $self->logger->debug( 'Launching "Send" external 2F command -> '
+    $self->logger->debug( $self->prefix
+          . '2f: launching "Send" command -> '
           . $self->conf->{ext2FSendCommand} );
     if ( my $c =
         $self->launch( $sessionInfo, $self->conf->{ext2FSendCommand}, $code ) )
     {
-        $self->logger->error("External send command failed (code $c)");
+        $self->logger->error( $self->prefix . "2f: send command failed ($c)" );
         return 0;
     }
     return 1;
@@ -93,7 +97,8 @@ sub launch {
         s#\$(\w+)#$session->{$1} // ''#ge;
         push @args, $_;
     }
-    $self->logger->debug( "Executing command: " . join( " ", @args ) );
+    $self->logger->debug(
+        $self->prefix . "2f: executing command: " . join( " ", @args ) );
     return system @args;
 }
 

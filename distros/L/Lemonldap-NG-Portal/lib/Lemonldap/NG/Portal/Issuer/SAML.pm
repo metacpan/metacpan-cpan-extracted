@@ -17,7 +17,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SAML_SLO_ERROR
   PE_SAML_SSO_ERROR
   PE_ISSUERMISSINGREQATTR
-  PE_SAML_UNKNOWN_ENTITY
+  PE_UNKNOWNPARTNER
   PE_SAML_SERVICE_NOT_ALLOWED
   PE_UNAUTHORIZEDPARTNER
 );
@@ -188,7 +188,7 @@ sub storeEnv {
     return PE_OK if ( $artifact or !$request );
     my $login = $self->createLogin( $self->lassoServer );
     $self->disableSignatureVerification($login);
-    $self->processAuthnRequestMsg( $login, $request, 'debug' );
+    $self->processAuthnRequestMsgWithError( $login, $request, 'debug' );
     if ( my $sp = $login->remote_providerID() ) {
         $req->env->{llng_saml_sp} = $sp;
         if ( my $spConfKey = $self->spList->{$sp}->{confKey} ) {
@@ -196,8 +196,7 @@ sub storeEnv {
 
             # Store target authentication level in pdata
             my $targetAuthnLevel =
-              $self->conf->{samlSPMetaDataOptions}->{$spConfKey}
-              ->{samlSPMetaDataOptionsAuthnLevel};
+              $self->spOptions->{$sp}->{samlSPMetaDataOptionsAuthnLevel};
             $req->pdata->{targetAuthnLevel} = $targetAuthnLevel
               if $targetAuthnLevel;
         }
@@ -333,18 +332,19 @@ sub run {
                     }
                 }
                 else {
+                    $self->lazy_load_entityid($idp_initiated_sp);
+
                     unless ( defined $self->spList->{$idp_initiated_sp} ) {
                         $self->userLogger->error(
                             "SP $idp_initiated_sp not known");
-                        return PE_SAML_UNKNOWN_ENTITY;
+                        return PE_UNKNOWNPARTNER;
                     }
                     $idp_initiated_spConfKey =
                       $self->spList->{$idp_initiated_sp}->{confKey};
                 }
 
                 # Check if IDP Initiated SSO is allowed
-                unless ( $self->conf->{samlSPMetaDataOptions}
-                    ->{$idp_initiated_spConfKey}
+                unless ( $self->spOptions->{$idp_initiated_sp}
                     ->{samlSPMetaDataOptionsEnableIDPInitiatedURL} )
                 {
                     $self->userLogger->error(
@@ -365,8 +365,7 @@ sub run {
 
                 # Force NameID Format
                 my $nameIDFormatKey =
-                  $self->conf->{samlSPMetaDataOptions}
-                  ->{$idp_initiated_spConfKey}
+                  $self->spOptions->{$idp_initiated_sp}
                   ->{samlSPMetaDataOptionsNameIDFormat} || "email";
                 eval {
 
@@ -384,18 +383,33 @@ sub run {
                 }
             }
 
+            my $lasso_error;
+
             # Process authentication request
             if ($artifact) {
                 $result = $self->processArtResponseMsg( $login, $request );
             }
             else {
-                $result = $self->processAuthnRequestMsg( $login, $request );
+                ( $result, $lasso_error ) =
+                  $self->processAuthnRequestMsgWithError( $login, $request );
             }
 
             unless ($result) {
-                $self->logger->error(
-                    "SSO: Fail to process authentication request");
-                return PE_SAML_SSO_ERROR;
+                if ( $lasso_error ==
+                    Lasso::Constants::SERVER_ERROR_PROVIDER_NOT_FOUND )
+                {
+                    my $sp = eval { $login->remote_providerID() };
+                    $self->logger->error(
+                            "SSO: Incoming entity ID $sp was not found"
+                          . " in registered Service Providers metadata." );
+
+                    return PE_UNKNOWNPARTNER;
+                }
+                else {
+                    $self->logger->error(
+                        "SSO: Fail to process authentication request");
+                    return PE_SAML_SSO_ERROR;
+                }
             }
 
             # Get SP entityID
@@ -407,24 +421,27 @@ sub run {
             unless ($spConfKey) {
                 $self->userLogger->error(
                     "$sp do not match any SP in configuration");
-                return PE_SAML_UNKNOWN_ENTITY;
+                return PE_UNKNOWNPARTNER;
             }
             $self->logger->debug("$sp match $spConfKey SP in configuration");
 
             # Do we check signature?
             my $checkSSOMessageSignature =
-              $self->conf->{samlSPMetaDataOptions}->{$spConfKey}
+              $self->spOptions->{$sp}
               ->{samlSPMetaDataOptionsCheckSSOMessageSignature};
 
             if ($checkSSOMessageSignature) {
 
                 $self->forceSignatureVerification($login);
 
+                my $lasso_error;
                 if ($artifact) {
                     $result = $self->processArtResponseMsg( $login, $request );
                 }
                 else {
-                    $result = $self->processAuthnRequestMsg( $login, $request );
+                    ( $result, $lasso_error ) =
+                      $self->processAuthnRequestMsgWithError( $login,
+                        $request );
                 }
 
                 unless ($result) {
@@ -447,7 +464,7 @@ sub run {
             return $h if ( $h != PE_OK );
 
             # Set environment for rule/macro evaluation
-            $req->env->{llng_saml_sp} = $sp;
+            $req->env->{llng_saml_sp}        = $sp;
             $req->env->{llng_saml_spconfkey} = $spConfKey;
             if ( $login->request ) {
                 my $acs = $login->request->AssertionConsumerServiceURL;
@@ -484,8 +501,8 @@ sub run {
             # Get default NameID Format from configuration
             # Set to "email" if no value in configuration
             my $nameIDFormatKey =
-              $self->conf->{samlSPMetaDataOptions}->{$spConfKey}
-              ->{samlSPMetaDataOptionsNameIDFormat} || "email";
+              $self->spOptions->{$sp}->{samlSPMetaDataOptionsNameIDFormat}
+              || "email";
 
             # NameID unspecified is forced to default NameID format
             if (  !$nameIDFormat
@@ -517,8 +534,7 @@ sub run {
             $self->logger->debug("SSO: authentication request is valid");
 
             my $spAuthnLevel =
-              $self->conf->{samlSPMetaDataOptions}->{$spConfKey}
-              ->{samlSPMetaDataOptionsAuthnLevel} || 0;
+              $self->spOptions->{$sp}->{samlSPMetaDataOptionsAuthnLevel} || 0;
 
             # Get ForceAuthn flag
             my $force_authn;
@@ -577,7 +593,7 @@ sub run {
 
             # Get SP options notOnOrAfterTimeout
             my $notOnOrAfterTimeout =
-              $self->conf->{samlSPMetaDataOptions}->{$spConfKey}
+              $self->spOptions->{$sp}
               ->{samlSPMetaDataOptionsNotOnOrAfterTimeout};
 
             # Build Assertion
@@ -610,20 +626,21 @@ sub run {
               : '';
 
             # Override default NameID Mapping
-            if ( $self->conf->{samlSPMetaDataOptions}->{$spConfKey}
-                ->{samlSPMetaDataOptionsNameIDSessionKey} )
+            if (
+                $self->spOptions->{$sp}->{samlSPMetaDataOptionsNameIDSessionKey}
+              )
             {
                 $nameIDSessionKey =
-                  $self->conf->{samlSPMetaDataOptions}->{$spConfKey}
+                  $self->spOptions->{$sp}
                   ->{samlSPMetaDataOptionsNameIDSessionKey};
             }
 
             my $nameIDContent;
             if (    $nameIDSessionKey
-                and $self->spMacros->{$sp}->{$nameIDSessionKey} )
+                and $self->spMacros->{$spConfKey}->{$nameIDSessionKey} )
             {
                 $nameIDContent =
-                  $self->spMacros->{$sp}->{$nameIDSessionKey}
+                  $self->spMacros->{$spConfKey}->{$nameIDSessionKey}
                   ->( $req, $req->{sessionInfo} );
             }
             elsif ( $nameIDSessionKey
@@ -668,27 +685,19 @@ sub run {
             # Push attributes
             my @attributes;
 
-            foreach (
-                keys %{
-                    $self->conf->{samlSPMetaDataExportedAttributes}
-                      ->{$spConfKey}
-                }
-              )
-            {
+            foreach ( keys %{ $self->spAttributes->{$sp} } ) {
 
                 # Extract fields from exportedAttr value
                 my ( $mandatory, $name, $format, $friendly_name ) =
-                  split( /;/,
-                    $self->conf->{samlSPMetaDataExportedAttributes}
-                      ->{$spConfKey}->{$_} );
+                  split( /;/, $self->spAttributes->{$sp}->{$_} );
 
                 # Name is required
                 next unless $name;
 
                 # Lookup attribute value in SP macros or session
                 my $value;
-                if ( $self->spMacros->{$sp}->{$_} ) {
-                    $value = $self->spMacros->{$sp}->{$_}
+                if ( $self->spMacros->{$spConfKey}->{$_} ) {
+                    $value = $self->spMacros->{$spConfKey}->{$_}
                       ->( $req, $req->{sessionInfo} );
                 }
                 else {
@@ -733,7 +742,7 @@ sub run {
 
                     # SAML2 attribute value
                     my $saml2value = $self->createAttributeValue( $_,
-                        $self->conf->{samlSPMetaDataOptions}->{$spConfKey}
+                        $self->spOptions->{$sp}
                           ->{samlSPMetaDataOptionsForceUTF8} );
 
                     unless ($saml2value) {
@@ -779,8 +788,8 @@ sub run {
               ->set_subject_name_id( $login->nameIdentifier );
 
             # Set basic conditions
-            my $oneTimeUse = $self->conf->{samlSPMetaDataOptions}->{$spConfKey}
-              ->{samlSPMetaDataOptionsOneTimeUse} // 0;
+            my $oneTimeUse =
+              $self->spOptions->{$sp}->{samlSPMetaDataOptionsOneTimeUse} // 0;
 
             my $conditionNotOnOrAfter = $notOnOrAfterTimeout || "86400";
             eval {
@@ -834,7 +843,7 @@ sub run {
 
             # Set SessionNotOnOrAfter
             my $sessionNotOnOrAfterTimeout =
-              $self->conf->{samlSPMetaDataOptions}->{$spConfKey}
+              $self->spOptions->{$sp}
               ->{samlSPMetaDataOptionsSessionNotOnOrAfterTimeout};
             $sessionNotOnOrAfterTimeout ||= $self->conf->{timeout};
             my $timeout             = $time + $sessionNotOnOrAfterTimeout;
@@ -852,8 +861,8 @@ sub run {
 
             # Signature
             my $signSSOMessage =
-              $self->conf->{samlSPMetaDataOptions}->{$spConfKey}
-              ->{samlSPMetaDataOptionsSignSSOMessage} // -1;
+              $self->spOptions->{$sp}->{samlSPMetaDataOptionsSignSSOMessage}
+              // -1;
 
             if ( $signSSOMessage == 0 ) {
                 $self->logger->debug("SSO response will not be signed");
@@ -1197,7 +1206,7 @@ sub soapSloServer {
 
         # Do we check signature?
         my $checkSLOMessageSignature =
-          $self->conf->{samlSPMetaDataOptions}->{$spConfKey}
+          $self->spOptions->{$sp}
           ->{samlSPMetaDataOptionsCheckSLOMessageSignature};
 
         if ($checkSLOMessageSignature) {
@@ -1317,8 +1326,8 @@ sub soapSloServer {
         }
 
         # Signature
-        my $signSLOMessage = $self->{samlSPMetaDataOptions}->{$spConfKey}
-          ->{samlSPMetaDataOptionsSignSLOMessage} // 0;
+        my $signSLOMessage =
+          $self->spOptions->{$sp}->{samlSPMetaDataOptionsSignSLOMessage} // 0;
 
         if ( $signSLOMessage == 0 ) {
             $self->logger->debug("SLO response will not be signed");
@@ -1406,7 +1415,7 @@ sub logout {
     # for them.
     # Redirect on logout page when all is done.
     if ( $self->sendLogoutRequestToProviders( $req, $logout ) ) {
-        $req->urldc( $self->p->buildUrl({logout => 1}));
+        $req->urldc( $self->p->buildUrl( { logout => 1 } ) );
         return PE_OK;
     }
 
@@ -1685,8 +1694,11 @@ sub _finishSlo {
       @_;
 
     # Signature
-    my $signSLOMessage = $self->conf->{samlSPMetaDataOptions}->{$spConfKey}
-      ->{samlSPMetaDataOptionsSignSLOMessage};
+    my $sp             = $logout->remote_providerID;
+    my $signSLOMessage = '';
+    $signSLOMessage =
+      $self->spOptions->{$sp}->{samlSPMetaDataOptionsSignSLOMessage}
+      if $sp;
 
     unless ($signSLOMessage) {
         $self->logger->debug("Do not sign this SLO response");
@@ -1835,7 +1847,7 @@ sub sloServer {
 
         # Do we check signature?
         my $checkSLOMessageSignature =
-          $self->conf->{samlSPMetaDataOptions}->{$spConfKey}
+          $self->spOptions->{$sp}
           ->{samlSPMetaDataOptionsCheckSLOMessageSignature};
 
         if ($checkSLOMessageSignature) {
@@ -1992,7 +2004,7 @@ sub sloServer {
 
         # Do we check signature?
         my $checkSLOMessageSignature =
-          $self->conf->{samlSPMetaDataOptions}->{$spConfKey}
+          $self->spOptions->{$sp}
           ->{samlSPMetaDataOptionsCheckSLOMessageSignature};
 
         if ($checkSLOMessageSignature) {
@@ -2157,17 +2169,12 @@ sub attributeServer {
     my @returned_attributes;
 
     # Browse SP authorized attributes
-    foreach (
-        keys %{ $self->conf->{samlSPMetaDataExportedAttributes}->{$spConfKey} }
-      )
-    {
+    foreach ( keys %{ $self->spAttributes->{$sp} } ) {
         my $sp_attr = $_;
 
         # Extract fields from exportedAttr value
         my ( $mandatory, $name, $format, $friendly_name ) =
-          split( /;/,
-            $self->conf->{samlSPMetaDataExportedAttributes}->{$spConfKey}
-              ->{$sp_attr} );
+          split( /;/, $self->spAttributes->{$sp}->{$sp_attr} );
 
         foreach (@requested_attributes) {
             my $req_attr       = $_;
@@ -2237,7 +2244,7 @@ sub attributeServer {
 
                     # SAML2 attribute value
                     my $saml2value = $self->createAttributeValue( $local_value,
-                        $self->conf->{samlSPMetaDataOptions}->{$spConfKey}
+                        $self->spOptions->{$sp}
                           ->{samlSPMetaDataOptionsForceUTF8} );
 
                     unless ($saml2value) {

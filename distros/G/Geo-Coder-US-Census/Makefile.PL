@@ -4,24 +4,6 @@ use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
 use Getopt::Long;	# Technique inspired by IO::Lambda
 use IO::Socket::INET;
 
-my $online_tests;
-
-if($ENV{AUTHOR_TESTING}) {
-	$online_tests = are_online();
-} elsif($ENV{AUTOMATED_TESTING} || $ENV{NO_NETWORK_TESTING} || (!-t STDIN)) {
-	$online_tests = 0;
-} else {
-	Getopt::Long::GetOptions('online-tests!' => \$online_tests);
-
-	if(!defined($online_tests)) {
-		if($ENV{AUTHOR_TESTING}) {
-			$online_tests = are_online();
-		} else {
-			$online_tests = 0;
-		}
-	}
-}
-
 my $test_requires = {
 	'Test::Most' => 0,
 	'Test::NoWarnings' => 0,
@@ -31,7 +13,7 @@ my $test_requires = {
 	'Test::LWP::UserAgent' => 0
 };
 
-if($online_tests) {
+if(online_tests()) {
 	open(my $enabled, '>', 't/online.enabled') || die "Can't touch t/online.enabled $!";
 	close($enabled) || die "Can't touch t/online.enabled $!";
 	$test_requires->{'Test::LWP::UserAgent'} = 0;
@@ -53,7 +35,7 @@ WriteMakefile(
 	TEST_REQUIRES => $test_requires,
 	PREREQ_PM => {
 		'Encode' => 0,
-		'JSON' => 0,
+		'JSON::MaybeXS' => 0,
 		'HTTP::Request' => 0,
 		'LWP::UserAgent' => 0,
 		'LWP::Protocol::https' => 0,
@@ -80,13 +62,19 @@ WriteMakefile(
 	MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this
 );
 
-sub are_online
+sub online_tests
 {
+	return 0 if($ENV{'NO_NETWORK_TESTING'});
+	return 0 if(!-t STDIN);
 	my $s = IO::Socket::INET->new(
 		PeerAddr => 'geocoding.geo.census.gov:443',
 		Timeout => 10
 	);
 	if($s) {
+		if($ENV{'PERL_MM_USE_DEFAULT'} || $ENV{'AUTOMATED_TESTING'}) {
+			close($s);
+			return 1;
+		}
 		print <<EOF;
 
 You appear to be directly connected to the Internet.  I have some tests

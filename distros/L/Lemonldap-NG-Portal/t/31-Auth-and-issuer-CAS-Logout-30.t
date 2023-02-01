@@ -159,8 +159,7 @@ ok(
     'Query SP for logout'
 );
 count(1);
-ok( $res->[2]->[0] =~ m%<span trmsg="37"></span>%, ' PE37 found' );
-count(1);
+expectPortalError( $res, 108, "Unauthorized URL" );
 
 # Logout initiated by CAS, try with valid service URL
 ok(
@@ -173,7 +172,6 @@ ok(
     'Query SP for logout'
 );
 count(1);
-
 expectRedirection( $res, 'http://auth.sp.com/' );
 
 # Verify that user has been disconnected

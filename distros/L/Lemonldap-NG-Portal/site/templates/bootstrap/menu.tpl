@@ -114,6 +114,9 @@
       <TMPL_IF NAME="Appslist">
         <div id="appslist">
 
+          <TMPL_IF NAME="NO_APP_ALLOWED">
+            <div class="message message-warning alert"><div class="text-center"><span trspan="noAppAllowed">">None application allowed!</span></div></div>
+          <TMPL_ELSE>
           <TMPL_LOOP NAME="APPSLIST_LOOP">
           <!-- Template loops -->
 
@@ -185,7 +188,7 @@
               <!-- End of categories loop -->
             </TMPL_IF>
           </TMPL_LOOP>
-
+          </TMPL_IF>
         </div>
       </TMPL_IF>
 

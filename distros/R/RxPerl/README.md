@@ -37,7 +37,7 @@ The documentation in this POD applies to all three adapter modules as well.
 This module is an implementation of [Reactive Extensions](http://reactivex.io/) in Perl. It replicates the
 behavior of [rxjs 6](https://www.npmjs.com/package/rxjs) which is the JavaScript implementation of ReactiveX.
 
-Currently 58 of the 100+ operators in rxjs are implemented in this module.
+Currently 81 of the 100+ operators in rxjs are implemented in this module.
 
 # EXPORTABLE FUNCTIONS
 
@@ -183,6 +183,38 @@ should apply to RxPerl too).
     Observables may emit at most one value per event, however [Mojo::EventEmitter](https://metacpan.org/pod/Mojo%3A%3AEventEmitter)'s are able to emit
     more. So this function serves to pack all of them in an arrayref, and emit that as a single value instead.
 
+- rx\_generate
+
+    [https://rxjs.dev/api/index/function/generate](https://rxjs.dev/api/index/function/generate)
+
+        # 2, 5, 10, 17, 26
+        rx_generate(
+            1,
+            sub ($x) { $x <= 5 }, # could also use $_
+            sub ($x) { $x + 1 }, # could also use $_
+            sub ($x) { $x ** 2 + 1 }, # optional, and could also use $_ here
+        )->subscribe($observer);
+
+- rx\_iif
+
+    [https://rxjs.dev/api/index/function/iif](https://rxjs.dev/api/index/function/iif)
+
+        my $i;
+
+        my $o = rx_iif(
+            sub { $i > 5 },
+            rx_of(1, 2, 3),
+            rx_of(10, 20, 30),
+        );
+
+        $i = 4;
+        # 10, 20, 30, complete
+        $o->subscribe($observer);
+
+        $i = 6;
+        # 1, 2, 3, complete
+        $o->subscribe($observer);
+
 - rx\_interval
 
     [https://rxjs.dev/api/index/function/interval](https://rxjs.dev/api/index/function/interval)
@@ -230,6 +262,18 @@ should apply to RxPerl too).
         # 10, 20, 30, complete
         rx_of(10, 20, 30)->subscribe($observer);
 
+- rx\_on\_error\_resume\_next
+
+    [https://rxjs.dev/api/index/function/onErrorResumeNext](https://rxjs.dev/api/index/function/onErrorResumeNext)
+
+        # 1, 2, 3, 10, 20, 30, complete
+        rx_on_error_resume_next(
+            rx_of(1, 2, 3)->pipe( op_concat_with(rx_throw_error('foo')) ),
+            rx_throw_error('bar'),
+            rx_of(10, 20, 30),
+            rx_throw_error('baz'),
+        )->subscribe($observer);
+
 - rx\_partition
 
     [https://rxjs.dev/api/index/function/partition](https://rxjs.dev/api/index/function/partition)
@@ -251,6 +295,13 @@ should apply to RxPerl too).
             rx_interval(1)->pipe( op_map(sub {$_[0] * 100}) ),
             rx_interval(0.7)->pipe( op_map(sub {$_[0] * 10) ),
         )->subscribe($observer);
+
+- rx\_range
+
+    [https://rxjs.dev/api/index/function/range](https://rxjs.dev/api/index/function/range)
+
+        # 10, 11, 12, 13, 14, 15, 16, complete
+        rx_range(10, 7)->subscribe($observer);
 
 - rx\_replay\_subject
 
@@ -305,6 +356,17 @@ should apply to RxPerl too).
         # (pause 10 seconds) 0, 1, 2, 3, ... (every 1 second)
         rx_timer(10, 1)->subscribe($observer);
 
+- rx\_zip
+
+    [https://rxjs.dev/api/index/function/zip](https://rxjs.dev/api/index/function/zip)
+
+        # [0, 0, 0], [1, 1, 1], [2, 2, 2], complete
+        rx_zip(
+            rx_interval(0.7)->pipe( op_take(3) ),
+            rx_interval(1),
+            rx_interval(2),
+        )->subscribe($observer);
+
 ## PIPEABLE OPERATORS
 
 Pipeable operators (also referred to as "operators") are passed as arguments to the ["pipe"](#pipe) method of
@@ -351,6 +413,17 @@ apply to RxPerl too).
             op_buffer_count(3, 1),
         )->subscribe($observer);
 
+- op\_buffer\_time
+
+    Works like rxjs's "bufferTime", except the parameter is in seconds instead of ms.
+
+    [https://rxjs.dev/api/operators/bufferTime](https://rxjs.dev/api/operators/bufferTime)
+
+        # [0], [1], [2, 3], [4], [5, 6], [7]...
+        rx_interval(0.7)->pipe(
+            op_buffer_time(1),
+        )->subscribe($observer);
+
 - op\_catch\_error
 
     [https://rxjs.dev/api/operators/catchError](https://rxjs.dev/api/operators/catchError)
@@ -376,16 +449,58 @@ apply to RxPerl too).
             op_take(10),
         )->subscribe($observer);
 
+- op\_concat\_all
+
+    [https://rxjs.dev/api/operators/concatAll](https://rxjs.dev/api/operators/concatAll)
+
+        # 0, 1, 2, 0, 1, 2, 0, 1, complete
+        rx_interval(0.7)->pipe(
+            op_map(sub { rx_interval(1)->pipe( op_take(3) ) }),
+            op_concat_all(),
+            op_take(10),
+        )->subscribe($observer);
+
 - op\_concat\_map
 
     [https://rxjs.dev/api/operators/concatMap](https://rxjs.dev/api/operators/concatMap)
 
         # 0, 1, 2, 0, 1, 2, 0, 1, 2, complete
         rx_of(10, 20, 30)->pipe(
-            op_concat_map(sub {
-                rx_interval(1)->pipe(op_take(3)),
+            op_concat_map(sub ($val, $idx) {
+                rx_interval(1)->pipe(op_take(3)), # can also use $_ here instead of $val
             }),
         )->subscribe($observer);
+
+- op\_concat\_with
+
+    [https://rxjs.dev/api/operators/concatWith](https://rxjs.dev/api/operators/concatWith)
+
+        # 0, 1, 2, 3, 4, 5, 6, 7, 8, complete
+        rx_of(0, 1, 2)->pipe(
+            op_concat_with(
+                rx_of(3, 4, 5),
+                rx_of(6, 7, 8),
+            ),
+        )->subscribe($observer);
+
+- op\_count
+
+    [https://rxjs.dev/api/operators/count](https://rxjs.dev/api/operators/count)
+
+        # 3, complete
+        rx_of(0, 1, 2)->pipe(
+            op_count(),
+        )->subscribe($observer);
+
+        # 3, complete
+        rx_of(0, 1, 2, 3, 4, 5, 6)->pipe(
+            op_count(sub { $_[0] % 2 == 1 }), # could have also used $_ here instead of $_[0]
+        )->subscribe($observer);
+
+        # 4, complete
+        rx_of(1, 1, 1, 1, 1, 1, 1)->pipe(
+            op_count(sub ($value, $idx) { $idx % 2 == 0 }),
+        );
 
 - op\_debounce\_time
 
@@ -396,6 +511,16 @@ apply to RxPerl too).
         # 3, complete
         rx_of(1, 2, 3)->pipe(
             op_debounce_time(0.5),
+        )->subscribe($observer);
+
+- op\_default\_if\_empty
+
+    [https://rxjs.dev/api/operators/defaultIfEmpty](https://rxjs.dev/api/operators/defaultIfEmpty)
+
+        # 42, complete
+        rx_timer(0.7)->pipe(
+            op_ignore_elements(),
+            op_default_if_empty(42),
         )->subscribe($observer);
 
 - op\_delay
@@ -452,6 +577,16 @@ apply to RxPerl too).
             op_distinct_until_key_changed('name'),
         )->subscribe($observer);
 
+- op\_element\_at
+
+    [https://rxjs.dev/api/operators/elementAt](https://rxjs.dev/api/operators/elementAt)
+
+        # 2, complete
+        rx_interval(0.7)->pipe(
+            op_take(5),
+            op_element_at(2, 9),
+        )->subscribe($observer);
+
 - op\_end\_with
 
     [https://rxjs.dev/api/operators/endWith](https://rxjs.dev/api/operators/endWith)
@@ -461,14 +596,34 @@ apply to RxPerl too).
             op_end_with(100, 200),
         )->subscribe($observer);
 
+- op\_every
+
+    [https://rxjs.dev/api/operators/every](https://rxjs.dev/api/operators/every)
+
+        # 0, complete
+        rx_of(5, 10, 15, 18, 20)->pipe(
+            op_every(sub ($value, $idx) { $value % 5 == 0 }),
+        )->subscribe($observer);
+
+- op\_exhaust\_all
+
+    [https://rxjs.dev/api/operators/exhaustAll](https://rxjs.dev/api/operators/exhaustAll)
+
+        # 0, 1, 2, 3, 0, 1, 2, 3, complete
+        rx_interval(3)->pipe(
+            op_take(3),
+            op_map(sub { rx_interval(1)->pipe( op_take(4) ) }),
+            op_exhaust_all(),
+        )->subscribe($observer);
+
 - op\_exhaust\_map
 
     [https://rxjs.dev/api/operators/exhaustMap](https://rxjs.dev/api/operators/exhaustMap)
 
         # 0, 1, 2, complete
         rx_of(10, 20, 30)->pipe(
-            op_exhaust_map(sub {
-                rx_interval(1)->pipe( op_take(3) );
+            op_exhaust_map(sub ($val, $idx) {
+                rx_interval(1)->pipe( op_take(3) ); # can also use $_ here instead of $val
             }),
         )->subscribe($observer);
 
@@ -515,6 +670,37 @@ apply to RxPerl too).
             $s->unsubscribe;
         });
 
+- op\_find
+
+    [https://rxjs.dev/api/operators/find](https://rxjs.dev/api/operators/find)
+
+        # 7, complete
+        rx_interval(0.7)->pipe(
+            op_find(sub ($val, $idx) { $val == 7 }), # could use $_ here
+        )->subscribe($observer);
+
+        # undef, complete
+        rx_interval(0.7)->pipe(
+            op_take(5),
+            op_find(sub { $_ == 7 }),
+        )->subscribe($observer);
+
+- op\_find\_index
+
+    [https://rxjs.dev/api/operators/findIndex](https://rxjs.dev/api/operators/findIndex)
+
+        # 7, complete
+        rx_interval(0.7)->pipe(
+            op_map(sub { $_ * 2 }),
+            op_find_index(sub ($val, $idx) { $val == 14 }), # could use $_ here
+        )->subscribe($observer);
+
+        # -1, complete
+        rx_interval(0.7)->pipe(
+            op_take(5),
+            op_find_index(sub { $_ == 7 }),
+        )->subscribe($observer);
+
 - op\_first
 
     [https://rxjs.dev/api/operators/first](https://rxjs.dev/api/operators/first)
@@ -547,6 +733,23 @@ apply to RxPerl too).
             op_ignore_elements(),
         )->subscribe($observer);
 
+- op\_is\_empty
+
+    [https://rxjs.dev/api/operators/isEmpty](https://rxjs.dev/api/operators/isEmpty)
+
+    Same as rxjs's _isEmpty_, but emits 1 or 0 instead of true or false.
+
+        # (pause 1 second) 0, complete
+        rx_interval(1)->pipe(
+            op_is_empty(),
+        )->subscribe($observer);
+
+        # (pause 2 seconds) 1, complete
+        rx_timer(2)->pipe(
+            op_ignore_elements(),
+            op_is_empty(),
+        )->subscribe($observer);
+
 - op\_map
 
     [https://rxjs.dev/api/operators/map](https://rxjs.dev/api/operators/map)
@@ -577,15 +780,25 @@ apply to RxPerl too).
             op_map_to(123),
         )->subscribe($observer);
 
+- op\_merge\_all
+
+    [https://rxjs.dev/api/operators/mergeAll](https://rxjs.dev/api/operators/mergeAll)
+
+        # 0, 1, 0, 2, 1, 3, 2, 0, 3, 1, 0, ...
+        rx_interval(1)->pipe(
+            op_map(sub { rx_interval(0.7)->pipe(op_take(4)) }),
+            op_merge_all(2),
+        )->subscribe($observer);
+
 - op\_merge\_map
 
     [https://rxjs.dev/api/operators/mergeMap](https://rxjs.dev/api/operators/mergeMap)
 
         # 11, 21, 31, 12, 22, 32, 13, 23, 33, complete
         rx_of(10, 20, 30)->pipe(
-            op_merge_map(sub ($x) {
+            op_merge_map(sub ($x, $idx) {
                 return rx_interval(1)->pipe(
-                    op_map(sub ($y) {
+                    op_map(sub ($y, @) {
                         return $x + $y + 1;
                     }),
                     op_take(3),
@@ -593,9 +806,32 @@ apply to RxPerl too).
             }),
         )->subscribe($observer);
 
+- op\_merge\_with
+
+    [https://rxjs.dev/api/operators/mergeWith](https://rxjs.dev/api/operators/mergeWith)
+
+        # 0, 0, 1, 1, 2, 3, 2, 4, 3, ...
+        rx_interval(0.7)->pipe(
+            rx_merge_with( rx_interval(1) ),
+        )->subscribe($observer);
+
 - op\_multicast
 
     [https://rxjs.dev/api/operators/multicast](https://rxjs.dev/api/operators/multicast)
+
+- op\_on\_error\_resume\_next\_with
+
+    [https://rxjs.dev/api/index/function/onErrorResumeNextWith](https://rxjs.dev/api/index/function/onErrorResumeNextWith)
+
+        # 1, 2, 3, 10, 20, 30, complete
+        rx_of(1, 2, 3)->pipe(
+            op_concat_with( rx_throw_error('foo') ),
+            op_on_error_resume_next_with(
+                rx_throw_error('bar'),
+                rx_of(10, 20, 30),
+                rx_throw_error('baz'),
+            ),
+        )->subscribe($observer);
 
 - op\_pairwise
 
@@ -619,6 +855,16 @@ apply to RxPerl too).
             undef,
         )->pipe(
             op_pluck('name', 'first'),
+        )->subscribe($observer);
+
+- op\_reduce
+
+    [https://rxjs.dev/api/operators/reduce](https://rxjs.dev/api/operators/reduce)
+
+        # (pause 6 seconds) 15, complete
+        rx_interval(1)->pipe(
+            op_take(6),
+            op_reduce(sub ($acc, $value, $idx) { $acc + $value }, 0),
         )->subscribe($observer);
 
 - op\_ref\_count
@@ -700,6 +946,15 @@ apply to RxPerl too).
             op_skip_until( rx_timer(3.5) ),
         )->subscribe($observer);
 
+- op\_skip\_while
+
+    [https://rxjs.dev/api/operators/skipWhile](https://rxjs.dev/api/operators/skipWhile)
+
+        # 5, 3, 7, 1, complete
+        rx_of(1, 3, 5, 3, 7, 1)->pipe(
+            op_skip_while(sub ($v, $idx) { $v < 4 }), # could use $_ here
+        )->subscribe($observer);
+
 - op\_start\_with
 
     [https://rxjs.dev/api/operators/startWith](https://rxjs.dev/api/operators/startWith)
@@ -707,6 +962,17 @@ apply to RxPerl too).
         # 100, 200, 0, 1, 2, 3, complete
         rx_of(0, 1, 2, 3)->pipe(
             op_start_with(100, 200),
+        )->subscribe($observer);
+
+- op\_switch\_all
+
+    [https://rxjs.dev/api/operators/switchAll](https://rxjs.dev/api/operators/switchAll)
+
+        # 0, 0, 0, 1, 2, 3, 4, complete
+        rx_timer(0, 3)->pipe(
+            op_take(3),
+            op_map(sub { rx_interval(2)->pipe(op_take(5)) }),
+            op_switch_all(),
         )->subscribe($observer);
 
 - op\_switch\_map
@@ -717,9 +983,9 @@ apply to RxPerl too).
         my $o = rx_interval(2.5)->pipe( op_take(3) );
 
         $o->pipe(
-            op_switch_map(sub ($x) {
+            op_switch_map(sub ($x, $idx) {
                 return rx_interval(0.7)->pipe(
-                    op_map(sub ($y) { $x * 10 + $y + 1 }),
+                    op_map(sub ($y, $idx2) { $x * 10 + $y + 1 }),
                 );
             }),
         )->subscribe($observer);
@@ -788,6 +1054,19 @@ apply to RxPerl too).
             op_with_latest_from(rx_interval(0.7)),
         )->subscribe($observer);
 
+- op\_zip\_with
+
+    [https://rxjs.dev/api/operators/zipWith](https://rxjs.dev/api/operators/zipWith)
+
+        # [0, 0, 0], [1, 1, 1], [2, 2, 2], complete
+        rx_interval(0.7)->pipe(
+            op_take(3),
+            op_zip_with(
+                rx_interval(1),
+                rx_interval(2),
+            ),
+        )->subscribe($observer);
+
 ## PROMISE FUNCTIONS
 
 These functions return a promise or a future, and require the existence of a user-selectable
@@ -824,6 +1103,12 @@ or a [Future](https://metacpan.org/pod/Future) object (when using with [RxPerl::
 
         my $o = ...; # an observable
         last_value_from($o)->then( ... );
+
+## OTHER FUNCTIONS
+
+- is\_observable
+
+    Returns true if the argument passed to it is an RxPerl Observable.
 
 # OBSERVABLE METHODS
 

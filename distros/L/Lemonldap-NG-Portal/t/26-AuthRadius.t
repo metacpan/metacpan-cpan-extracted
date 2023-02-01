@@ -9,12 +9,13 @@ my $res;
 my $mock   = Test::MockObject->new();
 my $client = LLNG::Manager::Test->new( {
         ini => {
-            logLevel       => 'error',
-            authentication => 'Radius',
-            userDB         => 'Demo',
-            radiusServer   => '127.0.0.1',
-            radiusSecret   => 'test',
-            requireToken   => 1
+            logLevel           => 'error',
+            authentication     => 'Radius',
+            userDB             => 'Demo',
+            radiusServer       => '127.0.0.1',
+            radiusSecret       => 'test',
+            requireToken       => 1,
+            portalDisplayOrder => 'Logout LoginHistory , Appslist'
         }
     }
 );
@@ -69,6 +70,16 @@ ok(
 );
 count(1);
 expectAuthenticatedAs( $res, 'dwho' );
+my @tabs = map m#<div id="(appslist|loginHistory|logout)">#g, $res->[2]->[0];
+ok( $#tabs == 2, 'Right number of categories' )
+  or explain( $#tabs, '3 categories' );
+ok(
+    $tabs[0] eq 'logout'
+      && $tabs[1] eq 'loginHistory'
+      && $tabs[2] eq 'appslist',
+    'Categories are well sorted'
+) or explain( \@tabs, 'Sorted categories (logout, loginHistory, appslist)' );
+count(2);
 $client->logout($id);
 
 clean_sessions();

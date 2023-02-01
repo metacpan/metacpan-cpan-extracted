@@ -16,7 +16,7 @@ has url => sub { die 'missing url' };
 has ua => sub { Mojo::UserAgent->new };
 has 'connected_o';
 
-our $VERSION = "v0.0.31";
+our $VERSION = "v0.0.32";
 
 sub new ($class, $url) {
     my $self = $class->SUPER::new(url => $url);
@@ -31,7 +31,7 @@ sub new ($class, $url) {
     # WS connection attempts
     $self->{please_be_connected} = rx_subject->new;
     my $websocket_o = $self->{please_be_connected}->pipe(
-        op_switch_map(sub ($be_connected) {
+        op_switch_map(sub ($be_connected, @) {
             if ($be_connected) {
                 return make_websockets_observable($self->url, $self);
             }
@@ -55,8 +55,8 @@ sub new ($class, $url) {
     $self->{incoming_o} = rx_subject->new;
     $websocket_o->pipe(
         op_filter(sub { defined $_ }),
-        op_switch_map(sub ($ws) { rx_from_event($ws, 'binary') }),
-        op_switch_map(sub ($binary_part) {
+        op_switch_map(sub ($ws, @) { rx_from_event($ws, 'binary') }),
+        op_switch_map(sub ($binary_part, @) {
             if (my ($bytes_prefix, $remaining) = $binary_part =~ /^\:(.+?)\:\ (.*)\z/) {
                 my ($identifier, $i, $is_final) = $bytes_prefix =~ /^(\S+)\ ([0-9]+)(\$)?\z/;
 
@@ -123,7 +123,7 @@ sub new ($class, $url) {
     # ping
     $config_o->pipe(
         op_map(sub ($config, @) { $config->{pingInterval} - rand() }),
-        op_switch_map(sub ($iv) {
+        op_switch_map(sub ($iv, @) {
             rx_timer($iv * rand(), $iv)->pipe(
                 op_take_until($self->connected_o->pipe(op_filter(sub { ! $_ }))),
             ),
@@ -132,7 +132,7 @@ sub new ($class, $url) {
 
     # timeout
     $config_o->pipe(
-        op_switch_map(sub ($config) {
+        op_switch_map(sub ($config, @) {
             $self->{incoming_o}->pipe(
                 op_start_with(undef),
                 op_switch_map(sub {
@@ -191,7 +191,7 @@ sub do_request ($self, $stream_name, $request_name, $payload = undef) {
         $self->{responses_o}->pipe(
             op_filter(sub { eqq($_->{jsonrpc}, '2.0') and $_->{id} eq $id }),
             op_take_until($self->connected_o->pipe(op_filter(sub { ! $_ }))),
-            op_switch_map(sub ($data) {
+            op_switch_map(sub ($data, @) {
                 if (exists $data->{result}) { return rx_of($data->{result}) }
                 return rx_throw_error($data->{error});
             }),

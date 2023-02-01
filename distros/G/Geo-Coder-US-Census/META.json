@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -35,7 +35,7 @@
             "Encode" : "0",
             "Geo::StreetAddress::US" : "0",
             "HTTP::Request" : "0",
-            "JSON" : "0",
+            "JSON::MaybeXS" : "0",
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
             "Net::SSLeay" : "1.81",
@@ -50,7 +50,8 @@
             "Test::LWP::UserAgent" : "0",
             "Test::Most" : "0",
             "Test::NoWarnings" : "0",
-            "Test::Number::Delta" : "0"
+            "Test::Number::Delta" : "0",
+            "Test::Script" : "1.12"
          }
       }
    },
@@ -66,6 +67,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-US-Census"
       }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

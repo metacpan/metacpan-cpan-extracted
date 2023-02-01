@@ -91,7 +91,7 @@ my $client = LLNG::Manager::Test->new( {
 ok(
     $res = $client->_get(
         '/',
-        query  => 'url=' . encodeUrl('http://cda.example.llng/'),
+        query  => buildForm( { url => encodeUrl('http://cda.example.llng/') } ),
         accept => 'text/html',
     ),
     'Unauth CDA request'
@@ -121,7 +121,9 @@ ok(
     $res = $client->_get(
         '/',
         cookie => "lemonldap=$id",
-        query  => 'url=' . encodeUrl('http://sub.cda.example.llng/'),
+        query  => buildForm(
+            { url => encodeUrl('http://sub-domain.cda.example.llng/') }
+        ),
         accept => 'text/html',
     ),
     'CDA request to subdomain'
@@ -129,28 +131,30 @@ ok(
 count(1);
 
 my ($querytosub) = expectRedirection( $res,
-    qr#^http://sub.cda.example.llng/\?(lemonldapcda=.*)$# );
+    qr#^http://sub-domain.cda.example.llng/\?(lemonldapcda=.*)$# );
 
 # Check that %.oneonly.llng rejects subdomains
 ok(
     $res = $client->_get(
         '/',
         cookie => "lemonldap=$id",
-        query  => 'url=' . encodeUrl('http://sub.cda.oneonly.llng/'),
+        query  => buildForm(
+            { url => encodeUrl('http://sub-domain.cda.oneonly.llng/') }
+        ),
         accept => 'text/html',
     ),
     'CDA request to subdomain'
 );
 count(1);
 
-expectPortalError( $res, 37, "Subdomain CDA request not allowed by wildcard" );
+expectPortalError( $res, 109, "Subdomain CDA request not allowed by wildcard" );
 
 # Check that %.oneonly.llng allows one-level domains
 ok(
     $res = $client->_get(
         '/',
         cookie => "lemonldap=$id",
-        query  => 'url=' . encodeUrl('http://cda.oneonly.llng/'),
+        query  => buildForm( { url => encodeUrl('http://cda.oneonly.llng/') } ),
         accept => 'text/html',
     ),
     'CDA request to one-level wildcard'
@@ -159,9 +163,9 @@ count(1);
 my ($querytoone) =
   expectRedirection( $res, qr#^http://cda.oneonly.llng/\?(lemonldapcda=.*)$# );
 
-validate_cda( $client, $querytosub, 'sub.cda.example.llng', 'dwho' );
-validate_cda( $client, $query,      'cda.example.llng',     'dwho' );
-validate_cda( $client, $querytoone, 'cda.oneonly.llng',     'dwho' );
+validate_cda( $client, $querytosub, 'sub-domain.cda.example.llng', 'dwho' );
+validate_cda( $client, $query,      'cda.example.llng',            'dwho' );
+validate_cda( $client, $querytoone, 'cda.oneonly.llng',            'dwho' );
 
 clean_sessions();
 

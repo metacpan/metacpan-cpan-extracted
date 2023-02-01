@@ -79,6 +79,6 @@
       ],
       "x_MailingList" : "mailto:lemonldap-ng-dev@ow2.org"
    },
-   "version" : "v2.0.15.1",
+   "version" : "v2.0.16",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

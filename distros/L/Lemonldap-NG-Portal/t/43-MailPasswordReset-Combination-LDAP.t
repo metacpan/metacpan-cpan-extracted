@@ -33,7 +33,7 @@ SKIP: {
                 authentication             => 'Combination',
                 userDB                     => 'Same',
                 passwordDB                 => 'LDAP',
-                ldapServer                 => 'ldap://127.0.0.1:19389/',
+                ldapServer                 => $main::slapd_url,
                 ldapBase                   => 'ou=users,dc=example,dc=com',
                 managerDn                  => 'cn=admin,dc=example,dc=com',
                 managerPassword            => 'admin',
@@ -108,5 +108,5 @@ SKIP: {
     #print STDERR Dumper($query);
 }
 count($maintests);
-stopLdapServer() if $ENV{LLNGTESTLDAP};
+clean_sessions();
 done_testing( count() );

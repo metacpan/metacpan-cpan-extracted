@@ -60,17 +60,15 @@ use Mouse;
 use JSON qw(from_json to_json);
 use MIME::Base64;
 use Lemonldap::NG::Portal::Main::Constants qw(
+  URIRE
   PE_OK
   portalConsts
   PE_PASSWORD_OK
-  URIRE
 );
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.0.16';
 
-extends qw(
-  Lemonldap::NG::Portal::Main::Plugin
-);
+extends 'Lemonldap::NG::Portal::Main::Plugin';
 
 has configStorage => (
     is      => 'ro',
@@ -664,8 +662,6 @@ sub pwdReset {
         return $self->p->sendError( $req, "Missing password argument", 400 );
     }
 
-    my $tmp = $self->conf->{portalRequireOldPassword};
-    $self->conf->{portalRequireOldPassword} = 0;
     $req->user( $user || $mail );
     $req->steps( ['getUser'] );
     my $result = $self->p->process( $req, ( $mail ? ( useMail => 1 ) : () ) );
@@ -678,7 +674,6 @@ sub pwdReset {
     $result =
       $self->p->_passwordDB->setNewPassword( $req, $password, $mail ? 1 : 0 );
     $req->{user} = undef;
-    $self->conf->{portalRequireOldPassword} = $tmp;
 
     if ( $result == PE_PASSWORD_OK or $result == PE_OK ) {
         return $self->p->sendJSONresponse( $req, { 'result' => JSON::true } );

@@ -2,13 +2,11 @@ package Lemonldap::NG::Portal::Password::Null;
 
 use strict;
 use Mouse;
-use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_NO_PASSWORD_BE
-);
+use Lemonldap::NG::Portal::Main::Constants 'PE_NO_PASSWORD_BE';
 
 extends 'Lemonldap::NG::Portal::Password::Base';
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.16';
 
 sub init {
     return 1;

@@ -9,7 +9,6 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 require 't/test-lib.pm';
 
 my $res;
-
 my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel    => 'error',
@@ -69,7 +68,7 @@ ok(
 );
 count(1);
 
-expectPortalError( $res, 37, "Untrusted URL denied by portal" );
+expectPortalError( $res, 109, "Untrusted URL denied by portal" );
 
 # Handler part
 use_ok('Lemonldap::NG::Handler::Server');

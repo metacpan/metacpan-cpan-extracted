@@ -205,7 +205,7 @@ my $access_token_old = $res->{_oidc_access_token};
 ok( $access_token_eol, 'OIDC EOL time is stored' );
 ok( $access_token_old, 'Obtained refresh token' );
 is( $res->{cn},   'Frédéric Accents', 'UTF-8 values' );
-is( $res->{mail}, 'fa@badwolf.org',     'Correct email' );
+is( $res->{mail}, 'fa@badwolf.org',   'Correct email' );
 count(5);
 
 is( $res->{userinfo_hook}, "op/french", "oidcGotUserInfo called" );
@@ -459,7 +459,7 @@ sub op {
                     'loa-3'       => 3
                 },
                 oidcServicePrivateKeySig => oidc_key_op_private_sig,
-                oidcServicePublicKeySig  => oidc_key_op_public_sig,
+                oidcServicePublicKeySig  => oidc_cert_op_public_sig,
             }
         }
     );
@@ -490,11 +490,12 @@ sub rp {
                         oidcOPMetaDataOptionsJWKSTimeout       => 0,
                         oidcOPMetaDataOptionsClientSecret      => "rpsecret",
                         oidcOPMetaDataOptionsScope => "openid profile email",
-                        oidcOPMetaDataOptionsStoreIDToken => 0,
-                        oidcOPMetaDataOptionsMaxAge       => 30,
-                        oidcOPMetaDataOptionsDisplay      => "",
-                        oidcOPMetaDataOptionsClientID     => "rpid",
-                        oidcOPMetaDataOptionsStoreIDToken => 1,
+                        oidcOPMetaDataOptionsStoreIDToken     => 0,
+                        oidcOPMetaDataOptionsMaxAge           => 30,
+                        oidcOPMetaDataOptionsDisplay          => "",
+                        oidcOPMetaDataOptionsClientID         => "rpid",
+                        oidcOPMetaDataOptionsStoreIDToken     => 1,
+                        oidcOPMetaDataOptionsUseNonce     => 1,
                         oidcOPMetaDataOptionsConfigurationURI =>
                           "https://auth.op.com/.well-known/openid-configuration"
                     }

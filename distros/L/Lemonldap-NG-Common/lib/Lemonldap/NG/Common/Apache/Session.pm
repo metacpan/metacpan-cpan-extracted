@@ -183,9 +183,6 @@ sub get_key_from_all_sessions {
     {
         return $class->_dbiGKFAS( $1, @_ );
     }
-    elsif ( $backend =~ /^Apache::Session::(?:NoSQL|Redis|Cassandra)$/ ) {
-        return $class->_NoSQLGKFAS(@_);
-    }
     elsif ( $backend =~ /^Apache::Session::(File|PHP|DBFile|LDAP)$/ ) {
         no strict 'refs';
         my $tmp = "_${1}GKFAS";
@@ -386,32 +383,6 @@ sub _LDAPGKFAS {
             $data = [$data] unless ( ref($data) );
             my $tmp = $v;
             $res{$k}->{$_} = $tmp->{$_} foreach (@$data);
-        }
-        else {
-            $res{$k} = $v;
-        }
-    }
-    return \%res;
-}
-
-sub _NoSQLGKFAS {
-    my ( $class, $args, $data ) = @_;
-    require Redis;
-    die "Only Redis is supported" unless ( $args->{Driver} eq 'Redis' );
-    my $redis = Redis->new(%$args);
-    my @keys  = $redis->keys('*');
-    my %res;
-
-    foreach my $k (@keys) {
-        my $v =
-          eval { $args->{unserialize}->( $redis->get($k), \&decodeThaw64 ); };
-        next if ($@);
-        if ( ref($data) eq 'CODE' ) {
-            $res{$k} = &$data( $v, $k );
-        }
-        elsif ($data) {
-            $data = [$data] unless ( ref($data) );
-            $res{$k}->{$_} = $v->{$_} foreach (@$data);
         }
         else {
             $res{$k} = $v;

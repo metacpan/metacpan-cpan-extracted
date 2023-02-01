@@ -8,9 +8,9 @@ use Log::ger;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-11'; # DATE
+our $DATE = '2023-02-01'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.003'; # VERSION
+our $VERSION = '1.004'; # VERSION
 
 our @EXPORT_OK = qw(
                        gen_csv_util
@@ -68,7 +68,7 @@ sub _return_or_write_file {
     } else {
         if (-f $filename) {
             if ($overwrite) {
-                log_info "Overwriting output file $filename";
+                log_info "[csvutil] Overwriting output file $filename";
             } else {
                 return [412, "Refusing to ovewrite existing output file '$filename', please select another path or specify --overwrite"];
             }
@@ -88,7 +88,7 @@ sub compile_eval_code {
     my ($str, $label) = @_;
     defined($str) && length($str) or die [400, "Please specify code ($label)"];
     $str = "package main; no strict; no warnings; sub { $str }";
-    log_trace "Compiling Perl code: $str";
+    log_trace "[csvutil] Compiling Perl code: $str";
     my $code = eval $str; ## no critic: BuiltinFunctions::ProhibitStringyEval
     die [400, "Can't compile code ($label) '$str': $@"] if $@;
     $code;
@@ -191,7 +191,7 @@ sub _complete_field_or_field_list {
     }
 
     # user hasn't specified -f, bail
-    return {message=>"Please specify -f first"} unless defined $args && $args->{input_filename};
+    return {message=>"Please specify input filename first"} unless defined $args && $args->{input_filename};
 
     # user wants to read CSV from stdin, bail
     return {message=>"Can't get field list when input is stdin"} if $args->{input_filename} eq '-';
@@ -1262,7 +1262,7 @@ sub gen_csv_util {
             eval {
 
                 if ($on_begin) {
-                    log_trace "Calling on_begin hook handler ...";
+                    log_trace "[csvutil] Calling on_begin hook handler ...";
                     $on_begin->($r);
                 }
 
@@ -1290,7 +1290,7 @@ sub gen_csv_util {
 
                         # close the previous file, if any
                         if ($r->{output_fh} && $r->{output_filename} ne '-') {
-                            log_info "Closing output file '$r->{output_filename}' ...";
+                            log_info "[csvutil] Closing output file '$r->{output_filename}' ...";
                             close $r->{output_fh} or die [500, "Can't close output file '$r->{output_filename}': $!"];
                             delete $r->{has_printed_header};
                             delete $r->{wants_switch_to_next_output_file};
@@ -1300,14 +1300,14 @@ sub gen_csv_util {
                         return if $r->{output_filenum} > @{ $r->{output_filenames} };
 
                         $r->{output_filename} = $r->{output_filenames}[ $r->{output_filenum}-1 ];
-                        log_info "[%d/%s] Opening output file %s ...",
+                        log_info "[csvutil] [%d/%s] Opening output file %s ...",
                             $r->{output_filenum}, $r->{output_num_of_files}, $r->{output_filename};
                         if ($r->{output_filename} eq '-') {
                             $r->{output_fh} = \*STDOUT;
                         } else {
                             if (-f $r->{output_filename}) {
                                 if ($r->{util_args}{overwrite}) {
-                                    log_info "Will be overwriting output file %s", $r->{output_filename};
+                                    log_info "[csvutil] Will be overwriting output file %s", $r->{output_filename};
                                 } else {
                                     die [412, "Refusing to overwrite existing output file '$r->{output_filename}', choose another name or use --overwrite (-O)"];
                                 }
@@ -1382,7 +1382,7 @@ sub gen_csv_util {
                 } # if outputs csv
 
                 if ($before_read_input) {
-                    log_trace "Calling before_read_input handler ...";
+                    log_trace "[csvutil] Calling before_read_input handler ...";
                     $before_read_input->($r);
                 }
 
@@ -1409,27 +1409,27 @@ sub gen_csv_util {
                         $r->{input_filename} = $input_filename;
 
                         if ($r->{input_filenum} == 1 && $before_open_input_files) {
-                            log_trace "Calling before_open_input_files handler ...";
+                            log_trace "[csvutil] Calling before_open_input_files handler ...";
                             $before_open_input_files->($r);
                             if (delete $r->{wants_skip_files}) {
-                                log_trace "Handler wants to skip files, skipping all input files";
+                                log_trace "[csvutil] Handler wants to skip files, skipping all input files";
                                 last READ_CSV;
                             }
                         }
 
                         if ($before_open_input_file) {
-                            log_trace "Calling before_open_input_file handler ...";
+                            log_trace "[csvutil] Calling before_open_input_file handler ...";
                             $before_open_input_file->($r);
                             if (delete $r->{wants_skip_file}) {
-                                log_trace "Handler wants to skip this file, moving on to the next file";
+                                log_trace "[csvutil] Handler wants to skip this file, moving on to the next file";
                                 next INPUT_FILENAME;
                             } elsif (delete $r->{wants_skip_files}) {
-                                log_trace "Handler wants to skip all files, skipping all input files";
+                                log_trace "[csvutil] Handler wants to skip all files, skipping all input files";
                                 last READ_CSV;
                             }
                         }
 
-                        log_info "[file %d/%d] Reading input file %s ...",
+                        log_info "[csvutil] [file %d/%d] Reading input file %s ...",
                             $r->{input_filenum}, scalar(@input_filenames), $input_filename;
                         my ($fh, $err) = _open_file_read($input_filename);
                         die $err if $err;
@@ -1492,14 +1492,14 @@ sub gen_csv_util {
                                 }
 
                                 if ($on_input_header_row) {
-                                    log_trace "Calling on_input_header_row hook handler ...";
+                                    log_trace "[csvutil] Calling on_input_header_row hook handler ...";
                                     $on_input_header_row->($r);
 
                                     if (delete $r->{wants_skip_file}) {
-                                        log_trace "Handler wants to skip this file, moving on to the next file";
+                                        log_trace "[csvutil] Handler wants to skip this file, moving on to the next file";
                                         next INPUT_FILENAME;
                                     } elsif (delete $r->{wants_skip_files}) {
-                                        log_trace "Handler wants to skip all files, skipping all input files";
+                                        log_trace "[csvutil] Handler wants to skip all files, skipping all input files";
                                         last READ_CSV;
                                     }
                                 }
@@ -1526,14 +1526,14 @@ sub gen_csv_util {
                                 }
 
                                 if ($on_input_data_row) {
-                                    log_trace "Calling on_input_data_row hook handler (for first data row) ..." if $r->{input_rownum} <= 2;
+                                    log_trace "[csvutil] Calling on_input_data_row hook handler (for first data row) ..." if $r->{input_rownum} <= 2;
                                     $on_input_data_row->($r);
 
                                     if (delete $r->{wants_skip_file}) {
-                                        log_trace "Handler wants to skip this file, moving on to the next file";
+                                        log_trace "[csvutil] Handler wants to skip this file, moving on to the next file";
                                         next INPUT_FILENAME;
                                     } elsif (delete $r->{wants_skip_files}) {
-                                        log_trace "Handler wants to skip all files, skipping all input files";
+                                        log_trace "[csvutil] Handler wants to skip all files, skipping all input files";
                                         last READ_CSV;
                                     }
                                 }
@@ -1544,17 +1544,17 @@ sub gen_csv_util {
                         # XXX actually close filehandle except stdin
 
                         if ($after_close_input_file) {
-                            log_trace "Calling after_close_input_file handler ...";
+                            log_trace "[csvutil] Calling after_close_input_file handler ...";
                             $after_close_input_file->($r);
                             if (delete $r->{wants_skip_files}) {
-                                log_trace "Handler wants to skip reading all file, skipping";
+                                log_trace "[csvutil] Handler wants to skip reading all file, skipping";
                                 last READ_CSV;
                             }
                         }
                     } # for input_filename
 
                     if ($after_close_input_files) {
-                        log_trace "Calling after_close_input_files handler ...";
+                        log_trace "[csvutil] Calling after_close_input_files handler ...";
                         $after_close_input_files->($r);
                     }
 
@@ -1576,7 +1576,7 @@ sub gen_csv_util {
                 delete $r->{wants_input_row_as_hashref};
 
                 if ($after_read_input) {
-                    log_trace "Calling after_read_input handler ...";
+                    log_trace "[csvutil] Calling after_read_input handler ...";
                     $after_read_input->($r);
                 }
 
@@ -1586,7 +1586,7 @@ sub gen_csv_util {
                 delete $r->{output_filenum};
                 if ($r->{output_fh}) {
                     if ($r->{output_filename} ne '-') {
-                        log_info "Closing output file '$r->{output_filename}' ...";
+                        log_info "[csvutil] Closing output file '$r->{output_filename}' ...";
                         close $r->{output_fh} or die [500, "Can't close output file '$r->{output_filename}': $!"];
                     }
                     delete $r->{output_fh};
@@ -1601,7 +1601,7 @@ sub gen_csv_util {
                 delete $r->{wants_switch_to_next_output_file};
 
                 if ($on_end) {
-                    log_trace "Calling on_end hook handler ...";
+                    log_trace "[csvutil] Calling on_end hook handler ...";
                     $on_end->($r);
                 }
 
@@ -1710,7 +1710,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 1.003 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2023-01-11.
+This document describes version 1.004 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2023-02-01.
 
 =head1 DESCRIPTION
 
@@ -1785,6 +1785,10 @@ This distribution contains the following CLI utilities:
 =item * L<csv-sort-fields>
 
 =item * L<csv-sort-rows>
+
+=item * L<csv-sorted>
+
+=item * L<csv-sorted-rows>
 
 =item * L<csv-split>
 

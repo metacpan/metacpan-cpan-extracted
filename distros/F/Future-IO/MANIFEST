@@ -2,12 +2,14 @@ Build.PL
 Changes
 lib/Future/IO.pm
 lib/Future/IO/ImplBase.pm
+lib/Future/IO/System.pm
 lib/Test/Future/IO/Impl.pm
 MANIFEST			This list of files
 t/00use.t
 t/01sleep.t
 t/02sysread.t
 t/03sysread_exactly.t
+t/03sysread_until_eof.t
 t/04syswrite.t
 t/05syswrite_exactly.t
 t/06connect.t
@@ -15,6 +17,7 @@ t/07accept.t
 t/10sleep+sysread.t
 t/20impl-override.t
 t/21impl-before-load.t
+t/30system.t
 t/99pod.t
 README
 LICENSE

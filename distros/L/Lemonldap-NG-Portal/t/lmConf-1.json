@@ -5,7 +5,7 @@
       "0002-app": {
         "options": {
           "description": "A simple application displaying authenticated user",
-          "display": "on",
+          "display": "auto",
           "logo": "demo.png",
           "name": "Application Test 1",
           "uri": "http://test1.example.com/",
@@ -16,7 +16,7 @@
       "0003-app": {
         "options": {
           "description": "",
-          "display": "on",
+          "display": "auto",
           "logo": "thumbnail.png",
           "name": "Application Test 2",
           "uri": "http://test2.example.com/",

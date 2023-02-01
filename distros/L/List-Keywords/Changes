@@ -1,5 +1,18 @@
 Revision history for List-Keywords
 
+0.09    2023-02-01
+        [CHANGES]
+         * Recognise a `my $var` declaration in front of single-argument
+           blocks (first, any/all/none/notall); use that instead of global $_
+         * Switch all the unit tests from Test::More to Test::V2
+
+        [BUGFIXES]
+         * Support latest bleadperl which needs `PERL_USE_VOLATILE_API` to get
+           access to optimize_optree() and finalize_optree()
+         * Don't confuse custom RPEEP hooks into an infinite spin by putting
+           the op start pointer into the optree fragment root too soon
+           (RT142471)
+
 0.08    2021-05-31
         [CHANGES]
          * Use the new XPK_*CTX versions of token macros to simplify needing

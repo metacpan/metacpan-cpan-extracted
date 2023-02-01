@@ -7,10 +7,12 @@ build_requires:
   Email::Sender: '0'
   GD::SecurityImage: '0'
   HTTP::Message: '0'
+  Hash::Merge::Simple: '0'
   IO::String: '0'
   Image::Magick: '0'
   LWP::UserAgent: '0'
   MIME::Entity: '0'
+  Net::SSLeay: '0'
   SOAP::Lite: '0'
   Text::Unidecode: '0'
   XML::LibXML: '0'
@@ -56,7 +58,7 @@ recommends:
   Web::ID: '0'
 requires:
   Clone: '0'
-  Lemonldap::NG::Handler: v2.0.15.1
+  Lemonldap::NG::Handler: v2.0.16
   Regexp::Assemble: '0'
 resources:
   MailingList: mailto:lemonldap-ng-dev@ow2.org
@@ -64,5 +66,5 @@ resources:
   bugtracker: https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues
   homepage: https://lemonldap-ng.org/
   license: http://opensource.org/licenses/GPL-2.0
-version: v2.0.15.1
+version: v2.0.16
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -25,7 +25,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.0.16';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Auth
@@ -151,7 +151,7 @@ sub extractFormInfo {
 
             # Do we check signature?
             my $checkSSOMessageSignature =
-              $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
+              $self->idpOptions->{$idp}
               ->{samlIDPMetaDataOptionsCheckSSOMessageSignature};
 
             if ($checkSSOMessageSignature) {
@@ -227,11 +227,10 @@ sub extractFormInfo {
             }
 
             # Do we check conditions?
-            my $checkTime = $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
-              ->{samlIDPMetaDataOptionsCheckTime};
+            my $checkTime =
+              $self->idpOptions->{$idp}->{samlIDPMetaDataOptionsCheckTime};
             my $checkAudience =
-              $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
-              ->{samlIDPMetaDataOptionsCheckAudience};
+              $self->idpOptions->{$idp}->{samlIDPMetaDataOptionsCheckAudience};
 
             # Check conditions - time and audience
             unless (
@@ -246,8 +245,7 @@ sub extractFormInfo {
             }
 
             my $relayStateURL =
-              $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
-              ->{samlIDPMetaDataOptionsRelayStateURL};
+              $self->idpOptions->{$idp}->{samlIDPMetaDataOptionsRelayStateURL};
 
             #  Extract RelayState information
             if ( $self->extractRelayState( $req, $relaystate, $relayStateURL ) )
@@ -257,7 +255,7 @@ sub extractFormInfo {
 
             # Check if we accept direct login from IDP
             my $allowLoginFromIDP =
-              $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
+              $self->idpOptions->{$idp}
               ->{samlIDPMetaDataOptionsAllowLoginFromIDP};
             if ( !$assertion_responded and !$allowLoginFromIDP ) {
                 $self->userLogger->error(
@@ -321,16 +319,14 @@ sub extractFormInfo {
             # Set user
             my $user = $nameid_content;
             my $userAttribute =
-              $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
-              ->{samlIDPMetaDataOptionsUserAttribute};
+              $self->idpOptions->{$idp}->{samlIDPMetaDataOptionsUserAttribute};
 
             if ($userAttribute) {
                 $self->logger->debug(
                     "Try to set user value from SAML attribute $userAttribute");
 
                 my $force_utf8 =
-                  $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
-                  ->{samlIDPMetaDataOptionsForceUTF8};
+                  $self->idpOptions->{$idp}->{samlIDPMetaDataOptionsForceUTF8};
 
                 my $attr_statement = $assertion->AttributeStatement();
                 if ($attr_statement) {
@@ -506,7 +502,7 @@ sub extractFormInfo {
 
             # Do we check signature?
             my $checkSLOMessageSignature =
-              $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
+              $self->idpOptions->{$idp}
               ->{samlIDPMetaDataOptionsCheckSLOMessageSignature};
 
             if ($checkSLOMessageSignature) {
@@ -596,7 +592,7 @@ sub extractFormInfo {
 
             # Do we check signature?
             my $checkSLOMessageSignature =
-              $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
+              $self->idpOptions->{$idp}
               ->{samlIDPMetaDataOptionsCheckSLOMessageSignature};
 
             if ($checkSLOMessageSignature) {
@@ -730,8 +726,7 @@ sub extractFormInfo {
 
             # Do we set signature?
             my $signSLOMessage =
-              $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
-              ->{samlIDPMetaDataOptionsSignSLOMessage};
+              $self->idpOptions->{$idp}->{samlIDPMetaDataOptionsSignSLOMessage};
 
             if ( $signSLOMessage == 0 ) {
                 $self->logger->debug(
@@ -968,6 +963,7 @@ sub extractFormInfo {
               if $self->{idpList}->{$_}->{displayName};
             my $icon    = $self->{idpList}->{$_}->{icon};
             my $order   = $self->{idpList}->{$_}->{order} // 0;
+            my $tooltip = $self->{idpList}->{$_}->{tooltip} || $idpName;
             my $img_src = '';
 
             if ($icon) {
@@ -984,8 +980,9 @@ sub extractFormInfo {
               {
                 val   => $_,
                 name  => $idpName,
+                title => $tooltip,
                 icon  => $img_src,
-                order => $order,
+                order => $order
               };
         }
         @list =
@@ -1014,25 +1011,20 @@ sub extractFormInfo {
     $self->logger->debug("$idp match $idpConfKey IDP in configuration");
 
     # IDP ForceAuthn
-    my $forceAuthn = $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
-      ->{samlIDPMetaDataOptionsForceAuthn};
+    my $forceAuthn =
+      $self->idpOptions->{$idp}->{samlIDPMetaDataOptionsForceAuthn};
 
     # IDP IsPassive
-    my $isPassive = $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
-      ->{samlIDPMetaDataOptionsIsPassive};
+    my $isPassive =
+      $self->idpOptions->{$idp}->{samlIDPMetaDataOptionsIsPassive};
 
     # IDP NameIDFormat
-    my $nameIDFormat = $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
-      ->{samlIDPMetaDataOptionsNameIDFormat};
+    my $nameIDFormat =
+      $self->idpOptions->{$idp}->{samlIDPMetaDataOptionsNameIDFormat};
     $nameIDFormat = $self->getNameIDFormat($nameIDFormat) if $nameIDFormat;
 
-    # IDP ProxyRestriction
-    my $allowProxiedAuthn = $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
-      ->{samlIDPMetaDataOptionsAllowProxiedAuthn};
-
     # IDP HTTP method
-    my $method = $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
-      ->{samlIDPMetaDataOptionsSSOBinding};
+    my $method = $self->idpOptions->{$idp}->{samlIDPMetaDataOptionsSSOBinding};
     $method = $self->getHttpMethod($method);
 
     # If no method defined, get first HTTP method
@@ -1054,13 +1046,13 @@ sub extractFormInfo {
           . " with IDP $idpConfKey for SSO profile" );
 
     # Set signature
-    my $signSSOMessage = $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
-      ->{samlIDPMetaDataOptionsSignSSOMessage} // -1;
+    my $signSSOMessage =
+      $self->idpOptions->{$idp}->{samlIDPMetaDataOptionsSignSSOMessage} // -1;
 
     # Authentication Context
     my $requestedAuthnContext =
-      $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
-      ->{samlIDPMetaDataOptionsRequestedAuthnContext} // '';
+      $self->idpOptions->{$idp}->{samlIDPMetaDataOptionsRequestedAuthnContext}
+      // '';
     $requestedAuthnContext = $self->getAuthnContext($requestedAuthnContext)
       if $requestedAuthnContext;
 
@@ -1068,7 +1060,7 @@ sub extractFormInfo {
     my $login = $self->createAuthnRequest(
         $req,          $self->lassoServer, $idp,
         $method,       $forceAuthn,        $isPassive,
-        $nameIDFormat, $allowProxiedAuthn, $signSSOMessage,
+        $nameIDFormat, 0,                  $signSSOMessage,
         $requestedAuthnContext
     );
 
@@ -1177,8 +1169,8 @@ sub setAuthSessionInfo {
     }
 
     # Force UTF-8
-    my $force_utf8 = $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
-      ->{samlIDPMetaDataOptionsForceUTF8};
+    my $force_utf8 =
+      $self->idpOptions->{$idp}->{samlIDPMetaDataOptionsForceUTF8};
 
     # Try to get attributes if attribute statement is present in assertion
     my $attr_statement = $assertion->AttributeStatement();
@@ -1188,17 +1180,11 @@ sub setAuthSessionInfo {
         my @attributes = $attr_statement->Attribute();
 
         # Wanted attributes are defined in IDP configuration
-        foreach (
-            keys
-            %{ $self->conf->{samlIDPMetaDataExportedAttributes}->{$idpConfKey} }
-          )
-        {
+        foreach ( keys %{ $self->idpAttributes->{$idp} } ) {
 
             # Extract fields from exportedAttr value
             my ( $mandatory, $name, $format, $friendly_name ) =
-              split( /;/,
-                $self->conf->{samlIDPMetaDataExportedAttributes}->{$idpConfKey}
-                  ->{$_} );
+              split( /;/, $self->idpAttributes->{$idp}->{$_} );
 
             # Try to get value
             my $value =
@@ -1230,8 +1216,7 @@ sub setAuthSessionInfo {
         my $utime    = time();
         my $timeout  = $self->conf->{timeout};
         my $adaptSessionUtime =
-          $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
-          ->{samlIDPMetaDataOptionsAdaptSessionUtime};
+          $self->idpOptions->{$idp}->{samlIDPMetaDataOptionsAdaptSessionUtime};
 
         if ( ( $utime + $timeout > $samltime ) and $adaptSessionUtime ) {
 
@@ -1261,8 +1246,8 @@ sub setAuthSessionInfo {
     $req->{sessionInfo}->{ $self->liDump } = $identity->dump() if $identity;
 
     # Keep SAML Token in session
-    my $store_samlToken = $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
-      ->{samlIDPMetaDataOptionsStoreSAMLToken};
+    my $store_samlToken =
+      $self->idpOptions->{$idp}->{samlIDPMetaDataOptionsStoreSAMLToken};
     if ($store_samlToken) {
         $self->logger->debug("Store SAML Token in session");
         $req->{sessionInfo}->{_samlToken} = $req->data->{_samlToken};
@@ -1334,8 +1319,7 @@ sub authLogout {
     }
 
     # IDP HTTP method
-    $method = $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
-      ->{samlIDPMetaDataOptionsSLOBinding};
+    $method = $self->idpOptions->{$idp}->{samlIDPMetaDataOptionsSLOBinding};
     $method = $self->getHttpMethod($method);
 
     # If no method defined, get first HTTP method
@@ -1357,8 +1341,8 @@ sub authLogout {
           . " with IDP $idpConfKey for SLO profile" );
 
     # Set signature
-    my $signSLOMessage = $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
-      ->{samlIDPMetaDataOptionsSignSLOMessage} // 0;
+    my $signSLOMessage =
+      $self->idpOptions->{$idp}->{samlIDPMetaDataOptionsSignSLOMessage} // 0;
 
     # Build Logout Request
     my $logout =
@@ -1437,7 +1421,7 @@ sub authLogout {
 
         # Do we check signature?
         my $checkSLOMessageSignature =
-          $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
+          $self->idpOptions->{$idp}
           ->{samlIDPMetaDataOptionsCheckSLOMessageSignature};
 
         unless ($checkSLOMessageSignature) {
@@ -1536,6 +1520,9 @@ sub getIDP {
     else {
         $self->logger->debug("IDP $idp selected from idp URL Parameter");
     }
+
+    # Lazy load IDP
+    $self->lazy_load_entityid($idp);
 
     # Case 6: auto select IDP if only one IDP defined
     if ( scalar keys %{ $self->idpList } == 1 ) {

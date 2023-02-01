@@ -1,5 +1,16 @@
 Revision history for Future-IO
 
+0.12    2023-01-31
+        [CHANGES]
+         * Added `Future::IO::System`, containing a system()-like and a
+           qx()-like method
+         * Added `->sysread_until_eof` method
+         * Update to perl v5.14 `package NAME VERSION` syntax
+         * Use `await` notation in method minisynopsis lines
+
+        [BUGFIXES]
+         * Need to work harder to set LocalAddr during socket tests
+
 0.11    2022-01-07
         [CHANGES]
          * Added ->connect and ->accept for socket-based code

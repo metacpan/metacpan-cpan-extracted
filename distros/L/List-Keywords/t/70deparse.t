@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use List::Keywords ':all';
 
@@ -31,6 +31,11 @@ is_deparsed
    sub { first { $_ > 10 } 1 .. 10 },
    'first {$_ > 10;} 1..10;',
    'first {}';
+
+is_deparsed
+   sub { first my $x { $x > 10 } 1 .. 10 },
+   'first my $x {$x > 10;} 1..10;',
+   'first my $x {}';
 
 is_deparsed
    sub { any { $_ > 10 } 1 .. 10 },

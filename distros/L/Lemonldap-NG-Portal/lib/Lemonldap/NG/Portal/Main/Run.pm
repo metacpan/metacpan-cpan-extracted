@@ -429,18 +429,17 @@ sub autoRedirect {
     # Redirection should be made if urldc defined
     if ( $req->{urldc} ) {
         $self->logger->debug("Building redirection to $req->{urldc}");
+        if (    $req->{pdata}->{_url}
+            and $req->{pdata}->{_url} eq encode_base64( $req->{urldc}, '' ) )
+        {
+            $self->logger->info("Force cleaning pdata");
+            delete $req->{pdata}->{_url};
+        }
         if ( $self->_jsRedirect->( $req, $req->sessionInfo ) ) {
             $req->error(PE_REDIRECT);
             $req->data->{redirectFormMethod} = "get";
         }
         else {
-            if (    $req->{pdata}->{_url}
-                and $req->{pdata}->{_url} eq encode_base64( $req->{urldc}, '' )
-              )
-            {
-                $self->logger->info("Force cleaning pdata");
-                delete $req->{pdata}->{_url};
-            }
             return [ 302, [ Location => $req->{urldc}, $req->spliceHdrs ], [] ];
         }
     }
@@ -962,18 +961,19 @@ sub sendHtml {
     my $csp = $self->csp . "form-action " . $self->conf->{cspFormAction};
     if ( my $url = $req->urldc ) {
         $self->logger->debug("Required urldc: $url");
-        $url =~ URIRE;
-        $url = $2 . '://' . $3 . ( $4 ? ":$4" : '' );
-        $self->logger->debug("Set CSP form-action with urldc: $url");
-        $csp .= " $url";
+        my $host = $self->cspGetHost($url);
+        if ($host) {
+            $self->logger->debug("Set CSP form-action with urldc: $url");
+            $csp .= " $host";
+        }
     }
     my $url = $args{params}->{URL};
     if ( defined $url ) {
         $self->logger->debug("Required Params URL: $url");
-        if ( $url =~ URIRE ) {
-            $url = $2 . '://' . $3 . ( $4 ? ":$4" : '' );
+        my $host = $self->cspGetHost($url);
+        if ($host) {
             $self->logger->debug("Set CSP form-action with Params URL: $url");
-            $csp .= " $url";
+            $csp .= " $host";
         }
     }
     if ( defined $req->data->{cspFormAction}
@@ -1204,11 +1204,12 @@ sub _sumUpSession {
       $withoutUser
       ? {}
       : { user => $session->{ $self->conf->{whatToTrace} } };
-    $res->{$_} = $session->{$_} foreach (
+    $res->{$_} = $session->{$_}
+      foreach (
         "_utime", "ipAddr",
         keys %{ $self->conf->{sessionDataToRemember} },
         keys %{ $self->pluginSessionDataToRemember }
-    );
+      );
     return $res;
 }
 
@@ -1304,12 +1305,26 @@ sub loadTemplate {
 # Content-Security-Polity header
 sub cspGetHost {
     my ( $self, $url ) = @_;
-    my $uri = $url // "";
-    unless ( $uri->isa("URI") ) {
+    return unless $url;
+    my $uri = $url;
+    unless (blessed($uri) && $uri->isa("URI") ) {
         $uri = URI->new($uri);
     }
-    return (
-        $uri->scheme . "://" . ( $uri->_port ? $uri->host_port : $uri->host ) );
+    my $scheme = $uri->scheme || "";
+    if ( $scheme =~ /^https?/ ) {
+        return (
+            $scheme . "://"
+              . (
+                ( $uri->port == $uri->default_port )
+                ? $uri->host
+                : $uri->host_port
+              )
+        );
+    }
+    elsif ($scheme) {
+        return ( $scheme . ":" );
+    }
+    return;
 }
 
 sub buildUrl {

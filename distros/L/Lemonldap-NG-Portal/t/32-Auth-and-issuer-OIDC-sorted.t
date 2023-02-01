@@ -99,8 +99,8 @@ count(3);
 # Found OIDC idp logo and display name
 ok(
     $res->[2]->[0] =~
-qr%<img src="http://auth.rp.com/static/common/icons/sfa_manager.png" class="mr-2" alt="op2" title="op2" />%,
-    'Found OIDC idp logo'
+qr%<img src="http://auth.rp.com/static/common/icons/sfa_manager.png" class="mr-2" alt="op2" title="My_tooltip" />%,
+    'Found OIDC idp logo and tooltip'
 ) or print STDERR Dumper( $res->[2]->[0] );
 ok( $res->[2]->[0] =~ qr%idpOPtest%, 'Found OIDC idp display name' )
   or print STDERR Dumper( $res->[2]->[0] );
@@ -150,7 +150,7 @@ sub op {
                     'loa-3' => 3
                 },
                 oidcServicePrivateKeySig => oidc_key_op_private_sig,
-                oidcServicePublicKeySig  => oidc_key_op_public_sig,
+                oidcServicePublicKeySig  => oidc_cert_op_public_sig,
             }
         }
     );
@@ -206,7 +206,8 @@ sub rp {
                         oidcOPMetaDataOptionsScope        => "openid profile",
                         oidcOPMetaDataOptionsStoreIDToken => 0,
                         oidcOPMetaDataOptionsDisplay      => "",
-                        oidcOPMetaDataOptionsIcon => 'icons/sfa_manager.png',
+                        oidcOPMetaDataOptionsIcon    => 'icons/sfa_manager.png',
+                        oidcOPMetaDataOptionsTooltip => 'My_tooltip',
                         oidcOPMetaDataOptionsClientID         => "rpid",
                         oidcOPMetaDataOptionsConfigurationURI =>
                           "https://auth.op.com/.well-known/openid-configuration"

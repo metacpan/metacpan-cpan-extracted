@@ -22,7 +22,7 @@ my $client = LLNG::Manager::Test->new( {
             passwordPolicyMinUpper      => 3,
             passwordPolicyMinDigit      => 1,
             passwordPolicyMinSpeChar    => 2,
-            passwordPolicySpecialChar   => '   [  } \   ',
+            passwordPolicySpecialChar   => '[ }\ }',
             portalDisplayPasswordPolicy => 1
         }
     }
@@ -69,11 +69,11 @@ ok(
     $res = $client->_post(
         '/',
         IO::String->new(
-            'oldpassword=dwho&newpassword=TESTis0k\}&confirmpassword=TESTis0k\}'
+'oldpassword=dwho&newpassword=T ESTis0k\}&confirmpassword=T ESTis0k\}'
         ),
         cookie => "lemonldap=$id",
         accept => 'application/json',
-        length => 66
+        length => 68
     ),
     'Password min size respected'
 );
@@ -324,7 +324,7 @@ m%<span trspan="passwordPolicyMinSpeChar">Minimal special characters:</span> 2%,
 ) or print STDERR Dumper( $res->[2]->[0], 'passwordPolicyMinSpeChar' );
 ok(
     $res->[2]->[0] =~
-m%\Q<span trspan="passwordPolicySpecialChar">Allowed special characters:</span> [ } \E%,
+m%\Q<span trspan="passwordPolicySpecialChar">Allowed special characters:</span> <space> [ \ }%,
     ' passwordPolicySpecialChar'
 ) or print STDERR Dumper( $res->[2]->[0], 'passwordPolicySpecialChar' );
 ok( $res->[2]->[0] !~ m%class="fa fa-eye-slash toggle-password">%,

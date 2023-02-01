@@ -97,3 +97,8 @@
 0.2.7 Sat Jan 28 15:00:54 2023
     - fixed dist.ini to exclude stuff from repo that's messing
       up CPAN indexing (no-op)
+
+0.2.8 Mon Jan 30 15:00:55 2023
+    - added wrapper, Getopt2h2o that will 'require Getopts::Long'
+      and then uses opt2h2o; it's perfect for hanging accessors
+      on your commandline flag options

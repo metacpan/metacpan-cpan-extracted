@@ -1,3 +1,8 @@
+0.002   2022-11-13  Released-By: PERLANCAR; Urgency: medium
+
+        - Add Data::XLSX::Parser.
+
+
 0.001   2022-08-10  Released-By: PERLANCAR
 
         - First early release.

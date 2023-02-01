@@ -47,9 +47,11 @@ sub init {
     $self->{hiddenAttributes} .= ' _session_id'
       unless $conf->{displaySessionId};
 
-    $self->{regSfaTypes} = [
-        sort map { s/^Yubikey$/UBK/r } split /[\s,]+/,
-        $conf->{available2FSelfRegistration}
+    $self->{regSfaTypes} = [ (
+            sort map { s/^Yubikey$/UBK/r } split /[\s,]+/,
+            $conf->{available2FSelfRegistration}
+        ),
+        keys %{ $conf->{sfExtra} || {} },
     ];
     return 1;
 }

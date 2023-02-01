@@ -1,5 +1,8 @@
 Revision history for idi
 
+0.0305    2023-01-31 22:06:27 PST
+    - Fix module imports.
+
 0.0304    2022-11-03 11:45:40 CDT
     - Improve documentation.
     - Improve tests.

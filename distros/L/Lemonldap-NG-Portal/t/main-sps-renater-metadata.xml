@@ -1,0 +1,223 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<md:EntitiesDescriptor xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:eidas="http://eidas.europa.eu/saml-extensions" xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:mdattr="urn:oasis:names:tc:SAML:metadata:attribute" xmlns:mdrpi="urn:oasis:names:tc:SAML:metadata:rpi" xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui" xmlns:pyff="http://pyff.io/NS" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:ser="http://eidas.europa.eu/metadata/servicelist" xmlns:shibmd="urn:mace:shibboleth:metadata:1.0" xmlns:xrd="http://docs.oasis-open.org/ns/xri/xrd-1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Name="https://federation.renater.fr/" ID="_20230113T161041Z" validUntil="2023-01-22T16:10:41Z" cacheDuration="PT1H"><ds:Signature><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/><ds:Reference URI="#_20230113T161041Z"><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#WithComments"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>2KtAwPZuto8H/1NhPHG4hN44rSI11bYPCya0Gl8frpQ=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>PWpSRWuIK7RPe7FSIlJQMqc7WUzE1iX1b/WEEgzT8auGdvVyBjuuRrqzs+fVstHzci7veJsJwABXX6eFUQL88qtm6CEBRYJAEG4BPG+V77wlrYqkMsI8XsNUIw1Bt9iiSitkQ0PhuN+WVNkaiZi5+nWtJan4IagPld90BvKNmIIRRt4xnxRKKNW+rT4HkrK25tQxqlmfvU1L73A4HNPV0wtKNylB7ZeR3spvczp3HDgyrLhCfdp9Igiw5EvDIUvvjhK0ujAnkfZbxa9/uKe8RqgotaZVBDx+m93RO47r7Vj60OmJ9umheTP6O8HMIUl55Gc1y8K9hkKW9L7Q18wcOw==</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIC9zCCAd+gAwIBAgIEfe6j3jANBgkqhkiG9w0BAQsFADAsMSowKAYDVQQDEyFT
+QU1MIE1ldGFkYXRhIFNpZ25pbmcgQ2VydGlmaWNhdGUwHhcNMTYwNzI5MDczNjM4
+WhcNMjYwNjA3MDczNjM4WjAsMSowKAYDVQQDEyFTQU1MIE1ldGFkYXRhIFNpZ25p
+bmcgQ2VydGlmaWNhdGUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDv
+X69N/roE+BhQXuybhP75br2oxXIZCf3A2qkEtzqynnd6r8lFM5QPbph6GOyV3mo3
+nYG/avlAbujhVTXbdqRdRjO6m+rV/62YX03Bhrsw8Q8XMLMkeE1eNk1HFyxbVYtb
+fh+FAKbShqTehI+g2jmp4aKM2xNKSBK3WY8fQ/x33lp/ZUmdPrNutyXG8fh6aqlP
+2gYuxaopYuUhtnu7U9SO41XAse6P3T39qmYLXdEEilXnZ97Lip7LfhudEd0JOSdl
+439MktMn2ExbPP1Nt2N8gVqIXsx5j45hFfNQl5C4ccy7/Yh6aShHbqZiLqKu+bHw
+B09w8LBxErDYJrjEuFs3AgMBAAGjITAfMB0GA1UdDgQWBBTT88iZzWO+hN9SBUkp
+x871lmTuLTANBgkqhkiG9w0BAQsFAAOCAQEABoPpODryXwiM5jjtqk6veR02FevC
+KHpZP6Od7Kqcfs6lg5LcQmGUOgpmW3Gg4UMjBYkgARsT2Nsnah1CJqa8cjvv8p5K
+EIhY0hVS8iMJnrb3PDeiFSeP4xSfct/6z/ebV4+QFl22bsm2zpAC6BpFz8+IJ/jA
+mQzTVob4MAUeQPnwwzm3xz6yanLZx7BK5cfrTCa+hrarNQCboRjXPwiejF8WRCxp
+gRHH6yNs5QH/Z6o5e3tUP7uEpn2Ob+kcLsEMGb9DghkoDAgkHCOZeTy+7hgxt+/T
+94cLTa58gVtvEOnd0GuL7Vfd+IVdXgSard8RfR3OyZlf6M4aSGQA73sskQ==</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature>
+    <md:EntityDescriptor entityID="https://podcast.mines-nantes.fr/shibboleth">
+        <md:Extensions>
+            <mdrpi:RegistrationInfo registrationAuthority="https://federation.renater.fr/" registrationInstant="2017-05-16T17:41:05Z">
+                <mdrpi:RegistrationPolicy xml:lang="en">https://services.renater.fr/federation/en/documentation/engagement-conformite/metadata_registration_practice_statement</mdrpi:RegistrationPolicy>
+            </mdrpi:RegistrationInfo>
+            <mdattr:EntityAttributes>
+                <saml:Attribute Name="http://macedir.org/entity-category" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+                    <saml:AttributeValue>https://federation.renater.fr/category/metier</saml:AttributeValue>
+                    <saml:AttributeValue>https://federation.renater.fr/scope/national</saml:AttributeValue>
+                </saml:Attribute>
+                <saml:Attribute Name="https://federation.renater.fr/member-of" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+                    <saml:AttributeValue>https://federation.renater.fr/</saml:AttributeValue>
+                </saml:Attribute>
+                <saml:Attribute Name="urn:oasis:names:tc:SAML:profiles:subject-id:req" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+                    <saml:AttributeValue>none</saml:AttributeValue>
+                </saml:Attribute>
+            </mdattr:EntityAttributes>
+        </md:Extensions>
+        <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.0:protocol urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:2.0:protocol">
+            <md:Extensions>
+                <mdui:UIInfo>
+                    <mdui:DisplayName xml:lang="fr">cartographie des compétences des EC</mdui:DisplayName>
+                    <mdui:DisplayName xml:lang="en">EC skills</mdui:DisplayName>
+                    <mdui:Description xml:lang="fr">Cartographie des compétences des EC IMT</mdui:Description>
+                    <mdui:Description xml:lang="en">IMT skills for techers</mdui:Description>
+                    <mdui:Logo height="129" width="225">https://www.imt-atlantique.fr/sites/default/files/logo_mt_0_0.png</mdui:Logo>
+                    <mdui:InformationURL xml:lang="fr">https://podcast.mines-nantes.fr/cartographie</mdui:InformationURL>
+                </mdui:UIInfo>
+            </md:Extensions>
+            <md:KeyDescriptor use="signing">
+                <ds:KeyInfo>
+                    <ds:X509Data>
+                        <ds:X509Certificate>MIIEODCCAqCgAwIBAgIJAOw6/PrXfTlvMA0GCSqGSIb3DQEBCwUAMCIxIDAeBgNV
+BAMTF3BvZGNhc3QubWluZXMtbmFudGVzLmZyMB4XDTIwMDUyNTA2NDU0MVoXDTMw
+MDUyMzA2NDU0MVowIjEgMB4GA1UEAxMXcG9kY2FzdC5taW5lcy1uYW50ZXMuZnIw
+ggGiMA0GCSqGSIb3DQEBAQUAA4IBjwAwggGKAoIBgQCo9jIbHGK+M9hKZsBMj748
+7G/8fqaAbaBtfG8cQZ1P5QFKQkH1jbKiOIJl5T/fqrQnXXEYPnm7CFWBcVTM2X3o
+oogpEyUM9zP4nu3yFl6m1lW8eDv8lI2LKAkvp37YC5CeAh9KETu2ATsIIJH4CK+Z
+epCe6PDsqOeseDDDahzNgOrFIIHwm1kPyYMhlBMHfY+uF9R+wIcJ0G4n22Vw1RWD
+4opPOWlA3JZHtZamUso2e+Yeq67e3BFG0NLPvUku2wgnJ1nhN7mkIZlXiBp+RBDj
+F0HnRdEThvhS3eBB4UQV81H+iw6CvCJgRAvgZIeiS/YSIVHP/DU47Z5Cbcensklv
+RAaWjJUlcuAjbYvitsafMibJwhaGnRcze4vu4E0wM0gfnic/X13QaRJOLfP7G/7G
+i0Y7sZCToFMFL428li5+Xlt9FXwhQG5cGT+8beim+X2JEyYC1du0Q0LMkV40ObuC
+JxW2ILcyImNZ81XPVJpDFzTqBlQK0pBlU1NAve5P8+ECAwEAAaNxMG8wTgYDVR0R
+BEcwRYIXcG9kY2FzdC5taW5lcy1uYW50ZXMuZnKGKmh0dHBzOi8vcG9kY2FzdC5t
+aW5lcy1uYW50ZXMuZnIvc2hpYmJvbGV0aDAdBgNVHQ4EFgQU4m7suvFJV/I58aln
+8mVvItTgH2cwDQYJKoZIhvcNAQELBQADggGBAGaAjGDtIQDLOnJEuNu/lskPZCrO
+d+S7/jKVxnJO72Prk7jy8vFY+cE0N5ddmD840PDsv7WRTzN1t6le9jX6oTX81Xz7
+riSe5zhgGcZhns9RRH6bGJRA2LiDRbPQVi8JhP/ffS0hPUtKlZh/frG0kptCkfi9
+1IKWuuJ6Yibsu0St38j2Y6CaHkHTIGMPjok82iyLawTCtvK0E75uDkepZgQhGZyb
+A9tfdhaJ43NhLt2H6IsnHl9/T2eZfxKrE3l43XlPiFecTMnKHfdaTntFadtxLep0
+iOJq0Cx1yWCtiJgNe4bLNcNTCUG5hdD/pYQd5fEZ7ou+4bPPYkRVfDVekGzONpLf
+bU4A3dwVS52dbTnq1NbdxoO8M11ZnOapReKd+BJ2zJCvN8RYMaphcm4mXEn1ORCp
+Enz+bVv9DiOg3Ql2pf0hRBt1mTFLqBqMkFUH3iRGJKFbnKWhIMTrdvCPxX81sYFe
+GHhSo2EtGScebXhd7nYU81qZk3OgBnIILa4PbQ==</ds:X509Certificate>
+                    </ds:X509Data>
+                </ds:KeyInfo>
+            </md:KeyDescriptor>
+            <md:KeyDescriptor use="encryption">
+                <ds:KeyInfo>
+                    <ds:X509Data>
+                        <ds:X509Certificate>MIIEODCCAqCgAwIBAgIJAOw6/PrXfTlvMA0GCSqGSIb3DQEBCwUAMCIxIDAeBgNV
+BAMTF3BvZGNhc3QubWluZXMtbmFudGVzLmZyMB4XDTIwMDUyNTA2NDU0MVoXDTMw
+MDUyMzA2NDU0MVowIjEgMB4GA1UEAxMXcG9kY2FzdC5taW5lcy1uYW50ZXMuZnIw
+ggGiMA0GCSqGSIb3DQEBAQUAA4IBjwAwggGKAoIBgQCo9jIbHGK+M9hKZsBMj748
+7G/8fqaAbaBtfG8cQZ1P5QFKQkH1jbKiOIJl5T/fqrQnXXEYPnm7CFWBcVTM2X3o
+oogpEyUM9zP4nu3yFl6m1lW8eDv8lI2LKAkvp37YC5CeAh9KETu2ATsIIJH4CK+Z
+epCe6PDsqOeseDDDahzNgOrFIIHwm1kPyYMhlBMHfY+uF9R+wIcJ0G4n22Vw1RWD
+4opPOWlA3JZHtZamUso2e+Yeq67e3BFG0NLPvUku2wgnJ1nhN7mkIZlXiBp+RBDj
+F0HnRdEThvhS3eBB4UQV81H+iw6CvCJgRAvgZIeiS/YSIVHP/DU47Z5Cbcensklv
+RAaWjJUlcuAjbYvitsafMibJwhaGnRcze4vu4E0wM0gfnic/X13QaRJOLfP7G/7G
+i0Y7sZCToFMFL428li5+Xlt9FXwhQG5cGT+8beim+X2JEyYC1du0Q0LMkV40ObuC
+JxW2ILcyImNZ81XPVJpDFzTqBlQK0pBlU1NAve5P8+ECAwEAAaNxMG8wTgYDVR0R
+BEcwRYIXcG9kY2FzdC5taW5lcy1uYW50ZXMuZnKGKmh0dHBzOi8vcG9kY2FzdC5t
+aW5lcy1uYW50ZXMuZnIvc2hpYmJvbGV0aDAdBgNVHQ4EFgQU4m7suvFJV/I58aln
+8mVvItTgH2cwDQYJKoZIhvcNAQELBQADggGBAGaAjGDtIQDLOnJEuNu/lskPZCrO
+d+S7/jKVxnJO72Prk7jy8vFY+cE0N5ddmD840PDsv7WRTzN1t6le9jX6oTX81Xz7
+riSe5zhgGcZhns9RRH6bGJRA2LiDRbPQVi8JhP/ffS0hPUtKlZh/frG0kptCkfi9
+1IKWuuJ6Yibsu0St38j2Y6CaHkHTIGMPjok82iyLawTCtvK0E75uDkepZgQhGZyb
+A9tfdhaJ43NhLt2H6IsnHl9/T2eZfxKrE3l43XlPiFecTMnKHfdaTntFadtxLep0
+iOJq0Cx1yWCtiJgNe4bLNcNTCUG5hdD/pYQd5fEZ7ou+4bPPYkRVfDVekGzONpLf
+bU4A3dwVS52dbTnq1NbdxoO8M11ZnOapReKd+BJ2zJCvN8RYMaphcm4mXEn1ORCp
+Enz+bVv9DiOg3Ql2pf0hRBt1mTFLqBqMkFUH3iRGJKFbnKWhIMTrdvCPxX81sYFe
+GHhSo2EtGScebXhd7nYU81qZk3OgBnIILa4PbQ==</ds:X509Certificate>
+                    </ds:X509Data>
+                </ds:KeyInfo>
+            </md:KeyDescriptor>
+            <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://podcast.mines-nantes.fr/Shibboleth.sso/SAML2/POST" index="1"/>
+            <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://podcast.mines-nantes.fr/Shibboleth.sso/SAML/POST" index="5"/>
+            <md:AttributeConsumingService index="0">
+                <md:ServiceName xml:lang="fr">cartographie des compétences des EC</md:ServiceName>
+                <md:ServiceName xml:lang="en">EC skills</md:ServiceName>
+                <md:ServiceDescription xml:lang="fr">Cartographie des compétences des EC IMT</md:ServiceDescription>
+                <md:ServiceDescription xml:lang="en">IMT skills for techers</md:ServiceDescription>
+                <md:RequestedAttribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" Name="urn:oid:0.9.2342.19200300.100.1.3" FriendlyName="mail"/>
+                <md:RequestedAttribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" Name="urn:oid:1.3.6.1.4.1.5923.1.1.1.6" FriendlyName="eduPersonPrincipalName" isRequired="true"/>
+                <md:RequestedAttribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" Name="urn:oid:2.5.4.4" FriendlyName="sn"/>
+                <md:RequestedAttribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" Name="urn:oid:2.5.4.42" FriendlyName="givenName"/>
+            </md:AttributeConsumingService>
+        </md:SPSSODescriptor>
+        <md:Organization>
+            <md:OrganizationName xml:lang="en">Ecole nationale supérieure Mines-Télécom Atlantique Bretagne Pays de la Loire</md:OrganizationName>
+            <md:OrganizationDisplayName xml:lang="en">Ecole nationale supérieure Mines-Télécom Atlantique Bretagne Pays de la Loire</md:OrganizationDisplayName>
+            <md:OrganizationURL xml:lang="en">https://www.imt-atlantique.fr/fr</md:OrganizationURL>
+        </md:Organization>
+        <md:ContactPerson contactType="technical">
+            <md:EmailAddress>mailto:sic-dist@mines-nantes.fr</md:EmailAddress>
+        </md:ContactPerson>
+    </md:EntityDescriptor>
+    <md:EntityDescriptor entityID="https://www.numistral.fr/shibboleth">
+        <md:Extensions>
+            <mdrpi:RegistrationInfo registrationAuthority="https://federation.renater.fr/" registrationInstant="2019-01-23T13:58:35Z">
+                <mdrpi:RegistrationPolicy xml:lang="en">https://services.renater.fr/federation/en/documentation/engagement-conformite/metadata_registration_practice_statement</mdrpi:RegistrationPolicy>
+            </mdrpi:RegistrationInfo>
+            <mdattr:EntityAttributes>
+                <saml:Attribute Name="http://macedir.org/entity-category" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+                    <saml:AttributeValue>https://federation.renater.fr/category/metier</saml:AttributeValue>
+                    <saml:AttributeValue>https://federation.renater.fr/scope/national</saml:AttributeValue>
+                </saml:Attribute>
+                <saml:Attribute Name="https://federation.renater.fr/member-of" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+                    <saml:AttributeValue>https://federation.renater.fr/</saml:AttributeValue>
+                </saml:Attribute>
+                <saml:Attribute Name="urn:oasis:names:tc:SAML:profiles:subject-id:req" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+                    <saml:AttributeValue>none</saml:AttributeValue>
+                </saml:Attribute>
+            </mdattr:EntityAttributes>
+        </md:Extensions>
+        <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.0:protocol urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:2.0:protocol">
+            <md:Extensions>
+                <mdui:UIInfo>
+                    <mdui:DisplayName xml:lang="fr">Portail bibliothèque numérique - numistral</mdui:DisplayName>
+                    <mdui:DisplayName xml:lang="en">Portail bibliothèque numérique - numistral</mdui:DisplayName>
+                    <mdui:Description xml:lang="fr">Portail bibliothèque numérique - numistral</mdui:Description>
+                    <mdui:Description xml:lang="en">Portail bibliothèque numérique - numistral</mdui:Description>
+                    <mdui:InformationURL xml:lang="fr">https://www.numistral.fr</mdui:InformationURL>
+                </mdui:UIInfo>
+            </md:Extensions>
+            <md:KeyDescriptor use="signing">
+                <ds:KeyInfo>
+                    <ds:X509Data>
+                        <ds:X509Certificate>MIIDHjCCAgagAwIBAgIJAM+eJUnMwngEMA0GCSqGSIb3DQEBBQUAMBsxGTAXBgNV
+BAMTEHd3dy5udW1pc3RyYWwuZnIwIBcNMTkwMTEwMTc0OTAwWhgPNDExNzA4MTkx
+NzQ5MDBaMBsxGTAXBgNVBAMTEHd3dy5udW1pc3RyYWwuZnIwggEiMA0GCSqGSIb3
+DQEBAQUAA4IBDwAwggEKAoIBAQDDv0zUGTjqiRu0rKlx3pJklug5JKlK7pOBIEtV
+tRJh7RzZkU9Hiie0EbR5eMAPy07Sd7cWvymNTCJ+efb5XQg0cREVhN7bbCq4LItb
+2Zy/ICNzWkiveZp8ZsBzqV62k8kOgjxr32pfsm57GT6Z+vcMnPZwdpmGPOFWn5ei
+323cy+Xv/IFsFzmL/gxjM1RCROPXbog7cvnxMRo1m0IhrYiuEPZiDhzzo+clCGJy
+LlvWs2cgMOTVDoBw4DMbw4t0s3W5wf00xz/vUBMfNCUo/hd+1hggqM1SSMZwTooO
+7PMQ+tABPG11YUXEIAj4DEVAuAn8OZD+QJPpjMy1n0BIDhvPAgMBAAGjYzBhMEAG
+A1UdEQQ5MDeCEHd3dy5udW1pc3RyYWwuZnKGI2h0dHBzOi8vd3d3Lm51bWlzdHJh
+bC5mci9zaGliYm9sZXRoMB0GA1UdDgQWBBT3FJcN4bPQPAjtgs/TVnh0N5GTeTAN
+BgkqhkiG9w0BAQUFAAOCAQEAnPQRE7ibreX6RAknzinykxUvPas3Vk5JkWK0zVlz
+Ie9ZlMezHkyrTM92CPnZoxDBAPnGdq+iaj5RIuFOL1scvpXO9LcYLaJMw1I0pBjw
+YEfZeL8LA73gaXQhJZQO2LP66Bqnpy/eP7FwR3ko0wEEXC8MGGTVEQuuroRFAFcv
+4nPpxXQJjsNvF4VXE7no3Tbw0eicivhw55s50UhfbVCwXbmuzVL4ttklJWTU8elM
+B/I0asWTsf/nzUUZQL9O4sar4kGZDBnM74si7HX03xzhq6d3geFRYfrbDQIEYLai
+fsDwhBGpV6YTK/uR07UTqBRQB0MlStBw88D6Ju7oFeHBpA==</ds:X509Certificate>
+                    </ds:X509Data>
+                </ds:KeyInfo>
+            </md:KeyDescriptor>
+            <md:KeyDescriptor use="encryption">
+                <ds:KeyInfo>
+                    <ds:X509Data>
+                        <ds:X509Certificate>MIIDHjCCAgagAwIBAgIJAM+eJUnMwngEMA0GCSqGSIb3DQEBBQUAMBsxGTAXBgNV
+BAMTEHd3dy5udW1pc3RyYWwuZnIwIBcNMTkwMTEwMTc0OTAwWhgPNDExNzA4MTkx
+NzQ5MDBaMBsxGTAXBgNVBAMTEHd3dy5udW1pc3RyYWwuZnIwggEiMA0GCSqGSIb3
+DQEBAQUAA4IBDwAwggEKAoIBAQDDv0zUGTjqiRu0rKlx3pJklug5JKlK7pOBIEtV
+tRJh7RzZkU9Hiie0EbR5eMAPy07Sd7cWvymNTCJ+efb5XQg0cREVhN7bbCq4LItb
+2Zy/ICNzWkiveZp8ZsBzqV62k8kOgjxr32pfsm57GT6Z+vcMnPZwdpmGPOFWn5ei
+323cy+Xv/IFsFzmL/gxjM1RCROPXbog7cvnxMRo1m0IhrYiuEPZiDhzzo+clCGJy
+LlvWs2cgMOTVDoBw4DMbw4t0s3W5wf00xz/vUBMfNCUo/hd+1hggqM1SSMZwTooO
+7PMQ+tABPG11YUXEIAj4DEVAuAn8OZD+QJPpjMy1n0BIDhvPAgMBAAGjYzBhMEAG
+A1UdEQQ5MDeCEHd3dy5udW1pc3RyYWwuZnKGI2h0dHBzOi8vd3d3Lm51bWlzdHJh
+bC5mci9zaGliYm9sZXRoMB0GA1UdDgQWBBT3FJcN4bPQPAjtgs/TVnh0N5GTeTAN
+BgkqhkiG9w0BAQUFAAOCAQEAnPQRE7ibreX6RAknzinykxUvPas3Vk5JkWK0zVlz
+Ie9ZlMezHkyrTM92CPnZoxDBAPnGdq+iaj5RIuFOL1scvpXO9LcYLaJMw1I0pBjw
+YEfZeL8LA73gaXQhJZQO2LP66Bqnpy/eP7FwR3ko0wEEXC8MGGTVEQuuroRFAFcv
+4nPpxXQJjsNvF4VXE7no3Tbw0eicivhw55s50UhfbVCwXbmuzVL4ttklJWTU8elM
+B/I0asWTsf/nzUUZQL9O4sar4kGZDBnM74si7HX03xzhq6d3geFRYfrbDQIEYLai
+fsDwhBGpV6YTK/uR07UTqBRQB0MlStBw88D6Ju7oFeHBpA==</ds:X509Certificate>
+                    </ds:X509Data>
+                </ds:KeyInfo>
+            </md:KeyDescriptor>
+            <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://www.numistral.fr/Shibboleth.sso/SAML2/POST" index="1"/>
+            <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://www.numistral.fr/Shibboleth.sso/SAML/POST" index="5"/>
+            <md:AttributeConsumingService index="0">
+                <md:ServiceName xml:lang="fr">Portail bibliothèque numérique - numistral</md:ServiceName>
+                <md:ServiceName xml:lang="en">Portail bibliothèque numérique - numistral</md:ServiceName>
+                <md:ServiceDescription xml:lang="fr">Portail bibliothèque numérique - numistral</md:ServiceDescription>
+                <md:ServiceDescription xml:lang="en">Portail bibliothèque numérique - numistral</md:ServiceDescription>
+                <md:RequestedAttribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" Name="urn:oid:0.9.2342.19200300.100.1.3" FriendlyName="mail" isRequired="true"/>
+                <md:RequestedAttribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" Name="urn:oid:1.3.6.1.4.1.5923.1.1.1.6" FriendlyName="eduPersonPrincipalName" isRequired="true"/>
+                <md:RequestedAttribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" Name="urn:oid:2.16.840.1.113730.3.1.241" FriendlyName="displayName"/>
+                <md:RequestedAttribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" Name="urn:oid:2.5.4.3" FriendlyName="cn"/>
+            </md:AttributeConsumingService>
+        </md:SPSSODescriptor>
+        <md:Organization>
+            <md:OrganizationName xml:lang="en">Bibliothèque Nationale et Universitaire Strasbourg</md:OrganizationName>
+            <md:OrganizationDisplayName xml:lang="en">Bibliothèque Nationale et Universitaire Strasbourg</md:OrganizationDisplayName>
+            <md:OrganizationURL xml:lang="en">http://www.bnu.fr</md:OrganizationURL>
+        </md:Organization>
+        <md:ContactPerson contactType="technical">
+            <md:EmailAddress>mailto:cri-contact@bnu.fr</md:EmailAddress>
+        </md:ContactPerson>
+    </md:EntityDescriptor>
+    </md:EntitiesDescriptor>

@@ -42,6 +42,28 @@ GQIDAQAB
 -----END PUBLIC KEY-----";
 }
 
+sub oidc_cert_op_public_sig {
+    "-----BEGIN CERTIFICATE-----
+MIIC/zCCAeegAwIBAgIUYFySF9bmkPZK1u+wdkwTSS9bxnMwDQYJKoZIhvcNAQEL
+BQAwDzENMAsGA1UEAwwEVGVzdDAeFw0yMjExMjkxNDI2MTFaFw00MjAxMjgxNDI2
+MTFaMA8xDTALBgNVBAMMBFRlc3QwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+AoIBAQCzaOyYigW5bMySKUloDz//n9PfRye7Nf0YiZdSsVHaT0QpMy0YwcJ0qVY6
+XcFX4FMBT1MvPsnN3+InkYnoHxOsfU8cWYenLz+oT9Lk6GKcikiLt5sAGqehVzAN
+0Jry6DOryTxJbGFE1d9UiXDPg0fVxonyWaIREWPsi80qoSHMCTSnIOvyG5u95MLf
+3FES6MqWyq62k8AU8nd/bJtWx3KRfmvHSHlKyUbeNVZiFn9I5vZojM6vREyOFCax
+hHBum3dqeOUFn3xo7ODsYCRs7zT3dflVWT29o9GDTPElDQOjRgvLORGKxIAgVvS1
+0q4OeNEYrrL83aPoC3YeOTGe1u0ZAgMBAAGjUzBRMB0GA1UdDgQWBBS/LX4E0Ipq
+h/4wcxNIXvoksj4vizAfBgNVHSMEGDAWgBS/LX4E0Ipqh/4wcxNIXvoksj4vizAP
+BgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA4IBAQAZk2m++tQ/FkZedpoA
+BlbRjvWjQ8u6qH5zaqS5oxnNX/JfJEFOsqL2n37g/0wuu6HhSYh2vD+zc4KfVMrj
+v6wzzmspJaZnACQLlEoB+ZKC1P+a8R95BK8iL1Dp1Iy0SC8CR6ZvQDEHNGWm8SAC
+K/cm2ee4wv4obg336SjXZ+Wid8lmdKDpJ7/XjiK2NQuvDLw6Jt7QpItKqwajEcJ/
+BOYQi7AAYtRBfi0v99nm3L2XF2ijTsIHDGhQqliFTXYwKO6ErCevEpDfDF28txqT
+R333fBH0ADco70lNPVTfOtpfdTjKvJ3N9SmU9V0BbhtegzMeung3QBmtMxApt8++
+LcJp
+-----END CERTIFICATE-----";
+}
+
 sub id_token_payload {
     my $token = shift;
     JSON::from_json( decode_base64( [ split /\./, $token ]->[1] ) );
@@ -75,8 +97,36 @@ sub authorize {
         accept => 'text/html',
         cookie => "lemonldap=$id",
     );
+    return $res;
+}
+
+sub codeAuthorize {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    my ( $op, $id, $params ) = @_;
+    my $res = authorize( $op, $id, $params );
     my ($code) = expectRedirection( $res, qr#http://.*code=([^\&]*)# );
     return $code;
+}
+
+sub tokenExchange {
+    my ( $op, $clientid, %params ) = @_;
+    my $query = buildForm( {
+            grant_type => 'urn:ietf:params:oauth:grant-type:token-exchange',
+            %params
+        }
+    );
+
+    my $res = $op->_post(
+        "/oauth2/token",
+        IO::String->new($query),
+        accept => 'application/json',
+        length => length($query),
+        custom => {
+            HTTP_AUTHORIZATION => "Basic "
+              . encode_base64("$clientid:$clientid"),
+        },
+    );
+    return $res;
 }
 
 sub codeGrant {

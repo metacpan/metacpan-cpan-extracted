@@ -1,19 +1,20 @@
 #!/usr/bin/env perl
 
+package Date::Parse::Modern;
+
 use strict;
 use warnings;
 use v5.10;
 
-package Date::Parse::Modern;
-
 use Carp;
-use Time::Local;
+use Time::Local 1.26;
 use Exporter 'import';
 our @EXPORT = ('strtotime');
 
 ###############################################################################
 
-our $VERSION = 0.3;
+# https://pause.perl.org/pause/query?ACTION=pause_operating_model#3_5_factors_considering_in_the_indexing_phase
+our $VERSION = 0.4;
 
 # https://timezonedb.com/download
 my $TZ_OFFSET = {
@@ -136,8 +137,8 @@ sub strtotime {
 		return undef;
 	}
 
-	my ($year, $month, $day) = (0, 0, 0);
-	my ($hour, $min  , $sec) = (0, 0, 0);
+	my ($year, $month, $day)      = (0, 0, 0);
+	my ($hour, $min  , $sec, $ms) = (0, 0, 0, 0);
 
 	###########################################################################
 	###########################################################################
@@ -185,7 +186,7 @@ sub strtotime {
 		\s+
 		(\d{1,4})        # Digits
 		[\s\$]           # Whitespace OR end of line
-		((\d+?) )?       # If there are digits ater the space it's 'Jan 13 2000'
+		((\d{4}) )?      # If there are digits ater the space it's 'Jan 13 2000'
 	/x;
 
 	# Next we look for alpha months followed by a digit if we didn't find a numeric month above
@@ -310,11 +311,25 @@ sub strtotime {
 		$year += 1900;
 	}
 
+	# Time::Local doesn't support fractional seconds, so we make an int version
+	# and then add the ms after the timegm_modern() conversion
+	$ms  = $sec - int($sec);
+	$sec = int($sec);
+
 	# If we have all the requisite pieces we build a unixtime
 	my $ret;
-	eval {
+	my $err = $@ || 'Error' unless eval {
 		$ret = Time::Local::timegm_modern($sec, $min, $hour, $day, $month - 1, $year);
+
+		return 1;
 	};
+
+	if ($err && $err =~ /Undefined subroutine/) {
+		print STDERR $err;
+		return undef;
+	};
+
+	$ret += $ms;
 
 	# If we find a timezone offset we take that in to account now
 	# Either: +1000 or -0700
@@ -323,21 +338,24 @@ sub strtotime {
 	my $tz_offset_seconds = 0;
 	my $tz_str            = '';
 	state $tz_rule        = qr/
-		(\s([+-])(\d{1,2})(\d{2}) # +1000 or -700 (three or four digits)
+		(
+		(\s|:\d\d)             # Start AFTER a space, or time (:12)
+		([+-])(\d{1,2})(\d{2}) # +1000 or -700 (three or four digits)
 		|
-		\d{2}\                    # Only match chars if they're AFTER a time
-		([A-Z]{1,4})\b            # Capitalized TZ at end of string
+		\d{2}\                 # Only match chars if they're AFTER a time
+		([A-Z]{1,4})\b         # Capitalized TZ at end of string
 		|
-		\d{2}(Z)$)                # Just a simple Z at the end
+		\d{2}(Z)$              # Just a simple Z at the end
+		)
 	/x;
 
 	if ($ret && $str =~ $tz_rule) {
 		my $str_offset = 0;
 
 		# String timezone: 11:53 PST
-		if ($5 || $6)  {
+		if ($6 || $7)  {
 			# Whichever form matches, the TZ is that one
-			my $tz_code = $5 || $6 || '';
+			my $tz_code = $6 || $7 || '';
 
 			# Lookup the timezone offset in the table
 			$str_offset  = $TZ_OFFSET->{$tz_code} || 0;
@@ -349,9 +367,9 @@ sub strtotime {
 		} else {
 			# Break the input string into parts so we can do math
 			# +1000 = 10 hours, -0700 = 7 hours, +0430 = 4.5 hours
-			$str_offset = ($3 + ($4 / 60)) * 3600;
+			$str_offset = ($4 + ($5 / 60)) * 3600;
 
-			if ($2 eq "-") {
+			if ($3 eq "-") {
 				$str_offset *= -1;
 			}
 

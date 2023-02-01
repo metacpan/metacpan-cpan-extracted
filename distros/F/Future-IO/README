@@ -64,17 +64,18 @@ METHODS
 
  accept
 
-       $f = Future::IO->accept( $fh )
+       $socketfh = await Future::IO->accept( $fh );
 
     Since version 0.11.
 
     Returns a Future that will become done when a new connection has been
     accepted on the given filehandle, which should represent a listen-mode
-    socket.
+    socket. The returned future will yield the newly-accepted client socket
+    filehandle.
 
  alarm
 
-       $f = Future::IO->alarm( $epoch )
+       await Future::IO->alarm( $epoch );
 
     Since version 0.08.
 
@@ -84,7 +85,7 @@ METHODS
 
  connect
 
-       $f = Future::IO->connect( $fh, $name )
+       await Future::IO->connect( $fh, $name );
 
     Since version 0.11.
 
@@ -93,16 +94,14 @@ METHODS
 
  sleep
 
-       $f = Future::IO->sleep( $secs )
+       await Future::IO->sleep( $secs );
 
     Returns a Future that will become done a fixed delay from now, given in
     seconds. This value may be fractional.
 
  sysread
 
-       $f = Future::IO->sysread( $fh, $length )
-    
-          $bytes = $f->get
+       $bytes = await Future::IO->sysread( $fh, $length );
 
     Returns a Future that will become done when at least one byte can be
     read from the given filehandle. It may return up to $length bytes. On
@@ -115,9 +114,7 @@ METHODS
 
  sysread_exactly
 
-       $f = Future::IO->sysread_exactly( $fh, $length )
-    
-          $bytes = $f->get
+       $bytes = await Future::IO->sysread_exactly( $fh, $length );
 
     Since version 0.03.
 
@@ -131,11 +128,19 @@ METHODS
 
     This may make more than one sysread() call.
 
+ sysread_until_eof
+
+       $f = Future::IO->sysread_until_eof( $fh )
+
+    Since version 0.12.
+
+    Returns a Future that will become done when the given filehandle
+    reaches the EOF condition. The returned future will yield all of the
+    bytes read up until that point.
+
  syswrite
 
-       $f = Future::IO->syswrite( $fh, $bytes )
-    
-          $written_len = $f->get
+       $written_len = await Future::IO->syswrite( $fh, $bytes );
 
     Since version 0.04.
 
@@ -149,9 +154,7 @@ METHODS
 
  syswrite_exactly
 
-       $f = Future::IO->syswrite_exactly( $fh, $bytes )
-    
-          $written_len = $f->get
+       $written_len = await Future::IO->syswrite_exactly( $fh, $bytes );
 
     Since version 0.04.
 
@@ -164,9 +167,7 @@ METHODS
 
  waitpid
 
-       $f = Future::IO->waitpid( $pid )
-    
-          $wstatus = $f->get
+       $wstatus = await Future::IO->waitpid( $pid );
 
     Since version 0.09.
 
@@ -184,7 +185,7 @@ METHODS
 
  override_impl
 
-       Future::IO->override_impl( $impl )
+       Future::IO->override_impl( $impl );
 
     Sets a new implementation for Future::IO, replacing the minimal default
     internal implementation. This can either be a package name or an object
@@ -202,7 +203,7 @@ METHODS
 
  HAVE_MULTIPLE_FILEHANDLES
 
-       $has = Future::IO->HAVE_MULTIPLE_FILEHANDLES
+       $has = Future::IO->HAVE_MULTIPLE_FILEHANDLES;
 
     Since version 0.11.
 
@@ -212,7 +213,7 @@ METHODS
 
  await
 
-       $f = $f->await
+       $f = $f->await;
 
     Since version 0.07.
 

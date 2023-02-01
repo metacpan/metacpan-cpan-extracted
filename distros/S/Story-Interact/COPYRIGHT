@@ -13,13 +13,16 @@ Files: Changes
  doap.ttl
  lib/Story/Interact/Analyze.pm
  lib/Story/Interact/Character.pm
+ lib/Story/Interact/Harness.pm
  lib/Story/Interact/Harness/Terminal.pm
+ lib/Story/Interact/Harness/Test.pm
  lib/Story/Interact/Page.pm
  lib/Story/Interact/PageSource.pm
  lib/Story/Interact/PageSource/DBI.pm
  lib/Story/Interact/PageSource/Dir.pm
  lib/Story/Interact/State.pm
  lib/Story/Interact/Syntax.pm
+ t/integration/house-story.t
 Copyright: Copyright 2023 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 

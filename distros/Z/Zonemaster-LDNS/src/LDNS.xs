@@ -1375,12 +1375,17 @@ packet_edns_version(obj,...)
 # -------------------
 # Get/set EDNS data
 # 
-# Beware, this code can only take a unique U32 parameter which means it 
-# is not a full implementation of EDNS data but it is enough for our 
+# This function acts on the OPT RDATA field of a packet. An OPT RDATA consists of at least one triplet
+# {OPTION-CODE, OPTION-LENGTH, OPTION-DATA}.
+# When given a parameter, this function will set and return the field, although with the limitation described below.
+# Otherwise, it will get and return the field (if any).
+#
+# Beware, when setting OPT RDATA, this code can only take a unique U32 parameter
+# which means it is not a full implementation of EDNS data but it is enough for our
 # current purpose. It can only deal with option codes with OPTION-LENGTH=0
 # (see 6.1.2 section of RFC 6891) which means OPTION-DATA is always empty.
 #
-# returns: a bytes string
+# returns: a bytes string (or undef if no OPT RDATA is found)
 #
 SV *
 packet_edns_data(obj,...)
@@ -1391,7 +1396,7 @@ packet_edns_data(obj,...)
         {
             SvGETMAGIC(ST(1));
             opt = ldns_native2rdf_int32(LDNS_RDF_TYPE_INT32, (U32)SvIV(ST(1)));
-            if(opt == NULL) 
+            if(opt == NULL)
             {
                 croak("Failed to set OPT RDATA");
             }
@@ -1399,8 +1404,12 @@ packet_edns_data(obj,...)
         }
         else {
             opt = ldns_pkt_edns_data(obj);
+            if(opt == NULL)
+            {
+                XSRETURN_UNDEF;
+            }
         }
-        RETVAL = newSVpvn((char*)(opt), 4);
+        RETVAL = newSVpvn((char*)(opt->_data), opt->_size);
     OUTPUT:
         RETVAL
 

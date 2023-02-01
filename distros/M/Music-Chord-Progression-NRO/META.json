@@ -68,7 +68,7 @@
          "web" : "https://github.com/ology/Music-Chord-Progression-NRO"
       }
    },
-   "version" : "0.0203",
+   "version" : "0.0308",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"

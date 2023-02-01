@@ -37,6 +37,12 @@
         <span trspan="passwordPolicySpecialChar">Allowed special characters:</span> <TMPL_VAR NAME="PPOLICY_ALLOWEDSPECHAR">
     </li>
     </TMPL_IF>
+    <TMPL_IF NAME="ENABLE_CHECKHIBP">
+    <li>
+        <i id="ppolicy-checkhibp-feedback" class="fa fa-li"> </i>
+        <span trspan="passwordCompromised">Password compromised</span>
+    </li>
+    </TMPL_IF>
   </ul>
   <TMPL_IF NAME="PPOLICY_NOPOLICY">
     <span trspan="passwordPolicyNone">You are free to choose your password! ;-)</span>

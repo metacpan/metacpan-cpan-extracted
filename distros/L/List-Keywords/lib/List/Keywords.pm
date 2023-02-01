@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package List::Keywords 0.08;
+package List::Keywords 0.09;
 
 use v5.14;
 use warnings;
@@ -104,7 +104,7 @@ sub import
 
 sub B::Deparse::pp_firstwhile
 {
-   my ($self, $op) = @_;
+   my ($self, $op, $cx) = @_;
    # first, any, all, none, notall
    my $private = $op->private;
    my $name =
@@ -115,7 +115,29 @@ sub B::Deparse::pp_firstwhile
       ( $private == 25 ) ? "notall" :
                            "firstwhile[op_private=$private]";
 
-   return B::Deparse::mapop(@_, $name);
+   # We can't just call B::Deparse::mapop because of the possibility of `my $var`
+   # So we'll inline it here
+   my $kid = $op->first;
+   $kid = $kid->first->sibling; # skip PUSHMARK
+   my $code = $kid->first;
+   $kid = $kid->sibling;
+   if(B::Deparse::is_scope $code) {
+      $code = "{" . $self->deparse($code, 0) . "} ";
+      if($op->targ) {
+         my $varname = $self->padname($op->targ);
+         $code = "my $varname $code";
+      }
+   }
+   else {
+      $code = $self->deparse($code, 24);
+      $code .= ", " if !B::Deparse::null($kid);
+   }
+   my @exprs;
+   for (; !B::Deparse::null($kid); $kid = $kid->sibling) {
+      my $expr = $self->deparse($kid, 6);
+      push @exprs, $expr if defined $expr;
+   }
+   return $self->maybe_parens_func($name, $code . join(" ", @exprs), $cx, 5);
 }
 
 sub B::Deparse::pp_reducewhile
@@ -137,6 +159,14 @@ Repeatedly calls the block of code, with C<$_> locally set to successive
 values from the given list. Returns the value and stops at the first item to
 make the block yield a true value. If no such item exists, returns C<undef>.
 
+   $val = first my $var { CODE } LIST
+
+I<Since version 0.09.>
+
+Optionally the code block can be prefixed with a lexical variable declaration.
+In this case, that variable will contain each value from the list, and the
+global C<$_> will remain untouched.
+
 =head2 any
 
    $bool = any { CODE } LIST
@@ -145,6 +175,12 @@ Repeatedly calls the block of code, with C<$_> locally set to successive
 values from the given list. Returns true and stops at the first item to make
 the block yield a true value. If no such item exists, returns false.
 
+   $val = any my $var { CODE } LIST
+
+I<Since version 0.09.>
+
+Uses the lexical variable instead of global C<$_>, similar to L</first>.
+
 =head2 all
 
    $bool = all { CODE } LIST
@@ -152,6 +188,12 @@ the block yield a true value. If no such item exists, returns false.
 Repeatedly calls the block of code, with C<$_> locally set to successive
 values from the given list. Returns false and stops at the first item to make
 the block yield a false value. If no such item exists, returns true.
+
+   $val = all my $var { CODE } LIST
+
+I<Since version 0.09.>
+
+Uses the lexical variable instead of global C<$_>, similar to L</first>.
 
 =head2 none
 
@@ -163,6 +205,13 @@ the block yield a false value. If no such item exists, returns true.
 I<Since verison 0.03.>
 
 Same as L</any> and L</all> but with the return value inverted.
+
+   $val = none my $var { CODE } LIST
+   $val = notall my $var { CODE } LIST
+
+I<Since version 0.09.>
+
+Uses the lexical variable instead of global C<$_>, similar to L</first>.
 
 =cut
 

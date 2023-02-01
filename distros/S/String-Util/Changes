@@ -1,4 +1,10 @@
-1.32  2021-03-26 14:06:00 PDT
+1.33  2023-01-31 15:48:59 PST
+
+1.32  2023-01-31
+
+	- Remove a bunch of old deprecated functions: crunch, cellfill, define, randword, fullchomp, randcrypt, equndef, neundef
+
+	- Update documentation
 
 1.32  2021-03-26 09:27:35 PDT
 

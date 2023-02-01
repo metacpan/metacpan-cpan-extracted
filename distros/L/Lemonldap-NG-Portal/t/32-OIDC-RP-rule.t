@@ -99,22 +99,33 @@ count(1);
 expectOK($res);
 
 # Try to authenticate to OP
-$query = "user=french&password=french&$query";
+my $query_auth = "user=french&password=french&$query";
 ok(
     $res = $op->_post(
         $url,
-        IO::String->new($query),
+        IO::String->new($query_auth),
         accept => 'text/html',
-        length => length($query),
+        length => length($query_auth),
     ),
     "Post authentication,        endpoint $url"
 );
 count(1);
 my $idpId = expectCookie($res);
-ok( $res->[2]->[0] =~ /trmsg="84"/, 'Reject reason is 84' );
+expectPortalError( $res, 84, 'PE_UNAUTHORIZEDPARTNER' );
+
+$query =~ s/client_id=rpid/client_id=unknownrp/;
+ok(
+    $res = $op->_get(
+        $url,
+        query  => $query,
+        accept => 'text/html',
+        cookie => "lemonldap=$idpId",
+    ),
+    "Post access to unknown RP",
+);
 count(1);
 
-#print STDERR Dumper($res);
+expectPortalError( $res, 107, "Unknown client ID" );
 
 clean_sessions();
 done_testing( count() );
@@ -163,7 +174,7 @@ sub op {
                     'loa-3' => 3
                 },
                 oidcServicePrivateKeySig => oidc_key_op_private_sig,
-                oidcServicePublicKeySig  => oidc_key_op_public_sig,
+                oidcServicePublicKeySig  => oidc_cert_op_public_sig,
             }
         }
     );

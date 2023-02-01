@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use List::Keywords 'any';
 
@@ -34,13 +34,18 @@ ok( !(any { $_ > 10 } 1 .. 9), 'list does not contain a value above ten' );
 {
    my @seen;
    any { push @seen, $_; $_ > 10 } 10, 20, 30, 40;
-   is_deeply( \@seen, [ 10, 20 ], 'short-circuits after first true result' );
+   is( \@seen, [ 10, 20 ], 'short-circuits after first true result' );
 }
 
 # stack discipline
 {
-   is_deeply( [ 1, 2, (any { $_ eq "x" } "x", "y"), 3, 4 ],
+   is( [ 1, 2, (any { $_ eq "x" } "x", "y"), 3, 4 ],
       [ 1, 2, 1, 3, 4 ], 'any() preserves stack discipline' );
+}
+
+# any my $x { BLOCK }
+{
+   ok( (any my $x { $x > 10 } 1 .. 20), 'list contains a value found by any my $x' );
 }
 
 done_testing;

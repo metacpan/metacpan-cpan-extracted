@@ -32,7 +32,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_PP_INSUFFICIENT_PASSWORD_QUALITY
 );
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.0.16';
 
 extends qw(
   Lemonldap::NG::Portal::Lib::SMTP
@@ -81,8 +81,8 @@ sub init {
             'passwordPolicyActivation'
         )
     );
-    return 0 unless $self->passwordPolicyActivationRule;
-    return 1;
+
+    return $self->passwordPolicyActivationRule ? 1 : 0;
 }
 
 # RUNNIG METHODS
@@ -103,30 +103,26 @@ sub resetPwd {
 
 sub _reset {
     my ( $self, $req ) = @_;
-    my ($mailToken);
+    my $mailToken;
 
     # PASSWORD CHANGE FORM => changePwd()
-    if (
+    return $self->changePwd($req)
+      if (
         $req->method =~ /^POST$/i
         and (  $req->param('newpassword')
             or $req->param('confirmpassword')
             or $req->param('reset') )
-      )
-    {
-        return $self->changePwd($req);
-    }
+      );
 
     # FIRST FORM
     $mailToken = $req->data->{mailToken} = $req->param('mail_token');
     unless ( $req->param('mail') || $mailToken ) {
         $self->setSecurity($req);
-        return PE_MAILFIRSTACCESS if ( $req->method eq 'GET' );
-        return PE_MAILFORMEMPTY;
+        return $req->method eq 'GET' ? PE_MAILFIRSTACCESS : PE_MAILFORMEMPTY;
     }
 
-    my $searchByMail = 1;
-
     # OTHER FORMS
+    my $searchByMail = 1;
     if ($mailToken) {
         $self->logger->debug("Token given for password reset: $mailToken");
 
@@ -224,7 +220,6 @@ sub _reset {
     unless ( $mailSession or $mailToken ) {
 
         # Create a new session
-
         my $infos = {};
 
         # Set _utime for session autoremove
@@ -307,7 +302,7 @@ sub _reset {
         $req->data->{mailAddress} ||=
           $self->p->getFirstValue(
             $req->{sessionInfo}->{ $self->conf->{mailSessionKey} } );
-        return PE_MAILERROR unless ( $req->data->{mailAddress} );
+        return PE_MAILERROR unless $req->data->{mailAddress};
 
         # Build confirmation url
         my $req_url = $req->data->{_url};
@@ -327,8 +322,7 @@ sub _reset {
             $subject = 'mailConfirmSubject';
             $tr->( \$subject );
         }
-        my $body;
-        my $html;
+        my ( $body, $html );
         if ( $self->conf->{mailConfirmBody} ) {
 
             # We use a specific text message, no html
@@ -362,17 +356,15 @@ sub _reset {
               . " is trying to reset his/her password" );
 
         # Send mail
-        unless (
+        $self->logger->debug('Unable to send reset mail')
+          unless (
             $self->send_mail(
                 $req->data->{mailAddress},
                 $subject, $body, $html
             )
-          )
-        {
-            $self->logger->debug('Unable to send reset mail');
+          );
 
-            # Don't return an error here to avoid enumeration
-        }
+        # Do not return an error here to avoid enumeration
         return PE_MAILCONFIRMOK;
     }
 
@@ -456,7 +448,7 @@ sub changePwd {
             $pwdRegEx = "[A-Z]{$uppers}[a-z]{$lowers}\\d{$digits}";
             $pwdRegEx .=
               $self->conf->{passwordPolicySpecialChar} eq '__ALL__'
-              ? "\\W{$chars}"
+              ? qq[\W{$chars}]
               : "[$self->{conf}->{passwordPolicySpecialChar}]{$chars}";
             $self->logger->debug("Generated password RegEx: $pwdRegEx");
         }
@@ -505,7 +497,7 @@ sub changePwd {
     my $result =
       $self->p->_passwordDB->setNewPassword( $req,
         $req->data->{newpassword}, 1 );
-    $req->{user} = undef;
+    undef $req->{user};
 
     # Mail token can be used only one time, delete the session if all is ok
     unless ( $result == PE_PASSWORD_OK or $result == PE_OK ) {
@@ -559,11 +551,9 @@ sub changePwd {
     }
 
     # Send mail
-    return PE_MAILERROR
-      unless $self->send_mail( $req->data->{mailAddress}, $subject, $body,
-        $html );
-
-    return PE_MAILOK;
+    return $self->send_mail( $req->data->{mailAddress}, $subject, $body, $html )
+      ? PE_MAILOK
+      : PE_MAILERROR;
 }
 
 sub setSecurity {
@@ -595,10 +585,6 @@ sub display {
     $self->logger->debug( 'Display called with code: ' . $req->error );
 
     my %tplPrm = (
-        SKIN_PATH       => $self->conf->{staticPrefix},
-        SKIN            => $self->p->getSkin($req),
-        SKIN_BG         => $self->conf->{portalSkinBackground},
-        MAIN_LOGO       => $self->conf->{portalMainLogo},
         AUTH_ERROR      => $req->error,
         AUTH_ERROR_TYPE => $req->error_type,
         AUTH_ERROR_ROLE => $req->error_role,
@@ -624,6 +610,7 @@ sub display {
         DISPLAY_MAILSENT        => 0,
         DISPLAY_PASSWORD_FORM   => 0,
         ENABLE_PASSWORD_DISPLAY => $self->conf->{portalEnablePasswordDisplay},
+        ENABLE_CHECKHIBP        => $self->conf->{checkHIBP},
         DONT_STORE_PASSWORD     => $self->conf->{browsersDontStorePassword},
         DISPLAY_PPOLICY  => $self->conf->{portalDisplayPasswordPolicy} && $isPP,
         PPOLICY_MINSIZE  => $self->conf->{passwordPolicyMinSize},
@@ -642,13 +629,9 @@ sub display {
         $tplPrm{MAIL_TOKEN} = $req->data->{mailToken};
     }
 
-    # Display captcha if it's enabled
-    if ( $req->captchaHtml ) {
-        $tplPrm{CAPTCHA_HTML} = $req->captchaHtml;
-    }
-    if ( $req->token ) {
-        $tplPrm{TOKEN} = $req->token;
-    }
+    # Display captcha if enabled
+    $tplPrm{CAPTCHA_HTML} = $req->captchaHtml if ( $req->captchaHtml );
+    $tplPrm{TOKEN}        = $req->token       if $req->token;
 
     # DEPRECATED: This is only used for compatibility with existing templates
     if ( $req->captcha ) {

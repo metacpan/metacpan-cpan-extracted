@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 # This "test" never fails, but prints a benchmark comparison between these
 # util functions and the ones provided by List::Util

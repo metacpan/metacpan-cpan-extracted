@@ -759,6 +759,7 @@ sub sfExtra {
         $tmp->{type}       = 'sfExtra';
         $tmp->{data}->{$_} = $val->{$mod}->{$_}
           foreach (qw(type rule logo level label));
+        $tmp->{data}->{register} = $val->{$mod}->{register} ? \1 : \0;
         my $over = $val->{$mod}->{over} // {};
         $tmp->{data}->{over} = [ map { [ $_, $over->{$_} ] } keys %$over ];
         push @$res, $tmp;

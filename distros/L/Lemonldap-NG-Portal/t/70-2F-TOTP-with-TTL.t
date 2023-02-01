@@ -3,7 +3,7 @@ use strict;
 use IO::String;
 
 require 't/test-lib.pm';
-my $maintests = 22;
+my $maintests = 27;
 
 SKIP: {
     eval { require Convert::Base32 };
@@ -100,7 +100,27 @@ SKIP: {
     ok( $code = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 ),
         'Code' );
     ok( $code =~ /^\d{6}$/, 'Code contains 6 digits' );
-    my $s = "code=$code&token=$token&TOTPName=myTOTP";
+    my $s = "code=$code&token=$token&TOTPName=my-T #OTP";
+    ok(
+        $res = $client->_post(
+            '/2fregisters/totp/verify',
+            IO::String->new($s),
+            length => length($s),
+            cookie => "lemonldap=$id",
+        ),
+        'Post code'
+    );
+    eval { $res = JSON::from_json( $res->[2]->[0] ) };
+    ok( not($@), 'Content is JSON' )
+      or explain( $res->[2]->[0], 'JSON content' );
+    ok( $res->{error} eq 'badName', 'badName returned' )
+      or explain( $res, 'Expect badName' );
+
+    # Post code
+    ok( $code = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 ),
+        'Code' );
+    ok( $code =~ /^\d{6}$/, 'Code contains 6 digits' );
+    $s = "code=$code&token=$token&TOTPName=my-T OTP";
     ok(
         $res = $client->_post(
             '/2fregisters/totp/verify',

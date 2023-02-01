@@ -46,7 +46,7 @@ ok(
 );
 count(1);
 
-expectPortalError( $res, 68, "Unauthorized CAS service" );
+expectPortalError( $res, 107, "Unknown CAS service" );
 
 my $ticket;
 

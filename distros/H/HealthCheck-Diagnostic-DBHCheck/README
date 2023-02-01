@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version v0.500.3
+    version v1.0.0
 
 SYNOPSIS
 
@@ -14,6 +14,7 @@ SYNOPSIS
                 dbh       => \&connect_to_read_write_db,
                 db_access => "rw",
                 tags      => [qw< dbh_check_rw >]
+                timeout   => 10, # default
             ),
             HealthCheck::Diagnostic::DBHCheck->new(
                 dbh       => \&connect_to_read_only_db,
@@ -40,12 +41,12 @@ ATTRIBUTES
 
  label
 
-    Inherited from "label1" in HealthCheck::Diagnostic, defaults to
+    Inherited from "label" in HealthCheck::Diagnostic, defaults to
     dbh_check.
 
  tags
 
-    Inherited from "tags1" in HealthCheck::Diagnostic, defaults to [
+    Inherited from "tags" in HealthCheck::Diagnostic, defaults to [
     'dbh_check' ].
 
  dbh
@@ -71,6 +72,13 @@ ATTRIBUTES
 
     Defaults to DBI::db.
 
+ timeout
+
+    Sets up an ALRM signal handler used to timeout the initial connection
+    attempt after the number of seconds provided.
+
+    Defaults to 10.
+
 DEPENDENCIES
 
     HealthCheck::Diagnostic
@@ -85,7 +93,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2019 - 2020 by Grant Street Group.
+    This software is Copyright (c) 2019 - 2023 by Grant Street Group.
 
     This is free software, licensed under:
 

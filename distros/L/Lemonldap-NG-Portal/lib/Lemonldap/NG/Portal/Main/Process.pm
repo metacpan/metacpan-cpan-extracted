@@ -8,6 +8,7 @@ use strict;
 use MIME::Base64;
 use POSIX qw(strftime);
 use Lemonldap::NG::Portal::Main::Constants qw(portalConsts);
+use URI;
 
 # Main method
 # -----------
@@ -51,6 +52,8 @@ sub processHook {
     my $err = PE_OK;
     for my $sub ( @{ $self->hook->{$hookName} } ) {
         if ( ref $sub eq 'CODE' ) {
+
+            # If return code is not PE_OK (0), stop processing
             last if ( $err = $sub->( $req, @args ) );
         }
         else {
@@ -58,8 +61,14 @@ sub processHook {
         }
     }
     if ( $err != PE_OK ) {
-        $self->logger->warn(
-            "Hook $hookName returned " . portalConsts->{$err} );
+        my $msg = "Hook $hookName returned " . portalConsts->{$err};
+        if ( $err > 0 ) {
+            $self->logger->warn($msg);
+        }
+        else {
+            # <0 error codes are normal in some use cases
+            $self->logger->debug($msg);
+        }
     }
     return $err;
 }
@@ -161,7 +170,15 @@ sub controlUrl {
             delete $req->{urldc};
             return PE_BADURL;
         }
-        my ( $proto, $vhost, $appuri ) = ( $2, $3, $5 );
+        my ( $proto, $vhost, $appuri );
+        if ($tmp) {
+            my $u = URI->new($tmp);
+            if ( $u->scheme =~ /^https?$/ ) {
+                $proto  = $u->scheme;
+                $vhost  = $u->host if $u->can("host");
+                $appuri = $u->path_query;
+            }
+        }
 
         # Try to resolve alias
         my $originalVhost = $self->HANDLER->resolveAlias($vhost);
@@ -179,11 +196,11 @@ sub controlUrl {
             and !$self->isTrustedUrl($vhost) )
         {
             $self->userLogger->error(
-                    "URL contains a non protected host (param: "
+                    "URL contains an unprotected host (param: "
                   . ( $req->param('logout') ? 'HTTP Referer' : 'urldc' )
                   . " | value: $tmp | alias: $vhost)" );
             delete $req->{urldc};
-            return PE_BADURL;
+            return PE_UNPROTECTEDURL;
         }
 
         $req->env->{urldc} = $req->{urldc};
@@ -303,14 +320,14 @@ sub deleteSession {
     $req->userData( {} );
 
     # Redirect or Post if asked by authLogout
-    if ( $req->urldc and $req->urldc ne $self->conf->{portal} ) {
-        $req->steps( [] );
-        return PE_REDIRECT;
-    }
-
     if ( $req->postUrl ) {
         $req->steps( ['autoPost'] );
         return PE_OK;
+    }
+
+    if ( $req->urldc and $req->urldc ne $self->conf->{portal} ) {
+        $req->steps( [] );
+        return PE_REDIRECT;
     }
 
     # If logout redirects to another URL, just remove next steps for the

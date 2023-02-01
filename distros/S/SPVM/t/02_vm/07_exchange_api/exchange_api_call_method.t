@@ -1268,6 +1268,28 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
   is($point->y, 2);
 }
 
+# Static instance method call
+{
+  {
+    my $list = SPVM::FloatList->new([]);
+    $list->SPVM::FloatList::push(1);
+    is_deeply($list->length, 1);
+  }
+}
+
+# Invalid argument type
+{
+  {
+    my $list = SPVM::IntList->new([]);
+    eval { $list->push(undef) };
+    like($@, qr|The 1th argument of the "push" method in the "IntList" class must be a number|);
+  }
+  {
+    eval { SPVM::IntList->new(1) };
+    like($@, qr|The 1th argument of the "new" method in the "IntList" class must be a SPVM::BlessedObject::Array object|);
+  }
+}
+
 # All object is freed
 my $end_memory_blocks_count = $api->get_memory_blocks_count();
 is($end_memory_blocks_count, $start_memory_blocks_count);

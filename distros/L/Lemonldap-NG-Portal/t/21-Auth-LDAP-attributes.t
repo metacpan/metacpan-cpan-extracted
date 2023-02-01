@@ -20,7 +20,7 @@ SKIP: {
                 userDB                   => 'Same',
                 passwordDB               => 'LDAP',
                 portalRequireOldPassword => 1,
-                ldapServer               => 'ldap://127.0.0.1:19389/',
+                ldapServer               => $main::slapd_url,
                 ldapBase                 => 'ou=users,dc=example,dc=com',
                 managerDn                => 'cn=admin,dc=example,dc=com',
                 managerPassword          => 'admin',
@@ -81,8 +81,7 @@ SKIP: {
     is( $res->{roomNumber}, 0, 'attribute with value of 0 present' );
     ok( !exists $res->{displayName}, 'missing LDAP attribute is not stored' );
 
-    clean_sessions();
 }
 count($maintests);
-stopLdapServer() if $ENV{LLNGTESTLDAP};
+clean_sessions();
 done_testing( count() );

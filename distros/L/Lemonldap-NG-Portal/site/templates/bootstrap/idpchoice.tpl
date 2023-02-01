@@ -29,10 +29,10 @@
 
       <div class="row text-center">
       <TMPL_LOOP NAME="LIST">
-        <div class="col-sm-6 <TMPL_VAR NAME="class"> mb-3">
+        <div class="col-sm-6 mb-3">
           <button type="submit" class="btn btn-secondary idploop py-3" val="<TMPL_VAR NAME="VAL">">
           <TMPL_IF NAME="icon">
-            <img src="<TMPL_VAR NAME="icon">" class="mr-2" alt="<TMPL_VAR NAME="NAME">" title="<TMPL_VAR NAME="NAME">" />
+            <img src="<TMPL_VAR NAME="icon">" class="mr-2" alt="<TMPL_VAR NAME="NAME">" title="<TMPL_VAR NAME="title">" />
           <TMPL_ELSE>
             <i class="fa fa-globe mr-2"></i>
             <TMPL_VAR NAME="NAME">

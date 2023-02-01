@@ -84,7 +84,7 @@ SKIP: {
     ok( $code = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 ),
         'Code' );
     ok( $code =~ /^\d{6}$/, 'Code contains 6 digits' );
-    my $s = "code=$code&token=$token&TOTPName=myTOTP";
+    my $s = "code=$code&token=$token&TOTPName=MyTOTp";
     ok(
         $res = $client->_post(
             '/2fregisters/totp/verify',
@@ -263,7 +263,7 @@ qr%<input type="hidden" name="reference1x1" value="RemoveSF-(\d{10})"/>%,
       or print STDERR Dumper( $res->[2]->[0] ), time(), " / $1";
     ok(
         $res->[2]->[0] =~
-qr%<p class="notifText">1 expired second factor\(s\) has/have been removed \(\d{10}\)!</p>%,
+qr%<p class="notifText">1 expired second factor\(s\) has/have been removed \(MyU2F\)!</p>%,
         'Notification message found'
     ) or print STDERR Dumper( $res->[2]->[0] );
     $id = expectCookie($res);
@@ -298,7 +298,7 @@ qr%<input type="hidden" name="reference1x2" value="RemoveSF-(\d{10})"/>%,
       or print STDERR Dumper( $res->[2]->[0] ), time(), " / $1";
     my @notifs =
       ( $res->[2]->[0] =~
-m%<p class="notifText">1 expired second factor\(s\) has/have been removed \((?:myTOTP|\d{10})\)!</p>%gs
+m%<p class="notifText">1 expired second factor\(s\) has/have been removed \(My(?:TOTp|U2F)\)!</p>%gs
       );
     ok( 2 == @notifs, '2 notifications found' )
       or print STDERR Dumper( $res->[2]->[0] );

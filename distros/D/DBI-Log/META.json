@@ -54,6 +54,6 @@
          "web" : "https://github.com/zorgnax/dbilog"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

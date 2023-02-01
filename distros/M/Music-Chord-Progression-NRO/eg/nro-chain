@@ -3,31 +3,53 @@ use strict;
 use warnings;
 
 # Use a circular list ("necklace") of Neo-Riemannian transformations,
-# plus "X" meaning "make no transformation." Starting at position zero
+# plus "X" meaning "make no transformation." Starting at position zero,
 # move forward or backward along the necklace, transforming the
 # current chord, and render the resulting progression as MIDI.
 
-use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util Music-Chord-Progression-NRO Music-MelodicDevice-Transposition);
+# Example:
+# > perl nro-chain --r=1 --m=12 --bpm=90 --note=C --o=5 --t=X,PRL,R,L,R,L,R --v
+# > perl nro-chain --r=2 --m=8 --bpm=110 --note=A --o=5 --s=minor --t=8 --v
+# > perl nro-chain --r=4 --t=7 --nobass --v
+# > timidity %.mid
+
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util Music-Chord-Progression-NRO Music-MelodicDevice-Transposition); # local author libs
+
+use Getopt::Long qw(GetOptions);
 use MIDI::Util qw(setup_score midi_format);
 use Music::Chord::Progression::NRO ();
 use Music::MelodicDevice::Transposition ();
 
-my $max       = shift || 8;
-my $bpm       = shift || 100;
-my $note      = shift || 'G';
-my $octave    = shift || 4;
-my $transform = shift || 'X,PRL,R,L,R,L,R'; # Mostly diatonic
-                                            # integer = random
+my %opt = (
+    repeat    => 1,
+    max       => 4,
+    bpm       => 100,
+    note      => 'G',
+    octave    => 4,
+    scale     => 'major',
+    transform => 'X,PRL,R,L,R,L,R', # mostly diatonic. integer = random
+    bass      => 1,
+    verbose   => 0,
+);
+GetOptions(\%opt,
+    'repeat=i',
+    'max=i',
+    'bpm=i',
+    'note=s',
+    'octave=i',
+    'scale=s',
+    'transform=s',
+    'bass!',
+    'verbose',
+) or die("Error in command line arguments\n");
 
-print "Initial: $note$octave\nTransforms: $transform\n";
-
-my @bass; # collected by top
-
-if ($transform =~ /[A-Z,]/) {
-    $transform = [ split /,/, $transform ];
+if ($opt{transform} =~ /[A-Z,]/) {
+    $opt{transform} = [ split /,/, $opt{transform} ];
 }
 
-my $score = setup_score(bpm => $bpm);
+my @bass; # collected by top()
+
+my $score = setup_score(bpm => $opt{bpm});
 
 $score->synch(
     \&top,
@@ -37,8 +59,11 @@ $score->synch(
 $score->write_score("$0.mid");
 
 sub bottom {
+    return unless $opt{bass};
+
     my $md = Music::MelodicDevice::Transposition->new;
     my $transposed = $md->transpose(-24, \@bass);
+
     for my $note (@$transposed) {
         $score->n('wn', midi_format($note));
     }
@@ -46,16 +71,33 @@ sub bottom {
 
 sub top {
     my $nro = Music::Chord::Progression::NRO->new(
-        base_note   => $note,
-        base_octave => $octave,
-        transform   => $transform,
-        max         => $max,
-        verbose     => 1,
+        base_note   => $opt{note},
+        base_octave => $opt{octave},
+        base_scale  => $opt{scale},
+        transform   => $opt{transform},
+        max         => $opt{max},
+        verbose     => $opt{verbose},
     );
     my $chords = $nro->circular;
 
-    for my $chord (@$chords) {
-        $score->n('wn', midi_format(@$chord));
-        push @bass, $chord->[0];
+    # repeat though the chord progression
+    for my $i (1 .. $opt{repeat}) {
+        my $j = 0; # chord counter
+
+        for my $chord (@$chords) {
+            $j++;
+
+            # add a midi formatted whole note to the score
+            $score->n('wn', midi_format(@$chord));
+
+            # select the lowest note of the final chord for the bass
+            if ($i >= $opt{repeat} && $j >= @$chords) {
+                push @bass, $chord->[0];
+            }
+            # otherwise pick any chord note
+            else {
+                push @bass, $chord->[ int rand @$chord ];
+            }
+        }
     }
 }

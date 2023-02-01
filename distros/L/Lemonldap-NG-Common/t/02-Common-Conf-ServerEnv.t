@@ -4,12 +4,14 @@ use Data::Dumper;
 
 BEGIN { use_ok('Lemonldap::NG::Common::Conf') }
 
+use File::Temp;
+my $dir = File::Temp::tempdir( CLEANUP => 1 );
 my $h;
 
 ok(
     $h = new Lemonldap::NG::Common::Conf( {
             type    => 'File',
-            dirName => "t/",
+            dirName => $dir,
         }
     ),
     'type => file',
@@ -73,5 +75,3 @@ ok( $cfg = $h->getConf( { cfgNum => 1, raw => 1 } ), 'Get raw conf' );
 ok( $cfg->{test} eq '%SERVERENV:A%',
     '%SERVERENV:A% is not substitued into Aa in raw mode' )
   or print STDERR "Expect $cfg->{test} eq %SERVERENV:A%\n";
-
-unlink 't/lmConf-1.json';

@@ -595,7 +595,7 @@ This file contains:
           while (cs.$modelValue.title !== (type + "s")) {
             cs = cs.$parentNodeScope;
           }
-          t = JSON.parse(JSON.stringify($scope.currentNode).replace(new RegExp(idkey, 'g'), 'new__' + name));
+          t = JSON.parse(JSON.stringify($scope.currentNode).replace(/[*]/g, '').replace(new RegExp(idkey, 'g'), 'new__' + name));
           t.id = type + "s/new__" + name;
           t.title = name;
           cs.$modelValue.nodes.push(t);
@@ -871,6 +871,19 @@ This file contains:
           return console.log('New key cancelled');
         });
       };
+      $scope.newCertificateNoPassword = function() {
+        var currentNode;
+        $scope.waiting = true;
+        currentNode = $scope.currentNode;
+        return $http.post(window.confPrefix + "/newCertificate", {
+          "password": ''
+        }).then(function(response) {
+          currentNode.data[0].data = response.data["private"];
+          currentNode.data[1].data = response.data["public"];
+          currentNode.data[2].data = response.data.hash;
+          return $scope.waiting = false;
+        }, readError);
+      };
       $scope.newRSAKey = function() {
         return $scope.showModal('password.html').then(function() {
           var currentNode, password;
@@ -888,19 +901,6 @@ This file contains:
         }, function() {
           return console.log('New key cancelled');
         });
-      };
-      $scope.newRSAKeyNoPassword = function() {
-        var currentNode;
-        $scope.waiting = true;
-        currentNode = $scope.currentNode;
-        return $http.post(window.confPrefix + "/newRSAKey", {
-          "password": ''
-        }).then(function(response) {
-          currentNode.data[0].data = response.data["private"];
-          currentNode.data[1].data = response.data["public"];
-          currentNode.data[2].data = response.data.hash;
-          return $scope.waiting = false;
-        }, readError);
       };
       $scope.getKey = function(node) {
         var d, i, len, n, o, ref, tmp, uri;

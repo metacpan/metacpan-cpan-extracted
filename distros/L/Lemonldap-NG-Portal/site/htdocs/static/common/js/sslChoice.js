@@ -13,6 +13,9 @@
         withCredentials: true
       },
       success: function(data) {
+        if (data.ajax_auth_token) {
+          $('#lformSSL').find('input[name="ajax_auth_token"]').attr("value", data.ajax_auth_token);
+        }
         sendUrl(path);
         return console.log('Success -> ', data);
       },

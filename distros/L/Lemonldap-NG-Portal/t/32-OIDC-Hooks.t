@@ -58,7 +58,7 @@ my $op = LLNG::Manager::Test->new( {
                 }
             },
             oidcServicePrivateKeySig => oidc_key_op_private_sig,
-            oidcServicePublicKeySig  => oidc_key_op_public_sig,
+            oidcServicePublicKeySig  => oidc_cert_op_public_sig,
             customPlugins            => 't::OidcHookPlugin',
         }
     }
@@ -172,7 +172,7 @@ expectJWT( $token,
       "openid profile email my_hooked_scope myscope refreshed_online_french" );
 
 ## Test Offline refresh hook
-$code = authorize(
+$code = codeAuthorize(
     $op, $idpId,
     {
         response_type => 'code',

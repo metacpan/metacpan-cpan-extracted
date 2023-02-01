@@ -180,6 +180,9 @@ count(1);
 ( $url, $query ) =
   expectRedirection( $res, qr#^http://auth.op.com(/.*)\?(.*)$# );
 
+like( $query, qr/id_token_hint=/, "Found ID Token hint" );
+count(1);
+
 switch ('op');
 ok(
     $res = $op->_get(
@@ -214,8 +217,7 @@ clean_sessions();
 done_testing( count() );
 
 sub op {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'idp.com',
@@ -263,7 +265,7 @@ sub op {
                     'loa-3' => 3
                 },
                 oidcServicePrivateKeySig => oidc_key_op_private_sig,
-                oidcServicePublicKeySig  => oidc_key_op_public_sig,
+                oidcServicePublicKeySig  => oidc_cert_op_public_sig,
             }
         }
     );
@@ -271,8 +273,7 @@ sub op {
 
 sub rp {
     my ( $jwks, $metadata ) = @_;
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'rp.com',

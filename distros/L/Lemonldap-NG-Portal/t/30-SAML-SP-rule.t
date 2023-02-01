@@ -11,9 +11,9 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 4;
+my $maintests = 5;
 my $debug     = 'error';
-my ( $issuer, $sp, $res );
+my ( $issuer, $sp, $unknownsp, $res );
 
 # Redefine LWP methods for tests
 LWP::Protocol::PSGI->register(
@@ -32,8 +32,9 @@ SKIP: {
     }
 
     # Initialization
-    $issuer = register( 'issuer', \&issuer );
-    $sp     = register( 'sp',     \&sp );
+    $issuer    = register( 'issuer',    \&issuer );
+    $sp        = register( 'sp',        \&sp );
+    $unknownsp = register( 'unknownsp', \&unknownsp );
 
     # Simple SP access
     my $res;
@@ -83,7 +84,33 @@ SKIP: {
     );
     expectOK($res);
     my $idpId = expectCookie($res);
-    ok( $res->[2]->[0] =~ /trmsg="84"/, 'Reject reason is 84' );
+    expectPortalError( $res, 84, 'PE_UNAUTHORIZEDPARTNER' );
+
+    # Access to unknown SP
+    switch ("unknownsp");
+    ok(
+        $res = $unknownsp->_get(
+            '/',
+            accept => 'text/html',
+            query  => 'url=aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tLw=='
+        ),
+        'Unauth SP request'
+    );
+    my ( $url, $query ) = expectRedirection( $res,
+        qr#^http://auth.idp.com(/saml/singleSignOn)\?(SAMLRequest=.+)# );
+
+    # Push SAML request to IdP
+    switch ('issuer');
+    ok(
+        $res = $issuer->_get(
+            $url,
+            query  => $query,
+            accept => 'text/html',
+            cookie => "lemonldap=$idpId",
+        ),
+        'Launch SAML request to IdP'
+    );
+    expectPortalError( $res, 107, "Unknown entity ID" );
 }
 
 count($maintests);
@@ -180,6 +207,60 @@ sub sp {
                 samlOrganizationDisplayName => "SP",
                 samlOrganizationName        => "SP",
                 samlOrganizationURL         => "http://www.sp.com",
+                samlServicePublicKeySig     => saml_key_sp_public_sig,
+                samlServicePrivateKeyEnc    => saml_key_sp_private_enc,
+                samlServicePrivateKeySig    => saml_key_sp_private_sig,
+                samlServicePublicKeyEnc     => saml_key_sp_public_enc,
+                samlSPSSODescriptorAuthnRequestsSigned => 1,
+            },
+        }
+    );
+}
+
+sub unknownsp {
+    return LLNG::Manager::Test->new( {
+            ini => {
+                logLevel               => $debug,
+                domain                 => 'unknownsp.com',
+                portal                 => 'http://auth.unknownsp.com',
+                authentication         => 'SAML',
+                userDB                 => 'Same',
+                issuerDBSAMLActivation => 0,
+                restSessionServer      => 1,
+                samlIDPMetaDataExportedAttributes => {
+                    idp => {
+                        mail => "0;mail;;",
+                        uid  => "1;uid",
+                        cn   => "0;cn"
+                    }
+                },
+                samlIDPMetaDataOptions => {
+                    idp => {
+                        samlIDPMetaDataOptionsEncryptionMode => 'none',
+                        samlIDPMetaDataOptionsSSOBinding     => 'redirect',
+                        samlIDPMetaDataOptionsSLOBinding     => 'redirect',
+                        samlIDPMetaDataOptionsSignSSOMessage => 1,
+                        samlIDPMetaDataOptionsSignSLOMessage => 1,
+                        samlIDPMetaDataOptionsCheckSSOMessageSignature => 1,
+                        samlIDPMetaDataOptionsCheckSLOMessageSignature => 1,
+                        samlIDPMetaDataOptionsForceUTF8                => 1,
+                    }
+                },
+                samlIDPMetaDataExportedAttributes => {
+                    idp => {
+                        "uid" => "0;uid;;",
+                        "cn"  => "1;cn;;",
+                    },
+                },
+                samlIDPMetaDataXML => {
+                    idp => {
+                        samlIDPMetaDataXML =>
+                          samlIDPMetaDataXML( 'idp', 'HTTP-Redirect' )
+                    }
+                },
+                samlOrganizationDisplayName => "SP",
+                samlOrganizationName        => "SP",
+                samlOrganizationURL         => "http://www.unknownsp.com",
                 samlServicePublicKeySig     => saml_key_sp_public_sig,
                 samlServicePrivateKeyEnc    => saml_key_sp_private_enc,
                 samlServicePrivateKeySig    => saml_key_sp_private_sig,

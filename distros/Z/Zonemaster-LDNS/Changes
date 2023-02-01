@@ -1,5 +1,11 @@
 Release history for Zonemaster component Zonemaster-LDNS
 
+3.1.0 2023-01-31 (public fix version)
+ [Feature]
+ - Includes the OPT RDATA from the edns_data function
+   (needed to fix a bug in Zonemaster-Engine) (#166)
+
+
 3.0.0 2022-12-19
 
  [Breaking change]

@@ -13,7 +13,7 @@ extends qw(
 
 );
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.0.16';
 
 sub init {
     my ($self) = @_;
@@ -27,14 +27,13 @@ sub confirm {
 }
 
 sub modifyPassword {
-    my ( $self, $req, $pwd, $useMail ) = @_;
-
-    my $userCol     = $useMail ? $self->mailField : $self->pivot;
+    my ( $self, $req, $pwd, %args ) = @_;
+    my $userCol     = $args{useMail} ? $self->mailField : $self->pivot;
     my $passwordCol = $self->conf->{dbiAuthPasswordCol};
     my $table       = $self->conf->{dbiAuthTable};
     my $dynamicHash = $self->conf->{dbiDynamicHashEnabled} || 0;
-
     my $passwordsql;
+
     if ( $dynamicHash == 1 ) {
 
         # Dynamic password hashes

@@ -58,6 +58,12 @@ function templates(tpl,key) {
             "get" : tpl+"s/"+key+"/"+"casAppMetaDataOptionsRule",
             "id" : tpl+"s/"+key+"/"+"casAppMetaDataOptionsRule",
             "title" : "casAppMetaDataOptionsRule"
+         },
+         {
+            "get" : tpl+"s/"+key+"/"+"casAppMetaDataOptionsComment",
+            "id" : tpl+"s/"+key+"/"+"casAppMetaDataOptionsComment",
+            "title" : "casAppMetaDataOptionsComment",
+            "type" : "longtext"
          }
       ],
       "id" : "casAppMetaDataOptions",
@@ -128,6 +134,12 @@ function templates(tpl,key) {
             "id" : tpl+"s/"+key+"/"+"casSrvMetaDataOptionsGateway",
             "title" : "casSrvMetaDataOptionsGateway",
             "type" : "bool"
+         },
+         {
+            "get" : tpl+"s/"+key+"/"+"casSrvMetaDataOptionsComment",
+            "id" : tpl+"s/"+key+"/"+"casSrvMetaDataOptionsComment",
+            "title" : "casSrvMetaDataOptionsComment",
+            "type" : "longtext"
          }
       ],
       "id" : "casSrvMetaDataOptions",
@@ -145,6 +157,11 @@ function templates(tpl,key) {
             "get" : tpl+"s/"+key+"/"+"casSrvMetaDataOptionsIcon",
             "id" : tpl+"s/"+key+"/"+"casSrvMetaDataOptionsIcon",
             "title" : "casSrvMetaDataOptionsIcon"
+         },
+         {
+            "get" : tpl+"s/"+key+"/"+"casSrvMetaDataOptionsTooltip",
+            "id" : tpl+"s/"+key+"/"+"casSrvMetaDataOptionsTooltip",
+            "title" : "casSrvMetaDataOptionsTooltip"
          },
          {
             "default" : "",
@@ -352,6 +369,12 @@ function templates(tpl,key) {
             "id" : "oidcOPMetaDataOptionsProtocol",
             "title" : "oidcOPMetaDataOptionsProtocol",
             "type" : "simpleInputContainer"
+         },
+         {
+            "get" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsComment",
+            "id" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsComment",
+            "title" : "oidcOPMetaDataOptionsComment",
+            "type" : "longtext"
          }
       ],
       "id" : "oidcOPMetaDataOptions",
@@ -368,6 +391,11 @@ function templates(tpl,key) {
             "get" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsIcon",
             "id" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsIcon",
             "title" : "oidcOPMetaDataOptionsIcon"
+         },
+         {
+            "get" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsTooltip",
+            "id" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsTooltip",
+            "title" : "oidcOPMetaDataOptionsTooltip"
          },
          {
             "default" : "",
@@ -391,6 +419,37 @@ function templates(tpl,key) {
 ;
   case 'oidcRPMetaDataNode':
     return [
+   {
+      "_nodes" : [
+         {
+            "default" : 0,
+            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsPublic",
+            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsPublic",
+            "title" : "oidcRPMetaDataOptionsPublic",
+            "type" : "bool"
+         },
+         {
+            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsClientID",
+            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsClientID",
+            "title" : "oidcRPMetaDataOptionsClientID"
+         },
+         {
+            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsClientSecret",
+            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsClientSecret",
+            "title" : "oidcRPMetaDataOptionsClientSecret",
+            "type" : "password"
+         },
+         {
+            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRedirectUris",
+            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRedirectUris",
+            "title" : "oidcRPMetaDataOptionsRedirectUris"
+         }
+      ],
+      "help" : "idpopenidconnect.html#basic-options",
+      "id" : "oidcRPMetaDataOptionsBasic",
+      "title" : "oidcRPMetaDataOptionsBasic",
+      "type" : "simpleInputContainer"
+   },
    {
       "cnodes" : tpl+"s/"+key+"/"+"oidcRPMetaDataExportedVars",
       "default" : [
@@ -425,59 +484,13 @@ function templates(tpl,key) {
             "type" : "oidcAttribute"
          }
       ],
-      "help" : "idpopenidconnect.html#oidcexportedattr",
+      "help" : "idpopenidconnect.html#exported-attributes",
       "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataExportedVars",
       "title" : "oidcRPMetaDataExportedVars",
       "type" : "oidcAttributeContainer"
    },
    {
-      "cnodes" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsExtraClaims",
-      "default" : [],
-      "help" : "idpopenidconnect.html#oidcextraclaims",
-      "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsExtraClaims",
-      "title" : "oidcRPMetaDataOptionsExtraClaims",
-      "type" : "keyTextContainer"
-   },
-   {
-      "cnodes" : tpl+"s/"+key+"/"+"oidcRPMetaDataScopeRules",
-      "default" : [],
-      "help" : "idpopenidconnect.html#scope-rules",
-      "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataScopeRules",
-      "title" : "oidcRPMetaDataScopeRules",
-      "type" : "keyTextContainer"
-   },
-   {
       "_nodes" : [
-         {
-            "_nodes" : [
-               {
-                  "default" : 0,
-                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsPublic",
-                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsPublic",
-                  "title" : "oidcRPMetaDataOptionsPublic",
-                  "type" : "bool"
-               },
-               {
-                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsClientID",
-                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsClientID",
-                  "title" : "oidcRPMetaDataOptionsClientID"
-               },
-               {
-                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsClientSecret",
-                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsClientSecret",
-                  "title" : "oidcRPMetaDataOptionsClientSecret",
-                  "type" : "password"
-               },
-               {
-                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRedirectUris",
-                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRedirectUris",
-                  "title" : "oidcRPMetaDataOptionsRedirectUris"
-               }
-            ],
-            "id" : "oidcRPMetaDataOptionsBasic",
-            "title" : "oidcRPMetaDataOptionsBasic",
-            "type" : "simpleInputContainer"
-         },
          {
             "_nodes" : [
                {
@@ -529,6 +542,28 @@ function templates(tpl,key) {
             "id" : "oidcRPMetaDataOptionsAdvanced",
             "title" : "oidcRPMetaDataOptionsAdvanced",
             "type" : "simpleInputContainer"
+         },
+         {
+            "_nodes" : [
+               {
+                  "cnodes" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsExtraClaims",
+                  "default" : [],
+                  "help" : "idpopenidconnect.html#oidcextraclaims",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsExtraClaims",
+                  "title" : "oidcRPMetaDataOptionsExtraClaims",
+                  "type" : "keyTextContainer"
+               },
+               {
+                  "cnodes" : tpl+"s/"+key+"/"+"oidcRPMetaDataScopeRules",
+                  "default" : [],
+                  "help" : "idpopenidconnect.html#scope-rules",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataScopeRules",
+                  "title" : "oidcRPMetaDataScopeRules",
+                  "type" : "keyTextContainer"
+               }
+            ],
+            "id" : "oidcRPMetaDataOptionsScopes",
+            "title" : "oidcRPMetaDataOptionsScopes"
          },
          {
             "_nodes" : [
@@ -749,6 +784,12 @@ function templates(tpl,key) {
             "id" : "logout",
             "title" : "logout",
             "type" : "simpleInputContainer"
+         },
+         {
+            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsComment",
+            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsComment",
+            "title" : "oidcRPMetaDataOptionsComment",
+            "type" : "longtext"
          }
       ],
       "help" : "idpopenidconnect.html#options",
@@ -1061,13 +1102,6 @@ function templates(tpl,key) {
          },
          {
             "default" : 0,
-            "get" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsAllowProxiedAuthn",
-            "id" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsAllowProxiedAuthn",
-            "title" : "samlIDPMetaDataOptionsAllowProxiedAuthn",
-            "type" : "bool"
-         },
-         {
-            "default" : 0,
             "get" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsAllowLoginFromIDP",
             "id" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsAllowLoginFromIDP",
             "title" : "samlIDPMetaDataOptionsAllowLoginFromIDP",
@@ -1108,6 +1142,24 @@ function templates(tpl,key) {
             "id" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsRelayStateURL",
             "title" : "samlIDPMetaDataOptionsRelayStateURL",
             "type" : "bool"
+         },
+         {
+            "_nodes" : [
+               {
+                  "get" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsFederationEntityID",
+                  "id" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsFederationEntityID",
+                  "title" : "samlIDPMetaDataOptionsFederationEntityID"
+               }
+            ],
+            "id" : "samlIDPMetaDataOptionsFederation",
+            "title" : "samlIDPMetaDataOptionsFederation",
+            "type" : "simpleInputContainer"
+         },
+         {
+            "get" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsComment",
+            "id" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsComment",
+            "title" : "samlIDPMetaDataOptionsComment",
+            "type" : "longtext"
          }
       ],
       "help" : "authsaml.html#options",
@@ -1126,6 +1178,11 @@ function templates(tpl,key) {
             "get" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsIcon",
             "id" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsIcon",
             "title" : "samlIDPMetaDataOptionsIcon"
+         },
+         {
+            "get" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsTooltip",
+            "id" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsTooltip",
+            "title" : "samlIDPMetaDataOptionsTooltip"
          },
          {
             "default" : "",
@@ -1363,6 +1420,62 @@ function templates(tpl,key) {
             "id" : "samlSPMetaDataOptionsSecurity",
             "title" : "samlSPMetaDataOptionsSecurity",
             "type" : "simpleInputContainer"
+         },
+         {
+            "_nodes" : [
+               {
+                  "get" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsFederationEntityID",
+                  "id" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsFederationEntityID",
+                  "title" : "samlSPMetaDataOptionsFederationEntityID"
+               },
+               {
+                  "default" : "",
+                  "get" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsFederationOptionalAttributes",
+                  "id" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsFederationOptionalAttributes",
+                  "select" : [
+                     {
+                        "k" : "",
+                        "v" : "keep"
+                     },
+                     {
+                        "k" : "ignore",
+                        "v" : "ignore"
+                     }
+                  ],
+                  "title" : "samlSPMetaDataOptionsFederationOptionalAttributes",
+                  "type" : "select"
+               },
+               {
+                  "default" : "",
+                  "get" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsFederationRequiredAttributes",
+                  "id" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsFederationRequiredAttributes",
+                  "select" : [
+                     {
+                        "k" : "",
+                        "v" : "keep"
+                     },
+                     {
+                        "k" : "optional",
+                        "v" : "makeoptional"
+                     },
+                     {
+                        "k" : "ignore",
+                        "v" : "ignore"
+                     }
+                  ],
+                  "title" : "samlSPMetaDataOptionsFederationRequiredAttributes",
+                  "type" : "select"
+               }
+            ],
+            "id" : "samlSPMetaDataOptionsFederation",
+            "title" : "samlSPMetaDataOptionsFederation",
+            "type" : "simpleInputContainer"
+         },
+         {
+            "get" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsComment",
+            "id" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsComment",
+            "title" : "samlSPMetaDataOptionsComment",
+            "type" : "longtext"
          }
       ],
       "help" : "idpsaml.html#options",
@@ -1447,6 +1560,12 @@ function templates(tpl,key) {
             "title" : "vhostAccessToTrace"
          },
          {
+            "get" : tpl+"s/"+key+"/"+"vhostAuthnLevel",
+            "id" : tpl+"s/"+key+"/"+"vhostAuthnLevel",
+            "title" : "vhostAuthnLevel",
+            "type" : "int"
+         },
+         {
             "default" : "Main",
             "get" : tpl+"s/"+key+"/"+"vhostType",
             "id" : tpl+"s/"+key+"/"+"vhostType",
@@ -1466,6 +1585,10 @@ function templates(tpl,key) {
                {
                   "k" : "DevOpsST",
                   "v" : "DevOpsST"
+               },
+               {
+                  "k" : "DevOpsCDA",
+                  "v" : "DevOpsCDA"
                },
                {
                   "k" : "Main",
@@ -1492,12 +1615,6 @@ function templates(tpl,key) {
             "type" : "select"
          },
          {
-            "get" : tpl+"s/"+key+"/"+"vhostAuthnLevel",
-            "id" : tpl+"s/"+key+"/"+"vhostAuthnLevel",
-            "title" : "vhostAuthnLevel",
-            "type" : "int"
-         },
-         {
             "get" : tpl+"s/"+key+"/"+"vhostDevOpsRulesUrl",
             "id" : tpl+"s/"+key+"/"+"vhostDevOpsRulesUrl",
             "title" : "vhostDevOpsRulesUrl"
@@ -1508,6 +1625,13 @@ function templates(tpl,key) {
             "id" : tpl+"s/"+key+"/"+"vhostServiceTokenTTL",
             "title" : "vhostServiceTokenTTL",
             "type" : "int"
+         },
+         {
+            "default" : "",
+            "get" : tpl+"s/"+key+"/"+"vhostComment",
+            "id" : tpl+"s/"+key+"/"+"vhostComment",
+            "title" : "vhostComment",
+            "type" : "longtext"
          }
       ],
       "help" : "configvhost.html#options",

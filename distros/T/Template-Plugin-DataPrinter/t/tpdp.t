@@ -40,7 +40,9 @@ my %stash = (
 
     my $blue  = quotemeta(color('blue'));
     my $cyan  = quotemeta(color('cyan'));
-    my $reset = quotemeta(color('reset'));
+    my $old_reset = quotemeta(color('reset'));  # before DDP 1.1.0
+    my $new_reset = quotemeta("\e[m");          # after DDP 1.1.0
+    my $reset = qr/$new_reset|$old_reset/;
     like($ansi, qr/$blue.*$stash{string}.*$reset/,
         'output contains blue string');
     like($ansi, qr/$cyan.*$stash{number}.*$reset/,

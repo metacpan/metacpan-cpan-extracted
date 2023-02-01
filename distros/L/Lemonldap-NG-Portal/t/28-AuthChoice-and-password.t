@@ -44,7 +44,7 @@ SKIP: {
                 dbiAuthPasswordCol  => 'password',
                 dbiAuthPasswordHash => '',
 
-                ldapServer      => 'ldap://127.0.0.1:19389/',
+                ldapServer      => $main::slapd_url,
                 ldapBase        => 'ou=users,dc=example,dc=com',
                 managerDn       => 'cn=admin,dc=example,dc=com',
                 managerPassword => 'admin',
@@ -111,7 +111,6 @@ SKIP: {
         $client->logout($id);
     }
 
-    clean_sessions();
 }
 count($maintests);
 stopLdapServer() if $ENV{LLNGTESTLDAP};

@@ -2,7 +2,7 @@ package Lemonldap::NG::Handler::Lib::ServiceToken;
 
 use strict;
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.16';
 
 sub fetchId {
     my ( $class, $req ) = @_;
@@ -22,14 +22,26 @@ sub fetchId {
 
     # Looking for service headers
     my $vhost = $class->resolveAlias($req);
-    my %serviceHeaders;
+    my ( %serviceHeaders, @vhostRegexp );
     @vhosts = grep {
         if (/^([\w\-]+)=(.+)$/) {
             $serviceHeaders{$1} = $2;
             $class->logger->debug("Found service header: $1 => $2");
             0;
         }
-        else { 1 }
+        elsif (m#^/(.+)?/$#) {
+            push @vhostRegexp, qr/$1/;
+            $class->logger->debug("Found VHost regexp: $1");
+            0;
+        }
+        elsif (/^[\w.*%-]+$/) {
+            $class->logger->debug("Found VHost: $_");
+            1;
+        }
+        else {
+            $class->logger->debug("Found a non valid VHost: $_");
+            0;
+        }
     } @vhosts;
 
     # $_session_id and at least one vhost
@@ -41,12 +53,19 @@ sub fetchId {
     }
 
     # Is vhost listed in token ?
-    unless ( grep { $_ eq $vhost } @vhosts ) {
-        $class->userLogger->error(
-            "$vhost not authorized in token (" . join( ', ', @vhosts ) . ')' );
+    if ( grep { $_ eq $vhost } @vhosts ) {
+        $class->logger->debug( "$vhost found in VHosts list: " . join ', ', @vhosts );
+    }
+    elsif ( grep { $vhost =~ $_ } @vhostRegexp ) {
+        $class->logger->debug( "$vhost matches a VHost regexp: " . join ', ',
+            @vhostRegexp );
+    }
+    else {
+        $class->userLogger->error( "$vhost not allowed in token scope ("
+              . join( ', ', ( @vhostRegexp, @vhosts, ) )
+              . ')' );
         return 0;
     }
-    $class->logger->debug( 'Found VHosts: ' . join ', ', @vhosts );
 
     # Is token in good interval ?
     my $ttl =

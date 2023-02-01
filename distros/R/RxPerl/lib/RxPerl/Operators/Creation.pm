@@ -11,17 +11,17 @@ use RxPerl::ReplaySubject;
 
 use Carp 'croak';
 use Scalar::Util qw/ weaken blessed reftype /;
+use List::Util 'first';
 
 use Exporter 'import';
 our @EXPORT_OK = qw/
-    rx_behavior_subject rx_combine_latest rx_concat rx_defer rx_EMPTY
-    rx_fork_join rx_from rx_from_event rx_from_event_array rx_interval
-    rx_merge rx_NEVER rx_observable rx_of rx_partition rx_race
-    rx_replay_subject rx_subject rx_throw_error rx_timer
+    rx_behavior_subject rx_combine_latest rx_concat rx_defer rx_EMPTY rx_fork_join rx_from rx_from_event
+    rx_from_event_array rx_generate rx_iif rx_interval rx_merge rx_NEVER rx_observable rx_of rx_on_error_resume_next
+    rx_partition rx_race rx_range rx_replay_subject rx_subject rx_throw_error rx_timer rx_zip
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.14.0";
+our $VERSION = "v6.19.0";
 
 sub rx_observable;
 
@@ -100,7 +100,7 @@ sub _rx_concat_helper {
 }
 
 sub rx_concat {
-    my (@sources) = @_;
+    my @sources = @_;
 
     return rx_observable->new(sub {
         my ($subscriber) = @_;
@@ -322,6 +322,51 @@ sub rx_from_event_array {
     });
 }
 
+sub rx_generate {
+    my ($initial, $condition, $iterate, $result_selector) = @_;
+
+    return rx_observable->new(sub {
+        my ($subscriber) = @_;
+
+        my $must_finish = 0;
+
+        $subscriber->subscription->add(sub { $must_finish = 1 });
+
+        my $x = $initial;
+        while (1) {
+            ! $must_finish or last;
+            my $cond; my $ok = eval { local $_ = $x; $cond = $condition->($x); 1 };
+            if (! $ok) {
+                $subscriber->{error}->($@) if defined $subscriber->{error};
+                last;
+            }
+            if (! $cond) {
+                $subscriber->{complete}->() if defined $subscriber->{complete};
+                last;
+            }
+            my $output_val; $ok = eval { local $_ = $x; $output_val = $result_selector ? $result_selector->($x) : $x; 1 };
+            if (! $ok) {
+                $subscriber->{error}->($@) if defined $subscriber->{error};
+                last;
+            }
+            $subscriber->{next}->($output_val) if defined $subscriber->{next};
+            $ok = eval { local $_ = $x; $x = $iterate->($x); 1 };
+            if (! $ok) {
+                $subscriber->{error}->($@) if defined $subscriber->{error};
+                last;
+            }
+        }
+    });
+}
+
+sub rx_iif {
+    my ($condition, $true_result, $false_result) = @_;
+
+    return rx_defer(sub {
+        return $condition->() ? $true_result : $false_result;
+    });
+}
+
 sub rx_interval {
     my ($after) = @_;
 
@@ -396,11 +441,58 @@ sub rx_of {
     return rx_observable->new(sub {
         my ($subscriber) = @_;
 
-        foreach my $value (@values) {
-            return if !! ${ $subscriber->{closed_ref} };
-            $subscriber->{next}->($value) if defined $subscriber->{next};
+        my $i = 0;
+
+        $subscriber->subscription->add(sub { $i = @values });
+
+        for (; $i < @values; $i++) {
+            $subscriber->{next}->($values[$i]) if defined $subscriber->{next};
         }
+
         $subscriber->{complete}->() if defined $subscriber->{complete};
+
+        return;
+    });
+}
+
+sub _rx_on_error_resume_next_helper {
+    my ($sources, $subscriber, $active) = @_;
+
+    if (! @$sources) {
+        $subscriber->{complete}->() if defined $subscriber->{complete};
+        return;
+    }
+
+    my $source = shift @$sources;
+    my $own_subscription = RxPerl::Subscription->new;
+    my $own_subscriber = {
+        new_subscription => $own_subscription,
+        next             => $subscriber->{next},
+        error            => sub {
+            _rx_on_error_resume_next_helper($sources, $subscriber, $active);
+        },
+        complete         => sub {
+            _rx_on_error_resume_next_helper($sources, $subscriber, $active);
+        },
+    };
+    @$active = ($own_subscription);
+    $source->subscribe($own_subscriber);
+}
+
+sub rx_on_error_resume_next {
+    my @sources = @_;
+
+    return rx_observable->new(sub {
+        my ($subscriber) = @_;
+
+        my @sources = @sources;
+
+        my @active;
+        $subscriber->subscription->add(
+            \@active, sub { undef @sources },
+        );
+
+        _rx_on_error_resume_next_helper(\@sources, $subscriber, \@active);
 
         return;
     });
@@ -464,6 +556,26 @@ sub rx_race {
     });
 }
 
+sub rx_range {
+    my ($start, $count) = @_;
+
+    return rx_observable->new(sub {
+        my ($subscriber) = @_;
+
+        my $i = $start;
+
+        $subscriber->subscription->add(sub { $i = $start + $count });
+
+        for (; $i < $start + $count; $i++) {
+            $subscriber->{next}->($i) if defined $subscriber->{next};
+        }
+
+        $subscriber->{complete}->() if defined $subscriber->{complete};
+
+        return;
+    });
+}
+
 sub rx_replay_subject { "RxPerl::ReplaySubject" }
 
 sub rx_subject { "RxPerl::Subject" }
@@ -508,5 +620,57 @@ sub rx_timer {
         };
     });
 };
+
+sub rx_zip {
+    my @sources = @_;
+
+    return rx_observable->new(sub {
+        my ($subscriber) = @_;
+
+        my @sources_metadata = map {
+            +{
+                buffer    => [],
+                completed => 0,
+            };
+        } @sources;
+        my @own_subscriptions = map RxPerl::Subscription->new, @sources;
+
+        $subscriber->subscription->add(\@own_subscriptions);
+
+        for my $i (0 .. (@sources - 1)) {
+            my $own_subscriber = {
+                new_subscription => $own_subscriptions[$i],
+                next             => sub {
+                    my ($v) = @_;
+
+                    # push to buffer
+                    push @{$sources_metadata[$i]{buffer}}, $v;
+
+                    # if all buffers have elements in them:
+                    if (!first {!@{$_->{buffer}}} @sources_metadata) {
+                        my @next = map {shift @$_} map $_->{buffer}, @sources_metadata;
+                        $subscriber->{next}->(\@next) if defined $subscriber->{next};
+                        if (first {!@{$_->{buffer}} and $_->{completed}} @sources_metadata) {
+                            $subscriber->{complete}->() if defined $subscriber->{complete};
+                        }
+                    }
+                },
+                error            => sub {
+                    $subscriber->{error}->(@_) if defined $subscriber->{error};
+                },
+                complete         => sub {
+                    $sources_metadata[$i]{completed} = 1;
+                    if (!@{$sources_metadata[$i]{buffer}}) {
+                        $subscriber->{complete}->() if defined $subscriber->{complete};
+                    }
+                },
+            };
+
+            $sources[$i]->subscribe($own_subscriber);
+        }
+
+        return;
+    });
+}
 
 1;

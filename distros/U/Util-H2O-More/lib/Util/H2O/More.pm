@@ -4,9 +4,9 @@ use warnings;
 package Util::H2O::More;
 use parent q/Exporter/;
 
-our $VERSION = q{0.2.7};
+our $VERSION = q{0.2.8};
 
-our @EXPORT_OK = (qw/baptise opt2h2o h2o o2h d2o o2d o2h2o ini2h2o h2o2ini/);
+our @EXPORT_OK = (qw/baptise opt2h2o h2o o2h d2o o2d o2h2o ini2h2o h2o2ini Getopt2h2o/);
 
 use Util::H2O ();
 
@@ -64,6 +64,16 @@ sub opt2h2o(@) {
     my @getopt_def = @_;
     my @flags_only = map { m/([^=|\s]+)/g; $1 } @getopt_def;
     return @flags_only;
+}
+
+# wrapper around opt2h2o (yeah!)
+sub Getopt2h2o(@) {
+  my ($ARGV_ref, $defaults, @opts) = @_;
+  $defaults //= {};
+  my $o = h2o $defaults, opt2h2o(@opts);
+  require Getopt::Long;
+  Getopt::Long::GetOptionsFromArray( $ARGV_ref, $o, @opts ); # Note, @ARGV is passed by reference
+  return $o;
 }
 
 # general form of method used to give accessors to Config::Tiny in Util::H2O's
@@ -338,6 +348,21 @@ behavior of C<h2o>, which maintains the name space of C<Util::H2O::_$hash>
 even if C<h2o> is passed with the C<-isa> and C<-class> flags,
 which are both utilized to achieve the effective outcome of
 C<baptise> and C<bastise -recurse>.
+
+=head2 C<Getopt2h2o REF, REF, LIST>
+
+Wrapper around the idiom enabled buy C<opt2h2o>. It even will C<require>
+C<Getopts::Long>. Usage:
+
+  use Util::H2O::More qw/Getopt2h2o/;
+  my $opts_ref = Getopt2h2o \@ARGV, { n => 10 }, qw/f=s n=i/;
+
+The first argument is the a refernece to the C<@ARGV> array (or equivalent),
+the second argument is the initial state of the hash to be objectified by
+C<h2o>, the rest of the arguments is an array containing the C<Getopt::Long>
+argument description.
+
+This methods was created because even C<opt2h2o> was too much typing :-).
 
 =head2 C<opt2h2o LIST>
 

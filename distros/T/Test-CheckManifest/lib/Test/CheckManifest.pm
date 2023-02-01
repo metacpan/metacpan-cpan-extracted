@@ -4,6 +4,7 @@ package Test::CheckManifest;
 
 use strict;
 use warnings;
+use 5.008;
 
 use Cwd;
 use Carp;
@@ -13,7 +14,7 @@ use Test::Builder;
 use File::Find;
 use Scalar::Util qw(blessed);
 
-our $VERSION = '1.42';
+our $VERSION = '1.43';
 our $VERBOSE = 1;
 our $HOME;
 our $test_bool = 1;
@@ -33,13 +34,13 @@ sub import {
     my %plan   = @_;
 
     for my $func ( qw( ok_manifest ) ) {
-        no strict 'refs';
+        no strict 'refs';  ## no critic
         *{$caller."::".$func} = \&$func;
     }
 
     $test->exported_to($caller);
     $test->plan(%plan);
-    
+
     $plan = 1 if(exists $plan{tests});
 }
 
@@ -66,7 +67,7 @@ sub _validate_args {
 
     my $bool = lc( $hashref->{bool} || '' );
     $hashref->{bool} = $bool && $bool eq 'and' ? 'and' : 'or';
-    
+
     return $hashref, $msg;
 }
 
@@ -88,7 +89,7 @@ sub _check_excludes {
 
         push @excluded, $path;
     }
-    
+
     return \@excluded;
 }
 
@@ -140,9 +141,9 @@ sub _manifest_files {
 
 sub ok_manifest {
     my ($hashref,$msg) = _validate_args( @_ );
-    
+
     $test->plan(tests => 1) if !$plan;
-    
+
     my $home     = _find_home( $hashref );
     my $manifest = File::Spec->catfile( $home, 'MANIFEST' );
 
@@ -155,7 +156,7 @@ sub ok_manifest {
         $test->diag( "No files in MANIFEST found (is it readable?)" );
         return;
     }
-    
+
     my $skip_path  = File::Spec->catfile( $home, 'MANIFEST.SKIP' );
     my @skip_files = _read_file( $skip_path );
     my @skip_rx    = map{ qr/$_/ }@skip_files;
@@ -178,7 +179,7 @@ sub ok_manifest {
                 \@skip_rx,
                 $home,
             );
-            
+
             my $abs = File::Spec->rel2abs($file);
 
             $is_excluded ?
@@ -229,14 +230,14 @@ sub _check_manifest {
     my %seen_files = ();
     @dup_files = map { $seen_files{$_}++ ? $_ : () } @manifest;
     $bool = 0 if scalar @dup_files > 0;
-    
+
     my $diag = 'The following files are not named in the MANIFEST file: '.
                join(', ', sort keys %missing_files);
     my $plus = 'The following files are not part of distro but named in the MANIFEST file: '.
                join(', ',@files_plus);
     my $dup  = 'The following files appeared more than once in the MANIFEST file: '.
                join(', ',@dup_files);
-    
+
     my $success;
 
     if ( !$ENV{NO_MANIFEST_CHECK} ) {
@@ -259,17 +260,17 @@ sub _read_file {
     my ($path) = @_;
 
     return if !-r $path;
-    
+
     my @files;
 
     open my $fh, '<', $path;
     while( my $fh_line = <$fh> ){
         chomp $fh_line;
-        
+
         next if $fh_line =~ m{ \A \s* \# }x;
-        
+
         my ($file);
-        
+
         if ( ($file) = $fh_line =~ /^'(\\[\\']|.+)+'\s*/) {
             $file =~ s/\\([\\'])/$1/g;
         }
@@ -283,7 +284,7 @@ sub _read_file {
     }
 
     close $fh;
-    
+
     chomp @files;
 
     {
@@ -308,7 +309,12 @@ sub _is_excluded {
     return 0 if $files_in_skip and 'ARRAY' ne ref $files_in_skip;
 
     if ( $files_in_skip ) {
-        (my $local_file = $file) =~ s{\Q$home\E}{};
+
+        # $home is usually given without trailing slash,
+        # the $files_in_skip is taken from MANIFEST.SKIP which usually contain regexes
+        # for files relative the $home. Therefore the remaining leading slashes in $localfile
+        my $separator = $^O eq 'MSWin32' ? '[/\\\\]' : '/';
+        (my $local_file = $file) =~ s{\Q$home\E$separator*}{};
         for my $rx ( @{$files_in_skip} ) {
             return 1 if $local_file =~ $rx;
         }
@@ -320,7 +326,7 @@ sub _is_excluded {
     return 1 if @matches;
 
     my $is_in_dir = _is_in_dir( $file, $dirref );
-    
+
     $bool ||= 'or';
     if ( $bool eq 'or' ) {
         push @matches, $file if grep{ $file =~ /$_/ }@$filter;
@@ -331,7 +337,7 @@ sub _is_excluded {
             push @matches, $file;
         }
     }
-    
+
     return scalar @matches;
 }
 
@@ -386,7 +392,7 @@ Test::CheckManifest - Check if your Manifest matches your distro
 
 =head1 VERSION
 
-version 1.42
+version 1.43
 
 =head1 SYNOPSIS
 
@@ -434,8 +440,8 @@ These files would be excluded (as examples):
 
 You can also combine "filter" and "exclude" with 'and' or 'or' default is 'or':
 
-  ok_manifest({exclude => ['/var/test'], 
-               filter  => [qr/\.svn/], 
+  ok_manifest({exclude => ['/var/test'],
+               filter  => [qr/\.svn/],
                bool    => 'and'});
 
 These files have to be named in the C<MANIFEST>:
@@ -479,7 +485,7 @@ using L<ExtUtils::Manifest>.
 
     use Test::More tests => 2;
     use ExtUtils::Manifest;
-    
+
     is_deeply [ ExtUtils::Manifest::manicheck() ], [], 'missing';
     is_deeply [ ExtUtils::Manifest::filecheck() ], [], 'extra';
 

@@ -173,5 +173,34 @@ like(
     "Expected info for disconnected handle"
 );
 
-done_testing;
+$result = HealthCheck::Diagnostic::DBHCheck->check(
+    dbh     => sub { sleep 3 },
+    timeout => 2,
+);
+note explain $result;
 
+is_deeply(
+    $result,
+    {
+        info   => 'Database connection timeout after 2 seconds.',
+        status => 'CRITICAL',
+    },
+    "Expected result for DB connection timeout with check method args"
+);
+
+$result = HealthCheck::Diagnostic::DBHCheck->new(
+    dbh     => sub { sleep 3 },
+    timeout => 1,
+)->check;
+note explain $result;
+
+is_deeply(
+    $result,
+    {
+        info   => 'Database connection timeout after 1 seconds.',
+        status => 'CRITICAL',
+    },
+    "Expected result for DB connection timeout with class args"
+);
+
+done_testing;

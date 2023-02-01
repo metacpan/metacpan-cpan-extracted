@@ -15,11 +15,13 @@ BEGIN { use_ok('Lemonldap::NG::Common::Conf') }
 # its man page ( perldoc Test::More ) for help writing this test script.
 
 my $h;
+use File::Temp;
+my $dir = File::Temp::tempdir( CLEANUP => 1 );
 
 ok(
     $h = new Lemonldap::NG::Common::Conf( {
             type    => 'File',
-            dirName => "t/",
+            dirName => $dir,
         }
     ),
     'type => file',
@@ -49,7 +51,5 @@ for ( my $i = 0 ; $i < @test ; $i++ ) {
       or print STDERR "Expect $cfg->{test} eq $test[$i]->{test}\n";
     $count += 2;
 }
-
-unlink 't/lmConf-1.json';
 
 done_testing($count);

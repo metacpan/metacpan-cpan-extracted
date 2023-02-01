@@ -3,36 +3,19 @@ use MIME::Base64;
 use Test::More;
 use strict;
 use IO::String;
+use DBI;
+use Digest::SHA;
 
 require 't/test-lib.pm';
+my $maintests = 10;
 
-my $res;
-my $maintests = 6;
+# Hook SHA512 function into all new DBI connections
+{
+    my $old_connect = \&DBI::connect;
+    *DBI::connect = sub {
+        my $connection = $old_connect->(@_) or return;
 
-my $userdb = tempdb();
-
-SKIP: {
-    eval
-'require DBD::SQLite; use Digest::SHA; use Lemonldap::NG::Portal::Lib::DBI';
-    if ($@) {
-        skip 'DBI/DBD::SQLite not found', $maintests;
-    }
-    eval q`
-    no warnings 'redefine';
-
-    sub Lemonldap::NG::Portal::Lib::DBI::hash_password_from_database {
-
-        # Remark: database function must get hexadecimal input
-        # and send back hexadecimal output
-        my $self     = shift;
-        my $dbh      = shift;
-        my $dbmethod = shift;
-        my $dbsalt   = shift;
-        my $password = shift;
-
-        # Create functions
-        use Digest::SHA;
-        $dbh->sqlite_create_function(
+        $connection->sqlite_create_function(
             'sha256', 1,
             sub {
                 my $p = shift;
@@ -41,7 +24,7 @@ SKIP: {
                     Digest::SHA->new(256)->add( pack( 'H*', $p ) )->digest );
             }
         );
-        $dbh->sqlite_create_function(
+        $connection->sqlite_create_function(
             'sha512', 1,
             sub {
                 my $p = shift;
@@ -51,44 +34,32 @@ SKIP: {
             }
         );
 
-        # convert password to hexa
-        my $passwordh = unpack "H*", $password;
+        $connection->sqlite_create_function(
+            'unixcrypth',
+            2,
+            sub {
+                my $p    = shift;
+                my $hash = shift;
+                return
+                  unpack( 'H*',
+                    crypt( pack( 'H*', $p ), pack( 'H*', $hash ) ) );
+            }
+        );
 
-        my @rows = ();
-        eval {
-            my $sth = $dbh->prepare("SELECT $dbmethod('$passwordh$dbsalt')");
-            $sth->execute();
-            @rows = $sth->fetchrow_array();
-        };
-        if ($@) {
-            $self->logger->error(
-                "DBI error while hashing with '$dbmethod' hash function: $@");
-            $self->userLogger->warn("Unable to check password");
-            return "";
-        }
-
-        if ( @rows == 1 ) {
-            $self->logger->debug(
-"Successfully hashed password with $dbmethod hash function in database"
-            );
-
-            # convert salt to binary
-            my $dbsaltb = pack 'H*', $dbsalt;
-
-            # convert result to binary
-            my $res = pack 'H*', $rows[0];
-
-            return encode_base64( $res . $dbsaltb, '' );
-        }
-        else {
-            $self->userLogger->warn(
-                "Unable to check password with '$dbmethod'");
-            return "";
-        }
-
-        # Return encode_base64(SQL_METHOD(password + salt) + salt)
+        return $connection;
     }
-`;
+}
+
+my $res;
+
+my $userdb = tempdb();
+
+SKIP: {
+    eval
+'require DBD::SQLite; use Digest::SHA; use Lemonldap::NG::Portal::Lib::DBI';
+    if ($@) {
+        skip 'DBI/DBD::SQLite not found', $maintests;
+    }
 
     my $dbh = DBI->connect("dbi:SQLite:dbname=$userdb");
 
@@ -106,6 +77,11 @@ SKIP: {
     $dbh->do(
 "INSERT INTO users VALUES ('jsmith','{ssha512}wr0zU/I6f7U4bVoeOlJnNFbhF0a9np59LUeNnhokohVI/wiNzt8Y4JujfOfNQiGuiVgY+xrYggfmgpke6KdjxKS7W0GR1ZCe','John Smith')"
     );
+
+    #_password secret4
+    $dbh->do(
+"INSERT INTO users VALUES ('jenny','\$6\$LvcDEZkf9SAFXpnQ\$Dzy6.c.dxPfZ1IvE.xdIYVu7iX9ia8BYhPbR9SKv7.u1WWCd0AIFIM4eVd7q24CElR.NkGA.zlK86q48n7IUL1','The Doctors Daughter')"
+    );
     my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel                         => 'error',
@@ -121,10 +97,11 @@ SKIP: {
                 dbiAuthPasswordHash              => '',
                 dbiDynamicHashEnabled            => 1,
                 dbiDynamicHashValidSchemes       => 'sha sha256 sha512',
-                dbiDynamicHashValidSaltedSchemes => 'ssha ssha256 ssha512',
-                dbiDynamicHashNewPasswordScheme  => 'ssha256',
-                passwordDB                       => 'DBI',
-                portalRequireOldPassword         => 1,
+                dbiDynamicHashValidSaltedSchemes =>
+                  'ssha ssha256 ssha512 unixcrypt6',
+                dbiDynamicHashNewPasswordScheme => 'ssha256',
+                passwordDB                      => 'DBI',
+                portalRequireOldPassword        => 1,
             }
         }
     );
@@ -153,6 +130,53 @@ SKIP: {
     $id = expectCookie($res);
     $client->logout($id);
 
+    # Try to authenticate against unix password
+    ok(
+        $res = $client->_post(
+            '/', IO::String->new('user=jenny&password=secret4'),
+            length => 27
+        ),
+        'Authentication against salted unix SHA-512 password'
+    );
+    expectOK($res);
+    $id = expectCookie($res);
+
+    $client->p->conf->{dbiDynamicHashNewPasswordScheme} = 'unixcrypt6';
+
+    # Try to modify password
+    ok(
+        $res = $client->_post(
+            '/',
+            IO::String->new(
+'oldpassword=secret4&newpassword=secret5&confirmpassword=secret5'
+            ),
+            cookie => "lemonldap=$id",
+            accept => 'application/json',
+            length => 63
+        ),
+        'Change password'
+    );
+    expectOK($res);
+    $client->logout($id);
+
+    my $sth = $dbh->prepare("SELECT password FROM users WHERE user='jenny';");
+    $sth->execute();
+    my $row = $sth->fetchrow_array;
+    ok( $row =~ /^\$6/, 'Verify that password is hashed with correct scheme' );
+
+    # Try to authenticate against new salted unix password
+    ok(
+        $res = $client->_post(
+            '/', IO::String->new('user=jenny&password=secret5'),
+            length => 27
+        ),
+        'Authentication against newly-modified unix password'
+    );
+    expectOK($res);
+    $id = expectCookie($res);
+
+    $client->logout($id);
+
     # Try to authenticate against salted password
     ok(
         $res = $client->_post(
@@ -163,6 +187,8 @@ SKIP: {
     );
     expectOK($res);
     $id = expectCookie($res);
+
+    $client->p->conf->{dbiDynamicHashNewPasswordScheme} = 'ssha256';
 
     # Try to modify password
     ok(

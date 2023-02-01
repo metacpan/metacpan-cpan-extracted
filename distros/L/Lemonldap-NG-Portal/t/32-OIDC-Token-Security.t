@@ -73,7 +73,7 @@ my $op = LLNG::Manager::Test->new( {
                 'loa-3' => 3
             },
             oidcServicePrivateKeySig => oidc_key_op_private_sig,
-            oidcServicePublicKeySig  => oidc_key_op_public_sig,
+            oidcServicePublicKeySig  => oidc_cert_op_public_sig,
         }
     }
 );
@@ -172,6 +172,56 @@ count(1);
 
 # Play code on RP1
 $query = buildForm( {
+        grant_type   => 'authorization_code',
+        code         => $code,
+        redirect_uri => 'http://rp.com/',
+    }
+);
+
+# Bad auth (header)
+ok(
+    $res = $op->_post(
+        "/oauth2/token",
+        IO::String->new($query),
+        accept => 'text/html',
+        length => length($query),
+        custom => {
+            HTTP_AUTHORIZATION => "Basic " . encode_base64("rpid:invalid"),
+        },
+    ),
+    "Post auth code on correct RP"
+);
+count(1);
+expectReject( $res, 401, "invalid_client" );
+is( getHeader( $res, "WWW-Authenticate" ), "Basic" );
+count(1);
+
+# Bad auth (form)
+$query = buildForm( {
+        grant_type    => 'authorization_code',
+        code          => $code,
+        redirect_uri  => 'http://rp.com/',
+        client_id     => 'rpid',
+        client_secret => 'rpsecre',
+    }
+);
+
+ok(
+    $res = $op->_post(
+        "/oauth2/token",
+        IO::String->new($query),
+        accept => 'text/html',
+        length => length($query),
+    ),
+    "Post auth code on correct RP"
+);
+count(1);
+expectReject( $res, 400, "invalid_client" );
+is( getHeader( $res, "WWW-Authenticate" ), undef );
+count(1);
+
+# Correct parameters
+$query = buildForm( {
         grant_type    => 'authorization_code',
         code          => $code,
         redirect_uri  => 'http://rp.com/',
@@ -194,7 +244,9 @@ ok(
     "Post auth code on correct RP"
 );
 count(1);
-expectReject( $res, 400, "invalid_request" );
+expectReject( $res, 401, "invalid_client" );
+is( getHeader( $res, "WWW-Authenticate" ), "Basic" );
+count(1);
 
 ok(
     $res = $op->_post(

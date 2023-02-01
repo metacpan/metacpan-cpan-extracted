@@ -1,6 +1,9 @@
 <TMPL_INCLUDE NAME="header.tpl">
-
-  <title>LemonLDAP::NG Comparator</title>
+  <TMPL_IF NAME="INSTANCE_NAME">
+    <title><TMPL_VAR NAME="INSTANCE_NAME"> Comparator</title>
+  <TMPL_ELSE>
+    <title>LemonLDAP::NG Comparator</title>
+  </TMPL_IF>
   <link rel="prefetch" href="<TMPL_VAR NAME="STATIC_PREFIX">struct.json" />
 </head>
 

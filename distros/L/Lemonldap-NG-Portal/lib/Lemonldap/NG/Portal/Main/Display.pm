@@ -2,7 +2,7 @@
 # Display functions for LemonLDAP::NG Portal
 package Lemonldap::NG::Portal::Main::Display;
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.0.16';
 
 package Lemonldap::NG::Portal::Main;
 use strict;
@@ -36,6 +36,7 @@ sub displayInit {
             }
         }
     }
+
     my $rule = HANDLER->buildSub(
         HANDLER->substitute( $self->conf->{portalRequireOldPassword} ) );
     unless ($rule) {
@@ -43,6 +44,7 @@ sub displayInit {
         $self->logger->error("Bad requireOldPwd rule: $error");
     }
     $self->requireOldPwd($rule);
+
     $rule =
       HANDLER->buildSub( HANDLER->substitute( $self->conf->{stayConnected} ) );
     unless ($rule) {
@@ -50,6 +52,7 @@ sub displayInit {
         $self->logger->error("Bad stayConnected rule: $error");
     }
     $self->stayConnected($rule);
+
     $rule =
       HANDLER->buildSub(
         HANDLER->substitute( $self->conf->{passwordPolicyActivation} ) );
@@ -58,30 +61,28 @@ sub displayInit {
         $self->logger->error("Bad passwordPolicyActivation rule: $error");
     }
     $self->passwordPolicyActivation($rule);
+
     $rule =
-      HANDLER->buildSub( HANDLER->substitute( $self->conf->{rememberAuthChoiceRule} ) );
+      HANDLER->buildSub(
+        HANDLER->substitute( $self->conf->{rememberAuthChoiceRule} ) );
     unless ($rule) {
         my $error = HANDLER->tsv->{jail}->error || 'Unable to compile rule';
         $self->logger->error("Bad rememberAuthChoiceRule rule: $error");
     }
     $self->rememberAuthChoice($rule);
 
-    my $speChars =
-      $self->conf->{passwordPolicySpecialChar} eq '__ALL__'
-      ? ''
-      : $self->conf->{passwordPolicySpecialChar};
-    $speChars =~ s/\s+/ /g;
-    $speChars =~ s/(?:^\s|\s$)//g;
-    $self->speChars($speChars);
+    my %speChars = $self->conf->{passwordPolicySpecialChar} eq '__ALL__'
+      ? ()    # Dedup
+      : map { ( s/\s+/<space>/r => 1 ) } split '',
+      $self->conf->{passwordPolicySpecialChar};
+    $self->speChars( join q{ }, sort keys %speChars );
 
-    my $isPP =
-         $self->conf->{passwordPolicyMinSize}
-      || $self->conf->{passwordPolicyMinLower}
-      || $self->conf->{passwordPolicyMinUpper}
-      || $self->conf->{passwordPolicyMinDigit}
-      || $self->conf->{passwordPolicyMinSpeChar}
-      || $speChars;
-    $self->isPP($isPP);
+    $self->isPP( $self->speChars
+          || $self->conf->{passwordPolicyMinSize}
+          || $self->conf->{passwordPolicyMinLower}
+          || $self->conf->{passwordPolicyMinUpper}
+          || $self->conf->{passwordPolicyMinDigit}
+          || $self->conf->{passwordPolicyMinSpeChar} );
 }
 
 # Call portal process and set template parameters
@@ -264,20 +265,27 @@ sub display {
             PPOLICY_NOPOLICY        => !$self->isPP(),
             ENABLE_PASSWORD_DISPLAY =>
               $self->conf->{portalEnablePasswordDisplay},
-            DISPLAY_PPOLICY    => $self->conf->{portalDisplayPasswordPolicy},
-            PPOLICY_MINSIZE    => $self->conf->{passwordPolicyMinSize},
-            PPOLICY_MINLOWER   => $self->conf->{passwordPolicyMinLower},
-            PPOLICY_MINUPPER   => $self->conf->{passwordPolicyMinUpper},
-            PPOLICY_MINDIGIT   => $self->conf->{passwordPolicyMinDigit},
-            PPOLICY_MINSPECHAR => $self->conf->{passwordPolicyMinSpeChar},
+            ENABLE_CHECKHIBP => $self->conf->{checkHIBP},
+            DISPLAY_PPOLICY  => $self->conf->{portalDisplayPasswordPolicy},
+            PPOLICY_MINSIZE  => $self->conf->{passwordPolicyMinSize},
+            PPOLICY_MINLOWER => $self->conf->{passwordPolicyMinLower},
+            PPOLICY_MINUPPER => $self->conf->{passwordPolicyMinUpper},
+            PPOLICY_MINDIGIT => $self->conf->{passwordPolicyMinDigit},
             (
-                $self->requireOldPwd->( $req, $req->userData )
-                ? ( REQUIRE_OLDPASSWORD => 1 )
+                $self->conf->{passwordPolicyMinSpeChar}
+                  && $self->conf->{passwordPolicySpecialChar}
+                ? ( PPOLICY_MINSPECHAR =>
+                      $self->conf->{passwordPolicyMinSpeChar} )
                 : ()
             ),
             (
                 $self->conf->{passwordPolicyMinSpeChar} || $self->speChars()
                 ? ( PPOLICY_ALLOWEDSPECHAR => $self->speChars() )
+                : ()
+            ),
+            (
+                $self->requireOldPwd->( $req, $req->userData )
+                ? ( REQUIRE_OLDPASSWORD => 1 )
                 : ()
             ),
             $self->menu->params($req),
@@ -402,6 +410,7 @@ sub display {
               || $self->conf->{proxyAuthServiceImpersonation},
             ENABLE_PASSWORD_DISPLAY =>
               $self->conf->{portalEnablePasswordDisplay},
+            ENABLE_CHECKHIBP => $self->conf->{checkHIBP},
             (
                 $self->stayConnected->( $req, $req->sessionInfo )
                 ? ( STAYCONNECTED => 1 )
@@ -412,8 +421,10 @@ sub display {
                 ? ( REMEMBERAUTHCHOICE => 1 )
                 : ()
             ),
-            REMEMBERAUTHCHOICEDEFAULTCHECKED => $self->conf->{rememberDefaultChecked} // 0,
-            REMEMBERAUTHCHOICECOOKIENAME => $self->conf->{rememberCookieName} // 'llngrememberauthchoice',
+            REMEMBERAUTHCHOICEDEFAULTCHECKED =>
+              $self->conf->{rememberDefaultChecked} // 0,
+            REMEMBERAUTHCHOICECOOKIENAME => $self->conf->{rememberCookieName}
+              // 'llngrememberauthchoice',
             REMEMBERAUTHCHOICETIMER => $self->conf->{rememberTimer} // 5,
             (
                 $req->data->{customScript}
@@ -490,12 +501,19 @@ sub display {
                 PPOLICY_NOPOLICY    => !$self->isPP(),
                 ENABLE_PASSWORD_DISPLAY =>
                   $self->conf->{portalEnablePasswordDisplay},
+                ENABLE_CHECKHIBP => $self->conf->{checkHIBP},
                 DISPLAY_PPOLICY  => $self->conf->{portalDisplayPasswordPolicy},
                 PPOLICY_MINSIZE  => $self->conf->{passwordPolicyMinSize},
                 PPOLICY_MINLOWER => $self->conf->{passwordPolicyMinLower},
                 PPOLICY_MINUPPER => $self->conf->{passwordPolicyMinUpper},
                 PPOLICY_MINDIGIT => $self->conf->{passwordPolicyMinDigit},
-                PPOLICY_MINSPECHAR => $self->conf->{passwordPolicyMinSpeChar},
+                (
+                    $self->conf->{passwordPolicyMinSpeChar}
+                      && $self->conf->{passwordPolicySpecialChar}
+                    ? ( PPOLICY_MINSPECHAR =>
+                          $self->conf->{passwordPolicyMinSpeChar} )
+                    : ()
+                ),
                 (
                     $self->conf->{passwordPolicyMinSpeChar} || $self->speChars()
                     ? ( PPOLICY_ALLOWEDSPECHAR => $self->speChars() )
@@ -679,7 +697,6 @@ sub buildHiddenForm {
 
 # Return skin name
 # @return skin name
-# TODO: create property for skinRule
 sub getSkin {
     my ( $self, $req ) = @_;
     my $skin = $self->conf->{portalSkin};
@@ -689,12 +706,17 @@ sub getSkin {
     $req->{sessionInfo}->{ipAddr} ||= $req->address;
 
     # Load specific skin from skinRules
-    foreach my $rule ( @{ $self->{skinRules} } ) {
+    foreach my $rule ( @{ $self->skinRules } ) {
         if ( $rule->[1]->( $req, $req->sessionInfo ) ) {
-            if ( -d $self->conf->{templateDir} . '/' . $rule->[0] ) {
+            my $directory = $self->conf->{templateDir} . '/' . $rule->[0];
+            if ( -d $directory ) {
                 $skin = $rule->[0];
                 $self->logger->debug("Skin $skin selected from skin rule");
                 last;
+            }
+            else {
+                $self->logger->warn( "Skin $rule->[0] was not selected "
+                      . "because $directory does not exist" );
             }
         }
     }

@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,7 +19,7 @@ name: Test-CheckManifest
 provides:
   Test::CheckManifest:
     file: lib/Test/CheckManifest.pm
-    version: '1.42'
+    version: '1.43'
 requires:
   Carp: '0'
   Cwd: '3.75'
@@ -35,15 +35,19 @@ resources:
   bugtracker: http://github.com/reneeb/Test-CheckManifest/issues
   homepage: http://github.com/reneeb/Test-CheckManifest
   repository: http://github.com/reneeb/Test-CheckManifest.git
-version: '1.42'
+version: '1.43'
 x_contributors:
+  - 'bernhard <Bernhard.Schmalhofer@gmx.de>'
   - 'Dan Book <grinnz@gmail.com>'
   - 'doug <doug@hcsw.org>'
+  - 'E. Choroba <choroba@matfyz.cz>'
   - 'LorenzoTa <LorenzoTa@users.noreply.github.com>'
   - 'LorenzoTa <lortav72@gmail.com>'
   - 'Michael Gray <michael@michaelgray.info>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Paul Cochrane <paul.cochrane@posteo.de>'
   - 'reneeb <github@renee-baecker.de>'
   - 'reneeb <info@perl-services.de>'
   - 'Renee <reb@perl-services.de>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

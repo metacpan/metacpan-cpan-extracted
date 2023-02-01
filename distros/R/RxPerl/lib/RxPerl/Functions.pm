@@ -6,13 +6,15 @@ use warnings;
 require RxPerl::Operators::Pipeable;
 
 use Carp 'croak';
+use Scalar::Util 'blessed';
 
 use Exporter 'import';
 our @EXPORT_OK = qw/
-    last_value_from first_value_from
+    last_value_from first_value_from is_observable
 /;
+our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.14.0";
+our $VERSION = "v6.19.0";
 
 sub _promise_class {
     my $fn = (caller(1))[3];
@@ -68,6 +70,12 @@ sub first_value_from {
     return last_value_from(
         $observable->pipe(RxPerl::Operators::Pipeable::op_first())
     );
+}
+
+sub is_observable {
+    my ($thing) = @_;
+
+    return !!(blessed($thing) && $thing->isa('RxPerl::Observable'));
 }
 
 1;

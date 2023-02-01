@@ -23,19 +23,22 @@ displayError = (j, status, err) ->
 			setMsg res, 'warning'
 
 # Delete function (launched by "delete" button)
-delete2F = (device, epoch) ->
-		if device == 'U2F'
-			device = 'u'
-		else if device == 'UBK'
-				device = 'yubikey'
-		else if device == 'TOTP'
-				device = 'totp'
-		else if device == 'WebAuthn'
-				device = 'webauthn'
-		else setMsg 'u2fFailed', 'warning'
+delete2F = (device, epoch, prefix) ->
+		# Only needed in case pre 2.0.16 templates are used
+		if (!prefix)
+			if device == 'U2F'
+				prefix = 'u'
+			else if device == 'UBK'
+					prefix = 'yubikey'
+			else if device == 'TOTP'
+					prefix = 'totp'
+			else if device == 'WebAuthn'
+					prefix = 'webauthn'
+			# Falling back is not likely to be very successful...
+			else prefix = device.toLowerCase()
 		$.ajax
 			type: "POST"
-			url: "#{portal}2fregisters/#{device}/delete"
+			url: "#{portal}2fregisters/#{prefix}/delete"
 			data:
 				epoch: epoch
 			dataType: 'json'
@@ -53,7 +56,7 @@ delete2F = (device, epoch) ->
 
 # Register "click" events
 $(document).ready ->
-	$('body').on 'click', '.remove2f', () -> delete2F ( $(this).attr 'device' ), ( $(this).attr 'epoch' )
+	$('body').on 'click', '.remove2f', () -> delete2F ( $(this).attr 'device' ), ( $(this).attr 'epoch' ), ( $(this).attr 'prefix' )
 	$('#goback').attr 'href', portal
 	$(".data-epoch").each ->
 		myDate = new Date($(this).text() * 1000)

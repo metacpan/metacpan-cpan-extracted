@@ -3,7 +3,7 @@ package t::OidcHookPlugin;
 use Mouse;
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
-use Lemonldap::NG::Portal::Main::Constants qw(PE_OK);
+use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_SENDRESPONSE);
 use Data::Dumper;
 use Test::More;
 
@@ -21,6 +21,7 @@ use constant hook => {
     oidcGotIDToken                    => 'modifyIDToken',
     oidcGotOnlineRefresh              => 'refreshHook',
     oidcGotOfflineRefresh             => 'refreshHook',
+    oidcGotTokenExchange              => 'tokenExchange',
 };
 
 sub addClaimToIDToken {
@@ -104,6 +105,15 @@ sub refreshHook {
     my ( $self, $req, $rp, $refreshInfo, $sessionInfo ) = @_;
     my $uid = $refreshInfo->{uid} || ( "online_" . $sessionInfo->{uid} );
     $refreshInfo->{scope} = $refreshInfo->{scope} . " refreshed_" . $uid;
+    return PE_OK;
+}
+
+sub tokenExchange {
+    my ( $self, $req, $rp ) = @_;
+    if ( $req->param("testtokenexchange") ) {
+        $req->response( $self->p->sendJSONresponse( $req, { result => 1 } ) );
+        return PE_SENDRESPONSE;
+    }
     return PE_OK;
 }
 

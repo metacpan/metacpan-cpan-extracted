@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OIDC_AUTH_ERROR
 );
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.0.16';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Auth
@@ -48,6 +48,8 @@ sub init {
           ->{oidcOPMetaDataOptionsDisplayName};
         my $icon = $self->conf->{oidcOPMetaDataOptions}->{$_}
           ->{oidcOPMetaDataOptionsIcon};
+        my $tooltip = $self->conf->{oidcOPMetaDataOptions}->{$_}
+          ->{oidcOPMetaDataOptionsTooltip} || $name;
         my $order = $self->conf->{oidcOPMetaDataOptions}->{$_}
           ->{oidcOPMetaDataOptionsSortNumber} // 0;
         my $img_src;
@@ -63,21 +65,27 @@ sub init {
           {
             val   => $_,
             name  => $name,
+            title => $tooltip,
             icon  => $img_src,
-            class => "openidconnect",
             order => $order
           };
     }
-    $self->addRouteFromConf(
-        'Unauth',
-        oidcServiceMetaDataFrontChannelURI => 'alreadyLoggedOut',
-        oidcServiceMetaDataBackChannelURI  => 'backLogout',
-    );
-    $self->addRouteFromConf(
-        'Auth',
-        oidcServiceMetaDataFrontChannelURI => 'frontLogout',
-        oidcServiceMetaDataBackChannelURI  => 'backLogout',
-    );
+
+    # If this module has already been loaded,
+    # skip routes to avoid a warning in conf
+    if ( !$self->p->loadedModules->{ ref($self) } ) {
+        $self->addRouteFromConf(
+            'Unauth',
+            oidcServiceMetaDataFrontChannelURI => 'alreadyLoggedOut',
+            oidcServiceMetaDataBackChannelURI  => 'backLogout',
+        );
+        $self->addRouteFromConf(
+            'Auth',
+            oidcServiceMetaDataFrontChannelURI => 'frontLogout',
+            oidcServiceMetaDataBackChannelURI  => 'backLogout',
+        );
+    }
+
     @list =
       sort {
              $a->{order} <=> $b->{order}
@@ -216,7 +224,12 @@ sub extractFormInfo {
         }
 
         # Check validity of ID Token
-        unless ( $self->checkIDTokenValidity( $op, $id_token_payload_hash ) ) {
+        unless (
+            $self->checkIDTokenValidity(
+                $op, $id_token_payload_hash, $req->data->{_oidcNonce}
+            )
+          )
+        {
             $self->userLogger->error('ID Token not valid');
             return PE_OIDC_AUTH_ERROR;
         }
@@ -286,12 +299,21 @@ sub extractFormInfo {
     # AuthN Request
     $self->logger->debug("Build OpenIDConnect AuthN Request");
 
+    my $nonce;
+    if ( $self->conf->{oidcOPMetaDataOptions}->{$op}
+        ->{oidcOPMetaDataOptionsUseNonce} )
+    {
+        $nonce = $self->generateNonce();
+        $req->data->{_oidcNonce} = $nonce;
+    }
+
     # Save state
-    my $state = $self->storeState( $req, qw/urldc checkLogins _oidcOPCurrent/ );
+    my $state = $self->storeState( $req,
+        qw/urldc checkLogins _oidcOPCurrent _oidcNonce/ );
 
     # Authorization Code Flow
     my $authorization_request_uri =
-      $self->buildAuthorizationCodeAuthnRequest( $req, $op, $state );
+      $self->buildAuthorizationCodeAuthnRequest( $req, $op, $state, $nonce );
     unless ($authorization_request_uri) {
         return PE_OIDC_AUTH_ERROR;
     }
@@ -352,12 +374,16 @@ sub authLogout {
     my $endsession_endpoint =
       $self->oidcOPList->{$op}->{conf}->{end_session_endpoint};
 
+    my $client_id =
+      $self->conf->{oidcOPMetaDataOptions}->{$op}
+      ->{oidcOPMetaDataOptionsClientID};
+
     if ($endsession_endpoint) {
         my $logout_url = $self->conf->{portal} . '?logout=1';
         $req->urldc(
             $self->buildLogoutRequest(
                 $endsession_endpoint, $req->{sessionInfo}->{_oidc_id_token},
-                $logout_url
+                $logout_url, undef, $client_id,
             )
         );
 
@@ -392,10 +418,14 @@ sub alreadyLoggedOut {
 
 sub frontLogout {
     my ( $self, $req ) = @_;
+    return $self->p->sendError( $req,
+        'Front Channel logout is not implemented', 501 );
 }
 
 sub backLogout {
     my ( $self, $req ) = @_;
+    return $self->p->sendError( $req, 'Back Channel logout is not implemented',
+        501 );
 }
 
 1;

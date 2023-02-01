@@ -145,20 +145,20 @@ is(htmlesc(undef)  , ''                    , 'htmlesc undef');
 
 
 #------------------------------------------------------------------------------
-# eq_undef, neundef
+# eqq, neqq
 #
-ok(equndef('a'   , 'a')     , 'equndef same');
-ok(equndef(undef , undef)   , 'equndef undef');
-ok(!equndef('a'  , 'b')     , 'equndef diff');
-ok(!equndef('a'  , undef)   , 'equndef a and undef');
+ok(eqq('a'   , 'a')     , 'eqq same');
+ok(eqq(undef , undef)   , 'eqq undef');
+ok(!eqq('a'  , 'b')     , 'eqq diff');
+ok(!eqq('a'  , undef)   , 'eqq a and undef');
 
-ok(!neundef('a'   , 'a')     , 'nequndef same');
-ok(!neundef(undef , undef)   , 'nequndef undef');
-ok(neundef('a'    , 'b')     , 'nequndef diff');
-ok(neundef('a'    , undef)   , 'nequndef a and undef');
+ok(!neqq('a'   , 'a')     , 'neqq same');
+ok(!neqq(undef , undef)   , 'neqq undef');
+ok(neqq('a'    , 'b')     , 'neqq diff');
+ok(neqq('a'    , undef)   , 'neqq a and undef');
 
 #
-# eq_undef, neundef
+# eq_undef, neqq
 #------------------------------------------------------------------------------
 
 
@@ -221,14 +221,6 @@ is(sanitize("foo_bar()")             , 'foo_bar'            , 'Sanitize function
 is(sanitize("/path/to/file.txt")     , 'path_to_file_txt'   , 'Sanitize path');
 
 is(sanitize("Hello there!!!", '.')   , 'Hello.there'        , 'Sanitize with a custom separator');
-
-#------------------------------------------------------------------------------
-# randword
-# Not sure how to test this besides making sure it actually runs.
-#
-
-$val = randword(20);
-ok(defined($val) && (length($val) == 20), 'randword');
 
 #
 # randword

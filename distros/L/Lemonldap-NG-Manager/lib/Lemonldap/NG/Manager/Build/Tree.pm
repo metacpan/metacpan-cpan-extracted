@@ -11,18 +11,14 @@
 # initialization and available directly in $scope array. Example: '*portal'
 # implies that portal value is available in $scope.portal
 #
-# All other ideas have to be set in Manager/Build/Attributes.pm !
+# All other ideas have to be set in Manager/Build/Attributes.pm!
 
-# DON'T FORGET TO RUN "make json" AFTER EACH CHANGE
+# DO NOT FORGET TO RUN "make json" AFTER EACH CHANGE
 
 package Lemonldap::NG::Manager::Build::Tree;
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.0.16';
 
-# TODO: Missing:
-#  * activeTimer
-#  * confirmFormMethod
-#  * redirectFormMethod
 sub tree {
     return [ {
             title => 'generalParameters',
@@ -36,13 +32,15 @@ sub tree {
                             help  => 'portalmenu.html',
                             nodes => [ {
                                     title => 'portalModules',
+                                    help  => 'portalmenu.html#menu-modules',
                                     form  => 'simpleInputContainer',
                                     nodes => [
-                                        'portalDisplayLogout',
-                                        'portalDisplayChangePassword',
                                         'portalDisplayAppslist',
                                         'portalDisplayLoginHistory',
+                                        'portalDisplayChangePassword',
                                         'portalDisplayOidcConsents',
+                                        'portalDisplayLogout',
+                                        'portalDisplayOrder'
                                     ]
                                 },
                                 'applicationList'
@@ -399,10 +397,10 @@ sub tree {
                         {
                             title => 'radiusParams',
                             help  => 'authradius.html',
-                            form  => 'simpleInputContainer',
                             nodes => [
                                 'radiusAuthnLevel', 'radiusSecret',
-                                'radiusServer'
+                                'radiusServer',     'radiusExportedVars',
+                                'radiusDictionaryFile',
                             ]
                         },
                         {
@@ -440,8 +438,8 @@ sub tree {
                             help  => 'authssl.html',
                             nodes => [
                                 'SSLAuthnLevel', 'SSLVar',
-                                'SSLVarIf',      'sslByAjax',
-                                'sslHost',
+                                'SSLIssuerVar',  'SSLVarIf',
+                                'sslByAjax',     'sslHost',
                             ]
                         },
                         {
@@ -633,7 +631,8 @@ sub tree {
                                 'stayConnected',
                                 'stayConnectedBypassFG',
                                 'stayConnectedTimeout',
-                                'stayConnectedCookieName'
+                                'stayConnectedCookieName',
+                                'stayConnectedSingleSession',
                             ],
                         },
                         {
@@ -833,6 +832,16 @@ sub tree {
                             ],
                         },
                         {
+                            title => 'HIBPcheck',
+                            help  => 'checkhibp.html',
+                            form  => 'simpleInputContainer',
+                            nodes => [
+                                'checkHIBP',
+                                'checkHIBPURL',
+                                'checkHIBPRequired'
+                            ],
+                        },
+                        {
                             title => 'impersonation',
                             help  => 'impersonation.html',
                             form  => 'simpleInputContainer',
@@ -882,6 +891,19 @@ sub tree {
                             ]
                         },
                         {
+                            title => 'locationDetectPlugin',
+                            help  => 'locationdetect.html',
+                            form  => 'simpleInputContainer',
+                            nodes => [
+                                'locationDetect',
+                                'locationDetectGeoIpDatabase',
+                                'locationDetectGeoIpLanguages',
+                                'locationDetectIpDetail',
+                                'locationDetectUaDetail'
+                            ]
+                        },
+
+                        {
                             title => 'decryptValue',
                             help  => 'decryptvalue.html',
                             form  => 'simpleInputContainer',
@@ -904,6 +926,20 @@ sub tree {
                         'sfOnlyUpgrade',
                         'sfLoginTimeout',
                         'sfRegisterTimeout',
+                        {
+                            title => 'password2f',
+                            help  => 'password2f.html',
+                            form  => 'simpleInputContainer',
+                            nodes => [
+                                'password2fActivation',
+                                'password2fSelfRegistration',
+                                'password2fAuthnLevel',
+                                'password2fLabel',
+                                'password2fLogo',
+                                'password2fUserCanRemoveKey',
+                                'password2fTTL',
+                            ]
+                        },
                         {
                             title => 'utotp2f',
                             help  => 'utotp2f.html',
@@ -1259,8 +1295,7 @@ sub tree {
                     help  => 'samlservice.html#organization',
                     form  => 'simpleInputContainer',
                     nodes => [
-                        'samlOrganizationDisplayName',
-                        'samlOrganizationName',
+                        'samlOrganizationDisplayName', 'samlOrganizationName',
                         'samlOrganizationURL'
                     ]
                 },
@@ -1358,6 +1393,11 @@ sub tree {
                             ]
                         },
                         {
+                            title => 'samlFederation',
+                            form  => 'simpleInputContainer',
+                            nodes => [ 'samlFederationFiles', ]
+                        },
+                        {
                             title => 'samlDiscoveryProtocol',
                             form  => 'simpleInputContainer',
                             nodes => [
@@ -1407,7 +1447,7 @@ sub tree {
                     title => 'oidcServiceMetaDataSecurity',
                     nodes => [ {
                             title => 'oidcServiceMetaDataKeys',
-                            form  => 'RSAKeyNoPassword',
+                            form  => 'RSACertKeyNoPassword',
                             group => [
                                 'oidcServicePrivateKeySig',
                                 'oidcServicePublicKeySig',
@@ -1418,6 +1458,7 @@ sub tree {
                         'oidcServiceAllowImplicitFlow',
                         'oidcServiceAllowHybridFlow',
                         'oidcServiceAllowOnlyDeclaredScopes',
+                        'oidcServiceIgnoreScopeForClaims',
                     ],
                 },
                 {
@@ -1446,6 +1487,7 @@ sub tree {
                 'casAccessControlPolicy',
                 'casStrictMatching',
                 'casTicketExpiration',
+                'casBackChannelSingleLogout',
                 'casStorage',
                 'casStorageOptions',
                 'casAttributes',

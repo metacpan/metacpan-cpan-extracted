@@ -13,7 +13,7 @@ extends qw(
   Lemonldap::NG::Portal::Password::Base
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.16';
 
 sub init {
     my ($self) = @_;
@@ -35,26 +35,26 @@ sub confirm {
         );
     };
     if ($@) {
-        $self->logger("Pwd confirm error: $@");
+        $self->logger("REST password confirm error: $@");
         return 0;
     }
     return ( $res->{result} ? 1 : 0 );
 }
 
 sub modifyPassword {
-    my ( $self, $req, $pwd, $useMail ) = @_;
+    my ( $self, $req, $pwd, %args ) = @_;
     my $res = eval {
         $self->restCall(
             $self->conf->{restPwdModifyUrl},
             {
-                ( $useMail ? 'mail' : 'user' ) => $req->user,
-                useMail  => ( $useMail ? JSON::true : JSON::false ),
-                password => $pwd,
+                ( $args{useMail} ? 'mail' : 'user' ) => $req->user,
+                useMail  => ( $args{useMail} ? JSON::true : JSON::false ),
+                password => $pwd
             }
         );
     };
     if ($@) {
-        $self->logger("Pwd confirm error: $@");
+        $self->logger("REST password confirm error: $@");
         return PE_ERROR;
     }
     return ( $res->{result} ? PE_PASSWORD_OK : PE_ERROR );

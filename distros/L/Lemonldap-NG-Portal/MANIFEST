@@ -8,8 +8,11 @@ lib/Lemonldap/NG/Portal.pm
 lib/Lemonldap/NG/Portal/2F/Engines/Default.pm
 lib/Lemonldap/NG/Portal/2F/Ext2F.pm
 lib/Lemonldap/NG/Portal/2F/Mail2F.pm
+lib/Lemonldap/NG/Portal/2F/Password.pm
 lib/Lemonldap/NG/Portal/2F/Radius.pm
 lib/Lemonldap/NG/Portal/2F/Register/Base.pm
+lib/Lemonldap/NG/Portal/2F/Register/Generic.pm
+lib/Lemonldap/NG/Portal/2F/Register/Password.pm
 lib/Lemonldap/NG/Portal/2F/Register/TOTP.pm
 lib/Lemonldap/NG/Portal/2F/Register/U2F.pm
 lib/Lemonldap/NG/Portal/2F/Register/WebAuthn.pm
@@ -21,6 +24,7 @@ lib/Lemonldap/NG/Portal/2F/UTOTP.pm
 lib/Lemonldap/NG/Portal/2F/WebAuthn.pm
 lib/Lemonldap/NG/Portal/2F/Yubikey.pm
 lib/Lemonldap/NG/Portal/Auth.pod
+lib/Lemonldap/NG/Portal/Auth/_Ajax.pm
 lib/Lemonldap/NG/Portal/Auth/_WebForm.pm
 lib/Lemonldap/NG/Portal/Auth/AD.pm
 lib/Lemonldap/NG/Portal/Auth/Apache.pm
@@ -117,6 +121,7 @@ lib/Lemonldap/NG/Portal/Plugins/BruteForceProtection.pm
 lib/Lemonldap/NG/Portal/Plugins/CDA.pm
 lib/Lemonldap/NG/Portal/Plugins/CertificateResetByMail.pm
 lib/Lemonldap/NG/Portal/Plugins/CheckDevOps.pm
+lib/Lemonldap/NG/Portal/Plugins/CheckHIBP.pm
 lib/Lemonldap/NG/Portal/Plugins/CheckState.pm
 lib/Lemonldap/NG/Portal/Plugins/CheckUser.pm
 lib/Lemonldap/NG/Portal/Plugins/ContextSwitching.pm
@@ -128,13 +133,16 @@ lib/Lemonldap/NG/Portal/Plugins/GlobalLogout.pm
 lib/Lemonldap/NG/Portal/Plugins/GrantSession.pm
 lib/Lemonldap/NG/Portal/Plugins/History.pm
 lib/Lemonldap/NG/Portal/Plugins/Impersonation.pm
+lib/Lemonldap/NG/Portal/Plugins/LocationDetect.pm
 lib/Lemonldap/NG/Portal/Plugins/MailPasswordReset.pm
 lib/Lemonldap/NG/Portal/Plugins/NewLocationWarning.pm
 lib/Lemonldap/NG/Portal/Plugins/Notifications.pm
 lib/Lemonldap/NG/Portal/Plugins/PublicPages.pm
 lib/Lemonldap/NG/Portal/Plugins/Refresh.pm
 lib/Lemonldap/NG/Portal/Plugins/Register.pm
+lib/Lemonldap/NG/Portal/Plugins/RememberAuthChoice.pm
 lib/Lemonldap/NG/Portal/Plugins/RESTServer.pm
+lib/Lemonldap/NG/Portal/Plugins/SamlFederation.pm
 lib/Lemonldap/NG/Portal/Plugins/SingleSession.pm
 lib/Lemonldap/NG/Portal/Plugins/SOAPServer.pm
 lib/Lemonldap/NG/Portal/Plugins/Status.pm
@@ -175,6 +183,7 @@ site/coffee/2fregistration.coffee
 site/coffee/autoRenew.coffee
 site/coffee/captcha.coffee
 site/coffee/confirm.coffee
+site/coffee/generic2fregistration.coffee
 site/coffee/globalLogout.coffee
 site/coffee/idpchoice.coffee
 site/coffee/info.coffee
@@ -182,6 +191,7 @@ site/coffee/kerberos.coffee
 site/coffee/kerberosChoice.coffee
 site/coffee/notifications.coffee
 site/coffee/oidcchecksession.coffee
+site/coffee/password2fregistration.coffee
 site/coffee/portal.coffee
 site/coffee/redirect.coffee
 site/coffee/registerbrowser.coffee
@@ -202,6 +212,7 @@ site/htdocs/static/bootstrap/css/styles.min.css
 site/htdocs/static/bootstrap/js/skin.js
 site/htdocs/static/bootstrap/js/skin.min.js
 site/htdocs/static/bootstrap/js/skin.min.js.map
+site/htdocs/static/bootstrap/password.png
 site/htdocs/static/bootstrap/totp.png
 site/htdocs/static/bootstrap/u2f.png
 site/htdocs/static/bootstrap/utotp.png
@@ -314,6 +325,9 @@ site/htdocs/static/common/js/captcha.min.js.map
 site/htdocs/static/common/js/confirm.js
 site/htdocs/static/common/js/confirm.min.js
 site/htdocs/static/common/js/confirm.min.js.map
+site/htdocs/static/common/js/generic2fregistration.js
+site/htdocs/static/common/js/generic2fregistration.min.js
+site/htdocs/static/common/js/generic2fregistration.min.js.map
 site/htdocs/static/common/js/globalLogout.js
 site/htdocs/static/common/js/globalLogout.min.js
 site/htdocs/static/common/js/globalLogout.min.js.map
@@ -335,6 +349,9 @@ site/htdocs/static/common/js/notifications.min.js.map
 site/htdocs/static/common/js/oidcchecksession.js
 site/htdocs/static/common/js/oidcchecksession.min.js
 site/htdocs/static/common/js/oidcchecksession.min.js.map
+site/htdocs/static/common/js/password2fregistration.js
+site/htdocs/static/common/js/password2fregistration.min.js
+site/htdocs/static/common/js/password2fregistration.min.js.map
 site/htdocs/static/common/js/portal.js
 site/htdocs/static/common/js/portal.min.js
 site/htdocs/static/common/js/portal.min.js.map
@@ -431,6 +448,7 @@ site/templates/bootstrap/errormsg.tpl
 site/templates/bootstrap/ext2fcheck.tpl
 site/templates/bootstrap/finduser.tpl
 site/templates/bootstrap/footer.tpl
+site/templates/bootstrap/generic2fregister.tpl
 site/templates/bootstrap/globallogout.tpl
 site/templates/bootstrap/gpgform.tpl
 site/templates/bootstrap/header.tpl
@@ -452,6 +470,8 @@ site/templates/bootstrap/openidform.tpl
 site/templates/bootstrap/openIdPol.tpl
 site/templates/bootstrap/openIdTrust.tpl
 site/templates/bootstrap/password.tpl
+site/templates/bootstrap/password2fcheck.tpl
+site/templates/bootstrap/password2fregister.tpl
 site/templates/bootstrap/passwordpolicy.tpl
 site/templates/bootstrap/public/test.tpl
 site/templates/bootstrap/pwdWillExpire.tpl
@@ -488,10 +508,12 @@ site/templates/common/mail/fr.json
 site/templates/common/mail/he.json
 site/templates/common/mail/it.json
 site/templates/common/mail/ms.json
+site/templates/common/mail/pl.json
+site/templates/common/mail/pt.json
 site/templates/common/mail/pt_BR.json
 site/templates/common/mail/tr.json
 site/templates/common/mail/vi.json
-site/templates/common/mail/zh_CN.json
+site/templates/common/mail/zh.json
 site/templates/common/mail/zh_TW.json
 site/templates/common/mail_2fcode.tpl
 site/templates/common/mail_certificateConfirm.tpl
@@ -518,6 +540,7 @@ t/01-Reject-Hashes-in-URL.t
 t/01-Unauth-Logout.t
 t/01-WebAuthn-Registration.t
 t/01-WebAuthn.t
+t/02-Password-Demo-checkHIBP.t
 t/02-Password-Demo-Hook.t
 t/02-Password-Demo-Local-noPpolicy.t
 t/02-Password-Demo-Local-Ppolicy.t
@@ -530,6 +553,7 @@ t/04-language-selection.t
 t/10-AuthCustom.t
 t/19-Auth-Null.t
 t/20-Auth-and-password-DBI-dynamic-hash.t
+t/20-Auth-and-password-DBI-encrypt.t
 t/20-Auth-and-password-DBI.t
 t/20-Auth-DBI-utf8.t
 t/21-Auth-and-password-LDAP.t
@@ -549,6 +573,7 @@ t/27-AuthProxy-with-choice.t
 t/27-AuthProxy.t
 t/28-AuthChoice-and-password.t
 t/28-AuthChoice-Custom.t
+t/28-AuthChoice-Slave-rememberAuthChoice.t
 t/28-AuthChoice-with-captcha.t
 t/28-AuthChoice-with-info.t
 t/28-AuthChoice-with-over.t
@@ -558,6 +583,7 @@ t/29-AuthGPG.t
 t/29-AuthSSL.t
 t/30-Auth-and-issuer-SAML-Artifact-with-SOAP-SLO-IdP-initiated.t
 t/30-Auth-and-issuer-SAML-Artifact-with-SOAP-SLO.t
+t/30-Auth-and-issuer-SAML-Federation.t
 t/30-Auth-and-issuer-SAML-Metadata.t
 t/30-Auth-and-issuer-SAML-NameID.t
 t/30-Auth-and-issuer-SAML-POST-IdP-initiated.t
@@ -571,6 +597,7 @@ t/30-Auth-and-issuer-SAML-Redirect.t
 t/30-Auth-ResolutionRule.t
 t/30-Auth-SAML-with-choice.t
 t/30-CDC.t
+t/30-SAML-Federation-Config.t
 t/30-SAML-Head-to-Tail-POST.t
 t/30-SAML-Macros.t
 t/30-SAML-POST-Logout-when-expired.t
@@ -579,6 +606,7 @@ t/30-SAML-POST-with-2F-and-Notification.t
 t/30-SAML-POST-with-2F-UpgradeOnly.t
 t/30-SAML-POST-with-Notification.t
 t/30-SAML-ReAuth-with-choice.t
+t/30-SAML-ReAuth-with-Cmb-Kerberos.t
 t/30-SAML-ReAuth.t
 t/30-SAML-RelayState.t
 t/30-SAML-SP-rule.t
@@ -613,20 +641,24 @@ t/32-CAS-Proxy.t
 t/32-CAS-Security.t
 t/32-OIDC-ClaimTypes.t
 t/32-OIDC-ClientCredentials-Grant.t
-t/32-OIDC-Code-Flow-with-2F.t
+t/32-OIDC-Code-Flow-Mobile.t
 t/32-OIDC-Code-Flow-with-2F-UpgradeOnly.t
+t/32-OIDC-Code-Flow-with-2F.t
 t/32-OIDC-Grant-Type-OAuth2-Handler-Rules.t
 t/32-OIDC-Grant-Type-Rules.t
 t/32-OIDC-Hooks.t
 t/32-OIDC-Logout-from-RP-bypass-confirm.t
 t/32-OIDC-Logout-redirect-uri-not-allowed.t
 t/32-OIDC-Macro.t
+t/32-OIDC-Metadata.t
 t/32-OIDC-Offline-Session.t
-t/32-OIDC-Password-Grant.t
 t/32-OIDC-Password-Grant-with-Bruteforce-and-Choice.t
+t/32-OIDC-Password-Grant.t
 t/32-OIDC-Refresh-Token.t
 t/32-OIDC-Register.t
+t/32-OIDC-Response-Modes.t
 t/32-OIDC-RP-rule.t
+t/32-OIDC-Token-Exchange.t
 t/32-OIDC-Token-Introspection.t
 t/32-OIDC-Token-Security.t
 t/33-Auth-and-issuer-OpenID2.t
@@ -642,7 +674,7 @@ t/35-REST-sessions-with-REST-server.t
 t/35-SOAP-config-backend.t
 t/35-SOAP-sessions-with-SOAP-server.t
 t/36-Combination-Custom.t
-t/36-Combination-Kerberos-or-Demo.t
+t/36-Combination-Kerberos-multiple-domains.t
 t/36-Combination-Password.t
 t/36-Combination-with-Choice.t
 t/36-Combination-with-over.t
@@ -721,6 +753,7 @@ t/61-CrowdSec-warn.t
 t/61-CrowdSec.t
 t/61-ForceAuthn.t
 t/61-GrantSession.t
+t/61-LocationDetect.t
 t/61-NewLocationWarning-Custom.t
 t/61-NewLocationWarning.t
 t/61-Session-ActivityTimeout.t
@@ -732,10 +765,12 @@ t/62-SingleSession.t
 t/62-UpgradeSession-disabled.t
 t/62-UpgradeSession.t
 t/63-History.t
+t/64-StayConnected-singleSession.t
 t/64-StayConnected-with-2F-and-History.t
 t/64-StayConnected-with-History.t
 t/64-StayConnected-with-rule.t
 t/64-StayConnected-without-fingerprint-checking.t
+t/64-StayConnected.t
 t/65-AutoSignin.t
 t/65-CheckState.t
 t/66-CDA-already-auth.t
@@ -783,10 +818,13 @@ t/68-Impersonation-with-merge.t
 t/68-Impersonation-with-TOTP.t
 t/68-Impersonation-with-UnrestrictedUser.t
 t/68-Impersonation.t
+t/70-2F-Password.t
 t/70-2F-TOTP-8-with-global-storage.t
+t/70-2F-TOTP-and-U2F-with-authnLevels-and-UpgradeOnly.t
 t/70-2F-TOTP-and-U2F-with-TTL-and-JSON.t
 t/70-2F-TOTP-encryption.t
 t/70-2F-TOTP-with-History-and-Refresh.t
+t/70-2F-TOTP-with-LDAP.t
 t/70-2F-TOTP-with-Range.t
 t/70-2F-TOTP-with-TTL-and-JSON.t
 t/70-2F-TOTP-with-TTL-and-XML.t
@@ -809,6 +847,7 @@ t/76-2F-Ext-with-CodeActivation-Resend.t
 t/76-2F-Ext-with-CodeActivation.t
 t/76-2F-Ext-with-GrantSession.t
 t/76-2F-Ext-with-History.t
+t/77-2F-Extra-Register.t
 t/77-2F-Extra.t
 t/77-2F-Mail-SessionKey.t
 t/77-2F-Mail-with-global-storage.t
@@ -830,6 +869,7 @@ t/AfterDataCustomPlugin.pm
 t/CaptchaOldApi.pm
 t/CasHookPlugin.pm
 t/Custom.pm
+t/geoip/test.mmdb
 t/gpghome/key.asc
 t/gpghome/openpgp-revocs.d/9482CEFB055809CBAFE6D71AAB2D5542891D1677.rev
 t/gpghome/private-keys-v1.d/A076B0E7DB141A919271EE8B581CDFA8DA42F333.key
@@ -844,6 +884,8 @@ t/lib/Lemonldap/NG/Handler/Test.pm
 t/lib/Lemonldap/NG/Portal/Auth/LDAPPolicy.pm
 t/lib/Lemonldap/NG/Portal/Custom.pm
 t/lmConf-1.json
+t/main-idps-renater-metadata.xml
+t/main-sps-renater-metadata.xml
 t/oidc-lib.pm
 t/OidcHookPlugin.pm
 t/PasswordHookPlugin.pm

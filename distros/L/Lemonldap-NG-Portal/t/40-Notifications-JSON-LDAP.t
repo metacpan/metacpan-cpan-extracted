@@ -10,7 +10,6 @@ my $maintests = 11;
 my $logLevel  = 'error';
 require 't/test-lib.pm';
 my $file                       = tempdb();
-my $ldapServer                 = "ldap://127.0.0.1:19389/";
 my $ldapBindDN                 = 'cn=admin,dc=example,dc=com';
 my $ldapBindPassword           = 'admin';
 my $ldapConfBase               = 'ou=notifications,dc=example,dc=com';
@@ -20,7 +19,6 @@ my $notificationStorageOptions = {
       Lemonldap::NG::Common::Logger::Std->new( { logLevel => $logLevel } ),
     userLogger =>
       Lemonldap::NG::Common::Logger::Std->new( { logLevel => $logLevel } ),
-    ldapServer       => $ldapServer,
     ldapBindDN       => $ldapBindDN,
     ldapBindPassword => $ldapBindPassword,
     ldapConfBase     => $ldapConfBase,
@@ -29,10 +27,11 @@ my $notificationStorageOptions = {
 SKIP: {
     skip 'LLNGTESTLDAP is not set', $maintests unless ( $ENV{LLNGTESTLDAP} );
     require 't/test-ldap.pm';
+    $notificationStorageOptions->{ldapServer} = $main::slapd_url;
     use Net::LDAP;
     $notif = Lemonldap::NG::Common::Notifications::LDAP->new(
         $notificationStorageOptions);
-    my $ldap = Net::LDAP->new($ldapServer);
+    my $ldap = Net::LDAP->new($main::slapd_url);
     my $mesg = $ldap->bind( $ldapBindDN, password => $ldapBindPassword );
     is( $mesg->code, 0, "Bind to LDAP server" ) or diag $mesg->error;
 
@@ -208,9 +207,8 @@ SKIP: {
     $id = expectCookie($res);
     $client->logout($id);
 
-    clean_sessions();
     eval { unlink $file };
-    stopLdapServer();
+    clean_sessions();
 }
 
 count($maintests);

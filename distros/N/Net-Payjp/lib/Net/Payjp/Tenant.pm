@@ -1,4 +1,4 @@
-package Net::Payjp::Resource;
+package Net::Payjp::Tenant;
 
 use strict;
 use warnings;
@@ -36,29 +36,14 @@ sub all{
 
 sub delete{
   my $self = shift;
-  my %p = @_;
 
   $self->_request(method => 'DELETE', url => $self->_instance_url);
 }
 
-sub _instance_url{
+sub application_urls{
   my $self = shift;
 
-  if(ref($self) =~ /Net::Payjp::Customer::Card/){
-    return $self->api_base.'/v1/'.'customers/'.$self->cus_id.'/cards'; 
-  }
-  elsif(ref($self) =~ /Net::Payjp::Customer::Subscription/){
-    return $self->api_base.'/v1/'.'customers/'.$self->cus_id.'/subscriptions'; 
-  }
-  else{
-    return $self->_class_url.'/'.$self->id; 
-  }
-}
-
-sub _class_url{
-  my $self = shift;
-  my ($class) = lc(ref($self)) =~ /([^:]*$)/; 
-  return $self->api_base.'/v1/'.$class.'s';
+  $self->_request(method => 'POST', url => $self->_instance_url . '/application_urls');
 }
 
 1;

@@ -37,7 +37,7 @@ expectRedirection( $res, 'http://auth.sp.com/somewhere' );
 
 # Gateway to unknown URL is denied
 $res = gatewayRequest( $issuer, "http://auth.unknown.com/somewhere" );
-expectPortalError( $res, 68 );
+expectPortalError( $res, 107 );
 
 # Access control "Fake ticket"
 ok( $issuer = issuer('faketicket'), 'Issuer portal' );
@@ -49,7 +49,7 @@ expectRedirection( $res, 'http://auth.sp.com/somewhere' );
 
 # Gateway to unknown URL is denied
 $res = gatewayRequest( $issuer, "http://auth.unknown.com/somewhere" );
-expectPortalError( $res, 68 );
+expectPortalError( $res, 107 );
 
 clean_sessions();
 done_testing( count() );

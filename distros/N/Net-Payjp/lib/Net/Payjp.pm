@@ -7,6 +7,8 @@ use LWP::UserAgent;
 use LWP::Protocol::https;
 use HTTP::Request::Common;
 use JSON;
+use List::Util qw/min/;
+use POSIX qw/floor/;
 
 use Net::Payjp::Account;
 use Net::Payjp::Charge;
@@ -16,6 +18,8 @@ use Net::Payjp::Subscription;
 use Net::Payjp::Token;
 use Net::Payjp::Transfer;
 use Net::Payjp::Event;
+use Net::Payjp::Tenant;
+use Net::Payjp::TenantTransfer;
 use Net::Payjp::Object;
 
 # ABSTRACT: API client for pay.jp
@@ -24,17 +28,10 @@ use Net::Payjp::Object;
 
  # Create charge
  my $payjp = Net::Payjp->new(api_key => $API_KEY);
- my $card = {
-   number => '4242424242424242',
-   exp_month => '02',
-   exp_year => '2020',
-   address_zip => '2020014'
- };
  my $res = $payjp->charge->create(
-   card => $card,
+   card => 'token_id_by_Checkout_or_payjp.js',
    amount => 3500,
    currency => 'jpy',
-   description => 'test charge',
  );
  if(my $e = $res->error){
    print "Error;
@@ -67,8 +64,10 @@ This is required. You get this from your Payjp Account settings.
 
 =cut
 
-our $VERSION = '0.1.4';
+our $VERSION = '0.2.2';
 our $API_BASE = 'https://api.pay.jp';
+our $INITIAL_DELAY_SEC = 2;
+our $MAX_DELAY_SEC = 32;
 
 sub new{
   my $self = shift;
@@ -79,11 +78,12 @@ sub _init{
   my $self = shift;
   my %p = @_;
   return(
-    api_key => $p{api_key},
-    id => $p{id},
-    cus_id => $p{cus_id},
-    version => $VERSION,
+    api_key  => $p{api_key},
+    id       => $p{id},
     api_base => $API_BASE,
+    max_retry     => $p{max_retry} || 0,
+    initial_delay => $p{initial_delay} || $INITIAL_DELAY_SEC,
+    max_delay     => $p{max_delay} || $MAX_DELAY_SEC,
   );
 }
 
@@ -91,12 +91,6 @@ sub api_key{
   my $self = shift;
   $self->{api_key} = shift if @_;
   return $self->{api_key};
-}
-
-sub version{
-  my $self = shift;
-  $self->{version} = shift if @_;
-  return $self->{version};
 }
 
 sub api_base{
@@ -111,12 +105,6 @@ sub id{
   return $self->{id};
 }
 
-sub cus_id{
-  my $self = shift;
-  $self->{cus_id} = shift if @_;
-  return $self->{cus_id};
-}
-
 =head1 Charge Methods
 
 =head2 create
@@ -125,14 +113,8 @@ Create a new charge
 
 L<https://pay.jp/docs/api/#支払いを作成>
 
- my $card = {
-   number => '4242424242424242',
-   exp_month => '02',
-   exp_year => '2020',
-   address_zip => '2020014'
- };
  $payjp->charge->create(
-   card => $card,
+   card => 'tok_76e202b409f3da51a0706605ac81',
    amount => 3500,
    currency => 'jpy',
    description => 'yakiimo',
@@ -231,7 +213,7 @@ $res = $payjp->customer->all(limit => 2, offset => 1);
 
 sub charge{
   my $self = shift;
-  my $class = Net::Payjp::Charge->new(api_key => $self->api_key, id => $self->id);
+  return Net::Payjp::Charge->new(%$self);
 }
 
 =head1 Cutomer card Methods
@@ -247,9 +229,7 @@ Create a customer's card
 L<https://pay.jp/docs/api/#顧客のカードを作成>
 
  $card->create(
-   number => '4242424242424242',
-   exp_year => '2020',
-   exp_month => '02'
+   card => 'tok_76e202b409f3da51a0706605ac81'
  );
 
 =head2 retrieve
@@ -312,7 +292,7 @@ $subscription->all(limit => 1, offset => 0);
 
 sub customer{
   my $self = shift;
-  my $class = Net::Payjp::Customer->new(api_key => $self->api_key, id => $self->id);
+  return Net::Payjp::Customer->new(%$self);
 }
 
 =head1 Plan Methods
@@ -369,7 +349,7 @@ L<https://pay.jp/docs/api/#プランリストを取得>
 
 sub plan{
   my $self = shift;
-  my $class = Net::Payjp::Plan->new(api_key => $self->api_key, id => $self->id);
+  return Net::Payjp::Plan->new(%$self);
 }
 
 =head1 Subscription Methods
@@ -450,26 +430,10 @@ L<https://pay.jp/docs/api/#定期課金のリストを取得>
 
 sub subscription{
   my $self = shift;
-  my $class = Net::Payjp::Subscription->new(api_key => $self->api_key, id => $self->id);
+  return Net::Payjp::Subscription->new(%$self);
 }
 
 =head1 Token Methods
-
-=head2 create
-
-Create a token
-
-L<https://pay.jp/docs/api/#トークンを作成>
-
- my $card = {
-   number => '4242424242424242',
-   cvc => "1234",
-   exp_month => "02",
-   exp_year =>"2020"
- };
- $payjp->token->create(
-   card => $card,
- );
 
 =head2 retrieve
 
@@ -483,7 +447,7 @@ $payjp->token->retrieve('tok_eff34b780cbebd61e87f09ecc9c6');
 
 sub token{
   my $self = shift;
-  my $class = Net::Payjp::Token->new(api_key => $self->api_key, id => $self->id);
+  return Net::Payjp::Token->new(%$self);
 }
 
 =head1 Transfer Methods
@@ -519,7 +483,7 @@ L<https://pay.jp/docs/api/#入金の内訳を取得>
 
 sub transfer{
   my $self = shift;
-  my $class = Net::Payjp::Transfer->new(api_key => $self->api_key, id => $self->id);
+  return Net::Payjp::Transfer->new(%$self);
 }
 
 =head1 Event Methods
@@ -544,7 +508,7 @@ $payjp->event->all(limit => 10, offset => 0);
 
 sub event{
   my $self = shift;
-  my $class = Net::Payjp::Event->new(api_key => $self->api_key, id => $self->id);
+  return Net::Payjp::Event->new(%$self);
 }
 
 =head1 Account Methods
@@ -561,81 +525,94 @@ L<https://pay.jp/docs/api/#アカウント情報を取得>
 
 sub account{
   my $self = shift;
-  my $class = Net::Payjp::Account->new(api_key => $self->api_key);
+  return Net::Payjp::Account->new(%$self);
+}
+
+sub tenant{
+  my $self = shift;
+  return Net::Payjp::Tenant->new(%$self);
+}
+
+sub tenant_transfer{
+  my $self = shift;
+  return Net::Payjp::TenantTransfer->new(%$self);
 }
 
 sub _request{
   my $self = shift;
   my %p = @_;
 
-  my $api_url = $p{url};
+  my $url = $p{url};
   my $method = $p{method} || 'GET';
+  my $retry = $p{retry} || 0;
 
   my $req;
-  if($method eq 'GET'){
-    if($p{param}){
-      my @param;
-      foreach my $k(keys %{$p{param}}){
-        push(@param, "$k=".$p{param}->{$k});
-      }
-      $req = GET("$api_url?".join("&", @param));
-    }
-    else{
-      $req = GET($api_url);
-    }
+  my $with_param;
+  if(ref $p{param} eq 'HASH' and keys %{$p{param}} > 0) {
+    $with_param = 1;
   }
-  elsif($method eq 'POST'){
-    if(ref $p{param} eq 'HASH'){
-      $req = POST($api_url, $self->_api_param(param => $p{param}));
+  if($with_param and ($method eq 'GET' or $method eq 'DELETE')){
+    my @param;
+    foreach my $k(keys %{$p{param}}){
+      push(@param, "$k=".$p{param}->{$k});
     }
-    else{
-      $req = new HTTP::Request POST => $api_url;
-    }
+    $url .= '?'.join("&", @param);
   }
-  elsif($method eq 'DELETE'){
-    $req = new HTTP::Request(DELETE => $api_url);
+  if($method eq 'POST' and $with_param){
+    $req = POST($url, $self->_api_param(param => $p{param}));
+  } else {
+    $req = new HTTP::Request $method => $url;
   }
 
   $req->authorization_basic($self->api_key, '');
-
   my $ua = LWP::UserAgent->new();
   $ua->timeout(30);
   my $client = {
-    'bindings_version' => $self->version,
+    'bindings_version' => $VERSION,
     'lang' => 'perl',
     'lang_version' => $],
     'publisher' => 'payjp',
     'uname' => $^O
   };
   $ua->default_header(
-    'User-Agent' => 'Payjp/v1 PerlBindings/'.$self->version,
+    'User-Agent' => 'Payjp/v1 PerlBindings/'.$VERSION,
     'X-Payjp-Client-User-Agent' => JSON->new->encode($client),
   );
 
   my $res = $ua->request($req);
-  if($res->code == 200){
+  my $code = $res->code;
+  if($code == 200){
     my $obj = $self->_to_object(JSON->new->decode($res->content));
     $self->id($obj->id) if $obj->id;
     return $obj;
-  }
-  elsif($res->code =~ /^4/){
+  } elsif($code == 429 and $retry < $self->{max_retry}){
+    sleep($self->_get_delay_sec(
+      retry => $retry,
+      init_sec => $self->{initial_delay},
+      max_sec => $self->{max_delay}
+    ));
+    return $self->_request(method => $method, url =>$url, param => $p{param}, retry => $retry + 1);
+  } elsif($code =~ /^4/){
     return $self->_to_object(JSON->new->decode($res->content));
   }
-  else{
-    if($res->content =~ /status_code/){
-       return $self->_to_object(JSON->new->decode($res->content));
+  return $self->_to_object(
+    {
+      error => {
+        message => $res->message,
+        status_code => $code,
+      }
     }
-    else{
-      return $self->_to_object(
-        {
-          error => {
-            message => $res->message,
-            status_code => $res->code,
-          }
-        }
-      );
-    }
-  }
+  );
+}
+
+sub _get_delay_sec {
+  my $self = shift;
+  my %p = @_;
+  my $retry = $p{retry}; # number
+  my $init_sec = $p{init_sec}; # number
+  my $max_sec = $p{max_sec}; # number
+
+  return min($init_sec * 2 ** $retry, $max_sec) / 2 * (1 + rand(1));
 }
 
 sub _to_object{
@@ -662,6 +639,17 @@ sub _api_param{
     }
   }
   return $req_param;
+}
+
+sub _instance_url{
+  my $self = shift;
+  return $self->_class_url.'/'.($self->id or '');
+}
+
+sub _class_url{
+  my $self = shift;
+  my ($class) = lc(ref($self)) =~ /([^:]*$)/;
+  return $self->api_base.'/v1/'.$class.'s';
 }
 
 1;

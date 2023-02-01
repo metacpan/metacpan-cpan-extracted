@@ -3,96 +3,36 @@
 use strict;
 use warnings;
 
+use Test::Mock::LWP;
 use Net::Payjp;
-use Test::More tests => 5;
+use Test::More tests => 12;
 
-my $api_key = 'sk_test_c62fade9d045b54cd76d7036';
-my $payjp = Net::Payjp->new(api_key => $api_key);
-my $res;
-
+my $payjp = Net::Payjp->new(api_key => 'api_key');
 
 isa_ok($payjp->token, 'Net::Payjp::Token');
+can_ok($payjp->token, qw(retrieve create));
+ok(!$payjp->token->can('all'));
+ok(!$payjp->token->can('save'));
+ok(!$payjp->token->can('delete'));
 
+$Mock_resp->mock( content => sub { '{"id":"res1"}' } );
+$Mock_resp->mock( code => sub {200}  );
+$Mock_ua->mock( timeout => sub {} );
+$Mock_ua->mock( default_header => sub {}  );
 
 #Create
-my $card = {
-  number => '4242424242424242',
-  cvc => "1234",
-  exp_month => "02",
-  exp_year =>"2020"
-};
-can_ok($payjp->token, 'create');
-#$res = $payjp->token->create(
-#  card => $card,
-#);
-$res = $payjp->_to_object(JSON->new->decode(q(
-{
-  "card": {
-    "address_city": null,
-    "address_line1": null,
-    "address_line2": null,
-    "address_state": null,
-    "address_zip": null,
-    "address_zip_check": "unchecked",
-    "brand": "Visa",
-    "country": null,
-    "created": 1442290383,
-    "customer": null,
-    "cvc_check": "passed",
-    "exp_month": 2,
-    "exp_year": 2020,
-    "fingerprint": "e1d8225886e3a7211127df751c86787f",
-    "id": "car_e3ccd4e0959f45e7c75bacc4be90",
-    "last4": "4242",
-    "name": null,
-    "object": "card"
-  },
-  "created": 1442290383,
-  "id": "tok_5ca06b51685e001723a2c3b4aeb4",
-  "livemode": false,
-  "object": "token",
-  "used": false
-}
-)));
-is($res->object, 'token', 'got a token object back');
-
-
-#Set tok_id.
-$payjp->id($res->id);
-
+$Mock_req->mock( content => sub {
+    my $p = $_[1];
+    is($p, 'card%5Bnumber%5D=4242');
+} );
+my $token = $payjp->token;
+my $res = $token->create(card => {number => '4242'});
+is($Mock_req->{new_args}[1], 'POST');
+is($Mock_req->{new_args}[2], 'https://api.pay.jp/v1/tokens');
+is($res->id, 'res1');
+is($token->id, 'res1');
 
 #Retrieve
-can_ok($payjp->token, 'retrieve');
-#$res = $payjp->token->retrieve;
-$res = $payjp->_to_object(JSON->new->decode(q(
-{
-  "card": {
-    "address_city": null,
-    "address_line1": null,
-    "address_line2": null,
-    "address_state": null,
-    "address_zip": null,
-    "address_zip_check": "unchecked",
-    "brand": "Visa",
-    "country": null,
-    "created": 1442290383,
-    "customer": null,
-    "cvc_check": "passed",
-    "exp_month": 2,
-    "exp_year": 2020,
-    "fingerprint": "e1d8225886e3a7211127df751c86787f",
-    "id": "car_e3ccd4e0959f45e7c75bacc4be90",
-    "last4": "4242",
-    "name": null,
-    "object": "card"
-  },
-  "created": 1442290383,
-  "id": "tok_5ca06b51685e001723a2c3b4aeb4",
-  "livemode": false,
-  "object": "token",
-  "used": true
-}
-)));
-is($res->object, 'token', 'got a token object back');
-
-
+$token->retrieve;
+is($Mock_req->{new_args}[1], 'GET');
+is($Mock_req->{new_args}[2], 'https://api.pay.jp/v1/tokens/res1');

@@ -1,0 +1,20 @@
+---
+abstract: 'turn a Gnumeric file into a Spreadsheet::Read data structure'
+author:
+  - 'Bob Rogers <rogers@rgrjr.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Spreadsheet-ReadGnumeric
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Spreadsheet-ReadGnumeric
+  homepage: https://git.sr.ht/~rgrjr/Spreadsheet-ReadGnumeric
+  repository: https://git.sr.ht/~rgrjr/Spreadsheet-ReadGnumeric
+version: '0.1'
+x_serialization_backend: 'YAML::Tiny version 1.70'

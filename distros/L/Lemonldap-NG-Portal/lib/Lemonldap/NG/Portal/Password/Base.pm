@@ -17,7 +17,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.0.16';
 
 # INITIALIZATION
 
@@ -102,7 +102,7 @@ sub _modifyPassword {
     my $res = $self->modifyPassword( $req, $req->data->{newpassword} );
     if ( $res == PE_PASSWORD_OK ) {
 
-        $self->p->processHook(
+        my $hook_result = $self->p->processHook(
             $req, 'passwordAfterChange', $req->user,
             $req->data->{newpassword},
             $req->data->{oldpassword}
@@ -137,7 +137,7 @@ sub _modifyPassword {
         $req->{passwordWasChanged} = 1;
 
         #  Continue process if password change is ok
-        return PE_PASSWORD_OK;
+        return ( $hook_result != PE_OK ) ? $hook_result : PE_PASSWORD_OK;
     }
     return $res;
 }
@@ -185,12 +185,11 @@ sub checkPasswordQuality {
 
     ### Special characters policy
     my $speChars = $self->conf->{passwordPolicySpecialChar};
-    $speChars =~ s/\s+//g;
 
     ## Min special characters
     # Just number of special characters must be checked
     if ( $self->conf->{passwordPolicyMinSpeChar} && $speChars eq '__ALL__' ) {
-        my $spe = $password =~ s/\W//g;
+        my $spe = $password =~ s/[\W_]//g;
         if ( $spe < $self->conf->{passwordPolicyMinSpeChar} ) {
             $self->logger->error("Password has not enough special characters");
             return PE_PP_INSUFFICIENT_PASSWORD_QUALITY;
@@ -198,7 +197,7 @@ sub checkPasswordQuality {
         return PE_OK;
     }
 
-    # Number of special characters must be checked
+    # Check number of special characters
     if ( $self->conf->{passwordPolicyMinSpeChar} && $speChars ) {
         my $test = $password;
         my $spe  = $test =~ s/[\Q$speChars\E]//g;
@@ -228,13 +227,15 @@ sub checkPasswordQuality {
 # in order to call the password hook
 sub setNewPassword {
     my ( $self, $req, $pwd, $useMail ) = @_;
-
+    my %args;
     my $hook_result =
       $self->p->processHook( $req, 'passwordBeforeChange', $req->user, $pwd );
     return $hook_result if ( $hook_result != PE_OK );
 
     # Delegate to subclass
-    my $mod_result = $self->modifyPassword( $req, $pwd, $useMail );
+    $args{useMail}       = $useMail;
+    $args{passwordReset} = 1;
+    my $mod_result = $self->modifyPassword( $req, $pwd, %args );
 
     if ( $mod_result == PE_PASSWORD_OK ) {
         $hook_result =

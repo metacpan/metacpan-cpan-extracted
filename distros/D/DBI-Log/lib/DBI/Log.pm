@@ -6,13 +6,15 @@ no warnings;
 use DBI;
 use Time::HiRes;
 
-our $VERSION = "0.10";
+our $VERSION = "0.11";
 our %opts = (
     file => $file,
     trace => 0,
     timing => 0,
+    replace_placeholders => 1,
     fh => undef,
     exclude => undef,
+    format => "sql",
 );
 
 my $orig_execute = \&DBI::st::execute;
@@ -102,7 +104,7 @@ sub import {
             my $home = $ENV{HOME} || (getpwuid($<))[7];
             $file2 =~ s{^~/}{$home/};
         }
-        open $opts{fh}, ">>", $file2 or die "Can't open $opts{file}: $!";
+        open $opts{fh}, ">>", $file2 or die "Can't open $opts{file}: $!\n";
     }
 }
 
@@ -139,7 +141,7 @@ sub pre_query {
     # stop there.
     my @filtered_callers;
     CALLER: for my $caller (reverse @callers) {
-        my ($package, $file, $line, $sub) = @$caller;
+        my ($package, $file, $line, $long_sub) = @$caller;
         if ($package eq "DBI::Log") {
             last CALLER;
         }
@@ -157,13 +159,17 @@ sub pre_query {
         @filtered_callers = ($filtered_callers[-1]);
     }
 
-    my $stack = "";
+    my @stack;
     for my $caller (@filtered_callers) {
-        my ($package, $file, $line, $sub) = @$caller;
-        my $short_sub = $sub;
-        $short_sub =~ s/.*:://;
-        $short_sub = $name if $sub eq "DBI::Log::__ANON__";
-        $stack .= "-- $short_sub $file $line\n";
+        my ($package, $file, $line, $long_sub) = @$caller;
+        my $sub = $long_sub;
+        $sub =~ s/.*:://;
+        $sub = $name if $long_sub =~ /^DBI::Log::__ANON__/;
+        push @stack, {
+            sub => $sub,
+            file => $file,
+            line => $line,
+        };
     }
 
     if (ref($query) && ref($query) eq "DBI::st") {
@@ -171,7 +177,7 @@ sub pre_query {
         $query = $query->{Statement};
     }
 
-    if ($dbh) {
+    if ($dbh && $opts{replace_placeholders}) {
         # When you use $sth->bind_param(1, "value") the params can be found in
         # $sth->{ParamValues} and they override arguments sent in to
         # $sth->execute()
@@ -195,21 +201,97 @@ sub pre_query {
     }
 
     $query =~ s/^\s*\n|\s*$//g;
-    $info = "-- " . scalar(localtime()) . "\n";
-    print {$opts{fh}} "$info$stack$query\n";
-    $log->{time1} = Time::HiRes::time();
+    $log->{time_started} = Time::HiRes::time();
+    $log->{query} = $query;
+    $log->{stack} = \@stack;
+    if ($opts{format} eq "json") {
+        # For JSON output we don't want to output anything yet, so post_query()
+        # can emit the whole JSON object, just remember them.
+    }
+    else {
+        my $mesg;
+        $mesg .= "-- " . scalar(localtime()) . "\n";
+        for my $caller (@stack) {
+            $mesg .= "-- $caller->{sub} $caller->{file} $caller->{line}\n";
+        }
+        $mesg .= "$query\n";
+        print {$opts{fh}} $mesg;
+    }
+
     return $log;
 }
 
 sub post_query {
     my ($log) = @_;
     return if $log->{skip};
-    if ($opts{timing}) {
-        $log->{time2} = Time::HiRes::time();
-        my $diff = sprintf '%.3f', $log->{time2} - $log->{time1};
-        print {$opts{fh}} "-- ${diff}s\n";
+    $log->{time_ended} = Time::HiRes::time();
+    $log->{time_taken} = sprintf "%.3f", $log->{time_ended} - $log->{time_started};
+
+    if ($opts{format} eq "json") {
+        # print all the info as JSON
+        print {$opts{fh}} to_json($log) . "\n";
     }
-    print {$opts{fh}} "\n";
+    else {
+        # For SQL output format, pre_query already printed most of the info, we
+        # just need to add the time taken - and that only if we're doing
+        # timings...
+        if ($opts{timing}) {
+            print {$opts{fh}} "-- $log->{time_taken}s\n";
+        }
+        print {$opts{fh}} "\n";
+    }
+}
+
+sub to_json {
+    my ($val, $depth) = @_;
+    $depth ||= 0;
+    my $pretty = 0;
+
+    my $out;
+    if (!defined $val) {
+        $out = "null";
+    }
+    elsif (ref $val eq "HASH") {
+        $out = "{";
+        $out .= "\n" if $pretty;
+        my $i = 0;
+        for my $key (sort keys %$val) {
+            my $val2 = $val->{$key};
+            if ($i) {
+                $out .= $pretty ? ",\n" : ", ";
+            }
+            $out .= "    " x ($depth + 1) if $pretty;
+            $out .= "\"$key\": " . to_json($val2, $depth + 1);
+            $i++;
+        }
+        $out .= "\n" if $pretty;
+        $out .= "    " x ($depth) if $pretty;
+        $out .= "}";
+    }
+    elsif (ref $val eq "ARRAY") {
+        $out = "[";
+        $out .= "\n" if $pretty;
+        for my $i (0 .. @$val - 1) {
+            my $val2 = $val->[$i];
+            if ($i) {
+                $out .= $pretty ? ",\n" : ", ";
+            }
+            $out .= "    " x ($depth + 1) if $pretty;
+            $out .= to_json($val2, $depth + 1);
+        }
+        $out .= "\n" if $pretty;
+        $out .= "    " x ($depth) if $pretty;
+        $out .= "]";
+    }
+    elsif ($val =~ /^(-?\d+(\.\d*)?(e[+-]?\d+)?)$/i) {
+        $out = $val;
+    }
+    else {
+        $val =~ s/"/\"/g;
+        $out = "\"$val\"";
+    }
+
+    return $out;
 }
 
 1;
@@ -226,37 +308,76 @@ DBI::Log - Log all DBI queries
 
     use DBI::Log;
 
+or
+
+    perl -MDBI::Log path/to/script.pl
+
 =head1 DESCRIPTION
 
-You can use this module to log all queries that are made with DBI. You just need
-to include it in your script and it will work automatically. By default, it will
-send output to STDERR, which is useful for command line scripts and for CGI
-scripts since STDERR will appear in the error log.
+You can use this module to log all queries that are made with DBI. You can
+include it in your script with `use DBI::Log` or use the C<-M> option for
+C<perl> to avoid changing your code at all.
 
-If you want to log elsewhere, set the file option to a different location.
+By default, it will send output to C<STDERR>, which is useful for command line
+scripts and for CGI scripts since STDERR will appear in the error log.
+
+You can control where output goes, and various other behaviour, by setting
+the options documented below.
+
+=head1 OPTIONS
+
+Options can be set on the C<use DBI::Log>` line when loading the module:
+
+    use DBI::Log timing => 1, file => "/tmp/querylog.sql";
+
+or passed to C<-M> e.g.:
+
+    perl -M'DBI::Log timing => 1' path/to/script.pl
+
+The following options are available:
+
+=over 4
+
+=item C<file>
+
+Set the C<file> option to send query logs to the named file instead of STDERR.
 
     use DBI::Log file => "~/querylog.sql";
 
 Each query in the log is prepended with the date and the place in the code where
 it was run from. You can add a full stack trace by setting the trace option.
 
+=item C<trace>
+
+Include a stack trace with each query, so you can see where the code which
+performed the query was called from:
+
     use DBI::Log trace => 1;
 
+=item C<timing>
+
 If you want timing information about how long the queries took to run add the
-timing option.
+C<timing> option.
 
     use DBI::Log timing => 1;
 
-If you want to exclude function calls from within a certain package appearing in
-the stack trace, you can use the exclude option like this:
+=item C<exclude>
+
+If you want to exclude function calls from within certain package(s) appearing
+in the stack trace from C<trace>, you can use the exclude option like this:
 
     use DBI::Log exclude => ["DBIx::Class"];
 
 It will exclude any package starting with that name, for example
-DBIx::Class::ResultSet DBI::Log is excluded by default.
+C<DBIx::Class::ResultSet> and C<DBI::Log> are excluded by default.
 
-The log is formatted as SQL, so if you look at it in an editor, it might be
-highlighted. This is what the output may look like:
+=item C<format>
+
+By default the log is formatted as SQL, so if you look at it in an editor,
+it might be syntax highlighted. Additional information about the query
+is added as SQL comments.
+
+This is what the output may look like:
 
     -- Fri Sep 11 17:31:18 2015
     -- execute t/test.t 18
@@ -275,11 +396,46 @@ highlighted. This is what the output may look like:
     -- (eval) t/test.t 27
     INSERT INTO bar VALUES ('1', '2')
 
-There is a built-in way to log with DBI, which can be enabled with
-DBI->trace(1), but the output is not easy to read through.
 
-This module integrates placeholder values into the query, so the log will
-contain valid queries.
+JSON output is also available, enable it by setting the C<format> option
+to C<json> e.g.:
+
+    use DBI::Log format => "json";
+
+Query logs will then be emitted in "line-delimited JSON" format, where each
+record is a JSON object, separated by newlines - this format is useful if you
+want to post-process the information - for example, using jq to get only queries
+which took longer than a second:
+
+    jq 'select(.time_taken >= 1)' < querylog.json
+
+=item C<replace_placeholders>
+
+By default, this module replaces placeholders in the query with the values
+- either provided in a call to execute() or bound beforehand - but this
+behaviour can be disabled by setting C<replace_placeholders> to false:
+
+    use DBI::Log replace_placeholders => 0;
+
+This may be useful if you're doing later processing on the log, e.g. parsing
+it and grouping by queries, and want all executions of the same query to
+look alike without the values.
+
+=back
+
+=head1 SEE ALSO
+
+There is a built-in way to log with DBI, which can be enabled with
+C<DBI->trace(1)>, but the output is not particulary easy to read through nor
+does it give you much idea where the queries are run from.
+
+L<DBIx::Class> provides facilities via the C<DBIC_TRACE> env var or setting
+C<$class->storage->debug(1);>, and even more powerful facilities by setting
+C<debugobj()>, but if you have a codebase which mixes DBIx::Class queries with
+direct DBI queries, you won't be capturing all queries.
+
+L<DBIx::Class::UnicornLogger>, L<DBIx::Class::Storage::Debug::PrettyTrace> and
+other similar options may be useful if you use DBIx::Class exclusively.
 
 =head1 METACPAN
 
@@ -295,9 +451,15 @@ Jacob Gelbman, E<lt>gelbman@gmail.comE<gt>
 
 =head1 CONTRIBUTORS
 
-Árpád Szász, E<lt>arpad.szasz@plenum.roE<gt>
-Pavel Serikov
-David Precious
+=over
+
+=item * Árpád Szász, E<lt>arpad.szasz@plenum.roE<gt>
+
+=item * Pavel Serikov
+
+=item * David Precious (BIGPRESH) - E<lt>davidp@preshweb.co.ukE<gt>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

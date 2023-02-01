@@ -5,9 +5,9 @@ use warnings;
 package Story::Interact::Harness::Terminal;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001006';
+our $VERSION   = '0.001007';
 
-use Story::Interact::State ();
+use Story::Interact::Harness ();
 use Term::Choose qw( choose );
 use Text::Wrap ();
 
@@ -15,20 +15,7 @@ use Moo;
 use Types::Common -types;
 use namespace::clean;
 
-use constant DEBUG       => !!$ENV{PERL_STORY_INTERACT_DEBUG};
-use constant FIRST_PAGE  => $ENV{PERL_STORY_INTERACT_START} // 'main';
-
-has 'state' => (
-	is        => 'ro',
-	isa       => Object,
-	builder   => sub { Story::Interact::State->new },
-);
-
-has 'page_source' => (
-	is        => 'ro',
-	isa       => Object,
-	required  => 1,
-);
+with 'Story::Interact::Harness';
 
 has 'paragraph_formatter' => (
 	is        => 'ro',
@@ -36,26 +23,26 @@ has 'paragraph_formatter' => (
 	builder   => 1,
 );
 
-sub get_page {
-	my ( $self, $page_id ) = @_;
-	my $page = $self->page_source->get_page( $self->state, $page_id );
-	if ( DEBUG ) {
+if ( Story::Interact::Harness::DEBUG ) {
+	around get_page => sub {
+		my ( $next, $self ) = ( shift, shift );
+		my $page = $self->$next( @_ );
 		if ( @{ $page->next_pages } > 0 ) {
 			$page->add_next_page( ':debug', 'DEBUG INTERFACE' );
 		}
-	}
-	return $page;
+		return $page;
+	};
 }
 
 sub run {
 	my ( $self ) = @_;
 
-	my $page = $self->get_page( FIRST_PAGE );
+	my $page = $self->get_page( Story::Interact::Harness::FIRST_PAGE );
 
 	while ( 1 ) {
 		$self->display_page( $page );
 		my $chosen = $self->prompt_next( $page ) or last;
-		if ( DEBUG and $chosen eq ':debug' ) {
+		if ( Story::Interact::Harness::DEBUG and $chosen eq ':debug' ) {
 			$page = $self->run_debugger( $page );
 			next;
 		}

@@ -638,11 +638,11 @@ sub attributes {
         },
         'available2F' => {
             'default' =>
-              'UTOTP,TOTP,U2F,REST,Mail2F,Ext2F,WebAuthn,Yubikey,Radius',
+'UTOTP,TOTP,U2F,REST,Mail2F,Ext2F,WebAuthn,Yubikey,Radius,Password',
             'type' => 'text'
         },
         'available2FSelfRegistration' => {
-            'default' => 'TOTP,U2F,WebAuthn,Yubikey',
+            'default' => 'Password,TOTP,U2F,WebAuthn,Yubikey',
             'type'    => 'text'
         },
         'avoidAssignment' => {
@@ -748,6 +748,9 @@ sub attributes {
         'casAppMetaDataOptionsAuthnLevel' => {
             'type' => 'int'
         },
+        'casAppMetaDataOptionsComment' => {
+            'type' => 'longtext'
+        },
         'casAppMetaDataOptionsRule' => {
             'test' => sub {
                 return perlExpr(@_);
@@ -770,6 +773,10 @@ sub attributes {
             'default' => 1,
             'type'    => 'int'
         },
+        'casBackChannelSingleLogout' => {
+            'default' => 0,
+            'type'    => 'bool'
+        },
         'casSrvMetaDataExportedVars' => {
             'default' => {
                 'cn'   => 'cn',
@@ -783,6 +790,9 @@ sub attributes {
         },
         'casSrvMetaDataOptions' => {
             'type' => 'subContainer'
+        },
+        'casSrvMetaDataOptionsComment' => {
+            'type' => 'longtext'
         },
         'casSrvMetaDataOptionsDisplayName' => {
             'type' => 'text'
@@ -809,6 +819,9 @@ sub attributes {
         },
         'casSrvMetaDataOptionsSortNumber' => {
             'type' => 'int'
+        },
+        'casSrvMetaDataOptionsTooltip' => {
+            'type' => 'text'
         },
         'casSrvMetaDataOptionsUrl' => {
             'msgFail' => '__badUrl__',
@@ -1930,6 +1943,23 @@ m[^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         'localStorageOptions' => {
             'type' => 'keyTextContainer'
         },
+        'locationDetect' => {
+            'default' => 0,
+            'type'    => 'bool'
+        },
+        'locationDetectGeoIpDatabase' => {
+            'type' => 'text'
+        },
+        'locationDetectGeoIpLanguages' => {
+            'default' => 'en, fr',
+            'type'    => 'text'
+        },
+        'locationDetectIpDetail' => {
+            'type' => 'text'
+        },
+        'locationDetectUaDetail' => {
+            'type' => 'text'
+        },
         'locationRules' => {
             'default' => {
                 'default' => 'deny'
@@ -2244,6 +2274,9 @@ m[^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         'oidcOPMetaDataOptionsClientSecret' => {
             'type' => 'password'
         },
+        'oidcOPMetaDataOptionsComment' => {
+            'type' => 'longtext'
+        },
         'oidcOPMetaDataOptionsConfigurationURI' => {
             'type' => 'url'
         },
@@ -2320,6 +2353,9 @@ m[^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
                 }
             ],
             'type' => 'select'
+        },
+        'oidcOPMetaDataOptionsTooltip' => {
+            'type' => 'text'
         },
         'oidcOPMetaDataOptionsUiLocales' => {
             'type' => 'text'
@@ -2417,6 +2453,9 @@ m[^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         },
         'oidcRPMetaDataOptionsClientSecret' => {
             'type' => 'password'
+        },
+        'oidcRPMetaDataOptionsComment' => {
+            'type' => 'longtext'
         },
         'oidcRPMetaDataOptionsDisplayName' => {
             'type' => 'text'
@@ -2610,6 +2649,10 @@ m[^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             'default' => 3600,
             'type'    => 'int'
         },
+        'oidcServiceIgnoreScopeForClaims' => {
+            'default' => 0,
+            'type'    => 'bool'
+        },
         'oidcServiceKeyIdSig' => {
             'type' => 'text'
         },
@@ -2675,7 +2718,7 @@ m[^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             'type' => 'RSAPrivateKey'
         },
         'oidcServicePublicKeySig' => {
-            'type' => 'RSAPublicKey'
+            'type' => 'RSAPublicKeyOrCertificate'
         },
         'oidcStorage' => {
             'type' => 'PerlModule'
@@ -2754,6 +2797,30 @@ m[^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         'pamService' => {
             'default' => 'login',
             'type'    => 'text'
+        },
+        'password2fActivation' => {
+            'default' => 0,
+            'type'    => 'boolOrExpr'
+        },
+        'password2fAuthnLevel' => {
+            'type' => 'int'
+        },
+        'password2fLabel' => {
+            'type' => 'text'
+        },
+        'password2fLogo' => {
+            'type' => 'text'
+        },
+        'password2fSelfRegistration' => {
+            'default' => 0,
+            'type'    => 'boolOrExpr'
+        },
+        'password2fTTL' => {
+            'type' => 'int'
+        },
+        'password2fUserCanRemoveKey' => {
+            'default' => 1,
+            'type'    => 'bool'
         },
         'passwordDB' => {
             'default' => 'Demo',
@@ -2896,6 +2963,11 @@ qr/(?:(?:https?):\/\/(?:(?:(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.]
             'default' => '$_oidcConsents && $_oidcConsents =~ /\\w+/',
             'type'    => 'boolOrExpr'
         },
+        'portalDisplayOrder' => {
+            'default' =>
+              'Appslist ChangePassword LoginHistory OidcConsents Logout',
+            'type' => 'text'
+        },
         'portalDisplayPasswordPolicy' => {
             'default' => 0,
             'type'    => 'bool'
@@ -3001,8 +3073,10 @@ qr/(?:(?:https?):\/\/(?:(?:(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.]
                 return perlExpr(@_);
             },
             'msgFail' => '__badValue__',
-            'test'    => qr/^\w+$/,
-            'type'    => 'keyTextContainer'
+            'test'    => sub {
+                1;
+            },
+            'type' => 'keyTextContainer'
         },
         'portalStatus' => {
             'default' => 0,
@@ -3084,6 +3158,17 @@ qr/(?:(?:https?):\/\/(?:(?:(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.]
         'radiusAuthnLevel' => {
             'default' => 3,
             'type'    => 'int'
+        },
+        'radiusDictionaryFile' => {
+            'type' => 'text'
+        },
+        'radiusExportedVars' => {
+            'default'    => {},
+            'keyMsgFail' => '__badVariableName__',
+            'keyTest'    => qr/^!?[a-zA-Z][a-zA-Z0-9_-]*$/,
+            'msgFail'    => '__badValue__',
+            'test'       => qr/^[a-zA-Z][a-zA-Z0-9_:\-]*$/,
+            'type'       => 'keyTextContainer'
         },
         'radiusSecret' => {
             'type' => 'text'
@@ -3381,6 +3466,9 @@ qr/(?:(?:https?):\/\/(?:(?:(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.]
             'default' => '#PORTAL#/saml/metadata',
             'type'    => 'text'
         },
+        'samlFederationFiles' => {
+            'type' => 'text'
+        },
         'samlIDPMetaDataExportedAttributes' => {
             'default'    => {},
             'keyMsgFail' => '__badMetadataName__',
@@ -3405,10 +3493,6 @@ qr/(?:(?:https?):\/\/(?:(?:(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.]
             'default' => 0,
             'type'    => 'bool'
         },
-        'samlIDPMetaDataOptionsAllowProxiedAuthn' => {
-            'default' => 0,
-            'type'    => 'bool'
-        },
         'samlIDPMetaDataOptionsCheckAudience' => {
             'default' => 1,
             'type'    => 'bool'
@@ -3424,6 +3508,9 @@ qr/(?:(?:https?):\/\/(?:(?:(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.]
         'samlIDPMetaDataOptionsCheckTime' => {
             'default' => 1,
             'type'    => 'bool'
+        },
+        'samlIDPMetaDataOptionsComment' => {
+            'type' => 'longtext'
         },
         'samlIDPMetaDataOptionsDisplayName' => {
             'type' => 'text'
@@ -3444,6 +3531,9 @@ qr/(?:(?:https?):\/\/(?:(?:(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.]
                 }
             ],
             'type' => 'select'
+        },
+        'samlIDPMetaDataOptionsFederationEntityID' => {
+            'type' => 'text'
         },
         'samlIDPMetaDataOptionsForceAuthn' => {
             'default' => 0,
@@ -3620,35 +3710,13 @@ qr/(?:(?:https?):\/\/(?:(?:(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.]
             'default' => 0,
             'type'    => 'bool'
         },
+        'samlIDPMetaDataOptionsTooltip' => {
+            'type' => 'text'
+        },
         'samlIDPMetaDataOptionsUserAttribute' => {
             'type' => 'text'
         },
         'samlIDPMetaDataXML' => {
-            'test' => sub {
-                my $v = shift();
-                return 1 unless $v and %$v;
-                my @msg;
-                my $res = 1;
-                my %entityIds;
-                foreach my $idpId ( keys %$v ) {
-                    unless ( $v->{$idpId}{'samlIDPMetaDataXML'} =~
-                        /entityID="(.+?)"/is )
-                    {
-                        push @msg, "$idpId SAML metadata has no EntityID";
-                        $res = 0;
-                        next;
-                    }
-                    my $eid = $1;
-                    if ( defined $entityIds{$eid} ) {
-                        push @msg,
-"$idpId and $entityIds{$eid} have the same SAML EntityID";
-                        $res = 0;
-                        next;
-                    }
-                    $entityIds{$eid} = $idpId;
-                }
-                return $res, join( ', ', @msg );
-            },
             'type' => 'file'
         },
         'samlIDPSSODescriptorArtifactResolutionServiceArtifact' => {
@@ -3816,6 +3884,9 @@ qr/(?:(?:https?):\/\/(?:(?:(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.]
             'default' => 1,
             'type'    => 'bool'
         },
+        'samlSPMetaDataOptionsComment' => {
+            'type' => 'longtext'
+        },
         'samlSPMetaDataOptionsEnableIDPInitiatedURL' => {
             'default' => 0,
             'type'    => 'bool'
@@ -3833,6 +3904,39 @@ qr/(?:(?:https?):\/\/(?:(?:(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.]
                 {
                     'k' => 'assertion',
                     'v' => 'Assertion'
+                }
+            ],
+            'type' => 'select'
+        },
+        'samlSPMetaDataOptionsFederationEntityID' => {
+            'type' => 'text'
+        },
+        'samlSPMetaDataOptionsFederationOptionalAttributes' => {
+            'default' => '',
+            'select'  => [ {
+                    'k' => '',
+                    'v' => 'keep'
+                },
+                {
+                    'k' => 'ignore',
+                    'v' => 'ignore'
+                }
+            ],
+            'type' => 'select'
+        },
+        'samlSPMetaDataOptionsFederationRequiredAttributes' => {
+            'default' => '',
+            'select'  => [ {
+                    'k' => '',
+                    'v' => 'keep'
+                },
+                {
+                    'k' => 'optional',
+                    'v' => 'makeoptional'
+                },
+                {
+                    'k' => 'ignore',
+                    'v' => 'ignore'
                 }
             ],
             'type' => 'select'
@@ -4220,6 +4324,10 @@ qr/^(?:(?:(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-
         'sslHost' => {
             'type' => 'url'
         },
+        'SSLIssuerVar' => {
+            'default' => 'SSL_CLIENT_I_DN',
+            'type'    => 'text'
+        },
         'SSLVar' => {
             'default' => 'SSL_CLIENT_S_DN_Email',
             'type'    => 'text'
@@ -4250,6 +4358,10 @@ qr/^(?:(?:(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-
             'msgFail' => '__badCookieName__',
             'test'    => qr/^[a-zA-Z][a-zA-Z0-9_-]*$/,
             'type'    => 'text'
+        },
+        'stayConnectedSingleSession' => {
+            'default' => 0,
+            'type'    => 'bool'
         },
         'stayConnectedTimeout' => {
             'default' => 2592000,
@@ -4467,6 +4579,10 @@ qr/^(?:(?:(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-
         'vhostAuthnLevel' => {
             'type' => 'int'
         },
+        'vhostComment' => {
+            'default' => '',
+            'type'    => 'longtext'
+        },
         'vhostDevOpsRulesUrl' => {
             'type' => 'url'
         },
@@ -4506,6 +4622,10 @@ qr/^(?:(?:(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-
                 {
                     'k' => 'DevOpsST',
                     'v' => 'DevOpsST'
+                },
+                {
+                    'k' => 'DevOpsCDA',
+                    'v' => 'DevOpsCDA'
                 },
                 {
                     'k' => 'Main',

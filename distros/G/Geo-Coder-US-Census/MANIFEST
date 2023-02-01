@@ -5,6 +5,7 @@ lib/Geo/Coder/US/Census.pm
 LICENSE
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 README
 README.md
 t/00-load.t
@@ -13,10 +14,13 @@ t/bin.t
 t/boiler.t
 t/carp.t
 t/changes.t
+t/comment-spelling.t
 t/coverage.t
 t/critic.t
 t/cv.t
 t/dist.t
+t/eof.t
+t/eol.t
 t/gv.t
 t/kwalitee.t
 t/links.t
@@ -26,11 +30,11 @@ t/namespaces.t
 t/no404s.t
 t/noplan.t
 t/pod-cm.t
+t/pod-spelling.t
 t/pod.t
 t/port.t
 t/prereq.t
 t/snippets.t
-t/spelling.t
 t/strict.t
 t/unused.t
 t/us.t

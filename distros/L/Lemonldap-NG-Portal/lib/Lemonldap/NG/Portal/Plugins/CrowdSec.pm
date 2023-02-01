@@ -33,7 +33,9 @@ has crowdsecUrl => ( is => 'rw' );
 sub init {
     my ($self) = @_;
     if ( $self->conf->{crowdsecUrl} ) {
-        $self->crowdsecUrl( $self->conf->{crowdsecUrl} =~ s#/+$## );
+        my $tmp = $self->conf->{crowdsecUrl};
+        $tmp =~ s#/+$##;
+        $self->crowdsecUrl($tmp);
     }
     else {
         $self->logger->warn(
@@ -59,7 +61,7 @@ sub check {
         return PE_ERROR;
     }
     my $content = $resp->decoded_content;
-    unless ($content) {
+    if ( !$content or $content eq 'null' ) {
         $self->userLogger->info("$ip isn't known by CrowsSec");
         return PE_OK;
     }
@@ -86,6 +88,7 @@ sub check {
                     return PE_SESSIONNOTGRANTED;
                 }
                 else {
+                    $self->userLogger->error("$ip is banned by CrowdSec");
                     $req->env->{CROWDSEC_REJECT} = 1;
                     return PE_OK;
                 }

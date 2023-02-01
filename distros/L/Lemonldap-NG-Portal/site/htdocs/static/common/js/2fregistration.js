@@ -34,21 +34,23 @@ LemonLDAP::NG 2F registration script
     }
   };
 
-  delete2F = function(device, epoch) {
-    if (device === 'U2F') {
-      device = 'u';
-    } else if (device === 'UBK') {
-      device = 'yubikey';
-    } else if (device === 'TOTP') {
-      device = 'totp';
-    } else if (device === 'WebAuthn') {
-      device = 'webauthn';
-    } else {
-      setMsg('u2fFailed', 'warning');
+  delete2F = function(device, epoch, prefix) {
+    if (!prefix) {
+      if (device === 'U2F') {
+        prefix = 'u';
+      } else if (device === 'UBK') {
+        prefix = 'yubikey';
+      } else if (device === 'TOTP') {
+        prefix = 'totp';
+      } else if (device === 'WebAuthn') {
+        prefix = 'webauthn';
+      } else {
+        prefix = device.toLowerCase();
+      }
     }
     return $.ajax({
       type: "POST",
-      url: portal + "2fregisters/" + device + "/delete",
+      url: portal + "2fregisters/" + prefix + "/delete",
       data: {
         epoch: epoch
       },
@@ -78,7 +80,7 @@ LemonLDAP::NG 2F registration script
 
   $(document).ready(function() {
     $('body').on('click', '.remove2f', function() {
-      return delete2F($(this).attr('device'), $(this).attr('epoch'));
+      return delete2F($(this).attr('device'), $(this).attr('epoch'), $(this).attr('prefix'));
     });
     $('#goback').attr('href', portal);
     return $(".data-epoch").each(function() {

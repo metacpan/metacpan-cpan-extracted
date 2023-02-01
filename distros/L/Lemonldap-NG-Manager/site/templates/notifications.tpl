@@ -1,6 +1,9 @@
 <TMPL_INCLUDE NAME="header.tpl">
-
-  <title>LemonLDAP::NG Notifications explorer</title>
+  <TMPL_IF NAME="INSTANCE_NAME">
+    <title><TMPL_VAR NAME="INSTANCE_NAME"> Notifications</title>
+  <TMPL_ELSE>
+    <title>LemonLDAP::NG Notifications</title>
+  </TMPL_IF>
 </head>
 
 <body ng-app="llngNotificationsExplorer" ng-controller="NotificationsExplorerCtrl" ng-csp>

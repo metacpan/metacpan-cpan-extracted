@@ -115,6 +115,9 @@ sub portalConstants {
         PE_BAD_DEVOPS_FILE                   => 104,
         PE_FILENOTFOUND                      => 105,
         PE_OIDC_AUTH_ERROR                   => 106,
+        PE_UNKNOWNPARTNER                    => 107,
+        PE_UNAUTHORIZEDURL                   => 108,
+        PE_UNPROTECTEDURL                    => 109
     };
 }
 

@@ -2,8 +2,8 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 1.003 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2023-01-11.
+    This document describes version 1.004 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2023-02-01.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -75,6 +75,10 @@ DESCRIPTION
     *   csv-sort-fields
 
     *   csv-sort-rows
+
+    *   csv-sorted
+
+    *   csv-sorted-rows
 
     *   csv-split
 

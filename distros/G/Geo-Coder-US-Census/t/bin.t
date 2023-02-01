@@ -5,7 +5,7 @@ use strict;
 use Test::Most;
 
 BIN: {
-	eval 'use Test::Script';
+	eval 'use Test::Script 1.12';
 	if($@) {
 		plan(skip_all => 'Test::Script required for testing scripts');
 	} else {

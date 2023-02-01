@@ -280,6 +280,69 @@ ENDKEY
         );
     }
 
+    sub check_psession_post_delete {
+        my ( $portal, $user_handle ) = @_;
+
+        # Inspect Psession content
+        my $psession = $portal->getPersistentSession("dwho");
+
+        # userHandle is stored
+        is( $psession->{data}->{_webAuthnUserHandle},
+            $user_handle, "User handle saved" );
+
+        my $devices = from_json $psession->{data}->{_2fDevices};
+        is( @{$devices}, 1, "1 devices found" );
+        my $device1 = $devices->[0];
+
+        # Epoch will differ
+        delete $device1->{epoch};
+        is_deeply(
+            $device1,
+            {
+                '_credentialId'        => encode_base64url($credential_id_1),
+                '_credentialPublicKey' =>
+'pQECAyYgASFYIM_oQXEUzjPwEhM4gWmIbCuOXc4Ja8jPDKxbQaZckal7Ilgg_9a693_nkf7flk1S9AV2tjrtJPF6kg8TCGbFKoeD9Wc',
+                '_signCount' => 6,
+                'name'       => "MyFirstDevice",
+                'type'       => 'WebAuthn'
+            },
+            "Registration contains expected data"
+        );
+    }
+
+    sub delete_device {
+        my ( $client, $id, $name ) = @_;
+
+        # Display 2FA Manager
+        ok(
+            $res = $client->_get(
+                '/2fregisters',
+                cookie => "lemonldap=$id",
+                accept => "test/html",
+            ),
+            'Show 2FA Manager'
+        );
+
+        my $tr = getHtmlElement( $res,
+            "//td[text() = \"$name\"]/..//span[\@prefix=\"webauthn\"]" )->shift;
+        ok( $tr, "Found $name among registered devices" );
+        my $epoch = $tr->getAttribute('epoch');
+        ok( $epoch, "Found epoch for $name" );
+
+        my $delete_query = buildForm( { epoch => $epoch } );
+        ok(
+            $res = $client->_post(
+                '/2fregisters/webauthn/delete',
+                $delete_query,
+                length => length($delete_query),
+                cookie => "lemonldap=$id",
+            ),
+            'Delete WebAuthn query'
+        );
+        my $json = expectJSON($res);
+        is( $json->{result}, 1, "Deletion successful" );
+    }
+
     my $id = login_and_check_display($client);
 
     my $user_handle_1 =
@@ -288,6 +351,9 @@ ENDKEY
     # Register same device again, fails because credential ID is already taken
     register_new_device( $client, $id, $webauthn_tester_1,
         "MyAlreadyRegisteredDevice", "webauthnAlreadyRegistered" );
+
+    # Make sure epoch is different
+    Time::Fake->offset("+10m");
 
     # Register a different device should succeed
     my $user_handle_2 =
@@ -313,9 +379,11 @@ ENDKEY
         ]
     );
 
+    delete_device( $client, $id, "MySecondDevice" );
+    check_psession_post_delete( $portal, $user_handle_1 );
+
 }
 
-# TODO delete
 clean_sessions();
 
 done_testing();

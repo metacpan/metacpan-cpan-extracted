@@ -39,7 +39,8 @@ sub newLdap {
     my $ldap;
 
     # Build object and test LDAP connection
-    $self->logger->debug( "Try to build new LDAP connection with: $self->{conf}->{ldapServer}" );
+    $self->logger->debug(
+        "Try to build new LDAP connection with: $self->{conf}->{ldapServer}");
 
     return undef
       unless (

@@ -1,15 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
 
-package Future::IO;
+package Future::IO 0.12;
 
-use strict;
+use v5.14;
 use warnings;
-use 5.010;  # //
-
-our $VERSION = '0.11';
 
 use Carp;
 
@@ -19,6 +16,9 @@ my @readers;
 my @writers;
 
 our $IMPL;
+
+our $MAX_READLEN = 8192;
+our $MAX_WRITELEN = 8192;
 
 =head1 NAME
 
@@ -97,12 +97,13 @@ A testing module which does this is provided by L<Test::Future::IO>.
 
 =head2 accept
 
-   $f = Future::IO->accept( $fh )
+   $socketfh = await Future::IO->accept( $fh );
 
 I<Since version 0.11.>
 
 Returns a L<Future> that will become done when a new connection has been
 accepted on the given filehandle, which should represent a listen-mode socket.
+The returned future will yield the newly-accepted client socket filehandle.
 
 =cut
 
@@ -116,7 +117,7 @@ sub accept
 
 =head2 alarm
 
-   $f = Future::IO->alarm( $epoch )
+   await Future::IO->alarm( $epoch );
 
 I<Since version 0.08.>
 
@@ -143,7 +144,7 @@ sub alarm
 
 =head2 connect
 
-   $f = Future::IO->connect( $fh, $name )
+   await Future::IO->connect( $fh, $name );
 
 I<Since version 0.11.>
 
@@ -162,7 +163,7 @@ sub connect
 
 =head2 sleep
 
-   $f = Future::IO->sleep( $secs )
+   await Future::IO->sleep( $secs );
 
 Returns a L<Future> that will become done a fixed delay from now, given in
 seconds. This value may be fractional.
@@ -179,9 +180,7 @@ sub sleep
 
 =head2 sysread
 
-   $f = Future::IO->sysread( $fh, $length )
-
-      $bytes = $f->get
+   $bytes = await Future::IO->sysread( $fh, $length );
 
 Returns a L<Future> that will become done when at least one byte can be read
 from the given filehandle. It may return up to C<$length> bytes. On EOF, the
@@ -204,9 +203,7 @@ sub sysread
 
 =head2 sysread_exactly
 
-   $f = Future::IO->sysread_exactly( $fh, $length )
-
-      $bytes = $f->get
+   $bytes = await Future::IO->sysread_exactly( $fh, $length );
 
 I<Since version 0.03.>
 
@@ -232,29 +229,62 @@ sub sysread_exactly
       return $IMPL->$code( $fh, $length );
    }
 
-   return _sysread_into_buffer( $IMPL, $fh, $length, '' );
+   return _sysread_into_buffer( $IMPL, $fh, $length, \(my $buffer = '') );
 }
 
 sub _sysread_into_buffer
 {
-   my ( $IMPL, $fh, $length, $bytes ) = @_;
+   my ( $IMPL, $fh, $length, $bufref ) = @_;
 
-   $IMPL->sysread( $fh, $length - length $bytes )->then( sub {
+   $IMPL->sysread( $fh, $length - length $$bufref )->then( sub {
       my ( $more ) = @_;
       return Future->done() if !defined $more; # EOF
 
-      $bytes .= $more;
+      $$bufref .= $more;
 
-      return Future->done( $bytes ) if length $bytes >= $length;
-      return _sysread_into_buffer( $IMPL, $fh, $length, $bytes );
+      return Future->done( $$bufref ) if length $$bufref >= $length;
+      return _sysread_into_buffer( $IMPL, $fh, $length, $bufref );
+   });
+}
+
+=head2 sysread_until_eof
+
+   $f = Future::IO->sysread_until_eof( $fh )
+
+I<Since version 0.12.>
+
+Returns a L<Future> that will become done when the given filehandle reaches
+the EOF condition. The returned future will yield all of the bytes read up
+until that point.
+
+=cut
+
+sub sysread_until_eof
+{
+   shift;
+   my ( $fh ) = @_;
+
+   $IMPL //= "Future::IO::_DefaultImpl";
+
+   return _sysread_until_eof( $IMPL, $fh, \(my $buffer = '') );
+}
+
+sub _sysread_until_eof
+{
+   my ( $IMPL, $fh, $bufref ) = @_;
+
+   $IMPL->sysread( $fh, $MAX_READLEN )->then( sub {
+      my ( $more ) = @_;
+      return Future->done( $$bufref ) if !defined $more;
+
+      $$bufref .= $more;
+      return _sysread_until_eof( $IMPL, $fh, $bufref );
    });
 }
 
 =head2 syswrite
 
-   $f = Future::IO->syswrite( $fh, $bytes )
-
-      $written_len = $f->get
+   $written_len = await Future::IO->syswrite( $fh, $bytes );
 
 I<Since version 0.04.>
 
@@ -278,9 +308,7 @@ sub syswrite
 
 =head2 syswrite_exactly
 
-   $f = Future::IO->syswrite_exactly( $fh, $bytes )
-
-      $written_len = $f->get
+   $written_len = await Future::IO->syswrite_exactly( $fh, $bytes );
 
 I<Since version 0.04.>
 
@@ -304,27 +332,25 @@ sub syswrite_exactly
       return $IMPL->$code( $fh, $bytes );
    }
 
-   return _syswrite_from_buffer( $IMPL, $fh, $bytes, length $bytes );
+   return _syswrite_from_buffer( $IMPL, $fh, \$bytes, length $bytes );
 }
 
 sub _syswrite_from_buffer
 {
-   my ( $IMPL, $fh, $bytes, $len ) = @_;
+   my ( $IMPL, $fh, $bufref, $len ) = @_;
 
-   $IMPL->syswrite( $fh, $bytes )->then( sub {
+   $IMPL->syswrite( $fh, substr $$bufref, 0, $MAX_WRITELEN )->then( sub {
       my ( $written_len ) = @_;
-      substr $bytes, 0, $written_len, "";
+      substr $$bufref, 0, $written_len, "";
 
-      return Future->done( $len ) if !length $bytes;
-      return _syswrite_from_buffer( $IMPL, $fh, $bytes, $len );
+      return Future->done( $len ) if !length $$bufref;
+      return _syswrite_from_buffer( $IMPL, $fh, $bufref, $len );
    });
 }
 
 =head2 waitpid
 
-   $f = Future::IO->waitpid( $pid )
-
-      $wstatus = $f->get
+   $wstatus = await Future::IO->waitpid( $pid );
 
 I<Since version 0.09.>
 
@@ -352,7 +378,7 @@ sub waitpid
 
 =head2 override_impl
 
-   Future::IO->override_impl( $impl )
+   Future::IO->override_impl( $impl );
 
 Sets a new implementation for C<Future::IO>, replacing the minimal default
 internal implementation. This can either be a package name or an object
@@ -384,7 +410,7 @@ sub override_impl
 
 =head2 HAVE_MULTIPLE_FILEHANDLES
 
-   $has = Future::IO->HAVE_MULTIPLE_FILEHANDLES
+   $has = Future::IO->HAVE_MULTIPLE_FILEHANDLES;
 
 I<Since version 0.11.>
 
@@ -556,7 +582,7 @@ redo_select:
 
 =head2 await
 
-   $f = $f->await
+   $f = $f->await;
 
 I<Since version 0.07.>
 

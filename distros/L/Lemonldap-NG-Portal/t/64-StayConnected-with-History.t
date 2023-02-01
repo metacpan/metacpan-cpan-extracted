@@ -51,7 +51,6 @@ ok(
 );
 expectRedirection( $res, 'http://auth.example.com/' );
 count(1);
-$client->logout($id);
 
 # Try to authenticate
 # -------------------
@@ -85,7 +84,6 @@ my $cid = expectCookie( $res, 'llngpersistent' );
 ok( $res->[1]->[5] =~ /\bsecure\b/, ' Secure cookie found' )
   or explain( $res->[1]->[5], 'Secure cookie found' );
 count(2);
-$client->logout($id);
 
 # Try to connect with persistent connection cookie
 ok(
@@ -115,8 +113,6 @@ ok(
 count(1);
 expectRedirection( $res, 'http://auth.example.com/' );
 $id = expectCookie($res);
-
-$client->logout($id);
 
 # Try to connect with persistent connection cookie and an expired token
 ok(
@@ -270,7 +266,6 @@ ok(
 ok( $query =~ /user/, ' Get login form' );
 count(2);
 
-$client->logout($id);
 clean_sessions();
 
 done_testing( count() );

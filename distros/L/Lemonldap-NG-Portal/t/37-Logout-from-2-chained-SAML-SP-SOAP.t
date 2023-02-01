@@ -289,7 +289,6 @@ sub proxy {
                     'idp' => {
                         'samlIDPMetaDataOptionsAdaptSessionUtime'        => 0,
                         'samlIDPMetaDataOptionsAllowLoginFromIDP'        => 0,
-                        'samlIDPMetaDataOptionsAllowProxiedAuthn'        => 0,
                         'samlIDPMetaDataOptionsCheckAudience'            => 1,
                         'samlIDPMetaDataOptionsCheckSLOMessageSignature' => 1,
                         'samlIDPMetaDataOptionsCheckSSOMessageSignature' => 1,
@@ -390,7 +389,6 @@ sub sp {
                     'proxy' => {
                         'samlIDPMetaDataOptionsAdaptSessionUtime'        => 0,
                         'samlIDPMetaDataOptionsAllowLoginFromIDP'        => 0,
-                        'samlIDPMetaDataOptionsAllowProxiedAuthn'        => 0,
                         'samlIDPMetaDataOptionsCheckAudience'            => 1,
                         'samlIDPMetaDataOptionsCheckSLOMessageSignature' => 1,
                         'samlIDPMetaDataOptionsCheckSSOMessageSignature' => 1,

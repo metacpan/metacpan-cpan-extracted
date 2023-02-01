@@ -19,7 +19,7 @@ use overload '""' => sub {
     return make_one_line $text;
 };
 
-our $VERSION = "v0.0.31";
+our $VERSION = "v0.0.32";
 
 has '+code' => (
     default => 'jsonrpc_error',

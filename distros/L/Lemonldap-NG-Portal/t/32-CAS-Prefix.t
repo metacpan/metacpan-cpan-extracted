@@ -99,7 +99,7 @@ ok(
     'Query CAS server'
 );
 count(1);
-expectPortalError( $res, 68 );
+expectPortalError( $res, 107 );
 
 # Service defined with multiple URLs, will be matched by URI
 ok(

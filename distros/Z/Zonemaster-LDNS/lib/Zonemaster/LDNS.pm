@@ -2,7 +2,7 @@ package Zonemaster::LDNS;
 
 use 5.014;
 
-our $VERSION = '3.0.0';
+our $VERSION = '3.1.0';
 
 use parent 'Exporter';
 our @EXPORT_OK = qw[to_idn has_idn ldns_version load_zonefile];

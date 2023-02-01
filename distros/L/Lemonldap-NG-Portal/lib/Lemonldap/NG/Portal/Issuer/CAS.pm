@@ -3,19 +3,22 @@ package Lemonldap::NG::Portal::Issuer::CAS;
 use strict;
 use Mouse;
 use URI;
+use POSIX qw(strftime);
 use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_CAS_SERVICE_NOT_ALLOWED
+  URIRE
+  PE_OK
   PE_INFO
   PE_ERROR
   PE_LOGOUT_OK
-  PE_OK
-  PE_BADURL
   PE_SENDRESPONSE
-  URIRE
+  PE_UNKNOWNPARTNER
+  PE_UNAUTHORIZEDURL
+  PE_UNAUTHORIZEDPARTNER
+  PE_CAS_SERVICE_NOT_ALLOWED
 );
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.0.15';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer',
   'Lemonldap::NG::Portal::Lib::CAS';
@@ -101,7 +104,7 @@ sub storeEnvAndCheckGateway {
         else {
             $self->logger->error(
                 "Disallowing redirection to unknown service $service");
-            return PE_CAS_SERVICE_NOT_ALLOWED;
+            return PE_UNKNOWNPARTNER;
         }
     }
 
@@ -234,7 +237,7 @@ sub run {
 
             unless ($app) {
                 $self->userLogger->error('CAS service not configured');
-                return PE_CAS_SERVICE_NOT_ALLOWED;
+                return PE_UNKNOWNPARTNER;
             }
 
             # Check if we have sufficient auth level
@@ -262,9 +265,9 @@ sub run {
 
                     if ( $casAccessControlPolicy =~ /^(error)$/i ) {
                         $self->logger->debug(
-"Return error instead of redirecting user on CAS service"
-                        );
-                        return PE_CAS_SERVICE_NOT_ALLOWED;
+                                "Return error instead of redirecting user"
+                              . " on CAS service" );
+                        return PE_UNAUTHORIZEDPARTNER;
                     }
 
                     else {
@@ -379,7 +382,7 @@ sub run {
                 $self->userLogger->error(
                         "Untrusted service URL $logout_service"
                       . "specified for CAS Logout" );
-                return PE_BADURL;
+                return PE_UNAUTHORIZEDURL;
             }
         }
 
@@ -388,6 +391,10 @@ sub run {
 
         # Delete local session
         if ( my $session = $self->p->getApacheSession($session_id) ) {
+            if ( $self->conf->{casBackChannelSingleLogout} ) {
+                $self->_send_back_channel_LogoutRequests( $session->data );
+            }
+
             unless ( $self->p->_deleteSession( $req, $session ) ) {
                 $self->logger->error("Fail to delete session $session_id ");
             }
@@ -488,6 +495,10 @@ sub logout {
 
     # Delete linked CAS sessions
     $self->deleteCasSecondarySessions($session_id) if ($session_id);
+
+    if ( $self->conf->{casBackChannelSingleLogout} ) {
+        $self->_send_back_channel_LogoutRequests( $req->sessionInfo );
+    }
 
     return PE_OK;
 }
@@ -601,6 +612,11 @@ sub validate {
 
     # Return success message
     $self->deleteCasSession($casServiceSession);
+
+    if ( $self->conf->{casBackChannelSingleLogout} ) {
+        $self->_save_ticket_for_single_logout( $localSession, $service,
+            $req->param('ticket') );
+    }
 
     my $h =
       $self->p->processHook( $req, 'casGenerateValidateResponse', $username );
@@ -923,6 +939,11 @@ sub _validate2 {
     # Return success message
     $self->deleteCasSession($casServiceSession);
 
+    if ( $self->conf->{casBackChannelSingleLogout} ) {
+        $self->_save_ticket_for_single_logout( $localSession, $service,
+            $req->param('ticket') );
+    }
+
     my $h =
       $self->p->processHook( $req, 'casGenerateValidateResponse', $username,
         $attributes );
@@ -956,6 +977,49 @@ sub getUsernameForApp {
         $username = $data->{$username_attribute};
     }
     return $username;
+}
+
+sub _save_ticket_for_single_logout {
+    my ( $self, $localSession, $service, $ticket ) = @_;
+
+    $self->logger->debug("Saving service $service ticket $ticket for SLO");
+
+    my $service2ticket = $localSession->data->{cas_tickets_for_SLO} || {};
+    $service2ticket->{$service} = $ticket;
+    $localSession->update( { cas_tickets_for_SLO => $service2ticket } );
+}
+
+sub _send_back_channel_LogoutRequests {
+    my ( $self, $sessionData ) = @_;
+
+    my $service2ticket = $sessionData->{cas_tickets_for_SLO} or return;
+
+    foreach my $service ( keys %$service2ticket ) {
+        my $ticket = $service2ticket->{$service};
+        $self->logger->debug(
+            "Sending back-channel LogoutRequest to $service (ticket $ticket)");
+
+        my $now = strftime( "%Y-%m-%dT%TZ", gmtime() );
+
+        # NB: $ticket is a good enough random ID :-)
+        # NB: although it looks alike SAML, the CAS SLO protocol is specific
+        my $logoutRequest =
+qq{<samlp:LogoutRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="$ticket" Version="2.0" IssueInstant="$now">
+                <saml:NameID xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">\@NOT_USED\@</saml:NameID>
+                <samlp:SessionIndex>$ticket</samlp:SessionIndex>
+            </samlp:LogoutRequest>};
+
+# Apereo CAS is doing async requests by defaut. But doing it synchronously with a timeout should do it
+        my $response = $self->ua->post(
+            $service,
+            { logoutRequest => $logoutRequest },
+            "Content-Type" => 'application/x-www-form-urlencoded'
+        );
+        $self->logger->debug(
+                "Sending back-channel LogoutRequest to $service: result ("
+              . $response->message . ")"
+              . "\n$logoutRequest" );
+    }
 }
 
 1;

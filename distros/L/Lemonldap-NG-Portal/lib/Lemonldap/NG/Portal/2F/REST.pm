@@ -10,7 +10,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.0.16';
 
 extends qw(
   Lemonldap::NG::Portal::Lib::Code2F
@@ -22,8 +22,8 @@ extends qw(
 # Prefix can overriden by sfExtra and is used for routes
 has prefix => ( is => 'rw', default => 'rest' );
 
-# Type is used to lookup config
-has type => ( is => 'ro', default => 'rest' );
+# Used to lookup config
+has conf_type => ( is => 'ro', default => 'rest' );
 
 has legend    => ( is => 'rw', default => 'enterRest2fCode' );
 has initAttrs => ( is => 'rw', default => sub { {} } );
@@ -34,13 +34,15 @@ sub init {
 
     if ( $self->code_activation ) {
         unless ( $self->conf->{rest2fInitUrl} ) {
-            $self->logger->error('Missing REST intialization URL');
+            $self->logger->error(
+                $self->prefix . '2f: missing intialization URL' );
             return 0;
         }
     }
     else {
         unless ( $self->conf->{rest2fVerifyUrl} ) {
-            $self->logger->error('Missing REST verification URL');
+            $self->logger->error(
+                $self->prefix . '2f: missing verification URL' );
             return 0;
         }
     }
@@ -49,8 +51,8 @@ sub init {
         my $attr = $self->conf->{rest2fInitArgs}->{$k};
         $attr =~ s/^$//;
         unless ( $attr =~ /^\w+$/ ) {
-            $self->logger->error(
-                "2F REST: $k key must point to a single attribute or macro");
+            $self->logger->error( $self->prefix
+                  . "2f: $k key must point to a single attribute or macro" );
             return 0;
         }
         $self->initAttrs->{$k} = $attr;
@@ -59,14 +61,14 @@ sub init {
         my $attr = $self->conf->{rest2fVerifyArgs}->{$k};
         $attr =~ s/^$//;
         unless ( $attr =~ /^\w+$/ ) {
-            $self->logger->error(
-                "2F REST: $k key must point to a single attribute or macro");
+            $self->logger->error( $self->prefix
+                  . "2f: $k key must point to a single attribute or macro" );
             return 0;
         }
+        $self->logger->debug( $self->prefix . "2f: push verify attribute $k" );
         $self->vrfyAttrs->{$k} = $attr;
     }
 
-    $self->prefix( $self->conf->{sfPrefix} ) if ( $self->conf->{sfPrefix} );
     return $self->SUPER::init();
 }
 
@@ -85,20 +87,21 @@ sub sendCode {
         }
 
         # Launch REST request
-        $self->logger->debug('Call REST init URL');
+        $self->logger->debug( $self->prefix . '2f: call init URL' );
         my $res =
           eval { $self->restCall( $self->conf->{rest2fInitUrl}, $args ); };
         if ($@) {
-            $self->logger->error("REST 2F error: $@");
+            $self->logger->error( $self->prefix . "2f: error ($@)" );
             return PE_ERROR;
         }
         unless ( $res->{result} ) {
-            $self->logger->error("REST 2F initialization has failed");
+            $self->logger->error( $self->prefix . '2f: initialization failed' );
             return PE_ERROR;
         }
     }
     else {
-        $self->logger->debug('No init URL, skipping initialization');
+        $self->logger->debug(
+            $self->prefix . '2f: no init URL, skipping initialization' );
     }
 
     return 1;
@@ -110,7 +113,7 @@ sub verify_external {
     # Prepare args
     my $args = {
         user => $session->{ $self->conf->{whatToTrace} },
-        code => $code,
+        code => $code
     };
 
     foreach my $k ( keys %{ $self->{vrfyAttrs} } ) {
@@ -126,20 +129,24 @@ sub verify_external {
     }
 
     # Launch REST request
-    $self->logger->debug('Call REST vrfy URL');
+    $self->logger->debug( $self->prefix . '2f: call verify URL' );
     my $res =
       eval { $self->restCall( $self->conf->{rest2fVerifyUrl}, $args ); };
     if ($@) {
-        $self->logger->error("REST 2F error: $@");
+        $self->logger->error( $self->prefix . "2f: error ($@)" );
         return PE_ERROR;
     }
 
     # Result
     unless ( $res->{result} ) {
-        $self->userLogger->warn( 'REST Second factor failed for '
+        $self->userLogger->warn( $self->prefix
+              . '2f: failed for '
               . $session->{ $self->conf->{whatToTrace} } );
         return PE_BADOTP;
     }
+
+    $self->logger->debug(
+        $self->prefix . '2f: credentials accepted by server' );
     return PE_OK;
 }
 

@@ -1,6 +1,10 @@
 package main;
 
-my ( $mail, $mail_envelope, $mail_subject );
+my ( $mail, $mail_envelope, $mail_subject, $mime );
+
+sub mime {
+    return $mime;
+}
 
 sub mail {
     return $mail;
@@ -31,6 +35,7 @@ extends 'Email::Sender::Transport';
 
 sub send_email {
     my ( $self, $email, $envelope ) = @_;
+    $mime          = $email->cast('MIME::Entity');
     $mail          = $email->get_body;
     $mail_subject  = $email->get_header("Subject");
     $mail_envelope = $envelope;

@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use List::Keywords 'all';
 
@@ -32,13 +32,18 @@ ok(  (all { $_ < 10 } 1 .. 9), 'all list values below ten' );
 {
    my @seen;
    all { push @seen, $_; $_ < 20 } 10, 20, 30, 40;
-   is_deeply( \@seen, [ 10, 20 ], 'short-circuits after first false result' );
+   is( \@seen, [ 10, 20 ], 'short-circuits after first false result' );
 }
 
 # stack discipline
 {
-   is_deeply( [ 1, 2, (all { $_ eq "x" } "x", "x"), 3, 4 ],
+   is( [ 1, 2, (all { $_ eq "x" } "x", "x"), 3, 4 ],
       [ 1, 2, 1, 3, 4 ], 'all() preserves stack discipline' );
+}
+
+# all my $x { BLOCK }
+{
+   ok( (all my $x { $x < 10 } 1 .. 9), 'list contains all values found by all my $x' );
 }
 
 done_testing;

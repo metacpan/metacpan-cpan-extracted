@@ -3,18 +3,17 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Test::Future::IO::Impl;
+package Test::Future::IO::Impl 0.12;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.11';
 
 use Test::More;
 use Test::Builder;
 
 use Errno qw( EINVAL EPIPE );
 use IO::Handle;
+use Socket qw( pack_sockaddr_in INADDR_LOOPBACK );
 use Time::HiRes qw( time );
 
 use Exporter 'import';
@@ -109,6 +108,7 @@ sub run_accept_test
 
    my $serversock = IO::Socket::INET->new(
       Type      => Socket::SOCK_STREAM(),
+      LocalAddr => "localhost",
       LocalPort => 0,
       Listen    => 1,
    ) or die "Cannot socket()/listen() - $@";
@@ -117,7 +117,12 @@ sub run_accept_test
 
    my $f = Future::IO->accept( $serversock );
 
-   my $sockname = $serversock->sockname;
+   # Some platforms have assigned 127.0.0.1 here; others have left 0.0.0.0
+   # If it's still 0.0.0.0, then guess that maybe connecting to 127.0.0.1 will
+   # work
+   my $sockname = ( $serversock->sockhost ne "0.0.0.0" )
+      ? $serversock->sockname
+      : pack_sockaddr_in( $serversock->sockport, INADDR_LOOPBACK );
 
    my $clientsock = IO::Socket::INET->new(
       Type => Socket::SOCK_STREAM(),
@@ -141,11 +146,17 @@ sub run_connect_test
 
    my $serversock = IO::Socket::INET->new(
       Type      => Socket::SOCK_STREAM(),
+      LocalAddr => "localhost",
       LocalPort => 0,
       Listen    => 1,
    ) or die "Cannot socket()/listen() - $@";
 
-   my $sockname = $serversock->sockname;
+   # Some platforms have assigned 127.0.0.1 here; others have left 0.0.0.0
+   # If it's still 0.0.0.0, then guess that maybe connecting to 127.0.0.1 will
+   # work
+   my $sockname = ( $serversock->sockhost ne "0.0.0.0" )
+      ? $serversock->sockname
+      : pack_sockaddr_in( $serversock->sockport, INADDR_LOOPBACK );
 
    # ->connect success
    {

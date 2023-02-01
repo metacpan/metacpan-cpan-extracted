@@ -4,9 +4,9 @@ use strict;
 use Acme::CPANModulesUtil::Misc;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-10'; # DATE
+our $DATE = '2022-11-13'; # DATE
 our $DIST = 'Acme-CPANModules-WorkingWithXLS'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 my $text = <<'_';
 
@@ -23,7 +23,11 @@ The following are tools (programs, modules, scripts) to work with Excel formats
 (for reading XLS or XLSX, although Spreadsheet::XLSX is strongly discouraged
 because it is a quick-and-dirty hack). Spreadsheet::Read can also read CSV via
 Text::CSV_XS. The module can return information about cell's attributes
-(formatting, alignment, and so on), merged cells, etc.
+(formatting, alignment, and so on), merged cells, etc. The distribution of this
+module also comes with some CLIs like <prog:xlscat>, <prog:xlsx2csv>.
+
+<pm:Data::XLSX::Parser> which claims to be a "faster XLSX parser". Haven't used
+this one personally or benchmarked it though.
 
 
 **Getting information**
@@ -51,6 +55,10 @@ chunks of raw binary data.
 
 
 **Converting to CSV**
+
+<prog:xlsx2csv> from <pm:Spreadsheet::Read>. Since it's based on
+Spreadsheet::Read, it can read XLS/XLSX/ODS. It always outputs to file and not
+to stdout.
 
 `CATDOC` (<http://www.wagner.pp.ru/~vitus/software/catdoc/>) contains following
 the programs `catdoc` (to print the plain text of Microsoft Word documents to
@@ -91,7 +99,7 @@ Acme::CPANModules::WorkingWithXLS - Working with Excel formats (XLS, XLSX) or ot
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::WorkingWithXLS (from Perl distribution Acme-CPANModules-WorkingWithXLS), released on 2022-08-10.
+This document describes version 0.002 of Acme::CPANModules::WorkingWithXLS (from Perl distribution Acme-CPANModules-WorkingWithXLS), released on 2022-11-13.
 
 =head1 DESCRIPTION
 
@@ -106,7 +114,11 @@ L<Spreadsheet::ParseExcel>, L<Spreadsheet::ParseXLSX>, or Spreadsheet::XLSX
 (for reading XLS or XLSX, although Spreadsheet::XLSX is strongly discouraged
 because it is a quick-and-dirty hack). Spreadsheet::Read can also read CSV via
 Text::CSV_XS. The module can return information about cell's attributes
-(formatting, alignment, and so on), merged cells, etc.
+(formatting, alignment, and so on), merged cells, etc. The distribution of this
+module also comes with some CLIs like L<xlscat>, L<xlsx2csv>.
+
+L<Data::XLSX::Parser> which claims to be a "faster XLSX parser". Haven't used
+this one personally or benchmarked it though.
 
 B<Getting information>
 
@@ -130,6 +142,10 @@ L<xls-each-row> from L<App::XLSUtils>
 
 B<Converting to CSV>
 
+L<xlsx2csv> from L<Spreadsheet::Read>. Since it's based on
+Spreadsheet::Read, it can read XLS/XLSX/ODS. It always outputs to file and not
+to stdout.
+
 C<CATDOC> (L<http://www.wagner.pp.ru/~vitus/software/catdoc/>) contains following
 the programs C<catdoc> (to print the plain text of Microsoft Word documents to
 standard output), L<xls2csv> (to convert Microsoft Excel workbook files to
@@ -147,25 +163,29 @@ TBD
 
 =over
 
-=item * L<Spreadsheet::Read>
+=item L<Spreadsheet::Read>
 
 Author: L<HMBRAND|https://metacpan.org/author/HMBRAND>
 
-=item * L<Spreadsheet::ReadSXC> - Extract OpenOffice 1.x spreadsheet data
+=item L<Spreadsheet::ReadSXC>
 
 Author: L<CORION|https://metacpan.org/author/CORION>
 
-=item * L<Spreadsheet::ParseExcel> - Read information from an Excel file.
+=item L<Spreadsheet::ParseExcel>
 
 Author: L<DOUGW|https://metacpan.org/author/DOUGW>
 
-=item * L<Spreadsheet::ParseXLSX> - parse XLSX files
+=item L<Spreadsheet::ParseXLSX>
 
 Author: L<DOY|https://metacpan.org/author/DOY>
 
-=item * L<App::XLSUtils>
+=item L<Data::XLSX::Parser>
 
-=item * L<App::XLSperl>
+Author: L<ACIDLEMON|https://metacpan.org/author/ACIDLEMON>
+
+=item L<App::XLSUtils>
+
+=item L<App::XLSperl>
 
 Author: L<JONALLEN|https://metacpan.org/author/JONALLEN>
 

@@ -76,6 +76,14 @@ KEYWORDS
     item to make the block yield a true value. If no such item exists,
     returns undef.
 
+       $val = first my $var { CODE } LIST
+
+    Since version 0.09.
+
+    Optionally the code block can be prefixed with a lexical variable
+    declaration. In this case, that variable will contain each value from
+    the list, and the global $_ will remain untouched.
+
  any
 
        $bool = any { CODE } LIST
@@ -85,6 +93,12 @@ KEYWORDS
     make the block yield a true value. If no such item exists, returns
     false.
 
+       $val = any my $var { CODE } LIST
+
+    Since version 0.09.
+
+    Uses the lexical variable instead of global $_, similar to "first".
+
  all
 
        $bool = all { CODE } LIST
@@ -93,6 +107,12 @@ KEYWORDS
     values from the given list. Returns false and stops at the first item
     to make the block yield a false value. If no such item exists, returns
     true.
+
+       $val = all my $var { CODE } LIST
+
+    Since version 0.09.
+
+    Uses the lexical variable instead of global $_, similar to "first".
 
  none
 
@@ -104,6 +124,13 @@ KEYWORDS
     Since verison 0.03.
 
     Same as "any" and "all" but with the return value inverted.
+
+       $val = none my $var { CODE } LIST
+       $val = notall my $var { CODE } LIST
+
+    Since version 0.09.
+
+    Uses the lexical variable instead of global $_, similar to "first".
 
  reduce
 

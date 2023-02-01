@@ -103,7 +103,6 @@ combined_like(
     'Configuration merge OK'
 );
 
-
 count($tests);
 done_testing( count() );
 &cleanConfFiles;

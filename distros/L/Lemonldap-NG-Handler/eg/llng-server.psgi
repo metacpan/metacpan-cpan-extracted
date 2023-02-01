@@ -7,18 +7,29 @@
 # Set LLNG_DEFAULTCONFFILE if it is not in the right place
 #$ENV{LLNG_DEFAULTCONFFILE} = 'e2e-tests/conf/lemonldap-ng.ini';
 
+our (
+  $sourceServer
+);
+
+$sourceServer ||= $ENV{SOURCE_SERVER} || 'nginx';
+my $class = (
+      $sourceServer eq 'nginx'   ? 'Lemonldap::NG::Handler::Server::Nginx'
+    : $sourceServer eq 'traefik' ? 'Lemonldap::NG::Handler::Server::Traefik'
+    :                              die("Unknown server $sourceServer")
+);
+
 my %builder = (
     handler => sub {
-        require Lemonldap::NG::Handler::Server::Nginx;
-        return Lemonldap::NG::Handler::Server::Nginx->run( {} );
+        eval "require $class";
+        return $class->run( {} );
     },
     reload => sub {
-        require Lemonldap::NG::Handler::Server::Nginx;
-        return Lemonldap::NG::Handler::Server::Nginx->reload();
+        eval "require $class";
+        return $class->reload();
     },
     status => sub {
-        require Lemonldap::NG::Handler::Server::Nginx;
-        return Lemonldap::NG::Handler::Server::Nginx->status();
+        eval "require $class";
+        return $class->status();
     },
     manager => sub {
         require Lemonldap::NG::Manager;

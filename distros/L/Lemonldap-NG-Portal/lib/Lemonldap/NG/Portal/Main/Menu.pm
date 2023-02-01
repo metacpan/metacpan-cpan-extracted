@@ -7,7 +7,7 @@ use Mouse;
 use Clone 'clone';
 use Lemonldap::NG::Portal::Main::Constants 'URIRE';
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.0.16';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -18,28 +18,30 @@ has menuModules => (
     lazy    => 1,
     builder => sub {
         my $conf = $_[0]->{conf};
-        my @res;
-        foreach (qw(Appslist ChangePassword LoginHistory OidcConsents Logout)) {
+        my ( @res, %hash );
+        my @modules = grep { !$hash{$_}++ } split /[,\s]+/,
+          $conf->{portalDisplayOrder};
+        foreach (@modules) {
             my $cond = $conf->{"portalDisplay$_"} // 1;
             $_[0]->p->logger->debug("Evaluate condition $cond for module $_");
             my $tmp =
-              $_[0]->{p}
-              ->HANDLER->buildSub( $_[0]->{p}->HANDLER->substitute($cond) );
-            push @res, [ $_, $tmp ] if ($tmp);
+              $_[0]
+              ->p->HANDLER->buildSub( $_[0]->p->HANDLER->substitute($cond) );
+            push @res, [ $_, $tmp ] if $tmp;
         }
         return \@res;
     }
 );
 
+has noApp         => ( is => 'rw', default => sub { 0 } );
 has specific      => ( is => 'rw', default => sub { {} } );
 has sfManagerRule => ( is => 'rw', default => sub { 1 } );
-
 has imgPath => (
     is      => 'rw',
     lazy    => 1,
     builder => sub {
-        return $_[0]->{conf}->{impgPath}
-          || $_[0]->{conf}->{staticPrefix} . '/logos';
+        return $_[0]->conf->{impgPath}
+          || $_[0]->conf->{staticPrefix} . '/logos';
     }
 );
 
@@ -65,13 +67,16 @@ sub init {
 #  - AUTH_ERROR_TYPE
 sub params {
     my ( $self, $req ) = @_;
-    $self->{conf}->{imgPath} ||= $self->{staticPrefix};
+    $self->conf->{imgPath} ||= $self->{staticPrefix};
     my %res;
     my @defaultTabs = (qw/appslist password logout loginHistory oidcConsents/);
-    my @customTabs  = split( /,\s*/, $self->{conf}->{customMenuTabs} || '' );
+    my @customTabs  = split /[,\s]+/, $self->conf->{customMenuTabs} || '';
 
-    # Tab to display
-    # Get the tab URL parameter
+    # Modules to display
+    $res{DISPLAY_MODULES} = $self->displayModules($req);
+
+    # Display noApp message
+    $res{NO_APP_ALLOWED} = $self->noApp;
 
     # Force password tab in case of password error
     if (
@@ -97,23 +102,22 @@ sub params {
         $res{DISPLAY_TAB} = "password";
     }
 
-    # else calculate modules to display
+    # else compute modules to display and default tab
     else {
+        # Get the tab URL parameter
+
         my $tab = $req->param("tab");
-        if ( defined $tab
-            and grep ( /^$tab$/, ( @defaultTabs, @customTabs ) ) )
-        {
+        if ( defined $tab and grep /^$tab$/, ( @defaultTabs, @customTabs ) ) {
             $self->logger->debug( "Select menu tab "
                   . $req->param("tab")
                   . "from GET parameter" );
             $res{DISPLAY_TAB} = $req->param("tab");
         }
         else {
-            $res{DISPLAY_TAB} = "appslist";
+            $res{DISPLAY_TAB} = $res{DISPLAY_MODULES}->[0];
         }
     }
 
-    $res{DISPLAY_MODULES} = $self->displayModules($req);
     $res{AUTH_ERROR_TYPE} =
       $req->error_type( $res{AUTH_ERROR} = $req->menuError );
     $res{AUTH_ERROR_ROLE} = $req->error_role;
@@ -122,10 +126,12 @@ sub params {
     $res{sfaManager} =
          $self->p->_sfEngine->display2fRegisters( $req, $req->userData )
       && $self->sfManagerRule->( $req, $req->userData );
-    $self->logger->debug("Display 2fRegisters link") if $res{sfaManager};
+    $self->logger->debug('Display 2fRegisters link') if $res{sfaManager};
 
     # Display refresh my rights unless disabled
     $res{RefreshMyRights} = $self->conf->{portalDisplayRefreshMyRights};
+    $self->logger->debug('Display RefreshMyRights link')
+      if $res{RefreshMyRights};
 
     # Display menu links only if required
     foreach (qw(ContextSwitching DecryptValue Notifications)) {
@@ -144,7 +150,6 @@ sub params {
 
     # Decide whether to display the dropdown or regular text
     $res{DropdownMenu} = 0;
-
     foreach (
         qw(RefreshMyRights sfaManager Notifications DecryptValue ContextSwitching)
       )
@@ -169,11 +174,12 @@ sub displayModules {
     # Store module in result if condition is valid
     foreach my $module ( @{ $self->menuModules } ) {
         $self->logger->debug("Check if $module->[0] has to be displayed");
-
         if ( $module->[1]->( $req, $req->userData ) ) {
             my $moduleHash = { $module->[0] => 1 };
             if ( $module->[0] eq 'Appslist' ) {
                 $moduleHash->{'APPSLIST_LOOP'} = $self->appslist($req);
+                $self->noApp(1)
+                  unless scalar @{ $moduleHash->{'APPSLIST_LOOP'} };
             }
             elsif ( $module->[0] eq 'LoginHistory' ) {
                 $moduleHash->{'SUCCESS_LOGIN'} =

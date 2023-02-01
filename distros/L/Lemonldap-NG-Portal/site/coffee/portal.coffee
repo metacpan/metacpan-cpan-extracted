@@ -46,6 +46,13 @@ translatePage = (lang) ->
 			msg = translate "PE#{$(this).attr 'trmsg'}"
 			if msg.match /_hide_/
 				$(this).parent().hide()
+		$("[trattribute]").each ->
+			trattributes = $(this).attr('trattribute').trim().split(/\s+/)
+			for trattribute in trattributes
+				[attribute, value] = trattribute.split(':')
+				if attribute and value
+					$(this).attr attribute, translate(value)
+			true
 		$("[trplaceholder]").each ->
 			tmp = translate($(this).attr('trplaceholder'))
 			$(this).attr 'placeholder', tmp
@@ -389,7 +396,7 @@ $(window).on 'load', () ->
 		false
 
 	# Password policy
-	checkpassword = (password) ->
+	checkpassword = (password,e) ->
 		result = true
 		if window.datas.ppolicy.minsize > 0
 			result = false if setDanger( password.length >= window.datas.ppolicy.minsize, 'ppolicy-minsize-feedback' )
@@ -403,8 +410,42 @@ $(window).on 'load', () ->
 			digit = password.match(/[0-9]/g)
 			result = false if setDanger( digit and digit.length >= window.datas.ppolicy.mindigit, 'ppolicy-mindigit-feedback')
 
+		# if checkHIBP is enabled
+		if $('#ppolicy-checkhibp-feedback').length > 0
+			# don't check HIBP at each keyup, but only when input focuses out
+			if e == "focusout"
+				newpasswordVal = $( "#newpassword" ).val()
+				if( newpasswordVal.length >= 5 )
+					$.ajax
+						dataType: "json"
+						url: "/checkhibp?password=" + btoa(newpasswordVal)
+						context: document.body
+						success: (data) ->
+							code = data.code
+							msg = data.message
+							if code != undefined
+								if parseInt(code) == 0
+									# password ok
+									result = false if setDanger( true, 'ppolicy-checkhibp-feedback' )
+								else if parseInt(code) == 2
+									# password compromised
+									result = false if setDanger( false, 'ppolicy-checkhibp-feedback' )
+								else
+									# unexpected error
+									console.log 'checkhibp: backend error: ', msg
+									result = false if setDanger( false, 'ppolicy-checkhibp-feedback' )
+						error: (j, status, err) ->
+							console.log 'checkhibp: frontend error: ', err  if err
+							res = JSON.parse j.responseText if j
+							if res and res.error
+								console.log 'checkhibp: returned error: ', res
+			# password compromised by default
+			else
+				result = false if setDanger( false, 'ppolicy-checkhibp-feedback' )
+
 		if window.datas.ppolicy.allowedspechar
 			nonwhitespechar = window.datas.ppolicy.allowedspechar.replace(/\s/g, '')
+			nonwhitespechar = nonwhitespechar.replace(/<space>/g, ' ')
 			hasforbidden = false
 			i = 0
 			len = password.length
@@ -418,6 +459,7 @@ $(window).on 'load', () ->
 		if window.datas.ppolicy.minspechar > 0 and window.datas.ppolicy.allowedspechar
 			numspechar = 0
 			nonwhitespechar = window.datas.ppolicy.allowedspechar.replace(/\s/g, '')
+			nonwhitespechar = nonwhitespechar.replace(/<space>/g, ' ')
 			i = 0
 			while i < password.length
 				if nonwhitespechar.indexOf(password.charAt(i)) >= 0
@@ -449,6 +491,10 @@ $(window).on 'load', () ->
 			checkpassword e.target.value
 			return
 
+		$('#newpassword').focusout (e) ->
+			checkpassword e.target.value, "focusout"
+			return
+
 	# If generating password, disable policy check
 	togglecheckpassword = (e) ->
 		if e.target.checked
@@ -474,34 +520,6 @@ $(window).on 'load', () ->
 	if window.datas.ppolicy? and $('#newpassword').length
 		$('#reset').change togglecheckpassword
 
-	# Functions to show/hide display password button
-	if datas['enablePasswordDisplay']
-		field = ''
-		if datas['dontStorePassword']
-			$(".toggle-password").mousedown () ->
-				field = $(this).attr 'id'
-				field = field.replace /^toggle_/, ''
-				console.log 'Display', field
-				$(this).toggleClass("fa-eye fa-eye-slash")
-				$("input[name=#{field}]").attr('class', 'form-control')
-			$(".toggle-password").mouseup () ->
-				$(this).toggleClass("fa-eye fa-eye-slash")
-				$("input[name=#{field}]").attr('class', 'form-control key') if $("input[name=#{field}]").get(0).value
-		else
-			$(".toggle-password").mousedown () ->
-				field = $(this).attr 'id'
-				field = field.replace /^toggle_/, ''
-				console.log 'Display', field
-				$(this).toggleClass("fa-eye fa-eye-slash")
-				$("input[name=#{field}]").attr("type", "text")
-			$(".toggle-password").mouseup () ->
-				$(this).toggleClass("fa-eye fa-eye-slash")
-				$("input[name=#{field}]").attr("type", "password")
-
-	# Ping if asked
-	if datas['pingInterval'] and datas['pingInterval'] > 0
-		window.setTimeout ping, datas['pingInterval']
-
 	# Set local dates (used to display history)
 	$(".localeDate").each ->
 		s = new Date($(this).attr("val")*1000)
@@ -509,6 +527,52 @@ $(window).on 'load', () ->
 
 	$('.oidcConsent').on 'click', () ->
 		removeOidcConsent $(this).attr 'partner'
+
+	# Ping if asked
+	if datas['pingInterval'] and datas['pingInterval'] > 0
+		window.setTimeout ping, datas['pingInterval']
+
+	# Functions to show/hide display password button
+	if datas['enablePasswordDisplay']
+		field = ''
+		if datas['dontStorePassword']
+			$(".toggle-password").on 'mousedown touchstart', () ->
+				field = $(this).attr 'id'
+				field = field.replace /^toggle_/, ''
+				console.log 'Display', field
+				$(this).toggleClass("fa-eye fa-eye-slash")
+				$("input[name=#{field}]").attr('class', 'form-control')
+			$(".toggle-password").on 'mouseup touchend', () ->
+				$(this).toggleClass("fa-eye fa-eye-slash")
+				$("input[name=#{field}]").attr('class', 'form-control key') if $("input[name=#{field}]").get(0).value
+		else
+			$(".toggle-password").on 'mousedown touchstart', () ->
+				field = $(this).attr 'id'
+				field = field.replace /^toggle_/, ''
+				console.log 'Display', field
+				$(this).toggleClass("fa-eye fa-eye-slash")
+				$("input[name=#{field}]").attr("type", "text")
+			$(".toggle-password").on 'mouseup touchend', () ->
+				$(this).toggleClass("fa-eye fa-eye-slash")
+				$("input[name=#{field}]").attr("type", "password")
+
+	# Functions to show/hide newpassword inputs
+	$('#reset').change () ->
+		checked = $(this).prop('checked')
+		console.log 'Reset is checked', checked
+		if checked == true
+			$('#newpasswords').hide()
+			$('#newpassword').removeAttr('required')
+			$('#confirmpassword').removeAttr('required')
+			$('#confirmpassword').get(0)?.setCustomValidity('')
+		else
+			$('#newpasswords').show()
+			$('#newpassword').attr('required', true)
+			$('#confirmpassword').attr('required', true)
+			if $('#confirmpassword').get(0)?.value == $('#newpassword').get(0)?.value
+				$('#confirmpassword').get(0)?.setCustomValidity('')
+			else
+				$('#confirmpassword').get(0)?.setCustomValidity(translate('PE34'))
 
 	# Functions to show/hide placeholder password inputs
 	$('#passwordfield').on 'input', () ->
@@ -580,4 +644,7 @@ $(window).on 'load', () ->
 		if datas['scrollTop'] && (document.body.scrollTop > Math.abs(datas['scrollTop']) || document.documentElement.scrollTop > Math.abs(datas['scrollTop']))
 			$('#btn-back-to-top').css("display","block")
 		else
-    		$('#btn-back-to-top').css("display","none")
+			$('#btn-back-to-top').css("display","none")
+
+	$(document).trigger "portalLoaded"
+	true

@@ -48,6 +48,8 @@ my %WriteMakefileArgs = (
     "script/csv-sort",
     "script/csv-sort-fields",
     "script/csv-sort-rows",
+    "script/csv-sorted",
+    "script/csv-sorted-rows",
     "script/csv-split",
     "script/csv-sum",
     "script/csv-transpose",
@@ -62,7 +64,8 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::CSVUtils",
   "PREREQ_PM" => {
-    "Complete::Util" => "0.608",
+    "Complete::Util" => "0.616",
+    "Data::Cmp" => "0.002",
     "Data::Sah::Compiler::perl::TH::any" => "0.914",
     "Data::Sah::Compiler::perl::TH::array" => "0.914",
     "Data::Sah::Compiler::perl::TH::bool" => "0.914",
@@ -106,7 +109,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Needs" => 0
   },
-  "VERSION" => "1.003",
+  "VERSION" => "1.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -115,7 +118,8 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Capture::Tiny" => 0,
-  "Complete::Util" => "0.608",
+  "Complete::Util" => "0.616",
+  "Data::Cmp" => "0.002",
   "Data::Sah::Compiler::perl::TH::any" => "0.914",
   "Data::Sah::Compiler::perl::TH::array" => "0.914",
   "Data::Sah::Compiler::perl::TH::bool" => "0.914",

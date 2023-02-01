@@ -45,7 +45,11 @@
    "provides" : {
       "experimental" : {
          "file" : "lib/experimental.pm",
-         "version" : "0.030"
+         "version" : "0.031"
+      },
+      "stable" : {
+         "file" : "lib/stable.pm",
+         "version" : "0.031"
       }
    },
    "release_status" : "stable",
@@ -60,7 +64,7 @@
          "web" : "https://github.com/Dual-Life/experimental"
       }
    },
-   "version" : "0.030",
+   "version" : "0.031",
    "x_contributors" : [
       "brian greenfield <0briang0@gmail.com>",
       "Dagfinn Ilmari Manns\u00e5ker <ilmari@ilmari.org>",
@@ -72,6 +76,7 @@
       "Leon Timmermans <fawaka@gmail.com>",
       "Philippe Bruhat (BooK) <book@cpan.org>",
       "Ricardo Signes <rjbs@cpan.org>",
+      "Ricardo Signes <rjbs@semiotic.systems>",
       "Sawyer X <xsawyerx@cpan.org>"
    ],
    "x_generated_by_perl" : "v5.36.0",

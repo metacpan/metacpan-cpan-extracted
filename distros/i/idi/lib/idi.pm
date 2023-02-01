@@ -5,12 +5,12 @@ package idi;
 use strict;
 use warnings;
 
+use Moo;
 use strictures 2;
 use File::Slurper qw(read_binary);
 use File::Temp qw(tempfile);
 use MIDI::Simple ();
 use Music::Tempo qw(bpm_to_ms);
-use Moo;
 use namespace::clean;
 
 use Exporter qw(import);
@@ -30,7 +30,7 @@ our @EXPORT = qw(
     x
 );
 
-our $VERSION = '0.0304';
+our $VERSION = '0.0305';
 
 my $self;
 
@@ -245,7 +245,7 @@ Default: C<64>
 
 =head2 w
 
-  w('filename.mid')
+  w("filename.mid")
 
 Write score to a file.
 

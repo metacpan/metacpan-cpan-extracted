@@ -6,12 +6,12 @@ use File::Spec;
 use File::Basename;
 use Test::More;
 
-eval "use Test::CheckManifest tests => 10";
+eval { use Test::CheckManifest tests => 10 };
 plan skip_all => "Test::CheckManifest required" if $@;
 
 #$Test::CheckManifest::VERBOSE = 0;
 
-# create a directory and a file 
+# create a directory and a file
 my $home = dirname(File::Spec->rel2abs($0));
 
 my $dir   = File::Spec->catdir($home,'.git');

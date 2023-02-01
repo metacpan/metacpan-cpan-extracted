@@ -4,7 +4,7 @@ use warnings;
 
 use Scalar::Util 'blessed', 'reftype', 'weaken';
 
-our $VERSION = "v6.14.0";
+our $VERSION = "v6.19.0";
 
 sub new {
     my ($class) = @_;
@@ -32,10 +32,12 @@ sub _execute_item {
         }
         elsif (reftype $item eq 'ARRAY' and not defined blessed($item)) {
             $self->_execute_item($_) foreach @$item;
+            @$item = ();
         }
         elsif (reftype $item eq 'REF') {
             # ref to ::Subscription object
             $self->_execute_item($$item);
+            $$item = undef;
         }
         elsif (reftype $item eq 'SCALAR') {
             # ref to undef, or some other invalid construct
@@ -43,6 +45,7 @@ sub _execute_item {
         }
         elsif (reftype $item eq 'HASH' and not defined blessed($item)) {
             $self->_execute_item([values %$item]);
+            %$item = ();
         }
     }
 }

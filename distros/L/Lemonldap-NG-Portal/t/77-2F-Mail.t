@@ -69,10 +69,10 @@ sub expectSentCode {
         "Prompt indicates success"
     );
 
-    like( mail() , qr%Doctor Who%, 'Found session attribute in mail' );
-    like( mail() , qr%<b>(\d{4})</b>%, 'Found 2F code in mail' );
+    like( mail(), qr%Doctor Who%,     'Found session attribute in mail' );
+    like( mail(), qr%<b>(\d{4})</b>%, 'Found 2F code in mail' );
 
-    mail () =~ qr%<b>(\d{4})</b>%;
+    mail() =~ qr%<b>(\d{4})</b>%;
     return $1;
 }
 

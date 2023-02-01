@@ -429,4 +429,342 @@ subtest 'op_buffer' => sub {
     }], 'works';
 };
 
+subtest 'op_buffer_time' => sub {
+    my $source = cold('-12-34-56');
+    my $o = $source->pipe(op_buffer_time(3));
+    obs_is $o, ['---a--b--', {
+        a => [ 1, 2 ],
+        b => [ 3, 4 ],
+    }];
+};
+
+subtest 'op_concat_with' => sub {
+    my $o = rx_interval(1)->pipe(
+        op_take(2),
+        op_concat_with(
+            rx_interval(1)->pipe(op_take(3)),
+            rx_interval(1)->pipe(op_take(2)),
+        ),
+    );
+    obs_is $o, ['-0101201'];
+};
+
+subtest 'op_count' => sub {
+    my $o = rx_EMPTY->pipe(op_count);
+    obs_is $o, ['0'], 'empty';
+
+    $o = rx_interval(1)->pipe(
+        op_take(7),
+        op_count(sub { $_ % 2 }),
+    );
+    obs_is $o, ['-------3'], 'predicate';
+
+    $o = cold('2222222')->pipe(
+        op_count(sub { $_[1] % 2 == 0 }),
+    );
+    obs_is $o, ['------4'], 'index';
+};
+
+subtest 'op_default_if_empty' => sub {
+    my $o = rx_timer(1)->pipe(
+        op_ignore_elements,
+        op_default_if_empty(4),
+    );
+    obs_is $o, ['-4'];
+
+    $o = cold('-0-')->pipe(
+        op_default_if_empty(4),
+    );
+    obs_is $o, ['-0-'];
+
+    $o = rx_EMPTY->pipe(op_default_if_empty(4));
+    obs_is $o, ['4'];
+};
+
+subtest 'rx_range' => sub {
+    my $o = rx_range(10, 7);
+    obs_is $o, ['(abcdefg)', {
+        a => 10,
+        b => 11,
+        c => 12,
+        d => 13,
+        e => 14,
+        f => 15,
+        g => 16,
+    }];
+};
+
+subtest 'op_reduce' => sub {
+    my $o = cold('12345')->pipe(
+        op_reduce(sub { $_[0] + $_[1] }),
+    );
+    obs_is $o, ['----a', { a => 15 }], 'w/o seed';
+
+    $o = cold('12345')->pipe(
+        op_reduce(sub { $_[0] + $_[1] }, 1),
+    );
+    obs_is $o, ['----a', { a => 16 }], 'with seed';
+};
+
+subtest 'rx_zip' => sub {
+    my $o = rx_zip(
+        rx_interval(1)->pipe(op_take(3)),
+        rx_interval(2),
+        rx_interval(3),
+    );
+    obs_is $o, ['---a--b--c', {
+        a => [ 0, 0, 0 ],
+        b => [ 1, 1, 1 ],
+        c => [ 2, 2, 2 ],
+    }], 'w/ rx_interval';
+
+    $o = rx_zip(
+        rx_of(1, 2, 3),
+        rx_of(10, 20, 30, 40),
+        rx_of(qw/ a b c /),
+    );
+    obs_is $o, ['(abc)', {
+        a => [ 1, 10, 'a' ],
+        b => [ 2, 20, 'b' ],
+        c => [ 3, 30, 'c' ],
+    }], 'w/ rx_of';
+};
+
+subtest 'op_every' => sub {
+    my $o = rx_zip(
+        rx_interval(1),
+        rx_of(5, 10, 15, 18, 20),
+    )->pipe(
+        op_every(sub { $_->[1] % 5 == 0 }),
+    );
+    obs_is $o, ['----0'], 'returns false';
+
+    $o = rx_zip(
+        rx_interval(1),
+        rx_of(5, 10, 15, 20),
+    )->pipe(
+        op_every(sub { $_->[1] % 5 == 0 }),
+    );
+    obs_is $o, ['----1'], 'returns true';
+};
+
+subtest 'op_element_at' => sub {
+    my $o = rx_interval(1)->pipe(
+        op_element_at(3),
+    );
+    obs_is $o, ['----3'], 'finds it';
+
+    $o = rx_interval(1)->pipe(
+        op_take(2),
+        op_element_at(2, 9),
+    );
+    obs_is $o, ['--9'], 'default';
+};
+
+subtest 'op_zip_with' => sub {
+    my $o = rx_interval(0.7)->pipe(
+        op_take(3),
+        op_zip_with(
+            rx_interval(1),
+            rx_interval(2),
+        ),
+    );
+    obs_is $o, ['--a-b-c', {
+        a => [ 0, 0, 0 ],
+        b => [ 1, 1, 1 ],
+        c => [ 2, 2, 2 ],
+    }];
+};
+
+subtest 'rx_generate' => sub {
+    my $o = rx_generate(
+        1,
+        sub { $_ <= 5 },
+        sub { $_ + 1 },
+        sub { $_ ** 2 + 1 },
+    );
+    obs_is $o, ['(abcde)', {
+        a => 2,
+        b => 5,
+        c => 10,
+        d => 17,
+        e => 26,
+    }], 'squares';
+};
+
+subtest 'is_observable' => sub {
+    my $o = cold('-1');
+    ok is_observable($o);
+};
+
+subtest 'op_merge_with' => sub {
+    my $o = rx_interval(3)->pipe(
+        op_merge_with( rx_interval(4) ),
+        op_take(5),
+    );
+    obs_is $o, ['---00-1-12'];
+};
+
+subtest 'rx_on_error_resume_next' => sub {
+    my $o = rx_on_error_resume_next(
+        rx_of(1, 2, 3)->pipe( op_concat_with(rx_throw_error('goo')) ),
+        rx_throw_error('foo'),
+        rx_of(7, 8, 9),
+        rx_throw_error('foo'),
+    );
+    obs_is $o, ['(123789)'];
+};
+
+subtest 'op_on_error_resume_next_with' => sub {
+    my $o = rx_of(1, 2, 3)->pipe(
+        op_concat_with(rx_throw_error('goo')),
+        op_on_error_resume_next_with(
+            rx_throw_error('foo'),
+            rx_of(7, 8, 9),
+            rx_throw_error('foo'),
+        ),
+    );
+    obs_is $o, ['(123789)'];
+};
+
+subtest 'op_skip_while' => sub {
+    my $o = rx_of(1, 3, 5, 2, 7, 1)->pipe(
+        op_skip_while(sub { $_ < 4 }),
+    );
+    obs_is $o, ['(5271)'];
+};
+
+subtest 'op_switch_all' => sub {
+    my $o = rx_timer(0, 3)->pipe(
+        op_take(3),
+        op_map(sub { rx_interval(2)->pipe(op_take(5)) }),
+        op_switch_all(),
+        op_take(6),
+    );
+    obs_is $o, ['--0--0--0-1-2-3'];
+};
+
+subtest 'op_merge_all' => sub {
+    my $i = 0;
+    my $o = rx_timer(0, 3)->pipe(
+        op_map(sub {
+            my $idx = $i++;
+            return rx_interval(2)->pipe(
+                op_map(sub { [$idx, $_] }),
+                op_take(4),
+            );
+        }),
+        op_merge_all(1),
+        op_take(12),
+    );
+    obs_is $o, ['--a-b-c-d-e-f-g-h-i-j-k-l', {
+        a => [ 0, 0 ],
+        b => [ 0, 1 ],
+        c => [ 0, 2 ],
+        d => [ 0, 3 ],
+        e => [ 1, 0 ],
+        f => [ 1, 1 ],
+        g => [ 1, 2 ],
+        h => [ 1, 3 ],
+        i => [ 2, 0 ],
+        j => [ 2, 1 ],
+        k => [ 2, 2 ],
+        l => [ 2, 3 ],
+    }];
+};
+
+subtest 'op_concat_all' => sub {
+    my $o = rx_interval(1)->pipe(
+        op_map(sub { rx_interval(1)->pipe( op_take(3) ) }),
+        op_concat_all(),
+        op_take(10),
+    );
+    obs_is $o, ['--0120120120'];
+};
+
+subtest 'op_exhaust_map' => sub {
+    my $o = rx_interval(3)->pipe(
+        op_map(sub {
+            my ($v) = @_;
+            return rx_interval(1)->pipe(
+                op_map(sub { [$v, $_] }),
+                op_take(4),
+            );
+        }),
+        op_exhaust_all(),
+        op_take(12),
+    );
+    obs_is $o, ['----abcd--efgh--ijkl', {
+        a => [ 0, 0 ],
+        b => [ 0, 1 ],
+        c => [ 0, 2 ],
+        d => [ 0, 3 ],
+        e => [ 2, 0 ],
+        f => [ 2, 1 ],
+        g => [ 2, 2 ],
+        h => [ 2, 3 ],
+        i => [ 4, 0 ],
+        j => [ 4, 1 ],
+        k => [ 4, 2 ],
+        l => [ 4, 3 ],
+    }];
+};
+
+subtest 'op_find' => sub {
+    my $o = rx_interval(1)->pipe(
+        op_find(sub { $_[0] == 7 }),
+    );
+    obs_is $o, ['--------7'], 'finds';
+
+    $o = rx_interval(1)->pipe(
+        op_take(5),
+        op_find(sub { $_[0] == 7 }),
+    );
+    obs_is $o, ['-----a', {
+        a => undef,
+    }], "doesn't find";
+};
+
+subtest 'op_find_index' => sub {
+    my $o = rx_interval(1)->pipe(
+        op_map(sub { $_ * 2 }),
+        op_find_index(sub { $_ == 14 }),
+    );
+    obs_is $o, ['--------7'], 'finds';
+
+    $o = rx_interval(1)->pipe(
+        op_take(5),
+        op_find_index(sub { $_ == 14 }),
+    );
+    obs_is $o, ['-----a', { a => -1 }], "doesn't find";
+};
+
+subtest 'rx_iif' => sub {
+    my $i;
+    my $o = rx_iif(
+        sub { $i > 5 },
+        rx_of(7, 8, 9),
+        rx_of(1, 2, 3),
+    );
+
+    $i = 4;
+    obs_is $o, ['(123)'], 'false';
+
+    $i = 6;
+    obs_is $o, ['(789)'], 'true';
+};
+
+subtest 'op_is_empty' => sub {
+    my $o = rx_interval(1)->pipe(
+        op_is_empty,
+    );
+    obs_is $o, ['-0'], 'full';
+
+    $o = rx_timer(2)->pipe(
+        op_ignore_elements,
+        op_is_empty,
+    );
+    obs_is $o, ['--1'], 'empty';
+};
+
 done_testing();

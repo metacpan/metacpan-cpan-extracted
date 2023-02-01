@@ -19,12 +19,12 @@ SKIP: {
         my $fh_manifest = IO::File->new( $dir . '/MANIFEST', 'w' );
         $fh_manifest->print( $_ . "\n" ) for (qw/MANIFEST A.txt B.txt 02_issue1.t 03_issue7.t/);
         $fh_manifest->close or die $!;
-        
+
         # create file
         my $fh = IO::File->new( $dir . '/A.txt', 'w' );
         $fh->print( scalar localtime ) or die $!;
         $fh->close or die $!;
-        
+
         # create symlink
         eval { symlink $dir . '/A.txt', $dir . '/B.txt' };
 

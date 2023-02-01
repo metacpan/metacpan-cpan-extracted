@@ -3,9 +3,9 @@ NAME
     XLSX) or other spreadsheet formats like LibreOffice Calc (ODS)
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Acme::CPANModules::WorkingWithXLS (from Perl distribution
-    Acme-CPANModules-WorkingWithXLS), released on 2022-08-10.
+    Acme-CPANModules-WorkingWithXLS), released on 2022-11-13.
 
 DESCRIPTION
     The following are tools (programs, modules, scripts) to work with Excel
@@ -21,6 +21,11 @@ DESCRIPTION
     discouraged because it is a quick-and-dirty hack). Spreadsheet::Read can
     also read CSV via Text::CSV_XS. The module can return information about
     cell's attributes (formatting, alignment, and so on), merged cells, etc.
+    The distribution of this module also comes with some CLIs like xlscat,
+    xlsx2csv.
+
+    Data::XLSX::Parser which claims to be a "faster XLSX parser". Haven't
+    used this one personally or benchmarked it though.
 
     Getting information
 
@@ -44,6 +49,9 @@ DESCRIPTION
 
     Converting to CSV
 
+    xlsx2csv from Spreadsheet::Read. Since it's based on Spreadsheet::Read,
+    it can read XLS/XLSX/ODS. It always outputs to file and not to stdout.
+
     "CATDOC" (<http://www.wagner.pp.ru/~vitus/software/catdoc/>) contains
     following the programs "catdoc" (to print the plain text of Microsoft
     Word documents to standard output), xls2csv (to convert Microsoft Excel
@@ -59,26 +67,23 @@ DESCRIPTION
     TBD
 
 ACME::CPANMODULES ENTRIES
-    *   Spreadsheet::Read
-
+    Spreadsheet::Read
         Author: HMBRAND <https://metacpan.org/author/HMBRAND>
 
-    *   Spreadsheet::ReadSXC - Extract OpenOffice 1.x spreadsheet data
-
+    Spreadsheet::ReadSXC
         Author: CORION <https://metacpan.org/author/CORION>
 
-    *   Spreadsheet::ParseExcel - Read information from an Excel file.
-
+    Spreadsheet::ParseExcel
         Author: DOUGW <https://metacpan.org/author/DOUGW>
 
-    *   Spreadsheet::ParseXLSX - parse XLSX files
-
+    Spreadsheet::ParseXLSX
         Author: DOY <https://metacpan.org/author/DOY>
 
-    *   App::XLSUtils
+    Data::XLSX::Parser
+        Author: ACIDLEMON <https://metacpan.org/author/ACIDLEMON>
 
-    *   App::XLSperl
-
+    App::XLSUtils
+    App::XLSperl
         Author: JONALLEN <https://metacpan.org/author/JONALLEN>
 
 FAQ

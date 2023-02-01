@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Story-Interact>
 Bug tracker:  <https://github.com/tobyink/p5-story-interact/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.001007	2023-02-01
+
+ - Added: Story::Interact::Harness::Test.
+ - Factor out common story harness code into Story::Interact::Harness.
+
 0.001006	2023-01-28
 
  - Regexp fixes.

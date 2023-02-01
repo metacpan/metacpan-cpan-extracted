@@ -39,7 +39,7 @@ my $token = $crypt->encrypt(
     join ':',                        time,
     $sessionId,                      'test1.example.com',
     'XFromVH=app1-auth.example.com', "serviceHeader1=$sessionId",
-    "serviceHeader2=$sessionId",     'test2.example.com',
+    "serviceHeader2=$sessionId",     '/^test[29]\.example.co/',
     '*.example.com'
 );
 

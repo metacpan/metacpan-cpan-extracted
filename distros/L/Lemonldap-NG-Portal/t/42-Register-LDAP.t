@@ -30,7 +30,7 @@ SKIP: {
                 userDB                   => 'Same',
                 registerDB               => 'LDAP',
                 captcha_register_enabled => 0,
-                ldapServer               => 'ldap://127.0.0.1:19389/',
+                ldapServer               => $main::slapd_url,
                 ldapBase                 => 'ou=users,dc=example,dc=com',
                 managerDn                => 'cn=admin,dc=example,dc=com',
                 managerPassword          => 'admin',
@@ -94,7 +94,6 @@ SKIP: {
     expectCookie($res);
 }
 count($maintests);
-stopLdapServer() if $ENV{LLNGTESTLDAP};
 clean_sessions();
 
 done_testing( count() );
