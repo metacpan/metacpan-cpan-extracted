@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Provide access to chemical element properties
 
-our $VERSION = '0.0400';
+our $VERSION = '0.0501';
 
 use Moo;
 use strictures 2;
@@ -17,33 +17,6 @@ use namespace::clean;
 has symbols => (is => 'lazy', init_args => undef);
 
 sub _build_symbols {
-    my ($self) = @_;
-    my $symbols = $self->as_hash;
-    return $symbols;
-}
-
-
-has header => (is => 'lazy', init_args => undef);
-
-sub _build_header {
-    my ($self) = @_;
-    my @headers = $self->headers;
-    return \@headers;
-}
-
-
-sub as_file {
-    my ($self) = @_;
-
-    my $file = eval { dist_dir('Chemistry-PeriodicTable') . '/Periodic-Table.csv' };
-    $file = 'share/Periodic-Table.csv'
-        unless $file && -e $file;
-
-    return $file;
-}
-
-
-sub as_hash {
     my ($self) = @_;
 
     my $file = $self->as_file;
@@ -72,7 +45,9 @@ sub as_hash {
 }
 
 
-sub headers {
+has header => (is => 'lazy', init_args => undef);
+
+sub _build_header {
     my ($self) = @_;
 
     my $file = $self->as_file;
@@ -91,20 +66,34 @@ sub headers {
 
     close $fh;
 
-    return @headers;
+    return \@headers;
+}
+
+
+sub as_file {
+    my ($self) = @_;
+
+    my $file = eval { dist_dir('Chemistry-PeriodicTable') . '/Periodic-Table.csv' };
+    $file = 'share/Periodic-Table.csv'
+        unless $file && -e $file;
+
+    return $file;
 }
 
 
 sub number {
     my ($self, $string) = @_;
     my $n;
+    # looking for a symbol
     if (length $string < 4) {
         $n = $self->symbols->{ ucfirst $string }[0];
     }
+    # looking for an element name
     else {
         for my $symbol (keys %{ $self->symbols }) {
             if (lc $self->symbols->{$symbol}[1] eq lc $string) {
                 $n = $self->symbols->{$symbol}[0];
+                last;
             }
         }
     }
@@ -178,7 +167,7 @@ Chemistry::PeriodicTable - Provide access to chemical element properties
 
 =head1 VERSION
 
-version 0.0400
+version 0.0501
 
 =head1 SYNOPSIS
 
@@ -214,7 +203,7 @@ C<Chemistry::PeriodicTable> provides access to chemical element properties.
 
   $symbols = $pt->symbols;
 
-The computed hash-reference of the element properties.
+The computed hash-reference of the element properties keyed by symbol.
 
 =head2 header
 
@@ -222,11 +211,35 @@ The computed hash-reference of the element properties.
 
 The computed array-reference of the property headers.
 
+These are:
+
+   0 Atomic Number
+   1 Element
+   2 Symbol
+   3 Atomic Weight
+   4 Period
+   5 Group
+   6 Phase
+   7 Most Stable Crystal
+   8 Type
+   9 Ionic Radius
+  10 Atomic Radius
+  11 Electronegativity
+  12 First Ionization Potential
+  13 Density
+  14 Melting Point (K)
+  15 Boiling Point (K)
+  16 Isotopes
+  17 Specific Heat Capacity
+  18 Electron Configuration
+  19 Display Row
+  20 Display Column
+
 =head1 METHODS
 
 =head2 new
 
-  $pt = Chemistry::PeriodicTable->new(verbose => 1);
+  $pt = Chemistry::PeriodicTable->new;
 
 Create a new C<Chemistry::PeriodicTable> object.
 
@@ -235,43 +248,6 @@ Create a new C<Chemistry::PeriodicTable> object.
   $filename = $pt->as_file;
 
 Return the data filename location.
-
-=head2 as_hash
-
-  $data = $pt->as_hash;
-
-Return the data as a hash reference.
-
-Keys are the element symbols and the values are the element
-properties.
-
-=head2 headers
-
-  @headers = $pt->headers;
-
-Return the data headers. These are:
-
-  Atomic Number
-  Element
-  Symbol
-  Atomic Weight
-  Period
-  Group
-  Phase
-  Most Stable Crystal
-  Type
-  Ionic Radius
-  Atomic Radius
-  Electronegativity
-  First Ionization Potential
-  Density
-  Melting Point (K)
-  Boiling Point (K)
-  Isotopes
-  Specific Heat Capacity
-  Electron Configuration
-  Display Row
-  Display Column
 
 =head2 number
 

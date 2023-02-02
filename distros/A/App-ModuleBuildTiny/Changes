@@ -1,5 +1,12 @@
 Revision history for App-ModuleBuildTiny
 
+0.031     Thu Feb  2 02:35:19 PM CET 2023
+          - Make configuration optional for minting
+          - Add prompt before release
+          - Remove VERSION section from template
+          - Make "configure all" default to current values
+          - Allow for removing configure values
+
 0.030     Mon Jan 16 12:16:05 AM CET 2023
           - Allow for multiple prereq files
           - Add scan command for prereqs

@@ -1,11 +1,14 @@
+package main;
+
 use 5.014;
 
 use strict;
 use warnings;
-use routines;
 
-use Test::Auto;
 use Test::More;
+use Venus::Test;
+
+my $test = test(__FILE__);
 
 =name
 
@@ -13,17 +16,23 @@ Test::DB
 
 =cut
 
+$test->for('name');
+
 =tagline
 
 Temporary Testing Databases
 
 =cut
 
+$test->for('tagline');
+
 =abstract
 
 Temporary Databases for Testing
 
 =cut
+
+$test->for('abstract');
 
 =includes
 
@@ -36,6 +45,8 @@ method: sqlite
 
 =cut
 
+$test->for('includes');
+
 =synopsis
 
   use Test::DB;
@@ -45,12 +56,6 @@ method: sqlite
   # my $tdbo = $tdb->create(database => 'sqlite');
 
   # my $dbh = $tdbo->dbh;
-
-=cut
-
-=libraries
-
-Types::Standard
 
 =cut
 
@@ -86,12 +91,6 @@ Using the established connection, create the test/temporary database.
 Establish a connection to the newly created test/temporary database.
 
   $tdbo->create->dbh;
-
-+=item #4
-
-Make the test database object immutable.
-
-  $tdbo->create->database('example'); # error
 
 +=back
 
@@ -195,17 +194,17 @@ B<using Mojo::SQLite>
 =method clone
 
 The clone method generates a database based on the type and database template
-specified and returns a C<Test::DB::Object> with an active connection, C<dbh>
-and C<dsn>. If the database specified doesn't have a corresponding database
-driver this method will returned the undefined value. The type of database can
-be omitted if the C<TESTDB_DATABASE> environment variable is set, if not the
-type of database must be either C<sqlite>, C<mysql>, C<mssql> or C<postgres>.
-Any options provided are passed along to the test database object class
+specified and returns a driver object with an active connection, C<dbh> and
+C<dsn>. If the database specified doesn't have a corresponding database driver
+this method will returned the undefined value. The type of database can be
+omitted if the C<TESTDB_DATABASE> environment variable is set, if not the type
+of database must be either C<sqlite>, C<mysql>, C<mssql> or C<postgres>.  Any
+options provided are passed along to the test database object class
 constructor.
 
 =signature clone
 
-clone(Str :$database, Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+clone(Str :$database, Str %options) : Maybe[Object]
 
 =example-1 clone
 
@@ -237,16 +236,16 @@ clone(Str :$database, Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
 =method create
 
 The create method generates a database based on the type specified and returns
-a C<Test::DB::Object> with an active connection, C<dbh> and C<dsn>. If the
-database specified doesn't have a corresponding database driver this method
-will returned the undefined value. The type of database can be omitted if the
+a driver object with an active connection, C<dbh> and C<dsn>. If the database
+specified doesn't have a corresponding database driver this method will
+returned the undefined value. The type of database can be omitted if the
 C<TESTDB_DATABASE> environment variable is set, if not the type of database
 must be either C<sqlite>, C<mysql>, C<mssql> or C<postgres>. Any options
 provided are passed along to the test database object class constructor.
 
 =signature create
 
-create(Str :$database, Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+create(Str :$database, Str %options) : Maybe[Object]
 
 =example-1 create
 
@@ -276,7 +275,7 @@ The mssql method builds and returns a L<Test::DB::Mssql> object.
 
 =signature mssql
 
-mssql(Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+mssql(Str %options) : Maybe[InstanceOf["Test::DB::Mssql"]]
 
 =example-1 mssql
 
@@ -292,7 +291,7 @@ The mysql method builds and returns a L<Test::DB::Mysql> object.
 
 =signature mysql
 
-mysql(Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+mysql(Str %options) : Maybe[InstanceOf["Test::DB::Mysql"]]
 
 =example-1 mysql
 
@@ -308,7 +307,7 @@ The postgres method builds and returns a L<Test::DB::Postgres> object.
 
 =signature postgres
 
-postgres(Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+postgres(Str %options) : Maybe[InstanceOf["Test::DB::Postgres"]]
 
 =example-1 postgres
 
@@ -324,7 +323,7 @@ The sqlite method builds and returns a L<Test::DB::Sqlite> object.
 
 =signature sqlite
 
-sqlite(Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+sqlite(Str %options) : Maybe[InstanceOf["Test::DB::Sqlite"]]
 
 =example-1 sqlite
 
@@ -341,117 +340,110 @@ SKIP: {
     skip 'Environment not configured for testing';
   }
 
-  my $test = testauto(__FILE__);
-
-  my $subs = $test->standard;
-
-  $subs->synopsis(fun($tryable) {
+  $test->for('synopsis', sub {
+    my ($tryable) = @_;
     ok my $result = $tryable->result;
 
     $result
   });
 
-  $subs->example(-1, 'mssql', 'method', fun($tryable) {
+  $test->for('example', 1, 'mssql', sub {
+    my ($tryable) = @_;
     ok my $result = $tryable->result;
-    ok $result->isa('Test::DB::Object');
     ok $result->isa('Test::DB::Mssql');
 
     $result
   });
 
-  $subs->example(-1, 'mysql', 'method', fun($tryable) {
+  $test->for('example', 1, 'mysql', sub {
+    my ($tryable) = @_;
     ok my $result = $tryable->result;
-    ok $result->isa('Test::DB::Object');
     ok $result->isa('Test::DB::Mysql');
 
     $result
   });
 
-  $subs->example(-1, 'postgres', 'method', fun($tryable) {
+  $test->for('example', 1, 'postgres', sub {
+    my ($tryable) = @_;
     ok my $result = $tryable->result;
-    ok $result->isa('Test::DB::Object');
     ok $result->isa('Test::DB::Postgres');
 
     $result
   });
 
-  $subs->example(-1, 'sqlite', 'method', fun($tryable) {
+  $test->for('example', 1, 'sqlite', sub {
+    my ($tryable) = @_;
     ok my $result = $tryable->result;
-    ok $result->isa('Test::DB::Object');
     ok $result->isa('Test::DB::Sqlite');
 
     $result
   });
 
-  if (do { local $@; eval { require DBD::Pg }; !$@ }) {
-    $subs->example(-1, 'clone', 'method', fun($tryable) {
-      ok my $result = $tryable->result;
-      ok $result->isa('Test::DB::Object');
-      ok $result->isa('Test::DB::Postgres');
+  $test->for('example', 1, 'create', sub {
+    my ($tryable) = @_;
+    ok my $result = $tryable->result;
+    my $database = $ENV{TESTDB_DATABASE};
+    ok $result->isa('Test::DB::Mssql') if (lc($database) eq 'mssql');
+    ok $result->isa('Test::DB::Mysql') if (lc($database) eq 'mysql');
+    ok $result->isa('Test::DB::Postgres') if (lc($database) eq 'postgres');
+    ok $result->isa('Test::DB::Sqlite') if (lc($database) eq 'sqlite');
+    ok $result->destroy;
 
+    $result
+  });
+
+  my $is_sqlite = lc($ENV{TESTDB_DATABASE}) eq 'sqlite';
+  if (do {local $@; eval {require DBD::SQLite}; $is_sqlite && !$@}) {
+    $test->for('example', 2, 'create', sub {
+      my ($tryable) = @_;
+      ok my $result = $tryable->result;
+      ok $result->isa('Test::DB::Sqlite');
       ok $result->destroy;
 
       $result
     });
 
-    $subs->example(-2, 'clone', 'method', fun($tryable) {
+    $test->for('example', 3, 'create', sub {
+      my ($tryable) = @_;
       ok my $result = $tryable->result;
-      ok $result->isa('Test::DB::Object');
-      ok $result->isa('Test::DB::Postgres');
-
-      ok $result->destroy;
-
-      $result
-    });
-
-    $subs->example(-3, 'clone', 'method', fun($tryable) {
-      ok my $result = $tryable->result;
-      ok $result->isa('Test::DB::Object');
-      ok $result->isa('Test::DB::Postgres');
-
+      ok $result->isa('Test::DB::Sqlite');
       ok $result->destroy;
 
       $result
     });
   }
 
-  $subs->example(-1, 'create', 'method', fun($tryable) {
-    ok my $result = $tryable->result;
-    ok $result->isa('Test::DB::Object');
-
-    my $database = $ENV{TESTDB_DATABASE};
-
-    ok $result->isa('Test::DB::Mssql') if (lc($database) eq 'mssql');
-    ok $result->isa('Test::DB::Mysql') if (lc($database) eq 'mysql');
-    ok $result->isa('Test::DB::Postgres') if (lc($database) eq 'postgres');
-    ok $result->isa('Test::DB::Sqlite') if (lc($database) eq 'sqlite');
-
-    ok $result->destroy;
-
-    $result
-  });
-
-  if (do { local $@; eval { require DBD::SQLite }; !$@ }) {
-    $subs->example(-2, 'create', 'method', fun($tryable) {
+  my $is_postgres = lc($ENV{TESTDB_DATABASE}) eq 'postgres';
+  if (do {local $@; eval {require DBD::Pg}; $is_postgres && !$@}) {
+    $test->for('example', 1, 'clone', sub {
+      my ($tryable) = @_;
       ok my $result = $tryable->result;
-      ok $result->isa('Test::DB::Object');
-      ok $result->isa('Test::DB::Sqlite');
-
+      ok $result->isa('Test::DB::Postgres');
       ok $result->destroy;
 
       $result
     });
 
-    $subs->example(-3, 'create', 'method', fun($tryable) {
+    $test->for('example', 2, 'clone', sub {
+      my ($tryable) = @_;
       ok my $result = $tryable->result;
-      ok $result->isa('Test::DB::Object');
-      ok $result->isa('Test::DB::Sqlite');
+      ok $result->isa('Test::DB::Postgres');
+      ok $result->destroy;
 
+      $result
+    });
+
+    $test->for('example', 3, 'clone', sub {
+      my ($tryable) = @_;
+      ok my $result = $tryable->result;
+      ok $result->isa('Test::DB::Postgres');
       ok $result->destroy;
 
       $result
     });
   }
 }
+
+$test->render('lib/Test/DB.pod') if $ENV{RENDER};
 
 ok 1 and done_testing;

@@ -1,8 +1,9 @@
+
 =pod
 
 This is a B<test> to see if I can do not only C<$self> and C<method()>, but
 also C<< $self->method() >> and C<< $self->{FIELDNAME} >> and
-C<< $Foo <=> $Bar >> without resorting to escape sequences. If 
+C<< $Foo <=> $Bar >> without resorting to escape sequences. If
 I want to refer to the right-shift operator I can do something
 like C<<< $x >> 3 >>> or even C<<<< $y >> 5 >>>>.
 

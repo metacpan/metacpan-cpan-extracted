@@ -4,7 +4,7 @@ use warnings;
 
 use RxPerl::Operators::Creation qw/
     rx_observable rx_subject rx_concat rx_of rx_interval rx_combine_latest rx_concat rx_throw_error rx_zip
-    rx_merge rx_on_error_resume_next
+    rx_merge rx_on_error_resume_next rx_race
 /;
 use RxPerl::ConnectableObservable;
 use RxPerl::Utils qw/ get_timer_subs /;
@@ -18,14 +18,15 @@ our @EXPORT_OK = qw/
     op_audit_time op_buffer op_buffer_count op_buffer_time op_catch_error op_combine_latest_with op_concat_all
     op_concat_map op_concat_with op_count op_debounce_time op_default_if_empty op_delay op_distinct_until_changed
     op_distinct_until_key_changed op_element_at op_end_with op_every op_exhaust_all op_exhaust_map op_filter
-    op_finalize op_find op_find_index op_first op_ignore_elements op_is_empty op_map op_map_to op_merge_all
-    op_merge_map op_merge_with op_multicast op_on_error_resume_next_with op_pairwise op_pluck op_reduce op_ref_count
-    op_repeat op_retry op_sample_time op_scan op_share op_skip op_skip_until op_skip_while op_start_with op_switch_all
-    op_switch_map op_take op_take_until op_take_while op_tap op_throttle_time op_with_latest_from op_zip_with
+    op_finalize op_find op_find_index op_first op_group_by op_ignore_elements op_is_empty op_last op_map op_map_to
+    op_max op_merge_all op_merge_map op_merge_with op_min op_multicast op_on_error_resume_next_with op_pairwise
+    op_pluck op_race_with op_reduce op_ref_count op_repeat op_retry op_sample_time op_scan op_share op_skip
+    op_skip_until op_skip_while op_start_with op_switch_all op_switch_map op_take op_take_last op_take_until
+    op_take_while op_tap op_throttle_time op_throw_if_empty op_to_array op_with_latest_from op_zip_with
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.19.0";
+our $VERSION = "v6.22.1";
 
 sub op_audit_time {
     my ($duration) = @_;
@@ -779,6 +780,57 @@ sub op_first {
     };
 }
 
+sub op_group_by {
+    my ($key_fn) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my %observables;
+            my @observables;
+            my $stop_producing_observables;
+
+            $subscriber->subscription->add(sub {
+                $stop_producing_observables = 1;
+            });
+
+            my $own_subscriber = {
+                # %$subscriber,
+                next     => sub {
+                    my ($v) = @_;
+
+                    my $key = do { local $_ = $v; $key_fn->($v); };
+                    $observables{$key} //= do {
+                        my $new_obs = rx_subject->new;
+                        push @observables, $new_obs;
+                        $subscriber->{next}->($new_obs);
+                        $new_obs;
+                    } unless $stop_producing_observables;
+                    $observables{$key}{next}->($v) if exists $observables{$key} and defined $observables{$key}{next};
+                },
+                error    => sub {
+                    $subscriber->{error}->() if defined $subscriber->{error};
+                },
+                complete => sub {
+                    for my $val (@observables) {
+                        $val->{complete}->() if defined $val->{complete};
+                    }
+                    $subscriber->{complete}->() if defined $subscriber->{complete};
+                    undef @observables;
+                    %observables = ();
+                },
+            };
+
+            $source->subscribe($own_subscriber);
+
+            return;
+        });
+    };
+}
+
 sub op_ignore_elements {
     return sub {
         my ($source) = @_;
@@ -805,6 +857,63 @@ sub op_is_empty {
             op_map_to(0),
             op_default_if_empty(1),
         );
+    };
+}
+
+sub op_last {
+    my ($predicate, $default) = @_;
+    my $has_default = @_ >= 2;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my $last_val;
+            my $last_val_obtained;
+
+            my $idx = 0;
+            my $own_subscriber = {
+                %$subscriber,
+                next => sub {
+                    my ($v) = @_;
+
+                    if ($predicate) {
+                        my $passes;
+                        my $ok = eval { local $_ = $v; $passes = $predicate->($v, $idx++); 1 };
+                        $ok or do {
+                            $subscriber->{error}->($@) if defined $subscriber->{error};
+                            return;
+                        };
+                        if ($passes) {
+                            $last_val = $v;
+                            $last_val_obtained = 1;
+                        }
+                    } else {
+                        $last_val = $v;
+                        $last_val_obtained = 1;
+                    }
+                },
+                complete => sub {
+                    if (! $last_val_obtained) {
+                        if ($has_default) {
+                            $subscriber->{next}->($default) if defined $subscriber->{next};
+                            $subscriber->{complete}->() if defined $subscriber->{complete};
+                        } else {
+                            $subscriber->{error}->("no last value found");
+                        }
+                    } else {
+                        $subscriber->{next}->($last_val) if defined $subscriber->{next};
+                        $subscriber->{complete}->() if defined $subscriber->{complete};
+                    }
+                },
+            };
+
+            $source->subscribe($own_subscriber);
+
+            return;
+        });
     };
 }
 
@@ -851,6 +960,55 @@ sub op_map_to {
             my $own_subscriber = { %$subscriber };
             $own_subscriber->{next} &&= sub {
                 $subscriber->{next}->($mapping_value) if defined $subscriber->{next};
+            };
+
+            $source->subscribe($own_subscriber);
+
+            return;
+        });
+    };
+}
+
+sub op_max {
+    my ($comparer) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my $curr_max;
+            my $has_curr_max;
+
+            my $own_subscriber = {
+                %$subscriber,
+                next     => sub {
+                    my ($v) = @_;
+
+                    if (!$has_curr_max) {
+                        $curr_max = $v;
+                        $has_curr_max = 1;
+                    }
+                    else {
+                        if (!$comparer) {
+                            if ($v > $curr_max) {
+                                $curr_max = $v;
+                            }
+                        }
+                        else {
+                            if ($comparer->($v, $curr_max) > 0) {
+                                $curr_max = $v;
+                            }
+                        }
+                    }
+                },
+                complete => sub {
+                    if ($has_curr_max) {
+                        $subscriber->{next}->($curr_max) if defined $subscriber->{next};
+                    }
+                    $subscriber->{complete}->() if defined $subscriber->{complete};
+                },
             };
 
             $source->subscribe($own_subscriber);
@@ -973,6 +1131,55 @@ sub op_merge_with {
     };
 }
 
+sub op_min {
+    my ($comparer) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my $curr_min;
+            my $has_curr_min;
+
+            my $own_subscriber = {
+                %$subscriber,
+                next     => sub {
+                    my ($v) = @_;
+
+                    if (!$has_curr_min) {
+                        $curr_min = $v;
+                        $has_curr_min = 1;
+                    }
+                    else {
+                        if (!$comparer) {
+                            if ($v < $curr_min) {
+                                $curr_min = $v;
+                            }
+                        }
+                        else {
+                            if ($comparer->($v, $curr_min) < 0) {
+                                $curr_min = $v;
+                            }
+                        }
+                    }
+                },
+                complete => sub {
+                    if ($has_curr_min) {
+                        $subscriber->{next}->($curr_min) if defined $subscriber->{next};
+                    }
+                    $subscriber->{complete}->() if defined $subscriber->{complete};
+                },
+            };
+
+            $source->subscribe($own_subscriber);
+
+            return;
+        });
+    };
+}
+
 sub op_multicast {
     my ($subject_factory) = @_;
 
@@ -1067,6 +1274,19 @@ sub op_pluck {
 
             $source->subscribe($own_subscriber);
         });
+    };
+}
+
+sub op_race_with {
+    my @other_sources = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_race(
+            $source,
+            @other_sources,
+        );
     };
 }
 
@@ -1564,6 +1784,42 @@ sub op_take {
     };
 }
 
+sub op_take_last {
+    my ($count) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my @last_values;
+
+            my $own_subscriber = {
+                %$subscriber,
+                next     => sub {
+                    my ($v) = @_;
+
+                    push @last_values, $v;
+                    if (@last_values > $count) {
+                        shift @last_values;
+                    }
+                },
+                complete => sub {
+                    foreach my $last_val (@last_values) {
+                        $subscriber->{next}->($last_val) if defined $subscriber->{next};
+                    }
+                    $subscriber->{complete}->() if defined $subscriber->{complete};
+                },
+            };
+
+            $source->subscribe($own_subscriber);
+
+            return;
+        });
+    }
+}
+
 sub op_take_until {
     my ($notifier_observable) = @_;
 
@@ -1687,6 +1943,67 @@ sub op_throttle_time {
 
                         $subscriber->{next}->(@value) if defined $subscriber->{next};
                     }
+                },
+            };
+
+            $source->subscribe($own_subscriber);
+
+            return;
+        });
+    };
+}
+
+sub op_throw_if_empty {
+    my ($error_factory) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my $is_empty = 1;
+
+            my $own_subscriber = {
+                %$subscriber,
+                next     => sub {
+                    $is_empty = 0;
+                    $subscriber->{next}->(@_) if defined $subscriber->{next};
+                },
+                complete => sub {
+                    if ($is_empty) {
+                        $subscriber->{error}->($error_factory->()) if defined $subscriber->{error};
+                    } else {
+                        $subscriber->{complete}->() if defined $subscriber->{complete};
+                    }
+                },
+            };
+
+            $source->subscribe($own_subscriber);
+
+            return;
+        });
+    };
+}
+
+sub op_to_array {
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my @values;
+
+            my $own_subscriber = {
+                %$subscriber,
+                next     => sub {
+                    my ($v) = @_;
+                    push @values, $v;
+                },
+                complete => sub {
+                    $subscriber->{next}->(\@values) if defined $subscriber->{next};
+                    $subscriber->{complete}->() if defined $subscriber->{complete};
                 },
             };
 

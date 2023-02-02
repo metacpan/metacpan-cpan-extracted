@@ -2,7 +2,7 @@ NAME
     UUID4::Tiny - Cryptographically secure v4 UUIDs for Linux x64
 
 VERSION
-    version 0.002
+    version 0.003
 
 SYNOPSIS
      use UUID4::Tiny qw/
@@ -39,6 +39,14 @@ FUNCTIONS
         my $uuid_string = uuid_to_string( create_uuid );
 
     Converts a 16 byte UUID to a canonical 8-4-4-4-12 format UUID string.
+
+    Calling this function on a string that is already a UUID string will
+    return the string unmodified, and raise a warning.
+
+    Calling this function on a reference is almost certainly not what you
+    want, as the function would naively try to unpack the stringified
+    reference, e.g. "ARRAY(0xdeadbeef1234)", into a UUID string. For this
+    reason, the function will croak if its input is a reference.
 
   create_uuid_string
         my $uuid_string = create_uuid_string;

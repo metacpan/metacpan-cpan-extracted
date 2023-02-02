@@ -3,12 +3,12 @@ use strict;
 use warnings;
 
 # Use a circular list ("necklace") of Neo-Riemannian transformations,
-# plus "X" meaning "make no transformation." Starting at position zero,
+# plus "I" meaning "make no transformation." Starting at position zero,
 # move forward or backward along the necklace, transforming the
 # current chord, and render the resulting progression as MIDI.
 
 # Example:
-# > perl nro-chain --r=1 --m=12 --bpm=90 --note=C --o=5 --t=X,PRL,R,L,R,L,R --v
+# > perl nro-chain --r=1 --m=12 --bpm=90 --note=C --o=5 --t=I,PRL,R,L,R,L,R --v
 # > perl nro-chain --r=2 --m=8 --bpm=110 --note=A --o=5 --s=minor --t=8 --v
 # > perl nro-chain --r=4 --t=7 --nobass --v
 # > timidity %.mid
@@ -27,7 +27,7 @@ my %opt = (
     note      => 'G',
     octave    => 4,
     scale     => 'major',
-    transform => 'X,PRL,R,L,R,L,R', # mostly diatonic. integer = random
+    transform => 'I,PRL,R,L,R,L,R', # mostly diatonic. integer = random
     bass      => 1,
     verbose   => 0,
 );

@@ -22,6 +22,7 @@ meta-spec:
   version: '1.4'
 name: Music-Chord-Progression-NRO
 requires:
+  Algorithm::Combinatorics: '0'
   Carp: '0'
   Data::Dumper::Compact: '0'
   Moo: '2'
@@ -35,7 +36,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-Chord-Progression-NRO
   repository: https://github.com/ology/Music-Chord-Progression-NRO.git
-version: '0.0308'
+version: '0.0400'
 x_Dist_Zilla:
   perl:
     version: '5.032001'

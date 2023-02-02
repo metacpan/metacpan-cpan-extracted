@@ -68,7 +68,7 @@ for my $modname ( qw/bigint bigfloat bigrat bignum
     no strict 'refs';
     diag sprintf "%-24s %s\n", 
                  $modname . '@' . u(${"${modname}::VERSION"}),
-                 $INC{$modpath} ;
+                 ($INC{$modpath} =~ s#^$ENV{HOME}/#\$HOME/#r);
   } else {
     diag "(Module '$modname' is not available)\n";
   }

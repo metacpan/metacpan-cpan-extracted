@@ -1,0 +1,405 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/CSVUtils/csv_sorted_fields/csv_sorted_fields
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-02-02'; # DATE
+our $DIST = 'App-CSVUtils'; # DIST
+our $VERSION = '1.005'; # VERSION
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/CSVUtils/csv_sorted_fields/csv_sorted_fields",
+    program_name => "csv-sorted-fields",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+    use_utf8 => 1,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Check that CSV fields are sorted
+# PODNAME: csv-sorted-fields
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+csv-sorted-fields - Check that CSV fields are sorted
+
+=head1 VERSION
+
+This document describes version 1.005 of csv-sorted-fields (from Perl distribution App-CSVUtils), released on 2023-02-02.
+
+=head1 SYNOPSIS
+
+B<csv-sorted-fields> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<csv-sorted-fields> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<csv-sorted-fields> [B<L<--by-code|/"--by-code=s">>=I<any>|B<L<--by-code-json|/"--by-code=s">>=I<json>] [(B<L<--by-example|/"--by-examples-json=s">>=I<str>)+|B<L<--by-examples-json|/"--by-examples-json=s">>=I<json>] [B<L<--by-sortsub|/"--by-sortsub=s">>=I<str>] [B<L<--ci|/"--ci, -i">>|B<L<-i|/"--ci, -i">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--input-escape-char|/"--input-escape-char=s">>=I<str>] [B<L<--input-header|/"--no-input-header">>|B<L<--no-input-header|/"--no-input-header">>|B<L<--noinput-header|/"--no-input-header">>] [B<L<--input-quote-char|/"--input-quote-char=s">>=I<str>] [B<L<--input-sep-char|/"--input-sep-char=s">>=I<str>] [B<L<--input-tsv|/"--input-tsv">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--quiet-arg|/"--quiet-arg, -q">>|B<L<-q|/"--quiet-arg, -q">>|B<L<--no-quiet-arg|/"--quiet-arg, -q">>|B<L<--noquiet-arg|/"--quiet-arg, -q">>] [B<L<--reverse|/"--reverse, -r">>|B<L<-r|/"--reverse, -r">>] [(B<L<--sortsub-args|/"--sortsub-args=s%">> I<key>=I<s>)+|B<L<--sortsub-args-json|/"--sortsub-args=s%">>=I<json>] -- [I<L<input_filename|/"--input-filename=s">>]
+
+=head1 DESCRIPTION
+
+This utility checks that fields in the CSV are sorted according to specified
+sorting rule(s). Example C<input.csv>:
+
+ b,c,a
+ 1,2,3
+ 4,5,6
+
+Example check command:
+
+ % csv-sorted-fields input.csv; # check if the fields are ascibetically sorted
+ ERROR 400: Fields are NOT sorted
+
+Example C<input2.csv>:
+
+ c,b,a
+ 1,2,3
+ 4,5,6
+ 
+ % csv-sorted-fields input2.csv -r
+ Fields are sorted
+
+See L<csv-sort-fields> for details on sorting options.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--by-code-json>=I<s>
+
+Sort fields using Perl code (JSON-encoded).
+
+See C<--by-code>.
+
+=item B<--by-code>=I<s>
+
+Sort fields using Perl code.
+
+C<$a> and C<$b> (or the first and second argument) will contain C<[$field_name,
+$field_idx]>.
+
+
+=item B<--by-example>=I<s@>
+
+Add a field to sort by example.
+
+Can be specified multiple times.
+
+=item B<--by-examples-json>=I<s>
+
+Sort by a list of field names as examples (JSON-encoded).
+
+See C<--by-example>.
+
+=item B<--by-sortsub>=I<s>
+
+Sort using a Sort::Sub routine.
+
+When sorting rows, usually combined with C<--key> because most Sort::Sub routine
+expects a string to be compared against.
+
+When sorting fields, the Sort::Sub routine will get the field name as argument.
+
+
+=item B<--ci>, B<-i>
+
+(No description)
+
+
+=item B<--quiet-arg>, B<-q>
+
+If set to true, do not show messages.
+
+=item B<--reverse>, B<-r>
+
+(No description)
+
+
+=item B<--sortsub-args-json>=I<s>
+
+Arguments to pass to Sort::Sub routine (JSON-encoded).
+
+See C<--sortsub-args>.
+
+=item B<--sortsub-args>=I<s>%
+
+Arguments to pass to Sort::Sub routine.
+
+Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
+
+=back
+
+=head2 Input options
+
+=over
+
+=item B<--input-escape-char>=I<s>
+
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--input-tsv> option.
+
+
+=item B<--input-filename>=I<s>
+
+Input CSV file.
+
+Default value:
+
+ "-"
+
+Use C<-> to read from stdin.
+
+Encoding of input file is assumed to be UTF-8.
+
+
+Can also be specified as the 1st command-line argument.
+
+=item B<--input-quote-char>=I<s>
+
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--input-tsv> option.
+
+
+=item B<--input-sep-char>=I<s>
+
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--input-tsv> option.
+
+
+=item B<--input-tsv>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--input-sep-char>, C<--input-quote-char>, C<--input-escape-char>
+options. If one of those options is specified, then C<--input-tsv> will be
+ignored.
+
+
+=item B<--no-input-header>
+
+Specify that input CSV does not have a header row.
+
+By default, the first row of the input CSV will be assumed to contain field
+names (and the second row contains the first data row). When you declare that
+input CSV does not have header row (C<--no-input-header>), the first row of the
+CSV is assumed to contain the first data row. Fields will be named C<field1>,
+C<field2>, and so on.
+
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C csv-sorted-fields csv-sorted-fields
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete csv-sorted-fields 'p/*/`csv-sorted-fields`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-CSVUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-CSVUtils>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSVUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

@@ -1,0 +1,49 @@
+---
+abstract: 'A fast perl binding for Redis Cluster'
+author:
+  - 'plainbanana <plainbanana@mustardon.tokyo>'
+build_requires:
+  IO::CaptureOutput: '0'
+  Mouse: '0'
+  Sub::Retry: '0'
+  Test::Docker::Image: '0.05'
+  Test::LeakTrace: '0'
+  Test::More: '0.98'
+  Test::SharedFork: '0'
+configure_requires:
+  File::Spec: '0'
+  File::Which: '0'
+  File::chdir: '0'
+  Module::Build: '0.4005'
+  Module::Build::XSUtil: '0.02'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.20, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Redis-Cluster-Fast
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+    - deps
+provides:
+  Redis::Cluster::Fast:
+    file: lib/Redis/Cluster/Fast.pm
+    version: '0.01'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/plainbanana/Redis-Cluster-Fast/issues
+  homepage: https://github.com/plainbanana/Redis-Cluster-Fast
+  repository: https://github.com/plainbanana/Redis-Cluster-Fast.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

@@ -1,12 +1,11 @@
 package App::ModuleBuildTiny::Dist;
 
-use 5.010;
+use 5.014;
 use strict;
 use warnings;
-our $VERSION = '0.030';
+our $VERSION = '0.031';
 
 use CPAN::Meta;
-use Carp qw/croak/;
 use Config;
 use Encode qw/encode_utf8 decode_utf8/;
 use File::Basename qw/basename dirname/;
@@ -57,7 +56,7 @@ sub distfilename {
 sub generate_readme {
 	my $distname = shift;
 	my $filename = distfilename($distname);
-	croak "Main module file $filename doesn't exist" if not -f $filename;
+	die "Main module file $filename doesn't exist\n" if not -f $filename;
 	my $parser = Pod::Simple::Text->new;
 	$parser->output_string( \my $content );
 	$parser->parse_characters(1);
@@ -82,9 +81,7 @@ sub load_mergedata {
 sub distname {
 	my $extra = shift;
 	return delete $extra->{name} if defined $extra->{name};
-	my $distname = basename(rel2abs('.'));
-	$distname =~ s/(?:^(?:perl|p5)-|[\-\.]pm$)//x;
-	return $distname;
+	return basename(rel2abs('.')) =~ s/ (?: ^ (?: perl|p5 ) - | [\-\.]pm $ )//xr;
 }
 
 sub detect_license {
@@ -94,7 +91,7 @@ sub detect_license {
 		Software::LicenseUtils->VERSION(0.103014);
 		my $spec_version = $mergedata->{'meta-spec'} && $mergedata->{'meta-spec'}{version} ? $mergedata->{'meta-spec'}{version} : 2;
 		my @guess = Software::LicenseUtils->guess_license_from_meta_key($mergedata->{license}[0], $spec_version);
-		croak "Couldn't parse license from metamerge: @guess" if @guess > 1;
+		die "Couldn't parse license from metamerge: @guess\n" if @guess > 1;
 		if (@guess) {
 			my $class = $guess[0];
 			require_module($class);
@@ -109,17 +106,18 @@ sub detect_license {
 		my $content = "=head1 LICENSE\n" . $license_pod;
 		my @guess = Software::LicenseUtils->guess_license_from_pod($content);
 		next if not @guess;
-		croak "Couldn't parse license from $license_section in $filename: @guess" if @guess != 1;
+		die "Couldn't parse license from $license_section in $filename: @guess\n" if @guess != 1;
 		my $class = $guess[0];
 		my ($year) = $license_pod =~ /.*? copyright .*? ([\d\-]+)/;
 		require_module($class);
 		return $class->new({holder => join(', ', @{$authors}), year => $year});
 	}
-	croak "No license found in $filename";
+	die "No license found in $filename\n";
 }
 
 sub checkchanges {
-	my $version = quotemeta shift;
+	my $self = shift;
+	my $version = quotemeta $self->meta->version;
 	open my $changes, '<:raw', 'Changes' or die "Couldn't open Changes file";
 	my (undef, @content) = grep { / ^ $version (?:-TRIAL)? (?:\s+|$) /x ... /^\S/ } <$changes>;
 	pop @content while @content && $content[-1] =~ / ^ (?: \S | \s* $ ) /x;
@@ -128,7 +126,7 @@ sub checkchanges {
 
 sub checkmeta {
 	my $self = shift;
-	(my $module_name = $self->{meta}->name) =~ s/-/::/g;
+	my $module_name = $self->{meta}->name =~ s/-/::/gr;
 	my $meta_version = $self->{meta}->version;
 	my $detected_version = $self->{data}->version($module_name);
 	die sprintf "Version mismatch between module and meta, did you forgot to run regenerate? (%s versus %s)", $detected_version, $meta_version if $detected_version != $meta_version;
@@ -180,6 +178,7 @@ sub load_prereqs {
 		require Module::CPANfile;
 		push @prereqs, Module::CPANfile->load('cpanfile')->prereq_specs;
 	}
+
 	if (@prereqs == 1) {
 		return $prereqs[0];
 	}
@@ -307,8 +306,6 @@ sub write_tarball {
 	my ($self, $name) = @_;
 	require Archive::Tar;
 	my $arch = Archive::Tar->new;
-	checkchanges($self->meta->version);
-	$self->checkmeta();
 	for my $filename ($self->files) {
 		$arch->add_data($filename, $self->get_file($filename), { mode => oct '0644'} );
 	}
@@ -327,12 +324,6 @@ sub get_file {
 	return if not exists $self->{files}{$filename};
 	my $raw = $self->{files}{$filename};
 	return $raw ? encode_utf8($raw) : read_binary($filename);
-}
-
-sub is_generated {
-	my ($self, $filename) = @_;
-	return if not exists $self->{files}{$filename};
-	return length $self->{files}{$filename};
 }
 
 sub run {

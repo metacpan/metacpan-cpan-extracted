@@ -21,10 +21,8 @@ confess "Non-zero CHILD_ERROR ($?)" if $? != 0;
 use Test::More;
 
 use Data::Dumper::Interp;
-diag "Loaded ", $INC{"Data::Dumper::Interp.pm" =~ s/::/\//gr},
-     " VERSION=", ($Data::Dumper::Interp::VERSION // "undef"),"\n";
 
-confess "Non-zero CHILD_ERROR ($?)" if $? != 0;
+confess "Non-zero initial CHILD_ERROR ($?)" if $? != 0;
 
 # Format a Unicode string in «french quotes» and also with hex escapes
 # (so we can still see something useful on non-Unicode platforms).
@@ -443,9 +441,12 @@ my $ratstr  = '1/9';
   die(u(blessed($bigf))," <<$bigfstr>> ",u($bigf)," $@") unless blessed($bigf) =~ /^Math::BigFloat/;
   checklit(sub{eval $_[0]}, $bigf, qr/(?:\(Math::BigFloat[^\)]*\))?${bigfstr}/);
 
+  # Some implementations make everything a Math::BigFloat, others make
+  # integers a Math::BigInt .
   my $bigi = eval $bigistr // die;
-  die(u(blessed($bigi))," <<$bigistr>> ",u($bigi)," $@") unless blessed($bigi) =~ /^Math::BigInt/;
-  checklit(sub{eval $_[0]}, $bigi, qr/(?:\(Math::BigInt[^\)]*\))?${bigistr}/);
+  die(u(blessed($bigi))," <<$bigistr>> ",u($bigi)," $@") 
+    unless blessed($bigi) =~ /^Math::Big\w*/;
+  checklit(sub{eval $_[0]}, $bigi, qr/(?:\(Math::Big\w*[^\)]*\))?${bigistr}/);
 
   # Confirm that various Overloads values disable
   foreach my $Sval (0, undef, "", [], [0], [""]) {

@@ -8,9 +8,9 @@ use Text::CSV_XS;
 use Text::CSV_XS::TSV;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-01'; # DATE
+our $DATE = '2023-02-02'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.004'; # VERSION
+our $VERSION = '1.005'; # VERSION
 
 binmode STDIN, ':encoding(utf8)';
 binmode STDOUT, ':encoding(utf8)';
@@ -38,7 +38,7 @@ tsv2csv - Convert TSV to CSV
 
 =head1 VERSION
 
-This document describes version 1.004 of tsv2csv (from Perl distribution App-CSVUtils), released on 2023-02-01.
+This document describes version 1.005 of tsv2csv (from Perl distribution App-CSVUtils), released on 2023-02-02.
 
 =head1 SYNOPSIS
 

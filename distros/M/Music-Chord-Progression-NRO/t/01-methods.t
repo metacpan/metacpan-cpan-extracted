@@ -10,7 +10,7 @@ my $module = 'Music::Chord::Progression::NRO';
 use_ok $module;
 
 subtest throws => sub {
-    throws_ok { $module->new(base_note => 'X') }
+    throws_ok { $module->new(base_note => 'I') }
         qr/not a valid note/, 'bogus base_note';
 
     throws_ok { $module->new(base_octave => -1) }
@@ -43,7 +43,7 @@ subtest default => sub {
 
 subtest transform_array => sub {
     my $obj = new_ok $module => [
-        transform => [qw(X P P)],
+        transform => [qw(I P P)],
     ];
     my $got = $obj->generate;
     no warnings qw(qw);
@@ -86,7 +86,7 @@ subtest midinum_format => sub {
 subtest circular => sub {
     my $expect = 4;
     my $obj = new_ok $module => [
-        transform => [qw(X P P)],
+        transform => [qw(I P P)],
         max       => $expect,
     ];
     my $got = $obj->circular;

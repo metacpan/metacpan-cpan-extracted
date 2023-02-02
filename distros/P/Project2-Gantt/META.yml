@@ -1,0 +1,70 @@
+---
+abstract: 'Generate Gantt images'
+author:
+  - 'Bruno Ramos <bramos@cpan.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Directory: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Project2-Gantt
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Project2::Gantt:
+    file: lib/Project2/Gantt.pm
+    version: '0.006'
+  Project2::Gantt::DateUtils:
+    file: lib/Project2/Gantt/DateUtils.pm
+    version: '0.006'
+  Project2::Gantt::GanttHeader:
+    file: lib/Project2/Gantt/GanttHeader.pm
+    version: '0.006'
+  Project2::Gantt::Globals:
+    file: lib/Project2/Gantt/Globals.pm
+    version: '0.006'
+  Project2::Gantt::ImageWriter:
+    file: lib/Project2/Gantt/ImageWriter.pm
+    version: '0.006'
+  Project2::Gantt::Resource:
+    file: lib/Project2/Gantt/Resource.pm
+    version: '0.006'
+  Project2::Gantt::Skin:
+    file: lib/Project2/Gantt/Skin.pm
+    version: '0.006'
+  Project2::Gantt::SpanInfo:
+    file: lib/Project2/Gantt/SpanInfo.pm
+    version: '0.006'
+  Project2::Gantt::Task:
+    file: lib/Project2/Gantt/Task.pm
+    version: '0.006'
+  Project2::Gantt::TextUtils:
+    file: lib/Project2/Gantt/TextUtils.pm
+    version: '0.006'
+  Project2::Gantt::TimeSpan:
+    file: lib/Project2/Gantt/TimeSpan.pm
+    version: '0.006'
+requires:
+  Alien::Font::Vera: '0.013'
+  Imager: '1.019'
+  Mojolicious: '9.31'
+resources:
+  repository: git://github.com/brunoramoslu/Project2-Gantt.git
+version: '0.006'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -1,0 +1,6 @@
+TODO:
+ - Add option to sort tasks by date automatically
+ - Add option to hide weekends
+ - Add tests for days and months mode
+ - ADd tests for sub projects
+ - Add better colors to default skin

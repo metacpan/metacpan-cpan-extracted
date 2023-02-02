@@ -1,0 +1,35 @@
+---
+abstract: 'Contract ABI utilities'
+author:
+  - 'Reginaldo Costa <refeco@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Code::TidyAll: '0.82'
+  Test::Fatal: '0.016'
+  Test::More: '0.98'
+  Test::Perl::Critic: '1.04'
+  Test::Pod: '1.52'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Blockchain-Contract-Solidity-ABI
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '1.50'
+  Digest::Keccak: '0.05'
+  Math::BigInt: '1.999837'
+  Module::Load: '0.36'
+  indirect: '0.39'
+  perl: '5.026000'
+resources:
+  repository: https://github.com/refeco/perl-ABI.git
+version: '0.005'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

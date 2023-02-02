@@ -6,6 +6,10 @@ ABSTRACT
 
     Temporary Databases for Testing
 
+VERSION
+
+    0.10
+
 SYNOPSIS
 
       use Test::DB;
@@ -47,12 +51,6 @@ DESCRIPTION
       Establish a connection to the newly created test/temporary database.
 
         $tdbo->create->dbh;
-
-    #4
-
-      Make the test database object immutable.
-
-        $tdbo->create->database('example'); # error
 
     on destroy
 
@@ -121,22 +119,16 @@ DESCRIPTION
         my $tdbo = $tdb->sqlite(%options)->create;
         my $sqlite = Mojo::SQLite->new($tdbo->uri);
 
-LIBRARIES
-
-    This package uses type constraints from:
-
-    Types::Standard
-
 METHODS
 
-    This package implements the following methods:
+    This package provides the following methods:
 
  clone
 
-      clone(Str :$database, Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+    clone(Str :$database, Str %options) : Maybe[Object]
 
     The clone method generates a database based on the type and database
-    template specified and returns a Test::DB::Object with an active
+    template specified and returns a driver object with an active
     connection, dbh and dsn. If the database specified doesn't have a
     corresponding database driver this method will returned the undefined
     value. The type of database can be omitted if the TESTDB_DATABASE
@@ -144,7 +136,7 @@ METHODS
     sqlite, mysql, mssql or postgres. Any options provided are passed along
     to the test database object class constructor.
 
-    clone example #1
+    clone example 1
 
         # given: synopsis
       
@@ -152,7 +144,7 @@ METHODS
       
         $tdb->clone(template => 'template0');
 
-    clone example #2
+    clone example 2
 
         # given: synopsis
       
@@ -161,7 +153,7 @@ METHODS
       
         $tdb->clone;
 
-    clone example #3
+    clone example 3
 
         # given: synopsis
       
@@ -171,24 +163,24 @@ METHODS
 
  create
 
-      create(Str :$database, Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+    create(Str :$database, Str %options) : Maybe[Object]
 
     The create method generates a database based on the type specified and
-    returns a Test::DB::Object with an active connection, dbh and dsn. If
-    the database specified doesn't have a corresponding database driver
-    this method will returned the undefined value. The type of database can
-    be omitted if the TESTDB_DATABASE environment variable is set, if not
-    the type of database must be either sqlite, mysql, mssql or postgres.
-    Any options provided are passed along to the test database object class
+    returns a driver object with an active connection, dbh and dsn. If the
+    database specified doesn't have a corresponding database driver this
+    method will returned the undefined value. The type of database can be
+    omitted if the TESTDB_DATABASE environment variable is set, if not the
+    type of database must be either sqlite, mysql, mssql or postgres. Any
+    options provided are passed along to the test database object class
     constructor.
 
-    create example #1
+    create example 1
 
         # given: synopsis
       
         $tdb->create;
 
-    create example #2
+    create example 2
 
         # given: synopsis
       
@@ -196,7 +188,7 @@ METHODS
       
         $tdb->create;
 
-    create example #3
+    create example 3
 
         # given: synopsis
       
@@ -204,11 +196,11 @@ METHODS
 
  mssql
 
-      mssql(Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+    mssql(Str %options) : Maybe[InstanceOf["Test::DB::Mssql"]]
 
     The mssql method builds and returns a Test::DB::Mssql object.
 
-    mssql example #1
+    mssql example 1
 
         # given: synopsis
       
@@ -216,11 +208,11 @@ METHODS
 
  mysql
 
-      mysql(Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+    mysql(Str %options) : Maybe[InstanceOf["Test::DB::Mysql"]]
 
     The mysql method builds and returns a Test::DB::Mysql object.
 
-    mysql example #1
+    mysql example 1
 
         # given: synopsis
       
@@ -228,11 +220,11 @@ METHODS
 
  postgres
 
-      postgres(Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+    postgres(Str %options) : Maybe[InstanceOf["Test::DB::Postgres"]]
 
     The postgres method builds and returns a Test::DB::Postgres object.
 
-    postgres example #1
+    postgres example 1
 
         # given: synopsis
       
@@ -240,41 +232,13 @@ METHODS
 
  sqlite
 
-      sqlite(Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+    sqlite(Str %options) : Maybe[InstanceOf["Test::DB::Sqlite"]]
 
     The sqlite method builds and returns a Test::DB::Sqlite object.
 
-    sqlite example #1
+    sqlite example 1
 
         # given: synopsis
       
         $tdb->sqlite;
-
-AUTHOR
-
-    Al Newkirk, awncorp@cpan.org
-
-LICENSE
-
-    Copyright (C) 2011-2019, Al Newkirk, et al.
-
-    This is free software; you can redistribute it and/or modify it under
-    the terms of the The Apache License, Version 2.0, as elucidated in the
-    "license file"
-    <https://github.com/iamalnewkirk/test-db/blob/master/LICENSE>.
-
-PROJECT
-
-    Wiki <https://github.com/iamalnewkirk/test-db/wiki>
-
-    Project <https://github.com/iamalnewkirk/test-db>
-
-    Initiatives <https://github.com/iamalnewkirk/test-db/projects>
-
-    Milestones <https://github.com/iamalnewkirk/test-db/milestones>
-
-    Contributing
-    <https://github.com/iamalnewkirk/test-db/blob/master/CONTRIBUTE.md>
-
-    Issues <https://github.com/iamalnewkirk/test-db/issues>
 

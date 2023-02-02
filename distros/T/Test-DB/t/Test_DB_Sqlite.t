@@ -1,11 +1,14 @@
+package main;
+
 use 5.014;
 
 use strict;
 use warnings;
-use routines;
 
-use Test::Auto;
 use Test::More;
+use Venus::Test;
+
+my $test = test(__FILE__);
 
 =name
 
@@ -13,17 +16,23 @@ Test::DB::Sqlite
 
 =cut
 
+$test->for('name');
+
 =tagline
 
 Temporary Testing Databases for Sqlite
 
 =cut
 
+$test->for('tagline');
+
 =abstract
 
 Temporary Sqlite Database for Testing
 
 =cut
+
+$test->for('abstract');
 
 =includes
 
@@ -32,6 +41,8 @@ method: create
 method: destroy
 
 =cut
+
+$test->for('includes');
 
 =synopsis
 
@@ -45,26 +56,6 @@ method: destroy
 
 =cut
 
-=libraries
-
-Types::Standard
-
-=cut
-
-=inherits
-
-Test::DB::Object
-
-=cut
-
-=integrates
-
-Data::Object::Role::Buildable
-Data::Object::Role::Immutable
-Data::Object::Role::Stashable
-
-=cut
-
 =attributes
 
 dbh: ro, opt, Object
@@ -74,6 +65,8 @@ file: ro, opt, Str
 uri: ro, opt, Str
 
 =cut
+
+$test->for('attributes');
 
 =description
 
@@ -144,17 +137,15 @@ SKIP: {
     skip 'Environment not configured for Sqlite testing';
   }
 
-  my $test = testauto(__FILE__);
-
-  my $subs = $test->standard;
-
-  $subs->synopsis(fun($tryable) {
+  $test->for('synopsis', sub {
+    my ($tryable) = @_;
     ok my $result = $tryable->result;
 
     $result
   });
 
-  $subs->example(-1, 'clone', 'method', fun($tryable) {
+  $test->for('example', 1, 'clone', sub {
+    my ($tryable) = @_;
     ok my $result = $tryable->result;
     ok $result->isa('Test::DB::Sqlite');
     ok $result->dbh;
@@ -164,7 +155,8 @@ SKIP: {
     $result
   });
 
-  $subs->example(-1, 'create', 'method', fun($tryable) {
+  $test->for('example', 1, 'create', sub {
+    my ($tryable) = @_;
     ok my $result = $tryable->result;
     ok $result->isa('Test::DB::Sqlite');
     ok $result->dbh;
@@ -174,12 +166,15 @@ SKIP: {
     $result
   });
 
-  $subs->example(-1, 'destroy', 'method', fun($tryable) {
+  $test->for('example', 1, 'destroy', sub {
+    my ($tryable) = @_;
     ok my $result = $tryable->result;
     ok $result->isa('Test::DB::Sqlite');
 
     $result
   });
 }
+
+$test->render('lib/Test/DB/Sqlite.pod') if $ENV{RENDER};
 
 ok 1 and done_testing;

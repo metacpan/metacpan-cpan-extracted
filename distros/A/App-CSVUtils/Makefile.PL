@@ -49,6 +49,7 @@ my %WriteMakefileArgs = (
     "script/csv-sort-fields",
     "script/csv-sort-rows",
     "script/csv-sorted",
+    "script/csv-sorted-fields",
     "script/csv-sorted-rows",
     "script/csv-split",
     "script/csv-sum",
@@ -109,7 +110,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Needs" => 0
   },
-  "VERSION" => "1.004",
+  "VERSION" => "1.005",
   "test" => {
     "TESTS" => "t/*.t"
   }

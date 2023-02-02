@@ -1,5 +1,21 @@
 Revision history for Perl extension RxPerl
 
+v6.22.1 2023-02-02T16:23:23Z
+
+    - updated documentation, with warning for op_group_by
+
+v6.22.0 2023-02-02T15:04:14Z
+
+    - added op_group_by
+
+v6.21.0 2023-02-02T09:49:06Z
+
+    - added op_to_array and op_throw_if_empty
+
+v6.20.0 2023-02-01T21:43:10Z
+
+    - added op_last, op_max, op_min, op_race_with and op_take_last
+
 v6.19.0 2023-02-01T14:48:40Z
 
     - added op_find, op_find_index, rx_iif and op_is_empty

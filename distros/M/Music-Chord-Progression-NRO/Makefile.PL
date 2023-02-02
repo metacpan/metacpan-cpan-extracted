@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.013002",
   "NAME" => "Music::Chord::Progression::NRO",
   "PREREQ_PM" => {
+    "Algorithm::Combinatorics" => 0,
     "Carp" => 0,
     "Data::Dumper::Compact" => 0,
     "Moo" => 2,
@@ -36,7 +37,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0308",
+  "VERSION" => "0.0400",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,6 +45,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Algorithm::Combinatorics" => 0,
   "Carp" => 0,
   "Data::Dumper::Compact" => 0,
   "File::Spec" => 0,

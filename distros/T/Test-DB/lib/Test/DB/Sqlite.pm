@@ -5,85 +5,93 @@ use 5.014;
 use strict;
 use warnings;
 
-use registry;
-use routines;
+use Venus::Class;
 
-use Data::Object::Class;
-use Data::Object::ClassHas;
-
-extends 'Test::DB::Object';
-
-with 'Data::Object::Role::Buildable';
-with 'Data::Object::Role::Immutable';
-with 'Data::Object::Role::Stashable';
+with 'Venus::Role::Optional';
 
 use DBI;
 use File::Copy ();
 use File::Spec ();
 use File::Temp ();
 
-our $VERSION = '0.07'; # VERSION
+# VERSION
+
+our $VERSION = '0.10';
 
 # ATTRIBUTES
 
-has 'dbh' => (
-  is => 'ro',
-  isa => 'Object',
-  new => 1,
-);
+attr 'dbh';
+attr 'dsn';
+attr 'file';
+attr 'uri';
+attr 'database';
+attr 'template';
 
-fun new_dbh($self) {
-  DBI->connect($self->dsn, '', '', { RaiseError => 1, AutoCommit => 1 })
+# OPTIONS
+
+sub lazy_build_dbh {
+  my ($self, $data) = @_;
+
+  $data ||= DBI->connect($self->dsn, '', '', { RaiseError => 1, AutoCommit => 1 });
+
+  return $data;
 }
 
-has 'dsn' => (
-  is => 'ro',
-  isa => 'Str',
-  new => 1,
-);
+sub lazy_build_dsn {
+  my ($self, $data) = @_;
 
-fun new_dsn($self) {
-  "dbi:SQLite:dbname=@{[$self->file]}"
+  return $data ? $data : "dbi:SQLite:dbname=@{[$self->file]}";
 }
 
-has 'file' => (
-  is => 'ro',
-  isa => 'Str',
-  new => 1,
-);
+sub lazy_build_file {
+  my ($self, $data) = @_;
 
-fun new_file($self) {
-  File::Spec->catfile(File::Temp::tempdir, "@{[$self->database]}.db")
+  my $database = $self->database;
+
+  return $data ? $data : File::Spec->catfile(File::Temp::tempdir, "$database.db");
 }
 
-has 'uri' => (
-  is => 'ro',
-  isa => 'Str',
-  new => 1,
-);
+sub lazy_build_uri {
+  my ($self, $data) = @_;
 
-fun new_uri($self) {
-  "sqlite:@{[$self->file]}"
+  return $data ? $data : "sqlite:@{[$self->file]}";
+}
+
+sub lazy_build_database {
+  my ($self, $data) = @_;
+
+  return $data ? $data : join '_', 'testing_db', time, $$, sprintf "%04d", rand 999;
+}
+
+sub lazy_build_template {
+  my ($self, $data) = @_;
+
+  return $data ? $data : $ENV{TESTDB_TEMPLATE};
 }
 
 # METHODS
 
-method clone(Str $source) {
-  File::Copy::copy($source, $self->file);
+sub clone {
+  my ($self, $file) = @_;
+
+  File::Copy::copy($file || $self->template, $self->file);
 
   return $self->create;
 }
 
-method create() {
+sub create {
+  my ($self) = @_;
+
   my $dbh = $self->dbh;
 
   $self->uri;
-  $self->immutable;
 
   return $self;
 }
 
-method destroy() {
+sub destroy {
+  my ($self) = @_;
+
   my $file = $self->file;
 
   unlink $file;
@@ -93,7 +101,7 @@ method destroy() {
 
 1;
 
-=encoding utf8
+
 
 =head1 NAME
 
@@ -104,6 +112,12 @@ Test::DB::Sqlite - Temporary Testing Databases for Sqlite
 =head1 ABSTRACT
 
 Temporary Sqlite Database for Testing
+
+=cut
+
+=head1 VERSION
+
+0.10
 
 =cut
 
@@ -126,45 +140,9 @@ for testing purposes.
 
 =cut
 
-=head1 INHERITS
-
-This package inherits behaviors from:
-
-L<Test::DB::Object>
-
-=cut
-
-=head1 INTEGRATES
-
-This package integrates behaviors from:
-
-L<Data::Object::Role::Buildable>
-
-L<Data::Object::Role::Immutable>
-
-L<Data::Object::Role::Stashable>
-
-=cut
-
-=head1 LIBRARIES
-
-This package uses type constraints from:
-
-L<Types::Standard>
-
-=cut
-
 =head1 ATTRIBUTES
 
 This package has the following attributes:
-
-=cut
-
-=head2 database
-
-  database(Str)
-
-This attribute is read-only, accepts C<(Str)> values, and is optional.
 
 =cut
 
@@ -179,6 +157,14 @@ This attribute is read-only, accepts C<(Object)> values, and is optional.
 =head2 dsn
 
   dsn(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is optional.
+
+=cut
+
+=head2 database
+
+  database(Str)
 
 This attribute is read-only, accepts C<(Str)> values, and is optional.
 
@@ -202,19 +188,19 @@ This attribute is read-only, accepts C<(Str)> values, and is optional.
 
 =head1 METHODS
 
-This package implements the following methods:
+This package provides the following methods:
 
 =cut
 
 =head2 clone
 
-  clone(Str $source) : Object
+clone(Str $source) : Object
 
 The clone method creates a temporary database from a database template.
 
 =over 4
 
-=item clone example #1
+=item clone example 1
 
   # given: synopsis
 
@@ -228,13 +214,13 @@ The clone method creates a temporary database from a database template.
 
 =head2 create
 
-  create() : Object
+create() : Object
 
 The create method creates a temporary database and returns the invocant.
 
 =over 4
 
-=item create example #1
+=item create example 1
 
   # given: synopsis
 
@@ -248,13 +234,13 @@ The create method creates a temporary database and returns the invocant.
 
 =head2 destroy
 
-  destroy() : Object
+destroy() : Object
 
 The destroy method destroys (drops) the database and returns the invocant.
 
 =over 4
 
-=item destroy example #1
+=item destroy example 1
 
   # given: synopsis
 
@@ -264,33 +250,5 @@ The destroy method destroys (drops) the database and returns the invocant.
   # <Test::DB::Sqlite>
 
 =back
-
-=cut
-
-=head1 AUTHOR
-
-Al Newkirk, C<awncorp@cpan.org>
-
-=head1 LICENSE
-
-Copyright (C) 2011-2019, Al Newkirk, et al.
-
-This is free software; you can redistribute it and/or modify it under the terms
-of the The Apache License, Version 2.0, as elucidated in the L<"license
-file"|https://github.com/iamalnewkirk/test-db/blob/master/LICENSE>.
-
-=head1 PROJECT
-
-L<Wiki|https://github.com/iamalnewkirk/test-db/wiki>
-
-L<Project|https://github.com/iamalnewkirk/test-db>
-
-L<Initiatives|https://github.com/iamalnewkirk/test-db/projects>
-
-L<Milestones|https://github.com/iamalnewkirk/test-db/milestones>
-
-L<Contributing|https://github.com/iamalnewkirk/test-db/blob/master/CONTRIBUTE.md>
-
-L<Issues|https://github.com/iamalnewkirk/test-db/issues>
 
 =cut

@@ -44,6 +44,33 @@ ok( !(first { $_ > 10 } 1 .. 9), 'list does not contain a value above ten' );
       '$_ was untouched during first my $x block' );
 }
 
+# variable is aliased to input list; mutations are visible
+{
+   my @input;
+   my $output;
+
+   $output = first { ++$_ } @input = (1);
+   is( $output, 2, 'result value sees modification of $_' );
+   is( \@input, [ 2 ], 'input list sees modification of $_' );
+
+   $output = first my $x { ++$x } @input = (1);
+   is( $output, 2, 'result value sees modification of lexical $x' );
+   is( \@input, [ 2 ], 'input list sees modification of lexical $x' );
+}
+
+# result is aliased to input list; mutations are visible
+{
+   my @input;
+
+   sub incr { $_[0]++ }
+
+   incr first { 1 } @input = (1);
+   is( \@input, [ 2 ], 'result was aliased to input list of $_' );
+
+   incr first my $x { 1 } @input = (1);
+   is( \@input, [ 2 ], 'result was aliased to input list of lexical $x' );
+}
+
 # refcounts
 {
    my $arr = [];

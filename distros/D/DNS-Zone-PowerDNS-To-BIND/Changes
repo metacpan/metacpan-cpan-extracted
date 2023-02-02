@@ -1,3 +1,12 @@
+0.010   2022-11-12  Released-By: PERLANCAR; Urgency: medium
+
+        - Add support for many other record types: AFSDB, APL, AXFR, CAA,
+          CDNSKEY, CDS, CERT, CSYNC, DHCID, DLV, DNAME, DNSKEY, DS, EUI48,
+          EUI64, HINFO, HIP, HTTPS, IPSECKEY, IXFR, KEY, KX, LOC, NAPTR, NSEC,
+          NSEC3, NSEC3PARAM, OPENPGPKEY, OPT, RP, RRSIG, SIG, SMIMEA, SVCB, TA,
+          TKEY, TLSA, TSIG, URI, ZONEMD (thanks keteague).
+
+
 0.009   2022-11-05  Released-By: PERLANCAR; Urgency: medium
 
         - Add support for AAAA and PTR records (thanks keteague).

@@ -10,9 +10,7 @@ use Test::DB;
 my $testdb = Test::DB->new;
 
 # creates DB
-my $pgdb = $testdb->create(
-  database => 'postgres',
-);
+my $pgdb = $testdb->postgres->create;
 
 # do stuff in test DB
 $pgdb->dbh->do('create table users (id serial primary key)');

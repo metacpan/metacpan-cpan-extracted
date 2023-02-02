@@ -10,9 +10,7 @@ use Test::DB;
 my $testdb = Test::DB->new;
 
 # creates DB
-my $sldb = $testdb->create(
-  database => 'sqlite',
-);
+my $sldb = $testdb->sqlite->create;
 
 # do stuff in test DB
 $sldb->dbh->do('create table users (id int primary key)');

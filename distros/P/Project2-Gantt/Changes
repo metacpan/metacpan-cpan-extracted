@@ -1,0 +1,20 @@
+Revision history for Project2-Gantt
+
+0.006     2023-02-02 16:06:40 CET
+    - Fix undef warning in debug log in sub project loop
+
+0.005     2023-02-02 15:10:50 CET
+    - Fix Changes management when releasing new version
+
+0.004     2023-02-02 14:54:01 CET
+
+0.003     2023-02-01 17:12:35 CET (TRIAL RELEASE)
+    - Fix Changes format
+    - Add better test for hours mode using Test::Directory
+
+0.002     2023-02-01 17:05:26 CET (TRIAL RELEASE)
+    - Fix hours mode
+    - Small improvements
+
+0.001     2023-01-29 12:55:56 CET (TRIAL RELEASE)
+    - Initial release

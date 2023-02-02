@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package List::Keywords 0.09;
+package List::Keywords 0.10;
 
 use v5.14;
 use warnings;
@@ -61,6 +61,48 @@ In regular operation where the code is just performing some test on each item,
 and does not make use of C<caller> or C<return>, this should not cause any
 noticable differences.
 
+=head2 Lexical Variable Syntax
+
+Newly added in I<version 0.09> many of the functions in this module support a
+new syntax idea that may be added to Perl core eventually, whereby a lexical
+variable can be declared before the code block. In that case, this lexical
+variable takes the place of the global C<$_> for the purpose of carrying
+values from the input list.
+
+This syntax is currently under discussion for Perl's C<map> and C<grep>
+blocks, and may be added in a future release of Perl.
+
+L<https://github.com/Perl/RFCs/pull/33>
+
+=head2 Aliasing and Modification
+
+Each time the block code is executed, the global C<$_> or the lexical variable
+being used is aliased to an element of the input list (in the same way as it
+would be for perl's C<map> or C<foreach> loops, for example). If the block
+attempts to modify the value of this variable, such modifications are visible
+in the input list. You almost certainly want to avoid doing this.
+
+For example:
+
+   my @numbers = ...;
+   my $x = first my $x { $x++ > 10 } @numbers;
+
+This will modify values in the C<@numbers> array, but due to the short-circuit
+nature of C<first>, will only have modified values up to the selected element
+by the time it returns. This will likely confuse later uses of the input
+array.
+
+Additionally, the result of C<first> is also aliased to the input list, much
+as it is for core perl's C<grep>. This may mean that values passed in to other
+functions have an ability to mutate at a distance.
+
+For example:
+
+   func( first { ... } @numbers );
+
+Here, the invoked C<func()> may be able to modify the C<@numbers> array, for
+example by modifying its own C<@_> array.
+
 =head2 Performance
 
 The following example demonstrates a simple case and shows how the performance
@@ -83,6 +125,7 @@ The C<List::Keyword> version here ran 26% faster.
 my %KEYWORD_OK = map { $_ => 1 } qw(
    first any all none notall
    reduce reductions
+   ngrep nmap
 );
 
 sub import
@@ -144,6 +187,33 @@ sub B::Deparse::pp_reducewhile
 {
    return B::Deparse::mapop(@_, "reduce");
 }
+
+sub deparse_niter
+{
+   my ($name, $self, $op, $cx) = @_;
+   my $targ = $op->targ;
+   my $targcount = $op->private;
+
+   # We can't just call B::Deparse::mapop because of the `my ($var)` list
+   my $kid = $op->first;
+   $kid = $kid->first->sibling; # skip PUSHMARK
+   my $block = $kid->first;
+   my @varnames = map { $self->padname($_) } $targ .. $targ + $targcount - 1;
+
+   $kid = $kid->sibling;
+   my @exprs;
+   for(; !B::Deparse::null($kid); $kid = $kid->sibling) {
+      my $expr = $self->deparse($kid, 6);
+      push @exprs, $expr if defined $expr;
+   }
+
+   my $code = "my (" . join(", ", @varnames) . ") {" . $self->deparse($block, 0) . "} "
+      . join(", ", @exprs);
+   return $self->maybe_parens_func($name, $code, $cx, 5);
+}
+
+sub B::Deparse::pp_ngrepwhile { deparse_niter(ngrep => @_) }
+sub B::Deparse::pp_nmapwhile  { deparse_niter(nmap  => @_) }
 
 =head1 KEYWORDS
 
@@ -236,6 +306,53 @@ I<Since version 0.06.>
 Similar to C<reduce>, but returns a full list of all the partial results of
 every invocation, beginning with the initial value itself and ending with the
 final result.
+
+=cut
+
+=head1 N-AT-A-TIME FUNCTIONS
+
+The following two functions are a further experiment to try out n-at-a-time
+lexical variable support on the core C<grep> and C<map> operators. They are
+differently named, because keyword plugins cannot replace existing core
+keywords, only add new ones.
+
+=head2 ngrep
+
+   @values = ngrep my ($var1, $var2, ...) { CODE } LIST
+
+   $values = ngrep my ($var1, $var2, ...) { CODE } LIST
+
+I<Since version 0.10.>
+
+A variation on core's C<grep>, which uses lexical variable syntax to request a
+number of items at once. The input list is broken into bundles sized according
+to the number of variables declared. The block of code is called in scalar
+context with the variables set to each corresponding bundle of values, and the
+bundles for which the block returned true are saved for the resulting list.
+
+In scalar context, returns the number of values that would have been present
+in the resulting list (i.e. this is not the same as the number of times the
+block returned true).
+
+=cut
+
+=head2 nmap
+
+   @results = nmap my ($var1, $var2, ...) { CODE } LIST
+
+   $results = nmap my ($var1, $var2, ...) { CODE } LIST
+
+I<Since version 0.10.>
+
+A variation on core's C<map>, which uses lexical variable syntax to request a
+number of items at once. The input list is broken into bundles sized according
+to the number of variables declared. The block of code is called in list
+context with the variables set to each corresponding bundle of values, and the
+results of the block from each bundle are concatenated together to form the
+result list.
+
+In scalar context, returns the number of values that would have been present
+in the resulting list.
 
 =cut
 

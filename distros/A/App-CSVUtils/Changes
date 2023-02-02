@@ -1,3 +1,10 @@
+1.005   2023-02-02  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utility: csv-sorted-fields.
+
+        - [test] Add tests for csv-sorted-{rows,fields}.
+
+
 1.004   2023-02-01  Released-By: PERLANCAR; Urgency: medium
 
         - Add utility: csv-sorted-rows.

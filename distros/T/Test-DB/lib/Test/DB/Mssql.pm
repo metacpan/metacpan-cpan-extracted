@@ -5,120 +5,109 @@ use 5.014;
 use strict;
 use warnings;
 
-use registry;
-use routines;
+use Venus::Class;
 
-use Data::Object::Class;
-use Data::Object::ClassHas;
-
-extends 'Test::DB::Object';
-
-with 'Data::Object::Role::Buildable';
-with 'Data::Object::Role::Immutable';
-with 'Data::Object::Role::Stashable';
+with 'Venus::Role::Optional';
 
 use DBI;
 
-our $VERSION = '0.07'; # VERSION
+# VERSION
+
+our $VERSION = '0.10';
 
 # ATTRIBUTES
 
-has 'dbh' => (
-  is => 'ro',
-  isa => 'Object',
-  new => 1,
-);
+attr 'dbh';
+attr 'dsn';
+attr 'hostname';
+attr 'hostport';
+attr 'initial';
+attr 'uri';
+attr 'username';
+attr 'password';
+attr 'database';
+attr 'template';
+attr 'odbcdsn';
 
-fun new_dbh($self) {
-  DBI->connect($self->dsn, $self->username, $self->password, {
+# OPTIONS
+
+sub lazy_build_dbh {
+  my ($self, $data) = @_;
+
+  $data ||= DBI->connect($self->dsn, $self->username, $self->password, {
     RaiseError => 1,
     AutoCommit => 1
-  })
+  });
+
+  return $data;
 }
 
-has 'dsn' => (
-  is => 'ro',
-  isa => 'Str',
-  new => 1,
-);
+sub lazy_build_dsn {
+  my ($self, $data) = @_;
 
-fun new_dsn($self) {
-  $self->dsngen($self->database)
+  return $self->dsngen($self->database);
 }
 
-has 'hostname' => (
-  is => 'ro',
-  isa => 'Maybe[Str]',
-  new => 1,
-);
+sub lazy_build_hostname {
+  my ($self, $data) = @_;
 
-fun new_hostname($self) {
-  $ENV{TESTDB_HOSTNAME}
+  return $data ? $data : $ENV{TESTDB_HOSTNAME};
 }
 
-has 'hostport' => (
-  is => 'ro',
-  isa => 'Maybe[Str]',
-  new => 1,
-);
+sub lazy_build_hostport {
+  my ($self, $data) = @_;
 
-fun new_hostport($self) {
-  $ENV{TESTDB_HOSTPORT}
+  return $data ? $data : $ENV{TESTDB_HOSTPORT};
 }
 
-has 'initial' => (
-  is => 'ro',
-  isa => 'Str',
-  new => 1,
-);
+sub lazy_build_initial {
+  my ($self, $data) = @_;
 
-fun new_initial($self) {
-  $ENV{TESTDB_INITIAL} || 'master'
+  return $data ? $data : $ENV{TESTDB_INITIAL} || 'master';
 }
 
-has 'odbcdsn' => (
-  is => 'ro',
-  isa => 'Str',
-  new => 1,
-);
+sub lazy_build_uri {
+  my ($self, $data) = @_;
 
-fun new_odbcdsn($self) {
-  $ENV{TESTDB_ODBCDSN}
+  return $self->urigen($self->database);
 }
 
-has 'uri' => (
-  is => 'ro',
-  isa => 'Str',
-  new => 1,
-);
+sub lazy_build_username {
+  my ($self, $data) = @_;
 
-fun new_uri($self) {
-  $self->urigen($self->database)
+  return $data ? $data : $ENV{TESTDB_USERNAME} || 'sa';
 }
 
-has 'username' => (
-  is => 'ro',
-  isa => 'Str',
-  new => 1,
-);
+sub lazy_build_password {
+  my ($self, $data) = @_;
 
-fun new_username($self) {
-  $ENV{TESTDB_USERNAME} || 'sa'
+  return $data ? $data : $ENV{TESTDB_PASSWORD} || '';
 }
 
-has 'password' => (
-  is => 'ro',
-  isa => 'Str',
-  new => 1,
-);
+sub lazy_build_database {
+  my ($self, $data) = @_;
 
-fun new_password($self) {
-  $ENV{TESTDB_PASSWORD} || ''
+  return $data ? $data : join '_', 'testing_db', time, $$, sprintf "%04d", rand 999;
+}
+
+sub lazy_build_template {
+  my ($self, $data) = @_;
+
+  return $data ? $data : $ENV{TESTDB_TEMPLATE};
+}
+
+sub lazy_build_odbcdsn {
+  my ($self, $data) = @_;
+
+  return $data ? $data : $ENV{TESTDB_ODBCDSN};
 }
 
 # METHODS
 
-method clone(Str $source = $self->template) {
+sub clone {
+  my ($self) = @_;
+
+  my $source = $self->template;
   my $initial = $self->initial;
 
   my $dbh = DBI->connect($self->dsngen($initial),
@@ -137,15 +126,14 @@ method clone(Str $source = $self->template) {
 
   $self->dbh;
   $self->uri;
-  $self->immutable;
 
   return $self;
 }
 
-method create() {
-  my $initial = $self->initial;
+sub create {
+  my ($self) = @_;
 
-  my $dbh = DBI->connect($self->dsngen($initial),
+  my $dbh = DBI->connect($self->dsngen($self->initial),
     $self->username,
     $self->password,
     {
@@ -160,17 +148,17 @@ method create() {
   $dbh->disconnect;
 
   $self->dbh;
-  $self->immutable;
+  $self->uri;
 
   return $self;
 }
 
-method destroy() {
-  my $initial = $self->initial;
+sub destroy {
+  my ($self) = @_;
 
   $self->dbh->disconnect if $self->{dbh};
 
-  my $dbh = DBI->connect($self->dsngen($initial),
+  my $dbh = DBI->connect($self->dsngen($self->initial),
     $self->username,
     $self->password,
     {
@@ -187,23 +175,44 @@ method destroy() {
   return $self;
 }
 
-method dsngen(Str $name) {
-  join ';', "dbi:ODBC:DSN=@{[$self->odbcdsn]};database=$name", join ';',
-    ($self->hostname ? ("host=@{[$self->hostname]}") : ()),
-    ($self->hostport ? ("port=@{[$self->hostport]}") : ())
+sub dsngen {
+  my ($self, $name) = @_;
+
+  my $hostname = $self->hostname;
+  my $hostport = $self->hostport;
+
+  return join ';', "dbi:ODBC:DSN=@{[$self->odbcdsn]};database=$name", join ';',
+    ($hostname ? ("host=@{[$hostname]}") : ()),
+    ($hostport ? ("port=@{[$hostport]}") : ())
 }
 
-method urigen(Str $name) {
-  join('/', 'mssql', ($self->username ? '' : ()), ($self->username ?
-    join('@', join(':', $self->username ? ($self->username, ($self->password ? $self->password : ())) : ()),
-    $self->hostname ? ($self->hostport ? (join(':', $self->hostname, $self->hostport)) : $self->hostname) : '') : ()),
+sub urigen {
+  my ($self, $name) = @_;
+
+  my $username = $self->username;
+  my $password = $self->password;
+  my $hostname = $self->hostname;
+  my $hostport = $self->hostport;
+
+  return join(
+    '/', 'mssql',
+    ($username ? '' : ()),
+    (
+      $username
+      ? join('@',
+        join(':', $username ? ($username, ($password ? $password : ())) : ()),
+        $hostname
+        ? ($hostport ? (join(':', $hostname, $hostport)) : $hostname)
+        : '')
+      : ()
+    ),
     $name
-  )
+    )
 }
 
 1;
 
-=encoding utf8
+
 
 =head1 NAME
 
@@ -214,6 +223,12 @@ Test::DB::Mssql - Temporary Testing Databases for Mssql
 =head1 ABSTRACT
 
 Temporary Mssql Database for Testing
+
+=cut
+
+=head1 VERSION
+
+0.10
 
 =cut
 
@@ -239,45 +254,9 @@ C<TESTDB_HOSTPORT>.
 
 =cut
 
-=head1 INHERITS
-
-This package inherits behaviors from:
-
-L<Test::DB::Object>
-
-=cut
-
-=head1 INTEGRATES
-
-This package integrates behaviors from:
-
-L<Data::Object::Role::Buildable>
-
-L<Data::Object::Role::Immutable>
-
-L<Data::Object::Role::Stashable>
-
-=cut
-
-=head1 LIBRARIES
-
-This package uses type constraints from:
-
-L<Types::Standard>
-
-=cut
-
 =head1 ATTRIBUTES
 
 This package has the following attributes:
-
-=cut
-
-=head2 database
-
-  database(Str)
-
-This attribute is read-only, accepts C<(Str)> values, and is optional.
 
 =cut
 
@@ -292,6 +271,14 @@ This attribute is read-only, accepts C<(Object)> values, and is optional.
 =head2 dsn
 
   dsn(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is optional.
+
+=cut
+
+=head2 database
+
+  database(Str)
 
 This attribute is read-only, accepts C<(Str)> values, and is optional.
 
@@ -313,14 +300,6 @@ This attribute is read-only, accepts C<(Str)> values, and is optional.
 
 =cut
 
-=head2 password
-
-  password(Str)
-
-This attribute is read-only, accepts C<(Str)> values, and is optional.
-
-=cut
-
 =head2 uri
 
   uri(Str)
@@ -337,21 +316,29 @@ This attribute is read-only, accepts C<(Str)> values, and is optional.
 
 =cut
 
+=head2 password
+
+  password(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is optional.
+
+=cut
+
 =head1 METHODS
 
-This package implements the following methods:
+This package provides the following methods:
 
 =cut
 
 =head2 clone
 
-  clone(Str $source) : Object
+clone(Str $source) : Object
 
 The clone method creates a temporary database from a database template.
 
 =over 4
 
-=item clone example #1
+=item clone example 1
 
   # given: synopsis
 
@@ -365,13 +352,13 @@ The clone method creates a temporary database from a database template.
 
 =head2 create
 
-  create() : Object
+create() : Object
 
 The create method creates a temporary database and returns the invocant.
 
 =over 4
 
-=item create example #1
+=item create example 1
 
   # given: synopsis
 
@@ -385,13 +372,13 @@ The create method creates a temporary database and returns the invocant.
 
 =head2 destroy
 
-  destroy() : Object
+destroy() : Object
 
 The destroy method destroys (drops) the database and returns the invocant.
 
 =over 4
 
-=item destroy example #1
+=item destroy example 1
 
   # given: synopsis
 
@@ -401,33 +388,5 @@ The destroy method destroys (drops) the database and returns the invocant.
   # <Test::DB::Mssql>
 
 =back
-
-=cut
-
-=head1 AUTHOR
-
-Al Newkirk, C<awncorp@cpan.org>
-
-=head1 LICENSE
-
-Copyright (C) 2011-2019, Al Newkirk, et al.
-
-This is free software; you can redistribute it and/or modify it under the terms
-of the The Apache License, Version 2.0, as elucidated in the L<"license
-file"|https://github.com/iamalnewkirk/test-db/blob/master/LICENSE>.
-
-=head1 PROJECT
-
-L<Wiki|https://github.com/iamalnewkirk/test-db/wiki>
-
-L<Project|https://github.com/iamalnewkirk/test-db>
-
-L<Initiatives|https://github.com/iamalnewkirk/test-db/projects>
-
-L<Milestones|https://github.com/iamalnewkirk/test-db/milestones>
-
-L<Contributing|https://github.com/iamalnewkirk/test-db/blob/master/CONTRIBUTE.md>
-
-L<Issues|https://github.com/iamalnewkirk/test-db/issues>
 
 =cut

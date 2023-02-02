@@ -20,7 +20,7 @@ use 5.018;  # lexical_subs
 use feature qw(say state lexical_subs);
 use feature 'lexical_subs'; no warnings "experimental::lexical_subs";
 package  Data::Dumper::Interp;
-$Data::Dumper::Interp::VERSION = '4.110';
+$Data::Dumper::Interp::VERSION = '4.111';
 
 package  # newline prevents Dist::Zilla::Plugin::PkgVersion from adding $VERSION
   DB;
@@ -42,7 +42,9 @@ use Carp;
 use POSIX qw(INT_MAX);
 use Encode ();
 use Scalar::Util qw(blessed reftype refaddr looks_like_number);
-use List::Util qw(min max first any pairmap);
+use List::Util qw(min max first);
+use List::Util 1.33 qw(any);
+use List::Util 1.29 qw(pairmap);
 use Regexp::Common qw/RE_balanced/;
 use Term::ReadKey ();
 use overload ();
@@ -554,15 +556,16 @@ sub _show_as_number(_) {
   # IMPORTANT: We must not do any numeric ops or comparisions
   # on $value because that may set some magic which defeats our attempt 
   # to try bitstring unary & below (after a numeric compare, $value is 
-  # apparently assumed to be numeric even if it is/was a "string").
+  # apparently assumed to be numeric or dual-valued even if it 
+  # is/was just a "string").
   
   return 0 if !defined $value;
 
   # if the utf8 flag is on, it almost certainly started as a string
   return 0 if !ref($value) && utf8::is_utf8($value);
 
-  # Recently there was a Perl bug where looks_like_number() provoked a 
-  # warning from BigRat.pm if it is called under 'use bigrat;'
+  # There was a Perl bug where looks_like_number() provoked a warning from 
+  # BigRat.pm if it is called under 'use bigrat;' so we must not do that.
   #   https://github.com/Perl/perl5/issues/20685
   #return 0 unless looks_like_number($value);
 

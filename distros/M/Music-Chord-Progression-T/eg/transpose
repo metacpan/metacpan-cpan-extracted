@@ -1,0 +1,35 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util Music-Chord-Progression-T); # local author libs
+
+use MIDI::Util qw(setup_score midi_format);
+use Music::Chord::Progression::T ();
+
+my $bpm       = shift || 100;
+my $note      = shift || 'C';
+my $octave    = shift || 4;
+my $quality   = shift || '';
+my $transform = shift || 'I,T1,T2,T3'; # giving an integer = random
+my $semitones = shift || 7;
+
+if ($transform =~ /[IT]/) {
+    $transform = [ split /,/, $transform ];
+}
+
+my $transpose = Music::Chord::Progression::T->new(
+    base_note     => $note,
+    base_octave   => $octave,
+    chord_quality => $quality,
+    transform     => $transform,
+    semitones     => $semitones,
+    verbose       => 1,
+);
+my $chords = $transpose->generate;
+
+my $score = setup_score(bpm => $bpm);
+
+$score->n('wn', midi_format(@$_)) for @$chords;
+
+$score->write_score("$0.mid");

@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-01'; # DATE
+our $DATE = '2023-02-02'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.004'; # VERSION
+our $VERSION = '1.005'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -26,12 +26,12 @@ sub on_input_data_row {
     # keys we add to the stash
     $r->{input_rows} //= [];
     if ($r->{wants_input_row_as_hashref}) {
-        $r->{rows_as_hashref} //= [];
+        $r->{input_rows_as_hashref} //= [];
     }
 
     push @{ $r->{input_rows} }, $r->{input_row};
     if ($r->{wants_input_row_as_hashref}) {
-        push @{ $r->{rows_as_hashref} }, $r->{input_row_as_hashref};
+        push @{ $r->{input_rows_as_hashref} }, $r->{input_row_as_hashref};
     }
 }
 
@@ -44,7 +44,7 @@ sub after_close_input_files {
     my @keys;
     if ($r->{util_args}{key}) {
         my $code_gen_key = compile_eval_code($r->{util_args}{key}, 'key');
-        for my $row (@{ $r->{util_args}{hash} ? $r->{rows_as_hashref} : $r->{input_rows} }) {
+        for my $row (@{ $r->{util_args}{hash} ? $r->{input_rows_as_hashref} : $r->{input_rows} }) {
             local $_ = $row;
             push @keys, $code_gen_key->($row);
         }
@@ -76,8 +76,8 @@ sub after_close_input_files {
         } elsif ($r->{util_args}{hash}) {
             $sort_indices++;
             $code = sub {
-                local $main::a = $r->{rows_as_hashref}[$a];
-                local $main::b = $r->{rows_as_hashref}[$b];
+                local $main::a = $r->{input_rows_as_hashref}[$a];
+                local $main::b = $r->{input_rows_as_hashref}[$b];
                 #log_trace "a=<%s> vs b=<%s>", $main::a, $main::b;
                 $code0->($main::a, $main::b);
             };
@@ -136,7 +136,7 @@ sub after_close_input_files {
 
     }
 
-    if ($main::_SORTED_ROWS) {
+    if ($main::_CSV_SORTED_ROWS) {
         require Data::Cmp;
         #use DD; dd $r->{input_rows}; print "\n"; dd $sorted_rows;
         if (Data::Cmp::cmp_data($r->{input_rows}, $sorted_rows)) {
@@ -269,7 +269,7 @@ App::CSVUtils::csv_sort_rows - Sort CSV rows
 
 =head1 VERSION
 
-This document describes version 1.004 of App::CSVUtils::csv_sort_rows (from Perl distribution App-CSVUtils), released on 2023-02-01.
+This document describes version 1.005 of App::CSVUtils::csv_sort_rows (from Perl distribution App-CSVUtils), released on 2023-02-02.
 
 =for Pod::Coverage ^(on|after|before)_.+$
 

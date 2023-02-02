@@ -1,11 +1,14 @@
+package main;
+
 use 5.014;
 
 use strict;
 use warnings;
-use routines;
 
-use Test::Auto;
 use Test::More;
+use Venus::Test;
+
+my $test = test(__FILE__);
 
 =name
 
@@ -13,17 +16,23 @@ Test::DB::Postgres
 
 =cut
 
+$test->for('name');
+
 =tagline
 
 Temporary Testing Databases for Postgres
 
 =cut
 
+$test->for('tagline');
+
 =abstract
 
 Temporary Postgres Database for Testing
 
 =cut
+
+$test->for('abstract');
 
 =includes
 
@@ -32,6 +41,8 @@ method: create
 method: destroy
 
 =cut
+
+$test->for('includes');
 
 =synopsis
 
@@ -42,26 +53,6 @@ method: destroy
   my $tdbo = Test::DB::Postgres->new;
 
   # my $dbh = $tdbo->create->dbh;
-
-=cut
-
-=libraries
-
-Types::Standard
-
-=cut
-
-=inherits
-
-Test::DB::Object
-
-=cut
-
-=integrates
-
-Data::Object::Role::Buildable
-Data::Object::Role::Immutable
-Data::Object::Role::Stashable
 
 =cut
 
@@ -77,6 +68,8 @@ username: ro, opt, Str
 password: ro, opt, Str
 
 =cut
+
+$test->for('attributes');
 
 =description
 
@@ -150,17 +143,15 @@ SKIP: {
     skip 'Environment not configured for Postgres testing';
   }
 
-  my $test = testauto(__FILE__);
-
-  my $subs = $test->standard;
-
-  $subs->synopsis(fun($tryable) {
+  $test->for('synopsis', sub {
+    my ($tryable) = @_;
     ok my $result = $tryable->result;
 
     $result
   });
 
-  $subs->example(-1, 'clone', 'method', fun($tryable) {
+  $test->for('example', 1, 'clone', sub {
+    my ($tryable) = @_;
     ok my $result = $tryable->result;
     ok $result->isa('Test::DB::Postgres');
     ok $result->dbh;
@@ -170,7 +161,8 @@ SKIP: {
     $result
   });
 
-  $subs->example(-1, 'create', 'method', fun($tryable) {
+  $test->for('example', 1, 'create', sub {
+    my ($tryable) = @_;
     ok my $result = $tryable->result;
     ok $result->isa('Test::DB::Postgres');
     ok $result->dbh;
@@ -180,12 +172,15 @@ SKIP: {
     $result
   });
 
-  $subs->example(-1, 'destroy', 'method', fun($tryable) {
+  $test->for('example', 1, 'destroy', sub {
+    my ($tryable) = @_;
     ok my $result = $tryable->result;
     ok $result->isa('Test::DB::Postgres');
 
     $result
   });
 }
+
+$test->render('lib/Test/DB/Postgres.pod') if $ENV{RENDER};
 
 ok 1 and done_testing;

@@ -1,0 +1,67 @@
+NAME
+    Project2::Gant - Create Gantt charts
+
+SYNOPSIS
+        use Project2::Gantt;
+
+                    my $gantt = Project2::Gantt->new(
+                    file        =>      'gantt.png',
+                    description =>      'My Project'
+            );
+
+            my $john = $gantt->addResource(name => 'John Doe');
+            my $jane = $gantt->addResource(name => 'Jane Doe');
+
+            $gantt->addTask(
+                    description => 'Analysis',
+                    resource    => $john,
+                    start       => '2023-01-06',
+                    end         => '2023-01-10'
+            );
+
+            $gantt->addTask(
+                    description => 'Development',
+                    resource    => $john,
+                    start       => '2023-01-13',
+                    end         => '2023-01-20'
+            );
+
+            $gantt->addTask(
+                    description => 'Testing',
+                    resource    => $jane,
+                    start       => '2023-01-23',
+                    end         => '2023-01-31'
+            );
+
+            $gantt->addTask(
+                    description => 'Deployment',
+                    resource    => $jane,
+                    start       => '2023-02-07',
+                    end         => '2023-02-07'
+            );
+
+            $gantt->write();
+
+DESCRIPTION
+    This module allows you to easily create Gantt charts.
+
+    You can specify the "font" or simple install Alien::Font::Vera as a
+    fallback batteries included font.
+
+CAVEATS
+    You can generate images in all formats supported by Imager.
+
+AUTHOR
+    Bruno Ramos <bramos@cpan.org>
+
+ACKNOWLEDGEMENTS
+    This module is inspired by Project::Gantt from Alexander Christian
+    Westholm.
+
+COPYRIGHT
+    Copyright(c) 2023 by Bruno Ramos
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

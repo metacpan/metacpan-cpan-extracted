@@ -767,4 +767,54 @@ subtest 'op_is_empty' => sub {
     obs_is $o, ['--1'], 'empty';
 };
 
+subtest 'op_last' => sub {
+    my $o = cold('-5-6-')->pipe( op_last );
+    obs_is $o, ['----6'];
+
+    $o = cold('-5-6-7-')->pipe(
+        op_last(sub { $_ % 2 == 0 }),
+    );
+    obs_is $o, ['------6'];
+
+    $o = cold('---')->pipe(
+        op_last(undef, 9),
+    );
+    obs_is $o, ['--9'];
+};
+
+subtest 'op_race_with' => sub {
+    my $o = rx_interval(3)->pipe(
+        op_race_with(
+            rx_interval(2),
+            rx_interval(1),
+        ),
+        op_take(5),
+    );
+    obs_is $o, ['-01234'];
+};
+
+subtest 'op_take_last' => sub {
+    my $o = rx_of(1, 2, 3, 5, 6)->pipe(
+        op_take_last(3),
+    );
+    obs_is $o, ['(356)'];
+
+    $o = rx_of(5, 6)->pipe(
+        op_take_last(3),
+    );
+    obs_is $o, ['(56)'];
+};
+
+subtest 'op_group_by' => sub {
+    my $o = rx_interval(1)->pipe(
+        op_take(5),
+        op_group_by(sub { $_ % 2 }),
+        op_merge_map(sub { $_->pipe( op_reduce(sub { [@{$_[0]}, $_[1]] }, []) ) }),
+    );
+    obs_is $o, ['-----(ab)', {
+        a => [ 0, 2, 4 ],
+        b => [ 1, 3 ],
+    }];
+};
+
 done_testing();

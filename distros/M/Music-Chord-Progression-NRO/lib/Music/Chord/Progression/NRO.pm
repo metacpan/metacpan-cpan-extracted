@@ -3,10 +3,11 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate Neo-Riemann chord progressions
 
-our $VERSION = '0.0308';
+our $VERSION = '0.0400';
 
 use Moo;
 use strictures 2;
+use Algorithm::Combinatorics qw(variations);
 use Carp qw(croak);
 use Data::Dumper::Compact qw(ddc);
 use Music::NeoRiemannianTonnetz ();
@@ -181,9 +182,19 @@ sub _build_transform {
         @transform = @{ $self->transform };
     }
     elsif ($self->transform =~ /^\d+$/) {
-        my @nro = qw(L P R N S H PRL);
+        my @alphabet = qw(P R L);
+        my @nro = @alphabet;
 
-        @transform = ('X', map { $nro[ int rand @nro ] } 1 .. $self->transform - 1);
+        my $iter = variations(\@alphabet, 2);
+        while (my $v = $iter->next) {
+            push @nro, join('', @$v);
+        }
+        $iter = variations(\@alphabet, 3);
+        while (my $v = $iter->next) {
+            push @nro, join('', @$v);
+        }
+
+        @transform = ('I', map { $nro[ int rand @nro ] } 1 .. $self->transform - 1);
     }
 
     return @transform;
@@ -194,7 +205,7 @@ sub _build_chord {
 
     my $chord;
 
-    if ($token =~ /^X$/) {
+    if ($token =~ /^I$/) {
         $chord = $pitches; # no transformation
     }
     else {
@@ -221,7 +232,7 @@ Music::Chord::Progression::NRO - Generate Neo-Riemann chord progressions
 
 =head1 VERSION
 
-version 0.0308
+version 0.0400
 
 =head1 SYNOPSIS
 
@@ -299,7 +310,7 @@ Please see the L<Music::NeoRiemannianTonnetz> module for the allowed transformat
 
 This can also be given as an integer, which defines the number of random transformations to perform.
 
-Additionally the "non-transformation", C<X> is allowed to return the the initial chord.
+Additionally the "non-transformation", C<I> is allowed to return the the initial chord.
 
 Default: C<4>
 
@@ -329,7 +340,7 @@ The L<Music::NeoRiemannianTonnetz> object.
     base_scale  => 'minor',
     format      => 'midinum',
     max         => 12,
-    transform   => [qw(X PRL R L R L R)],
+    transform   => [qw(I PRL R L R L R)],
   );
 
 Create a new C<Music::Chord::Progression::NRO> object.
@@ -340,18 +351,18 @@ Create a new C<Music::Chord::Progression::NRO> object.
 
   $chords = $nro->generate;
 
-Generate a *linear* series of transformed chords.
+Generate a I<linear> series of transformed chords.
 
 =head2 circular
 
   $chords = $nro->circular;
 
-Generate a series of transformed chords based on a circular list of transformations.
+Generate a series of transformed chords based on a I<circular> list of transformations.
 
 The F<eg/nro-chain> program puts it this way:
 
 "Use a circular list ("necklace") of Neo-Riemannian transformations,
-plus "X" meaning "make no transformation." Starting at position zero,
+plus C<I> meaning "make no transformation." Starting at position zero,
 move forward or backward along the necklace, transforming the current
 chord..."
 

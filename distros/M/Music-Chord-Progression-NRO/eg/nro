@@ -13,7 +13,7 @@ my $octave    = shift || 4;
 my $scale     = shift || 'major';
 my $transform = shift || 'P,L,R,P,L,R'; # giving an integer = random
 
-if ($transform =~ /^[HLNPRSX,]+$/) {
+if ($transform =~ /^[HILNPRS,]+$/) {
     $transform = [ split /,/, $transform ];
 }
 

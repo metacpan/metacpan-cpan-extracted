@@ -1,6 +1,6 @@
 package App::Greple::xlate;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 =encoding utf-8
 
@@ -28,8 +28,9 @@ Pattern C<^(\w.*\n)+> means consecutive lines starting with
 alpha-numeric letter.  This command show the area to be translated.
 Option B<--all> is used to produce entire text.
 
-=for html
-<p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/select-area.png"></p>
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/select-area.png">
+</p>
 
 Then add C<--xlate> option to translate the selected area.  It will
 find and replace them by the B<deepl> command output.
@@ -37,10 +38,11 @@ find and replace them by the B<deepl> command output.
 By default, original and translated text is printed in the conflict
 marker format compatible with L<git(1)>.  Using C<ifdef> format, you
 can get desired part by L<unifdef(1)> command easily.  Format can be
-specified by B<--deepl-format> option.
+specified by B<--xlate-format> option.
 
-=for html
-<p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/format-conflict.png"></p>
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/format-conflict.png">
+</p>
 
 If you want to translate entire text, use B<--match-entire> option.
 This is a short-cut to specify the pattern matches entire text
@@ -172,6 +174,11 @@ don't want to remove them and keep in the file, use C<accumulate>.
 
 =back
 
+=item --xlate-batch-update
+
+Update cache for all non-existent data in batch mode.  This is much
+more efficient than normal operation.
+
 =back
 
 =head1 ENVIRONMENT
@@ -242,23 +249,31 @@ our $dryrun = 0;
 
 my $current_file;
 
-our %LABELS = (
+our %formatter = (
     none => undef,
     conflict => sub {
-	( sprintf("<<<<<<< %s\n", uc $lang_from),
-	  sprintf("=======\n"),
-	  sprintf(">>>>>>> %s\n", uc $lang_to) ) ;
+	join '',
+	    "<<<<<<< $lang_from\n",
+	    $_[0],
+	    "=======\n",
+	    $_[1],
+	    ">>>>>>> $lang_to\n";
     },
     ifdef => sub {
-	( sprintf("#ifdef %s\n", uc $lang_from),
-	  "#endif\n" . sprintf("#ifdef %s\n", uc $lang_to),
-	  "#endif\n" ) ;
+	join '',
+	    #ifdef $lang_from\n",
+	    $_[0],
+	    "#endif\n",
+	    "#ifdef $lang_to\n",
+	    $_[1],
+	    "#endif\n";
     },
-    space => [ '', "\n", '' ],
+    space   => sub { join "\n", @_ },
+    discard => sub { '' },
     );
 
-my $xlate_old_cache = {};
-my $xlate_new_cache = {};
+my $old_cache = {};
+my $new_cache = {};
 my $xlate_cache_update;
 my $xlate_called;
 
@@ -268,13 +283,12 @@ sub prologue {
 	    $cache_method = 'auto';
 	}
 	if (lc $cache_method eq 'accumulate') {
-	    $xlate_new_cache = $xlate_old_cache;
+	    $new_cache = $old_cache;
 	}
 	if ($cache_method =~ /^(no|never)/i) {
 	    $cache_method = '';
 	}
     }
-
     if ($xlate_engine) {
 	my $mod = __PACKAGE__ . "::$xlate_engine";
 	if (eval "require $mod") {
@@ -290,11 +304,6 @@ sub prologue {
 	    die "No \"xlate\" function in $mod.\n";
 	}
     }
-}
-
-sub get_label {
-    my $label = $LABELS{+shift};
-    ref $label eq 'CODE' ? [ $label->() ] : $label;
 }
 
 sub translate_anyway {
@@ -316,9 +325,13 @@ sub translate_anyway {
 sub translate {
     goto &translate_anyway unless $cache_method;
     my $text = shift;
-    $xlate_new_cache->{$text} //= delete $xlate_old_cache->{$text} // do {
-	$xlate_cache_update++;
-	translate_anyway $text;
+    $new_cache->{$text} //= delete $old_cache->{$text} // do {
+	if ($cache_method eq 'batch') {
+	    '';
+	} else {
+	    $xlate_cache_update++;
+	    translate_anyway $text;
+	}
     };
 }
 
@@ -350,9 +363,8 @@ sub xlate {
     $_ =~ s/\n\n+/\n/g if $squash_newlines;
     $_ = fold_lines $_ if $fold_line;
 
-    if (state $label = get_label $output_format) {
-	my($start, $mid, $end) = @$label;
-	return join '', $start, $orig, $mid, $_, $end;
+    if (state $formatter = $formatter{$output_format}) {
+	return $formatter->($orig, $_);
     } else {
 	return $_;
     }
@@ -373,11 +385,11 @@ sub cache_file {
 
 sub read_cache {
     my $file = shift;
-    %$xlate_new_cache = %$xlate_old_cache = ();
+    %$new_cache = %$old_cache = ();
     if (open my $fh, $file) {
 	my $json = do { local $/; <$fh> };
 	my $hash = $json eq '' ? {} : decode_json $json;
-	%$xlate_old_cache = %$hash;
+	%$old_cache = %$hash;
 	warn "read cache from $file\n";
     }
 }
@@ -386,7 +398,7 @@ sub write_cache {
     return if $dryrun;
     my $file = shift;
     if (open my $fh, '>', $file) {
-	my $json = encode_json $xlate_new_cache;
+	my $json = encode_json $new_cache;
 	print $fh $json;
 	warn "write cache to $file\n";
     }
@@ -412,9 +424,35 @@ sub before {
     }
 }
 
+sub batch_update {
+
+    my @from = @_;
+
+    print STDERR "From:\n", map s/^/\t< /r, @from
+	if $show_progress;
+
+    my @to = &XLATE(@_);
+
+    print STDERR "To:\n", map s/^/\t> /r, @to
+	if $show_progress;
+
+    die "Unmatched response: @to" if @_ != @to;
+
+    for my $i (0 .. $#_) {
+	$xlate_cache_update++;
+	$new_cache->{$_[$i]} = $to[$i];
+    }
+
+}
+
 sub after {
     if (my $cache = cache_file) {
-	if ($xlate_cache_update or %$xlate_old_cache) {
+	if ($cache_method eq 'batch') {
+	    if (my @from = grep { $new_cache->{$_} eq '' } keys %$new_cache) {
+		batch_update @from;
+	    }
+	}
+	if ($xlate_cache_update or %$old_cache) {
 	    write_cache $cache;
 	}
     }
@@ -444,6 +482,11 @@ option --xlate \
 	--begin &__PACKAGE__::before \
 	--end   &__PACKAGE__::after \
 	--cm    &__PACKAGE__::xlate
+
+option --xlate-batch-update \
+	--xlate-cache=batch \
+	--xlate-format=discard \
+	--xlate
 
 option --match-entire    --re '\A(?s).+\z'
 option --match-paragraph --re '^(.+\n)+'

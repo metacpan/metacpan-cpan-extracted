@@ -2,3 +2,6 @@ Revision history for Pod-AsciiDoctor
 
 NOT USED - Please use github http://github.com/benignbala/pod-asciidoctor
 
+0.101000    2023-02-02
+
+    Convert to dzil / @SHLOMIF + other cleanups

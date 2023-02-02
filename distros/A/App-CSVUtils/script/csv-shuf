@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-01'; # DATE
+our $DATE = '2023-02-02'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.004'; # VERSION
+our $VERSION = '1.005'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_shuf_rows/csv_shuf_rows",
@@ -41,7 +41,7 @@ csv-shuf - Shuffle CSV rows
 
 =head1 VERSION
 
-This document describes version 1.004 of csv-shuf (from Perl distribution App-CSVUtils), released on 2023-02-01.
+This document describes version 1.005 of csv-shuf (from Perl distribution App-CSVUtils), released on 2023-02-02.
 
 =head1 SYNOPSIS
 

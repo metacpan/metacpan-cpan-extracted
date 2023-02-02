@@ -62,4 +62,18 @@ is_deparsed
    'reduce {$a + $b;} 1..5;',
    'reduce {}';
 
+my $listcode = "'one', 1";
+# Perls before 5.22 deparsed without parens here, later ones add parens
+$listcode = "($listcode)" if $^V ge v5.22.0;
+
+is_deparsed
+   sub { ngrep my ($k, $v) { length $k } one => 1 },
+   'ngrep my ($k, $v) {length $k;} '.$listcode.';',
+   'ngrep my ($k, $v) {}';
+
+is_deparsed
+   sub { nmap my ($k, $v) { ($v, $k) } one => 1 },
+   'nmap my ($k, $v) {$v, $k;} '.$listcode.';',
+   'nmap my ($k, $v) {}';
+
 done_testing;

@@ -17,7 +17,6 @@
          "CPAN::Meta::Merge" : "0",
          "CPAN::Meta::Prereqs::Filter" : "0",
          "CPAN::Upload::Tiny" : "0.009",
-         "Carp" : "0",
          "Config" : "0",
          "Data::Section::Simple" : "0",
          "Encode" : "0",
@@ -41,7 +40,7 @@
          "Pod::Simple::Text" : "3.23",
          "Software::LicenseUtils" : "0.103014",
          "Text::Template" : "0",
-         "perl" : "5.010",
+         "perl" : "5.014",
          "strict" : "0",
          "warnings" : "0"
       }

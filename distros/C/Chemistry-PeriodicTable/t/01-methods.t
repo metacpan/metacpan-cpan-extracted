@@ -11,13 +11,11 @@ my $obj = new_ok 'Chemistry::PeriodicTable';
 my $got = $obj->as_file;
 ok -e $got, 'as_file';
 
-my @headers = $obj->headers;
-is_deeply \@headers, $obj->header, 'header';
-is @headers, 21, 'headers';
+$got = $obj->header;
+is @$got, 21, 'header';
 
-$got = $obj->as_hash;
-is_deeply $got, $obj->symbols, 'symbols';
-is_deeply [ @{ $got->{H} }[0,1] ], [1, 'Hydrogen'], 'as_hash';
+$got = $obj->symbols;
+is_deeply [ @{ $got->{H} }[0,1] ], [1, 'Hydrogen'], 'symbols';
 
 is $obj->number('H'), 1, 'number';
 is $obj->number('hydrogen'), 1, 'number';

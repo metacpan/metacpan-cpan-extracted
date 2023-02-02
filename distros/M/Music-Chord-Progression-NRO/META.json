@@ -34,6 +34,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Algorithm::Combinatorics" : "0",
             "Carp" : "0",
             "Data::Dumper::Compact" : "0",
             "Moo" : "2",
@@ -68,7 +69,7 @@
          "web" : "https://github.com/ology/Music-Chord-Progression-NRO"
       }
    },
-   "version" : "0.0308",
+   "version" : "0.0400",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"

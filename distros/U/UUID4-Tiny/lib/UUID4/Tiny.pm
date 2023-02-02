@@ -5,7 +5,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Carp qw/carp croak/;
 use Exporter;
@@ -63,6 +63,9 @@ sub string_to_uuid {
 
 sub uuid_to_string {
     my $uuid = shift;
+    if ( my $reftype = ref $uuid ) {
+        croak "Invalid UUID: expected scalar but got reference to $reftype";
+    }
     if ( is_uuid_string $uuid ) {
         # Emulates UUID::Tiny behavior to
         # prevent accidental double conversion
@@ -80,13 +83,15 @@ __END__
 
 =encoding UTF-8
 
+=for markdown [![Test](https://github.com/cv-library/UUID4-Tiny/actions/workflows/test.yml/badge.svg)](https://github.com/cv-library/UUID4-Tiny/actions/workflows/test.yml)
+
 =head1 NAME
 
 UUID4::Tiny - Cryptographically secure v4 UUIDs for Linux x64
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -128,6 +133,14 @@ a message containing the errno if the call to getrandom() fails.
     my $uuid_string = uuid_to_string( create_uuid );
 
 Converts a 16 byte UUID to a canonical 8-4-4-4-12 format UUID string.
+
+Calling this function on a string that is already a UUID string will return the
+string unmodified, and raise a warning.
+
+Calling this function on a reference is almost certainly not what you want, as
+the function would naively try to unpack the stringified reference, e.g.
+C<ARRAY(0xdeadbeef1234)>, into a UUID string. For this reason, the function
+will croak if its input is a reference.
 
 =head2 create_uuid_string
 

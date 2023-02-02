@@ -1,3 +1,7 @@
+1.05 2023-01-29
+ - add a callback named BeforeFindTickets so user can modify the query
+   or format of the calendar search
+
 1.04 2022-09-21
  - Include user's groups and system when looking for calendar saved search
 

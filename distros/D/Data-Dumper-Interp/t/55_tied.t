@@ -109,15 +109,16 @@ is( vis(\42), "\\42", "\\42" );
 is( vis(\"abc"), "\\\"abc\"", "\\\"abc\"" );
 
 foreach (
-         #['$scal', '(Math::BigInt)123'],
-         ['\$scal', '\(Math::BigInt)123'],
-         ['\@ary', '[0,1,2,3,4,5,6,7,8,9,3.14,(Math::BigFloat)999999999999999999999990000.123450000000007]' ],
-         ['\%hash', '{a => 111,b => 3.14,c => (Math::BigFloat)999999999999999999999990002.123450000000007}' ],
+         ['$scal', qr/^\Q(Math::Big\E\w+\Q)123\E$/],
+         ['\$scal', qr/^\Q\(Math::Big\E\w+\Q)123\E$/],
+         ['\@ary', qr/^\Q[0,1,2,3,4,5,6,7,8,9,3.14,(Math::Big\E\w+\Q)999999999999999999999990000.123450000000007]\E$/ ],
+         ['\%hash', qr/^\Q{a => 111,b => 3.14,c => (Math::Big\E\w+\Q)999999999999999999999990002.123450000000007}\E$/ ],
         )
 {
-  my ($untied_item, $untied_expected) = @$_;
-  is (eval "vis($untied_item)", $untied_expected, 
-      "vis($untied_item): $untied_expected");
+  my ($untied_item, $exp_re) = @$_;
+  my $got = eval "vis($untied_item)";
+  like($got, $exp_re, 
+      "Expected <<$exp_re>> got <<".u($got).">>");
 
   (my $tied_item = $untied_item) =~ s/([a-zA-Z])/t$1/ or die;
   my $s = eval "vis($tied_item)";

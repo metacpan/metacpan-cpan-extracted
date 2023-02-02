@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-01'; # DATE
+our $DATE = '2023-02-02'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.004'; # VERSION
+our $VERSION = '1.005'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -20,7 +20,8 @@ gen_csv_util(
     summary => 'Check that CSV rows are sorted',
     description => <<'_',
 
-This utility checks that rows in the CSV is sorted. Example `input.csv`:
+This utility checks that rows in the CSV are sorted according to specified
+sorting rule(s). Example `input.csv`:
 
     name,age
     Andy,20
@@ -46,6 +47,9 @@ Example `input2.csv`:
 
     % csv-sorted-rows input2.csv --by-field ~name; # check if name is ascibetically sorted in descending order
     ERROR 400: Rows are NOT sorted
+
+See <prog:csv-sort-rows> for details on sorting options.
+
 _
 
     writes_csv => 0,
@@ -72,7 +76,7 @@ _
     on_input_data_row => \&App::CSVUtils::csv_sort_rows::on_input_data_row,
 
     after_close_input_files => sub {
-        local $main::_SORTED_ROWS = 1;
+        local $main::_CSV_SORTED_ROWS = 1;
         App::CSVUtils::csv_sort_rows::after_close_input_files(@_);
     },
 );
@@ -92,7 +96,7 @@ App::CSVUtils::csv_sorted_rows - Check that CSV rows are sorted
 
 =head1 VERSION
 
-This document describes version 1.004 of App::CSVUtils::csv_sorted_rows (from Perl distribution App-CSVUtils), released on 2023-02-01.
+This document describes version 1.005 of App::CSVUtils::csv_sorted_rows (from Perl distribution App-CSVUtils), released on 2023-02-02.
 
 =head1 FUNCTIONS
 
@@ -105,7 +109,8 @@ Usage:
 
 Check that CSV rows are sorted.
 
-This utility checks that rows in the CSV is sorted. Example C<input.csv>:
+This utility checks that rows in the CSV are sorted according to specified
+sorting rule(s). Example C<input.csv>:
 
  name,age
  Andy,20
@@ -131,6 +136,8 @@ Example C<input2.csv>:
  
  % csv-sorted-rows input2.csv --by-field ~name; # check if name is ascibetically sorted in descending order
  ERROR 400: Rows are NOT sorted
+
+See L<csv-sort-rows> for details on sorting options.
 
 This function is not exported.
 

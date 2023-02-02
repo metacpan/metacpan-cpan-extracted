@@ -5,70 +5,103 @@ use 5.014;
 use strict;
 use warnings;
 
-use registry;
-use routines;
+use Venus::Class;
 
-use Data::Object::Class;
+# VERSION
 
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.10';
+
+# AUTHORITY
+
+our $AUTHORITY = 'cpan:AWNCORP';
 
 # METHODS
 
-method build(Str :$database = $ENV{TESTDB_DATABASE}, Str %options) {
-  if (lc($database) eq 'mssql') {
-    require Test::DB::Mssql; return Test::DB::Mssql->new(%options);
+sub build {
+  my ($self, %options) = @_;
+
+  my $type = $self->type($options{database});
+
+  if (lc($type) eq 'sqlite') {
+    return $self->sqlite(%options);
   }
-  elsif (lc($database) eq 'mysql') {
-    require Test::DB::Mysql; return Test::DB::Mysql->new(%options);
+  elsif (lc($type) eq 'postgres') {
+    return $self->postgres(%options);
   }
-  elsif (lc($database) eq 'postgres') {
-    require Test::DB::Postgres; return Test::DB::Postgres->new(%options);
+  elsif (lc($type) eq 'mysql') {
+    return $self->mysql(%options);
   }
-  elsif (lc($database) eq 'sqlite') {
-    require Test::DB::Sqlite; return Test::DB::Sqlite->new(%options);
+  elsif (lc($type) eq 'mssql') {
+    return $self->mssql(%options);
   }
   else {
     return undef;
   }
 }
 
-method create(Str :$database = $ENV{TESTDB_DATABASE}, Str %options) {
-  if (my $generator = $self->build(%options, database => $database)) {
-    return $generator->create;
+sub create {
+  my ($self, %options) = @_;
+
+  if (my $driver = $self->build(%options)) {
+    return $driver->create;
   }
   else {
     return undef;
   }
 }
 
-method clone(Str :$database = $ENV{TESTDB_DATABASE}, Str %options) {
-  if (my $generator = $self->build(%options, database => $database)) {
-    return $generator->clone;
+sub clone {
+  my ($self, %options) = @_;
+
+  if (my $driver = $self->build(%options)) {
+    return $driver->clone;
   }
   else {
     return undef;
   }
 }
 
-method mssql(Str %options) {
-  return $self->build(%options, database => 'mssql');
+sub mssql {
+  my ($self, %options) = @_;
+
+  require Test::DB::Mssql;
+
+  return Test::DB::Mssql->new(%options);
 }
 
-method mysql(Str %options) {
-  return $self->build(%options, database => 'mysql');
+sub mysql {
+  my ($self, %options) = @_;
+
+  require Test::DB::Mysql;
+
+  return Test::DB::Mysql->new(%options);
 }
 
-method postgres(Str %options) {
-  return $self->build(%options, database => 'postgres');
+sub postgres {
+  my ($self, %options) = @_;
+
+  require Test::DB::Postgres;
+
+  return Test::DB::Postgres->new(%options);
 }
 
-method sqlite(Str %options) {
-  return $self->build(%options, database => 'sqlite');
+sub sqlite {
+  my ($self, %options) = @_;
+
+  require Test::DB::Sqlite;
+
+  return Test::DB::Sqlite->new(%options);
+}
+
+sub type {
+  my ($self, $name) = @_;
+
+  return $name || $ENV{TESTDB_DATABASE} || 'sqlite';
 }
 
 1;
 
-=encoding utf8
+
 
 =head1 NAME
 
@@ -79,6 +112,12 @@ Test::DB - Temporary Testing Databases
 =head1 ABSTRACT
 
 Temporary Databases for Testing
+
+=cut
+
+=head1 VERSION
+
+0.10
 
 =cut
 
@@ -126,12 +165,6 @@ Using the established connection, create the test/temporary database.
 Establish a connection to the newly created test/temporary database.
 
   $tdbo->create->dbh;
-
-=item #4
-
-Make the test database object immutable.
-
-  $tdbo->create->database('example'); # error
 
 =back
 
@@ -232,36 +265,28 @@ B<using Mojo::SQLite>
 
 =cut
 
-=head1 LIBRARIES
-
-This package uses type constraints from:
-
-L<Types::Standard>
-
-=cut
-
 =head1 METHODS
 
-This package implements the following methods:
+This package provides the following methods:
 
 =cut
 
 =head2 clone
 
-  clone(Str :$database, Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+clone(Str :$database, Str %options) : Maybe[Object]
 
 The clone method generates a database based on the type and database template
-specified and returns a C<Test::DB::Object> with an active connection, C<dbh>
-and C<dsn>. If the database specified doesn't have a corresponding database
-driver this method will returned the undefined value. The type of database can
-be omitted if the C<TESTDB_DATABASE> environment variable is set, if not the
-type of database must be either C<sqlite>, C<mysql>, C<mssql> or C<postgres>.
-Any options provided are passed along to the test database object class
+specified and returns a driver object with an active connection, C<dbh> and
+C<dsn>. If the database specified doesn't have a corresponding database driver
+this method will returned the undefined value. The type of database can be
+omitted if the C<TESTDB_DATABASE> environment variable is set, if not the type
+of database must be either C<sqlite>, C<mysql>, C<mssql> or C<postgres>.  Any
+options provided are passed along to the test database object class
 constructor.
 
 =over 4
 
-=item clone example #1
+=item clone example 1
 
   # given: synopsis
 
@@ -273,7 +298,7 @@ constructor.
 
 =over 4
 
-=item clone example #2
+=item clone example 2
 
   # given: synopsis
 
@@ -286,7 +311,7 @@ constructor.
 
 =over 4
 
-=item clone example #3
+=item clone example 3
 
   # given: synopsis
 
@@ -300,19 +325,19 @@ constructor.
 
 =head2 create
 
-  create(Str :$database, Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+create(Str :$database, Str %options) : Maybe[Object]
 
 The create method generates a database based on the type specified and returns
-a C<Test::DB::Object> with an active connection, C<dbh> and C<dsn>. If the
-database specified doesn't have a corresponding database driver this method
-will returned the undefined value. The type of database can be omitted if the
+a driver object with an active connection, C<dbh> and C<dsn>. If the database
+specified doesn't have a corresponding database driver this method will
+returned the undefined value. The type of database can be omitted if the
 C<TESTDB_DATABASE> environment variable is set, if not the type of database
 must be either C<sqlite>, C<mysql>, C<mssql> or C<postgres>. Any options
 provided are passed along to the test database object class constructor.
 
 =over 4
 
-=item create example #1
+=item create example 1
 
   # given: synopsis
 
@@ -322,7 +347,7 @@ provided are passed along to the test database object class constructor.
 
 =over 4
 
-=item create example #2
+=item create example 2
 
   # given: synopsis
 
@@ -334,7 +359,7 @@ provided are passed along to the test database object class constructor.
 
 =over 4
 
-=item create example #3
+=item create example 3
 
   # given: synopsis
 
@@ -346,13 +371,13 @@ provided are passed along to the test database object class constructor.
 
 =head2 mssql
 
-  mssql(Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+mssql(Str %options) : Maybe[InstanceOf["Test::DB::Mssql"]]
 
 The mssql method builds and returns a L<Test::DB::Mssql> object.
 
 =over 4
 
-=item mssql example #1
+=item mssql example 1
 
   # given: synopsis
 
@@ -364,13 +389,13 @@ The mssql method builds and returns a L<Test::DB::Mssql> object.
 
 =head2 mysql
 
-  mysql(Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+mysql(Str %options) : Maybe[InstanceOf["Test::DB::Mysql"]]
 
 The mysql method builds and returns a L<Test::DB::Mysql> object.
 
 =over 4
 
-=item mysql example #1
+=item mysql example 1
 
   # given: synopsis
 
@@ -382,13 +407,13 @@ The mysql method builds and returns a L<Test::DB::Mysql> object.
 
 =head2 postgres
 
-  postgres(Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+postgres(Str %options) : Maybe[InstanceOf["Test::DB::Postgres"]]
 
 The postgres method builds and returns a L<Test::DB::Postgres> object.
 
 =over 4
 
-=item postgres example #1
+=item postgres example 1
 
   # given: synopsis
 
@@ -400,46 +425,18 @@ The postgres method builds and returns a L<Test::DB::Postgres> object.
 
 =head2 sqlite
 
-  sqlite(Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+sqlite(Str %options) : Maybe[InstanceOf["Test::DB::Sqlite"]]
 
 The sqlite method builds and returns a L<Test::DB::Sqlite> object.
 
 =over 4
 
-=item sqlite example #1
+=item sqlite example 1
 
   # given: synopsis
 
   $tdb->sqlite;
 
 =back
-
-=cut
-
-=head1 AUTHOR
-
-Al Newkirk, C<awncorp@cpan.org>
-
-=head1 LICENSE
-
-Copyright (C) 2011-2019, Al Newkirk, et al.
-
-This is free software; you can redistribute it and/or modify it under the terms
-of the The Apache License, Version 2.0, as elucidated in the L<"license
-file"|https://github.com/iamalnewkirk/test-db/blob/master/LICENSE>.
-
-=head1 PROJECT
-
-L<Wiki|https://github.com/iamalnewkirk/test-db/wiki>
-
-L<Project|https://github.com/iamalnewkirk/test-db>
-
-L<Initiatives|https://github.com/iamalnewkirk/test-db/projects>
-
-L<Milestones|https://github.com/iamalnewkirk/test-db/milestones>
-
-L<Contributing|https://github.com/iamalnewkirk/test-db/blob/master/CONTRIBUTE.md>
-
-L<Issues|https://github.com/iamalnewkirk/test-db/issues>
 
 =cut

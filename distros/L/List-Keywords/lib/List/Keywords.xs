@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
  */
 #define PERL_NO_GET_CONTEXT
 /* needed on latest perl to get optimize_optree/finalize_optree */
@@ -30,6 +30,13 @@
 #  else
 #    define finalize_optree(op)
 #  endif
+#endif
+
+#if HAVE_PERL_VERSION(5,28,0)
+#  define XPUSHzero  XPUSHs(&PL_sv_zero)
+#else
+   /* perls before 5.28 do not have PL_sv_zero */
+#  define XPUSHzero  mXPUSHi(0)
 #endif
 
 /* We can't newLOGOP because that will force scalar context */
@@ -151,8 +158,8 @@ static OP *pp_firststart(pTHX)
 
   if(targ) {
     SV **padentry = &PAD_SVl(targ);
-    save_clearsv(padentry);
-    sv_setsv(*padentry, src);
+    save_sptr(padentry);
+    *padentry = SvREFCNT_inc(src);
   }
   else {
     SAVE_DEFSV;
@@ -182,14 +189,17 @@ static OP *pp_firstwhile(pTHX)
     /* Stop */
 
     /* Technically this means that `first` will not necessarily return the
-     * value from the list, but instead returns whatever $_ was set to after
-     * the block has run; differing if the block modified it.
+     * value from the list, but instead returns whatever the var was set to
+     * after the block has run; differing if the block modified it.
      * I'm unsure how I feel about this, but both `CORE::grep` and
      * `List::Util::first` do the same thing, so we are in good company
      */
     SV *ret = (mode & FIRST_RET_NO ) ? &PL_sv_no :
               (mode & FIRST_RET_YES) ? &PL_sv_yes :
-                                       sv_mortalcopy(targsv);
+                                       SvREFCNT_inc(targsv);
+    if(targ)
+      SvREFCNT_dec(targsv);
+
     LEAVE_with_name("first");
     (void)POPMARK;
     SP = PL_stack_base + POPMARK;
@@ -216,8 +226,11 @@ static OP *pp_firstwhile(pTHX)
   }
   SvTEMP_off(src);
 
-  if(targ)
-    sv_setsv(targsv, src);
+  if(targ) {
+    SV **padentry = &PAD_SVl(targ);
+    SvREFCNT_dec(*padentry);
+    *padentry = SvREFCNT_inc(src);
+  }
   else
     DEFSV_set(src);
 
@@ -374,15 +387,15 @@ static OP *pp_reducewhile(pTHX)
 
     if(mode == REDUCE_REDUCTIONS) {
       (void)POPMARK;
-      I32 items = --*PL_markstack_ptr - PL_markstack_ptr[-1];
+      I32 retcount = --*PL_markstack_ptr - PL_markstack_ptr[-1];
       (void)POPMARK;
       SP = PL_stack_base + POPMARK;
       if(gimme == G_SCALAR) {
-        SP[1] = SP[items];
+        SP[1] = SP[retcount];
         SP += 1;
       }
       else if(gimme == G_ARRAY)
-        SP += items;
+        SP += retcount;
     }
     else {
       (void)POPMARK;
@@ -448,6 +461,368 @@ static const struct XSParseKeywordHooks hooks_reductions = {
   .build = &build_reduce,
 };
 
+static XOP xop_ngrepstart;
+static XOP xop_ngrepwhile;
+
+/* During the operation of ngrep, the top two marks on the markstack keep
+ * track of the input values and return values, respectively */
+#define VALMARK  (PL_markstack_ptr[0])
+#define RETMARK  (PL_markstack_ptr[-1])
+
+static OP *pp_ngrepstart(pTHX)
+{
+  /* Inspired by perl core's pp_grepstart() */
+  dSP;
+  PADOFFSET targ = PL_op->op_targ;
+  U8 targcount = PL_op->op_private;
+
+  if(PL_stack_base + TOPMARK == SP) {
+    /* Empty */
+    (void)POPMARK;
+    if(GIMME_V == G_SCALAR)
+      XPUSHzero;
+    RETURNOP(PL_op->op_next->op_next);
+  }
+
+  PL_stack_sp = PL_stack_base + TOPMARK + 1;
+  PUSHMARK(PL_stack_sp);
+  PUSHMARK(PL_stack_sp);
+
+  ENTER_with_name("ngrep");
+
+  for(U8 targi = 0; targi < targcount; targi++) {
+    SV **svp = PL_stack_base + TOPMARK;
+    SV *sv = svp <= SP ? *svp : &PL_sv_undef;
+    if(SvPADTMP(sv)) {
+      sv = PL_stack_base[TOPMARK] = sv_mortalcopy(sv);
+      PL_tmps_floor++;
+    }
+    SvTEMP_off(sv);
+
+    SV **padentry = &PAD_SVl(targ + targi);
+    save_sptr(padentry);
+    *padentry = SvREFCNT_inc(sv);
+
+    VALMARK++;
+  }
+
+  PUTBACK;
+
+  /* Jump to body of block */
+  return (cLOGOPx(PL_op->op_next))->op_other;
+}
+
+static OP *pp_ngrepwhile(pTHX)
+{
+  dSP;
+  PADOFFSET targ = PL_op->op_targ;
+  U8 targcount = PL_op->op_private;
+  dPOPss;
+
+  if(SvTRUE_NN(sv)) {
+    /* VALMARK has already been updated to point at next chunk;
+     * we'll have to look backwards */
+    SV **chunksvs = PL_stack_base + VALMARK - targcount;
+
+    for(U8 targi = 0; targi < targcount; targi++) {
+      if(chunksvs + targi > SP)
+        break;
+
+      PL_stack_base[RETMARK++] = chunksvs[targi];
+    }
+  }
+
+  if(UNLIKELY(PL_stack_base + VALMARK > SP)) {
+    U8 gimme = GIMME_V;
+    I32 retcount = --RETMARK - PL_markstack_ptr[-2]; /* origmark */
+
+    LEAVE_with_name("ngrep");
+
+    (void)POPMARK;
+    (void)POPMARK;
+    SP = PL_stack_base + POPMARK;
+
+    if(gimme == G_SCALAR) {
+      /* No need to X this because we know we consumed at least one stack item */
+      mPUSHi(retcount);
+    }
+    else if(gimme == G_LIST)
+      SP += retcount;
+
+    RETURN;
+  }
+
+  /* next round */
+
+  for(U8 targi = 0; targi < targcount; targi++) {
+    SV **svp = PL_stack_base + VALMARK;
+    SV *sv = svp <= SP ? *svp : &PL_sv_undef;
+    if(SvPADTMP(sv)) {
+      sv = PL_stack_base[VALMARK] = sv_mortalcopy(sv);
+      PL_tmps_floor++;
+    }
+    SvTEMP_off(sv);
+
+    SV **padentry = &PAD_SVl(targ + targi);
+    SvREFCNT_dec(*padentry);
+    *padentry = SvREFCNT_inc(sv);
+
+    VALMARK++;
+  }
+
+  PUTBACK;
+
+  return cLOGOP->op_other;
+}
+
+#undef VALMARK
+#undef RETMARK
+
+static XOP xop_nmapstart;
+static XOP xop_nmapwhile;
+
+static OP *pp_nmapstart(pTHX)
+{
+  /* Inspired by perl core's pp_grepstart() */
+  dSP;
+  PADOFFSET targ = PL_op->op_targ;
+  U8 targcount = PL_op->op_private;
+
+  if(PL_stack_base + TOPMARK == SP) {
+    /* Empty */
+    (void)POPMARK;
+    if(GIMME_V == G_SCALAR)
+      XPUSHzero;
+    RETURNOP(PL_op->op_next->op_next);
+  }
+
+  PL_stack_sp = PL_stack_base + TOPMARK + 1;
+  PUSHMARK(PL_stack_sp);
+  PUSHMARK(PL_stack_sp);
+
+  ENTER_with_name("nmap");
+
+  SAVETMPS;
+
+  ENTER_with_name("nmap_item");
+
+  for(U8 targi = 0; targi < targcount; targi++) {
+    SV **svp = PL_stack_base + TOPMARK;
+    SV *sv = svp <= SP ? *svp : &PL_sv_undef;
+    if(SvPADTMP(sv)) {
+      sv = PL_stack_base[TOPMARK] = sv_mortalcopy(sv);
+      PL_tmps_floor++;
+    }
+    SvTEMP_off(sv);
+
+    SV **padentry = &PAD_SVl(targ + targi);
+    save_sptr(padentry);
+    *padentry = SvREFCNT_inc(sv);
+
+    (*PL_markstack_ptr)++;
+  }
+
+  PUTBACK;
+
+  PUSHMARK(PL_stack_sp);
+
+  /* Jump to body of block */
+  return (cLOGOPx(PL_op->op_next))->op_other;
+}
+
+/* During the operation of ngrep_while, the top three marks on the markstack
+ * keep track of the block result list, the input values, and the output
+ * values, respectively */
+#define BLOCKMARK  (PL_markstack_ptr[0])
+#define VALMARK    (PL_markstack_ptr[-1])
+#define RETMARK    (PL_markstack_ptr[-2])
+
+static OP *pp_nmapwhile(pTHX)
+{
+  /* Inspired by perl core's pp_mapwhile() */
+  dSP;
+  U8 gimme = GIMME_V;
+  PADOFFSET targ = PL_op->op_targ;
+  U8 targcount = PL_op->op_private;
+
+  I32 items = (SP - PL_stack_base) - BLOCKMARK;
+
+  if(items && gimme != G_VOID) {
+    if(items > (VALMARK - RETMARK)) {
+      I32 shift = items - (VALMARK - RETMARK);
+      I32 count = (SP - PL_stack_base) - (VALMARK - targcount);
+      /* avoid needing to reshuffle the stack too often, even at the cost of
+       * making holes in it */
+      if(shift < count)
+        shift = count;
+
+      /* make a hole 'shift' SV*s wide */
+      EXTEND(SP, shift);
+      SV **src = SP;
+      SV **dst = (SP += shift);
+      VALMARK += shift;
+      BLOCKMARK += shift;
+
+      /* move the values up into it */
+      while(count--)
+        *(dst--) = *(src--);
+    }
+
+    SV **dst = PL_stack_base + (RETMARK += items) - 1;
+
+    if(gimme == G_LIST) {
+      EXTEND_MORTAL(items);
+      I32 tmpsbase = PL_tmps_floor + 1;
+      Move(PL_tmps_stack + tmpsbase, PL_tmps_stack + tmpsbase + items, PL_tmps_ix - PL_tmps_floor, SV *);
+      PL_tmps_ix += items;
+
+      I32 i = items;
+      while(i-- > 0) {
+        SV *sv = POPs;
+        if(!SvTEMP(sv))
+          sv = sv_mortalcopy(sv);
+        *dst-- = sv;
+        PL_tmps_stack[tmpsbase++] = SvREFCNT_inc_simple(sv);
+      }
+      PL_tmps_floor += items;
+      FREETMPS;
+      i = items;
+      while(i-- > 0)
+        SvTEMP_on(PL_tmps_stack[--tmpsbase]);
+    }
+    else {
+      /* No point mortalcopying temporary values in scalar context */
+      I32 i = items;
+      while(i-- > 0) {
+        (void)POPs;
+        *dst-- = &PL_sv_undef;
+      }
+      FREETMPS;
+    }
+  }
+  else {
+    FREETMPS;
+  }
+
+  LEAVE_with_name("nmap_item");
+
+  if(UNLIKELY(PL_stack_base + VALMARK > SP)) {
+    I32 retcount = --RETMARK - PL_markstack_ptr[-3]; /* origmark */
+    (void)POPMARK;
+    LEAVE_with_name("nmap");
+
+    (void)POPMARK;
+    (void)POPMARK;
+    SP = PL_stack_base + POPMARK;
+
+    if(gimme == G_SCALAR) {
+      /* No need to X this because we know we consumed at least one stack item */
+      mPUSHi(retcount);
+    }
+    else if(gimme == G_LIST)
+      SP += retcount;
+
+    RETURN;
+  }
+
+  /* next round */
+
+  ENTER_with_name("nmap_item");
+
+  for(U8 targi = 0; targi < targcount; targi++) {
+    SV **svp = PL_stack_base + VALMARK;
+    SV *sv = svp <= SP ? *svp : &PL_sv_undef;
+    if(SvPADTMP(sv)) {
+      sv = PL_stack_base[VALMARK] = sv_mortalcopy(sv);
+      PL_tmps_floor++;
+    }
+    SvTEMP_off(sv);
+
+    SV **padentry = &PAD_SVl(targ + targi);
+    SvREFCNT_dec(*padentry);
+    *padentry = SvREFCNT_inc(sv);
+
+    VALMARK++;
+  }
+
+  PUTBACK;
+
+  return cLOGOP->op_other;
+}
+
+#undef BLOCKMARK
+#undef VALMARK
+#undef RETMARK
+
+enum {
+  NITER_NGREP,
+  NITER_NMAP,
+};
+
+static int build_niter(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
+{
+  size_t argi = 0;
+  int varcount = args[argi++]->i;
+
+  /* It's very unlikely but lets just check */
+  if(varcount > 255)
+    croak("Using more than 255 lexical variables to an iterated block function is not currently supported");
+
+  PADOFFSET varix = args[argi++]->padix;
+  /* Because of how these vars were constructed, it really ought to be the
+   * case that they have consequitive padix values. Lets just check to be sure
+   */
+  for(int vari = 1; vari < varcount; vari++)
+    if(args[argi++]->padix != varix + vari)
+      croak("ARGH: Expected consequitive padix for lexical variables");
+
+  OP *block = op_scope(args[argi++]->op);
+  OP *list  = args[argi++]->op;
+
+  switch(SvIV((SV *)hookdata)) {
+    case NITER_NGREP:
+      block = op_contextualize(block, G_SCALAR);
+      *out = build_blocklist(aTHX_ varix, block, list,
+        &pp_ngrepstart, &pp_ngrepwhile, (U8)varcount);
+      break;
+
+    case NITER_NMAP:
+      block = op_contextualize(block, G_LIST);
+      *out = build_blocklist(aTHX_ varix, block, list,
+        &pp_nmapstart, &pp_nmapwhile, (U8)varcount);
+      break;
+  }
+  return KEYWORD_PLUGIN_EXPR;
+}
+
+static const struct XSParseKeywordHooks hooks_ngrep = {
+  .permit_hintkey = "List::Keywords/ngrep",
+
+  .pieces = (const struct XSParseKeywordPieceType []){
+    XPK_PREFIXED_BLOCK(
+      XPK_KEYWORD("my"),
+      XPK_PARENSCOPE(XPK_COMMALIST(XPK_LEXVAR_MY(XPK_LEXVAR_SCALAR)))
+    ),
+    XPK_LISTEXPR_LISTCTX,
+    {0},
+  },
+  .build = &build_niter,
+};
+
+static const struct XSParseKeywordHooks hooks_nmap = {
+  .permit_hintkey = "List::Keywords/nmap",
+
+  .pieces = (const struct XSParseKeywordPieceType []){
+    XPK_PREFIXED_BLOCK(
+      XPK_KEYWORD("my"),
+      XPK_PARENSCOPE(XPK_COMMALIST(XPK_LEXVAR_MY(XPK_LEXVAR_SCALAR)))
+    ),
+    XPK_LISTEXPR_LISTCTX,
+    {0},
+  },
+  .build = &build_niter,
+};
+
 MODULE = List::Keywords    PACKAGE = List::Keywords
 
 BOOT:
@@ -487,3 +862,27 @@ BOOT:
   XopENTRY_set(&xop_reducewhile, xop_desc, "reduce iter");
   XopENTRY_set(&xop_reducewhile, xop_class, OA_LOGOP);
   Perl_custom_op_register(aTHX_ &pp_reducewhile, &xop_reducewhile);
+
+  register_xs_parse_keyword("ngrep", &hooks_ngrep, newSViv(NITER_NGREP));
+
+  XopENTRY_set(&xop_ngrepstart, xop_name, "ngrepstart");
+  XopENTRY_set(&xop_ngrepstart, xop_desc, "ngrep");
+  XopENTRY_set(&xop_ngrepstart, xop_class, OA_LISTOP);
+  Perl_custom_op_register(aTHX_ &pp_ngrepstart, &xop_ngrepstart);
+
+  XopENTRY_set(&xop_ngrepwhile, xop_name, "ngrepwhile");
+  XopENTRY_set(&xop_ngrepwhile, xop_desc, "ngrep iter");
+  XopENTRY_set(&xop_ngrepwhile, xop_class, OA_LOGOP);
+  Perl_custom_op_register(aTHX_ &pp_ngrepwhile, &xop_ngrepwhile);
+
+  register_xs_parse_keyword("nmap", &hooks_nmap, newSViv(NITER_NMAP));
+
+  XopENTRY_set(&xop_nmapstart, xop_name, "nmapstart");
+  XopENTRY_set(&xop_nmapstart, xop_desc, "nmap");
+  XopENTRY_set(&xop_nmapstart, xop_class, OA_LISTOP);
+  Perl_custom_op_register(aTHX_ &pp_nmapstart, &xop_nmapstart);
+
+  XopENTRY_set(&xop_nmapwhile, xop_name, "nmapwhile");
+  XopENTRY_set(&xop_nmapwhile, xop_desc, "nmap iter");
+  XopENTRY_set(&xop_nmapwhile, xop_class, OA_LOGOP);
+  Perl_custom_op_register(aTHX_ &pp_nmapwhile, &xop_nmapwhile);

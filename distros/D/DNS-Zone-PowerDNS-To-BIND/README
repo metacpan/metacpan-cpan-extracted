@@ -3,9 +3,9 @@ NAME
     information in PowerDNS database
 
 VERSION
-    This document describes version 0.009 of DNS::Zone::PowerDNS::To::BIND
+    This document describes version 0.010 of DNS::Zone::PowerDNS::To::BIND
     (from Perl distribution DNS-Zone-PowerDNS-To-BIND), released on
-    2022-11-05.
+    2022-11-12.
 
 SYNOPSIS
      use DNS::Zone::PowerDNS::To::BIND qw(gen_bind_zone_from_powerdns_db);
@@ -115,8 +115,10 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
-CONTRIBUTOR
-    Ken Teague <kteague@pobox.com>
+CONTRIBUTORS
+    *   Ken Teague <kteague@pobox.com>
+
+    *   keteague <kteague+github.com@pobox.com>
 
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull

@@ -1,44 +1,5 @@
-Changelog for Test-DB
+0.10 2022-02-02
 
-0.07 2021-01-14T06:57:39
- - Add release updates
- - Improve usage documentation (#28)
- - Support for DB URIs (#27)
- - Fix all key/value pair unpacking method signatures (#26)
+- [feature] Refactor to use Venus 1.90+
 
-0.06 2020-08-13T12:06:44
- - Built release version 0.06
- - Add release updates
- - Include TESTDB_TEMPLATE in driver descriptions (#21)
- - Include example for MSSQL, and POD taglines for all (#20)
 
-0.05 2020-08-12T21:54:22
- - Built release version 0.05
- - Add release updates
- - Implement support for MSSQL (#16)
- - Update .gitattributes
-
-0.04 2020-08-10T03:49:17
- - Built release version 0.04
- - Add release updates
- - Cleanup and re-launch
-
-0.03 2020-04-09T20:02:31
- - Built release version 0.03
- - Added release updates
- - Fix META data
- - Allow clone for SQLite and Postgres
- - Add examples
- - Add META data
- - Enable auto-commit which allows DDL statements
-
-0.02 2020-04-05T00:47:11
- - Built release version 0.02
- - Added release updates
- - Update documentation
-
-0.01 2020-04-05T00:17:37
- - Built release version 0.01
- - Added release updates
- - Initial implementation
- - Initial commit

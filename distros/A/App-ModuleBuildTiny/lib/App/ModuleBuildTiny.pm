@@ -1,14 +1,13 @@
 package App::ModuleBuildTiny;
 
-use 5.010;
+use 5.014;
 use strict;
 use warnings;
-our $VERSION = '0.030';
+our $VERSION = '0.031';
 
 use Exporter 5.57 'import';
 our @EXPORT = qw/modulebuildtiny/;
 
-use Carp qw/croak/;
 use Config;
 use CPAN::Meta;
 use Data::Section::Simple 'get_data_section';
@@ -58,8 +57,7 @@ sub fill_in {
 
 sub write_module {
 	my %opts = @_;
-	my $template = get_data_section('Module.pm');
-	$template =~ s/ ^ % (\w+) /=$1/gxms;
+	my $template = get_data_section('Module.pm') =~ s/ ^ % (\w+) /=$1/gxmsr;
 	my $filename = catfile('lib', split /::/, $opts{module_name}) . '.pm';
 	my $content = fill_in($template, \%opts);
 	mkpath(dirname($filename));
@@ -86,7 +84,7 @@ sub write_readme {
 	write_text('README', fill_in($template, \%opts));
 }
 
-sub get_config {
+sub get_config_file {
 	local $HOME = $USERPROFILE if $^O eq 'MSWin32';
 	return catfile(glob('~'), qw/.mbtiny conf/);
 }
@@ -123,17 +121,19 @@ my @config_items = (
 my %actions = (
 	dist => sub {
 		my @arguments = @_;
-		GetOptionsFromArray(\@arguments, \my %opts, qw/trial verbose!/) or exit 2;
+		GetOptionsFromArray(\@arguments, \my %opts, qw/trial verbose!/) or return 2;
 		my $dist = App::ModuleBuildTiny::Dist->new(%opts);
 		die "Trial mismatch" if $opts{trial} && $dist->release_status ne 'testing';
+		$dist->checkchanges;
+		$dist->checkmeta;
 		my $name = $dist->meta->name . '-' . $dist->meta->version;
-		printf "tar czf $name.tar.tz %s\n", join ' ', $dist->files if $opts{verbose};
+		printf "tar czf $name.tar.gz %s\n", join ' ', $dist->files if $opts{verbose};
 		$dist->write_tarball($name);
 		return 0;
 	},
 	distdir => sub {
 		my @arguments = @_;
-		GetOptionsFromArray(\@arguments, \my %opts, qw/trial verbose!/) or exit 2;
+		GetOptionsFromArray(\@arguments, \my %opts, qw/trial verbose!/) or return 2;
 		my $dist = App::ModuleBuildTiny::Dist->new(%opts);
 		die "Trial mismatch" if $opts{trial} && $dist->release_status ne 'testing';
 		$dist->write_dir($dist->meta->name . '-' . $dist->meta->version, $opts{verbose});
@@ -143,42 +143,48 @@ my %actions = (
 		my @arguments = @_;
 		$AUTHOR_TESTING = 1;
 		GetOptionsFromArray(\@arguments, 'release!' => \$RELEASE_TESTING, 'author!' => \$AUTHOR_TESTING, 'automated!' => \$AUTOMATED_TESTING,
-			'extended!' => \$EXTENDED_TESTING, 'non-interactive!' => \$NONINTERACTIVE_TESTING) or exit 2;
+			'extended!' => \$EXTENDED_TESTING, 'non-interactive!' => \$NONINTERACTIVE_TESTING) or return 2;
 		my $dist = App::ModuleBuildTiny::Dist->new;
 		return $dist->run(command => [ $Config{perlpath}, 'Build', 'test' ], build => 1);
 	},
 	upload => sub {
 		my @arguments = @_;
-		GetOptionsFromArray(\@arguments, \my %opts, qw/trial config=s silent/) or exit 2;
+		GetOptionsFromArray(\@arguments, \my %opts, qw/trial config=s silent/) or return 2;
 
 		my $dist = App::ModuleBuildTiny::Dist->new;
+		$dist->checkchanges;
+		$dist->checkmeta;
 		$dist->run(command => [ $Config{perlpath}, 'Build', 'test' ], build => 1) or return 1;
-		my $trial =  $dist->release_status eq 'testing' && $dist->version !~ /_/;
-		my $name = $dist->meta->name . '-' . $dist->meta->version . ($trial ? '-TRIAL' : '' );
-		my $file = $dist->write_tarball($name);
-		require CPAN::Upload::Tiny;
-		CPAN::Upload::Tiny->VERSION('0.009');
-		my $uploader = CPAN::Upload::Tiny->new_from_config_or_stdin($opts{config});
-		$uploader->upload_file($file);
-		print "Successfully uploaded $file\n" if not $opts{silent};
+
+		my $sure = prompt('Do you want to continue the release process? y/n', 'n');
+		if (lc $sure eq 'y') {
+			my $trial =  $dist->release_status eq 'testing' && $dist->version !~ /_/;
+			my $name = $dist->meta->name . '-' . $dist->meta->version . ($trial ? '-TRIAL' : '' );
+			my $file = $dist->write_tarball($name);
+			require CPAN::Upload::Tiny;
+			CPAN::Upload::Tiny->VERSION('0.009');
+			my $uploader = CPAN::Upload::Tiny->new_from_config_or_stdin($opts{config});
+			$uploader->upload_file($file);
+			print "Successfully uploaded $file\n" if not $opts{silent};
+		}
 		return 0;
 	},
 	run => sub {
 		my @arguments = @_;
-		croak "No arguments given to run" if not @arguments;
-		GetOptionsFromArray(\@arguments, 'build!' => \(my $build = 1)) or exit 2;
+		die "No arguments given to run\n" if not @arguments;
+		GetOptionsFromArray(\@arguments, 'build!' => \(my $build = 1)) or return 2;
 		my $dist = App::ModuleBuildTiny::Dist->new();
 		return $dist->run(command => \@arguments, build => $build);
 	},
 	shell => sub {
 		my @arguments = @_;
-		GetOptionsFromArray(\@arguments, 'build!' => \my $build) or exit 2;
+		GetOptionsFromArray(\@arguments, 'build!' => \my $build) or return 2;
 		my $dist = App::ModuleBuildTiny::Dist->new();
 		return $dist->run(command => [ $SHELL ], build => $build);
 	},
 	listdeps => sub {
 		my @arguments = @_;
-		GetOptionsFromArray(\@arguments, \my %opts, qw/json only_missing|only-missing|missing omit_core|omit-core=s author versions/) or exit 2;
+		GetOptionsFromArray(\@arguments, \my %opts, qw/json only_missing|only-missing|missing omit_core|omit-core=s author versions/) or return 2;
 		my $dist = App::ModuleBuildTiny::Dist->new;
 
 		require CPAN::Meta::Prereqs::Filter;
@@ -201,55 +207,65 @@ my %actions = (
 		}
 		else {
 			require JSON::PP;
-			print JSON::PP->new->ascii->pretty->encode($prereqs->as_string_hash);
+			print JSON::PP->new->ascii->canonical->pretty->encode($prereqs->as_string_hash);
 		}
 		return 0;
 	},
 	regenerate => sub {
 		my @arguments = @_;
-		GetOptionsFromArray(\@arguments, \my %opts, qw/trial bump version=s verbose dry_run/) or exit 2;
+		GetOptionsFromArray(\@arguments, \my %opts, qw/trial bump version=s verbose dry_run|dry-run/) or return 2;
 		my %files = map { $_ => 1 } @arguments ? @arguments : qw/Build.PL META.json META.yml MANIFEST LICENSE README/;
 
 		if ($opts{bump}) {
 			bump_versions(%opts);
 		}
 
-		if (!$opts{dry_run}) {
-			my $dist = App::ModuleBuildTiny::Dist->new(%opts, regenerate => \%files);
-			for my $filename ($dist->files) {
-				write_binary($filename, $dist->get_file($filename)) if $dist->is_generated($filename);
-			}
+		my $dist = App::ModuleBuildTiny::Dist->new(%opts, regenerate => \%files);
+		my @generated = grep { $files{$_} } $dist->files;
+		for my $filename (@generated) {
+			say "Updating $filename" if $opts{verbose};
+			write_binary($filename, $dist->get_file($filename)) if !$opts{dry_run};
 		}
 		return 0;
 	},
 	scan => sub {
 		my @arguments = @_;
 		my %opts = (sanitize => 1);
-		GetOptionsFromArray(\@arguments, \%opts, qw/omit_core|omit-core=s sanitize omit=s@/) or exit 2;
+		GetOptionsFromArray(\@arguments, \%opts, qw/omit_core|omit-core=s sanitize! omit=s@/) or return 2;
 		my $dist = App::ModuleBuildTiny::Dist->new(regenerate => { 'META.json' => 1 });
 		my $prereqs = $dist->scan_prereqs(%opts);
 		write_json('prereqs.json', $prereqs->as_string_hash);
+		return 0;
 	},
 	configure => sub {
 		my @arguments = @_;
-		my $config_file = get_config();
+		my $config_file = get_config_file();
 
 		my $mode = @arguments ? $arguments[0] : 'upgrade';
 
+		my $save = sub {
+			my ($config, $key, $value) = @_;
+			if (length $value and $value ne '-') {
+				$config->{$key} = $value;
+			}
+			else {
+				delete $config->{$key};
+			}
+		};
 		if ($mode eq 'upgrade') {
 			my $config = -f $config_file ? read_json($config_file) : {};
 			for my $item (@config_items) {
 				my ($key, $description, $default) = @{$item};
 				next if defined $config->{$key};
-				$config->{$key} = prompt($description, $default);
+				$save->($config, $key, prompt($description, $default));
 			}
 			write_json($config_file, $config);
 		}
 		elsif ($mode eq 'all') {
-			my $config = {};
+			my $config = -f $config_file ? read_json($config_file) : {};
 			for my $item (@config_items) {
 				my ($key, $description, $default) = @{$item};
-				$config->{$key} = prompt($description, $default);
+				$save->($config, $key, prompt($description, $config->{$key} // $default));
 			}
 			write_json($config_file, $config);
 		}
@@ -268,26 +284,30 @@ my %actions = (
 	mint => sub {
 		my @arguments = @_;
 
-		my $config_file = get_config();
-		croak "No config file present, please run mbtiny configure" if not -f $config_file;
-		my $config = read_json($config_file);
-		croak "Config not readable, please run mbtiny configure" if not defined $config;
+		my $config_file = get_config_file();
+		my $config = -f $config_file ? read_json($config_file) // {} : {};
 
-		my $distname = decode_utf8(shift @arguments || croak 'No distribution name given');
-		croak "Directory $distname already exists" if -e $distname;
+		my $distname = decode_utf8(shift @arguments || die "No distribution name given\n");
+		die "Directory $distname already exists\n" if -e $distname;
 
 		my %args = (
 			%{ $config },
 			version => '0.001',
 			dirname => $distname,
+			abstract => 'INSERT YOUR ABSTRACT HERE',
 		);
-		GetOptionsFromArray(\@arguments, \%args, qw/author=s email=s version=s abstract=s license=s dirname=s/) or exit 2;
+		GetOptionsFromArray(\@arguments, \%args, qw/author=s email=s license=s version=s abstract=s dirname=s/) or return 2;
+		for my $item (@config_items) {
+			my ($key, $description, $default) = @{$item};
+			next if defined $args{$key};
+			$args{$key} = prompt($description, $default);
+		}
 
 		my $license = create_license_for(delete $args{license}, $args{author});
 
 		mkdir $args{dirname};
 		chdir $args{dirname};
-		($args{module_name} = $distname) =~ s/-/::/g; # 5.014 for s///r?
+		$args{module_name} = $distname =~ s/-/::/gr;
 
 		write_module(%args, notice => $license->notice);
 		write_text('LICENSE', $license->fulltext);
@@ -300,9 +320,9 @@ my %actions = (
 
 sub modulebuildtiny {
 	my ($action, @arguments) = @_;
-	croak 'No action given' unless defined $action;
+	die "No action given\n" unless defined $action;
 	my $call = $actions{$action};
-	croak "No such action '$action' known\n" if not $call;
+	die "No such action '$action' known\n" if not $call;
 	return $call->(@arguments);
 }
 
@@ -340,7 +360,7 @@ An extremely powerful but somewhat heavy authoring tool.
 
 =item * L<Minilla|Minilla>
 
-A more minimalistic but still somewhat customizable authoring tool.
+A more minimalistic than Dist::Zilla but still somewhat customizable authoring tool.
 
 =back
 
@@ -384,10 +404,6 @@ our $VERSION = '{{ $version }}';
 %head1 NAME
 
 {{ $module_name }} - {{ $abstract }}
-
-%head1 VERSION
-
-{{ $version }}
 
 %head1 DESCRIPTION
 

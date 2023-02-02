@@ -10,16 +10,14 @@ use Test::DB;
 my $testdb = Test::DB->new;
 
 # creates DB
-my $pgdb = $testdb->create(
-  database => 'mssql',
-);
+my $msdb = $testdb->mssql->create;
 
 # do stuff in test DB
-$pgdb->dbh->do('create table [users] ([id] int primary key)');
-$pgdb->dbh->do('select * from [users]');
+$msdb->dbh->do('create table [users] ([id] int primary key)');
+$msdb->dbh->do('select * from [users]');
 
 # destroys DB
-$pgdb->destroy;
+$msdb->destroy;
 
 # no mas
-say join ' ', 'done with', $pgdb->database;
+say join ' ', 'done with', $msdb->database;

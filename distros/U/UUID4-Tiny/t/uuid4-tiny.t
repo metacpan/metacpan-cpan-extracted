@@ -51,6 +51,14 @@ tests uuid_to_string => sub {
 
     is uuid_to_string($bytes), $string,
         'UUID bytes convert to correct UUID string';
+
+    like exception { uuid_to_string [] },
+        qr/^Invalid UUID: expected scalar but got reference to ARRAY/,
+        'refuses to convert ARRAYREF';
+
+    like exception { uuid_to_string bless {}, 'Foo::Bar' },
+        qr/^Invalid UUID: expected scalar but got reference to Foo::Bar/,
+        'refuses to convert blessed';
 };
 
 tests 'create_uuid(_string)' => sub {

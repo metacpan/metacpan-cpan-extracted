@@ -202,6 +202,22 @@ subtest csv_sort_fields => sub {
     };
 };
 
+subtest csv_sorted_fields => sub {
+    my ($res, $stdout);
+
+    require App::CSVUtils::csv_sorted_fields;
+
+    subtest "sorted, alphabetical" => sub {
+        $stdout = capture_stdout { $res = App::CSVUtils::csv_sorted_fields::csv_sorted_fields(input_filename=>"$dir/1.csv") };
+        is($res->[0],200,"status");
+    };
+    subtest "not sorted, reverse alphabetical" => sub {
+        $stdout = capture_stdout { $res = App::CSVUtils::csv_sorted_fields::csv_sorted_fields(input_filename=>"$dir/1.csv", reverse=>1) };
+        is($res->[0],400,"status");
+        like($res->[2],qr/NOT/,"output");
+    };
+};
+
 subtest csv_sort_rows => sub {
     my ($res, $stdout);
 
@@ -254,6 +270,22 @@ subtest csv_sort_rows => sub {
             $stdout = capture_stdout { $res = App::CSVUtils::csv_sort_rows::csv_sort_rows(input_filename=>"$dir/sort-rows.csv", by_sortsub=>"numerically<r>", hash=>1, key=>'$_->{f1}') };
             is($stdout,qq(f1,f2\n10,Chuck\n2,andy\n1,Andy\n), "output");
         };
+    };
+};
+
+subtest csv_sorted_rows => sub {
+    my ($res, $stdout);
+
+    require App::CSVUtils::csv_sorted_rows;
+
+    subtest "sorted, by fields, numerical" => sub {
+        $stdout = capture_stdout { $res = App::CSVUtils::csv_sorted_rows::csv_sorted_rows(input_filename=>"$dir/1.csv", by_fields=>["f1"]) };
+        is($res->[0],200,"status");
+    };
+    subtest "not sorted, by fields, reverse numerical" => sub {
+        $stdout = capture_stdout { $res = App::CSVUtils::csv_sorted_rows::csv_sorted_rows(input_filename=>"$dir/1.csv", by_fields=>["-f1"]) };
+        is($res->[0],400,"status");
+        like($res->[2],qr/NOT/,"output");
     };
 };
 

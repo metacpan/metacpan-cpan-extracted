@@ -46,6 +46,49 @@ DESCRIPTION
     each item, and does not make use of caller or return, this should not
     cause any noticable differences.
 
+ Lexical Variable Syntax
+
+    Newly added in version 0.09 many of the functions in this module
+    support a new syntax idea that may be added to Perl core eventually,
+    whereby a lexical variable can be declared before the code block. In
+    that case, this lexical variable takes the place of the global $_ for
+    the purpose of carrying values from the input list.
+
+    This syntax is currently under discussion for Perl's map and grep
+    blocks, and may be added in a future release of Perl.
+
+    https://github.com/Perl/RFCs/pull/33
+
+ Aliasing and Modification
+
+    Each time the block code is executed, the global $_ or the lexical
+    variable being used is aliased to an element of the input list (in the
+    same way as it would be for perl's map or foreach loops, for example).
+    If the block attempts to modify the value of this variable, such
+    modifications are visible in the input list. You almost certainly want
+    to avoid doing this.
+
+    For example:
+
+       my @numbers = ...;
+       my $x = first my $x { $x++ > 10 } @numbers;
+
+    This will modify values in the @numbers array, but due to the
+    short-circuit nature of first, will only have modified values up to the
+    selected element by the time it returns. This will likely confuse later
+    uses of the input array.
+
+    Additionally, the result of first is also aliased to the input list,
+    much as it is for core perl's grep. This may mean that values passed in
+    to other functions have an ability to mutate at a distance.
+
+    For example:
+
+       func( first { ... } @numbers );
+
+    Here, the invoked func() may be able to modify the @numbers array, for
+    example by modifying its own @_ array.
+
  Performance
 
     The following example demonstrates a simple case and shows how the
@@ -153,6 +196,50 @@ KEYWORDS
     Similar to reduce, but returns a full list of all the partial results
     of every invocation, beginning with the initial value itself and ending
     with the final result.
+
+N-AT-A-TIME FUNCTIONS
+
+    The following two functions are a further experiment to try out
+    n-at-a-time lexical variable support on the core grep and map
+    operators. They are differently named, because keyword plugins cannot
+    replace existing core keywords, only add new ones.
+
+ ngrep
+
+       @values = ngrep my ($var1, $var2, ...) { CODE } LIST
+    
+       $values = ngrep my ($var1, $var2, ...) { CODE } LIST
+
+    Since version 0.10.
+
+    A variation on core's grep, which uses lexical variable syntax to
+    request a number of items at once. The input list is broken into
+    bundles sized according to the number of variables declared. The block
+    of code is called in scalar context with the variables set to each
+    corresponding bundle of values, and the bundles for which the block
+    returned true are saved for the resulting list.
+
+    In scalar context, returns the number of values that would have been
+    present in the resulting list (i.e. this is not the same as the number
+    of times the block returned true).
+
+ nmap
+
+       @results = nmap my ($var1, $var2, ...) { CODE } LIST
+    
+       $results = nmap my ($var1, $var2, ...) { CODE } LIST
+
+    Since version 0.10.
+
+    A variation on core's map, which uses lexical variable syntax to
+    request a number of items at once. The input list is broken into
+    bundles sized according to the number of variables declared. The block
+    of code is called in list context with the variables set to each
+    corresponding bundle of values, and the results of the block from each
+    bundle are concatenated together to form the result list.
+
+    In scalar context, returns the number of values that would have been
+    present in the resulting list.
 
 TODO
 

@@ -11,7 +11,7 @@ use Test2::V0;
 use Exporter 'import';
 our @EXPORT = qw/ obs_is cold /;
 
-our $VERSION = "v6.19.0";
+our $VERSION = "v6.22.1";
 
 sub cold {
     my ($marble, $mapping) = @_;

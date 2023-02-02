@@ -19,7 +19,7 @@ name: DNS-Zone-PowerDNS-To-BIND
 provides:
   DNS::Zone::PowerDNS::To::BIND:
     file: lib/DNS/Zone/PowerDNS/To/BIND.pm
-    version: '0.009'
+    version: '0.010'
 requires:
   DBIx::Connect::Any: '0'
   DNS::Zone::Struct::Common: '0.004'
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DNS-Zone-PowerDNS-To-BIND
   homepage: https://metacpan.org/release/DNS-Zone-PowerDNS-To-BIND
   repository: git://github.com/perlancar/perl-DNS-Zone-PowerDNS-To-BIND.git
-version: '0.009'
+version: '0.010'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -498,6 +498,7 @@ x_Dist_Zilla:
 x_authority: cpan:PERLANCAR
 x_contributors:
   - 'Ken Teague <kteague@pobox.com>'
+  - 'keteague <kteague+github.com@pobox.com>'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

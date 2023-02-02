@@ -14,9 +14,9 @@ our @EXPORT_OK = qw(
                );
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-05'; # DATE
+our $DATE = '2022-11-12'; # DATE
 our $DIST = 'DNS-Zone-PowerDNS-To-BIND'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 our %SPEC;
 
@@ -155,20 +155,100 @@ sub gen_bind_zone_from_powerdns_db {
             push @res, "A $rec->{content}\n";
 	} elsif ($type eq 'AAAA') {
             push @res, "AAAA $rec->{content}\n";
+	} elsif ($type eq 'AFSDB') {
+            push @res, "AFSDB $rec->{content}\n";
+	} elsif ($type eq 'APL') {
+            push @res, "APL $rec->{content}\n";
+	} elsif ($type eq 'AXFR') {
+            push @res, "AXFR $rec->{content}\n";
+	} elsif ($type eq 'CAA') {
+            push @res, "CAA $rec->{content}.\n";
+	} elsif ($type eq 'CDNSKEY') {
+            push @res, "CDNSKEY $rec->{content}\n";
+	} elsif ($type eq 'CDS') {
+            push @res, "CDS $rec->{content}\n";
+	} elsif ($type eq 'CERT') {
+            push @res, "CERT $rec->{content}\n";
         } elsif ($type eq 'CNAME') {
             push @res, "CNAME $rec->{content}.\n";
+	} elsif ($type eq 'CSYNC') {
+            push @res, "CSYNC $rec->{content}\n";
+	} elsif ($type eq 'DHCID') {
+            push @res, "DHCID $rec->{content}\n";
+	} elsif ($type eq 'DLV') {
+            push @res, "DLV $rec->{content}\n";
+	} elsif ($type eq 'DNAME') {
+            push @res, "DNAME $rec->{content}\n";
+	} elsif ($type eq 'DNSKEY') {
+            push @res, "DNSKEY $rec->{content}\n";
+	} elsif ($type eq 'DS') {
+            push @res, "DS $rec->{content}\n";
+	} elsif ($type eq 'EUI48') {
+            push @res, "EUI48 $rec->{content}\n";
+	} elsif ($type eq 'EUI64') {
+            push @res, "EUI64 $rec->{content}\n";
+	} elsif ($type eq 'HINFO') {
+            push @res, "HINFO $rec->{content}\n";
+	} elsif ($type eq 'HIP') {
+            push @res, "HIP $rec->{content}\n";
+	} elsif ($type eq 'HTTPS') {
+            push @res, "HTTPS $rec->{content}\n";
+	} elsif ($type eq 'IPSECKEY') {
+            push @res, "IPSECKEY $rec->{content}\n";
+	} elsif ($type eq 'IXFR') {
+            push @res, "IXFR $rec->{content}\n";
+	} elsif ($type eq 'KEY') {
+            push @res, "KEY $rec->{content}\n";
+	} elsif ($type eq 'KX') {
+            push @res, "KX $rec->{content}\n";
+	} elsif ($type eq 'LOC') {
+            push @res, "LOC $rec->{content}\n";
         } elsif ($type eq 'MX') {
             push @res, "MX $rec->{prio} $rec->{content}.\n";
+	} elsif ($type eq 'NAPTR') {
+            push @res, "NAPTR $rec->{content}\n";
         } elsif ($type eq 'NS') {
             push @res, "NS $rec->{content}.\n";
+	} elsif ($type eq 'NSEC') {
+            push @res, "NSEC $rec->{content}\n";
+	} elsif ($type eq 'NSEC3') {
+            push @res, "NSEC3 $rec->{content}\n";
+	} elsif ($type eq 'NSEC3PARAM') {
+            push @res, "NSEC3PARAM $rec->{content}\n";
+	} elsif ($type eq 'OPENPGPKEY') {
+            push @res, "OPENPGPKEY $rec->{content}\n";
+	} elsif ($type eq 'OPT') {
+            push @res, "OPT $rec->{content}\n";
 	} elsif ($type eq 'PTR') {
             push @res, "PTR $rec->{content}.\n";
+	} elsif ($type eq 'RP') {
+            push @res, "RP $rec->{content}\n";
+	} elsif ($type eq 'RRSIG') {
+            push @res, "RRSIG $rec->{content}\n";
+	} elsif ($type eq 'SIG') {
+            push @res, "SIG $rec->{content}\n";
+	} elsif ($type eq 'SMIMEA') {
+            push @res, "SMIMEA $rec->{content}\n";
         } elsif ($type eq 'SSHFP') {
             push @res, "SSHFP $rec->{content}\n";
         } elsif ($type eq 'SRV') {
             push @res, "SRV $rec->{prio} $rec->{content}\n";
+	} elsif ($type eq 'SVCB') {
+            push @res, "SVCB $rec->{content}\n";
+	} elsif ($type eq 'TA') {
+            push @res, "TA $rec->{content}\n";
+	} elsif ($type eq 'TKEY') {
+            push @res, "TKEY $rec->{content}\n";
+	} elsif ($type eq 'TLSA') {
+            push @res, "TLSA $rec->{content}\n";
+	} elsif ($type eq 'TSIG') {
+            push @res, "TSIG $rec->{content}\n";
         } elsif ($type eq 'TXT') {
             push @res, "TXT ", _encode_txt($rec->{content}), "\n";
+	} elsif ($type eq 'URI') {
+            push @res, "URI $rec->{content}\n";
+	} elsif ($type eq 'ZONEMD') {
+            push @res, "ZONEMD $rec->{content}\n";
         } else {
             die "Can't dump record with type $type";
         }
@@ -192,7 +272,7 @@ DNS::Zone::PowerDNS::To::BIND - Generate BIND zone configuration from informatio
 
 =head1 VERSION
 
-This document describes version 0.009 of DNS::Zone::PowerDNS::To::BIND (from Perl distribution DNS-Zone-PowerDNS-To-BIND), released on 2022-11-05.
+This document describes version 0.010 of DNS::Zone::PowerDNS::To::BIND (from Perl distribution DNS-Zone-PowerDNS-To-BIND), released on 2022-11-12.
 
 =head1 SYNOPSIS
 
@@ -311,11 +391,21 @@ L<DNS::Zone::Struct::To::BIND>
 
 perlancar <perlancar@cpan.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Ken Teague
+=for stopwords Ken Teague keteague
+
+=over 4
+
+=item *
 
 Ken Teague <kteague@pobox.com>
+
+=item *
+
+keteague <kteague+github.com@pobox.com>
+
+=back
 
 =head1 CONTRIBUTING
 

@@ -27,7 +27,8 @@ SEE ALSO
 
       * Minilla
 
-      A more minimalistic but still somewhat customizable authoring tool.
+      A more minimalistic than Dist::Zilla but still somewhat customizable
+      authoring tool.
 
 AUTHOR
 
