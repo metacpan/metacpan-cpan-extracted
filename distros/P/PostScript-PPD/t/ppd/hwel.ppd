@@ -1,0 +1,2205 @@
+*PPD-Adobe: "4.3"
+*%%%% PPD file for Lexmark MB2200 Series with CUPS.
+*%%%% Created by the CUPS PPD Compiler CUPS v1.4.2.
+*% ******************************************************************************
+*% *	  Adobe PostScript(R) Printer Description File   			     *
+*% *	  Produced by Lexmark International, Inc.				     *
+*% *										     *
+*% *										     *
+*% *										     *
+*% *	  Copyright 2019 Lexmark International, Inc. All rights reserved.   *
+*% ******************************************************************************
+*%******************************************************************************
+*%      License
+*%******************************************************************************
+*%
+*%Redistribution of this file, with or without modification, is permitted
+*%provided that the following conditions are met:
+*%
+*%      Redistributions of this file must reproduce the above copyright notice,
+*%      this list of conditions and the following disclaimer in the file and
+*%      documentation and/or other materials provided with the distribution.
+*%
+*%      Neither the name of Lexmark International, Inc. nor the names of its
+*%      contributors may be used to endorse or promote products derived
+*%      from this file without specific prior written permission.
+*%
+*%THIS FILE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+*%ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+*%WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+*%DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+*%FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+*%DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+*%SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+*%CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+*%OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+*%OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*%
+*%******************************************************************************
+*%      General Information
+*%******************************************************************************
+
+*FormatVersion: "4.3"
+*FileVersion: "1.0.0"
+*LanguageVersion: English
+*LanguageEncoding: ISOLatin1
+*PCFileName: "LXMB2200.PPD"
+*Product: "(Lexmark MB2200 Series)"
+*Product: "(Lexmark MB2236adw)"
+*Manufacturer: "Lexmark"
+*ModelName: "Lexmark MB2200 Series"
+*ShortNickName: "Lexmark MB2200 Series"
+*NickName: "Lexmark MB2200 Series"
+*PSVersion: "(3010.010) 20040929"
+*LanguageLevel: "3"
+*ColorDevice: False
+*DefaultColorSpace: Gray
+*FileSystem: True
+*Throughput: "36"
+*LandscapeOrientation: Plus90
+*TTRasterizer: Type42
+*% Driver-defined attributes...
+*LexJobNameUTF8: ""
+*cupsCommands: "ReportLevels AutoConfigure"
+*cupsIPPSupplies: False
+*cupsSNMPSupplies: False
+*Source: "Serial"
+*Source: "Parallel"
+*Source: "Network"
+*DefaultOutputOrder: Normal
+*LXSupportPrintAndHold: True
+*Password: "0"
+*ExitServer: "
+     count 0 eq   % is the password on the stack?
+     { true }
+     { dup        % potential password
+         statusdict /checkpassword get exec not
+     } ifelse
+     {  %  if no password or not valid
+         (WARNING : Cannot perform the exitserver command.) =
+         (Password supplied is not valid.) =
+         (Please contact the author of this software.) = flush
+         quit
+     } if
+     serverdict /exitserver get exec"
+*End
+*Reset: "
+     count 0 eq  % is the password on the stack?
+     { true }
+     { dup      % potential password
+         statusdict /checkpassword get exec not
+     } ifelse
+     {  %  if no password or not valid
+         (WARNING : Cannot reset printer.) =
+         (Password supplied is not valid.) =
+         (Please contact the author of this software.) = flush
+         quit
+     } if
+     serverdict /exitserver get exec
+     systemdict /quit get exec
+     (WARNING : Printer Reset Failed.) = flush"
+*End
+*?FileSystem: ""
+*?TTRasterizer: ""
+*LXCountPIN: "4"
+*LXlowPINchar: "0"
+*LXhiPINchar: "9"
+*HBPStripHeight: "128"
+*HBPVendorSignature: True
+*1284DeviceID: "MFG: Lexmark ;MDL: Lexmark MB2200 Series"
+*NonUIOrderDependency: "50 AnySetup *PnH"
+*NonUIOrderDependency: "50 AnySetup *FaxNumber"
+*PrinterType: "Laser"
+*RequiresPageRegion All: True
+*PrinterError: "Paper Jam"
+*PrinterError: "Wrong Paper Length"
+*PrinterError: "Invalid Manual Insertion"
+*PrinterError: "Change Size in Feeder"
+*PrinterError: "Change Size in Tray 1"
+*PrinterError: "Change Size in Tray 2"
+*PrinterError: "Paper Out or Feed Failure - Feeder"
+*PrinterError: "Paper Out or Feed Failure"
+*PrinterError: "Paper Out or Feed Failure - Tray 1"
+*PrinterError: "Paper Out or Feed Failure - Tray 2"
+*PrinterError: "Load Manual Paper"
+*PrinterError: "Output Bin Full"
+*PrinterError: "Cover Open/Cartridge Not Installed"
+*PrinterError: "Memory Full"
+*PrinterError: "Complex Page"
+*PrinterError: "Default Storage Error"
+*PrinterError: "Defective Font Card Installed"
+*PrinterError: "Flash Full"
+*PrinterError: "ioerror"
+*PrinterError: "Flash Error"
+*PrinterError: "Duplex Not Attached"
+*PrinterError: "Duplex Cover Open"
+*PrinterError: "Scheduled Maintenance"
+*PrinterError: "Toner Low"
+*PrinterError: "Service Error"
+*PrinterError: "Not Ready"
+*Message: "%%  exitserver: permanent state may be changed  %%"
+*Message: "%%  Flushing: rest of job (to end-of-file) will be ignored  %%"
+*Message: "FontName not found; using Courier"
+*Protocols: TBCP
+*Status: "Printer Busy"
+*Status: "Warming Up"
+*Status: "idle"
+*Status: "busy"
+*Status: "waiting"
+*Status: "initializing"
+*Status: "not ready"
+*DefaultColorSep: ProcessBlack.85lpi.600dpi/85 lpi /600 dpi
+*InkName: ProcessBlack/Process Black
+*InkName: CustomColor/Custom Color
+*InkName: ProcessCyan/Process Cyan
+*InkName: ProcessMagenta/Process Magenta
+*InkName: ProcessYellow/Process Yellow
+*ColorSepScreenAngle ProcessBlack.85lpi.600dpi/85 lpi /600 dpi: "45.0"
+*ColorSepScreenAngle CustomColor.85lpi.600dpi/85 lpi /600 dpi: "45.0"
+*ColorSepScreenAngle ProcessCyan.85lpi.600dpi/85 lpi /600 dpi: "71.5651"
+*ColorSepScreenAngle ProcessMagenta.85lpi.600dpi/85 lpi /600 dpi: "18.4349"
+*ColorSepScreenAngle ProcessYellow.85lpi.600dpi/85 lpi /600 dpi: "0.0"
+*ColorSepScreenAngle ProcessBlack.71lpi.600dpi/71 lpi /600 dpi: "45.0"
+*ColorSepScreenAngle CustomColor.71lpi.600dpi/71 lpi /600 dpi: "45.0"
+*ColorSepScreenAngle ProcessCyan.71lpi.600dpi/71 lpi /600 dpi: "71.5651"
+*ColorSepScreenAngle ProcessMagenta.71lpi.600dpi/71 lpi /600 dpi: "18.4349"
+*ColorSepScreenAngle ProcessYellow.71lpi.600dpi/71 lpi /600 dpi: "0.0"
+*ColorSepScreenAngle ProcessBlack.116lpi.1200dpi/116 lpi /1200 dpi: "45.0"
+*ColorSepScreenAngle CustomColor.116lpi.1200dpi/116 lpi /1200 dpi: "45.0"
+*ColorSepScreenAngle ProcessCyan.116lpi.1200dpi/116 lpi /1200 dpi: "71.5651"
+*ColorSepScreenAngle ProcessMagenta.116lpi.1200dpi/116 lpi /1200 dpi: "18.4349"
+*ColorSepScreenAngle ProcessYellow.116lpi.1200dpi/116 lpi /1200 dpi: "0.0"
+*ColorSepScreenFreq ProcessBlack.85lpi.600dpi/85 lpi /600 dpi: "84.8528"
+*ColorSepScreenFreq CustomColor.85lpi.600dpi/85 lpi /600 dpi: "84.8528"
+*ColorSepScreenFreq ProcessCyan.85lpi.600dpi/85 lpi /600 dpi: "94.8683"
+*ColorSepScreenFreq ProcessMagenta.85lpi.600dpi/85 lpi /600 dpi: "154.0"
+*ColorSepScreenFreq ProcessYellow.85lpi.600dpi/85 lpi /600 dpi: "30.0"
+*ColorSepScreenFreq ProcessBlack.71lpi.600dpi/71 lpi /600 dpi: "70.7107"
+*ColorSepScreenFreq CustomColor.71lpi.600dpi/71 lpi /600 dpi: "70.7107"
+*ColorSepScreenFreq ProcessCyan.71lpi.600dpi/71 lpi /600 dpi: "63.2456"
+*ColorSepScreenFreq ProcessMagenta.71lpi.600dpi/71 lpi /600 dpi: "63.2456"
+*ColorSepScreenFreq ProcessYellow.71lpi.600dpi/71 lpi /600 dpi: "66.6667"
+*ColorSepScreenFreq ProcessBlack.116lpi.1200dpi/116 lpi /1200 dpi: "106.066"
+*ColorSepScreenFreq CustomColor.116lpi.1200dpi/116 lpi /1200 dpi: "106.066"
+*ColorSepScreenFreq ProcessCyan.116lpi.1200dpi/116 lpi /1200 dpi: "94.8683"
+*ColorSepScreenFreq ProcessMagenta.116lpi.1200dpi/116 lpi /1200 dpi: "94.8683"
+*ColorSepScreenFreq ProcessYellow.116lpi.1200dpi/116 lpi /1200 dpi: "100.0"
+*JobPatchFile 1: "%%Lexmark Linux PPD File 1"
+*JCLBegin: "<1B>%-12345X@PJL JOB<0A>"
+*JCLToPSInterpreter: "@PJL ENTER LANGUAGE = POSTSCRIPT<0A>"
+*JCLEnd: "<1B>%-12345X@PJL EOJ <0A><1B>%-12345X"
+*VMOption 512Meg: "512000000"
+*DefaultScreenProc: Dot
+*ScreenProc Dot: "{abs exch abs 2 copy add 1 gt {1 sub dup mul exch 1 sub dup mul add 1
+     sub }{dup mul exch dup mul add 1 exch sub }ifelse }"
+*End
+*ScreenProc Line: "{ pop }"
+*ScreenProc Ellipse: "{ dup 5 mul 8 div mul exch dup mul exch add sqrt 1 exch sub }"
+*ScreenFreq: "60.0"
+*ScreenAngle: "45.0"
+*DefaultTransfer: Factory
+*Transfer Factory: "{}"
+*Transfer Factory.Inverse: "{1 exch sub }"
+*cupsVersion: 1.4
+*cupsModelNumber: 0
+*cupsManualCopies: False
+*cupsFilter: "application/vnd.cups-raster 0 /usr/lib/cups/filter/rerouteprintoption"
+*cupsFilter: "application/vnd.cups-command 0 /usr/lib/cups/filter/CommandFileFilterG2"
+*cupsLanguages: "ar fr de it es ko ja ru pl pt zh_tw zh_cn"
+*NonUIConstraints: *CustomFaxNumber True *PnH Verify
+*NonUIConstraints: *PnH Verify *CustomFaxNumber True
+*NonUIConstraints: *CustomFaxNumber True *PnH Repeat
+*NonUIConstraints: *PnH Repeat *CustomFaxNumber True
+*NonUIConstraints: *CustomFaxNumber True *PnH Reserve
+*NonUIConstraints: *PnH Reserve *CustomFaxNumber True
+*NonUIConstraints: *CustomFaxNumber True *CustomPnH True
+*NonUIConstraints: *CustomPnH True *CustomFaxNumber True
+*UIConstraints: *SepPages NoneF *SepSource Tray1
+*UIConstraints: *SepSource Tray1 *SepPages NoneF
+*UIConstraints: *OptDuplex False *Duplex DuplexNoTumble
+*UIConstraints: *Duplex DuplexNoTumble *OptDuplex False
+*UIConstraints: *OptDuplex False *Duplex DuplexTumble
+*UIConstraints: *Duplex DuplexTumble *OptDuplex False
+*UIConstraints: *InputSlot ManualPaper *PageSize Env10
+*UIConstraints: *PageSize Env10 *InputSlot ManualPaper
+*UIConstraints: *InputSlot ManualPaper *PageSize Env9
+*UIConstraints: *PageSize Env9 *InputSlot ManualPaper
+*UIConstraints: *InputSlot ManualPaper *PageSize EnvMonarch
+*UIConstraints: *PageSize EnvMonarch *InputSlot ManualPaper
+*UIConstraints: *InputSlot ManualPaper *PageSize EnvDL
+*UIConstraints: *PageSize EnvDL *InputSlot ManualPaper
+*UIConstraints: *InputSlot ManualPaper *PageSize EnvC5
+*UIConstraints: *PageSize EnvC5 *InputSlot ManualPaper
+*UIConstraints: *InputSlot ManualPaper *PageSize ISOB5
+*UIConstraints: *PageSize ISOB5 *InputSlot ManualPaper
+*UIConstraints: *InputSlot ManualPaper *PageSize OthEnv
+*UIConstraints: *PageSize OthEnv *InputSlot ManualPaper
+*UIConstraints: *InputSlot ManualPaper *PageRegion Env10
+*UIConstraints: *PageRegion Env10 *InputSlot ManualPaper
+*UIConstraints: *InputSlot ManualPaper *PageRegion Env9
+*UIConstraints: *PageRegion Env9 *InputSlot ManualPaper
+*UIConstraints: *InputSlot ManualPaper *PageRegion EnvMonarch
+*UIConstraints: *PageRegion EnvMonarch *InputSlot ManualPaper
+*UIConstraints: *InputSlot ManualPaper *PageRegion EnvDL
+*UIConstraints: *PageRegion EnvDL *InputSlot ManualPaper
+*UIConstraints: *InputSlot ManualPaper *PageRegion EnvC5
+*UIConstraints: *PageRegion EnvC5 *InputSlot ManualPaper
+*UIConstraints: *InputSlot ManualPaper *PageRegion ISOB5
+*UIConstraints: *PageRegion ISOB5 *InputSlot ManualPaper
+*UIConstraints: *InputSlot ManualPaper *PageRegion OthEnv
+*UIConstraints: *PageRegion OthEnv *InputSlot ManualPaper
+*UIConstraints: *InputSlot ManualPaper *MediaType Envelope
+*UIConstraints: *MediaType Envelope *InputSlot ManualPaper
+*UIConstraints: *InputSlot ManualEnv *PageSize Letter
+*UIConstraints: *PageSize Letter *InputSlot ManualEnv
+*UIConstraints: *InputSlot ManualEnv *PageSize Legal
+*UIConstraints: *PageSize Legal *InputSlot ManualEnv
+*UIConstraints: *InputSlot ManualEnv *PageSize Statement
+*UIConstraints: *PageSize Statement *InputSlot ManualEnv
+*UIConstraints: *InputSlot ManualEnv *PageSize Executive
+*UIConstraints: *PageSize Executive *InputSlot ManualEnv
+*UIConstraints: *InputSlot ManualEnv *PageSize FanFoldGermanLegal
+*UIConstraints: *PageSize FanFoldGermanLegal *InputSlot ManualEnv
+*UIConstraints: *InputSlot ManualEnv *PageSize 8.5x13.4028
+*UIConstraints: *PageSize 8.5x13.4028 *InputSlot ManualEnv
+*UIConstraints: *InputSlot ManualEnv *PageSize A4
+*UIConstraints: *PageSize A4 *InputSlot ManualEnv
+*UIConstraints: *InputSlot ManualEnv *PageSize A5
+*UIConstraints: *PageSize A5 *InputSlot ManualEnv
+*UIConstraints: *InputSlot ManualEnv *PageSize A6
+*UIConstraints: *PageSize A6 *InputSlot ManualEnv
+*UIConstraints: *InputSlot ManualEnv *PageSize B5
+*UIConstraints: *PageSize B5 *InputSlot ManualEnv
+*UIConstraints: *InputSlot ManualEnv *PageSize Hagaki
+*UIConstraints: *PageSize Hagaki *InputSlot ManualEnv
+*UIConstraints: *Duplex DuplexNoTumble *PageSize Env10
+*UIConstraints: *PageSize Env10 *Duplex DuplexNoTumble
+*UIConstraints: *Duplex DuplexNoTumble *PageSize Env9
+*UIConstraints: *PageSize Env9 *Duplex DuplexNoTumble
+*UIConstraints: *Duplex DuplexNoTumble *PageSize EnvMonarch
+*UIConstraints: *PageSize EnvMonarch *Duplex DuplexNoTumble
+*UIConstraints: *Duplex DuplexNoTumble *PageSize EnvDL
+*UIConstraints: *PageSize EnvDL *Duplex DuplexNoTumble
+*UIConstraints: *Duplex DuplexNoTumble *PageSize EnvC5
+*UIConstraints: *PageSize EnvC5 *Duplex DuplexNoTumble
+*UIConstraints: *Duplex DuplexNoTumble *PageSize ISOB5
+*UIConstraints: *PageSize ISOB5 *Duplex DuplexNoTumble
+*UIConstraints: *Duplex DuplexNoTumble *PageSize OthEnv
+*UIConstraints: *PageSize OthEnv *Duplex DuplexNoTumble
+*UIConstraints: *Duplex DuplexNoTumble *PageRegion Env10
+*UIConstraints: *PageRegion Env10 *Duplex DuplexNoTumble
+*UIConstraints: *Duplex DuplexNoTumble *PageRegion Env9
+*UIConstraints: *PageRegion Env9 *Duplex DuplexNoTumble
+*UIConstraints: *Duplex DuplexNoTumble *PageRegion EnvMonarch
+*UIConstraints: *PageRegion EnvMonarch *Duplex DuplexNoTumble
+*UIConstraints: *Duplex DuplexNoTumble *PageRegion EnvDL
+*UIConstraints: *PageRegion EnvDL *Duplex DuplexNoTumble
+*UIConstraints: *Duplex DuplexNoTumble *PageRegion EnvC5
+*UIConstraints: *PageRegion EnvC5 *Duplex DuplexNoTumble
+*UIConstraints: *Duplex DuplexNoTumble *PageRegion ISOB5
+*UIConstraints: *PageRegion ISOB5 *Duplex DuplexNoTumble
+*UIConstraints: *Duplex DuplexNoTumble *PageRegion OthEnv
+*UIConstraints: *PageRegion OthEnv *Duplex DuplexNoTumble
+*UIConstraints: *Duplex DuplexNoTumble *MediaType Envelope
+*UIConstraints: *MediaType Envelope *Duplex DuplexNoTumble
+*UIConstraints: *Duplex DuplexTumble *PageSize Env10
+*UIConstraints: *PageSize Env10 *Duplex DuplexTumble
+*UIConstraints: *Duplex DuplexTumble *PageSize Env9
+*UIConstraints: *PageSize Env9 *Duplex DuplexTumble
+*UIConstraints: *Duplex DuplexTumble *PageSize EnvMonarch
+*UIConstraints: *PageSize EnvMonarch *Duplex DuplexTumble
+*UIConstraints: *Duplex DuplexTumble *PageSize EnvDL
+*UIConstraints: *PageSize EnvDL *Duplex DuplexTumble
+*UIConstraints: *Duplex DuplexTumble *PageSize EnvC5
+*UIConstraints: *PageSize EnvC5 *Duplex DuplexTumble
+*UIConstraints: *Duplex DuplexTumble *PageSize ISOB5
+*UIConstraints: *PageSize ISOB5 *Duplex DuplexTumble
+*UIConstraints: *Duplex DuplexTumble *PageSize OthEnv
+*UIConstraints: *PageSize OthEnv *Duplex DuplexTumble
+*UIConstraints: *Duplex DuplexTumble *PageRegion Env10
+*UIConstraints: *PageRegion Env10 *Duplex DuplexTumble
+*UIConstraints: *Duplex DuplexTumble *PageRegion Env9
+*UIConstraints: *PageRegion Env9 *Duplex DuplexTumble
+*UIConstraints: *Duplex DuplexTumble *PageRegion EnvMonarch
+*UIConstraints: *PageRegion EnvMonarch *Duplex DuplexTumble
+*UIConstraints: *Duplex DuplexTumble *PageRegion EnvDL
+*UIConstraints: *PageRegion EnvDL *Duplex DuplexTumble
+*UIConstraints: *Duplex DuplexTumble *PageRegion EnvC5
+*UIConstraints: *PageRegion EnvC5 *Duplex DuplexTumble
+*UIConstraints: *Duplex DuplexTumble *PageRegion ISOB5
+*UIConstraints: *PageRegion ISOB5 *Duplex DuplexTumble
+*UIConstraints: *Duplex DuplexTumble *PageRegion OthEnv
+*UIConstraints: *PageRegion OthEnv *Duplex DuplexTumble
+*UIConstraints: *Duplex DuplexTumble *MediaType Envelope
+*UIConstraints: *MediaType Envelope *Duplex DuplexTumble
+*UIConstraints: *MediaType Envelope *PageSize Letter
+*UIConstraints: *PageSize Letter *MediaType Envelope
+*UIConstraints: *MediaType Envelope *PageSize Legal
+*UIConstraints: *PageSize Legal *MediaType Envelope
+*UIConstraints: *MediaType Envelope *PageSize Statement
+*UIConstraints: *PageSize Statement *MediaType Envelope
+*UIConstraints: *MediaType Envelope *PageSize Executive
+*UIConstraints: *PageSize Executive *MediaType Envelope
+*UIConstraints: *MediaType Envelope *PageSize FanFoldGermanLegal
+*UIConstraints: *PageSize FanFoldGermanLegal *MediaType Envelope
+*UIConstraints: *MediaType Envelope *PageSize 8.5x13.4028
+*UIConstraints: *PageSize 8.5x13.4028 *MediaType Envelope
+*UIConstraints: *MediaType Envelope *PageSize A4
+*UIConstraints: *PageSize A4 *MediaType Envelope
+*UIConstraints: *MediaType Envelope *PageSize A5
+*UIConstraints: *PageSize A5 *MediaType Envelope
+*UIConstraints: *MediaType Envelope *PageSize A6
+*UIConstraints: *PageSize A6 *MediaType Envelope
+*UIConstraints: *MediaType Envelope *PageSize B5
+*UIConstraints: *PageSize B5 *MediaType Envelope
+*UIConstraints: *MediaType Envelope *PageSize Hagaki
+*UIConstraints: *PageSize Hagaki *MediaType Envelope
+*UIConstraints: *PageSize Env10 *MediaType Plain
+*UIConstraints: *MediaType Plain *PageSize Env10
+*UIConstraints: *PageSize Env10 *MediaType Letterhead
+*UIConstraints: *MediaType Letterhead *PageSize Env10
+*UIConstraints: *PageSize Env10 *MediaType Labels
+*UIConstraints: *MediaType Labels *PageSize Env10
+*UIConstraints: *PageSize Env10 *MediaType Recycled
+*UIConstraints: *MediaType Recycled *PageSize Env10
+*UIConstraints: *PageSize Env10 *MediaType Bond
+*UIConstraints: *MediaType Bond *PageSize Env10
+*UIConstraints: *PageSize Env10 *MediaType Preprint
+*UIConstraints: *MediaType Preprint *PageSize Env10
+*UIConstraints: *PageSize Env10 *MediaType Colored
+*UIConstraints: *MediaType Colored *PageSize Env10
+*UIConstraints: *PageSize Env10 *MediaType Light
+*UIConstraints: *MediaType Light *PageSize Env10
+*UIConstraints: *PageSize Env10 *MediaType Heavy
+*UIConstraints: *MediaType Heavy *PageSize Env10
+*UIConstraints: *PageSize Env10 *MediaType Card
+*UIConstraints: *MediaType Card *PageSize Env10
+*UIConstraints: *PageRegion Env10 *MediaType Plain
+*UIConstraints: *MediaType Plain *PageRegion Env10
+*UIConstraints: *PageRegion Env10 *MediaType Letterhead
+*UIConstraints: *MediaType Letterhead *PageRegion Env10
+*UIConstraints: *PageRegion Env10 *MediaType Labels
+*UIConstraints: *MediaType Labels *PageRegion Env10
+*UIConstraints: *PageRegion Env10 *MediaType Recycled
+*UIConstraints: *MediaType Recycled *PageRegion Env10
+*UIConstraints: *PageRegion Env10 *MediaType Bond
+*UIConstraints: *MediaType Bond *PageRegion Env10
+*UIConstraints: *PageRegion Env10 *MediaType Preprint
+*UIConstraints: *MediaType Preprint *PageRegion Env10
+*UIConstraints: *PageRegion Env10 *MediaType Colored
+*UIConstraints: *MediaType Colored *PageRegion Env10
+*UIConstraints: *PageRegion Env10 *MediaType Light
+*UIConstraints: *MediaType Light *PageRegion Env10
+*UIConstraints: *PageRegion Env10 *MediaType Heavy
+*UIConstraints: *MediaType Heavy *PageRegion Env10
+*UIConstraints: *PageRegion Env10 *MediaType Card
+*UIConstraints: *MediaType Card *PageRegion Env10
+*UIConstraints: *PageSize Env9 *MediaType Plain
+*UIConstraints: *MediaType Plain *PageSize Env9
+*UIConstraints: *PageSize Env9 *MediaType Letterhead
+*UIConstraints: *MediaType Letterhead *PageSize Env9
+*UIConstraints: *PageSize Env9 *MediaType Labels
+*UIConstraints: *MediaType Labels *PageSize Env9
+*UIConstraints: *PageSize Env9 *MediaType Recycled
+*UIConstraints: *MediaType Recycled *PageSize Env9
+*UIConstraints: *PageSize Env9 *MediaType Bond
+*UIConstraints: *MediaType Bond *PageSize Env9
+*UIConstraints: *PageSize Env9 *MediaType Preprint
+*UIConstraints: *MediaType Preprint *PageSize Env9
+*UIConstraints: *PageSize Env9 *MediaType Colored
+*UIConstraints: *MediaType Colored *PageSize Env9
+*UIConstraints: *PageSize Env9 *MediaType Light
+*UIConstraints: *MediaType Light *PageSize Env9
+*UIConstraints: *PageSize Env9 *MediaType Heavy
+*UIConstraints: *MediaType Heavy *PageSize Env9
+*UIConstraints: *PageSize Env9 *MediaType Card
+*UIConstraints: *MediaType Card *PageSize Env9
+*UIConstraints: *PageRegion Env9 *MediaType Plain
+*UIConstraints: *MediaType Plain *PageRegion Env9
+*UIConstraints: *PageRegion Env9 *MediaType Letterhead
+*UIConstraints: *MediaType Letterhead *PageRegion Env9
+*UIConstraints: *PageRegion Env9 *MediaType Labels
+*UIConstraints: *MediaType Labels *PageRegion Env9
+*UIConstraints: *PageRegion Env9 *MediaType Recycled
+*UIConstraints: *MediaType Recycled *PageRegion Env9
+*UIConstraints: *PageRegion Env9 *MediaType Bond
+*UIConstraints: *MediaType Bond *PageRegion Env9
+*UIConstraints: *PageRegion Env9 *MediaType Preprint
+*UIConstraints: *MediaType Preprint *PageRegion Env9
+*UIConstraints: *PageRegion Env9 *MediaType Colored
+*UIConstraints: *MediaType Colored *PageRegion Env9
+*UIConstraints: *PageRegion Env9 *MediaType Light
+*UIConstraints: *MediaType Light *PageRegion Env9
+*UIConstraints: *PageRegion Env9 *MediaType Heavy
+*UIConstraints: *MediaType Heavy *PageRegion Env9
+*UIConstraints: *PageRegion Env9 *MediaType Card
+*UIConstraints: *MediaType Card *PageRegion Env9
+*UIConstraints: *PageSize EnvMonarch *MediaType Plain
+*UIConstraints: *MediaType Plain *PageSize EnvMonarch
+*UIConstraints: *PageSize EnvMonarch *MediaType Letterhead
+*UIConstraints: *MediaType Letterhead *PageSize EnvMonarch
+*UIConstraints: *PageSize EnvMonarch *MediaType Labels
+*UIConstraints: *MediaType Labels *PageSize EnvMonarch
+*UIConstraints: *PageSize EnvMonarch *MediaType Recycled
+*UIConstraints: *MediaType Recycled *PageSize EnvMonarch
+*UIConstraints: *PageSize EnvMonarch *MediaType Bond
+*UIConstraints: *MediaType Bond *PageSize EnvMonarch
+*UIConstraints: *PageSize EnvMonarch *MediaType Preprint
+*UIConstraints: *MediaType Preprint *PageSize EnvMonarch
+*UIConstraints: *PageSize EnvMonarch *MediaType Colored
+*UIConstraints: *MediaType Colored *PageSize EnvMonarch
+*UIConstraints: *PageSize EnvMonarch *MediaType Light
+*UIConstraints: *MediaType Light *PageSize EnvMonarch
+*UIConstraints: *PageSize EnvMonarch *MediaType Heavy
+*UIConstraints: *MediaType Heavy *PageSize EnvMonarch
+*UIConstraints: *PageSize EnvMonarch *MediaType Card
+*UIConstraints: *MediaType Card *PageSize EnvMonarch
+*UIConstraints: *PageRegion EnvMonarch *MediaType Plain
+*UIConstraints: *MediaType Plain *PageRegion EnvMonarch
+*UIConstraints: *PageRegion EnvMonarch *MediaType Letterhead
+*UIConstraints: *MediaType Letterhead *PageRegion EnvMonarch
+*UIConstraints: *PageRegion EnvMonarch *MediaType Labels
+*UIConstraints: *MediaType Labels *PageRegion EnvMonarch
+*UIConstraints: *PageRegion EnvMonarch *MediaType Recycled
+*UIConstraints: *MediaType Recycled *PageRegion EnvMonarch
+*UIConstraints: *PageRegion EnvMonarch *MediaType Bond
+*UIConstraints: *MediaType Bond *PageRegion EnvMonarch
+*UIConstraints: *PageRegion EnvMonarch *MediaType Preprint
+*UIConstraints: *MediaType Preprint *PageRegion EnvMonarch
+*UIConstraints: *PageRegion EnvMonarch *MediaType Colored
+*UIConstraints: *MediaType Colored *PageRegion EnvMonarch
+*UIConstraints: *PageRegion EnvMonarch *MediaType Light
+*UIConstraints: *MediaType Light *PageRegion EnvMonarch
+*UIConstraints: *PageRegion EnvMonarch *MediaType Heavy
+*UIConstraints: *MediaType Heavy *PageRegion EnvMonarch
+*UIConstraints: *PageRegion EnvMonarch *MediaType Card
+*UIConstraints: *MediaType Card *PageRegion EnvMonarch
+*UIConstraints: *PageSize EnvDL *MediaType Plain
+*UIConstraints: *MediaType Plain *PageSize EnvDL
+*UIConstraints: *PageSize EnvDL *MediaType Letterhead
+*UIConstraints: *MediaType Letterhead *PageSize EnvDL
+*UIConstraints: *PageSize EnvDL *MediaType Labels
+*UIConstraints: *MediaType Labels *PageSize EnvDL
+*UIConstraints: *PageSize EnvDL *MediaType Recycled
+*UIConstraints: *MediaType Recycled *PageSize EnvDL
+*UIConstraints: *PageSize EnvDL *MediaType Bond
+*UIConstraints: *MediaType Bond *PageSize EnvDL
+*UIConstraints: *PageSize EnvDL *MediaType Preprint
+*UIConstraints: *MediaType Preprint *PageSize EnvDL
+*UIConstraints: *PageSize EnvDL *MediaType Colored
+*UIConstraints: *MediaType Colored *PageSize EnvDL
+*UIConstraints: *PageSize EnvDL *MediaType Light
+*UIConstraints: *MediaType Light *PageSize EnvDL
+*UIConstraints: *PageSize EnvDL *MediaType Heavy
+*UIConstraints: *MediaType Heavy *PageSize EnvDL
+*UIConstraints: *PageSize EnvDL *MediaType Card
+*UIConstraints: *MediaType Card *PageSize EnvDL
+*UIConstraints: *PageRegion EnvDL *MediaType Plain
+*UIConstraints: *MediaType Plain *PageRegion EnvDL
+*UIConstraints: *PageRegion EnvDL *MediaType Letterhead
+*UIConstraints: *MediaType Letterhead *PageRegion EnvDL
+*UIConstraints: *PageRegion EnvDL *MediaType Labels
+*UIConstraints: *MediaType Labels *PageRegion EnvDL
+*UIConstraints: *PageRegion EnvDL *MediaType Recycled
+*UIConstraints: *MediaType Recycled *PageRegion EnvDL
+*UIConstraints: *PageRegion EnvDL *MediaType Bond
+*UIConstraints: *MediaType Bond *PageRegion EnvDL
+*UIConstraints: *PageRegion EnvDL *MediaType Preprint
+*UIConstraints: *MediaType Preprint *PageRegion EnvDL
+*UIConstraints: *PageRegion EnvDL *MediaType Colored
+*UIConstraints: *MediaType Colored *PageRegion EnvDL
+*UIConstraints: *PageRegion EnvDL *MediaType Light
+*UIConstraints: *MediaType Light *PageRegion EnvDL
+*UIConstraints: *PageRegion EnvDL *MediaType Heavy
+*UIConstraints: *MediaType Heavy *PageRegion EnvDL
+*UIConstraints: *PageRegion EnvDL *MediaType Card
+*UIConstraints: *MediaType Card *PageRegion EnvDL
+*UIConstraints: *PageSize EnvC5 *MediaType Plain
+*UIConstraints: *MediaType Plain *PageSize EnvC5
+*UIConstraints: *PageSize EnvC5 *MediaType Letterhead
+*UIConstraints: *MediaType Letterhead *PageSize EnvC5
+*UIConstraints: *PageSize EnvC5 *MediaType Labels
+*UIConstraints: *MediaType Labels *PageSize EnvC5
+*UIConstraints: *PageSize EnvC5 *MediaType Recycled
+*UIConstraints: *MediaType Recycled *PageSize EnvC5
+*UIConstraints: *PageSize EnvC5 *MediaType Bond
+*UIConstraints: *MediaType Bond *PageSize EnvC5
+*UIConstraints: *PageSize EnvC5 *MediaType Preprint
+*UIConstraints: *MediaType Preprint *PageSize EnvC5
+*UIConstraints: *PageSize EnvC5 *MediaType Colored
+*UIConstraints: *MediaType Colored *PageSize EnvC5
+*UIConstraints: *PageSize EnvC5 *MediaType Light
+*UIConstraints: *MediaType Light *PageSize EnvC5
+*UIConstraints: *PageSize EnvC5 *MediaType Heavy
+*UIConstraints: *MediaType Heavy *PageSize EnvC5
+*UIConstraints: *PageSize EnvC5 *MediaType Card
+*UIConstraints: *MediaType Card *PageSize EnvC5
+*UIConstraints: *PageRegion EnvC5 *MediaType Plain
+*UIConstraints: *MediaType Plain *PageRegion EnvC5
+*UIConstraints: *PageRegion EnvC5 *MediaType Letterhead
+*UIConstraints: *MediaType Letterhead *PageRegion EnvC5
+*UIConstraints: *PageRegion EnvC5 *MediaType Labels
+*UIConstraints: *MediaType Labels *PageRegion EnvC5
+*UIConstraints: *PageRegion EnvC5 *MediaType Recycled
+*UIConstraints: *MediaType Recycled *PageRegion EnvC5
+*UIConstraints: *PageRegion EnvC5 *MediaType Bond
+*UIConstraints: *MediaType Bond *PageRegion EnvC5
+*UIConstraints: *PageRegion EnvC5 *MediaType Preprint
+*UIConstraints: *MediaType Preprint *PageRegion EnvC5
+*UIConstraints: *PageRegion EnvC5 *MediaType Colored
+*UIConstraints: *MediaType Colored *PageRegion EnvC5
+*UIConstraints: *PageRegion EnvC5 *MediaType Light
+*UIConstraints: *MediaType Light *PageRegion EnvC5
+*UIConstraints: *PageRegion EnvC5 *MediaType Heavy
+*UIConstraints: *MediaType Heavy *PageRegion EnvC5
+*UIConstraints: *PageRegion EnvC5 *MediaType Card
+*UIConstraints: *MediaType Card *PageRegion EnvC5
+*UIConstraints: *PageSize ISOB5 *MediaType Plain
+*UIConstraints: *MediaType Plain *PageSize ISOB5
+*UIConstraints: *PageSize ISOB5 *MediaType Letterhead
+*UIConstraints: *MediaType Letterhead *PageSize ISOB5
+*UIConstraints: *PageSize ISOB5 *MediaType Labels
+*UIConstraints: *MediaType Labels *PageSize ISOB5
+*UIConstraints: *PageSize ISOB5 *MediaType Recycled
+*UIConstraints: *MediaType Recycled *PageSize ISOB5
+*UIConstraints: *PageSize ISOB5 *MediaType Bond
+*UIConstraints: *MediaType Bond *PageSize ISOB5
+*UIConstraints: *PageSize ISOB5 *MediaType Preprint
+*UIConstraints: *MediaType Preprint *PageSize ISOB5
+*UIConstraints: *PageSize ISOB5 *MediaType Colored
+*UIConstraints: *MediaType Colored *PageSize ISOB5
+*UIConstraints: *PageSize ISOB5 *MediaType Light
+*UIConstraints: *MediaType Light *PageSize ISOB5
+*UIConstraints: *PageSize ISOB5 *MediaType Heavy
+*UIConstraints: *MediaType Heavy *PageSize ISOB5
+*UIConstraints: *PageSize ISOB5 *MediaType Card
+*UIConstraints: *MediaType Card *PageSize ISOB5
+*UIConstraints: *PageRegion ISOB5 *MediaType Plain
+*UIConstraints: *MediaType Plain *PageRegion ISOB5
+*UIConstraints: *PageRegion ISOB5 *MediaType Letterhead
+*UIConstraints: *MediaType Letterhead *PageRegion ISOB5
+*UIConstraints: *PageRegion ISOB5 *MediaType Labels
+*UIConstraints: *MediaType Labels *PageRegion ISOB5
+*UIConstraints: *PageRegion ISOB5 *MediaType Recycled
+*UIConstraints: *MediaType Recycled *PageRegion ISOB5
+*UIConstraints: *PageRegion ISOB5 *MediaType Bond
+*UIConstraints: *MediaType Bond *PageRegion ISOB5
+*UIConstraints: *PageRegion ISOB5 *MediaType Preprint
+*UIConstraints: *MediaType Preprint *PageRegion ISOB5
+*UIConstraints: *PageRegion ISOB5 *MediaType Colored
+*UIConstraints: *MediaType Colored *PageRegion ISOB5
+*UIConstraints: *PageRegion ISOB5 *MediaType Light
+*UIConstraints: *MediaType Light *PageRegion ISOB5
+*UIConstraints: *PageRegion ISOB5 *MediaType Heavy
+*UIConstraints: *MediaType Heavy *PageRegion ISOB5
+*UIConstraints: *PageRegion ISOB5 *MediaType Card
+*UIConstraints: *MediaType Card *PageRegion ISOB5
+*UIConstraints: *PageSize OthEnv *MediaType Plain
+*UIConstraints: *MediaType Plain *PageSize OthEnv
+*UIConstraints: *PageSize OthEnv *MediaType Letterhead
+*UIConstraints: *MediaType Letterhead *PageSize OthEnv
+*UIConstraints: *PageSize OthEnv *MediaType Labels
+*UIConstraints: *MediaType Labels *PageSize OthEnv
+*UIConstraints: *PageSize OthEnv *MediaType Recycled
+*UIConstraints: *MediaType Recycled *PageSize OthEnv
+*UIConstraints: *PageSize OthEnv *MediaType Bond
+*UIConstraints: *MediaType Bond *PageSize OthEnv
+*UIConstraints: *PageSize OthEnv *MediaType Preprint
+*UIConstraints: *MediaType Preprint *PageSize OthEnv
+*UIConstraints: *PageSize OthEnv *MediaType Colored
+*UIConstraints: *MediaType Colored *PageSize OthEnv
+*UIConstraints: *PageSize OthEnv *MediaType Light
+*UIConstraints: *MediaType Light *PageSize OthEnv
+*UIConstraints: *PageSize OthEnv *MediaType Heavy
+*UIConstraints: *MediaType Heavy *PageSize OthEnv
+*UIConstraints: *PageSize OthEnv *MediaType Card
+*UIConstraints: *MediaType Card *PageSize OthEnv
+*UIConstraints: *PageRegion OthEnv *MediaType Plain
+*UIConstraints: *MediaType Plain *PageRegion OthEnv
+*UIConstraints: *PageRegion OthEnv *MediaType Letterhead
+*UIConstraints: *MediaType Letterhead *PageRegion OthEnv
+*UIConstraints: *PageRegion OthEnv *MediaType Labels
+*UIConstraints: *MediaType Labels *PageRegion OthEnv
+*UIConstraints: *PageRegion OthEnv *MediaType Recycled
+*UIConstraints: *MediaType Recycled *PageRegion OthEnv
+*UIConstraints: *PageRegion OthEnv *MediaType Bond
+*UIConstraints: *MediaType Bond *PageRegion OthEnv
+*UIConstraints: *PageRegion OthEnv *MediaType Preprint
+*UIConstraints: *MediaType Preprint *PageRegion OthEnv
+*UIConstraints: *PageRegion OthEnv *MediaType Colored
+*UIConstraints: *MediaType Colored *PageRegion OthEnv
+*UIConstraints: *PageRegion OthEnv *MediaType Light
+*UIConstraints: *MediaType Light *PageRegion OthEnv
+*UIConstraints: *PageRegion OthEnv *MediaType Heavy
+*UIConstraints: *MediaType Heavy *PageRegion OthEnv
+*UIConstraints: *PageRegion OthEnv *MediaType Card
+*UIConstraints: *MediaType Card *PageRegion OthEnv
+*OpenUI *PageSize/Media Size: PickOne
+*OrderDependency: 30 AnySetup *PageSize
+*DefaultPageSize: Letter
+*PageSize Letter/Letter (8 1/2 x 11 in): "
+<< /Policies << /PageSize 2 >> /PageSize [612 792] /ImagingBBox null >> setpagedevice"
+*End
+*PageSize Legal/Legal (8 1/2 x 14 in): "
+<< /Policies << /PageSize 2 >> /PageSize [612 1008] /ImagingBBox null >> setpagedevice"
+*End
+*PageSize 8.5x13.4028/Oficio (Mexico) (216 x 340 mm): "
+<< /Policies << /PageSize 2 >> /PageSize [612 965] /ImagingBBox null >> setpagedevice"
+*End
+*PageSize B5/B5 (182 x 257 mm): "
+1 dict dup /Policies 1 dict dup /PageSize 2 put put setpagedevice
+        2 dict dup /PageSize [516 729]  put dup /ImagingBBox null put setpagedevice"
+*End
+*PageSize A4/A4 (210 x 297 mm): "
+<< /Policies << /PageSize 2 >> /PageSize [595 842] /ImagingBBox null >> setpagedevice"
+*End
+*PageSize Executive/Executive (7 1/4 x 10 1/2 in): "
+<< /Policies << /PageSize 2 >> /PageSize [522 756] /ImagingBBox null >> setpagedevice"
+*End
+*PageSize Hagaki/Hagaki: "
+<< /Policies << /PageSize 2 >> /PageSize [284 420] /ImagingBBox null >> setpagedevice"
+*End
+*PageSize A5/A5 (148 x 210 mm): "
+<< /Policies << /PageSize 2 >> /PageSize [420 595] /ImagingBBox null >> setpagedevice"
+*End
+*PageSize A6/A6 (105 x 148 mm): "
+<< /Policies << /PageSize 2 >> /PageSize [297 419] /ImagingBBox null  >> setpagedevice"
+*End
+*PageSize FanFoldGermanLegal/Folio (8 1/2 x 13 in): "
+<< /Policies << /PageSize 2 >> /PageSize [612 936] /ImagingBBox null >> setpagedevice"
+*End
+*PageSize Statement/Statement (5 1/2 x 8 1/2 in): "
+<< /Policies << /PageSize 2 >> /PageSize [396 612] /ImagingBBox null >> setpagedevice"
+*End
+*PageSize EnvMonarch/Envelope 7 3/4 (3 7/8x7 1/2 in): "
+<< /Policies << /PageSize 2 >> /PageSize [279 540] /ImagingBBox null >> setpagedevice"
+*End
+*PageSize Env9/Envelope 9 (3 7/8 x 8 7/8 in): "
+<< /Policies << /PageSize 2 >> /PageSize [279 639] /ImagingBBox null >> setpagedevice"
+*End
+*PageSize Env10/Envelope 10 (4 1/8 x 9 1/2 in): "
+<< /Policies << /PageSize 2 >> /PageSize [297 684] /ImagingBBox null >> setpagedevice"
+*End
+*PageSize EnvDL/Envelope DL (110 x 220 mm): "
+<< /Policies << /PageSize 2 >> /PageSize [312 624] /ImagingBBox null >> setpagedevice"
+*End
+*PageSize EnvC5/Envelope C5 (162 x 229 mm): "
+<< /Policies << /PageSize 2 >> /PageSize [459 649] /ImagingBBox null >> setpagedevice"
+*End
+*PageSize ISOB5/Envelope B5 (176 x 250 mm): "
+<< /Policies << /PageSize 2 >> /PageSize [499 708] /ImagingBBox null >> setpagedevice"
+*End
+*PageSize OthEnv/Other Envelope: "
+<< /Policies << /PageSize 2 >> /PageSize [612 996] /ImagingBBox null >> setpagedevice"
+*End
+*CloseUI: *PageSize
+*OpenUI *PageRegion/Media Size: PickOne
+*OrderDependency: 35 AnySetup *PageRegion
+*DefaultPageRegion: Letter
+*PageRegion Letter/Letter (8 1/2 x 11 in): "
+<< /Policies << /PageSize 2 >> /PageSize [612 792] /ImagingBBox null >> setpagedevice "
+*End
+*PageRegion Legal/Legal (8 1/2 x 14 in): "
+<< /Policies << /PageSize 2 >> /PageSize [612 1008] /ImagingBBox null >> setpagedevice "
+*End
+*PageRegion 8.5x13.4028/Oficio (Mexico) (216 x 340 mm): "
+<< /Policies << /PageSize 2 >> /PageSize [612 965] /ImagingBBox null >> setpagedevice "
+*End
+*PageRegion B5/B5 (182 x 257 mm): "
+1 dict dup /Policies 1 dict dup /PageSize 2 put put setpagedevice
+        2 dict dup /PageSize [516 729]  put dup /ImagingBBox null put setpagedevice "
+*End
+*PageRegion A4/A4 (210 x 297 mm): "
+<< /Policies << /PageSize 2 >> /PageSize [595 842] /ImagingBBox null >> setpagedevice "
+*End
+*PageRegion Executive/Executive (7 1/4 x 10 1/2 in): "
+<< /Policies << /PageSize 2 >> /PageSize [522 756] /ImagingBBox null >> setpagedevice "
+*End
+*PageRegion Hagaki/Hagaki: "
+<< /Policies << /PageSize 2 >> /PageSize [284 420] /ImagingBBox null >> setpagedevice "
+*End
+*PageRegion A5/A5 (148 x 210 mm): "
+<< /Policies << /PageSize 2 >> /PageSize [420 595] /ImagingBBox null >> setpagedevice "
+*End
+*PageRegion A6/A6 (105 x 148 mm): "
+<< /Policies << /PageSize 2 >> /PageSize [297 419] /ImagingBBox null  >> setpagedevice "
+*End
+*PageRegion FanFoldGermanLegal/Folio (8 1/2 x 13 in): "
+<< /Policies << /PageSize 2 >> /PageSize [612 936] /ImagingBBox null >> setpagedevice "
+*End
+*PageRegion Statement/Statement (5 1/2 x 8 1/2 in): "
+<< /Policies << /PageSize 2 >> /PageSize [396 612] /ImagingBBox null >> setpagedevice "
+*End
+*PageRegion EnvMonarch/Envelope 7 3/4 (3 7/8x7 1/2 in): "
+<< /Policies << /PageSize 2 >> /PageSize [279 540] /ImagingBBox null >> setpagedevice "
+*End
+*PageRegion Env9/Envelope 9 (3 7/8 x 8 7/8 in): "
+<< /Policies << /PageSize 2 >> /PageSize [279 639] /ImagingBBox null >> setpagedevice "
+*End
+*PageRegion Env10/Envelope 10 (4 1/8 x 9 1/2 in): "
+<< /Policies << /PageSize 2 >> /PageSize [297 684] /ImagingBBox null >> setpagedevice "
+*End
+*PageRegion EnvDL/Envelope DL (110 x 220 mm): "
+<< /Policies << /PageSize 2 >> /PageSize [312 624] /ImagingBBox null >> setpagedevice "
+*End
+*PageRegion EnvC5/Envelope C5 (162 x 229 mm): "
+<< /Policies << /PageSize 2 >> /PageSize [459 649] /ImagingBBox null >> setpagedevice "
+*End
+*PageRegion ISOB5/Envelope B5 (176 x 250 mm): "
+<< /Policies << /PageSize 2 >> /PageSize [499 708] /ImagingBBox null >> setpagedevice "
+*End
+*PageRegion OthEnv/Other Envelope: "
+<< /Policies << /PageSize 2 >> /PageSize [612 996] /ImagingBBox null >> setpagedevice "
+*End
+*CloseUI: *PageRegion
+*DefaultImageableArea: Letter
+*ImageableArea Letter/Letter (8 1/2 x 11 in): "12 12 600 780"
+*ImageableArea Legal/Legal (8 1/2 x 14 in): "12 12 600 996"
+*ImageableArea 8.5x13.4028/Oficio (Mexico) (216 x 340 mm): "12 12 600 953"
+*ImageableArea B5/B5 (182 x 257 mm): "12 12 506 716"
+*ImageableArea A4/A4 (210 x 297 mm): "10 12 589 830"
+*ImageableArea Executive/Executive (7 1/4 x 10 1/2 in): "12 12 510 744"
+*ImageableArea Hagaki/Hagaki: "12 12 272 408"
+*ImageableArea A5/A5 (148 x 210 mm): "12 12 408 583"
+*ImageableArea A6/A6 (105 x 148 mm): "12 12 285 407"
+*ImageableArea FanFoldGermanLegal/Folio (8 1/2 x 13 in): "12 12 600 924"
+*ImageableArea Statement/Statement (5 1/2 x 8 1/2 in): "12 12 384 600"
+*ImageableArea EnvMonarch/Envelope 7 3/4 (3 7/8x7 1/2 in): "12 12 279 528"
+*ImageableArea Env9/Envelope 9 (3 7/8 x 8 7/8 in): "12 12 279 627"
+*ImageableArea Env10/Envelope 10 (4 1/8 x 9 1/2 in): "12 12 294 672"
+*ImageableArea EnvDL/Envelope DL (110 x 220 mm): "12 12 310 612"
+*ImageableArea EnvC5/Envelope C5 (162 x 229 mm): "12 12 456 637"
+*ImageableArea ISOB5/Envelope B5 (176 x 250 mm): "12 12 498 696"
+*ImageableArea OthEnv/Other Envelope: "12 12 600 985"
+*DefaultPaperDimension: Letter
+*PaperDimension Letter/Letter (8 1/2 x 11 in): "612 792"
+*PaperDimension Legal/Legal (8 1/2 x 14 in): "612 1008"
+*PaperDimension 8.5x13.4028/Oficio (Mexico) (216 x 340 mm): "612 965"
+*PaperDimension B5/B5 (182 x 257 mm): "516.239990234375 728.640014648438"
+*PaperDimension A4/A4 (210 x 297 mm): "595 842"
+*PaperDimension Executive/Executive (7 1/4 x 10 1/2 in): "522 756"
+*PaperDimension Hagaki/Hagaki: "284 420"
+*PaperDimension A5/A5 (148 x 210 mm): "419.760009765625 595.440002441406"
+*PaperDimension A6/A6 (105 x 148 mm): "297 419"
+*PaperDimension FanFoldGermanLegal/Folio (8 1/2 x 13 in): "612 936"
+*PaperDimension Statement/Statement (5 1/2 x 8 1/2 in): "396 612"
+*PaperDimension EnvMonarch/Envelope 7 3/4 (3 7/8x7 1/2 in): "279 540"
+*PaperDimension Env9/Envelope 9 (3 7/8 x 8 7/8 in): "279 639"
+*PaperDimension Env10/Envelope 10 (4 1/8 x 9 1/2 in): "297 684"
+*PaperDimension EnvDL/Envelope DL (110 x 220 mm): "311.760009765625 623.52001953125"
+*PaperDimension EnvC5/Envelope C5 (162 x 229 mm): "459.359985351562 649.440002441406"
+*PaperDimension ISOB5/Envelope B5 (176 x 250 mm): "498.959991455078 708.47998046875"
+*PaperDimension OthEnv/Other Envelope: "612 996"
+*MaxMediaWidth: "612"
+*MaxMediaHeight: "1008"
+*HWMargins: 12 12 12 12
+*CustomPageSize True: "
+pop pop pop
+	statusdict /setuniversalsize known {
+	 statusdict begin
+		2 copy
+		currentpagedevice /UniversalDetails get /Orientation get () setuniversalsize
+	 end
+	} if
+		<< /PageSize [5 -2 roll]
+		/ImagingBBox null
+		/Policies <</PageSize 2>>
+>> setpagedevice"
+*ParamCustomPageSize Width: 1 points 278.640014648438 612
+*ParamCustomPageSize Height: 2 points 419.760009765625 1008
+*ParamCustomPageSize WidthOffset: 3 points 0 0
+*ParamCustomPageSize HeightOffset: 4 points 0 0
+*ParamCustomPageSize Orientation: 5 int 0 0
+*RequiresPageRegion All: True
+*OpenUI *InputSlot/Media Source: PickOne
+*OrderDependency: 20 AnySetup *InputSlot
+*DefaultInputSlot: Tray1
+*InputSlot Tray1/Tray 1: "
+         1 dict dup /MediaPosition null put setpagedevice
+         currentpagedevice /InputAttributes get 0 get setpagedevice
+         1 dict dup /InputAttributes 1 dict dup /Priority [0] put put setpagedevice
+         1 dict dup /Policies 1 dict dup /PageSize 2 put put setpagedevice
+         << /ManualFeed false >> setpagedevice"
+*End
+*InputSlot ManualPaper/Manual Paper: "
+   1 dict dup /MediaPosition null put setpagedevice
+          1 dict dup /ManualFeed true  put setpagedevice
+         1 dict dup /Policies 1 dict dup /PageSize 2 put put setpagedevice"
+*End
+*InputSlot ManualEnv/Manual Envelope: "
+   1 dict dup /MediaPosition null put setpagedevice
+   1 dict dup /ManualFeed true  put setpagedevice
+   1 dict dup /Policies 1 dict dup /PageSize 2 put put setpagedevice"
+*End
+*CloseUI: *InputSlot
+*OpenGroup: InstallableOptions/Installable Options
+*OpenUI *OptDuplex/Duplexer: Boolean
+*OrderDependency: 0 AnySetup *OptDuplex
+*DefaultOptDuplex: True
+*OptDuplex False/Not Installed: ""
+*OptDuplex True/Installed: ""
+*CloseUI: *OptDuplex
+*CloseGroup: InstallableOptions
+*OpenGroup: JCL/JCL
+*OpenUI *PnH/Print and Hold: PickOne
+*OrderDependency: 0 JCLSetup *PnH
+*DefaultPnH: False
+*PnH False/Off: ""
+*PnH Verify: "@PJL SET JOBNAME = GETMYJOBNAME
+@PJL SET USERNAME = GEYMYUSERNAME
+@PJL SET HOLD = PROOF
+@PJL SET QTY = GETMYCOPIES<0A>"
+*End
+*PnH Repeat: "@PJL SET JOBNAME = GETMYJOBNAME
+@PJL SET USERNAME = GEYMYUSERNAME
+@PJL SET HOLD = ON
+@PJL SET HOLDTYPE = PUBLIC
+@PJL SET QTY = GETMYCOPIES<0A>"
+*End
+*PnH Reserve: "@PJL SET JOBNAME = GETMYJOBNAME
+@PJL SET USERNAME = GEYMYUSERNAME
+@PJL SET HOLD = STORE
+@PJL SET QTY = GETMYCOPIES<0A>"
+*End
+*CloseUI: *PnH
+*CustomPnH True/Confidential:"@PJL SET JOBNAME = GETMYJOBNAME
+@PJL SET USERNAME = GEYMYUSERNAME
+@PJL SET HOLD = ON
+@PJL SET HOLDTYPE = PRIVATE
+@PJL SET HOLDKEY = "\1"
+@PJL SET QTY = GETMYCOPIES<0A>"
+*End
+*ParamCustomPnH pin/Pin Number: 1 passcode 0 4
+*OpenUI *FaxNumber/Fax Number: PickOne
+*OrderDependency: 0 JCLSetup *FaxNumber
+*DefaultFaxNumber: False
+*FaxNumber False/Off: ""
+*CloseUI: *FaxNumber
+*CustomFaxNumber True/On:"@PJL LJOBINFO USERID = GEYMYUSERNAME HOSTID = GETMYHOST
+@PJL SET USERNAME = GEYMYUSERNAME
+@PJL LFAX PHONENUMBER = "\1" STATIONID = GETMYHOST<0A>"
+*End
+*ParamCustomFaxNumber faxNumber/Enter Fax Number: 1 string 0 32
+*CloseGroup: JCL
+*OpenGroup: Finishing/Finishing
+*OpenUI *Duplex/Duplex: PickOne
+*OrderDependency: 0 AnySetup *Duplex
+*DefaultDuplex: DuplexNoTumble
+*Duplex None: "<< /Duplex false >> setpagedevice"
+*Duplex DuplexNoTumble/Duplex - Long Edge: "<< /Duplex true /Tumble false >> setpagedevice"
+*Duplex DuplexTumble/Duplex - Short Edge: "<< /Duplex true /Tumble true >> setpagedevice"
+*CloseUI: *Duplex
+*OpenUI *Collate/Collation: Boolean
+*OrderDependency: 50 AnySetup *Collate
+*DefaultCollate: False
+*Collate True/On: "<< /Collate true >> setpagedevice"
+*Collate False/Off: "<< /Collate false >> setpagedevice"
+*CloseUI: *Collate
+*OpenUI *SepPages/Separator Pages: PickOne
+*OrderDependency: 51 AnySetup *SepPages
+*DefaultSepPages: PrinterS
+*SepPages PrinterS/Use Printer Setting: ""
+*SepPages NoneF/None: "<< /SlipSheet 0 >> setpagedevice"
+*SepPages Jobs/Between Jobs: "<< /SlipSheet 2 >> setpagedevice"
+*SepPages Copies/Between Copies: "<< /SlipSheet 3 >> setpagedevice"
+*SepPages Pages/Between Pages: "<< /SlipSheet 4 >> setpagedevice"
+*CloseUI: *SepPages
+*OpenUI *SepSource/Separator Source: PickOne
+*OrderDependency: 52 AnySetup *SepSource
+*DefaultSepSource: PrinterS
+*SepSource PrinterS/Use Printer Setting: ""
+*SepSource Tray1/Tray 1: "<< /SlipSheetDetails << /Type 96 /SlipSheetSource 0 >> >> setpagedevice"
+*CloseUI: *SepSource
+*OpenUI *OutputBin/Output Bin: PickOne
+*OrderDependency: 56 AnySetup *OutputBin
+*DefaultOutputBin: PrinterS
+*OutputBin PrinterS/Use Printer Setting: ""
+*OutputBin StandardBin/Standard Bin: "
+      << /OutputAttributes << 0 << /OutputType (TOP OUTPUT BIN) >> >> >> setpagedevice
+      << /OutputType (TOP OUTPUT BIN) >> setpagedevice"
+*End
+*CloseUI: *OutputBin
+*CloseGroup: Finishing
+*OpenGroup: Quality/Quality
+*OpenUI *LXResolution/Resolution: PickOne
+*OrderDependency: 11 AnySetup *LXResolution
+*DefaultLXResolution: 602x600dpi
+*LXResolution 604x600dpi/2400 Image Quality: "
+<< /HWResolution [600 600] >> setpagedevice"
+*End
+*LXResolution 602x600dpi/1200 Image Quality: "
+<< /HWResolution [600 600] >> setpagedevice"
+*End
+*LXResolution 600dpi/600 dpi: "
+<< /HWResolution [600 600] >> setpagedevice"
+*End
+*CloseUI: *LXResolution
+*OpenUI *Halftone/Halftone: PickOne
+*OrderDependency: 180 AnySetup *Halftone
+*DefaultHalftone: PrinterS
+*Halftone PrinterS/Use Printer Setting: ""
+*Halftone FalseF/Normal: "<< /DeviceRenderingInfo << /LineDetail /Off >> >> setpagedevice"
+*Halftone TrueF/Detail: "<< /DeviceRenderingInfo << /LineDetail /On >> >> setpagedevice"
+*CloseUI: *Halftone
+*OpenUI *TonerDarkness/Toner Darkness: PickOne
+*OrderDependency: 16 AnySetup *TonerDarkness
+*DefaultTonerDarkness: PrinterS
+*TonerDarkness PrinterS/Use Printer Setting: ""
+*TonerDarkness 3/1: "<< /DeviceRenderingInfo << /Type 105 /PrintDarkness 3 /TonerSaver true >> >> setpagedevice"
+*TonerDarkness 8/2: "<< /DeviceRenderingInfo << /Type 105 /PrintDarkness 3 /TonerSaver false >> >> setpagedevice"
+*TonerDarkness 10/3: "<< /DeviceRenderingInfo << /Type 105 /PrintDarkness 5 /TonerSaver false >> >> setpagedevice"
+*CloseUI: *TonerDarkness
+*OpenUI *LexMirror/Mirror: Boolean
+*OrderDependency: 500 AnySetup *LexMirror
+*DefaultLexMirror: False
+*LexMirror True/On: "<<    /Install { currentpagedevice /PageSize get 0 get 0 translate -1 1 scale  } >> setpagedevice"
+*LexMirror False/Off: ""
+*CloseUI: *LexMirror
+*CloseGroup: Quality
+*OpenGroup: Color/Color
+*OpenUI *ColorMode/Color Mode: PickOne
+*OrderDependency: 13 AnySetup *ColorMode
+*DefaultColorMode: FalseM
+*ColorMode FalseM/Monochrome: "<< /cupsColorOrder 0 /cupsColorSpace 0 /cupsBitsPerColor 8 >> setpagedevice"
+*CloseUI: *ColorMode
+*CloseGroup: Color
+*OpenGroup: Paper/Paper
+*OpenUI *MediaType/Paper Type: PickOne
+*OrderDependency: 40 AnySetup *MediaType
+*DefaultMediaType: PrinterS
+*MediaType PrinterS/Use Printer Setting: ""
+*MediaType Plain: "<< /MediaType (Plain)           /Policies << /MediaType 2 >> >> setpagedevice"
+*MediaType Colored: "<< /MediaType (Colored Paper)   /Policies << /MediaType 2 >> >> setpagedevice"
+*MediaType Card/Card stock: "<< /MediaType (Card Stock)  /Policies << /MediaType 2 >> >> setpagedevice"
+*MediaType Labels: "<< /MediaType (Labels)      /Policies << /MediaType 2 >> >> setpagedevice"
+*MediaType Bond: "<< /MediaType (Bond) /Policies << /MediaType 2 >> >> setpagedevice"
+*MediaType Letterhead: "<< /MediaType (Letterhead)  /Policies << /MediaType 2 >> >> setpagedevice"
+*MediaType Preprint/Preprinted: "<< /MediaType (Preprinted)        /Policies << /MediaType 2 >> >> setpagedevice"
+*MediaType Envelope: "<< /MediaType (Envelope)        /Policies << /MediaType 2 >> >> setpagedevice"
+*MediaType Recycled: "<< /MediaType (Recycled)    /Policies << /MediaType 2 >> >> setpagedevice"
+*MediaType Light: "<< /MediaType (Light) /Policies << /MediaType 2 >> >> setpagedevice"
+*MediaType Heavy: "<< /MediaType (Heavy) /Policies << /MediaType 2 >> >> setpagedevice"
+*CloseUI: *MediaType
+*OpenUI *LexBlankPage/Print Blank Pages: PickOne
+*OrderDependency: 175 AnySetup *LexBlankPage
+*DefaultLexBlankPage: PrinterS
+*LexBlankPage PrinterS/Use Printer Setting: ""
+*LexBlankPage False/Off: ""
+*LexBlankPage True/On: ""
+*CloseUI: *LexBlankPage
+*CloseGroup: Paper
+*ar.Translation Manufacturer/Lexmark: ""
+*ar.Translation ModelName/Lexmark MB2200 Series: ""
+*ar.Translation ShortNickName/Lexmark MB2200 Series: ""
+*ar.Translation NickName/Lexmark MB2200 Series: ""
+*ar.Translation PageSize/حجم الوسائط: ""
+*ar.PageSize Letter/Letter ‏(1/2 8 × 11 بوصة): ""
+*ar.PageSize Legal/Legal ‏(1/2 8 × 14 بوصة): ""
+*ar.PageSize 8.5x13.4028/Oficio ‏(المكسيك) ‏(216 × 340 ملم): ""
+*ar.PageSize B5/B5 ‏(182 × 257 ملم): ""
+*ar.PageSize A4/A4 ‏(210 × 297 ملم): ""
+*ar.PageSize Executive/Executive ‏(1/4 7 × 1/2 10 بوصة): ""
+*ar.PageSize Hagaki/Hagaki: ""
+*ar.PageSize A5/A5 ‏(148 × 210 ملم): ""
+*ar.PageSize A6/A6 ‏(105 × 148 ملم): ""
+*ar.PageSize FanFoldGermanLegal/Folio ‏(1/2 8  × 13 بوصة): ""
+*ar.PageSize Statement/Statement ‏(1/2 5 × 1/2 8 بوصة): ""
+*ar.PageSize EnvMonarch/ظرف 3/4 7 ‏(7/8 3 × 1/2 7 بوصة): ""
+*ar.PageSize Env9/الظرف 9 ‏(7/8 3 × 7/8 8 بوصات): ""
+*ar.PageSize Env10/الظرف 10 ‏(1/8 4 × 1/2 9 بوصات): ""
+*ar.PageSize EnvDL/ظرف DL ‏(110 × 220 ملم): ""
+*ar.PageSize EnvC5/ظرف C5 ‏(162 × 229 ملم): ""
+*ar.PageSize ISOB5/ظرف B5 ‏(176 ×250 ملم): ""
+*ar.PageSize OthEnv/ظرف آخر: ""
+*ar.Translation InputSlot/مصدر الوسائط: ""
+*ar.InputSlot Tray1/الدرج 1: ""
+*ar.InputSlot ManualPaper/تغذية الورق يدويًا: ""
+*ar.InputSlot ManualEnv/ظرف يدوي: ""
+*ar.Translation InstallableOptions/الخيارات القابلة للتنزيل: ""
+*ar.Translation OptDuplex/وحدة الطباعة على الوجهين: ""
+*ar.OptDuplex False/غير مثبت: ""
+*ar.OptDuplex True/مثبت: ""
+*ar.Translation JCL/JCL: ""
+*ar.Translation PnH/الطباعة والتوقف: ""
+*ar.PnH False/إيقاف: ""
+*ar.PnH Verify/تحقق: ""
+*ar.PnH Repeat/تكرار: ""
+*ar.PnH Reserve/احتياطي: ""
+*ar.Translation FaxNumber/رقم الفاكس: ""
+*ar.FaxNumber False/إيقاف: ""
+*ar.Translation Finishing/الإنهاء: ""
+*ar.Translation Duplex/على الوجهين: ""
+*ar.Duplex None/لا يوجد: ""
+*ar.Duplex DuplexNoTumble/طباعة على الوجهين - الحافة الطويلة: ""
+*ar.Duplex DuplexTumble/طباعة على الوجهين - الحافة القصيرة: ""
+*ar.Translation Collate/الترتيب: ""
+*ar.Collate True/تشغيل: ""
+*ar.Collate False/إيقاف: ""
+*ar.Translation SepPages/الصفحات الفاصلة: ""
+*ar.SepPages PrinterS/استخدام إعداد الطابعة: ""
+*ar.SepPages NoneF/لا يوجد: ""
+*ar.SepPages Jobs/بين المهام: ""
+*ar.SepPages Copies/بين النسخ: ""
+*ar.SepPages Pages/بين الصفحات: ""
+*ar.Translation SepSource/مصدر الفاصل: ""
+*ar.SepSource PrinterS/استخدام إعداد الطابعة: ""
+*ar.SepSource Tray1/الدرج 1: ""
+*ar.Translation OutputBin/حاوية الإخراج: ""
+*ar.OutputBin PrinterS/استخدام إعداد الطابعة: ""
+*ar.OutputBin StandardBin/حاوية قياسية: ""
+*ar.Translation Quality/الجودة: ""
+*ar.Translation LXResolution/درجة الدقة: ""
+*ar.LXResolution 604x600dpi/جودة الصورة 2400: ""
+*ar.LXResolution 602x600dpi/جودة الصورة 1200: ""
+*ar.LXResolution 600dpi/600 dpi: ""
+*ar.Translation Halftone/ألوان نصفية: ""
+*ar.Halftone PrinterS/استخدام إعداد الطابعة: ""
+*ar.Halftone FalseF/عادية: ""
+*ar.Halftone TrueF/التفاصيل: ""
+*ar.Translation TonerDarkness/قتامة الحبر: ""
+*ar.TonerDarkness PrinterS/استخدام إعداد الطابعة: ""
+*ar.TonerDarkness 3/1: ""
+*ar.TonerDarkness 8/2: ""
+*ar.TonerDarkness 10/3: ""
+*ar.Translation LexMirror/طباعة معكوسة: ""
+*ar.LexMirror True/تشغيل: ""
+*ar.LexMirror False/إيقاف: ""
+*ar.Translation Color/ألوان: ""
+*ar.Translation ColorMode/وضع الألوان: ""
+*ar.ColorMode FalseM/أحادي اللون: ""
+*ar.Translation Paper/ورق: ""
+*ar.Translation MediaType/نوع الورق: ""
+*ar.MediaType PrinterS/استخدام إعداد الطابعة: ""
+*ar.MediaType Plain/ورق عادي: ""
+*ar.MediaType Colored/ملونة: ""
+*ar.MediaType Card/البطاقات: ""
+*ar.MediaType Labels/ورق العناوين: ""
+*ar.MediaType Bond/ورق فاخر: ""
+*ar.MediaType Letterhead/ورق ذو رأسية: ""
+*ar.MediaType Preprint/مطبوعة مسبقًا: ""
+*ar.MediaType Envelope/ظرف: ""
+*ar.MediaType Recycled/معاد تدويره: ""
+*ar.MediaType Light/خفيف: ""
+*ar.MediaType Heavy/ثقيل: ""
+*ar.Translation LexBlankPage/طباعة الصفحات الفارغة: ""
+*ar.LexBlankPage PrinterS/استخدام إعداد الطابعة: ""
+*ar.LexBlankPage False/إيقاف: ""
+*ar.LexBlankPage True/تشغيل: ""
+*ar.CustomPnH True/سري: ""
+*ar.ParamCustomPnH pin/رقم Pin: ""
+*ar.CustomFaxNumber True/تشغيل: ""
+*ar.ParamCustomFaxNumber faxNumber/إدخال رقم الفاكس: ""
+*fr.Translation Manufacturer/Lexmark: ""
+*fr.Translation ModelName/Lexmark MB2200 Series: ""
+*fr.Translation ShortNickName/Lexmark MB2200 Series: ""
+*fr.Translation NickName/Lexmark MB2200 Series: ""
+*fr.Translation PageSize/Format de support: ""
+*fr.PageSize Letter/Lettre (8 1/2 x 11 pouces): ""
+*fr.PageSize Legal/Légal (8,5 x 14 pouces): ""
+*fr.PageSize 8.5x13.4028/Oficio(México)(8,5 x 13,4 po.): ""
+*fr.PageSize B5/B5 (182 x 257 mm): ""
+*fr.PageSize A4/A4 (210 x 297 mm): ""
+*fr.PageSize Executive/Exécutive (7,25 x 10,5 pouces): ""
+*fr.PageSize Hagaki/Hagaki: ""
+*fr.PageSize A5/A5 (148 x 210 mm): ""
+*fr.PageSize A6/A6 (105 x 148 mm): ""
+*fr.PageSize FanFoldGermanLegal/Folio (8 1/2 x 13 pouces): ""
+*fr.PageSize Statement/Statement (5,5 x 8,5 pouces): ""
+*fr.PageSize EnvMonarch/Env. 7 3/4 (3 7/8 x 7 1/2 po): ""
+*fr.PageSize Env9/Env. 9 (3 7/8 x 8 7/8 po): ""
+*fr.PageSize Env10/Env. 10 (4 1/8 x 9 1/2 po): ""
+*fr.PageSize EnvDL/Enveloppe DL (110 x 220 mm): ""
+*fr.PageSize EnvC5/Enveloppe C5 (162 x 229 mm): ""
+*fr.PageSize ISOB5/Enveloppe B5 (176 x 250 mm): ""
+*fr.PageSize OthEnv/Autre Enveloppe: ""
+*fr.Translation InputSlot/Source d'alimentation du support: ""
+*fr.InputSlot Tray1/Bac 1: ""
+*fr.InputSlot ManualPaper/Manuel papier: ""
+*fr.InputSlot ManualEnv/Enveloppe Manuel: ""
+*fr.Translation InstallableOptions/Options installables: ""
+*fr.Translation OptDuplex/Dispositif recto verso: ""
+*fr.OptDuplex False/Pas installé: ""
+*fr.OptDuplex True/Installée: ""
+*fr.Translation JCL/JCL ( Langage de contrôle de tâche ): ""
+*fr.Translation PnH/Imprimer et suspendre: ""
+*fr.PnH False/Hors Fonction: ""
+*fr.PnH Verify/Vérifier: ""
+*fr.PnH Repeat/Répéter: ""
+*fr.PnH Reserve/Différer: ""
+*fr.Translation FaxNumber/N° de télécopieur: ""
+*fr.FaxNumber False/Hors Fonction: ""
+*fr.Translation Finishing/Finition: ""
+*fr.Translation Duplex/Reliure Recto Verso: ""
+*fr.Duplex None/Hors Fonction: ""
+*fr.Duplex DuplexNoTumble/Reliure Bords Longs: ""
+*fr.Duplex DuplexTumble/Reliure Bords Courts: ""
+*fr.Translation Collate/Assemblage: ""
+*fr.Collate True/En Fonction: ""
+*fr.Collate False/Hors Fonction: ""
+*fr.Translation SepPages/Séparateurs: ""
+*fr.SepPages PrinterS/Utiliser param. imprim.: ""
+*fr.SepPages NoneF/Hors Fonction: ""
+*fr.SepPages Jobs/Entre les Documents: ""
+*fr.SepPages Copies/Entre les Copies: ""
+*fr.SepPages Pages/Entre les Pages: ""
+*fr.Translation SepSource/Alimentation Séparateur: ""
+*fr.SepSource PrinterS/Utiliser param. imprim.: ""
+*fr.SepSource Tray1/Bac 1: ""
+*fr.Translation OutputBin/Réceptacle: ""
+*fr.OutputBin PrinterS/Utiliser param. imprim.: ""
+*fr.OutputBin StandardBin/Réceptacle Standard: ""
+*fr.Translation Quality/Qualité: ""
+*fr.Translation LXResolution/Résolution: ""
+*fr.LXResolution 604x600dpi/2400 Qualité Image: ""
+*fr.LXResolution 602x600dpi/1200 Qualité Image: ""
+*fr.LXResolution 600dpi/600 ppp: ""
+*fr.Translation Halftone/Demi-teintes: ""
+*fr.Halftone PrinterS/Utiliser param. imprim.: ""
+*fr.Halftone FalseF/Normale: ""
+*fr.Halftone TrueF/Détails: ""
+*fr.Translation TonerDarkness/Intensité Toner: ""
+*fr.TonerDarkness PrinterS/Utiliser param. imprim.: ""
+*fr.TonerDarkness 3/1: ""
+*fr.TonerDarkness 8/2: ""
+*fr.TonerDarkness 10/3: ""
+*fr.Translation LexMirror/Miroir: ""
+*fr.LexMirror True/En Fonction: ""
+*fr.LexMirror False/Hors Fonction: ""
+*fr.Translation Color/Couleur: ""
+*fr.Translation ColorMode/Modèle colorimétrique: ""
+*fr.ColorMode FalseM/Monochrome: ""
+*fr.Translation Paper/Papier: ""
+*fr.Translation MediaType/Type Papier: ""
+*fr.MediaType PrinterS/Utiliser param. imprim.: ""
+*fr.MediaType Plain/Ordinaire: ""
+*fr.MediaType Colored/Couleur: ""
+*fr.MediaType Card/Bristol: ""
+*fr.MediaType Labels/Etiquettes: ""
+*fr.MediaType Bond/Qualité: ""
+*fr.MediaType Letterhead/En-tête: ""
+*fr.MediaType Preprint/Préimprimé: ""
+*fr.MediaType Envelope/Enveloppe: ""
+*fr.MediaType Recycled/Recyclé: ""
+*fr.MediaType Light/Brillant: ""
+*fr.MediaType Heavy/Lourd: ""
+*fr.Translation LexBlankPage/Imprimer pages vierges: ""
+*fr.LexBlankPage PrinterS/Utiliser param. imprim.: ""
+*fr.LexBlankPage False/Hors Fonction: ""
+*fr.LexBlankPage True/En Fonction: ""
+*fr.CustomPnH True/Confidentiel: ""
+*fr.ParamCustomPnH pin/Numéro PIN: ""
+*fr.CustomFaxNumber True/En Fonction: ""
+*fr.ParamCustomFaxNumber faxNumber/Entrez numéro télécopie: ""
+*de.Translation Manufacturer/Lexmark: ""
+*de.Translation ModelName/Lexmark MB2200 Series: ""
+*de.Translation ShortNickName/Lexmark MB2200 Series: ""
+*de.Translation NickName/Lexmark MB2200 Series: ""
+*de.Translation PageSize/Medienformat: ""
+*de.PageSize Letter/Letter (8 1/2 x 11) Zoll: ""
+*de.PageSize Legal/Legal (8 1/2 x 14) Zoll: ""
+*de.PageSize 8.5x13.4028/Oficio (Méxiko) (216 x 340) mm: ""
+*de.PageSize B5/B5 (182 x 257) mm: ""
+*de.PageSize A4/A4 (210 x 297) mm: ""
+*de.PageSize Executive/Executive (7 1/4 x 10 1/2) Zoll: ""
+*de.PageSize Hagaki/Hagaki: ""
+*de.PageSize A5/A5 (148 x 210) mm: ""
+*de.PageSize A6/A6 (105 x 148) mm: ""
+*de.PageSize FanFoldGermanLegal/Folio (8 1/2 x 13)Zoll: ""
+*de.PageSize Statement/Statement (5 1/2 x 8 1/2) Zoll: ""
+*de.PageSize EnvMonarch/Briefumschlag 7 3/4 (3 7/8x7 1/2) Zoll: ""
+*de.PageSize Env9/Briefumschlag 9 (3 7/8 x 8 7/8) Zoll: ""
+*de.PageSize Env10/Briefumschlag 10 (4 1/8 x 9 1/2) Zoll: ""
+*de.PageSize EnvDL/Briefumschlag DL (110 x 220) mm: ""
+*de.PageSize EnvC5/Briefumschlag C5 (162 x 229) mm: ""
+*de.PageSize ISOB5/Briefumschlag B5 (176 x 250 mm): ""
+*de.PageSize OthEnv/Anderer Briefumschlag: ""
+*de.Translation InputSlot/Medienzuführung: ""
+*de.InputSlot Tray1/Fach 1: ""
+*de.InputSlot ManualPaper/Papier manuell: ""
+*de.InputSlot ManualEnv/Briefumschlag manuell: ""
+*de.Translation InstallableOptions/Installierbare Optionen: ""
+*de.Translation OptDuplex/Duplexeinheit: ""
+*de.OptDuplex False/Nicht Eingebaut: ""
+*de.OptDuplex True/Eingebaut: ""
+*de.Translation JCL/JCL: ""
+*de.Translation PnH/Drucken und Halten: ""
+*de.PnH False/Aus: ""
+*de.PnH Verify/Bestätigen: ""
+*de.PnH Repeat/Wiederholen: ""
+*de.PnH Reserve/Reservieren: ""
+*de.Translation FaxNumber/Faxnummer: ""
+*de.FaxNumber False/Aus: ""
+*de.Translation Finishing/Papierausgabe: ""
+*de.Translation Duplex/Beidseitig Binderand: ""
+*de.Duplex None/Aus: ""
+*de.Duplex DuplexNoTumble/Lange Kante Binden: ""
+*de.Duplex DuplexTumble/Kurze Kante Binden: ""
+*de.Translation Collate/Sortieren: ""
+*de.Collate True/Ein: ""
+*de.Collate False/Aus: ""
+*de.Translation SepPages/Trennseiten: ""
+*de.SepPages PrinterS/Druckereinst. verw.: ""
+*de.SepPages NoneF/Aus: ""
+*de.SepPages Jobs/Zwischen Aufträgen: ""
+*de.SepPages Copies/Zwischen Kopien: ""
+*de.SepPages Pages/Zwischen Seiten: ""
+*de.Translation SepSource/Trennseitenzufuhr: ""
+*de.SepSource PrinterS/Druckereinst. verw.: ""
+*de.SepSource Tray1/Fach 1: ""
+*de.Translation OutputBin/Papierablage: ""
+*de.OutputBin PrinterS/Druckereinst. verw.: ""
+*de.OutputBin StandardBin/Standardablage: ""
+*de.Translation Quality/Qualität: ""
+*de.Translation LXResolution/Auflösung: ""
+*de.LXResolution 604x600dpi/2400 Bildqualität: ""
+*de.LXResolution 602x600dpi/1200 Bildqualität: ""
+*de.LXResolution 600dpi/600 dpi: ""
+*de.Translation Halftone/Halbton: ""
+*de.Halftone PrinterS/Druckereinst. verw.: ""
+*de.Halftone FalseF/Normal : ""
+*de.Halftone TrueF/Detail: ""
+*de.Translation TonerDarkness/Tonerdeckung: ""
+*de.TonerDarkness PrinterS/Druckereinst. verw.: ""
+*de.TonerDarkness 3/1: ""
+*de.TonerDarkness 8/2: ""
+*de.TonerDarkness 10/3: ""
+*de.Translation LexMirror/Spiegeln: ""
+*de.LexMirror True/Ein: ""
+*de.LexMirror False/Aus: ""
+*de.Translation Color/Farbanpassung: ""
+*de.Translation ColorMode/Farbmodus: ""
+*de.ColorMode FalseM/Schwarzweiß: ""
+*de.Translation Paper/Papier: ""
+*de.Translation MediaType/Papiersorte: ""
+*de.MediaType PrinterS/Druckereinst. verw.: ""
+*de.MediaType Plain/Normalpapier: ""
+*de.MediaType Colored/Farbpapier: ""
+*de.MediaType Card/Karten: ""
+*de.MediaType Labels/Etiketten: ""
+*de.MediaType Bond/Feinpostpapier: ""
+*de.MediaType Letterhead/Briefbogen: ""
+*de.MediaType Preprint/Vorgedruckt: ""
+*de.MediaType Envelope/Briefumschlag: ""
+*de.MediaType Recycled/Recycling-Papier: ""
+*de.MediaType Light/Leichtes Papier: ""
+*de.MediaType Heavy/Schweres Papier: ""
+*de.Translation LexBlankPage/Leere Seiten drucken: ""
+*de.LexBlankPage PrinterS/Druckereinst. verw.: ""
+*de.LexBlankPage False/Aus: ""
+*de.LexBlankPage True/Ein: ""
+*de.CustomPnH True/Vertraulich: ""
+*de.ParamCustomPnH pin/PIN-Nummer: ""
+*de.CustomFaxNumber True/Ein: ""
+*de.ParamCustomFaxNumber faxNumber/Faxnummer eingeben: ""
+*it.Translation Manufacturer/Lexmark: ""
+*it.Translation ModelName/Lexmark MB2200 Series: ""
+*it.Translation ShortNickName/Lexmark MB2200 Series: ""
+*it.Translation NickName/Lexmark MB2200 Series: ""
+*it.Translation PageSize/Dimensioni supporto: ""
+*it.PageSize Letter/Letter (8 1/2 x 11 poll): ""
+*it.PageSize Legal/Legal (8 1/2 x 14 poll): ""
+*it.PageSize 8.5x13.4028/Oficio (Messico) (216 x 340 mm): ""
+*it.PageSize B5/B5 (182 x 257 mm): ""
+*it.PageSize A4/A4 (210 x 297 mm): ""
+*it.PageSize Executive/Executive (7 1/4 x 10 1/2 poll): ""
+*it.PageSize Hagaki/Hagaki: ""
+*it.PageSize A5/A5 (148 x 210 mm): ""
+*it.PageSize A6/A6 (105 x 148 mm): ""
+*it.PageSize FanFoldGermanLegal/Folio (8 1/2 x 13 poll): ""
+*it.PageSize Statement/Statement (5 1/2 x 8 1/2 poll): ""
+*it.PageSize EnvMonarch/Busta 7 3/4 (3 7/8x7 1/2 poll): ""
+*it.PageSize Env9/Busta 9 (3 7/8 x 8 7/8 poll): ""
+*it.PageSize Env10/Busta 10 (4 1/8 x 9 1/2 poll): ""
+*it.PageSize EnvDL/Busta DL (110 x 220 mm): ""
+*it.PageSize EnvC5/Busta C5 (162 x 229 mm): ""
+*it.PageSize ISOB5/Busta B5 (176 x 250 mm): ""
+*it.PageSize OthEnv/Altre buste: ""
+*it.Translation InputSlot/Origine supporto: ""
+*it.InputSlot Tray1/Vassoio 1: ""
+*it.InputSlot ManualPaper/Carta manuale: ""
+*it.InputSlot ManualEnv/Busta Manuale: ""
+*it.Translation InstallableOptions/Opzioni installabili: ""
+*it.Translation OptDuplex/Opzione fronte/retro: ""
+*it.OptDuplex False/Non Installato: ""
+*it.OptDuplex True/Installato: ""
+*it.Translation JCL/JCL: ""
+*it.Translation PnH/Stampa e conserva: ""
+*it.PnH False/Disabilitato: ""
+*it.PnH Verify/Verifica: ""
+*it.PnH Repeat/Ripeti: ""
+*it.PnH Reserve/Conserva: ""
+*it.Translation FaxNumber/Numero fax: ""
+*it.FaxNumber False/Disabilitato: ""
+*it.Translation Finishing/Fascicolazione: ""
+*it.Translation Duplex/Fronte/Retro: ""
+*it.Duplex None/Disabilitato: ""
+*it.Duplex DuplexNoTumble/Lato lungo: ""
+*it.Duplex DuplexTumble/Lato corto: ""
+*it.Translation Collate/Fascicolazione: ""
+*it.Collate True/Abilitato: ""
+*it.Collate False/Disabilitato: ""
+*it.Translation SepPages/Fogli separatori: ""
+*it.SepPages PrinterS/Usa impost. stampante: ""
+*it.SepPages NoneF/Disabilitato: ""
+*it.SepPages Jobs/Tra processi: ""
+*it.SepPages Copies/Tra copie: ""
+*it.SepPages Pages/Tra pagine: ""
+*it.Translation SepSource/Origine separatore: ""
+*it.SepSource PrinterS/Usa impost. stampante: ""
+*it.SepSource Tray1/Vassoio 1: ""
+*it.Translation OutputBin/Racc. di uscita: ""
+*it.OutputBin PrinterS/Usa impost. stampante: ""
+*it.OutputBin StandardBin/Raccoglitore standard: ""
+*it.Translation Quality/Qualità: ""
+*it.Translation LXResolution/Risoluzione: ""
+*it.LXResolution 604x600dpi/Qualità imm. 2400: ""
+*it.LXResolution 602x600dpi/Qualità imm. 1200: ""
+*it.LXResolution 600dpi/600 dpi: ""
+*it.Translation Halftone/Mezzatinta: ""
+*it.Halftone PrinterS/Usa impost. stampante: ""
+*it.Halftone FalseF/Normale: ""
+*it.Halftone TrueF/Dettagli: ""
+*it.Translation TonerDarkness/Intensità del toner: ""
+*it.TonerDarkness PrinterS/Usa impost. stampante: ""
+*it.TonerDarkness 3/1: ""
+*it.TonerDarkness 8/2: ""
+*it.TonerDarkness 10/3: ""
+*it.Translation LexMirror/Speculare: ""
+*it.LexMirror True/Abilitato: ""
+*it.LexMirror False/Disabilitato: ""
+*it.Translation Color/Colore: ""
+*it.Translation ColorMode/Modalità colore: ""
+*it.ColorMode FalseM/Monocromatica: ""
+*it.Translation Paper/Carta: ""
+*it.Translation MediaType/Tipo di carta: ""
+*it.MediaType PrinterS/Usa impost. stampante: ""
+*it.MediaType Plain/Normale: ""
+*it.MediaType Colored/A colori: ""
+*it.MediaType Card/Cartoncino: ""
+*it.MediaType Labels/Etichette: ""
+*it.MediaType Bond/Carta di qualità: ""
+*it.MediaType Letterhead/Carta intestata: ""
+*it.MediaType Preprint/Prestampati: ""
+*it.MediaType Envelope/Busta: ""
+*it.MediaType Recycled/Carta riciclata: ""
+*it.MediaType Light/Chiaro: ""
+*it.MediaType Heavy/Spessa: ""
+*it.Translation LexBlankPage/Stampa pagine vuote: ""
+*it.LexBlankPage PrinterS/Usa impost. stampante: ""
+*it.LexBlankPage False/Disabilitato: ""
+*it.LexBlankPage True/Abilitato: ""
+*it.CustomPnH True/Riservata: ""
+*it.ParamCustomPnH pin/Numero PIN: ""
+*it.CustomFaxNumber True/Abilitato: ""
+*it.ParamCustomFaxNumber faxNumber/Immettere num. fax: ""
+*es.Translation Manufacturer/Lexmark: ""
+*es.Translation ModelName/Lexmark MB2200 Series: ""
+*es.Translation ShortNickName/Lexmark MB2200 Series: ""
+*es.Translation NickName/Lexmark MB2200 Series: ""
+*es.Translation PageSize/Tamaño del material: ""
+*es.PageSize Letter/Carta (8 1/2 x 11 pulg.): ""
+*es.PageSize Legal/Legal (8 1/2 x 14 pulg.): ""
+*es.PageSize 8.5x13.4028/Oficio (México) (216 x 340 mm): ""
+*es.PageSize B5/B5 (182 x 257 mm): ""
+*es.PageSize A4/A4 (210 x 297 mm): ""
+*es.PageSize Executive/Ejecutivo (7 1/4 x 10 1/2 p.): ""
+*es.PageSize Hagaki/Hagaki: ""
+*es.PageSize A5/A5 (148 x 210 mm): ""
+*es.PageSize A6/A6 (105 x 148 mm): ""
+*es.PageSize FanFoldGermanLegal/Folio (8 1/2 x 13 pulg.): ""
+*es.PageSize Statement/Media carta (5 1/2 x 8 1/2 p.): ""
+*es.PageSize EnvMonarch/Sobre 7 3/4 (3 7/8 x 7 1/2 p.): ""
+*es.PageSize Env9/Sobre 9 (3 7/8 x 8 7/8 pulg.): ""
+*es.PageSize Env10/Sobre 10 (4 1/8 x 9 1/2 pulg.): ""
+*es.PageSize EnvDL/Sobre DL (110 x 220 mm): ""
+*es.PageSize EnvC5/Sobre C5 (162 x 229 mm): ""
+*es.PageSize ISOB5/Sobre B5 (176 x 250 mm): ""
+*es.PageSize OthEnv/Otro Sobre: ""
+*es.Translation InputSlot/Origen del material: ""
+*es.InputSlot Tray1/Bandeja 1: ""
+*es.InputSlot ManualPaper/Papel manual: ""
+*es.InputSlot ManualEnv/Sobre manual: ""
+*es.Translation InstallableOptions/Opciones instalables: ""
+*es.Translation OptDuplex/Dispositivo dúplex: ""
+*es.OptDuplex False/No Instalado: ""
+*es.OptDuplex True/Instalada: ""
+*es.Translation JCL/JCL: ""
+*es.Translation PnH/Imprimir y poner en espera: ""
+*es.PnH False/Desactivado: ""
+*es.PnH Verify/Verificar: ""
+*es.PnH Repeat/Repetir: ""
+*es.PnH Reserve/Reservar: ""
+*es.Translation FaxNumber/Número de fax: ""
+*es.FaxNumber False/Desactivado: ""
+*es.Translation Finishing/Acabado: ""
+*es.Translation Duplex/Encuadernado Doble: ""
+*es.Duplex None/Desactivado: ""
+*es.Duplex DuplexNoTumble/Borde Largo: ""
+*es.Duplex DuplexTumble/Borde Corto: ""
+*es.Translation Collate/Clasificación: ""
+*es.Collate True/Activado: ""
+*es.Collate False/Desactivado: ""
+*es.Translation SepPages/Hojas de separación: ""
+*es.SepPages PrinterS/Usar valores impresora: ""
+*es.SepPages NoneF/Desactivado: ""
+*es.SepPages Jobs/Entre trabajos: ""
+*es.SepPages Copies/Entre copias: ""
+*es.SepPages Pages/Entre páginas: ""
+*es.Translation SepSource/Fuente de separadores: ""
+*es.SepSource PrinterS/Usar valores impresora: ""
+*es.SepSource Tray1/Bandeja 1: ""
+*es.Translation OutputBin/Bandeja de Salida: ""
+*es.OutputBin PrinterS/Usar valores impresora: ""
+*es.OutputBin StandardBin/Bandeja de salida Estándar: ""
+*es.Translation Quality/Calidad: ""
+*es.Translation LXResolution/Resolución: ""
+*es.LXResolution 604x600dpi/Calidad 2400IQ: ""
+*es.LXResolution 602x600dpi/Calidad 1200IQ: ""
+*es.LXResolution 600dpi/600 ppp: ""
+*es.Translation Halftone/Media tinta: ""
+*es.Halftone PrinterS/Usar valores impresora: ""
+*es.Halftone FalseF/Normal: ""
+*es.Halftone TrueF/Detalle: ""
+*es.Translation TonerDarkness/Intensidad del tóner: ""
+*es.TonerDarkness PrinterS/Usar valores impresora: ""
+*es.TonerDarkness 3/1: ""
+*es.TonerDarkness 8/2: ""
+*es.TonerDarkness 10/3: ""
+*es.Translation LexMirror/Espejo: ""
+*es.LexMirror True/Activado: ""
+*es.LexMirror False/Desactivado: ""
+*es.Translation Color/Color: ""
+*es.Translation ColorMode/Modo de color: ""
+*es.ColorMode FalseM/Monocromo: ""
+*es.Translation Paper/Papel: ""
+*es.Translation MediaType/Tipo de papel: ""
+*es.MediaType PrinterS/Usar valores impresora: ""
+*es.MediaType Plain/Normal: ""
+*es.MediaType Colored/De color: ""
+*es.MediaType Card/Tarjeta: ""
+*es.MediaType Labels/Etiquetas: ""
+*es.MediaType Bond/Alta calidad: ""
+*es.MediaType Letterhead/Cabecera: ""
+*es.MediaType Preprint/Preimpreso: ""
+*es.MediaType Envelope/Sobre: ""
+*es.MediaType Recycled/Reciclado: ""
+*es.MediaType Light/Claro: ""
+*es.MediaType Heavy/Pesado: ""
+*es.Translation LexBlankPage/Imprimir páginas en blanco: ""
+*es.LexBlankPage PrinterS/Usar valores impresora: ""
+*es.LexBlankPage False/Desactivado: ""
+*es.LexBlankPage True/Activado: ""
+*es.CustomPnH True/Confidencial: ""
+*es.ParamCustomPnH pin/Número PIN: ""
+*es.CustomFaxNumber True/Activado: ""
+*es.ParamCustomFaxNumber faxNumber/Introducir número de fax: ""
+*ko.Translation Manufacturer/Lexmark: ""
+*ko.Translation ModelName/Lexmark MB2200 Series: ""
+*ko.Translation ShortNickName/Lexmark MB2200 Series: ""
+*ko.Translation NickName/Lexmark MB2200 Series: ""
+*ko.Translation PageSize/용지 크기: ""
+*ko.PageSize Letter/Letter(8 1/2 x 11인치): ""
+*ko.PageSize Legal/Legal(8 1/2 x 14인치): ""
+*ko.PageSize 8.5x13.4028/Oficio (Mexico) (216 x 340 mm): ""
+*ko.PageSize B5/B5(182 x 257mm): ""
+*ko.PageSize A4/A4(210 x 297mm): ""
+*ko.PageSize Executive/Executive(7 1/4 x 10 1/2 인치): ""
+*ko.PageSize Hagaki/Hagaki: ""
+*ko.PageSize A5/A5(148 x 210mm): ""
+*ko.PageSize A6/A6(105 x 148mm): ""
+*ko.PageSize FanFoldGermanLegal/Folio(8 1/2 x 13인치): ""
+*ko.PageSize Statement/Statement(5 1/2 x 8 1/2 인치): ""
+*ko.PageSize EnvMonarch/봉투 7 3/4 (3 7/8 x 7 1/2 인치): ""
+*ko.PageSize Env9/봉투 9(3 7/8 x 8 7/8인치): ""
+*ko.PageSize Env10/봉투 10(4 1/8 x 9 1/2인치): ""
+*ko.PageSize EnvDL/DL 봉투(110 x 220mm): ""
+*ko.PageSize EnvC5/C5 봉투(162 x 229mm): ""
+*ko.PageSize ISOB5/B5 봉투(176 x 250mm): ""
+*ko.PageSize OthEnv/기타 봉투: ""
+*ko.Translation InputSlot/용지 급지대: ""
+*ko.InputSlot Tray1/트레이 1: ""
+*ko.InputSlot ManualPaper/수동 용지: ""
+*ko.InputSlot ManualEnv/수동 봉투: ""
+*ko.Translation InstallableOptions/설치할 수 있는 옵션: ""
+*ko.Translation OptDuplex/양면 인쇄 장치 : ""
+*ko.OptDuplex False/설치되지 않음: ""
+*ko.OptDuplex True/설치됨: ""
+*ko.Translation JCL/JCL: ""
+*ko.Translation PnH/인쇄 후 대기: ""
+*ko.PnH False/꺼짐: ""
+*ko.PnH Verify/확인: ""
+*ko.PnH Repeat/반복: ""
+*ko.PnH Reserve/예약: ""
+*ko.Translation FaxNumber/팩스 번호: ""
+*ko.FaxNumber False/꺼짐: ""
+*ko.Translation Finishing/마무리: ""
+*ko.Translation Duplex/양면: ""
+*ko.Duplex None/없음: ""
+*ko.Duplex DuplexNoTumble/양면-긴 가장자리: ""
+*ko.Duplex DuplexTumble/양면-짧은 가장자리: ""
+*ko.Translation Collate/콜레이트: ""
+*ko.Collate True/켜짐: ""
+*ko.Collate False/꺼짐: ""
+*ko.Translation SepPages/페이지 분리기: ""
+*ko.SepPages PrinterS/프린터 설정 사용: ""
+*ko.SepPages NoneF/없음: ""
+*ko.SepPages Jobs/작업 사이: ""
+*ko.SepPages Copies/인쇄 사이: ""
+*ko.SepPages Pages/페이지 사이: ""
+*ko.Translation SepSource/자원 분리기: ""
+*ko.SepSource PrinterS/프린터 설정 사용: ""
+*ko.SepSource Tray1/트레이 1: ""
+*ko.Translation OutputBin/출력 빈: ""
+*ko.OutputBin PrinterS/프린터 설정 사용: ""
+*ko.OutputBin StandardBin/표준 빈: ""
+*ko.Translation Quality/품질: ""
+*ko.Translation LXResolution/인쇄 해상도: ""
+*ko.LXResolution 604x600dpi/2400 이미지 품질: ""
+*ko.LXResolution 602x600dpi/1200 이미지 품질: ""
+*ko.LXResolution 600dpi/600 dpi: ""
+*ko.Translation Halftone/하프톤: ""
+*ko.Halftone PrinterS/프린터 설정 사용: ""
+*ko.Halftone FalseF/보통: ""
+*ko.Halftone TrueF/세부 사항: ""
+*ko.Translation TonerDarkness/토너 어둡기: ""
+*ko.TonerDarkness PrinterS/프린터 설정 사용: ""
+*ko.TonerDarkness 3/1: ""
+*ko.TonerDarkness 8/2: ""
+*ko.TonerDarkness 10/3: ""
+*ko.Translation LexMirror/﻿미러: ""
+*ko.LexMirror True/켜짐: ""
+*ko.LexMirror False/꺼짐: ""
+*ko.Translation Color/칼라: ""
+*ko.Translation ColorMode/색상 모드: ""
+*ko.ColorMode FalseM/흑백: ""
+*ko.Translation Paper/용지: ""
+*ko.Translation MediaType/﻿용지 유형: ""
+*ko.MediaType PrinterS/프린터 설정 사용: ""
+*ko.MediaType Plain/일반 용지: ""
+*ko.MediaType Colored/색상지: ""
+*ko.MediaType Card/카드 용지: ""
+*ko.MediaType Labels/라벨: ""
+*ko.MediaType Bond/본드: ""
+*ko.MediaType Letterhead/레터헤드: ""
+*ko.MediaType Preprint/양면지: ""
+*ko.MediaType Envelope/봉투: ""
+*ko.MediaType Recycled/재활용: ""
+*ko.MediaType Light/밝게: ""
+*ko.MediaType Heavy/중량지: ""
+*ko.Translation LexBlankPage/빈 페이지 인쇄: ""
+*ko.LexBlankPage PrinterS/프린터 설정 사용: ""
+*ko.LexBlankPage False/꺼짐: ""
+*ko.LexBlankPage True/켜짐: ""
+*ko.CustomPnH True/기밀: ""
+*ko.ParamCustomPnH pin/Pin 번호: ""
+*ko.CustomFaxNumber True/켜짐: ""
+*ko.ParamCustomFaxNumber faxNumber/팩스 번호 입력: ""
+*ja.Translation Manufacturer/Lexmark: ""
+*ja.Translation ModelName/Lexmark MB2200 Series: ""
+*ja.Translation ShortNickName/Lexmark MB2200 Series: ""
+*ja.Translation NickName/Lexmark MB2200 Series: ""
+*ja.Translation PageSize/用紙のサイズ: ""
+*ja.PageSize Letter/レター (216 x 279 mm): ""
+*ja.PageSize Legal/リーガル (216 x 356 mm): ""
+*ja.PageSize 8.5x13.4028/Oficio (メキシコ)(216 x 340 mm): ""
+*ja.PageSize B5/B5 (182 x 257 mm): ""
+*ja.PageSize A4/A4 (210 x 297 mm): ""
+*ja.PageSize Executive/エグゼクティブ (184 x 267 mm): ""
+*ja.PageSize Hagaki/Hagaki: ""
+*ja.PageSize A5/A5 (148 x 210 mm): ""
+*ja.PageSize A6/A6 (105 x 148 mm): ""
+*ja.PageSize FanFoldGermanLegal/フォリオ (8.5 x 13 インチ): ""
+*ja.PageSize Statement/ステートメント (140 x 216 mm): ""
+*ja.PageSize EnvMonarch/封筒 7 3/4 (98 x 191 mm): ""
+*ja.PageSize Env9/封筒 #9 (98 x 225 mm): ""
+*ja.PageSize Env10/封筒 #10 (104 x 241 mm): ""
+*ja.PageSize EnvDL/封筒 DL (110 x 220 mm): ""
+*ja.PageSize EnvC5/封筒 C5 (162 x 229 mm): ""
+*ja.PageSize ISOB5/封筒 B5 (176 x 250 mm): ""
+*ja.PageSize OthEnv/その他: ""
+*ja.Translation InputSlot/給紙源: ""
+*ja.InputSlot Tray1/カセット 1: ""
+*ja.InputSlot ManualPaper/手差し用紙: ""
+*ja.InputSlot ManualEnv/手差し封筒: ""
+*ja.Translation InstallableOptions/インストール可能オプション: ""
+*ja.Translation OptDuplex/両面印刷ユニット: ""
+*ja.OptDuplex False/インストールされていません: ""
+*ja.OptDuplex True/インストール済み: ""
+*ja.Translation JCL/JCL: ""
+*ja.Translation PnH/印刷して一時停止: ""
+*ja.PnH False/オフ: ""
+*ja.PnH Verify/確認: ""
+*ja.PnH Repeat/繰り返し: ""
+*ja.PnH Reserve/予約: ""
+*ja.Translation FaxNumber/FAX 番号: ""
+*ja.FaxNumber False/オフ: ""
+*ja.Translation Finishing/仕上げ: ""
+*ja.Translation Duplex/両面印刷: ""
+*ja.Duplex None/なし: ""
+*ja.Duplex DuplexNoTumble/両面印刷 - 長辺: ""
+*ja.Duplex DuplexTumble/両面印刷 - 短辺: ""
+*ja.Translation Collate/ソーターで印刷: ""
+*ja.Collate True/オン: ""
+*ja.Collate False/オフ: ""
+*ja.Translation SepPages/区切りページ: ""
+*ja.SepPages PrinterS/プリンタ設定を使用: ""
+*ja.SepPages NoneF/なし: ""
+*ja.SepPages Jobs/ジョブの間: ""
+*ja.SepPages Copies/部の間: ""
+*ja.SepPages Pages/ページの間: ""
+*ja.Translation SepSource/区切りページ源: ""
+*ja.SepSource PrinterS/プリンタ設定を使用: ""
+*ja.SepSource Tray1/カセット 1: ""
+*ja.Translation OutputBin/排紙トレイ: ""
+*ja.OutputBin PrinterS/プリンタ設定を使用: ""
+*ja.OutputBin StandardBin/標準排紙トレイ: ""
+*ja.Translation Quality/品質: ""
+*ja.Translation LXResolution/印刷品質: ""
+*ja.LXResolution 604x600dpi/2400 DPI（イメージ・クォリティ）: ""
+*ja.LXResolution 602x600dpi/1200 DPI（イメージ・クォリティ）: ""
+*ja.LXResolution 600dpi/600 DPI: ""
+*ja.Translation Halftone/ハーフトーン: ""
+*ja.Halftone PrinterS/プリンタ設定を使用: ""
+*ja.Halftone FalseF/標準: ""
+*ja.Halftone TrueF/詳細: ""
+*ja.Translation TonerDarkness/トナーの濃さ: ""
+*ja.TonerDarkness PrinterS/プリンタ設定を使用: ""
+*ja.TonerDarkness 3/1: ""
+*ja.TonerDarkness 8/2: ""
+*ja.TonerDarkness 10/3: ""
+*ja.Translation LexMirror/﻿左右反転: ""
+*ja.LexMirror True/オン: ""
+*ja.LexMirror False/オフ: ""
+*ja.Translation Color/カラー用紙: ""
+*ja.Translation ColorMode/カラーモード: ""
+*ja.ColorMode FalseM/モノクロ: ""
+*ja.Translation Paper/用紙: ""
+*ja.Translation MediaType/用紙の種類: ""
+*ja.MediaType PrinterS/プリンタ設定を使用: ""
+*ja.MediaType Plain/普通紙: ""
+*ja.MediaType Colored/カラー用紙: ""
+*ja.MediaType Card/厚紙: ""
+*ja.MediaType Labels/ラベル: ""
+*ja.MediaType Bond/ボンド紙: ""
+*ja.MediaType Letterhead/レターヘッド: ""
+*ja.MediaType Preprint/プレプリント: ""
+*ja.MediaType Envelope/封筒: ""
+*ja.MediaType Recycled/再生紙: ""
+*ja.MediaType Light/明: ""
+*ja.MediaType Heavy/重量紙: ""
+*ja.Translation LexBlankPage/空白ページを印刷: ""
+*ja.LexBlankPage PrinterS/プリンタ設定を使用: ""
+*ja.LexBlankPage False/オフ: ""
+*ja.LexBlankPage True/オン: ""
+*ja.CustomPnH True/秘密: ""
+*ja.ParamCustomPnH pin/暗証番号: ""
+*ja.CustomFaxNumber True/オン: ""
+*ja.ParamCustomFaxNumber faxNumber/FAX 番号を入力: ""
+*ru.Translation Manufacturer/Lexmark: ""
+*ru.Translation ModelName/Lexmark MB2200 Series: ""
+*ru.Translation ShortNickName/Lexmark MB2200 Series: ""
+*ru.Translation NickName/Lexmark MB2200 Series: ""
+*ru.Translation PageSize/Размер материала: ""
+*ru.PageSize Letter/Letter (8 1/2 x 11''): ""
+*ru.PageSize Legal/Legal (8 1/2 x 14''): ""
+*ru.PageSize 8.5x13.4028/Oficio (Мексика) (216 x 340 мм): ""
+*ru.PageSize B5/B5 (182 x 257 мм): ""
+*ru.PageSize A4/A4 (210 x 297 мм): ""
+*ru.PageSize Executive/Executive (7 1/4 x 10 1/2''): ""
+*ru.PageSize Hagaki/Hagaki: ""
+*ru.PageSize A5/A5 (148 x 210 мм): ""
+*ru.PageSize A6/A6 (105 x 148 мм): ""
+*ru.PageSize FanFoldGermanLegal/Folio (8 1/2 x 13 ДЧИЛНБ): ""
+*ru.PageSize Statement/Statement (5 1/2 x 8 1/2''): ""
+*ru.PageSize EnvMonarch/Конверт 7 3/4: ""
+*ru.PageSize Env9/Конверт 9: ""
+*ru.PageSize Env10/Конверт 10: ""
+*ru.PageSize EnvDL/Конверт DL: ""
+*ru.PageSize EnvC5/Конверт C5: ""
+*ru.PageSize ISOB5/Конверт B5: ""
+*ru.PageSize OthEnv/Другой конверт: ""
+*ru.Translation InputSlot/Источник бумаги: ""
+*ru.InputSlot Tray1/Лоток 1: ""
+*ru.InputSlot ManualPaper/Выбор бумаги вручную: ""
+*ru.InputSlot ManualEnv/Конверт вручную: ""
+*ru.Translation InstallableOptions/Установленные дополнительные устройства: ""
+*ru.Translation OptDuplex/Модуль дуплекса: ""
+*ru.OptDuplex False/Не установлен: ""
+*ru.OptDuplex True/Установлен: ""
+*ru.Translation JCL/JCL: ""
+*ru.Translation PnH/Отложенная печать: ""
+*ru.PnH False/Выкл: ""
+*ru.PnH Verify/Проверить: ""
+*ru.PnH Repeat/Повторить: ""
+*ru.PnH Reserve/Резервировать: ""
+*ru.Translation FaxNumber/Номер факса: ""
+*ru.FaxNumber False/Выкл: ""
+*ru.Translation Finishing/Оформление: ""
+*ru.Translation Duplex/Двусторонняя: ""
+*ru.Duplex None/Нет: ""
+*ru.Duplex DuplexNoTumble/Двусторонняя - книга: ""
+*ru.Duplex DuplexTumble/Двусторонняя - блокнот: ""
+*ru.Translation Collate/Разбор по копиям: ""
+*ru.Collate True/Вкл: ""
+*ru.Collate False/Выкл: ""
+*ru.Translation SepPages/Страницы-разделители: ""
+*ru.SepPages PrinterS/Использ. Настр. принтера: ""
+*ru.SepPages NoneF/Нет: ""
+*ru.SepPages Jobs/Между заданиями: ""
+*ru.SepPages Copies/Между копиями: ""
+*ru.SepPages Pages/Между страницами: ""
+*ru.Translation SepSource/Источник страницы-разделителя: ""
+*ru.SepSource PrinterS/Использ. Настр. принтера: ""
+*ru.SepSource Tray1/Лоток 1: ""
+*ru.Translation OutputBin/Выходной лоток: ""
+*ru.OutputBin PrinterS/Использ. Настр. принтера: ""
+*ru.OutputBin StandardBin/Стандартный лоток: ""
+*ru.Translation Quality/Качество: ""
+*ru.Translation LXResolution/Разрешение: ""
+*ru.LXResolution 604x600dpi/Качество изображения 2400: ""
+*ru.LXResolution 602x600dpi/Качество изображения 1200: ""
+*ru.LXResolution 600dpi/600 т/д: ""
+*ru.Translation Halftone/Полутона: ""
+*ru.Halftone PrinterS/Использ. Настр. принтера: ""
+*ru.Halftone FalseF/Обычная: ""
+*ru.Halftone TrueF/Detail: ""
+*ru.Translation TonerDarkness/Плотность тонера: ""
+*ru.TonerDarkness PrinterS/Использ. Настр. принтера: ""
+*ru.TonerDarkness 3/1: ""
+*ru.TonerDarkness 8/2: ""
+*ru.TonerDarkness 10/3: ""
+*ru.Translation LexMirror/Зеркальная: ""
+*ru.LexMirror True/Вкл: ""
+*ru.LexMirror False/Выкл: ""
+*ru.Translation Color/Цвет: ""
+*ru.Translation ColorMode/Цветной режим: ""
+*ru.ColorMode FalseM/Монохромная: ""
+*ru.Translation Paper/Бумага: ""
+*ru.Translation MediaType/Тип бумаги: ""
+*ru.MediaType PrinterS/Использ. Настр. принтера: ""
+*ru.MediaType Plain/Обычная бумага: ""
+*ru.MediaType Colored/Цветная бумага: ""
+*ru.MediaType Card/Карточки: ""
+*ru.MediaType Labels/Наклейки: ""
+*ru.MediaType Bond/Фирменные бланки: ""
+*ru.MediaType Letterhead/Бланки: ""
+*ru.MediaType Preprint/Печатные бланки: ""
+*ru.MediaType Envelope/Конверт: ""
+*ru.MediaType Recycled/Из вторсырья: ""
+*ru.MediaType Light/Тонкая: ""
+*ru.MediaType Heavy/оКНРМЮЪ: ""
+*ru.Translation LexBlankPage/Печать пустых страниц: ""
+*ru.LexBlankPage PrinterS/Использ. Настр. принтера: ""
+*ru.LexBlankPage False/Выкл: ""
+*ru.LexBlankPage True/Вкл: ""
+*ru.CustomPnH True/Конфиденциально: ""
+*ru.ParamCustomPnH pin/PIN-код: ""
+*ru.CustomFaxNumber True/Вкл: ""
+*ru.ParamCustomFaxNumber faxNumber/Введите номер факса: ""
+*pl.Translation Manufacturer/Lexmark: ""
+*pl.Translation ModelName/Lexmark MB2200 Series: ""
+*pl.Translation ShortNickName/Lexmark MB2200 Series: ""
+*pl.Translation NickName/Lexmark MB2200 Series: ""
+*pl.Translation PageSize/Rozmiar nośnika: ""
+*pl.PageSize Letter/Letter (8 1/2 x 11 cali): ""
+*pl.PageSize Legal/Legal (8 1/2 x 14 cali): ""
+*pl.PageSize 8.5x13.4028/Oficio (Meksyk) (216 x 340 mm): ""
+*pl.PageSize B5/B5 (182 x 257 mm): ""
+*pl.PageSize A4/A4 (210 x 297 mm): ""
+*pl.PageSize Executive/Executive (7 1/4 x 10 1/2 cala): ""
+*pl.PageSize Hagaki/Hagaki: ""
+*pl.PageSize A5/A5 (148 x 210 mm): ""
+*pl.PageSize A6/A6 (105 x 148 mm): ""
+*pl.PageSize FanFoldGermanLegal/Folio (8 1/2 x 13 cali): ""
+*pl.PageSize Statement/Statement (5 1/2 x 8 1/2 cala): ""
+*pl.PageSize EnvMonarch/Kop. 7 3/4 (3 7/8 x 7 1/2 cala): ""
+*pl.PageSize Env9/Koperta 9 (3 7/8 x 8 7/8 cala): ""
+*pl.PageSize Env10/Koperta 10 (4 1/8 x 9 1/2 cala): ""
+*pl.PageSize EnvDL/Koperta DL (110 x 220 mm): ""
+*pl.PageSize EnvC5/Koperta C5 (162 x 229 mm): ""
+*pl.PageSize ISOB5/Koperta B5 (176 x 250 mm): ""
+*pl.PageSize OthEnv/Inna koperta: ""
+*pl.Translation InputSlot/Źródło nośnika: ""
+*pl.InputSlot Tray1/Zasobnik 1: ""
+*pl.InputSlot ManualPaper/Ręczny podajnik papieru: ""
+*pl.InputSlot ManualEnv/Ręczny kopert: ""
+*pl.Translation InstallableOptions/Instalowalne opcje: ""
+*pl.Translation OptDuplex/Dupleks: ""
+*pl.OptDuplex False/Nie zainstalowano: ""
+*pl.OptDuplex True/Zainstalowane: ""
+*pl.Translation JCL/JCL: ""
+*pl.Translation PnH/Drukowanie z zatrzymaniem: ""
+*pl.PnH False/Wyłączone: ""
+*pl.PnH Verify/Próbne: ""
+*pl.PnH Repeat/Powtarzane: ""
+*pl.PnH Reserve/Odroczone: ""
+*pl.Translation FaxNumber/Numer faksu: ""
+*pl.FaxNumber False/Wyłączone: ""
+*pl.Translation Finishing/Wykańczanie: ""
+*pl.Translation Duplex/Dwustronny: ""
+*pl.Duplex None/Brak: ""
+*pl.Duplex DuplexNoTumble/Dupleks — długi brzeg: ""
+*pl.Duplex DuplexTumble/Dupleks — krótki brzeg: ""
+*pl.Translation Collate/Sortowanie: ""
+*pl.Collate True/Włączone: ""
+*pl.Collate False/Wyłączone: ""
+*pl.Translation SepPages/Strony separatorów: ""
+*pl.SepPages PrinterS/Użyj ustawień drukarki: ""
+*pl.SepPages NoneF/Brak: ""
+*pl.SepPages Jobs/Między zadaniami: ""
+*pl.SepPages Copies/Między kopiami: ""
+*pl.SepPages Pages/Między stronami: ""
+*pl.Translation SepSource/Źródło separatorów: ""
+*pl.SepSource PrinterS/Użyj ustawień drukarki: ""
+*pl.SepSource Tray1/Zasobnik 1: ""
+*pl.Translation OutputBin/Odbiornik: ""
+*pl.OutputBin PrinterS/Użyj ustawień drukarki: ""
+*pl.OutputBin StandardBin/Odbiornik standardowy: ""
+*pl.Translation Quality/Jakość: ""
+*pl.Translation LXResolution/Rozdzielczość: ""
+*pl.LXResolution 604x600dpi/Jakość obrazu 2400: ""
+*pl.LXResolution 602x600dpi/Jakość obrazu 1200: ""
+*pl.LXResolution 600dpi/600 dpi: ""
+*pl.Translation Halftone/Półtony: ""
+*pl.Halftone PrinterS/Użyj ustawień drukarki: ""
+*pl.Halftone FalseF/Normalna: ""
+*pl.Halftone TrueF/Szczegóły: ""
+*pl.Translation TonerDarkness/Intensywność toneru: ""
+*pl.TonerDarkness PrinterS/Użyj ustawień drukarki: ""
+*pl.TonerDarkness 3/1: ""
+*pl.TonerDarkness 8/2: ""
+*pl.TonerDarkness 10/3: ""
+*pl.Translation LexMirror/Odbicie lustrzane: ""
+*pl.LexMirror True/Włączone: ""
+*pl.LexMirror False/Wyłączone: ""
+*pl.Translation Color/Kolorowy: ""
+*pl.Translation ColorMode/Tryb koloru: ""
+*pl.ColorMode FalseM/Monochromatyczny: ""
+*pl.Translation Paper/Papier: ""
+*pl.Translation MediaType/Typ papieru: ""
+*pl.MediaType PrinterS/Użyj ustawień drukarki: ""
+*pl.MediaType Plain/Zwykły: ""
+*pl.MediaType Colored/Papier kolorowy: ""
+*pl.MediaType Card/Karta okolicznościowa: ""
+*pl.MediaType Labels/Etykiety: ""
+*pl.MediaType Bond/Papier dokumentowy: ""
+*pl.MediaType Letterhead/Papier firmowy: ""
+*pl.MediaType Preprint/Formularze: ""
+*pl.MediaType Envelope/Koperta: ""
+*pl.MediaType Recycled/Makulaturowy: ""
+*pl.MediaType Light/O małej gramaturze: ""
+*pl.MediaType Heavy/O dużej gramaturze: ""
+*pl.Translation LexBlankPage/Drukuj puste strony: ""
+*pl.LexBlankPage PrinterS/Użyj ustawień drukarki: ""
+*pl.LexBlankPage False/Wyłączone: ""
+*pl.LexBlankPage True/Włączone: ""
+*pl.CustomPnH True/Poufne: ""
+*pl.ParamCustomPnH pin/Numer PIN: ""
+*pl.CustomFaxNumber True/Włączone: ""
+*pl.ParamCustomFaxNumber faxNumber/Wprowadź numer faksu: ""
+*pt.Translation Manufacturer/Lexmark: ""
+*pt.Translation ModelName/Lexmark MB2200 Series: ""
+*pt.Translation ShortNickName/Lexmark MB2200 Series: ""
+*pt.Translation NickName/Lexmark MB2200 Series: ""
+*pt.Translation PageSize/Tamanho da mídia: ""
+*pt.PageSize Letter/Carta (8 1/2 x 11 pol): ""
+*pt.PageSize Legal/Ofício (8 1/2 x 14 pol): ""
+*pt.PageSize 8.5x13.4028/Ofício (México) (216 x 340 mm): ""
+*pt.PageSize B5/B5 (182 x 257 mm): ""
+*pt.PageSize A4/A4 (210 x 297 mm): ""
+*pt.PageSize Executive/Executivo (7 1/4 x 10 1/2 pol): ""
+*pt.PageSize Hagaki/Hagaki: ""
+*pt.PageSize A5/A5 (148 x 210 mm): ""
+*pt.PageSize A6/A6 (105 x 148 mm): ""
+*pt.PageSize FanFoldGermanLegal/Folio (8 1/2 x 13 pol): ""
+*pt.PageSize Statement/Declaraçăo (5 1/2 x 8 1/2 pol): ""
+*pt.PageSize EnvMonarch/Envelope 7 3/4(3 7/8x7 1/2 pol): ""
+*pt.PageSize Env9/Envelope 9 (3 7/8 x 8 7/8 pol): ""
+*pt.PageSize Env10/Envelope 10 (4 1/8 x 9 1/2 pol): ""
+*pt.PageSize EnvDL/Envelope DL (110 x 220 mm): ""
+*pt.PageSize EnvC5/Envelope C5 (162 x 229 mm): ""
+*pt.PageSize ISOB5/Envelope B5 (176 x 250 mm): ""
+*pt.PageSize OthEnv/Outros Envelopes: ""
+*pt.Translation InputSlot/Origem da mídia: ""
+*pt.InputSlot Tray1/Bandeja 1: ""
+*pt.InputSlot ManualPaper/Papel Manual: ""
+*pt.InputSlot ManualEnv/Envelope Manual: ""
+*pt.Translation InstallableOptions/Opções instaláveis: ""
+*pt.Translation OptDuplex/Duplexador: ""
+*pt.OptDuplex False/Năo Instalado: ""
+*pt.OptDuplex True/Instalada: ""
+*pt.Translation JCL/JCL: ""
+*pt.Translation PnH/Imprimir e reter: ""
+*pt.PnH False/Desligado: ""
+*pt.PnH Verify/Verificar: ""
+*pt.PnH Repeat/Repetir: ""
+*pt.PnH Reserve/Reservar: ""
+*pt.Translation FaxNumber/Número fax: ""
+*pt.FaxNumber False/Desligado: ""
+*pt.Translation Finishing/Acabamento: ""
+*pt.Translation Duplex/Modo Duplex: ""
+*pt.Duplex None/Nenhum: ""
+*pt.Duplex DuplexNoTumble/Margem Longa: ""
+*pt.Duplex DuplexTumble/Duplex - Borda Curta: ""
+*pt.Translation Collate/Agrupar: ""
+*pt.Collate True/Ativar: ""
+*pt.Collate False/Desligado: ""
+*pt.Translation SepPages/Páginas Separadoras: ""
+*pt.SepPages PrinterS/Usar config. da impr.: ""
+*pt.SepPages NoneF/Nenhum: ""
+*pt.SepPages Jobs/Entre Trabalhos: ""
+*pt.SepPages Copies/Entre Cópias: ""
+*pt.SepPages Pages/Entre Páginas: ""
+*pt.Translation SepSource/Origem do Separador: ""
+*pt.SepSource PrinterS/Usar config. da impr.: ""
+*pt.SepSource Tray1/Bandeja 1: ""
+*pt.Translation OutputBin/Bandejas de Saída: ""
+*pt.OutputBin PrinterS/Usar config. da impr.: ""
+*pt.OutputBin StandardBin/Bandeja de Saída padrão: ""
+*pt.Translation Quality/Qualidade: ""
+*pt.Translation LXResolution/Resolução: ""
+*pt.LXResolution 604x600dpi/Qualidade de Imagem 2400: ""
+*pt.LXResolution 602x600dpi/Qualidade de Imagem 1200: ""
+*pt.LXResolution 600dpi/600 dpi: ""
+*pt.Translation Halftone/Meio-tom: ""
+*pt.Halftone PrinterS/Usar config. da impr.: ""
+*pt.Halftone FalseF/Normal : ""
+*pt.Halftone TrueF/Detalhe: ""
+*pt.Translation TonerDarkness/Tonalidade de toner: ""
+*pt.TonerDarkness PrinterS/Usar config. da impr.: ""
+*pt.TonerDarkness 3/1: ""
+*pt.TonerDarkness 8/2: ""
+*pt.TonerDarkness 10/3: ""
+*pt.Translation LexMirror/Espelhado: ""
+*pt.LexMirror True/Ativar: ""
+*pt.LexMirror False/Desligado: ""
+*pt.Translation Color/Colorido: ""
+*pt.Translation ColorMode/Modo colorido: ""
+*pt.ColorMode FalseM/Monocromática: ""
+*pt.Translation Paper/Papel: ""
+*pt.Translation MediaType/Tipo de Papel: ""
+*pt.MediaType PrinterS/Usar config. da impr.: ""
+*pt.MediaType Plain/Plain: ""
+*pt.MediaType Colored/Colorido: ""
+*pt.MediaType Card/Cartões: ""
+*pt.MediaType Labels/Etiquetas: ""
+*pt.MediaType Bond/Encorpado: ""
+*pt.MediaType Letterhead/Timbrado: ""
+*pt.MediaType Preprint/Pré-impresso: ""
+*pt.MediaType Envelope/Envelopes: ""
+*pt.MediaType Recycled/Reciclado: ""
+*pt.MediaType Light/Claro: ""
+*pt.MediaType Heavy/Maior gramatura: ""
+*pt.Translation LexBlankPage/Imprimir páginas em branco: ""
+*pt.LexBlankPage PrinterS/Usar config. da impr.: ""
+*pt.LexBlankPage False/Desligado: ""
+*pt.LexBlankPage True/Ativar: ""
+*pt.CustomPnH True/Confidencial: ""
+*pt.ParamCustomPnH pin/Número PIN: ""
+*pt.CustomFaxNumber True/Ativar: ""
+*pt.ParamCustomFaxNumber faxNumber/Digite nº do fax: ""
+*zh_tw.Translation Manufacturer/Lexmark: ""
+*zh_tw.Translation ModelName/Lexmark MB2200 Series: ""
+*zh_tw.Translation ShortNickName/Lexmark MB2200 Series: ""
+*zh_tw.Translation NickName/Lexmark MB2200 Series: ""
+*zh_tw.Translation PageSize/材質尺寸: ""
+*zh_tw.PageSize Letter/Letter（8 1/2 x 11 英吋）: ""
+*zh_tw.PageSize Legal/Legal（8 1/2 x 14 英吋）: ""
+*zh_tw.PageSize 8.5x13.4028/Oficio (墨西哥)(216 x 340 公釐): ""
+*zh_tw.PageSize B5/B5（182 x 257 公釐）: ""
+*zh_tw.PageSize A4/A4（210 x 297 公釐）: ""
+*zh_tw.PageSize Executive/Executive（7 1/4x10 1/2 英吋）: ""
+*zh_tw.PageSize Hagaki/Hagaki: ""
+*zh_tw.PageSize A5/A5（148 x 210 公釐）: ""
+*zh_tw.PageSize A6/A6（105 x 148 公釐）: ""
+*zh_tw.PageSize FanFoldGermanLegal/Folio（8 1/2 x 13 英吋）: ""
+*zh_tw.PageSize Statement/Statement（5 1/2x8 1/2 英吋）: ""
+*zh_tw.PageSize EnvMonarch/7 3/4 號信封 （3 7/8x7 1/2 英吋）: ""
+*zh_tw.PageSize Env9/9 號信封 （3 7/8 x 8 7/8 英吋）: ""
+*zh_tw.PageSize Env10/10 號信封 （4 1/8 x 9 1/2 英吋）: ""
+*zh_tw.PageSize EnvDL/DL 信封 （110 x 220 公釐）: ""
+*zh_tw.PageSize EnvC5/C5 信封 （162 x 229 公釐）: ""
+*zh_tw.PageSize ISOB5/B5 信封 （176 x 250 公釐）: ""
+*zh_tw.PageSize OthEnv/其它信封: ""
+*zh_tw.Translation InputSlot/材質來源: ""
+*zh_tw.InputSlot Tray1/裝紙匣 1: ""
+*zh_tw.InputSlot ManualPaper/手動送紙: ""
+*zh_tw.InputSlot ManualEnv/手動信封: ""
+*zh_tw.Translation InstallableOptions/可安裝選購品: ""
+*zh_tw.Translation OptDuplex/雙面列印裝置: ""
+*zh_tw.OptDuplex False/未安裝: ""
+*zh_tw.OptDuplex True/已安裝: ""
+*zh_tw.Translation JCL/JCL: ""
+*zh_tw.Translation PnH/列印與保留: ""
+*zh_tw.PnH False/關: ""
+*zh_tw.PnH Verify/驗證: ""
+*zh_tw.PnH Repeat/重複: ""
+*zh_tw.PnH Reserve/保留: ""
+*zh_tw.Translation FaxNumber/傳真號碼: ""
+*zh_tw.FaxNumber False/關: ""
+*zh_tw.Translation Finishing/輸出處理: ""
+*zh_tw.Translation Duplex/雙面列印: ""
+*zh_tw.Duplex None/無: ""
+*zh_tw.Duplex DuplexNoTumble/雙面列印 - 長邊: ""
+*zh_tw.Duplex DuplexTumble/雙面列印 - 短邊: ""
+*zh_tw.Translation Collate/逐份列印: ""
+*zh_tw.Collate True/開: ""
+*zh_tw.Collate False/關: ""
+*zh_tw.Translation SepPages/分隔頁: ""
+*zh_tw.SepPages PrinterS/使用印表機設定: ""
+*zh_tw.SepPages NoneF/無: ""
+*zh_tw.SepPages Jobs/介於工作之間: ""
+*zh_tw.SepPages Copies/在列印副本之間: ""
+*zh_tw.SepPages Pages/介於頁面之間: ""
+*zh_tw.Translation SepSource/分隔頁來源: ""
+*zh_tw.SepSource PrinterS/使用印表機設定: ""
+*zh_tw.SepSource Tray1/裝紙匣 1: ""
+*zh_tw.Translation OutputBin/出紙架: ""
+*zh_tw.OutputBin PrinterS/使用印表機設定: ""
+*zh_tw.OutputBin StandardBin/標準送紙匣: ""
+*zh_tw.Translation Quality/品質: ""
+*zh_tw.Translation LXResolution/列印解析度: ""
+*zh_tw.LXResolution 604x600dpi/2400 影像品質: ""
+*zh_tw.LXResolution 602x600dpi/1200 影像品質: ""
+*zh_tw.LXResolution 600dpi/600 dpi: ""
+*zh_tw.Translation Halftone/半色調: ""
+*zh_tw.Halftone PrinterS/使用印表機設定: ""
+*zh_tw.Halftone FalseF/一般: ""
+*zh_tw.Halftone TrueF/詳細資料: ""
+*zh_tw.Translation TonerDarkness/碳粉明暗度: ""
+*zh_tw.TonerDarkness PrinterS/使用印表機設定: ""
+*zh_tw.TonerDarkness 3/1: ""
+*zh_tw.TonerDarkness 8/2: ""
+*zh_tw.TonerDarkness 10/3: ""
+*zh_tw.Translation LexMirror/鏡映: ""
+*zh_tw.LexMirror True/開: ""
+*zh_tw.LexMirror False/關: ""
+*zh_tw.Translation Color/色彩: ""
+*zh_tw.Translation ColorMode/颜色模式: ""
+*zh_tw.ColorMode FalseM/單色: ""
+*zh_tw.Translation Paper/紙張: ""
+*zh_tw.Translation MediaType/紙張種類: ""
+*zh_tw.MediaType PrinterS/使用印表機設定: ""
+*zh_tw.MediaType Plain/普通紙: ""
+*zh_tw.MediaType Colored/彩色紙: ""
+*zh_tw.MediaType Card/卡片: ""
+*zh_tw.MediaType Labels/貼紙: ""
+*zh_tw.MediaType Bond/無覆膜的雪銅紙: ""
+*zh_tw.MediaType Letterhead/銜頭紙: ""
+*zh_tw.MediaType Preprint/預印: ""
+*zh_tw.MediaType Envelope/信封: ""
+*zh_tw.MediaType Recycled/再生紙: ""
+*zh_tw.MediaType Light/淡: ""
+*zh_tw.MediaType Heavy/厚磅紙張: ""
+*zh_tw.Translation LexBlankPage/列印空白頁: ""
+*zh_tw.LexBlankPage PrinterS/使用印表機設定: ""
+*zh_tw.LexBlankPage False/關: ""
+*zh_tw.LexBlankPage True/開: ""
+*zh_tw.CustomPnH True/密件: ""
+*zh_tw.ParamCustomPnH pin/個人識別碼號碼: ""
+*zh_tw.CustomFaxNumber True/開: ""
+*zh_tw.ParamCustomFaxNumber faxNumber/輸入傳真號碼: ""
+*zh_cn.Translation Manufacturer/Lexmark: ""
+*zh_cn.Translation ModelName/Lexmark MB2200 Series: ""
+*zh_cn.Translation ShortNickName/Lexmark MB2200 Series: ""
+*zh_cn.Translation NickName/Lexmark MB2200 Series: ""
+*zh_cn.Translation PageSize/介质尺寸: ""
+*zh_cn.PageSize Letter/Letter (8 1/2 x 11 英寸): ""
+*zh_cn.PageSize Legal/Legal (8 1/2 x 14 英寸): ""
+*zh_cn.PageSize 8.5x13.4028/Oficio(墨西哥) (216 x 340 毫米): ""
+*zh_cn.PageSize B5/B5 (182 x 257 毫米): ""
+*zh_cn.PageSize A4/A4 (210 x 297 毫米): ""
+*zh_cn.PageSize Executive/Executive (7 1/4 x 10 1/2 英寸): ""
+*zh_cn.PageSize Hagaki/Hagaki: ""
+*zh_cn.PageSize A5/A5 (148 x 210 毫米): ""
+*zh_cn.PageSize A6/A6 (105 x 148 毫米): ""
+*zh_cn.PageSize FanFoldGermanLegal/Folio (8 1/2 x 13 英寸): ""
+*zh_cn.PageSize Statement/Statement (5 1/2 x 8 1/2 英寸): ""
+*zh_cn.PageSize EnvMonarch/信封 7 3/4 (3 7/8 x 7 1/2 英寸): ""
+*zh_cn.PageSize Env9/信封 9 (3 7/8 x 8 7/8 英寸): ""
+*zh_cn.PageSize Env10/信封 10 (4 1/8 x 9 1/2 英寸): ""
+*zh_cn.PageSize EnvDL/信封 DL (110 x 220 毫米): ""
+*zh_cn.PageSize EnvC5/信封 C5 (162 x 229 毫米): ""
+*zh_cn.PageSize ISOB5/信封 B5  (176 x 250 毫米): ""
+*zh_cn.PageSize OthEnv/其他信封: ""
+*zh_cn.Translation InputSlot/介质来源: ""
+*zh_cn.InputSlot Tray1/进纸匣 1: ""
+*zh_cn.InputSlot ManualPaper/手动纸张: ""
+*zh_cn.InputSlot ManualEnv/手动信封: ""
+*zh_cn.Translation InstallableOptions/可安装选项: ""
+*zh_cn.Translation OptDuplex/双面打印部件: ""
+*zh_cn.OptDuplex False/未安装: ""
+*zh_cn.OptDuplex True/已安装: ""
+*zh_cn.Translation JCL/JCL: ""
+*zh_cn.Translation PnH/打印和保存: ""
+*zh_cn.PnH False/关: ""
+*zh_cn.PnH Verify/校验: ""
+*zh_cn.PnH Repeat/重复: ""
+*zh_cn.PnH Reserve/保留: ""
+*zh_cn.Translation FaxNumber/传真号码: ""
+*zh_cn.FaxNumber False/关: ""
+*zh_cn.Translation Finishing/输出: ""
+*zh_cn.Translation Duplex/双面打印: ""
+*zh_cn.Duplex None/无: ""
+*zh_cn.Duplex DuplexNoTumble/双面打印 - 长边: ""
+*zh_cn.Duplex DuplexTumble/双面打印 - 短边: ""
+*zh_cn.Translation Collate/逐份打印: ""
+*zh_cn.Collate True/开: ""
+*zh_cn.Collate False/关: ""
+*zh_cn.Translation SepPages/分隔页: ""
+*zh_cn.SepPages PrinterS/使用打印机设置: ""
+*zh_cn.SepPages NoneF/无: ""
+*zh_cn.SepPages Jobs/任务之间: ""
+*zh_cn.SepPages Copies/副本之间: ""
+*zh_cn.SepPages Pages/页之间: ""
+*zh_cn.Translation SepSource/分隔纸源: ""
+*zh_cn.SepSource PrinterS/使用打印机设置: ""
+*zh_cn.SepSource Tray1/进纸匣 1: ""
+*zh_cn.Translation OutputBin/接纸架: ""
+*zh_cn.OutputBin PrinterS/使用打印机设置: ""
+*zh_cn.OutputBin StandardBin/标准接纸架: ""
+*zh_cn.Translation Quality/质量: ""
+*zh_cn.Translation LXResolution/打印分辨率: ""
+*zh_cn.LXResolution 604x600dpi/2400 图象质量: ""
+*zh_cn.LXResolution 602x600dpi/1200 图象质量: ""
+*zh_cn.LXResolution 600dpi/600 dpi: ""
+*zh_cn.Translation Halftone/半色调: ""
+*zh_cn.Halftone PrinterS/使用打印机设置: ""
+*zh_cn.Halftone FalseF/正常: ""
+*zh_cn.Halftone TrueF/细节: ""
+*zh_cn.Translation TonerDarkness/鼓粉浓度: ""
+*zh_cn.TonerDarkness PrinterS/使用打印机设置: ""
+*zh_cn.TonerDarkness 3/1: ""
+*zh_cn.TonerDarkness 8/2: ""
+*zh_cn.TonerDarkness 10/3: ""
+*zh_cn.Translation LexMirror/镜像: ""
+*zh_cn.LexMirror True/开: ""
+*zh_cn.LexMirror False/关: ""
+*zh_cn.Translation Color/颜色: ""
+*zh_cn.Translation ColorMode/颜色模式: ""
+*zh_cn.ColorMode FalseM/单色: ""
+*zh_cn.Translation Paper/纸张: ""
+*zh_cn.Translation MediaType/纸张类型: ""
+*zh_cn.MediaType PrinterS/使用打印机设置: ""
+*zh_cn.MediaType Plain/普通纸: ""
+*zh_cn.MediaType Colored/彩色纸: ""
+*zh_cn.MediaType Card/卡片纸: ""
+*zh_cn.MediaType Labels/标签: ""
+*zh_cn.MediaType Bond/铜版纸: ""
+*zh_cn.MediaType Letterhead/信签: ""
+*zh_cn.MediaType Preprint/预印纸: ""
+*zh_cn.MediaType Envelope/信封: ""
+*zh_cn.MediaType Recycled/再生纸: ""
+*zh_cn.MediaType Light/浅: ""
+*zh_cn.MediaType Heavy/重磅纸: ""
+*zh_cn.Translation LexBlankPage/打印空白页: ""
+*zh_cn.LexBlankPage PrinterS/使用打印机设置: ""
+*zh_cn.LexBlankPage False/关: ""
+*zh_cn.LexBlankPage True/开: ""
+*zh_cn.CustomPnH True/保密: ""
+*zh_cn.ParamCustomPnH pin/Pin码: ""
+*zh_cn.CustomFaxNumber True/开: ""
+*zh_cn.ParamCustomFaxNumber faxNumber/输入传真号码: ""
+*DefaultFont: Courier
+*% End of LXMB2200.PPD, 98725 bytes.
+*en.PageSize 8.5x13.4028/Oficio (México): ""

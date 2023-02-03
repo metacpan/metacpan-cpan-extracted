@@ -13,11 +13,11 @@ use App::DBBrowser::Auxil;
 
 
 sub new {
-    my ( $class, $info, $options, $data ) = @_;
+    my ( $class, $info, $options, $d ) = @_;
     bless {
         i => $info,
         o => $options,
-        d => $data
+        d => $d
     }, $class;
 }
 
@@ -38,6 +38,15 @@ sub __choose_drop_item {
     my ( $sf, $type ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    if ( ! @{$sf->{d}{user_table_keys}} ) {
+        my $info = $sf->{d}{db_string};
+        my $prompt = sprintf 'No %ss.', $type;
+        my $table = $tc->choose(
+            [ undef ],
+            { info => $info, prompt => $prompt, undef => '<<' }
+        );
+        return;
+    }
     my $sql = {};
     $ax->reset_sql( $sql );
     my $tables = [ grep { $sf->{d}{tables_info}{$_}[3] eq uc $type } @{$sf->{d}{user_table_keys}} ];
@@ -65,7 +74,7 @@ sub __drop {
     }
     $sql->{table} = $ax->quote_table( $sf->{d}{tables_info}{$table} );
     my $stmt_type = 'Drop_' . $type;
-    $sf->{i}{stmt_types} = [ $stmt_type ];
+    $sf->{d}{stmt_types} = [ $stmt_type ];
     my $info = $ax->get_sql_info( $sql );
     # Choose
     my $ok = $tc->choose(

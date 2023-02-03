@@ -24,7 +24,7 @@
 
   $hostname  = Sys::Hostname::hostname();
   $init_done = 0;
-  $VERSION   = '1.22';
+  $VERSION   = '1.23';
   
   require_version DBI 1.30;
 

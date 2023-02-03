@@ -108,7 +108,7 @@ sub get_databases {
     #print "DB: $info_database\n";
     my $dbh = $sf->get_db_handle( $info_database );
     my $databases = $dbh->selectcol_arrayref( $stmt, {}, $sf->{o}{G}{metadata} ? () : @regex_system_db );
-    $dbh->disconnect(); ##
+    $dbh->disconnect();
     if ( $sf->{o}{G}{metadata} ) {
         my $regexp = join '|', @regex_system_db;
         my $user_db   = [];

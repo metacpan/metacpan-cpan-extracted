@@ -62,22 +62,22 @@
    "provides" : {
       "App::ansiecho" : {
          "file" : "lib/App/ansiecho.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/kaz-utashiro/App-ansiecho/issues"
+         "web" : "https://github.com/tecolicom/App-ansiecho/issues"
       },
-      "homepage" : "https://github.com/kaz-utashiro/App-ansiecho",
+      "homepage" : "https://github.com/tecolicom/App-ansiecho",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/kaz-utashiro/App-ansiecho.git",
-         "web" : "https://github.com/kaz-utashiro/App-ansiecho"
+         "url" : "https://github.com/tecolicom/App-ansiecho.git",
+         "web" : "https://github.com/tecolicom/App-ansiecho"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

@@ -13,7 +13,7 @@ use Graph::Traversal::DFS;
 use List::Util qw( any uniq );
 
 # ABSTRACT: OpenSMILES format writer
-our $VERSION = '0.8.4'; # VERSION
+our $VERSION = '0.8.5'; # VERSION
 
 require Exporter;
 our @ISA = qw( Exporter );
@@ -57,8 +57,10 @@ sub write_SMILES
             non_tree_edge => sub { my @sorted = sort { $vertex_symbols{$a} <=>
                                                        $vertex_symbols{$b} }
                                                      @_[0..1];
-                                   $rings->{$vertex_symbols{$sorted[0]}}
-                                           {$vertex_symbols{$sorted[1]}} =
+                                   $rings->{$vertex_symbols{$_[0]}}
+                                           {$vertex_symbols{$_[1]}} =
+                                   $rings->{$vertex_symbols{$_[1]}}
+                                           {$vertex_symbols{$_[0]}} =
                                         _depict_bond( @sorted, $graph ) },
 
             pre  => sub { my( $vertex, $dfs ) = @_;
@@ -175,6 +177,7 @@ sub write_SMILES
         for my $i (0..$#symbols) {
             if( $rings->{$i} ) {
                 for my $j (sort { $a <=> $b } keys %{$rings->{$i}}) {
+                    next if $i > $j;
                     if( !@ring_ids ) {
                         # All 100 rings are open now. There is no other
                         # solution but to terminate the program.

@@ -7,7 +7,7 @@ use FindBin;
 use lib "$FindBin::Bin/..";
 
 use Test::More ( tests => 69 );
-use Data::Dumper;
+use Data::Dump qw( pp );
 
 use t::ChkUtil;
 dualvar_or_skip 69;
@@ -22,10 +22,10 @@ $ppd->load( "t/ppd/HP-LaserJet_4L-hpijs.ppd" );
 
 ok( $ppd, "Loaded HP LasterJet 4L ppd" );
 
-# warn Dumper $ppd;
+# warn pp $ppd;
 is( $ppd->Manufacturer, "HP", " ... Manufacturer" );
 is( $ppd->ModelName, "HP LaserJet 4L", " ... ModelName" );
-ok( !$ppd->ColorDevice, " ... not ColourDevice" );
+ok( !$ppd->ColorDevice, " ... not ColorDevice" ) or die $ppd->ColorDevice;
 ok( $ppd->cupsManualCopies, " ... cupsManualCopies" );
 is( $ppd->get( 'cupsManualCopies'), $ppd->cupsManualCopies, " ... and get" );
 
@@ -39,12 +39,12 @@ is_deeply( $ps, [
   '(3010.000) 705',
   '(3010.000) 800'
 ], " ... PSVersion" )
-        or die Dumper $ps;
+        or die pp $ps;
 
 $ps = $ppd->CustomPageSize( 'True' );
 is( $ps, "pop pop pop pop pop\n%% FoomaticRIPOptionSetting: PageSize=Custom", 
     " ... CustomPageSize/True" )
-        or die Dumper $ps;
+        or die pp $ppd;
 
 my $cmd = $ppd->FoomaticRIPCommandLine;
 is( $cmd, "gs -q -dBATCH -dPARANOIDSAFER -dQUIET -dNOPAUSE -sDEVICE=ijs -sIjsServer=hpijs%A%B%C -dIjsUseOutputFD%Z -sOutputFile=- -", 
@@ -67,7 +67,7 @@ is_deeply( $l, [
   'UI.Economode',
   'UI.Copies'
 ], " ... list" )
-        or die Dumper $l;
+        or die pp $l;
 
 foreach my $name ( $G->list ) {
     my $c = $G->get( $name );
@@ -102,7 +102,7 @@ is_deeply( $l, [
   'w558h774',
   'w612h935'
 ], " ... as a list" )
-    or die Dumper $l;
+    or die pp $l;
 
 my @list;
 foreach my $name ( $pd->sorted_list ) {
@@ -134,7 +134,7 @@ is_deeply( \@list, [
   'Oufuku:Oufuku-Hagaki',
   'Photo:Photo/4x6 inch index card'
 ], "All have text" )
-        or die Dumper \@list;
+        or die pp \@list;
 
 my $p = $pd->A4;
 ok( $p, "A4" );

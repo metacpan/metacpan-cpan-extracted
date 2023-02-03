@@ -1,6 +1,6 @@
 package App::Greple::xlate;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 =encoding utf-8
 
@@ -35,8 +35,8 @@ Option B<--all> is used to produce entire text.
 Then add C<--xlate> option to translate the selected area.  It will
 find and replace them by the B<deepl> command output.
 
-By default, original and translated text is printed in the conflict
-marker format compatible with L<git(1)>.  Using C<ifdef> format, you
+By default, original and translated text is printed in the "conflict
+marker" format compatible with L<git(1)>.  Using C<ifdef> format, you
 can get desired part by L<unifdef(1)> command easily.  Format can be
 specified by B<--xlate-format> option.
 
@@ -54,6 +54,8 @@ C<(?s).*>.
 
 =item B<--xlate>
 
+=item B<--xlate-color>
+
 Invoke the translation process for each matched area.
 
 Without this option, B<greple> behaves as a normal search command.  So
@@ -62,6 +64,8 @@ translation before invoking actual work.
 
 Command result goes to standard out, so redirect to file if necessary,
 or consider to use L<App::Greple::update> module.
+
+B<--xlate> calls B<--xlate-color> option with B<--color=never> option.
 
 =item B<--xlate-engine>=I<engine>
 
@@ -174,11 +178,6 @@ don't want to remove them and keep in the file, use C<accumulate>.
 
 =back
 
-=item --xlate-batch-update
-
-Update cache for all non-existent data in batch mode.  This is much
-more efficient than normal operation.
-
 =back
 
 =head1 ENVIRONMENT
@@ -238,7 +237,6 @@ our $xlate_engine;
 our $show_progress = 1;
 our $output_format = 'conflict';
 our $collapse_spaces = 1;
-our $squash_newlines = 1;
 our $lang_from = 'ORIGINAL';
 our $lang_to = 'JA';
 our $fold_line = 0;
@@ -275,7 +273,6 @@ our %formatter = (
 my $old_cache = {};
 my $new_cache = {};
 my $xlate_cache_update;
-my $xlate_called;
 
 sub prologue {
     if (defined $cache_method) {
@@ -306,33 +303,12 @@ sub prologue {
     }
 }
 
-sub translate_anyway {
-    my $from = shift;
-
-    print STDERR "From:\n", $from =~ s/^/\t< /mgr
-	if $show_progress;
-
-    return $from if $dryrun;
-
-    my $to = &XLATE($from);
-
-    print STDERR "To:\n", $to =~ s/^/\t> /mgr, "\n\n"
-	if $show_progress;
-
-    return $to;
-}
-
-sub translate {
-    goto &translate_anyway unless $cache_method;
-    my $text = shift;
-    $new_cache->{$text} //= delete $old_cache->{$text} // do {
-	if ($cache_method eq 'batch') {
-	    '';
-	} else {
-	    $xlate_cache_update++;
-	    translate_anyway $text;
-	}
-    };
+sub normalize {
+    local $_ = shift;
+    s{^.+(?:\n.+)*}{
+	${^MATCH} =~ s/\A\s+|\s+\z//gr =~ s/\s+/ /gr
+    }pmge;
+    $_;
 }
 
 sub fold_lines {
@@ -343,30 +319,59 @@ sub fold_lines {
 	runin     => 4,
 	runout    => 4,
 	);
-    join "\n", $fold->text($_[0])->chops;
+    local $_ = shift;
+    s/(.+)/join "\n", $fold->text($1)->chops/ge;
+    $_;
+}
+
+sub xlate_postgrep {
+    my $grep = shift;
+    my @miss;
+    for my $r ($grep->result) {
+	my($b, @match) = @$r;
+	for my $m (@match) {
+	    my $key = normalize($grep->cut(@$m));
+	    $new_cache->{$key} //= delete $old_cache->{$key} // do {
+		push @miss, $key;
+		"NOT TRANSLATED YET\n";
+	    };
+	}
+    }
+    cache_update(@miss) if @miss;
 }
 
 sub xlate {
-    my %args = @_;
-    my $orig = $_;
-    $orig .= "\n" unless $orig =~ /\n\z/;
-
-    my $source = $orig;
-    if ($collapse_spaces) {
-	$source =~ s{^.+(?:\n.+)*}{
-	    ${^MATCH} =~ s/\A\s+|\s+\z//gr =~ s/\s+/ /gr
-	}pmge;
-    }
-
-    $xlate_called++;
-    $_ = translate $source;
-    $_ =~ s/\n\n+/\n/g if $squash_newlines;
-    $_ = fold_lines $_ if $fold_line;
-
+    my $text = shift;
+    my $key = normalize($text);
+    my $s = $new_cache->{$key} // "!!! TRANSLATION ERROR !!!\n";
+    $s = fold_lines $s if $fold_line;
     if (state $formatter = $formatter{$output_format}) {
-	return $formatter->($orig, $_);
+	return $formatter->($text, $s);
     } else {
-	return $_;
+	return $s;
+    }
+}
+sub xlate_colormap { xlate $_ }
+sub xlate_callback { xlate { @_ }->{match} }
+
+sub cache_update {
+    my @from = @_;
+
+    print STDERR "From:\n", map s/^/\t< /mgr, @from
+	if $show_progress;
+
+    return @from if $dryrun;
+
+    my @to = &XLATE(@from);
+
+    print STDERR "To:\n", map s/^/\t> /mgr, @to
+	if $show_progress;
+
+    die "Unmatched response: @to" if @from != @to;
+
+    for my $i (0 .. $#from) {
+	$xlate_cache_update++;
+	$new_cache->{$from[$i]} = $to[$i];
     }
 }
 
@@ -424,34 +429,8 @@ sub before {
     }
 }
 
-sub batch_update {
-
-    my @from = @_;
-
-    print STDERR "From:\n", map s/^/\t< /r, @from
-	if $show_progress;
-
-    my @to = &XLATE(@_);
-
-    print STDERR "To:\n", map s/^/\t> /r, @to
-	if $show_progress;
-
-    die "Unmatched response: @to" if @_ != @to;
-
-    for my $i (0 .. $#_) {
-	$xlate_cache_update++;
-	$new_cache->{$_[$i]} = $to[$i];
-    }
-
-}
-
 sub after {
     if (my $cache = cache_file) {
-	if ($cache_method eq 'batch') {
-	    if (my @from = grep { $new_cache->{$_} eq '' } keys %$new_cache) {
-		batch_update @from;
-	    }
-	}
 	if ($xlate_cache_update or %$old_cache) {
 	    write_cache $cache;
 	}
@@ -478,15 +457,13 @@ option default \
 	--face +E --ci=A \
 	--prologue &__PACKAGE__::prologue
 
-option --xlate \
-	--begin &__PACKAGE__::before \
-	--end   &__PACKAGE__::after \
-	--cm    &__PACKAGE__::xlate
+option --xlate-color \
+	--postgrep &__PACKAGE__::xlate_postgrep \
+	--callback &__PACKAGE__::xlate_callback \
+	--begin    &__PACKAGE__::before \
+	--end      &__PACKAGE__::after
 
-option --xlate-batch-update \
-	--xlate-cache=batch \
-	--xlate-format=discard \
-	--xlate
+option --xlate --xlate-color --color=never
 
 option --match-entire    --re '\A(?s).+\z'
 option --match-paragraph --re '^(.+\n)+'

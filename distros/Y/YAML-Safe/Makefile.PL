@@ -13,7 +13,9 @@ my $DEFINE = '';
 # https://gcc.gnu.org/onlinedocs/gcc-4.0.0/gcc/Warning-Options.html
 if ($Config{gccversion} and $Config{gccversion} =~ /^(\d+\.\d+)\./) {
   my $gccver = $1;
-  if ($gccver >= 4.3) {
+  if ($] > 5.035004) {
+    $DEFINE = '-Wall -Wextra -W';
+  } elsif ($gccver >= 4.3) {
     $DEFINE = '-Wall -Werror=declaration-after-statement -Wextra -W';
   } elsif ($gccver >= 3.4) {
     $DEFINE = '-Wall -Wdeclaration-after-statement -Wextra -W';

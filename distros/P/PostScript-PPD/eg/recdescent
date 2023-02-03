@@ -1,0 +1,82 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Parse::RecDescent;
+use Data::Dump qw( pp );
+use Path::Tiny;
+
+
+# This doesn't work.
+# But it was useful in that it proved to me RecDescent was way to slow for my needs
+
+$::RD_TRACE = 1;
+
+my $grammar=<< 'TXT';
+ppd: line(s)
+line: <skip: qr/[ \t]*/> NL | ( comment | Group | section | kvp ) NL
+    { warn "line:" }
+comment: STAR PERCENT anything
+    { warn "$item[0]: '$item[3]'" }
+kvp: STAR identifier COLON value
+    { warn "$item[0]: $item[2]='$item[4]'"; }    
+section: STAR identifier COLON quotedtext NL STAR 'End'
+    { warn "$item[0]: $item[2]='$item[4]'"; }
+Group: STAR 'OpenGroup' COLON identifier NL GroupBody(s) STAR 'CloseGroup' COLON id
+    { warn "$item[0]: $item[4]" }
+GroupBody: UI | UIBody(s?)
+UI: STAR 'OpenUI' STAR identifier COLON type NL UIBody(s) STAR 'CloseUI' COLON STAR id
+    { warn "$item[0]: $item[4]" }
+
+UIBody: setup | option
+
+setup: NL | ( comment | section | kvp ) NL
+option: NL | ( comment | optsection | optkvp ) NL
+optkvp: STAR id identifier COLON value
+    { 
+        $DB::single = 1;
+        warn "$item[0]: $item[2].$item[3]='$item[5]'"; 
+        if( $item[2] eq 'CloseUI' or $item[2] eq 'CloseGroup' ) {
+            undef;
+        }
+        else {
+            1;
+        }
+    }
+optsection: STAR id identifier COLON quotedtext NL STAR 'End'
+    { warn "$item[0]: $item[2].$item[3]='$item[5]'"; }
+
+
+value: quotedtext | baretext
+quotedtext: QUOTE text QUOTE
+    { $return = $item[2]; }
+baretext: /[^\n]+/
+
+identifier: idi18n | id
+idi18n: id SLASH name
+    { $return = "$item[1] ($item[3])" }
+
+name: /[^:\n]+/
+id: /[-\w]+/
+text: <skip: qr//> /[^"]+/
+anything: /[^\n]*/
+type: /\w+/
+
+COLON: ':'
+NL: <skip: qr/[ \t]*/> /\n/
+PERCENT: '%'
+QUOTE: '"'
+SPACE: ' '
+STAR: '*'
+SLASH: '/'
+
+TXT
+
+
+
+my $parser = Parse::RecDescent->new( $grammar );
+
+my $file = path(shift);
+
+$parser->ppd( $file->slurp ) or die "Bad text";

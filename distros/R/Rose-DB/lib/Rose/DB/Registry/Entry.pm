@@ -7,7 +7,7 @@ use Clone::PP();
 use Rose::Object;
 our @ISA = qw(Rose::Object);
 
-our $VERSION = '0.765';
+our $VERSION = '0.784';
 
 our $Debug = 0;
 
@@ -41,6 +41,9 @@ BEGIN
 
     pre_disconnect_sql => { type => 'array' },
     post_connect_sql   => { type => 'array' },
+
+    # Oracle
+    service            => { type => 'scalar' },
 
     # Pg
     european_dates     => { type => 'boolean', method_spec => { default => 0 } },

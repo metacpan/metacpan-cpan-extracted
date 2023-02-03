@@ -17,12 +17,13 @@ my %WriteMakefileArgs = (
   "NAME" => "OpenAPI::Render",
   "PREREQ_PM" => {
     "CGI" => 0,
+    "Clone" => 0,
     "File::Basename" => 0,
     "Getopt::Long::Descriptive" => 0,
     "JSON" => 0,
     "Text::ASCIITable" => 0
   },
-  "VERSION" => "0.2.0",
+  "VERSION" => "0.3.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -31,6 +32,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "CGI" => 0,
+  "Clone" => 0,
   "File::Basename" => 0,
   "Getopt::Long::Descriptive" => 0,
   "JSON" => 0,

@@ -1,5 +1,12 @@
 Revision history for Perl extension App-Greple-deepl
 
+0.04 2023-02-03T01:07:48Z
+
+    - re-implement cache update strategy
+      now call `deepl' command just once for translation
+    - use --callback interface
+    - --xlate calls --xlate-color with --color=never option
+
 0.03 2023-02-02T05:00:57Z
 
     - implement --xlate-batch-update option

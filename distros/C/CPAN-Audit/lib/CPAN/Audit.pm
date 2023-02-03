@@ -14,7 +14,7 @@ use CPAN::Audit::Version;
 use CPAN::Audit::Query;
 use CPAN::Audit::DB;
 
-our $VERSION = '20230104.001';
+our $VERSION = '20230202.003';
 
 sub new {
     my( $class, %params ) = @_;
@@ -131,7 +131,7 @@ sub command_installed {
 
 	my $verbose_callback = sub {
 		my ($info) = @_;
-		$self->message( sprintf '%s: %s-%s', $info->{path}, $info->{distname}, $info->{version} );
+		$self->verbose( sprintf '%s: %s-%s', $info->{path}, $info->{distname}, $info->{version} );
 	};
 
 	my @deps = CPAN::Audit::Installed->new(
@@ -187,8 +187,7 @@ sub command {
         if ( my $core = $Module::CoreList::version{$]} ) {
             while ( my ( $mod, $ver ) = each %$core ) {
                 my $dist = $self->{db}{module2dist}{$mod} or next;
-
-                $dists->{$dist} = $ver if version->parse($ver) > $dists->{$dist};
+                $dists->{$dist} = $ver if( ! defined $dists->{$dist} or version->parse($ver) > $dists->{$dist} );
             }
         }
     }
@@ -229,12 +228,6 @@ sub command {
     }
 
 	return \%report;
-}
-
-sub message_info {
-    my $self = shift;
-    return if $self->{quiet};
-    $self->message(@_);
 }
 
 sub verbose {

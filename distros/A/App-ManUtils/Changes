@@ -1,5 +1,9 @@
-Revision history for App-ManUtils
+0.002   2022-11-16  Released-By: PERLANCAR
 
-0.001   2016-10-27 (PERLANCAR)
+        - Add CLIs: manlist (list-manpages), manlistsect
+          (list-manpage-sections).
+
+
+0.001   2016-10-27  Released-By: PERLANCAR
 
         - First release.

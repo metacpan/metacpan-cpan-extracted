@@ -19,9 +19,12 @@ is(ansiecho(qw(--separate=: a b c))->{stdout}, "a:b:c\n", '--seprate=: a b c');
 is(ansiecho(qw(--separate=\N{COLON} a b c))->{stdout}, "a:b:c\n", '--seprate=\N{COLON} a b c');
 
 is(ansiecho(qw(\\-c))->{stdout}, "-c\n", '\\-c');
-is(ansiecho(qw(\\055c))->{stdout}, "-c\n", '\\055c');
-is(ansiecho(qw(\\x2dc))->{stdout}, "-c\n", '\\x2dc');
-is(ansiecho(qw(\\N{U+002D}c))->{stdout}, "-c\n", '\\N{U+002D}c');
+is(ansiecho(qw(\\55c))->{stdout}, "\55c\n", '\\55c');
+is(ansiecho(qw(\\055c))->{stdout}, "\055c\n", '\\055c');
+is(ansiecho(qw(\\o{55}c))->{stdout}, "\o{55}c\n", '\\o{55}c');
+is(ansiecho(qw(\\o{055}c))->{stdout}, "\o{055}c\n", '\\o{055}c');
+is(ansiecho(qw(\\x2dc))->{stdout}, "\x2dc\n", '\\x2dc');
+is(ansiecho(qw(\\N{U+002D}c))->{stdout}, "\N{U+002D}c\n", '\\N{U+002D}c');
 
 SKIP: {
 

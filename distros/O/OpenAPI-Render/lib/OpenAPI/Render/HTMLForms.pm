@@ -3,18 +3,26 @@ package OpenAPI::Render::HTMLForms;
 use strict;
 use warnings;
 
-our $VERSION = '0.2.0'; # VERSION
+# ABSTRACT: Generate HTML forms for OpenAPI specifications.
+our $VERSION = '0.3.0'; # VERSION
 
-use CGI qw(-nosticky -utf8 h1 h2 h3 p input filefield popup_menu legend submit start_div end_div start_fieldset end_fieldset start_form end_form start_html end_html);
+use OpenAPI::Render;
+use parent OpenAPI::Render::;
 
-use parent qw(OpenAPI::Render);
+use CGI qw( -nosticky -utf8 h1 h2 h3 p input filefield popup_menu legend submit start_div end_div start_fieldset end_fieldset start_form end_form start_html end_html );
+use List::Util qw( any );
 
 sub header
 {
     my( $self ) = @_;
-    return start_html( -title => $self->{api}{info}{title} . ' v' .
-                                 $self->{api}{info}{version},
-                       -script =>
+
+    my %start_html_options = (
+        -title => $self->api->{info}{title} . ' v' .
+                  $self->api->{info}{version},
+    );
+
+    if( any { $_->{in} eq 'path' } $self->parameters ) {
+        $start_html_options{-script} =
 '
 
 function replace_url_parameters( form ) {
@@ -30,7 +38,10 @@ function replace_url_parameters( form ) {
     form.setAttribute( "action", url );
 }
 
-'          );
+'
+    }
+
+    return start_html( %start_html_options );
 }
 
 sub footer
@@ -51,8 +62,8 @@ sub operation_header
                        -method => $operation ) .
            start_fieldset .
            legend( uc( $operation ) .
-                   ( $self->{api}{paths}{$path}{$operation}{description}
-                        ? ': ' . $self->{api}{paths}{$path}{$operation}{description} : '' ) );
+                   ( $self->api->{paths}{$path}{$operation}{description}
+                        ? ': ' . $self->api->{paths}{$path}{$operation}{description} : '' ) );
 }
 
 sub operation_footer
@@ -61,7 +72,9 @@ sub operation_footer
 
     my %submit_options;
     if( $operation eq 'get' || $operation eq 'post' ) {
-        $submit_options{-onclick} = 'replace_url_parameters( this.form )';
+        if( any { $_->{in} eq 'path' } $self->parameters( $path, $operation ) ) {
+            $submit_options{-onclick} = 'replace_url_parameters( this.form )';
+        }
     } else {
         $submit_options{-name} =
             sprintf 'Submit Query (cannot be handled for %s)',

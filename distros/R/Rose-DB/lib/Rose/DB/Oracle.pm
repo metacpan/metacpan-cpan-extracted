@@ -9,11 +9,15 @@ use Rose::DB;
 
 our $Debug = 0;
 
-our $VERSION  = '0.767';
+our $VERSION  = '0.784';
 
 use Rose::Class::MakeMethods::Generic
 (
-  inheritable_scalar => '_default_post_connect_sql',
+  inheritable_scalar =>
+  [
+    '_default_post_connect_sql',
+    '_booleans_are_numeric',
+  ]
 );
 
 __PACKAGE__->_default_post_connect_sql
@@ -27,6 +31,42 @@ __PACKAGE__->_default_post_connect_sql
       ($ENV{'NLS_TIMESTAMP_TZ_FORMAT'} || 'YYYY-MM-DD HH24:MI:SS.FF TZHTZM') . q('),
   ]
 );
+
+__PACKAGE__->booleans_are_numeric(0);
+
+#
+# Class methods
+#
+
+sub booleans_are_numeric
+{
+  my($class) = shift;
+
+  if(@_)
+  {
+    my $arg = shift;
+
+    $class->_booleans_are_numeric($arg);
+
+    no warnings 'redefine';
+    if($arg)
+    {
+      *format_boolean = \&format_boolean_numeric;
+    }
+    else
+    {
+      *format_boolean = \&format_boolean_char;
+    }
+
+    return $arg ? 1 : 0;
+  }
+
+  return $class->_booleans_are_numeric;
+}
+
+#
+# Object methods
+#
 
 sub default_post_connect_sql
 {
@@ -102,10 +142,20 @@ sub build_dsn
 
   if($args{'host'} || $args{'port'})
   {
-    $args{'sid'} = $database;
+    if ($args{'service'})
+    {
+      $args{'service_name'} = $args{'service'};
 
-    return 'dbi:Oracle:' . 
-      join(';', map { "$_=$args{$_}" } grep { $args{$_} } qw(sid host port));
+      return 'dbi:Oracle:' .
+        join(';', map { "$_=$args{$_}" } grep { $args{$_} } qw(service_name host port));
+    }
+    else
+    {
+      $args{'sid'} = $database;
+
+      return 'dbi:Oracle:' .
+        join(';', map { "$_=$args{$_}" } grep { $args{$_} } qw(sid host port));
+    }
   }
 
   return "dbi:Oracle:$database";
@@ -326,7 +376,7 @@ sub parse_dbi_column_info_default
   #
   #   $col_info->{'COLUMN_DEF'} = "'foo' "; # WTF?
   #
-  # I have no idea why.  Anyway, we just want the value beteen the quotes.
+  # I have no idea why.  Anyway, we just want the value between the quotes.
 
   return undef unless (defined $default);
 
@@ -532,7 +582,10 @@ sub format_select_lock
   return $sql;
 }
 
-sub format_boolean { $_[1] ? 't' : 'f' }
+sub format_boolean_char    { $_[1] ? 't' : 'f' }
+sub format_boolean_numeric { $_[1] ? 1 : 0 }
+
+BEGIN { *format_boolean = \&format_boolean_char }
 
 #
 # Date/time keywords and inlining
@@ -673,6 +726,17 @@ Rose::DB::Oracle - Oracle driver class for Rose::DB.
     password => 'mysecret',
   );
 
+  Rose::DB->register_db
+  (
+    domain   => 'production',
+    type     => 'main',
+    driver   => 'Oracle',
+    service  => 'my_pdb',
+    host     => 'db.example.com',
+    username => 'produser',
+    password => 'prodsecret',
+  );
+
   Rose::DB->default_domain('development');
   Rose::DB->default_type('main');
   ...
@@ -689,6 +753,8 @@ This class cannot be used directly.  You must use L<Rose::DB> and let its L<new(
 Only the methods that are new or have different behaviors than those in L<Rose::DB> are documented here.  See the L<Rose::DB> documentation for the full list of methods.
 
 B<Oracle 9 or later is required.>
+
+If you want to connect to a service rather than a database, use the C<service> parameter instead of C<database> when registering the data source, as shown in the L<SYNOPSIS|/SYNOPSIS> above. This will allow you to connect to PDBs (Pluggable Databases).
 
 B<Note:> This class is a work in progress.  Support for Oracle databases is not yet complete.  If you would like to help, please contact John Siracusa at siracusa@gmail.com or post to the L<mailing list|Rose::DB/SUPPORT>.
 
@@ -707,6 +773,10 @@ The L<default_post_connect_sql|/default_post_connect_sql> statements will be run
     ALTER SESSION SET NLS_TIMESTAMP_TZ_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF TZHTZM'
 
 If one or more C<NLS_*_FORMAT> environment variables are set, the format strings above are replaced by the values that these environment variables have I<at the time this module is loaded>.
+
+=item B<booleans_are_numeric [BOOL]>
+
+Get or set a boolean value that indicates whether or not boolean columns are numeric. Oracle does not have a dedicated boolean column type. Two common stand-in column types are CHAR(1) and NUMBER(1). If C<booleans_are_numeric> is true, then boolean columns are treated as NUMBER(1) columns containing either 1 or 0. If false, they are treated as CHAR(1) columns containing either 't' or 'f'. The default is false.
 
 =back
 

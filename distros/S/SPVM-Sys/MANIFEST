@@ -4,6 +4,7 @@
 .github/workflows/linux-ubuntu-latest.yml
 .github/workflows/macos-latest.yml
 .github/workflows/windows-2019.yml
+.github/workflows/windows-latest.yml
 .gitignore
 Changes
 lib/SPVM/Sys.c
@@ -218,6 +219,9 @@ t/ftest/file_bytes8.txt
 t/ftest/file_empty.txt
 t/ftest/file_new_lines.txt
 t/ftest/foo.txt
+t/ftest/myexe.bat
+t/ftest/myexe.cmd
+t/ftest/myexe.exe
 t/ftest/readline_basic.txt
 t/ftest/readline_eof.txt
 t/ftest/readline_long_lines.txt

@@ -19,7 +19,7 @@ sub safe_backslash {
 	| \\ N\{U\+[0-9a-f]+\}
 	| \\ c.
 	| \\ o\{\d+\}
-	| \\ \d\d\d
+	| \\ \d{1,3}
 	| \\ .
         )
     }{ eval qq["$1"] or die "$1 : string error.\n"}xiger;

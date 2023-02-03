@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.313';
+our $VERSION = '2.314';
 
 #use bytes; # required
 use Scalar::Util qw( looks_like_number );
@@ -13,7 +13,7 @@ use Scalar::Util qw( looks_like_number );
 
 sub new {
     my ( $class, $info, $opt ) = @_;
-    my $db_module  = $info->{plugin};
+    my $db_module = $info->{plugin};
     eval "require $db_module" or die $@;
     my $plugin = $db_module->new( $info, $opt );
     bless { Plugin => $plugin }, $class;
@@ -86,8 +86,18 @@ sub get_schemas {
             $user_schema = [ $db ];
         }
         else {
-            # 'pg_schema' holds the unquoted name of the schema
-            my $TABLE_SCHEM = $driver eq 'Pg' ? 'pg_schema' : 'TABLE_SCHEM';
+            my $table_schem;
+            if ( $driver eq 'Pg' ) {
+                # 'pg_schema' holds the unquoted name of the schema
+                $table_schem = 'pg_schema';
+            }
+            elsif ( $driver eq 'Sybase' ) {
+                # DBD::Sybase  table_info
+                $table_schem = 'TABLE_OWNER';
+            }
+            else {
+                $table_schem = 'TABLE_SCHEM';
+            }
             my $regex_sys;
             if ( $driver eq 'Pg' ) {
                 $regex_sys = qr/^(?:pg_|information_schema$)/;
@@ -96,7 +106,7 @@ sub get_schemas {
                 $regex_sys = qr/^(?:SYS|SQLJ$|NULLID$)/;
             }
             my $sth = $dbh->table_info( undef, '%', '', '' );
-            my $info = $sth->fetchall_hashref( $TABLE_SCHEM );
+            my $info = $sth->fetchall_hashref( $table_schem );
             for my $schema ( sort keys %$info ) {
                 if ( defined $regex_sys && $schema =~ $regex_sys ) {
                     push @$sys_schema, $schema;
@@ -159,10 +169,11 @@ sub get_databases {
 
 
 sub tables_info { # not public
-    my ( $sf, $dbh, $schema, $is_system_schema ) = @_;
-    my $db_driver = $sf->get_db_driver();
-    my ( $table_schem, $table_name );
-    if ( $db_driver eq 'Pg' ) {
+    my ( $sf, $dbh, $schema, $is_system_schema, $has_attached_db ) = @_;
+    my $driver = $sf->get_db_driver();
+    my ( $table_cat, $table_schem, $table_name );
+    if ( $driver eq 'Pg' ) {
+        $table_cat   = 'TABLE_CAT';
         $table_schem = 'pg_schema';
         $table_name  = 'pg_table';
         # DBD::Pg  3.16.0:
@@ -172,14 +183,23 @@ sub tables_info { # not public
         # pg_table: the unquoted name of the table
         # ...
     }
+    elsif ( $driver eq 'Sybase' ) {
+        # DBD::Sybase  table_info
+        $table_cat   = 'TABLE_QUALIFIER';
+        $table_schem = 'TABLE_OWNER';
+        $table_name  = 'TABLE_NAME';
+    }
     else {
+        $table_cat   = 'TABLE_CAT';
         $table_schem = 'TABLE_SCHEM';
         $table_name  = 'TABLE_NAME';
     }
-    # DBD::Pg: TABLE_CAT: The name of the database that the table or view is in (always the current database).
+    # TABLE_CAT:
+    # DBD::Pg: The name of the database that the table or view is in (always the current database).
+    # DBD::Sybase: TABLE_CAT = TABLE_QUALIFIER (database name)
     # The others: nothing
-    my @keys = ( 'TABLE_CAT', $table_schem, $table_name, 'TABLE_TYPE' );
-    if ( $db_driver eq 'SQLite' && $sf->{Plugin}{i}{db_attached} ) {
+    my @keys = ( $table_cat, $table_schem, $table_name, 'TABLE_TYPE' );
+    if ( $driver eq 'SQLite' && $has_attached_db ) {
         # If a SQLite database has databases attached, set $schema to `undef`.
         # If $schema is `undef`, `$dbh->table_info( undef, $schema, '%', '' )` returns all schemas - main, temp and
         # aliases of attached databases - with its tables.
@@ -193,42 +213,45 @@ sub tables_info { # not public
         if ( $info_table->{TABLE_TYPE} eq 'INDEX' ) {
             next;
         }
-        # The table name in $table_key is used in the tables-menu but not in SQL code.
+        # The table name in $table_keys is used in the tables-menu but not in SQL code.
         # To get the table names for SQL code it is used the 'quote_table' routine in Auxil.pm.
-        my $table_key;
-        if ( $db_driver eq 'SQLite' && ! defined $schema ) {
+        my $table_keys;
+        if ( $driver eq 'SQLite' && ! defined $schema ) {
             # The $schema is `undef` if a SQLite database has attached databases.
             next if $info_table->{$table_name} eq 'sqlite_temp_master'; # no 'create temp table'
             if ( $info_table->{$table_schem} =~ /^main\z/i ) {
-                $table_key = sprintf "[%s] %s", "\x{001f}" . $info_table->{$table_schem}, $info_table->{$table_name};
+                $table_keys = sprintf "[%s] %s", "\x{001f}" . $info_table->{$table_schem}, $info_table->{$table_name};
                 # \x{001f} keeps the main tables on top of the tables menu.
             }
             else {
-                $table_key = sprintf "[%s] %s", $info_table->{$table_schem}, $info_table->{$table_name};
+                $table_keys = sprintf "[%s] %s", $info_table->{$table_schem}, $info_table->{$table_name};
             }
         }
         else {
-            $table_key = $info_table->{$table_name};
+            $table_keys = $info_table->{$table_name};
         }
         if ( $is_system_schema ) {
-            push @sys_table_keys, $table_key;
+            push @sys_table_keys, $table_keys;
         }
         else {
-            if ( $info_table->{TABLE_TYPE} =~ /^SYSTEM/ || ( $db_driver eq 'SQLite' && $info_table->{TABLE_NAME} =~ /^sqlite_/ ) ) {
-                push @sys_table_keys, $table_key;
+            if ( $info_table->{TABLE_TYPE} =~ /^SYSTEM/ || ( $driver eq 'SQLite' && $info_table->{TABLE_NAME} =~ /^sqlite_/ ) ) {
+                push @sys_table_keys, $table_keys;
             }
             else {
-                push @user_table_keys, $table_key;
+                push @user_table_keys, $table_keys;
             }
         }
-        $tables_info->{$table_key} = [ @{$info_table}{@keys} ];
+        $tables_info->{$table_keys} = [ @{$info_table}{@keys} ];
     }
     return $tables_info, [ sort @user_table_keys ], [ sort @sys_table_keys ];
 }
 
 
 
+# Oracle and Sybase untested
 
+# Sysbase:
+#   SET quoted_identifier ON
 
 
 1;
@@ -246,7 +269,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.313
+Version 2.314
 
 =head1 DESCRIPTION
 

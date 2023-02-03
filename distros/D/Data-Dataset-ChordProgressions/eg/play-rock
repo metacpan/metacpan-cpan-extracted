@@ -7,12 +7,11 @@
 use strict;
 use warnings;
 
-use Data::Dataset::ChordProgressions;
+use Data::Dataset::ChordProgressions qw(as_hash transpose);
 use List::MoreUtils qw(first_index);
 use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util);
 use MIDI::Util qw(setup_score midi_format);
 use Music::Chord::Note;
-use Music::Scales qw(get_scale_notes);
 
 my $reps  = shift || 2;
 my $sects = shift || 'Amv-DMc-Emv-DMc'; # <note><major|minor><verse|chorus>
@@ -25,38 +24,20 @@ my $score = setup_score();
 
 my $cn = Music::Chord::Note->new;
 
-my %data = Data::Dataset::ChordProgressions::as_hash();
+my %data = as_hash();
 
 for my $sect (@sections) {
     my ($note, $section, $scale, @pool);
     if ($sect =~ /^([A-G][#b]?)(M|m)(v|c)$/) {
         ($note, $scale, $section) = ($1, $2, $3);
-        if ($scale eq 'M') {
-            if ($section eq 'v') {
-                @pool = @{ $data{rock}{major}{verse} };
-            }
-            else {
-                @pool = @{ $data{rock}{major}{chorus} };
-            }
-            $scale = 'major';
-        }
-        else {
-            if ($section eq 'v') {
-                @pool = @{ $data{rock}{minor}{verse} };
-            }
-            else {
-                @pool = @{ $data{rock}{minor}{chorus} };
-            }
-            $scale = 'minor';
-        }
+        $scale   = $scale   eq 'M' ? 'major' : 'minor';
+        $section = $section eq 'v' ? 'verse' : 'chorus';
+        @pool    = @{ $data{rock}{$scale}{$section} };
     }
-
-    my %note_map;
-    @note_map{ get_scale_notes('C', $scale) } = get_scale_notes($note, $scale);
 
     my $progression = $pool[int rand @pool];
 
-    (my $named = $progression->[0]) =~ s/([A-G][#b]?)/$note_map{$1}/g;
+    my $named = transpose($note, $scale, $progression->[0]);
 
     print "$note $scale: $named, $progression->[1]\n";
 

@@ -1,4 +1,11 @@
 Kwalitee requires this.
 
+0.400 Fixed multilined quoted values, even those that don't end with *End
+      Added *JCLOpen and *JCLClose 
+      Work around so bad utf-8 (Gestetner)
+      Detect closing a group when none was opened (Ricoh)
+      Of the 6200+ PPDs that ship with foomatic, only 8 have errors I can't work around.
+
+
 0.300 Added PostScript::PPD->parse
       Fixed PostScript::PPD->get

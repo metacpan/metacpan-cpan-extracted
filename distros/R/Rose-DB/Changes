@@ -1,3 +1,10 @@
+0.784 (02.03.2023) - John Siracusa <siracusa@gmail.com>
+
+    * Added support for PDBs (Pluggable Databases) to DBD::Oracle. (Patch
+      by Ferry Hendrikx.)
+    * Added support for "numeric" booleans to DBD::Oracle. (Patch by Ferry
+      Hendrikx.)
+
 0.783 (04.06.2020) - John Siracusa <siracusa@gmail.com>
 
     * Fixed a bug in DBD::Pg version detection.

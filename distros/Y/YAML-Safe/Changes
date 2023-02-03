@@ -1,4 +1,9 @@
 ---
+version: 0.82
+date:    Fr 3. Feb 14:16:03 CET 2023
+changes:
+- Fix build since 3.36 (nwc)
+---
 version: 0.81
 date:    Sat Jun  4 08:38:51 AM CEST 2022
 changes:

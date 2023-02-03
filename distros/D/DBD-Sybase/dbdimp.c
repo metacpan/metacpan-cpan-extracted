@@ -5587,6 +5587,7 @@ static int _dbd_rebind_ph(SV *sth, imp_sth_t *imp_sth, phs_t *phs, int maxlen) {
   CS_MONEY m_value;
 #if defined(CS_BIGINT_TYPE)
   CS_BIGINT bi_value;
+  CS_UINT ui_value;
 #endif
   CS_INT datatype;
   int free_value = 0;
@@ -5629,6 +5630,15 @@ static int _dbd_rebind_ph(SV *sth, imp_sth_t *imp_sth, phs_t *phs, int maxlen) {
       value = &i_value;
       value_len = 4;
       break;
+#if defined(CS_UINT_TYPE)
+    case CS_UINT_TYPE:
+    case CS_USMALLINT_TYPE:
+      phs->datafmt.datatype = CS_UINT_TYPE;
+      ui_value = atoi(phs->sv_buf);
+      value = &ui_value;
+      value_len = 4;
+      break;
+#endif
 #if defined(CS_BIGINT_TYPE)
     case CS_BIGINT_TYPE:
       // A CS_BIGINT is defined as long long, or _int64_t or various other typedefs

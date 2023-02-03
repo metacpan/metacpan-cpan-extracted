@@ -25,6 +25,6 @@ resources:
   bugtracker: https://github.com/merkys/chemistry-opensmiles/issues
   homepage: https://search.cpan.org/dist/Chemistry-OpenSMILES
   repository: git://github.com/merkys/chemistry-opensmiles.git
-version: 0.8.4
+version: 0.8.5
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

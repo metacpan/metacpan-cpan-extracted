@@ -16,11 +16,11 @@ use App::DBBrowser::Table::Extensions;
 
 
 sub new {
-    my ( $class, $info, $options, $data ) = @_;
+    my ( $class, $info, $options, $d ) = @_;
     my $sf = {
         i => $info,
         o => $options,
-        d => $data,
+        d => $d
     };
     bless $sf, $class;
 }
@@ -391,7 +391,7 @@ sub _regexp {
             return " $col SIMILAR TO ? ESCAPE '#'";
         }
     }
-    elsif ( $sf->{i}{driver} =~ /^(?:DB2|oracle)\z/ ) {
+    elsif ( $sf->{i}{driver} =~ /^(?:DB2|Oracle)\z/ ) {
         if ( $do_not_match ) {
             return " NOT REGEXP_LIKE($col,?,'i')" if ! $case_sensitive;
             return " NOT REGEXP_LIKE($col,?,'c')" if   $case_sensitive;

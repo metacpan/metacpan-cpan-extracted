@@ -38,7 +38,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-Chord-Progression-Transform
   repository: https://github.com/ology/Music-Chord-Progression-Transform.git
-version: '0.0106'
+version: '0.0107'
 x_Dist_Zilla:
   perl:
     version: '5.032001'

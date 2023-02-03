@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Stereochemistry handling routines
-our $VERSION = '0.8.4'; # VERSION
+our $VERSION = '0.8.5'; # VERSION
 
 require Exporter;
 our @ISA = qw( Exporter );

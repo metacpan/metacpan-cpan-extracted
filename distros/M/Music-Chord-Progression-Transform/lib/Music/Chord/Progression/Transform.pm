@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate transformed chord progressions
 
-our $VERSION = '0.0106';
+our $VERSION = '0.0107';
 
 use Moo;
 use strictures 2;
@@ -275,17 +275,17 @@ Music::Chord::Progression::Transform - Generate transformed chord progressions
 
 =head1 VERSION
 
-version 0.0106
+version 0.0107
 
 =head1 SYNOPSIS
 
   use MIDI::Util qw(setup_score midi_format);
   use Music::Chord::Progression::Transform ();
 
-  my $transform = Music::Chord::Progression::Transform->new;
+  my $prog = Music::Chord::Progression::Transform->new;
 
-  my $chords = $transform->generate;
-  $chords = $transform->circular;
+  my $chords = $prog->generate;
+  $chords = $prog->circular;
 
   # render a midi file
   my $score = setup_score();
@@ -301,7 +301,7 @@ and Neo-Riemann chord progressions.
 
 =head2 base_note
 
-  $base_note = $transform->base_note;
+  $base_note = $prog->base_note;
 
 The initial C<isobase>, capitalized note on which the progression starts.
 
@@ -309,7 +309,7 @@ Default: C<C>
 
 =head2 base_octave
 
-  $base_octave = $transform->base_octave;
+  $base_octave = $prog->base_octave;
 
 The initial note octave on which the progression starts.
 
@@ -317,7 +317,7 @@ Default: C<4>
 
 =head2 chord_quality
 
-  $chord_quality = $transform->chord_quality;
+  $chord_quality = $prog->chord_quality;
 
 The quality or "flavor" of the initial chord.
 
@@ -332,14 +332,14 @@ Default: C<''> (major)
 
 =head2 base_chord
 
-  $base_chord = $transform->base_chord;
+  $base_chord = $prog->base_chord;
 
-The chord given by the B<base_note>, B<base_octave>, and the
+The initial chord given by the B<base_note>, B<base_octave>, and the
 B<chord_quality>.
 
 =head2 format
 
-  $format = $transform->format;
+  $format = $prog->format;
 
 The format of the returned results, as either named C<ISO> notes or
 C<midinum> integers.
@@ -350,31 +350,32 @@ Default: C<ISO>
 
   $semitones = $transpose->semitones;
 
-The number of semitones of which a transposition transformation can be
-made.
+The number of positive and negative semitones for a transposition
+transformation.  That is, this is a +/- bound on the C<T>
+transformations.
 
 Default: C<7> (a perfect 5th)
 
 =head2 max
 
-  $max = $transform->max;
+  $max = $prog->max;
 
-The maximum number of I<circular> transformations to make.
+The number of I<circular> transformations to make.
 
 Default: C<4>
 
 =head2 allowed
 
-  $allowed = $transform->allowed;
+  $allowed = $prog->allowed;
 
 The allowed transformations. Currently this is either C<T>
-(transposition), C<N> Neo-Riemann, or both.
+for transposition, C<N> for Neo-Riemannian, or both.
 
 Default: C<T N>
 
 =head2 transforms
 
-  $transforms = $transform->transforms;
+  $transforms = $prog->transforms;
 
 The array-reference of C<T#> transposed and Neo-Riemann
 transformations that define the chord progression.
@@ -396,7 +397,7 @@ Default: C<4>
 
 =head2 verbose
 
-  $verbose = $transform->verbose;
+  $verbose = $prog->verbose;
 
 Show progress.
 
@@ -406,9 +407,9 @@ Default: C<0>
 
 =head2 new
 
-  $transform = Music::Chord::Progression::Transform->new; # use defaults
+  $prog = Music::Chord::Progression::Transform->new; # use defaults
 
-  $transform = Music::Chord::Progression::Transform->new( # override defaults
+  $prog = Music::Chord::Progression::Transform->new( # override defaults
     base_note     => 'Bb',
     base_octave   => 5,
     chord_quality => '7',
@@ -422,13 +423,13 @@ Create a new C<Music::Chord::Progression::Transform> object.
 
 =head2 generate
 
-  $chords = $transform->generate;
+  $chords = $prog->generate;
 
 Generate a I<linear> series of transformed chords.
 
 =head2 circular
 
-  $chords = $transform->circular;
+  $chords = $prog->circular;
 
 Generate a series of transformed chords based on a I<circular> list of
 transformations.

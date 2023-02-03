@@ -1,0 +1,5 @@
+#!/bin/bash
+
+SRC=/usr/share/cups/model/
+
+time (find -L $SRC -name \*.PPD  -o -name \*.ppd -o -name \*.ppd.gz | xargs perl -Iblib/lib eg/check ) 3>&1 1>&2 2>&3 | tee errors

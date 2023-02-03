@@ -62,7 +62,7 @@ Example:
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 DESCRIPTION
 
@@ -186,8 +186,7 @@ C<--separate ''>.
 
 =item B<--separate> I<string>
 
-Set separator string between arguments.  Option B<-j> is a short-cut
-for B<--separate ''>.
+Set separator string between arguments.
 
 =item B<-->[B<no->]B<rgb24>
 
@@ -441,7 +440,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-©︎ 2021-2022 Kazumasa Utashiro.
+©︎ 2021-2023 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

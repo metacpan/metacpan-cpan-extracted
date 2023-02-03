@@ -88,7 +88,7 @@ sub get_login_data {
         my $secret = $item->{secret};
         my $field_is_required = $db_opt->{$db//''}{'field_' . $name} // $db_opt->{$plugin}{'field_' . $name} // 1; # set to "required" (1) if undefined
         if ( $field_is_required ) {
-            if ( exists $sf->{i}{login_error} && $sf->{i}{login_error} ) {
+            if ( $sf->{i}{login_error} ) {
                 $login_data->{$name}{default} = undef; # if a login error occured, the user has to enter the arguments by hand
                 delete $sf->{i}{login_error};
             }

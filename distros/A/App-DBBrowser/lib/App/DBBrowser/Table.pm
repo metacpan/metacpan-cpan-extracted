@@ -24,11 +24,11 @@ use App::DBBrowser::Table::Substatements;
 
 
 sub new {
-    my ( $class, $info, $options, $data ) = @_;
+    my ( $class, $info, $options, $d ) = @_;
     bless {
         i => $info,
         o => $options,
-        d => $data
+        d => $d
     }, $class;
 }
 
@@ -40,14 +40,14 @@ sub browse_the_table {
     $ax->reset_sql( $sql );
     $sql->{table} = $qt_table;
     $sql->{cols} = $qt_columns;
-    $sf->{i}{stmt_types} = [ 'Select' ];
-    $sf->{i}{changed_sql} = {};
+    $sf->{d}{stmt_types} = [ 'Select' ];
+    my $changed = {};
     $ax->print_sql_info( $ax->get_sql_info( $sql ) );
 
     PRINT_TABLE: while ( 1 ) {
         my $all_arrayref;
         if ( ! eval {
-            ( $all_arrayref, $sql ) = $sf->__on_table( $sql );
+            ( $all_arrayref, $sql ) = $sf->__on_table( $sql, $changed );
             1 }
         ) {
             $ax->print_error_message( $@ );
@@ -67,7 +67,7 @@ sub browse_the_table {
 
 
 sub __on_table {
-    my ( $sf, $sql ) = @_;
+    my ( $sf, $sql, $changed ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $sb = App::DBBrowser::Table::Substatements->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -86,7 +86,7 @@ sub __on_table {
     );
     my @pre = ( $hidden, undef );
     my @choices = ( $print_table, $select, $aggregate, $distinct, $where, $group_by, $having, $order_by, $limit, $export );
-    $sf->{i}{stmt_types} = [ 'Select' ];
+    $sf->{d}{stmt_types} = [ 'Select' ];
     my $old_idx = 1;
 
     CUSTOMIZE: while ( 1 ) {
@@ -99,16 +99,16 @@ sub __on_table {
         );
         $ax->print_sql_info( $info );
         if ( ! defined $idx || ! defined $menu->[$idx] ) {
-            for my $key ( keys %{$sf->{changed_sql}} ) {
-                if ( $sf->{changed_sql}{$key} ) {
-                    delete $sf->{changed_sql};
+            for my $key ( keys %{$changed} ) {
+                if ( $changed->{$key} ) {
+                    $changed = {};
                     $ax->reset_sql( $sql );
                     next CUSTOMIZE;
                 }
             }
             last CUSTOMIZE;
         }
-        my $chosen = $menu->[$idx];
+        my $sub_stmt = $menu->[$idx];
         if ( $sf->{o}{G}{menu_memory} ) {
             if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
                 $old_idx = 1;
@@ -117,55 +117,87 @@ sub __on_table {
             $old_idx = $idx;
         }
         my $backup_sql = $ax->backup_href( $sql );
-        if ( $chosen eq $select ) {
+        if ( $sub_stmt eq $select ) {
             my $ret = $sb->select( $sql );
-            if ( ! defined $ret ) { $sql = $backup_sql }
-            else { $sf->{changed_sql}{$chosen} = $ret };
+            if ( ! defined $ret ) {
+                $sql = $backup_sql;
+            }
+            else {
+                $changed->{$sub_stmt} = $ret;
+            }
         }
-        elsif ( $chosen eq $distinct ) {
+        elsif ( $sub_stmt eq $distinct ) {
             my $ret = $sb->distinct( $sql );
-            if ( ! defined $ret ) { $sql = $backup_sql }
-            else { $sf->{changed_sql}{$chosen} = $ret };
+            if ( ! defined $ret ) {
+                $sql = $backup_sql;
+            }
+            else {
+                $changed->{$sub_stmt} = $ret;
+            }
         }
-        elsif ( $chosen eq $aggregate ) {
+        elsif ( $sub_stmt eq $aggregate ) {
             my $ret = $sb->aggregate( $sql );
-            if ( ! defined $ret ) { $sql = $backup_sql }
-            else { $sf->{changed_sql}{$chosen} = $ret };
+            if ( ! defined $ret ) {
+                $sql = $backup_sql;
+            }
+            else {
+                $changed->{$sub_stmt} = $ret;
+            }
         }
-        elsif ( $chosen eq $where ) {
+        elsif ( $sub_stmt eq $where ) {
             my $ret = $sb->where( $sql );
-            if ( ! defined $ret ) { $sql = $backup_sql }
-            else { $sf->{changed_sql}{$chosen} = $ret };
+            if ( ! defined $ret ) {
+                $sql = $backup_sql;
+            }
+            else {
+                $changed->{$sub_stmt} = $ret;
+            }
         }
-        elsif ( $chosen eq $group_by ) {
+        elsif ( $sub_stmt eq $group_by ) {
             my $ret = $sb->group_by( $sql );
-            if ( ! defined $ret ) { $sql = $backup_sql }
-            else { $sf->{changed_sql}{$chosen} = $ret };
+            if ( ! defined $ret ) {
+                $sql = $backup_sql;
+            }
+            else {
+                $changed->{$sub_stmt} = $ret;
+            }
         }
-        elsif ( $chosen eq $having ) {
+        elsif ( $sub_stmt eq $having ) {
             my $ret = $sb->having( $sql );
-            if ( ! defined $ret ) { $sql = $backup_sql }
-            else { $sf->{changed_sql}{$chosen} = $ret };
+            if ( ! defined $ret ) {
+                $sql = $backup_sql;
+            }
+            else {
+                $changed->{$sub_stmt} = $ret;
+            }
         }
-        elsif ( $chosen eq $order_by ) {
+        elsif ( $sub_stmt eq $order_by ) {
             my $ret = $sb->order_by( $sql );
-            if ( ! defined $ret ) { $sql = $backup_sql }
-            else { $sf->{changed_sql}{$chosen} = $ret };
+            if ( ! defined $ret ) {
+                $sql = $backup_sql;
+            }
+            else {
+                $changed->{$sub_stmt} = $ret;
+            }
         }
-        elsif ( $chosen eq $limit ) {
+        elsif ( $sub_stmt eq $limit ) {
             my $ret = $sb->limit_offset( $sql );
-            if ( ! defined $ret ) { $sql = $backup_sql }
-            else { $sf->{changed_sql}{$chosen} = $ret };
+            if ( ! defined $ret ) {
+                $sql = $backup_sql;
+            }
+            else {
+                $changed->{$sub_stmt} = $ret;
+            }
         }
-        elsif ( $chosen eq $hidden ) {
+        elsif ( $sub_stmt eq $hidden ) {
             require App::DBBrowser::Table::InsertUpdateDelete;
             my $write = App::DBBrowser::Table::InsertUpdateDelete->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $write->table_write_access( $sql );
-            $sf->{i}{stmt_types} = [ 'Select' ];
+            $sf->{d}{stmt_types} = [ 'Select' ];
             $old_idx = 1;
             $sql = $backup_sql; # so no need for table_write_access to return $sql
         }
-        elsif ( $chosen eq $export ) {
+        elsif ( $sub_stmt eq $export ) {
             my $file_fs = $sf->__get_filename_fs( $sql );
             if ( ! length $file_fs ) {
                 next CUSTOMIZE;
@@ -174,7 +206,7 @@ sub __on_table {
                 print 'Working ...' . "\r" if $sf->{o}{table}{progress_bar};
                 my $all_arrayref = $sf->__selected_statement_result( $sql );
                 my $open_mode;
-                if ( length $sf->{o}{export}{file_encoding} ) { ##
+                if ( length $sf->{o}{export}{file_encoding} ) {
                     $open_mode = '>:encoding(' . $sf->{o}{export}{file_encoding} . ')';
                 }
                 else {
@@ -184,12 +216,11 @@ sub __on_table {
                 require String::Unescape;
                 my $options = {
                     map { $_ => String::Unescape::unescape( $sf->{o}{csv_out}{$_} ) }
-                    # grep length: keep the default value if the option is set to ''
-                    grep { length $sf->{o}{csv_out}{$_} }
+                    grep { length $sf->{o}{csv_out}{$_} } # keep the default value if the option is set to ''
                     keys %{$sf->{o}{csv_out}}
                 };
                 if ( ! length $options->{eol} ) {
-                    $options->{eol} = $/; # use $/ as default value for eol
+                    $options->{eol} = $/; # for `eol` use `$/` as the default value
                 }
                 require Text::CSV_XS;
                 my $csv = Text::CSV_XS->new( $options ) or die Text::CSV_XS->error_diag();
@@ -200,7 +231,7 @@ sub __on_table {
                 $ax->print_error_message( $@ );
             }
         }
-        elsif ( $chosen eq $print_table ) {
+        elsif ( $sub_stmt eq $print_table ) {
             local $| = 1;
             print hide_cursor(); # safety
             print clear_screen();
@@ -218,9 +249,9 @@ sub __selected_statement_result {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $statement = $ax->get_stmt( $sql, 'Select', 'prepare' );
     my @arguments = ( @{$sql->{where_args}}, @{$sql->{having_args}} );
-    unshift @{$sf->{i}{history}{ $sf->{d}{db} }{print}}, [ $statement, \@arguments ];
-    if ( $#{$sf->{i}{history}{ $sf->{d}{db} }{print}} > 50 ) {
-        $#{$sf->{i}{history}{ $sf->{d}{db} }{print}} = 50;
+    unshift @{$sf->{d}{table_print_history}}, [ $statement, \@arguments ];
+    if ( $#{$sf->{d}{table_print_history}} > 50 ) {
+        $#{$sf->{d}{table_print_history}} = 50;
     }
     my $sth = $sf->{d}{dbh}->prepare( $statement );
     $sth->execute( @arguments );

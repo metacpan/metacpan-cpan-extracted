@@ -7,24 +7,20 @@
 use strict;
 use warnings;
 
-use Data::Dataset::ChordProgressions;
+use Data::Dataset::ChordProgressions qw(as_hash transpose);
 use Music::Scales qw(get_scale_notes);
 
 my $n     = shift || 4;
 my $note  = shift || 'C'; # Transpose chords from C to this
 my $scale = shift || 'major'; # or minor
 
-my %data = Data::Dataset::ChordProgressions::as_hash();
+my %data = as_hash();
 
 # List of jazz > scale > type chord progressions
 my @pool = map { @{ $data{jazz}{$scale}{$_} } } keys %{ $data{jazz}{$scale} };
 
-my %note_map;
-@note_map{ get_scale_notes('C', $scale) } = get_scale_notes($note, $scale);
-
 for my $i (1 .. $n) {
     my $progression = $pool[int rand @pool];
-    # Transpose the chords
-    (my $named = $progression->[0]) =~ s/([A-G][#b]?)/$note_map{$1}/g;
+    my $named = transpose($note, $scale, $progression->[0]);
     print "$i. $named, $progression->[1]\n";
 }

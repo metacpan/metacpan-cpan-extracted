@@ -1,3 +1,8 @@
+0.8.5 2023-01-26
+
+    - Fixing incorrect chirality handling code as it did not consider all
+      ring bonds up to now.
+
 0.8.4 2022-11-29
 
     - Ceasing to mark unimportant double bonds in

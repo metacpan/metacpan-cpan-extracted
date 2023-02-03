@@ -3,34 +3,134 @@ class Sys::FileTest {
   use Sys::IO::Stat;
   use Sys::IO::Constant as IO;
   use Sys::User;
+  use Sys;
+  use Fn;
+
+  static method A : double ($file : string, $base_time : long) {
+
+    unless ($file) {
+      die "The file must be defined";
+    }
+
+    my $stat = Sys::IO::Stat->new;
+
+    Sys::IO::Stat->stat($file, $stat);
+
+    my $atime = $stat->st_atime;
+
+    my $result_time = ($base_time - $atime) / 86400.0;
+
+    return $result_time;
+  }
+
+  static method C : double ($file : string, $base_time : long) {
+
+    unless ($file) {
+      die "The file must be defined";
+    }
+
+    my $stat = Sys::IO::Stat->new;
+
+    Sys::IO::Stat->stat($file, $stat);
+
+    my $ctime = $stat->st_ctime;
+
+    my $result_time = ($base_time - $ctime) / 86400.0;
+
+    return $result_time;
+  }
+
+  static method M : double ($file : string, $base_time : long) {
+
+    unless ($file) {
+      die "The file must be defined";
+    }
+
+    my $stat = Sys::IO::Stat->new;
+
+    Sys::IO::Stat->stat($file, $stat);
+
+    my $mtime = $stat->st_mtime;
+
+    my $result_time = ($base_time - $mtime) / 86400.0;
+
+    return $result_time;
+  }
+
+  static method O : int ($file : string) {
+
+    unless ($file) {
+      die "The file must be defined";
+    }
+
+    my $stat = Sys::IO::Stat->new;
+
+    my $status = Sys::IO::Stat->stat_raw($file, $stat);
+
+    my $ok = 0;
+    unless ($status == -1) {
+      if (Sys->defined("_WIN32")) {
+        if ($stat->st_uid == 0) {
+          $ok = 1;
+        }
+      }
+      else {
+        if ($stat->st_uid == Sys::User->getuid) {
+          $ok = 1;
+        }
+      }
+    }
+    
+    return $ok;
+  }
 
   static method R : int ($file : string) {
     unless ($file) {
       die "The file must be defined";
     }
-    
+
     my $status = Sys::IO->access_raw($file, IO->R_OK);
-    
+
     my $ok = 0;
     if ($status == 0) {
-      $ok = 0;
+      $ok = 1;
     }
-    
+
     return $ok;
   }
-  
+
+  static method S : int ($file : string) {
+    unless ($file) {
+      die "The file must be defined";
+    }
+
+    my $stat = Sys::IO::Stat->new;
+
+    Sys::IO::Stat->stat($file, $stat);
+
+    my $ok = 0;
+    unless (Sys->defined("_WIN32")) {
+      # Socket
+      if (($stat->st_mode & IO->S_IFMT) == IO->S_IFSOCK) {
+        $ok = 1;
+      }
+    }
+
+    return $ok;
+  }
+
   static method W : int ($file : string) {
     unless ($file) {
       die "The file must be defined";
     }
-    
+
     my $status = Sys::IO->access_raw($file, IO->W_OK);
-    
+
     my $ok = 0;
     if ($status == 0) {
-      $ok = 0;
+      $ok = 1;
     }
-    
+
     return $ok;
   }
 
@@ -38,395 +138,344 @@ class Sys::FileTest {
     unless ($file) {
       die "The file must be defined";
     }
-    
+
     my $status = Sys::IO->access_raw($file, IO->X_OK);
-    
+
     my $ok = 0;
     if ($status == 0) {
-      $ok = 0;
+      if (Sys->defined("_WIN32")) {
+        my $parts = Fn->split(".", $file);
+        my $last_part = $parts->[@$parts - 1];
+        if ($last_part eq "exe" || $last_part eq "cmd" || $last_part eq "bat") {
+          $ok = 1;
+        }
+      }
+      else {
+        $ok = 1;
+      }
+    }
+
+    return $ok;
+  }
+
+  static method b : int ($file : string) {
+
+    unless ($file) {
+      die "The file must be defined";
+    }
+
+    my $stat = Sys::IO::Stat->new;
+
+    my $status = Sys::IO::Stat->stat_raw($file, $stat);
+
+    # Block device
+    my $ok = 0;
+    unless ($status == -1) {
+      if (($stat->st_mode & IO->S_IFMT) == IO->S_IFBLK) {
+        $ok = 1;
+      }
+    }
+
+    return $ok;
+  }
+
+  static method c : int ($file : string) {
+
+    unless ($file) {
+      die "The file must be defined";
+    }
+
+    my $stat = Sys::IO::Stat->new;
+
+    my $status = Sys::IO::Stat->stat_raw($file, $stat);
+
+    # Character device
+    my $ok = 0;
+    unless ($status == -1) {
+      if (($stat->st_mode & IO->S_IFMT) == IO->S_IFCHR) {
+        $ok = 1;
+      }
     }
     
     return $ok;
   }
 
-  static method r : int ($file : string) {
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $status = Sys::IO->eaccess_emulate_raw($file, IO->R_OK);
-    
-    my $ok = 0;
-    if ($status == 0) {
-      $ok = 0;
-    }
-    
-    return $ok;
-  }
-  
-  static method w : int ($file : string) {
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $status = Sys::IO->eaccess_emulate_raw($file, IO->W_OK);
-    
-    my $ok = 0;
-    if ($status == 0) {
-      $ok = 0;
-    }
-    
-    return $ok;
-  }
+  static method d : int ($file : string) {
 
-  static method x : int ($file : string) {
     unless ($file) {
       die "The file must be defined";
     }
-    
-    my $status = Sys::IO->eaccess_emulate_raw($file, IO->X_OK);
-    
+
+    my $stat = Sys::IO::Stat->new;
+
+    my $status = Sys::IO::Stat->stat_raw($file, $stat);
+
     my $ok = 0;
-    if ($status == 0) {
-      $ok = 0;
+    unless ($status == -1) {
+      if (($stat->st_mode & IO->S_IFMT) == IO->S_IFDIR) {
+        $ok = 1;
+      }
     }
     
     return $ok;
   }
 
   static method e : int ($file : string) {
-    
+
     unless ($file) {
       die "The file must be defined";
     }
-    
+
     my $status = Sys::IO->access_raw($file, IO->F_OK);
-    
+
     my $ok = 0;
     if ($status == 0) {
       $ok = 1;
     }
-    
+
     return $ok;
-  }
-  
-  static method s : long ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    
-    Sys::IO::Stat->stat($file, $stat);
-    
-    my $size = $stat->st_size;
-    
-    return $size;
-  }
-  
-  static method M : double ($file : string, $base_time : long) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    
-    Sys::IO::Stat->stat($file, $stat);
-    
-    my $mtime = $stat->st_mtime;
-    
-    my $result_time = ($base_time - $mtime) / 86400.0;
-    
-    return $result_time;
-  }
-  
-  static method C : double ($file : string, $base_time : long) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    
-    Sys::IO::Stat->stat($file, $stat);
-    
-    my $ctime = $stat->st_ctime;
-    
-    my $result_time = ($base_time - $ctime) / 86400.0;
-    
-    return $result_time;
   }
 
-  static method A : double ($file : string, $base_time : long) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    
-    Sys::IO::Stat->stat($file, $stat);
-    
-    my $atime = $stat->st_atime;
-    
-    my $result_time = ($base_time - $atime) / 86400.0;
-    
-    return $result_time;
-  }
-  
-  static method O : int ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    
-    Sys::IO::Stat->stat($file, $stat);
-    
-    my $ok = 0;
-    if ($stat->st_uid == Sys::User->getuid) {
-      $ok = 1;
-    }
-    
-    return $ok;
-  }
-  
-  static method o : int ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    
-    Sys::IO::Stat->stat($file, $stat);
-    
-    my $ok = 0;
-    if ($stat->st_uid == Sys::User->geteuid) {
-      $ok = 1;
-    }
-    
-    return $ok;
-  }
-  
-  static method z : int ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    
-    Sys::IO::Stat->stat($file, $stat);
-    
-    my $size = $stat->st_size;
-    
-    my $zero = 0;
-    if ($size == 0) {
-      $zero = 1;
-    }
-    
-    return $zero;
-  }
-  
-  static method S : int ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    
-    Sys::IO::Stat->stat($file, $stat);
-    
-    # Socket
-    my $ok = 0;
-    if (($stat->st_mode & IO->S_IFMT) == IO->S_IFSOCK) {
-      $ok = 1;
-    }
-    
-    return $ok;
-  }
-  
-  static method c : int ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    
-    Sys::IO::Stat->stat($file, $stat);
-    
-    # Character device
-    my $ok = 0;
-    if (($stat->st_mode & IO->S_IFMT) == IO->S_IFCHR) {
-      $ok = 1;
-    }
-    
-    return $ok;
-  }
-  
-  static method b : int ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    
-    Sys::IO::Stat->stat($file, $stat);
-    
-    # Block device
-    my $ok = 0;
-    if (($stat->st_mode & IO->S_IFMT) == IO->S_IFBLK) {
-      $ok = 1;
-    }
-    
-    return $ok;
-  }
-  
   static method f : int ($file : string) {
-    
+
     unless ($file) {
       die "The file must be defined";
     }
-    
+
     my $stat = Sys::IO::Stat->new;
-    
-    Sys::IO::Stat->stat($file, $stat);
-    
+
+    my $status = Sys::IO::Stat->stat_raw($file, $stat);
+
     my $ok = 0;
-    if (($stat->st_mode & IO->S_IFMT) == IO->S_IFREG) {
-      $ok = 1;
+    unless ($status == -1) {
+      if (($stat->st_mode & IO->S_IFMT) == IO->S_IFREG) {
+        $ok = 1;
+      }
     }
     
     return $ok;
   }
-  
-  static method d : int ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    
-    Sys::IO::Stat->stat($file, $stat);
-    
-    my $ok = 0;
-    if (($stat->st_mode & IO->S_IFMT) == IO->S_IFDIR) {
-      $ok = 1;
-    }
-    
-    return $ok;
-  }
-  
-  static method p : int ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    
-    Sys::IO::Stat->stat($file, $stat);
-    
-    # FIFO/PIPE
-    my $ok = 0;
-    if (($stat->st_mode & IO->S_IFMT) == IO->S_IFIFO) {
-      $ok = 1;
-    }
-    
-    return $ok;
-  }
-  
-  static method u : int ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    
-    Sys::IO::Stat->stat($file, $stat);
-    
-    # Character device
-    my $ok = 0;
-    if ($stat->st_mode & IO->S_ISUID) {
-      $ok = 1;
-    }
-    
-    return $ok;
-  }
-  
+
   static method g : int ($file : string) {
-    
+
     unless ($file) {
       die "The file must be defined";
     }
-    
+
     my $stat = Sys::IO::Stat->new;
-    
-    Sys::IO::Stat->stat($file, $stat);
-    
-    # Character device
+
+    my $status = Sys::IO::Stat->stat_raw($file, $stat);
+
     my $ok = 0;
-    if ($stat->st_mode & IO->S_ISGID) {
-      $ok = 1;
+    unless ($status == -1) {
+      unless (Sys->defined("_WIN32")) {
+        if ($stat->st_mode & IO->S_ISGID) {
+          $ok = 1;
+        }
+      }
     }
     
     return $ok;
   }
-  
+
   static method k : int ($file : string) {
-    
+
     unless ($file) {
       die "The file must be defined";
     }
-    
+
     my $stat = Sys::IO::Stat->new;
-    
-    Sys::IO::Stat->stat($file, $stat);
-    
-    # Character device
+
+    my $status = Sys::IO::Stat->stat_raw($file, $stat);
+
     my $ok = 0;
-    if ($stat->st_mode & IO->S_ISVTX) {
-      $ok = 1;
+    unless ($status == -1) {
+      unless (Sys->defined("_WIN32")) {
+        if ($stat->st_mode & IO->S_ISVTX) {
+          $ok = 1;
+        }
+      }
     }
     
     return $ok;
   }
-  
+
   static method l : int ($file : string) {
-    
+
     unless ($file) {
       die "The file must be defined";
     }
-    
+
     my $stat = Sys::IO::Stat->new;
-    
-    Sys::IO::Stat->lstat($file, $stat);
-    
+
+    my $status = Sys::IO::Stat->lstat_raw($file, $stat);
+
     # Symbolic link
     my $ok = 0;
-    if (($stat->st_mode & IO->S_IFMT) == IO->S_IFLNK) {
-      $ok = 1;
+    unless ($status == -1) {
+      if (($stat->st_mode & IO->S_IFMT) == IO->S_IFLNK) {
+        $ok = 1;
+      }
+    }
+
+    return $ok;
+  }
+
+  static method o : int ($file : string) {
+    if (Sys->defined("_WIN32")) {
+      return &O($file);
+    }
+
+    unless ($file) {
+      die "The file must be defined";
+    }
+
+    my $stat = Sys::IO::Stat->new;
+
+    my $status = Sys::IO::Stat->stat_raw($file, $stat);
+
+    my $ok = 0;
+    unless ($status == -1) {
+      if ($stat->st_uid == Sys::User->geteuid) {
+        $ok = 1;
+      }
+    }
+    return $ok;
+  }
+
+  static method p : int ($file : string) {
+
+    unless ($file) {
+      die "The file must be defined";
+    }
+
+    my $stat = Sys::IO::Stat->new;
+
+    my $status = Sys::IO::Stat->stat_raw($file, $stat);
+
+    # FIFO/PIPE
+    my $ok = 0;
+    unless ($status == -1) {
+      if (($stat->st_mode & IO->S_IFMT) == IO->S_IFIFO) {
+        $ok = 1;
+      }
     }
     
     return $ok;
   }
-  
-=pod
 
-Not implemented methods
-  static method t : int ($file : string);
-  static method T : int ($file : string);
-  static method B : int ($file : string);
+  static method r : int ($file : string) {
+    if (Sys->defined("_WIN32")) {
+      return &R($file);
+    }
 
-=cut
+    unless ($file) {
+      die "The file must be defined";
+    }
 
+    my $status = Sys::IO->eaccess_emulate_raw($file, IO->R_OK);
+
+    my $ok = 0;
+    if ($status == 0) {
+      $ok = 1;
+    }
+
+    return $ok;
+  }
+
+  static method s : long ($file : string) {
+
+    unless ($file) {
+      die "The file must be defined";
+    }
+
+    my $stat = Sys::IO::Stat->new;
+    Sys::IO::Stat->stat($file, $stat);
+
+    my $size = $stat->st_size;
+
+    return $size;
+  }
+
+  static method u : int ($file : string) {
+
+    unless ($file) {
+      die "The file must be defined";
+    }
+
+    my $stat = Sys::IO::Stat->new;
+
+    my $status = Sys::IO::Stat->stat_raw($file, $stat);
+
+    # Character device
+    my $ok = 0;
+    unless ($status == -1) {
+      unless (Sys->defined("_WIN32")) {
+        if ($stat->st_mode & IO->S_ISUID) {
+          $ok = 1;
+        }
+      }
+    }
+
+    return $ok;
+  }
+
+  static method w : int ($file : string) {
+    if (Sys->defined("_WIN32")) {
+      return &W($file);
+    }
+
+    unless ($file) {
+      die "The file must be defined";
+    }
+
+    my $status = Sys::IO->eaccess_emulate_raw($file, IO->W_OK);
+
+    my $ok = 0;
+    if ($status == 0) {
+      $ok = 1;
+    }
+
+    return $ok;
+  }
+
+  static method x : int ($file : string) {
+    if (Sys->defined("_WIN32")) {
+      return &X($file);
+    }
+
+    unless ($file) {
+      die "The file must be defined";
+    }
+
+    my $status = Sys::IO->eaccess_emulate_raw($file, IO->X_OK);
+
+    my $ok = 0;
+    if ($status == 0) {
+      $ok = 1;
+    }
+
+    return $ok;
+  }
+
+  static method z : int ($file : string) {
+
+    unless ($file) {
+      die "The file must be defined";
+    }
+
+    my $stat = Sys::IO::Stat->new;
+
+    my $status = Sys::IO::Stat->stat_raw($file, $stat);
+    
+    my $ok = 0;
+    unless ($status) {
+      my $size = $stat->st_size;
+      if ($size == 0) {
+        $ok = 1;
+      }
+    }
+    
+    return $ok;
+  }
 }

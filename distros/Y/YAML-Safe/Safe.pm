@@ -1,7 +1,7 @@
 use strict; use warnings;
 
 package YAML::Safe;
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 

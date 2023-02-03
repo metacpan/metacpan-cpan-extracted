@@ -10,6 +10,8 @@ $|++;
 my $ppd = PostScript::PPD->new;
 
 foreach my $file ( @ARGV ) {
+    $ENV{__WARN__} = sub { print STDERR "$file: ", @_, "\n" };
+
     eval {$ppd->load( $file );};
     if( $@ ) {
         warn "$file: $@";

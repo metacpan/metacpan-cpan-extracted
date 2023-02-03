@@ -85,19 +85,6 @@ sub get_db_handle {
     if ( ! $env_var_yes->{DBI_DSN} || ! exists $ENV{DBI_DSN} ) {
         $dsn = "dbi:$sf->{i}{driver}:$db";
     }
-    #if ( ! $env_var_yes->{DBI_DSN} || ! exists $ENV{DBI_DSN} ) {
-    #    $dsn = "dbi:$sf->{i}{driver}:dbname=$db";
-    #    my $host = $cred->get_login( 'host', $show_sofar, $settings );
-    #    if ( defined $host ) {
-    #        $show_sofar .= "\n" . 'Host: ' . $host;
-    #        $dsn .= ";host=$host" if length $host;
-    #    }
-    #    my $port = $cred->get_login( 'port', $show_sofar, $settings );
-    #    if ( defined $port ) {
-    #        $show_sofar .= "\n" . 'Port: ' . $port;
-    #        $dsn .= ";port=$port" if length $port;
-    #    }
-    #}
     my $user = $cred->get_login( 'user', $show_sofar, $settings );
     $show_sofar .= "\n" . 'User: ' . $user if defined $user;
     my $passwd = $cred->get_login( 'pass', $show_sofar, $settings );
@@ -117,7 +104,7 @@ sub get_databases {
     my ( $sf ) = @_;
     return \@ARGV if @ARGV;
     my $driver = $sf->get_db_driver();
-    # DBI->data_sources('DB2') returns a list of all cataloged databases.
+    # data_sources returns a list of all cataloged databases.
     my @cataloged_databases = DBI->data_sources( $driver );
     for ( @cataloged_databases ) {
         s/^dbi:$driver://;

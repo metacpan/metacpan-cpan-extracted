@@ -71,7 +71,7 @@
          "web" : "https://github.com/ology/Music-Chord-Progression-Transform"
       }
    },
-   "version" : "0.0106",
+   "version" : "0.0107",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"

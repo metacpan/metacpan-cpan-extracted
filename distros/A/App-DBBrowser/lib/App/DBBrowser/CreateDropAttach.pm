@@ -10,15 +10,16 @@ use App::DBBrowser::Auxil;
 #use App::DBBrowser::CreateDropAttach::AttachDB;    # required
 #use App::DBBrowser::CreateDropAttach::CreateTable; # required
 #use App::DBBrowser::CreateDropAttach::DropTable;   # required
+use App::DBBrowser::DB;
 #use App::DBBrowser::Opt::Set;                      # required
 
 
 sub new {
-    my ( $class, $info, $options, $data ) = @_;
+    my ( $class, $info, $options, $d ) = @_;
     bless {
         i => $info,
         o => $options,
-        d => $data
+        d => $d
     }, $class;
 }
 
@@ -27,7 +28,7 @@ sub create_drop_or_attach {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    $sf->{i}{old_idx_cda} //= 1;
+    my $old_idx_cda = 1;
 
     CREATE_DROP_ATTACH: while ( 1 ) {
         my $hidden = $sf->{d}{db_string};
@@ -41,7 +42,7 @@ sub create_drop_or_attach {
         push @entries, $drop_view    if $sf->{o}{enable}{drop_view};
         if ( $sf->{i}{driver} eq 'SQLite' ) {
             push @entries, $attach_databases;
-            push @entries, $detach_databases if $sf->{i}{db_attached};
+            push @entries, $detach_databases;
         }
         if ( ! @entries ) {
             return;
@@ -51,21 +52,17 @@ sub create_drop_or_attach {
         # Choose
         my $idx = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v}}, prompt => '', index => 1, default => $sf->{i}{old_idx_cda}, undef => '  <=' }
+            { %{$sf->{i}{lyt_v}}, prompt => '', index => 1, default => $old_idx_cda, undef => '  <=' }
         );
         if ( ! defined $idx || ! defined $menu->[$idx] ) {
-            # Here this menu is left without comming back hence the cleanup.
-            # (with a true return value, this menu is - after leaving to update data - reopened automatically)
-            delete $sf->{i}{ss} if exists $sf->{i}{ss};  # delete saved books
-            delete $sf->{i}{gc} if exists $sf->{i}{gc};  # delete datasource-file menu memory
             return;
         }
         if ( $sf->{o}{G}{menu_memory} ) {
-            if ( $sf->{i}{old_idx_cda} == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                $sf->{i}{old_idx_cda} = 1;
+            if ( $old_idx_cda == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
+                $old_idx_cda = 1;
                 next CREATE_DROP_ATTACH;
             }
-            $sf->{i}{old_idx_cda} = $idx;
+            $old_idx_cda = $idx;
         }
         my $choice = $menu->[$idx];
         if ( $choice eq $hidden ) {
@@ -79,7 +76,7 @@ sub create_drop_or_attach {
             my $ct = App::DBBrowser::CreateDropAttach::CreateTable->new( $sf->{i}, $sf->{o}, $sf->{d} );
             if ( $choice eq $create_table ) {
                 if ( ! eval { $ct->create_table(); 1 } ) {
-                    $ax->print_error_message( $@ ); ##
+                    $ax->print_error_message( $@ );
                 }
             }
             elsif ( $choice eq $create_view ) {
@@ -87,7 +84,6 @@ sub create_drop_or_attach {
                     $ax->print_error_message( $@ );
                 }
             }
-            return 1;
         }
         elsif ( $choice =~ /^-\ Drop/i ) {
             require App::DBBrowser::CreateDropAttach::DropTable;
@@ -102,28 +98,31 @@ sub create_drop_or_attach {
                     $ax->print_error_message( $@ );
                 }
             }
-            return 1;
         }
         elsif ( $choice =~ /^-\ (?:Attach|Detach)/ ) {
             require App::DBBrowser::CreateDropAttach::AttachDB;
             my $att = App::DBBrowser::CreateDropAttach::AttachDB->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $changed;
+            my $changed; ##
             if ( $choice eq $attach_databases ) {
                 if ( ! eval { $changed = $att->attach_db(); 1 } ) {
                     $ax->print_error_message( $@ );
-                    next CREATE_DROP_ATTACH;
                 }
             }
             elsif ( $choice eq $detach_databases ) {
                 if ( ! eval { $changed = $att->detach_db(); 1 } ) {
                     $ax->print_error_message( $@ );
-                    next CREATE_DROP_ATTACH;
                 }
             }
-            if ( ! $changed ) {
-                next CREATE_DROP_ATTACH;
-            }
-            return 1;
+        }
+        if ( ! eval {
+            my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
+            ( $sf->{d}{tables_info},
+              $sf->{d}{user_table_keys},
+              $sf->{d}{sys_table_keys} ) = $plui->tables_info( $sf->{d}{dbh}, $sf->{d}{schema},
+                                                               $sf->{d}{is_system_schema}, $sf->{d}{db_attached} );
+            1 }
+         ) {
+            $ax->print_error_message( $@ );
         }
     }
 }

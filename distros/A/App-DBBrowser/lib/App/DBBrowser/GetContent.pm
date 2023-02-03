@@ -5,33 +5,36 @@ use warnings;
 use strict;
 use 5.014;
 
+use Encode         qw( encode );
+use File::Basename qw( basename );
+
 use Encode::Locale  qw();
 
 use Term::Choose qw();
 
 use App::DBBrowser::GetContent::Filter;
 use App::DBBrowser::GetContent::Parse;
-use App::DBBrowser::GetContent::Read;
+use App::DBBrowser::GetContent::Source;
 #use App::DBBrowser::Opt::Set               # required
 
 use open ':encoding(locale)';
 
 
 sub new {
-    my ( $class, $info, $options, $data ) = @_;
+    my ( $class, $info, $options, $d ) = @_;
     my $sf = {
         i => $info,
         o => $options,
-        d => $data,
+        d => $d
     };
     bless $sf, $class;
 }
 
 
 sub get_content {
-    my ( $sf, $sql, $skip_to ) = @_;
+    my ( $sf, $sql, $source, $goto_filter ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $cr = App::DBBrowser::GetContent::Read->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $cs = App::DBBrowser::GetContent::Source->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $cp = App::DBBrowser::GetContent::Parse->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
@@ -39,164 +42,245 @@ sub get_content {
         [ 'plain', '- Plain' ],
         [ 'file',  '- From File' ],
     );
-    $sf->{i}{gc}{old_idx_menu} //= 0;
-    my $data_source_choice_idx = $sf->{o}{insert}{'data_source_' . $sf->{i}{stmt_types}[0]};
+    my $data_source_choice_idx = $sf->{o}{insert}{'data_source_' . $sf->{d}{stmt_types}[0]};
+    $source->{old_idx_menu} //= 0;
 
     MENU: while ( 1 ) {
-        if ( ! $skip_to ) {
-            if ( $data_source_choice_idx == 2 ) {
-                my $prompt = 'Type of data source:';
-                my @pre = ( undef );
-                my $menu = [ @pre, map( $_->[1], @choices ) ];
-                # Choose
-                my $idx = $tc->choose(
-                    $menu,
-                    { %{$sf->{i}{lyt_v}}, prompt => $prompt, index => 1, default => $sf->{i}{gc}{old_idx_menu},
-                      undef => '  <=' }
-                );
-                if ( ! defined $idx || ! defined $menu->[$idx] ) {
-                    return;
-                }
-                if ( $sf->{o}{G}{menu_memory} ) {
-                    if ( $sf->{i}{gc}{old_idx_menu} == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                        $sf->{i}{gc}{old_idx_menu} = 0;
-                        next MENU;
-                    }
-                    $sf->{i}{gc}{old_idx_menu} = $idx;
-                }
-                $sf->{i}{gc}{source_type} = $choices[$idx-@pre][0];
-            }
-            else {
-                $sf->{i}{gc}{source_type} = $choices[$data_source_choice_idx][0];
-            }
+        if ( $goto_filter ) {
+            # keep current source type
         }
+        elsif ( $data_source_choice_idx =~ /^(?:0|1)\z/ ) {
+            $source->{source_type} = $choices[$data_source_choice_idx][0];
+        }
+        else {
+            my $prompt = 'Source type:';
+            my @pre = ( undef );
+            my $menu = [ @pre, map( $_->[1], @choices ) ];
+            # Choose
+            my $idx = $tc->choose(
+                $menu,
+                { %{$sf->{i}{lyt_v}}, prompt => $prompt, index => 1, default => $source->{old_idx_menu},
+                    undef => '  <=' }
+            );
+            if ( ! defined $idx || ! defined $menu->[$idx] ) {
+                return;
+            }
+            if ( $sf->{o}{G}{menu_memory} ) {
+                if ( $source->{old_idx_menu} == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
+                    $source->{old_idx_menu} = 0;
+                    next MENU;
+                }
+                $source->{old_idx_menu} = $idx;
+            }
+            $source->{source_type} = $choices[$idx-@pre][0];
+        }
+        if ( $source->{source_type} eq 'plain' ) {
+            my $ok = $cs->from_col_by_col( $sql );
+            if ( ! $ok ) {
+                return if $data_source_choice_idx =~ /^(?:0|1)\z/;
+                $goto_filter = 0;
+                next MENU;
+            }
+            return 1;
+        }
+        $source->{old_idx_dir} //= 0;
 
-        GET_DATA: while ( 1 ) {
-            my ( $aoa, $open_mode );
-            if ( ! $skip_to || $skip_to eq 'GET_DATA' ) {
-                if ( $skip_to ) {
-                    $skip_to = '';
-                }
-                my $ok;
-                if ( $sf->{i}{gc}{source_type} eq 'plain' ) {
-                    ( $ok, $sf->{i}{gc}{file_fs} ) = $cr->from_col_by_col( $sql );
-                }
-                elsif ( $sf->{i}{gc}{source_type} eq 'file' ) {
-                    ( $ok, $sf->{i}{gc}{file_fs} ) = $cr->from_file( $sql );
-                }
-                if ( ! $ok ) {
-                    return if $data_source_choice_idx < 2;
+        DIR: while ( 1 ) {
+            if ( $goto_filter ) {
+                # keep current source dir
+            }
+            elsif ( ! $sf->{o}{insert}{history_dirs} ) {
+                $source->{dir} = $cs->__new_search_dir();
+                if ( ! length $source->{dir} ) {
+                    return if $data_source_choice_idx =~ /^(?:0|1)\z/;
                     next MENU;
                 }
             }
-            my $file_fs = $sf->{i}{gc}{file_fs};
-            if ( ! defined $sf->{i}{ss}{$file_fs}{book} ) {
-                delete $sf->{i}{ss};
+            elsif ( $sf->{o}{insert}{history_dirs} == 1 ) {
+                my $dirs = $cs->__avail_directories();
+                if ( ! @$dirs ) {
+                    $source->{dir} = $cs->__new_search_dir();
+                    if ( ! length $source->{dir} ) {
+                        return if $data_source_choice_idx =~ /^(?:0|1)\z/;
+                        next MENU;
+                    }
+                }
+                else{
+                    $source->{dir} = $dirs->[0];
+                }
             }
+            else {
+                my $dirs = $cs->__avail_directories();
+                my $prompt = 'Choose a Dir:';
+                my $new_search = '  NEW search';
+                my @pre = ( undef, $new_search );
+                my $menu = [ @pre, map( '- ' . $_, @$dirs ) ];
+                # Choose
+                my $idx = $tc->choose(
+                    $menu,
+                    { %{$sf->{i}{lyt_v}}, prompt => $prompt, index => 1, default => $source->{old_idx_dir}, undef => '  <=' }
+                );
+                if ( ! defined $idx || ! defined $menu->[$idx] ) {
+                    return if $data_source_choice_idx =~ /^(?:0|1)\z/;
+                    next MENU;
+                }
+                if ( $sf->{o}{G}{menu_memory} ) {
+                    if ( $source->{old_idx_dir} == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
+                        $source->{old_idx_dir} = 0;
+                        next DIR;
+                    }
+                    $source->{old_idx_dir} = $idx;
+                }
+                if ( $menu->[$idx] eq $new_search ) {
+                    $source->{dir} = $cs->__new_search_dir();
+                    if ( ! length $source->{dir} ) {
+                        next DIR;
+                    }
+                }
+                else {
+                    $source->{dir} = $dirs->[$idx-@pre];
+                }
+            }
+            $cs->__add_to_history( $source->{dir} );
+            my $files_in_chosen_dir = $cs->__files_in_dir( $source->{dir} );
+            if ( $goto_filter && ! $sf->{o}{insert}{enable_input_filter} && ! $source->{saved_book} ) {
+                $goto_filter = 0;
+            }
+            $source->{old_idx_file} //= 0;
 
-            PARSE: while ( 1 ) {
-                if ( ! $skip_to || $skip_to eq 'PARSE' ) {
-                    if ( $skip_to ) {
-                        $skip_to = '';
+            FILE: while ( 1 ) {
+                if ( $goto_filter ) {
+                    # keep current source file
+                }
+                else {
+                    my $prompt = 'Choose a File:';
+                    my @pre = ( undef );
+                    my $change_dir = '  Change dir';
+                    if ( $sf->{o}{insert}{history_dirs} == 1 ) {
+                        push @pre, $change_dir;
                     }
-                    my ( $parse_mode_idx, $open_mode );
-                    if ( $sf->{i}{gc}{source_type} eq 'plain' ) {
-                        $parse_mode_idx = -1;
-                        $open_mode = '<';
+                    my $menu = [ @pre, map { '  ' . basename $_ } @$files_in_chosen_dir ]; #
+                    # Choose
+                    my $idx = $tc->choose(
+                        $menu,
+                        { %{$sf->{i}{lyt_v}}, prompt => $prompt, index => 1, default => $source->{old_idx_file},
+                        undef => '  <=' }
+                    );
+                    if ( ! defined $idx || ! defined $menu->[$idx] ) {
+                        if ( $sf->{o}{insert}{history_dirs} == 1 ) {
+                            return if $data_source_choice_idx =~ /^(?:0|1)\z/;
+                            next MENU;
+                        }
+                        next DIR;
                     }
-                    elsif ( $sf->{i}{gc}{source_type} eq 'file' ) {
-                        $parse_mode_idx = $sf->{o}{insert}{parse_mode_input_file};
-                        if ( length $sf->{o}{insert}{file_encoding} ) { ##
-                            $open_mode = '<:encoding(' . $sf->{o}{insert}{file_encoding} . ')';
+                    if ( $sf->{o}{G}{menu_memory} ) {
+                        if ( $source->{old_idx_file} == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
+                            $source->{old_idx_file} = 0;
+                            next FILE;
                         }
-                        else {
-                            $open_mode = '<';
-                        }
+                        $source->{old_idx_file} = $idx;
                     }
-                    $sql->{insert_into_args} = [];
-                    if ( $parse_mode_idx < 3 && -T $file_fs ) {
-                        open my $fh, $open_mode, $file_fs or die $!;
-                        my $parse_ok;
-                        if ( $parse_mode_idx == -1 ) {
-                            $parse_ok = $cp->parse_plain( $sql, $fh );
+                    if ( $menu->[$idx] eq $change_dir ) {
+                        $source->{dir} = $cs->__new_search_dir();
+                        if ( length $source->{dir} ) {
+                            $files_in_chosen_dir = $cs->__files_in_dir( $source->{dir} );
                         }
-                        elsif ( $parse_mode_idx == 0 ) {
-                            $parse_ok = $cp->parse_with_Text_CSV( $sql, $fh );
-                        }
-                        elsif ( $parse_mode_idx == 1 ) {
-                            $parse_ok = $cp->parse_with_split( $sql, $fh );
-                        }
-                        elsif ( $parse_mode_idx == 2 ) {
-                            $parse_ok = $cp->parse_with_template( $sql, $fh );
-                            if ( $parse_ok && $parse_ok == -1 ) {
-                                next PARSE;
-                            }
-                        }
-                        if ( ! $parse_ok ) {
-                            next GET_DATA;
-                        }
-                        if ( ! @{$sql->{insert_into_args}} ) {
-                            $tc->choose(
-                                [ 'empty file!' ],
-                                { prompt => 'Press ENTER' }
-                            );
-                            close $fh;
-                            next GET_DATA;
-                        }
+                        next FILE;
                     }
                     else {
-                        SHEET: while ( 1 ) {
-                            my $ok = $cp->parse_with_Spreadsheet_Read( $sql, $file_fs );
-                            if ( ! $ok ) {
-                                next GET_DATA;
-                            }
-                            if ( ! @{$sql->{insert_into_args}} ) { #
-                                next SHEET if $sf->{i}{ss}{$file_fs}{sheet_count} >= 2;
-                                next GET_DATA;
-                            }
-                            last SHEET;
+                        my $old_file_fs = $source->{file_fs};
+                        $source->{file_fs} = encode( 'locale_fs', $files_in_chosen_dir->[$idx-@pre] );
+                        if ( ! defined $old_file_fs || $old_file_fs ne $source->{file_fs} ) {
+                            delete $source->{saved_book};
+                            delete $source->{sheet_name};
                         }
                     }
                 }
-                if ( ! $sf->{o}{insert}{enable_input_filter} ) {
-                    return 1;
-                }
-                if ( $skip_to eq 'FILTER') {
-                    $skip_to = '';
+                my $parse_mode_idx = $sf->{o}{insert}{parse_mode_input_file};
+                if ( $goto_filter && ! $sf->{o}{insert}{enable_input_filter} ) {
+                    $goto_filter = 0;
                 }
 
-                FILTER: while ( 1 ) {
-                    my $ok = $cf->input_filter( $sql );
-                    if ( ! $ok ) {
-                        if (    exists $sf->{i}{ss}{$file_fs}{sheet_count}
-                            && defined $sf->{i}{ss}{$file_fs}{sheet_count}
-                            && $sf->{i}{ss}{$file_fs}{sheet_count} >= 2 ) {
+                PARSE: while ( 1 ) {
+                    if ( $goto_filter ) {
+                        # keep current insert_into_args
+                    }
+                    else {
+                        $sql->{insert_into_args} = [];
+                        if ( $parse_mode_idx < 3 && -T $source->{file_fs} ) {
+                            my $open_mode;
+                            if ( length $sf->{o}{insert}{file_encoding} ) {
+                                $open_mode = '<:encoding(' . $sf->{o}{insert}{file_encoding} . ')';
+                            }
+                            else {
+                                $open_mode = '<';
+                            }
+                            open my $fh, $open_mode, $source->{file_fs} or die $!;
+                            my $parse_ok;
+                            if ( $parse_mode_idx == 0 ) {
+                                $parse_ok = $cp->parse_with_Text_CSV( $sql, $fh );
+                            }
+                            elsif ( $parse_mode_idx == 1 ) {
+                                $parse_ok = $cp->parse_with_split( $sql, $fh );
+                            }
+                            elsif ( $parse_mode_idx == 2 ) {
+                                $parse_ok = $cp->parse_with_template( $sql, $fh );
+                                if ( $parse_ok && $parse_ok == -1 ) { # reparse
+                                    next PARSE;
+                                }
+                            }
+                            if ( ! $parse_ok ) {
+                                next FILE;
+                            }
+                            if ( ! @{$sql->{insert_into_args}} ) {
+                                $tc->choose(
+                                    [ 'empty file!' ],
+                                    { prompt => 'Press ENTER' }
+                                );
+                                close $fh;
+                                next FILE;
+                            }
+                        }
+                        else {
+                            SHEET: while ( 1 ) {
+                                my $ok = $cp->parse_with_Spreadsheet_Read( $sql, $source, $source->{file_fs} );
+                                if ( ! $ok ) {
+                                    next FILE;
+                                }
+                                if ( ! @{$sql->{insert_into_args}} ) { #
+                                    next SHEET if $source->{saved_book};
+                                    next FILE;
+                                }
+                                last SHEET;
+                            }
+                        }
+                    }
+                    if ( ! $sf->{o}{insert}{enable_input_filter} ) {
+                        return 1;
+                    }
+                    $goto_filter = 0;
+
+                    FILTER: while ( 1 ) {
+                        my $ok = $cf->input_filter( $sql, $source );
+                        if ( ! $ok ) {
+                            if ( $source->{saved_book} ) {
+                                next PARSE;
+                            }
+                            next FILE;
+                        }
+                        elsif ( $ok == -1 ) { # -1 -> REPARSE
+                            require App::DBBrowser::Opt::Set;
+                            my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
+                            $opt_set->set_options( 'import' );
                             next PARSE;
                         }
-                        next GET_DATA;
+                        return 1;
                     }
-                    elsif ( $ok == -1 ) { # -1 -> REPARSE
-                        #if ( ! -T $file_fs ) {
-                        #    $tc->choose(
-                        #        [ 'Press ENTER' ],
-                        #        { prompt => 'Not a text file: "Spreadsheet::Read" is used automatically' }
-                        #    );
-                        #    next FILTER;
-                        #}
-                        require App::DBBrowser::Opt::Set;
-                        my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
-                        $opt_set->set_options( 'import' );
-                        next PARSE;
-                    }
-                    return 1;
                 }
             }
         }
     }
 }
-
-
-
 
 
 

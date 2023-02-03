@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/kaz-utashiro/App-ansiecho/workflows/test/badge.svg)](https://github.com/kaz-utashiro/App-ansiecho/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-ansiecho.svg)](https://metacpan.org/release/App-ansiecho)
+[![Actions Status](https://github.com/tecolicom/App-ansiecho/workflows/test/badge.svg)](https://github.com/tecolicom/App-ansiecho/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-ansiecho.svg)](https://metacpan.org/release/App-ansiecho)
 # NAME
 
 ansiecho - Colored echo command using ANSI terminal sequence
@@ -47,7 +47,7 @@ Example:
 
 # VERSION
 
-Version 1.03
+Version 1.04
 
 # DESCRIPTION
 
@@ -169,8 +169,7 @@ Then use this variable like:
 
 - **--separate** _string_
 
-    Set separator string between arguments.  Option **-j** is a short-cut
-    for **--separate ''**.
+    Set separator string between arguments.
 
 - **--**\[**no-**\]**rgb24**
 
@@ -417,7 +416,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-©︎ 2021-2022 Kazumasa Utashiro.
+©︎ 2021-2023 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

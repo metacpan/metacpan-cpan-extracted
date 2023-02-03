@@ -21,7 +21,7 @@ our @ISA = qw(Rose::Object);
 
 our $Error;
 
-our $VERSION = '0.783';
+our $VERSION = '0.784';
 
 our $Debug = 0;
 
@@ -575,6 +575,19 @@ sub catalog
   return $self->{'catalog'};
 }
 
+sub service
+{
+  my($self) = shift;
+
+  if(@_)
+  {
+    $self->{'dsn'} = undef  if($self->{'dsn'});
+    return $self->{'service'} = shift;
+  }
+
+  return $self->{'service'};
+}
+
 sub host
 {
   my($self) = shift;
@@ -737,6 +750,7 @@ my %DSN_Attr_Method =
   hostname => 'host',
   hostaddr => 'host',
   sid      => 'database',
+  service  => 'service_name',
 );
 
 sub dsn_attribute_to_db_method { $DSN_Attr_Method{$_[1]} }
@@ -3964,7 +3978,7 @@ L<http://rosecode.org>
 
 =head1 CONTRIBUTORS
 
-Kostas Chatzikokolakis, Peter Karman, Brian Duggan, Lucian Dragus, Ask Bjørn Hansen, Sergey Leschenko, Ron Savage
+Kostas Chatzikokolakis, Peter Karman, Brian Duggan, Lucian Dragus, Ask Bjørn Hansen, Sergey Leschenko, Ron Savage, Ferry Hendrikx
 
 =head1 AUTHOR
 

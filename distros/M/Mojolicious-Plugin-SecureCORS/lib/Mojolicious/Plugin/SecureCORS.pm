@@ -3,7 +3,7 @@ package Mojolicious::Plugin::SecureCORS;
 use Mojo::Base 'Mojolicious::Plugin';
 use Carp;
 
-our $VERSION = 'v2.0.4';
+our $VERSION = 'v2.0.5';
 
 use List::MoreUtils qw( any none );
 
@@ -103,7 +103,7 @@ sub _preflight {
             return $c->render(status => 204, data => q{});  # Bad Origin:
         }
     } else {
-        if (none {$_ eq q{*} || $_ eq $origin} split q{ }, $opt{origin}) {
+        if (none {$_ eq q{*} || $_ eq $origin} split q{ }, $opt{origin} // q{}) {
             return $c->render(status => 204, data => q{});  # Bad Origin:
         }
     }
@@ -115,7 +115,7 @@ sub _preflight {
             return $c->render(status => 204, data => q{});  # Bad Access-Control-Request-Headers:
         }
     } else {
-        my %good_headers = map {lc $_ => 1} split /,\s*/ms, $opt{headers};
+        my %good_headers = map {lc $_ => 1} split /,\s*/ms, $opt{headers} // q{};
         if (any {!exists $good_headers{$_}} @want_headers) {
             return $c->render(status => 204, data => q{});  # Bad Access-Control-Request-Headers:
         }
@@ -157,7 +157,7 @@ sub _request {
             return;     # Bad Origin:
         }
     } else {
-        if (none {$_ eq q{*} || $_ eq $origin} split q{ }, $opt{origin}) {
+        if (none {$_ eq q{*} || $_ eq $origin} split q{ }, $opt{origin} // q{}) {
             return;     # Bad Origin:
         }
     }
@@ -199,7 +199,7 @@ Mojolicious::Plugin::SecureCORS - Complete control over CORS
 
 =head1 VERSION
 
-This document describes Mojolicious::Plugin::SecureCORS version v2.0.4
+This document describes Mojolicious::Plugin::SecureCORS version v2.0.5
 
 
 =head1 SYNOPSIS

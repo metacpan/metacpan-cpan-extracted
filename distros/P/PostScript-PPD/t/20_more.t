@@ -6,8 +6,8 @@ use warnings;
 use FindBin;
 BEGIN { chdir "$FindBin::Dir/.." }
 
-use Test::More ( tests => 14 );
-use Data::Dumper;
+use Test::More ( tests => 23 );
+use Data::Dump qw( pp );
 
 
 
@@ -44,3 +44,27 @@ pass( "Loaded LJ 4L ppd" );
 is( $ppd->Manufacturer, 'HP', " ... Manufacturer" );
 is( $ppd->ModelName, "HP LaserJet 4L", " ... ModelName" );
 
+#####
+$ppd->load( "t/ppd/hwel.ppd" );
+pass( "Loaded Lexmark MB2200 Series ppd" );
+is( $ppd->Manufacturer, 'Lexmark', " ... Manufacturer" );
+is( $ppd->ModelName, "Lexmark MB2200 Series", " ... ModelName" );
+
+my $custom = $ppd->Group( 'JCL' )->get( 'CustomPnH' )->get( "True" )->value;
+is( $custom, q(@PJL SET JOBNAME = GETMYJOBNAME
+@PJL SET USERNAME = GEYMYUSERNAME
+@PJL SET HOLD = ON
+@PJL SET HOLDTYPE = PRIVATE
+@PJL SET HOLDKEY = "\1"
+@PJL SET QTY = GETMYCOPIES<0A>), qq(Parsed "" on a line) ); # or die pp $custom;
+
+#####
+$ppd->load( "t/ppd/Ricoh-PDF_Printer-PDF.ppd" );
+pass( "Loaded Ricoh MS330 Series ppd" );
+is( $ppd->Manufacturer, 'Ricoh', " ... Manufacturer" );
+is( $ppd->ModelName, "Ricoh PDF Printer", " ... ModelName" );
+
+my $G = $ppd->Group( "General" );
+ok( $G, "Got General" );
+my $UI = $G->UI( "N-up" );
+ok( $UI, "Got General/N-up" ) or die pp $G;

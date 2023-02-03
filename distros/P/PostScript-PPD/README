@@ -1,4 +1,4 @@
-PostScript-PPD version 0.01
+PostScript-PPD version 0.0400
 ===========================
 
 Parse PostScript Printer Definition (PPD) files.
@@ -14,11 +14,16 @@ To install this module type the following:
 
 DEPENDENCIES
 
+    Carp
     Compress::Zlib
+    Data::Dump
+    IO::File
+    Storable
+
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2008-2020 by Philip Gwyn
+Copyright (C) 2008-2023 by Philip Gwyn
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

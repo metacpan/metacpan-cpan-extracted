@@ -50,6 +50,6 @@
          "url" : "https://github.com/rurban/YAML-Safe"
       }
    },
-   "version" : "0.81",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.82",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

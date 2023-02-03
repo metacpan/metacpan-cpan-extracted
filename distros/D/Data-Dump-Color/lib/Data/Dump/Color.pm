@@ -5,9 +5,9 @@
 package Data::Dump::Color;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-24'; # DATE
+our $DATE = '2023-02-03'; # DATE
 our $DIST = 'Data-Dump-Color'; # DIST
-our $VERSION = '0.248'; # VERSION
+our $VERSION = '0.249'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -58,11 +58,19 @@ sub max {
     return $max;
 }
 
+sub _get_color_theme_obj {
+    require Module::Load::Util;
+    Module::Load::Util::instantiate_class_with_optional_args(
+        {ns_prefixes=>['ColorTheme::Data::Dump::Color','ColorTheme','']}, $COLOR_THEME);
+}
+
 sub _col {
     require ColorThemeUtil::ANSI;
     my ($item, $str) = @_;
 
     return $str unless $COLOR;
+
+    local $ct_obj = _get_color_theme_obj() unless defined $ct_obj;
 
     my $ansi = '';
     $item = $ct_obj->get_item_color($item);
@@ -78,16 +86,13 @@ sub _col {
 
 sub dump
 {
-    require Module::Load::Util;
-
     local %seen;
     local %refcnt;
     local %require;
     local @fixup;
     local @cfixup;
 
-    local $ct_obj = Module::Load::Util::instantiate_class_with_optional_args(
-        {ns_prefixes=>['ColorTheme::Data::Dump::Color','ColorTheme','']}, $COLOR_THEME);
+    local $ct_obj = _get_color_theme_obj() if $COLOR && !(defined $ct_obj);
     require Data::Dump::FilterContext if @FILTERS;
 
     my $name = "var";
@@ -165,8 +170,9 @@ sub dd {
 sub ddx {
     my(undef, $file, $line) = caller;
     $file =~ s,.*[\\/],,;
-    my $out = _col(linum=>"$file:$line: ") . dump(@_) . "\n";
+    my $out = dump(@_) . "\n";
     $out =~ s/^/# /gm;
+    $out = _col(linum=>"$file:$line: ") . $out;
     print $out;
 }
 
@@ -784,7 +790,7 @@ Data::Dump::Color - Like Data::Dump, but with color
 
 =head1 VERSION
 
-This document describes version 0.248 of Data::Dump::Color (from Perl distribution Data-Dump-Color), released on 2021-06-24.
+This document describes version 0.249 of Data::Dump::Color (from Perl distribution Data-Dump-Color), released on 2023-02-03.
 
 =head1 SYNOPSIS
 
@@ -794,13 +800,13 @@ Use it like you would Data::Dump, e.g.:
 
 =head1 DESCRIPTION
 
-Sample screenshot:
+Sample screenshots:
 
-=for Pod::Coverage ^(dumpf|pp|quote|squote|tied_str|fullname|format_list|str|looks_like_number|max)$
+=for html <img src="https://st.aticpan.org/source/PERLANCAR/Data-Dump-Color-0.249/share/images/Screenshot_20210624_071713.png" />
 
-=for html <img src="https://st.aticpan.org/source/PERLANCAR/Data-Dump-Color-0.248/share/images/Screenshot_20210624_071713.png" />
 
-=for html <img src="https://st.aticpan.org/source/PERLANCAR/Data-Dump-Color-0.248/share/images/Screenshot_20210624_071341.png" />
+=for html <img src="https://st.aticpan.org/source/PERLANCAR/Data-Dump-Color-0.249/share/images/Screenshot_20210624_071341.png" />
+
 
 This module aims to be a drop-in replacement for L<Data::Dump>. It adds colors
 to dumps. It also adds various visual aids in the comments, e.g. array/hash
@@ -808,6 +814,8 @@ index, depth indicator, and so on.
 
 For more information, see Data::Dump. This documentation explains what's
 different between this module and Data::Dump.
+
+=for Pod::Coverage ^(dumpf|pp|quote|squote|tied_str|fullname|format_list|str|looks_like_number|max)$
 
 =head1 RESULTS
 
@@ -938,14 +946,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Data-Dump-
 
 Source repository is at L<https://github.com/perlancar/perl-Data-Dump-Color>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dump-Color>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Data::Dump>, L<JSON::Color>, L<YAML::Tiny::Color>
@@ -966,15 +966,41 @@ Scott Baker <bakerscot@cpan.org>
 
 =item *
 
-Steven Haryanto <sharyanto@cpan.org>
+Steven Haryanto <stevenharyanto@gmail.com>
 
 =back
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2018, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2021, 2018, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dump-Color>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

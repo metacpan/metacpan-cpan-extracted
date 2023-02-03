@@ -8,7 +8,7 @@ use strict;
 use warnings;
 
 use Data::Dumper::Compact qw(ddc);
-use Data::Dataset::ChordProgressions;
+use Data::Dataset::ChordProgressions qw(as_hash transpose);
 use List::MoreUtils qw(first_index);
 use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util);
 use MIDI::Util qw(setup_score midi_format);
@@ -22,13 +22,10 @@ my $reps  = shift || 1;
 
 my $octave = 4;
 
-my %data = Data::Dataset::ChordProgressions::as_hash();
+my %data = as_hash();
 
 # List of jazz > scale > type chord progressions
 my @pool = map { @{ $data{jazz}{$scale}{$_} } } keys %{ $data{jazz}{$scale} };
-
-my %note_map;
-@note_map{ get_scale_notes('C', $scale) } = get_scale_notes($note, $scale);
 
 my $score = setup_score();
 
@@ -36,8 +33,7 @@ my $cn = Music::Chord::Note->new;
 
 for my $i (1 .. $n) {
     my $progression = $pool[int rand @pool];
-    # Transpose the chords
-    (my $named = $progression->[0]) =~ s/([A-G][#b]?)/$note_map{$1}/g;
+    my $named = transpose($note, $scale, $progression->[0]);
     print "$i. $named, $progression->[1]\n";
     my @chords = split /-/, $named;
     for my $j (1 .. $reps) {

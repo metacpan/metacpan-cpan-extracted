@@ -9,7 +9,7 @@ use Carp qw( carp croak confess cluck );
 use Storable qw( dclone );
 use IO::File;
 
-our $VERSION = '0.0300';
+our $VERSION = '0.0400';
 
 sub DEBUG () { 0 }
 
@@ -97,43 +97,70 @@ sub __read_line
     my $S = $self->{__read_state};
 
     if( $S->{key} ) {
-        $self->__append( $line );
-        return;
+        if( $line =~ /^\*/ and $S->{value} =~ /^".*"\s*$/s ) {
+            $self->__new_tupple;
+        }
+        else {
+            $self->__append( $line );
+            return;
+        }
     }
 
     # comment
     return if $line =~ /^\*%/;
     # End a multi-line tupple
     if( $line =~ /^\*End\s*$/ ) {
-        $self->__new_tupple if $S->{key};
+        $self->__new_tupple;    # missing *End?
         return;
     }
 
     # Start a config group
     if( $line =~ /^\*OpenGroup:\s*(.+)/ ) {
-        $self->__new_group( $1 );
+        my $name = $1;
+        $self->__new_tupple;    # missing *End?
+        $self->__new_group( $name );
         return;
     }
     # End a config group
     if( $line =~ /^\*CloseGroup:\s*(.+)/ ) {
-        $self->__end_group( $1 );
+        my $name = $1;
+        $self->__new_tupple;    # missing *End?
+        $self->__end_group( $name );
         return;
     }
     # Open a UI option
-    if( $line =~ /^\*OpenUI\s*\*(.+?):\s*(.+)/ ) {
-        $self->__new_UI( $1, $2 );
+    if( $line =~ /^\*(?:JCL)?OpenUI\s*\*(.+?):\s*(.+)/ ) {
+        my( $name, $value ) = ( $1, $2 );
+        $self->__new_tupple;    # missing *End?
+        $self->__new_UI( $name, $value );
         return;
     }
     # End the UI option
-    if( $line =~ /^\*CloseUI:?\s*\*(.+)/ ) {
-        $self->__end_UI( $1 );
+    if( $line =~ /^\*(?:JCL)?CloseUI:?\s*\*(.+)/ ) {
+        my $name = $1;
+        $self->__new_tupple;    # missing *End?
+        $self->__end_UI( $name );
+        return;
+    }
+
+    # Translation tupple, that contains bad UTF-8 (Gestetner)
+    if( $line =~ /^(\*zh_([^:]+)\s+)""$/ ) {
+        my( $used, $name ) = ( $1, $2 );
+        $self->__new_tupple;    # missing *End?
+        $S->{key} = $name;
+        $S->{value} = '';
+        $self->__new_tupple;
         return;
     }
     # New tupple
     if( $line =~ /^(\*\s*([^:]+):\s*)/ ) {
-        $S->{key} = $2;
+        my( $used, $name ) = ( $1, $2 );
+        $self->__new_tupple;    # missing *End?
+
+        $used = length $used;
+        $S->{key} = $name;
         $S->{value} = '';
-        my $used=length $1;
+        local $S->{first} = 1;
         $self->__append( substr $line, $used );
         return;
     }
@@ -150,20 +177,42 @@ sub __append
     my $S = $self->{__read_state};
     my $exit = 0;
     $exit = 1 if not $S->{value};
-    
-    if( $line =~ m/^"(.*)"\s+$/ ) {
+
+    # *Something: "honk" <- here
+    if( $line =~ m/^"(.*)" *$/ ) { 
+        $S->{quoted} = 1;
         $exit = 1;
     }    
-    elsif( $line =~ m/^"/ ) {
-        $exit = ( 0 != length $S->{value} );
-#        $line =~ s/^"\s+$//;
+    # *Something: "honk
+    # " <- here
+    # *End
+    # *Something: "<- here
+    # "
+    # *End
+    elsif( $line =~ m/^"/ ) {       
+        $S->{quoted} = 1;
+        $exit = ( $line =~ /" *$/ );
+        $exit = 0 if $S->{first};
     }
-    elsif( not $S->{value} ) {
-        $line =~ s/\s+$//;
+    # *Something: "
+    # with trailing
+    # " 
+    # *End <- here
+    elsif( $line eq "*End\n" ) {
+        $line = '';
+        $exit = 1;
     }
-    if( $line =~ /"\s*$/ and not $line =~ m/^"\s*$/ ) {
-        $exit = 1; # ( 0 != length $S->{value} );
+    # *Something: "
+    # with trailing <- here
+    # "
+    # *End
+    elsif( not $S->{first} ) {
+        $line =~ s/ +$//;
     }
+
+    # *Something: "
+    # Ho&& <- here
+    # nk"
     if( $line =~ s/&&\s*$// ) {
         $exit = 0;
     }
@@ -182,6 +231,8 @@ sub __new_tupple
     my( $self ) = @_;
     my $S = $self->{__read_state};
     return unless $S->{key};
+
+    chomp( $S->{value} ) unless $S->{quoted};
 
     my $C = $S->{current}[-1];
     if( $S->{key} =~ /^([^ ]+)\s+(.+(\/.+)?)$/ ) {
@@ -202,6 +253,7 @@ sub __new_tupple
     }
     $S->{key} = '';
     $S->{value} = '';
+    $S->{quoted} = 0;
 }
 
 sub __fix_value
@@ -274,7 +326,19 @@ sub __new_group
 sub __end_group
 {
     my( $self, $name ) = @_;
-    $self->__pop( group => $name );
+
+
+    my $S = $self->{__read_state};
+    my $data = $S->{current}[-1];
+    if( 'HASH' eq ref $data ) {
+        if( 'group' ne $data->{__type} ) {    # Missing *CloseUI
+            $self->__pop( $data->{__type}, $data->{__name} );
+        }
+    }
+
+
+    my( $tname, $text ) = $self->__parse_name( $name );
+    $self->__pop( group => $tname );
 }
 
 ################################################
@@ -316,8 +380,9 @@ sub __push
     $C->{$type}{ $data->{__name} } = $data;
     push @{ $C->{"__${type}_sorted"} }, $data->{__name};
 
+    # warn "PUSH $type.$data->{__name}\n";
     $self->__new_key( "$type.$data->{__name}" );
-    push @{ $self->{__read_state}{current} }, $data;
+    push @{ $S->{current} }, $data;
 }
 
 ################################################
@@ -326,12 +391,18 @@ sub __pop
     my( $self, $type, $name ) = @_;
 
     my $S = $self->{__read_state};
+    # warn "POP $type.$name\n";
 
 #    die "Trying to pop unknown $type $name" 
 #            unless $C->{$type}{$name};
     my $current = pop @{ $S->{current} };
     $name =~ s/\s+$//;
     $name =~ s(/.+$)();
+
+    die "Closing $type $name that was never open" 
+        unless $current->{__name};
+
+    # Missing *CloseUI
     die "Current $type is $current->{__name}, not $name"
             unless $current->{__name} eq $name;
 }
@@ -744,7 +815,7 @@ Philip Gwyn, E<lt>gwyn-at-cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2020 by Philip Gwyn
+Copyright (C) 2008-2023 by Philip Gwyn
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

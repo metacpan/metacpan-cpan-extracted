@@ -1,3 +1,13 @@
+0.3.0 2023-02-03
+
+    - Check OpenAPI version.
+    - Accept raw JSON in new().
+    - Make a copy of input value to new() in order not to overwrite it.
+    - Make unexposed methods private.
+    - Add methods api() and parameters().
+    - Skip adding JavaScript if no 'path' placeholders need replacing.
+    - Add POD.
+
 0.2.0 2022-10-21
 
     - Follow OpenAPI guidelines for prefixing custom properties.

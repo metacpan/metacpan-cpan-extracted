@@ -12,7 +12,9 @@ use Encode qw(decode);
 use JSON;
 use LWP::UserAgent;
 
-our $VERSION = '4.04';
+our $VERSION = '4.05';
+
+# {{{ Constructors
 
 sub new {
 	my ( $obj, %conf ) = @_;
@@ -20,7 +22,7 @@ sub new {
 	my $lang = $conf{language} // 'd';
 	my $ua   = $conf{ua};
 
-	if ( not $ua ) {
+	if ( not $ua and not $conf{async} ) {
 		my %lwp_options = %{ $conf{lwp_options} // { timeout => 10 } };
 		$ua = LWP::UserAgent->new(%lwp_options);
 		$ua->env_proxy;
@@ -46,6 +48,10 @@ sub new {
 
 	bless( $ref, $obj );
 
+	if ( $conf{async} ) {
+		return $ref;
+	}
+
 	my $url = $conf{url} . "/${lang}n";
 
 	$reply = $ua->post( $url, $ref->{post} );
@@ -68,6 +74,59 @@ sub new {
 
 	return $ref;
 }
+
+sub new_p {
+	my ( $obj, %conf ) = @_;
+	my $promise = $conf{promise}->new;
+
+	if ( not $conf{input} ) {
+		return $promise->reject('You need to specify an input value');
+	}
+	if ( not $conf{url} ) {
+		return $promise->reject('You need to specify a URL');
+	}
+
+	my $self = $obj->new( %conf, async => 1 );
+	$self->{promise} = $conf{promise};
+
+	my $lang = $conf{language} // 'd';
+	my $url  = $conf{url} . "/${lang}n";
+	$conf{user_agent}->post_p( $url, form => $self->{post} )->then(
+		sub {
+			my ($tx) = @_;
+			if ( my $err = $tx->error ) {
+				$promise->reject(
+					"POST $url returned HTTP $err->{code} $err->{message}");
+				return;
+			}
+			my $content = $tx->res->body;
+
+			$self->{raw_reply} = $content;
+
+			$self->{raw_reply} =~ s{ ^ SLs [.] sls = }{}x;
+			$self->{raw_reply} =~ s{ ; SLs [.] showSuggestion [(] [)] ; $ }{}x;
+
+			if ( $self->{developer_mode} ) {
+				say $self->{raw_reply};
+			}
+
+			$self->{json} = from_json( $self->{raw_reply} );
+
+			$promise->resolve( $self->results );
+			return;
+		}
+	)->catch(
+		sub {
+			my ($err) = @_;
+			$promise->reject($err);
+			return;
+		}
+	)->wait;
+
+	return $promise;
+}
+
+# }}}
 
 sub errstr {
 	my ($self) = @_;
@@ -123,7 +182,7 @@ finder services
 
 =head1 VERSION
 
-version 4.04
+version 4.05
 
 =head1 DESCRIPTION
 
@@ -172,18 +231,39 @@ you can use an empty hashref to override it.
 
 =back
 
-=item $status->errstr
+=item my $stopfinder_p = Travel::Status::DE::HAFAS::StopFinder->new_p(I<%opt>)
+
+Return a promise that resolves into a list of
+Travel::Status::DE::HAFAS::StopFinder results ($stopfinder->results) on success
+and rejects with an error message ($stopfinder->errstr) on failure. In addition
+to the arguments of B<new>, the following mandatory arguments must be set.
+
+=over
+
+=item B<promise> => I<promises module>
+
+Promises implementation to use for internal promises as well as B<new_p> return
+value.  Recommended: Mojo::Promise(3pm).
+
+=item B<user_agent> => I<user agent>
+
+User agent instance to use for asynchronous requests. The object must implement
+a B<post_p> function. Recommended: Mojo::UserAgent(3pm).
+
+=back
+
+=item $stopfinder->errstr
 
 In case of an error in the HTTP request, returns a string describing it.  If
 no error occurred, returns undef.
 
-=item $status->results
+=item $stopfinder->results
 
 Returns a list of stop candidates. Each list element is a hash reference. The
 hash keys are B<id> (IBNR / UIC station code) and B<name> (stop name). Both can
 be used as input for the Travel::Status::DE::HAFAS(3pm) constructor.
 
-If no matching results were found or the parser / http request failed, returns
+If no matching results were found or the parser / HTTP request failed, returns
 the empty list.
 
 =back

@@ -13,21 +13,27 @@ use App::DBBrowser::Auxil;
 #use App::DBBrowser::Subqueries; # required
 
 sub new {
-    my ( $class, $info, $options, $data ) = @_;
+    my ( $class, $info, $options, $d ) = @_;
     bless {
         i => $info,
         o => $options,
-        d => $data
+        d => $d
     }, $class;
 }
 
 
 sub union_tables {
     my ( $sf ) = @_;
-    $sf->{i}{stmt_types} = [ 'Union' ];
+    $sf->{d}{stmt_types} = [ 'Union' ];
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $tables = [ @{$sf->{d}{user_table_keys}}, @{$sf->{d}{sys_table_keys}} ];
+    my $tables;
+    if ( $sf->{o}{G}{metadata} ) {
+        $tables = [ @{$sf->{d}{user_table_keys}}, @{$sf->{d}{sys_table_keys}} ];
+    }
+    else {
+        $tables = [ @{$sf->{d}{user_table_keys}} ];
+    }
     ( $sf->{d}{col_names}, $sf->{d}{col_types} ) = $ax->tables_column_names_and_types( $tables );
     my $union = {
         used_tables    => [],
@@ -143,7 +149,7 @@ sub __union_table_columns {
         if ( ! defined $chosen[0] ) {
             if ( @bu_cols ) {
                 $table_cols = pop @bu_cols;
-                $union->{subselect_data}[$next_idx] = [ $qt_union_table, $ax->quote_simple_many( $table_cols ) ];
+                $union->{subselect_data}[$next_idx] = [ $qt_union_table, $ax->quote_cols( $table_cols ) ];
                 next;
             }
             $#{$union->{subselect_data}} = $next_idx - 1;
@@ -153,7 +159,7 @@ sub __union_table_columns {
             next;
         }
         elsif ( $chosen[0] eq $privious_cols ) {
-            push @{$union->{subselect_data}}, [ $qt_union_table, $ax->quote_simple_many( $union->{saved_cols} ) ];
+            push @{$union->{subselect_data}}, [ $qt_union_table, $ax->quote_cols( $union->{saved_cols} ) ];
             return 1;
         }
         elsif ( $chosen[0] eq $sf->{i}{ok} ) {
@@ -162,14 +168,14 @@ sub __union_table_columns {
             if ( ! @$table_cols ) {
                 $table_cols = [ @{$sf->{d}{col_names}{$union_table}} ];
             }
-            $union->{subselect_data}[$next_idx] = [ $qt_union_table, $ax->quote_simple_many( $table_cols ) ];
+            $union->{subselect_data}[$next_idx] = [ $qt_union_table, $ax->quote_cols( $table_cols ) ];
             $union->{saved_cols} = $table_cols;
             return 1;
         }
         else {
             push @bu_cols, $table_cols;
             push @$table_cols, @chosen;
-            $union->{subselect_data}[$next_idx] = [ $qt_union_table, $ax->quote_simple_many( $table_cols ) ];
+            $union->{subselect_data}[$next_idx] = [ $qt_union_table, $ax->quote_cols( $table_cols ) ];
         }
     }
 }

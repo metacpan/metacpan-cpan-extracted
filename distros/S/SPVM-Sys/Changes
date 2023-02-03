@@ -1,3 +1,30 @@
+0.36 2022-02-03
+  [Bug Fix]
+    * Fixed the bug that many methods in the Sys::FileTest class doesn't work well.
+      -r
+      -w
+      -x
+      -o
+      -R
+      -W
+      -X
+      -O
+    * Fixed the bug that Sys::FileTest doesn't work well on Windows.
+      -r is the same as the -R
+      -w is the same as the -W
+      -x is the same as the -X
+      -o is the same as the -O
+  [Incompatible Changes]
+    The d method in the FileTest doesn't throw an exception when the directori doesn't exist.
+    The f method in the FileTest doesn't throw an exception when the directori doesn't exist.
+    The g method in the FileTest doesn't throw an exception when the directori doesn't exist.
+    The k method in the FileTest doesn't throw an exception when the directori doesn't exist.
+    The l method in the FileTest doesn't throw an exception when the directori doesn't exist.
+    The b method in the FileTest doesn't throw an exception when the directori doesn't exist.
+    The o method in the FileTest doesn't throw an exception when the directori doesn't exist.
+    The p method in the FileTest doesn't throw an exception when the directori doesn't exist.
+    The O method in the FileTest doesn't throw an exception when the directori doesn't exist.
+    
 0.35 2022-01-30
   [Test Bug Fix]
     * Fixed the testing bug that the tests on latest SPVM don't work well.

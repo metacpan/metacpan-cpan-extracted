@@ -7,11 +7,11 @@ use 5.014;
 
 
 sub new {
-    my ( $class, $info, $options, $data ) = @_;
+    my ( $class, $info, $options, $d ) = @_;
     bless {
         i => $info,
         o => $options,
-        d => $data
+        d => $d
     }, $class;
 }
 
@@ -47,7 +47,7 @@ sub function_with_col_and_arg {
         #    my $prec_num = '1' . '0' x $arg;
         #    return "cast( ( $col * $prec_num ) as int ) / $prec_num.0";
         #}
-        return "TRUNC($col,$arg)"     if $sf->{i}{driver} =~ /^(?:Pg|Firebird|oracle)\z/;
+        return "TRUNC($col,$arg)"     if $sf->{i}{driver} =~ /^(?:Pg|Firebird|Oracle)\z/;
         return "TRUNCATE($col,$arg)";
     }
 }
@@ -78,7 +78,7 @@ sub epoch_to_date {
     return "TO_TIMESTAMP(${col}::bigint/$interval)::date"                                  if $sf->{i}{driver} eq 'Pg';
     return "DATEADD(CAST($col AS BIGINT)/$interval SECOND TO DATE '1970-01-01')"           if $sf->{i}{driver} eq 'Firebird';
     return "TIMESTAMP('1970-01-01') + ($col/$interval) SECONDS"                            if $sf->{i}{driver} eq 'DB2';
-    return "TO_DATE('1970-01-01','YYYY-MM-DD') + NUMTODSINTERVAL($col/$interval,'SECOND')" if $sf->{i}{driver} eq 'oracle';
+    return "TO_DATE('1970-01-01','YYYY-MM-DD') + NUMTODSINTERVAL($col/$interval,'SECOND')" if $sf->{i}{driver} eq 'Oracle';
 }
 
 
@@ -89,7 +89,7 @@ sub epoch_to_datetime {
     return "TO_TIMESTAMP(${col}::bigint/$interval)::timestamp"                                 if $sf->{i}{driver} eq 'Pg';
     return "DATEADD(CAST($col AS BIGINT)/$interval SECOND TO TIMESTAMP '1970-01-01 00:00:00')" if $sf->{i}{driver} eq 'Firebird';
     return "TIMESTAMP('1970-01-01 00:00:00') + ($col/$interval) SECONDS"                       if $sf->{i}{driver} eq 'DB2';
-    return "TO_TIMESTAMP('1970-01-01 00:00:00','YYYY-MM-DD HH24:MI:SS') + NUMTODSINTERVAL($col/$interval,'SECOND')"  if $sf->{i}{driver} eq 'oracle';
+    return "TO_TIMESTAMP('1970-01-01 00:00:00','YYYY-MM-DD HH24:MI:SS') + NUMTODSINTERVAL($col/$interval,'SECOND')"  if $sf->{i}{driver} eq 'Oracle';
 }
 
 

@@ -3,12 +3,11 @@
 use strict;
 use warnings;
 
-use JSON;
 use OpenAPI::Render::HTMLForms;
 use Test::More tests => 1;
 
 open( my $inp, 't/RestfulDB-API.json' );
-my $api = OpenAPI::Render::HTMLForms->new( decode_json( join '', <$inp> ) );
+my $api = OpenAPI::Render::HTMLForms->new( join '', <$inp> );
 close $inp;
 
 is( $api->show . "\n", <<END, 'HTML forms generation works' );

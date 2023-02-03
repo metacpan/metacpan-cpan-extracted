@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.313';
+our $VERSION = '2.314';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -38,10 +38,10 @@ BEGIN {
 sub new {
     my ( $class ) = @_;
     my $info = {
-        tc_default    => { hide_cursor => 0, clear_screen => 1, page => 2, undef => '<<', prompt => 'Your choice:' },
-        tf_default    => { hide_cursor => 2, clear_screen => 1, page => 2 },
+        tc_default    => { hide_cursor => 0, clear_screen => 1, page => 2, keep => 6, undef => '<<', prompt => 'Your choice:' },
+        tf_default    => { hide_cursor => 2, clear_screen => 1, page => 2, keep => 6 },
         tr_default    => { hide_cursor => 2, clear_screen => 1, page => 2 },
-        tcu_default   => { hide_cursor => 0, clear_screen => 1, page => 2 }, ##
+        tcu_default   => { hide_cursor => 0, clear_screen => 1, page => 2, keep => 6 }, ##
         lyt_h         => { order => 0, alignment => 2 },
         lyt_v         => { undef => '  BACK', layout => 2 },
         dots          => '...',
@@ -77,7 +77,7 @@ sub __init {
     }
     my $app_dir = catdir( $config_home // $home, 'db_browser' );
     mkdir $app_dir or die $! if ! -d $app_dir;
-    $sf->{i}{home_dir} = $home; ##
+    $sf->{i}{home_dir} = $home;
     $sf->{i}{app_dir}  = $app_dir;
     $sf->{i}{f_settings}           = catfile $app_dir, 'general_settings.json';
     $sf->{i}{conf_file_fmt}        = catfile $app_dir, 'config_%s.json';
@@ -85,11 +85,6 @@ sub __init {
     $sf->{i}{f_dir_history}        = catfile $app_dir, 'dir_history.json';
     $sf->{i}{f_subqueries}         = catfile $app_dir, 'subqueries.json';
     $sf->{i}{f_search_and_replace} = catfile $app_dir, 'search_and_replace.json';
-    $sf->{i}{f_plain}              = catfile $app_dir, 'tmp_file_plain.csv';
-    END {
-        no warnings qw( closure );
-        unlink $sf->{i}{f_plain} if -e $sf->{i}{f_plain};
-    }
 }
 
 
@@ -134,12 +129,6 @@ sub __options {
 sub run {
     my ( $sf ) = @_;
     local $| = 1;
-    local $SIG{INT} = local $SIG{TERM} = local $SIG{HUP} = sub {
-        if ( defined $sf->{i}{f_plain} && -e $sf->{i}{f_plain} ) {
-            unlink $sf->{i}{f_plain};
-        }
-        exit;
-    };
     $sf->__init();
     $sf->__options();
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
@@ -197,7 +186,7 @@ sub run {
 
         my @databases;
         my $prefix;
-        my ( $user_dbs, $sys_dbs ) = ( [], [] ); #
+        my ( $user_dbs, $sys_dbs ) = ( [], [] );
         if ( ! eval {
             ( $user_dbs, $sys_dbs ) = $plui->get_databases();
             $prefix = $driver eq 'SQLite' ? '' : '- ';
@@ -269,10 +258,17 @@ sub run {
             # DB-HANDLE
 
             my $dbh;
+            $sf->{d} = {
+                db => $db,
+                user_dbs => $user_dbs,
+                sys_dbs => $sys_dbs,
+            };
+            $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
             if ( ! eval {
                 $dbh = $plui->get_db_handle( $db );
-                $sf->{i}{quote_char} = $dbh->get_info(29)  // '"', # SQL_IDENTIFIER_QUOTE_CHAR
-                $sf->{i}{sep_char}   = $dbh->get_info(41)  // '.'; # SQL_CATALOG_NAME_SEPARATOR # name
+                $sf->{d}{identifier_quote_char} = $dbh->get_info(29) // '"', # SQL_IDENTIFIER_QUOTE_CHAR
+                #$sf->{d}{catalog_name_sep} = $dbh->get_info(41) // '.';  # SQL_CATALOG_NAME_SEPARATOR
+                #$sf->{d}{catalog_location} = $dbh->get_info(114) || 1;   # SQL_CATALOG_LOCATION
                 1 }
             ) {
                 $ax->print_error_message( $@ );
@@ -283,13 +279,7 @@ sub run {
                 next PLUGIN   if @{$sf->{o}{G}{plugins}} > 1;
                 last PLUGIN;
             }
-            $sf->{d} = {
-                db       => $db,
-                dbh      => $dbh,
-                user_dbs => $user_dbs,
-                sys_dbs  => $sys_dbs,
-            };
-            $sf->{i}{db_attached} = 0;
+            $sf->{d}{dbh} = $dbh;
             if ( $driver eq 'SQLite' && -s $sf->{i}{f_attached_db} ) {
                 my $h_ref = $ax->read_json( $sf->{i}{f_attached_db} ) // {};
                 my $attached_db = $h_ref->{$db} // [];
@@ -298,11 +288,9 @@ sub run {
                         my $stmt = sprintf "ATTACH DATABASE %s AS %s", $dbh->quote_identifier( $ref->[0] ), $dbh->quote( $ref->[1] );
                         $dbh->do( $stmt );
                     }
-                    $sf->{i}{db_attached} = 1;
+                    $sf->{d}{db_attached} = 1;
                 }
             }
-            $sf->{i}{stmt_history} = [];
-            $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
 
             # SCHEMAS
 
@@ -376,17 +364,17 @@ sub run {
                     }
                 }
                 $db_string = 'DB ' . basename( $db ) . ( @schemas > 1 ? '.' . $schema : '' ) . '';
-                $sf->{d}{schema}       = $schema;
+                $sf->{d}{schema} = $schema;
+                $sf->{d}{is_system_schema} = $is_system_schema;
                 $sf->{d}{user_schemas} = $user_schemas;
-                $sf->{d}{sys_schemas}  = $sys_schemas;
-                $sf->{d}{db_string}    = $db_string;
-                $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+                $sf->{d}{sys_schemas} = $sys_schemas;
+                $sf->{d}{db_string}  = $db_string;
 
                 # TABLES
 
                 my ( $tables_info, $user_table_keys, $sys_table_keys );
                 if ( ! eval {
-                    ( $tables_info, $user_table_keys, $sys_table_keys ) = $plui->tables_info( $dbh, $schema, $is_system_schema );
+                    ( $tables_info, $user_table_keys, $sys_table_keys ) = $plui->tables_info( $dbh, $schema, $is_system_schema, $sf->{d}{db_attached} );
                     1 }
                 ) {
                     $ax->print_error_message( $@ );
@@ -398,7 +386,7 @@ sub run {
                 }
                 $sf->{d}{tables_info} = $tables_info;
                 $sf->{d}{user_table_keys} = $user_table_keys;
-                $sf->{d}{sys_table_keys}  = $sf->{o}{G}{metadata} ? $sys_table_keys : [];
+                $sf->{d}{sys_table_keys} = $sys_table_keys;
                 my $old_idx_tbl = 1;
 
                 TABLE: while ( 1 ) {
@@ -472,24 +460,17 @@ sub run {
                     if ( $table eq $hidden ) {
                         require App::DBBrowser::CreateDropAttach;
                         my $cda = App::DBBrowser::CreateDropAttach->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                        my $changed = $cda->create_drop_or_attach();
-                        if ( $changed ) {
-                            # Loop to SCHEMA to update the list of tables and then automatically go back to the
-                            # create_drop_or_attach menu.
-                            $sf->{redo_schema} = $sf->{d}{schema};
-                            $sf->{redo_table}  = $table;
-                            next SCHEMA;
-                        }
-                        else {
-                            # leave without reentering to the create_drop_or_attach-menu
-                            next TABLE
-                        }
+                        $cda->create_drop_or_attach();
+                        $tables_info = $sf->{d}{tables_info};
+                        $user_table_keys = $sf->{d}{user_table_keys};
+                        $sys_table_keys = $sf->{d}{sys_table_keys};
+                        next TABLE
                     }
                     my ( $qt_table, $qt_columns );
                     if ( $table eq $join ) {
                         require App::DBBrowser::Join;
                         my $new_j = App::DBBrowser::Join->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                        $sf->{i}{special_table} = 'join';
+                        $sf->{d}{special_table} = 'join';
                         if ( ! eval { ( $qt_table, $qt_columns ) = $new_j->join_tables(); 1 } ) {
                             $ax->print_error_message( $@ );
                             next TABLE;
@@ -499,7 +480,7 @@ sub run {
                     elsif ( $table eq $union ) {
                         require App::DBBrowser::Union;
                         my $new_u = App::DBBrowser::Union->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                        $sf->{i}{special_table} = 'union';
+                        $sf->{d}{special_table} = 'union';
                         if ( ! eval { ( $qt_table, $qt_columns ) = $new_u->union_tables(); 1 } ) {
                             $ax->print_error_message( $@ );
                             next TABLE;
@@ -507,7 +488,7 @@ sub run {
                         next TABLE if ! defined $qt_table;
                     }
                     elsif ( $table eq $from_subquery ) {
-                        $sf->{i}{special_table} = 'subquery';
+                        $sf->{d}{special_table} = 'subquery';
                         if ( ! eval { ( $qt_table, $qt_columns ) = $sf->__derived_table(); 1 } ) {
                             $ax->print_error_message( $@ );
                             next TABLE;
@@ -515,14 +496,14 @@ sub run {
                         next TABLE if ! defined $qt_table;
                     }
                     else {
-                        $sf->{i}{special_table} = '';
+                        $sf->{d}{special_table} = '';
                         if ( ! eval {
                             $table =~ s/^[-\ ]\s//;
                             $sf->{d}{table_key} = $table;
                             my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
                             $qt_table = $ax->quote_table( $sf->{d}{tables_info}{$table} );
                             $sf->{d}{cols} = $ax->column_names( $qt_table );
-                            $qt_columns = $ax->quote_simple_many( $sf->{d}{cols} );
+                            $qt_columns = $ax->quote_cols( $sf->{d}{cols} );
                             1 }
                         ) {
                             $ax->print_error_message( $@ );
@@ -530,9 +511,9 @@ sub run {
                         }
                     }
                     my $table_footer;
-                    if ( $sf->{i}{special_table} ) {
-                        $table_footer = ucfirst $sf->{i}{special_table};
-                        my $qc = quotemeta $sf->{i}{quote_char};
+                    if ( $sf->{d}{special_table} ) {
+                        $table_footer = ucfirst $sf->{d}{special_table};
+                        my $qc = quotemeta $sf->{d}{identifier_quote_char};
                         if ( $qt_table =~ /\sAS\s$qc([^$qc]+)$qc\z/ ) {
                             $table_footer .= ': ' . $1;
                         }
@@ -557,7 +538,7 @@ sub __derived_table {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     require App::DBBrowser::Subqueries;
     my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    $sf->{i}{stmt_types} = [ 'Select' ];
+    $sf->{d}{stmt_types} = [ 'Select' ];
     my $tmp = { table => '()' };
     $ax->reset_sql( $tmp );
     $ax->print_sql_info( $ax->get_sql_info( $tmp ) );
@@ -569,7 +550,7 @@ sub __derived_table {
     $qt_table .= " AS " . $ax->quote_col_qualified( [ $alias ] );
     $tmp->{table} = $qt_table;
     my $columns = $ax->column_names( $qt_table );
-    my $qt_columns = $ax->quote_simple_many( $columns );
+    my $qt_columns = $ax->quote_cols( $columns );
     return $qt_table, $qt_columns;
 }
 
@@ -594,7 +575,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.313
+Version 2.314
 
 =head1 DESCRIPTION
 

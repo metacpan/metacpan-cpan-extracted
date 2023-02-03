@@ -27,7 +27,7 @@ no_index:
 provides:
   App::ansiecho:
     file: lib/App/ansiecho.pm
-    version: '1.03'
+    version: '1.04'
 requires:
   Encode: '0'
   Getopt::EX: v2.1.1
@@ -38,10 +38,10 @@ requires:
   Text::ANSI::Printf: '2.01'
   perl: v5.14.0
 resources:
-  bugtracker: https://github.com/kaz-utashiro/App-ansiecho/issues
-  homepage: https://github.com/kaz-utashiro/App-ansiecho
-  repository: https://github.com/kaz-utashiro/App-ansiecho.git
-version: '1.03'
+  bugtracker: https://github.com/tecolicom/App-ansiecho/issues
+  homepage: https://github.com/tecolicom/App-ansiecho
+  repository: https://github.com/tecolicom/App-ansiecho.git
+version: '1.04'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

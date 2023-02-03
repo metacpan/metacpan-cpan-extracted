@@ -23,7 +23,7 @@ for my $file (
     'lib/App/DBBrowser/GetContent/Filter.pm',
     'lib/App/DBBrowser/GetContent/Filter/SearchAndReplace.pm',
     'lib/App/DBBrowser/GetContent/Parse.pm',
-    'lib/App/DBBrowser/GetContent/Read.pm',
+    'lib/App/DBBrowser/GetContent/Source.pm',
     'lib/App/DBBrowser/Join.pm',
     'lib/App/DBBrowser/Opt/DBGet.pm',
     'lib/App/DBBrowser/Opt/DBSet.pm',

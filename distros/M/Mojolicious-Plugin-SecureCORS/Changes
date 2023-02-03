@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-SecureCORS
 
+v2.0.5  2023-02-03 14:27:53 EET
+        - Fix warning about undefined option.
+
 v2.0.4  2021-02-17 13:09:46 EET
         - Fix compatibility with Mojolicious-9.01.
 

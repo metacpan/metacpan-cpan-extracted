@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.313';
+our $VERSION = '2.314';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -47,7 +47,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL>/C<Firebird>/C<DB2> datab
 
 =head1 VERSION
 
-Version 2.313
+Version 2.314
 
 =head1 SYNOPSIS
 
@@ -219,8 +219,8 @@ Detach DB
 For I<Create Table>, I<Drop Table>, I<Create View> and I<Drop View> see L</WRITE ACCESS>. These entries are available if
 enabled in L</Extensions>.
 
-I<Attache DB> is available for C<SQLite> databases. I<Attach DB> can be used to attach databases to the
-current database. The menu entry I<Detach DB> is available if a C<SQLite> database has attached databases.
+I<Attache DB> is available for C<SQLite> databases. I<Attach DB> can be used to attach databases to the current
+database.
 
 By selecting the prompt line of this menu (the database name) one can change the I<Source type of input data> settings.
 
@@ -343,8 +343,9 @@ type is used automatically without showing a menu.
 
 For the meaning of the different data source types see L<Source type of input data>.
 
-After the data has been read the user can apply different input filters (See L<Input filters>). When the input filters
-are confirmed the user is asked
+If the data has been read from a file, the user can apply different input filters (See L<Input filters>).
+
+The user is then asked
 
 =over
 
@@ -421,7 +422,7 @@ Delete records. The affected records are shown before the user confirms the dele
 
 =head2 Data Input
 
-=head3 Source type of input data
+=head3 Source type
 
 =over
 
@@ -429,28 +430,26 @@ Delete records. The affected records are shown before the user confirms the dele
 
 Insert the data cell by cell.
 
-=item File
+=item From File
 
 The data is read from a chosen file.
 
-Supported file formats: text files and file formats supported by L<Spreadsheet::Read>.
+Supported file formats: text files and file formats supported by L<Spreadsheet::Read>. C<Spreadsheet::Read> uses
+different parser modules for the different file formats - see L<Spreadsheet::Read/DESCRIPTION>. The parser modules are
+not installed automatically. It is up to the user to install the required parser modules.
 
-Selecting I<From File> opens the I<Source file directory> sub-menu where one can choose the directory which should be
+Selecting I<From File> opens the I<Source directory> sub-menu where one can choose the directory which should be
 searched for files.
 
-If L<Directory history> is set to C<1> and a directory has been saved, this menu is skipped and the directory is chosen
+If the L<Directory history> is set to C<1>, the I<Source directory> sub-menu is skipped and the directory is chosen
 automatically.
 
 After a directory has been chosen a sub-menu is opened where one can choose the source file.
 
-Selecting the prompt line of the source file sub-menu allows one to set the parse settings described in L</Import>.
-If the previous sub-menu I<Source file directory> is not shown due to the settings described before, additionally to the
-parse settings it is also possible the change the source file directory in this sub-menu by selecting I<NEW search>.
+If the previous sub-menu I<Source directory> is not shown due to the settings described before, it is possible the
+change the source directory in this sub-menu by selecting I<NEW search>.
 
 =back
-
-See also the input filter L</Reparse> in I<Input filters>, which allows one to change the parse-settings and then
-re-read the data.
 
 =head3 Input filters
 
@@ -462,9 +461,6 @@ Use only selected columns of the imported data.
 
 If the data has empty columns (C<-->), the non-empty columns are preselected. Columns are regarded as
 empty if the values of all fields in the column - including the column header - have no length.
-
-If the selected columns of a previous I<Choose Cols> usage are a subset of the current available columns, this subset
-of columns is preselected. A I<RESET> removes this preselection.
 
 Columns added with the filter I<Append Col> are empty and therefore not preselected.
 
@@ -787,7 +783,7 @@ subquery (I<Read-Line>).
 If stored or temporarily stored subqueries are available, it is also possible to select one of those subqueries instead
 of entering a subquery.
 
-The subqueries are automatically enclosed in parentheses if the subqueries do not contain any parentheses.
+The subqueries are automatically enclosed in parentheses.
 
 A subquery can be saved or removed in the sub-menu which opens by selecting the prompt line of a subquery menu
 (I<Choose SQ:>).
@@ -1126,7 +1122,7 @@ Expects a regex pattern. If set, removes trailing characters matching regexp fro
 
 =back
 
-=head3 Enable input filter
+=head3 Input filter
 
 Enable the input filter menu.
 
@@ -1155,12 +1151,12 @@ This option expects as its value a string. The string is used as a glob pattern.
 
 If I<file> is selected as the data source type, only files matching this glob pattern are part of the available files.
 
-=head3 Show hidden files
+=head3 Hidden files
 
 If I<file> is selected as the data source type, this setting determines if hidden files are part of the available files
 or not.
 
-=head3 Menu 'data source'
+=head3 Source type
 
 Set the data source type to C<plain>, C<file> or C<menu> for C<Insert Into> and for C<Create Table>.
 

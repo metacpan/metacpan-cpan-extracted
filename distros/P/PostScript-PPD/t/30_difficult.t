@@ -7,7 +7,7 @@ use FindBin;
 use lib "$FindBin::Bin/..";
 
 use Test::More ( tests => 24 );
-use Data::Dumper;
+use Data::Dump qw( pp );
 
 use t::ChkUtil;
 dualvar_or_skip 24;
@@ -57,7 +57,7 @@ ok( $ha, "Got HalftoningAlgorithm" );
 ######
 my $wts = $ha->get( 'WTS' );
 ok( $wts, "Read WTS" )
-        or die Dumper $ha;
+        or die pp $ha;
 is( "$wts", q,
       << /UseWTS true >> setuserparams
       <<
@@ -93,7 +93,7 @@ $ppd->load( "t/ppd/stlin.ppd" );
 pass( "Loaded Lexmark T641 ppd" );
 
 my $oid = $ppd->OIDOptDuplex;
-isa_ok( $oid, "PostScript::PPD::Subkey", "OID promoted to subkey" ) or die Dumper $oid;
+isa_ok( $oid, "PostScript::PPD::Subkey", "OID promoted to subkey" ) or die pp $oid;
 is( $oid->value, ".1.3.6.1.2.1.43.13.4.1.10.1.2", " ... value" );
 
 my $proc = $ppd->DefaultScreenProc;

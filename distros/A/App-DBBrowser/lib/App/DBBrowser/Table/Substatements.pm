@@ -14,11 +14,11 @@ use App::DBBrowser::Table::Substatements::Operators;
 
 
 sub new {
-    my ( $class, $info, $options, $data ) = @_;
+    my ( $class, $info, $options, $d ) = @_;
     my $sf = {
         i => $info,
         o => $options,
-        d => $data,
+        d => $d,
         aggregate     => [ "AVG(X)", "COUNT(X)", "COUNT(*)", "MAX(X)", "MIN(X)", "SUM(X)" ],
         distinct      => "DISTINCT",
         all           => "ALL",
@@ -30,8 +30,8 @@ sub new {
     if    ( $info->{driver} =~ /^(?:SQLite|mysql|MariaDB)\z/ ) { push @{$sf->{aggregate}}, "GROUP_CONCAT(X)"; }
     elsif ( $info->{driver} eq 'Pg' )                          { push @{$sf->{aggregate}}, "STRING_AGG(X)"; }
     elsif ( $info->{driver} eq 'Firebird' )                    { push @{$sf->{aggregate}}, "LIST(X)"; }
-    elsif ( $info->{driver} =~ /^(?:DB2|oracle)\z/ )           { push @{$sf->{aggregate}}, "LISTAGG(X)"; }
-    $sf->{i}{menu_addition} = '%%';
+    elsif ( $info->{driver} =~ /^(?:DB2|Oracle)\z/ )           { push @{$sf->{aggregate}}, "LISTAGG(X)"; }
+    $sf->{i}{menu_addition} = '%%'; ##
     bless $sf, $class;
 }
 
@@ -166,7 +166,13 @@ sub __add_aggregate_substmt {
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my @pre = ( undef, $sf->{i}{ok} );
-    my $GROUP_CONCAT = $sf->{aggregate}[-1] =~ s/\(\X\)\z//r;
+    my $GROUP_CONCAT;
+    if ( defined $sf->{aggregate}[6] ) {
+        $GROUP_CONCAT = $sf->{aggregate}[6] =~ s/\(\X\)\z//r;
+    }
+    else {
+        $GROUP_CONCAT = '';
+    }
     my $i = @{$sql->{aggr_cols}};
     my $info = $ax->get_sql_info( $sql );
     # Choose
@@ -218,14 +224,14 @@ sub __add_aggregate_substmt {
         if ( ! defined $qt_col ) {
             return;
         }
-        my $qc = quotemeta $sf->{i}{quote_char};
+        my $qc = quotemeta $sf->{d}{identifier_quote_char};
         $default_alias .= ' ' . $qt_col =~ s/^$qc(.+)$qc\z/$1/r;
         if ( $aggr =~ /^$GROUP_CONCAT\z/ ) {
             if ( $sf->{i}{driver} eq 'Pg' ) {
                 # Pg, STRING_AGG: separator mandatory
                 $sql->{aggr_cols}[$i] .= "${qt_col}::text,',')";
             }
-            elsif ( $sf->{i}{driver} =~ /^(?:DB2|oracle)\z/ ) {
+            elsif ( $sf->{i}{driver} =~ /^(?:DB2|Oracle)\z/ ) {
                 # DB2, LISTAGG: no default separator
                 $sql->{aggr_cols}[$i] .= "$qt_col,',')";
             }
@@ -259,7 +265,7 @@ sub __add_aggregate_substmt {
             #elsif ( $sf->{i}{driver} eq 'Firebird' ) {
             #    $sql->{aggr_cols}[$i] .= "$qt_col,'$sep')";
             #}
-            #elsif ( $sf->{i}{driver} =~ /^(?:DB2|oracle)\z/ ) {
+            #elsif ( $sf->{i}{driver} =~ /^(?:DB2|Oracle)\z/ ) {
             #    if ( $is_distinct ) {
             #        # DB2 codes: error code -214 - error caused by:
             #        # DISTINCT is specified in the SELECT clause, and a column name or sort-key-expression in the

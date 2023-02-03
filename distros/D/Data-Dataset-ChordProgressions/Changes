@@ -1,5 +1,23 @@
 Revision history for Data-Dataset-ChordProgressions
 
+0.0303 2023-02-02 21:51:21
+    - Improve documentation again.
+
+0.0302 2023-02-02 21:36:21
+    - Improve documentation.
+
+0.0301 2023-02-02 21:21:41
+    - Fix the transpose() progression logic.
+
+0.0300 2023-02-02 21:00:12
+    - Ok ok. Use Exporter. Sheesh!
+
+0.0201 2023-02-02 20:42:44
+    - Improve the eg/* programs.
+
+0.0200 2023-02-02 20:30:08
+    - Add the transpose() function.
+
 0.0109 2022-10-21 20:49:28
     - Avoid implicit imports.
 
