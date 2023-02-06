@@ -1,8 +1,6 @@
 #
 # (c) Jan Gehring <jan.gehring@gmail.com>
 #
-# vim: set ts=2 sw=2 tw=0:
-# vim: set expandtab:
 
 =head1 NAME
 
@@ -35,7 +33,7 @@ use strict;
 use warnings;
 use Rex::Interface::File;
 
-our $VERSION = '1.13.4'; # VERSION
+our $VERSION = '1.14.0'; # VERSION
 
 use constant DEFAULT_READ_LEN => 64;
 

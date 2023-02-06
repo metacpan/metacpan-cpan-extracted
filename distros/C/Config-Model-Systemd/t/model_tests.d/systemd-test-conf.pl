@@ -22,7 +22,6 @@ my @tests = (
         setup => {
             'main-sshd' => $conf_dir.'sshd.service.d/override.conf',
             # create symlink from array elements to target file (the last of the array)
-            # TODO: update C::M::Tester version require
             'ssh.service' => [ $conf_dir.'/sshd.service', '/lib/systemd/system/ssh.service' ]
         },
         check => {

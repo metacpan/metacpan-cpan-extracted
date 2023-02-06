@@ -11,19 +11,20 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-10'; # DATE
+our $DATE = '2023-01-29'; # DATE
 our $DIST = 'App-BPOMUtils-NutritionFacts'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/NutritionFacts/bpom_show_nutrition_facts",
     program_name => "bpom-tampilkan-ing",
     log => 1,
+    use_utf8 => 1,
 );
 
 $cmdline->run;
 
-# ABSTRACT: Round values and format them as nutrition fact table (ING - informasi nilai gizi)
+# ABSTRACT: Render BPOM-compliant nutrition fact table (ING - informasi nilai gizi) in various formats
 # PODNAME: bpom-tampilkan-ing
 
 __END__
@@ -34,11 +35,11 @@ __END__
 
 =head1 NAME
 
-bpom-tampilkan-ing - Round values and format them as nutrition fact table (ING - informasi nilai gizi)
+bpom-tampilkan-ing - Render BPOM-compliant nutrition fact table (ING - informasi nilai gizi) in various formats
 
 =head1 VERSION
 
-This document describes version 0.016 of bpom-tampilkan-ing (from Perl distribution App-BPOMUtils-NutritionFacts), released on 2023-01-10.
+This document describes version 0.023 of bpom-tampilkan-ing (from Perl distribution App-BPOMUtils-NutritionFacts), released on 2023-01-29.
 
 =head1 SYNOPSIS
 
@@ -251,13 +252,20 @@ C<--naked-res> so you just get:
 
 =item B<--output-format>=I<s>, B<-f>
 
+Pick an output format for the nutrition fact.
+
 Default value:
 
  "vertical_text_table"
 
 Valid values:
 
- ["raw_table","vertical_html_table","vertical_text_table","linear_html","linear_text","calculation_html","calculation_text"]
+ ["raw_table","vertical_html_table","vertical_text_table","linear_html","linear_text","raw_linear","calculation_html","calculation_text"]
+
+C<vertical_text_table> is the default. The /(vertical)?.*table/ formats presents
+the information in a table, while the /linear/ formats presents the information
+in a paragraph.
+
 
 =item B<--page-result>
 
@@ -393,24 +401,34 @@ String. Specify additional command-line options.
 
 =head2 An example, in linear text format (color/emphasis is shown with markup)
 
- % bpom-tampilkan-ing --carbohydrate 13.113 --color never --fat 0.223 --output-format linear_text --package-size 20 --protein 0.99 --saturated-fat 0.01 --serving-size 175 --sodium 0.223 --sugar 7.173
- *INFORMASI NILAI GIZI*   *JUMLAH PER KEMASAN (20 g)* : *JUMLAH PER KEMASAN (20 g*) : *Energi total 10 kkal*, Energi dari lemak 0 kkal, Energi dari lemak jenuh 0 kkal, *Lemak total 0 g (0% AKG)*, *Lemak jenuh 0 g (0% AKG)*, *Protein 0 g (0% AKG)*, *Karbohidrat total 3 g (1% AKG)*, *Gula 1 g*, *Garam (Natrium) 0 mg (0% AKG)*. /Persen AKG berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih tinggi atau lebih rendah./
+ % bpom-tampilkan-ing --carbohydrate 13.113 --color never --fat 0.223 --output-format raw_linear --package-size 20 --protein 0.99 --saturated-fat 0.01 --serving-size 175 --sodium 0.223 --sugar 7.173
+ *INFORMASI NILAI GIZI*   *JUMLAH PER KEMASAN (20 g)* : *Energi total 10 kkal*, Energi dari lemak 0 kkal, Energi dari lemak jenuh 0 kkal, *Lemak total 0 g (0% AKG)*, *Lemak jenuh 0 g (0% AKG)*, *Protein 0 g (0% AKG)*, *Karbohidrat total 3 g (1% AKG)*, *Gula 1 g*, *Garam (Natrium) 0 mg (0% AKG)*. /Persen AKG berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih tinggi atau lebih rendah./
 
-=head2 The same example in vetical HTML table format
+=head2 An example, in raw_linear format (just like linear_text but with no border)
+
+ % bpom-tampilkan-ing --carbohydrate 13.113 --color never --fat 0.223 --output-format linear_text --package-size 20 --protein 0.99 --saturated-fat 0.01 --serving-size 175 --sodium 0.223 --sugar 7.173
+ .---------------------------------------------------------------------------------.
+ | *INFORMASI NILAI GIZI* *JUMLAH PER KEMASAN (20 g)* : *Energi total 10 kkal*,    |
+ | Energi dari lemak 0 kkal, Energi dari lemak jenuh 0 kkal, *Lemak total 0 g (0%  |
+ | AKG)*, *Lemak jenuh 0 g (0% AKG)*, *Protein 0 g (0% AKG)*, *Karbohidrat total 3 |
+ | g (1% AKG)*, *Gula 1 g*, *Garam (Natrium) 0 mg (0% AKG)*. /Persen AKG           |
+ | berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih     |
+ | tinggi atau lebih rendah./                                                      |
+ `---------------------------------------------------------------------------------'
+
+=head2 The same example in vertical HTML table format
 
  % bpom-tampilkan-ing --carbohydrate 13.113 --fat 0.223 --output-format vertical_html_table --package-size 20 --protein 0.99 --saturated-fat 0.01 --serving-size 175 --sodium 0.223 --sugar 7.173
  
  <style>
-   table.vertical_html_table { border-collapse: collapse; border: 1px solid; }
-   tr.vertical_html_table.has_bottom_border { border-bottom: 1pt solid black; }
-   // td:first-child { background: red; }
+   table.vertical_html_table { border-collapse: collapse; border: solid 1pt black; }
+   table.vertical_html_table tr.has_bottom_border { border-bottom: solid 1pt black; }
  </style>
  <table class="vertical_html_table"><colgroup><col style="width:16pt;"><col style="width:200pt;"><col style="width:48pt;"><col style="width:48pt;"><col style="width:36pt;"></colgroup>
  <tr><td colspan=5 align="middle"><b>INFORMASI NILAI GIZI</b></td></tr>
  <tbody>
  <tr><td colspan=5></td></tr>
  <tr><td colspan=5 align="left"><b>JUMLAH PER KEMASAN (20 g)</b></td></tr>
- <tr><td colspan=5><b>JUMLAH PER KEMASAN (20 g</b>)</td></tr>
  <tr class=has_bottom_border><td colspan=5><b>Energi total 10 kkal</b></td></tr>
  <tr><td colspan=3></td><td colspan=2 align="middle"><b>% AKG</b>*</td></tr>
  <tr><td colspan=2><b>Lemak total</b></td><td align="right"><b>0 g</b></td><td align="right">0 %</td><td></td></tr>
@@ -430,7 +448,6 @@ String. Specify additional command-line options.
  |                                               *INFORMASI NILAI GIZI*                                                |
  |                                                                                                                     |
  | *JUMLAH PER KEMASAN (20 g)*                                                                                         |
- | *JUMLAH PER KEMASAN (20 g*)                                                                                         |
  | *Energi total 10 kkal*                                                                                              |
  +-----------------------|----------------------|-----------------------+----------------------|-----------------------+
  |                                                                      |                   *% AKG**                   |
@@ -443,6 +460,73 @@ String. Specify additional command-line options.
  +-----------------------|----------------------+-----------------------+----------------------+-----------------------+
  | /*Persen AKG berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih tinggi atau lebih rendah./ |
  `---------------------------------------------------------------------------------------------------------------------'
+
+=head2 The same example, in calculation text format
+
+ % bpom-tampilkan-ing --carbohydrate 13.113 --color never --fat 0.223 --output-format calculation_text --package-size 20 --protein 0.99 --saturated-fat 0.01 --serving-size 175 --sodium 0.223 --sugar 7.173
+ .-------------------------------------------------------------------------------------------------------------------------------------------------------------------------.
+ |                                                                   *PERHITUNGAN INFORMASI NILAI GIZI*                                                                    |
+ |                                                                             *Energi total*                                                                              |
+ |                                                  Energi total per 100 g | = lemak × 9 + protein × 4 + karbohidrat × 4 = 0.223 × 9 + 0.99 × 4 + 13.113 × 4 = 58.419 kkal |
+ |                                           Energi total per kemasan 20 g | = 58.419 × 20 / 100 = 11.6838 kkal                                                            |
+ | (dibulatkan: <5 -> 0, <=50 -> 5 kkal terdekat, >50 -> 10 kkal terdekat) | = *10* kkal                                                                                   |
+ |                                                                         |                                                                                               |
+ |                                                                           *%AKG energi total*                                                                           |
+ |                                                                    %AKG | = 11.6838 / 2150 × 100 = 0.543432558139535                                                    |
+ |                                              (dibulatkan ke % terdekat) | = *1*                                                                                         |
+ |                                                                           *Energi dari lemak*                                                                           |
+ |                                             Energi dari lemak per 100 g | = lemak × 9 = 0.223 × 9 = 2.007 kkal                                                          |
+ |                                      Energi dari lemak per kemasan 20 g | = 2.007 × 20 / 100 = 3.51225 kkal                                                             |
+ | (dibulatkan: <5 -> 0, <=50 -> 5 kkal terdekat, >50 -> 10 kkal terdekat) | = *0* kkal                                                                                    |
+ |                                                                        *Energi dari lemak jenuh*                                                                        |
+ |                                             Energi dari lemak per 100 g | = lemak jenuh × 9 = 0.01 × 9 = 0.09 kkal                                                      |
+ |                                Energi dari lemak jenuh per kemasan 20 g | = 0.09 × 20 / 100 = 0.018 kkal                                                                |
+ | (dibulatkan: <5 -> 0, <=50 -> 5 kkal terdekat, >50 -> 10 kkal terdekat) | = *0* kkal                                                                                    |
+ |                                                                              *Lemak total*                                                                              |
+ |                                                   Lemak total per 100 g | = 0.223 g                                                                                     |
+ |                                            Lemak total per kemasan 20 g | = 0.223 × 20 / 100 = 0.0446 g                                                                 |
+ |     (dibulatkan: <0.5 -> 0, <=5 -> 0.5 g terdekat, >=5 -> 1 g terdekat) | = *0* g                                                                                       |
+ |                                                                         |                                                                                               |
+ |                                                                           *%AKG lemak total*                                                                            |
+ |                                                                    %AKG | = 0.0446 / 67 × 100 = 0.0665671641791045                                                      |
+ |                                              (dibulatkan ke % terdekat) | = *0*                                                                                         |
+ |                                                                              *Lemak jenuh*                                                                              |
+ |                                                   Lemak jenuh per 100 g | = 0.01 g                                                                                      |
+ |                                            Lemak jenuh per kemasan 20 g | = 0.01 × 20 / 100 = 0.002 g                                                                   |
+ |     (dibulatkan: <0.5 -> 0, <=5 -> 0.5 g terdekat, >=5 -> 1 g terdekat) | = *0* g                                                                                       |
+ |                                                                         |                                                                                               |
+ |                                                                           *%AKG lemak jenuh*                                                                            |
+ |                                                                    %AKG | = 0.002 / 67 × 100 = 0.01                                                                     |
+ |                                              (dibulatkan ke % terdekat) | = *0*                                                                                         |
+ |                                                                                *Protein*                                                                                |
+ |                                                       Protein per 100 g | = 0.99 g                                                                                      |
+ |                                          Protein total per kemasan 20 g | = 0.99 × 20 / 100 = 0.198 g                                                                   |
+ |                          (dibulatkan: <0.5 -> 0, >=0.5 -> 1 g terdekat) | = *0* g                                                                                       |
+ |                                                                         |                                                                                               |
+ |                                                                             *%AKG protein*                                                                              |
+ |                                                                    %AKG | = 0.198 / 60 × 100 = 0.33                                                                     |
+ |                                              (dibulatkan ke % terdekat) | = *0*                                                                                         |
+ |                                                                           *Karbohidrat total*                                                                           |
+ |                                             Karbohidrat total per 100 g | = 13.113 g                                                                                    |
+ |                                      Karbohidrat total per kemasan 20 g | = 13.113 × 20 / 100 = 2.6226 g                                                                |
+ |                          (dibulatkan: <0.5 -> 0, >=0.5 -> 1 g terdekat) | = *3* g                                                                                       |
+ |                                                                         |                                                                                               |
+ |                                                                        *%AKG karbohidrat total*                                                                         |
+ |                                                                    %AKG | = 2.6226 / 325 × 100 = 0.0665671641791045                                                     |
+ |                                              (dibulatkan ke % terdekat) | = *1*                                                                                         |
+ |                                                                                 *Gula*                                                                                  |
+ |                                                          Gula per 100 g | = 7.173 g                                                                                     |
+ |                                                   Gula per kemasan 20 g | = 7.173 × 20 / 100 = 1.4346 g                                                                 |
+ |                          (dibulatkan: <0.5 -> 0, >=0.5 -> 1 g terdekat) | = *1* g                                                                                       |
+ |                                                                                *Natrium*                                                                                |
+ |                                                       Natrium per 100 g | = 0.223 mg                                                                                    |
+ |                                                Natrium per kemasan 20 g | = 0.223 × 20 / 100 = 0.0446 mg                                                                |
+ |   (dibulatkan: <5 -> 0, <=140 -> 5 mg terdekat, >140 -> 10 mg terdekat) | = *0* mg                                                                                      |
+ |                                                                         |                                                                                               |
+ |                                                                             *%AKG natrium*                                                                              |
+ |                                                                    %AKG | = 0.0446 / 1500 × 100 = 0.00297333333333333                                                   |
+ |                                              (dibulatkan ke % terdekat) | = *0*                                                                                         |
+ `-------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------'
 
 =head1 HOMEPAGE
 

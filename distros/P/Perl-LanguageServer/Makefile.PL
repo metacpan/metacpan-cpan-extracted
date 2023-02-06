@@ -1,4 +1,4 @@
-use v5.18;
+use v5.16;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -48,7 +48,7 @@ WriteMakefile(
         },
     },
     PL_FILES         => {},
-    MIN_PERL_VERSION => '5.014',
+    MIN_PERL_VERSION => '5.016',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },

@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-02'; # DATE
+our $DATE = '2023-02-03'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.005'; # VERSION
+our $VERSION = '1.007'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_select_fields/csv_select_fields",
@@ -41,7 +41,7 @@ csv-select-fields - Only output selected field(s)
 
 =head1 VERSION
 
-This document describes version 1.005 of csv-select-fields (from Perl distribution App-CSVUtils), released on 2023-02-02.
+This document describes version 1.007 of csv-select-fields (from Perl distribution App-CSVUtils), released on 2023-02-03.
 
 =head1 SYNOPSIS
 
@@ -125,17 +125,17 @@ Field names to include, takes precedence over --exclude-field-pat (JSON-encoded)
 
 See C<--include-field>.
 
-=item B<-a>
-
-Shortcut for --field-pat=.*, effectively selecting all fields.
-
-See C<--include-field-pat>.
-
 =item B<-A>
 
 Shortcut for --exclude-field-pat=.*, effectively excluding all fields.
 
 See C<--exclude-field-pat>.
+
+=item B<-a>
+
+Shortcut for --field-pat=.*, effectively selecting all fields.
+
+See C<--include-field-pat>.
 
 =back
 

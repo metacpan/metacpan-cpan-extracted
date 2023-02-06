@@ -1,8 +1,6 @@
 #
 # (c) Jan Gehring <jan.gehring@gmail.com>
 #
-# vim: set ts=2 sw=2 tw=0:
-# vim: set expandtab:
 
 package Rex::Output;
 
@@ -18,7 +16,7 @@ END   { IPC::Shareable->clean_up_all; }
 
 use base 'Rex::Output::Base';
 
-our $VERSION = '1.13.4'; # VERSION
+our $VERSION = '1.14.0'; # VERSION
 
 sub get {
   my ( $class, $output_module ) = @_;

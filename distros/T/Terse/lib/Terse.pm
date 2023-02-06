@@ -1,8 +1,9 @@
 package Terse;
-our $VERSION = '0.121';
+our $VERSION = '0.1234';
 use 5.006;
 use strict;
 use warnings;
+no warnings 'redefine';
 use Plack::Request;
 use Plack::Response;
 use JSON;
@@ -23,7 +24,9 @@ BEGIN {
 
 sub new {
 	my ($pkg, %args) = @_;
-       
+	
+	$pkg = ref $pkg if ref $pkg;
+ 
 	if (delete $args{private}) {
 		for my $key (keys %args) {
 			if ($key !~ m/^_/) {
@@ -33,6 +36,186 @@ sub new {
 	} 
 
 	return bless \%args, $pkg;
+}
+
+sub run {
+	my ($pkg, %args) = @_;
+
+	my $j = $pkg->new(
+		private => 1,
+		login => 'login',
+		logout => 'logout',
+		auth => 'auth',
+		insecure_session => 0,
+		content_type => 'application/json',
+		request_class => 'Plack::Request',
+		websocket_class => 'Terse::WebSocket',
+		sock => 'psgix.io',
+		stream_check => 'psgi.streaming',
+		%args
+	);
+
+	$j->_build_terse();
+	
+	$j->request = $j->{_request_class}->new($args{plack_env});
+	$j->response = $pkg->new(
+		authenticated => \0,
+		error => \0,
+		errors => [],
+	);
+
+	my $content_type = $j->request->content_type;
+	if ($content_type && $content_type =~ m/application\/json/) {
+		$j->graft('params', $j->request->raw_body || "{}");
+	} else {
+		$j->params = {%{$j->request->parameters || {}}};
+	}
+
+	unless ((reftype($j->params) || "") eq 'HASH') {
+		$j->response->raiseError('Invalid parameters', 400);
+		return $j->_response($j->response);
+	}
+	
+	$j->sid = $j->request->cookies->{sid};
+	
+	unless ($j->sid) {
+		my $h = Digest::SHA->new(256);
+		my @us = gettimeofday;
+		push @us, map { $j->request->env->{$_} } grep {
+			$_ =~ /^HTTP(?:_|$)/;
+		} keys %{ $j->request->env };
+		$h->add(@us);
+		$j->sid = $h->hexdigest;
+	}
+
+	$j->sid = {
+		value => $j->is_logout ? "" : $j->sid,
+		path  => $j->request->uri,
+		secure => !$j->{_insecure_session},
+	};
+
+	my $auth = $j->{_auth};
+	
+	my ($session) = $j->_dispatch($auth, $pkg->new());
+	
+	my $req = $j->params->req;
+	$req =~ /^([a-z][0-9a-zA-Z_]{1,31})$/ && do { $req = $1 // '' } if $req;
+	$req = $j->{_application}->preprocess_req($req, $j) if $j->{_application}->can('preprocess_req');
+	if (!$req || !$session || $PRIVATE{$req}) {
+		$j->response->raiseError('Invalid request', 400);
+		return $j->_response($j->response);
+	}
+
+	$j->req = $req;
+	$j->response->authenticated = \1;
+	$j->session = $session;
+
+	$j->sid->expires = (ref $j->session && $j->session->expires) || (time + 24 * 60 * 60) 
+		if (!$j->sid->expires);
+
+	($j->is_login, $j->is_logout) = (
+		$j->{_login} eq $req,
+		$j->{_logout} eq $req
+	);
+
+	my ($out) = $j->_dispatch($req); 
+	
+	return $j->_response($j->response) if $j->response->error;
+
+	$j->session = $out if ( $j->is_login || $j->is_logout );
+
+	($j->session) = $j->_dispatch($auth, $j->session)  if $j->response->authenticated;
+
+	if ((!$j->response->authenticated || !$j->session) && !($j->is_login || $j->is_logout)) {
+		$j->response->raiseError('Unauthenticated during the request', 400);
+		return $j->_response($j->response);
+	}
+	
+	return $j->_response($j->response, $j->sid, $j->content_type);
+}
+
+sub to_app {
+	my ($self, $new, $run) = @_;
+	my $app = $self->new($new ? %{ $new } : ());
+	return sub {
+		my ($env) = (shift);
+		Terse->run(
+			plack_env => $env,
+			application => $app,
+			($env->{'psgix.logger'} ? (logger => $env->{'psgix.logger'}) : ()),
+		);
+	};
+};
+ 
+sub logger {
+	my ($self, $logger) = @_;
+	$self->{_logger} = $logger if ($logger);
+	return $self->{_logger};
+}
+
+sub logError {
+	my ($self, $message, $status, $no_response) = @_;
+	$self->{_application} 
+		? $self->response->raiseError($message, $status) 
+		: $self->raiseError($message, $status);
+	$message = { message => $message } if (!ref $message);
+	$message = $self->{_application}->_logError($message, $status)
+		if ($self->{_application} && $self->{_application}->can('_logError'));
+	ref $self->{_logger} eq 'CODE' 
+		? $self->{_logger}->('error', $message) 
+		: $self->{_logger}->error($message) 
+	if $self->{_logger};
+	$self->response->no_response = 1 if $no_response;
+	return $self;
+}
+
+sub logInfo {
+	my ($self, $message) = @_;
+	$message = { message => $message } if (!ref $message);
+	$message = $self->{_application}->_logInfo($message)
+		if ($self->{_application} && $self->{_application}->can('_logInfo'));
+	ref $self->{_logger} eq 'CODE' 
+		? $self->{_logger}->('info', $message) 
+		: $self->{_logger}->info($message) 
+	if $self->{_logger};
+	return $self;
+}
+
+sub raiseError {
+	my ($self, $message, $code) = @_;
+	return $self->response->raiseError($message, $code) if $self->{_application};
+	$self->{error} = \1;
+	if ((reftype($message) || '') eq 'ARRAY') {
+		push @{$self->{errors}}, @{$message};
+	} else {
+		push @{$self->{errors}}, $message;
+	}
+	$self->{status_code} = $code if ($code);
+	return $self;
+}
+
+sub graft {
+	my ($self, $name, $json) = @_;
+
+	$self->{$name} = eval {
+		$JSON->decode($json);
+	};
+
+	return 0 if $@;
+
+	return $self->_bless_tree($self->{$name});
+}
+
+sub pretty { $_[0]->{_pretty} = 1; $_[0]; }
+
+sub serialize {
+	my ($self, $die) = @_;
+	my $pretty = !!(reftype $self eq 'HASH' && $self->{_pretty});
+	my $out = eval {
+		$JSON->pretty($pretty)->encode($self);
+	};
+	die $@ if ($@ && $die);
+	return $out || $@;
 }
 
 sub _build_terse {
@@ -137,193 +320,16 @@ sub _build_terse {
 	return $t;
 }
 
-sub run {
-	my ($pkg, %args) = @_;
-
-	my $j = $pkg->new(
-		private => 1,
-		login => 'login',
-		logout => 'logout',
-		auth => 'auth',
-		insecure_session => 0,
-		content_type => 'application/json',
-		request_class => 'Plack::Request',
-		websocket_class => 'Terse::WebSocket',
-		sock => 'psgix.io',
-		stream_check => 'psgi.streaming',
-		%args
-	);
-
-	$j->_build_terse();
-
-	$j->request = $j->{_request_class}->new($args{plack_env});
-	$j->response = $pkg->new(
-		authenticated => \0,
-		error => \0,
-		errors => [],
-	);
-
-	my $content_type = $j->request->content_type;
-	if ($content_type && $content_type =~ m/application\/json/) {
-		$j->graft('params', $j->request->raw_body || "{}");
-	} else {
-		$j->params = {%{$j->request->parameters || {}}};
-	}
-
-	unless ((reftype($j->params) || "") eq 'HASH') {
-		$j->response->raiseError('Invalid parameters', 400);
-		return $j->_response($j->response);
-	}
-
-	$j->sid = $j->request->cookies->{sid};
-	
-	unless ($j->sid) {
-		my $h = Digest::SHA->new(256);
-		my @us = gettimeofday;
-		push @us, map { $j->request->env->{$_} } grep {
-			$_ =~ /^HTTP(?:_|$)/;
-		} keys %{ $j->request->env };
-		$h->add(@us);
-		$j->sid = $h->hexdigest;
-	}
-
-	$j->sid = {
-		value => $j->is_logout ? "" : $j->sid,
-		path  => $j->request->uri,
-		secure => !$j->{_insecure_session},
-	};
-
-	my $auth = $j->{_auth};
-	my ($session) = $j->_dispatch($auth, $pkg->new());
-	my $req = $j->params->req;
-	$req =~ /^([a-z][0-9a-zA-Z_]{1,31})$/; $req = $1 // '';
-	$req = $j->{_application}->preprocess_req($req, $j) if $j->{_application}->can('preprocess_req');
-	if (!$req || !$session || $PRIVATE{$req}) {
-		$j->response->raiseError('Invalid request', 400);
-		return $j->_response($j->response);
-	}
-
-	$j->req = $req;
-	$j->response->authenticated = \1;
-	$j->session = $session;
-
-	$j->sid->expires = (ref $j->session && $j->session->expires) || (time + 24 * 60 * 60) 
-		if (!$j->sid->expires);
-
-	($j->is_login, $j->is_logout) = (
-		$j->{_login} eq $req,
-		$j->{_logout} eq $req
-	);
-
-	my ($out) = $j->_dispatch($req); 
-	
-	return $j->_response($j->response) if $j->response->error;
-
-	$j->session = $out if ( $j->is_login || $j->is_logout );
-
-	($j->session) = $j->_dispatch($auth, $j, $j->session)  if $j->response->authenticated;
-
-	if ((!$j->response->authenticated || !$j->session) && !($j->is_login || $j->is_logout)) {
-		$j->response->raiseError('Unauthenticated during the request', 400);
-		return $j->_response($j->response);
-	}
-
-	return $j->_response($j->response, $j->sid, $j->content_type);
-}
-
-sub to_app {
-	my ($self, $new, $run) = @_;
-	my $app = $self->new($new ? %{ $new } : ());
-	return sub {
-		my ($env) = (shift);
-		Terse->run(
-			plack_env => $env,
-			application => $app,
-			($env->{'psgix.logger'} ? (logger => $env->{'psgix.logger'}) : ()),
-		);
-	};
-};
- 
-sub logger {
-	my ($self, $logger) = @_;
-	$self->{_logger} = $logger if ($logger);
-	return $self->{_logger};
-}
-
-sub logError {
-	my ($self, $message, $status, $no_response) = @_;
-	$self->{_application} 
-		? $self->response->raiseError($message, $status) 
-		: $self->raiseError($message, $status);
-	$message = { message => $message } if (!ref $message);
-	$message = $self->{_application}->_logError($message, $status)
-		if ($self->{_application} && $self->{_application}->can('_logError'));
-	ref $self->{_logger} eq 'CODE' 
-		? $self->{_logger}->('error', $message) 
-		: $self->{_logger}->error($message) 
-	if $self->{_logger};
-	$self->response->no_response = 1 if $no_response;
-	return $self;
-}
-
-sub logInfo {
-	my ($self, $message) = @_;
-	$message = { message => $message } if (!ref $message);
-	$message = $self->{_application}->_logInfo($message)
-		if ($self->{_application} && $self->{_application}->can('_logInfo'));
-	ref $self->{_logger} eq 'CODE' 
-		? $self->{_logger}->('info', $message) 
-		: $self->{_logger}->info($message) 
-	if $self->{_logger};
-	return $self;
-}
-
-sub raiseError {
-	my ($self, $message, $code) = @_;
-	return $self->response->raiseError($message, $code) if $self->{_application};
-	$self->{error} = \1;
-	if ((reftype($message) || '') eq 'ARRAY') {
-		push @{$self->{errors}}, @{$message};
-	} else {
-		push @{$self->{errors}}, $message;
-	}
-	$self->{status_code} = $code if ($code);
-	return $self;
-}
-
-sub graft {
-	my ($self, $name, $json) = @_;
-
-	$self->{$name} = eval {
-		$JSON->decode($json);
-	};
-
-	return 0 if $@;
-
-	return $self->_bless_tree($self->{$name});
-}
-
-sub pretty { $_[0]->{_pretty} = 1; $_[0]; }
-
-sub serialize {
-	my ($self, $die) = @_;
-	my $pretty = !!(reftype $self eq 'HASH' && $self->{_pretty});
-	my $out = eval {
-		$JSON->pretty($pretty)->encode($self);
-	};
-	die $@ if ($@ && $die);
-	return $out || $@;
-}
-
 sub _bless_tree {
 	my ($self, $node) = @_;
 	my $refnode = ref $node;
 	return unless $refnode eq 'HASH' || $refnode eq 'ARRAY';
-	bless $node, ref $self;
 	if ($refnode eq 'HASH'){
+		bless $node, $node->{_inherit} ? ref $self : __PACKAGE__;
 		$self->_bless_tree($node->{$_}) for keys %$node;
 	}
 	if ($refnode eq 'ARRAY'){
+		bless $node, ref $self;
 		$self->_bless_tree($_) for @$node;
 	}
 	$node;
@@ -348,13 +354,14 @@ sub DESTROY {}
 
 sub AUTOLOAD : lvalue {
 	my $classname =  ref $_[0];
-	my $validname = '[_a-zA-Z][a-zA-Z0-9_]*';
+	my $validname = '[_a-zA-Z][\:a-zA-Z0-9_]*';
 	our $AUTOLOAD =~ /^${classname}::($validname)$/;
 	my $key = $1;
 	die "illegal key name, must be of $validname form\n$AUTOLOAD" unless $key;
 	my $miss = Want::want('REF OBJECT') ? {} : '';
 	my $retval = $_[0]->{$key};
 	return $retval->(@_) if (ref $retval eq 'CODE');
+	die "illegal use of AUTOLOAD $classname -> $key - too many arguments" if (scalar @_ > 2);
 	my $isBool = Want::want('SCALAR BOOL') && ((reftype($retval) // '') eq 'SCALAR');
 	return $$retval if $isBool;
 	$_[0]->{$key} = $_[1] // $retval // $miss;
@@ -372,7 +379,7 @@ Terse - Lightweight Web Framework
 
 =head1 VERSION
 
-Version 0.121
+Version 0.1234
 
 =cut
 

@@ -3,7 +3,7 @@ abstract: 'format terminal output using C<String::Tagged>'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
-  Test::More: '0.88'
+  Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
@@ -16,10 +16,10 @@ name: String-Tagged-Terminal
 provides:
   String::Tagged::Terminal:
     file: lib/String/Tagged/Terminal.pm
-    version: '0.05'
+    version: '0.06'
   String::Tagged::Terminal::Win32Console:
     file: lib/String/Tagged/Terminal/Win32Console.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   Convert::Color: '0'
   Convert::Color::XTerm: '0'
@@ -28,5 +28,5 @@ requires:
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

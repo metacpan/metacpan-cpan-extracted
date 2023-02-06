@@ -1,6 +1,6 @@
 # ABSTRACT: encapsulation of Dancer2 packages
 package Dancer2::Core::App;
-$Dancer2::Core::App::VERSION = '0.400000';
+$Dancer2::Core::App::VERSION = '0.400001';
 use Moo;
 use Carp               qw<croak carp>;
 use Scalar::Util       'blessed';
@@ -8,7 +8,7 @@ use Module::Runtime    'is_module_name';
 use Safe::Isa;
 use Sub::Quote;
 use File::Spec;
-use Module::Runtime    'use_module';
+use Module::Runtime    qw< require_module use_module >;
 use List::Util         ();
 use Ref::Util          qw< is_ref is_globref is_scalarref >;
 
@@ -884,6 +884,19 @@ sub template {
         and $self->setup_session;
 
     # return content
+    if ($self->has_with_return) {
+        my $old_with_return = $self->with_return;
+        my $local_response;
+        $self->set_with_return( sub {
+            $local_response ||= shift;
+        });
+        my $content = $template->process( @_ );
+        $self->set_with_return($old_with_return);
+        if ($local_response) {
+            $self->with_return->($local_response);
+        }
+        return $content;
+    }
     return $template->process( @_ );
 }
 
@@ -1695,7 +1708,7 @@ Dancer2::Core::App - encapsulation of Dancer2 packages
 
 =head1 VERSION
 
-version 0.400000
+version 0.400001
 
 =head1 DESCRIPTION
 
@@ -1909,7 +1922,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Alexis Sukrieh.
+This software is copyright (c) 2023 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

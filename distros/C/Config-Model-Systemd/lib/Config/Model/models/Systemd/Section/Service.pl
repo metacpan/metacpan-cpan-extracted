@@ -95,7 +95,8 @@ C<oneshot> for long-running services.)",
 C<cgroup>:
 
 It is generally recommended to use C<ExitType>C<main> when a service has
-a known forking model and a main process can reliably be determined. C<ExitType>C<cgroup> is meant for applications whose forking model is not known ahead of time and which
+a known forking model and a main process can reliably be determined. C<ExitType>C<cgroup> is meant for applications
+whose forking model is not known ahead of time and which
 might not have a specific main process. It is well suited for transient or automatically generated services,
 such as graphical applications inside of a desktop environment.',
         'type' => 'leaf',
@@ -938,7 +939,8 @@ killed by the kernel\'s OOM killer this is logged but the service continues runn
 C<stop> the event is logged but the service is terminated cleanly by the service
 manager. If set to C<kill> and one of the service\'s processes is killed by the OOM
 killer the kernel is instructed to kill all remaining processes of the service too, by setting the
-C<memory.oom.group> attribute to C<1>; also see L<kernel documentation|https://docs.kernel.org/admin-guide/cgroup-v2.html>.
+C<memory.oom.group> attribute to C<1>; also see L<kernel
+documentation|https://docs.kernel.org/admin-guide/cgroup-v2.html>.
 
 Defaults to the setting C<DefaultOOMPolicy> in
 L<systemd-system.conf(5)>

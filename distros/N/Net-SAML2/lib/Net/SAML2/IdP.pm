@@ -1,7 +1,7 @@
 package Net::SAML2::IdP;
 use Moose;
 
-our $VERSION = '0.62'; # VERSION
+our $VERSION = '0.64'; # VERSION
 
 use MooseX::Types::URI qw/ Uri /;
 
@@ -13,6 +13,7 @@ use Crypt::OpenSSL::X509;
 use HTTP::Request::Common;
 use LWP::UserAgent;
 use XML::LibXML;
+use Try::Tiny;
 use Net::SAML2::XML::Util qw/ no_comments /;
 
 
@@ -30,6 +31,7 @@ has 'formats' => (
     default  => sub { {} }
 );
 has 'default_format' => (isa => 'Str', is => 'ro', required => 0);
+has 'debug' => (isa => 'Bool', is => 'ro', required => 0, default => 0);
 
 
 sub new_from_url {
@@ -126,6 +128,7 @@ sub new_from_xml {
         art_urls => $data->{Art} || {},
         certs    => \%certs,
         cacert   => $args{cacert},
+        debug    => $args{debug},
         $data->{DefaultFormat}
         ? (
             default_format => $data->{DefaultFormat},
@@ -177,18 +180,21 @@ around BUILDARGS => sub {
         my $ca = Crypt::OpenSSL::Verify->new($params{cacert}, { strict_certs => 0, });
 
         my %certificates;
+        my @errors;
         for my $use (keys %{$params{certs}}) {
             my $certs = $params{certs}{$use};
             for my $pem (@{$certs}) {
                 my $cert = Crypt::OpenSSL::X509->new_from_string($pem);
-                ## BUGBUG this is failing for valid things ...
-                eval { $ca->verify($cert) };
-                if ($@) {
-                    warn "Can't verify IdP cert: $@";
-                    next;
+                try {
+                    $ca->verify($cert);
+                    push(@{$certificates{$use}}, $pem);
                 }
-                push(@{$certificates{$use}}, $pem);
+                catch { push (@errors, $_); };
             }
+        }
+
+        if ( $params{debug} && @errors ) {
+            warn "Can't verify IdP cert(s): " . join(", ", @errors);
         }
 
         $params{certs} = \%certificates;
@@ -266,7 +272,7 @@ Net::SAML2::IdP - Net::SAML2::IdP - SAML Identity Provider object
 
 =head1 VERSION
 
-version 0.62
+version 0.64
 
 =head1 SYNOPSIS
 
@@ -348,13 +354,23 @@ the one listed first by the IdP.
 
 If no NameID formats were advertised by the IdP, returns undef.
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Chris Andrews  <chrisa@cpan.org>
 
+=item *
+
+Timothy Legge <timlegge@gmail.com>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Chris Andrews and Others, see the git log.
+This software is copyright (c) 2023 by Venda Ltd, see the CONTRIBUTORS file for others.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

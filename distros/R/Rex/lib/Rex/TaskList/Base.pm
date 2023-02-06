@@ -1,8 +1,6 @@
 #
 # (c) Jan Gehring <jan.gehring@gmail.com>
 #
-# vim: set ts=2 sw=2 tw=0:
-# vim: set expandtab:
 
 package Rex::TaskList::Base;
 
@@ -10,7 +8,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.4'; # VERSION
+our $VERSION = '1.14.0'; # VERSION
 
 BEGIN {
   use Rex::Shared::Var;
@@ -26,7 +24,7 @@ use Rex::Fork::Manager;
 use Rex::Report;
 use Rex::Group;
 use Time::HiRes qw(time);
-use POSIX qw(floor);
+use POSIX       qw(floor);
 
 sub new {
   my $that  = shift;

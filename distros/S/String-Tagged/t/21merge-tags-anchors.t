@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use String::Tagged;
 
@@ -18,7 +18,7 @@ $str->merge_tags( sub { $_[1] == $_[2] } );
 
 undef @tags;
 $str->iter_tags( sub { push @tags, [ @_ ] } );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [ 0, 12, message => 1 ],
            ],
@@ -28,7 +28,7 @@ $str->insert( 0, "<<" );
 
 undef @tags;
 $str->iter_tags( sub { push @tags, [ @_ ] } );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [ 0, 14, message => 1 ],
            ],
@@ -38,7 +38,7 @@ $str->append( ">>" );
 
 undef @tags;
 $str->iter_tags( sub { push @tags, [ @_ ] } );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [ 0, 16, message => 1 ],
            ],

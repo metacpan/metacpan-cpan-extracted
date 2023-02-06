@@ -125,5 +125,7 @@ lib/Devel/AssertOS/MacOSX/v12.pm
 lib/Devel/AssertOS/HWCapabilities/Int64.pm
 t/int-size.t
 lib/Devel/AssertOS/HWCapabilities/Int32.pm
+lib/Devel/AssertOS/MacOSX/v13.pm
+lib/Devel/AssertOS/OSFeatures/Systemd.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

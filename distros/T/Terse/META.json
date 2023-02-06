@@ -38,6 +38,7 @@
             "Plack::Request" : "0",
             "Plack::Response" : "0",
             "Scalar::Util" : "0",
+            "Test::Instruction" : "0",
             "Time::HiRes" : "0",
             "Want" : "0",
             "perl" : "5.006"
@@ -50,6 +51,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.121",
+   "version" : "0.1234",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

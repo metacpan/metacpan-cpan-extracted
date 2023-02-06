@@ -1,5 +1,39 @@
 Revision history for Net-IMAP-Client
 
+0.9507  Apr 22, 2016
+
+        - avoid uninitialized warning (fixes RT#98616)
+        - avoid null args in search (fixes RT#113816)
+        - DESTROY() preserves $@
+        - add missing whatis entry (fixes RT#97513)
+
+0.9506  July 23, 2014
+
+        - check for Red Hat certs directory location
+
+0.9505  July 23, 2014
+
+        - check for existence of SSL cert directory and throw exception if it is not found
+
+0.9504  Jan 19, 2014
+
+        - don't quote $charset var (fixes RT#77372, Broken SORT)
+
+0.9503  Jan 18, 2014
+
+        - search command discards in-progress messages (fixes RT#84623)
+        - add 'ssl_options' argument (fixes RT#84309)
+
+0.9502  Jan 18, 2014
+
+        - fix Net::Socket::SSL deprecated call warning by add some constructor arguments
+
+0.9501  Aug 7, 2011
+
+        - search() method: Don't quote UID criteria (fixes RT#46245)
+        - fix synopsis: search() method returns array reference (fixes RT #69464)
+
+
 0.95    Apr 9, 2011
 
         - fix #48163 error after logout

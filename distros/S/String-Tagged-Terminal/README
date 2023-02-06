@@ -4,13 +4,13 @@ NAME
 
 SYNOPSIS
 
-     use String::Tagged::Terminal;
+       use String::Tagged::Terminal;
     
-     my $st = String::Tagged::Terminal->new
-        ->append( "Hello my name is " )
-        ->append_tagged( $name, bold => 1, fgindex => 4 );
+       my $st = String::Tagged::Terminal->new
+          ->append( "Hello my name is " )
+          ->append_tagged( $name, bold => 1, fgindex => 4 );
     
-     $st->say_to_terminal;
+       $st->say_to_terminal;
 
 DESCRIPTION
 
@@ -47,6 +47,17 @@ TAGS
     random colours:
 
        $st->append_tagged( "text", fgindex => 1 + rand 6 );
+
+ sizepos
+
+    (experimental)
+
+    This tag takes a value indicating an adjustment to the vertical
+    positioning, and possibly also size, in order to create subscript or
+    superscript effects.
+
+    Recognised values are sub for subscript, and super for superscript.
+    These are implemented using the mintty-style CSI 73/74/75 m codes.
 
 CONSTRUCTORS
 

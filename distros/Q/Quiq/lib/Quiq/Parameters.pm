@@ -21,7 +21,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.206';
+our $VERSION = '1.207';
 
 use Quiq::Converter;
 use Quiq::Hash;
@@ -481,7 +481,7 @@ sub extractToObject {
 
 =head1 VERSION
 
-1.206
+1.207
 
 =head1 AUTHOR
 
@@ -489,7 +489,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2022 Frank Seitz
+Copyright (C) 2023 Frank Seitz
 
 =head1 LICENSE
 

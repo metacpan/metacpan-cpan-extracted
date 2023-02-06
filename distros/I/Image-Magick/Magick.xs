@@ -23,7 +23,7 @@
 %                             February 1997                                   %
 %                                                                             %
 %                                                                             %
-%  Copyright 1999-2020 ImageMagick Studio LLC, a non-profit organization      %
+%  Copyright @ 1999 ImageMagick Studio LLC, a non-profit organization         %
 %  dedicated to making software imaging solutions freely available.           %
 %                                                                             %
 %  You may not use this file except in compliance with the License.  You may  %
@@ -75,7 +75,7 @@ extern "C" {
 #define DegreesToRadians(x)  (MagickPI*(x)/180.0)
 #define EndOf(array)  (&array[NumberOf(array)])
 #define MagickPI  3.14159265358979323846264338327950288419716939937510
-#define MaxArguments  34
+#define MaxArguments  35
 #ifndef na
 #define na  PL_na
 #endif
@@ -289,7 +289,8 @@ static struct
       {"interline-spacing", RealReference},
       {"interword-spacing", RealReference},
       {"direction", MagickDirectionOptions},
-      {"decorate", MagickDecorateOptions} } },
+      {"decorate", MagickDecorateOptions},
+      {"word-break", MagickWordBreakOptions} } },
     { "ColorFloodfill", { {"geometry", StringReference},
       {"x", IntegerReference}, {"y", IntegerReference},
       {"fill", StringReference}, {"bordercolor", StringReference},
@@ -324,7 +325,8 @@ static struct
       {"vector-graphics", StringReference}, {"kerning", RealReference},
       {"interline-spacing", RealReference},
       {"interword-spacing", RealReference},
-      {"direction", MagickDirectionOptions} } },
+      {"direction", MagickDirectionOptions},
+      {"word-break", MagickWordBreakOptions} } },
     { "Equalize", { {"channel", MagickChannelOptions} } },
     { "Gamma", { {"gamma", StringReference}, {"channel", MagickChannelOptions},
       {"red", RealReference}, {"green", RealReference},
@@ -585,6 +587,7 @@ static struct
       {"intensity-sigma", RealReference}, {"spatial-sigma", RealReference},
       {"channel", MagickChannelOptions} } },
     { "SortPixels", { { (const char *) NULL, NullReference } } },
+    { "Integral", { { (const char *) NULL, NullReference } } },
   };
 
 static SplayTreeInfo
@@ -1082,9 +1085,9 @@ static double SiPrefixToDoubleInterval(const char *string,const double interval)
   return(value);
 }
 
-static inline double StringToDouble(const char *string,char **sentinal)
+static inline double StringToDouble(const char *string,char **sentinel)
 {
-  return(InterpretLocaleValue(string,sentinal));
+  return(InterpretLocaleValue(string,sentinel));
 }
 
 static double StringToDoubleInterval(const char *string,const double interval)
@@ -7695,6 +7698,8 @@ Mogrify(ref,...)
     BilateralBlurImage = 306
     SortPixels         = 307
     SortPixelsImage    = 308
+    Integral           = 309
+    IntegralImage      = 310
     MogrifyRegion      = 666
   PPCODE:
   {
@@ -8658,6 +8663,9 @@ Mogrify(ref,...)
           if (attribute_flag[33] != 0)
             draw_info->decorate=(DecorationType)
               argument_list[33].integer_reference;
+          if (attribute_flag[34] != 0)
+            draw_info->word_break=(WordBreakType)
+              argument_list[34].integer_reference;
           (void) AnnotateImage(image,draw_info,exception);
           draw_info=DestroyDrawInfo(draw_info);
           break;
@@ -8862,7 +8870,7 @@ Mogrify(ref,...)
               break;
             }
           /*
-            Parameter Handling used used ONLY for normal composition.
+            Parameter Handling used ONLY for normal composition.
           */
           if (attribute_flag[5] != 0) /* gravity */
             image->gravity=(GravityType) argument_list[5].integer_reference;
@@ -8891,6 +8899,9 @@ Mogrify(ref,...)
                   (void) CompositeImage(composite_image,
                     argument_list[10].image_reference,CopyGreenCompositeOp,
                     clip_to_self,0,0,exception);
+                  (void) SetImageColorspace(composite_image,sRGBColorspace,
+                    exception);
+
                 }
               else
                 {
@@ -9199,6 +9210,9 @@ Mogrify(ref,...)
           if (attribute_flag[32] != 0)
             draw_info->direction=(DirectionType)
               argument_list[32].integer_reference;
+          if (attribute_flag[33] != 0)
+            draw_info->word_break=(WordBreakType)
+              argument_list[33].integer_reference;
           (void) DrawImage(image,draw_info,exception);
           draw_info=DestroyDrawInfo(draw_info);
           break;
@@ -9514,7 +9528,7 @@ Mogrify(ref,...)
           TextureImage(image,argument_list[0].image_reference,exception);
           break;
         }
-        case 55:  /* Evalute */
+        case 55:  /* Evaluate */
         {
           MagickEvaluateOperator
             op;
@@ -10482,7 +10496,7 @@ Mogrify(ref,...)
           image=TransposeImage(image,exception);
           break;
         }
-        case 100:  /* Tranverse */
+        case 100:  /* Transverse */
         {
           image=TransverseImage(image,exception);
           break;
@@ -11631,6 +11645,11 @@ Mogrify(ref,...)
         case 154:  /* SortPixels */
         {
           (void) SortImagePixels(image,exception);
+          break;
+        }
+        case 155:  /* Integral */
+        {
+          image=IntegralImage(image,exception);
           break;
         }
       }

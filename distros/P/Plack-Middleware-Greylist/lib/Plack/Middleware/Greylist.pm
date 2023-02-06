@@ -5,9 +5,7 @@ package Plack::Middleware::Greylist;
 # RECOMMEND PREREQ: Cache::FastMmap
 # RECOMMEND PREREQ: Ref::Util::XS
 
-use v5.10;
-
-use strict;
+use v5.12;
 use warnings;
 
 use parent qw( Plack::Middleware );
@@ -21,7 +19,7 @@ use Plack::Util::Accessor qw/ default_rate rules cache file _match greylist retr
 use Ref::Util             qw/ is_plain_arrayref /;
 use Time::Seconds         qw/ ONE_MINUTE /;
 
-our $VERSION = 'v0.3.5';
+our $VERSION = 'v0.4.1';
 
 
 sub prepare_app {
@@ -167,7 +165,7 @@ Plack::Middleware::Greylist - throttle requests with different rates based on ne
 
 =head1 VERSION
 
-version v0.3.5
+version v0.4.1
 
 =head1 SYNOPSIS
 
@@ -290,6 +288,14 @@ This does not enforce consistent rates for named blocks. For example, if you spe
 
 Requests from both netblocks would be counted together, but requests from 10./16 netblock would be rejected after 60
 requests. This is probably not something that you want.
+
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.4.0, the this module requires Perl v5.12 or later.
+
+If you need this module on Perl v5.10, please use one of the v0.3.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
 
 =head1 SOURCE
 

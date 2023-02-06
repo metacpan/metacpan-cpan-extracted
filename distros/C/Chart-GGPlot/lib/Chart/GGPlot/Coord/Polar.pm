@@ -5,7 +5,7 @@ package Chart::GGPlot::Coord::Polar;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.002002'; # VERSION
+our $VERSION = '0.002003'; # VERSION
 
 use List::AllUtils;
 use PDL::Primitive qw(which);
@@ -180,7 +180,7 @@ Chart::GGPlot::Coord::Polar - The polar coordinate system
 
 =head1 VERSION
 
-version 0.002002
+version 0.002003
 
 =head1 DESCRIPTION
 

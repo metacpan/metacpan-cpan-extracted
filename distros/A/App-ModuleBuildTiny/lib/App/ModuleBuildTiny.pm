@@ -3,7 +3,7 @@ package App::ModuleBuildTiny;
 use 5.014;
 use strict;
 use warnings;
-our $VERSION = '0.031';
+our $VERSION = '0.033';
 
 use Exporter 5.57 'import';
 our @EXPORT = qw/modulebuildtiny/;
@@ -16,7 +16,7 @@ use ExtUtils::Manifest qw/manifind maniskip maniread/;
 use File::Basename qw/dirname/;
 use File::Path qw/mkpath/;
 use File::Slurper qw/write_text write_binary read_binary/;
-use File::Spec::Functions qw/catfile catdir rel2abs/;
+use File::Spec::Functions qw/catfile catdir curdir rel2abs/;
 use Getopt::Long 2.36 'GetOptionsFromArray';
 use JSON::PP qw/decode_json/;
 use Module::Runtime 'require_module';
@@ -124,8 +124,8 @@ my %actions = (
 		GetOptionsFromArray(\@arguments, \my %opts, qw/trial verbose!/) or return 2;
 		my $dist = App::ModuleBuildTiny::Dist->new(%opts);
 		die "Trial mismatch" if $opts{trial} && $dist->release_status ne 'testing';
-		$dist->checkchanges;
-		$dist->checkmeta;
+		$dist->check_changes;
+		$dist->check_meta;
 		my $name = $dist->meta->name . '-' . $dist->meta->version;
 		printf "tar czf $name.tar.gz %s\n", join ' ', $dist->files if $opts{verbose};
 		$dist->write_tarball($name);
@@ -144,17 +144,26 @@ my %actions = (
 		$AUTHOR_TESTING = 1;
 		GetOptionsFromArray(\@arguments, 'release!' => \$RELEASE_TESTING, 'author!' => \$AUTHOR_TESTING, 'automated!' => \$AUTOMATED_TESTING,
 			'extended!' => \$EXTENDED_TESTING, 'non-interactive!' => \$NONINTERACTIVE_TESTING) or return 2;
+		my @dirs = 't';
+		if ($AUTHOR_TESTING) {
+			push @dirs, catdir('xt', 'author');
+			push @dirs, glob 'xt/*.t';
+		}
+		push @dirs, catdir('xt', 'release') if $RELEASE_TESTING;
+		push @dirs, catdir('xt', 'extended') if $EXTENDED_TESTING;
+		@dirs = grep -e, @dirs;
 		my $dist = App::ModuleBuildTiny::Dist->new;
-		return $dist->run(command => [ $Config{perlpath}, 'Build', 'test' ], build => 1);
+		return $dist->run(command => [ 'prove', '-br', @dirs ], build => 1, verbose => 1);
 	},
 	upload => sub {
 		my @arguments = @_;
-		GetOptionsFromArray(\@arguments, \my %opts, qw/trial config=s silent/) or return 2;
+		GetOptionsFromArray(\@arguments, \my %opts, qw/trial config=s silent tag push:s/) or return 2;
 
 		my $dist = App::ModuleBuildTiny::Dist->new;
-		$dist->checkchanges;
-		$dist->checkmeta;
-		$dist->run(command => [ $Config{perlpath}, 'Build', 'test' ], build => 1) or return 1;
+		$dist->check_changes;
+		$dist->check_meta;
+		local ($AUTHOR_TESTING, $RELEASE_TESTING) = (1, 1);
+		$dist->run(command => [ catfile(curdir, 'Build'), 'test' ], build => 1, verbose => !$opts{silent}) or return 1;
 
 		my $sure = prompt('Do you want to continue the release process? y/n', 'n');
 		if (lc $sure eq 'y') {
@@ -166,6 +175,22 @@ my %actions = (
 			my $uploader = CPAN::Upload::Tiny->new_from_config_or_stdin($opts{config});
 			$uploader->upload_file($file);
 			print "Successfully uploaded $file\n" if not $opts{silent};
+
+			if ($opts{tag}) {
+				require Git::Wrapper;
+				my $git = Git::Wrapper->new('.');
+				my $version = 'v' . $dist->version;
+				$git->tag('-m' => $version, $version);
+			}
+
+			if (defined $opts{push}) {
+				require Git::Wrapper;
+				my $git = Git::Wrapper->new('.');
+
+				my @remote = length $opts{push} ? $opts{push} : ();
+				$git->push(@remote);
+				$git->push({ tags => 1 }, @remote) if $opts{tag};
+			}
 		}
 		return 0;
 	},
@@ -174,13 +199,13 @@ my %actions = (
 		die "No arguments given to run\n" if not @arguments;
 		GetOptionsFromArray(\@arguments, 'build!' => \(my $build = 1)) or return 2;
 		my $dist = App::ModuleBuildTiny::Dist->new();
-		return $dist->run(command => \@arguments, build => $build);
+		return $dist->run(command => \@arguments, build => $build, verbose => 1);
 	},
 	shell => sub {
 		my @arguments = @_;
 		GetOptionsFromArray(\@arguments, 'build!' => \my $build) or return 2;
 		my $dist = App::ModuleBuildTiny::Dist->new();
-		return $dist->run(command => [ $SHELL ], build => $build);
+		return $dist->run(command => [ $SHELL ], build => $build, verbose => 0);
 	},
 	listdeps => sub {
 		my @arguments = @_;
@@ -213,11 +238,12 @@ my %actions = (
 	},
 	regenerate => sub {
 		my @arguments = @_;
-		GetOptionsFromArray(\@arguments, \my %opts, qw/trial bump version=s verbose dry_run|dry-run/) or return 2;
+		GetOptionsFromArray(\@arguments, \my %opts, qw/trial bump version=s verbose dry_run|dry-run commit/) or return 2;
 		my %files = map { $_ => 1 } @arguments ? @arguments : qw/Build.PL META.json META.yml MANIFEST LICENSE README/;
 
 		if ($opts{bump}) {
 			bump_versions(%opts);
+			$files{Changes}++;
 		}
 
 		my $dist = App::ModuleBuildTiny::Dist->new(%opts, regenerate => \%files);
@@ -225,6 +251,27 @@ my %actions = (
 		for my $filename (@generated) {
 			say "Updating $filename" if $opts{verbose};
 			write_binary($filename, $dist->get_file($filename)) if !$opts{dry_run};
+		}
+
+		if ($opts{commit}) {
+			require Git::Wrapper;
+			my $git = Git::Wrapper->new('.');
+			my @files = keys %files;
+			if ($opts{bump}) {
+				push @files, 'lib';
+				push @files, 'script' if -d 'script';
+			}
+			my $allowed = join '|', map qr{^\Q$_\E$}, @files;
+			my @modified = grep /$allowed/, $git->ls_files({ modified => 1 });
+
+			if (@modified) {
+				my @changes = $dist->get_changes;
+				my $version = 'v' . $dist->version;
+				my $message = join '', $version, "\n\n", @changes;
+				$git->commit({ m => $message }, @files);
+			} else {
+				say "No modifications to commit";
+			}
 		}
 		return 0;
 	},

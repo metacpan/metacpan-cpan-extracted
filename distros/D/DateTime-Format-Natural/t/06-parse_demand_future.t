@@ -97,7 +97,7 @@ sub compare_strings
 {
     my ($string, $result) = @_;
 
-    my $parser = DateTime::Format::Natural->new(demand_future => true);
+    my $parser = DateTime::Format::Natural->new(demand_future => true, format => 'm/d');
     my $dt = $parser->parse_datetime($string);
 
     if ($parser->success && $parser->_get_truncated) {

@@ -16,6 +16,9 @@ my %WriteMakefileArgs = (
   "EXE_FILES" => [
     "script/csv-add-fields",
     "script/csv-avg",
+    "script/csv-check-cell",
+    "script/csv-check-field",
+    "script/csv-check-values",
     "script/csv-concat",
     "script/csv-convert-to-hash",
     "script/csv-csv",
@@ -65,8 +68,11 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::CSVUtils",
   "PREREQ_PM" => {
+    "Complete::Module" => "0.262",
     "Complete::Util" => "0.616",
     "Data::Cmp" => "0.002",
+    "Data::Dmp" => "0.242",
+    "Data::Sah" => "0.914",
     "Data::Sah::Compiler::perl::TH::any" => "0.914",
     "Data::Sah::Compiler::perl::TH::array" => "0.914",
     "Data::Sah::Compiler::perl::TH::bool" => "0.914",
@@ -77,6 +83,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::str" => "0.914",
     "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
     "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
+    "Data::Sah::Filter::perl::Re::re_from_str" => 0,
     "Exporter" => "5.57",
     "File::Slurper::Dash" => 0,
     "Getopt::Long" => "2.50",
@@ -90,6 +97,7 @@ my %WriteMakefileArgs = (
     "Perinci::Sub::XCompletion::sortsub_spec" => 0,
     "Sah::Schema::filename" => 0,
     "Sah::Schema::posint" => 0,
+    "Sah::Schema::re_from_str" => 0,
     "Sah::Schema::true" => 0,
     "Sah::Schema::uint" => 0,
     "Sort::ByExample" => 0,
@@ -110,7 +118,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Needs" => 0
   },
-  "VERSION" => "1.005",
+  "VERSION" => "1.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -119,8 +127,11 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Capture::Tiny" => 0,
+  "Complete::Module" => "0.262",
   "Complete::Util" => "0.616",
   "Data::Cmp" => "0.002",
+  "Data::Dmp" => "0.242",
+  "Data::Sah" => "0.914",
   "Data::Sah::Compiler::perl::TH::any" => "0.914",
   "Data::Sah::Compiler::perl::TH::array" => "0.914",
   "Data::Sah::Compiler::perl::TH::bool" => "0.914",
@@ -131,6 +142,7 @@ my %FallbackPrereqs = (
   "Data::Sah::Compiler::perl::TH::str" => "0.914",
   "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
   "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
+  "Data::Sah::Filter::perl::Re::re_from_str" => 0,
   "Exporter" => "5.57",
   "File::Slurper" => 0,
   "File::Slurper::Dash" => 0,
@@ -149,6 +161,7 @@ my %FallbackPrereqs = (
   "Perinci::Sub::XCompletion::sortsub_spec" => 0,
   "Sah::Schema::filename" => 0,
   "Sah::Schema::posint" => 0,
+  "Sah::Schema::re_from_str" => 0,
   "Sah::Schema::true" => 0,
   "Sah::Schema::uint" => 0,
   "Sort::ByExample" => 0,

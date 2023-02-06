@@ -1,0 +1,37 @@
+---
+abstract: 'Export metrics using Prometheus::Tiny::Shared'
+author:
+  - 'Javier Arturo Rodriguez'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.21, Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-PrometheusTiny
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Mojolicious: '9.0'
+  Prometheus::Tiny::Shared: '0'
+  Time::HiRes: '0'
+resources:
+  bugtracker: https://github.com/codehead/Mojolicious-Plugin-PrometheusTiny/issues
+  homepage: https://github.com/codehead/Mojolicious-Plugin-PrometheusTiny
+  repository: https://github.com/codehead/Mojolicious-Plugin-PrometheusTiny.git
+version: '0.02'
+x_contributors:
+  - 'Javier Arturo Rodriguez <javier@rodriguez.org.mx>'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0
+x_static_install: 0

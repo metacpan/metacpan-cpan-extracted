@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 86 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 91 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/CSVUtils.pm',
@@ -14,6 +14,8 @@ my @module_files = (
     'App/CSVUtils/csv2vcf.pm',
     'App/CSVUtils/csv_add_fields.pm',
     'App/CSVUtils/csv_avg.pm',
+    'App/CSVUtils/csv_check_cell.pm',
+    'App/CSVUtils/csv_check_field.pm',
     'App/CSVUtils/csv_concat.pm',
     'App/CSVUtils/csv_convert_to_hash.pm',
     'App/CSVUtils/csv_csv.pm',
@@ -54,6 +56,9 @@ my @module_files = (
 my @scripts = (
     'script/csv-add-fields',
     'script/csv-avg',
+    'script/csv-check-cell',
+    'script/csv-check-field',
+    'script/csv-check-values',
     'script/csv-concat',
     'script/csv-convert-to-hash',
     'script/csv-csv',

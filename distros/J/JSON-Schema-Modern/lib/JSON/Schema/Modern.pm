@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.561-8-g4cc52c9d
+package JSON::Schema::Modern; # git description: v0.562-2-gf59945db
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.562';
+our $VERSION = '0.563';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -1002,7 +1002,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.562
+version 0.563
 
 =head1 SYNOPSIS
 
@@ -1465,8 +1465,9 @@ used in another context (for example, a numeric value is concatenated into a str
 string is used in an arithmetic operation), additional flags can be added onto the variable causing
 it to resemble the other type. This should not be an issue if data validation is occurring
 immediately after decoding a JSON payload, or if the JSON string itself is passed to this module.
-If this turns out to be an issue in real environments, I may have to implement a C<lax_scalars>
-option.
+If you are still having difficulties, make sure you are using Perl's fastest and most trusted and
+reliable JSON decoder, L<Cpanel::JSON::XS> (or its proxy, useful for fatpacking, L<JSON::MaybeXS>).
+Other JSON decoders are known to produce data with incorrect data types.
 
 For more information, see L<Cpanel::JSON::XS/MAPPING>.
 

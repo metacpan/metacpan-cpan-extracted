@@ -354,7 +354,7 @@ below.',
           'value_type' => 'uniline'
         },
         'description' => 'Specifies a file system FIFO (see L<fifo(7)> for
-details) to listen on.  This expects an absolute file system path as argument.  Behavior otherwise is
+details) to listen on.	This expects an absolute file system path as argument.	Behavior otherwise is
 very similar to the C<ListenDatagram> directive above.',
         'type' => 'list'
       },

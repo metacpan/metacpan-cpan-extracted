@@ -1,5 +1,40 @@
 Revision history for Music-Chord-Progression-Transform
 
+0.0205 2023-02-06 00:15:01
+    - Handle the naming of the diminished chord.
+    - What is a "-6" chord? Who knows?
+
+0.0204 2023-02-06 00:00:25
+    - Handle more chordname wackiness. :\
+
+0.0203 2023-02-05 23:47:39
+    - Do not allow spaces in chord names.
+
+0.0202 2023-02-05 20:58:24
+    - Improve documentation.
+
+0.0201 2023-02-05 09:34:02
+    - Fix the eg/* programs.
+    - Improve documentation.
+
+0.0200 2023-02-04 14:03:13
+    - Make the generate() and circular() methods return more than just the genrated notes.
+
+0.0111 2023-02-03 23:08:18
+    - Include O & I in the random transforms.
+    - Do not force O to be in the 1st position of all random transforms.
+
+0.0110 2023-02-03 19:34:32
+    - Only taskify_tokens() for P, L, and R multiple operations.
+    - Remove the local author lib line.
+
+0.0109 2023-02-03 12:08:34
+    - Fix logic error in the numeric transform routine.
+
+0.0108 2023-02-03 11:39:04
+    - Handle 7th chord NROs for a numeric (random) transform.
+    - Improve quality tests.
+
 0.0107 2023-02-02 12:17:38
     - Improve documentation.
 

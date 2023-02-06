@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="_f0b0652f-1382-43af-a70e-97254820f180" Version="2.0" IssueInstant="2018-07-25T08:02:24.342Z" Destination="https://testsuite.zaaksysteem.nl/auth/saml/consumer-post" Consent="urn:oasis:names:tc:SAML:2.0:consent:unspecified" InResponseTo="_c217d2c8502884bf418552907827f430d745fa6c">
+  <Issuer xmlns="urn:oasis:names:tc:SAML:2.0:assertion">http://adfs.dev.mintlab.nl/adfs/services/trust</Issuer>
+  <samlp:Status>
+    <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/>
+  </samlp:Status>
+  <Assertion xmlns="urn:oasis:names:tc:SAML:2.0:assertion" ID="_0024c3a6-3b4e-4920-8c59-0602ae4a3c5d" IssueInstant="2018-07-25T08:02:24.341Z" Version="2.0">
+    <Issuer>http://adfs.dev.mintlab.nl/adfs/services/trust</Issuer>
+    <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+      <ds:SignedInfo>
+        <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+        <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+        <ds:Reference URI="#_0024c3a6-3b4e-4920-8c59-0602ae4a3c5d">
+          <ds:Transforms>
+            <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+            <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+          </ds:Transforms>
+          <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+          <ds:DigestValue>/UGIkccgX9xPwusXApqxm7KDyLpgx7W/tp6gANTvNsw=</ds:DigestValue>
+        </ds:Reference>
+      </ds:SignedInfo>
+      <ds:SignatureValue></ds:SignatureValue>
+      <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+        <ds:X509Data>
+          <ds:X509Certificate></ds:X509Certificate>
+        </ds:X509Data>
+      </KeyInfo>
+    </ds:Signature>
+    <Subject>
+      <SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+        <SubjectConfirmationData InResponseTo="_c217d2c8502884bf418552907827f430d745fa6c" NotOnOrAfter="2018-07-25T08:07:24.342Z" Recipient="https://testsuite.zaaksysteem.nl/auth/saml/consumer-post"/>
+      </SubjectConfirmation>
+    </Subject>
+    <Conditions NotBefore="2018-07-25T08:02:24.338Z" NotOnOrAfter="2018-07-25T09:02:24.338Z">
+      <AudienceRestriction>
+        <Audience>TestUPN</Audience>
+      </AudienceRestriction>
+    </Conditions>
+    <AttributeStatement>
+      <Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/initials">
+        <AttributeValue>G.B.</AttributeValue>
+      </Attribute>
+      <Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name">
+        <AttributeValue>G&#xC3;&#xA9; G.B.. Ruiker</AttributeValue>
+      </Attribute>
+      <Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname">
+        <AttributeValue>G&#xC3;&#xA9;</AttributeValue>
+      </Attribute>
+      <Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress">
+        <AttributeValue>gebruiker@testsuite.zaaksysteem.nl</AttributeValue>
+      </Attribute>
+      <Attribute Name="http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsaccountname">
+        <AttributeValue>gebruiker</AttributeValue>
+      </Attribute>
+      <Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/otherphone">
+        <AttributeValue>0123123123</AttributeValue>
+      </Attribute>
+      <Attribute Name="http://schemas.xmlsoap.org/claims/Group">
+        <AttributeValue>Domain Users</AttributeValue>
+        <AttributeValue>Zaaksysteemgebruikers</AttributeValue>
+      </Attribute>
+      <Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn">
+        <AttributeValue>gebruiker@testsuite.dev.zaaksysteem.nl</AttributeValue>
+      </Attribute>
+      <Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname">
+        <AttributeValue>Ruiker</AttributeValue>
+      </Attribute>
+    </AttributeStatement>
+    <AuthnStatement AuthnInstant="2018-07-25T07:54:35.599Z">
+      <AuthnContext>
+        <AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</AuthnContextClassRef>
+      </AuthnContext>
+    </AuthnStatement>
+  </Assertion>
+</samlp:Response>

@@ -102,7 +102,9 @@ boot-up and shutdown differently than during normal runtime.',
 "%". The percentage specifies how much CPU time the unit shall get at maximum, relative to the total CPU time
 available on one CPU. Use values > 100% for allotting CPU time on more than one CPU. This controls the
 C<cpu.max> attribute on the unified control group hierarchy and
-C<cpu.cfs_quota_us> on legacy. For details about these control group attributes, see L<Control Groups v2|https://docs.kernel.org/admin-guide/cgroup-v2.html> and L<CFS Bandwidth Control|https://docs.kernel.org/scheduler/sched-bwc.html>.
+C<cpu.cfs_quota_us> on legacy. For details about these control group attributes, see L<Control Groups
+v2|https://docs.kernel.org/admin-guide/cgroup-v2.html> and L<CFS Bandwidth
+Control|https://docs.kernel.org/scheduler/sched-bwc.html>.
 Setting C<CPUQuota> to an empty value unsets the quota.
 
 Example: C<CPUQuota=20%> ensures that the executed processes will never get more than
@@ -239,7 +241,8 @@ percentage value may be specified, which is taken relative to the installed phys
 system. If assigned the special value C<infinity>, all available memory is protected, which may be
 useful in order to always inherit all of the protection afforded by ancestors.
 This controls the C<memory.min> or C<memory.low> control group attribute.
-For details about this control group attribute, see L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
+For details about this control group attribute, see L<Memory Interface
+Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
 
 Units may have their children use a default C<memory.min> or
 C<memory.low> value by specifying C<DefaultMemoryMin> or
@@ -355,7 +358,8 @@ L<systemd-system.conf(5)>.',
 group hierarchy is used on the system. Takes a single weight value (between 1 and 10000) to set the
 default block I/O weight. This controls the C<io.weight> control group attribute,
 which defaults to 100. For details about this control group attribute, see L<IO
-Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#io-interface-files>.  The available I/O bandwidth is split up among all units within one slice
+Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#io-interface-files>.  The available I/O bandwidth is
+split up among all units within one slice
 relative to their block I/O weight. A higher weight means more I/O bandwidth, a lower weight means
 less.
 
@@ -374,7 +378,8 @@ and shutdown differently than during runtime.',
 group hierarchy is used on the system. Takes a single weight value (between 1 and 10000) to set the
 default block I/O weight. This controls the C<io.weight> control group attribute,
 which defaults to 100. For details about this control group attribute, see L<IO
-Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#io-interface-files>.  The available I/O bandwidth is split up among all units within one slice
+Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#io-interface-files>.  The available I/O bandwidth is
+split up among all units within one slice
 relative to their block I/O weight. A higher weight means more I/O bandwidth, a lower weight means
 less.
 
@@ -395,7 +400,8 @@ the device specific weight value, between 1 and 10000. (Example: C</dev/sda 1000
 path may be specified as path to a block device node or as any other file, in which case the backing block
 device of the file system of the file is determined. This controls the C<io.weight> control
 group attribute, which defaults to 100. Use this option multiple times to set weights for multiple devices.
-For details about this control group attribute, see L<IO Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#io-interface-files>.
+For details about this control group attribute, see L<IO Interface
+Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#io-interface-files>.
 
 The specified device node should reference a block device that has an I/O scheduler
 associated, i.e. should not refer to partition or loopback block devices, but to the originating,
@@ -418,7 +424,8 @@ system of the file is used. If the bandwidth is suffixed with K, M, G, or T, the
 parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes, respectively, to the base of 1000. (Example:
 "/dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 5M"). This controls the C<io.max> control
 group attributes. Use this option multiple times to set bandwidth limits for multiple devices. For details
-about this control group attribute, see L<IO Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#io-interface-files>.
+about this control group attribute, see L<IO Interface
+Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#io-interface-files>.
 
 Similar restrictions on block device discovery as for C<IODeviceWeight> apply, see above.',
         'type' => 'leaf',
@@ -435,7 +442,8 @@ system of the file is used. If the bandwidth is suffixed with K, M, G, or T, the
 parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes, respectively, to the base of 1000. (Example:
 "/dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 5M"). This controls the C<io.max> control
 group attributes. Use this option multiple times to set bandwidth limits for multiple devices. For details
-about this control group attribute, see L<IO Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#io-interface-files>.
+about this control group attribute, see L<IO Interface
+Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#io-interface-files>.
 
 Similar restrictions on block device discovery as for C<IODeviceWeight> apply, see above.',
         'type' => 'leaf',
@@ -452,7 +460,8 @@ used. If the IOPS is suffixed with K, M, G, or T, the specified IOPS is parsed a
 GigaIOPS, or TeraIOPS, respectively, to the base of 1000. (Example:
 "/dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 1K"). This controls the C<io.max> control
 group attributes. Use this option multiple times to set IOPS limits for multiple devices. For details about
-this control group attribute, see L<IO Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#io-interface-files>.
+this control group attribute, see L<IO Interface
+Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#io-interface-files>.
 
 Similar restrictions on block device discovery as for C<IODeviceWeight> apply, see above.',
         'type' => 'leaf',
@@ -469,7 +478,8 @@ used. If the IOPS is suffixed with K, M, G, or T, the specified IOPS is parsed a
 GigaIOPS, or TeraIOPS, respectively, to the base of 1000. (Example:
 "/dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 1K"). This controls the C<io.max> control
 group attributes. Use this option multiple times to set IOPS limits for multiple devices. For details about
-this control group attribute, see L<IO Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#io-interface-files>.
+this control group attribute, see L<IO Interface
+Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#io-interface-files>.
 
 Similar restrictions on block device discovery as for C<IODeviceWeight> apply, see above.',
         'type' => 'leaf',
@@ -483,7 +493,8 @@ the device specific latency target. (Example: "/dev/sda 25ms"). The file path ma
 as path to a block device node or as any other file, in which case the backing block device of the file
 system of the file is determined. This controls the C<io.latency> control group
 attribute. Use this option multiple times to set latency target for multiple devices. For details about this
-control group attribute, see L<IO Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#io-interface-files>.
+control group attribute, see L<IO Interface
+Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#io-interface-files>.
 
 Implies C<IOAccounting=yes>.
 
@@ -696,7 +707,8 @@ transport-protocol := { C<tcp> | C<udp> }
 ip-ports := { ip-port | ip-port-range }
 
 An optional address-family expects C<ipv4> or C<ipv6> values.
-If not specified, a rule will be matched for both IPv4 and IPv6 addresses and applied depending on other socket fields, e.g. transport-protocol,
+If not specified, a rule will be matched for both IPv4 and IPv6 addresses and applied depending on other socket fields,
+e.g. transport-protocol,
 ip-port.
 
 An optional transport-protocol expects C<tcp> or C<udp> transport protocol names.
@@ -708,7 +720,8 @@ ip-port-range := ip-port-lowC<->ip-port-high,
 where ip-port-low is smaller than or equal to ip-port-high
 and both are within 1\x{2026}65535 inclusively.
 
-A special value C<any> can be used to apply a rule to any address family, transport protocol and any port with a positive value.
+A special value C<any> can be used to apply a rule to any address family, transport protocol and any port with a
+positive value.
 
 To allow multiple rules assign C<SocketBindAllow> or C<SocketBindDeny> multiple times.
 To clear the existing assignments pass an empty C<SocketBindAllow> or C<SocketBindDeny>
@@ -777,7 +790,8 @@ transport-protocol := { C<tcp> | C<udp> }
 ip-ports := { ip-port | ip-port-range }
 
 An optional address-family expects C<ipv4> or C<ipv6> values.
-If not specified, a rule will be matched for both IPv4 and IPv6 addresses and applied depending on other socket fields, e.g. transport-protocol,
+If not specified, a rule will be matched for both IPv4 and IPv6 addresses and applied depending on other socket fields,
+e.g. transport-protocol,
 ip-port.
 
 An optional transport-protocol expects C<tcp> or C<udp> transport protocol names.
@@ -789,7 +803,8 @@ ip-port-range := ip-port-lowC<->ip-port-high,
 where ip-port-low is smaller than or equal to ip-port-high
 and both are within 1\x{2026}65535 inclusively.
 
-A special value C<any> can be used to apply a rule to any address family, transport protocol and any port with a positive value.
+A special value C<any> can be used to apply a rule to any address family, transport protocol and any port with a
+positive value.
 
 To allow multiple rules assign C<SocketBindAllow> or C<SocketBindDeny> multiple times.
 To clear the existing assignments pass an empty C<SocketBindAllow> or C<SocketBindDeny>
@@ -1002,7 +1017,8 @@ specific to the unified hierarchy while others are specific to the legacy hierar
 kernel might support further controllers, which aren\'t covered here yet as delegation is either not supported
 at all for them or not defined cleanly.
 
-For further details on the delegation model consult L<Control Group APIs and Delegation|https://systemd.io/CGROUP_DELEGATION>.',
+For further details on the delegation model consult L<Control Group APIs and
+Delegation|https://systemd.io/CGROUP_DELEGATION>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },

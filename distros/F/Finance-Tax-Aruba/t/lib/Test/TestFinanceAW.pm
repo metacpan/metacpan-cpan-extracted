@@ -27,6 +27,7 @@ my %mapping = (
     tax_rate          => "Tax rate",
     net_income        => "Net income",
     tax_free_wage     => "Income after taxes",
+    child_deductions  => "Child deductions",
 );
 
 sub test_yearly_income {
@@ -44,8 +45,10 @@ sub test_yearly_income {
     # of 1500.
     # The pension of the employee is deducted
     # The bonus is added
+    #
 
     my $yearly_income_gross = $monthly * 12;
+    $yearly_income_gross += ($args{fringe} // 0) * 12;
 
     is($calc->yearly_income_gross,
         $yearly_income_gross, "Yearly gross income: $yearly_income_gross");
@@ -110,7 +113,7 @@ sub test_yearly_income {
     # This is the actual zuiver jaarloon, aka net yearly income
     if (!check_optional_results($calc, $results, 'net_yearly_income')) {
         my $amount
-            = $calc->yearly_income - $calc->aov_employee - $calc->azv_employee + $calc->fringe;
+            = $calc->yearly_income - $calc->aov_employee - $calc->azv_employee;
 
         is($calc->net_yearly_income, $amount, "Net yearly income: $amount");
     }
@@ -127,18 +130,20 @@ sub test_yearly_income {
     # taxable amount is the taxeable wage minus the minimum of the tax bracket
     # Over difference the tax rate is applied
     if (!check_optional_results($calc, $results, 'taxable_amount')) {
-        my $amount = $calc->taxable_wage - $calc->tax_minimum;
+        my $amount = sprintf("%.02f", $calc->taxable_wage - $calc->tax_minimum) + 0;
         is($calc->taxable_amount, $amount, "Taxable amount: $amount");
     }
 
     if (!check_optional_results($calc, $results, 'tax_variable')) {
-        my $amount = int($calc->taxable_amount / 100 * $calc->tax_rate);
+        my $amount
+            = sprintf("%.02f", $calc->taxable_amount / 100 * $calc->tax_rate)
+            + 0;
         is($calc->tax_variable, $amount, "Income tax (variable): $amount");
     }
 
     {
         check_required_results($calc, $results, 'tax_fixed');
-        my $amount = $calc->tax_variable + $calc->tax_fixed;
+        my $amount = int($calc->tax_variable + $calc->tax_fixed);
         is($calc->income_tax, $amount, "Income tax (total): $amount");
     }
 

@@ -4,7 +4,7 @@ package Chart::GGPlot::Limits;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.002002'; # VERSION
+our $VERSION = '0.002003'; # VERSION
 
 use Data::Frame;
 use List::AllUtils qw(pairmap); 
@@ -120,7 +120,7 @@ Chart::GGPlot::Limits - Functions for applying limits to the scales
 
 =head1 VERSION
 
-version 0.002002
+version 0.002003
 
 =head1 SYNOPSIS
 

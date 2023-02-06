@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2017-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2017-2023 -- leonerd@leonerd.org.uk
 
-package String::Tagged::Terminal 0.05;
+package String::Tagged::Terminal 0.06;
 
 use v5.14;
 use warnings;
@@ -21,13 +21,13 @@ C<String::Tagged::Terminal> - format terminal output using C<String::Tagged>
 
 =head1 SYNOPSIS
 
- use String::Tagged::Terminal;
+   use String::Tagged::Terminal;
 
- my $st = String::Tagged::Terminal->new
-    ->append( "Hello my name is " )
-    ->append_tagged( $name, bold => 1, fgindex => 4 );
+   my $st = String::Tagged::Terminal->new
+      ->append( "Hello my name is " )
+      ->append_tagged( $name, bold => 1, fgindex => 4 );
 
- $st->say_to_terminal;
+   $st->say_to_terminal;
 
 =head1 DESCRIPTION
 
@@ -64,6 +64,16 @@ colours:
 
    $st->append_tagged( "text", fgindex => 1 + rand 6 );
 
+=head2 sizepos
+
+(experimental)
+
+This tag takes a value indicating an adjustment to the vertical positioning,
+and possibly also size, in order to create subscript or superscript effects.
+
+Recognised values are C<sub> for subscript, and C<super> for superscript.
+These are implemented using the F<mintty>-style C<CSI 73/74/75 m> codes.
+
 =cut
 
 =head1 CONSTRUCTORS
@@ -92,7 +102,7 @@ sub new_from_formatting
 
    return $class->clone( $orig,
       only_tags => [qw(
-         bold under italic strike blink reverse
+         bold under italic strike blink reverse sizepos
          monospace
          fg bg
       )],
@@ -219,6 +229,24 @@ sub build_terminal
          }
       }
 
+      {
+         if( defined $pen{sizepos} and !defined $tags{sizepos} ) {
+            push @sgr, 75; # reset
+         }
+         elsif( defined $pen{sizepos} and defined $tags{sizepos} and $pen{sizepos} eq $tags{sizepos} ) {
+            # Leave it
+         }
+         elsif( defined( my $val = $tags{sizepos} ) ) {
+            if( $val eq "sub" ) {
+               push @sgr, 74;
+            }
+            elsif( $val eq "super" ) {
+               push @sgr, 73;
+            }
+            $pen{sizepos} = $val;
+         }
+      }
+
       if( @sgr and %pen ) {
          $ret .= "\e[" . join( ";", @sgr ) . "m";
       }
@@ -252,7 +280,7 @@ sub as_formatting
 
    return String::Tagged->clone( $self,
       only_tags => [qw(
-         bold under italic strike blink reverse
+         bold under italic strike blink reverse sizepos
          altfont
          fgindex bgindex
       )],

@@ -92,7 +92,7 @@ sub compare_strings
 {
     my ($string, $result) = @_;
 
-    my $parser = DateTime::Format::Natural->new;
+    my $parser = DateTime::Format::Natural->new(format => 'm/d');
     $parser->_set_datetime(\%time);
 
     my @dt = $parser->parse_datetime_duration($string);

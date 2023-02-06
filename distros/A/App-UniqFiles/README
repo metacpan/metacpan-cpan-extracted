@@ -2,8 +2,8 @@ NAME
     App::UniqFiles - Report duplicate or unique file contents
 
 VERSION
-    This document describes version 0.139 of App::UniqFiles (from Perl
-    distribution App-UniqFiles), released on 2022-11-15.
+    This document describes version 0.141 of App::UniqFiles (from Perl
+    distribution App-UniqFiles), released on 2023-02-06.
 
 SYNOPSIS
      # See uniq-files script
@@ -37,6 +37,10 @@ FUNCTIONS
         size. This can be quicker but will generate a false positive when
         two files of the same size are deemed as duplicate even though their
         content may be different.
+
+        If set to 'name' then only name comparison will be performed. This
+        of course can potentially generate lots of false positives, but in
+        some cases you might want to compare filename for uniqueness.
 
     *   authoritative_dirs => *array[str]*
 
@@ -176,6 +180,10 @@ FUNCTIONS
         size. This can be quicker but will generate a false positive when
         two files of the same size are deemed as duplicate even though their
         content may be different.
+
+        If set to 'name' then only name comparison will be performed. This
+        of course can potentially generate lots of false positives, but in
+        some cases you might want to compare filename for uniqueness.
 
     *   authoritative_dirs => *array[str]*
 
@@ -325,8 +333,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2020, 2019, 2017, 2015, 2014, 2012,
-    2011 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2022, 2020, 2019, 2017, 2015, 2014,
+    2012, 2011 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

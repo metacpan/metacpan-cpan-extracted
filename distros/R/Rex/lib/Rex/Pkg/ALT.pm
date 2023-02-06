@@ -8,7 +8,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.4'; # VERSION
+our $VERSION = '1.14.0'; # VERSION
 
 use Rex::Helper::Run;
 use Rex::Commands::File;

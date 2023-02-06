@@ -3,7 +3,7 @@ package App::ModuleBuildTiny::Dist;
 use 5.014;
 use strict;
 use warnings;
-our $VERSION = '0.031';
+our $VERSION = '0.033';
 
 use CPAN::Meta;
 use Config;
@@ -12,12 +12,14 @@ use File::Basename qw/basename dirname/;
 use File::Copy qw/copy/;
 use File::Path qw/mkpath rmtree/;
 use File::Spec::Functions qw/catfile catdir rel2abs/;
-use File::Slurper qw/write_text read_binary/;
+use File::Slurper qw/write_text read_text read_binary/;
+use File::chdir;
 use ExtUtils::Manifest qw/manifind maniskip maniread/;
 use Module::Runtime 'require_module';
 use Module::Metadata 1.000037;
-
 use Pod::Escapes qw/e2char/;
+use POSIX 'strftime';
+
 
 use Env qw/@PERL5LIB @PATH/;
 
@@ -115,16 +117,21 @@ sub detect_license {
 	die "No license found in $filename\n";
 }
 
-sub checkchanges {
+sub get_changes {
 	my $self = shift;
 	my $version = quotemeta $self->meta->version;
 	open my $changes, '<:raw', 'Changes' or die "Couldn't open Changes file";
 	my (undef, @content) = grep { / ^ $version (?:-TRIAL)? (?:\s+|$) /x ... /^\S/ } <$changes>;
 	pop @content while @content && $content[-1] =~ / ^ (?: \S | \s* $ ) /x;
-	die "Changes appears to be empty\n" if not @content
+	return @content;
 }
 
-sub checkmeta {
+sub check_changes {
+	my $self = shift;
+	die "Changes appears to be empty\n" if not $self->get_changes;
+}
+
+sub check_meta {
 	my $self = shift;
 	my $module_name = $self->{meta}->name =~ s/-/::/gr;
 	my $meta_version = $self->{meta}->version;
@@ -160,7 +167,6 @@ sub scan_prereqs {
 		runtime   => { requires => $runtime->as_string_hash },
 		test      => { requires => $test->as_string_hash },
 		configure => { requires => { 'Module::Build::Tiny' => mbt_version() } },
-		develop   => { requires => { 'App::ModuleBuildTiny' => $VERSION } },
 	});
 	require CPAN::Meta::Prereqs::Filter;
 	return CPAN::Meta::Prereqs::Filter::filter_prereqs($prereqs, %opts);
@@ -210,6 +216,7 @@ sub new {
 
 		my $prereqs = load_prereqs();
 		$prereqs->{configure}{requires}{'Module::Build::Tiny'} //= mbt_version();
+		$prereqs->{develop}{requires}{'App::ModuleBuildTiny'} //= $VERSION;
 
 		my $metahash = {
 			name           => $distname,
@@ -275,6 +282,11 @@ sub new {
 	$files{'META.yml'} //= $meta->as_string({ version => 1.4 });
 	$files{LICENSE} //= $license->fulltext;
 	$files{README} //= generate_readme($dist_name);
+	if ($opts{regenerate}{Changes}) {
+		my $time = strftime("%Y-%m-%d %H:%M:%S%z", localtime);
+		my $header = sprintf "%-9s %s\n", $meta->version, $time;
+		$files{Changes} = read_text('Changes') =~ s/(?<=\n\n)/$header/er;
+	}
 	# This must come last
 	$files{MANIFEST} //= join '', map { "$_\n" } sort keys %files;
 
@@ -331,16 +343,18 @@ sub run {
 	require File::Temp;
 	my $dir  = File::Temp::tempdir(CLEANUP => 1);
 	$self->write_dir($dir, $opts{verbose});
-	chdir $dir;
+	local $CWD = $dir;
 	if ($opts{build}) {
 		system $Config{perlpath}, 'Build.PL';
 		system $Config{perlpath}, 'Build';
 		my @extralib = map { rel2abs(catdir('blib', $_)) } 'arch', 'lib';
 		local @PERL5LIB = (@extralib, @PERL5LIB);
 		local @PATH = (rel2abs(catdir('blib', 'script')), @PATH);
+		say join ' ', @{ $opts{command} } if $opts{verbose};
 		return not system @{ $opts{command} };
 	}
 	else {
+		say join ' ', @{ $opts{command} } if $opts{verbose};
 		return not system @{ $opts{command} };
 	}
 }

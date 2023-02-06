@@ -18,7 +18,7 @@ WebService::UK::Parliament::LordsVotes - Query the UK Parliament Lords Vo API
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

@@ -16,7 +16,11 @@ use overload  '@{}' => sub { ${ shift() }->[0] },
               ;
 
 package main::HObj;
-sub new { bless \\42, shift }
+
+# With Perl 5.18.4 "bless \\42" throws "Modification of read-only value"
+#sub new { bless \\42, shift }
+sub new { bless \(my $o = \42), shift } # emulate later Perls
+
 use overload  '%{}' => sub { \%{ main::HVObj->new() } },
               "fallback" => 1,
               ;

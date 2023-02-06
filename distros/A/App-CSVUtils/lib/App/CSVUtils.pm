@@ -8,9 +8,9 @@ use Log::ger;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-02'; # DATE
+our $DATE = '2023-02-03'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.005'; # VERSION
+our $VERSION = '1.007'; # VERSION
 
 our @EXPORT_OK = qw(
                        gen_csv_util
@@ -1710,7 +1710,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 1.005 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2023-02-02.
+This document describes version 1.007 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2023-02-03.
 
 =head1 DESCRIPTION
 
@@ -1721,6 +1721,12 @@ This distribution contains the following CLI utilities:
 =item * L<csv-add-fields>
 
 =item * L<csv-avg>
+
+=item * L<csv-check-cell>
+
+=item * L<csv-check-field>
+
+=item * L<csv-check-values>
 
 =item * L<csv-concat>
 

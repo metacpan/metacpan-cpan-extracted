@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl -w
 
 ## no critic
 
@@ -19,7 +19,7 @@ our @REGIONS = (undef);
 
 if ( $ENV{AMAZON_S3_REGIONS} ) {
   push @REGIONS, split /\s*,\s*/xsm, $ENV{AMAZON_S3_REGIONS};
-} ## end if ( $ENV{AMAZON_S3_REGIONS...})
+}
 
 my $host;
 
@@ -38,17 +38,17 @@ if ( exists $ENV{AMAZON_S3_LOCALSTACK} ) {
   $skip_owner_id    = 1;
   $skip_permissions = 1;
   $skip_acls        = 1;
-} ## end if ( exists $ENV{AMAZON_S3_LOCALSTACK...})
+}
 else {
   $host = $ENV{AMAZON_S3_HOST};
-} ## end else [ if ( exists $ENV{AMAZON_S3_LOCALSTACK...})]
+}
 
 my $secure = $host ? 0 : 1;
 
-# do not use DNS bucket names for testing if a mocking service is used
-# override this by setting AMAZON_S3_DNS_BUCKET_NAMES to any value
-# your tests may fail unless you have DNS entry for the bucket name
-# e.g 127.0.0.1 net-amazon-s3-test-test.localhost
+# - do not use DNS bucket names for testing if a mocking service is used
+# - override this by setting AMAZON_S3_DNS_BUCKET_NAMES to any value
+# - your tests may fail unless you have DNS entry for the bucket name
+#   e.g 127.0.0.1 net-amazon-s3-test-test.localhost
 
 my $dns_bucket_names
   = ( $host && !exists $ENV{AMAZON_S3_DNS_BUCKET_NAMES} ) ? 0 : 1;
@@ -65,10 +65,10 @@ my $token                 = $ENV{'AWS_SESSION_TOKEN'};
 
 if ( !$ENV{'AMAZON_S3_EXPENSIVE_TESTS'} ) {
   plan skip_all => 'Testing this module for real costs money.';
-} ## end if ( !$ENV{'AMAZON_S3_EXPENSIVE_TESTS'...})
+}
 else {
-  plan tests => 74 * scalar(@REGIONS) + 2;
-} ## end else [ if ( !$ENV{'AMAZON_S3_EXPENSIVE_TESTS'...})]
+  plan tests => 76 * scalar(@REGIONS) + 2;
+}
 
 ########################################################################
 # BEGIN TESTS
@@ -92,7 +92,7 @@ if ( $ENV{AMAZON_S3_CREDENTIALS} ) {
   );
   ( $aws_access_key_id, $aws_secret_access_key, $token )
     = $s3->get_credentials;
-} ## end if ( $ENV{AMAZON_S3_CREDENTIALS...})
+}
 else {
   $s3 = Amazon::S3->new(
     { aws_access_key_id     => $aws_access_key_id,
@@ -104,14 +104,14 @@ else {
       level                 => $ENV{DEBUG} ? 'trace' : 'error',
     }
   );
-} ## end else [ if ( $ENV{AMAZON_S3_CREDENTIALS...})]
+}
 
 # list all buckets that i own
 my $response = eval { return $s3->buckets; };
 
 if ( $EVAL_ERROR || !$response ) {
   BAIL_OUT($EVAL_ERROR);
-} ## end if ( $EVAL_ERROR || !$response)
+}
 
 $OWNER_ID          = $response->{owner_id};
 $OWNER_DISPLAYNAME = $response->{owner_displayname};
@@ -154,17 +154,17 @@ for my $location (@REGIONS) {
 
     if ( $EVAL_ERROR || !$bucket_obj ) {
       diag( Dumper( [ $EVAL_ERROR, $s3->err, $s3->errstr, $s3->error ] ) );
-    } ## end if ( $EVAL_ERROR || !$bucket_obj)
+    }
 
     last if $bucket_obj;
 
     # 409 indicates bucket name not yet available...
     if ( $s3->last_response->code ne '409' ) {
       BAIL_OUT("could not create $bucketname");
-    } ## end if ( $s3->last_response...)
+    }
 
     $bucket_suffix = '-2';
-  } ## end while (1)
+  }
 
   is( ref $bucket_obj,
     'Amazon::S3::Bucket',
@@ -174,23 +174,23 @@ for my $location (@REGIONS) {
   SKIP: {
     if ($no_region_constraint) {
       skip "No region constraints", 1;
-    } ## end if ($no_region_constraint)
+    }
 
     is( $bucket_obj->get_location_constraint, $location );
-  } ## end SKIP:
+  }
 
   SKIP: {
 
     if ( $skip_acls || !$bucket_obj ) {
       skip "ACLs only for Amazon S3", 3;
-    } ## end if ( $skip_acls || !$bucket_obj)
+    }
 
     like_acl_allusers_read($bucket_obj);
 
     ok( $bucket_obj->set_acl( { acl_short => 'private' } ) );
     unlike_acl_allusers_read($bucket_obj);
 
-  } ## end SKIP:
+  }
 
   # another way to get a bucket object (does no network I/O,
   # assumes it already exists).  Read Amazon::S3::Bucket.
@@ -222,7 +222,7 @@ for my $location (@REGIONS) {
       or diag( Dumper( [$response] ) );
 
     is( undef, $bucket_obj->get_key("non-existing-key") );
-  } ## end SKIP:
+  }
 
   my $keyname = 'testing.txt';
 
@@ -247,7 +247,7 @@ for my $location (@REGIONS) {
     SKIP: {
       if ($skip_acls) {
         skip "ACLs only for Amazon S3", 3;
-      } ## end if ($skip_acls)
+      }
 
       is_request_response_code( $url, 200,
         "can access the publicly readable key" );
@@ -256,20 +256,20 @@ for my $location (@REGIONS) {
 
       ok(
         $bucket_obj->set_acl( { key => $keyname, acl_short => 'private' } ) );
-    } ## end SKIP:
+    }
 
     SKIP: {
       if ($skip_acls) {
         skip 'ACLs only for Amazon S3', 1;
-      } ## end if ($skip_acls)
+      }
 
       is_request_response_code( $url, 403, "cannot access the private key" );
-    } ## end SKIP:
+    }
 
     SKIP: {
       if ($skip_acls) {
         skip 'ACLs only for Amazon S3', 5;
-      } ## end if ($skip_acls)
+      }
 
       unlike_acl_allusers_read( $bucket_obj, $keyname );
 
@@ -293,18 +293,18 @@ for my $location (@REGIONS) {
           }
         )
       );
-    } ## end SKIP:
+    }
 
     SKIP: {
       if ( $skip_acls || $ENV{LOCALSTACK} ) {
         skip 'LocalStack does not enforce ACLs', 2;
-      } ## end if ( $skip_acls || $ENV...)
+      }
 
       is_request_response_code( $url,
         403, 'cannot access the private key after acl_xml set' );
 
       unlike_acl_allusers_read( $bucket_obj, $keyname );
-    } ## end SKIP:
+    }
   }
 
   {
@@ -334,7 +334,7 @@ for my $location (@REGIONS) {
         if $skip_permissions || $skip_acls;
 
       is_request_response_code( $url, 403, "cannot access the private key" );
-    } ## end SKIP:
+    }
 
     SKIP: {
       skip 'ACLs only for Amazon S3', 4 if $skip_acls;
@@ -354,7 +354,7 @@ for my $location (@REGIONS) {
 
       like_acl_allusers_read( $bucket_obj, $keyname2 );
 
-    } ## end SKIP:
+    }
 
     $bucket_obj->delete_key($keyname2);
   }
@@ -364,14 +364,14 @@ for my $location (@REGIONS) {
 
     if ( $v eq '2' ) {
       $response = $bucket_obj->list_v2( { 'fetch-owner' => 'true' } );
-    } ## end if ( $v eq '2' )
+    }
     else {
       $response = $bucket_obj->list;
-    } ## end else [ if ( $v eq '2' ) ]
+    }
 
     if ( !$response ) {
       BAIL_OUT( $s3->err . ": " . $s3->errstr );
-    } ## end if ( !$response )
+    }
 
     is( $response->{bucket}, $bucketname_raw, "list($v) - bucketname " );
 
@@ -400,11 +400,11 @@ for my $location (@REGIONS) {
       skip 'LocalStack has different owner for bucket', 1 if $skip_owner_id;
       is( $key->{owner_id}, $OWNER_ID, "list($v) - owner id " )
         or diag( Dumper [$key] );
-    } ## end SKIP:
+    }
 
     is( $key->{owner_displayname},
       $OWNER_DISPLAYNAME, "list($v) - owner display name" );
-  } ## end foreach my $v ( 1 .. 2 )
+  }
 
   # You can't delete a bucket with things in it
   ok( !$bucket_obj->delete_bucket(), 'delete bucket' );
@@ -470,7 +470,22 @@ EOT
   is( $response->{content_length},
     $lorem_ipsum_size, 'get_key_filename - content_length' );
 
+  # before we delete this key...
+
+  my $copy_result = $bucket_obj->copy_object(
+    key    => "$keyname.bak",
+    source => "$keyname",
+  );
+
+  isa_ok( $copy_result, 'HASH', 'copy_object returns a hash reference' );
+
   $bucket_obj->delete_key($keyname);
+  $response = $bucket_obj->list;
+
+  ok( ( grep {"$keyname.bak"} @{ $response->{keys} } ), 'found the copy' );
+
+  $bucket_obj->delete_key($keyname);
+  $bucket_obj->delete_key("$keyname.bak");
 
   # try empty files
   $keyname .= '3';
@@ -516,7 +531,7 @@ EOT
     'delete key from bucket - empty list of keys' );
 
   ok( $bucket_obj->delete_bucket(), 'delete bucket' );
-} ## end for my $location (@REGIONS)
+}
 
 # see more docs in Amazon::S3::Bucket
 
@@ -530,7 +545,7 @@ sub is_request_response_code {
 
   is( $response->code, $code, $message )
     or diag( Dumper($response) );
-} ## end sub is_request_response_code
+}
 
 sub like_acl_allusers_read {
   my ( $bucketobj, $keyname ) = @_;
@@ -542,20 +557,20 @@ sub like_acl_allusers_read {
   like( $acl, qr(AllUsers.+READ), $message )
     or diag( Dumper [$acl] );
 
-} ## end sub like_acl_allusers_read
+}
 
 sub unlike_acl_allusers_read {
   my ( $bucketobj, $keyname ) = @_;
   my $message = acl_allusers_read_message( 'unlike', @_ );
   unlike( $bucketobj->get_acl($keyname), qr(AllUsers.+READ), $message );
-} ## end sub unlike_acl_allusers_read
+}
 
 sub acl_allusers_read_message {
   my ( $like_or_unlike, $bucketobj, $keyname ) = @_;
   my $message = $like_or_unlike . "_acl_allusers_read: " . $bucketobj->bucket;
   $message .= " - $keyname" if $keyname;
   return $message;
-} ## end sub acl_allusers_read_message
+}
 
 sub acl_xml_from_acl_short {
   my $acl_short = shift || 'private';
@@ -571,7 +586,7 @@ sub acl_xml_from_acl_short {
                 <Permission>READ</Permission>
             </Grant>
         ~;
-  } ## end if ( $acl_short eq 'public-read')
+  }
 
   return qq~<?xml version="1.0" encoding="UTF-8"?>
     <AccessControlPolicy xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
@@ -591,5 +606,5 @@ sub acl_xml_from_acl_short {
             $public_read
         </AccessControlList>
     </AccessControlPolicy>~;
-} ## end sub acl_xml_from_acl_short
+}
 

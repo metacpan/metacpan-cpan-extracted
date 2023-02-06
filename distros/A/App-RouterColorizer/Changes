@@ -1,3 +1,12 @@
+1.230370  2023-02-06 02:56:24+00:00 UTC
+ Joelle Maslak <jmaslak@antelope.net>
+ * [feature] Ciena colorizing of additional status messages
+ * [bugfix] Ciena colorizing of disabled ports in show ptp is proper now
+
+1.230360  2023-02-05 00:27:06+00:00 UTC
+ Joelle Maslak <jmaslak@antelope.net>
+ * [feature] Colorize Arista "maximum total number of routes" w/o warning limits
+
 1.230020  2023-01-02 17:21:37+00:00 UTC
  Joelle Maslak <jmaslak@antelope.ent>
  * [feature] Colorize Ciena "module show" and "module show slot <x>"

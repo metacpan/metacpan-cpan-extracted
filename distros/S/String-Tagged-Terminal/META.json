@@ -30,18 +30,18 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "String::Tagged::Terminal" : {
          "file" : "lib/String/Tagged/Terminal.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "String::Tagged::Terminal::Win32Console" : {
          "file" : "lib/String/Tagged/Terminal/Win32Console.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

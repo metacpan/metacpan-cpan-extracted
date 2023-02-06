@@ -1,0 +1,110 @@
+0.015   2023-01-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist App-BPOMUtils to App-BPOMUtils-Table. Remove
+          nutrition facts routine because it has been split to its own distro
+          App-BPOMUtils-NutritionFacts (already released previously).
+
+
+0.014   2022-11-10  Released-By: PERLANCAR; Urgency: medium
+
+        - Give border to nutrition facts (HTML linear version).
+
+        - Fix example.
+
+
+0.013   2022-11-02  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with Perinci::Sub::Gen::AccessTable 0.590 to show
+          --queries and --query-boolean.
+
+        - [ux] Add some examples.
+
+
+0.012   2022-11-01  Released-By: PERLANCAR; Urgency: medium
+
+        - Tweak Abstract and rename alias CLI
+          bpom-daftar-cemaran-logam-pangan ->
+          bpom-daftar-karakteristik-dasar-dan-cemaran-logam-pangan.
+
+
+0.011   2022-10-31  Released-By: PERLANCAR; Urgency: medium
+
+        - Add CLIs: bpom-list-food-additives, bpom-list-food-inputs,
+          bpom-list-food-microbe-inputs.
+
+
+0.010   2022-10-31  Released-By: PERLANCAR; Urgency: medium
+
+        - Add CLI: bpom-list-food-ingredients.
+
+
+0.009   2022-10-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Update fixed table data & updated metadata.
+
+        - [ux] [cli bpom-list-food-categories] Add examples.
+
+
+0.008   2022-10-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utility: bpom-list-food-categories; move data to
+          App::BPOMUtils::Table.
+
+
+0.007   2022-10-12  Released-By: PERLANCAR; Urgency: medium
+
+        [cli bpom-tampilkan-ing]
+
+        - Add option --color.
+
+        - Add/tweak examples.
+
+
+0.006   2022-10-11  Released-By: PERLANCAR; Urgency: medium
+
+        - Make subs exportable.
+
+        [cli bpom-tampilkan-ing]
+
+        - Produce formatted ING (currently supported format:
+          vertical_table_{html,text}, linear_{html,text}).
+
+        - [ux] Add alias --salt for --sodium.
+
+        - Add optional option --name, currently for placeholder only.
+
+
+0.005   2022-09-07  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Allow CLI bpom-show-nutrition-facts (bpom-tampilkan-ing) to
+          read configuration file & env.
+
+
+0.004   2022-09-07  Released-By: PERLANCAR; Urgency: medium
+
+        - Add CLI: bpom-show-nutrition-facts (and Indonesian alias
+          bpom-tampilkan-ing).
+
+
+0.003   2022-09-07  Released-By: PERLANCAR; Urgency: medium
+
+        - Add CLI bpom-list-reg-code-prefixes (and Indonesian alias:
+          bpom-daftar-kode-prefiks-reg).
+
+        - [incompatible change] Rename CLI bpom-list-jenis-pangan to
+          bpom-list-food-types for language consistency. Add Indonesian alias
+          bpom-daftar-jenis-pangan.
+
+
+0.002   2021-08-28  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Tweak package summary and description.
+
+
+0.001   2021-08-27  Released-By: PERLANCAR
+
+        - First release.

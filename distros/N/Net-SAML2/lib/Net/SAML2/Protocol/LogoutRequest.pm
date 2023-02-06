@@ -1,6 +1,6 @@
 package Net::SAML2::Protocol::LogoutRequest;
 use Moose;
-our $VERSION = '0.62'; # VERSION
+our $VERSION = '0.64'; # VERSION
 use MooseX::Types::Common::String qw/ NonEmptySimpleStr /;
 use MooseX::Types::URI qw/ Uri /;
 use Net::SAML2::XML::Util qw/ no_comments /;
@@ -41,6 +41,12 @@ has affiliation_group_id => (
     predicate => 'has_affiliation_group_id'
 );
 
+has name_qualifier => (
+    isa       => NonEmptySimpleStr,
+    is        => 'ro',
+    required  => 0,
+    predicate => 'has_name_qualifier'
+);
 has include_name_qualifier =>
     (isa => 'Bool', is => 'ro', required => 0, default => 0);
 
@@ -119,9 +125,9 @@ sub as_xml {
                     ) : (),
                     $self->include_name_qualifier
                     ? (
-                        $self->has_destination
-                        ? (NameQualifier => $self->destination)
-                        : (),
+                        $self->has_name_qualifier
+                        ? (NameQualifier => $self->name_qualifier)
+                        : ($self->has_destination ? (NameQualifier => $self->destination) : ()),
                         SPNameQualifier =>
                         $self->has_affiliation_group_id ? $self->affiliation_group_id : $self->issuer
                         )
@@ -148,7 +154,7 @@ Net::SAML2::Protocol::LogoutRequest - SAML2 LogoutRequest Protocol object
 
 =head1 VERSION
 
-version 0.62
+version 0.64
 
 =head1 SYNOPSIS
 
@@ -202,6 +208,11 @@ Tell the module to include the NameQualifier and SPNameQualifier attributes in
 the NameID. Defaults to false unless the B<nameid_format> equals
 C<urn:oasis:names:tc:SAML:2.0:nameidformat:persistent>
 
+=item B<name_qualifier>
+
+When supplied sets the NameQualifier attribute. When not supplied, this
+defaults to the destination.
+
 =item B<affiliation_group_id>
 
 When supplied sets the SPNameQualifier attribute. When not supplied, this
@@ -227,13 +238,23 @@ XML data
 
 Returns the LogoutRequest as XML.
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Chris Andrews  <chrisa@cpan.org>
 
+=item *
+
+Timothy Legge <timlegge@gmail.com>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Chris Andrews and Others, see the git log.
+This software is copyright (c) 2023 by Venda Ltd, see the CONTRIBUTORS file for others.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

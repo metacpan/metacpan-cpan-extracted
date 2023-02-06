@@ -1,5 +1,27 @@
 Revision history for Music-Duration-Partition
 
+0.0805 2023-02-05 16:08:13
+    - Improve SYNOPSIS.
+
+0.0804 2023-02-05 15:49:22
+    - Improve documentation.
+
+0.0803 2023-02-05 14:56:41
+    - Use the new add_to_score method in the eg/ programs.
+
+0.0802 2023-02-05 14:39:44
+    - Add the add_to_score method.
+    - Improve documentation.
+    - Improve test file.
+
+0.0801 2023-02-05 12:15:30
+    - Oh yeah! MIDI::Simple is needed for the Length hash! Derp
+
+0.0800 2023-02-05 12:02:24
+    - Why was this importing MIDI::Simple? Bah!
+    - Improve test file.
+    - Add the motifs method.
+
 0.0708 2022-10-23 12:33:49
     - Avoid implicit imports.
 

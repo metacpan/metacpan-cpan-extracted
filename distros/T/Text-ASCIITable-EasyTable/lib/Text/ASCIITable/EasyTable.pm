@@ -13,7 +13,7 @@ use parent qw(Exporter);
 
 our @EXPORT = qw(easy_table); ## no critic (ProhibitAutomaticExportation)
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 ########################################################################
 sub is_array { push @_, 'ARRAY'; goto &_is_type; }

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::SP;
-our $VERSION = '0.62'; # VERSION
+our $VERSION = '0.64'; # VERSION
 
 use Moose;
 
@@ -31,6 +31,7 @@ has 'cert'   => (isa => 'Str', is => 'ro', required => 1);
 has 'key'    => (isa => 'Str', is => 'ro', required => 1);
 has 'cacert' => (isa => 'Str', is => 'rw', required => 0, predicate => 'has_cacert');
 
+has 'encryption_key'   => (isa => 'Str', is => 'ro', required => 0, predicate => 'has_encryption_key');
 has 'error_url'        => (isa => Uri, is => 'ro', required => 1, coerce => 1);
 has 'org_name'         => (isa => 'Str', is => 'ro', required => 1);
 has 'org_display_name' => (isa => 'Str', is => 'ro', required => 1);
@@ -47,6 +48,7 @@ has 'acs_url_artifact' => (isa => 'Str', is => 'ro', required => 0);
 
 has '_cert_text' => (isa => 'Str', is => 'ro', init_arg => undef, builder => '_build_cert_text', lazy => 1);
 
+has '_encryption_key_text' => (isa => 'Str', is => 'ro', init_arg => undef, builder => '_build_encryption_key_text', lazy => 1);
 has 'authnreq_signed'         => (isa => 'Bool', is => 'ro', required => 0, default => 1);
 has 'want_assertions_signed'  => (isa => 'Bool', is => 'ro', required => 0, default => 1);
 
@@ -143,6 +145,15 @@ around BUILDARGS => sub {
     return $self->$orig(%args);
 };
 
+sub _build_encryption_key_text {
+    my ($self) = @_;
+
+    my $cert = Crypt::OpenSSL::X509->new_from_file($self->encryption_key);
+    my $text = $cert->as_string;
+    $text =~ s/-----[^-]*-----//gm;
+    return $text;
+}
+
 sub _build_cert_text {
     my ($self) = @_;
 
@@ -171,7 +182,7 @@ sub authn_request {
 
 
 sub logout_request {
-    my ($self, $destination, $nameid, $nameid_format, $session) = @_;
+    my ($self, $destination, $nameid, $nameid_format, $session, $params) = @_;
 
     my $logout_req = Net::SAML2::Protocol::LogoutRequest->new(
         issuer      => $self->id,
@@ -181,8 +192,16 @@ sub logout_request {
         NonEmptySimpleStr->check($nameid_format)
             ? (nameid_format => $nameid_format)
             : (),
+        (defined $params->{sp_name_qualifier})
+            ? (affiliation_group_id => $params->{sp_name_qualifier})
+            : (),
+        (defined $params->{name_qualifier})
+            ? (name_qualifier => $params->{name_qualifier})
+            : (),
+        (defined $params->{include_name_qualifier})
+            ? ( include_name_qualifier => $params->{include_name_qualifier} )
+            : ( include_name_qualifier => 1),
     );
-
     return $logout_req;
 }
 
@@ -310,7 +329,9 @@ sub generate_metadata {
                 protocolSupportEnumeration => URN_PROTOCOL,
             },
 
-            $self->_generate_key_descriptors($x),
+            $self->_generate_key_descriptors($x, 'signing'),
+
+            $self->has_encryption_key ? $self->_generate_key_descriptors($x, 'encryption') : (),
 
             $self->_generate_single_logout_service($x),
 
@@ -344,6 +365,7 @@ sub generate_metadata {
 sub _generate_key_descriptors {
     my $self = shift;
     my $x    = shift;
+    my $use  = shift;
 
     return
            if !$self->authnreq_signed
@@ -352,22 +374,21 @@ sub _generate_key_descriptors {
 
     return $x->KeyDescriptor(
         $md,
-        { use => 'signing' },
+        { use => $use },
         $x->KeyInfo(
             $ds,
             $x->X509Data(
                 $ds,
                 $x->X509Certificate(
                     $ds,
-                    $self->_cert_text,
+                    $use eq 'signing' ? $self->_cert_text : $self->_encryption_key_text,
                 )
             ),
             $x->KeyName(
                 $ds,
-                Digest::MD5::md5_hex($self->_cert_text)
+                Digest::MD5::md5_hex($use eq 'signing' ? $self->_cert_text : $self->_encryption_key_text)
             ),
-
-        )
+        ),
     );
 }
 
@@ -427,7 +448,7 @@ Net::SAML2::SP - Net::SAML2::SP - SAML Service Provider object
 
 =head1 VERSION
 
-version 0.62
+version 0.64
 
 =head1 SYNOPSIS
 
@@ -467,6 +488,11 @@ Path to the signing certificate
 =item B<key>
 
 Path to the private key for the signing certificate
+
+=item B<encryption_key>
+
+Path to the public key that the IdP should use for encryption. This
+is used when generating the metadata.
 
 =item B<cacert>
 
@@ -575,12 +601,24 @@ my $authnreq = authn_request(
 
 =back
 
-=head2 logout_request( $destination, $nameid, $nameid_format, $session )
+=head2 logout_request( $destination, $nameid, $nameid_format, $session, $params )
 
 Returns a LogoutRequest object created by this SP, intended for the
 given destination, which should be the identity URI of the IdP.
 
 Also requires the nameid (+format) and session to be logged out.
+
+=over
+
+$params is a HASH reference for parameters to Net::SAML2::Protocol::LogoutRequest
+
+$params =   (
+                # name qualifier parameters from Assertion NameId
+                name_qualifier      => "https://idp.shibboleth.local/idp/shibboleth"
+                sp_name_qualifier   => "https://netsaml2-testapp.local"
+            );
+
+=back
 
 =head2 logout_response( $destination, $status, $response_to )
 
@@ -635,13 +673,23 @@ Returns the metadata XML document for this SP.
 
 Return the assertion service which is the default
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Chris Andrews  <chrisa@cpan.org>
 
+=item *
+
+Timothy Legge <timlegge@gmail.com>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Chris Andrews and Others, see the git log.
+This software is copyright (c) 2023 by Venda Ltd, see the CONTRIBUTORS file for others.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

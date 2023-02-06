@@ -1,17 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
 
-package AnyEvent::Future;
+package AnyEvent::Future 0.05;
 
-use strict;
+use v5.14;
 use warnings;
 
-our $VERSION = '0.04';
-
 use base qw( Future );
-Future->VERSION( '0.05' ); # to respect subclassing
+Future->VERSION( '0.49' ); # ->set_udata
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -222,8 +220,8 @@ sub as_future(&)
 
    my $f = AnyEvent::Future->new;
 
-   $f->{w} = $code->( $f );
-   $f->on_cancel( sub { undef shift->{w} } );
+   $f->set_udata( w => scalar $code->( $f ) );
+   $f->on_cancel( sub { $f->set_udata( w => undef ) } );
 
    return $f;
 }
@@ -277,12 +275,12 @@ futures:
 
    sub http_get_future
    {
-      my @args = @_;
+      my ( $url, @args ) = @_;
 
       as_future_cb {
          my ( $done_cb ) = @_;
 
-         http_get @args, $done_cb;
+         http_get $url, @args, $done_cb;
       }
    }
 

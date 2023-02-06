@@ -46,8 +46,6 @@ $decoder
     ->decode('0x...');
 ```
 
-For more information check this [post](https://www.refeco.dev/solidity/2022/10/24/perl-abi-introduction.html)
-
 # Installation
 
 ## cpanminus
@@ -80,9 +78,9 @@ You can also look for information at:
 
 # License and Copyright
 
-This software is Copyright (c) 2022 by Reginaldo Costa.
+This software is Copyright (c) 2022 by REFECO.
 
 This is free software, licensed under:
 
-  [The Artistic License 2.0 (GPL Compatible)](https://www.perlfoundation.org/artistic-license-20.html)
+  [The MIT License](./LICENSE)
 

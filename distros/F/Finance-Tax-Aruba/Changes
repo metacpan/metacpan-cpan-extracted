@@ -1,5 +1,17 @@
 Revision history for Finance-Tax-Aruba
 
+TODO:
+
+    * Add support for elderly deductions
+    * Support dual household income tax calculations
+    * Convert to Object::Pad
+
+0.006     2023-02-04 15:52:53Z
+
+    * Add support for child deductions
+    * Fix fringe benefits bug where fringe benefits was not used for
+      AOZ/AZV calculations
+
 0.005     2023-01-08 05:12:22Z
 
     * Add 2023 year support

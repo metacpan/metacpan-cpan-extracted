@@ -1,3 +1,23 @@
+Wed Jan 25 11:54:59 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.59 - copy_object]:
+	* VERSION: bump
+	* README.md: generated
+	* src/main/perl/lib/Amazon/S3.pm.in
+	- minor pod changes
+	* src/main/perl/lib/Amazon/S3/Bucket.pm.in
+	(copy_object): new
+	* src/main/perl/Makefile.am: corrected comments re: make test
+	* cpan/Makefile.am: PROJECT_HOME
+
+	[unit tests]:
+	* src/main/perl/t/01-api.t
+	- added unit test for copy_object()
+	* src/main/perl/t/04-list-buckets.t
+	- use AMAZON_S3_HOST from environment not S3_HOST
+	* README-TESTING.md
+	- corrected way make test invoked
+
 Mon Dec 19 09:25:04 2022  Rob Lauer  <rlauer6@comcast.net>
 
 	[0.58 - min perl required]:

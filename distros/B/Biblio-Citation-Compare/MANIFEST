@@ -1,9 +1,12 @@
-README
-MANIFEST
+Biblio-Citation-Compare-0.55/META.json
+Biblio-Citation-Compare-0.55/META.yml
 Changes
-Makefile.PL
 lib/Biblio/Citation/Compare.pm
+Makefile.PL
+MANIFEST			This list of files
+README
 t/01-sameWork.t
 t/02-editions.t
+t/sameTitle.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

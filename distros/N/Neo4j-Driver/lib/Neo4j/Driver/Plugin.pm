@@ -4,7 +4,7 @@ use warnings;
 
 package Neo4j::Driver::Plugin;
 # ABSTRACT: Plug-in interface for Neo4j::Driver
-$Neo4j::Driver::Plugin::VERSION = '0.35';
+$Neo4j::Driver::Plugin::VERSION = '0.36';
 
 1;
 
@@ -20,7 +20,7 @@ Neo4j::Driver::Plugin - Plug-in interface for Neo4j::Driver
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 DESCRIPTION
 
@@ -62,11 +62,11 @@ since version 0.34.>
  
  
  package main;
- use Neo4j::Driver 0.31;
+ use Neo4j::Driver 0.34;
  use Local::MyProxyPlugin;
  
  $driver = Neo4j::Driver->new();
- $driver->plugin('Local::MyProxyPlugin');
+ $driver->plugin( Local::MyProxyPlugin->new );
 
 =head1 WARNING: EXPERIMENTAL
 
@@ -91,6 +91,35 @@ This version of L<Neo4j::Driver> can trigger the following events.
 Future versions may introduce new events or remove existing ones.
 
 =over
+
+=item error
+
+I<Since version 0.36.>
+
+ $events->add_handler(
+   error => sub {
+     my ($continue, $error) = @_;
+     $ui->show_alert_box( $error->as_string );
+     $continue->();  # die
+   },
+ );
+
+This event will be triggered when the driver encounters a Neo4j
+server error or a network-related error. Parameters given are
+a code reference for continuing with the next handler registered
+for this event and a L<Neo4j::Error> object. The driver's
+default behaviour for this event basically is to
+C<< die $error->as_string() >>.
+
+The driver does not expect event handlers to survive execution.
+If you don't call C<die()>, the driver session is likely to be
+in an inconsistent state and you should expect further errors.
+To safely continue after errors, C<use feature 'try'>.
+
+Note that this event will I<not> be triggered for most error
+conditions caused by an internal error or a usage error. In such
+cases, the driver will just die regularly with an error message
+string in the usual Perl fashion.
 
 =item http_adapter_factory
 

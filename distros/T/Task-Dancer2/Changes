@@ -1,5 +1,9 @@
 Revision history for Task-Dancer2
 
+0.07    2023-02-05
+        Added Dancer2::Template::Handlebars and Dancer2::Plugin::DBIx::Class
+        (GeekRuthie)
+
 0.06    2015-11-08
         Changed link for Dancer2::Logger::File::RotateLogs in README from
         Dancer to Dancer2 (roryzweistra)

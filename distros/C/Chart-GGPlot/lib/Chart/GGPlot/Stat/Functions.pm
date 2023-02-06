@@ -4,7 +4,7 @@ package Chart::GGPlot::Stat::Functions;
 
 use Chart::GGPlot::Setup;
 
-our $VERSION = '0.002002'; # VERSION
+our $VERSION = '0.002003'; # VERSION
 
 use Module::Load;
 
@@ -45,7 +45,7 @@ Chart::GGPlot::Stat::Functions - Function interface for stats
 
 =head1 VERSION
 
-version 0.002002
+version 0.002003
 
 =head1 DESCRIPTION
 

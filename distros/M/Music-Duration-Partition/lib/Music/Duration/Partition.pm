@@ -3,15 +3,13 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Partition a musical duration into rhythmic phrases
 
-our $VERSION = '0.0708';
+our $VERSION = '0.0805';
 
 use Moo;
 use strictures 2;
-
-use Math::Random::Discrete ();
 use MIDI::Simple ();
+use Math::Random::Discrete ();
 use List::Util qw(min);
-
 use namespace::clean;
 
 use constant TICKS => 96;
@@ -188,6 +186,21 @@ sub motif {
     return $motif;
 }
 
+
+sub motifs {
+    my ($self, $n) = @_;
+    my @motifs = map { $self->motif } 1 .. $n;
+    return @motifs;
+}
+
+
+sub add_to_score {
+    my ($self, $score, $motif, $pitches) = @_;
+    for my $i (0 .. $#$motif) {
+        $score->n($motif->[$i], $pitches->[$i]);
+    }
+}
+
 sub _duration {
     my ( $self, $name ) = @_;
 
@@ -217,44 +230,41 @@ Music::Duration::Partition - Partition a musical duration into rhythmic phrases
 
 =head1 VERSION
 
-version 0.0708
+version 0.0805
 
 =head1 SYNOPSIS
 
-  use MIDI::Simple ();
   use Music::Duration::Partition;
-  use Music::Scales;
 
   my $mdp = Music::Duration::Partition->new(
     size => 8,                  # 2 measures in 4/4 time
-    pool => [qw(hn dqn qn en)], # Made from these durations
-    pool_select => sub { my $self = shift; ... }, # optional
+    pool => [qw(hn dqn qn en)], # made from these durations
   );
 
-  my $motif = $mdp->motif; # Random list-ref of pool members
-
-  my @scale = get_scale_MIDI('C', 4, 'major');
-
-  my $score = MIDI::Simple->new_score;
-
-  for my $n (0 .. 31) { # 32/8=4 loops over the motif
-    $score->n($motif->[$n % @$motif], $scale[int rand @scale]);
-  }
-
-  $score->write_score('motif.mid');
-
-  # The pool may also be weighted
+  # the pool may also be weighted
   $mdp = Music::Duration::Partition->new(
     size    => 100,
     pool    => [qw(d50  d25)],
-    weights => [   0.7, 0.3], # optional
+    weights => [   0.7, 0.3 ], # optional
   );
 
-  # The pool may also be grouped
+  # the pool may also be grouped
   $mdp = Music::Duration::Partition->new(
     pool   => [qw(hn qn tqn)],
-    groups => [   1, 1, 3], # optional
+    groups => [   1, 1, 3   ], # optional
   );
+
+  my $motif  = $mdp->motif;  # list-ref of pool members
+  my @motifs = $mdp->motifs; # list of motifs
+
+  # midi usage:
+  # use List::Util qw(shuffle);
+  # use MIDI::Simple ();
+  # use Music::Scales qw(get_scale_MIDI);
+  # my $score = MIDI::Simple->new;
+  # my @notes = shuffle get_scale_MIDI('C', 4, 'major');
+  # $mdp->add_to_score($score, $motif, \@notes);
+  # $score->write_score('motif.mid');
 
 =head1 DESCRIPTION
 
@@ -371,6 +381,18 @@ The default B<pool_select> used constructs this by selecting a B<pool>
 duration at random, that fits into the size remaining after each
 application, in a loop until the B<size> is met.
 
+=head2 motifs
+
+  @motifs = $mdp->motifs($n);
+
+Return B<n> motifs.
+
+=head2 add_to_score
+
+  $mdp->add_to_score($score, $motif, $pitches);
+
+Add the B<motif> and B<pitches> to the B<score>.
+
 =head1 SEE ALSO
 
 The F<eg/*> and F<t/01-methods.t> programs in this distribution.
@@ -389,7 +411,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Gene Boggs.
+This software is copyright (c) 2023 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

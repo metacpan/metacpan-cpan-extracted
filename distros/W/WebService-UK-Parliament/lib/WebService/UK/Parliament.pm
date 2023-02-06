@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Mojo::Base -base;
 use Module::Load qw/load/;
@@ -45,7 +45,7 @@ WebService::UK::Parliament - Query the UK Parliament API
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -58,11 +58,11 @@ Version 0.03
 	my $members = $factory->members();
 
 	my $local = $members->getLocationConstituencySearch({
-		searchText => $green_town,
+		searchText => $j_corbyn,
 		take => 326,
 	});
 		
-	...
+	... # independence
 
 =head1 DESCRIPTION
 

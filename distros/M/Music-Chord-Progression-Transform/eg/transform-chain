@@ -2,21 +2,21 @@
 use strict;
 use warnings;
 
-# Use a circular list ("necklace") of Neo-Riemannian transformations,
-# plus "I" meaning "make no transformation." Starting at position zero,
-# move forward or backward along the necklace, transforming the
-# current chord, and render the resulting progression as MIDI.
+# Use a circular list ("necklace") of chord transformations.
+# Starting at position zero, move forward or backward along the necklace,
+# transforming the current chord, and render the resulting progression as MIDI.
 
 # Example:
 # > perl transform-chain --r=1 --m=12 --bpm=90 --note=C --o=5 --t=O,P,T1,T-2,L,R --v
 # > perl transform-chain --r=2 --m=8 --bpm=110 --note=A --o=5 --q=m --t=8 --v
+# > perl transform-chain --r=1 --m=12 --bpm=100 --note=Bb --q=7 --t=8 --v
 # > perl transform-chain --r=4 --t=7 --nobass --v
 # > timidity %.mid
 
 use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util Music-Chord-Progression-Transform Music-MelodicDevice-Transposition); # local author libs
 
 use Getopt::Long qw(GetOptions);
-use MIDI::Util qw(setup_score midi_format);
+use MIDI::Util qw(setup_score);
 use Music::Chord::Progression::Transform ();
 use Music::MelodicDevice::Transposition ();
 
@@ -65,7 +65,7 @@ sub bottom {
     my $transposed = $md->transpose(-24, \@bass);
 
     for my $note (@$transposed) {
-        $score->n('wn', midi_format($note));
+        $score->n('wn', $note);
     }
 }
 
@@ -76,22 +76,23 @@ sub top {
         chord_quality => $opt{quality},
         transforms    => $opt{transforms},
         max           => $opt{max},
+        format        => 'midinum',
         verbose       => $opt{verbose},
     );
-    my $chords = $transform->circular;
+    my ($generated) = $transform->circular;
 
     # repeat though the chord progression
     for my $i (1 .. $opt{repeat}) {
         my $j = 0; # chord counter
 
-        for my $chord (@$chords) {
+        for my $chord (@$generated) {
             $j++;
 
             # add a midi formatted whole note to the score
-            $score->n('wn', midi_format(@$chord));
+            $score->n('wn', @$chord);
 
             # select the lowest note of the final chord for the bass
-            if ($i >= $opt{repeat} && $j >= @$chords) {
+            if ($i >= $opt{repeat} && $j >= @$generated) {
                 push @bass, $chord->[0];
             }
             # otherwise pick any chord note

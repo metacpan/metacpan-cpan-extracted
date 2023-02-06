@@ -85,14 +85,13 @@ sub _prep_response {
 sub _r {
 	my $self = shift;
 	my $url = $self->{url};
-	my $key = $self->{method} eq 'GET'
-		? "GET"
-		: $self->{request}{statements}[0]{statement} // '';
+	my $key = $self->{query};
 	my $response = $self->{res}{$url}{$key} // $self->res($url, $key);
 	return $response // {
 		content_type => 'text/plain',
 		status => '501',
 		content => 'response unimplemented',
+		content => 'response unimplemented for <'.$key.'> to '.$url,
 	};
 }
 
@@ -105,12 +104,14 @@ sub fetch_all { '' . shift->_r->{content} }
 sub fetch_event { &Neo4j::Driver::Net::HTTP::LWP::fetch_event }
 
 sub request {
-	my ($self, $method, $url, $json, $accept) = @_;
+	my ($self, $method, $url, $json, $accept, $mode) = @_;
 	$self->{method}  = $method;
 	$self->{url}     = $url;
 	$self->{request} = $json;
 	$self->{accept}  = $accept;
+	$self->{mode}    = $mode;
 	$self->{buffer}  = undef;   # for ::LWP::fetch_event
+	$self->{query}   = $method eq 'GET' ? 'GET' : $json->{statements}[0]{statement} // '';
 }
 
 sub date_header { shift->_r->{date} || '' }

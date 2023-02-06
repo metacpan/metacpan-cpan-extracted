@@ -3,9 +3,10 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "String::Tagged::Terminal" );
-use_ok( "String::Tagged::Terminal::Win32Console" ) if $^O eq "MSWin32";
+require String::Tagged::Terminal;
+require String::Tagged::Terminal::Win32Console if $^O eq "MSWin32";
 
+pass "Modules loaded";
 done_testing;

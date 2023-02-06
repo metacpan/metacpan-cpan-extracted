@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate walking basslines
 
-our $VERSION = '0.0506';
+our $VERSION = '0.0508';
 
 use Moo;
 use strictures 2;
@@ -122,6 +122,9 @@ sub generate {
     $chord ||= 'C';
     $num   ||= 4;
 
+    if ($chord =~ /^(.+)\//) {
+        $chord  = $1;
+    }
     my ($chord_note, $flavor) = _parse_chord($chord);
 
     my $next_chord_note;
@@ -296,7 +299,7 @@ MIDI::Bassline::Walk - Generate walking basslines
 
 =head1 VERSION
 
-version 0.0506
+version 0.0508
 
 =head1 SYNOPSIS
 
@@ -514,7 +517,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Gene Boggs.
+This software is Copyright (c) 2023 by Gene Boggs.
 
 This is free software, licensed under:
 

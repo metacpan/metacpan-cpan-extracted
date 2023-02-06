@@ -30,7 +30,7 @@ sub _r {
 	
 	if ( $self->{force_echo} ne 'SHOW DEFAULT DATABASE'
 			&& ref $self->{request} eq 'HASH'
-			&& ref $self->{request}{statements} eq 'ARRAY'
+			&& defined $self->{request}{statements}[0]{statement}
 			&& $self->{request}{statements}[0]{statement} eq 'SHOW DEFAULT DATABASE' ) {
 		return $self->_prep_response({ jolt => [
 			{ header => { fields => ['name'] } },
@@ -43,17 +43,22 @@ sub _r {
 	my $request = $self->{request};
 	$request = $self->{req_callback}->($request) if $self->{req_callback};
 	return $self->_prep_response({ jolt => [
-		{ header => { fields => [qw( method url accept query )] } },
+		{ header => { fields => [qw( method url accept mode query )] } },
 		{ data => [
 			{ 'U' => $self->{method} },
 			{ 'U' => $self->{url} },
 			{ 'U' => $self->{accept} },
+			{ 'U' => $self->{mode} },
 			# This works because U is the sigil for a string in strict Jolt
 			# and the Jolt result parser leaves strings unchanged:
 			{ 'U' => $request },
 		] },
 		{ summary => {} },
-		{ info => {} },
+		{ info => {
+			# Transaction functions require the tx to remain open.
+			commit => "http://localhost:7474/db/echo/tx/echo/commit",
+			transaction => { expires => 'Tue, 1 Jan 2999 00:00:00 GMT' },
+		}},
 	]});
 }
 

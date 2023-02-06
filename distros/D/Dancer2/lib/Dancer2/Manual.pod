@@ -13,7 +13,7 @@ Dancer2::Manual - A gentle introduction to Dancer2
 
 =head1 VERSION
 
-version 0.400000
+version 0.400001
 
 =head1 DESCRIPTION
 
@@ -56,7 +56,7 @@ the most recent version on CPAN.
 
 Create a web application using the dancer script:
 
-    $ dancer2 -a MyApp && cd MyApp
+    $ dancer2 gen -a MyApp && cd MyApp
     + MyApp
     + MyApp/config.yml
     + MyApp/Makefile.PL
@@ -100,7 +100,7 @@ a script to start it. A default skeleton is used to bootstrap the new
 application, but you can use the C<-s> option to provide another skeleton.
 For example:
 
-    $ dancer2 -a MyApp -s ~/mydancerskel
+    $ dancer2 gen -a MyApp -s ~/mydancerskel
 
 For an example of a skeleton directory check the default one available in
 the C<share/> directory of your Dancer2 distribution.
@@ -197,8 +197,8 @@ requests.
 =head2 Route Handlers
 
 The route action is the code reference declared. It can access parameters
-through the specific L<route_parameters|/route_parameters>, 
-L<query_parameters|/query_parameters>, and  L<body_parameters|/body_parameters>
+through the specific L<route_parameters|Dancer2::Manual::Keywords/route_parameters>,
+L<query_parameters|Dancer2::Manual::Keywords/query_parameters>, and L<body_parameters|Dancer2::Manual::Keywords/body_parameters>
 keywords, which return a L<Hash::MultiValue> object. 
 This hashref is a merge of the route pattern matches and the request params.
 
@@ -531,7 +531,7 @@ This is done with the B<pass> keyword, like in the following example
 
 Hooks are code references (or anonymous subroutines) that are triggered at
 specific moments during the resolution of a request.  They are set up using the
-L<hook|/hook> keyword.
+L<hook|Dancer2::Manual::Keywords/hook> keyword.
 
 Many of them are provided by Dancer2's core, but plugins and engines can also
 define their own.
@@ -544,7 +544,7 @@ C<before> hooks are evaluated before each request within the context of the
 request and receives as argument the app (a L<Dancer2::Core::App> object).
 
 It's possible to define variables which will be accessible in the action
-blocks with the L<var keyword|/var>.
+blocks with the L<var keyword|Dancer2::Manual::Keywords/var>.
 
     hook before => sub {
         var note => 'Hi there';
@@ -826,10 +826,13 @@ it's used to report the error.
 
 =item * Next, looks in the C<public/> directory for a corresponding HTML file
 matching the error code (e.g. C<500.html> or C<404.html>). If such a file
-exists, it's used to report the error. (Note, however, that if B<show_errors>
+exists, it's used to report the error. (Note, however, that if B<show_stacktrace>
 is set to true, in the case of a 500 error the static HTML page will not be
 shown, but will be replaced with a default error page containing more
 informative diagnostics. For more information see L<Dancer2::Config>.)
+
+(In older versions, B<show_errors> was used instead of B<show_stacktrace>.
+Both are supported, but B<show_errors> is deprecated.)
 
 =item * As default, render a generic error page on the fly.
 
@@ -842,7 +845,7 @@ error page with the HTTP status code 500.
 
 It's possible either to display the content of the error message or to hide
 it with a generic error page. This is a choice left to the end-user and can
-be controlled with the B<show_errors> setting (see above).
+be controlled with the B<show_stacktrace> setting (see above).
 
 =head2 Error Hooks
 
@@ -1452,14 +1455,14 @@ file:
     # appdir/environments/development.yml
     log: 'debug'
     startup_info: 1
-    show_errors:  1
+    show_stacktrace:  1
 
 And in a production one:
 
     # appdir/environments/production.yml
     log: 'warning'
     startup_info: 0
-    show_errors:  0
+    show_stacktrace:  0
 
 Please note that you are not limited to writing configuration files in YAML.
 Dancer2 supports any file format that is supported by L<Config::Any>, such
@@ -1873,7 +1876,7 @@ Carton builds them for you when you need it.
 
 First set up a new app:
 
-     $ dancer2 -a MyApp
+     $ dancer2 gen -a MyApp
      ...
 
 Delete the files that are not needed:
@@ -2276,7 +2279,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Alexis Sukrieh.
+This software is copyright (c) 2023 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

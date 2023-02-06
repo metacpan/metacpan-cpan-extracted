@@ -49,9 +49,7 @@ sub melody {
 
         my @phrase = $i % $mod ? @$motif : shuffle @$motif;
 
-        for my $n ( 0 .. @notes - 1 ) {
-            $score->n( $phrase[$n], $notes[$n] );
-        }
+        $mdp->add_to_score($score, \@phrase, \@notes);
 
         $score->r('wn');
     }

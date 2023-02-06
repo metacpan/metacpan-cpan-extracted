@@ -51,7 +51,7 @@ __PACKAGE__->mk_accessors(
   }
 );
 
-our $VERSION = '0.58'; ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
+our $VERSION = '0.59'; ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
 
 ########################################################################
 sub new {
@@ -1495,7 +1495,13 @@ managing Amazon S3 buckets and keys.
           'x-amz-meta-colour' => 'orange',
       }
   );
-  
+
+  # copy an object
+  $bucket->copy_object(
+    source => $source,
+    key    => $new_keyname
+  );
+
   # list keys in the bucket
   $response = $bucket->list
       or die $s3->err . ": " . $s3->errstr;
@@ -1865,7 +1871,7 @@ default: false
 
 =back
 
-Returns a HASHREF containging the metadata for all of the buckets
+Returns a HASHREF containing the metadata for all of the buckets
 owned by the accout or (see below) or C<undef> on
 error.
 
@@ -2190,6 +2196,8 @@ money each time you use their service. And yes, testing counts as using.
 Because of this, the application's test suite skips anything approaching 
 a real test unless you set these environment variables:
 
+For more on testing this module see L<README-TESTING.md|https://github.com/rlauer6/perl-amazon-s3/blob/master/README-TESTING.md>
+
 =over 
 
 =item AMAZON_S3_EXPENSIVE_TESTS
@@ -2309,6 +2317,10 @@ Bugs should be reported via the CPAN bug tracker at
 <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Amazon-S3>
 
 For other issues, contact the author.
+
+=head1 REPOSITORY
+
+L<https://github.com/rlauer6/perl-amazon-s3|https://github.com/rlauer6/perl-amazon-s3>
 
 =head1 AUTHOR
 

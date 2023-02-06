@@ -1,6 +1,6 @@
 package Dancer2::Core::Error;
 # ABSTRACT: Class representing fatal errors
-$Dancer2::Core::Error::VERSION = '0.400000';
+$Dancer2::Core::Error::VERSION = '0.400001';
 use Moo;
 use Carp;
 use Dancer2::Core::Types;
@@ -18,14 +18,14 @@ has app => (
     predicate => 'has_app',
 );
 
-has show_errors => (
+has show_stacktrace => (
     is      => 'ro',
     isa     => Bool,
     default => sub {
         my $self = shift;
 
         $self->has_app
-            and return $self->app->setting('show_errors');
+            and return $self->app->setting('show_stacktrace');
     },
 );
 
@@ -106,8 +106,8 @@ sub default_error_page {
     my $uri_base = $self->has_app && $self->app->has_request ?
         $self->app->request->uri_base : '';
 
-    # GH#1001 stack trace if show_errors is true and this is a 'server' error (5xx)
-    my $show_fullmsg = $self->show_errors && $self->status =~ /^5/;
+    # GH#1001 stack trace if show_stacktrace is true and this is a 'server' error (5xx)
+    my $show_fullmsg = $self->show_stacktrace && $self->status =~ /^5/;
     my $opts = {
         title    => $self->title,
         charset  => $self->charset,
@@ -273,8 +273,8 @@ sub _build_content {
         return $content if defined $content;
     }
 
-    # It doesn't make sense to return a static page for a 500 if show_errors is on
-    if ( !($self->show_errors && $self->status eq '500') ) {
+    # It doesn't make sense to return a static page for a 500 if show_stacktrace is on
+    if ( !($self->show_stacktrace && $self->status eq '500') ) {
          if ( my $content = $self->static_page ) {
              return $content;
          }
@@ -483,7 +483,7 @@ Dancer2::Core::Error - Class representing fatal errors
 
 =head1 VERSION
 
-version 0.400000
+version 0.400001
 
 =head1 SYNOPSIS
 
@@ -507,7 +507,7 @@ well under debugging to catch errors and show them on screen.
 
 =head1 ATTRIBUTES
 
-=head2 show_errors
+=head2 show_stacktrace
 
 =head2 charset
 
@@ -589,7 +589,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Alexis Sukrieh.
+This software is copyright (c) 2023 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

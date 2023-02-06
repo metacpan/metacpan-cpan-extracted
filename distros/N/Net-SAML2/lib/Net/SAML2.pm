@@ -1,12 +1,11 @@
 use strict;
 use warnings;
 package Net::SAML2;
-our $VERSION = "0.62";
+our $VERSION = "0.64";
 
-require 5.008_001;
+require 5.012;
 
 # ABSTRACT: SAML2 bindings and protocol implementation
-
 
 # entities
 use Net::SAML2::IdP;
@@ -22,8 +21,8 @@ use Net::SAML2::Protocol::AuthnRequest;
 use Net::SAML2::Protocol::LogoutRequest;
 use Net::SAML2::Protocol::LogoutResponse;;
 use Net::SAML2::Protocol::Assertion;
+use Net::SAML2::Protocol::Artifact;
 use Net::SAML2::Protocol::ArtifactResolve;
-
 
 1;
 
@@ -39,7 +38,7 @@ Net::SAML2 - SAML2 bindings and protocol implementation
 
 =head1 VERSION
 
-version 0.62
+version 0.64
 
 =head1 SYNOPSIS
 
@@ -116,30 +115,32 @@ Identity Providers (IdPs).  It has been tested against:
 
 =over
 
-=item GSuite (Google)
+=item Auth0 (requires Net::SAML2 >=0.39)
 
 =item Azure (Microsoft Office 365)
 
-=item OneLogin
+=item GSuite (Google)
 
 =item Jump
 
-=item Mircosoft ADFS
-
 =item Keycloak
 
-=item Auth0 (requires Net::SAML2 >=0.39)
+=item Mircosoft ADFS (not recently tested)
+
+=item Okta
+
+=item OneLogin
 
 =item PingIdentity
 
 Version 0.54 and newer support EncryptedAssertions.  No changes required to existing
 SP applications if EncryptedAssertions are not in use.
 
+=item SAMLTEST.ID (requires Net::SAML2 >=0.63)
+
+=item Shibboleth (requires Net::SAML2 >=0.63)
+
 =back
-
-=head1 NAME
-
-Net::SAML2 - SAML bindings and protocol implementation
 
 =head1 MAJOR CAVEATS
 
@@ -151,50 +152,23 @@ Net::SAML2 - SAML bindings and protocol implementation
 
 =back
 
-=head1 CONTRIBUTORS
+=head1 AUTHORS
 
-=over
+=over 4
 
-=item Chris Andrews <chris@nodnol.org>
-
-=item Oskari Okko Ojala <okko@frantic.com>
-
-=item Peter Marschall <peter@adpm.de>
-
-=item Mike Wisener <xmikew@cpan.org>
-
-=item Jeff Fearn <jfearn@redhat.com>
-
-=item Alessandro Ranellucci <aar@cpan.org>
-
-=item Mike Wisener <mwisener@secureworks.com>, xmikew <github@32ths.com>
-
-=item xmikew <github@32ths.com>
-
-=item Timothy Legge <timlegge@gmail.com>
-
-=back
-
-=head1 COPYRIGHT
-
-The following copyright notice applies to all the files provided in
-this distribution, including binary files, unless explicitly noted
-otherwise.
-
-Copyright 2010, 2011 Venda Ltd.
-
-=head1 LICENCE
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=head1 AUTHOR
+=item *
 
 Chris Andrews  <chrisa@cpan.org>
 
+=item *
+
+Timothy Legge <timlegge@gmail.com>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Chris Andrews and Others, see the git log.
+This software is copyright (c) 2023 by Venda Ltd, see the CONTRIBUTORS file for others.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

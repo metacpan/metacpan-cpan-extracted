@@ -1,0 +1,425 @@
+class File::Spec::Win32 extends File::Spec::Unix {
+  use Regex;
+  use StringList;
+  use Array;
+  use Cwd;
+  
+  our $DRIVE_RX_STRING : private string;
+  our $UNC_RX_STRING : private string;
+  our $VOL_RX_STRING : private string;
+
+  INIT {
+    $DRIVE_RX_STRING = "[a-zA-Z]:";
+    $UNC_RX_STRING = "(?:\\\\\\\\|//)[^\\\\/]+[\\\\/][^\\\\/]+";
+    $VOL_RX_STRING = "(?:$DRIVE_RX_STRING|$UNC_RX_STRING)";
+  }
+  
+  # Class Methods
+  static method new : File::Spec::Win32 () {
+    
+    my $self = new File::Spec::Win32;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method devnull : string () {
+    return "nul";
+  }
+  
+  method rootdir : string () {
+    return "\\";
+  }
+
+  method tmpdir : string () {
+    my $interface = (File::Spec::Interface)$self;
+    
+    my $env_tmpdir = Sys->getenv("TMPDIR");
+    my $env_temp = Sys->getenv("TEMP");
+    my $env_tmp = Sys->getenv("TMP");
+    my $dirlist = [
+      $env_tmpdir,
+      $env_temp,
+      $env_tmp,
+      "SYS:/temp",
+      "C:\system\temp",
+      "C:/temp",
+      "/tmp",
+      "/",
+    ];
+
+    my $tmpdir = $interface->_tmpdir($dirlist);
+    return $tmpdir;
+  }
+  
+  method file_name_is_absolute : int ($path : string) {
+    
+    my $is_abs = 0;
+    my $vol_re = Regex->new("^($VOL_RX_STRING)");
+    if ($vol_re->match($path)) {
+      my $vol = $vol_re->cap1;
+      
+      my $unc_re = Regex->new("^$UNC_RX_STRING");
+      if ($unc_re->match($vol)) {
+        $is_abs = 2;
+      }
+      else {
+        my $drive_re = Regex->new("^$DRIVE_RX_STRING[\\\\/]");
+        if ($drive_re->match($path)) {
+          $is_abs = 2;
+        }
+      }
+    }
+    else {
+      my $re = Regex->new("^[\\\\/]");
+      if ($re->match($path)) {
+        $is_abs = 1;
+      }
+    }
+    
+    return $is_abs;
+  }
+
+  method _same : int ($path1 : string, $path2 : string) {
+    my $same = 0;
+    if (Fn->lc($path1) eq Fn->lc($path2)) {
+      $same = 1;
+    }
+    return $same;
+  }
+  
+  method path : string[] () {
+    
+    my $env_path = Sys->getenv("PATH");
+    unless ($env_path) {
+      return new string[0];
+    }
+    
+    my $pathes = Fn->split(";", $env_path);
+    
+    my $re = Regex->new("\"");
+    my $pathes_list = StringList->new;
+    for (my $i = 0; $i < @$pathes; $i++) {
+      my $path = $pathes->[$i];
+      $path = $re->replace_g($path, "");
+      if (length $path) {
+        $pathes_list->push($path);
+      }
+    }
+    $pathes_list->unshift(".");
+    $pathes = $pathes_list->to_array;
+    
+    return $pathes;
+  }
+  
+  method splitpath : string[] ($path : string, $nofile = 0 : int) {
+    
+    my $volume = "";
+    my $directory = "";
+    my $file = "";
+    
+    my $re_valume = Regex->new("^($VOL_RX_STRING?)(.*)", "s");
+    if ($re_valume->match($path)) {
+      $volume = $re_valume->cap1;
+      my $rest = $re_valume->cap2;
+      
+      if ($nofile) {
+        $directory = $rest;
+      }
+      else {
+        my $re = Regex->new("^((?:.*[\\\\/](?:\.\.?\z)?)?)([^\\\\/]*)", "s");
+        if ($re->match($rest)) {
+          $directory = $re->cap1;
+          $file      = $re->cap2;
+        }
+      }
+    }
+    
+    return [$volume, $directory, $file];
+  }
+  
+  method splitdir : string[] ($path : string) {
+    my $dirs = Regex->new("[\\\\/]")->split($path, -1);
+    
+    return $dirs;
+  }
+
+  private method _canon_cat : string ($parts : string[]) {
+    my $first = $parts->[0];
+    
+    my $volume = (string)undef;
+    
+    # drive letter - (C:)
+    my $re_drive = Regex->new("\A([A-Za-z]:)([\\\\/]?)");
+    $first = $re_drive->replace($first, "");
+    if ($re_drive->replaced_count > 0) {
+      $volume = Fn->ucfirst($re_drive->cap1);
+      if (length $re_drive->cap2) {
+        $volume .= "\\";
+      }
+    }
+    else {
+      my $re_unc = Regex->new("\A(?:\\\\\\\\|//)([^\\\\/]+)(?:[\\\\/]([^\\\\/]+))?[\\\\/]?", "s");
+      $first = $re_unc->replace($first, "");
+      
+      # UNC volume (\\192.168.201.101)
+      if ($re_unc->replaced_count > 0) {
+        $volume = "\\\\" . $re_unc->cap1;
+        if ($re_unc->cap2) {
+          $volume .= "\\" . $re_unc->cap2;
+        }
+        $volume .= "\\";
+      }
+      else {
+        my $re_root = Regex->new("\A[\\\\/]");
+        $first = $re_root->replace($first, "");
+        
+        # root dir (\foo)
+        if ($re_root->replaced_count > 0) {
+          $volume = "\\";
+        }
+        else {
+          $volume = "";
+        }
+      }
+    }
+    
+    $parts->[0] = $first;
+    
+    my $path = Fn->join("\\", $parts);
+    
+    # /+ to \
+    $path = Regex->new("/+")->replace_g($path, "\\");
+    
+    # \+ to \
+    $path = Regex->new("\\\\+")->replace_g($path, "\\");
+    
+    # xx\.\.\yy --> xx\yy
+    $path = Regex->new("(?:(?:\A|\\\\)\.(?:\\\\\.)*(?:\\\\|\z))+")->replace_g($path, "\\");
+    
+    # xx\yy\..\zz --> xx\zz
+    my $parts_list = StringList->new;
+    $parts = Fn->split("\\", $path);
+    for (my $i = 0; $i < @$parts; $i++) {
+      my $part = $parts->[$i];
+      if ($part eq "..") {
+        if ($parts_list->length > 0) {
+          my $before_part = $parts_list->get($parts_list->length - 1);
+          unless ($before_part eq "..") {
+            $parts_list->pop;
+            next;
+          }
+        }
+      }
+      $parts_list->push($part);
+    }
+    $parts = $parts_list->to_array;
+    $path = Fn->join("\\", $parts);
+    
+    # \xx --> xx
+    $path = Regex->new("\A\\\\")->replace_g($path, "");
+    
+    # xx\ --> xx
+    $path = Regex->new("\\\\\z")->replace_g($path, "");
+    
+    if (Regex->new("\\\\\z")->match($volume)) {
+      # <vol>\.. --> <vol>\
+      $path = Regex->new("\A\.\.(?:\\\\\.\.)*(?:\\\\|\z)")->replace($path, "");
+      
+      # \\HOST\SHARE\ --> \\HOST\SHARE
+      my $re = Regex->new("\A(\\\\\\\\.*)\\\\\z", "s");
+      if (!length $path && $re->match($volume)) {
+        $path = $re->cap1;
+        return $path;
+      }
+    }
+    
+    if (length $path || length $volume) {
+      $path = $volume . $path;
+    }
+    else {
+      $path = ".";
+    }
+    
+    return $path;
+  }
+  
+  method canonpath : string ($path : string) {
+    my $interface = (File::Spec::Interface)$self;
+    
+    unless ($path) {
+      die "The \$path must be defined";
+    }
+    
+    unless (length $path) {
+      return $path;
+    }
+    
+    my $canonpath = $self->_canon_cat([$path]);
+    
+    return $canonpath;
+  }
+
+  method catdir : string ($dir_parts : string[]) {
+    my $interface = (File::Spec::Interface)$self;
+    
+    unless ($dir_parts) {
+      die "The \$dir_parts must be defined";
+    }
+    
+    unless (@$dir_parts) {
+      return "";
+    }
+    
+    unless (length $dir_parts->[0]) {
+      $dir_parts->[0] = "/";
+    }
+    
+    if (Regex->new("^$DRIVE_RX_STRING\z")->match($dir_parts->[0])) {
+      $dir_parts->[0] .= "\\";
+    }
+    
+    my $dir = $self->_canon_cat($dir_parts);
+    
+    return $dir;
+  }
+
+  method catfile : string ($dir_parts : string[], $file_base_name : string) {
+    my $interface = (File::Spec::Interface)$self;
+    
+    unless ($dir_parts) {
+      die "The \$dir_parts must be defined";
+    }
+    
+    unless ($file_base_name) {
+      die "The \$file_base_name must be defined";
+    }
+    
+    if (@$dir_parts) {
+      unless (length $dir_parts->[0]) {
+        $dir_parts->[0] = "/";
+      }
+      
+      if (Regex->new("^$DRIVE_RX_STRING\z")->match($dir_parts->[0])) {
+        $dir_parts->[0] .= "\\";
+      }
+    }
+    
+    my $parts_list = StringList->new($dir_parts);
+    $parts_list->push($file_base_name);
+    my $parts = $parts_list->to_array;
+    
+    my $file = $self->_canon_cat($parts);
+    
+    return $file;
+  }
+
+  method rel2abs : string ($path : string, $base = undef : string) {
+    my $interface = (File::Spec::Interface)$self;
+    
+    my $is_abs = $interface->file_name_is_absolute($path);
+    
+    my $abs_path = (string)undef;
+    
+    # Check for volume (should probably document the '2' thing...)
+    if ($is_abs == 2) {
+      $abs_path = $interface->canonpath($path) ;
+    }
+    elsif ($is_abs) {
+      # It's missing a volume, add one
+      my $vol_parts = $interface->splitpath(Cwd->getcwd);
+      my $vol = $vol_parts->[0];
+      
+      $abs_path = $interface->canonpath($vol . $path);
+    }
+    else {
+      if (!$base || $base eq "") {
+        my $drive = $interface->splitpath($path)->[0];
+        if (length $drive) {
+          eval { $base = Cwd->getdcwd($drive); };
+          if ($@) {
+            unless (error == class_id Error::System) {
+              die $@;
+            }
+          }
+        }
+        unless ($base) {
+          $base = Cwd->getcwd;
+        }
+      }
+      elsif (!$interface->file_name_is_absolute($base)) {
+        $base = $interface->rel2abs($base) ;
+      }
+      else {
+        $base = $interface->canonpath($base) ;
+      }
+      
+      my $path_parts = $interface->splitpath($path, 1);
+      my $path_dir = $path_parts->[1];
+      my $path_base_file = $path_parts->[2];
+      
+      my $base_parts = $interface->splitpath($base, 1);
+      my $base_volume = $base_parts->[0];
+      my $base_dir = $base_parts->[1];
+      
+      $path = $interface->catpath( 
+       $base_volume, 
+       $interface->catdir([$base_dir, $path_dir]), 
+       $path_base_file
+      );
+      
+      $abs_path = $interface->canonpath($path);
+    }
+    
+    return $abs_path;
+  }
+  
+  method catpath : string ($volume : string, $directory : string, $file : string) {
+    unless ($volume) {
+      $volume = "";
+    }
+    unless ($directory) {
+      $directory = "";
+    }
+    unless ($file) {
+      $file = "";
+    }
+    
+    my $path = $volume;
+    
+    # If it's UNC, make sure the glue separator is there, reusing
+    # whatever separator is first in the $volume
+    my $v = (string)undef;
+    my $unc_re = Regex->new("^([\\\\/])[\\\\/][^\\\\/]+[\\\\/][^\\\\/]+\z", "s");
+    if ($unc_re->match($path)) {
+      my $v = $unc_re->cap1;
+      if (Regex->new("^[^\\\\/]")->match($directory)) {
+        $path .= $v;
+      }
+    }
+    
+    $path .= $directory;
+    
+    
+    
+    # If the volume is not just A:, make sure the glue separator is 
+    # there, reusing whatever separator is first in the $volume if possible.
+    if (!Regex->new("^[a-zA-Z]:\z", "s")->match($path) && Regex->new("[^\\\\/]\z")->match($path)
+        && Regex->new("[^\\\\/]")->match($file))
+    {
+      my $re = Regex->new("([\\\\/])");
+      my $sep = (string)undef;
+      if ($re->match($path)) {
+        $sep = $re->cap1;
+      }
+      else {
+        $sep = "\\";
+      }
+      $path .= $sep;
+    }
+    
+    $path .= $file;
+    
+    return $path;
+  }
+}

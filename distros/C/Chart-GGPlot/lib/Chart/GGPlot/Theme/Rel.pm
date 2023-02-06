@@ -5,7 +5,7 @@ package Chart::GGPlot::Theme::Rel;
 use Chart::GGPlot::Setup;
 use Function::Parameters qw(classmethod);
 
-our $VERSION = '0.002002'; # VERSION
+our $VERSION = '0.002003'; # VERSION
 
 use overload '*' => fun( $self, $other, $swap ) { $self->value * $other },
   fallback       => 1;
@@ -33,7 +33,7 @@ Chart::GGPlot::Theme::Rel - To specify sizes relative to the parent
 
 =head1 VERSION
 
-version 0.002002
+version 0.002003
 
 =head1 AUTHOR
 

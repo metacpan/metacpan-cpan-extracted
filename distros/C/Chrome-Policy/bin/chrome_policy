@@ -1,0 +1,59 @@
+#! /usr/bin/env perl
+
+# PODNAME: chrome_policy
+# ABSTRACT: Set Chrome policies
+
+use v5.37;
+use lib '/home/regular/IdeaProjects/Chrome-Policy/lib';
+use autouse 'Data::Printer' => 'p';
+use English;
+use Chrome::Policy::Chrome;
+use Chrome::Policy::Chromium;
+use Getopt::Long;
+
+BEGIN {
+  if ( $UID != 0 ) {
+    say 'Please execute the program as the root user (for /etc/opt access).';
+    die 'sudo /home/regular/perl5/perlbrew/perls/perl-5.37.8/bin/perl -I /home/regular/perl5/perlbrew/perls/perl-5.37.8/bin/perl chrome_policy';
+  }
+}
+
+my $getopt = Getopt::Long::Parser -> new;
+$getopt -> configure( 'auto_help' , 'auto_version' , 'no_ignore_case' , 'bundling' );
+$getopt -> getoptions( \my %options , 'chromium|u' );
+
+my $policy;
+unless ( $options{chromium} ) {
+  $policy = Chrome::Policy::Chrome -> new;
+}
+else {
+  $policy = Chrome::Policy::Chromium -> new;
+}
+$policy -> set_strict_policy;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+chrome_policy - Set Chrome policies
+
+=head1 VERSION
+
+version 0.230360
+
+=head1 AUTHOR
+
+Elvin Aslanov <rwp.primary@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by Elvin Aslanov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

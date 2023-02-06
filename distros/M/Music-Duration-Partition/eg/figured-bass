@@ -71,17 +71,11 @@ sub bottom {
     for my $x ( 1 .. $max ) {
         my @notes2 = map { $voice->rand } 0 .. @$motif2 - 1;
 
-        for my $n ( 0 .. @$motif1 - 1 ) {
-            $score->n( $motif1->[$n], $notes1[$n] );
-            #warn "1: $motif1->[$n], $notes1[$n]\n";
-        }
+        $mdp1->add_to_score($score, $motif1, \@notes1);
 
         $score->r('qn');
 
-        for my $n ( 0 .. @$motif2 - 1 ) {
-            $score->n( $motif2->[$n], $notes2[$n] );
-            #warn "2: $motif2->[$n], $notes2[$n]\n";
-        }
+        $mdp2->add_to_score($score, $motif2, \@notes2);
 
         $score->r('qn');
     }

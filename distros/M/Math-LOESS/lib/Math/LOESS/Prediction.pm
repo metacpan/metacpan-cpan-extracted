@@ -6,7 +6,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.001000'; # VERSION
 
 use Math::LOESS::_swig;
 use Type::Params qw(compile_named);
@@ -86,7 +86,7 @@ Math::LOESS::Prediction - Math::LOESS prediction and confidence intervals
 
 =head1 VERSION
 
-version 0.0001
+version 0.001000
 
 =head1 DESCRIPTION
 
@@ -136,7 +136,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Stephan Loyd.
+This software is copyright (c) 2019-2023 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

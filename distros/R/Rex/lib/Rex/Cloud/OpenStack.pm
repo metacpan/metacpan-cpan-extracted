@@ -1,8 +1,6 @@
 #
 # (c) Ferenc Erki <erkiferenc@gmail.com>
 #
-# vim: set ts=2 sw=2 tw=0:
-# vim: set expandtab:
 
 package Rex::Cloud::OpenStack;
 
@@ -10,7 +8,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.4'; # VERSION
+our $VERSION = '1.14.0'; # VERSION
 
 use Rex::Logger;
 
@@ -25,7 +23,7 @@ BEGIN {
 use Data::Dumper;
 use Carp;
 use MIME::Base64 qw(decode_base64);
-use Digest::MD5 qw(md5_hex);
+use Digest::MD5  qw(md5_hex);
 use File::Basename;
 
 sub new {

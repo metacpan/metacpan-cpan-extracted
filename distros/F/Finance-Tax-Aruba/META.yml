@@ -22,22 +22,22 @@ name: Finance-Tax-Aruba
 provides:
   Finance::Tax::Aruba:
     file: lib/Finance/Tax/Aruba.pm
-    version: '0.005'
+    version: '0.006'
   Finance::Tax::Aruba::Income:
     file: lib/Finance/Tax/Aruba/Income.pm
-    version: '0.005'
+    version: '0.006'
   Finance::Tax::Aruba::Income::2020:
     file: lib/Finance/Tax/Aruba/Income/2020.pm
-    version: '0.005'
+    version: '0.006'
   Finance::Tax::Aruba::Income::2021:
     file: lib/Finance/Tax/Aruba/Income/2021.pm
-    version: '0.005'
+    version: '0.006'
   Finance::Tax::Aruba::Income::2023:
     file: lib/Finance/Tax/Aruba/Income/2023.pm
-    version: '0.005'
+    version: '0.006'
   Finance::Tax::Aruba::Role::Income::TaxYear:
     file: lib/Finance/Tax/Aruba/Role/Income/TaxYear.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   Carp: '0'
   DateTime: '0'
@@ -51,8 +51,8 @@ requires:
   namespace::autoclean: '0'
   perl: '5.010'
 resources:
-  repository: git://gitlab.com/opndev/finance-tax-aruba.git
-version: '0.005'
+  repository: git://gitlab.com/opndev/perl5/finance-tax-aruba.git
+version: '0.006'
 x_contributors:
   - 'Wesley Schwengle <waterkip@cpan.org>'
   - 'Shlomi Fish <shlomif@shlomifish.org>'

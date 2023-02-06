@@ -5,7 +5,8 @@ use strict;
 use warnings;
 use Text::LevenshteinXS qw(distance);
 use HTML::Entities;
-use Text::Names qw/samePerson cleanName parseName/;
+use Text::Names qw/samePerson cleanName parseName parseName2/;
+use Text::Roman qw/isroman roman2int/;
 use utf8;
 
 require Exporter;
@@ -13,14 +14,14 @@ require Exporter;
 our @ISA = qw(Exporter);
 
 our %EXPORT_TAGS = ( 'all' => [ qw(
-	sameWork sameAuthors toString extractEdition
+	sameWork sameAuthors toString extractEdition sameAuthorBits sameTitle sameAuthorsLoose
 ) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw( );
 
-our $VERSION = '0.4';
+our $VERSION = '0.56';
 
 # to correct bogus windows entities. unfixable ones are converted to spaces.
 my %WIN2UTF = (
@@ -72,15 +73,15 @@ my @ED_RES = (
 my $TITLE_SPLIT = '(?:\?|\:|\.|!)';
 
 sub sameAuthors {
-    my ($list1, $list2) = @_;
-    #return 0 if $#$list1 != $#$list2;
+    my ($list1, $list2, %opts) = @_;
+    return 0 if $#$list1 != $#$list2 and $opts{strict};
     if ($#$list2 > $#$list1) {
         my $t = $list1;
         $list1 = $list2;
         $list2 = $t;
     }
     for (my $i = 0; $i <= $#$list2; $i++) {
-        return 0 unless grep { samePerson($list2->[$i],$_) } @$list1;
+        return 0 unless grep { samePerson($list2->[$i],$_, %opts) } @$list1;
     }
     return 1;
 }
@@ -97,19 +98,29 @@ sub firstAuthor {
 
 sub sameWork {
 
-    my $debug = 0;
+ 	my ($e, $c, $threshold,$loose,$nolinks,%opts) = @_;
 
- 	my ($e, $c, $threshold,$loose,$nolinks) = @_;
+    my $debug = $opts{debug} || 0;
+
     $loose = 0 unless defined $loose;
     $threshold = 0.15 unless $threshold;
-
+    $opts{loose} = 1 if $loose;
+  
     if ($debug) {
-        warn "sameEntry 1: " . toString($e);
-        warn "sameEntry 2: " . toString($c);
+        warn "sameWork 1: " . toString($e);
+        warn "sameWork 2: " . toString($c);
     }
 
     if (defined $e->{doi} and length $e->{doi} and defined $c->{doi} and length $c->{doi}) {
-        return 1 if $e->{doi} eq $c->{doi};
+        if ($e->{doi} eq $c->{doi}) {
+            # we don't use doi to say 1 because often we have dois that are for a whole issue
+            # however same doi lowers the threshold
+            $threshold /= 2 if $e->{doi} eq $c->{doi};
+            $loose = 1;
+            $opts{loose} = 1;
+        } else {
+            return 0;
+        }
     }
 
 	return 0 if (!$c);
@@ -120,24 +131,71 @@ sub sameWork {
 
     # first check if authors,date, and title are almost literally the same
     my $tsame = (lc $e->{title} eq lc $c->{title}) ? 1 : 0;
-    my $asame = sameAuthors($e->{authors},$c->{authors});
+    my $asame = sameAuthors($e->{authors},$c->{authors},strict=>1);
+    my $asame_loose = $asame || sameAuthors($e->{authors},$c->{authors},strict=>0); #asame_loose will be 1 while same is 0 when there are extra authors in one paper but all overlap authors match
+    my $asame_bits = $asame_loose || sameAuthorBits($e->{authors},$c->{authors});
     my $dsame = (defined $e->{date} and defined $c->{date} and $e->{date} eq $c->{date}) ? 1 : 0;
 
     if ($debug) {
         warn "tsame: $tsame";
         warn "asame: $asame";
+        warn "asame_loose: $asame_loose";
+        warn "asame_bits: $asame_bits";
         warn "dsame: $dsame";
     }
 
     return 1 if ($tsame and $asame and $dsame);
 
 	# if authors quite different, not same
-    if (!$asame) {
-        #print "$lname1, $lname2<br>";
-        #print my_dist_text($lname1,$lname2); 
+    if (!$asame_bits) {
         warn "authors too different" if $debug;
      	return 0;
     }
+    # at this point the authors are plausibly the same
+
+    # check dates
+    my $date_wildcards = '^forthcoming|in press|manuscript|unknown|web$';
+    my $compat_dates = ($dsame or ($e->{date} && $e->{date} =~ /$date_wildcards/) or ($c->{date} && $c->{date} =~ /$date_wildcards/));
+    if (!$dsame and !$compat_dates) {
+
+        #disabled for most cases because we want to conflate editions and republications for now. 
+        if ($e->{title} =~ /^Introduction.?$/ or $e->{title} =~ /^Preface.?$/) {
+            return 0 if ($e->{source} and $e->{source} ne $c->{source}) or 
+                        ($e->{volume} and $e->{volume} ne $c->{volume});
+        }
+
+        # numeric dates
+        if ($e->{date} and $e->{date} =~ /^\d\d\d\d$/ and $c->{date} and $c->{date} =~ /^\d\d\d\d$/) {
+            my $date_diff = $e->{date} - $c->{date};            
+            # quite often people misremember dates so we permit some slack
+            # we will consider the dates compat if they close in time
+            # if dates are far apart, we know they are not exactly the same publicatoins. 
+            # but they might be reprints of the same thing, which we want to conflate. 
+            if ($date_diff > 3 or $date_diff < -3) {
+                if ($asame_bits) {
+                    $threshold /= 2;
+                    warn "dates different, lowering similarity threshold" if $debug;
+                } else {
+                    warn "dates+authors too different" if $debug;
+                    return 0;
+                }
+
+            } else {
+                # nearby date
+                $threshold /= 2;
+            }
+
+        } else {
+            #messed up dates, assume the worst
+            $threshold /=2;
+        }
+
+    } else {
+        $loose = 1 if $asame_loose or $asame_bits;
+    }
+    
+
+
 
     warn "pre title length" if $debug;
 	# if title very different in lengths and do not contain ":" or brackets, not the same
@@ -150,35 +208,13 @@ sub sameWork {
 				); 	
 
 	# Compare links
-    if (!$nolinks) {
-        foreach my $l (@{$e->{links}}) {
+#    if (!$nolinks) {
+#        foreach my $l (@{$e->{links}}) {
 #            print "Links e:\n" . join("\n",$e->getLinks);
 #            print "Links c:\n" . join("\n",$c->getLinks);
-            return 1 if grep { $l eq $_} @{$c->{links}};
-        }
-    }
-
-    # check dates
-    my $compat_dates = $dsame;
-    if (!$dsame and defined $e->{date} and defined $c->{date} and $e->{date} =~ /^\d\d\d\d$/ and $c->{date} =~ /^\d\d\d\d$/ ) {
-
-        $compat_dates = 0;
-        #disabled for most cases because we want to conflate editions and republications for now. 
-        if ($e->{title} =~ /^Introduction.?$/ or $e->{title} =~ /^Preface.?$/) {
-            return 0 if ($e->{source} and $e->{source} ne $c->{source}) or 
-                        ($e->{volume} and $e->{volume} ne $c->{volume});
-        }
-        if ($loose) {
-            $threshold /= 2;
-        } else {
-            $threshold /= 3;
-        }
-    } 
-    
-   # authors same, loosen for title 
-    if ($asame and $compat_dates) {
-       $loose = 1;
-    }
+#            return 1 if grep { $l eq $_} @{$c->{links}};
+#        }
+#    }
 
     warn "pre loose mode: loose = $loose" if $debug;
 
@@ -196,6 +232,7 @@ sub sameWork {
     my $ed2 = extractEdition($str2);
     warn "ed1: $ed1" if $debug;
     warn "ed2: $ed2" if $debug;
+    $loose =1 if $ed1 and $ed2 and $ed1 == $ed2 and !$dsame and $asame_loose;
 
     return 0 if ($ed1 and !$ed2) or ($ed2 and !$ed1) or ($ed1 && $ed1 != $ed2);
     warn "not diff editions" if $debug;
@@ -227,12 +264,11 @@ sub sameWork {
     if ($loose) {
 
         warn "loose: $str1 -- $str2" if $debug;
-        return 1 if (my_dist_text($str1,$str2) / (length($str1) +1) < $threshold);
 
-        if ($e->{title} =~ /(.+)\s*$TITLE_SPLIT\s*(.+)/) {
+        if ($e->{title} =~ /(.+?)\s*$TITLE_SPLIT\s*(.+)/) {
 
             my $str1 = _strip_non_word($1);
-            if ($c->{title} =~ /(.+)\s*$TITLE_SPLIT\s*(.+)/) {
+            if ($c->{title} =~ /(.+?)\s*$TITLE_SPLIT\s*(.+)/) {
                 return 0;
             } else {
                 if (my_dist_text($str1,$str2) / (length($str1) +1)< $threshold) {
@@ -240,7 +276,7 @@ sub sameWork {
                 }
             }
 
-        } elsif ($c->{title} =~ /(.+)\s*$TITLE_SPLIT\s*(.+)/) {
+        } elsif ($c->{title} =~ /(.+?)\s*$TITLE_SPLIT\s*(.+)/) {
 
             my $str2 = _strip_non_word($1);
             if (my_dist_text($str1,$str2) / (length($str1) +1)< $threshold) {
@@ -257,9 +293,60 @@ sub sameWork {
     return 0;
 }
 
+sub sameAuthorsLoose {
+  my ($a, $b) = @_;
+  my $asame = sameAuthors($a,$b,strict=>1);
+  my $asame_loose = $asame || sameAuthors($a,$b,strict=>0);
+  return $asame_loose || sameAuthorBits($a,$b);
+}
+
+sub sameAuthorBits {
+    my ($a, $b) = @_;
+    my (@alist, @blist);
+    for (@$a) { 
+        my $v = lc $_; # we copy so we don't modify the original
+        $v =~ s/[,\.]//g;
+        #$v =~ s/(\p{Ll})(\p{Lu})/$1 $2/g;
+        push @alist, split(/\s+/, $v); 
+    }
+    for (@$b) { 
+        my $v = lc $_;
+        $v =~ s/[,\.]//g;
+        #$v =~ s/(\p{Ll})(\p{Lu})/$1 $2/g;
+        push @blist, split(/\s+/, $v); 
+    }
+    #use Data::Dumper;
+    @alist = sort @alist;
+    @blist = sort @blist;
+    #print Dumper(\@alist);
+    #print Dumper(\@blist);
+    return 0 if $#alist != $#blist;
+    for (my $i=0; $i<= $#alist; $i++) {
+        return 0 if lc $alist[$i] ne lc $blist[$i];
+    }
+    return 1;
+}
+
+#wip
+#sub author_bits {
+#    my $list_ref = shift;
+#    my @new;
+#    for (@$list_ref) { 
+#        my $v = $_; # we copy so we don't modify the original
+#        $v =~ s/,//;
+#        $v =~ s/(\p{Ll}\p
+#        push @alist, split(/\s+/, $v); 
+#    }
+#}
+
 sub _strip_non_word {
     my $str = shift;
-    $str =~ s/[^[0-9a-zA-Z\)\]\(\[]+/ /g;
+    #abbreviation "volume" v
+    $str =~ s/\bvolume\b/v/gi;
+    $str =~ s/\bvol\.?\b/v/gi;
+    $str =~ s/\bv\.\b/v/gi;
+
+  $str =~ s/[^[0-9a-zA-Z\)\]\(\[]+/ /g;
     $str =~ s/\s+/ /g;
     $str =~ s/^\s+//;
     $str =~ s/\s+$//;
@@ -277,26 +364,21 @@ my %nums = (
     eighth => 8,
     ninth => 9,
     tenth => 10,
-    I => 1,
-    II => 2,
-    III => 3,
-    IV => 4,
-    V => 5,
-    VI => 6,
-    VII => 7,
-    VIII => 8,
-    IX => 9,
-    X => 10,
 );
 sub extract_num {
     my $s = shift;
     if ($s =~ /\b(\d+)/) {
         return $1;
     }
+    if (isroman($s)) {
+        return roman2int($s);
+    }
+
     for my $n (keys %nums) {
         if ($s =~ /\b$n\b/i) {
             return $nums{$n};
         }
+
     }
     return $s;
 }
@@ -312,25 +394,16 @@ sub extractEdition {
 }
 
 sub numdiff {
-	my ($s1,$s2) = @_;
-	#print "----checking numdiff (($s1,$s2))\n";
-    my @n1 = ($s1 =~ /\b([IXV0-9]{1,4}|first|second|third|fourth|fifth|sixth|1st|2nd|3rd|4th|5th|6th|7th|8th|9th)\b/ig);
-    my @n2 = ($s2 =~ /\b([IXV0-9]{1,4}|first|second|third|fourth|fifth|sixth|1st|2nd|3rd|4th|5th|6th|7th|8th|9th)\b/ig);
-    #print "In s1:" . join(",",@n1) . "\n";
-    #print "In s2:" . join(",",@n2) . "\n";
-    return 0 if $#n1 ne $#n2;
-    for (0..$#n1) {
-        return 1 if lc $n1[$_] ne lc $n2[$_];
-    }
-    #print "Not diff\n";
-    return 0;
-=old
-    my $num1 = undef;
-    my $num2 = undef;
-	$num1 = $1 if ($s1 =~ /\W([IV1-9]{1,4})(((\W|$).{0,3}$)|(\W\s*:))/);
-    $num2 = $1 if ($s2 =~ /\W([IV1-9]{1,4})(((\W|$).{0,3}$)|(\W\s*:))/);
-    return $num1 eq $num2 ? 0 : 1;
-=cut
+  my ($s1,$s2) = @_;
+  my @n1 = ($s1 =~ /\b([IXV0-9]{1,4}|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|eleventh|twelveth|1st|2nd|3rd|4th|5th|6th|7th|8th|9th|10th|11th|12th)\b/ig);
+  my @n2 = ($s2 =~ /\b([IXV0-9]{1,4}|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|eleventh|twelveth|1st|2nd|3rd|4th|5th|6th|7th|8th|9th|10th|11th|12th)\b/ig);
+  #print "In s1:" . join(",",@n1) . "\n";
+  #print "In s2:" . join(",",@n2) . "\n";
+  return 0 if $#n1 ne $#n2;
+  for (0..$#n1) {
+      return 1 if lc $n1[$_] ne lc $n2[$_];
+  }
+  return 0;
 }
 
 
@@ -364,6 +437,11 @@ sub safe_decode {
 sub toString {
     my $h = shift;
     return join("; ",@{$h->{authors}}) . " ($h->{date}) $h->{title}\n";
+}
+
+sub sameTitle {
+  my ($a, $b, $threshold,$loose,$nolinks,%opts) = @_;
+  return sameWork({ title => $a }, { title => $b }, $threshold,$loose,$nolinks,%opts);
 }
 
 1;

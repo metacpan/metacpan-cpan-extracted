@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.002002'; # VERSION
+our $VERSION = '0.002003'; # VERSION
 
 use Convert::Color::RGB;
 
@@ -1362,7 +1362,7 @@ Chart::GGPlot::Util::Scales::_Viridis
 
 =head1 VERSION
 
-version 0.002002
+version 0.002003
 
 =head1 AUTHOR
 

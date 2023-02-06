@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2008-2022 -- leonerd@leonerd.org.uk
 
-package String::Tagged::Extent 0.18;
+package String::Tagged::Extent 0.19;
 
 use v5.14;
 use warnings;

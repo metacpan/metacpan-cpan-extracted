@@ -4,9 +4,9 @@ author:
   - 'Matt S Trout (mst) <mst@shadowcat.co.uk>'
 build_requires: {}
 configure_requires:
-  Module::Build::Tiny: '0.034'
+  Module::Build::Tiny: '0.039'
 dynamic_config: 0
-generated_by: 'App::ModuleBuildTiny version 0.029, CPAN::Meta::Converter version 2.150010'
+generated_by: 'App::ModuleBuildTiny version 0.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,7 +18,7 @@ provides:
     version: '0.001001'
   Babble:
     file: lib/Babble.pm
-    version: '0.090009'
+    version: '0.090010'
   Babble::Config:
     file: lib/Babble/Config.pm
   Babble::Filter:
@@ -60,6 +60,6 @@ requires:
   Mu: '0'
   PPR: '0.001006'
   strictures: '2'
-version: '0.090009'
+version: '0.090010'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -6,7 +6,7 @@ use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean -except => 'stat';
 use MooseX::Singleton;
 
-our $VERSION = '0.002002'; # VERSION
+our $VERSION = '0.002003'; # VERSION
 
 use Data::Frame;
 
@@ -143,7 +143,7 @@ Chart::GGPlot::Stat::Count - Statistic method that counts number of data in bin
 
 =head1 VERSION
 
-version 0.002002
+version 0.002003
 
 =head1 SEE ALSO
 

@@ -20,9 +20,9 @@ name: Pod-AsciiDoctor
 provides:
   Pod::AsciiDoctor:
     file: lib/Pod/AsciiDoctor.pm
-    version: '0.101000'
+    version: '0.101001'
 requires:
-  Pod::Parser: '0'
+  Pod::Parser: '1.65'
   parent: '0'
   perl: '5.014'
   strict: '0'
@@ -31,7 +31,7 @@ resources:
   bugtracker: https://github.com/shlomif/Pod-AsciiDoctor/issues
   homepage: http://metacpan.org/release/Pod-AsciiDoctor
   repository: git://github.com/shlomif/Pod-AsciiDoctor.git
-version: '0.101000'
+version: '0.101001'
 x_Dist_Zilla:
   perl:
     version: '5.036000'

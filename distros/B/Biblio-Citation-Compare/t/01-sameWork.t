@@ -1,5 +1,7 @@
-use Biblio::Citation::Compare 'sameWork','sameAuthors','toString';
-use Test::More;
+use lib '../lib';
+use Biblio::Citation::Compare 'sameWork','sameAuthors','toString', 'sameAuthorBits';
+use Test::Most;
+die_on_fail;
 
 my @samePersonYes = ( 
     [ [ 'D. Bourget', 'Chalmers D' ], ['David J. R. Bourget','David C Chalmers'] ],
@@ -12,6 +14,9 @@ my @samePersonNo = (
     [ [ 'Hunter, David' ], ['Hunter, Daniel'] ],
     [ [ 'D. Bourget', 'J Wilson' ], ['D. Chalmers', 'J Wilson'] ]
 );
+
+ok( sameAuthorBits(['Bourget, David','Joseph, richard'], ['David Joseph Richard Bourget']), 'same authors bits works'); 
+ok(!sameAuthorBits(['A, A'],['B, B']), 'same authors bits does not overgenerates');
 
 ok( sameAuthors($_->[0],$_->[1]), join(";",@{$_->[0]}) . " = " . join(";",@{$_->[1]})) for @samePersonYes;
 ok( !sameAuthors($_->[0],$_->[1]), join(";",@{$_->[0]}) . " != " . join(";",@{$_->[1]})) for @samePersonNo;
@@ -28,6 +33,12 @@ $e2->{date} = 2009;
 $e1->{title} = "Chapter 1 of xyz";
 $e2->{title} = "Chapter 2 of xyz";
 same($e1,$e2,0);
+
+# Test numeric difference
+$e1->{title} = "Chapter one of xyz";
+$e2->{title} = "Chapter two of xyz";
+same($e1,$e2,0);
+
 
 $e1->{title} = "IV- The first pakladjs lkasdjf ";
 $e2->{title} = "X- The first pakladjs lkasdjft ";
@@ -146,14 +157,23 @@ check(
 #
 
 # missing firstname
+#check(
+#    ['Russell, '],
+#    "2009",
+#    "Short",
+#    ['Russell, B'],
+#    "2009",
+#    "Short",
+#    1
+#);
 check(
-    ['Russell, '],
-    "2009",
-    "Short",
-    ['Russell, B'],
-    "2009",
-    "Short",
-    1
+    ['Bourget, David'],
+    2008,
+    "The title of the work",
+    ['Other, Person'],
+    2008,
+    "The title of the work",
+    0
 );
 
 check(
@@ -258,6 +278,7 @@ check(
     ['Uriah Kriegel'],2008,"Real Intentionality 3: Why intentionality entails consciousness",
     0
 );
+
 
 
 

@@ -20,7 +20,7 @@ my $s = $driver->session;
 # those features or moved elsewhere once the features are documented
 # and thus officially supported.
 
-use Test::More 0.96 tests => 8 + 1;
+use Test::More 0.94;
 use Test::Exception;
 use Test::Warnings qw(warnings);
 
@@ -32,6 +32,8 @@ sub response_for { $mock_plugin->response_for(undef, @_) }
 
 
 my ($q, $r, @a, $a);
+
+plan tests => 9 + 1;
 
 
 {
@@ -262,6 +264,16 @@ END
 	warnings { is $r->get_bool(6), undef, 'get_bool false'; };
 	warnings { ok $r->get_bool(5), 'get_bool true'; };
 	warnings { is $r->get_bool(3), 0, 'get_bool 0'; };
+};
+
+
+subtest 'stack trace' => sub {
+	plan tests => 1;
+	my $d = Neo4j::Driver->new->plugin( Neo4j_Test::MockHTTP->new );
+	throws_ok {
+		$Neo4j::Driver::Events::STACK_TRACE = 1;
+		$d->session->run('trace not implemented');
+	} qr/::Transaction::HTTP::_run_autocommit\b/, 'debug stack trace';
 };
 
 

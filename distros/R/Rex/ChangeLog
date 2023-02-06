@@ -1,5 +1,31 @@
 Revision history for Rex
 
+1.14.0 2023-02-05 Ferenc Erki <erkiferenc@gmail.com>
+ - No code changes since 1.13.4.1 trial release
+
+1.13.4.1-TRIAL 2023-01-30 Ferenc Erki <erkiferenc@gmail.com>
+ [BUG FIXES]
+ - Detect invalid hostgroup expressions
+ - Prevent empty log lines upon Rexfile warnings
+ - Fix tests on Strawberry Perl older than 5.18.4
+ - Fix test warnings on Perl before 5.16.0
+
+ [DOCUMENTATION]
+ - Clarify optional arguments of file commands
+ - Clarify optional arguments of the pkg command
+ - Correct example for file_read command
+
+ [ENHANCEMENTS]
+ - Show Rexfile path in loading messages
+ - Hide internal details when Rexfile loading fails
+
+ [MINOR]
+ - Set minimum required Perl version to 5.12.5
+
+ [REVISION]
+ - Fix handling of warnings during Rexfile loading
+ - Mask internal naming in Rexfile loading output
+
 1.13.4 2021-07-05 Ferenc Erki <erkiferenc@gmail.com>
  [DOCUMENTATION]
  - Add section about Rex core vs extending Rex

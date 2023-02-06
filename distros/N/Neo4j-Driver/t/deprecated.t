@@ -129,7 +129,7 @@ subtest 'direct Neo4j::Driver hash access' => sub {
 subtest 'die_on_error = 0' => sub {
 	# die_on_error only ever affected upstream errors via HTTP JSON, 
 	# never any errors issued via Bolt/Jolt or by this driver itself.
-	plan tests => 7;
+	plan tests => 9;
 	# init
 	my $d = Neo4j_Test->driver();
 	$d->{die_on_error} = 0;
@@ -146,6 +146,13 @@ subtest 'die_on_error = 0' => sub {
 	lives_ok { $w = warning { is $t->run(' iced manifolds.')->size, 0 }; } 'execute cypher syntax error';
 	(like $w, qr/\bStatement\b.*Syntax/i, 'cypher syntax error') or diag 'got warning(s): ', explain($w);
 	}
+	# broken server response
+	my $mock = Neo4j_Test::MockHTTP->new;
+	$mock->response_for(undef, 'foo' => { content_type => 'text/plain', content => 'bar' });
+	$d = Neo4j::Driver->new('http:')->plugin($mock);
+	$d->{die_on_error} = 0;
+	lives_ok { $r = 0; warning { $r = $d->session->run('foo') }; } 'broken response lives';
+	is ref($r), 'Neo4j::Driver::Result', 'broken response result fallback';
 };
 
 

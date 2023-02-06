@@ -24,7 +24,7 @@ Terse::View - views made simple.
 
 =head1 VERSION
 
-Version 0.121
+Version 0.1234
 
 =cut
 

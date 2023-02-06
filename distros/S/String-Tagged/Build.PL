@@ -12,8 +12,7 @@ my $build = Module::Build->new(
       'Module::Build' => '0.4004', # test_requires
    },
    test_requires => {
-      'Test::Identity' => 0,
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    license => 'perl',
    create_license => 1,

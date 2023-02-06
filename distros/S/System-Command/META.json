@@ -4,7 +4,7 @@
       "Philippe Bruhat (BooK) <book@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "system",
       "command"
@@ -14,18 +14,10 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "System-Command",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Pod::Coverage::TrustPod" : "0",
-            "Test::CPAN::Meta" : "0",
-            "Test::Pod" : "0",
-            "Test::Pod::Coverage" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
@@ -77,11 +69,11 @@
    "provides" : {
       "System::Command" : {
          "file" : "lib/System/Command.pm",
-         "version" : "1.121"
+         "version" : "1.122"
       },
       "System::Command::Reaper" : {
          "file" : "lib/System/Command/Reaper.pm",
-         "version" : "1.121"
+         "version" : "1.122"
       }
    },
    "release_status" : "stable",
@@ -96,8 +88,11 @@
          "web" : "http://github.com/book/System-Command"
       }
    },
-   "version" : "1.121",
+   "version" : "1.122",
    "x_contributors" : [
+      "Olaf Alders <oalders@cpan.org>",
+      "Lisa Hansen <Lisa.Hansen@sas.com>",
+      "Slaven Rezi\u0107 <srezic@cpan.org>",
       "Michael McClimon <mmcclimon@cpan.org>",
       "Ed J <etj@cpan.org>",
       "viviparous <viviparous@github.com>",
@@ -112,7 +107,8 @@
       "mokko <mauricemengel@gmail.com>",
       "Alessandro Ghedini <al3xbio@gmail.com>"
    ],
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

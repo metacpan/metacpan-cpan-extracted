@@ -5,7 +5,7 @@ package Chart::GGPlot::Scale::SupportsSecondaryAxis;
 use Chart::GGPlot::Role;
 use namespace::autoclean;
 
-our $VERSION = '0.002002'; # VERSION
+our $VERSION = '0.002003'; # VERSION
 
 use Types::Standard qw(InstanceOf Maybe);
 
@@ -40,7 +40,7 @@ Chart::GGPlot::Scale::SupportsSecondaryAxis - Role for scales that support secon
 
 =head1 VERSION
 
-version 0.002002
+version 0.002003
 
 =head1 AUTHOR
 

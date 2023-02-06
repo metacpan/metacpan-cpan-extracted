@@ -4,7 +4,7 @@
       "Stephan Loyd <sloyd@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -63,24 +63,24 @@
    "provides" : {
       "Alien::Plotly::Kaleido" : {
          "file" : "lib/Alien/Plotly/Kaleido.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "url" : "https://github.com/stphnlyd/perl5-Alien-Plotly-Kaleido.git"
+         "url" : "https://github.com/iynehz/perl5-Alien-Plotly-Kaleido.git"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_alienfile" : {
-      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.29",
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {
          "share" : {
-            "Archive::Zip" : "0",
-            "URI" : "0",
-            "URI::Escape" : "0",
-            "URI::file" : "0"
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "Net::SSLeay" : "1.49",
+            "URI" : "0"
          },
          "system" : {}
       }
@@ -89,7 +89,7 @@
       "Carlos D. \u00c1lvaro <github@cdalvaro.io>"
    ],
    "x_generated_by_perl" : "v5.26.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.17",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

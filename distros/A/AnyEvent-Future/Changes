@@ -1,5 +1,12 @@
 Revision history for AnyEvent-Future
 
+0.05    2023-02-03
+        [CHANGES]
+         * Support Future::XS by using the `udata` API
+
+        [BUGFIXES]
+         * Fix http_get example around function's prototype (RT137913)
+
 0.04    2019-05-07 00:27:20
         [CHANGES]
          * Avoid ->done_cb / ->fail_cb which were removed in Future 0.40

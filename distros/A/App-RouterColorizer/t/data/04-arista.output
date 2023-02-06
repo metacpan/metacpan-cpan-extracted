@@ -36,7 +36,8 @@ Last login: Tue Aug 17 12:05:09 [4m2[24m021 from [30m[45m192.0.2.12[0m
                                    Sent      Rcvd     Best Paths     Best ECMP Paths
 [36m    IPv4 Unicast:                     0         0              0                   0[0m
 [36m    IPv6 Unicast:                     0         0              0                   0[0m
-  Configured maximum total number of routes is [4m12[24m000
+[36m  Configured maximum total number of routes is [4m12[24m000[0m
+[36m  Configured maximum total number of routes is [4m12[24m000, warning limit is [4m10[24m000[0m
   Inbound updates dropped by reason:
     AS path loop detection: 0
     Enforced First AS: 0
@@ -116,7 +117,7 @@ TCP Socket Information:
                                    Sent      Rcvd     Best Paths     Best ECMP Paths
 [36m    IPv4 Unicast:                     0         0              0                   0[0m
 [36m    IPv6 Unicast:                     0         0              0                   0[0m
-  Configured maximum total number of routes is [4m12[24m000
+[36m  Configured maximum total number of routes is [4m12[24m000[0m
   Inbound updates dropped by reason:
     AS path loop detection: 0
     Enforced First AS: 0
@@ -205,7 +206,7 @@ TCP Socket Information:
                                    Sent      Rcvd     Best Paths     Best ECMP Paths
 [36m    IPv4 Unicast:                     0         2              2                   0[0m
 [36m    IPv6 Unicast:                     0         0              0                   0[0m
-  Configured maximum total number of routes is [4m12[24m000
+[36m  Configured maximum total number of routes is [4m12[24m000[0m
   Inbound updates dropped by reason:
     AS path loop detection: 0
     Enforced First AS: 0
@@ -297,7 +298,7 @@ TCP Socket Information:
                                    Sent      Rcvd     Best Paths     Best ECMP Paths
 [36m    IPv4 Unicast:                     0        13             11                   0[0m
 [36m    IPv6 Unicast:                     0         0              0                   0[0m
-  Configured maximum total number of routes is [4m12[24m000
+[36m  Configured maximum total number of routes is [4m12[24m000[0m
   Inbound updates dropped by reason:
     AS path loop detection: 0
     Enforced First AS: 0

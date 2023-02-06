@@ -1,6 +1,6 @@
 package Dancer2::Core::Route;
 # ABSTRACT: Dancer2's route handler
-$Dancer2::Core::Route::VERSION = '0.400000';
+$Dancer2::Core::Route::VERSION = '0.400001';
 use Moo;
 use Dancer2::Core::Types;
 use Module::Runtime 'use_module';
@@ -318,7 +318,7 @@ Dancer2::Core::Route - Dancer2's route handler
 
 =head1 VERSION
 
-version 0.400000
+version 0.400001
 
 =head1 ATTRIBUTES
 
@@ -363,7 +363,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Alexis Sukrieh.
+This software is copyright (c) 2023 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -9,12 +9,12 @@
 # Also not that "composite -watermark" is actually known as the compose
 # method "Modulate".
 #
-# Essentially each image is equivelent to
-#   magick logo: -crop 80x80+140+60 +repage \
+# Essentially each image is equivalent to
+#   convert logo: -crop 80x80+140+60 +repage \
 #           -size 60x60 gradient:black-white \
 #           -alpha set miff:- |\
-#   magick - -geometry +10+10 -virtual-pixel gray \
-#            -dissolve 70x30  show:
+#    composite -  -geometry +10+10 -virtual-pixel gray \
+#              -dissolve 70x30   show:
 # for various composition methods.
 #
 use strict;
@@ -90,7 +90,7 @@ $clone->Composite(
 push(@$results, $clone);
 
 # ---------------
-# Masked and Blending Demonstartion
+# Masked and Blending Demonstration
 
 $clone=$dest->Clone();
 $clone->Label('Circle Masked\n(three image)');
@@ -133,7 +133,7 @@ $clone->Composite(
 push(@$results, $clone);
 
 # ---------------
-# Displacement Demonstartion
+# Displacement Demonstration
 
 $clone=$dest->Clone();
 $clone->Label('Displace 50x0\n(displace horiz)');
@@ -231,7 +231,7 @@ push(@$results, $clone);
 # ----------------------------------------
 # Output the changed pixels
 
-# to every image underlay a checkboard pattern
+# to every image underlay a checkerboard pattern
 # so as to show if any transparency is present
 for my $image ( @$results ) {
   $image->Composite(
@@ -248,5 +248,5 @@ my $montage=$results->Montage(font=>'Generic.ttf',
   shadow=>'True',
 );
 $montage->Write('show:');
-$montage->Write('compose_specials.jpg');
+$montage->Write('compose-specials.jpg');
 

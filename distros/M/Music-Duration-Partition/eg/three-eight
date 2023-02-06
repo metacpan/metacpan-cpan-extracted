@@ -50,7 +50,7 @@ sub bass {
         pool    => [qw(dqn qn en sn)],
         weights => [   1,  2, 2, 1  ],
     );
-    my @motifs = map { $mdp->motif } 1 .. 4;
+    my @motifs = $mdp->motifs(4);
 
     my @pitches = get_scale_MIDI($note, $octave, $bscale);
     my @intervals = qw(-3 -2 -1 1 2 3);
@@ -60,7 +60,7 @@ sub bass {
     );
     my @notes = map { [ map { $voice->rand } @$_ ] } @motifs;
 
-    add_notes($d, \@motifs, \@notes, \@pitches);
+    add_notes($d, $mdp, \@motifs, \@notes, \@pitches);
 }
 
 sub top {
@@ -71,7 +71,7 @@ sub top {
         pool    => [qw(qn en sn)],
         weights => [   1, 2, 3  ],
     );
-    my @motifs = map { $mdp->motif } 1 .. 8;
+    my @motifs = $mdp->motifs(8);
 
     my @pitches = (
         get_scale_MIDI($note, $octave + 1, $tscale),
@@ -84,19 +84,17 @@ sub top {
     );
     my @notes = map { [ map { $voice->rand } @$_ ] } @motifs;
 
-    add_notes($d, \@motifs, \@notes, \@pitches);
+    add_notes($d, $mdp, \@motifs, \@notes, \@pitches);
 }
 
 sub add_notes {
-    my ($d, $motifs, $notes, $pitches) = @_;
+    my ($d, $mdp, $motifs, $notes, $pitches) = @_;
 
     for my $n (1 .. $d->bars) {
         my $index = int rand @$motifs;
         my $motif = $motifs->[$index];
         my $pitch = $notes->[$index];
-        for my $i (0 .. $#$motif) {
-            $d->note($motif->[$i], $pitch->[$i]);
-        }
+        $mdp->add_to_score($d->score, $motif, $pitch);
     }
 
     $d->note($d->dotted_quarter, $pitches->[0]);

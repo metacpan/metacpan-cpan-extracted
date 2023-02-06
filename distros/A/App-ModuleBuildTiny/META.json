@@ -4,7 +4,7 @@
       "Leon Timmermans <leont@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.031",
+   "generated_by" : "App::ModuleBuildTiny version 0.033",
    "license" : [
       "perl_5"
    ],
@@ -21,7 +21,7 @@
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.030"
+            "App::ModuleBuildTiny" : "0.033"
          }
       },
       "runtime" : {
@@ -44,11 +44,14 @@
             "File::Slurper" : "0",
             "File::Spec::Functions" : "0",
             "File::Temp" : "0",
+            "File::chdir" : "0",
             "Getopt::Long" : "2.36",
+            "Git::Wrapper" : "0",
             "JSON::PP" : "0",
             "Module::CPANfile" : "0",
             "Module::Metadata" : "1.000037",
             "Module::Runtime" : "0",
+            "POSIX" : "0",
             "Parse::CPAN::Meta" : "0",
             "Perl::PrereqScanner" : "0",
             "Pod::Escapes" : "0",
@@ -72,11 +75,11 @@
    "provides" : {
       "App::ModuleBuildTiny" : {
          "file" : "lib/App/ModuleBuildTiny.pm",
-         "version" : "0.031"
+         "version" : "0.033"
       },
       "App::ModuleBuildTiny::Dist" : {
          "file" : "lib/App/ModuleBuildTiny/Dist.pm",
-         "version" : "0.031"
+         "version" : "0.033"
       }
    },
    "release_status" : "stable",
@@ -91,7 +94,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#toolchain"
    },
-   "version" : "0.031",
+   "version" : "0.033",
    "x_serialization_backend" : "JSON::PP version 4.07",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

@@ -4,7 +4,7 @@ package Chart::GGPlot::Backend::Plotly::Geom::Tile;
 
 use Chart::GGPlot::Class;
 
-our $VERSION = '0.002002'; # VERSION
+our $VERSION = '0.002003'; # VERSION
 
 extends qw(Chart::GGPlot::Backend::Plotly::Geom::Rect);
 
@@ -24,7 +24,7 @@ Chart::GGPlot::Backend::Plotly::Geom::Tile - Chart::GGPlot's Plotly implementati
 
 =head1 VERSION
 
-version 0.002002
+version 0.002003
 
 =head1 SEE ALSO
 

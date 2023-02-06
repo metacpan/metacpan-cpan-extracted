@@ -16,7 +16,7 @@ my $aws_access_key_id     = $ENV{'AWS_ACCESS_KEY_ID'}     // 'foo';
 my $aws_secret_access_key = $ENV{'AWS_ACCESS_KEY_SECRET'} // 'foo';
 my $token                 = $ENV{'AWS_SESSION_TOKEN'};
 
-my $host = $ENV{S3_HOST};
+my $host = $ENV{AMAZON_S3_HOST};
 
 if ( !$ENV{'AMAZON_S3_EXPENSIVE_TESTS'} ) {
   plan skip_all => 'Testing this module for real costs money.';

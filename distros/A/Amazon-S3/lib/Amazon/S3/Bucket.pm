@@ -19,7 +19,7 @@ use URI;
 
 use parent qw{Class::Accessor::Fast};
 
-our $VERSION = '0.58'; ## no critic
+our $VERSION = '0.59'; ## no critic
 
 __PACKAGE__->mk_accessors(
   qw{bucket creation_date account buffer_size region logger verify_region });
@@ -689,7 +689,66 @@ sub get_key_filename {
   return $self->get_key( $key, $method, \$filename );
 } ## end sub get_key_filename
 
-# returns bool
+########################################################################
+# See: https://docs.aws.amazon.com/AmazonS3/latest/API/API_CopyObject.html
+#
+# Note that in this request the bucket object is the destination you
+# specify the source bucket in the key (bucket-name/source-key) or the
+# header x-amz-copy-source
+########################################################################
+sub copy_object {
+########################################################################
+  my ( $self, %parameters ) = @_;
+
+  my ( $source, $key, $bucket, $headers_in )
+    = @parameters{qw(source key bucket headers)};
+
+  $headers_in //= {};
+
+  my %request_headers;
+
+  if ( reftype($headers_in) eq 'ARRAY' ) {
+    %request_headers = @{$headers_in};
+  }
+  elsif ( reftype($headers_in) eq 'HASH' ) {
+    %request_headers = %{$headers_in};
+  }
+  else {
+    croak 'headers must be hash or array'
+      if !ref($headers_in) || reftype($headers_in) ne 'HASH';
+  }
+
+  croak 'source or x-amz-copy-source must be specified'
+    if !$source && !exists $request_headers{'x-amz-copy-source'};
+
+  croak 'no key'
+    if !$key;
+
+  my $acct = $self->account;
+
+  if ( !$request_headers{'x-amz-copy-source'} ) {
+
+    $request_headers{'x-amz-copy-source'} = sprintf '%s/%s',
+      $bucket // $self->{bucket},
+      $acct->_urlencode($source);
+  }
+
+  $request_headers{'x-amz-tagging-directive'} //= 'COPY';
+
+  $key = $self->_uri($key);
+
+  my $request = $acct->_make_request( 'PUT', $key, \%request_headers, );
+
+  my $response = $acct->_do_http($request);
+
+  if ( $response->code !~ /\A2\d\d\z/xsm ) {
+    $acct->_remember_errors( $response->content, 1 );
+    croak $response->status_line;
+  }
+
+  return $acct->_xpc_of_content( $response->content );
+} ## end sub copy_key
+
 ########################################################################
 sub delete_key {
 ########################################################################
@@ -1128,6 +1187,69 @@ The method works like C<add_key> except the value is assumed
 to be a filename on the local file system. The file will 
 be streamed rather then loaded into memory in one big chunk.
 
+=head2 copy_object %parameters
+
+Copies an object from one bucket to another bucket. I<Note that the
+bucket represented by the bucket object is the destination.> Returns a
+hash reference to the response object (C<CopyObjectResult>).
+
+Headers returned from the request can be obtained using the
+C<last_response()> method.
+
+ my $headers = { $bucket->last_response->headers->flatten };
+
+Throws an exception if the response code is not 2xx. You can get an
+extended error message using the C<errstr()> method.
+
+ my $result = eval { return $s3->copy_object( key => 'foo.jpg',
+     source => 'boo.jpg' ); };
+ 
+ if ($@) {
+   die $s3->errstr;
+ }
+
+Examples:
+
+ $bucket->copy_object( key => 'foo.jpg', source => 'boo.jpg' );
+
+ $bucket->copy_object(
+   key    => 'foo.jpg',
+   source => 'boo.jpg',
+   bucket => 'my-source-bucket'
+ );
+ 
+ $bucket->copy_object(
+   key     => 'foo.jpg',
+   headers => { 'x-amz-copy-source' => 'my-source-bucket/boo.jpg'
+   );
+
+See L<CopyObject|
+https://docs.aws.amazon.com/AmazonS3/latest/API/API_CopyObject.html>
+for more details.
+
+C<%parameters> is a list of key/value pairs described below:
+
+=over
+
+=item key (required)
+
+Name of the destination key in the bucket represented by the bucket object.
+
+=item headers (optional)
+
+Hash or array reference of headers to send in the request.
+
+=item bucket (optional)
+
+Name of the source bucket. Default is the same bucket as the destination.
+
+=item source (optional)
+
+Name of the source key in the source bucket. If not provided, you must
+provide the source in the `x-amz-copy-source` header.
+
+=back
+
 =head2 head_key $key_name
 
 Returns a configuration HASH of the given key. If a key does
@@ -1499,5 +1621,12 @@ L<Amazon::S3>
 
 Please see the L<Amazon::S3> manpage for author, copyright, and
 license information.
+
+=head1 CONTRIBUTORS
+
+Rob Lauer
+Jojess Fournier
+Tim Mullin
+Todd Rinaldo
 
 =cut

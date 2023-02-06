@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::JSON;
 # ABSTRACT: JSON/REST result handler
-$Neo4j::Driver::Result::JSON::VERSION = '0.35';
+$Neo4j::Driver::Result::JSON::VERSION = '0.36';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -17,6 +17,8 @@ our @CARP_NOT = qw(Neo4j::Driver::Net::HTTP);
 use Try::Tiny;
 
 use URI 1.31;
+
+use Neo4j::Error;
 
 
 my ($TRUE, $FALSE);
@@ -83,32 +85,33 @@ sub _parse_json {
 	my (undef, $params) = @_;
 	
 	my $response = $params->{http_agent}->fetch_all;
-	
-	my @errors = ();
-	if (! $params->{http_header}->{success}) {
-		my $reason_phrase = $params->{http_agent}->http_reason;
-		push @errors, "HTTP error: $params->{http_header}->{status} $reason_phrase on $params->{http_method} to $params->{http_path}";
-	}
-	
+	my $error = 'Neo4j::Error';
 	my $json;
 	try {
 		$json = $params->{http_agent}->json_coder->decode($response);
 	}
 	catch {
-		push @errors, $_;
-		$json = {};
+		$error = $error->append_new( Internal => {
+			as_string => "$_",
+			raw => $response,
+		});
 	};
 	if (ref $json->{errors} eq 'ARRAY') {
-		foreach my $error (@{$json->{errors}}) {
-			$error = "$error->{code}: $error->{message}" if ref $error eq 'HASH';
-			push @errors, $error;
-		}
+		$error = $error->append_new( Server => $_ ) for @{$json->{errors}};
+	}
+	if ($json->{message}) {
+		$error = $error->append_new( Internal => $json->{message} );
+		# can happen when the Jersey ServletContainer intercepts the request
+	}
+	if (! $params->{http_header}->{success}) {
+		$error = $error->append_new( Network => {
+			code => $params->{http_header}->{status},
+			as_string => sprintf( "HTTP error: %s %s on %s to %s",
+				$params->{http_header}->{status}, $params->{http_agent}->http_reason, $params->{http_method}, $params->{http_path} ),
+		});
 	}
 	
-	if (@errors) {
-		croak join "\n", @errors if $params->{die_on_error};
-		carp join "\n", @errors;
-	}
+	$params->{error_handler}->($error) if ref $error;
 	
 	return $json;
 }

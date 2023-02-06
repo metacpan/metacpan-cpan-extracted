@@ -20,9 +20,9 @@ my @tests = (
             pension_employee => 360,
             pension_employer => 360,
 
-            #net_yearly_income => 81423.84,
-            tax_fixed => 0,
-            tax_rate  => 12,
+            net_yearly_income => 10535.52,
+            tax_fixed         => 0,
+            tax_rate          => 12,
         },
     },
     {
@@ -56,28 +56,62 @@ my @tests = (
             tax_rate  => 52,
         },
     },
-);
+    {
+        year   => 2023,
+        isa    => 'Finance::Tax::Aruba::Income::2023',
+        income => 7000,
+        label  => "One child policy",
 
-my %mapping = (
-    wervingskosten    => "Wervingskosten",
-    aov_yearly_income => "AOV yearly income",
-    azv_yearly_income => "AZV yearly income",
-    taxfree_max       => "Tax free amount",
-    pension_employee  => "Employee pension amount",
-    pension_employer  => "Employer pension amount",
-    net_yearly_income => "Yearly income (net)",
-    tax_fixed         => "Income tax (fixed)",
-    tax_variable      => "Income tax (variable)",
-    tax_rate          => "Tax rate",
+        children              => 1,    # 700
+        dependents            => 0,    # 1200
+        children_study_abroad => 0,    # 3800
+
+        results => {
+            wervingskosten    => 1500,
+            aov_yearly_income => 79980,
+            azv_yearly_income => 79980,
+
+            child_deductions  => 700,
+            net_yearly_income => 74001.32,
+
+            tax_fixed => 3493,
+            tax_rate  => 21,
+
+        },
+    },
+    {
+        year   => 2023,
+        isa    => 'Finance::Tax::Aruba::Income::2023',
+        income => 7000,
+        label  => "Test with all kinds of kids",
+
+        children              => 2,    # 700
+        dependents            => 2,    # 1200
+        children_study_abroad => 2,    # 3800
+
+        results => {
+            wervingskosten    => 1500,
+            aov_yearly_income => 79980,
+            azv_yearly_income => 79980,
+
+            child_deductions  => 5700 *2,
+            net_yearly_income => 63301.32,
+
+            tax_fixed => 0,
+            tax_rate  => 12,
+
+        },
+    },
 );
 
 foreach (@tests) {
-    subtest sprintf("Running test for year %s with monthly income of %d",
-        $_->{year}, $_->{income}) => sub {
+    my $name = delete $_->{label};
+    $name //= sprintf("Running test for year %s with monthly income of %d",
+        $_->{year}, $_->{income});
+    subtest $name => sub {
         test_yearly_income(%{$_});
     }
 }
-
 
 
 done_testing;

@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use String::Tagged;
 
@@ -19,7 +19,7 @@ my $orig = String::Tagged->new
    my $new = String::Tagged->clone( $orig );
 
    is( $new->str, "this string has some tags applied to it", '->str of clone' );
-   is_deeply( [ sort $new->tagnames ], [qw( some tags )], '->tagnames of clone' );
+   is( [ sort $new->tagnames ], [qw( some tags )], '->tagnames of clone' );
 }
 
 # instance clone
@@ -32,7 +32,7 @@ my $orig = String::Tagged->new
 # subset clone
 {
    my $new = $orig->clone( only_tags => [qw( tags )] );
-   is_deeply( [ $new->tagnames ], [qw( tags )], '->tagnames of partial clone' );
+   is( [ $new->tagnames ], [qw( tags )], '->tagnames of partial clone' );
 }
 
 # clone with converter
@@ -44,7 +44,7 @@ my $orig = String::Tagged->new
       }
    );
 
-   is_deeply( [ sort $new->tagnames ], [qw( different_tag some )], '->tagnames of converted clone' );
+   is( [ sort $new->tagnames ], [qw( different_tag some )], '->tagnames of converted clone' );
 
    is( $new->get_tag_at( index( $new, "some" ), "some" ), 2, 'value of sub-converted tag' );
 }

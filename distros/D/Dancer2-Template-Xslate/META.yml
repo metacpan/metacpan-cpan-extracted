@@ -16,7 +16,7 @@ configure_requires:
   Module::Build: '0.28'
   perl: v5.8.0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,7 +31,7 @@ resources:
   bugtracker: https://github.com/PerlDancer/dancer2-template-xslate/issues
   homepage: https://metacpan.org/release/Dancer2-Template-Xslate
   repository: git://github.com/PerlDancer/dancer2-template-xslate.git
-version: v0.1.2
-x_generated_by_perl: v5.28.3
+version: v0.2.0
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: MIT

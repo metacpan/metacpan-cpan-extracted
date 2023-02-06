@@ -47,7 +47,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.206';
+our $VERSION = '1.207';
 
 use Quiq::Unindent;
 
@@ -87,6 +87,222 @@ sub new {
 # -----------------------------------------------------------------------------
 
 =head2 Allgemeine Syntax
+
+=head3 link() - Link
+
+=head4 Synopsis
+
+  $markup = $gen->link($url);
+  $markup = $gen->link($url,$text);
+
+=head4 Description
+
+Confluence-Doku: L<Links|https://confluence.atlassian.com/doc/confluence-wiki-markup-251003035.html#ConfluenceWikiMarkup-Links>
+
+Erzeuge den Markup-Text für einen Link und liefere diesen zurück.
+
+=head4 Examples
+
+=over 2
+
+=item *
+
+URL:
+
+  $gen->link('https://confluence.atlassian.com/');
+
+erzeugt
+
+  [https://confluence.atlassian.com/]
+
+=item *
+
+Text über URL:
+
+  $gen->link('https://confluence.atlassian.com/','Atlassian');
+
+erzeugt
+
+  [Atlassian|https://confluence.atlassian.com/]
+
+=back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub link {
+    my ($self,$url,$text) = @_;
+    return $text? "[$text|$url]": "[$url]";
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 paragraph() - Paragraph
+
+=head4 Synopsis
+
+  $markup = $gen->paragraph($text);
+
+=head4 Description
+
+Erzeuge einen Paragraph und liefere den resultierenden Wiki-Code
+zurück. Ist $text nicht angegeben oder ein Leerstring, wird ein
+Leerstring geliefert. Andernfalls wird $text per trim() von einer
+etwaigen Einrückung befreit und Zeilenumbrüche durch Leerzeichen
+ersetzt, da ein Paragraph in Confluence-Wiki Syntax einzeilig ist.
+
+=head4 Examples
+
+=over 2
+
+=item *
+
+Text:
+
+  $gen->paragraph("Dies ist\nein Test.");
+
+erzeugt
+
+  Dies ist ein Test.
+
+=item *
+
+Eine Einrückung wird automatisch entfernt:
+
+  $gen->paragraph(q~
+      Dies ist
+      ein Test.
+  ~);
+
+erzeugt
+
+  Dies ist ein Test.
+
+=back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub paragraph {
+    my $self = shift;
+    my $text = shift // '';
+
+    $text = Quiq::Unindent->trim($text);
+    $text =~ s/\n+/ /g; # Zeilenumbrüche zu Leerzeichen
+    if ($text ne '') {
+        $text .= "\n\n";
+    }
+
+    return $text;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 tableHeaderRow() - Tabellen-Kopfzeile
+
+=head4 Synopsis
+
+  $markup = $gen->tableHeaderRow(@titles);
+
+=head4 Description
+
+Confluence-Doku: L<Tables|https://confluence.atlassian.com/doc/confluence-wiki-markup-251003035.html#ConfluenceWikiMarkup-Tables>
+
+Erzeuge den Markup-Text für die Kopfzeile einer Tabelle und
+liefere diesen zurück.
+
+=head4 Examples
+
+=over 2
+
+=item *
+
+Tabellen-Kopfzeile:
+
+  $gen->tableHeaderRow(qw/A B C D/);
+
+erzeugt
+
+  ||A||B||C||D||\n
+
+=item *
+
+Tabellen-Kopfzeile mit leerem Kolumnentitel:
+
+  $gen->tableHeaderRow('A','','B','C','D');
+
+erzeugt
+
+  ||A|| ||B||C||D||\n
+
+=back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub tableHeaderRow {
+    my $self = shift;
+    # @_: @titles
+
+    return '||'.join('||',map{!defined || $_ eq ''? ' ': $_} @_)."||\n";
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 tableRow() - Tabellen-Zeile
+
+=head4 Synopsis
+
+  $markup = $gen->tableRow(@data);
+
+=head4 Description
+
+Confluence-Doku: L<Tables|https://confluence.atlassian.com/doc/confluence-wiki-markup-251003035.html#ConfluenceWikiMarkup-Tables>
+
+Erzeuge den Markup-Text für die Zeile einer Tabelle und
+liefere diesen zurück.
+
+=head4 Examples
+
+=over 2
+
+=item *
+
+Zeile:
+
+  $gen->tableRow(1,2,3,4);
+
+erzeugt
+
+  |1|2|3|4|\n
+
+=item *
+
+Zeile mit leerem Wert:
+
+  $gen->tableRow(1,undef,2,3,4);
+
+erzeugt
+
+  |1| |2|3|4\n
+
+=back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub tableRow {
+    my $self = shift;
+    # @_: @titles
+
+    return '|'.join('|',map{!defined || $_ eq ''? ' ': $_} @_)."|\n";
+}
+
+# -----------------------------------------------------------------------------
 
 =head3 section() - Abschnitt
 
@@ -172,68 +388,6 @@ sub section {
 {
     no warnings 'once';
     *heading = \&section;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 paragraph() - Paragraph
-
-=head4 Synopsis
-
-  $markup = $gen->paragraph($text);
-
-=head4 Description
-
-Erzeuge einen Paragraph und liefere den resultierenden Wiki-Code
-zurück. Ist $text nicht angegeben oder ein Leerstring, wird ein
-Leerstring geliefert. Andernfalls wird $text per trim() von einer
-etwaigen Einrückung befreit und Zeilenumbrüche durch Leerzeichen
-ersetzt, da ein Paragraph in Confluence-Wiki Syntax einzeilig ist.
-
-=head4 Examples
-
-=over 2
-
-=item *
-
-Text:
-
-  $gen->paragraph("Dies ist\nein Test.");
-
-erzeugt
-
-  Dies ist ein Test.
-
-=item *
-
-Eine Einrückung wird automatisch entfernt:
-
-  $gen->paragraph(q~
-      Dies ist
-      ein Test.
-  ~);
-
-erzeugt
-
-  Dies ist ein Test.
-
-=back
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub paragraph {
-    my $self = shift;
-    my $text = shift // '';
-
-    $text = Quiq::Unindent->trim($text);
-    $text =~ s/\n+/ /g; # Zeilenumbrüche zu Leerzeichen
-    if ($text ne '') {
-        $text .= "\n\n";
-    }
-
-    return $text;
 }
 
 # -----------------------------------------------------------------------------
@@ -955,7 +1109,7 @@ sub testPage {
 
 =head1 VERSION
 
-1.206
+1.207
 
 =head1 AUTHOR
 
@@ -963,7 +1117,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2022 Frank Seitz
+Copyright (C) 2023 Frank Seitz
 
 =head1 LICENSE
 

@@ -6,7 +6,7 @@ use Chart::GGPlot::Class;
 use namespace::autoclean;
 use MooseX::Singleton;
 
-our $VERSION = '0.002002'; # VERSION
+our $VERSION = '0.002003'; # VERSION
 
 with qw(Chart::GGPlot::Geom);
 
@@ -60,7 +60,7 @@ Chart::GGPlot::Geom::Blank - Class for blank geom
 
 =head1 VERSION
 
-version 0.002002
+version 0.002003
 
 =head1 SEE ALSO
 

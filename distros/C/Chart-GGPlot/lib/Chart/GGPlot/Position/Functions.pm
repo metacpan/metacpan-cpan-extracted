@@ -4,7 +4,7 @@ package Chart::GGPlot::Position::Functions;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.002002'; # VERSION
+our $VERSION = '0.002003'; # VERSION
 
 use Module::Load;
 
@@ -41,7 +41,7 @@ Chart::GGPlot::Position::Functions - Functions for Chart::GGPlot::Position
 
 =head1 VERSION
 
-version 0.002002
+version 0.002003
 
 =head1 AUTHOR
 

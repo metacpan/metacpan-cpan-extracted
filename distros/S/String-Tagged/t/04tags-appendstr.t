@@ -3,27 +3,26 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Identity;
+use Test2::V0;
 
 use String::Tagged;
 
 my $str = String::Tagged->new();
 
-is_deeply( [ $str->tagnames ], [], 'No tags defined initially' );
+is( [ $str->tagnames ], [], 'No tags defined initially' );
 
-identical( scalar $str->apply_tag( -1, -1, everywhere => 1 ),
+ref_is( scalar $str->apply_tag( -1, -1, everywhere => 1 ),
    $str, '->apply_tag returns $str' );
 
-identical( scalar $str->append_tagged( "Hello", word => "greeting" ),
+ref_is( scalar $str->append_tagged( "Hello", word => "greeting" ),
    $str, '->append_tagged returns $str' );
 
 is( $str->str, "Hello", 'str after first append' );
 
-is_deeply( [ sort $str->tagnames ],
+is( [ sort $str->tagnames ],
            [qw( everywhere word )], 'tagnames after first append' );
 
-is_deeply( $str->get_tags_at( 0 ), 
+is( $str->get_tags_at( 0 ), 
            { word => "greeting", everywhere => 1 },
            'tags at pos 0' );
 
@@ -36,7 +35,7 @@ sub fetch_tags
    push @tags, [ $start, $len, map { $_ => $tags{$_} } sort keys %tags ]
 }
 $str->iter_tags_nooverlap( \&fetch_tags );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [ 0, 5, everywhere => 1, word => "greeting" ],
            ],
@@ -48,7 +47,7 @@ is( $str->str, "Hello, ", 'str after second append' );
 
 undef @tags;
 $str->iter_tags_nooverlap( \&fetch_tags );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [ 0, 5, everywhere => 1, word => "greeting" ],
               [ 5, 2, everywhere => 1 ],
@@ -61,7 +60,7 @@ is( $str->str, "Hello, world", 'str after third append' );
 
 undef @tags;
 $str->iter_tags_nooverlap( \&fetch_tags );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [ 0, 5, everywhere => 1, word => "greeting" ],
               [ 5, 2, everywhere => 1 ],

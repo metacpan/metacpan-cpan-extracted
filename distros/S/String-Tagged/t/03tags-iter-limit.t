@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use String::Tagged;
 
@@ -17,7 +17,7 @@ my @tags;
 
 undef @tags;
 $str->iter_tags( sub { push @tags, [ @_ ] }, start => 20 );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [  0, 32, message => 1 ],
               [ 23,  4, italic  => 1 ],
@@ -26,7 +26,7 @@ is_deeply( \@tags,
 
 undef @tags;
 $str->iter_tags( sub { push @tags, [ @_ ] }, end => 20 );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [  0, 32, message => 1 ],
               [ 14,  4, bold    => 1 ],
@@ -35,7 +35,7 @@ is_deeply( \@tags,
 
 undef @tags;
 $str->iter_tags( sub { push @tags, [ @_ ] }, only => [qw( message )] );
-is_deeply( \@tags,
+is( \@tags,
            [
               [ 0, 32, message => 1 ],
            ],
@@ -43,7 +43,7 @@ is_deeply( \@tags,
 
 undef @tags;
 $str->iter_tags( sub { push @tags, [ @_ ] }, except => [qw( message )] );
-is_deeply( \@tags,
+is( \@tags,
            [
               [ 14,  4, bold    => 1 ],
               [ 23,  4, italic  => 1 ],
@@ -58,7 +58,7 @@ sub fetch_tags
 
 undef @tags;
 $str->iter_tags_nooverlap( \&fetch_tags, start => 20 );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [ 20, 3, message => 1 ],
               [ 23, 4, italic  => 1, message => 1 ],
@@ -68,7 +68,7 @@ is_deeply( \@tags,
 
 undef @tags;
 $str->iter_tags_nooverlap( \&fetch_tags, end => 20 );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [  0, 14, message => 1 ],
               [ 14,  4, bold    => 1, message => 1 ],
@@ -78,7 +78,7 @@ is_deeply( \@tags,
 
 undef @tags;
 $str->iter_tags_nooverlap( \&fetch_tags, only => [qw( message )] );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [  0, 32, message => 1 ],
            ],
@@ -86,7 +86,7 @@ is_deeply( \@tags,
 
 undef @tags;
 $str->iter_tags_nooverlap( \&fetch_tags, except => [qw( message )] );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [  0, 14 ],
               [ 14,  4, bold  => 1 ],
@@ -105,7 +105,7 @@ sub fetch_substrs
 
 undef @substrs;
 $str->iter_substr_nooverlap( \&fetch_substrs, start => 20 );
-is_deeply( \@substrs, 
+is( \@substrs, 
            [
               [ "nd ",   message => 1 ],
               [ "ITAL",  italic  => 1, message => 1 ],
@@ -115,7 +115,7 @@ is_deeply( \@substrs,
 
 undef @substrs;
 $str->iter_substr_nooverlap( \&fetch_substrs, end => 20 );
-is_deeply( \@substrs, 
+is( \@substrs, 
            [
               [ "A string with ",   message => 1 ],
               [ "BOLD",             bold    => 1, message => 1 ],

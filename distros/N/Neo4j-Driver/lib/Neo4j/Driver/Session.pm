@@ -5,15 +5,23 @@ use utf8;
 
 package Neo4j::Driver::Session;
 # ABSTRACT: Context of work for database interactions
-$Neo4j::Driver::Session::VERSION = '0.35';
+$Neo4j::Driver::Session::VERSION = '0.36';
 
-use Carp qw();
-our @CARP_NOT = qw(Neo4j::Driver);
+use Carp qw(croak);
+our @CARP_NOT = qw(
+	Neo4j::Driver
+	Try::Tiny
+);
+use List::Util qw(min);
+use Scalar::Util qw(blessed);
+use Time::HiRes ();
+use Try::Tiny;
 use URI 1.25;
 
 use Neo4j::Driver::Net::Bolt;
 use Neo4j::Driver::Net::HTTP;
 use Neo4j::Driver::Transaction;
+use Neo4j::Error;
 
 
 sub new {
@@ -53,6 +61,72 @@ sub run {
 }
 
 
+sub _execute {
+	my ($self, $mode, $func) = @_;
+	
+	croak sprintf "%s->execute_%s() requires subroutine ref", __PACKAGE__, lc $mode unless ref $func eq 'CODE';
+	
+	$self->{retry_sleep} //= 1;
+	my (@r, $r);
+	my $wantarray = wantarray;
+	my $time_stop = Time::HiRes::time
+		+ ($self->{driver}->{max_transaction_retry_time} // 30);  # seconds
+	my $tries = 0;
+	my $success = 0;
+	do {
+		my $tx = $self->new_tx($mode);
+		$tx->{error_handler} = sub { die shift };
+		
+		try {
+			$tx->_begin;
+			$tx->{managed} = 1;  # Disallow commit() in $func
+			if ($wantarray) {
+				@r = $func->($tx);
+			}
+			else {
+				$r = $func->($tx);
+			}
+			$tx->{managed} = 0;
+			$tx->commit;
+			$success = 1;  # return from sub not possible in a Try::Tiny block
+		}
+		catch {
+			# The tx may or may not already be closed; we need to make sure
+			$tx->{managed} = 0;
+			try { $tx->rollback };
+			
+			# Never retry non-Neo4j errors
+			croak $_ unless blessed $_ && $_->isa('Neo4j::Error');
+			
+			if (! $_->is_retryable || Time::HiRes::time >= $time_stop) {
+				$self->{driver}->{plugins}->trigger( error => $_ );
+				$success = -1;  # return in case the event handler doesn't die
+			}
+			else {
+				Time::HiRes::sleep min
+					$self->{retry_sleep} * (1 << $tries++),
+					$time_stop - Time::HiRes::time;
+			}
+		};
+	} until ($success);
+	return $wantarray ? @r : $r;
+}
+
+
+sub execute_read {
+	my ($self, $func) = @_;
+	
+	return $self->_execute( READ => $func );
+}
+
+
+sub execute_write {
+	my ($self, $func) = @_;
+	
+	return $self->_execute( WRITE => $func );
+}
+
+
 sub close {
 	# uncoverable pod (see Deprecations.pod)
 	warnings::warnif deprecated => __PACKAGE__ . "->close() is deprecated";
@@ -87,7 +161,7 @@ sub new {
 
 
 sub new_tx {
-	return Neo4j::Driver::Transaction::Bolt->new(shift);
+	return Neo4j::Driver::Transaction::Bolt->new(@_);
 }
 
 
@@ -110,7 +184,7 @@ sub new {
 
 
 sub new_tx {
-	return Neo4j::Driver::Transaction::HTTP->new(shift);
+	return Neo4j::Driver::Transaction::HTTP->new(@_);
 }
 
 
@@ -128,14 +202,19 @@ Neo4j::Driver::Session - Context of work for database interactions
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 SYNOPSIS
 
  use Neo4j::Driver;
  $session = Neo4j::Driver->new->basic_auth(...)->session;
  
- # explicit transaction
+ # managed transaction function
+ @records = $session->execute_read( sub ($transaction) {
+   $transaction->run('MATCH (m:Movie) RETURN m')->list;
+ });
+ 
+ # unmanaged explicit transaction
  $transaction = $session->begin_transaction;
  
  # autocommit transaction
@@ -145,17 +224,46 @@ version 0.35
 
 Provides a context of work for database interactions.
 
-A Session hosts a series of transactions carried out against a
-database. Within the database, all statements are carried out within
-a transaction. Within application code, however, it is not always
-necessary to explicitly begin a transaction. If a statement is run
-directly against a Session, the server will automatically C<BEGIN>
-and C<COMMIT> that statement within its own transaction. This type
-of transaction is known as an I<autocommit transaction>.
+A Session is a logical container hosting a series of
+L<transactions|Neo4j::Driver::Transaction> carried out against
+a database. Transactions can be either managed, unmanaged, or
+auto-commit transactions:
 
-I<Explicit transactions> allow multiple statements to be committed
-as part of a single atomic operation and can be rolled back if
-necessary.
+=over
+
+=item Managed transaction functions
+
+A transaction function bundles an atomic unit of work that is
+either automatically committed when the function (subroutine)
+returns, or rolled back if an exception is thrown during query
+execution or by the user code. This means you don't have to
+think much about steps like begin or commit – the driver will
+do it all for you.
+
+However, transaction functions must always be idempotent,
+because they might be retried (re-executed) multiple times
+in certain error conditions, for example if the connection
+breaks down during execution. See L</"execute_read"> and
+L</"execute_write"> below.
+
+=item Unmanaged explicit transactions
+
+Instead of using transaction functions, you can choose to
+handle begin, commit, rollback, and failures entirely yourself
+in an I<unmanaged> transaction. This gives you more freedom
+in your interactions with the transaction, but it's also
+a bit more cumbersome. See L</"begin_transaction">.
+
+=item Auto-commit transactions
+
+For simple one-off queries where you don't want to deal with
+explicit transactions at all, there is also a way to run
+queries directly on a session. Opening a transaction before
+and committing it afterwards happens implicitly on the server.
+However, unlike a managed transaction function, auto-commit
+queries will never be retried. See L</"run"> below.
+
+=back
 
 Only one open transaction per session at a time is supported. To
 work with multiple concurrent transactions, simply use more than
@@ -178,11 +286,52 @@ L<Neo4j::Driver::Session> implements the following methods.
 
 Begin a new explicit L<Transaction|Neo4j::Driver::Transaction>.
 
+=head2 execute_read
+
+ @records = $session->execute_read( sub ($tx) {
+   $tx->run('...')->list;
+ });
+
+Exactly like C<execute_write()>, except that it tries to route
+the request to a read-only server if one is available. This is a
+performance optimisation only and does not imply access control.
+
+The effect of using this method to run queries that modify the
+database is unspecified.
+
+=head2 execute_write
+
+ @records = $session->execute_write( sub ($tx) {
+   $tx->run('...')->list;
+ });
+
+Execute a unit of work as a single, managed transaction with
+retry behaviour. The transaction allows for one or more queries
+to be run.
+
+The driver will automatically commit the transaction when the
+provided subroutine finishes execution. Any error raised during
+execution will result in a rollback attempt. For certain kinds
+of errors, the given subroutine will be retried with exponential
+backoff until L<Neo4j::Driver/"max_transaction_retry_time">
+(see L<Neo4j::Error/"is_retryable"> for the complete list).
+Because of this, the given subroutine needs to be B<idempotent>
+(S<i. e.>, have the same effect regardless of how many times
+it is executed).
+
+Note that L<Neo4j::Driver::Result> objects may not be valid
+outside of the given subroutine. While the driver currently
+doesn't prevent you from returning such an object from the
+subroutine, the effect of doing so with results retrieved over
+a Bolt connection is unspecified. A simple solution might be
+to return the list of records from the subroutine instead,
+which is always safe to do.
+
 =head2 run
 
  $result = $session->run('...');
 
-Run and commit a statement using an autocommit transaction and return
+Run and commit a statement using an auto-commit transaction and return
 the L<Result|Neo4j::Driver::Result>.
 
 This method is semantically exactly equivalent to the following code,

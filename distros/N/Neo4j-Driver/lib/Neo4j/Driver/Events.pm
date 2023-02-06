@@ -5,21 +5,54 @@ use utf8;
 
 package Neo4j::Driver::Events;
 # ABSTRACT: Event manager for Neo4j::Driver plug-ins
-$Neo4j::Driver::Events::VERSION = '0.35';
+$Neo4j::Driver::Events::VERSION = '0.36';
 
 # This package is not part of the public Neo4j::Driver API.
 # (except as far as documented in Plugin.pm)
 
 
 use Carp qw(croak);
-our @CARP_NOT = qw(Neo4j::Driver);
+our @CARP_NOT = qw(
+	Neo4j::Driver::Result::Bolt
+	Neo4j::Driver::Result::Jolt
+	Neo4j::Driver::Result::JSON
+	Neo4j::Driver::Result::Text
+);
+
+use Scalar::Util qw(weaken);
+
+
+our $STACK_TRACE = 0;  # die with stack trace on error; for debugging only
 
 
 sub new {
 	# uncoverable pod
 	my ($class) = @_;
 	
-	return bless {}, $class;
+	my $self = bless {}, $class;
+	$self->_init_default_handlers;
+	return $self;
+}
+
+
+# Set up the default handlers for generic events when creating the manager.
+sub _init_default_handlers {
+	my ($self) = @_;
+	
+	$self->{default_handlers}->{error} = sub {
+		# Unlike regular handlers, default handlers don't receive a callback.
+		my ($error) = @_;
+		
+		die $error->trace if $STACK_TRACE;
+		
+		# Join all errors into a multi-line string for backwards compatibility with pre-0.36.
+		my @errors;
+		do { push @errors, $error } while $error = $error->related;
+		@errors = map { $_->as_string } @errors;
+		croak join "\n", @errors if $self->{die_on_error};
+		Carp::carp join "\n", @errors;
+	};
+	weaken $self;
 }
 
 
@@ -55,7 +88,7 @@ sub trigger {
 	
 	my $default_handler = $self->{default_handlers}->{$event};
 	my $handlers = $self->{handlers}->{$event}
-		or return $default_handler ? $default_handler->() : ();
+		or return $default_handler ? $default_handler->(@params) : ();
 	
 	my $callback = $default_handler // sub {};
 	for my $handler ( reverse @$handlers ) {

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Test::More tests => 6;
-use Test::Output;
+use Test::Output qw(output_from);
 
 use lib qw{lib};
 

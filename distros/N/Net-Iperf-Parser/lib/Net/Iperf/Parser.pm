@@ -1,26 +1,21 @@
 package Net::Iperf::Parser;
-$Net::Iperf::Parser::VERSION = '0.03';
-use Moose;
-use namespace::autoclean;
+$Net::Iperf::Parser::VERSION = '0.04';
+use Mojo::Base::Tiny -base;
 
-# ABSTRACT: Parse a single iperf line result
-
-
-has start           => ( is => 'ro', isa => 'Int', default => 0  );
-has end             => ( is => 'ro', isa => 'Int', default => 0  );
-has is_valid        => ( is => 'ro', isa => 'Bool', default => 1 );
-has is_process_avg  => ( is => 'ro', isa => 'Bool', default => 1 );
-has speed           => ( is => 'ro', isa => 'Num', default => 0  );
-
+has start          => 0;
+has end            => 0;
+has is_valid       => 1;
+has is_process_avg => 1;
+has speed          => 0;
 
 sub duration {
-    my $s   = shift;
+    my $s = shift;
     return $s->end - $s->start;
 }
 
 sub is_global_avg {
-    my $s   = shift;
-    return ($s->is_process_avg && $s->start == 0 && $s->end > 5) || 0;
+    my $s = shift;
+    return ( $s->is_process_avg && $s->start == 0 && $s->end > 5 ) || 0;
 }
 
 sub speedk {
@@ -28,7 +23,7 @@ sub speedk {
 }
 
 sub speedm {
-    return shift->speed / (1024 * 1024);
+    return shift->speed / ( 1024 * 1024 );
 }
 
 sub dump {
@@ -39,7 +34,7 @@ sub dump {
 
     my $ret = "{\n";
 
-    foreach(@fld) {
+    foreach (@fld) {
         $ret .= "\t$_ => " . $s->$_ . ",\n";
     }
 
@@ -49,18 +44,18 @@ sub dump {
 
 }
 
-
 sub parsecsv {
-    my $s       = shift;
-    my $row     = shift || '';
-    if ($row =~ /\,/) {
+    my $s   = shift;
+    my $row = shift || '';
+    if ( $row =~ /\,/ ) {
         $s->{is_valid} = 1;
-        my @itms = split(/,/,$row);
+        my @itms = split( /,/, $row );
 
         my $t_range = $itms[6];
-        ($s->{start},$s->{end}) = map $_+0, split(/-/, $t_range);
+        ( $s->{start}, $s->{end} ) = map $_ + 0, split( /-/, $t_range );
 
-        $s->{is_process_avg} = ($itms[5] == -1 || 0);
+        $s->{is_process_avg} = ( $itms[5] == -1 || 0 );
+
         #$s->{speed} = ($itms[-1] / $s->duration);
         $s->{speed} = $itms[-1] + 0;
     } else {
@@ -69,45 +64,46 @@ sub parsecsv {
 }
 
 sub parse {
-    my $s       = shift;
-    my $row     = shift || '';
-    if ($row =~ /^\[((\s*\d+)|SUM)\]\s+\d/) {
+    my $s   = shift;
+    my $row = shift || '';
+    if ( $row =~ /^\[((\s*\d+)|SUM)\]\s+\d/ ) {
         $s->{is_valid} = 1;
         my @itms;
         $row =~ /([\d\.]+-\s*[\d\.]+)\s+sec/;
         my $t_range = $1;
-        ($s->{start},$s->{end}) = map $_+0, split(/-/, $t_range);
+        ( $s->{start}, $s->{end} ) = map $_ + 0, split( /-/, $t_range );
 
-        $s->{is_process_avg} = ($row =~ /^\[SUM\]/ || 0);
-        $row =~/\s+([\d\.]+)\s+(\w+)\/sec/;
-        if ($2 eq 'Mbits') {
-            $s->{speed} = ($1+0) * 1024 * 1024;
+        $s->{is_process_avg} = ( $row =~ /^\[SUM\]/ || 0 );
+        $row =~ /\s+([\d\.]+)\s+(\w+)\/sec/;
+        if ( $2 eq 'Mbits' ) {
+            $s->{speed} = ( $1 + 0 ) * 1024 * 1024;
         } else {
-            $s->{speed} = ($1+0) * 1024;
+            $s->{speed} = ( $1 + 0 ) * 1024;
         }
     } else {
         $s->{is_valid} = 0;
     }
 }
 
-
-__PACKAGE__->meta->make_immutable;
-
 1;
 
-__END__
-
 =pod
-
-=encoding UTF-8
 
 =head1 NAME
 
 Net::Iperf::Parser - Parse a single iperf line result
 
+=for html <p>
+    <a href="https://github.com/emilianobruni/net-iperf-parser/actions/workflows/test.yml">
+        <img alt="github workflow tests" src="https://github.com/emilianobruni/net-iperf-parser/actions/workflows/test.yml/badge.svg">
+    </a>
+    <img alt="Top language: " src="https://img.shields.io/github/languages/top/emilianobruni/net-iperf-parser">
+    <img alt="github last commit" src="https://img.shields.io/github/last-commit/emilianobruni/net-iperf-parser">
+</p>
+
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -186,6 +182,8 @@ Parse a single iperf line result
 
 Parse a single iperf line result in CSV mode (-y C)
 
+=encoding UTF-8
+
 =head1 SEE ALSO
 
 L<iperf|https://iperf.fr/>
@@ -196,9 +194,14 @@ Emiliano Bruni <info@ebruni.it>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Emiliano Bruni.
+This software is copyright (c) 2019-2023 by Emiliano Bruni.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
+
+__END__
+
+# ABSTRACT: Parse a single iperf line result
+

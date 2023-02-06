@@ -5,7 +5,8 @@ use base 'Terse';
 sub new {
 	my ($pkg, @args) = @_;
 	my $self = $pkg->SUPER::new(@args);
-	my ($namespace) = $pkg =~ m/([^:]+)$/;
+	(my $namespace = $pkg) =~ s/^.*Model:://;
+	$namespace =~ s/\:\:/\//g;
 	$self->namespace = lc( $namespace );
 	$self->build_model() if ($self->can('build_model'));
 	return $self;
@@ -24,7 +25,7 @@ Terse::Controller - models made simple.
 
 =head1 VERSION
 
-Version 0.121
+Version 0.1234
 
 =cut
 

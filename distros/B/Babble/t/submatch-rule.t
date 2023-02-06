@@ -7,6 +7,7 @@ package # hide from PAUSE
   ClassKeyword;
 
 use Moo;
+use B ();
 
 sub extend_grammar {
   my ($self, $g) = @_;

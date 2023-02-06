@@ -1,3 +1,10 @@
+0.003   2022-11-15  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Tweak mention of Require::HookChain::source::metacpan.
+
+
 0.002   2020-11-13  Released-By: PERLANCAR; Urgency: high
 
         - Update to make it work again.

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use lib qw(./lib t/lib);
 
-use Test::More 0.88;
+use Test::More 0.94;
 use Test::Exception;
 use Test::Warnings qw(warning);
 use Mock::Quick;
@@ -11,7 +11,7 @@ use Mock::Quick;
 
 # Unit tests for Neo4j::Driver::Net::HTTP::LWP
 
-plan tests => 1 + 12 + 1;
+plan tests => 1 + 13 + 1;
 
 use Neo4j::Driver::Net::HTTP::LWP;
 use HTTP::Headers;
@@ -89,14 +89,26 @@ subtest 'delete request' => sub {
 
 
 subtest 'post request' => sub {
-	plan tests => 5;
+	plan tests => 6;
 	my $json = { answer => 42 };
 	lives_ok { $m->request('POST', '/post', $json, 'application/vnd.neo4j.jolt') } 'request post';
 	$rq = $m->{response};
 	lives_and { is $rq->method(), 'POST' } 'method post';
 	lives_and { like $rq->uri(), qr/\Q$uri\Epost/i } 'uri post';
 	lives_and { is $rq->header('Accept'), 'application/vnd.neo4j.jolt' } 'accept jolt';
+	lives_and { is $rq->header('Access-Mode'), undef } 'no mode';
 	lives_and { is $rq->content(), encode_json($json) } 'content json';
+};
+
+
+subtest 'request modes' => sub {
+	plan tests => 4;
+	lives_ok { $m->request('POST', '/post', {}, 'application/vnd.neo4j.jolt', 'WRITE') } 'request write';
+	$rq = $m->{response};
+	lives_and { is $rq->header('Access-Mode'), 'WRITE' } 'write mode';
+	lives_ok { $m->request('POST', '/post', {}, 'application/vnd.neo4j.jolt', 'READ') } 'request read';
+	$rq = $m->{response};
+	lives_and { is $rq->header('Access-Mode'), 'READ' } 'read mode';
 };
 
 

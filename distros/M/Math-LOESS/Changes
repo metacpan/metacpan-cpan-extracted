@@ -1,5 +1,9 @@
 Revision history for Math::LOESS
 
+0.001000    2023-02-04
+  - Changed my github username.
+  - Fixed a version string issue in Math::LOESS::Model.
+
 0.0001      2019-05-24
   - First release.
 

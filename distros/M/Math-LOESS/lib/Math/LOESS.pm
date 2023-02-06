@@ -6,7 +6,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.001000'; # VERSION
 
 use List::Util qw(reduce);
 use PDL::Core qw(ones);
@@ -221,7 +221,7 @@ Math::LOESS - Perl wrapper of the Locally-Weighted Regression package originally
 
 =head1 VERSION
 
-version 0.0001
+version 0.001000
 
 =head1 SYNOPSIS
 
@@ -291,10 +291,6 @@ When provided as a construction parameter, it is like a shortcut for,
 
 Bad values in C<$x>, C<$y>, C<$weights> are removed.
 
-=head1 NAME
-
-Math::LOESS - Perl wrapper of the Locally-Weighted Regression package originally written by Cleveland, et al.
-
 =head1 ATTRIBUTES
 
 =head2 model
@@ -355,7 +351,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Stephan Loyd.
+This software is copyright (c) 2019-2023 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

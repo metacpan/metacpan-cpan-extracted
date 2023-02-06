@@ -1,0 +1,12 @@
+Revision history for Perl distribution Dist-Zilla-PluginBundle-RWP
+
+This is a changelog file in addition to git commit messages.
+
+0.230350  2023-02-04 23:08:14+04:00 Asia/Baku
+
+  * First CPAN release
+  * Use Dist::Zilla::Role::PluginBundle::Easy Moose role
+  * Setup the required configure method
+  * Add bundles using the add_bundle method
+  * Add plugins using add_plugins method
+  * Test that including [@RWP] builds a distribution successfully

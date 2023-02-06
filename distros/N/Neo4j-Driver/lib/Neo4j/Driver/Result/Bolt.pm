@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::Bolt;
 # ABSTRACT: Bolt result handler
-$Neo4j::Driver::Result::Bolt::VERSION = '0.35';
+$Neo4j::Driver::Result::Bolt::VERSION = '0.36';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -13,6 +13,7 @@ $Neo4j::Driver::Result::Bolt::VERSION = '0.35';
 use parent 'Neo4j::Driver::Result';
 
 use Carp qw(croak);
+our @CARP_NOT = qw(Neo4j::Driver::Net::Bolt Neo4j::Driver::Result);
 
 
 our $gather_results = 0;  # 1: detach from the stream immediately (yields JSON-style result; used for testing)
@@ -39,6 +40,7 @@ sub new {
 		cxn => $params->{bolt_connection},  # important to avoid dereferencing the connection
 		stream => $params->{bolt_stream},
 		server_info => $params->{server_info},
+		error_handler => $params->{error_handler},
 	};
 	bless $self, $class;
 	
@@ -60,13 +62,13 @@ sub _gather_results {
 	while ( my @row = $stream->fetch_next ) {
 		
 		croak 'next true and failure/success mismatch: ' . $stream->failure . '/' . $stream->success unless $stream->failure == -1 || $stream->success == -1 || ($stream->failure xor $stream->success);  # assertion
-		croak 'next true and error: client ' . $stream->client_errnum . ' ' . $stream->client_errmsg . '; server ' . $stream->server_errcode . ' ' . $stream->server_errmsg if $stream->failure && $stream->failure != -1;
+		$self->{cxn}->_trigger_bolt_error( $stream, $self->{error_handler} ) if $stream->failure && $stream->failure != -1;
 		
 		push @data, { row => \@row, meta => [] };
 	}
 	
 	croak 'next false and failure/success mismatch: ' . $stream->failure . '/' . $stream->success unless  $stream->failure == -1 || $stream->success == -1 || ($stream->failure xor $stream->success);  # assertion
-	croak 'next false and error: client ' . $stream->client_errnum . ' ' . $stream->client_errmsg . '; server ' . $stream->server_errcode . ' ' . $stream->server_errmsg if $stream->failure && $stream->failure != -1;
+	$self->{cxn}->_trigger_bolt_error( $stream, $self->{error_handler} ) if $stream->failure && $stream->failure != -1;
 	
 	$self->{stream} = undef;
 	$self->{cxn} = undef;
@@ -91,9 +93,7 @@ sub _fetch_next {
 	unless ($self->{stream}->success) {
 		# success() == -1 is not an error condition; it simply
 		# means that there are no more records on the stream
-		my $stream = $self->{stream};
-		croak sprintf "Bolt error %i: %s", $stream->client_errnum, $stream->client_errmsg unless $stream->server_errcode || $stream->server_errmsg;
-		croak sprintf "%s:\n%s\nBolt error %i: %s", $stream->server_errcode, $stream->server_errmsg, $stream->client_errnum, $stream->client_errmsg;
+		$self->{cxn}->_trigger_bolt_error( $self->{stream}, $self->{error_handler} );
 	}
 	
 	return $self->_init_record( $record );

@@ -25,14 +25,12 @@ my $build = Module::Build->new
                  'Storable' => 0,
                  'Term::ReadLine' => 0,
                },
-   build_requires => {
-                       'Cwd' => 0,
-                       'File::Find' => 0,
-                       'File::Spec' => 0,
-                       'FindBin' => 0,
-                       'Module::Util' => 0,
-                     },
    test_requires => {
+                      'Cwd' => 0,
+                      'File::Find' => 0,
+                      'File::Spec' => 0,
+                      'FindBin' => 0,
+                      'Module::Util' => 0,
                       'Test::MockTime::HiRes' => 0,
                       'Test::More' => 0,
                     },
@@ -40,7 +38,6 @@ my $build = Module::Build->new
    script_files => [ 'scripts/dateparse' ],
    license => 'perl',
    create_readme => 1,
-   create_makefile_pl => 'traditional',
    meta_merge => {
       resources => {
          repository => 'https://github.com/stsc/DateTime-Format-Natural',

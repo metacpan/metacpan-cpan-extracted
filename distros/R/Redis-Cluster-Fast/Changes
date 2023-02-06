@@ -1,5 +1,23 @@
 Revision history for Perl extension Redis-Cluster-Fast
 
+0.05 2023-02-05T09:56:36Z
+
+    - skip tests when test Redis Cluster fails to start
+    - fix workflow
+
+0.04 2023-02-04T08:23:18Z
+
+    - fix for using manually setting environment variable TEST_REDIS_CLUSTER_STARTUP_NODES
+    - Ignore patches that appear to be reversed or already applied.
+
+0.03 2023-02-03T20:04:10Z
+
+    - fix a problem with a patch not being applied
+
+0.02 2023-02-03T18:45:17Z
+
+    - fix tests
+
 0.01 2023-02-02T19:10:47Z
 
     - first version

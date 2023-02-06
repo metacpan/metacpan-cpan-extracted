@@ -16,7 +16,6 @@ lib/DateTime/Format/Natural/Rewrite.pm
 lib/DateTime/Format/Natural/Test.pm
 lib/DateTime/Format/Natural/Utils.pm
 lib/DateTime/Format/Natural/Wrappers.pm
-Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml

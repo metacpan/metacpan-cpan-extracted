@@ -5,7 +5,7 @@ package Chart::GGPlot::Setup;
 use 5.016;
 use warnings;
 
-our $VERSION = '0.002002'; # VERSION
+our $VERSION = '0.002003'; # VERSION
 
 use utf8;
 use feature ':5.16';
@@ -160,7 +160,7 @@ Chart::GGPlot::Setup - Import stuffs into Chart::GGPlot classes
 
 =head1 VERSION
 
-version 0.002002
+version 0.002003
 
 =head1 SYNOPSIS
 

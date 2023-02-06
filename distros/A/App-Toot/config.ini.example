@@ -1,0 +1,6 @@
+[default]
+instance = mastodon.social
+username = youruser
+client_id = OKE98_kdno_NOTAREALCLIENTID
+client_secret = mkjklnv_NOTAREALCLIENTSECRET
+access_token = jo83_NOTAREALACCESSTOKEN

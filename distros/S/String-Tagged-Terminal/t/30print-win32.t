@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 BEGIN { $^O = "MSWin32"; }
 my ( $Attr, @Log );
@@ -32,7 +32,7 @@ $Attr = 7; # default white-on-black, no underline
    undef @Log;
    $st->print_to_terminal;
 
-   is_deeply( \@Log,
+   is( \@Log,
       [
          [ Attr => 7 ],
          [ Write => "some " ],
@@ -53,7 +53,7 @@ $Attr = 7; # default white-on-black, no underline
    undef @Log;
    $st->print_to_terminal;
 
-   is_deeply( \@Log,
+   is( \@Log,
       [
          [ Attr => 7 ],
          [ Write => "output " ],
@@ -74,7 +74,7 @@ $Attr = 7; # default white-on-black, no underline
    undef @Log;
    $st->print_to_terminal;
 
-   is_deeply( \@Log, [
+   is( \@Log, [
          [ Attr => 7 ],
          [ Write => "with " ],
          [ Attr => 15 ],

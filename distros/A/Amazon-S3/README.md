@@ -41,7 +41,13 @@ managing Amazon S3 buckets and keys.
             'x-amz-meta-colour' => 'orange',
         }
     );
-    
+
+    # copy an object
+    $bucket->copy_object(
+      source => $source,
+      key    => $new_keyname
+    );
+
     # list keys in the bucket
     $response = $bucket->list
         or die $s3->err . ": " . $s3->errstr;
@@ -387,7 +393,7 @@ default: us-east-1
 
     default: false
 
-Returns a HASHREF containging the metadata for all of the buckets
+Returns a HASHREF containing the metadata for all of the buckets
 owned by the accout or (see below) or `undef` on
 error.
 
@@ -687,6 +693,8 @@ money each time you use their service. And yes, testing counts as using.
 Because of this, the application's test suite skips anything approaching 
 a real test unless you set these environment variables:
 
+For more on testing this module see [README-TESTING.md](https://github.com/rlauer6/perl-amazon-s3/blob/master/README-TESTING.md)
+
 - AMAZON\_S3\_EXPENSIVE\_TESTS
 
     Doesn't matter what you set it to. Just has to be set
@@ -794,6 +802,10 @@ Bugs should be reported via the CPAN bug tracker at
 &lt;http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Amazon-S3>
 
 For other issues, contact the author.
+
+# REPOSITORY
+
+[https://github.com/rlauer6/perl-amazon-s3](https://github.com/rlauer6/perl-amazon-s3)
 
 # AUTHOR
 

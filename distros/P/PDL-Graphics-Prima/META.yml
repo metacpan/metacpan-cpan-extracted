@@ -1,121 +1,31 @@
 ---
-abstract: 'an interactive plotting widget and library for PDL and Prima'
+abstract: unknown
 author:
-  - 'David Mertens (dcmertens.perl@gmail.com)'
-build_requires: {}
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
 configure_requires:
-  Module::Build: '0.28'
-dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: PDL-Graphics-Prima
-provides:
-  PDL::Demos::Prima:
-    file: lib/PDL/Demos/Prima.pm
-  PDL::Graphics::Prima:
-    file: lib/PDL/Graphics/Prima.pm
-    version: '0.18'
-  PDL::Graphics::Prima::Axis:
-    file: lib/PDL/Graphics/Prima/Axis.pm
-    version: '0.18'
-  PDL::Graphics::Prima::DataSet:
-    file: lib/PDL/Graphics/Prima/DataSet.pm
-    version: '0.18'
-  PDL::Graphics::Prima::DataSet::Annotation:
-    file: lib/PDL/Graphics/Prima/DataSet.pm
-  PDL::Graphics::Prima::DataSet::Collection:
-    file: lib/PDL/Graphics/Prima/DataSet.pm
-  PDL::Graphics::Prima::DataSet::Dist:
-    file: lib/PDL/Graphics/Prima/DataSet.pm
-  PDL::Graphics::Prima::DataSet::Func:
-    file: lib/PDL/Graphics/Prima/DataSet.pm
-  PDL::Graphics::Prima::DataSet::Grid:
-    file: lib/PDL/Graphics/Prima/DataSet.pm
-  PDL::Graphics::Prima::DataSet::Image:
-    file: lib/PDL/Graphics/Prima/DataSet.pm
-  PDL::Graphics::Prima::DataSet::Pair:
-    file: lib/PDL/Graphics/Prima/DataSet.pm
-  PDL::Graphics::Prima::Limits:
-    file: lib/PDL/Graphics/Prima/Limits.pm
-    version: '0.18'
-  PDL::Graphics::Prima::Palette:
-    file: lib/PDL/Graphics/Prima/Palette.pm
-    version: '0.18'
-  PDL::Graphics::Prima::Palette::HSVrange:
-    file: lib/PDL/Graphics/Prima/Palette.pm
-  PDL::Graphics::Prima::PlotType:
-    file: lib/PDL/Graphics/Prima/PlotType.pm
-    version: '0.18'
-  PDL::Graphics::Prima::PlotType::Annotation:
-    file: lib/PDL/Graphics/Prima/PlotType.pm
-  PDL::Graphics::Prima::PlotType::Annotation::Box:
-    file: lib/PDL/Graphics/Prima/PlotType.pm
-  PDL::Graphics::Prima::PlotType::Annotation::Line:
-    file: lib/PDL/Graphics/Prima/PlotType.pm
-  PDL::Graphics::Prima::PlotType::Annotation::Region:
-    file: lib/PDL/Graphics/Prima/PlotType.pm
-  PDL::Graphics::Prima::PlotType::Annotation::Text:
-    file: lib/PDL/Graphics/Prima/PlotType.pm
-  PDL::Graphics::Prima::PlotType::CallBack:
-    file: lib/PDL/Graphics/Prima/PlotType.pm
-  PDL::Graphics::Prima::PlotType::Grid:
-    file: lib/PDL/Graphics/Prima/PlotType.pm
-  PDL::Graphics::Prima::PlotType::Grid::Matrix:
-    file: lib/PDL/Graphics/Prima/PlotType.pm
-  PDL::Graphics::Prima::PlotType::Image:
-    file: lib/PDL/Graphics/Prima/PlotType.pm
-  PDL::Graphics::Prima::PlotType::Image::Basic:
-    file: lib/PDL/Graphics/Prima/PlotType.pm
-  PDL::Graphics::Prima::PlotType::Pair:
-    file: lib/PDL/Graphics/Prima/PlotType.pm
-  PDL::Graphics::Prima::PlotType::Pair::Area:
-    file: lib/PDL/Graphics/Prima/PlotType.pm
-  PDL::Graphics::Prima::PlotType::Pair::Bands:
-    file: lib/PDL/Graphics/Prima/PlotType.pm
-  PDL::Graphics::Prima::PlotType::Pair::Blobs:
-    file: lib/PDL/Graphics/Prima/PlotType.pm
-  PDL::Graphics::Prima::PlotType::Pair::BoxAndWhisker:
-    file: lib/PDL/Graphics/Prima/PlotType.pm
-  PDL::Graphics::Prima::PlotType::Pair::ErrorBars:
-    file: lib/PDL/Graphics/Prima/PlotType.pm
-  PDL::Graphics::Prima::PlotType::Pair::Histogram:
-    file: lib/PDL/Graphics/Prima/PlotType.pm
-  PDL::Graphics::Prima::PlotType::Pair::Lines:
-    file: lib/PDL/Graphics/Prima/PlotType.pm
-  PDL::Graphics::Prima::PlotType::Pair::Spikes:
-    file: lib/PDL/Graphics/Prima/PlotType.pm
-  PDL::Graphics::Prima::PlotType::Pair::Symbols:
-    file: lib/PDL/Graphics/Prima/PlotType.pm
-  PDL::Graphics::Prima::PlotType::Pair::TrendLines:
-    file: lib/PDL/Graphics/Prima/PlotType.pm
-  PDL::Graphics::Prima::PlotType::Role::Raster:
-    file: lib/PDL/Graphics/Prima/PlotType.pm
-  PDL::Graphics::Prima::ReadLine:
-    file: lib/PDL/Graphics/Prima/ReadLine.pm
-    version: '0.18'
-  PDL::Graphics::Prima::Scaling:
-    file: lib/PDL/Graphics/Prima/Scaling.pm
-    version: '0.18'
-  PDL::Graphics::Prima::Scaling::Linear:
-    file: lib/PDL/Graphics/Prima/Scaling.pm
-  PDL::Graphics::Prima::Scaling::Log:
-    file: lib/PDL/Graphics/Prima/Scaling.pm
-  PDL::Graphics::Prima::Simple:
-    file: lib/PDL/Graphics/Prima/Simple.pm
-    version: '0.18'
-  Prima::Plot:
-    file: lib/PDL/Graphics/Prima.pm
+no_index:
+  directory:
+    - t
+    - inc
 requires:
   PDL: v2.4.0
   PDL::Drawing::Prima: '0.15'
   Prima: '1.67'
-  perl: v5.12.0
+  perl: '5.012'
 resources:
-  bugtracker: http://github.com/PDLPorters/PDL-Graphics-Prima/issues
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/PDLPorters/PDL-Graphics-Prima
-version: '0.18'
+  IRC: irc://irc.perl.org/#graphql-perl
+  bugtracker: https://github.com/PDLPorters/PDL-Graphics-Prima/issues
+  repository: https://github.com/PDLPorters/PDL-Graphics-Prima
+version: '0.19'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

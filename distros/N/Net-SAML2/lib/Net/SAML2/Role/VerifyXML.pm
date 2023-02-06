@@ -1,12 +1,13 @@
 package Net::SAML2::Role::VerifyXML;
 use Moose::Role;
-our $VERSION = '0.62'; # VERSION
+our $VERSION = '0.64'; # VERSION
 
 use Net::SAML2::XML::Sig;
 use Crypt::OpenSSL::Verify;
 use Crypt::OpenSSL::X509;
 use Carp qw(croak);
 use List::Util qw(none);
+use Try::Tiny;
 
 # ABSTRACT: A role to verify the SAML response XML
 
@@ -38,10 +39,10 @@ sub verify_xml {
 
     if ($cacert) {
         my $ca = Crypt::OpenSSL::Verify->new($cacert, { strict_certs => 0 });
-        eval { $ca->verify($cert) };
-        if ($@) {
-            croak("Could not verify CA certificate: $@");
-        }
+        try { $ca->verify($cert) }
+        catch {
+            croak("Could not verify CA certificate: $_");
+        };
     }
 
     return 1 if !$anchors;
@@ -83,7 +84,7 @@ Net::SAML2::Role::VerifyXML - A role to verify the SAML response XML
 
 =head1 VERSION
 
-version 0.62
+version 0.64
 
 =head1 SYNOPSIS
 
@@ -130,13 +131,23 @@ version 0.62
         },
     );
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Chris Andrews  <chrisa@cpan.org>
 
+=item *
+
+Timothy Legge <timlegge@gmail.com>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Chris Andrews and Others, see the git log.
+This software is copyright (c) 2023 by Venda Ltd, see the CONTRIBUTORS file for others.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

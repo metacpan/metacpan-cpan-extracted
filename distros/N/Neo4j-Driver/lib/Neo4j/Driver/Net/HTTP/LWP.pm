@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::HTTP::LWP;
 # ABSTRACT: HTTP network adapter for libwww-perl
-$Neo4j::Driver::Net::HTTP::LWP::VERSION = '0.35';
+$Neo4j::Driver::Net::HTTP::LWP::VERSION = '0.36';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Net::HTTP);
@@ -120,7 +120,7 @@ sub fetch_all {
 
 
 sub request {
-	my ($self, $method, $url, $json, $accept) = @_;
+	my ($self, $method, $url, $json, $accept, $mode) = @_;
 	
 	$self->{buffer} = undef;
 	
@@ -132,6 +132,7 @@ sub request {
 			'Accept' => $accept,
 			'Content' => $self->{json_coder}->encode($json),
 			'Content-Type' => $CONTENT_TYPE,
+			$mode ? ('Access-Mode' => $mode) : ()
 		);
 	}
 	else {
@@ -157,7 +158,7 @@ Neo4j::Driver::Net::HTTP::LWP - HTTP network adapter for libwww-perl
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 SYNOPSIS
 

@@ -9,9 +9,9 @@ use Log::ger;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-10'; # DATE
+our $DATE = '2023-01-29'; # DATE
 our $DIST = 'App-BPOMUtils-NutritionFacts'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 our @EXPORT_OK = qw(
                        bpom_show_nutrition_facts
@@ -25,6 +25,8 @@ $SPEC{':package'} = {
 };
 
 my $res;
+
+my $M = "\N{MULTIPLICATION SIGN}";
 
 sub _nearest {
     require Math::Round;
@@ -40,20 +42,27 @@ sub _fmt_num_id {
 my @output_formats = (qw/
                                            raw_table
                                            vertical_html_table vertical_text_table
-                                           linear_html linear_text
+                                           linear_html linear_text raw_linear
                                            calculation_html calculation_text
 /);
 # horizontal_html_table horizontal_text_table formats not supported yet
 
 $SPEC{bpom_show_nutrition_facts} = {
     v => 1.1,
-    summary => 'Round values and format them as nutrition fact table (ING - informasi nilai gizi)',
+    summary => 'Render BPOM-compliant nutrition fact table (ING - informasi nilai gizi) in various formats',
     args => {
         name => {schema=>'str*'},
 
-        # XXX output_format: vertical table, horizontal table, simple table, csv. currently only simple table is supported
         output_format => {
+            summary => 'Pick an output format for the nutrition fact',
             schema => ['str*', {in=>\@output_formats}],
+            description => <<'_',
+
+`vertical_text_table` is the default. The /(vertical)?.*table/ formats presents
+the information in a table, while the /linear/ formats presents the information
+in a paragraph.
+
+_
             default => 'vertical_text_table',
             cmdline_aliases => {
                 f=>{},
@@ -87,17 +96,27 @@ $SPEC{bpom_show_nutrition_facts} = {
     examples => [
         {
             summary => 'An example, in linear text format (color/emphasis is shown with markup)',
+            args => {fat=>0.223, saturated_fat=>0.010, protein=>0.990, carbohydrate=>13.113, sugar=>7.173, sodium=>0.223, serving_size=>175, package_size=>20, output_format=>"raw_linear", color=>"never"},
+            test => 0,
+        },
+        {
+            summary => 'An example, in raw_linear format (just like linear_text but with no border)',
             args => {fat=>0.223, saturated_fat=>0.010, protein=>0.990, carbohydrate=>13.113, sugar=>7.173, sodium=>0.223, serving_size=>175, package_size=>20, output_format=>"linear_text", color=>"never"},
             test => 0,
         },
         {
-            summary => 'The same example in vetical HTML table format',
+            summary => 'The same example in vertical HTML table format',
             args => {fat=>0.223, saturated_fat=>0.010, protein=>0.990, carbohydrate=>13.113, sugar=>7.173, sodium=>0.223, serving_size=>175, package_size=>20, output_format=>"vertical_html_table"},
             test => 0,
         },
         {
             summary => 'The same example, in vertical text format (color/emphasis is shown with markup)',
             args => {fat=>0.223, saturated_fat=>0.010, protein=>0.990, carbohydrate=>13.113, sugar=>7.173, sodium=>0.223, serving_size=>175, package_size=>20, output_format=>"vertical_text_table", color=>"never"},
+            test => 0,
+        },
+        {
+            summary => 'The same example, in calculation text format',
+            args => {fat=>0.223, saturated_fat=>0.010, protein=>0.990, carbohydrate=>13.113, sugar=>7.173, sodium=>0.223, serving_size=>175, package_size=>20, output_format=>"calculation_text", color=>"never"},
             test => 0,
         },
     ],
@@ -190,15 +209,6 @@ sub bpom_show_nutrition_facts {
             else               { _nearest(10, $val) }
         };
 
-        if ($per_package_ing) {
-            if ($output_format eq 'raw_table') {
-            } elsif ($output_format =~ /vertical/) {
-                push @rows, [{colspan=>5, $attr=>$code_fmttext->("*JUMLAH PER KEMASAN ("._fmt_num_id($args{package_size})." g*)")}];
-            } elsif ($output_format =~ /linear/) {
-                push @rows, $code_fmttext->("*JUMLAH PER KEMASAN ("._fmt_num_id($args{package_size})." g*) : ");
-            }
-        }
-
         my $val0 = $args{fat} * 9 + $args{protein} * 4 + $args{carbohydrate} * 4;
         my $val  = $val0*$args{$size_key}/100;
         my $valr = $code_round_energy->($val);
@@ -231,15 +241,15 @@ sub bpom_show_nutrition_facts {
         } elsif ($output_format =~ /calculation/) {
             push @rows, [{colspan=>2, align=>'middle', $attr=>$code_fmttext->('*Energi total*')}];
             push @rows, [{align=>'right', text=>'Energi total per 100 g'},
-                         {align=>'left', $attr=>"= lemak x 9 + protein x 4 + karbohidrat x 4 = $args{fat} x 9 + $args{protein} x 4 + $args{carbohydrate} x 4 = $val0 kkal"}];
+                         {align=>'left', $attr=>"= lemak $M 9 + protein $M 4 + karbohidrat $M 4 = $args{fat} $M 9 + $args{protein} $M 4 + $args{carbohydrate} $M 4 = $val0 kkal"}];
             push @rows, [{align=>'right', text=>"Energi total per ".($per_package_ing ? "kemasan $args{package_size} g" : "takaran saji $args{serving_size} g")},
-                         {align=>'left', $attr=>"= $val0 x $args{$size_key} / 100 = $val kkal"}];
+                         {align=>'left', $attr=>"= $val0 $M $args{$size_key} / 100 = $val kkal"}];
             push @rows, [{align=>'right', text=>"(dibulatkan: <5 -> 0, <=50 -> 5 kkal terdekat, >50 -> 10 kkal terdekat)"},
                          {align=>'left', $attr=>$code_fmttext->("= *$valr* kkal")}];
             push @rows, ['', ''];
             push @rows, [{colspan=>2, align=>'middle', $attr=>$code_fmttext->('*%AKG energi total*')}];
             push @rows, [{align=>'right', text=>"\%AKG"},
-                         {align=>'left', $attr=>"= $val / 2150 x 100 = $pct_dv"}];
+                         {align=>'left', $attr=>"= $val / 2150 $M 100 = $pct_dv"}];
             push @rows, [{align=>'right', text=>"(dibulatkan ke % terdekat)"},
                          {align=>'left', $attr=>$code_fmttext->("= *$pct_dv_R*")}];
         }
@@ -268,9 +278,9 @@ sub bpom_show_nutrition_facts {
             } elsif ($output_format =~ /calculation/) {
                 push @rows, [{colspan=>2, align=>'middle', $attr=>$code_fmttext->('*Energi dari lemak*')}];
                 push @rows, [{align=>'right', text=>'Energi dari lemak per 100 g'},
-                             {align=>'left', $attr=>"= lemak x 9 = $args{fat} x 9 = $val0 kkal"}];
+                             {align=>'left', $attr=>"= lemak $M 9 = $args{fat} $M 9 = $val0 kkal"}];
                 push @rows, [{align=>'right', text=>"Energi dari lemak per ".($per_package_ing ? "kemasan $args{package_size} g" : "takaran saji $args{serving_size} g")},
-                             {align=>'left', $attr=>"= $val0 x $args{$size_key} / 100 = $val kkal"}];
+                             {align=>'left', $attr=>"= $val0 $M $args{$size_key} / 100 = $val kkal"}];
                 push @rows, [{align=>'right', text=>"(dibulatkan: <5 -> 0, <=50 -> 5 kkal terdekat, >50 -> 10 kkal terdekat)"},
                              {align=>'left', $attr=>$code_fmttext->("= *$valr* kkal")}];
             }
@@ -300,9 +310,9 @@ sub bpom_show_nutrition_facts {
             } elsif ($output_format =~ /calculation/) {
                 push @rows, [{colspan=>2, align=>'middle', $attr=>$code_fmttext->('*Energi dari lemak jenuh*')}];
                 push @rows, [{align=>'right', text=>'Energi dari lemak per 100 g'},
-                             {align=>'left', $attr=>"= lemak jenuh x 9 = $args{saturated_fat} x 9 = $val0 kkal"}];
+                             {align=>'left', $attr=>"= lemak jenuh $M 9 = $args{saturated_fat} $M 9 = $val0 kkal"}];
                 push @rows, [{align=>'right', text=>"Energi dari lemak jenuh per ".($per_package_ing ? "kemasan $args{package_size} g" : "takaran saji $args{serving_size} g")},
-                             {align=>'left', $attr=>"= $val0 x $args{$size_key} / 100 = $val kkal"}];
+                             {align=>'left', $attr=>"= $val0 $M $args{$size_key} / 100 = $val kkal"}];
                 push @rows, [{align=>'right', text=>"(dibulatkan: <5 -> 0, <=50 -> 5 kkal terdekat, >50 -> 10 kkal terdekat)"},
                              {align=>'left', $attr=>$code_fmttext->("= *$valr* kkal")}];
             }
@@ -354,13 +364,13 @@ sub bpom_show_nutrition_facts {
             push @rows, [{align=>'right', text=>'Lemak total per 100 g'},
                          {align=>'left', $attr=>"= $args{fat} g"}];
             push @rows, [{align=>'right', text=>"Lemak total per ".($per_package_ing ? "kemasan $args{package_size} g" : "takaran saji $args{serving_size} g")},
-                         {align=>'left', $attr=>"= $val0 x $args{$size_key} / 100 = $val g"}];
+                         {align=>'left', $attr=>"= $val0 $M $args{$size_key} / 100 = $val g"}];
             push @rows, [{align=>'right', text=>"(dibulatkan: <0.5 -> 0, <=5 -> 0.5 g terdekat, >=5 -> 1 g terdekat)"},
                          {align=>'left', $attr=>$code_fmttext->("= *$valr* g")}];
             push @rows, ['', ''];
             push @rows, [{colspan=>2, align=>'middle', $attr=>$code_fmttext->('*%AKG lemak total*')}];
             push @rows, [{align=>'right', text=>"\%AKG"},
-                         {align=>'left', $attr=>"= $val / 67 x 100 = $pct_dv"}];
+                         {align=>'left', $attr=>"= $val / 67 $M 100 = $pct_dv"}];
             push @rows, [{align=>'right', text=>"(dibulatkan ke % terdekat)"},
                          {align=>'left', $attr=>$code_fmttext->("= *$pct_dv_R*")}];
         }
@@ -392,13 +402,13 @@ sub bpom_show_nutrition_facts {
                 push @rows, [{align=>'right', text=>'Lemak jenuh per 100 g'},
                              {align=>'left', $attr=>"= $args{saturated_fat} g"}];
                 push @rows, [{align=>'right', text=>"Lemak jenuh per ".($per_package_ing ? "kemasan $args{package_size} g" : "takaran saji $args{serving_size} g")},
-                             {align=>'left', $attr=>"= $val0 x $args{$size_key} / 100 = $val g"}];
+                             {align=>'left', $attr=>"= $val0 $M $args{$size_key} / 100 = $val g"}];
                 push @rows, [{align=>'right', text=>"(dibulatkan: <0.5 -> 0, <=5 -> 0.5 g terdekat, >=5 -> 1 g terdekat)"},
                              {align=>'left', $attr=>$code_fmttext->("= *$valr* g")}];
                 push @rows, ['', ''];
                 push @rows, [{colspan=>2, align=>'middle', $attr=>$code_fmttext->('*%AKG lemak jenuh*')}];
                 push @rows, [{align=>'right', text=>"\%AKG"},
-                             {align=>'left', $attr=>"= $val / 67 x 100 = $pct_dv"}];
+                             {align=>'left', $attr=>"= $val / 67 $M 100 = $pct_dv"}];
                 push @rows, [{align=>'right', text=>"(dibulatkan ke % terdekat)"},
                              {align=>'left', $attr=>$code_fmttext->("= *$pct_dv_R*")}];
             }
@@ -442,13 +452,13 @@ sub bpom_show_nutrition_facts {
             push @rows, [{align=>'right', text=>'Protein per 100 g'},
                          {align=>'left', $attr=>"= $args{protein} g"}];
             push @rows, [{align=>'right', text=>"Protein total per ".($per_package_ing ? "kemasan $args{package_size} g" : "takaran saji $args{serving_size} g")},
-                         {align=>'left', $attr=>"= $val0 x $args{$size_key} / 100 = $val g"}];
+                         {align=>'left', $attr=>"= $val0 $M $args{$size_key} / 100 = $val g"}];
             push @rows, [{align=>'right', text=>"(dibulatkan: <0.5 -> 0, >=0.5 -> 1 g terdekat)"},
                          {align=>'left', $attr=>$code_fmttext->("= *$valr* g")}];
             push @rows, ['', ''];
             push @rows, [{colspan=>2, align=>'middle', $attr=>$code_fmttext->('*%AKG protein*')}];
             push @rows, [{align=>'right', text=>"\%AKG"},
-                         {align=>'left', $attr=>"= $val / 60 x 100 = $pct_dv"}];
+                         {align=>'left', $attr=>"= $val / 60 $M 100 = $pct_dv"}];
             push @rows, [{align=>'right', text=>"(dibulatkan ke % terdekat)"},
                          {align=>'left', $attr=>$code_fmttext->("= *$pct_dv_R*")}];
         }
@@ -491,13 +501,13 @@ sub bpom_show_nutrition_facts {
             push @rows, [{align=>'right', text=>'Karbohidrat total per 100 g'},
                          {align=>'left', $attr=>"= $args{carbohydrate} g"}];
             push @rows, [{align=>'right', text=>"Karbohidrat total per ".($per_package_ing ? "kemasan $args{package_size} g" : "takaran saji $args{serving_size} g")},
-                         {align=>'left', $attr=>"= $val0 x $args{$size_key} / 100 = $val g"}];
+                         {align=>'left', $attr=>"= $val0 $M $args{$size_key} / 100 = $val g"}];
             push @rows, [{align=>'right', text=>"(dibulatkan: <0.5 -> 0, >=0.5 -> 1 g terdekat)"},
                          {align=>'left', $attr=>$code_fmttext->("= *$valr* g")}];
             push @rows, ['', ''];
             push @rows, [{colspan=>2, align=>'middle', $attr=>$code_fmttext->('*%AKG karbohidrat total*')}];
             push @rows, [{align=>'right', text=>"\%AKG"},
-                         {align=>'left', $attr=>"= $val / 325 x 100 = $pct_dv"}];
+                         {align=>'left', $attr=>"= $val / 325 $M 100 = $pct_dv"}];
             push @rows, [{align=>'right', text=>"(dibulatkan ke % terdekat)"},
                          {align=>'left', $attr=>$code_fmttext->("= *$pct_dv_R*")}];
         }
@@ -532,7 +542,7 @@ sub bpom_show_nutrition_facts {
             push @rows, [{align=>'right', text=>'Gula per 100 g'},
                          {align=>'left', $attr=>"= $args{sugar} g"}];
             push @rows, [{align=>'right', text=>"Gula per ".($per_package_ing ? "kemasan $args{package_size} g" : "takaran saji $args{serving_size} g")},
-                         {align=>'left', $attr=>"= $val0 x $args{$size_key} / 100 = $val g"}];
+                         {align=>'left', $attr=>"= $val0 $M $args{$size_key} / 100 = $val g"}];
             push @rows, [{align=>'right', text=>"(dibulatkan: <0.5 -> 0, >=0.5 -> 1 g terdekat)"},
                          {align=>'left', $attr=>$code_fmttext->("= *$valr* g")}];
         }
@@ -577,13 +587,13 @@ sub bpom_show_nutrition_facts {
             push @rows, [{align=>'right', text=>'Natrium per 100 g'},
                          {align=>'left', $attr=>"= $args{sodium} mg"}];
             push @rows, [{align=>'right', text=>"Natrium per ".($per_package_ing ? "kemasan $args{package_size} g" : "takaran saji $args{serving_size} g")},
-                         {align=>'left', $attr=>"= $val0 x $args{$size_key} / 100 = $val mg"}];
+                         {align=>'left', $attr=>"= $val0 $M $args{$size_key} / 100 = $val mg"}];
             push @rows, [{align=>'right', text=>"(dibulatkan: <5 -> 0, <=140 -> 5 mg terdekat, >140 -> 10 mg terdekat)"},
                          {align=>'left', $attr=>$code_fmttext->("= *$valr* mg")}];
             push @rows, ['', ''];
             push @rows, [{colspan=>2, align=>'middle', $attr=>$code_fmttext->('*%AKG natrium*')}];
             push @rows, [{align=>'right', text=>"\%AKG"},
-                         {align=>'left', $attr=>"= $val / 1500 x 100 = $pct_dv"}];
+                         {align=>'left', $attr=>"= $val / 1500 $M 100 = $pct_dv"}];
             push @rows, [{align=>'right', text=>"(dibulatkan ke % terdekat)"},
                          {align=>'left', $attr=>$code_fmttext->("= *$pct_dv_R*")}];
         }
@@ -611,9 +621,8 @@ sub bpom_show_nutrition_facts {
             $table =~ s!<table>!<table class="$output_format"><colgroup><col style="width:16pt;"><col style="width:200pt;"><col style="width:48pt;"><col style="width:48pt;"><col style="width:36pt;"></colgroup>!;
             $text = "
 <style>
-  table.$output_format { border-collapse: collapse; border: 1px solid; }
-  tr.$output_format.has_bottom_border { border-bottom: 1pt solid black; }
-  // td:first-child { background: red; }
+  table.$output_format { border-collapse: collapse; border: solid 1pt black; }
+  table.$output_format tr.has_bottom_border { border-bottom: solid 1pt black; }
 </style>\n" . $table;
         } else {
             require Text::Table::More;
@@ -623,11 +632,17 @@ sub bpom_show_nutrition_facts {
         if ($output_format =~ /html/) {
             $text = "
 <style>
-  p { border-style: solid; }
+  p.$output_format { border: solid 1pt black; }
 </style>
-<p>" . join("", @rows). "</p>\n";
+<p class=\"$output_format\">" . join("", @rows). "</p>\n";
+        } elsif ($output_format =~ /text/) {
+            require Text::ANSI::Util;
+            require Text::Table::More;
+            my $ing = Text::ANSI::Util::ta_wrap(join("", @rows), $ENV{COLUMNS} // 80);
+            $text = Text::Table::More::generate_table(rows => [[$ing]], header_row=>0);
         } else {
-            $text = join("", @rows). "\n";
+            # raw_linear
+            $text = join("", @rows) . "\n";
         }
     } elsif ($output_format =~ /calculation/) {
         if ($output_format =~ /html/) {
@@ -636,9 +651,8 @@ sub bpom_show_nutrition_facts {
             $table =~ s!<table>!<table class="$output_format">!;
             $text = "
 <style>
-  table.$output_format { border-collapse: collapse; border: 1px solid; }
-  tr.$output_format.has_bottom_border { border-bottom: 1pt solid black; }
-  // td:first-child { background: red; }
+  table.$output_format { font-size: smaller; border-collapse: collapse; border: solid 1pt black; }
+  table.$output_format tr.has_bottom_border { border-bottom: solid 1pt black; }
 </style>\n" . $table;
         } else {
             require Text::Table::More;
@@ -679,7 +693,7 @@ App::BPOMUtils::NutritionFacts - Utilities related to BPOM nutrition facts
 
 =head1 VERSION
 
-This document describes version 0.016 of App::BPOMUtils::NutritionFacts (from Perl distribution App-BPOMUtils-NutritionFacts), released on 2023-01-10.
+This document describes version 0.023 of App::BPOMUtils::NutritionFacts (from Perl distribution App-BPOMUtils-NutritionFacts), released on 2023-01-29.
 
 =head1 SYNOPSIS
 
@@ -704,13 +718,37 @@ Usage:
 
  bpom_show_nutrition_facts(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Round values and format them as nutrition fact table (ING - informasi nilai gizi).
+Render BPOM-compliant nutrition fact table (ING - informasi nilai gizi) in various formats.
 
 Examples:
 
 =over
 
 =item * An example, in linear text format (colorE<sol>emphasis is shown with markup):
+
+ bpom_show_nutrition_facts(
+   carbohydrate => 13.113,
+   color => "never",
+   fat => 0.223,
+   output_format => "raw_linear",
+   package_size => 20,
+   protein => 0.99,
+   saturated_fat => 0.01,
+   serving_size => 175,
+   sodium => 0.223,
+   sugar => 7.173
+ );
+
+Result:
+
+ [
+   200,
+   "OK",
+   "*INFORMASI NILAI GIZI*   *JUMLAH PER KEMASAN (20 g)* : *Energi total 10 kkal*, Energi dari lemak 0 kkal, Energi dari lemak jenuh 0 kkal, *Lemak total 0 g (0% AKG)*, *Lemak jenuh 0 g (0% AKG)*, *Protein 0 g (0% AKG)*, *Karbohidrat total 3 g (1% AKG)*, *Gula 1 g*, *Garam (Natrium) 0 mg (0% AKG)*. /Persen AKG berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih tinggi atau lebih rendah./\n",
+   { "cmdline.skip_format" => 1 },
+ ]
+
+=item * An example, in raw_linear format (just like linear_text but with no border):
 
  bpom_show_nutrition_facts(
    carbohydrate => 13.113,
@@ -730,11 +768,11 @@ Result:
  [
    200,
    "OK",
-   "*INFORMASI NILAI GIZI*   *JUMLAH PER KEMASAN (20 g)* : *JUMLAH PER KEMASAN (20 g*) : *Energi total 10 kkal*, Energi dari lemak 0 kkal, Energi dari lemak jenuh 0 kkal, *Lemak total 0 g (0% AKG)*, *Lemak jenuh 0 g (0% AKG)*, *Protein 0 g (0% AKG)*, *Karbohidrat total 3 g (1% AKG)*, *Gula 1 g*, *Garam (Natrium) 0 mg (0% AKG)*. /Persen AKG berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih tinggi atau lebih rendah./\n",
+   ".---------------------------------------------------------------------------------.\n| *INFORMASI NILAI GIZI* *JUMLAH PER KEMASAN (20 g)* : *Energi total 10 kkal*,    |\n| Energi dari lemak 0 kkal, Energi dari lemak jenuh 0 kkal, *Lemak total 0 g (0%  |\n| AKG)*, *Lemak jenuh 0 g (0% AKG)*, *Protein 0 g (0% AKG)*, *Karbohidrat total 3 |\n| g (1% AKG)*, *Gula 1 g*, *Garam (Natrium) 0 mg (0% AKG)*. /Persen AKG           |\n| berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih     |\n| tinggi atau lebih rendah./                                                      |\n`---------------------------------------------------------------------------------'\n",
    { "cmdline.skip_format" => 1 },
  ]
 
-=item * The same example in vetical HTML table format:
+=item * The same example in vertical HTML table format:
 
  bpom_show_nutrition_facts(
    carbohydrate => 13.113,
@@ -753,7 +791,7 @@ Result:
  [
    200,
    "OK",
-   "\n<style>\n  table.vertical_html_table { border-collapse: collapse; border: 1px solid; }\n  tr.vertical_html_table.has_bottom_border { border-bottom: 1pt solid black; }\n  // td:first-child { background: red; }\n</style>\n<table class=\"vertical_html_table\"><colgroup><col style=\"width:16pt;\"><col style=\"width:200pt;\"><col style=\"width:48pt;\"><col style=\"width:48pt;\"><col style=\"width:36pt;\"></colgroup>\n<tr><td colspan=5 align=\"middle\"><b>INFORMASI NILAI GIZI</b></td></tr>\n<tbody>\n<tr><td colspan=5></td></tr>\n<tr><td colspan=5 align=\"left\"><b>JUMLAH PER KEMASAN (20 g)</b></td></tr>\n<tr><td colspan=5><b>JUMLAH PER KEMASAN (20 g</b>)</td></tr>\n<tr class=has_bottom_border><td colspan=5><b>Energi total 10 kkal</b></td></tr>\n<tr><td colspan=3></td><td colspan=2 align=\"middle\"><b>% AKG</b>*</td></tr>\n<tr><td colspan=2><b>Lemak total</b></td><td align=\"right\"><b>0 g</b></td><td align=\"right\">0 %</td><td></td></tr>\n<tr><td colspan=2><b>Lemak jenuh</b></td><td align=\"right\"><b>0 g</b></td><td align=\"right\">0 %</td><td></td></tr>\n<tr><td colspan=2><b>Protein</b></td><td align=\"right\"><b>0 g</b></td><td align=\"right\">0 %</td><td></td></tr>\n<tr><td colspan=2><b>Karbohidrat total</b></td><td align=\"right\"><b>3 g</b></td><td align=\"right\">1 %</td><td></td></tr>\n<tr><td colspan=2><b>Gula</b></td><td align=\"right\"><b>1 g</b></td><td></td><td></td></tr>\n<tr class=has_bottom_border><td colspan=2><b>Garam (Natrium)</b></td><td align=\"right\"><b>0 mg</b></td><td align=\"right\">0 %</td><td></td></tr>\n<tr><td colspan=5><i>*Persen AKG berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih tinggi atau lebih rendah.</i></td></tr>\n</tbody>\n</table>\n",
+   "\n<style>\n  table.vertical_html_table { border-collapse: collapse; border: solid 1pt black; }\n  table.vertical_html_table tr.has_bottom_border { border-bottom: solid 1pt black; }\n</style>\n<table class=\"vertical_html_table\"><colgroup><col style=\"width:16pt;\"><col style=\"width:200pt;\"><col style=\"width:48pt;\"><col style=\"width:48pt;\"><col style=\"width:36pt;\"></colgroup>\n<tr><td colspan=5 align=\"middle\"><b>INFORMASI NILAI GIZI</b></td></tr>\n<tbody>\n<tr><td colspan=5></td></tr>\n<tr><td colspan=5 align=\"left\"><b>JUMLAH PER KEMASAN (20 g)</b></td></tr>\n<tr class=has_bottom_border><td colspan=5><b>Energi total 10 kkal</b></td></tr>\n<tr><td colspan=3></td><td colspan=2 align=\"middle\"><b>% AKG</b>*</td></tr>\n<tr><td colspan=2><b>Lemak total</b></td><td align=\"right\"><b>0 g</b></td><td align=\"right\">0 %</td><td></td></tr>\n<tr><td colspan=2><b>Lemak jenuh</b></td><td align=\"right\"><b>0 g</b></td><td align=\"right\">0 %</td><td></td></tr>\n<tr><td colspan=2><b>Protein</b></td><td align=\"right\"><b>0 g</b></td><td align=\"right\">0 %</td><td></td></tr>\n<tr><td colspan=2><b>Karbohidrat total</b></td><td align=\"right\"><b>3 g</b></td><td align=\"right\">1 %</td><td></td></tr>\n<tr><td colspan=2><b>Gula</b></td><td align=\"right\"><b>1 g</b></td><td></td><td></td></tr>\n<tr class=has_bottom_border><td colspan=2><b>Garam (Natrium)</b></td><td align=\"right\"><b>0 mg</b></td><td align=\"right\">0 %</td><td></td></tr>\n<tr><td colspan=5><i>*Persen AKG berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih tinggi atau lebih rendah.</i></td></tr>\n</tbody>\n</table>\n",
    { "cmdline.skip_format" => 1 },
  ]
 
@@ -777,7 +815,31 @@ Result:
  [
    200,
    "OK",
-   ".---------------------------------------------------------------------------------------------------------------------.\n|                                               *INFORMASI NILAI GIZI*                                                |\n|                                                                                                                     |\n| *JUMLAH PER KEMASAN (20 g)*                                                                                         |\n| *JUMLAH PER KEMASAN (20 g*)                                                                                         |\n| *Energi total 10 kkal*                                                                                              |\n+-----------------------|----------------------|-----------------------+----------------------|-----------------------+\n|                                                                      |                   *% AKG**                   |\n| *Lemak total*                                |                 *0 g* |                  0 % |                       |\n| *Lemak jenuh*                                |                 *0 g* |                  0 % |                       |\n| *Protein*                                    |                 *0 g* |                  0 % |                       |\n| *Karbohidrat total*                          |                 *3 g* |                  1 % |                       |\n| *Gula*                                       |                 *1 g* |                      |                       |\n| *Garam (Natrium)*                            |                *0 mg* |                  0 % |                       |\n+-----------------------|----------------------+-----------------------+----------------------+-----------------------+\n| /*Persen AKG berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih tinggi atau lebih rendah./ |\n`---------------------------------------------------------------------------------------------------------------------'\n",
+   ".---------------------------------------------------------------------------------------------------------------------.\n|                                               *INFORMASI NILAI GIZI*                                                |\n|                                                                                                                     |\n| *JUMLAH PER KEMASAN (20 g)*                                                                                         |\n| *Energi total 10 kkal*                                                                                              |\n+-----------------------|----------------------|-----------------------+----------------------|-----------------------+\n|                                                                      |                   *% AKG**                   |\n| *Lemak total*                                |                 *0 g* |                  0 % |                       |\n| *Lemak jenuh*                                |                 *0 g* |                  0 % |                       |\n| *Protein*                                    |                 *0 g* |                  0 % |                       |\n| *Karbohidrat total*                          |                 *3 g* |                  1 % |                       |\n| *Gula*                                       |                 *1 g* |                      |                       |\n| *Garam (Natrium)*                            |                *0 mg* |                  0 % |                       |\n+-----------------------|----------------------+-----------------------+----------------------+-----------------------+\n| /*Persen AKG berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih tinggi atau lebih rendah./ |\n`---------------------------------------------------------------------------------------------------------------------'\n",
+   { "cmdline.skip_format" => 1 },
+ ]
+
+=item * The same example, in calculation text format:
+
+ bpom_show_nutrition_facts(
+   carbohydrate => 13.113,
+   color => "never",
+   fat => 0.223,
+   output_format => "calculation_text",
+   package_size => 20,
+   protein => 0.99,
+   saturated_fat => 0.01,
+   serving_size => 175,
+   sodium => 0.223,
+   sugar => 7.173
+ );
+
+Result:
+
+ [
+   200,
+   "OK",
+   ".-------------------------------------------------------------------------------------------------------------------------------------------------------------------------.\n|                                                                   *PERHITUNGAN INFORMASI NILAI GIZI*                                                                    |\n|                                                                             *Energi total*                                                                              |\n|                                                  Energi total per 100 g | = lemak \xD7 9 + protein \xD7 4 + karbohidrat \xD7 4 = 0.223 \xD7 9 + 0.99 \xD7 4 + 13.113 \xD7 4 = 58.419 kkal |\n|                                           Energi total per kemasan 20 g | = 58.419 \xD7 20 / 100 = 11.6838 kkal                                                            |\n| (dibulatkan: <5 -> 0, <=50 -> 5 kkal terdekat, >50 -> 10 kkal terdekat) | = *10* kkal                                                                                   |\n|                                                                         |                                                                                               |\n|                                                                           *%AKG energi total*                                                                           |\n|                                                                    %AKG | = 11.6838 / 2150 \xD7 100 = 0.543432558139535                                                    |\n|                                              (dibulatkan ke % terdekat) | = *1*                                                                                         |\n|                                                                           *Energi dari lemak*                                                                           |\n|                                             Energi dari lemak per 100 g | = lemak \xD7 9 = 0.223 \xD7 9 = 2.007 kkal                                                          |\n|                                      Energi dari lemak per kemasan 20 g | = 2.007 \xD7 20 / 100 = 3.51225 kkal                                                             |\n| (dibulatkan: <5 -> 0, <=50 -> 5 kkal terdekat, >50 -> 10 kkal terdekat) | = *0* kkal                                                                                    |\n|                                                                        *Energi dari lemak jenuh*                                                                        |\n|                                             Energi dari lemak per 100 g | = lemak jenuh \xD7 9 = 0.01 \xD7 9 = 0.09 kkal                                                      |\n|                                Energi dari lemak jenuh per kemasan 20 g | = 0.09 \xD7 20 / 100 = 0.018 kkal                                                                |\n| (dibulatkan: <5 -> 0, <=50 -> 5 kkal terdekat, >50 -> 10 kkal terdekat) | = *0* kkal                                                                                    |\n|                                                                              *Lemak total*                                                                              |\n|                                                   Lemak total per 100 g | = 0.223 g                                                                                     |\n|                                            Lemak total per kemasan 20 g | = 0.223 \xD7 20 / 100 = 0.0446 g                                                                 |\n|     (dibulatkan: <0.5 -> 0, <=5 -> 0.5 g terdekat, >=5 -> 1 g terdekat) | = *0* g                                                                                       |\n|                                                                         |                                                                                               |\n|                                                                           *%AKG lemak total*                                                                            |\n|                                                                    %AKG | = 0.0446 / 67 \xD7 100 = 0.0665671641791045                                                      |\n|                                              (dibulatkan ke % terdekat) | = *0*                                                                                         |\n|                                                                              *Lemak jenuh*                                                                              |\n|                                                   Lemak jenuh per 100 g | = 0.01 g                                                                                      |\n|                                            Lemak jenuh per kemasan 20 g | = 0.01 \xD7 20 / 100 = 0.002 g                                                                   |\n|     (dibulatkan: <0.5 -> 0, <=5 -> 0.5 g terdekat, >=5 -> 1 g terdekat) | = *0* g                                                                                       |\n|                                                                         |                                                                                               |\n|                                                                           *%AKG lemak jenuh*                                                                            |\n|                                                                    %AKG | = 0.002 / 67 \xD7 100 = 0.01                                                                     |\n|                                              (dibulatkan ke % terdekat) | = *0*                                                                                         |\n|                                                                                *Protein*                                                                                |\n|                                                       Protein per 100 g | = 0.99 g                                                                                      |\n|                                          Protein total per kemasan 20 g | = 0.99 \xD7 20 / 100 = 0.198 g                                                                   |\n|                          (dibulatkan: <0.5 -> 0, >=0.5 -> 1 g terdekat) | = *0* g                                                                                       |\n|                                                                         |                                                                                               |\n|                                                                             *%AKG protein*                                                                              |\n|                                                                    %AKG | = 0.198 / 60 \xD7 100 = 0.33                                                                     |\n|                                              (dibulatkan ke % terdekat) | = *0*                                                                                         |\n|                                                                           *Karbohidrat total*                                                                           |\n|                                             Karbohidrat total per 100 g | = 13.113 g                                                                                    |\n|                                      Karbohidrat total per kemasan 20 g | = 13.113 \xD7 20 / 100 = 2.6226 g                                                                |\n|                          (dibulatkan: <0.5 -> 0, >=0.5 -> 1 g terdekat) | = *3* g                                                                                       |\n|                                                                         |                                                                                               |\n|                                                                        *%AKG karbohidrat total*                                                                         |\n|                                                                    %AKG | = 2.6226 / 325 \xD7 100 = 0.0665671641791045                                                     |\n|                                              (dibulatkan ke % terdekat) | = *1*                                                                                         |\n|                                                                                 *Gula*                                                                                  |\n|                                                          Gula per 100 g | = 7.173 g                                                                                     |\n|                                                   Gula per kemasan 20 g | = 7.173 \xD7 20 / 100 = 1.4346 g                                                                 |\n|                          (dibulatkan: <0.5 -> 0, >=0.5 -> 1 g terdekat) | = *1* g                                                                                       |\n|                                                                                *Natrium*                                                                                |\n|                                                       Natrium per 100 g | = 0.223 mg                                                                                    |\n|                                                Natrium per kemasan 20 g | = 0.223 \xD7 20 / 100 = 0.0446 mg                                                                |\n|   (dibulatkan: <5 -> 0, <=140 -> 5 mg terdekat, >140 -> 10 mg terdekat) | = *0* mg                                                                                      |\n|                                                                         |                                                                                               |\n|                                                                             *%AKG natrium*                                                                              |\n|                                                                    %AKG | = 0.0446 / 1500 \xD7 100 = 0.00297333333333333                                                   |\n|                                              (dibulatkan ke % terdekat) | = *0*                                                                                         |\n`-------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------'\n",
    { "cmdline.skip_format" => 1 },
  ]
 
@@ -811,7 +873,11 @@ Total fat, in gE<sol>100g.
 
 =item * B<output_format> => I<str> (default: "vertical_text_table")
 
-(No description)
+Pick an output format for the nutrition fact.
+
+C<vertical_text_table> is the default. The /(vertical)?.*table/ formats presents
+the information in a table, while the /linear/ formats presents the information
+in a paragraph.
 
 =item * B<package_size>* => I<ufloat>
 

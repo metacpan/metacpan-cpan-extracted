@@ -1,5 +1,9 @@
 Revision history for Babble
 
+0.090010
+          - RT#146065: Load B in test. Thanks to ANDK and HAARG for the report
+            and further information.
+          - Add support for more postfix dereference sigils ( `->&*`, `->**` ).
 0.090009
           - Performance improvement [general]: add regex caching for
             match_positions_of().

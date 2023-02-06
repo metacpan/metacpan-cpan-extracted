@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use lib qw(./lib t/lib);
 
-use Test::More 0.88;
+use Test::More 0.94;
 use Test::Exception;
 use Test::Warnings;
 
@@ -69,6 +69,10 @@ response_for 'html' => {
 response_for 'xhtml' => {
 	content_type => 'application/xhtml+xml',
 	content => '<html><title>foo</title></html>',
+};
+response_for 'untitled html' => {
+	content_type => 'text/html',
+	content => '<h1>foo</h1>',
 };
 response_for 'binary' => {
 	content_type => 'application/octet-stream',
@@ -164,7 +168,7 @@ subtest 'deprecated/internal jolt option' => sub {
 
 
 subtest 'acceptable' => sub {
-	plan tests => 7 + 5;
+	plan tests => 7 + 6;
 	my $s = Neo4j::Driver->new('http:')->plugin($mock_plugin)->session(database => 'dummy');
 	lives_and { isa_ok $s->run('json'), 'Neo4j::Driver::Result::JSON' } 'json';
 	lives_and { isa_ok $s->run('json params'), 'Neo4j::Driver::Result::JSON' } 'json params';
@@ -175,8 +179,9 @@ subtest 'acceptable' => sub {
 	lives_and { isa_ok $s->run('jolt v2'), 'Neo4j::Driver::Result::Jolt' } 'jolt';
 	dies_ok { $s->run('text') } 'text dies';
 	ok $@ !~ m/\bskipping result parsing\b/i, 'text parsed';
-	throws_ok { $s->run('html') } qr/\bskipping result parsing\b/i, 'html';
-	throws_ok { $s->run('xhtml') } qr/\bskipping result parsing\b/i, 'xhtml';
+	throws_ok { $s->run('html') } qr/\bReceived HTML content\b.*\bfoo\b/i, 'html';
+	throws_ok { $s->run('xhtml') } qr/\bReceived HTML content\b.*\bfoo\b/i, 'xhtml';
+	throws_ok { $s->run('untitled html') } qr/\bReceived HTML content\b/i, 'untitled html';
 	throws_ok { $s->run('binary') } qr/\bskipping result parsing\b/i, 'binary';
 };
 

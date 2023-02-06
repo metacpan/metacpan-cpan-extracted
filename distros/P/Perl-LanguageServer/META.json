@@ -44,7 +44,7 @@
             "Moose" : "0",
             "PadWalker" : "0",
             "Scalar::Util" : "0",
-            "perl" : "5.014"
+            "perl" : "5.016"
          }
       }
    },
@@ -56,6 +56,6 @@
          "web" : "https://github.com/richterger/Perl-LanguageServer"
       }
    },
-   "version" : "v2.4.0",
+   "version" : "v2.5.0",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

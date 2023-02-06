@@ -6,7 +6,7 @@ use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean -except => 'stat';
 use MooseX::Singleton;
 
-our $VERSION = '0.002002'; # VERSION
+our $VERSION = '0.002003'; # VERSION
 
 use PDL::Primitive qw(which);
 use POSIX qw(floor);
@@ -186,7 +186,7 @@ Chart::GGPlot::Stat::Bin - Statistic method that gets histogram of data
 
 =head1 VERSION
 
-version 0.002002
+version 0.002003
 
 =head1 SEE ALSO
 

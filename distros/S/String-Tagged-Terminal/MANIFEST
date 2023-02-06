@@ -1,6 +1,7 @@
 Build.PL
 Changes
 examples/ex.pl
+examples/random.pl
 lib/String/Tagged/Terminal.pm
 lib/String/Tagged/Terminal/Win32Console.pm
 MANIFEST			This list of files

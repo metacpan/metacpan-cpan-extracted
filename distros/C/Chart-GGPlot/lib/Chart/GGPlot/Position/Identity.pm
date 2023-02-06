@@ -5,7 +5,7 @@ package Chart::GGPlot::Position::Identity;
 use Chart::GGPlot::Class;
 use namespace::autoclean;
 
-our $VERSION = '0.002002'; # VERSION
+our $VERSION = '0.002003'; # VERSION
 
 with qw(Chart::GGPlot::Position);
 
@@ -29,7 +29,7 @@ Chart::GGPlot::Position::Identity - Position class that does not adjust position
 
 =head1 VERSION
 
-version 0.002002
+version 0.002003
 
 =head1 AUTHOR
 

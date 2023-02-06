@@ -1,8 +1,6 @@
 #
 # (c) Jan Gehring <jan.gehring@gmail.com>
 #
-# vim: set ts=3 sw=3 tw=0:
-# vim: set expandtab:
 
 package Rex::Constants;
 
@@ -10,7 +8,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.4'; # VERSION
+our $VERSION = '1.14.0'; # VERSION
 
 require Rex::Exporter;
 use base qw(Rex::Exporter);

@@ -1,8 +1,6 @@
 #
 # (c) Jan Gehring <jan.gehring@gmail.com>
 #
-# vim: set ts=2 sw=2 tw=0:
-# vim: set expandtab:
 
 =head1 NAME
 
@@ -64,7 +62,7 @@ use strict;
 use warnings;
 use Fcntl;
 
-our $VERSION = '1.13.4'; # VERSION
+our $VERSION = '1.14.0'; # VERSION
 
 require Rex::Exporter;
 use Data::Dumper;
@@ -97,7 +95,7 @@ use base qw(Rex::Exporter);
 
 use vars qw(%file_handles);
 
-=head2 template($file, @params)
+=head2 template($file [, %params])
 
 Parse a template and return the content.
 
@@ -290,7 +288,7 @@ sub _get_std_template_vars {
   return %template_vars;
 }
 
-=head2 file($file_name, %options)
+=head2 file($file_name [, %options])
 
 This function is the successor of I<install file>. Please use this function to upload files to your server.
 
@@ -840,7 +838,7 @@ On failure it will die.
 
  my $fh;
  eval {
-   $fh = read("/etc/groups");
+   $fh = file_read("/etc/groups");
  };
  
  # catch an error
@@ -972,7 +970,7 @@ OUT:
     ->report_resource_end( type => "delete_lines_matching", name => $file );
 }
 
-=head2 delete_lines_according_to($search, $file, @options)
+=head2 delete_lines_according_to($search, $file [, @options])
 
 This is the successor of the delete_lines_matching() function. This function also allows the usage of on_change and on_no_change hooks.
 
@@ -1016,7 +1014,7 @@ sub delete_lines_according_to {
 
 }
 
-=head2 append_if_no_such_line($file, $new_line, @regexp)
+=head2 append_if_no_such_line($file, $new_line [, @regexp])
 
 Append $new_line to $file if none in @regexp is found. If no regexp is
 supplied, the line is appended unless there is already an identical line
@@ -1047,7 +1045,7 @@ sub append_if_no_such_line {
   _append_or_update( 'append_if_no_such_line', @_ );
 }
 
-=head2 append_or_amend_line($file, $line, @regexp)
+=head2 append_or_amend_line($file, $line [, @regexp])
 
 Similar to L<append_if_no_such_line>, but if the line in the regexp is
 found, it will be updated. Otherwise, it will be appended.
@@ -1302,7 +1300,7 @@ sub extract {
 
 }
 
-=head2 sed($search, $replace, $file)
+=head2 sed($search, $replace, $file [, %options])
 
 Search some string in a file and replace it.
 

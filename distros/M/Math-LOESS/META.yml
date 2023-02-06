@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::F77: '1.22'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,16 +18,16 @@ name: Math-LOESS
 provides:
   Math::LOESS:
     file: lib/Math/LOESS.pm
-    version: '0.0001'
+    version: '0.001000'
   Math::LOESS::Model:
     file: lib/Math/LOESS/Model.pm
-    version: '0.0001'
+    version: '0.001000'
   Math::LOESS::Outputs:
     file: lib/Math/LOESS/Outputs.pm
-    version: '0.0001'
+    version: '0.001000'
   Math::LOESS::Prediction:
     file: lib/Math/LOESS/Prediction.pm
-    version: '0.0001'
+    version: '0.001000'
 requires:
   DynaLoader: '0'
   Exporter: '0'
@@ -45,7 +45,8 @@ requires:
   vars: '0'
   warnings: '0'
 resources:
-  repository: https://github.com/stphnlyd/perl5-Math-LOESS.git
-version: '0.0001'
+  repository: https://github.com/iynehz/perl5-Math-LOESS.git
+version: '0.001000'
 x_generated_by_perl: v5.26.3
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -40,7 +40,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Pod::Parser" : "0",
+            "Pod::Parser" : "1.65",
             "parent" : "0",
             "perl" : "5.014",
             "strict" : "0",
@@ -59,7 +59,7 @@
    "provides" : {
       "Pod::AsciiDoctor" : {
          "file" : "lib/Pod/AsciiDoctor.pm",
-         "version" : "0.101000"
+         "version" : "0.101001"
       }
    },
    "release_status" : "stable",
@@ -74,7 +74,7 @@
          "web" : "https://github.com/shlomif/Pod-AsciiDoctor"
       }
    },
-   "version" : "0.101000",
+   "version" : "0.101001",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"

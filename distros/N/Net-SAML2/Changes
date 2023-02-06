@@ -1,6 +1,98 @@
 Revision history for Perl extension Net::SAML2.
 
+0.64 -- Sun Feb 05 18:21:41 AST 2023
+
+  Release 0.63-TRIAL as production release
+
+  [ Significant Changes since 0.62 ]
+
+  Maintenance release that has a number of fixes for small issues.  This is
+  the first release in some time that has been tested for SOAP connections and
+  SOAP Artifacts.  The testapp has been updated to fix SOAP and the Shibboleth
+  and samltest.id IdPs.
+
+  - Minimum Perl version has been bumped to 5.12
+  - Contributors and authors set automatically
+  - Add Shibboleth and samltest.id as supported IdPs
+  - Allow encryption certificate in SP metadata
+  - LogoutRequest was missing NameQualifier and SPNameQualifier needed by some IdPs
+  - Fix bug in obtaining Assertion dates and message id and improve id validation
+  - Fix multiple SOAP issues including support for multiple certs in metadata
+  - New Net::SAML2::Protocol::Artifact to access parts of the ArtifactResponse
+  - Allow obtaining assertion substatus and allow assertions without NameID
+  - testapp:
+    - allow untrusted TLS SOAP connections
+    - read key and cert from config.yml
+    - fix metadata generation issues and make signing optional
+    - only enable logout bindings supported by IdP
+    - allow for custom attribute mapping by IdP
+    - Support for Shibboleth and samltest.id IdPs
+
+  [ Change Log ]
+  - 63edefa Increment Version number for release
+  - 17674de v0.63
+
+0.63 -- Fri Feb 03 19:18:42 AST 2023
+
+  [ Significant Changes since 0.62 ]
+
+  Maintenance release that has a number of fixes for small issues.  This is
+  the first release in some time that has been tested for SOAP connections and
+  SOAP Artifacts.  The testapp has been updated to fix SOAP and the Shibboleth
+  and samltest.id IdPs.
+
+  - Minimum Perl version has been bumped to 5.12
+  - Contributors and authors set automatically
+  - Add Shibboleth and samltest.id as supported IdPs
+  - Allow encryption certificate in SP metadata
+  - LogoutRequest was missing NameQualifier and SPNameQualifier needed by some IdPs
+  - Fix bug in obtaining Assertion dates and message id and improve id validation
+  - Fix multiple SOAP issues including support for multiple certs in metadata
+  - New Net::SAML2::Protocol::Artifact to access parts of the ArtifactResponse
+  - Allow obtaining assertion substatus and allow assertions without NameID
+  - testapp:
+    - allow untrusted TLS SOAP connections
+    - read key and cert from config.yml
+    - fix metadata generation issues and make signing optional
+    - only enable logout bindings supported by IdP
+    - allow for custom attribute mapping by IdP
+    - Support for Shibboleth and samltest.id IdPs
+
+  [ Change Log ]
+  - 8d0b962 use Moose is equivalent to use strict
+  - faf3ec7 Update for release 0.63
+  - 1688e1c Add XsdID as a type for id attribute type checking
+  - fc6a199 Get the substatus of a failed assertion
+  - 3c9e4fc Create a Artifact to hold the parts of the Artifact
+  - 36652dc Fixes perl-net-saml2#152 - Incorrect id set on messages from XML
+  - 33d9985 Allow assertion without a NameID
+  - 6a140ca Get the correct dates from the assertions
+  - 3d291ff testapp: allow attribute mapping by IdP
+  - 60a3592 testapp: only enable supported IdP logout bindings
+  - cfc5351 Add Shibboleth and samltest.id as supported IdPs
+  - c81e384 Fix LogoutRequest's missing NameQualifier and SPNameQualifier for samletest.id
+  - cf8991a remove eol spaces
+  - ade3fed testapp: signed metadat messes with testing - make it an option
+  - 571f7a9 testapp Fix issue in metadata generation missing fully qualified URI
+  - 01424dd testapp: key and cert should be read from config and missed https options
+  - 787bd1f Allow encryption key to be specified in the metadata.xml
+  - f6740e4 testapp: allow SOAP connections to untrusted SSL servers
+  - eb48fa8 SOAP Some IdPs have issues with newlines in SOAP-ENV
+  - 83e30e1 SOAP binding should support multiple certs in the IdP Metadata
+            Use Try::Tiny to handle exceptions
+  - ef2472d Install Sub::Name without running tests
+  - dffc8c8 Test::Deep requires perl 5.012 and newer
+  - e213bae New Year advance Copyright
+  - 9f8b287 Set sane default values for testing testapp
+  - bf27ae9 Bump version to .63
+  - b782aa7 Set authors and contributors
+  - 013a0c6 Update contributors and reorder alphabetically
+  - d268c0f Add missing Credit for Gianni in 0.62
+
 0.62 -- Wed Nov 30 21:13:55 AST 2022
+
+  Thanks to Gianni Ceccarelli for providing an "insecure" option
+  to allow a Net::SAML2::Binding::Redirect to be unsigned.
 
   - e59ce1b Increment Version in Git Repo
   - 165661e testapp allow the metadata or authnreq to be unsigned

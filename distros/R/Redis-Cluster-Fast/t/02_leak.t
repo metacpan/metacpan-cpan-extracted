@@ -25,19 +25,19 @@ no_leaks_ok {
     my $redis = Redis::Cluster::Fast->new(
         startup_nodes => get_startup_nodes,
     );
+    $redis->del('test-leak');
     my $pid = fork;
     if ($pid == 0) {
         # child
-        $redis->incr('test-fork');
+        $redis->incr('test-leak');
         exit 0;
-    }
-    else {
+    } else {
         # parent
-        $redis->incr('test-fork');
+        $redis->incr('test-leak');
         waitpid($pid, 0);
     }
 
-    $redis->get('test-fork');
+    $redis->get('test-leak');
 } "No Memory leak - fork";
 
 done_testing;

@@ -1,3 +1,33 @@
+1.207 2023-02-04
+================
+
+[Quiq::Confluence::Markup]
+* link(): Methode hinzugefügt
+* tableHeaderRow(): Methode hinzugefügt
+
+[Quiq::File::Image]
+* new(): UTF-8 Encoding des Pfads berücksichtigt
+
+[Quiq::Html::Widget::SelectMenu]
+* new(): Attribut optionPairs hinzugefügt
+
+[Quiq::Html::Pygments]
+* css(): Berücksichtigt, dass pygments UTF-8 liefert
+* html(): Berücksichtigt, dass pygments UTF-8 liefert
+
+[Quiq::Image]
+* findImages(): UTF-8 Encoding von Pfaden berücksichtigt
+* standardName(): außer Whitespace auch nicht-ASCII Zeichen in - wandeln
+
+[Quiq::TempDir]
+* new(): Option -parentDir hinzugefügt (Erzeugung in vorgegebenem Verzeichnis)
+
+[Quiq::TimeLapse::Directory]
+* new(): UTF-8 Encoding von Pfaden berücksichtigt
+
+[Quiq::Web::Navigation]
+* prevUrl(): Methode hinzugefügt
+
 1.206 2023-01-01
 ================
 

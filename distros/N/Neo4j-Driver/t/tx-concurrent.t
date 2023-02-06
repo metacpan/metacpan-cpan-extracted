@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use lib qw(./lib t/lib);
 
-use Test::More 0.88;
+use Test::More 0.94;
 use Test::Exception;
 use Test::Warnings qw(warning);
 
@@ -18,7 +18,7 @@ use Test::Warnings qw(warning);
 use Neo4j_Test;
 use Neo4j_Test::MockHTTP;
 
-plan tests => 12 + 1;
+plan tests => 14 + 1;
 
 
 my ($w, $d, $s, $t, $r);
@@ -133,7 +133,7 @@ subtest 'config for https: uri' => sub {
 
 
 subtest 'bolt explicit' => sub {
-	plan tests => 5;
+	plan tests => 8;
 	$d = Neo4j::Driver->new({ uri => 'bolt:' });
 	$d->{net_module} = 'Local::Bolt';
 	lives_ok { $s = 0; $s = $d->session(database => 'dummy'); } 'session';
@@ -141,13 +141,22 @@ subtest 'bolt explicit' => sub {
 	throws_ok {
 		$s->begin_transaction;
 	}  qr/\bConcurrent transactions\b.*\bunsupported\b.*\bBolt\b/i, 'concurrent explicit dies';
+	throws_ok {
+		$s->execute_read(sub {});
+	}  qr/\bConcurrent transactions\b.*\bunsupported\b.*\bBolt\b/i, 'concurrent managed in unmanaged dies';
 	lives_ok { $t->commit } 'commit 1';
 	lives_and { ok ! $t->is_open } 'closed 1';
+	throws_ok {
+		$s->execute_read(sub { $s->execute_read(sub {}) });
+	}  qr/\bConcurrent transactions\b.*\bunsupported\b.*\bBolt\b/i, 'concurrent unmanaged in managed dies';
+	throws_ok {
+		$s->execute_read(sub { $s->begin_transaction });
+	}  qr/\bConcurrent transactions\b.*\bunsupported\b.*\bBolt\b/i, 'concurrent managed in managed dies';
 };
 
 
 subtest 'bolt autocommit' => sub {
-	plan tests => 5;
+	plan tests => 6;
 	$d = Neo4j::Driver->new({ uri => 'bolt:' });
 	$d->{net_module} = 'Local::Bolt';
 	lives_ok { $s = 0; $s = $d->session(database => 'dummy'); } 'session';
@@ -157,6 +166,9 @@ subtest 'bolt autocommit' => sub {
 	}  qr/\bConcurrent transactions\b.*\bunsupported\b.*\bBolt\b/i, 'concurrent auto dies';
 	lives_ok { $t->commit } 'commit 1';
 	lives_and { ok ! $t->is_open } 'closed 1';
+	throws_ok {
+		$s->execute_read(sub { $s->run('') });
+	}  qr/\bConcurrent transactions\b.*\bunsupported\b.*\bBolt\b/i, 'concurrent managed dies';
 };
 
 
@@ -219,6 +231,42 @@ subtest 'http autocommit, concurrent disabled' => sub {
 		or diag 'got warning(s): ', explain $w;
 	isa_ok $r, Neo4j::Driver::Result::, 'run auto result';
 	lives_ok { $t->commit } 'commit expl';
+};
+
+
+subtest 'http managed, concurrent enabled' => sub {
+	plan tests => 3;
+	$d = Neo4j::Driver->new->plugin($mock_plugin);
+	$d->config( uri => 'http:', concurrent_tx => 1 );
+	$s = $d->session;
+	my ($r1, $r2);
+	lives_ok { $s->execute_write(sub {
+		shift->run('foo');
+		$r1 = $s->run('');
+		$r2 = $s->execute_write(sub { shift->run('bar') });
+	})} 'concurrent in execute lives';
+	isa_ok $r1, Neo4j::Driver::Result::, 'run auto result';
+	isa_ok $r2, Neo4j::Driver::Result::, 'execute result';
+};
+
+
+subtest 'http managed, concurrent disabled' => sub {
+	plan tests => 5;
+	$d = Neo4j::Driver->new->plugin($mock_plugin);
+	$d->config( uri => 'http:', concurrent_tx => 0 );
+	$s = $d->session;
+	my ($r1, $r2, $w1, $w2);
+	lives_ok { $s->execute_write(sub {
+		shift->run('foo');
+		$w1 = warning { $r1 = $s->run(''); };
+		$w2 = warning { $r2 = $s->execute_write(sub { shift->run('bar') }); };
+	})} 'concurrent in execute lives';
+	like $w1, qr/\bConcurrent transactions\b/i, 'auto in execute warns'
+		or diag 'got warning(s): ', explain $w1;
+	isa_ok $r1, Neo4j::Driver::Result::, 'run auto result';
+	like eval { $w2->[0] }, qr/\bConcurrent transactions\b/i, 'execute in execute warns'
+		or diag 'got warning(s): ', explain $w2;
+	isa_ok $r2, Neo4j::Driver::Result::, 'execute result';
 };
 
 

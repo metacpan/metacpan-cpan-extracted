@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/plainbanana/Redis-Cluster-Fast/workflows/Test/badge.svg)](https://github.com/plainbanana/Redis-Cluster-Fast/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Redis-Cluster-Fast.svg)](https://metacpan.org/release/Redis-Cluster-Fast)
+[![Actions Status](https://github.com/plainbanana/Redis-Cluster-Fast/workflows/test/badge.svg)](https://github.com/plainbanana/Redis-Cluster-Fast/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Redis-Cluster-Fast.svg)](https://metacpan.org/release/Redis-Cluster-Fast)
 # NAME
 
 Redis::Cluster::Fast - A fast perl binding for Redis Cluster

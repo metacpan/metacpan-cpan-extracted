@@ -1,5 +1,9 @@
 Revision history for Perl extension Kx.
 
+0.044 - 2023-02-04
+  - Changed my github username.
+  - Updated INSTALL instructions for how to obtain kdb c.o file.
+
 0.042 - 2016-11-06
   - Some refactoring. No feature changes
 

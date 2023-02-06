@@ -17,10 +17,11 @@ build_requires:
   Test::Differences: '0'
   Test::More: '0'
   Test::Most: '0'
+  strict: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 keywords:
   - PSGI
   - Plack
@@ -36,7 +37,7 @@ name: Plack-Middleware-Greylist
 provides:
   Plack::Middleware::Greylist:
     file: lib/Plack/Middleware/Greylist.pm
-    version: v0.3.5
+    version: v0.4.1
 recommends:
   Cache::FastMmap: '0'
   Ref::Util::XS: '0'
@@ -49,13 +50,12 @@ requires:
   Ref::Util: '0'
   Time::Seconds: '0'
   parent: '0'
-  perl: v5.10.0
-  strict: '0'
+  perl: v5.12.0
   warnings: '0'
 resources:
   bugtracker: https://github.com/robrwo/Plack-Middleware-Greylist/issues
   repository: git://github.com/robrwo/Plack-Middleware-Greylist.git
-version: v0.3.5
+version: v0.4.1
 x_authority: cpan:RRWO
 x_contributors:
   - 'Gabor Szabo <gabor@szabgab.com>'

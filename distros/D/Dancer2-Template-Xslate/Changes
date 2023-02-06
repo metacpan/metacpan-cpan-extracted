@@ -1,8 +1,9 @@
 Revision history for Dancer2-Template-Xslate
 
-v0.1.2    2021-01-23 19:05:38+01:00 Europe/Malta
+v0.2.0    2023-02-04 14:53:09-05:00 America/Toronto
+    - Add warning about Dancer2 layouts and cascading templates (GH#1, Pedro Melo)
 
-v0.1.2  Sat 23 Jan 19:02:08 CET 2021
+v0.1.2    2021-01-23 19:02:08+01:00 Europe/Malta
     - Fix path to layout in t/01-file.t (Gary Greene)
     - Remove broken example config (Pedro Melo)
     - Use Dist:Zilla::Plugin::TravisCI

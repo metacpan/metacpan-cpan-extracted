@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate transformed chord progressions
 
-our $VERSION = '0.0107';
+our $VERSION = '0.0205';
 
 use Moo;
 use strictures 2;
@@ -13,7 +13,6 @@ use Data::Dumper::Compact qw(ddc);
 use Music::NeoRiemannianTonnetz ();
 use Music::Chord::Note ();
 use Music::Chord::Namer qw(chordname);
-use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(Music-MelodicDevice-Transposition); # local author lib
 use Music::MelodicDevice::Transposition ();
 use namespace::clean;
 
@@ -41,7 +40,8 @@ has chord_quality => (
 
 
 has base_chord => (
-    is => 'lazy',
+    is       => 'lazy',
+    init_arg => undef,
 );
 
 sub _build_base_chord {
@@ -122,6 +122,7 @@ sub generate {
 
     $self->_initial_conditions(@transforms) if $self->verbose;
 
+    my @chords;
     my @generated;
     my $i = 0;
 
@@ -135,16 +136,23 @@ sub generate {
 
         push @generated, $self->format eq 'ISO' ? \@notes : $transformed;
 
+        my $chord = chordname(@base);
+        $chord =~ s/\s+//;
+        $chord =~ s/-6/6/;
+        $chord =~ s/o/dim/;
+        $chord = $1 . $2 if $chord =~ /^(.+)\/(\d+)$/;
+        push @chords, $chord;
+
         printf "%d. %s: %s   %s   %s\n",
             $i, $token,
             ddc($transformed), ddc(\@notes),
-            scalar chordname(@base)
+            $chord
             if $self->verbose;
 
         $notes = $transformed;
     }
 
-    return \@generated;
+    return \@generated, \@transforms, \@chords;
 }
 
 
@@ -157,6 +165,7 @@ sub circular {
 
     $self->_initial_conditions(@transforms) if $self->verbose;
 
+    my @chords;
     my @generated;
     my $posn = 0;
 
@@ -170,10 +179,13 @@ sub circular {
 
         push @generated, $self->format eq 'ISO' ? \@notes : $transformed;
 
+        my $chord = chordname(@base);
+        push @chords, $chord;
+
         printf "%d. %s (%d): %s   %s   %s\n",
             $i, $token, $posn % @transforms,
             ddc($transformed), ddc(\@notes),
-            scalar chordname(@base)
+            $chord
             if $self->verbose;
 
         $notes = $transformed;
@@ -181,7 +193,7 @@ sub circular {
         $posn = int rand 2 ? $posn + 1 : $posn - 1;
     }
 
-    return \@generated;
+    return \@generated, \@transforms, \@chords;
 }
 
 sub _get_pitches {
@@ -206,31 +218,37 @@ sub _build_transform {
         @t = @{ $self->transforms };
     }
     elsif ($self->transforms =~ /^\d+$/) {
-        my @transforms;
+        my @transforms = qw(O I);
 
         if (grep { $_ eq 'T' } @{ $self->allowed }) {
             push @transforms, (map { 'T' . $_ } 1 .. $self->semitones);  # positive
             push @transforms, (map { 'T-' . $_ } 1 .. $self->semitones); # negative
         }
         if (grep { $_ eq 'N' } @{ $self->allowed }) {
-            my @alphabet = qw(P R L);
-            push @transforms, @alphabet;
-
-            my $iter = variations(\@alphabet, 2);
-            while (my $v = $iter->next) {
-                push @transforms, join('', @$v);
+            if ($self->chord_quality eq 7) {
+                push @transforms, qw(
+                  S23 S32 S34 S43 S56 S65
+                  C32     C34         C65
+                );
             }
+            else {
+                my @alphabet = qw(P R L);
+                push @transforms, @alphabet;
 
-            $iter = variations(\@alphabet, 3);
-            while (my $v = $iter->next) {
-                push @transforms, join('', @$v);
+                my $iter = variations(\@alphabet, 2);
+                while (my $v = $iter->next) {
+                    push @transforms, join('', @$v);
+                }
+
+                $iter = variations(\@alphabet, 3);
+                while (my $v = $iter->next) {
+                    push @transforms, join('', @$v);
+                }
             }
         }
 
-        @t = ('O',
-            map { $transforms[ int rand @transforms ] }
-                1 .. $self->transforms - 1
-        );
+        @t = map { $transforms[ int rand @transforms ] }
+            1 .. $self->transforms;
     }
 
     return @t;
@@ -252,7 +270,8 @@ sub _build_chord {
         $chord = $self->_mdt->transpose($semitones, $notes);
     }
     else {
-        my $task = $self->_nrt->taskify_tokens($token) if length $token > 1;
+        my $task = $self->_nrt->taskify_tokens($token)
+            if length $token > 1 && $token !~ /\d/;
         my $op = defined $task ? $task : $token;
 
         $chord = $self->_nrt->transform($op, $notes);
@@ -275,21 +294,22 @@ Music::Chord::Progression::Transform - Generate transformed chord progressions
 
 =head1 VERSION
 
-version 0.0107
+version 0.0205
 
 =head1 SYNOPSIS
 
-  use MIDI::Util qw(setup_score midi_format);
   use Music::Chord::Progression::Transform ();
 
   my $prog = Music::Chord::Progression::Transform->new;
 
-  my $chords = $prog->generate;
-  $chords = $prog->circular;
+  my ($generated, $transforms, $chords) = $prog->generate;
 
-  # render a midi file
+  ($generated, $transforms, $chords) = $prog->circular;
+
+  # midi
+  use MIDI::Util qw(setup_score midi_format);
   my $score = setup_score();
-  $score->n('wn', midi_format(@$_)) for @$chords;
+  $score->n('wn', @$_) for midi_format(@$generated);
   $score->write_score('transform.mid');
 
 =head1 DESCRIPTION
@@ -336,6 +356,8 @@ Default: C<''> (major)
 
 The initial chord given by the B<base_note>, B<base_octave>, and the
 B<chord_quality>.
+
+This is a computed, not a constructor attribute.
 
 =head2 format
 
@@ -386,9 +408,9 @@ where C<#> is a positive or negative number between +/- B<semitones>.
 For Neo-Riemann transformations, please see the
 L<Music::NeoRiemannianTonnetz> module for the allowed operations.
 
-Additionally the "non-transformation" operations are included: C<O>
-returns to the initial chord, and C<I> is the identity that leaves the
-current chord untouched.
+Additionally the following "non-transformation" operations are
+included: C<O> returns to the initial chord, and C<I> is the identity
+that leaves the current chord untouched.
 
 This can also be given as an integer, which defines the number of
 random transformations to perform.
@@ -423,22 +445,19 @@ Create a new C<Music::Chord::Progression::Transform> object.
 
 =head2 generate
 
-  $chords = $prog->generate;
+  ($generated, $transforms, $chords) = $prog->generate;
 
 Generate a I<linear> series of transformed chords.
 
 =head2 circular
 
-  $chords = $prog->circular;
+  ($generated, $transforms, $chords) = $prog->circular;
 
-Generate a series of transformed chords based on a I<circular> list of
-transformations.
+Generate a I<circular> series of transformed chords.
 
 This method defines movement over a circular list ("necklace") of
-chord transformations, including C<O>, which means "return to the
-original chord", and C<I> which means to "make no transformation."
-Starting at position zero, move forward or backward along the
-necklace, transforming the current chord.
+chord transformations.  Starting at position zero, move forward or
+backward along the necklace, transforming the current chord.
 
 =head1 SEE ALSO
 

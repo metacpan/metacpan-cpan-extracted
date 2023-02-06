@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::Jolt;
 # ABSTRACT: Jolt result handler
-$Neo4j::Driver::Result::Jolt::VERSION = '0.35';
+$Neo4j::Driver::Result::Jolt::VERSION = '0.36';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -15,6 +15,7 @@ use parent 'Neo4j::Driver::Result';
 use Carp qw(carp croak);
 our @CARP_NOT = qw(Neo4j::Driver::Net::HTTP Neo4j::Driver::Result);
 
+use Neo4j::Error;
 
 my ($TRUE, $FALSE);
 
@@ -57,12 +58,7 @@ sub new {
 sub _gather_results {
 	my ($self, $params) = @_;
 	
-	my @errors = ();
-	if (! $params->{http_header}->{success}) {
-		my $reason_phrase = $params->{http_agent}->http_reason;
-		push @errors, "HTTP error: $params->{http_header}->{status} $reason_phrase on $params->{http_method} to $params->{http_path}";
-	}
-	
+	my $error = 'Neo4j::Error';
 	my @results = ();
 	my $columns = undef;
 	my @data = ();
@@ -103,11 +99,14 @@ sub _gather_results {
 			$self->{notifications} = $event->{notifications};
 		}
 		elsif ($type eq 'error') {  # FailureEvent
-			carp "Jolt error: unexpected error event $prev" unless $state == 0 || $state == 3;
+			# If a rollback caused by a failure fails as well,
+			# two failure events may appear on the Jolt stream.
+			# Otherwise, there is always one at most.
+			carp "Jolt error: unexpected error event $prev" unless $state == 0 || $state == 3 || $state == 4;
 			croak "Jolt error: expected reference to HASH, received " . (ref $event ? "reference to " . ref $event : "scalar") . " in $type event $prev" unless ref $event eq 'HASH';
 			$state = 4;
-			push @errors, "Jolt error: Jolt $type event with 0 errors $prev" unless @{$event->{errors}};
-			push @errors, map {"$_->{code}: $_->{message}"} @{$event->{errors}};
+			$error = $error->append_new(Internal => "Jolt error: Jolt $type event with 0 errors $prev") unless @{$event->{errors}};
+			$error = $error->append_new(Server => $_) for @{$event->{errors}};
 		}
 		else {
 			croak "Jolt error: unsupported $type event $prev";
@@ -115,7 +114,15 @@ sub _gather_results {
 		$prev = "after $type event";
 	}
 	croak "Jolt error: unexpected end of event stream $prev" unless $state >= 10;
-	croak join "\n", @errors if @errors;
+	
+	if (! $params->{http_header}->{success}) {
+		$error = $error->append_new(Network => {
+			code => $params->{http_header}->{status},
+			as_string => sprintf("HTTP error: %s %s on %s to %s", $params->{http_header}->{status}, $params->{http_agent}->http_reason, $params->{http_method}, $params->{http_path}),
+		});
+	}
+	
+	$params->{error_handler}->($error) if ref $error;
 	$self->{http_agent} = undef;
 	
 	if (@results == 1) {

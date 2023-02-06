@@ -1,0 +1,625 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Resolver - resolve keys to data
+
+
+=head1 VERSION
+
+This document describes Data::Resolver version 0.001001.
+
+=begin html
+
+<a href="https://travis-ci.org/polettix/Data-Resolver">
+<img alt="Build Status" src="https://travis-ci.org/polettix/Data-Resolver.svg?branch=master">
+</a>
+<a href="https://www.perl.org/">
+<img alt="Perl Version" src="https://img.shields.io/badge/perl-5.24+-brightgreen.svg">
+</a>
+<a href="https://badge.fury.io/pl/Data-Resolver">
+<img alt="Current CPAN version" src="https://badge.fury.io/pl/Data-Resolver.svg">
+</a>
+<a href="http://cpants.cpanauthors.org/dist/Data-Resolver">
+<img alt="Kwalitee" src="http://cpants.cpanauthors.org/dist/Data-Resolver.png">
+</a>
+<a href="http://www.cpantesters.org/distro/O/Data-Resolver.html?distmat=1">
+<img alt="CPAN Testers" src="https://img.shields.io/badge/cpan-testers-blue.svg">
+</a>
+<a href="http://matrix.cpantesters.org/?dist=Data-Resolver">
+<img alt="CPAN Testers Matrix" src="https://img.shields.io/badge/matrix-@testers-blue.svg">
+</a>
+
+=end html
+
+=head1 SYNOPSIS
+
+   # generate is a single entry point useful to instantiate from
+   # metadata/configurations
+   use Data::Resolver 'generate';
+
+   my $spec = { -factory => 'resolver_from_tar',
+                path => '/to/archive.tar' };
+   my $dr_tar = generate($spec);
+
+   my $dr_dir = generate({ -factory => 'resolver_from_dir',
+                           path => '.' });
+
+   # functions can be imported and used directly though
+   use Data::Resolver qw< resolver_from_tar resolver_from_dir >;
+   my $dr_tar = resolver_from_tar(path => 'to/somewhere.tar');
+
+   # getting stuff is easy, this is how to get the default
+   # representation
+   my ($thing, $meta) = $dr_something->($key);
+   my $type = $meta->{type};
+   if    ($type eq 'file')       { say 'got a file'       }
+   elsif ($type eq 'filehandle') { say 'got a filehandle' }
+   elsif ($type eq 'data')     ) { say 'got data'         }
+   elsif ($type eq 'error') { ... }
+
+   # you can specify the type and just get the value
+   my $data = $dr_something->($key, 'data');
+   my $path = $dr_something->($key, 'file');
+   my $fh   = $dr_something->($key, 'filehandle');
+
+   # it's possible to get a list of available keys
+   my $list_aref = $dr_something->(undef, 'list');
+
+
+
+
+=head1 DESCRIPTION
+
+While coding, two problems often arise:
+
+=over
+
+=item *
+
+Using several modules, there can be a variety of ways on how they get
+access to data. Many times they support reading from a file, but often
+times they expect to receive data (e.g. L<JSON::PP>). Other times
+modules an be OK with both, and even accept I<filehandles>.
+
+=item *
+
+Deciding on where to store data and what to use as a source can be
+limiting, especially when multiple I<things> might be needed. What is
+best at that point? A directory? An archive? A few URLs?
+
+=back
+
+This module aims at providing a way forward to cope for both problems,
+by providing a unified interface that can get three types of I<data
+types> (i.e. C<data>, C<file>, or C<filehandle>) while at the same time
+providing a very basic interface that can be backed by several different
+fetching approaches, like reading from a directory, taking items from an
+archive, or download stuff on the fly from a URL.
+
+=head2 The Resolver Interface
+
+A valid I<resolver> is a I<function> that supports I<at least> the
+following interface:
+
+=over
+
+=item *
+
+The resolver has the following signature:
+
+   my $resolver = sub ($key, [$type]) { ... }
+
+where C<$key> is a I<mandatory> parameter providing the key that we want
+to resolve to a data representation, and C<$type> is an I<optional>
+parameter that specifies what representation is needed.
+
+=item *
+
+When called in I<list context>, two items are provided back, i.e. the
+I<value> and the I<metadata>:
+
+   my ($value, $meta) = $resolver->(@args);
+
+The C<$meta> is a hash reference that contains I<at least> one key
+C<type>, indicating the type of the C<$value>. Allowed types are I<at
+least> the following:
+
+=over
+
+=item C<data>
+
+The C<$value> is directly data. It might be provided either as a plain
+scalar, or as a reference to a plain scalar (C<ref()> will help
+disambiguate the two cases).
+
+=item C<error>
+
+The C<$value> should be ignored because an error occurred during
+retrieval. When the resolver is set for I<throwing> an exception, this
+is never returned.
+
+=item C<file>
+
+The C<$value> represents a file path in the filesystem.
+
+=item C<filehandle>
+
+The C<$value> is a filehandle, suitable for reading. Characteristics of
+thi filehandle may vary, although it I<SHOULD> support seeking.
+
+=back
+
+=item *
+
+When called in I<scalar context>, only the C<$value> is provided back:
+
+   my $value = $resolver->(@args);
+
+In this case it is usually better to also provide a I<type> as the
+second argument, unless the default return type for the resolver is
+already known in advance.
+
+=item *
+
+The following invocation provides back a list of all supported keys:
+
+   my $list = $resolver->(undef, 'list');
+
+=back
+
+Examples:
+
+   # get list of supported keys, as an array ref
+   my $list = $resolver->(undef, 'list');
+
+   # get value associated to key 'foo', as raw data
+   my $data = $resolver->(foo => 'data');
+
+   # get value and metadata, decide later how to use them
+   my ($value, $meta) = $resolver->('foo');
+   if ($meta->{type} eq 'file') { ... }
+
+=head2 Stock Factories
+
+The module comes with a few I<stock factory> functions to generate
+resolvers in a few cases:
+
+=over
+
+=item *
+
+A directory in the filesystem, via L</resolver_from_dir>.
+
+=item *
+
+A TAR archive, via L</resolver_from_tar>.
+
+=item *
+
+A list of resolvers, via L</resolver_from_alternatives>. This allows
+e.g. looking for a resolution of the key from multiple sources (possibly
+of different kinds).
+
+=back
+
+
+=head1 INTERFACE
+
+The interface provided by this module can be broadly divided into three
+areas:
+
+=over
+
+=item *
+
+I<factories> to generate resolvers;
+
+=item *
+
+I<transformers> to ease turning a data representation into another (e.g.
+turning data into a file or a filehandle)
+
+=item *
+
+I<utilities> for coding new resolvers/resolver factories.
+
+=back
+
+=head2 Factories
+
+These functions generate resolvers.
+
+=head3 B<< generate >>
+
+   my $resolver = generate($specification_hash);
+
+Generate a new resolver based on a hash containing a I<specification>.
+The following meta-keys are supported:
+
+=over
+
+=item C<< -factory >>
+
+The name of the factory function (e.g. L</resolver_from_tar>).
+
+=item C<< -package >>
+
+The package where the factory function above is located. By default this
+is C<Data::Resolver>.
+
+=item C<< --recursed-args >>
+
+A sub-hash where values are array references, holding sub-specifications
+that are generated recursively via C<generate> itself. The key and the
+resulting array are then inserted as new keys/value pairs in the hash.
+
+=back
+
+All the rest of the hash is passed to the factory function as key/value
+pairs.
+
+Example:
+
+   my $spec = { -factory => 'resolver_from_tar',
+                path => '/to/archive.tar' };
+   my $dr_tar = generate($spec);
+
+   my $spec = {
+      -factory => 'resolver_from_alternatives',
+      -recursed => {
+         alternatives => [
+            { -factory => resolver_from_tar => archive => $tar },
+            { -factory => resolver_from_dir => root    => $dir },
+         ],
+      }
+   };
+   my $dr_multi = generate($spec);
+
+
+=head3 B<< resolver_from_alternatives >>
+
+   my $dr = resolver_from_alternatives(%args);
+
+Generate a resolver that I<wraps> other resolvers and tries them in
+sequence, until the first supporing the input key.
+
+It cares about two keys in C<%args>:
+
+=over
+
+=item C<alternatives>
+
+Accepts a reference to an array of sub-resolvers (i.e. C<CODE>
+references) or sub-resolver specifications (which will be instantiated
+via L</generate>).
+
+=item C<throw>
+
+If set to a I<true> value, raise an exception in case of errors.
+
+=back
+
+The C<list> type is supported for the C<undef> key only. It replicates
+the call over all alternatives, aggregating the result in the order they
+appear while filtering out duplicates (it does not try to normalize keys
+in any way, so this might give practical duplicates out).
+
+The search for a key is performed in the same order as the sub-resolvers
+appear in C<alternatives>; when a result is found, it is returned.
+Exceptions from sub-resolvers are trapped.
+
+If C<throw> is set, errors will raise exceptions thrown as hashes, via
+L</resolved_error>/L</resolved>. This happens in two cases:
+
+=over
+
+=item *
+
+the call for type C<list> does not provide an C<undef> key. In this
+case, the error code is set to C<400>.
+
+=item *
+
+the call for any other type does not provide a result back. In this
+case, the error code is set to C<404>.
+
+=back
+
+
+=head3 B<< resolver_from_dir >>
+
+   my $dr = resolver_from_dir(%args);
+
+Generate a resolver that serves files from a directory in the local
+filesystem. It supports the following keys in C<%args>:
+
+=over
+
+=item C<path>
+
+=item C<root>
+
+The path to the directory containing the files. C<root> takes precedence
+over C<path>.
+
+=item C<throw>
+
+If set to a I<true> value, raise an exception in case of errors.
+
+=back
+
+Errors are handled via L</resolved_error>/L</resolved>, including
+raising exceptions.
+
+The call to type C<list> with an C<undef> key will generate a lit of all
+files in the subtree starting from C<path>/C<root>. As an extension,
+it's also possible to pass the name of a sub-directory and get only that
+subtree back; this is prone to errors if the sub-directory does not
+exist (error code C<404>) or is a file instead of a directory (error
+code C<400>).
+
+The call for other types will resolve the key and provide back the
+requested type, defaulting to type C<file> for effort minimization. The
+code tries to restrict looking for the file only inside the sub-tree
+I<but> you should check by yourself if this is really critical (patches
+welcome!).
+
+If the key cannot be found, error code C<404> is set; if the key refers
+to a directory, error code C<400> is set; if the C<type> cannot be
+handled via L</transform>, error code C<400> is set.
+
+
+=head3 B<< resolver_from_tar >>
+
+   my $dr = resolver_from_tar(%args);
+
+Generate a resolver that serves file from a TAR file in the local
+filesystem. It supports the following keys in C<%args>:
+
+=over
+
+=item C<archive>
+
+=item C<path>
+
+The path to the TAR file. C<archive> takes precedence over C<path>.
+
+=item C<throw>
+
+If set to a I<true> value, raise an exception in case of errors.
+
+=back
+
+Errors are handled via L</resolved_error>/L</resolved>, including
+raising exceptions.
+
+The call for type C<list> only supports key C<undef> and will lead to
+error code C<400> otherwise.
+
+The call for any other type will look for the key and return the
+requested type, defaulting to type C<data>. Two keys are actually
+searched, to cater for the equivalence of C<path/to/file> and
+C<./path/to/file>; this means that it's possible to ask for C<somefile>
+and get back the contents of C<./somefile>, or vice-versa.
+
+If a file for a key cannot be found, error code C<404> is returned. This
+also applies if the key is present, but represents a directory item.
+
+Type transformation is performed via L</transform>; unsupported types
+will lead to error code C<400> I<after> the search and extraction of
+data from the archive (i.e. there is no attempt to pre-validate the
+type and this is by design).
+
+=head3 B<< resolver_from_passthrough >>
+
+   my $dr = resolver_from_passthrough(%args);
+
+Generate a minimal, I<fake>-like resolver that always returns what is
+provided. Arguments C<%args> are added to the return value via
+L</resolved>, so key C<throw> might lead to exceptions.
+
+In the generated resolver, the type defaults to C<undef>. No attempt at
+validation is done, by design.
+
+=head2 Transformers
+
+=head3 B<< data_to_fh >>
+
+   my $data = 'Some thing';
+   my $fh1 = data_to_fh($data);  # first way
+   my $fh2 = data_to_fh(\$data); # second way
+
+Gets a scalar or a scalar reference and provides a filehandle back,
+suitable for reading/seeking.
+
+=head3 B<< data_to_file >>
+
+   my $data = 'Some thing';
+   my $path1 = data_to_file($data);  # plain scalar in
+   my $path2 = data_to_file(\$data); # scalar reference in
+   my $persistent_path = data_to_file($data, 1);
+
+Gets a scalar or a scalar reference and saves it to a temporary file in
+the filesystem. A second parameter, when true, makes it possible to
+persist the file after the process exists (the file would be removed
+otherwise).
+
+=head3 B<< fh_to_data >>
+
+   open my $fh, '<:raw', $some_path or die '...';
+   my $data = fh_to_data($fh);
+
+Slurps data from a filehandle. The filehandle is not changed otherwise,
+so it's up to the caller to set the right Perl IO layers if needed.
+
+=head3 B<< fh_to_file >>
+
+   open my $fh, '<:raw', $some_path or die '...';
+   my $path = fh_to_file($fh);
+   my $persistent_path = fh_to_file($fh, 1);
+
+Slurps data from a filehandle and saves it into a temporary file (or
+persistent, if the second parameter is present and true).
+
+=head3 B<< file_to_data >>
+
+   my $data = file_to_data($path);
+
+Slurps data from a file in the filesystem. Data are read in raw mode.
+
+=head3 B<< file_to_fh >>
+
+   my $fh = file_to_fh($path);
+
+Opens a file in the filesystem in read raw mode.
+
+=head3 B<< transform >>
+
+   my $ref_to_that = transform($this, $this_type, $that_type);
+
+Treat input C<$this> as having C<$this_type> and return it as a
+reference to a C<$that_type>.
+
+Input and output types can be:
+
+=over
+
+=item C<fh>
+
+=item C<filehandle>
+
+the input is a file handle
+
+=item C<data>
+
+the input is raw data
+
+=item C<file>
+
+=item C<path>
+
+the input is a path in the filesystem.
+
+=back
+
+B<NOTE> the return value is a reference to the target data form, to
+avoid transferring too much data around.
+
+
+=head2 Utilities For New Resolvers
+
+This module comes with two non-trivial resolvers, one for wrapping a
+directory and another one for tar archives. There can be other possible
+resolvers, e.g. using different archive formats (like ZIP), leveraging
+any file format that supports carrying metadata (like PDF, or many image
+formats), or wrapping remote resources (plain HTTP or some fancy API).
+
+These functions help complying with the I<output> API of a resolver,
+i.e.:
+
+=over
+
+=item *
+
+throw an exception when errors occur and the resolver was created with
+C<throw> parameter set;
+
+=item *
+
+return just the content in scalar context;
+
+=item *
+
+return the content and additional metadata in list context.
+
+=back
+
+A typical way of using these function is like this:
+
+   sub resolver_for_whatever (%args) {
+      my $OK = resolved_factory($args{throw});
+      my $KO = resolved_error_factory($args{throw});
+      return sub ($key, $type = 'xxx') {
+         return $KO->(400 => 'Wrong inputs!') if $some_error;
+         return $OK->($data, type => 'data');
+      };
+   }
+
+
+=head3 B<< resolved >>
+
+   return resolved($throw, $value, $meta_as_href);
+   return resolved($throw, $value, %meta);
+
+Throw an exception if C<$throw> is I<true> and metadata have C<type> set
+to C<error>.
+
+Otherwise, return C<$value> if called in scalar context.
+
+Otherwise, return a list with C<$value> and a hash reference with the
+metadata.
+
+=head3 B<< resolved_error >>
+
+   return resolved_error($throw, $code, $message, $meta);
+   return resolved_error($throw, $code, $message, %meta);
+
+If an error has to be returned, this is a shorthand to integrate the
+optional metadata with a code and a message. If C<$throw> is set, an
+exception is thrown.
+
+=head3 B<< resolved_error_factory >>
+
+   my $error_return = resolved_error_factory($throw);
+
+Wrap L</resolved_error> with the specific value for C<$throw>. This can
+be useful because whether a resolver should throw exceptions or not is
+usually set at resolver creation time, so it makes sense to wrap this
+characteristic.
+
+=head3 B<< resolved_factory >>
+
+   my $return = resolved_factory($throw);
+
+Wrap L</resolved> with the specific value for C<$throw>. This can be
+useful because whether a resolver should throw exceptions or not is
+usually set at resolver creation time, so it makes sense to wrap this
+characteristic.
+
+
+=head1 BUGS AND LIMITATIONS
+
+Minimum perl version 5.24 because reasons (it's been around since 2016
+and signatures just make sense).
+
+Report bugs through Codeberg (patches welcome) at
+L<https://codeberg.org/polettix/Data-Resolver/issues>.
+
+=head1 AUTHOR
+
+Flavio Poletti <flavio@polettix.it>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2023 by Flavio Poletti <flavio@polettix.it>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+=cut

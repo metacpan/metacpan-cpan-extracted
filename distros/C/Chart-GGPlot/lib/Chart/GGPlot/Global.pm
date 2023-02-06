@@ -6,7 +6,7 @@ use Chart::GGPlot::Class;
 use namespace::autoclean;
 use MooseX::Singleton;
 
-our $VERSION = '0.002002'; # VERSION
+our $VERSION = '0.002003'; # VERSION
 
 use Module::Load;
 use Types::Standard qw(ConsumerOf InstanceOf);
@@ -51,7 +51,7 @@ Chart::GGPlot::Global - Various global variables and settings
 
 =head1 VERSION
 
-version 0.002002
+version 0.002003
 
 =head1 SYNOPSIS
 

@@ -1,11 +1,22 @@
+0.05      2023-02-05 18:42:57-05:00 America/New_York
+
+    [ BUG FIXES ]
+    * None
+
+    [ ENHANCEMENTS ]
+    * None
+
+    [ DOCUMENTATION ]
+    * Pod and grammar fixes (Jason A. Crome)
+
 0.04      2018-10-24 14:28:06-04:00 America/New_York
 
     [ BUG FIXES ]
     * PR #3: Add min Perl version as reported by CPANTS (Mohammad S Anwar)
- 
+
     [ ENHANCEMENTS ]
     * None
- 
+
     [ DOCUMENTATION ]
     * None
 
@@ -13,10 +24,10 @@
 
     [ BUG FIXES ]
     * GH #2: Fix missing JSON prereq (andk)
- 
+
     [ ENHANCEMENTS ]
     * None
- 
+
     [ DOCUMENTATION ]
     * None
 
@@ -24,22 +35,22 @@
 
     [ BUG FIXES ]
     * PR #1: Add missing prereqs as reported by CPANTS (Mohammad S Anwar)
- 
+
     [ ENHANCEMENTS ]
     * None
- 
+
     [ DOCUMENTATION ]
     * None
 
 0.01      2018-10-19 16:11:30-04:00 America/New_York
 
     Initial version.
- 
+
     [ BUG FIXES ]
     * None
- 
+
     [ ENHANCEMENTS ]
     * None
- 
+
     [ DOCUMENTATION ]
     * None

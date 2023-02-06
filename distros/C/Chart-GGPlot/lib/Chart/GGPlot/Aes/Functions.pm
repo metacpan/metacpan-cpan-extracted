@@ -4,7 +4,7 @@ package Chart::GGPlot::Aes::Functions;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.002002'; # VERSION
+our $VERSION = '0.002003'; # VERSION
 
 use Eval::Quosure;
 use List::AllUtils qw(pairmap);
@@ -83,7 +83,7 @@ Chart::GGPlot::Aes::Functions - Function interface for aesthetics mappings
 
 =head1 VERSION
 
-version 0.002002
+version 0.002003
 
 =head1 METHODS
 

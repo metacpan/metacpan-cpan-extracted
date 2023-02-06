@@ -12,6 +12,7 @@ my %tests = (
     "title 2: bla" => 2,
     "title V X" => 10,
     "3ieme éd." => 3,
+    "totle xxvi" => 26,
     "A title with I in the middle" => undef,
     "no edition" => undef,
 );
@@ -20,3 +21,4 @@ for my $k (sort keys %tests) {
     is(Biblio::Citation::Compare::extractEdition($k),$tests{$k},"$k => $tests{$k}");
 }
 
+done_testing

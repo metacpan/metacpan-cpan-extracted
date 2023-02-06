@@ -15,16 +15,16 @@ sub test_loadClass : Init(1) {
 
 # -----------------------------------------------------------------------------
 
-sub test_section : Test(2) {
+sub test_link : Test(2) {
     my $self = shift;
 
     my $gen = Quiq::Confluence::Markup->new;
     
-    my $markup = $gen->section(1,'Test');
-    $self->is($markup,"h1. Test\n\n");
+    my $markup = $gen->link('https://confluence.atlassian.com/');
+    $self->is($markup,'[https://confluence.atlassian.com/]');
 
-    $markup = $gen->section(1,'Test',"Ein\nTest");
-    $self->is($markup,"h1. Test\n\nEin\nTest\n\n");
+    $markup = $gen->link('https://confluence.atlassian.com/','Atlassian');
+    $self->is($markup,'[Atlassian|https://confluence.atlassian.com/]');
 }
 
 # -----------------------------------------------------------------------------
@@ -39,6 +39,48 @@ sub test_paragraph : Test(2) {
 
     $markup = $gen->paragraph("Ein\nTest");
     $self->is($markup,"Ein Test\n\n");
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_tableHeaderRow : Test(2) {
+    my $self = shift;
+
+    my $gen = Quiq::Confluence::Markup->new;
+    
+    my $markup = $gen->tableHeaderRow(qw/A B C D/);
+    $self->is($markup,"||A||B||C||D||\n");
+
+    $markup = $gen->tableHeaderRow('A','','B','C','D');
+    $self->is($markup,"||A|| ||B||C||D||\n");
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_tableRow : Test(2) {
+    my $self = shift;
+
+    my $gen = Quiq::Confluence::Markup->new;
+    
+    my $markup = $gen->tableRow(1,2,3,4);
+    $self->is($markup,"|1|2|3|4|\n");
+
+    $markup = $gen->tableRow(1,undef,2,3,4);
+    $self->is($markup,"|1| |2|3|4|\n");
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_section : Test(2) {
+    my $self = shift;
+
+    my $gen = Quiq::Confluence::Markup->new;
+    
+    my $markup = $gen->section(1,'Test');
+    $self->is($markup,"h1. Test\n\n");
+
+    $markup = $gen->section(1,'Test',"Ein\nTest");
+    $self->is($markup,"h1. Test\n\nEin\nTest\n\n");
 }
 
 # -----------------------------------------------------------------------------

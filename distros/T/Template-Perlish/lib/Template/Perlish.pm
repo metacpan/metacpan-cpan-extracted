@@ -8,7 +8,7 @@ use strict;
 use Carp;
 use English qw( -no_match_vars );
 use constant ERROR_CONTEXT => 3;
-{ our $VERSION = '1.56'; }
+{ our $VERSION = '1.58'; }
 use Scalar::Util qw< blessed reftype >;
 
 # Function-oriented interface
@@ -373,43 +373,8 @@ END_OF_CODE
       push @code, "binmode $handle, '$self->{binmode}';\n"
          if defined $self->{binmode};
 
-      push @code, <<'END_OF_CODE';
-
-      no warnings 'redefine';
-      local *V  = sub {
-         my $path = scalar(@_) ? shift : [];
-         my $input = scalar(@_) ? shift : $V;
-         return traverse($input, $path, $self);
-      };
-      local *A  = sub {
-         my $path = scalar(@_) ? shift : [];
-         my $input = scalar(@_) ? shift : $V;
-         return @{traverse($input, $path, $self) || []};
-      };
-      local *H  = sub {
-         my $path = scalar(@_) ? shift : [];
-         my $input = scalar(@_) ? shift : $V;
-         return %{traverse($input, $path, $self) || {}};
-      };
-      local *HK = sub {
-         my $path = scalar(@_) ? shift : [];
-         my $input = scalar(@_) ? shift : $V;
-         return keys %{traverse($input, $path, $self) || {}};
-      };
-      local *HV = sub {
-         my $path = scalar(@_) ? shift : [];
-         my $input = scalar(@_) ? shift : $V;
-         return values %{traverse($input, $path, $self) || {}};
-      };
-END_OF_CODE
-
-      push @code, <<"END_OF_CODE";
-      local *P = sub { return print $handle \@_; };
-      use warnings 'redefine';
-
-END_OF_CODE
-
-
+      # add functions that can be seen only within the compiled code
+      push @code, $self->_compile_code_localsubs($handle);
 
       push @code, <<'END_OF_CODE';
       { # double closure to free "my" variables
@@ -459,6 +424,64 @@ END_OF_CODE
 
    croak $error;
 } ## end sub _compile_sub
+
+sub _compile_code_localsubs {
+   my ($self, $handle) = @_;
+   my @code;
+   push @code, <<'END_OF_CODE';
+
+   no warnings 'redefine';
+
+END_OF_CODE
+
+   # custom functions to be injected
+   if (defined(my $custom = $self->{functions})) {
+      push @code, map {
+         "   local *$_ = \$self->{functions}{$_};\n"
+      } keys %$custom;
+   }
+
+   # input data structure traversing facility
+   push @code, <<'END_OF_CODE';
+
+   local *V  = sub {
+      my $path = scalar(@_) ? shift : [];
+      my $input = scalar(@_) ? shift : $V;
+      return traverse($input, $path, $self);
+   };
+   local *A  = sub {
+      my $path = scalar(@_) ? shift : [];
+      my $input = scalar(@_) ? shift : $V;
+      return @{traverse($input, $path, $self) || []};
+   };
+   local *H  = sub {
+      my $path = scalar(@_) ? shift : [];
+      my $input = scalar(@_) ? shift : $V;
+      return %{traverse($input, $path, $self) || {}};
+   };
+   local *HK = sub {
+      my $path = scalar(@_) ? shift : [];
+      my $input = scalar(@_) ? shift : $V;
+      return keys %{traverse($input, $path, $self) || {}};
+   };
+   local *HV = sub {
+      my $path = scalar(@_) ? shift : [];
+      my $input = scalar(@_) ? shift : $V;
+      return values %{traverse($input, $path, $self) || {}};
+   };
+
+END_OF_CODE
+
+   # this comes separated because we need $handle
+   push @code, <<"END_OF_CODE";
+   local *P = sub { return print $handle \@_; };
+
+   use warnings 'redefine';
+
+END_OF_CODE
+
+   return @code;
+}
 
 sub _extract_section {
    my ($hash, $line_no) = @_;

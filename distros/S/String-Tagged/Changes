@@ -1,5 +1,10 @@
 Revision history for String-Tagged
 
+0.19    2023-02-06
+        [CHANGES]
+         * Document `sizepos` as a String::Tagged::Formatting tag
+         * Swap all unit tests from `Test::More` to `Test2::V0`
+
 0.18    2022-04-29
         [CHANGES]
          * Extract String::Tagged::Extent into its own actual .pm file

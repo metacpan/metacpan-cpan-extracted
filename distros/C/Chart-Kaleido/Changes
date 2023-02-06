@@ -1,5 +1,8 @@
 Revision history of Chart-Kaleido
 
+0.014       2022-02-04
+    - Changed my github username.
+
 0.012       2022-09-14
     - Fix typo in Chart::Kaleido doc SYNOPSIS.
     - Bump minimal Alien::Plotly::Kaleido version requirement.

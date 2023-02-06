@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Identity;
+use Test2::V0;
 
 use String::Tagged;
 
@@ -14,17 +13,17 @@ $str->apply_tag( -1, -1, message => 1 );
 
 my @tags;
 $str->iter_tags_nooverlap( sub { push @tags, [ @_ ] } );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [ 0, 18, message => 1 ],
            ],
            'tags list initially' );
 
-identical( $str->delete_tag( 3, 4, 'message' ), $str, '->delete_tag returns $str' );
+ref_is( $str->delete_tag( 3, 4, 'message' ), $str, '->delete_tag returns $str' );
 
 undef @tags;
 $str->iter_tags_nooverlap( sub { push @tags, [ @_ ] } );
-is_deeply( \@tags, 
+is( \@tags, 
            [
              [ 0, 18 ],
            ],
@@ -32,11 +31,11 @@ is_deeply( \@tags,
 
 $str->apply_tag( -1, -1, message => 1 );
 
-identical( $str->unapply_tag( 3, 4, 'message' ), $str, '->unapply_tag returns $str' );
+ref_is( $str->unapply_tag( 3, 4, 'message' ), $str, '->unapply_tag returns $str' );
 
 undef @tags;
 $str->iter_tags_nooverlap( sub { push @tags, [ @_ ] } );
-is_deeply( \@tags, 
+is( \@tags, 
            [
              [ 0,  3, message => 1 ],
              [ 3,  4, ],
@@ -48,7 +47,7 @@ $str->unapply_tag( 3, 7, 'message' );
 
 undef @tags;
 $str->iter_tags_nooverlap( sub { push @tags, [ @_ ] } );
-is_deeply( \@tags, 
+is( \@tags, 
            [
              [  0, 3, message => 1 ],
              [  3, 7, ],
@@ -60,7 +59,7 @@ $str->unapply_tag( 0, 5, 'message' );
 
 undef @tags;
 $str->iter_tags_nooverlap( sub { push @tags, [ @_ ] } );
-is_deeply( \@tags, 
+is( \@tags, 
            [
              [  0, 10, ],
              [ 10,  8, message => 1 ],

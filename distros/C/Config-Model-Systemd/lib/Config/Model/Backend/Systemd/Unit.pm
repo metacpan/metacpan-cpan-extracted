@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Systemd::Unit ;
-$Config::Model::Backend::Systemd::Unit::VERSION = '0.252.1';
+$Config::Model::Backend::Systemd::Unit::VERSION = '0.252.2';
 use strict;
 use warnings;
 use 5.020;
@@ -22,6 +22,12 @@ no warnings qw/experimental::postderef experimental::signatures/;
 extends 'Config::Model::Backend::IniFile';
 
 with 'Config::Model::Backend::Systemd::Layers';
+
+has _has_system_file => (
+    is => 'rw',
+    isa => 'Bool',
+    default => 0,
+);
 
 my $logger = get_logger("Backend::Systemd::Unit");
 my $user_logger = get_logger("User");
@@ -60,8 +66,7 @@ sub get_unit_info ($self, $file_path) {
     return ($unit_name, $unit_type);
 }
 
-## no critic (Subroutines::ProhibitBuiltinHomonyms)
-sub read ($self, %args) {
+around read => sub ($orig, $self, %args) {
     # enable 2 styles of comments (gh #1)
     $args{comment_delimiter} = "#;";
 
@@ -76,11 +81,18 @@ sub read ($self, %args) {
         # allow non-existent file to let user start from scratch
         return 1 unless  $args{file_path}->exists;
 
-        return $self->load_ini_file(%args);
+        return $self->load_ini_file($orig, %args);
     }
 
     my ($unit_name, $unit_type) = $self->get_unit_info($args{file_path});
     my $app = $self->instance->application;
+
+    my @default_directories;
+    if ($app !~ /-user$/ or not $args{file_path}->exists) {
+        # this user file may overrides an existing service file
+        # so we don't read these default files
+        @default_directories = $self->default_directories;
+    }
 
     $self->node->instance->layered_start;
     my $root = $args{root} || path('/');
@@ -88,7 +100,7 @@ sub read ($self, %args) {
 
     # load layers for this service
     my $found_unit = 0;
-    foreach my $layer ($self->default_directories) {
+    foreach my $layer (@default_directories) {
         my $local_root = $layer =~ m!^/! ? $root : $cwd;
         my $layer_dir = $local_root->child($layer);
         next unless $layer_dir->is_dir;
@@ -97,7 +109,7 @@ sub read ($self, %args) {
         next unless $layer_file->exists;
 
         $user_logger->warn("Reading unit '$unit_type' '$unit_name' from '$layer_file'.");
-        $self->load_ini_file(%args, file_path => $layer_file);
+        $self->load_ini_file($orig, %args, file_path => $layer_file);
         $found_unit++;
 
         # TODO: may also need to read files in
@@ -106,7 +118,10 @@ sub read ($self, %args) {
     }
     $self->node->instance->layered_stop;
 
-    if (not $found_unit) {
+    if ($found_unit) {
+        $self->_has_system_file(1);
+    }
+    else {
         $user_logger->warn("Could not find unit files for $unit_type name $unit_name");
     }
 
@@ -115,12 +130,9 @@ sub read ($self, %args) {
     # for user -> ~/.local/systemd/user/*.conf
     # for local file -> $args{filexx}
 
-    # TODO: document limitations (can't read arbitrary files in /etc/
-    # systemd/system/unit.type.d/ and
-    # ~/.local/systemd/user/unit.type.d/*.conf
-
     my $service_path;
-    if ($app =~ /-user$/) {
+    if ($app =~ /-user$/ and $args{file_path}->exists) {
+        # this use file may override an existing service file
         $service_path = $args{file_path} ;
     }
     else {
@@ -132,20 +144,18 @@ sub read ($self, %args) {
     }
     elsif ($service_path->exists) {
         $logger->debug("reading unit $unit_type name $unit_name from $service_path");
-        $self->load_ini_file(%args, file_path => $service_path);
+        $self->load_ini_file($orig, %args, file_path => $service_path);
     }
     return 1;
-}
+};
 
-sub load_ini_file {
-    my ($self, %args) = @_ ;
-
+sub load_ini_file ($self, $orig_read, %args) {
     $logger->debug("opening file '".$args{file_path}."' to read");
 
-    my $res = $self->SUPER::read( %args );
+    my $res = $self->$orig_read( %args );
     die "failed ". $args{file_path}." read" unless $res;
     return;
-}
+};
 
 # overrides call to node->load_data
 sub load_data ($self, %args) {
@@ -213,7 +223,7 @@ sub load_data ($self, %args) {
     return;
 }
 
-sub write ($self, %args) {
+around 'write' => sub ($orig, $self, %args) {
     # args are:
     # root       => './my_test',  # fake root directory, userd for tests
     # config_dir => /etc/foo',    # absolute path
@@ -235,12 +245,15 @@ sub write ($self, %args) {
 
     my $app = $self->instance->application;
     my $service_path;
-    if ($app =~  /-(user|file)$/) {
+
+    # check if service has files in $self->default_directories
+    # yes -> use a a file on $unit_name.$unit_type.d directry
+    # no -> create a  $args{file_path} file
+    if ($app =~  /-(user|file)$/ and not $self->_has_system_file) {
         $service_path = $args{file_path};
 
         $logger->debug("writing unit to $service_path");
-        # mouse super() does not work...
-        $self->SUPER::write(%args, file_path => $service_path);
+        $self->$orig(%args, file_path => $service_path);
     }
     else {
         my $dir = $args{file_path}->parent->child("$unit_name.$unit_type.d");
@@ -248,8 +261,7 @@ sub write ($self, %args) {
         $service_path = $dir->child('override.conf');
 
         $logger->debug("writing unit to $service_path");
-        # mouse super() does not work...
-        $self->SUPER::write(%args, file_path => $service_path);
+        $self->$orig(%args, file_path => $service_path);
 
         if (scalar $dir->children == 0) {
             # remove empty dir
@@ -258,17 +270,16 @@ sub write ($self, %args) {
         }
     }
     return 1;
-}
+};
 
-sub _write_leaf{
-    my ($self, $args, $node, $elt)  = @_ ;
+around _write_leaf => sub ($orig, $self, $args, $node, $elt) {
     # must skip disable element which cannot be hidden :-(
     if ($elt eq 'disable') {
         return '';
     } else {
-        return $self->SUPER::_write_leaf($args, $node, $elt);
+        return $self->$orig($args, $node, $elt);
     }
-}
+};
 
 no Mouse ;
 __PACKAGE__->meta->make_immutable ;
@@ -289,7 +300,7 @@ Config::Model::Backend::Systemd::Unit - R/W backend for systemd unit files
 
 =head1 VERSION
 
-version 0.252.1
+version 0.252.2
 
 =head1 SYNOPSIS
 
@@ -321,6 +332,12 @@ This method write systemd configuration data.
 
 When the service is disabled, the target configuration file is
 replaced by a link to C</dev/null>.
+
+=head1 LIMITATIONS
+
+Unit backend cannot read or write arbitrary files in
+C</etc/systemd/system/unit.type.d/> and
+C< ~/.config/systemd/user/unit.type.d/*.conf>.
 
 =head1 AUTHOR
 

@@ -1,8 +1,6 @@
 #
 # (c) Jan Gehring <jan.gehring@gmail.com>
 #
-# vim: set ts=2 sw=2 tw=0:
-# vim: set expandtab:
 #
 # this is a simple helper class for the get() function
 
@@ -12,7 +10,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.4'; # VERSION
+our $VERSION = '1.14.0'; # VERSION
 
 sub new {
   my $that  = shift;

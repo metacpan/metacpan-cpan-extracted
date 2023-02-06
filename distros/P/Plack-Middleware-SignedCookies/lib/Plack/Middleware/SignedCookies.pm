@@ -1,10 +1,10 @@
 use 5.006; use strict; use warnings;
 
 package Plack::Middleware::SignedCookies;
-$Plack::Middleware::SignedCookies::VERSION = '1.203';
-# ABSTRACT: accept only server-minted cookies
 
-use parent 'Plack::Middleware';
+our $VERSION = '1.204';
+
+BEGIN { require Plack::Middleware; our @ISA = 'Plack::Middleware' }
 
 use Plack::Util ();
 use Plack::Util::Accessor qw( secret secure httponly );
@@ -62,10 +62,6 @@ __END__
 =head1 NAME
 
 Plack::Middleware::SignedCookies - accept only server-minted cookies
-
-=head1 VERSION
-
-version 1.203
 
 =head1 SYNOPSIS
 

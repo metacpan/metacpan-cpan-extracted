@@ -22,8 +22,8 @@ sub session_setting {
     setting( session => 'CHI' );
 }
 
-throws_ok { session_setting() } 
-    qr/Missing required arguments: driver/, 
+throws_ok { session_setting() }
+    qr/Missing required arguments: driver/,
     'Dies ok when no driver specified';
 
 session_setting( 1 );

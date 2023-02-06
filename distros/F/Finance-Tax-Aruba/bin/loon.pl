@@ -70,7 +70,7 @@ my $maandloon = to_awg($ARGV[0]);
 my $months    = $opts{months};
 
 $opts{'tax-free'} = ($opts{'tax-free'} // 0) * $months;
-$opts{'fringe'} = ($opts{'fringe'} // 0) * $months;
+$opts{'fringe'} //= 0;
 
 if ($opts{yearly}) {
     $maandloon = $maandloon / $months;
@@ -116,15 +116,15 @@ if ($opts{cur} ne 'awg') {
 my @order = qw(
     -
     bruto
-    werving
-    pensioen_employee
+    fringe
     bonus
+    werving
     jaarloon
     -
+    pensioen_employee
     azv
     aov
     -
-    fringe
     zuiver
     tabelinkomen
     taxed
@@ -288,7 +288,7 @@ loon.pl - A salary cost calculator
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

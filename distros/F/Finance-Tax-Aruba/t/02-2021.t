@@ -27,8 +27,8 @@ my @tests = (
 
             taxfree_amount => 10_535.52,
 
-            tax_fixed   => 0,
-            tax_rate    => 12,
+            tax_fixed => 0,
+            tax_rate  => 12,
         },
     },
     {
@@ -63,27 +63,73 @@ my @tests = (
         },
     },
     {
-        year     => 2021,
-        isa      => 'Finance::Tax::Aruba::Income::2021',
-        income   => 7812.50,
-        fringe   => 40 * 12,
-        tax_free => 600 * 12,
+        year                  => 2021,
+        isa                   => 'Finance::Tax::Aruba::Income::2021',
+        label                 => "Test fringe and tax benefits",
+        income                => 7812.50,
+        fringe                => 40,
+        tax_free              => 600 * 12,
         pension_employee_perc => 0,
         pension_employer_perc => 6,
-        results => {
+        results               => {
             pension_employee => 0,
             pension_employer => 5625,
-            tax_fixed => 4191.60,
-            tax_rate  => 23,
-            net_income => 85783.40,
-            tax_free_wage => 48222.40,
+            tax_fixed        => 4191.60,
+            tax_rate         => 23,
+            net_income       => 85783,
+            tax_free_wage    => 48222,
+        },
+    },
+    {
+        year                  => 2021,
+        isa                   => 'Finance::Tax::Aruba::Income::2021',
+        label                 => "Test random salary",
+        income                => 7812.50,
+        results               => {
+            tax_fixed        => 4191.60,
+            tax_rate         => 23,
+            taxable_wage     => 54966.5,
+        },
+    },
+    {
+        year                  => 2021,
+        isa                   => 'Finance::Tax::Aruba::Income::2021',
+        label                 => "Test bonus on salary",
+        income                => 7812.50,
+        bonus                 => 7812.50,
+        results               => {
+            tax_fixed        => 4191.60,
+            tax_rate         => 23,
+            taxable_wage     => 62779,
+        },
+    },
+    {
+        # This implemenation maybe incorrect.
+        year                  => 2021,
+        isa                   => 'Finance::Tax::Aruba::Income::2021',
+        label                 => "Test bonus on low salary",
+        income                => 1000,
+        bonus                 => 81750,
+        results               => {
+            aov_yearly_income => 85000,
+            azv_yearly_income => 85000,
+
+            pension_employee => 360,
+            pension_employer => 360,
+
+            tax_fixed        => 4191.60,
+            tax_rate         => 23,
+            taxable_wage     => 58559,
         },
     },
 );
 
 foreach (@tests) {
-    subtest sprintf("Running test for year %s with monthly income of %.2f",
-        $_->{year}, $_->{income}) => sub {
+    my $name = delete $_->{label};
+    $name //= sprintf("Running test for year %s with monthly income of %d",
+        $_->{year}, $_->{income});
+
+    subtest $name => sub {
         test_yearly_income(%{$_});
     }
 }

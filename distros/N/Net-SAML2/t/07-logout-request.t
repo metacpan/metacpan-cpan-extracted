@@ -82,5 +82,37 @@ foreach (qw(NameQualifier SPNameQualifier SPProvidedID)) {
         $args{destination}, ".. and the NameQualifier");
 }
 
+{
+    my $sp = net_saml2_sp(
+        authnreq_signed        => 0,
+        want_assertions_signed => 0,
+        slo_url_post           => '/sls-post-response',
+        slo_url_soap           => '/slo-soap',
+    );
 
+    my %logout_params = (
+                            name_qualifier => 'https://idp.shibboleth.local/idp/shibboleth',
+                            sp_name_qualifier => 'https://netsaml2-testapp',
+                         );
+
+    my $logout_request = $sp->logout_request(
+                            $args{destination},
+                            $args{nameid},
+                            $args{nameid_format},
+                            $args{session},
+                            \%logout_params);
+    my $xml = $logout_request->as_xml;
+
+    my $xpath = get_xpath(
+        $xml,
+        samlp => URN_PROTOCOL,
+        saml  => URN_ASSERTION,
+    );
+    my $name_id = get_single_node_ok($xpath, '/samlp:LogoutRequest/saml:NameID');
+    is($name_id->getAttribute('SPNameQualifier'),
+        $logout_params{sp_name_qualifier}, "We the SPNameQualifier");
+    is($name_id->getAttribute('NameQualifier'),
+        $logout_params{name_qualifier}, ".. and the NameQualifier");
+
+}
 done_testing;

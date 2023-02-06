@@ -9,7 +9,7 @@ use Carp qw( carp croak confess cluck );
 use Storable qw( dclone );
 use IO::File;
 
-our $VERSION = '0.0400';
+our $VERSION = '0.0401';
 
 sub DEBUG () { 0 }
 
@@ -229,6 +229,7 @@ sub __append
 sub __new_tupple
 {
     my( $self ) = @_;
+
     my $S = $self->{__read_state};
     return unless $S->{key};
 
@@ -262,7 +263,7 @@ sub __fix_value
     if( $v eq 'False' ) {
         return 0;
     }
-    elsif( $v =~ s/"(.+)"\s*/$1/s ) {
+    elsif( $v =~ s/"(.*)"\s*/$1/s ) {
         $v =~ s/&quot;?/"/g;
     }
     return $v;
@@ -273,7 +274,7 @@ sub __new_key
     my( $self, $key ) = @_;
     my $S = $self->{__read_state};
     my $C = $S->{current}[-1];
-    push @{ $C->{__sorted} }, $key unless $C->{$key};
+    push @{ $C->{__sorted} }, $key unless exists $C->{$key};
 }
 
 ################################################
@@ -348,7 +349,7 @@ sub __new_UI
     my( $tname, $text ) = $self->__parse_name( $name );
     $self->__push( UI => { __name => $tname,
                            __text => $text,
-                           __type => $type
+                           __option => $type
                          }
                  );
 }
@@ -514,6 +515,14 @@ sub text
     my( $self ) = @_;
     return $self->{__text};
 }
+
+sub option
+{
+    my( $self ) = @_;
+    return $self->{__option};
+}
+
+
 
 sub list
 {

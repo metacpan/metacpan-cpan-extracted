@@ -3,8 +3,7 @@ abstract: 'string buffers with value tags on extents'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
-  Test::Identity: '0'
-  Test::More: '0.88'
+  Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
@@ -17,13 +16,13 @@ name: String-Tagged
 provides:
   String::Tagged:
     file: lib/String/Tagged.pm
-    version: '0.18'
+    version: '0.19'
   String::Tagged::Extent:
     file: lib/String/Tagged/Extent.pm
-    version: '0.18'
+    version: '0.19'
 requires:
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.18'
+version: '0.19'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

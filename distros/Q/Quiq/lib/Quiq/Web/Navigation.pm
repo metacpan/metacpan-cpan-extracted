@@ -145,7 +145,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.206';
+our $VERSION = '1.207';
 
 use Quiq::Path;
 use Quiq::LockedCounter;
@@ -222,6 +222,7 @@ sub new {
 
     my $self = $class->SUPER::new(
         backUrl => undef,
+        prevUrl => undef,
     );
 
     # Allgemeines Navigations-Verzeichnis erzeugen
@@ -314,6 +315,14 @@ sub new {
         $self->set(backUrl=>$url);
     }
 
+    if ($rrid) {
+        my $data = $callH->{$rrid} // $self->throw;
+        # $url,$rrid,$brid,$x,$y
+        my ($url) = split /\0/,$data;
+# warn "prevUrl: $url\n";
+        $self->set(prevUrl=>$url);
+    }
+
     $callH->close;
 
     return $self;
@@ -397,9 +406,83 @@ sub backUrlObj {
 
 # -----------------------------------------------------------------------------
 
+=head3 prevUrl() - URL der Vorgängerseite
+
+=head4 Synopsis
+
+  $url = $nav->prevUrl;
+  $url = $nav->prevUrl($defaultUrl);
+
+=head4 Arguments
+
+=over 4
+
+=item (String) $defaultUrl
+
+URL, der geliefert wird, wenn kein Vorgänger-URL definiert ist.
+
+=back
+
+=head4 Returns
+
+(String) URL
+
+=head4 Description
+
+Liefere den URL der Vorgängerseite als Zeichenkette. Ist keine
+Vorgängerseite definiert, liefere undef.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub prevUrl {
+    my $self = shift;
+    my $defaultUrl = shift;
+    return $self->{'prevUrl'} // $defaultUrl;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 prevUrlObj() - URL-Objekt der Vorgängerseite
+
+=head4 Synopsis
+
+  $urlObj = $nav->prevUrlObj;
+  $urlObj = $nav->prevUrlObj($defaultUrl);
+
+=head4 Arguments
+
+=over 4
+
+=item (String) $defaultUrl
+
+URL, der genutzt wird, wenn kein Vorgänger-URL definiert ist.
+
+=back
+
+=head4 Returns
+
+(Object) URL-Objekt (siehe Quiq::Url)
+
+=head4 Description
+
+Liefere den URL der Vorgängerseite als Objekt.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub prevUrlObj {
+    my $self = shift;
+    return Quiq::Url->new($self->prevUrl);
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.206
+1.207
 
 =head1 AUTHOR
 
@@ -407,7 +490,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2022 Frank Seitz
+Copyright (C) 2023 Frank Seitz
 
 =head1 LICENSE
 

@@ -1,5 +1,5 @@
 name = "Redis-Cluster-Fast"
-badges = ['github-actions/Test', 'metacpan']
+badges = ['github-actions/test', 'metacpan']
 module_maker = "ModuleBuild"
 [build]
 build_class = "builder::MyBuilder"

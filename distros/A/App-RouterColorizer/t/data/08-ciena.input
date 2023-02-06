@@ -619,3 +619,8 @@ wdm$ module show slot 2
 +-----------------------+-----------------------------------------------------+
 |Uptime                 |1d 13h 59m  3s                                       |
 +-----------------------+-----------------------------------------------------+
+Success! Preparing state dump...
+Terminal will be disconnected in 1 minute if it remains inactive.
+WARNING:
+  You cannot abort the restart operation once it has started.
+ERROR: setting PTP attributes for 2/1: admin state must be disabled

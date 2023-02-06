@@ -44,6 +44,7 @@ do { my $x = {
                                         'Scope::Upper' => '0',
                                         'Type::Tiny::XS' => '0',
                                         'URL::Encode::XS' => '0',
+                                        'Unicode::UTF8' => '0',
                                         'YAML::XS' => '0'
                                       },
                       'requires' => {

@@ -4,7 +4,7 @@
       "Jason A. Crome <cromedome@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -27,7 +27,7 @@
             "Moo" : "0",
             "Type::Tiny" : "0",
             "Types::Standard" : "0",
-            "perl" : "5.010"
+            "perl" : "5.008"
          }
       },
       "test" : {
@@ -50,8 +50,9 @@
       "x_IRC" : "irc://irc.perl.org/#dancer",
       "x_WebIRC" : "https://chat.mibbit.com/#dancer@irc.perl.org"
    },
-   "version" : "0.04",
-   "x_generated_by_perl" : "v5.28.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
+   "version" : "0.05",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

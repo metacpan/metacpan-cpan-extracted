@@ -1,4 +1,15 @@
+0.252.2 2023-02-04
+
+  Bug fix:
+    * correctly write systemd-user override unit file
+
+  Model generator (parse-man.pl) changes:
+    * parse-man: avoid very long lines in descriptions
+
 0.252.1 2022-11-06
+
+  Model update:
+    * update model from systemd 252 documentation
 
 0.251.1 2022-05-28
 

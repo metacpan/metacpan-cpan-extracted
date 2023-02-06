@@ -12,6 +12,7 @@ my $redis = Redis::Cluster::Fast->new(
 );
 $redis->mset('{my}hoge', 'test1', '{my}fuga', 'test2');
 $redis->mset('{my}foo', 'FOO', '{my}bar', 'BAR');
+$redis->del('test-fork');
 
 my $pid = fork;
 if ($pid == 0) {

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::HTTP;
 # ABSTRACT: Network controller for Neo4j HTTP
-$Neo4j::Driver::Net::HTTP::VERSION = '0.35';
+$Neo4j::Driver::Net::HTTP::VERSION = '0.36';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -43,7 +43,7 @@ sub new {
 	my $http_adapter = $driver->{plugins}->trigger('http_adapter_factory', $driver);
 	
 	my $self = bless {
-		die_on_error => $driver->{die_on_error},
+		events => $driver->{plugins},
 		cypher_types => $driver->{cypher_types},
 		server_info => $driver->{server_info},
 		http_agent => $http_adapter,
@@ -64,7 +64,11 @@ sub _server {
 	my ($neo4j_version, $tx_endpoint);
 	my @discovery_queue = ($DISCOVERY_ENDPOINT);
 	while (@discovery_queue) {
-		my $tx = { transaction_endpoint => shift @discovery_queue };
+		my $events = $self->{events};
+		my $tx = {
+			error_handler => sub { $events->trigger(error => shift) },
+			transaction_endpoint => shift @discovery_queue,
+		};
 		my $service = $self->_request($tx, 'GET')->_json;
 		
 		$neo4j_version = $service->{neo4j_version};
@@ -170,7 +174,7 @@ sub _request {
 	my $accept = $self->{accept_for}->{$method}
 	             // $self->_accept_for($method);
 	
-	$self->{http_agent}->request($method, $tx_endpoint, $json, $accept);
+	$self->{http_agent}->request($method, $tx_endpoint, $json, $accept, $tx->{mode});
 	
 	my $header = $self->{http_agent}->http_header;
 	$tx->{closed} = $header->{success};  # see _parse_tx_status() and neo4j #12651
@@ -182,7 +186,7 @@ sub _request {
 		http_method => $method,
 		http_path => $tx_endpoint,
 		http_header => $header,
-		die_on_error => $self->{die_on_error},
+		error_handler => $tx->{error_handler},
 		cypher_types => $self->{cypher_types},
 		server_info => $self->{server_info},
 		statements => $json ? $json->{statements} : [],

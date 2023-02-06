@@ -1,0 +1,77 @@
+Top Priorities
+--------------
+1. Rewrite collation. Right now the algorithm depends upon knowing the pixel
+   extent of each axis, but that shouldn't be necessary and is only marginally
+   an artifact of the implementation. Collation should return a hash with keys
+   being pixel padding and values being the min/max. This would also allow for
+   negative paddings values (for offset text).
+2. Perform dataset collation when datasets are created or changed.
+3. Use SizeSpecs to configure all distances.
+Sliders for interactive plots:
+  - add as option to function plots
+  - add as separate group of options (like palette, axes, legend)
+  - would need to be able to configure their scaling, min, max, and default
+New scaling types:
+  - date scaling type, mostly used (I suspect) for axes
+  - power-law (quadratic, square-root, etc), probably mostly used for color maps
+Add margin/padding options
+Better color space support, use Maggie's ColorSpace?
+
+
+Next Steps: Aesthetics
+----------------------
+1. Use SizeSpecs to configure all distances.
+2. Add margin/padding options
+3. Superscripts and/or subscripts
+4. Better handling of large numbers (depends upon previous)
+5. Better color space support, use Maggie's ColorSpace?
+6. Support legends
+7. Greater configuration for placement, orientation, and size of color map
+8. Fancier axis rendering options, especially background gray
+
+Wishlist
+--------
+Sliders for interactive plots:
+  - add as option to function plots
+  - add as separate group of options (like palette, axes, legend)
+  - would need to be able to configure their scaling, min, max, and default
+New scaling types:
+  - date scaling type, mostly used (I suspect) for axes
+  - power-law (quadratic, square-root, etc), probably mostly used for color maps
+
+Histogram blows up when its data is removed
+colors do not appear to be threading (11-03-08/plot-dists.pl)
+legends
+criss-crossing lines for high zoom levels (maybe need to change Prima
+	interface to use double instead of int)
+
+Colors
+======
+Switch to using Maggie's ColorSpace
+
+Emphasizing Data
+================
+Teach DataSets how to emphasize and de-emphasize their data
+Teach Palettes how to emphasize and de-emphasize their colors
+
+Legends, Color Bars
+===================
+One legend entry per data set
+Auto-detect features based on explicit DataSet properties
+Zoom/pan on color bar emphasizes data in that color range
+
+Grid/Matrix
+===========
+To speed up rendering, work with images
+If grid bounds are within viewport, or extend just outside, use a single
+	Image.
+If grid bounds are much larger than viewport, work with tiles of Images that
+   cover slightly beyond the current view.
+ - Create function/method that updates the tiles one data-row or column at a
+   time. This will preserve user interaction while still updating the plot
+ - When panning (say) left, once the leftmost tiles pan far enough, simply
+   move them to the far right.
+
+On zoom, create first "image" of zoom based on a zoom-in of the current
+	image or tiles. Then use the UI rendering method to improve resolution.
+Might want to create a whole new Prima image class for this

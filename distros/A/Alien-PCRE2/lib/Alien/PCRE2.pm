@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Alien::PCRE2;
 
-our $VERSION = '0.016000';
+our $VERSION = '0.017000';
 
 use base qw( Alien::Base );
 

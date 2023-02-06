@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Systemd::Layers;
-$Config::Model::Backend::Systemd::Layers::VERSION = '0.252.1';
+$Config::Model::Backend::Systemd::Layers::VERSION = '0.252.2';
 use Mouse::Role;
 
 
@@ -59,7 +59,7 @@ Config::Model::Backend::Systemd::Layers - Role that provides Systemd default dir
 
 =head1 VERSION
 
-version 0.252.1
+version 0.252.2
 
 =head1 SYNOPSIS
 

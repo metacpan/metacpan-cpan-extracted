@@ -4,7 +4,11 @@ examples/demo-show.pl
 lib/String/Tagged.pm
 lib/String/Tagged/Extent.pm
 lib/String/Tagged/Formatting.pod
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01plain.t
 t/02tags-conststr.t
@@ -26,7 +30,3 @@ t/34join.t
 t/40operators.t
 t/50subclass.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

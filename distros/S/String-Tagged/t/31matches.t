@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use String::Tagged;
 
@@ -14,7 +14,7 @@ my @subs = map {
    [ $_->str, $_->get_tags_at( 0 ) ]
 } $str->matches( qr/\S+/ );
 
-is_deeply( \@subs,
+is( \@subs,
    [ [ "Here", {} ],
      [ "is", { tag => "value" } ],
      [ "%s", { tag => "value" } ],

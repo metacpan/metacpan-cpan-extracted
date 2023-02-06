@@ -1,0 +1,16 @@
+Makefile
+Makefile.old
+Build
+Build.bat
+MYMETA.*
+.build/
+_build/
+cover_db/
+blib/
+inc/
+.lwpcookies
+.last_cover_stats
+nytprof.out
+pod2htm*.tmp
+GetoptLongWrapper-*
+GetoptLongWrapper-*.tar.gz

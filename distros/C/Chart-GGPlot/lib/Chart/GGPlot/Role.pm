@@ -5,7 +5,7 @@ package Chart::GGPlot::Role;
 use strict;
 use warnings;
 
-our $VERSION = '0.002002'; # VERSION
+our $VERSION = '0.002003'; # VERSION
 
 use Chart::GGPlot::Setup ();
 
@@ -28,7 +28,7 @@ Chart::GGPlot::Role - For creating roles in Chart::GGPlot
 
 =head1 VERSION
 
-version 0.002002
+version 0.002003
 
 =head1 SYNOPSIS
 

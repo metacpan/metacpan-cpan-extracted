@@ -236,11 +236,11 @@ cluster_node *get_node_by_random(Redis__Cluster__Fast self) {
     return self->acc->cc->table[slot_num];
 }
 
-static cmd_reply_context_t *Redis__Cluster__Fast_run_cmd(
-        Redis__Cluster__Fast self, int argc, const char **argv, size_t *argvlen, cmd_reply_context_t *reply_t) {
+void Redis__Cluster__Fast_run_cmd(Redis__Cluster__Fast self, int argc, const char **argv, size_t *argvlen,
+                                  cmd_reply_context_t *reply_t) {
     DEBUG_MSG("start: %s", *argv);
     reply_t->done = 0;
-    reply_t->self = (void*)self;
+    reply_t->self = (void *) self;
 
     if (self->pid != getpid()) {
         DEBUG_MSG("%s", "pid changed");
@@ -249,7 +249,7 @@ static cmd_reply_context_t *Redis__Cluster__Fast_run_cmd(
         if (Redis__Cluster__Fast_connect(self)) {
             DEBUG_MSG("%s", "failed fork");
             reply_t->error = "failed to fork";
-            return reply_t;
+            return;
         }
     }
 
@@ -259,7 +259,7 @@ static cmd_reply_context_t *Redis__Cluster__Fast_run_cmd(
     if (len == -1) {
         DEBUG_MSG("error: err=%s", "memory error");
         reply_t->error = "memory allocation error";
-        return reply_t;
+        return;
     }
 
     int status = redisClusterAsyncFormattedCommand(self->acc, replyCallback, reply_t, cmd, (int) len);
@@ -277,13 +277,13 @@ static cmd_reply_context_t *Redis__Cluster__Fast_run_cmd(
             if (status != REDIS_OK) {
                 DEBUG_MSG("error: err=%d errstr=%s", self->acc->err, self->acc->errstr);
                 reply_t->error = strtok(self->acc->errstr, "");
-                return reply_t;
+                return;
             } else {
                 reply_t->error = NULL;
             }
         } else {
             reply_t->error = strtok(self->acc->errstr, "");
-            return reply_t;
+            return;
         }
     } else {
         reply_t->error = NULL;
@@ -300,8 +300,6 @@ static cmd_reply_context_t *Redis__Cluster__Fast_run_cmd(
             break;
         }
     }
-
-    return reply_t;
 }
 
 MODULE = Redis::Cluster::Fast    PACKAGE = Redis::Cluster::Fast

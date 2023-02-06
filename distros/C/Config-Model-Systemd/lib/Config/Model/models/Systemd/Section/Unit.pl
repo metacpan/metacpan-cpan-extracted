@@ -1154,7 +1154,8 @@ distributions.',
           'value_type' => 'uniline'
         },
         'description' => 'C<ConditionCredential> may be used to check whether a credential
-by the specified name was passed into the service manager. See L<System and Service Credentials|https://systemd.io/CREDENTIALS> for details about
+by the specified name was passed into the service manager. See L<System and Service
+Credentials|https://systemd.io/CREDENTIALS> for details about
 credentials. If used in services for the system service manager this may be used to conditionalize
 services based on system credentials passed in. If used in services for the per-user service
 manager this may be used to conditionalize services based on credentials passed into the

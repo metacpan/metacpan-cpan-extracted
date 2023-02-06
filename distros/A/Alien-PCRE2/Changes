@@ -1,5 +1,9 @@
 Revision history for Alien::PCRE2.
 
+0.017000 2023-02-03
+
+    - Fix share install download by switching to Alien::Build::Plugin::Download::GitHub (thanks Zaki Mughal)
+
 0.016000 2022-05-08 Codename Queen Mother
 
     - HOLIDAY EDITION: Happy Mother's Day!

@@ -4,7 +4,7 @@ Plack::Middleware::Greylist - throttle requests with different rates based on ne
 
 # VERSION
 
-version v0.3.5
+version v0.4.1
 
 # SYNOPSIS
 
@@ -139,6 +139,14 @@ This does not enforce consistent rates for named blocks. For example, if you spe
 
 Requests from both netblocks would be counted together, but requests from 10./16 netblock would be rejected after 60
 requests. This is probably not something that you want.
+
+# SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.4.0, the this module requires Perl v5.12 or later.
+
+If you need this module on Perl v5.10, please use one of the v0.3.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
 
 # SOURCE
 

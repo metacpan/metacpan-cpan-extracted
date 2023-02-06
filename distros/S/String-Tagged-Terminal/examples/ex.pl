@@ -34,6 +34,10 @@ print "\n";
 $st = String::Tagged::Terminal->new( "Attrs: " );
 $st->append_tagged( $_, $_ => 1 )
    ->append( " " ) for qw( bold italic under strike blink reverse altfont );
+$st->append_tagged( "super", baseline => "super" )
+   ->append( "script ");
+$st->append_tagged( "sub", baseline => "sub" )
+   ->append( "script ");
 $st->say_to_terminal;
 print "\n";
 

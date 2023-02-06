@@ -10,9 +10,9 @@ use Exporter qw(import);
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-15'; # DATE
+our $DATE = '2023-02-06'; # DATE
 our $DIST = 'App-UniqFiles'; # DIST
-our $VERSION = '0.139'; # VERSION
+our $VERSION = '0.141'; # VERSION
 
 our @EXPORT_OK = qw(uniq_files);
 
@@ -200,6 +200,10 @@ If set to '', 'none', or 'size', then digest will be set to file size. This
 means uniqueness will be determined solely from file size. This can be quicker
 but will generate a false positive when two files of the same size are deemed as
 duplicate even though their content may be different.
+
+If set to 'name' then only name comparison will be performed. This of course can
+potentially generate lots of false positives, but in some cases you might want
+to compare filename for uniqueness.
 
 _
         },
@@ -410,6 +414,18 @@ sub uniq_files {
         $files = $ffiles;
     } # FILTER
 
+    my %name_files; # key = filename (computed), value = [path, ...]
+  GROUP_FILE_NAMES: {
+        for my $f (@$files) {
+            #my $path = abs_path($f);
+            (my $basename = $f) =~ s!.+/!!;
+            $name_files{$basename} //= [];
+            push @{ $name_files{$basename} }, $f
+                unless grep { $_ eq $f } @{ $name_files{$basename} };
+        }
+        #use DD; dd \%name_files;
+    }
+
     my %size_counts; # key = size, value = number of files having that size
     my %size_files; # key = size, value = [file, ...]
     my %file_sizes; # key = filename, value = file size, for caching stat()
@@ -427,7 +443,7 @@ sub uniq_files {
         }
     }
 
-    my $calc_digest = !($algorithm eq '' || $algorithm eq 'none' || $algorithm eq 'size');
+    my $calc_digest = !($algorithm eq '' || $algorithm eq 'none' || $algorithm eq 'size' || $algorithm eq 'name');
 
     # calculate digest for all files having non-unique sizes
     my %digest_counts; # key = digest, value = num of files having that digest
@@ -464,7 +480,7 @@ sub uniq_files {
 
   SORT_DUPLICATE_FILES: {
         last unless @authoritative_dirs;
-        my $hash = $calc_digest ? \%digest_files : \%size_files;
+        my $hash = $calc_digest ? \%digest_files : $algorithm eq 'name' ? \%name_files : \%size_files;
         for my $key (keys %$hash) {
             my @files = @{ $hash->{$key} };
             my @abs_files;
@@ -618,7 +634,7 @@ App::UniqFiles - Report duplicate or unique file contents
 
 =head1 VERSION
 
-This document describes version 0.139 of App::UniqFiles (from Perl distribution App-UniqFiles), released on 2022-11-15.
+This document describes version 0.141 of App::UniqFiles (from Perl distribution App-UniqFiles), released on 2023-02-06.
 
 =head1 SYNOPSIS
 
@@ -658,6 +674,10 @@ If set to '', 'none', or 'size', then digest will be set to file size. This
 means uniqueness will be determined solely from file size. This can be quicker
 but will generate a false positive when two files of the same size are deemed as
 duplicate even though their content may be different.
+
+If set to 'name' then only name comparison will be performed. This of course can
+potentially generate lots of false positives, but in some cases you might want
+to compare filename for uniqueness.
 
 =item * B<authoritative_dirs> => I<array[str]>
 
@@ -795,6 +815,10 @@ If set to '', 'none', or 'size', then digest will be set to file size. This
 means uniqueness will be determined solely from file size. This can be quicker
 but will generate a false positive when two files of the same size are deemed as
 duplicate even though their content may be different.
+
+If set to 'name' then only name comparison will be performed. This of course can
+potentially generate lots of false positives, but in some cases you might want
+to compare filename for uniqueness.
 
 =item * B<authoritative_dirs> => I<array[str]>
 
@@ -947,7 +971,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2017, 2015, 2014, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019, 2017, 2015, 2014, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

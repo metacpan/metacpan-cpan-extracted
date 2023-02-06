@@ -2,7 +2,7 @@ NAME
     Net::SAML2 - SAML2 bindings and protocol implementation
 
 VERSION
-    version 0.62
+    version 0.64
 
 SYNOPSIS
       See TUTORIAL.md for implementation documentation and
@@ -75,52 +75,34 @@ DESCRIPTION
     Net::SAML2 correctly perform the SSO process against numerous SAML
     Identity Providers (IdPs). It has been tested against:
 
-    GSuite (Google)
-    Azure (Microsoft Office 365)
-    OneLogin
-    Jump
-    Mircosoft ADFS
-    Keycloak
     Auth0 (requires Net::SAML2 >=0.39)
+    Azure (Microsoft Office 365)
+    GSuite (Google)
+    Jump
+    Keycloak
+    Mircosoft ADFS (not recently tested)
+    Okta
+    OneLogin
     PingIdentity
         Version 0.54 and newer support EncryptedAssertions. No changes
         required to existing SP applications if EncryptedAssertions are not
         in use.
 
-NAME
-    Net::SAML2 - SAML bindings and protocol implementation
+    SAMLTEST.ID (requires Net::SAML2 >=0.63)
+    Shibboleth (requires Net::SAML2 >=0.63)
 
 MAJOR CAVEATS
     SP-side protocol only
     Requires XML metadata from the IdP
 
-CONTRIBUTORS
-    Chris Andrews <chris@nodnol.org>
-    Oskari Okko Ojala <okko@frantic.com>
-    Peter Marschall <peter@adpm.de>
-    Mike Wisener <xmikew@cpan.org>
-    Jeff Fearn <jfearn@redhat.com>
-    Alessandro Ranellucci <aar@cpan.org>
-    Mike Wisener <mwisener@secureworks.com>, xmikew <github@32ths.com>
-    xmikew <github@32ths.com>
-    Timothy Legge <timlegge@gmail.com>
+AUTHORS
+    *   Chris Andrews <chrisa@cpan.org>
 
-COPYRIGHT
-    The following copyright notice applies to all the files provided in this
-    distribution, including binary files, unless explicitly noted otherwise.
-
-    Copyright 2010, 2011 Venda Ltd.
-
-LICENCE
-    This library is free software; you can redistribute it and/or modify it
-    under the same terms as Perl itself.
-
-AUTHOR
-    Chris Andrews <chrisa@cpan.org>
+    *   Timothy Legge <timlegge@gmail.com>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022 by Chris Andrews and Others, see the
-    git log.
+    This software is copyright (c) 2023 by Venda Ltd, see the CONTRIBUTORS
+    file for others.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -19,7 +19,7 @@ name: App-BPOMUtils-NutritionFacts
 provides:
   App::BPOMUtils::NutritionFacts:
     file: lib/App/BPOMUtils/NutritionFacts.pm
-    version: '0.016'
+    version: '0.023'
 requires:
   Browser::Open: '0'
   Data::Sah::Coerce::perl::To_float::From_str::percent: '0'
@@ -39,6 +39,7 @@ requires:
   Perinci::CmdLine::Lite: '1.924'
   Sah::Schema::true: '0'
   Sah::Schema::ufloat: '0'
+  Text::ANSI::Util: '0.22'
   Text::Table::HTML: '0.008'
   Text::Table::More: '0'
   perl: '5.010001'
@@ -49,7 +50,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-BPOMUtils-NutritionFacts
   homepage: https://metacpan.org/release/App-BPOMUtils-NutritionFacts
   repository: git://github.com/perlancar/perl-App-BPOMUtils-NutritionFacts.git
-version: '0.016'
+version: '0.023'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

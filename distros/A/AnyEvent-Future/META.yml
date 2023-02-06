@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,11 +17,12 @@ name: AnyEvent-Future
 provides:
   AnyEvent::Future:
     file: lib/AnyEvent/Future.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   AnyEvent: '0'
-  Future: '0'
+  Future: '0.49'
+  perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

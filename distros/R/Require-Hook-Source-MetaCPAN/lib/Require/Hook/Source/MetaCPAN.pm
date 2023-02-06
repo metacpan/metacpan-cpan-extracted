@@ -1,14 +1,13 @@
 package Require::Hook::Source::MetaCPAN;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-11-13'; # DATE
-our $DIST = 'Require-Hook-Source-MetaCPAN'; # DIST
-our $VERSION = '0.002'; # VERSION
-
-use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-11-15'; # DATE
+our $DIST = 'Require-Hook-Source-MetaCPAN'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 # preload to avoid deep recursion in our INC
 use HTTP::Tiny;
@@ -32,12 +31,12 @@ sub Require::Hook::Source::MetaCPAN::INC {
     my $resp = HTTP::Tiny->new->get($url);
     $resp->{success} or do {
         die "Can't load $filename: Can't retrieve $url: $resp->{status} - $resp->{reason}" if $self->{die};
-        return undef;
+        return undef; ## no critic: TestingAndDebugging::ProhibitExplicitReturnUndef
     };
 
     $resp->{content} =~ m!href="(.+?\?raw=1)"! or do {
         die "Can't load $filename: Can't find source URL in $url" if $self->{die};
-        return undef;
+        return undef; ## no critic: TestingAndDebugging::ProhibitExplicitReturnUndef
     };
 
     $url = URI::URL->new($1, $url)->abs . "";
@@ -45,7 +44,7 @@ sub Require::Hook::Source::MetaCPAN::INC {
     $resp = HTTP::Tiny->new->get($url);
     $resp->{success} or do {
         die "Can't load $filename: Can't retrieve $url: $resp->{status} - $resp->{reason}" if $self->{die};
-        return undef;
+        return undef; ## no critic: TestingAndDebugging::ProhibitExplicitReturnUndef
     };
 
     \($resp->{content});
@@ -66,7 +65,7 @@ Require::Hook::Source::MetaCPAN - Load module source code from MetaCPAN
 
 =head1 VERSION
 
-This document describes version 0.002 of Require::Hook::Source::MetaCPAN (from Perl distribution Require-Hook-Source-MetaCPAN), released on 2020-11-13.
+This document describes version 0.003 of Require::Hook::Source::MetaCPAN (from Perl distribution Require-Hook-Source-MetaCPAN), released on 2022-11-15.
 
 =head1 SYNOPSIS
 
@@ -109,6 +108,42 @@ Please visit the project's homepage at L<https://metacpan.org/release/Require-Ho
 
 Source repository is at L<https://github.com/perlancar/perl-Require-Hook-Source-MetaCPAN>.
 
+=head1 SEE ALSO
+
+Other C<Require::Hook::*> modules.
+
+L<Require::HookChain::source::metacpan> is a L<Require::HookChain> version and
+it uses us.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2020, 2017 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Require-Hook-Source-MetaCPAN>
@@ -116,22 +151,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 SEE ALSO
-
-Other C<Require::Hook::*> modules.
-
-L<Require::HookChain::source::metacpan> uses us.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -12,10 +12,11 @@ INSTALL - How to install Kx
 =head1 DESCRIPTION
 
 This is experimental at the moment. Mark developed it on MacOSX and Linux,
-x86. And now my (Stephan's) development platform is Linux (x86).
+x86. And now my (Stephan's) development platform is Linux (x64).
 
-You need to first get a copy of c.o from L<http://kx.com/q/c/> for your
-architecture. Make libkdb.a from c.o for easy linking like below in the
+You need to first get a copy of c.o from L<https://github.com/KxSystems/kdb>
+(for example for Linux x64 it's L<https://github.com/KxSystems/kdb/blob/master/l64/c.o>)
+for your architecture. Make libkdb.a from c.o for easy linking like below in the
 same path as the package source.
 
     ar -r libkdb.a c.o

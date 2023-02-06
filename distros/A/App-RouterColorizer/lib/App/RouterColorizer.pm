@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 package App::RouterColorizer;
-$App::RouterColorizer::VERSION = '1.230020';
+$App::RouterColorizer::VERSION = '1.230370';
 use Moose;
 
 use feature 'signatures';
@@ -184,7 +184,7 @@ s/^ ( \Q  Inherits configuration from and member of peer-group \E \N+ ) $/$self-
     $line =~
       s/^ ( \Q    \E (?: IPv4 | IPv6) \Q Unicast:     \E \N* ) $/$self->_colorize($1, $INFO)/exx;
     $line =~
-s/^ ( \Q  Configured maximum total number of routes is \E \d+ \Q, warning limit is \E \d+ ) $/$self->_colorize($1, $INFO)/exx;
+s/^ ( \Q  Configured maximum total number of routes is \E \d+ (?: \Q, warning limit is \E \d+ )? ) $/$self->_colorize($1, $INFO)/exx;
 
     # BGP Errors
     my $errors = qr/
@@ -602,17 +602,17 @@ s/^ ( \| \s+ \| ) ( \Q Optical Return Loss \E \( \QdB\E \) ) ( \s+ \| \s+ ) ( $B
       s/ ^ ( \| ) ( [^|]+ ) ( \| ) ( \Q Dis \E  ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ )
                   ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ )
                   ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) /
-        $1.$self->_colorize($2, $INFO).
-        $3.$self->_colorize($4, $INFO).
-        $5.$self->_colorize($6, $INFO).
-        $7.$self->_colorize($8, $INFO).
-        $9.$self->_colorize($10, $INFO).
-        $11.$self->_colorize($12, $INFO).
-        $13.$self->_colorize($14, $INFO).
-        $15.$self->_colorize($16, $INFO).
-        $17.$self->_colorize($18, $INFO).
-        $19.$self->_colorize($20, $INFO).
-        $21.$self->_colorize($22, $INFO).
+        $1.$self->_colorize($2, $ORANGE).
+        $3.$self->_colorize($4, $ORANGE).
+        $5.$self->_colorize($6, $ORANGE).
+        $7.$self->_colorize($8, $ORANGE).
+        $9.$self->_colorize($10, $ORANGE).
+        $11.$self->_colorize($12, $ORANGE).
+        $13.$self->_colorize($14, $ORANGE).
+        $15.$self->_colorize($16, $ORANGE).
+        $17.$self->_colorize($18, $ORANGE).
+        $19.$self->_colorize($20, $ORANGE).
+        $21.$self->_colorize($22, $ORANGE).
         $23/exx;
 
     # module show
@@ -652,6 +652,22 @@ s/^ ( \| \s+ \| ) ( \Q Optical Return Loss \E \( \QdB\E \) ) ( \s+ \| \s+ ) ( $B
         $9.$self->_colorize($10, $ORANGE).
         $11.$self->_colorize($12, $ORANGE).
         $13/exx;
+
+    # Success for dumps
+    $line =~ s/^ ( \QSuccess! Preparing state dump...\E \s* ) $/ $self->_colorize($1, $GREEN)/exx;
+
+    # Logout message
+    $line =~ s/^ ( \QTerminal will be disconnected in 1 minute if it remains inactive.\E )/
+        $self->_colorize($1, $RED)/exx;
+
+    # Warning message
+    $line =~ s/^ (\QWARNING:\E) / $self->_colorize($1, $ORANGE)/exx;
+    $line =~ s/^ (\Q  You cannot abort the restart operation once it has started.\E ) $/
+        $self->_colorize($1, $ORANGE)/exx;
+
+    # Error messages when something isn't disabled first
+    $line =~ s/^ (\QERROR: \E .* disabled ) $/ $self->_colorize($1, $RED)/exx;
+
 
     return $line;
 }
@@ -744,7 +760,7 @@ App::RouterColorizer - Colorize router CLI output
 
 =head1 VERSION
 
-version 1.230020
+version 1.230370
 
 =head1 DESCRIPTION
 

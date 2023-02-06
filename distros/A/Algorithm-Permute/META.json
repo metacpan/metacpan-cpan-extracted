@@ -5,7 +5,7 @@
       "Stephan Loyd <sloyd@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -49,16 +49,18 @@
    "provides" : {
       "Algorithm::Permute" : {
          "file" : "lib/Algorithm/Permute.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "url" : "https://github.com/stphnlyd/perl5-Algorithm-Permute.git"
+         "url" : "https://github.com/iynehz/perl5-Algorithm-Permute.git"
       }
    },
-   "version" : "0.16",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "0.17",
+   "x_generated_by_perl" : "v5.26.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

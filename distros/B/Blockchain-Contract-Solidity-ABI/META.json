@@ -58,6 +58,6 @@
          "web" : "https://github.com/refeco/perl-ABI"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

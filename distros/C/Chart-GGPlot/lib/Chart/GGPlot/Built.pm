@@ -5,7 +5,7 @@ package Chart::GGPlot::Built;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.002002'; # VERSION
+our $VERSION = '0.002003'; # VERSION
 
 use Data::Frame::Types qw(DataFrame);
 use List::AllUtils qw(pairmap);
@@ -68,7 +68,7 @@ Chart::GGPlot::Built - A processed ggplot that can be rendered
 
 =head1 VERSION
 
-version 0.002002
+version 0.002003
 
 =head1 DESCRIPTION
 

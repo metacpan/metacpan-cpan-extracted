@@ -1,8 +1,6 @@
 #
 # (c) Jan Gehring <jan.gehring@gmail.com>
 #
-# vim: set ts=2 sw=2 tw=0:
-# vim: set expandtab:
 
 =head1 NAME
 
@@ -24,7 +22,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.4'; # VERSION
+our $VERSION = '1.14.0'; # VERSION
 
 use Rex::Commands -no => [qw/auth/];
 use Rex::Helper::Run;
@@ -37,7 +35,7 @@ BEGIN {
   LWP::UserAgent->use;
 }
 
-use Time::HiRes qw(tv_interval gettimeofday);
+use Time::HiRes    qw(tv_interval gettimeofday);
 use File::Basename qw(basename);
 use Data::Dumper;
 

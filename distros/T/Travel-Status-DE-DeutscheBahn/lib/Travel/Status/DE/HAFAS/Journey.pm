@@ -10,12 +10,12 @@ no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
 use parent 'Class::Accessor';
 
-our $VERSION = '4.05';
+our $VERSION = '4.07';
 
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime
 	  is_cancelled is_partially_cancelled
-	  station station_uic platform sched_platform rt_platform operator
+	  station station_eva platform sched_platform rt_platform operator
 	  id name type type_long class number line line_no load delay
 	  route_end route_start origin destination direction)
 );
@@ -50,7 +50,7 @@ sub new {
 	my $train_no = $product->{prodCtx}{num};
 	my $cat      = $product->{prodCtx}{catOut};
 	my $catlong  = $product->{prodCtx}{catOutL};
-	if ( $name eq $cat ) {
+	if ( $name and $cat and $name eq $cat ) {
 		$name .= ' ' . $product->{nameS};
 	}
 	if ( defined $train_no and not $train_no ) {
@@ -89,6 +89,7 @@ sub new {
 	my $class = $product->{cls};
 
 	my @stops;
+	my $route_end;
 	for my $stop ( @{ $journey->{stopL} // [] } ) {
 		my $loc       = $locL[ $stop->{locX} ];
 		my $sched_arr = $stop->{aTimeS};
@@ -100,20 +101,14 @@ sub new {
 			if ( not defined $timestr ) {
 				next;
 			}
-			if ( length($timestr) == 8 ) {
 
-				# arrival time includes a day offset
-				my $offset_date = $hafas->{now}->clone;
-				$offset_date->add( days => substr( $timestr, 0, 2, q{} ) );
-				$offset_date = $offset_date->strftime('%Y%m%d');
-				$timestr     = $hafas->{strptime_obj}
-				  ->parse_datetime("${offset_date}T${timestr}");
-			}
-			else {
-				$timestr
-				  = $hafas->{strptime_obj}
-				  ->parse_datetime("${date}T${timestr}");
-			}
+			$timestr = handle_day_change(
+				input    => $timestr,
+				date     => $date,
+				strp_obj => $hafas->{strptime_obj},
+				now      => $hafas->{now}
+			);
+
 		}
 
 		my $arr_delay
@@ -157,6 +152,7 @@ sub new {
 				load          => $tco,
 			}
 		);
+		$route_end = $loc->{name};
 	}
 
 	if ( $journey->{stbStop} ) {
@@ -177,7 +173,7 @@ sub new {
 		direction              => $direction,
 		is_cancelled           => $is_cancelled,
 		is_partially_cancelled => $partially_cancelled,
-		route_end              => $stops[-1]{name},
+		route_end              => $route_end // $direction,
 		messages               => \@messages,
 		route                  => \@stops,
 	};
@@ -200,7 +196,7 @@ sub new {
 
 	if ( $journey->{stbStop} ) {
 		$ref->{station}     = $locL[ $journey->{stbStop}{locX} ]->{name};
-		$ref->{station_uic} = 0 + $locL[ $journey->{stbStop}{locX} ]->{extId};
+		$ref->{station_eva} = 0 + $locL[ $journey->{stbStop}{locX} ]->{extId};
 		$ref->{sched_platform} = $journey->{stbStop}{dPlatfS};
 		$ref->{rt_platform}    = $journey->{stbStop}{dPlatfR};
 		$ref->{platform}       = $ref->{rt_platform} // $ref->{sched_platform};
@@ -210,12 +206,22 @@ sub new {
 		my $time_r
 		  = $journey->{stbStop}{ $hafas->{arrivals} ? 'aTimeR' : 'dTimeR' };
 
-		my $datetime_s
-		  = $hafas->{strptime_obj}->parse_datetime("${date}T${time_s}");
-		my $datetime_r
-		  = $time_r
-		  ? $hafas->{strptime_obj}->parse_datetime("${date}T${time_r}")
-		  : undef;
+		for my $timestr ( $time_s, $time_r ) {
+			if ( not defined $timestr ) {
+				next;
+			}
+
+			$timestr = handle_day_change(
+				input    => $timestr,
+				date     => $date,
+				strp_obj => $hafas->{strptime_obj},
+				now      => $hafas->{now}
+			);
+
+		}
+
+		my $datetime_s = $time_s;
+		my $datetime_r = $time_r;
 
 		my $delay
 		  = $datetime_r
@@ -252,7 +258,31 @@ sub new {
 
 # }}}
 
+sub handle_day_change {
+	my (%opt)   = @_;
+	my $date    = $opt{date};
+	my $timestr = $opt{input};
+	if ( length($timestr) == 8 ) {
+
+		# arrival time includes a day offset
+		my $offset_date = $opt{now}->clone;
+		$offset_date->add( days => substr( $timestr, 0, 2, q{} ) );
+		$offset_date = $offset_date->strftime('%Y%m%d');
+		$timestr = $opt{strp_obj}->parse_datetime("${offset_date}T${timestr}");
+	}
+	else {
+		$timestr = $opt{strp_obj}->parse_datetime("${date}T${timestr}");
+	}
+	return $timestr;
+}
+
 # {{{ Accessors
+
+# Legacy
+sub station_uic {
+	my ($self) = @_;
+	return $self->{station_eva};
+}
 
 sub is_changed_platform {
 	my ($self) = @_;
@@ -414,7 +444,7 @@ journey received by Travel::Status::DE::HAFAS
 
 =head1 VERSION
 
-version 4.05
+version 4.07
 
 =head1 DESCRIPTION
 
@@ -546,10 +576,9 @@ if the backend does not provide an operator.
 
 Name of the station at which this journey was requested.
 
-=item $journey->station_uic (station only)
+=item $journey->station_eva (station only)
 
 UIC/EVA ID of the station at which this journey was requested.
-May be renamed in future releases.
 
 =item $journey->route
 

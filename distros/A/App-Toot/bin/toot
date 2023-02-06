@@ -1,0 +1,110 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Getopt::Long ();
+use Pod::Usage   ();
+use App::Toot;
+
+our $VERSION = '0.03';
+
+my $opt = {
+    config => 'default',
+};
+
+Getopt::Long::GetOptions(
+    $opt,
+    'config=s',
+    'status=s',
+    'help',
+) or Pod::Usage::pod2usage( -exitval => 1 );
+
+if ( $opt->{'help'} ) {
+    Pod::Usage::pod2usage( -exitval => 0, -verbose => 1 );
+}
+
+if ( !defined $opt->{'status'} ) {
+    foreach my $line ( <STDIN> ) {
+        $opt->{'status'} .= $line;
+    }
+}
+
+chomp( $opt->{'status'} );
+
+if ( !defined $opt->{'status'} ) {
+    Pod::Usage::pod2usage( -msg => 'Option status is required', -exitval => 1, -verbose => 1 );
+}
+
+my $app = App::Toot->new($opt);
+my $ret = $app->run();
+if ( !$ret->id ) {
+    die 'post was not successful';
+}
+
+exit 0;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+toot - post a status to Mastodon
+
+=head1 SYNOPSIS
+
+ toot [--config <name>] [--status <status to post>] [--help]
+
+=head1 DESCRIPTION
+
+C<toot> is a tool for posting to Mastodon.
+
+=head1 OPTIONS
+
+=over
+
+=item --config <name>
+
+The section of the config to load credentials for.
+
+Optional.  Defaults to C<default>.
+
+For more details, see the documentation for L<App::Toot::Config> or C<perldoc App::Toot::Config>.
+
+=item --status <status to post>
+
+The status to post.
+
+Optional.  If not defined, status is taken from C<STDIN>.
+
+=item --help
+
+Print the help dialogue.
+
+=back
+
+=head1 EXAMPLES
+
+=head2 Post a status using a different account defined in the config
+
+ $ toot --config development --status 'toot all day'
+
+=head2 Take input from STDIN and post it.
+
+ $ echo 'toot all day' | toot
+ $ someothertool | toot
+
+=head1 CONFIGURATION
+
+For configuration, see the documentation for L<App::Toot::Config> or C<perldoc App::Toot::Config>.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2023 Blaine Motsinger under the MIT license.
+
+=head1 AUTHOR
+
+Blaine Motsinger C<blaine@renderorange.com>
+
+=cut

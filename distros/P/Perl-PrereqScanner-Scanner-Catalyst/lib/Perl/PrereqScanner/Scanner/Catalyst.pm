@@ -5,6 +5,8 @@ package Perl::PrereqScanner::Scanner::Catalyst;
 use strict;
 use warnings;
 
+our $VERSION = '0.003'; # VERSION
+
 use Moose;
 with 'Perl::PrereqScanner::Scanner';
 
@@ -190,7 +192,7 @@ Perl::PrereqScanner::Scanner::Catalyst - Plugin for Perl::PrereqScanner looking 
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -217,7 +219,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Stephan Loyd.
+This software is copyright (c) 2017-2023 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

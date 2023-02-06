@@ -17,3 +17,5 @@ Revision history for Perl extension Biblio::Citation::Compare.
     - Removed unnecessary "use" statements in Makefile.PL, fixing bug RT 101163
 0.4   Jun 11 2015
     - Improved detection and handling of editions; minor bug fixes
+0.55 Feb 4 2023
+    - Misc and fix for failing test contributed by KohaAloha

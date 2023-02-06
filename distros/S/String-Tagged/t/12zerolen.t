@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use String::Tagged;
 
@@ -11,7 +11,7 @@ my $str = String::Tagged->new( "Tag [] here" );
 
 $str->apply_tag( 5, 0, zero => "length" );
 
-is_deeply( [ $str->tagnames ], [qw( zero )], '->tagnames sees zero-length tag' );
+is( [ $str->tagnames ], [qw( zero )], '->tagnames sees zero-length tag' );
 
 # ->iter_tags sees the zero-width tag
 {
@@ -46,7 +46,7 @@ is_deeply( [ $str->tagnames ], [qw( zero )], '->tagnames sees zero-length tag' )
    my $new = String::Tagged->new( "" );
    $new .= $str;
 
-   is_deeply( [ $str->tagnames ], [qw( zero )], '->tagnames of copy contains zero-length tag' );
+   is( [ $str->tagnames ], [qw( zero )], '->tagnames of copy contains zero-length tag' );
 }
 
 # ->debug_sprintf
@@ -64,7 +64,7 @@ EOF
       "", zero => "here"
    );
 
-   is_deeply( [ $zero->tagnames ], [qw( zero )], '->tagnames on zerolength' );
+   is( [ $zero->tagnames ], [qw( zero )], '->tagnames on zerolength' );
 
    {
       my $found;
@@ -96,7 +96,7 @@ EOF
       my $str = String::Tagged->new( "more" );
       $str .= $zero;
 
-      is_deeply( [ $str->tagnames ], [qw( zero )], '->tagnames string appended with zerolength' );
+      is( [ $str->tagnames ], [qw( zero )], '->tagnames string appended with zerolength' );
    }
 }
 

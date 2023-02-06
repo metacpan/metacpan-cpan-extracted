@@ -51,6 +51,7 @@
             "Perinci::CmdLine::Lite" : "1.924",
             "Sah::Schema::true" : "0",
             "Sah::Schema::ufloat" : "0",
+            "Text::ANSI::Util" : "0.22",
             "Text::Table::HTML" : "0.008",
             "Text::Table::More" : "0",
             "perl" : "5.010001",
@@ -71,7 +72,7 @@
    "provides" : {
       "App::BPOMUtils::NutritionFacts" : {
          "file" : "lib/App/BPOMUtils/NutritionFacts.pm",
-         "version" : "0.016"
+         "version" : "0.023"
       }
    },
    "release_status" : "stable",
@@ -86,7 +87,7 @@
          "web" : "https://github.com/perlancar/perl-App-BPOMUtils-NutritionFacts"
       }
    },
-   "version" : "0.016",
+   "version" : "0.023",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

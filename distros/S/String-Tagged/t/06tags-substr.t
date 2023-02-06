@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use String::Tagged;
 
@@ -19,7 +19,7 @@ sub fetch_tags
 }
 
 $str->iter_tags_nooverlap( \&fetch_tags );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [ 0,  1, message => 1 ],
               [ 1,  1, e => 1, message => 1 ],
@@ -31,7 +31,7 @@ $str->set_substr( 7, 5, "planet" );
 
 undef @tags;
 $str->iter_tags_nooverlap( \&fetch_tags );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [ 0,  1, message => 1 ],
               [ 1,  1, e => 1, message => 1 ],
@@ -45,7 +45,7 @@ $str->set_substr( 0, 5, "Goodbye" );
 
 undef @tags;
 $str->iter_tags_nooverlap( \&fetch_tags );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [ 0, 7, message => 1 ],
               [ 7, 1, comma => 1, message => 1 ],
@@ -57,7 +57,7 @@ $str->set_substr( 7, 1, "" );
 
 undef @tags;
 $str->iter_tags_nooverlap( \&fetch_tags );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [ 0, 14, message => 1 ],
            ],
@@ -70,7 +70,7 @@ $str->set_substr( 2, 10, "urm" );
 
 undef @tags;
 $str->iter_tags_nooverlap( \&fetch_tags );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [ 0, 2, goodbye => 1, message => 1 ],
               [ 2, 3, message => 1 ],
@@ -82,7 +82,7 @@ $str->set_substr( 0, 0, "I say, " );
 
 undef @tags;
 $str->iter_tags_nooverlap( \&fetch_tags );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [  0, 7, message => 1 ],
               [  7, 2, goodbye => 1, message => 1 ],

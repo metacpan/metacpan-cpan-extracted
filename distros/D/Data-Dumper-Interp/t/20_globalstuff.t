@@ -66,9 +66,11 @@ for my $modname ( qw/bigint bigfloat bigrat bignum
   my $modpath = "${modname}.pm" =~ s/::/\//gr;
   if ($INC{$modpath}) {
     no strict 'refs';
+    my $path = $INC{$modpath};
+    $path =~ s#^$ENV{HOME}/#\$HOME/# if $ENV{HOME};
     diag sprintf "%-24s %s\n", 
                  $modname . '@' . u(${"${modname}::VERSION"}),
-                 ($INC{$modpath} =~ s#^$ENV{HOME}/#\$HOME/#r);
+                 $path;
   } else {
     diag "(Module '$modname' is not available)\n";
   }

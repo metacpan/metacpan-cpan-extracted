@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use String::Tagged;
 
@@ -16,7 +16,7 @@ is( length($str), 12, 'length() str also works' );
 
 is( $str->plain_substr( 0, 5 ), "Hello", 'Plain substring accessor' );
 
-isa_ok( $str->substr( 0, 5 ), "String::Tagged", 'Tagged substring accessor' );
+isa_ok( $str->substr( 0, 5 ), [ "String::Tagged" ], 'Tagged substring accessor' );
 
 $str->set_substr( 7, 5, "planet" );
 is( $str->str, "Hello, planet", "After set_substr" );

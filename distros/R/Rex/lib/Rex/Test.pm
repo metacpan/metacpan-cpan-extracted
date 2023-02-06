@@ -1,8 +1,6 @@
 #
 # (c) Jan Gehring <jan.gehring@gmail.com>
 #
-# vim: set ts=2 sw=2 tw=0:
-# vim: set expandtab:
 
 package Rex::Test;
 
@@ -14,7 +12,7 @@ use Data::Dumper;
 use Rex::Commands::Box;
 require Rex::CLI;
 
-our $VERSION = '1.13.4'; # VERSION
+our $VERSION = '1.14.0'; # VERSION
 
 BEGIN {
   use Rex::Shared::Var;

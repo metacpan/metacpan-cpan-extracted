@@ -12,7 +12,7 @@ use Encode qw(decode);
 use JSON;
 use LWP::UserAgent;
 
-our $VERSION = '4.05';
+our $VERSION = '4.07';
 
 # {{{ Constructors
 
@@ -182,7 +182,7 @@ finder services
 
 =head1 VERSION
 
-version 4.05
+version 4.07
 
 =head1 DESCRIPTION
 
@@ -260,8 +260,8 @@ no error occurred, returns undef.
 =item $stopfinder->results
 
 Returns a list of stop candidates. Each list element is a hash reference. The
-hash keys are B<id> (IBNR / UIC station code) and B<name> (stop name). Both can
-be used as input for the Travel::Status::DE::HAFAS(3pm) constructor.
+hash keys are B<id> (IBNR / EVA / UIC station code) and B<name> (stop name).
+Both can be used as input for the Travel::Status::DE::HAFAS(3pm) constructor.
 
 If no matching results were found or the parser / HTTP request failed, returns
 the empty list.

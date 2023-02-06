@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::Util;
-our $VERSION = '0.62'; # VERSION
+our $VERSION = '0.64'; # VERSION
 
 use Crypt::OpenSSL::Random qw(random_pseudo_bytes);
 
@@ -32,7 +32,7 @@ Net::SAML2::Util - Utility functions for Net::SAML2
 
 =head1 VERSION
 
-version 0.62
+version 0.64
 
 =head1 SYNOPSIS
 
@@ -46,13 +46,23 @@ version 0.62
 
 Generate a NETSAML2 Request Id
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Chris Andrews  <chrisa@cpan.org>
 
+=item *
+
+Timothy Legge <timlegge@gmail.com>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Chris Andrews and Others, see the git log.
+This software is copyright (c) 2023 by Venda Ltd, see the CONTRIBUTORS file for others.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

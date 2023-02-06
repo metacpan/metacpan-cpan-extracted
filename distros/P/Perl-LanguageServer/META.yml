@@ -30,8 +30,8 @@ requires:
   Moose: '0'
   PadWalker: '0'
   Scalar::Util: '0'
-  perl: '5.014'
+  perl: '5.016'
 resources:
   repository: https://github.com/richterger/Perl-LanguageServer.git
-version: v2.4.0
+version: v2.5.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

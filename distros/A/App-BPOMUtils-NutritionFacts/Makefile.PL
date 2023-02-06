@@ -39,6 +39,7 @@ my %WriteMakefileArgs = (
     "Perinci::CmdLine::Lite" => "1.924",
     "Sah::Schema::true" => 0,
     "Sah::Schema::ufloat" => 0,
+    "Text::ANSI::Util" => "0.22",
     "Text::Table::HTML" => "0.008",
     "Text::Table::More" => 0,
     "strict" => 0,
@@ -51,7 +52,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.016",
+  "VERSION" => "0.023",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -81,6 +82,7 @@ my %FallbackPrereqs = (
   "Sah::Schema::true" => 0,
   "Sah::Schema::ufloat" => 0,
   "Test::More" => 0,
+  "Text::ANSI::Util" => "0.22",
   "Text::Table::HTML" => "0.008",
   "Text::Table::More" => 0,
   "strict" => 0,

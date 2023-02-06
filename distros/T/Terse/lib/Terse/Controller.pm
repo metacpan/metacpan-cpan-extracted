@@ -1,6 +1,7 @@
 package Terse::Controller;
 use strict;
 use warnings;
+no warnings 'reserved';
 use attributes ();
 use base 'Terse';
 use B 'svref_2object';
@@ -42,10 +43,11 @@ sub preprocess_req {
 sub build_terse {
 	my ($self, $t) = @_;
 	if ($self->models) {
+		$t->models ||= {};
 		$t->{model} = sub {
 			my ($t, $model) = @_;
-			$t->raiseError("invalid model: ${model}", 400) unless $self->models->$model;
-			return $t->models->$model ||= $self->models->$model->connect($t);
+			$t->raiseError("invalid model: ${model}", 400) unless $self->models->{$model};
+			return $t->models->{$model} ||= $self->models->{$model}->connect($t);
 		};
 	}
 	if ($self->controllers) {
@@ -73,10 +75,11 @@ sub build_terse {
 		};
 	}
 	if ($self->plugins) {
+		$t->plugins ||= {};
 		$t->{plugin} = sub {
 			my ($t, $plugin) = @_;
 			$t->raiseError("invalid plugin: ${plugin}", 400) unless $self->plugins->{$plugin};
-			return $t->plugins->$plugin ||= ($self->plugins->{$plugin}->can('connect') 
+			return $t->plugins->{$plugin} ||= ($self->plugins->{$plugin}->can('connect')
 				? $self->plugins->{$plugin}->connect($t) 
 				: $self->plugins->{$plugin});
 		};
@@ -176,12 +179,11 @@ sub response_handle {
 	$ct ||= 'application/json';
 	my $res = $t->{_delayed_response};
 	return $res if ($res);
-	my ($content_type, $body) = $self->views->{$t->response_view || $self->response_view} 
+	my ($content_type, $body) = $self->views && $self->views->{$t->response_view || $self->response_view} 
 		? $t->view($t->response_view || $self->response_view)->render($t, $response_body) 
 		: ($ct, $response_body->serialize());
-	$body = undef if $response_body->error && $response_body->no_response;
 	$res = $t->_build_response($sid, $content_type, $response_body->status_code ||= $status ||= 200);
-	$res->body($body) if $body;
+	$res->body($body);
 	return $res->finalize;
 }
 
@@ -190,12 +192,17 @@ sub dispatch {
 	my $package = ref $self || $self;
 	my $dispatch = $Terse::Controller::dispatcher{$package};
 	my @dispatcher = @{ $dispatch->{$req} || [] };
-	my @ISA = eval "\@${package}::ISA";
-	for (@ISA) {
-		$dispatch = $Terse::Controller::dispatcher{$_};
-		next unless $dispatch && $dispatch->{$req};
-		unshift @dispatcher, @{ $dispatch->{$req} };
-	}
+	my $in;
+	$in = sub {
+		my @ISA = eval "\@$_[0]::ISA";
+		for (@ISA) {
+			$in->($_);
+			$dispatch = $Terse::Controller::dispatcher{$_};
+			next unless $dispatch && $dispatch->{$req};
+			unshift @dispatcher, @{ $dispatch->{$req} };
+		}
+	};
+	$in->($package);
 	if (!scalar @dispatcher) {
 		$t->logError('Invalid dispatch request', 400);
 		return;
@@ -268,7 +275,7 @@ Terse::Controller - controllers made simple.
 
 =head1 VERSION
 
-Version 0.121
+Version 0.1234
 
 =cut
 

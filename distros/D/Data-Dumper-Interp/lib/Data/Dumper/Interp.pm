@@ -20,7 +20,7 @@ use 5.018;  # lexical_subs
 use feature qw(say state lexical_subs);
 use feature 'lexical_subs'; no warnings "experimental::lexical_subs";
 package  Data::Dumper::Interp;
-$Data::Dumper::Interp::VERSION = '4.111';
+$Data::Dumper::Interp::VERSION = '4.113';
 
 package  # newline prevents Dist::Zilla::Plugin::PkgVersion from adding $VERSION
   DB;

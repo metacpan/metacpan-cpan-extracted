@@ -10,9 +10,18 @@ lib/Terse/WebSocket.pm
 Makefile.PL
 MANIFEST			This list of files
 README
-t/00-load.t
-t/01-basic.t
-t/02-controller.t
+t/000-load.t
+t/001-basic.t
+t/100-terse-new.t
+t/101-terse-run.t
+t/102-terse-to_app.t
+t/103-terse_logger.t
+t/104-terse_logError.t
+t/105-terse_logInfo.t
+t/106-terse_raiseError.t
+t/200-controller.t
+t/lib/Hospital.pm
+t/lib/Hospital2.pm
 t/lib/Test.pm
 t/lib/Test.psgi
 t/lib/Test/App.pm

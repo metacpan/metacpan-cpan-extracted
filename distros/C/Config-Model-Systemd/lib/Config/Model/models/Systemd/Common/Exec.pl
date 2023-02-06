@@ -201,7 +201,8 @@ not have it in its name), the verity data is read from it and automatically used
 
 This option is supported only for disk images that contain a single file system, without an
 enveloping partition table. Images that contain a GPT partition table should instead include both
-root file system and matching Verity data in the same image, implementing the L<Discoverable Partitions Specification|https://systemd.io/DISCOVERABLE_PARTITIONS>.',
+root file system and matching Verity data in the same image, implementing the L<Discoverable Partitions
+Specification|https://systemd.io/DISCOVERABLE_PARTITIONS>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -248,7 +249,8 @@ C</proc/>. If C<ptraceable> all processes that cannot be
 ptrace()\'ed by a process are hidden to it. If C<default> no
 restrictions on C</proc/> access or visibility are made. For further details see
 L<The /proc
-Filesystem|https://docs.kernel.org/filesystems/proc.html#mount-options>. It is generally recommended to run most system services with this option set to
+Filesystem|https://docs.kernel.org/filesystems/proc.html#mount-options>. It is generally recommended to run most system
+services with this option set to
 C<invisible>. This option is implemented via file system namespacing, and thus cannot
 be used with services that shall be able to install mount points in the host file system
 hierarchy. Note that the root user is unaffected by this option, so to be effective it has to be used
@@ -274,7 +276,8 @@ C<pid>, all files and directories not directly associated with process managemen
 introspection are made invisible in the C</proc/> file system configured for the
 unit\'s processes. This controls the C<subset=> mount option of the
 C<procfs> instance for the unit. For further details see L<The /proc
-Filesystem|https://docs.kernel.org/filesystems/proc.html#mount-options>. Note that Linux exposes various kernel APIs via C</proc/>,
+Filesystem|https://docs.kernel.org/filesystems/proc.html#mount-options>. Note that Linux exposes various kernel APIs
+via C</proc/>,
 which are made unavailable with this setting. Since these APIs are used frequently this option is
 useful only in a few, specific cases, and is not suitable for most non-trivial programs.
 
@@ -504,7 +507,8 @@ C<->, except for the first character which must be one of a-z, A-Z and
 C<_> (i.e. digits and C<-> are not permitted as first character). The
 user/group name must have at least one character, and at most 31. These restrictions are made in
 order to avoid ambiguities and to ensure user/group names and unit files remain portable among Linux
-systems. For further details on the names accepted and the names warned about see L<User/Group Name Syntax|https://systemd.io/USER_NAMES>.
+systems. For further details on the names accepted and the names warned about see L<User/Group Name
+Syntax|https://systemd.io/USER_NAMES>.
 
 When used in conjunction with C<DynamicUser> the user/group name specified is
 dynamically allocated at the time the service is started, and released at the time the service is
@@ -540,7 +544,8 @@ C<->, except for the first character which must be one of a-z, A-Z and
 C<_> (i.e. digits and C<-> are not permitted as first character). The
 user/group name must have at least one character, and at most 31. These restrictions are made in
 order to avoid ambiguities and to ensure user/group names and unit files remain portable among Linux
-systems. For further details on the names accepted and the names warned about see L<User/Group Name Syntax|https://systemd.io/USER_NAMES>.
+systems. For further details on the names accepted and the names warned about see L<User/Group Name
+Syntax|https://systemd.io/USER_NAMES>.
 
 When used in conjunction with C<DynamicUser> the user/group name specified is
 dynamically allocated at the time the service is started, and released at the time the service is
@@ -1769,7 +1774,8 @@ non-service units and for services of the user service manager.',
       {
         'description' => 'Sets the adjustment value for the Linux kernel\'s Out-Of-Memory (OOM) killer score for
 executed processes. Takes an integer between -1000 (to disable OOM killing of processes of this unit)
-and 1000 (to make killing of processes of this unit under memory pressure very likely). See L<The /proc Filesystem|https://docs.kernel.org/filesystems/proc.html> for
+and 1000 (to make killing of processes of this unit under memory pressure very likely). See L<The /proc
+Filesystem|https://docs.kernel.org/filesystems/proc.html> for
 details. If not specified defaults to the OOM score adjustment level of the service manager itself,
 which is normally at 0.
 
@@ -2471,7 +2477,6 @@ Simple allow-list example using these directives:
     InaccessiblePaths=-/lost+found
     NoExecPaths=/
     ExecPaths=/usr/sbin/my_daemon /usr/lib /usr/lib64
-
 ',
         'type' => 'list'
       },
@@ -2543,7 +2548,6 @@ Simple allow-list example using these directives:
     InaccessiblePaths=-/lost+found
     NoExecPaths=/
     ExecPaths=/usr/sbin/my_daemon /usr/lib /usr/lib64
-
 ',
         'type' => 'list'
       },
@@ -2615,7 +2619,6 @@ Simple allow-list example using these directives:
     InaccessiblePaths=-/lost+found
     NoExecPaths=/
     ExecPaths=/usr/sbin/my_daemon /usr/lib /usr/lib64
-
 ',
         'type' => 'list'
       },
@@ -2687,7 +2690,6 @@ Simple allow-list example using these directives:
     InaccessiblePaths=-/lost+found
     NoExecPaths=/
     ExecPaths=/usr/sbin/my_daemon /usr/lib /usr/lib64
-
 ',
         'type' => 'list'
       },
@@ -2759,7 +2761,6 @@ Simple allow-list example using these directives:
     InaccessiblePaths=-/lost+found
     NoExecPaths=/
     ExecPaths=/usr/sbin/my_daemon /usr/lib /usr/lib64
-
 ',
         'type' => 'list'
       },
@@ -3065,7 +3066,8 @@ C<MountAPIVFS=yes> is implied.',
       'ProtectKernelModules',
       {
         'description' => 'Takes a boolean argument. If true, explicit module loading will be denied. This allows
-module load and unload operations to be turned off on modular kernels. It is recommended to turn this on for most services
+module load and unload operations to be turned off on modular kernels. It is recommended to turn this on for most
+services
 that do not need special file systems or extra kernel modules to work. Defaults to off. Enabling this option
 removes C<CAP_SYS_MODULE> from the capability bounding set for the unit, and installs a
 system call filter to block module system calls, also C</usr/lib/modules> is made
@@ -3468,7 +3470,34 @@ then write() will be removed from the set.)
 
 As the number of possible system calls is large, predefined sets of system calls are provided. A set
 starts with C<\@> character, followed by name of the set.
-Currently predefined system call setsSetDescription\@aioAsynchronous I/O (L<io_setup(2)>, L<io_submit(2)>, and related calls)\@basic-ioSystem calls for basic I/O: reading, writing, seeking, file descriptor duplication and closing (L<read(2)>, L<write(2)>, and related calls)\@chownChanging file ownership (L<chown(2)>, L<fchownat(2)>, and related calls)\@clockSystem calls for changing the system clock (L<adjtimex(2)>, L<settimeofday(2)>, and related calls)\@cpu-emulationSystem calls for CPU emulation functionality (L<vm86(2)> and related calls)\@debugDebugging, performance monitoring and tracing functionality (L<ptrace(2)>, L<perf_event_open(2)> and related calls)\@file-systemFile system operations: opening, creating files and directories for read and write, renaming and removing them, reading file properties, or creating hard and symbolic links\@io-eventEvent loop system calls (L<poll(2)>, L<select(2)>, L<epoll(7)>, L<eventfd(2)> and related calls)\@ipcPipes, SysV IPC, POSIX Message Queues and other IPC (L<mq_overview(7)>, L<svipc(7)>)\@keyringKernel keyring access (L<keyctl(2)> and related calls)\@memlockLocking of memory in RAM (L<mlock(2)>, L<mlockall(2)> and related calls)\@moduleLoading and unloading of kernel modules (L<init_module(2)>, L<delete_module(2)> and related calls)\@mountMounting and unmounting of file systems (L<mount(2)>, L<chroot(2)>, and related calls)\@network-ioSocket I/O (including local AF_UNIX): L<socket(7)>, L<unix(7)>\@obsoleteUnusual, obsolete or unimplemented (L<create_module(2)>, L<gtty(2)>, \x{2026})\@privilegedAll system calls which need super-user capabilities (L<capabilities(7)>)\@processProcess control, execution, namespacing operations (L<clone(2)>, L<kill(2)>, L<namespaces(7)>, \x{2026})\@raw-ioRaw I/O port access (L<ioperm(2)>, L<iopl(2)>, pciconfig_read(), \x{2026})\@rebootSystem calls for rebooting and reboot preparation (L<reboot(2)>, kexec(), \x{2026})\@resourcesSystem calls for changing resource limits, memory and scheduling parameters (L<setrlimit(2)>, L<setpriority(2)>, \x{2026})\@setuidSystem calls for changing user ID and group ID credentials, (L<setuid(2)>, L<setgid(2)>, L<setresuid(2)>, \x{2026})\@signalSystem calls for manipulating and handling process signals (L<signal(2)>, L<sigprocmask(2)>, \x{2026})\@swapSystem calls for enabling/disabling swap devices (L<swapon(2)>, L<swapoff(2)>)\@syncSynchronizing files and memory to disk (L<fsync(2)>, L<msync(2)>, and related calls)\@system-serviceA reasonable set of system calls used by common system services, excluding any special purpose calls. This is the recommended starting point for allow-listing system calls for system services, as it contains what is typically needed by system services, but excludes overly specific interfaces. For example, the following APIs are excluded: C<\@clock>, C<\@mount>, C<\@swap>, C<\@reboot>.\@timerSystem calls for scheduling operations by time (L<alarm(2)>, L<timer_create(2)>, \x{2026})\@knownAll system calls defined by the kernel. This list is defined statically in systemd based on a kernel version that was available when this systemd version was released. It will become progressively more out-of-date as the kernel is updated.
+Currently predefined system call setsSetDescription\@aioAsynchronous I/O (L<io_setup(2)>, L<io_submit(2)>, and related
+calls)\@basic-ioSystem calls for basic I/O: reading, writing, seeking, file descriptor duplication and closing
+(L<read(2)>, L<write(2)>, and related calls)\@chownChanging file ownership (L<chown(2)>, L<fchownat(2)>, and related
+calls)\@clockSystem calls for changing the system clock (L<adjtimex(2)>, L<settimeofday(2)>, and related
+calls)\@cpu-emulationSystem calls for CPU emulation functionality (L<vm86(2)> and related calls)\@debugDebugging,
+performance monitoring and tracing functionality (L<ptrace(2)>, L<perf_event_open(2)> and related
+calls)\@file-systemFile system operations: opening, creating files and directories for read and write, renaming and
+removing them, reading file properties, or creating hard and symbolic links\@io-eventEvent loop system calls
+(L<poll(2)>, L<select(2)>, L<epoll(7)>, L<eventfd(2)> and related calls)\@ipcPipes, SysV IPC, POSIX Message Queues and
+other IPC (L<mq_overview(7)>, L<svipc(7)>)\@keyringKernel keyring access (L<keyctl(2)> and related calls)\@memlockLocking
+of memory in RAM (L<mlock(2)>, L<mlockall(2)> and related calls)\@moduleLoading and unloading of kernel modules
+(L<init_module(2)>, L<delete_module(2)> and related calls)\@mountMounting and unmounting of file systems (L<mount(2)>,
+L<chroot(2)>, and related calls)\@network-ioSocket I/O (including local AF_UNIX): L<socket(7)>,
+L<unix(7)>\@obsoleteUnusual, obsolete or unimplemented (L<create_module(2)>, L<gtty(2)>, \x{2026})\@privilegedAll system calls
+which need super-user capabilities (L<capabilities(7)>)\@processProcess control, execution, namespacing operations
+(L<clone(2)>, L<kill(2)>, L<namespaces(7)>, \x{2026})\@raw-ioRaw I/O port access (L<ioperm(2)>, L<iopl(2)>, pciconfig_read(),
+\x{2026})\@rebootSystem calls for rebooting and reboot preparation (L<reboot(2)>, kexec(), \x{2026})\@resourcesSystem calls for
+changing resource limits, memory and scheduling parameters (L<setrlimit(2)>, L<setpriority(2)>, \x{2026})\@setuidSystem calls
+for changing user ID and group ID credentials, (L<setuid(2)>, L<setgid(2)>, L<setresuid(2)>, \x{2026})\@signalSystem calls for
+manipulating and handling process signals (L<signal(2)>, L<sigprocmask(2)>, \x{2026})\@swapSystem calls for enabling/disabling
+swap devices (L<swapon(2)>, L<swapoff(2)>)\@syncSynchronizing files and memory to disk (L<fsync(2)>, L<msync(2)>, and
+related calls)\@system-serviceA reasonable set of system calls used by common system services, excluding any special
+purpose calls. This is the recommended starting point for allow-listing system calls for system services, as it
+contains what is typically needed by system services, but excludes overly specific interfaces. For example, the
+following APIs are excluded: C<\@clock>, C<\@mount>, C<\@swap>, C<\@reboot>.\@timerSystem calls for scheduling operations by
+time (L<alarm(2)>, L<timer_create(2)>, \x{2026})\@knownAll system calls defined by the kernel. This list is defined statically
+in systemd based on a kernel version that was available when this systemd version was released. It will become
+progressively more out-of-date as the kernel is updated.
 Note, that as new system calls are added to the kernel, additional system calls might be added to the groups
 above. Contents of the sets may also change between systemd versions. In addition, the list of system calls
 depends on the kernel version and architecture for which systemd was compiled. Use
@@ -3623,14 +3652,16 @@ securely.",
 a text file. The text file should contain newline-separated variable assignments. Empty lines, lines
 without an C<=> separator, or lines starting with C<;> or
 C<#> will be ignored, which may be used for commenting. The file must be UTF-8
-encoded. Valid characters are L<unicode scalar values|https://www.unicode.org/glossary/#unicode_scalar_value> other than
+encoded. Valid characters are L<unicode scalar values|https://www.unicode.org/glossary/#unicode_scalar_value> other
+than
 L<noncharacters|https://www.unicode.org/glossary/#noncharacter>, U+0000 NUL, and
 U+FEFF L<byte order mark|https://www.unicode.org/glossary/#byte_order_mark>.
 Control codes other than NUL are allowed.
 
 In the file, an unquoted value after the C<=> is parsed with the same backslash-escape
 rules as L<unquoted
-text|https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_02_01> in a POSIX shell, but unlike in a shell, interior whitespace is preserved and quotes after the
+text|https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_02_01> in a POSIX shell, but
+unlike in a shell, interior whitespace is preserved and quotes after the
 first non-whitespace character are preserved. Leading and trailing whitespace (space, tab, carriage return) is
 discarded, but interior whitespace within the line is preserved verbatim. A line ending with a backslash will be
 continued to the following one, with the newline itself discarded. A backslash
@@ -3639,12 +3670,14 @@ C<\\\\> will become the value C<\\>.
 
 In the file, a C<\'>-quoted value after the C<=> can span multiple lines
 and contain any character verbatim other than single quote, like L<single-quoted
-text|https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_02_02> in a POSIX shell. No backslash-escape sequences are recognized. Leading and trailing whitespace
+text|https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_02_02> in a POSIX shell. No
+backslash-escape sequences are recognized. Leading and trailing whitespace
 outside of the single quotes is discarded.
 
 In the file, a C<">-quoted value after the C<=> can span multiple lines,
 and the same escape sequences are recognized as in L<double-quoted
-text|https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_02_03> of a POSIX shell. Backslash (C<\\>) followed by any of C<"\\`$> will
+text|https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_02_03> of a POSIX shell.
+Backslash (C<\\>) followed by any of C<"\\`$> will
 preserve that character. A backslash followed by newline is a line continuation, and the newline itself is
 discarded. A backslash followed by any other character is ignored; both the backslash and the following
 character are preserved verbatim. Leading and trailing whitespace outside of the double quotes is
@@ -3925,7 +3958,8 @@ appends a new line to the end of the buffer). Note that leading and trailing whi
 with this option is removed. If an empty line is specified the buffer is cleared (hence, in order to insert an
 empty line, add an additional C<\\n> to the end or beginning of a line).
 
-C<StandardInputData> accepts arbitrary binary data, encoded in L<Base64|https://tools.ietf.org/html/rfc2045#section-6.8>. No escape sequences or specifiers are
+C<StandardInputData> accepts arbitrary binary data, encoded in
+L<Base64|https://tools.ietf.org/html/rfc2045#section-6.8>. No escape sequences or specifiers are
 resolved. Any whitespace in the encoded version is ignored during decoding.
 
 Note that C<StandardInputText> and C<StandardInputData> operate on the
@@ -3955,7 +3989,8 @@ appends a new line to the end of the buffer). Note that leading and trailing whi
 with this option is removed. If an empty line is specified the buffer is cleared (hence, in order to insert an
 empty line, add an additional C<\\n> to the end or beginning of a line).
 
-C<StandardInputData> accepts arbitrary binary data, encoded in L<Base64|https://tools.ietf.org/html/rfc2045#section-6.8>. No escape sequences or specifiers are
+C<StandardInputData> accepts arbitrary binary data, encoded in
+L<Base64|https://tools.ietf.org/html/rfc2045#section-6.8>. No escape sequences or specifiers are
 resolved. Any whitespace in the encoded version is ignored during decoding.
 
 Note that C<StandardInputText> and C<StandardInputData> operate on the
@@ -4247,8 +4282,10 @@ C<%d/mycred>, e.g. C<Environment=MYCREDPATH=%d/mycred>.
 Currently, an accumulated credential size limit of 1 MB per unit is enforced.
 
 The service manager itself may receive system credentials that can be propagated to services
-from a hosting container manager or VM hypervisor. See the L<Container Interface|https://systemd.io/CONTAINER_INTERFACE> documentation for details
-about the former. For the latter, pass L<DMI/SMBIOS|https://www.dmtf.org/standards/smbios> OEM string table entries (field type
+from a hosting container manager or VM hypervisor. See the L<Container
+Interface|https://systemd.io/CONTAINER_INTERFACE> documentation for details
+about the former. For the latter, pass L<DMI/SMBIOS|https://www.dmtf.org/standards/smbios> OEM string table entries
+(field type
 11) with a prefix of C<io.systemd.credential:> or
 C<io.systemd.credential.binary:>. In both cases a key/value pair separated by
 C<=> is expected, in the latter case the right-hand side is Base64 decoded when
@@ -4266,7 +4303,8 @@ L<systemd-stub(7)>.
 If referencing an C<AF_UNIX> stream socket to connect to, the connection will
 originate from an abstract namespace socket, that includes information about the unit and the
 credential ID in its socket name. Use L<getpeername(2)>
-to query this information. The returned socket name is formatted as C<NUL>RANDOM C</unit/> UNITC</> ID, i.e. a C<NUL> byte (as required
+to query this information. The returned socket name is formatted as C<NUL>RANDOM C</unit/> UNITC</> ID, i.e. a C<NUL>
+byte (as required
 for abstract namespace socket names), followed by a random string (consisting of alphadecimal
 characters), followed by the literal string C</unit/>, followed by the requesting
 unit name, followed by the literal character C</>, followed by the textual credential
@@ -4354,8 +4392,10 @@ C<%d/mycred>, e.g. C<Environment=MYCREDPATH=%d/mycred>.
 Currently, an accumulated credential size limit of 1 MB per unit is enforced.
 
 The service manager itself may receive system credentials that can be propagated to services
-from a hosting container manager or VM hypervisor. See the L<Container Interface|https://systemd.io/CONTAINER_INTERFACE> documentation for details
-about the former. For the latter, pass L<DMI/SMBIOS|https://www.dmtf.org/standards/smbios> OEM string table entries (field type
+from a hosting container manager or VM hypervisor. See the L<Container
+Interface|https://systemd.io/CONTAINER_INTERFACE> documentation for details
+about the former. For the latter, pass L<DMI/SMBIOS|https://www.dmtf.org/standards/smbios> OEM string table entries
+(field type
 11) with a prefix of C<io.systemd.credential:> or
 C<io.systemd.credential.binary:>. In both cases a key/value pair separated by
 C<=> is expected, in the latter case the right-hand side is Base64 decoded when
@@ -4373,7 +4413,8 @@ L<systemd-stub(7)>.
 If referencing an C<AF_UNIX> stream socket to connect to, the connection will
 originate from an abstract namespace socket, that includes information about the unit and the
 credential ID in its socket name. Use L<getpeername(2)>
-to query this information. The returned socket name is formatted as C<NUL>RANDOM C</unit/> UNITC</> ID, i.e. a C<NUL> byte (as required
+to query this information. The returned socket name is formatted as C<NUL>RANDOM C</unit/> UNITC</> ID, i.e. a C<NUL>
+byte (as required
 for abstract namespace socket names), followed by a random string (consisting of alphadecimal
 characters), followed by the literal string C</unit/>, followed by the requesting
 unit name, followed by the literal character C</>, followed by the textual credential

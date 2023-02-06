@@ -15,7 +15,7 @@ name: Task-Dancer2
 provides:
   Task::Dancer2:
     file: lib/Task/Dancer2.pm
-    version: 0.06
+    version: 0.07
 requires:
   perl: 5.00
 resources:

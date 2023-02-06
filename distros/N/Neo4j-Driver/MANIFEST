@@ -45,11 +45,13 @@ t/json-utf8.t
 t/lib/Neo4j_Test.pm
 t/lib/Neo4j_Test/EchoHTTP.pm
 t/lib/Neo4j_Test/MockHTTP.pm
+t/lib/Neo4j_Test/MockQuery.pm
 t/lib/Neo4j_Test/NetModulePlugin.pm
 t/lib/Neo4j_Test/Sim.pm
 t/net-lwp.t
 t/plugins.t
 t/record.t
+t/session-execute.t
 t/session.t
 t/simulator/1b50ab87c090165edcff76695714a028.json
 t/simulator/258e20659e551c22f831022dfc85eaf3.json
@@ -114,7 +116,6 @@ t/tx-concurrent.t
 t/types.t
 xt/author/compatibility.t
 xt/author/cpan-distros.t
-xt/author/critic.t
 xt/author/internals.t
 xt/author/minimum-version.t
 xt/author/pod-syntax.t

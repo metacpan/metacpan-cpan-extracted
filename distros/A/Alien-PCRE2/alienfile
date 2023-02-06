@@ -16,15 +16,17 @@ plugin 'PkgConfig' => (
 );
  
 share {
-    plugin Download => (
-        url => 'https://github.com/PhilipHazel/pcre2/releases',
+    plugin 'Download::GitHub' => (
+        github_user => 'PhilipHazel',
+        github_repo => 'pcre2',
 
-        filter => qr/^pcre2-.*\.tar\.gz$/,
+        asset        => 1,
+        asset_name   => qr/^pcre2-.*\.tar\.gz$/,
+        asset_format => 'tar.gz',
 
 #        version => qr/([0-9\.]+)/,  # error, prefers 10.21 over 10.23
         version => qr/^pcre2-([0-9\.]+)/,
     );
-    plugin Extract => 'tar.gz';
     plugin 'Build::Autoconf' => ();
     build [
 #        '%{configure} --enable-pcre2-16 --enable-pcre2-32 --disable-shared',
@@ -33,7 +35,7 @@ share {
 #        '%{make} install',
 #        '%{dmake}',
 #        '%{dmake} install',
-        '%{gmake}',
-        '%{gmake} install',
+        '%{gmake} noinst_PROGRAMS=',
+        '%{gmake} install noinst_PROGRAMS=',
     ];
 };

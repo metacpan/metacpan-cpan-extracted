@@ -1,3 +1,15 @@
+1.007   2023-02-03  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add csv-check-values as alias for csv-check-cell.
+
+        - [cli csv-check-cell] Add option --with-regex.
+
+
+1.006   2023-02-03  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utilties: csv-check-field, csv-check-cell.
+
+
 1.005   2023-02-02  Released-By: PERLANCAR; Urgency: medium
 
         - Add utility: csv-sorted-fields.

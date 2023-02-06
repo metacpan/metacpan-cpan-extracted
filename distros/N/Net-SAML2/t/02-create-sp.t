@@ -162,6 +162,11 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
         is($kd->getAttribute('use'),
             "signing", "Key descriptor is there for signing only");
 
+        ok(
+            !$kd->getAttribute('encryption'),
+            "Key descriptor encryption is undefined"
+        );
+
         my $ki = get_single_node_ok($xpath, $kd->nodePath() . "/ds:KeyInfo");
 
         my $cert = get_single_node_ok($xpath,
@@ -192,6 +197,30 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
         my $node = get_single_node_ok($xpath, '/node()/ds:Signature');
 
     }
+
+}
+{
+    my $sp = net_saml2_sp( ( encryption_key => 't/sign-nopw-cert.pem' ) );
+
+    my $xpath = get_xpath(
+        $sp->metadata,
+        md => URN_METADATA,
+        ds => URN_SIGNATURE,
+    );
+
+    # Test SPSSODescriptor
+    my $node = get_single_node_ok($xpath, '/node()/md:SPSSODescriptor');
+    my $p = $node->nodePath();
+
+    my $kd = get_single_node_ok($xpath, "$p/md:KeyDescriptor[\@use='signing']");
+
+    is($kd->getAttribute('use'),
+        "signing", "Key descriptor is there for signing");
+
+    $kd = get_single_node_ok($xpath, "$p/md:KeyDescriptor[\@use='encryption']");
+
+    is($kd->getAttribute('use'),
+        "encryption", "Key descriptor is there for encryption");
 
 }
 

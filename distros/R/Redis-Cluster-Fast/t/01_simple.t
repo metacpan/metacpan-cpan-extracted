@@ -23,4 +23,8 @@ is $redis->mset('{my}hoge', 'test', '{my}fuga', 'test2'), 'OK';
 my @res = $redis->mget('{my}hoge', '{my}fuga');
 is_deeply \@res, [ 'test', 'test2' ];
 
+$redis->hset('myhash', 'field1', 'Hello');
+$redis->hset('myhash', 'field2', 'ByeBye');
+is_deeply scalar $redis->hgetall('myhash'), { field1 => 'Hello', field2 => 'ByeBye' };
+
 done_testing;

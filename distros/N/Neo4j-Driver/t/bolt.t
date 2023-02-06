@@ -3,13 +3,13 @@ use strict;
 use warnings;
 use lib qw(./lib t/lib);
 
-use Test::More 0.88;
+use Test::More 0.94;
 use Test::Exception;
 use Test::Warnings qw(warning);
 
 
 package Local::Bolt;
-sub new { bless \(my $b = undef), shift }
+sub new { bless [\(my $b = undef), @_], shift }
 sub connect { &new }
 sub connect_tls { &new }
 
@@ -17,8 +17,9 @@ sub connect_tls { &new }
 sub connected { 1 }
 sub errnum { 0 }
 sub errmsg { undef }
+sub reset_cxn {}
 sub server_id { __PACKAGE__ }
-sub run_query { my $b = shift; $$b = 0; $b }
+sub run_query { my $b = shift; ${$b->[0]} = 0; $b }
 
 # ResultStream
 use JSON::PP;
@@ -35,7 +36,7 @@ my @row = (
 	( bless { properties => {} }, 'Neo4j::Bolt::Relationship' ),
 );
 sub field_names { 0..9 }
-sub fetch_next { my $b = shift; return if $$b; $$b = 1; @row }
+sub fetch_next { my $b = shift; return if ${$b->[0]}; ${$b->[0]} = 1; @row }
 sub update_counts { {} }
 sub success { 1 }
 sub failure { 0 }
@@ -61,6 +62,17 @@ sub connected { 0 }
 sub client_errnum { -13 }
 sub client_errmsg { "all wrong" }
 
+package Local::Bolt::FailureRef;
+sub new { bless $_[1], shift }
+sub server_errcode { shift->{server_errcode} }
+sub server_errmsg { shift->{server_errmsg} }
+sub client_errnum { shift->{client_errnum} // 0 }
+sub client_errmsg { shift->{client_errmsg} }
+sub errnum { shift->{errnum} // 0 }
+sub errmsg { shift->{errmsg} }
+sub reset_cxn { $_[0]->{$_} = $_[0]->{"reset_$_"} for qw( errnum errmsg ); }
+sub _bolt_error { &Neo4j::Driver::Net::Bolt::_bolt_error }
+
 package main;
 
 
@@ -81,7 +93,7 @@ sub new_session {
 
 my ($s, $f, $t, $r, $v);
 
-plan tests => 1 + 8 + 1;
+plan tests => 1 + 9 + 1;
 
 
 lives_and { ok $s = new_session('Local::Bolt') } 'driver';
@@ -128,18 +140,30 @@ subtest 'deep_bless' => sub {
 
 
 subtest 'txn' => sub {
-	plan tests => 9;
+	plan tests => 15;
 	lives_and { ok $t = $s->begin_transaction } 'begin 1';
 	lives_and { ok $r = $t->run('dummy') } 'run';
 	lives_and { is $r->size(), 1 } 'size';
 	lives_and { is $r->list->[0]->get(7), 42 } 'get';
-	lives_and { $t->rollback } 'rollback';
+	lives_ok { $t->rollback } 'rollback';
 	dies_ok { $t->commit; } 'closed 1';
 	lives_and { ok $t = $s->begin_transaction } 'begin 2';
 	dies_ok { $s->begin_transaction } 'nested explicit';
 	dies_ok { $s->run('') } 'nested auto';
-	lives_and { $t->commit } 'commit';
+	lives_ok { $t->commit } 'commit';
 	dies_ok { $t->rollback; } 'closed 2';
+	lives_and {
+		is $s->execute_write( sub { shift->{bolt_txn}[3]{mode} } ), 'w';
+	} 'managed write mode';
+	lives_and {
+		is $s->execute_read(  sub { shift->{bolt_txn}[3]{mode} } ), 'r';
+	} 'managed read mode';
+	throws_ok {
+		$s->execute_write( sub { shift->commit } );
+	} qr/\bcommit\b.*\bmanaged transaction\b/i, 'managed explicit commit dies';
+	throws_ok {
+		$s->execute_read( sub { shift->rollback } );
+	} qr/\brollback\b.*\bmanaged transaction\b/i, 'managed explicit rollback dies';
 };
 
 
@@ -168,6 +192,52 @@ subtest 'bolt error' => sub {
 		$f->run([['A'],['B']]);
 	} qr/\bmultiple statements\b/i, 'no multiple';
 	throws_ok { new_session('Local::Bolt::CxnFailure') } qr/Bolt error -13: all wrong/i, 'new cxn failure';
+};
+
+
+subtest 'bolt trigger error' => sub {
+	plan tests => 9 * 2;
+	my $h = sub { $f = shift };
+	$r = Local::Bolt::FailureRef->new({ server_errcode => '31' });
+	Neo4j::Driver::Net::Bolt->_trigger_bolt_error($r, $h);
+	is $f->source, 'Server', 'server_errcode source';
+	is $f->code, '31', 'server_errcode code';
+	$r = Local::Bolt::FailureRef->new({ server_errmsg => '37' });
+	Neo4j::Driver::Net::Bolt->_trigger_bolt_error($r, $h);
+	is $f->source, 'Server', 'server_errmsg source';
+	is $f->message, '37', 'server_errmsg message';
+	$r = Local::Bolt::FailureRef->new({ client_errnum => '41' });
+	Neo4j::Driver::Net::Bolt->_trigger_bolt_error($r, $h);
+	is $f->source, 'Network', 'client_errnum source';
+	is $f->code, '41', 'client_errnum message';
+	$r = Local::Bolt::FailureRef->new({ client_errmsg => '43' });
+	Neo4j::Driver::Net::Bolt->_trigger_bolt_error($r, $h);
+	is $f->source, 'Network', 'client_errmsg source';
+	is $f->message, '43', 'client_errmsg message';
+	$r = Local::Bolt::FailureRef->new({ errnum => '47' });
+	Neo4j::Driver::Net::Bolt->_trigger_bolt_error($r, $h);
+	is $f->source, 'Network', 'errnum source';
+	is $f->code, '47', 'errnum message';
+	$r = Local::Bolt::FailureRef->new({ errmsg => '53' });
+	Neo4j::Driver::Net::Bolt->_trigger_bolt_error($r, $h);
+	is $f->source, 'Network', 'errmsg source';
+	is $f->message, '53', 'errmsg message';
+	# eval cxn
+	$r = Local::Bolt::FailureRef->new({ errnum => '59' });
+	$r = Local::Bolt::FailureRef->new({ connection => $r });
+	Neo4j::Driver::Net::Bolt::_trigger_bolt_error($r, $r, $h);
+	is $f->source, 'Network', 'cxn errnum source';
+	is $f->code, '59', 'cxn errnum message';
+	$r = Local::Bolt::FailureRef->new({ errmsg => '61' });
+	my $r2 = Local::Bolt::FailureRef->new({ connection => $r });
+	Neo4j::Driver::Net::Bolt::_trigger_bolt_error($r2, $r, $h);
+	is $f->source, 'Network', 'cxn errmsg source';
+	is $f->message, '61', 'cxn errmsg message';
+	$r = Local::Bolt::FailureRef->new({ reset_errnum => '67' });
+	$r = Local::Bolt::FailureRef->new({ connection => $r });
+	Neo4j::Driver::Net::Bolt::_trigger_bolt_error($r, $r, $h);
+	is $f->source, 'Internal', 'cxn reset errnum source';
+	is $f->code, '67', 'cxn reset errnum message';
 };
 
 

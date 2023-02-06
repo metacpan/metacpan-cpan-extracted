@@ -6,7 +6,7 @@ Template::Perlish - Yet Another Templating system for Perl
 
 =head1 VERSION
 
-This document describes Template::Perlish version 1.56.
+This document describes Template::Perlish version 1.58.
 
 
 =head1 SYNOPSIS
@@ -289,7 +289,8 @@ template:
    use Template::Perlish qw< render >;
    my $rendered = render($template);              # OR
    my $rendered = render($template, %variables);  # OR
-   my $rendered = render($template, $var_referEnce);
+   my $rendered = render($template, $var_ref);    # OR
+   my $rendered = render($template, $var_ref, $opts_ref);
 
 if you already have a template and the variables to fill it in, this is
 probably the quickest thing to do.
@@ -297,6 +298,8 @@ probably the quickest thing to do.
 You can pass the template alone, or you can pass the variables as well,
 either as a flat list (that will be converted back to a hash) or as a
 single reference.
+
+It's also possible to set all options described for constructor L</new>, as long as you
 
 Returns the rendered template, i.e. the same output as L</process>. Note
 that it assumes the default values for options explained in L</new>.
@@ -321,6 +324,13 @@ but only the following will make sense:
 
 string to set C<binmode> on the output filehandle. A defined value
 disables the default to C<utf8>.
+
+=item I<functions>
+
+(as of version 1.58) hash reference with functions that will be injected
+in the C<Template::Perlish> namespace for the duration of the template
+evaluation. Keys are assumed to be valid function names, values are
+assumed to be valid sub references.
 
 =item I<method_over_keys>
 

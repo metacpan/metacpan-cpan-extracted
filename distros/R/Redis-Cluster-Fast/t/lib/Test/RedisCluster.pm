@@ -16,8 +16,12 @@ use constant {
 };
 
 sub get_startup_nodes {
-    my $ports = REDIS_CLUSTER_PORTS;
-    [ map {"localhost:$_"} @$ports ];
+    if (my $nodes = $ENV{TEST_REDIS_CLUSTER_STARTUP_NODES}) {
+        return [ split(/,/, $nodes) ];
+    } else {
+        my $ports = REDIS_CLUSTER_PORTS;
+        return [ map {"localhost:$_"} @$ports ];
+    }
 }
 
 sub _get_container_ports {
@@ -26,7 +30,7 @@ sub _get_container_ports {
 }
 
 my $redis_cluster_guard;
-unless ($ENV{DISABLE_TEST_REDIS_CLUSTER}) {
+unless ($ENV{TEST_REDIS_CLUSTER_STARTUP_NODES}) {
     $redis_cluster_guard = Test::RedisClusterImage->new(
         boot => 'Test::RedisClusterBoot',
         container_ports => _get_container_ports,

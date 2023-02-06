@@ -5,7 +5,7 @@
    ],
    "description" : "PCRE2 is the new Perl Compatible Regular Expression engine, written in C, compiled and installed via Alien",
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "alien",
       "pcre",
@@ -32,6 +32,7 @@
          "requires" : {
             "Alien::Build" : "0.32",
             "Alien::Build::MM" : "0.32",
+            "Alien::Build::Plugin::Download::Negotiate" : "1.30",
             "Alien::gmake" : "0.11",
             "Archive::Tar" : "0",
             "Config" : "0",
@@ -41,8 +42,8 @@
             "IO::Zlib" : "0",
             "Mojo::DOM" : "0",
             "Mojolicious" : "7.00",
+            "Mozilla::CA" : "0",
             "Net::SSLeay" : "1.49",
-            "Sort::Versions" : "0",
             "URI" : "0",
             "URI::Escape" : "0"
          }
@@ -51,6 +52,7 @@
          "requires" : {
             "Alien::Build" : "1.40",
             "Alien::Build::MM" : "0.32",
+            "Alien::Build::Plugin::Download::GitHub" : "0.10",
             "ExtUtils::MakeMaker" : "6.52"
          }
       },
@@ -96,11 +98,12 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.016000",
+   "version" : "0.017000",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 2.48",
+      "generated_by" : "Alien::Build::MM version 2.73",
       "requires" : {
          "share" : {
+            "Alien::Build::Plugin::Download::Negotiate" : "1.30",
             "Alien::gmake" : "0.11",
             "Archive::Tar" : "0",
             "Config" : "0",
@@ -109,8 +112,8 @@
             "IO::Zlib" : "0",
             "Mojo::DOM" : "0",
             "Mojolicious" : "7.00",
+            "Mozilla::CA" : "0",
             "Net::SSLeay" : "1.49",
-            "Sort::Versions" : "0",
             "URI" : "0",
             "URI::Escape" : "0"
          },

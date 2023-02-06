@@ -8,15 +8,11 @@ build_requires:
   File::Temp: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Pod::Coverage::TrustPod: '0'
-  Test::CPAN::Meta: '0'
   Test::More: '0.88'
-  Test::Pod: '0'
-  Test::Pod::Coverage: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 keywords:
   - system
   - command
@@ -28,10 +24,10 @@ name: System-Command
 provides:
   System::Command:
     file: lib/System/Command.pm
-    version: '1.121'
+    version: '1.122'
   System::Command::Reaper:
     file: lib/System/Command/Reaper.pm
-    version: '1.121'
+    version: '1.122'
 requires:
   Carp: '0'
   Cwd: '0'
@@ -51,8 +47,11 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=System-Command
   repository: http://github.com/book/System-Command.git
-version: '1.121'
+version: '1.122'
 x_contributors:
+  - 'Olaf Alders <oalders@cpan.org>'
+  - 'Lisa Hansen <Lisa.Hansen@sas.com>'
+  - 'Slaven Rezić <srezic@cpan.org>'
   - 'Michael McClimon <mmcclimon@cpan.org>'
   - 'Ed J <etj@cpan.org>'
   - 'viviparous <viviparous@github.com>'
@@ -66,5 +65,6 @@ x_contributors:
   - 'Olivier Mengué <dolmen@cpan.org>'
   - 'mokko <mauricemengel@gmail.com>'
   - 'Alessandro Ghedini <al3xbio@gmail.com>'
-x_generated_by_perl: v5.28.1
+x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

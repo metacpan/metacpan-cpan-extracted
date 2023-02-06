@@ -1,11 +1,12 @@
 package Net::SAML2::Binding::SOAP;
 use Moose;
 
-our $VERSION = '0.62'; # VERSION
+our $VERSION = '0.64'; # VERSION
 
 use MooseX::Types::URI qw/ Uri /;
 use Net::SAML2::XML::Util qw/ no_comments /;
 use Carp qw(croak);
+use Try::Tiny;
 
 with 'Net::SAML2::Role::VerifyXML';
 
@@ -33,7 +34,7 @@ sub build_user_agent {
 has 'url'      => (isa => Uri, is => 'ro', required => 1, coerce => 1);
 has 'key'      => (isa => 'Str', is => 'ro', required => 1);
 has 'cert'     => (isa => 'Str', is => 'ro', required => 1);
-has 'idp_cert' => (isa => 'Str', is => 'ro', required => 1);
+has 'idp_cert' => (isa => 'ArrayRef[Str]', is => 'ro', required => 1, predicate => 'has_idp_cert');
 has 'cacert' => (
     is        => 'ro',
     isa       => 'Str',
@@ -46,6 +47,26 @@ has 'anchors' => (
     required  => 0,
     predicate => 'has_anchors'
 );
+
+# BUILDARGS
+
+# Earlier versions expected the idp_cert to be a string.  However, metadata
+# can include multiple signing certificates so the $idp->cert is now
+# expected to be an arrayref to the certificates.  To avoid breaking existing
+# applications this changes the the cert to an arrayref if it is not
+# already an array ref.
+
+around BUILDARGS => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    my %params = @_;
+    if ($params{idp_cert} && ref($params{idp_cert}) ne 'ARRAY') {
+            $params{idp_cert} = [$params{idp_cert}];
+    }
+
+    return $self->$orig(%params);
+};
 
 
 sub request {
@@ -81,15 +102,27 @@ sub handle_response {
     my ($self, $response) = @_;
 
     my $saml = _get_saml_from_soap($response);
-    $self->verify_xml(
-        $saml,
-        no_xml_declaration => 1,
-        cert_text          => $self->idp_cert,
-        cacert             => $self->cacert,
-        anchors            => $self->anchors
-    );
-    return $saml;
+    my @errors;
+    foreach my $cert (@{$self->idp_cert}) {
+        my $success = try {
+            $self->verify_xml(
+                $saml,
+                no_xml_declaration => 1,
+                cert_text          => $cert,
+                cacert             => $self->cacert,
+                anchors            => $self->anchors
+            );
+            return 1;
+        }
+        catch { push (@errors, $_); return 0; };
 
+        return $saml if $success;
+    }
+
+    if (@errors) {
+        croak "Unable to verify XML with the given certificates: "
+        . join(", ", @errors);
+    }
 }
 
 
@@ -97,13 +130,25 @@ sub handle_request {
     my ($self, $request) = @_;
 
     my $saml = _get_saml_from_soap($request);
+    my @errors;
     if (defined $saml) {
-        $self->verify_xml(
-            $saml,
-            cert_text => $self->idp_cert,
-            cacert    => $self->cacert
-        );
-        return $saml;
+        foreach my $cert (@{$self->idp_cert}) {
+            my $success = try {
+                $self->verify_xml(
+                    $saml,
+                    cert_text => $cert,
+                    cacert    => $self->cacert
+                );
+                return 1;
+            }
+            catch { push (@errors, $_); return 0; };
+            return $saml if $success;
+        }
+
+        if (@errors) {
+            croak "Unable to verify XML with the given certificates: "
+            . join(", ", @errors);
+        }
     }
 
     return;
@@ -158,11 +203,7 @@ sub create_soap_envelope {
     die "failed to sign" unless $ret;
 
     my $soap = <<"SOAP";
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
-<SOAP-ENV:Body>
-$signed_message
-</SOAP-ENV:Body>
-</SOAP-ENV:Envelope>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"><SOAP-ENV:Body>$signed_message</SOAP-ENV:Body></SOAP-ENV:Envelope>
 SOAP
     return $soap;
 }
@@ -181,7 +222,7 @@ Net::SAML2::Binding::SOAP - Net::SAML2::Binding::SOAP - SOAP binding for SAML
 
 =head1 VERSION
 
-version 0.62
+version 0.64
 
 =head1 SYNOPSIS
 
@@ -259,13 +300,23 @@ Accepts a string containing the complete SOAP request.
 
 Signs and SOAP-wraps the given message.
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Chris Andrews  <chrisa@cpan.org>
 
+=item *
+
+Timothy Legge <timlegge@gmail.com>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Chris Andrews and Others, see the git log.
+This software is copyright (c) 2023 by Venda Ltd, see the CONTRIBUTORS file for others.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

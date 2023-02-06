@@ -1,19 +1,16 @@
 NAME
-
     Net::Iperf::Parser - Parse a single iperf line result
 
 VERSION
-
-    version 0.03
+    version 0.04
 
 SYNOPSIS
-
       use Net::Iperf::Parser;
-    
+
       my $p = new Net::Iperf::Parser;
-    
+
       my @rows = `iperf -c iperf.volia.net -P 2`;
-    
+
       foreach (@rows) {
         $p->parse($_);
         print $p->dump if ($p->is_valid && $p->is_global_avg);
@@ -34,66 +31,50 @@ SYNOPSIS
       }
 
 DESCRIPTION
-
     Parse a single iperf line result in default or CSV mode
 
 METHODS
-
- start
-
+  start
     Return the start time
 
- end
-
+  end
     Return the end time
 
- is_valid
-
+  is_valid
     Return if the parsed row is a valid iperf row
 
- is_process_avg
-
+  is_process_avg
     Return if the row is a process average value
 
- is_global_avg
-
+  is_global_avg
     Return if the row is the last summary value
 
- speed
-
+  speed
     Return the speed calculated in bps
 
- speedk
-
+  speedk
     Return the speed calculated in Kbps
 
- speedm
-
+  speedm
     Return the speed calculated in Mbps
 
- dump
-
+  dump
     Return a to_string version of the object (like a Data::Dumper::dumper)
 
- parse($row)
-
+  parse($row)
     Parse a single iperf line result
 
- parsecsv($row)
-
+  parsecsv($row)
     Parse a single iperf line result in CSV mode (-y C)
 
 SEE ALSO
-
     iperf <https://iperf.fr/>
 
 AUTHOR
-
     Emiliano Bruni <info@ebruni.it>
 
 COPYRIGHT AND LICENSE
-
-    This software is copyright (c) 2019 by Emiliano Bruni.
+    This software is copyright (c) 2019-2023 by Emiliano Bruni.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

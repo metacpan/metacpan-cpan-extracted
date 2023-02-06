@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,13 +20,14 @@ requires:
   Moo: '0'
   Type::Tiny: '0'
   Types::Standard: '0'
-  perl: '5.010'
+  perl: '5.008'
 resources:
   IRC: irc://irc.perl.org/#dancer
   WebIRC: https://chat.mibbit.com/#dancer@irc.perl.org
   bugtracker: https://github.com/cromedome/Dancer2-Session-CHI/issues
   homepage: http://perldancer.org/
   repository: git://github.com/cromedome/Dancer2-Session-CHI.git
-version: '0.04'
-x_generated_by_perl: v5.28.0
+version: '0.05'
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

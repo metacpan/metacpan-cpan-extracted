@@ -124,11 +124,11 @@ You can find documentation for this module with the perldoc command.
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2022 by Reginaldo Costa.
+This software is Copyright (c) 2022 by REFECO.
 
 This is free software, licensed under:
 
-  The Artistic License 2.0 (GPL Compatible)
+  The MIT License
 
 =cut
 

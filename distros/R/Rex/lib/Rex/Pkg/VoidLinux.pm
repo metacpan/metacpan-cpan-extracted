@@ -3,8 +3,6 @@
 # based on Rex::Pkg::Arch
 # (c) Harm Müller <harm _DOT_ mueller _AT_ g m a i l _Dot_ com>
 #
-# vim: set ts=2 sw=2 tw=0:
-# vim: set expandtab:
 
 package Rex::Pkg::VoidLinux;
 
@@ -12,7 +10,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.4'; # VERSION
+our $VERSION = '1.14.0'; # VERSION
 
 use Rex::Helper::Run;
 use Rex::Commands::File;

@@ -28,9 +28,10 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.206';
+our $VERSION = '1.207';
 
 use overload '""' => sub {${$_[0]}}, 'cmp' => sub{${$_[0]} cmp $_[1]};
+use Quiq::Path;
 use File::Temp ();
 
 # -----------------------------------------------------------------------------
@@ -54,6 +55,10 @@ use File::Temp ();
 Entferne das Verzeichnis bei Beendigung des Programms. Wenn 0, bleibt das
 Verzeichnis nach Beendigung des Programms bestehen.
 
+=item -parentDir => $dir
+
+Erzeuge das temporäre Verzeichnis unterhalb von Verzeichnis $dir.
+
 =back
 
 =head4 Returns
@@ -76,9 +81,11 @@ sub new {
     # Optionen und Argumente
 
     my $cleanup = 1;
+    my $parentDir = undef;
 
     my $argA = $class->parameters(0,0,\@_,
         -cleanup => \$cleanup,
+        -parentDir => \$parentDir,
     );
 
     # Wir setzen unsere Optionen in die Optionen von File::Temp::newdir() um
@@ -86,6 +93,9 @@ sub new {
     my @args;
     if (defined $cleanup) {
         push @args,'CLEANUP',$cleanup;
+    }
+    if ($parentDir) {
+        push @args,'DIR',Quiq::Path->expandTilde($parentDir);
     }
 
     # Objekt instantiieren
@@ -96,7 +106,7 @@ sub new {
 
 =head1 VERSION
 
-1.206
+1.207
 
 =head1 AUTHOR
 
@@ -104,7 +114,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2022 Frank Seitz
+Copyright (C) 2023 Frank Seitz
 
 =head1 LICENSE
 

@@ -1,5 +1,5 @@
 package Kx;
-$Kx::VERSION = '0.042';
+$Kx::VERSION = '0.044';
 use 5.008;
 use strict;
 use warnings;
@@ -1611,7 +1611,7 @@ type for the array.  Only simple types are allowed at the moment.
 =cut
 
 package Kx::LIST;
-$Kx::LIST::VERSION = '0.042';
+$Kx::LIST::VERSION = '0.044';
 use 5.008;
 use strict;
 use warnings;
@@ -1967,7 +1967,7 @@ package Kx::HASH;
 #####################################################################
 #                           K Hash package                          #
 #####################################################################
-$Kx::HASH::VERSION = '0.042';
+$Kx::HASH::VERSION = '0.044';
 =head1 Kx::HASH
 
 You may wish to tie a Perl hash to a Kdb+ variable. Well, you can do

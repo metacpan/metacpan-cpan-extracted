@@ -21,7 +21,7 @@ use Travel::Status::DE::HAFAS::Polyline qw(decode_polyline);
 use Travel::Status::DE::HAFAS::Journey;
 use Travel::Status::DE::HAFAS::StopFinder;
 
-our $VERSION = '4.05';
+our $VERSION = '4.07';
 
 # {{{ Endpoint Definition
 
@@ -703,8 +703,10 @@ sub station {
 
 	if ($loc) {
 		$self->{station_info} = {
-			name => $loc->{name},
-			uic  => $loc->{extId},
+			name  => $loc->{name},
+			eva   => $loc->{extId},
+			names => [ map { $locL[ $_->[0] ]{name} } @prefcounts ],
+			evas  => [ map { $locL[ $_->[0] ]{extId} } @prefcounts ],
 		};
 	}
 	else {
@@ -794,7 +796,7 @@ monitors
 
 =head1 VERSION
 
-version 4.05
+version 4.07
 
 =head1 DESCRIPTION
 
@@ -949,13 +951,14 @@ service messages. Each message belongs to at least one arrival/departure.
 
 =item $status->station
 
-Returns a hashref describing the most common departure station in all requested
-journeys. Note that this may be different from the station for which departures
-were requested, as HAFAS uses different identifiers for train stations, bus
-stops, and other modes of transit even if they are interlinked.
+Returns a hashref describing the departure stations in all requested journeys.
+The hashref contains four entries: B<names> (station names), B<name> (most
+common name), B<evas> (UIC / EVA IDs), and B<eva> (most common UIC / EVA ID).
+These are subject to change.
 
-The hashref contains two entries: B<name> (station name) and B<uic> (UIC / EVA
-ID). These are subject to change.
+Note that the most common name and ID may be different from the station for
+which departures were requested, as HAFAS uses different identifiers for train
+stations, bus stops, and other modes of transit even if they are interlinked.
 
 Not available in journey mode.
 

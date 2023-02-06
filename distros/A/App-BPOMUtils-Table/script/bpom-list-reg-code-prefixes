@@ -1,0 +1,660 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/BPOMUtils/Table/RegCodePrefix/bpom_list_reg_code_prefixes
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-01-20'; # DATE
+our $DIST = 'App-BPOMUtils-Table'; # DIST
+our $VERSION = '0.015'; # VERSION
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/BPOMUtils/Table/RegCodePrefix/bpom_list_reg_code_prefixes",
+    program_name => "bpom-list-reg-code-prefixes",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: List known alphabetical prefixes in BPOM registered product codes
+# PODNAME: bpom-list-reg-code-prefixes
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+bpom-list-reg-code-prefixes - List known alphabetical prefixes in BPOM registered product codes
+
+=head1 VERSION
+
+This document describes version 0.015 of bpom-list-reg-code-prefixes (from Perl distribution App-BPOMUtils-Table), released on 2023-01-20.
+
+=head1 SYNOPSIS
+
+B<bpom-list-reg-code-prefixes> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<bpom-list-reg-code-prefixes> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<bpom-list-reg-code-prefixes> [B<L<--code-contains|/"--code-contains=s">>=I<str>] [(B<L<--code-in|/"--code-in=s@">>=I<str>)+|B<L<--code-in-json|/"--code-in=s@">>=I<json>] [B<L<--code-is|/"--code-is=s">>=I<str>] [B<L<--code-isnt|/"--code-isnt=s">>=I<str>] [B<L<--code-max|/"--code-max=s">>=I<str>] [B<L<--code-min|/"--code-min=s">>=I<str>] [B<L<--code-not-contains|/"--code-not-contains=s">>=I<str>] [(B<L<--code-not-in|/"--code-not-in=s@">>=I<str>)+|B<L<--code-not-in-json|/"--code-not-in=s@">>=I<json>] [B<L<--code-xmax|/"--code-xmax=s">>=I<str>] [B<L<--code-xmin|/"--code-xmin=s">>=I<str>] [B<L<--code|/"--code=s">>=I<str>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [B<L<--division-contains|/"--division-contains=s">>=I<str>] [(B<L<--division-in|/"--division-in=s@">>=I<str>)+|B<L<--division-in-json|/"--division-in=s@">>=I<json>] [B<L<--division-is|/"--division-is=s">>=I<str>] [B<L<--division-isnt|/"--division-isnt=s">>=I<str>] [B<L<--division-max|/"--division-max=s">>=I<str>] [B<L<--division-min|/"--division-min=s">>=I<str>] [B<L<--division-not-contains|/"--division-not-contains=s">>=I<str>] [(B<L<--division-not-in|/"--division-not-in=s@">>=I<str>)+|B<L<--division-not-in-json|/"--division-not-in=s@">>=I<json>] [B<L<--division-xmax|/"--division-xmax=s">>=I<str>] [B<L<--division-xmin|/"--division-xmin=s">>=I<str>] [B<L<--division|/"--division=s">>=I<str>] [(B<L<--exclude-field|/"--exclude-fields-json=s">>=I<str>)+|B<L<--exclude-fields-json|/"--exclude-fields-json=s">>=I<json>] [(B<L<--field|/"--fields-json=s">>=I<str>)+|B<L<--fields-json|/"--fields-json=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--query-boolean|/"--query-boolean=s">>=I<str>|B<L<--and|/"--query-boolean=s">>|B<L<--or|/"--query-boolean=s">>] [(B<L<--query|/"--query=s@">>=I<str>)+|B<L<--queries-json|/"--query=s@">>=I<json>|(B<L<-q|/"--query=s@">>=I<str>)+] [B<L<--random|/"--random">>|B<L<--no-random|/"--random">>|B<L<--norandom|/"--random">>] [B<L<--result-limit|/"--result-limit=s">>=I<int>] [B<L<--result-start|/"--result-start=s">>=I<int>] [(B<L<--sort|/"--sort=s@">>=I<str>)+|B<L<--sort-json|/"--sort=s@">>=I<json>] [B<L<--summary-eng-contains|/"--summary-eng-contains=s">>=I<str>] [(B<L<--summary-eng-in|/"--summary-eng-in=s@">>=I<str>)+|B<L<--summary-eng-in-json|/"--summary-eng-in=s@">>=I<json>] [B<L<--summary-eng-is|/"--summary-eng-is=s">>=I<str>] [B<L<--summary-eng-isnt|/"--summary-eng-isnt=s">>=I<str>] [B<L<--summary-eng-max|/"--summary-eng-max=s">>=I<str>] [B<L<--summary-eng-min|/"--summary-eng-min=s">>=I<str>] [B<L<--summary-eng-not-contains|/"--summary-eng-not-contains=s">>=I<str>] [(B<L<--summary-eng-not-in|/"--summary-eng-not-in=s@">>=I<str>)+|B<L<--summary-eng-not-in-json|/"--summary-eng-not-in=s@">>=I<json>] [B<L<--summary-eng-xmax|/"--summary-eng-xmax=s">>=I<str>] [B<L<--summary-eng-xmin|/"--summary-eng-xmin=s">>=I<str>] [B<L<--summary-eng|/"--summary-eng=s">>=I<str>] [B<L<--summary-ind-contains|/"--summary-ind-contains=s">>=I<str>] [(B<L<--summary-ind-in|/"--summary-ind-in=s@">>=I<str>)+|B<L<--summary-ind-in-json|/"--summary-ind-in=s@">>=I<json>] [B<L<--summary-ind-is|/"--summary-ind-is=s">>=I<str>] [B<L<--summary-ind-isnt|/"--summary-ind-isnt=s">>=I<str>] [B<L<--summary-ind-max|/"--summary-ind-max=s">>=I<str>] [B<L<--summary-ind-min|/"--summary-ind-min=s">>=I<str>] [B<L<--summary-ind-not-contains|/"--summary-ind-not-contains=s">>=I<str>] [(B<L<--summary-ind-not-in|/"--summary-ind-not-in=s@">>=I<str>)+|B<L<--summary-ind-not-in-json|/"--summary-ind-not-in=s@">>=I<json>] [B<L<--summary-ind-xmax|/"--summary-ind-xmax=s">>=I<str>] [B<L<--summary-ind-xmin|/"--summary-ind-xmin=s">>=I<str>] [B<L<--summary-ind|/"--summary-ind=s">>=I<str>] [B<L<--with-field-names|/"--with-field-names">>|B<L<--without-field-names|/"--with-field-names">>] -- [I<L<query|/"--query=s@">>] ...
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Field selection options
+
+=over
+
+=item B<--detail>, B<-l>
+
+Return array of full records instead of just ID fields.
+
+By default, only the key (ID) field is returned per result entry.
+
+
+=item B<--exclude-field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--exclude-fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--exclude-field>.
+
+=item B<--field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--field>.
+
+=item B<--with-field-names>
+
+Return field names in each record (as hash/associative array).
+
+When enabled, function will return each record as hash/associative array
+(field name => value pairs). Otherwise, function will return each record
+as list/array (field value, field value, ...).
+
+
+=back
+
+=head2 Filtering for code options
+
+=over
+
+=item B<--code-contains>=I<s>
+
+Only return records where the 'code' field contains specified text.
+
+=item B<--code-in-json>=I<s>
+
+Only return records where the 'code' field is in the specified values (JSON-encoded).
+
+See C<--code-in>.
+
+=item B<--code-in>=I<s@>
+
+Only return records where the 'code' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--code-is>=I<s>
+
+Only return records where the 'code' field equals specified value.
+
+=item B<--code-isnt>=I<s>
+
+Only return records where the 'code' field does not equal specified value.
+
+=item B<--code-max>=I<s>
+
+Only return records where the 'code' field is less than or equal to specified value.
+
+=item B<--code-min>=I<s>
+
+Only return records where the 'code' field is greater than or equal to specified value.
+
+=item B<--code-not-contains>=I<s>
+
+Only return records where the 'code' field does not contain specified text.
+
+=item B<--code-not-in-json>=I<s>
+
+Only return records where the 'code' field is not in the specified values (JSON-encoded).
+
+See C<--code-not-in>.
+
+=item B<--code-not-in>=I<s@>
+
+Only return records where the 'code' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--code-xmax>=I<s>
+
+Only return records where the 'code' field is less than specified value.
+
+=item B<--code-xmin>=I<s>
+
+Only return records where the 'code' field is greater than specified value.
+
+=item B<--code>=I<s>
+
+Only return records where the 'code' field equals specified value.
+
+=back
+
+=head2 Filtering for division options
+
+=over
+
+=item B<--division-contains>=I<s>
+
+Only return records where the 'division' field contains specified text.
+
+=item B<--division-in-json>=I<s>
+
+Only return records where the 'division' field is in the specified values (JSON-encoded).
+
+See C<--division-in>.
+
+=item B<--division-in>=I<s@>
+
+Only return records where the 'division' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--division-is>=I<s>
+
+Only return records where the 'division' field equals specified value.
+
+=item B<--division-isnt>=I<s>
+
+Only return records where the 'division' field does not equal specified value.
+
+=item B<--division-max>=I<s>
+
+Only return records where the 'division' field is less than or equal to specified value.
+
+=item B<--division-min>=I<s>
+
+Only return records where the 'division' field is greater than or equal to specified value.
+
+=item B<--division-not-contains>=I<s>
+
+Only return records where the 'division' field does not contain specified text.
+
+=item B<--division-not-in-json>=I<s>
+
+Only return records where the 'division' field is not in the specified values (JSON-encoded).
+
+See C<--division-not-in>.
+
+=item B<--division-not-in>=I<s@>
+
+Only return records where the 'division' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--division-xmax>=I<s>
+
+Only return records where the 'division' field is less than specified value.
+
+=item B<--division-xmin>=I<s>
+
+Only return records where the 'division' field is greater than specified value.
+
+=item B<--division>=I<s>
+
+Only return records where the 'division' field equals specified value.
+
+=back
+
+=head2 Filtering for summary_eng options
+
+=over
+
+=item B<--summary-eng-contains>=I<s>
+
+Only return records where the 'summary_eng' field contains specified text.
+
+=item B<--summary-eng-in-json>=I<s>
+
+Only return records where the 'summary_eng' field is in the specified values (JSON-encoded).
+
+See C<--summary-eng-in>.
+
+=item B<--summary-eng-in>=I<s@>
+
+Only return records where the 'summary_eng' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--summary-eng-is>=I<s>
+
+Only return records where the 'summary_eng' field equals specified value.
+
+=item B<--summary-eng-isnt>=I<s>
+
+Only return records where the 'summary_eng' field does not equal specified value.
+
+=item B<--summary-eng-max>=I<s>
+
+Only return records where the 'summary_eng' field is less than or equal to specified value.
+
+=item B<--summary-eng-min>=I<s>
+
+Only return records where the 'summary_eng' field is greater than or equal to specified value.
+
+=item B<--summary-eng-not-contains>=I<s>
+
+Only return records where the 'summary_eng' field does not contain specified text.
+
+=item B<--summary-eng-not-in-json>=I<s>
+
+Only return records where the 'summary_eng' field is not in the specified values (JSON-encoded).
+
+See C<--summary-eng-not-in>.
+
+=item B<--summary-eng-not-in>=I<s@>
+
+Only return records where the 'summary_eng' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--summary-eng-xmax>=I<s>
+
+Only return records where the 'summary_eng' field is less than specified value.
+
+=item B<--summary-eng-xmin>=I<s>
+
+Only return records where the 'summary_eng' field is greater than specified value.
+
+=item B<--summary-eng>=I<s>
+
+Only return records where the 'summary_eng' field equals specified value.
+
+=back
+
+=head2 Filtering for summary_ind options
+
+=over
+
+=item B<--summary-ind-contains>=I<s>
+
+Only return records where the 'summary_ind' field contains specified text.
+
+=item B<--summary-ind-in-json>=I<s>
+
+Only return records where the 'summary_ind' field is in the specified values (JSON-encoded).
+
+See C<--summary-ind-in>.
+
+=item B<--summary-ind-in>=I<s@>
+
+Only return records where the 'summary_ind' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--summary-ind-is>=I<s>
+
+Only return records where the 'summary_ind' field equals specified value.
+
+=item B<--summary-ind-isnt>=I<s>
+
+Only return records where the 'summary_ind' field does not equal specified value.
+
+=item B<--summary-ind-max>=I<s>
+
+Only return records where the 'summary_ind' field is less than or equal to specified value.
+
+=item B<--summary-ind-min>=I<s>
+
+Only return records where the 'summary_ind' field is greater than or equal to specified value.
+
+=item B<--summary-ind-not-contains>=I<s>
+
+Only return records where the 'summary_ind' field does not contain specified text.
+
+=item B<--summary-ind-not-in-json>=I<s>
+
+Only return records where the 'summary_ind' field is not in the specified values (JSON-encoded).
+
+See C<--summary-ind-not-in>.
+
+=item B<--summary-ind-not-in>=I<s@>
+
+Only return records where the 'summary_ind' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--summary-ind-xmax>=I<s>
+
+Only return records where the 'summary_ind' field is less than specified value.
+
+=item B<--summary-ind-xmin>=I<s>
+
+Only return records where the 'summary_ind' field is greater than specified value.
+
+=item B<--summary-ind>=I<s>
+
+Only return records where the 'summary_ind' field equals specified value.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--and>
+
+Shortcut for --query-boolean=and.
+
+See C<--query-boolean>.
+
+=item B<--or>
+
+Shortcut for --query-boolean=or.
+
+See C<--query-boolean>.
+
+=item B<--queries-json>=I<s>, B<-q>
+
+Search (JSON-encoded).
+
+See C<--query>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--query-boolean>=I<s>
+
+Whether records must match all search queries ('and') or just one ('or').
+
+Default value:
+
+ "and"
+
+Valid values:
+
+ ["and","or"]
+
+If set to C<and>, all queries must match; if set to C<or>, only one query should
+match. See the C<queries> option for more details on searching.
+
+
+=item B<--query>=I<s@>
+
+Search.
+
+This will search all searchable fields with one or more specified queries. Each
+query can be in the form of C<-FOO> (dash prefix notation) to require that the
+fields do not contain specified string, or C</FOO/> to use regular expression.
+All queries must match if the C<query_boolean> option is set to C<and>; only one
+query should match if the C<query_boolean> option is set to C<or>.
+
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Ordering options
+
+=over
+
+=item B<--random>
+
+Return records in random order.
+
+=item B<--sort-json>=I<s>
+
+Order records according to certain field(s) (JSON-encoded).
+
+See C<--sort>.
+
+=item B<--sort>=I<s@>
+
+Order records according to certain field(s).
+
+A list of field names separated by comma. Each field can be prefixed with '-' to
+specify descending order instead of the default ascending.
+
+
+Can be specified multiple times.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Paging options
+
+=over
+
+=item B<--result-limit>=I<s>
+
+Only return a certain number of records.
+
+=item B<--result-start>=I<s>
+
+Only return starting from the n'th record.
+
+Default value:
+
+ 1
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C bpom-list-reg-code-prefixes bpom-list-reg-code-prefixes
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete bpom-list-reg-code-prefixes 'p/*/`bpom-list-reg-code-prefixes`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-BPOMUtils-Table>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-BPOMUtils-Table>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2022, 2021 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-BPOMUtils-Table>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

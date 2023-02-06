@@ -1,0 +1,24 @@
+0.040   2023-01-17  Released-By: PERLANCAR
+
+        - Rename module/dist Bencher-Scenario-Regexp{,-}Assemble.
+
+
+0.03    2017-01-25  Released-By: PERLANCAR
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.16) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=x_benchmarks.
+
+
+0.02    2016-02-11  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- Fix Abstract.
+
+
+0.01    2016-02-10  Released-By: PERLANCAR
+
+        - First release.

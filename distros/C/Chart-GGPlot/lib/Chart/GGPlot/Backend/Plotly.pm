@@ -5,7 +5,7 @@ package Chart::GGPlot::Backend::Plotly;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.002002'; # VERSION
+our $VERSION = '0.002003'; # VERSION
 
 with qw(Chart::GGPlot::Backend);
 
@@ -597,7 +597,7 @@ Chart::GGPlot::Backend::Plotly - Plotly backend for Chart::GGPlot
 
 =head1 VERSION
 
-version 0.002002
+version 0.002003
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,6 @@
 package Dancer2::Plugin;
 # ABSTRACT: base class for Dancer2 plugins
-$Dancer2::Plugin::VERSION = '0.400000';
+$Dancer2::Plugin::VERSION = '0.400001';
 use strict;
 use warnings;
 
@@ -501,7 +501,7 @@ sub _find_consumer {
     #    or croak('Could not find Dancer2 app');
 
     return $class;
-};
+}
 
 # This has to be called for now at the end of every plugin package, in order to
 # map the keywords of the associated app to the plugin, so that these keywords
@@ -539,8 +539,12 @@ sub register_plugin {
                     no strict 'refs';
                     $plugin_module->can($keyword)
                       or *{"${plugin_module}::$keyword"} = sub {
-                          my $coderef = shift()->app->name->can($keyword);
-                          $coderef->(@_);
+                        $_[0]
+                          ? do {
+                            my $cb = shift()->app->name->can($keyword);
+                            $cb->(@_);
+                          }
+                          : $app_dsl_cb->(@_);
                       };
                 }
             });
@@ -636,7 +640,7 @@ Dancer2::Plugin - base class for Dancer2 plugins
 
 =head1 VERSION
 
-version 0.400000
+version 0.400001
 
 =head1 SYNOPSIS
 
@@ -1099,7 +1103,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Alexis Sukrieh.
+This software is copyright (c) 2023 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

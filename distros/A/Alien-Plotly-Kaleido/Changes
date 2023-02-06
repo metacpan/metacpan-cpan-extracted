@@ -1,5 +1,8 @@
 Revision history of Alien-Plotly-Kaleido
 
+0.003       2023-02-04
+    - Changed my github username.
+
 0.002       2021-03-20
     - Use Kaleido version 0.2.1
     - Fix MacOS installation. Thanks Carlos D. Álvaro!

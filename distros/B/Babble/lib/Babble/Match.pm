@@ -44,8 +44,8 @@ lazy submatches => sub {
   my $submatch_re = qq[ \\A${re}\\Z ${\$self->grammar_regexp} ];
   my $_re;
   my @values = $self->text =~ (
-    Babble::Config::CACHE_RE ? $SUBMATCHES_COMPILE_CACHE{$submatch_re} : $_re = ( Babble::Config::CACHE_RE ? $SUBMATCHES_COMPILE_CACHE{$submatch_re} : 0 )
-    || do {
+    Babble::Config::CACHE_RE ? $SUBMATCHES_COMPILE_CACHE{$submatch_re} : $_re ||=
+    do {
       warn "Cache miss submatches\n" if Babble::Config::CACHE_RE && Babble::Config::DEBUG_CACHE_MISS;
       use re 'eval';
       my $re = qr/$submatch_re/x;
@@ -103,8 +103,8 @@ sub match_positions_of {
     local $_ = $self->text;
     my $mp_re = qq/${\$self->top_re} ${wrapped}/;
     my $_re;
-    $_ =~ ( Babble::Config::CACHE_RE ? $MATCH_POS_COMPILE_CACHE{$mp_re} : $_re = ( Babble::Config::CACHE_RE ? $MATCH_POS_COMPILE_CACHE{$mp_re} : 0 )
-      || do {
+    $_ =~ ( Babble::Config::CACHE_RE ? $MATCH_POS_COMPILE_CACHE{$mp_re} : $_re ||=
+      do {
         warn "Cache miss match_positions_of(): @{[ $self->top_re ]}\n" if Babble::Config::CACHE_RE && Babble::Config::DEBUG_CACHE_MISS;
         use re 'eval';
         my $re = qr/$mp_re/x;

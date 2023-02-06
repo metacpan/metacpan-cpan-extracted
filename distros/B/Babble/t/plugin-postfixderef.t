@@ -6,6 +6,13 @@ use Babble::Match;
 my $pd = Babble::Plugin::PostfixDeref->new;
 
 my @cand = (
+  [ '$foo->$*' ,  '${$foo}'  ],
+  [ '$foo->@*' ,  '@{$foo}'  ],
+  [ '$foo->$#*',  '$#{$foo}' ],
+  [ '$foo->%*' ,  '%{$foo}'  ],
+  [ '$foo->&*' ,  '&{$foo}'  ],
+  [ '$foo->**' ,  '*{$foo}'  ],
+
   [ 'my $x = $foo->$*; my @y = $bar->baz->@*;',
     'my $x = ${$foo}; my @y = @{$bar->baz};' ],
   [ 'my $x = ($foo->bar->$*)->baz->@*;',

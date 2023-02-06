@@ -31,7 +31,7 @@ EOF
 
 eval {
     # sleep 1 sec
-    $redis->eval($lua, 1, '{key}10', 100000, 1);
+    $redis->eval($lua, 1, '{key}10', 1000000, 1);
 };
 like $@, qr/^\[eval\] Timeout/;
 

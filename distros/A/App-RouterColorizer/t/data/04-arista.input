@@ -37,6 +37,7 @@ Last login: Tue Aug 17 12:05:09 2021 from 192.0.2.12
     IPv4 Unicast:                     0         0              0                   0
     IPv6 Unicast:                     0         0              0                   0
   Configured maximum total number of routes is 12000
+  Configured maximum total number of routes is 12000, warning limit is 10000
   Inbound updates dropped by reason:
     AS path loop detection: 0
     Enforced First AS: 0

@@ -1,6 +1,6 @@
 package App::Greple::xlate;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 =encoding utf-8
 
@@ -209,6 +209,11 @@ limit the matching area.
 You can use C<-Mupdate> module to modify files by the result of
 B<greple> command.
 
+=item L<App::sdif>
+
+Use B<sdif> to show conflict marker format side by side with B<-V>
+option.
+
 =back
 
 =head1 AUTHOR
@@ -304,11 +309,38 @@ sub prologue {
 }
 
 sub normalize {
-    local $_ = shift;
-    s{^.+(?:\n.+)*}{
+    $_[0] =~ s{^.+(?:\n.+)*}{
 	${^MATCH} =~ s/\A\s+|\s+\z//gr =~ s/\s+/ /gr
-    }pmge;
-    $_;
+    }pmger;
+}
+
+sub xlate_postgrep {
+    my $grep = shift;
+    my @miss;
+    for my $r ($grep->result) {
+	my($b, @match) = @$r;
+	for my $m (@match) {
+	    my $key = normalize $grep->cut(@$m);
+	    $new_cache->{$key} //= delete $old_cache->{$key} // do {
+		push @miss, $key;
+		"NOT TRANSLATED YET\n";
+	    };
+	}
+    }
+    cache_update(@miss) if @miss;
+}
+
+sub cache_update {
+    my @from = @_;
+    print STDERR "From:\n", map s/^/\t< /mgr, @from if $show_progress;
+    return @from if $dryrun;
+
+    my @to = &XLATE(@from);
+
+    print STDERR "To:\n", map s/^/\t> /mgr, @to if $show_progress;
+    die "Unmatched response:\n@to" if @from != @to;
+    $xlate_cache_update += @from;
+    @{$new_cache}{@from} = @to;
 }
 
 sub fold_lines {
@@ -324,25 +356,9 @@ sub fold_lines {
     $_;
 }
 
-sub xlate_postgrep {
-    my $grep = shift;
-    my @miss;
-    for my $r ($grep->result) {
-	my($b, @match) = @$r;
-	for my $m (@match) {
-	    my $key = normalize($grep->cut(@$m));
-	    $new_cache->{$key} //= delete $old_cache->{$key} // do {
-		push @miss, $key;
-		"NOT TRANSLATED YET\n";
-	    };
-	}
-    }
-    cache_update(@miss) if @miss;
-}
-
 sub xlate {
     my $text = shift;
-    my $key = normalize($text);
+    my $key = normalize $text;
     my $s = $new_cache->{$key} // "!!! TRANSLATION ERROR !!!\n";
     $s = fold_lines $s if $fold_line;
     if (state $formatter = $formatter{$output_format}) {
@@ -354,29 +370,9 @@ sub xlate {
 sub xlate_colormap { xlate $_ }
 sub xlate_callback { xlate { @_ }->{match} }
 
-sub cache_update {
-    my @from = @_;
-
-    print STDERR "From:\n", map s/^/\t< /mgr, @from
-	if $show_progress;
-
-    return @from if $dryrun;
-
-    my @to = &XLATE(@from);
-
-    print STDERR "To:\n", map s/^/\t> /mgr, @to
-	if $show_progress;
-
-    die "Unmatched response: @to" if @from != @to;
-
-    for my $i (0 .. $#from) {
-	$xlate_cache_update++;
-	$new_cache->{$from[$i]} = $to[$i];
-    }
-}
-
 sub cache_file {
-    my $file = "$current_file.xlate-$xlate_engine-$lang_to.json";
+    my $file = sprintf("%s.xlate-%s-%s.json",
+		       $current_file, $xlate_engine, $lang_to);
     if ($cache_method eq 'auto') {
 	-f $file ? $file : undef;
     } else {
@@ -412,6 +408,7 @@ sub write_cache {
 sub before {
     my %args = @_;
     $current_file = delete $args{&::FILELABEL} or die;
+    s/\z/\n/ if /.\z/;
     $xlate_cache_update = 0;
     if (not defined $xlate_engine) {
 	die "Select translation engine.\n";

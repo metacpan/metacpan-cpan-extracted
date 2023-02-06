@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::Role::ProtocolMessage;
-our $VERSION = '0.62'; # VERSION
+our $VERSION = '0.64'; # VERSION
 
 use Moose::Role;
 
@@ -12,10 +12,11 @@ use namespace::autoclean;
 use DateTime;
 use MooseX::Types::URI qw/ Uri /;
 use Net::SAML2::Util qw(generate_id);
+use Net::SAML2::Types qw(XsdID);
 
 
 has id => (
-    isa     => 'Str',
+    isa     => XsdID,
     is      => 'ro',
     builder => "_build_id"
 );
@@ -92,7 +93,7 @@ Net::SAML2::Role::ProtocolMessage - Common behaviour for Protocol messages
 
 =head1 VERSION
 
-version 0.62
+version 0.64
 
 =head1 DESCRIPTION
 
@@ -145,13 +146,23 @@ Legal short names for B<$status> are:
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Chris Andrews  <chrisa@cpan.org>
 
+=item *
+
+Timothy Legge <timlegge@gmail.com>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Chris Andrews and Others, see the git log.
+This software is copyright (c) 2023 by Venda Ltd, see the CONTRIBUTORS file for others.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

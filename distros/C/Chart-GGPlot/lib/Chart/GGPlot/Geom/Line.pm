@@ -7,7 +7,7 @@ use namespace::autoclean;
 
 extends qw(Chart::GGPlot::Geom::Path);
 
-our $VERSION = '0.002002'; # VERSION
+our $VERSION = '0.002003'; # VERSION
 
 use Chart::GGPlot::Layer;
 use Chart::GGPlot::Util::Pod qw(layer_func_pod);
@@ -81,7 +81,7 @@ Chart::GGPlot::Geom::Line - Class for line geom
 
 =head1 VERSION
 
-version 0.002002
+version 0.002003
 
 =head1 SEE ALSO
 

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Neo4j community graph database driver for Bolt and HTTP
-$Neo4j::Driver::VERSION = '0.35';
+$Neo4j::Driver::VERSION = '0.36';
 
 use Carp qw(croak);
 
@@ -35,6 +35,7 @@ my %OPTIONS = (
 	encrypted => 'tls',
 	jolt => 'jolt',
 	concurrent_tx => 'concurrent_tx',
+	max_transaction_retry_time => 'max_transaction_retry_time',
 	net_module => 'net_module',
 	timeout => 'timeout',
 	tls => 'tls',
@@ -149,6 +150,7 @@ sub config {
 sub session {
 	my ($self, @options) = @_;
 	
+	$self->{plugins}->{die_on_error} = $self->{die_on_error};
 	warnings::warnif deprecated => __PACKAGE__ . "->{die_on_error} is deprecated" unless $self->{die_on_error};
 	warnings::warnif deprecated => __PACKAGE__ . "->{http_timeout} is deprecated; use config()" if defined $self->{http_timeout};
 	$self->{timeout} //= $self->{http_timeout};
@@ -231,7 +233,7 @@ Neo4j::Driver - Neo4j community graph database driver for Bolt and HTTP
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 SYNOPSIS
 
@@ -240,11 +242,13 @@ version 0.35
  $uri = 'http://localhost';
  $driver = Neo4j::Driver->new($uri)->basic_auth('neo4j', 'password');
  
- sub say_friends_of {
+ sub say_friends_of ($person) {
    $query = 'MATCH (a:Person)-[:KNOWS]->(f) '
-             . 'WHERE a.name = {name} RETURN f.name';
-   $records = $driver->session->run($query, name => shift)->list;
-   foreach $record ( @$records ) {
+             . 'WHERE a.name = $name RETURN f.name';
+   @records = $driver->session->execute_read( sub ($tx) {
+     $tx->run($query, { name => $person })->list;
+   });
+   foreach $record ( @records ) {
      say $record->get('f.name');
    }
  }
@@ -307,25 +311,22 @@ See L</"uri"> for details.
 
 B<This driver's development is not yet considered finalised.>
 
-As of version 0.31, the major open items are:
+As of version 0.36, the one major open item is:
 
 =over
 
 =item *
 
 Support for the C<neo4j:> URI scheme in some fashion.
-(No implementation of Bolt routing is currently planned.)
-
-=item *
-
-Managed transactions through transaction functions.
+(No first-party implementation of client-side routing is
+currently planned, but plug-ins might get a hook for it.)
 
 =back
 
-Once the above items are implemented, this driver will
+Once the above item is implemented, this driver will
 move to S<version 1.00,> removing L<deprecated
 functionality|Neo4j::Driver::Deprecations>.
-There is an ongoing effort to work on these and other
+There is an ongoing effort to work on this and other
 items, but there is no schedule for their completion.
 
 =head1 METHODS
@@ -526,6 +527,13 @@ URI scheme (C<http> / C<https>).
 Before version 0.27, this option was named C<tls>. Use of the
 former name is now discouraged.
 
+=head2 max_transaction_retry_time
+
+ $driver->config(max_transaction_retry_time => 6);  # seconds
+
+Specifies the maximum amount of time that a managed transaction
+will retry before failing. The default value is S<30 seconds>.
+
 =head2 timeout
 
  $driver->config(timeout => 60);  # seconds
@@ -596,8 +604,11 @@ using Perl 5.26 or newer if you can.
 
 =head1 DIAGNOSTICS
 
-Neo4j::Driver currently dies as soon as an error condition is
-discovered. Use L<C<try>|perlsyn/"Try"> or C<eval> to catch this.
+Neo4j::Driver triggers an "error" event as soon as an error
+condition is discovered. If unhandled, this event will cause
+the driver to die with an error string.
+See L<Neo4j::Driver::Transaction/"ERROR HANDLING"> for
+further information.
 
 Warnings are given when deprecated or ambiguous method calls are used.
 These warnings may be disabled if desired.

@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use String::Tagged;
 
@@ -14,7 +14,7 @@ $str->apply_tag( 6, 6, message => 1 );
 
 my @tags;
 $str->iter_tags( sub { push @tags, [ @_ ] } );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [ 0, 6, message => 1 ],
               [ 6, 6, message => 1 ],
@@ -25,7 +25,7 @@ $str->merge_tags( sub { $_[1] == $_[2] } );
 
 undef @tags;
 $str->iter_tags( sub { push @tags, [ @_ ] } );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [ 0, 12, message => 1 ],
            ],
@@ -40,7 +40,7 @@ $str->merge_tags( sub { $_[1] == $_[2] } );
 
 undef @tags;
 $str->iter_tags( sub { push @tags, [ @_ ] } );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [ 0, 6, message => 1 ],
               [ 6, 6, message => 2 ],
@@ -56,7 +56,7 @@ $str->merge_tags( sub { $_[1] == $_[2] } );
 
 undef @tags;
 $str->iter_tags( sub { push @tags, [ @_ ] } );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [ 0, 6, message => 1 ],
               [ 6, 6, others  => 1 ],
@@ -73,7 +73,7 @@ $str->merge_tags( sub { $_[1] == $_[2] } );
 
 undef @tags;
 $str->iter_tags( sub { push @tags, [ @_ ] } );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [ 0, 12, message => 1 ],
            ],
@@ -88,7 +88,7 @@ $str->merge_tags( sub { $_[1] == $_[2] } );
 
 undef @tags;
 $str->iter_tags( sub { push @tags, [ @_ ] } );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [ 0, 4, message => 1 ],
               [ 8, 4, message => 1 ],
@@ -104,7 +104,7 @@ $str->merge_tags( sub { $_[1] == $_[2] } );
 
 undef @tags;
 $str->iter_tags( sub { push @tags, [ @_ ] } );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [ 0, 12, message => 1 ],
            ],
@@ -120,7 +120,7 @@ $str->merge_tags( sub { $_[1] == $_[2] } );
 
 undef @tags;
 $str->iter_tags( sub { push @tags, [ @_ ] } );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [ 0,  5, word    => 1 ],
               [ 0, 12, message => 1 ],

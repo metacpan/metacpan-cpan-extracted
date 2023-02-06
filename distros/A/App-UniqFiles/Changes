@@ -1,3 +1,15 @@
+0.141   2023-02-06  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+        - [build] Rebuild to fix POD.
+
+
+0.140   2023-02-06  Released-By: PERLANCAR; Urgency: medium
+
+        - Add algorithm 'name' to only compare by name.
+
+
 0.139   2022-11-15  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

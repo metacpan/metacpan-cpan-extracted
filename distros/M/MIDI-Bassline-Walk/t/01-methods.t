@@ -45,18 +45,28 @@ subtest attrs => sub {
 
     my $got = ref $obj->scale;
     is $got, 'CODE', 'scale';
-    $got = $obj->scale->('C7b5');
-    is $got, 'major', 'scale';
-    $got = $obj->scale->('Dm7b5');
-    is $got, 'minor', 'scale';
 };
 
 subtest scale => sub {
     my $obj = new_ok 'MIDI::Bassline::Walk' => [
         verbose => VERBOSE,
+    ];
+    my $got = $obj->scale->('C7b5');
+    is $got, 'major', 'scale';
+    $got = $obj->scale->('Dm7b5');
+    is $got, 'minor', 'scale';
+    $got = $obj->scale->('D#/A#');
+    is $got, 'major', 'scale';
+};
+
+subtest modal => sub {
+    my $obj = new_ok 'MIDI::Bassline::Walk' => [
+        verbose => VERBOSE,
         modal   => 1,
     ];
-    my $got = $obj->scale->('Dm7b5');
+    my $got = $obj->scale->('C7b5');
+    is $got, 'ionian', 'scale';
+    $got = $obj->scale->('Dm7b5');
     is $got, 'dorian', 'scale';
 };
 
@@ -66,6 +76,12 @@ subtest generate => sub {
     ];
 
     my $got = $obj->generate('C7b5', 4);
+    is scalar(@$got), 4, 'generate';
+
+    $got = $obj->generate('D/A', 4);
+    is scalar(@$got), 4, 'generate';
+
+    $got = $obj->generate('D', 4, 'C/G');
     is scalar(@$got), 4, 'generate';
 
     $obj = new_ok 'MIDI::Bassline::Walk' => [

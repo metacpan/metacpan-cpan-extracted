@@ -1,5 +1,6 @@
-package Dancer2::DeprecationPolicy; # ABSTRACT: Define the process by which
-outdated, broken, or unused code from Dancer2
+package Dancer2::DeprecationPolicy; 
+
+# ABSTRACT: Define the process by which outdated, broken, or unused code is removed from Dancer2
 
 __END__
 
@@ -9,11 +10,11 @@ __END__
 
 =head1 NAME
 
-Dancer2::DeprecationPolicy - Define the process by which
+Dancer2::DeprecationPolicy - Define the process by which outdated, broken, or unused code is removed from Dancer2
 
 =head1 VERSION
 
-version 0.400000
+version 0.400001
 
 =head1 DESCRIPTION
 
@@ -115,7 +116,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Alexis Sukrieh.
+This software is copyright (c) 2023 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

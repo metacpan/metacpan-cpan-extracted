@@ -1,0 +1,6 @@
+0.001001  2023-02-05 14:57:40 CET
+   - Do proper (non-TRIAL) release to ender CPAN & trigger
+     CPAN Testers.
+
+0.001  2023-02-05 10:58:24 CET
+   - Initial release

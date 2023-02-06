@@ -31,6 +31,14 @@ Tag with boolean value indicating reverse video; i.e. the effect of swapping
 foreground and background colours. This effect is common on terminal-based
 string systems, but is unlikely to be found elsewhere.
 
+=head2 sizepos
+
+Tag with a string value inidicating sub- or super-script effects. The value
+C<"sub"> indicates subscript, and C<"super"> indicates superscript.
+
+One single tag is used for both rather than using two separate booleans in
+order to avoid confusion over what would happen if both are set at once.
+
 =head2 fg, bg
 
 Tags with L<Convert::Color> instances giving foreground and background
@@ -83,6 +91,11 @@ formatted I<Matrix> message body to and from this format.
 
 L<String::Tagged::IRC> - parse or build IRC formatted messages and convert
 bidirectionally to this format.
+
+=item *
+
+L<String::Tagged::Markdown> - parse and emit text with Markdown inline
+formatting and convert bidirectionally to this format.
 
 =item *
 

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::Bolt;
 # ABSTRACT: Network controller for Neo4j Bolt
-$Neo4j::Driver::Net::Bolt::VERSION = '0.35';
+$Neo4j::Driver::Net::Bolt::VERSION = '0.36';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -17,6 +17,7 @@ use URI 1.25;
 
 use Neo4j::Driver::Result::Bolt;
 use Neo4j::Driver::ServerInfo;
+use Neo4j::Error;
 
 
 # Neo4j::Bolt < 0.10 didn't report human-readable error messages
@@ -62,7 +63,7 @@ sub new {
 	else {
 		$cxn = $net_module->connect( "$uri", $driver->{http_timeout} );
 	}
-	croak $class->_bolt_error($cxn) unless $cxn->connected;
+	$class->_trigger_bolt_error( $cxn, $driver->{plugins} ) unless $cxn->connected;
 	
 	return bless {
 		net_module => $net_module,
@@ -73,6 +74,54 @@ sub new {
 		cypher_types => $driver->{cypher_types},
 		active_tx => 0,
 	}, $class;
+}
+
+
+# Trigger an error using the given event handler.
+# Meant to only be called after a failure has occurred.
+# $ref may be a Neo4j::Bolt ResultStream, Cxn, Txn.
+# $error_handler may be a coderef or the event manager.
+sub _trigger_bolt_error {
+	my ($self, $ref, $error_handler) = @_;
+	
+	local $@;
+	my $error = 'Neo4j::Error';
+	
+	$error = $error->append_new( Server => {
+		code => scalar $ref->server_errcode,
+		message => scalar $ref->server_errmsg,
+		raw => scalar eval { $ref->get_failure_details },  # Neo4j::Bolt >= 0.41
+	}) if eval { $ref->server_errcode || $ref->server_errmsg };
+	
+	$error = $error->append_new( Network => {
+		code => scalar $ref->client_errnum,
+		message => scalar $ref->client_errmsg // $BOLT_ERROR{$ref->client_errnum},
+		as_string => $self->_bolt_error($ref),
+	}) if eval { $ref->client_errnum || $ref->client_errmsg };
+	
+	$error = $error->append_new( Network => {
+		code => scalar $ref->errnum,
+		message => scalar $ref->errmsg // $BOLT_ERROR{$ref->errnum},
+		as_string => $self->_bolt_error($ref),
+	}) if eval { $ref->errnum || $ref->errmsg };
+	
+	eval {
+		my $cxn = $self->{connection};
+		$error = $error->append_new( Network => {
+			code => scalar $cxn->errnum,
+			message => scalar $cxn->errmsg // $BOLT_ERROR{$cxn->errnum},
+			as_string => $self->_bolt_error($cxn),
+		}) if eval { $cxn->errnum || $cxn->errmsg } && $cxn != $ref;
+		$cxn->reset_cxn;
+		$error = $error->append_new( Internal => {  # perlbolt#51
+			code => scalar $cxn->errnum,
+			message => scalar $cxn->errmsg // $BOLT_ERROR{$cxn->errnum},
+			as_string => $self->_bolt_error($cxn),
+		}) if eval { $cxn->errnum || $cxn->errmsg };
+	};
+	
+	return $error_handler->($error) if ref $error_handler eq 'CODE';
+	$error_handler->trigger(error => $error);
 }
 
 
@@ -127,37 +176,13 @@ sub _run {
 	if ($statement->[0]) {
 		$stream = $query_runner->run_query( @$statement, $self->{database} );
 		
-		if (! $stream) {
-			$tx->{closed} = 1;
-			$self->{active_tx} = 0;
-			croak $self->_bolt_error( $self->{connection} );
-		}
-		if ($stream->failure) {
+		if (! $stream || $stream->failure) {
 			# failure() == -1 is an error condition because run_query_()
 			# always calls update_errstate_rs_obj()
 			
-			if ( ! $stream->server_errcode && ! $stream->server_errmsg ) {
-				$tx->{closed} = 1;
-				$self->{active_tx} = 0;
-				croak $self->_bolt_error( $stream );
-			}
-			
-			# <https://neo4j.com/docs/status-codes/4.2/> suggests that
-			# transactions should already have been rolled back and
-			# closed automatically at this point due to the server error.
-			# This is usually what happens on HTTP (but see neo4j#12651).
-			# However, on Bolt, the transaction might remain open (marked
-			# as failed, thus uncommittable and ignoring rollback messages;
-			# but see perlbolt#51). An explicit reset seems sensible here,
-			# although in practice perlbolt currently resets automatically.
 			$tx->{closed} = 1;
 			$self->{active_tx} = 0;
-			
-			my $error = sprintf "%s:\n%s\n%s",
-				$stream->server_errcode, $stream->server_errmsg, $self->_bolt_error( $stream );
-			$tx->{bolt_txn} = undef;
-			$self->{connection}->reset_cxn if $self->{connection}->can('reset_cxn');
-			croak $error;
+			$self->_trigger_bolt_error( $stream, $tx->{error_handler} );
 		}
 		
 		$result = $self->{result_module}->new({
@@ -174,9 +199,11 @@ sub _run {
 
 
 sub _new_tx {
-	my ($self) = @_;
+	my ($self, $driver_tx) = @_;
 	
 	my $params = {};
+	$params->{mode} = lc substr $driver_tx->{mode}, 0, 1 if $driver_tx->{mode};
+	
 	my $transaction = "$self->{net_module}::Txn";
 	return unless $transaction->can('new');
 	return $transaction->new( $self->{connection}, $params, $self->{database} );

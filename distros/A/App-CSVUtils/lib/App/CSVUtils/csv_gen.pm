@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-02'; # DATE
+our $DATE = '2023-02-03'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.005'; # VERSION
+our $VERSION = '1.007'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -130,7 +130,7 @@ App::CSVUtils::csv_gen - Generate CSV data using Perl code
 
 =head1 VERSION
 
-This document describes version 1.005 of App::CSVUtils::csv_gen (from Perl distribution App-CSVUtils), released on 2023-02-02.
+This document describes version 1.007 of App::CSVUtils::csv_gen (from Perl distribution App-CSVUtils), released on 2023-02-03.
 
 =head1 FUNCTIONS
 

@@ -34,6 +34,7 @@ sub preprocess_req {
                         	}
                 	}
 		}
+		$req = $self->SUPER::preprocess_req($req, $t) if ! $req;
         	($req) = $t->request->uri->path =~ m/([^\/]+)$/ if ! $req;
 	}
         return $req;
@@ -85,23 +86,38 @@ sub _load_modules {
 	my $type = $args{type};
 	$args{path} =~ s/([^\/]+)$/$args{lib}\/$1/ if ($args{lib});
 	my @modules = map {
-		(my $m = $_) =~ s/^(\/)|(\.pm)$//ig;
-		$m =~ s/\//::/g;
+		(my $l = $_) =~ s/^(\/)|(\.pm)$//ig;
+		(my $m = $l) =~ s/\//::/g;
 		[
-			"$args{path}/${type}/${_}",
+			"$args{path}/${type}/${l}.pm",
 			"$args{pkg}::${type}::${m}"
 		]
 	} $self->_recurse_directory("$args{path}/$type");
 	my %mods = ();
 	for my $module (@modules) {
-		eval {
-			require $module->[0];
-		};
+		no warnings 'reserved';
+		eval "require $module->[1]";
 		die $@ if $@;
+	}
+	for my $module (@modules) {
 		$module = $module->[1]->new(app => 1);
 		die $@ && next if $@;
 		$mods{_alias} = { %{$mods{_alias} || {}}, %{$Terse::Controller::dispatcher{ref $module}{_alias} || {}} }; 
 		$mods{_alias}{$module->capture} = { namespace => $module->namespace } if $module->{capture};
+		my $in;
+		$in = sub {
+			my @ISA = eval "\@$_[0]::ISA";
+			for (@ISA) {
+				$in->($_);
+				my $dispatch = $Terse::Controller::dispatcher{$_};
+				$mods{_alias} = {%{$dispatch->{_alias} || {}}, %{$mods{_alias} || {}}}; 
+			}
+		};
+		$in->(ref $module);
+
+
+
+
 		$mods{$module->namespace} = $module;
 	}
 	return \%mods;
@@ -135,14 +151,17 @@ sub dispatch {
 	my ($self, $req, $t, @params) = @_;
 	my $root_path = $t->_root_path || "";
 	(my $path = $t->request->uri->path) =~ s/^$root_path\///g;
+	if (!$path && !$req) {
+		$req = lc(ref $self);
+	}
 	my $controller = $t->controller($path);
 	if ($path && ! $controller) {
 		$t->logError('Path not found - ' . $path, 500);
 		return;
 	}
 	if ($req eq $t->{_auth} || $t->is_login || $t->is_logout) {
-		my @response = $self->SUPER::dispatch($req, $t, @params);
-		@response = $controller->dispatch($req, $t, @response)
+		my @response = ($self->SUPER::dispatch($req, $t, @params));
+		@response = ($controller->dispatch($req, $t, @response))
 			if $path && $controller->can($req);
 		return @response;
 	} elsif ($path) {
@@ -169,7 +188,7 @@ Terse::App - Lightweight MVC applications.
 
 =head1 VERSION
 
-Version 0.121
+Version 0.1234
 
 =cut
 

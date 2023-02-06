@@ -24,7 +24,7 @@ use Storable qw(dclone);
 
 use DateTime::Format::Natural::Utils qw(trim);
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 validation_options(
     on_fail => sub
@@ -75,8 +75,6 @@ sub _init
 
     $self->{data} = $mod->__new();
     $self->{grammar_class} = $mod;
-
-    $self->{format_provided} = exists $opts{format};
 
     $self->{mode} = '';
 }
@@ -989,6 +987,7 @@ valuable suggestions and patches:
  Jörn Clausen
  Jim Avera
  Olaf Alders
+ Karen Etheridge
 
 =head1 SEE ALSO
 

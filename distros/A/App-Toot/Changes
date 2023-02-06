@@ -1,0 +1,11 @@
+Revision history for App::Toot
+
+0.03 2023-02-05
+ - Add Github workflows to run tests
+ - Update bugtracker to Github issues
+
+0.02 2023-02-05
+ - Update test deps
+
+0.01 2023-02-05
+ - Initial version

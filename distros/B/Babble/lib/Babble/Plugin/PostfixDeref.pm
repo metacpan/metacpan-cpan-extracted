@@ -98,7 +98,7 @@ sub transform_to_plain {
   }
   my $tf = sub {
     my ($m, $in_quotelike) = @_;
-    return if Babble::Config::BAIL_OUT_LATE && $m->text !~ m/ \s* -> \s* [\@%\$] /xs;
+    return if Babble::Config::BAIL_OUT_LATE && $m->text !~ m/ \s* -> \s* [\@%\$\&\*] /xs;
     my $interpolate = defined $in_quotelike && $in_quotelike;
     my ($term, $postfix) = $m->subtexts(qw(term postfix));
     #warn "Term: $term"; warn "Postfix: $postfix";
@@ -107,7 +107,7 @@ sub transform_to_plain {
       ( (?>(?&PerlOWS)) -> (?>(?&PerlOWS))
         (?>
              \$\#\*
-           | \$\*
+           | [\$\&\*]\*
            | (?> (?&PerlQualifiedIdentifier) | (?&PerlVariableScalar) )
            (?: (?>(?&PerlOWS)) (?&PerlParenthesesList) )?+
            | (?:
@@ -120,7 +120,7 @@ sub transform_to_plain {
     }x;
     while ($postfix =~ s/^${strip_re}//) {
       my $stripped = $1;
-      if ($stripped =~ /(\$\#?)\*$/) {
+      if ($stripped =~ /(\$\#?|[\&\*])\*$/) {
         my $sigil = $1;
         $term = $sigil.'{'.$term.'}';
         if( $interpolate ) {
@@ -173,7 +173,7 @@ sub transform_to_plain {
 sub check_bail_out_early {
   my ($self, $top) = @_;
   $top->text !~ m/postderef|postderef_qq/xs
-    && $top->text !~ m/ \s* -> \s* [\@%\$] /xs;
+    && $top->text !~ m/ \s* -> \s* [\@%\$\&\*] /xs;
 }
 
 1;

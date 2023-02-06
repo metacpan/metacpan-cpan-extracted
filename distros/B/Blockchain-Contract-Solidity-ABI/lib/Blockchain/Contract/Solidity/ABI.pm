@@ -10,11 +10,11 @@ Blockchain::Contract::Solidity::ABI - Contract ABI utilities
 
 =head1 VERSION
 
-Version 0.005
+Version 0.006
 
 =cut
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 =head1 SYNOPSIS
 
@@ -65,11 +65,11 @@ L<https://metacpan.org/release/REFECO-Blockchain-Contract-Solidity-ABI>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2022 by Reginaldo Costa.
+This software is Copyright (c) 2022 by REFECO.
 
 This is free software, licensed under:
 
-  The Artistic License 2.0 (GPL Compatible)
+  The MIT License
 
 =cut
 

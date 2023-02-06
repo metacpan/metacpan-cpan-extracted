@@ -5,7 +5,7 @@ package Chart::GGPlot::Geom;
 use Chart::GGPlot::Role qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.002002'; # VERSION
+our $VERSION = '0.002003'; # VERSION
 
 use Data::Frame::Util qw(guess_and_convert_to_pdl);
 use Types::Standard qw(ArrayRef CodeRef);
@@ -95,7 +95,7 @@ Chart::GGPlot::Geom - The geom role
 
 =head1 VERSION
 
-version 0.002002
+version 0.002003
 
 =head1 DESCRIPTION
 

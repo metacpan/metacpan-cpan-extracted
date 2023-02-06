@@ -36,7 +36,24 @@ my @tests = (
         backend_arg => 'obex',
         setup => {
             'main-obex' => '/usr/lib/systemd/user/obex.service',
-            'user-obex' => '~/.config/systemd/user/obex.service',
+        },
+        load => 'service:obex Service Environment:0="TEST=true"',
+        file_contents_like => {
+            "home/joe/.config/systemd/user/obex.service.d/override.conf" => qr/TEST=true/ ,
+        },
+        file_check_sub => sub {
+            my $list_ref = shift ;
+            # file added during tests
+            push @$list_ref, "/home/joe/.config/systemd/user/obex.service.d/override.conf" ;
+        }
+    },
+    {
+        name => 'overridden-service',
+        backend_arg => 'obex',
+        data_from => 'override-service',
+        setup => {
+            'main-obex' => '/usr/lib/systemd/user/obex.service',
+            'user-obex' => '~/.config/systemd/user/obex.service.d/override.conf',
         },
         check => [
             'service:obex Unit Description' => 'Le service Obex a la dent bleue',
@@ -55,7 +72,7 @@ my @tests = (
         backend_arg => 'obex.service',
         setup => {
             'main-obex' => '/usr/lib/systemd/user/obex.service',
-            'user-obex' => '~/.config/systemd/user/obex.service',
+            'user-obex' => '~/.config/systemd/user/obex.service.d/override.conf',
         },
         load => 'service:obex Unit Description~',
         check => [

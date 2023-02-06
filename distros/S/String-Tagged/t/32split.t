@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use String::Tagged;
 
@@ -13,9 +13,9 @@ use String::Tagged;
    my @lines = $str->split( qr/\n/ );
 
    is( scalar @lines, 2, '->split returns 2 elements' );
-   isa_ok( $lines[0], "String::Tagged", '->split returns String::Tagged instances' );
+   isa_ok( $lines[0], [ "String::Tagged" ], '->split returns String::Tagged instances' );
 
-   is_deeply( [ map { $_->str } @lines ], [ "A message with", "linefeeds" ],
+   is( [ map { $_->str } @lines ], [ "A message with", "linefeeds" ],
       '->split returns correct strings' );
 }
 
@@ -40,7 +40,7 @@ use String::Tagged;
    my @parts = $str->split( qr/\s+/, 2 );
 
    is( scalar @parts, 2, '->split with limit returns only that limit' );
-   is_deeply( [ map { $_->str } @parts ], [ "command", "with some arguments" ],
+   is( [ map { $_->str } @parts ], [ "command", "with some arguments" ],
       '->split with limit returns correct strings' );
 }
 
@@ -51,7 +51,7 @@ use String::Tagged;
    my @parts = $str->split( qr/(\d+)/ );
 
    is( scalar @parts, 4, '->split with capture returns captures too' );
-   is_deeply( [ map { $_->str } @parts ], [qw( abc 12 def 345 )],
+   is( [ map { $_->str } @parts ], [qw( abc 12 def 345 )],
       '->split with capture returns correct strings' );
 }
 

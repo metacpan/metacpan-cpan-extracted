@@ -183,6 +183,11 @@ corresponding cache file does not exist, it does not create it.
     You can use `-Mupdate` module to modify files by the result of
     **greple** command.
 
+- [App::sdif](https://metacpan.org/pod/App%3A%3Asdif)
+
+    Use **sdif** to show conflict marker format side by side with **-V**
+    option.
+
 # AUTHOR
 
 Kazumasa Utashiro

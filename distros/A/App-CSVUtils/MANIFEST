@@ -14,6 +14,8 @@ lib/App/CSVUtils/csv2td.pm
 lib/App/CSVUtils/csv2vcf.pm
 lib/App/CSVUtils/csv_add_fields.pm
 lib/App/CSVUtils/csv_avg.pm
+lib/App/CSVUtils/csv_check_cell.pm
+lib/App/CSVUtils/csv_check_field.pm
 lib/App/CSVUtils/csv_concat.pm
 lib/App/CSVUtils/csv_convert_to_hash.pm
 lib/App/CSVUtils/csv_csv.pm
@@ -51,6 +53,9 @@ lib/App/CSVUtils/csv_transpose.pm
 lib/App/CSVUtils/csv_uniq.pm
 script/csv-add-fields
 script/csv-avg
+script/csv-check-cell
+script/csv-check-field
+script/csv-check-values
 script/csv-concat
 script/csv-convert-to-hash
 script/csv-csv

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Temporal;
 # ABSTRACT: Represents a Neo4j temporal value
-$Neo4j::Driver::Type::Temporal::VERSION = '0.35';
+$Neo4j::Driver::Type::Temporal::VERSION = '0.36';
 
 # may not be supported by Bolt
 
@@ -23,7 +23,7 @@ Neo4j::Driver::Type::Temporal - Represents a Neo4j temporal value
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 DESCRIPTION
 

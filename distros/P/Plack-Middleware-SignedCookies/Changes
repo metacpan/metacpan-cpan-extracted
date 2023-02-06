@@ -1,4 +1,9 @@
-Revision history for Plack-Middleware-SignedCookies
+Release history for Plack-Middleware-SignedCookies
+
+1.204 Sun 05 Feb 2023
+	- Testing with HTTP::CookieJar to avoid HTTP::Cookies RFC6265 non-compliance
+	- No more parent.pm dependency
+	- Updated packaging and package metadata
 
 1.203 Mon 31 Aug 2020
 	- Support for streaming PSGI apps.

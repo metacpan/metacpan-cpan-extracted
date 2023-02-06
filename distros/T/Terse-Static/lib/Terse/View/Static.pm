@@ -25,7 +25,7 @@ sub build_view {
 
 sub render {
         my ($self, $t, $data) = @_;
-	my $template = $t->captured->[0] || $data->template || $t->template || $t->req;
+	my $template = $t->captured->[0] !~ m/^1$/ && $t->captured->[0] || $data->template || $t->template || $t->req;
 	$template = 'html/' . $template . '.html' if ($template !~ m/\.[^\.]+$/);
 	my $allowed = $self->allowed;
 	my ($mime) = $template =~ m/($allowed)$/;
@@ -54,7 +54,7 @@ Terse::View::Static - Serve static resources view
 
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =cut
 

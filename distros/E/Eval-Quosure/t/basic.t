@@ -38,11 +38,4 @@ my $q1 = baz();
 
 is( $q1->eval( { '$a' => 2, '$c' => 3 } ), 42 );
 
-subtest 'bareword' => sub {
-    my $q_bad = Eval::Quosure->new('somebareword');
-    eval { $q_bad->eval(); };
-    ok( $@, 'dies on undefined bareword' );
-    unlike( $@, qr/^\d+:/m, 'error message simplified' );
-};
-
 done_testing;

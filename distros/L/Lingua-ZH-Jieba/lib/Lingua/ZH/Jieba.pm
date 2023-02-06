@@ -5,11 +5,11 @@
 # the SWIG interface file instead.
 
 package Lingua::ZH::Jieba;
-$Lingua::ZH::Jieba::VERSION = '0.006';
+$Lingua::ZH::Jieba::VERSION = '0.007';
 use base qw(Exporter);
 use base qw(DynaLoader);
 package Lingua::ZH::Jiebac;
-$Lingua::ZH::Jiebac::VERSION = '0.006';
+$Lingua::ZH::Jiebac::VERSION = '0.007';
 bootstrap Lingua::ZH::Jieba;
 package Lingua::ZH::Jieba;
 @EXPORT = qw();
@@ -55,7 +55,7 @@ package Lingua::ZH::Jieba;
 ############# Class : Lingua::ZH::Jieba::vector_s ##############
 
 package Lingua::ZH::Jieba::vector_s;
-$Lingua::ZH::Jieba::vector_s::VERSION = '0.006';
+$Lingua::ZH::Jieba::vector_s::VERSION = '0.007';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Lingua::ZH::Jieba );
 %OWNER = ();
@@ -100,7 +100,7 @@ sub ACQUIRE {
 ############# Class : Lingua::ZH::Jieba::vector_wordpos ##############
 
 package Lingua::ZH::Jieba::vector_wordpos;
-$Lingua::ZH::Jieba::vector_wordpos::VERSION = '0.006';
+$Lingua::ZH::Jieba::vector_wordpos::VERSION = '0.007';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Lingua::ZH::Jieba );
 %OWNER = ();
@@ -145,7 +145,7 @@ sub ACQUIRE {
 ############# Class : Lingua::ZH::Jieba::vector_keyword ##############
 
 package Lingua::ZH::Jieba::vector_keyword;
-$Lingua::ZH::Jieba::vector_keyword::VERSION = '0.006';
+$Lingua::ZH::Jieba::vector_keyword::VERSION = '0.007';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Lingua::ZH::Jieba );
 %OWNER = ();
@@ -190,7 +190,7 @@ sub ACQUIRE {
 ############# Class : Lingua::ZH::Jieba::vector_word ##############
 
 package Lingua::ZH::Jieba::vector_word;
-$Lingua::ZH::Jieba::vector_word::VERSION = '0.006';
+$Lingua::ZH::Jieba::vector_word::VERSION = '0.007';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Lingua::ZH::Jieba );
 %OWNER = ();
@@ -235,7 +235,7 @@ sub ACQUIRE {
 ############# Class : Lingua::ZH::Jieba::Word ##############
 
 package Lingua::ZH::Jieba::Word;
-$Lingua::ZH::Jieba::Word::VERSION = '0.006';
+$Lingua::ZH::Jieba::Word::VERSION = '0.007';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Lingua::ZH::Jieba );
 %OWNER = ();
@@ -279,7 +279,7 @@ sub ACQUIRE {
 ############# Class : Lingua::ZH::Jieba::KeywordExtractor ##############
 
 package Lingua::ZH::Jieba::KeywordExtractor;
-$Lingua::ZH::Jieba::KeywordExtractor::VERSION = '0.006';
+$Lingua::ZH::Jieba::KeywordExtractor::VERSION = '0.007';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Lingua::ZH::Jieba );
 %OWNER = ();
@@ -318,7 +318,7 @@ sub ACQUIRE {
 ############# Class : Lingua::ZH::Jieba::Jieba ##############
 
 package Lingua::ZH::Jieba::Jieba;
-$Lingua::ZH::Jieba::Jieba::VERSION = '0.006';
+$Lingua::ZH::Jieba::Jieba::VERSION = '0.007';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Lingua::ZH::Jieba );
 %OWNER = ();

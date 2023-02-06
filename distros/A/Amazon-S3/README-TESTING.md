@@ -20,7 +20,7 @@ with additional environment variables described below.
 | `AWS_ACCESS_KEY_ID` | Your AWS access key |
 | `AWS_ACCESS_KEY_SECRET` | Your AWS sekkr1t passkey. Be forewarned that setting this environment variable on a shared system might leak that information to another user. Be careful. |
 | `AWS_SESSION_TOKEN` |  Optional session token. |
-| `S3_HOST` | Defaults to s3.amazonaws.com.  Set this for example if you want to test the module against an API compatible service like minio. |
+| `AMAZONS3_HOST` | Defaults to s3.amazonaws.com.  Set this for example if you want to test the module against an API compatible service like minio. |
 | `AMAZON_S3_SKIP_ACL_TESTS` |  Doesn't matter what you set it to. Just has to be set if you want to skip ACLs tests. |
 | `AMAZON_S3_SKIP_REGION_CONSTRAINT_TEST` |  Doesn't matter what you set it to. Just has to be set if you want to skip region constraint test. |
 | `AMAZON_S3_MINIO` | Doesn't matter what you set it to. Just has to be set if you want to skip tests that would fail on minio. |
@@ -72,7 +72,7 @@ make test AMAZON_S3_EXPENSIVE_TESTS=1 AMAZON_S3_REGIONS='eu-west-1'
 # Credentials for Testing
 
 You should set the environment variables `AWS_ACCESS_KEY_ID` and
-AWS_ACCESS_SECRET_KEY` to your AWS credential values that have the
+`AWS_ACCESS_SECRET_KEY` to your AWS credential values that have the
 ability to create and write to buckets.
 
 If you set environment variable `AMAZON_S3_CREDENTIAL` to any value,
@@ -95,11 +95,23 @@ on both services (as of the writing of this document).__ To make it
 through the tests, try setting one or more of the environment
 variables above which will selectively skip some test.
 
+If you are using a mocking service, you might find it useful to set
+the environment variable AWS_EC2_METADATA_DISABLED to a true value.
+
+```
+export AWS_EC2_METADATA_DISABLED=true
+```
+
+This will prevent the AWS CLI from looking for metadata when you are
+not actually running on an EC2 instance or container.  Without this
+variable set, the CLI attempts to access the metadata service at
+http://169.254.169.254/latest/meta-data/ until it eventually times out.
+
 ## Testing with LocalStack
 
 LocalStack seems to be the easiest to work with and supports a number
 of AWS APIs besides S3. It does not implement the full suite of APIs
-however. In particular, LocalStack does not envorce ACLs. Accordingly,
+however. In particular, LocalStack does not enforce ACLs. Accordingly,
 those tests are skipped if the environment variable AMAZON_S3_LOCALSTACK
 is set to any value.
 
@@ -141,7 +153,7 @@ variables to get through (the majority) of the tests.
 Environment Variable | Value | Description
 -------------------- | ----- | ----------- 
 AMAZON_EXPENSIVE_TESTS | 1 | enables testing of S3 API
-S3_HOST | localhost:4566
+AMAZONS3_HOST | localhost:4566
 AMAZON_S3_LOCALSTACK | any | skips some tests that will fail on LocalStack
 AWS_ACCESS_KEY_ID | test | AWS access key for LocalStack
 AWS_ACCESS_KEY_SECRET | test | AWS secret access key for LocalStack
@@ -157,12 +169,11 @@ name for your bucket by setting the name of the bucket in your
 To run tests using LocalStack...
 
 ```
-make test \
-  AMAZON_S3_EXPENSIVE_TESTS=1
-  S3_HOST=s3.localhost.localstack.cloud:4566 \
-  AMAZON_S3_LOCALSTACK=1 \
-  AWS_ACCESS_KEY_ID=test \
-  AWS_ACCESS_SECRET_KEY=test  \
-  AMAZON_S3_DOMAIN_BUCKET_NAMES=1
+ AMAZON_S3_EXPENSIVE_TESTS=1 \
+ AMAZON_S3_HOST=s3.localhost.localstack.cloud:4566 \
+ AMAZON_S3_LOCALSTACK=1 \
+ AWS_ACCESS_KEY_ID=test \
+ AWS_ACCESS_SECRET_KEY=test  \
+ AMAZON_S3_DOMAIN_BUCKET_NAMES=1 make test
 ```
 

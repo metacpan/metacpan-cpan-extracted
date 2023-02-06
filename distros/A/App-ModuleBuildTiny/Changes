@@ -1,5 +1,15 @@
 Revision history for App-ModuleBuildTiny
 
+0.033     2023-02-05 17:05:51+0100
+          - Add xt test running to test command
+          - Add documentation for --commit, --tag and --push
+
+0.032     2023-02-03 20:16:39+0100
+          - Correctly run author and release tests on upload.
+          - Update Changes file on regenerate --bump
+          - Add a --commit option to regenerate
+          - Add --tag and --push to upload
+
 0.031     Thu Feb  2 02:35:19 PM CET 2023
           - Make configuration optional for minting
           - Add prompt before release

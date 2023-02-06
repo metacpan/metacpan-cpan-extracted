@@ -39,8 +39,8 @@ lazy grammar_regexp => sub {
   # (RT #126285, RT #144248).
   my $final_re = "${define_block} ${base_re}";
   my $_re;
-  return Babble::Config::CACHE_RE ? $COMPILE_CACHE{$final_re} : $_re = ( Babble::Config::CACHE_RE ? $COMPILE_CACHE{$final_re} : 0 )
-    || do {
+  return Babble::Config::CACHE_RE ? $COMPILE_CACHE{$final_re} : $_re ||=
+    do {
       warn "Cache miss grammar_regexp: ${define_block}\n" if Babble::Config::CACHE_RE && Babble::Config::DEBUG_CACHE_MISS;
       use re 'eval';
       my $re = qr{$final_re}x;

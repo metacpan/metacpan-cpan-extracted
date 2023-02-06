@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use String::Tagged;
 
@@ -29,7 +29,7 @@ sub fetch_tags
 }
 
 $str->iter_tags_nooverlap( \&fetch_tags );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [  0, 5, begin  => 1 ],
               [  5, 1, ],
@@ -44,7 +44,7 @@ is( $str->str, "BEGIN middle END", 'str after second append' );
 
 undef @tags;
 $str->iter_tags_nooverlap( \&fetch_tags );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [  0, 5, begin  => 1 ],
               [  5, 1, ],
@@ -61,7 +61,7 @@ is( $str->str, " middle BEGIN", 'str after first prepend' );
 
 undef @tags;
 $str->iter_tags_nooverlap( \&fetch_tags );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [ 0, 1, begin => 1 ],
               [ 1, 6, begin => 1, middle => 1 ],
@@ -75,7 +75,7 @@ is( $str->str, "END middle BEGIN", 'str after second prepend' );
 
 undef @tags;
 $str->iter_tags_nooverlap( \&fetch_tags );
-is_deeply( \@tags, 
+is( \@tags, 
            [
               [  0, 3, begin => 1, end => 1 ],
               [  3, 1, begin => 1 ],

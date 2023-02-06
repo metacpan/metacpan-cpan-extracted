@@ -7,7 +7,7 @@ use warnings;
 
 use Path::Tiny;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 my @keys_deps      = qw(Depends Imports Suggests LinkingTo Enhances);
 my @keys_list_type = qw(
@@ -152,7 +152,7 @@ R::DescriptionFile - R package DESCRIPTION file parser
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -192,7 +192,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Stephan Loyd.
+This software is copyright (c) 2018-2023 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

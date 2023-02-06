@@ -1,0 +1,6 @@
+0.004   2023-02-05  Released-By: PERLANCAR
+
+        - First release. convert-benzoate-unit is moved here from
+          App-BPOMUtils-Additives. Fix molecular weight of potassium benzoate.
+          Fix conversion factor of calcium benzoate because each molecule
+          contains 2 benzoate groups.

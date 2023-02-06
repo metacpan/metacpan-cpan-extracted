@@ -150,12 +150,12 @@ EXAMPLES
 
        sub http_get_future
        {
-          my @args = @_;
+          my ( $url, @args ) = @_;
     
           as_future_cb {
              my ( $done_cb ) = @_;
     
-             http_get @args, $done_cb;
+             http_get $url, @args, $done_cb;
           }
        }
 

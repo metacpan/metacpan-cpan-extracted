@@ -1,3 +1,48 @@
+0.023   2023-01-29  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Fix example for raw_linear.
+
+
+0.022   2023-01-29  Released-By: PERLANCAR; Urgency: medium
+
+        - Add output format 'raw_linear', which is just like linear_text
+          but without border.
+
+
+0.021   2023-01-29  Released-By: PERLANCAR; Urgency: medium
+
+        - Give border to linear_text output.
+
+
+0.020   2023-01-27  Released-By: PERLANCAR; Urgency: medium
+
+        - More CSS tweak.
+
+        - [format calculation_html, calculation_text] Use Unicode multiplication
+          sign instead of "x".
+
+
+0.019   2023-01-27  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix CSS selector.
+
+
+0.018   2023-01-10  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix duplicate JUMLAH PER KEMASAN output.
+
+        - [ux] Add example to show the result of calculation_text output format.
+
+
+0.017   2023-01-10  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Tweak Abstract.
+
+
 0.016   2023-01-10  Released-By: PERLANCAR; Urgency: medium
 
         - Add output format: calculation_html, calculation_text.

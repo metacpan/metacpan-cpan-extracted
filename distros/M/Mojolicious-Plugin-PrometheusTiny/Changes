@@ -1,0 +1,7 @@
+Revision history for Mojolicious-Plugin-PrometheusTiny
+
+0.02  2023-02-05 20:41:19 CST
+        - Improved example in README. Fixed bug in custom metrics.
+
+0.01  2023-02-05 01:59:04 CST
+        - Initial release
