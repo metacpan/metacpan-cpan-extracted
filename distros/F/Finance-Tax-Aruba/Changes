@@ -6,6 +6,12 @@ TODO:
     * Support dual household income tax calculations
     * Convert to Object::Pad
 
+0.007     2023-02-07 16:36:22Z
+
+    * Support employer pays all constructions
+    * Support income without payroll where the person pays all the
+      premiums (excl pension which is not withheld).
+
 0.006     2023-02-04 15:52:53Z
 
     * Add support for child deductions

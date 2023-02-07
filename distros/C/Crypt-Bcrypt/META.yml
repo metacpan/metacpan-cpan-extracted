@@ -5,10 +5,12 @@ author:
 build_requires:
   ExtUtils::ParseXS: '2.21'
   Test::More: '0'
+  perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,17 +19,19 @@ name: Crypt-Bcrypt
 provides:
   Crypt::Bcrypt:
     file: lib/Crypt/Bcrypt.pm
-    version: '0.007'
+    version: '0.008'
 requires:
+  Digest::SHA: '0'
   Exporter: '5.57'
   MIME::Base64: '2.21'
   XSLoader: '0'
+  perl: '5.006'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/Leont/crypt-bcrypt/issues
   repository: git://github.com/Leont/crypt-bcrypt.git
-version: '0.007'
-x_generated_by_perl: v5.32.0
+version: '0.008'
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

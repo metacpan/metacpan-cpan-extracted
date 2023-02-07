@@ -1,8 +1,16 @@
 Revision history for Music-Chord-Progression-Transform
 
+0.0302 2023-02-07 00:56:29
+    - Handle more chord name issues.
+
+0.0301 2023-02-06 16:40:41
+    - Improve documentation.
+
+0.0300 2023-02-06 16:24:21
+    - Change the default format from ISO to midinum.
+
 0.0205 2023-02-06 00:15:01
     - Handle the naming of the diminished chord.
-    - What is a "-6" chord? Who knows?
 
 0.0204 2023-02-06 00:00:25
     - Handle more chordname wackiness. :\

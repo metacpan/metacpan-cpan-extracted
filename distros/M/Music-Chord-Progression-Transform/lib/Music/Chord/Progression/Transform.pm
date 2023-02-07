@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate transformed chord progressions
 
-our $VERSION = '0.0205';
+our $VERSION = '0.0302';
 
 use Moo;
 use strictures 2;
@@ -58,7 +58,7 @@ sub _build_base_chord {
 has format => (
     is      => 'ro',
     isa     => sub { croak "$_[0] is not a valid format" unless $_[0] =~ /^(?:ISO|midinum)$/ },
-    default => sub { 'ISO' },
+    default => sub { 'midinum' },
 );
 
 
@@ -136,11 +136,7 @@ sub generate {
 
         push @generated, $self->format eq 'ISO' ? \@notes : $transformed;
 
-        my $chord = chordname(@base);
-        $chord =~ s/\s+//;
-        $chord =~ s/-6/6/;
-        $chord =~ s/o/dim/;
-        $chord = $1 . $2 if $chord =~ /^(.+)\/(\d+)$/;
+        my $chord = _sanitize_chordname(@base);
         push @chords, $chord;
 
         printf "%d. %s: %s   %s   %s\n",
@@ -179,7 +175,7 @@ sub circular {
 
         push @generated, $self->format eq 'ISO' ? \@notes : $transformed;
 
-        my $chord = chordname(@base);
+        my $chord = _sanitize_chordname(@base);
         push @chords, $chord;
 
         printf "%d. %s (%d): %s   %s   %s\n",
@@ -194,6 +190,26 @@ sub circular {
     }
 
     return \@generated, \@transforms, \@chords;
+}
+
+sub _sanitize_chordname {
+    my (@notes) = @_;
+
+    my $chord = chordname(@notes);
+
+    # fix mangled/unknown chordnames
+    $chord =~ s/\s+//;
+    $chord =~ s/o/dim/;
+    $chord =~ s/maj/M/;
+    $chord =~ s/sus7/7sus4/;
+    $chord =~ s/7adda5/7(#5)/;
+    $chord =~ s/7addb2/7(b9,13)/;
+    $chord =~ s/9add13/7(9,13)/;
+    $chord =~ s/7addm10/7(#9)/;
+    $chord = $1 . $2 if $chord =~ /^(.+)\/(\d+)$/;
+    # ...and there are probably more to come...
+
+    return $chord;
 }
 
 sub _get_pitches {
@@ -294,7 +310,7 @@ Music::Chord::Progression::Transform - Generate transformed chord progressions
 
 =head1 VERSION
 
-version 0.0205
+version 0.0302
 
 =head1 SYNOPSIS
 
@@ -302,14 +318,18 @@ version 0.0205
 
   my $prog = Music::Chord::Progression::Transform->new;
 
+  $prog = Music::Chord::Progression::Transform->new(
+    transforms => [qw(L R P R S)],
+  );
+
   my ($generated, $transforms, $chords) = $prog->generate;
 
   ($generated, $transforms, $chords) = $prog->circular;
 
   # midi
-  use MIDI::Util qw(setup_score midi_format);
+  use MIDI::Util qw(setup_score);
   my $score = setup_score();
-  $score->n('wn', @$_) for midi_format(@$generated);
+  $score->n('wn', @$_) for @$generated;
   $score->write_score('transform.mid');
 
 =head1 DESCRIPTION
@@ -323,7 +343,8 @@ and Neo-Riemann chord progressions.
 
   $base_note = $prog->base_note;
 
-The initial C<isobase>, capitalized note on which the progression starts.
+The initial C<isobase>, capitalized note on which the progression
+starts (but may be immediately transformed by the first operation).
 
 Default: C<C>
 
@@ -357,7 +378,7 @@ Default: C<''> (major)
 The initial chord given by the B<base_note>, B<base_octave>, and the
 B<chord_quality>.
 
-This is a computed, not a constructor attribute.
+This is computed and not a constructor attribute.
 
 =head2 format
 
@@ -366,7 +387,7 @@ This is a computed, not a constructor attribute.
 The format of the returned results, as either named C<ISO> notes or
 C<midinum> integers.
 
-Default: C<ISO>
+Default: C<midinum>
 
 =head2 semitones
 
@@ -393,7 +414,7 @@ Default: C<4>
 The allowed transformations. Currently this is either C<T>
 for transposition, C<N> for Neo-Riemannian, or both.
 
-Default: C<T N>
+Default: C<T,N>
 
 =head2 transforms
 
@@ -434,8 +455,8 @@ Default: C<0>
   $prog = Music::Chord::Progression::Transform->new( # override defaults
     base_note     => 'Bb',
     base_octave   => 5,
-    chord_quality => '7',
-    format        => 'midinum',
+    chord_quality => '7b5',
+    format        => 'ISO',
     max           => 12,
     allowed       => ['T'],
     transforms    => [qw(O T1 T2 T3)],
@@ -455,7 +476,7 @@ Generate a I<linear> series of transformed chords.
 
 Generate a I<circular> series of transformed chords.
 
-This method defines movement over a circular list ("necklace") of
+This method defines movement around a circular list ("necklace") of
 chord transformations.  Starting at position zero, move forward or
 backward along the necklace, transforming the current chord.
 

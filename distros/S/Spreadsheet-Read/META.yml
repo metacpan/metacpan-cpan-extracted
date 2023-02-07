@@ -16,6 +16,10 @@ optional_features:
     description: Provides parsing of CSV streams
     requires: 
       Text::CSV_XS: '0.71'
+  opt_gnumeric: 
+    description: Provides parsing of Gnumeric spreadsheets
+    requires: 
+      Spreadsheet::ReadGnumeric: '0.1'
   opt_ods: 
     description: Provides parsing of OpenOffice spreadsheets
     requires: 
@@ -39,7 +43,7 @@ optional_features:
 provides: 
   Spreadsheet::Read: 
     file: Read.pm
-    version: '0.85'
+    version: '0.86'
 recommends: 
   Data::Peek: '0.52'
   File::Temp: '0.2311'
@@ -61,4 +65,4 @@ resources:
   bugtracker: https://github.com/Tux/Spreadsheet-Read/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Spreadsheet-Read
-version: '0.85'
+version: '0.86'

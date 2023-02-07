@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v1.0.2
+    version v1.0.3
 
 SYNOPSIS
 
@@ -25,15 +25,15 @@ DESCRIPTION
 
 ATTRIBUTES
 
-orig_error
+ orig_error
 
     Returns the original, untouched error object or string.
 
-error_string
+ error_string
 
     Returns the stringified version of the error.
 
-error_type
+ error_type
 
     Returns a string that describes the type of error. These can be one of
     the following:
@@ -56,7 +56,7 @@ error_type
 
 CONSTRUCTORS
 
-new
+ new
 
         my $parsed_error = DBIx::ParseError::MySQL->new($@);
 
@@ -74,7 +74,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2020 - 2021 by Grant Street Group.
+    This software is Copyright (c) 2020 - 2023 by Grant Street Group.
 
     This is free software, licensed under:
 

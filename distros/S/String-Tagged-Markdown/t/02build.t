@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use String::Tagged::Markdown;
 
@@ -51,6 +51,14 @@ use String::Tagged::Markdown;
       ->append_tagged( "fixed_here", fixed => 1 );
 
    is( $str->build_markdown, "This is `fixed_here`" );
+}
+
+# fixed-width can use multiple markers to escape the meaning inside
+{
+   my $str = String::Tagged::Markdown->new
+      ->append_tagged( "this has `backticks`", fixed => 1 );
+
+   is( $str->build_markdown, "`` this has `backticks` ``" );
 }
 
 # marker text gets escaped

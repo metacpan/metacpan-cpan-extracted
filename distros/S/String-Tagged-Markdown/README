@@ -61,17 +61,30 @@ CONSTRUCTORS
        backslashes escape any special characters as \*
 
     In addition, within `fixed` width spans, the other formatting markers
-    are not recognised and are interpreted literally.
+    are not recognised and are interpreted literally. To include literal
+    backticks inside a `fixed` width span, use multiple backticks and a
+    space to surround the sequence. Any sequence of fewer backticks within
+    the sequence is interpreted literally. A single space on each side
+    immediately within the outer backticks will be stripped, if present.
+
+       `` fixed width with `literal backticks` inside it ``
 
  new_from_formatting
 
-       $st = String::Tagged::Markdown->new_from_formatting( $fmt )
+       $st = String::Tagged::Markdown->new_from_formatting( $fmt, %args )
 
     Returns a new instance by convertig String::Tagged::Formatting standard
     tags.
 
     The bold, italic and strike tags are preserved. monospace is renamed to
     fixed.
+
+    Supports the following extra named arguments:
+
+    convert_tags => HASH
+
+      Optionally provides additional tag conversion callbacks, as defined
+      by "clone" in String::Tagged.
 
 METHODS
 
@@ -85,13 +98,20 @@ METHODS
 
  as_formatting
 
-       $fmt = $st->as_formatting
+       $fmt = $st->as_formatting( %args )
 
     Returns a new String::Tagged instance tagged with
     String::Tagged::Formatting standard tags.
 
     The bold, italic and strike tags are preserved, fixed is renamed to
     monospace. The link tag is currently not represented at all.
+
+    Supports the following extra named arguments:
+
+    convert_tags => HASH
+
+      Optionally provides additional tag conversion callbacks, as defined
+      by "clone" in String::Tagged.
 
 AUTHOR
 

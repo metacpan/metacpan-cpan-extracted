@@ -7,7 +7,7 @@ WriteMakefile(
     NAME              => 'Biblio::Citation::Compare',
     VERSION_FROM      => 'lib/Biblio/Citation/Compare.pm', # finds $VERSION
     PREREQ_PM         => {
-        'Text::Names' => 0.19,
+        'Text::Names' => 0.46,
         'Text::LevenshteinXS' => 0.03,
         'HTML::Parser' => 2.25, 
         'Test::More' => 0.96,

@@ -31,6 +31,9 @@ my %opts = (
                 year=s
                 yearly
             ),
+            'as-np',
+            'no-pension',
+            'premiums-employer',
             'pension-employee=f',
             'pension-employer=f',
             'tax-free=f',
@@ -82,22 +85,22 @@ my $calc = Finance::Tax::Aruba::Income->tax_year(
     $opts{year},
     income => $maandloon,
     months => $opts{months},
-    exists $opts{'pension-employee'}
-        ? (pension_employee_perc => $opts{'pension-employee'})
-        : (),
-    exists $opts{'pension-employer'}
-        ? (pension_employer_perc => $opts{'pension-employer'})
-        : (),
 
-    exists $opts{'bonus'}
-        ? (bonus => $opts{'bonus'})
-        : (),
-    $opts{'fringe'}
-        ? (fringe => $opts{'fringe'})
-        : (),
-    $opts{'tax-free'}
-        ? (tax_free => $opts{'tax-free'})
-        : (),
+    exists $opts{'as-np'} ? ( as_np => 1) : (
+        exists $opts{'fringe'}
+            ? (fringe => $opts{'fringe'})
+            : (),
+        exists $opts{'no-pension'} ? (no_pension => 1) : (),
+        exists $opts{'premiums-employer'} ? (premiums_employer => 1) : (),
+        exists $opts{'bonus'}
+            ? (bonus => $opts{'bonus'})
+            : (),
+        exists $opts{'tax-free'}
+            ? (tax_free => $opts{'tax-free'})
+            : (),
+    ),
+
+
 
 );
 
@@ -115,9 +118,10 @@ if ($opts{cur} ne 'awg') {
 
 my @order = qw(
     -
-    bruto
+    income
     fringe
     bonus
+    bruto
     werving
     jaarloon
     -
@@ -165,6 +169,7 @@ my $gov_gets = $calc->income_tax + $azv_total + $aov_total;
 my $effective_rate = $gov_gets / $jaarloon * 100;
 
 my %year = (
+    income         => $calc->income,
     bruto          => $calc->yearly_income_gross,
     jaarloon       => $calc->yearly_income,
     netto          => $calc->tax_free_wage,
@@ -197,6 +202,7 @@ my %year = (
 );
 
 my %mapping = (
+    income         => 'Inkomen',
     bruto          => 'Bruto',
     jaarloon       => 'Jaarloon',
     netto          => 'Netto',
@@ -288,7 +294,7 @@ loon.pl - A salary cost calculator
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -329,9 +335,21 @@ The mandatory pension percentage paid by the employee
 
 The mandatory pension percentage paid by the employer
 
+=item --no-pension
+
+For DGA's pension is optional and this disabled pension plans
+
+=item --premium-employer
+
+The employer pays all the premiums of the AZV and OAV/AWW
+
 =item --tax-free
 
 Add the amount of tax free income to your paycheck
+
+=item --fringe
+
+Add the amount of fringe benefits to your paycheck
 
 =back
 

@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {
 	'Import::Into' => 0,
 	'Carp' => 0,
-	'Coerce::Types::Standard' => 0,
+	'Coerce::Types::Standard' => '0.000008',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Factory-Sub-*' },

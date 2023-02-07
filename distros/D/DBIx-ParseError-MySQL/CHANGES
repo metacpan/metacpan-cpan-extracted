@@ -1,6 +1,14 @@
 Changelog for DBIx-ParseError-MySQL
 
-v1.0.2 2021-06-07T22:15:14
+v1.0.3 2023-02-07T16:21:45
+ - Update README / LICENSE / Makefile (Brendan Byrd)
+ - POD fixes (Brendan Byrd)
+ - Pull request #4: SM-4041 (Tom Christiansen)
+ - SM-4041: Add a comment about this new error message (Brendan Byrd)
+ - SM-4041 add test case for new error (Tom Christiansen)
+ - SM-4014 add new connection error; fix regex (Tom Christiansen)
+
+v1.0.2 2021-06-07T22:15:01
  - Update README (Brendan Byrd)
  - Pull request #3: SM-3107 (Brendan Byrd)
  - Add support for other "Deadlock found" errors and "Service lock wait

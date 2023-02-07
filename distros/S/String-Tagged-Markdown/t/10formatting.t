@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use String::Tagged::Markdown;
 
@@ -30,6 +30,29 @@ use String::Tagged::Markdown;
       ->as_formatting;
 
    ok( $st->get_tag_at( 0, "monospace" ), '$st has monospace tag' );
+}
+
+# custom convert_tags
+{
+   my $st = String::Tagged::Markdown->new_from_formatting(
+      String::Tagged->new
+         ->append_tagged( "text", a_tag => 1 ),
+      convert_tags => {
+         a_tag => "bold"
+      }
+   );
+
+   is( $st->build_markdown, "**text**",
+      '->new_from_formatting permits custom convert_tags' );
+
+   my $st2 = $st->as_formatting(
+      convert_tags => {
+         bold => "a_tag"
+      }
+   );
+
+   is( [ $st2->tagnames ], [qw( a_tag )],
+      '->as_formatting permits custom convert_tags' );
 }
 
 done_testing;

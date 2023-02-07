@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_IPS::Strunk_3He;
-$Lab::Moose::Instrument::OI_IPS::Strunk_3He::VERSION = '3.841';
+$Lab::Moose::Instrument::OI_IPS::Strunk_3He::VERSION = '3.842';
 #ABSTRACT: Example subclass with predefined field limits of a Oxford Instruments IPS
 
 use v5.20;
@@ -41,7 +41,7 @@ Lab::Moose::Instrument::OI_IPS::Strunk_3He - Example subclass with predefined fi
 
 =head1 VERSION
 
-version 3.841
+version 3.842
 
 =head1 COPYRIGHT AND LICENSE
 

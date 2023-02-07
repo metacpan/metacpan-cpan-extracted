@@ -1,6 +1,6 @@
 package Lab::Instrument::Vectormagnet;
 #ABSTRACT: ???
-$Lab::Instrument::Vectormagnet::VERSION = '3.841';
+$Lab::Instrument::Vectormagnet::VERSION = '3.842';
 use v5.20;
 
 use strict;
@@ -637,7 +637,7 @@ Lab::Instrument::Vectormagnet - ???
 
 =head1 VERSION
 
-version 3.841
+version 3.842
 
 =head1 COPYRIGHT AND LICENSE
 

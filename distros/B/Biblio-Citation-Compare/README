@@ -19,6 +19,7 @@ This module requires these other modules and libraries:
     Text::Names
     Text::LevenshteinXS
     HTML::Entities
+    various commonly used modules such as Test::More
 
 COPYRIGHT AND LICENCE
 

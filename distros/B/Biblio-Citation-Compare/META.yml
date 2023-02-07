@@ -22,12 +22,12 @@ requires:
   Test::More: '0.96'
   Test::Most: '0.38'
   Text::LevenshteinXS: '0.03'
-  Text::Names: '0.19'
+  Text::Names: '0.46'
   Text::Roman: '3.5'
 resources:
   bugtracker: https://github.com/dbourget/Biblio-Citation-Compare
   homepage: https://metacpan.org/dist/Biblio-Citation-Compare
   license: https://dev.perl.org/licenses/
   repository: https://github.com/dbourget/Biblio-Citation-Compare.git
-version: '0.56'
+version: '0.57'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

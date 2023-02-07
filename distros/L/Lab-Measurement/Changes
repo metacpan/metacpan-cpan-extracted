@@ -4,6 +4,9 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.842 2023-02-07
+  * Nanonis Tramea: Bug fixes
+
 3.841 2023-01-25
   * Nanonis Tramea: More functionality (timing, data transfer)
   * Lakeshore 372: Fixes

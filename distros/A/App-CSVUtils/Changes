@@ -1,3 +1,10 @@
+1.008   2023-02-03  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Fix description/example in csv-check-cell.
+
+
 1.007   2023-02-03  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] Add csv-check-values as alias for csv-check-cell.

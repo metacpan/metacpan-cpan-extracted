@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::NanonisTramea;
-$Lab::Moose::Instrument::NanonisTramea::VERSION = '3.841';
+$Lab::Moose::Instrument::NanonisTramea::VERSION = '3.842';
 #ABSTRACT: Nanonis Tramea
 
 use v5.20;
@@ -188,7 +188,6 @@ sub oneDSwp_SwpSignalGet {
 
     if (($option eq "select") == 1){
         my $selected = substr $response,44,$strlen;
-        # print($selected,"\n");
     }
     elsif (($option eq "info")==1){
       my $elementNum = unpack("N!", substr $response,48+$strlen,4);
@@ -1601,10 +1600,10 @@ sub File_datLoad {
   # MISSING: Do not try to read column names and data if you are not asking for it 
   $self->write(command=>$head.nt_int(length($file_path)).$file_path.nt_int($header_only));
 
-  my $result_head = $self->read(read_length=>40);
+  my $result_head = $self->binary_read(read_length=>40);
   my $result_size = unpack("N!",substr $result_head,32,4);
 
-  my $result = $self->read(read_length=>$result_size);
+  my $result = $self->binary_read(read_length=>$result_size);
   my $Channel_names_size = unpack('N!', substr $result,0,4);
   my $Name_number = unpack('N!', substr $result,4,4);
   my $raw_names = substr $result,8,$Channel_names_size;
@@ -1891,16 +1890,36 @@ sub load_data {
     $to_return{pdl}= $pdl;
     if ($params{return_head} == 1){
 
-      $to_return{cols}=$cols_ref;
+      $to_return{header}=$head;
     }
     if ($params{return_colnames} == 1){
 
-      $to_return{header}=$head;
+      $to_return{cols}=$cols_ref;
 
     }
     return \%to_return;  
  }
 
+}
+
+# Function prototype to add sweep functionalities 
+
+sub load_last_measurement_2D {
+  my($self,%params) = validated_hash(
+  \@_,
+  return_head => {isa=>"Bool", default => 0},
+  return_colnames => {isa=>"Bool", default => 1},
+  return_raw => {isa =>"Bool",default =>0}
+ );
+  my %files = $self->threeDSwp_FilePathsGet();
+ if(scalar(keys %files)>1)
+ {
+   croak "Last Measurement was not a 2D swep, number of files recived: ".scalar(keys %files) ;
+ }
+ else
+ {
+    return $self->load_data(file_origin=>$files{0}, return_head=>$params{return_head},return_colnames=>$params{return_colnames});
+ }
 }
 
 sub parse_last_measurement {
@@ -2162,7 +2181,7 @@ sub step2_prop_configure {
                                   $params{at_end_val});  
 }
 
-sub nanonis_sweep {
+sub tramea_sweep {
   my ($self, %params) = validated_hash(
     \@_,
     sweep_channel => {isa => "Int"},
@@ -2180,7 +2199,8 @@ sub nanonis_sweep {
     point_number_step1 =>{isa=>"Int", optional=>1},
     point_number_step2 =>{isa=>"Int", optional=>1},
     series_name => {isa=> "Str", optional=>1},
-    comment => {isa=>"Str", optional =>1}
+    comment => {isa=>"Str", optional =>1},
+    load => {isa=>"Bool", default=>1}
   );
   
 
@@ -2307,75 +2327,11 @@ sub nanonis_sweep {
   {
     sleep(0.1);
   }
+  if($params{load}==1)
+  {
+    return $self->load_last_measurement_2D();
+  }
 }
-### To be deprecated!
-
-# sub to_pdl_1D{
-#     my ($self,%params) =  validated_hash(
-#       \@_,
-#       file_name=>{isa => "Str"},
-#       session_path=>{isa => "Str", optional =>1},
-#     );
-
-#     #check for file existence
-#     if(exists($params{session_path}))
-#     {
-#       $self->set_Session_Path(value=>$params{session_path});
-#     } 
-#     if($self->Session_Path() ne '')
-#     {
-#       if(-s $self->Session_Path().'/'.$params{file_name})
-#       {
-#         my $startdata = 0;
-#         my @x_col = ();
-#         my @y_col  = ();
-#         my $EOF=1; 
-#         my $buffer_line;
-#         my @col_names;
-#         my @cols;
-#         open(my $fa,'<',$self->Session_Path().'/'.$params{file_name});
-#         while($EOF)
-#         {
-#           $buffer_line=<$fa>;
-#           if($buffer_line)
-#           {
-#               if ($buffer_line =~ /(\[DATA])/){
-#                   $buffer_line = <$fa>;
-#                   @col_names = (split "\t",$buffer_line);
-#                   $buffer_line=<$fa>;
-#                   $startdata = 1;
-#               }
-#               if ($startdata==1){ 
-#                   my @buffer = split(" ",$buffer_line);
-
-#                   for(my $index=0;$index<scalar(@buffer);$index++)
-#                   {
-#                     push(@{$cols[$index]},$buffer[$index]);
-#                   }
-#               }
-#           }
-#           else
-#           {
-#               $EOF=0;
-#           }
-#         }
-#         close($fa);
-#         #my $new_pdl = pdl(pdl(@x_col),pdl(@y_col));
-#         my $new_pdl = pdl(@cols);
-#         return $new_pdl,@col_names; 
-#       }
-#       else
-#       {
-#         die "File not found at ".$self->Session_Path()."/".$params{file_name};
-#       }
-#     }
-#     else
-#     {
-#       die "Error: Session_Path is not set";
-#     }
-#   return 0;
-#   }
- 
 __PACKAGE__->meta()->make_immutable();
 
 1;
@@ -2392,7 +2348,7 @@ Lab::Moose::Instrument::NanonisTramea - Nanonis Tramea
 
 =head1 VERSION
 
-version 3.841
+version 3.842
 
 =head1 SYNOPSIS
 
@@ -2490,6 +2446,7 @@ C<float32_array> refers to float32 array binary.
 This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2022       Andreas K. Huettel, Erik Fabrizzi, Simon Reinhardt
+            2023       Erik Fabrizzi
 
 
 This is free software; you can redistribute it and/or modify it under

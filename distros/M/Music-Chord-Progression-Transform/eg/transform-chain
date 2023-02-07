@@ -76,7 +76,6 @@ sub top {
         chord_quality => $opt{quality},
         transforms    => $opt{transforms},
         max           => $opt{max},
-        format        => 'midinum',
         verbose       => $opt{verbose},
     );
     my ($generated) = $transform->circular;

@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::Income::2021;
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 use Moose;
 use namespace::autoclean;
 
@@ -103,7 +103,7 @@ Finance::Tax::Aruba::Income::2021 - Income tax calculator for the year 2021
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

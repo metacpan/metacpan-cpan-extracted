@@ -9,7 +9,7 @@ package Require::HookChain::munge::prepend;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-11-15'; # DATE
 our $DIST = 'Require-HookChain'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 sub new {
     my ($class, $preamble) = @_;
@@ -43,7 +43,7 @@ Require::HookChain::munge::prepend - Prepend a piece of code to module source
 
 =head1 VERSION
 
-This document describes version 0.004 of Require::HookChain::munge::prepend (from Perl distribution Require-HookChain), released on 2022-11-15.
+This document describes version 0.005 of Require::HookChain::munge::prepend (from Perl distribution Require-HookChain), released on 2022-11-15.
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package SPVM::Time::Local;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 1;
 
@@ -8,7 +8,13 @@ our $VERSION = '0.06';
 
 SPVM::Time::Local - Reverse Manipulation of localtime and gmtime Functions.
 
-=head1 Synopsys
+=head1 Description
+
+C<SPVM::Time::Local> is the C<Time::Local> class in L<SPVM> language.
+
+C<Time::Local> provides reverse manipulations of L<localtime|SPVM::Time/"localtime"> and L<gmtime|SPVM::Time/"gmtime"> functions.
+
+=head1 Usage
   
   use Time
   use Time::Local;
@@ -23,21 +29,11 @@ SPVM::Time::Local - Reverse Manipulation of localtime and gmtime Functions.
   # Convert a Time::Info object that is UTC to the epoch time
   my $epoch = Time::Local->timegm($time_info_utc);
 
-=head1 Description
-
-C<Time::Local> provides reverse manipulations of L<localtime|SPVM::Time/"localtime"> and L<gmtime|SPVM::Time/"gmtime"> functions.
-
-This module is a L<SPVM> class.
-
-=head1 Caution
-
-C<Time::Local> is a L<SPVM> class. L<SPVM> itself is yet experimental status.
-
 =head1 Class Methods
 
 =head2 timelocal
 
-  static method timelocal : long ($time_info : Time::Info)
+  static method timelocal : long ($time_info : Time::Info);
 
 Convert a L<Time::Info|SPVM::Time::Info> object that is local time to the epoch time.
 
@@ -49,7 +45,7 @@ This method is the same as C<timelocal> function of C<Linux>.
 
 =head2 timegm
 
-  static method timegm : long ($time_info : Time::Info)
+  static method timegm : long ($time_info : Time::Info);
 
 Convert a L<Time::Info|SPVM::Time::Info> object that is C<UTC> to the epoch time.
 
@@ -61,7 +57,7 @@ This method is the same as C<timegm> function of C<Linux>.
 
 =head1 Repository
 
-L<https://github.com/yuki-kimoto/SPVM-Time-Local>
+L<SPVM::Time::Local - Github|https://github.com/yuki-kimoto/SPVM-Time-Local>
 
 =head1 Author
 

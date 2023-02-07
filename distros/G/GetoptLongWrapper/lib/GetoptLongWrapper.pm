@@ -15,11 +15,11 @@ GetoptLongWrapper - A wrapper for the Getopt::Long module
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 # Add your own module that defines the supporting functions, pass an instance of it to the constructor (new) as $obj.
 # We don't need to EXPROT $obj.
@@ -51,11 +51,36 @@ my $dflt_help_opt= {
 
 A wrapper for the Getopts::Long module.
 
-use MyMainModule;  # has all the support functions for the options ...
+use MyMainModule;  # has the definition for function the_date. In real practice, not a demo,  all the support functions for the options ...
+ 
 use GetoptLongWrapper;
-my $gow_obj = GetoptLongWrapper->new($obj, \%OPTS_CONFIG);
-$gow_obj->run_getopt
-$gow_obj->execute_opt();
+my $mmm=MyMainModule->new();
+my %OPTS_CONFIG=(
+   'the_date'  => {
+     'desc'       => q^Print today's date.^,
+     'func'       => 'MyModule::the_date()',
+     'opt_arg_eg'   => '',
+     'opt_arg_type' => '',
+     },
+);
+$ARGV[0]='--the_date';
+my $golw_obj=new GetoptLongWrapper(mmm, \%OPTS_CONFIG);
+$golw->run_getopt();
+my $rc=$golw->execute_opt();
+if(ref($rc))
+  {
+  use Data::Dumper;
+  print Dumper $rc;
+  }
+else
+  {
+  print $rc, "\n";
+  }
+
+=head2 DEMO
+A full demo is available on GitHub.
+Requires a database , mySQL or MariaDB - the repository include SQL file to create and populate the database.
+https://github.com/ngabriel8/GOLWDemo
 
 =head1 EXPORT
 
@@ -70,18 +95,18 @@ print_usage_and_die
 
 =item I<new>
 
-  my $obj = new GetoptLongWrapper($obj, $config_href);
+  my $golw = new GetoptLongWrapper($MyObj, $config_href);
 
-The constructor takes two arguments: an object ref and a refenece to an OPT_CONFIG hash.
+The constructor takes two arguments: an object ref and a refenece to an OPTS_CONFIG hash.
 
 =cut
 
 sub new
 {
 my $name                                = basename(__FILE__, '.pm');
-my $gow_usage=sprintf('Usage: my $gow=new %s($your_object, \%%OPTS_CONFIG);', $name);
+my $golw_usage=sprintf('Usage: my $gow=new %s($your_object, \%%OPTS_CONFIG);', $name);
 $!=0;
-(scalar(@_) != 3) && die $gow_usage;
+(scalar(@_) != 3) && die $golw_usage;
 my $class=shift;
 ($obj, $config_href)=@_;
 my $self=();
@@ -265,7 +290,7 @@ return $rc;
 
 =head1 AUTHOR
 
-Nazar Gabriel, C<< <ngabriel@cpan.org> >>
+Whats his Name, C<< <whn at theglorydays.net> >>
 
 =head1 BUGS
 
@@ -302,7 +327,7 @@ L<https://metacpan.org/release/GetoptLongWrapper>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2023 by Nazar Gabriel.
+This software is Copyright (c) 2023 by Whats his Name.
 
 This is free software, licensed under:
 

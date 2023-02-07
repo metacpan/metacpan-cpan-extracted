@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
     NAME             => 'GetoptLongWrapper',
-    AUTHOR           => q{Nazar Gabriel <ngabriel@cpan.org>},
+    AUTHOR           => q{Whats his Name <whn@theglorydays.net>},
     VERSION_FROM     => 'lib/GetoptLongWrapper.pm',
     ABSTRACT_FROM    => 'lib/GetoptLongWrapper.pm',
     LICENSE          => 'artistic_2',

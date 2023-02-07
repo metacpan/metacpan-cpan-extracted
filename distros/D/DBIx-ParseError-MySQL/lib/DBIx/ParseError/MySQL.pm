@@ -11,7 +11,7 @@ use Types::Standard qw( Str Bool Object );
 
 # ABSTRACT: Error parser for MySQL
 use version;
-our $VERSION = 'v1.0.2'; # VERSION
+our $VERSION = 'v1.0.3'; # VERSION
 
 #pod =head1 SYNOPSIS
 #pod
@@ -32,7 +32,7 @@ our $VERSION = 'v1.0.2'; # VERSION
 #pod
 #pod =head1 ATTRIBUTES
 #pod
-#pod =head1 orig_error
+#pod =head2 orig_error
 #pod
 #pod Returns the original, untouched error object or string.
 #pod
@@ -44,7 +44,7 @@ has orig_error => (
     required => 1,
 );
 
-#pod =head1 error_string
+#pod =head2 error_string
 #pod
 #pod Returns the stringified version of the error.
 #pod
@@ -63,7 +63,7 @@ sub _build_error_string {
     return $self->orig_error."";
 }
 
-#pod =head1 error_type
+#pod =head2 error_type
 #pod
 #pod Returns a string that describes the type of error.  These can be one of the following:
 #pod
@@ -88,7 +88,7 @@ sub _build_error_type {
 
     # We have to capture just the first error, not other errors that may be buried in the
     # stack trace.
-    $error =~ s/ at [^\n]+ line \d+\.?\n.+//s;
+    $error =~ s/ at [^\n]+ line \d+\.?(?s:\n.*)?//;
 
     # Disable /x flag to allow for whitespace within string, but turn it on for newlines
     # and comments.
@@ -126,7 +126,11 @@ sub _build_error_type {
         # Packet corruption
         (?-x:Got a read error from the connection pipe)|
         (?-x:Got (?:an error|timeout) (?:reading|writing) communication packets)|
-        (?-x:Malformed communication packet)
+        (?-x:Malformed communication packet)|
+
+        # XXX: This _might be_ a connection failure, but the DBD::mysql error message
+        # does not expose the direct failure cause.  See DBD::mysql/dbdimp.c#L2551.
+        (?-x:Turning (?:off|on) AutoCommit failed)
     >x;
 
     # Failover/shutdown of node/server
@@ -175,12 +179,14 @@ sub _build_is_transient {
 
 #pod =head1 CONSTRUCTORS
 #pod
-#pod =head1 new
+#pod =head2 new
 #pod
 #pod     my $parsed_error = DBIx::ParseError::MySQL->new($@);
 #pod
 #pod Returns a C<DBIx::ParseError::MySQL> object.  Since the error is the only parameter, it
 #pod can be passed by itself.
+#pod
+#pod =for Pod::Coverage BUILDARGS
 #pod
 #pod =cut
 
@@ -215,7 +221,7 @@ DBIx::ParseError::MySQL - Error parser for MySQL
 
 =head1 VERSION
 
-version v1.0.2
+version v1.0.3
 
 =head1 SYNOPSIS
 
@@ -236,15 +242,15 @@ compatible with Galera's WSREP errors.
 
 =head1 ATTRIBUTES
 
-=head1 orig_error
+=head2 orig_error
 
 Returns the original, untouched error object or string.
 
-=head1 error_string
+=head2 error_string
 
 Returns the stringified version of the error.
 
-=head1 error_type
+=head2 error_type
 
 Returns a string that describes the type of error.  These can be one of the following:
 
@@ -265,12 +271,14 @@ C<< lock connection shutdown >>.
 
 =head1 CONSTRUCTORS
 
-=head1 new
+=head2 new
 
     my $parsed_error = DBIx::ParseError::MySQL->new($@);
 
 Returns a C<DBIx::ParseError::MySQL> object.  Since the error is the only parameter, it
 can be passed by itself.
+
+=for Pod::Coverage BUILDARGS
 
 =head1 SEE ALSO
 
@@ -282,7 +290,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 - 2021 by Grant Street Group.
+This software is Copyright (c) 2020 - 2023 by Grant Street Group.
 
 This is free software, licensed under:
 

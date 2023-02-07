@@ -1,77 +1,41 @@
 {
-   "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-         ],
-      "bugtracker" : {
-         "web" : "https://github.com/Tux/Spreadsheet-Read/issues"
-         },
-      "repository" : {
-         "url" : "https://github.com/Tux/Spreadsheet-Read",
-         "web" : "https://github.com/Tux/Spreadsheet-Read",
-         "type" : "git"
-         }
+   "version" : "0.86",
+   "meta-spec" : {
+      "version" : 2,
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
       },
-   "version" : "0.85",
-   "prereqs" : {
-      "runtime" : {
-         "requires" : {
-            "List::Util" : "0",
-            "Exporter" : "0",
-            "Data::Dumper" : "0",
-            "Encode" : "0",
-            "File::Temp" : "0.22",
-            "Data::Peek" : "0",
-            "Carp" : "0",
-            "perl" : "5.008001"
-            },
-         "recommends" : {
-            "Data::Peek" : "0.52",
-            "File::Temp" : "0.2311",
-            "IO::Scalar" : "0"
-            }
-         },
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-            }
-         },
-      "test" : {
-         "requires" : {
-            "Test::Harness" : "0",
-            "Test::NoWarnings" : "0",
-            "Test::More" : "0.88"
-            },
-         "recommends" : {
-            "Test::More" : "1.302191"
-            }
-         }
-      },
+   "author" : [
+      "H.Merijn Brand <perl5@tux.freedom.nl>"
+      ],
+   "abstract" : "Meta-Wrapper for reading spreadsheet data",
    "license" : [
       "perl_5"
       ],
-   "name" : "Spreadsheet-Read",
-   "provides" : {
-      "Spreadsheet::Read" : {
-         "file" : "Read.pm",
-         "version" : "0.85"
-         }
-      },
-   "generated_by" : "Author",
-   "dynamic_config" : 1,
    "optional_features" : {
-      "opt_ods" : {
+      "opt_tools" : {
          "prereqs" : {
             "runtime" : {
                "recommends" : {
-                  "Spreadsheet::ParseODS" : "0.37"
-                  },
-               "requires" : {
-                  "Spreadsheet::ParseODS" : "0.26"
+                  "Tk::TableMatrix::Spreadsheet" : "0",
+                  "Tk::NoteBook" : "0",
+                  "Tk" : "804.036"
                   }
                }
             },
-         "description" : "Provides parsing of OpenOffice spreadsheets"
+         "description" : "Spreadsheet tools"
+         },
+      "opt_gnumeric" : {
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Spreadsheet::ReadGnumeric" : "0.1"
+                  },
+               "recommends" : {
+                  "Spreadsheet::ReadGnumeric" : "0.1"
+                  }
+               }
+            },
+         "description" : "Provides parsing of Gnumeric spreadsheets"
          },
       "opt_csv" : {
          "description" : "Provides parsing of CSV streams",
@@ -81,9 +45,9 @@
                   "Text::CSV_XS" : "0.71"
                   },
                "recommends" : {
-                  "Text::CSV_XS" : "1.49",
                   "Text::CSV" : "2.02",
-                  "Text::CSV_PP" : "2.02"
+                  "Text::CSV_PP" : "2.02",
+                  "Text::CSV_XS" : "1.49"
                   }
                }
             }
@@ -97,20 +61,6 @@
                   },
                "requires" : {
                   "Spreadsheet::ReadSXC" : "0.26"
-                  }
-               }
-            }
-         },
-      "opt_xlsx" : {
-         "description" : "Provides parsing of Microsoft Excel 2007 files",
-         "prereqs" : {
-            "runtime" : {
-               "recommends" : {
-                  "Spreadsheet::ParseXLSX" : "0.27"
-                  },
-               "requires" : {
-                  "Spreadsheet::ParseXLSX" : "0.24",
-                  "Spreadsheet::ParseExcel::FmtDefault" : "0"
                   }
                }
             }
@@ -129,26 +79,89 @@
                }
             }
          },
-      "opt_tools" : {
-         "description" : "Spreadsheet tools",
+      "opt_xlsx" : {
+         "description" : "Provides parsing of Microsoft Excel 2007 files",
          "prereqs" : {
             "runtime" : {
+               "requires" : {
+                  "Spreadsheet::ParseXLSX" : "0.24",
+                  "Spreadsheet::ParseExcel::FmtDefault" : "0"
+                  },
                "recommends" : {
-                  "Tk" : "804.036",
-                  "Tk::NoteBook" : "0",
-                  "Tk::TableMatrix::Spreadsheet" : "0"
+                  "Spreadsheet::ParseXLSX" : "0.27"
                   }
                }
             }
+         },
+      "opt_ods" : {
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Spreadsheet::ParseODS" : "0.26"
+                  },
+               "recommends" : {
+                  "Spreadsheet::ParseODS" : "0.37"
+                  }
+               }
+            },
+         "description" : "Provides parsing of OpenOffice spreadsheets"
          }
       },
-   "meta-spec" : {
-      "version" : 2,
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Tux/Spreadsheet-Read/issues"
+         },
+      "repository" : {
+         "url" : "https://github.com/Tux/Spreadsheet-Read",
+         "type" : "git",
+         "web" : "https://github.com/Tux/Spreadsheet-Read"
+         },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+         ]
+      },
+   "provides" : {
+      "Spreadsheet::Read" : {
+         "file" : "Read.pm",
+         "version" : "0.86"
+         }
+      },
+   "name" : "Spreadsheet-Read",
+   "dynamic_config" : 1,
+   "prereqs" : {
+      "runtime" : {
+         "recommends" : {
+            "Data::Peek" : "0.52",
+            "File::Temp" : "0.2311",
+            "IO::Scalar" : "0"
+            },
+         "requires" : {
+            "Encode" : "0",
+            "File::Temp" : "0.22",
+            "Data::Peek" : "0",
+            "Carp" : "0",
+            "List::Util" : "0",
+            "Exporter" : "0",
+            "Data::Dumper" : "0",
+            "perl" : "5.008001"
+            }
+         },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+            }
+         },
+      "test" : {
+         "recommends" : {
+            "Test::More" : "1.302191"
+            },
+         "requires" : {
+            "Test::NoWarnings" : "0",
+            "Test::Harness" : "0",
+            "Test::More" : "0.88"
+            }
+         }
       },
    "release_status" : "stable",
-   "author" : [
-      "H.Merijn Brand <perl5@tux.freedom.nl>"
-      ],
-   "abstract" : "Meta-Wrapper for reading spreadsheet data"
+   "generated_by" : "Author"
    }

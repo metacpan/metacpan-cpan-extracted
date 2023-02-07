@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022-2023 -- leonerd@leonerd.org.uk
 
-package String::Tagged::Markdown 0.02;
+package String::Tagged::Markdown 0.03;
 
 use v5.26;
 use warnings;
@@ -52,32 +52,58 @@ String value indicating a link. The value itself is the link target.
 
 =cut
 
-my %TAG_FOR_MARKER = (
+# Use class methods that depend on the specific tags we parse, so we can
+# easily extend the syntax using a subclass
+
+sub markdown_markers
+{
    "**" => "bold",
    "*"  => "italic",
    "__" => "bold",
    "_"  => "italic",
    "~~" => "strike",
    "`"  => "fixed",
-);
+}
 
-my %MARKER_FOR_TAG = map {
-   # Don't emit _ markers
-   ( $_ =~ m/_/ ) ? () : ( $TAG_FOR_MARKER{$_} => $_ ),
-} keys %TAG_FOR_MARKER;
+sub __cache_per_class ( $code )
+{
+   my %cache;
+   return sub ( $self ) {
+      my $class = ref $self || $self;
+      return $cache{$class} //= $code->( $class );
+   };
+}
+
+*TAG_FOR_MARKER = __cache_per_class sub ( $class ) {
+   return +{ $class->markdown_markers };
+};
+
+# Reverse mapping of TAG_FOR_MARKER
+*MARKER_FOR_TAG = __cache_per_class sub ( $class ) {
+   my $TAG_FOR_MARKER = $class->TAG_FOR_MARKER;
+
+   return +{ map {
+      # Don't emit _ markers
+      ( $_ =~ m/_/ ) ? () : ( $TAG_FOR_MARKER->{$_} => $_ ),
+   } keys %$TAG_FOR_MARKER };
+};
 
 # Regexp to match any formatting marker
-my $MARKER_PATTERN = do {
+*MARKER_PATTERN = __cache_per_class sub ( $class ) {
+   my $TAG_FOR_MARKER = $class->TAG_FOR_MARKER;
+
    my $re = join "|", map { quotemeta $_ }
                       sort { length $b <=> length $a }
-                      keys %TAG_FOR_MARKER;
+                      keys %$TAG_FOR_MARKER;
    qr/$re/;
 };
 
 # Regexp to match any character that needs escaping
-my $NEEDS_ESCAPE_PATTERN = do {
+*NEEDS_ESCAPE_PATTERN = __cache_per_class sub ( $class ) {
+   my $TAG_FOR_MARKER = $class->TAG_FOR_MARKER;
+
    my $chars = quotemeta join "", uniqstr map { substr( $_, 0, 1 ) } (
-      keys %TAG_FOR_MARKER,
+      keys %$TAG_FOR_MARKER,
       "\\", "[", "]"
    );
    my $re = "[$chars]";
@@ -109,7 +135,13 @@ Recognises the following kinds of inline text markers:
    backslashes escape any special characters as \*
 
 In addition, within C<`fixed`> width spans, the other formatting markers are
-not recognised and are interpreted literally.
+not recognised and are interpreted literally. To include literal backticks
+inside a C<`fixed`> width span, use multiple backticks and a space to surround
+the sequence. Any sequence of fewer backticks within the sequence is
+interpreted literally. A single space on each side immediately within the outer
+backticks will be stripped, if present.
+
+   `` fixed width with `literal backticks` inside it ``
 
 =cut
 
@@ -119,6 +151,9 @@ sub parse_markdown ( $class, $str )
 
    my %tags_in_effect;
    my $link_start_pos;
+
+   my $MARKER_PATTERN = $class->MARKER_PATTERN;
+   my $TAG_FOR_MARKER = $class->TAG_FOR_MARKER;
 
    pos $str = 0;
    while( pos $str < length $str ) {
@@ -139,11 +174,16 @@ sub parse_markdown ( $class, $str )
       }
       elsif( $str =~ m/\G($MARKER_PATTERN)/gc ) {
          my $marker = $1;
-         my $tag = $TAG_FOR_MARKER{$marker};
+         my $tag = $TAG_FOR_MARKER->{$marker};
 
          if( $marker eq "`" ) {
+            if( $str =~ m/\G(`)+/gc ) {
+               $marker .= $1;
+            }
             $str =~ m/\G(.*?)(?:\Q$marker\E|$)/gc;
-            $self->append_tagged( $1, %tags_in_effect, $tag => 1 );
+            my $inner = $1;
+            $inner =~ s/^ (.*) $/$1/ if length $marker > 1;
+            $self->append_tagged( $inner, %tags_in_effect, $tag => 1 );
             next;
          }
 
@@ -161,7 +201,7 @@ sub parse_markdown ( $class, $str )
 
 =head2 new_from_formatting
 
-   $st = String::Tagged::Markdown->new_from_formatting( $fmt )
+   $st = String::Tagged::Markdown->new_from_formatting( $fmt, %args )
 
 Returns a new instance by convertig L<String::Tagged::Formatting> standard
 tags.
@@ -169,15 +209,42 @@ tags.
 The C<bold>, C<italic> and C<strike> tags are preserved. C<monospace> is
 renamed to C<fixed>.
 
+Supports the following extra named arguments:
+
+=over 4
+
+=item convert_tags => HASH
+
+Optionally provides additional tag conversion callbacks, as defined by
+L<String::Tagged/clone>.
+
+=back
+
 =cut
 
-sub new_from_formatting ( $class, $orig )
+*_TAGS_FROM_FORMATTING = __cache_per_class sub ( $class ) {
+   return +{ $class->tags_from_formatting };
+};
+
+sub tags_from_formatting ( $class )
 {
+   bold      => "bold",
+   italic    => "italic",
+   monospace => "fixed",
+   strike    => "strike",
+}
+
+sub new_from_formatting ( $class, $orig, %args )
+{
+   my $CONVERSIONS = $class->_TAGS_FROM_FORMATTING;
+
+   if( $args{convert_tags} ) {
+      $CONVERSIONS = { $CONVERSIONS->%*, $args{convert_tags}->%* };
+   }
+
    return $class->clone( $orig,
-      only_tags => [qw( bold italic strike monospace )],
-      convert_tags => {
-         monospace => "fixed",
-      }
+      only_tags => [ keys $CONVERSIONS->%* ],
+      convert_tags => $CONVERSIONS,
    );
 }
 
@@ -201,6 +268,9 @@ sub build_markdown ( $self )
    my @tags_in_effect;  # need to remember the order
    my $link_target;
 
+   my $NEEDS_ESCAPE_PATTERN = $self->NEEDS_ESCAPE_PATTERN;
+   my $MARKER_FOR_TAG       = $self->MARKER_FOR_TAG;
+
    $self->iter_substr_nooverlap( my $code = sub ( $substr, %tags ) {
       while( @tags_in_effect and !$tags{ $tags_in_effect[-1] } ) {
          my $tag = pop @tags_in_effect;
@@ -209,7 +279,7 @@ sub build_markdown ( $self )
             $ret .= "]($link_target)";
          }
          else {
-            my $marker = $MARKER_FOR_TAG{$tag};
+            my $marker = $MARKER_FOR_TAG->{$tag};
             $ret .= $marker;
          }
       }
@@ -229,7 +299,7 @@ sub build_markdown ( $self )
             $link_target = $tags{link};
          }
          else {
-            my $marker = $MARKER_FOR_TAG{$tag};
+            my $marker = $MARKER_FOR_TAG->{$tag};
             $ret .= $marker;
          }
 
@@ -237,9 +307,14 @@ sub build_markdown ( $self )
 
       }
 
-      # Inside `fixed`, most markers don't need escaping
+      # Inside `fixed`, markers don't need escaping
       if( $tags{fixed} ) {
-         $substr =~ s/([\\`])/\\$1/g;
+         # If the interior contains literal `s then we'll have to use multiple
+         # and a space to surround it
+         my $more = "";
+         $more .= "`" while $substr =~ m/`$more/;
+
+         $substr = "$more $substr $more" if length $more and $substr =~ m/^`|`$/;
       }
       else {
          $substr =~ s/($NEEDS_ESCAPE_PATTERN)/\\$1/g;
@@ -254,7 +329,7 @@ sub build_markdown ( $self )
 
 =head2 as_formatting
 
-   $fmt = $st->as_formatting
+   $fmt = $st->as_formatting( %args )
 
 Returns a new C<String::Tagged> instance tagged with
 L<String::Tagged::Formatting> standard tags.
@@ -262,15 +337,41 @@ L<String::Tagged::Formatting> standard tags.
 The C<bold>, C<italic> and C<strike> tags are preserved, C<fixed> is renamed
 to C<monospace>. The C<link> tag is currently not represented at all.
 
+Supports the following extra named arguments:
+
+=over 4
+
+=item convert_tags => HASH
+
+Optionally provides additional tag conversion callbacks, as defined by
+L<String::Tagged/clone>.
+
+=back
+
 =cut
 
-sub as_formatting ( $self )
+*_TAGS_TO_FORMATTING = __cache_per_class sub ( $class ) {
+   return +{ $class->tags_to_formatting };
+};
+
+sub tags_to_formatting ( $class )
 {
+   bold   => "bold",
+   italic => "italic",
+   fixed  => "monospace",
+   strike => "strike",
+}
+
+sub as_formatting ( $self, %args )
+{
+   my $CONVERSIONS = $self->_TAGS_TO_FORMATTING;
+   if( $args{convert_tags} ) {
+      $CONVERSIONS = { $CONVERSIONS->%*, $args{convert_tags}->%* };
+   }
+
    return String::Tagged->clone( $self,
-      only_tags => [qw( bold italic fixed strike )],
-      convert_tags => {
-         fixed => "monospace",
-      }
+      only_tags => [ keys $CONVERSIONS->%* ],
+      convert_tags => $CONVERSIONS,
    );
 }
 

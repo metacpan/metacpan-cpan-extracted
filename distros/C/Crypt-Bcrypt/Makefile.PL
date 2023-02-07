@@ -5,6 +5,7 @@
 use strict;
 use warnings;
 
+use 5.006;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
@@ -18,8 +19,10 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Crypt-Bcrypt",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Crypt::Bcrypt",
   "PREREQ_PM" => {
+    "Digest::SHA" => 0,
     "Exporter" => "5.57",
     "MIME::Base64" => "2.21",
     "XSLoader" => 0,
@@ -29,7 +32,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,6 +44,7 @@ my %WriteMakefileArgs = (
 );
 
 my %FallbackPrereqs = (
+  "Digest::SHA" => 0,
   "Exporter" => "5.57",
   "ExtUtils::ParseXS" => "2.21",
   "MIME::Base64" => "2.21",

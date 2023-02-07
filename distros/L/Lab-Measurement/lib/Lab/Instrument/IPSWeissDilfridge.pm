@@ -1,6 +1,6 @@
 package Lab::Instrument::IPSWeissDillFridge;
 #ABSTRACT: Derived IPS instrument for the AG Weiss dilution refrigerator
-$Lab::Instrument::IPSWeissDillFridge::VERSION = '3.841';
+$Lab::Instrument::IPSWeissDillFridge::VERSION = '3.842';
 use v5.20;
 
 use strict;
@@ -79,7 +79,7 @@ Lab::Instrument::IPSWeissDillFridge - Derived IPS instrument for the AG Weiss di
 
 =head1 VERSION
 
-version 3.841
+version 3.842
 
 =head1 TO DO
 

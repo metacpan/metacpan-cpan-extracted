@@ -6,7 +6,7 @@ use Test::More;
 
 plan tests => 1;
 
-# In the OPTS_CONFIG hash use $obj for function calls. The Wrapper constructor refers to your module's reference as $obj internally.
+# in the OPTS_CONFIG hash use $obj for function calls. The Wrapper constructor refers to your module's reference as $obj internally.
 
 package MyModule;
 use strict;

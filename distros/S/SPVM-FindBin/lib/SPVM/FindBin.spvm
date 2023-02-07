@@ -1,0 +1,79 @@
+class FindBin {
+  use Sys;
+  use Sys::IO;
+  use Sys::IO::Stat;
+  use Sys::FileTest;
+  use Cwd;
+  use File::Spec;
+  use File::Basename;
+  use Sys::IO::Constant as IO;
+  
+  our $Bin : ro string;
+  our $Script : ro string;
+  our $RealBin : ro string;
+  our $RealScript : ro string;
+  
+  private static method readlinkp : string ($file : string) {
+    my $stat = Sys::IO::Stat->new;
+    
+    my $status = Sys::IO::Stat->lstat($file, $stat);
+    
+    my $link_text = (string)undef;
+    if ($status == 0) {
+      if (($stat->st_mode & IO->S_IFMT) == IO->S_IFLNK) {
+        my $link_text_length = (int)$stat->st_size;
+        my $link_text = (mutable string)new_string_len $link_text_length;
+        Sys::IO->readlink($file, $link_text, $link_text_length);
+      }
+    }
+    
+    return $link_text;
+  }
+  
+  static method init : void () {
+    
+    my $script = CommandInfo->PROGRAM_NAME;
+    
+    unless (Sys::FileTest->f($script)) {
+      die "Cannot find current script \"$script\"";
+    }
+    
+    my $spec = File::Spec->new;
+    
+    unless ($spec->file_name_is_absolute($script)) {
+      $script = $spec->catfile([Cwd->getcwd], $script);
+    }
+    
+    my $fbn = File::Basename->new;
+    my $fbn_ret = $fbn->fileparse($script);
+    $Script = $fbn_ret->[0];
+    $Bin = $fbn_ret->[1];
+    
+    while (1) {
+      my $link_text = &readlinkp($script);
+      
+      my $fbn_ret = $fbn->fileparse($script);
+      $RealScript = $fbn_ret->[0];
+      $RealBin = $fbn_ret->[1];
+      
+      unless ($link_text) {
+        last;
+      }
+      
+      if ($spec->file_name_is_absolute($link_text)) {
+        $script = $link_text;
+      }
+      else {
+        $script = $spec->catfile([$RealBin], $link_text);
+      }
+    }
+    
+    $Bin = Cwd->abs_path($Bin);
+    
+    $RealBin = Cwd->abs_path($RealBin);
+  }
+
+  static method again : void () {
+    &init();
+  }
+}

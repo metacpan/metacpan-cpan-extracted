@@ -30,7 +30,6 @@
       "runtime" : {
          "requires" : {
             "Log::ger" : "0.038",
-            "Require::Hook::Source::MetaCPAN" : "0",
             "Scalar::Util" : "0",
             "alias::module" : "0",
             "strict" : "0",
@@ -49,31 +48,27 @@
    "provides" : {
       "RHC" : {
          "file" : "lib/RHC.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Require::HookChain" : {
          "file" : "lib/Require/HookChain.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Require::HookChain::log::logger" : {
          "file" : "lib/Require/HookChain/log/logger.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Require::HookChain::log::stderr" : {
          "file" : "lib/Require/HookChain/log/stderr.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Require::HookChain::munge::prepend" : {
          "file" : "lib/Require/HookChain/munge/prepend.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Require::HookChain::r" : {
          "file" : "lib/Require/HookChain.pm",
-         "version" : "0.004"
-      },
-      "Require::HookChain::source::metacpan" : {
-         "file" : "lib/Require/HookChain/source/metacpan.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -88,7 +83,7 @@
          "web" : "https://github.com/perlancar/perl-Require-HookChain"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

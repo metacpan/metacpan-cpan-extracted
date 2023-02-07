@@ -10,7 +10,7 @@ use Text::CSV_XS;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-02-03'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.007'; # VERSION
+our $VERSION = '1.008'; # VERSION
 
 binmode STDIN, ':encoding(utf8)';
 binmode STDOUT, ':encoding(utf8)';
@@ -53,7 +53,7 @@ csv2ltsv - Convert CSV to LTSV
 
 =head1 VERSION
 
-This document describes version 1.007 of csv2ltsv (from Perl distribution App-CSVUtils), released on 2023-02-03.
+This document describes version 1.008 of csv2ltsv (from Perl distribution App-CSVUtils), released on 2023-02-03.
 
 =head1 SYNOPSIS
 

@@ -17,7 +17,6 @@ my %WriteMakefileArgs = (
   "NAME" => "Require::HookChain",
   "PREREQ_PM" => {
     "Log::ger" => "0.038",
-    "Require::Hook::Source::MetaCPAN" => 0,
     "Scalar::Util" => 0,
     "alias::module" => 0,
     "strict" => 0,
@@ -29,7 +28,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +40,6 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Log::ger" => "0.038",
-  "Require::Hook::Source::MetaCPAN" => 0,
   "Scalar::Util" => 0,
   "Test::More" => 0,
   "alias::module" => 0,

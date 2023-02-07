@@ -26,7 +26,7 @@ our @EXPORT_OK = qw/
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.22.1";
+our $VERSION = "v6.22.2";
 
 sub op_audit_time {
     my ($duration) = @_;
@@ -253,11 +253,7 @@ sub op_combine_latest_with {
 }
 
 sub op_concat_all {
-    return sub {
-        my ($source) = @_;
-
-        return $source->pipe( op_merge_all(1) );
-    };
+    return op_merge_all(1);
 }
 
 sub op_concat_map {
@@ -1018,40 +1014,6 @@ sub op_max {
     };
 }
 
-sub _op_merge_all_make_subscriber {
-    my ($small_subscriptions, $subscriber, $num_subscriptions_ref, $stored_observables) = @_;
-
-    my $small_subscription = RxPerl::Subscription->new;
-    $small_subscriptions->{$small_subscription} = $small_subscription;
-    return {
-        new_subscription => $small_subscription,
-        next     => sub {
-            $subscriber->{next}->(@_) if defined $subscriber->{next};
-        },
-        error    => sub {
-            $subscriber->{error}->(@_) if defined $subscriber->{error};
-        },
-        complete => sub {
-            $$num_subscriptions_ref--;
-            delete $small_subscriptions->{$small_subscription};
-            if (@$stored_observables) {
-                $$num_subscriptions_ref++;
-                my $new_obs = shift @$stored_observables;
-                $new_obs->subscribe(
-                    _op_merge_all_make_subscriber(
-                        $small_subscriptions,
-                        $subscriber,
-                        $num_subscriptions_ref,
-                        $stored_observables,
-                    ),
-                );
-            } else {
-                $subscriber->{complete}->() if !$$num_subscriptions_ref and defined $subscriber->{complete};
-            }
-        },
-    };
-}
-
 sub op_merge_all {
     my ($concurrent) = @_;
 
@@ -1071,6 +1033,33 @@ sub op_merge_all {
                 \%small_subscriptions,
             );
 
+            my $weak_sub;
+            my $make_subscriber_sub = sub {
+                my $small_subscription = RxPerl::Subscription->new;
+                $small_subscriptions{$small_subscription} = $small_subscription;
+                return {
+                    new_subscription => $small_subscription,
+                    next     => sub {
+                        $subscriber->{next}->(@_) if defined $subscriber->{next};
+                    },
+                    error    => sub {
+                        $subscriber->{error}->(@_) if defined $subscriber->{error};
+                    },
+                    complete => sub {
+                        $num_subscriptions--;
+                        delete $small_subscriptions{$small_subscription};
+                        if (@stored_observables) {
+                            $num_subscriptions++;
+                            my $new_obs = shift @stored_observables;
+                            $new_obs->subscribe($weak_sub->());
+                        } else {
+                            $subscriber->{complete}->() if !$num_subscriptions and defined $subscriber->{complete};
+                        }
+                    },
+                };
+            };
+            weaken($weak_sub = $make_subscriber_sub);
+
             my $own_subscriber = {
                 new_subscription => $own_subscription,
                 next     => sub {
@@ -1080,14 +1069,7 @@ sub op_merge_all {
                     if (! defined $concurrent or $num_subscriptions < $concurrent) {
                         $num_subscriptions++;
                         my $new_obs = shift @stored_observables;
-                        $new_obs->subscribe(
-                            _op_merge_all_make_subscriber(
-                                \%small_subscriptions,
-                                $subscriber,
-                                \$num_subscriptions,
-                                \@stored_observables,
-                            ),
-                        );
+                        $new_obs->subscribe($make_subscriber_sub->());
                     }
                 },
                 error    => sub {

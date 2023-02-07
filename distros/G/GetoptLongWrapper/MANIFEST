@@ -1,9 +1,9 @@
 Changes
 ignore.txt
 LICENSE
-Makefile.PL
 MANIFEST			This list of files
-MANIFEST.SKIP
+MANIFEST.SKIP			List of files/directories to exclude from the MANIFEST file
+Makefile.PL
 lib/GetoptLongWrapper.pm
 README
 t/00-load.t

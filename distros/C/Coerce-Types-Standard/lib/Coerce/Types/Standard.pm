@@ -10,7 +10,7 @@ use parent 'Types::Standard';
 our @EXPORT_OK = ( Types::Standard->type_names );
 
 our $meta = __PACKAGE__->meta;
-our $VERSION = '0.000007';
+our $VERSION = '0.000008';
 
 our (%entity, %recurse, %compare, $esc, $unesc, $path);
 BEGIN {
@@ -440,11 +440,6 @@ sub recurse {
 	$_[0];
 }
 
-# TODO a little documentations
-# TBC .....
-
-__PACKAGE__->meta->make_immutable;
-
 1;
 
 __END__
@@ -455,7 +450,7 @@ Coerce::Types::Standard - Coercing
 
 =head1 VERSION
 
-Version 0.000007
+Version 0.000008
 
 =cut
 

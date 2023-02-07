@@ -2,6 +2,6 @@ class Time::Local {
   use Time::Info;
   
   native static method timelocal : long ($time_info : Time::Info);
+  
   native static method timegm : long ($time_info : Time::Info);
 }
-

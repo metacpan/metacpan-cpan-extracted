@@ -19,3 +19,7 @@ Revision history for Perl extension Biblio::Citation::Compare.
     - Improved detection and handling of editions; minor bug fixes
 0.55 Feb 4 2023
     - Misc and fix for failing test contributed by KohaAloha
+0.56 Feb 5 2023
+    - Fixed missing dependency for Test::Most
+0.57 Feb 6 2023
+    - Incremented Text::Names version to resolve problems with it

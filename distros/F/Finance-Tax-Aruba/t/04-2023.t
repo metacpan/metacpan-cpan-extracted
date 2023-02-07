@@ -94,11 +94,49 @@ my @tests = (
             aov_yearly_income => 79980,
             azv_yearly_income => 79980,
 
-            child_deductions  => 5700 *2,
+            child_deductions  => 5700 * 2,
             net_yearly_income => 63301.32,
 
             tax_fixed => 0,
             tax_rate  => 12,
+
+        },
+    },
+    {
+        year              => 2023,
+        isa               => 'Finance::Tax::Aruba::Income::2023',
+        income            => 6250,
+        label             => "Test premiums paid by employer and no pension",
+        fringe            => 40,
+        no_pension        => 1,
+        premiums_employer => 1,
+
+        results => {
+            wervingskosten    => 1500,
+            yearly_income     => 73980,
+            net_yearly_income => 73980,
+
+            azv_percentage_employer => 10.5,
+            aov_percentage_employer => 15.5,
+
+            tax_fixed => 3493,
+            tax_rate  => 21,
+
+        },
+    },
+    {
+        year              => 2023,
+        isa               => 'Finance::Tax::Aruba::Income::2023',
+        income            => 6250,
+        label             => "Pension 1% by employee",
+        pension_employee_perc => 1,
+
+        results => {
+            wervingskosten    => 1500,
+            pension_employer_perc => 5,
+
+            tax_fixed => 3493,
+            tax_rate  => 21,
 
         },
     },

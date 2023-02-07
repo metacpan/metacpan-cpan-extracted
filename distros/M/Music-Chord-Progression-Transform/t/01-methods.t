@@ -48,7 +48,7 @@ subtest transform_array => sub {
     ];
     my ($got) = $obj->generate;
     no warnings qw(qw);
-    my $expect = [[qw(C4 E4 G4)], [qw(C4 D#4 G4)], [qw(D4 F4 A4)]];
+    my $expect = [ [ 60, 64, 67 ], [ 60, 63, 67 ], [ 62, 65, 69 ] ];
     is_deeply $got, $expect, 'generated chords';
 };
 
@@ -71,13 +71,13 @@ subtest transform_base => sub {
     is @$got, $expect, "generated $expect chords";
 };
 
-subtest midinum_format => sub {
+subtest ISO_format => sub {
     my $obj = new_ok $module => [
-        format     => 'midinum',
+        format     => 'ISO',
         transforms => [qw(O)],
     ];
     my ($got) = $obj->generate;
-    my $expect = [qw(60 64 67)];
+    my $expect = [qw(C4 E4 G4)];
     is_deeply $got->[0], $expect, 'generated 0th chord';
 };
 
@@ -89,7 +89,7 @@ subtest circular => sub {
     ];
     my ($got) = $obj->circular;
     is @$got, $expect, "generated $expect chords";
-    $expect = [qw(C4 E4 G4)];
+    $expect = [qw(60 64 67)];
     is_deeply $got->[0], $expect, 'generated 0th chord';
 };
 
@@ -102,7 +102,7 @@ subtest t_quality => sub {
     my $expect = 4;
     is @$got, $expect, "generated $expect chords";
     no warnings qw(qw);
-    $expect = [['C4','E4','G4','A#4'],['C#4','F4','G#4','B4'],['D#4','G4','A#4','C#5'],['C4','E4','G4','A#4']];
+    $expect = [ [ 60, 64, 67, 70 ], [ 61, 65, 68, 71 ], [ 63, 67, 70, 73 ], [ 60, 64, 67, 70 ] ];
     is_deeply $got, $expect, 'generate';
 };
 
@@ -115,7 +115,7 @@ subtest nro_quality => sub {
     my $expect = 4;
     is @$got, $expect, "generated $expect chords";
     no warnings qw(qw);
-    $expect = [['C4','E4','G4','A#4'],['C#4','E4','G4','A4'],['C4','E4','G4','A#4'],['C#4','E4','F#4','A#4']];
+    $expect = [ [ 60, 64, 67, 70 ], [ 61, 64, 67, 69 ], [ 60, 64, 67, 70 ], [ 61, 64, 66, 70 ] ];
     is_deeply $got, $expect, 'generate';
 };
 

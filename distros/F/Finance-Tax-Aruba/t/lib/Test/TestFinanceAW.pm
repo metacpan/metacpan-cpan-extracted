@@ -149,11 +149,14 @@ sub test_yearly_income {
 
     check_required_results($calc, $results, 'tax_rate');
 
+    if (!check_optional_results($calc, $results, 'employee_income_deductions')) {
+        my $amount = $calc->aov_employee + $calc->azv_employee + $calc->income_tax;
+        is($calc->employee_income_deductions, $amount, "Employee income deducations: $amount");
+    }
+
+
     if (!check_optional_results($calc, $results, 'tax_free_wage')) {
-        my $amount
-            = $calc->yearly_income
-            - $calc->employee_income_deductions
-            - $calc->taxfree_amount;
+        my $amount = $calc->yearly_income - $calc->employee_income_deductions - $calc->taxfree_amount - $calc->fringe;
         is($calc->tax_free_wage, $amount, "Tax free wages: $amount");
     }
 

@@ -1,5 +1,12 @@
 Revision history for String-Tagged-Markdown
 
+0.03    2023-02-06
+        [CHANGES]
+         * Handle the multiple-backtick version of fixed-width
+         * Permit extension syntax by subclassing
+         * Added `String::Tagged::Markdown::HFM` to handle HedgeDoc extensions
+         * Swap all unit tests from `Test::More` to `Test2::V0`
+
 0.02    2022-12-04
         [BUGFIXES]
          * Don't need to escape most formatting characters inside `fixed` text

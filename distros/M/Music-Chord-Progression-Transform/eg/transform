@@ -11,7 +11,7 @@ my $bpm        = shift || 100;
 my $note       = shift || 'C';
 my $octave     = shift || 4;
 my $quality    = shift || '';
-my $transforms = shift || 'P,L,R,P,L,R'; # giving an integer = random
+my $transforms = shift || 'L,R,P,R,S'; # giving an integer = random
 
 if ($transforms !~ /^\d+$/) {
     $transforms = [ split /,/, $transforms ];
@@ -22,7 +22,6 @@ my $transform = Music::Chord::Progression::Transform->new(
     base_octave   => $octave,
     chord_quality => $quality,
     transforms    => $transforms,
-    format        => 'midinum',
     verbose       => 1,
 );
 my ($generated) = $transform->generate;

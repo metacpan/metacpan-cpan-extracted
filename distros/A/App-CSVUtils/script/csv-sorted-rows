@@ -13,7 +13,7 @@ use Perinci::CmdLine::Any;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-02-03'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.007'; # VERSION
+our $VERSION = '1.008'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_sorted_rows/csv_sorted_rows",
@@ -41,7 +41,7 @@ csv-sorted-rows - Check that CSV rows are sorted
 
 =head1 VERSION
 
-This document describes version 1.007 of csv-sorted-rows (from Perl distribution App-CSVUtils), released on 2023-02-03.
+This document describes version 1.008 of csv-sorted-rows (from Perl distribution App-CSVUtils), released on 2023-02-03.
 
 =head1 SYNOPSIS
 

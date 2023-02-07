@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::Role::Income::TaxYear;
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 use Moose::Role;
 
 # ABSTRACT: A role that implements income tax logic
@@ -431,10 +431,7 @@ sub child_deductions {
 sub zuiver_jaarloon {
     my $self = shift;
 
-    return
-          $self->yearly_income
-        - $self->aov_employee
-        - $self->azv_employee
+    return $self->yearly_income - $self->aov_employee - $self->azv_employee
         - $self->child_deductions;
 }
 
@@ -456,8 +453,11 @@ sub pension_total {
 
 sub tax_free_wage {
     my $self = shift;
-    return $self->yearly_income - $self->employee_income_deductions
-        - $self->taxfree_amount - $self->fringe;
+    return
+          $self->yearly_income
+        - $self->employee_income_deductions
+        - $self->taxfree_amount
+        - $self->fringe;
 }
 
 sub net_income {
@@ -489,8 +489,76 @@ around BUILDARGS => sub {
         $args{$_} *= ($args{months} // 12);
     }
 
+    if ($args{as_np}) {
+
+        $args{pension_employer_perc} = 0;
+        $args{pension_employee_perc} = 0;
+
+        $self->_offset_values('aov_percentage_employer', 0,
+            'aov_percentage_employee', \%args);
+        $self->_offset_values('azv_percentage_employer', 0,
+            'azv_percentage_employee', \%args);
+        return $self->$orig(%args);
+    }
+
+
+    if ($args{no_pension}) {
+        $args{pension_employer_perc} = 0;
+        $args{pension_employee_perc} = 0;
+    }
+    else {
+        if ($args{pension_employee_perc}) {
+            $self->_offset_values('pension_employee_perc',
+                $args{pension_employee_perc},
+                'pension_employer_perc', \%args);
+        }
+        if ($args{pension_employer_perc}) {
+            $self->_offset_values('pension_employer_perc',
+                $args{pension_employer_perc},
+                'pension_employee_perc', \%args);
+        }
+    }
+
+    if ($args{premiums_employer}) {
+        $self->_offset_values('aov_percentage_employee', 0,
+            'aov_percentage_employer', \%args);
+        $self->_offset_values('azv_percentage_employee', 0,
+            'azv_percentage_employer', \%args);
+    }
+    else {
+        if ($args{azv_by_employer}) {
+            $self->_offset_values(
+                'azv_percentage_employee', 0,
+                'azv_percentage_employer', \%args
+            );
+        }
+
+        if ($args{aov_by_employer}) {
+            $self->_offset_values(
+                'aov_percentage_employee', 0,
+                'aov_percentage_employer', \%args
+            );
+        }
+    }
+
     return $self->$orig(%args);
+
 };
+
+sub _offset_values {
+    my $self   = shift;
+    my $source = $self->meta->find_attribute_by_name(shift);
+    my $value  = shift;
+    my $target = $self->meta->find_attribute_by_name(shift);
+    my $args   = shift;
+
+    my $diff = $value - $source->default;
+    my $t    = $target->default + (-1 * $diff);
+
+    $args->{ $source->name } = $value;
+    $args->{ $target->name } = $t;
+    return;
+}
 
 1;
 
@@ -506,7 +574,7 @@ Finance::Tax::Aruba::Role::Income::TaxYear - A role that implements income tax l
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

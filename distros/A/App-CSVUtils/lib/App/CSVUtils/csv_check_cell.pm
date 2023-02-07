@@ -8,7 +8,7 @@ use Log::ger;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-02-03'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.007'; # VERSION
+our $VERSION = '1.008'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -29,11 +29,11 @@ Example `input.csv`:
 
 Check that ingredients do not contain number:
 
-    % csv-check-cell input.csv %weight --with-schema array::num::rev_sorted
-    ERROR 400: Field '%weight' does not validate with schema 'array::num::rev_sorted'
+    % csv-check-cell input.csv -f ingredient --with-regex '/\\A[A-Za-z ]+\\z/'
 
-    % csv-check-field input2.csv %weight --with-schema array/num/rev_sorted
-    Field '%weight' validates with schema 'array::num::rev_sorted'
+Check that all %weight is between 0 and 100:
+
+    % csv-check-cell input.csv -f %weight --with-code '$_>0 && $_<=100'
 
 _
 
@@ -161,7 +161,7 @@ App::CSVUtils::csv_check_cell - Check the value of cells of CSV against code/sch
 
 =head1 VERSION
 
-This document describes version 1.007 of App::CSVUtils::csv_check_cell (from Perl distribution App-CSVUtils), released on 2023-02-03.
+This document describes version 1.008 of App::CSVUtils::csv_check_cell (from Perl distribution App-CSVUtils), released on 2023-02-03.
 
 =head1 FUNCTIONS
 
@@ -183,11 +183,11 @@ Example C<input.csv>:
 
 Check that ingredients do not contain number:
 
- % csv-check-cell input.csv %weight --with-schema array::num::rev_sorted
- ERROR 400: Field '%weight' does not validate with schema 'array::num::rev_sorted'
- 
- % csv-check-field input2.csv %weight --with-schema array/num/rev_sorted
- Field '%weight' validates with schema 'array::num::rev_sorted'
+ % csv-check-cell input.csv -f ingredient --with-regex '/\\A[A-Za-z ]+\\z/'
+
+Check that all %weight is between 0 and 100:
+
+ % csv-check-cell input.csv -f %weight --with-code '$_>0 && $_<=100'
 
 This function is not exported.
 

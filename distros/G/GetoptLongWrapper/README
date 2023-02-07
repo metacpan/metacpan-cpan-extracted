@@ -1,5 +1,8 @@
 GetoptLongWrapper
 
+A full demo is avaialable on GitHub: https://github.com/ngabriel8/GOLWDemo
+Requires a database mySQL or MariaDB.
+
 INSTALLATION
 
 To install this module, run the following commands:
@@ -28,7 +31,7 @@ You can also look for information at:
         https://metacpan.org/release/GetoptLongWrapper
 
 LICENSE AND COPYRIGHT
-This software is Copyright (c) 2023 by Nazar Gabriel.
+This software is Copyright (c) 2023 by Whats his Name.
 
 This is free software, licensed under:
 

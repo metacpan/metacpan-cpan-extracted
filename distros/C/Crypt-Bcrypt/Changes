@@ -1,5 +1,9 @@
 Revision history for Crypt-Bcrypt
 
+0.008     2023-02-07 14:25:37+01:00 Europe/Amsterdam
+          - Add support for pre-hashed bcrypt
+          - Add bcrypt_needs_rehash function
+
 0.007     2022-01-22 00:25:43+01:00 Europe/Amsterdam
           - Require ExtUtils::ParseXS 2.21 for perl 5.10 compatibility
 

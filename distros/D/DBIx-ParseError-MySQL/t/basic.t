@@ -29,6 +29,7 @@ our %ERRORS = (
         'Got an error writing communication packets',
         'Got timeout reading communication packets',
         'Got timeout writing communication packets',
+        'Turning off AutoCommit failed',
     ],
     shutdown => [
         'WSREP has not yet prepared node for application use',

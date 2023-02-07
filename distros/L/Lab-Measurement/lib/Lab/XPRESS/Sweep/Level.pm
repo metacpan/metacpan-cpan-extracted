@@ -1,5 +1,5 @@
 package Lab::XPRESS::Sweep::Level;
-$Lab::XPRESS::Sweep::Level::VERSION = '3.841';
+$Lab::XPRESS::Sweep::Level::VERSION = '3.842';
 #ABSTRACT: Level (e.g. Voltage or Current) sweep
 
 use v5.20;
@@ -168,7 +168,7 @@ Lab::XPRESS::Sweep::Level - Level (e.g. Voltage or Current) sweep
 
 =head1 VERSION
 
-version 3.841
+version 3.842
 
 =head1 SYNOPSIS
 

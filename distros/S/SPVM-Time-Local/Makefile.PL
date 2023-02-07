@@ -3,8 +3,22 @@ use ExtUtils::MakeMaker;
 use strict;
 use warnings;
 use Config;
-use SPVM::Builder::Util::API;
+use Getopt::Long 'GetOptions';
 
+GetOptions(
+  'meta' => \my $meta,
+  'no-build-spvm-modules' => \my $no_build_spvm_modules,
+);
+
+if ($meta) {
+  $no_build_spvm_modules = 1;
+}
+
+unless ($meta) {
+  # Do something such as environment check.
+}
+
+my %configure_and_runtime_requires = ('SPVM' => '0.9689');
 WriteMakefile(
   NAME              => 'SPVM::Time::Local',
   VERSION_FROM      => 'lib/SPVM/Time/Local.pm',
@@ -25,9 +39,15 @@ WriteMakefile(
       },
     },
   },
-  # SPVM::Builder::Util::API is needed for Makefile.PL
+  NORECURS => 1,
   CONFIGURE_REQUIRES => {
-    'SPVM'              => '0.9610',
+    %configure_and_runtime_requires,
+  },
+  PREREQ_PM         => {
+    %configure_and_runtime_requires,
+  },
+  TEST_REQUIRES => {
+    
   },
 );
 
@@ -35,8 +55,10 @@ sub MY::postamble {
 
   my $make_rule = '';
   
-  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Time::Local');
-  
+  unless ($no_build_spvm_modules) {
+    require SPVM::Builder::Util::API;
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Time::Local');
+  }
   
   return $make_rule;
 }

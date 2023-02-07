@@ -1,14 +1,12 @@
 package Crypt::Passphrase::Bcrypt;
-$Crypt::Passphrase::Bcrypt::VERSION = '0.003';
+$Crypt::Passphrase::Bcrypt::VERSION = '0.004';
 use strict;
 use warnings;
 
 use parent 'Crypt::Passphrase::Encoder';
 
 use Carp 'croak';
-use Crypt::Bcrypt qw/bcrypt bcrypt_check/;
-use Digest::SHA 'hmac_sha256';
-use MIME::Base64 'encode_base64';
+use Crypt::Bcrypt 0.008 qw/bcrypt bcrypt_hashed bcrypt_check_hashed bcrypt_needs_rehash/;
 
 sub new {
 	my ($class, %args) = @_;
@@ -22,34 +20,15 @@ sub new {
 	}, $class;
 }
 
-my $subtype = qr/2[abxy]/;
-my $cost = qr/\d{2}/;
-my $salt_qr = qr{ [./A-Za-z0-9]{22} }x;
-
 sub hash_password {
 	my ($self, $password) = @_;
 	my $salt = $self->random_bytes(16);
-	if ($self->{hash}) {
-		(my $encoded_salt = encode_base64($salt, "")) =~ tr{A-Za-z0-9+/=}{./A-Za-z0-9}d;
-		my $hashed_password = encode_base64(hmac_sha256($password, $encoded_salt), "");
-		my $hash = bcrypt($hashed_password, $self->{subtype}, $self->{cost}, $salt);
-		$hash =~ s{ ^ \$ ($subtype) \$ ($cost) \$ ($salt_qr) }{\$bcrypt-sha256\$v=2,t=$1,r=$2\$$3\$}x;
-		return $hash;
-	}
-	else {
-		return bcrypt($password, $self->{subtype}, $self->{cost}, $salt);
-	}
+	return bcrypt_hashed($password, $self->{subtype}, $self->{cost}, $salt, $self->{hash});
 }
 
 sub needs_rehash {
 	my ($self, $hash) = @_;
-	if ($hash =~ / \A \$ ($subtype) \$ ($cost) \$ /x) {
-		return 0 if $1 eq $self->{subtype} && $2 >= $self->{cost} && $self->{hash} eq '';
-	}
-	elsif ($hash =~ / ^ \$ bcrypt-sha256 \$ v=2,t=($subtype),r=($cost) \$ /x) {
-		return 0 if $1 eq $self->{subtype} && $2 >= $self->{cost} && $self->{hash} eq 'sha256';
-	}
-	return 1;
+	return bcrypt_needs_rehash($hash, @{$self}{qw/subtype cost hash/});
 }
 
 sub crypt_subtypes {
@@ -58,12 +37,7 @@ sub crypt_subtypes {
 
 sub verify_password {
 	my ($class, $password, $hash) = @_;
-	if ($hash =~ s/ ^ \$ bcrypt-sha256 \$ v=2,t=($subtype),r=($cost) \$ ($salt_qr) \$ /\$$1\$$2\$$3/x) {
-		return bcrypt_check(encode_base64(hmac_sha256($password, $3), ""), $hash);
-	}
-	else {
-		return bcrypt_check($password, $hash);
-	}
+	return bcrypt_check_hashed($password, $hash);
 }
 
 1;
@@ -82,11 +56,11 @@ Crypt::Passphrase::Bcrypt - A bcrypt encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 
-This class implements a bcrypt encoder for Crypt::Passphrase. L<Crypt::Passphrase::Argon2|Crypt::Passphrase::Argon2> is recommended over this module as an encoder, as that provides memory-hardness and more easily allows for long passwords.
+This class implements a bcrypt encoder for Crypt::Passphrase. For high-end parameters L<Crypt::Passphrase::Argon2|Crypt::Passphrase::Argon2> is recommended over this module as an encoder, as that provides memory-hardness and more easily allows for long passwords.
 
 =head1 METHODS
 

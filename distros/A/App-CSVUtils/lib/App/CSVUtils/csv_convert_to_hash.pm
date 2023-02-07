@@ -7,7 +7,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-02-03'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.007'; # VERSION
+our $VERSION = '1.008'; # VERSION
 
 use App::CSVUtils qw(gen_csv_util);
 
@@ -75,7 +75,7 @@ App::CSVUtils::csv_convert_to_hash - Return a hash of field names as keys and fi
 
 =head1 VERSION
 
-This document describes version 1.007 of App::CSVUtils::csv_convert_to_hash (from Perl distribution App-CSVUtils), released on 2023-02-03.
+This document describes version 1.008 of App::CSVUtils::csv_convert_to_hash (from Perl distribution App-CSVUtils), released on 2023-02-03.
 
 =head1 FUNCTIONS
 

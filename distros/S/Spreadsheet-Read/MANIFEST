@@ -17,6 +17,7 @@ files/blank.xls
 files/blank.xlsx
 files/clear.ods
 files/content.xml
+files/Dates.gnumeric
 files/Dates.ods
 files/Dates.xls
 files/Dates.xlsx
@@ -28,6 +29,8 @@ files/empty.txt
 files/empty.xls
 files/empty.xlsx
 files/example.xlsx
+files/gnumeric.gnumeric
+files/gnumeric.xml
 files/macosx.csv
 files/macosx.xls
 files/merged.ods
@@ -120,6 +123,8 @@ t/623_misc.t
 t/624_dates.t
 t/625_perc.t
 t/627_merged.t
+t/700_gnumeric.t
+t/704_dates.t
 t/999_fail.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
