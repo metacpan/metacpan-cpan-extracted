@@ -3,8 +3,20 @@ use ExtUtils::MakeMaker;
 use strict;
 use warnings;
 use Config;
-use SPVM::Builder::Util::API;
+use Getopt::Long 'GetOptions';
 
+GetOptions(
+  'meta' => \my $meta,
+  'no-build-spvm-modules' => \my $no_build_spvm_modules,
+);
+
+if ($meta) {
+  $no_build_spvm_modules = 1;
+}
+
+my %configure_and_runtime_requires = (
+  'SPVM' => '0.9691',
+);
 WriteMakefile(
   NAME              => 'SPVM::Digest::MD5',
   VERSION_FROM      => 'lib/SPVM/Digest/MD5.pm',
@@ -24,24 +36,27 @@ WriteMakefile(
         web  => '',
       },
     },
-  },
-  # SPVM::Builder::Util::API is needed for Makefile.PL
-  CONFIGURE_REQUIRES => {
-    'SPVM'              => '0.9686',
+    no_index => {
+      directory => [qw/perl_impl/],
+    }
   },
   NORECURS => 1,
-  META_MERGE   => {
-      no_index => {
-          directory => [qw/perl_impl/],
-      }
-  }
+  CONFIGURE_REQUIRES => {
+    %configure_and_runtime_requires,
+  },
+  PREREQ_PM         => {
+    %configure_and_runtime_requires,
+  },
 );
 
 sub MY::postamble {
 
   my $make_rule = '';
   
-  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Digest::MD5');
+  unless ($no_build_spvm_modules) {
+    require SPVM::Builder::Util::API;
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Digest::MD5');
+  }
   
   $make_rule .= qq|dynamic ::\n\tperl -e 'use Config;chdir "perl_impl" or die; system("$^X Makefile.PL && $Config{make}") == 0 or die';|;
   

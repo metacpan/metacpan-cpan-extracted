@@ -1,4 +1,6 @@
 package OpenData::ShortNumberInfo;
+# ABSTRACT: Perl interface to OpenData ShortNumberInfo web service
+
 
 use v5.36;
 use Object::Pad;
@@ -6,12 +8,14 @@ use Object::Pad;
 class OpenData::ShortNumberInfo {
 	use HTTP::Tiny;
 	use URI;
-	use JSON;
+	use JSON::PP;
 
-	field $number :
-	param //= 103;
+	field $number :param //= 103;
 
-	method name ( ) {
+	# TODO: accessor $name
+
+
+	method name ( $number ) {
 		# Construct API URL
 		my $uri = URI -> new( 'https://api.opendata.az' );
 		$uri -> path_segments(
@@ -39,3 +43,52 @@ class OpenData::ShortNumberInfo {
 		}
 	}
 }
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+OpenData::ShortNumberInfo - Perl interface to OpenData ShortNumberInfo web service
+
+=head1 VERSION
+
+version 0.230380
+
+=head1 SYNOPSIS
+
+  use OpenData::ShortNumberInfo;
+
+  my $shortnumberinfo =
+	  OpenData::ShortNumberInfo -> new( number => 101 );
+
+  say $shortnumberinfo -> name();
+
+=head1 METHODS
+
+=head2 name
+
+Take a 3 digit phone number and return the organization it belongs to
+Prints a message to standard error stream exiting with the status code of 2
+if there's no organization for the number specified
+
+=head1 SEE ALSO
+
+=for :list * Your::Module
+* Your::Package
+
+=head1 AUTHOR
+
+Elvin Aslanov <rwp.primary@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by Elvin Aslanov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

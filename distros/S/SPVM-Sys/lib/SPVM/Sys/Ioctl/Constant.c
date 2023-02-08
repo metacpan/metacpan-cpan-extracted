@@ -14,7 +14,7 @@ int32_t SPVM__Sys__Ioctl__Constant__FIONBIO(SPVM_ENV* env, SPVM_VALUE* stack) {
   stack[0].ival = FIONBIO;
   return 0;
 #else
-  env->die(env, stack, "FIONBIO is not defined on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "FIONBIO is not defined on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #endif
   

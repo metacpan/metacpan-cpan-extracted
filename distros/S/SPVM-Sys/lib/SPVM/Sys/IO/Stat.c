@@ -14,7 +14,7 @@ int32_t SPVM__Sys__IO__Stat__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   // So sizeof(struct stat) * 2 is allocated.
   struct stat* st_stat = env->new_memory_stack(env, stack, sizeof(struct stat) * 2);
   
-  void* obj_stat = env->new_pointer_by_name(env, stack, "Sys::IO::Stat", st_stat, &e, FILE_NAME, __LINE__);
+  void* obj_stat = env->new_pointer_by_name(env, stack, "Sys::IO::Stat", st_stat, &e, __func__, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   stack[0].oval = obj_stat;
@@ -43,13 +43,13 @@ int32_t SPVM__Sys__IO__Stat__stat_raw(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_path = stack[0].oval;
   if (!obj_path) {
-    return env->die(env, stack, "The $path must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $path must be defined", __func__, FILE_NAME, __LINE__);
   }
   const char* path = env->get_chars(env, stack, obj_path);
   
   void* obj_stat = stack[1].oval;
   if (!obj_stat) {
-    return env->die(env, stack, "The $stat must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $stat must be defined", __func__, FILE_NAME, __LINE__);
   }
   
   struct stat* stat_buf = env->get_pointer(env, stack, obj_stat);
@@ -70,7 +70,7 @@ int32_t SPVM__Sys__IO__Stat__stat(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = stack[0].ival;
 
   if (status == -1) {
-    env->die(env, stack, "[System Error]stat failed:%s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]stat failed:%s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -79,20 +79,20 @@ int32_t SPVM__Sys__IO__Stat__stat(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__Stat__lstat_raw(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  return env->die(env, stack, "lstat is not supported on this system(_WIN32)", FILE_NAME, __LINE__);
+  return env->die(env, stack, "lstat is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
 #else
 
   int32_t e = 0;
   
   void* obj_path = stack[0].oval;
   if (!obj_path) {
-    return env->die(env, stack, "The $path must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $path must be defined", __func__, FILE_NAME, __LINE__);
   }
   const char* path = env->get_chars(env, stack, obj_path);
   
   void* obj_lstat = stack[1].oval;
   if (!obj_lstat) {
-    return env->die(env, stack, "The $lstat must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $lstat must be defined", __func__, FILE_NAME, __LINE__);
   }
   
   struct stat* stat_buf = env->get_pointer(env, stack, obj_lstat);
@@ -114,7 +114,7 @@ int32_t SPVM__Sys__IO__Stat__lstat(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = stack[0].ival;
 
   if (status == -1) {
-    env->die(env, stack, "[System Error]lstat failed:%s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]lstat failed:%s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -130,7 +130,7 @@ int32_t SPVM__Sys__IO__Stat__fstat_raw(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_stat = stack[1].oval;
   
   if (!obj_stat) {
-    return env->die(env, stack, "The $stat must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $stat must be defined", __func__, FILE_NAME, __LINE__);
   }
   
   struct stat* stat_buf = env->get_pointer(env, stack, obj_stat);
@@ -149,7 +149,7 @@ int32_t SPVM__Sys__IO__Stat__fstat(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = stack[0].ival;
 
   if (status == -1) {
-    env->die(env, stack, "[System Error]fstat failed:%s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]fstat failed:%s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -212,7 +212,7 @@ int32_t SPVM__Sys__IO__Stat__st_size(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__Stat__st_blksize(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "The \"st_blksize\" method in the class \"Sys::IO::Stat\" is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "The \"st_blksize\" method in the class \"Sys::IO::Stat\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   void* obj_stat = stack[0].oval;
@@ -227,7 +227,7 @@ int32_t SPVM__Sys__IO__Stat__st_blksize(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__Stat__st_blocks(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "The \"st_blocks\" method in the class \"Sys::IO::Stat\" is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "The \"st_blocks\" method in the class \"Sys::IO::Stat\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   void* obj_stat = stack[0].oval;
@@ -320,10 +320,10 @@ int32_t SPVM__Sys__IO__Stat__st_ctime(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__Stat__st_atim_tv_nsec(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "The st_atim_tv_nsec method in the Sys::IO::Stat is not supported on this system(_WIN32)", FILE_NAME, __LINE__);
+  env->die(env, stack, "The st_atim_tv_nsec method in the Sys::IO::Stat is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #elif defined(__solaris) || defined(__sun)
-  env->die(env, stack, "The st_atim_tv_nsec method in the Sys::IO::Stat is not supported on this system(__solaris or __sun)", FILE_NAME, __LINE__);
+  env->die(env, stack, "The st_atim_tv_nsec method in the Sys::IO::Stat is not supported on this system(__solaris or __sun)", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   void* obj_stat = stack[0].oval;
@@ -342,10 +342,10 @@ int32_t SPVM__Sys__IO__Stat__st_atim_tv_nsec(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__Stat__st_mtim_tv_nsec(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "The st_mtim_tv_nsec method in the Sys::IO::Stat is not supported on this system(_WIN32)", FILE_NAME, __LINE__);
+  env->die(env, stack, "The st_mtim_tv_nsec method in the Sys::IO::Stat is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #elif defined(__solaris) || defined(__sun)
-  env->die(env, stack, "The st_mtim_tv_nsec method in the Sys::IO::Stat is not supported on this system(__solaris or __sun)", FILE_NAME, __LINE__);
+  env->die(env, stack, "The st_mtim_tv_nsec method in the Sys::IO::Stat is not supported on this system(__solaris or __sun)", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   void* obj_stat = stack[0].oval;
@@ -364,10 +364,10 @@ int32_t SPVM__Sys__IO__Stat__st_mtim_tv_nsec(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__Stat__st_ctim_tv_nsec(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "The st_ctim_tv_nsec method in the Sys::IO::Stat is not supported on this system(_WIN32)", FILE_NAME, __LINE__);
+  env->die(env, stack, "The st_ctim_tv_nsec method in the Sys::IO::Stat is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #elif defined(__solaris) || defined(__sun)
-  env->die(env, stack, "The st_ctim_tv_nsec method in the Sys::IO::Stat is not supported on this system(__solaris or __sun)", FILE_NAME, __LINE__);
+  env->die(env, stack, "The st_ctim_tv_nsec method in the Sys::IO::Stat is not supported on this system(__solaris or __sun)", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   void* obj_stat = stack[0].oval;

@@ -27,10 +27,15 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.9606"
+            "SPVM" : "0.9691"
          }
       },
       "runtime" : {
+         "requires" : {
+            "SPVM" : "0.9691"
+         }
+      },
+      "test" : {
          "requires" : {}
       }
    },
@@ -42,6 +47,6 @@
          "web" : "https://github.com/yuki-kimoto/Perl-SPVM-Math"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

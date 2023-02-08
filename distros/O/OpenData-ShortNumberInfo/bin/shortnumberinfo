@@ -1,5 +1,9 @@
 #! /usr/bin/env perl
 
+# ABSTRACT: Perl utility to interact with OpenData ShortNumberInfo web service
+
+# PODNAME: shortnumberinfo
+
 use v5.36;
 use OpenData::ShortNumberInfo;
 
@@ -7,3 +11,30 @@ my $shortnumberinfo =
 	OpenData::ShortNumberInfo -> new( number => $ARGV[0] );
 
 say $shortnumberinfo -> name();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+shortnumberinfo - Perl utility to interact with OpenData ShortNumberInfo web service
+
+=head1 VERSION
+
+version 0.230380
+
+=head1 AUTHOR
+
+Elvin Aslanov <rwp.primary@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by Elvin Aslanov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

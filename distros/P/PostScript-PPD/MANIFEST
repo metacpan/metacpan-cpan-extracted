@@ -13,7 +13,7 @@ t/02_pod_coverage.t
 t/10_main.t
 t/20_more.t
 t/30_difficult.t
-t/ChkUtil.pm
+t/lib/ChkUtil.pm
 t/ppd/Generic-PCL_5_Printer-gimp-print-ijs.ppd
 t/ppd/HP-LaserJet_4L-hpijs.ppd
 t/ppd/hwel.ppd

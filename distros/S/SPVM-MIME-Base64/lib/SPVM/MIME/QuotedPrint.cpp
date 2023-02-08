@@ -65,7 +65,7 @@ int32_t SPVM__MIME__QuotedPrint__encode_qp(SPVM_ENV* env, SPVM_VALUE* stack) {
         void* obj_str = stack[0].oval;
         
         if (!obj_str) {
-                return env->die(env, stack, "The input must be defined", FILE_NAME, __LINE__);
+                return env->die(env, stack, "The input must be defined", __func__, FILE_NAME, __LINE__);
         }
         
         beg = (char*)env->get_chars(env, stack, obj_str);
@@ -179,7 +179,7 @@ int32_t SPVM__MIME__QuotedPrint__decode_qp(SPVM_ENV* env, SPVM_VALUE* stack) {
         void* obj_str = stack[0].oval;
         
         if (!obj_str) {
-                return env->die(env, stack, "The input must be defined", FILE_NAME, __LINE__);
+                return env->die(env, stack, "The input must be defined", __func__, FILE_NAME, __LINE__);
         }
         
         int32_t len = env->length(env, stack, obj_str);

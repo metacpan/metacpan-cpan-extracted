@@ -1,3 +1,6 @@
+0.08 2023-02-08
+  [Prerequirement Changes]
+    * SPVM 0.9691+ is needed.
 0.07 2023-02-07
   [Distribution Bug Fix]
     * Don't index cpanm by removing cpanm file.

@@ -11,8 +11,8 @@ my $builder = Module::Build::Pluggable->new(
     add_to_cleanup      => [ 'Music-Chord-Note-*' ],
     meta_merge     => {
       resources => {
-        repository  => 'http://github.com/bayashi/Music-Chord-Note',
-        bugtracker  => 'http://github.com/bayashi/Music-Chord-Note/issues',
+        repository  => 'https://github.com/bayashi/Music-Chord-Note',
+        bugtracker  => 'https://github.com/bayashi/Music-Chord-Note/issues',
       }
     },
     recursive_test_files => 1,

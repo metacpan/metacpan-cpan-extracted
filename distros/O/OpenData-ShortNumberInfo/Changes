@@ -1,0 +1,6 @@
+Revision history for OpenData-ShortNumberInfo
+
+0.230380  2023-02-07 23:30:38+04:00 Asia/Baku
+    - Use JSON::PP
+    - Use @RWP bundle
+    - Add Changes

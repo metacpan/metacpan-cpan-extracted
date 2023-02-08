@@ -817,4 +817,21 @@ subtest 'op_group_by' => sub {
     }];
 };
 
+subtest 'op_audit' => sub {
+    my $o = cold('-01-23-45')->pipe(
+        op_audit(sub { cold('--1') }),
+    );
+    obs_is $o, ['---1--3--5'];
+
+    $o = cold('-01-2#')->pipe(
+        op_audit(sub { cold('--1') }),
+    );
+    obs_is $o, ['---1-#'];
+
+    $o = cold('-01-23-45')->pipe(
+        op_audit(sub { cold('--#') }),
+    );
+    obs_is $o, ['---#'];
+};
+
 done_testing();

@@ -27,49 +27,49 @@ no_index:
 provides:
   RxPerl:
     file: lib/RxPerl.pm
-    version: v6.22.2
+    version: v6.23.0
   RxPerl::Base:
     file: lib/RxPerl/Base.pm
-    version: v6.22.2
+    version: v6.23.0
   RxPerl::BehaviorSubject:
     file: lib/RxPerl/BehaviorSubject.pm
-    version: v6.22.2
+    version: v6.23.0
   RxPerl::ConnectableObservable:
     file: lib/RxPerl/ConnectableObservable.pm
-    version: v6.22.2
+    version: v6.23.0
   RxPerl::Functions:
     file: lib/RxPerl/Functions.pm
-    version: v6.22.2
+    version: v6.23.0
   RxPerl::Observable:
     file: lib/RxPerl/Observable.pm
-    version: v6.22.2
+    version: v6.23.0
   RxPerl::Operators::Creation:
     file: lib/RxPerl/Operators/Creation.pm
-    version: v6.22.2
+    version: v6.23.0
   RxPerl::Operators::Pipeable:
     file: lib/RxPerl/Operators/Pipeable.pm
-    version: v6.22.2
+    version: v6.23.0
   RxPerl::ReplaySubject:
     file: lib/RxPerl/ReplaySubject.pm
-    version: v6.22.2
+    version: v6.23.0
   RxPerl::Subject:
     file: lib/RxPerl/Subject.pm
-    version: v6.22.2
+    version: v6.23.0
   RxPerl::Subscriber:
     file: lib/RxPerl/Subscriber.pm
-    version: v6.22.2
+    version: v6.23.0
   RxPerl::Subscription:
     file: lib/RxPerl/Subscription.pm
-    version: v6.22.2
+    version: v6.23.0
   RxPerl::SyncTimers:
     file: lib/RxPerl/SyncTimers.pm
-    version: v6.22.2
+    version: v6.23.0
   RxPerl::Test:
     file: lib/RxPerl/Test.pm
-    version: v6.22.2
+    version: v6.23.0
   RxPerl::Utils:
     file: lib/RxPerl/Utils.pm
-    version: v6.22.2
+    version: v6.23.0
 requires:
   Hash::Ordered: '0.006'
   Sub::Util: '1.41'
@@ -79,7 +79,7 @@ resources:
   bugtracker: https://gitlab.com/karjala/rxperl/issues
   homepage: https://gitlab.com/karjala/rxperl
   repository: https://gitlab.com/karjala/rxperl.git
-version: v6.22.2
+version: v6.23.0
 x_authority: cpan:KARJALA
 x_contributors:
   - 'Alexander Karelas <alex.karelas@gmail.com>'

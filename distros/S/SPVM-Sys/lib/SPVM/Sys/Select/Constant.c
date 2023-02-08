@@ -14,7 +14,7 @@ int32_t SPVM__Sys__Select__Constant__FD_SETSIZE(SPVM_ENV* env, SPVM_VALUE* stack
   stack[0].ival = FD_SETSIZE;
   return 0;
 #else
-  env->die(env, stack, "FD_SETSIZE is not defined on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "FD_SETSIZE is not defined on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #endif
 

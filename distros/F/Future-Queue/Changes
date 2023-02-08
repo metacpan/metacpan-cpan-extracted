@@ -1,5 +1,12 @@
 Revision history for Future-Queue
 
+0.51    2023-02-08
+        [CHANGES]
+         * Allow specifying a different class, prototype instance, or
+           constructor-like coderef for creating pending Future instances
+           (helps with RT146025)
+         * Swap all unit tests from `Test::More` to `Test2::V0`
+
 0.50    2023-01-16
         [CHANGES]
          * Optional maximum size; push will return a pending future until

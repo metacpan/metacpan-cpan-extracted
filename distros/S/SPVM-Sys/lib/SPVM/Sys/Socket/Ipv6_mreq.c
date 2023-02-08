@@ -11,7 +11,7 @@ int32_t SPVM__Sys__Socket__Ipv6_mreq__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   struct ipv6_mreq* multi_request = env->new_memory_stack(env, stack, sizeof(struct ipv6_mreq));
 
-  void* obj_multi_request = env->new_pointer_by_name(env, stack, "Sys::Socket::Ipv6_mreq", multi_request, &e, FILE_NAME, __LINE__);
+  void* obj_multi_request = env->new_pointer_by_name(env, stack, "Sys::Socket::Ipv6_mreq", multi_request, &e, __func__, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   stack[0].oval = obj_multi_request;
@@ -47,7 +47,7 @@ int32_t SPVM__Sys__Socket__Ipv6_mreq__ipv6mr_multiaddr(SPVM_ENV* env, SPVM_VALUE
   struct in6_addr* address_ret = env->new_memory_stack(env, stack, sizeof(struct in6_addr));
   *address_ret = address;
 
-  void* obj_address_ret = env->new_pointer_by_name(env, stack, "Sys::Socket::In6_addr", address_ret, &e, FILE_NAME, __LINE__);
+  void* obj_address_ret = env->new_pointer_by_name(env, stack, "Sys::Socket::In6_addr", address_ret, &e, __func__, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   stack[0].oval = obj_address_ret;

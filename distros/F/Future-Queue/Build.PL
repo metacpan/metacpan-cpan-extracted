@@ -10,7 +10,7 @@ my $build = Module::Build->new(
       'Future' => 0,
    },
    test_requires => {
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

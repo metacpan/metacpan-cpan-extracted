@@ -3,9 +3,9 @@ NAME
     Data::Sah::Filter::* or Data::Sah::FilterBundle::* distribution
 
 VERSION
-    This document describes version 0.007 of
+    This document describes version 0.008 of
     Pod::Weaver::Plugin::Data::Sah::Filter (from Perl distribution
-    Pod-Weaver-Plugin-Data-Sah-Filter), released on 2022-08-25.
+    Pod-Weaver-Plugin-Data-Sah-Filter), released on 2022-11-15.
 
 SYNOPSIS
     In your weaver.ini:

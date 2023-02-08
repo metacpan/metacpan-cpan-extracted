@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Hooks;
 # ABSTRACT: Framework for implementing Git (and Gerrit) hooks
-$Git::Hooks::VERSION = '3.4.0';
+$Git::Hooks::VERSION = '3.5.0';
 use v5.16.0;
 use utf8;
 use Carp;
@@ -294,7 +294,7 @@ Git::Hooks - Framework for implementing Git (and Gerrit) hooks
 
 =head1 VERSION
 
-version 3.4.0
+version 3.5.0
 
 =head1 SYNOPSIS
 
@@ -1753,7 +1753,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by CPQD <www.cpqd.com.br>.
+This software is copyright (c) 2023 by CPQD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

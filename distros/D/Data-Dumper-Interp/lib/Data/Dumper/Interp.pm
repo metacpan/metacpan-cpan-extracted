@@ -20,7 +20,7 @@ use 5.018;  # lexical_subs
 use feature qw(say state lexical_subs);
 use feature 'lexical_subs'; no warnings "experimental::lexical_subs";
 package  Data::Dumper::Interp;
-$Data::Dumper::Interp::VERSION = '4.113';
+$Data::Dumper::Interp::VERSION = '4.114';
 
 package  # newline prevents Dist::Zilla::Plugin::PkgVersion from adding $VERSION
   DB;
@@ -206,7 +206,15 @@ sub _vistype {
 sub new {
   croak "No args are allowed for ".__PACKAGE__."::new" if @_ > 1;
   my ($class) = @_;
-  (bless $class->SUPER::new([],[]), $class)->_config_defaults()
+  #(bless $class->SUPER::new([],[]), $class)->_config_defaults()
+  
+  ###TEMP DEBUGGING
+  # Try to catch FreeBSD bug where $! changes somewhere
+  my $initialbang = $!+0;
+  my $r = (bless $class->SUPER::new([],[]), $class)->_config_defaults();
+  Carp::confess blessed($r),"::new(...) changed \$! unexpectedly (was $initialbang, now ",$!+0
+    if $! != $initialbang;
+  $r
 }
 
 ########### Subs callable as either a Function or Method #############
@@ -1254,11 +1262,13 @@ sub DB_Vis_Eval($$) {
 1;
  __END__
 
+=pod
+
 =encoding UTF-8
 
 =head1 NAME
 
-Data::Dumper::Interp - Data::Dumper for humans, with interpolation
+Data::Dumper::Interp - interpolate Data::Dumper output into strings, with human-oriented options
 
 =head1 SYNOPSIS
 
@@ -1320,25 +1330,32 @@ Data::Dumper::Interp - Data::Dumper for humans, with interpolation
 
 =head1 DESCRIPTION
 
-This is a wrapper for Data::Dumper optimized for consumption by humans
-instead of machines; the output defaults to higher-level 
-forms which may not be 'eval'able.
+This Data::Dumper wrapper optimizes for human consumption and avoids side-effects.
 
 The namesake feature is interpolating Data::Dumper output 
-into strings, but simple functions are also provided to 
-visualize a scalar, array, or hash.
+into strings, but simple functions are also provided
+to visualize a scalar, array, or hash.
 
 Diagnostic and debug messages are primary use cases.
 
 Internally, Data::Dumper is called to visualize (i.e. format) data
-with pre- and postprocessing to "improve" the results:
+with pre- and post-processing to "improve" the results:
 
-Output is compact (1 line if possibe,
-otherwise folded at your terminal width), and OMITS a trailing newline.
-Unicode characters appear as themselves,
-objects like Math:BigInt are stringified, "virtual" values behind
-overloaded array/hash-deref operators are shown, and 
-some Data::Dumper bugs^H^H^H^Hquirks are circumvented.
+=over 2
+
+=item * Output is compact (1 line if possibe,
+otherwise folded at your terminal width), WITHOUT a trailing newline.
+
+=item * Printable Unicode characters appear as themselves.
+
+=item * Objects like Math:BigInt are stringified
+
+=item * "virtual" values behind overloaded array/hash-deref operators are shown
+
+=item * Data::Dumper bugs^H^H^H^Hquirks are circumvented.
+
+=back
+
 See "DIFFERENCES FROM Data::Dumper".
 
 Finally, a few utilities are provided to quote strings for /bin/sh.
@@ -1354,8 +1371,10 @@ format variable values.
 C<$var> is replaced by its value,
 C<@var> is replaced by "(comma, sparated, list)",
 and C<%hash> by "(key => value, ...)" .
-Most complex expressions are recognized, e.g. indexing,
-dereferences, slices, etc.
+More complex expressions with indexing, dereferences, slices
+and method calls are also recognized, e.g.
+
+  'The answer is $foo->[$bar->{$somekey}]->frobnicate(42) for Pete's sake'
 
 Expressions are evaluated in the caller's context using Perl's debugger
 hooks, and may refer to almost any lexical or global visible at
@@ -1405,8 +1424,7 @@ The "l" variants return a bare list without the enclosing parenthesis.
 
 =head2 hlvisq EVENLIST
 
-Alternatives with a 'q' suffix display strings in 'single quoted' form
-if possible.
+The 'q' variants display strings in 'single quoted' form if possible.
 
 Internally, Data::Dumper is called with C<Useqq(0)>, but depending on
 the version of Data::Dumper the result may be "double quoted" anyway
@@ -1416,7 +1434,7 @@ if wide characters are present.
 
 =head2 Data::Dumper::Interp->new()
 
-=head2 visnew
+=head2 visnew()
 
 Creates an object initialized from the global configuration
 variables listed below
@@ -1430,9 +1448,9 @@ on the object
 
 For example:
 
-   $msg = Data::Dumper::Interp->new()->Foldwidth(40)->avis(@ARGV);
- and
    $msg = visnew->Foldwidth(40)->avis(@ARGV);
+ or
+   $msg = Data::Dumper::Interp->new()->Foldwidth(40)->avis(@ARGV);
 
 return the same string as
 
@@ -1484,7 +1502,7 @@ the object ref replaced by the result.  The check is then repeated.
 =head2 Sortkeys(subref)
 
 The default sorts numeric substrings in keys by numerical
-value.  See C<Data::Dumper> documentation.
+value, e.g. "A.20" sorts before "A.100".  See C<Data::Dumper> documentation.
 
 =head2 Useqq
 
@@ -1502,7 +1520,7 @@ The avilable options are:
 
 =over 4
 
-=item "unicode" (or "utf8" for historical reasons)
+=item "unicode"
 
 All printable
 characters are shown as themselves rather than hex escapes, and
@@ -1514,9 +1532,8 @@ Show ASCII control characters using single "control picture" characters,
 for example '␤' is shown for newline instead of '\n'.  
 Similarly for \0 \a \b \e \f \r and \t.
 
-This is sometimes useful for debugging because every character occupies 
-the same space with a fixed-width font.  
-The commonly-used "Last Resort" font for these characters
+This way every character occupies the same space with a fixed-width font.  
+However the commonly-used "Last Resort" font for these characters
 can be hard to read on modern high-res displays.
 You can set C<Useqq> to just "unicode" to see traditional \n etc. 
 backslash escapes while still seeing wide characters as themselves.
@@ -1558,15 +1575,9 @@ the string "undef".
 =head2 quotekey SCALAR
 
 Returns the argument ($_ by default) if it is a valid bareword,
-otherwise a quoted string.
+otherwise a "quoted string".
 
-=head2 qsh
-
-=head2 qsh $string
-
-=head2 qshpath
-
-=head2 qshpath $might_have_tilde_prefix
+=head2 qsh [$string]
 
 The string ($_ by default) is quoted if necessary for parsing
 by /bin/sh, which has different quoting rules than Perl.
@@ -1574,13 +1585,15 @@ by /bin/sh, which has different quoting rules than Perl.
 If the string contains only "shell-safe" ASCII characters
 it is returned as-is, without quotes.
 
-C<qshpath> is like C<qsh> except that an initial ~ or ~username is left
-unquoted.  Useful for paths given to bash or csh.
-
 If the argument is a ref but is not an object which stringifies,
 then vis() is called and the resulting string quoted.
 An undefined value is shown as C<undef> without quotes; 
 as a special case to avoid ambiguity the string 'undef' is always "quoted".
+
+=head2 qshpath [$might_have_tilde_prefix]
+
+Similar to C<qsh> except that an initial ~ or ~username is left
+unquoted.  Useful for paths given to bash or csh.
 
 =head1 LIMITATIONS
 
@@ -1644,10 +1657,11 @@ Results differ from plain C<Data::Dumper> output in the following ways
 
 =item *
 
-A final newline is I<not> included.
+A final newline I<never> included.
 
 Everything is shown on a single line if possible, otherwise wrapped to
-the terminal width with indentation appropriate to structure levels.
+your terminal width (or C<$Foldwidth>) with indentation 
+appropriate to structure levels.
 
 =item *
 
@@ -1687,16 +1701,15 @@ For example "A.20" sorts before "A.100".
 
 =item *
 
-All punctuation variables, including $@ and $?, are preserved over calls.
+Punctuation variables, including $@ and $?, are preserved over calls.
 
 =item *
 
-Representation of numbers and strings are made predictable and obvious:
-Floating-point values always appear as numbers (not 'quoted strings'),
-and strings containing digits like "42" appear as quoted strings
-and not numbers (string vs. number detection is ala JSON::PP).
+Numbers and strings which look like numbers are kept distinct when displayed, 
+i.e. "0" does not become 0 or vice-versa. Floating-point values are shown
+as numbers not 'quoted strings' and similarly for stringified objects.
 
-Although such differences might be immaterial to Perl when executing code,
+Although such differences might be immaterial to Perl during execution,
 they may be important when communicating to a human.
 
 =back

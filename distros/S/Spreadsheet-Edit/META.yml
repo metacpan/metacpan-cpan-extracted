@@ -1,0 +1,58 @@
+---
+abstract: 'Slice and dice spreadsheets, optionally using tied variables.'
+author:
+  - 'Jim Avera'
+build_requires:
+  Capture::Tiny: '0'
+  FindBin: '0'
+  Getopt::Long: '0'
+  Test::More: '0.98'
+  autovivification: '0'
+  indirect: '0'
+  lib: '0'
+  multidimensional: '0'
+  perl: v5.20.0
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Spreadsheet-Edit
+requires:
+  Carp: '0'
+  Clone: '0'
+  Data::Dumper::Interp: '0'
+  Encode: '0'
+  Exporter: '0'
+  Exporter::Tiny: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Path: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  Guard: '0'
+  Import::Into: '0'
+  List::Util: '0'
+  Scalar::Util: '0'
+  Symbol: '0'
+  Text::CSV: '0'
+  Tie::Array: '0'
+  Tie::Indirect: '0'
+  bytes: '0'
+  constant: '0'
+  feature: '0'
+  mro: '0'
+  overload: '0'
+  parent: '0'
+  perl: v5.20.0
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+version: '2.102'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: CC0-1.0

@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Repository::Plugin::GitHooks;
 # ABSTRACT: A Git::Repository plugin with some goodies for hook developers
-$Git::Repository::Plugin::GitHooks::VERSION = '3.4.0';
+$Git::Repository::Plugin::GitHooks::VERSION = '3.5.0';
 use parent qw/Git::Repository::Plugin/;
 
 use v5.16.0;
@@ -623,7 +623,15 @@ sub get_config {
                 if ($option =~ /(.+)\.(.+)/) {
                     my ($osection, $okey) = (lc $1, lc $2);
                     if ($value =~ s/^\cJ//) {
-                        push @{$config{$osection}{$okey}}, $value;
+                        ## no critic (ProhibitDeepNests)
+                        if ($value eq 'undef') {
+                            # The 'undef' string is a special mark telling us to
+                            # disregard every previous value already set for
+                            # this variable.
+                            delete $config{$osection}{$okey};
+                        } else {
+                            push @{$config{$osection}{$okey}}, $value;
+                        }
                     } else {
                         # An option without a value is considered a boolean
                         # true. We mark it explicitly so instead of leaving it
@@ -1613,7 +1621,7 @@ Git::Repository::Plugin::GitHooks - A Git::Repository plugin with some goodies f
 
 =head1 VERSION
 
-version 3.4.0
+version 3.5.0
 
 =head1 SYNOPSIS
 
@@ -1804,6 +1812,12 @@ C<undef>, if it's not defined.
 As a special case, options without values (i.e., with no equals sign after its
 name in the configuration file) are set to the string 'true' to force Perl
 recognize them as true Booleans.
+
+The string C<undef> may be used to reset the list of values. Only values after
+the last occurrence of C<undef> are considered either in list or in scalar
+context. This is a general way for you to cancel higher level configurations
+(e.g., system or global) configs in lower level configurations (e.g. local). And
+it works for every configuration option.
 
 =head2 get_config_boolean SECTION VARIABLE
 
@@ -2373,7 +2387,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by CPQD <www.cpqd.com.br>.
+This software is copyright (c) 2023 by CPQD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

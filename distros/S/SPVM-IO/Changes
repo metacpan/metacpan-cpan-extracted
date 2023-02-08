@@ -1,3 +1,6 @@
+0.15 2023-02-08
+  [Prerequirement Changes]
+    * SPVM 0.9691+ is needed.
 0.14 2022-12-03
   [Prerequrement Changes]
     * SPVM::IO needs SPVM 0.9664+.

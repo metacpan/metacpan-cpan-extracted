@@ -1,3 +1,6 @@
+0.06 2023-02-08
+  [Prerequirement Changes]
+    * SPVM 0.9691+ is needed.
 0.05 2022-08-04
   [New Features]
     * Add the optional argument to MIME::Base64->encode_base64

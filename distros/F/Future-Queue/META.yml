@@ -3,7 +3,7 @@ abstract: 'a FIFO queue of values that uses L<Future>s'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
-  Test::More: '0.88'
+  Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
@@ -16,11 +16,11 @@ name: Future-Queue
 provides:
   Future::Queue:
     file: lib/Future/Queue.pm
-    version: '0.50'
+    version: '0.51'
 requires:
   Future: '0'
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.50'
+version: '0.51'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

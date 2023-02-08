@@ -27,14 +27,14 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "Future::Queue" : {
          "file" : "lib/Future/Queue.pm",
-         "version" : "0.50"
+         "version" : "0.51"
       }
    },
    "release_status" : "stable",
@@ -43,6 +43,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.50",
+   "version" : "0.51",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

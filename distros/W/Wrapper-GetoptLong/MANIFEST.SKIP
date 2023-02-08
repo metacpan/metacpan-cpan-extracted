@@ -1,0 +1,7 @@
+^MANIFEST\.bak$
+Makefile(\.old)?$
+CVS/
+blib/
+GetoptLong-.*\.tar\.gz$
+.cvsignore
+ignore.txt

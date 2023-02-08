@@ -20,5 +20,5 @@ no_index:
 requires:
   Compress::Zlib: '2'
   Data::Dump: '0'
-version: '0.0401'
+version: '0.0402'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

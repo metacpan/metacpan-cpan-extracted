@@ -93,4 +93,4 @@ is("0 3 7 10", "@Kind3", 'chord_num:m7');
 
 
 my $all_chords_list = $cn->all_chords_list;
-is(66, $#{$all_chords_list}, 'number of all chords');
+is(73, $#{$all_chords_list}, 'number of all chords');

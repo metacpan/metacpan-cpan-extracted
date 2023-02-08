@@ -1,5 +1,5 @@
 package URI::Title::Image;
-$URI::Title::Image::VERSION = '1.903';
+$URI::Title::Image::VERSION = '1.904';
 use warnings;
 use strict;
 
@@ -70,6 +70,6 @@ URI::Title::Image - get titles of images
 
 =head1 VERSION
 
-version 1.903
+version 1.904
 
 =cut

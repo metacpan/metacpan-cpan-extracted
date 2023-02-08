@@ -1,6 +1,6 @@
 package SPVM::MIME::Base64;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 1;
 
@@ -76,6 +76,10 @@ L<https://github.com/yuki-kimoto/SPVM-MIME-Base64>
 =head1 Author
 
 Yuki Kimoto (kimoto.yuki@gmail.com)
+
+=head1 Contributors
+
+Yoshiyuki Itoh(https://github.com/YoshiyukiItoh)
 
 =head1 Copyright & License
 

@@ -807,6 +807,7 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
   {
     eval { $api->new_string([]) };
     like($@, qr/The string can't be a reference/);
+    like($@, qr|XS_SPVM__ExchangeAPI_xs_new_string at SPVM\.xs line \d+|);
   }
 }
 
@@ -1062,6 +1063,12 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
     my $length = @$values;
     is($length, 3);
   }
+}
+
+# Call not defined method
+{
+  eval { SPVM::Int->not_defined_method };
+  like($@, qr|The "not_defined_method" method in the "Int" class is not defined|);
 }
 
 # TODO

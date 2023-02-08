@@ -11,7 +11,7 @@ int32_t SPVM__Sys__Time__Timeval__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   struct timeval* st_tv = env->new_memory_stack(env, stack, sizeof(struct timeval));
   
-  void* obj_tv = env->new_pointer_by_name(env, stack, "Sys::Time::Timeval", st_tv, &e, FILE_NAME, __LINE__);
+  void* obj_tv = env->new_pointer_by_name(env, stack, "Sys::Time::Timeval", st_tv, &e, __func__, FILE_NAME, __LINE__);
   if (e) { return e; }
 
   stack[0].oval = obj_tv;

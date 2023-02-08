@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Hooks::CheckJira;
 # ABSTRACT: Git::Hooks plugin which requires citation of Jira issues in commit messages
-$Git::Hooks::CheckJira::VERSION = '3.4.0';
+$Git::Hooks::CheckJira::VERSION = '3.5.0';
 use v5.16.0;
 use utf8;
 use Log::Any '$log';
@@ -147,13 +147,13 @@ sub check_codes {
                         ## no critic (ProhibitDeepNests)
                         if (length $@) {
                             $git->fault("I couldn't parse option value ($check).",
-                                        {option => 'check-code', details => $@});
+                                        {option => $type, details => $@});
                         } elsif (! defined $code) {
                             $git->fault("I couldn't do option value ($check).",
-                                        {option => 'check-code', details => $!});
+                                        {option => $type, details => $!});
                         } else {
                             $git->fault("I couldn't run  option value ($check).",
-                                        {option => 'check-code'});
+                                        {option => $type});
                         }
                         ## use critic (ProhibitDeepNests)
                         next CODE;
@@ -162,12 +162,12 @@ sub check_codes {
                     $code = eval $check; ## no critic (BuiltinFunctions::ProhibitStringyEval)
                     length $@
                         and $git->fault("I couldn't parse option value.",
-                                        {option => 'check-code', details => $@})
+                                        {option => $type, details => $@})
                         and next CODE;
                 }
                 defined $code and ref $code and ref $code eq 'CODE'
                     or $git->fault("The option value must end with a code-ref.",
-                                   {option => 'check-code'})
+                                   {option => $type})
                     and next CODE;
                 push @{$cache->{codes}}, [$type => $code];
             }
@@ -534,7 +534,7 @@ Git::Hooks::CheckJira - Git::Hooks plugin which requires citation of Jira issues
 
 =head1 VERSION
 
-version 3.4.0
+version 3.5.0
 
 =head1 SYNOPSIS
 
@@ -1006,7 +1006,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by CPQD <www.cpqd.com.br>.
+This software is copyright (c) 2023 by CPQD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

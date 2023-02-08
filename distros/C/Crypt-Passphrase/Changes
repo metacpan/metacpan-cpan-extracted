@@ -1,5 +1,10 @@
 Revision history for Crypt-Passphrase
 
+0.006     2023-02-08 01:36:27+01:00 Europe/Amsterdam
+          - Add Crypt::Passphrase::MD5::Hex
+          - Add Crypt::Passphrase::SHA1::Hex
+          - Add Crypt::Passphrase::PassphraseHash
+
 0.005     2022-12-26 17:56:04+01:00 Europe/Amsterdam
           - Cache accepted hashes for crypt validators
           - Never accept undefined hashes

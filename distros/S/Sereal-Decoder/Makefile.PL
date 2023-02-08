@@ -8,7 +8,10 @@ use Config;
 
 my $shared_dir= "../shared";
 my $its_our_repo_file= "../this_is_the_Sereal_repo.txt";
-my $in_source_repo= ( -d "../../.git" and -d $shared_dir and -e "../this_is_the_Sereal_repo.txt" );
+my $in_source_repo= ( -d "../../.git" &&
+                      -d $shared_dir &&
+                      -e $its_our_repo_file );
+my $do_prompt= !$in_source_repo || $ENV{CPAN_COMPAT};
 
 unshift @INC, ".", "./inc";
 unshift @INC, $shared_dir, "$shared_dir/inc"
@@ -16,21 +19,41 @@ unshift @INC, $shared_dir, "$shared_dir/inc"
 
 my $module= "Sereal::Decoder";
 require inc::Sereal::BuildTools;
-inc::Sereal::BuildTools::link_files($shared_dir)             if $in_source_repo;
-inc::Sereal::BuildTools::generate_constant_includes($module) if $in_source_repo;
+if ($in_source_repo) {
+    inc::Sereal::BuildTools::link_files($shared_dir);
+    inc::Sereal::BuildTools::generate_constant_includes($module);
+}
 
 my $optimize= inc::Sereal::BuildTools::build_optimize();
 
-# TODO Configure/optimize for miniz:
+# Note you can Configure/optimize for miniz by modifying miniz.h
 #   * Important: For best perf. be sure to customize the below macros for your target platform:
 #     #define MINIZ_USE_UNALIGNED_LOADS_AND_STORES 1
 #     #define MINIZ_LITTLE_ENDIAN 1
 #     #define MINIZ_HAS_64BIT_REGISTERS 1
+# Or you can set USE_UNALIGNED in the env before running Makefile.PL
+
+if ($do_prompt and !defined $ENV{USE_UNALIGNED}) {
+    my $use_unaligned= prompt("USE_UNALIGNED not set in env. Use unaligned loads and stores? yes/no","no");
+    $ENV{USE_UNALIGNED} = $use_unaligned eq "yes";
+} else {
+    $ENV{USE_UNALIGNED} ||= 1;
+    $ENV{USE_UNALIGNED} = 0 if $ENV{USE_UNALIGNED} ne 1
+                            && $ENV{USE_UNALIGNED} ne "yes";
+}
+
+if ($do_prompt and !defined $ENV{NO_ASM} and !defined $ENV{ZSTD_DISABLE_ASM}) {
+    my $use_asm= prompt("neither NO_ASM nor ZSTD_DISABLE_ASM set in env. Use assembly in ZSTD? yes/no","yes");
+    $ENV{NO_ASM} = $use_asm ne "yes";
+}
 
 my $libs= '';
 my $subdirs= [];
 my $objects= '$(BASEEXT)$(OBJ_EXT) srl_decoder$(OBJ_EXT)';
 my $defines= inc::Sereal::BuildTools::build_defines();
+my $inc= '-I.';
+$inc .= ' -I/usr/local/include'
+    if $^O =~ /openbsd/;
 
 # Prefer external libraries over the bundled one.
 inc::Sereal::BuildTools::check_external_libraries( \$libs, \$defines, \$objects, $subdirs );
@@ -75,7 +98,8 @@ inc::Sereal::BuildTools::WriteMakefile(
         'XSLoader'          => '0',
     },
     CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker' => '7.0',
+        'Devel::CheckLib'       => '1.16',
+        'ExtUtils::MakeMaker'   => '7.0',
     },
     NAME         => $module,
     VERSION_FROM => 'lib/Sereal/Decoder.pm',    # finds $VERSION
@@ -85,9 +109,9 @@ inc::Sereal::BuildTools::WriteMakefile(
     LICENSE       => 'perl',
     ABSTRACT_FROM => 'lib/Sereal/Decoder.pm',
     AUTHOR        => 'Steffen Mueller <smueller@cpan.org>, Yves Orton <yves@cpan.org>',
-    LIBS          => [$libs],                                                          # e.g., '-lm'
+    LIBS          => [$libs],   # e.g., '-lm'
     DEFINE        => $defines,
-    INC      => '-I.',                            # e.g., '-I. -I/usr/include/other'
+    INC      => $inc,           # e.g., '-I. -I/usr/local/include'
     OPTIMIZE => $optimize,
     OBJECT   => $objects,
     DIR      => $subdirs,

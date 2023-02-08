@@ -3,8 +3,8 @@ use strict;
 use warnings;
 
 use RxPerl::Operators::Creation qw/
-    rx_observable rx_subject rx_concat rx_of rx_interval rx_combine_latest rx_concat rx_throw_error rx_zip
-    rx_merge rx_on_error_resume_next rx_race
+    rx_observable rx_subject rx_concat rx_of rx_interval rx_combine_latest rx_concat
+    rx_throw_error rx_zip rx_merge rx_on_error_resume_next rx_race rx_timer
 /;
 use RxPerl::ConnectableObservable;
 use RxPerl::Utils qw/ get_timer_subs /;
@@ -15,23 +15,22 @@ use Scalar::Util 'reftype', 'refaddr', 'blessed', 'weaken';
 
 use Exporter 'import';
 our @EXPORT_OK = qw/
-    op_audit_time op_buffer op_buffer_count op_buffer_time op_catch_error op_combine_latest_with op_concat_all
-    op_concat_map op_concat_with op_count op_debounce_time op_default_if_empty op_delay op_distinct_until_changed
-    op_distinct_until_key_changed op_element_at op_end_with op_every op_exhaust_all op_exhaust_map op_filter
-    op_finalize op_find op_find_index op_first op_group_by op_ignore_elements op_is_empty op_last op_map op_map_to
-    op_max op_merge_all op_merge_map op_merge_with op_min op_multicast op_on_error_resume_next_with op_pairwise
-    op_pluck op_race_with op_reduce op_ref_count op_repeat op_retry op_sample_time op_scan op_share op_skip
-    op_skip_until op_skip_while op_start_with op_switch_all op_switch_map op_take op_take_last op_take_until
-    op_take_while op_tap op_throttle_time op_throw_if_empty op_to_array op_with_latest_from op_zip_with
+    op_audit op_audit_time op_buffer op_buffer_count op_buffer_time op_catch_error op_combine_latest_with op_concat_all
+    op_concat_map op_concat_with op_count op_debounce op_debounce_time op_default_if_empty op_delay
+    op_distinct_until_changed op_distinct_until_key_changed op_element_at op_end_with op_every op_exhaust_all
+    op_exhaust_map op_filter op_finalize op_find op_find_index op_first op_group_by op_ignore_elements op_is_empty
+    op_last op_map op_map_to op_max op_merge_all op_merge_map op_merge_with op_min op_multicast
+    op_on_error_resume_next_with op_pairwise op_pluck op_race_with op_reduce op_ref_count op_repeat op_retry op_sample
+    op_sample_time op_scan op_share op_skip op_skip_until op_skip_while op_start_with op_switch_all op_switch_map
+    op_take op_take_last op_take_until op_take_while op_tap op_throttle op_throttle_time op_throw_if_empty op_to_array
+    op_with_latest_from op_zip_with
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.22.2";
+our $VERSION = "v6.23.0";
 
-sub op_audit_time {
-    my ($duration) = @_;
-
-    my ($timer_sub, $cancel_timer_sub) = get_timer_subs;
+sub op_audit {
+    my ($duration_selector) = @_;
 
     return sub {
         my ($source) = @_;
@@ -39,30 +38,59 @@ sub op_audit_time {
         return rx_observable->new(sub {
             my ($subscriber) = @_;
 
-            my $id;
-            my $in_audit = 0;
-            my @last_value;
+            my $last_val;
+            my $mini_subscription;
+            my $main_is_complete;
 
-            $subscriber->subscription->add(
-                sub { $cancel_timer_sub->($id) },
-            );
-
-            $source->subscribe({
-                %$subscriber,
-                next => sub {
-                    @last_value = @_;
-
-                    if (! $in_audit) {
-                        $in_audit = 1;
-                        $id = $timer_sub->($duration, sub {
-                            $in_audit = 0;
-                            $subscriber->{next}->(@last_value) if defined $subscriber->{next};
-                        });
+            my $mini_subscriber = {
+                next     => sub {
+                    $subscriber->{next}->($last_val) if defined $subscriber->{next};
+                },
+                error    => sub {
+                    $subscriber->{error}->(@_) if defined $subscriber->{error};
+                },
+                complete => sub {
+                    undef $mini_subscription;
+                    undef $last_val;
+                    if ($main_is_complete) {
+                        $subscriber->{complete}->() if defined $subscriber->{complete};
                     }
                 },
-            });
+            };
+
+            my $own_subscriber = {
+                next     => sub {
+                    my ($v) = @_;
+
+                    $last_val = $v;
+                    if (!defined $mini_subscription) {
+                        $mini_subscription = $duration_selector->($v)->pipe(
+                            op_take(1),
+                        )->subscribe($mini_subscriber);
+                    }
+                },
+                error    => sub {
+                    $subscriber->{error}->(@_) if defined $subscriber->{error};
+                },
+                complete => sub {
+                    $main_is_complete = 1;
+                    if (! defined $mini_subscription) {
+                        $subscriber->{complete}->() if defined $subscriber->{complete};
+                    }
+                }
+            };
+
+            my $own_subscription = $source->subscribe($own_subscriber);
+
+            return $mini_subscription, $own_subscription;
         });
     };
+}
+
+sub op_audit_time {
+    my ($duration) = @_;
+
+    return op_audit(sub { rx_timer($duration) });
 }
 
 sub op_buffer {
@@ -316,12 +344,8 @@ sub op_count {
     };
 }
 
-my $_debounce_empty = {};
-
-sub op_debounce_time {
-    my ($due_time) = @_;
-
-    my ($timer_sub, $cancel_timer_sub) = get_timer_subs;
+sub op_debounce {
+    my ($duration_selector) = @_;
 
     return sub {
         my ($source) = @_;
@@ -329,42 +353,61 @@ sub op_debounce_time {
         return rx_observable->new(sub {
             my ($subscriber) = @_;
 
-            my @value_to_emit;
-            my $id;
+            my $mini_subscription;
+            my $last_val;
+            my $has_last_val;
 
-            my $own_subscription = RxPerl::Subscription->new;
-            my $own_observer = {
-                new_subscription => $own_subscription,
+            my $mini_subscriber = {
                 next     => sub {
-                    my @value = @_;
-
-                    @value_to_emit = @value ? @value : $_debounce_empty;
-
-                    $cancel_timer_sub->($id);
-                    $id = $timer_sub->($due_time, sub {
-                        undef @value_to_emit;
-                        $subscriber->{next}->(@value) if defined $subscriber->{next};
-                    });
+                    $subscriber->{next}->($last_val) if defined $subscriber->{next};
+                    undef $has_last_val;
                 },
                 error    => sub {
-                    $cancel_timer_sub->($id);
                     $subscriber->{error}->(@_) if defined $subscriber->{error};
                 },
                 complete => sub {
-                    if (@value_to_emit) {
-                        $cancel_timer_sub->($id);
-                        @value_to_emit = () if _eqq($value_to_emit[0], $_debounce_empty);
-                        $subscriber->{next}->(@value_to_emit);
-                    }
-                    $subscriber->{complete}->();
+                    undef $mini_subscription;
                 },
             };
 
-            $source->subscribe($own_observer);
+            my $own_subscriber = {
+                next     => sub {
+                    my ($v) = @_;
 
-            return ($own_subscription, sub { $cancel_timer_sub->($id) });
+                    if (defined $mini_subscription) {
+                        $mini_subscription->unsubscribe();
+                    }
+
+                    $last_val = $v;
+                    $has_last_val = 1;
+
+                    $mini_subscription = $duration_selector->($v)->pipe(
+                        op_take(1),
+                    )->subscribe($mini_subscriber);
+                },
+                error    => sub {
+                    $subscriber->{error}->(@_) if defined $subscriber->{error};
+                },
+                complete => sub {
+                    if ($has_last_val) {
+                        $subscriber->{next}->($last_val) if defined $subscriber->{next};
+                    }
+                    $subscriber->{complete}->() if defined $subscriber->{complete};
+                }
+            };
+
+            my $main_subscription = $source->subscribe($own_subscriber);
+            $main_subscription->add(\$mini_subscription);
+
+            return $main_subscription, $mini_subscription;
         });
-    }
+    };
+}
+
+sub op_debounce_time {
+    my ($due_time) = @_;
+
+    return op_debounce(sub { rx_timer($due_time) });
 }
 
 sub op_default_if_empty {
@@ -1458,8 +1501,8 @@ sub op_retry {
     };
 }
 
-sub op_sample_time {
-    my ($period) = @_;
+sub op_sample {
+    my ($notifier) = @_;
 
     return sub {
         my ($source) = @_;
@@ -1467,29 +1510,47 @@ sub op_sample_time {
         return rx_observable->new(sub {
             my ($subscriber) = @_;
 
-            my @last_value;
-            my $emitted = 0;
+            my $last_val;
+            my $has_last_val;
 
-            my $n_s = rx_interval($period)->subscribe(sub {
-                if ($emitted) {
-                    $emitted = 0;
-                    $subscriber->{next}->(@last_value) if defined $subscriber->{next};
-                }
-            });
-
-            $subscriber->subscription->add($n_s);
-
-            $source->subscribe({
-                %$subscriber,
-                next => sub {
-                    my @value = @_;
-
-                    @last_value = @value;
-                    $emitted = 1;
+            my $notifier_subscription = RxPerl::Subscription->new;
+            my $notifier_subscriber = {
+                new_subscription => $notifier_subscription,
+                next             => sub {
+                    if ($has_last_val) {
+                        $subscriber->{next}->($last_val) if defined $subscriber->{next};
+                        undef $has_last_val;
+                    }
                 },
-            });
+                error            => sub {
+                    $subscriber->{error}->(@_) if defined $subscriber->{error};
+                },
+            };
+
+            $subscriber->subscription->add($notifier_subscription);
+
+            my $own_subscriber = {
+                %$subscriber,
+                next  => sub {
+                    my ($v) = @_;
+
+                    $last_val = $v;
+                    $has_last_val = 1;
+                },
+            };
+
+            $notifier->subscribe($notifier_subscriber);
+            $source->subscribe($own_subscriber);
+
+            return;
         });
     };
+}
+
+sub op_sample_time {
+    my ($period) = @_;
+
+    return op_sample(rx_interval($period));
 }
 
 sub op_scan {
@@ -1893,10 +1954,8 @@ sub op_tap {
     };
 }
 
-sub op_throttle_time {
-    my ($duration) = @_;
-
-    my ($timer_sub, $cancel_timer_sub) = get_timer_subs;
+sub op_throttle {
+    my ($duration_selector) = @_;
 
     return sub {
         my ($source) = @_;
@@ -1904,35 +1963,44 @@ sub op_throttle_time {
         return rx_observable->new(sub {
             my ($subscriber) = @_;
 
-            my $silent_mode = 0;
-            my $silence_timer_id;
+            my $mini_subscription;
 
-            $subscriber->subscription->add(
-                sub { $cancel_timer_sub->($silence_timer_id) if defined $silence_timer_id }
-            );
+            my $mini_subscriber = {
+                error    => sub {
+                    $subscriber->{error}->(@_) if defined $subscriber->{error};
+                },
+                complete => sub {
+                    undef $mini_subscription;
+                },
+            };
 
             my $own_subscriber = {
                 %$subscriber,
                 next => sub {
-                    my @value = @_;
+                    my ($v) = @_;
 
-                    if (! $silent_mode) {
-                        $silent_mode = 1;
-                        $silence_timer_id = $timer_sub->($duration, sub {
-                            undef $silence_timer_id;
-                            $silent_mode = 0;
-                        });
-
-                        $subscriber->{next}->(@value) if defined $subscriber->{next};
+                    if (! $mini_subscription) {
+                        $subscriber->{next}->(@_) if defined $subscriber->{next};
+                        $mini_subscription = $duration_selector->($v)->pipe(
+                            op_take(1),
+                        )->subscribe($mini_subscriber);
                     }
                 },
             };
+
+            $subscriber->subscription->add(\$mini_subscription);
 
             $source->subscribe($own_subscriber);
 
             return;
         });
     };
+}
+
+sub op_throttle_time {
+    my ($duration) = @_;
+
+    return op_throttle(sub { rx_timer($duration) });
 }
 
 sub op_throw_if_empty {

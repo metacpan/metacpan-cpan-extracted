@@ -80,10 +80,12 @@ ModPerl::RegistryCookerSealed - monkey-patch :Sealed registry handler() into Mod
 
 =head2 SYNOPSIS
 
+<VirtualHost *:443>
     PerlModule ModPerl::RegistryCookerSealed
     PerlResponseHandler ModPerl::Registry
-    AddHandlder perl-script .pl
+    AddHandler perl-script .pl
     Options +ExecCGI
+</VirtualHost>
 
 =head2 LICENSE
 

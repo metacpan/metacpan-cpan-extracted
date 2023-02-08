@@ -49,6 +49,20 @@ CONSTRUCTOR
       that remains pending, until a subsequent "shift" operation makes
       enough space.
 
+    prototype => STRING or OBJECT or CODE
+
+      Since verison 0.51.
+
+      Optional. If defined, gives either a class name, an object instance
+      to clone or a code reference to invoke when a new pending Future
+      instance is needed by the shift or push methods when they cannot
+      complete immediately.
+
+         $f = $prototype->();    # if CODE reference
+         $f = $prototype->new;   # otherwise
+
+      If not provided, a default of Future will be used.
+
  push
 
        $queue->push( @items );

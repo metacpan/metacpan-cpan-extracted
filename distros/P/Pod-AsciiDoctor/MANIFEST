@@ -8,7 +8,6 @@ MANIFEST
 MANIFEST.SKIP
 META.json
 META.yml
-Makefile.PL
 README
 README.adoc
 README.old

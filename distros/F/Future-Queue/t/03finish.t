@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Future;
 use Future::Queue;
@@ -19,7 +19,7 @@ use Future::Queue;
    my $f2 = $queue->shift;
 
    is( $f1->result, "ITEM", '$f1->result' );
-   is_deeply( [ $f2->result ], [], '$f2->result' );
+   is( [ $f2->result ], [], '$f2->result' );
 
    ok( !defined eval { $queue->push( "MORE" ) },
       '->push after ->finish is an error' );
@@ -38,7 +38,7 @@ use Future::Queue;
    $queue->finish;
 
    is( $f1->result, "ITEM", '$f1->result' );
-   is_deeply( [ $f2->result ], [], '$f2->result' );
+   is( [ $f2->result ], [], '$f2->result' );
 }
 
 done_testing;

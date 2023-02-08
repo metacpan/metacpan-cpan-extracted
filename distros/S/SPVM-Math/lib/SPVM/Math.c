@@ -1637,7 +1637,7 @@ int32_t SPVM__Math__nan(SPVM_ENV* env, SPVM_VALUE* stack) {
 
   void* string = stack[0].oval;
   if (string == NULL) {
-    return env->die(env, stack, "String must be defined", MFILE, __LINE__);
+    return env->die(env, stack, "String must be defined", __func__, MFILE, __LINE__);
   }
 
   const char* tagp = env->get_chars(env, stack, string);
@@ -1662,7 +1662,7 @@ int32_t SPVM__Math__nanf(SPVM_ENV* env, SPVM_VALUE* stack) {
 
   void* string = stack[0].oval;
   if (string == NULL) {
-    return env->die(env, stack, "String must be defined", MFILE, __LINE__);
+    return env->die(env, stack, "String must be defined", __func__, MFILE, __LINE__);
   }
 
   const char* tagp = env->get_chars(env, stack, string);

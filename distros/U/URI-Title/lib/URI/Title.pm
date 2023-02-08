@@ -1,5 +1,5 @@
 package URI::Title;
-$URI::Title::VERSION = '1.903';
+$URI::Title::VERSION = '1.904';
 use 5.006;
 use warnings;
 use strict;
@@ -193,7 +193,7 @@ URI::Title - get the titles of things on the web in a sensible way
 
 =head1 VERSION
 
-version 1.903
+version 1.904
 
 =head1 SYNOPSIS
 

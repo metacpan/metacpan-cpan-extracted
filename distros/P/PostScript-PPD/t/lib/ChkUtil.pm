@@ -1,4 +1,4 @@
-package t::ChkUtil;
+package ChkUtil;
 
 use strict;
 

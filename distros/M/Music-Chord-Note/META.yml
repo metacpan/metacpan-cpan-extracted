@@ -10,7 +10,7 @@ configure_requires:
   Module::Build::Pluggable: '0'
   Module::Build::Pluggable::CPANfile: '0.05'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,15 +19,15 @@ name: Music-Chord-Note
 provides:
   Music::Chord::Note:
     file: lib/Music/Chord/Note.pm
-    version: '0.10'
+    version: '0.11'
 requires:
   Carp: '0'
   perl: '5.006002'
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: http://github.com/bayashi/Music-Chord-Note/issues
+  bugtracker: https://github.com/bayashi/Music-Chord-Note/issues
   license: http://www.perlfoundation.org/artistic_license_2_0
-  repository: http://github.com/bayashi/Music-Chord-Note
-version: '0.10'
+  repository: https://github.com/bayashi/Music-Chord-Note
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

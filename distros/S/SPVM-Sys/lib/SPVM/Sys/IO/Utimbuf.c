@@ -13,7 +13,7 @@ int32_t SPVM__Sys__IO__Utimbuf__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   struct utimbuf* st_utimbuf = env->new_memory_stack(env, stack, sizeof(struct utimbuf));
   
-  void* obj_utimbuf = env->new_pointer_by_name(env, stack, "Sys::IO::Utimbuf", st_utimbuf, &e, FILE_NAME, __LINE__);
+  void* obj_utimbuf = env->new_pointer_by_name(env, stack, "Sys::IO::Utimbuf", st_utimbuf, &e, __func__, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   stack[0].oval = obj_utimbuf;

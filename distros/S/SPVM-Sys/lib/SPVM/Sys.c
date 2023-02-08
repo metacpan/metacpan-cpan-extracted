@@ -11,7 +11,7 @@ int32_t SPVM__Sys__defined(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_macro_name = stack[0].oval;
   if (!obj_macro_name) {
-    return env->die(env, stack, "The $macro_name must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $macro_name must be defined", __func__, FILE_NAME, __LINE__);
   }
   
   const char* macro_name = env->get_chars(env, stack, obj_macro_name);
@@ -222,7 +222,7 @@ int32_t SPVM__Sys__defined(SPVM_ENV* env, SPVM_VALUE* stack) {
 #   endif
   }
   else {
-    return env->die(env, stack, "The macro name \"%s\" is not supported yet", macro_name, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The macro name \"%s\" is not supported yet", macro_name, __func__, FILE_NAME, __LINE__);
   }
 
   if (items > 1) {
@@ -232,19 +232,19 @@ int32_t SPVM__Sys__defined(SPVM_ENV* env, SPVM_VALUE* stack) {
     
     // Int
     if (env->is_type(env, stack, obj_value, SPVM_NATIVE_C_BASIC_TYPE_ID_INT_CLASS, 0)) {
-      env->set_field_int_by_name(env, stack, obj_value, "value", ival, &e, FILE_NAME, __LINE__);
+      env->set_field_int_by_name(env, stack, obj_value, "value", ival, &e, __func__, FILE_NAME, __LINE__);
       if (e) { return e; }
     }
     else if (env->is_type(env, stack, obj_value, SPVM_NATIVE_C_BASIC_TYPE_ID_LONG_CLASS, 0)) {
-      env->set_field_long_by_name(env, stack, obj_value, "value", lval, &e, FILE_NAME, __LINE__);
+      env->set_field_long_by_name(env, stack, obj_value, "value", lval, &e, __func__, FILE_NAME, __LINE__);
       if (e) { return e; }
     }
     else if (env->is_type(env, stack, obj_value, SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE_CLASS, 0)) {
-      env->set_field_double_by_name(env, stack, obj_value, "value", dval, &e, FILE_NAME, __LINE__);
+      env->set_field_double_by_name(env, stack, obj_value, "value", dval, &e, __func__, FILE_NAME, __LINE__);
       if (e) { return e; }
     }
     else {
-      return env->die(env, stack, "The $value must be the Int, Long, or Double class", macro_name, FILE_NAME, __LINE__);
+      return env->die(env, stack, "The $value must be the Int, Long, or Double class", macro_name, __func__, FILE_NAME, __LINE__);
     }
   }
   
@@ -258,7 +258,7 @@ int32_t SPVM__Sys__getenv(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_name = stack[0].oval;
   
   if (!obj_name) {
-    return env->die(env, stack, "The name must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The name must be defined", __func__, FILE_NAME, __LINE__);
   }
   
   const char* name = env->get_chars(env, stack, obj_name);
@@ -280,18 +280,18 @@ int32_t SPVM__Sys__getenv(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__setenv(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "setenv is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "setenv is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   void* obj_name = stack[0].oval;
   if (!obj_name) {
-    return env->die(env, stack, "The name must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The name must be defined", __func__, FILE_NAME, __LINE__);
   }
   const char* name = env->get_chars(env, stack, obj_name);
 
   void* obj_value = stack[1].oval;
   if (!obj_value) {
-    return env->die(env, stack, "The value must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The value must be defined", __func__, FILE_NAME, __LINE__);
   }
   const char* value = env->get_chars(env, stack, obj_value);
   
@@ -300,7 +300,7 @@ int32_t SPVM__Sys__setenv(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = setenv(name, value, overwrite);
 
   if (status == -1) {
-    env->die(env, stack, "[System Error]setenv failed:%s.", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]setenv failed:%s.", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -312,19 +312,19 @@ int32_t SPVM__Sys__setenv(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__unsetenv(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "unsetenv is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "unsetenv is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   void* obj_name = stack[0].oval;
   if (!obj_name) {
-    return env->die(env, stack, "The name must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The name must be defined", __func__, FILE_NAME, __LINE__);
   }
   const char* name = env->get_chars(env, stack, obj_name);
 
   int32_t status = unsetenv(name);
 
   if (status == -1) {
-    env->die(env, stack, "[System Error]unsetenv failed:%s.", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]unsetenv failed:%s.", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   

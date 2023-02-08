@@ -1,4 +1,12 @@
 #!/usr/bin/perl
+
+unless (($ENV{PERL_PERTURB_KEYS}//"") eq "2") {
+  $ENV{PERL_PERTURB_KEYS} = "2"; # deterministic
+  $ENV{PERL_HASH_SEED} = "0xDEADBEEF";
+  $ENV{PERL_HASH_SEED_DEBUG} = "1";
+  exec $^X, $0, @ARGV; # for reproducible results
+}
+
 use strict; use warnings  FATAL => 'all'; use feature qw(state say); use utf8;
 #use open IO => ':locale';
 use open ':std', ':encoding(UTF-8)';
@@ -14,11 +22,13 @@ use Test::More;
 use Data::Dumper::Interp;
 
 my $initial_seed;
+my $iters_btw_timechecks = 50;
 my $time_limit = 3;  # seconds
 
 while (@ARGV) {
   if ($ARGV[0] =~ /^-s/) { shift; $initial_seed = shift // die }
   elsif ($ARGV[0] =~ /^-t/) { shift; $time_limit = shift // die }
+  elsif ($ARGV[0] =~ /^-i/) { shift; $iters_btw_timechecks = shift // die }
   else { die "Unrecognized arg $ARGV[0]" }
 }
 
@@ -95,7 +105,7 @@ my $start_time = time;
 my $iter = 0;
 while (time < $start_time+$time_limit) {
   # Do several iterations between OS calls to get current time
-  for (0..49) {
+  for (1..$iters_btw_timechecks) {
     ++$iter;
     #$Data::Dumper::Interp::Debug = 1 if $iter==21;
     @saved_items = ();

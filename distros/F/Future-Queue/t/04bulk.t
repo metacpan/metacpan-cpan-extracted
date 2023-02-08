@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Future;
 use Future::Queue;
@@ -25,10 +25,10 @@ use Future::Queue;
 
    $queue->push( $_ ) for qw( A B C D );
 
-   is_deeply( [ $queue->shift_atmost( 3 )->result ], [qw( A B C )],
+   is( [ $queue->shift_atmost( 3 )->result ], [qw( A B C )],
       '->shift_atmost can yield multiple' );
 
-   is_deeply( [ $queue->shift_atmost( 3 )->result ], [qw( D )],
+   is( [ $queue->shift_atmost( 3 )->result ], [qw( D )],
       '->shift_atmost yields when non-empty' );
 
    ok( !$queue->shift_atmost( 3 )->is_ready,
@@ -59,10 +59,10 @@ use Future::Queue;
 
    $queue->push( $_ ) for qw( A B C );
 
-   is_deeply( [ $f1->result ], [qw( A )],
+   is( [ $f1->result ], [qw( A )],
       'shift_atmost yielded first pushed item' );
 
-   is_deeply( [ $f2->result ], [qw( B )],
+   is( [ $f2->result ], [qw( B )],
       'shift_atmost again yielded second pushed item' );
 }
 
@@ -75,10 +75,10 @@ use Future::Queue;
 
    $queue->push( qw( A B C D ) );
 
-   is_deeply( [ $f1->result ], [qw( A B C )],
+   is( [ $f1->result ], [qw( A B C )],
       'shift_atmost yielded first three pushed items' );
 
-   is_deeply( [ $f2->result ], [qw( D )],
+   is( [ $f2->result ], [qw( D )],
       'shift_atmost again yielded remaining pushed item' );
 }
 

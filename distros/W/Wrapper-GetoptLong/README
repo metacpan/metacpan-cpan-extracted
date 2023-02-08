@@ -1,0 +1,80 @@
+Wrapper-GetoptLong
+
+SYNOPSIS
+
+A wrapper for the Getopts::Long module.
+
+use MyMainModule;  # Has all the support functions for the options ...
+
+use Wrapper::GetoptLong;
+
+my $mmm=MyMainModule->new();
+my %OPTS_CONFIG=(
+   'the_date'  => {
+        'desc'       => q^Print today's date in the format specified - uses strftime acceptable formats.^,
+        'func'       => 'MyModule::the_date($obj->opts{'the_date'})',
+	'opt_arg_eg'   => '%m-%d-%Y',
+	'opt_arg_type' => 's',
+	},
+   );
+@ARGV=('--the_date', '%m/%d/%Y');
+my $golw_obj=new Wrapper::GetoptLong(\%OPTS_CONFIG, $mmm);
+$golw->run_getopt();
+my $rc=$golw->execute_opt();
+if(ref($rc))
+  {
+  use Data::Dumper;
+  print Dumper $rc;
+  }
+else
+  {
+  print $rc, "\n";
+  }
+
+DEMO
+
+A full demo is avaialable on GitHub: https://github.com/ngabriel8/WGOLDemo
+Requires a database , mySQL or MariaDB - the repository includes files to create and populate the database.
+
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Wrapper::GetoptLong
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Wrapper-GetoptLong
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Wrapper-GetoptLong
+
+    Search CPAN
+        https://metacpan.org/release/Wrapper-GetoptLong
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2023 by Nazar Gabriel.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

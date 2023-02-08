@@ -3,9 +3,9 @@
 # $Id: GnusFilter.pm,v 1.6 2001/09/16 04:39:55 joe Exp $
 
 package News::GnusFilter;
-$VERSION = '0.55';
+$VERSION = '0.56';
 
-use 5.006;
+use v5.22;
 use strict;
 
 =head1 NAME
@@ -103,7 +103,7 @@ The recommended installation path for your script is I<~/.gnusfilter>.
 ##################################################
 use Exporter;
 use base "Exporter";
-
+use feature 'state';
 BEGIN {
 
     no strict;
@@ -859,7 +859,7 @@ Warns if the message is MIME-encoded.
 
 
 sub mimes {
-    my ($mime_crap, %result) if 0; # static vars
+    state ($mime_crap, %result);
 
     return \%result, $mime_crap if $mime_crap;
     $mime_crap = '';
@@ -1066,7 +1066,7 @@ package News::GnusFilter::Message;
 
 sub get_message {
 
-    my $msg if 0; # static var trick
+    state($msg); # static var trick
     return $msg if $msg;
 
     $msg = bless {}, ref $_[0] || $_[0];
@@ -1159,8 +1159,6 @@ for normal e-mail.
 is wrong
 
 
-=item * uses the C<my $x if 0;> trick.
-
 =back
 
 =head1 NOTES
@@ -1178,7 +1176,3 @@ heavily from Tom Christiansen's I<msgchk> script.
 
 Copyright 2001 Joe Schaefer.  This code is free software; it is freely
 modifiable and redistributable under the same terms as Perl itself.
-
-
-
-

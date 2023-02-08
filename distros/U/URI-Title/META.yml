@@ -25,19 +25,19 @@ name: URI-Title
 provides:
   URI::Title:
     file: lib/URI/Title.pm
-    version: '1.903'
+    version: '1.904'
   URI::Title::HTML:
     file: lib/URI/Title/HTML.pm
-    version: '1.903'
+    version: '1.904'
   URI::Title::Image:
     file: lib/URI/Title/Image.pm
-    version: '1.903'
+    version: '1.904'
   URI::Title::MP3:
     file: lib/URI/Title/MP3.pm
-    version: '1.903'
+    version: '1.904'
   URI::Title::PDF:
     file: lib/URI/Title/PDF.pm
-    version: '1.903'
+    version: '1.904'
 requires:
   Carp: '0'
   Encode: '0'
@@ -60,7 +60,7 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=URI-Title
   repository: http://github.com/book/URI-Title.git
-version: '1.903'
+version: '1.904'
 x_contributors:
   - 'Philippe Bruhat (BooK) <book@cpan.org>'
   - 'Neil Bowers <neilb@cpan.org>'

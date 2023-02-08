@@ -3,13 +3,14 @@
 use strict;
 use warnings;
 
-use FindBin;
-use lib "$FindBin::Bin/..";
+#use FindBin;
+#use lib "$FindBin::Bin/..";
+use lib 't/lib';
 
 use Test::More ( tests => 24 );
 use Data::Dump qw( pp );
 
-use t::ChkUtil;
+use ChkUtil;
 dualvar_or_skip 24;
 
 use_ok( 'PostScript::PPD' );

@@ -1,6 +1,6 @@
 package App::Greple::xlate;
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 =encoding utf-8
 
@@ -264,7 +264,7 @@ our %formatter = (
     },
     ifdef => sub {
 	join '',
-	    #ifdef $lang_from\n",
+	    "#ifdef $lang_from\n",
 	    $_[0],
 	    "#endif\n",
 	    "#ifdef $lang_to\n",
@@ -314,7 +314,7 @@ sub normalize {
     }pmger;
 }
 
-sub xlate_postgrep {
+sub postgrep {
     my $grep = shift;
     my @miss;
     for my $r ($grep->result) {
@@ -367,8 +367,8 @@ sub xlate {
 	return $s;
     }
 }
-sub xlate_colormap { xlate $_ }
-sub xlate_callback { xlate { @_ }->{match} }
+sub colormap { xlate $_ }
+sub callback { xlate { @_ }->{match} }
 
 sub cache_file {
     my $file = sprintf("%s.xlate-%s-%s.json",
@@ -405,7 +405,7 @@ sub write_cache {
     }
 }
 
-sub before {
+sub begin {
     my %args = @_;
     $current_file = delete $args{&::FILELABEL} or die;
     s/\z/\n/ if /.\z/;
@@ -426,7 +426,7 @@ sub before {
     }
 }
 
-sub after {
+sub end {
     if (my $cache = cache_file) {
 	if ($xlate_cache_update or %$old_cache) {
 	    write_cache $cache;
@@ -455,10 +455,10 @@ option default \
 	--prologue &__PACKAGE__::prologue
 
 option --xlate-color \
-	--postgrep &__PACKAGE__::xlate_postgrep \
-	--callback &__PACKAGE__::xlate_callback \
-	--begin    &__PACKAGE__::before \
-	--end      &__PACKAGE__::after
+	--postgrep &__PACKAGE__::postgrep \
+	--callback &__PACKAGE__::callback \
+	--begin    &__PACKAGE__::begin \
+	--end      &__PACKAGE__::end
 
 option --xlate --xlate-color --color=never
 

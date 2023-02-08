@@ -3,8 +3,20 @@ use ExtUtils::MakeMaker;
 use strict;
 use warnings;
 use Config;
-use SPVM::Builder::Util::API;
+use Getopt::Long 'GetOptions';
 
+GetOptions(
+  'meta' => \my $meta,
+  'no-build-spvm-modules' => \my $no_build_spvm_modules,
+);
+
+if ($meta) {
+  $no_build_spvm_modules = 1;
+}
+
+my %configure_and_runtime_requires = (
+  'SPVM' => '0.9691',
+);
 WriteMakefile(
   NAME              => 'SPVM::Errno',
   VERSION_FROM      => 'lib/SPVM/Errno.pm',
@@ -25,9 +37,15 @@ WriteMakefile(
       },
     },
   },
-  # SPVM::Builder::Util::API is needed for Makefile.PL
+  NORECURS => 1,
   CONFIGURE_REQUIRES => {
-    'SPVM'              => '0.9618_01',
+    %configure_and_runtime_requires,
+  },
+  PREREQ_PM         => {
+    %configure_and_runtime_requires,
+  },
+  TEST_REQUIRES => {
+    
   },
 );
 
@@ -35,8 +53,10 @@ sub MY::postamble {
 
   my $make_rule = '';
   
-  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Errno');
-  
+  unless ($no_build_spvm_modules) {
+    require SPVM::Builder::Util::API;
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Errno');
+  }
   
   return $make_rule;
 }

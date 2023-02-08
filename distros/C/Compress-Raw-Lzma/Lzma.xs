@@ -726,7 +726,7 @@ lzma_alone_encoder(Class, flags, bufsize, filters)
             //setTainted(obj);
         XPUSHs(obj);
     }
-    if (GIMME == G_ARRAY) {
+    if (GIMME_V == G_ARRAY) {
         SV * sv = sv_2mortal(newSViv(err)) ;
         setDUALstatus(sv, err);
         //if (is_tainted)
@@ -772,7 +772,7 @@ lzma_raw_encoder(Class, flags, bufsize, filters, forZip)
             //setTainted(obj);
         XPUSHs(obj);
     }
-    if (GIMME == G_ARRAY) {
+    if (GIMME_V == G_ARRAY) {
         SV * sv = sv_2mortal(newSViv(err)) ;
         setDUALstatus(sv, err);
         //if (is_tainted)
@@ -818,7 +818,7 @@ lzma_stream_encoder(Class, flags, bufsize, filters, check=LZMA_CHECK_CRC32)
             //setTainted(obj);
         XPUSHs(obj);
     }
-    if (GIMME == G_ARRAY) {
+    if (GIMME_V == G_ARRAY) {
         SV * sv = sv_2mortal(newSViv(err)) ;
         setDUALstatus(sv, err);
         //if (is_tainted)
@@ -863,7 +863,7 @@ lzma_easy_encoder(Class, flags, bufsize, preset=LZMA_PRESET_DEFAULT, check=LZMA_
             //setTainted(obj);
         XPUSHs(obj);
     }
-    if (GIMME == G_ARRAY) {
+    if (GIMME_V == G_ARRAY) {
         SV * sv = sv_2mortal(newSViv(err)) ;
         setDUALstatus(sv, err);
         //if (is_tainted)
@@ -1114,7 +1114,7 @@ lzma_auto_decoder(Class, flags, bufsize, memlimit=UINT64_MAX, fl=0)
             //setTainted(obj);
         XPUSHs(obj);
     }
-    if (GIMME == G_ARRAY) {
+    if (GIMME_V == G_ARRAY) {
         SV * sv = sv_2mortal(newSViv(err)) ;
         setDUALstatus(sv, err);
         //if (is_tainted)
@@ -1161,7 +1161,7 @@ lzma_raw_decoder(Class, flags, bufsize, filters, properties)
             //setTainted(obj);
         XPUSHs(obj);
     }
-    if (GIMME == G_ARRAY) {
+    if (GIMME_V == G_ARRAY) {
         SV * sv = sv_2mortal(newSViv(err)) ;
         setDUALstatus(sv, err);
         //if (is_tainted)

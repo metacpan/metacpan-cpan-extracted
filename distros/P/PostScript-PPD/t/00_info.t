@@ -3,8 +3,11 @@
 use strict;
 use warnings;
 
+use lib 't/lib';
+
 use FindBin;
 use Test::More tests => 1;
+
 
 pass;
 # idea from Test::Harness, thanks!
@@ -15,3 +18,4 @@ diag(
 
 diag( "We are $0" );
 diag( "FindBind says $FindBin::Bin" );
+diag( join ' ', "INC:", @INC );

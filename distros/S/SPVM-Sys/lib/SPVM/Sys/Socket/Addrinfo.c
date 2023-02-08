@@ -13,7 +13,7 @@ int32_t SPVM__Sys__Socket__Addrinfo__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   struct addrinfo* addrinfo = env->new_memory_stack(env, stack, sizeof(struct addrinfo));
 
-  void* obj_addrinfo = env->new_pointer_by_name(env, stack, "Sys::Socket::Addrinfo", addrinfo, &e, FILE_NAME, __LINE__);
+  void* obj_addrinfo = env->new_pointer_by_name(env, stack, "Sys::Socket::Addrinfo", addrinfo, &e, __func__, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   stack[0].oval = obj_addrinfo;
@@ -181,12 +181,12 @@ int32_t SPVM__Sys__Socket__Addrinfo__copy_ai_addr(SPVM_ENV* env, SPVM_VALUE* sta
     
     // Calls the clone method.
     {
-      void* obj_ai_addr = env->new_pointer_by_name(env, stack, sockaddr_class_name, tmp_ai_addr, &e, FILE_NAME, __LINE__);
+      void* obj_ai_addr = env->new_pointer_by_name(env, stack, sockaddr_class_name, tmp_ai_addr, &e, __func__, FILE_NAME, __LINE__);
       if (e) { return e; }
       
       stack[0].oval = obj_ai_addr;
       int32_t args_stack_length = 1;
-      e = env->call_instance_method_by_name(env, stack, "clone", args_stack_length, FILE_NAME, __LINE__);
+      e = env->call_instance_method_by_name(env, stack, "clone", args_stack_length, __func__, FILE_NAME, __LINE__);
       if (e) { return e; };
       obj_ai_addr_clone = stack[0].oval;
     }

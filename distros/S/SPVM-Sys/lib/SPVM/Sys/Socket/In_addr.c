@@ -11,7 +11,7 @@ int32_t SPVM__Sys__Socket__In_addr__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   struct in_addr* address = env->new_memory_stack(env, stack, sizeof(struct in_addr));
 
-  void* obj_address = env->new_pointer_by_name(env, stack, "Sys::Socket::In_addr", address, &e, FILE_NAME, __LINE__);
+  void* obj_address = env->new_pointer_by_name(env, stack, "Sys::Socket::In_addr", address, &e, __func__, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   stack[0].oval = obj_address;

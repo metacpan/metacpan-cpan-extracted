@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,12 +14,15 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Crypt-Passphrase",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Crypt::Passphrase",
   "PREREQ_PM" => {
     "Carp" => 0,
     "Crypt::URandom" => 0,
+    "Digest::MD5" => 0,
+    "Digest::SHA" => 0,
     "Encode" => 0,
+    "Hash::Util::FieldHash" => 0,
     "Scalar::Util" => 0,
     "Unicode::Normalize" => 0,
     "parent" => 0,
@@ -32,7 +35,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,8 +45,11 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Crypt::URandom" => 0,
+  "Digest::MD5" => 0,
+  "Digest::SHA" => 0,
   "Encode" => 0,
   "File::Spec" => 0,
+  "Hash::Util::FieldHash" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Scalar::Util" => 0,

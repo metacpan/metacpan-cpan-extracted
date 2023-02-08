@@ -1,5 +1,10 @@
 Revision history for Perl extension RxPerl
 
+v6.23.0 2023-02-08T15:57:28Z
+
+    - added op_audit, op_debounce, op_sample and op_throttle
+    - fixed behavior of op_audit_time slightly, according to rxjs
+
 v6.22.2 2023-02-07T14:55:04Z
 
     - updated documentation

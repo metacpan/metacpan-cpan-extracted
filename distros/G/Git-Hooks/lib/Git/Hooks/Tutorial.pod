@@ -13,7 +13,7 @@ Git::Hooks Tutorial - Gentle introduction to Git::Hooks
 
 =head1 VERSION
 
-version 3.4.0
+version 3.5.0
 
 =head1 NAME
 
@@ -353,7 +353,7 @@ takes place before the commits are integrated, it's more useful to enable just
 the other two.
 
 First, you have to create the same driver script as L<described for the
-server|https://github.com/gnustavo/Git-Hooks/wiki/Tutorial-for-Git-administrators#server-driver-script>.
+server|https://metacpan.org/dist/Git-Hooks/view/lib/Git/Hooks/Tutorial.pod#Server-Driver-Script>.
 
 Then we must create the symlinks from the hook names to the driver
 script. However, in Gerrit there's a single F<hooks> directory per server,
@@ -461,7 +461,7 @@ system|https://docs.docker.com/engine/install/>.
 If you install Git::Hooks it comes with a script called F<githooks-docker.sh>
 which makes it easy to use it in a Docker container. You don't have to install
 the module though, as the script can be L<downloaded directly from
-GitHub|https://raw.githubusercontent.com/gnustavo/Git-Hooks/next/scripts/githooks-docker.sh|githooks-docker.sh>
+GitHub|https://raw.githubusercontent.com/gnustavo/Git-Hooks/next/scripts/githooks-docker.sh>
 like this:
 
   mkdir -p $HOME/bin
@@ -475,7 +475,7 @@ The first step is to build a custom Docker image based on the L<official Perl
 image|https://hub.docker.com/_/perl> and installing Git::Hooks and a few other
 Perl modules in it.
 
-If you l<can't invoke docker without
+If you L<can't invoke docker without
 sudo|https://docs.docker.com/engine/install/linux-postinstall/> edit the
 F<githooks-docker.sh> script and set its C<SUDO> configuration variable like
 this:
@@ -527,9 +527,9 @@ repositories.
 In the example above, the REPO_ROOT is defined dynamically by the command
 C<realpath ../..>, which resolves to the grandparent of the repository which
 invoked the hook. This is good for Git servers in which all repositories are
-siblings, such as in Bitbucket and in GitLab. Gerrit, on the other hand, keeps
-its repositories in a hierarchy and you should define the C<REPO_ROOT> variable
-with a fixed string.
+siblings, such as Bitbucket and GitLab. Gerrit, on the other hand, keeps its
+repositories in a hierarchy and you should define the C<REPO_ROOT> variable with
+a fixed string.
 
 This is all there is to it!
 
@@ -554,7 +554,7 @@ repositories.
 If all goes well you should be able to see the container with the following
 command:
 
-  $HOME/bin/githooks-docker.sh start $REPO_ROOT
+  $HOME/bin/githooks-docker.sh status
   CONTAINER ID   IMAGE             COMMAND            CREATED         STATUS         PORTS     NAMES
   319d57c5e34d   git-hooks:3.3.1   "sleep infinity"   5 minutes ago   Up 5 minutes             git-hooks
 
@@ -588,7 +588,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by CPQD <www.cpqd.com.br>.
+This software is copyright (c) 2023 by CPQD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -15,7 +15,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.22.2";
+our $VERSION = "v6.23.0";
 
 1;
 __END__
@@ -61,7 +61,7 @@ The documentation in this POD applies to all three adapter modules as well.
 This module is an implementation of L<Reactive Extensions|http://reactivex.io/> in Perl. It replicates the
 behavior of L<rxjs 6|https://www.npmjs.com/package/rxjs> which is the JavaScript implementation of ReactiveX.
 
-Currently 89 of the 100+ operators in rxjs are implemented in this module.
+Currently 93 of the 100+ operators in rxjs are implemented in this module.
 
 =head1 EXPORTABLE FUNCTIONS
 
@@ -408,6 +408,15 @@ apply to RxPerl too).
 
 =over
 
+=item op_audit
+
+L<https://rxjs.dev/api/operators/audit>
+
+    # 1, 3, 5, 7, 9, ...
+    rx_interval(0.7)->pipe(
+        op_audit(sub ($val) { rx_timer(1) }),
+    )->subscribe($observer);
+
 =item op_audit_time
 
 L<https://rxjs.dev/api/operators/auditTime>
@@ -533,6 +542,15 @@ L<https://rxjs.dev/api/operators/count>
     rx_of(1, 1, 1, 1, 1, 1, 1)->pipe(
         op_count(sub ($value, $idx) { $idx % 2 == 0 }),
     );
+
+=item op_debounce
+
+L<https://rxjs.dev/api/operators/debounce>
+
+    # 3, complete
+    rx_of(1, 2, 3)->pipe(
+        op_debounce(sub ($val) { rx_timer(0.5) }),
+    )->subscribe($observer);
 
 =item op_debounce_time
 
@@ -1018,6 +1036,15 @@ L<https://rxjs.dev/api/operators/retry>
         op_retry(2),
     )->subscribe($observer);
 
+=item op_sample
+
+L<https://rxjs.dev/api/operators/sample>
+
+    # 0, 1, 3, 4, 6, 7, ...
+    rx_interval(0.7)->pipe(
+        op_sample(rx_interval(1)),
+    )->subscribe($observer);
+
 =item op_sample_time
 
 L<https://rxjs.dev/api/operators/sampleTime>
@@ -1164,6 +1191,15 @@ L<https://rxjs.dev/api/operators/tap>
     # foo0, 0, foo1, 1, foo2, 2, ...
     rx_interval(1)->pipe(
         op_tap(sub {say "foo$_[0]"}),
+    )->subscribe($observer);
+
+=item op_throttle
+
+L<https://rxjs.dev/api/operators/throttle>
+
+    # 0, 2, 4, 6, 8, 10, ...
+    rx_interval(0.7)->pipe(
+        op_throttle(sub ($val) { rx_timer(1) }),
     )->subscribe($observer);
 
 =item op_throttle_time

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
 
-package Future::Queue 0.50;
+package Future::Queue 0.51;
 
 use v5.14;
 use warnings;
@@ -66,6 +66,19 @@ Optional. If defined, there can be at most the given number of items in the
 queue. Attempts to call L</push> beyond that will yield a future that remains
 pending, until a subsequent L</shift> operation makes enough space.
 
+=item prototype => STRING or OBJECT or CODE
+
+I<Since verison 0.51.>
+
+Optional. If defined, gives either a class name, an object instance to clone
+or a code reference to invoke when a new pending C<Future> instance is needed
+by the C<shift> or C<push> methods when they cannot complete immediately.
+
+   $f = $prototype->();    # if CODE reference
+   $f = $prototype->new;   # otherwise
+
+If not provided, a default of C<Future> will be used.
+
 =back
 
 =cut
@@ -75,10 +88,15 @@ sub new
    my $class = shift;
    my %params = @_;
 
+   my $prototype = $params{prototype};
+
    return bless {
       items => [],
       max_items => $params{max_items},
       shift_waiters => [],
+      ( ref $prototype eq "CODE" ) ?
+         ( f_factory => $prototype ) :
+         ( f_prototype => $prototype // "Future" ),
    }, $class;
 }
 
@@ -143,7 +161,7 @@ sub push :method
    $self->_manage_shift_waiters;
    return Future->done if !@more;
 
-   my $f = Future->new;
+   my $f = $self->{f_factory} ? $self->{f_factory}->() : $self->{f_prototype}->new;
    push @{ $self->{push_waiters} //= [] }, sub {
       my $count = $max - @$items;
       push @$items, splice @more, 0, $count;
@@ -211,7 +229,7 @@ sub shift :method
 
    return Future->done if $self->{finished};
 
-   my $f = Future->new;
+   my $f = $self->{f_factory} ? $self->{f_factory}->() : $self->{f_prototype}->new;
    push @{ $self->{shift_waiters} }, sub {
       return $f->done if !@$items and $self->{finished};
       $f->done( shift @$items );
@@ -250,7 +268,7 @@ sub shift_atmost
 
    return Future->done if $self->{finished};
 
-   my $f = Future->new;
+   my $f = $self->{f_factory} ? $self->{f_factory}->() : $self->{f_prototype}->new;
    push @{ $self->{shift_waiters} }, sub {
       return $f->done if !@$items and $self->{finished};
       $f->done( splice @$items, 0, $count );

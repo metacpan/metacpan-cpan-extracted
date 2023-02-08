@@ -11,4 +11,5 @@ t/01queue.t
 t/02max-items.t
 t/03finish.t
 t/04bulk.t
+t/05prototype.t
 t/99pod.t

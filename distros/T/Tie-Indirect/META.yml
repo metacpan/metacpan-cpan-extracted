@@ -1,0 +1,28 @@
+---
+abstract: 'tie variables to access data located at run-time.'
+author:
+  - 'Jim Avera <jim.avera@gmail.com>'
+build_requires:
+  Data::Dumper::Interp: '0'
+  Test::More: '0'
+  feature: '0'
+  open: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-Indirect
+requires:
+  Carp: '0'
+  Tie::Hash: '0'
+version: '0.001'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: CC0-1.0

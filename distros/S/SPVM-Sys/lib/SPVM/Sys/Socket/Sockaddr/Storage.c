@@ -11,7 +11,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__Storage__new(SPVM_ENV* env, SPVM_VALUE* sta
   
   struct sockaddr_storage* socket_address = env->new_memory_stack(env, stack, sizeof(struct sockaddr_storage));
 
-  void* obj_socket_address = env->new_pointer_by_name(env, stack, "Sys::Socket::Sockaddr::Storage", socket_address, &e, FILE_NAME, __LINE__);
+  void* obj_socket_address = env->new_pointer_by_name(env, stack, "Sys::Socket::Sockaddr::Storage", socket_address, &e, __func__, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   stack[0].oval = obj_socket_address;

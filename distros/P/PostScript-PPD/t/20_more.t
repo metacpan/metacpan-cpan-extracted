@@ -3,15 +3,16 @@
 use strict;
 use warnings;
 
-use FindBin;
-BEGIN { chdir "$FindBin::Dir/.." }
+#use FindBin;
+#BEGIN { chdir "$FindBin::Dir/.." }
+use lib "t/lib";
 
 use Test::More ( tests => 23 );
 use Data::Dump qw( pp );
 
 
 
-use t::ChkUtil;
+use ChkUtil;
 dualvar_or_skip 14;
 
 use_ok( 'PostScript::PPD' );

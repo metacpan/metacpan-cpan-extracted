@@ -23,5 +23,6 @@ t/author-pod-syntax.t
 t/failure.t
 t/html.t
 t/image.t
+t/images/camel_head.v25e738a.png
 t/images/has_title.png
 t/images/no_title.png

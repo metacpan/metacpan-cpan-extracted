@@ -1,5 +1,8 @@
 Revision history for Perl module URI::Title
 
+1.904 2023-02-08 BOOK
+  - Make the image tests more reliable (RT#146263, thanks to Slaven Rezić (SREZIC))
+
 1.903 2023-01-21 BOOK
   - Extract title from PNG images (RT#57066, thanks to Håkon Hægland (HAKONH))
   - Restored some minor documentation items that were lost in a botched merge

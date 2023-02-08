@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Encoder;
-$Crypt::Passphrase::Encoder::VERSION = '0.005';
+$Crypt::Passphrase::Encoder::VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -7,6 +7,7 @@ use parent 'Crypt::Passphrase::Validator';
 
 use Carp 'croak';
 use Crypt::URandom;
+use Hash::Util::FieldHash 'fieldhash';
 
 sub random_bytes {
 	my ($self, $count) = @_;
@@ -17,11 +18,11 @@ sub crypt_subtypes {
 	return;
 }
 
-my %cache;
+fieldhash my %cache;
 sub accepts_hash {
 	my ($self, $hash) = @_;
 	return if not defined $hash;
-	$cache{$self} ||= do {
+	$cache{$self} //= do {
 		my $string = join '|', $self->crypt_subtypes or return;
 		qr/ \A \$ (?: $string ) \$ /x;
 	};
@@ -44,7 +45,7 @@ Crypt::Passphrase::Encoder - Base class for Crypt::Passphrase encoders
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -60,7 +61,7 @@ This hashes a password. Note that this will return a new value each time since i
 
 This method will return true if the password needs a rehash. This may either mean it's using a different hashing algoritm, or because it's using different parameters. This should be overloaded in your subclass.
 
-=head2 crypt_types()
+=head2 crypt_subtypes()
 
 This method returns the types of crypt entries this validator supports. This is used to implement C<accepts_hash>.
 

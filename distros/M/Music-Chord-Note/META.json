@@ -4,7 +4,7 @@
       "Dai Okabayashi <bayashi@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "artistic_2"
    ],
@@ -43,21 +43,21 @@
    "provides" : {
       "Music::Chord::Note" : {
          "file" : "lib/Music/Chord/Note.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/bayashi/Music-Chord-Note/issues"
+         "web" : "https://github.com/bayashi/Music-Chord-Note/issues"
       },
       "license" : [
          "http://www.perlfoundation.org/artistic_license_2_0"
       ],
       "repository" : {
-         "url" : "http://github.com/bayashi/Music-Chord-Note"
+         "url" : "https://github.com/bayashi/Music-Chord-Note"
       }
    },
-   "version" : "0.10",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

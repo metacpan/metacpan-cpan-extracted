@@ -11,7 +11,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__In6__new(SPVM_ENV* env, SPVM_VALUE* stack) 
   
   struct sockaddr_in6* socket_address = env->new_memory_stack(env, stack, sizeof(struct sockaddr_in6));
 
-  void* obj_socket_address = env->new_pointer_by_name(env, stack, "Sys::Socket::Sockaddr::In6", socket_address, &e, FILE_NAME, __LINE__);
+  void* obj_socket_address = env->new_pointer_by_name(env, stack, "Sys::Socket::Sockaddr::In6", socket_address, &e, __func__, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   stack[0].oval = obj_socket_address;
@@ -112,7 +112,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__In6__copy_sin6_addr(SPVM_ENV* env, SPVM_VAL
   struct in6_addr* address_ret = env->new_memory_stack(env, stack, sizeof(struct in6_addr));
   *address_ret = address;
 
-  void* obj_address_ret = env->new_pointer_by_name(env, stack, "Sys::Socket::In6_addr", address_ret, &e, FILE_NAME, __LINE__);
+  void* obj_address_ret = env->new_pointer_by_name(env, stack, "Sys::Socket::In6_addr", address_ret, &e, __func__, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   stack[0].oval = obj_address_ret;
@@ -129,7 +129,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__In6__set_sin6_addr(SPVM_ENV* env, SPVM_VALU
   void* obj_address = stack[1].oval;
 
   if (!obj_address) {
-    return env->die(env, stack, "The address must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The address must be defined", __func__, FILE_NAME, __LINE__);
   }
   
   struct in6_addr* address = env->get_pointer(env, stack, obj_address);

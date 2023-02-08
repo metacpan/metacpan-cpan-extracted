@@ -11,7 +11,12 @@ dist.ini
 lib/Crypt/Passphrase.pm
 lib/Crypt/Passphrase/Encoder.pm
 lib/Crypt/Passphrase/Fallback.pm
+lib/Crypt/Passphrase/MD5/Hex.pm
+lib/Crypt/Passphrase/PassphraseHash.pm
+lib/Crypt/Passphrase/SHA1/Hex.pm
 lib/Crypt/Passphrase/Validator.pm
 t/00-compile.t
+t/validator.t
+xt/author/pod-coverage.t
 xt/author/pod-syntax.t
 xt/author/with-dependencies.t

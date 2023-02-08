@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-deepl
 
+0.06 2023-02-08T05:58:20Z
+
+    - fix --xlate-format=ifdef bug
+
 0.05 2023-02-06T10:08:10Z
 
     - some minor improvements

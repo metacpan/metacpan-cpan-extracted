@@ -1,14 +1,14 @@
 ---
 abstract: 'Encoding and decoding of base64 strings'
 author:
-  - 'A. U. Thor <kimoto@vs.sakura.ne.jp>'
+  - 'Yuki Kimoto<kimoto.yuki@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  SPVM: 0.9634_01
+  SPVM: '0.9691'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -17,6 +17,7 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
-version: '0.05'
+requires:
+  SPVM: '0.9691'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

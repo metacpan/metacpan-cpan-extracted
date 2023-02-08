@@ -27,15 +27,18 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "SPVM" : "0.9691"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.9664",
+            "SPVM" : "0.9691",
             "SPVM::Math" : "0.11",
             "SPVM::Sys" : "0.28"
          }
+      },
+      "test" : {
+         "requires" : {}
       }
    },
    "release_status" : "stable",
@@ -46,6 +49,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-IO"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

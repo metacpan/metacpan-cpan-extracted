@@ -7,7 +7,7 @@ const char* FILE_NAME = "Sys/IO/Flock";
 
 int32_t SPVM__Sys__IO__Flock__new(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "The \"new\" method in the class \"Sys::IO::Flock\" is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "The \"new\" method in the class \"Sys::IO::Flock\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   
@@ -15,7 +15,7 @@ int32_t SPVM__Sys__IO__Flock__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   struct flock* st_flock = env->new_memory_stack(env, stack, sizeof(struct flock));
 
-  void* obj_st_flock = env->new_pointer_by_name(env, stack, "Sys::IO::Flock", st_flock, &e, FILE_NAME, __LINE__);
+  void* obj_st_flock = env->new_pointer_by_name(env, stack, "Sys::IO::Flock", st_flock, &e, __func__, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   stack[0].oval = obj_st_flock;
@@ -26,7 +26,7 @@ int32_t SPVM__Sys__IO__Flock__new(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__Flock__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "The \"new\" method in the class \"Sys::IO::Flock\" is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "The \"new\" method in the class \"Sys::IO::Flock\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   
@@ -45,7 +45,7 @@ int32_t SPVM__Sys__IO__Flock__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__Flock__l_type(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "The \"l_type\" method in the class \"Sys::IO::Flock\" is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "The \"l_type\" method in the class \"Sys::IO::Flock\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   
@@ -65,7 +65,7 @@ int32_t SPVM__Sys__IO__Flock__l_type(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__Flock__set_l_type(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "The \"set_l_type\" method in the class \"Sys::IO::Flock\" is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "The \"set_l_type\" method in the class \"Sys::IO::Flock\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   
@@ -82,7 +82,7 @@ int32_t SPVM__Sys__IO__Flock__set_l_type(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__Flock__l_whence(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "The \"l_whence\" method in the class \"Sys::IO::Flock\" is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "The \"l_whence\" method in the class \"Sys::IO::Flock\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   
@@ -102,7 +102,7 @@ int32_t SPVM__Sys__IO__Flock__l_whence(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__Flock__set_l_whence(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "The \"set_l_whence\" method in the class \"Sys::IO::Flock\" is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "The \"set_l_whence\" method in the class \"Sys::IO::Flock\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   
@@ -119,7 +119,7 @@ int32_t SPVM__Sys__IO__Flock__set_l_whence(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__Flock__l_start(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "The \"l_start\" method in the class \"Sys::IO::Flock\" is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "The \"l_start\" method in the class \"Sys::IO::Flock\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   
@@ -139,7 +139,7 @@ int32_t SPVM__Sys__IO__Flock__l_start(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__Flock__set_l_start(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "The \"set_l_start\" method in the class \"Sys::IO::Flock\" is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "The \"set_l_start\" method in the class \"Sys::IO::Flock\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   
@@ -156,7 +156,7 @@ int32_t SPVM__Sys__IO__Flock__set_l_start(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__Flock__l_len(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "The \"l_len\" method in the class \"Sys::IO::Flock\" is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "The \"l_len\" method in the class \"Sys::IO::Flock\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   
@@ -176,7 +176,7 @@ int32_t SPVM__Sys__IO__Flock__l_len(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__Flock__set_l_len(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "The \"set_l_len\" method in the class \"Sys::IO::Flock\" is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "The \"set_l_len\" method in the class \"Sys::IO::Flock\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   
@@ -193,7 +193,7 @@ int32_t SPVM__Sys__IO__Flock__set_l_len(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__Flock__l_pid(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "The \"new\" method in the class \"Sys::IO::Flock\" is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "The \"new\" method in the class \"Sys::IO::Flock\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   
@@ -213,7 +213,7 @@ int32_t SPVM__Sys__IO__Flock__l_pid(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__Flock__set_l_pid(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "The \"new\" method in the class \"Sys::IO::Flock\" is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "The \"new\" method in the class \"Sys::IO::Flock\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   

@@ -1,6 +1,23 @@
 CHANGES
 -------
 
+  2.204 8 February 2023
+
+    * Cast isdigit argument as unsigned char
+      https://github.com/pmqs/Compress-Raw-Bzip2/pull/9
+      967696b4fa91768fa4d46163f46982bc063a175e
+
+    * Use GIMME_V instead of GIMME
+      https://github.com/pmqs/Compress-Raw-Bzip2/pull/8
+      54e3c1e18b61f0892056925240bbc80f76e2f038
+
+    * typos
+      12496575c17829506cc9c9fa325e31aab1fcd1c7
+
+    * Trim trailing spaces from bzip2-src
+      https://github.com/pmqs/Compress-Raw-Bzip2/pull/7
+      8728d405e8d805cb88685b82a5e5493b62288046
+
   2.201 25 June 2022
 
       * 2.201

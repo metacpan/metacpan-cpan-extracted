@@ -5,7 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  SPVM: '0.9606'
+  SPVM: '0.9691'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -17,8 +17,9 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
+requires:
+  SPVM: '0.9691'
 resources:
   repository: https://github.com/yuki-kimoto/Perl-SPVM-Math.git
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

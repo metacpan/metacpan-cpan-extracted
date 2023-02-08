@@ -37,7 +37,7 @@ The documentation in this POD applies to all three adapter modules as well.
 This module is an implementation of [Reactive Extensions](http://reactivex.io/) in Perl. It replicates the
 behavior of [rxjs 6](https://www.npmjs.com/package/rxjs) which is the JavaScript implementation of ReactiveX.
 
-Currently 89 of the 100+ operators in rxjs are implemented in this module.
+Currently 93 of the 100+ operators in rxjs are implemented in this module.
 
 # EXPORTABLE FUNCTIONS
 
@@ -378,6 +378,15 @@ the result of the transformation to the next pipeable operator in the pipe, or r
 The following list is the currently implemented operators, with links to relevant rxjs documentation (which should
 apply to RxPerl too).
 
+- op\_audit
+
+    [https://rxjs.dev/api/operators/audit](https://rxjs.dev/api/operators/audit)
+
+        # 1, 3, 5, 7, 9, ...
+        rx_interval(0.7)->pipe(
+            op_audit(sub ($val) { rx_timer(1) }),
+        )->subscribe($observer);
+
 - op\_audit\_time
 
     [https://rxjs.dev/api/operators/auditTime](https://rxjs.dev/api/operators/auditTime)
@@ -503,6 +512,15 @@ apply to RxPerl too).
         rx_of(1, 1, 1, 1, 1, 1, 1)->pipe(
             op_count(sub ($value, $idx) { $idx % 2 == 0 }),
         );
+
+- op\_debounce
+
+    [https://rxjs.dev/api/operators/debounce](https://rxjs.dev/api/operators/debounce)
+
+        # 3, complete
+        rx_of(1, 2, 3)->pipe(
+            op_debounce(sub ($val) { rx_timer(0.5) }),
+        )->subscribe($observer);
 
 - op\_debounce\_time
 
@@ -988,6 +1006,15 @@ apply to RxPerl too).
             op_retry(2),
         )->subscribe($observer);
 
+- op\_sample
+
+    [https://rxjs.dev/api/operators/sample](https://rxjs.dev/api/operators/sample)
+
+        # 0, 1, 3, 4, 6, 7, ...
+        rx_interval(0.7)->pipe(
+            op_sample(rx_interval(1)),
+        )->subscribe($observer);
+
 - op\_sample\_time
 
     [https://rxjs.dev/api/operators/sampleTime](https://rxjs.dev/api/operators/sampleTime)
@@ -1134,6 +1161,15 @@ apply to RxPerl too).
         # foo0, 0, foo1, 1, foo2, 2, ...
         rx_interval(1)->pipe(
             op_tap(sub {say "foo$_[0]"}),
+        )->subscribe($observer);
+
+- op\_throttle
+
+    [https://rxjs.dev/api/operators/throttle](https://rxjs.dev/api/operators/throttle)
+
+        # 0, 2, 4, 6, 8, 10, ...
+        rx_interval(0.7)->pipe(
+            op_throttle(sub ($val) { rx_timer(1) }),
         )->subscribe($observer);
 
 - op\_throttle\_time

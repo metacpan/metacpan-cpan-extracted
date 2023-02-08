@@ -7,7 +7,7 @@ use 5.018;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Data::Dumper for humans, with interpolation",
+  "ABSTRACT" => "interpolate Data::Dumper output into strings, with human-oriented options",
   "AUTHOR" => "Jim Avera",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -50,7 +50,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "version" => "0.77"
   },
-  "VERSION" => "4.113",
+  "VERSION" => "4.114",
   "test" => {
     "TESTS" => "t/*.t"
   }

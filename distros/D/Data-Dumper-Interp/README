@@ -1,7 +1,7 @@
 This archive contains the distribution Data-Dumper-Interp,
-version 4.113:
+version 4.114:
 
-  Data::Dumper for humans, with interpolation
+  interpolate Data::Dumper output into strings, with human-oriented options
 
 This software is copyright (c) 2023 by Jim Avera.
 

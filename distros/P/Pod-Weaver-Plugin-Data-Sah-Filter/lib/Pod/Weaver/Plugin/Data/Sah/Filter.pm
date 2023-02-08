@@ -9,9 +9,9 @@ use Data::Dmp;
 use File::Temp;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-25'; # DATE
+our $DATE = '2022-11-15'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Data-Sah-Filter'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 sub _process_filter_module {
     no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
@@ -87,6 +87,7 @@ sub _process_filter_module {
                 );
                 my ($actual_errmsg, $actual_filtered_value);
                 ($actual_errmsg, $actual_filtered_value) = @{ $filter_code->($eg->{value}) };
+                $actual_errmsg =~ s/\R/ /g;
                 my $correct_filtered_value = exists($eg->{filtered_value}) ?
                     $eg->{filtered_value} : $eg->{value};
                 push @pod, " ", dmp($eg->{value}), " #",
@@ -220,7 +221,7 @@ Pod::Weaver::Plugin::Data::Sah::Filter - Plugin to use when building Data::Sah::
 
 =head1 VERSION
 
-This document describes version 0.007 of Pod::Weaver::Plugin::Data::Sah::Filter (from Perl distribution Pod-Weaver-Plugin-Data-Sah-Filter), released on 2022-08-25.
+This document describes version 0.008 of Pod::Weaver::Plugin::Data::Sah::Filter (from Perl distribution Pod-Weaver-Plugin-Data-Sah-Filter), released on 2022-11-15.
 
 =head1 SYNOPSIS
 

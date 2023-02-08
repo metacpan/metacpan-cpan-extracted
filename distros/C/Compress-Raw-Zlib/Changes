@@ -1,7 +1,17 @@
 CHANGES
 -------
 
-  2.201 27 June 2022
+  2.204 8 February 2023
+      * Update zlib sources to zlib-1.2.13
+        https://github.com/pmqs/Compress-Raw-Zlib/issues/20
+        eafe29c85437582d16c6bda16449ea2dea534266
+
+      * Use GIMME_V instead of the deprecated GIMME
+        https://github.com/pmqs/Compress-Raw-Zlib/pull/19
+        7a7b045d9d8729a6c82a78039dab5decf7e65907
+
+
+  2.202 27 June 2022
 
       * Z_NULL should be 'UV' rather than 'PV'
         https://github.com/pmqs/Compress-Raw-Zlib/issues/17
