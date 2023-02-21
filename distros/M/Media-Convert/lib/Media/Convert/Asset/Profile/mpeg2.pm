@@ -40,11 +40,11 @@ sub _probe_audiocodec {
 }
 
 sub _probe_videobitrate {
-	return undef;
+	return;
 }
 
 sub _probe_audiobitrate {
-	return undef;
+	return;
 }
 
 1;

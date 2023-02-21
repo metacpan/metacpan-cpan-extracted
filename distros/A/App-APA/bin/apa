@@ -1,0 +1,86 @@
+#! /usr/bin/env perl
+
+# PODNAME: apa
+
+use v5.37.9;
+
+use lib '/home/regular/IdeaProjects/App-APA/lib';
+
+use Getopt::Std; # function: getopts
+use Pod::Usage;  # function: pod2usage
+use App::APA;
+
+getopts( '1fl:a' , \our %options );
+binmode( STDOUT , ':encoding(UTF-8)' ); # warning: wide character
+
+my $apa = App::APA -> new();
+
+if ( defined( $options{f} or $options{1} ) ) {
+  say $apa -> first_item;
+}
+elsif ( defined( $options{l} ) ) {
+  say for $apa -> limit_items( $options{l} );
+}
+elsif ( defined( $options{a} ) ) {
+  say for $apa -> all_items;
+}
+else {
+  say pod2usage( verbose => 1 );
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+apa
+
+=head1 VERSION
+
+version 0.230470
+
+=head1 DESCRIPTION
+
+=head2 OPTIONS
+
+=over
+
+=item -f
+=item -1
+First news item
+
+=item -l
+Fetch specified number of news items
+
+=item -a
+All news items
+
+=back
+
+=head1 NAME
+apa - App::APA frontend to parse RSS news
+
+=head1 SYNOPSIS
+apa -f
+apa -n <number>
+apa -a
+
+=head1 SEE ALSO
+
+L<XML::RSS>
+
+=head1 AUTHOR
+
+Elvin Aslanov <rwp.primary@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by Elvin Aslanov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

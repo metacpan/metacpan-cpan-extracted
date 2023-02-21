@@ -1,7 +1,7 @@
 This archive contains the distribution Data-Dumper-Interp,
-version 4.114:
+version 5.002:
 
-  interpolate Data::Dumper output into strings, with human-oriented options
+  interpolate Data::Dumper output into strings for human consumption
 
 This software is copyright (c) 2023 by Jim Avera.
 

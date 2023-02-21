@@ -7,7 +7,7 @@ require Exporter;
 use parent 'Exporter';
 use OPCUA::Open62541::Constant;
 
-our $VERSION = '1.05';
+our $VERSION = '2.00';
 
 our @EXPORT_OK = @OPCUA::Open62541::Constant::EXPORT_OK;
 our %EXPORT_TAGS = %OPCUA::Open62541::Constant::EXPORT_TAGS;
@@ -202,6 +202,10 @@ This method is only available if open62541 library supports it.
 
 =item $status_code = $server_config->setDefault()
 
+=item $status_code = $server_config->setDefaultWithSecurityPolicies($port, $certificate, $privateKey, $trustList, $issuerList, $revocationList)
+
+$trustList, $issuerList and $revocationList are currently not supported and have to be undef.
+
 =item $status_code = $server_config->setMinimal($port, $certificate)
 
 =item $server_config->setCustomHostname($custom_hostname)
@@ -225,9 +229,13 @@ in the callback.
 
 =item $logger = $server_config->getLogger()
 
-=item $buildinfo = $server_config->getBuildInfo()
+=item $buildInfo = $server_config->getBuildInfo()
 
 =item $server_config->setBuildInfo(\%buildInfo)
+
+=item $applicationDescription = $server_config->getApplicationDescription()
+
+=item $server_config->setApplicationDescription(\%applicationDescription)
 
 =item $limit = $server_config->getMaxSecureChannels()
 
@@ -369,13 +377,7 @@ If set to false, historical data can be deleted (this is the default).
 
 =item $status_code = $client->connect($url)
 
-=item $status_code = $client->connect_async($endpointUrl, $callback, $userdata)
-
-1.0 API
-
 =item $status_code = $client->connectAsync($endpointUrl)
-
-1.1 API
 
 =over 8
 
@@ -383,24 +385,20 @@ If set to false, historical data can be deleted (this is the default).
 
 =back
 
-There should be an interval of 100ms between the call to connect_async() and
+There should be an interval of 100ms between the call to connectAsync() and
 run_iterate() or open62541 may try to operate on a non existent socket.
 
 =item $status_code = $client->run_iterate($timeout)
 
 =item $status_code = $client->disconnect()
 
-=item $status_code = $client->disconnect_async(\$requestId)
-
-=item $client_state = $client->getState()
-
-1.0 API
+=item $status_code = $client->disconnectAsync()
 
 =item ($channel_state, $session_state, $connect_status) = $client->getState()
 
 1.1 API
 
-In scalar context return 1.0 API compatible $client_state.
+In scalar context croak due to 1.0 API incompatibility.
 
 =item $status_code = $client->sendAsyncBrowseRequest(\%request, \&callback, $data, \$reqId)
 
@@ -730,13 +728,35 @@ In scalar context return 1.0 API compatible $client_state.
 
 =item $status_code = $client_config->setDefault()
 
+=item $status_code = $client_config->setDefaultEncryption($certificate, $privateKey, $trustList, $revocationList)
+
+If no trust or revocation list is set, the client will accept all certificates.
+
 =item $context = $client_config->getClientContext()
 
 =item $client_config->setClientContext($context)
 
+=item $securityMode = $client_config->getSecurityMode()
+
+=item $client_config->setSecurityMode($securityMode)
+
+=item $clientDescription = $client_config->getClientDescription()
+
+=item $client_config->setClientDescription($clientDescription)
+
 =item $client_config->setStateCallback($callback)
 
 =item $logger = $client_config->getLogger()
+
+=item $client_config->setUsernamePassword($userName, $password)
+
+With this method a username and password can be set for the OPC UA connection.
+If $userName is an empty string or undef, username and password are cleared in
+the client configuration.
+Calling this method will also clear endpoint and userTokenPolicy data in the
+client configuration that may exist from previous connection.
+If a previous connection was made, the client will again try to get and match
+the endpoints and policies from the server.
 
 =back
 
@@ -787,7 +807,7 @@ OPCUA::Open62541::Constant
 Alexander Bluhm E<lt>bluhm@genua.deE<gt>,
 Anton Borowka,
 Arne Becker,
-Marvin Knoblauch E<lt>mknob@genua.deE<gt>,
+Marvin Knoblauch E<lt>mknob@genua.deE<gt>
 
 =head1 CAVEATS
 
@@ -800,9 +820,9 @@ This only works for Perl that is compiled on a 64 bit platform.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020-2022 Alexander Bluhm
+Copyright (c) 2020-2023 Alexander Bluhm
 
-Copyright (c) 2020-2022 Anton Borowka
+Copyright (c) 2020-2023 Anton Borowka
 
 Copyright (c) 2020 Arne Becker
 

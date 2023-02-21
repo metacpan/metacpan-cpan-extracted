@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,13 +19,13 @@ name: Music-RhythmSet
 provides:
   Music::RhythmSet:
     file: lib/Music/RhythmSet.pm
-    version: '0.04'
+    version: '0.05'
   Music::RhythmSet::Util:
     file: lib/Music/RhythmSet/Util.pm
-    version: '0.04'
+    version: '0.05'
   Music::RhythmSet::Voice:
     file: lib/Music/RhythmSet/Voice.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   List::GroupingPriorityQueue: '0'
   MIDI: '0'
@@ -35,5 +35,6 @@ requires:
   perl: v5.24.0
 resources:
   license: http://opensource.org/licenses/BSD-3-Clause
-version: '0.04'
+  repository: https://thrig.me/src/Music-RhythmSet.git
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

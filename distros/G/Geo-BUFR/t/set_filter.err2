@@ -1,2 +1,0 @@
-BUFR.pm ERROR: Section 5 is not '7777' but the 4 characters (in hex): 0x37 0x37 0x37 0x0D at ./bufrread.pl line 157
-In message 2 contained in bulletin with ahl ISXD99 SVVS 200300

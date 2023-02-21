@@ -1,3 +1,13 @@
+0.007   2022-11-15  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [ux] Add examples to filters, add description to some of the
+          schemas.
+
+        - [doc] Cross-mention schemas.
+
+
 0.006   2022-08-26  Released-By: PERLANCAR; Urgency: medium
 
         - Add schemas: json_str::array, json_str::hash.

@@ -35,7 +35,7 @@ use HTML::Blitz::ActionType qw(
 );
 use List::Util qw(all reduce);
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 method new($class:) {
     bless {
@@ -379,7 +379,7 @@ fun _with_stopper($alternatives, $result) {
 }
 
 method compile($name, $html) {
-    my $codegen = HTML::Blitz::CodeGen->new;
+    my $codegen = HTML::Blitz::CodeGen->new(name => $name);
     my $matcher = HTML::Blitz::Matcher->new([
         map _with_stopper($_->{selector}, _bind_scope($codegen->scope, $_->{result})),
             @{$self->{rules}}
@@ -585,12 +585,28 @@ method compile($name, $html) {
 
                 my $skipped = 0;
                 if ($param->{type} eq AT_P_IMMEDIATE) {
-                    $codegen->emit_text($param->{value});
+                    if ($token->{name} eq 'script') {
+                        $codegen->emit_script_text($param->{value});
+                    } elsif ($token->{name} eq 'style') {
+                        $codegen->emit_style_text($param->{value});
+                    } else {
+                        $codegen->emit_text($param->{value});
+                    }
                 } elsif ($param->{type} eq AT_P_VARIABLE) {
-                    $codegen->emit_variable($param->{value});
+                    if ($token->{name} eq 'script') {
+                        $codegen->emit_variable_script($param->{value});
+                    } elsif ($token->{name} eq 'style') {
+                        $codegen->emit_variable_style($param->{value});
+                    } else {
+                        $codegen->emit_variable($param->{value});
+                    }
                 } elsif ($param->{type} eq AT_P_FRAGMENT) {
+                    $token->{name} eq 'script' || $token->{name} eq 'style' || $token->{name} eq 'title'
+                        and $parser->throw_for($token, "<$token->{name}> tag cannot have descendant elements");
                     $codegen->incorporate($param->{value});
                 } elsif ($param->{type} eq AT_P_VARHTML) {
+                    $token->{name} eq 'script' || $token->{name} eq 'style' || $token->{name} eq 'title'
+                        and $parser->throw_for($token, "<$token->{name}> tag cannot have descendant elements");
                     $codegen->emit_variable_html($param->{value});
                 } else {
                     $param->{type} eq AT_P_TRANSFORM
@@ -599,9 +615,21 @@ method compile($name, $html) {
                     $skipped = 1;
                     $text_content = '' . $param->{static}->($text_content);
                     if (@{$param->{dynamic}}) {
-                        $codegen->emit_call($param->{dynamic}, $text_content);
+                        if ($token->{name} eq 'script') {
+                            $codegen->emit_call_script($param->{dynamic}, $text_content);
+                        } elsif ($token->{name} eq 'style') {
+                            $codegen->emit_call_style($param->{dynamic}, $text_content);
+                        } else {
+                            $codegen->emit_call($param->{dynamic}, $text_content);
+                        }
                     } else {
-                        $codegen->emit_text($text_content);
+                        if ($token->{name} eq 'script') {
+                            $codegen->emit_script_text($text_content);
+                        } elsif ($token->{name} eq 'style') {
+                            $codegen->emit_style_text($text_content);
+                        } else {
+                            $codegen->emit_text($text_content);
+                        }
                     }
                 }
 

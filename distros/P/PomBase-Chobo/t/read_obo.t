@@ -5,6 +5,8 @@ use Test::Deep;
 
 use PomBase::Chobo::ParseOBO;
 
+use utf8;
+
 my $parser = PomBase::Chobo::ParseOBO->new();
 
 my $ontology_data = PomBase::Chobo::OntologyData->new();
@@ -30,7 +32,7 @@ $fypo_0000133 = $ontology_data->get_term_by_id($lookup_id);
 
 is ($fypo_0000133->name(), $lookup_name);
 is ($fypo_0000133->id(), $lookup_id);
-is ($fypo_0000133->def()->{definition}, 'A cell phenotype in which cells contain more than one nucleus apiece and are elongated.');
+is ($fypo_0000133->def()->{definition}, 'A cell phenotype in which cells contain more than one nucleus apiece and are elongated. UTF-8 characters for testing: amyloid β (Aβ) peptides');
 cmp_deeply ($fypo_0000133->def()->{dbxrefs}, ['PomBase:mah', 'PMID:12381658']);
 is ($fypo_0000133->comment(), 'Test comment.');
 

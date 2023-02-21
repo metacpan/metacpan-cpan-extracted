@@ -5,7 +5,7 @@ use Test::More;
 use Prima::sys::Test;
 use Prima::Application;
 
-plan tests => 16;
+plan tests => 17;
 
 my %id;
 my $xw = create_window(
@@ -57,6 +57,10 @@ is( $xw-> windowState, ws::Normal, "restore from maximized" );
 reset_flag;
 $xw-> windowState( ws::Minimized);
 is( $xw-> windowState, ws::Minimized, "restore from minimized" );
+
+reset_flag;
+$xw-> windowState( ws::Fullscreen);
+is( $xw-> windowState, ws::Fullscreen, "switch for fullscreen" );
 
 reset_flag;
 $xw-> windowState( ws::Normal);

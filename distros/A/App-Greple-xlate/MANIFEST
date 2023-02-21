@@ -1,6 +1,7 @@
 Build.PL
 Changes
 LICENSE
+MANIFEST.SKIP
 META.json
 README.md
 cpanfile

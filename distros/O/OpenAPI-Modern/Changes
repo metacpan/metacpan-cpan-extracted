@@ -1,12 +1,24 @@
 Revision history for OpenAPI-Modern
 
+0.040     2023-02-18 23:43:50Z
+          - all request and response validation are now done with
+            Mojo::Message::Request and ::Response objects, converting from
+            HTTP::Request and HTTP::Response as needed; the $options hash is
+            now populated with the mojo request
+
+0.039     2023-02-11 23:23:17Z
+          - BREAKING CHANGE: find_path now takes one argument, not two; the
+            $request object is now passed with the $options hash.
+          - the $options hash populated by validate_request, validate_response
+            and find_path now includes the request object, when available
+
 0.038     2023-01-15 18:51:02Z
           - fix vocabulary tests with TJSA 1.018
           - fix test for compatibility with JSM 0.561
 
 0.037     2022-11-27 23:57:29Z
           - added operation_path to the options hash returned from find_path,
-            validate_response, find_path
+            validate_request, validate_response
 
 0.036     2022-11-19 22:30:06Z
           - fix some media-type test cases to accomodate changes in
@@ -61,7 +73,7 @@ Revision history for OpenAPI-Modern
             (ExtUtils::MakeMaker or Module::Build) are used
 
 0.025     2022-04-03 19:58:27Z
-          - find_path() no longer returns an undef operation_id when there is
+          - find_path no longer returns an undef operation_id when there is
             no operationId defined in the schema document
 
 0.024     2022-03-25 23:41:04Z

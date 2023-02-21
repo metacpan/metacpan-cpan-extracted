@@ -6,20 +6,120 @@ use warnings;
 use Module::Build;
 our @ISA = qw{ Module::Build };
 
-use Carp;
 # use lib 'inc';	# Already done because this module is running.
+use My::Module::Meta;
 
 sub ACTION_authortest {
-    my ( $self, @args ) = @_;
+##  my ( $self, @args ) = @_;	# Arguments unused
+    my ( $self ) = @_;
 
-    local $ENV{AUTHOR_TESTING} = 1;
-
-    $self->depends_on( 'build' );
-    $self->test_files( qw{ t xt/author } );
-    $self->depends_on( 'test' );
+    $self->depends_on( qw{ functional_test optionals_test structural_test } );
 
     return;
 }
+
+sub ACTION_functional_test {
+    my ( $self ) = @_;
+
+    local $ENV{AUTHOR_TESTING} = 1;
+
+    $self->my_depends_on();
+
+    print <<'EOD';
+
+functional_test
+AUTHOR_TESTING=1
+EOD
+
+    # Not depends_on(), because that is idempotent. But we really do
+    # want to run 'test' more than once if we do more than one of the
+    # *_test actions.
+    $self->dispatch( 'test' );
+
+    return;
+}
+
+sub ACTION_optionals_test {
+    my ( $self ) = @_;
+
+    my $optionals = join ',', My::Module::Meta->optional_modules();
+    local $ENV{AUTHOR_TESTING} = 1;
+    local $ENV{PERL5OPT} = "-MTest::Without::Module=$optionals";
+
+    $self->my_depends_on();
+
+    print <<"EOD";
+
+optionals_test
+AUTHOR_TESTING=1
+PERL5OPT=-MTest::Without::Module=$optionals
+EOD
+
+    # Not depends_on(), because that is idempotent. But we really do
+    # want to run 'test' more than once if we do more than one of the
+    # *_test actions.
+    $self->dispatch( 'test' );
+
+    return;
+}
+
+sub ACTION_structural_test {
+    my ( $self ) = @_;
+
+    local $ENV{AUTHOR_TESTING} = 1;
+
+    $self->my_depends_on();
+
+    print <<'EOD';
+
+structural_test
+AUTHOR_TESTING=1
+EOD
+
+    my $structural_test_files = 'xt/author';
+    if ( $self->can( 'args' ) ) {
+	my @arg = $self->args();
+	for ( my $inx = 0; $inx < $#arg; $inx += 2 ) {
+	    $arg[$inx] =~ m/ \A structural[-_]test[-_]files \z /smx
+		or next;
+	    $structural_test_files = $arg[ $inx + 1 ];
+	    last;
+	}
+    }
+    $self->test_files( $structural_test_files );
+
+    # Not depends_on(), because that is idempotent. But we really do
+    # want to run 'test' more than once if we do more than one of the
+    # *_test actions.
+    $self->dispatch( 'test' );
+
+    return;
+}
+
+sub my_depends_on {
+    my ( $self ) = @_;
+    my @depends_on;
+    -d 'blib'
+	or push @depends_on, 'build';
+    -e 'META.json'
+	or push @depends_on, 'distmeta';
+    @depends_on
+	and $self->depends_on( @depends_on );
+    return;
+}
+
+sub harness_switches {
+    my ( $self ) = @_;
+    my @res = $self->SUPER::harness_switches();
+    foreach ( @res ) {
+	'-MDevel::Cover' eq $_
+	    or next;
+	$_ .= '=-db,cover_db,-ignore,inc/,-ignore,eg/';
+    }
+    return @res;
+}
+
+
 
 1;
 
@@ -80,7 +180,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2019-2022 by Thomas R. Wyant, III
+Copyright (C) 2019-2023 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

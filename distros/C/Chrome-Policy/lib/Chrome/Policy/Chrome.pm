@@ -27,7 +27,7 @@ Chrome::Policy::Chrome - Google Chrome Policy class
 
 =head1 VERSION
 
-version 0.230360
+version 0.230410
 
 =head1 AUTHOR
 

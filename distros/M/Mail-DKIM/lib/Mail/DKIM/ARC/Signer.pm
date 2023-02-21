@@ -1,7 +1,7 @@
 package Mail::DKIM::ARC::Signer;
 use strict;
 use warnings;
-our $VERSION = '1.20220520'; # VERSION
+our $VERSION = '1.20230212'; # VERSION
 # ABSTRACT: generates a DKIM signature for a message
 
 # Copyright 2017 FastMail Pty Ltd.  All Rights Reserved.
@@ -594,7 +594,7 @@ Mail::DKIM::ARC::Signer - generates a DKIM signature for a message
 
 =head1 VERSION
 
-version 1.20220520
+version 1.20230212
 
 =head1 SYNOPSIS
 
@@ -631,7 +631,7 @@ version 1.20220520
   }
   $signer->CLOSE;
 
-  die 'Failed' $signer->result_details() unless $signer->result() eq 'sealed';
+  die 'Failed' $signer->result_detail() unless $signer->result() eq 'sealed';
 
   # Get all the signature headers to prepend to the message
   # ARC-Seal, ARC-Message-Signature and ARC-Authentication-Results

@@ -2,8 +2,8 @@ NAME
     Complete::Util - General completion routine
 
 VERSION
-    This document describes version 0.612 of Complete::Util (from Perl
-    distribution Complete-Util), released on 2022-09-08.
+    This document describes version 0.614 of Complete::Util (from Perl
+    distribution Complete-Util), released on 2023-01-17.
 
 DESCRIPTION
     This package provides some generic completion routines that follow the
@@ -114,6 +114,8 @@ FUNCTIONS
 
     *   $answers* => *array[hash|array]*
 
+        (No description)
+
     Return value: (hash)
 
     Return a combined completion answer. Words from each input answer will
@@ -169,7 +171,11 @@ FUNCTIONS
 
     *   array* => *array[str]*
 
+        (No description)
+
     *   exclude => *array*
+
+        (No description)
 
     *   replace_map => *hash*
 
@@ -184,6 +190,8 @@ FUNCTIONS
         types "um" it can be completed unambiguously into "unmount".
 
     *   summaries => *array[str]*
+
+        (No description)
 
     *   word* => *str* (default: "")
 
@@ -204,7 +212,11 @@ FUNCTIONS
 
     *   elems* => *array[str]*
 
+        (No description)
+
     *   exclude => *array*
+
+        (No description)
 
     *   remaining => *code*
 
@@ -253,7 +265,11 @@ FUNCTIONS
 
     *   sep => *str* (default: ",")
 
+        (No description)
+
     *   summaries => *array[str]*
+
+        (No description)
 
     *   uniq => *bool*
 
@@ -297,9 +313,15 @@ FUNCTIONS
 
     *   hash* => *hash*
 
+        (No description)
+
     *   summaries => *hash*
 
+        (No description)
+
     *   summaries_from_hash_values => *true*
+
+        (No description)
 
     *   word* => *str* (default: "")
 
@@ -347,9 +369,15 @@ FUNCTIONS
 
     *   answer* => *hash|array*
 
+        (No description)
+
     *   prefix => *str*
 
+        (No description)
+
     *   suffix => *str*
+
+        (No description)
 
     Return value: (undef)
 
@@ -438,8 +466,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2020, 2019, 2017, 2016, 2015, 2014,
-    2013 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2022, 2020, 2019, 2017, 2016, 2015,
+    2014, 2013 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

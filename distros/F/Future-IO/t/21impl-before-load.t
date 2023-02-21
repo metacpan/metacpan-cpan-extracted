@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Identity;
+use Test2::V0;
 
 no warnings 'once';
 $Future::IO::IMPL = "TestImplementation";

@@ -167,6 +167,7 @@ YAML
     'parameters are decoded using the indicated media type and then validated against the content schema',
   );
 
+
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     openapi_schema => $yamlpp->load_string(<<YAML));
@@ -220,6 +221,7 @@ YAML
     },
     'path parameters: operation overshadows path-item',
   );
+
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
@@ -323,6 +325,7 @@ YAML
     'bad $ref in path-item parameters',
   );
 
+
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     openapi_schema => $yamlpp->load_string(<<YAML));
@@ -385,6 +388,7 @@ YAML
     },
     'cookies are not yet supported',
   );
+
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
@@ -506,7 +510,6 @@ YAML
     'after adding wildcard support, this parameter can be parsed',
   );
 
-
   $request = request('POST', 'http://example.com/foo?alpha=1&epsilon={"foo":42}', [ Alpha => 1 ]);
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
@@ -523,7 +526,6 @@ YAML
     },
     'media-types in the openapi document are looked up case-insensitively',
   );
-
 
   $openapi->add_media_type('image/*' => sub ($value) { $value });
 
@@ -543,7 +545,6 @@ YAML
     },
     'wildcard media-types in the openapi document are looked up case-insensitively too',
   );
-
 
   $request = request('POST', 'http://example.com/foo?alpha=hello&beta=3.1415',
     [ 'alpha' => 'header value' ]);    # exactly matches query parameter
@@ -809,7 +810,6 @@ YAML
     'request body is missing',
   );
 
-
   $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'text/bloop' ], 'plain text');
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
@@ -826,7 +826,6 @@ YAML
     },
     'Content-Type not allowed by the schema',
   );
-
 
   $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=us-ascii' ], 'ascii plain text');
   cmp_deeply(
@@ -903,7 +902,6 @@ YAML
   );
 
 
-
   # this will match against the document at image/*
   # but we have no media-type registry for image/*, only image/jpeg
   $openapi->add_media_type('image/jpeg' => sub ($value) { $value });
@@ -923,7 +921,6 @@ YAML
     },
     'Content-Type header is matched to a wildcard entry in the document, then matched to a media-type implementation',
   );
-
 
   $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=UTF-8' ],
     chr(0xe9).'clair"}');
@@ -1004,7 +1001,6 @@ YAML
     },
     'errors during media-type decoding are detected',
   );
-
 
   $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'application/json' ],
     '{"alpha": "123", "beta": "'."\x{c3}\x{a9}".'clair"}');

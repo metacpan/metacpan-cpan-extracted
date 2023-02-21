@@ -44,51 +44,6 @@ Subset 1
      9  011001          missing  WIND DIRECTION [DEGREE TRUE]
     10  011002          missing  WIND SPEED [M/S]
 
-Message 3  ISXD99 SVVS 200300
-
-Section 0:
-    Length of BUFR message:            164
-    BUFR edition:                      4
-
-Section 1:
-    Length of section:                 22
-    BUFR master table:                 0
-    Originating centre:                98
-    Originating subcentre:             0
-    Update sequence number:            0
-    Optional section present:          0
-    Data category (table A):           0
-    International data subcategory:    0
-    Local data subcategory:            20
-    Master table version number:       13
-    Local table version number:        1
-    Year:                              2016
-    Month:                             2
-    Day:                               20
-    Hour:                              3
-    Minute:                            0
-    Second:                            0
-
-Section 3:
-    Length of section:                 35
-    Number of data subsets:            1
-    Observed data:                     1
-    Compressed data:                   0
-    Data descriptors unexpanded:       301089 001019 002001 301011 301012 301021 007030 025053 302032 302034 007032 013013 302040 302042
-
-Subset 1
-
-     1  004001             2016  YEAR [YEAR]
-     2  004002                2  MONTH [MONTH]
-     3  004003               20  DAY [DAY]
-     4  004004                3  HOUR [HOUR]
-     5  004005                0  MINUTE [MINUTE]
-     6  005001         58.85100  LATITUDE (HIGH ACCURACY) [DEGREE]
-     7  006001          9.11970  LONGITUDE (HIGH ACCURACY) [DEGREE]
-     8  012101           274.55  TEMPERATURE/DRY-BULB TEMPERATURE [K]
-     9  011001              262  WIND DIRECTION [DEGREE TRUE]
-    10  011002              2.9  WIND SPEED [M/S]
-
 Message 7  ISMD11 OKPR 060600
 
 Section 0:

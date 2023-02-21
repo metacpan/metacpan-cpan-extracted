@@ -2,14 +2,14 @@ package Plack::App::ServiceStatus;
 
 # ABSTRACT: Check and report status of various services needed by your app
 
-our $VERSION = '0.908'; # VERSION
+our $VERSION = '0.911'; # VERSION
 
-use 5.018;
+use 5.024;
 use strict;
 use warnings;
 
 use base 'Class::Accessor::Fast';
-__PACKAGE__->mk_accessors(qw(app version checks show_hostname));
+__PACKAGE__->mk_accessors(qw(app version checks show_hostname buildinfo));
 
 use Try::Tiny;
 use Plack::Response;
@@ -17,13 +17,16 @@ use JSON::MaybeXS;
 use Sys::Hostname qw(hostname);
 use Module::Runtime qw(use_module);
 use Log::Any qw($log);
+use Path::Tiny;
+use POSIX qw(strftime);
 
 my $startup = time();
 
 sub new {
     my ( $class, %args ) = @_;
 
-    my %attr = map { $_ => delete $args{$_}} qw(app version show_hostname);
+    my %attr =
+      map { $_ => delete $args{$_} } qw(app version show_hostname buildinfo);
     $attr{checks} = [];
 
     while ( my ( $key, $value ) = each %args ) {
@@ -39,15 +42,15 @@ sub new {
             use_module($module);
             push(
                 $attr{checks}->@*,
-                {   class => $module,
+                {
+                    class => $module,
                     name  => $key,
                     args  => $value
                 }
             );
         }
         catch {
-            $log->errorf( "%s: cannot init %s: %s", __PACKAGE__, $module,
-                $_ );
+            $log->errorf( "%s: cannot init %s: %s", __PACKAGE__, $module, $_ );
         };
     }
 
@@ -57,19 +60,41 @@ sub new {
 sub to_app {
     my $self = shift;
 
+    my $hostname = $self->show_hostname ? hostname() : '';
+
+    my $buildinfo;
+    if ( $self->buildinfo ) {
+        if ( -f $self->buildinfo ) {
+            $buildinfo =
+              eval { decode_json( path( $self->buildinfo )->slurp_utf8 ) };
+            if ($@) {
+                $buildinfo = { status => 'error', message => $@ };
+            }
+        }
+        else {
+            $buildinfo = {
+                status  => 'error',
+                message => 'cannot read buildinfo from ' . $self->buildinfo
+            };
+        }
+    }
+
     my $app = sub {
         my $env = shift;
 
         my $json = {
-            app        => $self->app,
-            started_at => $startup,
-            uptime     => time() - $startup,
+            app                => $self->app,
+            started_at_iso8601 => strftime( '%Y-%m-%dT%H:%M:%SZ', gmtime($startup) ),
+            started_at         => $startup,
+            uptime             => time() - $startup,
         };
-        $json->{version} = $self->version;
-        $json->{hostname} = hostname() if $self->show_hostname;
+        $json->{version}   = $self->version;
+        $json->{hostname}  = $hostname  if $hostname;
+        $json->{buildinfo} = $buildinfo if $buildinfo;
 
         my @results = (
-            {   name   => $self->app,
+            {
+                name   => $self->app,
                 status => 'ok',
             }
         );
@@ -112,7 +137,7 @@ Plack::App::ServiceStatus - Check and report status of various services needed b
 
 =head1 VERSION
 
-version 0.908
+version 0.911
 
 =head1 SYNOPSIS
 
@@ -184,13 +209,29 @@ your app is running and has access to all needed services.
 
 =over
 
+=item * name
+
+The name of your app.
+
 =item * version
 
-Set the version of your app.
+The version of your app.
+
+item * DBI, DBIxConnector, DBIC, Redis, Elasticsearch, NetStomp
+
+Enable and configure a check, see L<Checks> below
 
 =item * show_hostname
 
 If set to a true value, show the hostname.
+
+=item * buildinfo
+
+Path to a C<buildinfo.json> JSON file containing information on
+when/how the app was built. See
+L<bin/plack_app_service_status_generate_buildinfo.pl> for a script
+that will generate a C<buildinfo.json> containing the build date, git
+commit and git branch.
 
 =back
 
@@ -242,8 +283,6 @@ that here an embedded app is the better fit.
 
 =over
 
-=item * tests
-
 =item * make sure the app is only initiated once when running in OX
 
 =back
@@ -254,13 +293,15 @@ Thanks to
 
 =over
 
-=item *
-
-L<validad.com|http://www.validad.com/> for funding the
+=item * L<validad.com|https://www.validad.com/> for funding the
 development of this code.
 
-=item * <Manfred Stock|https://github.com/mstock> for adding
+=item *
+
+L<Manfred Stock|https://github.com/mstock> for adding
 Net::Stomp and a Icinga/Nagios check script.
+
+=item * L<VÖV / Knowledgebase Erwachsenenbildung|https://adulteducation.at/> for the buildinfo feature.
 
 =back
 

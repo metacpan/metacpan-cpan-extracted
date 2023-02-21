@@ -1,5 +1,5 @@
 package SQL::Abstract::Plugin::TableAlias;
-use strict; use warnings; our $VERSION = '0.03';
+use strict; use warnings; our $VERSION = '0.04';
 use Moo;
 
 with 'SQL::Abstract::Role::Plugin';
@@ -237,7 +237,7 @@ SQL::Abstract::Plugin::TableAlias - automagical table aliasing
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -250,13 +250,13 @@ Version 0.03
 	my ($stmt, @bind) = $sql->select({
 		select => [ qw/one two three/, [qw/four five/], [qw/six seven eight/] ],
 		from => [
-			"numbers",
+			"already",
 			-join => [
-				integers => on => { one => "one" }
+				aware => on => { one => "one" }
 			],
 			-join => {
 				on => { two => { ">" => "other" } },
-				to => "floats",
+				to => "first",
 				type => "left"
 			}
 		],
@@ -275,19 +275,19 @@ Version 0.03
 produces:
 
 	SELECT 
-		numbers.one,
-		numbers.two,
-		numbers.three,
-		integers.four,
-		integers.five,
-		floats.six,
-		floats.seven,
-		floats.eight 
-	FROM numbers AS numbers 
-		JOIN integers AS integers ON numbers.one = integers.one 
-		LEFT JOIN floats AS floats ON integers.two > floats.other 
-	WHERE ( floats.six = ? AND integers.five = ? AND numbers.nine = ? ) 
-	ORDER BY numbers.one, integers.four ASC, numbers.three DESC, floats.seven DESC
+		already.one,
+		already.two,
+		already.three,
+		aware.four,
+		aware.five,
+		first.six,
+		first.seven,
+		first.eight 
+	FROM already AS already 
+		JOIN aware AS aware ON already.one = aware.one 
+		LEFT JOIN first AS first ON aware.two > first.other 
+	WHERE ( first.six = ? AND aware.five = ? AND already.nine = ? ) 
+	ORDER BY already.one, aware.four ASC, already.three DESC, first.seven DESC
 
 setting talias:
 
@@ -295,13 +295,13 @@ setting talias:
 		talias => [qw/n i f/],
 		select => [ qw/one two three/, [qw/four five/], [qw/six seven eight/] ],
 		from => [
-			"numbers",
+			"already",
 			-join => [
-				integers => on => { one => "one" }
+				aware => on => { one => "one" }
 			],
 			-join => {
 				on => { two => { ">" => "other" } },
-				to => "floats",
+				to => "first",
 				type => "left"
 			}
 		],
@@ -328,12 +328,13 @@ produces:
 		f.six,
 		f.seven,
 		f.eight 
-	FROM numbers AS n 
-		JOIN integers AS i ON n.one = i.one 
-		LEFT JOIN floats AS f ON i.two > f.other 
+	FROM already AS n 
+		JOIN aware AS i ON n.one = i.one 
+		LEFT JOIN first AS f ON i.two > f.other 
 	WHERE ( f.six = ? AND i.five = ? AND n.nine = ? ) 
 	ORDER BY n.one, i.four ASC, n.three DESC, f.seven DESC
 
+you know who you are.
 
 =head1 DESCRIPTION
 

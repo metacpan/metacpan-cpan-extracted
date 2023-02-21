@@ -36,7 +36,7 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.037'; # VERSION
+our $VERSION = '0.038'; # VERSION
 
 use Mouse;
 use FileHandle;
@@ -165,7 +165,7 @@ sub parse
 
   my %meta = ();
 
-  my $fh = FileHandle->new($filename, 'r') or die "can't open $filename: $!";
+  open my $fh, '<:utf8', $filename or die "can't open $filename: $!";
 
   my $line_number = 0;;
 

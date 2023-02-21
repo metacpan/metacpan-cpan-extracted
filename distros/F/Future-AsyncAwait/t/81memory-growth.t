@@ -13,7 +13,7 @@ use Test::Refcount;
 
 use Future;
 
-use Future::AsyncAwait;
+use Future::AsyncAwait qw( :experimental(cancel) );
 
 async sub identity
 {
@@ -48,6 +48,21 @@ sub abandoned
 no_growth \&abandoned,
    calls => 10000,
    'abandoned async sub does not grow memory';
+
+sub precancelled
+{
+   my $f1 = Future->new;
+   my $fret = (async sub {
+      CANCEL { }
+      await $f1;
+   })->();
+   $f1->done;
+   $fret->get;
+}
+
+no_growth \&precancelled,
+   calls => 10000,
+   'precancellation does not grow memory';
 
 # RT142222
 {

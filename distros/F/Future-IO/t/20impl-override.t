@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Identity;
+use Test2::V0;
 
 use Future::IO;
 
@@ -32,8 +31,8 @@ Future::IO->override_impl( "TestImplementation" );
 
    my $f = Future::IO->sleep( 5 );
 
-   is_deeply( \@impl_args, [ 5 ], '->sleep args' );
-   identical( $f, $impl_f, '->sleep return' );
+   is( \@impl_args, [ 5 ], '->sleep args' );
+   ref_is( $f, $impl_f, '->sleep return' );
 
    $f->cancel;
 }
@@ -44,8 +43,8 @@ Future::IO->override_impl( "TestImplementation" );
 
    my $f = Future::IO->sysread( "FH", 1024 );
 
-   is_deeply( \@impl_args, [ "FH", 1024 ], '->sysread args' );
-   identical( $f, $impl_f, '->sysread return' );
+   is( \@impl_args, [ "FH", 1024 ], '->sysread args' );
+   ref_is( $f, $impl_f, '->sysread return' );
 
    $f->cancel;
 }

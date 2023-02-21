@@ -100,7 +100,7 @@ The following profiles are defined by C<Media::Convert::Asset::ProfileFactory>:
 
 =cut
 
-package Media::Convert::Asset::Profile::Base;
+package Media::Convert::Asset::Profile::Base; ## no critic(MatchesPackage)
 
 =head2 Base
 
@@ -190,7 +190,7 @@ my %quals = (
 
 sub _probe_videobitrate {
 	my $self = shift;
-	if(eval($self->video_framerate) > 30) {
+	if(eval($self->video_framerate) > 30) { ## no critic(StringyEval)
 		return $rates_50{$self->video_height};
 	} else {
 		return $rates_30{$self->video_height};
@@ -262,7 +262,7 @@ sub _probe_audiocodec {
 }
 
 sub _probe_audiobitrate {
-	return undef;
+	return;
 }
 
 no Moose;
@@ -312,13 +312,13 @@ sub _probe_exten {
 
 sub _probe_height {
 	my $self = shift;
-	return undef unless defined ($self->reference->video_height);
+	return unless defined ($self->reference->video_height);
 	return int($self->reference->video_height / 4);
 }
 
 sub _probe_width {
 	my $self = shift;
-	return undef unless defined ($self->reference->video_width);
+	return unless defined ($self->reference->video_width);
 	return int($self->reference->video_width / 4);
 }
 
@@ -326,8 +326,8 @@ sub _probe_videosize {
 	my $self = shift;
 	my $width = $self->video_width;
 	my $height = $self->video_height;
-	return undef unless defined($width) && defined($height);
-	return undef unless $width && $height;
+	return unless defined($width) && defined($height);
+	return unless $width && $height;
 	return $self->video_width . "x" . $self->video_height;
 }
 
@@ -346,12 +346,12 @@ sub create {
 	}
 
 	if(!exists($profiles->{$profile})) {
-		eval "require Media::Convert::Asset::Profile::$profile;";
+		eval "require Media::Convert::Asset::Profile::$profile;"; ## no critic(StringyEval)
 
 		return "Media::Convert::Asset::Profile::$profile"->new(url => '', reference => $ref);
 	} else {
 		my $parent = $profiles->{$profile}{parent};
-		eval "require Media::Convert::Asset::Profile::$parent;";
+		eval "require Media::Convert::Asset::Profile::$parent;"; ## no critic(StringyEval)
 		my $rv = "Media::Convert::Asset::Profile::$parent"->new(url => '', reference => $ref);
 		foreach my $param(keys %{$profiles->{$profile}{settings}}) {
 			$rv->meta->find_attribute_by_name($param)->set_value($rv, $profiles->{$profile}{settings}{$param});

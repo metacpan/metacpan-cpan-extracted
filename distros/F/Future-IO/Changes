@@ -1,5 +1,16 @@
 Revision history for Future-IO
 
+0.13    2023-02-19
+        [CHANGES]
+         * Swap all unit tests from `Test::More` to `Test2::V0`
+         * Reomved test-time dependency on `Test::Identity`
+
+        [BUGFIXES]
+         * t/30system.t should check that the impl actually provides a
+           `->waitpid` method before using it
+         * Insert a hacky "sleep 1" into the connect tests on MSWin32 in case
+           that helps fix the test failures
+
 0.12    2023-01-31
         [CHANGES]
          * Added `Future::IO::System`, containing a system()-like and a

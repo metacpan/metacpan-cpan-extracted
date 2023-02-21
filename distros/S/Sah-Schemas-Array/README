@@ -1,0 +1,143 @@
+NAME
+    Sah::Schemas::Array - Sah schemas related to array type
+
+VERSION
+    This document describes version 0.003 of Sah::Schemas::Array (from Perl
+    distribution Sah-Schemas-Array), released on 2023-02-03.
+
+DESCRIPTION
+    The Sah's "array" type supports some basic constraint clauses:
+    "min_len", "max_len", "len", "len_between" (for checking number of
+    elements), "uniq" (for checking that elements are unique), "has" (for
+    checking that a specified value is found in array).
+
+    Until Data::Sah allows easier creation of custom clauses, this
+    distribution contains schemas that allow you to perform additional
+    checks.
+
+SAH SCHEMAS
+    The following schemas are included in this distribution:
+
+    *   array::int::contiguous
+
+        An array of a single contiguous range of integers.
+
+    *   array::int::monotonically_decreasing
+
+        An array of integers with monotonically decreasing elements.
+
+        This is like the "array::num::monotonically_decreasing" schema
+        except elements must be integers.
+
+    *   array::int::monotonically_increasing
+
+        An array of integers with monotonically increasing elements.
+
+        This is like the "array::num::monotonically_increasing" schema
+        except elements must be integers.
+
+    *   array::int::reverse_sorted
+
+        An array of reversely sorted integers.
+
+        This is like the "array::num::reverse_sorted" schema except elements
+        must be integers.
+
+    *   array::int::sorted
+
+        An array of sorted integers.
+
+        This is like the "array::num::sorted" schema except elements must be
+        integers.
+
+    *   array::num::monotonically_decreasing
+
+        An array of numbers with monotonically decreasing elements.
+
+        Use this schema if you want to accept an array of numbers where the
+        elements are monotonically decreasing, i.e. "elem(i) < elem(i-1) for
+        all i > 0". It's similar to the "array::num::reverse_sorted" schema
+        except that duplicate numbers are not allowed (e.g. "[4, 2, 2, 1]"
+        is okay for "array::num::reverse_sorted" but will fail
+        "array::num::monotonically_decreasing").
+
+    *   array::num::monotonically_increasing
+
+        An array of numbers with monotonically increasing elements.
+
+        Use this schema if you want to accept an array of numbers where the
+        elements are monotonically increasing, i.e. "elem(i) > elem(i-1) for
+        all i > 0". It's similar to the "array::num::sorted" schema except
+        that duplicate numbers are not allowed (e.g. "[1, 2, 2, 4]" is okay
+        for "array::num::sorted" but will fail
+        "array::num::monotonically_increasing").
+
+    *   array::num::reverse_sorted
+
+        An array of reversely sorted numbers.
+
+        Use this schema if you want to accept an array of reversely sorted
+        numbers, i.e. "elem(i) <= elem(i-1) for all i > 0".
+
+        See also: "array::num::monotonically_decreasing" and
+        "array::num::sorted" schemas.
+
+    *   array::num::sorted
+
+        An array of sorted numbers.
+
+        Use this schema if you want to accept an array of sorted numbers,
+        i.e. "elem(i) >= elem(i-1) for all i > 0".
+
+        See also: "array::num::monotonically_increasing" and
+        "array::num::reverse_sorted" schemas.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Sah-Schemas-Array>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Sah-Schemas-Array>.
+
+SEE ALSO
+    Sah::PSchemas::Array
+
+    Sah::Schemas::Hash
+
+    Sah - schema specification
+
+    Data::Sah - Perl implementation of Sah
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Array>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

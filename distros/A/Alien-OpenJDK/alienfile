@@ -1,0 +1,172 @@
+use alienfile;
+
+use File::Which qw(which);
+use Path::Tiny qw( path );
+use Capture::Tiny qw(capture_merged);
+use JSON::PP qw( decode_json );
+
+probe sub {
+  my ($build) = @_;
+  my @bins = qw(java javac);
+  for my $bin (@bins) {
+    $build->log("Looking for $bin");
+    return 'share' unless which($bin);
+  }
+
+  # Check JVM and javac version
+  my ($java_version_out) = capture_merged {
+    system( qw(java -version) );
+  };
+  my ($version_via_java) = $java_version_out =~ /^openjdk version "([0-9\._]+)"/m or return 'share';
+  $build->log("java has OpenJDK version: $version_via_java");
+
+  my ($javac_version_out) = capture_merged {
+    system( qw(javac -version) );
+  };
+  my ($version_via_javac) = $javac_version_out =~ /^javac ([0-9\._]+)/m or return 'share';
+  $build->log("javac has version: $version_via_javac");
+
+  return 'share' unless $version_via_java eq $version_via_javac;
+
+  # Get settings including java.home
+  my ($java_settings_out) = capture_merged {
+    system( qw(java -XshowSettings:properties) );
+  };
+  my ($java_home) = $java_settings_out =~ /^\s*\Qjava.home\E\s+=\s+(.+)$/m;
+  $build->log("JAVA_HOME: $java_home");
+  $build->runtime_prop->{java_home} = $java_home;
+
+  return 'system';
+};
+
+sub do_source {
+  # This requires a valid boot JDK.
+  # See <https://hg.openjdk.java.net/jdk/jdk/raw-file/tip/doc/building.html#boot-jdk-requirements>.
+  plugin 'Download::GitHub' => (
+    github_user => 'openjdk',
+    github_repo => 'jdk',
+    tags_only   => 1,
+  );
+  plugin 'Build::Autoconf' => (
+    with_pic => 0,
+  );
+  patch sub {
+    path('configure')->chmod('u+x');
+  };
+  build [
+    '%{configure}',
+    '%{make}',
+    '%{make} install',
+  ];
+}
+
+sub _decode {
+  if( $_[0]->{content} ) {
+    return decode_json($_[0]->{content});
+  } elsif( $_[0]->{path} ) {
+    return decode_json( path($_[0]->{path})->slurp_raw );
+  }
+}
+
+sub do_dist_temurin {
+  # API documentation: <https://github.com/adoptium/api.adoptium.net>
+  my $endpoint_server = 'https://api.adoptium.net';
+  start_url $endpoint_server . '/v3/info/available_releases';
+
+  # Perl to API
+  my %os_mapping = (
+      linux   => 'linux',
+      MSWin32 => 'windows',
+      darwin  => 'mac',
+      solaris => 'solaris',
+      aix     => 'aix',
+
+      # need to determine libc for this one
+      # => alpine-linux
+  );
+  my %arch_mapping = (
+      x86_64 => 'x64',
+      x86    => 'x86',
+      # Same as x86
+      # => x32
+
+      ppc64 => 'ppc64',
+
+      # => ppc64le # Not yet implemented
+      # => s390x # Not yet implemented
+
+      aarch64 => 'aarch64',
+
+      # => arm # Need to specify hard-float or soft-float?
+
+      # => sparcv9 # Not yet implemented
+      # => riscv64 # Not yet implemented
+  );
+
+  my $os   = $os_mapping{ $^O } or die "Unsupported OS $^O";
+  my $meta_arch = meta->prop->{platform}{cpu}{arch}{name};
+  my $arch = $arch_mapping{ $meta_arch }   or die "Unsupported arch $meta_arch";
+
+  plugin 'Download';
+  plugin 'Prefer::SortVersions';
+
+  meta->around_hook( fetch => sub {
+    my $orig = shift;
+    my $build = shift;
+
+    my $data = $orig->($build, @_);
+
+    if( $data->{filename} eq 'available_releases' ) {
+      my $available_releases = _decode( $data );
+      $build->log( "Available releases: @{ $available_releases->{available_releases} }" );
+
+      my $release = $available_releases->{most_recent_lts};
+      $build->log( "Using release $release" );
+
+      my $assets = _decode( $orig->($build,
+        $endpoint_server
+        .  "/v3/assets/latest/${release}/hotspot"
+        . "?image_type=jdk"
+        . "&os=${os}"
+        . "&architecture=${arch}"
+        . "&vendor=eclipse"
+      ) );
+
+      return {
+        type => 'list',
+        list => [
+          map {
+            +{
+              filename => $_->{binary}{package}{name},
+              url      => $_->{binary}{package}{link},
+              version  => $_->{version}{openjdk_version},
+            }
+          } @$assets
+        ],
+      };
+    } else {
+      return $data;
+    }
+
+  });
+
+  plugin 'Extract' => ( $^O eq 'MSWin32' ? 'zip' : 'tar.gz' );
+
+  plugin 'Build::Copy';
+
+  gather sub {
+    my ($build) = @_;
+
+    my $java_home = Path::Tiny::path($build->runtime_prop->{prefix});
+
+    $build->runtime_prop->{'style'} = 'binary';
+    $build->runtime_prop->{'distribution'} = 'Eclipse Temurin';
+
+    $build->runtime_prop->{java_home} = "$java_home";
+  };
+}
+
+share {
+  #do_source;
+  do_dist_temurin;
+}

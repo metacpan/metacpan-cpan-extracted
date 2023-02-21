@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Chemistry::File::CML;
-use Test::More tests => 8;
+use Test::More tests => 9;
 
 my @mols;
 
@@ -21,6 +21,7 @@ is( scalar @mols, 1 );
 is( $mols[0]->name, 'name' );
 is( scalar $mols[0]->atoms, 1 );
 is( $mols[0]->by_id( 'a1' )->x3, 0.5 );
+is( $mols[0]->by_id( 'a1' )->attr('cml/has_coords'), 1 );
 
 @mols = Chemistry::File::CML->parse_string( <<'END' );
 <?xml version="1.0"?>

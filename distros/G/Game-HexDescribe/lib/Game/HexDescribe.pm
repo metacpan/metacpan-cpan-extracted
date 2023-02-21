@@ -38,7 +38,7 @@ See L<Mojolicious::Guides> for more information.
 
 package Game::HexDescribe;
 
-our $VERSION = 1.02;
+our $VERSION = 1.03;
 
 use Modern::Perl;
 use Mojolicious::Lite;
@@ -46,7 +46,7 @@ use Mojo::UserAgent;
 use Mojo::Util qw(html_unescape);
 use Mojo::ByteStream;
 use Game::HexDescribe::Utils qw(init describe_text parse_table load_table
-				describe_map parse_map load_map);
+				describe_map parse_map load_map markdown);
 use Game::HexDescribe::Log;
 use Encode qw(decode_utf8);
 use File::ShareDir qw(dist_dir);
@@ -235,10 +235,11 @@ get '/stats/random/alpine' => sub {
 
 This is where the actual map is described.
 
-B<map> is the map, B<url> is the URL to an external table, B<table> is the text
-of the table, and a table will be loaded based on the B<load> parameter. Current
-valid values are I<seckler>, I<strom>, I<schroeder>, I<johnston>, and
-I<traveller>.
+B<map> is the map, B<url> is the URL to an external table. B<table> is the text
+of the table. B<load> determines the table to load. Current valid values are
+I<seckler>, I<strom>, I<schroeder>, I<johnston>, and I<traveller>. B<markdown>
+returns Markdown and no map. B<faces> determines whether images are kept in the
+HTML output. B<show> determines whether the map is kept in the HTML output.
 
 If we want to call this from the command line, we will need to request a map
 from Text Mapper, too.
@@ -256,6 +257,7 @@ any '/describe' => sub {
   my $labels = $c->param('labels');
   my $markdown = $c->param('markdown');
   my $faces = $c->param('faces');
+  my $show = $c->param('show');
   my $table = get_table($c);
   init();
   my $descriptions = describe_map(parse_map($map), parse_table($table), $faces);
@@ -269,11 +271,16 @@ any '/describe' => sub {
     }
     push(@$texts, $end) if $end;
     $c->render(text => markdown($texts), format => 'txt');
-  } else {
+  } elsif ($show) {
     $map = add_labels($map) if $labels;
     my $svg = get_post_data($text_mapper_url . '/render', map => $map);
     $c->render(template => 'description',
 	       svg => add_links($svg),
+	       descriptions => $descriptions);
+  } else {
+    $map = add_labels($map) if $labels;
+    $c->render(template => 'description',
+	       svg => '',
 	       descriptions => $descriptions);
   }
 };
@@ -812,7 +819,7 @@ Start the app at the very end. The rest is templates for the various web pages.
 
 =cut
 
-app->start;
+app->start || 1;
 
 __DATA__
 @@ edit.html.ep
@@ -865,6 +872,10 @@ Create Markdown instead of HTML output.
 <label>
 %= check_box 'faces' => 1, checked => 1
 Include images (faces, dungeon maps) in the HTML output (slow)
+</label><br>
+<label>
+%= check_box 'show' => 1, checked => 1
+Include map in the HTML output (slow)
 </label>
 
 <p>
@@ -894,7 +905,7 @@ What random tables should be used to generate the descriptions?
 none (only use the data provided below)
 
 <p>
-If you have your own tables somewhere public (a pastebin, a public file at a
+If you have your own tables somewhere public (a pastebin, github raw text, a public file at a
 file hosting service), you can provide the URL to your tables right here:
 
 <p>
@@ -1177,7 +1188,7 @@ These results are based on the <strong><%= $rule %></strong> table.
 </div>
 
 % if ($seed) {
-%   my $different_seed = int(rand(~0)); # maxint
+%   my $different_seed = int(rand(1000000000));
 %   if ($rule) {
 %= form_for rule_markdown => (method => 'POST') => begin
 %= submit_button 'Markdown', name => 'submit'
@@ -1523,6 +1534,27 @@ You can also test for the absence of definitions:
 ;name
 1,Alex[store cutlass as blade]
 1,Berta
+% end
+
+<p>An expression consisting solely of the characters - + * / % < > = ( ) and 0–9
+is resolved like a mathematical expression. In the following example, population
+is a number 100–1000 and the chance of them organising a militia is proportional
+to that number. So we compare a d1000 roll to the same population number. The
+result is either 1 (true) or undefined (false). This allows us to return an
+appropriate description.
+
+%= example begin
+;village
+1,This village of [population] people [organised][militia]
+
+;population
+1,[1d10x100]
+
+;organised
+1,[[1d1000]<[same population]]
+
+;militia
+1,[organised?||has a militia][!organised||has not managed to organise a militia]
 % end
 
 <p>
@@ -2501,7 +2533,7 @@ include https://campaignwiki.org/contrib/gnomeyland.txt
 
 <p>
 Sometimes you want to establish some sort of fact and access it from everywhere.
-This can be achieved by <a href="#naming_things">naming things</a>. But but you
+This can be achieved by <a href="#naming_things">naming things</a>. But you
 could also do it using the rules mentioned previously: "save", "store", "quote"
 and regular lookups, if you use the "global" modifier.
 

@@ -3,8 +3,7 @@ abstract: 'Future-returning IO methods'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
-  Test::Identity: '0'
-  Test::More: '0.88'
+  Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
@@ -17,16 +16,16 @@ name: Future-IO
 provides:
   Future::IO:
     file: lib/Future/IO.pm
-    version: '0.12'
+    version: '0.13'
   Future::IO::ImplBase:
     file: lib/Future/IO/ImplBase.pm
-    version: '0.12'
+    version: '0.13'
   Future::IO::System:
     file: lib/Future/IO/System.pm
-    version: '0.12'
+    version: '0.13'
   Test::Future::IO::Impl:
     file: lib/Test/Future/IO/Impl.pm
-    version: '0.12'
+    version: '0.13'
 requires:
   Future: '0'
   Struct::Dumb: '0'
@@ -34,5 +33,5 @@ requires:
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

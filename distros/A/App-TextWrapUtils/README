@@ -2,8 +2,8 @@ NAME
     App::TextWrapUtils - Utilities related to text wrapping
 
 VERSION
-    This document describes version 0.001 of App::TextWrapUtils (from Perl
-    distribution App-TextWrapUtils), released on 2022-11-24.
+    This document describes version 0.002 of App::TextWrapUtils (from Perl
+    distribution App-TextWrapUtils), released on 2022-12-13.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -26,7 +26,7 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   backend => *perl::modname* (default: "Text::Wrap")
+    *   backend => *perl::modname* (default: "Text::ANSI::Util")
 
         (No description)
 

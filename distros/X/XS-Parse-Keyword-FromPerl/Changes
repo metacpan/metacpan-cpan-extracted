@@ -1,0 +1,16 @@
+Revision history for XS-Parse-Keyword-FromPerl
+
+0.03    2023-02-19
+        [CHANGES]
+         * Provide wrappings of more parser pieces - the single-argument
+           parametric ones and most of the structure-forming ones.
+         * Also provide the non-my variant `XPK_LEXVAR`
+
+0.02    2023-02-17
+        [CHANGES]
+         * Provide wrappings for the simple parser pieces - non-structural,
+           non-parametric ones, and arguments to the `build` phase
+         * Provide wrappings of many of perl's `new*OP()` functions
+
+0.01    2023-02-16
+        First version, released on an unsuspecting world.

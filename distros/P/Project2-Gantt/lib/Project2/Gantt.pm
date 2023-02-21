@@ -12,8 +12,8 @@ use Project2::Gantt::Skin;
 
 use Mojo::Log;
 
-our $DATE = '2023-02-02'; # DATE
-our $VERSION = '0.006';
+our $DATE = '2023-02-16'; # DATE
+our $VERSION = '0.009';
 
 has root        => undef;
 has skin        => sub { Project2::Gantt::Skin->new };
@@ -211,56 +211,60 @@ Project2::Gant - Create Gantt charts
 
 =head1 SYNOPSIS
 
-    use Project2::Gantt;
+  use Project2::Gantt;
 
-		my $gantt = Project2::Gantt->new(
-		file        =>      'gantt.png',
-		description =>      'My Project'
-	);
+  my $gantt = Project2::Gantt->new(
+    file        =>      'gantt.png',
+    description =>      'My Project'
+  );
 
-	my $john = $gantt->addResource(name => 'John Doe');
-	my $jane = $gantt->addResource(name => 'Jane Doe');
+  my $john = $gantt->addResource(name => 'John Doe');
+  my $jane = $gantt->addResource(name => 'Jane Doe');
 
-	$gantt->addTask(
-		description => 'Analysis',
-		resource    => $john,
-		start       => '2023-01-06',
-		end         => '2023-01-10'
-	);
+  $gantt->addTask(
+    description => 'Analysis',
+    resource    => $john,
+    start       => '2023-01-06',
+    end         => '2023-01-10'
+  );
 
-	$gantt->addTask(
-		description => 'Development',
-		resource    => $john,
-		start       => '2023-01-13',
-		end         => '2023-01-20'
-	);
+  $gantt->addTask(
+    description => 'Development',
+    resource    => $john,
+    start       => '2023-01-13',
+    end         => '2023-01-20'
+  );
 
-	$gantt->addTask(
-		description => 'Testing',
-		resource    => $jane,
-		start       => '2023-01-23',
-		end         => '2023-01-31'
-	);
+  $gantt->addTask(
+    description => 'Testing',
+    resource    => $jane,
+    start       => '2023-01-23',
+    end         => '2023-01-31'
+  );
 
-	$gantt->addTask(
-		description => 'Deployment',
-		resource    => $jane,
-		start       => '2023-02-07',
-		end         => '2023-02-07'
-	);
+  $gantt->addTask(
+    description => 'Deployment',
+    resource    => $jane,
+    start       => '2023-02-07',
+    end         => '2023-02-07'
+  );
 
-	$gantt->write();
+  $gantt->write();
 
 =head1 DESCRIPTION
 
 This module allows you to easily create Gantt charts.
 
-You can specify the C<font> or simple install L<Alien::Font::Vera>
-as a fallback batteries included font.
+You can specify the C<font> you want but a dependency on L<Alien::Font::Vera>
+is included to have a fallback batteries included font available.
 
 =head1 CAVEATS
 
 You can generate images in all formats supported by L<Imager>.
+
+If you don't have, or don't want to install a TTF font,
+you can use the one provided by L<Alien::Font::Vera> package
+and everything will just work.
 
 =head1 AUTHOR
 

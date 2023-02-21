@@ -1,0 +1,60 @@
+Fri Feb 10 10:40:18 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.3]:
+	* VERSION: bump
+	* NEWS.md: updated
+	* src/main/perl/bin/inotify.pl.in
+	- removed debug message
+	* src/main/perl/lib/Workflow/Inotify/Handler.pm.in
+	- create accessors from values in handler's configuration section
+	- updated pod to explain new feature
+	(new)
+	- read config file if object passed is a config file name
+	(get_app_config): new
+
+Thu Feb  9 14:30:38 2023  Rob Lauer  <rlauer6@comcast.net>>
+
+	[1.0.2]:
+	* configure.ac: remove warnings as errors
+	* config/inotify.service: example.cfg -> upload.cfg
+	* src/main/perl/bin/Makefile.am
+	- moved README.md generation to src/main/perl/lib
+	* src/main/perl/bin/inotify.pl.in
+	- help
+	- fixed @INC hack
+	* src/main/perl/lib/Makefile.am: add above to build
+	* src/main/perl/lib/Workflow/Inotify.pm.in: new
+	* cpan/buildspec.yml: package name Workflow::Inotify now
+	* .gitignore
+	- src/main/perl/lib/README.md
+	- cpan/provides
+
+Wed Feb  8 10:02:14 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.1]:
+	* ChangeLog: new
+	* README.md: generated
+	* .gitignore: new
+	* VERSION: new
+	* Makefile.am
+	-  don't clean .spec file
+	* NEWS: updated
+	* bootstrap: version handling
+	* configure.ac: get version from VERSION
+	* src/main/bash/bin/inotifyd.in: typo
+	* src/main/perl/bin/Makefile.am
+	- build README.md from pod
+	- make inotify.pl executable
+	* src/main/perl/bin/inotify.pl.in
+	- perlcritic refactoring
+	- make logfile output optional
+	- verbose flag to control initial messages
+	- perl5lib can now be ':' delimited list of paths
+	- booleans config values can be true, false, on, off, 0, 1
+	- better documentation
+	* src/main/perl/lib/Workflow/Inotify/Handler.pm.in
+	- perlcritic refactoring
+	- better documentation
+	* cpan/buildspec.yml: new
+	* cpan/requires: new
+	* config/inotify.service: new

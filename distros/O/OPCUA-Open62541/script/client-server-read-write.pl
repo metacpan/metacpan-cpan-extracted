@@ -9,14 +9,9 @@ use warnings;
 # server-read server-write
 my @funcs = (
   [qw(	Value			Variant		1 1 0 0		1 1	)],
-  [qw(	Value			Variant		0 0 1 1		0 0
-	HAVE_UA_CLIENTASYNCREADVALUEATTRIBUTECALLBACK_VARIANT)],
-  [qw(	Value			DataValue	0 0 1 1		0 0
-	HAVE_UA_CLIENTASYNCREADVALUEATTRIBUTECALLBACK_DATAVALUE)],
+  [qw(	Value			DataValue	0 0 1 1		0 0	)],
   [qw(	DataType		DataType	0 0 1 0		0 0	)],
   [qw(	NodeId			NodeId		1 1 0 0		1 0	)],
-  [qw(	NodeId			NodeId		0 0 1 1		0 0
-	HAVE_UA_CLIENT_READNODEIDATTRIBUTE_ASYNC)],
   [qw(	NodeClass		NodeClass	1 1 1 1		1 0	)],
   [qw(	BrowseName		QualifiedName	1 1 1 1		1 1	)],
   [qw(	DisplayName		LocalizedText	1 1 1 1		1 1	)],
@@ -159,11 +154,7 @@ sub print_xs_client_callback {
     print $xsf <<"EOXSFUNC";
 static void
 clientAsyncRead${type}Callback(UA_Client *client, void *userdata,
-    UA_UInt32 requestId,
-#ifdef HAVE_UA_CLIENTASYNCOPERATIONCALLBACK
-    UA_StatusCode status,
-#endif
-    UA_${type} *var)
+    UA_UInt32 requestId, UA_StatusCode status, UA_${type} *var)
 {
 	dTHX;
 	SV *sv;

@@ -1,4 +1,4 @@
-class Sys::Time::Timespec : pointer_t {
+class Sys::Time::Timespec : pointer {
   
   native static method new : Sys::Time::Timespec ();
 

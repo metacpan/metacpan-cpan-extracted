@@ -280,6 +280,13 @@ static const struct XSParseKeywordHooks hooks_lexvar_name = {
   .build1 = &build_constsv,
 };
 
+static const struct XSParseKeywordHooks hooks_lexvar = {
+  .permit_hintkey = hintkey,
+
+  .piece1 = XPK_LEXVAR(XPK_LEXVAR_ANY),
+  .build1 = &build_constpadix,
+};
+
 static const struct XSParseKeywordHooks hooks_lexvar_my = {
   .permit_hintkey = hintkey,
 
@@ -380,6 +387,7 @@ BOOT:
   register_xs_parse_keyword("piecepkg", &hooks_packagename, NULL);
 
   register_xs_parse_keyword("piecelexvarname", &hooks_lexvar_name, NULL);
+  register_xs_parse_keyword("piecelexvar",     &hooks_lexvar,      NULL);
   register_xs_parse_keyword("piecelexvarmy",   &hooks_lexvar_my,   NULL);
 
   register_xs_parse_keyword("pieceattrs", &hooks_attrs, NULL);

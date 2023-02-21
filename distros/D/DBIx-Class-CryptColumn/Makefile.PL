@@ -17,8 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "DBIx::Class::CryptColumn",
   "PREREQ_PM" => {
-    "Crypt::Passphrase" => "0.006",
-    "Crypt::Passphrase::PassphraseHash" => 0,
+    "Crypt::Passphrase" => "0.007",
     "DBIx::Class" => 0,
     "Scalar::Util" => 0,
     "Sub::Util" => "1.40",
@@ -38,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.89",
     "lib" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,9 +45,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Crypt::Passphrase" => "0.006",
+  "Crypt::Passphrase" => "0.007",
   "Crypt::Passphrase::Encoder" => 0,
-  "Crypt::Passphrase::PassphraseHash" => 0,
   "DBIx::Class" => 0,
   "DBIx::Class::Core" => 0,
   "DBIx::Class::Schema" => 0,

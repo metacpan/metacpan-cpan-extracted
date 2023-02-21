@@ -1,5 +1,5 @@
 package Crypt::Bcrypt;
-$Crypt::Bcrypt::VERSION = '0.008';
+$Crypt::Bcrypt::VERSION = '0.009';
 use strict;
 use warnings;
 
@@ -58,12 +58,13 @@ sub _get_parameters {
 	elsif ($hash =~ / ^ \$ bcrypt-sha256 \$ v=2,t=($subtype_qr),r=($cost_qr) \$ /x) {
 		return ($1, $2, 'sha256');
 	}
+	return ('', 0, '');
 }
 
 sub bcrypt_needs_rehash {
 	my ($hash, $wanted_subtype, $wanted_cost, $wanted_hash) = @_;
 	my ($my_subtype, $my_cost, $my_hash) = _get_parameters($hash);
-	return $my_subtype ne $wanted_subtype || $my_cost < $wanted_cost || $my_hash ne ($wanted_hash || '');
+	return $my_subtype ne $wanted_subtype || $my_cost != $wanted_cost || $my_hash ne ($wanted_hash || '');
 }
 
 1;
@@ -82,7 +83,7 @@ Crypt::Bcrypt - A modern bcrypt implementation
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -130,7 +131,7 @@ This is a very broken version that is only useful for compatibility with ancient
 
 =back
 
-C<$cost> must be between 5 and 31 (inclusive). C<$salt> must be exactly 16 bytes.
+C<$cost> must be between 4 and 31 (inclusive). C<$salt> must be exactly 16 bytes.
 
 =head2 bcrypt_check($password, $hash)
 
@@ -138,7 +139,7 @@ This checks if the C<$password> satisfies the C<$hash>, and does so in a timing-
 
 =head2 bcrypt_hashed($password, $subtype, $cost, $salt, $hash_algorithm)
 
-This works like the C<bcrypt> functions, but pre-hashes the password using the specified hash. This is mainly useful to get around the 72 character limit. Currently only sha256 is supported. This uses a salt-keyed hash to prevent password shucking.
+This works like the C<bcrypt> functions, but pre-hashes the password using the specified hash. This is mainly useful to get around the 72 character limit. Currently only sha256 is supported. This uses a salt-keyed hash to prevent password shucking. If C<$hash_algorithm> is an empty string it will perform a normal C<bcrypt> operation.
 
 =head2 bcrypt_check_hashed($password, $hash)
 

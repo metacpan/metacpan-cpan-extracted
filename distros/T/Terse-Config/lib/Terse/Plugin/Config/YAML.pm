@@ -24,7 +24,7 @@ Terse::Plugin::Config::YAML - YAML configs
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 

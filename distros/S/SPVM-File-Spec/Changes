@@ -1,3 +1,52 @@
+0.03 2023-02-10
+  [Incompatible Changes]
+    * Current File::Spec is copied to File::Spec::Instance.
+    * File::Spec::Unix is renamed to File::Spec::Instance::Unix.
+    * File::Spec::Win32 is renamed to File::Spec::Instance::Win32.
+    * File::Spec::Interface is renamed to File::Spec::Instance::Interface.
+    * The definition of the methods of the File::Spec are changed and removed.
+      [Removed]
+      - static method new : File::Spec ();
+      - method has_interfaces : int ();
+      
+      [Before]
+      -  method canonpath : string ($path : string);
+      -  method catdir : string ($directories : string[]);
+      -  method catfile : string ($directories : string[], $filename : string);
+      -  method curdir : string ();
+      -  method devnull : string ();
+      -  method rootdir : string ();
+      -  method tmpdir : string ();
+      -  method updir : string ();
+      -  method no_upwards : string[] ($directories : string[]);
+      -  method file_name_is_absolute : int ($path : string);
+      -  method path : string[] ();
+      -  method join : string ($directories : string[], $filename : string);
+      -  method splitpath : string[] ($path : string, $no_file = 0 : int);
+      -  method splitdir : string[] ($path : string);
+      -  method catpath : string ($volume : string, $directory : string, $file : string);
+      -  method abs2rel : string ($path : string, $base = undef : string);
+      -  method rel2abs : string ($path : string, $base = undef : string);
+      [After]
+      +  static method canonpath : string ($path : string);
+      +  static method catdir : string ($directories : string[]);
+      +  static method catfile : string ($directories : string[], $filename : string);
+      +  static method curdir : string ();
+      +  static method devnull : string ();
+      +  static method rootdir : string ();
+      +  static method tmpdir : string ();
+      +  static method updir : string ();
+      +  static method updir : string ();
+      +  static method no_upwards : string[] ($directories : string[]);
+      +  static method file_name_is_absolute : int ($path : string);
+      +  static method path : string[] ();
+      +  static method join : string ($directories : string[], $filename : string);
+      +  static method splitpath : string[] ($path : string, $no_file = 0 : int);
+      +  static method splitdir : string[] ($path : string);
+      +  static method catpath : string ($volume : string, $directory : string, $file : string);
+      +  static method abs2rel : string ($path : string, $base = undef : string);
+      +  static method rel2abs : string ($path : string, $base = undef : string);
+      
 0.02 2023-02-06
   [Changes]
     * Added the File::Spec::Cwd class. This is the same as the Cwd module.

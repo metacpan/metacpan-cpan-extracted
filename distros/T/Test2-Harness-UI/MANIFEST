@@ -38,6 +38,7 @@ lib/Test2/Harness/UI/Controller/JobField.pm
 lib/Test2/Harness/UI/Controller/Lookup.pm
 lib/Test2/Harness/UI/Controller/Project.pm
 lib/Test2/Harness/UI/Controller/Query.pm
+lib/Test2/Harness/UI/Controller/Resources.pm
 lib/Test2/Harness/UI/Controller/Run.pm
 lib/Test2/Harness/UI/Controller/RunField.pm
 lib/Test2/Harness/UI/Controller/Stream.pm
@@ -67,6 +68,8 @@ lib/Test2/Harness/UI/Schema/MySQL/Permission.pm
 lib/Test2/Harness/UI/Schema/MySQL/PrimaryEmail.pm
 lib/Test2/Harness/UI/Schema/MySQL/Project.pm
 lib/Test2/Harness/UI/Schema/MySQL/Reporting.pm
+lib/Test2/Harness/UI/Schema/MySQL/Resource.pm
+lib/Test2/Harness/UI/Schema/MySQL/ResourceBatch.pm
 lib/Test2/Harness/UI/Schema/MySQL/Run.pm
 lib/Test2/Harness/UI/Schema/MySQL/RunField.pm
 lib/Test2/Harness/UI/Schema/MySQL/Session.pm
@@ -92,6 +95,8 @@ lib/Test2/Harness/UI/Schema/MySQL56/Permission.pm
 lib/Test2/Harness/UI/Schema/MySQL56/PrimaryEmail.pm
 lib/Test2/Harness/UI/Schema/MySQL56/Project.pm
 lib/Test2/Harness/UI/Schema/MySQL56/Reporting.pm
+lib/Test2/Harness/UI/Schema/MySQL56/Resource.pm
+lib/Test2/Harness/UI/Schema/MySQL56/ResourceBatch.pm
 lib/Test2/Harness/UI/Schema/MySQL56/Run.pm
 lib/Test2/Harness/UI/Schema/MySQL56/RunField.pm
 lib/Test2/Harness/UI/Schema/MySQL56/Session.pm
@@ -116,6 +121,8 @@ lib/Test2/Harness/UI/Schema/Overlay/Permission.pm
 lib/Test2/Harness/UI/Schema/Overlay/PrimaryEmail.pm
 lib/Test2/Harness/UI/Schema/Overlay/Project.pm
 lib/Test2/Harness/UI/Schema/Overlay/Reporting.pm
+lib/Test2/Harness/UI/Schema/Overlay/Resource.pm
+lib/Test2/Harness/UI/Schema/Overlay/ResourceBatch.pm
 lib/Test2/Harness/UI/Schema/Overlay/Run.pm
 lib/Test2/Harness/UI/Schema/Overlay/RunField.pm
 lib/Test2/Harness/UI/Schema/Overlay/Session.pm
@@ -141,6 +148,8 @@ lib/Test2/Harness/UI/Schema/PostgreSQL/Permission.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/PrimaryEmail.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/Project.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/Reporting.pm
+lib/Test2/Harness/UI/Schema/PostgreSQL/Resource.pm
+lib/Test2/Harness/UI/Schema/PostgreSQL/ResourceBatch.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/Run.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/RunField.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/Session.pm
@@ -165,6 +174,8 @@ lib/Test2/Harness/UI/Schema/Result/Permission.pm
 lib/Test2/Harness/UI/Schema/Result/PrimaryEmail.pm
 lib/Test2/Harness/UI/Schema/Result/Project.pm
 lib/Test2/Harness/UI/Schema/Result/Reporting.pm
+lib/Test2/Harness/UI/Schema/Result/Resource.pm
+lib/Test2/Harness/UI/Schema/Result/ResourceBatch.pm
 lib/Test2/Harness/UI/Schema/Result/Run.pm
 lib/Test2/Harness/UI/Schema/Result/RunField.pm
 lib/Test2/Harness/UI/Schema/Result/Session.pm
@@ -177,6 +188,7 @@ lib/Test2/Harness/UI/Schema/Result/User.pm
 lib/Test2/Harness/UI/Schema/ResultSet.pm
 lib/Test2/Harness/UI/Sweeper.pm
 lib/Test2/Harness/UI/Util.pm
+lib/Test2/Harness/UI/Util/DateTimeFormat.pm
 lib/Test2/Harness/UI/Util/Errors.pm
 lib/Test2/Harness/UI/Util/HashBase.pm
 lib/Test2/Harness/UI/Util/ImportModes.pm
@@ -203,6 +215,7 @@ share/css/jquery-ui.theme.min.css
 share/css/json-formatter.css
 share/css/main.css
 share/css/project.css
+share/css/resources.css
 share/css/theme.css
 share/css/upload.css
 share/css/user.css
@@ -237,6 +250,7 @@ share/js/json-formatter.umd.js
 share/js/lookup.js
 share/js/main.js
 share/js/project.js
+share/js/resources.js
 share/js/runtable.js
 share/js/upload.js
 share/js/view.js
@@ -250,6 +264,7 @@ share/templates/login.tx
 share/templates/lookup.tx
 share/templates/main.tx
 share/templates/project.tx
+share/templates/resources.tx
 share/templates/upload.tx
 share/templates/user.tx
 share/templates/view.tx

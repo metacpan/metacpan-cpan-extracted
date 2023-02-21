@@ -6,7 +6,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 0.25
+Version 0.28
 
 =cut
 
@@ -138,6 +138,22 @@ Provide abstract text for the class.
 Provide a synopsis for the class.
 
 	$class->synopsis('...');
+
+=cut
+
+=head2 no_strict
+
+Disable strict by flag.
+
+	$class->no_strict('refs');
+
+=cut
+
+=head2 no_warnings
+
+Disable warnings by flag.
+
+	$class->no_warnings('reserved');
 
 =cut
 

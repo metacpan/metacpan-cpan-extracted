@@ -34,7 +34,7 @@
    "provides" : {
       "LaTeX::TOM" : {
          "file" : "lib/LaTeX/TOM.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       },
       "LaTeX::TOM::Node" : {
          "file" : "lib/LaTeX/TOM/Node.pm",
@@ -58,6 +58,6 @@
          "url" : "https://github.com/stsc/LaTeX-TOM"
       }
    },
-   "version" : "1.04",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "1.05",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

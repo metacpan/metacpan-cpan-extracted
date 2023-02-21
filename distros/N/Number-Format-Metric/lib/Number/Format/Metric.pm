@@ -1,16 +1,18 @@
 package Number::Format::Metric;
 
-our $DATE = '2014-12-05'; # DATE
-our $VERSION = '0.60'; # VERSION
-
 use 5.010001;
 use locale;
 use strict;
 use utf8;
 use warnings;
 
-require Exporter;
-our @ISA       = qw(Exporter);
+use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-02-14'; # DATE
+our $DIST = 'Number-Format-Metric'; # DIST
+our $VERSION = '0.602'; # VERSION
+
 our @EXPORT_OK = qw(
                        format_metric
                );
@@ -75,16 +77,18 @@ Number::Format::Metric - Format number with metric prefix
 
 =head1 VERSION
 
-This document describes version 0.60 of Number::Format::Metric (from Perl distribution Number-Format-Metric), released on 2014-12-05.
+This document describes version 0.602 of Number::Format::Metric (from Perl distribution Number-Format-Metric), released on 2023-02-14.
 
 =head1 SYNOPSIS
 
  use Number::Format::Metric qw(format_metric);
 
- format_metric(14     , {base=>10});               # => "14"
- format_metric(12000  , {base=> 2, precision=>1}); # => "11.7K"
- format_metric(12000  , {base=>10, precision=>1}); # => "11.7Ki"
- format_metric(-0.0017, {base=>10});               # => "1.7m"
+ format_metric(14     , {base=>10});               # => "14.0"
+ format_metric(14     , {base=>10, precision=>0}); # => "14"
+ format_metric(12001  , {base=> 2, precision=>1}); # => "11.7k"
+ format_metric(12001  , {base=>10, precision=>3}); # => "12.001ki"
+ format_metric(-0.0017, {base=>10});               # => "-1.7m"
+ format_metric(1.26e6 , {base=>10});               # => "1.3Mi"
 
 =head1 FUNCTIONS
 
@@ -104,16 +108,9 @@ prefix). Known options:
 
 =item * i_mark => BOOL (default: 1)
 
-Give "i" suffix to prefixes when in base 10 for K, M, G, T, and so on.
+Give "i" suffix to prefixes when in base 10 for k, M, G, T, and so on.
 
 =back
-
-=head1 SEE ALSO
-
-Other number formatting modules: L<Number::Format>, L<Format::Human::Bytes>,
-L<Number::Bytes::Human>.
-
-L<https://en.wikipedia.org/wiki/Metric_prefix>
 
 =head1 HOMEPAGE
 
@@ -123,6 +120,48 @@ Please visit the project's homepage at L<https://metacpan.org/release/Number-For
 
 Source repository is at L<https://github.com/perlancar/perl-Number-Format-Metric>.
 
+=head1 SEE ALSO
+
+Other number formatting modules: L<Number::Format>, L<Format::Human::Bytes>,
+L<Number::Bytes::Human>.
+
+L<https://en.wikipedia.org/wiki/Metric_prefix>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2014, 2013 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Number-Format-Metric>
@@ -130,16 +169,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2014 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

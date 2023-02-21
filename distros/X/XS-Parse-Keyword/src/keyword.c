@@ -609,7 +609,11 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       if(is_special)
         THISARG.padix = pad_add_name_pvn(SvPVX(varname), SvCUR(varname), 0, NULL, NULL);
       else
-        yycroak("TODO: XS_PARSE_KEYWORD_LEXVAR without LEXVAR_MY");
+#if HAVE_PERL_VERSION(5, 16, 0)
+        THISARG.padix = pad_findmy_pvn(SvPVX(varname), SvCUR(varname), 0);
+#else
+        THISARG.padix = pad_findmy(SvPVX(varname), SvCUR(varname), 0);
+#endif
 
       (*argidx)++;
       return;
@@ -689,6 +693,7 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       (*argidx)++;
       while(probe_piece(aTHX_ argsv, argidx, piece->u.pieces + 0, hookdata)) {
         THISARG.i++;
+        lex_read_space(0);
         parse_pieces(aTHX_ argsv, argidx, piece->u.pieces + 1, hookdata);
       }
       return;
@@ -710,6 +715,7 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
 
         if(!probe_piece(aTHX_ argsv, argidx, piece->u.pieces + 0, hookdata))
           break;
+        lex_read_space(0);
       }
       return;
 

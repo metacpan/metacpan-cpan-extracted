@@ -1,0 +1,25 @@
+[
+   {
+      "op": "set-defaults",
+      "font": "[%= as_file('assets/MadkittenRegular-o7E4.ttf') %]",
+      "font-size": 12
+   },
+
+   {
+      "op": "add-page",
+      "from": "[%= as_file('assets/basic.pdf') %]",
+      "from-page": 1
+   },
+
+   {
+      "op": "add-image",
+      "path": "[%= as_file('assets/scroll_old.png') %]",
+      "x": 260, "y": 750, "width": 64, "height": 32
+   },
+
+   {
+      "op": "add-text",
+      "text-template": "Hello, [% recipient %]!",
+      "x": 260, "y": 500
+   }
+]

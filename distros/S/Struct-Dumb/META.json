@@ -21,15 +21,14 @@
       },
       "test" : {
          "requires" : {
-            "Test::Fatal" : "0",
-            "Test::More" : "0.88"
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "Struct::Dumb" : {
          "file" : "lib/Struct/Dumb.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -38,6 +37,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.13",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.14",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

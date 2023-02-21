@@ -59,16 +59,16 @@ sub test_search__display_nondb_columns_and_columndata_closures
     $self->{ws}->{-columndata_closures} = {
         my_header1 => sub { my ($self, $row) = @_; return "Widget #".$row->{widget_no}; },
         my_header2 => sub { my ($self, $row) = @_; return "Widget Size: ".$row->{size}; },
-        my_header3 => sub { return "***"; },
+        my_header3 => sub { return "a***b"; },
     };
     $self->SUPER::test_search__basic;
 
     $self->assert_display_contains(
         [ 'tr', 'td' ],
-        [ 'Widget #1', 1, 'clock_widget', 'A time keeper widget', 'small', 'Widget Size: small', 'my_header3: \*\*\*</', ],
-        [ 'Widget #2', 2, 'calendar_widget', 'A date tracker widget', 'medium', 'Widget Size: medium', 'my_header3: \*\*\*</', ],
+        [ 'Widget #1', 1, 'clock_widget', 'A time keeper widget', 'small', 'Widget Size', 'small', 'my_header3', 'a\*\*\*b', ],
+        [ 'Widget #2', 2, 'calendar_widget', 'A date tracker widget', 'medium', 'Widget Size', 'medium', 'my_header3', 'a\*\*\*b', ],
         [ 'td', 'tr', 'tr', 'td' ],
-        [ 'Widget #3', 3, 'silly_widget', 'A goofball widget', 'unknown', 'Widget Size: unknown', 'my_header3: \*\*\*</', ],
+        [ 'Widget #3', 3, 'silly_widget', 'A goofball widget', 'unknown', 'Widget Size', 'unknown', 'my_header3', 'a\*\*\*b', ],
         [ 'td', 'tr' ],
     );
 }
@@ -237,8 +237,9 @@ sub test_search__only_allows_sorting_by_specified_columns
     $ws->search();
 
     $self->assert_display_contains(
-        [ 'div', 'align', 'right', 'Sort by', 'sortby_columns_popup',
-          'sortby=widget_no', 'widget_no', 'sortby=name', 'name' ],
+        [ 'div align="right', 'Sort by', 'sortby_columns_popup' ],
+        [ 'option value="\?sortby=name">name' ],
+        [ 'option selected="selected" value="\?sortby=widget_no&amp;sort_reverse=0">widget_no', ],
         [ 4, 'gps_widget', 'A GPS widget', 'medium' ],
         [ 3, 'silly_widget', 'A goofball widget', 'unknown' ],
         [ 'td', 'tr', 'tr', 'td' ],
@@ -296,13 +297,13 @@ sub test_search__extra_attributes
 
     $self->assert_display_contains(
         [ 'table' ],
-        [ 'tr', 'td [^<>]*test-attr2="bar" [^<>]*test-attr1="foo".*' ],
+        [ 'tr', 'td [^<>]*test-attr(?:2="bar"|1="foo") [^<>]*test-attr(?:2="bar"|1="foo")[^<>]*><' ],
         [ 1, 'clock_widget', 'A time keeper widget', 'small' ],
-        [ 'td [^<>]*test-attr2="bar" [^<>]*test-attr1="foo".*' ],
+        [ 'td [^<>]*test-attr(?:2="bar"|1="foo") [^<>]*test-attr(?:2="bar"|1="foo")[^<>]*><' ],
         [ 2, 'calendar_widget', 'A date tracker widget', 'medium' ],
-        [ 'td', 'tr', 'tr', 'td [^<>]*test-attr2="bar" [^<>]*test-attr1="foo".*' ],
+        [ 'td', 'tr', 'tr', 'td [^<>]*test-attr(?:2="bar"|1="foo") [^<>]*test-attr(?:2="bar"|1="foo")[^<>]*><' ],
         [ 3, 'silly_widget', 'A goofball widget', 'unknown' ],
-        [ 'td [^<>]*test-attr2="bar" [^<>]*test-attr1="foo".*' ],
+        [ 'td [^<>]*test-attr(?:2="bar"|1="foo") [^<>]*test-attr(?:2="bar"|1="foo")[^<>]*><' ],
         [ 4, 'gps_widget', 'A GPS widget', 'medium' ],
         [ 'td', 'tr' ],
     );
@@ -315,19 +316,19 @@ sub test_search__extra_attributes_closure
         my ($obj, $row) = @_;
         my $col1 = $obj->{'header_columns'}->[0];
         my $col2 = $obj->{'header_columns'}->[1];
-        return { "attr_$col1" => $row->{$col1}, "attr_$col2" => $row->{$col2} };
+        return { 'attr_'.$col1 => $row->{$col1}, 'attr_'.$col2 => $row->{$col2} };
     };
     $self->SUPER::test_search__basic;
 
     $self->assert_display_contains(
         [ 'table' ],
-        [ 'tr', 'td [^<>]*attr-widget-no="1" [^<>]*attr-name="clock_widget".*' ],
+        [ 'tr', 'td [^<>]*attr-(?:widget-no="1"|name="clock_widget") [^<>]*attr-(?:widget-no="1"|name="clock_widget")[^<>]*><' ],
         [ 1, 'clock_widget', 'A time keeper widget', 'small' ],
-        [ 'td [^<>]*attr-widget-no="2" [^<>]*attr-name="calendar_widget".*' ],
+        [ 'td [^<>]*attr-(?:widget-no="2"|name="calendar_widget") [^<>]*attr-(?:widget-no="2"|name="calendar_widget")[^<>]*><' ],
         [ 2, 'calendar_widget', 'A date tracker widget', 'medium' ],
-        [ 'td', 'tr', 'tr', 'td [^<>]*attr-widget-no="3" [^<>]*attr-name="silly_widget".*' ],
+        [ 'td', 'tr', 'tr', 'td [^<>]*attr-(?:widget-no="3"|name="silly_widget") [^<>]*attr-(?:widget-no="3"|name="silly_widget")[^<>]*><' ],
         [ 3, 'silly_widget', 'A goofball widget', 'unknown' ],
-        [ 'td [^<>]*attr-widget-no="4" [^<>]*attr-name="gps_widget".*' ],
+        [ 'td [^<>]*attr-(?:widget-no="4"|name="gps_widget") [^<>]*attr-(?:widget-no="4"|name="gps_widget")[^<>]*><' ],
         [ 4, 'gps_widget', 'A GPS widget', 'medium' ],
         [ 'td', 'tr' ],
     );

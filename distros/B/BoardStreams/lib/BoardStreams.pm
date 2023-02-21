@@ -2,7 +2,7 @@ package BoardStreams;
 
 use Mojo::Base -strict;
 
-our $VERSION = "v0.0.32";
+our $VERSION = "v0.0.34";
 
 our $db;
 

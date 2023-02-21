@@ -1,0 +1,56 @@
+class File::Copy {
+  use Sys::IO::Stat;
+  use Sys::IO;
+  use IO::File;
+  
+  static method copy : int ($from : string, $to : string, $size = 0 : int) {
+    
+    my $from_io_file = IO::File->new($from, "<");
+    
+    my $to_io_file = IO::File->new($to, ">");
+    
+    my $fstat_from = Sys::IO::Stat->new;
+    Sys::IO::Stat->fstat($from_io_file->fileno, $fstat_from);
+    
+    my $size_max = 1024 * 1024 * 2;
+    if ($size == 0) {
+      my $st_size = $fstat_from->st_size;
+      if ($st_size < 512) {
+        $size = 1024;
+      }
+      if ($st_size > $size_max) {
+        $size = $size_max;
+      }
+    }
+    
+    my $buffer = (mutable string)new_string_len $size;
+    my $offset = 0;
+    
+    while (1) {
+      my $read_length = $from_io_file->sysread($buffer, $size);
+      if ($read_length == 0) {
+        last;
+      }
+      $to_io_file->syswrite($buffer, $read_length);
+    }
+    
+    $from_io_file->close;
+    $to_io_file->close;
+    
+    my $success = 1;
+    
+    return $success;
+  }
+  
+  static method move : int ($from : string, $to : string) {
+    
+    my $status = Sys::IO->rename($from, $to);
+    
+    my $success = 0;
+    if ($status == 0) {
+      $success = 1;
+    }
+    
+    return $success;
+  }
+}

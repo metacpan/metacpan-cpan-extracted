@@ -31,8 +31,8 @@ WriteMakefile(
     resources => {
       repository => {
         type => 'git',
-        url  => '',
-        web  => '',
+        url  => 'https://github.com/yuki-kimoto/SPVM-Digest-SHA.git',
+        web  => 'https://github.com/yuki-kimoto/SPVM-Digest-SHA',
       },
     },
     no_index => {
@@ -60,7 +60,8 @@ sub MY::postamble {
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Digest::SHA');
   }
   
-  $make_rule .= qq|dynamic ::\n\tperl -e 'use Config;chdir "perl_impl" or die; system("$^X Makefile.PL && $Config{make}") == 0 or die';|;
+  # Compile Perl's Digest::MD5 for tests.
+  $make_rule .= qq|dynamic ::\n\tperl -e "use Config;chdir qq(perl_impl) or die; system(qq(perl Makefile.PL)) == 0 or die;system(qq($Config{make})) == 0 or die;";|;
   
   return $make_rule;
 }

@@ -14,3 +14,4 @@ t/valuereader.t
 t/valuereader.xlsx
 t/valuereader1904.xlsx
 t/Mappe1.xlsx
+t/cells_without_r_attr.xlsx

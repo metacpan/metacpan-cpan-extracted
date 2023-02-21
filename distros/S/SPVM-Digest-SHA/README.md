@@ -1,4 +1,3 @@
 # SPVM::Digest::SHA
 
-SPVM::Digest::SHA is a SPVM module.
-
+<a href="https://metacpan.org/pod/SPVM::Digest::SHA">SPVM::Digest::SHA - CPAN</a>

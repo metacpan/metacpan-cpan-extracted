@@ -2,7 +2,7 @@ package Plack::App::ServiceStatus::DBI;
 
 # ABSTRACT: Check DBI connection
 
-our $VERSION = '0.908'; # VERSION
+our $VERSION = '0.911'; # VERSION
 
 use 5.018;
 use strict;
@@ -36,7 +36,7 @@ Plack::App::ServiceStatus::DBI - Check DBI connection
 
 =head1 VERSION
 
-version 0.908
+version 0.911
 
 =head1 SYNOPSIS
 

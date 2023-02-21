@@ -3,7 +3,7 @@ package PGXN::Site::Locale::fr;
 use 5.10.0;
 use utf8;
 use parent 'PGXN::Site::Locale';
-our $VERSION = v0.22.1;
+our $VERSION = v0.22.2;
 
 our %Lexicon = (
     listcomma => ',',

@@ -13,7 +13,7 @@ my $form = HTML::Form->parse( <<'EOT', "http://localhost/" );
 </form>
 EOT
 
-isa_ok($form, 'HTML::Form');
+isa_ok( $form, 'HTML::Form' );
 
 {
     my $input = $form->find_input('#password-field');

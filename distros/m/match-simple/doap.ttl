@@ -31,7 +31,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "match-simple";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-001>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-002>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-003>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-004>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-005>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-006>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-007_01>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-007_02>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-007_03>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-008>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-009>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-010>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-011>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-001>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-002>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-003>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-004>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-005>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-006>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-007_01>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-007_02>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-007_03>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-008>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-009>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-010>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-011>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-012>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-match-simple>;
@@ -236,6 +236,20 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/match-simple-0.011.tar.gz>;
 	doap:revision        "0.011"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/match-simple/v_0-012>
+	a                    doap:Version;
+	dc:identifier        "match-simple-0.012"^^xsd:string;
+	dc:issued            "2023-02-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Bundle match::simple::sugar with some useful extras.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/match-simple-0.012.tar.gz>;
+	doap:revision        "0.012"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/bricker>
 	a                    foaf:Person;

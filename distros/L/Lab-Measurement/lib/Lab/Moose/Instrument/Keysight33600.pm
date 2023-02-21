@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Keysight33600;
-$Lab::Moose::Instrument::Keysight33600::VERSION = '3.842';
+$Lab::Moose::Instrument::Keysight33600::VERSION = '3.851';
 #ABSTRACT: Keysight 33500/33600 series Function/Arbitrary Waveform Generator (work in progress)
 
 use v5.20;
@@ -59,7 +59,7 @@ Lab::Moose::Instrument::Keysight33600 - Keysight 33500/33600 series Function/Arb
 
 =head1 VERSION
 
-version 3.842
+version 3.851
 
 =head1 SYNOPSIS
 
@@ -70,13 +70,20 @@ version 3.842
     connection_options => {...}
  );
 
- # Setup waveform
- $trueform->write(command => 'FUNC RAMP');
- $trueform->write(command => 'FUNC:RAMP:SYMM 25');
- $trueform->write(command => 'FREQ 200');
- $trueform->write(command => 'VOLT 2');
- $trueform->write(command => 'VOLT:OFFS 1');
+ ### Setup waveform ###
 
+ # Clear volatile memory
+ $trueform->write(command => 'DATA:VOL:CLE');
+ # write new waveform into volatile memory
+ $trueform->write(command => 'DATA:ARB myarb, 0, 0, 0.1, ...,1, ...');
+ # load the new waveform
+ $trueform->write(command => 'SOUR:FUNC:ARB myarb');
+ # set parameters
+ $trueform->write(command => 'SOUR:VOLT 1'); # amplitude
+ $trueform->write(command => 'FUNC:ARB:SRAT 100000'); # samples/points per second
+ $trueform->write(command => 'FUNC:ARB:FILT STEP'); # interpolation type
+
+ $trueform->write(command => 'OUTP:POL INV'); # invert output polarity 
 
  # Setup trigger input
  $trueform->write(command => 'BURS:MODE TRIG');

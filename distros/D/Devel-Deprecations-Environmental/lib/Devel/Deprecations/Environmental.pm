@@ -3,11 +3,11 @@ package Devel::Deprecations::Environmental;
 use strict;
 use warnings;
 
-use DateTime::Format::ISO8601;
+use Devel::Deprecations::Environmental::MicroDateTime;
 use Module::Load ();
 use Scalar::Util qw(blessed);
 
-our $VERSION = '1.000';
+our $VERSION = '1.101';
 
 =head1 NAME
 
@@ -41,6 +41,27 @@ This will always warn about 32 bit perl or a really old perl:
         OldPerl => { older_than => '5.14.0', },
         'Int32';
 
+=head1 INCOMPATIBLE CHANGES
+
+Version 1.000 used L<DateTime::Format::ISO8601> for parsing times provided as
+strings. This was removed in 1.100 as it had an unreasonable number of
+dependencies. As a result we now only support a subset of ISO 8601 formats,
+namely the sensible ones:
+
+=over
+
+=item YYYY-MM-DD
+
+=item YYYY-MM-DD HH:MM:SS
+
+=item YYYY-MM-DDTHH:MM:SS
+
+=back
+
+You can still pass in a DateTime object if you wish, and so can use
+DateTime::Format::ISO8601 yourself to construct them from some crazy
+involving week numbers if you really want.
+
 =head1 DEPRECATION ARGUMENTS
 
 Each deprecation has a name, which can be optionally followed by a hash-ref of
@@ -51,8 +72,9 @@ arguments. All deprecations automatically support:
 =item warn_from
 
 The time at which to start emitting warnings about an impending deprecation.
-Defaults to the moment of creation, C<'1970-01-01'> (any ISO 8601 format is
-accepted). You can also provide this as a L<DateTime> object.
+Defaults to the moment of creation, C<'1970-01-01'> (in general the accepted
+date format is YYYY-MM-DD followed by an optional space or letter T and
+HH:MM:SS). You can also provide this as a L<DateTime> object.
 
 This must be before any of C<unsupported_from> or C<fatal_from> which are
 specified.
@@ -137,12 +159,28 @@ sub import {
         $args->{warn_from} ||= '1970-01-01';
         my %_froms = (
             map {
-                $_ => blessed($args->{$_}) ? $args->{$_} : DateTime::Format::ISO8601->parse_datetime($args->{$_})
+                $_ => blessed($args->{$_})
+                    ? $args->{$_}
+                    : Devel::Deprecations::Environmental::MicroDateTime->parse_datetime($args->{$_})
             } grep {
                 exists($args->{$_})
             } qw(warn_from unsupported_from fatal_from)
         );
         delete($args->{$_}) foreach(qw(warn_from unsupported_from fatal_from));
+
+        my $now = Devel::Deprecations::Environmental::MicroDateTime->now();
+
+        # if any param is a DateTime we need to upgrade all of them so comparisons work
+        if(
+            grep { blessed($_) eq 'DateTime' }
+            map { $_froms{$_} }
+            grep { exists($_froms{$_}) }
+            qw(fatal_from unsupported_from warn_from)
+        ) {
+            $now = DateTime->from_epoch(epoch => $now->epoch());
+            $_froms{$_} = DateTime->from_epoch(epoch => $_froms{$_}->epoch())
+                foreach(grep { exists($_froms{$_}) && blessed($_froms{$_}) ne 'DateTime' } qw(fatal_from unsupported_from warn_from));
+        }
 
         # check that warn/unsupported/fatal are ordered correctly in time
         foreach my $pair (
@@ -160,7 +198,7 @@ sub import {
 
         if($class->is_deprecated($args)) {
             my $reason = $class->reason($args);
-            my $now = DateTime->now();
+
             if($_froms{fatal_from} && $_froms{fatal_from} < $now) {
                 die(_fatal_msg(
                     %{$args->{_source}},
@@ -252,7 +290,7 @@ to parts of the environment your code is running in;
 
 =head1 AUTHOR, LICENCE and COPYRIGHT
 
-Copyright 2022 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+Copyright 2023 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
 
 This software is free-as-in-speech software, and may be used, distributed, and
 modified under the terms of either the GNU General Public Licence version 2 or

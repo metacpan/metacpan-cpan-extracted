@@ -18,7 +18,9 @@ BEGIN {
 }
 require_ok $pkg;
 
-{
+# FIXME: https://github.com/gbv/Catmandu-PICA/issues/79
+SKIP: {
+    skip "PICA::Data 2.06 not _fully_ compatible with Catmandu";
     my $fixer = Catmandu::Fix->new(
         fixes => [q|
     do pica_each()
@@ -33,6 +35,7 @@ require_ok $pkg;
         end
     end
     do pica_each('010@')
+        copy_field(record.0,foo)
         if all_match(record.0.0,'010@')
           add_field(from_var,true)
         end

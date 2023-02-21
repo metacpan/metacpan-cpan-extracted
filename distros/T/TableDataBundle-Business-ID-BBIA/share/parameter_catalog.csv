@@ -1,0 +1,435 @@
+number,parameter,unit,price,note
+1,Absorbsi air,per contoh,70000,khusus tepung agar
+2,Bagian yang tidak larut dalam air,per contoh,60000,
+3,Bahan asing / benda asing,per contoh,45000,
+4,Daya tahan bihun,per contoh,40000,
+5,Derajat brix,per contoh,45000,
+6,Gum base,per contoh,75000,khusus kembang gula karet
+7,Head space / ruang kosong makanan kaleng,per contoh,25000,
+8,Keadaan / organoleptik,per contoh,30000,
+9,Kebocoran kaleng dan kekeruhan,per contoh,20000,
+10,Kehalusan / lolos ayakan mesh 200,per contoh,220000,khusus kakao bubuk
+11,Kehalusan / lolos ayakan per mesh,per contoh,25000,
+12,Kekentalan / viskositas (Engler),per contoh,60000,alat brookfield rusak
+13,Kekeruhan / kejernihan pada gula,per contoh,135000,
+14,Kelarutan dalam air,per contoh,40000,contoh makanan
+15,Kelarutan dalam alkohol,per contoh,50000,
+16,Kematangan,per contoh,35000,
+17,Keutuhan (bahan),per contoh,30000,
+18,Kotoran agar-agar,per contoh,100000,
+19,Kotoran minyak,per contoh,150000,
+20,Mikroskopik,per contoh,50000,"khusus : kopi, tepung, saus tomat, saus cabe"
+21,Waktu pemasakan Mi Cepat Saji (Instant),per contoh,50000,
+22,Logam Kalsium / CaO,per contoh,190000,khusus pupuk
+23,Logam Kalium / K2O,per contoh,190000,khusus pupuk
+24,Logam Magnesium / MgO,per contoh,190000,khusus pupuk
+25,Logam Arsen (As),per contoh,160000,
+26,Logam Barium (Ba),per contoh,120000,
+27,Logam Besi (Fe),per contoh,120000,
+28,Logam Kadmium (Cd),per contoh,80000,
+29,Logam Kromium (Cr),per contoh,120000,
+30,Logam Magnesium (Mg),per contoh,120000,
+31,Logam Mangan (Mn),per contoh,120000,
+32,Logam Nikel (Ni),per contoh,120000,
+33,Logam Raksa (Hg),per contoh,110000,
+34,Logam Seng (Zn),per contoh,80000,
+35,Logam Tembaga (Cu),per contoh,80000,
+36,Logam Timah (Sn),per contoh,200000,
+37,Logam Timbal (Pb),per contoh,80000,
+38,Logam Timbal (Pb) dan Kadmium (Cd) metode Grafit furnace : pengujian 1 jenis logam,per contoh,300000,"khusus : minyak / margarin / mentega, susu dan turunannya, gula kristal putih / rafinasi, bahan baku kembang gula / minuman"
+39,Logam Timbal (Pb) dan Kadmium (Cd) metode Grafit furnace : pengujian dua jenis,Penambahan per jenis logam,120000,"khusus : minyak / margarin / mentega, susu dan turunannya, gula kristal putih / rafinasi, bahan baku kembang gula / minuman"
+40,Logam Selenium (Se),per contoh,150000,
+41,Uji Identifikasi Fe,per contoh,120000,hanya tepung terigu
+42,Fosfor (P) / fosfat total,per contoh,225000,dalam makanan/pupuk
+43,Fosfor larut dalam air,per contoh,225000,dalam makanan/pupuk
+44,Fosfor larut dalam asam sitrat,per contoh,225000,dalam makanan/pupuk
+45,Kalium (K),per contoh,120000,
+46,Kalsium (Ca),per contoh,120000,
+47,Natrium (Na),per contoh,120000,
+48,Acesulfam K,per contoh,285000,
+49,Aspartam,per contoh,285000,
+50,Sakarin,per contoh,260000,
+51,Sakarin (kualitatif),per contoh,100000,(positif / negatif)
+52,Siklamat,per contoh,285000,
+53,Siklamat (kualitatif),per contoh,110000,(positif / negatif)
+54,Benzoat / Natrium benzoat / Asam benzoat,per contoh,260000,
+55,Benzoat / Natrium benzoat / Asam benzoat (kualitatif),per contoh,190000,(positif / negatif)
+56,Boraks / Asam borat (kualitatif),per contoh,85000,(positif / negatif)
+57,Formaldehida / Formalin (kualitatif),per contoh,105000,(positif / negatif)
+58,Nitrit (NO2),per contoh,120000,khusus daging / daging olahan
+59,Sorbat / Kalium sorbat / Asam sorbat,per contoh,260000,
+60,Sorbat / Kalium sorbat / Asam sorbat (kualitatif),per contoh,165000,(positif / negatif)
+61,Sulfat pupuk / SO4 pupuk,per contoh,150000,
+62,Methyl paraben,per contoh,260000,
+63,SO2 / Sulfit,per contoh,150000,pangan dan gula
+64,Asam folat / Vitamin B9,per contoh,325000,
+65,Vitamin A,per contoh,365000,
+66,Vitamin B1 (Thiamin),per contoh,260000,
+67,Vitamin B2 (Riboflavin),per contoh,260000,
+68,Vitamin B6 (Pyridoxine),per contoh,305000,
+69,Vitamin C (Asam askorbat),per contoh,365000,
+70,Vitamin D / D3,per contoh,600000,
+71,Vitamin E (Tokoferol),per contoh,350000,
+72,Beta karoten,per contoh,375000,
+73,Total karoten / Total karotenoid metode spektro,per contoh,360000,
+74,Vitamin B1 (Thiamin),per contoh,450000,"metode SNI 3751:2018, TIDAK BISA"
+75,Vitamin B2 (Riboflavin),per contoh,450000,"metode SNI 3751:2018, TIDAK BISA"
+76,Taurine,per contoh,450000,TIDAK BISA
+77,B-Karoten (spektro),per contoh,370000,TIDAK BISA
+78,"Aflatoksin B1, B2, G1, G2, total",per contoh,680000,
+79,"Aflatoksin B1, B2, G1, G2, total (TLC)",per contoh,340000,
+80,Aflatoksin M1,per contoh,1000000,khusus produk susu dan turunannya
+81,DON,per contoh,1000000,
+82,Okratoksin A,per contoh,800000,"khusus kopi instan dan produk tepung (t.terigu, t.tapioka, t.jagung, dll)"
+83,3-MPCD,per contoh,1490000,TIDAK BISA
+84,Poly Aromatic Hydrocarbon (PAH) GC MS,per contoh,1025000,TIDAK BISA
+85,Uji Melamin,per contoh,1000000,TIDAK BISA
+86,Polychlorinated Biphenyl (PCB),per contoh,1000000,TIDAK BISA
+87,Kimia Organik Air Mineral Alami Sesuai SNI,per contoh,3200000,
+88,DNA Babi,per contoh,1500000,Hubungi CS 081213900044
+89,Abu (preparasi logam/mineral),per contoh,70000,
+90,Abu gravimetri (microwave),per contoh,70000,
+91,Abu konduktivitas,per contoh,100000,
+92,Abu sulfat,per contoh,115000,
+93,Abu tidak larut dalam air,per contoh,90000,
+94,Abu tidak larut dalam asam,per contoh,115000,
+95,Air (metode xylol),per contoh,130000,"pupuk (NPK, Amonium Sulfat) dan rempah-rempah (cabe bubuk, lada bubuk, dll)"
+96,Air (metode oven),per contoh,60000,
+97,Air (metode Karl Fischer),per contoh,200000,"contoh kopi instan, pupuk urea"
+98,Air (metode oven),per contoh,70000,untuk agar-agar & ikan asap
+99,Aktifitas air (Water Activity / AW),per contoh,75000,
+100,Amilopektin (perhitungan),per contoh,745000,sudah termasuk biaya karbohidrat dan amilosa
+101,Amilosa,per contoh,280000,
+102,Perhitungan angka kecukupan gizi (AKG),per contoh,100000,
+103,Antioksidan minyak : BHA,per contoh,325000,
+104,Antioksidan minyak : TBHQ,per contoh,325000,
+105,Antioksidan minyak : BHT,per contoh,325000,
+106,Asam Lemak (komposisi asam lemak metode uji GC) : Pengujian Satu Kelompok Asam Lemak,per contoh,615000,"1. Kelompok asam lemak reguler 2. Kelompok Omega 3,6,9 3. Kelompok AA, DHA, EPA 4. Kelompok lemak trans"
+107,Asam Lemak (komposisi asam lemak metode uji GC) : Pengujian 2 jenis atau lebih kelompok asam lemak,Penambahan per kelompok,300000,"1. Kelompok asam lemak reguler 2. Kelompok Omega 3,6,9 3. Kelompok AA, DHA, EPA 4. Kelompok lemak trans"
+108,Asam lemak bebas (Free Fatty Acid / FFA),per contoh,110000,khusus : produk minyak / lemak
+109,Asam lemak bebas/FFA Makanan (diekstrak terlebih dahulu),per contoh,195000,
+110,Asam Sianida/HCN (kuantitatif),per contoh,180000,
+111,Alkohol (GC-MS),per contoh,400000,khusus sari buah
+112,Bagian / bahan yang tidak tersabunkan,per contoh,295000,hanya bisa produk minyak / lemak
+113,Besar jenis butir,per contoh,125000,GKP / GKR (5 jenis tray)
+114,Bilangan formol,per contoh,70000,
+115,Bilangan iod,per contoh,170000,hanya bisa produk minyak / lemak
+116,Bilangan penyabunan,per contoh,100000,hanya bisa produk minyak / lemak
+117,Bilangan peroksida makanan (diekstrak terlebih dahulu),per contoh,195000,
+118,Bilangan peroksida minyak/lemak,per contoh,110000,
+119,Biuret (urea),per contoh,115000,
+120,Bobot jenis / density,per contoh,25000,
+121,Bobot tuntas,per contoh,25000,
+122,Derajat asam / Bilangan asam untuk makanan,per contoh,165000,metode diekstrak terlebih dahulu
+123,Derajat asam / Bilangan asam untuk minyak,per contoh,80000,
+124,Derajat putih,per contoh,95000,
+125,Enzim diastase dalam madu (kuantitatif),per contoh,145000,
+126,Falling number (nilai jatuh),per contoh,250000,
+127,Flock gula rafinasi,per contoh,55000,
+128,Gluten,per contoh,130000,khusus tepung terigu
+129,Gula pereduksi (sebelum inversi),per contoh,175000,
+130,Gula sakarosa (metode Luff),per contoh,220000,
+131,Gula metode HPLC : Pengujian satu jenis parameter gula,per contoh,345000,"Glukosa, Sukrosa, Fruktosa, Maltosa, Laktosa"
+132,Gula metode HPLC : Pengujian dua jenis atau lebih parameter gula,Penambahan per jenis gula,150000,"Glukosa, Sukrosa, Fruktosa, Maltosa, Laktosa"
+133,Gula total (sesudah inversi),per contoh,190000,
+134,Hidroksi Metil Furfural (HMF),per contoh,110000,
+135,Indeks bias / ND,per contoh,40000,
+136,Jenis pati lain,per contoh,40000,
+137,Kafein (Spektrofotometer/HPLC),per contoh,325000,
+138,Kalori / energi (perhitungan),per contoh,20000,"harus dengan analisa karbohidrat, air, abu, lemak dan protein senilai Rp. 465.000"
+139,Karbohidrat (perhitungan),per contoh,35000,"harus dengan analisa air, abu, lemak dan protein Rp. 430.000"
+140,Karbohidrat (titrimetri / hidrolisa pati),per contoh,215000,
+141,Kealkalian abu (Alkali),per contoh,105000,
+142,KIO3 (Iodium / yodium dalam garam dapur),per contoh,105000,
+143,Klorida dalam garam / NaCl,per contoh,155000,
+144,Klorida dalam makanan (diabukan terlebih dahulu),per contoh,170000,
+145,Kolesterol (GC),per contoh,395000,
+146,Laktosa (titrimetri),per contoh,125000,
+147,Lemak total,per contoh,175000,
+148,Lemak total dalam susu dan produk turunannya,per contoh,175000,
+149,Metanol / etanol secara penyulingan,per contoh,105000,
+150,Minyak pelikan (kualitatif),per contoh,80000,
+151,MSG (kemurnian / kuantitatif),per contoh,175000,
+152,MSG dalam makanan (kualitatif),per contoh,110000,
+153,Padatan kakao tanpa lemak,per contoh,235000,Perhitungan : 100% - Lemak - Air
+154,Padatan susu tanpa lemak (cokelat butir),per contoh,425000,
+155,Padatan tanpa lemak (pengurangan),per contoh,30000,
+156,Padatan tanpa lemak (Perhitungan : 100% - Lemak- Air),per contoh,235000,
+157,Padatan terlarut,per contoh,90000,
+158,Pewarna sintetis metode HPLC : Pengujian satu jenis parameter pewarna,per contoh,325000,"Kuning FCF, Merah alura, Biru berlian, Tartrazine, Ponceau 4R"
+159,Pewarna sintetis metode HPLC : Pengujian dua jenis atau lebih parameter pewarna,Penambahan per jenis pewarna,175000,"Kuning FCF, Merah alura, Biru berlian, Tartrazine, Ponceau 4R"
+160,Pewarna sintetis secara kromatografi kertas (kualitatif),per contoh,130000,
+161,Pewarna sudan red,per contoh,300000,
+162,pH (derajat asam) cairan / padatan,per contoh,40000,
+163,Polarisasi (dalam gula),per contoh,120000,
+164,Polifenol dalam bahan baku (spektrofotometri),per contoh,330000,
+165,Polifenol minuman teh dalam kemasan (spektrofotometri),per contoh,300000,
+166,"Proksimat (air, abu, protein, lemak, karbohidrat)",per contoh,465000,
+167,Protein,per contoh,125000,
+168,Protein dalam kopi (ditetapkan kafein),per contoh,450000,
+169,Putaran optik,per contoh,105000,
+170,Sari kopi,per contoh,80000,
+171,Sedimen (dalam gula),per contoh,200000,
+172,Serangga dalam semua bentuk stadia dan potongan-potongan yang tampak,per contoh,115000,
+173,Serat kasar,per contoh,130000,
+174,Serat makanan (dietary fiber),per contoh,345000,
+175,Serat makanan tidak larut / larut (IDF/SDF),per contoh,345000,
+176,Shell cacao,per contoh,365000,
+177,"Silikat dalam makanan, garam/Abu silikat",per contoh,100000,
+178,Sisa penguapan,per contoh,70000,
+179,Sulfat dalam pupuk/garam (dengan preparasi),per contoh,150000,
+180,Tanin (kualitatif),per contoh,140000,
+181,Teina (kualitatif),per contoh,180000,
+182,Terbinafin (Kromatogram Spektro),per contoh,250000,
+183,Titik leleh (awal/akhir),per contoh,80000,khusus minyak/lemak
+184,Total asam,per contoh,50000,
+185,Total padatan,per contoh,60000,
+186,Total padatan susu bukan lemak (yoghurt),per contoh,425000,"sudah termasuk analisa gula total, lemak, air"
+187,Fosfatidil kolin dalam lesitin,per contoh,800000,TIDAK BISA
+188,Warna kristal,per contoh,125000,
+189,Warna larutan Gula Kristal Mentah (Raw Sugar),per contoh,100000,
+190,Warna larutan Gula Kristal Putih & Gula Rafinasi,per contoh,170000,
+191,Warna pada minyak (Lovibond),per contoh,95000,
+192,Xylosa,per contoh,365000,
+193,Kandungan sulfur dalam pupuk,per contoh,150000,
+194,Asam bebas dalam Pupuk,per contoh,200000,
+195,"Aldrin, dieldrin, heptaklor, metoksiklor",per contoh,700000,TIDAK BISA
+196,Residu pestisida,per contoh,750000,TIDAK BISA
+197,Aerob termofil / mesofil,per contoh,100000,
+198,Anaerob termofil,per contoh,100000,
+199,Bacillus cereus,per contoh,180000,
+200,BATPS (Bakteri Aerob Termofilik Pembentuk Spora),per contoh,100000,
+201,Clostridium perfringens,per contoh,145000,
+202,Coliform,per contoh,135000,
+203,Colilert (Uji cepat E.coli),per contoh,180000,
+204,Enterobacter/Enterobacteriaceae,per contoh,150000,
+205,Enterococcus/enterococci,per contoh,150000,
+206,Escherichia Coli (E. Coli),per contoh,185000,
+207,Jumlah Bakteri Aerob:Total Plate Count (TPC) / Angka Lempeng Total (ALT),per contoh,130000,
+208,Jumlah bakteri anaerob,per contoh,150000,
+209,Kapang khamir,per contoh,150000,
+210,Listeria sp.,per contoh,180000,
+211,Listeria monocytogenes,per contoh,180000,
+212,Pseudomonas aeroginusa,per contoh,180000,
+213,Reduktase,per contoh,160000,
+214,Salmonella sp,per contoh,180000,
+215,Shigella,per contoh,110000,
+216,Staphylococcus aureus,per contoh,200000,
+217,Streptococci,per contoh,155000,
+218,Vibrio cholera,per contoh,125000,
+219,Vibrio sp,per contoh,125000,
+220,Vibrio parahaemoliticus,per contoh,125000,
+221,Bacillus cereus (n5),per paket,875000,
+222,BATPS (Bakteri Aerob Termofilik Pembentuk Spora) (n5),per paket,450000,
+223,Clostridium perfringens (n5),per paket,700000,
+224,Coliform (n5),per paket,625000,
+225,Colilert (Uji Cepat E.coli) (n5),per paket,800000,
+226,Enterobacter / Enterobacteriaceae (n5),per paket,725000,
+227,Enterococcus / Enterococci (n5),per paket,725000,
+228,Escherichia coli (E. Coli) (n5),per paket,875000,
+229,Jumlah Bakteri Aerob : Total Plate Count (TPC) / Angka Lempeng Total (ALT) (n5),per paket,575000,
+230,Jumlah bakteri anaerob (n5),per paket,725000,
+231,Kapang khamir (n5),per paket,725000,
+232,Listeria sp. (n5),per paket,800000,
+233,Listeria monocytogenes (n5),per paket,800000,
+234,Pseudomonas aeroginusa (n5),per paket,800000,
+235,Salmonella sp (n5),per paket,800000,
+236,Shigella (n5),per paket,500000,
+237,Staphylococcus aureus (n5),per paket,975000,
+238,Streptococci (n5),per paket,750000,
+239,Vibrio cholera (n5),per paket,575000,
+240,Vibrio sp (n5),per paket,575000,
+241,Vibrio parahaemoliticus (n5),per paket,575000,
+242,Aluminium (Al),per contoh,70000,contoh air
+243,Amonium (NH4) / Amonia (NH3),per contoh,75000,contoh air (SNI Air & Permenkes)
+244,Amonia bebas (NH3-N),per contoh,110000,contoh air limbah
+245,Antimon (Sb),per contoh,90000,contoh air
+246,Alkalinitas Total (M-alkalinity atau P-alkalinity),per contoh,60000,contoh air
+247,M-alkalinity,per contoh,60000,contoh air
+248,P-alkalinity,per contoh,60000,contoh air
+249,Arsen (As),per contoh,75000,contoh air
+250,Barium (Ba),per contoh,70000,contoh air
+251,Keadaan - Bau,per contoh,10000,contoh air
+252,Besi (Fe),per contoh,70000,contoh air
+253,Bikarbonat,per contoh,40000,contoh air
+254,BOD5,per contoh,85000,contoh air
+255,Boron (ICP),per contoh,120000,contoh air (SNI Air & Permenkes)
+256,Boron (Spektrofotometer),per contoh,130000,contoh air - TIDAK BISA -
+257,Bromat,per contoh,400000,contoh air (hanya SNI Air)
+258,COD,per contoh,150000,contoh air
+259,CO2 Titrimetri,per contoh,50000,contoh air - TIDAK BISA -
+260,CO2 Tester,per contoh,55000,contoh air - TIDAK BISA -
+261,Daya Hantar Listrik (DHL),per contoh,40000,contoh air
+262,Deterjen/Surfaktan (MBAS),per contoh,180000,contoh air
+263,DO (Oksigen terlarut),per contoh,70000,contoh air
+264,Fenol,per contoh,150000,contoh air
+265,Fluorida (F),per contoh,180000,contoh air
+266,Fosfat (PO4),per contoh,60000,contoh air
+267,Kadmium (Cd),per contoh,70000,contoh air limbah
+268,Kadmium (Cd) metode Grafit furnace,per contoh,130000,contoh air (SNI Air & Permenkes)
+269,Kalium (K),per contoh,70000,contoh air
+270,Kalsium (Ca),per contoh,55000,contoh air
+271,Kekeruhan,per contoh,50000,contoh air
+272,Kesadahan Ca,per contoh,50000,contoh air
+273,Kesadahan Mg,per contoh,50000,contoh air
+274,Kesadahan total,per contoh,60000,contoh air
+275,Khlor bebas (Cl2),per contoh,60000,contoh air
+276,Khlorida (Cl),per contoh,70000,contoh air
+277,Kobalt (Co),per contoh,70000,contoh air
+278,Kromium (Cr),per contoh,70000,contoh air
+279,Kromium heksa valen (Cr 6+),per contoh,60000,contoh air
+280,Magnesium (Mg),per contoh,55000,contoh air
+281,Mangan (Mn),per contoh,70000,contoh air
+282,Minyak dan lemak,per contoh,200000,contoh air
+283,Natrium (Na),per contoh,55000,contoh air
+284,Nikel (Ni),per contoh,70000,contoh air
+285,Nitrat (NO3),per contoh,50000,contoh air
+286,Nitrat limbah (JIS),per contoh,60000,contoh air
+287,Nitrit (NO2),per contoh,50000,contoh air
+288,Perak (Ag),per contoh,130000,contoh air
+289,Raksa (Hg),per contoh,130000,contoh air
+290,Seng (Zn),per contoh,70000,contoh air
+291,Tembaga (Cu),per contoh,70000,contoh air
+292,Timah (Sn),per contoh,120000,contoh air
+293,Timbal (Pb),per contoh,70000,contoh air limbah
+294,Timbal (Pb) metode Grafit furnace,per contoh,125000,contoh air (SNI Air & Permenkes)
+295,Total Organic Carbon (TOC),per contoh,325000,contoh air
+296,Padatan terlarut (TDS),per contoh,50000,contoh air
+297,Padatan tersuspensi (TSS),per contoh,120000,contoh air
+298,Padatan total,per contoh,60000,contoh air
+299,pH (derajat keasaman),per contoh,30000,contoh air
+300,Keadaan - Rasa,per contoh,20000,contoh air
+301,RSC (Perbandingan Sodium Karbonat),per contoh,50000,contoh air - TIDAK BISA -
+302,Salinitas,per contoh,50000,contoh air
+303,SAR (Perbandingan Penyerapan Sodium),per contoh,40000,contoh air - TIDAK BISA -
+304,Selenium (Se),per contoh,150000,contoh air
+305,Sianida (CN),per contoh,150000,contoh air
+306,Silika (Si),per contoh,60000,contoh air
+307,Suhu,per contoh,20000,contoh air
+308,Sulfat (SO4),per contoh,50000,contoh air
+309,Sulfida (H2S),per contoh,130000,contoh air limbah
+310,Keadaan - Warna,per contoh,30000,contoh air
+311,Zat organik,per contoh,45000,contoh air
+312,Pencahayaan,per contoh,75000,udara - TIDAK BISA -
+313,Arah Angin,per contoh,30000,udara di luar ruang lingkup akreditasi
+314,Minyak mineral,per contoh,560000,contoh air
+315,Amoniak,per contoh,110000,udara di luar ruang lingkup akreditasi
+316,Arah kecepatan angin,per contoh,60000,udara di luar ruang lingkup akreditasi
+317,Asam sulfida (H2S),per contoh,130000,udara di luar ruang lingkup akreditasi
+318,Debu + Timbal,per contoh,300000,udara di luar ruang lingkup akreditasi
+319,Hidrogen Fluorida (HF) emisi,per contoh,180000,udara di luar ruang lingkup akreditasi
+320,Karbon monoksida (CO) Udara,per contoh,120000,udara di luar ruang lingkup akreditasi
+321,Kebisingan,per contoh,80000,udara di luar ruang lingkup akreditasi
+322,Kelembaban,per contoh,40000,udara di luar ruang lingkup akreditasi
+323,Khlor bebas (Cl2) emisi,per contoh,150000,udara di luar ruang lingkup akreditasi
+324,Nitrogen oksida (NOx),per contoh,100000,udara di luar ruang lingkup akreditasi
+325,Oksigen (Ox),per contoh,100000,udara di luar ruang lingkup akreditasi
+326,Partikel debu,per contoh,200000,udara di luar ruang lingkup akreditasi
+327,Suhu,per contoh,30000,udara di luar ruang lingkup akreditasi
+328,Sulfur oksida (SOx),per contoh,130000,udara di luar ruang lingkup akreditasi
+329,Ozon / O3,per contoh,100000,udara di luar ruang lingkup akreditasi
+330,Penerbitan LHU : Bahasa Indonesia,per sertifikat,10000,
+331,Penerbitan LHU : Bahasa Inggris,per sertifikat,50000,
+332,Alih bahasa LHU,per sertifikat,50000,
+333,Revisi nama / merk / dll,per sertifikat,50000,
+334,Biaya pengiriman kuitansi area Jawa,per pengiriman,25000,
+335,Biaya pengiriman kuitansi area Luar Jawa,per pengiriman,30000,
+336,Swab test,orang per hari,1000000,
+337,Agar-agar tepung SNI 2802:2015,per contoh,1820000,
+338,Air demineral SNI 6241:2015,per contoh,1775000,termasuk perak (Ag) wajib
+339,Air demineral SNI 6241:2015 + Bromat,per contoh,2160000,termasuk perak (Ag) wajib
+340,Air mineral alami SNI 6242:2015,per contoh,6205000,
+341,Air mineral alami SNI 6242:2015 berkarbonasi,per contoh,6530000,
+342,Air mineral SNI 3553:2015,per contoh,2585000,
+343,Air mineral SNI 3553:2015 + Bromat,per contoh,2985000,
+344,Air mineral SNI 3553:2015 + Bromat dan Perak,per contoh,3115000,
+345,Air minum embun SNI 7812:2013,per contoh,2955000,
+346,Air Minum pH Tinggi SNI 8982:2021,per contoh,4915000,"termasuk bromat, mikro n5"
+347,Bakpia kacang hijau SNI 01-4291-1996,per contoh,2280000,"termasuk pengawet benzoat, sulfit, kalium sorbat"
+348,Bakso daging SNI 3818:2014,per contoh,2105000,
+349,Bawang merah goreng SNI 7713:2013,per contoh,2320000,
+350,Bihun instan SNI 3742:2019,per contoh,6320000,
+351,Bihun SNI 01-2975-2006,per contoh,1355000,
+352,Biji Kopi SNI 01-2907-2008,per contoh,tidak bisa,
+353,Biskuit SNI 2973:2011,per contoh,2210000,
+354,Es Krim SNI 3713:2018,per contoh,3615000,
+355,Garam konsumsi beryodium SNI 3556:2010,per contoh,820000,
+356,Garam konsumsi beryodium SNI 3556:2016,per contoh,820000,
+357,Gula kristal - Bagian 1: Mentah (raw sugar) SNI 3140.1:2008/Amd1:2011,per contoh,565000,
+358,Gula kristal - Bagian 1: Mentah SNI 3140.1:2008,per contoh,565000,
+359,Gula kristal - Bagian 2: Rafinasi SNI 01-3140.2-2006,per contoh,1805000,
+360,Gula kristal - Bagian 2: Rafinasi SNI 3140-2:2018,per contoh,,
+361,Gula kristal - Bagian 2: Rafinasi SNI 3140.2-2011,per contoh,2695000,
+362,Gula kristal - Bagian 3: Putih SNI 3140-3:2020,per contoh,1625000,
+363,Gula kristal - Bagian 3: Putih SNI 3140.3:2010,per contoh,1400000,
+364,Gula kristal - Bagian 3: Putih SNI 3140.3:2010/Amd1:2011,per contoh,1400000,
+365,Jelly Hidrokoloid SNI 01-3552-2018,per contoh,,
+366,Kacang garing SNI 01-4301-1996,per contoh,,
+367,Kakao bubuk SNI 3747:2009,per contoh,2160000,
+368,Kakao bubuk SNI 3747:2013,per contoh,2135000,
+369,Kakao massa SNI 3749:2009,per contoh,2230000,
+370,Keripik Buah SNI 8370:2018,per contoh,3245000,mikro n5
+371,Keripik kentang SNI 4031:2018,per contoh,4115000,mikro n5
+372,Keripik singkong SNI 4305:2018,per contoh,4295000,mikro n5
+373,Keripik Tempe SNI 2602:2018,per contoh,4400000,mikro n5
+374,"Kerupuk ikan, udang dan moluska SNI 8272:2016",per contoh,1760000,"diluar parameter ""sensori"" mikro n5"
+375,Kodeks makanan Indonesia SNI 01-0219-1987,per contoh,,
+376,Kopi bubuk SNI 01-3542-2004,per contoh,1715000,
+377,Kopi instan SNI 2983:2014,per contoh,3185000,
+378,Kopi premix SNI 8773:2019 (mengandung susu),per contoh,2480000,mikro n5
+379,Kopi premix SNI 8773:2019 (mengandung krimer),per contoh,2530000,mikro n5
+380,Kopi Sangrai dan Kopi Bubuk SNI 8964:2021,per contoh,3465000,mikro n5
+381,Kornet daging sapi (corned beef) SNI 3775:2015,per contoh,1945000,
+382,Krimer nabati bubuk SNI 4444:2018,per contoh,4310000,
+383,Kue lapis SNI 01-4309-1996,per contoh,2220000,"termasuk sakarin siklamat, na benzoat, k. sorbat (kualitatif)"
+384,Lemak kakao SNI 3748:2009,per contoh,1785000,
+385,Makanan ringan ekstrudat SNI 2866:2015,per contoh,2245000,
+386,Madu SNI 8664:2018,per contoh,1390000,tanpa analisa kloramfenikol
+387,Margarin SNI 3541:2014 (salted),per contoh,2200000,
+388,Margarin SNI 3541:2014 (unsalted),,2030000,
+389,Mi instan SNI 3551:2018 (digoreng),per contoh,,
+390,Mi instan SNI 3551:2018 (dioven),,,
+391,Mi kering SNI 8217:2015 (proses mi digoreng),per contoh,2980000,
+392,Mi kering SNI 8217:2015 (proses mi dikeringkan),per contoh,2815000,
+393,Minuman sari buah SNI 3719:2014,per contoh,1905000,
+394,Minuman susu fermentasi berperisa SNI 7552:2009,per contoh,2168150,bakteri starter subkon
+395,Minuman teh dalam kemasan SNI 3143:2011,per contoh,1600000,
+396,Minyak Goreng Kelapa SNI 8904:2020,per contoh,2222500,
+397,Minyak goreng sawit SNI 7709:2019,per contoh,1655000,
+398,Minyak goreng SNI 3741:2013,per contoh,1875000,
+399,Mononatrium L-glutamat SNI 8067:2015,per contoh,,
+400,Pati jagung SNI 8523:2018,per contoh,5460000,
+401,Produk Remah Roti (Breadcrumbs) SNI 8906:2020,per contoh,3715000,mikro n5
+402,Pupuk Fosfat Alam untuk Pertanian SNI 02-3776-2005,per contoh,1000000,
+403,Pupuk Kalium Klorida SNI 02-2805-2005,per contoh,260000,
+404,Pupuk NPK Padat SNI 2803:2012,per contoh,1145000,
+405,Pupuk SP-36 SNI 02-3769-2005,per contoh,1095000,
+406,Pupuk Tripel Superfosfat SNI 02-0086-2005,per contoh,1375000,
+407,Pupuk Urea SNI 2801:2010,per contoh,335000,
+408,Roti manis SNI 8372:2018,per contoh,5835000,mikro n5
+409,Roti Tawar SNI 8371:2018,per contoh,4860000,mikro n5
+410,Sari buah apel SNI 01-4867.3-1998,per contoh,2260000,
+411,Saus tomat SNI 01-3546-2004,per contoh,1600000,
+412,Serbuk Minuman Tradisional SNI 01-4320-1996,per contoh,1565000,
+413,Sirup SNI 3544:2013,per contoh,1840000,
+414,Sohun SNI 01-3723-1995,per contoh,1335000,
+415,Sosis daging SNI 3820:2015,per contoh,,
+416,Susu bubuk SNI 2970:2015,per contoh,2940000,"diluar parameter ""Indeks Kelarutan dan Schorched particles"""
+417,Susu coklat bubuk SNI 3752:2009,per contoh,2285000,
+418,Susu kental manis SNI 2971:2011,per contoh,258000,
+419,Susu sereal SNI 01-4270-1996,per contoh,,
+420,Susu UHT (ultra high temperature) SNI 3950:2014,per contoh,2390000,
+421,Teh hijau bubuk SNI 01-4453-1998,per contoh,2035000,
+422,Teh hijau celup SNI 4324:2014,per contoh,1855000,
+423,Teh hitam celup SNI 3753:2014,per contoh,1855000,
+424,Teh hitam SNI 1902:2016,per contoh,1980000,
+425,Teh kering dalam kemasan SNI 3836:2013,per contoh,1990000,
+426,Tempe kedelai SNI 3144:2015,per contoh,1475000,
+427,Tepung agar-agar murni SNI 2802:2021,per contoh,1970000,
+428,Tepung beras SNI 3549:2009,per contoh,1760000,
+429,Tepung bumbu SNI 4476:2018,per contoh,,
+430,Tepung hunkwe SNI 01-3726-1995,per contoh,1945000,
+431,Tepung terigu sebagai bahan makanan SNI 3751:2018,per contoh,8340000,Termasuk DON dan Okratoksin
+432,Yogurt SNI 2981:2009,per contoh,2443150,Bakteri Starter Subkon
+433,Air Bersih sesuai Permenkes 32 tahun 2017,per contoh,2185000,
+434,Air Minum sesuai Permenkes 492 tahun 2010,per contoh,2855000,

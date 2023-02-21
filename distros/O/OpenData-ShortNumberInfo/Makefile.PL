@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.036000;
+use 5.037009;
 
 use ExtUtils::MakeMaker;
 
@@ -14,21 +14,22 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "OpenData-ShortNumberInfo",
   "EXE_FILES" => [
-    "bin/shortnumberinfo"
+    "bin/short_number"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.036000",
+  "MIN_PERL_VERSION" => "5.037009",
   "NAME" => "OpenData::ShortNumberInfo",
   "PREREQ_PM" => {
     "HTTP::Tiny" => 0,
     "JSON::PP" => 0,
-    "Object::Pad" => 0,
-    "URI" => 0
+    "URI" => 0,
+    "experimental" => 0
   },
   "TEST_REQUIRES" => {
-    "Test::More" => 0
+    "Test::More" => 0,
+    "feature" => 0
   },
-  "VERSION" => "0.230380",
+  "VERSION" => "0.230470",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,9 +39,10 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "HTTP::Tiny" => 0,
   "JSON::PP" => 0,
-  "Object::Pad" => 0,
   "Test::More" => 0,
-  "URI" => 0
+  "URI" => 0,
+  "experimental" => 0,
+  "feature" => 0
 );
 
 

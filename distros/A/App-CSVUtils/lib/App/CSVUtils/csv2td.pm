@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-03'; # DATE
+our $DATE = '2023-02-18'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.008'; # VERSION
+our $VERSION = '1.017'; # VERSION
 
 use App::CSVUtils qw(gen_csv_util);
 
@@ -62,7 +62,7 @@ App::CSVUtils::csv2td - Return an enveloped aoaos table data from CSV data
 
 =head1 VERSION
 
-This document describes version 1.008 of App::CSVUtils::csv2td (from Perl distribution App-CSVUtils), released on 2023-02-03.
+This document describes version 1.017 of App::CSVUtils::csv2td (from Perl distribution App-CSVUtils), released on 2023-02-18.
 
 =head1 FUNCTIONS
 

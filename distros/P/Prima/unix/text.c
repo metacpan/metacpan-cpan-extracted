@@ -12,6 +12,7 @@
 #define SHIFT(a,b)	{ (a) += XX-> btransform. x; (b) += XX-> btransform. y; }
 #define RANGE(a)        { if ((a) < -16383) (a) = -16383; else if ((a) > 16383) a = 16383; }
 #define RANGE2(a,b)     RANGE(a) RANGE(b)
+#define MY_MATRIX (PDrawable(self)->current_state.matrix)
 
 typedef struct {
 	int default_char1;
@@ -124,7 +125,9 @@ gp_text_out_rotated(
 
 	if ( !prima_update_rotated_fonts( XX-> font,
 		text, len, wide,
-		PDrawable( self)-> font. direction, &r, ok_to_not_rotate
+		PDrawable( self)-> font. direction, 
+		MY_MATRIX,
+		&r, ok_to_not_rotate
 	))
 		return false;
 
@@ -154,8 +157,8 @@ gp_text_out_rotated(
 
 		/* find reference point in pixmap */
 		px = ( cs-> lbearing < 0) ? -cs-> lbearing : 0;
-		rx. l = px * r-> cos2. l - py * r-> sin2. l + UINT16_PRECISION/2;
-		ry. l = px * r-> sin2. l + py * r-> cos2. l + UINT16_PRECISION/2;
+		rx. l = px * r-> matrix[0]. l + py * r-> matrix[2]. l + UINT16_PRECISION/2;
+		ry. l = px * r-> matrix[1]. l + py * r-> matrix[3]. l + UINT16_PRECISION/2;
 		psx = rx. i. i - r-> shift. x;
 		psy = ry. i. i - r-> shift. y;
 
@@ -166,8 +169,8 @@ gp_text_out_rotated(
 			real_ax += positions[i * 2];
 			real_ay += positions[i * 2 + 1];
 		}
-		rx. l = real_ax * r-> cos2. l - real_ay * r-> sin2. l + UINT16_PRECISION/2;
-		ry. l = real_ax * r-> sin2. l + real_ay * r-> cos2. l + UINT16_PRECISION/2;
+		rx. l = real_ax * r-> matrix[0]. l + real_ay * r-> matrix[2]. l + UINT16_PRECISION/2;
+		ry. l = real_ax * r-> matrix[1]. l + real_ay * r-> matrix[3]. l + UINT16_PRECISION/2;
 		dsx = x + rx. i. i - psx;
 		dsy = REVERT( y + ry. i. i) + psy - r-> dimension. y + 1;
 
@@ -267,13 +270,13 @@ gp_text_out_rotated(
 
 		if ( PDrawable( self)-> font. style & fsUnderlined) {
 			ay = d + ( XX-> flags. base_line ? 0 : XX-> font-> font. descent);
-			rx. l = -ovx.x * r-> cos2. l - ay * r-> sin2. l + 0.5;
-			ry. l = -ovx.x * r-> sin2. l + ay * r-> cos2. l + 0.5;
+			rx. l = -ovx.x * r-> matrix[0]. l + ay * r-> matrix[2]. l + 0.5;
+			ry. l = -ovx.x * r-> matrix[1]. l + ay * r-> matrix[3]. l + 0.5;
 			x1 = x + rx. i. i;
 			y1 = y + ry. i. i;
 			tw += ovx.y;
-			rx. l = tw * r-> cos2. l - ay * r-> sin2. l + 0.5;
-			ry. l = tw * r-> sin2. l + ay * r-> cos2. l + 0.5;
+			rx. l = tw * r-> matrix[0]. l + ay * r-> matrix[2]. l + 0.5;
+			ry. l = tw * r-> matrix[1]. l + ay * r-> matrix[3]. l + 0.5;
 			x2 = x + rx. i. i;
 			y2 = y + ry. i. i;
 			XDrawLine( DISP, XX-> gdrawable, XX-> gc, x1, REVERT( y1), x2, REVERT( y2));
@@ -282,13 +285,13 @@ gp_text_out_rotated(
 		if ( PDrawable( self)-> font. style & fsStruckOut) {
 			ay = (PDrawable( self)-> font.ascent - PDrawable( self)-> font.internalLeading)/2 +
 				+ ( XX-> flags. base_line ? 0 : XX-> font-> font. descent);
-			rx. l = -ovx.x * r-> cos2. l - ay * r-> sin2. l + 0.5;
-			ry. l = -ovx.x * r-> sin2. l + ay * r-> cos2. l + 0.5;
+			rx. l = -ovx.x * r-> matrix[0]. l + ay * r-> matrix[2]. l + 0.5;
+			ry. l = -ovx.x * r-> matrix[1]. l + ay * r-> matrix[3]. l + 0.5;
 			x1 = x + rx. i. i;
 			y1 = y + ry. i. i;
 			tw += ovx.y;
-			rx. l = tw * r-> cos2. l - ay * r-> sin2. l + 0.5;
-			ry. l = tw * r-> sin2. l + ay * r-> cos2. l + 0.5;
+			rx. l = tw * r-> matrix[0]. l + ay * r-> matrix[2]. l + 0.5;
+			ry. l = tw * r-> matrix[1]. l + ay * r-> matrix[3]. l + 0.5;
 			x2 = x + rx. i. i;
 			y2 = y + ry. i. i;
 			XDrawLine( DISP, XX-> gdrawable, XX-> gc, x1, REVERT( y1), x2, REVERT( y2));
@@ -304,33 +307,22 @@ gp_text_out_rotated(
 	return true;
 }
 
+void
+prima_paint_text_background( Handle self, Point * p, int x, int y )
+{
+	Matrix m;
+	COPY_MATRIX_WITHOUT_TRANSLATION( MY_MATRIX, m );
+	m[4] = x;
+	m[5] = y;
+	prima_paint_box( self, p[2].x, p[2].y, m, X(self)->back.primary);
+}
+
 static void
 paint_text_background( Handle self, const char * text, int x, int y, int len, int flags)
-{	
-	DEFXX;
-	int i;
+{
 	Point * p;
-	FillPattern fp;
-
-	memcpy( &fp, apc_gp_get_fill_pattern( self), sizeof( FillPattern));
 	p = gp_get_text_box( self, text, len, flags);
-	XSetForeground( DISP, XX-> gc, XX-> back. primary);
-	XX-> flags. brush_back = 0;
-	XX-> flags. brush_fore = 1;
-	XX-> fore. balance = 0;
-	XSetFunction( DISP, XX-> gc, GXcopy);
-	apc_gp_set_fill_pattern( self, fillPatterns[fpSolid]);
-	for ( i = 0; i < 4; i++) {
-		p[i].x += x;
-		p[i].y += y;
-	}
-	i = p[2].x; p[2].x = p[3].x; p[3].x = i;
-	i = p[2].y; p[2].y = p[3].y; p[3].y = i;
-
-	apc_gp_fill_poly( self, 4, p);
-	apc_gp_set_rop( self, XX-> rop);
-	apc_gp_set_color( self, XX-> fore. color);
-	apc_gp_set_fill_pattern( self, fp);
+	prima_paint_text_background( self, p, x, y);
 	free( p);
 }
 
@@ -347,6 +339,8 @@ draw_text_underline(Handle self, const char * text, int x, int y, int len, int f
 		lw = gcv.line_width = XX-> font-> underlineThickness;
 		XChangeGC( DISP, XX-> gc, GCLineWidth, &gcv);
 	}
+	if ( !XX-> flags. base_line)
+		y += XX-> font-> font. descent;
 	if ( PDrawable( self)-> font. style & fsUnderlined)
 		XDrawLine( DISP, XX-> gdrawable, XX-> gc,
 			x - ovx.x, REVERT( y + d), x + tw - 1 + ovx.y, REVERT( y + d));
@@ -471,7 +465,7 @@ apc_gp_text_out( Handle self, const char * text, int x, int y, int len, int flag
 
 	SHIFT(x, y);
 	RANGE2(x,y);
-	if ( PDrawable( self)-> font. direction != 0) {
+	if ( PDrawable( self)-> font. direction != 0.0 || !prima_matrix_is_translated_only(MY_MATRIX)) {
 		Bool ok_to_not_rotate = false;
 		Bool ret;
 		ret = gp_text_out_rotated( self, text, NULL, NULL, x, y, len, flags, &ok_to_not_rotate);
@@ -764,7 +758,7 @@ apc_gp_get_glyphs_width( Handle self, PGlyphsOutRec t)
 
 #ifdef USE_XFT
 	if ( X(self)-> font-> xft)
-		return prima_xft_get_glyphs_width( X(self)-> font, t, NULL);
+		return prima_xft_get_glyphs_width( self, X(self)-> font, t, NULL);
 #endif
 
 	SWAP_BYTES(t->glyphs,t->len);

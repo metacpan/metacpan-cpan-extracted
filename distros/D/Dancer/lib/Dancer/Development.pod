@@ -13,7 +13,7 @@ Dancer::Development - guide for developers interested in contributing
 
 =head1 VERSION
 
-version 1.3520
+version 1.3521
 
 =head1 DESCRIPTION
 

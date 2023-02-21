@@ -80,9 +80,9 @@ sub readopts {
 			$content .= "file '$input'\n";
 		}
 		print "Writing " . $self->url . " with content:\n$content\n";
-		open CONCAT, ">" . $self->url;
-		print CONCAT $content;
-		close CONCAT;
+		open my $concat, ">", $self->url;
+		print $concat $content;
+		close $concat;
 	}
 
 	return ('-f', 'concat', '-safe', '0', $self->Media::Convert::Asset::readopts());

@@ -1,5 +1,7 @@
 Revision history for Excel-ValueReader-XLSX
 
+1.10 12.02.2023
+  - support cells without an 'r' attribute (David Flink++)
 
 1.09 22.01.2023
   - fix bug on parsing empty string nodes with LibXML (ulibuck++)

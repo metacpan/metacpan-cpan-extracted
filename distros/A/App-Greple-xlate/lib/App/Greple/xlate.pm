@@ -1,6 +1,6 @@
 package App::Greple::xlate;
 
-our $VERSION = "0.06";
+our $VERSION = "0.08";
 
 =encoding utf-8
 
@@ -56,6 +56,10 @@ C<(?s).*>.
 
 =item B<--xlate-color>
 
+=item B<--xlate-fold>
+
+=item B<--xlate-fold-width>=I<n> (Default: 70)
+
 Invoke the translation process for each matched area.
 
 Without this option, B<greple> behaves as a normal search command.  So
@@ -65,7 +69,13 @@ translation before invoking actual work.
 Command result goes to standard out, so redirect to file if necessary,
 or consider to use L<App::Greple::update> module.
 
-B<--xlate> calls B<--xlate-color> option with B<--color=never> option.
+Option B<--xlate> calls B<--xlate-color> option with B<--color=never>
+option.
+
+With B<--xlate-fold> option, converted text is folded by the specified
+width.  Default width is 70 and can be set by B<--xlate-fold-width>
+option.  Four columns are reserved for run-in operation, so each line
+could hold 74 characters at most.
 
 =item B<--xlate-engine>=I<engine>
 
@@ -126,14 +136,6 @@ If the format is C<none> or unkown, only translated text is printed.
 =item B<-->[B<no->]B<xlate-progress> (Default: True)
 
 See the tranlsation result in real time in the STDERR output.
-
-=item B<--xlate-fold>
-
-=item B<--xlate-fold-width>=I<n> (Default: 70)
-
-Fold converted text by the specified width.  Default width is 70 and
-can be set by B<--xlate-fold-width> option.  Four columns are reserved
-for run-in operation, so each line could hold 74 characters at most.
 
 =item B<--match-entire>
 
@@ -237,18 +239,24 @@ use Data::Dumper;
 use JSON;
 use Text::ANSI::Fold ':constants';
 use App::cdif::Command;
+use Hash::Util qw(lock_keys);
+use Unicode::EastAsianWidth;
 
-our $xlate_engine;
-our $show_progress = 1;
-our $output_format = 'conflict';
-our $collapse_spaces = 1;
-our $lang_from = 'ORIGINAL';
-our $lang_to = 'JA';
-our $fold_line = 0;
-our $fold_width = 70;
-our $auth_key;
-our $cache_method //= $ENV{GREPLE_XLATE_CACHE} || 'auto';
-our $dryrun = 0;
+my %opt = (
+    engine   => \(our $xlate_engine),
+    progress => \(our $show_progress = 1),
+    format   => \(our $output_format = 'conflict'),
+    collapse => \(our $collapse_spaces = 1),
+    from     => \(our $lang_from = 'ORIGINAL'),
+    to       => \(our $lang_to = 'JA'),
+    fold     => \(our $fold_line = 0),
+    width    => \(our $fold_width = 70),
+    auth_key => \(our $auth_key),
+    method   => \(our $cache_method //= $ENV{GREPLE_XLATE_CACHE} || 'auto'),
+    dryrun   => \(our $dryrun = 0),
+    );
+lock_keys %opt;
+sub opt :lvalue { ${$opt{+shift}} }
 
 my $current_file;
 
@@ -279,7 +287,8 @@ my $old_cache = {};
 my $new_cache = {};
 my $xlate_cache_update;
 
-sub prologue {
+sub setup {
+    return if state $once_called++;
     if (defined $cache_method) {
 	if ($cache_method eq '') {
 	    $cache_method = 'auto';
@@ -310,8 +319,13 @@ sub prologue {
 
 sub normalize {
     $_[0] =~ s{^.+(?:\n.+)*}{
-	${^MATCH} =~ s/\A\s+|\s+\z//gr =~ s/\s+/ /gr
+	${^MATCH}
+	    =~ s/\A\s+|\s+\z//gr
+	    =~ s/(?<=\p{InFullwidth})\n(?=\p{InFullwidth})//gr
+	    =~ s/\s+/ /gr
     }pmger;
+
+
 }
 
 sub postgrep {
@@ -406,6 +420,7 @@ sub write_cache {
 }
 
 sub begin {
+    setup if not (state $done++);
     my %args = @_;
     $current_file = delete $args{&::FILELABEL} or die;
     s/\z/\n/ if /.\z/;
@@ -434,13 +449,21 @@ sub end {
     }
 }
 
+sub setopt {
+    while (my($key, $val) = splice @_, 0, 2) {
+	next if $key eq &::FILELABEL;
+	die "$key: Invalid option.\n" if not exists $opt{$key};
+	opt($key) = $val;
+    }
+}
+
 1;
 
 __DATA__
 
 builtin xlate-progress!    $show_progress
 builtin xlate-format=s     $output_format
-builtin xlate-fold!        $fold_line
+builtin xlate-fold-line!   $fold_line
 builtin xlate-fold-width=i $fold_width
 builtin xlate-from=s       $lang_from
 builtin xlate-to=s         $lang_to
@@ -450,17 +473,17 @@ builtin xlate-dryrun       $dryrun
 
 builtin deepl-auth-key=s   $__PACKAGE__::deepl::auth_key
 
-option default \
-	--face +E --ci=A \
-	--prologue &__PACKAGE__::prologue
+option default --face +E --ci=A
+
+option --xlate-setopt --prologue &__PACKAGE__::setopt($<shift>)
 
 option --xlate-color \
 	--postgrep &__PACKAGE__::postgrep \
 	--callback &__PACKAGE__::callback \
 	--begin    &__PACKAGE__::begin \
 	--end      &__PACKAGE__::end
-
 option --xlate --xlate-color --color=never
+option --xlate-fold --xlate --xlate-fold-line
 
 option --match-entire    --re '\A(?s).+\z'
 option --match-paragraph --re '^(.+\n)+'

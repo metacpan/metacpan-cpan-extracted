@@ -1,8 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More tests => 1;
+use Test2::V0;
 
-use_ok( "String::Tagged::HTML" );
+require String::Tagged::HTML;
+
+pass "Modules loaded";
+done_testing;

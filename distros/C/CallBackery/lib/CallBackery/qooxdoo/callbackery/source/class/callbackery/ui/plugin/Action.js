@@ -172,6 +172,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                     case 'logout':
                     case 'cancel':
                     case 'download':
+                    case 'display':
                         if (btCfg.addToMenu != null) {
                             button = new qx.ui.menu.Button(label);
                         }
@@ -321,6 +322,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                             }
                             break;
                         case 'download':
+                        case 'display':
                             var formData = getFormData();
                             if (formData === false){
                                 callbackery.ui.MsgBox.getInstance().error(
@@ -331,6 +333,15 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                             }
                             var key = btCfg.key;
                             callbackery.data.Server.getInstance().callAsyncSmart(function(cookie){
+                                let url = 'download'
+                                +'?name='+cfg.name
+                                +'&key='+key
+                                +'&xsc='+encodeURIComponent(cookie)
+                                +'&formData='+encodeURIComponent(qx.lang.Json.stringify(formData));
+                                if (btCfg.action == 'display') {
+                                    window.open(url + '&display=1','_blank');
+                                    return;
+                                }
                                 var iframe = new qx.ui.embed.Iframe().set({
                                     width: 100,
                                     height: 100
@@ -367,13 +378,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                                     }
                                     that.getApplicationRoot().remove(iframe);
                                 });
-                                iframe.setSource(
-                                    'download'
-                                    +'?key='+key
-                                    +'&xsc='+encodeURIComponent(cookie)
-                                    +'&name='+cfg.name
-                                    +'&formData='+encodeURIComponent(qx.lang.Json.stringify(formData))
-                                );
+                                iframe.setSource(url);
                                 that.getApplicationRoot().add(iframe,{top: -1000,left: -1000});
                             },'getSessionCookie');
                             break;

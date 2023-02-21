@@ -9,6 +9,8 @@ lib/Terse/View.pm
 lib/Terse/WebSocket.pm
 Makefile.PL
 MANIFEST			This list of files
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 README
 t/000-load.t
 t/001-basic.t
@@ -19,6 +21,9 @@ t/103-terse_logger.t
 t/104-terse_logError.t
 t/105-terse_logInfo.t
 t/106-terse_raiseError.t
+t/107-graft.t
+t/108-pretty.t
+t/109-serialize.t
 t/200-controller.t
 t/lib/Hospital.pm
 t/lib/Hospital2.pm
@@ -40,5 +45,3 @@ t/manifest.t
 t/pod-coverage.t
 t/pod.t
 xt/boilerplate.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

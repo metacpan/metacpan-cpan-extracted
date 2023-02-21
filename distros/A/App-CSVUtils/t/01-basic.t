@@ -10,7 +10,7 @@ use Test::Needs;
 use App::CSVUtils;
 use Capture::Tiny ':all';
 use File::Temp qw(tempdir);
-use File::Slurper qw(write_text);
+use File::Slurper qw(read_text write_text);
 
 my $dir = tempdir(CLEANUP => 1);
 write_text("$dir/empty.csv", '');
@@ -554,11 +554,6 @@ _
     # XXX test opt:ignore_case
 };
 
-subtest "csv_csv" => sub {
-    # TODO
-    ok 1;
-};
-
 subtest "csv_uniq" => sub {
     require App::CSVUtils::csv_uniq;
 
@@ -574,6 +569,19 @@ subtest "csv_uniq" => sub {
     is((capture_stdout { $res = App::CSVUtils::csv_uniq::csv_uniq(input_filename=>"$dir/uniq.csv", fields=>["f1","f3"]) }), "", "no duplicate values in fields f1+f3");
     is((capture_stdout { $res = App::CSVUtils::csv_uniq::csv_uniq(input_filename=>"$dir/uniq.csv", fields=>["f1","f3"], ignore_case=>1) }), "csv-uniq: Duplicate value '4|b'\n", "Duplicate values (ignore_case) in fields f1+f3");
     is((capture_stdout { $res = App::CSVUtils::csv_uniq::csv_uniq(input_filename=>"$dir/uniq.csv", fields=>["f2"], unique=>1) }), "csv-uniq: Unique value '2'\ncsv-uniq: Unique value '5'\ncsv-uniq: Unique value '7'\n", "unique values reported");
+};
+
+subtest "csv_csv, opt: --inplace" => sub {
+    require App::CSVUtils::csv_csv;
+
+    App::CSVUtils::csv_csv::csv_csv(input_filename=>"$dir/4.csv", output_always_quote=>1, inplace=>1);
+    is(read_text("$dir/4.csv"), qq("f1","F3","f2"\n"1","2","3"\n"4","5","6"\n));
+    App::CSVUtils::csv_csv::csv_csv(input_filename=>"$dir/4.csv", output_always_quote=>0, inplace=>1, inplace_backup_ext=>"~");
+    is(read_text("$dir/4.csv"), qq(f1,F3,f2\n1,2,3\n4,5,6\n));
+    is(read_text("$dir/4.csv~"), qq("f1","F3","f2"\n"1","2","3"\n"4","5","6"\n));
+
+    # TODO: test with util that reads multiple csv
+    # TODO: test with util that writes multiple csv
 };
 
 done_testing;

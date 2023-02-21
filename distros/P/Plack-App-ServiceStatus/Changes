@@ -1,5 +1,20 @@
 Changes for Plack::App::ServiceStatus
 
+0.911     2023-02-14 20:58:04+01:00
+    - use more complex strftime format, which is also more portable (Thomas Klausner)
+    - bump perl req to 5.24 so i can use postfix deref (Thomas Klausner)
+    - Fixed minor pod typo. (Mohammad S Anwar)
+
+
+0.910     2023-02-09 21:41:03+01:00
+    - add started_at_iso8601 human readable timestamp (Thomas Klausner)
+
+
+0.909     2023-02-09 21:12:45+01:00
+    - add script to generate buildinfo (Thomas Klausner)
+    - display buildinfo from a json file (Thomas Klausner)
+
+
 0.908     2022-09-19 13:15:06+02:00
     - less bug-prone way to pass args to object during new
 

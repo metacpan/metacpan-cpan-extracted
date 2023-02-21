@@ -1,0 +1,140 @@
+use alienfile;
+
+use JSON::PP qw( decode_json );
+use Path::Tiny qw( path );
+
+plugin 'Probe::CommandLine' => (
+  command => 'zig',
+  args    => [ 'version' ],
+  match   => qr/^([0-9\.]+)(-.*)?$/,
+  version => qr/^([0-9\.]+)(-.*)?$/,
+);
+
+sub _decode {
+  if( $_[0]->{content} ) {
+    return decode_json($_[0]->{content});
+  } elsif( $_[0]->{path} ) {
+    return decode_json( path($_[0]->{path})->slurp_raw );
+  }
+}
+
+share {
+  requires 'Alien::Build::CommandSequence';
+  requires 'Sort::Versions';
+  requires 'Alien::unzip' if $^O eq 'MSWin32';
+
+  start_url 'https://ziglang.org/download/index.json';
+
+  my %os_arch_mapping = (
+    "MSWin32:x86_64"  => 'x86_64-windows',
+    "MSWin32:x86"     => 'x86-windows',
+    "MSWin32:aarch64" => 'aarch64-windows',
+    "darwin:aarch64"  => 'aarch64-macos',
+    "darwin:x86_64"   => 'x86_64-macos',
+    "linux:x86_64"    => 'x86_64-linux',
+    "linux:x86"       => 'x86-linux',
+    "linux:aarch64"   => 'aarch64-linux',
+    #"linux:"   => 'linux-riscv64',
+    #"linux:"   => 'linux-powerpc64le',
+    #"linux:"   => 'linux-powerpc',
+  );
+
+  my $os_arch = join ":", $^O, meta->prop->{platform}{cpu}{arch}{name};
+
+  plugin 'Download' => (
+    version => qr/zig(?:-.*)?-([0-9\.]+.*)\.(?:zip|tar\.xz)$/,
+  );
+
+  meta->around_hook( fetch => sub {
+    my $orig = shift;
+    my $build = shift;
+
+    my $data = $orig->($build, @_);
+
+    if( $data->{filename} eq 'index.json' ) {
+      my $downloads = _decode($data);
+      my $dev = delete $downloads->{master};
+      $downloads->{ $dev->{version} } = $dev;
+
+      my $zig_os_arch = $os_arch_mapping{$os_arch};
+      my $dev_has_os_arch = exists $dev->{$zig_os_arch};
+      my $use_binary_release = !! $dev_has_os_arch;
+
+      #$use_binary_release = 0;
+
+      my @versions = sort { Sort::Versions::versioncmp( $b, $a ) } keys %$downloads;
+      my $type = $use_binary_release ? $zig_os_arch : 'src';
+
+      $build->install_prop->{release_style} = $use_binary_release ? 'binary' : 'source';
+      $build->install_prop->{release_format} = (
+        $use_binary_release
+        ? ($^O eq 'MSWin32' ? 'zip' : 'tar.xz')
+        : 'tar.xz'
+      );
+
+
+      return {
+        type => 'list',
+        list => [
+          map {
+            exists $downloads->{$_}{$type}
+            ? (
+              +{
+                filename => ( $downloads->{$_}{$type}{tarball} =~ m,/([^/]+)$, )[0],
+                url      => $downloads->{$_}{$type}{tarball},
+                version  => $_,
+              }
+            ) : ()
+          } @versions
+        ],
+      };
+    } else {
+      return $data;
+    }
+  });
+
+  extract(sub {
+    my ($build) = @_;
+    meta->apply_plugin('Extract',
+      format  => $build->install_prop->{release_format} || 'tar.xz'
+    );
+    # NOTE HACK!!!
+    meta->{hook}{extract}[-1]->(@_);
+  });
+
+  build sub {
+    my ($build) = @_;
+    if( $build->install_prop->{release_style} eq 'source' ) {
+      plugin 'Build::CMake';
+      Alien::Build::CommandSequence->new(
+        ['%{cmake}', @{ meta->prop->{plugin_build_cmake}->{args} }, '%{.install.extract}'],
+        '%{make}',
+        '%{make} install',
+      )->execute($build);
+    } else {
+      plugin 'Build::Copy';
+      # NOTE HACK!!!
+      if( ref(my $last_hook = meta->{hook}{build}[-1]) eq 'Alien::Build::CommandSequence' ) {
+        $last_hook->execute(@_);
+      } else {
+        $last_hook->(@_);
+      }
+    }
+  };
+
+  plugin 'Gather::IsolateDynamic';
+
+  before gather => sub {
+    my ($zig) = grep { -f } path('zig'), path('zig.exe');
+    if( $zig ) {
+      my $bin = path('bin');
+      $bin->mkpath;
+      $zig->move( $zig->absolute($bin) );
+    }
+  };
+
+  after gather => sub {
+    my ($build) = @_;
+    $build->runtime_prop->{'style'} = $build->install_prop->{release_style};
+  };
+}

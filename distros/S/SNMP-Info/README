@@ -2,7 +2,7 @@ NAME
     SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 VERSION
-    SNMP::Info - Version 3.89
+    SNMP::Info - Version 3.92
 
 AUTHOR
     SNMP::Info is maintained by team of Open Source authors headed by Eric
@@ -23,14 +23,16 @@ DEVICES SUPPORTED
 SYNOPSIS
      use SNMP::Info;
 
-     my $info = new SNMP::Info(
-                                # Auto Discover more specific Device Class
+     my $info = SNMP::Info->new({
+                                # Auto Discover your Device Class (Cisco, Juniper, etc ...)
                                 AutoSpecify => 1,
                                 Debug       => 1,
+
                                 # The rest is passed to SNMP::Session
                                 DestHost    => 'router',
                                 Community   => 'public',
                                 Version     => 2
+
                                 # Parameter reference for SNMPv3
                                 # Version   => 3
                                 # SecLevel  => 'authPriv', # authPriv|authNoPriv|noAuthNoPriv
@@ -39,10 +41,11 @@ SYNOPSIS
                                 # AuthPass  => 'authp4ss',
                                 # PrivProto => 'DES',      # DES|AES
                                 # PrivPass  => 'pr1vp4ss',
-                              ) or die "Can't connect to device.\n";
+                               });
 
      my $err = $info->error();
-     die "SNMP Community or Version probably wrong connecting to device. $err\n" if defined $err;
+     die $err if defined $err;
+     # usually a wrong DestHost or Community or Version if you have trouble here
 
      my $name  = $info->name();
      my $class = $info->class();
@@ -526,6 +529,11 @@ SUBCLASSES
 
             See documentation in SNMP::Info::Layer2::Exinda for details.
 
+        SNMP::Info::Layer2::Hirschmann
+            Subclass for Hirschmann switches
+
+            See documentation in SNMP::Info::Layer2::Hirschmann for details.
+
         SNMP::Info::Layer2::HP
             Subclass for more recent HP Procurve Switches.
 
@@ -819,6 +827,11 @@ SUBCLASSES
 
             See documentation in SNMP::Info::Layer3::N1600 for details.
 
+        SNMP::Info::Layer3::Netonix
+            Subclass for Netonix switches.
+
+            See documentation in SNMP::Info::Layer3::Netonix for details.
+
         SNMP::Info::Layer3::NetSNMP
             Subclass for host systems running Net-SNMP.
 
@@ -994,18 +1007,24 @@ USAGE
     new()
         Creates a new object and connects via SNMP::Session.
 
-         my $info = new SNMP::Info( 'Debug'             => 1,
-                                    'AutoSpecify'       => 1,
-                                    'BigInt'            => 1,
-                                    'BulkWalk'          => 1,
-                                    'BulkRepeaters'     => 20,
-                                    'IgnoreNetSNMPConf' => 1,
-                                    'LoopDetect'        => 1,
-                                    'DestHost'          => 'myrouter',
-                                    'Community'         => 'public',
-                                    'Version'           => 2,
-                                    'MibDirs'           => ['dir1','dir2','dir3'],
-                                  ) or die;
+        Always returns an SNMP::Info instance, and you should always check
+        for error() as in SYNOPSIS above to be sure of success.
+
+        Will take a bare list of key/value options but we recommend a HASH
+        ref as in the example below and SYNOPSIS, to catch syntax errors.
+
+         my $info = SNMP::Info->({ 'Debug'             => 1,
+                                   'AutoSpecify'       => 1,
+                                   'BigInt'            => 1,
+                                   'BulkWalk'          => 1,
+                                   'BulkRepeaters'     => 20,
+                                   'LoopDetect'        => 1,
+                                   'IgnoreNetSNMPConf' => 1,
+                                   'DestHost'          => 'myrouter',
+                                   'Community'         => 'public',
+                                   'Version'           => 2,
+                                   'MibDirs'           => ['dir1','dir2','dir3'],
+                                });
 
         SNMP::Info Specific Arguments :
 

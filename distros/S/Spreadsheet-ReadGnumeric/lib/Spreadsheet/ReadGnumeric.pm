@@ -16,37 +16,29 @@ use strict;
 use warnings;
 
 use XML::Parser::Lite;
+use Spreadsheet::Gnumeric::StyleRegion;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
-### Object stuff.
+use parent qw(Spreadsheet::Gnumeric::Base);
 
-# define instance accessors.
-sub BEGIN {
-    no strict 'refs';
-    for my $method (qw(gzipped_p),
-		    qw(current_elt current_attrs chars namespaces element_stack),
-		    qw(sheet cells rc)) {
-	my $field = '_' . $method;
-	*$method = sub {
-	    my $self = shift;
-	    @_ ? $self->{$field} = shift : $self->{$field};
-	}
-    }
+BEGIN {
+    Spreadsheet::ReadGnumeric->define_instance_accessors
+	(# User options to control parsing.
+	 qw(gzipped_p cells rc attr merge minimal_attributes convert_colors),
+	 # Intermediate data structures for sheet parsing.
+	 qw(sheet style_regions style_attributes),
+	 # XML parsing internals.
+	 qw(current_elt current_attrs chars namespaces element_stack));
 }
 
 sub new {
     my ($class, @options) = @_;
 
-    my $self = bless({ }, $class);
-    while (@options) {
-	my ($slot, $value) = (shift(@options), shift(@options));
-	$self->$slot($value)
-	    if $self->can($slot);
-    }
-    # Establish defaults.
+    my $self = $class->SUPER::new(@options);
     $self->{_cells} //= 1;
     $self->{_rc} //= 1;
+    $self->{_convert_colors} //= 1;
     return $self;
 }
 
@@ -175,6 +167,43 @@ sub _handle_end {
     $Self->namespaces($old_ns_scope);
 }
 
+### Utility routines.
+
+sub _decode_alpha {
+    # Note that this is one-based, so "A" is 1, "Z" is 26, and "AA" is 27.  But
+    # there is no consistent zero digit, so this is not really base 26; if it
+    # were, "A" should be zero and "Z" should overflow to "BA".
+    my ($alpha) = @_;
+
+    if (length($alpha) == 0) {
+	return 0;
+    }
+    else {
+	return (26 * _decode_alpha(substr($alpha, 0, -1))
+		+ ord(lc(substr($alpha, -1))) - ord('a') + 1)
+    }
+}
+
+sub _decode_cell_name {
+    my ($cell_name) = @_;
+
+    my ($alpha, $digits) = $cell_name =~ /^([a-zA-Z]+)(\d+)$/;
+    return
+	unless $alpha;
+    return (_decode_alpha($alpha), 0 + $digits);
+}
+
+sub _encode_cell_name {
+    # Note that $value is one-based, so 1 corresponds to "A".  See the note
+    # under _decode_alpha.
+    my ($value) = @_;
+
+    return ($value <= 26
+	    ? chr(ord('A') + $value - 1)
+	    : (_encode_cell_name(int(($value - 1) / 26))
+	       . _encode_cell_name(1 + ($value - 1) % 26)));
+}
+
 ### Spreadsheet parsing
 
 sub _parse_stream {
@@ -234,42 +263,42 @@ sub parse {
     return $self->_parse_stream($stream);
 }
 
-sub _num_to_alpha {
-    # Note that $value is zero-based, so 0 corresponds to "A".
-    my ($value) = @_;
-
-    return ($value < 26
-	    ? chr(ord('A') + $value)
-	    : _num_to_alpha(int($value / 26)) . _num_to_alpha($value % 26));
-}
-
 sub _process_Name_elt {
     # Record the sheet name.
-    my ($self) = @_;
+    my ($self, $name) = @_;
 
     # Find the enclosing element, which needs to be "Sheet".
     my $stack = $self->element_stack;
     return
 	unless $stack->[@$stack-1][0] eq 'Sheet';
     my $sheets = $self->sheets;
-    $sheets->[0]{sheet}{$self->chars} = @$sheets;
-    $self->{_sheet}{label} = $self->chars;
+    $sheets->[0]{sheet}{$name} = @$sheets;
+    $self->{_sheet}{label} = $name;
 }
 
 sub _process_MaxCol_elt {
-    my ($self, $text) = @_;
+    my ($self, $maxcol) = @_;
 
     $self->{_sheet}{mincol} = 1;
-    $self->{_sheet}{maxcol} = $text;
+    $self->{_sheet}{maxcol} = 1 + $maxcol;
 }
 
 sub _process_MaxRow_elt {
-    my ($self, $text) = @_;
+    my ($self, $maxrow) = @_;
 
     return
-	unless $text;
+	unless $maxrow;
     $self->{_sheet}{minrow} = 1;
-    $self->{_sheet}{maxrow} = $text;
+    $self->{_sheet}{maxrow} = 1 + $maxrow;
+}
+
+sub _process_Merge_elt {
+    # We don't care about MergedRegions, as that's just a container.
+    my ($self, $text) = @_;
+
+    push(@{$self->{_sheet}{merged}},
+	 [ map { _decode_cell_name($_) } split(':', $text) ])
+	if $self->attr;
 }
 
 sub _process_Cell_elt {
@@ -282,8 +311,11 @@ sub _process_Cell_elt {
     my ($row, $col) = ($keys{Row}, $keys{Col});
     $self->{_sheet}{cell}[$col + 1][$row + 1] = $text
 	if $self->rc;
-    $self->{_sheet}{_num_to_alpha($col) . ($row + 1)} = $text
+    $self->{_sheet}{_encode_cell_name($col + 1) . ($row + 1)} = $text
 	if $self->cells;
+    $self->{_sheet}{attr}[$col + 1][$row + 1]
+	= $self->find_style_for_cell($col, $row)
+	    if $self->attr;
 }
 
 sub _process_Sheet_elt {
@@ -298,7 +330,196 @@ sub _process_Sheet_elt {
 	if $self->{_sheet}{cell};
     push(@$sheets, $sheet);
     $sheet->{indx} = $indx;
+    my $attr = $self->attr;
+    if ($attr) {
+	$sheet->{style_regions} = $self->style_regions
+	    if $attr eq 'keep';
+	$self->style_regions([ ]);
+	# Distribute non-minimal attributes.
+	unless ($self->minimal_attributes) {
+	    for my $col (1 .. $sheet->{maxcol}) {
+		for my $row (1 .. $sheet->{maxrow} || 0) {
+		    $self->{_sheet}{attr}[$col][$row]
+			||= $self->find_style_for_cell($col - 1, $row - 1);
+		}
+	    }
+	}
+	# Distribute merging information.
+	my $merged = $sheet->{merged};
+	if ($merged) {
+	    my $attrs = $sheet->{attr};
+	    my $merge_p = $self->merge;
+	    for my $merge (@$merged) {
+		my ($col1, $row1, $col2, $row2) = @$merge;
+		my $base_cell_name = _encode_cell_name($col1) . $row1;
+		my $merge_flag = $merge_p ? $base_cell_name : 1;
+		my $base_cell_contents = ($self->rc
+					  ? $sheet->{cell}[$col1][$row1]
+					  : $sheet->{$base_cell_name});
+		for my $col ($col1 .. $col2) {
+		    for my $row ($row1 .. $row2) {
+			my $cell_attrs
+			    = ($attrs->[$col][$row]
+			       || $self->find_style_for_cell($col - 1,
+							     $row - 1)
+			       || { });
+			# Copy the hash so we don't accidentally mark other
+			# cells as merged due to shared structure.
+			$cell_attrs = { %$cell_attrs };
+			$cell_attrs->{merged} = $merge_flag;
+			$attrs->[$col][$row] = $cell_attrs;
+			# When $merge_p, also copy cell contents.
+			if ($merge_p) {
+			    $sheet->{cell}[$col][$row] = $base_cell_contents
+				if $self->rc;
+			    my $cell_name = _encode_cell_name($col) . $row;
+			    $sheet->{$cell_name} = $base_cell_contents
+				if $self->cells;
+			}
+		    }
+		}
+	    }
+	}
+    }
     $self->sheet({ });
+}
+
+## Parsing cell style attributes
+
+sub _convert_identity {
+    # We assume this is 0 or 1.
+    my ($value) = @_;
+
+    return $value;
+}
+
+sub _convert_align {
+    # This is a string which we truncate and downcase -- and hope the caller
+    # can figure it out, since Gnumeric seems to use non-standard values.
+    my ($value) = @_;
+
+    return $value =~ /^GNM_.ALIGN_(.*)$/ ? lc($1) : lc($value);
+}
+
+sub _convert_color {
+    my ($color) = @_;
+
+    my $convert_primary = sub {
+	# Pad and/or truncate the value.
+	my ($value) = @_;
+
+	my $len = length($value);
+	if ($len <= 2) {
+	    # Less than #xFF we round to zero.
+	    return '00';
+	}
+	elsif ($len == 3) {
+	    return '0' . substr($value, 0, 1);
+	}
+	else {
+	    return substr($value, 0, 2);
+	}
+    };
+
+    return join('', '#', map { $convert_primary->($_); } split(':', $color));
+}
+
+my %style_conversion_map
+    = (Back => [ bgcolor => \&_convert_color, 1 ],
+       Bold => [ bold    => \&_convert_identity ],
+       # Font is not an attribute.
+       Fore => [ fgcolor => \&_convert_color, 1 ],
+       Format => [ format  => \&_convert_identity ],
+       HAlign => [ halign  => \&_convert_align ],
+       Hidden => [ hidden  => \&_convert_identity ],
+       Indent => [ indent => \&_convert_identity ],
+       Italic => [ italic => \&_convert_identity ],
+       Locked => [ locked => \&_convert_identity ],
+       PatternColor => [ pattern_color => \&_convert_color, 1 ],
+       Rotation => [ rotation => \&_convert_identity ],
+       Script => [ script => \&_convert_identity ],
+       Shade => [ shade => \&_convert_identity ],
+       ShrinkToFit => [ shrink_to_fit => \&_convert_identity ],
+       Unit => [ size => \&_convert_identity ],
+       StrikeThrough => [ strike_through => \&_convert_identity ],
+       Underline => [ uline => \&_convert_identity ],
+       VAlign => [ valign => \&_convert_align ],
+       WrapText => [ wrap => \&_convert_identity ]);
+
+sub _convert_attributes {
+    # It is a useful coincidence that the cell metadata Spreadsheet::Read
+    # calls attributes are stored in XML attributes by Gnumeric.  So we convert
+    # Gnumeric cell attributes to Spreadsheet::Read cell attributes.
+    my ($self, $cell_attributes, $gnumeric_attributes) = @_;
+
+    my $convert_colors = $self->convert_colors;
+    for my $name (keys(%$gnumeric_attributes)) {
+	my $value = $gnumeric_attributes->{$name};
+	my $conversion = $style_conversion_map{$name};
+	my ($converted_name, $converter, $color_p)
+	    = ($conversion ? @$conversion : (lc($name), \&_convert_identity));
+	$converter = \&_convert_identity
+	    if $color_p && ! $convert_colors;
+	my $converted_value = $converter->($value);
+	$cell_attributes->{$converted_name} = $converted_value;
+    }
+}
+
+sub _process_Font_elt {
+    # Process a font definition.  This is contained inside <Style>, so it ends
+    # before it, so we initialize the style_attributes slot here, then </Style>
+    # fills it out.
+    my ($self, $font_name, %keys) = @_;
+
+    return
+	unless $self->attr;
+    my $style_attributes = { font => $font_name };
+    $self->_convert_attributes($style_attributes, \%keys);
+    $self->style_attributes($style_attributes);
+}
+
+sub _process_Style_elt {
+    # Process style attributes.
+    my ($self, $text, %keys) = @_;
+
+    return
+	unless $self->attr;
+    my $style_attributes = $self->style_attributes or die;
+    $self->_convert_attributes($style_attributes, \%keys);
+}
+
+sub find_style_for_cell {
+    # Assuming $self->attr is true, find the style region for ($col, $row) and
+    # return its attribute hash.
+    my ($self, $col, $row) = @_;
+
+    my $found;
+    for my $style_region (@{$self->{_style_regions}}) {
+	if ($style_region->start_col <= $col
+	        && $col <= $style_region->end_col
+	    && $style_region->start_row <= $row
+	        && $row <= $style_region->end_row) {
+	    die "duplicate at ($col, $row)"
+		# style regions are supposed to be disjoint; enable this for
+		# extra paranoia.
+		if 0 && $found;
+	    $found = $style_region;
+	}
+    }
+    return $found && $found->style_attributes;
+}
+
+sub _process_StyleRegion_elt {
+    # Collect a style region for the style attributes we have just defined.
+    my ($self, $text, %keys) = @_;
+
+    return
+	unless $self->attr;
+    my $style_region = Spreadsheet::Gnumeric::StyleRegion->new
+	(start_col => $keys{startCol}, end_col => $keys{endCol},
+	 start_row => $keys{startRow}, end_row => $keys{endRow},
+	 style_attributes => $self->style_attributes);
+    push(@{$self->{_style_regions}}, $style_region);
 }
 
 1;
@@ -311,7 +532,7 @@ Spreadsheet::ReadGnumeric - read a Gnumeric file, return Spreadsheet::Read
 
 =head1 VERSION
 
-Version 0.1
+Version 0.2
 
 =head1 SYNOPSIS
 
@@ -319,7 +540,7 @@ Version 0.1
 
     my $reader = Spreadsheet::ReadGnumeric->new
         (rc => 1, cells => 1);	# these are the defaults
-    my $book = $reader->parse_file('spreadsheet.gnumeric');
+    my $book = $reader->parse('spreadsheet.gnumeric');
     my $n_sheets = $book->[0]{sheets};
     my $sheet_1 = $book->[1];
     my $b12 = $sheet_1->{B12};
@@ -327,21 +548,54 @@ Version 0.1
     my $b12 = $sheet_1->{cell}[2][12];
     say $b12;	# => "not a vitamin", e.g.
 
-Note that Gnumeric saves expressions in cells, and not the result of
-expressions, and even the expressions are sometimes encoded in a way
+=head1 DESCRIPTION
+
+Given a source of saved Gnumeric data, C<Spreadsheet::ReadGnumeric>
+parses it and returns the result in the same format as
+C<Spreadsheet::Read>.  In fact, C<Spreadsheet::Read> has a few more
+bells and whistles, such as transposing the resulting sheets and
+providing an object-oriented interface to the resulting data, so it
+may be easier to access this module through C<Spreadsheet::Read>, even
+if you only want to parse Gnumeric data.
+
+Note that Gnumeric only saves raw cell values, and not their
+formatted versions.  In particular, Gnumeric saves expressions, and not
+expression values, never mind formatted expression values.
+Even the expressions are sometimes encoded in a way
 that C<Spreadsheet::ReadGnumeric> cannot not completely unparse, so
 the returned data structure will look less well populated than the
-spreadsheet does in Gnumeric.  See the "ExprID" TO DO item below.
+spreadsheet does in Gnumeric.  See the "ExprID" TODO item below.
 
 =head1 METHODS
 
-After creating an instance with L</new>, the public entrypoint for
-parsing a Gnumeric file is L</parse_file>, and for a stream is
-L</parse_gnumeric_stream>.
+After creating an instance with L</new>, call L</parse> with a file
+name, a stream, or a string containing the spreadsheet data.
+The L</attr>, L</cells>, L</convert_colors> L</gzipped_p>, L</merge>,
+L</minimal_attributes>, and L</rc> slots control how
+C<Spreadsheet::ReadGnumeric> parses its input.  They may also be used
+as initializer keywords to the L</new> method.
 
 The rest of these deal with the XML parsing mechanism and are probably
 not of interest (unless you need to write a subclass in order to
 extract more information).
+
+=head3 attr
+
+Slot that, if true, directs the parsing methods to retain style
+information in the returned C<< $sheet->{attr} >> array of each sheet.
+If the value of this slot is "keep", an arrayref of each sheet's
+C<Spreadsheet::Gnumeric::StyleRegion> instances is saved in
+C<< $sheet->{style_regions} >>.
+
+The C<attr> value is normally supplied to the C<new> method as an
+initializer.  See the C<Spreadsheet::Read> L<Cell
+Attributes|https://metacpan.org/pod/Spreadsheet::Read#Cell-Attributes>
+documentation for details of the resulting attributes.  See
+L<Spreadsheet::Gnumeric::StyleRegion> for details of how attribute
+conversion is performed.
+
+See also the L</merge> slot, which requests additional processing of
+cell merge information.
 
 =head3 cells
 
@@ -354,6 +608,19 @@ value.
 =head3 chars
 
 Slot that contains the text content of an XML element being parsed.
+
+=head3 convert_colors
+
+Slot that contains a boolean which, if defined and true, causes
+Gnumeric colors to be converted to the more common HTML-style format.
+Gnumeric specifies colors as RGB triples using hex numbers of one to
+four digits for each primary color, separated by colons, so that white
+is "FFFF:FFFF:FFFF", and cyan is "0:FC00:F800".  Conversion pads each
+primary to four digits, takes the first two, and prepends "#",
+producing "#FFFFFF" for white and "#00FCF8" for cyan.
+
+For C<Spreadsheet::Read> compatibility, the default is true.  This
+value is ignored unless L</attr> is true.
 
 =head3 current_attrs
 
@@ -374,14 +641,40 @@ being parsed, and is itself an arrayref of the values of
 
 while that containing element was being parsed.
 
+=head3 find_style_for_cell
+
+Given zero-based column and row indices, look in L</style_regions> for
+a suitable C<Spreadsheet::Gnumeric::StyleRegion> instance, and return
+its attribute hash.
+
 =head3 gzipped_p
 
-Slot that determines whether C<parse_file> will test whether its
+Slot that determines whether C<parse> will test whether its
 argument is gzipped.  There are three possibilities:  Undefined, other
-false, and true.  If undefined, then C<parse_file> will open the file,
+false, and true.  If undefined, then C<parse> will open the file,
 make the test, and then reset the stream to the beginning (see
-L</stream_gzipped_p>).  Otherwise, C<parse_file> will take the
+L</stream_gzipped_p>).  Otherwise, C<parse> will take the
 caller's word for it.
+
+=head3 merge
+
+Slot that requests additional processing of cell merging information.
+If true, (a) the value of the C<merged> attribute for merged cells is
+the name of the upper left corner of the rectangle of merged cells,
+and (b) the contents and attributes of that upper-left cell are copied
+into all of the others.  The default is false.
+
+This flag is ignored unless the L</attr> slot is also true.
+
+=head3 minimal_attributes
+
+Slot that, if true, causes attributes to be filled in only for cells
+that have content, i.e. actually appear as a C<< <Cell> >> in the file
+with a nonempty string string.  Otherwise, attributes are filled in
+for the full C<< $sheet->{maxrow} >> vs C<< $sheet->{maxcol} >> array.
+The default is false.
+
+This flag is ignored unless the L</attr> slot is also true.
 
 =head3 namespaces
 
@@ -400,9 +693,10 @@ of the method names listed as slots.
 Given an input source, reads it and returns the
 C<Spreadsheet::Read>-compatible data structure, constructed according
 to the options set up at instantiation time.  If the L</gzipped_p>
-slot is defined or the content starts with gzip magic (see
+slot is defined and true or the content starts with gzip magic (see
 L</stream_gzipped_p>), which is the normal state of saved Gnumeric
-spreadsheets, it is uncompressed while being read.
+spreadsheets, it is uncompressed while being read.  If C<gzipped_p> is
+not defined, the stream is read to see how it starts and then rewound.
 
 The input can be a reference (which is taken to be an open stream), a
 file name, or a literal string that contains the data.  If given an
@@ -433,6 +727,17 @@ name, determine whether we need to uncompress the data and then reset
 the stream back to the beginning.  If the C<gzipped_p> slot is
 defined, then we just return that and leave the stream untouched.  The
 file name is only used for error messages.
+
+=head3 style_attributes
+
+Internal slot used to store a hashref of spreadsheet attributes during
+parsing.
+
+=head3 style_regions
+
+Slot that contains an arrayref of
+C<Spreadsheet::Gnumeric::StyleRegion> instances, built by the style
+parsing code for each sheet and cleared when the sheet is completed.
 
 =head1 INTERNALS
 
@@ -489,10 +794,6 @@ content is the expression in the earlier cell with the same ID after
 shifting by the location difference.  This requires parsing equations,
 though.
 
-=item *
-
-Maybe implement the "attr" option (could be expensive).
-
 =back
 
 =head1 BUGS
@@ -532,7 +833,7 @@ C<Spreadsheet::Read> architecture.
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2022 by Bob Rogers.
+This software is Copyright (c) 2023 by Bob Rogers.
 
 This is free software, licensed under:
 

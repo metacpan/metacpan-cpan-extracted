@@ -1,6 +1,18 @@
 CHANGES
 -------
 
+  2.204 8 February 2022
+
+      * Update Gzip.pm
+        https://github.com/pmqs/IO-Compress/pull/49
+        6d0514b86ceeab56884c43fd1e6f09f839c12b74
+        feab074420bf4059eb6fa9d0553a354e2dd33e95
+
+      * Allow Z_NULL
+        https://github.com/pmqs/Compress-Raw-Zlib/issues/17
+        c42da1483767bc8afbdb2d8b03ecda7b67b4d022
+
+      
   2.201 25 June 2022
 
       * Disable zib header tests

@@ -386,30 +386,41 @@ YAML
     openapi_uri => '/api',
     openapi_schema => $yamlpp->load_string(<<YAML));
 $openapi_preamble
-components:
-  headers:
-    no_content_permitted:
-      description: when used with the Content-Length or Content-Type headers, indicates that, if present, the header value must be 0 or empty
-      required: false
-      schema:
-        type: string
-        enum: ['', '0']
 paths:
   /foo:
     post:
       responses:
-        '204':
+        '200':
           description: no content permitted
           headers:
             Content-Length:
-              \$ref: '#/components/headers/no_content_permitted'
+              description: if present, the value must be 0
+              required: false
+              schema:
+                type: integer
+                const: 0
             Content-Type:
-              \$ref: '#/components/headers/no_content_permitted'
+              description: cannot be present (an empty value is not permitted)
+              required: false
+              schema:
+                false
           content:
-            text/plain: # TODO: support */* and then this would be guaranteed
+            '*/*':
               schema:
                 type: string
                 maxLength: 0
+        '204':
+          description: no content permitted, and no Content-Length either
+          headers:
+            Content-Length:
+              required: false
+              schema: false
+            Content-Type:
+              required: false
+              schema: false
+          content:
+            '*/*':
+              schema: false
         default:
           description: default
           headers:
@@ -481,6 +492,33 @@ YAML
 
 
   cmp_deeply(
+    ($result = $openapi->validate_response(response(200, [ 'Content-Type' => 'text/plain', 'Content-Length' => 20 ], 'I should not have content'),
+      { path_template => '/foo', method => 'post' }))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/response/header/Content-Length',
+          keywordLocation => jsonp(qw(/paths /foo post responses 200 headers Content-Length schema const)),
+          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo post responses 200 headers Content-Length schema const)))->to_string,
+          error => 'value does not match',
+        },
+        {
+          instanceLocation => '/response/body',
+          keywordLocation => jsonp(qw(/paths /foo post responses 200 content */* schema maxLength)),
+          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo post responses 200 content */* schema maxLength)))->to_string,
+          error => 'length is greater than 0',
+        },
+      ],
+    },
+    'an undesired response body is detectable',
+  );
+
+
+  # note: when 204, mojo's $message->body always returns ''
+  # this test is only possible (for HTTP::Response) if we manually add a Content-Length; it will not
+  # be added via parse().
+  cmp_deeply(
     ($result = $openapi->validate_response(response(204, [ 'Content-Type' => 'text/plain', 'Content-Length' => 20 ], 'I should not have content'),
       { path_template => '/foo', method => 'post' }))->TO_JSON,
     {
@@ -488,19 +526,19 @@ YAML
       errors => [
         {
           instanceLocation => '/response/header/Content-Length',
-          keywordLocation => jsonp(qw(/paths /foo post responses 204 headers Content-Length $ref schema enum)),
-          absoluteKeywordLocation => $doc_uri_rel->clone->fragment('/components/headers/no_content_permitted/schema/enum')->to_string,
-          error => 'value does not match',
+          keywordLocation => jsonp(qw(/paths /foo post responses 204 headers Content-Length schema)),
+          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo post responses 204 headers Content-Length schema)))->to_string,
+          error => 'response header not permitted',
         },
         {
           instanceLocation => '/response/body',
-          keywordLocation => jsonp(qw(/paths /foo post responses 204 content text/plain schema maxLength)),
-          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo post responses 204 content text/plain schema maxLength)))->to_string,
-          error => 'length is greater than 0',
+          keywordLocation => jsonp(qw(/paths /foo post responses 204 content */* schema)),
+          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo post responses 204 content */* schema)))->to_string,
+          error => 'response body not permitted',
         },
       ],
     },
-    'an undesired response body is detectable',
+    'an undesired response body is detectable for 204 responses',
   );
 
 

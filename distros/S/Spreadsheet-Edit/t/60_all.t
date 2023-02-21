@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 use strict; use warnings; use feature qw(say state);
+use feature qw(say state lexical_subs);
+no warnings qw(experimental::lexical_subs);
 
 # Run all "subtests" twice:
 #
@@ -53,7 +55,7 @@ for my $st (@subtests) {
   my ($soutput, $swstat) = tee_merged { run_subtest($st, '--silent') };
   if ($swstat != 0) {
     # Diagnostic has already been displayed
-    die "Non-zero exit status"; 
+    die "$soutput\nNon-zero exit status from subtest '$st' --silent"; 
   }
   ok ($soutput eq "", basename($st)." --silent is really silent") or die;
 }

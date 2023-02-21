@@ -1,0 +1,7 @@
+class TestCase::File::Path {
+  use File::Path;
+  static method test : int () {
+    
+    return 1;
+  }
+}

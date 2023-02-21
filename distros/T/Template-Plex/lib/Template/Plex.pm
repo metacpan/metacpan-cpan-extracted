@@ -3,7 +3,7 @@ package Template::Plex;
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare('v0.4.3');
+use version; our $VERSION = version->declare('v0.5.0');
 use feature qw<say refaliasing>;
 no warnings "experimental";
 
@@ -227,6 +227,39 @@ sub fill_slot {
 	}
 	"";
 }
+
+sub append_slot {
+  my($self)=shift;
+  my $parent=$self->[parent_];
+  unless($parent){
+
+    Log::OK::WARN and log_warn __PACKAGE__.": No parent setup for ". $self->meta->{file};
+    return
+  }
+  else{
+    my %fillers=@_;
+    for(keys %fillers){
+      $parent->[slots_]{$_}.=$fillers{$_};
+    }
+  }
+}
+
+sub prepend_slot {
+  my($self)=shift;
+  my $parent=$self->[parent_];
+  unless($parent){
+
+    Log::OK::WARN and log_warn __PACKAGE__.": No parent setup for ". $self->meta->{file};
+    return
+  }
+  else{
+    my %fillers=@_;
+    for(keys %fillers){
+      $parent->[slots_]{$_}=$fillers{$_}.$parent->[slots_]{$_};
+    }
+  }
+}
+
 
 
 sub inherit {

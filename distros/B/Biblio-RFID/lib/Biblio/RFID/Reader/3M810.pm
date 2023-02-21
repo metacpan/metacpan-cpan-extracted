@@ -208,9 +208,9 @@ sub read_blocks {
 			} elsif ( $rest = _matched $data => 'FE 00 00 05 01' ) {
 				warn "FIXME ready? ",as_hex $rest;
 			} elsif ( $rest = _matched $data => '02 06' ) {
-				die "ERROR ",as_hex($rest);
+				die "ERROR ",as_hex($data);
 			} else {
-				die "FIXME unsuported ",as_hex($rest);
+				die "FIXME unsuported ",as_hex($data);
 			}
 	});
 
@@ -235,6 +235,9 @@ sub write_blocks {
 	my $hex_data = as_hex $data;
 	my $blocks   = sprintf('%02x', length($data) / 4 );
 
+	my $retry = 0;
+retry_write:
+
 	cmd(
 		"04 $tag 00 $blocks 00 $hex_data", "write_blocks $tag [$blocks] $hex_data", sub {
 			my $data = shift;
@@ -243,12 +246,22 @@ sub write_blocks {
 				my $blocks = substr($rest,8,1);
 				warn "# WRITE ",as_hex($tag), " [$blocks]\n";
 			} elsif ( $rest = _matched $data => '04 06' ) {
-				die "ERROR ",as_hex($rest);
+				die "ERROR ",as_hex($data);
 			} else {
-				die "UNSUPPORTED";
+				die "UNSUPPORTED ", as_hex($data);
 			}
 		}
 	);
+
+	my $verify_blocks = read_blocks($tag);
+	die "can't find data from tag $tag" unless exists $verify_blocks->{$tag};
+
+	if ( join('', @{ $verify_blocks->{$tag} }) ne $data ) {
+		$retry++;
+		warn "ERROR reading data back from tag, retry $retry\n";
+		die "ABORTED" if $retry == 10;
+		goto retry_write;
+	}
 
 }
 
@@ -279,12 +292,25 @@ sub read_afi {
 	return $afi;
 }
 
+=head2 afi_retry
+
+This specified how many times will driver try to write afi to tag
+
+  Biblio::RFID::Reader::3M810::afi_retry = 100;
+
+=cut
+
+our $afi_retry = 100;
+
 sub write_afi {
 	my $tag = shift;
 	$tag = shift if ref $tag;
 	my $afi = shift || die "no afi?";
 
 	$afi = as_hex $afi;
+	my $retry = 0;
+
+retry:
 
 	cmd(
 		"09 $tag $afi", "write_afi $tag $afi", sub {
@@ -293,18 +319,27 @@ sub write_afi {
 		if ( my $rest = _matched $data => '09 00' ) {
 			my $tag_back = hex_tag substr($rest,0,8);
 			die "write_afi got $tag_back expected $tag" if $tag_back ne $tag;
-			warn "# SECURITY ", hex_tag($tag), " AFI: ", as_hex($afi);
-		} elsif ( $rest = _matched $data => '0A 06' ) {
-			die "ERROR writing AFI to $tag ", as_hex($data);
+			warn "# SECURITY ", hex_tag($tag), " AFI: $afi";
+		} elsif ( $rest = _matched $data => '09 06' ) {
+			if ( $retry++ <= $afi_retry ) {
+#				warn "ERROR writing AFI $afi to $tag retry $retry\n";
+				goto retry;
+			}
+			die "ERROR writing AFI $afi to $tag ", as_hex($data);
 		} else {
 			die "IGNORED ",as_hex($data);
 		}
 	});
+
+	warn "INFO: tag $tag AFI $afi retry: $retry\n";
+
 	warn "## write_afi ", dump( $tag, $afi );
 	return $afi;
 }
 
-1
+sub tag_type { 'RFID501' }
+
+1;
 
 __END__
 

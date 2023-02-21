@@ -91,7 +91,7 @@ int32_t SPVM__Sys__IO__open(SPVM_ENV* env, SPVM_VALUE* stack) {
   errno = 0;
   int32_t fd = open(path, flags, mode);
   if (fd == -1) {
-    env->die(env, stack, "[System Error]open failed:%s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]open failed:%s. The \"%s\" file can't be opend", env->strerror(env, stack, errno, 0), path, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -242,7 +242,7 @@ int32_t SPVM__Sys__IO__fopen(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   errno = 0;
   if (!stream) {
-    env->die(env, stack, "[System Error]fopen failed:%s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]fopen failed:%s. The \"%s\" file can't be opend", env->strerror(env, stack, errno, 0), path, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -338,8 +338,8 @@ int32_t SPVM__Sys__IO__fread(SPVM_ENV* env, SPVM_VALUE* stack) {
   if (items > 4) {
     ptr_offset = stack[4].ival;
   }
-  if (!(((ptr_length - ptr_offset) / size) <= nmemb)) {
-    return env->die(env, stack, "(The length of the $ptr - $ptr_offset) / the $size must be less than or equal to the $nmemb", __func__, FILE_NAME, __LINE__);
+  if (!(nmemb * size <= ((ptr_length - ptr_offset))  )) {
+    return env->die(env, stack, "The $nmemb * the $size must be less than or equal to the length of the $ptr - $ptr_offset", __func__, FILE_NAME, __LINE__);
   }
   
   FILE* stream = env->get_pointer(env, stack, obj_stream);
@@ -497,8 +497,8 @@ int32_t SPVM__Sys__IO__fwrite(SPVM_ENV* env, SPVM_VALUE* stack) {
   if (items > 4) {
     ptr_offset = stack[4].ival;
   }
-  if (!(((ptr_length - ptr_offset) / size) <= nmemb)) {
-    return env->die(env, stack, "(The length of the $ptr - $ptr_offset) / the $size must be less than or equal to the $nmemb", __func__, FILE_NAME, __LINE__);
+  if (!(nmemb * size <= ((ptr_length - ptr_offset))  )) {
+    return env->die(env, stack, "The $nmemb * the $size must be less than or equal to the length of the $ptr - $ptr_offset", __func__, FILE_NAME, __LINE__);
   }
   
   FILE* stream = env->get_pointer(env, stack, obj_stream);
@@ -655,7 +655,7 @@ int32_t SPVM__Sys__IO__mkdir(SPVM_ENV* env, SPVM_VALUE* stack) {
 #endif
 
   if (status == -1) {
-    env->die(env, stack, "[System Error]mkdir failed:%s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]mkdir failed:%s. The \"%s\" directory can't be created", env->strerror(env, stack, errno, 0), path, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -688,7 +688,7 @@ int32_t SPVM__Sys__IO__rmdir(SPVM_ENV* env, SPVM_VALUE* stack) {
   errno = 0;
   int32_t status = rmdir(path);
   if (status == -1) {
-    env->die(env, stack, "[System Error]rmdir failed:%s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]rmdir failed:%s. The \"%s\" directory can't be removed", env->strerror(env, stack, errno, 0), path, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -710,7 +710,7 @@ int32_t SPVM__Sys__IO__unlink(SPVM_ENV* env, SPVM_VALUE* stack) {
   errno = 0;
   int32_t status = unlink(pathname);
   if (status == -1) {
-    env->die(env, stack, "[System Error]unlink failed:%s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]unlink failed:%s. The \"%s\" directory can't be removed", env->strerror(env, stack, errno, 0), pathname, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
 
@@ -742,7 +742,7 @@ int32_t SPVM__Sys__IO__rename(SPVM_ENV* env, SPVM_VALUE* stack) {
   errno = 0;
   int32_t status = rename(oldpath, newpath);
   if (status == -1) {
-    env->die(env, stack, "[System Error]rename failed:%s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]rename failed:%s. The \"%s\" file can't be renamed to the \"%s\" file", env->strerror(env, stack, errno, 0), oldpath, newpath, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -873,7 +873,7 @@ int32_t SPVM__Sys__IO__realpath(SPVM_ENV* env, SPVM_VALUE* stack) {
   }
   
   if (!ret_resolved_path) {
-    env->die(env, stack, "[System Error]realpath failed:%s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]realpath failed:%s. The \"%s\" file can't be resolved", env->strerror(env, stack, errno, 0), path, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -916,7 +916,7 @@ int32_t SPVM__Sys__IO___fullpath(SPVM_ENV* env, SPVM_VALUE* stack) {
   }
   
   if (!ret_absPath) {
-    env->die(env, stack, "[System Error]_fullpath failed:%s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]_fullpath failed:%s. The \"%s\" file can't be resolved", env->strerror(env, stack, errno, 0), relPath, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -937,7 +937,7 @@ int32_t SPVM__Sys__IO__chdir(SPVM_ENV* env, SPVM_VALUE* stack) {
   errno = 0;
   int32_t status = chdir(path);
   if (status == -1) {
-    env->die(env, stack, "[System Error]chdir failed:%s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]chdir failed:%s. The current directory can't be changed to the \"%s\" directory", env->strerror(env, stack, errno, 0), path, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -959,7 +959,7 @@ int32_t SPVM__Sys__IO__chmod(SPVM_ENV* env, SPVM_VALUE* stack) {
   errno = 0;
   int32_t status = chmod(path, mode);
   if (status == -1) {
-    env->die(env, stack, "[System Error]chmod failed:%s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]chmod failed:%s. The permission of the \"%s\" file can't be changed", env->strerror(env, stack, errno, 0), path, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
 
@@ -987,7 +987,7 @@ int32_t SPVM__Sys__IO__chown(SPVM_ENV* env, SPVM_VALUE* stack) {
   errno = 0;
   int32_t status = chown(path, owner, group);
   if (status == -1) {
-    env->die(env, stack, "[System Error]chown failed:%s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]chown failed:%s. The owner/group of the \"%s\" file can't be changed", env->strerror(env, stack, errno, 0), path, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
 
@@ -1013,7 +1013,7 @@ int32_t SPVM__Sys__IO__truncate(SPVM_ENV* env, SPVM_VALUE* stack) {
   errno = 0;
   int32_t status = truncate(path, length);
   if (status == -1) {
-    env->die(env, stack, "[System Error]truncate failed:%s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]truncate failed:%s. The \"%s\" file can't be truncated", env->strerror(env, stack, errno, 0), path, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -1044,7 +1044,7 @@ int32_t SPVM__Sys__IO__symlink(SPVM_ENV* env, SPVM_VALUE* stack) {
   errno = 0;
   int32_t status = symlink(oldpath, newpath);
   if (status == -1) {
-    env->die(env, stack, "[System Error]symlink failed:%s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]symlink failed:%s. The symbolic link from \"%s\" to \"%s\" can't be created", env->strerror(env, stack, errno, 0), oldpath, newpath, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -1085,7 +1085,7 @@ int32_t SPVM__Sys__IO__readlink(SPVM_ENV* env, SPVM_VALUE* stack) {
   errno = 0;
   int32_t placed_length = readlink(path, buf, bufsiz);
   if (placed_length == -1) {
-    env->die(env, stack, "[System Error]readlink failed:%s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]readlink failed:%s. The reading of the symbolic link of the \"%s\" file failed", env->strerror(env, stack, errno, 0), path, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -1108,7 +1108,7 @@ int32_t SPVM__Sys__IO__opendir(SPVM_ENV* env, SPVM_VALUE* stack) {
   errno = 0;
   DIR* dir_stream = opendir(dir);
   if (!dir_stream) {
-    env->die(env, stack, "[System Error]opendir failed:%s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]opendir failed:%s. The \"%s\" directory can't be opened", env->strerror(env, stack, errno, 0), dir, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
 
@@ -1252,7 +1252,7 @@ int32_t SPVM__Sys__IO__utime(SPVM_ENV* env, SPVM_VALUE* stack) {
   errno = 0;
   int32_t status = utime(filename, st_times);
   if (status == -1) {
-    env->die(env, stack, "[System Error]utime failed:%s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]utime failed:%s. The access and modification times of the \"%s\" file can't be changed", env->strerror(env, stack, errno, 0), filename, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -1281,13 +1281,16 @@ int32_t SPVM__Sys__IO__access_raw(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__IO__access(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+  void* obj_pathname = stack[0].oval;
   
   SPVM__Sys__IO__access_raw(env, stack);
   
   int32_t status = stack[0].ival;
-
+  
   if (status == -1) {
-    env->die(env, stack, "[System Error]access failed:%s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    const char* pathname = env->get_chars(env, stack, obj_pathname);
+    env->die(env, stack, "[System Error]access failed:%s", env->strerror(env, stack, errno, 0), pathname, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -1320,12 +1323,14 @@ int32_t SPVM__Sys__IO__faccessat_raw(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__IO__faccessat(SPVM_ENV* env, SPVM_VALUE* stack) {
+  void* obj_pathname = stack[1].oval;
   
   SPVM__Sys__IO__faccessat_raw(env, stack);
   
   int32_t status = stack[0].ival;
   
   if (status == -1) {
+    const char* pathname = env->get_chars(env, stack, obj_pathname);
     env->die(env, stack, "[System Error]faccessat failed:%s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
@@ -1596,7 +1601,7 @@ int32_t SPVM__Sys__IO__freopen(SPVM_ENV* env, SPVM_VALUE* stack) {
   FILE* reopened_stream = freopen(path, mode, stream);
   
   if (!reopened_stream) {
-    env->die(env, stack, "[System Error]freopen failed:%s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]freopen failed:%s. The \"%s\" file can't be reopend", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   

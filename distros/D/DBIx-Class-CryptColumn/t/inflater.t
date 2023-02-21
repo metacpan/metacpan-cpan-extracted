@@ -6,7 +6,6 @@ use lib 't/lib';
 
 use TestInflate;
 use Crypt::Passphrase;
-use Crypt::Passphrase::PassphraseHash;
 
 my $schema = TestInflate->connect('dbi:SQLite:dbname=:memory:');
 
@@ -16,13 +15,13 @@ $schema->storage->dbh->do($sql);
 my $rs = $schema->resultset('Foo');
 
 my $passphrase = TestInflate::Result::Foo->crypt_passphrase;;
-my $object = Crypt::Passphrase::PassphraseHash->new($passphrase, $passphrase->hash_password('moo'));
+my $object = $passphrase->curry_with_password('moo');
 
 my $id = $rs->create({ passphrase => $object })->id;
 
 my $row = $rs->find({ id => $id });
 
-is $row->get_column('passphrase'), 'oom', 'Column stored as reversed';
+is $row->get_column('passphrase'), '$reversed$oom', 'Column stored as reversed';
 
 my $ppr = $row->passphrase;
 isa_ok $ppr, 'Crypt::Passphrase::PassphraseHash';

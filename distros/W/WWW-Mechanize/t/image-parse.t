@@ -7,7 +7,6 @@ use Test::More tests => 47;
 use URI::file ();
 
 BEGIN {
-    delete @ENV{qw(PATH IFS CDPATH ENV BASH_ENV)};  # Placates taint-unsafe Cwd.pm in 5.6.1
     use_ok( 'WWW::Mechanize' );
 }
 
@@ -83,7 +82,7 @@ $mech->get( $uri );
 ok( $mech->success, "Fetched $uri" ) or die q{Can't get test page};
 
 eval { @images = $mech->find_all_images(); };
-is($@,'','survived eval');
+is($@,q{},'survived eval');
 is( scalar @images, 2, 'Exactly two images' );
 
 my $css_first = $images[0];

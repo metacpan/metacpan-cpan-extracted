@@ -1,5 +1,10 @@
 Revision history for Alien-zstd
 
+0.04      2023-02-13 23:58:24-05:00 America/New_York
+  - Fix missing $VERSION.
+  - Update output to match new release. Fixes RT#146465.
+  - Add GitHub issues to metadata.
+
 0.03      2022-11-01 20:38:04-04:00 America/New_York
   - Ensure that zstd program exists.
     See <https://github.com/PerlAlien/Alien-zstd/pull/4>.

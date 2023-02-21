@@ -1,0 +1,17 @@
+Changes
+colour_palette_16
+colour_palette_256
+colour_palette_8
+ignore.txt
+lib/ANSI/Palette.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-colours.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

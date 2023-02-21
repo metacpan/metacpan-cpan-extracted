@@ -16,7 +16,7 @@ my @FIELDS   = qw( id type description state last_update time_zone );
 my @INTERNAL = qw( _factory _observers );
 __PACKAGE__->mk_accessors( @FIELDS, @INTERNAL );
 
-$Workflow::VERSION = '1.61';
+$Workflow::VERSION = '1.62';
 
 use constant NO_CHANGE_VALUE => 'NOCHANGE';
 
@@ -116,6 +116,7 @@ sub execute_action {
     my $old_state = $self->state;
     my ( $new_state, $action_return );
 
+    local $EVAL_ERROR = undef;
     eval {
         $action->validate($self);
         $self->log->debug("Action validated ok");
@@ -332,6 +333,8 @@ sub _get_next_state {
 sub _auto_execute_state {
     my ( $self, $wf_state ) = @_;
     my $action_name;
+
+    local $EVAL_ERROR = undef;
     eval { $action_name = $wf_state->get_autorun_action_name($self); };
     if ($EVAL_ERROR)
     {    # we found an error, possibly more than one or none action
@@ -373,7 +376,7 @@ Workflow - Simple, flexible system to implement workflows
 
 =head1 VERSION
 
-This documentation describes version 1.61 of Workflow
+This documentation describes version 1.62 of Workflow
 
 =head1 SYNOPSIS
 
@@ -940,14 +943,14 @@ If you want to divide actions in groups (for example state change group,
 approval group, which have to be shown at different places on the page) add group property
 to your action
 
-<action name="terminate request"  group="state change"  class="MyApp::Action::Terminate" />
-<action name="approve request"  group="approval"  class="MyApp::Action::Approve" />
+  <action name="terminate request"  group="state change"  class="MyApp::Action::Terminate" />
+  <action name="approve request"  group="approval"  class="MyApp::Action::Approve" />
 
-my @actions = $wf->get_current_actions("approval");
+  my @actions = $wf->get_current_actions("approval");
 
-$group should be string that reperesents desired group name. In @actions you will get
+C<$group> should be string that reperesents desired group name. In @actions you will get
 list of action names available from the current state for the given environment limited by group.
-$group is optional parameter.
+C<$group> is optional parameter.
 
 Returns: list of strings representing available actions
 
@@ -1401,7 +1404,7 @@ L<http://www.slideshare.net/jonasbn/workflow-yapceu2010>
 =head1 COPYRIGHT
 
 Copyright (c) 2003 Chris Winters and Arvato Direct;
-Copyright (c) 2004-2022 Chris Winters. All rights reserved.
+Copyright (c) 2004-2023 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,9 +18,8 @@ no_index:
     - t
     - inc
 requires:
-  DateTime: '0'
-  DateTime::Format::ISO8601: '0'
   Devel::CheckOS: '1.95'
+  Devel::Hide: '0.0015'
   Module::Load: '0'
   Scalar::Util: '0'
   Test::Exception: '0.43'
@@ -29,5 +28,5 @@ requires:
 resources:
   bugtracker: https://github.com/DrHyde/perl-modules-Devel-Deprecations/issues
   repository: https://github.com/DrHyde/perl-modules-Devel-Deprecations
-version: '1.000'
+version: '1.101'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

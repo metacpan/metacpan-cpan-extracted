@@ -293,7 +293,7 @@ extern void rs_Long_Byte( Handle self, Byte * dstData, int dstType, double srcLo
 extern void rs_float_Byte( Handle self, Byte * dstData, int dstType, double srcLo, double srcHi, double dstLo, double dstHi);
 extern void rs_double_Byte( Handle self, Byte * dstData, int dstType, double srcLo, double srcHi, double dstLo, double dstHi);
 
-/* extra convertors */
+/* extra converters */
 extern void bc_irgb_rgb( Byte * source, Byte * dest, int count);
 extern void bc_ibgr_rgb( Byte * source, Byte * dest, int count);
 extern void bc_bgri_rgb( Byte * source, Byte * dest, int count);
@@ -316,7 +316,7 @@ extern Bool img_put( Handle dest, Handle src, int dstX, int dstY, int srcX, int 
 extern Bool img_bar( Handle dest, int x, int y, int w, int h, PImgPaintContext ctx);
 extern void img_integral_rotate( Handle self, Byte * new_data, int new_line_size, int degrees);
 extern Bool img_generic_rotate( Handle self, float degrees, PImage output, ColorPixel fill);
-extern Bool img_2d_transform( Handle self, float *matrix, ColorPixel fill, PImage output);
+extern Bool img_2d_transform( Handle self, Matrix matrix, ColorPixel fill, PImage output);
 extern void img_mirror( Handle self, Bool vertically);
 extern Bool img_mirror_raw( int type, int w, int h, Byte * data, Bool vertically);
 extern void img_premultiply_alpha_constant( Handle self, int alpha);

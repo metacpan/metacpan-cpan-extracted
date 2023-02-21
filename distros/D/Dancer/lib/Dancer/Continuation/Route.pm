@@ -1,7 +1,7 @@
 package Dancer::Continuation::Route;
 our $AUTHORITY = 'cpan:SUKRIA';
 # ABSTRACT: Internal exception class for Route exceptions in Dancer.
-$Dancer::Continuation::Route::VERSION = '1.3520';
+$Dancer::Continuation::Route::VERSION = '1.3521';
 use strict;
 use warnings;
 use Carp;
@@ -26,7 +26,7 @@ Dancer::Continuation::Route - Internal exception class for Route exceptions in D
 
 =head1 VERSION
 
-version 1.3520
+version 1.3521
 
 =head1 METHODS
 

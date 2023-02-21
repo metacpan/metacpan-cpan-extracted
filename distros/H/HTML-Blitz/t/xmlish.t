@@ -24,4 +24,10 @@ like exception { $blitz->apply_to_html('html~' . __LINE__, '<p />') }, qr/\bnon-
     is $got, '<math><p /></math>', '<p/> treated as self-closing in foreign element';
 }
 
+for my $tag ('svg', 'math') {
+    my $template = $blitz->apply_to_html('html~' . __LINE__, "<$tag/>");
+    my $got = $template->process;
+    is $got, "<$tag />", "$tag can be self-closing";
+}
+
 done_testing;

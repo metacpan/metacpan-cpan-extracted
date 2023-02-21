@@ -1,7 +1,7 @@
 package Mail::DKIM::Signer;
 use strict;
 use warnings;
-our $VERSION = '1.20220520'; # VERSION
+our $VERSION = '1.20230212'; # VERSION
 # ABSTRACT: generates a DKIM signature for a message
 
 # Copyright 2005-2007 Messiah College. All rights reserved.
@@ -426,7 +426,7 @@ Mail::DKIM::Signer - generates a DKIM signature for a message
 
 =head1 VERSION
 
-version 1.20220520
+version 1.20230212
 
 =head1 SYNOPSIS
 

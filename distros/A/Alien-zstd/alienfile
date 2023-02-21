@@ -4,7 +4,7 @@ plugin PkgConfig => 'libzstd';
 plugin 'Probe::CommandLine' => (
   command   => 'zstd',
   args      => [ '--version' ],
-  match     => qr/zstd command line interface/,
+  match     => qr/zstd command line interface|Zstandard CLI/,
   secondary => 1,
 );
 

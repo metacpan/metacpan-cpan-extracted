@@ -1,5 +1,5 @@
 {
-   "abstract" : "SPVM extension for SHA-1/224/256/384/512",
+   "abstract" : "SHA-1/224/256/384/512",
    "author" : [
       "USER_NAME<USER_MAIL>"
    ],
@@ -43,9 +43,11 @@
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "type" : "git"
+         "type" : "git",
+         "url" : "https://github.com/yuki-kimoto/SPVM-Digest-SHA.git",
+         "web" : "https://github.com/yuki-kimoto/SPVM-Digest-SHA"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

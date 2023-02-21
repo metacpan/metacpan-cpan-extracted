@@ -8,7 +8,7 @@ use File::Spec;
 use Env qw( @PATH );
 
 # ABSTRACT: Documentation and tools for using Platypus with the Rust programming language
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.15'; # VERSION
 
 
 sub native_type_map
@@ -47,7 +47,7 @@ FFI::Platypus::Lang::Rust - Documentation and tools for using Platypus with the 
 
 =head1 VERSION
 
-version 0.12
+version 0.15
 
 =head1 SYNOPSIS
 

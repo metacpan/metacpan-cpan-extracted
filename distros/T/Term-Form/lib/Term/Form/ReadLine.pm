@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.552';
+our $VERSION = '0.553';
 use Exporter 'import';
 our @EXPORT_OK = qw( read_line );
 
@@ -107,9 +107,9 @@ sub __before_readline {
                     $line_w = $m->{str}[$i][1] + $line_w;
                 }
             }
-            my $total_first_line_w = $self->{i}{max_key_w} + $line_w;
-            if ( $total_first_line_w <= $term_w ) {
-                my $empty_w = $term_w - $total_first_line_w;
+            my $top_pre_line_w = $self->{i}{max_key_w} + $line_w;
+            if ( $top_pre_line_w <= $term_w ) {
+                my $empty_w = $term_w - $top_pre_line_w;
                 unshift @pre_text_array, $self->{i}{prompt} . ( ' ' x $empty_w ) . $line;
             }
             else {
@@ -409,8 +409,8 @@ sub readline {
         my $p = "\r" . clear_to_end_of_line();
         if ( $self->{i}{prev_context_count} || $self->{i}{context_count} ) {
             my $count = $self->{i}{prev_context_count} // 0 > $self->{i}{context_count} // 0
-                ? $self->{i}{prev_context_count}
-                : $self->{i}{context_count};
+                            ? $self->{i}{prev_context_count}
+                            : $self->{i}{context_count};
             ++$count; # Home
             $p .= ( down( 1 ) . clear_to_end_of_line() ) x $count;
             $p .= up( $count );
@@ -499,7 +499,7 @@ Term::Form::ReadLine - Read a line from STDIN.
 
 =head1 VERSION
 
-Version 0.552
+Version 0.553
 
 =cut
 
@@ -690,7 +690,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2022-2022 Matthäus Kiem.
+Copyright 2022-2023 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

@@ -34,7 +34,7 @@ requires:
   Plack::Util::Accessor: 0
   Scalar::Util: 0
   Tags::HTML::Login::Button: 0.02
-  Tags::HTML::Page::Begin: 0.13
+  Tags::HTML::Page::Begin: 0.16
   Tags::HTML::Page::End: 0.04
   Tags::Output::Raw: 0
   Unicode::UTF8: 0
@@ -44,4 +44,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Plack-App-Login
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Plack-App-Login
-version: '0.06'
+version: '0.07'

@@ -53,6 +53,15 @@ is(folded($_, 5, boundary => 'word'), "000 ",    "boundary: check 0");
 is(folded($_, 6, boundary => 'word'), "000 ",    "boundary: check 0");
 is(folded($_, 7, boundary => 'word'), "000 000", "boundary: check 0");
 
+$_ = "사용하지 않은 데이터는";
+is(folded($_,  8, boundary => 'word'), "사용하지", "boundary: check Hangul");
+is(folded($_,  9, boundary => 'word'), "사용하지 ", "boundary: check Hangul");
+is(folded($_, 10, boundary => 'word'), "사용하지 ", "boundary: check Hangul");
+is(folded($_, 11, boundary => 'word'), "사용하지 ", "boundary: check Hangul");
+is(folded($_, 12, boundary => 'word'), "사용하지 ", "boundary: check Hangul");
+is(folded($_, 13, boundary => 'word'), "사용하지 않은", "boundary: check Hangul");
+is(folded($_, 14, boundary => 'word'), "사용하지 않은 ", "boundary: check Hangul");
+
 configure Text::ANSI::Fold width => 0, boundary => '';
 $_ = "__________aaa bbb/ccc ddd";
 

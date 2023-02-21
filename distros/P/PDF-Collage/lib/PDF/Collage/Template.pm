@@ -1,0 +1,143 @@
+package PDF::Collage::Template;
+use v5.24;
+use warnings;
+{ our $VERSION = '0.001' }
+
+use Carp;
+use Template::Perlish ();
+use Data::Resolver    ();
+use PDF::Builder;
+
+use Moo;
+use experimental qw< signatures >;
+no warnings qw< experimental::signatures >;
+
+use namespace::clean;
+
+has commands  => (is => ro => required => 1);
+has functions => (is => 'lazy');
+has logger    => (is => 'lazy');
+has metadata  => (is => 'lazy');
+
+has _data     => (is => 'lazy');
+has _defaults => (is => 'lazy');
+has _fonts    => (is => 'lazy');
+has _pdf      => (is => 'lazy');
+
+sub _build_functions ($self) { return {} }
+sub _build_logger    ($self) {
+   eval { require Log::Any; Log::Any->get_logger }
+}
+sub _build_metadata  ($self) { return {} }
+sub _build__data     ($self) { return {} }
+sub _build__defaults ($self) { return {} }
+sub _build__fonts    ($self) { return {} }
+sub _build__pdf      ($self) { return PDF::Builder->new }
+
+sub render ($self, $data) {
+   $self->new(    # hand over to a disposable clone
+      commands  => $self->commands,
+      functions => $self->functions,
+      _data     => $data,
+   )->_real_render;
+} ## end sub render
+
+sub _real_render ($self) {
+   for my $command ($self->commands->@*) {
+      my $op     = $command->{op} =~ s{-}{_}rgmxs;
+      my $method = $self->can('_op_' . $op)
+        or croak "unsupported op<$command->{op}>";
+      $self->$method($command);
+   } ## end for my $command ($self->...)
+   return $self->_pdf;
+} ## end sub _real_render
+
+sub _tpr ($self, $tmpl) {
+   return Template::Perlish::render($tmpl, $self->_data,
+      {functions => $self->functions});
+}
+
+sub _expand ($self, $command, @keys) {
+   my %auto_expand = map { $_ => 1 } @keys;
+   my %overall     = ($self->_defaults->%*, $command->%*);
+   my %retval;
+   for my $key (sort { $a cmp $b } keys %overall) {
+      my $nkey = $key =~ s{-}{_}rgmxs;
+      next if exists $retval{$nkey};
+      my $value = $overall{$key};
+      $retval{$nkey} = $auto_expand{$nkey} ? $self->_tpr($value) : $value;
+   } ## end for my $key (sort { $a ...})
+   return \%retval;
+} ## end sub _expand
+sub __pageno ($input)   { return $input eq 'last' ? 0 : $input }
+sub _font    ($s, $key) { $s->_fonts->{$key} //= $s->_pdf->font($key) }
+
+sub _op_add_image ($self, $command) {
+   my $opts  = $self->_expand($command, qw< page path x y width height >);
+   my $page  = $self->_pdf->open_page(__pageno($opts->{page} // 'last'));
+   my $image = $self->_pdf->image($opts->{path});
+   $page->object($image, $opts->@{qw< x y width height >});
+   return;
+} ## end sub _op_add_image
+
+sub _op_add_page ($self, $command) {
+   my $opts =
+     $self->_expand($command, qw< page from from_path from_page >);
+   my $target_n = __pageno($opts->{page} // 'last');
+   defined(my $source_path = $opts->{from} // $opts->{from_path})
+     or return $self->_pdf->page($target_n);
+   my $source   = PDF::Builder->open($source_path);
+   my $source_n = __pageno($opts->{from_page} // 'last');
+   return $self->_pdf->import_page($source, $source_n, $target_n);
+} ## end sub _op_add_page
+
+sub _op_add_text ($self, $command) {
+   my $opts =
+     $self->_expand($command, qw< page font font_family font_size x y >);
+   my $page = $self->_pdf->open_page(__pageno($opts->{page} // 'last'));
+   my $text = $page->text;
+
+   my $font = $self->_font($opts->{font} // $opts->{font_family});
+   $text->font($font, $opts->{font_size});
+
+   $text->position(map { $_ // 0 } $opts->@{qw< x y >});
+
+   my $content =
+     $self->_render_text($opts->@{qw< text text_template text_var >});
+   $text->text($content // '');
+
+   return $self;
+} ## end sub _op_add_text
+
+sub _render_text ($self, $plain, $template, $crumbs) {
+   return $plain                 if defined $plain;
+   return $self->_tpr($template) if defined $template;
+   return Template::Perlish::traverse($self->_data, $crumbs) // ''
+     if defined $crumbs;
+   return;
+} ## end sub _render_text
+
+sub _op_set_defaults ($self, $command) {
+   my $defaults = $self->_defaults;
+   while (my ($key, $value) = each $command->%*) {
+      next if $key eq 'op';
+      if (defined $value) { $defaults->{$key} = $value }
+      else                { delete $defaults->{$key} }
+   }
+   return;
+} ## end sub _op_set_defaults
+
+sub _default_log ($self, $command) {
+   warn "[$command->{level}] $command->{message}\n";
+   return $self;
+}
+
+sub _op_log ($self, $command) {
+   my $logger = $self->logger or return $self->_default_log($command);
+   my $method = $logger->can(lc($command->{level}) // 'info')
+      or return $self->_default_log($command);
+   $logger->$method($command->{message});
+   return $self;
+}
+
+1;

@@ -3,8 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use Struct::Dumb;
 

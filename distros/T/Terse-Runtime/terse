@@ -1,0 +1,23 @@
+#!usr/bin/perl;
+use Terse::Helper;
+Terse::Helper->new()->run(@ARGV, (!$#ARGV ? 1 : ()));
+__END__
+
+=head1 NAME
+  
+terse - CLA for generating a Terse application skeleton.
+  
+=head1 USAGE
+
+        lnation:High lnation$ terse --name Moon::Shine
+
+	plackup -p 3000 -s Starman MoonShine.psgi
+
+	visit http://localhost:3000/
+
+	terse --name Sky # Generates an application skeleton
+	terse --name Sky --controller Moon # Generate an application controller
+	terse --name Sky --model Sun # Generate an application model
+	terse --name Sky --plugin Stars # Generate an application plugin
+  
+=cut

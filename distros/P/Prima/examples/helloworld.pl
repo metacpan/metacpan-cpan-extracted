@@ -12,16 +12,21 @@ A very basic Prima toolkit usage is demonstrated
 
 use strict;
 use warnings;
-use Prima;
+use Prima qw(StdBitmap);
 use Prima::Application name => 'Generic';
+
+my $p = Prima::StdBitmap::image(0);
 
 my $w = Prima::MainWindow->new(
 	sizeMin => [200, 200],
 	text    => "Hello, world!",
+	font    => { size => 30 },
 	onPaint => sub {
 		my ( $self, $canvas) = @_;
 		$canvas-> clear;
-		$canvas-> text_shape_out( $self-> text, 10, 10);
+		$canvas->matrix->translate(100, 100)->rotate(10)->apply($canvas);
+		$canvas->stretch_image(100, 100, 300, 300, $p);
+		$canvas-> text_shape_out( $self-> text, 0, 0);
 	},
 );
 

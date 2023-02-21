@@ -1,4 +1,4 @@
-class Sys::User::Passwd : pointer_t {
+class Sys::User::Passwd : pointer {
   native method pw_name : string ();
   native method pw_passwd : string ();
   native method pw_uid : int ();

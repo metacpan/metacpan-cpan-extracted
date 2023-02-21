@@ -9,11 +9,12 @@ requires 'Carp';
 requires 'Data::Dump';
 requires 'Device::SerialPort';
 requires 'Time::HiRes';
+requires 'Digest::CRC';
 
 build_requires 'Test::More';
 
-build_requires 'Module::Install::Repository';
-auto_set_repository;
+#build_requires 'Module::Install::Repository';
+#auto_set_repository;
 
 test_requires 'Pod::Readme';
 

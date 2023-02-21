@@ -51,7 +51,7 @@ __PACKAGE__->mk_accessors(
   }
 );
 
-our $VERSION = '0.59'; ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
+our $VERSION = '0.60'; ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
 
 ########################################################################
 sub new {
@@ -70,32 +70,26 @@ sub new {
   $options{_region} = delete $options{region};
   $options{_signer} = delete $options{signer};
 
-  # convenience for level => 'debug' & for consistency with Amazon::Credentials
-  if ( delete $options{debug} ) {
-    $options{level} = 'debug';
-  }
+  # convenience for level => 'debug' & for consistency with
+  # Amazon::Credentials only do this if we are using internal logger,
+  # call should NOT use debug flag but rather use their own logger's
+  # level to turn on higher levels of logging...
 
-  # save this for later
-  my $level = $options{level};
-  $options{log_level} = delete $options{level};
+  if ( !$options{logger} ) {
+    if ( delete $options{debug} ) {
+      $options{level} = 'debug';
+    }
+
+    $options{log_level} = delete $options{level};
+    $options{log_level} //= $DEFAULT_LOG_LEVEL;
+
+    $options{logger}
+      = Amazon::S3::Logger->new( log_level => $options{log_level} );
+  }
 
   my $self = $class->SUPER::new( \%options );
 
-  # setup logger
-  if ( blessed( $self->logger ) ) {
-
-    # get level from your logger, if you didn't pass one
-    if ( $self->get_logger->can('level') ) {
-      if ( !$level ) {
-        $level = $self->get_logger->level();
-      } ## end if ( !$level )
-    } ## end if ( $self->get_logger...)
-  } ## end if ( blessed( $self->logger...))
-  else {
-
-    $self->logger( bless { log_level => $level // $DEFAULT_LOG_LEVEL },
-      'Amazon::S3::Logger' );
-  } ## end else [ if ( blessed( $self->logger...))]
+  # setup logger internal logging
 
   $self->get_logger->debug(
     sub {
@@ -104,7 +98,7 @@ sub new {
       if ( $safe_options{aws_secret_access_key} ) {
         $safe_options{aws_secret_access_key} = '****';
         $safe_options{aws_access_key_id}     = '****';
-      } ## end if ( $safe_options{aws_secret_access_key...})
+      }
 
       return Dumper( [ 'options: ', \%safe_options ] );
     }
@@ -122,7 +116,7 @@ sub new {
     $self->aws_access_key_id( _encrypt( $self->aws_access_key_id ) );
     $self->aws_secret_access_key( _encrypt( $self->aws_secret_access_key ) );
     $self->token( _encrypt( $self->token ) );
-  } ## end if ( !$self->credentials)
+  }
 
   my $ua;
 
@@ -133,13 +127,13 @@ sub new {
     );
 
     $ua->timing( join $COMMA, map { 2**$_ } 0 .. 5 );
-  } ## end if ( $self->retry )
+  }
   else {
     $ua = LWP::UserAgent->new(
       keep_alive            => $KEEP_ALIVE_CACHESIZE,
       requests_redirectable => [qw(GET HEAD DELETE)],
     );
-  } ## end else [ if ( $self->retry ) ]
+  }
 
   $ua->timeout( $self->timeout );
   $ua->env_proxy;
@@ -154,7 +148,7 @@ sub new {
   $self->turn_on_special_retry();
 
   return $self;
-} ## end sub new
+}
 
 ########################################################################
 {
@@ -324,7 +318,7 @@ sub region {
 
   if (@args) {
     $self->_region( $args[0] );
-  } ## end if (@args)
+  }
 
   $self->get_logger->debug(
     sub { return 'region: ' . ( $self->_region // $EMPTY ) } );
@@ -335,11 +329,11 @@ sub region {
 
     if ( $host =~ /\As3[.](.*)?amazonaws/xsm ) {
       $self->host( sprintf 's3.%s.amazonaws.com', $self->_region );
-    } ## end if ( $host =~ /\As3[.](.*)?amazonaws/xsm)
-  } ## end if ( $self->_region )
+    }
+  }
 
   return $self->_region;
-} ## end sub region
+}
 
 ########################################################################
 sub buckets {
@@ -377,7 +371,7 @@ sub buckets {
 
     if ( !ref $buckets || reftype($buckets) ne 'ARRAY' ) {
       $buckets = [$buckets];
-    } ## end if ( !ref $buckets || ...)
+    }
 
     foreach my $node ( @{$buckets} ) {
       push @buckets,
@@ -390,8 +384,8 @@ sub buckets {
         }
         );
 
-    } ## end foreach my $node ( @{$buckets...})
-  } ## end if ( ref $r->{Buckets})
+    }
+  }
 
   $self->reset_signer_region($region); # restore original region
 
@@ -402,7 +396,7 @@ sub buckets {
   };
 
   return $bucket_list;
-} ## end sub buckets
+}
 
 ########################################################################
 sub reset_signer_region {
@@ -449,7 +443,7 @@ sub add_bucket {
     $self->_validate_acl_short( $conf->{acl_short} );
 
     $header_ref{'x-amz-acl'} = $conf->{acl_short};
-  } ## end if ( $conf->{acl_short...})
+  }
 
   my $xml = <<'XML';
 <CreateBucketConfiguration>
@@ -471,7 +465,7 @@ XML
   my $bucket_obj = $retval ? $self->bucket($bucket) : undef;
 
   return $bucket_obj;
-} ## end sub add_bucket
+}
 
 ########################################################################
 sub bucket {
@@ -501,7 +495,7 @@ sub bucket {
       verify_region => $verify_region,
     }
   );
-} ## end sub bucket
+}
 
 ########################################################################
 sub delete_bucket {
@@ -514,11 +508,11 @@ sub delete_bucket {
   if ( eval { return $conf->isa('Amazon::S3::Bucket'); } ) {
     $bucket = $conf->bucket;
     $region = $conf->region;
-  } ## end if ( eval { return $conf...})
+  }
   else {
     $bucket = $conf->{bucket};
     $region = $conf->{region} || $self->get_bucket_location($bucket);
-  } ## end else [ if ( eval { return $conf...})]
+  }
 
   croak 'must specify bucket'
     if !$bucket;
@@ -530,7 +524,7 @@ sub delete_bucket {
       region  => $region,
     }
   );
-} ## end sub delete_bucket
+}
 
 ########################################################################
 sub list_bucket_v2 {
@@ -540,7 +534,7 @@ sub list_bucket_v2 {
   $conf->{'list-type'} = '2';
 
   goto &list_bucket;
-} ## end sub list_bucket_v2
+}
 
 ########################################################################
 sub list_bucket {
@@ -572,7 +566,7 @@ sub list_bucket {
 
     $path .= $query_string;
 
-  } ## end if ( %{$conf} )
+  }
 
   my $r = $self->_send_request(
     { method  => 'GET',
@@ -592,7 +586,7 @@ sub list_bucket {
   if ( $conf->{'list-type'} && $conf->{'list-type'} eq '2' ) {
     $marker      = 'ContinuationToken';
     $next_marker = 'NextContinuationToken';
-  } ## end if ( $conf->{'list-type'...})
+  }
 
   $bucket_list = {
     bucket       => $r->{Name},
@@ -614,7 +608,7 @@ sub list_bucket {
 
     if ( defined $etag ) {
       $etag =~ s{(^"|"$)}{}gxsm;
-    } ## end if ( defined $etag )
+    }
 
     push @keys,
       {
@@ -626,7 +620,7 @@ sub list_bucket {
       owner_id          => $node->{Owner}{ID},
       owner_displayname => $node->{Owner}{DisplayName},
       };
-  } ## end foreach my $node ( @{ $r->{...}})
+  }
   $bucket_list->{keys} = \@keys;
 
   if ( $conf->{delimiter} ) {
@@ -636,7 +630,7 @@ sub list_bucket {
     foreach my $node ( $r->{CommonPrefixes} ) {
       if ( ref $node ne 'ARRAY' ) {
         $node = [$node];
-      } ## end if ( ref $node ne 'ARRAY')
+      }
 
       foreach my $n ( @{$node} ) {
         next if !exists $n->{Prefix};
@@ -645,16 +639,16 @@ sub list_bucket {
         # strip delimiter from end of prefix
         if ($prefix) {
           $prefix =~ s/$strip_delim//xsm;
-        } ## end if ($prefix)
+        }
 
         push @common_prefixes, $prefix;
-      } ## end foreach my $n ( @{$node} )
-    } ## end foreach my $node ( $r->{CommonPrefixes...})
+      }
+    }
     $bucket_list->{common_prefixes} = \@common_prefixes;
-  } ## end if ( $conf->{delimiter...})
+  }
 
   return $bucket_list;
-} ## end sub list_bucket
+}
 
 ########################################################################
 sub list_bucket_all_v2 {
@@ -665,7 +659,7 @@ sub list_bucket_all_v2 {
   $conf->{'list-type'} = '2';
 
   return $self->list_bucket_all($conf);
-} ## end sub list_bucket_all_v2
+}
 
 ########################################################################
 sub list_bucket_all {
@@ -701,13 +695,13 @@ sub list_bucket_all {
     push @{ $all->{keys} }, @{ $response->{keys} };
 
     last if !$response->{is_truncated};
-  } ## end while ($TRUE)
+  }
 
   delete $all->{is_truncated};
   delete $all->{next_marker};
 
   return $all;
-} ## end sub list_bucket_all
+}
 
 ########################################################################
 sub get_credentials {
@@ -722,15 +716,15 @@ sub get_credentials {
     $aws_access_key_id     = $self->credentials->get_aws_access_key_id;
     $aws_secret_access_key = $self->credentials->get_aws_secret_access_key;
     $token                 = $self->credentials->get_token;
-  } ## end if ( $self->credentials)
+  }
   else {
     $aws_access_key_id     = $self->aws_access_key_id;
     $aws_secret_access_key = $self->aws_secret_access_key;
     $token                 = $self->token;
-  } ## end else [ if ( $self->credentials)]
+  }
 
   return ( $aws_access_key_id, $aws_secret_access_key, $token );
-} ## end sub get_credentials
+}
 
 # Log::Log4perl compatibility routines
 ########################################################################
@@ -739,7 +733,7 @@ sub get_logger {
   my ($self) = @_;
 
   return $self->logger;
-} ## end sub get_logger
+}
 
 ########################################################################
 sub level {
@@ -750,10 +744,10 @@ sub level {
     $self->log_level( $args[0] );
 
     $self->get_logger->level( uc $args[0] );
-  } ## end if (@args)
+  }
 
   return $self->get_logger->level;
-} ## end sub level
+}
 
 ########################################################################
 sub signer {
@@ -789,10 +783,10 @@ sub _validate_acl_short {
   if ( !any { $policy_name eq $_ }
     qw(private public-read public-read-write authenticated-read) ) {
     croak "$policy_name is not a supported canned access policy";
-  } ## end if ( !any { $policy_name...})
+  }
 
   return;
-} ## end sub _validate_acl_short
+}
 
 # Determine if a bucket can used as subdomain for the host
 # Specifying the bucket in the URL path is being deprecated
@@ -806,7 +800,7 @@ sub _can_bucket_be_subdomain {
 
   if ( length $bucketname > $MAX_BUCKET_NAME_LENGTH - 1 ) {
     return $FALSE;
-  } ## end if ( length $bucketname...)
+  }
 
   if ( length $bucketname < $MIN_BUCKET_NAME_LENGTH ) {
     return $FALSE;
@@ -898,7 +892,7 @@ sub _make_request {
   $self->get_logger->trace( sub { return Dumper( [$request] ); } );
 
   return $request;
-} ## end sub _make_request
+}
 
 # $self->_send_request($HTTP::Request)
 # $self->_send_request(@params_to_make_request)
@@ -930,10 +924,10 @@ sub _send_request {
   }
   elsif ( $content && $response->content_type eq 'application/xml' ) {
     $content = $self->_xpc_of_content($content);
-  } ## end if ( $content && $response...)
+  }
 
   return $content;
-} ## end sub _send_request
+}
 
 #
 # This is the necessary to find the region for a specific bucket
@@ -1093,7 +1087,7 @@ sub _do_http_no_redirect {
   $self->last_response($response);
 
   return $response;
-} ## end sub _do_http
+}
 
 ########################################################################
 sub _send_request_expect_nothing {
@@ -1114,7 +1108,7 @@ sub _send_request_expect_nothing {
   $self->_remember_errors( $response->content, $TRUE );
 
   return $FALSE;
-} ## end sub _send_request_expect_nothing
+}
 
 # Send a HEAD request first, to find out if we'll be hit with a 307 redirect.
 # Since currently LWP does not have true support for 100 Continue, it simply
@@ -1158,7 +1152,7 @@ sub _send_request_expect_nothing_probed {
   if ( $response->code =~ /^3/xsm ) {
     if ( defined $response->header('Location') ) {
       $override_uri = $response->header('Location');
-    } ## end if ( $response->code =~...)
+    }
     else {
       $self->_croak_if_response_error($response);
     }
@@ -1177,7 +1171,7 @@ sub _send_request_expect_nothing_probed {
 
   if ( defined $override_uri ) {
     $request->uri($override_uri);
-  } ## end if ( defined $override_uri)
+  }
 
   $response = $self->_do_http_no_redirect($request);
 
@@ -1192,7 +1186,7 @@ sub _send_request_expect_nothing_probed {
   $self->_remember_errors( $response->content, $TRUE );
 
   return $FALSE;
-} ## end sub _send_request_expect_nothing_probed
+}
 
 ########################################################################
 sub _croak_if_response_error {
@@ -1206,10 +1200,10 @@ sub _croak_if_response_error {
 
     croak sprintf 'Amazon::S3: Amazon responded with %s ',
       $response->status_line;
-  } ## end if ( $response->code !~...)
+  }
 
   return;
-} ## end sub _croak_if_response_error
+}
 
 ########################################################################
 sub _xpc_of_content {
@@ -1232,7 +1226,7 @@ sub _xpc_of_content {
   }
 
   return $xml_hr;
-} ## end sub _xpc_of_content
+}
 
 # returns 1 if errors were found
 ########################################################################
@@ -1249,7 +1243,7 @@ sub _remember_errors {
     $self->errstr($src);
 
     return $TRUE;
-  } ## end if ( !ref $src && $src...)
+  }
 
   my $r = ref $src ? $src : $self->_xpc_of_content( $src, $keep_root );
 
@@ -1258,17 +1252,17 @@ sub _remember_errors {
   # apparently buckets() does not keep_root
   if ( $r->{Error} ) {
     $r = $r->{Error};
-  } ## end if ( $r->{Error} )
+  }
 
   if ( $r->{Code} ) {
     $self->err( $r->{Code} );
     $self->errstr( $r->{Message} );
 
     return $TRUE;
-  } ## end if ( $r->{Code} )
+  }
 
   return $FALSE;
-} ## end sub _remember_errors
+}
 
 #
 # Deprecated - this adds a header for the old V2 auth signatures
@@ -1283,11 +1277,11 @@ sub _add_auth_header {
 
   if ( not $headers->header('Date') ) {
     $headers->header( Date => time2str(time) );
-  } ## end if ( not $headers->header...)
+  }
 
   if ($token) {
     $headers->header( $AMAZON_HEADER_PREFIX . 'security-token', $token );
-  } ## end if ($token)
+  }
 
   my $canonical_string = $self->_canonical_string( $method, $path, $headers );
   $self->get_logger->trace( Dumper( [$headers] ) );
@@ -1300,7 +1294,7 @@ sub _add_auth_header {
     Authorization => "AWS $aws_access_key_id:$encoded_canonical" );
 
   return;
-} ## end sub _add_auth_header
+}
 
 # generates an HTTP::Headers objects given one hash that represents http
 # headers to set and another hash that represents an object's metadata.
@@ -1322,10 +1316,10 @@ sub _merge_meta {
   foreach my $p ( pairs %{$metadata} ) {
     my ( $k, $v ) = @{$p};
     $http_header->header( "$METADATA_PREFIX$k" => $v );
-  } ## end while ( my ( $k, $v ) = each...)
+  }
 
   return $http_header;
-} ## end sub _merge_meta
+}
 
 # generate a canonical string for the given parameters.  expires is optional and is
 # only used by query string authentication.
@@ -1348,8 +1342,8 @@ sub _canonical_string {
       or $lk eq 'date'
       or $lk =~ /^$AMAZON_HEADER_PREFIX/xsm ) {
       $interesting_headers{$lk} = $self->_trim($value);
-    } ## end if ( $lk eq 'content-md5'...)
-  } ## end while ( my ( $key, $value...))
+    }
+  }
 
   # these keys get empty strings if they don't exist
   $interesting_headers{'content-type'} ||= $EMPTY;
@@ -1358,24 +1352,24 @@ sub _canonical_string {
   # just in case someone used this.  it's not necessary in this lib.
   if ( $interesting_headers{'x-amz-date'} ) {
     $interesting_headers{'date'} = $EMPTY;
-  } ## end if ( $interesting_headers...)
+  }
 
   # if you're using expires for query string auth, then it trumps date
   # (and x-amz-date)
   if ($expires) {
     $interesting_headers{'date'} = $expires;
-  } ## end if ($expires)
+  }
 
   my $buf = "$method\n";
 
   foreach my $key ( sort keys %interesting_headers ) {
     if ( $key =~ /^$AMAZON_HEADER_PREFIX/xsm ) {
       $buf .= "$key:$interesting_headers{$key}\n";
-    } ## end if ( $key =~ /^$AMAZON_HEADER_PREFIX/xsm)
+    }
     else {
       $buf .= "$interesting_headers{$key}\n";
-    } ## end else [ if ( $key =~ /^$AMAZON_HEADER_PREFIX/xsm)]
-  } ## end foreach my $key ( sort keys...)
+    }
+  }
 
   # don't include anything after the first ? in the resource...
   #  $path =~ /^([^?]*)/xsm;
@@ -1387,7 +1381,7 @@ sub _canonical_string {
   if ( $path =~ /[&?](acl|torrent|location|uploads|delete)($|=|&)/xsm ) {
     #  if ( $path =~ /[&?](acl|torrent|location|uploads|delete)([=&])?/xsm ) {
     $buf .= "?$1";
-  } ## end if ( $path =~ ...)
+  }
   elsif ( my %query_params = URI->new($path)->query_form ) {
     # see if the remaining parsed query string provides us with any
     # query string or upload id
@@ -1399,14 +1393,14 @@ sub _canonical_string {
       $buf .= sprintf '?partNumber=%s&uploadId=%s',
         $query_params{partNumber},
         $query_params{uploadId};
-    } ## end if ( $query_params{partNumber...})
+    }
     elsif ( $query_params{uploadId} ) {
       $buf .= sprintf '?uploadId=%s', $query_params{uploadId};
-    } ## end elsif ( $query_params{uploadId...})
-  } ## end elsif ( my %query_params ...)
+    }
+  }
 
   return $buf;
-} ## end sub _canonical_string
+}
 
 ########################################################################
 sub _trim {
@@ -1417,7 +1411,7 @@ sub _trim {
   $value =~ s/\s+$//xsm;
 
   return $value;
-} ## end sub _trim
+}
 
 # finds the hmac-sha1 hash of the canonical string and the aws secret access key and then
 # base64 encodes the result (optionally urlencoding after that).
@@ -1432,7 +1426,7 @@ sub _encode {
   my $b64 = encode_base64( $hmac->digest, $EMPTY );
 
   return $urlencode ? $self->_urlencode($b64) : return $b64;
-} ## end sub _encode
+}
 
 ########################################################################
 sub _urlencode {
@@ -1440,7 +1434,7 @@ sub _urlencode {
   my ( $self, $unencoded ) = @_;
 
   return uri_escape_utf8( $unencoded, '^A-Za-z0-9\-\._~\x2f' );
-} ## end sub _urlencode
+}
 
 1;
 

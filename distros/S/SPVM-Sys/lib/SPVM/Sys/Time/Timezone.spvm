@@ -1,4 +1,4 @@
-class Sys::Time::Timezone : pointer_t {
+class Sys::Time::Timezone : pointer {
   
   native static method new : Sys::Time::Timezone ();
 

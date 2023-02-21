@@ -1,5 +1,9 @@
 Revision history for Music-RhythmSet
 
+0.05    2023-02-14
+        Allow for patch_change in MIDI output so one need not inject
+        that manually.
+
 0.04    2022-04-29
         Better document the duplication of MIDI events. Also new embig
         parameter to de-duplicate the MIDI events.

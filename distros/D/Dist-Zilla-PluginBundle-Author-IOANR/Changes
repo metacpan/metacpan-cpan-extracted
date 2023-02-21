@@ -1,5 +1,9 @@
 Changelog for Dist-Zilla-PluginBundle-Author-IOANR
 
+1.230480 2023-02-17T22:14:13Z
+ - Update git host regex because github actions checkout doesn't use .git
+   suffix
+
 1.201592 2020-06-07T23:33:20Z
  - Fix repository URL
 

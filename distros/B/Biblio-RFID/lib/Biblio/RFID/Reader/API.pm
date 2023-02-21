@@ -3,6 +3,9 @@ package Biblio::RFID::Reader::API;
 use warnings;
 use strict;
 
+use Biblio::RFID::RFID501;
+use Biblio::RFID::SmartX;
+
 =head1 NAME
 
 Biblio::RFID::Reader::API - low-level RFID reader documentation
@@ -46,6 +49,13 @@ to receive response from other tags from protocol specification,
 
   $self->write_afi( $tag => $afi );
 
+=head2 tag_type
+
+  $self->tag_type( $tag );
+
+=cut
+
+sub tag_type { 'RFID501' }
 
 =head1 METHODS
 

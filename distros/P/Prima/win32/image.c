@@ -526,7 +526,7 @@ image_convert_for_gdi( Handle image )
 	return dup;
 }
 
-/* create a copy with given type, unless it is of this type alredy */
+/* create a copy with given type, unless it is of this type already */
 static Handle
 image_convert_to_type( Handle image, int type, Bool inplace )
 {
@@ -1363,7 +1363,8 @@ PutImageFunc (*img_put_on_layered[SRC_NUM]) = {
 Bool
 apc_gp_stretch_image( Handle self, Handle image,
 	int dst_x, int dst_y, int src_x, int src_y,
-	int dst_w, int dst_h, int src_w, int src_h, int rop)
+	int dst_w, int dst_h, int src_w, int src_h,
+	int rop, Bool use_matrix)
 {
 	PIcon img = (PIcon) image;
 	PutImageRequest req;
@@ -1373,6 +1374,8 @@ apc_gp_stretch_image( Handle self, Handle image,
 
 	objCheck false;
 	dobjCheck(image) false;
+
+	select_world_transform(self, use_matrix);
 
 	if ( src_h < 0) {
 		src_h = -src_h;

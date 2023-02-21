@@ -1,38 +1,16 @@
 class File::Basename {
-  use File::Basename::Win32;
-  use File::Basename::Unix;
-  use Sys;
-  
-  # Interfaces
-  interface File::Basename::Interface;
+  use File::Basename::Instance;
   
   # Class Methods
-  static method new : File::Basename () {
-    
-    my $self : File::Basename;
-    
-    if (Sys->defined("_WIN32")) {
-      $self = File::Basename::Win32->new;
-    }
-    else {
-      $self = File::Basename::Unix->new;
-    }
-    
-    return $self;
+  static method fileparse : string[] ($path : string) {
+    return File::Basename::Instance->new->fileparse($path);
   }
   
-  # Instance Methods
-  method has_interfaces : int () { return 1; }
-  
-  method fileparse : string[] ($path : string) {
-    return $self->(File::Basename::Interface)->fileparse($path);
+  static method basename : string ($path : string) {
+    return File::Basename::Instance->new->basename($path);
   }
   
-  method basename : string ($path : string) {
-    return $self->(File::Basename::Interface)->basename($path);
-  }
-  
-  method dirname : string ($path : string) {
-    return $self->(File::Basename::Interface)->dirname($path);
+  static method dirname : string ($path : string) {
+    return File::Basename::Instance->new->dirname($path);
   }
 }

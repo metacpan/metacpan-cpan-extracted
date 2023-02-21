@@ -14,11 +14,6 @@
    },
    "name" : "Tie-Mounted",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Test::More" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
             "Module::Build" : "0.42"
@@ -32,12 +27,17 @@
             "Tie::Array" : "0",
             "boolean" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
       }
    },
    "provides" : {
       "Tie::Mounted" : {
          "file" : "lib/Tie/Mounted.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       }
    },
    "release_status" : "stable",
@@ -49,6 +49,6 @@
          "url" : "https://github.com/stsc/Tie-Mounted"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,0 +1,221 @@
+<html>
+<head>
+<meta charset="utf-8"></meta>
+<title>RFID SIP2 Selfcheck</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<link href='http://fonts.googleapis.com/css?family=Roboto&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+<style type="text/css">
+
+body, input {
+	font-family: 'Roboto', sans-serif;
+	font-size: 150%;
+	/* disable selection which brings havoc on touchscreens */
+	-webkit-user-select: none;
+	-moz-user-select: -moz-none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+body {
+	background: #f0f0ff;
+	margin: 2em;
+}
+
+
+h1 {
+	position: absolute;
+	top: -0.5em;
+	left: 0.5em;
+	font-size: 100%;
+}
+
+.status {
+	background: #ff8;
+}
+
+.da {
+	background: #fcc;
+}
+
+.d7 {
+	background: #cfc;
+}
+
+.page {
+	border: 2em solid #fff;
+	border-radius: 1em;
+	background: #fff;
+}
+
+#tags {
+	position: fixed;
+	width: 20em;
+	top: 0;
+	right: 0;
+	font-size: 50%;
+}
+
+input[type=button] {
+	display: block;
+	float: left;
+	width: 50%;
+	height: 6em;
+	font-size: 100%;
+}
+
+.button {
+	margin-top: 1em;
+	display: block;
+	width: 100%;
+	position: absolute;
+	left: 0;
+	bottom: 0;
+}
+
+#timeout {
+	display: none;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-left: -8em; /* width + 2 * padding / 2 */
+	margin-top: -5em;
+	width: 12em;
+	height: 8em;
+	background: #ff8;
+	padding: 2em;
+	border: 0.5em solid #f00;
+	text-align: center;
+	font-size: 100%;
+}
+
+#working {
+	display: none;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-left: -250px; /* 500 / 2 */
+	margin-top: -187px;  /* 375 / 2 */
+}
+
+</style>
+<script type="text/javascript" src="/examples/selfcheck.js"></script>
+</head>
+<body>
+
+<div id="tags">
+RFID reader not found or driver program not started.
+</div>
+
+<h1>Knjižnica Filozofskog fakulteta</h1>
+
+<div id="timeout">
+Timeout in <span id="tick">99</span> seconds.
+<div class="button">
+<input type=button value="continue" onClick="start_timeout();" style="width:100%">
+</div>
+</div>
+
+
+<div id="working">
+<img src="/examples/giphy.gif">
+</div>
+
+
+<div class="page" id="start">
+
+<!--
+Put borrower card on a reader to borrow books
+-->
+
+Ako želite posuditi knjigu, najprije stavite iskaznicu na za to predviđeno mjesto.
+
+<hr>
+
+<!--
+Select checkin button to return books.
+-->
+
+Ako želite vratiti knjigu, pritisnite gumb za povrat.
+
+<div class="button">
+<input name=checkin type=button value="Povrat" onClick="change_page('checkin')" style="background: #8f8;">
+</div>
+</div>
+
+<div class="page" id="borrower_info">
+
+<!--
+Borrower:
+-->
+<h2>Informacije o članu</h2>
+<div class="borrower_name"></div>
+<!--
+<div class="borrower_email"></div>
+-->
+<div class="borrower_number"></div>
+
+<h2>Dokumenti</h2>
+
+<ul>
+<!--
+<li>Hold items: <span class="hold_items">0</span>
+-->
+<li>Posuđeno: <span class="charged_items">0</span>
+<li>Kašnjenja: <span class="overdue_items">0</span>
+<!--
+<li>Fine items: <span class="fine_items">0</span>
+-->
+</ul>
+
+<!--
+<h2>Dugovanje</h2>
+
+Ostatak: 0,00 kn
+
+<h2>Poruke</h2>
+
+Greeting from Koha.
+
+-->
+
+<div class="button">
+<input type="button" value="OK" onClick="change_page(circulation_type)">
+</div>
+
+</div>
+
+<div class="page" id="circulation">
+<!--
+Put books to borrow on reader pad.
+-->
+Postavite knjige na predviđeno mjesto ispred monitora.
+
+<hr>
+
+<div class="checkout">Posuđeno:</div>
+<div class="checkin">Vraćeno:</div>
+
+<ul id="books">
+</ul>
+
+<div class="button">
+<input class="checkout" type="button" value="Informacije o članu" onClick="change_page('borrower_info')">
+<input type="button" value="Završi" onClick="change_page('end')" style="float:right; background: #f88;">
+</div>
+
+</div>
+
+<div class="page" id="end">
+
+Hvala što ste koristili selfcheck sustav.
+
+</div>
+
+<div class="page" id="error">
+
+Greška. Odnesite knjige na pult.
+
+</div>
+
+</body>
+</html>

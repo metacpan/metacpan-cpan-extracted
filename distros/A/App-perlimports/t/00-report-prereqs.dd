@@ -21,7 +21,6 @@ do { my $x = {
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Pod::Wordlist' => '0',
                                       'Test::CPAN::Changes' => '0.19',
-                                      'Test::Code::TidyAll' => '0.50',
                                       'Test::EOL' => '0',
                                       'Test::Mojibake' => '0',
                                       'Test::More' => '0.96',
@@ -79,7 +78,6 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
-                                   'DDP' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'File::pushd' => '0',

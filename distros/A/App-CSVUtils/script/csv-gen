@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-03'; # DATE
+our $DATE = '2023-02-18'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.008'; # VERSION
+our $VERSION = '1.017'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_gen/csv_gen",
@@ -41,7 +41,7 @@ csv-gen - Generate CSV data using Perl code
 
 =head1 VERSION
 
-This document describes version 1.008 of csv-gen (from Perl distribution App-CSVUtils), released on 2023-02-03.
+This document describes version 1.017 of csv-gen (from Perl distribution App-CSVUtils), released on 2023-02-18.
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,7 @@ B<csv-gen> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?
 
 B<csv-gen> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<csv-gen> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--eval-fields|/"--eval-fields=s">>=I<str>] [B<L<--eval|/"--eval=s, -e">>=I<str>|B<L<-e|/"--eval=s, -e">>=I<str>] [(B<L<--field|/"--fields-json=s">>=I<str>)+|B<L<--fields-json|/"--fields-json=s">>=I<json>|(B<L<-f|/"--fields-json=s">>=I<str>)+] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--num-rows|/"--num-rows=s, -n">>=I<L<uint|Sah::Schema::uint>>|B<L<-n|/"--num-rows=s, -n">>=I<L<uint|Sah::Schema::uint>>] [B<L<--output-escape-char|/"--output-escape-char=s">>=I<str>] [B<L<--output-header|/"--output-header">>|B<L<--no-output-header|/"--output-header">>|B<L<--nooutput-header|/"--output-header">>] [B<L<--output-quote-char|/"--output-quote-char=s">>=I<str>] [B<L<--output-sep-char|/"--output-sep-char=s">>=I<str>] [B<L<--output-tsv|/"--output-tsv">>|B<L<--no-output-tsv|/"--output-tsv">>|B<L<--nooutput-tsv|/"--output-tsv">>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>|B<L<--no-overwrite|/"--overwrite, -O">>|B<L<--nooverwrite|/"--overwrite, -O">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<output_filename|/"--output-filename=s, -o">>]
+B<csv-gen> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--eval-fields|/"--eval-fields=s">>=I<str>] [B<L<--eval|/"--eval=s, -e">>=I<str>|B<L<-e|/"--eval=s, -e">>=I<str>] [(B<L<--field|/"--fields-json=s">>=I<str>)+|B<L<--fields-json|/"--fields-json=s">>=I<json>|(B<L<-f|/"--fields-json=s">>=I<str>)+] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--num-rows|/"--num-rows=s, -n">>=I<L<uint|Sah::Schema::uint>>|B<L<-n|/"--num-rows=s, -n">>=I<L<uint|Sah::Schema::uint>>] [B<L<--output-always-quote|/"--output-always-quote">>|B<L<--no-output-always-quote|/"--output-always-quote">>|B<L<--nooutput-always-quote|/"--output-always-quote">>] [B<L<--output-escape-char|/"--output-escape-char=s">>=I<str>] [B<L<--output-header|/"--output-header">>|B<L<--no-output-header|/"--output-header">>|B<L<--nooutput-header|/"--output-header">>] [B<L<--output-quote-char|/"--output-quote-char=s">>=I<str>] [B<L<--output-quote-empty|/"--output-quote-empty">>|B<L<--no-output-quote-empty|/"--output-quote-empty">>|B<L<--nooutput-quote-empty|/"--output-quote-empty">>] [B<L<--output-sep-char|/"--output-sep-char=s">>=I<str>] [B<L<--output-tsv|/"--output-tsv">>|B<L<--no-output-tsv|/"--output-tsv">>|B<L<--nooutput-tsv|/"--output-tsv">>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>|B<L<--no-overwrite|/"--overwrite, -O">>|B<L<--nooverwrite|/"--overwrite, -O">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<output_filename|/"--output-filename=s, -o">>]
 
 
 
@@ -184,6 +184,19 @@ C<--naked-res> so you just get:
  [1,2,3]
 
 
+=item B<--output-always-quote>
+
+Whether to always quote values.
+
+When set to false (the default), values are quoted only when necessary:
+
+ field1,field2,"field three contains comma (,)",field4
+
+When set to true, then all values will be quoted:
+
+ "field1","field2","field three contains comma (,)","field4"
+
+
 =item B<--output-escape-char>=I<s>
 
 Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
@@ -223,6 +236,19 @@ Specify field quote character in output CSV, will be passed to Text::CSV_XS.
 This is like C<--input-quote-char> option but for output instead of input.
 
 Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+
+=item B<--output-quote-empty>
+
+Whether to quote empty values.
+
+When set to false (the default), empty values are not quoted:
+
+ field1,field2,,field4
+
+When set to true, then empty values will be quoted:
+
+ field1,field2,"",field4
 
 
 =item B<--output-sep-char>=I<s>

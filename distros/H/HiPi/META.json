@@ -4,7 +4,7 @@
       "Mark Dootson <mdootson@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -37,7 +37,6 @@
             "Bit::Vector" : "0",
             "Device::SerialPort" : "0",
             "Digest::SHA" : "0",
-            "File::Copy::Recursive" : "0",
             "File::Slurp" : "0",
             "Getopt::Long" : "0",
             "Image::Imlib2" : "0",
@@ -53,7 +52,7 @@
    "provides" : {
       "HiPi" : {
          "file" : "lib/HiPi.pm",
-         "version" : "0.86"
+         "version" : "0.88"
       },
       "HiPi::Class" : {
          "file" : "lib/HiPi/Class.pm",
@@ -667,7 +666,7 @@
       },
       "HiPi::RaspberryPi" : {
          "file" : "lib/HiPi/RaspberryPi.pm",
-         "version" : "0.86"
+         "version" : "0.88"
       },
       "HiPi::Utils" : {
          "file" : "lib/HiPi/Utils.pm",
@@ -697,6 +696,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.86",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.88",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

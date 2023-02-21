@@ -58,6 +58,7 @@ t/pod-coverage.t
 t/pod.t
 t/regexp.t
 t/rewrite-header.t
+t/ruby.t
 t/short-titles.t
 t/splat.t
 t/splat_html.t

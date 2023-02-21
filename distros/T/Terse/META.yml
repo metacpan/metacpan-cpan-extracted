@@ -20,14 +20,15 @@ no_index:
     - inc
 requires:
   B: '0'
+  Cpanel::JSON::XS: '0'
   Digest::SHA: '0'
-  JSON: '0'
   Plack::Request: '0'
   Plack::Response: '0'
   Scalar::Util: '0'
+  Struct::WOP: '0.15'
   Test::Instruction: '0'
   Time::HiRes: '0'
   Want: '0'
   perl: '5.006'
-version: '0.1234'
+version: '0.123456789'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

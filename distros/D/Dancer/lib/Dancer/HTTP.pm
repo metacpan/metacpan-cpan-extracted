@@ -1,7 +1,7 @@
 package Dancer::HTTP;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: helper for rendering HTTP status codes for Dancer
-$Dancer::HTTP::VERSION = '1.3520';
+$Dancer::HTTP::VERSION = '1.3521';
 use strict;
 use warnings;
 use base 'Exporter';
@@ -99,7 +99,7 @@ Dancer::HTTP - helper for rendering HTTP status codes for Dancer
 
 =head1 VERSION
 
-version 1.3520
+version 1.3521
 
 =head1 DESCRIPTION
 

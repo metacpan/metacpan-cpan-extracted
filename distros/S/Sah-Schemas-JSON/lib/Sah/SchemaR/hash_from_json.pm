@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::hash_from_json;
 
-our $DATE = '2022-08-26'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2022-11-15'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 our $rschema = do{my$var={base=>"hash",clsets_after_base=>[{description=>"\nYou can use this schema if you want to accept a hash, but if user supplies a\nstring e.g. in a command-line script as command-line argument or option, the\nstring will be coerced into hash if the string contains a JSON-encoded object\n(hash). Data will not be valid if the string does not contain valid JSON.\n\nNote that hash data is accepted, unlike the `json_str::hash` schema which only\naccepts hash in JSON-encoded string form.\n\n",examples=>[{summary=>"Empty string is not a valid JSON",valid=>0,value=>""},{summary=>"Valid JSON but not a hash",valid=>0,value=>1},{summary=>"Valid JSON but not a hash",valid=>0,value=>"[]"},{summary=>"Already a hash",valid=>1,value=>{}},{summary=>"Not a hash",valid=>0,value=>[]},{summary=>"Not a valid JSON literal",valid=>0,value=>"foo"},{valid=>1,validated_value=>{},value=>"{}"},{valid=>1,validated_value=>{a=>1,b=>2},value=>"{\"a\":1,\"b\":2}"},{summary=>"Missing closing curly bracket",valid=>0,value=>"{\"a\":1,\"b\":2"}],prefilters=>["JSON::decode_str"],summary=>"Hash, coerced from JSON string"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["hash"],type=>"hash",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::hash_from_json - Hash, coerced from JSON string
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::SchemaR::hash_from_json (from Perl distribution Sah-Schemas-JSON), released on 2022-08-26.
+This document describes version 0.007 of Sah::SchemaR::hash_from_json (from Perl distribution Sah-Schemas-JSON), released on 2022-11-15.
 
 =head1 DESCRIPTION
 

@@ -1,13 +1,12 @@
 use Test::More tests => 10;
-BEGIN { use_ok( 'Data::Dump::Streamer', qw(:undump) ); }
+BEGIN { use_ok('Data::Dump::Streamer', qw(:undump)); }
 use strict;
 use warnings;
 use Data::Dumper;
 
-#$Id: sortkeys.t 26 2006-04-16 15:18:52Z demerphq $#
-
 # imports same()
 require "./t/test_helper.pl";
+
 # use this one for simple, non evalable tests. (GLOB)
 #   same ( $got,$expected,$name,$obj )
 #
@@ -15,14 +14,17 @@ require "./t/test_helper.pl";
 # same ( $name,$obj,$expected,@args )
 
 my $dump;
-my $o = Data::Dump::Streamer->new();
+my $o= Data::Dump::Streamer->new();
 
-isa_ok( $o, 'Data::Dump::Streamer' );
+isa_ok($o, 'Data::Dump::Streamer');
 
 {
-    use warnings FATAL=>'all';
-    my $hash={(map {$_ => $_, "1$_"=>"1$_" } 0..9,'a'..'j','A'..'J'),map { ( chr(65+$_).$_ => $_, $_.chr(65+$_) => $_) } 0..9};
-same( "Sortkeys Mixed Default (smart)", $o , <<'EXPECT',$hash );
+    use warnings FATAL => 'all';
+    my $hash= {
+        (map { $_ => $_, "1$_" => "1$_" } 0 .. 9, 'a' .. 'j', 'A' .. 'J'),
+        map { (chr(65 + $_) . $_ => $_, $_ . chr(65 + $_) => $_) } 0 .. 9
+    };
+    same("Sortkeys Mixed Default (smart)", $o, <<'EXPECT', $hash);
 $HASH1 = {
            0    => 0,
            "0A" => 0,
@@ -105,7 +107,7 @@ $HASH1 = {
            J9   => 9
          };
 EXPECT
-same(  "Sortkeys Mixed Lexico", $o->SortKeys('lex'), <<'EXPECT',( $hash ));
+    same("Sortkeys Mixed Lexico", $o->SortKeys('lex'), <<'EXPECT', ($hash));
 $HASH1 = {
            0    => 0,
            "0A" => 0,
@@ -188,8 +190,11 @@ $HASH1 = {
            j    => 'j'
          };
 EXPECT
-$hash={map { $_ => 1} (1,10,11,2,20,100)};
-same( "Sortkeys Numeric Alph==Lex", $o->SortKeys('alph'), <<'EXPECT', ( $hash )  );
+    $hash= { map { $_ => 1 } (1, 10, 11, 2, 20, 100) };
+    same(
+        "Sortkeys Numeric Alph==Lex",
+        $o->SortKeys('alph'),
+        <<'EXPECT', ($hash));
 $HASH1 = {
            1   => 1,
            10  => 1,
@@ -199,7 +204,7 @@ $HASH1 = {
            20  => 1
          };
 EXPECT
-same( "Sortkeys Numeric", $o->SortKeys('num') , <<'EXPECT', ( $hash ) );
+    same("Sortkeys Numeric", $o->SortKeys('num'), <<'EXPECT', ($hash));
 $HASH1 = {
            1   => 1,
            2   => 1,
@@ -209,7 +214,7 @@ $HASH1 = {
            100 => 1
          };
 EXPECT
-same( "Sortkeys Numeric Smart", $o->SortKeys('smart'), <<'EXPECT', ( $hash ) );
+    same("Sortkeys Numeric Smart", $o->SortKeys('smart'), <<'EXPECT', ($hash));
 $HASH1 = {
            1   => 1,
            2   => 1,
@@ -219,7 +224,13 @@ $HASH1 = {
            100 => 1
          };
 EXPECT
-same( $dump = $o->SortKeys(sub {[ sort grep { /1/ } keys %{shift @_} ]})->Data( $hash )->Out, <<'EXPECT', "Sortkeys Custom Filter", $o );
+    same(
+        $dump= $o->SortKeys(
+            sub {
+                [ sort grep { /1/ } keys %{ shift @_ } ]
+            }
+        )->Data($hash)->Out,
+        <<'EXPECT', "Sortkeys Custom Filter", $o);
 $HASH1 = {
            1   => 1,
            10  => 1,
@@ -227,15 +238,16 @@ $HASH1 = {
            11  => 1
          };
 EXPECT
-$o->SortKeys('smart');
+    $o->SortKeys('smart');
 }
 {
     #local $Data::Dump::Streamer::DEBUG=1;
-    my $h={'A'...'J'};
-    my $h2={'A'..'J'};
-    my $foo_bar=bless {foo=>1,bar=>2,baz=>3},'Foo::Bar';
-    $o->HashKeys('Foo::Bar'=>[qw(foo bar)],$h=>[qw( C G E )]);
-same( $dump = $o->Data($h2,$h,$foo_bar)->Out, <<'EXPECT', "HashKeys - array", $o );
+    my $h=             { 'A' ... 'J' };
+    my $h2=            { 'A' .. 'J' };
+    my $foo_bar= bless { foo => 1, bar => 2, baz => 3 }, 'Foo::Bar';
+    $o->HashKeys('Foo::Bar' => [qw(foo bar)], $h => [qw( C G E )]);
+    same($dump= $o->Data($h2, $h, $foo_bar)->Out,
+        <<'EXPECT', "HashKeys - array", $o);
 $HASH1 = {
            A => 'B',
            C => 'D',
@@ -253,8 +265,9 @@ $Foo_Bar1 = bless( {
               bar => 2
             }, 'Foo::Bar' );
 EXPECT
-    $o->HashKeys($h2=>sub { return ['I'] });
-    same( $dump = $o->Data($h2,$h,$foo_bar)->Out, <<'EXPECT', "HashKeys - coderef", $o );
+    $o->HashKeys($h2 => sub { return ['I'] });
+    same($dump= $o->Data($h2, $h, $foo_bar)->Out,
+        <<'EXPECT', "HashKeys - coderef", $o);
 $HASH1 = { I => 'J' };
 $HASH2 = {
            C => 'D',

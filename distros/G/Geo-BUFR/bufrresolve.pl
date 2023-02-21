@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# (C) Copyright 2010-2020 MET Norway
+# (C) Copyright 2010-2023 MET Norway
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,8 +33,8 @@ use constant DEFAULT_TABLE_FORMAT => 'BUFRDC';
 use constant DEFAULT_TABLE_PATH_BUFRDC => '/usr/local/lib/bufrtables';
 use constant DEFAULT_TABLE_PATH_ECCODES => '/usr/local/share/eccodes/definitions/bufr/tables';
 # Ought to be your most up-to-date B table
-use constant DEFAULT_TABLE_BUFRDC => 'B0000000000000033000';
-use constant DEFAULT_TABLE_ECCODES => '0/wmo/33';
+use constant DEFAULT_TABLE_BUFRDC => 'B0000000000000039000';
+use constant DEFAULT_TABLE_ECCODES => '0/wmo/39';
 
 # Parse command line options
 my %option = ();
@@ -249,6 +249,6 @@ Pål Sannes E<lt>pal.sannes@met.noE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010-2020 MET Norway
+Copyright (C) 2010-2023 MET Norway
 
 =cut

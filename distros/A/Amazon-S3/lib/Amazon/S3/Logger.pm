@@ -10,7 +10,7 @@ use POSIX;
 use Readonly;
 use Scalar::Util qw{ reftype };
 
-our $VERSION = '0.59'; ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
+our $VERSION = '0.60'; ## no critic (RequireInterpolationOfMetachars)
 
 Readonly::Hash our %LOG_LEVELS => (
   trace => 5,
@@ -22,7 +22,7 @@ Readonly::Hash our %LOG_LEVELS => (
 );
 
 {
-  no strict 'refs'; ## no critic (TestingAndDebugging::ProhibitNoStrict)
+  no strict 'refs'; ## no critic (ProhibitNoStrict)
 
   foreach my $level (qw{fatal error warn info debug trace}) {
 
@@ -30,7 +30,17 @@ Readonly::Hash our %LOG_LEVELS => (
       my ( $self, @message ) = @_;
       $self->_log_message( $level, @message );
     };
-  } ## end foreach my $level (qw{fatal error warn info debug trace})
+  }
+}
+
+########################################################################
+sub new {
+########################################################################
+  my ( $class, @args ) = @_;
+
+  my $options = ref $args[0] ? $args[0] : {@args};
+
+  return bless $options, $class;
 }
 
 ########################################################################
@@ -40,10 +50,10 @@ sub level {
 
   if (@args) {
     $self->{log_level} = $args[0];
-  } ## end if (@args)
+  }
 
   return $self->{log_level};
-} ## end sub level
+}
 
 ########################################################################
 sub _log_message {
@@ -59,10 +69,10 @@ sub _log_message {
     && ref $message[0]
     && reftype( $message[0] ) eq 'CODE' ) {
     $log_message = $message[0]->();
-  } ## end if ( defined $message[...])
+  }
   else {
     $log_message = join $EMPTY, @message;
-  } ## end else [ if ( defined $message[...])]
+  }
 
   chomp $log_message;
 
@@ -72,6 +82,6 @@ sub _log_message {
 
   return print {*STDERR} sprintf qq{%s: %s %s %s\n}, uc $level, $timestamp,
     $PROCESS_ID, $log_message;
-} ## end sub _log_message
+}
 
 1;

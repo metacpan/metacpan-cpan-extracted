@@ -1,0 +1,12 @@
+Change log for LWP::UserAgent::msgraph
+
+0.05     2023-02-16 21:50:38
+   -Fixed several pod typos
+
+0.04     2023-02-16 21:31:53
+   -Added a proper META.yml
+
+0.03     2023-02-16 21:15:23
+   -First CPAN upload
+   -Fixed a bug declaring $post as local variable inside auth()
+

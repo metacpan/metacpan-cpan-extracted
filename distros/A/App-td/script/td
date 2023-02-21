@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/td/td
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-05'; # DATE
+our $DATE = '2023-02-10'; # DATE
 our $DIST = 'App-td'; # DIST
-our $VERSION = '0.107'; # VERSION
+our $VERSION = '0.110'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/td/td",
@@ -38,11 +38,15 @@ td - Manipulate table data
 
 =head1 VERSION
 
-This document describes version 0.107 of td (from Perl distribution App-td), released on 2022-06-05.
+This document describes version 0.110 of td (from Perl distribution App-td), released on 2023-02-10.
 
 =head1 SYNOPSIS
 
-% B<td> [B<--case-insensitive>|B<-i>] [B<--detail>|B<-l>|B<--no-detail>|B<--nodetail>] [(B<--exclude-column>=I<str>)+|B<--exclude-columns-json>=I<json>|(B<-E>=I<str>)+] [B<--format>=I<name>|B<--json>] [(B<--include-column>=I<str>)+|B<--include-columns-json>=I<json>|(B<-I>=I<str>)+] [B<--lines>=I<str>|B<-n>=I<str>] [B<--(no)naked-res>] [B<--no-header-column>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--repeated>|B<-r>|B<--no-repeated>|B<--norepeated>] [B<--weight-column>=I<str>] -- E<lt>I<action>E<gt> [I<argv>] ...
+B<td> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<td> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<td> [B<L<--case-insensitive|/"--case-insensitive, -i">>|B<L<-i|/"--case-insensitive, -i">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [(B<L<--exclude-column|/"--exclude-columns-json=s">>=I<str>)+|B<L<--exclude-columns-json|/"--exclude-columns-json=s">>=I<json>|(B<L<-E|/"--exclude-columns-json=s">>=I<str>)+] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [(B<L<--include-column|/"--include-columns-json=s">>=I<str>)+|B<L<--include-columns-json|/"--include-columns-json=s">>=I<json>|(B<L<-I|/"--include-columns-json=s">>=I<str>)+] [B<L<--lines|/"--lines=s, -n">>=I<str>|B<L<-n|/"--lines=s, -n">>=I<str>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-header-column|/"--no-header-column">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--repeated|/"--repeated, -r">>|B<L<-r|/"--repeated, -r">>|B<L<--no-repeated|/"--repeated, -r">>|B<L<--norepeated|/"--repeated, -r">>] [B<L<--weight-column|/"--weight-column=s">>=I<str>] -- E<lt>I<L<action|/"--action=s*">>E<gt> [I<L<argv|/"--argv=s@">>] ...
 
 =head1 DESCRIPTION
 
@@ -67,11 +71,34 @@ C<[status, message, content, meta]> and C<content> is the actual table data. Thi
 kind of data is produced by C<Perinci::CmdLine>-based scripts and can contain
 more detailed table specification in the C<meta> hash, which C<td> can parse.
 
-If you have a CSV, you can easily convert it to table data using the I<csv2td>
-utility:
+B<What scripts/modules output table data?>
+
+CLI scripts that are written using L<Perinci::CmdLine> framework output
+enveloped table data. There are at least hundreds of such scripts on CPAN. Some
+examples include: L<lcpan> (from L<App::lcpan>), L<pmlist> (from
+L<App::PMUtils>), and L<bencher> (from L<Bencher>).
+
+C<TableData::*> modules contain table data. They can easily be output to CLI
+using the L<tabledata> utility (from L<App::TableDataUtils>).
+
+CSV output from any module/script can be easily converted to table data using
+the L<csv2td> utility:
 
  % csv2td YOUR.csv | td ...
  % program-that-outputs-csv | csv2td - | td ...
+
+Table data can also be converted from several other formats e.g. JSON, YAML,
+XLS/XLSX/ODS.
+
+B<What scripts/modules accept table data?>
+
+This I<td> script, for one, accept table data.
+
+If a module/script expects CSV, you can feed table data and convert it to CSV
+using L<td2csv> utility.
+
+Several other formats can also be converted to table data, e.g. JSON,
+YAML, XLS/XLSX/ODS.
 
 B<Using td>
 
@@ -144,7 +171,7 @@ Next, you can use these actions:
  % osnames -l --json | td select value description
  
  # Select all columns but some
- % osnames -l --json | td select '*' -e value -e description
+ % osnames -l --json | td select '*' -E value -E description
  
  # Return the rows in a random order
  % osnames -l --json | td shuf
@@ -174,14 +201,14 @@ Next, you can use these actions:
  % command ... | td uniq -i ;# case-insensitive
  % command ... | td uniq --repeated ;# only shows the duplicate rows
  % command ... | td uniq -i C1 -i C2 ;# only use columns C1 & C2 to check uniqueness
- % command ... | td uniq -e C5 -e C6 ;# use all columns but C5 & C6 to check uniqueness
+ % command ... | td uniq -E C5 -E C6 ;# use all columns but C5 & C6 to check uniqueness
  
  # Remove non-adjacent duplicate rows:
  % command ... | td nauniq
  % command ... | td nauniq -i ;# case-insensitive
  % command ... | td nauniq --repeated ;# only shows the duplicate rows
  % command ... | td nauniq -i C1 -i C2 ;# only use columns C1 & C2 to check uniqueness
- % command ... | td nauniq -e C5 -e C6 ;# use all columns but C5 & C6 to check uniqueness
+ % command ... | td nauniq -E C5 -E C6 ;# use all columns but C5 & C6 to check uniqueness
  
  # Transpose table (make first column of rows as column names in the
  # transposed table)
@@ -271,6 +298,9 @@ Can be specified multiple times.
 
 =item B<--detail>, B<-l>
 
+(No description)
+
+
 =back
 
 =head2 Head action options
@@ -278,6 +308,9 @@ Can be specified multiple times.
 =over
 
 =item B<--lines>=I<s>, B<-n>
+
+(No description)
+
 
 =back
 
@@ -287,7 +320,13 @@ Can be specified multiple times.
 
 =item B<--case-insensitive>, B<-i>
 
+(No description)
+
+
 =item B<--exclude-column>=I<s@>, B<-E>
+
+(No description)
+
 
 Can be specified multiple times.
 
@@ -296,6 +335,9 @@ Can be specified multiple times.
 See C<--exclude-column>.
 
 =item B<--include-column>=I<s@>, B<-I>
+
+(No description)
+
 
 Can be specified multiple times.
 
@@ -385,6 +427,9 @@ suitable default, e.g. the browser, is chosen.
 
 =item B<--lines>=I<s>, B<-n>
 
+(No description)
+
+
 =item B<--repeated>, B<-r>
 
 Allow/show duplicates.
@@ -409,6 +454,9 @@ Select a column that contains weight.
 
 =item B<--exclude-column>=I<s@>, B<-E>
 
+(No description)
+
+
 Can be specified multiple times.
 
 =item B<--exclude-columns-json>=I<s>
@@ -416,6 +464,9 @@ Can be specified multiple times.
 See C<--exclude-column>.
 
 =item B<--include-column>=I<s@>, B<-I>
+
+(No description)
+
 
 Can be specified multiple times.
 
@@ -453,6 +504,9 @@ Select a column that contains weight.
 
 =item B<--lines>=I<s>, B<-n>
 
+(No description)
+
+
 =back
 
 =head2 Transpose action options
@@ -471,7 +525,13 @@ Don't make the first column as column names of the transposed table; instead cre
 
 =item B<--case-insensitive>, B<-i>
 
+(No description)
+
+
 =item B<--exclude-column>=I<s@>, B<-E>
+
+(No description)
+
 
 Can be specified multiple times.
 
@@ -480,6 +540,9 @@ Can be specified multiple times.
 See C<--exclude-column>.
 
 =item B<--include-column>=I<s@>, B<-I>
+
+(No description)
+
 
 Can be specified multiple times.
 
@@ -574,13 +637,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

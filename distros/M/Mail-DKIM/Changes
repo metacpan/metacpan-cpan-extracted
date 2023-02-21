@@ -1,5 +1,9 @@
 This file summarizes what's changed between releases of Mail-DKIM.
 
+1.20230212 2023-02-12 UTC
+  + Fix typo in ARC signer example code.
+    Thanks to @dev-aaront-org
+
 1.20220520 2022-05-20 UTC
   + Change default algorithm in dkimsign.pl to sha-256
   + Use Getopt::Long::Descriptive in scripts for better command help

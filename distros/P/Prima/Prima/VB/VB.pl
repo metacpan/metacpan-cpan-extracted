@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Prima qw(Notebooks MsgBox ComboBox
 Dialog::FontDialog Dialog::ColorDialog Dialog::FileDialog Dialog::ImageDialog
-IniFile Utils Widget::RubberBand KeySelector Utils);
+IniFile Utils Widget::RubberBand KeySelector Utils sys::GUIException);
 use Prima::VB::VBLoader;
 use Prima::VB::VBControls;
 use Prima::VB::CfgMaint;
@@ -2519,10 +2519,7 @@ $VB::main-> update_menu();
 
 $VB::main-> load_file( $ARGV[0]) if @ARGV && -f $ARGV[0] && -r _;
 
-while ($::application) {
-	eval { run Prima };
-	Prima::MsgBox::message( "$@") if $::application && $@;
-}
+run Prima;
 
 1;
 

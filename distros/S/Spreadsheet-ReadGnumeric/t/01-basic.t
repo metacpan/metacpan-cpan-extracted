@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8;
+use Test::More tests => 43;
 
 use Spreadsheet::ReadGnumeric;
 
@@ -17,6 +17,20 @@ sub test_parse {
 }
 
 ### Main code.
+
+# Test conversion routines.
+
+# Note that this tests "carries" between digits and overflow into two and three
+# digits; the numbers should increment seamlessly between adjacent octaves.
+# (But this is not really base 26.)
+for my $octave (qw(0 1 2 3 25 26 27 28)) {
+    for my $case (qw(1 2 25 26)) {
+	my $start = $case + 26 * $octave;
+	my $alpha = Spreadsheet::ReadGnumeric::_encode_cell_name($start);
+	my $end = Spreadsheet::ReadGnumeric::_decode_alpha($alpha);
+	is($end, $start, "$start => '$alpha' => $end");
+    }
+}
 
 # Test a simple spreadsheet.
 my $data = test_parse('t/data/bank-statement.gnumeric');
@@ -60,3 +74,16 @@ for my $file (qw(t/data/bank-statement.xml t/data/bank-statement.gnumeric)) {
     is_deeply($data, $test_1_simple_no_cells_expected,
 	      "$file from string matches");
 }
+
+# Test the XML version with attributes.
+my $statement_xml = 't/data/bank-statement.xml'; 
+$data = test_parse($statement_xml, attr => 'keep', convert_colors => 0);
+use vars qw($test_1_expected_attrs);
+is(scalar(@{$data->[1]{style_regions}}), 49,
+   "have 49 style regions in $statement_xml");
+is_deeply([ @{$data->[1]{attr}[3]}[0 .. 10] ], $test_1_expected_attrs,
+	  "$statement_xml attribute subset matches");
+# Check that the color conversion default works.
+$data = test_parse($statement_xml, attr => 1);
+is($data->[1]{attr}[3][5]{bgcolor}, '#FFFFFF',
+   "$statement_xml attribute [3][5] white BG was converted");

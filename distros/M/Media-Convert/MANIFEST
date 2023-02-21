@@ -33,6 +33,7 @@ t/pnggen.t
 t/probe.t
 t/profiles.t
 t/reporting.t
+t/script.t
 t/testvids/bbb.mp4
 t/testvids/m-c.png
 t/testvids/m-c.svg

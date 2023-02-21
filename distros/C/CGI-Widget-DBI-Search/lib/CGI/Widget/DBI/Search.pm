@@ -4,7 +4,7 @@ use strict;
 
 use base qw/ CGI::Widget::DBI::Search::Base /;
 use vars qw/ $VERSION /;
-$CGI::Widget::DBI::Search::VERSION = '0.31';
+$CGI::Widget::DBI::Search::VERSION = '0.32';
 
 use DBI;
 use CGI::Widget::DBI::Search::Display::Table;
@@ -259,6 +259,10 @@ The following settings only affect display of search results, not the search log
                              as grid
   -browse_mode            => If true, hides sorting and paging options from search
                              result display.  Used by CGI::Widget::DBI::Browse.
+  -skip_table_row_color   => In -display_mode => 'table', this boolean will skip the element
+                             style which colors alternate odd/even rows; useful if you want
+                             to set the color using CSS via oddRow/evenRow class attributes.
+                             (default: 0)
 
 =item Universal options
 
@@ -273,6 +277,8 @@ The following settings only affect display of search results, not the search log
 
 Note: these should really be named -html_... instead of -css_..., but leaving as-is for legacy code.
 
+  -css_dataset_container_id => (default: searchWidgetContainerId) - this is the <div/> surrounding the search table/grid and nav links
+
   -css_grid_id           => (default: searchWidgetGridId)
   -css_grid_class        => (default: searchWidgetGridTable)
   -css_grid_cell_class   => (default: searchWidgetGridCell)
@@ -280,6 +286,7 @@ Note: these should really be named -html_... instead of -css_..., but leaving as
   -css_table_id                => (default: searchWidgetTableId)
   -css_table_class             => (default: searchWidgetTableTable)
   -css_table_row_class         => (default: searchWidgetTableRow)
+  -css_table_row_extra_attr    => {HASH} (default: {}) - literal '$rowindex' string is replaced by actual row index
   -css_table_header_row_class  => (default: searchWidgetTableHeaderRow)
   -css_table_cell_class        => (default: searchWidgetTableCell)
   -css_table_header_cell_class => (default: searchWidgetTableHeaderCell)
@@ -625,6 +632,11 @@ SQL operator to attach the expression with (default: AND).
 
 Appends extra bind params to the end of the current list of -bind_params.
 
+=item prepend_bind_params(@bind_params)
+
+Prepends extra bind params to the beginning of the current list of -bind_params.
+Useful for placeholders in the column list, e.g. in a MATCH .. AGAINST (?) statement.
+
 =cut
 
 sub append_where_clause {
@@ -639,6 +651,13 @@ sub append_bind_params {
     return if ! @bind_params;
     $self->{-bind_params} ||= [];
     push(@{ $self->{-bind_params} }, @bind_params);
+}
+
+sub prepend_bind_params {
+    my ($self, @bind_params) = @_;
+    return if ! @bind_params;
+    $self->{-bind_params} ||= [];
+    unshift(@{ $self->{-bind_params} }, @bind_params);
 }
 
 

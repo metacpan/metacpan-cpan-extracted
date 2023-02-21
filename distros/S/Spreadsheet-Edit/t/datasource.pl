@@ -38,7 +38,11 @@ my $s3 = Spreadsheet::Edit->new(clone => $s2);
 say "s3: ",$s3->data_source unless $silent;
 die unless $s3->data_source =~ /cloned from cloned from My ds1/i;
 
-{ new_sheet; my $lno=__LINE__; die unless data_source() =~ /created.*$lno/i; }
+{ new_sheet; my $lno=__LINE__; 
+  die "data_source = <<", data_source(), ">>\n  ...does not include line number or has wrong number"
+    unless data_source() =~ /created.*$lno/i; 
+}
+
 say "new_sheet: ",data_source unless $silent; 
 
 exit 0;

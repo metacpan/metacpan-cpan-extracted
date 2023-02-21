@@ -8,7 +8,7 @@ class TestCase::Sys::FileTest {
       # File
       {
         my $file = "t/ftest/file_empty.txt";
-        my $success = Sys::FileTest->A($file, Time->time);
+        my $success = Sys::FileTest->A($file);
       }
     }
 
@@ -21,7 +21,7 @@ class TestCase::Sys::FileTest {
       # File
       {
         my $file = "t/ftest/file_empty.txt";
-        my $success = Sys::FileTest->C($file, Time->time);
+        my $success = Sys::FileTest->C($file);
       }
     }
 
@@ -34,7 +34,7 @@ class TestCase::Sys::FileTest {
       # File
       {
         my $file = "t/ftest/file_empty.txt";
-        my $success = Sys::FileTest->M($file, Time->time);
+        my $success = Sys::FileTest->M($file);
       }
     }
 

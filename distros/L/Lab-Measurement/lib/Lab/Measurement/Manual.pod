@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.842
+version 3.851
 
 =head1 OVERVIEW
 
@@ -160,6 +160,8 @@ alias: L<Lab::Moose::Instrument::Agilent34410A>
 
 =item * L<Lab::Moose::Instrument::KeysightE3633E>
 
+=item * L<Lab::Moose::Instrument::Agilent33120A>
+
 =item * L<Lab::Moose::Instrument::DummySource>
 
 =back
@@ -293,6 +295,8 @@ contains support for temperature sensor and He/N2 level meters.
 =item * L<Lab::Moose::Instrument::Keysight33600>
 
 =item * L<Lab::Moose::Instrument::HP83732A>
+
+=item * L<Lab::Moose::Instrument::Agilent33120A>
 
 =back
 
@@ -478,6 +482,7 @@ This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
             2020       Andreas K. Huettel, Sam Bingner, Simon Reinhardt
             2021       Andreas K. Huettel, Fabian Weinelt, Simon Reinhardt
             2022       Andreas K. Huettel, Mia Schambeck, Simon Reinhardt
+            2023       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

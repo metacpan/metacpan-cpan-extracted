@@ -6,7 +6,7 @@ package WWW::Mechanize;
 use strict;
 use warnings;
 
-our $VERSION = '2.15';
+our $VERSION = '2.16';
 
 use Tie::RefHash ();
 use HTTP::Request 1.30 ();
@@ -112,11 +112,7 @@ sub get {
     my $self = shift;
     my $uri = shift;
 
-    $uri = $uri->url if ref($uri) eq 'WWW::Mechanize::Link';
-
-    $uri = $self->base
-            ? URI->new_abs( $uri, $self->base )
-            : URI->new( $uri );
+    $uri = $self->_uri_with_base( $uri );
 
     # It appears we are returning a super-class method,
     # but it in turn calls the request() method here in Mechanize
@@ -128,11 +124,7 @@ sub post {
     my $self = shift;
     my $uri = shift;
 
-    $uri = $uri->url if ref($uri) eq 'WWW::Mechanize::Link';
-
-    $uri = $self->base
-            ? URI->new_abs( $uri, $self->base )
-            : URI->new( $uri );
+    $uri = $self->_uri_with_base( $uri );
 
     # It appears we are returning a super-class method,
     # but it in turn calls the request() method here in Mechanize
@@ -144,11 +136,7 @@ sub put {
     my $self = shift;
     my $uri = shift;
 
-    $uri = $uri->url if ref($uri) eq 'WWW::Mechanize::Link';
-
-    $uri = $self->base
-            ? URI->new_abs( $uri, $self->base )
-            : URI->new( $uri );
+    $uri = $self->_uri_with_base( $uri );
 
     # It appears we are returning a super-class method,
     # but it in turn calls the request() method here in Mechanize
@@ -169,15 +157,36 @@ sub head {
     my $self = shift;
     my $uri = shift;
 
+    $uri = $self->_uri_with_base( $uri );
+
+    # It appears we are returning a super-class method,
+    # but it in turn calls the request() method here in Mechanize
+    return $self->SUPER::head( $uri->as_string, @_ );
+}
+
+
+sub delete {
+    my $self = shift;
+    my $uri = shift;
+
+    $uri = $self->_uri_with_base( $uri );
+
+    # It appears we are returning a super-class method,
+    # but it in turn calls the request() method here in Mechanize
+    return $self->SUPER::delete( $uri->as_string, @_ );
+}
+
+sub _uri_with_base {
+    my $self = shift;
+    my $uri = shift;
+
     $uri = $uri->url if ref($uri) eq 'WWW::Mechanize::Link';
 
     $uri = $self->base
             ? URI->new_abs( $uri, $self->base )
             : URI->new( $uri );
 
-    # It appears we are returning a super-class method,
-    # but it in turn calls the request() method here in Mechanize
-    return $self->SUPER::head( $uri->as_string, @_ );
+    return $uri;
 }
 
 
@@ -791,7 +800,7 @@ sub form_with {
                         unless ( defined $spec{$_} ) {    # case $attr => undef
                             qq{no $_};
                         }
-                        elsif ( $spec{$_} eq '' ) {       # case $attr=> ''
+                        elsif ( $spec{$_} eq q{} ) {       # case $attr=> ''
                             qq{empty $_};
                         }
                         else {                            # case $attr => $value
@@ -800,7 +809,7 @@ sub form_with {
                       }                # case $attr => undef
                       sort keys %spec  # sort keys to get deterministic messages
                   )
-                : ''
+                : q{}
               )
               . '.  The first one was used.'
         );
@@ -1014,7 +1023,7 @@ sub tick {
         # Sometimes the HTML is malformed and there is no value for the check
         # box, so we just return if the value passed is an empty string
         # (and the form input is found)
-        if ($value eq '') {
+        if ($value eq q{}) {
             $input->value($set ? $value : undef);
             return;
         }
@@ -1290,7 +1299,7 @@ sub save_content {
     }
 
     open( my $fh, '>', $filename ) or $self->die( "Unable to create $filename: $!" );
-    if ((my $binmode = delete($opts{binmode}) || '') || ($self->content_type() !~ m{^text/})) {
+    if ((my $binmode = delete($opts{binmode}) || q{}) || ($self->content_type() !~ m{^text/})) {
         if (length($binmode) && (substr($binmode, 0, 1) eq ':')) {
             binmode $fh, $binmode;
         }
@@ -1308,7 +1317,7 @@ sub save_content {
 
 sub _get_fh_default_stdout {
     my $self = shift;
-    my $p = shift || '';
+    my $p = shift || q{};
     if ( !$p ) {
         return \*STDOUT;
     } elsif ( !ref($p) ) {
@@ -1337,7 +1346,7 @@ sub dump_links {
 
     for my $link ( $self->links ) {
         my $url = $absolute ? $link->url_abs : $link->url;
-        $url = '' if not defined $url;
+        $url = q{} if not defined $url;
         print {$fh} $url, "\n";
     }
     return;
@@ -1351,7 +1360,7 @@ sub dump_images {
 
     for my $image ( $self->images ) {
         my $url = $absolute ? $image->url_abs : $image->url;
-        $url = '' if not defined $url;
+        $url = q{} if not defined $url;
         print {$fh} $url, "\n";
     }
     return;
@@ -1477,7 +1486,7 @@ sub _update_page {
 
     $self->{status}  = $res->code;
     $self->{base}    = $res->base;
-    $self->{ct}      = $res->content_type || '';
+    $self->{ct}      = $res->content_type || q{};
 
     if ( $res->is_success ) {
         $self->{uri} = $self->{redirected_uri};
@@ -1524,7 +1533,7 @@ sub _taintedness {
     return $_taintbrush if tainted( $_taintbrush );
 
     # Let's try again. Maybe somebody cleaned those.
-    $_taintbrush = substr(join('', grep { defined } @ARGV, %ENV), 0, 0);
+    $_taintbrush = substr(join(q{}, grep { defined } @ARGV, %ENV), 0, 0);
     return $_taintbrush if tainted( $_taintbrush );
 
     # If those don't work, go try to open some file from some unsafe
@@ -1758,7 +1767,7 @@ sub _link_from_token {
     my $name;
     if ( $tag eq 'a' ) {
         $text = $parser->get_trimmed_text("/$tag");
-        $text = '' unless defined $text;
+        $text = q{} unless defined $text;
 
         my $onClick = $attrs->{onclick};
         if ( $onClick && ($onClick =~ /^window\.open\(\s*'([^']+)'/) ) {
@@ -1891,7 +1900,7 @@ WWW::Mechanize - Handy web browsing in a Perl object
 
 =head1 VERSION
 
-version 2.15
+version 2.16
 
 =head1 SYNOPSIS
 
@@ -2224,6 +2233,11 @@ L<LWP::UserAgent>.  This lets you do things like
 and you can rest assured that the params will get filtered down
 appropriately. See L<LWP::UserAgent/get> for more details.
 
+B<NOTE:> The file in C<:content_file> will contain the raw content of
+the response. If the response content is encoded (e.g. gzip encoded),
+the file will be encoded as well. Use $mech->save_content if you need
+the decoded content.
+
 B<NOTE:> Because C<:content_file> causes the page contents to be
 stored in a file instead of the response object, some Mech functions
 that expect it to be there won't work as expected. Use with caution.
@@ -2259,12 +2273,18 @@ PUTs C<$content> to C<$uri>.  Returns an L<HTTP::Response> object.
 C<$uri> can be a well-formed URI string, a L<URI> object, or a
 L<WWW::Mechanize::Link> object.
 
-    my $res = $mech->head( $uri );
-    my $res = $mech->head( $uri , $field_name => $value, ... );
+    my $res = $mech->put( $uri );
+    my $res = $mech->put( $uri , $field_name => $value, ... );
 
 =head2 $mech->head ($uri )
 
 Performs a HEAD request to C<$uri>. Returns an L<HTTP::Response> object.
+C<$uri> can be a well-formed URI string, a L<URI> object, or a
+L<WWW::Mechanize::Link> object.
+
+=head2 $mech->delete ($uri )
+
+Performs a DELETE request to C<$uri>. Returns an L<HTTP::Response> object.
 C<$uri> can be a well-formed URI string, a L<URI> object, or a
 L<WWW::Mechanize::Link> object.
 
@@ -2958,29 +2978,67 @@ index mean:
 
 Index 0 is the I<filepath> that will be read from disk. Index 1 is the
 filename which will be used in the HTTP request body; if not given,
-filepath (index 0) is used instead. If C<<Content => 'content here'>> is
+filepath (index 0) is used instead. If C<< Content => 'content here' >> is
 used as shown, then I<filepath> will be ignored.
 
 The optional C<$number> parameter is used to distinguish between two fields
 with the same name.  The fields are numbered from 1.
 
-=head2 $mech->select($name, $value)
+=head2 $mech->select($name, $new_or_additional_single_value)
 
-=head2 $mech->select($name, \@values)
+=head2 $mech->select($name, \%new_single_value_by_number)
+
+=head2 $mech->select($name, \@new_list_of_values)
+
+=head2 $mech->select($name, \%new_list_of_values_by_number)
 
 Given the name of a C<select> field, set its value to the value
-specified.  If the field is not C<< <select multiple> >> and the
-C<$value> is an array, only the B<first> value will be set.  [Note:
-the documentation previously claimed that only the last value would
-be set, but this was incorrect.]  Passing C<$value> as a hash with
-an C<n> key selects an item by number (e.g.
-C<< {n => 3} >> or C<< {n => [2,4]} >>).
+specified.
+
+    # select 'foo'
+    $mech->select($name, 'foo');
+
+If the field is not C<< <select multiple> >> and the
+C<$value> is an array reference, only the B<first> value will be set.  [Note:
+until version 1.05_03 the documentation claimed that only the last value would
+be set, but this was incorrect.]
+
+    # select 'bar'
+    $mech->select($name, ['bar', 'ignored', 'ignored']);
+
+Passing C<$value> as a hash reference with an C<n> key selects an item by number.
+
+    # select the third value
+    $mech->select($name, {n => 3});
+
 The numbering starts at 1.  This applies to the current form.
 
 If you have a field with C<< <select multiple> >> and you pass a single
 C<$value>, then C<$value> will be added to the list of fields selected,
-without clearing the others.  However, if you pass an array reference,
-then all previously selected values will be cleared.
+without clearing the others.
+
+    # add 'bar' to the list of selected values
+    $mech->select($name, 'bar');
+
+However, if you pass an array reference, then all previously selected values
+will be cleared and replaced with all values inside the array reference.
+
+    # replace the selection with 'foo' and 'bar'
+    $mech->select($name, ['foo', 'bar']);
+
+This also works when selecting by numbers, in which case the value of the C<n>
+key will be an array reference of value numbers you want to replace the
+selection with.
+
+    # replace the selection with the 2nd and 4th element
+    $mech->select($name, {n => [2, 4]});
+
+To add multiple additional values to the list of selected fields without
+clearing, call C<select> in the simple C<$value> form with each single value
+in a loop.
+
+    # add all values in the array to the selection
+    $mech->select($name, $_) for @additional_values;
 
 Returns true on successfully setting the value. On failure, returns
 false and calls C<< $self->warn() >> with an error message.

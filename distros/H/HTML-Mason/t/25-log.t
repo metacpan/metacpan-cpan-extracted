@@ -3,7 +3,6 @@ use warnings;
 use Test::More tests => 1;
 use Log::Any::Test;
 use Log::Any qw($log);
-use Test::Deep;
 use File::Temp qw(tempdir);
 use File::Path;
 use HTML::Mason::Interp;
@@ -22,7 +21,7 @@ write_file( "$comp_root/foo", "% \$m->log->debug('in foo');\n<& /bar/baz &>" );
 write_file( "$comp_root/bar/baz", "% \$m->log->error('in bar/baz')" );
 $interp->exec('/foo');
 
-cmp_deeply(
+is_deeply(
     $log->msgs,
     [
         {

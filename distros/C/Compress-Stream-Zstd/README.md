@@ -30,12 +30,6 @@ buffer can be either a scalar or a scalar reference.
 
 On error undef is returned.
 
-## compress\_mt($source, $num\_threads \[, $level\])
-
-Multi-threaded version of the `compress` function.
-
-Note that this function uses experimental API of Zstandard.
-
 ## decompress($source)
 
 ## uncompress($source)

@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2020-2022 Alexander Bluhm
- * Copyright (c) 2020-2022 Anton Borowka
+ * Copyright (c) 2020-2023 Alexander Bluhm
+ * Copyright (c) 2020-2023 Anton Borowka
  * Copyright (c) 2020 Marvin Knoblauch
  *
  * This is free software; you can redistribute it and/or modify it under
@@ -25,6 +25,7 @@
 #include <open62541/client_highlevel.h>
 #include <open62541/client_highlevel_async.h>
 #include <open62541/client_subscriptions.h>
+#include <open62541/plugin/pki_default.h>
 
 //#define DEBUG
 #ifdef DEBUG
@@ -33,6 +34,14 @@
 #else
 # define DPRINTF(fmt, x...)
 #endif
+
+/*
+ * Define a constant for buffer overflow checks.
+ *
+ * This is sqrt(SIZE_MAX+1), as s1*s2 <= SIZE_MAX
+ * if both s1 < MUL_NO_OVERFLOW and s2 < MUL_NO_OVERFLOW
+ */
+#define MUL_NO_OVERFLOW	(1UL << (sizeof(size_t) * 4))
 
 static void croak_func(const char *, char *, ...)
     __attribute__noreturn__
@@ -1477,26 +1486,7 @@ server_run_mgset(pTHX_ SV* sv, MAGIC* mg)
 
 static MGVTBL server_run_mgvtbl = { 0, server_run_mgset, 0, 0, 0, 0, 0, 0 };
 
-#ifndef HAVE_UA_SERVER_READCONTAINSNOLOOPS
-
-/*
- * There is a typo in open62541 1.0 server read readContainsNoLoops,
- * the final s in the function name is missing.  Translate it to
- * get standard conforming name in Perl.
- * This code is not needed for open62541 1.1 as upstream has fixed the bug.
- */
-static UA_StatusCode
-UA_Server_readContainsNoLoops(UA_Server *ua_server, const UA_NodeId nodeId,
-    UA_Boolean *outContainsNoLoops)
-{
-    return UA_Server_readContainsNoLoop(ua_server, nodeId, outContainsNoLoops);
-}
-
-#endif /* HAVE_UA_SERVER_READCONTAINSNOLOOPS */
-
 /* 11.7.1 Node Lifecycle: Constructors, Destructors and Node Contexts */
-
-#ifdef HAVE_UA_SERVER_SETADMINSESSIONCONTEXT
 
 static OPCUA_Open62541_GlobalNodeLifecycle
 XS_unpack_OPCUA_Open62541_GlobalNodeLifecycle(SV *in)
@@ -1892,26 +1882,6 @@ addNodeEpilog(pTHX_ OPCUA_Open62541_Server server, SV *nodeContext,
 	}
 }
 
-#else
-
-static void
-addNodeProlog(pTHX_ OPCUA_Open62541_Server server, SV **nodeContext)
-{
-	*nodeContext = NULL;
-}
-
-static void
-addNodeEpilog(pTHX_ OPCUA_Open62541_Server server, SV *nodeContext,
-    OPCUA_Open62541_NodeId outoptNewNodeId, SV *outStack,
-    UA_StatusCode statusCode)
-{
-	if (statusCode == UA_STATUSCODE_GOOD && outoptNewNodeId != NULL) {
-		pack_UA_NodeId(SvRV(outStack), outoptNewNodeId);
-	}
-}
-
-#endif /* HAVE_UA_SERVER_SETADMINSESSIONCONTEXT */
-
 /* Open62541 C callback handling */
 
 static ClientCallbackData
@@ -1994,12 +1964,8 @@ clientCallbackPerl(UA_Client *ua_client, void *userdata, UA_UInt32 requestId,
 
 static void
 clientStateCallback(UA_Client *ua_client,
-#ifdef HAVE_UA_CLIENT_GETSTATE_3
     UA_SecureChannelState channelState, UA_SessionState sessionState,
     UA_StatusCode connectStatus)
-#else
-    UA_ClientState clientState)
-#endif
 {
 	dTHX;
 	dSP;
@@ -2022,7 +1988,6 @@ clientStateCallback(UA_Client *ua_client,
 	SAVETMPS;
 
 	PUSHMARK(SP);
-#ifdef HAVE_UA_CLIENT_GETSTATE_3
 	EXTEND(SP, 4);
 	PUSHs(sv);
 	sv = newSViv(channelState);
@@ -2033,12 +1998,6 @@ clientStateCallback(UA_Client *ua_client,
 	sv = newSV(0);
 	pack_UA_StatusCode(sv, &connectStatus);
 	mPUSHs(sv);
-#else
-	EXTEND(SP, 2);
-	PUSHs(sv);
-	sv = newSViv(clientState);
-	mPUSHs(sv);
-#endif
 	PUTBACK;
 
 	call_sv(client->cl_config.clc_statecallback, G_VOID | G_DISCARD);
@@ -2046,24 +2005,6 @@ clientStateCallback(UA_Client *ua_client,
 	FREETMPS;
 	LEAVE;
 }
-
-#ifndef HAVE_UA_CLIENT_CONNECTASYNC
-
-static void
-clientAsyncServiceCallback(UA_Client *ua_client, void *userdata,
-    UA_UInt32 requestId, void *response)
-{
-	dTHX;
-	SV *sv;
-
-	sv = newSV(0);
-	if (response != NULL)
-		pack_UA_StatusCode(sv, response);
-
-	clientCallbackPerl(ua_client, userdata, requestId, sv);
-}
-
-#endif /* HAVE_UA_CLIENT_CONNECTASYNC */
 
 static void
 clientAsyncBrowseCallback(UA_Client *ua_client, void *userdata,
@@ -2098,9 +2039,7 @@ clientAsyncBrowseNextCallback(UA_Client *ua_client, void *userdata,
 static void
 clientAsyncReadDataTypeCallback(UA_Client *ua_client, void *userdata,
     UA_UInt32 requestId,
-#ifdef HAVE_UA_CLIENTASYNCOPERATIONCALLBACK
     UA_StatusCode status,
-#endif
     UA_NodeId *nodeId)
 {
 	dTHX;
@@ -2769,19 +2708,6 @@ STATUSCODE_UNKNOWN()
 INCLUDE: Open62541-statuscode.xsh
 
 #############################################################################
-#ifdef HAVE_UA_CLIENTSTATE
-
-INCLUDE: Open62541-clientstate.xsh
-
-#else
-
-INCLUDE: Open62541-securechannelstate.xsh
-
-INCLUDE: Open62541-sessionstate.xsh
-
-#endif
-
-#############################################################################
 INCLUDE: Open62541-destroy.xsh
 
 #############################################################################
@@ -2921,13 +2847,11 @@ UA_Server_new(class)
 	}
 	DPRINTF("class %s, server %p, sv_server %p",
 	    class, RETVAL, RETVAL->sv_server);
-#ifdef HAVE_UA_SERVER_SETADMINSESSIONCONTEXT
 	/* Needed for lifecycle callbacks. */
 	UA_Server_setAdminSessionContext(RETVAL->sv_server, RETVAL);
 	/* Node context has to be freed in destructor, call it always. */
 	RETVAL->sv_config.svc_serverconfig->nodeLifecycle.destructor =
 	    serverGlobalNodeLifecycleDestructor;
-#endif
     OUTPUT:
 	RETVAL
 
@@ -3118,8 +3042,6 @@ UA_Server_browseNext(server, releaseContinuationPoint, continuationPoint)
 
 # 11.7 Information Model Callbacks
 
-#ifdef HAVE_UA_SERVER_SETADMINSESSIONCONTEXT
-
 void
 UA_Server_setAdminSessionContext(server, context)
 	OPCUA_Open62541_Server		server
@@ -3129,8 +3051,6 @@ UA_Server_setAdminSessionContext(server, context)
 	server->sv_lifecycle_server = ST(0);
 	SvREFCNT_dec(server->sv_lifecycle_context);
 	server->sv_lifecycle_context = SvREFCNT_inc(context);
-
-#endif /* HAVE_UA_SERVER_SETADMINSESSIONCONTEXT */
 
 # 11.9 Node Addition and Deletion
 
@@ -3350,11 +3270,9 @@ UA_ServerConfig_setDefault(config)
     CODE:
 	DPRINTF("config %p", config->svc_serverconfig);
 	RETVAL = UA_ServerConfig_setDefault(config->svc_serverconfig);
-#ifdef HAVE_UA_SERVER_SETADMINSESSIONCONTEXT
 	/* We always need the destructor, setDefault() clears it. */
 	config->svc_serverconfig->nodeLifecycle.destructor =
 	    serverGlobalNodeLifecycleDestructor;
-#endif
     OUTPUT:
 	RETVAL
 
@@ -3366,25 +3284,139 @@ UA_ServerConfig_setMinimal(config, portNumber, certificate)
     CODE:
 	RETVAL = UA_ServerConfig_setMinimal(config->svc_serverconfig,
 	    portNumber, certificate);
-#ifdef HAVE_UA_SERVER_SETADMINSESSIONCONTEXT
 	/* We always need the destructor, setMinimal() clears it. */
 	config->svc_serverconfig->nodeLifecycle.destructor =
 	    serverGlobalNodeLifecycleDestructor;
-#endif
     OUTPUT:
 	RETVAL
 
-#ifdef HAVE_UA_SERVERCONFIG_SETCUSTOMHOSTNAME
+#ifdef UA_ENABLE_ENCRYPTION
 
-void
-UA_ServerConfig_setCustomHostname(config, customHostname)
-	OPCUA_Open62541_ServerConfig	config
-	OPCUA_Open62541_String		customHostname
+UA_StatusCode
+UA_ServerConfig_setDefaultWithSecurityPolicies(conf, portNumber, certificate, privateKey, trustListRAV = &PL_sv_undef, issuerListRAV = &PL_sv_undef, revocationListRAV = &PL_sv_undef)
+	OPCUA_Open62541_ServerConfig	conf
+	UA_UInt16			portNumber
+	OPCUA_Open62541_ByteString	certificate
+	OPCUA_Open62541_ByteString	privateKey
+	SV *				trustListRAV
+	SV *				issuerListRAV
+	SV *				revocationListRAV
+    PREINIT:
+	UA_ByteString *			trustList;
+	size_t				trustListSize;
+	AV *				trustListAV;
+	SV *				trustListSV;
+	UA_ByteString *			issuerList;
+	size_t				issuerListSize;
+	AV *				issuerListAV;
+	SV *				issuerListSV;
+	UA_ByteString *			revocationList;
+	size_t				revocationListSize;
+	AV *				revocationListAV;
+	SV *				revocationListSV;
+	size_t				i;
+	SV **				item;
     CODE:
-	UA_ServerConfig_setCustomHostname(config->svc_serverconfig,
-	    *customHostname);
+	trustList = NULL;
+	trustListSize = 0;
+	issuerList = NULL;
+	issuerListSize = 0;
+	revocationList = NULL;
+	revocationListSize = 0;
 
-#endif
+	if (SvOK(trustListRAV)) {
+		if (!SvROK(trustListRAV) || SvTYPE(SvRV(trustListRAV)) != SVt_PVAV)
+			CROAK("Not an ARRAY reference for trustList");
+
+		trustListAV = (AV*)SvRV(trustListRAV);
+		trustListSize = av_top_index(trustListAV) + 1;
+	}
+	if (SvOK(issuerListRAV)) {
+		if (!SvROK(issuerListRAV) || SvTYPE(SvRV(issuerListRAV)) != SVt_PVAV)
+			CROAK("Not an ARRAY reference for issuerList");
+
+		issuerListAV = (AV*)SvRV(issuerListRAV);
+		issuerListSize = av_top_index(issuerListAV) + 1;
+	}
+	if (SvOK(revocationListRAV)) {
+		if (!SvROK(revocationListRAV)
+		    || SvTYPE(SvRV(revocationListRAV)) != SVt_PVAV)
+			CROAK("Not an ARRAY reference for revocationList");
+
+		revocationListAV = (AV*)SvRV(revocationListRAV);
+		revocationListSize = av_top_index(revocationListAV) + 1;
+	}
+
+	if (trustListSize > 0) {
+		if ((trustListSize >= MUL_NO_OVERFLOW
+		    || sizeof(UA_ByteString) >= MUL_NO_OVERFLOW)
+		    && SIZE_MAX / trustListSize < sizeof(UA_ByteString))
+			CROAK("trustList too big");
+
+		trustListSV = sv_2mortal(newSV(trustListSize * sizeof(UA_ByteString)));
+		trustList = (UA_ByteString*)SvPVX(trustListSV);
+
+		for (i = 0; i < trustListSize; i++) {
+			item = av_fetch(trustListAV, i, 0);
+
+			if (item == NULL || !SvOK(*item)) {
+				UA_ByteString_init(&trustList[i]);
+			} else {
+				trustList[i].data = SvPV(*item, trustList[i].length);
+			}
+		}
+	}
+	if (issuerListSize > 0) {
+		if ((issuerListSize >= MUL_NO_OVERFLOW
+		    || sizeof(UA_ByteString) >= MUL_NO_OVERFLOW)
+		    && SIZE_MAX / issuerListSize < sizeof(UA_ByteString))
+			CROAK("issuerList too big");
+
+		issuerListSV = sv_2mortal(newSV(issuerListSize * sizeof(UA_ByteString)));
+		issuerList = (UA_ByteString*)SvPVX(issuerListSV);
+
+		for (i = 0; i < issuerListSize; i++) {
+			item = av_fetch(issuerListAV, i, 0);
+
+			if (item == NULL || !SvOK(*item)) {
+				UA_ByteString_init(&issuerList[i]);
+			} else {
+				issuerList[i].data = SvPV(*item, issuerList[i].length);
+			}
+		}
+	}
+	if (revocationListSize > 0) {
+		if ((revocationListSize >= MUL_NO_OVERFLOW
+		    || sizeof(UA_ByteString) >= MUL_NO_OVERFLOW)
+		    && SIZE_MAX / revocationListSize < sizeof(UA_ByteString))
+			CROAK("revocationList too big");
+
+		revocationListSV = sv_2mortal(newSV(revocationListSize * sizeof(UA_ByteString)));
+		revocationList = (UA_ByteString*)SvPVX(revocationListSV);
+
+		for (i = 0; i < revocationListSize; i++) {
+			item = av_fetch(revocationListAV, i, 0);
+
+			if (item == NULL || !SvOK(*item)) {
+				UA_ByteString_init(&revocationList[i]);
+			} else {
+				revocationList[i].data = SvPV(*item, revocationList[i].length);
+			}
+		}
+	}
+
+	RETVAL = UA_ServerConfig_setDefaultWithSecurityPolicies(conf->svc_serverconfig,
+	    portNumber, certificate, privateKey, trustList, trustListSize,
+	    issuerList, issuerListSize, revocationList, revocationListSize);
+
+	/* accept all certificates as fallback ? */
+	if (trustList == NULL && issuerList == NULL && revocationList == NULL) {
+		UA_CertificateVerification_AcceptAll(&conf->svc_serverconfig->certificateVerification);
+	}
+    OUTPUT:
+	RETVAL
+
+#endif /* UA_ENABLE_ENCRYPTION */
 
 #ifdef HAVE_UA_SERVERCONFIG_CUSTOMHOSTNAME
 
@@ -3430,8 +3462,6 @@ UA_ServerConfig_setServerUrls(config, ...)
 
 #endif
 
-#ifdef HAVE_UA_SERVER_SETADMINSESSIONCONTEXT
-
 void
 UA_ServerConfig_setGlobalNodeLifecycle(config, lifecycle);
 	OPCUA_Open62541_ServerConfig		config
@@ -3476,8 +3506,6 @@ UA_ServerConfig_setGlobalNodeLifecycle(config, lifecycle);
 		    serverGlobalNodeLifecycleGenerateChildNodeId;
 	}
 
-#endif /* HAVE_UA_SERVER_SETADMINSESSIONCONTEXT */
-
 OPCUA_Open62541_Logger
 UA_ServerConfig_getLogger(config)
 	OPCUA_Open62541_ServerConfig	config
@@ -3509,6 +3537,25 @@ UA_ServerConfig_setBuildInfo(config, buildinfo)
     CODE:
 	UA_BuildInfo_clear(&config->svc_serverconfig->buildInfo);
 	UA_BuildInfo_copy(buildinfo, &config->svc_serverconfig->buildInfo);
+
+UA_ApplicationDescription
+UA_ServerConfig_getApplicationDescription(config)
+	OPCUA_Open62541_ServerConfig	config
+    CODE:
+	UA_ApplicationDescription_copy(
+	    &config->svc_serverconfig->applicationDescription, &RETVAL);
+    OUTPUT:
+	RETVAL
+
+void
+UA_ServerConfig_setApplicationDescription(config, applicationDescription)
+	OPCUA_Open62541_ServerConfig		config
+	OPCUA_Open62541_ApplicationDescription	applicationDescription
+    CODE:
+	UA_ApplicationDescription_clear(
+	    &config->svc_serverconfig->applicationDescription);
+	UA_ApplicationDescription_copy(applicationDescription,
+	    &config->svc_serverconfig->applicationDescription);
 
 # Limits for SecureChannels
 
@@ -3997,8 +4044,6 @@ UA_Client_connect(client, endpointUrl)
     OUTPUT:
 	RETVAL
 
-#ifdef HAVE_UA_CLIENT_CONNECTASYNC
-
 UA_StatusCode
 UA_Client_connectAsync(client, endpointUrl)
 	OPCUA_Open62541_Client		client
@@ -4008,50 +4053,6 @@ UA_Client_connectAsync(client, endpointUrl)
 	RETVAL = UA_Client_connectAsync(client->cl_client, endpointUrl);
     OUTPUT:
 	RETVAL
-
-#else /* HAVE_UA_CLIENT_CONNECTASYNC */
-
-UA_StatusCode
-UA_Client_connect_async(client, endpointUrl, callback, data)
-	OPCUA_Open62541_Client		client
-	char *				endpointUrl
-	SV *				callback
-	SV *				data
-    CODE:
-	client->cl_config.clc_clientconfig->clientContext = ST(0);
-	/*
-	 * If the client is already connecting, it will immediately return
-	 * a good status code.  In this case, the callback is never called.
-	 * We must not allocate its data structure to avoid a memory leak.
-	 * The socket API is smarter in this case, connect(2) fails with
-	 * EINPROGRESS which can be detected by the caller.
-	 */
-	if (UA_Client_getState(client->cl_client) >=
-	    UA_CLIENTSTATE_WAITING_FOR_ACK || !SvOK(callback)) {
-		/* ignore callback and data if no callback is defined */
-		RETVAL = UA_Client_connect_async(client->cl_client,
-		    endpointUrl, NULL, NULL);
-	} else {
-		ClientCallbackData ccd;
-
-		ccd = newClientCallbackData(callback, ST(0), data);
-		RETVAL = UA_Client_connect_async(client->cl_client,
-		    endpointUrl, clientAsyncServiceCallback, ccd);
-		if (RETVAL == UA_STATUSCODE_GOOD) {
-			if (client->cl_callbackdata != NULL)
-				deleteClientCallbackData(
-				    client->cl_callbackdata);
-			/* Pointer to free ccd if callback is not called. */
-			client->cl_callbackdata = ccd;
-			ccd->ccd_callbackdataref = &client->cl_callbackdata;
-		} else {
-			deleteClientCallbackData(ccd);
-		}
-	}
-    OUTPUT:
-	RETVAL
-
-#endif /* HAVE_UA_CLIENT_CONNECTASYNC */
 
 UA_StatusCode
 UA_Client_run_iterate(client, timeout)
@@ -4073,8 +4074,6 @@ UA_Client_disconnect(client)
     OUTPUT:
 	RETVAL
 
-#ifdef HAVE_UA_CLIENT_CONNECTASYNC
-
 UA_StatusCode
 UA_Client_disconnectAsync(client)
 	OPCUA_Open62541_Client		client
@@ -4084,24 +4083,6 @@ UA_Client_disconnectAsync(client)
     OUTPUT:
 	RETVAL
 
-#else /* HAVE_UA_CLIENT_CONNECTASYNC */
-
-UA_StatusCode
-UA_Client_disconnect_async(client, outoptReqId)
-	OPCUA_Open62541_Client		client
-	OPCUA_Open62541_UInt32		outoptReqId
-    CODE:
-	client->cl_config.clc_clientconfig->clientContext = ST(0);
-	RETVAL = UA_Client_disconnect_async(client->cl_client, outoptReqId);
-	if (outoptReqId != NULL)
-		pack_UA_UInt32(SvRV(ST(1)), outoptReqId);
-    OUTPUT:
-	RETVAL
-
-#endif /* HAVE_UA_CLIENT_CONNECTASYNC */
-
-#ifdef HAVE_UA_CLIENT_GETSTATE_3
-
 SV *
 UA_Client_getState(client)
 	OPCUA_Open62541_Client		client
@@ -4109,7 +4090,6 @@ UA_Client_getState(client)
 	UA_SecureChannelState		channelState;
 	UA_SessionState			sessionState;
 	UA_StatusCode			connectStatus;
-	int				clientState;
     CODE:
 	UA_Client_getState(client->cl_client,
 	    &channelState, &sessionState, &connectStatus);
@@ -4127,37 +4107,8 @@ UA_Client_getState(client)
 		break;
 	case G_SCALAR:
 		/* open62541 1.0 API returns the client state. */
-		/* XXX This is just a rough guess to get the tests pass. */
-		switch (sessionState) {
-		case UA_SESSIONSTATE_CLOSED:
-			clientState = 0;
-			/* UA_CLIENTSTATE_DISCONNECTED */
-			break;
-		case UA_SESSIONSTATE_CREATE_REQUESTED:
-			clientState = 1;
-			/* UA_CLIENTSTATE_WAITING_FOR_ACK */
-			break;
-		case UA_SESSIONSTATE_CREATED:
-			clientState = 2;
-			/* UA_CLIENTSTATE_CONNECTED */
-			break;
-		case UA_SESSIONSTATE_ACTIVATE_REQUESTED:
-			clientState = 2;
-			/* UA_CLIENTSTATE_CONNECTED */
-			break;
-		case UA_SESSIONSTATE_ACTIVATED:
-			clientState = 4;
-			/* UA_CLIENTSTATE_SESSION */
-			break;
-		case UA_SESSIONSTATE_CLOSING:
-			clientState = 5;
-			/* UA_CLIENTSTATE_SESSION_DISCONNECTED */
-			break;
-		default:
-			clientState = 0;
-			break;
-		}
-		RETVAL = newSViv(clientState);
+		RETVAL = &PL_sv_undef;
+		CROAK("obsolete API, use client getState() in list context");
 		break;
 	default:
 		RETVAL = &PL_sv_undef;
@@ -4165,19 +4116,6 @@ UA_Client_getState(client)
 	}
     OUTPUT:
 	RETVAL
-
-#else /* HAVE_UA_CLIENT_GETSTATE_3 */
-
-UA_ClientState
-UA_Client_getState(client)
-	OPCUA_Open62541_Client		client
-    CODE:
-	/* open62541 1.0 API returns client state. */
-	RETVAL = UA_Client_getState(client->cl_client);
-    OUTPUT:
-	RETVAL
-
-#endif /* HAVE_UA_CLIENT_GETSTATE_3 */
 
 UA_StatusCode
 UA_Client_sendAsyncBrowseRequest(client, request, callback, data, outoptReqId)
@@ -4337,12 +4275,8 @@ UA_Client_Subscriptions_create(client, request, subscriptionContext, statusChang
 	 * introduced in 2d5355b7be11233e67d5ff6be6b2a34e971e1814 does
 	 * it in most cases.
 	 */
-#ifdef HAVE_UA_CLIENT_SUBSCRIPTIONS_CREATE_ASYNC
 	if (RETVAL.responseHeader.serviceResult ==
 	    UA_STATUSCODE_BADOUTOFMEMORY) {
-#else
-	if (RETVAL.responseHeader.serviceResult != UA_STATUSCODE_GOOD) {
-#endif
 		if (sub->sc_delete)
 			deleteClientCallbackData(sub->sc_delete);
 		if (sub->sc_change)
@@ -4664,31 +4598,125 @@ UA_ClientConfig_setDefault(config)
     OUTPUT:
 	RETVAL
 
+#ifdef UA_ENABLE_ENCRYPTION
+
+UA_StatusCode
+UA_ClientConfig_setDefaultEncryption(config, localCertificate, privateKey, trustListRAV = &PL_sv_undef, revocationListRAV = &PL_sv_undef)
+	OPCUA_Open62541_ClientConfig	config
+	OPCUA_Open62541_ByteString	localCertificate
+	OPCUA_Open62541_ByteString	privateKey
+	SV *				trustListRAV
+	SV *				revocationListRAV
+    PREINIT:
+	UA_ByteString *			trustList;
+	size_t				trustListSize;
+	AV *				trustListAV;
+	SV *				trustListSV;
+	UA_ByteString *			revocationList;
+	size_t				revocationListSize;
+	AV *				revocationListAV;
+	SV *				revocationListSV;
+	size_t				i;
+	SV **				item;
+    CODE:
+	trustList = NULL;
+	trustListSize = 0;
+	revocationList = NULL;
+	revocationListSize = 0;
+
+	if (SvOK(trustListRAV)) {
+		if (!SvROK(trustListRAV) || SvTYPE(SvRV(trustListRAV)) != SVt_PVAV)
+			CROAK("Not an ARRAY reference for trustList");
+
+		trustListAV = (AV*)SvRV(trustListRAV);
+		trustListSize = av_top_index(trustListAV) + 1;
+	}
+	if (SvOK(revocationListRAV)) {
+		if (!SvROK(revocationListRAV)
+		    || SvTYPE(SvRV(revocationListRAV)) != SVt_PVAV)
+			CROAK("Not an ARRAY reference for revocationList");
+
+		revocationListAV = (AV*)SvRV(revocationListRAV);
+		revocationListSize = av_top_index(revocationListAV) + 1;
+	}
+
+	if (trustListSize > 0) {
+		if ((trustListSize >= MUL_NO_OVERFLOW
+		    || sizeof(UA_ByteString) >= MUL_NO_OVERFLOW)
+		    && SIZE_MAX / trustListSize < sizeof(UA_ByteString))
+			CROAK("trustList too big");
+
+		trustListSV = sv_2mortal(newSV(trustListSize * sizeof(UA_ByteString)));
+		trustList = (UA_ByteString*)SvPVX(trustListSV);
+
+		for (i = 0; i < trustListSize; i++) {
+			item = av_fetch(trustListAV, i, 0);
+
+			if (item == NULL || !SvOK(*item)) {
+				UA_ByteString_init(&trustList[i]);
+			} else {
+				trustList[i].data = SvPV(*item, trustList[i].length);
+			}
+		}
+	}
+	if (revocationListSize > 0) {
+		if ((revocationListSize >= MUL_NO_OVERFLOW
+		    || sizeof(UA_ByteString) >= MUL_NO_OVERFLOW)
+		    && SIZE_MAX / revocationListSize < sizeof(UA_ByteString))
+			CROAK("revocationList too big");
+
+		revocationListSV = sv_2mortal(newSV(revocationListSize * sizeof(UA_ByteString)));
+		revocationList = (UA_ByteString*)SvPVX(revocationListSV);
+
+		for (i = 0; i < revocationListSize; i++) {
+			item = av_fetch(revocationListAV, i, 0);
+
+			if (item == NULL || !SvOK(*item)) {
+				UA_ByteString_init(&revocationList[i]);
+			} else {
+				revocationList[i].data = SvPV(*item, revocationList[i].length);
+			}
+		}
+	}
+
+	RETVAL = UA_ClientConfig_setDefaultEncryption(config->clc_clientconfig,
+	    *localCertificate, *privateKey, trustList, trustListSize,
+	    revocationList, revocationListSize);
+
+	/* accept all certificates as fallback ? */
+	if (trustList == NULL && revocationList == NULL) {
+		UA_CertificateVerification_AcceptAll(
+		    &config->clc_clientconfig->certificateVerification);
+	}
+    OUTPUT:
+	RETVAL
+
+#endif /* UA_ENABLE_ENCRYPTION */
+
 void
 UA_ClientConfig_setUsernamePassword(config, userName, password)
 	OPCUA_Open62541_ClientConfig	config
-	OPCUA_Open62541_String		userName
-	OPCUA_Open62541_String		password
+	SV *				userName
+	SV *				password
     PREINIT:
-	UA_StatusCode			sc;
 	UA_UserNameIdentityToken *	identityToken;
     CODE:
+	UA_ExtensionObject_clear(&config->clc_clientconfig->userIdentityToken);
+
+	/*
+	 * The userTokenPolicy and endpoint have to be removed from the
+	 * client config or open62541 may try to use the userTokenPolicy
+	 * of a previous connection.
+	 */
+	UA_UserTokenPolicy_clear(&config->clc_clientconfig->userTokenPolicy);
+	UA_EndpointDescription_clear(&config->clc_clientconfig->endpoint);
+
+	if (!SvOK(userName) || !SvCUR(userName))
+		XSRETURN_EMPTY;
+
 	identityToken = UA_UserNameIdentityToken_new();
 	if (identityToken == NULL)
 		CROAKE("UA_UserNameIdentityToken_new");
-
-	sc = UA_String_copy(userName, &identityToken->userName);
-	if (sc != UA_STATUSCODE_GOOD) {
-		UA_UserNameIdentityToken_delete(identityToken);
-		CROAKS(sc, "UA_String_copy");
-	}
-	sc = UA_String_copy(password, &identityToken->password);
-	if (sc != UA_STATUSCODE_GOOD) {
-		UA_UserNameIdentityToken_delete(identityToken);
-		CROAKS(sc, "UA_String_copy");
-	}
-
-	UA_ExtensionObject_clear(&config->clc_clientconfig->userIdentityToken);
 
 	config->clc_clientconfig->userIdentityToken.encoding =
 	    UA_EXTENSIONOBJECT_DECODED;
@@ -4696,6 +4724,9 @@ UA_ClientConfig_setUsernamePassword(config, userName, password)
 	    &UA_TYPES[UA_TYPES_USERNAMEIDENTITYTOKEN];
 	config->clc_clientconfig->userIdentityToken.content.decoded.data =
 	    identityToken;
+
+	unpack_UA_String(&identityToken->userName, userName);
+	unpack_UA_String(&identityToken->password, password);
 
 SV *
 UA_ClientConfig_getClientContext(config)
@@ -4712,6 +4743,41 @@ UA_ClientConfig_setClientContext(config, context)
     CODE:
 	SvREFCNT_dec(config->clc_clientcontext);
 	config->clc_clientcontext = newSVsv(context);
+
+UA_MessageSecurityMode
+UA_ClientConfig_getSecurityMode(config)
+	OPCUA_Open62541_ClientConfig	config
+    CODE:
+	UA_MessageSecurityMode_copy(&config->clc_clientconfig->securityMode, &RETVAL);
+    OUTPUT:
+	RETVAL
+
+void
+UA_ClientConfig_setSecurityMode(config, securityMode)
+	OPCUA_Open62541_ClientConfig		config
+	OPCUA_Open62541_MessageSecurityMode	securityMode
+    CODE:
+	UA_MessageSecurityMode_clear(&config->clc_clientconfig->securityMode);
+	UA_MessageSecurityMode_copy(securityMode, &config->clc_clientconfig->securityMode);
+
+UA_ApplicationDescription
+UA_ClientConfig_getClientDescription(config)
+	OPCUA_Open62541_ClientConfig	config
+    CODE:
+	UA_ApplicationDescription_copy(
+	    &config->clc_clientconfig->clientDescription, &RETVAL);
+    OUTPUT:
+	RETVAL
+
+void
+UA_ClientConfig_setClientDescription(config, clientDescription)
+	OPCUA_Open62541_ClientConfig		config
+	OPCUA_Open62541_ApplicationDescription	clientDescription
+    CODE:
+	UA_ApplicationDescription_clear(
+	    &config->clc_clientconfig->clientDescription);
+	UA_ApplicationDescription_copy(clientDescription,
+	    &config->clc_clientconfig->clientDescription);
 
 void
 UA_ClientConfig_setStateCallback(config, callback)

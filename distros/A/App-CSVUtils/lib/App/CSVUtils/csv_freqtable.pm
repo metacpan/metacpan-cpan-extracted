@@ -5,11 +5,15 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-03'; # DATE
+our $DATE = '2023-02-18'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.008'; # VERSION
+our $VERSION = '1.017'; # VERSION
 
-use App::CSVUtils qw(gen_csv_util);
+use App::CSVUtils qw(
+                        gen_csv_util
+                        compile_eval_code
+                        eval_code
+                );
 
 gen_csv_util(
     name => 'csv_freqtable',
@@ -19,12 +23,46 @@ gen_csv_util(
 _
 
     add_args => {
-        %App::CSVUtils::argspec_field_1,
+        %App::CSVUtils::argspecopt_field_1,
+        ignore_case => {
+            summary => 'Ignore case',
+            schema => 'true*',
+            cmdline_aliases => {i=>{}},
+        },
+        key => {
+            summary => 'Generate computed field with this Perl code',
+            description => <<'_',
+
+If specified, then will compute field using Perl code.
+
+The code will receive the row (arrayref, or if -H is specified, hashref) as the
+argument. It should return the computed field (str).
+
+_
+            schema => $App::CSVUtils::sch_req_str_or_code,
+            cmdline_aliases => {k=>{}},
+        },
+        %App::CSVUtils::argspecopt_hash,
+    },
+    add_args_rels => {
+        'req_one&' => [ ['field', 'key'] ],
     },
     examples => [
         {
             summary => 'Show the age distribution of people',
             argv => ['people.csv', 'age'],
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Show the frequency of wins by a user, ignore case differences in user',
+            argv => ['winner.csv', 'user', '-i'],
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Show the frequency of events by period (YYYY-MM)',
+            argv => ['events.csv', '-H', '--key', 'sprintf("%04d-%02d", $_->{year}, $_->{month})'],
             test => 0,
             'x.doc.show_result' => 0,
         },
@@ -34,19 +72,39 @@ _
         my $r = shift;
 
         # check arguments
-        my $field_idx = $r->{input_fields_idx}{ $r->{util_args}{field} };
-        die [404, "Field '$r->{util_args}{field}' not found in CSV"]
-            unless defined $field_idx;
+        my $field_idx;
+        if (defined $r->{util_args}{field}) {
+            $field_idx = $r->{input_fields_idx}{ $r->{util_args}{field} };
+            die [404, "Field '$r->{util_args}{field}' not found in CSV"]
+                unless defined $field_idx;
+        }
+
+        $r->{wants_input_row_as_hashref} = 1 if $r->{util_args}{hash};
 
         # this is a key we add to the stash
         $r->{freqtable} //= {};
         $r->{field_idx} = $field_idx;
+        $r->{code} = undef;
     },
 
     on_input_data_row => sub {
         my $r = shift;
 
-        $r->{freqtable}{ $r->{input_row}[ $r->{field_idx} ] }++;
+        my $field_val;
+        if ($r->{util_args}{key}) {
+            unless ($r->{code}) {
+                $r->{code} = compile_eval_code($r->{util_args}{key}, 'key');
+            }
+            $field_val = eval_code($r->{code}, $r, $r->{wants_input_row_as_hashref} ? $r->{input_row_as_hashref} : $r->{input_row}) // '';
+        } else {
+            $field_val = $r->{input_row}[ $r->{field_idx} ];
+        }
+
+        if ($r->{util_args}{ignore_case}) {
+            $field_val = lc $field_val;
+        }
+
+        $r->{freqtable}{$field_val}++;
     },
 
     writes_csv => 0,
@@ -77,7 +135,7 @@ App::CSVUtils::csv_freqtable - Output a frequency table of values of a specified
 
 =head1 VERSION
 
-This document describes version 1.008 of App::CSVUtils::csv_freqtable (from Perl distribution App-CSVUtils), released on 2023-02-03.
+This document describes version 1.017 of App::CSVUtils::csv_freqtable (from Perl distribution App-CSVUtils), released on 2023-02-18.
 
 =head1 FUNCTIONS
 
@@ -98,6 +156,18 @@ Examples:
 
  csv_freqtable(input_filename => "people.csv", field => "age");
 
+=item * Show the frequency of wins by a user, ignore case differences in user:
+
+ csv_freqtable(input_filename => "winner.csv", field => "user", ignore_case => 1);
+
+=item * Show the frequency of events by period (YYYY-MM):
+
+ csv_freqtable(
+     input_filename => "events.csv",
+   hash => 1,
+   key => "sprintf(\"%04d-%02d\", \$_->{year}, \$_->{month})"
+ );
+
 =back
 
 This function is not exported.
@@ -106,9 +176,17 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<field>* => I<str>
+=item * B<field> => I<str>
 
 Field name.
+
+=item * B<hash> => I<bool>
+
+Provide row in $_ as hashref instead of arrayref.
+
+=item * B<ignore_case> => I<true>
+
+Ignore case.
 
 =item * B<input_escape_char> => I<str>
 
@@ -153,6 +231,15 @@ Inform that input file is in TSV (tab-separated) format instead of CSV.
 Overriden by C<--input-sep-char>, C<--input-quote-char>, C<--input-escape-char>
 options. If one of those options is specified, then C<--input-tsv> will be
 ignored.
+
+=item * B<key> => I<str|code>
+
+Generate computed field with this Perl code.
+
+If specified, then will compute field using Perl code.
+
+The code will receive the row (arrayref, or if -H is specified, hashref) as the
+argument. It should return the computed field (str).
 
 
 =back

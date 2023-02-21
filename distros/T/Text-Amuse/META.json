@@ -51,6 +51,6 @@
       "x_IRC" : "irc://irc.libera.chat/#amusewiki",
       "x_WebIRC" : "https://web.libera.chat/#amusewiki"
    },
-   "version" : "1.82",
+   "version" : "1.83",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -1,3 +1,18 @@
+0.008   2022-12-08  Released-By: PERLANCAR; Urgency: medium
+
+        - Add xclip support.
+
+
+0.007   2022-12-08  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Forgot to add clipit to schema.
+
+
+0.006   2022-12-08  Released-By: PERLANCAR; Urgency: medium
+
+        - Add parcellite & clipit support (minimal functionality).
+
+
 0.005   2022-10-25  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] Add examples.

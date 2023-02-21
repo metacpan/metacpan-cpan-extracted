@@ -128,6 +128,7 @@ $obj = Tags::HTML::Page::Begin->new(
 	'tags' => $tags,
 	'viewport' => undef,
 );
+$obj->process_css;
 $css->put(
 	['s', 'body'],
 	['d', 'color', 'red'],
@@ -155,7 +156,7 @@ is_deeply(
 
 		['b', 'style'],
 		['a', 'type', 'text/css'],
-		['d', "body{color:red;}*{box-sizing:border-box;margin:0;padding:0;}\n"],
+		['d', "*{box-sizing:border-box;margin:0;padding:0;}body{color:red;}\n"],
 		['e', 'style'],
 
 		['e', 'head'],

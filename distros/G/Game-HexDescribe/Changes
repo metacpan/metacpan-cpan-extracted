@@ -1,3 +1,15 @@
+1.03
+
+- Add option to not show the map.
+- Add < > and = to the arithmetic operators.
+- Documented the arithmetic rule. :)
+- Fix repeated clicking of the Regenerate button.
+- More rules for the Schroeder tables.
+
+1.02
+
+- Fix EOL handling for Windows
+
 1.01
 
 - Add a subcommand for the command line: "hex-describe rule --help"

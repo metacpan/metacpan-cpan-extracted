@@ -17,6 +17,7 @@ WriteMakefile(
     BUILD_REQUIRES => {
         'Test::More' => '0',
     	'JSON' => '0',
+	'Cpanel::JSON::XS' => 0
 	},
     PREREQ_PM => {
         'Scalar::Util' => '0',

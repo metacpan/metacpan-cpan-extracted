@@ -1,3 +1,16 @@
+0.241 2023-02-14
+    . Actually manually add the changes since I messed up the last release
+    . No code changes, no need to upgrade
+
+0.240 2023-02-13
+    . Use Test::More::isnt() instead of Test::More::isn't in tests, which is
+      deprecated, as ' isn't allowed as package separator in an upcoming
+      version of Perl
+
+      Contributed by Tony Cook, many thanks
+
+    . No code changes, no need to upgrade
+
 0.239 2022-12-06
     . Harden against changes to require error messages. The '@INC contains'
       may change in a future release of perl, this hardens the test to

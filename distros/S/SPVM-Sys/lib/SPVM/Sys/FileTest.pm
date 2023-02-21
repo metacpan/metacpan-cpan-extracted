@@ -31,21 +31,21 @@ C<Sys::FileTest> is the class for file tests.
 
 =head2 A
 
-  static method A : double ($file : string, $base_time : long)
+  static method A : double ($file : string)
 
-The script start time($base_time) minus file access time, in days.
+The program starting time(L<CommandInfo->BASE_TIME|SPVM::CommandInfo/"BASE_TIME">) minus file access time, in days.
 
 =head2 C
 
-  static method C : double ($file : string, $base_time : long)
+  static method C : double ($file : string)
 
-The script start time($base_time) minus file inode change time, in days.
+The program starting time(L<CommandInfo->BASE_TIME|SPVM::CommandInfo/"BASE_TIME">) minus file inode change time, in days.
 
 =head2 M
 
-  static method M : double ($file : string, $base_time : long)
+  static method M : double ($file : string)
 
-The script start time($base_time) minus file modification time, in days.
+The program starting time(L<CommandInfo->BASE_TIME|SPVM::CommandInfo/"BASE_TIME">) minus file modification time, in days.
 
 =head2 O
 

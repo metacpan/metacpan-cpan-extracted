@@ -1,0 +1,34 @@
+0.006   2023-02-16  Released-By: PERLANCAR; Urgency: medium
+
+        - images must be *smaller* than 2300x2300, not smaller or equal to.
+
+
+0.005   2023-02-11  Released-By: PERLANCAR; Urgency: medium
+
+        - [incompatible change] Rename
+          bpom-repo-check-{,files-}label-design.
+
+        - Add utility: bpom-rpo-check-files.
+
+        - Add check: multiple dots & symbols in filename.
+
+
+0.004   2023-01-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Check file size.
+
+
+0.003   2023-01-27  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux][cli bpom-rpo-check-label-design] By default set log level to
+          'info'.
+
+
+0.002   2023-01-20  Released-By: PERLANCAR; Urgency: low
+
+        - Tweak Rinci metadata.
+
+
+0.001   2023-01-20  Released-By: PERLANCAR
+
+        - First release.

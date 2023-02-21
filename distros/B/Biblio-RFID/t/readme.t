@@ -7,4 +7,4 @@ BEGIN {
 }
 
 ok( my $parser = Pod::Readme->new, 'Pod::Readme' );
-ok( $parser->parse_from_file( 'lib/RFID/Biblio.pm' => 'README' ), 'README' );
+ok( $parser->parse_from_file( 'lib/Biblio/RFID.pm' => 'README' ), 'README' );

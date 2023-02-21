@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-26'; # DATE
+our $DATE = '2022-11-15'; # DATE
 our $DIST = 'Sah-Schemas-JSON'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our $schema = [hash => {
     summary => 'Hash, coerced from JSON string',
@@ -51,7 +51,7 @@ Sah::Schema::hash_from_json - Hash, coerced from JSON string
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::Schema::hash_from_json (from Perl distribution Sah-Schemas-JSON), released on 2022-08-26.
+This document describes version 0.007 of Sah::Schema::hash_from_json (from Perl distribution Sah-Schemas-JSON), released on 2022-11-15.
 
 =head1 SYNOPSIS
 
@@ -91,7 +91,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "{\"a\":1,\"b\":2}";
+ $data = {};
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
@@ -106,8 +106,8 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "{\"a\":1,\"b\":2}";
- my $res = $validator->($data); # => ["",{a=>1,b=>2}]
+ $data = {};
+ my $res = $validator->($data); # => ["",{}]
  
  # a sample invalid data
  $data = [];
@@ -173,6 +173,23 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
+
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema:
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('$sch_name*', name=>'HashFromJson')
+     );
+ }
+
+ use My::Types qw(HashFromJson);
+ HashFromJson->assert_valid($data);
 
 =head1 DESCRIPTION
 

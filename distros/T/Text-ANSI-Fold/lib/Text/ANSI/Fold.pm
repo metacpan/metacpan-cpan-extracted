@@ -4,25 +4,38 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "2.1301";
+our $VERSION = "2.2102";
 
 use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
 use Carp;
 use List::Util qw(pairmap pairgrep);
+use Scalar::Util qw(looks_like_number);
 use Text::VisualWidth::PP 'vwidth';
+sub pwidth { vwidth $_[0] =~ s/\X\cH{1,2}//gr }
 
 ######################################################################
 use Exporter 'import';
 our %EXPORT_TAGS = (
     constants => [ qw(
-		   &LINEBREAK_NONE
-		   &LINEBREAK_ALL
-		   &LINEBREAK_RUNIN
-		   &LINEBREAK_RUNOUT
-		   ) ] );
+	&LINEBREAK_NONE
+	&LINEBREAK_ALL
+	&LINEBREAK_RUNIN
+	&LINEBREAK_RUNOUT
+	) ],
+    regex => [ qw(
+	$reset_re
+	$color_re
+	$erase_re
+	$csi_re
+	$osc_re
+	) ],
+    );
+
 our @EXPORT_OK = ( qw(&ansi_fold),
-		   @{$EXPORT_TAGS{constants}} );
+		   @{$EXPORT_TAGS{constants}},
+		   @{$EXPORT_TAGS{regex}},
+    );
 
 sub ansi_fold {
     my($text, $width, @option) = @_;
@@ -30,19 +43,19 @@ sub ansi_fold {
 }
 ######################################################################
 
-my $alphanum_re = qr{ [_\d\p{Latin}] }x;
-my $nonspace_re = qr{ \p{IsPrintableLatin} }x;
-my $reset_re    = qr{ \e \[ [0;]* m }x;
-my $color_re    = qr{ \e \[ [\d;]* m }x;
-my $erase_re    = qr{ \e \[ [\d;]* K }x;
-my $csi_re      = qr{
+our $alphanum_re = qr{ [_\d\p{Latin}\p{Greek}\p{Cyrillic}\p{Hangul}] }x;
+our $nonspace_re = qr{ \p{IsPrintableLatin} }x;
+our $reset_re    = qr{ \e \[ [0;]* m }x;
+our $color_re    = qr{ \e \[ [\d;]* m }x;
+our $erase_re    = qr{ \e \[ [\d;]* K }x;
+our $csi_re      = qr{
     # see ECMA-48 5.4 Control sequences
     (?: \e\[ | \x9b )	# csi
     [\x30-\x3f]*	# parameter bytes
     [\x20-\x2f]*	# intermediate bytes
     [\x40-\x7e]		# final byte
 }x;
-my $osc_re      = qr{
+our $osc_re      = qr{
     # see ECMA-48 8.3.89 OSC - OPERATING SYSTEM COMMAND
     (?: \e\] | \x9d )		# osc
     [\x08-\x13\x20-\x7d]*+	# command
@@ -105,10 +118,8 @@ BEGIN {
 
 our %TABSTYLE = (
     pairmap {
-	( $a =~ s/_/-/gr, ref $b ? $b : [ $b, $b ] );
+	( $a =~ s/_/-/gr => ref $b ? $b : [ $b, $b ] );
     }
-    space  => [ ' ', ' ' ],
-    dot    => [ '.', '.' ],
     symbol => [ "\N{SYMBOL FOR HORIZONTAL TABULATION}",			    # ␉
 		"\N{SYMBOL FOR SPACE}" ],				    # ␠
     shade  => [ "\N{MEDIUM SHADE}",					    # ▒
@@ -120,6 +131,10 @@ our %TABSTYLE = (
     dash   => [ "\N{BOX DRAWINGS HEAVY RIGHT}",				    # ╺
 		"\N{BOX DRAWINGS LIGHT DOUBLE DASH HORIZONTAL}" ],	    # ╌
 
+    dot          => '.',
+    space        => ' ',
+    emspace      => "\N{EM SPACE}",					    #  
+    middle_dot   => "\N{MIDDLE DOT}",					    # ·
     arrow        => "\N{RIGHTWARDS ARROW}",				    # →
     double_arrow => "\N{RIGHTWARDS DOUBLE ARROW}",			    # ⇒
     triple_arrow => "\N{RIGHTWARDS TRIPLE ARROW}",			    # ⇛
@@ -135,30 +150,41 @@ our %TABSTYLE = (
 
     );
 
+my @default = (
+    text      => '',
+    width     => undef,
+    padding   => 0,
+    boundary  => '',
+    padchar   => ' ',
+    prefix    => '',
+    ambiguous => 'narrow',
+    margin    => 0,
+    linebreak => $DEFAULT_LINEBREAK,
+    runin     => $DEFAULT_RUNIN_WIDTH,
+    runout    => $DEFAULT_RUNOUT_WIDTH,
+    expand    => 0,
+    tabstop   => 8,
+    tabhead   => ' ',
+    tabspace  => ' ',
+    discard   => {},
+    );
+
 sub new {
     my $class = shift;
-    my $obj = bless {
-	text      => '',
-	width     => undef,
-	padding   => 0,
-	boundary  => '',
-	padchar   => ' ',
-	prefix    => '',
-	ambiguous => 'narrow',
-	margin    => 0,
-	linebreak => $DEFAULT_LINEBREAK,
-	runin     => $DEFAULT_RUNIN_WIDTH,
-	runout    => $DEFAULT_RUNOUT_WIDTH,
-	expand    => 0,
-	tabstop   => 8,
-	tabhead   => ' ',
-	tabspace  => ' ',
-	discard   => {},
-    }, $class;
-
+    my $obj = bless { @default }, $class;
     $obj->configure(@_) if @_;
-
     $obj;
+}
+
+INTERNAL_METHODS: {
+    sub spawn {
+	my $obj = shift;
+	my $class = ref $obj;
+	my %new = ( %$obj, pairgrep { defined $b } @_ );
+	bless \%new, $class;
+    }
+    sub do_runin  { $_[0]->{linebreak} & LINEBREAK_RUNIN  && $_[0]->{runin}  > 0 }
+    sub do_runout { $_[0]->{linebreak} & LINEBREAK_RUNOUT && $_[0]->{runout} > 0 }
 }
 
 use Text::ANSI::Fold::Japanese::W3C qw(%prohibition);
@@ -190,10 +216,10 @@ my %prohibition_re = do {
 };
 
 sub configure {
-    my $obj = ref $_[0] ? $_[0] : do {
-	state $private = __PACKAGE__->new;
-    };
-    shift;
+    my $obj = shift;
+    if (not ref $obj) {
+	$obj = state $private = __PACKAGE__->new;
+    }
     croak "invalid parameter" if @_ % 2;
     while (@_ >= 2) {
 	my($a, $b) = splice @_, 0, 2;
@@ -229,40 +255,33 @@ sub pop_reset {
     @reset ? do { @color_stack = (); pop @reset } : '';
 }
 
+use constant MAX_INT => ~0 >> 1;
+
 sub fold {
-    my $obj = ref $_[0] ? $_[0] : do {
-	state $private = configure();
-    };
-    shift;
-
+    my $obj = shift;
     local $_ = shift // '';
-    my %opt = ( %$obj, pairgrep { defined $b } @_ );
 
-    my $width = $opt{width} // die;
-    if ($width < 0) {
-	$width = ~0 >> 1; # INT_MAX
+    if (not ref $obj) {
+	$obj = state $private = configure();
     }
+    my $opt = $obj->spawn(splice @_);
 
-    if (not defined $width or $width < 1) {
-	croak "invalid width";
-    }
-
-    if ($width <= $opt{margin}) {
-	croak "invalid margin";
-    }
-    $width -= $opt{margin};
+    my $width = $opt->{width};
+    croak "invalid width" if not looks_like_number $width;
+    $width = MAX_INT if $width < 0;
+    ($width -= $opt->{margin}) > 0 or croak "margin too big";
 
     my $word_char_re =
 	    { word => $alphanum_re, space => $nonspace_re }
-	    ->{$opt{boundary} // ''};
+	    ->{$opt->{boundary} // ''};
 
-    $Text::VisualWidth::PP::EastAsian = $opt{ambiguous} eq 'wide';
+    $Text::VisualWidth::PP::EastAsian = $opt->{ambiguous} eq 'wide';
 
     my $folded = '';
     my $eol = '';
     my $room = $width;
     @bg_stack = @color_stack = @reset = ();
-    my $yield_re = $opt{expand} ? qr/[^\e\n\f\r\t]/ : qr/[^\e\n\f\r]/;
+    my $yield_re = $opt->{expand} ? qr/[^\e\n\f\r\t]/ : qr/[^\e\n\f\r]/;
 
   FOLD:
     while (length) {
@@ -312,9 +331,9 @@ sub fold {
 	}
 
 	# tab
-	if ($opt{expand} and s/\A\t//) {
-	    my $space = $opt{tabstop} - ($width - $room) % $opt{tabstop};
-	    $_ = $opt{tabhead} . $opt{tabspace} x ($space - 1) . $_;
+	if ($opt->{expand} and s/\A\t//) {
+	    my $space = $opt->{tabstop} - ($width - $room) % $opt->{tabstop};
+	    $_ = $opt->{tabhead} . $opt->{tabspace} x ($space - 1) . $_;
 	    next;
 	}
 
@@ -338,7 +357,7 @@ sub fold {
 	}
 	next if $bs;
 
-	if (s/\A(\e*(?:${yield_re}(?!\cH))+)//) {
+	if (s/\A(\e+|(?:${yield_re}(?!\cH))+)//) {
 	    my $s = $1;
 	    if ((my $w = vwidth($s)) <= $room) {
 		$folded .= $s;
@@ -357,22 +376,25 @@ sub fold {
 	}
     }
 
+    ##
+    ## --boundary=word
+    ##
     if ($word_char_re
-	and my($tail) = /\A(${word_char_re}+)/
-	and $folded =~ m{
-		^
-		( (?: [^\e]* ${csi_re}++ ) *+ )
-		( .*? )
-		( ${word_char_re}+ )
-		\z
-	}x
-	) {
+	and my($w2) = /\A( (?: ${word_char_re} \cH ? ) + )/x
+	and my($lead, $w1) = $folded =~ m{
+		\A ## avoid CSI final char making a word
+		   ( (?: [^\e]* ${csi_re}++ ) *+ .*? )
+		   ( (?: ${word_char_re} \cH ? ) + )
+		\z }x
+    ) {
 	## Break line before word only when enough space will be
 	## provided for the word in the next turn.
-	my($s, $e) = ($-[3], $+[3]);
-	my $l = $e - $s;
-	if ($room + $l < $width and $l + length($tail) <= $width) {
-	    $_ = substr($folded, $s, $l, '') . pop_reset() . $_;
+	my $l = pwidth($w1);
+	## prefix length
+	my $p = $opt->{prefix} eq '' ? 0 : vwidth($opt->{prefix});
+	if ($room + $l < $width - $p and $l + pwidth($w2) <= $width - $p) {
+	    $folded = $lead;
+	    $_ = $w1 . pop_reset() . $_;
 	    $room += $l;
 	}
     }
@@ -380,31 +402,36 @@ sub fold {
     ##
     ## RUN-OUT
     ##
-    if ($_ ne ''
-	and $opt{linebreak} & LINEBREAK_RUNOUT and $opt{runout} > 0
-	and $folded =~ m{ (?<color>  (?! ${reset_re}) ${color_re}*+ )
-			  (?<runout> $prohibition_re{end}+ ) \z }xp
-	and ${^PREMATCH} ne ''
-	and (my $w = vwidth $+{runout}) <= $opt{runout}) {
-	$folded = ${^PREMATCH};
-	$_ = join '', ${^MATCH}, @reset, $_;
-	pop_reset() if $+{color};
-	$room += $w;
+    if ($_ ne '' and $opt->do_runout) {
+	if ($folded =~ m{ (?<color>  (?! ${reset_re}) ${color_re}*+ )
+			  (?<runout>
+			    (?: ($prohibition_re{end}) (?: \cH{1,2} \g{-1})* )+
+			  ) \z
+			}xp
+	    and ${^PREMATCH} ne ''
+	    and (my $w = pwidth $+{runout}) <= $opt->{runout}) {
+
+	    $folded = ${^PREMATCH};
+	    $_ = join '', ${^MATCH}, @reset, $_;
+	    pop_reset() if $+{color};
+	    $room += $w;
+	}
     }
 
     $folded .= pop_reset() if @reset;
 
-    $room += $opt{margin};
+    $room += $opt->{margin};
 
     ##
     ## RUN-IN
     ##
-    if ($opt{linebreak} & LINEBREAK_RUNIN and $opt{runin} > 0) {
+    if ($opt->do_runin) {
 	my @runin;
-	my $m = $opt{runin};
+	my $m = $opt->{runin};
 	while ($m > 0 and
 	       m{\A (?<color> ${color_re}*+)
-	            (?<runin> $prohibition_re{head})
+	            (?<runin> $prohibition_re{head} )
+		    ( \cH{1,2} \g{runin} )* # multiple strike
 	            (?<reset> (?: $erase_re* $reset_re+ $erase_re* )? )
 	       }xp) {
 	    my $w = vwidth $+{runin};
@@ -423,15 +450,15 @@ sub fold {
 	$_ = join '', @color_stack, $_ if $_ ne '';
     }
 
-    if ($opt{padding} and $room > 0) {
-	my $padding = $opt{padchar} x $room;
+    if ($opt->{padding} and $room > 0) {
+	my $padding = $opt->{padchar} x $room;
 	if (@bg_stack) {
 	    $padding = join '', @bg_stack, $padding, SGR_RESET;
 	}
 	$folded .= $padding;
     }
 
-    if (length and my $p = $opt{prefix}) {
+    if (length and my $p = $opt->{prefix}) {
 	my $s = ref $p eq 'CODE' ? &$p : $p;
 	$_ = $s . $_;
     }
@@ -465,12 +492,17 @@ sub simple_fold {
 }
 
 ######################################################################
+# EXTERNAL METHODS
 
-sub text {
+sub text :lvalue {
     my $obj = shift;
-    croak "Invalid argument" unless @_;
-    $obj->{text} = shift;
-    $obj;
+    if (@_ == 0) {
+	$obj->{text};
+    } else {
+	croak "Invalid argument" if @_ > 1;
+    	$obj->{text} = shift;
+	$obj;
+    }
 }
 
 sub retrieve {
@@ -523,7 +555,7 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
 
 =head1 VERSION
 
-Version 2.1301
+Version 2.2102
 
 =head1 SYNOPSIS
 
@@ -552,16 +584,21 @@ Version 2.1301
 
 =head1 DESCRIPTION
 
-Text::ANSI::Fold provides capability to fold a text into two strings
-by given width.  Text can include ANSI terminal sequences.  If the
-text is divided in the middle of ANSI-effect region, reset sequence is
-appended to folded text, and recover sequence is prepended to trimmed
-string.
+L<Text::ANSI::Fold> provides capability to divide a text into two
+parts by given width.  Text can include ANSI terminal sequences and
+the width is calculated by its visible representation.  If the text is
+divided in the middle of colored region, reset sequence is appended to
+the former text, and color recover sequence is inserted before the
+latter string.
 
 This module also support Unicode Asian full-width and non-spacing
 combining characters properly.  Japanese text formatting with
 head-or-end of line prohibition character is also supported.  Set
 the linebreak mode to enable it.
+
+Since the overhead of ANSI escape sequence handling is not significant
+when the data does not include them, this module can be used for
+normal text processing with small penalty.
 
 Use exported B<ansi_fold> function to fold original text, with number
 of visual columns you want to cut off the text.
@@ -571,9 +608,9 @@ of visual columns you want to cut off the text.
 It returns a pair of strings; first one is folded text, and second is
 the rest.
 
-Additional third result is the visual width of folded text.  You may
-want to know how many columns returned string takes for further
-processing.
+Additional third result is visual width of the folded text.  It is not
+always same as given width, and you may want to know how many columns
+returned string takes for further processing.
 
 Negative width value is taken as unlimited.  So the string is never
 folded, but you can use this to expand tabs and to get visual string
@@ -625,7 +662,7 @@ saved value.
 
 =head1 STRING OBJECT INTERFACE
 
-Fold object can hold string inside by B<text> method.
+A fold object can hold string inside by B<text> method.
 
     $f->text("text");
 
@@ -637,13 +674,14 @@ empty string if nothing remained.
         print "\n" if $folded !~ /\n\z/;
     }
 
-Method B<chops> returns chopped string list.  Because B<text> method
-returns the object itself, you can use B<text> and B<chops> like this:
+Method B<chops> returns chopped string list.  Because the B<text>
+method returns the object itself when called with a parameter, you can
+use B<text> and B<chops> in series:
 
-    print join "\n", $f->text($text)->chops;
+    print join "\n", $f->text($string)->chops;
 
 Actually, text can be set by B<new> or B<configure> method through
-B<text> option.  Next program just works.
+B<text> parameter.  Next program just works.
 
     use Text::ANSI::Fold;
     while (<>) {
@@ -658,10 +696,11 @@ reference, and chops text into given width list.
     my @list = $fold->text("1223334444")->chops(width => [ 1, 2, 3 ]);
     # return ("1", "22", "333") and keep "4444"
 
-If the width value is 0, it returns empty string.
+If the width value is 0, it returns empty string.  Negative width
+value takes all the rest of stored string.
 
-Negative width value takes all the rest of holded string in
-B<retrieve> and B<chops> method.
+Method B<text> has an lvalue attribute, so it can be assigned to, as
+well as can be a subject of mutating operator such as C<s///>.
 
 =head1 OPTIONS
 
@@ -685,11 +724,11 @@ Specify folding width.  Negative value means all the rest.
 Array reference can be specified but works only with B<chops> method,
 and retunrs empty string for zero width.
 
-=item B<boundary> => I<word> or I<space>
+=item B<boundary> => C<word> or C<space>
 
-Option B<boundary> takes I<word> and I<space> as a valid value.  These
+Option B<boundary> takes C<word> and C<space> as a valid value.  These
 prohibit to fold a line in the middle of ASCII/Latin sequence.  Value
-I<word> means a sequence of alpha-numeric characters, and I<space>
+C<word> means a sequence of alpha-numeric characters, and C<space>
 means simply non-space printables.
 
 This operation takes place only when enough space will be provided to
@@ -726,13 +765,13 @@ B<chops> interface.
 If the value is reference to subroutine, its result is used as a
 prefix string.
 
-=item B<ambiguous> => "narrow" or "wide"
+=item B<ambiguous> => C<narrow> or C<wide>
 
 Tells how to treat Unicode East Asian ambiguous characters.  Default
-is "narrow" which means single column.  Set "wide" to tell the module
-to treat them as wide character.
+is C<narrow> which means single column.  Set C<wide> to tell the
+module to treat them as wide character.
 
-=item B<discard> => [ "EL", "OSC" ]
+=item B<discard> => [ C<EL>, C<OSC> ]
 
 Specify the list reference of control sequence name to be discarded.
 B<EL> means Erase Line; B<OSC> means Operating System Command, defined
@@ -755,7 +794,7 @@ If the trimmed text end with prohibited characters (e.g. opening
 parenthesis), they are ran-out to the head of next line, if it fits to
 maximum width.
 
-Default B<linebreak> mode is B<LINEBREAK_NONE> and can be set one of
+Default B<linebreak> mode is C<LINEBREAK_NONE> and can be set one of
 those:
 
     LINEBREAK_NONE
@@ -763,7 +802,7 @@ those:
     LINEBREAK_RUNOUT
     LINEBREAK_ALL
 
-Import-tag B<:constants> can be used to access these constants.
+Import-tag C<:constants> can be used to access these constants.
 
 Option B<runin> and B<runout> is used to set maximum width of moving
 characters.  Default values are both 2.
@@ -794,8 +833,6 @@ C<symbols>'s tabhead and C<space>'s tabspace.
 
 Currently these names are available.
 
-    space  => [ ' ', ' ' ],
-    dot    => [ '.', '.' ],
     symbol => [ "\N{SYMBOL FOR HORIZONTAL TABULATION}",
                 "\N{SYMBOL FOR SPACE}" ],
     shade  => [ "\N{MEDIUM SHADE}",
@@ -810,6 +847,10 @@ Currently these names are available.
 Below are styles providing same character for both tabhead and
 tabspace.
 
+    dot          => '.',
+    space        => ' ',
+    emspace      => "\N{EM SPACE}",
+    middle-dot   => "\N{MIDDLE DOT}",
     arrow        => "\N{RIGHTWARDS ARROW}",
     double-arrow => "\N{RIGHTWARDS DOUBLE ARROW}",
     triple-arrow => "\N{RIGHTWARDS TRIPLE ARROW}",
@@ -827,8 +868,8 @@ tabspace.
 
 =head1 EXAMPLE
 
-Next code implements almost perfect fold command for multi byte
-characters with prohibited character handling.
+Next code implements almost fully-equipped fold command for multi byte
+text with Japanese prohibited character handling.
 
     #!/usr/bin/env perl
     
@@ -854,9 +895,13 @@ characters with prohibited character handling.
 
 =over 7
 
+=item L<https://github.com/tecolicom/ANSI-Tools>
+
+Collection of ANSI related tools.
+
 =item L<Text::ANSI::Fold>
 
-=item L<https://github.com/kaz-utashiro/Text-ANSI-Fold>
+=item L<https://github.com/tecolicom/Text-ANSI-Fold>
 
 Distribution and repository.
 
@@ -910,7 +955,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2018- Kazumasa Utashiro.
+Copyright 2018-2023 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

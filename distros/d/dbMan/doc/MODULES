@@ -97,4 +97,4 @@
 000001-000097	Milan Sorm		FallbackNotify
 000001-000098	Milan Sorm		SuggestionCacheRetrieve
 000001-000099	Milan Sorm		CmdSetOracleSpecials
-
+000001-000100	Milan Sorm		SQLOutputMarkdown

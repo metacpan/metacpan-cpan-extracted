@@ -9,7 +9,7 @@ require DynaLoader;
 use vars qw($VERSION @ISA $__import @preload $pid);
 @ISA = qw(DynaLoader);
 sub dl_load_flags { 0x00 }
-$VERSION = '1.67';
+$VERSION = '1.67001';
 $pid = $$;
 bootstrap Prima $VERSION;
 unless ( UNIVERSAL::can('Prima', 'init')) {
@@ -68,7 +68,23 @@ sub END
 sub run
 {
 	die "Prima was not properly initialized\n" unless $::application;
-	$::application-> go if $::application-> alive;
+	while ( 1 ) {
+		my $stack;
+		my $got_exception;
+		{
+			local $SIG{__DIE__} = sub {
+				$got_exception = 1;
+				$stack //= Carp::longmess();
+				die @_;
+			};
+			eval {
+				$::application-> go if $::application-> alive;
+			};
+		}
+		last unless defined $@ && $got_exception;
+		next if $::application->alive && !$::application->notify('Die', "$@", $stack);
+		die $@;
+	}
 	$::application-> destroy if $::application && $::application-> alive;
 	$::application = undef if $::application and not $::application->alive;
 }
@@ -123,6 +139,8 @@ Prima - a perl graphic toolkit
 	);
 
 	run Prima;
+
+See more screenshots at L<http://prima.eu.org/big-picture> .
 
 =head1 DESCRIPTION
 
@@ -390,6 +408,10 @@ L<Prima::Sliders> - sliding bars, spin buttons and input lines, dial widget etc.
 L<Prima::Spinner> - spinner animation
 
 L<Prima::TextView> - rich text browser widget
+
+L<Prima::Widget::Date> - standard date picker widget
+
+L<Prima::Widget::Time> - standard time input widget
 
 =item Standard dialogs
 

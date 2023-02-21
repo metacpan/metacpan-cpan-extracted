@@ -3,6 +3,7 @@ abstract: 'deeply encode/decode a struct'
 author:
   - 'Robert Acock <thisusedtobeanemail@gmail.com>'
 build_requires:
+  Cpanel::JSON::XS: '0'
   JSON: '0'
   Test::More: '0'
 configure_requires:
@@ -22,5 +23,5 @@ requires:
   Encode: '0'
   Scalar::Util: '0'
   perl: '5.006'
-version: '0.12'
+version: '0.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

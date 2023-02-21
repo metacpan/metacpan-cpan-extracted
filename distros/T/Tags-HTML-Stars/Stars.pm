@@ -33,7 +33,7 @@ Readonly::Scalar our $IMG_STAR_NOTHING => encode_base64(<<'END', '');
 </svg>
 END
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -195,6 +195,8 @@ Returns undef.
 
 =head1 EXAMPLE1
 
+=for comment filename=stars.pl
+
  use strict;
  use warnings;
 
@@ -235,6 +237,8 @@ Returns undef.
 
 =head1 EXAMPLE2
 
+=for comment filename=percent_stars.pl
+
  use strict;
  use warnings;
 
@@ -262,7 +266,7 @@ Returns undef.
  # Print out.
  print $tags->flush;
 
- # Output:
+ # Output for '55':
  # <div>
  #   <img src=
  #     "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwcHgiIGhlaWdodD0iMjc1cHgiIHZpZXdCb3g9IjAgMCAzMDAgMjc1IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSI+CiAgPHBvbHlnb24gZmlsbD0iI2ZkZmYwMCIgc3Ryb2tlPSIjNjA1YTAwIiBzdHJva2Utd2lkdGg9IjE1IiBwb2ludHM9IjE1MCwyNSAxNzksMTExIDI2OSwxMTEgMTk3LDE2NSAyMjMsMjUxIDE1MCwyMDAgNzcsMjUxIDEwMywxNjUgMzEsMTExIDEyMSwxMTEiIC8+Cjwvc3ZnPgo="
@@ -337,12 +341,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020-2022
+© Michal Josef Špaček 2020-2023
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

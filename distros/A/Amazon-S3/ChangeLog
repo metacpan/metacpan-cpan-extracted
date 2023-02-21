@@ -1,3 +1,22 @@
+Fri Feb 10 07:47:22 2023  Rob Lauer  <rlauer6@comcast.net>>
+
+	[0.60 - logging]:
+	* VERSION: bump
+	* NEWS.md: updated
+	* bootstrap: support M.rr style versions
+	* src/main/perl/lib/Amazon/S3.pm.in
+	- removed all end of block indicators inserted by perltidy
+	(new)
+	- only consider 'debug' flag when internal logger used
+	* src/main/perl/lib/Amazon/S3.pm.in
+	(new): new
+	* configure.ac
+	- fix email addres
+	- remove -Wall to prevent warning during configure
+	* s3-perl.pl: new
+	* src/main/perl/test.localstack: new
+	* .gitignore: added some of the files created by `make cpan`
+
 Wed Jan 25 11:54:59 2023  Rob Lauer  <rlauer6@comcast.net>
 
 	[0.59 - copy_object]:

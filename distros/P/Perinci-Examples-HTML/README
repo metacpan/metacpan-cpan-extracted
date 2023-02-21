@@ -2,11 +2,52 @@ NAME
     Perinci::Examples::HTML - Examples related to HTML form generation
 
 VERSION
-    This document describes version 0.001 of Perinci::Examples::HTML (from
-    Perl distribution Perinci-Examples-HTML), released on 2022-11-17.
+    This document describes version 0.002 of Perinci::Examples::HTML (from
+    Perl distribution Perinci-Examples-HTML), released on 2022-11-27.
 
 DESCRIPTION
 FUNCTIONS
+  bmi
+    Usage:
+
+     bmi(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Calculate BMI and show body weight category.
+
+    Demonstrates: schema's "in" clause, label (summary) of 'in' values,
+    schema's "min" & "max" clauses, summary, caption, default value,
+    function metadata.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   age => *uint*
+
+        Gender.
+
+    *   height => *ufloat*
+
+        Body height, in cm.
+
+    *   weight => *ufloat*
+
+        Body weight, in kg.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
   hello1
     Usage:
 
@@ -17,17 +58,19 @@ FUNCTIONS
     The acceptable name is restricted to safe characters only so it is safe
     when it needs to be displayed as HTML without any escaping.
 
+    Demonstrates: "in" clause, summary.
+
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
 
     *   name => *str*
 
-        (No description)
+        Name to greet.
 
     *   salutation => *str*
 
-        (No description)
+        Salutation (e.g. Mr, Mrs).
 
     Returns an enveloped result (an array).
 

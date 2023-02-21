@@ -1,3 +1,7 @@
+1.07 - 2023-02-20 - Todd Rinaldo
+ - t/29a_upcopy.t - under parallel builds allow more time for test
+ - t/29_downcopy.t: Correct typo in inline comment
+
 What's new in version 1.06
  - Correct misleading entries in SYNOPSIS
  - undef Tie::File objects before untie-ing arrays

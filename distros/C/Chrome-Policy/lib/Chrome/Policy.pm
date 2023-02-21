@@ -23,7 +23,7 @@ Chrome::Policy - Chrome Policy class
 
 =head1 VERSION
 
-version 0.230360
+version 0.230410
 
 Enterprise policies
 https://chromium.googlesource.com/chromium/src/+/HEAD/docs/enterprise/policies.md

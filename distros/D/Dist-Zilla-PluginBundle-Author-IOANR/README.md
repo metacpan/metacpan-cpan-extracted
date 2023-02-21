@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::Author::IOANR - Build dists the way IOANR likes
 
 # VERSION
 
-version 1.201592
+version 1.230480
 
 # OPTIONS
 
@@ -67,17 +67,17 @@ in addition to those websites please use your favorite search engine to discover
 
 ## Bugs / Feature Requests
 
-Please report any bugs or feature requests through the web interface at [https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR/issues](https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR/issues).
+Please report any bugs or feature requests through the web interface at [https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR.git/issues](https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR.git/issues).
 You will be automatically notified of any progress on the request by the system.
 
 ## Source Code
 
 The source code is available for from the following locations:
 
-[https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR](https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR)
+[https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR.git](https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR.git)
 
 ```
-git clone https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR.git
+git clone https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR.git.git
 ```
 
 # AUTHOR
@@ -86,7 +86,7 @@ Ioan Rogers <ioanr@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Ioan Rogers.
+This software is Copyright (c) 2023 by Ioan Rogers.
 
 This is free software, licensed under:
 

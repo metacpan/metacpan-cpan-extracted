@@ -1,0 +1,10 @@
+Revision history for Future-AsyncAwait-Hooks
+
+0.02    2023-02-14
+        [CHANGES]
+         * Implement suspend/resume blocks as true blocks rather than anon
+           sub CVs
+         * Forbid out-of-block control flow from suspend/resume blocks
+
+0.01    2023-02-12
+        First version, released on an unsuspecting world.

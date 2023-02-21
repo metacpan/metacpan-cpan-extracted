@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.314';
+our $VERSION = '2.316';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -43,15 +43,15 @@ __END__
 
 =head1 NAME
 
-C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL>/C<Firebird>/C<DB2> databases and their tables interactively.
+C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.314
+Version 2.316
 
 =head1 SYNOPSIS
 
-=head2 SQLite/MySQL/PostgreSQL/Firebird/DB2
+=head2 SQLite/MySQL/MariaDB/PostgreSQL/Firebird/DB2/Informix
 
     db-browser -h|--help
 
@@ -78,8 +78,9 @@ Before using C<db-browser>, make sure you backed up your databases.
 
 Search and read in SQL databases: one can browse databases and their tables interactively.
 
-The database plugins bundled with C<App::DBBrowser> provide support for the DBI drivers C<DBD::SQLite>, C<DBD::mysql>,
-C<DBD::MariaDB>, C<DBD::Pg> and C<DBD::Firebird>. See L<App::DBBrowser::DB> how to write a database plugin.
+C<App::DBBrowser> provides and supports plugins for the DBI drivers C<DBD::SQLite>, C<DBD::mysql>, C<DBD::MariaDB>,
+C<DBD::Pg>, C<DBD::Firebird>, C<DBD::DB2> and C<DBD::Informix>. See L<App::DBBrowser::DB> how to write a database
+plugin.
 
 =head1 NAVIGATION
 
@@ -222,7 +223,7 @@ enabled in L</Extensions>.
 I<Attache DB> is available for C<SQLite> databases. I<Attach DB> can be used to attach databases to the current
 database.
 
-By selecting the prompt line of this menu (the database name) one can change the I<Source type of input data> settings.
+By selecting the prompt line of this menu (the database name) one can change the I<Source type> settings.
 
 =head3 Tables Entries
 
@@ -280,7 +281,7 @@ Delete
 
 See L</WRITE ACCESS>. These entries are available if enabled in L</Extensions>.
 
-By selecting the prompt line of this menu (I<Choose SQL type:>) one can change the I<Source type of input data> settings.
+By selecting the prompt line of this menu (I<Choose SQL type:>) one can change the I<Source type> settings.
 
 =head3 Print TABLE
 
@@ -337,11 +338,11 @@ L</Import>.
 
 =head3 Create Table
 
-If the option I<Source type of input data> is set to I<menu>, selecting I<Create Table> opens a sub-menu where one can
-choose the type of the data source. If I<Source type of input data> is set to I<plain> or I<file>, the set data source
+If the option I<Source type> is set to I<menu>, selecting I<Create Table> opens a sub-menu where one can
+choose the type of the data source. If I<Source type> is set to I<plain> or I<file>, the set data source
 type is used automatically without showing a menu.
 
-For the meaning of the different data source types see L<Source type of input data>.
+For the meaning of the different data source types see L<Source type>.
 
 If the data has been read from a file, the user can apply different input filters (See L<Input filters>).
 
@@ -399,11 +400,11 @@ L</Import>.
 
 =head3 Insert Into
 
-If the option I<Source type of input data> is set to I<menu>, selecting I<Insert Into> opens a sub-menu where one can
-choose the type of the data source. If I<Source type of input data> is set to I<plain> or I<file>, the set data source
+If the option I<Source type> is set to I<menu>, selecting I<Insert Into> opens a sub-menu where one can
+choose the type of the data source. If I<Source type> is set to I<plain> or I<file>, the set data source
 type is used without showing a menu.
 
-For the meaning of the different data source types see L<Source type of input data>.
+For the meaning of the different data source types see L<Source type>.
 
 After the data has been read the user can apply different input filters (See L<Input filters>).
 
@@ -422,7 +423,7 @@ Delete records. The affected records are shown before the user confirms the dele
 
 =head2 Data Input
 
-=head3 Source type
+=head3 Data source
 
 =over
 
@@ -435,7 +436,7 @@ Insert the data cell by cell.
 The data is read from a chosen file.
 
 Supported file formats: text files and file formats supported by L<Spreadsheet::Read>. C<Spreadsheet::Read> uses
-different parser modules for the different file formats - see L<Spreadsheet::Read/DESCRIPTION>. The parser modules are
+different parser modules for the different file formats - see L<Spreadsheet::Read/SEE-ALSO>. The parser modules are
 not installed automatically. It is up to the user to install the required parser modules.
 
 Selecting I<From File> opens the I<Source directory> sub-menu where one can choose the directory which should be
@@ -446,8 +447,8 @@ automatically.
 
 After a directory has been chosen a sub-menu is opened where one can choose the source file.
 
-If the previous sub-menu I<Source directory> is not shown due to the settings described before, it is possible the
-change the source directory in this sub-menu by selecting I<NEW search>.
+If the previous sub-menu I<Source directory> is not shown due to the settings described before, it is possible to
+change the source directory in this sub-menu by selecting I<Change dir>.
 
 =back
 
@@ -849,8 +850,8 @@ With C<Firebird>, C<SIMILAR TO> is used instead of C<REGEXP>.
 
 =head3 Aliases
 
-If enabled, it is asked for an alias. If entered nothing, no alias is added except for joined tables, union tables,
-derived tables and aggregate functons which get then a default alias.
+If enabled, it is asked for an alias. If entered nothing, the default alias is used except for Subqueries in SELECT
+which don't have a default alias.
 
 =over
 
@@ -887,6 +888,8 @@ If set to C<YES>, qualified table names are used in SQL statements.
 =item Quote identifiers
 
 If set to C<YES>, SQL identifiers are quoted.
+
+C<Informix>: set the C<DELIMIDENT> environmet variable to allow quoted identifier.
 
 =back
 
@@ -1021,11 +1024,32 @@ Template
 
 Uses C<unpack> with the C<A> character to break up input lines.
 
-C<unpack> used with C<A> strips trailing whitespace. For leading whitespace to user has the option to remove it or not.
-Any remaining column separators can be removed with the I<Search & Replace> filter.
+=over
+
+=item
 
 If the row length is greater than the screen width, make notes of the number of columns and the length of each column
 before using I<Template>.
+
+=item
+
+Choose the input record separator.
+
+=item
+
+Set the number of columns (I<Col count>) and the width of the column separator (I<Sep width>). I<Col count> expects an
+integer of 1 or greater; I<Sep width> expects an integer of 0 or greater.
+
+=item
+
+Set the widths of the columns (1 or greater). For the last column one can also enter an asterisk (C<*>). The last
+column with an asterisk means: Use the remaining part of the row for the last column.
+
+=item
+
+Decide whether leading spaces should be removed. Trailing whitespaces are removed automatically.
+
+=back
 
 Advantages:
 
@@ -1033,7 +1057,7 @@ Advantages:
 
 =item
 
-Good for input with fixed-columns-length.
+Good for fixed column length inputs containing only single width characters.
 
 =back
 

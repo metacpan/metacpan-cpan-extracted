@@ -39,6 +39,7 @@ sub new {
   my @visible = $rfid->tags(
 		enter => sub { my $tag = shift; },
 		leave => sub { my $tag = shift; },
+		reader => sub { my $reader = shift; ref($reader) =~ m/something/ },
   );
 
 =cut
@@ -52,6 +53,19 @@ sub tags {
 	my $t = time;
 
 	foreach my $rfid ( @{ $self->{_readers} } ) {
+
+		if ( exists $triggers->{reader} ) {
+			if ( ! $triggers->{reader}->($rfid) ) {
+				# invalidate tags from other readers
+				if ( exists $self->{_tags} ) {
+					delete  $self->{_tags}->{$_} foreach (
+						grep { $self->{_tags}->{$_}->{reader} eq ref $rfid } keys %{ $self->{_tags} }
+					);
+				}
+				next;
+			}
+		}
+
 		warn "# inventory on $rfid";
 		my @tags = $rfid->inventory;
 
@@ -63,6 +77,8 @@ sub tags {
 					$self->{_tags}->{$tag}->{blocks} = $blocks->{$tag} || die "no $tag in ",dump($blocks);
 					my $afi = $rfid->read_afi($tag);
 					$self->{_tags}->{$tag}->{afi} = $afi;
+					$self->{_tags}->{$tag}->{type} = $rfid->tag_type( $tag );
+					$self->{_tags}->{$tag}->{reader} = ref $rfid; # save reader info
 
 				};
 				if ( $@ ) {
@@ -78,11 +94,11 @@ sub tags {
 
 		}
 	
-		foreach my $tag ( grep { $self->{_tags}->{$_}->{time} == 0 } keys %{ $self->{_tags} } ) {
-			$triggers->{leave}->( $tag ) if $triggers->{leave};
-			$self->_invalidate_tag( $tag );
-		}
+	}
 
+	foreach my $tag ( grep { $self->{_tags}->{$_}->{time} == 0 } keys %{ $self->{_tags} } ) {
+		$triggers->{leave}->( $tag ) if $triggers->{leave};
+		$self->_invalidate_tag( $tag );
 	}
 
 	warn "## _tags ",dump( $self->{_tags} );
@@ -102,6 +118,48 @@ sub tags {
 
 sub blocks { $_[0]->{_tags}->{$_[1]}->{ 'blocks' } || confess "no blocks for $_[1]"; };
 sub afi    { $_[0]->{_tags}->{$_[1]}->{ 'afi'    } || confess "no afi for $_[1]"; };
+
+=head2 to_hash
+
+  $self->to_hash( $tag );
+
+=cut
+
+sub to_hash {
+	my ( $self, $tag ) = @_;
+	return unless exists $self->{_tags}->{$tag};
+	my $type = $self->{_tags}->{$tag}->{type} || confess "can't find type for tag $tag ",dump( $self->{_tags} );
+	my $decode = 'Biblio::RFID::' . $type;
+	my $hash = $decode->to_hash( $self->blocks( $tag ) );
+	$hash->{tag_type} = $type;
+	return $hash;
+}
+
+=head2 debug
+
+  $self->debug(1); # or more
+
+=cut
+
+sub debug {
+	my ( $self, $level ) = @_;
+	$debug = $level if $level > $debug;
+	warn "debug level $level\n" if $level;
+}
+
+=head2 from_reader
+
+  my $reader = $self->from_reader( $tag );
+
+=cut
+
+sub from_reader {
+	my ( $self, $tag ) = @_;
+	return unless exists $self->{_tags}->{$tag};
+	my $reader = $self->{_tags}->{$tag}->{reader};
+	$reader =~ s/^.*:://; # strip module prefix
+	return $reader;
+}
 
 =head1 PRIVATE
 
@@ -127,7 +185,8 @@ Probe each RFID reader supported and returns succefull ones
 
 =cut
 
-my @readers = ( '3M810', 'CPRM02', 'librfid' );
+#my @readers = ( '3M810', 'CPRM02', 'librfid' );
+my @readers = ( '3M810', 'librfid' );
 
 sub _available {
 	my ( $self, $filter ) = @_;

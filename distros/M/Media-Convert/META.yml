@@ -25,5 +25,5 @@ requires:
   MooseX::Singleton: '0'
 resources:
   repository: https://salsa.debian.org/wouter/media-convert.git
-version: v1.0.3
+version: v1.0.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

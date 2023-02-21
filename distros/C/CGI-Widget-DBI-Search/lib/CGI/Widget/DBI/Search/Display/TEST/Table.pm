@@ -144,7 +144,7 @@ sub test_search__sorting
     # only displays most recent sorting
     $self->assert_display_contains(
         [ 'At first page', 'At last page' ],
-        [ "sortby=widget_no&sort_reverse=0", "widget_no", (map {("sortby=$_", $_)} qw/name description size/) ],
+        [ "sortby=widget_no&amp;sort_reverse=0", "widget_no", (map {("sortby=$_", $_)} qw/name description size/) ],
         [ 4, 'gps_widget', 'A GPS widget', 'medium' ],
         [ 3, 'silly_widget', 'A goofball widget', 'unknown' ],
         [ 2, 'calendar_widget', 'A date tracker widget', 'medium' ],
@@ -169,7 +169,7 @@ sub test_search__sorting__supports_href_and_form_extra_vars
     $self->assert_display_contains(
         [ 'input type="hidden" name="form_hiddenvar" value="bar' ],
         [ 'At first page', 'At last page' ],
-        [ "sortby=widget_no&href_testvar=foo", "widget_no", (map {("sortby=$_", $_)} qw/name description size/) ],
+        [ "sortby=widget_no&amp;href_testvar=foo", "widget_no", (map {("sortby=$_", $_)} qw/name description size/) ],
         [ 1, 'clock_widget', 'A time keeper widget', 'small' ],
         [ 2, 'calendar_widget', 'A date tracker widget', 'medium' ],
         [ 3, 'silly_widget', 'A goofball widget', 'unknown' ],
@@ -262,7 +262,7 @@ sub test_search__only_allows_sorting_by_specified_columns
     $ws->search();
 
     $self->assert_display_contains(
-        [ "sortby=widget_no&sort_reverse=1", "widget_no", (map {("sortby=$_", $_)} qw/name description/) ],
+        [ "sortby=widget_no&amp;sort_reverse=1", "widget_no", (map {("sortby=$_", $_)} qw/name description/) ],
         [ 1, 'clock_widget', 'A time keeper widget', 'small' ],
         [ 2, 'calendar_widget', 'A date tracker widget', 'medium' ],
         [ 3, 'silly_widget', 'A goofball widget', 'unknown' ],
@@ -281,7 +281,7 @@ sub test_search__only_allows_sorting_by_specified_columns
     $ws->search();
 
     $self->assert_display_contains(
-        [ "sortby=widget_no&sort_reverse=0", "widget_no", "sortby=name" ],
+        [ "sortby=widget_no&amp;sort_reverse=0", "widget_no", "sortby=name" ],
         [ 4, 'gps_widget', 'A GPS widget', 'medium' ],
         [ 3, 'silly_widget', 'A goofball widget', 'unknown' ],
         [ 2, 'calendar_widget', 'A date tracker widget', 'medium' ],
@@ -299,7 +299,7 @@ sub test_search__default_orderby_and_sorting
     # only displays most recent sorting
     $self->assert_display_contains(
         [ 'At first page', 'At last page' ],
-        [ (map {("sortby=$_", $_)} qw/widget_no name description/), "sortby=size&sort_reverse=1", "size" ],
+        [ (map {("sortby=$_", $_)} qw/widget_no name description/), "sortby=size&amp;sort_reverse=1", "size" ],
         [ 2, 'calendar_widget', 'A date tracker widget', 'medium' ],
         [ 4, 'gps_widget', 'A GPS widget', 'medium' ],
         [ 1, 'clock_widget', 'A time keeper widget', 'small' ],
@@ -313,6 +313,7 @@ sub test_search__css_options
     my $self = shift;
     $self->{ws}->{-css_table_class} = 'TestTableClass';
     $self->{ws}->{-css_table_row_class} = 'TestTableRowClass';
+    $self->{ws}->{-css_table_row_extra_attr} = { -id => 'TestTableRow_$rowindex', -class => 'clickable' }; # test $row_index feature
     $self->{ws}->{-css_table_header_row_class} = 'TestTableHeaderRowClass';
     $self->{ws}->{-css_table_cell_class} = 'TestTableCellClass';
     $self->{ws}->{-css_table_header_cell_class} = 'TestTableHeaderCellClass';
@@ -325,13 +326,13 @@ sub test_search__css_options
         [ 'thead', 'tr [^<>]*class="TestTableHeaderRowClass', 'th [^<>]*class="TestTableHeaderCellClass' ],
         [ map {("sortby=$_", $_)} qw/widget_no name description size/ ],
         [ 'th', 'tr', 'thead' ],
-        [ 'tbody', 'tr [^<>]*class="TestTableRowClass', 'td [^<>]*class="TestTableCellClass' ],
+        [ 'tbody', 'tr [^<>]*class="TestTableRowClass clickable', 'id="TestTableRow_1', 'td [^<>]*class="TestTableCellClass' ],
         [ 1, 'clock_widget', 'A time keeper widget', 'small' ],
-        [ 'td', 'tr', 'tr [^<>]*class="TestTableRowClass', 'td [^<>]*class="TestTableCellClass' ],
+        [ 'td', 'tr', 'tr [^<>]*class="TestTableRowClass clickable', 'id="TestTableRow_2', 'td [^<>]*class="TestTableCellClass' ],
         [ 2, 'calendar_widget', 'A date tracker widget', 'medium' ],
-        [ 'td', 'tr', 'tr [^<>]*class="TestTableRowClass', 'td [^<>]*class="TestTableCellClass' ],
+        [ 'td', 'tr', 'tr [^<>]*class="TestTableRowClass clickable', 'id="TestTableRow_3', 'td [^<>]*class="TestTableCellClass' ],
         [ 3, 'silly_widget', 'A goofball widget', 'unknown' ],
-        [ 'td', 'tr', 'tr [^<>]*class="TestTableRowClass', 'td [^<>]*class="TestTableCellClass' ],
+        [ 'td', 'tr', 'tr [^<>]*class="TestTableRowClass clickable', 'id="TestTableRow_4', 'td [^<>]*class="TestTableCellClass' ],
         [ 4, 'gps_widget', 'A GPS widget', 'medium' ],
         [ 'td', 'tr', 'tbody', 'table' ],
         [ 'At first page', 'At last page' ],
@@ -347,13 +348,13 @@ sub test_search__extra_attributes
     $self->assert_display_contains(
         [ 'table' ],
         [ map {("sortby=$_", $_)} qw/widget_no name description size/ ],
-        [ 'tr', 'td [^<>]*test-attr2="bar" [^<>]*test-attr1="foo' ],
+        [ 'tr', 'td [^<>]*test-attr(?:2="bar"|1="foo") [^<>]*test-attr(?:2="bar"|1="foo")[^<>]*>' ],
         [ 1, 'clock_widget', 'A time keeper widget', 'small' ],
-        [ 'td', 'tr', 'tr', 'td [^<>]*test-attr2="bar" [^<>]*test-attr1="foo' ],
+        [ 'td', 'tr', 'tr', 'td [^<>]*test-attr(?:2="bar"|1="foo") [^<>]*test-attr(?:2="bar"|1="foo")[^<>]*>' ],
         [ 2, 'calendar_widget', 'A date tracker widget', 'medium' ],
-        [ 'td', 'tr', 'tr', 'td [^<>]*test-attr2="bar" [^<>]*test-attr1="foo' ],
+        [ 'td', 'tr', 'tr', 'td [^<>]*test-attr(?:2="bar"|1="foo") [^<>]*test-attr(?:2="bar"|1="foo")[^<>]*>' ],
         [ 3, 'silly_widget', 'A goofball widget', 'unknown' ],
-        [ 'td', 'tr', 'tr', 'td [^<>]*test-attr2="bar" [^<>]*test-attr1="foo' ],
+        [ 'td', 'tr', 'tr', 'td [^<>]*test-attr(?:2="bar"|1="foo") [^<>]*test-attr(?:2="bar"|1="foo")[^<>]*>' ],
         [ 4, 'gps_widget', 'A GPS widget', 'medium' ],
         [ 'td', 'tr' ],
     );
@@ -366,20 +367,20 @@ sub test_search__extra_attributes_closure
         my ($obj, $row) = @_;
         my $col1 = $obj->{'header_columns'}->[0];
         my $col2 = $obj->{'header_columns'}->[1];
-        return { "attr_$col1" => $row->{$col1}, "attr_$col2" => $row->{$col2} };
+        return { 'attr_'.$col1 => $row->{$col1}, 'attr_'.$col2 => $row->{$col2} };
     };
     $self->SUPER::test_search__basic;
 
     $self->assert_display_contains(
         [ 'table' ],
         [ map {("sortby=$_", $_)} qw/widget_no name description size/ ],
-        [ 'tr', 'td [^<>]*attr-widget-no="1" [^<>]*attr-name="clock_widget' ],
+        [ 'tr', 'td [^<>]*attr-(?:widget-no="1"|name="clock_widget") [^<>]*attr-(?:widget-no="1"|name="clock_widget")[^<>]*>' ],
         [ 1, 'clock_widget', 'A time keeper widget', 'small' ],
-        [ 'td', 'tr', 'tr', 'td [^<>]*attr-widget-no="2" [^<>]*attr-name="calendar_widget' ],
+        [ 'td', 'tr', 'tr', 'td [^<>]*attr-(?:widget-no="2"|name="calendar_widget") [^<>]*attr-(?:widget-no="2"|name="calendar_widget")[^<>]*>' ],
         [ 2, 'calendar_widget', 'A date tracker widget', 'medium' ],
-        [ 'td', 'tr', 'tr', 'td [^<>]*attr-widget-no="3" [^<>]*attr-name="silly_widget' ],
+        [ 'td', 'tr', 'tr', 'td [^<>]*attr-(?:widget-no="3"|name="silly_widget") [^<>]*attr-(?:widget-no="3"|name="silly_widget")[^<>]*>' ],
         [ 3, 'silly_widget', 'A goofball widget', 'unknown' ],
-        [ 'td', 'tr', 'tr', 'td [^<>]*attr-widget-no="4" [^<>]*attr-name="gps_widget' ],
+        [ 'td', 'tr', 'tr', 'td [^<>]*attr-(?:widget-no="4"|name="gps_widget") [^<>]*attr-(?:widget-no="4"|name="gps_widget")[^<>]*>' ],
         [ 4, 'gps_widget', 'A GPS widget', 'medium' ],
         [ 'td', 'tr' ],
     );

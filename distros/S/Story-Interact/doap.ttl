@@ -33,7 +33,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Story-Interact";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001002>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001003>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001004>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001005>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001006>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001007>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001002>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001003>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001004>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001005>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001006>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001007>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001008>, <http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001009>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-story-interact>;
@@ -119,6 +119,37 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Story-Interact-0.001007.tar.gz>;
 	doap:revision        "0.001007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001008>
+	a                    doap:Version;
+	dc:identifier        "Story-Interact-0.001008"^^xsd:string;
+	dc:issued            "2023-02-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Story::Interact::PageSource::Waterfall.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Story::Interact::State->character_class.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Story-Interact-0.001008.tar.gz>;
+	doap:revision        "0.001008"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Story-Interact/v_0-001009>
+	a                    doap:Version;
+	dc:identifier        "Story-Interact-0.001009"^^xsd:string;
+	dc:issued            "2023-02-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Import `uniqstr` into Story::Interact::PageSource::Waterfall.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Story-Interact-0.001009.tar.gz>;
+	doap:revision        "0.001009"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

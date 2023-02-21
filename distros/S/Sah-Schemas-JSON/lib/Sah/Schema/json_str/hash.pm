@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-26'; # DATE
+our $DATE = '2022-11-15'; # DATE
 our $DIST = 'Sah-Schemas-JSON'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our $schema = [str => {
     summary => 'A string that contains valid JSON and the JSON encodes a hash (JavaScript object)',
@@ -52,7 +52,7 @@ Sah::Schema::json_str::hash - A string that contains valid JSON and the JSON enc
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::Schema::json_str::hash (from Perl distribution Sah-Schemas-JSON), released on 2022-08-26.
+This document describes version 0.007 of Sah::Schema::json_str::hash (from Perl distribution Sah-Schemas-JSON), released on 2022-11-15.
 
 =head1 SYNOPSIS
 
@@ -96,7 +96,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = "true";
+ $data = "\"foo\"";
  my $errmsg = $validator->($data); # => "String is a valid JSON but not an encoded hash"
 
 Often a schema has coercion rule or default value, so after validation the
@@ -111,8 +111,8 @@ prefiltered) value:
  my $res = $validator->($data); # => ["","{\"a\":1,\"b\":2}"]
  
  # a sample invalid data
- $data = "true";
- my $res = $validator->($data); # => ["String is a valid JSON but not an encoded hash","true"]
+ $data = "\"foo\"";
+ my $res = $validator->($data); # => ["String is a valid JSON but not an encoded hash","\"foo\""]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like
@@ -174,6 +174,23 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
+
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema:
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('$sch_name*', name=>'JsonStrHash')
+     );
+ }
+
+ use My::Types qw(JsonStrHash);
+ JsonStrHash->assert_valid($data);
 
 =head1 DESCRIPTION
 

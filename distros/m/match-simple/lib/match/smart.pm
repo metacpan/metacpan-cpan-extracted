@@ -11,7 +11,7 @@ use Scalar::Util qw( blessed looks_like_number refaddr );
 
 BEGIN {
 	$match::smart::AUTHORITY = 'cpan:TOBYINK';
-	$match::smart::VERSION   = '0.011';
+	$match::smart::VERSION   = '0.012';
 }
 
 our @ISA       = qw( Exporter::Tiny );
@@ -208,7 +208,7 @@ for overloading C<< ~~ >>.
 =head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=match-simple>.
+L<https://github.com/tobyink/p5-match-simple/issues>.
 
 =head1 SEE ALSO
 
@@ -222,7 +222,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017, 2022 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017, 2022-2023 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

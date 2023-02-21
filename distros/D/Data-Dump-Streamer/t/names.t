@@ -1,13 +1,12 @@
 use Test::More tests => 50;
-BEGIN { use_ok( 'Data::Dump::Streamer', qw(:undump Dump) ); }
+BEGIN { use_ok('Data::Dump::Streamer', qw(:undump Dump)); }
 use strict;
 use warnings;
 use Data::Dumper;
 
-#$Id: names.t 26 2006-04-16 15:18:52Z demerphq $#
-
 # imports same()
 require "./t/test_helper.pl";
+
 # use this one for simple, non evalable tests. (GLOB)
 #   same ( $got,$expected,$name,$obj )
 #
@@ -15,24 +14,30 @@ require "./t/test_helper.pl";
 # same ( $name,$obj,$expected,@args )
 
 my $dump;
-my $o = Data::Dump::Streamer->new();
+my $o= Data::Dump::Streamer->new();
 
-isa_ok( $o, 'Data::Dump::Streamer' );
+isa_ok($o, 'Data::Dump::Streamer');
+
 # Make sure Dump($var)->Names($name)->Out() works...
-is (scalar(Dump(@{[0,1]})->Names('foo','bar')->Out()),"\$foo = 0;\n\$bar = 1;\n",'Dump()->Names()');
+is(
+    scalar(Dump(@{ [ 0, 1 ] })->Names('foo', 'bar')->Out()),
+    "\$foo = 0;\n\$bar = 1;\n",
+    'Dump()->Names()'
+);
 {
-    same( "Named", $o->Declare(0)->Names('x','y'), <<'EXPECT', ( @{[ 0 , 1 ]} ) );
+    same("Named", $o->Declare(0)->Names('x', 'y'), <<'EXPECT', (@{ [ 0, 1 ] }));
 $x = 0;
 $y = 1;
 EXPECT
 }
 {
-    my $s=0;
-    my $a=[];
-    my $h={};
-    my $c=sub{1};
+    my $s= 0;
+    my $a= [];
+    my $h= {};
+    my $c= sub { 1 };
 
-    same( "Named Vars ", $o->Declare(0)->Names('*s','*a','*h','*c'), <<'EXPECT', ( $s,$a,$h,$c ) );
+    same("Named Vars ", $o->Declare(0)->Names('*s', '*a', '*h', '*c'),
+        <<'EXPECT', ($s, $a, $h, $c));
 $s = 0;
 @a = ();
 %h = ();
@@ -40,8 +45,12 @@ sub c {
   1;
 };
 EXPECT
+
     #local $Data::Dump::Streamer::DEBUG=0;
-    same( "Named Vars Refs", $o->Declare(0)->Names('*s','*a','*h','*c'), <<'EXPECT', ( $s,$a,$h,$c, ),\( $s,$a,$h,$c, ) );
+    same(
+        "Named Vars Refs",
+        $o->Declare(0)->Names('*s', '*a', '*h', '*c'),
+        <<'EXPECT', ($s, $a, $h, $c,), \($s, $a, $h, $c,));
 $s = 0;
 @a = ();
 %h = ();
@@ -53,14 +62,15 @@ $REF1 = \\@a;
 $REF2 = \\%h;
 $REF3 = \\&c;
 EXPECT
+
 #$o->diag;
 }
 {
-my $z=[1,2,3];
-my $x=\$z->[0];
-my $y=\$z->[2];
+    my $z= [ 1, 2, 3 ];
+    my $x= \$z->[0];
+    my $y= \$z->[2];
 
-    same( "Named() two", $o->Names('*z','x','y'), <<'EXPECT', ( $z,$x,$y ) );
+    same("Named() two", $o->Names('*z', 'x', 'y'), <<'EXPECT', ($z, $x, $y));
 @z = (
        1,
        2,
@@ -69,8 +79,9 @@ my $y=\$z->[2];
 $x = \$z[0];
 $y = \$z[2];
 EXPECT
+
     #local $Data::Dump::Streamer::DEBUG=1;
-    same( "Named() three", $o->Names('x','y','*z'), <<'EXPECT', ( $x,$y,$z ) );
+    same("Named() three", $o->Names('x', 'y', '*z'), <<'EXPECT', ($x, $y, $z));
 $x = 'R: $z[0]';
 $y = 'R: $z[2]';
 @z = (
@@ -84,10 +95,10 @@ EXPECT
 }
 {
 
-    my ($a,$b);
-    $a = [{ a => \$b }, { b => undef }];
-    $b = [{ c => \$b }, { d => \$a }];
-    same( "Named Harder", $o->Names('*prime','ref'), <<'EXPECT', ( $a,$b ) );
+    my ($a, $b);
+    $a= [ { a => \$b }, { b => undef } ];
+    $b= [ { c => \$b }, { d => \$a } ];
+    same("Named Harder", $o->Names('*prime', 'ref'), <<'EXPECT', ($a, $b));
 @prime = (
            { a => \$ref },
            { b => undef }
@@ -98,7 +109,7 @@ $ref = [
        ];
 EXPECT
 
-    same( "Named Harder Swap", $o->Names('prime','*ref'), <<'EXPECT', ( $a,$b ) );
+    same("Named Harder Swap", $o->Names('prime', '*ref'), <<'EXPECT', ($a, $b));
 $prime = [
            { a => \\@ref },
            { b => undef }
@@ -108,7 +119,7 @@ $prime = [
          { d => \$prime }
        );
 EXPECT
-    same( "Named Harder Two", $o->Names('*prime','*ref'), <<'EXPECT', ( $a,$b ) );
+    same("Named Harder Two", $o->Names('*prime', '*ref'), <<'EXPECT', ($a, $b));
 @prime = (
            { a => \\@ref },
            { b => undef }
@@ -118,16 +129,17 @@ EXPECT
          { d => \\@prime }
        );
 EXPECT
+
 #print $o->diag;
 }
 {
     #local $Data::Dump::Streamer::DEBUG=1;
-    my ($a,$b);
-    $a = [undef, { b => undef }];
-    $b = [undef, { d => $a }];
-    $b->[0]={ c => $b };
-    $a->[0]={ a => $b };
-    same( "Named Simpler", $o->Names('*prime','ref'), <<'EXPECT', ( $a,$b ) );
+    my ($a, $b);
+    $a= [ undef, { b => undef } ];
+    $b= [ undef, { d => $a } ];
+    $b->[0]= { c => $b };
+    $a->[0]= { a => $b };
+    same("Named Simpler", $o->Names('*prime', 'ref'), <<'EXPECT', ($a, $b));
 @prime = (
            { a => 'V: $ref' },
            { b => undef }
@@ -139,7 +151,8 @@ $ref = [
 $prime[0]{a} = $ref;
 $ref->[0]{c} = $ref;
 EXPECT
-    same( "Named Simpler Swap", $o->Names('prime','*ref'), <<'EXPECT', ( $a,$b ) );
+    same("Named Simpler Swap", $o->Names('prime', '*ref'),
+        <<'EXPECT', ($a, $b));
 $prime = [
            { a => \@ref },
            { b => undef }
@@ -149,7 +162,8 @@ $prime = [
          { d => $prime }
        );
 EXPECT
-    same( "Named Simpler Two", $o->Names('*prime','*ref'), <<'EXPECT', ( $a,$b ) );
+    same("Named Simpler Two", $o->Names('*prime', '*ref'),
+        <<'EXPECT', ($a, $b));
 @prime = (
            { a => \@ref },
            { b => undef }
@@ -159,20 +173,27 @@ EXPECT
          { d => \@prime }
        );
 EXPECT
+
 #print $o->diag;
 }
 {
-    same( "Declare Named()", $o->Declare(1)->Names('x','y'), <<'EXPECT', ( @{[ 0 , 1 ]} ) );
+    same(
+        "Declare Named()",
+        $o->Declare(1)->Names('x', 'y'),
+        <<'EXPECT', (@{ [ 0, 1 ] }));
 my $x = 0;
 my $y = 1;
 EXPECT
 }
 {
-my $z=[1,2,3];
-my $x=\$z->[0];
-my $y=\$z->[2];
+    my $z= [ 1, 2, 3 ];
+    my $x= \$z->[0];
+    my $y= \$z->[2];
 
-    same( "Declare Named() two", $o->Names('*z','x','y'), <<'EXPECT', ( $z,$x,$y ) );
+    same(
+        "Declare Named() two",
+        $o->Names('*z', 'x', 'y'),
+        <<'EXPECT', ($z, $x, $y));
 my @z = (
           1,
           2,
@@ -182,7 +203,10 @@ my $x = \$z[0];
 my $y = \$z[2];
 EXPECT
 
-    same( "Declare Named() three", $o->Names('x','y','*z'), <<'EXPECT', ( $x,$y,$z ) );
+    same(
+        "Declare Named() three",
+        $o->Names('x', 'y', '*z'),
+        <<'EXPECT', ($x, $y, $z));
 my $x = 'R: $z[0]';
 my $y = 'R: $z[2]';
 my @z = (
@@ -196,10 +220,13 @@ EXPECT
 }
 {
     #local $Data::Dump::Streamer::DEBUG=1;
-    my ($a,$b);
-    $a = [{ a => \$b }, { b => undef }];
-    $b = [{ c => \$b }, { d => \$a }];
-    same( "Declare Named Harder", $o->Names('*prime','ref'), <<'EXPECT', ( $a,$b ) );
+    my ($a, $b);
+    $a= [ { a => \$b }, { b => undef } ];
+    $b= [ { c => \$b }, { d => \$a } ];
+    same(
+        "Declare Named Harder",
+        $o->Names('*prime', 'ref'),
+        <<'EXPECT', ($a, $b));
 my @prime = (
               { a => 'R: $ref' },
               { b => undef }
@@ -211,7 +238,10 @@ my $ref = [
 $prime[0]{a} = \$ref;
 $ref->[0]{c} = $prime[0]{a};
 EXPECT
-    same( "Declare Named Harder Swap", $o->Names('prime','*ref'), <<'EXPECT', ( $a,$b ) );
+    same(
+        "Declare Named Harder Swap",
+        $o->Names('prime', '*ref'),
+        <<'EXPECT', ($a, $b));
 my $prime = [
               { a => \do { my $v = 'V: @ref' } },
               { b => undef }
@@ -222,7 +252,10 @@ my @ref = (
           );
 ${$prime->[0]{a}} = \@ref;
 EXPECT
-    same( "Declare Named Harder Two", $o->Names('*prime','*ref'), <<'EXPECT', ( $a,$b ) );
+    same(
+        "Declare Named Harder Two",
+        $o->Names('*prime', '*ref'),
+        <<'EXPECT', ($a, $b));
 my @prime = (
               { a => \do { my $v = 'V: @ref' } },
               { b => undef }
@@ -238,12 +271,15 @@ EXPECT
 }
 {
     #local $Data::Dump::Streamer::DEBUG=1;
-    my ($a,$b);
-    $a = [undef, { b => undef }];
-    $b = [undef, { d => $a }];
-    $b->[0]={ c => $b };
-    $a->[0]={ a => $b };
-    same( "Declare Named Simpler", $o->Names('*prime','ref'), <<'EXPECT', ( $a,$b ) );
+    my ($a, $b);
+    $a= [ undef, { b => undef } ];
+    $b= [ undef, { d => $a } ];
+    $b->[0]= { c => $b };
+    $a->[0]= { a => $b };
+    same(
+        "Declare Named Simpler",
+        $o->Names('*prime', 'ref'),
+        <<'EXPECT', ($a, $b));
 my @prime = (
               { a => 'V: $ref' },
               { b => undef }
@@ -255,7 +291,10 @@ my $ref = [
 $prime[0]{a} = $ref;
 $ref->[0]{c} = $ref;
 EXPECT
-    same( "Declare Named Simpler Swap", $o->Names('prime','*ref'), <<'EXPECT', ( $a,$b ) );
+    same(
+        "Declare Named Simpler Swap",
+        $o->Names('prime', '*ref'),
+        <<'EXPECT', ($a, $b));
 my $prime = [
               { a => 'V: @ref' },
               { b => undef }
@@ -267,7 +306,10 @@ my @ref = (
 $prime->[0]{a} = \@ref;
 $ref[0]{c} = \@ref;
 EXPECT
-    same( "Declare Named Simpler Two", $o->Names('*prime','*ref'), <<'EXPECT', ( $a,$b ) );
+    same(
+        "Declare Named Simpler Two",
+        $o->Names('*prime', '*ref'),
+        <<'EXPECT', ($a, $b));
 my @prime = (
               { a => 'V: @ref' },
               { b => undef }
@@ -279,15 +321,19 @@ my @ref = (
 $prime[0]{a} = \@ref;
 $ref[0]{c} = \@ref;
 EXPECT
+
 #print $o->diag;
 }
 {
     #local $Data::Dump::Streamer::DEBUG=1;
-    my ($x,$y,$z);
-    $z = [($x={ a => \$y }), { b => undef }];
-    $y = [{ c => \$y }, ({ d => \$z })];
+    my ($x, $y, $z);
+    $z= [ ($x= { a => \$y }), { b => undef } ];
+    $y= [ { c => \$y }, ({ d => \$z }) ];
 
-    same( "Hash Named Harder", $o->Declare(0)->Names('*prime','ref'), <<'EXPECT', ( $x,$y ) );
+    same(
+        "Hash Named Harder",
+        $o->Declare(0)->Names('*prime', 'ref'),
+        <<'EXPECT', ($x, $y));
 %prime = ( a => \$ref );
 $ref = [
          { c => $prime{a} },
@@ -297,7 +343,10 @@ $ref = [
          ] }
        ];
 EXPECT
-    same( "Hash Named Harder Swap", $o->Names('prime','*ref'), <<'EXPECT', ( $y,$x ) );
+    same(
+        "Hash Named Harder Swap",
+        $o->Names('prime', '*ref'),
+        <<'EXPECT', ($y, $x));
 $prime = [
            { c => 'V: $ref{a}' },
            { d => \[
@@ -308,7 +357,10 @@ $prime = [
 %ref = ( a => \$prime );
 $prime->[0]{c} = $ref{a};
 EXPECT
-    same( "Hash Named Harder Two", $o->Names('*prime','*ref'), <<'EXPECT', ( $x,$y ) );
+    same(
+        "Hash Named Harder Two",
+        $o->Names('*prime', '*ref'),
+        <<'EXPECT', ($x, $y));
 %prime = ( a => \\@ref );
 @ref = (
          { c => $prime{a} },
@@ -318,17 +370,19 @@ EXPECT
          ] }
        );
 EXPECT
+
 #print $o->diag;
 }
 {
     #local $Data::Dump::Streamer::DEBUG=1;
-    my ($x,$y,$z);
-    $z = [undef, { b => undef }];
-    $y = [undef, { d => $z }];
-    $x=$y->[0]={ c => $y };
-    $z->[0]={ a => $y };
+    my ($x, $y, $z);
+    $z= [ undef, { b => undef } ];
+    $y= [ undef, { d => $z } ];
+    $x= $y->[0]= { c => $y };
+    $z->[0]=     { a => $y };
 
-    same( "Hash Named Simpler", $o->Names('*prime','ref'), <<'EXPECT', ( $x,$y ) );
+    same("Hash Named Simpler", $o->Names('*prime', 'ref'),
+        <<'EXPECT', ($x, $y));
 %prime = ( c => 'V: $ref' );
 $ref = [
          \%prime,
@@ -340,7 +394,10 @@ $ref = [
 $prime{c} = $ref;
 $ref->[1]{d}[0]{a} = $ref;
 EXPECT
-    same( "Hash Named Simpler Swap", $o->Names('prime','*ref'), <<'EXPECT', ( $x,$y ) );
+    same(
+        "Hash Named Simpler Swap",
+        $o->Names('prime', '*ref'),
+        <<'EXPECT', ($x, $y));
 $prime = { c => \@ref };
 @ref = (
          $prime,
@@ -350,7 +407,10 @@ $prime = { c => \@ref };
          ] }
        );
 EXPECT
-    same( "Hash Named Simpler Two", $o->Names('*prime','*ref'), <<'EXPECT', ( $x,$y ) );
+    same(
+        "Hash Named Simpler Two",
+        $o->Names('*prime', '*ref'),
+        <<'EXPECT', ($x, $y));
 %prime = ( c => \@ref );
 @ref = (
          \%prime,
@@ -360,14 +420,18 @@ EXPECT
          ] }
        );
 EXPECT
+
 #print $o->diag;
 }
 {
-my $z={0..3};
-my $x=\$z->{0};
-my $y=\$z->{2};
+    my $z= { 0 .. 3 };
+    my $x= \$z->{0};
+    my $y= \$z->{2};
 
-    same( "Hash Declare Named() two", $o->Declare(1)->Names('*z','x','y'), <<'EXPECT', ( $z,$x,$y ) );
+    same(
+        "Hash Declare Named() two",
+        $o->Declare(1)->Names('*z', 'x', 'y'),
+        <<'EXPECT', ($z, $x, $y));
 my %z = (
           0 => 1,
           2 => 3
@@ -376,7 +440,10 @@ my $x = \$z{0};
 my $y = \$z{2};
 EXPECT
 
-    same( "Hash Declare Named() three", $o->Names('x','y','*z'), <<'EXPECT', ( $x,$y,$z ) );
+    same(
+        "Hash Declare Named() three",
+        $o->Names('x', 'y', '*z'),
+        <<'EXPECT', ($x, $y, $z));
 my $x = 'R: $z{0}';
 my $y = 'R: $z{2}';
 my %z = (
@@ -389,10 +456,13 @@ EXPECT
 }
 {
     #local $Data::Dump::Streamer::DEBUG=1;
-    my ($x,$y,$z);
-    $z = [($x={ a => \$y }), { b => undef }];
-    $y = [{ c => \$y }, { d => \$z }];
-    same( "Hash Declare Named Harder", $o->Names('*prime','ref'), <<'EXPECT', ( $x,$y ) );
+    my ($x, $y, $z);
+    $z= [ ($x= { a => \$y }), { b => undef } ];
+    $y= [ { c => \$y }, { d => \$z } ];
+    same(
+        "Hash Declare Named Harder",
+        $o->Names('*prime', 'ref'),
+        <<'EXPECT', ($x, $y));
 my %prime = ( a => 'R: $ref' );
 my $ref = [
             { c => 'V: $prime{a}' },
@@ -404,7 +474,10 @@ my $ref = [
 $prime{a} = \$ref;
 $ref->[0]{c} = $prime{a};
 EXPECT
-    same( "Hash Declare Named Harder Swap", $o->Names('prime','*ref'), <<'EXPECT', ( $x,$y ) );
+    same(
+        "Hash Declare Named Harder Swap",
+        $o->Names('prime', '*ref'),
+        <<'EXPECT', ($x, $y));
 my $prime = { a => \do { my $v = 'V: @ref' } };
 my @ref = (
             { c => $prime->{a} },
@@ -415,7 +488,10 @@ my @ref = (
           );
 ${$prime->{a}} = \@ref;
 EXPECT
-    same( "Hash Declare Named Harder Two", $o->Names('*prime','*ref'), <<'EXPECT', ( $x,$y ) );
+    same(
+        "Hash Declare Named Harder Two",
+        $o->Names('*prime', '*ref'),
+        <<'EXPECT', ($x, $y));
 my %prime = ( a => \do { my $v = 'V: @ref' } );
 my @ref = (
             { c => $prime{a} },
@@ -431,12 +507,15 @@ EXPECT
 }
 {
     #local $Data::Dump::Streamer::DEBUG=1;
-    my ($x,$y,$z);
-    $z = [undef, { b => undef }];
-    $y = [undef, { d => $z }];
-    $x=$y->[0]={ c => $y };
-    $z->[0]={ a => $y };
-    same( "Hash Declare Named Simpler", $o->Names('*prime','ref'), <<'EXPECT', ( $x,$y ) );
+    my ($x, $y, $z);
+    $z= [ undef, { b => undef } ];
+    $y= [ undef, { d => $z } ];
+    $x= $y->[0]= { c => $y };
+    $z->[0]=     { a => $y };
+    same(
+        "Hash Declare Named Simpler",
+        $o->Names('*prime', 'ref'),
+        <<'EXPECT', ($x, $y));
 my %prime = ( c => 'V: $ref' );
 my $ref = [
             \%prime,
@@ -448,7 +527,10 @@ my $ref = [
 $prime{c} = $ref;
 $ref->[1]{d}[0]{a} = $ref;
 EXPECT
-    same( "Hash Declare Named Simpler Swap", $o->Names('prime','*ref'), <<'EXPECT', ( $x,$y ) );
+    same(
+        "Hash Declare Named Simpler Swap",
+        $o->Names('prime', '*ref'),
+        <<'EXPECT', ($x, $y));
 my $prime = { c => 'V: @ref' };
 my @ref = (
             $prime,
@@ -460,7 +542,10 @@ my @ref = (
 $prime->{c} = \@ref;
 $ref[1]{d}[0]{a} = \@ref;
 EXPECT
-    same( "Hash Declare Named Simpler Two", $o->Names('*prime','*ref'), <<'EXPECT', ( $x,$y ) );
+    same(
+        "Hash Declare Named Simpler Two",
+        $o->Names('*prime', '*ref'),
+        <<'EXPECT', ($x, $y));
 my %prime = ( c => 'V: @ref' );
 my @ref = (
             \%prime,
@@ -472,17 +557,21 @@ my @ref = (
 $prime{c} = \@ref;
 $ref[1]{d}[0]{a} = \@ref;
 EXPECT
-$o->Declare(0);
+    $o->Declare(0);
+
 #print $o->diag;
 }
 {
     #local $Data::Dump::Streamer::DEBUG=1;
-    my ($x,$y,$z);
-    $z = [undef, { b => undef }];
-    $y = bless [undef, { d => $z }],'bar';
-    $x=bless(($y->[0]={ c => $y }),'foo');
-    $z->[0]={ a => $y };
-    same( "Blessed Declare Named Simpler", $o->Declare(1)->Names('*prime','ref'), <<'EXPECT', ( $x,$y ) );
+    my ($x, $y, $z);
+    $z= [ undef, { b => undef } ];
+    $y= bless [ undef, { d => $z } ], 'bar';
+    $x= bless(($y->[0]= { c => $y }), 'foo');
+    $z->[0]= { a => $y };
+    same(
+        "Blessed Declare Named Simpler",
+        $o->Declare(1)->Names('*prime', 'ref'),
+        <<'EXPECT', ($x, $y));
 my %prime = ( c => 'V: $ref' );
 my $ref = bless( [
             bless( \%prime, 'foo' ),
@@ -494,7 +583,10 @@ my $ref = bless( [
 $prime{c} = $ref;
 $ref->[1]{d}[0]{a} = $ref;
 EXPECT
-    same( "Blessed Declare Named Simpler Swap", $o->Names('prime','*ref'), <<'EXPECT', ( $x,$y ) );
+    same(
+        "Blessed Declare Named Simpler Swap",
+        $o->Names('prime', '*ref'),
+        <<'EXPECT', ($x, $y));
 my $prime = bless( { c => 'V: @ref' }, 'foo' );
 my @ref = (
             $prime,
@@ -506,7 +598,10 @@ my @ref = (
 $prime->{c} = bless( \@ref, 'bar' );
 $ref[1]{d}[0]{a} = bless( \@ref, 'bar' );
 EXPECT
-    same( "Blessed Declare Named Simpler Two", $o->Names('*prime','*ref'), <<'EXPECT', ( $x,$y ) );
+    same(
+        "Blessed Declare Named Simpler Two",
+        $o->Names('*prime', '*ref'),
+        <<'EXPECT', ($x, $y));
 my %prime = ( c => 'V: @ref' );
 my @ref = (
             bless( \%prime, 'foo' ),
@@ -518,17 +613,21 @@ my @ref = (
 $prime{c} = bless( \@ref, 'bar' );
 $ref[1]{d}[0]{a} = bless( \@ref, 'bar' );
 EXPECT
-$o->Declare(0);
+    $o->Declare(0);
+
 #print $o->diag;
 }
 {
     #local $Data::Dump::Streamer::DEBUG=1;
-    my ($x,$y,$z);
-    $z = [undef, { b => undef }];
-    $y = bless [undef, { d => $z }],'bar';
-    $x=bless(($y->[0]={ c => $y }),'foo');
-    $z->[0]={ a => $y };
-    same( "Blessed Named Simpler", $o->Declare(0)->Names('*prime','ref'), <<'EXPECT', ( $x,$y ) );
+    my ($x, $y, $z);
+    $z= [ undef, { b => undef } ];
+    $y= bless [ undef, { d => $z } ], 'bar';
+    $x= bless(($y->[0]= { c => $y }), 'foo');
+    $z->[0]= { a => $y };
+    same(
+        "Blessed Named Simpler",
+        $o->Declare(0)->Names('*prime', 'ref'),
+        <<'EXPECT', ($x, $y));
 %prime = ( c => 'V: $ref' );
 $ref = bless( [
          bless( \%prime, 'foo' ),
@@ -540,7 +639,10 @@ $ref = bless( [
 $prime{c} = $ref;
 $ref->[1]{d}[0]{a} = $ref;
 EXPECT
-    same( "Blessed Named Simpler Swap", $o->Names('prime','*ref'), <<'EXPECT', ( $x,$y ) );
+    same(
+        "Blessed Named Simpler Swap",
+        $o->Names('prime', '*ref'),
+        <<'EXPECT', ($x, $y));
 $prime = bless( { c => bless( \@ref, 'bar' ) }, 'foo' );
 @ref = (
          $prime,
@@ -550,7 +652,10 @@ $prime = bless( { c => bless( \@ref, 'bar' ) }, 'foo' );
          ] }
        );
 EXPECT
-    same( "Blessed Named Simpler Two", $o->Names('*prime','*ref'), <<'EXPECT', ( $x,$y ) );
+    same(
+        "Blessed Named Simpler Two",
+        $o->Names('*prime', '*ref'),
+        <<'EXPECT', ($x, $y));
 %prime = ( c => bless( \@ref, 'bar' ) );
 @ref = (
          bless( \%prime, 'foo' ),
@@ -560,17 +665,21 @@ EXPECT
          ] }
        );
 EXPECT
-$o->Declare(0);
+    $o->Declare(0);
+
 #print $o->diag;
 }
 {
     #local $Data::Dump::Streamer::DEBUG=1;
-    my ($x,$y,$z);
-    $z = [undef, { b => undef }];
-    $y = bless [undef, { d => \$z }],'bar';
-    $x=bless(($y->[0]={ c => \$y }),'foo');
-    $z->[0]={ a => \$y };
-    same( "Harder Blessed Named", $o->Declare(0)->Names('*prime','ref'), <<'EXPECT', ( $x,$y ) );
+    my ($x, $y, $z);
+    $z= [ undef, { b => undef } ];
+    $y= bless [ undef, { d => \$z } ], 'bar';
+    $x= bless(($y->[0]= { c => \$y }), 'foo');
+    $z->[0]= { a => \$y };
+    same(
+        "Harder Blessed Named",
+        $o->Declare(0)->Names('*prime', 'ref'),
+        <<'EXPECT', ($x, $y));
 %prime = ( c => \$ref );
 $ref = bless( [
          bless( \%prime, 'foo' ),
@@ -580,7 +689,10 @@ $ref = bless( [
          ] }
        ], 'bar' );
 EXPECT
-    same( "Harder Blessed Named Swap", $o->Names('prime','*ref'), <<'EXPECT', ( $x,$y ) );
+    same(
+        "Harder Blessed Named Swap",
+        $o->Names('prime', '*ref'),
+        <<'EXPECT', ($x, $y));
 $prime = bless( { c => \bless( \@ref, 'bar' ) }, 'foo' );
 @ref = (
          $prime,
@@ -590,7 +702,10 @@ $prime = bless( { c => \bless( \@ref, 'bar' ) }, 'foo' );
          ] }
        );
 EXPECT
-    same( "Harder Blessed Named Two", $o->Names('*prime','*ref'), <<'EXPECT', ( $x,$y ) );
+    same(
+        "Harder Blessed Named Two",
+        $o->Names('*prime', '*ref'),
+        <<'EXPECT', ($x, $y));
 %prime = ( c => \bless( \@ref, 'bar' ) );
 @ref = (
          bless( \%prime, 'foo' ),
@@ -600,17 +715,21 @@ EXPECT
          ] }
        );
 EXPECT
-$o->Declare(0);
+    $o->Declare(0);
+
 #print $o->diag;
 }
 {
     #local $Data::Dump::Streamer::DEBUG=1;
-    my ($x,$y,$z);
-    $z = [undef, { b => undef }];
-    $y = bless [undef, { d => \$z }],'bar';
-    $x=bless(($y->[0]={ c => \$y }),'foo');
-    $z->[0]={ a => \$y };
-    same( "Declare Harder Blessed Named", $o->Declare(1)->Names('*prime','ref'), <<'EXPECT', ( $x,$y ) );
+    my ($x, $y, $z);
+    $z= [ undef, { b => undef } ];
+    $y= bless [ undef, { d => \$z } ], 'bar';
+    $x= bless(($y->[0]= { c => \$y }), 'foo');
+    $z->[0]= { a => \$y };
+    same(
+        "Declare Harder Blessed Named",
+        $o->Declare(1)->Names('*prime', 'ref'),
+        <<'EXPECT', ($x, $y));
 my %prime = ( c => 'R: $ref' );
 my $ref = bless( [
             bless( \%prime, 'foo' ),
@@ -622,7 +741,10 @@ my $ref = bless( [
 $prime{c} = \$ref;
 ${$ref->[1]{d}}->[0]{a} = $prime{c};
 EXPECT
-    same( "Declare Harder Blessed Named Swap", $o->Names('prime','*ref'), <<'EXPECT', ( $x,$y ) );
+    same(
+        "Declare Harder Blessed Named Swap",
+        $o->Names('prime', '*ref'),
+        <<'EXPECT', ($x, $y));
 my $prime = bless( { c => \do { my $v = 'V: @ref' } }, 'foo' );
 my @ref = (
             $prime,
@@ -633,7 +755,10 @@ my @ref = (
           );
 ${$prime->{c}} = bless( \@ref, 'bar' );
 EXPECT
-    same( "Declare Harder Blessed Named Two", $o->Names('*prime','*ref'), <<'EXPECT', ( $x,$y ) );
+    same(
+        "Declare Harder Blessed Named Two",
+        $o->Names('*prime', '*ref'),
+        <<'EXPECT', ($x, $y));
 my %prime = ( c => \do { my $v = 'V: @ref' } );
 my @ref = (
             bless( \%prime, 'foo' ),
@@ -644,17 +769,19 @@ my @ref = (
           );
 ${$prime{c}} = bless( \@ref, 'bar' );
 EXPECT
-$o->Declare(0);
+    $o->Declare(0);
+
 #print $o->diag;
 }
 {
-    my $x=[];
-    push @$x,\$x;
-    same( "Doc Array Self ref", $o->Names('*x')->Declare(0), <<'EXPECT', ( $x ) );
+    my $x= [];
+    push @$x, \$x;
+    same("Doc Array Self ref", $o->Names('*x')->Declare(0), <<'EXPECT', ($x));
 @x = ( \\@x );
 EXPECT
 }
- #Dump->Names('*x')->Out($x);
+
+#Dump->Names('*x')->Out($x);
 __END__
 # with eval testing
 {

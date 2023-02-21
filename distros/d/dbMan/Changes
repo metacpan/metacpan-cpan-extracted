@@ -1,5 +1,8 @@
 Revision history for Perl extension dbMan
 
+0.47 <20230209>
+    - extension SQLOutputMarkdown
+
 0.46 <20180510>
     - extension SQLOutputCube typo
     - extension SQLOutputHTML typo

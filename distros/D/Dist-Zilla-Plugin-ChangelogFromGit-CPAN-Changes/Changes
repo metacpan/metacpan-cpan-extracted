@@ -1,5 +1,10 @@
 Changelog for Dist-Zilla-Plugin-ChangelogFromGit-CPAN-Changes
 
+0.230480 2023-02-17T23:50:45Z
+ - [Closes #25] Sort tags using version->parse (jddurand)
+ - require at least perl 5.24 due to deps (Ioan Rogers)
+ - migrate from travis to github actions (Ioan Rogers)
+
 0.173421 2017-12-08T20:34:16Z
  - *DO* add a changelog when not releasing, but don't update it. Various
    author tests need to see a changelog exists, e.g. kwalitee (Ioan Rogers)

@@ -1,7 +1,18 @@
-0.2.1   2021-06-01  Released-By: PERLANCAR; Urgency: medium
+0.2.2   2022-11-29  Released-By: PERLANCAR; Urgency: low
+
+        - No spec changes.
+
+        - Mention subnamespaces TableData::Lingua::Dict::* and make
+          TableData::Lingua::Word::* as a subnamespace entry. Mention related
+          namespace: Data::TableData:*.
+
+
+0.2.1   2021-06-01  Released-By: PERLANCAR; Urgency: low
+
+        - No spec changes.
 
 	- Mention some subnamespaces under TableData::* like TableData::Lingua::
-	  and TableData::Locale::. Add nmespace TableDataBase{,s}. Add nmespace
+	  and TableData::Locale::. Add nmespace TableDataBase{,s}. Add namespace
 	  TableDataRoles, change TableDataCollection -> TableDataBundle.
 
 

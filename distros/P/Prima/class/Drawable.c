@@ -328,19 +328,19 @@ Drawable_width( Handle self, Bool set, int width)
 Bool
 Drawable_put_image_indirect( Handle self, Handle image, int x, int y, int xFrom, int yFrom, int xDestLen, int yDestLen, int xLen, int yLen, int rop)
 {
-	Bool ok;
+	Bool ok, use_matrix;
 	CHECK_GP(false);
 	if ( image == NULL_HANDLE) return false;
 	if ( !(PObject(image)-> options.optSystemDrawable)) {
 		warn("This method is not available on this class because it is not a system Drawable object. You need to implement your own");
 		return false;
 	}
-	x += var-> current_state.matrix[4];
-	y += var-> current_state.matrix[5];
-	if ( xLen == xDestLen && yLen == yDestLen)
+	prima_matrix_apply_int_to_int(VAR_MATRIX, &x, &y);
+	use_matrix = !prima_matrix_is_translated_only(VAR_MATRIX);
+	if ( xLen == xDestLen && yLen == yDestLen && !use_matrix)
 		ok = apc_gp_put_image( self, image, x, y, xFrom, yFrom, xLen, yLen, rop);
 	else
-		ok = apc_gp_stretch_image( self, image, x, y, xFrom, yFrom, xDestLen, yDestLen, xLen, yLen, rop);
+		ok = apc_gp_stretch_image( self, image, x, y, xFrom, yFrom, xDestLen, yDestLen, xLen, yLen, rop, use_matrix);
 	if ( !ok) perl_error();
 	return ok;
 }
@@ -531,7 +531,7 @@ Drawable_matrix( Handle self, Bool set, SV * svmatrix)
 	int i;
 	if ( !set) {
 		AV * av;
-		Matrix *matrix = & var-> current_state.matrix;
+		Matrix *matrix = &VAR_MATRIX;
 
 		av = newAV();
 		for ( i = 0; i < 6; i++) av_push( av, newSVnv((*matrix)[i]));
@@ -539,13 +539,17 @@ Drawable_matrix( Handle self, Bool set, SV * svmatrix)
 		return sv_bless(svmatrix, gv_stashpv("Prima::matrix", GV_ADD));
 	} else {
 		if ( SvROK(svmatrix) && ( SvTYPE( SvRV(svmatrix)) == SVt_PVAV)) {
-			Matrix *matrix = & var-> current_state.matrix;
+			Matrix matrix;
 			AV * av = ( AV *) SvRV(svmatrix);
 			if ( av_len( av) != 5) goto FAIL;
 			for ( i = 0; i < 6; i++) {
 				SV ** holder = av_fetch( av, i, 0);
 				if ( !holder) goto FAIL;
-				(*matrix)[i] = SvNV( *holder);
+				matrix[i] = SvNV( *holder);
+			}
+			if ( memcmp(matrix, VAR_MATRIX, sizeof(matrix)) != 0) {
+				COPY_MATRIX(matrix, VAR_MATRIX);
+				apc_gp_set_text_matrix( self, matrix);
 			}
 		} else {
 		FAIL:
@@ -589,8 +593,7 @@ SV *
 Drawable_pixel( Handle self, Bool set, int x, int y, SV * color)
 {
 	CHECK_GP(0);
-	x += var-> current_state.matrix[4];
-	y += var-> current_state.matrix[5];
+	prima_matrix_apply_int_to_int(VAR_MATRIX, &x, &y);
 	if (!set)
 		return newSViv( apc_gp_get_pixel( self, x, y));
 	apc_gp_set_pixel( self, x, y, SvIV( color));

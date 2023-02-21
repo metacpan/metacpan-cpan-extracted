@@ -1,5 +1,5 @@
 package Alien::zstd;
-
+$Alien::zstd::VERSION = '0.04';
 use strict;
 use warnings;
 use base qw( Alien::Base );

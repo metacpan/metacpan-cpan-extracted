@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Run;
 use strict;
 use warnings;
 
-our $VERSION = '0.000129';
+our $VERSION = '0.000133';
 
 use Data::GUID;
 use List::Util qw/max/;
@@ -53,6 +53,12 @@ sub handle {
 
             $run->coverages->delete;
             $run->reportings->delete;
+
+            my $batches = $run->resource_batches;
+            while (my $batch = $batches->next) {
+                $batch->resources->delete;
+                $batch->delete;
+            }
 
             my $jobs = $run->jobs;
 

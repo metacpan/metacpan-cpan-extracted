@@ -1,3 +1,11 @@
+use lib 't/lib';
+use blib 'perl_impl';
+use SPVM 'Digest::SHA';
+use Digest::SHA;
+use SPVMImpl;
+Digest::SHA::is_spvm();
+die unless $INC{'Digest/SHA.pm'} =~ /\bblib\b/;
+
 # Test against SHA-1 Sample Vectors from NIST
 
 use strict;

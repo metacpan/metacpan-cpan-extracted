@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 my @types = qw(
+    ApplicationDescription
     Boolean
     BrowseDescription
     BrowseNextRequest
@@ -21,6 +22,7 @@ my @types = qw(
     ExpandedNodeId
     Int32
     LocalizedText
+    MessageSecurityMode
     ModifySubscriptionRequest
     MonitoredItemCreateRequest
     NodeClass

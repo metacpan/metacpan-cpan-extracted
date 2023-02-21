@@ -14,7 +14,7 @@ require Exporter;
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(holidays);
-our $VERSION   = '2.05';
+our $VERSION   = '2.06';
 
 sub holidays{
 	my %parameters = (
@@ -142,6 +142,9 @@ sub holidays{
 
 	# Extras for Meck-Pomm
 	@{$holidays{'mv'}} = qw(refo);
+	if ($year >= 2023) {
+		push @{$holidays{'mv'}}, qw(frau);
+	}
 
 	# Extras for Niedersachsen
 	@{$holidays{'ni'}} = qw();

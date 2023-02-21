@@ -1,7 +1,25 @@
-class Sys::IO::Stat : pointer_t {
+class Sys::IO::Stat : pointer {
+  use Sys::User;
+  use Sys::IO::Constant as IO;
+  use Hash;
+  use Sys;
+  use Fn;
+  
   # Class methods
-  native static method new : Sys::IO::Stat ();
-
+  static method new : Sys::IO::Stat ($path = undef : string) {
+    my $items = items;
+    
+    my $self = &_new;;
+    
+    if ($items > 0) {
+      &stat($path, $self);
+    }
+    
+    return $self;
+  }
+  
+  private native static method _new : Sys::IO::Stat ();
+  
   native static method stat_raw : int ($path : string, $stat : Sys::IO::Stat);
   
   native static method stat : int ($path : string, $stat : Sys::IO::Stat);
@@ -11,9 +29,9 @@ class Sys::IO::Stat : pointer_t {
   native static method lstat : int ($path : string, $stat : Sys::IO::Stat);
   
   native static method fstat_raw : int ($fd : int, $stat : Sys::IO::Stat);
-
+  
   native static method fstat : int ($fd : int, $stat : Sys::IO::Stat);
-
+  
   # Instance methods
   native method DESTROY : void ();
   native method st_dev : long ();
@@ -32,4 +50,333 @@ class Sys::IO::Stat : pointer_t {
   native method st_mtim_tv_nsec : long ();
   native method st_atim_tv_nsec : long ();
   native method st_ctim_tv_nsec : long ();
+  
+  method A : double () {
+    
+    my $base_time = CommandInfo->BASE_TIME;
+    
+    my $atime = $self->st_atime;
+    
+    my $result_time = ($base_time - $atime) / 86400.0;
+    
+    return $result_time;
+  }
+  
+  method C : double () {
+    
+    my $base_time = CommandInfo->BASE_TIME;
+    
+    my $ctime = $self->st_ctime;
+    
+    my $result_time = ($base_time - $ctime) / 86400.0;
+    
+    return $result_time;
+  }
+  
+  method M : double () {
+    
+    my $base_time = CommandInfo->BASE_TIME;
+    
+    my $mtime = $self->st_mtime;
+    
+    my $result_time = ($base_time - $mtime) / 86400.0;
+    
+    return $result_time;
+  }
+  
+  method O : int () {
+    
+    my $ok = 0;
+    if (Sys->defined("_WIN32")) {
+      if ($self->st_uid == 0) {
+        $ok = 1;
+      }
+    }
+    else {
+      if ($self->st_uid == Sys::User->getuid) {
+        $ok = 1;
+      }
+    }
+    
+    return $ok;
+  }
+  
+  method S : int () {
+    my $ok = 0;
+    unless (Sys->defined("_WIN32")) {
+      # Socket
+      if (($self->st_mode & IO->S_IFMT) == IO->S_IFSOCK) {
+        $ok = 1;
+      }
+    }
+    
+    return $ok;
+  }
+  
+  method b : int () {
+    
+    # Block device
+    my $ok = 0;
+    if (($self->st_mode & IO->S_IFMT) == IO->S_IFBLK) {
+      $ok = 1;
+    }
+    
+    return $ok;
+  }
+  
+  method c : int () {
+    
+    # Character device
+    my $ok = 0;
+    if (($self->st_mode & IO->S_IFMT) == IO->S_IFCHR) {
+      $ok = 1;
+    }
+    
+    return $ok;
+  }
+  
+  method d : int () {
+    
+    my $ok = 0;
+    if (($self->st_mode & IO->S_IFMT) == IO->S_IFDIR) {
+      $ok = 1;
+    }
+    
+    return $ok;
+  }
+  
+  method e : int () {
+    
+    my $ok = 1;
+    
+    return $ok;
+  }
+  
+  method f : int () {
+    
+    my $ok = 0;
+    if (($self->st_mode & IO->S_IFMT) == IO->S_IFREG) {
+      $ok = 1;
+    }
+    
+    return $ok;
+  }
+  
+  method g : int () {
+    
+    my $ok = 0;
+    unless (Sys->defined("_WIN32")) {
+      if ($self->st_mode & IO->S_ISGID) {
+        $ok = 1;
+      }
+    }
+    
+    return $ok;
+  }
+  
+  method k : int () {
+    
+    my $ok = 0;
+    unless (Sys->defined("_WIN32")) {
+      if ($self->st_mode & IO->S_ISVTX) {
+        $ok = 1;
+      }
+    }
+    
+    return $ok;
+  }
+  
+  method l : int () {
+    
+    # Symbolic link
+    my $ok = 0;
+    if (($self->st_mode & IO->S_IFMT) == IO->S_IFLNK) {
+      $ok = 1;
+    }
+    
+    return $ok;
+  }
+  
+  method o : int () {
+    if (Sys->defined("_WIN32")) {
+      return $self->O;
+    }
+    
+    my $ok = 0;
+    if ($self->st_uid == Sys::User->geteuid) {
+      $ok = 1;
+    }
+    return $ok;
+  }
+  
+  method p : int () {
+    
+    # FIFO/PIPE
+    my $ok = 0;
+    if (($self->st_mode & IO->S_IFMT) == IO->S_IFIFO) {
+      $ok = 1;
+    }
+    
+    return $ok;
+  }
+  
+  method s : long () {
+    
+    my $size = $self->st_size;
+    
+    return $size;
+  }
+  
+  method u : int () {
+    
+    # Character device
+    my $ok = 0;
+    unless (Sys->defined("_WIN32")) {
+      if ($self->st_mode & IO->S_ISUID) {
+        $ok = 1;
+      }
+    }
+    
+    return $ok;
+  }
+  
+  method z : int () {
+    
+    my $ok = 0;
+    my $size = $self->st_size;
+    if ($size == 0) {
+      $ok = 1;
+    }
+    
+    return $ok;
+  }
+  
+  method cando : int ($mode : int, $effective : int) {
+    my $stmode = $self->st_mode;
+    
+    my $cando = 0;
+    if (Sys->defined("_WIN32")) {
+      $cando = !!($mode & $stmode);
+    }
+    else {
+      my $stuid = $self->st_uid;
+      my $stgid = $self->st_gid;
+      
+      my $uid = 0;
+      if ($effective) {
+        $uid = Sys::User->geteuid;
+      }
+      else {
+        $uid = Sys::User->getuid;
+      }
+      
+      # $uid becomes 0 in i386/ubuntu in non-root user, but this logic return the same result as Perl
+      if ($uid == 0) {
+        # If we're root on unix
+        # not testing for executable status => all file tests are true
+        if (!($mode & 0111)) {
+          $cando = 1;
+        }
+        # testing for executable status =>
+        # for a file, any x bit will do
+        # for a directory, always true
+        elsif ($stmode & 0111 || (($stmode & IO->S_IFMT) == IO->S_IFDIR)) {
+          $cando = 1;
+        }
+      }
+      else {
+        if ($stuid == $uid) {
+          $cando = !!($stmode & $mode);
+        }
+        elsif (&_ingroup($stgid, $effective)) {
+          $cando = !!($stmode & ($mode >> 3));
+        }
+        else {
+          $cando = !!($stmode & ($mode >> 6));
+        }
+      }
+    }
+    
+    return $cando;
+  }
+  
+  private static method _ingroup : int ($gid : int, $effective : int) {
+
+    my $egid = Sys::User->getegid;
+    my $supp = Sys::User->getgroups;
+    my $rgid = Sys::User->getgid;
+    
+    my $ingroup = 0;
+    my $cmp_gid = 0;
+    if ($effective) {
+      $cmp_gid = $egid;
+    }
+    else {
+      $cmp_gid = $rgid;
+    }
+    
+    if ($gid == $cmp_gid) {
+      $ingroup = 1;
+    }
+    else {
+      for my $sup (@$supp) {
+        if ($gid == $sup) {
+          $ingroup = 1;
+          last;
+        }
+      }
+    }
+    
+    return $ingroup;
+  }
+  
+  method r : int () {
+    
+    my $effective = 1;
+    my $ok = $self->cando(IO->S_IRUSR, $effective);
+    
+    return $ok;
+  }
+  
+  method w : int () {
+    
+    my $effective = 1;
+    my $ok = $self->cando(IO->S_IWUSR, $effective);
+    
+    return $ok;
+  }
+  
+  method x : int () {
+    
+    my $effective = 1;
+    my $ok = $self->cando(IO->S_IXUSR, $effective);
+    
+    return $ok;
+  }
+  
+  method R : int () {
+    
+    my $effective = 0;
+    my $ok = $self->cando(IO->S_IRUSR, $effective);
+    
+    return $ok;
+  }
+  
+  method W : int () {
+    
+    my $effective = 0;
+    my $ok = $self->cando(IO->S_IWUSR, $effective);
+    
+    return $ok;
+  }
+  
+  method X : int () {
+    
+    my $effective = 0;
+    my $ok = $self->cando(IO->S_IXUSR, $effective);
+    
+    return $ok;
+  }
 }
+
+=pod

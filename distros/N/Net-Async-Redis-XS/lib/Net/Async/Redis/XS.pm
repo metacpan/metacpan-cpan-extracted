@@ -4,7 +4,7 @@ package Net::Async::Redis::XS;
 use strict;
 use warnings;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 use parent qw(Net::Async::Redis);
 
@@ -72,5 +72,5 @@ with contributions from C<< PEVANS@cpan.org >>.
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2022. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2022-2023. Licensed under the same terms as Perl itself.
 

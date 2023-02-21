@@ -3,10 +3,11 @@ use warnings FATAL => 'all';
 use IO::Handle;
 
 use Test::More tests => 60;
-BEGIN { require_ok('re::engine::GNU') };
+use Test::More::UTF8;
 
-binmode STDOUT, ':utf8';
-binmode STDERR, ':utf8';
+BEGIN {
+    require_ok('re::engine::GNU')
+};
 
 #########################
 
@@ -69,13 +70,13 @@ ok ($t1, "'test' =~ qr/\\(tes\\)t/");
   $t2 = 'test' =~ [ 0, '\(tes\)t' ];
   no re::engine::GNU;
 }
-ok ($t2, "'test' =~ qr/\\(tes\\)t (array form)");
+ok ($t2, "'test' =~ [ 0, '\\(tes\\)t' ]");
 {
   use re::engine::GNU -debug => $ENV{AUTHOR_TEST} || 0;
   $t3 = 'test' =~ { syntax => 0, pattern => '\(tes\)t' };
   no re::engine::GNU;
 }
-ok ($t3, "'test' =~ qr/\\(tes\\)t (hash form)");
+ok ($t3, "'test' =~ { syntax => 0, pattern => '\\(tes\\)t' }");
 {
   use re::engine::GNU -debug => $ENV{AUTHOR_TEST} || 0;
   #

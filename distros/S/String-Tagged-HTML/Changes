@@ -1,0 +1,14 @@
+Revision history for String-Tagged-HTML
+
+0.02    2023-02-15
+        [CHANGES]
+         * Added `->new_from_formatting`, which attempts to convert
+           String::Tagged::Formatting tags into some HTML styling
+         * Added some optional parsing support using HTML::TreeBuilder
+         * Automatically generate "<span style=...>" HTML elements from
+           individual style tags
+         * Swap all unit tests from `Test::More` to `Test2::V0`
+         * Much module style neatening - use VERSION, POD style, etc..
+
+0.01    2011-04-12
+        First version, released on an unsuspecting world.

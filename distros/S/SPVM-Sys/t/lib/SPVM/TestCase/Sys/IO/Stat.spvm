@@ -16,6 +16,17 @@ class TestCase::Sys::IO::Stat {
       }
     }
     
+    {
+      my $file = "$test_dir/ftest/not_found.txt";
+      
+      my $stat = Sys::IO::Stat->new;
+      {
+        eval { Sys::IO::Stat->stat("$file/not_found.txt", $stat); };
+        unless (Fn->contains($@, "not_found.txt")) {
+          return 0;
+        }
+      }
+    }
     return 1;
   }
 
@@ -61,6 +72,18 @@ class TestCase::Sys::IO::Stat {
       my $status = Sys::IO::Stat->lstat($file, $stat);
       unless ($status == 0) {
         return 0;
+      }
+    }
+
+    {
+      my $file = "$test_dir/ftest/not_found.txt";
+      
+      my $stat = Sys::IO::Stat->new;
+      {
+        eval { Sys::IO::Stat->lstat("$file/not_found.txt", $stat); };
+        unless (Fn->contains($@, "not_found.txt")) {
+          return 0;
+        }
       }
     }
     

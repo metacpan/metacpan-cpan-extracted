@@ -3,6 +3,8 @@ ignore.txt
 lib/Data/LNPath.pm
 Makefile.PL
 MANIFEST			This list of files
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 README
 t/00-load.t
 t/01-path.t
@@ -12,9 +14,7 @@ t/04-return_undef.t
 t/05-import.t
 t/06-import2.t
 t/07-no-meth-keys.t
+t/08-terse.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

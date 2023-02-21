@@ -3,12 +3,13 @@
 
 requires "HTTP::Tiny" => "0";
 requires "JSON::PP" => "0";
-requires "Object::Pad" => "0";
 requires "URI" => "0";
-requires "perl" => "v5.36.0";
+requires "experimental" => "0";
+requires "perl" => "v5.37.9";
 
 on 'test' => sub {
   requires "Test::More" => "0";
+  requires "feature" => "0";
 };
 
 on 'configure' => sub {

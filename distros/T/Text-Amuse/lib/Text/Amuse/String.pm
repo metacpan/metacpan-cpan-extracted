@@ -80,6 +80,8 @@ They return nothing, but nevertheless the Output module won't complain.
 
 =item set_bidi_document
 
+=item set_has_ruby
+
 =back
 
 =cut
@@ -102,6 +104,10 @@ sub language_code {
 }
 
 sub set_bidi_document {
+    return;
+}
+
+sub set_has_ruby {
     return;
 }
 

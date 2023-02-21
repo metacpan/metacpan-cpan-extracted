@@ -64,7 +64,6 @@ You can write everything in ~/.gitconfig:
         diff = sdif -n --margin=4 --mecab | env LESSANSIENDCHARS=mK less -cR
 
 <div>
-
     <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/sdif-tools/master/docs/images/git.jpg"></p>
 </div>
 

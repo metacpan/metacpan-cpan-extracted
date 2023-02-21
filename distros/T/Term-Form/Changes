@@ -1,6 +1,10 @@
 Revision history for Term::Form
 
 
+0.553   2023-02-17
+    - Update year copyright.
+    - Bugfix skip_items: check if key is defined.
+
 0.552   2022-07-17
     - Update key bindings.
 

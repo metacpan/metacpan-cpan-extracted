@@ -139,7 +139,6 @@ options:
     WITH_OPENMP       - compile with/without openmp (default 1)
     WITH_COCOA        - compile with/without Cocoa (default 1), MacOSX only
     WITH_LIBTHAI      - compile with/without libthai (default 1)
-    CYGWIN_WINAPI     - Winapi build in cygwin environment
     DEBUG             - build with debug information
     VERBOSE           - don't redirect commands to makefile.log
     EXTRA_LDFLAGS     - add extra ld line (i.e. -lgcc )
@@ -197,7 +196,6 @@ sub setup_argv
 		WITH_OPENMP   => $ENV{PRIMA_WITH_OPENMP}   // 1,
 		WITH_COCOA    => $ENV{PRIMA_WITH_COCOA}    // ($^O eq 'darwin'),
 		WITH_LIBTHAI  => $ENV{PRIMA_WITH_LIBTHAI}  // 1,
-		CYGWIN_WINAPI => $ENV{PRIMA_CYGWIN_WINAPI} // 0,
 		DEBUG         => $ENV{PRIMA_DEBUG}         // 0,
 		EXTRA_CCFLAGS => $ENV{PRIMA_EXTRA_CCFLAGS} // '',
 		EXTRA_LDFLAGS => $ENV{PRIMA_EXTRA_LDFLAGS} // '',
@@ -235,13 +233,8 @@ sub setup_variables
 		$Win32 = 1;
 		$platform = 'win32';
 	} elsif ( $^O =~ /cygwin/i) {
-		if ( $cmd_options{CYGWIN_WINAPI}) {
-			$Win32 = 1;
-			$platform = 'win32';
-		} else {
-			$unix = 1;
-			$platform = 'unix';
-		}
+		$unix = 1;
+		$platform = 'unix';
 		$cygwin = 1;
 	} else {
 		$platform = 'unix';
@@ -451,7 +444,7 @@ sub setup_environment
 		$flavor .= ( $Config{ptrsize} == 8 ) ? '64' : '32';
 	} elsif ( $cygwin ) {
 		$flavor .= ( $Config{ptrsize} == 8 ) ? '64' : '32';
-		$flavor .= '.' . ( $cmd_options{CYGWIN_WINAPI} ? 'win32' : 'x11' );
+		$flavor .= '.x11';
 	} else {
 		my $arch = `uname -m`;
 		chomp $arch;
@@ -1721,6 +1714,19 @@ sub setup_x11_extension
 	}
 }
 
+sub setup_xrandr
+{
+	setup_x11_extension('xrandr');
+	return unless ( $MODVERSIONS{xrandr} // '') =~ m/^(\d+)\.(\d+)/;
+	return unless $1 * 100 + $2 >= 1.5;
+	$DEFINES{HAVE_XRANDR_1_5} = 1;
+}
+
+sub setup_xcomposite
+{
+	setup_x11_extension('xcomposite');
+}
+
 sub setup_xlibs
 {
 	have_header( "X11/extensions/shape.h", "X11/X.h", "X11/Xlib.h", "X11/Xutil.h");
@@ -1738,7 +1744,8 @@ NO_HARFBUZZ
 	$cmd_options{WITH_ICONV} = 0 unless $cmd_options{WITH_XFT}; # iconv is used for xft only
 	setup_iconv() if $cmd_options{WITH_ICONV};
 	setup_gtk() if $cmd_options{WITH_GTK2} || $cmd_options{WITH_GTK3};
-	setup_x11_extension($_) for qw(xrandr xcomposite);
+	setup_xrandr();
+	setup_xcomposite();
 
 	if ( $use_pkgconfig ) {
 		$DEFINES{HAVE_X11_XCURSOR_XCURSOR_H} = 1 if pkgconfig('xcursor');
@@ -2664,6 +2671,7 @@ sub install
 {
 	my $self = shift;
 	my $t = $self->SUPER::install(@_);
+	my $q = $SHQUOTE;
 	my $n = $t =~ s[
 		(pure_\w+_install.*?)                       # 1
 		(INST_ARCHLIB\)"?\s+"?)\$\(DEST(\w+)\)(.*?)     # 2,3,4
@@ -2675,7 +2683,7 @@ sub install
 		"$2\$(DEST$3)$4".
 		"$5\$(DEST$6)$7$8".
 		"\n\t\$(NOECHO) \$(ABSPERL) $0 --postinstall ".
-			"dest=\$(DEST$3) bin=\$($6) slib=$cygwin_fake_Slib\n\n"
+			"${q}dest=\$(DEST$3)$q ${q}bin=\$($6)$q slib=$cygwin_fake_Slib\n\n"
 	]xgse;
 
 	$END .= <<BAD_MAKEFILE if $n != 3;

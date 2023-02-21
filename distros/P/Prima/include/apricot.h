@@ -452,7 +452,7 @@ typedef struct _PositionalEvent {
 	Point  where;
 	int    button;
 	int    mod;
-	Bool   dblclk;
+	int    nth;
 } PositionalEvent, *PPositionalEvent;
 
 #ifdef DNDEvent
@@ -802,7 +802,7 @@ CM(MouseClick)
 CM(MouseEnter)
 #define cmMouseLeave     0x00000059                /* mouse left window area */
 CM(MouseLeave)
-#define cmTranslateAccel 0x0000005A                /* key event spred to non-focused windows */
+#define cmTranslateAccel 0x0000005A                /* key event spread to non-focused windows */
 CM(TranslateAccel)
 #define cmDelegateKey    0x0000005B                /* reserved for key mapping */
 CM(DelegateKey)
@@ -1350,6 +1350,9 @@ exception_block( Bool block );
 extern void
 exception_check_raise( void );
 
+extern void
+exception_dispatch_pending_signals( void );
+
 #ifdef PRIMA_PLATFORM_X11
 #define EXCEPTION_CHECK_RAISE exception_check_raise()
 #else
@@ -1766,7 +1769,7 @@ GT(Max)
 END_TABLE(gt,UV)
 #undef GT
 
-/* widget grow constats */
+/* widget grow constants */
 #define GM(const_name) CONSTANT(gm,const_name)
 START_TABLE(gm,UV)
 #define gmGrowLoX             0x001
@@ -1840,6 +1843,8 @@ WS(Normal)
 WS(Minimized)
 #define   wsMaximized      2
 WS(Maximized)
+#define   wsFullscreen     3
+WS(Fullscreen)
 END_TABLE(ws,UV)
 #undef WS
 
@@ -2123,7 +2128,7 @@ typedef struct {
 	Handle         in;             /* 'in' option */
 	/* pack */
 	Point          pad;            /* border padding */
-	Point          ipad;           /* size increaze */
+	Point          ipad;           /* size increase */
 	Handle         order;          /* if non-nil, BEFORE or AFTER a widget */
 	/* place */
 	int x, y;
@@ -2136,7 +2141,7 @@ typedef struct {
 	unsigned int   anchory    : 2; /* 0 - bottom, 1 - center, 2 - top */
 	/* pack */
 	unsigned int   after      : 1; /* 0 - order is BEFORE; 1 - order is AFTER */
-	unsigned int   expand     : 1; /* causes the allocation rectange to fill all remaining space */
+	unsigned int   expand     : 1; /* causes the allocation rectangle to fill all remaining space */
 	unsigned int   fillx      : 1; /* fill horizontal extent */
 	unsigned int   filly      : 1; /* fill vertical extent */
 	unsigned int   side       : 2; /* 0 - left, 1 - bottom, 2 - right, 3 - top */
@@ -2265,8 +2270,8 @@ END_TABLE(scr,UV)
 
 extern int
 apc_widget_scroll( Handle self, int horiz, int vert,
-						Rect *confine, Rect *clip,
-						Bool scrollChildren);
+	Rect *confine, Rect *clip,
+	Bool scrollChildren);
 
 extern Bool
 apc_widget_set_capture( Handle self, Bool capture, Handle confineTo);
@@ -2549,7 +2554,7 @@ typedef struct _MenuItemReg {   /* Menu item registration record */
 		unsigned int utf8_text     : 1;
 		unsigned int utf8_accel    : 1;
 		unsigned int utf8_perlSub  : 1;
-		unsigned int autotoggle    : 1;  /* true if menu is toggled automatially */
+		unsigned int autotoggle    : 1;  /* true if menu is toggled automatically */
 		unsigned int custom_draw   : 1;  /* true if menu item is drawn through onMenuItemPaint */
 	} flags;
 } MenuItemReg, *PMenuItemReg;
@@ -2874,6 +2879,26 @@ LE(Round)
 END_TABLE(le,UV)
 #undef LE
 
+/* line end indexes */
+#define LEI(const_name) CONSTANT(lei,const_name)
+START_TABLE(lei,UV)
+#define    leiLineTail      0
+LEI(LineTail)
+#define    leiLineHead      1
+LEI(LineHead)
+#define    leiArrowTail     2
+LEI(ArrowTail)
+#define    leiArrowHead     3
+LEI(ArrowHead)
+#define    leiMax           3
+LEI(Max)
+#define    leiOnly          0x10
+LEI(Only)
+#define    leiHeadsAndTails leiLineTail
+#define    leiHeads         leiLineHead
+END_TABLE(lei,UV)
+#undef LEI
+
 /* line joins */
 #define LJ(const_name) CONSTANT(lj,const_name)
 START_TABLE(lj,UV)
@@ -3009,7 +3034,7 @@ END_TABLE(fv,UV)
 #undef FV
 
 
-/* font weigths */
+/* font weights */
 #define FW(const_name) CONSTANT(fw,const_name)
 START_TABLE(fw,UV)
 #define    fwUltraLight     1
@@ -3566,7 +3591,7 @@ typedef struct {
 
 /* gp functions */
 typedef struct {
-	LineEnd line_end[4];
+	LineEnd line_end[leiMax + 1];
 	int line_join;
 	double line_width;
 	double miter_limit;
@@ -3648,7 +3673,7 @@ extern Bool
 apc_gp_stretch_image( Handle self, Handle image,
 	int x, int y, int xFrom, int yFrom,
 	int xDestLen, int yDestLen, int xLen, int yLen,
-	int rop);
+	int rop, Bool use_matrix);
 
 #define TO(const_name) CONSTANT(to,const_name)
 START_TABLE(to,UV)
@@ -3670,7 +3695,7 @@ END_TABLE(to,UV)
 typedef struct {
 	char     *language;
 	uint32_t *text;
-	int len, flags;
+	unsigned int len, flags;
 	Byte     *analysis;
 	uint16_t *v2l;
 
@@ -3684,7 +3709,7 @@ typedef Bool TextShapeFunc( Handle self, PTextShapeRec rec);
 typedef TextShapeFunc *PTextShapeFunc;
 
 typedef struct {
-	int len, flags, text_len;
+	unsigned int len, flags, text_len;
 	uint16_t *glyphs, *indexes, *advances;
 	int16_t  *positions;
 	uint16_t *fonts;
@@ -3854,6 +3879,9 @@ apc_gp_set_rop( Handle self, int rop);
 
 extern Bool
 apc_gp_set_rop2( Handle self, int rop);
+
+extern Bool
+apc_gp_set_text_matrix( Handle self, Matrix matrix);
 
 extern Bool
 apc_gp_set_text_opaque( Handle self, Bool opaque);

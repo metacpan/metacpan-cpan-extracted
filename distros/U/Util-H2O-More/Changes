@@ -99,6 +99,21 @@
       up CPAN indexing (no-op)
 
 0.2.8 Mon Jan 30 15:00:55 2023
-    - added wrapper, Getopt2h2o that will 'require Getopts::Long'
+    - added wrapper, Getopt2h2o that will 'require Getopt::Long'
       and then uses opt2h2o; it's perfect for hanging accessors
       on your commandline flag options
+
+0.2.9 Wed Feb 08 15:00:56 2023
+    - added 2 wrappers around Data::Dumper::Dumper to help with
+      lazy debugging of data structures;
+    - ddd LIST - iterates over the LIST, applying Data::Dumper::Dumper to each item
+    - dddie LIST - same as ddd, but die's at the end of the LIST
+    - POD updated to reflect these helpers
+    - manually tested, no unit tests added for this
+
+0.3.0 Thu Feb 09 15:00:57 2023
+    - added tr4h2o for keys not appropriate for use as subroutine names/accessors
+    - added backward compat wrappers, ini2o (ini2h2o) and o2ini (h2o2ini) due to
+      unforseen impacts to users (who knew!?) of taking them away
+    - added tests, POD
+    - POD issues if found will usually just be addressed in the next release

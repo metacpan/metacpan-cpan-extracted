@@ -1,5 +1,13 @@
 Revision history for Perl extension App-Greple-deepl
 
+0.08 2023-02-21T14:30:17Z
+
+    - introduce docs/ directory
+
+0.07 2023-02-11T07:13:01Z
+
+    - update --xlate-fold optin to perform translation by itself
+
 0.06 2023-02-08T05:58:20Z
 
     - fix --xlate-format=ifdef bug

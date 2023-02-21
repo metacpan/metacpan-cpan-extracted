@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-03'; # DATE
+our $DATE = '2023-02-18'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.008'; # VERSION
+our $VERSION = '1.017'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -30,13 +30,13 @@ gen_csv_util(
     },
     examples => [
         {
-            summary => 'Check that column foo in CSV is unique, compare case-insensitively, report duplicates',
+            summary => 'Check that field "foo" in CSV is unique, compare case-insensitively, report duplicates',
             argv => ['file.csv', '-i', 'foo'],
             test => 0,
             'x.doc.show_result' => 0,
         },
         {
-            summary => 'Check that combination of columns foo, bar, baz in CSV is unique, report duplicates',
+            summary => 'Check that combination of fields "foo", "bar", "baz" in CSV is unique, report duplicates',
             argv => ['file.csv', 'foo', 'bar', 'baz'],
             test => 0,
             'x.doc.show_result' => 0,
@@ -98,7 +98,7 @@ App::CSVUtils::csv_uniq - Report or omit duplicated values in CSV
 
 =head1 VERSION
 
-This document describes version 1.008 of App::CSVUtils::csv_uniq (from Perl distribution App-CSVUtils), released on 2023-02-03.
+This document describes version 1.017 of App::CSVUtils::csv_uniq (from Perl distribution App-CSVUtils), released on 2023-02-18.
 
 =head1 FUNCTIONS
 
@@ -115,11 +115,11 @@ Examples:
 
 =over
 
-=item * Check that column foo in CSV is unique, compare case-insensitively, report duplicates:
+=item * Check that field "foo" in CSV is unique, compare case-insensitively, report duplicates:
 
  csv_uniq(input_filename => "file.csv", fields => ["foo"], ignore_case => 1);
 
-=item * Check that combination of columns foo, bar, baz in CSV is unique, report duplicates:
+=item * Check that combination of fields "foo", "bar", "baz" in CSV is unique, report duplicates:
 
  csv_uniq(input_filename => "file.csv", fields => ["foo", "bar", "baz"]);
 

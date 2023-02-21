@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-26'; # DATE
+our $DATE = '2022-11-15'; # DATE
 our $DIST = 'Sah-Schemas-JSON'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our $schema = [any => {
     summary => 'A data structure, coerced from JSON string',
@@ -19,12 +19,15 @@ script as command-line argument or option, the string will be assumed to be a
 JSON-encoded value and decoded. Data will not be valid if the string does not
 contain valid JSON.
 
+Thus, if you want to supply a string, you have to JSON-encode it.
+
 _
     examples => [
         {value=>'', valid=>0, summary=>'Empty string is not a valid JSON'},
-        {value=>'1', valid=>1},
+        {value=>'1', valid=>1, summary=>"A number"},
         {value=>'null', valid=>1, validated_value=>undef},
-        {value=>'foo', valid=>0, summary=>'Not a valid JSON literal'},
+        {value=>'foo', valid=>0, summary=>'Not a valid JSON literal, you have to encode string in JSON'},
+        {value=>'"foo"', valid=>1, validated_value=>'foo', summary=>'If you want to pass a string, it must be in JSON-encoded form'},
         {value=>'[1,2,3,{}]', valid=>1, validated_value=>[1,2,3,{}]},
         {value=>'[1,2', valid=>0, summary=>'Missing closing square bracket'},
         {value=>'[1,2,]', valid=>0, summary=>'Dangling comma'},
@@ -50,7 +53,7 @@ Sah::Schema::any_from_json - A data structure, coerced from JSON string
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::Schema::any_from_json (from Perl distribution Sah-Schemas-JSON), released on 2022-08-26.
+This document describes version 0.007 of Sah::Schema::any_from_json (from Perl distribution Sah-Schemas-JSON), released on 2022-11-15.
 
 =head1 SYNOPSIS
 
@@ -58,11 +61,13 @@ This document describes version 0.006 of Sah::Schema::any_from_json (from Perl d
 
  ""  # INVALID (Empty string is not a valid JSON)
 
- 1  # valid
+ 1  # valid (A number)
 
  "null"  # valid, becomes undef
 
- "foo"  # INVALID (Not a valid JSON literal)
+ "foo"  # INVALID (Not a valid JSON literal, you have to encode string in JSON)
+
+ "\"foo\""  # valid (If you want to pass a string, it must be in JSON-encoded form), becomes "foo"
 
  "[1,2,3,{}]"  # valid, becomes [1,2,3,{}]
 
@@ -92,12 +97,12 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = {};
+ $data = [1,2];
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
  $data = "[1,2";
- my $errmsg = $validator->($data); # => "String is not a valid JSON: , or ] expected while parsing array, at character offset 4 (before \"(end of string)\") at (eval 2364) line 13.\n"
+ my $errmsg = $validator->($data); # => "String is not a valid JSON: , or ] expected while parsing array, at character offset 4 (before \"(end of string)\") at (eval 2418) line 13.\n"
 
 Often a schema has coercion rule or default value, so after validation the
 validated value is different. To return the validated (set-as-default, coerced,
@@ -107,12 +112,12 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = {};
- my $res = $validator->($data); # => ["",{}]
+ $data = [1,2];
+ my $res = $validator->($data); # => ["",[1,2]]
  
  # a sample invalid data
  $data = "[1,2";
- my $res = $validator->($data); # => ["String is not a valid JSON: , or ] expected while parsing array, at character offset 4 (before \"(end of string)\") at (eval 2370) line 13.\n","[1,2"]
+ my $res = $validator->($data); # => ["String is not a valid JSON: , or ] expected while parsing array, at character offset 4 (before \"(end of string)\") at (eval 2424) line 13.\n","[1,2"]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like
@@ -175,6 +180,23 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
 
  % ./myapp.pl --arg1 ...
 
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema:
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('$sch_name*', name=>'AnyFromJson')
+     );
+ }
+
+ use My::Types qw(AnyFromJson);
+ AnyFromJson->assert_valid($data);
+
 =head1 DESCRIPTION
 
 You can use this schema if you want to accept any data (a data structure or
@@ -182,6 +204,8 @@ simple scalar), but if user supplies a defined string e.g. in a command-line
 script as command-line argument or option, the string will be assumed to be a
 JSON-encoded value and decoded. Data will not be valid if the string does not
 contain valid JSON.
+
+Thus, if you want to supply a string, you have to JSON-encode it.
 
 =head1 HOMEPAGE
 

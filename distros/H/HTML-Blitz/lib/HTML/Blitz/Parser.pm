@@ -13,7 +13,7 @@ use HTML::Blitz::TokenType qw(
     TT_DOCTYPE
 );
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 method _fail(
     $msg,
@@ -109,6 +109,11 @@ my %void_tags = map +($_ => 1), qw(
     source
     track
     wbr
+
+    basefont bgsound
+    frame
+    keygen
+    param
 );
 
 my %foreign_tags = map +($_ => 1), qw(
@@ -371,7 +376,7 @@ method parse() {
         }
 
         my $is_void = $void_tags{$name};
-        if ($is_self_closing && !$is_void && !$self->{in_foreign_elem}) {
+        if ($is_self_closing && !$is_void && !$foreign_tags{$name} && !$self->{in_foreign_elem}) {
             $self->_fail("invalid '/' at end of non-void tag '<$name>'", pos => $-[1], alt_msg => 'starting here', alt_pos => $pos, alt_width => 1 + length($name));
         }
         $is_self_closing ||= $is_void;

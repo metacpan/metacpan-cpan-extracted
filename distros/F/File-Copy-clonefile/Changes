@@ -1,0 +1,13 @@
+Revision history for File-Copy-clonefile
+
+v0.0.4  2023-02-20 01:33:13 JST
+  - Support flags (#1)
+
+v0.0.3  2023-02-17 02:35:46 JST
+  - No functional change, update dist.ini
+
+v0.0.2  2023-02-17 02:31:13 JST
+  - Simplify XS code
+
+v0.0.1  2023-02-17 02:04:36 JST
+  - Initial version

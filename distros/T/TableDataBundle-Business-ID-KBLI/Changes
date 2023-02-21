@@ -1,3 +1,15 @@
+20230214.0.0  2023-02-14  Released-By: PERLANCAR; Urgency: medium
+
+              - Add table data: Business::ID::KBLI::2020::Code.
+
+
+20230207.0.0  2023-02-07  Released-By: PERLANCAR; Urgency: low
+
+              - No data changes.
+
+              - [build] Use TableData pod weaver plugin for nicer POD.
+
+
 20220912.0.0  2022-09-12  Released-By: PERLANCAR
 
               - First release.

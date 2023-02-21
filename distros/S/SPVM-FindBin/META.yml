@@ -19,9 +19,9 @@ no_index:
     - inc
 requires:
   SPVM: '0.9689'
-  SPVM::File::Basename: '0.01'
-  SPVM::File::Spec: '0.02'
+  SPVM::File::Basename: '0.02'
+  SPVM::File::Spec: '0.03'
   SPVM::Sys: '0.36'
 resources: {}
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

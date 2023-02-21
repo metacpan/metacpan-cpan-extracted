@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::JSON - Various schemas related to JSON
 
 VERSION
-    This document describes version 0.006 of Sah::Schemas::JSON (from Perl
-    distribution Sah-Schemas-JSON), released on 2022-08-26.
+    This document describes version 0.007 of Sah::Schemas::JSON (from Perl
+    distribution Sah-Schemas-JSON), released on 2022-11-15.
 
 SAH SCHEMAS
     The following schemas are included in this distribution:
@@ -17,6 +17,8 @@ SAH SCHEMAS
         e.g. in a command-line script as command-line argument or option,
         the string will be assumed to be a JSON-encoded value and decoded.
         Data will not be valid if the string does not contain valid JSON.
+
+        Thus, if you want to supply a string, you have to JSON-encode it.
 
     *   array_from_json
 
@@ -60,6 +62,9 @@ SAH SCHEMAS
         "true", "false"; you have to quote it to "null", "true", "false" to
         prevent it being decoded into undef or boolean values.
 
+        See also related schema: "json_str", "str::encoded_json",
+        "str::escaped_json".
+
     *   json_str
 
         A string that contains valid JSON.
@@ -69,6 +74,9 @@ SAH SCHEMAS
         array will not beome an array) but you know that the string contains
         a valid JSON. Data will not be valid if the string does not contain
         valid JSON.
+
+        See also related schema: "json_or_str", "str::encoded_json",
+        "str::escaped_json".
 
     *   json_str::array
 

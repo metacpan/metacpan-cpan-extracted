@@ -31,8 +31,9 @@ my $meta = {
                         test => { requires => { "Test::Fatal" => 0, "Test::More" => 0.96 } },
                       },
   "provides"       => {
-                        "match::simple" => { file => "lib/match/simple.pm", version => 0.011 },
-                        "match::smart"  => { file => "lib/match/smart.pm", version => 0.011 },
+                        "match::simple"        => { file => "lib/match/simple.pm", version => 0.012 },
+                        "match::simple::sugar" => { file => "lib/match/simple/sugar.pm", version => 0.012 },
+                        "match::smart"         => { file => "lib/match/smart.pm", version => 0.012 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -46,7 +47,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/match-simple/project",
                       },
-  "version"        => 0.011,
+  "version"        => 0.012,
 };
 
 my %dynamic_config;

@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 c725251eccccdc1c64c2bd3561e9e6582a1fe11261d47a6bc03effcd8acb1b7b Build.PL
+SHA256 aee03342f5af9794ebfed349c977d9290757aa1f9ee6116b043e0e86df5abde2 Changes
+SHA256 db739608563af2d9f1763883315451cc38032cb67bdd42a443bfcc7eef1a49b2 LICENSE
+SHA256 596df7685a83729cb5780dd5340f3de050dedfbab91a3fdf95f29a0b6b8ccc11 MANIFEST
+SHA256 6d7bb89ce5ef7aa7b154afa93b90c6f268c8b80185ec3497e70a04905ec6f646 META.json
+SHA256 4f004338abc9a0cf94619489b914998fb41c31922199d920e4ee638944112c4c META.yml
+SHA256 7afce42ee8ce1f01a9dfffb0c8ffdd13b6e8086a8b3b964576d3800fbe2823e9 README
+SHA256 4ef87798026f21551774999263e73705c26d8cc11b09ecaa6aa5d224b19bbe18 eg/beatinator
+SHA256 3d1432edc2bf1c06bdf834740af7dd2ceeeace66141de053148e23ceee7f6cc8 eg/texty
+SHA256 89ec960d6c136b45e48e337a2c89579d0267368bc4ce45e4177038593853518e eg/variance
+SHA256 508323cda6dd679f05f002132a08850821bb04cadcbf6719cf41a54d3c0e3d32 lib/Music/RhythmSet.pm
+SHA256 9a87c1570b011ac340961aa90b4c423f9b9623dfd70df9a0b7ba29033dc4b8a6 lib/Music/RhythmSet/Util.pm
+SHA256 b930f733d8c51d6d6b658c824cb492077541f477ffc254cc3dfb836ff9917272 lib/Music/RhythmSet/Voice.pm
+SHA256 6e0025d53b50ec924de780e17a682b31d02c19c9d6b9f0c542b5958f79c4a489 t/00-load.t
+SHA256 10ae0f1d68f96e3443647d939c9b78f12cc58b55a85758ef99716bcf799e256b t/10-util.t
+SHA256 54a6be4e42bc871a812ac8af59cc0bee33980740e1136f4dee06b9e586588e00 t/20-voice.t
+SHA256 5b22e9f63213058d23273119e1ee445d7b5adde375f5ddba49d61923f3fc65ca t/60-rset.t
+SHA256 a62d3a4919438967277e5fdf0b6e42b3ff3b051b8db1789fd04a672b0ee1d8c3 t/pod-coverage.t
+SHA256 db1599f2c4add3186cd9ae82e88f7102dd7ab0bbacaa4b5fa9c951cb56050f6b t/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEElPO2YAAs9b/plKLEs1lvXE/ryKcFAmPsBXMACgkQs1lvXE/r
+yKfU5Av/dTEiHsLAw8ZbGoKEcv+cIohHuncOYDv8KQLtWhupYl8oxeAUCPiF5rs1
+uLzHm0jd/tqlAEJfBEWPN7ecv9hR7Bdao8rTxvxlg3XGxPWYD26wfKQsbOfVw5Jg
+sI+LhoyXmfDgawjYzqr7coNhdnczO57j/zJ0p4I5N3Ma/5qlEzdBLWq39/JYsHDe
+k88q4urPErl/0rn7jsbBYkUloWZq4/XesYjWDxn4SK3s8kuI5pJbSNy0v4F7e3NI
+S7/5gGfzWkQl5T+MK9q/VIywzrvFx6HHU9WNdK0wQiKDV+NmpmQ48oj0G0qMExBv
+f7fCtTJ0ozZLpJQ+qiRxrvA8JvVo/Dg0NEnkd5J1Mo2CwcZe9BbaoEk+DdvhrSRP
+CGQHPl0XebYmFAJaDu449/IZ/OIvLM1P+6COKkM3RUtHK00fGx4D4OuPDqehwCLX
+bueFETvW164eIHgdnkneklPkKe+o2CQuKkbf/PbPZ0y83395EqAznKdXeOto1k7q
+8agOgiqu
+=nbyE
+-----END PGP SIGNATURE-----

@@ -7,7 +7,7 @@ use OPCUA::Open62541::Test::Server;
 
 use Test::More tests =>
     OPCUA::Open62541::Test::Server::planning() +
-    OPCUA::Open62541::Test::Client::planning() + 41;
+    OPCUA::Open62541::Test::Client::planning() + 40;
 use Test::Deep;
 use Test::Exception;
 use Test::LeakTrace;
@@ -100,16 +100,7 @@ is($response->{MonitoredItemCreateResult_statusCode},
    "BadSubscriptionIdInvalid",
    "monitored items create fail response statuscode");
 
-ok(my $buildinfo = $server->{config}->getBuildInfo());
-note explain $buildinfo;
-# the semantics whether the callback is called in case of error has changed
-if ($buildinfo->{BuildInfo_softwareVersion} =~ /^1\.0\./) {
-    ok($deleted,
-       "subscription deleted callback");
-} else {
-    is($deleted, undef,
-       "subscription deleted callback");
-}
+is($deleted, undef, "subscription deleted callback");
 
 my $expected_response = {
     MonitoredItemCreateResult_filterResult => ignore(),

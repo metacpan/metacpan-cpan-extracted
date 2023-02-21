@@ -1,7 +1,7 @@
 {
    "abstract" : "Accurately serialize a data structure as Perl code.",
    "author" : [
-      "Yves Orton <yves@cpan.org>, Joshua ben Jore <jjore@cpan.org>"
+      "Yves Orton <yves@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4232",
@@ -73,11 +73,11 @@
    "provides" : {
       "Data::Dump::Streamer" : {
          "file" : "lib/Data/Dump/Streamer.pm",
-         "version" : "2.41"
+         "version" : "2.42"
       },
       "Data::Dump::Streamer::Deparser" : {
          "file" : "lib/Data/Dump/Streamer.pm",
-         "version" : "2.41"
+         "version" : "2.42"
       }
    },
    "release_status" : "stable",
@@ -89,6 +89,6 @@
          "url" : "https://github.com/demerphq/Data-Dump-Streamer"
       }
    },
-   "version" : "2.41",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "2.42",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

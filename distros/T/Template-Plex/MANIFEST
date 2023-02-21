@@ -11,6 +11,7 @@ examples/recursive-3.plex
 examples/recursive-top.plex
 examples/recursive.pl
 examples/synopsis.pl
+examples/synopsis_syntax_error.pl
 lib/Template/Plex.pm
 lib/Template/Plex.pod
 lib/Template/Plex/Internal.pm

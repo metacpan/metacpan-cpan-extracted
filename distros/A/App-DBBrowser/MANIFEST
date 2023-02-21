@@ -10,6 +10,7 @@ lib/App/DBBrowser/Credentials.pm
 lib/App/DBBrowser/DB.pm
 lib/App/DBBrowser/DB/DB2.pm
 lib/App/DBBrowser/DB/Firebird.pm
+lib/App/DBBrowser/DB/Informix.pm
 lib/App/DBBrowser/DB/MariaDB.pm
 lib/App/DBBrowser/DB/mysql.pm
 lib/App/DBBrowser/DB/Pg.pm

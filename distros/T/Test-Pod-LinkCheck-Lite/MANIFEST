@@ -41,6 +41,7 @@ t/data/pod_ok/man.pod
 t/data/pod_ok/no_links.pod
 t/data/pod_ok/url_links.pod
 t/pod_file_ok.t
+xt/author/basic.t
 xt/author/changes.t
 xt/author/critic.t
 xt/author/executable.t
@@ -48,6 +49,7 @@ xt/author/kwalitee.t
 xt/author/manifest.t
 xt/author/minimum_perl.t
 xt/author/perlcriticrc
+xt/author/perlpod.t
 xt/author/pod.t
 xt/author/pod_coverage.t
 xt/author/pod_links.t

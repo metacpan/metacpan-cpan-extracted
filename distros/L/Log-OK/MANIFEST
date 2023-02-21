@@ -9,7 +9,6 @@ examples/log4perl/app.pl
 examples/log4perl/My_Module.pm
 lib/Log/OK.pm
 lib/Log/OK.pod
-Log-OK-v0.1.4.tar
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP

@@ -1,5 +1,11 @@
 Revision history for Perl extension Tie::Mounted.
 
+0.20  2023-02-16  <schubiger@cpan.org>
+
+ - Move testing module to test_requires.
+
+ - Drop generating compat Makefile.PL.
+
 0.19  2022-12-21  <schubiger@cpan.org>
 
  - Merged development version to stable.

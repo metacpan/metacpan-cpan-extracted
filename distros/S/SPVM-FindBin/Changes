@@ -1,4 +1,9 @@
+0.03 2023-02-10
+  [Prerequirement Changes]
+    * SPVM::Basename 0.02+ is needed.
+0.02 2023-02-10
+  [Prerequirement Changes]
+    * SPVM::File::Spec 0.03+ is needed.
 0.01 2023-02-07
   [Changes]
     * First release.
-  

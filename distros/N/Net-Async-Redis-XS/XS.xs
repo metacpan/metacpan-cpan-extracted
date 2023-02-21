@@ -9,6 +9,25 @@
 #define G_LIST G_ARRAY
 #endif
 
+#ifndef PERL_ARGS_ASSERT_AV_COUNT
+/* Taken from inline.h, was added in 5.33.something */
+#define PERL_ARGS_ASSERT_AV_COUNT       \
+        assert(av)
+#endif
+
+#ifndef av_count
+/* Taken from inline.h, was added in 5.33.something */
+PERL_STATIC_INLINE Size_t
+Perl_av_count(pTHX_ AV *av)
+{
+    PERL_ARGS_ASSERT_AV_COUNT;
+    assert(SvTYPE(av) == SVt_PVAV);
+
+    return AvFILL(av) + 1;
+}
+#define av_count(a)          Perl_av_count(aTHX_ a)
+#endif
+
 /* Types of data structures that can nest */
 enum PendingStackType {
     array, map, set, attribute, push
@@ -190,7 +209,30 @@ PPCODE:
                     if(terminator == NULL) {
                         goto end_parsing;
                     }
-                    SV *v = newSVnv(my_strtod(ptr, &terminator));
+                    SV *v;
+#ifdef my_strtod
+                    v = newSVnv(my_strtod(ptr, &terminator));
+#else
+/* Taken from numeric.c in perl5 source */
+                    {
+                        const char * const s = ptr;
+                        char **e = &terminator;
+                        NV result;
+                        char * end_ptr;
+
+                        end_ptr = my_atof2(s, &result);
+                        if (e) {
+                            *e = end_ptr;
+                        }
+
+                        if (! end_ptr) {
+                            result = 0.0;
+                        }
+
+                        v = newSVnv(result);
+                    }
+#endif
+
                     ptr = terminator;
                     if(ptr + 2 > end) {
                         goto end_parsing;

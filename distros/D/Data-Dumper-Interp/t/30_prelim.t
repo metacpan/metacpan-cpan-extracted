@@ -182,8 +182,9 @@ EOF
 is( dvis('\%{}'), '\%{}' );
 
 # Once hit an assertion
-is( Data::Dumper::Interp->new()->Foldwidth(0)
-     ->vis(bless do{ \(my $x = []) }), q<bless(do{\(my $o = [])},'main')> );
+like( Data::Dumper::Interp->new()->Foldwidth(0)
+     ->vis(bless do{ \(my $x = []) },"Foo::Bar"), 
+     qr/^"Foo::Bar=\S+\(0x[0-9a-f]+\)"$/ );
 
 #say vis bless( do{ \(my $x = []) } );
 

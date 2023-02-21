@@ -11,12 +11,14 @@ use warnings;
 use version;
 use Carp;
 use English qw/ -no_match_vars /;
+use File::chdir;
+use Data::Dumper qw/Dumper/;
 
 extends 'App::VTide::Command::Run';
 
-our $VERSION = version->new('0.1.19');
+our $VERSION = version->new('0.1.20');
 our $NAME    = 'edit';
-our $OPTIONS = [ 'test|T!', 'save|s=s', 'verbose|v+', ];
+our $OPTIONS = [ 'recurse|r!', 'test|T!', 'save|s=s', 'verbose|v+', ];
 our $LOCAL   = 1;
 sub details_sub { return ( $NAME, $OPTIONS, $LOCAL ) }
 
@@ -30,7 +32,8 @@ sub run {
     my $params = $self->params($cmd);
     $params->{edit}  = $self->options->files;
     $params->{title} = $cmd;
-    my @cmd = $self->command($params);
+    $self->base($CWD);
+    my @cmd = $self->command( $params, $self->defaults->{recurse} );
 
     if ( $params->{env} && ref $params->{env} eq 'HASH' ) {
         for my $env ( keys %{ $params->{env} } ) {
@@ -53,7 +56,7 @@ sub run {
     }
 
     eval { require Term::Title; }
-        and Term::Title::set_titlebar($title);
+      and Term::Title::set_titlebar($title);
     system 'tmux', 'rename-window', $title;
 
     return;
@@ -83,7 +86,7 @@ sub auto_complete {
     } or do { warn $@ };
 
     print join ' ',
-        grep { $env ne 'vtide' && $env ne 'edit' ? /^$env/xms : 1 } @files;
+      grep { $env ne 'vtide' && $env ne 'edit' ? /^$env/xms : 1 } @files;
 
     return;
 }
@@ -98,7 +101,7 @@ App::VTide::Command::Edit - Run an edit command (like Run but without a terminal
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Edit version 0.1.19
+This documentation refers to App::VTide::Command::Edit version 0.1.20
 
 =head1 SYNOPSIS
 

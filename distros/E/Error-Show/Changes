@@ -1,5 +1,26 @@
 Revision history for Perl extension Error::Show.
 
+v0.2.0 
+  [new features]
+  - added limit option to limit number of errors processed
+  - added reverse option to reverse sequence of outputs
+  - added 'advanced' eval/string program processing. Gives source code
+    processing options to isolate context generation to a range of lines
+    within a string program.
+     * start_mark   
+     * end_mark
+     * start_offset
+     * end_offset
+
+  [fixes]
+  - Removed unused code
+  - Line numbering more consistent internally
+
+  [pod]
+  - Example for 'advanced string eval'
+  - Fix typos and spelling
+
+
 v0.1.1  2023-01-22
   [tests]
   - fixed failing frame test on perl 5.26/5.24

@@ -128,7 +128,7 @@ gate-frequency-sweep.pl - Sweep a gate voltage and a rf generator frequency
 
 =head1 VERSION
 
-version 3.842
+version 3.851
 
 =head1 COPYRIGHT AND LICENSE
 

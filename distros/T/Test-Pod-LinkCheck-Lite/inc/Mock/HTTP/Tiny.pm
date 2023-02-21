@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Storable ();
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use constant HASH_REF	=> ref {};
 
@@ -49,6 +49,21 @@ sub _default_agent {
     my ( $self ) = @_;
     ( my $agent = ref $self || $self ) =~ s/ :: /-/smxg;
     return join '/', "Mock $agent", $self->VERSION();
+}
+
+# NOTE this is only the static functionality.
+sub can_ssl {
+    local $@ = undef;
+    my ( $ok, $reason ) = ( 1, '' );
+    eval {
+	require IO::Socket::SSL;
+	IO::Socket::SSL->VERSION( 1.42 );
+	1;
+    } or ( $ok, $reason ) = 
+    ( 0, "IO::Socket::SSL 1.42 must be installed for https support\n" );
+    wantarray
+	or return $ok;
+    return ( $ok, $reason );
 }
 
 sub head {
@@ -141,6 +156,19 @@ the real L<HTTP::Tiny|HTTP::Tiny>.
 
 This method retrieves (but does not set) the user agent string.
 
+=head2 can_ssl
+
+ my $ok = HTTP::Tiny->can_ssl();
+ my ( $ok, $reason ) = HTTP::Tiny->can_ssl();
+
+If called in scalar context, this static method returns a true value if
+L<IO::Socket::SSL|IO::Socket::SSL> is available and a false value
+otherwise. In list context, if C<$ok> is false C<$resource> will contain
+the reason why not.
+
+The L<HTTP::Tiny> functionality when the invocant is an object is not
+provided.
+
 =head2 head
 
  my $resp = $ua->head( $url );
@@ -200,7 +228,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2019-2022 by Thomas R. Wyant, III
+Copyright (C) 2019-2023 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

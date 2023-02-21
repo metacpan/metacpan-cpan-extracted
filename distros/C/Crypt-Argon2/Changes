@@ -1,5 +1,8 @@
 Revision history for Crypt-Argon2
 
+0.013     2023-02-10 16:07:16+01:00 Europe/Amsterdam
+          - Stricten up argon2_needs_rehash
+
 0.012     2022-04-06 13:39:19+02:00 Europe/Amsterdam
           - Fix compilation on perl < 5.16
 

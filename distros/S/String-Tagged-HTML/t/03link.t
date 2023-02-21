@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More tests => 2;
+use Test2::V0;
 
 use String::Tagged::HTML;
 
@@ -18,3 +18,5 @@ $str = String::Tagged::HTML->new( "click here" );
 $str->apply_tag( 6, 4, a => { href => q(<things> and 'quotes") } );
 
 is( $str->as_html, qq(click <a href="&lt;things&gt; and &#39;quotes&quot;">here</a>), 'link with escaped entities' );
+
+done_testing;

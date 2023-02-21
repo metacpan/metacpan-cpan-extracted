@@ -6,7 +6,7 @@ use parent 'Locale::Maketext';
 use I18N::LangTags::Detect;
 use File::Spec;
 use Carp;
-our $VERSION = v0.22.1;
+our $VERSION = v0.22.2;
 
 # Allow unknown phrases to just pass-through.
 our %Lexicon = (
@@ -96,6 +96,8 @@ our %Lexicon = (
     'Nickname' => 'Nickname',
     'URL' => 'URL',
     'Email' => 'Email',
+    'Mastodon' => 'Mastodon',
+    'Follow PGXN on Mastodon' => 'Follow PGXN on Mastodon',
     'Twitter' => 'Twitter',
     'Follow PGXN on Twitter' => 'Follow PGXN on Twitter',
     'Browse' => 'Browse',

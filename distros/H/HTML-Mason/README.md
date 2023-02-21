@@ -4,7 +4,7 @@ HTML::Mason - High-performance, dynamic web site authoring system
 
 # VERSION
 
-version 1.59
+version 1.60
 
 # SYNOPSIS
 
@@ -188,8 +188,6 @@ Bugs and feature requests will be tracked at RT:
 
 Bugs may be submitted at [https://github.com/houseabsolute/HTML-Mason/issues](https://github.com/houseabsolute/HTML-Mason/issues).
 
-I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
-
 # SOURCE
 
 The source code repository for HTML-Mason can be found at [https://github.com/houseabsolute/HTML-Mason](https://github.com/houseabsolute/HTML-Mason).
@@ -215,7 +213,7 @@ The source code repository for HTML-Mason can be found at [https://github.com/ho
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 1998 - 2020 by Jonathan Swartz.
+This software is copyright (c) 1998 - 2023 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

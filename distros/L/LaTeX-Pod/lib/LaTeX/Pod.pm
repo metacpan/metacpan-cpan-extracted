@@ -13,7 +13,7 @@ use Params::Validate ':all';
 
 our ($VERSION, $DEBUG);
 
-$VERSION = '0.22';
+$VERSION = '0.23';
 $DEBUG   = false;
 
 validation_options(

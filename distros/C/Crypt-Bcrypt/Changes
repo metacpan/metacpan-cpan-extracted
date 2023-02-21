@@ -1,5 +1,9 @@
 Revision history for Crypt-Bcrypt
 
+0.009     2023-02-10 16:07:45+01:00 Europe/Amsterdam
+          - Stricten up bcrypt_needs_rehash
+          - Improve documentation
+
 0.008     2023-02-07 14:25:37+01:00 Europe/Amsterdam
           - Add support for pre-hashed bcrypt
           - Add bcrypt_needs_rehash function

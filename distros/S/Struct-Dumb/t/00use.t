@@ -3,8 +3,9 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "Struct::Dumb" );
+require Struct::Dumb;
 
+pass "Modules loaded";
 done_testing;

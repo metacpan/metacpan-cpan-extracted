@@ -5,12 +5,15 @@ use strict;
 use warnings;
 
 use Project2::Gantt;
-use Project2::Gantt::Skin;
+use Project2::Gantt::Skin::Small;
+use Project2::Gantt::Skin::Medium;
+use Project2::Gantt::Skin::Large;
 
-my $skin= Project2::Gantt::Skin->new(
-    doTitle         => 1,
-    doSwimLanes     => 1
-);
+# You can use on one of the default skins to control
+# the size of the SpanInfo
+my $skin= Project2::Gantt::Skin::Small->new;
+#my $skin= Project2::Gantt::Skin::Medium->new;
+#my $skin= Project2::Gantt::Skin::Large->new;
 
 my $gantt = Project2::Gantt->new(
     file            =>      'gantt.png',

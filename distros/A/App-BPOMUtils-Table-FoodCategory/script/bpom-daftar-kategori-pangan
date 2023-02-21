@@ -1,0 +1,780 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/BPOMUtils/Table/FoodCategory/bpom_list_food_categories
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-02-13'; # DATE
+our $DIST = 'App-BPOMUtils-Table-FoodCategory'; # DIST
+our $VERSION = '0.017'; # VERSION
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/BPOMUtils/Table/FoodCategory/bpom_list_food_categories",
+    program_name => "bpom-daftar-kategori-pangan",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: List food categories in BPOM processed food division
+# PODNAME: bpom-daftar-kategori-pangan
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+bpom-daftar-kategori-pangan - List food categories in BPOM processed food division
+
+=head1 VERSION
+
+This document describes version 0.017 of bpom-daftar-kategori-pangan (from Perl distribution App-BPOMUtils-Table-FoodCategory), released on 2023-02-13.
+
+=head1 SYNOPSIS
+
+B<bpom-daftar-kategori-pangan> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<bpom-daftar-kategori-pangan> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<bpom-daftar-kategori-pangan> [B<L<--code-contains|/"--code-contains=s">>=I<str>] [(B<L<--code-in|/"--code-in=s@">>=I<str>)+|B<L<--code-in-json|/"--code-in=s@">>=I<json>] [B<L<--code-is|/"--code-is=s">>=I<str>] [B<L<--code-isnt|/"--code-isnt=s">>=I<str>] [B<L<--code-matches|/"--code-matches=s">>=I<str>] [B<L<--code-max|/"--code-max=s">>=I<str>] [B<L<--code-min|/"--code-min=s">>=I<str>] [B<L<--code-not-contains|/"--code-not-contains=s">>=I<str>] [(B<L<--code-not-in|/"--code-not-in=s@">>=I<str>)+|B<L<--code-not-in-json|/"--code-not-in=s@">>=I<json>] [B<L<--code-not-matches|/"--code-not-matches=s">>=I<str>] [B<L<--code-xmax|/"--code-xmax=s">>=I<str>] [B<L<--code-xmin|/"--code-xmin=s">>=I<str>] [B<L<--code|/"--code=s">>=I<str>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [(B<L<--exclude-field|/"--exclude-fields-json=s">>=I<str>)+|B<L<--exclude-fields-json|/"--exclude-fields-json=s">>=I<json>] [(B<L<--field|/"--fields-json=s">>=I<str>)+|B<L<--fields-json|/"--fields-json=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--name-contains|/"--name-contains=s">>=I<str>] [(B<L<--name-in|/"--name-in=s@">>=I<str>)+|B<L<--name-in-json|/"--name-in=s@">>=I<json>] [B<L<--name-is|/"--name-is=s">>=I<str>] [B<L<--name-isnt|/"--name-isnt=s">>=I<str>] [B<L<--name-matches|/"--name-matches=s">>=I<str>] [B<L<--name-max|/"--name-max=s">>=I<str>] [B<L<--name-min|/"--name-min=s">>=I<str>] [B<L<--name-not-contains|/"--name-not-contains=s">>=I<str>] [(B<L<--name-not-in|/"--name-not-in=s@">>=I<str>)+|B<L<--name-not-in-json|/"--name-not-in=s@">>=I<json>] [B<L<--name-not-matches|/"--name-not-matches=s">>=I<str>] [B<L<--name-xmax|/"--name-xmax=s">>=I<str>] [B<L<--name-xmin|/"--name-xmin=s">>=I<str>] [B<L<--name|/"--name=s">>=I<str>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--query-boolean|/"--query-boolean=s">>=I<str>|B<L<--and|/"--query-boolean=s">>|B<L<--or|/"--query-boolean=s">>] [(B<L<--query|/"--query=s@">>=I<str>)+|B<L<--queries-json|/"--query=s@">>=I<json>|(B<L<-q|/"--query=s@">>=I<str>)+] [B<L<--random|/"--random">>|B<L<--no-random|/"--random">>|B<L<--norandom|/"--random">>] [B<L<--result-limit|/"--result-limit=s">>=I<int>] [B<L<--result-start|/"--result-start=s">>=I<int>] [(B<L<--sort|/"--sort=s@">>=I<str>)+|B<L<--sort-json|/"--sort=s@">>=I<json>] [B<L<--status-contains|/"--status-contains=s">>=I<str>] [(B<L<--status-in|/"--status-in=s@">>=I<str>)+|B<L<--status-in-json|/"--status-in=s@">>=I<json>] [B<L<--status-is|/"--status-is=s">>=I<str>] [B<L<--status-isnt|/"--status-isnt=s">>=I<str>] [B<L<--status-matches|/"--status-matches=s">>=I<str>] [B<L<--status-max|/"--status-max=s">>=I<str>] [B<L<--status-min|/"--status-min=s">>=I<str>] [B<L<--status-not-contains|/"--status-not-contains=s">>=I<str>] [(B<L<--status-not-in|/"--status-not-in=s@">>=I<str>)+|B<L<--status-not-in-json|/"--status-not-in=s@">>=I<json>] [B<L<--status-not-matches|/"--status-not-matches=s">>=I<str>] [B<L<--status-xmax|/"--status-xmax=s">>=I<str>] [B<L<--status-xmin|/"--status-xmin=s">>=I<str>] [B<L<--status|/"--status=s">>=I<str>] [B<L<--summary-contains|/"--summary-contains=s">>=I<str>] [(B<L<--summary-in|/"--summary-in=s@">>=I<str>)+|B<L<--summary-in-json|/"--summary-in=s@">>=I<json>] [B<L<--summary-is|/"--summary-is=s">>=I<str>] [B<L<--summary-isnt|/"--summary-isnt=s">>=I<str>] [B<L<--summary-matches|/"--summary-matches=s">>=I<str>] [B<L<--summary-max|/"--summary-max=s">>=I<str>] [B<L<--summary-min|/"--summary-min=s">>=I<str>] [B<L<--summary-not-contains|/"--summary-not-contains=s">>=I<str>] [(B<L<--summary-not-in|/"--summary-not-in=s@">>=I<str>)+|B<L<--summary-not-in-json|/"--summary-not-in=s@">>=I<json>] [B<L<--summary-not-matches|/"--summary-not-matches=s">>=I<str>] [B<L<--summary-xmax|/"--summary-xmax=s">>=I<str>] [B<L<--summary-xmin|/"--summary-xmin=s">>=I<str>] [B<L<--summary|/"--summary=s">>=I<str>] [B<L<--with-field-names|/"--with-field-names">>|B<L<--without-field-names|/"--with-field-names">>] -- [I<L<query|/"--query=s@">>] ...
+
+
+
+See examples in the L</EXAMPLES> section.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Field selection options
+
+=over
+
+=item B<--detail>, B<-l>
+
+Return array of full records instead of just ID fields.
+
+By default, only the key (ID) field is returned per result entry.
+
+
+=item B<--exclude-field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--exclude-fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--exclude-field>.
+
+=item B<--field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--field>.
+
+=item B<--with-field-names>
+
+Return field names in each record (as hash/associative array).
+
+When enabled, function will return each record as hash/associative array
+(field name => value pairs). Otherwise, function will return each record
+as list/array (field value, field value, ...).
+
+
+=back
+
+=head2 Filtering for code options
+
+=over
+
+=item B<--code-contains>=I<s>
+
+Only return records where the 'code' field contains specified text.
+
+=item B<--code-in-json>=I<s>
+
+Only return records where the 'code' field is in the specified values (JSON-encoded).
+
+See C<--code-in>.
+
+=item B<--code-in>=I<s@>
+
+Only return records where the 'code' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--code-is>=I<s>
+
+Only return records where the 'code' field equals specified value.
+
+=item B<--code-isnt>=I<s>
+
+Only return records where the 'code' field does not equal specified value.
+
+=item B<--code-matches>=I<s>
+
+Only return records where the 'code' field matches specified regular expression pattern.
+
+=item B<--code-max>=I<s>
+
+Only return records where the 'code' field is less than or equal to specified value.
+
+=item B<--code-min>=I<s>
+
+Only return records where the 'code' field is greater than or equal to specified value.
+
+=item B<--code-not-contains>=I<s>
+
+Only return records where the 'code' field does not contain specified text.
+
+=item B<--code-not-in-json>=I<s>
+
+Only return records where the 'code' field is not in the specified values (JSON-encoded).
+
+See C<--code-not-in>.
+
+=item B<--code-not-in>=I<s@>
+
+Only return records where the 'code' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--code-not-matches>=I<s>
+
+Only return records where the 'code' field does not match specified regular expression.
+
+=item B<--code-xmax>=I<s>
+
+Only return records where the 'code' field is less than specified value.
+
+=item B<--code-xmin>=I<s>
+
+Only return records where the 'code' field is greater than specified value.
+
+=item B<--code>=I<s>
+
+Only return records where the 'code' field equals specified value.
+
+=back
+
+=head2 Filtering for name options
+
+=over
+
+=item B<--name-contains>=I<s>
+
+Only return records where the 'name' field contains specified text.
+
+=item B<--name-in-json>=I<s>
+
+Only return records where the 'name' field is in the specified values (JSON-encoded).
+
+See C<--name-in>.
+
+=item B<--name-in>=I<s@>
+
+Only return records where the 'name' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--name-is>=I<s>
+
+Only return records where the 'name' field equals specified value.
+
+=item B<--name-isnt>=I<s>
+
+Only return records where the 'name' field does not equal specified value.
+
+=item B<--name-matches>=I<s>
+
+Only return records where the 'name' field matches specified regular expression pattern.
+
+=item B<--name-max>=I<s>
+
+Only return records where the 'name' field is less than or equal to specified value.
+
+=item B<--name-min>=I<s>
+
+Only return records where the 'name' field is greater than or equal to specified value.
+
+=item B<--name-not-contains>=I<s>
+
+Only return records where the 'name' field does not contain specified text.
+
+=item B<--name-not-in-json>=I<s>
+
+Only return records where the 'name' field is not in the specified values (JSON-encoded).
+
+See C<--name-not-in>.
+
+=item B<--name-not-in>=I<s@>
+
+Only return records where the 'name' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--name-not-matches>=I<s>
+
+Only return records where the 'name' field does not match specified regular expression.
+
+=item B<--name-xmax>=I<s>
+
+Only return records where the 'name' field is less than specified value.
+
+=item B<--name-xmin>=I<s>
+
+Only return records where the 'name' field is greater than specified value.
+
+=item B<--name>=I<s>
+
+Only return records where the 'name' field equals specified value.
+
+=back
+
+=head2 Filtering for status options
+
+=over
+
+=item B<--status-contains>=I<s>
+
+Only return records where the 'status' field contains specified text.
+
+=item B<--status-in-json>=I<s>
+
+Only return records where the 'status' field is in the specified values (JSON-encoded).
+
+See C<--status-in>.
+
+=item B<--status-in>=I<s@>
+
+Only return records where the 'status' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--status-is>=I<s>
+
+Only return records where the 'status' field equals specified value.
+
+=item B<--status-isnt>=I<s>
+
+Only return records where the 'status' field does not equal specified value.
+
+=item B<--status-matches>=I<s>
+
+Only return records where the 'status' field matches specified regular expression pattern.
+
+=item B<--status-max>=I<s>
+
+Only return records where the 'status' field is less than or equal to specified value.
+
+=item B<--status-min>=I<s>
+
+Only return records where the 'status' field is greater than or equal to specified value.
+
+=item B<--status-not-contains>=I<s>
+
+Only return records where the 'status' field does not contain specified text.
+
+=item B<--status-not-in-json>=I<s>
+
+Only return records where the 'status' field is not in the specified values (JSON-encoded).
+
+See C<--status-not-in>.
+
+=item B<--status-not-in>=I<s@>
+
+Only return records where the 'status' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--status-not-matches>=I<s>
+
+Only return records where the 'status' field does not match specified regular expression.
+
+=item B<--status-xmax>=I<s>
+
+Only return records where the 'status' field is less than specified value.
+
+=item B<--status-xmin>=I<s>
+
+Only return records where the 'status' field is greater than specified value.
+
+=item B<--status>=I<s>
+
+Only return records where the 'status' field equals specified value.
+
+=back
+
+=head2 Filtering for summary options
+
+=over
+
+=item B<--summary-contains>=I<s>
+
+Only return records where the 'summary' field contains specified text.
+
+=item B<--summary-in-json>=I<s>
+
+Only return records where the 'summary' field is in the specified values (JSON-encoded).
+
+See C<--summary-in>.
+
+=item B<--summary-in>=I<s@>
+
+Only return records where the 'summary' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--summary-is>=I<s>
+
+Only return records where the 'summary' field equals specified value.
+
+=item B<--summary-isnt>=I<s>
+
+Only return records where the 'summary' field does not equal specified value.
+
+=item B<--summary-matches>=I<s>
+
+Only return records where the 'summary' field matches specified regular expression pattern.
+
+=item B<--summary-max>=I<s>
+
+Only return records where the 'summary' field is less than or equal to specified value.
+
+=item B<--summary-min>=I<s>
+
+Only return records where the 'summary' field is greater than or equal to specified value.
+
+=item B<--summary-not-contains>=I<s>
+
+Only return records where the 'summary' field does not contain specified text.
+
+=item B<--summary-not-in-json>=I<s>
+
+Only return records where the 'summary' field is not in the specified values (JSON-encoded).
+
+See C<--summary-not-in>.
+
+=item B<--summary-not-in>=I<s@>
+
+Only return records where the 'summary' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--summary-not-matches>=I<s>
+
+Only return records where the 'summary' field does not match specified regular expression.
+
+=item B<--summary-xmax>=I<s>
+
+Only return records where the 'summary' field is less than specified value.
+
+=item B<--summary-xmin>=I<s>
+
+Only return records where the 'summary' field is greater than specified value.
+
+=item B<--summary>=I<s>
+
+Only return records where the 'summary' field equals specified value.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--and>
+
+Shortcut for --query-boolean=and.
+
+See C<--query-boolean>.
+
+=item B<--or>
+
+Shortcut for --query-boolean=or.
+
+See C<--query-boolean>.
+
+=item B<--queries-json>=I<s>, B<-q>
+
+Search (JSON-encoded).
+
+See C<--query>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--query-boolean>=I<s>
+
+Whether records must match all search queries ('and') or just one ('or').
+
+Default value:
+
+ "and"
+
+Valid values:
+
+ ["and","or"]
+
+If set to C<and>, all queries must match; if set to C<or>, only one query should
+match. See the C<queries> option for more details on searching.
+
+
+=item B<--query>=I<s@>
+
+Search.
+
+This will search all searchable fields with one or more specified queries. Each
+query can be in the form of C<-FOO> (dash prefix notation) to require that the
+fields do not contain specified string, or C</FOO/> to use regular expression.
+All queries must match if the C<query_boolean> option is set to C<and>; only one
+query should match if the C<query_boolean> option is set to C<or>.
+
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Ordering options
+
+=over
+
+=item B<--random>
+
+Return records in random order.
+
+=item B<--sort-json>=I<s>
+
+Order records according to certain field(s) (JSON-encoded).
+
+See C<--sort>.
+
+=item B<--sort>=I<s@>
+
+Order records according to certain field(s).
+
+A list of field names separated by comma. Each field can be prefixed with '-' to
+specify descending order instead of the default ascending.
+
+
+Can be specified multiple times.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Paging options
+
+=over
+
+=item B<--result-limit>=I<s>
+
+Only return a certain number of records.
+
+=item B<--result-start>=I<s>
+
+Only return starting from the n'th record.
+
+Default value:
+
+ 1
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C bpom-daftar-kategori-pangan bpom-daftar-kategori-pangan
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete bpom-daftar-kategori-pangan 'p/*/`bpom-daftar-kategori-pangan`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 EXAMPLES
+
+=head2 Print active categories codes matching "cokelat"
+
+ % bpom-daftar-kategori-pangan --status-is Aktif 'cokelat hitam'
+ 05010404
+ 05010423
+ 05010424
+ 05010425
+
+=head2 Print active records matching "cokelat hitam" in a formatted text table
+
+ % bpom-daftar-kategori-pangan --status-is Aktif 'cokelat hitam' -l --format text-pretty
+ +----------+----------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------+
+ |     code | name                                                                                               | summary                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | status |
+ +----------+----------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------+
+ | 05010404 | Truffles                                                                                           | Truffles adalah produk permen yang dibuat dari campuran cokelat hitam atau cokelat susu dengan lemak kakao, minyak nabati dan bahan lainnya. Tipe Eropa mengkombinasikan sirup dengan bahan-bahan berbasis cokelat (bubuk kakao, susu bubuk, lemak, gula, sirup                                                                                                                                                                                                                                                                  | Aktif  |
+ | 05010423 | Cokelat Hitam (dark chocolate, semisweet chocolate, bittersweet chocolate) / Cokelat Hitam Isi ... | Cokelat hitam, diperhitungkan dalam kondisi tanpa kandungan air, mengandung tidak kurang dari 35% padatan kakao, tidak kurang dari 18% lemak kakao, dan tidak kurang dari 14% padatan kakao tanpa lemak.<br> <br> Untuk Cokelat Hitam Isi : jumlah komponen cokelat untuk pelapisan tidak kurang dari 25% dari berat total produk akhir (dari 25% tsb min 60% merupakan komponen cokelat). Sehingga jumlah maksimal bahan isian adalah 75% (tidak termasuk produk tepung, confectionery, pastry dan biskuit).<br>                | Aktif  |
+ | 05010424 | Cokelat Hitam Manis (Sweet Chocolate) / Cokelat Hitam Manis Isi ...                                | Cokelat hitam manis, diperhitungkan dalam kondisi tanpa kandungan air, mengandung tidak kurang dari 30% padatan kakao, tidak kurang dari 18% lemak kakao, dan tidak kurang dari 12% padatan kakao tanpa lemak.<br> <br> Untuk Cokelat Hitam Manis Isi : jumlah komponen cokelat untuk pelapisan tidak kurang dari 25% dari berat total produk akhir (dari 25% tsb min 60% merupakan komponen cokelat). Sehingga jumlah maksimal bahan isian adalah 75% (tidak termasuk produk tepung, confectionery, pastry dan biskuit).        | Aktif  |
+ | 05010425 | Cokelat Hitam Kovertur (Dark Chocolate Couverture) / Cokelat Hitam Kovertur Isi ...                | Cokelat hitam kovertur, diperhitungkan dalam kondisi tanpa kandungan air, mengandung tidak kurang dari 35% padatan kakao, tidak kurang dari 31% lemak kakao, dan tidak kurang dari 2.5% padatan kakao tanpa lemak.<br> <br> Untuk Cokelat Hitam Kovertur Isi : jumlah komponen cokelat untuk pelapisan tidak kurang dari 25% dari berat total produk akhir (dari 25% tsb min 60% merupakan komponen cokelat). Sehingga jumlah maksimal bahan isian adalah 75% (tidak termasuk produk tepung, confectionery, pastry dan biskuit). | Aktif  |
+ +----------+----------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------+
+
+=head2 Print all category records with code 14.1.4.2
+
+ % bpom-daftar-kategori-pangan --code-matches '^14010402' -l --format text-pretty
+ +------------+----------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------+
+ |       code | name                                                                 | summary                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | status      |
+ +------------+----------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------+
+ | 1401040201 | Punches/Ades                                                         | Punches / ades adalah produk minuman yang diperoleh dari campuran sari buah dengan atau tanpa penambahan perisa.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | Aktif       |
+ | 1401040202 | Crush                                                                | Crush adalah minuman ringan yang mengandung sari buah, bukan untuk minuman citrus comminutes, ditujukan untuk dikonsumsi tanpa diencerkan, termasuk cordial yang dikonsumsi tanpa pengenceran.<br> <br> Karakteristik dasar:<br> Kandungan buah tidak kurang dari 3% dan tidak lebih dari 5% tergantung jenisnya                                                                                                                                                                                                                                                                                                                                                                                          | Aktif       |
+ | 1401040203 | Cordials                                                             | Cordials adalah minuman yang belum mempunyai status arti yang umum, tetapi dapat diaplikasikan untuk semua jenis squash jeruk yang jernih atau crush.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Tidak Aktif |
+ | 1401040204 | Minuman Sari Buah                                                    | Minuman sari buah adalah minuman yang diperoleh dengan mencampur air minum; sari buah atau campuran sari buah yang tidak difermentasi, dengan bagian lain dari satu jenis buah atau lebih, dengan atau tanpa penambahan gula. Total sari buah tidak kurang dari 35% (b/v).                                                                                                                                                                                                                                                                                                                                                                                                                                | Aktif       |
+ | 1401040205 | Minuman Rasa Buah                                                    | Minuman berperisa/rasa buah adalah minuman yang terdiri dari satu atau lebih jenis buah, dengan total sari buah kurang dari 10% (b/v)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Aktif       |
+ | 1401040206 | Sirup Berperisa                                                      | Sirup berperisa adalah produk minuman berupa larutan 65% gula yang berperisa. Dapat ditambahkan bahan pangan lain, susu tidak lebih dari 5% dihitung sebagai susu segar.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Tidak Aktif |
+ | 1401040207 | Sirup Buah                                                           | Sirup buah adalah produk yang diperoleh dengan mencampur sirup dan sari buah dengan atau tanpa bagian yang dapat dimakan dari satu jenis buah atau lebih.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Tidak Aktif |
+ | 1401040208 | Sirup Cokelat, Sirup Karamel, Sirup Kopi                             |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Tidak Aktif |
+ | 1401040209 | Minuman Berperisa...                                                 | Minuman berperisa adalah produk minuman yang diperoleh dari pencampuran air minum dengan bahan perisa dan gula dengan atau tanpa penambahan bahan pangan lain melalui proses pemanasan.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Tidak Aktif |
+ | 1401040210 | Squash                                                               | Squash adalah minuman yang diperoleh dari campuran sirup atau gula dan sari buah dengan atau tanpa bagian yang dapat dimakan dari satu jenis buah atau lebih dan dalam penggunaannya diencerkan dengan air.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | Tidak Aktif |
+ | 1401040211 | Squash Berperisa                                                     | Squash berperisa adalah produk yang diperoleh dari proses pencampuran sirup dan bahan penyedap rasa dan perisa dengan atau tanpa bagian yang dapat dimakan dari satu jenis buah-buahan atau lebih dan dalam penggunaannya harus diencerkan terlebih dahulu.                                                                                                                                                                                                                                                                                                                                                                                                                                               | Tidak Aktif |
+ | 1401040212 | Lemonade dan \xE2\x80\x98Fruit-Ades\xE2\x80\x99 Lainnya                                    | Lemonade dan \xE2\x80\x98fruit-ades\xE2\x80\x99 lainnya adalah minuman ringan yang tidak mengikuti kandungan buah didalamnya.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Tidak Aktif |
+ | 1401040213 | Serbuk Minuman Berperisa                                             | Serbuk minuman berperisa adalah produk serbuk minuman yang diperoleh dari campuran tepung, dengan perisa (alami, identik alami, tiruan) dengan atau tanpa pemanis.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Tidak Aktif |
+ | 1401040214 | Serbuk Minuman Rasa Jeruk                                            | Serbuk minuman rasa jeruk adalah produk serbuk minuman yang diperoleh dari campuran tepung gula pasir dengan perisa jeruk (alami, identik alami, tiruan).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Tidak Aktif |
+ | 1401040215 | Minuman Elektrolit Tidak Berkarbonat                                 | Minuman elektrolit tidak berkarbonat adalah minuman formulasi tidak berkarbonasi yang ditujukan untuk menggantikan cairan, karbohidrat, elektrolit dan mineral tubuh dengan cepat. Dapat mengandung kalsium fosfat, kalium fosfat, kalsium sitrat, kalium sitrat, kalium karbonat termasuk kalium bikarbonat, kalium klorida, kalsium klorida, natrium klorida, kalsium laktat, magnesium laktat dan magnesium sulfat.<br> <br> Karakteristik dasar:<br> \xC3\xAF\xE2\x80\x9A\xC2\xB7 Kandungan natrium tidak kurang dari 10 mmol/l<br> \xC3\xAF\xE2\x80\x9A\xC2\xB7 Kadar gula 50 g/l hingga 100 g/l, gula tersebut merupakan jumlah total dekstrosa, fruktosa, sirup glukosa, maltodekstrin dan sukrosa, dan mengandung fruktosa tidak lebih dari 50 g/l. | Tidak Aktif |
+ | 1401040216 | Minuman Hipotonik Tidak Berkarbonat                                  | Minuman hipotonik tidak berkarbonat adalah minuman ringan tidak berkarbonasi yang mengandung elektrolit, gula, asam sitrat dan mineral-mineral garam.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Tidak Aktif |
+ | 1401040217 | Minuman Isotonik Tidak Berkarbonat                                   | Minuman isotonik tidak berkarbonat adalah minuman ringan tidak berkarbonasi yang mengandung elektrolit, gula, asam sitrat dan mineral-mineral garam.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Tidak Aktif |
+ | 1401040218 | Minuman Hipertonik Tidak Berkarbonat                                 | Minuman hipertonik tidak berkarbonat adalah minuman ringan tidak berkarbonasi yang mengandung elektrolit, gula, asam sitrat dan mineral-mineral garam.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Tidak Aktif |
+ | 1401040219 | Minuman Dasar Elektrolit (Electrolyte Drinks Base) Tidak Berkarbonat | Minuman dasar elektrolit (electrolyte drinks base) tidak berkarbonat adalah minuman formulasi tidak berkarbonasi berbentuk bubuk atau cair yang dikonsumsi dengan penambahan air ditujukan untuk membuat minuman elektrolit.                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Tidak Aktif |
+ | 1401040220 | Minuman Asam Jawa                                                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Tidak Aktif |
+ | 1401040225 | Nata De Coco Dalam Minuman                                           |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Tidak Aktif |
+ | 1401040226 | Minuman Air Kelapa                                                   | Minuman Air Kelapa                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Tidak Aktif |
+ | 1401040227 | Minuman Lidah Buaya                                                  | &nbsp;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Tidak Aktif |
+ | 1401040228 | Minuman Nata De Coco                                                 | &nbsp;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Aktif       |
+ | 1401040229 | Minuman Jeli                                                         | Minuman jeli adalah minuman yang menggunakan bahan baku berupa hidrokoloid sebagai komponen utama. Produk akhir berupa<br> cairan semi liquid (gel) diperoleh dari proses pencampuran air, hidrokoloid dengan atau tanpa penambahan bahan pangan lain.<br> <br> Karakteristik dasar :<br> \xC3\xA2\xE2\x82\xAC\xC2\xA2 Memiliki tekstur/konsistensi gel semi liquid ;<br> \xC3\xA2\xE2\x82\xAC\xC2\xA2 Kandungan hidrokoloid tidak kurang dari 0,1%.                                                                                                                                                                                                                                                                                                        | Aktif       |
+ | 1401040230 | Minuman Madu                                                         | &nbsp;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Tidak Aktif |
+ | 1401040231 | Minuman Sari Buah (Steril Komersial)                                 | Minuman sari buah adalah minuman yang diperoleh dengan mencampur air minum; sari buah atau campuran sari buah yang tidak difermentasi, dengan bagian lain dari satu jenis buah atau lebih, dengan atau tanpa penambahan gula, karbondioksida                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Aktif       |
+ | 1401040232 | Sirup Madu                                                           | &nbsp;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Tidak Aktif |
+ | 1401040233 | Minuman Rasa Buah (Steril Komersial)                                 | Minuman rasa buah adalah minuman yang terdiri dari satu atau lebih jenis buah, dengan total sari buah kurang dari 10% (b/v).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Aktif       |
+ | 1401040234 | Minuman Nata de Coco (Steril)                                        | &nbsp;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Aktif       |
+ | 1401040235 | Minuman Buah                                                         | Minuman buah adalah minuman yang terdiri dari satu atau lebih jenis buah, dengan total sari buah 10% sampai 35% (b/v).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Aktif       |
+ | 1401040236 | Minuman Buah (Steril Komersial)                                      | Minuman buah adalah minuman yang terdiri dari satu atau lebih jenis buah, dengan total sari buah 10% sampai 35% (b/v).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Aktif       |
+ | 1401040237 | Minuman Asam Jawa (Steril Komersil)                                  | &nbsp;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Tidak Aktif |
+ | 1401040238 | Minuman Kopi Dalam Kemasan                                           | Minuman kopi dalam kemasan adalah minuman yang dibuat dari kopi bubuk, gula dan air minum melalui pemanasan, kandungan kafein tidak kurang dari 20 mg/kg dengan atau tanpa penambahan bahan pangan lain, dan dikemas secara kedap (hermetis).                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Tidak Aktif |
+ | 1401040239 | Minuman Teh Dalam Kemasan                                            | Minuman teh adalah minuman hasil seduhan daun teh atau ekstrak teh dalam air minuman dengan penambahan gula dan dikemas secara kedap (hermetis).<br> <br> Karakteristik dasar:<br> \xC3\xA2\xE2\x82\xAC\xC2\xA2 Bau dan rasa khas teh<br> \xC3\xA2\xE2\x82\xAC\xC2\xA2 Mengandung kafein dan tanin                                                                                                                                                                                                                                                                                                                                                                                                                                                          | Aktif       |
+ | 1401040240 | Minuman Teh dalam Kemasan (Steril Komersial)                         | Minuman teh dalam kemasan (Steril Komersial)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Aktif       |
+ | 1401040241 | Squash Berperisa (Steril)                                            | Squash berperisa adalah produk yang diperoleh dari proses pencampuran sirup dan bahan penyedap rasa dan perisa dengan atau tanpa bagian yang dapat dimakan dari satu jenis buah-buahan atau lebih dan dalam penggunaannya harus diencerkan terlebih dahulu.                                                                                                                                                                                                                                                                                                                                                                                                                                               | Tidak Aktif |
+ | 1401040242 | Serbuk Minuman Isotonik Tidak Berkarbonasi                           | &nbsp;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Tidak Aktif |
+ | 1401040243 | Minuman Kopi                                                         | Minuman kopi adalah minuman yang dibuat dari kopi bubuk, kopi instan, dan/atau ekstrak kopi, air minum, dengan atau tanpa penambahan gula dan bahan pangan lain.<br> <br> Karakteristik dasar :<br> Kadar kopi tidak kurang dari 4% (dihitung dari basis berat kering).                                                                                                                                                                                                                                                                                                                                                                                                                                   | Aktif       |
+ | 1401040244 | Minuman Teh                                                          | Minuman teh adalah minuman hasil seduhan daun teh atau ekstrak teh dalam air minuman dengan penambahan gula dan dikemas secara kedap (hermetis)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Tidak Aktif |
+ | 1401040245 | Kapucino                                                             | Kapucino adalah minuman yang dibuat dari espresso dan susu, yang merupakan minuman khas Italia.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Aktif       |
+ | 1401040246 | Minuman Berperisa Tidak Berkarbonat                                  | Minuman berperisa adalah produk minuman yang diperoleh dari pencampuran air minum dengan bahan perisa dan gula dengan atau tanpa penambahan bahan pangan lain melalui proses pemanasan.<br> Minuman berperisa ini tidak ditambahkan karbondioksida (Tidak Berkarbonat)                                                                                                                                                                                                                                                                                                                                                                                                                                    | Aktif       |
+ | 1401040247 | Minuman Kopi (Steril Komersial)                                      | Minuman kopi (steril komersial) adalah minuman yang dibuat dari kopi bubuk, gula dan air minum melalui pemanasan, kandungan kafein tidak kurang dari 250 mg/kg dengan atau tanpa penambahan bahan pangan lain, dan dikemas secara kedap (hermetis) dan steril komersial.<br> Karakteristik dasar:<br> \xC3\xA2\xE2\x82\xAC\xC2\xA2 Warna, aroma dan rasa normal<br> \xC3\xA2\xE2\x82\xAC\xC2\xA2 Kadar kopi minimum 4% (dihitung dari basis berat kering)                                                                                                                                                                                                                                                                                                   | Aktif       |
+ | 1401040248 | Minuman Rasa Susu (Cair) (Tidak Berkarbonat)                         | Minuman Rasa Susu (Cair) adalah minuman rasa susu berbentuk cair<br> <br> Karakteristik dasar:<br> Mengandung susu kurang dari 10% dihitung sebagai susu segar<br> Kadar lemak susu kurang dari 0.3%                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Aktif       |
+ | 1401040249 | Minuman Citrus Comminutes (Tidak Berkarbonat)                        | Minuman citrus comminutes adalah minuman ringan yang diperoleh<br> dari proses yang melibatkan kelompok buah citrus utuh.<br> Karakteristik dasar:<br> - Kandungan buah dalam minuman 7% hingga 10% tergantung<br> jenisnya sebelum diencerkan, dan 1,5% hingga 2% untuk<br> minuman yang dikonsumsi tanpa pengenceran<br> - Dapat ditambahkan gula tidak lebih dari 100 g/kg<br>                                                                                                                                                                                                                                                                                                                         | Aktif       |
+ | 1401040250 | Minuman Rasa Susu (Serbuk) (Tidak Berkarbonat)                       | Minuman Rasa Susu (Serbuk) adalah minuman rasa susu berbentuk serbuk.<br> <br> Karakteristik dasar:<br> Mengandung susu kurang dari 10% dihitung sebagai susu segar;<br> Kadar lemak susu kurang dari 0.3%.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | Tidak Aktif |
+ | 1401040251 | Minuman Fermentasi                                                   | -                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Tidak Aktif |
+ | 1401040252 | Minuman Ringan (Plain)                                               |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Aktif       |
+ +------------+----------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------+
+
+=head2 How many categories are active vs inactive?
+
+ % echo -n 'Aktif: '; bpom-daftar-kategori-pangan --status-is Aktif | wc -l; echo -n 'Tidak Aktif: '; bpom-daftar-kategori-pangan --status-isnt Aktif | wc -l
+ Aktif: 1372
+ Tidak Aktif: 587
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-BPOMUtils-Table-FoodCategory>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-BPOMUtils-Table-FoodCategory>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-BPOMUtils-Table-FoodCategory>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

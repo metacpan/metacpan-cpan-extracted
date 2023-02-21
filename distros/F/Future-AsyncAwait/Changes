@@ -1,5 +1,22 @@
 Revision history for Future-AsyncAwait
 
+0.64    2023-02-14
+        [CHANGES]
+         * Define ABI version 2, which adds pre_suspend and post_resume phase
+           hooks
+
+0.63    2023-02-12
+        [CHANGES]
+         * Added various bits of API to extension modules using modhookdata more
+           flexibly, including by pre-allocation before the first `await`
+         * Legacy hook API now prints warnings about its deprecation and
+           impending removal
+
+        [BUGFIXES]
+         * Bleadperl no longer supports `GIMME`, in any case should use
+           `GIMME_V`
+         * Fix memory leak around pre-allocated cancel AV
+
 0.62    2022-12-20
         [BUGFIXES]
          * Save/restore the value of the @_ array; does not work on perls

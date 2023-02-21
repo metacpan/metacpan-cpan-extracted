@@ -48,7 +48,7 @@ TODO: {
     "placeholder date/time"       => qr(Date/time)
   );
 
-  module_boilerplate_ok('lib/RFID/Biblio.pm');
+  module_boilerplate_ok('lib/Biblio/RFID.pm');
 
 
 }

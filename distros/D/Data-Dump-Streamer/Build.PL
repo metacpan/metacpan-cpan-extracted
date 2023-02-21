@@ -8,7 +8,7 @@ use My::Builder;
 
 my $build = My::Builder->new(
     module_name => 'Data::Dump::Streamer',
-    dist_author => 'Yves Orton <yves@cpan.org>, Joshua ben Jore <jjore@cpan.org>',
+    dist_author => 'Yves Orton <yves@cpan.org>',
     license => 'perl',
     configure_requires => {
         'perl' => '5.006',

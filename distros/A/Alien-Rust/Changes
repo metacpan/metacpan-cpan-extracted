@@ -1,0 +1,11 @@
+Revision history for Alien-Rust,
+
+0.03      2023-02-20 23:41:50-05:00 America/New_York
+  - Add methods for setting RUSTUP_HOME environment variable if necessary.
+    GH#2, GH#3.
+
+0.02      2023-02-15 21:06:34-05:00 America/New_York
+  - Also require cargo tool for system install. @plicease++, GH#1.
+
+0.01      2023-02-14 04:38:00-05:00 America/New_York
+  - initial version

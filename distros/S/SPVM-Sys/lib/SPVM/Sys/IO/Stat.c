@@ -6,7 +6,7 @@
 
 const char* FILE_NAME = "Sys/IO/Stat.c";
 
-int32_t SPVM__Sys__IO__Stat__new(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Sys__IO__Stat___new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t e = 0;
   
@@ -64,13 +64,15 @@ int32_t SPVM__Sys__IO__Stat__stat_raw(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 
 int32_t SPVM__Sys__IO__Stat__stat(SPVM_ENV* env, SPVM_VALUE* stack) {
-
+  void* obj_path = stack[0].oval;
+  
   SPVM__Sys__IO__Stat__stat_raw(env, stack);
   
   int32_t status = stack[0].ival;
 
   if (status == -1) {
-    env->die(env, stack, "[System Error]stat failed:%s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    const char* path = env->get_chars(env, stack, obj_path);
+    env->die(env, stack, "[System Error]stat failed:%s. The specified file is \"%s\"", env->strerror(env, stack, errno, 0), path, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -108,13 +110,15 @@ int32_t SPVM__Sys__IO__Stat__lstat_raw(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 
 int32_t SPVM__Sys__IO__Stat__lstat(SPVM_ENV* env, SPVM_VALUE* stack) {
-
+  void* obj_path = stack[0].oval;
+  
   SPVM__Sys__IO__Stat__lstat_raw(env, stack);
   
   int32_t status = stack[0].ival;
 
   if (status == -1) {
-    env->die(env, stack, "[System Error]lstat failed:%s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    const char* path = env->get_chars(env, stack, obj_path);
+    env->die(env, stack, "[System Error]lstat failed:%s. The specified file is \"%s\"", env->strerror(env, stack, errno, 0), path, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -143,7 +147,6 @@ int32_t SPVM__Sys__IO__Stat__fstat_raw(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__IO__Stat__fstat(SPVM_ENV* env, SPVM_VALUE* stack) {
-
   SPVM__Sys__IO__Stat__fstat_raw(env, stack);
   
   int32_t status = stack[0].ival;

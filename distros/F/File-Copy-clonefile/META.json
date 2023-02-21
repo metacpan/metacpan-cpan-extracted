@@ -1,0 +1,64 @@
+{
+   "abstract" : "call clonefile system call",
+   "author" : [
+      "Shoichi Kaji <skaji@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "File-Copy-clonefile",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Devel::CheckCompiler" : "0.07",
+            "ExtUtils::Constant" : "0",
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.20.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::LeakTrace" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "File::Copy::clonefile" : {
+         "file" : "lib/File/Copy/clonefile.pm",
+         "version" : "v0.0.4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/skaji/perl-File-Copy-clonefile/issues"
+      },
+      "homepage" : "https://github.com/skaji/perl-File-Copy-clonefile",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/skaji/perl-File-Copy-clonefile.git",
+         "web" : "https://github.com/skaji/perl-File-Copy-clonefile"
+      }
+   },
+   "version" : "v0.0.4",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_static_install" : 0
+}
+

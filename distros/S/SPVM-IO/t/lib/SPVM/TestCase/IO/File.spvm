@@ -4,7 +4,7 @@ class TestCase::IO::File {
   use Fn;
   use Array;
 
-  static method test_flush : int ($file : string) {
+  static method flush : int ($file : string) {
     
     my $io_file = IO::File->new($file, ">");
     
@@ -16,7 +16,18 @@ class TestCase::IO::File {
     return 1;
   }
 
-  static method test_autoflush : int ($file : string) {
+  static method close : int ($file : string) {
+    
+    my $io_file = IO::File->new($file, ">");
+    
+    $io_file->print("He");
+    $io_file->print("llo");
+    $io_file->close;
+    
+    return 1;
+  }
+
+  static method autoflush : int ($file : string) {
     
     my $io_file = IO::File->new($file, ">");
     unless ($io_file) {
@@ -38,7 +49,7 @@ class TestCase::IO::File {
     return 1;
   }
 
-  static method test_print : int ($file : string) {
+  static method print : int ($file : string) {
     
     my $io_file = IO::File->new($file, ">");
     unless ($io_file) {
@@ -50,7 +61,7 @@ class TestCase::IO::File {
     return 1;
   }
 
-  static method test_print_newline : int ($file : string) {
+  static method print_newline : int ($file : string) {
     my $io_file = IO::File->new($file, ">");
     unless ($io_file) {
       return 0;
@@ -61,7 +72,7 @@ class TestCase::IO::File {
     return 1;
   }
 
-  static method test_print_long_lines : int ($file : string) {
+  static method print_long_lines : int ($file : string) {
     my $io_file = IO::File->new($file, ">");
     unless ($io_file) {
       return 0;
@@ -72,7 +83,7 @@ class TestCase::IO::File {
     return 1;
   }
 
-  static method test_open : int ($file : string) {
+  static method open : int ($file : string) {
     {
       my $io_file = IO::File->new($file, "<");
       unless ($io_file) {
@@ -94,7 +105,7 @@ class TestCase::IO::File {
     return 1;
   }
 
-  static method test_read : int ($file : string) {
+  static method read : int ($file : string) {
     {
       my $io_file = IO::File->new($file, "<");
       unless ($io_file) {
@@ -135,7 +146,7 @@ class TestCase::IO::File {
     return 1;
   }
 
-  static method test_getline : int ($file : string) {
+  static method getline : int ($file : string) {
     my $io_file = IO::File->new($file, "<");
     unless ($io_file) {
       die "Can't open file $file";
@@ -171,7 +182,7 @@ class TestCase::IO::File {
     return 1;
   }
 
-  static method test_getline_while : int ($file : string) {
+  static method getline_while : int ($file : string) {
     my $io_file = IO::File->new($file, "<");
     unless ($io_file) {
       die "Can't open file $file";
@@ -192,7 +203,7 @@ class TestCase::IO::File {
     return 1;
   }
 
-  static method test_getline_eof : int ($file : string) {
+  static method getline_eof : int ($file : string) {
     my $io_file = IO::File->new($file, "<");
     unless ($io_file) {
       die "Can't open file $file";
@@ -235,7 +246,7 @@ class TestCase::IO::File {
     return 1;
   }
 
-  static method test_getline_long_line : int ($file : string) {
+  static method getline_long_line : int ($file : string) {
     my $io_file = IO::File->new($file, "<");
     unless ($io_file) {
       die "Can't open file $file";
@@ -271,7 +282,7 @@ class TestCase::IO::File {
     return 1;
   }
 
-  static method test_getline_chompr : int ($file : string) {
+  static method getline_chompr : int ($file : string) {
     my $io_file = IO::File->new($file, "<");
     unless ($io_file) {
       die "Can't open file $file";
@@ -310,7 +321,7 @@ class TestCase::IO::File {
     return 1;
   }
 
-  static method test_getline_chompr_while : int ($file : string) {
+  static method getline_chompr_while : int ($file : string) {
     my $io_file = IO::File->new($file, "<");
     unless ($io_file) {
       die "Can't open file $file";
@@ -330,7 +341,7 @@ class TestCase::IO::File {
     return 1;
   }
 
-  static method test_getline_chompr_eof : int ($file : string) {
+  static method getline_chompr_eof : int ($file : string) {
     my $io_file = IO::File->new($file, "<");
     unless ($io_file) {
       die "Can't open file $file";
@@ -377,7 +388,7 @@ class TestCase::IO::File {
     return 1;
   }
 
-  static method test_getline_chompr_long_line : int ($file : string) {
+  static method getline_chompr_long_line : int ($file : string) {
     my $io_file = IO::File->new($file, "<");
     unless ($io_file) {
       die "Can't open file $file";
@@ -416,7 +427,7 @@ class TestCase::IO::File {
     return 1;
   }
 
-  static method test_getlines : int ($file : string) {
+  static method getlines : int ($file : string) {
     {
       my $io_file = IO::File->new($file, "<");
       

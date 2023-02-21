@@ -1,3 +1,6 @@
+Version 0.66  - 19 February 2026
+              - BCM2835 library version updated to 1.71
+
 Version 0.65  - 22 July 2019
               - updated for RPI 4 function naming
               - added gpio_get_pud() method for RPI 4

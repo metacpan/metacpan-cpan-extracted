@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate transformed chord progressions
 
-our $VERSION = '0.0302';
+our $VERSION = '0.0303';
 
 use Moo;
 use strictures 2;
@@ -116,8 +116,10 @@ sub _build__mdt {
 sub generate {
     my ($self) = @_;
 
+    # get the pitch-nums of the base_chord - static and mutable
     my ($pitches, $notes) = $self->_get_pitches;
 
+    # get either the defined transformations or a random set
     my @transforms = $self->_build_transform;
 
     $self->_initial_conditions(@transforms) if $self->verbose;
@@ -129,11 +131,13 @@ sub generate {
     for my $token (@transforms) {
         $i++;
 
+        # perform the transformation
         my $transformed = $self->_build_chord($token, $pitches, $notes);
 
-        my @notes = map { $self->pitchname($_) } @$transformed;
+        my @notes = map { $self->pitchname($_) } @$transformed; # for ISO
         my @base = map { s/^([A-G][#b]?)\d/$1/r } @notes; # for chord-name
 
+        # tally what has been generated
         push @generated, $self->format eq 'ISO' ? \@notes : $transformed;
 
         my $chord = _sanitize_chordname(@base);
@@ -145,6 +149,7 @@ sub generate {
             $chord
             if $self->verbose;
 
+        # "increment" our pitches
         $notes = $transformed;
     }
 
@@ -155,8 +160,10 @@ sub generate {
 sub circular {
     my ($self) = @_;
 
+    # get the pitch-nums of the base_chord - static and mutable
     my ($pitches, $notes) = $self->_get_pitches;
 
+    # get either the defined transformations or a random set
     my @transforms = $self->_build_transform;
 
     $self->_initial_conditions(@transforms) if $self->verbose;
@@ -168,11 +175,13 @@ sub circular {
     for my $i (1 .. $self->max) {
         my $token = $transforms[ $posn % @transforms ];
 
+        # perform the transformation
         my $transformed = $self->_build_chord($token, $pitches, $notes);
 
-        my @notes = map { $self->pitchname($_) } @$transformed;
+        my @notes = map { $self->pitchname($_) } @$transformed; # for ISO
         my @base = map { s/^([A-G][#b]?)\d/$1/r } @notes; # for chord-name
 
+        # tally what has been generated
         push @generated, $self->format eq 'ISO' ? \@notes : $transformed;
 
         my $chord = _sanitize_chordname(@base);
@@ -184,8 +193,10 @@ sub circular {
             $chord
             if $self->verbose;
 
+        # "increment" our pitches
         $notes = $transformed;
 
+        # move left or right at random
         $posn = int rand 2 ? $posn + 1 : $posn - 1;
     }
 
@@ -310,7 +321,7 @@ Music::Chord::Progression::Transform - Generate transformed chord progressions
 
 =head1 VERSION
 
-version 0.0302
+version 0.0303
 
 =head1 SYNOPSIS
 
@@ -319,7 +330,7 @@ version 0.0302
   my $prog = Music::Chord::Progression::Transform->new;
 
   $prog = Music::Chord::Progression::Transform->new(
-    transforms => [qw(L R P R S)],
+    transforms => [qw(L R P T6 R S T-6)],
   );
 
   my ($generated, $transforms, $chords) = $prog->generate;
@@ -346,7 +357,7 @@ and Neo-Riemann chord progressions.
 The initial C<isobase>, capitalized note on which the progression
 starts (but may be immediately transformed by the first operation).
 
-Default: C<C>
+Default: C<C> (but may be C<C#>, C<Db>, etc.)
 
 =head2 base_octave
 

@@ -368,16 +368,17 @@ gp_get_glyphs_width( Handle self, PGlyphsOutRec t, int flags)
 }
 
 static void
-paint_text_background( Handle self, const char * text, int x, int y, int len, int flags)
+paint_text_background( Handle self, const char * text, int len, int flags)
 {
-	int i;
 	Point p[5];
 	ABC abc;
 	uint32_t *palette;
+	POINT pp[5];
+	HGDIOBJ  o1, o2;
+	int rop;
 
 	palette = sys alpha_arena_palette;
 	sys alpha_arena_palette = NULL;
-	if ( !apc_gp_push(self, NULL, NULL, 0)) return;
 
 	if ( flags & toGlyphs) {
 		PGlyphsOutRec t = (PGlyphsOutRec) text;
@@ -389,21 +390,29 @@ paint_text_background( Handle self, const char * text, int x, int y, int len, in
 		gp_get_text_widths(self, text, len, flags | toAddOverhangs, &abc);
 	}
 
-
-	apc_gp_set_fill_pattern( self, fillPatterns[fpSolid]);
-	apc_gp_set_color( self, apc_gp_get_back_color(self));
-	apc_gp_set_rop( self, ropCopyPut);
-
 	gp_get_text_box(self, &abc, p);
-	for ( i = 0; i < 4; i++) {
-		p[i].x += x;
-		p[i].y += y;
-	}
-	i = p[2].x; p[2].x = p[3].x; p[3].x = i;
-	i = p[2].y; p[2].y = p[3].y; p[3].y = i;
+	pp[0].x =  p[0].x;
+	pp[0].y = -p[0].y;
+	pp[1].x =  p[1].x;
+	pp[1].y = -p[1].y;
+	pp[2].x =  p[3].x;
+	pp[2].y = -p[3].y;
+	pp[3].x =  p[2].x;
+	pp[3].y = -p[2].y;
+	pp[4].x =  p[0].x;
+	pp[4].y = -p[0].y;
 
-	apc_gp_fill_poly( self, 4, p);
-	apc_gp_pop( self, NULL);
+	rop = GetROP2(sys ps);
+	o1 = SelectObject( sys ps, std_hollow_pen);
+	if ( rop != R2_COPYPEN )
+		SetROP2( sys ps, R2_COPYPEN );
+	o2 = SelectObject( sys ps, stylus_get_solid_brush(sys bg));
+	Polygon( sys ps, pp, 5 );
+	SelectObject( sys ps, o1 );
+	SelectObject( sys ps, o2 );
+	if ( rop != R2_COPYPEN )
+		SetROP2( sys ps, rop );
+
 	sys alpha_arena_palette = palette;
 }
 
@@ -413,7 +422,7 @@ apc_gp_text_out( Handle self, const char * text, int x, int y, int len, int flag
 {objCheck false;{
 	Bool ok = true;
 	HDC ps = sys ps;
-	int bk  = GetBkMode( ps), X = x, Y = y;
+	int bk  = GetBkMode( ps);
 	int opa = is_apt( aptTextOpaque) ? OPAQUE : TRANSPARENT;
 	Bool use_path, use_alpha;
 
@@ -421,7 +430,7 @@ apc_gp_text_out( Handle self, const char * text, int x, int y, int len, int flag
 	if ( div <= 0) div = 1;
 	/* Win32 has problems with text_out strings that are wider than
 	32K pixel - it doesn't plot the string at all. This hack is
-	although ugly, but is better that Win32 default behaviour, and
+	although ugly, but is better that Win32 default behavior, and
 	at least can be excused by the fact that all GP spaces have
 	their geometrical limits. */
 	if ( len > div) len = div;
@@ -432,6 +441,10 @@ apc_gp_text_out( Handle self, const char * text, int x, int y, int len, int flag
 		len = mb_len;
 	}
 
+	select_world_transform(self, true);
+	SHIFT_XY(x, y);
+	SetViewportOrgEx( sys ps, x, y, NULL );
+
 	use_alpha = sys alpha < 255;
 	use_path = (GetROP2( sys ps) != R2_COPYPEN) && !use_alpha;
 	if ( use_path ) {
@@ -441,21 +454,20 @@ apc_gp_text_out( Handle self, const char * text, int x, int y, int len, int flag
 		STYLUS_USE_TEXT;
 		if ( opa != bk) SetBkMode( ps, opa);
 	}
-	SHIFT_XY(X,Y);
 
 	if ( use_alpha ) {
 		if ( is_apt( aptTextOpaque))
-			paint_text_background(self, (char*)text, x, y, len, flags & toUTF8);
-		ok = aa_text_out( self, X, Y, (void*)text, len, flags & toUTF8);
+			paint_text_background(self, (char*)text, len, flags & toUTF8);
+		ok = aa_text_out( self, 0, 0, (void*)text, len, flags & toUTF8);
 	} else {
 		ok = ( flags & toUTF8 ) ?
-			TextOutW( ps, X, Y, ( U16*)text, len) :
-			TextOutA( ps, X, Y, text, len);
+			TextOutW( ps, 0, 0, ( U16*)text, len) :
+			TextOutA( ps, 0, 0, text, len);
 		if ( !ok ) apiErr;
 	}
 
 	if ( var font. style & (fsUnderlined | fsStruckOut))
-		underscore_font( self, X, Y, gp_get_text_width( self, text, len, flags), use_alpha);
+		underscore_font( self, 0, 0, gp_get_text_width( self, text, len, flags), use_alpha);
 
 	if ( use_path ) {
 		EndPath(ps);
@@ -470,7 +482,7 @@ apc_gp_text_out( Handle self, const char * text, int x, int y, int len, int flag
 
 /*
 
-It seems that Windows decidecly doesn't shape combining characters, and
+It seems that Windows decidedly doesn't shape combining characters, and
 possibly doesn't kerning/ligatures in general for fixed width fonts. The two
 functions, fix_combiners_pdx and fix_combiners_advances try to fix for this.
 
@@ -575,6 +587,10 @@ apc_gp_glyphs_out( Handle self, PGlyphsOutRec t, int x, int y)
 	FontContext fc;
 	float s, c, fxx, fyy;
 
+	select_world_transform(self, true);
+	SHIFT_XY(x,y);
+	SetViewportOrgEx( sys ps, x, y, NULL );
+
 	if ( t->len > 8192 ) t->len = 8192;
 	use_path = GetROP2( sys ps) != R2_COPYPEN;
 	use_alpha = sys alpha < 255;
@@ -583,7 +599,7 @@ apc_gp_glyphs_out( Handle self, PGlyphsOutRec t, int x, int y)
 		BeginPath(ps);
 	} else if ( use_alpha ) {
 		if ( is_apt( aptTextOpaque))
-			paint_text_background(self, (char*) t, x, y, 0, toGlyphs);
+			paint_text_background(self, (char*) t, 0, toGlyphs);
 	} else {
 		STYLUS_USE_TEXT;
 		if ( opa != bk) SetBkMode( ps, opa);
@@ -601,9 +617,8 @@ apc_gp_glyphs_out( Handle self, PGlyphsOutRec t, int x, int y)
 		s = 0.0;
 	}
 
-	SHIFT_XY(x,y);
-	fxx = xx = x;
-	fyy = yy = y;
+	fxx = xx = 0;
+	fyy = yy = 0;
 	savelen = t->len;
 	font_context_init(&fc, self, t);
 	while (( t-> len = font_context_next(&fc)) > 0 ) {
@@ -630,7 +645,7 @@ apc_gp_glyphs_out( Handle self, PGlyphsOutRec t, int x, int y)
 	t->len = savelen;
 
 	if ( var font. style & (fsUnderlined | fsStruckOut))
-		underscore_font( self, x, yy, gp_get_glyphs_width( self, t, 0), use_alpha);
+		underscore_font( self, 0, yy, gp_get_glyphs_width( self, t, 0), use_alpha);
 
 	if ( use_path ) {
 		EndPath(ps);
@@ -2013,6 +2028,15 @@ apc_gp_get_glyph_outline( Handle self, int index, int flags, int ** buffer)
 }
 
 Bool
+apc_gp_set_text_matrix( Handle self, Matrix matrix)
+{
+	objCheck 0;
+	apt_assign( aptWantWorldTransform, !prima_matrix_is_identity( matrix ));
+	apt_clear( aptCachedWorldTransform );
+	return true;
+}
+
+Bool
 apc_gp_get_text_out_baseline( Handle self)
 {
 	objCheck 0;
@@ -2033,7 +2057,6 @@ apc_gp_set_text_opaque( Handle self, Bool opaque)
 	apt_assign( aptTextOpaque, opaque);
 	return true;
 }
-
 
 Bool
 apc_gp_set_text_out_baseline( Handle self, Bool baseline)

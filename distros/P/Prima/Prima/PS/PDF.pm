@@ -109,7 +109,7 @@ sub change_transform
 	$self-> emit_content("@xm @tm cm");
 
 	if ( $rg ) {
-		$self-> emit_content($rg-> apply_offset . " n");
+		$self-> emit_content($rg-> apply_clip($self));
 	} elsif ( $doClip ) {
 		$self-> emit_content("h @cr re W n");
 	}
@@ -177,10 +177,12 @@ sub stroke
 		$r1 == rop::NoOper &&
 		$r2 == rop::NoOper;
 
+	my $lw_changed;
 	if ( $self-> {changed}-> {lineWidth}) {
 		my ($lw) = $self-> pixel2point($self-> lineWidth);
 		$self-> emit_content( float_format($lw) . ' w');
 		$self-> {changed}-> {lineWidth} = 0;
+		$lw_changed = 1;
 	}
 
 	if ( $self-> {changed}-> {lineEnd}) {
@@ -226,14 +228,20 @@ sub stroke
 			( $r1 == rop::Blackness) ? 0 :
 			( $r1 == rop::Whiteness) ? 0xffffff : $self-> color;
 
-		if ( $self-> {changed}-> {linePattern}) {
+		if ( $self-> {changed}-> {linePattern} || $lw_changed) {
 			if ( length( $lp) == 1) {
-				$self-> emit_content('[] 0 d');
+				$self-> emit_content('[] 0 d') if $self->{changed}->{linePattern};
 			} else {
-				my @x = split('', $lp);
+				my $lw = $self->lineWidth || 2.0; # because to be divided by 2
+				my @x = map { ord } split('', $lp);
 				push( @x, 0) if scalar(@x) % 1;
-				@x = map { ord($_) } @x;
-				$self-> emit_content("[@x] 0 d");
+				my @lp;
+				for ( my $i = 0; $i < @x; $i += 2 ) {
+					push @lp, ($x[$i] - 1) * $lw / 2;
+					push @lp, ($x[$i+1]) * $lw / 2;
+				}
+				@lp = map { $_ || 1 } @lp;
+				$self-> emit_content("[@lp] 0 d");
 			}
 			$self-> {changed}-> {linePattern} = 0;
 		}
@@ -808,8 +816,8 @@ sub fillPattern
 	my ($solidBack, $solidFore) = (0,0);
 	my $xid;
 	if( (ref($fp) // '') eq 'ARRAY') {
-		$solidBack = ! grep { $_ != 0    } @$fp;
-		$solidFore = ! grep { $_ != 0xff } @$fp;
+		$solidBack = fp::is_empty($fp);
+		$solidFore = fp::is_solid($fp);
 		if ( !$solidBack && !$solidFore) {
 			my $fpid = join( '', map { sprintf("%02x", $_)} @$fp);
 			$xid  = $self-> emit_pattern($fpid, $fp);
@@ -1050,7 +1058,7 @@ sub text_out
 	$self-> emit_content("q");
 	my $wmul = $self-> {font_x_scale};
 	if ( $self-> {font}-> {direction} != 0) {
-		my $r = $self-> {font}-> {direction};
+		my $r = $self-> {font}-> {direction} / $Prima::matrix::RAD;
 		my $sin1 = sin($r);
 		my $cos  = cos($r);
 		my $wcos = cos($r) * $wmul;
@@ -1353,8 +1361,12 @@ sub region
 	return $_[0]->{region} unless $#_;
 	my ( $self, $region ) = @_;
 	if ( $region && !UNIVERSAL::isa($region, "Prima::PS::PDF::Region")) {
-		warn "Region is not a Prima::PS::PDF::Region";
-		return undef;
+		if ( UNIVERSAL::isa($region, 'Prima::Region')) {
+			$region = Prima::PS::PDF::Region-> new_from_region( $region, $self );
+		} else {
+			warn "Region is not a Prima::PS::PDF::Region";
+			return undef;
+		}
 	}
 	$self->{clipRect} = [0,0,0,0];
 	$self->{region} = $region;
@@ -1398,6 +1410,7 @@ sub region
 package
 	Prima::PS::PDF::Region;
 use base qw(Prima::PS::Drawable::Region);
+use Prima::PS::Format;
 
 sub other { UNIVERSAL::isa($_[0], "Prima::PS::PDF::Region") ? $_[0] : () }
 
@@ -1416,6 +1429,27 @@ sub combine
 }
 
 sub is_empty { shift->{path} !~ /[Sf]/ }
+
+sub apply_offset
+{
+	my ($self, $canvas) = @_;
+	my $path = $self->apply_offset;
+	$path =~ s/\bn\b//;
+	return $path;
+}
+
+sub apply_clip
+{
+	my ($self, $canvas) = @_;
+	my $path = $self->{path};
+	my @offset = @{ $self->{offset} };
+	return "$path n" if 0 == grep { $_ != 0 } @offset;
+
+	@offset = $canvas-> pixel2point(@offset) if $canvas;
+	float_inplace(@offset);
+
+	return "1 0 0 1 @offset cm $path n 1 0 0 1 -$offset[0] -$offset[1] cm";
+}
 
 1;
 

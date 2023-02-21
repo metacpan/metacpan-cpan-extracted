@@ -1,4 +1,4 @@
-class Sys::IO::DirStream : pointer_t {
+class Sys::IO::DirStream : pointer {
   has closed : ro byte;
   native method DESTROY : void ();
 }

@@ -1,3 +1,6 @@
+0.16 2023-02-14
+  [Bug Fix]
+    * Fixed the bug that the close method in the IO::File doesn't set the stream undef.
 0.15 2023-02-08
   [Prerequirement Changes]
     * SPVM 0.9691+ is needed.

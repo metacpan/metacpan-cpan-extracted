@@ -1,5 +1,9 @@
 Revision history for Perl extension XML::LibXSLT.
 
+2.002001    2023-02-10
+    - Makefile.PL
+        - Corrections and refactorings
+
 2.002000    2022-05-17
     - lib/XML/LibXSLT/Quick.pm .
         - clarify license

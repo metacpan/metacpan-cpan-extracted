@@ -15,7 +15,7 @@ SKIP: {
         use_ok( HiPi::Interface::MPL3115A2 );
         use_ok( HiPi::Interface::MCP23017 );
         
-        my $mcpaddress = 0x26;
+        my $mcpaddress = 0x20;
         my $mpladdress = 0x60;
         
         my $driver = HiPi::Device::I2C->get_driver;
@@ -26,11 +26,11 @@ SKIP: {
         
         my $i2c = HiPi::Device::I2C->new;
         
-        #is( ($i2c->scan_bus(I2C_SCANMODE_AUTO, $mcpaddress, $mcpaddress ))[0], $mcpaddress, 'scan bus mcp');
-        #is( ($i2c->scan_bus(I2C_SCANMODE_AUTO, $mpladdress, $mpladdress ))[0], $mpladdress, 'scan bus mpl');
+        is( ($i2c->scan_bus(I2C_SCANMODE_AUTO, $mcpaddress, $mcpaddress ))[0], $mcpaddress, 'scan bus mcp');
+        is( ($i2c->scan_bus(I2C_SCANMODE_AUTO, $mpladdress, $mpladdress ))[0], $mpladdress, 'scan bus mpl');
         
-        ok( $i2c->check_address($mcpaddress),  'scan bus mcp' );
-        ok( $i2c->check_address($mpladdress),  'scan bus mpl' );
+        ok( $i2c->check_address($mcpaddress),  'check address mcp' );
+        ok( $i2c->check_address($mpladdress),  'check address mpl' );
         ok( $i2c->check_address(2) == 0,  'scan bus fail' );
         
         my $mpl = HiPi::Interface::MPL3115A2->new( address => $mpladdress );

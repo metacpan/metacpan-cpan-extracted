@@ -11,11 +11,15 @@ SPVM::Sys::IO::Stat - The stat Functions and The struct stat in C language
   use Sys::IO::Stat;
   
   my $file = "foo.txt";
-  my $stat =  Sys::IO::Stat->new;
-  Sys::IO::Stat->stat($file, $stat);
+  my $stat = Sys::IO::Stat->new($file);
   
   my $st_mode = $stat->st_mode;
   my $st_size = $stat->st_size;
+  
+  # More native
+  my $stat = Sys::IO::Stat->new;
+  Sys::IO::Stat->stat($file, $stat);
+  Sys::IO::Stat->lstat($file, $stat);
 
 =head1 Description
 
@@ -27,9 +31,11 @@ This is a L<pointer class|SPVM::Document::Language/"Pointer Class">.
 
 =head2 new
 
-  static method new : Sys::IO::Stat ();
+  static method new : Sys::IO::Stat ($path = undef : string, $options = undef : object[]);
 
-Create a new C<Sys::IO::Stat> object.
+Creates a new C<Sys::IO::Stat> object.
+
+If $path is specified, L</"stat"> is called.
 
 =head2 stat_raw
 
@@ -186,6 +192,106 @@ Gets C<st_atim.tv_nsec>.
   method st_ctim_tv_nsec : long ();
 
 Gets C<st_ctim.tv_nsec>.
+
+=head2 A
+
+  method A : double ();
+
+=head2 C
+
+  method C : double ();
+
+=head2 M
+
+  method M : double ();
+
+=head2 O
+
+  method O : int ();
+
+=head2 S
+
+  method S : int ();
+
+=head2 b
+
+  method b : int ();
+
+=head2 c
+
+  method c : int ();
+
+=head2 d
+
+  method d : int ();
+
+=head2 e
+
+  method e : int ();
+
+=head2 f
+
+  method f : int ();
+
+=head2 g
+
+  method g : int ();
+
+=head2 k
+
+  method k : int ();
+
+=head2 l
+
+  method l : int ();
+
+=head2 o
+
+  method o : int ();
+
+=head2 p
+
+  method p : int ();
+
+=head2 s
+
+  method s : long ();
+
+=head2 u
+
+  method u : int ();
+
+=head2 z
+
+  method z : int ();
+
+=head2 cando
+
+  method cando : int ($mode : int, $effective : int);
+
+=head2 r
+
+  method r : int ();
+
+=head2 w
+
+  method w : int ();
+
+=head2 x
+
+  method x : int ();
+
+=head2 R
+
+  method R : int ();
+
+=head2 W
+
+  method W : int ();
+
+=head2 X
+
+  method X : int ();
 
 =head1 Copyright & License
 

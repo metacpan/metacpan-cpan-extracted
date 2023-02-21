@@ -1,0 +1,48 @@
+---
+abstract: 'Securely hash and validate your passwords.'
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+build_requires:
+  Crypt::Passphrase::Encoder: '0'
+  Encode: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Mojolicious::Lite: '0'
+  Test::Mojo: '0'
+  Test::More: '0'
+  lib: '0'
+  parent: '0'
+  perl: '5.008'
+  utf8: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Passphrase
+provides:
+  Mojolicious::Command::passphrase:
+    file: lib/Mojolicious/Command/passphrase.pm
+    version: '0.003'
+  Mojolicious::Plugin::Passphrase:
+    file: lib/Mojolicious/Plugin/Passphrase.pm
+    version: '0.003'
+requires:
+  Crypt::Passphrase: '0'
+  Mojo::Base: '0'
+  Mojo::Util: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Leont/mojolicious-plugin-passphrase/issues
+  repository: git://github.com/Leont/mojolicious-plugin-passphrase.git
+version: '0.003'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -27,9 +27,8 @@ sub request ($method, $uri_string, $headers = [], $body_content = undef) {
   if ($TYPE eq 'lwp') {
     my $uri = URI->new($uri_string);
     my $host = $uri->$_call_if_can('host');
-    $uri->scheme(undef);
-    $uri->$_call_if_can(host => undef);
     $req = HTTP::Request->new($method => $uri, [ @$headers, $host ? ( Host => $host ) : () ], $body_content);
+    $req->protocol('HTTP/1.1'); # not added by HTTP::Request constructor
   }
   elsif ($TYPE eq 'mojo') {
     my $uri = Mojo::URL->new($uri_string);
@@ -54,6 +53,7 @@ sub response ($code, $headers = [], $body_content = undef) {
   my $res;
   if ($TYPE eq 'lwp') {
     $res = HTTP::Response->new($code, HTTP::Status::status_message($code), $headers, $body_content);
+    $res->protocol('HTTP/1.1'); # not added by HTTP::Response constructor
   }
   elsif ($TYPE eq 'mojo') {
     $res = Mojo::Message::Response->new(code => $code);

@@ -1222,7 +1222,7 @@ fep( ENUMLOGFONTEXW FAR *e, NEWTEXTMETRICEXW FAR *t, DWORD type, LPARAM _es)
 	if ( type & TRUETYPE_FONTTYPE) {
 		copy = 1;
 		es-> vecId = 1;
-		ret = 0; // enough; no further enumeration requred, since Win renders TrueType quite good
+		ret = 0; // enough; no further enumeration required, since Win renders TrueType quite good
 					// to not mix these with raster fonts.
 		goto EXIT;
 	} else if ( !( type & RASTER_FONTTYPE)) {
@@ -1382,7 +1382,7 @@ font_font2gp_internal( PFont font, Point res, Bool forceSize, HDC theDC)
 			)
 		{
 			font-> height   = es. tm. tmHeight;
-			// if synthesized embolding added, we have to reflect that...
+			// if synthesized emboldening added, we have to reflect that...
 			// ( 'cos it increments B-extent of a char cell).
 			if ( font-> style & fsBold) {
 				LOGFONTW lpf = es. lf;
@@ -1961,6 +1961,10 @@ hwnd_enter_paint( Handle self)
 	apc_gp_push(self, NULL, NULL, 0);
 	sys ps = save_ps;
 
+	apt_clear(aptWantWorldTransform);
+	apt_clear(aptUsedWorldTransform);
+	apt_clear(aptCachedWorldTransform);
+
 	SetGraphicsMode( sys ps, GM_ADVANCED);
 	sys stock_pen   = GetCurrentObject( sys ps, OBJ_PEN);
 	sys stock_brush = GetCurrentObject( sys ps, OBJ_BRUSH);
@@ -2069,10 +2073,12 @@ hwnd_leave_paint( Handle self)
 	sys stock_palette = NULL;
 	stylus_release(self);
 	sys bpp = 0;
+	select_world_transform(self, false);
 
 	save_ps = sys ps;
 	sys ps = 0;
 	apc_gp_pop(self, NULL);
+
 	sys ps = save_ps;
 }
 
@@ -2381,45 +2387,6 @@ palette_match( Handle self, long clr)
 
 	return PALETTERGB( color.r, color.g, color.b);
 }
-
-int
-arc_completion( double * angleStart, double * angleEnd, int * needFigure)
-{
-	int max;
-	long diff = ((long)( fabs( *angleEnd - *angleStart) * 1000 + 0.5));
-
-	if ( diff == 0) {
-		*needFigure = false;
-		return 0;
-	}
-	diff /= 1000;
-
-	while ( *angleStart > *angleEnd)
-		*angleEnd += 360;
-
-	while ( *angleStart < 0) {
-		*angleStart += 360;
-		*angleEnd   += 360;
-	}
-
-	while ( *angleStart >= 360) {
-		*angleStart -= 360;
-		*angleEnd   -= 360;
-	}
-
-	while ( *angleEnd >= *angleStart + 360)
-		*angleEnd -= 360;
-
-	if ( diff < 360) {
-		*needFigure = true;
-		return 0;
-	}
-
-	max = (int)(diff / 360);
-	*needFigure = ( max * 360) != diff;
-	return ( max % 2) ? 1 : 2;
-}
-
 
 #ifdef __cplusplus
 }

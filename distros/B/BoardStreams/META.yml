@@ -27,58 +27,58 @@ no_index:
 provides:
   BoardStreams:
     file: lib/BoardStreams.pm
-    version: v0.0.32
+    version: v0.0.34
   BoardStreams::Client:
     file: lib/BoardStreams/Client.pm
-    version: v0.0.32
+    version: v0.0.34
   BoardStreams::Client::Manager:
     file: lib/BoardStreams/Client/Manager.pm
-    version: v0.0.32
+    version: v0.0.34
   BoardStreams::Client::Stream:
     file: lib/BoardStreams/Client/Stream.pm
-    version: v0.0.32
+    version: v0.0.34
   BoardStreams::Client::StructDiff:
     file: lib/BoardStreams/Client/StructDiff.pm
-    version: v0.0.32
+    version: v0.0.34
   BoardStreams::Client::Util:
     file: lib/BoardStreams/Client/Util.pm
-    version: v0.0.32
+    version: v0.0.34
   BoardStreams::Client::WebSockets:
     file: lib/BoardStreams/Client/WebSockets.pm
-    version: v0.0.32
+    version: v0.0.34
   BoardStreams::DBMigrations:
     file: lib/BoardStreams/DBMigrations.pm
-    version: v0.0.32
+    version: v0.0.34
   BoardStreams::DBUtil:
     file: lib/BoardStreams/DBUtil.pm
-    version: v0.0.32
+    version: v0.0.34
   BoardStreams::Error:
     file: lib/BoardStreams/Error.pm
-    version: v0.0.32
+    version: v0.0.34
   BoardStreams::Error::DB:
     file: lib/BoardStreams/Error/DB.pm
-    version: v0.0.32
+    version: v0.0.34
   BoardStreams::Error::DB::Duplicate:
     file: lib/BoardStreams/Error/DB/Duplicate.pm
-    version: v0.0.32
+    version: v0.0.34
   BoardStreams::Error::JSONRPC:
     file: lib/BoardStreams/Error/JSONRPC.pm
-    version: v0.0.32
+    version: v0.0.34
   BoardStreams::Exceptions:
     file: lib/BoardStreams/Exceptions.pm
-    version: v0.0.32
+    version: v0.0.34
   BoardStreams::REs:
     file: lib/BoardStreams/REs.pm
-    version: v0.0.32
+    version: v0.0.34
   BoardStreams::Registry:
     file: lib/BoardStreams/Registry.pm
-    version: v0.0.32
+    version: v0.0.34
   BoardStreams::Util:
     file: lib/BoardStreams/Util.pm
-    version: v0.0.32
+    version: v0.0.34
   Mojolicious::Plugin::BoardStreams:
     file: lib/Mojolicious/Plugin/BoardStreams.pm
-    version: v0.0.32
+    version: v0.0.34
 requires:
   Cpanel::JSON::XS: '0'
   CryptX: '0'
@@ -105,7 +105,7 @@ resources:
   bugtracker: https://gitlab.com/karjala/new-boardstreams-pm/issues
   homepage: https://gitlab.com/karjala/new-boardstreams-pm
   repository: https://gitlab.com/karjala/new-boardstreams-pm.git
-version: v0.0.32
+version: v0.0.34
 x_authority: cpan:KARJALA
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

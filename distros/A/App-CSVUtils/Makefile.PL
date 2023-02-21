@@ -16,9 +16,10 @@ my %WriteMakefileArgs = (
   "EXE_FILES" => [
     "script/csv-add-fields",
     "script/csv-avg",
-    "script/csv-check-cell",
-    "script/csv-check-field",
-    "script/csv-check-values",
+    "script/csv-check-cell-values",
+    "script/csv-check-field-names",
+    "script/csv-check-field-values",
+    "script/csv-check-rows",
     "script/csv-concat",
     "script/csv-convert-to-hash",
     "script/csv-csv",
@@ -59,9 +60,11 @@ my %WriteMakefileArgs = (
     "script/csv-transpose",
     "script/csv-uniq",
     "script/csv2ltsv",
+    "script/csv2paras",
     "script/csv2td",
     "script/csv2tsv",
     "script/csv2vcf",
+    "script/paras2csv",
     "script/tsv2csv"
   ],
   "LICENSE" => "perl",
@@ -70,6 +73,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Complete::Module" => "0.262",
     "Complete::Util" => "0.616",
+    "Cwd" => 0,
     "Data::Cmp" => "0.002",
     "Data::Dmp" => "0.242",
     "Data::Sah" => "0.914",
@@ -101,8 +105,10 @@ my %WriteMakefileArgs = (
     "Sah::Schema::true" => 0,
     "Sah::Schema::uint" => 0,
     "Sort::ByExample" => 0,
+    "String::Pad" => "0.021",
     "Text::CSV_XS" => 0,
     "Text::CSV_XS::TSV" => 0,
+    "Text::Wrap::NoStrip" => "0.002",
     "Tie::IxHash" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -118,7 +124,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Needs" => 0
   },
-  "VERSION" => "1.008",
+  "VERSION" => "1.017",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -129,6 +135,7 @@ my %FallbackPrereqs = (
   "Capture::Tiny" => 0,
   "Complete::Module" => "0.262",
   "Complete::Util" => "0.616",
+  "Cwd" => 0,
   "Data::Cmp" => "0.002",
   "Data::Dmp" => "0.242",
   "Data::Sah" => "0.914",
@@ -165,11 +172,13 @@ my %FallbackPrereqs = (
   "Sah::Schema::true" => 0,
   "Sah::Schema::uint" => 0,
   "Sort::ByExample" => 0,
+  "String::Pad" => "0.021",
   "Test::Exception" => 0,
   "Test::More" => "0.98",
   "Test::Needs" => 0,
   "Text::CSV_XS" => 0,
   "Text::CSV_XS::TSV" => 0,
+  "Text::Wrap::NoStrip" => "0.002",
   "Tie::IxHash" => 0,
   "strict" => 0,
   "warnings" => 0

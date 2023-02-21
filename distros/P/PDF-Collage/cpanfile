@@ -1,0 +1,19 @@
+requires 'namespace::clean',   '0.27';
+requires 'perl',               '5.024000';
+requires 'Data::Resolver',     '0.002';
+requires 'Image::PNG::Libpng', '0.57';
+requires 'Moo',                '2.005005';
+requires 'PDF::Builder',       '3.025';
+requires 'Template::Perlish',  '1.58';
+
+on test => sub {
+   requires 'Path::Tiny', '0.084';
+};
+
+on develop => sub {
+   requires 'Path::Tiny',          '0.084';
+   requires 'Template::Perlish',   '1.52';
+   requires 'Test::Pod::Coverage', '1.04';
+   requires 'Test::Pod',           '1.51';
+   requires 'Test::Exception',     '0.43';
+};

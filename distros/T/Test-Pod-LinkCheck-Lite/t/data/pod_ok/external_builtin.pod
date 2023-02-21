@@ -2,6 +2,16 @@
 
 This POD contains a link to a built-in command, L<unlink|unlink>.
 
+NOTE that the test for proper handling of XE<lt>...E<gt> was expanded
+and moved to F<xt/author/perlpod.t>, since it made reference to POD over
+which I had no control. I am very grateful to Zaki Mughal (zmughal) for
+diagnosing the problem, developing the fix, submitting the pull request,
+and rattling my cage after I, for reasons inexplicable to me, ignored
+all this for a couple weeks. An equivalent (I hope!) test using only
+files under my control was added by modifying t/data/_lib/mu.pod to add
+an XE<lt>...E<gt> after the AUTHOR entry, which is referred to by
+F<t/data/pod_ok/external_installed_pod.pod>.
+
 =cut
 
 # ex: set textwidth=72 :

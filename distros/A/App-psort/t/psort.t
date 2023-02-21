@@ -349,6 +349,38 @@ EOF
 	 )
      },
 
+     do {
+	 my $in = <<EOF;
+xxx 3
+zzz 2
+yyy 1
+EOF
+	 my $out = <<EOF;
+yyy 1
+zzz 2
+xxx 3
+EOF
+	 (
+	  [["-n", "--rx", '\d+'], $in, $out, 1, 1],
+	 )
+     },
+
+     do {
+	 my $in = <<EOF;
+xxx /3/
+zzz /2/
+yyy /1/
+EOF
+	 my $out = <<EOF;
+yyy /1/
+zzz /2/
+xxx /3/
+EOF
+	 (
+	  [["-n", "--rx", '/(\d+)/'], $in, $out, 1, 1],
+	 )
+     },
+
      [["-C", '$a cmp $b'], <<EOF, <<EOF, 1, 1],
 c
 b
@@ -425,9 +457,15 @@ my @erroneous_test_defs =
      [['-MSort::Naturally=', '-C', 'ncmp($a,$b)'], "first test line\nsecond test line\n", qr{Undefined subroutine}],
     );
 
+my @warning_test_defs =
+    (
+     [["-n", "--rx", '/\d+/'], ("xxx 3\nzzz 2\nyyy 1\n") x 2, qr{\QNo regexp match. Maybe you want to omit the slashes, i.e. use --rx '\d+'?}],
+    );
+
 my $ok_test_count    = 4;
 my $error_test_count = 2;
-plan tests => 1 + $ok_test_count*@test_defs + $error_test_count*@erroneous_test_defs;
+my $warning_test_count = 3;
+plan tests => 1 + $ok_test_count*@test_defs + $error_test_count*@erroneous_test_defs + $warning_test_count*@warning_test_defs;
 
 SKIP: {
     skip "-x test does not work on Windows", 1
@@ -442,6 +480,10 @@ for my $test_def (@test_defs) {
 
 for my $test_def (@erroneous_test_defs) {
     run_psort_erroneous_testcase(@$test_def);
+}
+
+for my $test_def (@warning_test_defs) {
+    run_psort_warning_testcase(@$test_def);
 }
 
 sub _run_psort_testcase {
@@ -524,6 +566,20 @@ sub run_psort_testcase {
 sub run_psort_erroneous_testcase {
     my($args, $indata, $expected) = @_;
     _run_psort_testcase(1, $args, $indata, $expected);
+}
+
+sub run_psort_warning_testcase {
+    my($args, $indata, $expected, $expected_warning) = @_;
+
+    my($result) = _run_psort([@full_script, @$args], 1, \$indata);
+ SKIP: {
+	skip $result->{error}, $warning_test_count
+	    if $result->{error};
+	my $testlabel = !defined $args ? '<no args>' : "args: <@$args>";
+	ok $result->{cmdres}, "Expected success for $testlabel";
+	eq_or_diff $result->{stdout}, $expected, "Expected output for $testlabel";
+	like $result->{stderr}, $expected_warning, "Expected warning for $testlabel";
+    }
 }
 
 sub _run_psort {

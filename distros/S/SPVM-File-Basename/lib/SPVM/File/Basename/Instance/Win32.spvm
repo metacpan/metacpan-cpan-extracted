@@ -1,0 +1,41 @@
+class File::Basename::Instance::Win32 extends File::Basename::Instance::Unix {
+  
+  # Class Methods
+  static method new : File::Basename::Instance::Win32 () {
+    
+    my $self = new File::Basename::Instance::Win32;
+    
+    return $self;
+  }
+  
+  method fileparse : string[] ($path : string) {
+    unless ($path) {
+      die "The \$path must be defined";
+    }
+
+    my $dirpath = (string)undef;
+    my $basename = (string)undef;
+    
+    my $re = Regex->new("(?s)^((?:.*[:\\\/])?)(.*)");
+    if ($re->match($path)) {
+      $dirpath = $re->cap1;
+      $basename = $re->cap2;
+    }
+    
+    unless (Regex->new("[\\\/]\z")->match($dirpath)) {
+      $dirpath .= ".\\";
+    }
+    
+    return [$basename, $dirpath, ""];
+  }
+  
+  method _strip_trailing_sep : string ($path : string)  {
+    
+    my $re = Regex->new("([^:])[\\\/]*\z");
+    $path = $re->replace($path, method : string ($re : Regex) {
+      return $re->cap1;
+    });
+    
+    return $path;
+  }
+}

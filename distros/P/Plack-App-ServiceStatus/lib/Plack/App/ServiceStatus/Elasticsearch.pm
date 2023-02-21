@@ -2,7 +2,7 @@ package Plack::App::ServiceStatus::Elasticsearch;
 
 # ABSTRACT: Check Elasticsearch connection
 
-our $VERSION = '0.908'; # VERSION
+our $VERSION = '0.911'; # VERSION
 
 use 5.018;
 use strict;
@@ -30,7 +30,7 @@ Plack::App::ServiceStatus::Elasticsearch - Check Elasticsearch connection
 
 =head1 VERSION
 
-version 0.908
+version 0.911
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,404 @@
+NAME
+    App::BPOMUtils::Table::FoodCategory - List food categories in BPOM
+    processed food division
+
+VERSION
+    This document describes version 0.017 of
+    App::BPOMUtils::Table::FoodCategory (from Perl distribution
+    App-BPOMUtils-Table-FoodCategory), released on 2023-02-13.
+
+DESCRIPTION
+    This distribution contains the following CLIs:
+
+    *   bpom-daftar-kategori-pangan
+
+    *   bpom-daftar-kategori-pangan-rba
+
+    *   bpom-list-food-categories
+
+    *   bpom-list-food-categories-rba
+
+FUNCTIONS
+  bpom_list_food_categories
+    Usage:
+
+     bpom_list_food_categories(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    List food categories in BPOM processed food division.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   code => *str*
+
+        Only return records where the 'code' field equals specified value.
+
+    *   code.contains => *str*
+
+        Only return records where the 'code' field contains specified text.
+
+    *   code.in => *array[str]*
+
+        Only return records where the 'code' field is in the specified
+        values.
+
+    *   code.is => *str*
+
+        Only return records where the 'code' field equals specified value.
+
+    *   code.isnt => *str*
+
+        Only return records where the 'code' field does not equal specified
+        value.
+
+    *   code.matches => *str*
+
+        Only return records where the 'code' field matches specified regular
+        expression pattern.
+
+    *   code.max => *str*
+
+        Only return records where the 'code' field is less than or equal to
+        specified value.
+
+    *   code.min => *str*
+
+        Only return records where the 'code' field is greater than or equal
+        to specified value.
+
+    *   code.not_contains => *str*
+
+        Only return records where the 'code' field does not contain
+        specified text.
+
+    *   code.not_in => *array[str]*
+
+        Only return records where the 'code' field is not in the specified
+        values.
+
+    *   code.not_matches => *str*
+
+        Only return records where the 'code' field does not match specified
+        regular expression.
+
+    *   code.xmax => *str*
+
+        Only return records where the 'code' field is less than specified
+        value.
+
+    *   code.xmin => *str*
+
+        Only return records where the 'code' field is greater than specified
+        value.
+
+    *   detail => *bool* (default: 0)
+
+        Return array of full records instead of just ID fields.
+
+        By default, only the key (ID) field is returned per result entry.
+
+    *   exclude_fields => *array[str]*
+
+        Select fields to return.
+
+    *   fields => *array[str]*
+
+        Select fields to return.
+
+    *   name => *str*
+
+        Only return records where the 'name' field equals specified value.
+
+    *   name.contains => *str*
+
+        Only return records where the 'name' field contains specified text.
+
+    *   name.in => *array[str]*
+
+        Only return records where the 'name' field is in the specified
+        values.
+
+    *   name.is => *str*
+
+        Only return records where the 'name' field equals specified value.
+
+    *   name.isnt => *str*
+
+        Only return records where the 'name' field does not equal specified
+        value.
+
+    *   name.matches => *str*
+
+        Only return records where the 'name' field matches specified regular
+        expression pattern.
+
+    *   name.max => *str*
+
+        Only return records where the 'name' field is less than or equal to
+        specified value.
+
+    *   name.min => *str*
+
+        Only return records where the 'name' field is greater than or equal
+        to specified value.
+
+    *   name.not_contains => *str*
+
+        Only return records where the 'name' field does not contain
+        specified text.
+
+    *   name.not_in => *array[str]*
+
+        Only return records where the 'name' field is not in the specified
+        values.
+
+    *   name.not_matches => *str*
+
+        Only return records where the 'name' field does not match specified
+        regular expression.
+
+    *   name.xmax => *str*
+
+        Only return records where the 'name' field is less than specified
+        value.
+
+    *   name.xmin => *str*
+
+        Only return records where the 'name' field is greater than specified
+        value.
+
+    *   queries => *array[str]*
+
+        Search.
+
+        This will search all searchable fields with one or more specified
+        queries. Each query can be in the form of "-FOO" (dash prefix
+        notation) to require that the fields do not contain specified
+        string, or "/FOO/" to use regular expression. All queries must match
+        if the "query_boolean" option is set to "and"; only one query should
+        match if the "query_boolean" option is set to "or".
+
+    *   query_boolean => *str* (default: "and")
+
+        Whether records must match all search queries ('and') or just one
+        ('or').
+
+        If set to "and", all queries must match; if set to "or", only one
+        query should match. See the "queries" option for more details on
+        searching.
+
+    *   random => *bool* (default: 0)
+
+        Return records in random order.
+
+    *   result_limit => *int*
+
+        Only return a certain number of records.
+
+    *   result_start => *int* (default: 1)
+
+        Only return starting from the n'th record.
+
+    *   sort => *array[str]*
+
+        Order records according to certain field(s).
+
+        A list of field names separated by comma. Each field can be prefixed
+        with '-' to specify descending order instead of the default
+        ascending.
+
+    *   status => *str*
+
+        Only return records where the 'status' field equals specified value.
+
+    *   status.contains => *str*
+
+        Only return records where the 'status' field contains specified
+        text.
+
+    *   status.in => *array[str]*
+
+        Only return records where the 'status' field is in the specified
+        values.
+
+    *   status.is => *str*
+
+        Only return records where the 'status' field equals specified value.
+
+    *   status.isnt => *str*
+
+        Only return records where the 'status' field does not equal
+        specified value.
+
+    *   status.matches => *str*
+
+        Only return records where the 'status' field matches specified
+        regular expression pattern.
+
+    *   status.max => *str*
+
+        Only return records where the 'status' field is less than or equal
+        to specified value.
+
+    *   status.min => *str*
+
+        Only return records where the 'status' field is greater than or
+        equal to specified value.
+
+    *   status.not_contains => *str*
+
+        Only return records where the 'status' field does not contain
+        specified text.
+
+    *   status.not_in => *array[str]*
+
+        Only return records where the 'status' field is not in the specified
+        values.
+
+    *   status.not_matches => *str*
+
+        Only return records where the 'status' field does not match
+        specified regular expression.
+
+    *   status.xmax => *str*
+
+        Only return records where the 'status' field is less than specified
+        value.
+
+    *   status.xmin => *str*
+
+        Only return records where the 'status' field is greater than
+        specified value.
+
+    *   summary => *str*
+
+        Only return records where the 'summary' field equals specified
+        value.
+
+    *   summary.contains => *str*
+
+        Only return records where the 'summary' field contains specified
+        text.
+
+    *   summary.in => *array[str]*
+
+        Only return records where the 'summary' field is in the specified
+        values.
+
+    *   summary.is => *str*
+
+        Only return records where the 'summary' field equals specified
+        value.
+
+    *   summary.isnt => *str*
+
+        Only return records where the 'summary' field does not equal
+        specified value.
+
+    *   summary.matches => *str*
+
+        Only return records where the 'summary' field matches specified
+        regular expression pattern.
+
+    *   summary.max => *str*
+
+        Only return records where the 'summary' field is less than or equal
+        to specified value.
+
+    *   summary.min => *str*
+
+        Only return records where the 'summary' field is greater than or
+        equal to specified value.
+
+    *   summary.not_contains => *str*
+
+        Only return records where the 'summary' field does not contain
+        specified text.
+
+    *   summary.not_in => *array[str]*
+
+        Only return records where the 'summary' field is not in the
+        specified values.
+
+    *   summary.not_matches => *str*
+
+        Only return records where the 'summary' field does not match
+        specified regular expression.
+
+    *   summary.xmax => *str*
+
+        Only return records where the 'summary' field is less than specified
+        value.
+
+    *   summary.xmin => *str*
+
+        Only return records where the 'summary' field is greater than
+        specified value.
+
+    *   with_field_names => *bool*
+
+        Return field names in each record (as hash/associative array).
+
+        When enabled, function will return each record as hash/associative
+        array (field name => value pairs). Otherwise, function will return
+        each record as list/array (field value, field value, ...).
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-BPOMUtils-Table-FoodCategory>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-BPOMUtils-Table-FoodCategory>.
+
+SEE ALSO
+    App::BPOMUtils::Table::FoodCategoryRBA
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-BPOMUtils-Table-F
+    oodCategory>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

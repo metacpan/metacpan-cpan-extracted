@@ -1,0 +1,28 @@
+resources:
+  repositories:
+    - repository: ci-perl-helpers
+      type: github
+      name: houseabsolute/ci-perl-helpers
+      endpoint: houseabsolute
+
+stages:
+  - template: templates/helpers/build.yml@ci-perl-helpers
+    parameters:
+      debug: true
+
+  - template: templates/helpers/linux.yml@ci-perl-helpers
+    parameters:
+      debug: true
+      test_xt: true
+      use_default_perls: true
+
+  - template: templates/helpers/macos.yml@ci-perl-helpers
+    parameters:
+      debug: true
+      use_default_perls: true
+
+  - template: templates/helpers/windows.yml@ci-perl-helpers
+    parameters:
+      debug: true
+      use_default_perls: true
+

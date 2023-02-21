@@ -14,6 +14,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README
 README.md
+t/advanced_eval.t
 t/basic.t
 t/cli-check.t
 t/frames.t

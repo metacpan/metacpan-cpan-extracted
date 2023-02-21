@@ -3,7 +3,7 @@
 # under the same terms as Perl itself.
 
 package HTML::Mason::Cache::BaseCache;
-$HTML::Mason::Cache::BaseCache::VERSION = '1.59';
+$HTML::Mason::Cache::BaseCache::VERSION = '1.60';
 use strict;
 use warnings;
 

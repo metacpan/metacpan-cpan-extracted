@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
 
-package Future::IO 0.12;
+package Future::IO 0.13;
 
 use v5.14;
 use warnings;

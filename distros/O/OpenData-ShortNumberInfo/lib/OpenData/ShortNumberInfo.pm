@@ -2,46 +2,54 @@ package OpenData::ShortNumberInfo;
 # ABSTRACT: Perl interface to OpenData ShortNumberInfo web service
 
 
-use v5.36;
-use Object::Pad;
+use v5.37.9;
+use experimental qw( class builtin try );
 
 class OpenData::ShortNumberInfo {
-	use HTTP::Tiny;
-	use URI;
-	use JSON::PP;
+  use HTTP::Tiny;
+  use URI;
+  use JSON::PP;
 
-	field $number :param //= 103;
+  # @format:off
+  field $number :
+  param //= 103;
+  # @format:on
 
-	# TODO: accessor $name
+  method number ( ) {
+    return $number;
+  }
 
 
-	method name ( $number ) {
-		# Construct API URL
-		my $uri = URI -> new( 'https://api.opendata.az' );
-		$uri -> path_segments(
-			'v1',              # version
-			'json',            # format
-			'nrytn',           # organization
-			'ShortNumberInfo', # service
-			$number            # parameter
-		);
+  method name ( ) {
+    # Construct API URL
+    my $uri = URI -> new( 'https://api.opendata.az' );
+    $uri -> path_segments(
+      'v1' ,              # version
+      'json' ,            # format
+      'nrytn' ,           # organization
+      'ShortNumberInfo' , # service
+      $number             # parameter
+    );
 
-		# Issue HTTP request to get the web page
-		my $http = HTTP::Tiny -> new();
-		my $response = $http -> get( $uri ); # RV: HR
+    # Issue HTTP request to get the web page
+    my $http = HTTP::Tiny -> new;
+    my $response = $http -> get( $uri ); # RV: HR
 
-		# Convert JSON from HTTP response into Perl hash
-		my $json = JSON -> new();
-		my $content = $json -> decode( $response -> {content} );
+    # Convert JSON from HTTP response into Perl hash
+    my $json = JSON::PP -> new;
+    my $content = $json -> decode( $response -> {content} );
 
-		unless ( defined( $content -> {StatusMessage} ) ) {
-			return $content -> {Response} -> [0] -> {Name};
-		}
-		else {
-			STDERR -> say( $content -> {StatusMessage} );
-			exit 2;
-		}
-	}
+    unless ( defined $content -> {StatusMessage} ) {
+      return $content -> {Response} -> [0] -> {Name};
+    }
+    else {
+      STDERR -> say( $content -> {StatusMessage} );
+      exit 2;
+
+    }
+  }
+
+
 }
 
 __END__
@@ -56,7 +64,7 @@ OpenData::ShortNumberInfo - Perl interface to OpenData ShortNumberInfo web servi
 
 =head1 VERSION
 
-version 0.230380
+version 0.230470
 
 =head1 SYNOPSIS
 
@@ -65,20 +73,21 @@ version 0.230380
   my $shortnumberinfo =
 	  OpenData::ShortNumberInfo -> new( number => 101 );
 
-  say $shortnumberinfo -> name();
+  say $shortnumberinfo -> name;
+
+=head1 ATTRIBUTES
+
+=head2 number
+
+Returns the three digit phone number the object was constructed with
 
 =head1 METHODS
 
 =head2 name
 
-Take a 3 digit phone number and return the organization it belongs to
-Prints a message to standard error stream exiting with the status code of 2
-if there's no organization for the number specified
+Takes a 3 digit phone number, and returns the organization name it belongs to.
 
-=head1 SEE ALSO
-
-=for :list * Your::Module
-* Your::Package
+Prints a message to standard error stream exiting with the status code of 2 if there's no organization found for the number specified.
 
 =head1 AUTHOR
 

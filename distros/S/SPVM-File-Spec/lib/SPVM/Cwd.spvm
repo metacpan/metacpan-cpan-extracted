@@ -18,7 +18,7 @@ class Cwd {
     if (Sys->defined("_WIN32")) {
       my $realpath = Sys::IO->_fullpath(undef, $file, 0);
       
-      $realpath = (mutable string)File::Spec->new->canonpath($realpath);
+      $realpath = (mutable string)File::Spec->canonpath($realpath);
       
       Fn->replace_chars($realpath, '\\', '/');
       

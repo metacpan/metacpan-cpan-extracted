@@ -4,7 +4,7 @@ use strict;
 
 use base qw/ CGI::Widget::DBI::Search::Base /;
 use vars qw/ $VERSION /;
-$CGI::Widget::DBI::Browse::VERSION = '0.17';
+$CGI::Widget::DBI::Browse::VERSION = '0.18';
 
 use DBI;
 use CGI::Widget::DBI::Search 0.31;
@@ -103,8 +103,13 @@ Creates and initializes a new CGI::Widget::DBI::Browse object.
   -category_column_closures
                         => {HASH} of (CODE): Reference to a hash containing a code
                            reference for each category column which should be passed 
-                           through before displaying.  Similar to the -columndata_closures
-                           option of CGI::Widget::DBI::Search.
+                           through before displaying.  The content returned by the closure
+                           is displayed inside the <a/> navigation tag for the category.
+                           Similar to the -columndata_closures option of CGI::Widget::DBI::Search.
+  -category_before_link_closures
+                        => {HASH} of (CODE): Reference to a hash containing a code
+                           reference for each category column which is called to render
+                           content to display before the <a/> navigation tag for the category.
 
 =item Search result display options
 
@@ -124,6 +129,8 @@ Creates and initializes a new CGI::Widget::DBI::Browse object.
                            the actual search and displaying results are executed.  Useful
                            when behavior of the widget is dependent on whether we are
                            browsing or not. (i.e. the return value of is_browsing())
+  -default_grid_layout  => If true, defaults to -display_mode => 'grid' mode for viewing
+                           results, with link to switch to 'table' mode.
 
 =item Performance options
 
@@ -198,7 +205,7 @@ sub _is_browsing {
 sub parent_category_column {
     my ($self) = @_;
     $self->_set_category_index() if ! defined $self->{_category_idx};
-    return $self->{-category_columns}->[ -1 ] if ! $self->_is_browsing() && ! $self->{'auto_skip_in_effect'};
+    return $self->{-category_columns}->[ -1 ] if !( $self->_is_browsing() || $self->{'auto_skip_in_effect'});
     return undef if $self->{_category_idx} == 0;
     return $self->{-category_columns}->[ $self->{_category_idx} - 1 ];
 }
@@ -242,10 +249,8 @@ sub configure_search_for_category_browse {
       @{ $self->{-category_sql_retrieve_columns}->{$category_column} || [] };
     $ws->{-sql_search_columns} = undef;
     $ws->{-sql_retrieve_columns} = [
-        $ws->full_sql_column_for_alias($category_column), @extra_category_retr_cols,
+        q|COALESCE(|.$ws->sql_column_with_tbl_alias_for_alias($category_column).q|, '') AS |.$category_column, @extra_category_retr_cols,
     ];
-    $ws->{-where_clause} .= ($ws->{-where_clause} ? ' AND ' : '')
-      . $ws->sql_column_with_tbl_alias_for_alias($category_column) . ' IS NOT NULL';
     $ws->{-display_columns} = {
         $category_column => $ws->{-display_columns}->{$category_column} || $category_column
     };
@@ -376,7 +381,7 @@ results, i.e. present in -sql_retrieve_columns.
 =cut
 
 sub display_results {
-    my ($self) = @_;
+    my ($self, $override_disp_cols) = @_;
     my $q = $self->{q};
     my $ws = $self->{ws};
 
@@ -387,9 +392,12 @@ sub display_results {
     $self->{'filter_columns'} = [ grep($q->param($_), @{ $self->{-category_columns} }) ];
     if (@{ $self->{'filter_columns'} }) {
         $ws->{-where_clause} = ($ws->{-where_clause} ? '('.$ws->{-where_clause}.') AND ' : '').join(
-            ' AND ', map {$_.' = ?'} map { $ws->sql_column_with_tbl_alias_for_alias($_) } @{ $self->{'filter_columns'} }
+            ' AND ', map { q|COALESCE(|.$_.q|, '') = ?| } map { $ws->sql_column_with_tbl_alias_for_alias($_) } @{ $self->{'filter_columns'} }
         );
-        $ws->{-bind_params} = [ @{ $ws->{-bind_params} || [] }, map { $q->param($_) } @{ $self->{'filter_columns'} } ];
+        $ws->{-bind_params} = [
+            @{ $ws->{-bind_params} || [] },
+            map { my $val = $q->param($_); $val eq '(empty)' ? '' : $val; } @{ $self->{'filter_columns'} },
+        ];
 
         map {
             $ws->{-href_extra_vars}->{$_} = undef;
@@ -407,12 +415,11 @@ sub display_results {
     $ws->{-form_extra_vars}->{'_browse_skip_to_results_'} = undef;
 
     $self->add_breadcrumbs_to_header();
-
     $self->build_results();
 
     my $html;
     eval {
-        if ($self->{ws}->init_display_class()) {
+        if ($self->{ws}->init_display_class($override_disp_cols)) {
             $self->{ws}->{display}->{b} = $self; # circular ref, must break with _break_circular_references()
             $html = $self->{ws}->{display}->display();
         }
@@ -437,10 +444,8 @@ sub auto_skip_to_results {
         # skip to results if we are browsing but we reach a category which has just 0 or 1 members
         $self->{ws} = $self->{old_ws};
         $self->{-skip_to_results} = $self->{'auto_skip_in_effect'} = 1;
-        $self->{'_added_breadcrumbs'} = 0;
-        $self->add_breadcrumbs_to_header();
-        $self->{-post_auto_skip_callback}->($self)
-          if ref $self->{-post_auto_skip_callback} eq 'CODE';
+        $self->re_add_breadcrumbs_to_header();
+        $self->{-post_auto_skip_callback}->($self) if ref $self->{-post_auto_skip_callback} eq 'CODE';
         $self->{ws}->search();
     }
 }
@@ -453,7 +458,7 @@ sub display_cached_category_results {
     $self->_create_category_cache_table();
 
     my $parent_category = $self->parent_category_column();
-    my $parent_value = $self->decode_utf8($self->{q}->param($parent_category));
+    my $parent_value = $self->decode_utf8(scalar $self->{q}->param($parent_category));
 
     if (! $self->category_value_is_cached($parent_category, $parent_value)) {
         $self->cache_results_for_category_value($parent_category, $parent_value);
@@ -479,7 +484,7 @@ sub display_cached_category_results {
         $sth = $ws->{-dbh}->prepare_cached(qq|
             SELECT DISTINCT @{[ join ',', map { $ws->full_sql_column_for_alias($_) } ($category_column, @$extra_cols) ]}
             FROM @{[ $ws->{-sql_table} ]}
-            WHERE @{[ $ws->full_sql_column_for_alias($category_column) ]}
+            WHERE @{[ $ws->sql_column_with_tbl_alias_for_alias($category_column) ]}
               IN ( @{[ join ',', map {'?'} @{ $ws->{'results'} } ]} )
             ORDER BY $category_column
         |);
@@ -499,6 +504,12 @@ sub display_cached_category_results {
 
 sub category_title { return shift->{'category_title'} || '' }
 
+sub re_add_breadcrumbs_to_header {
+    my ($self) = @_;
+    $self->{'_added_breadcrumbs'} = 0;
+    $self->add_breadcrumbs_to_header();
+}
+
 sub add_breadcrumbs_to_header {
     my ($self) = @_;
     return if $self->{'_added_breadcrumbs'};
@@ -512,23 +523,23 @@ sub add_breadcrumbs_to_header {
         @{ $self->{'filter_columns'} }, '_browse_skip_to_results_', @{ $self->{-exclude_vars_from_breadcrumbs}||[] },
     ]);
     $self->{'category_title'} = '';
-    $self->{'breadcrumbs'} = ['Top'];
-    $self->{'breadcrumb_links'} = [ '<a href="?'.$extra_vars.'" class="breadcrumbNavLink">'.$ws->translate('Top').'</a>' ];
+    $self->{'breadcrumbs'} = [ 'Top' ];
+    $self->{'breadcrumb_links'} = [ '<a href="?'.$extra_vars.'" class="breadcrumbNavLink" id="breadcrumbNavLink-Top"><span>'.$ws->translate('Top').'</span></a>' ];
 
     foreach (@{ $self->{'filter_columns'} }) {
-        my $breadcrumb_name = $self->decode_utf8($q->param($_));
+        my $breadcrumb_name = $self->decode_utf8(scalar $q->param($_));
         $self->{'category_title'} = join(' > ', $self->{'category_title'} || (), $breadcrumb_name || ());
         push(@cume_category_filters, _uri_param_pair($_, $breadcrumb_name));
         push(@{ $self->{'breadcrumbs'} }, $breadcrumb_name);
         push(@{ $self->{'breadcrumb_links'} },
-             '<a href="?'.join('&', @cume_category_filters, $extra_vars||()).'" class="breadcrumbNavLink">'.$breadcrumb_name.'</a>');
+             '<a href="?'.join('&amp;', @cume_category_filters, $extra_vars||()).'" class="breadcrumbNavLink" id="breadcrumbNavLink-'.CGI::escapeHTML($breadcrumb_name).'"><span>'.$breadcrumb_name.'</span></a>');
     }
 
     my $skip_to_results = '';
     if ($self->is_browsing() && ! $self->{-skip_to_results}) {
         $skip_to_results = '&nbsp;&nbsp;&nbsp;&nbsp;<i> &rarr; <a href="?'.join(
-            '&', @cume_category_filters, '_browse_skip_to_results_=1', $extra_vars||(),
-        ).'" id="skipToResultsLink"><span>'.$ws->translate('Show all items in this category').'</span></a></i>';
+            '&amp;', @cume_category_filters, '_browse_skip_to_results_=1', $extra_vars||(),
+        ).'" class="breadcrumbNavLink" id="skipToResultsLink"><span>'.$ws->translate('Show all items in this category').'</span></a></i>';
     } elsif ($q->param('_browse_skip_to_results_')) {
         $self->{'category_title'} .= ' ('.$ws->translate('all results').')';
     } elsif (! $self->{-skip_to_results}) {
@@ -536,10 +547,39 @@ sub add_breadcrumbs_to_header {
         $self->{'category_title'} .= ' ('.$ws->translate('results').')';
     }
 
+    $self->configure_grid_or_table_view() if ! $self->is_browsing();
     $ws->{-optional_header} .= '<div id="breadcrumbNavDiv">'.join('&nbsp;&gt;&nbsp;', @{ $self->{'breadcrumb_links'} }).$skip_to_results.'</div>'
       . '<div class="categoryContentDiv" id="categoryContentDiv-'.join('__', @{ $self->{'breadcrumbs'} }).'"></div>'; # available for CSS-configured content
 
     $self->{'_added_breadcrumbs'} = 1;
+}
+
+sub grid_layout_enabled {
+    my ($self) = @_;
+    return ! $self->{-default_grid_layout} && $self->{q}->param('grid_layout')
+      || $self->{-default_grid_layout} && ! $self->{q}->param('no_grid_layout');
+}
+
+sub configure_grid_or_table_view {
+    my ($self) = @_;
+    my $ws = $self->{ws};
+
+    my $grid_layout_on = $self->grid_layout_enabled();
+    if ($grid_layout_on) {
+        $ws->{-display_mode} = 'grid';
+        $ws->{-grid_columns} ||= 4; # TODO: should call _set_display_defaults() somehow, but can't from outside $ws->display_results()
+        if ($ws->{-max_results_per_page} % $ws->{-grid_columns} != 0) {
+            # logic to round -max_results_per_page up to next integer large enough to be divisible by -grid_columns
+            $ws->{-max_results_per_page} = (int($ws->{-max_results_per_page} / $ws->{-grid_columns}) + 1) * $ws->{-grid_columns};
+        }
+    }
+
+    my $extra_vars = $ws->extra_vars_for_uri([ qw/grid_layout no_grid_layout/ ]);
+    $ws->{-optional_header} .= '<div id="gridTableViewLinkDiv" style="float: right;">'.$ws->translate('view').': '
+      . ($grid_layout_on
+         ? '<a href="?'.($self->{-default_grid_layout} ? 'no_grid_layout=1&amp;' : '').$extra_vars.'">'.$ws->translate('table').'</a> | <b>'.$ws->translate('grid').'</b>'
+         : '<b>'.$ws->translate('table').'</b> | <a href="?'.($self->{-default_grid_layout} ? '' : 'grid_layout=1&amp;').$extra_vars.'">'.$ws->translate('grid').'</a>')
+      . '</div>';
 }
 
 sub _uri_param_pair {
@@ -560,7 +600,7 @@ sub link_for_category_column {
     my $extra_vars = $self->{ws}->extra_vars_for_uri([ @{ $self->{'filter_columns'} }, '_browse_skip_to_results_', @exclude_params ]);
     my $category_decoded = $self->decode_utf8($row->{$category_col});
     return $col_found
-      ? '<a href="?'.join('&', (map { _uri_param_pair($_, $self->decode_utf8($row->{$_})) } @cols), $extra_vars || ()).'" id="jumpToCategoryLink">'
+      ? '<a href="?'.join('&amp;', (map { _uri_param_pair($_, $self->decode_utf8($row->{$_})) } @cols), $extra_vars || ()).'" id="jumpToCategoryLink">'
         .$category_decoded.'</a>'
       : $category_decoded;
 }
@@ -568,17 +608,17 @@ sub link_for_category_column {
 sub _category_columndata_closure {
     my ($self, $category_col) = @_;
     my $existing_category_filters =
-      join('&', map { _uri_param_pair($_, $self->decode_utf8($self->{q}->param($_))) } @{ $self->{'filter_columns'} });
+      join('&amp;', map { _uri_param_pair($_, $self->decode_utf8(scalar $self->{q}->param($_))) } @{ $self->{'filter_columns'} });
+    my $before_link_closure = $self->{-category_before_link_closures}->{$category_col};
+    my $column_closure = $self->{-category_column_closures}->{$category_col};
+    my @filter_columns = @{ $self->{'filter_columns'} };
     return sub {
         my ($sd, $row) = @_;
-        my $category_decoded = $self->decode_utf8($row->{$category_col});
-        my $category_display_value =
-          ref $self->{-category_column_closures}->{$category_col} eq 'CODE'
-            ? $self->{-category_column_closures}->{$category_col}->($sd, $row)
-            : $category_decoded;
-        my $extra_vars = $sd->extra_vars_for_uri([ @{ $self->{'filter_columns'} }, '_browse_skip_to_results_' ]);
-        return '<a href="?'.join(
-            '&', $existing_category_filters || (),
+        my $category_decoded = $sd->decode_utf8($row->{$category_col}) || '(empty)';
+        my $category_display_value = ref $column_closure eq 'CODE' ? $column_closure->($sd, $row) : $category_decoded;
+        my $extra_vars = $sd->extra_vars_for_uri([ @filter_columns, '_browse_skip_to_results_' ]);
+        return ($before_link_closure ? $before_link_closure->($sd, $row) : '').'<a href="?'.join(
+            '&amp;', $existing_category_filters || (),
             _uri_param_pair($category_col, $category_decoded),
             $extra_vars || (),
         ).'" id="categoryNavLink-'.CGI::escapeHTML($category_decoded).'">'.$category_display_value.'</a>'; # TODO: HTML::Escape is faster than CGI

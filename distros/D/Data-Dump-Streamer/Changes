@@ -1,3 +1,9 @@
+2.42
+
+Perltidy source to my preferred format. Fixed issues serializing
+the global stash. Added test to detect if serializing the global
+stash breaks anything. 
+
 2.41
 
 Merged in all the open PR's. Some MUCH much later than I originally

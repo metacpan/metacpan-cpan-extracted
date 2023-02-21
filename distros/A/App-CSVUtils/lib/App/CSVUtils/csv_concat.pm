@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-03'; # DATE
+our $DATE = '2023-02-18'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.008'; # VERSION
+our $VERSION = '1.017'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -68,6 +68,11 @@ _
     on_input_header_row => sub {
         my $r = shift;
 
+        # after we read the header row of each input file, we record the fields
+        # as well as the filehandle, so we can resume reading the data rows
+        # later. before printing all the rows, we collect all the fields from
+        # all files first.
+
         push @{ $r->{all_input_fields} }, $r->{input_fields};
         push @{ $r->{all_input_fh} }, $r->{input_fh};
         $r->{wants_skip_file}++;
@@ -124,7 +129,7 @@ App::CSVUtils::csv_concat - Concatenate several CSV files together, collecting a
 
 =head1 VERSION
 
-This document describes version 1.008 of App::CSVUtils::csv_concat (from Perl distribution App-CSVUtils), released on 2023-02-03.
+This document describes version 1.017 of App::CSVUtils::csv_concat (from Perl distribution App-CSVUtils), released on 2023-02-18.
 
 =head1 FUNCTIONS
 
@@ -173,6 +178,40 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<inplace> => I<true>
+
+Output to the same file as input.
+
+Normally, you output to a different file than input. If you try to output to the
+same file (C<-o INPUT.csv -O>) you will clobber the input file; thus the utility
+prevents you from doing it. However, with this C<--inplace> option, you can
+output to the same file. Like perl's C<-i> option, this will first output to a
+temporary file in the same directory as the input file then rename to the final
+file at the end. You cannot specify output file (C<-o>) when using this option,
+but you can specify backup extension with C<-b> option.
+
+Some caveats:
+
+=over
+
+=item * if input file is a symbolic link, it will be replaced with a regular file;
+
+=item * renaming (implemented using C<rename()>) can fail if input filename is too long;
+
+=item * value specified in C<-b> is currently not checked for acceptable characters;
+
+=item * things can also fail if permissions are restrictive;
+
+=back
+
+=item * B<inplace_backup_ext> => I<str> (default: "")
+
+Extension to add for backup of input file.
+
+In inplace mode (C<--inplace>), if this option is set to a non-empty string, will
+rename the input file using this extension as a backup. The old existing backup
+will be overwritten, if any.
+
 =item * B<input_escape_char> => I<str>
 
 Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
@@ -217,6 +256,18 @@ Overriden by C<--input-sep-char>, C<--input-quote-char>, C<--input-escape-char>
 options. If one of those options is specified, then C<--input-tsv> will be
 ignored.
 
+=item * B<output_always_quote> => I<bool> (default: 0)
+
+Whether to always quote values.
+
+When set to false (the default), values are quoted only when necessary:
+
+ field1,field2,"field three contains comma (,)",field4
+
+When set to true, then all values will be quoted:
+
+ "field1","field2","field three contains comma (,)","field4"
+
 =item * B<output_escape_char> => I<str>
 
 Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
@@ -251,6 +302,18 @@ Specify field quote character in output CSV, will be passed to Text::CSV_XS.
 This is like C<--input-quote-char> option but for output instead of input.
 
 Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_quote_empty> => I<bool> (default: 0)
+
+Whether to quote empty values.
+
+When set to false (the default), empty values are not quoted:
+
+ field1,field2,,field4
+
+When set to true, then empty values will be quoted:
+
+ field1,field2,"",field4
 
 =item * B<output_sep_char> => I<str>
 

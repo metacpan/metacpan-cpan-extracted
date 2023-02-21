@@ -1,3 +1,11 @@
+0.002   2022-11-29  Released-By: PERLANCAR; Urgency: medium
+
+        - Add entries: Bencher, Acme::CPANAuthors, Acme::CPANModules,
+          ScriptX, ArrayData, HashData, Games::Word::Wordlist,
+          Games::Word::Phraselist, TableData, Regexp::Common,
+          Regexp::Pattern; replace Sah with Data::Sah.
+
+
 0.001   2021-03-25  Released-By: PERLANCAR
 
         - First release.

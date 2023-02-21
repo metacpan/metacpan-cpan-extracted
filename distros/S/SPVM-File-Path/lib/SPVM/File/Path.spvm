@@ -1,0 +1,108 @@
+class File::Path {
+  use Hash;
+  use StringBuffer;
+  use StringList;
+  use Sys::FileTest;
+  use Sys::IO;
+  use Cwd;
+  use File::Basename;
+  
+  static method mkpath : int ($path : string, $options = undef : object[]) {
+    
+    unless ($path) {
+      die "The \$path must be defined";
+    }
+    
+    unless (length $path >= 0) {
+      die "The length of \$path must be greater than or equal to 0";
+    }
+    
+    my $options_h = Hash->new($options);
+    
+    my $mode = $options_h->delete_or_default_int("mode", -1);
+    
+    if ($mode < 0) {
+      $mode = 0777;
+    }
+    
+    my $created = 0;
+    &_mkpath_recursive($path, \$created, $mode);
+    
+    return $created;
+  }
+  
+  private static method _mkpath_recursive : void ($path : string, $created_ref : int*, $mode : int) {
+    unless (Sys::FileTest->d($path)) {
+      
+      my $parent = File::Basename->dirname($path);
+      
+      unless (Sys::FileTest->d($parent) || $path eq $parent ) {
+        &_mkpath_recursive($parent, $created_ref, $mode);
+      }
+      
+      Sys::IO->mkdir($path, $mode);
+      $$created_ref++;
+    }
+  }
+  
+  static method make_path : int ($path : string, $options = undef : object[]) {
+    return &mkpath($path, $options);
+  }
+
+  static method rmtree : int ($path : string) {
+
+    unless ($path) {
+      die "The \$path must be defined";
+    }
+    
+    unless (length $path >= 0) {
+      die "The length of \$path must be greater than or equal to 0";
+    }
+    
+    my $removed_count  = 0;
+    &_rmtree_recursive($path, \$removed_count);
+    
+    return $removed_count;
+  }
+
+  private static method _rmtree_recursive : void ($path : string, $removed_count_ref : int*) {
+    my $curdir = File::Spec->curdir;
+    my $updir  = File::Spec->updir;
+    
+    if (Sys::FileTest->d($path)) {
+      my $dh = Sys::IO->opendir($path);
+      my $file_base_names_list = StringList->new;
+      
+      while (my $dir_ent = Sys::IO->readdir($dh)) {
+        my $file_base_name = $dir_ent->d_name;
+        if ($file_base_name eq $updir) {
+          next;
+        }
+        
+        if ($file_base_name eq $curdir) {
+          next;
+        }
+        
+        $file_base_names_list->push($file_base_name);
+      }
+      
+      if ($file_base_names_list->length > 0) {
+        my $file_base_names = $file_base_names_list->to_array;
+        for my $file_base_name (@$file_base_names) {
+          my $child_dir = "$path/$file_base_name";
+          &_rmtree_recursive($child_dir, $removed_count_ref);
+        }
+      }
+      Sys::IO->rmdir($path);
+      $$removed_count_ref++;
+    }
+    else {
+      Sys::IO->unlink($path);
+      $$removed_count_ref++;
+    }
+  }
+  
+  static method remove_tree : int ($path : string) {
+    return &rmtree($path);
+  }
+}

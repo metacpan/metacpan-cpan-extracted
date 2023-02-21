@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use IO::Handle;
 
@@ -25,7 +25,7 @@ use Future::IO;
 
    is( scalar $f->get, 3, 'Future::IO->syswrite_exactly eventually writes all bytes' );
 
-   is_deeply( \@written, [ "ABC", "BC", "C" ], 'IO::Handle->syswrite override worked' );
+   is( \@written, [ "ABC", "BC", "C" ], 'IO::Handle->syswrite override worked' );
 
    $rd->read( my $buf, 3 );
    is( $buf, "ABC", 'Future::IO->syswrite_exactly wrote bytes' );

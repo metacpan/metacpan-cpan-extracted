@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-03'; # DATE
+our $DATE = '2023-02-18'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.008'; # VERSION
+our $VERSION = '1.017'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_uniq/csv_uniq",
@@ -41,7 +41,7 @@ csv-uniq - Report or omit duplicated values in CSV
 
 =head1 VERSION
 
-This document describes version 1.008 of csv-uniq (from Perl distribution App-CSVUtils), released on 2023-02-03.
+This document describes version 1.017 of csv-uniq (from Perl distribution App-CSVUtils), released on 2023-02-18.
 
 =head1 SYNOPSIS
 
@@ -304,11 +304,11 @@ For fish and zsh, install L<shcompgen> as described above.
 
 =head1 EXAMPLES
 
-=head2 Check that column foo in CSV is unique, compare case-insensitively, report duplicates
+=head2 Check that field "foo" in CSV is unique, compare case-insensitively, report duplicates
 
  % csv-uniq file.csv -i foo
 
-=head2 Check that combination of columns foo, bar, baz in CSV is unique, report duplicates
+=head2 Check that combination of fields "foo", "bar", "baz" in CSV is unique, report duplicates
 
  % csv-uniq file.csv foo bar baz
 

@@ -1,5 +1,6 @@
 Build.PL
 Changes
+examples/demo-formatting.pl
 examples/demo-show.pl
 lib/String/Tagged.pm
 lib/String/Tagged/Extent.pm

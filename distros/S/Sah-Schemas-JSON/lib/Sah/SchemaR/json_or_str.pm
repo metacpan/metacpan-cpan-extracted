@@ -1,10 +1,10 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::json_or_str;
 
-our $DATE = '2022-08-26'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2022-11-15'; # DATE
+our $VERSION = '0.007'; # VERSION
 
-our $rschema = do{my$var={base=>"any",clsets_after_base=>[{description=>"\nYou can use this schema if you want to accept any data (a data structure or\nsimple scalar), and if user supplies a defined string e.g. in a command-line\nscript as command-line argument or option, it will be tried to be JSON-decoded\nfirst. If the string does not contain valid JSON, it will be left as-is as\nstring.\n\nThis schema is convenient on the command-line where you want to accept data\nstructure via command-line argument or option. But you have to be careful when\nyou want to pass a string like `null`, `true`, `false`; you have to quote it to\n`\"null\"`, `\"true\"`, `\"false\"` to prevent it being decoded into undef or\nboolean values.\n\n",examples=>[{summary=>"Empty string, left as-is as string",valid=>1,value=>""},{valid=>1,value=>1},{summary=>"JSON-decoded and becomes undef",valid=>1,validated_value=>undef,value=>"null"},{summary=>"JSON-decoded into string",valid=>1,validated_value=>"null",value=>"\"null\""},{summary=>"JSON-decoded into array",valid=>1,validated_value=>[1,2,3,{}],value=>"[1,2,3,{}]"},{summary=>"Left as-is as string since it is invalid JSON (missing closing square bracket)",valid=>1,value=>"[1,2"},{summary=>"Left as-is as string since it is invalid JSON (dangling comma)",valid=>1,value=>"[1,2,]"},{summary=>"Not coerced, already an array",valid=>1,value=>[1,2]},{summary=>"Not coerced, already a hash",valid=>1,value=>{}},{summary=>"Not coerced, already an undef",valid=>1,value=>undef}],prefilters=>["Str::try_decode_json"],summary=>"A JSON-encoded data or string"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["any"],type=>"any",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
+our $rschema = do{my$var={base=>"any",clsets_after_base=>[{description=>"\nYou can use this schema if you want to accept any data (a data structure or\nsimple scalar), and if user supplies a defined string e.g. in a command-line\nscript as command-line argument or option, it will be tried to be JSON-decoded\nfirst. If the string does not contain valid JSON, it will be left as-is as\nstring.\n\nThis schema is convenient on the command-line where you want to accept data\nstructure via command-line argument or option. But you have to be careful when\nyou want to pass a string like `null`, `true`, `false`; you have to quote it to\n`\"null\"`, `\"true\"`, `\"false\"` to prevent it being decoded into undef or\nboolean values.\n\nSee also related schema: `json_str`, `str::encoded_json`, `str::escaped_json`.\n\n",examples=>[{summary=>"Empty string, left as-is as string",valid=>1,value=>""},{valid=>1,value=>1},{summary=>"JSON-decoded and becomes undef",valid=>1,validated_value=>undef,value=>"null"},{summary=>"JSON-decoded into string",valid=>1,validated_value=>"null",value=>"\"null\""},{summary=>"JSON-decoded into array",valid=>1,validated_value=>[1,2,3,{}],value=>"[1,2,3,{}]"},{summary=>"Left as-is as string since it is invalid JSON (missing closing square bracket)",valid=>1,value=>"[1,2"},{summary=>"Left as-is as string since it is invalid JSON (dangling comma)",valid=>1,value=>"[1,2,]"},{summary=>"Not coerced, already an array",valid=>1,value=>[1,2]},{summary=>"Not coerced, already a hash",valid=>1,value=>{}},{summary=>"Not coerced, already an undef",valid=>1,value=>undef}],prefilters=>["Str::try_decode_json"],summary=>"A JSON-encoded data or string"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["any"],type=>"any",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: A JSON-encoded data or string
@@ -21,7 +21,7 @@ Sah::SchemaR::json_or_str - A JSON-encoded data or string
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::SchemaR::json_or_str (from Perl distribution Sah-Schemas-JSON), released on 2022-08-26.
+This document describes version 0.007 of Sah::SchemaR::json_or_str (from Perl distribution Sah-Schemas-JSON), released on 2022-11-15.
 
 =head1 DESCRIPTION
 

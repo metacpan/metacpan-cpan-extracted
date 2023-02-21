@@ -382,6 +382,7 @@ sub stroke_primitive
 
 	$path = $path->widen(
 		linePattern => ( $lp eq lp::Null) ? lp::Solid : $lp,
+		(!$self->antialias && $self->lineWidth == 0) ? (lineWidth => 1) : (),
 	);
 	return unless $self->graphic_context_push;
 	$self->fillPattern(fp::Solid);
@@ -494,7 +495,7 @@ sub render_pattern
 
 	return unless $matrix || $margin[0] != 0 || $margin[1] != 0;
 	if ( $margin[0] < 0 || $margin[1] < 0 ) {
-		warn "render_patern: bad margin";
+		warn "render_pattern: bad margin";
 		return;
 	}
 

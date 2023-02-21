@@ -25,7 +25,7 @@ __PACKAGE__->create_accessors( qw(
     _hipi_baseaddr peripheral address _function_mode _clock_divider _baud_reference readmode
 ));
 
-our $VERSION ='0.65';
+our $VERSION ='0.66';
 
 our @EXPORT = ();
 our @EXPORT_OK = ();
@@ -152,11 +152,9 @@ sub new {
     
     # initialise
     HiPi::BCM2835::bcm2835_init();
-    
     $params{_hipi_baseaddr} = ( $params{peripheral} == BB_I2C_PERI_1 )
         ? BCM2835_BSC1_BASE
         : BCM2835_BSC0_BASE;
-
     my $self = $class->SUPER::new(%params);
     
     unless( $self->i2c_begin() ) {
@@ -277,8 +275,25 @@ sub i2c_read_register_rs {
     my $error = ( $self->_function_mode eq 'corelib' )
         ? HiPi::BCM2835::bcm2835_i2c_read_register_rs( $writebuffer, $readbuffer, $numbytes )
         : HiPi::BCM2835::_hipi_i2c_read_register_rs( $self->_hipi_baseaddr, $writebuffer, $readbuffer, $numbytes );
-
+    
     croak qq(i2c_read_register_rs failed with error $error) if $error;
+    my $template = ( $numbytes > 1 ) ? 'C' . $numbytes : 'C';
+    my @values = unpack($template, $readbuffer);    
+    return @values;
+}
+
+sub i2c_write_read_rs {
+    my( $self, $register, $numbytes) = @_;
+    $numbytes ||= 1;
+    my $writebuffer = pack('C', $register);
+    my $readbuffer = '0' x ( $numbytes + 1 );
+    HiPi::BCM2835::_hipi_i2c_set_transfer_params( $self->_hipi_baseaddr, $self->address, $self->_clock_divider );
+    
+    my $error = ( $self->_function_mode eq 'corelib' )
+        ? HiPi::BCM2835::bcm2835_i2c_write_read_rs( $writebuffer, 1, $readbuffer, $numbytes )
+        : HiPi::BCM2835::_hipi_i2c_write_read_rs( $self->_hipi_baseaddr, $writebuffer, 1, $readbuffer, $numbytes );
+        
+    croak qq(i2c_write_read_rs failed with error $error) if $error;
     my $template = ( $numbytes > 1 ) ? 'C' . $numbytes : 'C';
     my @values = unpack($template, $readbuffer);    
     return @values;
@@ -356,4 +371,5 @@ sub bus_write_bits {
 
 
 sub busmode { return 'bcm2835'; }
+
 1;

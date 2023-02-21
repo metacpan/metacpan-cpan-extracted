@@ -1,5 +1,32 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+2.00 2023-02-10
+    - Use methods ServerConfig::setDefaultWithSecurityPolicies()
+      and ClientConfig::setDefaultEncryption() to activate encryption
+      and optionally verfication on both sides respectively.
+    - Module OPCUA::Open62541::Test::CA is used to create private
+      key, certificate, CA and CRL for testing OPC UA encryption.
+    - Implement methods to get and set client and server description
+      in open62541 config.
+    - Generate OPC UA constants in Perl from open62541 version 1.3.4
+      with full namespace 0.
+    - Remove support for open62541 1.0 and 1.1 API.  1.2 branch did
+      not work properly with OPCUA::Open62541 anyway.  Minimum
+      required version of the open62541 library is 1.3 now.  open62541
+      master branch has issues.  OPCUA::Open62541 tests currently
+      run and pass with open62541 version 1.3.4.
+    - A lot of backwards compatibility code in implementations and tests
+      has been removed.
+    - The 1.0 API compatibility of the client getState() method has
+      been removed.  It has to be called in list context now to
+      retrieve channel state, session state, and connect status.
+      Trying to retrieve the client state in scalar context will
+      result in a Perl die.  A client state does not exist anymore.
+    - Implement basic encryption for client and server.  Certificates
+      are not validated yet.
+    - Improve behavior of client config setUsernamePassword()
+      method.
+
 1.05 2022-10-27
     - Create correct SIGNATURE file.
 

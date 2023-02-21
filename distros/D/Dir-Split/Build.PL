@@ -20,13 +20,12 @@ my $build = Module::Build->new
                  'File::Spec' => 0,
                  'Params::Validate' => 0,
                },
-   build_requires => {
-                       'File::Temp' => 0,
-                       'Test::More' => 0,
-                     },
+   test_requires => {
+                      'File::Temp' => 0,
+                      'Test::More' => 0,
+                    },
    license => 'perl',
    create_readme => 1,
-   create_makefile_pl => 'traditional',
    meta_merge => {
        resources => {
            repository => 'https://github.com/stsc/Dir-Split',

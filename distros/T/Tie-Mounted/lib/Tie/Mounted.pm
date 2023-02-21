@@ -11,7 +11,7 @@ use IO::File ();
 
 our ($VERSION, $FSTAB, $MOUNT_BIN, $UMOUNT_BIN, $NO_FILES);
 
-$VERSION = '0.19';
+$VERSION = '0.20';
 $FSTAB = '/etc/fstab';
 $MOUNT_BIN  = '/sbin/mount';
 $UMOUNT_BIN = '/sbin/umount';

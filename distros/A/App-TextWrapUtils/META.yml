@@ -19,10 +19,9 @@ name: App-TextWrapUtils
 provides:
   App::TextWrapUtils:
     file: lib/App/TextWrapUtils.pm
-    version: '0.001'
+    version: '0.002'
 recommends:
   Text::ANSI::Fold: '0'
-  Text::ANSI::Util: '0.22'
   Text::ANSI::WideUtil: '0'
   Text::Fold: '0'
   Text::LineFold: '0'
@@ -40,6 +39,7 @@ requires:
   Sah::Schema::filename: '0'
   Sah::Schema::perl::modname: '0.035'
   Sah::Schema::posint: '0'
+  Text::ANSI::Util: '0.22'
   Text::Wrap: '0'
   perl: '5.010001'
   strict: '0'
@@ -48,7 +48,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-TextWrapUtils
   homepage: https://metacpan.org/release/App-TextWrapUtils
   repository: git://github.com/perlancar/perl-App-TextWrapUtils.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

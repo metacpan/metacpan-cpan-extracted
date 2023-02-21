@@ -122,23 +122,26 @@ it extracts context (lines of code) surrounding them. The lines are prefixed
 with numbers  and the nicely formatted context is dumped on STDERR for you to
 see the error or your ways.
 
-The resulting output is optionally filtered seamlessly through the splain
+The resulting output is optionally filtered seamlessly through the **splain**
 program (see [diagnostics](https://metacpan.org/pod/diagnostics)), giving more information on why the reported
 syntax errors and warnings might have occurred. 
 
-From withing a program at runtime, this module can be used to give the same
+From within a program at runtime, this module can be used to give the same
 formatted code context around the source of an exception and iterate through
 any associated stack frames if provided.
 
 It supports perl string exceptions and warnings directly and also provides the
 ability to integrate third party CPAN exception objects and traces with minimal
-effort. Please see examples in this document or in examples directory of the
-distribution showing use with [Mojo::Exception](https://metacpan.org/pod/Mojo%3A%3AException), [Exception::Base](https://metacpan.org/pod/Exception%3A%3ABase),
-[Exception::Class::Base](https://metacpan.org/pod/Exception%3A%3AClass%3A%3ABase), and [Class::Throwable](https://metacpan.org/pod/Class%3A%3AThrowable).
+effort. Please see examples in this document or in the examples directory of
+the distribution showing use with [Mojo::Exception](https://metacpan.org/pod/Mojo%3A%3AException), [Exception::Base](https://metacpan.org/pod/Exception%3A%3ABase),
+[Exception::Class::Base](https://metacpan.org/pod/Exception%3A%3AClass%3A%3ABase) and [Class::Throwable](https://metacpan.org/pod/Class%3A%3AThrowable).
 
 A handful of options are available for basic configuration of how many lines of
 code to print before and after the error line, indenting of stack trace
 context, etc.
+
+From v0.2.0, added 'advanced string eval' support has been added for better
+context reporting of dynamically generated code.
 
 No symbols are exported and as such they must be accessed via the package name.
 
@@ -253,7 +256,7 @@ The expected types of data are as follows:
     Error string, as per `die` and `warn`, containing file and line number. These
     are extracted from the string error to locate context.
 
-    The output message after a the context is this string, 
+    The output message after the context is this string, 
 
 - 2. An reference to an array containing results from `caller`
 
@@ -272,6 +275,31 @@ The expected types of data are as follows:
     the output.
 
 **Options include:**
+
+#### limit 
+
+```perl
+limit=>$int
+```
+
+**From v0.2.0:** Limits the number of errors to extract and generate context
+for. Default is 100. If <=0,  no limiting is applied all all errors are
+processed.
+
+#### reverse
+
+```perl
+reverse=>$bool
+```
+
+**From v0.2.0:** Reverses the order of error processing. 
+
+Perl type string errors are sorted and processing in ascending line number
+order. When this option is used, the lines are processed by descending line
+number first. Does not change order of files processed.
+
+If frames are used instead, they are processed in reverse order to how they
+where supplied when this option is in effect.
 
 #### pre\_lines
 
@@ -334,6 +362,9 @@ if($@){
   say Error::Show::context error=>$@, program=>prog;
 }
 ```
+
+For advanced string eval processing options please see the **ADVANCED STRING
+EVAL** section in this document.
 
 # EXAMPLES
 
@@ -535,6 +566,96 @@ if($@){
 ```
 
 Please see the examples directory in this distribution
+
+# ADVANCED STRING EVAL
+
+**From v0.2.0** features to support advanced string evaluation are available.
+This was added to support the error reporting needs of the [Template::Plex](https://metacpan.org/pod/Template%3A%3APlex)
+module.
+
+Consider the following example. The 'meat' is the sub  in the middle of the
+string. Any errors/context reported should be relative to this, not the start
+of the overall eval string. With some help from comment markers "##\_PREAMBLE"
+and "##\_POSTAMBLE",  when can search for the middle and rebase the error line
+numbering.
+
+```perl
+eval {
+  "my $some_prep_work=1;
+  call_somthing();
+  #comments...
+  
+  ##_PREAMBLE
+
+  sub {
+     #code generated from user input...
+     say "My really cool dynamically created code"
+  }
+
+  ##_POSTAMBLE
+
+  #More code 
+  #Cleanup stuff.
+  "
+}
+```
+
+Additional configuration options can be provided  to search for the relevant
+code lines and offset the error line numbers.
+
+**NOTE** if these options are used, the **message** field is modified with
+updated line numbers if its in the form of a normal perl errors ie 'error line
+123 at file'.
+
+### start\_mark
+
+```perl
+start_mark=>$regexp
+```
+
+If specified, is a used as a regexp to match against source code lines. The line
+after a successful match is now the first line.
+
+This allows inserting a special marker to indicate the start of 'code of
+interest' with out knowing the exact line number in the resulting code.
+
+This is undefined and unused by default.
+
+### end\_mark
+
+```perl
+end_mark=>$regexp
+```
+
+If specified, is used as a regexp to match against source lines, in reverse
+order. The line after a successful match is now the last line
+
+This allows inserting a special marker to indicate the end of 'code of
+interest'.
+
+This is undefined unused by default.
+
+### start\_offset
+
+```perl
+start_offset=>$int
+```
+
+A static offset to add to the start line (which may have been modified by the
+**start\_mark** option). The result will be classed as the minimum line number of
+the file/string.
+
+This is useful to prevent any preamble after the start\_mark line in your string
+eval showing up in the user program context.
+
+### end\_offset
+
+A static offset to subtract to the end line (which may have been modified by
+the **end\_mark** option). The result will be classed as the maximum line number
+of the file.
+
+This is useful to prevent any postamble before the end\_mark in your string eval
+showing up in the user program context.
 
 # FUTURE WORK/TODO
 

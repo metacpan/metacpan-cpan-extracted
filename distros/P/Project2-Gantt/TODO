@@ -4,3 +4,6 @@ TODO:
  - Add tests for days and months mode
  - ADd tests for sub projects
  - Add better colors to default skin
+ - Create Skin::Light & Skin::Dark
+ - Add border
+

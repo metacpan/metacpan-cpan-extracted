@@ -1,10 +1,10 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::json_str;
 
-our $DATE = '2022-08-26'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2022-11-15'; # DATE
+our $VERSION = '0.007'; # VERSION
 
-our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nThis schema can be used if you want to accept a string that contains valid JSON.\nThe JSON string will not be decoded (e.g. a JSON-encoded array will not beome an\narray) but you know that the string contains a valid JSON. Data will not be\nvalid if the string does not contain valid JSON.\n\n",examples=>[{summary=>"Empty string is not a valid JSON",valid=>0,value=>""},{valid=>1,value=>1},{valid=>1,value=>"true"},{summary=>"Not a valid JSON literal",valid=>0,value=>"foo"},{summary=>"A JSON-encoded string",valid=>1,value=>"\"foo\""},{valid=>1,value=>"[1,2,3,{}]"},{summary=>"Missing closing square bracket",valid=>0,value=>"[1,2"},{summary=>"Dangling comma",valid=>0,value=>"[1,2,]"}],prefilters=>["JSON::check_decode"],summary=>"A string that contains valid JSON"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
+our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nThis schema can be used if you want to accept a string that contains valid JSON.\nThe JSON string will not be decoded (e.g. a JSON-encoded array will not beome an\narray) but you know that the string contains a valid JSON. Data will not be\nvalid if the string does not contain valid JSON.\n\nSee also related schema: `json_or_str`, `str::encoded_json`,\n`str::escaped_json`.\n\n",examples=>[{summary=>"Empty string is not a valid JSON",valid=>0,value=>""},{valid=>1,value=>1},{valid=>1,value=>"true"},{summary=>"Not a valid JSON literal",valid=>0,value=>"foo"},{summary=>"A JSON-encoded string",valid=>1,value=>"\"foo\""},{valid=>1,value=>"[1,2,3,{}]"},{summary=>"Missing closing square bracket",valid=>0,value=>"[1,2"},{summary=>"Dangling comma",valid=>0,value=>"[1,2,]"}],prefilters=>["JSON::check_decode"],summary=>"A string that contains valid JSON"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: A string that contains valid JSON
@@ -21,7 +21,7 @@ Sah::SchemaR::json_str - A string that contains valid JSON
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::SchemaR::json_str (from Perl distribution Sah-Schemas-JSON), released on 2022-08-26.
+This document describes version 0.007 of Sah::SchemaR::json_str (from Perl distribution Sah-Schemas-JSON), released on 2022-11-15.
 
 =head1 DESCRIPTION
 

@@ -34,10 +34,19 @@ my $test_dir = "$FindBin::Bin";
 
 # flush
 {
-  # test_flush
   {
     my $file = "$test_dir/test_files_tmp/io_file_test_flush.txt";
-    ok(SPVM::TestCase::IO::File->test_flush($file));
+    ok(SPVM::TestCase::IO::File->flush($file));
+    my $output = slurp_binmode($file);
+    is($output, 'Hello');
+  }
+}
+
+# close
+{
+  {
+    my $file = "$test_dir/test_files_tmp/io_file_test_flush.txt";
+    ok(SPVM::TestCase::IO::File->close($file));
     my $output = slurp_binmode($file);
     is($output, 'Hello');
   }
@@ -45,26 +54,23 @@ my $test_dir = "$FindBin::Bin";
 
 # print
 {
-  # test_print
   {
     my $file = "$test_dir/test_files_tmp/io_file_test_print.txt";
-    ok(SPVM::TestCase::IO::File->test_print($file));
+    ok(SPVM::TestCase::IO::File->print($file));
     my $output = slurp_binmode($file);
     is($output, 'Hello');
   }
 
-  # test_print_newline
   {
     my $file = "$test_dir/test_files_tmp/io_file_test_print_newline.txt";
-    ok(SPVM::TestCase::IO::File->test_print_newline($file));
+    ok(SPVM::TestCase::IO::File->print_newline($file));
     my $output = slurp_binmode($file);
     is($output, "\x0A");
   }
 
-  # test_print_long_lines
   {
     my $file = "$test_dir/test_files_tmp/io_file_test_print_long_lines.txt";
-    ok(SPVM::TestCase::IO::File->test_print_long_lines($file));
+    ok(SPVM::TestCase::IO::File->print_long_lines($file));
     my $output = slurp_binmode($file);
     is($output, "AAAAAAAAAAAAA\x0ABBBBBBBBBBBBBBBBBBB\x0ACCCCCCCCCCCCCCCCCCCCCCCCCCC\x0ADDDDDDDDDDDDDDDDDDDDDDDDD\x0AEEEEEEEEEEEEEEEEEEEEEE\x0AFFFFFFFFFFFFFF\x0A");
   }
@@ -73,32 +79,32 @@ my $test_dir = "$FindBin::Bin";
 # open
 {
   my $sp_file = SPVM::new_string("$test_dir/test_files_tmp/fread.txt");
-  ok(SPVM::TestCase::IO::File->test_open($sp_file));
+  ok(SPVM::TestCase::IO::File->open($sp_file));
 }
 
 # read
 {
   my $sp_file = SPVM::new_string("$test_dir/test_files_tmp/fread.txt");
-  ok(SPVM::TestCase::IO::File->test_read($sp_file));
+  ok(SPVM::TestCase::IO::File->read($sp_file));
 }
 
 # getline
 {
   {
     my $sp_file = SPVM::new_string("$test_dir/test_files_tmp/fread.txt");
-    ok(SPVM::TestCase::IO::File->test_getline($sp_file));
+    ok(SPVM::TestCase::IO::File->getline($sp_file));
   }
   {
     my $sp_file = SPVM::new_string("$test_dir/test_files_tmp/fread.txt");
-    ok(SPVM::TestCase::IO::File->test_getline_while($sp_file));
+    ok(SPVM::TestCase::IO::File->getline_while($sp_file));
   }
   {
     my $sp_file = SPVM::new_string("$test_dir/test_files_tmp/file_eof.txt");
-    ok(SPVM::TestCase::IO::File->test_getline_eof($sp_file));
+    ok(SPVM::TestCase::IO::File->getline_eof($sp_file));
   }
   {
     my $sp_file = SPVM::new_string("$test_dir/test_files_tmp/long_line.txt");
-    ok(SPVM::TestCase::IO::File->test_getline_long_line($sp_file));
+    ok(SPVM::TestCase::IO::File->getline_long_line($sp_file));
   }
 }
 
@@ -106,26 +112,26 @@ my $test_dir = "$FindBin::Bin";
 {
   {
     my $sp_file = SPVM::new_string("$test_dir/test_files_tmp/fread.txt");
-    ok(SPVM::TestCase::IO::File->test_getline_chompr($sp_file));
+    ok(SPVM::TestCase::IO::File->getline_chompr($sp_file));
   }
   {
     my $sp_file = SPVM::new_string("$test_dir/test_files_tmp/fread.txt");
-    ok(SPVM::TestCase::IO::File->test_getline_chompr_while($sp_file));
+    ok(SPVM::TestCase::IO::File->getline_chompr_while($sp_file));
   }
   {
     my $sp_file = SPVM::new_string("$test_dir/test_files_tmp/file_eof.txt");
-    ok(SPVM::TestCase::IO::File->test_getline_chompr_eof($sp_file));
+    ok(SPVM::TestCase::IO::File->getline_chompr_eof($sp_file));
   }
   {
     my $sp_file = SPVM::new_string("$test_dir/test_files_tmp/long_line.txt");
-    ok(SPVM::TestCase::IO::File->test_getline_chompr_long_line($sp_file));
+    ok(SPVM::TestCase::IO::File->getline_chompr_long_line($sp_file));
   }
 }
 
 # getlines
 {
   my $sp_file = SPVM::new_string("$test_dir/test_files_tmp/fread.txt");
-  ok(SPVM::TestCase::IO::File->test_getlines($sp_file));
+  ok(SPVM::TestCase::IO::File->getlines($sp_file));
 }
 
 

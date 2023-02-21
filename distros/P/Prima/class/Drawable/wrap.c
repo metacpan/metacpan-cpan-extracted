@@ -363,7 +363,7 @@ text_get_libthai_breaks( TextWrapRec* t)
 	src_len_bytes     = t-> textLen;
 	semistatic_init(&pbuf, &thbuf, sizeof(thwchar_t), 1024);
 
-	if ( !semistatic_expand(&pbuf, t->utf8_textLen)) {
+	if ( !semistatic_expand(&pbuf, t->utf8_textLen + 1)) {
 		warn("Not enough memory");
 		goto FAIL;
 	}
@@ -379,6 +379,7 @@ text_get_libthai_breaks( TextWrapRec* t)
 	}
 	if ( !got_thai_chars )
 		goto FAIL;
+	*u32 = 0;
 
 	t-> n_word_breaks = th_brk_wc_find_breaks(NULL, (thwchar_t*)pbuf.heap, t->word_breaks, LIBTHAI_MAX_TEXT_BREAKS);
 #ifdef _DEBUG
@@ -1279,7 +1280,7 @@ SV*
 Drawable_text_wrap( Handle self, SV * text, int width, int options, int tabIndent, int from, int len, SV * glyphs)
 {
 	if ( width < 0 ) width = INT_MAX;
-	if ( SvTYPE(glyphs) != SVt_NULL ) {
+	if ( SvOK(glyphs)) {
 		return string_glyphs_wrap(self, text, width, options, tabIndent, from, len, glyphs);
 	} else if ( !SvROK( text )) {
 		return string_wrap(self, text, width, options, tabIndent, from, len);

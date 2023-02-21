@@ -1,7 +1,7 @@
 package Dancer::Object::Singleton;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: Singleton base class for Dancer
-$Dancer::Object::Singleton::VERSION = '1.3520';
+$Dancer::Object::Singleton::VERSION = '1.3521';
 # This class is a root class for singleton objects in Dancer.
 # It provides basic OO singleton tools for Perl5 without being... MooseX::Singleton ;-)
 
@@ -74,7 +74,7 @@ Dancer::Object::Singleton - Singleton base class for Dancer
 
 =head1 VERSION
 
-version 1.3520
+version 1.3521
 
 =head1 SYNOPSIS
 

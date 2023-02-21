@@ -22,7 +22,7 @@ use Plack::Request;
 use HTTP::Message::PSGI;
 
 #plan 'no_plan';
-plan tests => 238;
+plan tests => 242;
 
 Template::Declare->init( dispatch_to => ['PGXN::Site::Templates'] );
 
@@ -106,7 +106,7 @@ test_wrapper($html, {
                     $tx->is('count(./dt)', 5, 'Should have 5 DT sub-elements');
                     my ($i, %seen) = (0);
                     for my $dist (@{ $dists }) {
-                        next if $seen->{ lc $dist->{dist} }++;
+                        next if $seen{ lc $dist->{dist} }++;
                         $i++;
                         $tx->ok("./dt[$i]", "Test dt $i" => sub {
                             $tx->ok('./a', "Test dt $i anchor" => sub {
@@ -168,7 +168,7 @@ sub test_wrapper {
 
     # Check the head element.
     $tx->ok('/html/head', 'Test head', sub {
-        $tx->is('count(./*)', 25, qq{Should have 25 elements below "head"});
+        $tx->is('count(./*)', 26, qq{Should have 25 elements below "head"});
         # Title.
         $tx->is(
             './title',
@@ -293,6 +293,10 @@ sub test_wrapper {
                 rel  => 'manifest',
                 href => '/ui/manifest.json',
             },
+            {
+                rel  => 'me',
+                href => 'https://botsin.space/@pgxn',
+            },
         ) {
             ++$i;
             $tx->ok("./link[$i]", "Test link $i", sub {
@@ -388,9 +392,10 @@ sub test_wrapper {
                 });
                 $tx->is('./span[1][@class="grey"]', '|', 'Should have spacer span');
                 $tx->ok('./a[2]', 'Test second anchor', sub {
-                    $tx->is('./@href', 'https://twitter.com/pgxn/', 'Should link to Twitter');
-                    $tx->is('./@title', $mt->maketext('Follow PGXN on Twitter'), 'Should have link title');
-                    $tx->is('./text()', $mt->maketext('Twitter'), 'Should have text "Blog"');
+                    $tx->is('./@href', 'https://botsin.space/@pgxn', 'Should link to Mastodon');
+                    $tx->is('./@title', $mt->maketext('Follow PGXN on Mastodon'), 'Should have link title');
+                    $tx->is('./@rel', 'me', 'Should have rel=me in Mastodon link');
+                    $tx->is('./text()', $mt->maketext('Mastodon'), 'Should have text "Blog"');
                 });
                 $tx->is('./span[2][@class="grey"]', '|', 'Should have spacer span');
                 $tx->ok('./a[3]', 'Test third anchor', sub {

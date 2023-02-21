@@ -25,8 +25,8 @@ METHODS
     Returns the command name for running 7-Zip.
 
 HELPERS
-  7z
-     %{7z}
+  sevenzip
+     %{sevenzip}
 
     Returns '7z', '7zz', or appropriate command for platform.
 

@@ -22,7 +22,7 @@ use Carp;
 use HiPi qw( :rpi :i2c );
 use HiPi::RaspberryPi;
 
-our $VERSION ='0.65';
+our $VERSION ='0.66';
 
 XSLoader::load('HiPi::BCM2835', $VERSION) if HiPi::is_raspberry_pi();
 

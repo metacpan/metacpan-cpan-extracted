@@ -2,7 +2,7 @@ package Log::OK;
 
 use strict;
 use warnings;
-use version; our $VERSION=version->declare("v0.1.5");
+use version; our $VERSION=version->declare("v0.1.6");
 
 use Carp qw<croak carp>;
 use constant::more ();
@@ -20,28 +20,6 @@ my %systems=(
 
 
 my $sub;
-CHECK{  
-  my $message= "Log::OK could not automatically sync log levels with your logger";
-  if($sub==\&log_any){
-    #carp $message;
-  }
-  elsif($sub==\&log_ger){
-    carp $message unless eval '
-      require Log::ger::Util;
-      Log::ger::Util::set_level Log::OK::LEVEL;
-      1;
-      ';
-  }
-  elsif($sub==\&log_dispatch){
-    #carp $message;
-  }
-  elsif($sub==\&log_log4perl){
-    #carp $message;
-  }
-  else {
-    #carp $message;
-  }
-}
 use constant::more();
 sub import {
 	#arguments are lvl , opt, env, cat in hash ref
@@ -147,6 +125,7 @@ sub log_ger {
 	
 	DEBUG_ and say STDERR "setup for Log::ger";
 	my ($opt, $value)=@_;
+  state $unset=1;
 	state $lookup={
 		fatal   => 10,
 		error   => 20,
@@ -172,6 +151,18 @@ sub log_ger {
 		}
 	}
 
+  #
+  # Update the level in Log::ger only when the constant exists and for the first time only
+  #
+  if(*Log::OK::LEVEL{CODE} and $unset){
+    $unset=undef;
+    my $message= "Log::OK could not automatically sync log levels with your logger";
+    carp $message unless eval "
+    require Log::ger::Util;
+    Log::ger::Util::set_level(Log::OK::LEVEL);
+    1;
+    ";
+  }
 
 	(
 		#TODO: these values don't work well with 

@@ -17,7 +17,7 @@ name: Dir-Split
 provides:
   Dir::Split:
     file: lib/Dir/Split.pm
-    version: '0.81'
+    version: '0.82'
 requires:
   Carp: '0'
   File::Basename: '0'
@@ -30,5 +30,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/stsc/Dir-Split
-version: '0.81'
+version: '0.82'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -21,12 +21,7 @@ sub log {
     return if $log_calls++;
     is($log_calls, 1, "log once");
     is($context, "client", "log context");
-    if ($buildinfo->{BuildInfo_softwareVersion} =~ /^1\.0\./) {
-	is($level, "info", "log level");
-	is($category, "client", "log category");
-	is($message, "Connecting to endpoint opc.tcp://localhost:",
-	    "log message");
-    } elsif ($buildinfo->{BuildInfo_softwareVersion} =~ /^1\.[1-3]\./) {
+    if ($buildinfo->{BuildInfo_softwareVersion} =~ /^1\.[1-3]\./) {
 	is($level, "warn", "log level");
 	is($category, "network", "log category");
 	is($message, "Server url is invalid: opc.tcp://localhost:",
@@ -48,13 +43,6 @@ sub clear {
     is($context, "client", "clear context");
 }
 
-if ($buildinfo->{BuildInfo_softwareVersion} =~ /^1\.0\./) {
-    pass "clear function is not called for client in open62541 1.0.1";
-    pass "clear function is not called for client in open62541 1.0.1";
-    # https://github.com/open62541/open62541/commit/
-    #   280012ee016e2f42ab9b1386174a8c12e6b29821
-}
-
 {
     ok(my $client = OPCUA::Open62541::Client->new(), "client");
     {
@@ -69,8 +57,4 @@ if ($buildinfo->{BuildInfo_softwareVersion} =~ /^1\.0\./) {
     $client->connect("opc.tcp://localhost:");
     isnt($log_calls, 0, "logger end");
 }
-if ($buildinfo->{BuildInfo_softwareVersion} =~ /^1\.0\./) {
-    is($clear_calls, 0, "client scope");  # bug in open62541 1.0.1
-} else {
-    is($clear_calls, 1, "client scope");  # bug in open62541 1.0.1
-}
+is($clear_calls, 1, "client scope");

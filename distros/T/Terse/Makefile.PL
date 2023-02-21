@@ -19,13 +19,14 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {
         'Plack::Request' => '0',
 	'Plack::Response' => '0',
-	'JSON' => '0',
+	'Cpanel::JSON::XS' => '0',
 	'Scalar::Util' => '0',
 	'Time::HiRes' => '0',
 	'Want' => '0',
 	'Digest::SHA' => '0',
 	'B' => '0',
-	'Test::Instruction' => '0'
+	'Test::Instruction' => '0',
+	'Struct::WOP' => '0.15',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Terse-*' },

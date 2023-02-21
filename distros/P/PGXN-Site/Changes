@@ -1,8 +1,12 @@
 Revision history for Perl extension PGXN::Site
 
+0.22.2  2023-02-18T23:25:58Z
+      - Replaced Twitter link with Mastodon and added a rel link to Mastodon
+        to the header.
+
 0.22.1  2022-01-17T18:52:06Z
       - Updated the "Recent Releases" box on the home page to filter out=
-        duplicate distributions, so as to avoid redundancy. 
+        duplicate distributions, so as to avoid redundancy.
 
 0.22.0  2021-05-29T21:32:54Z
       - Reorganized the nav and footer links. There are now fewer of them, and

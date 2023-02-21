@@ -44,7 +44,7 @@ use Carp qw(croak);
 use Scalar::Util qw(blessed);
 use overload ();
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 method new($class: @rules) {
     my $self = bless {

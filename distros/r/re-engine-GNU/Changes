@@ -1,6 +1,70 @@
 Changelog for re-engine-GNU
 
-0.025 2023-01-19T18:30:45
+0.027 2023-02-12T04:11:43
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - use Test::More::UTF8 instead of hacking on io layer on stdout/stderr
+ - workflows/dzil-build-and-test.yml: Remove devel until this will be
+   meaninful (currently devel uses 5.36 !?)
+ - workflows/dzil-build-and-test.yml: Use
+   perl-actions/install-with-cpm@stable instead of
+   perl-actions/install-with-cpm@v1, set_output matrix change to have devel
+   version
+ - workflows/dzil-build-and-test.yml: Add devel version
+ - workflows/dzil-build-and-test.yml: Try setting git config --global
+   github.user
+ - workflows/dzil-build-and-test.yml: Add repo-token
+ - Environment variable RE_ENGINE_GNU_VERSION support for those doing make
+   test directly on this repo with an old perl
+ - README.pod: dev+ [ci skip]
+ - README.pod: Add some badges [ci skip]
+
+0.026 2023-01-23T20:51:40Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - workflows/dzil-build-and-test.yml: dev+
+ - workflows/dzil-build-and-test.yml: Remove AUTHOR_TESTING and
+   RELEASE_TESTING when testing the distribution
+ - workflows/dzil-build-and-test.yml: Set PAUSE identity bis
+ - workflows/dzil-build-and-test.yml: Set PAUSE identity
+ - workflows/ci.yml -> workflows/dzil-build-and-test.yml
+ - workflows/ci.yml: Trying to understand why dzil test --verbose does not
+   work on windows workflow...
+ - workflows/ci.yml: use perl -MDist::Zilla::App instead of dzil directly
+   for windows workflow
+ - engine/GNU.pm: Add a section HOW TO CONTRIBUTE
+ - dist.ini: Move AUTHOR_TESTING=1 EXTENDED_TESTING=1 RELEASE_TESTING=1 to
+   the run instead of the full workflow - this is causing
+   List::SomeUtils::XS to fail because AUTHOR_TESTING sets -Werror
+   compilation flag that makes clang-13 bail
+ - dist.ini: Use cpan to install (and see why it fails on macos)
+   List::SomeUtils::XS
+ - dist.ini: Removed non-needed git identity, explicit install of
+   Test::Perl::Critic (cpanm bug on MacOS ?)
+ - Commit dzil regenerated files
+ - dist.ini: Generated Changes from git
+ - workflows/ci.yml: Run dzil test with --verbose option
+ - workflows/ci.yml: Try to fix git identity
+ - workflows/ci.yml: dev+
+ - engine/GNU.pm: Dummy commit to get actions to run (!?)
+ - workflows/ci.yml: Removed a comment
+ - workflows/ci.yml: Fetch repo history (no that big fortunately)
+ - workflows/ci.yml: Set git identity
+ - workflows/ci.yml:  ~ issue
+ - engine/GNU.pm: ## no critic when getting $version
+ - workflows/ci.yml: ~/.pause file tentative fix
+ - workflows/ci.yml: Create a dummy .pause file
+ - re/engine/GNU.pm: Bootstrap even when VERSION is not defined
+ - workflows/ci.yml: fix syntax
+ - workflows/ci.yml: testing github workflow
+ - dzil regenerate(d)
+ - dist.ini: Add cpanfile
+ - dist.ini: Add Changes to Git::Check.allow_dirty
+ - Makefile.PL: copied from release
+ - dist.ini: Revisit following comments in #6
+ - t/re-engine-GNU.t: explicit show array and hash forms
+ - weaver.ini
+ - weaver.ini: Initial commit
+
+0.025 2023-01-19T18:30:45Z
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - engine/GNU.pm: =for Pod::Coverage
  - dist.ini: Remove Test::Vars (unmaintained?), Test::DistManifest (not ok

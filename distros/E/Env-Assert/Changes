@@ -1,0 +1,11 @@
+Revision history for Env-Assert
+
+0.004     2023-02-19 15:47:10+01:00 Europe/Stockholm
+          * Move fatpacked executable to root.
+          * Update dist.ini with ExecDir to `script`.
+
+0.003     2023-02-16 09:55:57+01:00 Europe/Stockholm
+
+0.002     2023-02-15 17:34:31+01:00 Europe/Stockholm
+
+0.001     2023-02-15 14:51:19+01:00 Europe/Stockholm   * Initial version

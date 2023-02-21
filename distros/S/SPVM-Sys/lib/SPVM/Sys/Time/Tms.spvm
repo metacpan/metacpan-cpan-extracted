@@ -1,4 +1,4 @@
-class Sys::Time::Tms : pointer_t {
+class Sys::Time::Tms : pointer {
   # Class methods
   
   native static method new : Sys::Time::Tms ();

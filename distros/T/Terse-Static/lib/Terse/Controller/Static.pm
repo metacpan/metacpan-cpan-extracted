@@ -18,6 +18,8 @@ sub static_html :get(static) :view(static) :delayed :path(static/(.*\.html)$) :c
 
 sub static_plain :get(static) :view(static) :delayed :path(static/(.*\.txt)$) :captured(1) :content_type(text/plain);
 
+sub static_css :get(static) :view(static) :delayed :path(static/(.*\.css)$) :captured(1) :content_type(text/css);
+
 1;
 
 __END__;
@@ -30,7 +32,7 @@ Terse::Controller::Static - Serve static resources controller
 
 =head1 VERSION
 
-Version 0.06
+Version 0.08
 
 =cut
 

@@ -1,5 +1,10 @@
 Revision history for Crypt-Passphrase
 
+0.007     2023-02-12 17:20:19+01:00 Europe/Amsterdam
+          - Add curry_with_hash and curry_with_password methods
+          - Add a unicode normalization option
+          - Match MD5 and SHA hex case-insensitively
+
 0.006     2023-02-08 01:36:27+01:00 Europe/Amsterdam
           - Add Crypt::Passphrase::MD5::Hex
           - Add Crypt::Passphrase::SHA1::Hex

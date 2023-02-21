@@ -10,7 +10,7 @@ use Scalar::Util qw( blessed );
 
 BEGIN {
 	$match::simple::AUTHORITY = 'cpan:TOBYINK';
-	$match::simple::VERSION   = '0.011';
+	$match::simple::VERSION   = '0.012';
 }
 
 our @ISA       = qw( Exporter::Tiny );
@@ -224,11 +224,11 @@ encourages match::simple to use the pure Perl backend.
 =head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=match-simple>.
+L<https://github.com/tobyink/p5-match-simple/issues>.
 
 =head1 SEE ALSO
 
-L<match::smart>.
+L<match::smart>, L<match::simple::sugar>.
 
 This module uses L<Exporter::Tiny>.
 
@@ -238,7 +238,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017, 2022 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017, 2022-2023 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

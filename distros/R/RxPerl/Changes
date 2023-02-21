@@ -1,5 +1,28 @@
 Revision history for Perl extension RxPerl
 
+v6.26.2 2023-02-19T12:10:11Z
+
+    - fixed two examples in the documentation
+
+v6.26.1 2023-02-18T13:44:41Z
+
+    - fixed bug on op_buffer_time, where last remaining values were not emitted
+
+v6.26.0 2023-02-10T09:12:01Z
+
+    - added op_timeout
+    - fixed example in documentation of op_skip_last
+
+v6.25.0 2023-02-09T21:09:18Z
+
+    - added op_delay_when, op_distinct, op_skip_last, op_time_interval,
+      and op_timestamp
+
+v6.24.0 2023-02-09T13:13:54Z
+
+    - added op_single
+    - BUGFIX: fixed op_merge_all($n)
+
 v6.23.0 2023-02-08T15:57:28Z
 
     - added op_audit, op_debounce, op_sample and op_throttle

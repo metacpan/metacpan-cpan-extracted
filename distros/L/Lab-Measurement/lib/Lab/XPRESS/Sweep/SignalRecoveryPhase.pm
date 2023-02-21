@@ -1,5 +1,5 @@
 package Lab::XPRESS::Sweep::SignalRecoveryPhase;
-$Lab::XPRESS::Sweep::SignalRecoveryPhase::VERSION = '3.842';
+$Lab::XPRESS::Sweep::SignalRecoveryPhase::VERSION = '3.851';
 #ABSTRACT: Signal recovery lock in phase sweep
 
 use v5.20;
@@ -95,7 +95,7 @@ Lab::XPRESS::Sweep::SignalRecoveryPhase - Signal recovery lock in phase sweep
 
 =head1 VERSION
 
-version 3.842
+version 3.851
 
 =head1 SYNOPSIS
 

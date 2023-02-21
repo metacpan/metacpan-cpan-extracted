@@ -7,32 +7,38 @@ use Test::More tests => 2;
 use HTML::Form;
 
 {
-    my $test = "the settings of a previous form should not interfere with a latter form (control test with one form)";
-    my @forms = HTML::Form->parse( FakeResponse::One->new );
+    my $test
+        = "the settings of a previous form should not interfere with a latter form (control test with one form)";
+    my @forms    = HTML::Form->parse( FakeResponse::One->new );
     my $cat_form = $forms[0];
-    my @vals = $cat_form->param('age');
-    is_deeply(\@vals,[''], $test);
+    my @vals     = $cat_form->param('age');
+    is_deeply( \@vals, [''], $test );
 }
 {
-    my $test = "the settings of a previous form should not interfere with a latter form (test with two forms)";
-    my @forms = HTML::Form->parse( FakeResponse::TwoForms->new );
+    my $test
+        = "the settings of a previous form should not interfere with a latter form (test with two forms)";
+    my @forms    = HTML::Form->parse( FakeResponse::TwoForms->new );
     my $cat_form = $forms[1];
 
     my @vals = $cat_form->param('age');
-    is_deeply(\@vals,[''], $test);
+    is_deeply( \@vals, [''], $test );
 }
 
 ####
 package FakeResponse::One;
+
 sub new {
     bless {}, shift;
 }
+
 sub base {
-    return "http://foo.com"
+    return "http://foo.com";
 }
+
 sub content_charset {
     return "iso-8859-1";
 }
+
 sub decoded_content {
     my $html = qq{
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -59,12 +65,15 @@ sub decoded_content {
 
 #####
 package FakeResponse::TwoForms;
+
 sub new {
     bless {}, shift;
 }
+
 sub base {
-    return "http://foo.com"
+    return "http://foo.com";
 }
+
 sub decoded_content {
     my $html = qq{
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"

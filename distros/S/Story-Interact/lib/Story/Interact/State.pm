@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact::State;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001007';
+our $VERSION   = '0.001009';
 
 use Story::Interact::Character ();
 
@@ -37,6 +37,12 @@ has 'visited' => (
 	builder   => sub { {} },
 );
 
+has 'character_class' => (
+	is        => 'ro',
+	isa       => Str,
+	builder   => sub { 'Story::Interact::Character' },
+);
+
 sub BUILD {
 	my ( $self, $arg ) = @_;
 	$self->define_npc( player => ( name => 'Anon' ) );
@@ -50,7 +56,7 @@ sub player {
 sub define_npc {
 	my ( $self, $code, %attrs ) = @_;
 	return if defined $self->character->{$code};
-	$self->character->{$code} = Story::Interact::Character->new( %attrs );
+	$self->character->{$code} = $self->character_class->new( %attrs );
 }
 
 sub update_from_page {

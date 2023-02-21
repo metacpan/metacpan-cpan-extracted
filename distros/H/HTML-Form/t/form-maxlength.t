@@ -6,33 +6,31 @@ use Test::More tests => 12;
 use HTML::Form;
 
 my $html = do { local $/ = undef; <DATA> };
-my $form = HTML::Form->parse($html, 'foo.html' );
-isa_ok($form, 'HTML::Form');
+my $form = HTML::Form->parse( $html, 'foo.html' );
+isa_ok( $form, 'HTML::Form' );
 my $input = $form->find_input('passwd');
-isa_ok($input, 'HTML::Form::TextInput');
+isa_ok( $input, 'HTML::Form::TextInput' );
 
 sub set_value {
-  my $input = shift;
-  my $value = shift;
-  my $len = length($value);
-  my $old = $input->value;
-  is( $input->value($value), $old, "set value length=$len" );
-  is( $input->value, $value, "got value length=$len" );
+    my $input = shift;
+    my $value = shift;
+    my $len   = length($value);
+    my $old   = $input->value;
+    is( $input->value($value), $old,   "set value length=$len" );
+    is( $input->value,         $value, "got value length=$len" );
 }
 
 {
-  is( $input->{maxlength}, 8, 'got maxlength: 8' );
+    is( $input->{maxlength}, 8, 'got maxlength: 8' );
 
-  set_value( $input, '1234' );
-  set_value( $input, '1234567890' );
-  ok(!$input->strict, "not strict by default");
-  $form->strict(1);
-  ok($input->strict, "input strict change when form strict change");
-  set_value( $input, '1234' );
-  eval {
-      set_value( $input, '1234567890' );
-  };
-  like($@, qr/^Input 'passwd' has maxlength '8' at /, "Exception raised");
+    set_value( $input, '1234' );
+    set_value( $input, '1234567890' );
+    ok( !$input->strict, "not strict by default" );
+    $form->strict(1);
+    ok( $input->strict, "input strict change when form strict change" );
+    set_value( $input, '1234' );
+    eval { set_value( $input, '1234567890' ); };
+    like( $@, qr/^Input 'passwd' has maxlength '8' at /, "Exception raised" );
 }
 
 __DATA__

@@ -5,7 +5,7 @@ use Moose;
 use Archive::Zip          qw(AZ_OK);
 use Carp                  qw/croak/;
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 #======================================================================
 # ATTRIBUTES
@@ -97,6 +97,7 @@ sub sheets {
   my ($self) = @_;
   return $self->workbook_data->{sheets};
 }
+
 
 
 

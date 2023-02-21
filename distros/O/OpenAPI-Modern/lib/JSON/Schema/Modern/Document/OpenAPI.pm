@@ -5,7 +5,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.038';
+our $VERSION = '0.040';
 
 use 5.020;
 use Moo;
@@ -238,7 +238,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.038
+version 0.040
 
 =head1 SYNOPSIS
 
@@ -267,7 +267,8 @@ and the L<OpenAPI v3.1 specification|https://spec.openapis.org/oas/v3.1.0>.
 
 These values are all passed as arguments to the constructor.
 
-This class inherits all options from L<JSON::Schema::Modern::Document> and implements the following new ones:
+This class inherits all options from L<JSON::Schema::Modern::Document> and implements the following
+new ones:
 
 =head2 evaluator
 
@@ -281,7 +282,8 @@ schemas in the document, either manually or perhaps via a web framework plugin (
 =head2 metaschema_uri
 
 The URI of the schema that describes the OpenAPI document itself. Defaults to
-C<https://spec.openapis.org/oas/3.1/schema-base/latest> (an alias for the latest document available).
+C<https://spec.openapis.org/oas/3.1/schema-base/latest> (an alias for the latest document
+available).
 
 =head2 json_schema_dialect
 
@@ -306,7 +308,8 @@ longer be assumed.
 =head2 get_operationId_path
 
 Returns the json pointer location of the operation containing the provided C<operationId> (suitable
-for passing to C<< $document->get(..) >>), or C<undef> if the location does not exist in the document.
+for passing to C<< $document->get(..) >>), or C<undef> if the location does not exist in the
+document.
 
 =head1 SEE ALSO
 
@@ -348,8 +351,8 @@ Bugs may be submitted through L<https://github.com/karenetheridge/OpenAPI-Modern
 
 I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
-You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
-server|https://open-api.slack.com>, which are also great resources for finding help.
+You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI
+Slack server|https://open-api.slack.com>, which are also great resources for finding help.
 
 =head1 AUTHOR
 

@@ -6,7 +6,7 @@ use base 'RxPerl::Observable';
 
 use Hash::Ordered;
 
-our $VERSION = "v6.23.0";
+our $VERSION = "v6.26.2";
 
 # over-rideable
 # sub _on_subscribe {

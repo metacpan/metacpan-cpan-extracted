@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::IOANR 1.201592;
+package Dist::Zilla::PluginBundle::Author::IOANR 1.230480;
 
 # ABSTRACT: Build dists the way IOANR likes
 
@@ -85,7 +85,7 @@ sub _build__resources {
       die "Failed to find git remote url\n";
     }
 
-    my ($git_host, $git_org, $git_repo) = $git_url =~ m{^.+@?(github|gitlab).com[:/](\w+)/(.+).git$};
+    my ($git_host, $git_org, $git_repo) = $git_url =~ m{^.+@?(github|gitlab).com[:/](\w+)/(.+)(\.git)?$};
     if (!$git_host) {
       die "Unable to find supported git host from $git_url\n";
     }
@@ -272,7 +272,7 @@ Dist::Zilla::PluginBundle::Author::IOANR - Build dists the way IOANR likes
 
 =head1 VERSION
 
-version 1.201592
+version 1.230480
 
 =head1 OPTIONS
 
@@ -333,16 +333,16 @@ L<https://metacpan.org/release/Dist-Zilla-PluginBundle-Author-IOANR>
 
 =head2 Bugs / Feature Requests
 
-Please report any bugs or feature requests through the web interface at L<https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR/issues>.
+Please report any bugs or feature requests through the web interface at L<https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR.git/issues>.
 You will be automatically notified of any progress on the request by the system.
 
 =head2 Source Code
 
 The source code is available for from the following locations:
 
-L<https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR>
+L<https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR.git>
 
-  git clone https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR.git
+  git clone https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR.git.git
 
 =head1 AUTHOR
 
@@ -350,7 +350,7 @@ Ioan Rogers <ioanr@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Ioan Rogers.
+This software is Copyright (c) 2023 by Ioan Rogers.
 
 This is free software, licensed under:
 

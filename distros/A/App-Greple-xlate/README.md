@@ -51,6 +51,8 @@ This is a short-cut to specify the pattern matches entire text
 
 - **--xlate**
 - **--xlate-color**
+- **--xlate-fold**
+- **--xlate-fold-width**=_n_ (Default: 70)
 
     Invoke the translation process for each matched area.
 
@@ -61,7 +63,13 @@ This is a short-cut to specify the pattern matches entire text
     Command result goes to standard out, so redirect to file if necessary,
     or consider to use [App::Greple::update](https://metacpan.org/pod/App%3A%3AGreple%3A%3Aupdate) module.
 
-    **--xlate** calls **--xlate-color** option with **--color=never** option.
+    Option **--xlate** calls **--xlate-color** option with **--color=never**
+    option.
+
+    With **--xlate-fold** option, converted text is folded by the specified
+    width.  Default width is 70 and can be set by **--xlate-fold-width**
+    option.  Four columns are reserved for run-in operation, so each line
+    could hold 74 characters at most.
 
 - **--xlate-engine**=_engine_
 
@@ -118,13 +126,6 @@ This is a short-cut to specify the pattern matches entire text
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 
     See the tranlsation result in real time in the STDERR output.
-
-- **--xlate-fold**
-- **--xlate-fold-width**=_n_ (Default: 70)
-
-    Fold converted text by the specified width.  Default width is 70 and
-    can be set by **--xlate-fold-width** option.  Four columns are reserved
-    for run-in operation, so each line could hold 74 characters at most.
 
 - **--match-entire**
 

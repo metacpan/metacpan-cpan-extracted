@@ -50,7 +50,7 @@
    "provides" : {
       "TableData::Chemistry::Element" : {
          "file" : "lib/TableData/Chemistry/Element.pm",
-         "version" : "0.001"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -65,12 +65,17 @@
          "web" : "https://github.com/perlancar/perl-TableData-Chemistry-Element"
       }
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::TableData",
+            "name" : "TableData",
+            "version" : "0.002"
+         },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
             "name" : "@Author::PERLANCAR/PERLANCAR::CheckPendingRelease",
@@ -448,6 +453,11 @@
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
                         "version" : "0.082"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::TableData",
+                        "name" : "-TableData",
+                        "version" : "0.003"
                      }
                   ]
                }

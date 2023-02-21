@@ -1,5 +1,11 @@
 Revision history for App-ModuleBuildTiny
 
+0.035     2023-02-15 21:38:16+0100
+          - Add an auto_git configuration option
+
+0.034     2023-02-11 13:13:03+0100
+          - Allow putting metadata in .pod instead of .pm
+
 0.033     2023-02-05 17:05:51+0100
           - Add xt test running to test command
           - Add documentation for --commit, --tag and --push

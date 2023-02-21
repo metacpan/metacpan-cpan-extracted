@@ -6,10 +6,37 @@ use utf8;
 use Role::Tiny::With;
 with 'TableDataRole::Source::CSVInDATA';
 
+sub get_table_spec {
+    return +{
+        fields => {
+            atomic_number => {pos=>0, schema=>'posint*'},
+            symbol        => {pos=>1, schema=>'str*'},
+            eng_name      => {pos=>2, schema=>'str*'},
+            ind_name      => {pos=>3, schema=>'str*'},
+            name_origin   => {pos=>4, schema=>'str*'},
+            group         => {pos=>5, schema=>'str*'},
+            period        => {pos=>6, schema=>'str*'},
+            block         => {pos=>7, schema=>'str*'},
+            standard_atomic_weight => {pos=>8, schema=>'float*'},
+            density       => {pos=>9, schema=>'float*'},
+            melting_point => {pos=>10, schema=>'float*'},
+            boiling_point => {pos=>11, schema=>'float*'},
+            specific_heat_capacity => {pos=>12, schema=>'float*'},
+            electronegativity => {pos=>13, schema=>'float*'},
+            abundance_in_earth_crust => {pos=>14, schema=>'str*'},
+            origin        => {pos=>15, schema=>'str*'},
+            phase_at_rt   => {pos=>16, schema=>'str*'},
+        },
+        pk => 'atomic_number',
+    };
+}
+
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-05'; # DATE
+our $DATE = '2023-02-12'; # DATE
 our $DIST = 'TableData-Chemistry-Element'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
+
+our %STATS = ("num_columns",17,"num_rows",118); # STATS
 
 1;
 # ABSTRACT: Chemical elements
@@ -24,7 +51,50 @@ TableData::Chemistry::Element - Chemical elements
 
 =head1 VERSION
 
-This document describes version 0.001 of TableData::Chemistry::Element (from Perl distribution TableData-Chemistry-Element), released on 2023-02-05.
+This document describes version 0.003 of TableData::Chemistry::Element (from Perl distribution TableData-Chemistry-Element), released on 2023-02-12.
+
+=head1 SYNOPSIS
+
+To use from Perl code:
+
+ use TableData::Chemistry::Element;
+
+ my $td = TableData::Chemistry::Element->new;
+
+ # Iterate rows of the table
+ $td->each_row_arrayref(sub { my $row = shift; ... });
+ $td->each_row_hashref (sub { my $row = shift; ... });
+
+ # Get the list of column names
+ my @columns = $td->get_column_names;
+
+ # Get the number of rows
+ my $row_count = $td->get_row_count;
+
+See also L<TableDataRole::Spec::Basic> for other methods.
+
+To use from command-line (using L<tabledata> CLI):
+
+ # Display as ASCII table and view with pager
+ % tabledata Chemistry::Element --page
+
+ # Get number of rows
+ % tabledata --action count_rows Chemistry::Element
+
+See the L<tabledata> CLI's documentation for other available actions and options.
+
+=head1 TABLEDATA STATISTICS
+
+ +-------------+-------+
+ | key         | value |
+ +-------------+-------+
+ | num_columns | 17    |
+ | num_rows    | 118   |
+ +-------------+-------+
+
+The statistics is available in the C<%STATS> package variable.
+
+=for Pod::Coverage ^(get_table_spec)$
 
 =head1 HOMEPAGE
 

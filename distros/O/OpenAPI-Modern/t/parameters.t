@@ -59,7 +59,7 @@ subtest 'query parameters' => sub {
     undef $parameter_content;
     my $name = $test->{param_obj}{name};
     ()= $openapi->_validate_query_parameter({ %$state, data_path => '/request/query/'.$name },
-      $test->{param_obj}, URI->new('https://example.com/blah?'.$test->{queries}));
+      $test->{param_obj}, Mojo::URL->new('https://example.com/blah?'.$test->{queries}));
 
     cmp_deeply(
       [ map $_->TO_JSON, $state->{errors}->@* ],

@@ -5,10 +5,11 @@ use attributes ();
 use base 'Terse::Controller';
 use B 'svref_2object';
 use Cwd qw(abs_path cwd);
+use Module::Runtime qw/require_module/;
 
 sub start {
 	my ($pkg, %args) = @_;
-	my $path = $pkg->_path($pkg);
+	my $path = $pkg->_path($pkg, $args{lib});
 	my $self = $pkg->new(
 		app => 1,
 		models => $pkg->_build_models($pkg, $path, $args{lib}),
@@ -24,8 +25,8 @@ sub start {
 sub preprocess_req {
         my ($self, $req, $t) = @_;
 	if (!$req) {
+		(my $path = $t->request->uri->path) =~ s/\/$//;
 		if ($self->controllers->{_alias}) {
-			my $path = $t->request->uri->path;
 			for my $candidate (keys %{$self->controllers->{_alias}}) {
                         	my @captured = $path =~ m/$candidate/;
                         	if (scalar @captured) {
@@ -35,7 +36,7 @@ sub preprocess_req {
                 	}
 		}
 		$req = $self->SUPER::preprocess_req($req, $t) if ! $req;
-        	($req) = $t->request->uri->path =~ m/([^\/]+)$/ if ! $req;
+        	($req) = $path =~ m/([^\/]+)$/ if ! $req;
 	}
         return $req;
 }
@@ -49,7 +50,6 @@ sub _build_models {
 		lib => $lib
 	);
 }
-
 
 sub _build_views {
 	my ($self, $pkg, $path, $lib) =@_; 
@@ -84,7 +84,6 @@ sub _build_plugins {
 sub _load_modules {
 	my ($self, %args) = @_;
 	my $type = $args{type};
-	$args{path} =~ s/([^\/]+)$/$args{lib}\/$1/ if ($args{lib});
 	my @modules = map {
 		(my $l = $_) =~ s/^(\/)|(\.pm)$//ig;
 		(my $m = $l) =~ s/\//::/g;
@@ -95,9 +94,7 @@ sub _load_modules {
 	} $self->_recurse_directory("$args{path}/$type");
 	my %mods = ();
 	for my $module (@modules) {
-		no warnings 'reserved';
-		eval "require $module->[1]";
-		die $@ if $@;
+		require_module($module->[1]);
 	}
 	for my $module (@modules) {
 		$module = $module->[1]->new(app => 1);
@@ -127,6 +124,7 @@ sub _path {
 	my $pkg_file = join('/', split("\:\:", ($_[1])));
 	my $path = $0;
 	$path =~ s/[^\/]+$//g;
+ 	$path .= $_[2] . '/' if (defined $_[2]);
 	$path .= $pkg_file;
 	return $path;
 }
@@ -188,7 +186,7 @@ Terse::App - Lightweight MVC applications.
 
 =head1 VERSION
 
-Version 0.1234
+Version 0.123456789
 
 =cut
 

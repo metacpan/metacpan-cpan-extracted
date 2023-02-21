@@ -189,6 +189,13 @@ sub new
 	return $self;
 }
 
+sub apply
+{
+	my ( $self, $canvas ) = @_;
+	$canvas->matrix($self);
+	return $self;
+}
+
 sub set
 {
 	my $self = shift;
@@ -204,7 +211,7 @@ sub C           { $#_ ? $_[0]->[2] = $_[1] : $_[0]->[2]               }
 sub D           { $#_ ? $_[0]->[3] = $_[1] : $_[0]->[3]               }
 sub X           { $#_ ? $_[0]->[4] = $_[1] : $_[0]->[4]               }
 sub Y           { $#_ ? $_[0]->[5] = $_[1] : $_[0]->[5]               }
-sub translate   { $_[0]->[4]+=$_[1]; $_[0]->[5]+=$_[2];     $_[0]     }
+sub translate   { $_[0]->[4]+=$_[1]; $_[0]->[5]+=$_[2]//$_[1]; $_[0]  }
 sub scale       { $_[0]->multiply([$_[1],0,0,$_[2] // $_[1],0,0])     }
 sub shear       { $_[0]->multiply([1,$_[2] // $_[1],$_[1],1,0,0])     }
 sub is_identity { 0 == (grep { $identity->[$_] != $_[0]->[$_] } 0..5) }
@@ -214,7 +221,7 @@ our $RAD = 180.0 / $PI;
 sub rotate
 {
 	my ( $self, $angle ) = @_;
-	return if $angle == 0.0;
+	return $self if $angle == 0.0;
 	$angle /= $RAD;
 	my $cos = cos($angle);
 	my $sin = sin($angle);
@@ -510,12 +517,6 @@ sub profile_default
 	return $def;
 }
 
-sub profile_check_in
-{
-	my ( $self, $p, $default) = @_;
-	$p->{fd} = fileno($p->{file}) if exists $p->{file} && ! exists $p->{fd};
-}
-
 package Prima::Clipboard;
 use vars qw(@ISA);
 @ISA = qw(Prima::Component);
@@ -736,10 +737,10 @@ sub translate
 	$_[0]->matrix($m);
 }
 
-sub lineTail  { $#_ ? $_[0]->lineEndIndex(-1, $_[1])  : $_[0]->lineEndIndex(-1) }
-sub lineHead  { $#_ ? $_[0]->lineEndIndex(-2, $_[1])  : $_[0]->lineEndIndex(-2) }
-sub arrowTail { $#_ ? $_[0]->lineEndIndex(-3, $_[1])  : $_[0]->lineEndIndex(-3) }
-sub arrowHead { $#_ ? $_[0]->lineEndIndex(-4, $_[1])  : $_[0]->lineEndIndex(-4) }
+sub lineTail  { $#_ ? $_[0]->lineEndIndex(lei::Only | lei::LineTail , $_[1])  : $_[0]->lineEndIndex(lei::Only | lei::LineTail ) }
+sub lineHead  { $#_ ? $_[0]->lineEndIndex(lei::Only | lei::LineHead , $_[1])  : $_[0]->lineEndIndex(lei::Only | lei::LineHead ) }
+sub arrowTail { $#_ ? $_[0]->lineEndIndex(lei::Only | lei::ArrowTail, $_[1])  : $_[0]->lineEndIndex(lei::Only | lei::ArrowTail) }
+sub arrowHead { $#_ ? $_[0]->lineEndIndex(lei::Only | lei::ArrowHead, $_[1])  : $_[0]->lineEndIndex(lei::Only | lei::ArrowHead) }
 
 package Prima::Image;
 use vars qw( @ISA);
@@ -855,49 +856,21 @@ sub to_rgba
 {
 	my ($self, $type) = @_;
 
-	unless ( defined $type ) {
-		$type = ( $self->type & im::GrayScale ) ? im::Byte : im::RGB;
-	}
+	$type //= ( $self->type & im::GrayScale ) ? im::Byte : im::RGB;
 
-	if ( $self->isa('Prima::Icon')) {
-		return $self->clone( type => $type, maskType => im::bpp8 );
-	} else {
-		my $i = $self->to_icon( maskType => 8, fill => "\xff" );
-		$i->type($type);
-		return $i;
-	}
-}
+	return $self->clone( type => $type, maskType => im::bpp8 )
+		if $self->isa('Prima::Icon');
 
-sub to_icon
-{
-	my ( $self, %set ) = @_;
-	return if $self->isa('Prima::Icon');
-
-	my $fill = delete $set{fill};
-	my $type = delete $set{maskType} // 1;
-	my @size = $self->size;
-
-	return Prima::Icon->new(
-		%set,
-		size     => \@size,
-		maskType => $type,
-		( map { $_ => $self->$_() } qw(
-			data type palette scaling conversion preserveType
-		)),
-		(( defined $fill && length $fill ) ? (
-			autoMasking => am::None,
-			mask        => ( $fill x ((
-				($size[0] * $type + 31 ) / 32 * 4 * $size[1]
-			) / length $fill ))
-		) : ())
-	);
+	my $i = $self->convert_to_icon( 8, "\xff" );
+	$i->type($type);
+	return $i;
 }
 
 sub load_stream
 {
 	shift;
 	require Prima::Image::base64;
-	my ($ok, $error) = Prima::Image::base64::load_icon(@_);
+	my ($ok, $error) = Prima::Image::base64::load_image(@_);
 	$@ = $error unless $ok;
 	return $ok;
 }
@@ -1950,6 +1923,7 @@ sub profile_check_in
 sub maximize    { $_[0]-> windowState( ws::Maximized)}
 sub minimize    { $_[0]-> windowState( ws::Minimized)}
 sub restore     { $_[0]-> windowState( ws::Normal)}
+sub fullscreen  { $_[0]-> windowState( ws::Fullscreen)}
 
 sub frameWidth           {($#_)?$_[0]-> frameSize($_[1], ($_[0]-> frameSize)[1]):return ($_[0]-> frameSize)[0];  }
 sub frameHeight          {($#_)?$_[0]-> frameSize(($_[0]-> frameSize)[0], $_[1]):return ($_[0]-> frameSize)[1];  }
@@ -1962,6 +1936,20 @@ sub menuDisabledColor    { return shift-> menuColorIndex( ci::DisabledText , @_)
 sub menuHiliteColor      { return shift-> menuColorIndex( ci::HiliteText   , @_);}
 sub menuDark3DColor      { return shift-> menuColorIndex( ci::Dark3DColor  , @_);}
 sub menuLight3DColor     { return shift-> menuColorIndex( ci::Light3DColor , @_);}
+
+sub effect
+{
+	if ( $#_ == 1 ) {
+		my ( $self, $effect ) = @_;
+		my $effects = $self->effects;
+		return defined($effects) ? $effects->{$effect} : undef;
+	} else {
+		my ( $self, $effect, $value ) = @_;
+		my $effects = $self->effects // {};
+		$effects->{$effect} = $value;
+		$self->effects($effects);
+	}
+}
 
 
 package Prima::Dialog;
@@ -2234,7 +2222,7 @@ sub AUTOLOAD
 sub DESTROY {}
 
 package Prima::Application;
-use vars qw(@ISA @startupNotifications);
+use vars qw(@ISA @startupNotifications $GUI_EXCEPTION);
 @ISA = qw(Prima::Widget);
 
 {
@@ -2245,6 +2233,7 @@ my %RNT = (
 	Copy         => nt::Action,
 	Paste        => nt::Action,
 	Idle         => nt::Default,
+	Die          => nt::Notification,
 );
 
 sub notification_types { return \%RNT; }
@@ -2260,6 +2249,7 @@ sub profile_default
 		pointerType    => cr::Arrow,
 		pointerVisible => 1,
 		language       => Prima::Application->get_system_info->{guiLanguage},
+		guiException   => $GUI_EXCEPTION,
 		icon           => undef,
 		owner          => undef,
 		scaleChildren  => 0,
@@ -2291,6 +2281,7 @@ sub profile_check_in
 {
 	my ( $self, $p, $default) = @_;
 	$p->{textDirection} //= $self->lang_is_rtl($p->{language} // $default->{language});
+	$GUI_EXCEPTION = delete $p->{guiException} if exists $p->{guiException};
 	$self-> SUPER::profile_check_in( $p, $default);
 	delete $p-> { printerModule};
 	delete $p-> { owner};
@@ -2365,6 +2356,7 @@ sub get_printer
 	return $_[0]-> {Printer};
 }
 
+sub guiException  {$#_ ? $GUI_EXCEPTION = $_[1] : $GUI_EXCEPTION }
 sub hintFont      {($#_)?$_[0]-> set_hint_font        ($_[1])  :return Prima::Font-> new($_[0], "get_hint_font", "set_hint_font")}
 sub helpModule    {($#_)?$_[0]-> {HelpModule} = $_[1] : return $_[0]-> {HelpModule}}
 sub helpClass     {($#_)?$_[0]-> {HelpClass}  = $_[1] : return $_[0]-> {HelpClass}}
@@ -2414,6 +2406,15 @@ sub open_help
 	return unless length $link;
 	return unless $self-> help_init;
 	return $self-> {HelpClass}-> open($link);
+}
+
+sub on_die
+{
+	my ($self, $err, $stack) = @_;
+	return unless $GUI_EXCEPTION;
+	require Prima::MsgBox;
+	$self->clear_event if
+		Prima::MsgBox::signal_dialog($self->name . ' fatal error', $err, $stack) != mb::Abort;
 }
 
 sub on_clipboard

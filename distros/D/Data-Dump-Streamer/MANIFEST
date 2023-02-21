@@ -1,5 +1,5 @@
-.patch
 .gitignore
+.patch
 Build.PL
 Changes
 inc/My/Builder.pm
@@ -10,6 +10,7 @@ lib/Data/Dump/Streamer.xs
 lib/Data/Dump/Streamer/_/Printers.pm
 MANIFEST			This list of files
 MANIFEST.SKIP
+META.json
 META.yml
 README.md
 t/as.t
@@ -33,9 +34,10 @@ t/refcount.t
 t/refelem.t
 t/reftype.t
 t/sortkeys.t
+t/stash.t
+t/terse.t
 t/test_helper.pl
 t/tree.t
 t/usage.t
 t/xs_subs.t
 typemap
-META.json

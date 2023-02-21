@@ -1,0 +1,10 @@
+Revision history for App-APA
+
+0.230470  2023-02-16 15:38:54+04:00 Asia/Baku
+  - Convert to feature 'class'
+  - Add method documentation
+  - Add -1 as -f synonym option
+  - Use trim
+  - Introduce the get_items private method
+  - Use Dist-Zilla
+  - Release to CPAN

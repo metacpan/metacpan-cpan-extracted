@@ -1,13 +1,12 @@
 use Test::More tests => 6;
-BEGIN { use_ok( 'Data::Dump::Streamer', qw(:undump) ); }
+BEGIN { use_ok('Data::Dump::Streamer', qw(:undump)); }
 use strict;
 use warnings;
 use Data::Dumper;
 
-#$Id: tree.t 26 2006-04-16 15:18:52Z demerphq $#
-
 # imports same()
 require "./t/test_helper.pl";
+
 # use this one for simple, non evalable tests. (GLOB)
 #   same ( $got,$expected,$name,$obj )
 #
@@ -15,41 +14,42 @@ require "./t/test_helper.pl";
 # same ( $name,$obj,$expected,@args )
 
 my $dump;
-my $o = Data::Dump::Streamer->new();
+my $o= Data::Dump::Streamer->new();
 
-isa_ok( $o, 'Data::Dump::Streamer' );
+isa_ok($o, 'Data::Dump::Streamer');
 {
 
     sub tree {
-        my ($nodes,$md,$t,$d,$p,$par)=@_;
-        $t||='@';
-        $d||=0;
-        $p=':' unless defined $p;
-        if ($d<$md) {
+        my ($nodes, $md, $t, $d, $p, $par)= @_;
+        $t ||= '@';
+        $d ||= 0;
+        $p= ':' unless defined $p;
+        if ($d < $md) {
             my $node;
             if ($t eq '%') {
-                $node={};
-                push @$nodes,$node;
-                %$node=(par=>$par,
-                       left=>tree ( $nodes,$md,$t,$d+1,$p.'0',$node),
-                       right=>tree ( $nodes,$md,$t,$d+1,$p.'1',$node)
-                      );
+                $node= {};
+                push @$nodes, $node;
+                %$node= (
+                    par   => $par,
+                    left  => tree($nodes, $md, $t, $d + 1, $p . '0', $node),
+                    right => tree($nodes, $md, $t, $d + 1, $p . '1', $node));
 
-            } else {
-                $node=[];
-                push @$nodes,$node;
-                push @$node,$par,
-                       tree ( $nodes,$md,$t,$d+1,$p.'0',$node),
-                       tree ( $nodes,$md,$t,$d+1,$p.'1',$node);
+            }
+            else {
+                $node= [];
+                push @$nodes, $node;
+                push @$node, $par,
+                    tree($nodes, $md, $t, $d + 1, $p . '0', $node),
+                    tree($nodes, $md, $t, $d + 1, $p . '1', $node);
             }
             return $node;
         }
         return $p;
     }
-    my (@anodes,@hnodes);
-    my $at=tree(\@anodes,3,'@');
-    my $ht=tree(\@hnodes,3,'%');
-    same( "Parent Array Tree", $o,  <<'EXPECT',( $at ) );
+    my (@anodes, @hnodes);
+    my $at= tree(\@anodes, 3, '@');
+    my $ht= tree(\@hnodes, 3, '%');
+    same("Parent Array Tree", $o, <<'EXPECT', ($at));
 $ARRAY1 = [
             undef,
             [
@@ -87,8 +87,7 @@ $ARRAY1->[2][1][0] = $ARRAY1->[2];
 $ARRAY1->[2][2][0] = $ARRAY1->[2];
 EXPECT
 
-
-    same( "Parent tree Array Nodes", $o , <<'EXPECT', ( \@anodes ) );
+    same("Parent tree Array Nodes", $o, <<'EXPECT', (\@anodes));
 $ARRAY1 = [
             [
               undef,
@@ -139,7 +138,7 @@ $ARRAY1->[4][2] = $ARRAY1->[6];
 $ARRAY1->[5][0] = $ARRAY1->[4];
 $ARRAY1->[6][0] = $ARRAY1->[4];
 EXPECT
-    same( "Parent tree Hash", $o  , <<'EXPECT',( $ht ));
+    same("Parent tree Hash", $o, <<'EXPECT', ($ht));
 $HASH1 = {
            left  => {
                       left  => {
@@ -177,8 +176,7 @@ $HASH1->{right}{par} = $HASH1;
 $HASH1->{right}{right}{par} = $HASH1->{right};
 EXPECT
 
-
-    same( "Parent Tree Hash Nodes", $o, <<'EXPECT', ( \@hnodes ) );
+    same("Parent Tree Hash Nodes", $o, <<'EXPECT', (\@hnodes));
 $ARRAY1 = [
             {
               left  => 'V: $ARRAY1->[1]',

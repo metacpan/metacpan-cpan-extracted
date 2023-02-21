@@ -1,7 +1,7 @@
 package OX::RouteBuilder::REST;
 
 # ABSTRACT: OX::RouteBuilder which routes to an action method in a controller class based on HTTP verbs
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use Moose;
 use namespace::autoclean;
@@ -46,9 +46,21 @@ sub compile_routes {
         if ( $component->can($action) ) {
             return $component->$action(@_);
         }
+        elsif ($method eq 'HEAD' && $component->can($a . '_GET')) {
+            $action = $a . '_GET';
+            my $res = $component->$action(@_);
+            if (ref($res) eq 'ARRAY') {
+                $res->[2]=[''];
+            }
+            elsif (blessed($res) && $res->can('content')) {
+                $res->content('');
+            }
+            # else don't mess with content..
+            return $res;
+        }
         else {
-            return [ 500, [],
-                ["Component $component has no method $action"] ];
+            return [ 501, [],
+                ["Controller '$c' (".blessed($component).") has no method '$action'"] ];
         }
     };
 
@@ -90,7 +102,7 @@ OX::RouteBuilder::REST - OX::RouteBuilder which routes to an action method in a 
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -147,11 +159,15 @@ C<"REST.$controller.$action">, where C<$controller> is the name of a
 service which provides a controller instance. For each HTTP verb you
 want to support you will need to set up an action with the name
 C<$action_$verb> (e.g. C<$action_GET>, C<$action_PUT>, etc). If no
-matching action-verb-method is found, a 404 error will be returned.
+matching action-verb-method is found, a 501 error will be returned.
 
 C<controller> and C<action> will also be automatically added as
 defaults for the route, as well as C<name> (which will be set to
 C<"REST.$controller.$action">).
+
+A C<HEAD> request will be redirect to C<GET> (with a potential
+response body removed), unless you implement a method named
+C<$action_HEAD>.
 
 To generate a link to an action, use C<uri_for> with either the name
 (eg C<"REST.$controller.$action">), or by passing a HashRef C<<{
@@ -178,7 +194,7 @@ Validad GmbH http://validad.com
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 - 2021 by Thomas Klausner.
+This software is copyright (c) 2014 - 2023 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

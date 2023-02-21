@@ -4,26 +4,32 @@ Geo::BUFR
 Library for handling of WMO (World Meteorological Organization) BUFR
 files.
 
-
 INSTALLATION
 
-To install this module type the following:
+Installation is most easily done by modern tools like cpan and cpanm,
+e.g.
+
+   cpanm Geo::BUFR
+
+If you prefer the old way: download the tar file from CPAN (Download
+link at https://metacpan.org/pod/Geo::BUFR), unpack it and install
+with
 
    perl Makefile.PL
    make
    make test
    make install
 
-This will install the module in the standard locations. You will most
-probably require root privileges to install in standard system
-directories. To install in a non-standard directory like /home/cpan,
-specify the directory during the 'perl Makefile.PL' stage:
+This will install the module in the standard location for which you
+normally will need root privileges. To install in a non-standard
+directory like /home/cpan, specify the directory during the 'perl
+Makefile.PL' stage:
 
    perl Makefile.PL INSTALL_BASE=/home/cpan
 
-After installing, in order for Perl to find the module when executing
-programs, you are adviced to modify the environment variable $PERL5LIB,
-e.g.
+after which you are adviced to modify the environment variable
+$PERL5LIB in order for Perl to find the module when executing
+programs, e.g.
 
    export PERL5LIB=/home/cpan/lib/perl/5.8.4:$PERL5LIB
 
@@ -63,5 +69,5 @@ COPYRIGHT AND LICENCE
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
-Copyright (C) 2010-2019 MET Norway
+Copyright (C) 2010-2023 MET Norway
 

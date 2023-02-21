@@ -6,15 +6,14 @@ use warnings;
 use Log::ger;
 
 use Exporter::Rinci qw(import);
-use File::Which qw(which);
-use IPC::System::Options 'system', 'readpipe', -log=>1;
+use IPC::System::Options 'system', 'readpipe', 'run', -log=>1;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-25'; # DATE
+our $DATE = '2022-12-08'; # DATE
 our $DIST = 'Clipboard-Any'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
-my $known_clipboard_managers = [qw/klipper/];
+my $known_clipboard_managers = [qw/klipper parcellite clipit xclip/];
 my $sch_clipboard_manager = ['str', in=>$known_clipboard_managers];
 our %argspecopt_clipboard_manager = (
     clipboard_manager => {
@@ -25,6 +24,7 @@ our %argspecopt_clipboard_manager = (
 The default, when left undef, is to detect what clipboard manager is running.
 
 _
+        cmdline_aliases => {m=>{}},
     },
 );
 
@@ -37,9 +37,9 @@ $SPEC{':package'} = {
 
 This module provides common functions related to clipboard manager.
 
-Supported clipboard manager: KDE Plasma's Klipper (`klipper`). Support for more
-clipboard managers, e.g. on Windows or other Linux desktop environment is
-welcome.
+Supported clipboard manager: KDE Plasma's Klipper (`klipper`), `parcellite`.
+Support for more clipboard managers, e.g. on Windows or other Linux desktop
+environment is welcome.
 
 _
 };
@@ -61,14 +61,12 @@ _
 sub detect_clipboard_manager {
     my %args = @_;
 
-    #require Proc::Find;
-    #no warnings 'once';
-    #local $Proc::Find::CACHE = 1;
+    require File::Which;
 
   KLIPPER:
     {
         log_trace "Checking whether clipboard manager klipper is running ...";
-        unless (which "qdbus") {
+        unless (File::Which::which("qdbus")) {
             log_trace "qdbus not found in PATH, system is probably not using klipper";
             last;
         }
@@ -80,8 +78,48 @@ sub detect_clipboard_manager {
             log_trace "Failed listing org.kde.klipper /klipper methods, system is probably not using klipper";
             last;
         }
-        log_trace "Concluding klipper is active";
+        log_trace "org.kde.klipper/klipper object active, concluding using klipper";
         return "klipper";
+    }
+
+    require Proc::Find;
+    no warnings 'once';
+    local $Proc::Find::CACHE = 1;
+
+  PARCELLITE:
+    {
+        log_trace "Checking whether clipboard manager parcellite is running ...";
+        my @pids = Proc::Find::find_proc(name => "parcellite");
+        if (@pids) {
+            log_trace "parcellite process is running, concluding using parcellite";
+            return "parcellite";
+        } else {
+            log_trace "parcellite process does not seem to be running, probably not using parcellite";
+        }
+    }
+
+  CLIPIT:
+    {
+        # basically the same as parcellite
+        log_trace "Checking whether clipboard manager clipit is running ...";
+        my @pids = Proc::Find::find_proc(name => "clipit");
+        if (@pids) {
+            log_trace "clipit process is running, concluding using clipit";
+            return "clipit";
+        } else {
+            log_trace "clipit process does not seem to be running, probably not using clipit";
+        }
+    }
+
+  XCLIP:
+    {
+        log_trace "Checking whether xclip is available ...";
+        unless (File::Which::which("xclip")) {
+            log_trace "xclip not found in PATH, skipping choosing xclip";
+            last;
+        }
+        log_trace "xclip found in PATH, concluding using xclip";
+        return "xclip";
     }
 
     log_trace "No known clipboard manager is detected";
@@ -113,6 +151,28 @@ sub clear_clipboard_history {
         my $exit_code = $? < 0 ? $? : $?>>8;
         return [500, "/klipper's clearClipboardHistory failed: $exit_code"] if $exit_code;
         return [200, "OK"];
+    } elsif ($clipboard_manager eq 'parcellite') {
+        return [501, "Not yet implemented"];
+    } elsif ($clipboard_manager eq 'clipit') {
+        return [501, "Not yet implemented"];
+    } elsif ($clipboard_manager eq 'xclip') {
+        # implemented by setting both primary and clipboard to empty string
+
+        my $fh;
+
+        open $fh, "| xclip -i -selection primary" ## no critic: InputOutput::ProhibitTwoArgOpen
+            or return [500, "xclip -i -selection primary failed (1): $!"];
+        print $fh '';
+        close $fh
+            or return [500, "xclip -i -selection primary failed (2): $!"];
+
+        open $fh, "| xclip -i -selection clipboard" ## no critic: InputOutput::ProhibitTwoArgOpen
+            or return [500, "xclip -i -selection clipboard failed (1): $!"];
+        print $fh '';
+        close $fh
+            or return [500, "xclip -i -selection clipboard failed (2): $!"];
+
+        return [200, "OK"];
     }
 
     [412, "Cannot clear clipboard history (clipboard manager=$clipboard_manager)"];
@@ -142,6 +202,20 @@ sub clear_clipboard_content {
                "qdbus", "org.kde.klipper", "/klipper", "clearClipboardContents");
         my $exit_code = $? < 0 ? $? : $?>>8;
         return [500, "/klipper's clearClipboardContents failed: $exit_code"] if $exit_code;
+        return [200, "OK"];
+    } elsif ($clipboard_manager eq 'parcellite') {
+        return [501, "Not yet implemented"];
+    } elsif ($clipboard_manager eq 'clipit') {
+        return [501, "Not yet implemented"];
+    } elsif ($clipboard_manager eq 'xclip') {
+        # implemented by setting primary to empty string
+
+        open my $fh, "| xclip -i -selection primary" ## no critic: InputOutput::ProhibitTwoArgOpen
+            or return [500, "xclip -i -selection primary failed (1): $!"];
+        print $fh '';
+        close $fh
+            or return [500, "xclip -i -selection primary failed (2): $!"];
+
         return [200, "OK"];
     }
 
@@ -185,6 +259,27 @@ sub get_clipboard_content {
         my $exit_code = $? < 0 ? $? : $?>>8;
         return [500, "/klipper's getClipboardContents failed: $exit_code"] if $exit_code;
         chomp $stdout;
+        return [200, "OK", $stdout];
+    } elsif ($clipboard_manager eq 'parcellite') {
+        my ($stdout, $stderr);
+        system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
+               "parcellite", "-p");
+        my $exit_code = $? < 0 ? $? : $?>>8;
+        return [500, "parcellite command failed with exit code $exit_code"] if $exit_code;
+        return [200, "OK", $stdout];
+    } elsif ($clipboard_manager eq 'clipit') {
+        my ($stdout, $stderr);
+        system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
+               "clipit", "-p");
+        my $exit_code = $? < 0 ? $? : $?>>8;
+        return [500, "clipit command failed with exit code $exit_code"] if $exit_code;
+        return [200, "OK", $stdout];
+    } elsif ($clipboard_manager eq 'xclip') {
+        my ($stdout, $stderr);
+        system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
+               "xclip", "-o", "-selection", "primary");
+        my $exit_code = $? < 0 ? $? : $?>>8;
+        return [500, "xclip -o failed with exit code $exit_code"] if $exit_code;
         return [200, "OK", $stdout];
     }
 
@@ -243,6 +338,29 @@ sub list_clipboard_history {
             $i++;
         }
         return [200, "OK", \@rows];
+    } elsif ($clipboard_manager eq 'parcellite') {
+        # parcellite -c usually just prints the same result as -p (primary)
+        return [501, "Not yet implemented"];
+    } elsif ($clipboard_manager eq 'clipit') {
+        # clipit -c usually just prints the same result as -p (primary)
+        return [501, "Not yet implemented"];
+    } elsif ($clipboard_manager eq 'xclip') {
+        my ($stdout, $stderr, $exit_code);
+        my @rows;
+
+        system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
+               "xclip", "-o", "-selection", "primary");
+        $exit_code = $? < 0 ? $? : $?>>8;
+        return [500, "xclip -o (primary) failed with exit code $exit_code"] if $exit_code;
+        push @rows, $stdout;
+
+        system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
+               "xclip", "-o", "-selection", "clipboard");
+        $exit_code = $? < 0 ? $? : $?>>8;
+        return [500, "xclip -o (clipboard) failed with exit code $exit_code"] if $exit_code;
+        push @rows, $stdout;
+
+        return [200, "OK", \@rows];
     }
 
     [412, "Cannot list clipboard history (clipboard manager=$clipboard_manager)"];
@@ -252,6 +370,9 @@ $SPEC{'add_clipboard_content'} = {
     v => 1.1,
     summary => 'Add a new content to the clipboard',
     description => <<'_',
+
+For `xclip`: when adding content, the primary selection is set. The clipboard
+content is unchanged.
 
 _
     args => {
@@ -286,6 +407,21 @@ sub add_clipboard_content {
         my $exit_code = $? < 0 ? $? : $?>>8;
         return [500, "/klipper's setClipboardContents failed: $exit_code"] if $exit_code;
         return [200, "OK"];
+    } elsif ($clipboard_manager eq 'parcellite') {
+        # parcellite cli copies unknown options and stdin to clipboard history
+        # but not as the current one
+        return [501, "Not yet implemented"];
+    } elsif ($clipboard_manager eq 'clipit') {
+        # clipit cli copies unknown options and stdin to clipboard history but
+        # not as the current one
+        return [501, "Not yet implemented"];
+    } elsif ($clipboard_manager eq 'xclip') {
+        open my $fh, "| xclip -i -selection primary" ## no critic: InputOutput::ProhibitTwoArgOpen
+            or return [500, "xclip -i -selection primary failed (1): $!"];
+        print $fh $args{content};
+        close $fh
+            or return [500, "xclip -i -selection primary failed (2): $!"];
+        return [200, "OK"];
     }
 
     [412, "Cannot add clipboard content (clipboard manager=$clipboard_manager)"];
@@ -306,7 +442,7 @@ Clipboard::Any - Common interface to clipboard manager functions
 
 =head1 VERSION
 
-This document describes version 0.005 of Clipboard::Any (from Perl distribution Clipboard-Any), released on 2022-10-25.
+This document describes version 0.008 of Clipboard::Any (from Perl distribution Clipboard-Any), released on 2022-12-08.
 
 =head1 DESCRIPTION
 
@@ -330,12 +466,28 @@ on.
 
 =back
 
+=head2 Supported clipboard managers
+
+=head3 Klipper
+
+The default clipboard manager on KDE Plasma.
+
+=head3 clipit
+
+=head3 parcellite
+
+=head3 xclip
+
+This is not a "real" clipboard manager, but just an interface to the X
+selections. With C<xclip>, the history is viewed as having two items. The
+first/recent is the primary selection and the second one is the secondary.
+
 
 This module provides common functions related to clipboard manager.
 
-Supported clipboard manager: KDE Plasma's Klipper (C<klipper>). Support for more
-clipboard managers, e.g. on Windows or other Linux desktop environment is
-welcome.
+Supported clipboard manager: KDE Plasma's Klipper (C<klipper>), C<parcellite>.
+Support for more clipboard managers, e.g. on Windows or other Linux desktop
+environment is welcome.
 
 =head1 NOTES
 
@@ -351,6 +503,9 @@ Usage:
  add_clipboard_content(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Add a new content to the clipboard.
+
+For C<xclip>: when adding content, the primary selection is set. The clipboard
+content is unchanged.
 
 This function is not exported by default, but exportable.
 

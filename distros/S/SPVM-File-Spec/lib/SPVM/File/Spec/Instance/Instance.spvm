@@ -1,0 +1,94 @@
+class File::Spec::Instance::Instance {
+  
+  interface File::Spec::Instance::Instance::Interface;
+  
+  use Sys;
+  use File::Spec::Instance::Instance::Unix;
+  use File::Spec::Instance::Instance::Win32;
+  
+  # Class Methods
+  static method new : File::Spec::Instance::Instance () {
+    
+    my $self : File::Spec::Instance::Instance;
+    
+    if (Sys->defined("_WIN32")) {
+      $self = File::Spec::Instance::Instance::Win32->new;
+    }
+    else {
+      $self = File::Spec::Instance::Instance::Unix->new;
+    }
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method has_interfaces : int () { return 1; }
+  
+  method canonpath : string ($path : string) {
+    return $self->(File::Spec::Instance::Instance::Interface)->canonpath($path);
+  }
+  
+  method catdir : string ($directories : string[]) {
+    return $self->(File::Spec::Instance::Instance::Interface)->catdir($directories);
+  }
+  
+  method catfile : string ($directories : string[], $filename : string) {
+    return $self->(File::Spec::Instance::Instance::Interface)->catfile($directories, $filename);
+  }
+  
+  method curdir : string () {
+    return $self->(File::Spec::Instance::Instance::Interface)->curdir;
+  }
+  
+  method devnull : string () {
+    return $self->(File::Spec::Instance::Instance::Interface)->devnull;
+  }
+  
+  method rootdir : string () {
+    return $self->(File::Spec::Instance::Instance::Interface)->rootdir;
+  }
+  
+  method tmpdir : string () {
+    return $self->(File::Spec::Instance::Instance::Interface)->tmpdir;
+  }
+  
+  method updir : string () {
+    return $self->(File::Spec::Instance::Instance::Interface)->updir;
+  }
+  
+  method no_upwards : string[] ($directories : string[]) {
+    return $self->(File::Spec::Instance::Instance::Interface)->no_upwards($directories);
+  }
+  
+  method file_name_is_absolute : int ($path : string) {
+    return $self->(File::Spec::Instance::Instance::Interface)->file_name_is_absolute($path);
+  }
+  
+  method path : string[] () {
+    return $self->(File::Spec::Instance::Instance::Interface)->path;
+  }
+  
+  method join : string ($directories : string[], $filename : string) {
+    return $self->(File::Spec::Instance::Instance::Interface)->join($directories, $filename);
+  }
+  
+  method splitpath : string[] ($path : string, $no_file = 0 : int) {
+    return $self->(File::Spec::Instance::Instance::Interface)->splitpath($path, $no_file);
+  }
+  
+  method splitdir : string[] ($path : string) {
+    return $self->(File::Spec::Instance::Instance::Interface)->splitdir($path);
+  }
+   
+  method catpath : string ($volume : string, $directory : string, $file : string) {
+    return $self->(File::Spec::Instance::Instance::Interface)->catpath($volume, $directory, $file);
+  }
+  
+  method abs2rel : string ($path : string, $base = undef : string) {
+    return $self->(File::Spec::Instance::Instance::Interface)->abs2rel($path, $base);
+  }
+  
+  method rel2abs : string ($path : string, $base = undef : string) {
+    return $self->(File::Spec::Instance::Instance::Interface)->rel2abs($path, $base);
+  }
+}

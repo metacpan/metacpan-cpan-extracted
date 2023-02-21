@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Lakeshore350;
-$Lab::Moose::Instrument::Lakeshore350::VERSION = '3.842';
+$Lab::Moose::Instrument::Lakeshore350::VERSION = '3.851';
 #ABSTRACT: Lakeshore Model 350 Temperature Controller
 
 use v5.20;
@@ -36,7 +36,8 @@ sub BUILD {
     $self->cls();
 }
 
-my %channel_arg = ( channel => { isa => enum( [qw/ A B C D/] ) } );
+my %channel_arg
+    = ( channel => { isa => enum( [qw/ A B C D/] ), optional => 1 } );
 my %loop_arg = ( loop => { isa => enum( [ 1, 2, 3, 4 ] ), optional => 1 } );
 my %output_arg = ( output => { isa => enum( [ 1, 2, 3, 4 ] ) } );
 
@@ -416,8 +417,7 @@ sub set_curve_header {
     my ( $curve, $name, $SN, $format, $limit, $coefficient )
         = delete @args{qw/curve name SN format limit coefficient/};
     $self->write(
-        command =>
-            "CRVHDR $curve, \"$name\", \"$SN\", $format, $limit, $coefficient",
+        command => "CRVHDR $curve, $name, $SN, $format, $limit, $coefficient",
         %args
     );
 }
@@ -575,7 +575,7 @@ Lab::Moose::Instrument::Lakeshore350 - Lakeshore Model 350 Temperature Controlle
 
 =head1 VERSION
 
-version 3.842
+version 3.851
 
 =head1 SYNOPSIS
 
@@ -811,7 +811,7 @@ This driver consumes the following roles:
 
 This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
-  Copyright 2022       Simon Reinhardt
+  Copyright 2022-2023  Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

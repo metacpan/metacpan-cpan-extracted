@@ -10,14 +10,14 @@ $test_1_simple_expected
             'parsers' => [
                            {
                              'parser' => 'Spreadsheet::ReadGnumeric',
-                             'version' => '0.1',
+                             'version' => '0.2',
                              'type' => 'gnumeric'
                            }
                          ],
             'type' => 'gnumeric',
             'sheets' => 3,
             'error' => undef,
-            'version' => '0.1',
+            'version' => '0.2',
             'parser' => 'Spreadsheet::ReadGnumeric'
           },
           {
@@ -62,7 +62,7 @@ $test_1_simple_expected
             'B3' => 'Date',
             'B30' => '44882',
             'E24' => '1',
-            'maxrow' => '53',
+            'maxrow' => '54',
             'C38' => 'ATM',
             'E14' => '1',
             'C5' => '** 2022 **',
@@ -570,11 +570,11 @@ $test_1_simple_expected
             'C40' => 'ATM',
             'B37' => '44912',
             'E23' => '1',
-            'maxcol' => '255'
+            'maxcol' => '256'
           },
           {
             'label' => 'Sheet2',
-            'maxcol' => '255',
+            'maxcol' => '256',
             'mincol' => 1,
             'indx' => 2
           },
@@ -582,7 +582,7 @@ $test_1_simple_expected
             'label' => 'Sheet3',
             'indx' => 3,
             'mincol' => 1,
-            'maxcol' => '255'
+            'maxcol' => '256'
           }
         ];
 
@@ -597,7 +597,7 @@ $test_1_simple_no_rc_expected
             'parsers' => [
                            {
                              'parser' => 'Spreadsheet::ReadGnumeric',
-                             'version' => '0.1',
+                             'version' => '0.2',
                              'type' => 'gnumeric'
                            }
                          ],
@@ -605,7 +605,7 @@ $test_1_simple_no_rc_expected
             'type' => 'gnumeric',
             'error' => undef,
             'sheets' => 3,
-            'version' => '0.1'
+            'version' => '0.2'
           },
           {
             'label' => 'Sheet1',
@@ -621,7 +621,7 @@ $test_1_simple_no_rc_expected
             'B27' => '44877',
             'E17' => '1',
             'C37' => 'monthly maintenance fee',
-            'maxrow' => '53',
+            'maxrow' => '54',
             'C36' => 'Credit Card One',
             'G10' => '271.60000000000002',
             'C31' => 'Comcast (final)',
@@ -759,7 +759,7 @@ $test_1_simple_no_rc_expected
             'C14' => 'ATM',
             'E26' => '1',
             'K31' => '2581.4699999999998',
-            'maxcol' => '255',
+            'maxcol' => '256',
             'D40' => '100',
             'D36' => '1655',
             'A20' => '502',
@@ -777,14 +777,14 @@ $test_1_simple_no_rc_expected
           },
           {
             'label' => 'Sheet2',
-            'maxcol' => '255',
+            'maxcol' => '256',
             'indx' => 2,
             'mincol' => 1
           },
           {
             'label' => 'Sheet3',
             'mincol' => 1,
-            'maxcol' => '255',
+            'maxcol' => '256',
             'indx' => 3
           }
         ];
@@ -800,13 +800,13 @@ $test_1_simple_no_cells_expected
             'parsers' => [
                            {
                              'parser' => 'Spreadsheet::ReadGnumeric',
-                             'version' => '0.1',
+                             'version' => '0.2',
                              'type' => 'gnumeric'
                            }
                          ],
             'type' => 'gnumeric',
             'sheets' => 3,
-            'version' => '0.1',
+            'version' => '0.2',
             'error' => undef,
             'parser' => 'Spreadsheet::ReadGnumeric'
           },
@@ -1197,23 +1197,127 @@ $test_1_simple_no_cells_expected
                         ]
                       ],
             'indx' => 1,
-            'maxrow' => '53',
+            'maxrow' => '54',
             'mincol' => 1,
-            'maxcol' => '255',
+            'maxcol' => '256',
             'minrow' => 1
           },
           {
             'label' => 'Sheet2',
             'mincol' => 1,
             'indx' => 2,
-            'maxcol' => '255'
+            'maxcol' => '256'
           },
           {
             'label' => 'Sheet3',
-            'maxcol' => '255',
+            'maxcol' => '256',
             'indx' => 3,
             'mincol' => 1
           }
         ];
+
+# Attributes from column C.
+$test_1_expected_attrs_5
+    = {
+	'uline' => '0',
+            'format' => 'yyyy\\-mm\\-dd',
+            'indent' => '0',
+            'bgcolor' => 'FFFF:FFFF:FFFF',
+            'valign' => 'bottom',
+            'font' => 'Courier New',
+            'rotation' => '0',
+            'shade' => '0',
+            'halign' => 'general',
+            'pattern_color' => '0:0:0',
+            'bold' => '0',
+            'script' => '0',
+            'italic' => '0',
+            'locked' => '1',
+            'hidden' => '0',
+            'strike_through' => '0',
+            'wrap' => '0',
+            'shrink_to_fit' => '0',
+            'fgcolor' => '0:0:0',
+            'size' => '14'
+};
+$test_1_expected_attrs_9
+    = {
+	'hidden' => '0',
+            'locked' => '1',
+            'wrap' => '0',
+            'strike_through' => '0',
+            'size' => '14',
+            'fgcolor' => '0:0:0',
+            'shrink_to_fit' => '0',
+            'bgcolor' => 'FFFF:FFFF:FFFF',
+            'format' => 'yyyy\\-mm\\-dd',
+            'indent' => '0',
+            'uline' => '0',
+            'rotation' => '0',
+            'font' => 'Courier New',
+            'valign' => 'bottom',
+            'pattern_color' => '0:0:0',
+            'bold' => '0',
+            'shade' => '0',
+            'halign' => 'general',
+            'italic' => '0',
+            'script' => '0'
+};
+$test_1_expected_attrs
+    = [
+          undef,
+          {
+            'italic' => '0',
+            'script' => '0',
+            'halign' => 'general',
+            'shade' => '0',
+            'pattern_color' => '0:0:0',
+            'bold' => '0',
+            'font' => 'Sans',
+            'rotation' => '0',
+            'valign' => 'bottom',
+            'format' => 'General',
+            'indent' => '0',
+            'uline' => '0',
+            'bgcolor' => 'FFFF:FFFF:FFFF',
+            'fgcolor' => '0:0:0',
+            'shrink_to_fit' => '0',
+            'size' => '14',
+            'strike_through' => '0',
+            'wrap' => '0',
+            'locked' => '1',
+            'hidden' => '0'
+          },
+          undef,
+          {
+            'shrink_to_fit' => '0',
+            'fgcolor' => '0:0:0',
+            'size' => '12',
+            'locked' => '1',
+            'hidden' => '0',
+            'strike_through' => '0',
+            'wrap' => '0',
+            'shade' => '0',
+            'halign' => 'general',
+            'bold' => '0',
+            'pattern_color' => '0:0:0',
+            'script' => '0',
+            'italic' => '0',
+            'uline' => '0',
+            'indent' => '0',
+            'format' => 'General',
+            'bgcolor' => 'FFFF:FFFF:FFFF',
+            'valign' => 'bottom',
+            'rotation' => '0',
+            'font' => 'Sans'
+          },
+          undef,
+	  $test_1_expected_attrs_5,
+          undef,
+          $test_1_expected_attrs_5,
+          undef,
+	$test_1_expected_attrs_9,
+	$test_1_expected_attrs_9
+];
 
 1;

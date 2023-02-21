@@ -52,6 +52,7 @@ SKIP: {
 
     my $tnew = Sereal::Decoder::decode_sereal $blob;
     isa_ok $tnew, 'HTML::Blitz::Template', 'Sereal deserialized value';
+    #note $tnew->compile_to_string;
 
     is $tnew->process($data), $expected, 'Sereal deserialized template works';
 }
@@ -66,6 +67,7 @@ SKIP: {
 
     my $tnew = $enc->decode($blob);
     isa_ok $tnew, 'HTML::Blitz::Template', 'JSON deserialized value';
+    #note $tnew->compile_to_string;
 
     is $tnew->process($data), $expected, 'JSON deserialized template works';
 }

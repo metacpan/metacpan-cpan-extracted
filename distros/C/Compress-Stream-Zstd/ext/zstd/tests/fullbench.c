@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-present, Yann Collet, Facebook, Inc.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
  * This source code is licensed under both the BSD-style license (found in the
@@ -12,6 +12,7 @@
 /*_************************************
 *  Includes
 **************************************/
+#define ZSTD_DISABLE_DEPRECATE_WARNINGS /* No deprecation warnings, we still bench some deprecated functions */
 #include "util.h"        /* Compiler options, UTIL_GetFileSize */
 #include <stdlib.h>      /* malloc */
 #include <stdio.h>       /* fprintf, fopen, ftello64 */
@@ -20,7 +21,8 @@
 #include "timefn.h"      /* UTIL_clockSpanNano, UTIL_getTime */
 #include "mem.h"         /* U32 */
 #ifndef ZSTD_DLL_IMPORT
-    #include "zstd_internal.h"   /* ZSTD_decodeSeqHeaders, ZSTD_blockHeaderSize, blockType_e, KB, MB */
+    #include "zstd_internal.h"   /* ZSTD_decodeSeqHeaders, ZSTD_blockHeaderSize, ZSTD_getcBlockSize, blockType_e, KB, MB */
+    #include "decompress/zstd_decompress_internal.h"   /* ZSTD_DCtx struct */
 #else
     #define KB *(1 <<10)
     #define MB *(1 <<20)
@@ -45,7 +47,6 @@
 #define NBLOOPS    6
 #define TIMELOOP_S 2
 
-#define KNUTH      2654435761U
 #define MAX_MEM    (1984 MB)
 
 #define DEFAULT_CLEVEL 1
@@ -107,7 +108,25 @@ local_ZSTD_compress(const void* src, size_t srcSize,
     p.fParams = f;
     p.cParams = *(ZSTD_compressionParameters*)payload;
     return ZSTD_compress_advanced (g_zcc, dst, dstSize, src, srcSize, NULL ,0, p);
-    //return ZSTD_compress(dst, dstSize, src, srcSize, cLevel);
+}
+
+static size_t
+local_ZSTD_compress_freshCCtx(const void* src, size_t srcSize,
+                    void* dst, size_t dstSize,
+                    void* payload)
+{
+    ZSTD_parameters p;
+    ZSTD_frameParameters f = { 1 /* contentSizeHeader*/, 0, 0 };
+    p.fParams = f;
+    p.cParams = *(ZSTD_compressionParameters*)payload;
+    if (g_zcc != NULL) ZSTD_freeCCtx(g_zcc);
+    g_zcc = ZSTD_createCCtx();
+    assert(g_zcc != NULL);
+    {   size_t const r = ZSTD_compress_advanced (g_zcc, dst, dstSize, src, srcSize, NULL ,0, p);
+        ZSTD_freeCCtx(g_zcc);
+        g_zcc = NULL;
+        return r;
+    }
 }
 
 static size_t g_cSize = 0;
@@ -122,11 +141,15 @@ static size_t local_ZSTD_decompress(const void* src, size_t srcSize,
 static ZSTD_DCtx* g_zdc = NULL;
 
 #ifndef ZSTD_DLL_IMPORT
-extern size_t ZSTD_decodeLiteralsBlock(ZSTD_DCtx* ctx, const void* src, size_t srcSize);
+typedef enum {
+    not_streaming = 0,
+    is_streaming = 1
+} streaming_operation;
+extern size_t ZSTD_decodeLiteralsBlock(ZSTD_DCtx* ctx, const void* src, size_t srcSize, void* dst, size_t dstCapacity, const streaming_operation streaming);
 static size_t local_ZSTD_decodeLiteralsBlock(const void* src, size_t srcSize, void* dst, size_t dstSize, void* buff2)
 {
     (void)src; (void)srcSize; (void)dst; (void)dstSize;
-    return ZSTD_decodeLiteralsBlock(g_zdc, buff2, g_cSize);
+    return ZSTD_decodeLiteralsBlock(g_zdc, buff2, g_cSize, dst, dstSize, not_streaming);
 }
 
 static size_t local_ZSTD_decodeSeqHeaders(const void* src, size_t srcSize, void* dst, size_t dstSize, void* buff2)
@@ -134,6 +157,66 @@ static size_t local_ZSTD_decodeSeqHeaders(const void* src, size_t srcSize, void*
     int nbSeq;
     (void)src; (void)srcSize; (void)dst; (void)dstSize;
     return ZSTD_decodeSeqHeaders(g_zdc, &nbSeq, buff2, g_cSize);
+}
+
+FORCE_NOINLINE size_t ZSTD_decodeLiteralsHeader(ZSTD_DCtx* dctx, void const* src, size_t srcSize)
+{
+    RETURN_ERROR_IF(srcSize < MIN_CBLOCK_SIZE, corruption_detected, "");
+    {
+        BYTE const* istart = (BYTE const*)src;
+        symbolEncodingType_e const litEncType = (symbolEncodingType_e)(istart[0] & 3);
+        if (litEncType == set_compressed) {
+            RETURN_ERROR_IF(srcSize < 5, corruption_detected, "srcSize >= MIN_CBLOCK_SIZE == 3; here we need up to 5 for case 3");
+            {
+                size_t lhSize, litSize, litCSize;
+                U32 const lhlCode = (istart[0] >> 2) & 3;
+                U32 const lhc = MEM_readLE32(istart);
+                int const flags = ZSTD_DCtx_get_bmi2(dctx) ? HUF_flags_bmi2 : 0;
+                switch(lhlCode)
+                {
+                case 0: case 1: default:   /* note : default is impossible, since lhlCode into [0..3] */
+                    /* 2 - 2 - 10 - 10 */
+                    lhSize = 3;
+                    litSize  = (lhc >> 4) & 0x3FF;
+                    litCSize = (lhc >> 14) & 0x3FF;
+                    break;
+                case 2:
+                    /* 2 - 2 - 14 - 14 */
+                    lhSize = 4;
+                    litSize  = (lhc >> 4) & 0x3FFF;
+                    litCSize = lhc >> 18;
+                    break;
+                case 3:
+                    /* 2 - 2 - 18 - 18 */
+                    lhSize = 5;
+                    litSize  = (lhc >> 4) & 0x3FFFF;
+                    litCSize = (lhc >> 22) + ((size_t)istart[4] << 10);
+                    break;
+                }
+                RETURN_ERROR_IF(litSize > ZSTD_BLOCKSIZE_MAX, corruption_detected, "");
+                RETURN_ERROR_IF(litCSize + lhSize > srcSize, corruption_detected, "");
+#ifndef HUF_FORCE_DECOMPRESS_X2
+                return HUF_readDTableX1_wksp(
+                        dctx->entropy.hufTable,
+                        istart+lhSize, litCSize,
+                        dctx->workspace, sizeof(dctx->workspace),
+                        flags);
+#else
+                return HUF_readDTableX2_wksp(
+                        dctx->entropy.hufTable,
+                        istart+lhSize, litCSize,
+                        dctx->workspace, sizeof(dctx->workspace), flags);
+#endif
+            }
+        }
+    }
+    return 0;
+}
+
+static size_t local_ZSTD_decodeLiteralsHeader(const void* src, size_t srcSize, void* dst, size_t dstSize, void* buff2)
+{
+    (void)dst, (void)dstSize, (void)src, (void)srcSize;
+    return ZSTD_decodeLiteralsHeader(g_zdc, buff2, g_cSize);
 }
 #endif
 
@@ -166,30 +249,48 @@ local_ZSTD_compressStream_freshCCtx(const void* src, size_t srcSize,
                           void* dst, size_t dstCapacity,
                           void* payload)
 {
-    ZSTD_CCtx* const cctx = ZSTD_createCCtx();
-    size_t r;
-    assert(cctx != NULL);
+    if (g_cstream != NULL) ZSTD_freeCCtx(g_cstream);
+    g_cstream = ZSTD_createCCtx();
+    assert(g_cstream != NULL);
 
-    r = local_ZSTD_compressStream(src, srcSize, dst, dstCapacity, payload);
-
-    ZSTD_freeCCtx(cctx);
-
-    return r;
+    {   size_t const r = local_ZSTD_compressStream(src, srcSize, dst, dstCapacity, payload);
+        ZSTD_freeCCtx(g_cstream);
+        g_cstream = NULL;
+        return r;
+    }
 }
 
 static size_t
-local_ZSTD_compress_generic_end(const void* src, size_t srcSize,
-                                void* dst, size_t dstCapacity,
-                                void* payload)
+local_ZSTD_compress2(const void* src, size_t srcSize,
+                           void* dst, size_t dstCapacity,
+                           void* payload)
 {
     (void)payload;
     return ZSTD_compress2(g_cstream, dst, dstCapacity, src, srcSize);
 }
 
 static size_t
-local_ZSTD_compress_generic_continue(const void* src, size_t srcSize,
-                                     void* dst, size_t dstCapacity,
-                                     void* payload)
+local_ZSTD_compressStream2_end(const void* src, size_t srcSize,
+    void* dst, size_t dstCapacity,
+    void* payload)
+{
+    ZSTD_outBuffer buffOut;
+    ZSTD_inBuffer buffIn;
+    (void)payload;
+    buffOut.dst = dst;
+    buffOut.size = dstCapacity;
+    buffOut.pos = 0;
+    buffIn.src = src;
+    buffIn.size = srcSize;
+    buffIn.pos = 0;
+    ZSTD_compressStream2(g_cstream, &buffOut, &buffIn, ZSTD_e_end);
+    return buffOut.pos;
+}
+
+static size_t
+local_ZSTD_compressStream2_continue(const void* src, size_t srcSize,
+                                 void* dst, size_t dstCapacity,
+                                 void* payload)
 {
     ZSTD_outBuffer buffOut;
     ZSTD_inBuffer buffIn;
@@ -349,6 +450,9 @@ static int benchMem(unsigned benchNb,
     case 2:
         benchFunction = local_ZSTD_decompress; benchName = "decompress";
         break;
+    case 3:
+        benchFunction = local_ZSTD_compress_freshCCtx; benchName = "compress_freshCCtx";
+        break;
 #ifndef ZSTD_DLL_IMPORT
     case 11:
         benchFunction = local_ZSTD_compressContinue; benchName = "compressContinue";
@@ -358,6 +462,9 @@ static int benchMem(unsigned benchNb,
         break;
     case 13:
         benchFunction = local_ZSTD_decompressContinue; benchName = "decompressContinue";
+        break;
+    case 30:
+        benchFunction = local_ZSTD_decodeLiteralsHeader; benchName = "decodeLiteralsHeader";
         break;
     case 31:
         benchFunction = local_ZSTD_decodeLiteralsBlock; benchName = "decodeLiteralsBlock";
@@ -375,11 +482,17 @@ static int benchMem(unsigned benchNb,
     case 43:
         benchFunction = local_ZSTD_compressStream_freshCCtx; benchName = "compressStream_freshCCtx";
         break;
+    case 50:
+        benchFunction = local_ZSTD_compress2; benchName = "compress2";
+        break;
     case 51:
-        benchFunction = local_ZSTD_compress_generic_continue; benchName = "compress_generic, continue";
+        benchFunction = local_ZSTD_compressStream2_end; benchName = "compressStream2, end";
         break;
     case 52:
-        benchFunction = local_ZSTD_compress_generic_end; benchName = "compress_generic, end";
+        benchFunction = local_ZSTD_compressStream2_end; benchName = "compressStream2, end & short";
+        break;
+    case 53:
+        benchFunction = local_ZSTD_compressStream2_continue; benchName = "compressStream2, continue";
         break;
     case 61:
         benchFunction = local_ZSTD_compress_generic_T2_continue; benchName = "compress_generic, -T2, continue";
@@ -418,7 +531,6 @@ static int benchMem(unsigned benchNb,
     ZSTD_CCtx_setParameter(g_zcc, ZSTD_c_targetLength, (int)cparams.targetLength);
     ZSTD_CCtx_setParameter(g_zcc, ZSTD_c_strategy, cparams.strategy);
 
-
     ZSTD_CCtx_setParameter(g_cstream, ZSTD_c_compressionLevel, cLevel);
     ZSTD_CCtx_setParameter(g_cstream, ZSTD_c_windowLog, (int)cparams.windowLog);
     ZSTD_CCtx_setParameter(g_cstream, ZSTD_c_hashLog, (int)cparams.hashLog);
@@ -437,6 +549,9 @@ static int benchMem(unsigned benchNb,
     case 2:
         g_cSize = ZSTD_compress(dstBuff2, dstBuffSize, src, srcSize, cLevel);
         break;
+    case 3:
+        payload = &cparams;
+        break;
 #ifndef ZSTD_DLL_IMPORT
     case 11:
         payload = &cparams;
@@ -447,10 +562,12 @@ static int benchMem(unsigned benchNb,
     case 13 :
         g_cSize = ZSTD_compress(dstBuff2, dstBuffSize, src, srcSize, cLevel);
         break;
+    case 30:  /* ZSTD_decodeLiteralsHeader */
+        /* fall-through */
     case 31:  /* ZSTD_decodeLiteralsBlock : starts literals block in dstBuff2 */
         {   size_t frameHeaderSize;
             g_cSize = ZSTD_compress(dstBuff, dstBuffSize, src, srcSize, cLevel);
-            frameHeaderSize = ZSTD_frameHeaderSize(dstBuff, ZSTD_FRAMEHEADERSIZE_PREFIX);
+            frameHeaderSize = ZSTD_frameHeaderSize(dstBuff, ZSTD_FRAMEHEADERSIZE_PREFIX(ZSTD_f_zstd1));
             CONTROL(!ZSTD_isError(frameHeaderSize));
             /* check block is compressible, hence contains a literals section */
             {   blockProperties_t bp;
@@ -471,10 +588,10 @@ static int benchMem(unsigned benchNb,
             const BYTE* ip = dstBuff;
             const BYTE* iend;
             {   size_t const cSize = ZSTD_compress(dstBuff, dstBuffSize, src, srcSize, cLevel);
-                CONTROL(cSize > ZSTD_FRAMEHEADERSIZE_PREFIX);
+                CONTROL(cSize > ZSTD_FRAMEHEADERSIZE_PREFIX(ZSTD_f_zstd1));
             }
             /* Skip frame Header */
-            {   size_t const frameHeaderSize = ZSTD_frameHeaderSize(dstBuff, ZSTD_FRAMEHEADERSIZE_PREFIX);
+            {   size_t const frameHeaderSize = ZSTD_frameHeaderSize(dstBuff, ZSTD_FRAMEHEADERSIZE_PREFIX(ZSTD_f_zstd1));
                 CONTROL(!ZSTD_isError(frameHeaderSize));
                 ip += frameHeaderSize;
             }
@@ -489,7 +606,7 @@ static int benchMem(unsigned benchNb,
             ip += ZSTD_blockHeaderSize;    /* skip block header */
             ZSTD_decompressBegin(g_zdc);
             CONTROL(iend > ip);
-            ip += ZSTD_decodeLiteralsBlock(g_zdc, ip, (size_t)(iend-ip));   /* skip literal segment */
+            ip += ZSTD_decodeLiteralsBlock(g_zdc, ip, (size_t)(iend-ip), dstBuff, dstBuffSize, not_streaming);   /* skip literal segment */
             g_cSize = (size_t)(iend-ip);
             memcpy(dstBuff2, ip, g_cSize);   /* copy rest of block (it starts by SeqHeader) */
             srcSize = srcSize > 128 KB ? 128 KB : srcSize;   /* speed relative to block */
@@ -507,6 +624,11 @@ static int benchMem(unsigned benchNb,
         break;
     case 43 :
         payload = &cparams;
+        break;
+
+    case 52 :
+        /* compressStream2, short dstCapacity */
+        dstBuffSize--;
         break;
 
     /* test functions */
@@ -722,7 +844,7 @@ static int usage_advanced(const char* exename)
     DISPLAY( "\nAdvanced options :\n");
     DISPLAY( " -b#    : test only function # \n");
     DISPLAY( " -l#    : benchmark functions at that compression level (default : %i)\n", DEFAULT_CLEVEL);
-    DISPLAY( " --zstd : custom parameter selection. Format same as zstdcli \n");
+    DISPLAY( "--zstd= : custom parameter selection. Format same as zstdcli \n");
     DISPLAY( " -P#    : sample compressibility (default : %.1f%%)\n", COMPRESSIBILITY_DEFAULT * 100);
     DISPLAY( " -B#    : sample size (default : %u)\n", (unsigned)kSampleSizeDefault);
     DISPLAY( " -i#    : iteration loops [1-9](default : %i)\n", NBLOOPS);

@@ -7,7 +7,7 @@ use Carp         qw/croak/;
 
 extends 'Excel::ValueReader::XLSX::Backend';
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 #======================================================================
 # LAZY ATTRIBUTE CONSTRUCTORS
@@ -116,68 +116,90 @@ sub _extract_xf {
 sub values {
   my ($self, $sheet) = @_;
   my @data;
-  my ($row, $col, $cell_type, $seen_node);
+  my ($cell_type, $seen_node);
 
-  # regex for extracting information from cell nodes
+  # regexes for extracting information from cell nodes
+  state $row_regex = qr(
+     <(row)                  # row tag ($1)
+       (?:\s+r="(\d+)")?     # optional row number ($2)
+       [^>/]*?               # unused attrs
+     >                       # end of tag
+    )x;
   state $cell_regex = qr(
-     <c\                     # initial cell tag
-      r="([A-Z]+)(\d+)"      # capture col and row ($1 and $2)
+     <(c)                    # cell tag ($3)
+      (?: \s+ | (?=>) )      # either a space before attrs, or end of tag
+      (?:r="([A-Z]+)(\d+)")? # capture col ($4) and row ($5)
       [^>/]*?                # unused attrs
-      (?:s="(\d+)"\s*)?      # style attribute ($3)
-      (?:t="(\w+)"\s*)?      # type attribute ($4)
+      (?:s="(\d+)"\s*)?      # style attribute ($6)
+      (?:t="(\w+)"\s*)?      # type attribute ($7)
      (?:                     # non-capturing group for an alternation :
         />                   # .. either an xml closing without content
       |                      # or
         >                    # .. closing xml tag, followed by
       (?:
 
-         <v>(.+?)</v>        #    .. a value ($5)
+         <v>(.+?)</v>        #    .. a value ($8)
         |                    #    or 
-          (.+?)              #    .. some node content ($6)
+          (.+?)              #    .. some node content ($9)
        )
        </c>                  #    followed by a closing cell tag
       )
     )x;
-  # NOTE : this regex uses capturing groups; it would be more readable with named
-  # captures instead, but this doubles the execution time on big Excel files, so I
-  # came back to plain old capturing groups.
+  state $row_or_cell_regex = qr($row_regex|$cell_regex);
+  # NOTE : these regexes uses positional capturing groups; it would be more readable with named
+  # captures instead, but it doubles the execution time on big Excel files, so I
+  # stick to plain old capturing groups.
 
   # does this instance want date formatting ?
   my $has_date_formatter = $self->frontend->date_formatter;
 
   # parse worksheet XML, gathering all cells
   my $contents = $self->_zip_member_contents($self->_zip_member_name_for_sheet($sheet));
-  while ($contents =~ /$cell_regex/g) {
-    my ($col, $row, $style, $cell_type, $val, $inner) = ($self->A1_to_num($1), $2, $3, $4, $5, $6);
 
-    # handle cell value according to cell type
-    $cell_type //= '';
-    if ($cell_type eq 'inlineStr') {
-      # this is an inline string; gather all <t> nodes within the cell node
-      $val = join "", ($inner =~ m[<t>(.+?)</t>]g);
-      _decode_xml_entities($val) if $val;
+  # loop on matching nodes
+  my ($row, $col) = (0, 0);
+  while ($contents =~ /$row_or_cell_regex/g) {
+    if ($1) {                # this is a 'row' tag
+      $row = $2 // $row+1;
+      $col = 0;
     }
-    elsif ($cell_type eq 's') {
-      # this is a string cell; $val is a pointer into the global array of shared strings
-      $val = $self->strings->[$val];
-    }
-    else {
-      # this is a plain value
-      ($val) = ($inner =~ m[<v>(.*?)</v>])           if !defined $val && $inner;
-      _decode_xml_entities($val) if $val && $cell_type eq 'str';
+    elsif ($3) {             # this is a 'c' tag
+      my ($col_A1, $given_row, $style, $cell_type, $val, $inner) = ($4, $5, $6, $7, $8, $9);
 
-      # if necessary, transform the numeric value into a formatted date
-      if ($has_date_formatter && $style && looks_like_number($val) && $val >= 0) {
-        my $date_style = $self->date_styles->[$style];
-        $val = $self->formatted_date($val, $date_style)    if $date_style;
+      # row and column for this cell -- either given, or incremented from last cell
+      ($col, $row) = $col_A1 && $given_row ? ($self->A1_to_num($col_A1), $given_row)
+                                           : ($col+1,                    $row);
+
+      # handle cell value according to cell type
+      $cell_type //= '';
+      if ($cell_type eq 'inlineStr') {
+        # this is an inline string; gather all <t> nodes within the cell node
+        $val = join "", ($inner =~ m[<t>(.+?)</t>]g);
+        _decode_xml_entities($val) if $val;
       }
-    }
+      elsif ($cell_type eq 's') {
+        # this is a string cell; $val is a pointer into the global array of shared strings
+        $val = $self->strings->[$val];
+      }
+      else {
+        # this is a plain value
+        ($val) = ($inner =~ m[<v>(.*?)</v>])           if !defined $val && $inner;
+        _decode_xml_entities($val) if $val && $cell_type eq 'str';
 
-    # insert this value into the global data array
-    $data[$row-1][$col-1] = $val;
+        # if necessary, transform the numeric value into a formatted date
+        if ($has_date_formatter && $style && looks_like_number($val) && $val >= 0) {
+          my $date_style = $self->date_styles->[$style];
+          $val = $self->formatted_date($val, $date_style)    if $date_style;
+        }
+      }
+
+      # insert this value into the global data array
+      $data[$row-1][$col-1] = $val;
+    }
+    else {die "unexpected regex match"}
   }
 
-  # insert arrayrefs for empty rows
+  # insert empty arrayrefs for empty rows
   $_ //= [] foreach @data;
 
   return \@data;
@@ -257,7 +279,7 @@ Laurent Dami, E<lt>dami at cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2020,2021 by Laurent Dami.
+Copyright 2020-2023 by Laurent Dami.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

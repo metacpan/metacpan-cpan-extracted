@@ -1,0 +1,13 @@
+#!usr/bin/perl
+use ANSI::Palette qw/palette_256/;
+palette_256();
+__END__
+=head1 NAME
+  
+colour_palette_256 - CLA to print all 256 ansi colours.
+  
+=head1 USAGE
+  
+        lnation:High lnation$ colour_palette_256
+
+=cut

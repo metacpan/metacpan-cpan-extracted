@@ -1,0 +1,65 @@
+SMS-Send-IN-Textlocal version 1.00
+==================================
+ 
+Please see the POD documentation in Textlocal.pm module included in the
+distribution.
+ 
+INSTALLATION
+ 
+To install this module type the following:
+ 
+   perl Makefile.PL
+   make
+   make test
+   make install
+ 
+Since Textlocal Technologies runs a paid service, the test suite 
+does not actually use it to send any text message. If you wish to 
+test the functionality, you should set the following four environment
+variables:
+ 
+TL_SENDID - Your DLT approved senderid / header
+TL_APIKEY - Your Textlocal API key
+TL_DESTPH - A mobile number in India to send a text message to
+TL_MSGTXT - A message conforming with your transactional template
+            registered with Textlocal as per TRAI DLT rules
+ 
+Then, run 'make test' again and a text message will be sent.
+ 
+DEPENDENCIES
+ 
+This module requires these other modules and libraries:
+ 
+  SMS::Send
+  LWP::UserAgent
+  File::Spec
+  URI::Escape;
+  JSON  
+  Test::More 
+
+
+ACKNOWLEDGEMENT
+
+A big thanks to authors of pre-existing regional send driver authors, my K-C
+colleagues whose work on the drivers were a big inspiration. Also, a big 
+shoutout to my ex-colleague Teertha Chatterjee who assisted in testing the 
+code in production when it was being developed.
+
+ 
+COPYRIGHT AND LICENCE
+ 
+Copyright (C) 2023 by Indranil Das Gupta (indradg@l2c2.co.in)
+ 
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+ 
+This software comes with no warranty of any kind, including but not
+limited to the implied warranty of merchantability.
+ 
+Your use of this software may result in charges against / use of available
+credits on your Textlocal account. Please use this software carefully
+keeping a close eye on your usage and/or billing, The author takes 
+no responsibility for any such charges accrued.
+ 
+Document published by L2C2 Technologies [ http://www.l2c2.co.in ]

@@ -66,4 +66,15 @@ sub _get_loan_calc {
         "payoff_per_month: reduce interest by 1 makes principal $principal");
 }
 
+{
+    my $calc = _get_loan_calc(duration => 12);
+    my $interest = $calc->interest_per_month;
+    my $principal = $calc->principal_per_month();
+
+    is(sprintf("%.02f", $interest), 4.17, "Interest is 4.17");
+    is(sprintf("%.02f", $principal), 81.44, "Principal payment is 81.44");
+}
+
+
+
 done_testing;

@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'Data::LNPath' => 0,
+        'Data::LNPath' => '1.02',
 	'YAML::XS' => 0
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

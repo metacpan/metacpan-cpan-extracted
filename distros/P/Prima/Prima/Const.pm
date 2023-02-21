@@ -36,6 +36,14 @@ sub to_gray_rgb    { return from_rgb( (to_gray_byte($_[0])) x 3 ) }
 sub from_gray_byte { return 0x10101 * ($_[0] & 0xff) }
 sub premultiply { from_rgb( map { int($_ * $_[1] / 255) } to_rgb($_[0]) ) }
 
+sub distance
+{
+	my @x = to_rgb($_[0]);
+	my @y = to_rgb($_[1]);
+	$x[$_] -= $y[$_] for 0..2;
+	return sqrt( $x[0]*$x[0] + $x[1]*$x[1] + $x[2]*$x[2]);
+}
+
 package
     ci; *AUTOLOAD =  \&Prima::Const::AUTOLOAD;	# color indices
 package
@@ -72,13 +80,52 @@ package
     lp; *AUTOLOAD =  \&Prima::Const::AUTOLOAD;	# line pen styles
 package
     fp; *AUTOLOAD =  \&Prima::Const::AUTOLOAD;	# fill styles & font pitches
+
+sub patterns
+{
+	use bytes;
+	return (
+		"\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}",
+		"\x{FF}\x{FF}\x{FF}\x{FF}\x{FF}\x{FF}\x{FF}\x{FF}",
+		"\x{00}\x{00}\x{FF}\x{FF}\x{00}\x{00}\x{FF}\x{FF}",
+		"\x{80}\x{40}\x{20}\x{10}\x{08}\x{04}\x{02}\x{01}",
+		"\x{70}\x{38}\x{1C}\x{0E}\x{07}\x{83}\x{C1}\x{E0}",
+		"\x{E1}\x{C3}\x{87}\x{0F}\x{1E}\x{3C}\x{78}\x{F0}",
+		"\x{4B}\x{96}\x{2D}\x{5A}\x{B4}\x{69}\x{D2}\x{A5}",
+		"\x{88}\x{88}\x{88}\x{FF}\x{88}\x{88}\x{88}\x{FF}",
+		"\x{18}\x{24}\x{42}\x{81}\x{18}\x{24}\x{42}\x{81}",
+		"\x{33}\x{CC}\x{33}\x{CC}\x{33}\x{CC}\x{33}\x{CC}",
+		"\x{00}\x{08}\x{00}\x{80}\x{00}\x{08}\x{00}\x{80}",
+		"\x{00}\x{22}\x{00}\x{88}\x{00}\x{22}\x{00}\x{88}",
+		"\x{aa}\x{55}\x{aa}\x{55}\x{aa}\x{55}\x{aa}\x{55}",
+		"\x{aa}\x{ff}\x{aa}\x{ff}\x{aa}\x{ff}\x{aa}\x{ff}",
+		"\x{51}\x{22}\x{15}\x{88}\x{45}\x{22}\x{54}\x{88}",
+		"\x{02}\x{27}\x{05}\x{00}\x{20}\x{72}\x{50}\x{00}",
+	);
+	no bytes;
+}
+
+sub builtin
+{
+	return undef unless ref($_[0]) eq 'ARRAY';
+	my $fp = join('', map { chr } @{ $_[0] });
+	my @pt = patterns;
+	for ( my $i = 0; $i < @pt; $i++) {
+		return $i if $pt[$i] eq $fp;
+	}
+	return undef;
+}
+
+sub is_solid { ref($_[0]) eq 'ARRAY' ? !grep { $_ != 0xff } @{$_[0]} : 0 }
+sub is_empty { ref($_[0]) eq 'ARRAY' ? !grep { $_ != 0x00 } @{$_[0]} : 0 }
+
 package
     le; *AUTOLOAD =  \&Prima::Const::AUTOLOAD;	# line ends
 
 use constant Arrow => [
-	conic => [1,0,2.5,0,2.5,-0.5],
+	conic => [1,0,1.5,0,2.5,-0.5],
 	line  => [0,2.5],
-	conic => [-2.5,-0.5,-2.5,0,-1,0]
+	conic => [-2.5,-0.5,-1.5,0,-1,0]
 ];
 
 use constant Cusp => [
@@ -129,6 +176,9 @@ sub transform
 }
 
 sub scale { transform( $_[0], [ $_[1],0,0,$_[2] // $_[1],0,0 ] ) }
+
+package
+    lei; *AUTOLOAD =  \&Prima::Const::AUTOLOAD;	# line end indexes
 
 package
     lj; *AUTOLOAD =  \&Prima::Const::AUTOLOAD;	# line joins
@@ -362,6 +412,30 @@ See L<Prima::gp_problems/Colors>
 	cl::SysFlag  - indirect color constant bit set
 	cl::SysMask  - indirect color constant bit clear mask
 
+=item Color functions
+
+=over
+
+=item from_rgb R8,G8,B8 -> RGB24
+
+=item to_rgb   RGB24 -> R8,G8,B8
+
+=item from_bgr B8,G8,R8 -> RGB24
+
+=item to_bgr   RGB24 -> B8,G8,R8
+
+=item to_gray_byte RGB24 -> GRAY8
+
+=item to_gray_rgb  RGB24 -> GRAY24
+
+=item from_gray_byte GRAY8 -> GRAY24
+
+=item premultiply RGB24,A8 -> RGB24
+
+=item distance RGB24,RGB24 -> distance between colors
+
+=back
+
 =back
 
 =head2 cm::  - commands
@@ -475,13 +549,13 @@ Returns a C<cr::> constant corresponding to the C<ACTION>
 
 =item to_one_action ACTIONS
 
-Selects a best single action from combination of allowes C<ACTIONS>
+Selects a best single action from combination of allowed C<ACTIONS>
 
 =item keymod ACTION
 
-Returns a C<km::> keyboard modifier constant the C<ACTION> will be selected,
-when possible, if the user presses that modifier. Return 0 for C<dnd::Copy>
-that is a standard action to be performed without any modifiers.
+Returns a C<km::> keyboard modifier constant the C<ACTION> will be expected to
+start on if the user presses that modifier during a DND session. Returns 0 for
+C<dnd::Copy> that is the standard action to be performed without any modifiers.
 
 =back
 
@@ -581,6 +655,30 @@ See L<Prima::Drawable/fillPattern>
 	fp::SimpleDots
 	fp::Borland
 	fp::Parquet
+
+=over
+
+=item builtin $FILL_PATTERN
+
+Given a result from C<Drawable::fillPattern>, a 8x8 array of integers, checks whether the array matches
+one of the builtin C<fp::> constants, and returns one if found. Returns undef otherwise.
+
+=item is_empty $FILL_PATTERN
+
+Given a result from C<Drawable::fillPattern>, a 8x8 array of integers, checks whether the array consists
+strictly of zeros, or not.
+
+=item is_solid $FILL_PATTERN
+
+Given a result from C<Drawable::fillPattern>, a 8x8 array of integers, checks whether the array consists
+strictly of ones, or not.
+
+=item patterns
+
+Returns set of string-encoded fill patterns that correspond to builtin C<fp::> constants.
+These are not suitable for use in C<Drawable::fillPatterns>.
+
+=back
 
 =head2 fp::  - font pitches
 
@@ -693,6 +791,22 @@ See L<Prima::Drawable/lineEnd>
 	le::RoundRect
 	le::Spearhead
 	le::Tail
+
+Functions:
+
+	le::transform($matrix)
+	le::scale($scalex, [$scaley = $scalex])
+
+=head2 lei::  - line end indexes
+
+	lei::LineTail
+	lei::LineHead
+	lei::ArrowTail
+	lei::ArrowHead
+	lei::Max
+	lei::Only
+
+See L<Prima::Drawable/lineEndIndex>
 
 =head2 lj::  - line join styles
 
@@ -1081,6 +1195,25 @@ Others
         rop::AlphaCopy
 	rop::ConstantColor
 
+ROP functions
+
+=over
+
+=item alpha ROP, SRC_ALPHA = undef, DST_ALPHA = undef
+
+Combines one of the alpha-supporting ROPs ( Porter-Duff snd Photoshop
+operators) with
+source and destination alpha, if defined, and returns new ROP constant. This is useful
+when blending with constant alpha is required with/over images that don't have their own
+alpha channel. Or as an additional alpha channel when using icons.
+
+=item blend ALPHA
+
+Creates a ROP that would effecively execute alpha blending of the source image
+over the destination image with ALPHA value.
+
+=back
+
 =head2 sbmp:: - system bitmaps indices
 
 See also L<Prima::StdBitmap>.
@@ -1127,7 +1260,7 @@ See also L<Prima::StdBitmap>.
 =head2 scr:: - scroll exposure results
 
 C<Widget::scroll> returns one of these.
-	
+
 	scr::Error           - failure
 	scr::NoExpose        - call resulted in no new exposed areas
 	scr::Expose          - call resulted in new exposed areas, expect a repaint
@@ -1260,6 +1393,7 @@ See L<Prima::Window/windowState>
 	ws::Normal
 	ws::Minimized
 	ws::Maximized
+	ws::Fullscreen
 
 =head1 AUTHOR
 

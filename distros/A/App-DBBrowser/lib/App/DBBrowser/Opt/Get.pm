@@ -69,6 +69,7 @@ sub defaults {
         table => {
             codepage_mapping  => 0, # not an option, always 0
             hide_cursor       => 0, # not an option, always 0
+            max_rows          => 0, # not an option, always 0
             page              => 2, # not an option, always 2
 
             binary_filter     => 0,

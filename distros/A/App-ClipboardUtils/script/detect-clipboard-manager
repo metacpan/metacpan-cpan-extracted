@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-25'; # DATE
+our $DATE = '2022-12-08'; # DATE
 our $DIST = 'App-ClipboardUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Clipboard/Any/detect_clipboard_manager",
@@ -40,15 +40,15 @@ detect-clipboard-manager - Detect which clipboard manager program is currently r
 
 =head1 VERSION
 
-This document describes version 0.005 of detect-clipboard-manager (from Perl distribution App-ClipboardUtils), released on 2022-10-25.
+This document describes version 0.006 of detect-clipboard-manager (from Perl distribution App-ClipboardUtils), released on 2022-12-08.
 
 =head1 SYNOPSIS
 
-B<detect-clipboard-manager> L<--help|/"--help, -h, -v"> (or L<-h|/"--help, -h, -v">, L<-?|/"--help, -h, -v">)
+B<detect-clipboard-manager> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
 
-B<detect-clipboard-manager> L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)
+B<detect-clipboard-manager> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<detect-clipboard-manager> [L<--debug|/"--debug">|L<--log-level|/"--log-level=s">=I<level>|L<--quiet|/"--quiet">|L<--trace|/"--trace">|L<--verbose|/"--verbose">] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [L<--(no)naked-res|/"--naked-res">] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]]
+B<detect-clipboard-manager> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
 
 =head1 DESCRIPTION
 

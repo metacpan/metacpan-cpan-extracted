@@ -55,8 +55,9 @@ $capture_mode = (Prima::Application-> get_system_info-> {apc} == apc::Unix);
 sub profile_default
 {
 	my $f = $_[ 0]-> get_default_font;
+	my $e = Prima::InputLine->profile_default;
 	return {
-		%{Prima::InputLine-> profile_default},
+		%$e,
 		%{Prima::ListBox-> profile_default},
 		%{$_[ 0]-> SUPER::profile_default},
 		style          => cs::Simple,
@@ -66,7 +67,7 @@ sub profile_default
 		autoHScroll    => 0,
 		autoVScroll    => 1,
 		listVisible    => 0,
-		editHeight     => $f-> {height} + 2,
+		editHeight     => $e-> {height},
 		listHeight     => $::application-> uiScaling * 100,
 		ownerBackColor => 1,
 		selectable     => 0,
@@ -143,10 +144,9 @@ sub init
 		%{$profile{editProfile}},
 	);
 
-	if ( $self->{autoHeight} && $self->{style} != cs::Simple) {
-		$self->check_auto_size;
-		( $w, $h) = ( $self-> size);
-		$eh = $self-> geomHeight;
+	if ( $self->{autoHeight} ) {
+		$eh = $self-> {edit}-> default_geom_height
+			if $self->{edit}->can('default_geom_height');
 		$self->{edit}->set( height => $eh, bottom => $h - $eh );
 	}
 
@@ -183,6 +183,7 @@ sub init
 		delegations    => $profile{buttonDelegations},
 		%{$profile{buttonProfile}},
 	);
+	$self->check_auto_size;
 
 	$self-> visible( $visible);
 	return %profile;
@@ -551,6 +552,12 @@ sub set_style
 	return if $self-> {style} == $style;
 	my $decr = (( $self-> {style} == cs::Simple) || ( $style == cs::Simple)) ? 1 : 0;
 	$self-> {style} = $style;
+	my $eh = $self->editHeight;
+	if ( $self->{autoHeight} ) {
+		$self->check_auto_size;
+		$eh = $self-> {edit}-> default_geom_height
+			if $self->{edit}->can('default_geom_height');
+	}
 	if ( $style == cs::Simple) {
 		$self-> set(
 			height=> $self-> height + $self-> listHeight,
@@ -560,7 +567,7 @@ sub set_style
 			visible    => 1,
 			origin     => [ 0, 0],
 			width      => $self-> width,
-			height     => $self-> height - $self-> editHeight ,
+			height     => $self-> height - $eh,
 			clipOwner  => 1,
 			selectable => 1,
 		);
@@ -578,15 +585,15 @@ sub set_style
 		$self-> listVisible( 0);
 	}
 	$self-> {edit}-> set(
-		bottom => $self-> height - $self-> editHeight ,
+		bottom => $self-> height - $eh,
 		width  => $self-> { edit}-> width + $::application-> uiScaling * DefButtonX * $decr *
 			(( $style == cs::Simple) ? 1 : -1),
-		height => $self-> editHeight ,
+		height => $eh,
 		dndAware => (( $style == cs::DropDown) ? 'Text' : 0 ),
 	);
 	$self-> {button}-> set(
-		bottom => $self-> height - $self-> editHeight ,
-		height => $self-> editHeight ,
+		bottom => $self-> height - $eh,
+		height => $eh,
 		visible=> $style != cs::Simple,
 	);
 	if ( $style == cs::DropDownList) {

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/HTMLUtils/Grep.pm',
@@ -15,8 +15,7 @@ my @module_files = (
 
 my @scripts = (
     'script/grep-from-html',
-    'script/htmlgrep',
-    'script/less-pdf-text'
+    'script/htmlgrep'
 );
 
 # no fake home requested

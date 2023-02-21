@@ -1,5 +1,19 @@
 Revision history for Perl extension OLE::Storage_Lite.
 
+
+0.21 Fri Feb 17 2020
+
+    + Fix for Spreadsheet::ParseExcel break due to the previous change in
+      v0.20.  https://github.com/jmcnamara/ole-storage-lite/pull/4
+
+
+0.20 Wed Feb 15 2020
+
+    + Added performance improvement of 95+ percent on certain complex
+      messages. Patch from Todd Richmond.
+      https://github.com/jmcnamara/ole-storage-lite/pull/4
+
+
 0.20 Thu Jan 2 2020
 
     ! Fixed issue with dates being misinterpreted after 2020.

@@ -11,7 +11,7 @@ use Workflow::Persister::RandomId;
 use File::Slurp qw(slurp);
 use English qw( -no_match_vars );
 
-$Workflow::Persister::File::VERSION = '1.61';
+$Workflow::Persister::File::VERSION = '1.62';
 
 my @FIELDS = qw( path );
 __PACKAGE__->mk_accessors(@FIELDS);
@@ -61,6 +61,8 @@ sub fetch_workflow {
         persist_error "No workflow with ID '$wf_id' is available";
     }
     $self->log->debug("File exists, reconstituting workflow");
+
+    local $EVAL_ERROR = undef;
     my $wf_info = eval { $self->constitute_object($full_path) };
     if ($EVAL_ERROR) {
         persist_error "Cannot reconstitute data from file for ",
@@ -98,11 +100,11 @@ sub fetch_history {
     my ( $self, $wf ) = @_;
     my $history_dir = $self->_get_history_path($wf);
     $self->log->debug("Trying to read history files from dir '$history_dir'");
-    opendir( HISTORY, $history_dir )
+    opendir( my $hist, $history_dir )
         || persist_error "Cannot read history from '$history_dir': $!";
     my @history_files = grep { -f $_ }
-        map { catfile( $history_dir, $_ ) } readdir HISTORY;
-    closedir HISTORY;
+        map { catfile( $history_dir, $_ ) } readdir $hist;
+    closedir $hist;
     my @histories = ();
 
     foreach my $history_file (@history_files) {
@@ -149,6 +151,7 @@ sub constitute_object {
     my $content = slurp($object_path);
 
     no strict;
+    local $EVAL_ERROR = undef;
     my $object = eval $content;
     croak $EVAL_ERROR if ($EVAL_ERROR);
     return $object;
@@ -179,7 +182,7 @@ Workflow::Persister::File - Persist workflow and history to the filesystem
 
 =head1 VERSION
 
-This documentation describes version 1.61 of this package
+This documentation describes version 1.62 of this package
 
 =head1 SYNOPSIS
 
@@ -291,7 +294,7 @@ to deserialization attempt.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003-2022 Chris Winters. All rights reserved.
+Copyright (c) 2003-2023 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

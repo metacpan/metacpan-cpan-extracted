@@ -1,5 +1,8 @@
 Revision history for Template-Plugin-DataPrinter
 
+0.017     2023-02-09T17:41:40AEDT+1100
+  - Require HTML::FromANSI::Tiny >= 0.104
+
 0.016     2023-02-01T14:10:19AEDT+1100
   - Fix false-negative test failure with Data::Printer v1.1.0
 

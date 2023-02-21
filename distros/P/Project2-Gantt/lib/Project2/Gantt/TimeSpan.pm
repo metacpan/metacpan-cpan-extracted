@@ -6,13 +6,12 @@ use Project2::Gantt::Globals;
 
 use Mojo::Log;
 
-our $DATE = '2023-02-02'; # DATE
-our $VERSION = '0.006';
+our $DATE = '2023-02-16'; # DATE
+our $VERSION = '0.009';
 
 has task    => undef;
 has canvas  => undef;
 has skin    => undef;
-has beginX  => 205;
 has rootStr => undef;
 
 has log     => sub { Mojo::Log->new };
@@ -32,7 +31,7 @@ sub _writeBar($self, $mode, $height, $start = undef, $end = undef) {
 	my $rootStart   = $self->rootStr;
 	my $taskStart   = $task->start;
 	my $taskEnd     = $task->end;
-	my $startX      = $self->beginX;
+	my $startX      = $self->skin->spanInfoWidth;
 
 	my $past_task   = undef;
 	my $future_task = undef;
@@ -105,8 +104,8 @@ sub _drawTask($self, $startX, $startY, $endX, $range, $color = undef, $past_task
 	if ( $past_task ) {
 		$canvas->line(
 			color => 'red',
-			x1    => 205,
-			x2    => 205,
+			x1    => $self->skin->spanInfoWidth,
+			x2    => $self->skin->spanInfoWidth,
 			y1    => $startY,
 			y2    => $startY + 17,
 			aa    => 1,
@@ -198,8 +197,8 @@ sub _drawSubProj($self, $startX, $startY, $endX, $range, $past_task = undef, $fu
 	if ( $past_task ) {
 		$canvas->line(
 			color => 'red',
-			x1    => 205,
-			x2    => 205,
+			x1    => $self->skin->spanInfoWidth,
+			x2    => $self->skin->spanInfoWidth,
 			y1    => $startY,
 			y2    => $startY + 17,
 			aa    => 1,

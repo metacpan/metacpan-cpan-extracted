@@ -16,7 +16,7 @@ name: Tie-Mounted
 provides:
   Tie::Mounted:
     file: lib/Tie/Mounted.pm
-    version: '0.19'
+    version: '0.20'
 requires:
   Carp: '0'
   File::Which: '0'
@@ -26,5 +26,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/stsc/Tie-Mounted
-version: '0.19'
+version: '0.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

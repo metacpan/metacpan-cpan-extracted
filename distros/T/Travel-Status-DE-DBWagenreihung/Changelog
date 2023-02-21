@@ -1,3 +1,7 @@
+Travel::Status::DE::DBWagenreihung 0.08 - Mon Feb 13 2023
+
+    * Switch to new API URL; the one used previously has been deactivated
+
 Travel::Status::DE::DBWagenreihung 0.07 - Sat Jan 07 2023
 
     * Add ICE 3neo (model 408)

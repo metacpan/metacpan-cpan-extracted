@@ -1,7 +1,8 @@
 
-Get a packaged deb for Raspbian Stretch from http://hipi.znix.com/archive/bcm2835.html
+Get a packaged deb for Raspberry Pi OS from http://hipi.znix.com/archive/bcm2835.html
 
-or
+To build from source you need automake installed
+
+sudo apt install automake
 
 cpan -i HiPi::BCM2835
-

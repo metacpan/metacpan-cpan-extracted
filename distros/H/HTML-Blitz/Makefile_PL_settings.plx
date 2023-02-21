@@ -34,9 +34,5 @@ return {
         'Test::Pod' => 1.22,
     },
 
-    depend             => {
-        Makefile => '$(VERSION_FROM)',
-    },
-
     REPOSITORY         => [ github => 'mauke' ],
 };

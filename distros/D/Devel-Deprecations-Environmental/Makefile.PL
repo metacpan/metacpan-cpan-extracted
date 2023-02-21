@@ -14,8 +14,7 @@ WriteMakefile(
     'Test::Exception'           => 0.43,
     'Test::Time'                => 0.092,
     'Module::Load'              => 0,
-    'DateTime'                  => 0,
-    'DateTime::Format::ISO8601' => 0,
+    'Devel::Hide'               => 0.0015,
     'Devel::CheckOS'            => 1.95, # HWCapabilities::Int{32,64}
     'Scalar::Util'              => 0,
   },

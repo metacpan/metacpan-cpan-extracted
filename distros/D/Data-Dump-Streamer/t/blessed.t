@@ -1,8 +1,6 @@
 # This is from the Scalar::Utils distro
 use Data::Dump::Streamer qw(blessed);
 
-#$Id: blessed.t 26 2006-04-16 15:18:52Z demerphq $#
-
 use vars qw($t $y $x);
 
 print "1..7\n";
@@ -19,12 +17,12 @@ print "ok 3\n";
 print "not " if blessed([]);
 print "ok 4\n";
 
-$y = \$t;
+$y= \$t;
 
 print "not " if blessed($y);
 print "ok 5\n";
 
-$x = bless [], "ABC";
+$x= bless [], "ABC";
 
 print "not " unless blessed($x);
 print "ok 6\n";

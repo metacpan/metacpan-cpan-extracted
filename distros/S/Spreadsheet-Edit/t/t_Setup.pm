@@ -1,4 +1,5 @@
 use strict; use warnings  FATAL => 'all';
+use feature qw/say/;
 
 #
 # Parses standard options (--debug etc.) if present in @ARGV.
@@ -15,6 +16,9 @@ use strict; use warnings  FATAL => 'all';
 package t_Setup;
 
 use parent "Exporter::Tiny";
+
+our @EXPORT = qw($debug $verbose $silent);
+
 require v5.9.5; # for mro
 use mro; # enables next::method
 
@@ -37,6 +41,8 @@ require Spreadsheet::Edit;
 $Spreadsheet::Edit::Verbose = $verbose;  # all remain undef by default
 $Spreadsheet::Edit::Silent  = $silent;
 $Spreadsheet::Edit::Debug   = $debug;
+
+say "t_Setup: Debug is on\n" if $debug;
 
 sub import {
   my $target = caller;
@@ -93,7 +99,7 @@ sub import {
 
   # Catch unintended warnings (that is, while in 'silent' mode)
   $SIG{__WARN__} = sub { 
-    Carp::confess("warning trapped; @_") if $silent; 
+    Carp::confess("warning while in <silent> mode") if $silent; 
     die "bug:$_[0]" if $_[0] =~ "uninitialized value";
     warn @_;
   };
@@ -103,7 +109,5 @@ sub import {
   my $this = $_[0];
   goto &{ $this->next::can }; # see 'perldoc mro'  goto __SUPER__
 }
-
-our @EXPORT = qw($debug $verbose $silent);
 
 1;

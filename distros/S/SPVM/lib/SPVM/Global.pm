@@ -40,13 +40,9 @@ sub load_dynamic_libs {
         at_runtime => 1,
       );
       
-      my $get_method_names_options = $runtime->api->new_any_object_array(
-        [
-          $runtime->api->new_string($category)
-          =>
-          $runtime->api->class('Int')->new(1)
-        ]
-      );
+      my $get_method_names_options = $runtime->api->new_options({
+        $category => $runtime->api->class('Int')->new(1)
+      });
       
       my $method_names = $runtime->get_method_names($class_name, $get_method_names_options)->to_strings;
       
@@ -75,13 +71,9 @@ sub load_dynamic_libs {
 
   # Set function addresses of native and precompile methods
   for my $category ('precompile', 'native') {
-    my $get_method_names_options = $runtime->api->new_any_object_array(
-      [
-        $runtime->api->new_string($category)
-        =>
-        $runtime->api->class('Int')->new(1)
-      ]
-    );
+    my $get_method_names_options = $runtime->api->new_options({
+      $category => $runtime->api->class('Int')->new(1)
+    });
     
     for my $class_name (keys %{$dynamic_lib_files->{$category}}) {
       next unless grep { "$_" eq $class_name } @$class_names;
@@ -128,7 +120,10 @@ sub init_runtime {
     $BUILDER_ENV = $builder_runtime->build_env;
     
     # Set command line info
-    $BUILDER_ENV->set_command_info($0, \@ARGV);
+    $BUILDER_ENV->set_command_info_program_name($0);
+    $BUILDER_ENV->set_command_info_argv(\@ARGV);
+    my $base_time = $^T + 0; # For Perl 5.8.9
+    $BUILDER_ENV->set_command_info_base_time($base_time);
     
     # Call INIT blocks
     $BUILDER_ENV->call_init_blocks;
@@ -258,7 +253,10 @@ sub init_api {
   
   $ENV = $RUNTIME->build_env;
   
-  $ENV->set_command_info($0, \@ARGV);
+  $ENV->set_command_info_program_name($0);
+  $ENV->set_command_info_argv(\@ARGV);
+  my $base_time = $^T + 0; # For Perl 5.8.9
+  $ENV->set_command_info_base_time($base_time);
   
   $ENV->call_init_blocks;
   

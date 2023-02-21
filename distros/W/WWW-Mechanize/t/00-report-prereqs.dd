@@ -58,7 +58,7 @@ do { my $x = {
                                       'URI::URL' => '0',
                                       'URI::file' => '0',
                                       'base' => '0',
-                                      'perl' => '5.006',
+                                      'perl' => '5.008',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

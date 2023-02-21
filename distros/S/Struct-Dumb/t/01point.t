@@ -3,8 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use Scalar::Util qw( refaddr );
 
@@ -22,26 +21,26 @@ is( $point->x, 10, '$point->x is 10' );
 $point->y = 30;
 is( $point->y, 30, '$point->y is 30 after mutation' );
 
-like( exception { $point->z },
+like( dies { $point->z },
       qr/^main::Point does not have a 'z' field at \S+ line \d+\.?\n/,
       '$point->z throws exception' );
 
-like( exception { $point->z = 40 },
+like( dies { $point->z = 40 },
       qr/^main::Point does not have a 'z' field at \S+ line \d+\.?\n/,
       '$point->z :lvalue throws exception' );
 
-like( exception { Point(30) },
+like( dies { Point(30) },
       qr/^usage: main::Point\(\$x, \$y\) at \S+ line \d+\.?\n/,
       'Point(30) throws usage exception' );
 
-like( exception { @{ Point(0, 0) } },
+like( dies { @{ Point(0, 0) } },
       qr/^Cannot use main::Point as an ARRAY reference at \S+ line \d+\.?\n/,
       'Array deref throws exception' );
 
 SKIP: {
    skip "Instances are not ARRAYs", 1 unless Scalar::Util::reftype( Point(1, 1) ) eq "ARRAY";
 
-   ok( !( local $@ = exception {
+   ok( !( local $@ = dies {
          no warnings 'redefine';
          local *Point::_forbid_arrayification = sub {};
          @{ Point(2, 2) };
@@ -50,11 +49,11 @@ SKIP: {
       diag( "Exception was $@" );
 }
 
-like( exception { $point->x(50) },
+like( dies { $point->x(50) },
       qr/^main::Point->x invoked with arguments at \S+ line \d+\.?\n/,
       'Accessor with arguments throws exception' );
 
-ok( !( local $@ = exception { !! Point(0, 0) } ),
+ok( !( local $@ = dies { !! Point(0, 0) } ),
     'Point is boolean true' ) or diag( "Exception was $@" );
 
 is( $point + 0, refaddr $point,

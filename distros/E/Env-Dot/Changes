@@ -1,0 +1,6 @@
+Revision history for Env-Dot
+
+0.002     2023-02-19 15:44:20+01:00 Europe/Stockholm * Move fatpacked executable to root.
+          * Update dist.ini with ExecDir to `script`.
+
+0.001     2023-02-19 12:45:27+01:00 Europe/Stockholm

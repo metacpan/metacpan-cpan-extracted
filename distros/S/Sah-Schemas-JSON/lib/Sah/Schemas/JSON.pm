@@ -3,9 +3,9 @@
 package Sah::Schemas::JSON;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-26'; # DATE
+our $DATE = '2022-11-15'; # DATE
 our $DIST = 'Sah-Schemas-JSON'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 1;
 # ABSTRACT: Various schemas related to JSON
@@ -22,7 +22,7 @@ Sah::Schemas::JSON - Various schemas related to JSON
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::Schemas::JSON (from Perl distribution Sah-Schemas-JSON), released on 2022-08-26.
+This document describes version 0.007 of Sah::Schemas::JSON (from Perl distribution Sah-Schemas-JSON), released on 2022-11-15.
 
 =head1 SAH SCHEMAS
 
@@ -39,6 +39,8 @@ simple scalar), but if user supplies a defined string e.g. in a command-line
 script as command-line argument or option, the string will be assumed to be a
 JSON-encoded value and decoded. Data will not be valid if the string does not
 contain valid JSON.
+
+Thus, if you want to supply a string, you have to JSON-encode it.
 
 
 =item * L<array_from_json|Sah::Schema::array_from_json>
@@ -83,6 +85,8 @@ you want to pass a string like C<null>, C<true>, C<false>; you have to quote it 
 C<"null">, C<"true">, C<"false"> to prevent it being decoded into undef or
 boolean values.
 
+See also related schema: C<json_str>, C<str::encoded_json>, C<str::escaped_json>.
+
 
 =item * L<json_str|Sah::Schema::json_str>
 
@@ -92,6 +96,9 @@ This schema can be used if you want to accept a string that contains valid JSON.
 The JSON string will not be decoded (e.g. a JSON-encoded array will not beome an
 array) but you know that the string contains a valid JSON. Data will not be
 valid if the string does not contain valid JSON.
+
+See also related schema: C<json_or_str>, C<str::encoded_json>,
+C<str::escaped_json>.
 
 
 =item * L<json_str::array|Sah::Schema::json_str::array>

@@ -26,10 +26,13 @@ optional_features: {}
 provides:
   match::simple:
     file: lib/match/simple.pm
-    version: '0.011'
+    version: '0.012'
+  match::simple::sugar:
+    file: lib/match/simple/sugar.pm
+    version: '0.012'
   match::smart:
     file: lib/match/smart.pm
-    version: '0.011'
+    version: '0.012'
 recommends:
   match::simple::XS: '0.002'
 requires:
@@ -44,5 +47,5 @@ resources:
   homepage: https://metacpan.org/release/match-simple
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-match-simple.git
-version: '0.011'
+version: '0.012'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

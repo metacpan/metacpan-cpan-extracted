@@ -20,7 +20,7 @@ App::HTMLUtils::Grep - Command-line utilities related to grepping HTML files
 
 =head1 VERSION
 
-This document describes version 0.001 of App::HTMLUtils::Grep (from Perl distribution App-HTMLUtils-Grep), released on 2023-02-08.
+This document describes version 0.002 of App::HTMLUtils::Grep (from Perl distribution App-HTMLUtils-Grep), released on 2023-02-10.
 
 =head1 SYNOPSIS
 
@@ -32,8 +32,6 @@ grepping HTML files:
 =item * L<grep-from-html>
 
 =item * L<htmlgrep>
-
-=item * L<less-pdf-text>
 
 =back
 

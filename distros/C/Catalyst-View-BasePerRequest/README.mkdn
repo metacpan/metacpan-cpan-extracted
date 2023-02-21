@@ -51,14 +51,14 @@ One way to use it in a controller:
 # DESCRIPTION
 
 **NOTE**: This is early access code.  Although it's based on several other internal projects
-which have iterated over this concept for a number of years I still reserve the right
+which I have iterated over this concept for a number of years I still reserve the right
 to make breaking changes as needed.
 
 **NOTE**: You probably won't actually use this directly, it's intended to be a base framework
 for building / prototyping strongly typed / per request views in [Catalyst](https://metacpan.org/pod/Catalyst). This
 documentation serves as an overview of the concept.  In particular please note that
 this code does not address any issues around HTML / Javascript injection attacks or
-provides any auto escaping. You'll need to bake those features into whatver you
+provides any auto escaping. You'll need to bake those features into whatever you
 build on top of this.  Because of this the following documentation is light and is mostly
 intended to help anyone who is planning to build something on top of this framework
 rather than use it directly.
@@ -79,7 +79,7 @@ ok with a simple websites.  There are however downsides as your site becomes mor
 complex. First of all the stash as a means to pass data from the Controller to the
 template can be fragile.  For example just making a simple typo in the stash key
 can break your templates in ways that might not be easy to figure out.  Also your
-template can't enforce its requirements very easily (and its not easy for someone
+template can't enforce its requirements very easily (and it's not easy for someone
 working in the controller to know exactly what things need to go into the stash in
 order for the template to function as desired.)  The view itself has no way of 
 providing view / display oriented logic; generally that logic ends up creeping back up
@@ -96,7 +96,7 @@ Basically the classic approach works acceptable well for a simple website but st
 break down as your site becomes more complicated.
 
 An alternative approach, which is explored in this distribution, is to have a defined view for
-each desired response anf for it to define an explicit API that the controller uses to provide the required
+each desired response and for it to define an explicit API that the controller uses to provide the required
 and optional data to the view.  This defined view can further define its own methods
 used to generate suitable information for display.   Such an approach is more initial work
 as well as learning for the website developers, but in the long term it can provide
@@ -187,6 +187,35 @@ Alternatively using ["RESPONSE HELPERS"](#response-helpers):
     __PACKAGE__->config(namespace=>'');
     __PACKAGE__->meta->make_immutable;
 
+# ATTRIBUTES
+
+The following Moose attributes are considered part of this classes public API
+
+## app
+
+The string namespace of your [Catalyst](https://metacpan.org/pod/Catalyst) application.
+
+## ctx
+
+The current [Catalyst](https://metacpan.org/pod/Catalyst) context
+
+## root
+
+The root view object (that is the top view that was called first, usually from
+the controller).  
+
+## parent
+
+## has\_parent
+
+If the view was called from another view, that first view is set as the parent.
+
+## injected\_views
+
+## has\_injected\_views
+
+An arrayref of the method names associated with any injected views.
+
 # METHODS
 
 The following methods are considered part of this classes public API
@@ -200,10 +229,10 @@ controller via the `forward` method and not directly:
 
 ## respond
 
-Accepts an HTTP status code and a hashref of key / values used to set HTTP headers for a
+Accepts an HTTP status code and an arrayref of key / values used to set HTTP headers for a
 response.  Example:
 
-    $view->respond(201, +{ location=>$url });
+    $view->respond(201, [ location=>$url ]);
 
 Returns the view object to make it easier to do method chaining
 
@@ -262,8 +291,13 @@ wish to separate template / text from data.  Example:
 
 ## content
 
-Gets a content block string.  If the named content block does not exist, returns a zero length'
-string instead.
+Examples:
+
+    $self->content($name);
+    $self->content($name, +{ default=>'No main content' });
+
+Gets a content block string by '$name'.  If the block has not been defined returns either
+a zero length string or whatever you set the default key of the hashref options to.
 
 ## content\_for
 
@@ -285,6 +319,107 @@ Wraps an existing content with new content.  Throws an exception if the named co
       my $footer = shift;
       return "wrapped $footer end wrap";
     });
+
+# VIEW INJECTION
+
+Usually when building a website of more than toy complexity you will find that you will
+decompose your site into sub views and view wrappers.  Although you can call the `view`
+method on the context, I think its more in the spirit of the idea of a strong or structured
+view to have a view declare upfront what views its calling as sub views.  That lets you
+have more central control over view initalization and decouples how you are calling your
+views from the actual underlying views.  It can also tidy up some of the code and lastly
+makes it easy to immediately know what views are needed for the current one.  This can
+help with later refactoring (I've worked on projects where sub views got detached from
+actual use but nobody ever cleaned them up.)
+
+To inject a view into the current one, you need to declare it in configuration:
+
+    __PACKAGE__->config(
+      content_type=>'text/html', 
+      status_codes=>[200,404,400],
+      views=>+{
+        layout1 => [ Layout => sub { my ($self, $c) = @_; return title=>'Hey!' } ],
+        layout2 => [ Layout => (title=>'Yeah!') ],
+        layout3 => 'Layout',
+      },
+    );
+
+Basically this is a hashref under the `views` key, where each key in the hashref is the name
+of the method you are injecting into the current view which is responsible for creating the
+sub view and the value is one of three options:
+
+- A scalar value
+
+        __PACKAGE__->config(
+          content_type=>'text/html', 
+          status_codes=>[200,404,400],
+          views=>+{
+            layout => 'Layout',
+          },
+        );
+
+    This is the simplest option, it just injects a method that will call the named view and pass
+    any arguments from the method but does not add any global arguments.
+
+- An arrayref
+
+        __PACKAGE__->config(
+          content_type=>'text/html', 
+          status_codes=>[200,404,400],
+          views=>+{
+            layout => [ Layout => (title=>'Yeah!') ],
+          },
+        );
+
+    This option allows you to set some argument defaults to the view called.  The first item in the
+    arrayref must be the real name of the view, followed by arguments which are merged with any provided
+    to the method.
+
+- A coderef
+
+        __PACKAGE__->config(
+          content_type=>'text/html', 
+          status_codes=>[200,404,400],
+          views=>+{
+            layout => [ Layout => sub { my ($self, $c) = @_; return title=>'Hey!' } ],
+          },
+        );
+
+    The most complex option, you should probably reserve for very special needs.  Basically this coderef
+    will be called with the current view instance and Catalyst context; it should return arguments which
+    with then be merged and treated as in the arrayref option.
+
+Now you can call for the sub view via a simple method call on the view, rather than via the context:
+
+    package Example::View::Hello;
+
+    use Moose;
+
+    extends 'Catalyst::View::BasePerRequest';
+
+    has name => (is=>'ro', required=>1);
+    has age => (is=>'ro', required=>1);
+
+
+    sub render {
+      my ($self, $c) = @_;
+
+      return $self->layout(title=>'Hello!', sub {
+        my $layout = shift;
+        return "Hello @{[$self->name]}; you are @{[$self->age]} years old!";  
+      });
+    }
+
+
+    __PACKAGE__->config(
+      content_type=>'text/html', 
+      status_codes=>[200,404,400],
+      views=>+{
+        layout => 'Layout',
+      },
+    );
+
+    __PACKAGE__->meta->make_immutable;
 
 # RESPONSE HELPERS
 
@@ -314,6 +449,14 @@ you'll need to call ["detach"](#detach):
       ->http_bad_request
       ->detach;
 
+If you don't want to generate the response yet (perhaps you'll leave that to a global 'end'
+action) you can use the 'set\_http\_$STATUS' helpers instead which wil just set the response
+status.
+
+    return $c->view("Error")
+      ->set_http_bad_request
+      ->detach;
+
 Response helpers are just lowercased names you'll find for the codes listed in [HTTP::Status](https://metacpan.org/pod/HTTP%3A%3AStatus).
 Some of the most common ones I find in my code:
 
@@ -340,6 +483,28 @@ Runs when `COMPONENT` is called during `setup_components`.  This gets a referenc
 to the merged arguments from all configuration.  You should return this reference
 after modification.
 
+This is for modifying or adding arguments that are application scoped rather than context
+scoped.  
+
+## prepare\_build\_args
+
+This method will be called (if defined) by the factory class during build time.  It can be used
+to inject args and modify args.   It gets the context and `@args` as arguments and should return
+all the arguments you want to pass to `new`.  Example:
+
+    sub prepare_build_args {
+      my ($class, $c, @args) = @_;
+      # Mess with @args
+      return @args;
+    }
+
+## build
+
+Receives the initialization hash and should return a new instance of the the view.  By default this
+just calls `new` on the class with the hash of args but if you need to call some other method or
+have some complex initialization work that can't be handled with ["prepare\_build\_args"](#prepare_build_args) you can
+override.
+
 # CONFIGURATION
 
 This Catalyst Component supports the following configuation.
@@ -355,6 +520,26 @@ but it allows you to specify the permitted HTTP response codes that a template c
 generate.  for example a NotFound view probably makes no sense to return anything
 other than a 404 Not Found code.
 
+## lifecycle
+
+By default your view lifecycle is 'per request' which means we only build it one during the entire
+request cycle.  This is handled by the lifecycle module [Catalyst::View::BasePerRequest::Lifecycle::Request](https://metacpan.org/pod/Catalyst%3A%3AView%3A%3ABasePerRequest%3A%3ALifecycle%3A%3ARequest).
+However sometimes you would like your view to be build newly each you you request it.  For example
+you might have a view called from inside a loop, passing it different arguments each time.  In that
+case you want the 'Factory' lifecycle, which is handled by [Catalyst::View::BasePerRequest::Lifecycle::Factory](https://metacpan.org/pod/Catalyst%3A%3AView%3A%3ABasePerRequest%3A%3ALifecycle%3A%3AFactory).
+In order to do that set this configuration value to 'Factory'.  For example
+
+    __PACKAGE__->config(
+      content_type => 'text/html', 
+      status_codes => [200,201,400],
+      lifecycle => 'Factory',
+    );
+
+You can create your own lifecycle classes, but that's very advanced so for now if you
+want to do that you should review the source of the existing ones.  `D-d`or example you might
+create a view with a 'session' lifecycle, which returns the same view as long as the user
+is logged in.
+
 # ALSO SEE
 
 [Catalyst](https://metacpan.org/pod/Catalyst)
@@ -365,7 +550,7 @@ John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
 
 # LICENSE
 
-Copyright 2022, John Napiorkowski  [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+Copyright 2023, John Napiorkowski  [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

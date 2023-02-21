@@ -1,5 +1,6 @@
 Build.PL
 Changes
+examples/markdown-to-html.pl
 examples/markdown-to-term.pl
 lib/String/Tagged/Markdown.pm
 lib/String/Tagged/Markdown/HFM.pm

@@ -6,7 +6,7 @@ use English;
 use Error::Pure::Utils qw(clean);
 use Tags::HTML::Page::Begin;
 use Tags::Output::Raw;
-use Test::More 'tests' => 15;
+use Test::More 'tests' => 14;
 use Test::NoWarnings;
 
 # Test.
@@ -21,17 +21,6 @@ $obj = Tags::HTML::Page::Begin->new(
 	'tags' => Tags::Output::Raw->new,
 );
 isa_ok($obj, 'Tags::HTML::Page::Begin');
-
-# Test.
-eval {
-	Tags::HTML::Page::Begin->new;
-};
-is(
-	$EVAL_ERROR,
-	"Parameter 'tags' must be a 'Tags::Output::*' class.\n",
-	"Missing required parameter 'tags'.",
-);
-clean();
 
 # Test.
 eval {

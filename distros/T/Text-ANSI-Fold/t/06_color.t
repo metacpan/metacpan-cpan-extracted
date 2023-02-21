@@ -27,6 +27,13 @@ sub left  { (fold @_)[0] }
 sub right { (fold @_)[1] }
 
 {
+    # Broken data
+    is(left("\e",   width => 10), "\e",   "escape only");
+    is(left("\e\e", width => 10), "\e\e", "two escapes");
+    is(left("\e[",  width => 10), "\e[",  "escape [");
+}
+
+{
     $_ = r("12345678901234567890123456789012345678901234567890");
     is(left($_, width => 1), r("1"),             "ASCII: 1");
     is(left($_, width => 10), r("1234567890"),   "ASCII: 10");

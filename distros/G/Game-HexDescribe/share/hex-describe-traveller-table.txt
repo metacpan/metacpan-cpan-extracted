@@ -1662,7 +1662,7 @@
 
 ;maybe a merchant gunner
 # some guns are a sign of pirate activity!
-1,The **first gunner** is *[human name]*, [store Gunnery as extra skill][merchant upp and skills]. Their turret has a [beam laser|pulse laser] mounted. The **second gunner** is *[human name]*, [store Gunnery as extra skill][merchant upp and skills]. Their turret has a [beam laser|pulse laser|missile racks|sandcasters] mounted. [maybe a pirate ship]
+1,The **first gunner** is *[human name]*, [store Gunnery as extra skill][merchant upp and skills]. Their turret has a [beam laser|pulse laser] mounted. The **second gunner** is *[human name]*, [store Gunnery as extra skill][merchant upp and skills]. Their turret has [a beam laser|a pulse laser|missile racks|sandcasters] mounted. [maybe a pirate ship]
 1,The **gunner** is *[human name]*, [store Gunnery as extra skill][merchant upp and skills]. The ship has one turret with [beam laser|pulse laser] mounted. [maybe a pirate ship]
 1,The **gunner** is *[human name]*, [store Gunnery as extra skill][merchant upp and skills]. The ship has one turret with [missile racks|sandcasters] mounted.
 6,

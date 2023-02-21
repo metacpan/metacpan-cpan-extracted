@@ -75,3 +75,9 @@ undef: Thu Dec 14 20:02:42 CST 1995 by sanders@bsdi.com
 
 1.17:	Mon 17 Aug 08:30:54 BST 2015
 		- No changes version bounce
+
+1.18:	Fri 10 Feb 12:43:07 GMT 2023
+		- use isnt rather than isn't (Nicolas Mendoza <mendoza@pvv.ntnu.no>)
+		- Prevent unintended parse of ':' in TERMPATH (David Farrell <davidnmfarrell@gmail.com>)
+		- Various code cleanups (Arkadiy Voronov <voronov_ao@mail.ru>)
+        - Remove indirect method calls from documentation (Dan Book <grinnz@gmail.com>)

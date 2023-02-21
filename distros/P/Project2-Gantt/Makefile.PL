@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.020;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Project2-Gantt",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.020",
   "NAME" => "Project2::Gantt",
   "PREREQ_PM" => {
     "Alien::Font::Vera" => "0.013",
@@ -22,11 +23,12 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
+    "File::Find::Rule" => 0,
     "File::Spec" => 0,
     "Test::Directory" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,6 +38,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Alien::Font::Vera" => "0.013",
   "ExtUtils::MakeMaker" => 0,
+  "File::Find::Rule" => 0,
   "File::Spec" => 0,
   "Imager" => "1.019",
   "Mojolicious" => "9.31",

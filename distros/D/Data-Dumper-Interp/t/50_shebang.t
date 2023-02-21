@@ -93,7 +93,8 @@ sub checkeq_literal($$$) {
         # + for opening « or << in the displayed str
         .(" " x ($posn+length($quotes[0])))."^\n"
         .visFoldwidth()."\n" ) ;
-  goto &Carp::confess;
+  #goto &Carp::confess;
+  Carp::confess(@_);
 }
 
 # Convert a literal "expected" string which contains qr/.../ismx sequences
@@ -435,7 +436,7 @@ my $ratstr  = '1/9';
   use bignum;  # BigInt and BigFloat together
 
   # stringify everything possible
-  local $Data::Dumper::Interp::Overloads = 1;  # NOTE: the '1' will be a BigInt !
+  local $Data::Dumper::Interp::Objects = 1;  # NOTE: the '1' will be a BigInt !
 
   my $bigf = eval $bigfstr // die;
   die(u(blessed($bigf))," <<$bigfstr>> ",u($bigf)," $@") unless blessed($bigf) =~ /^Math::BigFloat/;
@@ -448,9 +449,9 @@ my $ratstr  = '1/9';
     unless blessed($bigi) =~ /^Math::Big\w*/;
   checklit(sub{eval $_[0]}, $bigi, qr/(?:\(Math::Big\w*[^\)]*\))?${bigistr}/);
 
-  # Confirm that various Overloads values disable
+  # Confirm that various Objects values disable
   foreach my $Sval (0, undef, "", [], [0], [""]) {
-    local $Data::Dumper::Interp::Overloads = $Sval;
+    local $Data::Dumper::Interp::Objects = $Sval;
     my $s = vis($bigf);
     die "bug(",u($Sval),")($s)" unless $s =~ /^\(?bless.*BigFloat/s;
   }
@@ -466,11 +467,11 @@ my $ratstr  = '1/9';
   die unless blessed($rat) =~ /^Math::BigRat/;
 
   # Without stringification
-  { local $Data::Dumper::Interp::Overloads = 0;
+  { local $Data::Dumper::Interp::Objects = 0;
     my $s = vis($bigf); die "bug($s)" unless $s =~ /^bless.*BigFloat/s;
   }
   # With explicit stringification of BigFloat only
-  { local $Data::Dumper::Interp::Overloads = [qr/^Math::BigFloat/];
+  { local $Data::Dumper::Interp::Objects = [qr/^Math::BigFloat/];
     checklit(sub{eval $_[0]}, $bigf, qr/(?:\(Math::BigFloat[^\)]*\))?${bigfstr}/);
     # But not other classes
     my $s = vis($rat); die "bug($s)" unless $s =~ /^bless.*BigRat/s;
@@ -517,10 +518,10 @@ EOF
 }
 
 # There was a bug for s/dvis called direct from outer scope, so don't use eval:
-#WAS BUG HERE: qr/.../ can visualize in a longer form on some platorms,
-## changing wrap.  I increased "F" to super-long to force wrap b4 the regex.
+#WAS BUG HERE: On some older platforms qr/.../ can visualize to a different, 
+#longer representation, so forcing wrap to be the same on all platforms.
 check
-  'global divs %toplex_h',
+  'global dvis %toplex_h',
 q(%toplex_h=( "" => "Emp",A => 111,"B B" => 222,C => {d => 888,e => 999},
   D => {},EEEEEEEEEEEEEEEEEEEEEEEEEE => \\42,
   F_long_enough_to_force_wrap_FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF

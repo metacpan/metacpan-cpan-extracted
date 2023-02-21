@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Keyword 0.32;
+package XS::Parse::Keyword 0.33;
 
 use v5.14;
 use warnings;
@@ -460,6 +460,19 @@ character. It is passed as a L<version> SV object in the I<sv> field.
 The C<_OPT>-suffixed version is optional; if no version string is found then
 I<sv> is set to C<NULL>.
 
+=head2 XPK_LEXVAR
+
+I<atomic, emits padix.>
+
+   XPK_LEXVAR(kind)
+
+A lexical variable name is expected and looked up from the current pad. The
+resulting pad index is passed in the I<padix> field. No error happens if the
+variable is not found; the value C<NOT_IN_PAD> is passed instead.
+
+The C<kind> argument specifies what kinds of variable are permitted, as per
+C<XPK_LEXVARNAME>.
+
 =head2 XPK_LEXVAR_MY
 
 I<atomic, emits padix.>
@@ -699,6 +712,20 @@ from the scope itself.
 
 This is a convenient shortcut to nesting the scope within a C<XPK_OPTIONAL>
 macro.
+
+=head2 XPK_..._pieces
+
+   XPK_SEQUENCE_pieces(ptr)
+   XPK_OPTIONAL_pieces(ptr)
+   ...
+
+For each of the C<XPK_...> macros that takes a variable-length list of pieces,
+there is a variant whose name ends with C<..._pieces>, taking a single pointer
+argument directly. This must point at a C<const XSParseKeywordPieceType []>
+array whose final element is the zero element.
+
+Normally hand-written C code of a fixed grammar would be unlikely to use these
+forms, but they may be useful in dynamically-generated cases.
 
 =cut
 

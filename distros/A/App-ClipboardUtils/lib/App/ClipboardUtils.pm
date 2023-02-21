@@ -3,9 +3,9 @@ package App::ClipboardUtils;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-25'; # DATE
+our $DATE = '2022-12-08'; # DATE
 our $DIST = 'App-ClipboardUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 1;
 # ABSTRACT: CLI utilities related to clipboard
@@ -22,7 +22,7 @@ App::ClipboardUtils - CLI utilities related to clipboard
 
 =head1 VERSION
 
-This document describes version 0.005 of App::ClipboardUtils (from Perl distribution App-ClipboardUtils), released on 2022-10-25.
+This document describes version 0.006 of App::ClipboardUtils (from Perl distribution App-ClipboardUtils), released on 2022-12-08.
 
 =head1 DESCRIPTION
 

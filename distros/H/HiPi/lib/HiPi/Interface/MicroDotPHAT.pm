@@ -99,10 +99,14 @@ sub new {
     # initialise
     my @controllers = ();
     
-    my $devicename = $params{devicename};
-    
+        
     for my $address ( 0x63, 0x62, 0x61 ) {
-        my %is31params = ( $devicename ) ? ( address => $address, devicename => $devicename ) : ( address => $address );
+        my %is31params = ( address => $address );
+        
+        for my $inpname ( qw( devicename backend ) ) {
+            $is31params{$inpname} = $params{$inpname} if $params{$inpname};
+        }
+        
         my $control = HiPi::Interface::IS31FL3730->new( %is31params );
         $control->reset;
         $control->configure( FL3730_SSD_NORMAL | FL3730_DM_MATRIX_BOTH | FL3730_AEN_OFF | FL3730_ADM_8X8 );

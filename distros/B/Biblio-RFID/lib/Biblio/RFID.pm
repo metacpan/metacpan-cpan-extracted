@@ -14,9 +14,9 @@ Biblio::RFID - perl tools to use different RFID readers for library use
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
-our $debug = 0;
+our $debug = $ENV{DEBUG} || 0;
 
 
 =head1 DESCRIPTION
@@ -110,7 +110,7 @@ sub hex_tag { uc(unpack('H16', shift)) }
 
 =head1 WARN
 
-We are installing L<perldoc/warn> handler to controll debug output
+We are installing L<perldoc/warn> handler to control debug output
 based on C<$Biblio::RFID::debug> level
 
 =cut

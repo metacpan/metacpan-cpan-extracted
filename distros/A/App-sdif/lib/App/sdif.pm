@@ -7,7 +7,7 @@ our @EXPORT      = qw(usage);
 our %EXPORT_TAGS = ();
 our @EXPORT_OK   = qw();
 
-our $VERSION = "4.25.0";
+our $VERSION = "4.25.1";
 
 use Pod::Usage;
 
@@ -88,8 +88,11 @@ You can write everything in ~/.gitconfig:
         show = sdif -n --margin=4 --mecab | env LESSANSIENDCHARS=mK less -cR
         diff = sdif -n --margin=4 --mecab | env LESSANSIENDCHARS=mK less -cR
 
-=for html
+=begin html
+
 <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/sdif-tools/master/docs/images/git.jpg"></p>
+
+=end html
 
 =head1 SEE ALSO
 

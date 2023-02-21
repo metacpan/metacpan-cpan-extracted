@@ -11,7 +11,7 @@ use List::MoreUtils qw(all);
 use LUGS::Events::Parser::Event ();
 use Params::Validate ':all';
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 validation_options(
     on_fail => sub

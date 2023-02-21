@@ -1,5 +1,14 @@
 Revision history for XS-Parse-Keyword
 
+0.33    2023-02-18
+        [CHANGES]
+         * Added XPK_LEXVAR, a non `my`-alike variant
+         * Added XPK_*_pieces() macros allowing caller to dynamically generate
+           sub-arrays of pieces
+
+        [BUGFIXES]
+         * Remember to consume whitespace between XPK_REPEATED elements
+
 0.32    2023-01-12
         [BUGFIXES]
          * Ensure that XPK_TERMEXPR acting as a fullexpr is OK with empty

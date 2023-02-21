@@ -24,7 +24,10 @@ sub render {
       return "wrapped $css end wrap";
     });
 
-    return "<div>Hello @{[ $self->name ]}!</div>";
+    return
+      $c->view(Factory => name=>"joe"),
+      $c->view(Factory => name=>"jon"),
+      "<div>Hello @{[ $self->name ]}!</div>";
   });
 }
 

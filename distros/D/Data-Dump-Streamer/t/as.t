@@ -1,7 +1,5 @@
 #!perl -w
 
-#$Id: as.t 26 2006-04-16 15:18:52Z demerphq $#
-
 use Test::More tests => 4;
 
 use_ok 'Data::Dump::Streamer';
@@ -9,6 +7,7 @@ use_ok 'Data::Dump::Streamer';
 import Data::Dump::Streamer as => 'DDS';
 
 {
+
     package Foo;
     use base Data::Dump::Streamer;
     import Data::Dump::Streamer as => 'Bar';
@@ -16,11 +15,11 @@ import Data::Dump::Streamer as => 'DDS';
 
 my $dds;
 
-$dds = DDS->new;
+$dds= DDS->new;
 ok($dds, "aliased namespace works for object construction");
 
-$dds = Foo->new;
+$dds= Foo->new;
 ok($dds, "derived package constructor works");
 
-$dds = Bar->new;
+$dds= Bar->new;
 ok($dds, "aliased namespace works with derived package constructor");

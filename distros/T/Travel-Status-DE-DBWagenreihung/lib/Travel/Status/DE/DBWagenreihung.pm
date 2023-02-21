@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.020;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Carp qw(cluck confess);
 use JSON;
@@ -86,7 +86,7 @@ sub new {
 
 	my $self = {
 		api_base => $opt{api_base}
-		  // 'https://www.apps-bahn.de/wr/wagenreihung/1.0',
+		  // 'https://ist-wr.noncd.db.de/wagenreihung/1.0',
 		developer_mode => $opt{developer_mode},
 		cache          => $opt{cache},
 		departure      => $opt{departure},
@@ -625,7 +625,7 @@ Travel::Status::DE::DBWagenreihung - Interface to Deutsche Bahn Wagon Order API.
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 This is beta software. The API may change without notice.
 

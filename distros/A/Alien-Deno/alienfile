@@ -1,0 +1,55 @@
+use alienfile;
+
+use Path::Tiny qw( path );
+
+plugin 'Probe::CommandLine' => (
+  command => 'deno',
+  args    => [ '--version' ],
+  match   => qr/^deno ([0-9\.]+)/,
+  version => qr/^deno ([0-9\.]+)/,
+);
+
+share {
+  # Only supports binary style for now.
+
+  my %os_arch_mapping = (
+    "darwin:aarch64" => { name => 'aarch64-apple-darwin' },
+    "darwin:x86_64"  => { name => 'x86_64-apple-darwin' },
+    "MSWin32:x86_64" => { name => 'x86_64-pc-windows-msvc' },
+    "linux:x86_64"   => { name => 'x86_64-unknown-linux-gnu' },
+  );
+
+  my $os_arch = join ":", ( $^O, meta->prop->{platform}{cpu}{arch}{name} );
+
+  plugin 'Download::GitHub' => (
+    github_user => 'denoland',
+    github_repo => 'deno',
+    asset       => 1,
+    asset_name  => qr/deno-@{[ $os_arch_mapping{$os_arch}{name} ]}\.zip/,
+    asset_format => 'zip',
+    asset_convert_version => sub {
+      my $version = shift;
+      $version =~ s/^v//;
+      $version;
+    },
+  );
+
+  patch sub {
+    my ($build) = @_;
+    for my $deno (map path($_), qw(deno deno.exe)) {
+      if( -f $deno ) {
+	$build->log("Moving $deno to bin/");
+	my $bin = path('bin');
+	$bin->mkpath;
+	$deno->move( $deno->absolute($bin) );
+      }
+    }
+  };
+
+  plugin 'Build::Copy';
+
+  gather sub {
+    my ($build) = @_;
+    $build->runtime_prop->{'style'} = 'binary';
+  };
+}

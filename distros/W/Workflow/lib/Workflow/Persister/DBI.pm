@@ -19,7 +19,7 @@ use Readonly;
 Readonly::Scalar my $TRUE => 1;
 Readonly::Scalar my $FALSE => 0;
 
-$Workflow::Persister::DBI::VERSION = '1.61';
+$Workflow::Persister::DBI::VERSION = '1.62';
 
 my @FIELDS = qw( _wf_fields _hist_fields handle dsn user password driver
     workflow_table history_table date_format parser autocommit);
@@ -73,6 +73,8 @@ sub create_handle {
             "key 'dsn' which maps to the first paramter ",
             "in the DBI 'connect()' call.";
     }
+
+    local $EVAL_ERROR = undef;
     my $dbh = eval {
                DBI->connect( $self->dsn, $self->user, $self->password )
             || croak "Cannot connect to database: $DBI::errstr";
@@ -217,6 +219,8 @@ sub create_workflow {
     }
 
     my ($sth);
+
+    local $EVAL_ERROR = undef;
     eval {
         $sth = $dbh->prepare($sql);
         $sth->execute(@values);
@@ -253,6 +257,8 @@ sub fetch_workflow {
     }
 
     my ($sth);
+
+    local $EVAL_ERROR = undef;
     eval {
         $sth = $self->handle->prepare($sql);
         $sth->execute($wf_id);
@@ -287,6 +293,8 @@ sub update_workflow {
     }
 
     my ($sth);
+
+    local $EVAL_ERROR = undef;
     eval {
         $sth = $self->handle->prepare($sql);
         $sth->execute( $wf->state, $update_date, $wf->id );
@@ -326,6 +334,8 @@ sub create_history {
         }
 
         my ($sth);
+
+        local $EVAL_ERROR = undef;
         eval {
             $sth = $dbh->prepare($sql);
             $sth->execute(@values);
@@ -364,6 +374,8 @@ sub fetch_history {
     }
 
     my ($sth);
+
+    local $EVAL_ERROR = undef;
     eval {
         $sth = $self->handle->prepare($sql);
         $sth->execute( $wf->id );
@@ -397,6 +409,7 @@ sub fetch_history {
 sub commit_transaction {
     my ( $self, $wf ) = @_;
     if ( not $self->autocommit() ) {
+        local $EVAL_ERROR = undef;
         eval { $self->handle->commit(); };
         if ($EVAL_ERROR) {
             $self->log->error("Caught error committing transaction: $EVAL_ERROR");
@@ -408,6 +421,7 @@ sub commit_transaction {
 sub rollback_transaction {
     my ( $self, $wf ) = @_;
     if ( not $self->autocommit() ) {
+        local $EVAL_ERROR = undef;
         eval { $self->handle->rollback(); };
         if ($EVAL_ERROR) {
             $self->log->error("Caught error rolling back transaction: $EVAL_ERROR");
@@ -463,7 +477,7 @@ Workflow::Persister::DBI - Persist workflow and history to DBI database
 
 =head1 VERSION
 
-This documentation describes version 1.61 of this package
+This documentation describes version 1.62 of this package
 
 =head1 SYNOPSIS
 
@@ -803,7 +817,7 @@ Returns nothing
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003-2022 Chris Winters. All rights reserved.
+Copyright (c) 2003-2023 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -1,6 +1,9 @@
 Revision history for Net::DNS::Resolver::Mock
 
-1.20220817 2022-08-17 03:33:52+00:00 UTC
+1.20230216 2023-02-16 23:31:47+00:00 UTC
+  - Build a zonefile cache hash to speed up multiple lookups
+
+1.20220817
   - Fix issue when looking up record at the root
 
 1.20200215 2020-02-15 15:07:49+00:00 UTC

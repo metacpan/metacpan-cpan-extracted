@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-26'; # DATE
+our $DATE = '2022-11-15'; # DATE
 our $DIST = 'Sah-Schemas-JSON'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our $schema = [str => {
     summary => 'A string that contains valid JSON and the JSON encodes an array',
@@ -51,7 +51,7 @@ Sah::Schema::json_str::array - A string that contains valid JSON and the JSON en
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::Schema::json_str::array (from Perl distribution Sah-Schemas-JSON), released on 2022-08-26.
+This document describes version 0.007 of Sah::Schema::json_str::array (from Perl distribution Sah-Schemas-JSON), released on 2022-11-15.
 
 =head1 SYNOPSIS
 
@@ -95,8 +95,8 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = "\"foo\"";
- my $errmsg = $validator->($data); # => "String is a valid JSON but not an encoded array"
+ $data = "foo";
+ my $errmsg = $validator->($data); # => "String is not a valid JSON: 'false' expected, at character offset 0 (before \"foo\") at (eval 2567) line 13.\n"
 
 Often a schema has coercion rule or default value, so after validation the
 validated value is different. To return the validated (set-as-default, coerced,
@@ -110,8 +110,8 @@ prefiltered) value:
  my $res = $validator->($data); # => ["","[1,2,3,{}]"]
  
  # a sample invalid data
- $data = "\"foo\"";
- my $res = $validator->($data); # => ["String is a valid JSON but not an encoded array","\"foo\""]
+ $data = "foo";
+ my $res = $validator->($data); # => ["String is not a valid JSON: 'false' expected, at character offset 0 (before \"foo\") at (eval 2573) line 13.\n","foo"]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like
@@ -173,6 +173,23 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
+
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema:
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('$sch_name*', name=>'JsonStrArray')
+     );
+ }
+
+ use My::Types qw(JsonStrArray);
+ JsonStrArray->assert_valid($data);
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,256 @@
+class TestCase::File::Spec::Instance::Unix {
+  use File::Spec::Instance::Unix;
+  use Sys;
+  use Array;
+  use Cwd;
+  
+  static method canonpath : int () {
+    
+    my $spec = File::Spec::Instance::Unix->new;
+    
+    {
+      my $canonpath = $spec->canonpath("xx////xx");
+      unless ($canonpath eq "xx/xx") {
+        return 0;
+      }
+    }
+    {
+      my $canonpath = $spec->canonpath("xx/././xx");
+      unless ($canonpath eq "xx/xx") {
+        return 0;
+      }
+    }
+    {
+      my $canonpath = $spec->canonpath("./xx");
+      unless ($canonpath eq "xx") {
+        return 0;
+      }
+    }
+    {
+      my $canonpath = $spec->canonpath("/../../xx");
+      unless ($canonpath eq "/xx") {
+        return 0;
+      }
+    }
+    {
+      my $canonpath = $spec->canonpath("/..");
+      unless ($canonpath eq "/") {
+        return 0;
+      }
+    }
+    {
+      my $canonpath = $spec->canonpath("xx/");
+      unless ($canonpath eq "xx") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+  static method catdir : int () {
+    
+    my $spec = File::Spec::Instance::Unix->new;
+    
+    {
+      my $catdir = $spec->catdir(["foo", "bar", "baz"]);
+      unless ($catdir eq "foo/bar/baz") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+  static method catfile : int () {
+    
+    my $spec = File::Spec::Instance::Unix->new;
+    
+    {
+      my $catfile = $spec->catfile(["foo", "bar", "baz"], "a.txt");
+      unless ($catfile eq "foo/bar/baz/a.txt") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+  static method no_upwards : int () {
+    
+    my $spec = File::Spec::Instance::Unix->new;
+    
+    {
+      my $no_upwards = $spec->no_upwards([".", "..", "./foo", "../bar", "bar/baz"]);
+      unless (Array->equals_string($no_upwards, ["./foo", "../bar", "bar/baz"])) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+  static method file_name_is_absolute : int () {
+    
+    my $spec = File::Spec::Instance::Unix->new;
+    
+    {
+      my $is_abs = $spec->file_name_is_absolute("/foo/bar");
+      unless ($is_abs) {
+        return 0;
+      }
+    }
+    {
+      my $is_abs = $spec->file_name_is_absolute("foo/bar");
+      if ($is_abs) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method join : int () {
+    
+    my $spec = File::Spec::Instance::Unix->new;
+    
+    {
+      my $join = $spec->join(["foo", "bar", "baz"], "a.txt");
+      unless ($join eq "foo/bar/baz/a.txt") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+  static method catpath : int () {
+    
+    my $spec = File::Spec::Instance::Unix->new;
+    
+    {
+      my $catpath = $spec->catpath("c:", "foo/bar/", "a.txt");
+      unless ($catpath eq "foo/bar/a.txt") {
+        return 0;
+      }
+    }
+    {
+      my $catpath = $spec->catpath("c:", "foo/bar", "a.txt");
+      unless ($catpath eq "foo/bar/a.txt") {
+        return 0;
+      }
+    }
+    {
+      my $catpath = $spec->catpath("c:", "foo/bar", "/a.txt");
+      unless ($catpath eq "foo/bar/a.txt") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+  static method splitpath : int () {
+    
+    my $spec = File::Spec::Instance::Unix->new;
+    
+    {
+      my $no_file = 1;
+      my $splitpath = $spec->splitpath("foo/bar", $no_file);
+      unless ($splitpath->[0] eq "") {
+        return 0;
+      }
+      unless ($splitpath->[1] eq "foo/bar") {
+        return 0;
+      }
+      unless ($splitpath->[2] eq "") {
+        return 0;
+      }
+    }
+    {
+      my $splitpath = $spec->splitpath("foo/bar/a.txt");
+      
+      unless ($splitpath->[0] eq "") {
+        return 0;
+      }
+      unless ($splitpath->[1] eq "foo/bar/") {
+        return 0;
+      }
+      unless ($splitpath->[2] eq "a.txt") {
+        return 0;
+      }
+    }
+    {
+      my $splitpath = $spec->splitpath("/foo/bar/a.txt");
+      unless ($splitpath->[0] eq "") {
+        return 0;
+      }
+      unless ($splitpath->[1] eq "/foo/bar/") {
+        return 0;
+      }
+      unless ($splitpath->[2] eq "a.txt") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+  static method rel2abs : int () {
+    
+    my $spec = File::Spec::Instance::Unix->new;
+    
+    {
+      my $rel2abs = $spec->rel2abs("foo/a.txt");
+      unless ($rel2abs eq (Cwd->getcwd . "/" . "foo/a.txt")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $rel2abs = $spec->rel2abs("/foo/a.txt");
+      unless ($rel2abs eq "/foo/a.txt") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+  static method splitdir : int () {
+    
+    my $spec = File::Spec::Instance::Unix->new;
+    
+    {
+      my $dirs = $spec->splitdir("foo/bar/baz");
+      unless (Array->equals_string($dirs, ["foo", "bar", "baz"])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $dirs = $spec->splitdir("/foo/bar//baz/");
+      unless (Array->equals_string($dirs, ["", "foo", "bar", "", "baz", ""])) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+  static method abs2rel : int () {
+    
+    my $spec = File::Spec::Instance::Unix->new;
+    
+    {
+      my $cwd = Cwd->getcwd;
+      my $abs2rel = $spec->abs2rel("$cwd/foo/a.txt");
+      
+      unless ($abs2rel eq "foo/a.txt") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+}

@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Argon2;
-$Crypt::Passphrase::Argon2::VERSION = '0.003';
+$Crypt::Passphrase::Argon2::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -7,6 +7,21 @@ use parent 'Crypt::Passphrase::Encoder';
 
 use Carp 'croak';
 use Crypt::Argon2 0.009;
+
+my %settings_for = (
+	interactive => {
+		time_cost   => 2,
+		memory_cost => '64M',
+	},
+	moderate => {
+		time_cost   => 3,
+		memory_cost => '256M',
+	},
+	sensitive => {
+		time_cost   => 4,
+		memory_cost => '1G',
+	}
+);
 
 my %encoder_for = (
 	argon2i  => \&Crypt::Argon2::argon2i_pass,
@@ -17,13 +32,15 @@ my %encoder_for = (
 sub new {
 	my ($class, %args) = @_;
 	my $subtype     =  $args{subtype}     || 'argon2id';
-	croak "Unknown subtype $subtype" unless $encoder_for{ $subtype };
+	croak "Unknown subtype $subtype" unless $encoder_for{$subtype};
+	my $profile     =  $args{profile}     || 'moderate';
+	croak "Unknown profile $profile" unless $settings_for{$profile};
 	return bless {
-		memory_cost => $args{memory_cost} || '256M',
-		time_cost   => $args{time_cost}   ||    3,
-		parallelism => $args{parallelism} ||    1,
-		output_size => $args{output_size} ||   16,
-		salt_size   => $args{salt_size}   ||   16,
+		memory_cost => $args{memory_cost} || $settings_for{$profile}{memory_cost},
+		time_cost   => $args{time_cost}   || $settings_for{$profile}{time_cost},
+		parallelism => $args{parallelism} ||  1,
+		output_size => $args{output_size} || 16,
+		salt_size   => $args{salt_size}   || 16,
 		subtype     => $subtype,
 	}, $class;
 }
@@ -32,12 +49,12 @@ sub hash_password {
 	my ($self, $password) = @_;
 	my $salt = $self->random_bytes($self->{salt_size});
 	my $encoder = $encoder_for{ $self->{subtype} };
-	return $encoder->($password, $salt, $self->{time_cost}, $self->{memory_cost}, $self->{parallelism}, $self->{output_size});
+	return $encoder->($password, $salt, @{$self}{qw/time_cost memory_cost parallelism output_size/});
 }
 
 sub needs_rehash {
 	my ($self, $hash) = @_;
-	return Crypt::Argon2::argon2_needs_rehash($hash, $self->{subtype}, $self->{time_cost}, $self->{memory_cost}, $self->{parallelism}, $self->{output_size}, $self->{salt_size});
+	return Crypt::Argon2::argon2_needs_rehash($hash, @{$self}{qw/subtype time_cost memory_cost parallelism output_size salt_size/});
 }
 
 my %matcher_for = (
@@ -70,7 +87,7 @@ Crypt::Passphrase::Argon2 - An Argon2 encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 
@@ -86,13 +103,33 @@ This creates a new Argon2 encoder, it takes named parameters that are all option
 
 =over 4
 
+=item * profile
+
+This sets the default values for the C<memory_cost> and C<time_cost> values. The default profile is C<moderate>, but this may change in any future version.
+
+=over 4
+
+=item * interactive
+
+This sets the defaults for C<memory_cost> and C<time_cost> to C<2> and C<'64M'> respectively.
+
+=item * moderate
+
+This sets the defaults for C<memory_cost> and C<time_cost> to C<3> and C<'256M'> respectively.
+
+=item * sensitive
+
+This sets the defaults for C<memory_cost> and C<time_cost> to C<4> and C<'1G'> respectively.
+
+=back
+
 =item * memory_cost
 
-Maximum memory (in bytes) that may be used to compute the Argon2 hash. This currently defaults to 256 megabytes, but this number may change in any future version.
+Maximum memory (in bytes) that may be used to compute the Argon2 hash.
 
 =item * time_cost
 
-Maximum amount of time it may take to compute the Argon2 hash. This currently defaults to C<3>, but this number may change in any future version.
+Maximum amount of time it may take to compute the Argon2 hash.
 
 =item * parallelism
 
@@ -108,7 +145,7 @@ The size of the salt. This defaults to 16 bytes, which should be more than enoug
 
 =item * subtype
 
-This choses the argon2 subtype. It defaults to C<argon2id>, and unless you know what you're doing you should probably keep it at that. This may change in any future version (but is unlikely to do so unless C<argon2_id> is cryptographically broken).
+This choses the argon2 subtype. It defaults to C<argon2id>, and unless you know what you're doing you should probably keep it at that. This may change in any future version (but is unlikely to do so unless C<argon2id> is cryptographically broken).
 
 =over 4
 

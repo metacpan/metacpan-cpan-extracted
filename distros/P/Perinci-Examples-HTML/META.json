@@ -33,6 +33,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Exporter" : "5.57",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -50,7 +51,7 @@
    "provides" : {
       "Perinci::Examples::HTML" : {
          "file" : "lib/Perinci/Examples/HTML.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -65,7 +66,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Examples-HTML"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

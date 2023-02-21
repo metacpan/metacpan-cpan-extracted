@@ -1,0 +1,33 @@
+---
+abstract: unknown
+author:
+  - 'Erich Strelow <estrelow@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LWP-UserAgent-msgraph
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '1.00'
+  Data::UUID: '1.00'
+  File::Spec: '3.26'
+  HTTP::Request: '6.00'
+  HTTP::Server::Simple::CGI: '0.40'
+  JSON: '2.00'
+  LWP::UserAgent: '6.00'
+  Net::EmptyPort: '2.19'
+  Test::More: '1.00'
+  URI: '1.00'
+  perl: '5.004'
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

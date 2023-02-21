@@ -3,8 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use Struct::Dumb;
 
@@ -33,11 +32,11 @@ struct Colour => [qw( red green blue )], named_constructor => 1;
    ::is( $point->z, 3, '$point->z from default named constructor' );
 }
 
-like( exception { Colour( red => 0, green => 0 ) },
+like( dies { Colour( red => 0, green => 0 ) },
       qr/^usage: main::Colour requires 'blue' at \S+ line \d+\.?\n/,
       'Colour() without blue throws usage exception' );
 
-like( exception { Colour( red => 0, green => 0, blue => 0, yellow => 1 ) },
+like( dies { Colour( red => 0, green => 0, blue => 0, yellow => 1 ) },
       qr/^usage: main::Colour does not recognise 'yellow' at \S+ line \d+\.?\n/,
       'Colour() with yellow throws usage exception' );
 

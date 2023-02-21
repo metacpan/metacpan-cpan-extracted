@@ -4,6 +4,8 @@ use lib $Bin;
 use t_Setup;  # parses @ARGV and sets $debug, $verbose and $silent
 use t_Utils;
 
+use Spreadsheet::Edit qw/fmt_sheet/;
+
 ##########################################################################
 package Other {
   use t_Setup;
@@ -11,10 +13,12 @@ package Other {
   use Spreadsheet::Edit ':FUNCS', # don't import stdvars
                         '@rows' => { -as, '@myrows' },
                         qw(%colx @crow %crow $num_cols @linenums),
+                        qw/fmt_sheet/,
                         ;
   our $Gtitle;
   $Gtitle = "Other::Gtitle before being tied";
 
+#$Spreadsheet::Edit::Debug = 1;
   new_sheet
             data_source => "Othersheet",
             rows => [ [qw(OtitleA OtitleB OtitleC)],
@@ -166,7 +170,7 @@ sub getcell_byident($;$) { # access by imported $variable + all other ways
   my ($v, $err) = getcell_bykey($ident, $inerr);
   my $vstr = vis($v);
 
-  my $id_v = eval "\$$ident";   # undef if not defined, not in apply(), etc.
+  my $id_v = eval insert_loc_in_evalstr("\$$ident"); # undef if not defined, not in apply(), etc.
   my $id_vstr = vis($id_v);
   $err //= "\$$ident returned $id_vstr but other access methods returned $vstr"
     if $vstr ne $id_vstr;
@@ -309,18 +313,41 @@ sub check_colx(@) {
 
 ####### MAIN ######
 
-check_no_sheet;
-options silent => $silent, verbose => $verbose, debug => $debug;
-read_spreadsheet $inpath;
+# Column variables named after (trimmed) titles or auto-aliases
+# "A title  ",Btitle,"  Multi-Word Title C",,H,F,Gtitle,Z,"0","003","999","-1"
+# A=0         B=1       C=2                  E F G=6    H  I   J     K     L
+our ($A_title, $Btitle, $Multi_Word_Title_C, $H, $F, $Gtitle, $Z, $_0, $_003, $_999, $_1);
+# And column letter codes (if they aren't titles)
+our ($A,$B,$C,$D,$E,   $G,   $I,$J,$K,$L);
 
-# Auto-detect would skip the title row due to the empty title
+check_no_sheet;
+
+# Auto-tie all columns, current and future.  
+# Note that tie_column_vars has it's own separate comprehensive test
+tie_column_vars ':all';
+
+options silent => $silent, verbose => $verbose, debug => $debug;
+
+# Verify that no-titles mode works
+read_spreadsheet {title_rx => undef}, $inpath;
+
+die "title_rx with no titles returns defined value" if defined(title_rx());
+my $expected_rx = 0;
+apply { # should visit all rows
+  die dvis 'Wrong $rx' unless $rx == $expected_rx++;
+  if    ($rx == 0) { die dvis '$rx Wrong $A' unless $A =~ /^Pre-title-row/; }
+  elsif ($rx == 1) { die dvis '$rx Wrong $A' unless $A =~ /^A title/; }
+  elsif ($rx == 2) { die dvis '$rx Wrong $A' unless $A eq "A2"; }
+  elsif ($rx == 3) { die dvis '$rx Wrong $A' unless $A eq "A3" && $B eq "B3"; }
+};
+die dvis '$expected_rx' unless $expected_rx == 7;
+
+# Can't auto-detect because it would skip the title row due to the empty title
 title_rx 1;
 
 { my $s=sheet(); dprint dvis('After reading $inpath\n   $$s->{rows}\n   $$s->{colx_desc}\n'); }
 
 
-# Now auto-detect is triggered by *any* alias to detect titles like "A" etc.
-# "A title  ",Btitle,"  Multi-Word Title C",,H,F,Gtitle,Z,"0","003","999","-1"
 alias Aalias => '^';
 alias Aalia2 => 0;
 alias Dalias => 'D';
@@ -344,18 +371,6 @@ check_colx qw(Aalias_0 Aalia2_0 Dalias_D Ealias_E Falias_F
 # alias to title which is defined but no variable yet tied to it
 alias MWTCalia => qr/Multi.Word .*C/;
   
-# Column variables named after (trimmed) titles or auto-aliases
-# "A title  ",Btitle,"  Multi-Word Title C",,H,F,Gtitle,Z,"0","003","999","-1"
-# A=0         B=1       C=2                  E F G=6    H  I   J     K     L
-our ($A_title, $Btitle, $Multi_Word_Title_C, $H, $F, $Gtitle, $Z, $_0, $_003, $_999, $_1);
-# And column letter codes (if they aren't titles)
-our ($A,$B,$C,$D,$E,   $G,   $I,$J,$K,$L);
-
-# Auto-tie all columns, current and future.  
-# Note that tie_column_vars has it's own separate comprehensive test
-tie_column_vars ':all';
-
-
 apply_torx {
   die unless $A         eq "A2";
   die unless $A_title   eq "A2";
@@ -517,7 +532,7 @@ foreach ([f => 0], [flt => 0, f => 1, flt => undef], [lt => $#rows],
     last_data_rx  $saved[1];
     title_rx      $saved[2];
   };
-  title_rx { enable => 0 };  # disable autodetect
+
   while (@pairs) {
     my ($key,$val) = @pairs[0,1]; @pairs = @pairs[2..$#pairs];
     if ($key =~ s/f//) {
@@ -796,31 +811,33 @@ foreach ([f => 0], [flt => 0, f => 1, flt => undef], [lt => $#rows],
     my $sheet1 = sheet();
     my $p = sheet();
     bug unless defined($p) && $p == $sheet1;
-    bug unless $Spreadsheet::Edit::OO::pkg2currsheet{"".__PACKAGE__} == $sheet1;
+    bug unless $Spreadsheet::Edit::pkg2currsheet{"".__PACKAGE__} == $sheet1;
+    bug unless sheet({package => __PACKAGE__}) == $sheet1;
+    bug if defined sheet({package => "bogopackage"});
 
     # replace with no sheet
     $p = sheet(undef);
     bug unless defined($p) && $p == $sheet1;
-    bug if defined $Spreadsheet::Edit::OO::pkg2currsheet{"".__PACKAGE__};
+    bug if defined $Spreadsheet::Edit::pkg2currsheet{"".__PACKAGE__};
     bug if defined eval { my $x = $num_cols; } ; # expect undef or croak
     bug if defined eval { my $x = $A_title;   } ; # expect undef or croak
-    bug if defined $Spreadsheet::Edit::OO::pkg2currsheet{"".__PACKAGE__};
+    bug if defined $Spreadsheet::Edit::pkg2currsheet{"".__PACKAGE__};
     $p = sheet();
     bug if defined $p;
-    bug if defined $Spreadsheet::Edit::OO::pkg2currsheet{"".__PACKAGE__};
+    bug if defined $Spreadsheet::Edit::pkg2currsheet{"".__PACKAGE__};
     bug if defined sheet();
 
     # put back the first sheet
     $p = sheet($sheet1);
     bug if defined $p;
-    bug unless $Spreadsheet::Edit::OO::pkg2currsheet{"".__PACKAGE__} == $sheet1;
+    bug unless $Spreadsheet::Edit::pkg2currsheet{"".__PACKAGE__} == $sheet1;
     apply_torx { bug unless $Gtitle eq "G$rx" } 4;
     check_both('ABCDEFGHIJKLMNO');
 
     # switch to a different sheet
     new_sheet silent => $silent;
     options silent => $silent, verbose => $verbose, debug => $debug;
-    my $sheet2 = $Spreadsheet::Edit::OO::pkg2currsheet{"".__PACKAGE__};
+    my $sheet2 = $Spreadsheet::Edit::pkg2currsheet{"".__PACKAGE__};
 
 #-----------------------------------
     my $inpath2 = write_string_to_tmpf("in2", <<'EOF');
@@ -849,7 +866,7 @@ EOF
     # switch back to original sheet
     $p = sheet($sheet1);
     bug unless $p == $sheet2;
-    bug unless $Spreadsheet::Edit::OO::pkg2currsheet{"".__PACKAGE__} == $sheet1;
+    bug unless $Spreadsheet::Edit::pkg2currsheet{"".__PACKAGE__} == $sheet1;
     apply { our $TitleP; bug unless $Gtitle eq "G$rx"; 
             check_colspec_is_undef('TitleP');
           };
@@ -868,7 +885,7 @@ EOF
     # Verify that the OO api does not do anything to the "current package"
     sheet(undef);
     { my $obj = Spreadsheet::Edit->new();
-      bug if defined $Spreadsheet::Edit::OO::pkg2currsheet{"".__PACKAGE__};
+      bug if defined $Spreadsheet::Edit::pkg2currsheet{"".__PACKAGE__};
     }
     bug if defined sheet();
 
@@ -876,9 +893,11 @@ EOF
     sheet($sheet1);
     { my $tmp;
       apply_torx { die "bug($Gtitle)" unless $Gtitle eq "G2" } [2];
-      sheet( package_active_sheet("Other") );
+      sheet( sheet({package => "Other"}) );
       apply_torx { 
-        die "bug($Gtitle)" if defined eval{ $Gtitle };
+        ## With Perl v5.20.1 the following eval does not catch the exception
+        #die "bug($Gtitle)" if defined eval{ $Gtitle };
+        die "bug($Gtitle)" if defined eval{ my $dummy = $Gtitle };
       } [2];
       bug unless $Other::Gtitle eq "Other::Gtitle before being tied";
       eval { my $i = defined $Gtitle }; verif_eval_err;
@@ -887,9 +906,10 @@ EOF
       bug unless @rows==4 && $rows[2]->[0]==314;
       bug unless @Other::myrows==4 && $Other::myrows[2]->[1]==159;
       sheet(undef);
-      bug if defined $Spreadsheet::Edit::OO::pkg2currsheet{"".__PACKAGE__};
-      bug if defined package_active_sheet(__PACKAGE__);
-      bug if defined $Spreadsheet::Edit::OO::pkg2currsheet{"".__PACKAGE__};
+      bug if defined $Spreadsheet::Edit::pkg2currsheet{"".__PACKAGE__};
+      bug if defined sheet({package => __PACKAGE__});
+      bug if defined sheet();
+      bug if defined $Spreadsheet::Edit::pkg2currsheet{"".__PACKAGE__};
       bug if defined sheet();
     }
 

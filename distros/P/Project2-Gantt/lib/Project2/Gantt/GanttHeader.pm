@@ -10,21 +10,18 @@ use Time::Seconds;
 
 use Mojo::Log;
 
-our $DATE = '2023-02-02'; # DATE
-our $VERSION = '0.006';
+our $DATE = '2023-02-16'; # DATE
+our $VERSION = '0.009';
 
 has canvas => undef;
 has title  => undef;
 has start  => undef;
 has end    => undef;
 has skin   => undef;
-has beginX => 205;
 has beginY => 30;
 has root   => undef;
 
 has log    => sub { Mojo::Log->new };
-
-use constant TITLE_SIZE => 200;
 
 sub new {
 	my $self = shift->SUPER::new(@_);
@@ -52,7 +49,7 @@ sub _writeHeaderDays($self, $start_date =  undef, $end_date =  undef) {
 	my $start	= $start_date // $self->start;
 	my $end		= $end_date   // $self->end;
 	my $yval	= $self->beginY;
-	my $xval	= $self->beginX;
+	my $xval	= $self->skin->spanInfoWidth;
 	$start		= dayBegin($start, $log);
 
 	$log->debug("xval=$xval yval=$yval");
@@ -128,7 +125,7 @@ sub _writeHeaderMonths($self) {
 	my $end		= $self->end;
 	my @yearsWritn	= ();
 	my $yval	= $self->beginY;
-	my $xval	= $self->beginX;
+	my $xval	= $self->skin->spanInfoWidth;
 	# transform start date to absolute beginning of month,
 	# so that $start+"1M" won't ever be bigger than $end
 	# before it should be
@@ -164,7 +161,7 @@ sub _writeHeaderHours($self, $start_hour =  undef, $end_hour =  undef) {
 	my $end		  = $end_hour   // $self->end;
 	my @daysWritn = ();
 	my $yval	  = $self->beginY;
-	my $xval	  = $self->beginX;
+	my $xval	  = $self->skin->spanInfoWidth;
 	$start		  = hourBegin($start, $log);
 
 	while($start <= $end){
@@ -239,7 +236,7 @@ sub _writeText($self, $text, $xval, $yval) {
 sub _writeTitle($self) {
 	my $xval = 1;
 	my $yval =  12;
-	my $title = truncate($self->title,TITLE_SIZE);
+	my $title = truncate($self->title,$self->skin->titleSize);
 	$self->_writeText($title, $xval, $yval);
 }
 

@@ -18,6 +18,7 @@ my $builder = Module::Build->new(
         'Test2::V0'    => '0.000060',
         'perl'         => '5.24.0',
     },
+    sign     => 1,
     requires => {
         'List::GroupingPriorityQueue' => '0',
         'MIDI'                        => '0',
@@ -33,6 +34,8 @@ my $builder = Module::Build->new(
             requires    => { 'Archive::Tar' => 1.09, },
         },
     },
+    meta_merge =>
+      { resources => { repository => 'https://thrig.me/src/Music-RhythmSet.git' } },
 );
 
 $builder->create_build_script();

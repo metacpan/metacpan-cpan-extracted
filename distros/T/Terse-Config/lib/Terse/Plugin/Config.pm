@@ -1,7 +1,6 @@
 package Terse::Plugin::Config;
 
 use base 'Terse::Plugin';
-
 use Data::LNPath qw/lnpath/;
 
 sub build_plugin {
@@ -16,7 +15,7 @@ sub build_plugin {
 
 sub find {
 	my ($self, $path) = @_;
-	return lnpath($self->config, $path);
+	return lnpath($self->{data}, $path);
 }
 
 sub _read_file {
@@ -29,7 +28,7 @@ sub _read_file {
 
 sub _parse_config {
 	my ($self, $content) = @_;
-	$self->graft('data', $content);
+	return $self->graft('data', $content);
 }
 
 1;
@@ -42,7 +41,7 @@ Terse::Plugin::Config - JSON configs
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 

@@ -1,23 +1,26 @@
 ---
-abstract: 'format HTML output using C<String::Tagged>'
+abstract: 'handle HTML content using C<String::Tagged>'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
-  Test::More: 0
+  Test2::V0: '0'
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3607'
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: String-Tagged-HTML
 provides:
   String::Tagged::HTML:
     file: lib/String/Tagged/HTML.pm
-    version: 0.01
+    version: '0.02'
 requires:
-  String::Tagged: 0.07
+  String::Tagged: '0.20'
+  perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.01
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

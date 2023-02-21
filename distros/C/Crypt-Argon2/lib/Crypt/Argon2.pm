@@ -1,5 +1,5 @@
 package Crypt::Argon2;
-$Crypt::Argon2::VERSION = '0.012';
+$Crypt::Argon2::VERSION = '0.013';
 use strict;
 use warnings;
 
@@ -30,7 +30,7 @@ sub argon2_needs_rehash {
 	while ($argstring =~ m/(\w)=(\d+)/gc) {
 		$args{$1} = $2;
 	}
-	return 1 if $args{t} < $t_cost or $args{m} < $m_cost or $args{p} < $parallelism;
+	return 1 if $args{t} != $t_cost or $args{m} != $m_cost or $args{p} != $parallelism;
 	return 1 if length decode_base64($salt) != $salt_length or length decode_base64($hash) != $output_length;
 	return 0;
 }
@@ -51,7 +51,7 @@ Crypt::Argon2 - Perl interface to the Argon2 key derivation functions
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 
@@ -144,7 +144,7 @@ This function processes the C<$password> with the given C<$salt> and parameters 
 
 =head2 argon2_needs_rehash($encoded, $type, $t_cost, $m_cost, $parallelism, $salt_length, $output_length)
 
-This function checks if a password-encoded string needs a rehash. It will return true if the C<$type> (valid values are C<argon2i>, C<argon2id> or C<argon2d>) mismatches or any of the C<$t_cost>, C<$m_cost>, C<$parallelism>, C<$salt_length> or C<$output_length> arguments are higher than in the password-encoded hash.
+This function checks if a password-encoded string needs a rehash. It will return true if the C<$type> (valid values are C<argon2i>, C<argon2id> or C<argon2d>), C<$t_cost>, C<$m_cost>, C<$parallelism>, C<$salt_length> or C<$output_length> arguments mismatches or any of the parameters of the password-encoded hash.
 
 =head2 ACKNOWLEDGEMENTS
 

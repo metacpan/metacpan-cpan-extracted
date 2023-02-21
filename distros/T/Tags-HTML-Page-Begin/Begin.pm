@@ -1,9 +1,10 @@
 package Tags::HTML::Page::Begin;
 
+use base qw(Tags::HTML);
 use strict;
 use warnings;
 
-use Class::Utils qw(set_params);
+use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
 use List::MoreUtils qw(none);
 use Readonly;
@@ -13,14 +14,20 @@ Readonly::Hash my %LANG => (
 	'title' => 'Page title',
 );
 
-our $VERSION = 0.15;
+our $VERSION = 0.16;
 
 # Constructor.
 sub new {
 	my ($class, @params) = @_;
 
 	# Create object.
-	my $self = bless {}, $class;
+	my ($object_params_ar, $other_params_ar) = split_params(
+		['application-name', 'author', 'base_href', 'base_target',
+		'css_init', 'css_src', 'charset', 'description', 'doctype',
+		'favicon', 'generator', 'html_lang', 'http_equiv_content_type',
+		'keywords', 'lang', 'refresh', 'robots', 'rss',
+		'script_js', 'script_js_src', 'viewport'], @params);
+	my $self = $class->SUPER::new(@{$other_params_ar});
 
 	# Application name.
 	$self->{'application-name'} = undef;
@@ -31,9 +38,6 @@ sub new {
 	# Base element.
 	$self->{'base_href'} = undef;
 	$self->{'base_target'} = undef;
-
-	# 'CSS::Struct' object.
-	$self->{'css'} = undef;
 
 	# Init CSS style.
 	$self->{'css_init'} = [
@@ -89,24 +93,11 @@ sub new {
 	# Script js sources.
 	$self->{'script_js_src'} = [];
 
-	# 'Tags' object.
-	$self->{'tags'} = undef;
-
 	# Viewport.
 	$self->{'viewport'} = 'width=device-width, initial-scale=1.0';
 
 	# Process params.
-	set_params($self, @params);
-
-	# Check to 'Tags' object.
-	if (! $self->{'tags'} || ! $self->{'tags'}->isa('Tags::Output')) {
-		err "Parameter 'tags' must be a 'Tags::Output::*' class.";
-	}
-
-	# Check to 'CSS::Struct' object.
-	if ($self->{'css'} && ! $self->{'css'}->isa('CSS::Struct::Output')) {
-		err "Parameter 'css' must be a 'CSS::Struct::Output::*' class.";
-	}
+	set_params($self, @{$object_params_ar});
 
 	# Check for 'css_src' array.
 	if (ref $self->{'css_src'} ne 'ARRAY') {
@@ -149,14 +140,11 @@ sub new {
 }
 
 # Process 'Tags'.
-sub process {
+sub _process {
 	my $self = shift;
 
 	my $css;
 	if ($self->{'css'}) {
-		$self->{'css'}->put(
-			@{$self->{'css_init'}},
-		);
 		$css = $self->{'css'}->flush(1);
 		if ($css ne '') {
 			$css .= "\n";
@@ -289,6 +277,16 @@ sub process {
 	return;
 }
 
+sub _process_css {
+	my $self = shift;
+
+	$self->{'css'}->put(
+		@{$self->{'css_init'}},
+	);
+
+	return;
+}
+
 sub _favicon {
 	my $self = shift;
 
@@ -397,6 +395,21 @@ Default value is undef.
 'CSS::Struct::Output' object for L<process_css> processing.
 
 Default value is undef.
+
+=item * C<css_init>
+
+Initialization of CSS.
+
+Default value is:
+
+ * {
+         box-sizing: border-box;
+         margin: 0;
+         padding: 0;
+ }
+
+CSS is handled by C<_process_css()> method in this module, which is abstract
+method of L<Tags::HTML>.
 
 =item * C<css_src>
 
@@ -569,6 +582,7 @@ Returns undef.
  );
 
  # Process page
+ $begin->process_css;
  $css->put(
         ['s', 'div'],
         ['d', 'color', 'red'],
@@ -592,20 +606,20 @@ Returns undef.
  #   <head>
  #     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
  #     <meta name="generator" content=
- #       "Perl module: Tags::HTML::Page::Begin, Version: 0.15" />
+ #       "Perl module: Tags::HTML::Page::Begin, Version: 0.16" />
  #     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
  #     <title>
  #       Page title
  #     </title>
  #     <style type="text/css">
- # div {
- # 	color: red;
- # 	background-color: black;
- # }
  # * {
- # 	box-sizing: border-box;
- # 	margin: 0;
- # 	padding: 0;
+ #         box-sizing: border-box;
+ #         margin: 0;
+ #         padding: 0;
+ # }
+ # div {
+ #         color: red;
+ #         background-color: black;
  # }
  # </style>
  #   </head>
@@ -621,7 +635,8 @@ Returns undef.
 L<Class::Utils>,
 L<Error::Pure>,
 L<List::MoreUtils>,
-L<Readonly>.
+L<Readonly>,
+L<Tags::HTML>.
 
 =head1 SEE ALSO
 
@@ -651,6 +666,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.15
+0.16
 
 =cut

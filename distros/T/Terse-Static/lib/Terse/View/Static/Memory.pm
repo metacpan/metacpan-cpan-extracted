@@ -25,10 +25,8 @@ sub _recurse_directory {
         for (readdir $d) {
                 next if $_ =~ m/^\./;
                 if (-d "$dir/$_") {
-                        $path .= "/$_" if $path;
-                        push @files, $self->_recurse_directory("$dir/$_", $path || $_);
+                        push @files, $self->_recurse_directory("$dir/$_", $path ? "$path/$_" : $_);
                 } elsif ($_ =~ m/\.($allowed)$/) {
-			#my $type_from_file = $self->ft->checktype_filename("$dir/$_");
 			push @files, $path ? "$path/$_" : $_;
                 }
         }
@@ -57,7 +55,7 @@ Terse::View::Static::Memory - Serve static resources in memory view
 
 =head1 VERSION
 
-Version 0.05
+Version 0.08
 
 =cut
 

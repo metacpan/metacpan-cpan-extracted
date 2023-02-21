@@ -12,12 +12,16 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Finance-Loan-Repayment
+provides:
+  Finance::Loan::Repayment:
+    file: lib/Finance/Loan/Repayment.pm
+    version: '1.5'
 requires:
   Config::Any: '0'
   File::Spec::Functions: '0'
@@ -25,9 +29,11 @@ requires:
   Moose: '0'
   Pod::Usage: '0'
   perl: '5.010'
-  strict: '0'
-  warnings: '0'
 resources:
-  repository: git://gitlab.com/waterkip/finance-loan-repayment
-version: '1.4'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+  repository: git://gitlab.com/waterkip/finance-loan-repayment.git
+version: '1.5'
+x_contributors:
+  - 'Wesley Schwengle <waterkip@cpan.org>'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: MIT

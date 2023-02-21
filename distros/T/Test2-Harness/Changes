@@ -1,3 +1,26 @@
+1.000147  2023-02-21 08:16:35-08:00 America/Los_Angeles
+
+    - Show all output early in interactive mode
+
+1.000146  2023-02-20 18:21:51-08:00 America/Los_Angeles
+
+    - Fix infinite hang in bad preload (#240)
+    - Remove some debugging
+    - Fix #261 ($. being set incorrectly)
+
+1.000145  2023-02-15 17:31:10-08:00 America/Los_Angeles
+
+    - Add ability to inject lines in resource output
+
+1.000144  2023-02-15 13:29:48-08:00 America/Los_Angeles
+
+    - Skip empty tables in resource view
+
+1.000143  2023-02-15 08:33:57-08:00 America/Los_Angeles
+
+    - Add 'autofill' to simplify 'd' and 'D' option types
+    - Better resource management
+
 1.000142  2023-01-25 14:38:31-08:00 America/Los_Angeles
 
     - Add more capabilities around argument processing

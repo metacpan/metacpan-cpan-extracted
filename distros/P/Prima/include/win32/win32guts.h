@@ -25,13 +25,7 @@ extern "C" {
 
 #define SEVERE_DEBUG
 typedef HANDLE WINHANDLE;
-
-#ifdef __CYGWIN__
-typedef int SOCKETHANDLE;
-#else
 typedef HANDLE SOCKETHANDLE;
-#endif
-
 #undef  HWND_DESKTOP
 #define HWND_DESKTOP         guts. desktop_window
 
@@ -69,10 +63,15 @@ typedef HANDLE SOCKETHANDLE;
 #define WM_EXTERNAL                       ( WM_USER + 17)
 #define WM_HASMATE                        ( WM_USER + 18)
 #define WM_FILE                           ( WM_USER + 19)
-#define WM_CROAK                          ( WM_USER + 20)
+#define WM_FILE_REHASH                    ( WM_USER + 20)
 #define WM_REPAINT_LAYERED                ( WM_USER + 21)
 #define WM_DRAG_RESPONSE                  ( WM_USER + 22)
 #define WM_XMOUSECLICK                    ( WM_USER + 23)
+#define WM_SIGNAL                         ( WM_USER + 24)
+#define WM_SYNTHETIC_EVENT                ( WM_USER + 25)
+#define WM_SYSHANDLE                      ( WM_USER + 26)
+#define WM_SYSHANDLE_REHASH               ( WM_USER + 27)
+#define WM_NOOP                           ( WM_USER + 28)
 #define WM_TERMINATE                      ( WM_USER + 99)
 #define WM_FIRST_USER_MESSAGE             ( WM_USER +100)
 #define WM_LAST_USER_MESSAGE              ( WM_USER +900)
@@ -94,13 +93,10 @@ typedef HANDLE SOCKETHANDLE;
 #define stbGDIMask      0x0F
 #define stbGPBrush      0x10
 
-#define SOCKETS_NONE         ( guts. socket_version == -1)
-#define SOCKETS_AS_HANDLES   ( guts. socket_version == 1)
-#define SOCKETS_NATIVE       ( guts. socket_version == 2)
-
 #define FHT_SOCKET  1
 #define FHT_PIPE    2
 #define FHT_OTHER   3
+#define FHT_STDIN   4
 
 #define apcWarn \
 	if (debug) \
@@ -184,6 +180,9 @@ typedef struct _HandleOptions_ {
 	unsigned aptClipByChildren       : 1;       // cached clipping by children
 	unsigned aptIgnoreSizeMessages   : 1;       // during window recreation
 	unsigned aptGDIPlus              : 1;       // uses GDI+
+	unsigned aptWantWorldTransform   : 1;       // SetWorldTransform is wanted for text
+	unsigned aptUsedWorldTransform   : 1;       // SetWorldTransform(matrix) mode is on currently
+	unsigned aptCachedWorldTransform : 1;       // SetWorldTransform doesn't need to be called repeatedly
 } HandleOptions;
 
 #define CLIPBOARD_MAIN 0
@@ -223,17 +222,10 @@ typedef struct _WinGuts
 	UINT           error_mode;           // SetErrorMode() result
 	DWORD          version;              // GetVersion() cached result
 	Point          cmDOUBLECLK;          // cached SM_CxDOUBLECLK values
-	int            socket_version;       // socket behavior type
-	List           files;                // List of active File objects
 	int            mouse_timer;          // is mouse timer started
 	Bool           popup_active;         // flag to avoid double popup activation
 	Bool           pointer_invisible;
 	HWND           console;              // win32-bound console window
-// socket variables
-	List           sockets;              // List of watchable sockets
-	HANDLE         socket_mutex;         // thread semaphore
-	HANDLE         socket_thread;        // thread id
-	Bool           socket_post_sync;     // semaphore
 	Bool           dont_xlate_message;   // one-time stopper to TranslateMessage() call
 	int            utf8_prepend_0x202D;  // newer windows do automatic bidi conversion, this is to cancel it
 	WCHAR *      (*alloc_utf8_to_wchar_visual)(const char*,int,int*);
@@ -252,6 +244,17 @@ typedef struct _WinGuts
 	Bool           application_stop_signal;
 	long           apc_error;
 	Bool           wc2mb_is_fragile;     // cannot properly process current ACP
+
+	int            get_pixel_needs_emulation; // 0 - not tried, -1 - no, 1 - yes
+	HDC            get_pixel_dc_src, get_pixel_dc_dst;
+
+	unsigned long  program_start_ts ;            // epoch
+	unsigned int   mouse_double_click_delay;     // ms
+	unsigned long  last_mouse_click_ts;          // (time - epoch) * 1000 + msec
+	HWND           last_mouse_click_source;
+	LPARAM         last_mouse_click_position;
+	unsigned int   last_mouse_click_number;
+	Byte           last_mouse_click_fingerprint; // kmXXX | mbXXX
 } WinGuts, *PWinGuts;
 
 typedef struct _WindowData
@@ -264,6 +267,7 @@ typedef struct _WindowData
 	Handle         old_foc;
 	HWND           old_active;
 	PHash          effects;
+	WINDOWPLACEMENT fs_saved_placement;
 } WindowData;
 
 typedef struct _TimerData
@@ -278,7 +282,7 @@ typedef struct _MenuItemData
 
 typedef struct _FileData
 {
-	SOCKETHANDLE   object;
+	intptr_t       object;
 	int            type;
 } FileData;
 
@@ -426,6 +430,7 @@ typedef struct _PaintState
 		RQBrush    rq_brush;
 		PDCFont    dc_font;
 		float      font_sin, font_cos;
+		Bool       wt_want, wt_used, wt_cached;
 	} paint;
 	struct {
 		HPALETTE   palette;
@@ -674,7 +679,6 @@ extern WCHAR *      alloc_utf8_to_wchar_visual( const char * utf8, int length, i
 extern WCHAR *      alloc_ascii_to_wchar( const char * text, int *length);
 extern char *       alloc_wchar_to_utf8( WCHAR * src, int * len );
 extern int          apcUpdateWindow( HWND wnd );
-extern int          arc_completion( double * angleStart, double * angleEnd, int * needFigure);
 extern Bool         add_font_to_hash( const PFont key, const PFont font, Bool addSizeEntry);
 extern char *       cf2name( UINT cf );
 extern void         char2wchar( WCHAR * dest, char * src, int lim);
@@ -702,6 +706,9 @@ extern PList        dnd_clipboard_get_formats();
 extern void         dpi_change(void);
 extern char *       err_msg( DWORD errId, char * buffer);
 extern char *       err_msg_gplus( GpStatus errId, char * buffer);
+extern Bool         file_process_events(int cmd, WPARAM param1, LPARAM param2);
+extern void         file_subsystem_done( void);
+extern Bool         file_subsystem_init( void);
 extern PDCFont      font_alloc( Font * data);
 extern void         font_change( Handle self, Font * font);
 extern void         font_clean( void);
@@ -751,10 +758,11 @@ extern HRGN         region_create( Handle mask);
 extern void         register_mapper_fonts(void);
 extern long         remap_color( long clr, Bool toSystem);
 extern void         reset_system_fonts(void);
-extern void         socket_rehash( void);
+extern void         syshandle_rehash( void);
 extern Bool         select_pen(Handle self);
 extern Bool         select_brush(Handle self);
 extern Bool         select_gp_brush(Handle self);
+extern Bool         select_world_transform(Handle self, Bool want_transform);
 extern void         stylus_clean( void);
 extern PDCObject    stylus_fetch( void * key );
 extern Bool         stylus_is_complex(Handle self);
@@ -764,6 +772,8 @@ extern GpPen*       stylus_gp_get_pen(int line_width, uint32_t color);
 extern HPEN         stylus_get_pen( DWORD style, DWORD line_width, COLORREF color );
 extern HBRUSH       stylus_get_solid_brush( COLORREF color );
 extern void         wchar2char( char * dest, WCHAR * src, int lim);
+
+#define MUTEX_TAKE(m) mutex_take(m,__FILE__,__LINE__)
 
 /* compatibility to MSVC 6 */
 #ifndef GWLP_USERDATA
@@ -802,6 +812,23 @@ my_GetUserPreferredUILanguages(
 	DWORD dwFlags, PULONG pulNumLanguages,
 	PZZWSTR pwszLanguagesBuffer, PULONG pcchLanguagesBuffer
 );
+
+#ifndef CONSOLE_READ_NOREMOVE
+#define CONSOLE_READ_NOREMOVE   0x0001
+#endif
+
+#ifndef CONSOLE_READ_NOWAIT
+#define CONSOLE_READ_NOWAIT     0x0002
+#endif
+
+BOOL
+WINAPI
+ReadConsoleInputExW(
+    _In_ HANDLE hConsoleInput,
+    _Out_writes_(nLength) PINPUT_RECORD lpBuffer,
+    _In_ DWORD nLength,
+    _Out_ LPDWORD lpNumberOfEventsRead,
+    _In_ USHORT wFlags);
 
 
 #ifdef __cplusplus

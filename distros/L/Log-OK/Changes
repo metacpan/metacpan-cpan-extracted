@@ -1,9 +1,15 @@
-0.1.5 Fri  2 Dec 2022 04:00:40 AEST
+v0.1.6 2023-02-11
+  [fixes]
+  - Remove annoying warning message re failed log level sync
+  - Reworked automatic log level synchronisation for Log::ger when scripts are
+    being required instead of used
+  - Clean up changes file
+
+v0.1.5 2022-12-02
 
   - Attempt automatic log level synchronisation for Log::ger
 
-  - Log::ger and Log::Any detection changes
-
+  - Log::ger and Log::Any detection changes.
     Detection now only checks for these packages, not an output or adaptor
     package like Log::ger::Output or Log::Any::Adaptor. Allows top level
     application to choose output after Log::OK is used.
@@ -13,32 +19,32 @@
   - More POD changes
 
 
-0.1.4 Thu  9 Jun 2022 08:57:30 AEST
+v0.1.4 2022-06-09
 
   - Fixed missing WARN constant when no system detected
 	- Tidy pod
 	- Change pod examples to show Log::ger because its easier
 
 
-0.1.3 
+v0.1.3 
 
   - If auto detect fails, creates constants for all supported frameworks
   - Changed unknown command line level setting to carp instead of croak
     to allow multiple frameworks to interoperate
 
-0.1.2   Mon 30 May 2022 03:23:40 AEST
+v0.1.2  2022-05-30
 
   - Disabled tests requiring installation of logging modules
   - Fixed an issue where no hash specified at main program level
     prevented autodetection of logging system in other modules
     with no hash specified
 
-0.1.1   Fri 15 Apr 2022 22:22:44 AEST
+v0.1.1  2022-04-15
 	
 	- Fixed tests calling wrong perl command
 	- Fixed list context/ state issue on 5.24 and 5.26
 
-0.1.0   Thu 14 Apr 2022 21:58:57 AEST
+v0.1.0  2022-04-14
 
   - Original release
   - Using constant::more for backend

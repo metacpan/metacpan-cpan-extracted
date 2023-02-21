@@ -58,8 +58,10 @@ t/encoded_ed3
 t/encoded_ed4
 t/extract.bufr
 t/extract.bufr1
+t/extract.bufr1_gts
 t/extract.bufr2
 t/extract.bufr3
+t/extract.bufr_gts
 t/extract.txt1
 t/extract.txt2
 t/filter
@@ -107,11 +109,9 @@ t/param2
 t/retained.bufr
 t/retained.txt
 t/set_filter.bufr
-t/set_filter.err2
 t/set_filter.pl
 t/set_filter.txt
 t/set_filter.txt2
-t/set_filter.txt3
 t/short_truncated_temp_synop.bufr
 t/short_truncated_temp_synop.err
 t/signify_datawidth.bufr

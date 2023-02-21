@@ -1,4 +1,4 @@
-class Sys::Socket::Sockaddr::Un extends Sys::Socket::Sockaddr : pointer_t {
+class Sys::Socket::Sockaddr::Un extends Sys::Socket::Sockaddr : pointer {
   
   # Class methods
   native static method new : Sys::Socket::Sockaddr::Un ();

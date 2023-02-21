@@ -4,7 +4,7 @@
 # ttl times
 
 package Music::RhythmSet::Voice;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use 5.24.0;
 use warnings;
@@ -24,8 +24,7 @@ has stash   => ( is => 'rw' );
 has ttl     => ( is => 'rw', default => sub { 0 } );
 
 # perldoc Moo
-sub BUILD
-{
+sub BUILD {
     my ( $self, $args ) = @_;
     if ( exists $args->{pattern} and exists $args->{ttl} ) {
         croak "invalid ttl" if $args->{ttl} < 1;
@@ -41,8 +40,7 @@ sub BUILD
 #
 # METHODS
 
-sub advance
-{
+sub advance {
     my ( $self, $count, %param ) = @_;
 
     my $measure = $self->measure;
@@ -88,8 +86,7 @@ sub advance
 #   $set->voices([$voice]);
 #   $set->changes(...)
 
-sub clone
-{
+sub clone {
     my ( $self, %param ) = @_;
 
     $param{newid} //= $self->id;
@@ -122,8 +119,7 @@ sub clone
     return $new;
 }
 
-sub from_string
-{
+sub from_string {
     my ( $self, $str, %param ) = @_;
     croak "need a string" unless defined $str and length $str;
 
@@ -165,8 +161,7 @@ sub from_string
 
 # TODO some means of note reduction and optional note sustains
 # over rests
-sub to_ly
-{
+sub to_ly {
     my ( $self, %param ) = @_;
 
     my $replay = $self->replay;
@@ -207,8 +202,7 @@ sub to_ly
     return $ly;
 }
 
-sub to_midi
-{
+sub to_midi {
     my ( $self, %param ) = @_;
 
     my $replay = $self->replay;
@@ -234,6 +228,9 @@ sub to_midi
 
     push $events->@*, [ 'track_name', 0, 'voice' . ( length $id ? " $id" : '' ) ];
     push $events->@*, [ 'set_tempo',  0, $param{tempo} ];
+    if ( $param{patch_change} ) {
+        push $events->@*, [ 'patch_change', 0, $param{chan}, $param{patch_change} ];
+    }
 
     for my $ref ( $replay->@* ) {
         my ( $bpat, $ttl ) = $ref->@*;
@@ -355,8 +352,7 @@ sub to_midi
     return $track;
 }
 
-sub _to_midi_bigly
-{
+sub _to_midi_bigly {
     my ( $events, $midi, $ttl ) = @_;
     for ( 1 .. $ttl ) {
         for my $eref ( $midi->@* ) {
@@ -365,8 +361,7 @@ sub _to_midi_bigly
     }
 }
 
-sub to_string
-{
+sub to_string {
     my ( $self, %param ) = @_;
 
     my $replay = $self->replay;
@@ -650,6 +645,15 @@ I<maxm> will limit the number of measures produced from the replay log.
 The LilyPond "Notation Reference" documentation may be helpful.
 
 =item B<to_midi> [ I<param> ]
+
+  my $track = $v->to_midi(
+    chan         => 0,         # MIDI channel (drumtrack == 9)
+    patch_change => 105,       # Banjo
+    note         => 42,        # MIDI number
+    sustain      => 1,         # hold notes open until next onset
+    tempo        => 640e3,     # ought to be fast enough?
+    velo         => 99,        # MIDI velocity (loudness)
+  );
 
 Encodes the replay log as a L<MIDI::Track> object and returns that.
 Parameters include I<chan>, I<dur>, I<note>, I<tempo>, I<velo> (see

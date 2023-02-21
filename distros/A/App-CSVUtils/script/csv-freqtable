@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-03'; # DATE
+our $DATE = '2023-02-18'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.008'; # VERSION
+our $VERSION = '1.017'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_freqtable/csv_freqtable",
@@ -41,7 +41,7 @@ csv-freqtable - Output a frequency table of values of a specified field in CSV
 
 =head1 VERSION
 
-This document describes version 1.008 of csv-freqtable (from Perl distribution App-CSVUtils), released on 2023-02-03.
+This document describes version 1.017 of csv-freqtable (from Perl distribution App-CSVUtils), released on 2023-02-18.
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,7 @@ B<csv-freqtable> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, 
 
 B<csv-freqtable> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<csv-freqtable> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--input-escape-char|/"--input-escape-char=s">>=I<str>] [B<L<--input-header|/"--no-input-header">>|B<L<--no-input-header|/"--no-input-header">>|B<L<--noinput-header|/"--no-input-header">>] [B<L<--input-quote-char|/"--input-quote-char=s">>=I<str>] [B<L<--input-sep-char|/"--input-sep-char=s">>=I<str>] [B<L<--input-tsv|/"--input-tsv">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<input_filename|/"--input-filename=s">>] E<lt>I<L<field|/"--field=s*, -f">>E<gt>
+B<csv-freqtable> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--hash|/"--hash, -H">>|B<L<-H|/"--hash, -H">>] [B<L<--ignore-case|/"--ignore-case, -i">>|B<L<-i|/"--ignore-case, -i">>] [B<L<--input-escape-char|/"--input-escape-char=s">>=I<str>] [B<L<--input-header|/"--no-input-header">>|B<L<--no-input-header|/"--no-input-header">>|B<L<--noinput-header|/"--no-input-header">>] [B<L<--input-quote-char|/"--input-quote-char=s">>=I<str>] [B<L<--input-sep-char|/"--input-sep-char=s">>=I<str>] [B<L<--input-tsv|/"--input-tsv">>] [B<L<--key|/"--key=s">>=I<any>|B<L<--key-json|/"--key=s">>=I<json>|B<L<-k|/"--key=s">>=I<any>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<input_filename|/"--input-filename=s">>] [I<L<field|/"--field=s, -f">>]
 
 
 
@@ -65,11 +65,35 @@ C<*> marks required options.
 
 =over
 
-=item B<--field>=I<s>*, B<-f>
+=item B<--field>=I<s>, B<-f>
 
 Field name.
 
 Can also be specified as the 2nd command-line argument.
+
+=item B<--hash>, B<-H>
+
+Provide row in $_ as hashref instead of arrayref.
+
+=item B<--ignore-case>, B<-i>
+
+Ignore case.
+
+=item B<--key-json>=I<s>, B<-k>
+
+Generate computed field with this Perl code (JSON-encoded).
+
+See C<--key>.
+
+=item B<--key>=I<s>
+
+Generate computed field with this Perl code.
+
+If specified, then will compute field using Perl code.
+
+The code will receive the row (arrayref, or if -H is specified, hashref) as the
+argument. It should return the computed field (str).
+
 
 =back
 
@@ -287,6 +311,14 @@ For fish and zsh, install L<shcompgen> as described above.
 =head2 Show the age distribution of people
 
  % csv-freqtable people.csv age
+
+=head2 Show the frequency of wins by a user, ignore case differences in user
+
+ % csv-freqtable winner.csv user -i
+
+=head2 Show the frequency of events by period (YYYY-MM)
+
+ % csv-freqtable events.csv -H --key 'sprintf("%04d-%02d", $_->{year}, $_->{month})'
 
 =head1 HOMEPAGE
 

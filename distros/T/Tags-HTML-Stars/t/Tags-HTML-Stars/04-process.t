@@ -3,7 +3,7 @@ use warnings;
 
 use Tags::HTML::Stars;
 use Tags::Output::Raw;
-use Test::More 'tests' => 3;
+use Test::More 'tests' => 4;
 use Test::NoWarnings;
 
 # Test.
@@ -40,3 +40,21 @@ $right_ret = <<'END';
 END
 chomp $right_ret;
 is($ret, $right_ret, '3 stars (full, half, nothing, width=10px)');
+
+# Test.
+$tags = Tags::Output::Raw->new;
+$obj = Tags::HTML::Stars->new(
+	'public_image_dir' => 'static_images',
+	'tags' => $tags,
+);
+$obj->process({
+	1 => 'full',
+	2 => 'half',
+	3 => 'nothing',
+});
+$ret = $tags->flush(1);
+$right_ret = <<'END';
+<div><img src="static_images/Star*.svg"></img><img src="static_images/Star-.svg"></img><img src="static_images/Star½.svg"></img></div>
+END
+chomp $right_ret;
+is($ret, $right_ret, '3 stars (full, half, nothing, public_image_dir)');

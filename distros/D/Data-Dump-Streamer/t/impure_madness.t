@@ -1,14 +1,13 @@
 use Test::More tests => 8;
 
-#$Id: impure_madness.t 26 2006-04-16 15:18:52Z demerphq $#
-
-BEGIN { use_ok( 'Data::Dump::Streamer', qw(:undump) ); }
+BEGIN { use_ok('Data::Dump::Streamer', qw(:undump)); }
 use strict;
 use warnings;
 use Data::Dumper;
 
 # imports same()
 require "./t/test_helper.pl";
+
 # use this one for simple, non evalable tests. (GLOB)
 #   same ( $got,$expected,$name,$obj )
 #
@@ -16,63 +15,69 @@ require "./t/test_helper.pl";
 # same ( $name,$obj,$expected,@args )
 
 my $dump;
-my $o = Data::Dump::Streamer->new();
-isa_ok( $o, 'Data::Dump::Streamer' );
-is( $o->Purity, 1 ,'Purity is the norm...');
+my $o= Data::Dump::Streamer->new();
+isa_ok($o, 'Data::Dump::Streamer');
+is($o->Purity, 1, 'Purity is the norm...');
 $o->Purity(0);
-is( $o->Purity, 0 ,'... but some like it impure!');
+is($o->Purity, 0, '... but some like it impure!');
 {
     local *icky;
-    *icky=\ "icky";
+    *icky= \ "icky";
     our $icky;
-    my $id = 0;
+    my $id= 0;
     my $btree;
-    $btree = sub {
-        my ( $d, $m, $p ) = @_;
+    $btree= sub {
+        my ($d, $m, $p)= @_;
         return $p
-          if $d > $m;
-        return [ $btree->( $d + 1, $m, $p . '0' ), $btree->( $d + 1, $m, $p . '1' ) ];
+            if $d > $m;
+        return [ $btree->($d + 1, $m, $p . '0'),
+            $btree->($d + 1, $m, $p . '1') ];
     };
 
-    my $t = $btree->( 0, 1, '' );
-    my ( $x, $y, $qr );
-    $x = \$y;
-    $y = \$x;
-    $qr = bless qr/this is a test/m, 'foo_bar';
+    my $t= $btree->(0, 1, '');
+    my ($x, $y, $qr);
+    $x= \$y;
+    $y= \$x;
+    $qr= bless qr/this is a test/m, 'foo_bar';
 
-    my $array = [];
-    my $hash = bless {
+    my $array= [];
+    my $hash= bless {
         A      => \$array,
         'B-B'  => ['$array'],
         'CCCD' => [ 'foo', 'bar' ],
-        'E'=>\\1,
-        'F'=>\\undef,
-        'Q'=>sub{\@_}->($icky),
-      },
-      'ThisIsATest';
-    $hash->{G}=\$hash;
-    my $boo = 'boo';
-    @$array = ( \$hash, \$hash, \$hash, \$qr, \$qr, \'foo', \$boo );
-    my $cap = capture( $x, $y, $qr, $x, $y, $qr );
+        'E'    => \\1,
+        'F'    => \\undef,
+        'Q'    => sub { \@_ }
+            ->($icky),
+        },
+        'ThisIsATest';
+    $hash->{G}= \$hash;
+    my $boo= 'boo';
+    @$array= (\$hash, \$hash, \$hash, \$qr, \$qr, \'foo', \$boo);
+    my $cap= capture($x, $y, $qr, $x, $y, $qr);
 
-    test_dump( {
-                name=>'Impure Impure Madness cap( $qr,$qr )',
-                no_redump=>1,
-                no_dumper=>1,
-               }, $o, capture( $qr, $qr ),
-               <<'EXPECT');
+    test_dump({
+            name      => 'Impure Impure Madness cap( $qr,$qr )',
+            no_redump => 1,
+            no_dumper => 1,
+        },
+        $o,
+        capture($qr, $qr),
+        <<'EXPECT');
 $ARRAY1 = [
             bless( qr/this is a test/m, 'foo_bar' ),
             alias_to($ARRAY1->[0])
           ];
 EXPECT
 
-
-    test_dump( {name=>"Total Impure Madness",
-                no_redump=>1,
-                no_dumper=>1,
-               }, $o, ( $cap,$array,$boo,$hash,$qr ),
-               <<'EXPECT');
+    test_dump({
+            name      => "Total Impure Madness",
+            no_redump => 1,
+            no_dumper => 1,
+        },
+        $o,
+        ($cap, $array, $boo, $hash, $qr),
+        <<'EXPECT');
 $ARRAY1 = [
             \$ARRAY1->[1],
             \$ARRAY1->[0],
@@ -107,41 +112,49 @@ $foo_bar1 = bless( qr/this is a test/m, 'foo_bar' );
 
 EXPECT
 
-
 }
 {
-    my ($x,$y);
-    $x=\$y;
-    $y=\$x;
+    my ($x, $y);
+    $x= \$y;
+    $y= \$x;
 
-    my $a=[1,2];
-    $a->[0]=\$a->[1];
-    $a->[1]=\$a->[0];
+    my $a= [ 1, 2 ];
+    $a->[0]= \$a->[1];
+    $a->[1]= \$a->[0];
 
     #$cap->[-1]=5;
     my $s;
-    $s=\$s;
-    my $bar='bar';
-    my $foo='foo';
-    my $halias= {foo=>1,bar=>2};
-    alias_hv(%$halias,'foo',$foo);
-    alias_hv(%$halias,'bar',$bar);
-    alias_hv(%$halias,'foo2',$foo);
+    $s= \$s;
+    my $bar= 'bar';
+    my $foo= 'foo';
+    my $halias= { foo => 1, bar => 2 };
+    alias_hv(%$halias, 'foo',  $foo);
+    alias_hv(%$halias, 'bar',  $bar);
+    alias_hv(%$halias, 'foo2', $foo);
 
-    my ($t,$u,$v,$w)=(1,2,3,4);
-    my $cap=sub{ \@_ }->($x,$y);
-    my $q1=qr/foo/;
-    my $q2=bless qr/bar/,'bar';
-    my $q3=\bless qr/baz/,'baz';
+    my ($t, $u, $v, $w)= (1, 2, 3, 4);
+    my $cap= sub { \@_ }
+        ->($x, $y);
+    my $q1= qr/foo/;
+    my $q2= bless qr/bar/, 'bar';
+    my $q3= \bless qr/baz/, 'baz';
+
     #same( $dump = $o->Data( $a,$q1,$q2,$q3,[$x,$y],[$s,$x,$y],$t,$u,$v,$t,[1,2,3],{1..4},$cap,$cap,$t,$u,$v,$halias)->Out, <<'EXPECT', "More Impure Madness", $o );
-    test_dump( {
-                name=>"More Impure Madness",
-                no_redump=>1,
-                no_dumper=>1,
-               }, $o,
-               ( $a,$q1,$q2,$q3,[$x,$y],[$s,$x,$y],$t,$u,$v,$t,[1,2,3],
-               {1..4},$cap,$cap,$t,$u,$v,$halias),
-               <<'EXPECT');
+    test_dump({
+            name      => "More Impure Madness",
+            no_redump => 1,
+            no_dumper => 1,
+        },
+        $o, (
+            $a, $q1, $q2, $q3,
+            [ $x, $y ],
+            [ $s, $x, $y ],
+            $t, $u, $v, $t,
+            [ 1, 2, 3 ],
+            { 1 .. 4 },
+            $cap, $cap, $t, $u, $v, $halias
+        ),
+        <<'EXPECT');
 $ARRAY1 = [
             \$ARRAY1->[1],
             \$ARRAY1->[0]
@@ -189,15 +202,17 @@ EXPECT
 {
     #local $Data::Dump::Streamer::DEBUG = 1;
     my $x;
-    $x = sub { \@_ }->( $x, $x );
+    $x= sub { \@_ }
+        ->($x, $x);
     push @$x, $x;
-    test_dump( {
-                name=>"Impure Alias Array",
-                no_redump=>1,
-                no_dumper=>1,
-               }, $o,
-               ( $x ),
-               <<'EXPECT');
+    test_dump({
+            name      => "Impure Alias Array",
+            no_redump => 1,
+            no_dumper => 1,
+        },
+        $o,
+        ($x),
+        <<'EXPECT');
 $ARRAY1 = [
             alias_to($ARRAY1),
             alias_to($ARRAY1),

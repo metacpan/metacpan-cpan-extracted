@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-26'; # DATE
+our $DATE = '2022-11-15'; # DATE
 our $DIST = 'Sah-Schemas-JSON'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our $schema = [any => {
     summary => 'A JSON-encoded data or string',
@@ -24,6 +24,8 @@ structure via command-line argument or option. But you have to be careful when
 you want to pass a string like `null`, `true`, `false`; you have to quote it to
 `"null"`, `"true"`, `"false"` to prevent it being decoded into undef or
 boolean values.
+
+See also related schema: `json_str`, `str::encoded_json`, `str::escaped_json`.
 
 _
     examples => [
@@ -56,7 +58,7 @@ Sah::Schema::json_or_str - A JSON-encoded data or string
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::Schema::json_or_str (from Perl distribution Sah-Schemas-JSON), released on 2022-08-26.
+This document describes version 0.007 of Sah::Schema::json_or_str (from Perl distribution Sah-Schemas-JSON), released on 2022-11-15.
 
 =head1 SYNOPSIS
 
@@ -98,7 +100,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = 1;
+ $data = undef;
  my $errmsg = $validator->($data); # => ""
 
 Often a schema has coercion rule or default value, so after validation the
@@ -109,8 +111,8 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = 1;
- my $res = $validator->($data); # => ["",1]
+ $data = undef;
+ my $res = $validator->($data); # => ["",undef]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like
@@ -173,6 +175,23 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
 
  % ./myapp.pl --arg1 ...
 
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema:
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('$sch_name*', name=>'JsonOrStr')
+     );
+ }
+
+ use My::Types qw(JsonOrStr);
+ JsonOrStr->assert_valid($data);
+
 =head1 DESCRIPTION
 
 You can use this schema if you want to accept any data (a data structure or
@@ -187,6 +206,8 @@ you want to pass a string like C<null>, C<true>, C<false>; you have to quote it 
 C<"null">, C<"true">, C<"false"> to prevent it being decoded into undef or
 boolean values.
 
+See also related schema: C<json_str>, C<str::encoded_json>, C<str::escaped_json>.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schemas-JSON>.
@@ -194,6 +215,14 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-JSON>.
+
+=head1 SEE ALSO
+
+L<Sah::Schema::json_str>
+
+L<Sah::Schema::str::encoded_json>
+
+L<Sah::Schema::str::escaped_json>
 
 =head1 AUTHOR
 

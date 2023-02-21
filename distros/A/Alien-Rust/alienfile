@@ -1,0 +1,91 @@
+use alienfile;
+
+use Path::Tiny qw( path );
+use File::Which qw( which );
+
+plugin 'Probe::CommandLine' => (
+  command => 'rustc',
+  args    => [ '--version' ],
+  match   => qr/^rustc ([0-9\.]+)/,
+  version => qr/^rustc ([0-9\.]+)/,
+);
+
+plugin 'Probe::CommandLine' => (
+  command   => 'cargo',
+  args      => [ '--version' ],
+  match     => qr/^cargo [0-9\.]+/,
+  secondary => 1,
+);
+
+sys {
+  gather sub {
+    my ($build) = @_;
+    if( which('rustup') ) {
+      # assume that rustup was used
+      _gather_rustup_prop($build);
+    }
+  };
+};
+
+sub _gather_rustup_prop {
+  my ($build) = @_;
+  $build->runtime_prop->{'_using_rustup'} = 1;
+  $build->runtime_prop->{'rustup_home'}  = (`rustup show`  =~ qr/^rustup home:\s+(.*)$/m )[0];
+}
+
+share {
+  my $rustup;
+  if( $^O ne 'MSWin32' ) {
+    $rustup = {
+      url => 'https://static.rust-lang.org/rustup/rustup-init.sh',
+      exe => [ qw(sh ./rustup-init.sh) ],
+    }
+  } else {
+    $rustup = {
+      url => 'https://static.rust-lang.org/rustup/dist/i686-pc-windows-gnu/rustup-init.exe',
+      exe => [ qw(.\\rustup-init.exe) ],
+    };
+  }
+  start_url $rustup->{url};
+  plugin 'Download';
+  plugin 'Extract::File';
+  build [
+    sub {
+      my ($build) = @_;
+      $ENV{CARGO_HOME}  = $build->install_prop->{prefix};
+      $ENV{RUSTUP_HOME} = $ENV{ALIEN_RUST_RUSTUP_HOME} || path($build->install_prop->{prefix})->child('.rustup');
+      $build->log( "CARGO_HOME  = $ENV{CARGO_HOME}");
+      $build->log( "RUSTUP_HOME = $ENV{RUSTUP_HOME}");
+    },
+    [ @{ $rustup->{exe} },
+      qw(--verbose -y),
+      qw(--no-modify-path),
+      qw(--profile default),
+    ],
+    sub {
+      my ($build) = @_;
+      my $from = $build->install_prop->{prefix};
+      my $to   = $build->runtime_prop->{prefix};
+      $build->log( "Changing contents of env file: $from -> $to");
+      my $env = path($from)->child('env');
+      $env->edit_utf8(sub {
+        s/\Q$from\E/$to/g;
+      }) if -f $env;
+    },
+  ];
+
+  gather sub {
+     my ($build) = @_;
+     $build->runtime_prop->{'version'} = ( `rustc --version` =~ qr/^rustc ([0-9\.]+)/)[0];
+
+      _gather_rustup_prop($build);
+      my $rustup_home = path($build->runtime_prop->{rustup_home});
+      my $from_prefix = path($build->install_prop->{prefix});
+      my $to_prefix   = path($build->runtime_prop->{prefix});
+      if( $from_prefix->subsumes( $rustup_home )  ) {
+        $build->runtime_prop->{rustup_home} = $rustup_home
+          ->relative( $from_prefix )
+          ->absolute( $to_prefix )->stringify;
+      }
+  };
+}

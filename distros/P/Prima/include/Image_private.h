@@ -12,6 +12,8 @@ extern "C" {
 #define my  ((( PImage) self)-> self)
 #define var (( PImage) self)
 
+#define VAR_MATRIX var->current_state.matrix
+
 Bool
 Image_read_pixel( Handle self, SV * pixel, ColorPixel *output );
 
@@ -20,6 +22,9 @@ Image_set_extended_data( Handle self, HV * profile);
 
 void
 Image_color2pixel( Handle self, Color color, Byte * pixel);
+
+Handle
+Icon_create_from_image( Handle self, int maskType, SV * mask_fill );
 
 #ifdef __cplusplus
 }

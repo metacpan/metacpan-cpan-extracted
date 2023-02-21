@@ -2,7 +2,7 @@ package Mail::DKIM::Key;
 use strict;
 use warnings;
 # ABSTRACT: Represents a DKIM Key
-our $VERSION = '1.20220520'; # VERSION
+our $VERSION = '1.20230212'; # VERSION
 
 # Copyright 2006 Jason Long. All rights reserved.
 #
@@ -101,7 +101,7 @@ Mail::DKIM::Key - Represents a DKIM Key
 
 =head1 VERSION
 
-version 1.20220520
+version 1.20230212
 
 =head1 AUTHORS
 

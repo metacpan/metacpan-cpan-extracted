@@ -3,13 +3,13 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Test::Future::IO::Impl 0.12;
+package Test::Future::IO::Impl 0.13;
 
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Builder;
+use Test2::V0;
+use Test2::API ();
 
 use Errno qw( EINVAL EPIPE );
 use IO::Handle;
@@ -58,17 +58,19 @@ my $errstr_ECONNREFUSED = do {
 sub time_about(&@)
 {
    my ( $code, $want_time, $name ) = @_;
-   my $test = Test::Builder->new;
+   my $ctx = Test2::API::context;
 
    my $t0 = time();
    $code->();
    my $t1 = time();
 
    my $got_time = $t1 - $t0;
-   $test->ok(
+   $ctx->ok(
       $got_time >= $want_time * 0.9 && $got_time <= $want_time * 1.5, $name
    ) or
-      $test->diag( sprintf "Test took %.3f seconds", $got_time );
+      $ctx->diag( sprintf "Test took %.3f seconds", $got_time );
+
+   $ctx->release;
 }
 
 =head2 run_tests
@@ -176,6 +178,10 @@ sub run_connect_test
    $serversock->close;
    undef $serversock;
 
+   # I really hate this, but apparently Win32 testers will fail if we don't
+   # do this.
+   sleep 1 if $^O eq "MSWin32";
+
    # ->connect fails
    {
       my $clientsock = IO::Socket::INET->new(
@@ -187,7 +193,7 @@ sub run_connect_test
 
       ok( !eval { $f->get; 1 }, 'Future::IO->connect fails on closed server' );
 
-      is_deeply( [ $f->failure ],
+      is( [ $f->failure ],
          [ "connect: $errstr_ECONNREFUSED\n", connect => $clientsock, $errstr_ECONNREFUSED ],
          'Future::IO->connect failure' );
    }
@@ -201,8 +207,6 @@ Tests the C<< Future::IO->sleep >> method.
 
 sub run_sleep_test
 {
-   my $test = Test::Builder->new;
-
    time_about sub {
       Future::IO->sleep( 0.2 )->get;
    }, 0.2, 'Future::IO->sleep( 0.2 ) sleeps 0.2 seconds';
@@ -255,7 +259,7 @@ sub run_sysread_test
 
       my $f = Future::IO->sysread( $rd, 1 );
 
-      is_deeply( [ $f->get ], [], 'Future::IO->sysread yields nothing on EOF' );
+      is( [ $f->get ], [], 'Future::IO->sysread yields nothing on EOF' );
    }
 
    # TODO: is there a nice portable way we can test for an IO error?
@@ -327,7 +331,7 @@ sub run_syswrite_test
 
       ok( !eval { $f->get }, 'Future::IO->syswrite fails on EPIPE' );
 
-      is_deeply( [ $f->failure ],
+      is( [ $f->failure ],
          [ "syswrite: $errstr_EPIPE\n", syswrite => $wr, $errstr_EPIPE ],
          'Future::IO->syswrite failure for EPIPE' );
    }

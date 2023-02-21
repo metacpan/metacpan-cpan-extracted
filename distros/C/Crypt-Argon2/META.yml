@@ -5,10 +5,12 @@ author:
 build_requires:
   Module::Build: '0.28'
   Test::More: '0.90'
+  perl: '5.006'
 configure_requires:
   Module::Build: '0.28'
+  perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
 license: unrestricted
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,18 +19,19 @@ name: Crypt-Argon2
 provides:
   Crypt::Argon2:
     file: lib/Crypt/Argon2.pm
-    version: '0.012'
+    version: '0.013'
 requires:
   Exporter: '5.57'
   MIME::Base64: '0'
   Time::HiRes: '0'
   XSLoader: '0'
+  perl: '5.006'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/Leont/crypt-argon2/issues
   repository: git://github.com/Leont/crypt-argon2.git
-version: '0.012'
-x_generated_by_perl: v5.34.0
+version: '0.013'
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: CC0-1.0

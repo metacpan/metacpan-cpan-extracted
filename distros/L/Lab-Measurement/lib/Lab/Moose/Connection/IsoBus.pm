@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::IsoBus;
-$Lab::Moose::Connection::IsoBus::VERSION = '3.842';
+$Lab::Moose::Connection::IsoBus::VERSION = '3.851';
 #ABSTRACT: Connection back end to the Oxford Instruments IsoBus
 
 use v5.20;
@@ -80,7 +80,7 @@ Lab::Moose::Connection::IsoBus - Connection back end to the Oxford Instruments I
 
 =head1 VERSION
 
-version 3.842
+version 3.851
 
 =head1 DESCRIPTION
 

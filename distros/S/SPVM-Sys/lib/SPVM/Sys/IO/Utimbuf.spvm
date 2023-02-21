@@ -1,4 +1,4 @@
-class Sys::IO::Utimbuf : pointer_t {
+class Sys::IO::Utimbuf : pointer {
   # Class methods
   native static method new : Sys::IO::Utimbuf ();
   

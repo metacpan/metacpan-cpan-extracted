@@ -1,6 +1,6 @@
 package SPVM::Sys;
 
-our $VERSION = '0.37';
+our $VERSION = '0.42';
 
 1;
 
@@ -8,59 +8,19 @@ our $VERSION = '0.37';
 
 SPVM::Sys - System Calls for File IO, User, Process, Signal, Socket
 
-=head1 Caution
-
-The C<Sys> module and the system modules will be highly changed without warnings.
-
-L<SPVM> itself is yet experimental release.
-
 =head1 Description
 
-C<Sys> is the class for system calls such as file IO, user manipulation, process, socket, time,
+C<SPVM::Sys> is the C<Sys> class in L<SPVM> language. It provides system calls such as file IO, user manipulation, process, socket, time,
 
-=head1 Modules
+This distribution contains many modules for system calls such as L<Sys::IO|SPVM::Sys::IO>. See L</"Modules">.
 
-The list of the modules that provide system calls.
+=head1 Usage
 
-=head2 Sys::IO
-
-L<Sys::IO|SPVM::Sys::IO> - File I/O
-
-=head2 Sys::Ioctl
-
-L<Sys::Ioctl|SPVM::Sys::Ioctl> - The C<ioctl> function
-
-=head2 Sys::Socket
-
-L<Sys::Socket|SPVM::Sys::Socket> - Socket
-
-=head2 Sys::Select
-
-L<Sys::Select|SPVM::Sys::Select> - The C<select> function
-
-=head2 Sys::Poll
-
-L<Sys::Poll|SPVM::Sys::Poll> - The C<poll> function.
-
-=head2 Sys::Process
-
-L<Sys::Process|SPVM::Sys::Process> - Process Manipulation
-
-=head2 Sys::Signal
-
-L<Sys::Signal|SPVM::Sys::Signal> - Signal
-
-=head2 Sys::Time
-
-L<Sys::Time|SPVM::Sys::Time> - Time Manipulation
-
-=head2 Sys::User
-
-L<Sys::User|SPVM::Sys::User> - User Manipulation
-
-=head2 Sys::FiteTest
-
-L<Sys::FiteTest|SPVM::Sys::FiteTest> - File Tests
+  use Sys;
+  
+  my $path = Sys->getenv("PATH");
+  
+  my $is_windows = Sys->defined("_WIN32");
 
 =head1 Class Methods
 
@@ -179,6 +139,122 @@ The C<get_osname> in the C<Sys> class supports the following os names.
 =item * openbsd
 
 =item * solaris
+
+=back
+
+=head1 Modules
+
+All modules that is included in this distribution.
+
+=over 2
+
+=item * L<Sys|SPVM::Sys>
+
+=item * L<Sys::FileTest|SPVM::Sys::FileTest>
+
+=item * L<Sys::IO|SPVM::Sys::IO>
+
+=item * L<Sys::IO::Constant|SPVM::Sys::IO::Constant>
+
+=item * L<Sys::Ioctl|SPVM::Sys::Ioctl>
+
+=item * L<Sys::Ioctl::Constant|SPVM::Sys::Ioctl::Constant>
+
+=item * L<Sys::IO::Dirent|SPVM::Sys::IO::Dirent>
+
+=item * L<Sys::IO::DirStream|SPVM::Sys::IO::DirStream>
+
+=item * L<Sys::IO::FileStream|SPVM::Sys::IO::FileStream>
+
+=item * L<Sys::IO::Flock|SPVM::Sys::IO::Flock>
+
+=item * L<Sys::IO::Stat|SPVM::Sys::IO::Stat>
+
+=item * L<Sys::IO::Utimbuf|SPVM::Sys::IO::Utimbuf>
+
+=item * L<Sys::Poll|SPVM::Sys::Poll>
+
+=item * L<Sys::Poll::Constant|SPVM::Sys::Poll::Constant>
+
+=item * L<Sys::Poll::PollfdArray|SPVM::Sys::Poll::PollfdArray>
+
+=item * L<Sys::Process|SPVM::Sys::Process>
+
+=item * L<Sys::Process::Constant|SPVM::Sys::Process::Constant>
+
+=item * L<Sys::Select|SPVM::Sys::Select>
+
+=item * L<Sys::Select::Constant|SPVM::Sys::Select::Constant>
+
+=item * L<Sys::Select::Fd_set|SPVM::Sys::Select::Fd_set>
+
+=item * L<Sys::Signal|SPVM::Sys::Signal>
+
+=item * L<Sys::Signal::Constant|SPVM::Sys::Signal::Constant>
+
+=item * L<Sys::Signal::Handler|SPVM::Sys::Signal::Handler>
+
+=item * L<Sys::Signal::Handler::Default|SPVM::Sys::Signal::Handler::Default>
+
+=item * L<Sys::Signal::Handler::Ignore|SPVM::Sys::Signal::Handler::Ignore>
+
+=item * L<Sys::Signal::Handler::Monitor|SPVM::Sys::Signal::Handler::Monitor>
+
+=item * L<Sys::Signal::Handler::Unknown|SPVM::Sys::Signal::Handler::Unknown>
+
+=item * L<Sys::Socket|SPVM::Sys::Socket>
+
+=item * L<Sys::Socket::Addrinfo|SPVM::Sys::Socket::Addrinfo>
+
+=item * L<Sys::Socket::AddrinfoLinkedList|SPVM::Sys::Socket::AddrinfoLinkedList>
+
+=item * L<Sys::Socket::Constant|SPVM::Sys::Socket::Constant>
+
+=item * L<Sys::Socket::Error|SPVM::Sys::Socket::Error>
+
+=item * L<Sys::Socket::Error::InetInvalidNetworkAddress|SPVM::Sys::Socket::Error::InetInvalidNetworkAddress>
+
+=item * L<Sys::Socket::In6_addr|SPVM::Sys::Socket::In6_addr>
+
+=item * L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr>
+
+=item * L<Sys::Socket::Ip_mreq|SPVM::Sys::Socket::Ip_mreq>
+
+=item * L<Sys::Socket::Ip_mreq_source|SPVM::Sys::Socket::Ip_mreq_source>
+
+=item * L<Sys::Socket::Ipv6_mreq|SPVM::Sys::Socket::Ipv6_mreq>
+
+=item * L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>
+
+=item * L<Sys::Socket::Sockaddr::In|SPVM::Sys::Socket::Sockaddr::In>
+
+=item * L<Sys::Socket::Sockaddr::In6|SPVM::Sys::Socket::Sockaddr::In6>
+
+=item * L<Sys::Socket::Sockaddr::Interface|SPVM::Sys::Socket::Sockaddr::Interface>
+
+=item * L<Sys::Socket::Sockaddr::Storage|SPVM::Sys::Socket::Sockaddr::Storage>
+
+=item * L<Sys::Socket::Sockaddr::Un|SPVM::Sys::Socket::Sockaddr::Un>
+
+=item * L<Sys::Time|SPVM::Sys::Time>
+
+=item * L<Sys::Time::Constant|SPVM::Sys::Time::Constant>
+
+=item * L<Sys::Time::Itimerval|SPVM::Sys::Time::Itimerval>
+
+=item * L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec>
+
+=item * L<Sys::Time::Timeval|SPVM::Sys::Time::Timeval>
+
+=item * L<Sys::Time::Timezone|SPVM::Sys::Time::Timezone>
+
+=item * L<Sys::Time::Tms|SPVM::Sys::Time::Tms>
+
+=item * L<Sys::User|SPVM::Sys::User>
+
+=item * L<Sys::User::Group|SPVM::Sys::User::Group>
+
+=item * L<Sys::User::Passwd|SPVM::Sys::User::Passwd>
 
 =back
 

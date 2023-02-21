@@ -3,7 +3,7 @@ use warnings;
 
 package OPCUA::Open62541::Test::Client;
 use OPCUA::Open62541::Test::Logger;
-use OPCUA::Open62541 qw(:STATUSCODE :CLIENTSTATE :SESSIONSTATE);
+use OPCUA::Open62541 qw(:STATUSCODE :SESSIONSTATE);
 use Carp 'croak';
 use Time::HiRes qw(sleep);
 
@@ -41,14 +41,27 @@ sub url {
 sub start {
     my OPCUA::Open62541::Test::Client $self = shift;
 
-    note("going to configure client");
-    is($self->{config}->setDefault(), "Good", "client: set default config");
     ok($self->{logger} = $self->{config}->getLogger(), "client: get logger");
     ok($self->{log} = OPCUA::Open62541::Test::Logger->new(
 	logger => $self->{logger},
 	ident => "OPC UA client",
     ), "client: test logger");
     ok($self->{log}->file($self->{logfile}), "client: log file");
+
+    note("going to configure client");
+
+    if ($self->{certificate} and $self->{privateKey}) {
+	is(
+	    $self->{config}->setDefaultEncryption(
+		$self->{certificate}, $self->{privateKey},
+		$self->{trustList}, $self->{revocationList},
+	    ),
+	    "Good",
+	    "client: set default encryption config"
+	);
+    } else {
+	is($self->{config}->setDefault(), "Good", "client: set default config");
+    }
 
     return $self;
 }
@@ -59,14 +72,8 @@ sub run {
     note("going to connect client to url $self->{url}");
     is($self->{client}->connect($self->{url}), STATUSCODE_GOOD,
 	"client: connect");
-    if (defined &CLIENTSTATE_SESSION) {
-	is($self->{client}->getState(), CLIENTSTATE_SESSION,
-	    "client: state session");
-    } else {
-	my ($channel, $session, $connect) = $self->{client}->getState();
-	is($session, SESSIONSTATE_ACTIVATED,
-	    "client: state session activated");
-    }
+    my ($channel, $session, $connect) = $self->{client}->getState();
+    is($session, SESSIONSTATE_ACTIVATED, "client: state session activated");
     # check client did connect(2)
     ok($self->{log}->loggrep(
 	qr/TCP connection established|SessionState: Activated/, 5),
@@ -112,14 +119,7 @@ sub iterate {
 sub iterate_connect {
     my OPCUA::Open62541::Test::Client $self = shift;
 
-    my $end = defined &CLIENTSTATE_CONNECTED ? sub {
-	# iterate until connected, this is bahavior of API 1.0
-	my $cs = $self->{client}->getState();
-	if ($cs == CLIENTSTATE_SESSION) {
-	    return 1;
-	}
-	return 0;
-    } : sub {
+    my $end = sub {
 	my $sc = shift;
 	# timeout happens if connection is not instant, try again
 	# workaround for bug introduced in open62541 commit
@@ -141,15 +141,7 @@ sub iterate_connect {
 sub iterate_disconnect {
     my OPCUA::Open62541::Test::Client $self = shift;
 
-    my $end = defined &CLIENTSTATE_DISCONNECTED ? sub {
-	my $sc = shift;
-	# iterate until disconnected, this is bahavior of API 1.0
-	if ($$sc == STATUSCODE_BADCONNECTIONCLOSED) {
-	    $$sc = STATUSCODE_GOOD;
-	    return 1;
-	}
-	return 0;
-    } : sub {
+    my $end = sub {
 	my $sc = shift;
 	# iterate until session closed, this is bahavior of API 1.1
 	my ($channel, $session, $connect) = $self->{client}->getState();
@@ -170,14 +162,8 @@ sub stop {
 
     note("going to disconnect client");
     is($self->{client}->disconnect(), STATUSCODE_GOOD, "client: disconnect");
-    if (defined &CLIENTSTATE_DISCONNECTED) {
-	is($self->{client}->getState(), CLIENTSTATE_DISCONNECTED,
-	    "client: state disconnected");
-    } else {
-	my ($channel, $session, $connect) = $self->{client}->getState();
-	is($session, SESSIONSTATE_CLOSED,
-	    "client: state session closing");
-    }
+    my ($channel, $session, $connect) = $self->{client}->getState();
+    is($session, SESSIONSTATE_CLOSED, "client: state session closing");
 
     return $self;
 }
@@ -237,6 +223,30 @@ Optional port number of the server.
 =item $args{url}
 
 URL of the server. Overwrites host and port arguments.
+
+=item $args{certificate}
+
+Certificate in PEM or DER format for signing and encryption.
+If the I<certificate> and I<privateKey> parameters are set, the client config
+will be configured with the relevant security policies.
+
+By default the client will match any security policy from the server.
+Set the security mode with
+
+  $client_config->setSecurityMode(MESSAGESECURITYMODE_SIGNANDENCRYPT).
+
+=item $args{privateKey}
+
+Private key in PEM or DER format that has to match the certificate.
+
+=item $args{trustList}
+
+Array reference with a list of trusted certificates in PEM or DER format.
+
+=item $args{revocationList}
+
+Array reference with a list of certificate revocation lists (CRL) in PEM or DER
+format.
 
 =item $args{logfile}
 
@@ -304,10 +314,13 @@ OPCUA::Open62541::Test::Logger
 =head1 AUTHORS
 
 Alexander Bluhm E<lt>bluhm@genua.deE<gt>,
+Anton Borowka
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020-2022 Alexander Bluhm
+Copyright (c) 2020-2023 Alexander Bluhm
+
+Copyright (c) 2020-2023 Anton Borowka
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

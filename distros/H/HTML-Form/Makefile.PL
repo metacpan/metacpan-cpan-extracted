@@ -24,6 +24,7 @@ my %WriteMakefileArgs = (
     "HTTP::Request::Common" => "6.03",
     "Test::More" => "0.96",
     "URI" => "1.10",
+    "parent" => 0,
     "strict" => 0
   },
   "TEST_REQUIRES" => {
@@ -31,9 +32,10 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "HTTP::Response" => 0,
     "Test::More" => "0.96",
+    "Test::Warnings" => 0,
     "warnings" => 0
   },
-  "VERSION" => "6.10",
+  "VERSION" => "6.11",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,7 +52,9 @@ my %FallbackPrereqs = (
   "HTTP::Request::Common" => "6.03",
   "HTTP::Response" => 0,
   "Test::More" => "0.96",
+  "Test::Warnings" => 0,
   "URI" => "1.10",
+  "parent" => 0,
   "strict" => 0,
   "warnings" => 0
 );

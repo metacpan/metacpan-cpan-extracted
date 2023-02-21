@@ -168,6 +168,7 @@ static Bool  do_no_shmem   = false;
 static Bool  do_no_gtk     = false;
 static Bool  do_no_quartz  = false;
 static Bool  do_no_xrender = false;
+static Bool  do_no_xim     = false;
 
 static Bool
 init_x11( char * error_buf )
@@ -241,9 +242,13 @@ init_x11( char * error_buf )
 		"XdndActionList",
 	 	"XdndActionDescription",
 		"text/plain",
-		"_NET_WM_ICON"
+		"_NET_WM_ICON",
+		"_NET_FRAME_EXTENTS",
+		"_NET_WM_STATE_FULLSCREEN"
 	};
 	char hostname_buf[256], *hostname = hostname_buf, *env;
+
+	XInitThreads();
 
 	guts. click_time_frame = 200;
 	guts. double_click_time_frame = 200;
@@ -455,6 +460,9 @@ init_x11( char * error_buf )
 		Mdebug("XWayland detected\n");
 	}
 
+	if ( !do_no_xim )
+		prima_xim_init();
+
 	if ( do_sync) XSynchronize( DISP, true);
 	return true;
 }
@@ -510,6 +518,9 @@ window_subsystem_get_options( int * argc, char *** argv)
 				" A(all together)",
 #ifdef USE_MITSHM
 	"no-shmem",       "do not use shared memory for images",
+#endif
+#ifdef X_HAVE_UTF8_STRING
+	"no-xim",         "do not use XIM",
 #endif
 	"no-core-fonts", "do not use core fonts",
 #ifdef USE_XFT
@@ -590,6 +601,12 @@ window_subsystem_set_option( char * option, char * value)
 		if ( value) warn("`--no-xrender' option has no parameters");
 		do_no_xrender = true;
 		return true;
+#ifdef X_HAVE_UTF8_STRING
+	} else if ( strcmp( option, "no-xim") == 0) {
+		if ( value) warn("`--no-xim' option has no parameters");
+		do_no_xim = true;
+		return true;
+#endif
 	} else if ( strcmp( option, "debug") == 0) {
 		if ( !value) {
 			warn("`--debug' must be given parameters. `--debug=A` assumed\n");
@@ -663,6 +680,9 @@ window_subsystem_done( void)
 {
 	int i;
 	if ( !DISP) return;
+
+	if ( guts.use_xim )
+		prima_xim_done();
 
 	for ( i = 0; i < sizeof(guts.xdnd_pointers) / sizeof(CustomPointer); i++) {
 		CustomPointer *cp = guts.xdnd_pointers + i;
@@ -1012,7 +1032,7 @@ apc_application_get_size( Handle self)
 Box *
 apc_application_get_monitor_rects( Handle self, int * nrects)
 {
-#if defined(HAVE_X11_EXTENSIONS_XRANDR_H) && (RANDR_MAJOR > 1 || (RANDR_MAJOR == 1 && RANDR_MINOR > 3))
+#if defined(HAVE_X11_EXTENSIONS_XRANDR_H) && defined(HAVE_XRANDR_1_5)
 	XRRMonitorInfo *m;
 	Box * ret = NULL;
 	int n;

@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.314';
+our $VERSION = '2.316';
 
 #use bytes; # required
 use Scalar::Util qw( looks_like_number );
@@ -69,21 +69,24 @@ sub get_db_handle {
 
 
 sub get_schemas {
-    my ( $sf, $dbh, $db ) = @_;
-    my ( $user_schema, $sys_schema );
+    my ( $sf, $dbh, $db, $is_system_db ) = @_;
+    my ( $user_schemas, $sys_schemas );
+    my $driver = $dbh->{Driver}{Name}; #
     if ( $sf->{Plugin}->can( 'get_schemas' ) ) {
-        ( $user_schema, $sys_schema ) = $sf->{Plugin}->get_schemas( $dbh, $db );
+        ( $user_schemas, $sys_schemas ) = $sf->{Plugin}->get_schemas( $dbh, $db, $is_system_db );
     }
     else {
-        my $driver = $dbh->{Driver}{Name}; #
         if ( $driver eq 'SQLite' ) {
-            $user_schema = [ 'main' ]; # [ undef ];
+            $user_schemas = [ 'main' ];
         }
         elsif( $driver =~ /^(?:mysql|MariaDB)\z/ ) {
             # MySQL 8.0 Reference Manual / MySQL Glossary / Schema:
             # In MySQL, physically, a schema is synonymous with a database.
             # You can substitute the keyword SCHEMA instead of DATABASE in MySQL SQL syntax,
-            $user_schema = [ $db ];
+            $user_schemas = [ $db ];
+        }
+        elsif ( $driver eq 'Firebird' ) {
+            $user_schemas = [];
         }
         else {
             my $table_schem;
@@ -91,8 +94,10 @@ sub get_schemas {
                 # 'pg_schema' holds the unquoted name of the schema
                 $table_schem = 'pg_schema';
             }
+            elsif ( $driver eq 'Informix' ) {
+                $table_schem = 'table_owner';
+            }
             elsif ( $driver eq 'Sybase' ) {
-                # DBD::Sybase  table_info
                 $table_schem = 'TABLE_OWNER';
             }
             else {
@@ -105,21 +110,33 @@ sub get_schemas {
             elsif ( $driver eq 'DB2' ) {
                 $regex_sys = qr/^(?:SYS|SQLJ$|NULLID$)/;
             }
+            elsif ( $driver eq 'Informix' ) {
+                $regex_sys = qr/^informix\z/i;
+            }
             my $sth = $dbh->table_info( undef, '%', '', '' );
             my $info = $sth->fetchall_hashref( $table_schem );
             for my $schema ( sort keys %$info ) {
                 if ( defined $regex_sys && $schema =~ $regex_sys ) {
-                    push @$sys_schema, $schema;
+                    push @$sys_schemas, $schema;
                 }
                 else {
-                    push @$user_schema, $schema;
+                    push @$user_schemas, $schema;
                 }
             }
         }
     }
-    $user_schema = [] if ! defined $user_schema;
-    $sys_schema  = [] if ! defined $sys_schema;
-    return $user_schema, $sys_schema;
+    $user_schemas //= [];
+    $sys_schemas //= [];
+    if ( $driver eq 'Pg' && ! @$user_schemas ) {
+        # 5.9.2. The Public Schema
+        # In the previous sections we created tables without specifying any schema names. By default such tables
+        # (and other objects) are automatically put into a schema named “public”. Every new database contains such a schema.
+        $user_schemas = [ 'public' ];
+    }
+    if ( $is_system_db ) {
+        return [], [ @$user_schemas, @$sys_schemas ];
+    }
+    return $user_schemas, $sys_schemas;
 }
 
 
@@ -168,14 +185,24 @@ sub get_databases {
 }
 
 
-sub tables_info { # not public
+sub tables_info { # not documented
     my ( $sf, $dbh, $schema, $is_system_schema, $has_attached_db ) = @_;
     my $driver = $sf->get_db_driver();
-    my ( $table_cat, $table_schem, $table_name );
+    if ( $sf->{Plugin}->can( 'tables_info' ) ) {
+        return $sf->{Plugin}->tables_info( $dbh, $schema, $is_system_schema, $has_attached_db );
+    }
+    if ( $driver eq 'SQLite' && $has_attached_db ) {
+        # If a SQLite database has databases attached, set $schema to `undef`.
+        # If $schema is `undef`, `$dbh->table_info( undef, $schema, '%', '' )` returns all schemas - main, temp and
+        # aliases of attached databases - with its tables.
+        $schema = undef;
+    }
+    my ( $table_cat, $table_schem, $table_name, $table_type );
     if ( $driver eq 'Pg' ) {
         $table_cat   = 'TABLE_CAT';
         $table_schem = 'pg_schema';
         $table_name  = 'pg_table';
+        $table_type  = 'TABLE_TYPE';
         # DBD::Pg  3.16.0:
         # The TABLE_SCHEM and TABLE_NAME will be quoted via quote_ident().
         # Four additional fields specific to DBD::Pg are returned:
@@ -183,75 +210,90 @@ sub tables_info { # not public
         # pg_table: the unquoted name of the table
         # ...
     }
+    elsif ( $driver eq 'Informix' ) {
+        $table_cat   = 'table_qualifier';
+        $table_schem = 'table_owner';
+        $table_name  = 'table_name';
+        $table_type  = 'table_type';
+    }
     elsif ( $driver eq 'Sybase' ) {
-        # DBD::Sybase  table_info
         $table_cat   = 'TABLE_QUALIFIER';
         $table_schem = 'TABLE_OWNER';
         $table_name  = 'TABLE_NAME';
+        $table_type  = 'TABLE_TYPE';
     }
     else {
         $table_cat   = 'TABLE_CAT';
         $table_schem = 'TABLE_SCHEM';
         $table_name  = 'TABLE_NAME';
+        $table_type  = 'TABLE_TYPE';
     }
-    # TABLE_CAT:
-    # DBD::Pg: The name of the database that the table or view is in (always the current database).
-    # DBD::Sybase: TABLE_CAT = TABLE_QUALIFIER (database name)
-    # The others: nothing
-    my @keys = ( $table_cat, $table_schem, $table_name, 'TABLE_TYPE' );
-    if ( $driver eq 'SQLite' && $has_attached_db ) {
-        # If a SQLite database has databases attached, set $schema to `undef`.
-        # If $schema is `undef`, `$dbh->table_info( undef, $schema, '%', '' )` returns all schemas - main, temp and
-        # aliases of attached databases - with its tables.
-        $schema = undef;
-    }
+    my @keys = ( $table_cat, $table_schem, $table_name, $table_type );
     my $sth = $dbh->table_info( undef, $schema, '%', '' );
     my $info_tables = $sth->fetchall_arrayref( { map { $_ => 1 } @keys } );
     my ( @user_table_keys, @sys_table_keys );
     my $tables_info = {};
     for my $info_table ( @$info_tables ) {
-        if ( $info_table->{TABLE_TYPE} eq 'INDEX' ) {
+        if ( $driver eq 'Informix' && $schema ne $info_table->{$table_schem} ) {
+            # Informix: `table_info` returns everything.
             next;
         }
-        # The table name in $table_keys is used in the tables-menu but not in SQL code.
+        if ( $info_table->{$table_type} eq 'INDEX' ) {
+            next;
+        }
+        # The table name in $table_key is used in the tables-menu but not in SQL code.
         # To get the table names for SQL code it is used the 'quote_table' routine in Auxil.pm.
-        my $table_keys;
+        my $table_key;
         if ( $driver eq 'SQLite' && ! defined $schema ) {
-            # The $schema is `undef` if a SQLite database has attached databases.
-            next if $info_table->{$table_name} eq 'sqlite_temp_master'; # no 'create temp table'
+            # attached databases, schema is undef
+            if ( $info_table->{$table_name} eq 'sqlite_temp_master' ) {
+                next; # no temp tables
+            }
             if ( $info_table->{$table_schem} =~ /^main\z/i ) {
-                $table_keys = sprintf "[%s] %s", "\x{001f}" . $info_table->{$table_schem}, $info_table->{$table_name};
+                $table_key = sprintf "[%s] %s", "\x{001f}" . $info_table->{$table_schem}, $info_table->{$table_name};
                 # \x{001f} keeps the main tables on top of the tables menu.
             }
             else {
-                $table_keys = sprintf "[%s] %s", $info_table->{$table_schem}, $info_table->{$table_name};
+                $table_key = sprintf "[%s] %s", $info_table->{$table_schem}, $info_table->{$table_name};
             }
         }
         else {
-            $table_keys = $info_table->{$table_name};
+            $table_key = $info_table->{$table_name};
         }
         if ( $is_system_schema ) {
-            push @sys_table_keys, $table_keys;
+            push @sys_table_keys, $table_key;
         }
         else {
-            if ( $info_table->{TABLE_TYPE} =~ /^SYSTEM/ || ( $driver eq 'SQLite' && $info_table->{TABLE_NAME} =~ /^sqlite_/ ) ) {
-                push @sys_table_keys, $table_keys;
+            if ( $info_table->{$table_type} =~ /^SYSTEM/ || ( $driver eq 'SQLite' && $info_table->{$table_name} =~ /^sqlite_/ ) ) {
+                push @sys_table_keys, $table_key;
             }
             else {
-                push @user_table_keys, $table_keys;
+                push @user_table_keys, $table_key;
             }
         }
-        $tables_info->{$table_keys} = [ @{$info_table}{@keys} ];
+        $tables_info->{$table_key} = [ @{$info_table}{@keys} ];
     }
     return $tables_info, [ sort @user_table_keys ], [ sort @sys_table_keys ];
 }
 
 
 
+
+# TABLE_CAT:
+# DBD::Pg: The name of the database that the table or view is in (always the current database).
+# DBD::Sybase: TABLE_CAT = TABLE_QUALIFIER (database name)
+# DBD::mysql and DBD::MariaDB: Empty, because MySQL doesn't support catalogs (yet) ''
+# DBD::Firebird: Note that Firebird implementations do not presently support the DBI concepts of 'catalog'
+#                and 'schema', so these parameters are effectively ignored.
+# DBD::SQLite: Always NULL, as SQLite does not have the concept of catalogs.
+
+
 # Oracle and Sybase untested
 
 # Sysbase:
 #   SET quoted_identifier ON
+
+
 
 
 1;
@@ -269,7 +311,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.314
+Version 2.316
 
 =head1 DESCRIPTION
 

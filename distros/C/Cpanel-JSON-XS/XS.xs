@@ -2724,6 +2724,8 @@ decode_comment (dec_t *dec)
 INLINE void
 decode_ws (dec_t *dec)
 {
+  if (dec->cur >= dec->end)
+    return;
   for (;;)
     {
       char ch = *dec->cur;
@@ -2750,7 +2752,7 @@ decode_ws (dec_t *dec)
 
 #define ERR(reason) SB dec->err = reason; goto fail; SE
 
-#define EXPECT_CH(ch) SB \
+#define EXPECT_CH(ch) SB        \
   if (*dec->cur != ch)		\
     ERR (# ch " expected");	\
   ++dec->cur;			\
@@ -3819,12 +3821,27 @@ fail:
 static void
 hv_store_str (pTHX_ HV* hv, char *key, U32 len, SV* value)
 {
-  /* Note: not a utf8 hash key */
 #if PERL_VERSION > 8 || (PERL_VERSION == 8 && PERL_SUBVERSION >= 9)
-  hv_common (hv, NULL, key, len, 0,
+  int utf8 = 0;
+#else
+  I32 ulen = (I32)len;
+#endif
+  /* check utf8 hash key */
+  for (U32 i=0; i<len; i++) {
+    if ((signed char)key[i] < 0) {
+#if PERL_VERSION > 8 || (PERL_VERSION == 8 && PERL_SUBVERSION >= 9)
+      utf8 = HVhek_UTF8;
+#else
+      ulen = -(I32)len;
+#endif
+      break;
+    }
+  }
+#if PERL_VERSION > 8 || (PERL_VERSION == 8 && PERL_SUBVERSION >= 9)
+  hv_common (hv, NULL, key, len, utf8,
              HV_FETCH_ISSTORE|HV_FETCH_JUST_SV, value, 0);
 #else
-  hv_store (hv, key, len, value, 0);
+  hv_store (hv, key, ulen, value, 0);
 #endif
 }
 
@@ -3870,11 +3887,11 @@ decode_hv (pTHX_ dec_t *dec, SV *typesv)
           }
           else if (*dec->cur == 0x27)
             endstr = 0x27;
-          is_bare=0;
+          is_bare = 0;
           ++dec->cur;
         } else {
           EXPECT_CH ('"');
-          is_bare=0;
+          is_bare = 0;
         }
 
         /* heuristic: assume that */
@@ -3923,7 +3940,8 @@ decode_hv (pTHX_ dec_t *dec, SV *typesv)
                       }
                     } // else overwrite it below
                   }
-                  decode_ws (dec); EXPECT_CH (':');
+                  decode_ws (dec);
+                  EXPECT_CH (':');
                   decode_ws (dec);
 
                   if (typesv)
@@ -3995,7 +4013,10 @@ decode_hv (pTHX_ dec_t *dec, SV *typesv)
                   }
 
                   dec->cur = p + 1;
-                  decode_ws (dec); if (*p != ':') EXPECT_CH (':');
+                  if (dec->cur >= dec->end)
+                    EXPECT_CH (':');
+                  decode_ws (dec);
+                  if (*p != ':') EXPECT_CH (':');
                   decode_ws (dec);
 
                   if (typesv)
@@ -4020,12 +4041,15 @@ decode_hv (pTHX_ dec_t *dec, SV *typesv)
                     }
                   else
                     {
-                      /* Note: not a utf8 hash key */
                       hv_store_str (aTHX_ hv, key, len, value);
                     }
                   break;
                 }
               ++p;
+              if (p > dec->end) {
+                dec->cur = p;
+                EXPECT_CH (':');
+              }
             }
         }
 
@@ -4485,11 +4509,16 @@ decode_json (pTHX_ SV *string, JSON *json, STRLEN *offset_return, SV *typesv)
   if (!sv)
     {
       SV *uni = sv_newmortal ();
-
+      COP cop = *PL_curcop;
+      if (dec.cur >= dec.end) // overshoot
+        {
+          croak ("%s, at character offset %d",
+                 dec.err,
+                 (int)ptr_to_index (aTHX_ string, dec.cur - SvPVX(string)));
+        }
 #if PERL_VERSION >= 8
       /* horrible hack to silence warning inside pv_uni_display */
       /* TODO: Can be omitted with newer perls */
-      COP cop = *PL_curcop;
       cop.cop_warnings = pWARN_NONE;
       ENTER;
       SAVEVPTR (PL_curcop);
@@ -4499,12 +4528,14 @@ decode_json (pTHX_ SV *string, JSON *json, STRLEN *offset_return, SV *typesv)
 #endif
       croak ("%s, at character offset %d (before \"%s\")",
              dec.err,
-             (int)ptr_to_index (aTHX_ string, dec.cur-SvPVX(string)),
-             dec.cur != dec.end ? SvPV_nolen (uni) : "(end of string)");
+             (int)ptr_to_index (aTHX_ string, dec.cur - SvPVX(string)),
+             dec.cur < dec.end ? SvPV_nolen (uni) : "(end of string)");
     }
 
-  if (!(dec.json.flags & F_ALLOW_NONREF) && json_nonref(aTHX_ sv))
+  if (!(dec.json.flags & F_ALLOW_NONREF) && json_nonref(aTHX_ sv)) {
+    SvREFCNT_dec (sv);
     croak ("JSON text must be an object or array (but found number, string, true, false or null, use allow_nonref to allow this)");
+  }
 
   if (UNLIKELY(converted && !(converted - 1))) /* with BOM, and UTF8 was not set */
     json->flags &= ~F_UTF8;

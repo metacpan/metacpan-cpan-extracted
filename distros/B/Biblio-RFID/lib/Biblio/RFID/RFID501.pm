@@ -17,7 +17,7 @@ This module tries to decode tag format as described in document
 
 L<http://solutions.3m.com/wps/portal/3M/en_US/3MLibrarySystems/Home/Resources/CaseStudiesAndWhitePapers/RFID501/>
 
-Goal is to be compatibile with existing 3M Alphanumeric tag format
+Goal is to be compatible with existing 3M Alphanumeric tag format
 which, as far as I know, isn't specificed anywhere. My documentation about
 this format is available at
 
@@ -118,6 +118,10 @@ sub to_hash {
 	return unless $data;
 
 	$data = join('', @$data) if ref $data eq 'ARRAY';
+
+	if ( length($data) < 24 ) {
+		die "short data from tag ", length($data), " < 24 bytes";
+	}
 
 	warn "## to_hash ",dump($data);
 

@@ -6,16 +6,19 @@ use warnings;
 
 use Test::More;
 
-plan tests => 91 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 98 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/CSVUtils.pm',
+    'App/CSVUtils/csv2paras.pm',
     'App/CSVUtils/csv2td.pm',
     'App/CSVUtils/csv2vcf.pm',
     'App/CSVUtils/csv_add_fields.pm',
     'App/CSVUtils/csv_avg.pm',
-    'App/CSVUtils/csv_check_cell.pm',
-    'App/CSVUtils/csv_check_field.pm',
+    'App/CSVUtils/csv_check_cell_values.pm',
+    'App/CSVUtils/csv_check_field_names.pm',
+    'App/CSVUtils/csv_check_field_values.pm',
+    'App/CSVUtils/csv_check_rows.pm',
     'App/CSVUtils/csv_concat.pm',
     'App/CSVUtils/csv_convert_to_hash.pm',
     'App/CSVUtils/csv_csv.pm',
@@ -50,15 +53,17 @@ my @module_files = (
     'App/CSVUtils/csv_split.pm',
     'App/CSVUtils/csv_sum.pm',
     'App/CSVUtils/csv_transpose.pm',
-    'App/CSVUtils/csv_uniq.pm'
+    'App/CSVUtils/csv_uniq.pm',
+    'App/CSVUtils/paras2csv.pm'
 );
 
 my @scripts = (
     'script/csv-add-fields',
     'script/csv-avg',
-    'script/csv-check-cell',
-    'script/csv-check-field',
-    'script/csv-check-values',
+    'script/csv-check-cell-values',
+    'script/csv-check-field-names',
+    'script/csv-check-field-values',
+    'script/csv-check-rows',
     'script/csv-concat',
     'script/csv-convert-to-hash',
     'script/csv-csv',
@@ -99,9 +104,11 @@ my @scripts = (
     'script/csv-transpose',
     'script/csv-uniq',
     'script/csv2ltsv',
+    'script/csv2paras',
     'script/csv2td',
     'script/csv2tsv',
     'script/csv2vcf',
+    'script/paras2csv',
     'script/tsv2csv'
 );
 

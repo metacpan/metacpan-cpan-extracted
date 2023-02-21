@@ -20,8 +20,19 @@ my %opts = (
     local $SIG{__WARN__};
     my $ok = eval {
         GetOptions(
-            \%opts, qw(help rate=s loan=s
-                total=s principal=s interest=s duration=i interest-only no_pay=i config=s)
+            \%opts, qw(
+                help
+                rate=s
+                loan=s
+                total=s
+                principal=s
+                interest=s
+                duration=i
+                interest-only
+                no_pay=i
+                config=s
+                summary
+            )
         );
     };
     if (!$ok) {
@@ -67,7 +78,7 @@ foreach (@required) {
 }
 
 my $ok = 0;
-my @optional = qw(total principal interest interest-only);
+my @optional = qw(total principal interest interest-only duration);
 foreach (@optional) {
     if (defined $opts{$_} && $opts{$_} > 0) {
         $ok++;
@@ -76,6 +87,8 @@ foreach (@optional) {
 if (!$ok) {
     pod2usage(1);
 }
+
+my $summary = $opts{summary};
 
 my %args = (
     rate => $opts{rate},
@@ -100,6 +113,10 @@ elsif ($opts{interest}) {
 elsif ($opts{total}) {
     $args{total_payment} = $opts{total};
 }
+elsif ($opts{duration}) {
+    $args{duration} = $opts{duration};
+}
+
 my $calc = Finance::Loan::Repayment->new(%args);
 
 my $loan            = $calc->loan;
@@ -121,20 +138,27 @@ while ($calc->loan > 0) {
 
     $total_interest  += $interest;
     $total_payments  += $payment;
-    $total_principal += $payment;
+    $total_principal += $principal;
     $loan            -= $principal;
 
     printf("Loan: %.2f\tInterest: %.2f\tPrincipal: %.2f\tPay per month: %.2f\n",
-        $calc->loan, $interest, $principal, $payment);
+        $calc->loan, $interest, $principal, $payment) unless $summary;
 
     $calc->loan($loan);
 
     $counter++;
     last if ($duration && $counter >= $duration);
-    printf("Year passed\n") if $counter % 12 == 0;
+    if ($counter % 12 == 0) {
+        printf("%.2f years\tInterest: %.2f\tPrincipal: %.2f\tPaid in total: %.2f\n",
+            $counter / 12,
+            $total_interest,
+            $total_principal,
+            $total_payments,
+        );
+    }
 }
 
-print "\n";
+print "\n" unless $summary;
 if ($duration) {
     printf("Duration: %dm\tInterest: %.2f\tPrincipal: %.2f\tPaid in total: %.2f\n",
         $counter,
@@ -174,7 +198,7 @@ loan.pl - A simple loan calculator
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =head1 SYNOPSIS
 

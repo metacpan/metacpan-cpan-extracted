@@ -6,6 +6,7 @@ LICENSE
 MANIFEST
 META.json
 README.md
+bin/plack_app_service_status_generate_buildinfo.pl
 cpanfile
 dist.ini
 example/check_plack_app_servicestatus
@@ -17,4 +18,8 @@ lib/Plack/App/ServiceStatus/Elasticsearch.pm
 lib/Plack/App/ServiceStatus/NetStomp.pm
 lib/Plack/App/ServiceStatus/Redis.pm
 t/00-compile.t
+t/buildinfo-broken.json
+t/buildinfo.json
+t/buildinfo.t
 t/netstomp.t
+t/status.t

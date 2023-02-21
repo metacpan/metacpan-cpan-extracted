@@ -91,56 +91,52 @@ sub from_col_by_col {
         }
         my $default;
 
-        ADD_DATA: while ( 1 ) {
+        WHAT_NEXT: while ( 1 ) {
+            my $add = 'Add Data';
+            my @pre = ( undef, $sf->{i}{ok} );
+            my $menu = [ @pre, $add ];
             my $info = $sf->__get_read_info( $aoa );
-            my $fields = [ map { [ $_, ] } @$col_names ];
-            # Fill_form
-            my $data = $tf->fill_form(
-                $fields,
-                { info => $info, auto_up => 1, confirm => $confirm, back => $back . '   ', prompt => 'Enter Data:' }
+            # Choose
+            my $choice = $tc->choose(
+                $menu,
+                { %{$sf->{i}{lyt_h}}, info => $info, prompt => '', default => $default }
             );
             $ax->print_sql_info( $info );
-            if ( ! defined $data ) {
+            if ( ! defined $choice ) {
                 if ( @$aoa < 2 ) {
                     next COL_BY_COL;
                 }
                 $default = 0;
+                $#$aoa--;
+                next WHAT_NEXT;
             }
-            else {
-                push @{$aoa}, [ map { $_->[1] } @$data ];
-                $default = 2;
+            elsif ( $choice eq $sf->{i}{ok} ) {
+                if ( ! @$aoa ) {
+                    next COL_BY_COL;
+                }
+                else {
+                    $sql->{insert_into_args} = $aoa;
+                    return 1;
+                }
             }
-
-            WHAT_NEXT: while ( 1 ) {
-                my $add = 'Add Data';
-                my @pre = ( undef, $sf->{i}{ok} );
-                my $menu = [ @pre, $add ];
+            elsif ( $choice eq $add ) {
                 my $info = $sf->__get_read_info( $aoa );
-                # Choose
-                my $choice = $tc->choose(
-                    $menu,
-                    { %{$sf->{i}{lyt_h}}, info => $info, prompt => '', default => $default }
+                my $fields = [ map { [ $_, ] } @$col_names ];
+                # Fill_form
+                my $data = $tf->fill_form(
+                    $fields,
+                    { info => $info, auto_up => 1, confirm => $confirm, back => $back . '   ', prompt => 'Enter Data:' }
                 );
                 $ax->print_sql_info( $info );
-                if ( ! defined $choice ) {
-                    if ( @$aoa < 2 ) {
-                        next COL_BY_COL;
-                    }
-                    $default = 0;
-                    $#$aoa--;
-                    next WHAT_NEXT;
-                }
-                elsif ( $choice eq $sf->{i}{ok} ) {
+                if ( ! defined $data ) {
                     if ( ! @$aoa ) {
                         next COL_BY_COL;
                     }
-                    else {
-                        $sql->{insert_into_args} = $aoa;
-                        return 1;
-                    }
+                    $default = 0;
                 }
-                elsif ( $choice eq $add ) {
-                    last WHAT_NEXT;
+                else {
+                    push @{$aoa}, [ map { $_->[1] } @$data ];
+                    $default = 2;
                 }
             }
         }

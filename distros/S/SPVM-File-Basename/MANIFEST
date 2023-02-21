@@ -9,12 +9,14 @@ Basename.pm.original
 Changes
 lib/SPVM/File/Basename.pm
 lib/SPVM/File/Basename.spvm
-lib/SPVM/File/Basename/Interface.pm
-lib/SPVM/File/Basename/Interface.spvm
-lib/SPVM/File/Basename/Unix.pm
-lib/SPVM/File/Basename/Unix.spvm
-lib/SPVM/File/Basename/Win32.pm
-lib/SPVM/File/Basename/Win32.spvm
+lib/SPVM/File/Basename/Instance.pm
+lib/SPVM/File/Basename/Instance.spvm
+lib/SPVM/File/Basename/Instance/Interface.pm
+lib/SPVM/File/Basename/Instance/Interface.spvm
+lib/SPVM/File/Basename/Instance/Unix.pm
+lib/SPVM/File/Basename/Instance/Unix.spvm
+lib/SPVM/File/Basename/Instance/Win32.pm
+lib/SPVM/File/Basename/Instance/Win32.spvm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP

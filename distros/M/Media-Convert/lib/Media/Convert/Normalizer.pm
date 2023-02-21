@@ -75,7 +75,7 @@ Performs the normalization.
 sub run {
 	my $self = shift;
 	my $pkg = "Media::Convert::Normalizer::" . ucfirst($self->impl);
-	eval "require $pkg;";
+	eval "require $pkg;"; ## no critic(StringyEval)
 	if($@) {
 		die "$@: $!";
 	}

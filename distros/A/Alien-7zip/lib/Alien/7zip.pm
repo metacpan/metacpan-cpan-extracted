@@ -1,5 +1,5 @@
 package Alien::7zip;
-$Alien::7zip::VERSION = '0.02';
+$Alien::7zip::VERSION = '0.03';
 use strict;
 use warnings;
 use base qw( Alien::Base );
@@ -45,9 +45,9 @@ sub exe {
 
 =head1 HELPERS
 
-=head2 7z
+=head2 sevenzip
 
- %{7z}
+ %{sevenzip}
 
 Returns '7z', '7zz', or appropriate command for
 platform.
@@ -56,7 +56,7 @@ platform.
 
 sub alien_helper {
   return +{
-    '7z' => sub {
+    'sevenzip' => sub {
       Alien::7zip->exe;
     },
   };

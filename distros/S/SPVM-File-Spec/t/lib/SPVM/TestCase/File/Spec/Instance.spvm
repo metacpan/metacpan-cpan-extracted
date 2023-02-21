@@ -1,0 +1,87 @@
+class TestCase::File::Spec::Instance {
+  use File::Spec::Instance;
+  use File::Spec::Instance::Unix;
+  use File::Spec::Instance::Win32;
+  use Sys;
+  
+  static method test : int () {
+    
+    {
+      my $spec = File::Spec::Instance->new;
+      unless ($spec is_compile_type File::Spec::Instance) {
+        return 0;
+      }
+      
+      if (Sys->defined("_WIN32")) {
+        unless ($spec is_type File::Spec::Instance::Win32) {
+          return 0;
+        }
+        unless ($spec isa File::Spec::Instance::Win32) {
+          return 0;
+        }
+        unless ($spec isa File::Spec::Instance) {
+          return 0;
+        }
+      }
+      else {
+        unless ($spec is_type File::Spec::Instance::Unix) {
+          return 0;
+        }
+        unless ($spec isa File::Spec::Instance::Unix) {
+          return 0;
+        }
+        unless ($spec isa File::Spec::Instance) {
+          return 0;
+        }
+      }
+    }
+
+    {
+      my $spec = File::Spec::Instance::Unix->new;
+      unless ($spec is_compile_type File::Spec::Instance::Unix) {
+        return 0;
+      }
+      unless ($spec is_type File::Spec::Instance::Unix) {
+        return 0;
+      }
+      unless ($spec isa File::Spec::Instance::Unix) {
+        return 0;
+      }
+    }
+
+    {
+      my $spec = File::Spec::Instance::Win32->new;
+      unless ($spec is_compile_type File::Spec::Instance::Win32) {
+        return 0;
+      }
+      unless ($spec is_type File::Spec::Instance::Win32) {
+        return 0;
+      }
+      unless ($spec isa File::Spec::Instance::Win32) {
+        return 0;
+      }
+    }
+    
+    {
+      my $spec = (File::Spec::Instance::Interface)File::Spec::Instance::Win32->new;
+      $spec->curdir;
+    }
+    
+    {
+      my $spec = (File::Spec::Instance::Interface)File::Spec::Instance::Win32->new;
+      $spec->curdir;
+    }
+    
+    # file_name_is_absolute
+    {
+      my $spec = File::Spec::Instance->new;
+      my $path = "t/basic.t";
+      my $is_abs = $spec->file_name_is_absolute($path);
+      if ($is_abs) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+}

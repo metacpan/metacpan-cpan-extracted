@@ -18,7 +18,7 @@ name: LaTeX-Pod
 provides:
   LaTeX::Pod:
     file: lib/LaTeX/Pod.pm
-    version: '0.22'
+    version: '0.23'
 requires:
   Carp: '0'
   Getopt::Long: '0'
@@ -29,5 +29,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/stsc/LaTeX-Pod
-version: '0.22'
+version: '0.23'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

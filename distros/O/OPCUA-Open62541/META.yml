@@ -7,6 +7,8 @@ author:
   - 'Marvin Knoblauch <mknob@genua.de>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  IO::Socket::SSL::Utils: '0'
+  MIME::Base64: '0'
   Test::Deep: '0'
   Test::EOL: '0'
   Test::Exception: '0'
@@ -35,5 +37,5 @@ no_index:
 requires: {}
 resources:
   repository: git://github.com/bluhm/p5-opcua-open62541.git
-version: '1.05'
+version: '2.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

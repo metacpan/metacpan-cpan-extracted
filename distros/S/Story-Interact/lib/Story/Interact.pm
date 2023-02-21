@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001007';
+our $VERSION   = '0.001009';
 
 use Story::Interact::Analyze ();
 use Story::Interact::Character ();
@@ -14,6 +14,7 @@ use Story::Interact::Page ();
 use Story::Interact::PageSource ();
 use Story::Interact::PageSource::DBI ();
 use Story::Interact::PageSource::Dir ();
+use Story::Interact::PageSource::Waterfall ();
 use Story::Interact::State ();
 use Story::Interact::Syntax ();
 

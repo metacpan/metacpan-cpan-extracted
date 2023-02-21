@@ -1,0 +1,134 @@
+NAME
+    App::BPOMUtils::RPO::Checker - Various checker utilities to help with
+    Processed Food Registration (RPO - Registrasi Pangan Olahan) at BPOM
+
+VERSION
+    This document describes version 0.006 of App::BPOMUtils::RPO::Checker
+    (from Perl distribution App-BPOMUtils-RPO-Checker), released on
+    2023-02-16.
+
+SYNOPSIS
+DESCRIPTION
+    This distribution includes CLI utilities related to helping with
+    Processed Food Registration (RPO - Registrasi Pangan Olahan).
+
+    *   bpom-rpo-check-files
+
+    *   bpom-rpo-check-files-label-design
+
+FUNCTIONS
+  bpom_rpo_check_files
+    Usage:
+
+     bpom_rpo_check_files(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Check document files.
+
+    By default will check all files in the current directory, recursively.
+
+    Here's what it checks: - filename should not contain unsafe symbols -
+    file must not be larger than 5MB - file must be readable
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   files => *array[filename]*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  bpom_rpo_check_files_label_design
+    Usage:
+
+     bpom_rpo_check_files_label_design(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Check label design files.
+
+    By default will check all files in the current directory, recursively.
+
+    Here's what it checks: - file must be in JPEG format and has name ending
+    in /.jpe?g$/i - filename should not contain unsafe symbols - file must
+    not be larger than 5MB - file must be readable - image size must be
+    smaller than 2300 x 2300 px - (WARNING) image should not be smaller than
+    600 x 600 px
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   files => *array[filename]*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-BPOMUtils-RPO-Checker>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-BPOMUtils-RPO-Checker>.
+
+SEE ALSO
+    <https://registrasipangan.pom.go.id>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-BPOMUtils-RPO-Che
+    cker>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

@@ -21,7 +21,7 @@ App::CSVUtils::Manual::Cookbook - App::CSVUtils cookbook
 
 =head1 VERSION
 
-This document describes version 1.008 of App::CSVUtils::Manual::Cookbook (from Perl distribution App-CSVUtils), released on 2023-02-03.
+This document describes version 1.017 of App::CSVUtils::Manual::Cookbook (from Perl distribution App-CSVUtils), released on 2023-02-18.
 
 =head1 DESCRIPTION
 
@@ -257,6 +257,34 @@ See also: L</Adding a field containing line number>.
 =head1 Shuffling every row
 
  % csv-munge-row 1.csv -e 'use List::Util "shuffle"; $_=[shuffle @$_]'
+
+=head1 MODIFYING VALUES
+
+=head2 Quoting all values, including where quotes are not necessary
+
+Sample file F<input.csv>:
+
+ name,age
+ budi",21
+ "toni saputra, s.h",32
+
+ % csv-csv input.csv --output-always-quote
+ "name","age"
+ "budi","21"
+ "toni saputra, s.h","32"
+
+=head2 Removing non-necessary quotes around values
+
+Sample file F<input.csv>:
+
+ "name","age"
+ "budi","21"
+ "toni saputra, s.h","32"
+
+ % csv-csv input.csv --no-output-always-quote
+ name,age
+ budi",21
+ "toni saputra, s.h",32
 
 =head1 PERFORMING SET OPERATIONS WITH CSV
 

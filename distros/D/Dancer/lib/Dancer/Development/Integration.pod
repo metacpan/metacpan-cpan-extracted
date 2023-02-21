@@ -13,7 +13,7 @@ Dancer::Development::Integration - guide for Dancer's core-team members
 
 =head1 VERSION
 
-version 1.3520
+version 1.3521
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,7 @@ use warnings;
 use Time::HiRes qw/time/;
 use Test2::Harness::Util::UUID qw/gen_uuid/;
 
-our $VERSION = '0.000129';
+our $VERSION = '0.000133';
 
 use Test2::Harness::UI::Util::HashBase qw{
     <config
@@ -25,6 +25,7 @@ sub sweep {
     $params{jobs}       //= 1;
     $params{coverage}   //= 1;
     $params{events}     //= 1;
+    $params{resources}  //= 1;
     $params{subtests}   //= 1;
     $params{run_fields} //= 1;
     $params{job_fields} //= 1;
@@ -36,7 +37,7 @@ sub sweep {
     $params{jobs} = 0 unless $params{events} && $params{subtests} && $params{job_fields};
 
     # Cannot delete runs if we save jobs or coverage
-    $params{runs} = 0 unless $params{jobs} && $params{coverage} && $params{run_fields};
+    $params{runs} = 0 unless $params{jobs} && $params{coverage} && $params{run_fields} && $params{resources};
 
     my $db_type = $self->config->guess_db_driver;
 
@@ -131,6 +132,14 @@ sub sweep_run {
     if ($params{coverage}) {
         $run->coverages->delete;
         $run->update({has_coverage => 0}) unless $params{runs};
+    }
+
+    if ($params{resources}) {
+        my $batches = $run->resource_batches;
+        while (my $batch = $batches->next) {
+            $batch->resources->delete;
+            $batch->delete;
+        }
     }
 
     if ($params{runs}) {

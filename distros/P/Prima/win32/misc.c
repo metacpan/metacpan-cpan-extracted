@@ -44,11 +44,6 @@ apc_query_drives_map( const char *firstDrive, char *map, int len)
 	DWORD driveMap;
 	int i;
 
-#ifdef __CYGWIN__
-	if ( !map || len <= 0) return true;
-	*map = 0;
-	return true;
-#endif
 	if ( !map) return false;
 
 	beg = toupper( *firstDrive);
@@ -89,9 +84,6 @@ int
 apc_query_drive_type( const char *drive)
 {
 	char buf[ 256];                        //  Win95 fix
-#ifdef __CYGWIN__
-	return false;
-#endif
 	strlcpy( buf, drive, 255);             //     sometimes D: isn't enough for 95,
 	if ( buf[1] == ':' && buf[2] == 0) {   //     but ok for D:\.
 		buf[2] = '\\';                      //
@@ -185,10 +177,7 @@ apc_sys_get_value( int sysValue)
 		RegCloseKey( hKey);
 		return atol( buf);
 	case svDblClickDelay   :
-		RegOpenKeyEx( HKEY_CURRENT_USER, "Control Panel\\Mouse", 0, KEY_READ, &hKey);
-		RegQueryValueEx( hKey, "DoubleClickSpeed", NULL, &valType, ( LPBYTE)buf, &valSize);
-		RegCloseKey( hKey);
-		return atol( buf);
+		return guts.mouse_double_click_delay;
 	case svWheelPresent    : return GetSystemMetrics( SM_MOUSEWHEELPRESENT);
 	case svXIcon           : return guts. icon_size_large. x;
 	case svYIcon           : return guts. icon_size_large. y;

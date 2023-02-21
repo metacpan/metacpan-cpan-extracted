@@ -14,7 +14,7 @@ use File::Basename qw(basename);
 use SemVer;
 use Gravatar::URL;
 #use namespace::autoclean; # Do not use; breaks sort {}
-our $VERSION = v0.22.1;
+our $VERSION = v0.22.2;
 
 my $l = PGXN::Site::Locale->get_handle('en');
 sub T { $l->maketext(@_) }
@@ -86,6 +86,11 @@ BEGIN { create_wrapper wrapper => sub {
             link {
                 rel is 'manifest';
                 href is "/ui/manifest.json";
+            };
+            # Mastadon IT ME
+            link {
+                rel is 'me';
+                href is 'https://botsin.space/@pgxn';
             };
 
             # Metadata. Twitter and Facebook unfurls as described in
@@ -197,9 +202,10 @@ BEGIN { create_wrapper wrapper => sub {
                         };
                         span { class is 'grey'; '|' };
                         a {
-                            href is 'https://twitter.com/pgxn/';
-                            title is T 'Follow PGXN on Twitter';
-                            T 'Twitter';
+                            rel is 'me';
+                            href is 'https://botsin.space/@pgxn';
+                            title is T 'Follow PGXN on Mastodon';
+                            T 'Mastodon';
                         };
                         span { class is 'grey'; '|' };
                         a {

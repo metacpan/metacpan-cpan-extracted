@@ -5,11 +5,10 @@ use strict;
 use Test::More 'no_plan';
 use Test::Fatal qw( exception );
 use Test::Warnings ':all';
-use Test::Deep qw( cmp_deeply re array_each code );
+use Test::Deep qw( array_each cmp_deeply code re );
 use URI::file ();
 
 BEGIN {
-    delete @ENV{qw(PATH IFS CDPATH ENV BASH_ENV)};  # Placates taint-unsafe Cwd.pm in 5.6.1
     use_ok( 'WWW::Mechanize' );
 }
 
@@ -111,7 +110,7 @@ ok( $mech->success, "Fetched $uri" ) or die q{Can't get test page};
     like(
         exception {
             $mech->submit_form(
-                with_fields => { 'xx' => '' },
+                with_fields => { 'xx' => q{} },
             );
         },
         qr/There is no form with the requested fields/,
@@ -124,7 +123,7 @@ ok( $mech->success, "Fetched $uri" ) or die q{Can't get test page};
     like(
         exception {
             $mech->submit_form(
-                with_fields => { '1a' => '' },
+                with_fields => { '1a' => q{} },
                 form_number => 2,
             );
         },
@@ -165,7 +164,7 @@ ok( $mech->success, "Fetched $uri" ) or die q{Can't get test page};
     is(
         exception {
             $mech->submit_form(
-                with_fields => { 'x' => '' },
+                with_fields => { 'x' => q{} },
                 form_name => '3rd_form_ambiguous',
             );
         },
@@ -179,7 +178,7 @@ ok( $mech->success, "Fetched $uri" ) or die q{Can't get test page};
     is(
         exception {
             $mech->submit_form(
-                with_fields => { '1b' => '', 'opt[2]' => '' },
+                with_fields => { '1b' => q{}, 'opt[2]' => q{} },
             );
         },
         undef,

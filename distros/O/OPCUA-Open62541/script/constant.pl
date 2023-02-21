@@ -18,20 +18,21 @@ close($fh);
 # type, prefix, header of generated Perl constants
 my @consts = (
   # constants used in define and enum tests
-  [qw(	enum	ATTRIBUTEID		constants;common	)],
-  [qw(	define	ACCESSLEVELMASK		constants;common	)],
-  [qw(	define	WRITEMASK		constants;common	)],
-  [qw(	define	VALUERANK		constants;common	)],
-  [qw(	enum	RULEHANDLING		constants;common	)],
-  [qw(	enum	ORDER			constants;common	)],
+  [qw(	enum	ATTRIBUTEID		common		)],
+  [qw(	define	ACCESSLEVELMASK		common		)],
+  [qw(	define	WRITEMASK		common		)],
+  [qw(	define	VALUERANK		common		)],
+  [qw(	enum	RULEHANDLING		common		)],
+  [qw(	enum	ORDER			common		)],
   [qw(	enum	VARIANT			types		)],
   # We need UA_StatusCode as C type to run special typemap conversion.
   [qw(	define	STATUSCODE		statuscodes	UA_StatusCode	)],
   # needed for functionality tests
+  [qw(	enum	APPLICATIONTYPE		types_generated	)],
   [qw(	enum	BROWSERESULTMASK	types_generated	)],
-  [qw(	enum	CLIENTSTATE		client_config;	UA_ClientState	)],
-  [qw(	enum	SECURECHANNELSTATE	common;	UA_SecureChannelState	)],
-  [qw(	enum	SESSIONSTATE		common;	UA_SessionState		)],
+  [qw(	enum	MESSAGESECURITYMODE	types_generated	)],
+  [qw(	enum	SECURECHANNELSTATE	common		)],
+  [qw(	enum	SESSIONSTATE		common		)],
   [qw(	enum	NODEIDTYPE		types		)],
   # Type numbers depend on open62541 compile time options.  We cannot
   # put them into Contant.pm as this file is commited into the source
@@ -224,28 +225,6 @@ EOFOOTER
 sub print_permanent {
     my ($pf) = @_;
     print $pf <<'EOPERMANENT';
-CLIENTSTATE DISCONNECTED
-CLIENTSTATE WAITING_FOR_ACK
-CLIENTSTATE CONNECTED
-CLIENTSTATE SECURECHANNEL
-CLIENTSTATE SESSION
-CLIENTSTATE SESSION_DISCONNECTED
-CLIENTSTATE SESSION_RENEWED
-SECURECHANNELSTATE FRESH
-SECURECHANNELSTATE HEL_SENT
-SECURECHANNELSTATE HEL_RECEIVED
-SECURECHANNELSTATE ACK_SENT
-SECURECHANNELSTATE ACK_RECEIVED
-SECURECHANNELSTATE OPN_SENT
-SECURECHANNELSTATE OPEN
-SECURECHANNELSTATE CLOSING
-SECURECHANNELSTATE CLOSED
-SESSIONSTATE CLOSED
-SESSIONSTATE CREATE_REQUESTED
-SESSIONSTATE CREATED
-SESSIONSTATE ACTIVATE_REQUESTED
-SESSIONSTATE ACTIVATED
-SESSIONSTATE CLOSING
 EOPERMANENT
 }
 

@@ -1,7 +1,7 @@
 package Dancer::Continuation::Route::ErrorSent;
 our $AUTHORITY = 'cpan:SUKRIA';
 # ABSTRACT: Internal Dancer exception class
-$Dancer::Continuation::Route::ErrorSent::VERSION = '1.3520';
+$Dancer::Continuation::Route::ErrorSent::VERSION = '1.3521';
 use strict;
 use warnings;
 use Carp;
@@ -22,7 +22,7 @@ Dancer::Continuation::Route::ErrorSent - Internal Dancer exception class
 
 =head1 VERSION
 
-version 1.3520
+version 1.3521
 
 =head1 AUTHOR
 

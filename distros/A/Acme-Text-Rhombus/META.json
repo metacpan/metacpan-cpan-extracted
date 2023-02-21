@@ -14,11 +14,6 @@
    },
    "name" : "Acme-Text-Rhombus",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Test::More" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
             "Module::Build" : "0.42"
@@ -28,12 +23,17 @@
          "requires" : {
             "Exporter" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
       }
    },
    "provides" : {
       "Acme::Text::Rhombus" : {
          "file" : "lib/Acme/Text/Rhombus.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       }
    },
    "release_status" : "stable",
@@ -45,6 +45,6 @@
          "url" : "https://github.com/stsc/Acme-Text-Rhombus"
       }
    },
-   "version" : "0.24",
+   "version" : "0.25",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

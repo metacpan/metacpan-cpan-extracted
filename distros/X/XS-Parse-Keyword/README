@@ -443,6 +443,19 @@ PIECES AND PIECE TYPES
     The _OPT-suffixed version is optional; if no version string is found
     then sv is set to NULL.
 
+ XPK_LEXVAR
+
+    atomic, emits padix.
+
+       XPK_LEXVAR(kind)
+
+    A lexical variable name is expected and looked up from the current pad.
+    The resulting pad index is passed in the padix field. No error happens
+    if the variable is not found; the value NOT_IN_PAD is passed instead.
+
+    The kind argument specifies what kinds of variable are permitted, as
+    per XPK_LEXVARNAME.
+
  XPK_LEXVAR_MY
 
     atomic, emits padix.
@@ -695,6 +708,21 @@ PIECES AND PIECE TYPES
 
     This is a convenient shortcut to nesting the scope within a
     XPK_OPTIONAL macro.
+
+ XPK_..._pieces
+
+       XPK_SEQUENCE_pieces(ptr)
+       XPK_OPTIONAL_pieces(ptr)
+       ...
+
+    For each of the XPK_... macros that takes a variable-length list of
+    pieces, there is a variant whose name ends with ..._pieces, taking a
+    single pointer argument directly. This must point at a const
+    XSParseKeywordPieceType [] array whose final element is the zero
+    element.
+
+    Normally hand-written C code of a fixed grammar would be unlikely to
+    use these forms, but they may be useful in dynamically-generated cases.
 
 AUTHOR
 

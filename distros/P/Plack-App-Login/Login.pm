@@ -14,7 +14,7 @@ use Tags::HTML::Page::End;
 use Tags::Output::Raw;
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 sub call {
 	my ($self, $env) = @_;
@@ -67,6 +67,16 @@ sub prepare_app {
 		$self->login_title('LOGIN');
 	}
 
+	# Tags helper for begin of page.
+	$self->{'_page_begin'} = Tags::HTML::Page::Begin->new(
+		'css' => $self->css,
+		'generator' => $self->generator,
+		'lang' => {
+			'title' => $self->title,
+		},
+		'tags' => $self->tags,
+	);
+
 	# Tags helper for login button.
 	$self->{'_login_button'} = Tags::HTML::Login::Button->new(
 		'css' => $self->css,
@@ -81,6 +91,7 @@ sub prepare_app {
 sub _css {
 	my $self = shift;
 
+	$self->{'_page_begin'}->process_css;
 	$self->{'_login_button'}->process_css;
 
 	return;
@@ -91,14 +102,7 @@ sub _tags {
 
 	$self->_css;
 
-	Tags::HTML::Page::Begin->new(
-		'css' => $self->css,
-		'generator' => $self->generator,
-		'lang' => {
-			'title' => $self->title,
-		},
-		'tags' => $self->tags,
-	)->process;
+	$self->{'_page_begin'}->process;
 	$self->{'_login_button'}->process;
 	Tags::HTML::Page::End->new(
 		'tags' => $self->tags,
@@ -224,12 +228,16 @@ Returns Plack::Component object.
  #   <head>
  #     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
  #     <meta charset="UTF-8" />
- #     <meta name="generator" content=
- #       "Perl module: Tags::HTML::Page::Begin, Version: 0.08" />
+ #     <meta name="generator" content="Plack::App::Login; Version: 0.07" />
  #     <title>
  #       Login page
  #     </title>
  #     <style type="text/css">
+ # * {
+ #         box-sizing: border-box;
+ #         margin: 0;
+ #         padding: 0;
+ # }
  # .outer {
  #         position: fixed;
  #         top: 50%;
@@ -281,12 +289,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2022 Michal Josef Špaček
+© 2020-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

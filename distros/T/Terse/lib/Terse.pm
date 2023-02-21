@@ -1,21 +1,22 @@
 package Terse;
-our $VERSION = '0.1234';
+our $VERSION = '0.123456789';
 use 5.006;
 use strict;
 use warnings;
 no warnings 'redefine';
 use Plack::Request;
 use Plack::Response;
-use JSON;
+use Cpanel::JSON::XS;
 use Scalar::Util qw/reftype/;
 use Time::HiRes qw(gettimeofday);
 use Terse::WebSocket;
 use Want qw/want/;
 use Digest::SHA;
+use Struct::WOP qw/all/ => { type => ['UTF-8'], destruct => 1 };
 
 our ($JSON, %PRIVATE);
 BEGIN {
-	$JSON = JSON->new->utf8->canonical(1)->allow_blessed->convert_blessed;
+	$JSON = Cpanel::JSON::XS->new->utf8->canonical(1)->allow_blessed->convert_blessed;
 	%PRIVATE = (
 		map { $_ => 1 } 
 		qw/new run logger logInfo logError websocket delayed_response build_terse content_type raiseError graft pretty serialize DESTROY TO_JSON AUTOLOAD to_app/
@@ -52,6 +53,7 @@ sub run {
 		websocket_class => 'Terse::WebSocket',
 		sock => 'psgix.io',
 		stream_check => 'psgi.streaming',
+		favicon => 'favicon.ico',
 		%args
 	);
 
@@ -63,6 +65,14 @@ sub run {
 		error => \0,
 		errors => [],
 	);
+	
+	if ($j->request->env->{PATH_INFO} =~ m/favicon.ico$/) {
+		return [500, [], []] unless -f $j->_favicon;
+		open my $fh, '<', $j->_favicon;
+		my $favicon = do { local $/; <$fh> };
+		close $fh;
+		return [200, ['Content-Type', 'image/vnd.microsoft.icon'], [$favicon] ];
+	}
 
 	my $content_type = $j->request->content_type;
 	if ($content_type && $content_type =~ m/application\/json/) {
@@ -95,7 +105,7 @@ sub run {
 	};
 
 	my $auth = $j->{_auth};
-	
+
 	my ($session) = $j->_dispatch($auth, $pkg->new());
 	
 	my $req = $j->params->req;
@@ -197,6 +207,11 @@ sub raiseError {
 sub graft {
 	my ($self, $name, $json) = @_;
 
+	unless ($json =~ m/[\{\[]/) {
+		$self->{$name} = $json;
+		return $self->{$name};
+	}
+
 	$self->{$name} = eval {
 		$JSON->decode($json);
 	};
@@ -212,7 +227,7 @@ sub serialize {
 	my ($self, $die) = @_;
 	my $pretty = !!(reftype $self eq 'HASH' && $self->{_pretty});
 	my $out = eval {
-		$JSON->pretty($pretty)->encode($self);
+		$JSON->pretty($pretty)->encode(maybe_decode($self));
 	};
 	die $@ if ($@ && $die);
 	return $out || $@;
@@ -337,7 +352,9 @@ sub _bless_tree {
 
 sub TO_JSON {
 	my $self = shift;
-	return [@$self] if reftype $self eq 'ARRAY';
+	my $ref = reftype $self;
+	return $self unless $ref && $ref =~ m/ARRAY|HASH/;
+	return [@$self] if $ref eq 'ARRAY';
 	return 'cannot stringify application object' if $self->{_application};
 	my $output = {};
 	my $nodebug = ! $self->{_debug};
@@ -379,7 +396,7 @@ Terse - Lightweight Web Framework
 
 =head1 VERSION
 
-Version 0.1234
+Version 0.123456789
 
 =cut
 

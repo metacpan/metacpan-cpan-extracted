@@ -20,7 +20,7 @@ use 5.018;  # lexical_subs
 use feature qw(say state lexical_subs);
 use feature 'lexical_subs'; no warnings "experimental::lexical_subs";
 package  Data::Dumper::Interp;
-$Data::Dumper::Interp::VERSION = '4.114';
+$Data::Dumper::Interp::VERSION = '5.002';
 
 package  # newline prevents Dist::Zilla::Plugin::PkgVersion from adding $VERSION
   DB;
@@ -86,7 +86,7 @@ our @EXPORT    = qw(visnew
                     visq avisq alvisq ivisq dvisq hvisq hlvisq
                     u quotekey qsh __forceqsh qshpath);
 
-our @EXPORT_OK = qw($Debug $MaxStringwidth $Truncsuffix $Overloads $Foldwidth
+our @EXPORT_OK = qw($Debug $MaxStringwidth $Truncsuffix $Objects $Foldwidth
                     $Useqq $Quotekeys $Sortkeys $Sparseseen
                     $Maxdepth $Maxrecurse $Deparse);
 
@@ -131,7 +131,7 @@ sub qshpath(_) {  # like qsh but does not quote initial ~ or ~username
 
 #################### Configuration Globals #################
 
-our ($Debug, $MaxStringwidth, $Truncsuffix, $Overloads,
+our ($Debug, $MaxStringwidth, $Truncsuffix, $Objects,
      $Foldwidth, $Foldwidth1,
      $Useqq, $Quotekeys, $Sortkeys, $Sparseseen,
      $Maxdepth, $Maxrecurse, $Deparse);
@@ -139,7 +139,7 @@ our ($Debug, $MaxStringwidth, $Truncsuffix, $Overloads,
 $Debug          = 0            unless defined $Debug;
 $MaxStringwidth = 0            unless defined $MaxStringwidth;
 $Truncsuffix    = "..."        unless defined $Truncsuffix;
-$Overloads      = 1            unless defined $Overloads;
+$Objects        = 1            unless defined $Objects;
 $Foldwidth      = undef        unless defined $Foldwidth;  # undef auto-detects
 $Foldwidth1     = undef        unless defined $Foldwidth1; # override for 1st
 
@@ -166,9 +166,16 @@ sub Truncsuffix {
   my($s, $v) = @_;
   @_ == 2 ? (($s->{Truncsuffix} = $v), return $s) : $s->{Truncsuffix};
 }
-sub Overloads {
+sub Objects {
   my($s, $v) = @_;
-  @_ == 2 ? (($s->{Overloads} = $v), return $s) : $s->{Overloads};
+  @_ == 2 ? (($s->{Objects} = $v), return $s) : $s->{Objects};
+}
+sub Overloads {
+  state $warned;
+  carp "WARNING: 'Overloads' is deprecated, please use 'Objects'\n"
+    unless $warned++;
+  my($s, $v) = @_;
+  goto &Objects;
 }
 sub Foldwidth {
   my($s, $v) = @_;
@@ -203,6 +210,7 @@ sub _vistype {
 #
 # Global variabls in Data::Dumper::Interp are provided for all config options
 # which users may change on Data::Dumper::Interp objects.
+our $initialbang = 999; ###TEMP DEBUG
 sub new {
   croak "No args are allowed for ".__PACKAGE__."::new" if @_ > 1;
   my ($class) = @_;
@@ -210,7 +218,7 @@ sub new {
   
   ###TEMP DEBUGGING
   # Try to catch FreeBSD bug where $! changes somewhere
-  my $initialbang = $!+0;
+  $initialbang = $!+0;
   my $r = (bless $class->SUPER::new([],[]), $class)->_config_defaults();
   Carp::confess blessed($r),"::new(...) changed \$! unexpectedly (was $initialbang, now ",$!+0
     if $! != $initialbang;
@@ -278,7 +286,7 @@ sub _config_defaults {
     ->MaxStringwidth($MaxStringwidth)
     ->Foldwidth($Foldwidth)
     ->Foldwidth1($Foldwidth1)
-    ->Overloads($Overloads)
+    ->Objects($Objects)
     ->Truncsuffix($Truncsuffix)
     ->Quotekeys($Quotekeys)
     ->Maxdepth($Maxdepth)
@@ -329,7 +337,7 @@ sub __COPY_NEEDED() { $COPY_NEEDED }
 
 sub _doedits {
   my $self = shift; oops unless @_ == 5;
-  my ($item, $testonly, $maxstringwidth, $truncsuf, $overloads) = @_;
+  my ($item, $testonly, $maxstringwidth, $truncsuf, $objects) = @_;
   return undef
     unless defined($item);
   if ($maxstringwidth) {
@@ -342,47 +350,61 @@ sub _doedits {
     }
   }
   my $overload_depth;
-  while (overload::Overloaded($item) && ref($item)) {
-    # N.B. Overloaded(...) also returns true if it's a NAME of an overloaded package
-    my $class = blessed($item) // oops; # overloaded ref is not blessed !?
+  while (my $class = blessed($item)) {
+    # Some kind of object reference
     last unless any { ref() eq "Regexp" ? $class =~ $_
                                         : ($_ eq "1" || $_ eq $class) 
-                    } @$overloads;
-    warn("Recursive overloads on $item ?\n"),last
-      if $overload_depth++ > 10;
-    # Stringify objects which have the stringification operator
-    if (overload::Method($class,'""')) {
-      return __COPY_NEEDED if $testonly;
-      my $prefix = _show_as_number($item) ? $magic_num_prefix : "";
-      $item = $item.""; # stringify;
-      if ($item !~ /^${class}=REF/) {
-        $item = "${prefix}($class)$item"; 
-      } else {
-        # The "stringification" looks like Perl's default, so don't prefix it
+                    } @$objects;
+    if (overload::Overloaded($item)) {
+      # N.B. Overloaded(...) also returns true if it's a NAME of an 
+      # overloaded package; should not happen in this case.
+      warn("Recursive overloads on $item ?\n"),last
+        if $overload_depth++ > 10;
+      # Stringify objects which have the stringification operator
+      if (overload::Method($class,'""')) {
+        return __COPY_NEEDED if $testonly;
+        my $prefix = _show_as_number($item) ? $magic_num_prefix : "";
+        $item = $item.""; # stringify;
+        if ($item !~ /^${class}=REF/) {
+          $item = "${prefix}($class)$item"; 
+        } else {
+          # The "stringification" looks like Perl's default, so don't prefix it
+        }
+        next
+      }
+      # Substitute the virtual value behind an overloaded deref operator
+      elsif (overload::Method($class,'@{}')) {
+        return __COPY_NEEDED if $testonly;
+        $item = \@{ $item };
+        next
+      }
+      elsif (overload::Method($class,'%{}')) {
+        return __COPY_NEEDED if $testonly;
+        $item = \%{ $item };
+        next
+      }
+      elsif (overload::Method($class,'${}')) {
+        return __COPY_NEEDED if $testonly;
+        $item = \${ $item };
+        next
+      }
+      elsif (overload::Method($class,'&{}')) {
+        return __COPY_NEEDED if $testonly;
+        $item = \&{ $item };
+        next
+      }
+      elsif (overload::Method($class,'*{}')) {
+        return __COPY_NEEDED if $testonly;
+        $item = \*{ $item };
+        next
       }
     }
-    # Substitute the virtual value behind an overloaded deref operator
-    elsif (overload::Method($class,'@{}')) {
+    # No overloaded operator (that we care about); just stringify the ref
+    unless ($class eq "Regexp") {  # unless Perl will handle it nicely
       return __COPY_NEEDED if $testonly;
-      $item = \@{ $item };
-    }
-    elsif (overload::Method($class,'%{}')) {
-      return __COPY_NEEDED if $testonly;
-      $item = \%{ $item };
-    }
-    elsif (overload::Method($class,'${}')) {
-      return __COPY_NEEDED if $testonly;
-      $item = \${ $item };
-    }
-    elsif (overload::Method($class,'&{}')) {
-      return __COPY_NEEDED if $testonly;
-      $item = \&{ $item };
-    }
-    elsif (overload::Method($class,'*{}')) {
-      return __COPY_NEEDED if $testonly;
-      $item = \*{ $item };
-    }
-    else { last; }  # nothing we care about
+      $item = "$item"
+    } 
+    last
   }
   # Prepend a "magic prefix" (later removed) to items which Data::Dumper is
   # likely to represent wrongly or anyway not how we want:
@@ -417,8 +439,8 @@ sub Dump {
     croak "extraneous args" if @_ != 1;
   }
 
-  my ($maxstringwidth, $overloads, $debug)
-    = @$self{qw/MaxStringwidth Overloads Debug/};
+  my ($maxstringwidth, $objects, $debug)
+    = @$self{qw/MaxStringwidth Objects Debug/};
 
   # Do desired substitutions in a copy of the data.
   #
@@ -434,10 +456,10 @@ sub Dump {
     $maxstringwidth //= 0;
     $maxstringwidth = 0 if $maxstringwidth >= INT_MAX;
     my $truncsuf = $self->{Truncsuffix};
-    $overloads = [ $overloads ] unless ref($overloads) eq 'ARRAY';
-    $overloads = undef unless grep{ $_ } @$overloads; # all false?
+    $objects = [ $objects ] unless ref($objects) eq 'ARRAY';
+    $objects = undef unless grep{ $_ } @$objects; # all false?
     my $callback = sub { 
-      $self->_doedits(@_, $maxstringwidth, $truncsuf, $overloads) 
+      $self->_doedits(@_, $maxstringwidth, $truncsuf, $objects) 
     };
     eval { 
       $values[0] = __copysubst($values[0], $callback)
@@ -1061,10 +1083,21 @@ sub _Interpolate {
   my ($self, $input, $i_or_d) = @_;
   return "<undef arg>" if ! defined $input;
 
+###TEMP DEBUGGING
+# Try to catch FreeBSD bug where $! changes somewhere
+$initialbang = $!+0;
+  
   &_SaveAndResetPunct;
 
+#say "###III1 ",_dbvis($save_stack[-1]);
+#say "###III2 ",_dbvis($initialbang);
+oops unless $save_stack[-1]->[1] == $initialbang;
+oops unless $!+0 == $initialbang;
+
   my $debug = $self->Debug;
+oops unless $!+0 == $initialbang;
   my $useqq = $self->Useqq;
+oops unless $!+0 == $initialbang;
 
   my $q = $useqq ? "" : "q";
   my $funcname = $i_or_d . "vis" .$q;
@@ -1165,6 +1198,7 @@ sub _Interpolate {
       $_->[0] = 'e';
     }
   } #local $_
+oops unless $!+0 == $Data::Dumper::Interp::initialbang;
 
   @_ = ($self, $funcname, \@pieces);
   goto &DB::DB_Vis_Interpolate
@@ -1183,6 +1217,7 @@ package
 sub DB_Vis_Interpolate {
   my ($self, $funcname, $pieces) = @_;
   #say "###Vis pieces=",Data::Dumper::Interp::_dbvis($pieces);
+Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
   my $result = "";
   foreach my $p (@$pieces) {
     my ($methname, $arg) = @$p;
@@ -1190,7 +1225,9 @@ sub DB_Vis_Interpolate {
       $result .= $arg;
     }
     elsif ($methname eq 'e') {
+Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
       $result .= DB::DB_Vis_Eval($funcname, $arg);
+Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
     } else {
       # Reduce indent before first wrap to account for stuff alrady there
       my $leftwid = length($result) - rindex($result,"\n") - 1;
@@ -1199,11 +1236,15 @@ sub DB_Vis_Interpolate {
       if ($foldwidth) {
         $self->{Foldwidth1} -= $leftwid if $leftwid < $self->{Foldwidth1}
       }
+Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
       $result .= $self->$methname( DB::DB_Vis_Eval($funcname, $arg) );
+Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
     }
   }
 
+Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
   &Data::Dumper::Interp::_RestorePunct;  # saved in _Interpolate
+Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
   $result
 }# DB_Vis_Interpolate
 
@@ -1218,37 +1259,50 @@ sub DB_Vis_Eval($$) {
   # Find the closest non-DB caller.  The eval will be done in that package.
   # Find the next caller further up which has arguments (i.e. wasn't doing
   # "&subname;"), and make @_ contain those arguments.
+Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
   my ($distance, $pkg, $fname, $lno);
   for ($distance = 0 ; ; $distance++) {
     ($pkg, $fname, $lno) = caller($distance);
     last if $pkg ne "DB";
   }
+Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
+  local *_ = [];
   while() {
     $distance++;
     my ($p, $hasargs) = (caller($distance))[0,4];
     if (! defined $p){
-      @DB::args = ('<@_ is not defined in the outer block>');
+      *_ = [ '<@_ is not defined in the outer block>' ];
       last
     }
-    last if $hasargs;
+    if ($hasargs) {
+      *_ = [ @DB::args ];  # copy in case of recursion
+      last
+    }
   }
-  local *_ = [ @DB::args ];  # copy in case of recursion
 
+Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
   &Data::Dumper::Interp::_RestorePunct;  # saved in _Interpolate
+Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
   $Data::Dumper::Interp::user_dollarat = $@; # 'eval' will reset $@
+  $Data::Dumper::Interp::user_bang = $!;     # not sure why this might be changed(!?!)
   my @result = do {
     local @Data::Dumper::Interp::result;
     local $Data::Dumper::Interp::string_to_eval =
       "package $pkg; "
      .' $@ = $Data::Dumper::Interp::user_dollarat; '
+     .' $! = $Data::Dumper::Interp::user_bang; '
      .' @Data::Dumper::Interp::result = '.$evalarg.';'
      .' $Data::Dumper::Interp::user_dollarat = $@; '  # possibly changed by a tie handler
      ;
+Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
      &DB_Vis_Evalwrapper;
+Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
      @Data::Dumper::Interp::result
   };
   my $errmsg = $@;
+Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
   &Data::Dumper::Interp::_SaveAndResetPunct;
+Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
   $Data::Dumper::Interp::save_stack[-1]->[0] = $Data::Dumper::Interp::user_dollarat;
 
   if ($errmsg) {
@@ -1256,6 +1310,7 @@ sub DB_Vis_Eval($$) {
     Carp::croak("${label_for_errmsg}: Error interpolating '$evalarg':\n$errmsg\n");
   }
 
+Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
   wantarray ? @result : (do{die "bug" if @result>1}, $result[0])
 }# DB_Vis_Eval
 
@@ -1268,7 +1323,7 @@ sub DB_Vis_Eval($$) {
 
 =head1 NAME
 
-Data::Dumper::Interp - interpolate Data::Dumper output into strings, with human-oriented options
+Data::Dumper::Interp - interpolate Data::Dumper output into strings for human consumption
 
 =head1 SYNOPSIS
 
@@ -1303,6 +1358,11 @@ Data::Dumper::Interp - interpolate Data::Dumper output into strings, with human-
     my $struct = { debt => 999_999_999_999_999_999.02 };
     say vis $struct;
       # --> {debt => (Math::BigFloat)999999999999999999.02}
+
+    # But if you do want to see object internals
+    say visnew->Objects(0)->vis($struct); 
+    { local $Data::Dumper::Interp::Objects=0; say vis $struct; } #another way
+      # --> {debt => bless({...lots of stuff...},'Math::BigInt')}
   }
 
   # Wide characters are readable
@@ -1330,13 +1390,12 @@ Data::Dumper::Interp - interpolate Data::Dumper output into strings, with human-
 
 =head1 DESCRIPTION
 
-This Data::Dumper wrapper optimizes for human consumption and avoids side-effects.
+This Data::Dumper wrapper optimizes output for human consumption 
+and avoids side-effects which interfere with debugging.
 
 The namesake feature is interpolating Data::Dumper output 
 into strings, but simple functions are also provided
 to visualize a scalar, array, or hash.
-
-Diagnostic and debug messages are primary use cases.
 
 Internally, Data::Dumper is called to visualize (i.e. format) data
 with pre- and post-processing to "improve" the results:
@@ -1348,7 +1407,7 @@ otherwise folded at your terminal width), WITHOUT a trailing newline.
 
 =item * Printable Unicode characters appear as themselves.
 
-=item * Objects like Math:BigInt are stringified
+=item * Object internals are not shown; Math:BigInt etc. are stringified.
 
 =item * "virtual" values behind overloaded array/hash-deref operators are shown
 
@@ -1461,10 +1520,8 @@ return the same string as
 
 These work the same way as variables/methods in Data::Dumper.
 
-For each configuration value, there is a global
-variable in package C<Data::Dumper::Interp> which provides the default,
-and a I<method> of the same name which sets or retrieves a config value
-on a specific object.
+Each configuration method has a corresponding global variable
+in package C<Data::Dumper::Interp> which provides the default.
 
 When a method is called without arguments the current value is returned.
 
@@ -1482,22 +1539,30 @@ MaxStringwidth=0 (the default) means no limit.
 
 Defaults to the terminal width at the time of first use.
 
-=head2 Overloads(BOOL);
+=head2 Objects(BOOL);
 
-=head2 Overloads("classname")
+=head2 Objects("classname")
 
-=head2 Overloads([ list of classnames ])
+=head2 Objects([ list of classnames ])
 
-A I<false> value disables stringification or evaluation of overloaded
-deref operators.
+A I<false> value disables special handling of objects
+and internals are shown as with Data::Dumper.
 
 A "1" (the default) enables for all objects, otherwise only 
 for the specified class name(s).
 
-If enabled, then objects are checked for an overloaded stringification
-('""') operator, or array-, hash-, scalar-, or glob- deref operators,
-in that order.  The first overloaded operator found will be evaluated and 
-the object ref replaced by the result.  The check is then repeated.
+When enabled, object internals are never shown.  
+If the stringification ('""') operator, 
+or array-, hash-, scalar-, or glob- deref operators are overloaded,
+then the first overloaded operator found will be evaluated and the
+object replaced by the result, and the check repeated; otherwise
+the I<ref> is stringified in the usual way, so something
+like "Foo::Bar=HASH(0xabcd1234)" appears.
+
+Beginning with version 5.000 the B<deprecated> C<Overloads> method
+is an alias for C<Objects>.
+
+=for Pod::Coverage Overloads
 
 =head2 Sortkeys(subref)
 
@@ -1651,13 +1716,13 @@ the "_" filehandle will not change across calls.
 =head1 DIFFERENCES FROM Data::Dumper
 
 Results differ from plain C<Data::Dumper> output in the following ways
-(most substitutions can be disabled via Config options):
+(most substitutions can be disabled via Config options): 
 
 =over 2
 
 =item *
 
-A final newline I<never> included.
+A final newline is I<never> included.
 
 Everything is shown on a single line if possible, otherwise wrapped to
 your terminal width (or C<$Foldwidth>) with indentation 
@@ -1667,14 +1732,14 @@ appropriate to structure levels.
 
 Printable Unicode characters appear as themselves instead of \x{ABCD}.
 
-Note: If your data contains 'wide characters', you must encode
-the result before displaying it as explained in C<perluniintro>,
-for example with C<< use open IO => ':locale'; >>.  
+Note: If your data contains 'wide characters', you should
+C<< use open IO => ':locale'; >> or otherwise arrange to
+encode the output for your terminal.
 You'll also want C<< use utf8; >> if your Perl source
 contains characters outside the ASCII range.
 
 Undecoded binary octets (e.g. data read from a 'binmode' file)
-will be escaped as individual bytes when necessary.
+will still be escaped as individual bytes when necessary.
 
 =item *
 
@@ -1682,14 +1747,14 @@ will be escaped as individual bytes when necessary.
 
 =item *
 
-Object refs are replaced by the object's stringified representation.
-For example, C<bignum> and C<bigrat> numbers are shown as easily
+The internals of objects are not shown.
+
+If stringifcation is overloaded it is used to obtain the object's
+representation.  For example, C<bignum> and C<bigrat> numbers are shown as easily
 readable values rather than S<"bless( {...}, 'Math::...')">.
 
 Stingified objects are prefixed with "(classname)" to make clear what
 happened.
-
-=item *
 
 The "virtual" value of objects which overload a dereference operator 
 (C<@{}> or C<%{}>) is displayed instead of the object's internals.
@@ -1722,14 +1787,14 @@ Jim Avera  (jim.avera AT gmail)
 
 =for nobody Foldwidth1 is currently an undocumented experimental method
 =for nobody which sets a different fold width for the first line only.
+=for nobody 
 =for nobody Terse & Indent methods exist to croak; using them is not allowed.
 =for nobody oops is an internal function (called to die if bug detected).
-=for nobody Debug method is for author's debugging, not documented.
+=for nobody The Debug method is for author's debugging, and not documented.
 =for nobody BLK_* CLOSER FLAGS_MASK NOOP OPENER are internal "constants".
 
 =for Pod::Coverage Foldwidth1 Terse Indent oops Debug
 
 =for Pod::Coverage BLK_CANTSPACE BLK_TRIPLE BLK_FOLDEDBACK BLK_HASCHILD BLK_MASK CLOSER FLAGS_MASK NOOP OPENER
-
 
 =cut

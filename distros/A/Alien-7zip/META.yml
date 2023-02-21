@@ -34,7 +34,7 @@ no_index:
 provides:
   Alien::7zip:
     file: lib/Alien/7zip.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Alien::Base: '0.038'
   base: '0'
@@ -45,7 +45,7 @@ resources:
   IRC: irc://irc.perl.org/#native
   homepage: https://github.com/PerlAlien/Alien-7zip
   repository: https://github.com/PerlAlien/Alien-7zip.git
-version: '0.02'
+version: '0.03'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:

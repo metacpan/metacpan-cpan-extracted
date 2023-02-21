@@ -1,3 +1,9 @@
+0.005   2022-11-30  Released-By: PERLANCAR; Urgency: medium
+
+        - Add bench_include_by_default property in list entry to
+          participant.
+
+
 0.004   2021-09-06  Released-By: PERLANCAR; Urgency: medium
 
 	- Don't add participants that do not have code.

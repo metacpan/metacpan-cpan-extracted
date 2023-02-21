@@ -538,6 +538,27 @@ METHODS
     hash, careful to preserve all the formatting tags from the original
     template string.
 
+ match_extents
+
+       @extents = $st->match_extents( $regexp )
+
+    Since version 0.20.
+
+    Returns a list of extent objects for every non-overlapping match of the
+    given $regexp. This is similar to "matches", except that the results
+    are returned as extent objects instead of substrings, allowing access
+    to the position information as well.
+
+    If using the result of this method to find regions of a string to
+    modify, remember that any length alterations will not update positions
+    in later extent objects. However, since the extents are non-overlapping
+    and in position order, this can be handled by iterating them in reverse
+    order so that the modifications done first are later in the string.
+
+       foreach my $e ( reverse $st->match_extents( $pattern ) ) {
+          $st->set_substr( $e->start, $e->length, $replacement );
+       }
+
  split
 
        @parts = $st->split( $regexp, $limit )

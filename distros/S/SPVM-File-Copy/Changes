@@ -1,0 +1,6 @@
+0.02 2023-02-14
+  [Prerequirement Changes]
+    * SPVM::IO 0.16+ is needed.
+0.01 2023-02-09
+  [Changes]
+    * First release.

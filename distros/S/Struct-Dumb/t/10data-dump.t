@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 BEGIN {
    plan skip_all => "No Data::Dump" unless eval { require Data::Dump; };

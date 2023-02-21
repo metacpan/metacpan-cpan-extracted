@@ -2,7 +2,7 @@ package BoardStreams::DBMigrations;
 
 use Mojo::Base -strict, -signatures;
 
-our $VERSION = "v0.0.32";
+our $VERSION = "v0.0.34";
 
 my $string = <<~'SQL';
     -- 1 up

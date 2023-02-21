@@ -2,9 +2,49 @@ NAME
     TableData::Chemistry::Element - Chemical elements
 
 VERSION
-    This document describes version 0.001 of TableData::Chemistry::Element
+    This document describes version 0.003 of TableData::Chemistry::Element
     (from Perl distribution TableData-Chemistry-Element), released on
-    2023-02-05.
+    2023-02-12.
+
+SYNOPSIS
+    To use from Perl code:
+
+     use TableData::Chemistry::Element;
+
+     my $td = TableData::Chemistry::Element->new;
+
+     # Iterate rows of the table
+     $td->each_row_arrayref(sub { my $row = shift; ... });
+     $td->each_row_hashref (sub { my $row = shift; ... });
+
+     # Get the list of column names
+     my @columns = $td->get_column_names;
+
+     # Get the number of rows
+     my $row_count = $td->get_row_count;
+
+    See also TableDataRole::Spec::Basic for other methods.
+
+    To use from command-line (using tabledata CLI):
+
+     # Display as ASCII table and view with pager
+     % tabledata Chemistry::Element --page
+
+     # Get number of rows
+     % tabledata --action count_rows Chemistry::Element
+
+    See the tabledata CLI's documentation for other available actions and
+    options.
+
+TABLEDATA STATISTICS
+     +-------------+-------+
+     | key         | value |
+     +-------------+-------+
+     | num_columns | 17    |
+     | num_rows    | 118   |
+     +-------------+-------+
+
+    The statistics is available in the %STATS package variable.
 
 HOMEPAGE
     Please visit the project's homepage at

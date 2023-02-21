@@ -4,10 +4,11 @@
 # related or neighboring rights to this document.  Attribution is requested
 # but not required.
 use strict; use warnings FATAL => 'all'; use utf8;
-use feature qw(say state);
+use feature qw(say state lexical_subs);
+no warnings qw(experimental::lexical_subs);
 
 package Spreadsheet::Edit::IO;
-$Spreadsheet::Edit::IO::VERSION = '2.102';
+$Spreadsheet::Edit::IO::VERSION = '3.003';
 # This module is derived from the old never-released Text:CSV::Spreadsheet
 
 use Exporter 'import';
@@ -15,6 +16,8 @@ our @EXPORT_OK = qw(@sane_CSV_read_options @sane_CSV_write_options
                     cx2let let2cx cxrx2sheetaddr convert_spreadsheet OpenAsCsv
                     sheetname_from_spec filepath_from_spec
                    );
+
+# TODO: Provide "known_attributes" function ala Text::CSV::known_attributes()
 
 use Carp;
 use File::Temp qw(tempfile tempdir);

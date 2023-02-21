@@ -3,7 +3,7 @@ use HTML::Blitz::pragma;
 use Exporter qw(import);
 use Carp qw(croak);
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 our @EXPORT_OK = qw(
     mk_doctype
@@ -71,13 +71,16 @@ fun _mk_attr($name, $value) {
 
 my %is_void = map +($_ => 1), qw(
     area
-    base br
+    base basefont bgsound br
     col
     embed
+    frame
     hr
     img input
+    keygen
     link
     meta
+    param
     source
     track
     wbr

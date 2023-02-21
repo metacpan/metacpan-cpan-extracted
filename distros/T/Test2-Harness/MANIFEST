@@ -194,6 +194,7 @@ t/integration/preload/lib/BBB.pm
 t/integration/preload/lib/Broken.pm
 t/integration/preload/lib/CCC.pm
 t/integration/preload/lib/FAST.pm
+t/integration/preload/lib/TestBadPreload.pm
 t/integration/preload/lib/TestPreload.pm
 t/integration/preload/lib/TestSimplePreload.pm
 t/integration/preload/no_preload.tx
@@ -328,6 +329,7 @@ t/yath_script/nested/scripts/yath
 t2/builder.t
 t2/caller.t
 t2/data.t
+t2/dollardot.t
 t2/ending.t
 t2/exception.t
 t2/findbin.t

@@ -20,6 +20,30 @@ use constant RANDOM_CMD =>
     '2d8S4rU0svlIoqpA01ntUV1w_NWiKZ8TvSbbhnmYkvLPCHhv8ccYxCLIXNlQcnVv';
 use constant CAN_MAN_MAN => run( COMMAND => [ qw{ man -w 1 man } ] ) || 0;
 
+# Check for https: support, since the modules are not prerequisites of
+# this one.
+my $have_https = do {
+    local $@ = undef;
+    eval {
+	check_install(
+	    module	=> 'IO::Socket::SSL',
+	    version	=> 1.42,
+	) && check_install(
+	    module	=> 'Net::SSLeay',
+	    version	=> 1.49,
+	);
+    };
+};
+
+$have_https
+    or diag <<'EOD';
+
+
+https: not available. You need IO::Socket::SSL 1.42 and Net::SSLeay
+1.49. Under this circumstance, diagnostics are normal.
+EOD
+
+
 # This mess is because if Devel::Hide or Test::Without::Module is
 # specified on the command line or in an enclosing file, a straight
 # 'use lib qw{ inc/Mock }' would trump it, and the mocked modules would
@@ -132,7 +156,7 @@ EOD
     $t->pod_file_ok( 't/data/pod_ok/no_links.pod' );
 
     @rslt = $t->pod_file_ok( 't/data/pod_ok/url_links.pod' );
-    is_deeply \@rslt, [ 0, 1, 0 ],
+    is_deeply \@rslt, [ 0, 1, $have_https ? 0 : 1 ],
 	'Test of t/data/pod_ok/url_links.pod returned proper data';
 
     SKIP: {
@@ -315,7 +339,7 @@ foreach my $skip_server_errors ( 0, 1 ) {
 	    $errors = $t->pod_file_ok( 't/data/not_ok/server_error.pod' );
 	}
 
-	cmp_ok $errors, '==', 1,
+	cmp_ok $errors, '==', $have_https ? 1 : 0,
 	    't/data/not_ok/server_error.pod error count with skip_server_errors false';
     }
 }
@@ -356,7 +380,7 @@ foreach (
 	    local $TODO = 'Deliberate failure';
 	    $errors = $t->pod_file_ok( 't/data/not_ok/redirect_no_path.pod' );
 	}
-	cmp_ok $errors, '==', 1,
+	cmp_ok $errors, '==', $have_https ? 1 : 0,
 	    "t/data/not_ok/redirect_no_path.pod error count with prohibit_redirect $name";
 
     } else {
@@ -375,7 +399,7 @@ if ( -d ( $ENV{GIT_DIR} || '.git' ) ) {
 	local $TODO = 'Deliberate failure';
 	$errors = $t->pod_file_ok( 't/data/not_ok/github_error.pod' );
     }
-    cmp_ok $errors, '==', 1,
+    cmp_ok $errors, '==', $have_https ? 1 : 0,
 	"t/data/not_ok/github_error.pod error count with IGNORE_GITHUB_MAYBE";
 } else {
     SKIP: {

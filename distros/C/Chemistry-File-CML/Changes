@@ -1,5 +1,8 @@
 Revision history for Perl extension Chemistry::File::CML.
 
+0.13  Fri Feb 10 2023
+        - Mark atoms without coordinates with an attribute.
+
 0.12  Mon Oct 10 2022
         - Adjusted to read a wider variety of CML files.
         - Prepared to read in some stereochemistry settings.

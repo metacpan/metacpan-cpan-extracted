@@ -1,0 +1,58 @@
+{
+   "abstract" : "scoped hook blocks that run extra code around C<await> expressions",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Future-AsyncAwait-Hooks",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Future::AsyncAwait::ExtensionBuilder" : "0.64",
+            "Module::Build" : "0.4004",
+            "XS::Parse::Keyword::Builder" : "0.13"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Future::AsyncAwait" : "0.64",
+            "perl" : "5.024"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Future" : "0",
+            "Future::AsyncAwait" : "0",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Future::AsyncAwait::Hooks" : {
+         "file" : "lib/Future/AsyncAwait/Hooks.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "x_IRC" : "irc://irc.perl.org/#io-async"
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

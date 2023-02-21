@@ -19,7 +19,7 @@ name: TableData-Chemistry-Element
 provides:
   TableData::Chemistry::Element:
     file: lib/TableData/Chemistry/Element.pm
-    version: '0.001'
+    version: '0.003'
 requires:
   Role::Tiny::With: '0'
   TableDataRole::Source::CSVInDATA: '0'
@@ -29,11 +29,15 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=TableData-Chemistry-Element
   homepage: https://metacpan.org/release/TableData-Chemistry-Element
   repository: git://github.com/perlancar/perl-TableData-Chemistry-Element.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::TableData
+      name: TableData
+      version: '0.002'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
@@ -332,6 +336,10 @@ x_Dist_Zilla:
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
               version: '0.082'
+            -
+              class: Pod::Weaver::Plugin::TableData
+              name: -TableData
+              version: '0.003'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -

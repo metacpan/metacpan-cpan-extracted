@@ -1,0 +1,49 @@
+use alienfile;
+
+plugin 'Probe::CommandLine' => (
+  command => 'go',
+  args    => [ 'version' ],
+  match   => qr/^go version go([0-9\.]+)\b/,
+  version => qr/^go version go([0-9\.]+)\b/,
+);
+
+share {
+  start_url 'https://go.dev/dl/';
+  my %os_mapping = (
+    'darwin'  => { name => 'darwin',  format => 'tar.gz' },
+    'linux'   => { name => 'linux',   format => 'tar.gz' },
+    'MSWin32' => { name => 'windows', format => 'zip'    },
+    'freebsd' => { name => 'freebsd', format => 'tar.gz' },
+  );
+  my %arch_mapping = (
+    'x86'     => '386',
+    'x86_64'  => 'amd64',
+    'aarch64' => 'arm64',
+
+    # => 'armv6l',
+    # => 'ppc64le',
+    # => 's390x'
+  );
+
+  my $os = $^O;
+  my $meta_arch = meta->prop->{platform}{cpu}{arch}{name};
+
+  my $match = qr{
+    ^
+    go([0-9\.]+)
+    \.
+    @{[ $os_mapping{$^O}{name} ]}
+    -
+    @{[ $arch_mapping{$meta_arch} ]}
+    \.
+    \Q@{[ $os_mapping{$^O}{format} ]}\E
+    $
+  }x;
+  plugin Download => (
+    filter  => $match,
+    version => $match,
+  );
+  plugin Extract => $os_mapping{$^O}{format};
+  plugin 'Build::Copy';
+  plugin 'Gather::IsolateDynamic';
+}

@@ -15,7 +15,6 @@ UA_Double				T_PACKED
 UA_StatusCode				T_PACKED
 UA_Guid					T_PACKED
 enum UA_NodeIdType			T_ENUM
-UA_ClientState				T_ENUM
 UA_SecureChannelState			T_ENUM
 UA_SessionState				T_ENUM
 UA_TimestampsToReturn			T_ENUM
@@ -27,6 +26,7 @@ OPCUA_Open62541_DataType		T_PACKED
 # struct with Perl callbacks converted from hash
 OPCUA_Open62541_GlobalNodeLifecycle	T_PACKED
 # these are used only as return value
+UA_ApplicationDescription		T_RETVAL_PACKED
 UA_BrowseResponse			T_RETVAL_PACKED
 UA_BrowseResult				T_RETVAL_PACKED
 UA_BuildInfo				T_RETVAL_PACKED
@@ -36,6 +36,7 @@ UA_CreateSubscriptionResponse		T_RETVAL_PACKED
 UA_DataValue				T_RETVAL_PACKED
 UA_DeleteMonitoredItemsResponse		T_RETVAL_PACKED
 UA_DeleteSubscriptionsResponse		T_RETVAL_PACKED
+UA_MessageSecurityMode			T_RETVAL_PACKED
 UA_ModifySubscriptionResponse		T_RETVAL_PACKED
 UA_MonitoredItemCreateRequest		T_RETVAL_PACKED
 UA_MonitoredItemCreateResult		T_RETVAL_PACKED
@@ -47,6 +48,7 @@ OPCUA_Open62541_Int32			T_PTROBJ_PACKED
 OPCUA_Open62541_UInt32			T_PTROBJ_PACKED
 OPCUA_Open62541_Double			T_PTROBJ_PACKED
 # conversions that allocate memory may need a mortal object destroyed later
+OPCUA_Open62541_ApplicationDescription		T_PTROBJ_PACKED
 OPCUA_Open62541_BrowseDescription		T_PTROBJ_PACKED
 OPCUA_Open62541_BrowseNextRequest		T_PTROBJ_PACKED
 OPCUA_Open62541_BrowseRequest			T_PTROBJ_PACKED
@@ -59,6 +61,7 @@ OPCUA_Open62541_DeleteMonitoredItemsRequest	T_PTROBJ_PACKED
 OPCUA_Open62541_DeleteSubscriptionsRequest	T_PTROBJ_PACKED
 OPCUA_Open62541_ExpandedNodeId			T_PTROBJ_PACKED
 OPCUA_Open62541_LocalizedText			T_PTROBJ_PACKED
+OPCUA_Open62541_MessageSecurityMode		T_PTROBJ_PACKED
 OPCUA_Open62541_ModifySubscriptionRequest	T_PTROBJ_PACKED
 OPCUA_Open62541_MonitoredItemCreateRequest	T_PTROBJ_PACKED
 OPCUA_Open62541_NodeClass			T_PTROBJ_PACKED

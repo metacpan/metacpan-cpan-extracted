@@ -1,0 +1,7 @@
+class TestCase::File::Glob {
+  use File::Glob;
+  static method test : int () {
+    
+    return 1;
+  }
+}

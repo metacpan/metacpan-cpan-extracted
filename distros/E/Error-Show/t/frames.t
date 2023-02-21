@@ -17,6 +17,7 @@ sub subc{
   my $i=0;
   while(my @frame=caller($i++)){
     push @frames, \@frame;
+    #say STDERR join ", ", @frame;
   }
   die {message=>"ouch", frames=>\@frames}
 }
@@ -31,14 +32,17 @@ sub suba {
 eval {
   suba;
 };
+
 my $result;
+
 if($@){
   $result=Error::Show::context message=>$@->{message}, frames=>$@->{frames};
 }
-ok $result =~ /24=>   subc/;
-ok $result =~ /27=>   subb/;
-ok $result =~ /32=>   suba/;
-ok $result =~ /31=> eval \{/;
+
+ok $result =~ /25=>   subc/;
+ok $result =~ /28=>   subb/;
+ok $result =~ /33=>   suba/;
+ok $result =~ /32=> eval \{/;
 #ok ($result =~ /(ouch)/g);
 
 my @a= $result =~ /ouch/g;

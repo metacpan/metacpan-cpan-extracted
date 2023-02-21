@@ -240,7 +240,7 @@ item_list_alloc(ItemList** list, int n)
 
 /*
 this codec throws all found images as frame numbers.
-currently only thumbnails, but if i get my hands on heics with depth images and the like, i'll add these here as well.
+currently only thumbnails, but if i get my hands on heics with depth images and the like, I'll add these here as well.
 if f ex we have a 2-frame heic where each frame has two thumbnails, Prima treats such file as this:
 
 frame 0 -> toplevel #0
@@ -286,6 +286,11 @@ open_load( PImgCodec instance, PImgLoadFileInstance fi)
 
 	if ( !( l-> ctx = heif_context_alloc()))
 		SET_ERROR("cannot create context");
+
+#if LIBHEIF_NUMERIC_VERSION > 0x10e0100
+	/* https://github.com/strukturag/libheif/pull/737 - multi-threading crashes sometimes */
+	heif_context_set_max_decoding_threads(l->ctx, 0);
+#endif
 
 	CALL heif_context_read_from_reader(l->ctx, &reader, fi->req, NULL);
 	CHECK_HEIF_ERROR;
@@ -625,7 +630,7 @@ save_defaults( PImgCodec c)
 	}
 
 	pset_i(is_primary, 0);
-	pset_c(quality, "50"); /* x265.quality and aom.quality defauilt values are 50 */
+	pset_c(quality, "50"); /* x265.quality and aom.quality default values are 50 */
 	pset_i(premultiplied_alpha, 0);
 	pset_i(thumbnail_of,    -1);
 	pset_sv(metadata,  newRV_noinc((SV*) newHV()));

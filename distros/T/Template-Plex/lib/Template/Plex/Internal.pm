@@ -1,6 +1,7 @@
 package Template::Plex::Internal;
 use strict;
 use warnings;
+use Error::Show;
 
 use Template::Plex;
 
@@ -95,6 +96,14 @@ $out.='
 	sub fill_slot {
 		$self->fill_slot(@_);
 	}
+	sub append_slot {
+		$self->append_slot(@_);
+	}
+
+	sub prepend_slot {
+		$self->prepend_slot(@_);
+	}
+
 	sub inherit {
 		$self->inherit(@_);
 	}
@@ -140,11 +149,10 @@ qq
 $_data_ 
 . '}
 .$self->postfix;
-
 		_PLEX_SKIP:
 		"";
-
 	}
+  ##__END
 };';
 
 };
@@ -168,29 +176,53 @@ sub _prepare_template{
 	my $prog=&Template::Plex::Internal::bootstrap;
  	my $ref=eval $prog;
 	if($@ and !$ref){
-		my $error=$@;
 
-		my $line=1;
-		my $start;
-		#my @lines=map { $start= $line if /##__START/;$line++ . $_."\n"; } split "\n", $prog;
-		my @lines=map { $start = $line if /##__START/; $line++;$_."\n" } split "\n", $prog;
-		$start+=2;
-		my @error_lines;
+    #####################################################
+    # use feature ":all";                               #
+    # say "START OF TEMPLATE=====";                     #
+    # my$i=0;                                           #
+    # say join "\n", map { $i++. $_} split /\n/, $prog; #
+    # say "END OF TEMPLATE=====";                       #
+    # say $@;                                           #
+    #####################################################
+    my $context=Error::Show::context error=>$@, program=>$prog,
+      start_mark=>'##__START',
+      end_mark=>'##__END',
+      start_offset=>2,
+      end_offset=>5,
+      limit=>1
+      ;
+    # Replace the sudo filename with the file name if we have one 
+    my $filename=$meta{file};
+    $context=~s/(\(eval \d+\))/$filename/g;
+    # Rethrow the exception, translated context line numbers
+		die $context;
 
-		$error=~s/line (\d+)/do{push @error_lines, $1;"line ".($1-$start)}/eg;
-		$error=~s/\(eval (\d+)\)/"(".$opts{file}.")"/eg;
-
-		my $min=min @error_lines;
-		my $max=$min;#max @error_lines;
-		#print  "max: $max\n";
-		$min-=5; $min=$start if $min<$start;
-		$max+=5; $max=$#lines-7 if $max>($#lines-7);
-		my $counter=$min-$start+1;
-		my $out=$error;
-		for ($min..$max){
-			$out.=$counter++."  ".$lines[$_];
-		}
-		croak $out;
+                #########################################################################################
+                # my $error=$@;                                                                         #
+                #                                                                                       #
+                # my $line=1;                                                                           #
+                # my $start;                                                                            #
+                # #my @lines=map { $start= $line if /##__START/;$line++ . $_."\n"; } split "\n", $prog; #
+                # my @lines=map { $start = $line if /##__START/; $line++;$_."\n" } split "\n", $prog;   #
+                # $start+=2;                                                                            #
+                # my @error_lines;                                                                      #
+                #                                                                                       #
+                # $error=~s/line (\d+)/do{push @error_lines, $1;"line ".($1-$start)}/eg;                #
+                # $error=~s/\(eval (\d+)\)/"(".$opts{file}.")"/eg;                                      #
+                #                                                                                       #
+                # my $min=min @error_lines;                                                             #
+                # my $max=$min;#max @error_lines;                                                       #
+                # #print  "max: $max\n";                                                                #
+                # $min-=5; $min=$start if $min<$start;                                                  #
+                # $max+=5; $max=$#lines-7 if $max>($#lines-7);                                          #
+                # my $counter=$min-$start+1;                                                            #
+                # my $out=$error;                                                                       #
+                # for ($min..$max){                                                                     #
+                #         $out.=$counter++."  ".$lines[$_];                                             #
+                # }                                                                                     #
+                # croak $out;                                                                           #
+                #########################################################################################
 	}
 	$plex->[Template::Plex::sub_]=$ref;
 	$plex;
@@ -229,7 +261,7 @@ sub _block_fix {
 	\my $buffer=\(shift);
 	#$buffer=~s/^\]\}$/]}/gms;
 	
-	$buffer=~s/^(\@\{\[.*?\]\})\n/$1/gms;
+	$buffer=~s/^(\s*\@\{\[.*?\]\})\n/$1/gms;
         ##############################################
         # while($buffer=~s/^\]\}\n/]}/gs){           #
         # }                                          #
@@ -238,6 +270,12 @@ sub _block_fix {
         ##############################################
 
 }
+
+sub _comment_strip {
+  \my $buffer=\(shift);
+  $buffer=~s/^\s*#.*?\n//gms;
+}
+
 
 sub _init_fix{
 	\my $buffer=\$_[0];
@@ -306,11 +344,14 @@ sub new{
 	$args//={};		#set to empty hash if not defined
 	
 	chomp $data unless $options{no_eof_chomp};
-	#Perform inject substitution
+	# Perform inject substitution
+  #
 	_subst_inject($data, root=>$root) unless $options{no_include};
-	#Perform suppurfluous EOL removal
+	# Perform superfluous EOL removal
+  #
 	_block_fix($data) unless $options{no_block_fix};
 	_init_fix($data) unless $options{no_init_fix};
+  _comment_strip($data) if $options{use_comments};
 	if($args){
 		#Only call this from top level call
 		#Returns the render sub

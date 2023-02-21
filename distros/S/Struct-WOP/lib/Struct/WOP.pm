@@ -7,15 +7,15 @@ use warnings;
 use Scalar::Util qw/reftype refaddr/;
 use Encode qw/decode encode/;
 
-our $VERSION = '0.12';
+our $VERSION = '0.20';
 our (%HELP, @MAYBE, $caller, $destruct);
 BEGIN {
 	%HELP = (
 		arrayref => sub { return map { $_[0]->($_, $_[2]) } @{ $_[1] } },
 		hashref => sub { $caller->can('filter_keys') && $caller->filter_keys($_[1]->{$_}, $_) and next or 
 			$destruct && do { $_[3]{$_[0]->($_)} = $_[0]->($_[1]->{$_}, $_[2]) } || do { $_[1]->{$_} = $_[0]->($_[1]->{$_}, $_[2]) } for keys %{ $_[1] }; $_[3]; },
-		scalarref => sub { ${$_[1]} =~ m/^[0-9.]+$/g ? $_[1] : do { ${$_[1]} =~ s/^(.*)$/$_[0]->(${$_[1]})/e; $_[1]; } && $destruct ? ${$_[1]} : $_[1]; }, 
-		scalar => sub { eval { $_[1] = $_[0]->($_, $_[1], Encode::FB_CROAK); 1; } and last foreach @MAYBE; $_[1]; }
+		scalarref => sub { ${$_[1]} =~ m/^(\d+(?:\.\d+)?)$/ ? $_[1] : do { ${$_[1]} =~ s/^(.*)$/$_[0]->(${$_[1]})/e; $_[1]; } && $destruct ? ${$_[1]} : $_[1]; }, 
+		scalar => sub { return undef unless defined $_[1]; eval { $_[1] = $_[0]->($_, $_[1], Encode::FB_CROAK); 1; } and last foreach @MAYBE; $_[1] =~ m/^((?!0\d)^\d+(?:\.\d+)?)$/ ? ($_[1] + 0) : $_[1]; }
 	);
 }
 
@@ -66,7 +66,7 @@ Struct::WOP - deeply encode/decode a struct
 
 =head1 VERSION
 
-Version 0.12
+Version 0.20
 
 =cut
 

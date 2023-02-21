@@ -1,0 +1,13 @@
+#!usr/bin/perl
+use ANSI::Palette qw/palette_8/;
+palette_8();
+__END__
+=head1 NAME
+  
+colour_palette_8 - CLA to print the 8 ansi colours.
+  
+=head1 USAGE
+  
+        lnation:High lnation$ colour_palette_8
+
+=cut

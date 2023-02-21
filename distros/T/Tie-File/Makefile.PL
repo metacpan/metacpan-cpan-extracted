@@ -15,9 +15,10 @@ WriteMakefile(
     DIR => [],
     META_MERGE  => {
         resources => {
-            license => 'http://dev.perl.org/licenses/',
-            bugtracker => 'https://github.com/toddr/Tie-File/issues',
-            repository => 'https://github.com/toddr/Tie-File',
+            license     => 'http://dev.perl.org/licenses/',
+            bugtracker  => 'https://github.com/Perl/perl5/issues',
+            repository  => 'https://github.com/Perl/perl5/tree/blead/dist/Tie-File',
+            MailingList => 'http://lists.perl.org/list/perl5-porters.html',
         },
     },
 );

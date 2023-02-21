@@ -1,0 +1,379 @@
+use alienfile;
+
+use Path::Tiny qw( path );
+use File::Copy::Recursive ();
+use IPC::Cmd ();
+use File::Spec ();
+use File::Find;
+use File::Which qw(which);
+use Sort::Versions qw(versioncmp);
+
+my $IS_UNIX = $^O ne 'MSWin32';
+
+# This currently requires the ability to link to Python for embedding.
+if( $IS_UNIX ) {
+  #plugin PkgConfig => 'python3-embed';
+}
+
+my $probe = 0;
+for my $command (qw(python3 python)) {
+  next unless which($command);
+  plugin 'Probe::CommandLine' => (
+    command   => $command,
+    args      => [ '--version' ],
+    version => qr/^Python (3\.[0-9\.]+)$/,
+    #secondary => $IS_UNIX,
+  );
+  $probe = 1;
+}
+
+unless( $probe ) {
+  probe sub { 'share' };
+}
+
+sub do_source {
+  start_url 'https://www.python.org/downloads/';
+  plugin Download => (
+    filter  => qr/^Python-3\..*\.tar\.xz$/,
+    version => qr/([0-9\.]+)/,
+  );
+  plugin Extract => 'tar.xz';
+  plugin 'Build::Autoconf';
+  build [
+    '%{configure} --enable-static --disable-shared',
+    '%{make}',
+    '%{make} install',
+  ];
+  after build => sub {
+    my($build) = @_;
+    $build->runtime_prop->{'style'} = 'source';
+    $build->runtime_prop->{command} = 'python3';
+  };
+  plugin 'Gather::IsolateDynamic';
+}
+
+sub do_binary_windows {
+  requires 'Alien::Build::CommandSequence';
+
+  start_url 'https://www.python.org/downloads/windows/';
+  my $arch_name = meta->prop->{platform}{cpu}{arch}{name};
+  my ($filter, $arch_id);
+  if( $arch_name eq 'x86' ) {
+    $filter = qr/python-([0-9\.]+)\.exe/;
+    $arch_id = 'win32';
+  } elsif( $arch_name eq 'x86_64' ) {
+    $filter = qr/python-([0-9\.]+)-amd64.exe/;
+    $arch_id = 'amd64';
+  } else {
+    die "Unknown architecture for Windows. Please file a bug report.";
+  }
+  plugin 'Download';
+  plugin 'Decode::Mojo';
+  download sub {
+    my ($build) = @_;
+
+    $build->log( "GET @{[ meta->prop->{start_url} ]}");
+
+    my $version_index_url = do {
+      my $ret = $build->decode( $build->fetch );
+      my ($first) =
+        sort { my @v = map { ($_->{filename} =~ $filter)[0] } $a, $b; versioncmp($v[1], $v[0]) }
+        grep { $_->{filename} =~ $filter } @{ $ret->{list} };
+      # from: https://www.python.org/ftp/python/3.11.1/python-3.11.1-amd64.exe
+      #   to: https://www.python.org/ftp/python/3.11.1
+      (my $url = $first->{url}) =~ s,/[^/]+$,,;
+      $url;
+    };
+    my $arch_index_url = "${version_index_url}/${arch_id}/";
+
+    my ($version) = $version_index_url =~ m,/([0-9\.]+)$,;
+    $build->runtime_prop->{version} = $version;
+
+    do {
+      my $ret = $build->decode( $build->fetch($arch_index_url) );
+      $build->log(".msi list (all) " . join(" ", map $_->{filename}, @{ $ret->{list} }));
+
+      # filter out debugging .msi's
+      my @filtered_list = grep {
+        $_->{filename} !~ /(_d|_pdb)\.msi$/
+      } @{ $ret->{list} };
+      $build->log(".msi list (filter) " . join(" ", map $_->{filename}, @filtered_list));
+
+      # Need to skip:
+      #
+      # Reason: modify global environment
+      #   - appendpath.msi
+      #   - path.msi
+      #
+      # Reason: extra disk space
+      #   - launcher.msi
+      #   - doc.msi
+      #
+      # Reason: use ensurepip
+      #   - pip.msi
+      my $msi_allow_filter = qr/
+        ^
+        ( tools
+        | dev
+        | ucrt
+        | exe
+        | core
+        | tcltk
+        | test
+        | lib
+        )
+        \.msi
+        $
+      /x;
+
+      my @downloads = grep { $_->{filename} =~ $msi_allow_filter } @filtered_list;
+
+      for my $download (@downloads) {
+        my $url = $download->{url};
+        $build->log("GET $url");
+
+        {
+          my $ret = $build->fetch($url);
+
+          if(defined $ret->{content})
+          {
+            path($ret->{filename})->spew_raw($ret->{content});
+          }
+          elsif(defined $ret->{path})
+          {
+            my $from = path($ret->{path});
+            my $to   = $ret->{filename};
+            if($ret->{tmp})
+            {
+              $from->move($to);
+            }
+            else
+            {
+              $from->copy($to);
+            }
+          }
+          else
+          {
+            die 'get did not return a file';
+          }
+        };
+      }
+    };
+  };
+
+
+  extract sub {
+    my ($build) = @_;
+
+    my @msis = Path::Tiny::path($build->install_prop->{download})->absolute->children( qr/\.msi$/ );
+    my $cwd = Path::Tiny->cwd->canonpath;
+
+    for my $msi (@msis) {
+      Alien::Build::CommandSequence->new([
+        qw(msiexec /a),
+        $msi->canonpath,
+        "TARGETDIR=$cwd",
+        '/qn'
+      ])->execute($build);
+      my $cwd_msi = Path::Tiny->cwd->child( $msi->basename );
+      if( -f $cwd_msi ) {
+        $build->log( "Removing @{[ $msi->basename ]}");
+        $cwd_msi->remove;
+      }
+    }
+  };
+
+  before build => sub {
+    my($build) = @_;
+
+    Alien::Build::CommandSequence->new([
+      qw(python -m ensurepip --default-pip),
+    ])->execute($build);
+  };
+
+  plugin 'Build::Copy';
+
+  after build => sub {
+    my($build) = @_;
+
+    my $prefix = $build->install_prop->{prefix};
+
+    $build->runtime_prop->{'style'} = 'binary';
+    $build->runtime_prop->{command} = 'python';
+
+    $build->runtime_prop->{share_bin_dir_rel} = '.';
+  };
+}
+
+sub _otool_libs {
+  my ($file) = @_;
+
+  my @libs = do {
+    my ($ok, $err, $full_buf, $stdout_buff, $stderr_buff) = IPC::Cmd::run(
+      command => [ qw(otool -L), $file  ],
+      verbose => 0,
+    ) or die;
+
+
+    my @lines = split /\n/, join "", @$stdout_buff;
+
+    # Output is a single line:
+    #   - ": is not an object file"
+    #   - ": object is not a Mach-O file type."
+    die "Not an object file: @lines" if @lines < 2;
+    # Output:
+    #   - "Archive : [...]"
+    die "No libs: $lines[0]" if $lines[0] =~ /^Archive\s+:\s+/;
+
+    # first line is $file
+    shift @lines;
+    grep { defined } map {
+      $_ =~ m%[[:blank:]]+(.*/(Python|[^/]*\.dylib))[[:blank:]]+\(compatibility version%;
+      my $path = $1;
+      $path;
+    } @lines;
+  };
+
+  \@libs;
+}
+
+use constant PYTHON_FRAMEWORK_PREFIX => '/Library/Frameworks/Python.framework';
+
+sub macos_relocatable_python {
+  my ($build, $base) = @_;
+
+  $base = path($base);
+
+  die "Not a directory: $base" unless -d $base;
+
+  my ($version_base) = $base->child( qw(Python.framework Versions) )->children( qr/^3\./ );
+
+  my @paths_to_check;
+
+  File::Find::find(
+    sub { push @paths_to_check, path($File::Find::name) if -f && -B },
+    $version_base );
+
+  my %paths_changed;
+
+  # Turn paths from PYTHON_FRAMEWORK_PREFIX to @rpath/Python.framework.
+  my $frameworks_path = path(PYTHON_FRAMEWORK_PREFIX)->parent;
+  my $rpathify = sub {
+    my ($path) = @_;
+    return unless index($path, PYTHON_FRAMEWORK_PREFIX . '/') == 0;
+    return File::Spec->catfile(
+      '@rpath',
+      File::Spec->abs2rel($path, $frameworks_path)
+    );
+  };
+  for my $change_path (@paths_to_check) {
+    next if exists $paths_changed{$change_path};
+    my $libs;
+    $build->log("Skipping $change_path\n"), next unless eval { $libs = _otool_libs( $change_path ); 1 };
+    $paths_changed{$change_path} = 1;
+
+    $change_path->chmod('u+w');
+
+    my $path_rel_ver = $change_path->relative( $version_base );
+    if( $path_rel_ver->parent eq 'bin' || $path_rel_ver eq 'Resources/Python.app/Contents/MacOS/Python' ) {
+      my $exec_path_rpath = File::Spec->catfile(
+        '@executable_path',
+        $base->relative($change_path->parent),
+      );
+      $build->log("-add_rpath for $change_path: $exec_path_rpath\n");
+      IPC::Cmd::run( command => [
+        qw(install_name_tool -add_rpath),
+          $exec_path_rpath,
+          $change_path
+      ]); # no or die to avoid duplicate rpath bits
+    }
+
+    if( $change_path->basename =~ /\.dylib$|^Python$/ ) {
+      my $to_python_framework_path = File::Spec->catfile(
+        $frameworks_path,
+        File::Spec->abs2rel($change_path, $base)
+      );
+      my $id_with_rpath = $rpathify->($to_python_framework_path);
+      $build->log("-id for $change_path: $id_with_rpath\n");
+      IPC::Cmd::run( command => [
+        qw(install_name_tool -id),
+          $id_with_rpath,
+          $change_path
+      ]) or die;
+    }
+
+    $build->log("Processing libs for $change_path\n");
+    for my $lib (@$libs) {
+      my $lib_with_rpath_framework = $rpathify->($lib) or next;
+      $build->log("-change: $lib -> $lib_with_rpath_framework\n");
+      IPC::Cmd::run( command => [
+        qw(install_name_tool -change),
+          $lib,
+          $lib_with_rpath_framework,
+          $change_path
+      ]) or die;
+    }
+  }
+
+  # python3 -c 'import sys; print( "\n".join(sys.path) )'
+}
+
+
+sub do_binary_macos {
+  requires 'Alien::Build::CommandSequence';
+
+  start_url 'https://www.python.org/downloads/macos/';
+  # Using universal2 installer.
+  plugin Download => (
+    filter  => qr/python-([0-9\.]+)-macos11.pkg/,
+    version => qr/([0-9\.]+)/,
+  );
+  extract sub {
+    my ($build) = @_;
+
+    Alien::Build::CommandSequence->new([
+      qw(pkgutil --expand-full),
+      $build->install_prop->{download},
+      'python'
+    ])->execute($build);
+  };
+
+  patch sub {
+    my ($build) = @_;
+
+    my @children = Path::Tiny->cwd->children;
+    $_->remove_tree for grep { $_->basename ne 'Python_Framework.pkg' } @children;
+    my $framework_src_dir = path('Python_Framework.pkg');
+    my $framework_dst_dir = path('Python.framework');
+    $framework_dst_dir->mkpath;
+    File::Copy::Recursive::rmove( "$framework_src_dir/Payload/*", $framework_dst_dir );
+    $framework_src_dir->remove_tree( { safe => 0 } );
+
+    macos_relocatable_python($build, $framework_dst_dir->parent);
+  };
+
+  plugin 'Build::Copy';
+
+  after build => sub {
+    my($build) = @_;
+
+    my $prefix = path($build->install_prop->{prefix});
+
+    $build->runtime_prop->{'style'} = 'binary';
+    $build->runtime_prop->{command} = 'python3';
+
+    my $framework_dst_dir = path('Python.framework');
+    my ($version_base) = $framework_dst_dir->child( qw(Versions) )->children( qr/^3\./ );
+    $build->runtime_prop->{share_bin_dir_rel} = $version_base->child('bin')->stringify;
+  };
+}
+
+share {
+  if( $^O eq 'MSWin32' ) {
+    do_binary_windows;
+  } elsif( $^O eq 'darwin' ) {
+    do_binary_macos;
+  } else {
+    do_source;
+  }
+}

@@ -6,55 +6,49 @@ use strict;
 use warnings;
 require overload;
 
-#$Id: overload.t 26 2006-04-16 15:18:52Z demerphq $#
-
 # imports same()
 require "./t/test_helper.pl";
 
 sub dump_obj {
-    my $obj = shift;
+    my $obj= shift;
     my $error;
-    if ( not eval { my @list = Dump( $obj ); 1 } ) {
-        $error = $@;
-        diag( $error );
+    if (not eval { my @list= Dump($obj); 1 }) {
+        $error= $@;
+        diag($error);
     }
-    return ! defined $error;
+    return !defined $error;
 }
 
-ok( dump_obj( bless( do{ my $v="FooBar"; \ $v }, 'T' ) ),
-    '${} overloading' );
+ok(dump_obj(bless(do { my $v= "FooBar"; \$v }, 'T')), '${} overloading');
 {
-    my $h={a=>'b'};
-    ok( dump_obj( [ bless( [ 1, 2, 3, 4, $h ], 'T' ),$h ] ),
-        '@{} overloading' );
+    my $h= { a => 'b' };
+    ok(dump_obj([ bless([ 1, 2, 3, 4, $h ], 'T'), $h ]), '@{} overloading');
 }
-ok( dump_obj( bless( {a=>'b',c=>[1,2,3,4]}, 'T' ) ),
-    '%{} overloading' );
-ok( dump_obj( bless( sub{}, 'T' ) ),
-    '&{} overloading' );
-ok( dump_obj( bless( gensym(), 'T' ) ),
-    '*{} overloading' );
-our @foofoo=qw(foo foo);
-our $foofoo=bless \@foofoo,'T';
-my $x=bless \*foofoo,'T';
-ok( dump_obj( $x ),'containing glob' );
+ok(dump_obj(bless({ a => 'b', c => [ 1, 2, 3, 4 ] }, 'T')), '%{} overloading');
+ok(dump_obj(bless(sub { },                           'T')), '&{} overloading');
+ok(dump_obj(bless(gensym(),                          'T')), '*{} overloading');
+our @foofoo= qw(foo foo);
+our $foofoo= bless \@foofoo, 'T';
+my $x= bless \*foofoo, 'T';
+ok(dump_obj($x), 'containing glob');
 
 {
-    my ($r1,$r2);
-    $r1 = \$r2;
-    $r2 = \$r1;
-    my $c= sub {die};
+    my ($r1, $r2);
+    $r1= \$r2;
+    $r2= \$r1;
+    my $c= sub { die };
     my $fh= gensym();
-    my $gv= \*foofoo ;
-    my $h={a=>'b',r1=>$r1,r2=>$r2,c=>$c,gv=>$gv};
-    my $a1=[ 0..4, $h, $r1, $r2,$c,$fh,$gv ];
-    $h->{array}=$a1;
-    my $a2=[$a1,$h];
+    my $gv= \*foofoo;
+    my $h= { a => 'b', r1 => $r1, r2 => $r2, c => $c, gv => $gv };
+    my $a1= [ 0 .. 4, $h, $r1, $r2, $c, $fh, $gv ];
+    $h->{array}= $a1;
+    my $a2= [ $a1, $h ];
 
-    bless $_,'T' for $r1,$r2,$c,$fh,$gv,$h,$a1,$a2;
+    bless $_, 'T' for $r1, $r2, $c, $fh, $gv, $h, $a1, $a2;
 
-    my $o=Dump();
-    test_dump( {name=>'overloading madness',no_dumper=>1}, $o, $a2, <<'EXPECT');
+    my $o= Dump();
+    test_dump({ name => 'overloading madness', no_dumper => 1 },
+        $o, $a2, <<'EXPECT');
 $T1 = [
         [
           0,
@@ -105,13 +99,16 @@ bless( *::foofoo{ARRAY}, 'T' );
 EXPECT
 }
 
-
 package T;
+
 BEGIN {
     overload->import(
-        map { my $operation = $_;
-              $operation => sub { Carp::confess( "The overloaded method $operation was called" ) } }
-        map { split( ' ' ) }
-        values %overload::ops
+        map {
+            my $operation= $_;
+            $operation => sub {
+                Carp::confess("The overloaded method $operation was called");
+            }
+            }
+            map { split(' ') } values %overload::ops
     );
 }

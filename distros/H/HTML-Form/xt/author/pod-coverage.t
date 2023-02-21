@@ -11,7 +11,7 @@ BEGIN {
 }
 use Pod::Coverage::TrustPod;
 
-my %skip = map { $_ => 1 } qw(  );
+my %skip = map { $_ => 1 } qw( HTML::Form::Input HTML::Form::TextInput HTML::Form::IgnoreInput HTML::Form::ListInput HTML::Form::SubmitInput HTML::Form::ImageInput HTML::Form::FileInput HTML::Form::KeygenInput );
 
 my @modules;
 for my $module ( all_modules() ) {

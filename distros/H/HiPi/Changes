@@ -1,3 +1,9 @@
+Version 0.88  - TBR
+
+Version 0.87  - 12 February 2023
+                Updated for multiple package builds
+                Bullseye, Buster, armhf, arm64
+
 Version 0.86  - 30 October 2021
                 Recognise Pi Zero 2
 

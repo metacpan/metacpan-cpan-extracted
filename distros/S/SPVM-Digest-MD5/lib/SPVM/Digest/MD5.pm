@@ -1,6 +1,6 @@
 package SPVM::Digest::MD5;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 1;
 
@@ -127,7 +127,7 @@ md5 digests you might want to append the string "==" to the result.
 
 =head1 Repository
 
-L<https://github.com/yuki-kimoto/SPVM-Digest-MD5>
+L<SPVM::Digest::MD5 - Github|https://github.com/yuki-kimoto/SPVM-Digest-MD5>
 
 =head1 Author
 

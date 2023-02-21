@@ -1,0 +1,77 @@
+{
+   "abstract" : "Add [@RWP] plugin bundle into dist.ini",
+   "author" : [
+      "Elvin Aslanov <rwp.primary@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-PluginBundle-RWP",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::AutoPrereqs" : "0",
+            "Dist::Zilla::Plugin::AutoVersion" : "0",
+            "Dist::Zilla::Plugin::CPANFile" : "0",
+            "Dist::Zilla::Plugin::GenerateFile" : "0",
+            "Dist::Zilla::Plugin::Git::Check" : "0",
+            "Dist::Zilla::Plugin::GithubMeta" : "0",
+            "Dist::Zilla::Plugin::InstallGuide" : "0",
+            "Dist::Zilla::Plugin::MetaJSON" : "0",
+            "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
+            "Dist::Zilla::Plugin::NextRelease" : "0",
+            "Dist::Zilla::Plugin::PodWeaver" : "0",
+            "Dist::Zilla::Plugin::Prereqs::AuthorDeps" : "0",
+            "Dist::Zilla::Plugin::PruneFiles" : "0",
+            "Dist::Zilla::PluginBundle::Basic" : "0",
+            "Dist::Zilla::PluginBundle::Filter" : "0",
+            "Dist::Zilla::PluginBundle::Git" : "0",
+            "Software::License::Perl_5" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Role::PluginBundle::Easy" : "0",
+            "Moose" : "0",
+            "builtin" : "0",
+            "experimental" : "0",
+            "perl" : "v5.37.0"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::PluginBundle::RWP" : {
+         "file" : "lib/Dist/Zilla/PluginBundle/RWP.pm",
+         "version" : "0.230470"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rwp0/Dist-Zilla-PluginBundle-RWP/issues"
+      },
+      "homepage" : "https://github.com/rwp0/Dist-Zilla-PluginBundle-RWP",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/rwp0/Dist-Zilla-PluginBundle-RWP.git",
+         "web" : "https://github.com/rwp0/Dist-Zilla-PluginBundle-RWP"
+      }
+   },
+   "version" : "0.230470",
+   "x_generated_by_perl" : "v5.37.9",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

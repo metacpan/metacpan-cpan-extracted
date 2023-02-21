@@ -19,11 +19,14 @@ Makefile_PL_settings.plx
 MANIFEST			This list of files
 MANIFEST.SKIP
 t/actions.t
+t/errors.t
 t/marshal.t
 t/methods.t
 t/selector-combinators.t
 t/selectors.t
+t/special.t
 t/template/doc.html
+t/void.t
 t/xmlish.t
 xt/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

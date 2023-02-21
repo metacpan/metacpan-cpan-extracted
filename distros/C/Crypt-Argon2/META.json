@@ -4,7 +4,7 @@
       "Leon Timmermans <leont@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unrestricted"
    ],
@@ -21,7 +21,8 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.28"
+            "Module::Build" : "0.28",
+            "perl" : "5.006"
          }
       },
       "develop" : {
@@ -38,20 +39,22 @@
             "MIME::Base64" : "0",
             "Time::HiRes" : "0",
             "XSLoader" : "0",
+            "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.90"
+            "Test::More" : "0.90",
+            "perl" : "5.006"
          }
       }
    },
    "provides" : {
       "Crypt::Argon2" : {
          "file" : "lib/Crypt/Argon2.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       }
    },
    "release_status" : "stable",
@@ -65,9 +68,9 @@
          "web" : "https://github.com/Leont/crypt-argon2"
       }
    },
-   "version" : "0.012",
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "version" : "0.013",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
    "x_spdx_expression" : "CC0-1.0"
 }
 

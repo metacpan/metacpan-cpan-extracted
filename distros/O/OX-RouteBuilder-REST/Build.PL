@@ -19,7 +19,7 @@ my %module_build_args = (
     "Validad GmbH http://validad.com"
   ],
   "dist_name" => "OX-RouteBuilder-REST",
-  "dist_version" => "0.005",
+  "dist_version" => "0.006",
   "license" => "perl",
   "module_name" => "OX::RouteBuilder::REST",
   "recursive_test_files" => 1,

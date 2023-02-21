@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::NanonisTramea;
-$Lab::Moose::Instrument::NanonisTramea::VERSION = '3.842';
+$Lab::Moose::Instrument::NanonisTramea::VERSION = '3.851';
 #ABSTRACT: Nanonis Tramea
 
 use v5.20;
@@ -2348,7 +2348,7 @@ Lab::Moose::Instrument::NanonisTramea - Nanonis Tramea
 
 =head1 VERSION
 
-version 3.842
+version 3.851
 
 =head1 SYNOPSIS
 

@@ -34,14 +34,18 @@
       "runtime" : {
          "requires" : {
             "Class::Accessor::Fast" : "0",
+            "Getopt::Long" : "0",
             "JSON::MaybeXS" : "0",
             "Log::Any" : "0",
             "Module::Runtime" : "0",
+            "POSIX" : "0",
+            "Path::Tiny" : "0",
             "Plack::Response" : "0",
+            "Pod::Usage" : "0",
             "Sys::Hostname" : "0",
             "Try::Tiny" : "0",
             "base" : "0",
-            "perl" : "5.018"
+            "perl" : "5.024"
          }
       },
       "test" : {
@@ -59,31 +63,31 @@
    "provides" : {
       "Plack::App::ServiceStatus" : {
          "file" : "lib/Plack/App/ServiceStatus.pm",
-         "version" : "0.908"
+         "version" : "0.911"
       },
       "Plack::App::ServiceStatus::DBI" : {
          "file" : "lib/Plack/App/ServiceStatus/DBI.pm",
-         "version" : "0.908"
+         "version" : "0.911"
       },
       "Plack::App::ServiceStatus::DBIC" : {
          "file" : "lib/Plack/App/ServiceStatus/DBIC.pm",
-         "version" : "0.908"
+         "version" : "0.911"
       },
       "Plack::App::ServiceStatus::DBIxConnector" : {
          "file" : "lib/Plack/App/ServiceStatus/DBIxConnector.pm",
-         "version" : "0.908"
+         "version" : "0.911"
       },
       "Plack::App::ServiceStatus::Elasticsearch" : {
          "file" : "lib/Plack/App/ServiceStatus/Elasticsearch.pm",
-         "version" : "0.908"
+         "version" : "0.911"
       },
       "Plack::App::ServiceStatus::NetStomp" : {
          "file" : "lib/Plack/App/ServiceStatus/NetStomp.pm",
-         "version" : "0.908"
+         "version" : "0.911"
       },
       "Plack::App::ServiceStatus::Redis" : {
          "file" : "lib/Plack/App/ServiceStatus/Redis.pm",
-         "version" : "0.908"
+         "version" : "0.911"
       }
    },
    "release_status" : "stable",
@@ -98,7 +102,7 @@
          "web" : "https://github.com/domm/Plack-App-ServiceStatus"
       }
    },
-   "version" : "0.908",
+   "version" : "0.911",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

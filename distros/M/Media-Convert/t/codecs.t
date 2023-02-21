@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+use v5.24;
+
 use Test::More;
 use Media::Convert::FfmpegInfo;
 

@@ -1,0 +1,55 @@
+{
+   "abstract" : "drive C<XS::Parse::Keyword> directly from Perl",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "XS-Parse-Keyword-FromPerl",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004",
+            "XS::Parse::Keyword::Builder" : "0.33"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XS::Parse::Keyword" : "0.33",
+            "perl" : "5.026"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "XS::Parse::Keyword::FromPerl" : {
+         "file" : "lib/XS/Parse/Keyword/FromPerl.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "x_IRC" : "irc://irc.perl.org/#io-async"
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

@@ -1,0 +1,71 @@
+use alienfile;
+
+use File::Which qw(which);
+
+my $MAX_VERSION = 15;
+my $probe = 0;
+for my $command (qw(llvm-ar), ( map "llvm-ar-$_", reverse 12..$MAX_VERSION) ) {
+  next unless which($command);
+  plugin 'Probe::CommandLine' => (
+    command   => $command,
+    args      => [ '--version' ],
+    version => qr/LLVM version ([0-9\.]+)/,
+  );
+  $probe = 1;
+}
+
+unless( $probe ) {
+  probe sub { 'share' };
+}
+
+sub do_source {
+  my $ALLOW_RC = 0;
+  # TODO make this an env variable.
+  # if unset, do not include releases with the -rc suffix (release candidates)
+  my $rc_part_qr = $ALLOW_RC ? qr/(?:rc\d+)?/ : qr// ;
+
+
+  plugin 'Download::GitHub' => (
+    github_user => 'llvm',
+    github_repo => 'llvm-project',
+    asset        => 1,
+    asset_name   => qr/llvm-project-([0-9\.]+$rc_part_qr)\.src\.tar\.xz$/,
+    asset_format => 'tar.xz',
+  );
+  plugin 'Build::CMake';
+  # TODO compare with <https://github.com/ycm-core/llvm/blob/708056a3d8259ce1d9fc0f15676d13b53cc23835/package_llvm.py#L202>.
+  # May need to expand to include more such as mlir and
+  # flang <https://github.com/llvm/llvm-project/tree/main/flang>
+  build [
+    sub {
+      die "Not building LLVM from source at this time as this takes too long."
+        if $ENV{AUTOMATED_TESTING} || $ENV{CI};
+    },
+    ['%{cmake}',
+      @{ meta->prop->{plugin_build_cmake}->{args} },
+      '-DCMAKE_BUILD_TYPE=Release',
+      # Build just these projects for now. Need to see if more should be the default.
+      '-DLLVM_ENABLE_PROJECTS=clang;clang-tools-extra',
+      (
+        which('ccache')
+        ? ( '-DLLVM_CCACHE_BUILD=ON' )
+        : ()
+      ),
+      '%{.install.extract}/llvm'],
+    '%{make}',
+    '%{make} install',
+  ];
+  plugin 'Gather::IsolateDynamic';
+  after gather => sub {
+    my ($build) = @_;
+    $build->runtime_prop->{'style'} = 'source';
+  };
+}
+
+share {
+  do_source;
+  # TODO
+  # - Add support for binary releases on Windows and macOS. Need to check which
+  #   projects are enabled in those builds. In the case of Windows, the
+  #   CPack-built NSIS installer file can be extracted using 7-zip (via Alien::7zip).
+}

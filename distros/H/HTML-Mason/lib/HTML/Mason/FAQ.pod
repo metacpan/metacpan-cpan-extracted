@@ -615,10 +615,6 @@ The root of the problem is probably that the temp directory is being chosen when
 
 I bet Lincoln would welcome a patch (hint, hint). One solution would be to check if you're running under mod_perl and you're root. If so, then check Apache->server->uid and see if that id can write to the temp directory too.
 
-=head2 How can I redirect the current request to be a file download?
-
-A detailed explanation is provided in ForceFileDownload.
-
 =head2 How can I manipulate cookies?
 
 You can use the helpful modules Apache::Cookie and CGI::Cookie. It's also fairly easy to roll your own cookie-manipulation functions, using the methods provided by the $r global.

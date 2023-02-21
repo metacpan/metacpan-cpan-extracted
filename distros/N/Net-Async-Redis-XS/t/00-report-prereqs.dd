@@ -26,7 +26,7 @@ do { my $x = {
                                       'Future::AsyncAwait' => '0.61',
                                       'IO::Async::Loop' => '0',
                                       'Net::Async::Redis' => '3.002',
-                                      'perl' => '5.032'
+                                      'perl' => '5.026'
                                     }
                     },
        'test' => {

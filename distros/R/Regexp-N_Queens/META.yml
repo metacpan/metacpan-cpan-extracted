@@ -1,0 +1,38 @@
+---
+abstract: Abstract
+author:
+  - 'Abigail <cpan@abigail.be>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+  strict: '0'
+  warnings: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Regexp-N_Queens
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.01'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/Abigail/Regexp-N_Queens.git
+version: '2023021701'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_test_requires:
+  Test::More: 0.88
+  strict: 0
+  warnings: 0

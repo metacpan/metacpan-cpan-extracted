@@ -3,7 +3,7 @@
 
 /* gzclose.c -- zlib gzclose() function
  * Copyright (C) 2004, 2010 Mark Adler
- * For conditions of distribution and use, see http://www.zlib.net/zlib_license.html
+ * For conditions of distribution and use, see https://www.zlib.net/zlib_license.html
  */
 
 #include "gzguts.h"
@@ -19,7 +19,7 @@ int ZEXPORT gzclose(file)
 
     if (file == NULL)
         return Z_STREAM_ERROR;
-    state = (gz_statep)file;
+    state.file = file;
 
     return state.state->mode == GZ_READ ? gzclose_r(file) : gzclose_w(file);
 #else

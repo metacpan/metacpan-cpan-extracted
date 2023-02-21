@@ -1,3 +1,11 @@
+use lib 't/lib';
+use blib 'perl_impl';
+use SPVM 'Digest::SHA';
+use Digest::SHA;
+use SPVMImpl;
+Digest::SHA::is_spvm();
+die unless $INC{'Digest/SHA.pm'} =~ /\bblib\b/;
+
 use strict;
 use Digest::SHA qw(
 	hmac_sha1	hmac_sha1_base64	hmac_sha1_hex

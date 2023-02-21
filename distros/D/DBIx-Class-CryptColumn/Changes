@@ -1,4 +1,14 @@
 Revision history for DBIx-Class-CryptColumn
 
+0.004     2023-02-12 17:45:53+01:00 Europe/Amsterdam
+          - Fix argument order in verify_method implementation
+
+0.003     2023-02-12 17:21:03+01:00 Europe/Amsterdam
+          - Use Crypt::Passphrase's new curry methods
+
+0.002     2023-02-08 22:35:16+01:00 Europe/Amsterdam
+          - Correctly pass on Crypt::Passphrase object to InflateColumn::Crypt::Passphrase
+          - Improve documentation
+
 0.001     2023-02-08 01:41:43+01:00 Europe/Amsterdam
           Initial release to an unsuspecting world

@@ -22,7 +22,7 @@ use Scalar::Util ();		# Core since 5.7.3
 use Storable ();		# Core since 5.7.3
 use Test::Builder ();		# Core since 5.6.2
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 our @ISA = qw{ Exporter };
 
@@ -86,6 +86,8 @@ use constant MAYBE_IGNORE_GITHUB	=> sub {
     return 1;
 };
 
+use constant USER_AGENT_CLASS	=> 'HTTP::Tiny';
+
 
 # NOTE that Test::Builder->new() gets us a singleton. For this reason I
 # use $Test::Builder::Level (localized) to get tests reported relative
@@ -124,10 +126,6 @@ sub new {
 	}
 	return $self;
     }
-}
-
-sub _default_agent {
-    return HTTP::Tiny->new()->agent();
 }
 
 sub _default_allow_man_spaces {
@@ -205,10 +203,8 @@ sub _default_skip_server_errors {
     return 1;
 }
 
-sub _init_agent {
-    my ( $self, $name, $value ) = @_;
-    $self->{$name} = $value;
-    return;
+sub _default_user_agent {
+    return USER_AGENT_CLASS;
 }
 
 sub _init_allow_man_spaces {
@@ -339,8 +335,28 @@ sub _init_skip_server_errors {
     return;
 }
 
+sub _init_user_agent {
+    my ( $self, $name, $value ) = @_;
+    defined $name
+	or $name = USER_AGENT_CLASS;
+    eval {
+	$value->isa( USER_AGENT_CLASS )
+    } or Carp::confess(
+	"Invalid user_agent value '$value': must be a subclass of HTTP::Tiny, or undef" );
+    $self->{$name} = $value;
+    if ( ref $value ) {
+	$self->{_user_agent} = $value;
+    } else {
+	# Probably unnecessary, but I'm paranoid.
+	delete $self->{_user_agent};
+    }
+    return;
+}
+
 sub agent {
     my ( $self ) = @_;
+    defined $self->{agent}
+	or $self->{agent} = $self->_user_agent()->agent();
     return $self->{agent};
 }
 
@@ -542,11 +558,22 @@ sub skip_server_errors {
     return $self->{skip_server_errors};
 }
 
+# This is a private method, but because it had to be accessed (read:
+# monkey-patched) to get badly-needed user functionality, it needs to
+# fulfill its interface contract until March 1 2024 or one year after
+# the release of version 0.011, whichever is later. That contract is:
+# * Name: _user_agent
+# * Arguments: none
+# * Return: HTTP::Tiny object, which may be a subclass.
 sub _user_agent {
     my ( $self ) = @_;
-    return( $self->{_user_agent} ||= HTTP::Tiny->new(
-	    agent	=> $self->agent(),
-	) );
+    return( $self->{_user_agent} ||= do {
+	    my @arg;
+	    defined $self->{agent}
+		and push @arg, agent => $self->{agent};
+	    $self->{user_agent}->new( @arg );
+	}
+    );
 }
 
 sub _pass {
@@ -886,6 +913,17 @@ sub _handle_url {
     my $url = "$link->[1]{to}"	# Stringify object
 	or return $self->_fail( $link, 'contains no url' );
 
+    if ( $url =~ m/ \A https : /smxi ) {
+	my ( $ok, $why ) = USER_AGENT_CLASS->can_ssl();
+	unless ( $ok ) {
+	    $self->{_ssl_warning}
+		or $TEST->diag( "Can not check https: links: $why" );
+	    $self->{_ssl_warning} = 1;
+	    return $self->_skip(
+		$link, 'not checked: https: checks unavailable' );
+	}
+    }
+
     $self->__ignore_url( $url )
 	and return $self->_skip( $link, 'not checked; explicitly ignored' );
 
@@ -1010,7 +1048,7 @@ sub run {
 	defined $source
 	    and $self->set_source( $source );
     my $attr = $self->_attr();
-    @{ $attr }{ qw{ line links sections } } = ( 1, [], {} );
+    @{ $attr }{ qw{ line links sections ignore_tag } } = ( 1, [], {}, [] );
     while ( my $token = $self->get_token() ) {
 	if ( my $code = $self->can( '__token_' . $token->type() ) ) {
 	    $code->( $self, $token );
@@ -1054,6 +1092,8 @@ sub __token_start {
 	    @{ $sect }[ 2 .. $#$sect ] = ( _normalize_text( "$sect" ) );
 	}
 	push @{ $attr->{links} }, [ @{ $token }[ 1 .. $#$token ] ];
+    } elsif ( 'X' eq $tag ) {
+	push @{ $attr->{ignore_tag} }, $tag;
     } elsif ( $section_tag{$tag} ) {
 	$attr->{text} = '';
     }
@@ -1063,6 +1103,7 @@ sub __token_start {
 sub __token_text {
     my ( $self, $token ) = @_;
     my $attr = $self->_attr();
+    return if @{ $attr->{ignore_tag} };
     my $text = $token->text();
     $attr->{line} += $text =~ tr/\n//;
     $attr->{text} .= $text;
@@ -1075,6 +1116,8 @@ sub __token_end {
     my $tag = $token->tag();
     if ( $section_tag{$tag} ) {
 	$attr->{sections}{ _normalize_text( delete $attr->{text} ) } = 1;
+    } elsif( @{ $attr->{ignore_tag} } && $tag eq $attr->{ignore_tag}[-1] ) {
+	pop @{ $attr->{ignore_tag} };
     }
     return;
 }
@@ -1176,6 +1219,15 @@ or whatever). They will only be checked if the C<check_url> attribute is
 true, and can only be successfully checked if Perl has access to the
 specified URL.
 
+B<NOTE> that C<https:> links can only be checked if
+L<IO::Socket::SSL|IO::Socket::SSL> version 1.42 (at least) and
+L<Net::SSLeay|Net::SSLeay> version 1.49 (at least) are installed. These
+are B<NOT> prerequisites of C<Test::Pod::LinkCheck::Lite> because they
+are not in core, and I am trying to keep non-core dependencies to a
+minimum. If these modules are not present an attempt to check an
+C<https:> link will result in a skipped test. In addition, a diagnostic
+will be issued for the first C<https:> link skipped by the test object.
+
 =item * pod (internal)
 
 These links are of the form C<< LE<lt>text|/sectionE<gt> >>. They are
@@ -1250,7 +1302,13 @@ The following arguments are supported:
 
 This argument is the user agent string to use for web access.
 
-The default is that of L<HTTP::Tiny|HTTP::Tiny>.
+B<Note> that this probably should have been called something more
+verbose like C<user_agent_string>, but I was influenced by the name
+used by L<HTTP::Tiny|HTTP::Tiny>, and did not anticipate the need for
+the interface to be able to specify the actual user agent.
+
+The default is C<undef>, which specifies whatever the actual user
+agent's C<agent()> method returns.
 
 =item allow_man_spaces
 
@@ -1266,6 +1324,9 @@ The default is false.
 This Boolean argument is set true to cache the responses from URL links.
 This means each URL is queried only once, no matter how many times it
 appears.
+
+This is an in-memory cache, and persists only for the life of the
+C<Test::Pod::LinkCheck::Lite> object.
 
 The default is true.
 
@@ -1419,6 +1480,17 @@ The logic (if any) in changing the default behaviour is that C<5xx>
 errors can represent actual server problems rather than errors in the
 link being checked, so changing the default behaviour eliminates
 possible false positives.
+
+=item user_agent
+
+Added in version 0.011
+
+This argument is either a class name or an object. Either way, it must
+be a subclass of L<HTTP::Tiny|HTTP::Tiny>.
+
+If a class name is passed, the class must already be loaded. An object
+of that class will be instantiated by calling its C<new()> method --
+with the agent argument if that was specified,
 
 =back
 
@@ -1621,7 +1693,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2019-2022 by Thomas R. Wyant, III
+Copyright (C) 2019-2023 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

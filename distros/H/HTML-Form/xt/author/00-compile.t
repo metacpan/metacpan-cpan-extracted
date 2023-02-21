@@ -6,10 +6,18 @@ use warnings;
 
 use Test::More 0.94;
 
-plan tests => 2;
+plan tests => 10;
 
 my @module_files = (
-    'HTML/Form.pm'
+    'HTML/Form.pm',
+    'HTML/Form/FileInput.pm',
+    'HTML/Form/IgnoreInput.pm',
+    'HTML/Form/ImageInput.pm',
+    'HTML/Form/Input.pm',
+    'HTML/Form/KeygenInput.pm',
+    'HTML/Form/ListInput.pm',
+    'HTML/Form/SubmitInput.pm',
+    'HTML/Form/TextInput.pm'
 );
 
 

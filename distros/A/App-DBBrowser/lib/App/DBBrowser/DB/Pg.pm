@@ -97,38 +97,23 @@ sub get_db_handle {
 sub get_databases {
     my ( $sf ) = @_;
     return \@ARGV if @ARGV;
-    my @regex_system_db = ( '^postgres$', '^template0$', '^template1$' );
-    my $stmt = "SELECT datname FROM pg_database";
-    if ( ! $sf->{o}{G}{metadata} ) {
-        $stmt .= " WHERE " . join( " AND ", ( "datname !~ ?" ) x @regex_system_db );
-    }
-    $stmt .= " ORDER BY datname";
     my $info_database = 'postgres';
-    #print $sf->{clear_screen};
-    #print "DB: $info_database\n";
     my $dbh = $sf->get_db_handle( $info_database );
-    my $databases = $dbh->selectcol_arrayref( $stmt, {}, $sf->{o}{G}{metadata} ? () : @regex_system_db );
+    my $stmt = "SELECT pg_catalog.quote_ident(datname) FROM pg_catalog.pg_database ORDER BY datname";
+    my $databases = $dbh->selectcol_arrayref( $stmt, {}, () );
     $dbh->disconnect();
-    if ( $sf->{o}{G}{metadata} ) {
-        my $regexp = join '|', @regex_system_db;
-        my $user_db   = [];
-        my $system_db = [];
-        for my $database ( @{$databases} ) {
-            if ( $database =~ /(?:$regexp)/ ) {
-                push @$system_db, $database;
-            }
-            else {
-                push @$user_db, $database;
-            }
+    my $user_db   = [];
+    my $system_db = [];
+    for my $database ( @{$databases} ) {
+        if ( $database =~ /^(?:postgres|template0|template1)\z/i ) {
+            push @$system_db, $database;
         }
-        return $user_db, $system_db;
+        else {
+            push @$user_db, $database;
+        }
     }
-    else {
-        return $databases;
-    }
+    return $user_db, $system_db;
 }
-
-
 
 
 

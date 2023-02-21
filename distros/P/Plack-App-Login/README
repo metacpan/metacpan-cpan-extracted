@@ -94,12 +94,16 @@ EXAMPLE
      #   <head>
      #     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
      #     <meta charset="UTF-8" />
-     #     <meta name="generator" content=
-     #       "Perl module: Tags::HTML::Page::Begin, Version: 0.08" />
+     #     <meta name="generator" content="Plack::App::Login; Version: 0.07" />
      #     <title>
      #       Login page
      #     </title>
      #     <style type="text/css">
+     # * {
+     #         box-sizing: border-box;
+     #         margin: 0;
+     #         padding: 0;
+     # }
      # .outer {
      #         position: fixed;
      #         top: 50%;
@@ -141,10 +145,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2020-2022 Michal Josef Špaček
+    © 2020-2023 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

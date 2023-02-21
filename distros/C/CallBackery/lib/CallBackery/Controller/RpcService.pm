@@ -542,7 +542,9 @@ async sub handleDownload {
     }
 
     $self->res->headers->content_type($map->{type}.';name=' .$map->{filename});
-    $self->res->headers->content_disposition('attachment;filename='.$map->{filename});
+    if (not $self->param('display')) {
+        $self->res->headers->content_disposition('attachment;filename='.$map->{filename});
+    }
     $self->res->content->asset($map->{asset});
     $self->rendered(200);
 }

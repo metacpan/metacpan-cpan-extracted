@@ -1,0 +1,16 @@
+#!usr/bin/perl
+use Insight::Scriptures;
+my $scripture = shift;
+my $insight = Insight::Scriptures->new({ scripture => $scripture });
+$insight->compose();
+__END__
+
+=head1 NAME
+ 
+insight_compose - CLA for Insight::Scripture to assist in composing a scripture
+ 
+=head1 USAGE
+ 
+        lnation:High lnation$ insight_compose 'lucks insights'
+
+=cut

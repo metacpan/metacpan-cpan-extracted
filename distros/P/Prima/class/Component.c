@@ -45,7 +45,7 @@ Component_init( Handle self, HV * profile)
 		SV ** holder;
 		int len = snprintf( buf, 1023, "on%s", HeKEY( he));
 		holder = hv_fetch( profile, buf, len, 0);
-		if ( holder == NULL || SvTYPE( *holder) == SVt_NULL) continue;
+		if ( holder == NULL || !SvOK( *holder)) continue;
 		my-> add_notification( self, HeKEY( he), *holder, self, -1);
 	}
 	sv_free( res);
@@ -631,7 +631,7 @@ XS( Component_event_hook_FROMPERL)
 		hook = ST(1);
 	}
 
-	if ( SvTYPE(hook) == SVt_NULL) {
+	if ( !SvOK(hook)) {
 		if ( prima_guts.event_hook) sv_free( prima_guts.event_hook);
 		prima_guts.event_hook = NULL;
 		PUTBACK;
@@ -721,7 +721,7 @@ XS( Component_notify_FROMPERL)
 	nameLen = strlen( name);
 	if ( hv_exists( hv, name, nameLen)) {
 		SV ** holder = hv_fetch( hv, name, nameLen, 0);
-		if ( !holder || !SvOK(*holder) || SvTYPE(*holder) == SVt_NULL) {
+		if ( !holder || !SvOK(*holder)) {
 			char buf[1024];
 			snprintf(buf, 1024, "Inconsistent storage in %s::notification_types for %s during Component.notify", var-> self-> className, name);
 			exception_remember(buf);
@@ -1130,7 +1130,7 @@ Component_delegations( Handle self, Bool set, SV * delegations)
 				char * event = SvPV_nolen( *holder);
 
 				if ( referer == NULL_HANDLE)
-					croak("Event delegations for objects without owners must be provided with explicit referer");
+					croak("Event delegations for objects without owners must be provided with explicit referrer");
 				snprintf( buf, 1023, "%s_%s", name, event);
 				sub = query_method( referer, buf, 0);
 				if ( sub == NULL) continue;

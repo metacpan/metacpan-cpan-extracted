@@ -330,6 +330,12 @@ readlink() places the contents of the symbolic link path in the buf buf, which h
 
 See the L<readlink|https://linux.die.net/man/2/readlink> function in Linux.
 
+=head2 readlinkp
+
+  static method readlinkp : string ($file : string);
+
+The same behaivior of Perl's L<readlink|https://perldoc.perl.org/functions/readlink> function.
+
 =head2 opendir
 
   static method opendir : Sys::IO::DirStream ($dir : string);
@@ -361,6 +367,7 @@ See the L<readdir|https://linux.die.net/man/3/readdir> function in Linux.
 The directory stream is a L<Sys::IO::DirStream|SPVM::Sys::IO::DirStream> object.
 
 The return value is a L<Sys::IO::Dirent|SPVM::Sys::IO::Dirent> object.
+
 =head2 rewinddir
 
   static method rewinddir : void ($dirp : Sys::IO::DirStream);
@@ -432,15 +439,15 @@ See the L<eaccess|https://linux.die.net/man/3/eaccess> function in Linux.
 
 See L<Sys::IO::Constant|SPVM::Sys::IO::Constant> about the constant value for the C<$mode>.
 
-=head2 eaccess_emulate_raw
+=head2 eaccess_raw
 
-  static method eaccess_emulate : int ($pathname : string, $mode : int)
+  static method eaccess : int ($pathname : string, $mode : int)
 
-The same as L</"eaccess_emulate">, but even if the return value is C<-1>, an exception will not be thrown.
+The same as L</"eaccess">, but even if the return value is C<-1>, an exception will not be thrown.
 
-=head2 eaccess_emulate
+=head2 eaccess
 
-  static method eaccess_emulate : int ($pathname : string, $mode : int)
+  static method eaccess : int ($pathname : string, $mode : int)
 
 Emulates C<eaccess> using L</"faccessat">.
 

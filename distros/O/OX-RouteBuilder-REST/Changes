@@ -1,5 +1,10 @@
 Revision history for OX::RouteBuilder::REST
 
+0.006     2023-02-15 13:06:49+01:00
+    - HEAD requests are now routed to $action_GET
+    - unimplemented verbs/methods return 501 instead of unspecific 501
+
+
 0.005     2022-03-10 16:51:22+01:00
     - Fix POD formatting (Andrew Hewus Fresh)
 

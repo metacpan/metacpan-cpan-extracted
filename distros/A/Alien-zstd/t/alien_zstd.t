@@ -8,7 +8,7 @@ alien_ok 'Alien::zstd';
 
 run_ok([ qw(zstd --version) ])
   ->success
-  ->out_like(qr/zstd command line interface/);
+  ->out_like(qr/zstd command line interface|Zstandard CLI/);
 
 my $xs = <<'END';
 #include "EXTERN.h"

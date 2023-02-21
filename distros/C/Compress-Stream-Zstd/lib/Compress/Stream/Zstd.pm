@@ -4,11 +4,10 @@ use strict;
 use warnings;
 use Exporter 'import';
 
-our $VERSION = "0.203";
+our $VERSION = "0.205";
 
 our @EXPORT = qw(
     compress
-    compress_mt
     decompress
     uncompress
     ZSTD_VERSION_NUMBER
@@ -55,12 +54,6 @@ Compresses the given buffer and returns the resulting bytes. The input
 buffer can be either a scalar or a scalar reference.
 
 On error undef is returned.
-
-=head2 compress_mt($source, $num_threads [, $level])
-
-Multi-threaded version of the C<compress> function.
-
-Note that this function uses experimental API of Zstandard.
 
 =head2 decompress($source)
 

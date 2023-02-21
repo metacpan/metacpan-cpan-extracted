@@ -44,7 +44,7 @@
    "provides" : {
       "App::OpenVZ::BCWatch" : {
          "file" : "lib/App/OpenVZ/BCWatch.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "url" : "https://github.com/stsc/App-OpenVZ-BCWatch"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

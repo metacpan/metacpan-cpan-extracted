@@ -42,6 +42,7 @@
             "Test::MinimumVersion" : "0",
             "Test::Mojibake" : "0",
             "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
             "Test::Portability::Files" : "0",
@@ -60,6 +61,7 @@
             "HTTP::Request::Common" : "6.03",
             "Test::More" : "0.96",
             "URI" : "1.10",
+            "parent" : "0",
             "perl" : "5.008001",
             "strict" : "0"
          }
@@ -73,6 +75,7 @@
             "File::Spec" : "0",
             "HTTP::Response" : "0",
             "Test::More" : "0.96",
+            "Test::Warnings" : "0",
             "warnings" : "0"
          }
       }
@@ -80,39 +83,39 @@
    "provides" : {
       "HTML::Form" : {
          "file" : "lib/HTML/Form.pm",
-         "version" : "6.10"
+         "version" : "6.11"
       },
       "HTML::Form::FileInput" : {
-         "file" : "lib/HTML/Form.pm",
-         "version" : "6.10"
+         "file" : "lib/HTML/Form/FileInput.pm",
+         "version" : "6.11"
       },
       "HTML::Form::IgnoreInput" : {
-         "file" : "lib/HTML/Form.pm",
-         "version" : "6.10"
+         "file" : "lib/HTML/Form/IgnoreInput.pm",
+         "version" : "6.11"
       },
       "HTML::Form::ImageInput" : {
-         "file" : "lib/HTML/Form.pm",
-         "version" : "6.10"
+         "file" : "lib/HTML/Form/ImageInput.pm",
+         "version" : "6.11"
       },
       "HTML::Form::Input" : {
-         "file" : "lib/HTML/Form.pm",
-         "version" : "6.10"
+         "file" : "lib/HTML/Form/Input.pm",
+         "version" : "6.11"
       },
       "HTML::Form::KeygenInput" : {
-         "file" : "lib/HTML/Form.pm",
-         "version" : "6.10"
+         "file" : "lib/HTML/Form/KeygenInput.pm",
+         "version" : "6.11"
       },
       "HTML::Form::ListInput" : {
-         "file" : "lib/HTML/Form.pm",
-         "version" : "6.10"
+         "file" : "lib/HTML/Form/ListInput.pm",
+         "version" : "6.11"
       },
       "HTML::Form::SubmitInput" : {
-         "file" : "lib/HTML/Form.pm",
-         "version" : "6.10"
+         "file" : "lib/HTML/Form/SubmitInput.pm",
+         "version" : "6.11"
       },
       "HTML::Form::TextInput" : {
-         "file" : "lib/HTML/Form.pm",
-         "version" : "6.10"
+         "file" : "lib/HTML/Form/TextInput.pm",
+         "version" : "6.11"
       }
    },
    "release_status" : "stable",
@@ -129,7 +132,7 @@
       "x_IRC" : "irc://irc.perl.org/#lwp",
       "x_MailingList" : "mailto:libwww@perl.org"
    },
-   "version" : "6.10",
+   "version" : "6.11",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028000"
@@ -282,7 +285,7 @@
             "class" : "Dist::Zilla::Plugin::MakeMaker",
             "config" : {
                "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : "4"
+                  "default_jobs" : "8"
                }
             },
             "name" : "MakeMaker",
@@ -340,6 +343,21 @@
             },
             "name" : "Test::Portability",
             "version" : "2.001001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::NoTabs",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::NoTabs" : {
+                  "filename" : "xt/author/no-tabs.t",
+                  "finder" : [
+                     ":InstallModules",
+                     ":ExecFiles",
+                     ":TestFiles"
+                  ]
+               }
+            },
+            "name" : "Test::NoTabs",
+            "version" : "0.15"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::EOL",
@@ -400,6 +418,7 @@
                      "CGI",
                      "autocomplete",
                      "checkbox",
+                     "keygen",
                      "readonly",
                      "unsetting",
                      "unvisited"
@@ -438,7 +457,7 @@
             "class" : "Dist::Zilla::Plugin::RunExtraTests",
             "config" : {
                "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : "4"
+                  "default_jobs" : "8"
                }
             },
             "name" : "RunExtraTests",
@@ -668,7 +687,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v6.10",
+                  "tag" : "v6.11",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
@@ -859,6 +878,7 @@
       "Mark Stosberg <MARKSTOS@cpan.org>",
       "Mark Stosberg <mark@summersault.com>",
       "Mike Schilli <mschilli@yahoo-inc.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "mschilli <github@perlmeister.com>",
       "murphy <murphy@genome.chop.edu>",
       "Olaf Alders <olaf@wundersolutions.com>",

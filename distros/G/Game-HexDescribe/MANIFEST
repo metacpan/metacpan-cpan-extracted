@@ -16,6 +16,7 @@ share/hex-describe-seckler-table.txt
 share/hex-describe-strom-table.txt
 share/hex-describe-traveller-table.txt
 t/basic.t
+t/markdown.t
 t/rule.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package String::Tagged::Markdown::HFM 0.03;
+package String::Tagged::Markdown::HFM 0.04;
 
 use v5.26;
 use warnings;

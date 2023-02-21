@@ -7,9 +7,9 @@ use warnings;
 use PerlX::Maybe;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-05'; # DATE
+our $DATE = '2023-02-10'; # DATE
 our $DIST = 'App-td'; # DIST
-our $VERSION = '0.107'; # VERSION
+our $VERSION = '0.110'; # VERSION
 
 our %SPEC;
 
@@ -145,6 +145,7 @@ has functionality similar to some Unix commands like *head*, *tail*, *wc*,
 lines/characters. This is convenient to use with CLI scripts that output table
 data.
 
+
 **What is table data?**
 
 A _table data_ is JSON-encoded data in the form of either: `hos` (hash of
@@ -158,11 +159,37 @@ The input can also be an _enveloped_ table data, where the envelope is an array:
 kind of data is produced by `Perinci::CmdLine`-based scripts and can contain
 more detailed table specification in the `meta` hash, which `td` can parse.
 
-If you have a CSV, you can easily convert it to table data using the *csv2td*
-utility:
+
+**What scripts/modules output table data?**
+
+CLI scripts that are written using <pm:Perinci::CmdLine> framework output
+enveloped table data. There are at least hundreds of such scripts on CPAN. Some
+examples include: <prog:lcpan> (from <pm:App::lcpan>), <prog:pmlist> (from
+<pm:App::PMUtils>), and <prog:bencher> (from <pm:Bencher>).
+
+`TableData::*` modules contain table data. They can easily be output to CLI
+using the <prog:tabledata> utility (from <pm:App::TableDataUtils>).
+
+CSV output from any module/script can be easily converted to table data using
+the <prog:csv2td> utility:
 
     % csv2td YOUR.csv | td ...
     % program-that-outputs-csv | csv2td - | td ...
+
+Table data can also be converted from several other formats e.g. JSON, YAML,
+XLS/XLSX/ODS.
+
+
+**What scripts/modules accept table data?**
+
+This *td* script, for one, accept table data.
+
+If a module/script expects CSV, you can feed table data and convert it to CSV
+using <prog:td2csv> utility.
+
+Several other formats can also be converted to table data, e.g. JSON,
+YAML, XLS/XLSX/ODS.
+
 
 **Using td**
 
@@ -235,7 +262,7 @@ Next, you can use these actions:
     % osnames -l --json | td select value description
 
     # Select all columns but some
-    % osnames -l --json | td select '*' -e value -e description
+    % osnames -l --json | td select '*' -E value -E description
 
     # Return the rows in a random order
     % osnames -l --json | td shuf
@@ -265,14 +292,14 @@ Next, you can use these actions:
     % command ... | td uniq -i ;# case-insensitive
     % command ... | td uniq --repeated ;# only shows the duplicate rows
     % command ... | td uniq -i C1 -i C2 ;# only use columns C1 & C2 to check uniqueness
-    % command ... | td uniq -e C5 -e C6 ;# use all columns but C5 & C6 to check uniqueness
+    % command ... | td uniq -E C5 -E C6 ;# use all columns but C5 & C6 to check uniqueness
 
     # Remove non-adjacent duplicate rows:
     % command ... | td nauniq
     % command ... | td nauniq -i ;# case-insensitive
     % command ... | td nauniq --repeated ;# only shows the duplicate rows
     % command ... | td nauniq -i C1 -i C2 ;# only use columns C1 & C2 to check uniqueness
-    % command ... | td nauniq -e C5 -e C6 ;# use all columns but C5 & C6 to check uniqueness
+    % command ... | td nauniq -E C5 -E C6 ;# use all columns but C5 & C6 to check uniqueness
 
     # Transpose table (make first column of rows as column names in the
     # transposed table)
@@ -900,7 +927,7 @@ App::td - Manipulate table data
 
 =head1 VERSION
 
-This document describes version 0.107 of App::td (from Perl distribution App-td), released on 2022-06-05.
+This document describes version 0.110 of App::td (from Perl distribution App-td), released on 2023-02-10.
 
 =head1 FUNCTIONS
 
@@ -934,11 +961,34 @@ C<[status, message, content, meta]> and C<content> is the actual table data. Thi
 kind of data is produced by C<Perinci::CmdLine>-based scripts and can contain
 more detailed table specification in the C<meta> hash, which C<td> can parse.
 
-If you have a CSV, you can easily convert it to table data using the I<csv2td>
-utility:
+B<What scripts/modules output table data?>
+
+CLI scripts that are written using L<Perinci::CmdLine> framework output
+enveloped table data. There are at least hundreds of such scripts on CPAN. Some
+examples include: L<lcpan> (from L<App::lcpan>), L<pmlist> (from
+L<App::PMUtils>), and L<bencher> (from L<Bencher>).
+
+C<TableData::*> modules contain table data. They can easily be output to CLI
+using the L<tabledata> utility (from L<App::TableDataUtils>).
+
+CSV output from any module/script can be easily converted to table data using
+the L<csv2td> utility:
 
  % csv2td YOUR.csv | td ...
  % program-that-outputs-csv | csv2td - | td ...
+
+Table data can also be converted from several other formats e.g. JSON, YAML,
+XLS/XLSX/ODS.
+
+B<What scripts/modules accept table data?>
+
+This I<td> script, for one, accept table data.
+
+If a module/script expects CSV, you can feed table data and convert it to CSV
+using L<td2csv> utility.
+
+Several other formats can also be converted to table data, e.g. JSON,
+YAML, XLS/XLSX/ODS.
 
 B<Using td>
 
@@ -1011,7 +1061,7 @@ Next, you can use these actions:
  % osnames -l --json | td select value description
  
  # Select all columns but some
- % osnames -l --json | td select '*' -e value -e description
+ % osnames -l --json | td select '*' -E value -E description
  
  # Return the rows in a random order
  % osnames -l --json | td shuf
@@ -1041,14 +1091,14 @@ Next, you can use these actions:
  % command ... | td uniq -i ;# case-insensitive
  % command ... | td uniq --repeated ;# only shows the duplicate rows
  % command ... | td uniq -i C1 -i C2 ;# only use columns C1 & C2 to check uniqueness
- % command ... | td uniq -e C5 -e C6 ;# use all columns but C5 & C6 to check uniqueness
+ % command ... | td uniq -E C5 -E C6 ;# use all columns but C5 & C6 to check uniqueness
  
  # Remove non-adjacent duplicate rows:
  % command ... | td nauniq
  % command ... | td nauniq -i ;# case-insensitive
  % command ... | td nauniq --repeated ;# only shows the duplicate rows
  % command ... | td nauniq -i C1 -i C2 ;# only use columns C1 & C2 to check uniqueness
- % command ... | td nauniq -e C5 -e C6 ;# use all columns but C5 & C6 to check uniqueness
+ % command ... | td nauniq -E C5 -E C6 ;# use all columns but C5 & C6 to check uniqueness
  
  # Transpose table (make first column of rows as column names in the
  # transposed table)
@@ -1102,19 +1152,30 @@ Arguments ('*' denotes required arguments):
 
 Action to perform on input table.
 
+
 =item * B<argv> => I<array[str]> (default: [])
 
 Arguments.
 
 =item * B<case_insensitive> => I<true>
 
+(No description)
+
 =item * B<detail> => I<bool>
+
+(No description)
 
 =item * B<exclude_columns> => I<array[str]>
 
+(No description)
+
 =item * B<include_columns> => I<array[str]>
 
+(No description)
+
 =item * B<lines> => I<str>
+
+(No description)
 
 =item * B<no_header_column> => I<true>
 
@@ -1192,13 +1253,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

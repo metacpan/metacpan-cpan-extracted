@@ -9,7 +9,7 @@ use Carp;
 our @EXPORT = qw( dprint dprintf
                   verif_no_internals_mentioned bug arrays_eq
                   hash_subset fmtsheet
-                  expect1 verif_eval_err check_colspec_is_undef
+                  expect1 verif_eval_err insert_loc_in_evalstr check_colspec_is_undef
                   check_no_sheet 
                   create_testdata
                   write_string_to_tmpf
@@ -18,6 +18,12 @@ our @EXPORT = qw( dprint dprintf
 sub dprint(@)   { print(@_)                if $debug };
 sub dprintf($@) { printf($_[0],@_[1..$#_]) if $debug };
 
+sub insert_loc_in_evalstr($) {
+  my $orig = shift;
+  my ($fn, $lno) = (caller(0))[1,2];
+#use Data::Dumper::Interp; say dvis '###insert_loc_in_evalstr $fn $lno';
+  "# line $lno \"$fn\"\n".$orig
+}
 sub verif_no_internals_mentioned($) {
   my $original = shift;
   return if $Carp::Verbose; 
@@ -34,7 +40,7 @@ sub verif_no_internals_mentioned($) {
   s/(?<!\w)\w[\w:\$]*=(?:REF|ARRAY|HASH|SCALAR|CODE|GLOB)\(0x[0-9a-f]+\)//g;
   
   # Ignore references to our test library packages, e.g. /path/to/t/t_Utils.pm
-  s#\bt_Utils.pm(\W|$)#<ELIDED>$1#gs;
+  s#\b(t_Utils).pm(\W|$)#<$1 .pm>$2#gs;
   
   my $msg;
   if (/\b(?<hit>Spreadsheet::[\w:]*)/) {
@@ -74,9 +80,10 @@ sub hash_subset($@) {
 sub fmtsheet(;$) {
   my $s = $_[0] // sheet({package => caller});
   return "sheet=undef" if ! defined $s;
-  "sheet->".vis($$s)
+  "sheet->".Spreadsheet::Edit::fmt_sheet($s);
+  #"sheet->".visnew->Maxdepth(1)->vis($$s)
+  #"sheet->".visnew->Maxdepth(2)->vis($$s)
   #"sheet->".vis(hash_subset($$s, qw(colx rows linenums num_cols current_rx title_rx)))
-  #"\nsheet=".Data::Dumper::Interp->new()->Maxdepth(2)->vis($s)
 }
 
 sub expect1($$) {
@@ -95,20 +102,24 @@ sub verif_eval_err(;$) {  # MUST be called on same line as the 'eval'
   my @caller = caller(0);
   my $ln = $caller[2];
   my $fn = $caller[1];
+  my $ex = $@;
   confess "expected error did not occur at $fn line $ln\n",
           fmtsheet(sheet({package => $caller[0]}))
-    unless $@;
+    unless $ex;
 
-  if ($@ !~ / at $fn line $ln\.?(?:$|\n)/s) {
-    confess "Got UN-expected err (not ' at $fn line $ln'):\n«$@»\n\n",
-            fmtsheet(sheet({package => $caller[0]})) ;
+  if ($ex !~ / at $fn line $ln\.?(?:$|\n)/s) {
+    die "tex";
+    confess "Got UN-expected err (not ' at $fn line $ln'):\n«$ex»\n",
+            fmtsheet(sheet({package => $caller[0]})),
+            "\n";
   }
-  if ($msg_regex && $@ !~ qr/$msg_regex/) {
-    confess "Got UN-expected err (not matching $msg_regex) at $fn line $ln'):\n«$@»\n\n",
-            fmtsheet(sheet({package => $caller[0]})) ;
+  if ($msg_regex && $ex !~ qr/$msg_regex/) {
+    confess "Got UN-expected err (not matching $msg_regex) at $fn line $ln'):\n«$ex»\n",
+            fmtsheet(sheet({package => $caller[0]})),
+            "\n";
   }
-  verif_no_internals_mentioned($@);
-  dprint "Got expected err: $@\n";
+  verif_no_internals_mentioned($ex);
+  dprint "Got expected err: $ex\n";
 }
 
 # Verify that a column title, alias, etc. is NOT defined
@@ -127,7 +138,7 @@ sub check_no_sheet() {
   my $pkg = caller;
   for (1,2) {
     confess "current sheet unexpected in $pkg"
-      if defined eval("do{ package $pkg; sheet() }");
+      if defined eval( insert_loc_in_evalstr("do{ package $pkg; sheet() }") );
     confess "bug2 $pkg"
       if defined sheet({package => $pkg});
   }

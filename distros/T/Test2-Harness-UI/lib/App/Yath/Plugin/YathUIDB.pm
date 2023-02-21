@@ -2,7 +2,7 @@ package App::Yath::Plugin::YathUIDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000129';
+our $VERSION = '0.000133';
 
 use Test2::Harness::UI::Util qw/config_from_settings/;
 use Test2::Harness::Util::JSON qw/decode_json/;
@@ -36,6 +36,13 @@ option_group {prefix => 'yathui', category => "YathUI Options"} => sub {
         type => 's',
         long_examples => [' get_port.sh', ' get_port.sh --pid $$'],
         description => 'Use a command to get a port number. "$$" will be replaced with the PID of the yath process',
+    );
+
+    option resources => (
+        type => 'd',
+        description => 'Send resource info (for supported resources) to yathui at the specified interval in seconds (5 if not specified)',
+        long_examples => ['', '=5'],
+        autofill => 5,
     );
 
     option only => (

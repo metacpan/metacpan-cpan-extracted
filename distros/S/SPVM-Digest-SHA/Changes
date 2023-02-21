@@ -1,3 +1,19 @@
+0.05 2023-02-09
+  [Incompatible Changes]
+    This rename is needed for "[Fixed Build Process Bug]Fixed build process bugs by reading native resouces".
+    renamed:    lib/SPVM/Digest/SHA.native/include/sha.c -> lib/SPVM/Digest/SHA.native/include/SPVM__Digest__SHA__sha.c
+    renamed:    lib/SPVM/Digest/SHA.native/include/sha.h -> lib/SPVM/Digest/SHA.native/include/SPVM__Digest__SHA__sha.h
+    renamed:    lib/SPVM/Digest/SHA.native/include/sha64bit.c -> lib/SPVM/Digest/SHA.native/include/SPVM__Digest__SHA__sha64bit.c
+    renamed:    lib/SPVM/Digest/SHA.native/include/sha64bit.h -> lib/SPVM/Digest/SHA.native/include/SPVM__Digest__SHA__sha64bit.h
+  [Fixed Build Process Bug]
+    * Fixed a build process bug on Windows.
+    * Fixed build process bugs by reading native resouces.
+  [Meta Information Improvement]
+    * Added the URL of this repository.
+  [Test Improvement]
+    * Added Github Action workflows.
+  [Test Bug Fix]
+    * Fixed a test bug that test don't work well on Perl 5.8.
 0.04 2022-02-08
   [Prerequirement Changes]
     * SPVM 0.9691+ is needed.

@@ -1,0 +1,4 @@
+0.017   2023-02-13  Released-By: PERLANCAR; Urgency: medium
+
+        - First release, split from App-BPOMUtils-Table because that
+          distribution's build time is now 3+ minutes.

@@ -1,5 +1,11 @@
 Revision history for App-VTide
 
+0.1.20   2023-02-13
+        Updating for release of version 0.1.20
+        Updated (Ivan Wills)
+        Trying to make starting more consistent on a Mac (Ivan Wills)
+        Better history and recursive edits (Ivan Wills)
+
 0.1.19   2022-12-04
         Updating for release of version 0.1.19
         Adding missing tests (Ivan Wills)

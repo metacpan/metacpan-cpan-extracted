@@ -5,8 +5,8 @@ use Mojo::Base -strict,-signatures;
 use Exporter ();
 use vars qw[@EXPORT @ISA];
 
-our $DATE = '2023-02-02'; # DATE
-our $VERSION = '0.006';
+our $DATE = '2023-02-16'; # DATE
+our $VERSION = '0.009';
 
 @ISA	= qw[Exporter];
 

@@ -2,6 +2,11 @@ Revision history for Perl distribution Chrome-Policy
 
 This is a changelog file in addition to git commit messages.
 
+0.230410  2023-02-11 01:22:00+04:00 Asia/Baku
+
+  - Add CONTRIBUTING file
+  - Document the set_strict_policy method
+
 0.230360  2023-02-05 04:50:40+04:00 Asia/Baku
 
   * Add GetOpt::Long::Parser OO option parsing

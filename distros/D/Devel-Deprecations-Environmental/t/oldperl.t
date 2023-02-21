@@ -6,7 +6,6 @@ use Test::Exception;
 
 use Config;
 use Devel::Deprecations::Environmental ();
-use DateTime;
 
 use lib 't/lib';
 

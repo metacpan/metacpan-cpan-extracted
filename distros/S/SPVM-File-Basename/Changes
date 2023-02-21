@@ -1,3 +1,22 @@
+0.02 2023-02-10
+  [Incompatible Changes]
+    * Current File::Basename is copied to File::Basename::Instance.
+    * File::Basename::Unix is renamed to File::Basename::Instance::Unix.
+    * File::Basename::Win32 is renamed to File::Basename::Instance::Win32.
+    * File::Basename::Interface is renamed to File::Basename::Instance::Interface.
+    * The definition of the methods of the File::Basename are changed and removed.
+      [Removed]
+      - static method new : File::Basename ();
+      - method has_interfaces : int ();
+      [Before]
+      -  method fileparse : string[] ($path : string);
+      -  method basename : string ($path : string);
+      -  method dirname : string ($path : string);
+      [After]
+      +  static method fileparse : string[] ($path : string);
+      +  static method basename : string ($path : string);
+      +  static method dirname : string ($path : string);
+      
 0.01 2023-01-26
   [Changes]
     * First release.

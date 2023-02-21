@@ -19,15 +19,12 @@ name: App-HTMLUtils-Grep
 provides:
   App::HTMLUtils::Grep:
     file: lib/App/HTMLUtils/Grep.pm
-    version: '0.001'
+    version: '0.002'
   App::htmlgrep:
     file: lib/App/htmlgrep.pm
-    version: '0.001'
+    version: '0.002'
 requires:
-  App::PDFUtils: '0.012'
   AppBase::Grep: '0.010'
-  CLI::MetaUtil::Getopt::Long::Complete: '0'
-  Complete::File: '0.440'
   Data::Sah::Compiler::perl::TH::array: '0.914'
   Data::Sah::Compiler::perl::TH::bool: '0.914'
   Data::Sah::Compiler::perl::TH::code: '0.914'
@@ -37,11 +34,7 @@ requires:
   Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix: '0'
   File::Basename: '0'
   File::Find::Rule: '0'
-  File::Slurper: '0'
   File::Temp: '0.2307'
-  File::Which: '0'
-  File::chdir: '0'
-  Getopt::Long: '2.50'
   IPC::System::Options: '0.339'
   Log::ger: '0.038'
   Perinci::CmdLine::Any: '0.154'
@@ -57,7 +50,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-HTMLUtils-Grep
   homepage: https://metacpan.org/release/App-HTMLUtils-Grep
   repository: git://github.com/perlancar/perl-App-HTMLUtils-Grep.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

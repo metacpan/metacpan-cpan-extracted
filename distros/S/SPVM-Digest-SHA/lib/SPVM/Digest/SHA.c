@@ -8,7 +8,7 @@ const char* FILE_NAME = "SPVM/Digest/SHA.c";
 #define Copy(src, dest, nitems, type) memcpy(dest, src, (nitems) * sizeof(type))
 #define Zero(dest, nitems, type) memset(dest, 0, (nitems) * sizeof(type))
 
-#include "sha.c"
+#include "SPVM__Digest__SHA__sha.c"
 
 static const int ix2alg[] =
   {1,1,1,224,224,224,256,256,256,384,384,384,512,512,512,

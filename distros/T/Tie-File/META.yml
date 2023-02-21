@@ -18,8 +18,9 @@ no_index:
     - t
     - inc
 resources:
-  bugtracker: https://github.com/toddr/Tie-File/issues
+  MailingList: http://lists.perl.org/list/perl5-porters.html
+  bugtracker: https://github.com/Perl/perl5/issues
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/toddr/Tie-File
-version: '1.06'
+  repository: https://github.com/Perl/perl5/tree/blead/dist/Tie-File
+version: '1.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

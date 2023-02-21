@@ -157,6 +157,8 @@ class IO::File extends IO::Handle {
     
     my $status = Sys::IO->fclose($stream);
     
+    $self->{stream} = undef;
+    
     return $status;
   }
   

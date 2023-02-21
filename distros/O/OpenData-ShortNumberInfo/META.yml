@@ -4,6 +4,7 @@ author:
   - 'Elvin Aslanov <rwp.primary@gmail.com>'
 build_requires:
   Test::More: '0'
+  feature: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -16,14 +17,14 @@ name: OpenData-ShortNumberInfo
 requires:
   HTTP::Tiny: '0'
   JSON::PP: '0'
-  Object::Pad: '0'
   URI: '0'
-  perl: v5.36.0
+  experimental: '0'
+  perl: v5.37.9
 resources:
   bugtracker: https://github.com/rwp0/OpenData-ShortNumberInfo/issues
   homepage: https://github.com/rwp0/OpenData-ShortNumberInfo
   repository: https://github.com/rwp0/OpenData-ShortNumberInfo.git
-version: '0.230380'
-x_generated_by_perl: v5.37.8
+version: '0.230470'
+x_generated_by_perl: v5.37.9
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

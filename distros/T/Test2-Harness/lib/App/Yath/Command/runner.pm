@@ -2,7 +2,7 @@ package App::Yath::Command::runner;
 use strict;
 use warnings;
 
-our $VERSION = '1.000142';
+our $VERSION = '1.000147';
 
 use Config qw/%Config/;
 use File::Spec;
@@ -18,6 +18,7 @@ BEGIN {
     my $int_done;
     my $orig = goto::file->can('filter');
     *goto::file::filter = sub {
+        local $.;
         my $out = $orig->(@_);
         seek(STDIN, 0, 0) if $FIX_STDIN;
 

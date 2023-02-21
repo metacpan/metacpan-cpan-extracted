@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-26'; # DATE
+our $DATE = '2022-11-15'; # DATE
 our $DIST = 'Sah-Schemas-JSON'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our $schema = [str => {
     summary => 'A string that contains valid JSON',
@@ -17,6 +17,9 @@ This schema can be used if you want to accept a string that contains valid JSON.
 The JSON string will not be decoded (e.g. a JSON-encoded array will not beome an
 array) but you know that the string contains a valid JSON. Data will not be
 valid if the string does not contain valid JSON.
+
+See also related schema: `json_or_str`, `str::encoded_json`,
+`str::escaped_json`.
 
 _
     examples => [
@@ -47,7 +50,7 @@ Sah::Schema::json_str - A string that contains valid JSON
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::Schema::json_str (from Perl distribution Sah-Schemas-JSON), released on 2022-08-26.
+This document describes version 0.007 of Sah::Schema::json_str (from Perl distribution Sah-Schemas-JSON), released on 2022-11-15.
 
 =head1 SYNOPSIS
 
@@ -85,12 +88,12 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "true";
+ $data = "[1,2,3,{}]";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = "foo";
- my $errmsg = $validator->($data); # => "String is not a valid JSON: 'false' expected, at character offset 0 (before \"foo\") at (eval 2497) line 13.\n"
+ $data = "[1,2,]";
+ my $errmsg = $validator->($data); # => "String is not a valid JSON: malformed JSON string, neither tag, array, object, number, string or atom, at character offset 5 (before \"]\") at (eval 2551) line 13.\n"
 
 Often a schema has coercion rule or default value, so after validation the
 validated value is different. To return the validated (set-as-default, coerced,
@@ -100,12 +103,12 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "true";
- my $res = $validator->($data); # => ["","true"]
+ $data = "[1,2,3,{}]";
+ my $res = $validator->($data); # => ["","[1,2,3,{}]"]
  
  # a sample invalid data
- $data = "foo";
- my $res = $validator->($data); # => ["String is not a valid JSON: 'false' expected, at character offset 0 (before \"foo\") at (eval 2503) line 13.\n","foo"]
+ $data = "[1,2,]";
+ my $res = $validator->($data); # => ["String is not a valid JSON: malformed JSON string, neither tag, array, object, number, string or atom, at character offset 5 (before \"]\") at (eval 2557) line 13.\n","[1,2,]"]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like
@@ -168,12 +171,32 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
 
  % ./myapp.pl --arg1 ...
 
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema:
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('$sch_name*', name=>'JsonStr')
+     );
+ }
+
+ use My::Types qw(JsonStr);
+ JsonStr->assert_valid($data);
+
 =head1 DESCRIPTION
 
 This schema can be used if you want to accept a string that contains valid JSON.
 The JSON string will not be decoded (e.g. a JSON-encoded array will not beome an
 array) but you know that the string contains a valid JSON. Data will not be
 valid if the string does not contain valid JSON.
+
+See also related schema: C<json_or_str>, C<str::encoded_json>,
+C<str::escaped_json>.
 
 =head1 HOMEPAGE
 
@@ -182,6 +205,14 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-JSON>.
+
+=head1 SEE ALSO
+
+L<Sah::Schema::json_or_str>
+
+L<Sah::Schema::str::encoded_json>
+
+L<Sah::Schema::str::escaped_json>
 
 =head1 AUTHOR
 

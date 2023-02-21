@@ -12,8 +12,21 @@ our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 our @ISA = 'Regexp';
 
 BEGIN {
-    our $VERSION = '0.025'; # VERSION
-    XSLoader::load __PACKAGE__, $VERSION;
+    #
+    our $VERSION = '0.027'; # VERSION
+    #
+    # Note that $VERSION is always defined when you use a distributed CPAN package.
+    # With old versions of perl, only the XSLoader::load(__PACKAGE__, $version) works.
+    # E.g. with perl-5.10, doing directly:
+    # make test
+    # within the repository may yell like this:
+    # Error:  XSLoader::load('Your::Module', $Your::Module::VERSION)
+    # In this case, you can put the module version in the RE_ENGINE_GNU_VERSION
+    # environment variable, e.g.:
+    # RE_ENGINE_GNU_VERSION=0.026 make test
+    #
+    my $version = eval q{$VERSION} // $ENV{RE_ENGINE_GNU_VERSION}; ## no critic
+    defined($version) ? XSLoader::load(__PACKAGE__, $version) : XSLoader::load();
 }
 
 {
@@ -102,7 +115,7 @@ re::engine::GNU - GNU Regular Expression Engine
 
 =head1 VERSION
 
-version 0.025
+version 0.027
 
 =head1 SYNOPSIS
 
@@ -358,6 +371,48 @@ L<GNU Gnulib Regular expressions|https://www.gnu.org/software/gnulib/manual/html
 L<perlre>
 
 =for Pod::Coverage ENGINE RE_SYNTAX_AWK RE_SYNTAX_ED RE_SYNTAX_EGREP RE_SYNTAX_EMACS RE_SYNTAX_GNU_AWK RE_SYNTAX_GREP RE_SYNTAX_POSIX_AWK RE_SYNTAX_POSIX_BASIC RE_SYNTAX_POSIX_EGREP RE_SYNTAX_POSIX_EXTENDED RE_SYNTAX_POSIX_MINIMAL_BASIC RE_SYNTAX_POSIX_MINIMAL_EXTENDED RE_SYNTAX_SED RE_BACKSLASH_ESCAPE_IN_LISTS RE_BK_PLUS_QM RE_CHAR_CLASSES RE_CONTEXT_INDEP_ANCHORS RE_CONTEXT_INDEP_OPS RE_CONTEXT_INVALID_OPS RE_DOT_NEWLINE RE_DOT_NOT_NULL RE_HAT_LISTS_NOT_NEWLINE RE_INTERVALS RE_LIMITED_OPS RE_NEWLINE_ALT RE_NO_BK_BRACES RE_NO_BK_PARENS RE_NO_BK_REFS RE_NO_BK_VBAR RE_NO_EMPTY_RANGES RE_UNMATCHED_RIGHT_PAREN_ORD RE_NO_POSIX_BACKTRACKING RE_NO_GNU_OPS RE_DEBUG RE_INVALID_INTERVAL_ORD RE_ICASE RE_CARET_ANCHORS_HERE RE_CONTEXT_INVALID_DUP RE_NO_SUB
+
+=head1 HOW TO CONTRIBUTE
+
+=over
+
+=item Patching
+
+  # Check that cpanm is installed
+  cpan App::cpanminus
+
+  # Eventually check the configure dependencies. This is using cpanfile.
+  cpanm --cpanfile cpanfile --installdeps --with-configure --notest .
+
+  # Test your changes
+  perl Makefile.PL
+  make
+  make test
+
+=item Authoring
+
+If you are going to change the authoring, which mainly means changing the C<dist.ini> file, you should:
+
+  # Check that cpanm is installed
+  cpan App::cpanminus
+
+  # Regenerate files relevant for authoring:
+  # Changes, META.json, README.pod, Makefile.PL and cpanfile are going to change.
+  dzil regenerate
+
+  # Eventually check the configure dependencies. This is using cpanfile.
+  cpanm --cpanfile cpanfile --installdeps --with-configure --notest .
+
+  # Eventually check the authoring dependencies. This is using cpanfile.
+  cpanm --cpanfile cpanfile --installdeps --with-develop --notest .
+
+  # Try it. You might want to set the environment variables:
+  # AUTHOR_TESTING=1
+  # EXTENDED_TESTING=1
+  # RELEASE_TESTING=1
+  dzil test --verbose
+
+=back
 
 =head1 AUTHOR
 

@@ -1,5 +1,11 @@
 Revision history for Perl extension LUGS::Events::Parser.
 
+0.13  2023-02-19  <schubiger@cpan.org>
+
+ - Move testing modules to test_requires.
+
+ - Drop generating compat Makefile.PL.
+
 0.12  2021-06-08  <schubiger@cpan.org>
 
  - Merged development version to stable.

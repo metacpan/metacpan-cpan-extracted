@@ -2,12 +2,13 @@ use strict;
 use warnings;
 use 5.014;
 
-use vars qw/$DEVNULL $is_Win32/;
+use vars qw/ $DEVNULL $is_Win32 /;
 
 use ExtUtils::MakeMaker;
 use Config;
 use Cwd qw/ cwd /;
 use File::Spec ();
+use File::Path 2.06 qw( make_path remove_tree );
 
 BEGIN {
     $::is_Win32 = ($^O =~ /Win32/);
@@ -31,11 +32,10 @@ while (my $arg = shift(@ARGV)) {
 
 my $DEBUG = delete $config{DEBUG};
 
-if ( $config{NO_THREADS} ) {
-  warn "disabling XML::LibXML support for Perl threads\n";
-  $config{DEFINE} .= " -DNO_XML_LIBXML_THREADS";
+if ( delete $config{NO_THREADS} ) {
+    warn "disabling XML::LibXML support for Perl threads\n";
+    $config{DEFINE} .= " -DNO_XML_LIBXML_THREADS";
 }
-delete $config{NO_THREADS};
 
 # We use it several times later. See:
 # https://rt.cpan.org/Public/Bug/Display.html?id=116461
@@ -88,8 +88,8 @@ See: https://bugzilla.gnome.org/show_bug.cgi?id=684564 .
 EOF
             }
 
-            $config{LIBS} ||= backtick("$xsltcfg --libs");
-            $config{INC} ||= backtick("$xsltcfg --cflags");
+            ($config{LIBS} ||= '' ) .= backtick("$xsltcfg --libs");
+            ($config{INC} ||= '') .= backtick("$xsltcfg --cflags");
             print "ok\n";
         };
         my $Err = $@;
@@ -102,8 +102,8 @@ EOF
             warn "*** ", $@ if $DEBUG;
             warn "using fallback values for LIBS and INC\n";
             # backtick fails if gnome-config didn't exist...
-            $config{LIBS} = '-L/usr/local/lib -L/usr/lib -lxslt -lxml2 -lz -lm';
-            $config{INC} = '-I/usr/local/include -I/usr/include';
+            ($config{LIBS} ||= '' ) .= ' -L/usr/local/lib -L/usr/lib -lxslt -lxml2 -lz -lm';
+            ($config{INC} ||= '') .= ' -I/usr/local/include -I/usr/include';
 
             print <<"OPT";
 options:
@@ -226,11 +226,23 @@ WriteMakefile(
     'PREREQ_PM' =>
     {
         'Encode' => 0,
+        'File::Path' => "2.06",
         'XML::LibXML' => "1.70",
         'strict' => 0,
         'warnings' => 0,
     },
     'OBJECT'     => '$(O_FILES)',
+    (($ExtUtils::MakeMaker::VERSION >= 6.52)
+        ? (
+            'CONFIGURE_REQUIRES' =>
+            {
+                'File::Path' => "2.06",
+                'strict' => 0,
+                'warnings' => 0,
+            },
+        )
+        : ()
+    ),
     (($ExtUtils::MakeMaker::VERSION >= 6.48)
         ? (MIN_PERL_VERSION => '5.014',)
         : ()
@@ -254,39 +266,6 @@ WriteMakefile(
 # Functions
 #  - these should really be in MakeMaker... But &shrug;
 ###################################################################
-
-sub rm_f {
-    my @files = @_;
-    my @realfiles;
-    foreach my $pat (@files) {
-        push @realfiles, glob($pat);
-    }
-    if (@realfiles) {
-        chmod(0777, @realfiles);
-        unlink(@realfiles);
-    }
-}
-
-sub rm_fr {
-    my @files = @_;
-    my @realfiles;
-    foreach my $pat (@files) {
-        push @realfiles, glob($pat);
-    }
-    foreach my $file (@realfiles) {
-        if (-d $file) {
-            # warn("$file is a directory\n");
-            rm_fr("$file/*");
-            rm_fr("$file/.exists");
-            rmdir($file) || die "Couldn't remove $file: $!";
-        }
-        else {
-            # warn("removing $file\n");
-            chmod(0777, $file);
-            unlink($file);
-        }
-    }
-}
 
 sub xsystem {
     my (@command)=@_;
@@ -369,7 +348,7 @@ sub try_link0 {
     # local $config{LIBS};
     # $config{LIBS} .= $opt;
     unless (mkdir(".testlink", 0777)) {
-        rm_fr(".testlink");
+        remove_tree(".testlink");
         mkdir(".testlink", 0777) || die "Cannot create .testlink dir: $!";
     }
     chdir(".testlink");
@@ -428,7 +407,7 @@ sub try_link {
     };
     warn $@ if $DEBUG && $@;
     chdir($start_dir);
-    rm_fr(".testlink");
+    remove_tree(".testlink");
     return $result;
 }
 
@@ -463,10 +442,11 @@ SRC
             }
         }
         else {
-
+            # Use a fake prototype in the style of autoconf.
             $result = try_link(<<"SRC", $libs);
-blank() { return 0; }
-int t() { ${func}(); return 0; }
+char blank(void) { return 0; }
+char ${func}(void);
+int t(void) { ${func}(); return 0; }
 SRC
         }
     }

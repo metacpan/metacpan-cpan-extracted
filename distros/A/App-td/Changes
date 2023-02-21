@@ -1,7 +1,31 @@
+0.110   2023-02-10  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Fix build, derp.
+
+
+0.109   2023-02-10  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] In description, describe which scripts/modules accept and
+          expect table data.
+
+
+0.108   2023-01-27  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Update examples in description (-e is now -E).
+
+
 0.107   2022-06-05  Released-By: PERLANCAR; Urgency: medium
 
-        - [incompatible change] Rename option name --repeat to --repeated, allow
-          uniq/nauniq to return duplicate rows under --repeated.
+        - [incompatible change] Rename option name --repeat to --repeated.
+
+        - [actions uniq, nauniq] Allow returning duplicate rows under
+          --repeated.
 
 
 0.106   2022-06-04  Released-By: PERLANCAR; Urgency: medium

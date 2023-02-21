@@ -118,12 +118,12 @@ Widget_init( Handle self, HV * profile)
 	my-> popupColorIndex( self, true, ciDark3DColor,  pget_i( popupDark3DColor)        );
 	SvHV_Font( pget_sv( popupFont), &Font_buffer, "Widget::init");
 	my-> set_popup_font  ( self, Font_buffer);
-	if ( SvTYPE( sv = pget_sv( popupItems)) != SVt_NULL)
+	if ( SvOK( sv = pget_sv( popupItems)))
 		my-> set_popupItems( self, sv);
-	if ( SvTYPE( sv = pget_sv( accelItems)) != SVt_NULL)
+	if ( SvOK( sv = pget_sv( accelItems)))
 		my-> set_accelItems( self, sv);
 
-	/* size, position, enabling, visibliity etc. runtime */
+	/* size, position, enabling, visibility etc. runtime */
 	{
 		Point set, set2;
 		AV * av;
@@ -191,7 +191,7 @@ Widget_init( Handle self, HV * profile)
 
 	{
 		SV * widgets = pget_sv( widgets);
-		if ( SvTYPE( widgets) != SVt_NULL) {
+		if ( SvOK( widgets) ) {
 			dSP;
 			ENTER;
 			SAVETMPS;
@@ -221,6 +221,7 @@ Widget_update_sys_handle( Handle self, HV * profile)
 		pexist( syncPaint) ||
 		pexist( clipOwner) ||
 		pexist( layered) ||
+		pexist( parentHandle) ||
 		pexist( transparent)
 	)) return;
 
@@ -1090,7 +1091,7 @@ Widget_hintVisible( Handle self, Bool set, int hintVisible)
 	wantVisible = ( hintVisible != 0);
 	if ( wantVisible == P_APPLICATION-> hintVisible) return false;
 	if ( wantVisible) {
-		if ( SvTYPE(var->hint) == SVt_NULL || (SvCUR( var-> hint) == 0)) return false;
+		if ( !SvOK(var->hint) || (SvCUR( var-> hint) == 0)) return false;
 		if ( hintVisible > 0) P_APPLICATION-> hintActive = -1; /* immediate */
 	}
 	C_APPLICATION-> set_hint_action( prima_guts.application, self, wantVisible, false);
@@ -1659,7 +1660,7 @@ Widget_set_hint( Handle self, SV *hint)
 		P_APPLICATION-> hintUnder == self)
 	{
 		Handle hintWidget = P_APPLICATION-> hintWidget;
-		if ( SvTYPE(var->hint) == SVt_NULL || (SvLEN( var-> hint) == 0))
+		if ( !SvOK(var->hint) || (SvLEN( var-> hint) == 0))
 			my-> set_hintVisible( self, 0);
 		if ( hintWidget)
 			CWidget(hintWidget)-> set_text( hintWidget, my-> get_hint( self));
@@ -2054,7 +2055,7 @@ Widget_selectedWidget( Handle self, Bool set, Handle widget)
 		}
 		return NULL_HANDLE;
 
-		/* classic solution should be recursive and inheritant call */
+		/* classic solution should be recursive and inherited call */
 		/* of get_selected() here, when Widget would return state of */
 		/* child-group selected state until Widget::selected() called; */
 		/* thus, each of them would call apc_widget_get_focused - that's expensive, */

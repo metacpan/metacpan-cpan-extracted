@@ -8,8 +8,9 @@ use warnings;
 use FindBin '$Bin';
 use Log::ger;
 use lib $Bin, "$Bin/t";
-
 use Test::More 0.96;
+use Test::Needs;
+
 require "testlib.pl";
 
 my ($table_data, $table_spec) = gen_test_data();
@@ -224,6 +225,31 @@ test_gen(
 
     },
 );
+
+# XXX test_gen aohos data
+
+subtest 'data from TableData object' => sub {
+    test_needs 'TableData::Sample::DeNiro';
+    require TableData::Sample::DeNiro;
+    test_gen(
+        name => 'data from TableData object (spec automatically from TableData Object)',
+        table_data => TableData::Sample::DeNiro->new,
+        status => 200,
+        post_test => sub {
+            my ($res) = @_;
+            my $func = $res->[2]{code};
+
+            test_query(
+                $func, {"Year.is"=>1971, detail=>1},
+                sub {
+                    my ($rr) = @_;
+                    is(scalar(@$rr), 1, "num of results = 1");
+                    is($rr->[0]{Title}, "Born to Win");
+                },
+            );
+        },
+    );
+};
 
 test_gen(
     name => 'paging',

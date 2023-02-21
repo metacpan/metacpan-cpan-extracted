@@ -63,14 +63,18 @@ sub alloc_surface
 
 sub apply_surface
 {
-	my ( $self, $x, $y, $alpha ) = @_;
+	my ( $self, $x, $y, $alpha, $colors ) = @_;
 
 	return 0 unless $self->{can_aa};
 
 	$alpha-> size( map { $_ / $self->{factor} } $alpha-> size );
 
 	my $canvas = $self->{canvas};
-	if ( $canvas->isa('Prima::Image') && ! $canvas->get_paint_state ) {
+	if ( $colors ) {
+		my $icon = Prima::Icon-> create_combined( $colors, $alpha );
+		$icon->premultiply_alpha;
+		return $canvas-> put_image( $x, $y, $icon, rop::Blend );
+	} elsif ( $canvas->isa('Prima::Image') && ! $canvas->get_paint_state ) {
 		return $canvas-> put_image( $x, $y, $alpha, rop::SrcOver | rop::ConstantColor );
 	} else {
 		my $bits = Prima::Image->new(
@@ -130,7 +134,6 @@ sub fillpoly
 
 	my $canvas = $self->{canvas};
 	$mode //= $self->{canvas}->fillMode;
-	$mode &= ~fm::Overlay; # very slow otherwise due to manual region patch
 	$poly = Prima::Drawable->render_polyline( $poly,
 		matrix => [$self->{factor},0,0,$self->{factor},0,0],
 		integer => 1
@@ -143,13 +146,43 @@ sub fillpoly
 
 	my $bitmap = $self->alloc_surface($w, $h) or goto FALLBACK;
 	$bitmap->region( $rgn );
-	$bitmap->set( map { $_ => $canvas->$_() } qw(fillPattern) );
-	my @fp = $canvas->fillPatternOffset;
-	$fp[0] -= $x;
-	$fp[1] -= $y;
-	$bitmap->fillPatternOffset(@fp);
+
+	my $colors;
+	my $fp = $canvas->fillPattern;
+	if ( ref($fp) ne 'ARRAY') {
+		goto STIPPLE if $fp->type == im::BW && !$fp->isa('Prima::Icon');
+
+		my @fp = $canvas->fillPatternOffset;
+		$fp[0] -= $x;
+		$fp[1] -= $y;
+		$colors = Prima::Image->new(
+			type              => ($canvas->isa('Prima::Image') ? $canvas->type : im::RGB),
+			size              => [ $w, $h ],
+			fillPattern       => $fp,
+			fillPatternOffset => \@fp,
+			color             => $canvas-> color,
+			backColor         => $canvas-> backColor,
+		);
+
+		$colors->bar( 0, 0, $colors->size );
+	} elsif ( !fp::is_solid($fp) && !fp::is_empty($fp) ) {
+	STIPPLE:
+		$fp = Prima::Image->new(
+			type     => im::BW,
+			size     => [8,8],
+			data     => join('000', map { chr } @$fp),
+		) if ref($fp) eq 'ARRAY';
+		$fp = $fp->clone( size => [ map { $_ * $self->{factor} } $fp-> size ] );
+		$bitmap->fillPattern($fp);
+
+		my @fp = $canvas->fillPatternOffset;
+		$fp[0] -= $x * $self->{factor};
+		$fp[1] -= $y * $self->{factor};
+		$bitmap->fillPatternOffset(@fp);
+	}
+
 	$bitmap->bar( 0, 0, $bitmap->size);
-	return $self->apply_surface($x, $y, $bitmap);
+	return $self->apply_surface($x, $y, $bitmap, $colors);
 
 FALLBACK:
 	return $self->{canvas}->fillpoly($poly);

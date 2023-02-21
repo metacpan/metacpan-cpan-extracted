@@ -59,20 +59,23 @@ render_dataset() for each row in the current page of search results.
 
 sub display_cell {
     my ($self, $row) = @_;
-    my $td_width = sprintf('%.0f%%', 1 / $self->{-grid_columns} * 100);
-
     my %extra_attributes = %{ $self->get_option_value('-extra_grid_cell_attributes', [$row]) || {} };
 
-    return $self->{q}->td(
-        {-class => $self->{-css_grid_cell_class} || 'searchWidgetGridCell',
-         -valign => 'top', -width => $td_width, %extra_attributes},
-        join '<br/>', map {
-            my $hdr = defined $self->{-display_columns}->{$_}
-              ? $self->{-display_columns}->{$_} : $_;
-            ($self->{-browse_mode} ? '' : $hdr ? $hdr.': ' : '')
-              . $self->display_record($row, $_);
-        } @{ $self->{'header_columns'} }
-    );
+    my $cell_html = '';
+    foreach my $col (@{ $self->{'header_columns'} }) {
+        next if ! defined $self->{-display_columns}->{$col};
+        my $record_html = $self->display_record($row, $col);
+        next if ! $record_html;
+        if ($self->{-browse_mode}) {
+            $cell_html .= ($cell_html ? '<br/>' : '').$record_html;
+            next;
+        }
+        my $hdr = $self->{-display_columns}->{$col};
+        $hdr .= ': ' if $hdr; # can be empty, which still displays without column heading
+        $cell_html .= '<div class="column_'.$col.'"><span class="headerLabel">'.$hdr.'</span><span class="cellContent">'.$record_html.'</span></div>';
+    }
+
+    return $self->{q}->td({-class => $self->{-css_grid_cell_class} || 'searchWidgetGridCell', %extra_attributes}, $cell_html);
 }
 
 =item display_dataset()
@@ -94,15 +97,17 @@ sub display_dataset {
 
     return ($self->{-optional_header}||'')
       . $self->extra_vars_for_form()
+      . '<div id="'.($self->{-css_dataset_container_id} || 'searchWidgetContainerId').'">'
       . ($self->{-browse_mode}
            ? $self->display_pager_links(1, 0, 1)
-           : '<div align="right">'.$self->translate('Sort by').': '.$self->display_sort_popup.'</div>'.$self->display_pager_links(1, 0))
+           : '<div align="right">'.$self->translate('Sort by').': '.$self->display_sort_popup().'</div>'.$self->display_pager_links(1, 0))
       . '<table id="'.($self->{-css_grid_id} || 'searchWidgetGridId').'" class="'.($self->{-css_grid_class} || 'searchWidgetGridTable').'">'
         . $self->{q}->Tr([ @grid_rows ])
       . '</table>'
       . ($self->{-browse_mode}
            ? $self->display_pager_links(0, 1, 1)
            : $self->display_pager_links(0, 1))
+      . '</div>'
       . ($self->{-optional_footer}||'');
 }
 
@@ -119,21 +124,25 @@ sub display_sort_popup {
     my $q = $self->{q};
 
     my @sortable_cols = ref $self->{-sortable_columns} eq 'HASH'
-      ? keys %{$self->{-sortable_columns} || {}}
+      ? sort { ($self->{-display_columns}->{$a} || $a) cmp ($self->{-display_columns}->{$b} || $b) } keys %{$self->{-sortable_columns}}
       : @{$self->{'sql_table_display_columns'}};
     $self->{'sortable_columns'} ||= [
         map { $self->_column_name($_) } grep { ! $self->{-unsortable_columns}->{$_} } @sortable_cols
     ];
     return $q->popup_menu(
         -name => 'sortby_columns_popup',
-        -values => [ '', map { $self->sortby_column_uri($_) } @{ $self->{'sortable_columns'} } ],
+        # call unescape version of sortby_column_uri() to convert &amp; back to & because CGI will autoEscape() - we can't have double-escaping
+        -values => [ '', map { $self->sortby_column_uri($_, 1) } @{ $self->{'sortable_columns'} } ],
         -labels => {
             '' => '<'.$self->translate('Sort field').'>',
-            map { $self->sortby_column_uri($_) => $self->{-display_columns}->{$_} || $_ }
-              @{$self->{'sortable_columns'}}
+            map {
+                my $lbl = $self->{-display_columns}->{$_};
+                $lbl =~ s|<[^<>]+>||g;
+                $self->sortby_column_uri($_, 1) => $lbl || $_;
+            } @{$self->{'sortable_columns'}}
         },
         -onchange => $self->{'action_uri_jsfunc'} ? 'var code = this.value; eval(code);' : 'if (this.value) window.location=this.value;',
-        -default => $q->param('sortby') ? $self->sortby_column_uri($q->param('sortby')) : undef,
+        -default => $q->param('sortby') ? $self->sortby_column_uri(scalar $q->param('sortby'), 1) : undef,
     );
 }
 

@@ -1,3 +1,10 @@
+0.006   2022-12-08  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+        - [build] Rebuild with Clipboard::Any 0.008 to update docs.
+
+
 0.005   2022-10-25  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] Add shorter alias clipadd (for add-clipboard-content) and

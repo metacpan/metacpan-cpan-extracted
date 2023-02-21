@@ -1,0 +1,898 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/BPOMUtils/Table/FoodIngredient/bpom_list_food_ingredients
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-02-13'; # DATE
+our $DIST = 'App-BPOMUtils-Table-FoodIngredient'; # DIST
+our $VERSION = '0.018'; # VERSION
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/BPOMUtils/Table/FoodIngredient/bpom_list_food_ingredients",
+    program_name => "bpom-daftar-bahan-baku-pangan",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: List ingredients in BPOM processed food division
+# PODNAME: bpom-daftar-bahan-baku-pangan
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+bpom-daftar-bahan-baku-pangan - List ingredients in BPOM processed food division
+
+=head1 VERSION
+
+This document describes version 0.018 of bpom-daftar-bahan-baku-pangan (from Perl distribution App-BPOMUtils-Table-FoodIngredient), released on 2023-02-13.
+
+=head1 SYNOPSIS
+
+B<bpom-daftar-bahan-baku-pangan> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<bpom-daftar-bahan-baku-pangan> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<bpom-daftar-bahan-baku-pangan> [B<L<--country-of-origin-contains|/"--country-of-origin-contains=s">>=I<str>] [(B<L<--country-of-origin-in|/"--country-of-origin-in=s@">>=I<str>)+|B<L<--country-of-origin-in-json|/"--country-of-origin-in=s@">>=I<json>] [B<L<--country-of-origin-is|/"--country-of-origin-is=s">>=I<str>] [B<L<--country-of-origin-isnt|/"--country-of-origin-isnt=s">>=I<str>] [B<L<--country-of-origin-matches|/"--country-of-origin-matches=s">>=I<str>] [B<L<--country-of-origin-max|/"--country-of-origin-max=s">>=I<str>] [B<L<--country-of-origin-min|/"--country-of-origin-min=s">>=I<str>] [B<L<--country-of-origin-not-contains|/"--country-of-origin-not-contains=s">>=I<str>] [(B<L<--country-of-origin-not-in|/"--country-of-origin-not-in=s@">>=I<str>)+|B<L<--country-of-origin-not-in-json|/"--country-of-origin-not-in=s@">>=I<json>] [B<L<--country-of-origin-not-matches|/"--country-of-origin-not-matches=s">>=I<str>] [B<L<--country-of-origin-xmax|/"--country-of-origin-xmax=s">>=I<str>] [B<L<--country-of-origin-xmin|/"--country-of-origin-xmin=s">>=I<str>] [B<L<--country-of-origin|/"--country-of-origin=s">>=I<str>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [(B<L<--exclude-field|/"--exclude-fields-json=s">>=I<str>)+|B<L<--exclude-fields-json|/"--exclude-fields-json=s">>=I<json>] [(B<L<--field|/"--fields-json=s">>=I<str>)+|B<L<--fields-json|/"--fields-json=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [(B<L<--id-in|/"--id-in=s@">>=I<int>)+|B<L<--id-in-json|/"--id-in=s@">>=I<json>] [B<L<--id-is|/"--id-is=s">>=I<int>] [B<L<--id-isnt|/"--id-isnt=s">>=I<int>] [B<L<--id-max|/"--id-max=s">>=I<int>] [B<L<--id-min|/"--id-min=s">>=I<int>] [(B<L<--id-not-in|/"--id-not-in=s@">>=I<int>)+|B<L<--id-not-in-json|/"--id-not-in=s@">>=I<json>] [B<L<--id-xmax|/"--id-xmax=s">>=I<int>] [B<L<--id-xmin|/"--id-xmin=s">>=I<int>] [B<L<--id|/"--id=s">>=I<int>] [B<L<--is-herbal-contains|/"--is-herbal-contains=s">>=I<str>] [(B<L<--is-herbal-in|/"--is-herbal-in=s@">>=I<str>)+|B<L<--is-herbal-in-json|/"--is-herbal-in=s@">>=I<json>] [B<L<--is-herbal-is|/"--is-herbal-is=s">>=I<str>] [B<L<--is-herbal-isnt|/"--is-herbal-isnt=s">>=I<str>] [B<L<--is-herbal-matches|/"--is-herbal-matches=s">>=I<str>] [B<L<--is-herbal-max|/"--is-herbal-max=s">>=I<str>] [B<L<--is-herbal-min|/"--is-herbal-min=s">>=I<str>] [B<L<--is-herbal-not-contains|/"--is-herbal-not-contains=s">>=I<str>] [(B<L<--is-herbal-not-in|/"--is-herbal-not-in=s@">>=I<str>)+|B<L<--is-herbal-not-in-json|/"--is-herbal-not-in=s@">>=I<json>] [B<L<--is-herbal-not-matches|/"--is-herbal-not-matches=s">>=I<str>] [B<L<--is-herbal-xmax|/"--is-herbal-xmax=s">>=I<str>] [B<L<--is-herbal-xmin|/"--is-herbal-xmin=s">>=I<str>] [B<L<--is-herbal|/"--is-herbal=s">>=I<str>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--name-contains|/"--name-contains=s">>=I<str>] [(B<L<--name-in|/"--name-in=s@">>=I<str>)+|B<L<--name-in-json|/"--name-in=s@">>=I<json>] [B<L<--name-is|/"--name-is=s">>=I<str>] [B<L<--name-isnt|/"--name-isnt=s">>=I<str>] [B<L<--name-matches|/"--name-matches=s">>=I<str>] [B<L<--name-max|/"--name-max=s">>=I<str>] [B<L<--name-min|/"--name-min=s">>=I<str>] [B<L<--name-not-contains|/"--name-not-contains=s">>=I<str>] [(B<L<--name-not-in|/"--name-not-in=s@">>=I<str>)+|B<L<--name-not-in-json|/"--name-not-in=s@">>=I<json>] [B<L<--name-not-matches|/"--name-not-matches=s">>=I<str>] [B<L<--name-xmax|/"--name-xmax=s">>=I<str>] [B<L<--name-xmin|/"--name-xmin=s">>=I<str>] [B<L<--name|/"--name=s">>=I<str>] [B<L<--origin-contains|/"--origin-contains=s">>=I<str>] [(B<L<--origin-in|/"--origin-in=s@">>=I<str>)+|B<L<--origin-in-json|/"--origin-in=s@">>=I<json>] [B<L<--origin-is|/"--origin-is=s">>=I<str>] [B<L<--origin-isnt|/"--origin-isnt=s">>=I<str>] [B<L<--origin-matches|/"--origin-matches=s">>=I<str>] [B<L<--origin-max|/"--origin-max=s">>=I<str>] [B<L<--origin-min|/"--origin-min=s">>=I<str>] [B<L<--origin-not-contains|/"--origin-not-contains=s">>=I<str>] [(B<L<--origin-not-in|/"--origin-not-in=s@">>=I<str>)+|B<L<--origin-not-in-json|/"--origin-not-in=s@">>=I<json>] [B<L<--origin-not-matches|/"--origin-not-matches=s">>=I<str>] [B<L<--origin-xmax|/"--origin-xmax=s">>=I<str>] [B<L<--origin-xmin|/"--origin-xmin=s">>=I<str>] [B<L<--origin|/"--origin=s">>=I<str>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--query-boolean|/"--query-boolean=s">>=I<str>|B<L<--and|/"--query-boolean=s">>|B<L<--or|/"--query-boolean=s">>] [(B<L<--query|/"--query=s@">>=I<str>)+|B<L<--queries-json|/"--query=s@">>=I<json>|(B<L<-q|/"--query=s@">>=I<str>)+] [B<L<--random|/"--random">>|B<L<--no-random|/"--random">>|B<L<--norandom|/"--random">>] [B<L<--result-limit|/"--result-limit=s">>=I<int>] [B<L<--result-start|/"--result-start=s">>=I<int>] [(B<L<--sort|/"--sort=s@">>=I<str>)+|B<L<--sort-json|/"--sort=s@">>=I<json>] [B<L<--status-contains|/"--status-contains=s">>=I<str>] [(B<L<--status-in|/"--status-in=s@">>=I<str>)+|B<L<--status-in-json|/"--status-in=s@">>=I<json>] [B<L<--status-is|/"--status-is=s">>=I<str>] [B<L<--status-isnt|/"--status-isnt=s">>=I<str>] [B<L<--status-matches|/"--status-matches=s">>=I<str>] [B<L<--status-max|/"--status-max=s">>=I<str>] [B<L<--status-min|/"--status-min=s">>=I<str>] [B<L<--status-not-contains|/"--status-not-contains=s">>=I<str>] [(B<L<--status-not-in|/"--status-not-in=s@">>=I<str>)+|B<L<--status-not-in-json|/"--status-not-in=s@">>=I<json>] [B<L<--status-not-matches|/"--status-not-matches=s">>=I<str>] [B<L<--status-xmax|/"--status-xmax=s">>=I<str>] [B<L<--status-xmin|/"--status-xmin=s">>=I<str>] [B<L<--status|/"--status=s">>=I<str>] [B<L<--type-contains|/"--type-contains=s">>=I<str>] [(B<L<--type-in|/"--type-in=s@">>=I<str>)+|B<L<--type-in-json|/"--type-in=s@">>=I<json>] [B<L<--type-is|/"--type-is=s">>=I<str>] [B<L<--type-isnt|/"--type-isnt=s">>=I<str>] [B<L<--type-matches|/"--type-matches=s">>=I<str>] [B<L<--type-max|/"--type-max=s">>=I<str>] [B<L<--type-min|/"--type-min=s">>=I<str>] [B<L<--type-not-contains|/"--type-not-contains=s">>=I<str>] [(B<L<--type-not-in|/"--type-not-in=s@">>=I<str>)+|B<L<--type-not-in-json|/"--type-not-in=s@">>=I<json>] [B<L<--type-not-matches|/"--type-not-matches=s">>=I<str>] [B<L<--type-xmax|/"--type-xmax=s">>=I<str>] [B<L<--type-xmin|/"--type-xmin=s">>=I<str>] [B<L<--type|/"--type=s">>=I<str>] [B<L<--with-field-names|/"--with-field-names">>|B<L<--without-field-names|/"--with-field-names">>] -- [I<L<query|/"--query=s@">>] ...
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Field selection options
+
+=over
+
+=item B<--detail>, B<-l>
+
+Return array of full records instead of just ID fields.
+
+By default, only the key (ID) field is returned per result entry.
+
+
+=item B<--exclude-field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--exclude-fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--exclude-field>.
+
+=item B<--field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--field>.
+
+=item B<--with-field-names>
+
+Return field names in each record (as hash/associative array).
+
+When enabled, function will return each record as hash/associative array
+(field name => value pairs). Otherwise, function will return each record
+as list/array (field value, field value, ...).
+
+
+=back
+
+=head2 Filtering for country_of_origin options
+
+=over
+
+=item B<--country-of-origin-contains>=I<s>
+
+Only return records where the 'country_of_origin' field contains specified text.
+
+=item B<--country-of-origin-in-json>=I<s>
+
+Only return records where the 'country_of_origin' field is in the specified values (JSON-encoded).
+
+See C<--country-of-origin-in>.
+
+=item B<--country-of-origin-in>=I<s@>
+
+Only return records where the 'country_of_origin' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--country-of-origin-is>=I<s>
+
+Only return records where the 'country_of_origin' field equals specified value.
+
+=item B<--country-of-origin-isnt>=I<s>
+
+Only return records where the 'country_of_origin' field does not equal specified value.
+
+=item B<--country-of-origin-matches>=I<s>
+
+Only return records where the 'country_of_origin' field matches specified regular expression pattern.
+
+=item B<--country-of-origin-max>=I<s>
+
+Only return records where the 'country_of_origin' field is less than or equal to specified value.
+
+=item B<--country-of-origin-min>=I<s>
+
+Only return records where the 'country_of_origin' field is greater than or equal to specified value.
+
+=item B<--country-of-origin-not-contains>=I<s>
+
+Only return records where the 'country_of_origin' field does not contain specified text.
+
+=item B<--country-of-origin-not-in-json>=I<s>
+
+Only return records where the 'country_of_origin' field is not in the specified values (JSON-encoded).
+
+See C<--country-of-origin-not-in>.
+
+=item B<--country-of-origin-not-in>=I<s@>
+
+Only return records where the 'country_of_origin' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--country-of-origin-not-matches>=I<s>
+
+Only return records where the 'country_of_origin' field does not match specified regular expression.
+
+=item B<--country-of-origin-xmax>=I<s>
+
+Only return records where the 'country_of_origin' field is less than specified value.
+
+=item B<--country-of-origin-xmin>=I<s>
+
+Only return records where the 'country_of_origin' field is greater than specified value.
+
+=item B<--country-of-origin>=I<s>
+
+Only return records where the 'country_of_origin' field equals specified value.
+
+=back
+
+=head2 Filtering for id options
+
+=over
+
+=item B<--id-in-json>=I<s>
+
+Only return records where the 'id' field is in the specified values (JSON-encoded).
+
+See C<--id-in>.
+
+=item B<--id-in>=I<s@>
+
+Only return records where the 'id' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--id-is>=I<s>
+
+Only return records where the 'id' field equals specified value.
+
+=item B<--id-isnt>=I<s>
+
+Only return records where the 'id' field does not equal specified value.
+
+=item B<--id-max>=I<s>
+
+Only return records where the 'id' field is less than or equal to specified value.
+
+=item B<--id-min>=I<s>
+
+Only return records where the 'id' field is greater than or equal to specified value.
+
+=item B<--id-not-in-json>=I<s>
+
+Only return records where the 'id' field is not in the specified values (JSON-encoded).
+
+See C<--id-not-in>.
+
+=item B<--id-not-in>=I<s@>
+
+Only return records where the 'id' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--id-xmax>=I<s>
+
+Only return records where the 'id' field is less than specified value.
+
+=item B<--id-xmin>=I<s>
+
+Only return records where the 'id' field is greater than specified value.
+
+=item B<--id>=I<s>
+
+Only return records where the 'id' field equals specified value.
+
+=back
+
+=head2 Filtering for is_herbal options
+
+=over
+
+=item B<--is-herbal-contains>=I<s>
+
+Only return records where the 'is_herbal' field contains specified text.
+
+=item B<--is-herbal-in-json>=I<s>
+
+Only return records where the 'is_herbal' field is in the specified values (JSON-encoded).
+
+See C<--is-herbal-in>.
+
+=item B<--is-herbal-in>=I<s@>
+
+Only return records where the 'is_herbal' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--is-herbal-is>=I<s>
+
+Only return records where the 'is_herbal' field equals specified value.
+
+=item B<--is-herbal-isnt>=I<s>
+
+Only return records where the 'is_herbal' field does not equal specified value.
+
+=item B<--is-herbal-matches>=I<s>
+
+Only return records where the 'is_herbal' field matches specified regular expression pattern.
+
+=item B<--is-herbal-max>=I<s>
+
+Only return records where the 'is_herbal' field is less than or equal to specified value.
+
+=item B<--is-herbal-min>=I<s>
+
+Only return records where the 'is_herbal' field is greater than or equal to specified value.
+
+=item B<--is-herbal-not-contains>=I<s>
+
+Only return records where the 'is_herbal' field does not contain specified text.
+
+=item B<--is-herbal-not-in-json>=I<s>
+
+Only return records where the 'is_herbal' field is not in the specified values (JSON-encoded).
+
+See C<--is-herbal-not-in>.
+
+=item B<--is-herbal-not-in>=I<s@>
+
+Only return records where the 'is_herbal' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--is-herbal-not-matches>=I<s>
+
+Only return records where the 'is_herbal' field does not match specified regular expression.
+
+=item B<--is-herbal-xmax>=I<s>
+
+Only return records where the 'is_herbal' field is less than specified value.
+
+=item B<--is-herbal-xmin>=I<s>
+
+Only return records where the 'is_herbal' field is greater than specified value.
+
+=item B<--is-herbal>=I<s>
+
+Only return records where the 'is_herbal' field equals specified value.
+
+=back
+
+=head2 Filtering for name options
+
+=over
+
+=item B<--name-contains>=I<s>
+
+Only return records where the 'name' field contains specified text.
+
+=item B<--name-in-json>=I<s>
+
+Only return records where the 'name' field is in the specified values (JSON-encoded).
+
+See C<--name-in>.
+
+=item B<--name-in>=I<s@>
+
+Only return records where the 'name' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--name-is>=I<s>
+
+Only return records where the 'name' field equals specified value.
+
+=item B<--name-isnt>=I<s>
+
+Only return records where the 'name' field does not equal specified value.
+
+=item B<--name-matches>=I<s>
+
+Only return records where the 'name' field matches specified regular expression pattern.
+
+=item B<--name-max>=I<s>
+
+Only return records where the 'name' field is less than or equal to specified value.
+
+=item B<--name-min>=I<s>
+
+Only return records where the 'name' field is greater than or equal to specified value.
+
+=item B<--name-not-contains>=I<s>
+
+Only return records where the 'name' field does not contain specified text.
+
+=item B<--name-not-in-json>=I<s>
+
+Only return records where the 'name' field is not in the specified values (JSON-encoded).
+
+See C<--name-not-in>.
+
+=item B<--name-not-in>=I<s@>
+
+Only return records where the 'name' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--name-not-matches>=I<s>
+
+Only return records where the 'name' field does not match specified regular expression.
+
+=item B<--name-xmax>=I<s>
+
+Only return records where the 'name' field is less than specified value.
+
+=item B<--name-xmin>=I<s>
+
+Only return records where the 'name' field is greater than specified value.
+
+=item B<--name>=I<s>
+
+Only return records where the 'name' field equals specified value.
+
+=back
+
+=head2 Filtering for origin options
+
+=over
+
+=item B<--origin-contains>=I<s>
+
+Only return records where the 'origin' field contains specified text.
+
+=item B<--origin-in-json>=I<s>
+
+Only return records where the 'origin' field is in the specified values (JSON-encoded).
+
+See C<--origin-in>.
+
+=item B<--origin-in>=I<s@>
+
+Only return records where the 'origin' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--origin-is>=I<s>
+
+Only return records where the 'origin' field equals specified value.
+
+=item B<--origin-isnt>=I<s>
+
+Only return records where the 'origin' field does not equal specified value.
+
+=item B<--origin-matches>=I<s>
+
+Only return records where the 'origin' field matches specified regular expression pattern.
+
+=item B<--origin-max>=I<s>
+
+Only return records where the 'origin' field is less than or equal to specified value.
+
+=item B<--origin-min>=I<s>
+
+Only return records where the 'origin' field is greater than or equal to specified value.
+
+=item B<--origin-not-contains>=I<s>
+
+Only return records where the 'origin' field does not contain specified text.
+
+=item B<--origin-not-in-json>=I<s>
+
+Only return records where the 'origin' field is not in the specified values (JSON-encoded).
+
+See C<--origin-not-in>.
+
+=item B<--origin-not-in>=I<s@>
+
+Only return records where the 'origin' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--origin-not-matches>=I<s>
+
+Only return records where the 'origin' field does not match specified regular expression.
+
+=item B<--origin-xmax>=I<s>
+
+Only return records where the 'origin' field is less than specified value.
+
+=item B<--origin-xmin>=I<s>
+
+Only return records where the 'origin' field is greater than specified value.
+
+=item B<--origin>=I<s>
+
+Only return records where the 'origin' field equals specified value.
+
+=back
+
+=head2 Filtering for status options
+
+=over
+
+=item B<--status-contains>=I<s>
+
+Only return records where the 'status' field contains specified text.
+
+=item B<--status-in-json>=I<s>
+
+Only return records where the 'status' field is in the specified values (JSON-encoded).
+
+See C<--status-in>.
+
+=item B<--status-in>=I<s@>
+
+Only return records where the 'status' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--status-is>=I<s>
+
+Only return records where the 'status' field equals specified value.
+
+=item B<--status-isnt>=I<s>
+
+Only return records where the 'status' field does not equal specified value.
+
+=item B<--status-matches>=I<s>
+
+Only return records where the 'status' field matches specified regular expression pattern.
+
+=item B<--status-max>=I<s>
+
+Only return records where the 'status' field is less than or equal to specified value.
+
+=item B<--status-min>=I<s>
+
+Only return records where the 'status' field is greater than or equal to specified value.
+
+=item B<--status-not-contains>=I<s>
+
+Only return records where the 'status' field does not contain specified text.
+
+=item B<--status-not-in-json>=I<s>
+
+Only return records where the 'status' field is not in the specified values (JSON-encoded).
+
+See C<--status-not-in>.
+
+=item B<--status-not-in>=I<s@>
+
+Only return records where the 'status' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--status-not-matches>=I<s>
+
+Only return records where the 'status' field does not match specified regular expression.
+
+=item B<--status-xmax>=I<s>
+
+Only return records where the 'status' field is less than specified value.
+
+=item B<--status-xmin>=I<s>
+
+Only return records where the 'status' field is greater than specified value.
+
+=item B<--status>=I<s>
+
+Only return records where the 'status' field equals specified value.
+
+=back
+
+=head2 Filtering for type options
+
+=over
+
+=item B<--type-contains>=I<s>
+
+Only return records where the 'type' field contains specified text.
+
+=item B<--type-in-json>=I<s>
+
+Only return records where the 'type' field is in the specified values (JSON-encoded).
+
+See C<--type-in>.
+
+=item B<--type-in>=I<s@>
+
+Only return records where the 'type' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--type-is>=I<s>
+
+Only return records where the 'type' field equals specified value.
+
+=item B<--type-isnt>=I<s>
+
+Only return records where the 'type' field does not equal specified value.
+
+=item B<--type-matches>=I<s>
+
+Only return records where the 'type' field matches specified regular expression pattern.
+
+=item B<--type-max>=I<s>
+
+Only return records where the 'type' field is less than or equal to specified value.
+
+=item B<--type-min>=I<s>
+
+Only return records where the 'type' field is greater than or equal to specified value.
+
+=item B<--type-not-contains>=I<s>
+
+Only return records where the 'type' field does not contain specified text.
+
+=item B<--type-not-in-json>=I<s>
+
+Only return records where the 'type' field is not in the specified values (JSON-encoded).
+
+See C<--type-not-in>.
+
+=item B<--type-not-in>=I<s@>
+
+Only return records where the 'type' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--type-not-matches>=I<s>
+
+Only return records where the 'type' field does not match specified regular expression.
+
+=item B<--type-xmax>=I<s>
+
+Only return records where the 'type' field is less than specified value.
+
+=item B<--type-xmin>=I<s>
+
+Only return records where the 'type' field is greater than specified value.
+
+=item B<--type>=I<s>
+
+Only return records where the 'type' field equals specified value.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--and>
+
+Shortcut for --query-boolean=and.
+
+See C<--query-boolean>.
+
+=item B<--or>
+
+Shortcut for --query-boolean=or.
+
+See C<--query-boolean>.
+
+=item B<--queries-json>=I<s>, B<-q>
+
+Search (JSON-encoded).
+
+See C<--query>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--query-boolean>=I<s>
+
+Whether records must match all search queries ('and') or just one ('or').
+
+Default value:
+
+ "and"
+
+Valid values:
+
+ ["and","or"]
+
+If set to C<and>, all queries must match; if set to C<or>, only one query should
+match. See the C<queries> option for more details on searching.
+
+
+=item B<--query>=I<s@>
+
+Search.
+
+This will search all searchable fields with one or more specified queries. Each
+query can be in the form of C<-FOO> (dash prefix notation) to require that the
+fields do not contain specified string, or C</FOO/> to use regular expression.
+All queries must match if the C<query_boolean> option is set to C<and>; only one
+query should match if the C<query_boolean> option is set to C<or>.
+
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Ordering options
+
+=over
+
+=item B<--random>
+
+Return records in random order.
+
+=item B<--sort-json>=I<s>
+
+Order records according to certain field(s) (JSON-encoded).
+
+See C<--sort>.
+
+=item B<--sort>=I<s@>
+
+Order records according to certain field(s).
+
+A list of field names separated by comma. Each field can be prefixed with '-' to
+specify descending order instead of the default ascending.
+
+
+Can be specified multiple times.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Paging options
+
+=over
+
+=item B<--result-limit>=I<s>
+
+Only return a certain number of records.
+
+=item B<--result-start>=I<s>
+
+Only return starting from the n'th record.
+
+Default value:
+
+ 1
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C bpom-daftar-bahan-baku-pangan bpom-daftar-bahan-baku-pangan
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete bpom-daftar-bahan-baku-pangan 'p/*/`bpom-daftar-bahan-baku-pangan`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-BPOMUtils-Table-FoodIngredient>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-BPOMUtils-Table-FoodIngredient>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-BPOMUtils-Table-FoodIngredient>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

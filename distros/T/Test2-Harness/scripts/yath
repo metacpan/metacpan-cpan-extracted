@@ -5,7 +5,7 @@
 # These will get re-processed later, but they MUST come even before App::Yath
 # is loaded.
 BEGIN {
-    local ($., $?, $@);
+    local $.;
     return if $^C;
 
     package App::Yath::Script;
@@ -258,6 +258,10 @@ BEGIN {
 
     # ==END TESTABLE CODE CREATE_APP==
 }
+
+# Reset these if we got this far.
+$? = 0;
+$@ = '';
 
 exit(App::Yath::Script::run());
 

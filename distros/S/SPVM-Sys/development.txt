@@ -1,0 +1,3 @@
+# Added the links to all modules
+
+  find lib | grep spvm | perl -p -e 'chomp; s/\.spvm//; s/SPVM:://; s/^lib\/SPVM\///; s/\//::/g; $_ .= "\n"' | sort | perl -p -e 'chomp; $_ = "=item * L<$_|SPVM::$_>"; $_ .= "\n\n"';

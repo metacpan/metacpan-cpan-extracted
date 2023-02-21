@@ -61,7 +61,7 @@ mem_cost = $mem_cost
 time_cost = $time_cost
 END
 
-# PODNAME: argon2-calibrate
+# PODNAME: argon2-calibrate - script to find the appropriate argon2 parameters
 
 __END__
 
@@ -71,11 +71,11 @@ __END__
 
 =head1 NAME
 
-argon2-calibrate
+argon2-calibrate - script to find the appropriate argon2 parameters
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 DESCRIPTION
 

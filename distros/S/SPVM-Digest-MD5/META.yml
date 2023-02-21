@@ -20,6 +20,7 @@ no_index:
     - perl_impl
 requires:
   SPVM: '0.9691'
-resources: {}
-version: '0.10'
+resources:
+  repository: https://github.com/yuki-kimoto/SPVM-Digest-MD5.git
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

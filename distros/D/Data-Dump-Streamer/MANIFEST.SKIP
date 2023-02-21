@@ -47,3 +47,6 @@ DDS\.pm
 \.(bs|c|def|obj|pdb)$
 ^dds\w+\.pl
 ^MYMETA.yml$
+^MYMETA\.json$
+.travis.yml
+tidyall.sh

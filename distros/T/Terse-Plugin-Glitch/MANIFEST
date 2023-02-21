@@ -1,0 +1,23 @@
+Changes
+ignore.txt
+lib/Terse/Plugin/Glitch.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/lib/glitch.conf
+t/lib/Test.psgi
+t/lib/Test/App.pm
+t/lib/Test/App/Controller/App.pm
+t/lib/Test/App/Model/Test.pm
+t/lib/Test/App/Plugin/Glitch.pm
+t/lib/Test/App/Plugin/ValidateParam.pm
+t/lib/Test/App/View/Pretty.pm
+t/lib/TestApp.pm
+t/lib/TestApp.psgi
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

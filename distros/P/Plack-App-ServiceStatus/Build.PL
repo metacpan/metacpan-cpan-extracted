@@ -18,21 +18,28 @@ my %module_build_args = (
     "Thomas Klausner <domm\@plix.at>"
   ],
   "dist_name" => "Plack-App-ServiceStatus",
-  "dist_version" => "0.908",
+  "dist_version" => "0.911",
   "license" => "perl",
   "module_name" => "Plack::App::ServiceStatus",
   "recursive_test_files" => 1,
   "requires" => {
     "Class::Accessor::Fast" => 0,
+    "Getopt::Long" => 0,
     "JSON::MaybeXS" => 0,
     "Log::Any" => 0,
     "Module::Runtime" => 0,
+    "POSIX" => 0,
+    "Path::Tiny" => 0,
     "Plack::Response" => 0,
+    "Pod::Usage" => 0,
     "Sys::Hostname" => 0,
     "Try::Tiny" => 0,
     "base" => 0,
-    "perl" => "5.018"
+    "perl" => "5.024"
   },
+  "script_files" => [
+    "bin/plack_app_service_status_generate_buildinfo.pl"
+  ],
   "test_requires" => {
     "File::Spec" => 0,
     "File::Temp" => 0,

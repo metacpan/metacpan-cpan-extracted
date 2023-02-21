@@ -4,8 +4,8 @@ use Mojo::Base -base,-signatures;
 
 use Time::Piece;
 
-our $DATE = '2023-02-02'; # DATE
-our $VERSION = '0.006';
+our $DATE = '2023-02-16'; # DATE
+our $VERSION = '0.009';
 
 has parent      => undef;
 has start       => sub { _makeDate(shift) };

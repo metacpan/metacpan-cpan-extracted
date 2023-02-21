@@ -2,8 +2,8 @@ NAME
     Clipboard::Any - Common interface to clipboard manager functions
 
 VERSION
-    This document describes version 0.005 of Clipboard::Any (from Perl
-    distribution Clipboard-Any), released on 2022-10-25.
+    This document describes version 0.008 of Clipboard::Any (from Perl
+    distribution Clipboard-Any), released on 2022-12-08.
 
 DESCRIPTION
     This module provides a common interface to interact with clipboard.
@@ -23,11 +23,23 @@ DESCRIPTION
         presented as an array. The current item/content is at index 0, the
         secondmost current item is at index 1, and so on.
 
+  Supported clipboard managers
+   Klipper
+    The default clipboard manager on KDE Plasma.
+
+   clipit
+   parcellite
+   xclip
+    This is not a "real" clipboard manager, but just an interface to the X
+    selections. With "xclip", the history is viewed as having two items. The
+    first/recent is the primary selection and the second one is the
+    secondary.
+
     This module provides common functions related to clipboard manager.
 
-    Supported clipboard manager: KDE Plasma's Klipper ("klipper"). Support
-    for more clipboard managers, e.g. on Windows or other Linux desktop
-    environment is welcome.
+    Supported clipboard manager: KDE Plasma's Klipper ("klipper"),
+    "parcellite". Support for more clipboard managers, e.g. on Windows or
+    other Linux desktop environment is welcome.
 
 NOTES
     2021-07-15 - Tested on my system (KDE Plasma 5.12.9 on Linux).
@@ -39,6 +51,9 @@ FUNCTIONS
      add_clipboard_content(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Add a new content to the clipboard.
+
+    For "xclip": when adding content, the primary selection is set. The
+    clipboard content is unchanged.
 
     This function is not exported by default, but exportable.
 

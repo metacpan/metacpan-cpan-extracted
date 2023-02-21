@@ -230,7 +230,17 @@ sub run_progress {
 	my $old_perc = -1;
 	my %vals;
 
-	my $length = $self->inputs->[0]->duration * 1000000;
+	my $length = $self->output->duration * 1000000;
+	if($length == 0) {
+		foreach my $input(@{$self->inputs}) {
+			my $dur = $input->duration * 1000000;
+			if($length == 0) {
+				$length = $dur;
+				next;
+			}
+			$length = $length < $dur ? $length : $dur;
+		}
+	}
 	shift @$command;
 	unshift @$command, ('ffmpeg', '-progress', '/dev/stdout');
 	open my $ffmpeg, "-|", @{$command};

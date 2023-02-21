@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-03'; # DATE
+our $DATE = '2023-02-18'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.008'; # VERSION
+our $VERSION = '1.017'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -130,7 +130,7 @@ App::CSVUtils::csv_gen - Generate CSV data using Perl code
 
 =head1 VERSION
 
-This document describes version 1.008 of App::CSVUtils::csv_gen (from Perl distribution App-CSVUtils), released on 2023-02-03.
+This document describes version 1.017 of App::CSVUtils::csv_gen (from Perl distribution App-CSVUtils), released on 2023-02-18.
 
 =head1 FUNCTIONS
 
@@ -176,6 +176,18 @@ Field names.
 
 Limit the number of rows to generate.
 
+=item * B<output_always_quote> => I<bool> (default: 0)
+
+Whether to always quote values.
+
+When set to false (the default), values are quoted only when necessary:
+
+ field1,field2,"field three contains comma (,)",field4
+
+When set to true, then all values will be quoted:
+
+ "field1","field2","field three contains comma (,)","field4"
+
 =item * B<output_escape_char> => I<str>
 
 Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
@@ -210,6 +222,18 @@ Specify field quote character in output CSV, will be passed to Text::CSV_XS.
 This is like C<--input-quote-char> option but for output instead of input.
 
 Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_quote_empty> => I<bool> (default: 0)
+
+Whether to quote empty values.
+
+When set to false (the default), empty values are not quoted:
+
+ field1,field2,,field4
+
+When set to true, then empty values will be quoted:
+
+ field1,field2,"",field4
 
 =item * B<output_sep_char> => I<str>
 

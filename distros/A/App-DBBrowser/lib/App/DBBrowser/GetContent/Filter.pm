@@ -186,24 +186,24 @@ sub __choose_columns {
     my ( $sf, $sql, $filter_str ) = @_;
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $aoa = $sql->{insert_into_args};
-    my $empty_cells_of_col_count = $sf->__count_empty_cells_of_cols( $aoa ); ## name
-    my $header = $sf->__prepare_header( $aoa, $empty_cells_of_col_count );
+    my $is_empty = $sf->__search_empty_cols( $aoa );
+    my $header = $sf->__prepare_header( $aoa, $is_empty );
     my $row_count = @$aoa;
     my $col_count = @{$aoa->[0]};
-    my $mark = []; ## name
+    my $non_empty_cols = [];
     for my $col_idx ( 0 .. $col_count - 1 ) {
-        if ( $empty_cells_of_col_count->[$col_idx] < $row_count ) {
-            push @$mark, $col_idx;
+        if ( ! $is_empty->[$col_idx] ) {
+            push @$non_empty_cols, $col_idx;
         }
     }
-    if ( @$mark == $col_count ) {
-        $mark = undef; # no preselect if all cols have entries
+    if ( @$non_empty_cols == $col_count ) {
+        $non_empty_cols = undef; # no preselect if all cols have entries
     }
     my $info = $sf->__get_filter_info( $sql, $filter_str );
     # Choose
     my $col_idx = $tu->choose_a_subset(
         $header,
-        { cs_label => 'Cols: ', layout => 0, order => 0, mark => $mark, all_by_default => 1, index => 1,
+        { cs_label => 'Cols: ', layout => 0, order => 0, mark => $non_empty_cols, all_by_default => 1, index => 1,
           confirm => $sf->{i}{ok}, back => $sf->{s_back}, info => $info, busy_string => $sf->{working} }
     );
     $sf->__print_busy_string();
@@ -222,16 +222,16 @@ sub __choose_rows {
     my $aoa = $sql->{insert_into_args};
     my @pre = ( undef, $sf->{i}{ok} );
     my $stringified_rows = [];
-    my $mark;
+    my $non_empty_rows = [];
     {
         no warnings 'uninitialized';
         for my $i ( 0 .. $#$aoa ) {
-            push @$mark, $i + @pre if length join '', @{$aoa->[$i]};
+            push @$non_empty_rows, $i + @pre if length join '', @{$aoa->[$i]};
             push @$stringified_rows, join ',', @{$aoa->[$i]};
         }
     }
-    if ( @$mark == @$stringified_rows ) {
-        $mark = undef;
+    if ( @$non_empty_rows == @$stringified_rows ) {
+        $non_empty_rows = undef;
     }
     my $prompt = 'Choose rows:';
     $sql->{insert_into_args} = []; # $sql->{insert_into_args} refers to a new empty array - this doesn't delete $aoa
@@ -243,7 +243,7 @@ sub __choose_rows {
             [ @pre, @$stringified_rows ],
             { %{$sf->{i}{lyt_v}}, prompt => $prompt, info => $info, meta_items => [ 0 .. $#pre ],
               include_highlighted => 2, index => 1, undef => $sf->{s_back}, busy_string => $sf->{working},
-              mark => $mark }
+              mark => $non_empty_rows }
         );
         $sf->__print_busy_string();
         if ( ! $idx[0] ) {
@@ -484,8 +484,8 @@ sub __split_column {
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $aoa = $sql->{insert_into_args};
-    my $empty_cells_of_col_count =  $sf->__count_empty_cells_of_cols( $aoa );
-    my $header = $sf->__prepare_header( $aoa, $empty_cells_of_col_count );
+    my $is_empty =  $sf->__search_empty_cols( $aoa );
+    my $header = $sf->__prepare_header( $aoa, $is_empty );
     my $prompt = 'Choose column:';
     my $info = $sf->__get_filter_info( $sql, $filter_str );
     # Stop
@@ -667,8 +667,8 @@ sub __join_columns {
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $aoa = $sql->{insert_into_args};
-    my $empty_cells_of_col_count =  $sf->__count_empty_cells_of_cols( $aoa );
-    my $header = $sf->__prepare_header( $aoa, $empty_cells_of_col_count );
+    my $is_empty = $sf->__search_empty_cols( $aoa );
+    my $header = $sf->__prepare_header( $aoa, $is_empty );
     my $info = $sf->__get_filter_info( $sql, $filter_str );
     # Choose
     my $chosen_idxs = $tu->choose_a_subset(
@@ -776,29 +776,30 @@ sub __empty_to_null {
 
 
 
-sub __count_empty_cells_of_cols {
+sub __search_empty_cols {
     my ( $sf, $aoa ) = @_;
     my $row_count = @$aoa;
     my $col_count = @{$aoa->[0]};
-    my $empty_cells_of_col_count = [ ( 0 ) x $col_count ];
+    my $is_empty ;
     COL: for my $col_idx ( 0 .. $col_count - 1 ) {
         for my $row_idx ( 0 .. $row_count - 1 ) {
             if ( length $aoa->[$row_idx][$col_idx] ) {
+                $is_empty->[$col_idx] = 0;
                 next COL;
             }
-            ++$empty_cells_of_col_count->[$col_idx];
         }
+        $is_empty->[$col_idx] = 1;
     }
-    return $empty_cells_of_col_count;
+    return $is_empty;
 }
 
 sub __prepare_header {
-    my ( $sf, $aoa, $empty_cells_of_col_count ) = @_;
+    my ( $sf, $aoa, $is_empty ) = @_;
     my $row_count = @$aoa;
     my $col_count = @{$aoa->[0]};
     my $header = [];
     for my $col_idx ( 0 .. $col_count - 1 ) {
-        if ( $empty_cells_of_col_count->[$col_idx] == $row_count ) {
+        if ( $is_empty->[$col_idx] ) {
             $header->[$col_idx] = '--';
         }
         else {

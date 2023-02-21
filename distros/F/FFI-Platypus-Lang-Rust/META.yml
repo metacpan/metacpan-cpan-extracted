@@ -8,15 +8,15 @@ build_requires:
   Test::Script: '0'
   perl: '5.008001'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
   FFI::Build::MM: '1.00'
   FFI::CheckLib: '0.11'
   File::Which: '0'
   File::chdir: '0'
   Path::Tiny: '0'
   perl: '5.008001'
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,6 +26,7 @@ no_index:
   directory:
     - examples
 requires:
+  Alien::Rust: '0.03'
   Env::ShellWords: '0'
   FFI::Build::File::Base: '1.00'
   FFI::CheckLib: '0.11'
@@ -37,14 +38,15 @@ requires:
   perl: '5.008001'
 resources:
   IRC: irc://irc.perl.org/#native
+  Twitter: https://fosstodon.org/@PerlFFI
   bugtracker: https://github.com/PerlFFI/FFI-Platypus-Lang-Rust/issues
   homepage: https://metacpan.org/pod/FFI::Platypus::Lang::Rust
   repository: git://github.com/PerlFFI/FFI-Platypus-Lang-Rust.git
-version: '0.12'
+version: '0.15'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Andrew Grangaard (SPAZM)'
-x_generated_by_perl: v5.37.5
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

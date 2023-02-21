@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 37;
+use Test::More tests => 35;
 use Config;
 
 my $perl = $Config{perlpath};
@@ -202,23 +202,12 @@ $output = `$perl ./bufrread.pl --nodata t/long_truncated_temp_synop_temp.bufr --
 $expected = read_file('t/long_truncated_temp_synop_temp_nodata.txt');
 is($output, $expected, 'testing bufrread.pl --nodata on file starting with truncated temp');
 
-`$perl ./bufrread.pl --ahl "ISXD99|ENMI|OKPR" --param t/param t/set_filter.bufr --tablepath t/bt > t/outrea9 2> t/errrea10`;
+`$perl ./bufrread.pl --ahl "ISXD99|ENMI|OKPR" --param t/param t/set_filter.bufr --tablepath t/bt > t/outrea9`;
 
 $output = read_file('t/outrea9');
 unlink 't/outrea9';
 $expected = read_file('t/set_filter.txt2');
 is($output, $expected, 'testing bufrread.pl --ahl -p on test file also used in set_filter.t');
-
-$output = read_file('t/errrea10');
-unlink 't/errrea10';
-$expected = read_file('t/set_filter.err2');
-$output =~ s/line \d+[.]?/line/g;
-$expected =~ s/line \d+[.]?/line/g;
-is($output, $expected, 'testing bufrread.pl --ahl -p on test file also used in set_filter.t for error message');
-
-$output = `$perl ./bufrread.pl --ahl "ISXD99|ENMI|OKPR" --nodata t/set_filter.bufr --tablepath t/bt`;
-$expected = read_file('t/set_filter.txt3');
-is($output, $expected, 'testing bufrread.pl --ahl --nodata on test file also used in set_filter.t');
 
 
 # Read in text file

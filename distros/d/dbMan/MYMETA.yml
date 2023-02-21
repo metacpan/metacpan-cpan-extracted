@@ -1,0 +1,37 @@
+---
+abstract: 'Database management tool/front-end (SQL console)'
+author:
+  - 'Milan Sorm (sorm@is4u.cz)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: dbMan
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Curses: '1.08'
+  Curses::UI: '0.95'
+  Cwd: '0'
+  DBI: '1.20'
+  Data::Dumper: '0'
+  Data::ShowTable: '0'
+  Locale::gettext: '1.01'
+  Term::ANSIColor: '0'
+  Term::ReadKey: '0'
+  Term::ReadLine: '0'
+  Term::ReadLine::Gnu: '0'
+  Term::Screen: '0'
+  Term::Size: '0'
+  Text::CSV_XS: '0'
+  Text::FormatTable: '0'
+version: '0.47'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

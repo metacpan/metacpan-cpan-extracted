@@ -3,7 +3,7 @@
 
 #include "perl.h"
 
-#define FUTURE_ASYNCAWAIT_ABI_VERSION 1
+#define FUTURE_ASYNCAWAIT_ABI_VERSION 2
 
 /*
  * The API contained in this file is even more experimental than the rest of
@@ -20,8 +20,10 @@ struct AsyncAwaitHookFuncs
 {
   U32 flags;  /* currently unused but reserve the ABI space just in case */
   void (*post_cv_copy)(pTHX_ CV *runcv, CV *cv, HV *modhookdata, void *hookdata);
+  void (*pre_suspend) (pTHX_ CV *cv, HV *modhookdata, void *hookdata);
   void (*post_suspend)(pTHX_ CV *cv, HV *modhookdata, void *hookdata);
   void (*pre_resume)  (pTHX_ CV *cv, HV *modhookdata, void *hookdata);
+  void (*post_resume) (pTHX_ CV *cv, HV *modhookdata, void *hookdata);
   void (*free)        (pTHX_ CV *cv, HV *modhookdata, void *hookdata);
 };
 
@@ -59,6 +61,32 @@ static void S_future_asyncawait_on_activate(pTHX_ void (*func)(pTHX_ void *data)
   }
 }
 
+/* flags constants for future_asyncawait_get_modhookdata() */
+enum {
+  FAA_MODHOOK_CREATE = (1<<0),
+};
+
+static HV *(*future_asyncawait_get_modhookdata_func)(pTHX_ CV *cv, U32 flags, PADOFFSET precreate_padix);
+#define future_asyncawait_get_modhookdata(cv, flags, precreate_padix)  \
+    S_future_asyncawait_get_modhookdata(aTHX_ cv, flags, precreate_padix)
+static HV *S_future_asyncawait_get_modhookdata(pTHX_ CV *cv, U32 flags, PADOFFSET precreate_padix)
+{
+  if(!future_asyncawait_get_modhookdata_func)
+    croak("Must call boot_future_asyncawait() first");
+
+  return (*future_asyncawait_get_modhookdata_func)(aTHX_ cv, flags, precreate_padix);
+}
+
+static PADOFFSET (*future_asyncawait_make_precreate_padix_func)(pTHX);
+#define future_asyncawait_make_precreate_padix()  S_future_asyncawait_make_precreate_padix(aTHX)
+PADOFFSET S_future_asyncawait_make_precreate_padix(pTHX)
+{
+  if(!future_asyncawait_make_precreate_padix_func)
+    croak("Must call boot_future_asyncawait() first");
+
+  return (*future_asyncawait_make_precreate_padix_func)(aTHX);
+}
+
 #define boot_future_asyncawait(ver)  S_boot_future_asyncawait(aTHX_ ver)
 static void S_boot_future_asyncawait(pTHX_ double ver)
 {
@@ -82,7 +110,13 @@ static void S_boot_future_asyncawait(pTHX_ double ver)
         abi_ver, FUTURE_ASYNCAWAIT_ABI_VERSION);
 
   register_future_asyncawait_hook_func = INT2PTR(void (*)(pTHX_ const struct AsyncAwaitHookFuncs *, void *),
-      SvUV(*hv_fetchs(PL_modglobal, "Future::AsyncAwait/register()@1", 0)));
+      SvUV(*hv_fetchs(PL_modglobal, "Future::AsyncAwait/register()@2", 0)));
+
+  future_asyncawait_get_modhookdata_func = INT2PTR(HV *(*)(pTHX_ CV *, U32, PADOFFSET),
+      SvUV(*hv_fetchs(PL_modglobal, "Future::AsyncAwait/get_modhookdata()@1", 0)));
+
+  future_asyncawait_make_precreate_padix_func = INT2PTR(PADOFFSET (*)(pTHX),
+      SvUV(*hv_fetchs(PL_modglobal, "Future::AsyncAwait/make_precreate_padix()@1", 0)));
 }
 
 /**************
@@ -148,6 +182,8 @@ static void S_future_asyncawait_wrap_suspendhook(pTHX_ SuspendHookFunc *newfunc,
 {
   if(*oldhookp)
     return;
+
+  warn("future_asyncawait_wrap_suspendhook() is now deprecated; use register_future_asyncawait_hook() instead");
 
   /* Rather than define our own mutex for this very-rare usecase, we'll just
    * abuse core's opcheck mutex for it. At worst this leads to thread

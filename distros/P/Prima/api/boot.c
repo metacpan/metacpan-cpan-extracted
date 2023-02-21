@@ -27,13 +27,10 @@
 #include "Region.h"
 #include "img_conv.h"
 
-#include <Types.inc>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "thunks.tinc"
 
 static void
 cv_set_prototype(char * package, char * method, char * prototype)
@@ -154,6 +151,12 @@ XS( prima_cleanup)
 	dXSARGS;
 	(void)items;
 
+	if ( prima_guts.init_ok == 0 ) {
+		ST(0) = &PL_sv_no;
+		XSRETURN(1);
+		return;
+	}
+
 	if ( prima_guts.application) Object_destroy( prima_guts.application);
 	prima_guts.app_is_dead = true;
 	hash_first_that( prima_guts.objects, (void*)kill_objects, NULL, NULL, NULL);
@@ -238,6 +241,7 @@ register_constants( void)
 	register_kb_constants();
 	register_km_constants();
 	register_le_constants();
+	register_lei_constants();
 	register_lj_constants();
 	register_lp_constants();
 	register_mb_constants();

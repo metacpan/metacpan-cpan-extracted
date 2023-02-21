@@ -1,6 +1,6 @@
 package SPVM::File::Spec;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 1;
 
@@ -17,111 +17,108 @@ This module is designed to support operations commonly performed on file specifi
 =head1 Usage
 
   use File::Spec;
-
-  my $spec = File::Spec->new;
-  my $file = $spec->catfile(["foo", "bar"], "a.txt"]);
-
-=head1 Interfaces
-
-=over 2
-
-=item * L<File::Spec::Interface|SPVM::File::Spec::Interface>
-
-=back
+  
+  my $file = File::Spec->catfile(["foo", "bar"], "a.txt"]);
 
 =head1 Class Methods
 
-  static method new : File::Spec ();
-
-=head1 Instance Methods
-
-=head2 has_interfaces
-
-  method has_interfaces : int ();
-
 =head2 canonpath
 
-  method canonpath : string ($path : string);
+  static method canonpath : string ($path : string);
 
 =head2 catdir
 
-  method catdir : string ($directories : string[]);
+  static method catdir : string ($directories : string[]);
 
 =head2 catfile
 
-  method catfile : string ($directories : string[], $filename : string);
+  static method catfile : string ($directories : string[], $filename : string);
 
 =head2 curdir
 
-  method curdir : string ();
+  static method curdir : string ();
 
 =head2 devnull
 
-  method devnull : string ();
+  static method devnull : string ();
 
 =head2 rootdir
 
-  method rootdir : string ();
+  static method rootdir : string ();
 
 =head2 tmpdir
 
-  method tmpdir : string ();
+  static method tmpdir : string ();
 
 =head2 updir
 
-  method updir : string ();
+  static method updir : string ();
 
 =head2 no_upwards
 
-  method no_upwards : string[] ($directories : string[]);
+  static method no_upwards : string[] ($directories : string[]);
 
 =head2 file_name_is_absolute
 
-  method file_name_is_absolute : int ($path : string);
+  static method file_name_is_absolute : int ($path : string);
 
 =head2 path
 
-  method path : string[] ();
+  static method path : string[] ();
 
 =head2 join
 
-  method join : string ($directories : string[], $filename : string);
+  static method join : string ($directories : string[], $filename : string);
 
 =head2 splitpath
 
-  method splitpath : string[] ($path : string, $no_file = 0 : int);
+  static method splitpath : string[] ($path : string, $no_file = 0 : int);
 
 =head2 splitdir
 
-  method splitdir : string[] ($path : string);
+  static method splitdir : string[] ($path : string);
 
 =head2 catpath
 
-  method catpath : string ($volume : string, $directory : string, $file : string);
+  static method catpath : string ($volume : string, $directory : string, $file : string);
 
 =head2 abs2rel
 
-  method abs2rel : string ($path : string, $base = undef : string);
+  static method abs2rel : string ($path : string, $base = undef : string);
 
 =head2 rel2abs
 
-  method rel2abs : string ($path : string, $base = undef : string);
+  static method rel2abs : string ($path : string, $base = undef : string);
 
-=head1 Well Known Child Classes
+=head1 Object Oriented Classes
+
+The following classes are used to implement C<SPVM::File::Spec>.
 
 =over 2
 
-=item * L<File::Spec::Unix|SPVM::File::Spec::Unix>
+=item * L<File::Spec::Instance|SPVM::File::Spec::Instance>
 
-=item * L<File::Spec::Win32|SPVM::File::Spec::Win32>
+=item * L<File::Spec::Instance::Unix|SPVM::File::Spec::Instance::Unix>
+
+=item * L<File::Spec::Instance::Win32|SPVM::File::Spec::Instance::Win32>
+
+=back
+
+=head1 SPVM::Cwd
+
+L<SPVM::Cwd> is included in this distribution.
+
+=over 2
+
+=item * L<SPVM::Cwd>
 
 =back
 
 =head1 See Also
 
-=head2 File::Spec::Cwd
+=head2 File::Spec
 
-C<SPVM::File::Spec::Cwd> is the Perl's L<Cwd> porting to L<SPVM>.
+C<SPVM::File::Spec> is Perl's L<File::Spec> porting to L<SPVM>.
 
 =head1 Repository
 

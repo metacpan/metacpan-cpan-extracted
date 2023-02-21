@@ -1,3 +1,9 @@
+0.12 2023-02-10T23:04:51+01:00
+ - Fix CSS processing from Tags::HTML::Page::Begin.
+
+0.11 2023-02-10T22:48:37+01:00
+ - Rewrite to new Tags::HTML::Page::Begin@0.16.
+
 0.10 2023-01-23T13:25:47+01:00
  - Add css_init() accessor and update to new Tags::HTML::Page::Begin.
  - Update copyright years.

@@ -81,7 +81,7 @@ has actionCfgMap => sub {
     my $self = shift;
     my %map;
     for my $row (@{$self->actionCfg}){
-        next unless $row->{action} =~ /^(submit|upload|download|autoSubmit|save)/;
+        next unless $row->{action} =~ /^(submit|upload|download|display|autoSubmit|save)/;
         next unless $row->{key};
         my $key = $row->{key};
         die mkerror(4646, "Duplicate action key $key") if exists $map{$key};

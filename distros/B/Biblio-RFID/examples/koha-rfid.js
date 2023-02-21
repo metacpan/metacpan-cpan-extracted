@@ -12,17 +12,8 @@
  *
  * You will have to inject remote javascript in Koha intranetuserjs using:
 
-
-<!-- this is basically remote script injection, doesn't work in Chrome with SSL -->
-//]]></script>
-
-<!-- invoke local RFID javascript -->
-<script type="text/javascript"
-src="http://localhost:9000/examples/koha-rfid.js" 
->
-
-<script type="text/javascript">
-//<![CDATA[
+// inject JavaScript RFID support
+$.getScript('http://localhost:9000/examples/koha-rfid.js');
 
  */
 
@@ -48,10 +39,15 @@ function rfid_scan(data,textStatus) {
 //	console.debug( 'rfid_scan', data, textStatus );
 
 	var span = $('span#rfid');
-	if ( span.size() == 0 ) {
-		$('ul#i18nMenu').append('<li><span id=rfid>RFID reader found<span>');
-		span = $('span#rfid');
-	}
+
+	if ( span.size() == 0 ) // insert last in language bar on bottom
+		span = $('ul#i18nMenu').append('<li><span id=rfid>RFID reader found<span>');
+
+	if ( span.size() == 0 ) // or before login on top
+		span = $('div#login').prepend('<span id=rfid>RFID reader found</span>');
+
+	span = $('span#rfid');
+
 
 	if ( data.tags ) {
 		if ( data.tags.length === 1 ) {
@@ -63,7 +59,11 @@ function rfid_scan(data,textStatus) {
 				var circulation = url.substr(-14,14) == 'circulation.pl';
 				var returns = url.substr(-10,10) == 'returns.pl';
 
-				if ( t.content.substr(0,3) == '130' ) {
+				if ( t.content.length == 0 ) { // empty tag
+
+					span.text( t.sid + ' empty' ).css('color', 'red' );
+
+				} else if ( t.content.substr(0,3) == '130' ) { // books
 
 					if ( circulation )
 						 rfid_secure( t.content, t.sid, 'D7' );

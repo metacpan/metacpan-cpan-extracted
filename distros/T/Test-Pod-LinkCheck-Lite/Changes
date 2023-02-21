@@ -1,3 +1,20 @@
+0.011		2023-02-14	T. R. Wyant
+    Add user_agent argument to new().  This allows the user to specify a
+    subclass of HTTP::Tiny, to implement extra client functionality such
+    as a persistent cache, Thanks to Graham (plicease) for letting me
+    know of the need for this, and working with me on the
+    implementation.
+
+    Ignore text in X<...> tags. Rendering the text was preventing the
+    proper identification of link targets. Thanks to Zaki Mughal
+    (zmughal) for recognizing the problem, fixing it, submitting the
+    pull request, and rattling my cage when I (for some unknown reason)
+    did not respond to his original request.
+
+    If IO::Socket::SSL is missing, https: links generate skipped tests,
+    with a diagnostic for the first one skipped.  Thanks to Mark Gardner
+    (mjgardner) for pointing out the need for this.
+
 0.010		2022-09-29	T. R. Wyant
     Localize $_ before while (<>).
 

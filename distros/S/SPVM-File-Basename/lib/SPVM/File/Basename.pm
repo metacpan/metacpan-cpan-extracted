@@ -1,6 +1,6 @@
 package SPVM::File::Basename;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 1;
 
@@ -18,13 +18,11 @@ This class parses a file path into a directory and a base name.
 
   use File::Basename;
   
-  my $fb = File::Basename->new;
-  
   my $path = "dir/a.txt";
   
   # fileparse
   {
-    my $ret = $fb->fileparse($path);
+    my $ret =File::Basename->fileparse($path);
     
     # a.txt
     my $base_name = $ret->[0];
@@ -36,13 +34,13 @@ This class parses a file path into a directory and a base name.
   # basename
   {
     # a.txt
-    my $base_name = $fb->basename($path);
+    my $base_name =File::Basename->basename($path);
   }
 
   # dirname
   {
     # dir
-    my $dir_name = $fb->dirname($path);
+    my $dir_name =File::Basename->dirname($path);
   }
 
 =head1 Interfaces
@@ -55,37 +53,27 @@ This class parses a file path into a directory and a base name.
 
 =head1 Class Methods
 
-=head2 new
-
-  static method new : File::Basename ();
-
-=head1 Instance Methods
-
 =head2 fileparse
 
-  method fileparse : string[] ($path : string);
+  static method fileparse : string[] ($path : string);
 
 =head2 basename
 
-  method basename : string ($path : string);
+  static method basename : string ($path : string);
 
 =head2 dirname
 
-  method dirname : string ($path : string);
+  static method dirname : string ($path : string);
 
-=head2 has_interfaces
+=head1 Object Oriented Classes
 
-  method has_interfaces : int ();
-
-Returns C<1>.
-
-=head1 Well Known Child Classes
+C<File::Basename> is implemented using the following classes.
 
 =over 2
 
-=item L<File::Basename::Unix|SPVM::File::Basename::Unix>
+=item L<File::Basename::Instance::Unix|SPVM::File::Basename::Instance::Unix>
 
-=item L<File::Basename::Win32|SPVM::File::Basename::Win32>
+=item L<File::Basename::Instance::Win32|SPVM::File::Basename::Instance::Win32>
 
 =back
 

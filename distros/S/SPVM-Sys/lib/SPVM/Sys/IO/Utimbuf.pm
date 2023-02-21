@@ -15,6 +15,9 @@ SPVM::Sys::IO::Utimbuf - struct utimbuf in C language
   my $actime = $utimbuf->actime;
   my $modtime = $utimbuf->modtime;
 
+  $utimbuf->set_actime($actime);
+  $utimbuf->set_modtime($modtime);
+
 =head1 Description
 
 C<Sys::IO::Utimbuf> is the class for the C<struct utimbuf> in C<C language>.

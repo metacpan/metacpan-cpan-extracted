@@ -1,5 +1,9 @@
 Revision history for Perl extension LaTeX::Pod.
 
+0.23  2023-02-12  <schubiger@cpan.org>
+
+ - Drop generating compat Makefile.PL.
+
 0.22  2023-01-23  <schubiger@cpan.org>
 
  - Merged development version to stable.

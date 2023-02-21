@@ -213,7 +213,6 @@ typedef struct _FontInfo {
 } FontInfo, *PFontInfo;
 
 typedef struct _RotatedFont {
-	double       direction;
 	int          first1;
 	int          first2;
 	int          height;
@@ -229,7 +228,8 @@ typedef struct _RotatedFont {
 	int          lineSize;
 	int          defaultChar1;
 	int          defaultChar2;
-	Fixed        sin, cos, sin2, cos2;
+	Fixed        matrix[4];
+	Fixed        inverse[4];
 	struct       RotatedFont *next;
 } RotatedFont, *PRotatedFont;
 
@@ -255,8 +255,9 @@ typedef struct _FontKey
 	int width;
 	int style;
 	int pitch;
-	int direction;
 	int vector;
+	int direction;
+	int matrix[4];
 	char name[ 256];
 } FontKey, *PFontKey;
 
@@ -458,7 +459,9 @@ typedef struct {
 #define AI_XdndActionDescription         50
 #define AI_PLAINTEXT_MIME                51
 #define AI_NET_WM_ICON                   52
-#define AI_count                         53
+#define AI_NET_FRAME_EXTENTS             53
+#define AI_NET_WM_STATE_FULLSCREEN       54
+#define AI_count                         55
 
 #define FXA_RESOLUTION_X            pguts->atoms[AI_FXA_RESOLUTION_X           ]
 #define FXA_RESOLUTION_Y            pguts->atoms[AI_FXA_RESOLUTION_Y           ]
@@ -516,6 +519,8 @@ typedef struct {
 #define XdndActionDescription       pguts->atoms[AI_XdndActionDescription      ]
 #define PLAINTEXT_MIME              pguts->atoms[AI_PLAINTEXT_MIME             ]
 #define NET_WM_ICON                 pguts->atoms[AI_NET_WM_ICON                ]
+#define NET_FRAME_EXTENTS           pguts->atoms[AI_NET_FRAME_EXTENTS          ]
+#define NET_WM_STATE_FULLSCREEN     pguts->atoms[AI_NET_WM_STATE_FULLSCREEN    ]
 
 #define DEBUG_FONTS 0x01
 #define DEBUG_CLIP  0x02
@@ -582,6 +587,7 @@ typedef struct _UnixGuts
 	long                         handled_events;
 	XButtonEvent                 last_button_event;
 	XButtonEvent                 last_click;
+	unsigned int                 last_mouseclick_number;
 	Time                         last_time;
 	int (*                       main_error_handler   )(Display*,XErrorEvent*);
 	int                          max_fd;
@@ -753,6 +759,7 @@ typedef struct _UnixGuts
 	Bool                         icccm_only;
 	Bool                         net_wm_maximization;
 	int                          net_wm_maximize_HORZ_vs_HORIZ;
+	Bool                         net_wm_fullscreen;
 	int                          use_gtk;
 	int                          use_quartz;
 	Bool                         use_harfbuzz;
@@ -781,6 +788,12 @@ typedef struct _UnixGuts
 	char                         unicode_hex_input_buffer[MAX_UNICODE_HEX_LENGTH + 1];
 
 	Bool                         application_stop_signal;
+
+	Bool                         use_xim;
+	XIM                          xim;
+	XIC                          xic;
+	char *                       xic_buffer;
+	unsigned int                 xic_bufsize;
 } UnixGuts;
 
 extern UnixGuts  guts;
@@ -881,15 +894,19 @@ typedef struct _drawable_sys_data
 		unsigned falsely_hidden           : 1;
 		unsigned first_click              : 1;
 		unsigned force_flush              : 1;
+		unsigned fullscreen               : 1;
+		unsigned fullscreen_emulated      : 1;
 		unsigned grab                     : 1;
 		unsigned has_icon                 : 1;
 		unsigned layered                  : 1;
 		unsigned layered_requested        : 1;
 		unsigned iconic                   : 1;
 		unsigned mapped                   : 1;
+		unsigned matrix_used              : 1;
 		unsigned modal                    : 1;
 		unsigned kill_current_region      : 1;
 		unsigned opaque                   : 1;
+		unsigned on_top                   : 1;
 		unsigned paint                    : 1;
 		unsigned paint_pending            : 1;
 		unsigned pointer_obscured         : 1;
@@ -919,8 +936,7 @@ typedef struct _drawable_sys_data
 #ifdef USE_XFT
 	XftDraw  * xft_drawable;
 	uint32_t * xft_map8;
-	double     xft_font_cos;
-	double     xft_font_sin;
+	Matrix     xft_font_matrix;
 	XftDraw  * xft_shadow_drawable;
 	Point      xft_shadow_extentions;
 	Pixmap     xft_shadow_pixmap;
@@ -1303,7 +1319,7 @@ prima_update_cursor( Handle self);
 
 extern Bool
 prima_update_rotated_fonts( PCachedFont f, const char * text, int len, Bool wide,
-	double direction, PRotatedFont *result, Bool * ok_to_not_rotate);
+	double direction, Matrix matrix, PRotatedFont *result, Bool * ok_to_not_rotate);
 
 extern void
 prima_free_rotated_entry( PCachedFont f);
@@ -1389,9 +1405,6 @@ prima_find_known_font( PFont font, Bool refill, Bool bySize);
 extern void
 prima_font_pp2font( char * ppFontNameSize, PFont font);
 
-extern void
-prima_build_font_key( PFontKey key, PFont f, Bool bySize);
-
 extern Bool
 prima_core_font_pick( Handle self, Font * source, Font * dest);
 
@@ -1476,7 +1489,7 @@ extern void
 prima_xft_gp_destroy( Handle self );
 
 extern Bool
-prima_xft_font_pick( Handle self, Font * source, Font * dest, double * size, XftFont ** xft_result);
+prima_xft_font_pick( Handle self, Font * source, Font * dest, double * size, Matrix matrix, XftFont ** xft_result);
 
 extern Bool
 prima_xft_set_font( Handle self, PFont font);
@@ -1493,7 +1506,7 @@ prima_xft_get_text_width( PCachedFont self, const char * text, int len,
 			Point * overhangs);
 
 extern int
-prima_xft_get_glyphs_width( PCachedFont self, PGlyphsOutRec glyphs,
+prima_xft_get_glyphs_width( Handle self, PCachedFont selfxx, PGlyphsOutRec glyphs,
 			Point * overhangs);
 
 extern Point *
@@ -1524,7 +1537,7 @@ extern int
 prima_xft_get_glyph_outline( Handle self, int index, int flags, int ** buffer);
 
 extern PCachedFont
-prima_xft_get_cache( PFont font);
+prima_xft_get_cache( PFont font, Matrix matrix);
 
 extern uint32_t *
 prima_xft_map8( const char * encoding);
@@ -1553,6 +1566,24 @@ extern unsigned long *
 prima_xft_mapper_query_ranges(PFont font, int * count, unsigned int * flags);
 
 #endif
+
+extern void
+prima_xim_init(void);
+
+extern void
+prima_xim_done(void);
+
+extern Bool
+prima_xim_handle_key_press( Handle self, XKeyEvent *ev, Event *e, KeySym *sym);
+
+extern void
+prima_xim_focus_in(Handle self);
+
+extern void
+prima_xim_focus_out(void);
+
+extern void
+prima_xim_update_cursor( Handle self);
 
 #ifdef WITH_GTK
 extern Display*
@@ -1613,6 +1644,9 @@ prima_region_create( Handle mask);
 extern Handle
 prima_find_toplevel_window(Handle self);
 
+extern Handle
+prima_find_root_parent(Handle self);
+
 extern Byte*
 prima_mirror_bits( void);
 
@@ -1648,4 +1682,10 @@ prima_update_dnd_aware( Handle self );
 
 extern Cursor
 prima_get_cursor(Handle self);
+
+extern void
+prima_paint_text_background( Handle self, Point * p, int x, int y );
+
+extern void
+prima_paint_box( Handle self, int w, int h, Matrix matrix, unsigned long foreground );
 

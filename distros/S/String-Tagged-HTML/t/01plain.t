@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More tests => 6;
+use Test2::V0;
 
 use String::Tagged::HTML;
 
@@ -27,3 +27,5 @@ is( $str->as_html, "10 &gt; 5<br/>", '->as_html with raw' );
 $str = String::Tagged::HTML->new_raw( "Hello<br/>" );
 
 is( $str->as_html, "Hello<br/>", '->new_raw constructs raw' );
+
+done_testing;

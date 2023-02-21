@@ -9,8 +9,12 @@ use HTML::Blitz::Atom qw(
     OP_VAR
     OP_VAR_QQ
     OP_VAR_HTML
+    OP_VAR_SCRIPT
+    OP_VAR_STYLE
     OP_CALL
     OP_CALL_QQ
+    OP_CALL_SCRIPT
+    OP_CALL_STYLE
     OP_MANGLE_ATTR
     OP_LOOP
     OP_COND
@@ -18,14 +22,15 @@ use HTML::Blitz::Atom qw(
 use Carp qw(croak);
 
 use constant {
-    _REPR_VERSION     => 0,
+    _REPR_VERSION     => 1,
     MAX_NESTED_CONCAT => 100,
 };
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
-method new($class: :$_scope = 0) {
+method new($class: :$_scope = 0, :$name = undef) {
     bless {
+        name  => defined($name) ? "$name" : undef,
         depth => $_scope,
         code  => [
             { type => OP_RAW, str => '' },
@@ -49,7 +54,7 @@ method FREEZE($model) {
             }
         }
     }
-    _REPR_VERSION, [$self->{depth}, \@code]
+    _REPR_VERSION, [$self->{depth}, \@code, $self->{name}]
 }
 
 method THAW($class: $model, $repr_version, $components) {
@@ -57,16 +62,16 @@ method THAW($class: $model, $repr_version, $components) {
         or croak "Cannot deserialize data format $repr_version with $class v$VERSION, which only supports data format " . _REPR_VERSION;
     my @todo = ['init', \my $self, @$components];
     while (@todo) {
-        my ($type, $ref, $depth, $code) = @{pop @todo};
+        my ($type, $ref, $depth, $code, $name) = @{pop @todo};
         if ($type eq 'exit') {
-            my $obj = $class->new(_scope => $depth);
+            my $obj = $class->new(_scope => $depth, name => $name);
             $obj->{code} = $code;
             $$ref = $obj;
             next;
         }
         $type eq 'init'
             or die "Internal error: bad THAW stack type '$type'";
-        push @todo, ['exit', $ref, $depth, $code];
+        push @todo, ['exit', $ref, $depth, $code, $name];
         for my $op (@$code) {
             if ($op->{type} eq OP_LOOP || $op->{type} eq OP_COND) {
                 if ($model eq 'JSON' && $op->{type} eq OP_COND) {
@@ -110,14 +115,21 @@ method emit_text($text) {
     $self->_emit_raw($text);
 }
 
+my $assert_style_code = q{sub {
+    $_[0] =~ m{(</style[\s/>])}aai
+        and Carp::croak "contents of <style> tag must not contain '$1': '$_[0]'";
+    $_[0]
+}};
+my $assert_style_fn = eval $assert_style_code
+    or die $@;
+
 method emit_style_text($text) {
-    $text =~ m{(</style[\s/>])}aai
-        and croak "contents of <style> tag must not contain '$1': '$text'";
-    $self->_emit_raw($text);
+    $self->_emit_raw($assert_style_fn->($text));
 }
 
-method emit_script_text($text) {
-    my $script_content_error = fun ($str) {
+my $assert_script_code = q{sub {
+    my $script_content_error = sub {
+        my ($str) = @_;
         SCRIPT_DATA: {
             $str =~ m{ ( <!-- (?! -?> ) ) | ( </script [ \t\r\n\f/>] ) }xaaigc
                 or return undef;
@@ -137,11 +149,16 @@ method emit_script_text($text) {
         undef
     };
 
-    if (defined(my $error = $script_content_error->($text))) {
-        croak $error;
+    if (defined(my $error = $script_content_error->($_[0]))) {
+        Carp::croak $error;
     }
+    $_[0]
+}};
+my $assert_script_fn = eval $assert_script_code
+    or die $@;
 
-    $self->_emit_raw($text);
+method emit_script_text($text) {
+    $self->_emit_raw($assert_script_fn->($text));
 }
 
 method emit_close_tag($name) {
@@ -223,12 +240,28 @@ method emit_variable_html($var) {
     push @{$self->{code}}, { type => OP_VAR_HTML, name => $var };
 }
 
+method emit_variable_script($var) {
+    push @{$self->{code}}, { type => OP_VAR_SCRIPT, name => $var };
+}
+
+method emit_variable_style($var) {
+    push @{$self->{code}}, { type => OP_VAR_STYLE, name => $var };
+}
+
 method emit_call($names, $value) {
     push @{$self->{code}}, { type => OP_CALL, names => $names, value => $value };
 }
 
 method emit_call_qq($names, $value) {
     push @{$self->{code}}, { type => OP_CALL_QQ, names => $names, value => $value };
+}
+
+method emit_call_script($names, $value) {
+    push @{$self->{code}}, { type => OP_CALL_SCRIPT, names => $names, value => $value };
+}
+
+method emit_call_style($names, $value) {
+    push @{$self->{code}}, { type => OP_CALL_STYLE, names => $names, value => $value };
 }
 
 method insert_loop($var) {
@@ -248,9 +281,9 @@ method rescoped_onto($scope) {
     for my $op (@{$self->{code}}) {
         if ($op->{type} eq OP_RAW) {
             push @code, { %$op };
-        } elsif ($op->{type} eq OP_VAR || $op->{type} eq OP_VAR_QQ || $op->{type} eq OP_VAR_HTML) {
+        } elsif ($op->{type} eq OP_VAR || $op->{type} eq OP_VAR_QQ || $op->{type} eq OP_VAR_HTML || $op->{type} eq OP_VAR_SCRIPT || $op->{type} eq OP_VAR_STYLE) {
             push @code, { %$op, name => [$op->{name}[0] + $scope, $op->{name}[1]] };
-        } elsif ($op->{type} eq OP_CALL || $op->{type} eq OP_CALL_QQ || $op->{type} eq OP_MANGLE_ATTR) {
+        } elsif ($op->{type} eq OP_CALL || $op->{type} eq OP_CALL_QQ || $op->{type} eq OP_MANGLE_ATTR || $op->{type} eq OP_CALL_SCRIPT || $op->{type} eq OP_CALL_STYLE) {
             my @names = map [$_->[0] + $scope, $_->[1]], @{$op->{names}};
             push @code, { %$op, names => \@names };
         } elsif ($op->{type} eq OP_LOOP) {
@@ -262,7 +295,7 @@ method rescoped_onto($scope) {
             die "Internal error: unknown op type $op->{type}";
         }
     }
-    my $new = ref($self)->new(_scope => $scope);
+    my $new = ref($self)->new(_scope => $scope, name => $self->{name});
     $new->{code} = \@code;
     $new
 }
@@ -360,6 +393,12 @@ method assemble(:$data_format, :$data_format_mapping) {
         $str_var->($var);
         $gen_vars{$var->[0]}{html_qq}{$var->[1]} //= $mk_varid->('qq', $var)
     };
+    my $str_var_script = fun ($var) {
+        $gen_vars{$var->[0]}{script}{$var->[1]} //= $mk_varid->('script', $var)
+    };
+    my $str_var_style = fun ($var) {
+        $gen_vars{$var->[0]}{style}{$var->[1]} //= $mk_varid->('style', $var)
+    };
     my $func_var = fun ($var) {
         $gen_vars{$var->[0]}{func}{$var->[1]} //= $mk_varid->('fn', $var)
     };
@@ -405,6 +444,8 @@ method assemble(:$data_format, :$data_format_mapping) {
     my $bclass = 'HTML::Blitz::Builder';
     my $need_builder = 0;
     my $need_err_callable = 0;
+    my $need_assert_script = 0;
+    my $need_assert_style = 0;
 
     my $do_assemble = fun ($scope_parent, $scope, $code, :$in_new_scope_env = 1) {
         my $new_scope_env = {
@@ -412,6 +453,8 @@ method assemble(:$data_format, :$data_format_mapping) {
             by_type => \my %seen_ref,
             html    => \my %local_vars_html,
             html_qq => \my %local_vars_html_qq,
+            script  => \my %local_vars_script,
+            style   => \my %local_vars_style,
             func    => \my %local_vars_func,
             # typeof => {},
         };
@@ -443,10 +486,20 @@ method assemble(:$data_format, :$data_format_mapping) {
                 $gen_concat->($str_var->($op->{name}));
             } elsif ($op->{type} eq OP_VAR_QQ) {
                 $gen_concat->($str_var_qq->($op->{name}));
+            } elsif ($op->{type} eq OP_VAR_SCRIPT) {
+                $gen_concat->($str_var_script->($op->{name}));
+            } elsif ($op->{type} eq OP_VAR_STYLE) {
+                $gen_concat->($str_var_style->($op->{name}));
             } elsif ($op->{type} eq OP_CALL) {
                 $gen_concat->($inline_esc->($build_call->($op)));
             } elsif ($op->{type} eq OP_CALL_QQ) {
                 $gen_concat->($inline_esc_qq->($build_call->($op)));
+            } elsif ($op->{type} eq OP_CALL_SCRIPT) {
+                $gen_concat->('$assert_script->(' . $build_call->($op) . ')');
+                $need_assert_script++;
+            } elsif ($op->{type} eq OP_CALL_STYLE) {
+                $gen_concat->('$assert_style->(' . $build_call->($op) . ')');
+                $need_assert_style++;
             } elsif ($op->{type} eq OP_VAR_HTML) {
                 $gen_concat->("${bclass}::to_html(" . $ref_of_type->('html', $op->{name}) . ')');
                 $need_builder++;
@@ -504,6 +557,16 @@ method assemble(:$data_format, :$data_format_mapping) {
                 $decl .= "$pvar = ref($pvar) ? \\&$pvar : \$err_callable->(" . _as_perl_string($template_var_name->('func', $scope, $rvar)) . ", $pvar);\n";
                 $need_err_callable++;
             }
+            for my $rvar (sort keys %local_vars_script) {
+                my $pvar = $local_vars_script{$rvar};
+                $decl .= "my $pvar = \$assert_script->(" . $ref_of_type->('str', [$scope, $rvar]) . ");\n";
+                $need_assert_script++;
+            }
+            for my $rvar (sort keys %local_vars_style) {
+                my $pvar = $local_vars_style{$rvar};
+                $decl .= "my $pvar = \$assert_style->(" . $ref_of_type->('str', [$scope, $rvar]) . ");\n";
+                $need_assert_style++;
+            }
 
             $gen_code = "$decl\n$gen_code" if length $decl;
 
@@ -521,13 +584,25 @@ method assemble(:$data_format, :$data_format_mapping) {
 
     my $gen_code = $do_assemble->([undef, ''], $self->scope, $self->{code});
 
-    "use strict; use warnings;\n"
-    . ($need_err_callable
+    (defined $self->{name}
+        ? '#line 1 "(blitz-template)' . $self->{name} =~ tr/"\n\r/_/r . qq{"\n}
+        : ''
+    )
+    . "use strict; use warnings 'all', FATAL => 'uninitialized';\n"
+    . ($need_err_callable || $need_assert_script || $need_assert_style
         ? "use Carp ();\n"
         : ''
     )
     . ($need_builder
         ? "use $bclass ();\n"
+        : ''
+    )
+    . ($need_assert_script
+        ? "my \$assert_script = $assert_script_code;\n"
+        : ''
+    )
+    . ($need_assert_style
+        ? "my \$assert_style = $assert_style_code;\n"
         : ''
     )
     . "sub {\n"

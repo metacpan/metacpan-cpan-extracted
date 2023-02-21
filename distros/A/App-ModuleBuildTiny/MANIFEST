@@ -11,5 +11,5 @@ lib/App/ModuleBuildTiny/Dist.pm
 prereqs.json
 script/mbtiny
 t/00-compile.t
-t/release-kwalitee.t
-t/release-pod-syntax.t
+xt/release/kwalitee.t
+xt/release/pod-syntax.t

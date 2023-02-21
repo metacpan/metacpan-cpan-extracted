@@ -1,0 +1,3 @@
+class File::Glob {
+  native static method glob : string[] ($pattern : string);
+}

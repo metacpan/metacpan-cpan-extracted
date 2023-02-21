@@ -1,0 +1,266 @@
+NAME
+
+    PDF::Collage - PDF manipulation with scissors and glue
+
+VERSION
+
+    This document describes PDF::Collage version 0.001.
+
+SYNOPSIS
+
+       use PDF::Collage qw< collage >;
+    
+       # $input might be... many things
+       my $collage = collage($input);
+       my $pdf = $collage->render(\%data);
+       $pdf->saveas('/path/to/somefile.pdf');
+
+DESCRIPTION
+
+    PDF::Collage helps generate an object wrapping either a
+    PDF::Collage::Template or a PDF::Collage::TemplatesCollection
+    (collectively referred as renderable object).
+
+    These allow eventually generate PDF::Builder objects, after applying
+    the supported transformations; this allows the generated PDF to be
+    saved (e.g. using the saveas method of the PDF::Builder object).
+
+    The Do What I Mean interface "collage" is a one-stop-shop for getting
+    one such object; it accepts a variety of inputs, including TAR bundles
+    (or their directory counterparts).
+
+    This distribution supports two basic types of inputs:
+
+      * definition representing single templates, allowing the
+      instantiation of a PDF::Collage::Template object;
+
+      * anything that can be turned into a Data::Resolver object, leading
+      to a PDF::Collage::TemplatesCollection (which, in turn, manages a
+      collection of PDF::Collage::Template objects).
+
+ Single Template Example
+
+    The details about the format for single templates can be found in the
+    documentation for PDF::Collage::Template.
+
+    The following is an example of a possible sequence of commands, which
+    take page 5 from a pre-existing PDF file available in the filesystem
+    and put some text over it in selected positions.
+
+       [  # a template is basically a sequence of commands in an array
+    
+          {  # set defaults for other commands
+             op => 'set-defaults',
+             font => 'DejaVuSans.ttf',
+             'font-size' => 12,
+             level => 'INFO',
+          },
+    
+          {
+             op => 'log',
+             message => 'starting operations...',
+             level   => 'WARN', # override defaults
+          },
+    
+          {  # add-page by defaults appends to the end
+             op => 'add-page',
+             from => 'existing-file.pdf', # relative to current dir
+             'from-page' => 5,
+          },
+    
+          {
+             op => 'add-text',
+             x => 10,
+             y => 20,
+             text => 'this is verbatim text',
+          },
+    
+          {  # text-template, rendered via Template::Perlish
+             op => 'add-text',
+             x => 10,
+             y => 40,
+             'text-template' => '[% foo %] is [% bar.baz %]',
+          },
+    
+          {  # text-variable, rendered via Template::Perlish
+             op => 'add-text',
+             x => 10,
+             y => 60,
+             'text-variable' => 'bar.baz',
+          },
+    
+          {
+             op => 'add-image',
+             path => 'logo.png',   # relative to current dir
+             x => 10,
+             y => 150,
+             width => 50,
+             height => 50,
+          },
+    
+          {
+             op => 'log',
+             message => 'that's all folks!',
+          },
+       ]
+
+    The template can refer anything in the filesystem, hence it's up to the
+    user to make sure that the elements are properly available in the
+    specific paths (in the example above, it would be the PDF file
+    existing-file.pdf and the image file logo.png, both assumed to be in
+    the current directory).
+
+    Refer to "Templates Collection" for something more cohesive.
+
+ Templates Collection
+
+    A templates collection is... a collection of templates. It allows
+    carrying around multiple templates at once, as well as artifacts that
+    are deemed important to have around, e.g. because they are referred
+    from the commands. As such, a collection might technically contain a
+    single template.
+
+    A collection always needs a Data::Resolver-compatible function to work
+    properly. Details are in the documentation for
+    PDF::Collage::TemplatesCollection, here's an example of the structure
+    of the keys that it should support:
+
+       definitions/bar.json
+       definitions/foo.json
+       definitions/galook.json
+       existing-file.pdf
+       logo.png
+
+    Every key ending with .json and starting with definitions/, optionally
+    prefixed with ./ (to cope with possible variations in TAR archives) is
+    considered a file containing the instructions valid for a single
+    template.
+
+    The name part (in the example bar, foo, and galook) is the selector,
+    which can be used to retrieve that specific sequence of commands from
+    the collection via "get" in PDF::Collage::TemplatesCollection, getting
+    back a PDF::Collage::Template object.
+
+    To retrieve elements from the resolver, e.g. to get a page from the
+    existing-file.pdf or the image logo.png, it's possible to use two
+    functions that are injected in the Template::Perlish namespace, namely
+    as_data and as_file, depending on the needs. The following fragment is
+    a command for taking page 5 from the document accessible through the
+    resolver and the image too:
+
+          {
+             op => 'add-page',
+             'from-page' => 5,
+             from => '[%= as_file("existing-file.pdf") %]',
+          },
+    
+          {
+             op => 'add-image',
+             path => '[%= as_file("logo.png") %]',
+             x => 10,
+             y => 150,
+             width => 50,
+             height => 50,
+          },
+
+    Note that it's necessary to open the template part with [%= to get the
+    filename back into the data.
+
+    By default, the injected function as_file will try to keep the
+    extension, derived from the provided key assuming it's a filename-like
+    string. Everything after the first dot is kept. It's possible to
+    disable this renaming (if and when it occurs) by passing a second
+    parameter with a false value, like in as_file($key, 0).
+
+INTERFACE
+
+    This module has a function-oriented interface.
+
+ collage
+
+       my $pc = collage($input);
+       my $pc = collage(auto => $input);      # same as above
+       my $pc = collage(resolver => $data_resolver_instance); # Data::Resolver
+       my $pc = collage(dir => $path_to_dir);
+       my $pc = collage(tar => $path_to_tar);
+       my $pc = collage(definition => \%hash_definition);
+       my $pc = collage(definition => \@array_definition);
+       my $pc = collage(definition => $json_hash_or_array);
+
+    This is a Do What I Mean catchall function to generate an instance of
+    either PDF::Collage::Template or PDF::Collage::TemplatesCollection.
+
+    The function acts as a dispatcher to one of the other functions:
+    "collage_from_definition", "collage_from_dir", "collage_from_resolver",
+    and "collage_from_tar".
+
+ collage_from_definition
+
+       my $pc = collage_from_definition($definition);
+
+    Generate a renderable object from a $definition.
+
+    If the definition is a string starting with either { or [, it is
+    considered a valid JSON string and decoded as such, then processed as
+    follows.
+
+    If the definition is an array reference, it is turned into an hash
+    reference with a single key commands, associated to the array reference
+    as value.
+
+    If the definition is an hash reference, it is considered a suitable
+    input for instantiating an object from PDF::Collage::Template, which is
+    returned back.
+
+ collage_from_dir
+
+       my $pc = collage_from_dir($path, %other_args);
+
+    This function is a thin wrapper around "collage_from_resolver"; it
+    first instantiates a Data::Resolver object of factory type
+    resolver_from_dir, using the provided $path and %other_args, then
+    passes the resulting object to "collage_from_resolver".
+
+ collage_from_resolver
+
+       my $pc = collage_from_resolver($resolver);
+
+    Instantiate a PDF::Collage::TemplatesCollection object passing
+    $resolver as the value associated to key resolver.
+
+ collage_from_tar
+
+       my $pc = collage_from_tar($path, %other_args);
+
+    This function is a thin wrapper around "collage_from_resolver"; it
+    first instantiates a Data::Resolver object of factory type
+    resolver_from_tar, using the provided $path and %other_args, then
+    passes the resulting object to "collage_from_resolver".
+
+BUGS AND LIMITATIONS
+
+    Minimum perl version 5.24.
+
+    Report bugs through GitHub (patches welcome) at
+    https://github.com/polettix/PDF-Collage.
+
+AUTHOR
+
+    Flavio Poletti <flavio@polettix.it>
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2023 by Flavio Poletti <flavio@polettix.it>
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+    implied. See the License for the specific language governing
+    permissions and limitations under the License.
+

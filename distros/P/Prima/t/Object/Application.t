@@ -4,8 +4,7 @@ use warnings;
 use Test::More;
 use Prima::sys::Test;
 use Prima::Application;
-
-plan tests => 14;
+use Prima::Utils;
 
 my $a = $::application;
 
@@ -19,6 +18,8 @@ SKIP: {
 		skip "not compiled with gtk", 3 unless $a->get_system_info->{gui} == gui::GTK;
 	} elsif ( $^O =~ /win32/i && $::application->pixel(0,0) == cl::Invalid) {
 		skip "rdesktop", 3;
+	} elsif ( $::application->get_bpp < 8 ) {
+		skip "depth too low", 3;
 	}
 
 	reset_flag;
@@ -30,8 +31,8 @@ SKIP: {
 				onTop => 1,
 			) : ('Widget')),
 		rect => [0,0,5,5],
-		color => cl::White,
-		backColor => cl::Black,
+		color => cl::LightRed,
+		backColor => cl::LightGreen,
 		onPaint => sub {
 			my $w = shift;
 			$w->rop2(rop::CopyPut);
@@ -49,11 +50,13 @@ SKIP: {
 	ok( $i && $i->width == 2 && $i->height == 1, "some bitmap grabbing succeeded");
 	skip "no bitmap", 1 unless $i;
 
-	$i->type(im::BW);
-	my ( $a, $b ) = ( $i->pixel(0,0), $i->pixel(1,0) );
-	($a,$b) = ($b,$a) if $b < $a;
-	is($a, 0, "one pixel is black");
-	is($b, 255, "another is white");
+	$i->type(im::RGB);
+	my ( $A, $B ) = ( $i->pixel(0,0), $i->pixel(1,0) );
+	skip "no access to screen", 1 if $A == 0 && $B == 0;
+	my ($r, $g, $b) = cl::to_rgb($A);
+	ok($r > 0x80 && $g < 0x40 && $b < 0x40, "one pixel is red");
+	($r, $g, $b) = cl::to_rgb($B);
+	ok($r < 0x40 && $g > 0x80 && $b < 0x40, "another is green");
 	$w->destroy;
 }
 
@@ -70,6 +73,7 @@ SKIP: {
 	$a-> pixel( 10, 10, 0xFFFFFF);
 	my $wh = $a-> pixel( 10, 10);
 	$a-> pixel( 10, 10, $pix);
+	skip "cannot sync display", 2 if $bl == $wh;
 	my ( $xr, $xg, $xb) = (( $wh & 0xFF0000) >> 16, ( $wh & 0xFF00) >> 8, $wh & 0xFF);
 	$wh =  ( $xr + $xg + $xb ) / 3;
 	is( $bl, 0, "black pixel");
@@ -130,7 +134,31 @@ ok( $::application->alive, "stop #2 works" );
 
 $SIG{ALRM} = 'DEFAULT';
 alarm(10);
+
+my ($die1, $die2) = ('','');
+my $want_clear_event = 1;
+$::application->onDie( sub {
+	my ($self, $err, $stack) = @_;
+	if ( $want_clear_event ) {
+		$want_clear_event = 0;
+		$die1 = $err;
+		$self->clear_event;
+		Prima::Utils::post( sub { die 43 } );
+	} else {
+		$die2 = $err;
+	}
+} );
+
+Prima::Utils::post( sub { die 42 } );
+eval { run Prima; };
+like( $die1, qr/42/, "die ignored");
+like( $die2, qr/43/, "die not ignored");
+isnt($::application, undef, 'app is still alive');
+
 $::application->close;
 $e = $::application->yield(1);
 ok(!$e, "yield returns 0 on application.close");
 
+
+
+done_testing;

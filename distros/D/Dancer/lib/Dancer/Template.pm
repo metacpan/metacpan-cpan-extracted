@@ -1,7 +1,7 @@
 package Dancer::Template;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: template wrapper for Dancer
-$Dancer::Template::VERSION = '1.3520';
+$Dancer::Template::VERSION = '1.3521';
 use strict;
 use warnings;
 use Dancer::ModuleLoader;
@@ -33,7 +33,7 @@ Dancer::Template - template wrapper for Dancer
 
 =head1 VERSION
 
-version 1.3520
+version 1.3521
 
 =head1 DESCRIPTION
 

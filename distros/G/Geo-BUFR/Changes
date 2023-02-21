@@ -1,4 +1,10 @@
 Revision history for Perl extension Geo::BUFR.
+1.39 2023-02-19
+- New option --gts in bufrextract.pl for extraction of full GTS envelope
+  from GTS bulletins, dropping option --reuse_ahl
+- New methods get_current_gts_starting_line() and get_current_gts_eom(),
+  dropping reuse_current_ahl() and ahl_is_reused()
+- Default tables for utility programs changed to master table version 39
 1.38 2020-07-15
 - Include replication descriptors in output for option --all_operators
   in bufrread.pl (or more generally for set_show_all_operators())

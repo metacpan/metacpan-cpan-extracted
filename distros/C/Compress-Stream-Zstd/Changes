@@ -1,5 +1,17 @@
 Revision history for Perl extension Compress-Stream-Zstd
 
+0.204 2023-02-08
+
+  *  Disable compress__mt
+     abdad95bc46ff1e4d913afb70a5d0158bf38930a
+     fc14e2ed8c5797af3be71c251916d44c67e44cd9
+
+  *  ignore .vscode
+     f1a66b51af598855ff15aacc86207fb677b6ff59
+
+  *  Update to zstd 1.54
+     d4d6b7e7d503b4916176d27d8b7ee9ace096b0f7     
+
 0.203 2022-04-27
 
   * 0.203

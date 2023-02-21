@@ -1,0 +1,63 @@
+WebService-IdoitAPI
+
+This module was inspired by the Python i-doit API client from Martin Vorlaender
+    https://github.com/mvorl/i-doit_API
+
+and the PHP i-doit CLI tool from Benjamin Heisig.
+    https://github.com/bheisig/i-doit-cli
+
+It is used mainly to import data into i-doit using Perl scripts,
+that scrape data from various sources.
+
+If you want to know more about i-doit, please visit
+    https://www.i-doit.com/.
+
+To get more information about the i-doit JSON RPC API, please visit
+     https://kb.i-doit.com/pages/viewpage.action?pageId=37355644
+
+and have a look at the API client written in PHP
+     https://github.com/i-doit/api-client-php
+
+For further question regarding i-doit and the JSON RPC API please visit
+    https://community.i-doit.com/
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WebService::IdoitAPI
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-IdoitAPI
+
+    GitHub Issues for this module
+        https://github.com/matwei-perl/WebService-IdoitAPI/issues
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/WebService-IdoitAPI
+
+    Search CPAN
+        https://metacpan.org/release/WebService-IdoitAPI
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2022 by Mathias Weidner.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

@@ -1,7 +1,6 @@
 use strict;
 use warnings;
-use OPCUA::Open62541 qw(:STATUSCODE :CLIENTSTATE :SESSIONSTATE
-    :SECURECHANNELSTATE);
+use OPCUA::Open62541 qw(:STATUSCODE :SESSIONSTATE :SECURECHANNELSTATE);
 use IO::Socket::INET;
 use Scalar::Util qw(looks_like_number);
 use Time::HiRes qw(sleep);
@@ -20,8 +19,6 @@ $server->start();
 # dont start server to trigger immediate callback in first run_iterate
 # $server->run();
 
-my $async = OPCUA::Open62541::Client->can('connect_async');
-
 my $data;
 {
     my $client = OPCUA::Open62541::Client->new();
@@ -29,14 +26,9 @@ my $data;
     is($config->setDefault(), STATUSCODE_GOOD, "config set default");
     my $url = "opc.tcp://localhost:" . $server->port();
 
-    if ($async) {
-	is($client->connect_async($url, sub { print "perl callback\n" }, undef),
-	   STATUSCODE_GOOD, "connect async");
-    } else {
-	$config->setStateCallback(sub { print "perl callback\n" });
-	$config->setClientContext("foobar");
-	is($client->connectAsync($url), STATUSCODE_GOOD, "connectAsync good");
-    }
+    $config->setStateCallback(sub { print "perl callback\n" });
+    $config->setClientContext("foobar");
+    is($client->connectAsync($url), STATUSCODE_GOOD, "connectAsync good");
 
     $data->{client} = $client;
 }

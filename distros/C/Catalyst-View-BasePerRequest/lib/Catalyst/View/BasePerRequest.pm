@@ -1,7 +1,7 @@
 package Catalyst::View::BasePerRequest;
 
-our $VERSION = '0.009';
-our $DEFAULT_FACTORY = 'Catalyst::View::BasePerRequest::Factory';
+our $VERSION = '0.010';
+our $DEFAULT_FACTORY = 'Catalyst::View::BasePerRequest::Lifecycle::Request';
 
 use Moose;
 use HTTP::Status ();
@@ -125,6 +125,11 @@ sub inject_http_status_helpers {
 
 sub factory_class {
   my ($class, $app, $merged_args) = @_;
+  if(exists $merged_args->{lifecycle}) {
+    my $lifecycle = $merged_args->{lifecycle};
+    $lifecycle = "Catalyst::View::BasePerRequest::Lifecycle::${lifecycle}" unless $lifecycle=~/^\+/;
+    return $lifecycle;
+  }
   return $DEFAULT_FACTORY;
 }
 
@@ -833,7 +838,27 @@ An ArrayRef of HTTP status codes used to provide response helpers.  This is opti
 but it allows you to specify the permitted HTTP response codes that a template can
 generate.  for example a NotFound view probably makes no sense to return anything
 other than a 404 Not Found code.
- 
+
+=head2 lifecycle
+
+By default your view lifecycle is 'per request' which means we only build it one during the entire
+request cycle.  This is handled by the lifecycle module L<Catalyst::View::BasePerRequest::Lifecycle::Request>.
+However sometimes you would like your view to be build newly each you you request it.  For example
+you might have a view called from inside a loop, passing it different arguments each time.  In that
+case you want the 'Factory' lifecycle, which is handled by L<Catalyst::View::BasePerRequest::Lifecycle::Factory>.
+In order to do that set this configuration value to 'Factory'.  For example
+
+    __PACKAGE__->config(
+      content_type => 'text/html', 
+      status_codes => [200,201,400],
+      lifecycle => 'Factory',
+    );
+
+You can create your own lifecycle classes, but that's very advanced so for now if you
+want to do that you should review the source of the existing ones.  F<D-d>or example you might
+create a view with a 'session' lifecycle, which returns the same view as long as the user
+is logged in.
+
 =head1 ALSO SEE
  
 L<Catalyst>
@@ -844,7 +869,7 @@ John Napiorkowski L<email:jjnapiork@cpan.org>
  
 =head1 LICENSE
  
-Copyright 2022, John Napiorkowski  L<email:jjnapiork@cpan.org>
+Copyright 2023, John Napiorkowski  L<email:jjnapiork@cpan.org>
  
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

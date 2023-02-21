@@ -11,7 +11,7 @@ use Tie::File ();
 
 our ($VERSION, $INETD_CONF);
 
-$VERSION = '0.32';
+$VERSION = '0.33';
 $INETD_CONF = '/etc/inetd.conf';
 
 validation_options(

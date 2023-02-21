@@ -3,7 +3,7 @@ package CGI::Widget::DBI::Search::Base;
 use strict;
 
 use Encode qw/decode/;
-use Encode::Detect;
+# use Encode::Detect; # no longer used- decode('utf8') is more reliable
 use Scalar::Util qw/blessed/;
 use URI::Escape qw/uri_escape uri_escape_utf8/;
 
@@ -60,11 +60,10 @@ sub extra_vars_for_uri {
     my ($self, $exclude_param_list) = @_;
     return '' unless ref $self->{-href_extra_vars} eq 'HASH';
     my %exclude = map {$_=>1} @{$exclude_param_list||[]};
-    return join('&', map {
-        $exclude{$_} ? () : uri_escape($_).'='.uri_escape_utf8(
-            defined $self->{-href_extra_vars}->{$_} ? $self->{-href_extra_vars}->{$_}
-              : defined $self->{q}->param($_) ? decode_utf8($self->{q}->param($_))
-                : '');
+    return join('&amp;', map {
+        my $param_val = $self->{q}->param($_);
+        $exclude{$_} ? () : uri_escape($_).'='.uri_escape_utf8(defined $self->{-href_extra_vars}->{$_} ? $self->{-href_extra_vars}->{$_}
+                                                                 : defined $self->{q}->param($_) ? decode_utf8($param_val) : '');
     } keys %{$self->{-href_extra_vars}});
 }
 
@@ -73,10 +72,9 @@ sub extra_vars_for_json {
     return '' unless ref $self->{-href_extra_vars} eq 'HASH';
     my %exclude = map {$_=>1} @{$exclude_param_list||[]};
     return join(', ', map { #TODO: js escape below key?
-        $exclude{$_} ? () : qq|'$_': '|
-          .(defined $self->{-href_extra_vars}->{$_} ? $self->{-href_extra_vars}->{$_}
-              : defined $self->{q}->param($_) ? js_escape(decode_utf8($self->{q}->param($_)))
-                : '').q|'|;
+        my $param_val = $self->{q}->param($_);
+        $exclude{$_} ? () : qq|'$_': '|.(defined $self->{-href_extra_vars}->{$_} ? $self->{-href_extra_vars}->{$_}
+                                           : defined $self->{q}->param($_) ? js_escape(decode_utf8($param_val)) : '').q|'|;
     } keys %{$self->{-href_extra_vars}});
 }
 
@@ -89,14 +87,55 @@ sub extra_vars_for_form {
     } sort keys %{$self->{-form_extra_vars}});
 }
 
+# matches a "double" encoded UTF-8 sequence within the range U+0000 - U+10FFFF
+use constant UTF8_DOUBLE_ENCODED_REGEX => qr/
+    \xC3 (?: [\x82-\x9F] \xC2 [\x80-\xBF]                                    # U+0080 - U+07FF
+           |  \xA0       \xC2 [\xA0-\xBF] \xC2 [\x80-\xBF]                   # U+0800 - U+0FFF
+           | [\xA1-\xAC] \xC2 [\x80-\xBF] \xC2 [\x80-\xBF]                   # U+1000 - U+CFFF
+           |  \xAD       \xC2 [\x80-\x9F] \xC2 [\x80-\xBF]                   # U+D000 - U+D7FF
+           | [\xAE-\xAF] \xC2 [\x80-\xBF] \xC2 [\x80-\xBF]                   # U+E000 - U+FFFF
+           |  \xB0       \xC2 [\x90-\xBF] \xC2 [\x80-\xBF] \xC2 [\x80-\xBF]  # U+010000 - U+03FFFF
+           | [\xB1-\xB3] \xC2 [\x80-\xBF] \xC2 [\x80-\xBF] \xC2 [\x80-\xBF]  # U+040000 - U+0FFFFF
+           |  \xB4       \xC2 [\x80-\x8F] \xC2 [\x80-\xBF] \xC2 [\x80-\xBF]  # U+100000 - U+10FFFF
+          )
+/x;
+# matches a well-formed UTF-8 encoded sequence within the range U+0080 - U+10FFFF
+use constant UTF8_REGEX => qr/
+    (?: [\xC2-\xDF] [\x80-\xBF]                           # U+0080 - U+07FF
+      |  \xE0       [\xA0-\xBF] [\x80-\xBF]               # U+0800 - U+0FFF
+      | [\xE1-\xEC] [\x80-\xBF] [\x80-\xBF]               # U+1000 - U+CFFF
+      |  \xED       [\x80-\x9F] [\x80-\xBF]               # U+D000 - U+D7FF
+      | [\xEE-\xEF] [\x80-\xBF] [\x80-\xBF]               # U+E000 - U+FFFF
+      |  \xF0       [\x90-\xBF] [\x80-\xBF] [\x80-\xBF]   # U+010000 - U+03FFFF
+      | [\xF1-\xF3] [\x80-\xBF] [\x80-\xBF] [\x80-\xBF]   # U+040000 - U+0FFFFF
+      |  \xF4       [\x80-\x8F] [\x80-\xBF] [\x80-\xBF]   # U+100000 - U+10FFFF
+    )
+/x;
+
+sub has_utf8_chars {
+    shift if blessed $_[0];
+    my ($string) = @_;
+    return $string =~ m/@{[ UTF8_REGEX ]}/og;
+}
+
+sub looks_like_double_encoded_utf8 {
+    shift if blessed $_[0];
+    my ($string) = @_;
+    return $string =~ m/@{[ UTF8_REGEX ]}/og if utf8::is_utf8($string);
+    return $string =~ m/@{[ UTF8_DOUBLE_ENCODED_REGEX ]}/og;
+}
+
 sub decode_utf8 {
     shift if blessed $_[0];
     my ($input) = @_;
-    my $output = eval { decode('Detect', $input); };
-    if ($@) {
-        return $input if $@ =~ m/^Unknown encoding:/;
-        die $@;
-    }
+    return $input if ! has_utf8_chars($input);
+
+    my $output = eval { decode('utf8', $input); };
+    return $input if $@; # if any error encountered, simply return input string
+
+    # note: this second decode() does not seem to be necessary on linux, as no strings get double-encoded utf8; here just for macosx systems
+    $output = eval { decode('utf8', $output); } if has_utf8_chars($output);
+    return $input if $@; # if any error encountered, simply return input string
     return $output;
 }
 

@@ -1,4 +1,4 @@
-class Sys::Socket::Sockaddr::In6 extends Sys::Socket::Sockaddr : pointer_t {
+class Sys::Socket::Sockaddr::In6 extends Sys::Socket::Sockaddr : pointer {
   use Sys::Socket::In6_addr;
   
   # Class methods

@@ -1,0 +1,16 @@
+0.003   2023-02-15  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention sponge original implementation, inplace
+          (App::inplace).
+
+
+0.002   2023-02-14  Released-By: PERLANCAR; Urgency: medium
+
+        - Add some basic test.
+
+
+0.001   2023-02-14  Released-By: PERLANCAR
+
+        - First release.

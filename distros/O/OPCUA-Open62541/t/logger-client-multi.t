@@ -3,14 +3,12 @@ use warnings;
 use OPCUA::Open62541;
 
 use OPCUA::Open62541::Test::Server;
-use Test::More tests => OPCUA::Open62541::Test::Server::planning_nofork() + 103;
+use Test::More tests => OPCUA::Open62541::Test::Server::planning_nofork() + 102;
 use Test::Exception;
 use Test::NoWarnings;
 
 my $server = OPCUA::Open62541::Test::Server->new();
 $server->start();
-ok(my $buildinfo = $server->{config}->getBuildInfo());
-note explain $buildinfo;
 
 my $log_context;
 my $log_calls = 0;
@@ -53,13 +51,8 @@ sub clear {
     $client->connect("opc.tcp://localhost:");
     isnt($log_calls, 2, "logger end");
 }
-if ($buildinfo->{BuildInfo_softwareVersion} =~ /^1\.0\./) {
-    is($clear_calls, 0, "client scope");  # bug in open62541
-    is($clear_context, undef, "clear context");  # bug in open62541
-} else {
-    is($clear_calls, 1, "client scope");
-    is($clear_context, "second", "clear context");
-}
+is($clear_calls, 1, "client scope");
+is($clear_context, "second", "clear context");
 
 $log_calls = $clear_calls = 0;
 $log_context = $clear_context = undef;
@@ -93,13 +86,8 @@ $log_context = $clear_context = undef;
     $client->connect("opc.tcp://localhost:");
     isnt($log_calls, 3, "two logger: logger end");
 }
-if ($buildinfo->{BuildInfo_softwareVersion} =~ /^1\.0\./) {
-    is($clear_calls, 0, "two logger: client scope");  # bug in open62541
-    is($clear_context, undef, "two logger: clear context");  # bug in open62541
-} else {
-    is($clear_calls, 1, "two logger: client scope");
-    is($clear_context, "second", "two logger: clear context");
-}
+is($clear_calls, 1, "two logger: client scope");
+is($clear_context, "second", "two logger: clear context");
 
 $log_calls = $clear_calls = 0;
 $log_context = $clear_context = undef;
@@ -134,13 +122,8 @@ $log_context = $clear_context = undef;
     $client->connect("opc.tcp://localhost:");
     isnt($log_calls, 3, "two config: logger end");
 }
-if ($buildinfo->{BuildInfo_softwareVersion} =~ /^1\.0\./) {
-    is($clear_calls, 0, "two config: client scope");  # bug in open62541
-    is($clear_context, undef, "two config: clear context");  # bug in open62541
-} else {
-    is($clear_calls, 1, "two config: client scope");
-    is($clear_context, "second", "two config: clear context");
-}
+is($clear_calls, 1, "two config: client scope");
+is($clear_context, "second", "two config: clear context");
 
 $log_calls = $clear_calls = 0;
 $log_context = $clear_context = undef;
@@ -177,13 +160,8 @@ $log_context = $clear_context = undef;
     $client->connect("opc.tcp://localhost:");
     isnt($log_calls, 3, "two scope: logger end");
 }
-if ($buildinfo->{BuildInfo_softwareVersion} =~ /^1\.0\./) {
-    is($clear_calls, 0, "two scope: client scope");  # bug in open62541
-    is($clear_context, undef, "two scope: clear context");  # bug
-} else {
-    is($clear_calls, 1, "two scope: client scope");
-    is($clear_context, "second", "two scope: clear context");
-}
+is($clear_calls, 1, "two scope: client scope");
+is($clear_context, "second", "two scope: clear context");
 
 $log_calls = $clear_calls = 0;
 $log_context = $clear_context = undef;
@@ -220,13 +198,8 @@ $log_context = $clear_context = undef;
     $client->connect("opc.tcp://localhost:");
     isnt($log_calls, 3, "two logger scope: logger end");
 }
-if ($buildinfo->{BuildInfo_softwareVersion} =~ /^1\.0\./) {
-    is($clear_calls, 0, "two logger scope: client scope");  # bug in open62541
-    is($clear_context, undef, "two logger scope: clear context");  # bug
-} else {
-    is($clear_calls, 1, "two logger scope: client scope");
-    is($clear_context, "second", "two logger scope: clear context");
-}
+is($clear_calls, 1, "two logger scope: client scope");
+is($clear_context, "second", "two logger scope: clear context");
 
 $log_calls = $clear_calls = 0;
 $log_context = $clear_context = undef;
@@ -266,10 +239,5 @@ $log_context = $clear_context = undef;
     $client->connect("opc.tcp://localhost:");
     isnt($log_calls, 3, "two config scope: logger end");
 }
-if ($buildinfo->{BuildInfo_softwareVersion} =~ /^1\.0\./) {
-    is($clear_calls, 0, "two config scope: client scope");  # bug in open62541
-    is($clear_context, undef, "two config scope: clear context");  # bug
-} else {
-    is($clear_calls, 1, "two config scope: client scope");
-    is($clear_context, "second", "two config scope: clear context");
-}
+is($clear_calls, 1, "two config scope: client scope");
+is($clear_context, "second", "two config scope: clear context");

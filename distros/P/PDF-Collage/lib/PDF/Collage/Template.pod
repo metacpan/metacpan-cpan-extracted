@@ -1,0 +1,205 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+PDF::Collage::Template - A single template for PDF::Collage
+
+
+=head1 SYNOPSIS
+
+   use PDF::Collage::Template;
+   my $pc = PDF::Collage::Template->new(%args);
+   my $pdf = $pc->render(\%data);
+   $pdf->saveas('/path/to/file.pdf');
+
+
+=head1 DESCRIPTION
+
+This module implements a class that allows loading a I<template> (as a
+sequence of commands for basic PDF manipulation) and then L</render>
+this template over and over, based on different data for filling in the
+form.
+
+The input format requires the presence of key C<commands>, associated to
+an array reference of L</commands>.
+
+Each such command is a hash reference, containing I<at least> a key
+C<op> which tells which kind of command should be executed. The command
+kinds are described in the following sub-sections.
+
+All commands are applied in sequence during a call to L</render>.
+
+=head2 B<< add-image >>
+
+   {
+      op => 'add-image',
+      page => 1,
+      path => '/path/to/image.png',
+      x => 10,
+      y => 30,
+      width => 10,
+      height => 10,
+   }
+
+Add an image. See L<PDF::Build> for the supported formats.
+
+=head2 B<< add-page >>
+
+   { op => 'add-page' }
+
+Add an empty page at the end.
+
+   { op => 'add-page', page => 1 }
+
+Add an empty page as page number 1.
+
+   {
+      op => 'add-page',
+      page => 2,
+      'from-path' => '/some/file.pdf',
+      'from-page' => 3
+   }
+
+Get page 3 from file C</some/file.pdf> and add it as page 2 in the PDF
+that is built.
+
+Key C<from-path> can also be abbreviated as C<from>.
+
+=head2 B<< add-text >>
+
+   {
+      op => 'add-text',
+      page => 1,
+      font => 'DejaVuSans.ttf',
+      'font-size' => 12,
+      text => 'whatever',
+      x => 10,
+      y => 20,
+   }
+
+Place a text label on the PDF.
+
+The C<font> key can be replaced with C<font-family>.
+
+There are three ways of defining the text:
+
+=over
+
+=item C<text>
+
+This text is taken verbatim and has precedence over other alternatives;
+
+=item C<text-template>
+
+This text is expanded using L<Template::Perlish> with the data passed to
+L</render>. It takes precedence over L</text-variable>.
+
+=item C<text-variable>
+
+This is meant to be a variable that is expanded using
+L<Template::Perlish> on the data provided.
+
+=back
+
+=head2 B<< log >>
+
+   {
+      op => 'log',
+      level => 'info',
+      message => 'whatever!',
+   }
+
+Print a log message. If L<Log::Any> is available, it will use it;
+otherwise, C<warn> is used.
+
+=head2 B<< set-defaults >>
+
+   {
+      op => 'set-default',
+      font => 'DejaVuSans.ttf',
+      'font-size' => 12,
+   }
+
+Set some defaults that will be used in following commands. This allows
+e.g. to set the same font once and for all for all L</add-text>
+commands, or the font size.
+
+=head1 INTERFACE
+
+This module has an I<object-oriented> interface.
+
+=head2 Constructor
+
+=head3 B<< new >>
+
+   my $pct = PDF::Collage::Template->new(%args);
+   my $pct = PDF::Collage::Template->new(\%args);
+
+Build a new object. The input arguments can be key-value pairs or a has
+reference, supporting the same keys as the accessors L</commands>,
+L</functions>, and L</metadata>.
+
+Returns a C<PDF::Collage::Template> object.
+
+=head2 Accesssors
+
+=head3 B<< commands >>
+
+   my $array_ref = $obj->commands;
+
+An array reference containing the list of commands to apply for
+generating a new PDF during L</render>.
+
+=head3 B<< functions >>
+
+   my $hash_ref = $obj->functions;
+
+A hash reference with I<functions> that will be injected into the
+L<Template::Perlish> namespace when expanding all templates during the
+call to L</render>.
+
+=head3 B<< metadata >>
+
+   my $hash_ref = $obj->metadata;
+
+Additional metadata, represented by a hash reference. Not used by the
+module, but kept for ease of manipulation.
+
+=head2 Methods
+
+=head2 B<< render >>
+
+   my $pdf = $obj->render(\%data);
+
+Use the provided hash reference to expand all applicable
+L<Template::Perlish> templates and then use them while applying
+L</commands> to generate the PDF.
+
+Returns a L<PDF::Builder> object.
+
+=head1 AUTHOR
+
+Flavio Poletti <flavio@polettix.it>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2023 by Flavio Poletti <flavio@polettix.it>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+=cut

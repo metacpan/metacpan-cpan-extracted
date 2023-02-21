@@ -1,0 +1,426 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/CSVUtils/csv2paras/csv2paras
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-02-18'; # DATE
+our $DIST = 'App-CSVUtils'; # DIST
+our $VERSION = '1.017'; # VERSION
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/CSVUtils/csv2paras/csv2paras",
+    program_name => "csv2paras",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+    use_utf8 => 1,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Convert CSV to paragraphs
+# PODNAME: csv2paras
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+csv2paras - Convert CSV to paragraphs
+
+=head1 VERSION
+
+This document describes version 1.017 of csv2paras (from Perl distribution App-CSVUtils), released on 2023-02-18.
+
+=head1 SYNOPSIS
+
+B<csv2paras> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<csv2paras> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<csv2paras> [B<L<--align|/"--align">>|B<L<--no-align|/"--align">>|B<L<--noalign|/"--align">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--hide-empty-values|/"--hide-empty-values">>|B<L<--no-hide-empty-values|/"--hide-empty-values">>|B<L<--nohide-empty-values|/"--hide-empty-values">>] [B<L<--input-escape-char|/"--input-escape-char=s">>=I<str>] [B<L<--input-header|/"--no-input-header">>|B<L<--no-input-header|/"--no-input-header">>|B<L<--noinput-header|/"--no-input-header">>] [B<L<--input-quote-char|/"--input-quote-char=s">>=I<str>] [B<L<--input-sep-char|/"--input-sep-char=s">>=I<str>] [B<L<--input-tsv|/"--input-tsv">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--width|/"--width=s">>=I<int>] -- [I<L<input_filename|/"--input-filename=s">>]
+
+
+
+See examples in the L</EXAMPLES> section.
+
+=head1 DESCRIPTION
+
+This utility converts CSV format like this:
+
+ name,email,phone,notes
+ bill,bill@example.com,555-1236,+
+ lisa,lisa@example.com,555-1235,from work
+ jimmy,jimmy@example.com,555-1237,
+
+into paragraphs format like this, which resembles (but not strictly follows)
+email headers (RFC-822) or internet message headers (RFC-5322):
+
+ name: bill
+ email: bill@example.com
+ phone: 555-1236
+ notes: +
+ 
+ name: lisa
+ email: lisa@example.com
+ phone: 555-1235
+ notes: from work
+ 
+ name: jimmy
+ email: jimmy@example.com
+ phone: 555-1237
+ notes:
+
+Why display in this format? It might be more visually readable or diff-able
+especially if there are a lot of fields and/or there are long values.
+
+If a CSV value contains newline, it will escaped "\n", e.g.:
+
+ # CSV
+ name,email,phone,notes
+ beth,beth@example.com,555-1231,"Has no last name
+ Might be adopted sometime by Jimmy"
+ matthew,matthew@example.com,555-1239,"Quit
+ 
+   or fired?"
+ 
+ # paragraph
+ name: beth
+ email: beth@example.com
+ phone: 555-1231
+ notes: Has no last name\nMight be adopted sometime by Jimmy
+ 
+ name: matthew
+ email: matthew@example.com
+ phone: 555-1239
+ notes: Quit\n\n  or fired?
+
+If a CSV value contains literal "\" (backslash) it will be escaped as "\".
+
+Long lines are also by default folded at 78 columns (but you can customize with
+the C<--width> option); if a line is folded a literal backslash is added to the
+end of each physical line and the next line will be indented by two spaces:
+
+ notes: This is a long note. This is a long note. This is a long note. This is\
+   a long note. This is a long note.
+
+A long word is also folded and the next line will be indented by one space:
+
+ notes: Thisisalongwordthisisalongwordthisisalongwordthisisalongwordthisisalongw\
+  ord
+
+Newline and backslash are also escaped in header; additionally a literal ":"
+(colon) is escaped into "\:".
+
+There is option to skip displaying empty fields (C<--hide-empty-values>) and to
+align the ":" header separator.
+
+Keywords: paragraphs, cards, pages, headers
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--align>
+
+Whether to align header separator across lines.
+
+Note that if you want to convert the paragraphs back to CSV later using
+L<paras2csv>, the padding spaces added by this option will become part of
+header value, unless you use its C<--trim-header> or C<--rtrim-header> option.
+
+
+=item B<--hide-empty-values>
+
+Whether to skip showing empty values.
+
+=item B<--width>=I<s>
+
+The width at which to fold long lines, -1 means to never fold.
+
+Default value:
+
+ 78
+
+=back
+
+=head2 Input options
+
+=over
+
+=item B<--input-escape-char>=I<s>
+
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--input-tsv> option.
+
+
+=item B<--input-filename>=I<s>
+
+Input CSV file.
+
+Default value:
+
+ "-"
+
+Use C<-> to read from stdin.
+
+Encoding of input file is assumed to be UTF-8.
+
+
+Can also be specified as the 1st command-line argument.
+
+=item B<--input-quote-char>=I<s>
+
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--input-tsv> option.
+
+
+=item B<--input-sep-char>=I<s>
+
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--input-tsv> option.
+
+
+=item B<--input-tsv>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--input-sep-char>, C<--input-quote-char>, C<--input-escape-char>
+options. If one of those options is specified, then C<--input-tsv> will be
+ignored.
+
+
+=item B<--no-input-header>
+
+Specify that input CSV does not have a header row.
+
+By default, the first row of the input CSV will be assumed to contain field
+names (and the second row contains the first data row). When you declare that
+input CSV does not have header row (C<--no-input-header>), the first row of the
+CSV is assumed to contain the first data row. Fields will be named C<field1>,
+C<field2>, and so on.
+
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C csv2paras csv2paras
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete csv2paras 'p/*/`csv2paras`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 EXAMPLES
+
+=head2 Convert to paragraphs format, show fields alphabetically, do not fold, hide empty values
+
+ % csv-sort-fields INPUT.csv | csv2paras --width=-1 --hide-empty-values
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-CSVUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-CSVUtils>.
+
+=head1 SEE ALSO
+
+L<paras2csv>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSVUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

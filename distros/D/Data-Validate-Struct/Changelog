@@ -1,3 +1,10 @@
+0.11
+	o typos
+
+	o added cpanfile
+
+	o don't die when reference types are different
+
 0.10
 	o fixed RT#101884
 	  - _trim() only removed 1st whitespace
@@ -9,7 +16,7 @@
 
 	o fixed cached errors bug - if a validator object has
 	  been used multiple times and if during the first
-	  run some errors occured, subsequent runs would show
+	  run some errors occurred, subsequent runs would show
 	  the same error again and again.
 
 0.08

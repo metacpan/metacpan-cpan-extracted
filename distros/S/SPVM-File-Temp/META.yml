@@ -1,0 +1,29 @@
+---
+abstract: 'Short Description'
+author:
+  - USER_NAME<USER_MAIL>
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  SPVM: '0.9692'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SPVM-File-Temp
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  SPVM: '0.9692'
+  SPVM::Errno: '0.07'
+  SPVM::File::Path: '0.01'
+  SPVM::File::Spec: '0.03'
+  SPVM::IO: '0.16'
+  SPVM::Sys: '0.41'
+resources: {}
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -11,3 +11,4 @@ lib/Data/Dump/Streamer.o
 *.tar.gz
 lib/DDS.pm
 Data-Dump-Streamer-*/
+*.bak

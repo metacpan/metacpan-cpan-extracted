@@ -1,3 +1,10 @@
+0.002   2022-12-13  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        - [incompatible change] [cli textwrap] Change default backend from
+          Text::Wrap to Text::ANSI::Util because Text::Wrap does not remove
+          initial indent.
+
+
 0.001   2022-11-24  Released-By: PERLANCAR
 
         - First release.

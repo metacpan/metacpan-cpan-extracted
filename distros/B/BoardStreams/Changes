@@ -1,5 +1,13 @@
 Revision history for Perl extension BoardStreams
 
+v0.0.34 2023-02-16T19:00:26Z
+
+    - fixed important bug
+
+v0.0.33 2023-02-15T15:55:31Z
+
+    - fixed minor bug
+
 v0.0.32 2023-02-01T13:13:48Z
 
     - updated to allow running with RxPerl v6.18.0

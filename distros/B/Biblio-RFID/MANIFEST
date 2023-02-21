@@ -1,6 +1,9 @@
 Changes
+examples/giphy.gif
 examples/koha-rfid.js
 examples/reset-OmnyKey.sh
+examples/selfcheck.html
+examples/selfcheck.js
 examples/usbreset.c
 ignore.txt
 inc/Module/AutoInstall.pm
@@ -20,9 +23,11 @@ lib/Biblio/RFID/Reader.pm
 lib/Biblio/RFID/Reader/3M810.pm
 lib/Biblio/RFID/Reader/API.pm
 lib/Biblio/RFID/Reader/CPRM02.pm
+lib/Biblio/RFID/Reader/INET.pm
 lib/Biblio/RFID/Reader/librfid.pm
 lib/Biblio/RFID/Reader/Serial.pm
 lib/Biblio/RFID/RFID501.pm
+lib/Biblio/RFID/SmartX.pm
 Makefile
 Makefile.PL
 MANIFEST
@@ -35,6 +40,7 @@ scripts/RFID-JSONP-server.pl
 scripts/scan.pl
 t/00-load.t
 t/05-RFID501.t
+t/06-SmartX.t
 t/10-3M-810.t
 t/20-CPR-M02.t
 t/30-librfid.t

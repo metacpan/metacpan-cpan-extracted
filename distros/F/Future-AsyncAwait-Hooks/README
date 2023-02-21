@@ -1,0 +1,60 @@
+NAME
+
+    Future::AsyncAwait::Hooks - scoped hook blocks that run extra code
+    around await expressions
+
+SYNOPSIS
+
+       use Future::AsyncAwait;
+       use Future::AsyncAwait::Hooks;
+    
+       async sub do_work
+       {
+          suspend { say "do_work is pausing here" }
+          resume  { say "do_Work has woken up again" }
+    
+          my $result = (await inner_1()) + (await inner_2());
+          return $result;
+       }
+
+DESCRIPTION
+
+    This module provides two extra syntax keywords for inserting code that
+    can observe the suspend and resume behaviour of await expressions
+    within an async sub.
+
+    These two keywords are lexically scoped. They affect await expressions
+    later within their own scope, or scopes nested within it. They do not
+    affect any await expressions in scopes outside of those in which they
+    appear.
+
+KEYWORDS
+
+ suspend
+
+       async sub {
+          suspend { BLOCK }
+       }
+
+    Inserts a block of code to run every time a subsequent await expression
+    at this block level pauses execution of the async sub.
+
+ resume
+
+       async sub {
+          resume { BLOCK }
+       }
+
+    Inserts a block of code to run every time a subsequent await expression
+    at this block level resumes execution of the async sub after a pause.
+
+TODO
+
+      * Maybe work out why it doesn't appear to work on perls older than
+      5.24. Or maybe nobody will be writing new code and needs it back that
+      old?
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

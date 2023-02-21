@@ -3,7 +3,7 @@ package App::perlimports::Config;
 use Moo;
 use MooX::StrictConstructor;
 
-our $VERSION = '0.000049';
+our $VERSION = '0.000050';
 
 use List::Util      qw( uniq );
 use Path::Tiny      qw( path );
@@ -176,7 +176,7 @@ sub _aggregate {
 }
 
 sub create_config {
-    my $class    = shift;
+    shift;                         # $class
     my $filename = shift;
 
     if ( -e $filename ) {
@@ -201,7 +201,7 @@ App::perlimports::Config - Generic configuration options for C<perlimports>
 
 =head1 VERSION
 
-version 0.000049
+version 0.000050
 
 =head1 DESCRIPTION
 

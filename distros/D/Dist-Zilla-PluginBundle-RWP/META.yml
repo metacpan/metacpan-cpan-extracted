@@ -12,15 +12,21 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Dist-Zilla-PluginBundle-RWP
+provides:
+  Dist::Zilla::PluginBundle::RWP:
+    file: lib/Dist/Zilla/PluginBundle/RWP.pm
+    version: '0.230470'
 requires:
   Dist::Zilla::Role::PluginBundle::Easy: '0'
   Moose: '0'
+  builtin: '0'
+  experimental: '0'
   perl: v5.37.0
 resources:
   bugtracker: https://github.com/rwp0/Dist-Zilla-PluginBundle-RWP/issues
   homepage: https://github.com/rwp0/Dist-Zilla-PluginBundle-RWP
   repository: https://github.com/rwp0/Dist-Zilla-PluginBundle-RWP.git
-version: '0.230350'
-x_generated_by_perl: v5.37.8
+version: '0.230470'
+x_generated_by_perl: v5.37.9
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

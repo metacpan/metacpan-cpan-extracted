@@ -35,4 +35,10 @@ my $hash4 = argon2id_pass($password, $salt, 2, '8M', 1, 16);
 ok($passphrase->verify_password($password, $hash4));
 ok($passphrase->needs_rehash($hash4));
 
+my $passphrase2 = Crypt::Passphrase::Argon2->new(profile => 'interactive');
+my $passphrase3 = Crypt::Passphrase::Argon2->new(profile => 'sensitive');
+my $hash5 = $passphrase2->hash_password($password);
+ok($passphrase3->verify_password($password, $hash5));
+ok($passphrase3->needs_rehash($hash5));
+
 done_testing;

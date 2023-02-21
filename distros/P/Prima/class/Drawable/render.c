@@ -197,7 +197,7 @@ Drawable_render_spline( SV * obj, SV * points, HV * profile)
 	Point *rendered, *storage;
 	NPoint *nrendered, *nstorage;
 	SV *ret;
-	Bool ok, closed, as_integer;
+	Bool ok, closed, as_integer = false;
 	int i, j, degree, precision, n_points, final_size, k, dim, n_add_points, temp_size,
 		tangent, last_tangent;
 	double *knots, *weights, t, dt, *weighted, *temp;
@@ -234,7 +234,7 @@ Drawable_render_spline( SV * obj, SV * points, HV * profile)
 	/* closed curve will need at least one extra point and unclamped default knot set */
 	if ( pexist( closed )) {
 		SV * sv = pget_sv(closed);
-		if ( SvTYPE(sv) == SVt_NULL ) goto DETECT_SHAPE;
+		if ( !SvOK(sv) ) goto DETECT_SHAPE;
 		closed = SvTRUE(sv);
 	}
 	else {
@@ -896,13 +896,18 @@ render_wide_line( NPoint *points, unsigned int n_points, DrawablePaintState *sta
 
 	path = newAV();
 
-	if (integer_precision && state->line_width <= 1.5) {
+	if (
+		integer_precision ?
+			(state->line_width <= 1.5) :
+			(state->line_width <= 0.0)
+	) {
 		/* no line widening, return as is */
 		NPolyPolyline* p = poly;
 		while (p) {
 			av_push( path, newSVpv("line", 0));
 			av_push( path, render_line2fill( p->points, p->n_points, integer_precision));
 			av_push( path, newSVpv("open", 0));
+			av_push( path, NULL_SV);
 			p = p->next;
 		}
 		ok = true;

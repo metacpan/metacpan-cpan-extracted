@@ -1,3 +1,10 @@
+0.11 2023-02-09
+  [Fixed Build Process Bug]
+    * Fixed a build process bug on Windows.
+  [Meta Information Improvement]
+    * Added the URL of this repository.
+  [Test Improvement]
+    * Added Github Action workflows.
 0.10 2023-02-08
   [Prerequirement Changes]
     * SPVM 0.9691+ is needed.

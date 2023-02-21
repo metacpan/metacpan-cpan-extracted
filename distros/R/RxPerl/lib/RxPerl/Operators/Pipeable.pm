@@ -5,6 +5,7 @@ use warnings;
 use RxPerl::Operators::Creation qw/
     rx_observable rx_subject rx_concat rx_of rx_interval rx_combine_latest rx_concat
     rx_throw_error rx_zip rx_merge rx_on_error_resume_next rx_race rx_timer
+    rx_behavior_subject
 /;
 use RxPerl::ConnectableObservable;
 use RxPerl::Utils qw/ get_timer_subs /;
@@ -12,22 +13,23 @@ use RxPerl::Subscription;
 
 use Carp 'croak';
 use Scalar::Util 'reftype', 'refaddr', 'blessed', 'weaken';
+use Time::HiRes ();
 
 use Exporter 'import';
 our @EXPORT_OK = qw/
     op_audit op_audit_time op_buffer op_buffer_count op_buffer_time op_catch_error op_combine_latest_with op_concat_all
-    op_concat_map op_concat_with op_count op_debounce op_debounce_time op_default_if_empty op_delay
-    op_distinct_until_changed op_distinct_until_key_changed op_element_at op_end_with op_every op_exhaust_all
-    op_exhaust_map op_filter op_finalize op_find op_find_index op_first op_group_by op_ignore_elements op_is_empty
-    op_last op_map op_map_to op_max op_merge_all op_merge_map op_merge_with op_min op_multicast
+    op_concat_map op_concat_with op_count op_debounce op_debounce_time op_default_if_empty op_delay op_delay_when
+    op_distinct op_distinct_until_changed op_distinct_until_key_changed op_element_at op_end_with op_every
+    op_exhaust_all op_exhaust_map op_filter op_finalize op_find op_find_index op_first op_group_by op_ignore_elements
+    op_is_empty op_last op_map op_map_to op_max op_merge_all op_merge_map op_merge_with op_min op_multicast
     op_on_error_resume_next_with op_pairwise op_pluck op_race_with op_reduce op_ref_count op_repeat op_retry op_sample
-    op_sample_time op_scan op_share op_skip op_skip_until op_skip_while op_start_with op_switch_all op_switch_map
-    op_take op_take_last op_take_until op_take_while op_tap op_throttle op_throttle_time op_throw_if_empty op_to_array
-    op_with_latest_from op_zip_with
+    op_sample_time op_scan op_share op_single op_skip op_skip_last op_skip_until op_skip_while op_start_with
+    op_switch_all op_switch_map op_take op_take_last op_take_until op_take_while op_tap op_throttle op_throttle_time
+    op_throw_if_empty op_time_interval op_timeout op_timestamp op_to_array op_with_latest_from op_zip_with
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.23.0";
+our $VERSION = "v6.26.2";
 
 sub op_audit {
     my ($duration_selector) = @_;
@@ -191,34 +193,7 @@ sub op_buffer_count {
 sub op_buffer_time {
     my ($buffer_time_span) = @_;
 
-    return sub {
-        my ($source) = @_;
-
-        return rx_observable->new(sub {
-            my ($subscriber) = @_;
-
-            my @buffer;
-
-            my $si = rx_interval($buffer_time_span)->subscribe(
-                sub {
-                    $subscriber->{next}->([ @buffer ]) if defined $subscriber->{next};
-                    undef @buffer;
-                },
-            );
-
-            my $own_subscriber = {
-                %$subscriber,
-                next => sub {
-                    my ($v) = @_;
-                    push @buffer, $v;
-                },
-            };
-
-            $source->subscribe($own_subscriber);
-
-            return $si;
-        });
-    };
+    return op_buffer(rx_interval($buffer_time_span));
 }
 
 sub _op_catch_error_helper {
@@ -499,6 +474,113 @@ sub op_delay {
                     %timers = ();
                 },
             ];
+        });
+    };
+}
+
+sub op_delay_when {
+    my ($delay_duration_selector) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my $idx = 0;
+            my %mini_subscriptions;
+            my $main_finished;
+
+            my $make_mini_subscriber = sub {
+                my ($v) = @_;
+
+                my $mini_subscription = RxPerl::Subscription->new;
+                $mini_subscriptions{$mini_subscription} = $mini_subscription;
+
+                return {
+                    new_subscription => $mini_subscription,
+                    next             => sub {
+                        $subscriber->{next}->($v) if defined $subscriber->{next};
+                    },
+                    error            => sub {
+                        $subscriber->{error}->(@_) if defined $subscriber->{error};
+                    },
+                    complete         => sub {
+                        delete $mini_subscriptions{$mini_subscription};
+                        if ($main_finished and ! %mini_subscriptions) {
+                            $subscriber->{complete}->() if defined $subscriber->{complete};
+                        }
+                    },
+                };
+            };
+
+            my $own_subscription = RxPerl::Subscription->new;
+            my $own_subscriber = {
+                new_subscription => $own_subscription,
+                next             => sub {
+                    my ($v) = @_;
+
+                    local $_ = $v;
+                    my $mini_obs = $delay_duration_selector->($v, $idx++);
+                    $mini_obs->subscribe($make_mini_subscriber->($v));
+                },
+                error            => sub {
+                    $subscriber->{error}->(@_) if defined $subscriber->{error};
+                },
+                complete         => sub {
+                    $main_finished = 1;
+                    if (!%mini_subscriptions) {
+                        $subscriber->{complete}->() if defined $subscriber->{complete};
+                    }
+                },
+            };
+
+            $subscriber->subscription->add($own_subscription, \%mini_subscriptions);
+
+            $source->subscribe($own_subscriber);
+
+            return;
+        });
+    };
+}
+
+sub op_distinct {
+    my ($key_selector) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my %keys_passed;
+            $subscriber->subscription->add(sub { %keys_passed = () });
+
+            my $own_subscriber = {
+                %$subscriber,
+                next => sub {
+                    my ($v) = @_;
+
+                    my $k;
+                    if ($key_selector) {
+                        my $ok = eval { local $_ = $v; $k = $key_selector->($v); 1 };
+                        if (! $ok) {
+                            $subscriber->{error}->($@) if defined $subscriber->{error};
+                            return;
+                        }
+                    } else {
+                        $k = $v;
+                    }
+                    if (! exists $keys_passed{$k}) {
+                        $keys_passed{$k} = 1;
+                        $subscriber->{next}->($v) if defined $subscriber->{next};
+                    }
+                },
+            };
+
+            $source->subscribe($own_subscriber);
+
+            return;
         });
     };
 }
@@ -1057,6 +1139,38 @@ sub op_max {
     };
 }
 
+sub _op_merge_all_make_subscriber {
+    my ($small_subscriptions, $subscriber, $stored_observables, $big_completed_ref) = @_;
+
+    my $small_subscription = RxPerl::Subscription->new;
+    $small_subscriptions->{$small_subscription} = $small_subscription;
+    return {
+        new_subscription => $small_subscription,
+        next             => sub {
+            $subscriber->{next}->(@_) if defined $subscriber->{next};
+        },
+        error            => sub {
+            $subscriber->{error}->(@_) if defined $subscriber->{error};
+        },
+        complete         => sub {
+            delete $small_subscriptions->{$small_subscription};
+            if (@$stored_observables) {
+                my $new_obs = shift @$stored_observables;
+                $new_obs->subscribe(
+                    _op_merge_all_make_subscriber(
+                        $small_subscriptions,
+                        $subscriber,
+                        $stored_observables,
+                        $big_completed_ref,
+                    ),
+                );
+            } elsif ($$big_completed_ref and !%$small_subscriptions) {
+                $subscriber->{complete}->() if defined $subscriber->{complete};
+            }
+        },
+    };
+}
+
 sub op_merge_all {
     my ($concurrent) = @_;
 
@@ -1066,9 +1180,9 @@ sub op_merge_all {
         return rx_observable->new(sub {
             my ($subscriber) = @_;
 
-            my $num_subscriptions = 0;
             my @stored_observables;
             my %small_subscriptions;
+            my $big_completed;
 
             my $own_subscription = RxPerl::Subscription->new;
             $subscriber->subscription->add(
@@ -1076,50 +1190,30 @@ sub op_merge_all {
                 \%small_subscriptions,
             );
 
-            my $weak_sub;
-            my $make_subscriber_sub = sub {
-                my $small_subscription = RxPerl::Subscription->new;
-                $small_subscriptions{$small_subscription} = $small_subscription;
-                return {
-                    new_subscription => $small_subscription,
-                    next     => sub {
-                        $subscriber->{next}->(@_) if defined $subscriber->{next};
-                    },
-                    error    => sub {
-                        $subscriber->{error}->(@_) if defined $subscriber->{error};
-                    },
-                    complete => sub {
-                        $num_subscriptions--;
-                        delete $small_subscriptions{$small_subscription};
-                        if (@stored_observables) {
-                            $num_subscriptions++;
-                            my $new_obs = shift @stored_observables;
-                            $new_obs->subscribe($weak_sub->());
-                        } else {
-                            $subscriber->{complete}->() if !$num_subscriptions and defined $subscriber->{complete};
-                        }
-                    },
-                };
-            };
-            weaken($weak_sub = $make_subscriber_sub);
-
             my $own_subscriber = {
                 new_subscription => $own_subscription,
-                next     => sub {
+                next             => sub {
                     my ($new_observable) = @_;
 
                     push @stored_observables, $new_observable;
-                    if (! defined $concurrent or $num_subscriptions < $concurrent) {
-                        $num_subscriptions++;
+                    if (!defined $concurrent or keys(%small_subscriptions) < $concurrent) {
                         my $new_obs = shift @stored_observables;
-                        $new_obs->subscribe($make_subscriber_sub->());
+                        $new_obs->subscribe(
+                            _op_merge_all_make_subscriber(
+                                \%small_subscriptions,
+                                $subscriber,
+                                \@stored_observables,
+                                \$big_completed,
+                            ),
+                        );
                     }
                 },
-                error    => sub {
+                error            => sub {
                     $subscriber->{error}->(@_) if defined $subscriber->{error};
                 },
-                complete => sub {
-                    $subscriber->{complete}->() if !$num_subscriptions and defined $subscriber->{complete};
+                complete         => sub {
+                    $big_completed = 1;
+                    $subscriber->{complete}->() if !%small_subscriptions and defined $subscriber->{complete};
                 },
             };
 
@@ -1600,6 +1694,54 @@ sub op_share {
     );
 }
 
+sub op_single {
+    my ($predicate) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my @found;
+
+            my $idx = 0;
+            my $own_subscriber = {
+                %$subscriber,
+                next     => sub {
+                    my ($v) = @_;
+
+                    if (!$predicate) {
+                        push @found, $v;
+                    } else {
+                        my $found;
+                        my $ok = eval { local $_ = $v; $found = $predicate->($v, $idx++); 1 };
+                        if (! $ok) {
+                            $subscriber->{error}->($@) if defined $subscriber->{error};
+                            return;
+                        }
+                        push @found, $v if $found;
+                    }
+
+                    $subscriber->{error}->('Too many values match') if @found > 1 and defined $subscriber->{error};
+                },
+                complete => sub {
+                    if (! @found) {
+                        $subscriber->{error}->('No values match') if defined $subscriber->{error};
+                    } else {
+                        $subscriber->{next}->($found[0]) if defined $subscriber->{next};
+                        $subscriber->{complete}->() if defined $subscriber->{complete};
+                    }
+                },
+            };
+
+            $source->subscribe($own_subscriber);
+
+            return;
+        });
+    };
+}
+
 sub op_skip {
     my ($count) = @_;
 
@@ -1620,6 +1762,36 @@ sub op_skip {
                         $subscriber->{next}->(@_) if defined $subscriber->{next};
                     }
                 },
+            };
+
+            $source->subscribe($own_subscriber);
+
+            return;
+        });
+    };
+}
+
+sub op_skip_last {
+    my ($skip_count) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my @skipped;
+            $subscriber->subscription->add(sub { undef @skipped });
+
+            my $own_subscriber = { %$subscriber };
+            $own_subscriber->{next} &&= sub {
+                my ($v) = @_;
+
+                push @skipped, $v;
+                if (@skipped > $skip_count) {
+                    my $new_v = shift @skipped;
+                    $subscriber->{next}->($new_v) if defined $subscriber->{next};
+                }
             };
 
             $source->subscribe($own_subscriber);
@@ -2034,6 +2206,72 @@ sub op_throw_if_empty {
             return;
         });
     };
+}
+
+sub op_time_interval {
+    return sub {
+        my ($source) = @_;
+
+        my $t0 = Time::HiRes::time();
+
+        return $source->pipe(
+            op_map(sub {
+                my $now = Time::HiRes::time();
+                my $interval = $now - $t0;
+                $t0 = $now;
+                return { value => $_, interval => $interval };
+            }),
+        );
+    };
+}
+
+sub op_timeout {
+    my ($duration) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my $subject = rx_behavior_subject->new(1);
+            my $s_s = $subject->pipe(
+                op_switch_map(sub { rx_timer($duration) }),
+            )->subscribe(sub {
+                $subscriber->{error}->('Timeout has occurred') if defined $subscriber->{error};
+            });
+
+            my $own_subscription = RxPerl::Subscription->new;
+            $subscriber->subscription->add($own_subscription, $s_s);
+
+            my $own_subscriber = {
+                new_subscription => $own_subscription,
+                next     => sub {
+                    $subject->{next}->(1) if defined $subject->{next};
+                    $subscriber->{next}->(@_) if defined $subscriber->{next};
+                },
+                error    => sub {
+                    $subscriber->{error}->(@_) if defined $subscriber->{error};
+                },
+                complete => sub {
+                    $subscriber->{complete}->() if defined $subscriber->{complete};
+                }
+            };
+
+            $source->subscribe($own_subscriber);
+
+            return;
+        });
+    };
+}
+
+sub op_timestamp {
+    return op_map(sub {
+        return {
+            value     => $_,
+            timestamp => Time::HiRes::time(),
+        };
+    });
 }
 
 sub op_to_array {

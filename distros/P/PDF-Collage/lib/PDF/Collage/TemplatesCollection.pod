@@ -1,0 +1,142 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+PDF::Collage::TemplatesCollection - Multiple templates for PDF::Collage
+
+
+=head1 SYNOPSIS
+
+   use PDF::Collage::TemplatesCollection;
+   my $pctc = PDF::Collage::TemplatesCollection->new(%args);
+
+   # the collection has a list of `selectors`
+   say for sort { $a cmp $b } $pc->selectors;
+
+   # with a selector we can get a specific template
+   my $tmpl = $pctc->get($selector); # PDF::Collage::Template
+   my $pdf = $tmpl->render(\%data);
+   $pdf->saveas('/path/to/somefile.pdf');
+
+   # we can also render in one sweep
+   my $pdf = $pctc->render($selector, \%data);
+
+   # we can even leverage a default if there's only one selector
+   my $pdf = $ctc->render(\%data);
+
+=head1 DESCRIPTION
+
+This module implements a class that allows loading a collection of
+I<templates> (each being a sequence of commands for basic PDF
+manipulation) and then L</get> or L</render> any of these templates over
+and over, based on different data for filling in the form.
+
+The input is a L<Data::Resolver> instance passed at construction time as
+L</resolver>, wrapping some data:
+
+=over
+
+=item *
+
+template definitions, i.e. data structures that are compatible with instantiating L<PDF::Collage::Template> objects;
+
+=item *
+
+additional artifacts, most probably one or more PDF files that can be
+used to take pages to assemble the target PDF.
+
+=back
+
+The definitions are supposed to be JSON file matching keys
+C<\A(?:\./)?definitions/(.*)\.json\z>. The part in the capture group is
+one of the available L</selectors>.
+
+=head1 INTERFACE
+
+This module has an I<object-oriented> interface.
+
+=head2 Constructor
+
+This class supports one constructor.
+
+=head3 B<< new >>
+
+   my $pct = PDF::Collage::Template->new(%args);
+   my $pct = PDF::Collage::Template->new(\%args);
+
+Build a new object. The input arguments can be key-value pairs or a has
+reference, supporting key C<resolver> to set the L</resolver>,
+
+Returns a C<PDF::Collage::TemplatesCollection> object.
+
+=head2 Accesssors
+
+This class supports the following accessor.
+
+=head3 B<< resolver >>
+
+   my $data_resolver_instance = $obj->resolver;
+
+Retrieve the C<Data::Resolver> instance underpinning the object.
+
+=head2 Methods
+
+This class supports the following methods.
+
+=head3 B<< contains >>
+
+   my $bool = $obj->contains($selector);
+
+Check if the specific C<$selector> is available.
+
+=head3 B<< get >>
+
+   my $tmpl = $obj->get($selector);
+
+Get the L<PDF::Collage::Template> object associated to the provided
+C<$selector>.
+
+=head3 B<< render >>
+
+   my $pdf = $obj->render($selector, \%data);
+   my $pdf = $obj->render(\%data); # only if there's a single template
+
+Wrapper to render a template, without retrieving it beforehand.
+
+If the collection only contains one single selector, it's possible to
+skip passing it to this method.
+
+Returns a L<PDF::Builder> object.
+
+=head3 B<< selectors >>
+
+   my @list = $obj->selectors;
+
+Get the list of available selector strings.
+
+=head1 AUTHOR
+
+Flavio Poletti <flavio@polettix.it>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2023 by Flavio Poletti <flavio@polettix.it>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+=cut

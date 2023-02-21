@@ -1,6 +1,6 @@
 package Geo::BUFR;
 
-# Copyright (C) 2010-2020 MET Norway
+# Copyright (C) 2010-2023 MET Norway
 #
 # This module is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
@@ -94,7 +94,7 @@ use Time::Local qw(timegm);
 
 require DynaLoader;
 our @ISA = qw(DynaLoader);
-our $VERSION = '1.38';
+our $VERSION = '1.39';
 
 # This loads BUFR.so, the compiled version of BUFR.xs, which
 # contains bitstream2dec, bitstream2ascii, dec2bitstream,
@@ -747,17 +747,14 @@ sub get_current_ahl {
     return defined $self->{CURRENT_AHL} ? $self->{CURRENT_AHL} : undef;
 }
 
-sub reuse_current_ahl {
+sub get_current_gts_starting_line {
     my $self = shift;
-    my $n = shift;
-    $Reuse_current_ahl = defined $n ? $n : 1; # Default is 1
-    Geo::BUFR->_spew(2, "Reuse_current_ahl set to %d", $Reuse_current_ahl);
-    return 1;
+    return defined $self->{CURRENT_GTS_STARTING_LINE} ? $self->{CURRENT_GTS_STARTING_LINE} : undef;
 }
 
-sub ahl_is_reused {
+sub get_current_gts_eom {
     my $self = shift;
-    return defined $self->{REUSED_CURRENT_AHL} ? $self->{REUSED_CURRENT_AHL} : undef;
+    return defined $self->{CURRENT_GTS_EOM} ? $self->{CURRENT_GTS_EOM} : undef;
 }
 
 sub set_filter_cb {
@@ -1451,10 +1448,11 @@ sub rewind {
 ## constructor). Decodes section 0 and sets $self->{START_POS} to
 ## start of message and $self->{POS} to end of BUFR message (or after
 ## first 8 bytes of truncated/corrupt BUFR message for which we still
-## want to attempt decoding). $self->{CURRENT_AHL} is updated if a
-## GTS ahl is found (implemented for file reading only), and
-## $self->{EOF} is set if no more 'BUFR' in file/buffer. Croaks if an
-## error occurs when reading BUFR message.
+## want to attempt decoding). $self->{CURRENT_AHL} is updated if a GTS
+## ahl is found (implemented for file reading only) and similarly for
+## $self->{CURRENT_GTS_STARTING_LINE}, and $self->{EOF} is set if no
+## more 'BUFR' in file/buffer. Croaks if an error occurs when reading
+## BUFR message.
 
 ## Returns BUFR message from section 1 on, or undef if no BUFR message
 ## is found.
@@ -1467,19 +1465,21 @@ sub _read_message {
         unless $filehandle or $in_buffer;
 
     # Locate next 'BUFR' and set $pos to this position in file/string,
-    # also finding corresponding GTS ahl if exists (for file
-    # only). Possibly sets $self->{EOF}
+    # also finding corresponding GTS ahl and starting line if exists
+    # (for file only). Possibly sets $self->{EOF}
     my $pos = defined $self->{POS} ? $self->{POS} : 0;
-    my $ahl;
-    ($pos, $ahl) = $self->_find_next_BUFR($filehandle,$in_buffer,$pos,'');
+    my ($ahl, $gts_start);
+    ($pos, $ahl, $gts_start) = $self->_find_next_BUFR($filehandle, $in_buffer, $pos, '');
     return if $pos < 0;
-    $self->{REUSED_CURRENT_AHL} = 0;
     if ($ahl) {
         $self->{CURRENT_AHL} = $ahl;
-    } elsif (! $Reuse_current_ahl) {
+        if ($gts_start) {
+            $self->{CURRENT_GTS_STARTING_LINE} = $gts_start;
+            $self->{GTS_CURRENT_EOM} = undef;
+        }
+    } else {
         $self->{CURRENT_AHL} = undef;
-    } elsif (defined $self->{CURRENT_AHL}) {
-        $self->{REUSED_CURRENT_AHL} = 1;
+        $self->{CURRENT_GTS_STARTING_LINE} = undef;
     }
 
     # Remember start position of BUFR message in case we need to
@@ -1568,8 +1568,30 @@ sub _read_message {
     # bytes of truncated/corrupt BUFR message)
     $self->{POS} = $pos;
 
+    # And then advance past GTS end of message if found
+    my $gts_eom;
+    if ($filehandle && ! $self->{BAD_LENGTH}) {
+        if ((read $filehandle, $gts_eom, 4) == 4 && $gts_eom eq "\r\r\n\003") {
+            $self->{CURRENT_GTS_EOM} = $gts_eom;
+            $self->{POS} +=4;
+        } else {
+            # return to end of message position
+            seek $filehandle, $pos, 0;
+        }
+    }
+
     return $msg;
 }
+
+# Note that our definition av AHL and GTS starting line differs
+# slightly from that of the Manual on the GTS PART II. OPERATIONAL
+# PROCEDURES FOR THE GLOBAL TELECOMMUNICATION SYSTEM (2.3.1 and 2.3.2)
+# in that the Abbreviated heading in the Manual starts with \r\r\n
+# which we have chosen to consider belonging to (the end of) the GTS
+# starting line.
+
+my $gts_start_regexp = qr{\001\r\r\n\d{3,5}\r\r\n};
+# Allow both 3 and 5 digits channel sequence number
 
 my $ahl_regex = qr{[A-Z]{4}\d\d [A-Z]{4} \d{6}(?: (?:(?:RR|CC|AA|PA)[A-Z])| COR| RTD)?};
 # BBB=Pxx (segmentation) was allowed until 2007, but at least one
@@ -1577,15 +1599,15 @@ my $ahl_regex = qr{[A-Z]{4}\d\d [A-Z]{4} \d{6}(?: (?:(?:RR|CC|AA|PA)[A-Z])| COR|
 # allowed (from ?), but are still used
 
 ## Advance to first occurrence of 'BUFR', or to the possibly preceding
-## GTS ahl if this is requested in $at. Returns the new position and
-## (if called in array context) the possibly preceding ahl. If no
-## 'BUFR' is found, sets $self->{EOF} and returns -1 for the new
-## position.
+## GTS envelope if this is requested in $at. Returns the new position
+## and (if called in array context) the possibly preceding ahl and gts
+## starting line. If no 'BUFR' is found, sets $self->{EOF} and returns
+## -1 for the new position.
 sub _find_next_BUFR {
     my $self = shift;
     my ($filehandle, $in_buffer, $pos, $at) = @_;
 
-    my ($new_pos, $ahl);
+    my ($new_pos, $ahl, $gts_start);
     if ($filehandle) {
         my $oldeol = $/;
         $/ = "BUFR";
@@ -1601,14 +1623,12 @@ sub _find_next_BUFR {
             # prepared originally, or might catch cases where ahl is
             # mistakingly included twice)
             my $reset = 4;
-            if ($slurp =~ /(${ahl_regex})((?:\r\r)?\n+BUFR)$/) {
-                $ahl = $1;
-                # Don't use lenght($&), since this slows down execution for
-                # Perl 5.16 or earlier. See the WARNING at the end of
-                # the Capture Buffers section of the perlre documentation
-                $reset = length($1) + length($2) if $at eq 'at_ahl';
+            if ($slurp =~ /(${gts_start_regexp}?)(${ahl_regex})((?:\r\r)?\n+BUFR)$/) {
+                $gts_start = $1 || '';
+                $ahl = $2;
+                $reset = length($gts_start) + length($2) + length($3) if $at eq 'at_ahl';
 
-                $self->_spew(2,"GTS ahl found: %s",$ahl) if $Spew;
+                $self->_spew(2,"GTS ahl found: %s%s", $gts_start, $ahl) if $Spew;
             }
             # Reset position of filehandle to just before 'BUFR', or
             # if requested, before possible preceding AHL
@@ -1620,11 +1640,13 @@ sub _find_next_BUFR {
         if ($new_pos < 0) {
             $self->{EOF} = 1;
         } else {
-            if (substr($in_buffer,$pos,$new_pos-$pos) =~ /(${ahl_regex})((?:\r\r)?\n+)$/) {
-                $ahl = $1;
-                $self->_spew(2,"GTS ahl found: %s",$ahl) if $Spew;
+            if (substr($in_buffer, $pos, $new_pos - $pos)
+                =~ /(${gts_start_regexp}?)(${ahl_regex})((?:\r\r)?\n+)$/) {
+                $gts_start = $1 || '';
+                $ahl = $2;
+                $self->_spew(2,"GTS ahl found: %s%s", $gts_start, $ahl) if $Spew;
                 if ($at eq 'at_ahl') {
-                    $new_pos -= length($1) + length($2);
+                    $new_pos -= length($gts_start) + length($2) + length($3);
                 }
             }
         }
@@ -1633,7 +1655,7 @@ sub _find_next_BUFR {
     if ($self->{EOF}) {
         if ($pos == 0) {
             if ($filehandle) {
-                $self->_spew(2,"No BUFR message in file %s",$self->{FILENAME})
+                $self->_spew(2,"No BUFR message in file %s", $self->{FILENAME})
                     if $Spew;
             } else {
                 $self->_spew(2, "No BUFR message found") if $Spew;
@@ -1642,7 +1664,7 @@ sub _find_next_BUFR {
         return -1;
     }
 
-    return wantarray ? ($new_pos,$ahl) : $new_pos;
+    return wantarray ? ($new_pos, $ahl, $gts_start) : $new_pos;
 }
 
 ## Returns the BUFR message in raw (binary) form, '' if errors encountered
@@ -2911,9 +2933,9 @@ sub _decode_bitstream {
                 if ($Show_replication) {
                     push @{$subset_desc[$isub]}, $id;
                     push @{$subset_data[$isub]}, '';
-                    $self->_spew(4, "X=0 in $id for F=1, might have been > 99 in expansion") 
+                    $self->_spew(4, "X=0 in $id for F=1, might have been > 99 in expansion")
                         if $Spew && $x == 0;
-                }                   
+                }
                 next D_LOOP if $y > 0; # Nothing more to do for normal replication
 
                 if ($x == 0) {
@@ -3283,7 +3305,7 @@ sub _decompress_bitstream {
                 foreach my $isub (1..$nsubsets) {
                     push @{$subset_data[$isub]}, '';
                 }
-                $self->_spew(4, "X=0 in $id for F=1, might have been > 99 in expansion") 
+                $self->_spew(4, "X=0 in $id for F=1, might have been > 99 in expansion")
                     if $Spew && $x == 0;
             }
             next D_LOOP if $y > 0; # Nothing more to do for normal replication
@@ -5866,6 +5888,9 @@ L<https://wiki.met.no/bufr.pm/start> for examples of use. For the
 majority of potential users of Geo::BUFR I would expect these programs
 to be all that you will need Geo::BUFR for.
 
+BUFR tables are not included in this module and must be installed
+separately, see L</"BUFR TABLE FILES">.
+
 Note that being Perl, this module cannot compete in speed with for
 example the (free) ECMWF BUFRDC Fortran library. Still, some effort
 has been invested in making the module reasonable fast in that the
@@ -6201,26 +6226,25 @@ Get Abbreviated Header Line (AHL) before current message:
 
   $ahl = $bufr->get_current_ahl();
 
-If there is no AHL immediately preceding current message, default is
-for C<get_current_ahl> to return undef. Sometimes that might not be
-what you want, e.g. when processing a file with GTS bulletins with
-possibly more than one BUFR message in each bulletin, and especially
-so if filtering on AHL using C<set_filter_cb>.
+Get GTS starting line before current message:
 
-  Geo::BUFR->reuse_current_ahl($n);
- - $n=1 (or not provided): Will cause C<get_current_ahl> to return last
-   AHL extracted and not undef if currently processed BUFR message has
-   no (immediately preceding) AHL
- - $n=0: Reset C<get_current_ahl> to default behaviour as described
-   above
+  $ahl = $bufr->get_current_gts_starting_line();
 
-Check if AHL has been reused:
+Get GTS end of message after current message:
 
-   $bufr->ahl_is_reused();
+  $ahl = $bufr->get_current_gts_eom();
 
-Will return true (1) if the AHL returned by C<get_current_ahl> is a
-reused one, i.e. the AHL is not immediately preceding the current BUFR
-message.
+Currently supporting the notation of the International Alphabet No. 5,
+i.e.  \001\r\r\n<csn>\r\r\n for GTS starting line with 3 or 5 digits for
+<csn> (channel sequence number), and \r\r\n\003 for GTS end of message.
+But ZCZC/NNNN notation (International Telegraph Alphabet No. 2) might be
+provided in a future version of Geo::BUFR if requested.
+
+Note that the definition of GTS starting line and AHL used in
+Geo::BUFR differs slightly from that of the Manual on the GTS. In the
+Manual the Abbreviated heading actually starts with \r\r\n, which in
+Geo::BUFR for convenience is considered part of the GTS starting
+line, since this provides for nicer output when displaying AHLs.
 
 Check length of BUFR message (as stated in section 0):
 
@@ -6525,11 +6549,11 @@ ecCodes (download from https://confluence.ecmwf.int/display/ECC/Releases).
 The utility programs in Geo::BUFR will look for table files by default
 in the standard installation directories, which in Unix-like systems
 will be /usr/local/lib/bufrtables for BUFRDC and
-/usr/local/share/eccodes/definitions/bufr/tables for eCcodes. You can
+/usr/local/share/eccodes/definitions/bufr/tables for ecCodes. You can
 change that behaviour by either providing the environment variable
 BUFR_TABLES, or setting path explicitly by using the
 C<--tablepath>. Note that while BUFR_TABLES is a well known concept in
-BUFRDC software, the closest you get in eCcodes is probably
+BUFRDC software, the closest you get in ecCodes is probably
 ECCODES_DEFINITION_PATH (see
 e.g. https://confluence.ecmwf.int/display/ECC/BUFR%3A+Local+configuration),
 for which BUFR_TABLES should (or could) be set to
@@ -6671,7 +6695,7 @@ L<https://wiki.met.no/bufr.pm/start>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010-2020 MET Norway
+Copyright (C) 2010-2023 MET Norway
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

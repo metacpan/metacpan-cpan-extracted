@@ -2,8 +2,8 @@ NAME
     App::td - Manipulate table data
 
 VERSION
-    This document describes version 0.107 of App::td (from Perl distribution
-    App-td), released on 2022-06-05.
+    This document describes version 0.110 of App::td (from Perl distribution
+    App-td), released on 2023-02-10.
 
 FUNCTIONS
   td
@@ -35,11 +35,34 @@ FUNCTIONS
     scripts and can contain more detailed table specification in the "meta"
     hash, which "td" can parse.
 
-    If you have a CSV, you can easily convert it to table data using the
-    *csv2td* utility:
+    What scripts/modules output table data?
+
+    CLI scripts that are written using Perinci::CmdLine framework output
+    enveloped table data. There are at least hundreds of such scripts on
+    CPAN. Some examples include: lcpan (from App::lcpan), pmlist (from
+    App::PMUtils), and bencher (from Bencher).
+
+    "TableData::*" modules contain table data. They can easily be output to
+    CLI using the tabledata utility (from App::TableDataUtils).
+
+    CSV output from any module/script can be easily converted to table data
+    using the csv2td utility:
 
      % csv2td YOUR.csv | td ...
      % program-that-outputs-csv | csv2td - | td ...
+
+    Table data can also be converted from several other formats e.g. JSON,
+    YAML, XLS/XLSX/ODS.
+
+    What scripts/modules accept table data?
+
+    This *td* script, for one, accept table data.
+
+    If a module/script expects CSV, you can feed table data and convert it
+    to CSV using td2csv utility.
+
+    Several other formats can also be converted to table data, e.g. JSON,
+    YAML, XLS/XLSX/ODS.
 
     Using td
 
@@ -112,7 +135,7 @@ FUNCTIONS
      % osnames -l --json | td select value description
  
      # Select all columns but some
-     % osnames -l --json | td select '*' -e value -e description
+     % osnames -l --json | td select '*' -E value -E description
  
      # Return the rows in a random order
      % osnames -l --json | td shuf
@@ -142,14 +165,14 @@ FUNCTIONS
      % command ... | td uniq -i ;# case-insensitive
      % command ... | td uniq --repeated ;# only shows the duplicate rows
      % command ... | td uniq -i C1 -i C2 ;# only use columns C1 & C2 to check uniqueness
-     % command ... | td uniq -e C5 -e C6 ;# use all columns but C5 & C6 to check uniqueness
+     % command ... | td uniq -E C5 -E C6 ;# use all columns but C5 & C6 to check uniqueness
  
      # Remove non-adjacent duplicate rows:
      % command ... | td nauniq
      % command ... | td nauniq -i ;# case-insensitive
      % command ... | td nauniq --repeated ;# only shows the duplicate rows
      % command ... | td nauniq -i C1 -i C2 ;# only use columns C1 & C2 to check uniqueness
-     % command ... | td nauniq -e C5 -e C6 ;# use all columns but C5 & C6 to check uniqueness
+     % command ... | td nauniq -E C5 -E C6 ;# use all columns but C5 & C6 to check uniqueness
  
      # Transpose table (make first column of rows as column names in the
      # transposed table)
@@ -207,13 +230,23 @@ FUNCTIONS
 
     *   case_insensitive => *true*
 
+        (No description)
+
     *   detail => *bool*
+
+        (No description)
 
     *   exclude_columns => *array[str]*
 
+        (No description)
+
     *   include_columns => *array[str]*
 
+        (No description)
+
     *   lines => *str*
+
+        (No description)
 
     *   no_header_column => *true*
 
@@ -284,14 +317,14 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2021, 2020, 2019, 2017, 2016, 2015
-    by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2017, 2016,
+    2015 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

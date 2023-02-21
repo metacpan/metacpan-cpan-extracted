@@ -32,7 +32,6 @@ sub get_db_driver {
 
 sub env_variables {
     my ( $sf ) = @_;
-    #return [ qw( DBI_DSN DBI_HOST DBI_PORT DBI_USER DBI_PASS ) ];
     return [ qw( DBI_DSN DBI_USER DBI_PASS ) ];
 }
 
@@ -40,8 +39,6 @@ sub env_variables {
 sub read_login_data {
     my ( $sf ) = @_;
     return [
-        #{ name => 'host', secret => 0 },
-        #{ name => 'port', secret => 0 },
         { name => 'user', secret => 0 },
         { name => 'pass', secret => 1 },
     ];

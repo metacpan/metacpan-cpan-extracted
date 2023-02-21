@@ -1,4 +1,4 @@
-class Sys::Socket::Ip_mreq : pointer_t {
+class Sys::Socket::Ip_mreq : pointer {
   use Sys::Socket::In_addr;
 
   native static method new : Sys::Socket::Ip_mreq ();

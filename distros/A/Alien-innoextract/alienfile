@@ -1,0 +1,84 @@
+use alienfile;
+
+use Path::Tiny qw( path );
+
+plugin 'Probe::CommandLine' => (
+  command => 'innoextract',
+  args    => [ '--version' ],
+  match   => qr/^innoextract ([0-9\.]+)/,
+  version => qr/^innoextract ([0-9\.]+)/,
+);
+
+
+share {
+  my %os_mapping = (
+    'linux'   => {
+      suffix => '-linux',
+      format => 'tar.xz',
+      arch   => {
+	'x86'    => 'bin/i686/innoextract',
+	'x86_64' => 'bin/amd64/innoextract',
+	#'' => 'bin/armv6j-hardfloat/innoextract',
+      },
+    },
+    'MSWin32' => {
+      suffix => '-windows',
+      format => 'zip',
+      arch   => {
+	# innoextract.exe is 32-bit, just use it on x86_64 too.
+	'x86'    => 'innoextract.exe',
+	'x86_64' => 'innoextract.exe',
+      },
+    },
+    'freebsd' => {
+      suffix => '-freebsd',
+      format => 'tar.xz',
+      arch   => {
+	'x86'    => 'bin/i686/innoextract',
+	'x86_64' => 'bin/amd64/innoextract',
+      },
+    },
+  );
+  my $meta_arch = meta->prop->{platform}{cpu}{arch}{name};
+
+  # TODO add a ALIEN_INNOEXTRACT_FROM_SOURCE env var
+  # Will need to have Boost, liblzma, iconv.
+  my $do_binary = exists $os_mapping{$^O}{arch}{$meta_arch};
+
+  my $suffix    = $do_binary ? $os_mapping{$^O}{suffix}  : '';
+  my $format    = $do_binary ? $os_mapping{$^O}{format}  : 'tar.gz';
+
+  plugin 'Download::GitHub' => (
+    github_user => 'dscharrer',
+    github_repo => 'innoextract',
+    asset        => 1,
+    asset_name  => qr/innoextract-([0-9\.]+)\Q$suffix\E\.\Q$format\E/,
+    asset_format => $format,
+  );
+  if( $do_binary ) {
+    patch sub {
+      my $bin = path('bin');
+      $bin->mkpath;
+      # delete here so that others are left
+      my $actual_exe = path(delete $os_mapping{$^O}{arch}{$meta_arch});
+
+      $actual_exe->move( $bin->child( $actual_exe->basename ) );
+
+      for my $other_exe (map path($_), values %{ $os_mapping{$^O}{arch} }) {
+	next unless -f $other_exe;
+	$other_exe->remove;
+      }
+    };
+    plugin 'Build::Copy';
+  } else {
+    plugin 'Build::CMake';
+    build [
+      ['%{cmake}', @{ meta->prop->{plugin_build_cmake}->{args} },
+	'-S' => '%{.install.extract}',
+	'-B' => '_build',
+      ],
+      [ '%{make}', qw(-C _build), ],
+      [ '%{make}', qw(-C _build), 'install' ],
+    ];
+  }
+}

@@ -18,6 +18,14 @@ extern "C" {
 #define my  ((( PImage) self)-> self)
 #define var (( PImage) self)
 
+Handle
+Image_convert_to_icon( Handle self, int maskType, SV * mask_fill )
+{
+	if ( maskType != 1 && maskType != 8 )
+		croak("Image.convert_to_icon: maskType must be either 1 or 8");
+	return Icon_create_from_image( self, maskType, mask_fill );
+}
+
 void
 Image_color2pixel( Handle self, Color color, Byte * pixel)
 {
@@ -204,7 +212,7 @@ Image_make_empty( Handle self)
 divide the pixels, by whether they match color or not on two
 groups, F and B. Both are converted correspondingly to the settings
 of color/backColor and rop/rop2. Possible variations:
-rop == rop::NoOper,    pixel value remains ths same
+rop == rop::NoOper,    pixel value remains the same
 rop == rop::CopyPut,   use the color value
 rop == rop::Blackness, use black pixel
 rop == rop::Whiteness, use white pixel
@@ -741,7 +749,7 @@ Image_set( Handle self, HV * profile)
 Routine sets image data almost as Image::set_data, but taking into
 account 'lineSize', 'type', and 'reverse' fields. To be called from bunch routines,
 line ::init or ::set. Returns true if relevant fields were found and
-data extracted and set, and false if user data should be set throught ::set_data.
+data extracted and set, and false if user data should be set through ::set_data.
 Image itself may undergo conversion during the routine; in that case 'palette'
 property may be used also. All these fields, if used, or meant to be used but
 erroneously set, will be deleted regardless of routine success.
@@ -910,27 +918,19 @@ Image_stats( Handle self, Bool set, int index, double value)
 }
 
 Bool
-Image_transform( Handle self, HV * profile )
+Image_matrix_transform( Handle self, Matrix matrix, ColorPixel fill)
 {
-	dPROFILE;
 	Image i;
 	int desired_type = var->type;
-	float matrix[6];
-	ColorPixel fill;
 
 	if (( desired_type & imBPP) <= 8)
 		desired_type = (desired_type & imGrayScale) ? imByte : imRGB;
-
-	if ( !pexist(matrix)) {
-		warn("'matrix' is required");
-		goto FAIL;
-	}
 
 	if (var->type != desired_type) {
 		Bool ok;
 		int type = var->type;
 		my->set_type( self, desired_type );
-		ok = my->transform( self, profile );
+		ok = my->matrix_transform( self, matrix, fill );
 		if ( is_opt( optPreserveType)) {
 			int conv = var-> conversion;
 			my-> set_conversion( self, ictNone);
@@ -940,24 +940,6 @@ Image_transform( Handle self, HV * profile )
 		return ok;
 	}
 
-	{
-		int i;
-		double *cmatrix;
-		if (( cmatrix = (double*) prima_read_array(
-			pget_sv(matrix),
-			"transform.matrix", 'd', 1, 6, 6, NULL, NULL)
-		) == NULL)
-			goto FAIL;
-		for ( i = 0; i < 6; i++)
-			matrix[i] = cmatrix[i];
-		free(cmatrix);
-	}
-
-	bzero(fill, sizeof(fill));
-	if ( pexist(fill))
-		Image_read_pixel( self, pget_sv(fill), &fill );
-
-	hv_clear(profile);
 	if (!img_2d_transform( self, matrix, fill, &i ))
 		return false;
 
@@ -974,6 +956,40 @@ Image_transform( Handle self, HV * profile )
 	}
 
 	return true;
+}
+
+Bool
+Image_transform( Handle self, HV * profile )
+{
+	dPROFILE;
+	Matrix matrix;
+	ColorPixel fill;
+
+	if ( !pexist(matrix)) {
+		warn("'matrix' is required");
+		goto FAIL;
+	}
+
+	{
+		int i;
+		double *cmatrix;
+		if (( cmatrix = (double*) prima_read_array(
+			pget_sv(matrix),
+			"transform.matrix", 'd', 1, 6, 6, NULL, NULL)
+		) == NULL)
+			goto FAIL;
+
+		for ( i = 0; i < 6; i++)
+			matrix[i] = cmatrix[i];
+		free(cmatrix);
+	}
+
+	bzero(fill, sizeof(fill));
+	if ( pexist(fill))
+		Image_read_pixel( self, pget_sv(fill), &fill );
+
+	hv_clear(profile);
+	return my-> matrix_transform( self, matrix, fill );
 
 FAIL:
 	hv_clear(profile);

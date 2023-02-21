@@ -19,7 +19,7 @@ use Carp;
 use HiPi 0.80;
 use HiPi qw( :rpi );
 
-our $VERSION ='0.65';
+our $VERSION ='0.66';
 
 sub _open {
     my ($class, %params) = @_;

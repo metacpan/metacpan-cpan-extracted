@@ -2,7 +2,7 @@ NAME
     Story::Interact::WWW - mojolicious app to read interactive stories
 
 DESCRIPTION
-    This is a companiion to Story::Interact, providing a browser-based reader
+    This is a companion to Story::Interact, providing a browser-based reader
     for interactive stories.
 
     It is provided as-is with almost zero documentation or tests. Use at your

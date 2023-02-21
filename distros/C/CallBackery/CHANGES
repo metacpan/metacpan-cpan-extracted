@@ -1,3 +1,22 @@
+0.43.0 2023-02-14 16:54:59 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - add display action which displays a report in a new window instead of providing a download
+
+      {
+            label => trm('Report'),
+            action => 'display',
+            key => 'report',
+            actionHandler => sub {
+                my $self = shift;
+                my $args = shift;
+                return {
+                    asset    => $self->getReportHtml(),
+                    type     => 'text/html',
+                    filename => 'xyz.html',
+                }
+            }
+        },
+
 0.42.5 2023-01-30 18:59:37 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - revert 0.42.2 do NOT catch instanciation errors as this will

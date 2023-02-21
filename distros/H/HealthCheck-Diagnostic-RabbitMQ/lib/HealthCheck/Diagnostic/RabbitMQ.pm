@@ -2,7 +2,7 @@ package HealthCheck::Diagnostic::RabbitMQ;
 
 # ABSTRACT: Check connectivity and queues on a RabbitMQ server
 use version;
-our $VERSION = 'v1.2.0'; # VERSION
+our $VERSION = 'v1.3.0'; # VERSION
 
 use 5.010;
 use strict;
@@ -134,7 +134,16 @@ sub run {
                 = $rabbit_mq->queue_declare( $channel, $queue,
                 { passive => 1 } );
 
+            my $server_properties;
+            if ($rabbit_mq->can("get_server_properties")) {
+                $server_properties = $rabbit_mq->get_server_properties;
+            }
+
             return {
+                (   $server_properties
+                    ? (server_properties => $server_properties)
+                    : ()
+                ),
                 name      => $name,
                 messages  => $messages,
                 listeners => $listeners,
@@ -237,7 +246,7 @@ HealthCheck::Diagnostic::RabbitMQ - Check connectivity and queues on a RabbitMQ 
 
 =head1 VERSION
 
-version v1.2.0
+version v1.3.0
 
 =head1 SYNOPSIS
 
@@ -409,7 +418,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2022 by Grant Street Group.
+This software is Copyright (c) 2018 - 2023 by Grant Street Group.
 
 This is free software, licensed under:
 

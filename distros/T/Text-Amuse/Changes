@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+1.83 2023-02-19
+
+ - Do not die on muse_format_line with <ruby>
+
 1.82 2022-04-30
 
  - Do not URI-escape the @ sign in URLS.

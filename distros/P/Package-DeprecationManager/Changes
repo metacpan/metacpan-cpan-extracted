@@ -1,3 +1,10 @@
+0.18     2023-02-19
+
+- Use Sub::Util instead of Sub::Name, which is part of Scalar-List-Utils,
+  which itself is a dependency already. Implemented by Aristotle Pagaltzis. GH
+  #3.
+
+
 0.17     2016-06-17
 
 - Remove use of namespace::autoclean.

@@ -8,16 +8,19 @@ my $builder = Module::Build->new(
   include_dirs => 'include',
   'build_requires' => {
     'Module::Build' => '0.28',
-    'Test::More' => '0.90'
+    'Test::More' => '0.90',
+    'perl' => '5.006'
   },
   'configure_requires' => {
-    'Module::Build' => '0.28'
+    'Module::Build' => '0.28',
+    'perl' => '5.006'
   },
   'requires' => {
     'Exporter' => '5.57',
     'MIME::Base64' => '0',
     'Time::HiRes' => '0',
     'XSLoader' => '0',
+    'perl' => '5.006',
     'strict' => '0',
     'warnings' => '0'
   },

@@ -30,7 +30,7 @@ BEGIN
 
     require Exporter;
 
-    $VERSION = '2.002000';
+    $VERSION = '2.002001';
 
     require DynaLoader;
 

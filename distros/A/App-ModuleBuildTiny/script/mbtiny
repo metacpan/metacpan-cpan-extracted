@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use App::ModuleBuildTiny;
 
-our $VERSION = '0.033';
+our $VERSION = '0.035';
 
 modulebuildtiny(@ARGV);
 
@@ -47,7 +47,7 @@ Make the new version a trial version.
 
 =item * commit
 
-Create a commit for the version bump.
+Create a git commit for the version bump. The default for this can be set in the configuration.
 
 =item * verbose
 
@@ -89,7 +89,7 @@ This contains the license of the distribution.
 
 =back
 
-=head2 upload [--silent] [--config=<config_file>]
+=head2 upload [--silent] [--config=<config_file>] [--tag] [--push]
 
 This assembles a tarball and uploads it to CPAN.
 
@@ -99,11 +99,11 @@ Using a L<Config::Identity|Config::Identity> compatible F<.pause> file in your h
 
 =item * tag
 
-Tag the current release with the current version.
+Tag the current release with the current version. The default for this can be set in the configuration.
 
 =item * push
 
-Push the current commit, and tag it C<--tag> is also specified.
+Push the current commit, and tag it C<--tag> is also specified. The default for this can be set in the configuration.
 
 =item * silent
 

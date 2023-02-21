@@ -4,9 +4,9 @@ use strict;
 use Acme::CPANModulesUtil::Misc;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-27'; # DATE
+our $DATE = '2022-12-02'; # DATE
 our $DIST = 'Acme-CPANModules-WorkingWithCSV'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 my $text = <<'_';
 The following are tools (modules and scripts) to work with the CSV format:
@@ -62,7 +62,7 @@ array(ref) with their `say()` method.
 
 **Adding/removing columns**
 
-<prog:csv-add-field>, <prog:csv-delete-field>, <prog:csv-select-fields> from
+<prog:csv-add-fields>, <prog:csv-delete-field>, <prog:csv-select-fields> from
 <pm:App::CSVUtils>
 
 
@@ -77,9 +77,9 @@ Aside from the obvious <pm:Text::CSV>, you can also use <prog:csv-each-row>,
 <prog:csv-munge-row>, <prog:csv-mp> from <pm:App::CSVUtils>.
 
 
-**Merging several CSV files into one**
+**Merging rows from several CSV files into one**
 
-<prog:csv-concat> from <pm:App::CSVUtils>
+<prog:csv-setop>, <prog:csv-concat> from <pm:App::CSVUtils>
 
 
 **Splitting a CSV file into several**
@@ -153,7 +153,7 @@ Acme::CPANModules::WorkingWithCSV - Working with CSV (comma-separated value) dat
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::WorkingWithCSV (from Perl distribution Acme-CPANModules-WorkingWithCSV), released on 2022-07-27.
+This document describes version 0.002 of Acme::CPANModules::WorkingWithCSV (from Perl distribution Acme-CPANModules-WorkingWithCSV), released on 2022-12-02.
 
 =head1 DESCRIPTION
 
@@ -204,7 +204,7 @@ L<csv-csv> from L<App::CSVUtils>
 
 B<Adding/removing columns>
 
-L<csv-add-field>, L<csv-delete-field>, L<csv-select-fields> from
+L<csv-add-fields>, L<csv-delete-field>, L<csv-select-fields> from
 L<App::CSVUtils>
 
 B<Processing columns of CSV with Perl code>
@@ -216,9 +216,9 @@ B<Processing rows of CSV with Perl code>
 Aside from the obvious L<Text::CSV>, you can also use L<csv-each-row>,
 L<csv-munge-row>, L<csv-mp> from L<App::CSVUtils>.
 
-B<Merging several CSV files into one>
+B<Merging rows from several CSV files into one>
 
-L<csv-concat> from L<App::CSVUtils>
+L<csv-setop>, L<csv-concat> from L<App::CSVUtils>
 
 B<Splitting a CSV file into several>
 
@@ -262,37 +262,39 @@ L<csv-setop> from L<App::CSVUtils>
 
 =over
 
-=item * L<Text::CSV> - comma-separated values manipulator (using XS or PurePerl)
+=item L<Text::CSV>
 
 Author: L<ISHIGAKI|https://metacpan.org/author/ISHIGAKI>
 
-=item * L<Text::CSV_XS> - comma-separated values manipulation routines
+=item L<Text::CSV_XS>
 
 Author: L<HMBRAND|https://metacpan.org/author/HMBRAND>
 
-=item * L<Text::CSV_PP> - Text::CSV_XS compatible pure-Perl module
+=item L<Text::CSV_PP>
 
 Author: L<ISHIGAKI|https://metacpan.org/author/ISHIGAKI>
 
-=item * L<App::CSVUtils> - CLI utilities related to CSV
+=item L<App::CSVUtils>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Perinci::CmdLine> - Rinci/Riap-based command-line application framework
+=item L<Perinci::CmdLine>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<App::TextTableUtils>
-
-=item * L<App::LTSVUtils> - CLI utilities related to LTSV
+=item L<App::TextTableUtils>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<App::SQLiteUtils> - Utilities related to SQLite
+=item L<App::LTSVUtils>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<csvgrep>
+=item L<App::SQLiteUtils>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item L<csvgrep>
 
 Author: L<NEILB|https://metacpan.org/author/NEILB>
 
@@ -347,6 +349,8 @@ L<App::CSVUtils::Manual::Cookbook>
 
 The See Also section in L<App::CSVUtils> documentation
 
+L<Acme::CPANModules::WorkingWithXLS>
+
 L<Acme::CPANModules> - about the Acme::CPANModules namespace
 
 L<cpanmodules> - CLI tool to let you browse/view the lists
@@ -368,9 +372,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -23,6 +23,8 @@ use vars qw(@ISA @EXPORT @EXPORT_OK);
 	read_dir rename rmdir unlink utime
 	seekdir telldir rewinddir
 	getenv setenv stat access getdir sv2local local2sv
+
+	nearest_d nearest_i
 );
 
 sub xcolor {
@@ -165,12 +167,6 @@ Currently, the list of the supported platforms is:
 	apc::Win32
 	apc::Unix
 
-=item ceil DOUBLE
-
-Obsolete function.
-
-Returns stdlib's ceil() of DOUBLE
-
 =item find_image PATH
 
 Converts PATH from perl module notation into a file path, and
@@ -178,15 +174,22 @@ searches for the file in C<@INC> paths set. If a file is
 found, its full filename is returned; otherwise C<undef> is
 returned.
 
-=item floor DOUBLE
-
-Obsolete function.
-
-Returns stdlib's floor() of DOUBLE
-
 =item last_error
 
 Returns last system error, if any
+
+=item nearest_i NUMBERS
+
+Performs C< floor($_ + .5) > operation over NUMBERS which can be an array or an arrayref.
+Returns converted integers that in either an array or an arrayref, depending on the calling syntax.
+
+=item nearest_d NUMBERS
+
+Performs C< floor($_ * 1e15 + .5) / 1e15 > operation over NUMBERS which can be
+an array or an arrayref.  Returns converted NVs that in either an array or an
+arrayref, depending on the calling syntax.  Used to protect against perl
+configurations that calculate C<sin>, C<cos> etc with only 15 significant
+digits in the mantissa.
 
 =item path [ FILE ]
 

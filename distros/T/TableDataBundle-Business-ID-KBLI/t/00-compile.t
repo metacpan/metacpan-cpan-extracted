@@ -6,10 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'TableData/Business/ID/KBLI/2020/Category.pm',
+    'TableData/Business/ID/KBLI/2020/Code.pm',
     'TableDataBundle/Business/ID/KBLI.pm'
 );
 

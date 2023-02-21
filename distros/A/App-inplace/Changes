@@ -1,3 +1,10 @@
-0.001   2019-02-21 (PERLANCAR)
+0.002   2023-02-15  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention sponge's perl implementation App::sponge.
+
+
+0.001   2019-02-21  Released-By: PERLANCAR
 
         - First release.

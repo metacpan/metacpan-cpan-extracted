@@ -12,8 +12,8 @@ use Project2::Gantt::SpanInfo;
 
 use Mojo::Log;
 
-our $DATE = '2023-02-02'; # DATE
-our $VERSION = '0.006';
+our $DATE = '2023-02-16'; # DATE
+our $VERSION = '0.009';
 
 has root   => undef;
 has mode   => 'days';
@@ -24,7 +24,6 @@ has end    => undef;
 
 has log    => sub { Mojo::Log->new };
 
-use constant SPAN_INFO_WIDTH => 205;
 use constant HEADER_HEIGHT   => 40;
 use constant ROW_HEIGHT      => 20;
 
@@ -36,8 +35,7 @@ sub new {
 
 sub _get_canvas($self) {
 	my $log    = $self->log;
-
-	my $width  = SPAN_INFO_WIDTH;
+	my $width  = $self->skin->spanInfoWidth;
 	my $height = HEADER_HEIGHT;
 
 	$log->debug("_get_canvas start=" . $self->start) if defined $self->start;

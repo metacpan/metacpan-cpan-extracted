@@ -3,6 +3,8 @@ use warnings;
 
 use Geo::BUFR;
 
+# Versions before 1.39 had 3 more tests for reusing current ahl
+
 Geo::BUFR->set_tablepath('t/bt');
 
 my $bufr = Geo::BUFR->new();
@@ -12,31 +14,14 @@ print "Filtering CCCC=TEST, data category not 2\n";
 $bufr->set_filter_cb(\&callback,2,qw(TEST));
 decode($bufr);
 
-print "\nFiltering CCCC=TEST, data category not 2, reusing current_ahl\n";
-Geo::BUFR->reuse_current_ahl();
-$bufr->rewind();
-decode($bufr);
-
 print "\nFiltering CCCC=TEST, data category not 0\n";
-Geo::BUFR->reuse_current_ahl(0);
 $bufr->rewind();
 $bufr->set_filter_cb(\&callback,0,qw(TEST));
 decode($bufr);
 
-print "\nFiltering CCCC=TEST, data category not 0, reusing current_ahl\n";
-Geo::BUFR->reuse_current_ahl(1);
-$bufr->rewind();
-decode($bufr);
-
 print "\nFiltering CCCC=TEST|SVVS, data category not 0\n";
-Geo::BUFR->reuse_current_ahl(0);
 $bufr->rewind();
 $bufr->set_filter_cb(\&callback,0,qw(TEST SVVS));
-decode($bufr);
-
-print "\nFiltering CCCC=TEST|SVVS, data category not 0, reusing current_ahl\n";
-Geo::BUFR->reuse_current_ahl(1);
-$bufr->rewind();
 decode($bufr);
 
 sub decode {

@@ -183,7 +183,16 @@ apc_application_get_bitmap( Handle self, Handle image, int x, int y, int xLen, i
 		return false;
 	}
 	bm2 = SelectObject( dc2, bm);
-	BitBlt( dc2, 0, 0, xLen, yLen, dc, x, sys last_size.y - y - yLen, SRCCOPY);
+	if ( !BitBlt( dc2, 0, 0, xLen, yLen, dc, x, sys last_size.y - y - yLen, SRCCOPY)) {
+		apiErr;
+		SelectObject( dc2, bm2);
+		SelectPalette( dc, hp3, 1);
+		SelectPalette( dc2, hp2, 1);
+		DeleteObject( hp);
+		dc_free();
+		return false;
+	}
+
 	SelectObject( dc2, bm2);
 	SelectPalette( dc2, hp2, 1);
 	DeleteObject( hp);
@@ -391,28 +400,24 @@ apcUpdateWindow( HWND win )
 	return ret;
 }
 
-static Bool
-files_rehash( Handle self, void * dummy)
-{
-	CFile( self)-> is_active( self, true);
-	return false;
-}
+typedef struct {
+	Event  event;
+	Bool   dynamic;
+	Handle source;
+} SyntheticEvent;
 
 Bool
 process_msg( MSG * msg)
 {
 	Bool postpone_msg_translation = false;
+
+	file_process_events(0,0,0);
+
 	switch ( msg-> message)
 	{
 	case WM_TERMINATE:
 	case WM_QUIT:
 		return false;
-	case WM_CROAK:
-		if ( msg-> wParam)
-			croak("%s", ( char *) msg-> lParam);
-		else
-			warn("%s", ( char *) msg-> lParam);
-		return true;
 	case WM_SYSKEYDOWN:
 		/*
 			If Prima handles an Alt-Key combination that is also handled by a menu
@@ -431,6 +436,7 @@ process_msg( MSG * msg)
 		Bool wui = P_APPLICATION-> wantUnicodeInput;
 		P_APPLICATION-> wantUnicodeInput = kp-> mod & kmUnicode;
 		SendMessage( kp-> wnd, kp-> msg, kp-> mp1, kp-> mp2);
+		free(kp);
 		mod_free( mod);
 		P_APPLICATION->wantUnicodeInput = wui;
 		exception_check_raise();
@@ -464,58 +470,25 @@ process_msg( MSG * msg)
 	case WM_RBUTTONDBLCLK:
 		mouse_click. pending = 0;
 		break;
-	case WM_SOCKET: {
-		int i;
-		SOCKETHANDLE socket = ( SOCKETHANDLE) msg-> lParam;
-		for ( i = 0; i < guts. sockets. count; i++) {
-			Handle self = guts. sockets. items[ i];
-			if (( sys s. file. object == socket) &&
-				( PFile( self)-> eventMask & msg-> wParam)) {
-				Event ev;
-				ev. cmd = ( msg-> wParam == feRead) ? cmFileRead :
-					(( msg-> wParam == feWrite) ? cmFileWrite : cmFileException);
-				CComponent( self)-> message( self, &ev);
-				break;
-			}
+	case WM_FILE:
+	case WM_FILE_REHASH:
+	case WM_NOOP:
+		file_process_events(msg->message, msg->wParam, msg->lParam);
+		return true;
+	case WM_SIGNAL:
+		exception_dispatch_pending_signals();
+		return true;
+	case WM_SYNTHETIC_EVENT: {
+		SyntheticEvent* ev = (SyntheticEvent*)(msg->lParam);
+		if ( PComponent(ev->source)->stage == csNormal )
+			CComponent(ev->source)-> message( ev->source, &ev->event);
+		if ( ev-> dynamic ) {
+			unprotect_object(ev->source);
+			free( ev);
 		}
-		guts. socket_post_sync = 0; // clear semaphore
 		return true;
 	}
-	case WM_SOCKET_REHASH:
-		socket_rehash();
-		guts. socket_post_sync = 0; // clear semaphore
-		return true;
-	case WM_FILE:
-		if ( msg-> wParam == 0) {
-			int i;
 
-			if ( guts. files. count == 0) return true;
-
-			list_first_that( &guts. files, files_rehash, NULL);
-			for ( i = 0; i < guts. files. count; i++) {
-				Handle self = guts. files. items[i];
-				if ( PFile( self)-> eventMask & feRead)
-					PostMessage( NULL, WM_FILE, feRead, ( LPARAM) self);
-				if ( PFile( self)-> eventMask & feWrite)
-					PostMessage( NULL, WM_FILE, feWrite, ( LPARAM) self);
-			}
-			PostMessage( NULL, WM_FILE, 0, 0);
-		} else {
-			int i;
-			Handle self = NULL_HANDLE;
-			for ( i = 0; i < guts. files. count; i++)
-				if (( guts. files. items[i] == ( Handle) msg-> lParam) &&
-					( PFile(guts. files. items[i])-> eventMask & msg-> wParam)) {
-					self = ( Handle) msg-> lParam;
-					break;
-				}
-			if ( self) {
-				Event ev;
-				ev. cmd = ( msg-> wParam == feRead) ? cmFileRead : cmFileWrite;
-				CComponent( self)-> message( self, &ev);
-			}
-		}
-		return true;
 	}
 	if ( !postpone_msg_translation)
 		TranslateMessage( msg);
@@ -786,15 +759,9 @@ apc_message( Handle self, PEvent ev, Bool post)
 		mp1s = ( SHORT) ev-> pos. button;
 		goto general;
 	case cmMouseClick:
-		if ( ev-> pos. dblclk) {
-			if ( ev-> pos. button & mbMiddle) msg = WM_MBUTTONDBLCLK; else
-			if ( ev-> pos. button & mbRight)  msg = WM_RBUTTONDBLCLK; else
-			if ( ev-> pos. button & mbLeft)   msg = WM_LBUTTONDBLCLK; else
-			{
-				msg = WM_XBUTTONDBLCLK;
-				mp1s = MAKEWPARAM(0, (ev-> pos. button & mb4) ? XBUTTON1 : XBUTTON2);
-			}
-		} else {
+		switch ( ev-> pos. nth ) {
+		case 0:
+		case 1: {
 			Event newEvent = *ev;
 			if ( ev-> pos. button & mbMiddle) msg = WM_MMOUSECLICK; else
 			if ( ev-> pos. button & mbRight)  msg = WM_RMOUSECLICK; else
@@ -807,7 +774,34 @@ apc_message( Handle self, PEvent ev, Bool post)
 			apc_message( self, &newEvent, post);
 			newEvent. cmd = cmMouseUp;
 			apc_message( self, &newEvent, post);
+			break;
 		}
+		case 2:
+			if ( ev-> pos. button & mbMiddle) msg = WM_MBUTTONDBLCLK; else
+			if ( ev-> pos. button & mbRight)  msg = WM_RBUTTONDBLCLK; else
+			if ( ev-> pos. button & mbLeft)   msg = WM_LBUTTONDBLCLK; else
+			{
+				msg = WM_XBUTTONDBLCLK;
+				mp1s = MAKEWPARAM(0, (ev-> pos. button & mb4) ? XBUTTON1 : XBUTTON2);
+			}
+			break;
+		default:
+			if ( post ) {
+				SyntheticEvent *ev2;
+				ev2 = malloc(sizeof(SyntheticEvent));
+				memcpy(&ev2->event, ev, sizeof(Event));
+				ev2->dynamic = true;
+				ev2->source  = self;
+				protect_object(self);
+				PostMessage( 0, WM_SYNTHETIC_EVENT, 0, ( LPARAM) ev2);
+			} else {
+				SyntheticEvent ev2 = {*ev, false, self};
+				MSG msg = { 0, WM_SYNTHETIC_EVENT, 0, (LPARAM) &ev2 };
+				process_msg(&msg); 
+			}
+			return true;
+		}
+
 	general: {
 		LPARAM mp2 = MAKELPARAM( ev-> pos. where. x, sys last_size. y - ev-> pos. where. y - 1);
 		WPARAM mp1 = mp1s |
@@ -1140,6 +1134,50 @@ find_console( HWND w, LPARAM ptr)
 	return FALSE;
 }
 
+static char *
+translate_console_input( INPUT_RECORD *ir)
+{
+	char buf[256];
+	switch (ir-> EventType) {
+	case FOCUS_EVENT:
+		snprintf(buf, 256, "type=focus set=%d", ir-> Event.FocusEvent.bSetFocus);
+		break;
+	case KEY_EVENT:
+		snprintf(buf, 256, "type=key down=%d repeat=%d key=%d scan=%d unicode=%d ascii=%d state=%ld",
+			ir->Event.KeyEvent.bKeyDown,
+			ir->Event.KeyEvent.wRepeatCount,
+			ir->Event.KeyEvent.wVirtualKeyCode,
+			ir->Event.KeyEvent.wVirtualScanCode,
+			ir->Event.KeyEvent.uChar.UnicodeChar,
+			ir->Event.KeyEvent.uChar.AsciiChar,
+			ir->Event.KeyEvent.dwControlKeyState
+		);
+		break;
+	case MENU_EVENT:
+		snprintf(buf, 256, "type=menu cmd=%d", ir-> Event.MenuEvent.dwCommandId);
+		break;
+	case MOUSE_EVENT:
+		snprintf(buf, 256, "type=mouse x=%d y=%d state=%ld ctrl=%ld event=%ld",
+			ir->Event.MouseEvent.dwMousePosition.X,
+			ir->Event.MouseEvent.dwMousePosition.Y,
+			ir->Event.MouseEvent.dwButtonState,
+			ir->Event.MouseEvent.dwControlKeyState,
+			ir->Event.MouseEvent.dwEventFlags
+		);
+		break;
+	case WINDOW_BUFFER_SIZE_EVENT:
+		snprintf(buf, 256, "type=buffer x=%d y=%d",
+			ir->Event.WindowBufferSizeEvent.dwSize.X,
+			ir->Event.WindowBufferSizeEvent.dwSize.Y
+		);
+		break;
+	default:
+		return NULL;
+	}
+
+	return duplicate_string(buf);
+}
+
 char *
 apc_system_action( const char * params)
 {
@@ -1229,6 +1267,23 @@ apc_system_action( const char * params)
 		} else if ( strncmp( params, "win32.OpenFile.", 15) == 0) {
 			params += 15;
 			return win32_openfile( params);
+		} else if ( strncmp( params, "win32.ReadConsoleInputEx", 24) == 0) {
+			INPUT_RECORD ir;
+			DWORD n;
+			int flags, fd;
+			int i = sscanf( params + 24, "%u %u", &fd, &flags);
+			WINHANDLE h;
+			if ( i != 2 ) {
+				warn("Bad wFlags\n");
+				return 0;
+			}
+			h = (fd == 0) ? GetStdHandle(STD_INPUT_HANDLE) : (WINHANDLE) _get_osfhandle(fd);
+			if (
+				ReadConsoleInputExW( h, &ir, 1, &n, flags) == 0 ||
+				n == 0
+			)
+				return NULL;
+			return translate_console_input(&ir);
 		} else
 			goto DEFAULT;
 		break;

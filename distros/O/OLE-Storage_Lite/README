@@ -16,11 +16,8 @@ INSTALLATION
         perl Makefile.PL
         make
         make test
-        make install    # You may need to be root
-        make clean      # or make realclean
-
-    Windows users without a working "make" can get nmake from:
-        ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe
+        make install
+        make clean
 
 SAMPLE
     Samples scripts are in sample directory.
@@ -32,4 +29,3 @@ SAMPLE
 
 AUTHOR
     Kawai Takanori (kwitknr@cpan.org)
-

@@ -2,8 +2,18 @@ Revision history for Perl distribution Dist-Zilla-PluginBundle-RWP
 
 This is a changelog file in addition to git commit messages.
 
-0.230350  2023-02-04 23:08:14+04:00 Asia/Baku
+0.230470  2023-02-16 18:34:33+04:00 Asia/Baku
+  - Add MetaJSON plugin
+  - Add MetaProvides::Package plugin
 
+0.230430  2023-02-12 18:57:08+04:00 Asia/Baku
+  - Add Prereqs::AuthorDeps plugin
+
+0.230410  2023-02-11 01:16:27+04:00 Asia/Baku
+  - Add a new GenerateFile plugin
+  - Compile adding plugins into a single add_plugins call
+
+0.230350  2023-02-04 23:08:14+04:00 Asia/Baku
   * First CPAN release
   * Use Dist::Zilla::Role::PluginBundle::Easy Moose role
   * Setup the required configure method

@@ -1,0 +1,23 @@
+Revision history for NetworkManager-Strict
+
+0.230480  2023-02-17 20:59:28+04:00 Asia/Baku
+  - Add synopsis to network_manager script
+  - Update the path in the script to be general referring to ~
+  - Add weaver.ini to the git repository
+
+0.230470  2023-02-16 22:56:53+04:00 Asia/Baku
+  - Document methods and attributes
+  - Separate the NetworkManager::Strict::General class into a file
+  - Add colors
+  - Add weaver.ini
+  - Release as stable to be inedxed (though versioned 0.x)
+  - Add exception to require root
+  - Add message to indicate success
+
+0.230430  2023-02-12 17:55:23+04:00 Asia/Baku (TRIAL RELEASE)
+  - Add NetworkManager::Strict class
+  - Add lock method using chmod
+  - Add set_dns method using nmcli
+  - Add network_manager script
+  - Add OpenDNS Family Shield DNS provider
+  - Add CloudFlare 1.1.1.1 for Families DNS provider

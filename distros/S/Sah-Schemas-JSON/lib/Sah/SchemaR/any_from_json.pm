@@ -1,10 +1,10 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::any_from_json;
 
-our $DATE = '2022-08-26'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2022-11-15'; # DATE
+our $VERSION = '0.007'; # VERSION
 
-our $rschema = do{my$var={base=>"any",clsets_after_base=>[{description=>"\nYou can use this schema if you want to accept any data (a data structure or\nsimple scalar), but if user supplies a defined string e.g. in a command-line\nscript as command-line argument or option, the string will be assumed to be a\nJSON-encoded value and decoded. Data will not be valid if the string does not\ncontain valid JSON.\n\n",examples=>[{summary=>"Empty string is not a valid JSON",valid=>0,value=>""},{valid=>1,value=>1},{valid=>1,validated_value=>undef,value=>"null"},{summary=>"Not a valid JSON literal",valid=>0,value=>"foo"},{valid=>1,validated_value=>[1,2,3,{}],value=>"[1,2,3,{}]"},{summary=>"Missing closing square bracket",valid=>0,value=>"[1,2"},{summary=>"Dangling comma",valid=>0,value=>"[1,2,]"},{summary=>"Not coerced, already an array",valid=>1,value=>[1,2]},{summary=>"Not coerced, already a hash",valid=>1,value=>{}},{summary=>"Not coerced, already an undef",valid=>1,value=>undef}],prefilters=>["JSON::decode_str"],summary=>"A data structure, coerced from JSON string"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["any"],type=>"any",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
+our $rschema = do{my$var={base=>"any",clsets_after_base=>[{description=>"\nYou can use this schema if you want to accept any data (a data structure or\nsimple scalar), but if user supplies a defined string e.g. in a command-line\nscript as command-line argument or option, the string will be assumed to be a\nJSON-encoded value and decoded. Data will not be valid if the string does not\ncontain valid JSON.\n\nThus, if you want to supply a string, you have to JSON-encode it.\n\n",examples=>[{summary=>"Empty string is not a valid JSON",valid=>0,value=>""},{summary=>"A number",valid=>1,value=>1},{valid=>1,validated_value=>undef,value=>"null"},{summary=>"Not a valid JSON literal, you have to encode string in JSON",valid=>0,value=>"foo"},{summary=>"If you want to pass a string, it must be in JSON-encoded form",valid=>1,validated_value=>"foo",value=>"\"foo\""},{valid=>1,validated_value=>[1,2,3,{}],value=>"[1,2,3,{}]"},{summary=>"Missing closing square bracket",valid=>0,value=>"[1,2"},{summary=>"Dangling comma",valid=>0,value=>"[1,2,]"},{summary=>"Not coerced, already an array",valid=>1,value=>[1,2]},{summary=>"Not coerced, already a hash",valid=>1,value=>{}},{summary=>"Not coerced, already an undef",valid=>1,value=>undef}],prefilters=>["JSON::decode_str"],summary=>"A data structure, coerced from JSON string"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["any"],type=>"any",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: A data structure, coerced from JSON string
@@ -21,7 +21,7 @@ Sah::SchemaR::any_from_json - A data structure, coerced from JSON string
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::SchemaR::any_from_json (from Perl distribution Sah-Schemas-JSON), released on 2022-08-26.
+This document describes version 0.007 of Sah::SchemaR::any_from_json (from Perl distribution Sah-Schemas-JSON), released on 2022-11-15.
 
 =head1 DESCRIPTION
 

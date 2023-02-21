@@ -113,10 +113,10 @@ sub _set_display_defaults {
         $self->{'href_extra_vars'} = $self->extra_vars_for_uri();
     }
     if ($self->{-href_extra_vars_qs}) {
-        $self->{'href_extra_vars'} .= '&'.$self->{-href_extra_vars_qs};
+        $self->{'href_extra_vars'} .= '&amp;'.$self->{-href_extra_vars_qs};
     }
-    $self->{'href_extra_vars'} = '&'.$self->{'href_extra_vars'}
-      if $self->{'href_extra_vars'} && $self->{'href_extra_vars'} !~ m/^&/;
+    $self->{'href_extra_vars'} = '&amp;'.$self->{'href_extra_vars'}
+      if $self->{'href_extra_vars'} && $self->{'href_extra_vars'} !~ m/^&amp;/;
 }
 
 =item _init_header_columns()
@@ -146,7 +146,7 @@ sub _column_name {
     return $col;
 }
 
-=item sortby_column_uri($column)
+=item sortby_column_uri($column, $unescape)
 
 Returns URI for sorting the dataset by the given column.  If the dataset is currently
 sorted by $column, then the URI returned will be for reversing the sort.
@@ -154,14 +154,16 @@ sorted by $column, then the URI returned will be for reversing the sort.
 =cut
 
 sub sortby_column_uri {
-    my ($self, $column) = @_;
+    my ($self, $column, $unescape) = @_;
     if ($self->{'action_uri_jsfunc'}) {
         my $json = _json_sortby_params($self, $column, 1);
         $json .= ', '.$self->{'json_extra_vars'} if $self->{'json_extra_vars'};
         return $self->{'action_uri_jsfunc'}.'({ '.$json.' });';
     }
-    return $self->BASE_URI . $self->{'action_uri'} . '?'
+    my $uri = $self->BASE_URI . $self->{'action_uri'} . '?'
       . _query_string_sortby_params($self, $column, 1) . ($self->{'href_extra_vars'} || '');
+    $uri =~ s/&amp;/&/g if $unescape;
+    return $uri;
 }
 
 sub _data_for_sortby_params {
@@ -175,7 +177,7 @@ sub _data_for_sortby_params {
 sub _query_string_sortby_params {
     my ($self, $column, $for_sortlink) = @_;
     my ($sortby, $reverse) = $self->_data_for_sortby_params($column, $for_sortlink);
-    return 'sortby=' . $column . ($sortby ? '&sort_reverse='.($reverse ? '1':'0') : '');
+    return 'sortby=' . $column . ($sortby ? '&amp;sort_reverse='.($reverse ? '1':'0') : '');
 }
 
 sub _json_sortby_params {
@@ -260,7 +262,7 @@ sub make_nav_uri {
 
     my $link = $self->BASE_URI.$self->{'action_uri'}.'?search_startat='.$page_no;
     if ($self->{-no_persistent_object} && $self->{'sortby'}) {
-        $link .= '&'._query_string_sortby_params($self, $self->{'sortby'});
+        $link .= '&amp;'._query_string_sortby_params($self, $self->{'sortby'});
     }
     $link .= $self->{'href_extra_vars'} || '';
     return $link;
@@ -306,7 +308,7 @@ sub display_pager_links {
     my $onclick_js = $self->{-page_nav_link_onclick} ? ' onclick="'.$self->{-page_nav_link_onclick}.'"' : '';
 
     return '' if $hide_if_singlepage && $startat == 0 && !$next_page_exists;
-    return '<table class="searchResultsNavBarTable '.($showpages ? 'bottom' : 'top').'" width="100%"><tr>'
+    return '<table class="searchResultsNavBarTable '.($showpages ? 'bottom' : 'top').'"><tr>'
       .'<td class="searchResultPagerLeftTd" align="left" nowrap="1" width="'.($middle_column ? '30%' : '50%').'">'
         .'<span class="searchResultPagerLinks">'
           .($startat > 0

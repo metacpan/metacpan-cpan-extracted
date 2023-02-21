@@ -1,9 +1,10 @@
+## no critic: TestingAndDebugging::RequireUseStrict
 package TableData;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-01'; # DATE
+our $DATE = '2022-11-29'; # DATE
 our $DIST = 'TableData'; # DIST
-our $VERSION = '0.2.1'; # VERSION
+our $VERSION = '0.2.2'; # VERSION
 
 1;
 # ABSTRACT: Specification for TableData::*, modules that contains table data
@@ -24,7 +25,7 @@ TableData - Specification for TableData::*, modules that contains table data
 
 =head1 VERSION
 
-This document describes version 0.2.1 of TableData (from Perl distribution TableData), released on 2021-06-01.
+This document describes version 0.2.2 of TableData (from Perl distribution TableData), released on 2022-11-29.
 
 =head1 SYNOPSIS
 
@@ -59,6 +60,8 @@ C<TableData::*> module.
 
 =head1 NAMESPACE ORGANIZATION
 
+=head2 TableData
+
 C<TableData> (this module) is the specification.
 
 All the modules under C<TableData::*> are modules with actual table data. The
@@ -66,37 +69,77 @@ entity mentioned in the module name should be singular, not plural (e.g.
 C<TableData::Person::AcmeInc> instead of C<TableData::Persons::AcmeInc> or
 C<TableData::People::AcmeInc>.
 
-More specific subnamespaces for more specific types of table data:
+More specific subnamespaces for more specific types of table data are described
+in entries below.
 
-=over
+=head2 TableData::Locale::*
 
-=item * C<TableData::Locale::*> for locale-related data
+For locale-related data.
 
 Examples: C<TableData::Locale::Country> (list of countries in the world),
 L<TableData::Locale::US::State> (list of US states),
 C<TableData::Locale::ID::Province> (list of Indonesian provinces).
 
-=item * C<TableData::Lingua::*> for human-language-related data
+=head2 TableData::Lingua::*
+
+For human-language-related data
 
 Examples: L<TableData::Lingua::Word::EN::Adjective::TalkEnglish> (list of top
 adjectives from talkenglish.com website, along with some other data like
-frequency). All C<TableData::Lingua::Word::*> modules should contain the column
-C<word> so they are usable from applications like word games.
+frequency). More specific C<TableData::Lingua::*> subnamespaces are described in entries below.
 
-=back
+=head2 TableData::Lingua::Word::*
 
-C<TableDataRole::*> the roles.
+All C<TableData::Lingua::Word::*> modules should contain the column C<word> so
+they are usable from applications like word games.
 
-C<TableDataRoles::*> is the name for distribution that contain several role
+=head2 TableData::Lingua::Dict::*
+
+For dictionaries.
+
+Examples: L<TableData::Lingua::Dict::ID::KBBI>,
+L<TableData::Lingua::Dict::ZH::Proverb::StarDict>,
+L<TableData::Lingua::Dict::FR_EN::FreeDict>.
+
+All C<TableData::Lingua::Dict::*> modules should contain the columns C<entry>
+and C<description>.
+
+=head2 TableDataRole::*
+
+The roles.
+
+=head2 TableDataRoles::*
+
+C<TableDataRoles::*> are names for distributions that contains several role
 modules.
 
-C<TableDataBase::*> for base classes.
+=head2 TableDataBase::*
 
-C<TableDataBases::*> is the name for distribution that contain several
+For base classes.
+
+=head2 TableDataBases::*
+
+C<TableDataBases::*> are names for distributions that contain several
 C<TableDataBase> modules.
 
-C<TableDataBundle-*> name for distribution that contains several C<TableData>
-modules.
+=head2 TableDataBundle::*
+
+C<TableDataBundle::*> are names for distributions that contain several
+C<TableData> modules. The subnamespaces can follow that of C<TableData>.
+
+Examples: L<TableDataBundle::Perl::CPAN::Release> which contains
+L<TableData::Perl::CPAN::Release::Static> and
+L<TableData::Perl::CPAN::Release::Static::FromNewest>.
+L<TableDataBundle::Software::License> which contains
+L<TableData::Software::License::FromRPL> and
+L<TableData::Software::License::FromSL>.
+
+=head1 RELATED NAMESPACES
+
+=head2 Data::TableData::*
+
+Modules that contain code to work with table data (not necessarily table data in
+C<TableData::> modules).
 
 =head1 FAQ
 
@@ -107,14 +150,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/TableData>
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-TableData>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=TableData>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -129,11 +164,37 @@ Modules and CLIs that manipulate table data: L<Data::TableData::Object>, L<td>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=TableData>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

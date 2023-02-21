@@ -1,5 +1,9 @@
 Revision history for Perl extension Config::Inetd.
 
+0.33  2023-02-13  <schubiger@cpan.org>
+
+ - Drop generating compat Makefile.PL.
+
 0.32  2023-01-21  <schubiger@cpan.org>
 
  - Merged development version to stable.

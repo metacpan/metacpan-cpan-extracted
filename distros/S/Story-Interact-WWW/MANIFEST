@@ -15,6 +15,7 @@ doap.ttl
 examples/si_www.conf
 lib/Story/Interact/WWW.pm
 share/public/js/si_www.js
+share/templates/index.html.ep
 share/templates/story.html.ep
 t/00start.t
 t/01basic.t

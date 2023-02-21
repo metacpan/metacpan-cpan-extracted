@@ -11,7 +11,11 @@ BEGIN {
 
 use Thread;
 use Test::More tests => 1 + 15 * 5;
-BEGIN { require_ok('re::engine::GNU') };
+use Test::More::UTF8;
+
+BEGIN {
+    require_ok('re::engine::GNU')
+};
 
 sub thr_sub {
   my ($qr) = @_;

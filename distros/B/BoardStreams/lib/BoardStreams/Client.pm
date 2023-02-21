@@ -4,7 +4,7 @@ use Mojo::Base -strict, -signatures;
 
 use BoardStreams::Client::Manager;
 
-our $VERSION = "v0.0.32";
+our $VERSION = "v0.0.34";
 
 sub new ($class, @args) {
     return BoardStreams::Client::Manager->new(@args);

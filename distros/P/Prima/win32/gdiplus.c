@@ -115,6 +115,8 @@ apc_gp_aa_bars( Handle self, int nr, NRect *rr)
 	Point t = sys transform2;
 	objCheck false;
 
+	select_world_transform(self, false);
+
 	if (( is_apt(aptDeviceBitmap) && ((PDeviceBitmap)self)->type == dbtBitmap)) {
 		Bool ok;
 		PImage pt;
@@ -205,6 +207,8 @@ apc_gp_aa_fill_poly( Handle self, int numPts, NPoint * points)
 	GpPointF *p;
 	objCheck false;
 
+	select_world_transform(self, false);
+
 	if (( is_apt(aptDeviceBitmap) && ((PDeviceBitmap)self)->type == dbtBitmap)) {
 		Bool ok;
 		Point *p;
@@ -256,7 +260,10 @@ apc_gp_aa_fill_poly( Handle self, int numPts, NPoint * points)
 	}
 
 	STYLUS_USE_GP_BRUSH;
-	if ( !CURRENT_GP_BRUSH ) return false;
+	if ( !CURRENT_GP_BRUSH ) {
+		free(p);
+		return false;
+	}
 	GPCALL GdipFillPolygon(
 		sys graphics,
 		CURRENT_GP_BRUSH,
@@ -264,6 +271,7 @@ apc_gp_aa_fill_poly( Handle self, int numPts, NPoint * points)
 		((sys fill_mode & fmWinding) == fmAlternate) ?
 			FillModeAlternate : FillModeWinding
 	);
+	free(p);
 	apiGPErrCheckRet(false);
 
 	return true;

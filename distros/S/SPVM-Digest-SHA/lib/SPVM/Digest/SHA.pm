@@ -1,12 +1,21 @@
 package SPVM::Digest::SHA;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 1;
 
 =head1 Name
 
-SPVM::Digest::SHA - SPVM extension for SHA-1/224/256/384/512
+SPVM::Digest::SHA - SHA-1/224/256/384/512
+
+=head1 Description
+
+C<SPVM::Digest::SHA> is the C<Digest::SHA> class in L<SPVM>.
+
+C<Digest::SHA> is a complete implementation of the NIST Secure Hash Standard.
+It gives SPVM programmers a convenient way to calculate SHA-1, SHA-224,
+SHA-256, SHA-384, SHA-512, SHA-512/224, and SHA-512/256 message digests.
+The module can handle all types of input, including partial-byte data.
 
 =head1 Usage
 
@@ -30,39 +39,6 @@ SPVM::Digest::SHA - SPVM extension for SHA-1/224/256/384/512
   my $digest = $sha->digest;
   my $digest = $sha->hexdigest;
   my $digest = $sha->b64digest;
-
-=head1 Description
-
-C<Digest::SHA> is a complete implementation of the NIST Secure Hash Standard.
-It gives SPVM programmers a convenient way to calculate SHA-1, SHA-224,
-SHA-256, SHA-384, SHA-512, SHA-512/224, and SHA-512/256 message digests.
-The module can handle all types of input, including partial-byte data.
-
-C<Digest::SHA> is a L<SPVM> module.
-
-C<Digest::SHA> is a Perl L<Digest::SHA> porting to L<SPVM>.
-
-=head1 Caution
-
-L<SPVM> is yet experimental status.
-
-=head1 Field Methods
-
-=head2 hashsize
-
-  method hashsize : int ()
-
-Returns the number of digest bits for this object.  The values are
-160, 224, 256, 384, 512, 224, and 256 for SHA-1, SHA-224, SHA-256,
-SHA-384, SHA-512, SHA-512/224 and SHA-512/256, respectively.
-
-=head2 algorithm
-
-  method algorithm : int ()
-
-Returns the digest algorithm for this object.  The values are 1,
-224, 256, 384, 512, 512224, and 512256 for SHA-1, SHA-224, SHA-256,
-SHA-384, SHA-512, SHA-512/224, and SHA-512/256, respectively.
 
 =head1 Class Methods
 
@@ -358,6 +334,22 @@ default.
 
 =head1 Instance Methods
 
+=head2 hashsize
+
+  method hashsize : int ()
+
+Returns the number of digest bits for this object.  The values are
+160, 224, 256, 384, 512, 224, and 256 for SHA-1, SHA-224, SHA-256,
+SHA-384, SHA-512, SHA-512/224 and SHA-512/256, respectively.
+
+=head2 algorithm
+
+  method algorithm : int ()
+
+Returns the digest algorithm for this object.  The values are 1,
+224, 256, 384, 512, 512224, and 512256 for SHA-1, SHA-224, SHA-256,
+SHA-384, SHA-512, SHA-512/224, and SHA-512/256, respectively.
+
 =head2 add
 
   method add : void ($date : string)
@@ -393,9 +385,15 @@ Returns the digest encoded as a Base64 string.
 
 Returns a duplicate copy of the object.
 
+=head1 See Also
+
+=head2 Digest::SHA
+
+C<SPVM::Digest::SHA> is a Perl's L<Digest::SHA> porting to L<SPVM>.
+
 =head1 Repository
 
-L<https://github.com/yuki-kimoto/SPVM-Digest-SHA>
+L<SPVM::Digest::SHA - Github|https://github.com/yuki-kimoto/SPVM-Digest-SHA>
 
 =head1 Author
 
@@ -403,7 +401,7 @@ Yuki Kimoto C<kimoto.yuki@gmail.com>
 
 =head1 Copyright & License
 
-Copyright 2022-2022 Yuki Kimoto, all rights reserved.
+Copyright 2022-2023 Yuki Kimoto, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

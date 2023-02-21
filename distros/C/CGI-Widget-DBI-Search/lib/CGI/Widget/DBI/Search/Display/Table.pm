@@ -90,6 +90,7 @@ sub render_column_headers {
                  %th_attributes, %extra_th_attributes},
                 '<span>'.$self->{-display_columns}->{$col}.'</span>',
             );
+
         } else {
             my $sortby = $self->{'sortby'} && $col eq $self->{'sortby'};
             $header_th_html .= $self->{q}->th(
@@ -115,12 +116,14 @@ sub display_dataset {
     my ($self) = @_;
     return ($self->{-optional_header}||'')
       . $self->extra_vars_for_form()
+      . '<div id="'.($self->{-css_dataset_container_id} || 'searchWidgetContainerId').'">'
       . $self->display_pager_links(1, 0)
       . '<table id="'.($self->{-css_table_id} || 'searchWidgetTableId').'" class="'.($self->{-css_table_class} || 'searchWidgetTableTable').'">'
         . '<thead>'.$self->{'header_html'}.'</thead>'
         . '<tbody>'.join('', @{ $self->{'dataset_rows_html'} }).'</tbody>'
       . '</table>'
       . $self->display_pager_links(0, 1)
+      . '</div>'
       . ($self->{-optional_footer}||'');
 }
 
@@ -134,17 +137,27 @@ Calls display_field($row, $header_col) for each header column.
 sub display_row {
     my ($self, $row) = @_;
     $self->{'_row_index'}++;
-    if ($self->TABLE_BGCOLOR1 && $self->TABLE_BGCOLOR2) { # toggle color
+    if (! $self->{-skip_table_row_color} && $self->TABLE_BGCOLOR1 && $self->TABLE_BGCOLOR2) {
         $self->{'_row_bgcolor'} = ($self->{'_row_bgcolor'}||'') eq $self->TABLE_BGCOLOR2
-          ? $self->TABLE_BGCOLOR1
-          : $self->TABLE_BGCOLOR2;
+          ? $self->TABLE_BGCOLOR1 : $self->TABLE_BGCOLOR2; # toggle color
     }
+    my $base_class = $self->{-css_table_row_class} || 'searchWidgetTableRow';
+    # my %extra_attr = %{ $self->{-css_table_row_extra_attr}||{} };
+    my %extra_attr = %{ $self->get_option_value('-css_table_row_extra_attr', [$row]) || {} };
+    my $extra_class = delete $extra_attr{-class}; delete $extra_attr{class};
+    $extra_class =~ s/\s*$base_class\s*//;
+    delete $extra_attr{-style}; delete $extra_attr{style};
 
-    return '<tr class="'.($self->{-css_table_row_class} || 'searchWidgetTableRow').' '
-      .($self->{'_row_index'} % 2 == 0 ? 'evenRow' : 'oddRow').'"'
-      .($self->{'_row_bgcolor'} ? ' style="background-color: '.$self->{'_row_bgcolor'}.';"' : '').'>'
-        .join('', map { $self->display_field($row, $_) } @{ $self->{'header_columns'} })
-      .'</tr>';
+    return '<tr class="'.$base_class.($extra_class ? ' '.$extra_class : '')
+      .' '.($self->{'_row_index'} % 2 == 0 ? 'evenRow' : 'oddRow').'"'
+      .($self->{'_row_bgcolor'} ? ' style="background-color: '.$self->{'_row_bgcolor'}.';"' : '')
+      .' '.join(' ', map {
+          my $attr = $_; $attr =~ s/^-//;
+          my $val = $extra_attr{$_};
+          $val =~ s/\$rowindex/ $self->{'_row_index'} /ge;
+          $attr.'="'.$val.'"';
+      } keys %extra_attr)
+      .'>'.join('', map { $self->display_field($row, $_) } @{ $self->{'header_columns'} }).'</tr>';
 }
 
 =item display_field( $row, $col )

@@ -1853,8 +1853,8 @@ sub reset
 	$tx1 = $fh if $tx1 < $fh;
 	$tx1 /= 2;
 	$tx1 += 4 + 10;
-	my $min_viable_rad = $tx1;
-	my $rad = $self-> {radius} = ($tx1 < ($br * 0.5)) ? $tx1 : ($br * 0.5);
+	my $min_viable_rad = $tx1 / 2 * 1.1;
+	my $rad = $self-> {radius} = ($min_viable_rad < $br/2) ? $min_viable_rad : ($br/2);
 
 	# circle center
 	$self-> {br}        = $br;
@@ -2110,14 +2110,20 @@ sub on_paint
 		);
 		$self-> fillpoly( \@j);
 	} else {
-		my @cxt = ( $self-> offset2pt( @cpt[0,1], $self-> {value}, $rad - 10), 4, 4);
 		my $knob = $::application->uiScaling * 3;
-		$canvas-> lineWidth(2);
+		$knob += $rad / 50;
+		my @cxt = ( $self-> offset2pt( @cpt[0,1], $self-> {value}, $rad - $knob * 1.5), 4, 4);
+		$canvas->antialias(1);
+		$canvas-> lineWidth(($rad > 50) ? 2 : 1);
 		$canvas-> color( $c3d[0]);
 		$canvas-> arc( @cxt[0..1], $knob, $knob, 65, 235);
-		$canvas-> color( $c3d[1]);
+		$canvas-> color((
+			cl::distance( $canvas->map_color($c3d[1]), $canvas->map_color($clr[1])) > 
+			cl::distance( $canvas->map_color($c3d[1]), 0)) ?
+				$c3d[1] : 0);
 		$canvas-> arc( @cxt[0..1], $knob, $knob, 255, 405);
 		$canvas-> lineWidth(0);
+		$canvas->antialias(0);
 	}
 AFTER_DIAL:
 	$canvas-> color( $clr[0]);

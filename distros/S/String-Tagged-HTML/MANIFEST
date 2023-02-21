@@ -1,12 +1,16 @@
 Build.PL
+Changes
 lib/String/Tagged/HTML.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01plain.t
 t/02format.t
 t/03link.t
+t/04auto-span.t
+t/10parse.t
+t/20formatting.t
 t/99pod.t
-Makefile.PL
-README
-LICENSE
-META.yml

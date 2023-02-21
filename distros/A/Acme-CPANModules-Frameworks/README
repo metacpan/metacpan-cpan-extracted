@@ -2,9 +2,9 @@ NAME
     Acme::CPANModules::Frameworks - List of frameworks on CPAN
 
 VERSION
-    This document describes version 0.001 of Acme::CPANModules::Frameworks
+    This document describes version 0.002 of Acme::CPANModules::Frameworks
     (from Perl distribution Acme-CPANModules-Frameworks), released on
-    2021-03-25.
+    2022-11-29.
 
 DESCRIPTION
     What qualifies as a framewor to be listed here is the existence of
@@ -14,84 +14,152 @@ DESCRIPTION
     This list is used in building a list of framework classifiers in
     Module::Features::PerlTrove.
 
-ACME::MODULES ENTRIES
-    *   Jifty
+ACME::CPANMODULES ENTRIES
+    Acme::CPANAuthors
+        Author: ISHIGAKI <https://metacpan.org/author/ISHIGAKI>
 
-    *   AnyEvent
+    Acme::CPANModules
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   IO::Async
+    Jifty
+        Author: ALEXMV <https://metacpan.org/author/ALEXMV>
 
-    *   POE
+    AnyEvent
+        Author: MLEHMANN <https://metacpan.org/author/MLEHMANN>
 
-    *   CHI
+    IO::Async
+        Author: PEVANS <https://metacpan.org/author/PEVANS>
 
-    *   App::Cmd
+    POE Author: BINGOS <https://metacpan.org/author/BINGOS>
 
-    *   Perinci::CmdLine
+    Bencher
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   DBI
+    CHI Author: ASB <https://metacpan.org/author/ASB>
 
-    *   Data::Printer
+    App::Cmd
+        Author: RJBS <https://metacpan.org/author/RJBS>
 
-    *   DateTime
+    Perinci::CmdLine
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Dist::Zilla
+    ScriptX
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Minilla
+    ArrayData
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   ShipIt
+    HashData
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Interchange
+    Games::Word::Phraselist
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Log::Any
+    Games::Word::Wordlist
+        Author: DOY <https://metacpan.org/author/DOY>
 
-    *   Log::Contextual
+    TableData
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Log::Dispatch
+    WordList
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Log::ger
+    DBI Author: TIMB <https://metacpan.org/author/TIMB>
 
-    *   Log::Log4perl
+    Data::Printer
+        Author: GARU <https://metacpan.org/author/GARU>
 
-    *   PDL
+    DateTime
+        Author: DROLSKY <https://metacpan.org/author/DROLSKY>
 
-    *   Moose
+    Dist::Zilla
+        Author: RJBS <https://metacpan.org/author/RJBS>
 
-    *   Moo
+    Minilla
+        Author: SYOHEX <https://metacpan.org/author/SYOHEX>
 
-    *   DBIx::Class
+    ShipIt
+        Author: MIYAGAWA <https://metacpan.org/author/MIYAGAWA>
 
-    *   Template::Toolkit
+    Interchange
+    Log::Any
+        Author: PREACTION <https://metacpan.org/author/PREACTION>
 
-    *   Test2
+    Log::Contextual
+        Author: FREW <https://metacpan.org/author/FREW>
 
-    *   Specio
+    Log::Dispatch
+        Author: DROLSKY <https://metacpan.org/author/DROLSKY>
 
-    *   Type::Tiny
+    Log::ger
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Params::Validate
+    Log::Log4perl
+        Author: ETJ <https://metacpan.org/author/ETJ>
 
-    *   Sah
+    PDL Author: ETJ <https://metacpan.org/author/ETJ>
 
-    *   Catalyst
+    Moose
+        Author: ETHER <https://metacpan.org/author/ETHER>
 
-    *   CGI::Application
+    Moo Author: HAARG <https://metacpan.org/author/HAARG>
 
-    *   Dancer
+    DBIx::Class
+        Author: RIBASUSHI <https://metacpan.org/author/RIBASUSHI>
 
-    *   Dancer2
+    Regexp::Common
+        Author: ABIGAIL <https://metacpan.org/author/ABIGAIL>
 
-    *   Gantry
+    Regexp::Pattern
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Mason
+    Template::Toolkit
+        Author: ABW <https://metacpan.org/author/ABW>
 
-    *   Maypole
+    Test2
+        Author: EXODIST <https://metacpan.org/author/EXODIST>
 
-    *   Mojolicious
+    Specio
+        Author: DROLSKY <https://metacpan.org/author/DROLSKY>
 
-    *   HTML::FormFu
+    Type::Tiny
+        Author: TOBYINK <https://metacpan.org/author/TOBYINK>
 
-    *   HTML::FormHandler
+    Data::Sah
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Params::Validate
+        Author: DROLSKY <https://metacpan.org/author/DROLSKY>
+
+    Catalyst
+        Author: JJNAPIORK <https://metacpan.org/author/JJNAPIORK>
+
+    CGI::Application
+        Author: MARTO <https://metacpan.org/author/MARTO>
+
+    Dancer
+        Author: BIGPRESH <https://metacpan.org/author/BIGPRESH>
+
+    Dancer2
+        Author: CROMEDOME <https://metacpan.org/author/CROMEDOME>
+
+    Gantry
+        Author: TKEEFER <https://metacpan.org/author/TKEEFER>
+
+    Mason
+        Author: JSWARTZ <https://metacpan.org/author/JSWARTZ>
+
+    Maypole
+        Author: TEEJAY <https://metacpan.org/author/TEEJAY>
+
+    Mojolicious
+        Author: SRI <https://metacpan.org/author/SRI>
+
+    HTML::FormFu
+        Author: CFRANKS <https://metacpan.org/author/CFRANKS>
+
+    HTML::FormHandler
+        Author: GSHANK <https://metacpan.org/author/GSHANK>
 
 FAQ
   What is an Acme::CPANModules::* module?
@@ -102,8 +170,13 @@ FAQ
 
   What are ways to use this Acme::CPANModules module?
     Aside from reading this Acme::CPANModules module's POD documentation,
-    you can install all the listed modules (entries) using cpanmodules CLI
-    (from App::cpanmodules distribution):
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n Frameworks
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
 
         % cpanmodules ls-entries Frameworks | cpanm -n
 
@@ -117,7 +190,9 @@ FAQ
 
     This Acme::CPANModules module also helps lcpan produce a more meaningful
     result for "lcpan related-mods" command when it comes to finding related
-    modules for the modules listed in this Acme::CPANModules module.
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -127,13 +202,6 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Acme-CPANModules-Frameworks>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-Acme-CPANModules-Frameworks/issues>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Acme::CPANModules - about the Acme::CPANModules namespace
 
@@ -142,9 +210,34 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021 by perlancar@cpan.org.
+    This software is copyright (c) 2022, 2021 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Fram
+    eworks>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

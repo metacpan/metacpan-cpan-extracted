@@ -1,0 +1,10 @@
+Revision history for Mojolicious-Plugin-Passphrase
+
+0.003     2023-02-14 02:01:34+01:00 Europe/Amsterdam
+          - Fix verify test
+
+0.002     2023-02-14 01:38:11+01:00 Europe/Amsterdam
+          - Add passphrase command
+
+0.001     2023-02-12 23:19:36+01:00 Europe/Amsterdam
+          Initial release to an unsuspecting world

@@ -33,6 +33,7 @@ instructions(
 		args => [
 			application => 'App::Test',
 			plack_env => {
+				PATH_INFO => "",
 				'plack.request.merged' => {
 					req => 'test',
 				},
@@ -69,6 +70,7 @@ instructions(
 		args => [
 			application => 'App::Test',
 			plack_env => {
+				PATH_INFO => "",
 				'plack.request.merged' => {
 					req => 'testing',
 				},
@@ -103,6 +105,7 @@ instructions(
 		args => [
 			application => 'App::Test',
 			plack_env => {
+				PATH_INFO => "",
 				'plack.request.merged' => {
 					req => 'unauth',
 				},

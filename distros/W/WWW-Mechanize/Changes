@@ -1,9 +1,25 @@
 Revision history for WWW::Mechanize
 
+2.16      2023-02-11 12:09:16Z
+    [FIXED]
+    - Raise minimum Perl to 5.8 to match what we test, what dependencies
+      depend on, etc. (GH#352) (James Raspass)
+    [ENHANCEMENTS]
+    - New method delete() that allows DELETE requests with Mechanize::Link
+      objects (GH#361) (Stuart A Johnston)
+    [DOCUMENTATION]
+    - Clarify documentation for select() (GH#77) (Julien Fiegehenn)
+    - Various POD fixes (Julien Fiegehenn)
+    - Explain that :content-file does not decode content (GH#363) (bscan)
+    [TESTS]
+    - Test that follow_link(n=> 'all') warns (Kueppo Tcheukam)
+    - Drop Test::Warn prerequisite and only use Test::Warnings (GH#360) (Graham Knop)
+
 2.15      2022-08-21 07:47:35Z
     [FIXED]
     - There was a test suite failure on some Windows machines introduced in
       2.14 that is now fixed. (GH#350) (Julien Fiegehenn)
+
     [ENHANCEMENTS]
     - form_with and all_forms_with() now support the "action" attribute to find
       forms (GH#349) (Julien Fiegehenn)

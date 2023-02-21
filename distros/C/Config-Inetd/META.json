@@ -37,7 +37,7 @@
    "provides" : {
       "Config::Inetd" : {
          "file" : "lib/Config/Inetd.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       }
    },
    "release_status" : "stable",
@@ -49,6 +49,6 @@
          "url" : "https://github.com/stsc/Config-Inetd"
       }
    },
-   "version" : "0.32",
+   "version" : "0.33",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

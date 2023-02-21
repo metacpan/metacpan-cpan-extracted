@@ -193,6 +193,7 @@ sub dispatch {
 	my $dispatch = $Terse::Controller::dispatcher{$package};
 	my @dispatcher = @{ $dispatch->{$req} || [] };
 	my $in;
+
 	$in = sub {
 		my @ISA = eval "\@$_[0]::ISA";
 		for (@ISA) {
@@ -210,6 +211,7 @@ sub dispatch {
 	$dispatch = undef;
 	my $path = $t->request->uri->path;
 	my $caps = scalar @{ $t->captured || [] };
+
 	DISPATCH: for my $candidate (reverse @dispatcher) {
 		next DISPATCH unless ($candidate->{lc($t->request->method)} || $candidate->{any});
 		next DISPATCH unless (!$candidate->{captured} || $caps == $candidate->{captured});
@@ -275,7 +277,7 @@ Terse::Controller - controllers made simple.
 
 =head1 VERSION
 
-Version 0.1234
+Version 0.123456789
 
 =cut
 

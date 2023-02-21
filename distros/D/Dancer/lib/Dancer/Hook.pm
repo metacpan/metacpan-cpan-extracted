@@ -1,7 +1,7 @@
 package Dancer::Hook;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: Class to manipulate hooks with Dancer
-$Dancer::Hook::VERSION = '1.3520';
+$Dancer::Hook::VERSION = '1.3521';
 use strict;
 use warnings;
 use Carp;
@@ -84,7 +84,7 @@ Dancer::Hook - Class to manipulate hooks with Dancer
 
 =head1 VERSION
 
-version 1.3520
+version 1.3521
 
 =head1 SYNOPSIS
 

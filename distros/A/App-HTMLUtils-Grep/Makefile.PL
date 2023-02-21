@@ -15,17 +15,13 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-HTMLUtils-Grep",
   "EXE_FILES" => [
     "script/grep-from-html",
-    "script/htmlgrep",
-    "script/less-pdf-text"
+    "script/htmlgrep"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::HTMLUtils::Grep",
   "PREREQ_PM" => {
-    "App::PDFUtils" => "0.012",
     "AppBase::Grep" => "0.010",
-    "CLI::MetaUtil::Getopt::Long::Complete" => 0,
-    "Complete::File" => "0.440",
     "Data::Sah::Compiler::perl::TH::array" => "0.914",
     "Data::Sah::Compiler::perl::TH::bool" => "0.914",
     "Data::Sah::Compiler::perl::TH::code" => "0.914",
@@ -35,11 +31,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
     "File::Basename" => 0,
     "File::Find::Rule" => 0,
-    "File::Slurper" => 0,
     "File::Temp" => "0.2307",
-    "File::Which" => 0,
-    "File::chdir" => 0,
-    "Getopt::Long" => "2.50",
     "IPC::System::Options" => "0.339",
     "Log::ger" => "0.038",
     "Perinci::CmdLine::Any" => "0.154",
@@ -57,7 +49,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -65,10 +57,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::PDFUtils" => "0.012",
   "AppBase::Grep" => "0.010",
-  "CLI::MetaUtil::Getopt::Long::Complete" => 0,
-  "Complete::File" => "0.440",
   "Data::Sah::Compiler::perl::TH::array" => "0.914",
   "Data::Sah::Compiler::perl::TH::bool" => "0.914",
   "Data::Sah::Compiler::perl::TH::code" => "0.914",
@@ -78,12 +67,8 @@ my %FallbackPrereqs = (
   "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
   "File::Basename" => 0,
   "File::Find::Rule" => 0,
-  "File::Slurper" => 0,
   "File::Spec" => 0,
   "File::Temp" => "0.2307",
-  "File::Which" => 0,
-  "File::chdir" => 0,
-  "Getopt::Long" => "2.50",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "IPC::System::Options" => "0.339",

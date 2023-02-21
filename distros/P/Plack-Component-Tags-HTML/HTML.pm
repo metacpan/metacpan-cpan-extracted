@@ -15,7 +15,7 @@ use Tags::HTML::Page::Begin;
 use Tags::HTML::Page::End;
 use Tags::Output::Raw;
 
-our $VERSION = 0.10;
+our $VERSION = 0.12;
 
 sub call {
 	my ($self, $env) = @_;
@@ -30,8 +30,13 @@ sub call {
 		return $app;
 	}
 
-	# Process 'Tags' for page.
+	# Process 'CSS::Struct' for page.
+	if (defined $self->{'_page_begin'}) {
+		$self->{'_page_begin'}->process_css;
+	}
 	$self->_css;
+
+	# Process 'Tags' for page.
 	$self->_tags;
 	$self->tags->finalize;
 	$self->_cleanup;
@@ -96,6 +101,25 @@ sub prepare_app {
 		$self->script_js_src([]);
 	}
 
+	if ($self->flag_begin) {
+		$self->{'_page_begin'} = Tags::HTML::Page::Begin->new(
+			'author' => $self->author,
+			'css' => $self->css,
+			defined $self->css_init ? (
+				'css_init' => $self->css_init,
+			) : (),
+			'charset' => $self->encoding,
+			'favicon' => $self->favicon,
+			'generator' => $self->generator,
+			'lang' => {
+				'title' => $self->title,
+			},
+			'script_js' => $self->script_js,
+			'script_js_src' => $self->script_js_src,
+			'tags' => $self->tags,
+		);
+	}
+
 	$self->_prepare_app;
 
 	return;
@@ -141,22 +165,7 @@ sub _tags {
 	my $self = shift;
 
 	if ($self->flag_begin) {
-		Tags::HTML::Page::Begin->new(
-			'author' => $self->author,
-			'css' => $self->css,
-			defined $self->css_init ? (
-				'css_init' => $self->css_init,
-			) : (),
-			'charset' => $self->encoding,
-			'favicon' => $self->favicon,
-			'generator' => $self->generator,
-			'lang' => {
-				'title' => $self->title,
-			},
-			'script_js' => $self->script_js,
-			'script_js_src' => $self->script_js_src,
-			'tags' => $self->tags,
-		)->process;
+		$self->{'_page_begin'}->process;
 	}
 
 	$self->_tags_middle;
@@ -515,6 +524,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.10
+0.12
 
 =cut

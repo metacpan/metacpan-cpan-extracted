@@ -1,0 +1,76 @@
+class TestCase::File::Temp {
+  use File::Temp;
+  use File::Spec;
+  use File::Basename;
+  use Fn;
+  use Sys::FileTest;
+  use List;
+  use IO::File;
+  
+  static method test : int () {
+
+    # Basic
+    {
+      my $dirname = (string)undef;
+      {
+        my $temp_dir = File::Temp->newdir;
+        $dirname = $temp_dir->dirname;
+        
+        warn "[Test Output]$dirname";
+        
+        unless (File::Spec->file_name_is_absolute($dirname)) {
+          return 0;
+        }
+        
+        my $file_spec_tmpdir = File::Spec->tmpdir;
+        unless (Fn->contains($dirname, $file_spec_tmpdir)) {
+          return 0;
+        }
+        
+        unless (Sys::FileTest->d($dirname)) {
+          return 0;
+        }
+
+        unless (Sys::FileTest->w($dirname)) {
+          return 0;
+        }
+        
+        my $io_file = IO::File->new("$dirname/a.txt", ">");
+        $io_file = undef;
+      }
+      
+      if (Sys::FileTest->d($dirname)) {
+        return 0;
+      }
+    }
+    
+    # Repeat
+    {
+      my $temp_dirs_list = List->new;
+      for (my $i = 0; $i < 1000; $i++) {
+        my $temp_dir = File::Temp->newdir;
+        $temp_dirs_list->push($temp_dir);
+        my $dirname = $temp_dir->dirname;
+        
+        unless (Sys::FileTest->d($dirname)) {
+          return 0;
+        }
+      }
+    }
+    
+    {
+      my $temp_dirs_list = List->new;
+      for (my $i = 0; $i < 1000; $i++) {
+        my $temp_dir = File::Temp->newdir;
+        $temp_dirs_list->push($temp_dir);
+        my $dirname = $temp_dir->dirname;
+        
+        unless (Sys::FileTest->d($dirname)) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+}

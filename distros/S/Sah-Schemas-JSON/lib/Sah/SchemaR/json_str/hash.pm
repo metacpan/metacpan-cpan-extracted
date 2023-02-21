@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::json_str::hash;
 
-our $DATE = '2022-08-26'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2022-11-15'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nThis schema is like the `json_str` schema: it accepts a string that contains\nvalid JSON. The JSON string will not be decoded but you know that the string\ncontains a valid JSON. In addition to that, the JSON must encode a hash\n(JavaScript object). Data will not be valid if it is not a valid JSON or if the\nJSON is not a hash.\n\nNote that unlike the `hash_from_json` schema, a hash data is not accepted by\nthis schema. Data must be a string.\n\n",examples=>[{summary=>"Empty string is not a valid JSON",valid=>0,value=>""},{summary=>"Valid JSON but not a hash",valid=>0,value=>1},{summary=>"Valid JSON but not a hash",valid=>0,value=>"true"},{summary=>"Not a valid JSON literal",valid=>0,value=>"foo"},{summary=>"Valid JSON but not a hash",valid=>0,value=>"\"foo\""},{summary=>"Valid JSON but not a hash",valid=>0,value=>"[]"},{valid=>1,value=>"{\"a\":1,\"b\":2}"},{summary=>"Invalid JSON: missing closing curly bracket",valid=>0,value=>"{\"a\":1"},{summary=>"Invalid JSON: dangling comma",valid=>0,value=>"{\"a\":1,}"}],prefilters=>["JSON::check_decode_hash"],summary=>"A string that contains valid JSON and the JSON encodes a hash (JavaScript object)"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::json_str::hash - A string that contains valid JSON and the JSON en
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::SchemaR::json_str::hash (from Perl distribution Sah-Schemas-JSON), released on 2022-08-26.
+This document describes version 0.007 of Sah::SchemaR::json_str::hash (from Perl distribution Sah-Schemas-JSON), released on 2022-11-15.
 
 =head1 DESCRIPTION
 

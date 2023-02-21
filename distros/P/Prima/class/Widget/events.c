@@ -505,7 +505,7 @@ void Widget_handle_event( Handle self, PEvent event)
 			break;
 		case cmMouseClick:
 			my-> notify( self, "<siiPi", "MouseClick",
-				event-> pos. button, event-> pos. mod, event-> pos. where, event-> pos. dblclk);
+				event-> pos. button, event-> pos. mod, event-> pos. where, event-> pos. nth);
 			break;
 		case cmMouseDown:
 			if (P_APPLICATION-> hintUnder == self)
@@ -540,7 +540,7 @@ void Widget_handle_event( Handle self, PEvent event)
 				is_opt( optShowHint) &&
 				(P_APPLICATION-> options. optShowHint) &&
 				var-> hint &&
-				SvTYPE(var->hint) != SVt_NULL &&
+				SvOK(var->hint) &&
 				SvCUR(var-> hint)
 			)
 				C_APPLICATION-> set_hint_action( prima_guts.application, self, true, true);
@@ -629,7 +629,7 @@ Widget_key_event( Handle self, int command, int code, int key, int mod, int repe
 }
 
 void
-Widget_mouse_event( Handle self, int command, int button, int mod, int x, int y, Bool dbl, Bool post)
+Widget_mouse_event( Handle self, int command, int button, int mod, int x, int y, int nth, Bool post)
 {
 	Event ev;
 	if ( command != cmMouseDown
@@ -647,7 +647,7 @@ Widget_mouse_event( Handle self, int command, int button, int mod, int x, int y,
 	ev. pos. where. y = y;
 	ev. pos. mod    = mod;
 	ev. pos. button = button;
-	if ( command == cmMouseClick) ev. pos. dblclk = dbl;
+	if ( command == cmMouseClick) ev. pos. nth = nth;
 	apc_message( self, &ev, post);
 }
 

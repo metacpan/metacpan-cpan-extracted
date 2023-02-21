@@ -17,3 +17,4 @@ t/20-voice.t
 t/60-rset.t
 t/pod-coverage.t
 t/pod.t
+SIGNATURE    Added here by Module::Build

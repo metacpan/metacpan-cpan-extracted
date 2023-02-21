@@ -176,7 +176,7 @@ has 'choice' => (
 	default => 'left',
 );
 
-sub arguments($$) {
+sub arguments {
 	my $self = shift;
 	my $index = shift;
 	my $stream_id;

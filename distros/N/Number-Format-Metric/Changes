@@ -1,18 +1,31 @@
-Revision history for Number-Format-Metric
+0.602   2023-02-14  Released-By: PERLANCAR; Urgency: low
 
-0.60    2014-12-05 (PERLANCAR)
+        - No functional changes.
+
+        - Really fix example results in Synopsis (RT#146402), add/tweak
+          some examples.
+
+
+0.601   2023-02-12  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Fix example result in Synopsis (RT#146402) (Thanks R Philley).
+
+
+0.60    2014-12-05  Released-By: PERLANCAR
 
         - Rename module/dist from SHARYANTO-Number-Util to Number-Format-Metric.
 
 
-0.59    2014-05-05 (SHARYANTO)
+0.59    2014-05-05  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Fix setlocale invocation in test, derp.
 
 
-0.58    2014-05-01 (SHARYANTO)
+0.58    2014-05-01  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -20,7 +33,7 @@ Revision history for Number-Format-Metric
           reports [CT#94487].
 
 
-0.57    2014-04-07 (SHARYANTO)
+0.57    2014-04-07  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -28,7 +41,7 @@ Revision history for Number-Format-Metric
           Rezic, CT#94487].
 
 
-0.56    2013-09-10 (SHARYANTO)
+0.56    2013-09-10  Released-By: SHARYANTO
 
         - No functional changes. Split from SHARYANTO-Utils to minimize
           dependencies (I'm trying to make Text::ANSITable work under Windows).

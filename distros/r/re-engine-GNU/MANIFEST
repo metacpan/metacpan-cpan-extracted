@@ -8,6 +8,7 @@ META.yml
 Makefile.PL
 README.GNU.txt
 config.h
+cpanfile
 dist.ini
 etc/config_REGEXP.pl
 etc/config_autoconf.pl

@@ -172,10 +172,9 @@ sub update_custom_line
 {
 	my ( $self, $le ) = @_;
 	$le //= $self->SUPER::lineEnd;
-	my $lp = (length($self->linePattern) > 1) ? 1 : 0;
-	$self->{lineEnd_flags} = ref($le) ? 1 : $lp;
+	$self->{lineEnd_flags} = ref($le) ? 1 : 0;
 	if ( $self->{lineEnd_flags} ) {
-		$self->{lineEnd_flags} |= 2 if $lp || defined($le->[2]) || defined($le->[3]);
+		$self->{lineEnd_flags} |= 2 if defined($le->[2]) || defined($le->[3]);
 	} else {
 		$self-> {changed}-> {lineEnd} = 1;
 	}
@@ -275,6 +274,11 @@ sub matrix
 	$self->change_transform;
 }
 
+sub change_transform  { Carp::croak "abstract call" }
+sub apply_canvas_font { Carp::croak "abstract call" }
+sub begin_doc         { Carp::croak "abstract call" }
+sub end_doc           { Carp::croak "abstract call" }
+
 sub region
 {
 	return undef;
@@ -327,8 +331,8 @@ sub graphic_context_push
 	return 0 unless $self->SUPER::graphic_context_push;
 	my $stack = $self->{gc_stack} //= [];
 	push @$stack, {
-		(map { $_,  $self->$_()  } qw(rotate reversed grayscale)),
-		(map { $_, [$self->$_()] } qw(resolution scale clipRect))
+		(map { $_,  $self->$_()  } qw(reversed grayscale)),
+		(map { $_, [$self->$_()] } qw(resolution clipRect))
 	};
 	return 1;
 }
@@ -339,8 +343,8 @@ sub graphic_context_pop
 	return unless $self->SUPER::graphic_context_pop;
 	my $stack = $self->{gc_stack} //= [];
 	my $item = pop @$stack or return 0;
-	@{$self->{$_}} = @{$item->{$_}} for qw(resolution scale clipRect);
-	$self->{$_} = $item->{$_} for qw(rotate reversed grayscale);
+	@{$self->{$_}} = @{$item->{$_}} for qw(resolution clipRect);
+	$self->{$_} = $item->{$_} for qw(reversed grayscale);
 	$self->change_transform;
 	return 1;
 }
@@ -409,9 +413,11 @@ sub fonts
 		my @fonts;
 		my $fm = $self-> font_mapper;
 		my $num = $fm->count;
+		my %seen;
 		if ( $num > 0 ) {
 			for my $fid ( 1 .. $num ) {
 				my $f = $fm->get($fid) or next;
+				next if $seen{ $f->{name} . "\0" . $f->{family} }++;
 				$f->{encodings} = [$enc];
 				$f->{encoding} = $enc;
 				push @fonts, $f;
@@ -930,46 +936,46 @@ sub new
 	}, $class;
 }
 
+sub new_from_region
+{
+	my ( $class, $region, $canvas ) = @_;
+	unless (defined $region) {
+		return undef;
+	} elsif ( $region->is_empty) {
+		return $class->new('');
+	} else {
+		$class =~ s/Region$/Path/;
+		my $path  = $class->new;
+		my @boxes = @{ $region->get_boxes // [] };
+		my $dict  = $path->dict;
+		$path->emit( $dict->{newpath} );
+		@boxes = $canvas-> pixel2point(@boxes) if $canvas;
+		for ( my $i = 0; $i < @boxes; $i += 4 ) {
+			my ($x,$y,$w,$h) = @boxes[$i .. $i+3];
+			$path->emit(
+				$x, $y, $dict->{moveto},
+				$x + $w, $y, $dict->{lineto},
+				$x + $w, $y + $h, $dict->{lineto},
+				$x, $y + $h, $dict->{lineto},
+				$dict->{closepath}
+			);
+		}
+		return $path->region;
+	}
+}
+
 sub get_handle { "$_[0]" }
 sub get_boxes    { [] }
 sub point_inside { 0 }
 sub rect_inside  { 0 }
 sub box          { 0,0,0,0 }
+sub path         { $_[0]->{path} }
 
 sub offset
 {
 	my ( $self, $dx, $dy ) = @_;
 	$self->{offset}->[0] += $dx;
 	$self->{offset}->[1] += $dy;
-}
-
-sub apply_offset
-{
-	my $self = shift;
-	my $path = $self->{path};
-	my @offset = @{ $self->{offset} };
-	return $path if 0 == grep { $_ != 0 } @offset;
-
-	my $n = '';
-	my $ix = 0;
-	while ( 1 ) {
-		$path =~ m/\G(\d+(?:\.\d+)?)/gcs and do {
-			$n .= $1 + $offset[$ix];
-			$ix = $ix ? 0 : 1;
-			redo;
-		};
-		$path =~ m/\G(\s+)/gcs and do {
-			$n .= $1;
-			redo;
-		};
-		$path =~ m/\G(\D+)/gcs and do {
-			$n .= $1;
-			$ix = 0;
-			redo;
-		};
-		$path =~ m/\G$/gcs and last;
-	}
-	$path = $n;
 }
 
 1;

@@ -8,6 +8,31 @@ all changes without author attribution are by Adi Fairbank
 
 =over 3
 
+=item 0.32 - Jan 28, 2018
+
+Remove Encode::Detect dependency, since simply calling decode('utf8', $s) seems more reliable in general
+
+Ensure all ampersands are html-escaped in final html output: & -> &amp;
+
+Reorganize Display::Grid->display_cell() method to be clearer, and wrap cell content in new div and spans
+for better styleability
+
+Sort columns by name and strip html in Display::Grid->display_sort_popup(), and fix to run under CGI 4
+
+Fix Grid and Table tests to get rid of indeterminant test code which can intermittently fail
+
+New method prepend_bind_params(), useful for placeholders in SELECT clause, like MATCH (...) AGAINST (?)
+
+Get rid of a width="100%" in table.searchResultsNavBarTable, so this can be styled by the user with CSS
+
+Instead of die()ing from decode() errors in Base->decode_utf8(), simply return input string
+
+Add -css_dataset_container_id and -css_table_row_extra_attr options
+
+Make code run with CGI 4 without warnings about calling param() in list context
+
+Add workaround for double-encoded utf8 strings, in Base->decode_utf8
+
 =item 0.31 - Dec 8, 2014
 
 Add -i18n_translation_strings option for internationalization support (provide translations for

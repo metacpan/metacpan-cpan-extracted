@@ -3,7 +3,7 @@
 # if AUTHOR_TEST_JMATES_MIDI is set to a program the generated MIDI
 # files will be passed to that program as the first argument:
 #
-#   AUTHOR_TEST_JMATES_MIDI=timidity prove t/20-voice.t
+#   AUTHOR_TEST_JMATES_MIDI=midiplay prove t/20-voice.t
 #
 # the MIDI files can also be inspected with
 #
@@ -14,7 +14,7 @@ use Data::Dumper;
 use Scalar::Util 'refaddr';
 use Test2::V0;
 
-plan(75);
+plan(77);
 
 use Music::RhythmSet::Util qw(write_midi);
 use Music::RhythmSet::Voice;
@@ -236,24 +236,26 @@ audit_track(
 my $track = audit_track(
     sub {
         $voice->to_midi(
-            maxm   => 1,
-            chan   => 7,
-            dur    => 21,
-            note   => 67,
-            tempo  => 640_000,
-            velo   => 111,
-            notext => 1,
+            maxm         => 1,
+            chan         => 7,
+            dur          => 21,
+            note         => 67,
+            tempo        => 640_000,
+            velo         => 111,
+            notext       => 1,
+            patch_change => 33,
         );
     },
     {   '_dur'           => 42,
-        '_events'        => 6,
+        '_events'        => 7,
         'note_off'       => 2,
         'note_off_notes' => { 67 => 2 },
         'note_on'        => 2,
         'note_on_dur'    => 42,
         'note_on_notes'  => { 67 => 2 },
         'set_tempo'      => 1,
-        'track_name'     => 1
+        'track_name'     => 1,
+        'patch_change'   => 1,
     }
 );
 for my $e ( $track->events_r->@* ) {
@@ -263,6 +265,9 @@ for my $e ( $track->events_r->@* ) {
         is( $e->[2], 7 );
         is( $e->[4], 111 );
         last;
+    } elsif ( $e->[0] eq 'patch_change' ) {
+        is( $e->[2], 7 );
+        is( $e->[3], 33 );
     }
 }
 if ( defined $ENV{AUTHOR_TEST_JMATES_MIDI} ) {
@@ -298,7 +303,6 @@ is( refaddr $tref->[5], refaddr $tref->[9] );
 
 $tref = $voice->to_midi( embig => 1 )->events_r;
 isnt( refaddr $tref->[5], refaddr $tref->[9] );
-
 
 # a whole lot of nothing
 $track = audit_track(

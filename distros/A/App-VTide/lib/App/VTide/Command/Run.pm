@@ -22,7 +22,7 @@ use Data::Dumper    qw/Dumper/;
 
 extends 'App::VTide::Command';
 
-our $VERSION = version->new('0.1.19');
+our $VERSION = version->new('0.1.20');
 our $NAME    = 'run';
 our $OPTIONS = [ 'name|n=s', 'test|T!', 'save|s=s', 'verbose|v+', ];
 our $LOCAL   = 1;
@@ -33,7 +33,7 @@ has first => (
     default => 1,
 );
 
-has base => ( is => 'rw', );
+has base => ( is => 'rw', default => $CWD );
 
 sub run {
     my ($self) = @_;
@@ -44,6 +44,7 @@ sub run {
 
     my $params = $self->params($cmd);
     my @cmd    = $self->command($params);
+    $self->log( 'START', @cmd );
 
     @ARGV = ();
     if (
@@ -94,7 +95,12 @@ sub run {
         $self->hooks->run( 'run_running', \@cmd );
 
         # start the terminal
-        $self->runit(@cmd);
+        eval {
+            $self->runit(@cmd);
+            1;
+        } or do {
+            $self->log( "RUN ERROR", @cmd, $@ );
+        }
     }
 
     # flag this is no longer the first run
@@ -307,7 +313,7 @@ sub command_param {
 }
 
 sub command {
-    my ( $self, $params ) = @_;
+    my ( $self, $params, $recurse ) = @_;
 
     if ( !$params->{edit} ) {
         return
@@ -341,7 +347,7 @@ sub command {
             $helper = eval $helper_text;    ## no critic
             die "No helper generated!" if !$helper;
         }
-        else {
+        elsif ( $self->defaults->{verbose} ) {
             warn "No helper text";
         }
         1;
@@ -351,13 +357,13 @@ sub command {
     };
 
     my $groups = $self->config->get->{editor}{files};
-    my @files  = $self->_globs2files( $groups, $helper, @globs );
+    my @files  = $self->_globs2files( $groups, $helper, $recurse, @globs );
 
     return ( @$editor, @files );
 }
 
 sub _globs2files {
-    my ( $self, $groups, $helper, @globs ) = @_;
+    my ( $self, $groups, $helper, $recurse, @globs ) = @_;
     my @files;
     my $count = 0;
 
@@ -368,7 +374,7 @@ sub _globs2files {
 
         if ($not_glob) {
             my %not_files = map { $_ => 1 }
-              $self->_globs2files( $groups, $helper, $not_glob );
+              $self->_globs2files( $groups, $helper, $recurse, $not_glob );
             @files = grep { !$not_files{$_} } @files;
             next GLOB;
         }
@@ -388,6 +394,14 @@ sub _globs2files {
                 unshift @globs, grep { !-f $_ } @g;
                 next GLOB;
             }
+        }
+        elsif ( $recurse && -d $glob ) {
+            push @files, map {
+                -d $_
+                  ? $self->_globs2files( $groups, $helper, $recurse, $_ )
+                  : $_
+            } $self->_globs2files( $groups, $helper, $recurse, "$glob/*" );
+            next GLOB;
         }
 
         push @files, $self->_dglob($glob);
@@ -437,18 +451,18 @@ sub runit {
         }
     }
 
-    my $fh = path( $self->base, '.vtide', 'run.log' )->opena;
-    print {$fh} '['
-      . localtime
-      . "] RUN $ENV{VTIDE_TERM} "
-      . ( join ' ', @cmd ) . "\n";
+    $self->log( 'SYSTEM', @cmd );
     my $err = system @cmd;
     if ($err) {
-        print {$fh} '['
-          . localtime
-          . "] RUN ERRORED $ENV{VTIDE_TERM} "
-          . ( join ' ', @cmd ) . "\n";
+        $self->log( "ERRORED", @cmd );
     }
+}
+
+sub log {
+    my ( $self, @msg ) = @_;
+    my $fh = path( $self->base, '.vtide', 'run.log' )->opena;
+    print {$fh} '[' . localtime . "] RUN $ENV{VTIDE_TERM} " . join ' ',
+      @msg . "\n";
 }
 
 sub auto_complete {
@@ -472,7 +486,7 @@ App::VTide::Command::Run - Run a terminal command
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Run version 0.1.19
+This documentation refers to App::VTide::Command::Run version 0.1.20
 
 =head1 SYNOPSIS
 

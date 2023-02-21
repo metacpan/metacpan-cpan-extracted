@@ -32,6 +32,9 @@ BEGIN { $^H{"t::pieces/permit"} = 1; }
    cmp_ok( $ret, '>', 0, 'result of piecelexvarmy' );
 
    $scalar = 123;
+
+   my $ret2 = piecelexvar $scalar;
+   is( $ret2, $ret, 'result of piecelexvar matches previous' );
 }
 
 done_testing;

@@ -9,7 +9,7 @@ use BoardStreams::Error::JSONRPC;
 use Exporter 'import';
 our @EXPORT_OK = qw/ db_error db_duplicate_error jsonrpc_error /;
 
-our $VERSION = "v0.0.32";
+our $VERSION = "v0.0.34";
 
 sub db_error {
     my ($code, $data) = @_;

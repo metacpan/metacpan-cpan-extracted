@@ -18,6 +18,8 @@ t/06_color.t
 t/07_expand.t
 t/08_backspace.t
 t/09_padcolor.t
+t/10_lvalue.t
+t/11_prefix.t
 tool/fix-w3c.pl
 META.yml
 MANIFEST

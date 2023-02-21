@@ -3,9 +3,9 @@ NAME
     read table data
 
 VERSION
-    This document describes version 0.590 of Perinci::Sub::Gen::AccessTable
+    This document describes version 0.591 of Perinci::Sub::Gen::AccessTable
     (from Perl distribution Perinci-Sub-Gen-AccessTable), released on
-    2022-11-02.
+    2023-02-12.
 
 SYNOPSIS
     In list_countries.pl:
@@ -441,12 +441,12 @@ FUNCTIONS
 
         Generated function's summary.
 
-    *   table_data* => *array|code*
+    *   table_data* => *array|code|obj*
 
         Data.
 
-        Table data is either an AoH or AoA. Or you can also pass a Perl
-        subroutine (see below).
+        Table data is either an AoH/AoA, or a TableData object, or a
+        coderef.
 
         Passing a subroutine lets you fetch data dynamically and from
         arbitrary source (e.g. DBI table or other external sources). The
@@ -470,11 +470,15 @@ FUNCTIONS
         (fields mentioned in sort arguments), 'filter_fields' (fields
         mentioned in filter arguments).
 
-    *   table_spec* => *hash*
+    *   table_spec => *hash*
 
         Table specification.
 
-        See "TableDef" for more details.
+        Required, unless "table_data" argument is a TableData object, in
+        which case table spec will be retrieved from the object if not
+        supplied.
+
+        See TableDef for more details.
 
         A hashref with these required keys: 'fields', 'pk'. 'fields' is a
         hashref of field specification with field name as keys, while 'pk'
@@ -570,8 +574,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015,
-    2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2022, 2020, 2019, 2018, 2017, 2016,
+    2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

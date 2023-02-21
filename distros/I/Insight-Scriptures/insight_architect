@@ -1,0 +1,17 @@
+#!usr/bin/perl
+use Insight::Scriptures;
+my $insight = Insight::Scriptures->new();
+$insight->architect();
+__END__
+
+=head1 NAME
+ 
+insight_architect - CLA for Insight::Scripture to assist in creating a scripture
+ 
+=head1 USAGE
+ 
+        lnation:High lnation$ insight_architect
+	
+	insight: help
+ 
+=cut

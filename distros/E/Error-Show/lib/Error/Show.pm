@@ -23,8 +23,8 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} });
 our @EXPORT = qw();
 
 
-our $VERSION = 'v0.1.1';
-use constant DEBUG=>0;
+our $VERSION = 'v0.2.0';
+use constant DEBUG=>undef;
 use enum ("PACKAGE=0",qw<FILENAME LINE SUBROUTINE 
   HASARGS WANTARRAY EVALTEXT IS_REQUIRE HINTS BITMASK 
   HINT_HASH MESSAGE SEQUENCE CODE_LINES>);
@@ -171,37 +171,6 @@ sub import {
 }
 
 
-our %exception_adaptors;
-$exception_adaptors{"Exception::Base"}=sub {
-
-};
-
-$exception_adaptors{"Exception::Class::Base"}=sub {
-  #take an error
-  my $e=shift;
-};
-
-
-sub process_ref_errror{
-  #
-  # This can only be a (single) runtime error
-  #
-  my $error=pop;
-  my %opts=@_;
-  my $ref=ref $error;
-
-
-  my %entry;
-
-  # 
-  # TODO: 
-  # Lookup handler code to process this type of error
-  # 
-
-  \%entry;
-
-}
-
 sub process_string_error{
   my $error=pop;
   my %opts=@_;
@@ -219,15 +188,19 @@ sub process_string_error{
   
     my $i=0;
 		for(split "\n", $error){
-      if(/at (.*?) line (\d+)/){
+      DEBUG and say STDERR "ERROR LINE: ".$_;
+      if(/at (.*?) line (\d+)/
+        or /Missing right curly or square bracket at (.*?) (\d+) at end of line/){
         #
         # Group by file names
         #
+        DEBUG and say STDERR "PROCESSING: ".$_;
+        DEBUG and say STDERR "file: $1 and line $2";
         my $entry=$entry{$1}//=[];
         #push @$entry, {file=>$1, line=>$2,message=>$_, sequence=>$i++};
         my $a=[];
         $a->[FILENAME]=$1;
-        $a->[LINE]=$2;
+        $a->[LINE]=$2-1;
         $a->[MESSAGE]=$_;
         $a->[MESSAGE]=$opts{message} if $opts{message};
         $a->[SEQUENCE]=$i++;
@@ -250,6 +223,8 @@ sub process_string_error{
 
 }
 
+# Takes a hash ref error sources
+
 sub text_output {
   my $info_ref=pop;
   my %opts=@_;
@@ -258,12 +233,22 @@ sub text_output {
   # Sort by sequence number 
   # Errors are stored by filename internally. Sort by sequence number.
   #
+
+  
   my @sorted_info= 
     sort { $a->[SEQUENCE] <=> $b->[SEQUENCE] } 
     map { $_->@* } values %$info_ref;
 
+  # Reverse the order if we want the first error listed last
+  #
+  @sorted_info=reverse (@sorted_info)if $opts{reverse};
+
   # Process each of the errors in sequence
+  my $counter=0;
+  my $limit=$opts{limit}//100;
   for my $info (@sorted_info){
+    last if $counter>=$limit and $limit >0;
+    $counter++;
     unless(exists $info->[CODE_LINES]){
       my @code;
       
@@ -280,14 +265,63 @@ sub text_output {
       $info->[CODE_LINES]=\@code;
     }
 
+    # At this point we have lines of code in an array
+    #
+    
+    #Find start mark and end mark
+    #
+    my $start_line=0;
+    if($opts{start_mark}){
+      my $counter=0;
+      my $start_mark=$opts{start_mark};
+        for($info->[CODE_LINES]->@*){
+          if(/$start_mark/){
+            $start_line+=$counter+1;
+            last;
+          }
+          $counter++;
+        }
+        # Don't include the start marker in the results
+    }
+
+    my $end_line=$info->[CODE_LINES]->@*-1;
+
+    if($opts{end_mark}){
+        my $counter=0;
+        my $end_mark=$opts{end_mark};
+        for (reverse($info->[CODE_LINES]->@*)){
+          if(/$end_mark/){
+            $end_line-=$counter;
+            last;
+          }
+          $counter++;
+        }
+    }
+
+    $start_line+=$opts{start_offset} if $opts{start_offset};
+    $end_line-=$opts{end_offset } if $opts{end_offset};
+
+    # preclamp the error line to within this range so that 'Unmatched ' errors
+    # at least show ssomething.
+    #
+    $info->[LINE]=$end_line if $info->[LINE]>$end_line;
+
+    DEBUG and say "START LINE after offset: $start_line";
+    DEBUG and say "END LINE after offset: $end_line";
+    # At this point the file min and max lines we should consider are
+    # start_line and end line  inclusive. The $start_line is also used as an
+    # offset to shift error sources
+    #
+
     my $min=$info->[LINE]-$opts{pre_lines};
     my $max=$info->[LINE]+$opts{post_lines};
 
-    my $target= $info->[LINE];
+    my $target= $info->[LINE];#-$start_line;
+    DEBUG and say "TARGET: $target";
 
-    $min=$min<0 ? 0: $min;
-    my $count=$info->[CODE_LINES]->@*;
-    $max=$max>=$count?$count:$max;
+    $min=$min<$start_line ? $start_line: $min;
+
+    $max=$max>$end_line?$end_line:$max;
 
     #
     # format counter on the largest number to be expected
@@ -301,19 +335,29 @@ sub text_output {
     my $mark="";
 
     #Change min and max to one based index
-    $min++;
+    #$min++;
     #$max--;
-
+    DEBUG and say "min before print $min";
+    DEBUG and say "max before print $max";
     for my $l($min..$max){
       $mark="";
 
-      #Perl line number is 1 based
-      $mark="=>" if $l==$info->[LINE];
+      my $a=$l-$start_line+1;
 
-      #However our code lines are stored in a 0 based array
-      $out.=sprintf $format, $l, $mark, $info->[CODE_LINES][$l-1];
+      #Perl line number is 1 based
+      $mark="=>" if $l==$target;
+
+
+      # Print lines as per the index in file array
+      $out.=sprintf $format, $a, $mark, $info->[CODE_LINES][$l];
     }
+
     $total.=$out;
+    
+    # Modifiy the message now with updated line numbers
+    # TODO: Tidy this up
+    $info->[MESSAGE]=~s/line (\d+)(?:\.|,)/(($1-1)>$max?$max:$1-1)-$start_line+1/e;
+
     $total.=$info->[MESSAGE]."\n" unless $opts{clean};
 
   }
@@ -335,16 +379,17 @@ sub _context{
   # argument $@ is used
   #
 	my %opts=@_;
+
   my $error= $opts{error};
 
 
 
 
-	$opts{start_mark}//=qr|.*|;	#regex which matches the start of the code 
-	$opts{pre_lines}//=5;		#Number of lines to show before target line
+  #$opts{start_mark};#//=qr|.*|;	#regex which matches the start of the code 
+	$opts{pre_lines}//=5;		  #Number of lines to show before target line
 	$opts{post_lines}//=5;		#Number of lines to show after target line
-	$opts{offset_start}//=0;	#Offset past start to consider as min line
-	$opts{offset_end}//=0;		#Offset before end to consider as max line
+	$opts{start_offset}//=0;	#Offset past start mark to consider as min line
+	$opts{end_offset}//=0;		#Offset before end to consider as max line
 	$opts{translation}//=0;		#A static value added to the line numbering
 	$opts{indent}//="";
 	$opts{file}//="";
@@ -375,7 +420,7 @@ sub _context{
 
 
 #
-# This only works with errors objects which captured a trace as a Devel::StackTrace object
+# Front end to the main processing sub. Configures and checks the inputs
 #
 my $msg= "Trace must be a ref to array of  {file=>.., line=>..} pairs";
 sub context{
@@ -426,7 +471,8 @@ sub context{
   
 
 
-  #Check for trace kv pair. If this is present. We ignore the error
+  # Check for trace kv pair. If this is present. We ignore the error
+  #
   if(ref($opts{error}) eq "ARRAY" and ref $opts{error}[0]){
     # Iterate through the list
     my $_indent=$opts{indent}//="    ";
@@ -455,6 +501,7 @@ sub context{
         $e->[MESSAGE]//="";
 
         #Force a message if one is provided
+        $e->[LINE]--; #Make the error 0 based
         $e->[MESSAGE]=$opts{message} if $opts{message};
         $_opts{indent}=$current_indent;
 
@@ -513,9 +560,10 @@ sub splain {
   $out;
 }
 
-sub wrap_eval{
-  my $program=shift;
-  "sub { $program }";
-}
+#sub wrap_eval{
+#  my $program=shift;
+#  "sub { $program }";
+#}
+
 1;
 __END__

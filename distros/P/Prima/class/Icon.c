@@ -14,6 +14,8 @@ extern "C" {
 #define my  ((( PIcon) self)-> self)
 #define var (( PIcon) self)
 
+#define VAR_MATRIX var->current_state.matrix
+
 static void
 produce_mask( Handle self)
 {
@@ -402,7 +404,7 @@ Icon_maskPixel( Handle self, Bool set, int x, int y, SV * pixel)
 		if ( opt_InPaint)
 			return inherited pixel(self,false,x,y,pixel);
 
-		pt = prima_matrix_apply_to_int( var->current_state.matrix, x, y );
+		pt = prima_matrix_apply_to_int( VAR_MATRIX, x, y );
 		x = pt.x;
 		y = pt.y;
 
@@ -427,7 +429,7 @@ Icon_maskPixel( Handle self, Bool set, int x, int y, SV * pixel)
 		if ( is_opt( optInDraw))
 			return inherited pixel(self,true,x,y,pixel);
 
-		pt = prima_matrix_apply_to_int( var->current_state.matrix, x, y );
+		pt = prima_matrix_apply_to_int( VAR_MATRIX, x, y );
 		x = pt.x;
 		y = pt.y;
 
@@ -550,6 +552,53 @@ Icon_stretch( Handle self, int width, int height)
 	var->maskSize = lineSize * abs( height);
 	inherited stretch( self, width, height);
 	var-> autoMasking = am;
+}
+
+Handle
+Icon_create_from_image( Handle self, int maskType, SV * mask_fill)
+{
+	Handle obj;
+	PIcon dst;
+	PImage src = (PImage) self;
+
+	obj = ( Handle) create_object("Prima::Icon", "");
+	CIcon( obj)-> create_empty_icon( obj, var->w, var->h, var->type, maskType);
+	dst = (PIcon) obj;
+
+	dst->owner      = src->owner;
+	dst->conversion = src->conversion ;
+	dst->scaling    = src->scaling;
+	dst->palSize    = src-> palSize;
+	dst->options.optPreserveType = src->options.optPreserveType;
+	dst->autoMasking = amNone;
+	memcpy( dst-> palette, src->palette, 768);
+	memcpy( dst-> data   , src->data   , src->dataSize);
+	memcpy( dst-> stats, src->stats, sizeof( src->stats));
+
+	if ( mask_fill && SvOK(mask_fill) && SvPOK(mask_fill)) {
+		STRLEN len;
+		int sz;
+		Byte *bits;
+
+		bits = (Byte*) SvPV(mask_fill, len);
+		sz  = (len > dst->maskSize) ? dst->maskSize : len;
+		if ( sz == 0 ) {
+			/* well... */
+		} else if ( sz == 1 ) {
+			memset( dst-> mask, *bits, dst->maskSize );
+		} else {
+			Byte *fill = dst->mask;
+			int left   = dst->maskSize;
+			while (left > 0) {
+				memcpy( fill, bits, (left > sz) ? left : sz);
+				left -= sz;
+				fill += sz;
+			}
+		}
+	} else if ( maskType == imbpp8)
+		memset( dst-> mask, 0xff, dst-> maskSize );
+
+	return obj;
 }
 
 void
@@ -777,7 +826,7 @@ Icon_bitmap( Handle self)
 void
 Icon_premultiply_alpha( Handle self, SV * alpha)
 {
-	if ( !alpha || ( SvTYPE( alpha ) == SVt_NULL)) {
+	if ( !alpha || !SvOK( alpha )) {
 		int type = var-> maskType;
 		Image dummy;
 		/* multiply with self */
@@ -813,7 +862,7 @@ Icon_bar_alpha( Handle self, int alpha, int x1, int y1, int x2, int y2)
 		NRect nrect = {x1,y1,x2,y2};
 		NPoint npoly[4];
 
-		if ( prima_matrix_is_square_rectangular( var->current_state.matrix, &nrect, npoly)) {
+		if ( prima_matrix_is_square_rectangular( VAR_MATRIX, &nrect, npoly)) {
 			x1 = floor(nrect.left   + .5);
 			y1 = floor(nrect.bottom + .5);
 			x2 = floor(nrect.right  + .5);
@@ -824,7 +873,7 @@ Icon_bar_alpha( Handle self, int alpha, int x1, int y1, int x2, int y2)
 			int i;
 			Point poly[4];
 
-			prima_matrix_apply2_to_int( var->current_state.matrix, npoly, poly, 4 );
+			prima_matrix_apply2_to_int( VAR_MATRIX, npoly, poly, 4 );
 			x1 = x2 = poly[0].x;
 			y1 = y2 = poly[0].y;
 			for ( i = 1; i < 4; i++) {
@@ -844,6 +893,7 @@ Icon_bar_alpha( Handle self, int alpha, int x1, int y1, int x2, int y2)
 			}
 			rgn = Region_update_change(rgn1, true);
 			Object_destroy(rgn1);
+			free_rgn = true;
 		}
 	}
 
@@ -900,13 +950,12 @@ Icon_rotate( Handle self, double degrees, SV * svfill)
 }
 
 Bool
-Icon_transform( Handle self, HV * profile )
+Icon_matrix_transform( Handle self, Matrix matrix, ColorPixel fill)
 {
-	dPROFILE;
 	Bool ok;
 	Image dummy;
 	int autoMasking = var->autoMasking, maskType = var->maskType;
-	SV * matrix = NULL;
+	ColorPixel icon_fill;
 	var->autoMasking = amNone;
 
 	var->updateLock++;
@@ -917,28 +966,22 @@ Icon_transform( Handle self, HV * profile )
 	dummy.scaling = var->scaling;
 	dummy.mate    = var->mate;
 
-	pdelete( fill );
+	bzero(&icon_fill, sizeof(icon_fill));
 
-	if ( pexist(matrix)) {
-		matrix = pget_sv(matrix);
-		++SvREFCNT(matrix);
-	}
-
-	ok = inherited transform(self, profile);
+	ok = inherited matrix_transform(self, matrix, icon_fill);
 	if ( ok ) {
-		pset_sv( matrix, matrix );
-		ok = Image_transform((Handle) &dummy, profile );
-		hv_clear(profile);
+		Image i;
+		ok = img_2d_transform((Handle) &dummy, matrix, icon_fill, &i );
 		if ( ok ) {
-			var-> mask     = dummy.data;
-			var-> maskLine = dummy. lineSize;
-			var-> maskSize = dummy. dataSize;
-			if ( var->w != dummy.w || var->h != dummy.h)
+			free( var-> mask );
+			var-> mask     = i.data;
+			var-> maskLine = i.lineSize;
+			var-> maskSize = i.dataSize;
+			if ( var->w != i.w || var->h != i.h)
 				croak("panic: icon object inconsistent after 2d transform");
 		}
+		return false;
 	}
-	if ( matrix )
-		--SvREFCNT(matrix);
 
 	if (maskType != imbpp8 && is_opt( optPreserveType))
 		my-> set_maskType( self, maskType);

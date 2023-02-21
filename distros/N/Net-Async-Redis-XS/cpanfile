@@ -1,4 +1,4 @@
-requires 'perl', '>= 5.032';
+requires 'perl', '>= 5.026';
 requires 'Future::AsyncAwait', '>= 0.61';
 requires 'Net::Async::Redis', '>= 3.002';
 requires 'IO::Async::Loop';

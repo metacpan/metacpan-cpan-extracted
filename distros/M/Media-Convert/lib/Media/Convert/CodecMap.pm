@@ -16,13 +16,13 @@ my %writemap = (
 	'opus' => 'libopus',
 );
 
-open CHECK_FDK, "ffmpeg -hide_banner -h encoder=libfdk_aac|";
-if(<CHECK_FDK> !~ /is not recognized/) {
+open my $check_fdk, "-|", "ffmpeg -hide_banner -h encoder=libfdk_aac";
+if(<$check_fdk> !~ /is not recognized/) {
 	$writemap{aac} = 'libfdk_aac';
 }
-close CHECK_FDK;
+close $check_fdk;
 
-sub detect_to_write($) {
+sub detect_to_write {
 	my $detected = shift;
 	if(exists($writemap{$detected})) {
 		return $writemap{$detected};

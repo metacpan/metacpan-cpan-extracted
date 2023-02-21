@@ -41,7 +41,7 @@ Tables looks like this:
 ```
 
 A semicolon and some text begin a new table. A number, a comma, and
-some text are an entry in he table. The text needs to be on one line.
+some text are an entry in the table. The text needs to be on one line.
 The numbers are relative probabilities. The chances for an encounter
 in the forest are thus 50% and the chances to encounter an elf, if you
 are encountering anything at all, are 25%. The example also shows how

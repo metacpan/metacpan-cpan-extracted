@@ -6,6 +6,16 @@ Home page:    <https://metacpan.org/release/Story-Interact>
 Bug tracker:  <https://github.com/tobyink/p5-story-interact/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.001009	2023-02-17
+
+ [ Bug Fixes ]
+ - Import `uniqstr` into Story::Interact::PageSource::Waterfall.
+
+0.001008	2023-02-17
+
+ - Added: Story::Interact::PageSource::Waterfall.
+ - Added: Story::Interact::State->character_class.
+
 0.001007	2023-02-01
 
  - Added: Story::Interact::Harness::Test.

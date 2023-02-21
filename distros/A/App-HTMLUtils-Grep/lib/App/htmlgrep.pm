@@ -3,9 +3,9 @@
 package App::htmlgrep;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-08'; # DATE
+our $DATE = '2023-02-10'; # DATE
 our $DIST = 'App-HTMLUtils-Grep'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -144,7 +144,7 @@ App::htmlgrep - Print lines matching text in HTML files
 
 =head1 VERSION
 
-This document describes version 0.001 of App::htmlgrep (from Perl distribution App-HTMLUtils-Grep), released on 2023-02-08.
+This document describes version 0.002 of App::htmlgrep (from Perl distribution App-HTMLUtils-Grep), released on 2023-02-10.
 
 =head1 FUNCTIONS
 

@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2008-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2008-2023 -- leonerd@leonerd.org.uk
 
-package String::Tagged 0.19;
+package String::Tagged 0.20;
 
 use v5.14;
 use warnings;
@@ -1613,6 +1613,44 @@ sub matches
    my @ret;
    while( $plain =~ m/$re/g ) {
       push @ret, $self->substr( $-[0], $+[0] - $-[0] );
+   }
+
+   return @ret;
+}
+
+=head2 match_extents
+
+   @extents = $st->match_extents( $regexp )
+
+I<Since version 0.20.>
+
+Returns a list of extent objects for every non-overlapping match of the given
+C<$regexp>. This is similar to L</matches>, except that the results are
+returned as extent objects instead of substrings, allowing access to the
+position information as well.
+
+If using the result of this method to find regions of a string to modify,
+remember that any length alterations will not update positions in later extent
+objects. However, since the extents are non-overlapping and in position order,
+this can be handled by iterating them in reverse order so that the
+modifications done first are later in the string.
+
+   foreach my $e ( reverse $st->match_extents( $pattern ) ) {
+      $st->set_substr( $e->start, $e->length, $replacement );
+   }
+
+=cut
+
+sub match_extents
+{
+   my $self = shift;
+   my ( $re ) = @_;
+
+   my $plain = $self->str;
+
+   my @ret;
+   while( $plain =~ m/$re/g ) {
+      push @ret, $self->_mkextent( $-[0], $+[0], 0 );
    }
 
    return @ret;

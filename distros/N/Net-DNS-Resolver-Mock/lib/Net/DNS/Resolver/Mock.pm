@@ -3,7 +3,7 @@ package Net::DNS::Resolver::Mock;
 use strict;
 use warnings;
 
-our $VERSION = '1.20220817'; # VERSION
+our $VERSION = '1.20230216'; # VERSION
 
 use base 'Net::DNS::Resolver';
 
@@ -49,15 +49,34 @@ sub die_on {
     return;
 }
 
+sub build_cache {
+    my ( $self ) = @_;
+    my $cache = {};
+    my $FakeZone = $self->{ 'zonefile' };
+    foreach my $Item ( @$FakeZone ) {
+        my $itemname = lc $Item->name();
+        my $itemtype = lc $Item->type();
+        my $key = join( ':', $itemname, $itemtype );
+        if ( ! exists $cache->{$key} ) {
+            $cache->{$key} = [];
+        }
+        push @{ $cache->{$key} }, $Item;
+    }
+    $self->{ 'zonefile_cache' } = $cache;
+    return;
+}
+
 sub zonefile_read {
     my ( $self, $zonefile ) = @_;
     $self->{ 'zonefile' } = Net::DNS::ZoneFile->read( $zonefile );
+    $self->build_cache();
     return;
 }
 
 sub zonefile_parse {
     my ( $self, $zonefile ) = @_;
     $self->{ 'zonefile' } = Net::DNS::ZoneFile->parse( $zonefile );
+    $self->build_cache();
     return;
 }
 
@@ -72,8 +91,6 @@ sub send {
 
     $name =~ s/\.$// unless $name eq '.';
 
-    my $FakeZone = $self->{ 'zonefile' };
-
     my $origname = $name;
     if ( lc $type eq 'ptr' ) {
         if ( index( lc $name, '.in-addr.arpa' )  == -1 ) {
@@ -85,16 +102,14 @@ sub send {
     }
     my $Packet = Net::DNS::Packet->new();
     $Packet->push( 'question' => Net::DNS::Question->new( $origname, $type, 'IN' ) );
-    foreach my $Item ( @$FakeZone ) {
-        my $itemname = $Item->name();
-        my $itemtype = $Item->type();
-        if ( ( lc $itemname eq lc $name ) && ( lc $itemtype eq lc $type ) ) {
-        $Packet->push( 'answer' => $Item );
-        }
-        elsif ( ( lc $itemname eq lc $name ) && ( lc $itemtype eq lc 'cname' ) ) {
-            $Packet->push( 'answer' => $Item );
-        }
+    my $key = join( ':', lc $name, lc $type );
+    my $cname_key = join( ':', lc $name, 'cname' );
+    if ( exists( $self->{ 'zonefile_cache' }->{ $cname_key } ) ) {
+        $Packet->push( 'answer' => @{ $self->{ 'zonefile_cache' }->{ $cname_key } } );
+    } elsif ( exists( $self->{ 'zonefile_cache' }->{ $key } ) ) {
+        $Packet->push( 'answer' => @{ $self->{ 'zonefile_cache' }->{ $key } } );
     }
+
     $Packet->{ 'answerfrom' } = '127.0.0.1';
     $Packet->{ 'status' } = 33152;
     return $Packet;

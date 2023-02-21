@@ -1,6 +1,6 @@
 package HTTP::Tiny::NoProxy;
 our $AUTHORITY = 'cpan:SUKRIA';
-$HTTP::Tiny::NoProxy::VERSION = '1.3520';
+$HTTP::Tiny::NoProxy::VERSION = '1.3521';
 use base 'HTTP::Tiny';
 
 # Simple subclass of HTTP::Tiny, adding the no_proxy argument, because we're
@@ -34,7 +34,7 @@ HTTP::Tiny::NoProxy
 
 =head1 VERSION
 
-version 1.3520
+version 1.3521
 
 =head1 AUTHOR
 

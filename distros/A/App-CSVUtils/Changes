@@ -1,3 +1,80 @@
+1.017   2023-02-18  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Forgot to generate CLIs: csv2paras, paras2csv.
+
+
+1.016   2023-02-18  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with fixed DZP:InsertExecsList to fix generated POD.
+
+
+1.015   2023-02-18  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utilities: csv2paras, paras2csv.
+
+        - [cli csv-freqtable] Add options --ignore-case (-i) and --key
+          (-k).
+
+
+1.014   2023-02-16  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Fix terminology column -> field in description & error message.
+
+        - [doc][bugfix] Fix typo in example of csv-intrange.
+
+        - [doc] Add some description to gen_csv_util().
+
+
+1.013   2023-02-15  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utility: csv-check-rows.
+
+        - [cli csv-check-field-names] Check that number of fields >= 1.
+
+
+1.012   2023-02-15  Released-By: PERLANCAR; Urgency: medium
+
+        - [incompatible change] Rename utilities for clarity: csv-check-cell ->
+          csv-check-cell-values, csv-check-fields -> csv-check-field-values;
+          Remove csv-check-values.
+
+        - Add utility: csv-check-field-names.
+
+        - Handle sparse fields that caused perl warning 'splice() offset
+          past end of array' (RT#146473).
+
+        - [bugfix] Fix completion for filenames (file_ext_filter is applied
+          to extension and not filename).
+
+        - [bugfix] In inplace mode, do not rename unwritten output files
+          (RT#146453, https://rt.cpan.org/Transaction/Display.html?id=2442471).
+
+        - Update error message (field option -F is now -f).
+
+
+1.011   2023-02-14  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] -b was not added.
+
+
+1.010   2023-02-14  Released-By: PERLANCAR; Urgency: medium
+
+        - Add inplace mode (--inplace, --inplace-backup-ext). Forbid input and
+          output as the same unless user specifies inplace mode. Ref: RT#146453.
+
+
+1.009   2023-02-10  Released-By: PERLANCAR; Urgency: medium
+
+        - Add options: --output-always-quote, --output-quote-empty.
+
+        - [doc] Add an example of using --output-always-quote in
+          Manual/Cookbook.pod
+
+
 1.008   2023-02-03  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

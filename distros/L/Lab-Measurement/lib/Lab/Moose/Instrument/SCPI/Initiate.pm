@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::SCPI::Initiate;
 #ABSTRACT: Role for the SCPI INITiate subsystem used by Rohde&Schwarz
-$Lab::Moose::Instrument::SCPI::Initiate::VERSION = '3.842';
+$Lab::Moose::Instrument::SCPI::Initiate::VERSION = '3.851';
 use v5.20;
 
 use Moose::Role;
@@ -50,7 +50,7 @@ Lab::Moose::Instrument::SCPI::Initiate - Role for the SCPI INITiate subsystem us
 
 =head1 VERSION
 
-version 3.842
+version 3.851
 
 =head1 METHODS
 

@@ -1,6 +1,13 @@
 Changelog for HealthCheck-Diagnostic-RabbitMQ
 
-v1.2.0 2022-05-16T18:46:21
+v1.3.0 2023-02-13T21:59:41
+ - Update README and LICENSE (Andrew Hewus Fresh)
+ - Update Makefile (Andrew Hewus Fresh)
+ - Pull request #6: SM-4039 Return server_properties even with queue (Paul
+   Durden)
+ - SM-4039 Return server_properties even with queue (Paul Durden)
+
+v1.2.0 2022-05-16T18:45:59
  - Update copyright (Andrew Hewus Fresh)
  - Pull request #5: SM-2947 (Mitch McCracken)
  - Switch to sprintf() and avoid 80-char width issue (Mitch McCracken)

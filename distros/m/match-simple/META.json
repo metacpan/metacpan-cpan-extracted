@@ -52,11 +52,15 @@
    "provides" : {
       "match::simple" : {
          "file" : "lib/match/simple.pm",
-         "version" : "0.011"
+         "version" : "0.012"
+      },
+      "match::simple::sugar" : {
+         "file" : "lib/match/simple/sugar.pm",
+         "version" : "0.012"
       },
       "match::smart" : {
          "file" : "lib/match/smart.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       }
    },
    "release_status" : "stable",
@@ -75,6 +79,6 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/match-simple/project"
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_serialization_backend" : "JSON::PP version 4.09"
 }

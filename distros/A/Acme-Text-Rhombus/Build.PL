@@ -11,10 +11,9 @@ my $build = Module::Build->new
    dist_author => 'Steven Schubiger <schubiger@cpan.org>',
    dist_version_from => 'lib/Acme/Text/Rhombus.pm',
    requires => { 'Exporter' => 0 },
-   build_requires => { 'Test::More' => 0 },
+   test_requires => { 'Test::More' => 0 },
    license => 'perl',
    create_readme => 1,
-   create_makefile_pl => 'traditional',
    meta_merge => {
        resources => {
            repository => 'https://github.com/stsc/Acme-Text-Rhombus',

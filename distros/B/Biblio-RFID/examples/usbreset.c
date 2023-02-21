@@ -2,6 +2,15 @@
 
 /*
 
+To install as suid binary use following commands:
+
+make usbreset
+cp usbreset /usr/local/bin/
+sudo chown root /usr/local/bin/usbreset 
+sudo chmod 2755 /usr/local/bin/usbreset 
+
+Taken from
+
 http://marc.info/?l=linux-usb-users&m=116827193506484&w=2
 
 and needs mounted usbfs filesystem
@@ -19,9 +28,6 @@ thing but with a "0" instead of the "2" above.
 
 Note that this mechanism is slated to be removed from the kernel within 
 the next year.  Hopefully some other mechanism will take its place.
-
-> To reset a
-> device?
 
 Here's a program to do it.  You invoke it as either
 

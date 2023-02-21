@@ -3,7 +3,7 @@ package App::ModuleBuildTiny::Dist;
 use 5.014;
 use strict;
 use warnings;
-our $VERSION = '0.033';
+our $VERSION = '0.035';
 
 use CPAN::Meta;
 use Config;
@@ -159,7 +159,7 @@ sub scan_prereqs {
 	File::Find::find(sub { push @runtime_files, $File::Find::name if -f }, 'script');
 	File::Find::find(sub { push @test_files, $File::Find::name if -f && /\.(t|pm)$/ }, 't');
 
-	my @omit = (@{ $opts{omit} || [] }, keys %{ $self->{meta}->provides });
+	my @omit = (@{ $opts{omit} // [] }, keys %{ $self->{meta}->provides });
 	my $runtime = scan_files(\@runtime_files, \@omit);
 	my $test = scan_files(\@test_files, \@omit);
 
@@ -200,18 +200,20 @@ sub load_prereqs {
 
 sub new {
 	my ($class, %opts) = @_;
-	my $mergefile = $opts{mergefile} || (grep { -f } qw/metamerge.json metamerge.yml/)[0];
-	my $mergedata = load_mergedata($mergefile) || {};
+	my $mergefile = $opts{mergefile} // (grep { -f } qw/metamerge.json metamerge.yml/)[0];
+	my $mergedata = load_mergedata($mergefile) // {};
 	my $distname = distname($mergedata);
 	my $filename = distfilename($distname);
+	my $podname = $filename =~ s/\.pm$/.pod/r;
 
 	my $data = Module::Metadata->new_from_file($filename, collect_pod => 1, decode_pod => 1) or die "Couldn't analyse $filename: $!";
-	my @authors = map { s/E<([^>]+)>/e2char($1)/ge; m/ \A \s* (.+?) \s* \z /x } grep { /\S/ } split /\n/, $data->pod('AUTHOR') // $data->pod('AUTHORS') // '' or warn "Could not parse any authors from `=head1 AUTHOR` in $filename";
-	my $license = detect_license($data, $filename, \@authors, $mergedata);
+	my $pod_data = -e $podname && Module::Metadata->new_from_file($podname, collect_pod => 1, decode_pod => 1) // $data;
+	my @authors = map { s/E<([^>]+)>/e2char($1)/ge; m/ \A \s* (.+?) \s* \z /x } grep { /\S/ } split /\n/, $pod_data->pod('AUTHOR') // $pod_data->pod('AUTHORS') // '' or warn "Could not parse any authors from `=head1 AUTHOR` in $filename";
+	my $license = detect_license($pod_data, $filename, \@authors, $mergedata);
 
-	my $load_meta = !%{ $opts{regenerate} || {} } && uptodate('META.json', 'cpanfile', 'prereqs.json', 'prereqs.yml', $mergefile);
+	my $load_meta = !%{ $opts{regenerate} // {} } && uptodate('META.json', 'cpanfile', 'prereqs.json', 'prereqs.yml', $mergefile);
 	my $meta = $load_meta ? CPAN::Meta->load_file('META.json', { lazy_validation => 0 }) : do {
-		my ($abstract) = ($data->pod('NAME') // '')  =~ / \A \s+ \S+ \s? - \s? (.+?) \s* \z /x or warn "Could not parse abstract from `=head1 NAME` in $filename";
+		my ($abstract) = ($pod_data->pod('NAME') // '')  =~ / \A \s+ \S+ \s? - \s? (.+?) \s* \z /x or warn "Could not parse abstract from `=head1 NAME` in $filename";
 		my $version = $data->version($data->name) // die "Cannot parse \$VERSION from $filename";
 
 		my $prereqs = load_prereqs();
@@ -226,7 +228,7 @@ sub new {
 			dynamic_config => 0,
 			license        => [ $license->meta2_name ],
 			prereqs        => $prereqs,
-			release_status => $opts{trial} || $version =~ /_/ ? 'testing' : 'stable',
+			release_status => $opts{trial} // $version =~ /_/ ? 'testing' : 'stable',
 			generated_by   => "App::ModuleBuildTiny version $VERSION",
 			'meta-spec'    => {
 				version    => '2',
@@ -257,7 +259,7 @@ sub new {
 		}
 		$metahash->{prereqs} = $filtered->as_string_hash;
 
-		$metahash->{provides} ||= Module::Metadata->provides(version => 2, dir => 'lib') if not $metahash->{no_index};
+		$metahash->{provides} //= Module::Metadata->provides(version => 2, dir => 'lib') if not $metahash->{no_index};
 		CPAN::Meta->create($metahash, { lazy_validation => 0 });
 	};
 

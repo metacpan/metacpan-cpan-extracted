@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-03'; # DATE
+our $DATE = '2023-02-18'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.008'; # VERSION
+our $VERSION = '1.017'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_setop/csv_setop",
@@ -41,7 +41,7 @@ csv-setop - Set operation (union/unique concatenation of rows, intersection/comm
 
 =head1 VERSION
 
-This document describes version 1.008 of csv-setop (from Perl distribution App-CSVUtils), released on 2023-02-03.
+This document describes version 1.017 of csv-setop (from Perl distribution App-CSVUtils), released on 2023-02-18.
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,7 @@ B<csv-setop> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<
 
 B<csv-setop> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<csv-setop> [B<L<--compare-fields|/"--compare-fields=s">>=I<str>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--ignore-case|/"--ignore-case, -i">>|B<L<-i|/"--ignore-case, -i">>|B<L<--no-ignore-case|/"--ignore-case, -i">>|B<L<--noignore-case|/"--ignore-case, -i">>] [B<L<--input-escape-char|/"--input-escape-char=s">>=I<str>] [(B<L<--input-filename|/"--input-filenames-json=s">>=I<L<filename|Sah::Schema::filename>>)+|B<L<--input-filenames-json|/"--input-filenames-json=s">>=I<json>] [B<L<--input-header|/"--no-input-header">>|B<L<--no-input-header|/"--no-input-header">>|B<L<--noinput-header|/"--no-input-header">>] [B<L<--input-quote-char|/"--input-quote-char=s">>=I<str>] [B<L<--input-sep-char|/"--input-sep-char=s">>=I<str>] [B<L<--input-tsv|/"--input-tsv">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--op|/"--union*">>=I<str>|B<L<--diff|/"--union*">>|B<L<--intersect|/"--union*">>|B<L<--symdiff|/"--union*">>|B<L<--union|/"--union*">>] [B<L<--output-escape-char|/"--output-escape-char=s">>=I<str>] [B<L<--output-filename|/"--output-filename=s, -o">>=I<L<filename|Sah::Schema::filename>>|B<L<-o|/"--output-filename=s, -o">>=I<L<filename|Sah::Schema::filename>>] [B<L<--output-header|/"--output-header">>|B<L<--no-output-header|/"--output-header">>|B<L<--nooutput-header|/"--output-header">>] [B<L<--output-quote-char|/"--output-quote-char=s">>=I<str>] [B<L<--output-sep-char|/"--output-sep-char=s">>=I<str>] [B<L<--output-tsv|/"--output-tsv">>|B<L<--no-output-tsv|/"--output-tsv">>|B<L<--nooutput-tsv|/"--output-tsv">>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>|B<L<--no-overwrite|/"--overwrite, -O">>|B<L<--nooverwrite|/"--overwrite, -O">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--result-fields|/"--result-fields=s">>=I<str>] -- [I<L<input_filename|/"--input-filenames-json=s">>] ...
+B<csv-setop> [B<L<--compare-fields|/"--compare-fields=s">>=I<str>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--ignore-case|/"--ignore-case, -i">>|B<L<-i|/"--ignore-case, -i">>|B<L<--no-ignore-case|/"--ignore-case, -i">>|B<L<--noignore-case|/"--ignore-case, -i">>] [B<L<--inplace|/"--inplace">>] [B<L<--inplace-backup-ext|/"--inplace-backup-ext=s, -b">>=I<str>|B<L<-b|/"--inplace-backup-ext=s, -b">>=I<str>] [B<L<--input-escape-char|/"--input-escape-char=s">>=I<str>] [(B<L<--input-filename|/"--input-filenames-json=s">>=I<L<filename|Sah::Schema::filename>>)+|B<L<--input-filenames-json|/"--input-filenames-json=s">>=I<json>] [B<L<--input-header|/"--no-input-header">>|B<L<--no-input-header|/"--no-input-header">>|B<L<--noinput-header|/"--no-input-header">>] [B<L<--input-quote-char|/"--input-quote-char=s">>=I<str>] [B<L<--input-sep-char|/"--input-sep-char=s">>=I<str>] [B<L<--input-tsv|/"--input-tsv">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--op|/"--union*">>=I<str>|B<L<--diff|/"--union*">>|B<L<--intersect|/"--union*">>|B<L<--symdiff|/"--union*">>|B<L<--union|/"--union*">>] [B<L<--output-always-quote|/"--output-always-quote">>|B<L<--no-output-always-quote|/"--output-always-quote">>|B<L<--nooutput-always-quote|/"--output-always-quote">>] [B<L<--output-escape-char|/"--output-escape-char=s">>=I<str>] [B<L<--output-filename|/"--output-filename=s, -o">>=I<L<filename|Sah::Schema::filename>>|B<L<-o|/"--output-filename=s, -o">>=I<L<filename|Sah::Schema::filename>>] [B<L<--output-header|/"--output-header">>|B<L<--no-output-header|/"--output-header">>|B<L<--nooutput-header|/"--output-header">>] [B<L<--output-quote-char|/"--output-quote-char=s">>=I<str>] [B<L<--output-quote-empty|/"--output-quote-empty">>|B<L<--no-output-quote-empty|/"--output-quote-empty">>|B<L<--nooutput-quote-empty|/"--output-quote-empty">>] [B<L<--output-sep-char|/"--output-sep-char=s">>=I<str>] [B<L<--output-tsv|/"--output-tsv">>|B<L<--no-output-tsv|/"--output-tsv">>|B<L<--nooutput-tsv|/"--output-tsv">>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>|B<L<--no-overwrite|/"--overwrite, -O">>|B<L<--nooverwrite|/"--overwrite, -O">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--result-fields|/"--result-fields=s">>=I<str>] -- [I<L<input_filename|/"--input-filenames-json=s">>] ...
 
 =head1 DESCRIPTION
 
@@ -315,6 +315,46 @@ interactive terminal (i.e. whether output is piped). This option specifically
 chooses an output format.
 
 
+=item B<--inplace>
+
+Output to the same file as input.
+
+Normally, you output to a different file than input. If you try to output to the
+same file (C<-o INPUT.csv -O>) you will clobber the input file; thus the utility
+prevents you from doing it. However, with this C<--inplace> option, you can
+output to the same file. Like perl's C<-i> option, this will first output to a
+temporary file in the same directory as the input file then rename to the final
+file at the end. You cannot specify output file (C<-o>) when using this option,
+but you can specify backup extension with C<-b> option.
+
+Some caveats:
+
+=over
+
+=item * if input file is a symbolic link, it will be replaced with a regular file;
+
+=item * renaming (implemented using C<rename()>) can fail if input filename is too long;
+
+=item * value specified in C<-b> is currently not checked for acceptable characters;
+
+=item * things can also fail if permissions are restrictive;
+
+=back
+
+
+=item B<--inplace-backup-ext>=I<s>, B<-b>
+
+Extension to add for backup of input file.
+
+Default value:
+
+ ""
+
+In inplace mode (C<--inplace>), if this option is set to a non-empty string, will
+rename the input file using this extension as a backup. The old existing backup
+will be overwritten, if any.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -338,6 +378,19 @@ you want to pipe the result for more post-processing. In this case you can use
 C<--naked-res> so you just get:
 
  [1,2,3]
+
+
+=item B<--output-always-quote>
+
+Whether to always quote values.
+
+When set to false (the default), values are quoted only when necessary:
+
+ field1,field2,"field three contains comma (,)",field4
+
+When set to true, then all values will be quoted:
+
+ "field1","field2","field three contains comma (,)","field4"
 
 
 =item B<--output-escape-char>=I<s>
@@ -377,6 +430,19 @@ Specify field quote character in output CSV, will be passed to Text::CSV_XS.
 This is like C<--input-quote-char> option but for output instead of input.
 
 Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+
+=item B<--output-quote-empty>
+
+Whether to quote empty values.
+
+When set to false (the default), empty values are not quoted:
+
+ field1,field2,,field4
+
+When set to true, then empty values will be quoted:
+
+ field1,field2,"",field4
 
 
 =item B<--output-sep-char>=I<s>

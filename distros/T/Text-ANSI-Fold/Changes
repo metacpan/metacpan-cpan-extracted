@@ -1,5 +1,43 @@
 Revision history for Perl extension Text-ANSI-Fold
 
+2.2102 2023-02-20T09:52:02Z
+
+    - Fix a bug of Hangul word bondary length calculation.
+
+2.2101 2023-02-14T10:09:52Z
+
+    - Avoid the panic caused by escape only line.
+
+2.20 2023-02-07T14:19:18Z
+
+    - Treat \p{Greek}, \p{Cyrillic}, \p{Hangul} as word character as well.
+
+2.19 2023-01-06T02:30:22Z
+
+    - Allow double-struck run-in/out characters with backspace.
+    - Move git repository.
+
+2.18 2023-01-05T06:24:41Z
+
+    - Allow boundary word to include backspaces.
+
+2.17 2022-12-19T10:07:17Z
+
+    - Add middle-dot and emspace tabstyles.
+
+2.16 2022-10-07T06:27:16Z
+
+    - Make :regex tagged variables exportable.
+
+2.15 2022-09-26T01:13:52Z
+
+    - Fix bug of --boundary=word does not work with --prefix option.
+
+2.14 2022-08-31T10:24:09Z
+
+    - Method "text" has :lvalue attribute and is now assignable.
+    - Non-number width parameter causes fatal error in fold().
+
 2.1301 2022-08-05T08:10:23Z
 
     - Fix bug of losing "0" with word-boundary.

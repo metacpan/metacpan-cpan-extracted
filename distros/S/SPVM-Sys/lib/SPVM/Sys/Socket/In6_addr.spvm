@@ -1,4 +1,4 @@
-class Sys::Socket::In6_addr : pointer_t {
+class Sys::Socket::In6_addr : pointer {
   
   # Class methods
   native static method new : Sys::Socket::In6_addr ();

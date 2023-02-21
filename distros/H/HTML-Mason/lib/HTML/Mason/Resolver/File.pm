@@ -3,7 +3,7 @@
 # it under the same terms as Perl itself.
 
 package HTML::Mason::Resolver::File;
-$HTML::Mason::Resolver::File::VERSION = '1.59';
+$HTML::Mason::Resolver::File::VERSION = '1.60';
 use strict;
 use warnings;
 

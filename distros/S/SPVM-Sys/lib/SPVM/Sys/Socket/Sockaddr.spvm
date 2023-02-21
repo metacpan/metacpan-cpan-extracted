@@ -1,4 +1,4 @@
-class Sys::Socket::Sockaddr : pointer_t {
+class Sys::Socket::Sockaddr : pointer {
   interface Sys::Socket::Sockaddr::Interface;
   interface Cloneable;
   

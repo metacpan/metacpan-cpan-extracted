@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use feature qw<say>;
 
-use Test::More tests => 17;
+use Test::More tests => 22;
 use Log::OK {sys=>"Log::ger"};
 
 BEGIN { use_ok('Template::Plex') };
@@ -11,16 +11,13 @@ use Template::Plex;
 
 my $default_data={data=>[1,2,3,4]};
 
-my $template=q|@{[
-	do {
-		#my $sub='Sub template: $data->@*';
+my $template=q|@{[ do {
 		my $s="";
 		for my $d ($fields{data}->@*) {
 			$s.="row $d\n"
 		}
 		$s;
-	}
-]}|;
+	}]}|;
 
 
 $template=Template::Plex->load([$template], $default_data);
@@ -30,6 +27,7 @@ for(1,2,3,4){
 	$expected.="row $_\n";
 }
 ok $result eq $expected, "Base values";
+
 $default_data->{data}=[5,6,7,8];
 $result=$template->render();
 $expected="";
@@ -172,4 +170,58 @@ ok $result eq "my name is John not Jill", "Lexical and override access";
         #my $setup=$template->setup;
         my $render=$template->render;
         ok $render eq "Hello!", "Render";
+}
+
+
+{
+  # Test catching compile time errors
+  
+  my $tt=[
+    '@{[init{
+    $self->args->{test}="testing";
+    {1+a
+    } ]}Hello!'
+  ];
+        my %vars;
+        my $template=
+        eval {
+          Template::Plex->load($tt, \%vars);
+        };
+        ok !defined($template), "Template load fail ok";
+
+        ok $@, "Compile error set";
+        if($@){
+          my $expected='4=>     \} \]\}Hello\!';
+          #say STDERR "RESULT: $@";
+          ok $@=~/$expected/s;
+          #test for the correct line number
+        }
+}
+
+{
+  # Test catching errors in body
+  
+  my $tt=[
+    '@{[init{
+    $self->args->{test}="testing";
+    } ]}Hello!
+    {]1+a'
+
+
+  ];
+        my %vars;
+        my $template=
+        eval {
+          Template::Plex->load($tt, \%vars);
+        };
+        ok !defined($template), "Template load failed ok";
+
+        ok $@, "Compile error set";
+
+        if($@){
+          #my $expected='4=>     \} \]\}Hello\!';
+          #say STDERR "RESULT: $@";
+          #ok $@=~/$expected/s;
+          #test for the correct line number
+        }
 }

@@ -1,6 +1,6 @@
 package Chemistry::File::CML;
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.13'; # VERSION
 # $Id$
 
 use base 'Chemistry::File';
@@ -30,14 +30,21 @@ Chemistry::Mol->register_format(cml => __PACKAGE__);
 
 Chemical Markup Language reader.
 
-This module automatically registers the 'cml' format with Chemistry::Mol.
+This module automatically registers the 'cml' format with L<Chemistry::Mol>.
 
 This version only reads some of the information available in CML files.
 It does not read stereochemistry yet, but this is envisaged in future.
 Writing CML files is not implemented yet too.
 
 This module is part of the PerlMol project, L<https://github.com/perlmol>.
-    
+
+=head2 Format specifics
+
+As not all atoms in a CML file may have coordinates, those who do are marked with an attribute with value 1:
+
+    $atom->attr('cml/has_coords');
+
+This is because L<Chemistry::Mol> has no other way to denote missing coordinates.
 
 =cut
 
@@ -93,6 +100,7 @@ sub parse_string {
                 $atom->coords( map { $_ * 1 } $element->getAttribute( 'x3' ),
                                               $element->getAttribute( 'y3' ),
                                               $element->getAttribute( 'z3' ) );
+                $atom->attr( 'cml/has_coords' => 1 );
             }
         }
 

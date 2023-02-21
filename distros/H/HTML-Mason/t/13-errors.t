@@ -334,7 +334,14 @@ EOF
 
 #------------------------------------------------------------
 
+    my $expect = qr/Error during compilation((?!Stack:).)*Stack:((?!Stack:).)*$/s;
+    if ($] >= 5.037) {
+        $expect = qr/(?:$expect|syntax error at.+)/;
+    }
     $group->add_test( name => 'top_level_compilation_error',
+                      # This doesn't work the way we want with Perl 5.37+. See
+                      # https://github.com/houseabsolute/HTML-Mason/issues/33
+                      # for the reason why.
                       description => "Make sure top-level compiler errors work in output mode",
                       interp_params => {
                                          error_format => 'text',
@@ -344,9 +351,9 @@ EOF
 % my $x = 
 EOF
                         # match "Error during compilation" followed by 
-                        # exactly one occurance of "Stack:"
+                        # exactly one occurence of "Stack:"
                         # (Mason should stop after the first error)
-                      expect => qr/Error during compilation((?!Stack:).)*Stack:((?!Stack:).)*$/s,
+                      expect => $expect,
                     );
 
 #------------------------------------------------------------

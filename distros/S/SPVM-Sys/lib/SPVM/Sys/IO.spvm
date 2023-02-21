@@ -96,11 +96,28 @@ class Sys::IO {
   
   native static method readlink : int ($path : string, $buf : mutable string, $bufsiz : int);
   
+  static method readlinkp : string ($file : string) {
+    my $stat = Sys::IO::Stat->new;
+    
+    my $status = Sys::IO::Stat->lstat($file, $stat);
+    
+    my $link_text = (string)undef;
+    if ($status == 0) {
+      if (($stat->st_mode & IO->S_IFMT) == IO->S_IFLNK) {
+        my $link_text_length = (int)$stat->st_size;
+        my $link_text = (mutable string)new_string_len $link_text_length;
+        &readlink($file, $link_text, $link_text_length);
+      }
+    }
+    
+    return $link_text;
+  }
+  
   native static method opendir : Sys::IO::DirStream ($dir : string);
   
   native static method closedir : int ($dirp : Sys::IO::DirStream);
   
-  native static method readdir : Sys::IO::Dirent ($dirp : Sys::IO::DirStream); # Non-thead safe
+  native static method readdir : Sys::IO::Dirent ($dirp : Sys::IO::DirStream);
   
   native static method rewinddir : void ($dirp : Sys::IO::DirStream);
   
@@ -118,12 +135,12 @@ class Sys::IO {
   
   native static method faccessat : int ($dirfd : int, $pathname : string, $mode : int, $flags : int);
   
-  static method eaccess_emulate_raw : int ($pathname : string, $mode : int) {
+  static method eaccess_raw : int ($pathname : string, $mode : int) {
     my $status = &faccessat_raw(IO->AT_FDCWD, $pathname, $mode, IO->AT_EACCESS);
     return $status;
   }
   
-  static method eaccess_emulate : int ($pathname : string, $mode : int) {
+  static method eaccess : int ($pathname : string, $mode : int) {
     my $status = &faccessat(IO->AT_FDCWD, $pathname, $mode, IO->AT_EACCESS);
     return $status;
   }

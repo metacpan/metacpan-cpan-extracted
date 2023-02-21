@@ -5,15 +5,25 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-26'; # DATE
+our $DATE = '2022-11-15'; # DATE
 our $DIST = 'Sah-Schemas-JSON'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 sub meta {
     +{
         v => 1,
         summary => 'Check that value can be decoded as JSON and it is a hash',
         might_fail => 1,
+        examples => [
+            {value=>'', valid=>0, summary=>'Empty string is not valid JSON'},
+            {value=>'null', valid=>0, summary=>'Valid JSON but not a hash'},
+            {value=>'[1,2,3]', valid=>0, summary=>'Valid JSON but not a hash'},
+            {value=>'{"a":1}'},
+            {value=>'"foo"', valid=>0, summary=>'Valid JSON but not a hash'},
+            {value=>'"foo', valid=>0, summary=>'Invalid JSON, missing closing quote'},
+            {value=>{}, valid=>0, summary=>'Will become something like "HASH(0x560142d4e5e8)" and fail because it is not valid JSON'},
+            #{value=>undef, valid=>0, summary=>'Will decode empty string and fail because empty string is not valid JSON'},
+        ],
     };
 }
 
@@ -34,7 +44,7 @@ sub filter {
 }
 
 1;
-# ABSTRACT:
+# ABSTRACT: Check that value can be decoded as JSON and it is a hash
 
 __END__
 
@@ -44,11 +54,43 @@ __END__
 
 =head1 NAME
 
-Data::Sah::Filter::perl::JSON::check_decode_hash
+Data::Sah::Filter::perl::JSON::check_decode_hash - Check that value can be decoded as JSON and it is a hash
 
 =head1 VERSION
 
-This document describes version 0.006 of Data::Sah::Filter::perl::JSON::check_decode_hash (from Perl distribution Sah-Schemas-JSON), released on 2022-08-26.
+This document describes version 0.007 of Data::Sah::Filter::perl::JSON::check_decode_hash (from Perl distribution Sah-Schemas-JSON), released on 2022-11-15.
+
+=head1 SYNOPSIS
+
+=head2 Using in Sah schema's C<prefilters> (or C<postfilters>) clause
+
+ ["str","prefilters",[["JSON::check_decode_hash"]]]
+
+=head2 Using with L<Data::Sah>:
+
+ use Data::Sah qw(gen_validator);
+ 
+ my $schema = ["str","prefilters",[["JSON::check_decode_hash"]]];
+ my $validator = gen_validator($schema);
+ if ($validator->($some_data)) { print 'Valid!' }
+
+=head2 Using with L<Data::Sah:Filter> directly:
+
+ use Data::Sah::Filter qw(gen_filter);
+
+ my $filter = gen_filter([["JSON::check_decode_hash"]]);
+ # $errmsg will be empty/undef when filtering succeeds
+ my ($errmsg, $filtered_value) = $filter->($some_data);
+
+=head2 Sample data and filtering results
+
+ "" # INVALID (String is not a valid JSON: malformed JSON string, neither tag, array, object, number, string or atom, at character offset 0 (before "(end of string)") at (eval 2357) line 8. ), unchanged (Empty string is not valid JSON)
+ "null" # INVALID (String is a valid JSON but not an encoded hash), unchanged (Valid JSON but not a hash)
+ "[1,2,3]" # INVALID (String is a valid JSON but not an encoded hash), unchanged (Valid JSON but not a hash)
+ "{\"a\":1}" # valid, unchanged
+ "\"foo\"" # INVALID (String is a valid JSON but not an encoded hash), unchanged (Valid JSON but not a hash)
+ "\"foo" # INVALID (String is not a valid JSON: unexpected end of string while parsing JSON string, at character offset 4 (before "(end of string)") at (eval 2362) line 8. ), unchanged (Invalid JSON, missing closing quote)
+ {} # INVALID (String is not a valid JSON: malformed JSON string, neither tag, array, object, number, string or atom, at character offset 0 (before "HASH(0x559dffd6ec58)") at (eval 2363) line 8. ), unchanged (Will become something like "HASH(0x560142d4e5e8)" and fail because it is not valid JSON)
 
 =head1 DESCRIPTION
 

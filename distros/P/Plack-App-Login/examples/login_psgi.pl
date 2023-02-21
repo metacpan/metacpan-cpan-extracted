@@ -27,12 +27,16 @@ Plack::Runner->new->run($app);
 #   <head>
 #     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 #     <meta charset="UTF-8" />
-#     <meta name="generator" content=
-#       "Perl module: Tags::HTML::Page::Begin, Version: 0.08" />
+#     <meta name="generator" content="Plack::App::Login; Version: 0.07" />
 #     <title>
 #       Login page
 #     </title>
 #     <style type="text/css">
+# * {
+#         box-sizing: border-box;
+#         margin: 0;
+#         padding: 0;
+# }
 # .outer {
 #         position: fixed;
 #         top: 50%;

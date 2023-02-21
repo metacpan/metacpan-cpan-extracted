@@ -1,3 +1,7 @@
+0.07 2023-02-10T22:24:02+01:00
+ - Rewrite to new Tags::HTML::Page::Begin@0.16 with css init section.
+ - Update copyright years.
+
 0.06 2022-09-14T11:04:14+02:00
  - Update CSS output for new Tags::HTML::Login::Button@0.02.
 

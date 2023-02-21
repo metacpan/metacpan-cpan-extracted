@@ -3,19 +3,27 @@
 
  /* gzread.c -- zlib functions for reading gzip files
  * Copyright (C) 2004, 2005, 2010, 2011, 2012, 2013, 2016 Mark Adler
- * For conditions of distribution and use, see http://www.zlib.net/zlib_license.html
+ * For conditions of distribution and use, see https://www.zlib.net/zlib_license.html
  */
 
 #include "gzguts.h"
 
+/* fix for Visual Studio, which doesn't support ssize_t type.
+ * see https://github.com/facebook/zstd/issues/1800#issuecomment-545945050 */
+#if defined(_MSC_VER) && !defined(ssize_t)
+#  include <BaseTsd.h>
+   typedef SSIZE_T ssize_t;
+#endif
+
+
 /* Local functions */
-local int gz_load OF((gz_statep, unsigned char *, unsigned, unsigned *));
-local int gz_avail OF((gz_statep));
-local int gz_look OF((gz_statep));
-local int gz_decomp OF((gz_statep));
-local int gz_fetch OF((gz_statep));
-local int gz_skip OF((gz_statep, z_off64_t));
-local z_size_t gz_read OF((gz_statep, voidp, z_size_t));
+local int gz_load _Z_OF((gz_statep, unsigned char *, unsigned, unsigned *));
+local int gz_avail _Z_OF((gz_statep));
+local int gz_look _Z_OF((gz_statep));
+local int gz_decomp _Z_OF((gz_statep));
+local int gz_fetch _Z_OF((gz_statep));
+local int gz_skip _Z_OF((gz_statep, z_off64_t));
+local z_size_t gz_read _Z_OF((gz_statep, voidp, z_size_t));
 
 /* Use read() to load a buffer -- return -1 on error, otherwise 0.  Read from
    state.state->fd, and update state.state->eof, state.state->err, and state.state->msg as appropriate.
@@ -386,7 +394,7 @@ int ZEXPORT gzread(file, buf, len)
     /* get internal structure */
     if (file == NULL)
         return -1;
-    state = (gz_statep)file;
+    state.file = file;
 
     /* check that we're reading and that there's no (serious) error */
     if (state.state->mode != GZ_READ ||
@@ -424,7 +432,7 @@ z_size_t ZEXPORT gzfread(buf, size, nitems, file)
     /* get internal structure */
     if (file == NULL)
         return 0;
-    state = (gz_statep)file;
+    state.file = file;
 
     /* check that we're reading and that there's no (serious) error */
     if (state.state->mode != GZ_READ ||
@@ -456,8 +464,8 @@ z_size_t ZEXPORT gzfread(buf, size, nitems, file)
 #endif
 
 #if ZLIB_VERNUM <= 0x1250
-ZEXTERN int ZEXPORT gzgetc OF((gzFile file));
-ZEXTERN int ZEXPORT gzgetc_ OF((gzFile file));
+ZEXTERN int ZEXPORT gzgetc _Z_OF((gzFile file));
+ZEXTERN int ZEXPORT gzgetc_ _Z_OF((gzFile file));
 #endif
 
 int ZEXPORT gzgetc(file)
@@ -470,7 +478,7 @@ int ZEXPORT gzgetc(file)
     /* get internal structure */
     if (file == NULL)
         return -1;
-    state = (gz_statep)file;
+    state.file = file;
 
     /* check that we're reading and that there's no (serious) error */
     if (state.state->mode != GZ_READ ||
@@ -485,7 +493,7 @@ int ZEXPORT gzgetc(file)
     }
 
     /* nothing there -- try gz_read() */
-    ret = (unsigned)gz_read(state, buf, 1);
+    ret = (int)gz_read(state, buf, 1);
     return ret < 1 ? -1 : buf[0];
 }
 
@@ -505,7 +513,7 @@ int ZEXPORT gzungetc(c, file)
     /* get internal structure */
     if (file == NULL)
         return -1;
-    state = (gz_statep)file;
+    state.file = file;
 
     /* check that we're reading and that there's no (serious) error */
     if (state.state->mode != GZ_READ ||
@@ -569,7 +577,7 @@ char * ZEXPORT gzgets(file, buf, len)
     /* check parameters and get internal structure */
     if (file == NULL || buf == NULL || len < 1)
         return NULL;
-    state = (gz_statep)file;
+    state.file = file;
 
     /* check that we're reading and that there's no (serious) error */
     if (state.state->mode != GZ_READ ||
@@ -628,7 +636,7 @@ int ZEXPORT gzdirect(file)
     /* get internal structure */
     if (file == NULL)
         return 0;
-    state = (gz_statep)file;
+    state.file = file;
 
     /* if the state is not known, but we can find out, then do so (this is
        mainly for right after a gzopen() or gzdopen()) */
@@ -649,7 +657,7 @@ int ZEXPORT gzclose_r(file)
     /* get internal structure */
     if (file == NULL)
         return Z_STREAM_ERROR;
-    state = (gz_statep)file;
+    state.file = file;
 
     /* check that we're reading */
     if (state.state->mode != GZ_READ)

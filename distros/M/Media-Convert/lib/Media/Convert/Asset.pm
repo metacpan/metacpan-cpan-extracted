@@ -1,5 +1,9 @@
 package Media::Convert::Asset;
 
+use strict;
+use warnings;
+use v5.24;
+
 our $VERSION;
 
 use Media::Convert;
@@ -119,7 +123,7 @@ sub _probe_mtime {
 	}
 	my @statdata = stat($self->url);
 	if(scalar(@statdata) == 0) {
-		return undef;
+		return;
 	}
 	return $statdata[9];
 }
@@ -237,7 +241,7 @@ sub _probe_videosize {
 	}
 	my $width = $self->video_width;
 	my $height = $self->video_height;
-	return undef unless defined($width) && defined($height);
+	return unless defined($width) && defined($height);
 	return $self->video_width . "x" . $self->video_height;
 }
 
@@ -344,7 +348,7 @@ sub _probe_videominrate {
 	if(defined($rate)) {
 		return $rate * 0.5;
 	}
-	return undef;
+	return;
 }
 
 =head2 video_maxrate
@@ -379,7 +383,7 @@ sub _probe_video_preset {
 	if($self->has_reference) {
 		return $self->reference->video_preset;
 	}
-	return undef;
+	return;
 }
 
 sub _probe_videomaxrate {
@@ -395,7 +399,7 @@ sub _probe_videomaxrate {
 	if(defined($rate)) {
 		return $rate * 1.45;
 	}
-	return undef;
+	return;
 }
 
 =head2 aspect_ratio
@@ -514,7 +518,7 @@ sub _probe_quality {
 	if($self->has_reference) {
 		return $self->reference->quality;
 	}
-	return undef;
+	return;
 }
 
 =head2 metadata
@@ -620,8 +624,8 @@ sub _probe_blackspots {
 	my $blacks = [];
 	pipe R, W;
 	if(fork == 0) {
-		open STDERR, ">&W";
-		open STDOUT, ">&W";
+		open STDERR, ">", "&W";
+		open STDOUT, ">", "&W";
 		my @cmd = ("ffmpeg", "-threads", "1", "-nostats", "-i", $self->url, "-vf", "blackdetect=d=0:pix_th=.01", "-f", "null", "/dev/null");
 		exec @cmd;
 		die "exec failed";
@@ -850,12 +854,12 @@ sub _probe {
 	if($self->has_reference) {
 		return $self->reference->_get_probedata;
 	}
-	open JSON, "-|:encoding(UTF-8)", "ffprobe", "-loglevel", "quiet", "-print_format", "json", "-show_format", "-show_streams", $self->url;
+	open my $jsonpipe, "-|:encoding(UTF-8)", "ffprobe", "-loglevel", "quiet", "-print_format", "json", "-show_format", "-show_streams", $self->url;
 	my $json = "";
-	while(<JSON>) {
+	while(<$jsonpipe>) {
 		$json .= $_;
 	}
-	close JSON;
+	close $jsonpipe;
 	return decode_json($json);
 }
 

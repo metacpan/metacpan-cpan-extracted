@@ -110,11 +110,15 @@ sub parse_with_split {
 sub __print_template_info {
     my ( $sf, $rows, $occupied_term_h ) = @_;
     my ( $term_w, $term_h ) = get_term_size();
+    my $ten_steps = '';
+    for my $count ( 1 .. int( $term_w / 10 ) ) {
+        $ten_steps .= ( ' ' x ( 10 - length $count ) ) . $count;
+    }
     my $tapeline = '123456789*';
-    my $ruler;
+    my $ruler = '';
     $ruler .= $tapeline x int( $term_w / 10 );
     $ruler .= substr( $tapeline, 0, ( $term_w % 10 ) );
-    my $info = $ruler;
+    my $info = $ten_steps . "\n" . $ruler;
     my $avail_h = $term_h - $occupied_term_h;
     if ( $avail_h < 5 ) { ##
         $avail_h = 5;
@@ -147,7 +151,7 @@ sub __print_template_info {
 }
 
 
-sub parse_with_template {
+sub parse_with_template { ##
     my ( $sf, $sql, $fh ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
@@ -156,7 +160,7 @@ sub parse_with_template {
     my $old_idx = 0;
 
     IRS: while ( 1 ) {
-        my $prompt = 'Choose the Input record separator:';
+        my $prompt = 'Choose the input record separator:';
         my @irs = ( "\\n", "\\r", "\\r\\n" );
         my $reparse = '  Reparse';
         my @pre = ( undef );
@@ -190,44 +194,78 @@ sub parse_with_template {
         seek $fh, 0, 0;
         my @rows = grep { ! /^\s+\z/ } <$fh>;
         chomp @rows;
+        #my $fields_set = [ [ 'Number of columns', ], [ ' Separator width', ], ]; ##
+        my $fields_set = [ [ 'Col count', ], [ 'Sep width', ], ];
 
-        COL_COUNT: while ( 1 ) {
-            my $info = $sf->__print_template_info( \@rows, 9 );
-            # Choose a number
-            my $col_count = $tu->choose_a_number( 2,
-                { clear_screen => 1, info => $info, cs_label => 'Number of columns: ',
-                  small_first => 1, confirm => 'Confirm', back => 'Back' }
+        SETTINGS: while ( 1 ) {
+            my $info = $sf->__print_template_info( \@rows, 7 + @$fields_set );
+            # Fill_form
+            my $form_set = $tf->fill_form(
+                $fields_set,
+                { info => $info, prompt => 'Settings:', auto_up => 2,
+                confirm => $sf->{i}{confirm}, back => $sf->{i}{back} . '   ' }
             );
             $ax->print_sql_info( $info );
-            if ( ! $col_count ) {
+            if ( ! $form_set ) {
                 next IRS;
             }
+            my $number_of_columns = $form_set->[0];
+            my $separator_width = $form_set->[1];
+            my $prompt;
+            if ( ! defined $number_of_columns->[1] || $number_of_columns->[1] !~ /^[1-9][0-9]*\z/ ) { ## defined
+                $prompt = "'$number_of_columns->[0]' requires a value of 1 or greater!";
+            }
+            if ( ! length $separator_width->[1] ) {
+                $separator_width->[1] = 0;
+            }
+            if ( $separator_width->[1] !~ /^(?:0|[1-9][0-9]*)\z/ ) {
+                $prompt = "'$separator_width->[0]' requires a value of 0 or greater!";
+            }
+            if ( $prompt ) {
+                my $info = $sf->__print_template_info( \@rows, 6 );
+                $tc->choose(
+                    [ 'Press ENTER' ],
+                    { info => $info, prompt => $prompt, info => $info }
+                );
+                $ax->print_sql_info( $info );
+                @$fields_set = @$form_set;
+                next SETTINGS;
+            }
+            my $col_count = $number_of_columns->[1];
+            my $col_sep_w = $separator_width->[1];
             my $col_names = [ map { 'c' . $_ } 1 .. $col_count ];
             my $fields = [ map { [ $_, ] } @$col_names ];
+            $fields->[-1][1] = '*';
 
             COL_WIDTHS: while ( 1 ) {
                 my $info = $sf->__print_template_info( \@rows, 7 + $col_count );
+                my $prompt = 'Separator width: ' . $col_sep_w;
+                $prompt .= "\n". 'Column widths:';
                 # Fill_form
                 my $form = $tf->fill_form(
                     $fields,
-                    { info => $info, prompt => 'Col widths:', auto_up => 2,
+                    { info => $info, prompt => $prompt, auto_up => 2,
                     confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
                 );
                 $ax->print_sql_info( $info );
                 if ( ! $form ) {
-                    next COL_COUNT;
+                    @$fields_set = @$form_set;
+                    next SETTINGS;
                 }
                 my @values;
                 for my $field ( @$form ) {
                     my ( $field_name, $field_value ) = @$field;
-                    my $prompt;
-                    if ( ! defined $field_value || ! length $field_value ) {
-                        $prompt = "$field_name: value not defined!";
+                    my ( $valid_regex, $error_message );
+                    if ( $field_name eq $form->[-1][0] ) {
+                        $valid_regex = qr/^(?:\*|[1-9][0-9]*)\z/;
+                        $error_message = " requires * or a value of 1 or greater!";
                     }
-                    elsif ( $field_value !~ /^(?:0|[1-9][0-9]*)\z/ ) {
-                        $prompt = "$field_name: \"$field_value\" is not 0 or greater!";
+                    else {
+                        $valid_regex = qr/^[1-9][0-9]*\z/;
+                        $error_message = " requires a value of 1 or greater!";
                     }
-                    if ( defined $prompt ) {
+                    if ( ! defined $field_value || $field_value !~ $valid_regex ) { ## defined
+                        $prompt = "'$field_name' " . $error_message;
                         my $info = $sf->__print_template_info( \@rows, 6 );
                         $tc->choose(
                             [ 'Press ENTER' ],
@@ -239,7 +277,7 @@ sub parse_with_template {
                     }
                     push @values, $field_value;
                 }
-                my $prompt = 'Remove leading Spaces?';
+                $prompt = 'Remove leading spaces?';
                 my ( $no, $yes ) = ( '- NO', '- YES' );
                 $info = $sf->__print_template_info( \@rows, 8 );
                 # Choose
@@ -251,18 +289,25 @@ sub parse_with_template {
                 if ( ! defined $remove_leading_spaces ) {
                     next COL_WIDTHS;
                 }
-                my $template = join( ' ', map { 'A' . $_ } @values );
-                seek $fh, 0, 0;
+                my $template = join( 'x' x $col_sep_w, map { 'A' . $_ } @values );
                 my $rows_of_cols = [];
-                if ( $remove_leading_spaces eq $yes ) {
-                    while ( my $row = <$fh> ) {
-                        push @$rows_of_cols, [ map { s/^\s+//; $_ } unpack( $template, $row ) ];
+                if ( ! eval {
+                    seek $fh, 0, 0;
+                    if ( $remove_leading_spaces eq $yes ) {
+                        while ( my $row = <$fh> ) {
+                            push @$rows_of_cols, [ map { s/^\s+//; $_ } unpack( $template, $row ) ];
+                        }
                     }
-                }
-                else {
-                    while ( my $row = <$fh> ) {
-                        push @$rows_of_cols, [ unpack( $template, $row ) ];
+                    else {
+                        while ( my $row = <$fh> ) {
+                            push @$rows_of_cols, [ unpack( $template, $row ) ];
+                        }
                     }
+                    1 }
+                ) {
+                    $ax->print_error_message( $@ );
+                    @$fields = @$form;
+                    next COL_WIDTHS;
                 }
                 $sql->{insert_into_args} = $rows_of_cols;
                 return 1;
@@ -279,7 +324,12 @@ sub parse_with_Spreadsheet_Read {
     require Spreadsheet::Read;
     my $book = delete $source->{saved_book};
     if ( ! defined $book ) {
-        $book = Spreadsheet::Read::ReadData( $file_fs, cells => 0, attr => 0, rc => 1, strip => 0 );
+        if ( ! eval {
+            $book = Spreadsheet::Read::ReadData( $file_fs, cells => 0, attr => 0, rc => 1, strip => 0 );
+            1 }
+        ) {
+            die "Read::Spreadsheet: $@";
+        }
         if ( ! defined $book ) {
             $tc->choose(
                 [ 'Press ENTER' ],

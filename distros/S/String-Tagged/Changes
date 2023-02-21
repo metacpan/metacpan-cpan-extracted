@@ -1,5 +1,9 @@
 Revision history for String-Tagged
 
+0.20    2023-02-15
+        [CHANGES]
+         * Added `->match_extents` method
+
 0.19    2023-02-06
         [CHANGES]
          * Document `sizepos` as a String::Tagged::Formatting tag

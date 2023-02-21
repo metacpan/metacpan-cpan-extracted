@@ -7,6 +7,18 @@ DISTRIBUTIONS
     requirements:
       ExtUtils::MakeMaker 0
       File::ShareDir::Install 0.06
+  File-Find-Rule-0.34
+    pathname: R/RC/RCLAMP/File-Find-Rule-0.34.tar.gz
+    provides:
+      File::Find::Rule 0.34
+      File::Find::Rule::Test::ATeam undef
+    requirements:
+      ExtUtils::MakeMaker 0
+      File::Find 0
+      File::Spec 0
+      Number::Compare 0
+      Test::More 0
+      Text::Glob 0.07
   File-ShareDir-Install-0.14
     pathname: E/ET/ETHER/File-ShareDir-Install-0.14.tar.gz
     provides:
@@ -183,6 +195,13 @@ DISTRIBUTIONS
       IO::Socket::IP 0.37
       Sub::Util 1.41
       perl 5.016
+  Number-Compare-0.03
+    pathname: R/RC/RCLAMP/Number-Compare-0.03.tar.gz
+    provides:
+      Number::Compare 0.03
+    requirements:
+      ExtUtils::MakeMaker 0
+      Test::More 0
   Sub-Uplevel-0.2800
     pathname: D/DA/DAGOLDEN/Sub-Uplevel-0.2800.tar.gz
     provides:
@@ -218,3 +237,12 @@ DISTRIBUTIONS
       perl 5.006001
       strict 0
       warnings 0
+  Text-Glob-0.11
+    pathname: R/RC/RCLAMP/Text-Glob-0.11.tar.gz
+    provides:
+      Text::Glob 0.11
+    requirements:
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      constant 0
+      perl 5.005030

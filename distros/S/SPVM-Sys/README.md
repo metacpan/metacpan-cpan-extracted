@@ -1,7 +1,3 @@
 # SPVM::Sys
 
-System Calls for File IO, User Manipulation, Process, Socket
-
-# Document
-
-https://metacpan.org/pod/SPVM::Sys
+<a href="https://metacpan.org/pod/SPVM::Sys">SPVM::Sys - CPAN</a>

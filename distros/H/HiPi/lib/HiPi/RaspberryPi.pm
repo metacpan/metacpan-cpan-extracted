@@ -2,7 +2,7 @@
 # Distribution : HiPi Modules for Raspberry Pi
 # File         : lib/HiPi/RaspberryPi.pm
 # Description  : Information about host Raspberry Pi
-# Copyright    : Copyright (c) 2013-2020 Mark Dootson
+# Copyright    : Copyright (c) 2013-2023 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -14,7 +14,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION ='0.86';
+our $VERSION ='0.88';
 
 my ( $btype1, $btype2, $btype3, $btype4) = ( 1, 2, 3, 4 );
 
@@ -196,14 +196,38 @@ my %_revinfostash = (
         '4' => 'Embest',
         '5' => 'Stadium',
     },
-    
     processor => {
         '0' => 'BCM2835',
         '1' => 'BCM2836',
         '2' => 'BCM2837',
         '3' => 'BCM2711',
     },
-    
+    processor_info => {
+        'BCM2835' => {
+            arm                 => 'ARM1176',
+            cores               => 1,
+            architecture_width  => 32,
+            raspios_supported   => [ 'armhf' ],
+        },
+        'BCM2836' => {
+            arm                 => 'Cortex-A7',
+            cores               => 4,
+            architecture_width  => 32,
+            raspios_supported   => [ 'armhf' ],
+        },
+        'BCM2837' => {
+            arm                 => 'Cortex-A53',
+            cores               => 4,
+            architecture_width  => 64,
+            raspios_supported   => [ 'armhf', 'arm64' ],
+        },
+        'BCM2711' => {
+            arm                 => 'Cortex-A72',
+            cores               => 4,
+            architecture_width  => 64,
+            raspios_supported   => [ 'armhf', 'arm64' ],
+        },
+    },
     type => {
         '0'  => 'Raspberry Pi Model A',                 # 00
         '1'  => 'Raspberry Pi Model B',                 # 01
@@ -223,9 +247,10 @@ my %_revinfostash = (
         '15' => 'UNKNOWN Rasberry Pi Model 15',         # 0F
         '16' => 'Raspberry Pi Compute Module 3 Plus',   # 10
         '17' => 'Raspberry Pi 4 Model B',               # 11
-        '18' => 'Raspberry Pi Zero 2',                  # 12
+        '18' => 'Raspberry Pi Zero 2 W',                # 12
         '19' => 'Raspberry Pi Model 400',               # 13
         '20' => 'Raspberry Pi Compute Module 4',        # 14
+        '21' => 'Raspberry Pi Compute Module 4S',       # 15
     },
     board_type => {
         '0'  => $btype2,
@@ -249,6 +274,7 @@ my %_revinfostash = (
         '18' => $btype3,
         '19' => $btype3,
         '20' => $btype4,
+        '21' => $btype4,
     },
     release => {
         '0'  => 'Q1 2013',
@@ -272,14 +298,23 @@ my %_revinfostash = (
         '18' => 'Q4 2021',
         '19' => 'Q4 2020',
         '20' => 'Q4 2020',
+        '21' => 'Q4 2020',
     },
     extended_release => {
         'a03111' => 'Q2 2019', #	4B	1.1	1GB	Sony UK
+        
         'b03111' => 'Q2 2019', #	4B	1.1	2GB	Sony UK
         'b03112' => 'Q1 2020', #	4B	1.2	2GB	Sony UK
+        'b03114' => 'Q3 2020', #	4B	1.4	2GB	Sony UK
+        'b03115' => 'Q1 2022', #	4B	1.5	2GB	Sony UK
+        
         'c03111' => 'Q2 2019', # 	4B	1.1	4GB	Sony UK
         'c03112' => 'Q1 2020', #	4B	1.2	4GB	Sony UK
+        'c03114' => 'Q2 2020', #	4B	1.4	4GB	Sony UK
+        'c03115' => 'Q1 2022', #	4B	1.5	4GB	Sony UK
+        
         'd03114' => 'Q2 2020', #	4B	1.4	8GB	Sony UK
+        'd03115' => 'Q1 2022', #	4B	1.5	8GB	Sony UK
     },
 );
 
@@ -330,6 +365,18 @@ sub serial_number { return $_config->{serial}; }
 sub get_alt_function_names { return $_alt_function_names; }
 
 sub alt_func_version { return $_alt_function_names_version; }
+
+sub architecture_width { return $_config->{processor_info}->{architecture_width}; }
+
+sub arm_core { return $_config->{processor_info}->{arm}; }
+
+sub rasberrypi_os_support {
+    return ( wantarray )
+        ? @{ $_config->{processor_info}->{raspios_supported} }
+        : join(', ', @{ $_config->{processor_info}->{raspios_supported} } );
+}
+
+sub number_of_cores { return $_config->{processor_info}->{cores}; }
 
 sub board_description {
     my $description = 'Unknown board type';
@@ -391,37 +438,58 @@ sub _configure {
     } else {
         # is this a scheme 0 or 1 number
         my $revnum = oct( '0x' . $rev );
+        #          NOQuuuWuFMMMCCCCPPPPTTTTTTTTRRRR
+        #                  ^
+        my $rev_scheme_new_type = ( $revnum >> 23 ) & 1;
         
-        my $schemenewt = 0b100000000000000000000000 & $revnum;
-        $schemenewt = $schemenewt >> 23;
-        
-        if ( $schemenewt ) {
-            my $schemerev = 0b1111 & $revnum;
-            my $schemetype = 0b111111110000 & $revnum;
-            $schemetype = $schemetype >> 4;
-            my $schemeproc = 0b1111000000000000 & $revnum;
-            $schemeproc = $schemeproc >> 12;
-            my $schememanu = 0b11110000000000000000 & $revnum;
-            $schememanu = $schememanu >> 16;
-            my $schemesize = 0b11100000000000000000000 & $revnum;
-            $schemesize = $schemesize >> 20;
+        if ( $rev_scheme_new_type ) {
+            #            NOQuuuWuFMMMCCCCPPPPTTTTTTTTRRRR
+
+            # revision                               RRRR
+            my $s_revision  =                      0b1111 & $revnum;
+            # raspberry type                 TTTTTTTT
+            my $s_raspberry_type =       ( 0b111111110000 & $revnum ) >> 4;
+            # processor                  PPPP
+            my $s_processor =        ( 0b1111000000000000 & $revnum ) >> 12;
+            # manufacturer           CCCC
+            my $s_manufacturer = ( 0b11110000000000000000 & $revnum ) >> 16;
+            # memory              MMM
+            my $s_memory =    ( 0b11100000000000000000000 & $revnum ) >> 20;           
+            # warranty   NOQuuuWuFMMMCCCCPPPPTTTTTTTTRRRR
+            #                  ^
+            my $s_warranty    = ( $revnum >> 25 ) & 1;
+            # otp read   NOQuuuWuFMMMCCCCPPPPTTTTTTTTRRRR
+            #              ^
+            my $s_otp_read    = ( $revnum >> 29 ) & 1;
+            # otp prog   NOQuuuWuFMMMCCCCPPPPTTTTTTTTRRRR
+            #             ^
+            my $s_otp_prog    = ( $revnum >> 30 ) & 1;
+            # no o volt  NOQuuuWuFMMMCCCCPPPPTTTTTTTTRRRR
+            #            ^
+            my $s_no_overvolt = ( $revnum >> 31 ) & 1;
             
             # base type
             my $binfo = $_revstash{$defaultkey};
                         
-            $binfo->{release}  = $_revinfostash{extended_release}->{$rev} || $_revinfostash{release}->{$schemetype} || 'Q1 2015';
-            $binfo->{model_name} = $_revinfostash{type}->{$schemetype} || qq(Unknown Raspberry Pi Type : $schemetype);
+            $binfo->{release}  = $_revinfostash{extended_release}->{$rev} || $_revinfostash{release}->{$s_raspberry_type} || 'Q1 2015';
+            $binfo->{model_name} = $_revinfostash{type}->{$s_raspberry_type} || qq(Unknown Raspberry Pi Type : $s_raspberry_type);
             $binfo->{model_name} = $device_tree_boardname if $device_tree_boardname;
-            $binfo->{memory}   = $_revinfostash{memsize}->{$schemesize} || 256;
-            $binfo->{manufacturer} = $_revinfostash{manufacturer}->{$schememanu} || 'Sony';
-            $binfo->{board_type} =  $_revinfostash{board_type}->{$schemetype} || $board_type;
-            $binfo->{processor} = $_revinfostash{processor}->{$schemeproc} || 'BCM2835';
+            $binfo->{memory}   = $_revinfostash{memsize}->{$s_memory} || 256;
+            $binfo->{manufacturer} = $_revinfostash{manufacturer}->{$s_manufacturer} || 'Sony';
+            $binfo->{board_type} =  $_revinfostash{board_type}->{$s_raspberry_type} || $board_type;
+            $binfo->{processor} = $_revinfostash{processor}->{$s_processor} || 'BCM2835';
             $binfo->{revision} = $rev;
-            $binfo->{revisionnumber} = $schemerev;
+            $binfo->{revisionnumber} = $s_revision;
+            $binfo->{processor_info} = $_revinfostash{processor_info}->{$binfo->{processor}};
             
-            $israspberry2 = ( $schemetype == 4 ) ? 1 : 0;
-            $israspberry3 = ( $schemetype == 8 || $schemetype == 10 || $schemetype == 13 || $schemetype == 14 || $schemetype == 16 || $schemetype == 18 ) ? 1 : 0;
-            $israspberry4 = ( $schemetype == 17 ) ? 1 : 0;
+            $israspberry2 = ( $s_raspberry_type == 4 ) ? 1 : 0;
+            $israspberry3 = ( $s_raspberry_type == 8  ||
+                              $s_raspberry_type == 10 ||
+                              $s_raspberry_type == 13 ||
+                              $s_raspberry_type == 14 ||
+                              $s_raspberry_type == 16 ||
+                              $s_raspberry_type == 18 ) ? 1 : 0;
+            $israspberry4 = ( $s_raspberry_type == 17 ) ? 1 : 0;
             
             $_config = { %$binfo };
         } else {
@@ -478,6 +546,7 @@ sub validpins {
 }
 
 sub dump_board_info {
+    my $processor = $_config->{processor};
     my $dump = qq(--------------------------------------------------\n);
     $dump .= qq(Raspberry Pi Board Info\n);
     $dump .= qq(--------------------------------------------------\n);
@@ -485,7 +554,7 @@ sub dump_board_info {
     $dump .= qq(Released         : $_config->{release}\n);
     $dump .= qq(Manufacturer     : $_config->{manufacturer}\n);
     $dump .= qq(Memory           : $_config->{memory}\n);
-    $dump .= qq(Processor        : $_config->{processor}\n);
+    $dump .= qq(Processor        : $processor\n);
     $dump .= qq(Hardware         : $_config->{hardware}\n);
     my $description = board_description();
     $dump .= qq(Description      : $description\n);
@@ -502,6 +571,11 @@ sub dump_board_info {
     $dump .= q(Is Raspberry 4   : ) . (($israspberry4) ? 'Yes' : 'No' ) . qq(\n);
     
     $dump .= q(Alt Function Map : Version ) . alt_func_version() . qq(\n);
+    
+    $dump .= qq(ARM Core         : ) . arm_core() . qq(\n);
+    $dump .= qq(Number of Cores  : ) . number_of_cores() . qq(\n);
+    $dump .= qq(Architecture     : Width ) . architecture_width() . qq( bit\n);
+    $dump .= qq(OS arch support  : ) . rasberrypi_os_support() . qq(\n);
     
     return $dump;
 }

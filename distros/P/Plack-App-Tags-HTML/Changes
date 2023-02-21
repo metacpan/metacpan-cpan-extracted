@@ -1,3 +1,14 @@
+0.11 2023-02-10T23:06:45+01:00
+ - Fix doc and regen examples.
+ - Update copyright years.
+ - Update to new Plack::Component::Tags::HTML@0.12.
+
+0.10 2023-02-09T11:58:28+01:00
+ - Add test for 'data_init' accessor.
+ - Add test for running with init() method without 'data_init' accessor.
+ - Fix running with init() method without 'data_init' accessor.
+ - Update to new Plack::Component::Tags::HTML.
+
 0.09 2022-11-03T21:36:40+01:00
  - API change: Add 'data_init' accessor.
 

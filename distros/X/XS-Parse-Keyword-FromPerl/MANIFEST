@@ -1,0 +1,19 @@
+Build.PL
+Changes
+hax/perl-additions.c.inc
+hax/perl-backcompat.c.inc
+lib/XS/Parse/Keyword/FromPerl.pm
+lib/XS/Parse/Keyword/FromPerl.xs
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01donothing.t
+t/02new-op.t
+t/10pieces-simple.t
+t/11pieces-op.t
+t/12pieces-pad.t
+t/13pieces-structural.t
+t/99pod.t

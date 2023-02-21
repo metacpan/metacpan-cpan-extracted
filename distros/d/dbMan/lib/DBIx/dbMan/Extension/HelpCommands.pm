@@ -5,11 +5,11 @@ use base 'DBIx::dbMan::Extension';
 use Text::FormatTable;
 use Term::ANSIColor;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 1;
 
-sub IDENTIFICATION { return "000001-000010-000008"; }
+sub IDENTIFICATION { return "000001-000010-000009"; }
 
 sub preference { return 0; }
 
@@ -66,7 +66,7 @@ sub handle_action {
 			}
 		} elsif ($action{type} eq 'license') {
 			$action{output} = <<'EOF';
-(c) Copyright 1999-2012 by Milan Sorm <sorm@is4u.cz>
+(c) Copyright 1999-2023 by Milan Sorm <sorm@is4u.cz>
 All rights reserved.
 			
 This program is free software; you can redistribute it and/or modify it

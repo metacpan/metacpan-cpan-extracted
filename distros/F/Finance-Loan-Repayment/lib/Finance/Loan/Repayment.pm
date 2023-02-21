@@ -2,7 +2,7 @@ package Finance::Loan::Repayment;
 use Moose;
 
 # ABSTRACT: Play with loans, rates and repayment options
-our $VERSION = '1.4';
+our $VERSION = '1.5';
 
 has loan => (
     is       => 'rw',
@@ -14,6 +14,11 @@ has rate => (
     is       => 'ro',
     isa      => 'Num',
     required => 1,
+);
+
+has duration => (
+    is       => 'ro',
+    isa      => 'Num',
 );
 
 has principal_payment => (
@@ -31,10 +36,29 @@ has total_payment => (
     isa => 'Num',
 );
 
+sub BUILDARGS {
+    my $self = shift;
+    my %args = @_;
+
+    if ($args{rate} && exists $args{duration} && !$args{total_payment}) {
+        my $monthly_rate = $args{rate} / 100 / 12;
+        my $duration = $args{duration};
+        my $a = $args{loan} * ($monthly_rate * ((1 + $monthly_rate) ** $duration));
+        my $b = ((1 + $monthly_rate) ** $duration) - 1;
+        $args{total_payment} = $a / $b;
+    }
+    return \%args;
+}
+
+sub _interest_per_month {
+    my $loan = shift;
+    my $rate = shift;
+    return $loan * ($rate / 100 / 12);
+}
+
 sub interest_per_month {
     my $self = shift;
-    my $loan = shift // $self->loan;
-    return $loan * ($self->rate / 100 / 12);
+    return _interest_per_month(shift // $self->loan, $self->rate);
 }
 
 sub principal_per_month {
@@ -47,13 +71,13 @@ sub principal_per_month {
         return $self->_check_payment_vs_loan($self->principal_payment, $loan);
     }
     elsif ($self->total_payment) {
-        if ($self->total_payment < $interest) {
-            return $interest + .01;
+        if ($self->total_payment > $interest) {
+            return $self->_check_payment_vs_loan(
+                $self->total_payment - $interest,
+                $loan
+            );
         }
-        return $self->_check_payment_vs_loan(
-            $self->total_payment - $interest,
-            $loan
-        );
+        die "Total payment is too small to cover interest";
     }
     elsif ($self->interest_off) {
         my $new_loan = (($interest - $self->interest_off) * 12)
@@ -83,7 +107,7 @@ Finance::Loan::Repayment - Play with loans, rates and repayment options
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =head1 SYNOPSIS
 

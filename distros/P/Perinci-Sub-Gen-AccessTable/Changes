@@ -1,3 +1,8 @@
+0.591   2023-02-12  Released-By: PERLANCAR; Urgency: medium
+
+        - Support TableData object as data source.
+
+
 0.590   2022-11-02  Released-By: PERLANCAR; Urgency: medium
 
         - Enable regex searching.

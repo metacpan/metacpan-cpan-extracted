@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More tests => 7;
+use Test2::V0;
 
 use String::Tagged::HTML;
 
@@ -32,3 +32,10 @@ is( $str->as_html, "<b>bbb <i>b+i</i></b><i> iii</i>", 'bold/italic overlapped' 
 
 $str = String::Tagged::HTML->new_tagged( "classy text", span => { class => "main" } );
 is( $str->as_html, qq(<span class="main">classy text</span>), 'bold' );
+
+$str = String::Tagged::HTML->new( "one and two" );
+$str->apply_tag( 0, 3, code => 1 );
+$str->apply_tag( 8, 3, code => 1 );
+is( $str->as_html, "<code>one</code> and <code>two</code>" );
+
+done_testing;

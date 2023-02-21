@@ -1,5 +1,5 @@
 package Crypt::Passphrase::SHA1::Hex;
-$Crypt::Passphrase::SHA1::Hex::VERSION = '0.006';
+$Crypt::Passphrase::SHA1::Hex::VERSION = '0.007';
 use parent 'Crypt::Passphrase::Validator';
 
 use Digest::SHA 'sha1_hex';
@@ -16,12 +16,12 @@ sub accepts_hash {
 
 sub verify_password {
 	my ($self, $password, $hash) = @_;
-	return sha1_hex($password) eq $hash;
+	return sha1_hex($password) eq lc $hash;
 }
 
 1;
 
-# ABSTRACT: Validate against hexed MD5 hashes with Crypt::Passphrase
+# ABSTRACT: Validate against hexed SHA1 hashes with Crypt::Passphrase
 
 __END__
 
@@ -31,11 +31,11 @@ __END__
 
 =head1 NAME
 
-Crypt::Passphrase::SHA1::Hex - Validate against hexed MD5 hashes with Crypt::Passphrase
+Crypt::Passphrase::SHA1::Hex - Validate against hexed SHA1 hashes with Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 DESCRIPTION
 
@@ -49,7 +49,7 @@ This creates a new SHA1 validator. It takes no arguments.
 
 =head2 accepts_hash($hash)
 
-This (heuristically) determines if we may be dealing with a hex encoded md5 sum.
+This (heuristically) determines if we may be dealing with a hex encoded sha1 sum.
 
 =head2 verify_hash($password, $hash)
 

@@ -432,9 +432,10 @@ subtest 'op_buffer' => sub {
 subtest 'op_buffer_time' => sub {
     my $source = cold('-12-34-56');
     my $o = $source->pipe(op_buffer_time(3));
-    obs_is $o, ['---a--b--', {
+    obs_is $o, ['---a--b-c', {
         a => [ 1, 2 ],
         b => [ 3, 4 ],
+        c => [ 5, 6 ],
     }];
 };
 
@@ -832,6 +833,59 @@ subtest 'op_audit' => sub {
         op_audit(sub { cold('--#') }),
     );
     obs_is $o, ['---#'];
+};
+
+subtest 'op_single' => sub {
+    my $o = cold('-01')->pipe(
+        op_single(sub { $_ % 2 == 0 }),
+    );
+    obs_is $o, ['--0'];
+
+    $o = cold('1-')->pipe(
+        op_single(),
+    );
+    obs_is $o, ['-1'];
+};
+
+subtest 'op_merge_all' => sub {
+    my $o = rx_of(0, 1, 5, 2)->pipe(
+        op_map(sub { rx_timer($_) }),
+        op_merge_all(1),
+    );
+    obs_is $o, ['00----0-0'];
+};
+
+subtest 'op_delay_when' => sub {
+    my $o = rx_of(3, 4, 5)->pipe(
+        op_delay_when(sub { rx_timer($_) }),
+    );
+    obs_is $o, ['---345'];
+};
+
+subtest 'op_distinct' => sub {
+    my $o = rx_of(1, 1, 2, 2, 2, 1, 2, 3, 4, 3, 2, 1)->pipe(
+        op_distinct(),
+    );
+    obs_is $o, ['(1234)'];
+
+    $o = rx_of(
+        { age => 4, name => 'Foo'},
+        { age => 7, name => 'Bar'},
+        { age => 5, name => 'Foo'},
+    )->pipe(
+        op_distinct(sub { $_->{name} }),
+    );
+    obs_is $o, ['(ab)', {
+        a => { age => 4, name => 'Foo' },
+        b => { age => 7, name => 'Bar' },
+    }];
+};
+
+subtest 'op_skip_last' => sub {
+    my $o = cold('-a--b--c-d--')->pipe(
+        op_skip_last(2),
+    );
+    obs_is $o, ['-------a-b--'];
 };
 
 done_testing();

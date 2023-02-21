@@ -99,6 +99,7 @@ lib/DBIx/dbMan/Extension/SQLOracleOutput.pm
 lib/DBIx/dbMan/Extension/SQLOutputCube.pm
 lib/DBIx/dbMan/Extension/SQLOutputHTML.pm
 lib/DBIx/dbMan/Extension/SQLOutputInsert.pm
+lib/DBIx/dbMan/Extension/SQLOutputMarkdown.pm
 lib/DBIx/dbMan/Extension/SQLOutputNULL.pm
 lib/DBIx/dbMan/Extension/SQLOutputOldTable.pm
 lib/DBIx/dbMan/Extension/SQLOutputPlain.pm
@@ -123,6 +124,8 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 META.yml
+MYMETA.json
+MYMETA.yml
 README
 t/01core.t
 t/02dbi.t

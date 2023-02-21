@@ -1,67 +1,68 @@
 use Test::More tests => 6;
 
-#$Id: madness_w.t 26 2006-04-16 15:18:52Z demerphq $#
-
-BEGIN { use_ok( 'Data::Dump::Streamer', qw(:undump weaken) ); }
+BEGIN { use_ok('Data::Dump::Streamer', qw(:undump weaken)); }
 use strict;
 use warnings;
 use Data::Dumper;
 
-SKIP:{
-    my ($_item,$_ref);
-    $_ref=\$_item;
-    skip ( "No Weak Refs", 5 )
+SKIP: {
+    my ($_item, $_ref);
+    $_ref= \$_item;
+    skip("No Weak Refs", 5)
         unless eval { weaken($_ref) };
 
 # imports same()
-require "./t/test_helper.pl";
+    require "./t/test_helper.pl";
+
 # use this one for simple, non evalable tests. (GLOB)
 #   same ( $got,$expected,$name,$obj )
 #
 # use this one for eval checks and dumper checks but NOT for GLOB's
 # same ( $name,$obj,$expected,@args )
 
-my $dump;
-my $o = Data::Dump::Streamer->new();
+    my $dump;
+    my $o= Data::Dump::Streamer->new();
 
-isa_ok( $o, 'Data::Dump::Streamer' );
+    isa_ok($o, 'Data::Dump::Streamer');
 
-{
-    local *icky;
-    *icky=\ "icky";
-    our $icky;
-    my $id = 0;
-    my $btree;
-    $btree = sub {
-        my ( $d, $m, $p ) = @_;
-        return $p
-          if $d > $m;
-        return [ $btree->( $d + 1, $m, $p . '0' ), $btree->( $d + 1, $m, $p . '1' ) ];
-    };
+    {
+        local *icky;
+        *icky= \ "icky";
+        our $icky;
+        my $id= 0;
+        my $btree;
+        $btree= sub {
+            my ($d, $m, $p)= @_;
+            return $p
+                if $d > $m;
+            return [
+                $btree->($d + 1, $m, $p . '0'),
+                $btree->($d + 1, $m, $p . '1') ];
+        };
 
-    my $t = $btree->( 0, 1, '' );
-    my ( $x, $y, $qr );
-    $x = \$y;
-    $y = \$x;
-    $qr = bless qr/this is a test/m, 'foo_bar';
-    weaken($y);
-    my $array = [];
-    my $hash = bless {
-        A      => \$array,
-        'B-B'  => ['$array'],
-        'CCCD' => [ 'foo', 'bar' ],
-        'E'=>\\1,
-        'F'=>\\undef,
-        'Q'=>sub{\@_}->($icky),
-      },
-      'ThisIsATest';
-    $hash->{G}=\$hash;
-    my $boo = 'boo';
-    @$array = ( \$hash, \$hash, \$hash, \$qr, \$qr, \'foo', \$boo );
-    my $cap = capture( $x, $y, $qr, $x, $y, $qr );
+        my $t= $btree->(0, 1, '');
+        my ($x, $y, $qr);
+        $x= \$y;
+        $y= \$x;
+        $qr= bless qr/this is a test/m, 'foo_bar';
+        weaken($y);
+        my $array= [];
+        my $hash= bless {
+            A      => \$array,
+            'B-B'  => ['$array'],
+            'CCCD' => [ 'foo', 'bar' ],
+            'E'    => \\1,
+            'F'    => \\undef,
+            'Q'    => sub { \@_ }
+                ->($icky),
+            },
+            'ThisIsATest';
+        $hash->{G}= \$hash;
+        my $boo= 'boo';
+        @$array= (\$hash, \$hash, \$hash, \$qr, \$qr, \'foo', \$boo);
+        my $cap= capture($x, $y, $qr, $x, $y, $qr);
 
-
-    same( 'Madness cap( $qr,$qr )', $o ,<<'EXPECT', capture( $qr, $qr ) );
+        same('Madness cap( $qr,$qr )', $o, <<'EXPECT', capture($qr, $qr));
 $ARRAY1 = [
             bless( qr/this is a test/m, 'foo_bar' ),
             'A: $ARRAY1->[0]'
@@ -69,10 +70,8 @@ $ARRAY1 = [
 alias_av(@$ARRAY1, 1, $ARRAY1->[0]);
 EXPECT
 
-
-
-    #same( $dump = $o->Data( $cap,$array,$boo,$hash,$qr )->Out, <<'EXPECT', "Total Madness", $o );
-    same( "Total Madness", $o,<<'EXPECT',( $cap,$array,$boo,$hash,$qr ) );
+        #same( $dump = $o->Data( $cap,$array,$boo,$hash,$qr )->Out, <<'EXPECT', "Total Madness", $o );
+        same("Total Madness", $o, <<'EXPECT', ($cap, $array, $boo, $hash, $qr));
 $ARRAY1 = [
             'R: $ARRAY1->[1]',
             'R: $ARRAY1->[0]',
@@ -117,37 +116,40 @@ alias_av(@$ARRAY1, 2, $foo_bar1);
 alias_av(@$ARRAY1, 5, $foo_bar1);
 EXPECT
 
+    }
+    {
+        my ($x, $y);
+        $x= \$y;
+        $y= \$x;
 
+        my $a= [ 1, 2 ];
+        $a->[0]= \$a->[1];
+        $a->[1]= \$a->[0];
+        weaken($a->[1]);
+        weaken($x);
 
-}
-{
-    my ($x,$y);
-    $x=\$y;
-    $y=\$x;
+        #$cap->[-1]=5;
+        my $s;
+        $s= \$s;
+        my $bar= 'bar';
+        my $foo= 'foo';
+        my $halias= { foo => 1, bar => 2 };
+        alias_hv(%$halias, 'foo',  $foo);
+        alias_hv(%$halias, 'bar',  $bar);
+        alias_hv(%$halias, 'foo2', $foo);
 
-    my $a=[1,2];
-    $a->[0]=\$a->[1];
-    $a->[1]=\$a->[0];
-    weaken($a->[1]);
-    weaken($x);
-    #$cap->[-1]=5;
-    my $s;
-    $s=\$s;
-    my $bar='bar';
-    my $foo='foo';
-    my $halias= {foo=>1,bar=>2};
-    alias_hv(%$halias,'foo',$foo);
-    alias_hv(%$halias,'bar',$bar);
-    alias_hv(%$halias,'foo2',$foo);
+        my ($t, $u, $v, $w)= (1, 2, 3, 4);
+        my $cap= sub { \@_ }
+            ->($x, $y);
+        my $q1= qr/foo/;
+        my $q2= bless qr/bar/, 'bar';
+        my $q3= \bless qr/baz/, 'baz';
 
-    my ($t,$u,$v,$w)=(1,2,3,4);
-    my $cap=sub{ \@_ }->($x,$y);
-    my $q1=qr/foo/;
-    my $q2=bless qr/bar/,'bar';
-    my $q3=\bless qr/baz/,'baz';
-    #same( $dump = $o->Data( $a,$q1,$q2,$q3,[$x,$y],[$s,$x,$y],$t,$u,$v,$t,[1,2,3],{1..4},$cap,$cap,$t,$u,$v,$halias)->Out, <<'EXPECT', "More Madness", $o );
-    same(  "More Madness", $o ,
-        <<'EXPECT',( $a,$q1,$q2,$q3,[$x,$y],[$s,$x,$y],$t,$u,$v,$t,[1,2,3],{1..4},$cap,$cap,$t,$u,$v,$halias));
+        #same( $dump = $o->Data( $a,$q1,$q2,$q3,[$x,$y],[$s,$x,$y],$t,$u,$v,$t,[1,2,3],{1..4},$cap,$cap,$t,$u,$v,$halias)->Out, <<'EXPECT', "More Madness", $o );
+        same(
+            "More Madness",
+            $o,
+            <<'EXPECT', ($a, $q1, $q2, $q3, [ $x, $y ], [ $s, $x, $y ], $t, $u, $v, $t, [ 1, 2, 3 ], { 1 .. 4 }, $cap, $cap, $t, $u, $v, $halias));
 $ARRAY1 = [
             'R: $ARRAY1->[1]',
             'R: $ARRAY1->[0]'
@@ -204,17 +206,19 @@ $HASH2 = {
 alias_hv(%$HASH2, 'foo2', $HASH2->{foo});
 EXPECT
 
-}
-{
-    skip ( "Causes error at global destruction on 5.8.0", 1 )
-        if $]==5.008;
-    #local $Data::Dump::Streamer::DEBUG = 1;
-    my $x;
-    $x = sub { \@_ }->( $x, $x );
-    my $y = $x; #keep it alive
-    weaken($x);
-    push @$x, $x;
-    same(   "Tye Alias Array", $o, <<'EXPECT',( $x ) );
+    }
+    {
+        skip("Causes error at global destruction on 5.8.0", 1)
+            if $] == 5.008;
+
+        #local $Data::Dump::Streamer::DEBUG = 1;
+        my $x;
+        $x= sub { \@_ }
+            ->($x, $x);
+        my $y= $x;    #keep it alive
+        weaken($x);
+        push @$x, $x;
+        same("Tye Alias Array", $o, <<'EXPECT', ($x));
 $ARRAY1 = [
             'A: $ARRAY1',
             'A: $ARRAY1',
@@ -225,8 +229,8 @@ alias_av(@$ARRAY1, 1, $ARRAY1);
 $ARRAY1->[2] = $ARRAY1;
 weaken($ARRAY1);
 EXPECT
-}
-undef $o;
+    }
+    undef $o;
 
 }
 

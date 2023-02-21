@@ -5,12 +5,13 @@ use strict;
 use warnings;
 use Log::ger;
 
+use Cwd;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-03'; # DATE
+our $DATE = '2023-02-18'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.008'; # VERSION
+our $VERSION = '1.017'; # VERSION
 
 our @EXPORT_OK = qw(
                        gen_csv_util
@@ -155,6 +156,8 @@ sub _instantiate_parser {
         $tcsv_opts{"quote_char"}  = undef;
         $tcsv_opts{"escape_char"} = undef;
     }
+    $tcsv_opts{always_quote} = 1 if $args->{"${prefix}always_quote"};
+    $tcsv_opts{quote_empty} = 1 if $args->{"${prefix}quote_empty"};
 
     Text::CSV_XS->new(\%tcsv_opts);
 }
@@ -305,7 +308,7 @@ sub _select_fields {
     [100, "Continue", [\@selected_fields, \@selected_field_idxs_array]];
 }
 
-our $xcomp_csvfiles = [filename => {file_ext_filter => qr/\.[tc]sv$/i}];
+our $xcomp_csvfiles = [filename => {file_ext_filter => qr/^[tc]sv$/i}];
 
 our %argspecs_csv_input = (
     input_header => {
@@ -436,6 +439,40 @@ Defaults to `\\` (backslash). Overrides `--output-tsv` option.
 _
         tags => ['category:output'],
     },
+    output_always_quote => {
+        summary => 'Whether to always quote values',
+        schema => 'bool*',
+        default => 0,
+        description => <<'_',
+
+When set to false (the default), values are quoted only when necessary:
+
+    field1,field2,"field three contains comma (,)",field4
+
+When set to true, then all values will be quoted:
+
+    "field1","field2","field three contains comma (,)","field4"
+
+_
+        tags => ['category:output'],
+    },
+    output_quote_empty => {
+        summary => 'Whether to quote empty values',
+        schema => 'bool*',
+        default => 0,
+        description => <<'_',
+
+When set to false (the default), empty values are not quoted:
+
+    field1,field2,,field4
+
+When set to true, then empty values will be quoted:
+
+    field1,field2,"",field4
+
+_
+        tags => ['category:output'],
+    },
 );
 
 our %argspecopt_input_filename = (
@@ -483,6 +520,46 @@ our %argspecopt_overwrite = (
     },
 );
 
+our %argspecsopt_inplace = (
+    inplace => {
+        summary => 'Output to the same file as input',
+        schema => 'true*',
+        description => <<'_',
+
+Normally, you output to a different file than input. If you try to output to the
+same file (`-o INPUT.csv -O`) you will clobber the input file; thus the utility
+prevents you from doing it. However, with this `--inplace` option, you can
+output to the same file. Like perl's `-i` option, this will first output to a
+temporary file in the same directory as the input file then rename to the final
+file at the end. You cannot specify output file (`-o`) when using this option,
+but you can specify backup extension with `-b` option.
+
+Some caveats:
+
+- if input file is a symbolic link, it will be replaced with a regular file;
+- renaming (implemented using `rename()`) can fail if input filename is too long;
+- value specified in `-b` is currently not checked for acceptable characters;
+- things can also fail if permissions are restrictive;
+
+_
+        tags => ['category:output'],
+    },
+    inplace_backup_ext => {
+        summary => 'Extension to add for backup of input file',
+        schema => 'str*',
+        default => '',
+        description => <<'_',
+
+In inplace mode (`--inplace`), if this option is set to a non-empty string, will
+rename the input file using this extension as a backup. The old existing backup
+will be overwritten, if any.
+
+_
+        cmdline_aliases => {b=>{}},
+        tags => ['category:output'],
+    },
+);
+
 our %argspecopt_output_filename = (
     output_filename => {
         summary => 'Output filename',
@@ -519,6 +596,16 @@ our %argspecopt_field = (
     field => {
         summary => 'Field name',
         schema => 'str*',
+        cmdline_aliases => { f=>{} },
+        completion => \&_complete_field,
+    },
+);
+
+our %argspecopt_field_1 = (
+    field => {
+        summary => 'Field name',
+        schema => 'str*',
+        pos => 1,
         cmdline_aliases => { f=>{} },
         completion => \&_complete_field,
     },
@@ -852,6 +939,14 @@ sub _add_arg_pos {
     }
 }
 
+sub _randext {
+    state $charset = [0..9, "A".."Z","a".."z"];
+    my $len = shift;
+    my $ext = "";
+    for (1..$len) { $ext .= $charset->[rand @$charset] }
+    $ext;
+}
+
 $SPEC{gen_csv_util} = {
     v => 1.1,
     summary => 'Generate a CSV utility',
@@ -862,6 +957,13 @@ function (code and metadata). You can then produce a CLI from the Rinci function
 simply using <pm:Perinci::CmdLine::Gen> or, if you use <pm:Dist::Zilla>,
 <pm:Dist::Zilla::Plugin::GenPericmdScript> or, if on the command-line,
 <prog:gen-pericmd-script>.
+
+Using this routine, by providing just one or a few hooks and setting some
+parameters like a couple of extra arguments, you will get a complete CLI with
+decent POD/manpage, ability to read one or multiple CSV's and write one or
+multiple CSV's, some command-line options to customize how the input CSV's
+should be parsed and how the output CSV's should be formatted and named. Your
+CLI also has tab completion, usage and help message, and other features.
 
 To create a CSV utility, you specify a `name` (e.g. `csv_dump`; must be a valid
 unqualified Perl identifier/function name) and optionally `summary`,
@@ -916,6 +1018,12 @@ The order of the hooks, in processing chronological order:
   called even when user specify `--no-input-header`, in which case the header
   row will be the generated `["field1", "field2", ...]`. You can use this hook
   e.g. to add/remove/rearrange fields.
+
+  You can set `$r->{wants_fill_rows}` to a defined false if you do not want
+  `$r->{input_rows}` to be filled with empty string elements when it contains
+  less than the number of fields (in case of sparse values at the end). Normally
+  you only want to do this when you want to do checking, e.g. in
+  <prog:csv-check-rows>.
 
 * on_input_data_row
 
@@ -1261,6 +1369,11 @@ sub gen_csv_util {
           MAIN_EVAL:
             eval {
 
+                # do some checking
+                if ($util_args{inplace} && (!$reads_csv || !$writes_csv)) {
+                    die [412, "--inplace cannot be specified when we do not read & write CSV"];
+                }
+
                 if ($on_begin) {
                     log_trace "[csvutil] Calling on_begin hook handler ...";
                     $on_begin->($r);
@@ -1270,11 +1383,40 @@ sub gen_csv_util {
                     # set output filenames, if not yet
                     unless ($r->{output_filenames}) {
                         my @output_filenames;
-                        if ($writes_multiple_csv) {
+                        if ($util_args{inplace}) {
+                            for my $input_filename (@{ $r->{input_filenames} }) {
+                                my $output_filename;
+                                while (1) {
+                                    $output_filename = $input_filename . "." . _randext(5);
+                                    last unless -e $output_filename;
+                                }
+                                push @output_filenames, $output_filename;
+                            }
+                        } elsif ($writes_multiple_csv) {
                             @output_filenames = @{ $util_args{output_filenames} // ['-'] };
                         } else {
                             @output_filenames = ($util_args{output_filename} // '-');
                         }
+
+                      CHECK_OUTPUT_FILENAME_SAME_AS_INPUT_FILENAME: {
+                            my %seen_output_abs_path; # key = output filename
+                            last unless $reads_csv && $writes_csv;
+                            for my $input_filename (@{ $r->{input_filenames} }) {
+                                next if $input_filename eq '-';
+                                my $input_abs_path = Cwd::abs_path($input_filename);
+                                die [500, "Can't get absolute path of input filename '$input_filename'"] unless $input_abs_path;
+                                for my $output_filename (@output_filenames) {
+                                    next if $output_filename eq '-';
+                                    next if $seen_output_abs_path{$output_filename};
+                                    my $output_abs_path = Cwd::abs_path($output_filename);
+                                    die [500, "Can't get absolute path of output filename '$output_filename'"] unless $output_abs_path;
+                                    die [412, "Cannot set output filename to '$output_filename' ".
+                                         ($output_filename ne $output_abs_path ? "($output_abs_path) ":"").
+                                         "because it is the same as input filename and input will be clobbered; use --inplace to avoid clobbering<"]
+                                        if $output_abs_path eq $input_abs_path;
+                                }
+                            }
+                        } # CHECK_OUTPUT_FILENAME_SAME_AS_INPUT_FILENAME
 
                         $r->{output_filenames} = \@output_filenames;
                         $r->{output_num_of_files} //= scalar(@output_filenames);
@@ -1514,6 +1656,14 @@ sub gen_csv_util {
                                 }
 
                             } else {
+                                # fill up the elements of row to the number of
+                                # fields, in case the row contains sparse values
+                                unless (defined $r->{wants_fill_rows} && !$r->{wants_fill_rows}) {
+                                    if (@{ $r->{input_row} } < @{ $r->{input_fields} }) {
+                                        splice @{ $r->{input_row} }, scalar(@{ $r->{input_row} }), 0, (("") x (@{ $r->{input_fields} } - @{ $r->{input_row} }));
+                                    }
+                                }
+
                                 # generate the hashref version of row if utility
                                 # requires it
                                 if ($r->{wants_input_row_as_hashref}) {
@@ -1581,7 +1731,6 @@ sub gen_csv_util {
                 }
 
                 # cleanup stash from csv-outputting-related keys
-                delete $r->{output_filenames};
                 delete $r->{output_num_of_files};
                 delete $r->{output_filenum};
                 if ($r->{output_fh}) {
@@ -1591,6 +1740,24 @@ sub gen_csv_util {
                     }
                     delete $r->{output_fh};
                 }
+                if ($r->{util_args}{inplace}) {
+                    my $output_filenum = $r->{output_filenum} // 0;
+                    my $i = -1;
+                    for my $output_filename (@{ $r->{output_filenames} }) {
+                        $i++;
+                        last if $i > $output_filenum;
+                        (my $input_filename = $output_filename) =~ s/\.\w{5}\z//
+                            or die [500, "BUG: Can't get original input file '$output_filename'"];
+                        if (length(my $ext = $r->{util_args}{inplace_backup_ext})) {
+                            my $backup_filename = $input_filename . $ext;
+                            log_info "[csvutil] Backing up input file '$output_filename' -> '$backup_filename' ...";
+                            rename $input_filename, $backup_filename or die [500, "Can't rename '$input_filename' -> '$backup_filename': $!"];
+                        }
+                        log_info "[csvutil] Renaming from temporary output file '$output_filename' -> '$input_filename' ...";
+                        rename $output_filename, $input_filename or die [500, "Can't rename back '$output_filename' -> '$input_filename': $!"];
+                    }
+                }
+                delete $r->{output_filenames};
                 delete $r->{output_filename};
                 delete $r->{output_rownum};
                 delete $r->{output_data_rownum};
@@ -1658,12 +1825,26 @@ sub gen_csv_util {
             if ($writes_csv) {
                 $meta->{args}{$_} = {%{$argspecs_csv_output{$_}}} for keys %argspecs_csv_output;
 
+                if ($reads_csv) {
+                    $meta->{args}{$_} = {%{$argspecsopt_inplace{$_}}} for keys %argspecsopt_inplace;
+                    $meta->{args_rels}{'dep_all&'} //= [];
+                    push @{ $meta->{args_rels}{'dep_all&'} }, ['inplace_backup_ext', ['inplace']];
+                }
+
                 if ($writes_multiple_csv) {
                     $meta->{args}{output_filenames} = {%{$argspecopt_output_filenames{output_filenames}}};
                     _add_arg_pos($meta->{args}, 'output_filenames', 'slurpy');
+                    if ($reads_csv) {
+                        $meta->{args_rels}{'choose_one&'} //= [];
+                        push @{ $meta->{args_rels}{'choose_one&'} }, [qw/output_filenames inplace/];
+                    }
                 } else {
                     $meta->{args}{output_filename} = {%{$argspecopt_output_filename{output_filename}}};
                     _add_arg_pos($meta->{args}, 'output_filename');
+                    if ($reads_csv) {
+                        $meta->{args_rels}{'choose_one&'} //= [];
+                        push @{ $meta->{args_rels}{'choose_one&'} }, [qw/output_filename inplace/];
+                    }
                 }
 
                 $meta->{args}{overwrite} = {%{$argspecopt_overwrite{overwrite}}};
@@ -1710,7 +1891,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 1.008 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2023-02-03.
+This document describes version 1.017 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2023-02-18.
 
 =head1 DESCRIPTION
 
@@ -1718,103 +1899,109 @@ This distribution contains the following CLI utilities:
 
 =over
 
-=item * L<csv-add-fields>
+=item 1. L<csv-add-fields>
 
-=item * L<csv-avg>
+=item 2. L<csv-avg>
 
-=item * L<csv-check-cell>
+=item 3. L<csv-check-cell-values>
 
-=item * L<csv-check-field>
+=item 4. L<csv-check-field-names>
 
-=item * L<csv-check-values>
+=item 5. L<csv-check-field-values>
 
-=item * L<csv-concat>
+=item 6. L<csv-check-rows>
 
-=item * L<csv-convert-to-hash>
+=item 7. L<csv-concat>
 
-=item * L<csv-csv>
+=item 8. L<csv-convert-to-hash>
 
-=item * L<csv-delete-fields>
+=item 9. L<csv-csv>
 
-=item * L<csv-dump>
+=item 10. L<csv-delete-fields>
 
-=item * L<csv-each-row>
+=item 11. L<csv-dump>
 
-=item * L<csv-fill-template>
+=item 12. L<csv-each-row>
 
-=item * L<csv-find-values>
+=item 13. L<csv-fill-template>
 
-=item * L<csv-freqtable>
+=item 14. L<csv-find-values>
 
-=item * L<csv-gen>
+=item 15. L<csv-freqtable>
 
-=item * L<csv-get-cells>
+=item 16. L<csv-gen>
 
-=item * L<csv-grep>
+=item 17. L<csv-get-cells>
 
-=item * L<csv-info>
+=item 18. L<csv-grep>
 
-=item * L<csv-intrange>
+=item 19. L<csv-info>
 
-=item * L<csv-list-field-names>
+=item 20. L<csv-intrange>
 
-=item * L<csv-lookup-fields>
+=item 21. L<csv-list-field-names>
 
-=item * L<csv-map>
+=item 22. L<csv-lookup-fields>
 
-=item * L<csv-munge-field>
+=item 23. L<csv-map>
 
-=item * L<csv-munge-row>
+=item 24. L<csv-munge-field>
 
-=item * L<csv-pick>
+=item 25. L<csv-munge-row>
 
-=item * L<csv-pick-fields>
+=item 26. L<csv-pick>
 
-=item * L<csv-pick-rows>
+=item 27. L<csv-pick-fields>
 
-=item * L<csv-replace-newline>
+=item 28. L<csv-pick-rows>
 
-=item * L<csv-select-fields>
+=item 29. L<csv-replace-newline>
 
-=item * L<csv-select-rows>
+=item 30. L<csv-select-fields>
 
-=item * L<csv-setop>
+=item 31. L<csv-select-rows>
 
-=item * L<csv-shuf>
+=item 32. L<csv-setop>
 
-=item * L<csv-shuf-fields>
+=item 33. L<csv-shuf>
 
-=item * L<csv-shuf-rows>
+=item 34. L<csv-shuf-fields>
 
-=item * L<csv-sort>
+=item 35. L<csv-shuf-rows>
 
-=item * L<csv-sort-fields>
+=item 36. L<csv-sort>
 
-=item * L<csv-sort-rows>
+=item 37. L<csv-sort-fields>
 
-=item * L<csv-sorted>
+=item 38. L<csv-sort-rows>
 
-=item * L<csv-sorted-fields>
+=item 39. L<csv-sorted>
 
-=item * L<csv-sorted-rows>
+=item 40. L<csv-sorted-fields>
 
-=item * L<csv-split>
+=item 41. L<csv-sorted-rows>
 
-=item * L<csv-sum>
+=item 42. L<csv-split>
 
-=item * L<csv-transpose>
+=item 43. L<csv-sum>
 
-=item * L<csv-uniq>
+=item 44. L<csv-transpose>
 
-=item * L<csv2ltsv>
+=item 45. L<csv-uniq>
 
-=item * L<csv2td>
+=item 46. L<csv2ltsv>
 
-=item * L<csv2tsv>
+=item 47. L<csv2paras>
 
-=item * L<csv2vcf>
+=item 48. L<csv2td>
 
-=item * L<tsv2csv>
+=item 49. L<csv2tsv>
+
+=item 50. L<csv2vcf>
+
+=item 51. L<paras2csv>
+
+=item 52. L<tsv2csv>
 
 =back
 
@@ -1834,6 +2021,13 @@ function (code and metadata). You can then produce a CLI from the Rinci function
 simply using L<Perinci::CmdLine::Gen> or, if you use L<Dist::Zilla>,
 L<Dist::Zilla::Plugin::GenPericmdScript> or, if on the command-line,
 L<gen-pericmd-script>.
+
+Using this routine, by providing just one or a few hooks and setting some
+parameters like a couple of extra arguments, you will get a complete CLI with
+decent POD/manpage, ability to read one or multiple CSV's and write one or
+multiple CSV's, some command-line options to customize how the input CSV's
+should be parsed and how the output CSV's should be formatted and named. Your
+CLI also has tab completion, usage and help message, and other features.
 
 To create a CSV utility, you specify a C<name> (e.g. C<csv_dump>; must be a valid
 unqualified Perl identifier/function name) and optionally C<summary>,
@@ -1889,6 +2083,12 @@ Called when receiving header row. Will be called for every input file, and
 called even when user specify C<--no-input-header>, in which case the header
 row will be the generated C<["field1", "field2", ...]>. You can use this hook
 e.g. to add/remove/rearrange fields.
+
+You can set C<< $r-E<gt>{wants_fill_rows} >> to a defined false if you do not want
+C<< $r-E<gt>{input_rows} >> to be filled with empty string elements when it contains
+less than the number of fields (in case of sparse values at the end). Normally
+you only want to do this when you want to do checking, e.g. in
+L<csv-check-rows>.
 
 =item * on_input_data_row
 

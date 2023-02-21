@@ -584,6 +584,7 @@ static int suspendedstate_free(pTHX_ SV *sv, MAGIC *mg)
     /* Legacy hooks after */
     SV **hookp = hv_fetchs(PL_modglobal, "Future::AsyncAwait/suspendhook", FALSE);
     if(hookp && SvOK(*hookp) && SvUV(*hookp)) {
+      warn("Invoking legacy Future::AsyncAwait suspendhook for FREE phase");
       SuspendHookFunc *hook = INT2PTR(SuspendHookFunc *, SvUV(*hookp));
       (*hook)(aTHX_ FAA_PHASE_FREE, (CV *)sv, state->modhookdata);
     }
@@ -1517,6 +1518,37 @@ static void MY_suspendedstate_cancel(pTHX_ SuspendedState *state)
 }
 
 /*
+ * Pre-creation assistance
+ */
+
+enum {
+  PRECREATE_CANCEL,
+  PRECREATE_MODHOOKDATA,
+};
+
+#define get_precreate_padix()  S_get_precreate_padix(aTHX)
+PADOFFSET S_get_precreate_padix(pTHX)
+{
+  return SvUV(SvRV(*hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/*precreate_padix", 0)));
+}
+
+#define get_or_create_precreate_padix()  S_get_or_create_precreate_padix(aTHX)
+PADOFFSET S_get_or_create_precreate_padix(pTHX)
+{
+  SV *sv;
+  PADOFFSET padix = SvUV(sv = SvRV(*hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/*precreate_padix", 0)));
+  if(!padix) {
+    padix = pad_add_name_pvs("@(Future::AsyncAwait/precancel)", 0, NULL, NULL);
+    sv_setuv(sv, padix);
+
+    PADOFFSET p2 = pad_add_name_pvs("%(Future::AsyncAwait/premodhookdata)", 0, NULL, NULL);
+    assert(p2 == padix + PRECREATE_MODHOOKDATA);
+  }
+
+  return padix;
+}
+
+/*
  * Some Future class helper functions
  */
 
@@ -1763,9 +1795,33 @@ static void MY_future_await_toplevel(pTHX_ SV *f)
   PUSHs(f);
   PUTBACK;
 
-  call_method("AWAIT_WAIT", GIMME);
+  call_method("AWAIT_WAIT", GIMME_V);
 
   LEAVE_with_name("future_await_toplevel");
+}
+
+/*
+ * API functions
+ */
+
+static HV *get_modhookdata(pTHX_ CV *cv, U32 flags, PADOFFSET precreate_padix)
+{
+  SuspendedState *state = suspendedstate_get(cv);
+
+  if(!state) {
+    if(!precreate_padix)
+      return NULL;
+
+    if(!(flags & FAA_MODHOOK_CREATE))
+      return NULL;
+
+    return (HV *)PAD_SVl(precreate_padix + PRECREATE_MODHOOKDATA);
+  }
+
+  if((flags & FAA_MODHOOK_CREATE) && !state->modhookdata)
+    state->modhookdata = newHV();
+
+  return state->modhookdata;
 }
 
 /*
@@ -1775,12 +1831,11 @@ static void MY_future_await_toplevel(pTHX_ SV *f)
 static XOP xop_enterasync;
 static OP *pp_enterasync(pTHX)
 {
-  PADOFFSET precancel_padix = PL_op->op_targ;
+  PADOFFSET precreate_padix = PL_op->op_targ;
 
-  if(precancel_padix) {
-    SV *sv = PAD_SVl(precancel_padix) = (SV *)newAV();
-    SvPADMY_on(sv);
-    save_clearsv(&PAD_SVl(precancel_padix));
+  if(precreate_padix) {
+    save_clearsv(&PAD_SVl(precreate_padix + PRECREATE_CANCEL));
+    save_clearsv(&PAD_SVl(precreate_padix + PRECREATE_MODHOOKDATA));
   }
 
   return PL_op->op_next;
@@ -1865,7 +1920,9 @@ static OP *pp_await(pTHX)
   CV *origcv = curcv;
   bool defer_mortal_curcv = FALSE;
 
-  AV *precancel = PL_op->op_targ ? (AV *)PAD_SVl(PL_op->op_targ) : NULL;
+  PADOFFSET precreate_padix = PL_op->op_targ;
+  /* Must fetch precancel AV now, before any pad fiddling or cv copy */
+  AV *precancel = precreate_padix ? (AV *)PAD_SVl(precreate_padix + PRECREATE_CANCEL) : NULL;
 
   SuspendedState *state = suspendedstate_get(curcv);
 
@@ -1937,6 +1994,7 @@ static OP *pp_await(pTHX)
     {
       SV **hookp = hv_fetchs(PL_modglobal, "Future::AsyncAwait/suspendhook", FALSE);
       if(hookp && SvOK(*hookp) && SvUV(*hookp)) {
+        warn("Invoking legacy Future::AsyncAwait suspendhook for PRERESUME phase");
         SuspendHookFunc *hook = INT2PTR(SuspendHookFunc *, SvUV(*hookp));
         if(!state->modhookdata)
           state->modhookdata = newHV();
@@ -1950,6 +2008,9 @@ static OP *pp_await(pTHX)
       RUN_HOOKS_REV(pre_resume, curcv, state->modhookdata);
 
     suspendedstate_resume(state, curcv);
+
+    if(regs)
+      RUN_HOOKS_FWD(post_resume, curcv, state->modhookdata);
 
 #ifdef DEBUG_SHOW_STACKS
     debug_showstack("Stack after resume");
@@ -1994,6 +2055,12 @@ static OP *pp_await(pTHX)
     curcv = cv_copy_flags(runcv, CV_COPY_NULL_LEXICALS);
     state = suspendedstate_new(curcv);
 
+    HV *premodhookdata = precreate_padix ? (HV *)PAD_SVl(precreate_padix + PRECREATE_MODHOOKDATA) : NULL;
+    if(premodhookdata) {
+      state->modhookdata = premodhookdata;
+      PAD_SVl(precreate_padix + PRECREATE_MODHOOKDATA) = NULL; /* steal it */
+    }
+
     if(regs) {
       if(!state->modhookdata)
         state->modhookdata = newHV();
@@ -2009,6 +2076,9 @@ static OP *pp_await(pTHX)
 
   state->curcop = PL_curcop;
 
+  if(regs)
+    RUN_HOOKS_FWD(pre_suspend, curcv, state->modhookdata);
+
   suspendedstate_suspend(state, origcv);
 
   /* New ones first */
@@ -2019,6 +2089,7 @@ static OP *pp_await(pTHX)
   {
     SV **hookp = hv_fetchs(PL_modglobal, "Future::AsyncAwait/suspendhook", FALSE);
     if(hookp && SvOK(*hookp) && SvUV(*hookp)) {
+      warn("Invoking legacy Future::AsyncAwait suspendhook for POSTSUSPEND phase");
       SuspendHookFunc *hook = INT2PTR(SuspendHookFunc *, SvUV(*hookp));
         if(!state->modhookdata)
           state->modhookdata = newHV();
@@ -2043,6 +2114,7 @@ static OP *pp_await(pTHX)
 
   if(!state->returning_future) {
     state->returning_future = future_new_from_proto(f);
+
     if(precancel) {
       I32 i;
       for(i = 0; i < av_count(precancel); i++)
@@ -2095,7 +2167,8 @@ static OP *pp_pushcancel(pTHX)
     future_on_cancel(state->returning_future, newRV_noinc((SV *)on_cancel));
   }
   else {
-    AV *precancel = (AV *)PAD_SVl(PL_op->op_targ);
+    PADOFFSET precreate_padix = PL_op->op_targ;
+    AV *precancel = (AV *)PAD_SVl(precreate_padix + PRECREATE_CANCEL);
     av_push(precancel, newRV_noinc((SV *)on_cancel));
   }
 
@@ -2191,7 +2264,7 @@ static void parse_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx, void 
    */
   hv_stores(GvHV(PL_hintgv), "Future::AsyncAwait/PL_compcv", newSVuv(PTR2UV(PL_compcv)));
 
-  hv_stores(GvHV(PL_hintgv), "Future::AsyncAwait/*precancel_padix", newRV_noinc(newSVuv(0)));
+  hv_stores(GvHV(PL_hintgv), "Future::AsyncAwait/*precreate_padix", newRV_noinc(newSVuv(0)));
 }
 
 static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
@@ -2242,13 +2315,13 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
 
   OP *body = newSTATEOP(0, NULL, NULL);
 
-  PADOFFSET precancel_padix = SvUV(SvRV(*hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/*precancel_padix", 0)));
-  if(precancel_padix) {
+  PADOFFSET precreate_padix = get_precreate_padix();
+  if(precreate_padix) {
     OP *enterasync;
     body = op_append_elem(OP_LINESEQ, body,
       enterasync = newOP_CUSTOM(&pp_enterasync, 0));
 
-    enterasync->op_targ = precancel_padix;
+    enterasync->op_targ = precreate_padix;
   }
 
   body = op_append_elem(OP_LINESEQ, body, newOP(OP_PUSHMARK, 0));
@@ -2311,9 +2384,7 @@ static int build_await(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdata
   else {
     *out = newUNOP_CUSTOM(&pp_await, 0, expr);
 
-    PADOFFSET precancel_padix = SvUV(SvRV(*hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/*precancel_padix", 0)));
-    if(precancel_padix)
-      (*out)->op_targ = precancel_padix;
+    (*out)->op_targ = get_precreate_padix();
   }
 
   return KEYWORD_PLUGIN_EXPR;
@@ -2350,14 +2421,7 @@ static int build_cancel(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdat
   *out = op_prepend_elem(OP_LINESEQ,
     (pushcancel = newSVOP_CUSTOM(&pp_pushcancel, 0, (SV *)on_cancel)), NULL);
 
-  SV *sv;
-  PADOFFSET precancel_padix = SvUV(sv = SvRV(*hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/*precancel_padix", 0)));
-  if(!precancel_padix) {
-    precancel_padix = pad_add_name_pvs("@(Future::AsyncAwait/precancel)", 0, NULL, NULL);
-    sv_setuv(sv, precancel_padix);
-  }
-
-  pushcancel->op_targ = precancel_padix;
+  pushcancel->op_targ = get_or_create_precreate_padix();
 
   return KEYWORD_PLUGIN_STMT;
 }
@@ -2368,6 +2432,41 @@ static struct XSParseKeywordHooks hooks_cancel = {
   .piece1 = XPK_ANONSUB,
   .build1 = &build_cancel,
 };
+
+/*
+ * Back-compat support
+ */
+
+struct AsyncAwaitHookFuncs_v1
+{
+  U32 flags;
+  void (*post_cv_copy)(pTHX_ CV *runcv, CV *cv, HV *modhookdata, void *hookdata);
+  /* no pre_suspend */
+  void (*post_suspend)(pTHX_ CV *cv, HV *modhookdata, void *hookdata);
+  void (*pre_resume)  (pTHX_ CV *cv, HV *modhookdata, void *hookdata);
+  /* no post_resume */
+  void (*free)        (pTHX_ CV *cv, HV *modhookdata, void *hookdata);
+};
+
+static void register_faa_hook_v1(pTHX_ const struct AsyncAwaitHookFuncs_v1 *hookfuncs_v1, void *hookdata)
+{
+  /* No flags are recognised; complain if the caller requested any */
+  if(hookfuncs_v1->flags)
+    croak("Unrecognised hookfuncs->flags value %08x", hookfuncs_v1->flags);
+
+  struct AsyncAwaitHookFuncs *hookfuncs;
+  Newx(hookfuncs, 1, struct AsyncAwaitHookFuncs);
+
+  hookfuncs->flags = 0;
+  hookfuncs->post_cv_copy = hookfuncs_v1->post_cv_copy;
+  hookfuncs->pre_suspend  = NULL;
+  hookfuncs->post_suspend = hookfuncs_v1->post_suspend;
+  hookfuncs->pre_resume   = hookfuncs_v1->pre_resume;
+  hookfuncs->post_resume  = NULL;
+  hookfuncs->free         = hookfuncs_v1->free;
+
+  register_faa_hook(aTHX_ hookfuncs, hookdata);
+}
 
 MODULE = Future::AsyncAwait    PACKAGE = Future::AsyncAwait
 
@@ -2410,10 +2509,17 @@ BOOT:
   DMD_SET_MAGIC_HELPER(&vtbl_suspendedstate, dumpmagic_suspendedstate);
 #endif
 
-  sv_setiv(*hv_fetchs(PL_modglobal, "Future::AsyncAwait/ABIVERSION_MIN", 1), FUTURE_ASYNCAWAIT_ABI_VERSION);
+  sv_setiv(*hv_fetchs(PL_modglobal, "Future::AsyncAwait/ABIVERSION_MIN", 1), 1);
   sv_setiv(*hv_fetchs(PL_modglobal, "Future::AsyncAwait/ABIVERSION_MAX", 1), FUTURE_ASYNCAWAIT_ABI_VERSION);
 
-  sv_setiv(*hv_fetchs(PL_modglobal, "Future::AsyncAwait/register()@1", 1), PTR2UV(&register_faa_hook));
+  sv_setiv(*hv_fetchs(PL_modglobal, "Future::AsyncAwait/register()@2", 1),
+    PTR2UV(&register_faa_hook));
+  sv_setiv(*hv_fetchs(PL_modglobal, "Future::AsyncAwait/register()@1", 1),
+    PTR2UV(&register_faa_hook_v1));
+  sv_setiv(*hv_fetchs(PL_modglobal, "Future::AsyncAwait/get_modhookdata()@1", 1),
+    PTR2UV(&get_modhookdata));
+  sv_setiv(*hv_fetchs(PL_modglobal, "Future::AsyncAwait/make_precreate_padix()@1", 1),
+    PTR2UV(&S_get_or_create_precreate_padix));
 
   {
     AV *run_on_loaded = NULL;

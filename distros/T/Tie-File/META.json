@@ -34,15 +34,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/toddr/Tie-File/issues"
+         "web" : "https://github.com/Perl/perl5/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "https://github.com/toddr/Tie-File"
-      }
+         "url" : "https://github.com/Perl/perl5/tree/blead/dist/Tie-File"
+      },
+      "x_MailingList" : "http://lists.perl.org/list/perl5-porters.html"
    },
-   "version" : "1.06",
+   "version" : "1.07",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

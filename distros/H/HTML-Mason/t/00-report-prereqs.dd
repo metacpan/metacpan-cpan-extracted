@@ -10,20 +10,19 @@ do { my $x = {
        'develop' => {
                       'requires' => {
                                       'CHI' => '0.21',
-                                      'Code::TidyAll' => '0.56',
-                                      'Code::TidyAll::Plugin::SortLines::Naturally' => '0.000003',
-                                      'Code::TidyAll::Plugin::Test::Vars' => '0.02',
-                                      'Parallel::ForkManager' => '1.19',
-                                      'Perl::Critic' => '1.126',
-                                      'Perl::Tidy' => '20160302',
+                                      'Perl::Critic' => '1.138',
+                                      'Perl::Critic::Moose' => '1.05',
+                                      'Perl::Tidy' => '20210111',
+                                      'Pod::Checker' => '1.74',
+                                      'Pod::Tidy' => '0.10',
                                       'Test::CPAN::Meta::JSON' => '0.16',
                                       'Test::Memory::Cycle' => '0',
                                       'Test::Mojibake' => '0',
                                       'Test::More' => '0.88',
                                       'Test::NoTabs' => '0',
+                                      'Test::Output' => '0',
                                       'Test::Pod' => '1.41',
                                       'Test::Spelling' => '0.12',
-                                      'Test::Vars' => '0.009',
                                       'Test::Version' => '2.05'
                                     }
                     },
@@ -47,7 +46,6 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0.8',
-                                   'Test::Deep' => '0',
                                    'Test::More' => '0.96'
                                  }
                  }

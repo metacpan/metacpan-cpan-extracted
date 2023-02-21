@@ -43,6 +43,21 @@ METHODS
 
             Default value is undef.
 
+    *       "css_init"
+
+            Initialization of CSS.
+
+            Default value is:
+
+             * {
+                     box-sizing: border-box;
+                     margin: 0;
+                     padding: 0;
+             }
+
+            CSS is handled by "_process_css()" method in this module, which
+            is abstract method of Tags::HTML.
+
     *       "css_src"
 
             List of CSS link structures.
@@ -225,13 +240,13 @@ EXAMPLE1
      # Print out.
      print $tags->flush;
 
-     # Output:
+     # Output like:
      # <!DOCTYPE html>
      # <html lang="en">
      #   <head>
      #     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
      #     <meta name="generator" content=
-     #       "Perl module: Tags::HTML::Page::Begin, Version: 0.06" />
+     #       "Perl module: Tags::HTML::Page::Begin, Version: 0.15" />
      #     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
      #     <title>
      #       Page title
@@ -240,6 +255,11 @@ EXAMPLE1
      # div {
      #      color: red;
      #      background-color: black;
+     # }
+     # * {
+     #      box-sizing: border-box;
+     #      margin: 0;
+     #      padding: 0;
      # }
      # </style>
      #   </head>
@@ -251,7 +271,7 @@ EXAMPLE1
      # </html>
 
 DEPENDENCIES
-    Class::Utils, Error::Pure, List::MoreUtils, Readonly.
+    Class::Utils, Error::Pure, List::MoreUtils, Readonly, Tags::HTML.
 
 SEE ALSO
     Tags::HTML::Page::End
@@ -271,5 +291,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.15
+    0.16
 

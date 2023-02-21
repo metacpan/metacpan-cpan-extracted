@@ -6,7 +6,7 @@ package HTML::Blitz::ParseError;
 use HTML::Blitz::pragma;
 use overload fallback => 1, '""' => method (@) { $self->to_string };
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 method new($class:
     :$src_name,
@@ -50,10 +50,12 @@ method to_string() {
     my $loc = $self->location;
     my $alt_loc = $self->alt_location;
     "$self->{src_name}:$loc->{line_num}:$loc->{col_num}: error: $self->{msg}\n"
+    . " |\n"
     . " | $loc->{line}\n"
     . " | $loc->{m_prefix}" . '^' x $self->{width} . "\n"
     . (!defined $alt_loc ? "" :
         "$self->{src_name}:$alt_loc->{line_num}:$alt_loc->{col_num}: ... $self->{alt_msg}\n"
+        . " |\n"
         . " | $alt_loc->{line}\n"
         . " | $alt_loc->{m_prefix}" . '^' x $self->{alt_width} . "\n"
     )

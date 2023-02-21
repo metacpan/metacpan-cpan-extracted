@@ -30,7 +30,6 @@ my $build = Module::Build->new
    script_files => [ 'scripts/vzwatchd' ],
    license => 'perl',
    create_readme => 1,
-   create_makefile_pl => 'traditional',
    meta_merge => {
        resources => {
            repository => 'https://github.com/stsc/App-OpenVZ-BCWatch',

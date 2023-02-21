@@ -37,7 +37,7 @@ The documentation in this POD applies to all three adapter modules as well.
 This module is an implementation of [Reactive Extensions](http://reactivex.io/) in Perl. It replicates the
 behavior of [rxjs 6](https://www.npmjs.com/package/rxjs) which is the JavaScript implementation of ReactiveX.
 
-Currently 93 of the 100+ operators in rxjs are implemented in this module.
+Currently 100 of the more than 100 operators in rxjs are implemented in this module.
 
 # EXPORTABLE FUNCTIONS
 
@@ -102,16 +102,19 @@ should apply to RxPerl too).
 
     [https://rxjs.dev/api/index/function/defer](https://rxjs.dev/api/index/function/defer)
 
-        # Suppose "int rand 10" here evaluates to 7. Then if after 7 seconds $special_var holds a true value,
-        # output will be: 0, 1, 2, 3, 4, 5, 6, 10, 20, 30, complete, otherwise it will be:
-        # 0, 1, 2, 3, 4, 5, 6, 40, 50, 60, complete.
+        my $special_var;
 
-        rx_concat(
-            rx_interval(1)->pipe( op_take(int rand 10) ),
-            rx_defer(sub {
-                return $special_var ? rx_of(10, 20, 30) : rx_of(40, 50, 60)
-            })
-        )->subscribe($observer);
+        my $o = rx_defer(sub {
+            return $special_var ? rx_of(10, 20, 30) : rx_of(40, 50, 60)
+        })
+
+        # 10, 20, 30, complete
+        $special_var = 1;
+        $o->subscribe($observer);
+
+        # 40, 50, 60, complete
+        $special_var = 0;
+        $o->subscribe($observer);
 
 - rx\_EMPTY
 
@@ -396,7 +399,7 @@ apply to RxPerl too).
         # 30, complete
         rx_concat(
             rx_of(10, 20, 30),
-            rx_EMPTY->pipe( op_delay(5) ),
+            rx_timer(5)->pipe( op_ignore_elements ),
         )->pipe(
             op_audit_time(1),
         )->subscribe($observer);
@@ -561,6 +564,33 @@ apply to RxPerl too).
     Do this instead, to achieve the expected effect:
 
         rx_timer(2)->pipe( op_ignore_elements() )
+
+- op\_delay\_when
+
+    [https://rxjs.dev/api/operators/delayWhen](https://rxjs.dev/api/operators/delayWhen)
+
+        # (pause 3 seconds) 3, (pause 1 second) 4, (pause one second) 5, complete
+        rx_of(3, 4, 5)->pipe(
+            op_delay_when(sub ($val, $idx) { rx_timer($val) }), # can also use $_ here
+        )->subscribe($observer);
+
+- op\_distinct
+
+    [https://rxjs.dev/api/operators/distinct](https://rxjs.dev/api/operators/distinct)
+
+        # 1, 2, 3, 4, complete
+        rx_of(1, 1, 2, 2, 2, 1, 2, 3, 4, 3, 2, 1)->pipe(
+            op_distinct(),
+        )->subscribe($observer);
+
+        # { age => 4, name => 'Foo' }, { age => 7, name => 'Bar' }, complete
+        rx_of(
+            { age => 4, name => 'Foo'},
+            { age => 7, name => 'Bar'},
+            { age => 5, name => 'Foo'},
+        )->pipe(
+            op_distinct(sub ($val) { $val->{name} }), # can also use $_ here
+        )->subscribe($observer);
 
 - op\_distinct\_until\_changed
 
@@ -1033,7 +1063,7 @@ apply to RxPerl too).
         # 0, 1, 3, 6, 10, ...
         rx_interval(1)->pipe(
             op_scan(sub {
-                my ($acc, $item) = @_;
+                my ($acc, $item, $idx) = @_;
                 return $acc + $item;
             }, 0),
         )->subscribe($observer);
@@ -1051,6 +1081,25 @@ apply to RxPerl too).
         $o->subscribe($observer1);
         $o->subscribe($observer2);
 
+- op\_single
+
+    [https://rxjs.dev/api/operators/single](https://rxjs.dev/api/operators/single)
+
+        # error: Too many values match
+        rx_of(0, 1, 2, 3)->pipe(
+            op_single(sub ($val, $idx) { $val % 2 == 1 }), # can also use $_ here
+        )->subscribe($observer);
+
+        # error: No values match
+        rx_of(1, 3)->pipe(
+            op_single(sub { $_ % 2 == 0 }),
+        )->subscribe($observer);
+
+        # 42, complete
+        rx_of(42)->pipe(
+            op_single(),
+        )->subscribe($observer);
+
 - op\_skip
 
     [https://rxjs.dev/api/operators/skip](https://rxjs.dev/api/operators/skip)
@@ -1058,6 +1107,16 @@ apply to RxPerl too).
         # 40, 50, complete
         rx_of(10, 20, 30, 40, 50)->pipe(
             op_skip(3),
+        )->subscribe($observer);
+
+- op\_skip\_last
+
+    [https://rxjs.dev/api/operators/skipLast](https://rxjs.dev/api/operators/skipLast)
+
+        # (pause 3 seconds) 0, 1, 2, 3, 4, 5, 6, 7, complete
+        rx_interval(1)->pipe(
+            op_take(10),
+            op_skip_last(2),
         )->subscribe($observer);
 
 - op\_skip\_until
@@ -1200,6 +1259,35 @@ apply to RxPerl too).
         rx_interval(0.7)->pipe(
             op_take(3),
             op_throw_if_empty(sub { "hello" }),
+        )->subscribe($observer);
+
+- op\_time\_interval
+
+    [https://rxjs.dev/api/operators/timeInterval](https://rxjs.dev/api/operators/timeInterval)
+
+        # { value => 0, interval => 0.7 }, { vale => 1, interval => 0.7 }, complete
+        rx_interval(0.7)->pipe(
+            op_take(2),
+            op_time_interval(),
+        )->subscribe($observer);
+
+- op\_timeout
+
+    [https://rxjs.dev/api/operators/timeout](https://rxjs.dev/api/operators/timeout)
+
+        # 0, error: Timeout has occurred
+        rx_timer(0.5, 2)->pipe(
+            op_timeout(1),
+        )->subscribe($observer);
+
+- op\_timestamp
+
+    [https://rxjs.dev/api/operators/timestamp](https://rxjs.dev/api/operators/timestamp)
+
+        # { value => 0, timestamp => 1675976745.17414 }, { value => 1, timestamp => 1675976746.17414 }, complete
+        rx_interval(1)->pipe(
+            op_take(2),
+            op_timestamp(),
         )->subscribe($observer);
 
 - op\_to\_array

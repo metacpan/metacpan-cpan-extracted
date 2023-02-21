@@ -78,7 +78,7 @@ sub choose_and_add_operator {
     else {
         $menu_addition = '=' . $sf->{i}{menu_addition};
         @operators_default = @{$sf->{o}{G}{operators}};
-        if ( $sf->{i}{driver} eq 'Firebird' ) {
+        if ( $sf->{i}{driver} =~ /(?:Firebird|Informix)\z/ ) {
             @operators_default = uniq map { s/(?<=REGEXP)_i\z//; $_ } @operators_default;
         }
         @operators_limited = ( " = ", " != ", " < ", " > ", " >= ", " <= ", "IN", "NOT IN" );
@@ -399,6 +399,14 @@ sub _regexp {
         else {
             return " REGEXP_LIKE($col,?,'i')" if ! $case_sensitive;
             return " REGEXP_LIKE($col,?,'c')" if   $case_sensitive;
+        }
+    }
+    elsif ( $sf->{i}{driver} eq 'Informix' ) {
+        if ( $do_not_match ) {
+            return " $col NOT MATCHES ? ";
+        }
+        else {
+            return " $col MATCHES ?";
         }
     }
 }

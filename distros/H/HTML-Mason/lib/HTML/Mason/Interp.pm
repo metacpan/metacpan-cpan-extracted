@@ -5,7 +5,7 @@
 # under the same terms as Perl itself.
 
 package HTML::Mason::Interp;
-$HTML::Mason::Interp::VERSION = '1.59';
+$HTML::Mason::Interp::VERSION = '1.60';
 use strict;
 use warnings;
 

@@ -160,12 +160,12 @@ sub test_display__top_level__uses_href_extra_vars_for_category_nav_links
     $self->test_display__top_level();
 
     $self->assert_display_contains(
-        [ 'continent=Africa\S*&href_testvar=foo"[^<>]+id="categoryNavLink-Africa".*',                 'Africa'        ],
-        [ 'continent=Asia\S*&href_testvar=foo"[^<>]+id="categoryNavLink-Asia".*',                     'Asia'          ],
-        [ 'continent=Australia\S*&href_testvar=foo"[^<>]+id="categoryNavLink-Australia".*',           'Australia'     ],
-        [ 'continent=Europe\S*&href_testvar=foo"[^<>]+id="categoryNavLink-Europe".*',                 'Europe'        ],
-        [ 'continent=North%20America\S*&href_testvar=foo"[^<>]+id="categoryNavLink-North America".*', 'North America' ],
-        [ 'continent=South%20America\S*&href_testvar=foo"[^<>]+id="categoryNavLink-South America".*', 'South America' ],
+        [ 'continent=Africa\S*&amp;href_testvar=foo"[^<>]+id="categoryNavLink-Africa".*',                 'Africa'        ],
+        [ 'continent=Asia\S*&amp;href_testvar=foo"[^<>]+id="categoryNavLink-Asia".*',                     'Asia'          ],
+        [ 'continent=Australia\S*&amp;href_testvar=foo"[^<>]+id="categoryNavLink-Australia".*',           'Australia'     ],
+        [ 'continent=Europe\S*&amp;href_testvar=foo"[^<>]+id="categoryNavLink-Europe".*',                 'Europe'        ],
+        [ 'continent=North%20America\S*&amp;href_testvar=foo"[^<>]+id="categoryNavLink-North America".*', 'North America' ],
+        [ 'continent=South%20America\S*&amp;href_testvar=foo"[^<>]+id="categoryNavLink-South America".*', 'South America' ],
     );
 }
 
@@ -205,15 +205,15 @@ sub test_display__second_level
     $self->assert_equals('continent', $wb->parent_category_column());
     $self->assert_deep_equals([qw/continent/], [$self->{wb}->ancestor_category_columns()]);
     $self->assert_display_contains(
-        [ 'continent=Africa&_browse_skip_to_results_=1"[^<>]+id="skipToResultsLink',
+        [ 'continent=Africa&amp;_browse_skip_to_results_=1"[^<>]+id="skipToResultsLink',
           "Show all items in this category" ],
         [ 'input type="hidden" name="continent" value="Africa' ],
         [ 'tr', 'td' ],
-        [ 'continent=Africa&nation=Madagascar[^<>]+id="categoryNavLink-Madagascar".*', 'Madagascar' ],
+        [ 'continent=Africa&amp;nation=Madagascar[^<>]+id="categoryNavLink-Madagascar".*', 'Madagascar' ],
         [ 'td', 'tr' ],
     );
     # test does not contain NULL category
-    $self->assert_display_does_not_contain([ 'a href="\?continent=Africa&nation=" id="categoryNavLink-Africa"></a' ]);
+    $self->assert_display_does_not_contain([ 'a href="\?continent=Africa&amp;nation=" id="categoryNavLink-Africa"></a' ]);
     $self->assert_equals('Africa', $wb->category_title());
 
     $self->init_test_object();
@@ -227,9 +227,9 @@ sub test_display__second_level
     $self->assert_display_contains(
         [ 'input type="hidden" name="continent" value="Asia' ],
         [ 'tr', 'td' ],
-        [ 'continent=Asia&nation=India[^<>]+id="categoryNavLink-India".*', 'India' ],
-        [ 'continent=Asia&nation=Japan[^<>]+id="categoryNavLink-Japan".*', 'Japan' ],
-        [ 'continent=Asia&nation=Thailand[^<>]+id="categoryNavLink-Thailand".*', 'Thailand' ],
+        [ 'continent=Asia&amp;nation=India[^<>]+id="categoryNavLink-India".*', 'India' ],
+        [ 'continent=Asia&amp;nation=Japan[^<>]+id="categoryNavLink-Japan".*', 'Japan' ],
+        [ 'continent=Asia&amp;nation=Thailand[^<>]+id="categoryNavLink-Thailand".*', 'Thailand' ],
         [ 'td', 'tr' ],
     );
     $self->assert_equals('Asia', $wb->category_title());
@@ -245,7 +245,7 @@ sub test_display__second_level
     $self->assert_display_contains(
         [ 'input type="hidden" name="continent" value="Australia' ],
         [ 'tr', 'td' ],
-        [ 'continent=Australia&nation=Australia[^<>]+id="categoryNavLink-Australia".*', 'Australia' ],
+        [ 'continent=Australia&amp;nation=Australia[^<>]+id="categoryNavLink-Australia".*', 'Australia' ],
         [ 'td', 'tr' ],
     );
     $self->assert_equals('Australia', $wb->category_title());
@@ -261,9 +261,9 @@ sub test_display__second_level
     $self->assert_display_contains(
         [ 'input type="hidden" name="continent" value="Europe' ],
         [ 'tr', 'td' ],
-        [ 'continent=Europe&nation=Denmark[^<>]+id="categoryNavLink-Denmark".*', 'Denmark' ],
-        [ 'continent=Europe&nation=Italy[^<>]+id="categoryNavLink-Italy".*', 'Italy' ],
-        [ 'continent=Europe&nation=Norway[^<>]+id="categoryNavLink-Norway".*', 'Norway' ],
+        [ 'continent=Europe&amp;nation=Denmark[^<>]+id="categoryNavLink-Denmark".*', 'Denmark' ],
+        [ 'continent=Europe&amp;nation=Italy[^<>]+id="categoryNavLink-Italy".*', 'Italy' ],
+        [ 'continent=Europe&amp;nation=Norway[^<>]+id="categoryNavLink-Norway".*', 'Norway' ],
         [ 'td', 'tr' ],
     );
     $self->assert_equals('Europe', $wb->category_title());
@@ -279,8 +279,8 @@ sub test_display__second_level
     $self->assert_display_contains(
         [ 'input type="hidden" name="continent" value="North America' ],
         [ 'tr', 'td' ],
-        [ 'continent=North%20America&nation=Canada[^<>]+id="categoryNavLink-Canada".*', 'Canada' ],
-        [ 'continent=North%20America&nation=United%20States[^<>]+id="categoryNavLink-United States".*', 'United States' ],
+        [ 'continent=North%20America&amp;nation=Canada[^<>]+id="categoryNavLink-Canada".*', 'Canada' ],
+        [ 'continent=North%20America&amp;nation=United%20States[^<>]+id="categoryNavLink-United States".*', 'United States' ],
         [ 'td', 'tr' ],
     );
     $self->assert_equals('North America', $wb->category_title());
@@ -296,8 +296,8 @@ sub test_display__second_level
     $self->assert_display_contains(
         [ 'input type="hidden" name="continent" value="South America' ],
         [ 'tr', 'td' ],
-        [ 'continent=South%20America&nation=Argentina[^<>]+id="categoryNavLink-Argentina".*', 'Argentina' ],
-        [ 'continent=South%20America&nation=Brazil[^<>]+id="categoryNavLink-Brazil".*', 'Brazil' ],
+        [ 'continent=South%20America&amp;nation=Argentina[^<>]+id="categoryNavLink-Argentina".*', 'Argentina' ],
+        [ 'continent=South%20America&amp;nation=Brazil[^<>]+id="categoryNavLink-Brazil".*', 'Brazil' ],
         [ 'td', 'tr' ],
     );
     $self->assert_equals('South America', $wb->category_title());
@@ -316,8 +316,8 @@ sub test_display__second_level__uses_href_extra_vars_for_category_nav_links
     $self->{wb}->{q}->param('continent', 'South America');
 
     $self->assert_display_contains(
-        [ 'continent=South%20America&nation=Argentina\S*&href_testvar=foo"[^<>]+id="categoryNavLink-Argentina".*', 'Argentina' ],
-        [ 'continent=South%20America&nation=Brazil\S*&href_testvar=foo"[^<>]+id="categoryNavLink-Brazil".*',    'Brazil'    ],
+        [ 'continent=South%20America&amp;nation=Argentina\S*&amp;href_testvar=foo"[^<>]+id="categoryNavLink-Argentina".*', 'Argentina' ],
+        [ 'continent=South%20America&amp;nation=Brazil\S*&amp;href_testvar=foo"[^<>]+id="categoryNavLink-Brazil".*',    'Brazil'    ],
     );
     $self->assert_display_does_not_contain(
         [ 'continent=South%20America\S*continent=South%20America[^<>]+id="categoryNavLink-' ],
@@ -338,6 +338,7 @@ sub test_display__second_level__creates_category_cache_table
     $self->assert_table_contents_equal(
         'browse_widget_category_cache', [qw/category_column category_value child_value/],
         [
+            [ 'continent', 'Africa',        '',              ], # coalesced to ''
             [ 'continent', 'Africa',        'Madagascar',    ],
             [ 'continent', 'Asia',          'India',         ],
             [ 'continent', 'Asia',          'Japan',         ],
@@ -373,8 +374,8 @@ sub test_display__third_level
         [ 'input type="hidden" name="continent" value="North America' ],
         [ 'input type="hidden" name="nation" value="United States' ],
         [ 'tr', 'td' ],
-        [ 'continent=North%20America&nation=United%20States&state_or_province=New%20York[^<>]+id="categoryNavLink-New York".*', 'New York, United States' ],
-        [ 'continent=North%20America&nation=United%20States&state_or_province=Oregon[^<>]+id="categoryNavLink-Oregon".*', 'Oregon, United States' ],
+        [ 'continent=North%20America&amp;nation=United%20States&amp;state_or_province=New%20York[^<>]+id="categoryNavLink-New York".*', 'New York, United States' ],
+        [ 'continent=North%20America&amp;nation=United%20States&amp;state_or_province=Oregon[^<>]+id="categoryNavLink-Oregon".*', 'Oregon, United States' ],
         [ 'td', 'tr' ],
     );
     # test New York not listed twice
@@ -399,7 +400,7 @@ sub test_display__third_level
         [ 'input type="hidden" name="continent" value="Asia' ],
         [ 'input type="hidden" name="nation" value="India' ],
         [ 'tr', 'td' ],
-        [ 'continent=Asia&nation=India&state_or_province=Maharashtra[^<>]+id="categoryNavLink-Maharashtra".*', 'Maharashtra, India' ],
+        [ 'continent=Asia&amp;nation=India&amp;state_or_province=Maharashtra[^<>]+id="categoryNavLink-Maharashtra".*', 'Maharashtra, India' ],
         [ 'td', 'tr' ],
     );
     $self->assert_equals('Asia > India', $wb->category_title());
@@ -417,7 +418,7 @@ sub test_display__third_level
         [ 'input type="hidden" name="continent" value="Asia' ],
         [ 'input type="hidden" name="nation" value="Japan' ],
         [ 'tr', 'td' ],
-        [ 'continent=Asia&nation=Japan&state_or_province=Kanto[^<>]+id="categoryNavLink-Kanto".*', 'Kanto, Japan' ],
+        [ 'continent=Asia&amp;nation=Japan&amp;state_or_province=Kanto[^<>]+id="categoryNavLink-Kanto".*', 'Kanto, Japan' ],
         [ 'td', 'tr' ],
     );
     $self->assert_equals('Asia > Japan', $wb->category_title());
@@ -437,7 +438,7 @@ sub test_display__third_level__uses_href_extra_vars_for_category_nav_links
     $self->{wb}->{q}->param('nation', 'Japan');
 
     $self->assert_display_contains(
-        [ 'continent=Asia&nation=Japan&state_or_province=Kanto\S*&href_testvar=foo"[^<>]+id="categoryNavLink-Kanto".*', 'Kanto, Japan' ],
+        [ 'continent=Asia&amp;nation=Japan&amp;state_or_province=Kanto\S*&amp;href_testvar=foo"[^<>]+id="categoryNavLink-Kanto".*', 'Kanto, Japan' ],
     );
     $self->assert_display_does_not_contain(
         [ 'continent=Asia\S*continent=Asia[^<>]+id="categoryNavLink-' ],
@@ -516,7 +517,7 @@ sub test_display__paging_category_navigation
     $self->assert_display_does_not_contain([ 'continent=Australia[^<>]+id="categoryNavLink-Australia".*', 'Australia' ]);
 
     # test 'Top' breadcrumb does not get repeatedly prepended to -optional_header
-    $self->assert_display_does_not_contain([ 'breadcrumbNavLink', 'Top', 'breadcrumbNavLink', 'Top' ]);
+    $self->assert_display_does_not_contain([ 'id="breadcrumbNavLink-Top', 'Top', 'id="breadcrumbNavLink-Top', 'Top' ]);
 }
 
 sub test_display__skip_to_results_from_category_navigation
@@ -549,10 +550,10 @@ sub test_display__skip_to_results_from_category_navigation
     $self->assert_equals('North America > United States', $wb->category_title());
 
     $self->assert_display_does_not_contain(
-        [ 'continent=North%20America&nation=United%20States&state_or_province=New%20York[^<>]+id="categoryNavLink-New York".*', 'New York' ],
+        [ 'continent=North%20America&amp;nation=United%20States&amp;state_or_province=New%20York[^<>]+id="categoryNavLink-New York".*', 'New York' ],
     );
     $self->assert_display_does_not_contain(
-        [ 'continent=North%20America&nation=United%20States&state_or_province=Oregon[^<>]+id="categoryNavLink-Oregon".*', 'Oregon' ],
+        [ 'continent=North%20America&amp;nation=United%20States&amp;state_or_province=Oregon[^<>]+id="categoryNavLink-Oregon".*', 'Oregon' ],
     );
     $self->assert_display_does_not_contain([ 'categoryNavLink-' ]);
 
@@ -610,7 +611,7 @@ sub test_display__auto_skip_to_results_from_category_navigation
     $self->assert_deep_equals([qw/continent/], [$self->{wb}->ancestor_category_columns()]);
 
     $self->assert_display_contains(
-        [ 'continent=Antarctica&_browse_skip_to_results_=1"[^<>]+id="skipToResultsLink',
+        [ 'continent=Antarctica&amp;_browse_skip_to_results_=1"[^<>]+id="skipToResultsLink',
           "Show all items in this category" ],
         [ 'input type="hidden" name="continent" value="Antarctica' ],
     );
@@ -876,7 +877,7 @@ sub test_display__records_with_column_using_link_for_category_column
 
     $self->assert_display_contains(
         [ 'Portland', 'Microbrew capital of the world', 1_583_138,
-          'a href="\?continent=North%20America&nation=United%20States&state_or_province=Oregon\S*&href_testvar=foo" id="jumpToCategoryLink"[^<>]*>Oregon' ],
+          'a href="\?continent=North%20America&amp;nation=United%20States&amp;state_or_province=Oregon\S*&amp;href_testvar=foo" id="jumpToCategoryLink"[^<>]*>Oregon' ],
     );
     $self->assert_display_does_not_contain([ '[^<>]*href_testvar2[^<>]*id="jumpToCategoryLink'       ] );
     $self->assert_display_does_not_contain([ 'continent=North%20America\S*continent=North%20America' ] );
@@ -989,8 +990,8 @@ sub test_display__breadcrumb_navigation
         [ 'continent=North%20America', 'href_testvar=foo', 'class="breadcrumbNavLink', 'North America', 'gt' ],
         [ 'continent=North%20America', 'nation=United%20States', 'href_testvar=foo', 'class="breadcrumbNavLink', 'United States' ],
 
-        [ 'state_or_province=New%20York', 'href_testvar2=bar', 'href_testvar=foo', 'id="categoryNavLink-New York".*', 'New York, United States' ],
-        [ 'state_or_province=Oregon',     'href_testvar2=bar', 'href_testvar=foo', 'id="categoryNavLink-Oregon".*',   'Oregon, United States'   ],
+        [ 'state_or_province=New%20York', 'href_testvar(?:=foo|2=bar)', 'href_testvar(?:=foo|2=bar)', 'id="categoryNavLink-New York".*', 'New York, United States' ],
+        [ 'state_or_province=Oregon',     'href_testvar(?:=foo|2=bar)', 'href_testvar(?:=foo|2=bar)', 'id="categoryNavLink-Oregon".*',   'Oregon, United States'   ],
     );
     $self->assert_display_does_not_contain([ 'href_testvar2=bar[^<>]*class="breadcrumbNavLink' ]);
 }
@@ -1020,7 +1021,7 @@ sub test_display__passing_where_clause_and_bind_params
     $wb->{q}->param('continent', 'North America');
     $self->assert_display_contains(
         [ 'tr', 'td' ],
-        [ 'continent=North%20America&nation=United%20States[^<>]+id="categoryNavLink-United States".*', 'United States' ],
+        [ 'continent=North%20America&amp;nation=United%20States[^<>]+id="categoryNavLink-United States".*', 'United States' ],
         [ 'td', 'tr' ],
     );
     # test Canada not listed at all
@@ -1035,13 +1036,13 @@ sub test_display__passing_href_extra_vars
     $wb->{ws}->{-href_extra_vars} = { myVar1 => undef, myVar2 => 'constant' };
 
     $self->assert_display_contains(
-        [ 'At first page', '3', 'results displayed', '1 - 3', 'of', '6', 'search_startat=1&myVar2=constant', 'Next &gt' ],
+        [ 'At first page', '3', 'results displayed', '1 - 3', 'of', '6', 'search_startat=1\S+myVar2=constant', 'Next &gt' ],
         [ 'tr', 'td' ],
         [ 'continent=Africa[^<>]+id="categoryNavLink-Africa".*', 'Africa' ],
         [ 'continent=Asia[^<>]+id="categoryNavLink-Asia".*', 'Asia' ],
         [ 'continent=Australia[^<>]+id="categoryNavLink-Australia".*', 'Australia' ],
         [ 'td', 'tr' ],
-        [ 'At first page', 'search_startat=1&myVar2=constant', 'Next &gt' ],
+        [ 'At first page', 'search_startat=1\S+myVar2=constant', 'Next &gt' ],
     );
     $self->assert_display_does_not_contain([ 'myVar1=' ]);
 
@@ -1090,7 +1091,7 @@ sub test_display__with_sql_search_columns_and_join_for_dataset
     $wb->{q}->param('continent', 'North America');
     $self->assert_display_contains(
         [ 'tr', 'td' ],
-        [ 'continent=North%20America&nation=United%20States[^<>]+id="categoryNavLink-United States".*', 'United States' ],
+        [ 'continent=North%20America&amp;nation=United%20States[^<>]+id="categoryNavLink-United States".*', 'United States' ],
         [ 'td', 'tr' ],
     );
     # test Canada not listed at all

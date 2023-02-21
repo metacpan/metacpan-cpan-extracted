@@ -147,6 +147,13 @@ load_function(HMODULE module, void ** ptr, const char * name)
 	(*ptr) = (void*) GetProcAddress(module, name);
 }
 
+BOOL WINAPI
+win32_ctrlhandler(DWORD dwCtrlType)
+{
+	PostThreadMessage( guts. main_thread_id, WM_SIGNAL, dwCtrlType, 0);
+	return FALSE;
+}
+
 Bool
 window_subsystem_init( char * error_buf)
 {
@@ -325,8 +332,6 @@ window_subsystem_init( char * error_buf)
 	guts. pointer_size. x    = GetSystemMetrics( SM_CXCURSOR);
 	guts. pointer_size. y    = GetSystemMetrics( SM_CYCURSOR);
 	list_create( &guts. transp, 8, 8);
-	list_create( &guts. files, 8, 8);
-	list_create( &guts. sockets, 8, 8);
 
 	// selecting locale layout, more or less latin-like
 
@@ -384,6 +389,29 @@ window_subsystem_init( char * error_buf)
 		guts.wc2mb_is_fragile = false;
 	}
 
+	if ( !SetConsoleCtrlHandler(win32_ctrlhandler, true))
+		apiErr;
+
+	{
+		/* Contains a 64-bit value representing the number of 100-nanosecond intervals since January 1, 1601 (UTC). */
+		FILETIME ft;
+		HKEY hKey;
+		DWORD valSize = 256, valType = REG_SZ;
+		char buf[ 256] = "";
+
+		GetSystemTimeAsFileTime(&ft);
+		guts.program_start_ts = ft.dwHighDateTime * 10000 + ft.dwLowDateTime / 10000;
+
+		RegOpenKeyEx( HKEY_CURRENT_USER, "Control Panel\\Mouse", 0, KEY_READ, &hKey);
+		RegQueryValueEx( hKey, "DoubleClickSpeed", NULL, &valType, ( LPBYTE)buf, &valSize);
+		RegCloseKey( hKey);
+		guts.mouse_double_click_delay = atol( buf);
+		if (guts.mouse_double_click_delay < 1 ) guts.mouse_double_click_delay = 50;
+	}
+
+	if ( !file_subsystem_init())
+		return false;
+
 	return true;
 }
 
@@ -429,15 +457,9 @@ window_subsystem_done()
 		OleUninitialize();
 	free( time_defs);
 	time_defs = NULL;
-	list_destroy( &guts. files);
 
-	if ( guts. socket_mutex) {
-		// prima_guts.app_is_dead must be TRUE for this moment!
-		prima_guts.app_is_dead = true;
-		CloseHandle( guts. socket_mutex);
-	}
+	file_subsystem_done();
 
-	list_destroy( &guts. sockets);
 	list_destroy( &guts. transp);
 	destroy_font_hash();
 
@@ -464,6 +486,11 @@ window_subsystem_done()
 	if ( std_unchecked_bitmap && std_unchecked_bitmap != (HBITMAP)-1)
 		DeleteObject( std_unchecked_bitmap);
 	SetErrorMode( guts. error_mode);
+
+	if ( guts.get_pixel_needs_emulation == 1 ) {
+		DeleteDC( guts.get_pixel_dc_dst);
+		dc_free();
+	}
 }
 
 void
@@ -526,7 +553,7 @@ err_msg_gplus( GpStatus errId, char * buffer)
 	case FontFamilyNotFound        : strcpy(buffer, "GDI+ font family not found");       break;
 	case FontStyleNotFound         : strcpy(buffer, "GDI+ font style not found");        break;
 	case NotTrueTypeFont           : strcpy(buffer, "GDI+ not a TrueType font");         break;
-	case UnsupportedGdiplusVersion : strcpy(buffer, "GDI+ unsipported Gdiplus version"); break;
+	case UnsupportedGdiplusVersion : strcpy(buffer, "GDI+ unsupported Gdiplus version"); break;
 	case GdiplusNotInitialized     : strcpy(buffer, "GDI+ not initialized");             break;
 	case PropertyNotFound          : strcpy(buffer, "GDI+ property not found");          break;
 	case PropertyNotSupported      : strcpy(buffer, "GDI+ property not supported");      break;
@@ -624,6 +651,24 @@ static Bool
 id_match( Handle self, PMenuItemReg m, void * params)
 {
 	return m-> id == *(( int*) params);
+}
+
+static unsigned long
+get_current_timestamp()
+{
+	/* Contains a 64-bit value representing the number of 100-nanosecond intervals since January 1, 1601 (UTC). */
+	FILETIME ft;
+	GetSystemTimeAsFileTime(&ft);
+	return ft.dwHighDateTime * 10000 + ft.dwLowDateTime / 10000 - guts.program_start_ts;
+}
+
+static Byte
+get_mouse_fingerprint( WPARAM mp1 )
+{
+	return
+		(( mp1 & MK_CONTROL )         ? kmCtrl   : 0) |
+		(( mp1 & MK_SHIFT   )         ? kmShift  : 0) |
+		(( GetKeyState( VK_MENU) < 0) ? kmAlt    : 0);
 }
 
 LRESULT CALLBACK generic_view_handler( HWND win, UINT  msg, WPARAM mp1, LPARAM mp2)
@@ -995,14 +1040,34 @@ AGAIN:
 		ev. cmd = cmMouseUp;
 		goto MB_MAINACT;
 	MB_DBLCLK:
-		ev. pos. dblclk = 1;
+		ev. pos. nth = 2;
 	MB_CLICK:
 		ev. cmd = cmMouseClick;
+		/* is this a 3rd etc click? */
+		{
+			unsigned long ts     = get_current_timestamp();
+			Bool is_continuation =
+				(ts - guts.last_mouse_click_ts < guts.mouse_double_click_delay) &&
+				(guts.last_mouse_click_fingerprint == (ev.pos.button | get_mouse_fingerprint( mp1 ) | apc_pointer_get_state(self))) &&
+				(mp2 == guts.last_mouse_click_position) &&
+				(win == guts.last_mouse_click_source)
+				;
+			if ( is_continuation ) {
+				ev. pos. nth = ++guts.last_mouse_click_number;
+			} else {
+				guts.last_mouse_click_number = ( ev. pos. nth == 0 ) ? 1 : 2;
+				guts.last_mouse_click_fingerprint = ev.pos.button | get_mouse_fingerprint( mp1 ) | apc_pointer_get_state(self);
+				guts.last_mouse_click_source = win;
+				guts.last_mouse_click_position = mp2;
+			}
+			guts.last_mouse_click_ts = ts;
+		}
+
 		goto MB_MAINACT;
 	MB_MAINACT:
 		if ( !is_apt( aptEnabled) || !apc_widget_is_responsive( self))
 		{
-			if ( ev. cmd == cmMouseDown || (ev. cmd == cmMouseClick && ev. pos. dblclk))
+			if ( ev. cmd == cmMouseDown || (ev. cmd == cmMouseClick && ev. pos. nth > 1))
 				MessageBeep( MB_OK);
 			return 0;
 		}
@@ -1022,12 +1087,7 @@ AGAIN:
 		ev. pos. where. x = (short)LOWORD( mp2);
 		ev. pos. where. y = sys last_size. y - (short)HIWORD( mp2) - 1;
 	MB_MAIN_NOPOS:
-		ev. pos. mod      = 0 |
-			(( mp1 & MK_CONTROL )         ? kmCtrl   : 0) |
-			(( mp1 & MK_SHIFT   )         ? kmShift  : 0) |
-			(( GetKeyState( VK_MENU) < 0) ? kmAlt    : 0) |
-			apc_pointer_get_state(self)
-		;
+		ev. pos. mod  = get_mouse_fingerprint( mp1 ) | apc_pointer_get_state(self);
 		break;
 	case WM_MEASUREITEM: {
 		MEASUREITEMSTRUCT *mis = (MEASUREITEMSTRUCT*) mp2;
@@ -1409,25 +1469,27 @@ LRESULT CALLBACK generic_frame_handler( HWND win, UINT  msg, WPARAM mp1, LPARAM 
 			// else we do not select any widget, but still have a chance to resize frame :)
 		}
 		break;
-	case WM_SIZE: {
-		int state = wsNormal;
-		Bool doWSChange = false;
-		if (( int) mp1 == SIZE_RESTORED) {
-			state = wsNormal;
-			if ( sys s. window. state != state) doWSChange = true;
-		} else if (( int) mp1 == SIZE_MAXIMIZED) {
-			state = wsMaximized;
-			doWSChange = true;
-		} else if (( int) mp1 == SIZE_MINIMIZED) {
-			state = wsMinimized;
-			doWSChange = true;
-		}
-		if ( doWSChange) {
-			ev. gen. i = sys s. window. state = state;
-			ev. cmd = cmWindowState;
+	case WM_SIZE:
+		if ( !is_apt( aptIgnoreSizeMessages)) {
+			int state = wsNormal;
+			Bool doWSChange = false;
+			if (( int) mp1 == SIZE_RESTORED) {
+				state = wsNormal;
+				if ( sys s. window. state != state)
+					doWSChange = true;
+			} else if (( int) mp1 == SIZE_MAXIMIZED) {
+				state = wsMaximized;
+				doWSChange = true;
+			} else if (( int) mp1 == SIZE_MINIMIZED) {
+				state = wsMinimized;
+				doWSChange = true;
+			}
+			if ( doWSChange) {
+				ev.gen.i = sys s.window.state = state;
+				ev.cmd = cmWindowState;
+			}
 		}
 		break;
-	}
 	case WM_SYNCMOVE: {
 		Handle parent = v-> self-> get_parent(( Handle) v);
 		if ( parent) {

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Scalar::Util qw/blessed/;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 our (%ERROR, %METH, $caller);
 
@@ -33,7 +33,7 @@ BEGIN {
 				}
 				elsif ( $ref && blessed $data ) {
 					my ($meth, $params) = $METH{meth_params}->($key, $data);
-					$data = scalar @{ $params } ? $data->$meth(@{ $params }) : $data->$meth;
+					$data = scalar @{ $params || [] } ? $data->$meth(@{ $params }) : $data->$meth;
 					$METH{error}->('invalid_method', $key, $follow) if ! defined $data;
 				}
 				else {
@@ -55,8 +55,8 @@ BEGIN {
 		meth_params => sub {
 			my ($key, $obj) = @_;
 			my ($method, $args) = $key =~ /^(.*?)\((.*)\)$/;
-			$args = $METH{generate_params}->($args, $obj);
-			return ($method, $args);
+			$args = $METH{generate_params}->($args, $obj) if $args;
+			return ($method || $key, $args);
 		},
 		generate_params => sub {
 			my ($string, $obj, @world, $current) = @_;
@@ -133,7 +133,7 @@ Data::LNPath - lookup on nested data via path
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =cut
 

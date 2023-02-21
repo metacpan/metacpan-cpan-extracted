@@ -33,8 +33,8 @@ sub search_and_replace {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $aoa = $sql->{insert_into_args};
-    my $empty_cells_of_col_count =  $cf->__count_empty_cells_of_cols( $aoa ); ##
-    my $header = $cf->__prepare_header( $aoa, $empty_cells_of_col_count );
+    my $is_empty = $cf->__search_empty_cols( $aoa );
+    my $header = $cf->__prepare_header( $aoa, $is_empty );
     my $saved = $ax->read_json( $sf->{i}{f_search_and_replace} ) // {};
     my $all_sr_groups = [];
     my $used_names = [];

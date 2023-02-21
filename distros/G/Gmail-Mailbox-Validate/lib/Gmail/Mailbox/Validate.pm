@@ -7,15 +7,15 @@ use Net::SMTP;
 
 =head1 NAME
 
-Gmail::Mailbox::Validate - Find out if the username has a valid gmail mailbox
+Gmail::Mailbox::Validate - Find if the username has a valid mailbox in gmail
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 SYNOPSIS
@@ -27,9 +27,20 @@ It's quite simple to use:
     my $v = Gmail::Mailbox::Validate->new();
     print "mailbox exists" if $v->validate($username);
     
-Or run via command line:
+Or run via one-liner perl:
 
     $ perl -MGmail::Mailbox::Validate -le 'print "mailbox exists" if Gmail::Mailbox::Validate->new()->validate("mytest")'
+
+Or run with docker:
+
+    $ docker run geekml/gmbox mytest
+
+Plese note,
+
+1. Your host running this program should have access to port 25 of gmail servers. Many providers disable users to access external SMTP port.
+
+2. If the program shows mailbox not exists, it doesn't mean you can register that username. Because the username can be reserved by google, or just has been deleted.
+
 
 
 =head1 SUBROUTINES/METHODS
@@ -47,7 +58,7 @@ sub new {
 
 =head2 validate
 
-Validate the mailbox for username provided.
+Validate if the given username has mailbox in gmail.
 
 =cut
 
@@ -56,7 +67,7 @@ sub validate {
 	my $username = shift;
 	
 	my $smtp = Net::SMTP->new('gmail-smtp-in.l.google.com') or die $@;
-        $smtp->mail('foo@bar.net') or die $@;
+  $smtp->mail('foo@bar.net') or die $@;
 
 	my $status = $smtp->to($username . '@gmail.com') ? 1 : 0;
 	$smtp->quit;

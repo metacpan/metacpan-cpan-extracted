@@ -16,7 +16,7 @@ name: LaTeX-TOM
 provides:
   LaTeX::TOM:
     file: lib/LaTeX/TOM.pm
-    version: '1.04'
+    version: '1.05'
   LaTeX::TOM::Node:
     file: lib/LaTeX/TOM/Node.pm
     version: '0.04'
@@ -32,5 +32,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/stsc/LaTeX-TOM
-version: '1.04'
+version: '1.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

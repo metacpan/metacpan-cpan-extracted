@@ -1,11 +1,11 @@
-[![Actions Status](https://github.com/kaz-utashiro/Text-ANSI-Fold/workflows/test/badge.svg)](https://github.com/kaz-utashiro/Text-ANSI-Fold/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Text-ANSI-Fold.svg)](https://metacpan.org/release/Text-ANSI-Fold)
+[![Actions Status](https://github.com/tecolicom/Text-ANSI-Fold/workflows/test/badge.svg)](https://github.com/tecolicom/Text-ANSI-Fold/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Text-ANSI-Fold.svg)](https://metacpan.org/release/Text-ANSI-Fold)
 # NAME
 
 Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and Asian wide characters with prohibition character handling.
 
 # VERSION
 
-Version 2.1301
+Version 2.2102
 
 # SYNOPSIS
 
@@ -34,16 +34,21 @@ Version 2.1301
 
 # DESCRIPTION
 
-Text::ANSI::Fold provides capability to fold a text into two strings
-by given width.  Text can include ANSI terminal sequences.  If the
-text is divided in the middle of ANSI-effect region, reset sequence is
-appended to folded text, and recover sequence is prepended to trimmed
-string.
+[Text::ANSI::Fold](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold) provides capability to divide a text into two
+parts by given width.  Text can include ANSI terminal sequences and
+the width is calculated by its visible representation.  If the text is
+divided in the middle of colored region, reset sequence is appended to
+the former text, and color recover sequence is inserted before the
+latter string.
 
 This module also support Unicode Asian full-width and non-spacing
 combining characters properly.  Japanese text formatting with
 head-or-end of line prohibition character is also supported.  Set
 the linebreak mode to enable it.
+
+Since the overhead of ANSI escape sequence handling is not significant
+when the data does not include them, this module can be used for
+normal text processing with small penalty.
 
 Use exported **ansi\_fold** function to fold original text, with number
 of visual columns you want to cut off the text.
@@ -53,9 +58,9 @@ of visual columns you want to cut off the text.
 It returns a pair of strings; first one is folded text, and second is
 the rest.
 
-Additional third result is the visual width of folded text.  You may
-want to know how many columns returned string takes for further
-processing.
+Additional third result is visual width of the folded text.  It is not
+always same as given width, and you may want to know how many columns
+returned string takes for further processing.
 
 Negative width value is taken as unlimited.  So the string is never
 folded, but you can use this to expand tabs and to get visual string
@@ -107,7 +112,7 @@ saved value.
 
 # STRING OBJECT INTERFACE
 
-Fold object can hold string inside by **text** method.
+A fold object can hold string inside by **text** method.
 
     $f->text("text");
 
@@ -119,13 +124,14 @@ empty string if nothing remained.
         print "\n" if $folded !~ /\n\z/;
     }
 
-Method **chops** returns chopped string list.  Because **text** method
-returns the object itself, you can use **text** and **chops** like this:
+Method **chops** returns chopped string list.  Because the **text**
+method returns the object itself when called with a parameter, you can
+use **text** and **chops** in series:
 
-    print join "\n", $f->text($text)->chops;
+    print join "\n", $f->text($string)->chops;
 
 Actually, text can be set by **new** or **configure** method through
-**text** option.  Next program just works.
+**text** parameter.  Next program just works.
 
     use Text::ANSI::Fold;
     while (<>) {
@@ -140,10 +146,11 @@ reference, and chops text into given width list.
     my @list = $fold->text("1223334444")->chops(width => [ 1, 2, 3 ]);
     # return ("1", "22", "333") and keep "4444"
 
-If the width value is 0, it returns empty string.
+If the width value is 0, it returns empty string.  Negative width
+value takes all the rest of stored string.
 
-Negative width value takes all the rest of holded string in
-**retrieve** and **chops** method.
+Method **text** has an lvalue attribute, so it can be assigned to, as
+well as can be a subject of mutating operator such as `s///`.
 
 # OPTIONS
 
@@ -165,11 +172,11 @@ function as well as **new** and **configure** method.
     Array reference can be specified but works only with **chops** method,
     and retunrs empty string for zero width.
 
-- **boundary** => _word_ or _space_
+- **boundary** => `word` or `space`
 
-    Option **boundary** takes _word_ and _space_ as a valid value.  These
+    Option **boundary** takes `word` and `space` as a valid value.  These
     prohibit to fold a line in the middle of ASCII/Latin sequence.  Value
-    _word_ means a sequence of alpha-numeric characters, and _space_
+    `word` means a sequence of alpha-numeric characters, and `space`
     means simply non-space printables.
 
     This operation takes place only when enough space will be provided to
@@ -206,13 +213,13 @@ function as well as **new** and **configure** method.
     If the value is reference to subroutine, its result is used as a
     prefix string.
 
-- **ambiguous** => "narrow" or "wide"
+- **ambiguous** => `narrow` or `wide`
 
     Tells how to treat Unicode East Asian ambiguous characters.  Default
-    is "narrow" which means single column.  Set "wide" to tell the module
-    to treat them as wide character.
+    is `narrow` which means single column.  Set `wide` to tell the
+    module to treat them as wide character.
 
-- **discard** => \[ "EL", "OSC" \]
+- **discard** => \[ `EL`, `OSC` \]
 
     Specify the list reference of control sequence name to be discarded.
     **EL** means Erase Line; **OSC** means Operating System Command, defined
@@ -233,7 +240,7 @@ function as well as **new** and **configure** method.
     parenthesis), they are ran-out to the head of next line, if it fits to
     maximum width.
 
-    Default **linebreak** mode is **LINEBREAK\_NONE** and can be set one of
+    Default **linebreak** mode is `LINEBREAK_NONE` and can be set one of
     those:
 
         LINEBREAK_NONE
@@ -241,7 +248,7 @@ function as well as **new** and **configure** method.
         LINEBREAK_RUNOUT
         LINEBREAK_ALL
 
-    Import-tag **:constants** can be used to access these constants.
+    Import-tag `:constants` can be used to access these constants.
 
     Option **runin** and **runout** is used to set maximum width of moving
     characters.  Default values are both 2.
@@ -269,8 +276,6 @@ function as well as **new** and **configure** method.
 
     Currently these names are available.
 
-        space  => [ ' ', ' ' ],
-        dot    => [ '.', '.' ],
         symbol => [ "\N{SYMBOL FOR HORIZONTAL TABULATION}",
                     "\N{SYMBOL FOR SPACE}" ],
         shade  => [ "\N{MEDIUM SHADE}",
@@ -285,6 +290,10 @@ function as well as **new** and **configure** method.
     Below are styles providing same character for both tabhead and
     tabspace.
 
+        dot          => '.',
+        space        => ' ',
+        emspace      => "\N{EM SPACE}",
+        middle-dot   => "\N{MIDDLE DOT}",
         arrow        => "\N{RIGHTWARDS ARROW}",
         double-arrow => "\N{RIGHTWARDS DOUBLE ARROW}",
         triple-arrow => "\N{RIGHTWARDS TRIPLE ARROW}",
@@ -300,8 +309,8 @@ function as well as **new** and **configure** method.
 
 # EXAMPLE
 
-Next code implements almost perfect fold command for multi byte
-characters with prohibited character handling.
+Next code implements almost fully-equipped fold command for multi byte
+text with Japanese prohibited character handling.
 
     #!/usr/bin/env perl
     
@@ -325,8 +334,12 @@ characters with prohibited character handling.
 
 # SEE ALSO
 
+- [https://github.com/tecolicom/ANSI-Tools](https://github.com/tecolicom/ANSI-Tools)
+
+    Collection of ANSI related tools.
+
 - [Text::ANSI::Fold](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold)
-- [https://github.com/kaz-utashiro/Text-ANSI-Fold](https://github.com/kaz-utashiro/Text-ANSI-Fold)
+- [https://github.com/tecolicom/Text-ANSI-Fold](https://github.com/tecolicom/Text-ANSI-Fold)
 
     Distribution and repository.
 
@@ -378,7 +391,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2018- Kazumasa Utashiro.
+Copyright 2018-2023 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

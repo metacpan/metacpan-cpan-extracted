@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '7.1101'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,7 +21,7 @@ name: HealthCheck-Diagnostic-RabbitMQ
 provides:
   HealthCheck::Diagnostic::RabbitMQ:
     file: lib/HealthCheck/Diagnostic/RabbitMQ.pm
-    version: v1.2.0
+    version: v1.3.0
 requires:
   Carp: '0'
   HealthCheck::Diagnostic: '0'
@@ -31,8 +31,8 @@ requires:
 resources:
   bugtracker: https://github.com/GrantStreetGroup/p5-HealthCheck-Diagnostic-RabbitMQ/issues
   repository: git://github.com/GrantStreetGroup/p5-HealthCheck-Diagnostic-RabbitMQ.git
-version: v1.2.0
-x_generated_by_perl: v5.34.0
+version: v1.3.0
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0
 x_static_install: 1

@@ -1,3 +1,123 @@
+0.42 2022-02-21
+  [Prerequirement Changes]
+    * SPVM 0.9692+ is needed.
+  [Incompatible Changes]
+    * The $base_time argument is removed in the A, C, M method in the Sys::IO::Stat and Sys::FileTest.
+0.41 2022-02-17
+  [Incompatible Changes]
+    * The x and X method in the Sys::FileTest class doesn't check the file extension on Windows.
+  [Bug Fix]
+    * Fixed link errors of Sys::Socket::Ip_mreq and Sys::Socket::Ipv6_mreq.
+0.40 2022-02-17
+  [Incompatible Changes]
+    * Renamed the eaccess_emulate in the Sys::IO class to eaccess.
+    * Renamed the eaccess_emulate_raw in the Sys::IO class to eaccess_raw.
+    * The z method in the Sys::FileTest method throw an exception when the file doesn't exist.
+  [New Features]
+    * Added the following methods to the Sys::IO::Stat class.
+      method A : double ($base_time : long);
+      method C : double ($base_time : long);
+      method M : double ($base_time : long);
+      method O : int ();
+      method S : int ();
+      method b : int ();
+      method c : int ();
+      method d : int ();
+      method d : int ();
+      method e : int ();
+      method f : int ();
+      method g : int ();
+      method k : int ();
+      method l : int ();
+      method o : int ();
+      method p : int ();
+      method s : long ();
+      method u : int ();
+      method z : int ();
+      method cando : int ($mode : int, $effective : int);
+      method r : int ();
+      method w : int ();
+      method x : int ();
+      method R : int ();
+      method W : int ();
+      method X : int ();
+
+   * Added the $path option arguments is added to the new method in the Sys::Stat.
+     
+     [Before}
+     static method new : Sys::IO::Stat ();
+     
+     [After}
+     static method new : Sys::IO::Stat ($path = undef : string);
+
+0.39 2022-02-14
+  [Compatible Intenal Changes]
+    * Removed unused the Sys::Util class.
+  [New Features]
+    * Added the readlinkp method in the Sys::IO class.
+    
+      static method readlinkp : int ($test_dir : string);
+    * Added the following methods to the Sys::IO::Dirent class.
+      method d_ino : int ();
+      method d_reclen : int ();
+      method d_name : string ();
+  [Exception Message Improvement]
+    * The following exception messages of the methods in the Sys::IO::Stat output the file name.
+      [Before]
+      -    "[System Error]lstat failed:%s"
+      -    "[System Error]stat failed:%s
+      [After]
+      +    "[System Error]stat failed:%s. The specified file is \"%s\""
+      +    "[System Error]lstat failed:%s. The specified file is \"%s\""
+    * The following exception messages of the methods in the Sys::IO output the file name.
+      [Before]
+      - "[System Error]open failed:%s"
+      - "[System Error]fopen failed:%s"
+      - "[System Error]mkdir failed:%s"
+      - "[System Error]rmdir failed:%s"
+      - "[System Error]unlink failed:%s"
+      - "[System Error]rename failed:%s"
+      - "[System Error]realpath failed:%s"
+      - "[System Error]_fullpath failed:%s"
+      - "[System Error]chdir failed:%s"
+      - "[System Error]chmod failed:%s"
+      - "[System Error]chown failed:%s"
+      - "[System Error]truncate failed:%s"
+      - "[System Error]symlink failed:%s"
+      - "[System Error]readlink failed:%s"
+      - "[System Error]opendir failed:%s"
+      - "[System Error]utime failed:%s"
+      
+      [After]
+      + "[System Error]open failed:%s. The \"%s\" file can't be opend"
+      + "[System Error]fopen failed:%s. The \"%s\" file can't be opend"
+      + "[System Error]mkdir failed:%s. The \"%s\" directory can't be created"
+      + "[System Error]rmdir failed:%s. The \"%s\" directory can't be removed"
+      + "[System Error]unlink failed:%s. The \"%s\" directory can't be removed"name
+      + "[System Error]rename failed:%s. The \"%s\" file can't be renamed to the \"%s\" file"
+      + "[System Error]realpath failed:%s. The \"%s\" file can't be resolved"
+      + "[System Error]_fullpath failed:%s. The \"%s\" file can't be resolved"
+      + "[System Error]chdir failed:%s. The current directory can't be changed to the \"%s\" directory"
+      + "[System Error]chmod failed:%s. The permission of the \"%s\" file can't be changed"
+      + "[System Error]chown failed:%s. The owner/group of the \"%s\" file can't be changed"
+      + "[System Error]truncate failed:%s. The \"%s\" file can't be truncated"
+      + "[System Error]symlink failed:%s. The symbolic link from \"%s\" to \"%s\" can't be created"
+      + "[System Error]readlink failed:%s. The reading of the symbolic link of the \"%s\" file failed"
+      + "[System Error]opendir failed:%s. The \"%s\" directory can't be opened", dir
+      + "[System Error]utime failed:%s. The access and modification times of the \"%s\" file can't be changed"
+    * Unified an exception message
+      [Before]
+      in this system
+      [After]
+      on this system
+    [Test Improment]
+      * Added the tests of the utime in the Sys::IO class.
+    [Internal Compatible Changes]
+      * Use pointer instead of deprecated pointer_t.
+0.38 2022-02-09
+  [Bug Fix]
+    * Fixed the bug that the fwrite and fread method in the Sys::IO class throw an exception in a wrong condition.
+    
 0.37 2022-02-08
   [Prerequirement Changes]
     * SPVM 0.9691+ is needed.

@@ -67,6 +67,17 @@ test_psgi
               my $res = $cb->($req);
               is($res->content,'/thing/123','uri_for used in controller');
           }
+          {
+              my $req = HTTP::Request->new(HEAD => "http://localhost/thing/123");
+              my $res = $cb->($req);
+              is($res->content,'','HEAD, so no content');
+          }
+          {
+              my $req = HTTP::Request->new(PUT => "http://localhost/thing/123");
+              my $res = $cb->($req);
+              is($res->code, 501, 'Status: 501');
+              like($res->content,qr/no method.*item_PUT/,'method not found');
+          }
       };
 
 done_testing;

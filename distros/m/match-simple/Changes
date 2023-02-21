@@ -6,6 +6,10 @@ Home page:    <https://metacpan.org/release/match-simple>
 Bug tracker:  <https://github.com/tobyink/p5-match-simple/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.012	2023-02-15
+
+ - Added: Bundle match::simple::sugar with some useful extras.
+
 0.011	2022-12-13
 
  - Updated: General distribution modernization, etc.

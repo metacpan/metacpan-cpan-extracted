@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 12;
+plan tests => 15;
 
 my @module_files = (
     'Project2/Gantt.pm',
@@ -16,6 +16,9 @@ my @module_files = (
     'Project2/Gantt/ImageWriter.pm',
     'Project2/Gantt/Resource.pm',
     'Project2/Gantt/Skin.pm',
+    'Project2/Gantt/Skin/Large.pm',
+    'Project2/Gantt/Skin/Medium.pm',
+    'Project2/Gantt/Skin/Small.pm',
     'Project2/Gantt/SpanInfo.pm',
     'Project2/Gantt/Task.pm',
     'Project2/Gantt/TextUtils.pm',

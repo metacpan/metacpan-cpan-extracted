@@ -29,7 +29,7 @@ Chrome::Policy::Chromium - Chromium Policy class
 
 =head1 VERSION
 
-version 0.230360
+version 0.230410
 
 =head1 AUTHOR
 

@@ -7,7 +7,7 @@ use Test::Exception;
 
 use Net::DNS::Resolver::Mock;
 
-plan tests => 24;
+plan tests => 30;
 
 {
     my $Resolver = Net::DNS::Resolver::Mock->new();
@@ -49,6 +49,14 @@ plan tests => 24;
     is( ref $Reply, 'Net::DNS::Packet', 'Net::DNS::Packet object returned' );
     is( ref $Reply->{ 'answer' }->[0], 'Net::DNS::RR::A', 'New::DNS::RR::A object returned' );
     is( $Reply->{ 'answer' }->[0]->rdatastr(), '5.6.7.8', 'Correct IP Address returned' );;
+
+    $Reply = $Resolver->query( 'multi.example.com', 'A' );
+    is( defined( $Reply ), 1, 'Valid multiple entry returns set' );
+    is( ref $Reply, 'Net::DNS::Packet', 'Net::DNS::Packet object returned' );
+    is( ref $Reply->{ 'answer' }->[0], 'Net::DNS::RR::A', 'New::DNS::RR::A object returned' );
+    is( ref $Reply->{ 'answer' }->[1], 'Net::DNS::RR::A', 'New::DNS::RR::A object returned' );
+    is( $Reply->{ 'answer' }->[0]->rdatastr(), '1.2.3.4', 'Correct IP Address returned' );;
+    is( $Reply->{ 'answer' }->[1]->rdatastr(), '5.6.7.8', 'Correct IP Address returned' );;
 
     $Reply = $Resolver->query( '8.6.4.2', 'PTR' );
     is( ref $Reply->{ 'answer' }->[0], 'Net::DNS::RR::PTR', 'New::DNS::RR::PTR object returned' );

@@ -19,10 +19,11 @@
 		}
 		state = page.state;
 		current_page = page;
+		after_render_page( page );
 	}
 
 	function get_page ( page_id ) {
-		$.ajax( API + '/page/' + page_id, {
+		$.ajax( API + '/story/' + STORY_ID + '/page/' + page_id, {
 			method: 'POST',
 			data: JSON.stringify( { "state": state } ),
 			contentType: 'application/json',

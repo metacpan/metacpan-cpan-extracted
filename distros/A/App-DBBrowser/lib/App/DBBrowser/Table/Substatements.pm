@@ -89,9 +89,9 @@ sub select {
             }
             else {
                 for my $complex_col ( @$complex_columns ) {
-                    my $alias = $ax->alias( $sql, 'select', $complex_col );
+                    my $alias = $ax->alias( $sql, 'select', $complex_col, $sf->{d}{default_alias}{$complex_col} );
                     if ( defined $alias && length $alias ) {
-                        $sql->{alias}{$complex_col} = $ax->quote_col_qualified( [ $alias ] );
+                        $sql->{alias}{$complex_col} = $ax->prepare_identifier( $alias );
                     }
                     push @{$sql->{selected_cols}}, $complex_col;
                 }
@@ -190,7 +190,7 @@ sub __add_aggregate_substmt {
     my $default_alias;
     if ( $aggr eq 'COUNT(*)' ) {
         $sql->{aggr_cols}[$i] = $aggr;
-        $default_alias = 'COUNT *';
+        $default_alias = 'COUNT';
     }
     else {
         $aggr =~ s/\(\X\)\z//;
@@ -210,7 +210,7 @@ sub __add_aggregate_substmt {
             }
             if ( $all_or_distinct eq $sf->{distinct} ) {
                 $sql->{aggr_cols}[$i] .= $sf->{distinct} . " ";
-                $default_alias .= ' ' .  $sf->{distinct};
+                $default_alias .= '_' .  $sf->{distinct};
                 $is_distinct = 1;
             }
         }
@@ -225,7 +225,7 @@ sub __add_aggregate_substmt {
             return;
         }
         my $qc = quotemeta $sf->{d}{identifier_quote_char};
-        $default_alias .= ' ' . $qt_col =~ s/^$qc(.+)$qc\z/$1/r;
+        $default_alias .= '_' . $qt_col =~ s/^$qc(.+)$qc\z/$1/r;
         if ( $aggr =~ /^$GROUP_CONCAT\z/ ) {
             if ( $sf->{i}{driver} eq 'Pg' ) {
                 # Pg, STRING_AGG: separator mandatory
@@ -286,7 +286,7 @@ sub __add_aggregate_substmt {
     }
     my $alias = $ax->alias( $sql, 'aggregate', $sql->{aggr_cols}[$i], $default_alias );
     if ( length $alias ) {
-        $sql->{alias}{$sql->{aggr_cols}[$i]} = $ax->quote_col_qualified( [ $alias ] );
+        $sql->{alias}{$sql->{aggr_cols}[$i]} = $ax->prepare_identifier( $alias );
     }
     return 1;
 }
@@ -764,6 +764,10 @@ sub limit_offset {
             }
         }
         if ( $choice eq $offset ) {
+            if ( $sf->{i}{driver} eq 'Informix' ) {
+                $tc->choose( [ 'BACK' ], { prompt => 'Informix: OFFSET not supported.' } );
+                next LIMIT;
+            }
             if ( ! $sql->{limit_stmt} ) {
                 # SQLite/mysql/MariaDB: no offset without limit
                 $sql->{limit_stmt} = "LIMIT " . '9223372036854775807'  if $sf->{i}{driver} eq 'SQLite';   # 2 ** 63 - 1

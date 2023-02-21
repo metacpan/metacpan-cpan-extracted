@@ -3,7 +3,7 @@ use strict;
 use lib 'inc';
 require Module::Build::HiPi::BCM2835;
 
-our $VERSION ='0.65';
+our $VERSION ='0.66';
 
 my $requires = {
         'HiPi'             => '0.80',
@@ -42,16 +42,12 @@ my $build = Module::Build::HiPi::BCM2835->new(
 	dist_abstract    => 'Interface to BCM2835 library',
     dist_description => 'Interface to BCM2835 library',
     
-    # script_files    => 'script',
+    create_packlist => ( $ENV{'HIPI_BUILD_SKIP_PACKLIST'} ) ? 0 : 1,
 
 );
 
 { # Get Options
-    
-    #my $doupdate  = _hipi_option_is_yes($build->args('hipi-update'));
-    #
-    #$build->notes( doupdate     => $doupdate );
-    
+        
     if( $ENV{PERL5_CPAN_IS_RUNNING} || $ENV{PERL5_CPANPLUS_IS_RUNNING} || $ENV{PERL5_CPAN_IS_EXECUTING} ) {
         $build->notes( cpanskip  => 1 );
     } else {
@@ -60,9 +56,5 @@ my $build = Module::Build::HiPi::BCM2835->new(
 }
 
 $build->create_build_script();
-
-sub _hipi_option_is_yes {
-    return lc( $_[0] ) eq 'y' || lc( $_[0] ) eq 'yes' || $_[0] eq 1;
-}
 
 1;

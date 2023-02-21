@@ -48,7 +48,7 @@ use SNMP::Info::IEEE802dot3ad;
 
 our ($DEBUG, $VERSION, %MIBS, %FUNCS, %GLOBALS, %MUNGE);
 
-$VERSION = '3.89';
+$VERSION = '3.92';
 
 %MIBS = (
   %SNMP::Info::IEEE802dot3ad::MIBS,

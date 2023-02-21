@@ -47,8 +47,7 @@ subtest transform_array => sub {
         transforms => [qw(O P T2)],
     ];
     my ($got) = $obj->generate;
-    no warnings qw(qw);
-    my $expect = [ [ 60, 64, 67 ], [ 60, 63, 67 ], [ 62, 65, 69 ] ];
+    my $expect = [[60,64,67],[60,63,67],[62,65,69]];
     is_deeply $got, $expect, 'generated chords';
 };
 
@@ -101,8 +100,7 @@ subtest t_quality => sub {
     my ($got) = $obj->generate;
     my $expect = 4;
     is @$got, $expect, "generated $expect chords";
-    no warnings qw(qw);
-    $expect = [ [ 60, 64, 67, 70 ], [ 61, 65, 68, 71 ], [ 63, 67, 70, 73 ], [ 60, 64, 67, 70 ] ];
+    $expect = [[60,64,67,70],[61,65,68,71],[63,67,70,73],[60,64,67,70]];
     is_deeply $got, $expect, 'generate';
 };
 
@@ -114,8 +112,7 @@ subtest nro_quality => sub {
     my ($got) = $obj->generate;
     my $expect = 4;
     is @$got, $expect, "generated $expect chords";
-    no warnings qw(qw);
-    $expect = [ [ 60, 64, 67, 70 ], [ 61, 64, 67, 69 ], [ 60, 64, 67, 70 ], [ 61, 64, 66, 70 ] ];
+    $expect = [[60,64,67,70],[61,64,67,69],[60,64,67,70],[61,64,66,70]];
     is_deeply $got, $expect, 'generate';
 };
 

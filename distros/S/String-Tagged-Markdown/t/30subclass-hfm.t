@@ -6,7 +6,7 @@ use warnings;
 use Test2::V0;
 
 use String::Tagged::Markdown::HFM;
-use Convert::Color;
+use constant HAVE_CONVERT_COLOR => defined eval { require Convert::Color; 1 };
 
 # parse HFM
 {
@@ -91,20 +91,32 @@ use Convert::Color;
 
 # formatting
 {
-   $String::Tagged::Markdown::HFM::HIGHLIGHT_COLOUR = Convert::Color->new( "rgb:1,1,0.7" );
-
    my $str = String::Tagged::Markdown::HFM->parse_markdown(
-      "^super^ ~sub~ ++underline++ ==highlight== **bold** *italic* ~~strike~~"
+      "^super^ ~sub~ ++underline++ **bold** *italic* ~~strike~~"
    )->as_formatting;
 
-   is( [ sort $str->tagnames ], [qw( bg bold italic sizepos strike under )],
+   is( [ sort $str->tagnames ], [qw( bold italic sizepos strike under )],
       'Converted S:T:Formatting has correct tagnames' );
    is( $str->get_tag_at( 0, "sizepos" ), "super", 'Sizepos for superscript' );
    is( $str->get_tag_at( 6, "sizepos" ), "sub",   'Sizepos for subscript' );
 
    is( String::Tagged::Markdown::HFM->new_from_formatting( $str )->build_markdown,
-      "^super^ ~sub~ ++underline++ ==highlight== **bold** *italic* ~~strike~~",
+      "^super^ ~sub~ ++underline++ **bold** *italic* ~~strike~~",
       'Reconstructed Markdown from S:T:Formatting' );
+}
+
+if(HAVE_CONVERT_COLOR) {
+   $String::Tagged::Markdown::HFM::HIGHLIGHT_COLOUR = Convert::Color->new( "rgb:1,1,0.7" );
+
+   my $str = String::Tagged::Markdown::HFM->parse_markdown( "==highlight==" )
+      ->as_formatting;
+
+   is( [ $str->tagnames ], [qw( bg )],
+      'Converted S:T:Formatting has bg tag for highlight' );
+
+   is( String::Tagged::Markdown::HFM->new_from_formatting( $str )->build_markdown,
+      "==highlight==",
+      'Reconstructed Markdown from S:T:Formatting including highlight' );
 }
 
 done_testing;

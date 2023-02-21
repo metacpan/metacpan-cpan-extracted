@@ -8,3 +8,10 @@ Revision history for RFID-Biblio
 
 0.03	2010-08-25
 		Renamed to Biblio::RFID
+
+0.04	2014-04-14
+		Added support for SmartX (mifare compatibile) cards using librfid
+
+0.05	2023-02-15
+		improvements to scripts/RFID-JSONP-server.pl
+		added SmartX cards support

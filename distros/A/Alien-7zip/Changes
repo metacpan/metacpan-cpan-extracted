@@ -1,8 +1,12 @@
 Revision history for Alien-7zip},
 
-0.02      2022-12-27 18:11:28-05:00 America/New_York
+0.03      2023-02-20 17:19:52-05:00 America/New_York
+  - Fix helper to use name 'sevenzip' as previous '7z' is invalid for
+    interpolation.
 
+0.02      2022-12-27 18:11:28-05:00 America/New_York
   - Fix missing $VERSION.
   - Patch header on macOS when building from source.
+
 0.01      2022-03-21 20:08:49-04:00 America/New_York
   - initial version

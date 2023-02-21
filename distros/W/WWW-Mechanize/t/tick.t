@@ -7,7 +7,6 @@ use Test::Fatal qw( exception );
 use Test::More;
 use URI::file ();
 
-delete @ENV{qw(PATH IFS CDPATH ENV BASH_ENV)};  # Placates taint-unsafe Cwd.pm in 5.6.1
 use_ok( 'WWW::Mechanize' );
 
 my $mech = WWW::Mechanize->new( cookie_jar => undef );
@@ -22,7 +21,7 @@ $mech->tick('foo','hello');
 $mech->tick('foo','bye');
 $mech->untick('foo','hello');
 
-$mech->tick('no_value', '');
+$mech->tick('no_value', q{});
 
 my $form = $mech->form_number(1);
 isa_ok( $form, 'HTML::Form' );

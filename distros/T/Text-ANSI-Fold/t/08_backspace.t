@@ -58,4 +58,14 @@ is(folded($_, 2), "漢\b漢", "broken wide char with single bs 2");
 is(folded($_, 3), "漢\b漢字\b", "broken wide char with single bs 3");
 is(folded($_, 4), "漢\b漢字\b", "broken wide char with single bs 4");
 
+sub bd { $_[0] =~ s/(\w)/$1\cH$1/gr }
+sub ul { $_[0] =~ s/(\w)/_\cH$1/gr }
+for my $f (\&bd, \&ul) {
+    state $n;
+    $_ = &$f("123 456 789");
+    is(folded($_, 5, boundary => 'word'), &$f("123 "),    "word boundary " . ++$n);
+    is(folded($_, 6, boundary => 'word'), &$f("123 "),    "word boundary " . ++$n);
+    is(folded($_, 7, boundary => 'word'), &$f("123 456"), "word boundary " . ++$n);
+}
+
 done_testing;

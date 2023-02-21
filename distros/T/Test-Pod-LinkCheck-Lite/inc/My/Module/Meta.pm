@@ -140,6 +140,10 @@ sub provides {
     return ( provides => $provides );
 }
 
+sub optional_modules {
+    return ( qw{ IO::Socket::SSL Net::SSLeay } );
+}
+
 sub requires {
     my ( $self, @extra ) = @_;
 ##  if ( ! $self->distribution() ) {
@@ -288,6 +292,10 @@ on.
 This method returns the names of things which are not to be indexed
 by CPAN.
 
+=head2 optional_modules
+
+This method returns the names of all optional modules.
+
 =head2 provides
 
  use YAML;
@@ -352,7 +360,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2019-2022 by Thomas R. Wyant, III
+Copyright (C) 2019-2023 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

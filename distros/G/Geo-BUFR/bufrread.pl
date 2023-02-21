@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# (C) Copyright 2010-2020 MET Norway
+# (C) Copyright 2010-2023 MET Norway
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,8 +33,8 @@ use constant DEFAULT_TABLE_FORMAT => 'BUFRDC';
 use constant DEFAULT_TABLE_PATH_BUFRDC => '/usr/local/lib/bufrtables';
 use constant DEFAULT_TABLE_PATH_ECCODES => '/usr/local/share/eccodes/definitions/bufr/tables';
 # Ought to be your most up-to-date code table(s)
-use constant DEFAULT_CTABLE_BUFRDC => 'C0000000000000033000';
-use constant DEFAULT_CTABLE_ECCODES => '0/wmo/33';
+use constant DEFAULT_CTABLE_BUFRDC => 'C0000000000000039000';
+use constant DEFAULT_CTABLE_ECCODES => '0/wmo/39';
 
 # Parse command line options
 my %option = ();
@@ -104,8 +104,6 @@ my $ahl_regexp;
 if ($option{ahl}) {
     eval { $ahl_regexp = qr/$option{ahl}/ };
     die "Argument to --ahl is not a valid Perl regular expression: $@" if $@;
-    # When filtering on ahl we assume file is composed of GTS bulletins only
-    Geo::BUFR->reuse_current_ahl();
 }
 
 # Where to direct output (including verbose output, but not output to STDERR)
@@ -357,6 +355,10 @@ sub read_filter_file {
             $num_required_criteria++ if $1;
         } else {
             my @values = split;
+            # Check that value line contains correct number of values
+            die "Number of values doesn't match number of descriptors"
+                . " for line $. in filter file '$filter_file'"
+                if scalar @values != scalar @{$fid[$num_criteria]};
             # Remove leading 0's in numerical values (to prepare for string comparison)
             for $_ (@values) { s/^0+(\d+)$/$1/ };
             $fiv[$num_criteria]->[++$num_val[$num_criteria]] = \@values;
@@ -601,6 +603,6 @@ Pål Sannes E<lt>pal.sannes@met.noE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010-2020 MET Norway
+Copyright (C) 2010-2023 MET Norway
 
 =cut

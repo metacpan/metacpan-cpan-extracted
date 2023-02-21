@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-03'; # DATE
+our $DATE = '2023-02-18'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.008'; # VERSION
+our $VERSION = '1.017'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -29,27 +29,27 @@ Example input:
     SKU3,quux,1,blah
     SKU14,corge,0,blah
 
-Check whether specified values are found in the `sku` column, print message
-when they are (search case-insensitively):
+Check whether specified values are found in the `sku` field, print message when
+they are (search case-insensitively):
 
     % csv-find-values product.csv sku sku1 sk3b sku15 -i
-    'sku1' is found in column 'sku' row 2
-    'sk3b' is found in column 'sku' row 4
+    'sku1' is found in field 'sku' row 2
+    'sk3b' is found in field 'sku' row 4
 
 Print message when values are *not* found instead:
 
     % csv-find-values product.csv sku sku1 sk3b sku15 -i --print-when=not_found
-    'sku15' is NOT found in column 'sku'
+    'sku15' is NOT found in field 'sku'
 
 Always print message:
 
     % csv-find-values product.csv sku sku1 sk3b sku15 -i --print-when=always
-    'sku1' is found in column 'sku' row 2
-    'sk3b' is found in column 'sku' row 4
-    'sku15' is NOT found in column 'sku'
+    'sku1' is found in field 'sku' row 2
+    'sk3b' is found in field 'sku' row 4
+    'sku15' is NOT found in field 'sku'
 
 Do custom action with Perl code, code will receive `$_` (the value being
-evaluated), `$found` (bool, whether it is found in the column), `$rownum` (the
+evaluated), `$found` (bool, whether it is found in the field), `$rownum` (the
 row number the value is found in), `$data_rownum` (the data row number the value
 is found in, equals `$rownum` - 1):
 
@@ -168,11 +168,11 @@ _
             } else {
                 if (defined $found_rownum) {
                     if ($r->{util_args}{print_when} eq 'found' || $r->{util_args}{print_when} eq 'always') {
-                        print "'$value' is found in column '$r->{field}' row ".($found_rownum+1)."\n";
+                        print "'$value' is found in field '$r->{field}' row ".($found_rownum+1)."\n";
                     }
                 } else {
                     if ($r->{util_args}{print_when} eq 'not_found' || $r->{util_args}{print_when} eq 'always') {
-                        print "'$value' is NOT found in column '$r->{field}'".($suggested_values && @$suggested_values ? ", perhaps you meant ".join("/", @$suggested_values)."?" : "")."\n";
+                        print "'$value' is NOT found in field '$r->{field}'".($suggested_values && @$suggested_values ? ", perhaps you meant ".join("/", @$suggested_values)."?" : "")."\n";
                     }
                 }
             }
@@ -195,7 +195,7 @@ App::CSVUtils::csv_find_values - Find specified values in a CSV field
 
 =head1 VERSION
 
-This document describes version 1.008 of App::CSVUtils::csv_find_values (from Perl distribution App-CSVUtils), released on 2023-02-03.
+This document describes version 1.017 of App::CSVUtils::csv_find_values (from Perl distribution App-CSVUtils), released on 2023-02-18.
 
 =head1 FUNCTIONS
 
@@ -219,27 +219,27 @@ Example input:
  SKU3,quux,1,blah
  SKU14,corge,0,blah
 
-Check whether specified values are found in the C<sku> column, print message
-when they are (search case-insensitively):
+Check whether specified values are found in the C<sku> field, print message when
+they are (search case-insensitively):
 
  % csv-find-values product.csv sku sku1 sk3b sku15 -i
- 'sku1' is found in column 'sku' row 2
- 'sk3b' is found in column 'sku' row 4
+ 'sku1' is found in field 'sku' row 2
+ 'sk3b' is found in field 'sku' row 4
 
 Print message when values are I<not> found instead:
 
  % csv-find-values product.csv sku sku1 sk3b sku15 -i --print-when=not_found
- 'sku15' is NOT found in column 'sku'
+ 'sku15' is NOT found in field 'sku'
 
 Always print message:
 
  % csv-find-values product.csv sku sku1 sk3b sku15 -i --print-when=always
- 'sku1' is found in column 'sku' row 2
- 'sk3b' is found in column 'sku' row 4
- 'sku15' is NOT found in column 'sku'
+ 'sku1' is found in field 'sku' row 2
+ 'sk3b' is found in field 'sku' row 4
+ 'sku15' is NOT found in field 'sku'
 
 Do custom action with Perl code, code will receive C<$_> (the value being
-evaluated), C<$found> (bool, whether it is found in the column), C<$rownum> (the
+evaluated), C<$found> (bool, whether it is found in the field), C<$rownum> (the
 row number the value is found in), C<$data_rownum> (the data row number the value
 is found in, equals C<$rownum> - 1):
 

@@ -40,7 +40,7 @@ use constant {
     MAX_WEBSOCKET_SIZE         => 262_144,
 };
 
-our $VERSION = "v0.0.32";
+our $VERSION = "v0.0.34";
 
 has _listener_observables => sub { +{} };
 
@@ -598,7 +598,7 @@ sub register ($self, $app, $config) {
                 { returning => 'id' },
             ))->hashes->[0]{id} if $keep_events and defined $new_event;
 
-            if ($new_event_id or defined $new_state) {
+            if (defined $new_event or defined $new_state) {
                 $new_event_id //= (await $db->query_p("SELECT nextval('bs_events_id_seq')"))->arrays->[0][0];
 
                 await $db->update_p(
@@ -609,7 +609,7 @@ sub register ($self, $app, $config) {
                         last_dt  => \'CURRENT_TIMESTAMP',
                     },
                     { id => $stream_id },
-                );
+                ) if (defined $new_event and $keep_events) or defined $new_state;
             }
 
             my $diff;

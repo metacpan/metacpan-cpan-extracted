@@ -150,6 +150,7 @@ lib/Lab/Moose/Instrument.pm
 lib/Lab/Moose/Instrument/ABB_TRMC2.pm
 lib/Lab/Moose/Instrument/AH2700A.pm
 lib/Lab/Moose/Instrument/AdjustRange.pm
+lib/Lab/Moose/Instrument/Agilent33120A.pm
 lib/Lab/Moose/Instrument/Agilent34410A.pm
 lib/Lab/Moose/Instrument/Agilent34460A.pm
 lib/Lab/Moose/Instrument/Cache.pm

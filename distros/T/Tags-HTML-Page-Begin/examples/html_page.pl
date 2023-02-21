@@ -23,6 +23,7 @@ my $end = Tags::HTML::Page::End->new(
 );
 
 # Process page
+$begin->process_css;
 $css->put(
        ['s', 'div'],
        ['d', 'color', 'red'],
@@ -46,20 +47,20 @@ print $tags->flush;
 #   <head>
 #     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 #     <meta name="generator" content=
-#       "Perl module: Tags::HTML::Page::Begin, Version: 0.15" />
+#       "Perl module: Tags::HTML::Page::Begin, Version: 0.16" />
 #     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 #     <title>
 #       Page title
 #     </title>
 #     <style type="text/css">
-# div {
-# 	color: red;
-# 	background-color: black;
-# }
 # * {
-# 	box-sizing: border-box;
-# 	margin: 0;
-# 	padding: 0;
+#         box-sizing: border-box;
+#         margin: 0;
+#         padding: 0;
+# }
+# div {
+#         color: red;
+#         background-color: black;
 # }
 # </style>
 #   </head>

@@ -4,7 +4,7 @@
       "P.Sannes <pal.sannes@met.no>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_2"
    ],
@@ -49,6 +49,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.38",
+   "version" : "1.39",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

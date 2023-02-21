@@ -1,21 +1,42 @@
 Revision history for Perl extension Template::Plex.
-0.4.3   Tue 28 Jun 14:53:54 AEST 2022
+
+v0.5.0
+  [new features]
+  - added append_slot
+  - added prepend_slot
+  - "cheat comments", which allows line starting with a perl comment to be
+    ignored. "use_comments" must be sepecified in options hash to enable
+
+  [changes]
+  - Now using Error::Show for error context instead of internal code
+  - Improved diagnostics with unmatched "{" or "[" in template. 
+
+  [pod]
+  - Improved Error and Logging section with a new example
+  - Documented new features
+  - Added information about line error numbers in regards to block_fix and include
+
+  [other]
+  - Reformated Changes file
+
+
+v0.4.3   2022-06-28
 	- Fixed failing tests... again..
 	- Improved error reporting context on template sytax error (reduced line count)
 	- Added 'inject' option when loading a template
 	- Briefly documented 'use' and 'inject' options when loading templates
 
 
-0.4.2	Thu 23 Jun 2022 14:41:55 AEST
+0.4.2	2022-06-23
 	- Removed usage of perl-5.36 features isa  and multi-element for loops
 	- Reverted min perl version back to 5.24 for better compatability
 	- Checked dependencies also work with perl 5.24
 	- Removed other non used features
 
-0.4.1	Wed 22 Jun 2022 14:30:56 AEST
+0.4.1	2022-06-22
 	- Fix bad tests
 
-0.4.0	Wed 22 Jun 2022 12:30:56 AEST
+0.4.0	2022-06-22
 	- Template inheritance and slotting
 	- Requires Perl 5.36 (for isa)
 	- User subclassing is now possible
@@ -42,7 +63,7 @@ Revision history for Perl extension Template::Plex.
 
 
 
-0.3.0  Mon 25 Apr 2022 20:43:10 AEST
+0.3.0  2022-04-25
 
 	- Subtemplates now can modify top level arguments hash (ie add keys not
 	  previously available)
@@ -51,7 +72,7 @@ Revision history for Perl extension Template::Plex.
 	- Added tests for skip and sub template argument manipulation
 	- Updated pod 
 
-0.2.0  Thu 31 Mar 2022 15:05:25 AEST
+0.2.0  2022-03-31
 	- Cleanup generated code a little
 	- Added plx subroutine for automatic loading/caching/rendering
 	- Added block_fix feature
@@ -61,9 +82,9 @@ Revision history for Perl extension Template::Plex.
 	- Added importing of String::Util subroutines into template
 	- Updated documentaion
 
-0.1.1  Fri 18 Feb 2022 18:03:48 AEST
+0.1.1  2022-02-18
 	- Fixed examples in example directory
 	- Fixed Changes (wrong package name)
 
-0.1.0  Wed Aug  4 08:58:42 2021
+0.1.0  2021-08-4
 	- Inital version

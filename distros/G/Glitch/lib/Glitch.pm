@@ -1,5 +1,5 @@
 package Glitch;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use 5.006; use strict; use warnings;
 use Data::Dumper; use feature qw/state/;
 state (%META);
@@ -10,6 +10,16 @@ BEGIN {
 
 sub import {
 	my ($pkg, %import) = @_;
+	build_meta(%import);
+	do {
+		no strict 'refs';
+		my $package = caller();
+		*{"${package}::glitch"} = \&glitch;
+	};
+}
+
+sub build_meta {
+	my (%import) = @_;
 	if (keys %import) {
 		$META{config_parser} = delete $import{glitch_config_parser} if defined $import{glitch_config_parser};
 		%import = (_parse_config(delete $import{glitch_config}), %import) if (defined $import{glitch_config}); 
@@ -31,11 +41,7 @@ sub import {
 			map { $_ => '' } ("file", "filepath", "line", "stacktrace", "module")
 		) for sort keys %import;
 	}
-	do {
-		no strict 'refs';
-		my $package = caller();
-		*{"${package}::glitch"} = \&glitch;
-	};
+	return 1;
 }
 
 sub glitch {
@@ -77,6 +83,7 @@ sub _log {
 
 sub _build_glitch {
 	my (%options) = @_;
+	no warnings 'redefine';
 	my $class = sprintf q|%s::%s|, $options{object_name} ||= 'Glitch', $options{name};
 	my @methods = map { my $struct = $_ =~ m/(file|filepath|line|stacktrace|module)/ ? "''" :  _stringify_struct($options{$_}); "sub $_ { return \$_[0]->{$_} || $struct; }" } sort keys %options;
 	unshift @methods, 'sub new { my $self = shift; return bless {@_}, $self; }';
@@ -153,7 +160,7 @@ Glitch - Exception Handling.
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 

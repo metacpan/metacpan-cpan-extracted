@@ -17,6 +17,9 @@ lib/Project2/Gantt/Globals.pm
 lib/Project2/Gantt/ImageWriter.pm
 lib/Project2/Gantt/Resource.pm
 lib/Project2/Gantt/Skin.pm
+lib/Project2/Gantt/Skin/Large.pm
+lib/Project2/Gantt/Skin/Medium.pm
+lib/Project2/Gantt/Skin/Small.pm
 lib/Project2/Gantt/SpanInfo.pm
 lib/Project2/Gantt/Task.pm
 lib/Project2/Gantt/TextUtils.pm

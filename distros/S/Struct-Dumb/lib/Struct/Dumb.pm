@@ -8,7 +8,7 @@ package Struct::Dumb;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Carp;
 
@@ -319,10 +319,7 @@ sub _build_class_for_feature_class
       my $name = $_;
       my $var = "\$$name";
 
-      "  field $var;",
-      "  ADJUST {",
-      "    $var = delete \$_[0]->{$name};",
-      "  }",
+      "  field $var :param = undef;",
       "  method $name$lvalue { \@_ and croak \"$pkg->$name invoked with arguments\"; $var }",
    } @$fields;
 

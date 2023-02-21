@@ -6,7 +6,7 @@ use constant {
     _REPR_VERSION => 0,
 };
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 method new($class: :$_codegen) {
     bless {

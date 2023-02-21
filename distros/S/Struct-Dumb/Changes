@@ -1,5 +1,12 @@
 Revision history for Struct-Dumb
 
+0.14    2023-02-11
+        [CHANGES]
+         * Updates to `feature 'class'` support, using `:param` instead of
+           `ADJUST` blocks
+         * Swap all unit tests from `Test::More` to `Test2::V0`
+         * Drop test-time dependence on `Test::Fatal`
+
 0.13    2022-08-27
         [CHANGES]
          * Use `feature 'class'` instead of blessed ARRAYrefs on perls which

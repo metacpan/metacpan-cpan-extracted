@@ -97,14 +97,6 @@ sub change_transform
 	}
 
 	my $m = $self-> matrix;
-	if ( $self->{reversed}) {
-		my @t = @$m[4,5];
-		@$m[4,5] = (0,0);
-		$m->rotate(90);
-		my ($x) = $self->point2pixel($self->{pageSize}->[0] - $self->{pageMargins}->[0] - $self->{pageMargins}->[2]);
-		$m->translate($x, 0);
-		$m->translate(-$t[0], $t[1]);
-	}
 	my $doMx = !$m->is_identity;
 
 	if ( !$doClip && !$doMx && !$rg) {
@@ -116,7 +108,7 @@ sub change_transform
 	$self-> emit(':');
 
 	if ( $rg ) {
-		$self-> emit($rg-> apply_offset);
+		$self-> emit($rg-> apply_clip($self) . ' C');
 	} elsif ( $doClip ) {
 		@cr = $self-> pixel2point( @cr);
 		float_inplace(@cr);
@@ -127,7 +119,7 @@ sub change_transform
 		my @tm = $self-> pixel2point( @$m[4,5] );
 		my @xm = @$m[0..3];
 		float_inplace(@xm, @tm);
-		$self-> emit("[@xm @tm] SM");
+		$self-> emit("[@xm @tm] CM");
 	}
 
 	$self-> {changed}-> {$_} = 1 for qw(fill linePattern lineWidth lineJoin lineEnd miterLimit font);
@@ -195,10 +187,12 @@ sub stroke
 		$r1 == rop::NoOper &&
 		$r2 == rop::NoOper;
 
+	my $lw_changed;
 	if ( $self-> {changed}-> {lineWidth}) {
 		my ($lw) = $self-> pixel2point($self-> lineWidth);
 		$self-> emit( float_format($lw) . ' SW');
 		$self-> {changed}-> {lineWidth} = 0;
+		$lw_changed++;
 	}
 
 	if ( $self-> {changed}-> {lineEnd}) {
@@ -238,18 +232,19 @@ sub stroke
 			( $r1 == rop::Blackness) ? 0 :
 			( $r1 == rop::Whiteness) ? 0xffffff : $self-> color;
 
-		if ( $self-> {changed}-> {linePattern}) {
+		if ( $self-> {changed}-> {linePattern} || $lw_changed ) {
 			if ( length( $lp) == 1) {
-				$self-> emit('[] 0 SD');
+				$self-> emit('[] 0 SD') if $self-> {changed}-> {linePattern};
 			} else {
-				my $lw = $self->lineWidth;
+				my $lw = $self->lineWidth || 2.0; # because to be divided by 2
 				my @x = map { ord } split('', $lp);
 				push( @x, 0) if scalar(@x) % 1;
 				my @lp;
 				for ( my $i = 0; $i < @x; $i += 2 ) {
-					push @lp, $x[$i];
-					push @lp, ($x[$i+1] - 1) * $lw / 2;
+					push @lp, ($x[$i] - 1) * $lw / 2;
+					push @lp, ($x[$i+1]) * $lw / 2;
 				}
+				@lp = map { $_ || 1 } @lp;
 				$self-> emit("[@lp] 0 SD");
 			}
 			$self-> {changed}-> {linePattern} = 0;
@@ -328,7 +323,7 @@ d/T/translate , d/R/rotate , d/Y/glyphshow , d/P/showpage , d/Z/scale , d/I/imag
 d/@/dup , d/G/setgray , d/A/setrgbcolor , d/l/lineto , d/F/fill ,
 d/FF/findfont , d/XF/scalefont , d/SF/setfont ,
 d/O/stroke , d/SD/setdash , d/SL/setlinecap , d/SW/setlinewidth ,
-d/SJ/setlinejoin , d/E/eofill , d/ML/setmiterlimit ,
+d/SJ/setlinejoin , d/E/eofill , d/ML/setmiterlimit , d/CM/concat ,
 d/SS/setcolorspace , d/SC/setcolor , d/SM/setmatrix , d/SPD/setpagedevice ,
 d/SP/setpattern , d/CP/currentpoint , d/MX/matrix , d/MP/makepattern ,
 d/b/begin , d/e/end , d/t/true , d/f/false , d/?/ifelse , d/a/arc ,
@@ -507,8 +502,8 @@ sub fillPattern
 	my $fpid;
 
 	if( (ref($fp) // '') eq 'ARRAY') {
-		$solidBack = ! grep { $_ != 0    } @$fp;
-		$solidFore = ! grep { $_ != 0xff } @$fp;
+		$solidBack = fp::is_empty($fp);
+		$solidFore = fp::is_solid($fp);
 		my @scaleto = $self-> pixel2point( 8, 8);
 		if ( !$solidBack && !$solidFore) {
 			$fpid = join( '', map { sprintf("%02x", $_)} @$fp);
@@ -861,7 +856,7 @@ CLEAR
 sub line
 {
 	my ( $self, $x1, $y1, $x2, $y2) = @_;
-	return $self->primitive( line => $x1, $y1, $x2, $y2) if $self-> is_custom_line(1);
+	return $self->primitive( line => $x1, $y1, $x2, $y2) if $self-> is_custom_line;
 	( $x1, $y1, $x2, $y2) = float_format($self-> pixel2point( $x1, $y1, $x2, $y2));
 	$self-> stroke("N $x1 $y1 M $x2 $y2 l O");
 }
@@ -869,7 +864,7 @@ sub line
 sub lines
 {
 	my ( $self, $array) = @_;
-	return $self->primitive( lines => $array ) if $self-> is_custom_line(1);
+	return $self->primitive( lines => $array ) if $self-> is_custom_line;
 	my $i;
 	my $c = scalar @$array;
 	my @a = float_format($self-> pixel2point( @$array));
@@ -884,7 +879,7 @@ sub lines
 sub polyline
 {
 	my ( $self, $array) = @_;
-	return $self->primitive( polyline => $array ) if $self-> is_custom_line(1);
+	return $self->primitive( polyline => $array ) if $self-> is_custom_line;
 	my $i;
 	my $c = scalar @$array;
 	my @a = float_format($self-> pixel2point( @$array));
@@ -983,8 +978,12 @@ sub region
 	return $_[0]->{region} unless $#_;
 	my ( $self, $region ) = @_;
 	if ( $region && !UNIVERSAL::isa($region, "Prima::PS::PostScript::Region")) {
-		warn "Region is not a Prima::PS::PostScript::Region";
-		return undef;
+		if ( UNIVERSAL::isa($region, 'Prima::Region')) {
+			$region = Prima::PS::PostScript::Region-> new_from_region( $region, $self );
+		} else {
+			warn "Region is not a Prima::PS::PostScript::Region";
+			return undef;
+		}
 	}
 	$self->{clipRect} = [0,0,0,0];
 	$self->{region} = $region;
@@ -1020,13 +1019,13 @@ sub region
 	my ($self, $mode) = @_;
 	my $path = join "\n", @{$self-> entries};
 	$path .= ' X' unless $path =~ /X$/;
-	$path .= ' C';
 	return Prima::PS::PostScript::Region->new( $path );
 }
 
 package
 	Prima::PS::PostScript::Region;
 use base qw(Prima::PS::Drawable::Region);
+use Prima::PS::Format;
 
 sub other { UNIVERSAL::isa($_[0], "Prima::PS::PostScript::Region") ? $_[0] : () }
 
@@ -1045,6 +1044,24 @@ sub combine
 }
 
 sub is_empty { shift->{path} !~ /[OF]/ }
+
+sub apply_offset
+{
+	my ($self, $canvas) = @_;
+	my $path = $self->{path};
+	my @offset = @{ $self->{offset} };
+	return $path if 0 == grep { $_ != 0 } @offset;
+
+	@offset = $canvas-> pixel2point(@offset) if $canvas;
+	float_inplace(@offset);
+	return "@offset T $path -$offset[0] -$offset[1] T";
+}
+
+sub apply_clip
+{
+	my ($self, $canvas) = @_;
+	return $self->apply_offset($canvas) . ' C';
+}
 
 1;
 

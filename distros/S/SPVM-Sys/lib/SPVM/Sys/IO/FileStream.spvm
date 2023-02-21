@@ -1,4 +1,4 @@
-class Sys::IO::FileStream : pointer_t {
+class Sys::IO::FileStream : pointer {
   # Fields
   has closed : ro byte;
 

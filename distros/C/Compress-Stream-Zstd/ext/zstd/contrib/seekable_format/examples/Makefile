@@ -1,5 +1,5 @@
 # ################################################################
-# Copyright (c) 2017-present, Facebook, Inc.
+# Copyright (c) Meta Platforms, Inc. and affiliates.
 # All rights reserved.
 #
 # This source code is licensed under both the BSD-style license (found in the
@@ -13,7 +13,7 @@ ZSTDLIB_PATH = ../../../lib
 ZSTDLIB_NAME = libzstd.a
 ZSTDLIB = $(ZSTDLIB_PATH)/$(ZSTDLIB_NAME)
 
-CPPFLAGS += -I../ -I../../../lib -I../../../lib/common
+CPPFLAGS += -DXXH_NAMESPACE=ZSTD_ -I../ -I../../../lib -I../../../lib/common
 
 CFLAGS ?= -O3
 CFLAGS += -g

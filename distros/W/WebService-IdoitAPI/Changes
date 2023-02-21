@@ -1,0 +1,18 @@
+Revision history for WebService-IdoitAPI
+
+v0.1.3 Sun Feb 19 10:47:42 CET 2023
+	- t/02-connection.t seems to work only with perl >= 5.14
+
+v0.1.2 Fri Feb 17 15:21:27 CET 2023
+	- update README
+	- give more meaningfull message when JSON RPC client fails
+	- fix GitHub issue #1
+
+v0.1.1 Sun Jan 15 19:46:11 CET 2023
+	- throw an exeption when configuration misses either apikey or url
+	- add tests
+
+0.1.0	Fri, 07 Oct 2022 08:42:12 +0200
+	- add WebService::IdoitAPI->new()
+	- add method request()
+

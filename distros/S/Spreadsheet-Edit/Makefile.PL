@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.020000;
+use 5.009005;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Spreadsheet-Edit",
   "LICENSE" => "unrestricted",
-  "MIN_PERL_VERSION" => "5.020000",
+  "MIN_PERL_VERSION" => "5.009005",
   "NAME" => "Spreadsheet::Edit",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
     "Data::Dumper::Interp" => 0,
     "Encode" => 0,
     "Exporter" => 0,
-    "Exporter::Tiny" => 0,
+    "Exporter::Tiny" => "1.001_000",
     "Fcntl" => 0,
     "File::Basename" => 0,
     "File::Copy" => 0,
@@ -32,9 +32,10 @@ my %WriteMakefileArgs = (
     "Guard" => 0,
     "Import::Into" => 0,
     "List::Util" => 0,
+    "POSIX" => 0,
     "Scalar::Util" => 0,
     "Symbol" => 0,
-    "Text::CSV" => 0,
+    "Text::CSV" => "1.90_01",
     "Tie::Array" => 0,
     "Tie::Indirect" => 0,
     "bytes" => 0,
@@ -55,9 +56,10 @@ my %WriteMakefileArgs = (
     "autovivification" => 0,
     "indirect" => 0,
     "lib" => 0,
-    "multidimensional" => 0
+    "multidimensional" => 0,
+    "open" => 0
   },
-  "VERSION" => "2.102",
+  "VERSION" => "3.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -71,7 +73,7 @@ my %FallbackPrereqs = (
   "Data::Dumper::Interp" => 0,
   "Encode" => 0,
   "Exporter" => 0,
-  "Exporter::Tiny" => 0,
+  "Exporter::Tiny" => "1.001_000",
   "Fcntl" => 0,
   "File::Basename" => 0,
   "File::Copy" => 0,
@@ -83,10 +85,11 @@ my %FallbackPrereqs = (
   "Guard" => 0,
   "Import::Into" => 0,
   "List::Util" => 0,
+  "POSIX" => 0,
   "Scalar::Util" => 0,
   "Symbol" => 0,
   "Test::More" => "0.98",
-  "Text::CSV" => 0,
+  "Text::CSV" => "1.90_01",
   "Tie::Array" => 0,
   "Tie::Indirect" => 0,
   "autovivification" => 0,
@@ -97,6 +100,7 @@ my %FallbackPrereqs = (
   "lib" => 0,
   "mro" => 0,
   "multidimensional" => 0,
+  "open" => 0,
   "overload" => 0,
   "parent" => 0,
   "strict" => 0,

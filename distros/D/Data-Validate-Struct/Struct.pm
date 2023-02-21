@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2007-2015 T. v.Dein <tlinden |AT| cpan.org>.
+# Copyright (c) 2007-2016 T. v.Dein <tlinden |AT| cpan.org>.
 # All Rights Reserved. Std. disclaimer applies.
 # Artistic License, same as perl itself. Have fun.
 #
@@ -21,7 +21,7 @@ use File::stat;
 use Data::Validate qw(:math is_printable);
 use Data::Validate::IP qw(is_ipv4 is_ipv6);
 
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 
 use vars qw(@ISA);
 
@@ -32,81 +32,81 @@ require Exporter;
 @EXPORT_OK = qw(add_validators);
 
 %__ValidatorTypes = (
-		    # primitives
-		    int            => sub { return defined(is_integer($_[0])); },
-		    hex            => sub { return defined(is_hex($_[0])); },
-		    oct            => sub { return defined(is_oct($_[0])); },
-		    number         => sub { return defined(is_numeric($_[0])); },
+                     # primitives
+                     int            => sub { return defined(is_integer($_[0])); },
+                     hex            => sub { return defined(is_hex($_[0])); },
+                     oct            => sub { return defined(is_oct($_[0])); },
+                     number         => sub { return defined(is_numeric($_[0])); },
 
-		    word           => qr(^[\w_\-]+$),
-		    line           => qr/^[^\n]+$/s,
+                     word           => qr(^[\w_\-]+$),
+                     line           => qr/^[^\n]+$/s,
 
-		    text           => sub { return defined(is_printable($_[0])); },
+                     text           => sub { return defined(is_printable($_[0])); },
 
-		    regex          => sub {
-                      my $r = ref $_[0];
-                      return 1 if $r eq 'Regexp';
-                      if ($r eq '') {
-		        # this is a bit loosy but should match most regular expressions
-		        # using the qr() operator, but it doesn't check if the expression
-		        # is valid. we could do this by compiling it, but this would lead
-		        # to exploitation possiblities to programs using the module.
-                        return $_[0] =~ qr/^qr ( (.).*\1 | \(.*\) | \{.*\} ) $/x;
-                      }
-                      return 0;
-                    },
+                     regex          => sub {
+                       my $r = ref $_[0];
+                       return 1 if $r eq 'Regexp';
+                       if ($r eq '') {
+                         # this is a bit loosy but should match most regular expressions
+                         # using the qr() operator, but it doesn't check if the expression
+                         # is valid. we could do this by compiling it, but this would lead
+                         # to exploitation possiblities to programs using the module.
+                         return $_[0] =~ qr/^qr ( (.).*\1 | \(.*\) | \{.*\} ) $/x;
+                       }
+                       return 0;
+                     },
 
-		    # via imported regexes
-		    uri            => qr(^$RE{URI}$),
-		    cidrv4         => sub {
-                      my ($p, $l) = split(/\//, $_[0]);
-                      return defined(is_ipv4($p)) && defined(is_between($l, 0, 32));
-                    },
-		    ipv4           => sub { defined(is_ipv4($_[0])) },
-                    quoted         => qr/^$RE{delimited}{ -delim => qr(\') }$/,
-		    hostname       => qr(^$host$),
+                     # via imported regexes
+                     uri            => qr(^$RE{URI}$),
+                     cidrv4         => sub {
+                       my ($p, $l) = split(/\//, $_[0]);
+                       return defined(is_ipv4($p)) && defined(is_between($l, 0, 32));
+                     },
+                     ipv4           => sub { defined(is_ipv4($_[0])) },
+                     quoted         => qr/^$RE{delimited}{ -delim => qr(\') }$/,
+                     hostname       => qr(^$host$),
 
-		    ipv6           => sub { defined(is_ipv6($_[0])) },
-		    cidrv6         => sub {
-                      my ($p, $l) = split('/', $_[0]);
-                      return defined(is_ipv6($p)) && defined(is_between($l, 0, 128));
-                    },
+                     ipv6           => sub { defined(is_ipv6($_[0])) },
+                     cidrv6         => sub {
+                       my ($p, $l) = split('/', $_[0]);
+                       return defined(is_ipv6($p)) && defined(is_between($l, 0, 128));
+                     },
 
-		    # matches perl style scalar variables
-		    # possible matches: $var ${var} $(var)
-		    vars           => qr/(?<!\\) ( \$\w+ | \$\{[^\}]+\} | \$\([^\)]+\) )/x,
+                     # matches perl style scalar variables
+                     # possible matches: $var ${var} $(var)
+                     vars           => qr/(?<!\\) ( \$\w+ | \$\{[^\}]+\} | \$\([^\)]+\) )/x,
 
-		    # closures
+                     # closures
 
-		    # this one doesn't do a stat() syscall, so keep cool
-		    path           => sub { return file_name_is_absolute($_[0]); },
+                     # this one doesn't do a stat() syscall, so keep cool
+                     path           => sub { return file_name_is_absolute($_[0]); },
 
-		    # though this one does it - it stat()s if the file exists
-		    fileexists     => sub { return stat($_[0]); },
+                     # though this one does it - it stat()s if the file exists
+                     fileexists     => sub { return stat($_[0]); },
 
-		    # do a dns lookup on given value, this also fails if
-		    # no dns is available - so be careful with this
-		    resolvablehost => sub { return gethostbyname($_[0]); },
+                     # do a dns lookup on given value, this also fails if
+                     # no dns is available - so be careful with this
+                     resolvablehost => sub { return gethostbyname($_[0]); },
 
-		    # looks if the given value is an existing user on the host system
-		    user           => sub { return (getpwnam($_[0]))[0]; },
+                     # looks if the given value is an existing user on the host system
+                     user           => sub { return (getpwnam($_[0]))[0]; },
 
-		    # same with group
-		    group          => sub { return getgrnam($_[0]); },
+                     # same with group
+                     group          => sub { return getgrnam($_[0]); },
 
-		    # int between 0 - 65535
-		    port           => sub {
-		      if ( $_[0] =~ /^$port$/ && ($_[0] > 0 && $_[0] < 65535) )
-			{ return 1; } else { return 0; } },
+                     # int between 0 - 65535
+                     port           => sub {
+                       if ( $_[0] =~ /^$port$/ && ($_[0] > 0 && $_[0] < 65535) )
+                         { return 1; } else { return 0; } },
 
-		    # variable integer range, use: range(N1 - N2)
-		    range          => sub {
-		      if ( defined(is_integer($_[0])) && ($_[0] >= $_[2] && $_[0] <= $_[3]) )
-			{ return 1; } else { return 0; } },
+                     # variable integer range, use: range(N1 - N2)
+                     range          => sub {
+                       if ( defined(is_integer($_[0])) && ($_[0] >= $_[2] && $_[0] <= $_[3]) )
+                         { return 1; } else { return 0; } },
 
-                    # just a place holder at make the key exist
-                    optional       => 1,
-);
+                     # just a place holder at make the key exist
+                     optional       => 1,
+                    );
 
 sub add_validators {
   # class method, add validators globally, not per object
@@ -195,7 +195,14 @@ sub _traverse {
   my ($self, $reference, $hash, @tree) = @_;
 
   foreach my $key (keys %{$reference}) {
-    if (ref($reference->{$key}) eq 'ARRAY') {
+    my $reference_ref = ref $reference->{$key};
+    my $hash_ref = ref $hash->{$key};
+    if ($reference_ref =~ /^ARRAY|HASH$/ && $reference_ref ne $hash_ref)
+    {
+      my $err = sprintf("Different structure types %s vs %s", $reference_ref, $hash_ref);
+      push @{$self->{errors}}, sprintf(q{%s at '%s'}, $err, join(' => ', @tree));
+    }
+    elsif ($reference_ref eq 'ARRAY') {
       # just use the 1st one, more elements in array are expected to be the same
       foreach my $item (@{$hash->{$key}}) {
         if (ref($item) eq q(HASH)) {
@@ -212,10 +219,10 @@ sub _traverse {
         }
       }
     }
-    elsif (ref($reference->{$key}) eq 'HASH') {
+    elsif ($reference_ref eq 'HASH') {
       $self->_traverse($reference->{$key}, $hash->{$key}, @tree, $key);
     }
-    elsif (ref($reference->{$key}) eq '') {
+    elsif ($reference_ref eq '') {
       $self->_debug("Checking $key at " . join(', ', @tree));
       if (my $err = $self->_check_type($key, $reference, $hash)) {
         push @{$self->{errors}}, sprintf(q{%s at '%s'}, $err, join(' => ', @tree));
@@ -557,7 +564,7 @@ The type 'optional' can be placed anywhere in the type string.
 
 In some rare situations you might require a negative match. So
 a test shall return TRUE if a particular value does NOT match the
-given type. This might be usefull to prevent certain things.
+given type. This might be useful to prevent certain things.
 
 To achieve this, you just have to prepend one of the below mentioned
 types with the keyword B<no>.
@@ -679,7 +686,7 @@ Enables debug output which gets printed to STDERR.
 Returns an array ref with the errors found when validating the hash.
 Each error is on the format '<value> doesn't match <types> at <ref>',
 where <ref> is a comma separated tree view depicting where in the
-the error occured.
+the error occurred.
 
 =item B<errstr()>
 
@@ -899,7 +906,7 @@ Thanks to David Cantrell for his helpful hints.
 
 =head1 VERSION
 
-0.10
+0.11
 
 =cut
 

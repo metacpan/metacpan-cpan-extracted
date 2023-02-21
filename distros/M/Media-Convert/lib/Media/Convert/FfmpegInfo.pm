@@ -11,7 +11,7 @@ has 'codecs' => (
 
 sub _build_codecs {
 	local $/ = "";
-	open my $ffmpeg, "ffmpeg -codecs 2>/dev/null|";
+	open my $ffmpeg, "-|", "ffmpeg -codecs 2>/dev/null";
 	my $codeclist = <$ffmpeg>;
 	close $ffmpeg;
 	my $parsing = 0;

@@ -3,7 +3,7 @@ use warnings;
 use IO::Socket::INET;
 use OPCUA::Open62541 'STATUSCODE_GOOD';
 
-use Test::More tests => 11;
+use Test::More tests => 6;
 use Test::NoWarnings;
 use Test::LeakTrace;
 
@@ -45,29 +45,3 @@ my $server = IO::Socket::INET->new(
 );
 ok($server, "server") or diag "server new and listen failed: $!";
 my $port = $server->sockport();
-
-SKIP: {
-    skip "No UA_Client_disconnect_async in open62541", 5
-	unless OPCUA::Open62541::Client->can('connect_async');
-($sok, $cok, $dok, my $aok) = (0, 0, 0, 0);
-no_leaks_ok {
-    my $client = OPCUA::Open62541::Client->new();
-    $sok = 1 if $client;
-    my $config = $client->getConfig();
-    $cok = 1 if $config;
-    my $sc = $config->setDefault();
-    $dok = 1 if $sc eq STATUSCODE_GOOD;
-    $sc = $client->connect_async(
-	"opc.tcp://localhost:$port",
-	sub {
-	    my ($c, $d, $i, $r) = @_;
-	},
-	undef,
-    );
-    $aok = 1 if $sc eq STATUSCODE_GOOD;
-} "leak client async";
-ok($sok, "client async new");
-ok($cok, "config async get");
-ok($dok, "default async set");
-ok($aok, "client async connect");
-}  # SKIP

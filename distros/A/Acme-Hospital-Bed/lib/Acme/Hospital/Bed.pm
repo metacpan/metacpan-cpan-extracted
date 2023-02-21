@@ -3,7 +3,7 @@ package Acme::Hospital::Bed;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub new {
 	my ($package, %args) = @_;
@@ -155,7 +155,7 @@ Acme::Hospital::Bed - The great new Acme::Hospital::Bed!
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -174,23 +174,48 @@ Perhaps a little code snippet.
 	Acme::Hospital::Bed->new(
 		total_num_of_beds => 30,
 		lifes => 5,
-		names => [qw/tom richard harry/],
+		names => [qw/tom richard joy/],
 		phrases => [
 			[
-				'Level 1 phrase'
+				"Hello, I am fine.",
+				"I still have my mind after episode 1.",
 			],
-			[...],
-			[...],
-			[...],
-			[...],
-			[...],
-			[...],
-			[...],
-			[...],
 			[
-				'Level 10 phrase'
+				"Hello, I am still fine.",
+				"I still have my mind after episode 2."
+			],
+			[
+				"Hello, I am also fine.",
+				"I still have my mind after episode 3."
+			],
+			[
+				"Hello, I think I'm still fine.",
+				"I still have my mind after watching and travelling through the world wide corruption."
+			],
+			[
+				"Hello, I think you think I'm fine.",
+				"I still have my mind after visiting my truest disbelievers."
+			],
+			[
+				"Hello, am I still fine.",
+				"I will then make my own judgement?",
+			],
+			[
+				"Hello, do you still think I'm fine.",
+				"Good luck?",
+			],
+			[
+				"Hello, I don't feel so fine.",
+				"Where is my mind?",
+			],
+			[
+				"Hello, This is not fine.",
+				"Where is my mind?",
+			],
+			[
+				"Are you being dishonest?",
 			]
-		]	
+		]
 	)->start;
 
 =head1 DESCRIPTION

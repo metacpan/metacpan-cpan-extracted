@@ -1,0 +1,13 @@
+Changes
+GetRandom.xs
+lib/Sys/GetRandom.pm
+Makefile.PL
+Makefile_PL_settings.plx
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/00-load.t
+t/01-bare.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   generated from Sys::GetRandom POD (added by maint/eumm-fixup.pl)

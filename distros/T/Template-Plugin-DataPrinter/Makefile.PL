@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Template::Plugin::DataPrinter",
   "PREREQ_PM" => {
     "Data::Printer" => "1.0.0",
-    "HTML::FromANSI::Tiny" => 0,
+    "HTML::FromANSI::Tiny" => "0.104",
     "Hash::Merge::Simple" => 0,
     "Template::Plugin" => 0,
     "base" => 0,
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::NoWarnings" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.016",
+  "VERSION" => "0.017",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,7 +53,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "File::Temp" => 0,
   "HTML::Entities" => 0,
-  "HTML::FromANSI::Tiny" => 0,
+  "HTML::FromANSI::Tiny" => "0.104",
   "Hash::Merge::Simple" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

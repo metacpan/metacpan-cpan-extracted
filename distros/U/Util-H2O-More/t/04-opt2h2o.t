@@ -24,6 +24,6 @@ $o = Getopt2h2o \@ARGV, {}, qw/option1=s option2=i option3 option4=s@/;
 is $o->option1, q{foo}, q{Getopt2h2os: '--option1 STRING' exists as expected};
 is $o->option2, 12,     q{Getopt2h2os: '--option2 NUMBER' exists as expected};
 is $o->option3, 1,      q{Getopt2h2os: '--option3' exists as expected};
-is_deeply $o->option4, [qw/bar baz/], q{H2oGetopts: '--option4 bar --option4 baz' exists as expected};
+is_deeply $o->option4, [qw/bar baz/], q{H2oGetopt: '--option4 bar --option4 baz' exists as expected};
 
 done_testing;

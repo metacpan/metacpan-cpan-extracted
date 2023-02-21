@@ -8,7 +8,7 @@ use utf8;
 use parent 'Class::Accessor';
 use Carp qw(cluck);
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 Travel::Status::DE::DBWagenreihung::Wagon->mk_ro_accessors(
 	qw(attributes class_type has_ac has_accessibility has_bahn_comfort
 	  has_bike_storage has_bistro has_compartments has_family_area

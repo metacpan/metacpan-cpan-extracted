@@ -16,6 +16,7 @@ api/file.c
 api/hash.c
 api/list.c
 api/matrix.c
+api/thunks.c
 api/omp.c
 api/options.c
 api/perl.c
@@ -84,6 +85,7 @@ examples/buttons2.pl
 examples/calendar.pl
 examples/canvas.pl
 examples/chess_puzzle.pl
+examples/clock.pl
 examples/cv.pl
 examples/detailedoutline.pl
 examples/dock.pl
@@ -142,6 +144,7 @@ examples/tiger.pl
 examples/tiger.eps
 examples/transparent.pl
 examples/triangle.pl
+examples/windowstate.pl
 img/bar.c
 img/codec_bmp.c
 img/codec_jpeg.c
@@ -261,9 +264,11 @@ pod/Prima/tutorial/menu2.gif
 pod/Prima/tutorial/menu3.gif
 pod/Prima/tutorial.pod
 pod/Prima/types.pod
+pod/Prima/Widget/date.gif
 pod/Prima/Widget/pack.pod
 pod/Prima/Widget/place.pod
 pod/Prima/Widget/link.gif
+pod/Prima/Widget/time.gif
 pod/Prima/Widget.pod
 pod/Prima/windings.gif
 pod/Prima/Window.pod
@@ -346,9 +351,11 @@ Prima/StdBitmap.pm
 Prima/Stress.pm
 Prima/sys/FS.pm
 Prima/sys/Gencls.pm
+Prima/sys/GUIException.pm
 Prima/sys/gtk/FileDialog.pm
 Prima/sys/win32/FileDialog.pm
 Prima/sys/win32/sysimage.gif
+Prima/sys/win32.pm
 Prima/sys/Test.pm
 Prima/sys/XQuartz.pm
 Prima/sysimage.gif
@@ -361,6 +368,7 @@ Prima/Themes.pm
 Prima/Tie.pm
 Prima/Utils.pm
 Prima/Widget/BidiInput.pm
+Prima/Widget/Date.pm
 Prima/Widget/EventRectangles.pm
 Prima/Widget/GroupScroller.pm
 Prima/Widget/Header.pm
@@ -372,6 +380,7 @@ Prima/Widget/Panel.pm
 Prima/Widget/RubberBand.pm
 Prima/Widget/ScrollWidget.pm
 Prima/Widget/StartupWindow.pm
+Prima/Widget/Time.pm
 Prima/Widget/UndoActions.pm
 Prima/VB/prima-cfgmaint.pl
 Prima/VB/CfgMaint.pm
@@ -428,10 +437,11 @@ t/Widget/Size.t
 t/Widget/SizeLimits.t
 t/Widget/Window.t
 t/Widget/ZOrder.t
+t/misc/cpan.t
 t/misc/fs.t
 t/misc/pod.t
+t/misc/precision.t
 t/misc/syntax.t
-t/misc/cpan.t
 unix/app.c
 unix/clipboard.c
 unix/cocoa.c
@@ -453,6 +463,7 @@ unix/timer.c
 unix/widget.c
 unix/window.c
 unix/xft.c
+unix/xim.c
 utils/prima-fmview.pl
 utils/prima-gencls.pl
 utils/makedoc/intro.tex

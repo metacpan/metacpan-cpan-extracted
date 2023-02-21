@@ -14,12 +14,6 @@
    },
    "name" : "Dir-Split",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "File::Temp" : "0",
-            "Test::More" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
             "Module::Build" : "0.42"
@@ -36,12 +30,18 @@
             "Params::Validate" : "0",
             "boolean" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
       }
    },
    "provides" : {
       "Dir::Split" : {
          "file" : "lib/Dir/Split.pm",
-         "version" : "0.81"
+         "version" : "0.82"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "url" : "https://github.com/stsc/Dir-Split"
       }
    },
-   "version" : "0.81",
+   "version" : "0.82",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

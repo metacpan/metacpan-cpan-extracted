@@ -1,5 +1,5 @@
 package Cpanel::JSON::XS;
-our $VERSION = '4.32';
+our $VERSION = '4.33';
 our $XS_VERSION = $VERSION;
 # $VERSION = eval $VERSION;
 
@@ -112,6 +112,8 @@ or        L<https://rt.cpan.org/Public/Dist/Display.html?Queue=Cpanel-JSON-XS>
 
 B<Changes to JSON::XS>
 
+- bare hashkeys are now checked for utf8. (GH #209)
+
 - stricter decode_json() as documented. non-refs are disallowed.
   safe by default.
   added a 2nd optional argument. decode() honors now allow_nonref.
@@ -162,6 +164,9 @@ B<Changes to JSON::XS>
   methods, like FREEZE/THAW or serialization with other methods.
 
 - additional fixes for:
+
+  - #208 - no security-relevant out-of-bounds reading of module memory
+    when decoding hash keys without ending ':'
 
   - [cpan #88061] AIX atof without USE_LONG_DOUBLE
 
@@ -2340,6 +2345,7 @@ BEGIN {
   local $^W; # silence redefine warnings. no warnings 'redefine' does not help
   # These already come with JSON::PP::Boolean. Avoid redefine warning.
   if (!defined $JSON::PP::Boolean::VERSION or $JSON::PP::VERSION lt '4.00') {
+    &overload::unimport( 'overload', '0+', '++', '--' );
     &overload::import( 'overload',
                        "0+"     => sub { ${$_[0]} },
                        "++"     => sub { $_[0] = ${$_[0]} + 1 },
@@ -2347,6 +2353,7 @@ BEGIN {
       );
   }
   # workaround 5.6 reserved keyword warning
+  &overload::unimport( 'overload', '""', 'eq', 'ne' );
   &overload::import( 'overload',
     '""'     => sub { ${$_[0]} == 1 ? '1' : '0' }, # GH 29
     'eq'     => sub {

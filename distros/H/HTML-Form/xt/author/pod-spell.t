@@ -18,6 +18,7 @@ Alex
 Alexandr
 Alexey
 Andreas
+Anwar
 Bill
 Bron
 Burke
@@ -33,6 +34,7 @@ FWILES
 Father
 Felix
 Fiegehenn
+FileInput
 Finch
 Form
 Froehlich
@@ -50,16 +52,21 @@ Hay
 Hedlund
 Hukins
 Ian
+IgnoreInput
+ImageInput
+Input
 Jacob
 James
 Julien
 Kapranoff
 Karaban
 Kennedy
+KeygenInput
 Kilgore
 Koenig
 Lance
 Lipcon
+ListInput
 Lukas
 MARKSTOS
 Magno
@@ -67,6 +74,7 @@ Mai
 Mann
 Mark
 Mike
+Mohammad
 Olaf
 Ondrej
 Ostmann
@@ -88,6 +96,8 @@ Steve
 SteveHay
 Stone
 Stosberg
+SubmitInput
+TextInput
 Thompson
 Todd
 Tom
@@ -129,10 +139,12 @@ jefflee
 john9art
 jraspass
 ka
+keygen
 lib
 lw
 mai
 mark
+mohammad
 mschilli
 murphy
 olaf

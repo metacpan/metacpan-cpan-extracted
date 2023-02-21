@@ -34,7 +34,7 @@ resources:
   homepage: https://github.com/jhthorsen/mojolicious-plugin-openapi
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/jhthorsen/mojolicious-plugin-openapi.git
-version: '5.08'
+version: '5.09'
 x_contributors:
   - 'Bernhard Graf <augensalat@gmail.com>'
   - 'Doug Bell <doug@preaction.me>'

@@ -8,6 +8,14 @@ use Test::EOL;
 
 my @files = (
     'lib/HTML/Form.pm',
+    'lib/HTML/Form/FileInput.pm',
+    'lib/HTML/Form/IgnoreInput.pm',
+    'lib/HTML/Form/ImageInput.pm',
+    'lib/HTML/Form/Input.pm',
+    'lib/HTML/Form/KeygenInput.pm',
+    'lib/HTML/Form/ListInput.pm',
+    'lib/HTML/Form/SubmitInput.pm',
+    'lib/HTML/Form/TextInput.pm',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/autocomplete.t',
@@ -18,6 +26,7 @@ my @files = (
     't/form-maxlength.t',
     't/form-multi-select.t',
     't/form-param.t',
+    't/form-parse.t',
     't/form-selector.t',
     't/form-unicode.t',
     't/form.t'

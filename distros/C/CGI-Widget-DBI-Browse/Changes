@@ -8,6 +8,33 @@ all changes without author attribution are by Adi Fairbank
 
 =over 3
 
+=item 0.18
+
+Ensure all ampersands are html-escaped in final html output: & -> &amp;
+
+Add new -category_before_link_closures option, for customizing content before each category nav <a/> link,
+inside the table <td/> cell
+
+Code optimization to decrease memory footprint: get rid of $self object inside anonymous sub returned
+by _category_columndata_closure()
+
+New public method grid_layout_enabled() so subclasses can tell if we are in grid or table display mode
+
+New method configure_grid_or_table_view() to add support for switching between grid and table view
+when browse results are reached; also add -default_grid_layout option to change default view to grid
+
+Support NULL or empty string values in browse categories, showing '(empty)' to the user
+
+Fix a couple tests for indeterminant html attribute order, to prevent intermittent failures
+
+Add support for overridden -display_columns in display_results() method
+
+Add new method re_add_breadcrumbs_to_header()
+
+Add id attributes and <span/>'s to breadcrumbNavLink <a/> elements, so the breadcrumbs can be renamed with CSS
+
+Make code run with CGI 4 without warnings about calling param() in list context
+
 =item 0.17 - Dec 8, 2014
 
 call translate() method from Search module v0.31 on user-visible English strings, to support internationalization

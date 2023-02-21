@@ -4,7 +4,7 @@ Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes - Generate valid CPAN::Chan
 
 # VERSION
 
-version 0.173421
+version 0.230480
 
 # SYNOPSIS
 
@@ -44,7 +44,7 @@ Defaults to on.
 ## `tag_regexp`
 
 A regexp string which will be used to match git tags to find releases. If your
-release tags are not compliant with [CPAN::Changes::Spec](https://metacpan.org/pod/CPAN::Changes::Spec), you can use a
+release tags are not compliant with [CPAN::Changes::Spec](https://metacpan.org/pod/CPAN%3A%3AChanges%3A%3ASpec), you can use a
 capture group. It will be used as the version in place of the full tag name.
 
 Also takes `semantic`, which becomes `qr{^v?(\d+\.\d+\.\d+)$}`, and
@@ -67,7 +67,7 @@ Defaults to 'Changelog for $dist\_name'
 ## `copy_to_root`
 
 When true, the generated changelog will be copied into the root folder where it
-can be committed (possiby automatically by [Dist::Zilla::Plugin::Git::Commit](https://metacpan.org/pod/Dist::Zilla::Plugin::Git::Commit))
+can be committed (possiby automatically by [Dist::Zilla::Plugin::Git::Commit](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AGit%3A%3ACommit))
 
 Defaults to true.
 
@@ -78,23 +78,41 @@ editing.
 
 Defaults to false.
 
-# BUGS AND LIMITATIONS
+# SUPPORT
 
-You can make new bug reports, and view existing ones, through the
-web interface at [https://github.com/ioanrogers/Dist-Zilla-Plugin-ChangelogFromGit-CPAN-Changes/issues](https://github.com/ioanrogers/Dist-Zilla-Plugin-ChangelogFromGit-CPAN-Changes/issues).
+## Perldoc
 
-# AVAILABILITY
+You can find documentation for this module with the perldoc command.
 
-The project homepage is [http://search.cpan.org/dist/Dist-Zilla-Plugin-ChangelogFromGit-CPAN-Changes/](http://search.cpan.org/dist/Dist-Zilla-Plugin-ChangelogFromGit-CPAN-Changes/).
+```
+perldoc Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes
+```
 
-The latest version of this module is available from the Comprehensive Perl
-Archive Network (CPAN). Visit [http://www.perl.com/CPAN/](http://www.perl.com/CPAN/) to find a CPAN
-site near you, or see [https://metacpan.org/module/Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes/](https://metacpan.org/module/Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes/).
+## Websites
 
-# SOURCE
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
 
-The development version is on github at [https://github.com/ioanrogers/Dist-Zilla-Plugin-ChangelogFromGit-CPAN-Changes](https://github.com/ioanrogers/Dist-Zilla-Plugin-ChangelogFromGit-CPAN-Changes)
-and may be cloned from [git://github.com/ioanrogers/Dist-Zilla-Plugin-ChangelogFromGit-CPAN-Changes.git](git://github.com/ioanrogers/Dist-Zilla-Plugin-ChangelogFromGit-CPAN-Changes.git)
+- MetaCPAN
+
+    A modern, open-source CPAN search engine, useful to view POD in HTML format.
+
+    [https://metacpan.org/release/Dist-Zilla-Plugin-ChangelogFromGit-CPAN-Changes](https://metacpan.org/release/Dist-Zilla-Plugin-ChangelogFromGit-CPAN-Changes)
+
+## Bugs / Feature Requests
+
+Please report any bugs or feature requests through the web interface at [https://github.com/ioanrogers/Dist-Zilla-Plugin-ChangelogFromGit-CPAN-Changes.git/issues](https://github.com/ioanrogers/Dist-Zilla-Plugin-ChangelogFromGit-CPAN-Changes.git/issues).
+You will be automatically notified of any progress on the request by the system.
+
+## Source Code
+
+The source code is available for from the following locations:
+
+[https://github.com/ioanrogers/Dist-Zilla-Plugin-ChangelogFromGit-CPAN-Changes.git](https://github.com/ioanrogers/Dist-Zilla-Plugin-ChangelogFromGit-CPAN-Changes.git)
+
+```
+git clone https://github.com/ioanrogers/Dist-Zilla-Plugin-ChangelogFromGit-CPAN-Changes.git.git
+```
 
 # AUTHOR
 
@@ -102,30 +120,7 @@ Ioan Rogers <ioanr@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ioan Rogers.
+This software is copyright (c) 2023 by Ioan Rogers.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
-# DISCLAIMER OF WARRANTY
-
-BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
-FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT
-WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER
-PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND,
-EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
-SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME
-THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.
-
-IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
-WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
-REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
-TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
-SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
-RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
-FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
-SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
-DAMAGES.

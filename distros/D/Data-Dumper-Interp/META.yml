@@ -1,5 +1,5 @@
 ---
-abstract: 'interpolate Data::Dumper output into strings, with human-oriented options'
+abstract: 'interpolate Data::Dumper output into strings for human consumption'
 author:
   - 'Jim Avera'
 build_requires:
@@ -44,7 +44,7 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: '4.114'
+version: '5.002'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -7,14 +7,20 @@ use List::MoreUtils           qw/all/;
 use Scalar::Util              qw/looks_like_number/;
 use Clone                     qw/clone/;
 use Module::Load::Conditional qw/check_install/;
+
 use Excel::ValueReader::XLSX;
 
 note "testing Excel::ValueReader::XLSX version $Excel::ValueReader::XLSX::VERSION";
 
-(my $xl_file    = $0) =~ s/\.t$/.xlsx/;          # 'valuereader.xlsx' in the same directory
-(my $xl_1904    = $0) =~ s/\.t$/1904.xlsx/;      # 'valuereader1904.xlsx'
-(my $xl_ulibuck = $0) =~ s/\w+.t$/ulibuck.xlsx/; # 'ulibuck.xlsx'
-(my $xl_mappe   = $0) =~ s/\w+.t$/Mappe1.xlsx/;  # 'Mappe1.xlsx'
+
+(my $tst_dir = $0) =~ s/valuereader\.t$//;
+$tst_dir       ||= ".";
+my $xl_file      = "$tst_dir/valuereader.xlsx";
+my $xl_1904      = "$tst_dir/valuereader1904.xlsx";
+my $xl_ulibuck   = "$tst_dir/ulibuck.xlsx";
+my $xl_mappe     = "$tst_dir/Mappe1.xlsx";
+my $xl_without_r = "$tst_dir/cells_without_r_attr.xlsx";
+
 
 my @expected_sheet_names = qw/Test Empty Entities Tab_entities Dates Tables/;
 my @expected_values      = (  ["Hello", undef, undef, 22, 33, 55],
@@ -173,6 +179,16 @@ my @expected_tab_cols_with_entities = (
 );
 
 
+my @expected_without_r = (
+  [qw/One      two      three/],
+  [qw/four     five     six  /],
+  [qw/seven    eight    nine /],
+  [11, 22],
+  [],
+  [33, 44],
+ );
+
+
 my @backends = ('Regex');
 push @backends, 'LibXML' if check_install(module => 'XML::LibXML::Reader');
 
@@ -255,7 +271,6 @@ foreach my $backend (@backends) {
   ok($are_all_numbers, "dates with no format, using $backend");
 
 
-
   # Excel file in 1904 date format
   my $reader_1904 = Excel::ValueReader::XLSX->new(xlsx => $xl_1904, using => $backend);
   my $dates_1904  = $reader_1904->values('Dates');
@@ -272,7 +287,14 @@ foreach my $backend (@backends) {
   my $reader_mappe = Excel::ValueReader::XLSX->new(xlsx => $xl_mappe, using => $backend);
   my $strings      = $reader_mappe->values('Tabelle2');
   is_deeply $strings, \@expected_mappe, "empty string nodes, using $backend";
+
+  # cells do not always have a 'r' attribute
+  my $reader_without_r = Excel::ValueReader::XLSX->new(xlsx => $xl_without_r, using => $backend);
+  my $vals = $reader_without_r->values(1);
+  is_deeply $vals, \@expected_without_r, "cells without 'r' attribute";
 }
+
+
 
 done_testing();
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 package Foo;
 use Struct::Dumb;

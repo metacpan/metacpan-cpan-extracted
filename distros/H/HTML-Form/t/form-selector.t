@@ -6,7 +6,8 @@ use warnings;
 use Test::More tests => 12;
 use HTML::Form;
 
-my $form = HTML::Form->parse(<<"EOT", base => "http://example.com", strict => 1);
+my $form
+    = HTML::Form->parse( <<"EOT", base => "http://example.com", strict => 1 );
 <form>
 <input name="n1" id="id1" class="A" value="1">
 <input id="id2" class="A" value="2">
@@ -22,25 +23,25 @@ EOT
 
 #$form->dump;
 
-is($form->value("n1"), 1);
-is($form->value("^n1"), 1);
-is($form->value("#id1"), 1);
-is($form->value(".A"), 1);
-is($form->value("#id2"), 2);
-is($form->value(".B"), 3);
+is( $form->value("n1"),   1 );
+is( $form->value("^n1"),  1 );
+is( $form->value("#id1"), 1 );
+is( $form->value(".A"),   1 );
+is( $form->value("#id2"), 2 );
+is( $form->value(".B"),   3 );
 
-is(j(map $_->value, $form->find_input(".A")), "1:2");
+is( j( map $_->value, $form->find_input(".A") ), "1:2" );
 
 $form->find_input("#id2")->name("n2");
-$form->value("#id2", 22);
-is($form->click->uri->query, "n1=1&n2=22");
+$form->value( "#id2", 22 );
+is( $form->click->uri->query, "n1=1&n2=22" );
 
 # try some odd names
-is($form->find_input("##foo")->name, "#bar");
-is($form->find_input("#bar"), undef);
-is($form->find_input("^#bar")->class, ".D");
-is($form->find_input("..D")->id, "#foo");
+is( $form->find_input("##foo")->name,  "#bar" );
+is( $form->find_input("#bar"),         undef );
+is( $form->find_input("^#bar")->class, ".D" );
+is( $form->find_input("..D")->id,      "#foo" );
 
 sub j {
-    join(":", @_);
+    join( ":", @_ );
 }

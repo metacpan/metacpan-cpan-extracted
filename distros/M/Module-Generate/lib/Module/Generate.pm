@@ -9,7 +9,7 @@ use Perl::Tidy;
 use Data::Dumper;
 use Module::Starter;
 $Data::Dumper::Deparse = 1;
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 our %CLASS;
 our $SUB_INDEX = 1;
 
@@ -63,6 +63,20 @@ sub synopsis {
 sub abstract {
 	$CLASS{CURRENT}{ABSTRACT} = $_[1];
 	return $_[0];
+}
+
+sub no_warnings {
+	my $self = shift;
+	$CLASS{CURRENT}{NO_WARNINGS} ||= [];
+	push @{ $CLASS{CURRENT}{NO_WARNINGS} }, @_;
+	return $self;
+}
+
+sub no_strict {
+	my $self = shift;
+	$CLASS{CURRENT}{NO_STRICT} ||= [];
+	push @{ $CLASS{CURRENT}{NO_STRICT} }, @_;
+	return $self;
 }
 
 sub use {
@@ -295,8 +309,10 @@ sub generate {
 	for my $class (@classes) {
 		my $cls = _perl_tidy(
 			sprintf(
-				qq{package %s; use strict; use warnings;%s\n%s\n%s\n%s\n\n1;\n\n__END__%s },
+				qq{package %s; use strict; use warnings;%s%s%s\n%s\n%s\n%s\n\n1;\n\n__END__%s },
 					$class,
+					_build_no_strict($CLASS{$class}{NO_STRICT}),
+					_build_no_warnings($CLASS{$class}{NO_WARNINGS}),
 					_build_use($CLASS{$class}),
 					_build_global($CLASS{$class}{GLOBAL}),
 					_build_phase($CLASS{$class}),
@@ -343,6 +359,20 @@ sub _make_path {
 		}
 	}
 	return $path;
+}
+
+sub _build_no_strict {
+	if ($_[0] && scalar @{$_[0]}) {
+		return sprintf "\nno strict qw/%s/;\n", join " ", @{$_[0]};
+	}
+	return '';
+}
+
+sub _build_no_warnings {
+	if ($_[0] && scalar @{$_[0]}) {
+		return sprintf "\nno warnings qw/%s/;\n", join " ", @{$_[0]};
+	}
+	return '';
 }
 
 sub _build_use {
@@ -685,7 +715,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 0.27
+Version 0.28
 
 =cut
 

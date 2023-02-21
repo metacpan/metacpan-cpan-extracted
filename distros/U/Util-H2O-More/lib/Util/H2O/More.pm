@@ -4,9 +4,9 @@ use warnings;
 package Util::H2O::More;
 use parent q/Exporter/;
 
-our $VERSION = q{0.2.8};
+our $VERSION = q{0.3.0};
 
-our @EXPORT_OK = (qw/baptise opt2h2o h2o o2h d2o o2d o2h2o ini2h2o h2o2ini Getopt2h2o/);
+our @EXPORT_OK = (qw/baptise opt2h2o h2o o2h d2o o2d o2h2o ini2h2o ini2o h2o2ini o2ini Getopt2h2o ddd dddie tr4h2o/);
 
 use Util::H2O ();
 
@@ -56,10 +56,29 @@ sub baptise ($$@) {
     return $self;
 }
 
+# make keys legal for use as accessor, provides original keys via "__og_keys" accessor
+sub tr4h2o($) {
+    my $hash_ref    = shift;
+    my $new_hashref = {};
+
+    # List::Util::pairmap was not happy being require'd for some reason
+    # so iterate and replace keys explicitly; store original key in resulting
+    # hashref via __og_keys
+    foreach my $og_k ( keys %$hash_ref ) {
+        my $k = $og_k;
+        $k =~ tr/a-zA-Z0-9/_/c;
+        $new_hashref->{$k} = $hash_ref->{$og_k};
+
+        # save old key via __og_keys
+        $new_hashref->{__og_keys}->{$k} = $og_k;
+    }
+    return $new_hashref;
+}
+
 # preconditioner for use with Getopt::Long flags; returns just the flag name given
 # a list of option descriptors, e.g., qw/option1=s option2=i option3/;
 
-# Getopts to keys
+# Getopt to keys
 sub opt2h2o(@) {
     my @getopt_def = @_;
     my @flags_only = map { m/([^=|\s]+)/g; $1 } @getopt_def;
@@ -68,34 +87,44 @@ sub opt2h2o(@) {
 
 # wrapper around opt2h2o (yeah!)
 sub Getopt2h2o(@) {
-  my ($ARGV_ref, $defaults, @opts) = @_;
-  $defaults //= {};
-  my $o = h2o $defaults, opt2h2o(@opts);
-  require Getopt::Long;
-  Getopt::Long::GetOptionsFromArray( $ARGV_ref, $o, @opts ); # Note, @ARGV is passed by reference
-  return $o;
+    my ( $ARGV_ref, $defaults, @opts ) = @_;
+    $defaults //= {};
+    my $o = h2o $defaults, opt2h2o(@opts);
+    require Getopt::Long;
+    Getopt::Long::GetOptionsFromArray( $ARGV_ref, $o, @opts );    # Note, @ARGV is passed by reference
+    return $o;
 }
 
 # general form of method used to give accessors to Config::Tiny in Util::H2O's
 # POD documentation
-sub o2h2o ($) {
+sub o2h2o($) {
     my $ref = shift;
     return h2o -recurse, { %{$ref} };
 }
 
 # more specific helper app that uses Config::Tiny->read and o2h2o to get a config
 # object back from an .ini; requries Config::Tiny
-sub ini2h2o ($) {
+sub ini2h2o($) {
     my $filename = shift;
     require Config::Tiny;
     return o2h2o( Config::Tiny->read($filename) );
 }
 
+# back compat
+sub ini2o($) {
+    return ini2h2o(shift);
+}
+
 # write out the INI file
-sub h2o2ini ($$) {
+sub h2o2ini($$) {
     my ( $config, $filename ) = @_;
     require Config::Tiny;
     return Config::Tiny->new( Util::H2O::o2h $config)->write($filename);
+}
+
+# back compat
+sub o2ini($$) {
+    return h2o2ini( shift, shift );
 }
 
 # return a dereferences hash (non-recursive); reverse of `h2o'
@@ -203,6 +232,23 @@ sub o2d($) {
         $thing = Util::H2O::o2h $thing;
     }
     return Util::H2O::o2h $thing;
+}
+
+# handy, poor man's debug wrappers
+
+sub ddd(@) {
+    require Data::Dumper;
+    foreach my $ref (@_) {
+        print STDERR Data::Dumper::Dumper($ref);
+    }
+}
+
+sub dddie(@) {
+    require Data::Dumper;
+    foreach my $ref (@_) {
+        print STDERR Data::Dumper::Dumper($ref);
+    }
+    die qq{died due to use of dddie};
 }
 
 1;
@@ -349,10 +395,53 @@ even if C<h2o> is passed with the C<-isa> and C<-class> flags,
 which are both utilized to achieve the effective outcome of
 C<baptise> and C<bastise -recurse>.
 
+=head2 C<tr4h2o REF>
+
+Replaces all characters not considered legal for subroutines or accessors
+methods with an underscore, C<_>. It is taken directly from the L<Util::H2O>
+cookbook on dealing with keys that are not compliant. However the solution used
+internally to this module doesn't use C<List::Util>'s C<pairmap> method due
+to some issues encountered during the development of C<tr4h2o>.
+
+C<tr4h2o> provides a way to retreive the original LIST of offensive  keys, C<__og_keys>.
+
+The following example is sufficient to demonstrate it's use, and again, it is
+taken straight from the C<Util::H2O> POD.
+
+  use Util::H2O::More qw/h2o tr4h2o ddd/;
+  
+  my $hash = { "foo bar" => 123, "quz-ba%z" => 456 };
+  my $obj  = h2o tr4h2o $hash;
+  print $obj->foo_bar, $obj->quz_ba_z, "\n";    # prints "123456
+  
+  # inspect new structure
+  ddd $obj;            # Data::Dumper::Dumper 
+  ddd $obj->__og_keys; # Data::Dumper::Dumper
+
+Output:
+
+  123456
+  $VAR1 = bless( {
+                   '__og_keys' => {
+                                    'foo_bar' => 'foo bar',
+                                    'quz_ba_z' => 'quz-ba%z'
+                                  },
+                   'quz_ba_z' => 456,
+                   'foo_bar' => 123
+                 }, 'Util::H2O::_7a1ad8c03918' );
+  $VAR1 = {
+            'foo_bar' => 'foo bar',
+            'quz_ba_z' => 'quz-ba%z'
+          };
+
+Note: this is not applied to recursive data structures, something like that
+would best be supported upstream by C<Util::H2O> using a flag like C<-tr> that
+assumes transliteration using, C<tr/a-zA-Z0-9/_/c>.
+
 =head2 C<Getopt2h2o REF, REF, LIST>
 
 Wrapper around the idiom enabled buy C<opt2h2o>. It even will C<require>
-C<Getopts::Long>. Usage:
+C<Getopt::Long>. Usage:
 
   use Util::H2O::More qw/Getopt2h2o/;
   my $opts_ref = Getopt2h2o \@ARGV, { n => 10 }, qw/f=s n=i/;
@@ -414,6 +503,8 @@ We can parse it with L<Config::Tiny> and objectify it with C<h2o>:
   my $config = ini2h2o qq{/path/to/my/config.ini}
   # ... $config now has accessors based Config::Tiny's read of config.ini
 
+C<ini2o> is provided as a wrapper because this method was renamed in 0.2.4.
+
 =head2 C<h2o2ini REF, FILENAME>
 
 Takes and object created via C<ini2h2o> and writes it back out to C<FILENAME>
@@ -429,6 +520,8 @@ configuration file after reading it and modifying a value.
   # update $config, write it out as a different file
   $config->section1->var1("some new value");
   h2o2ini $config, q{/path/to/my/other-config.ini};
+
+C<o2ini> is provided as a wrapper because this method was renamed in 0.2.4.
 
 =head2 C<o2h2o REF>
 
@@ -630,6 +723,20 @@ convenient that doing,
 
   my $count = scalar @{$root->some->barray->all}; 
 
+=head2 Debugging Methods
+
+=head3 C<ddd LIST>
+
+Takes a list and applies L<Data::Dumper>'s C<::Dumper> method to them, in turn. Prints to
+C<STDERR>.
+
+Used for debugging data structures, which is a likely thing to need if using this module.
+
+L<Data::Dumper> is C<require>'d by this method.
+
+=head3 C<dddie LIST>
+
+Does the same thing as C<ddd>, but C<die>s at the end.
 
 =head1 EXTERNAL METHODS
 

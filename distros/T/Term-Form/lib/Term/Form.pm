@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.552';
+our $VERSION = '0.553';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form );
 
@@ -612,7 +612,7 @@ sub __print_current_row {
 }
 
 
-sub __get_row_section_separator {
+sub __prepare_skip_row {
     my ( $self, $list, $idx ) = @_;
     my $remainder = '';
     my $val = '';
@@ -645,11 +645,11 @@ sub __get_row {
         return $list->[$idx][0];
     }
     if ( any { $_ == $idx } @{$self->{i}{keys_to_skip}} ) {
-        return $self->__get_row_section_separator( $list, $idx ); ## name
+        return $self->__prepare_skip_row( $list, $idx );
     }
     if ( ! defined $self->{i}{keys}[$idx] ) {
         my $key = $list->[$idx][0];
-        $self->{i}{keys}[$idx] = unicode_sprintf( $key, $self->{i}{max_key_w} );
+        $self->{i}{keys}[$idx] = unicode_sprintf( $key, $self->{i}{max_key_w} ); # left or right aligned ##
     }
     if ( ! defined $self->{i}{seps}[$idx] ) {
         if ( any { $_ == $idx } @{$self->{i}{read_only}} ) {
@@ -843,7 +843,7 @@ sub fill_form {
     $self->{i}{keys_to_skip} = [];
     if ( defined $self->{skip_items} ) {
         for my $i ( 0 .. $#$orig_list ) {
-            if ( $orig_list->[$i][0] =~ $self->{skip_items} ) {
+            if ( defined $orig_list->[$i][0] && $orig_list->[$i][0] =~ $self->{skip_items} ) {
                 push @{$self->{i}{keys_to_skip}}, $i + @{$self->{i}{pre}};
             }
             else {
@@ -1067,7 +1067,7 @@ sub fill_form {
             elsif ( $list->[$self->{i}{curr_row}][0] eq $self->{confirm} ) {
                 splice @$list, 0, @{$self->{i}{pre}};
                 $self->__reset( $up );
-                return [ map { [ $orig_list->[$_][0], $list->[$_][1] // '' ] } 0 .. $#{$list} ];
+                return [ map { [ $orig_list->[$_][0], $list->[$_][1] // '' ] } 0 .. $#{$list} ]; # documentation ##
                 #return [ map { [ $orig_list->[$_][0], $list->[$_][1] ] } 0 .. $#{$list} ];
             }
             if ( $self->{auto_up} == 2 ) {
@@ -1166,7 +1166,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.552
+Version 0.553
 
 =cut
 
@@ -1380,7 +1380,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014-2022 Matthäus Kiem.
+Copyright 2014-2023 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

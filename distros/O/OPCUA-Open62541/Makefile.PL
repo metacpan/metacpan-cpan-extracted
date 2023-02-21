@@ -15,102 +15,6 @@ check_lib_or_exit(
 
 my @have;
 check_lib(
-    function		=> "UA_Server_setAdminSessionContext(NULL, NULL);",
-    not_execute		=> 1,
-    lib			=> 'open62541',
-    header		=> 'open62541/server.h',
-    libpath		=> '/usr/local/lib',
-    incpath		=> '/usr/local/include',
-) and push @have, uc('UA_Server_setAdminSessionContext');
-check_lib(
-    function		=> "
-	UA_NodeId nodeId;
-	UA_Server_readContainsNoLoops(NULL, nodeId, NULL);",
-    not_execute		=> 1,
-    lib			=> 'open62541',
-    header		=> 'open62541/server.h',
-    libpath		=> '/usr/local/lib',
-    incpath		=> '/usr/local/include',
-) and push @have, uc('UA_Server_readContainsNoLoops');
-check_lib(
-    function		=> "UA_Client_getState(NULL, NULL, NULL, NULL);",
-    not_execute		=> 1,
-    lib			=> 'open62541',
-    header		=> 'open62541/client.h',
-    libpath		=> '/usr/local/lib',
-    incpath		=> '/usr/local/include',
-) and push @have, uc('UA_Client_getState_3');
-check_lib(
-    function		=> "UA_Client_connectAsync(NULL, NULL);",
-    not_execute		=> 1,
-    lib			=> 'open62541',
-    header		=> 'open62541/client.h',
-    libpath		=> '/usr/local/lib',
-    incpath		=> '/usr/local/include',
-) and push @have, uc('UA_Client_connectAsync');
-check_lib(
-    function		=> "
-	UA_CreateSubscriptionRequest request;
-	UA_Client_StatusChangeNotificationCallback statusChangeCallback;
-	UA_Client_DeleteSubscriptionCallback deleteCallback;
-	UA_ClientAsyncServiceCallback callback;
-	UA_Client_Subscriptions_create_async(NULL, request, NULL,
-	    statusChangeCallback, deleteCallback, callback, NULL, NULL);",
-    not_execute		=> 1,
-    lib			=> 'open62541',
-    header		=> 'open62541/client_subscriptions.h',
-    libpath		=> '/usr/local/lib',
-    incpath		=> '/usr/local/include',
-) and push @have, uc('UA_Client_Subscriptions_create_async');
-check_lib(
-    function		=> "
-	UA_NodeId nodeId;
-	UA_Client_readNodeIdAttribute_async(NULL, nodeId, NULL, NULL, NULL);",
-    not_execute		=> 1,
-    lib			=> 'open62541',
-    header		=> 'open62541/client.h',
-    libpath		=> '/usr/local/lib',
-    incpath		=> '/usr/local/include',
-) and push @have, uc('UA_Client_readNodeIdAttribute_async');
-check_lib(
-    function		=> "(UA_ClientAsyncOperationCallback)NULL;",
-    not_execute		=> 1,
-    lib			=> 'open62541',
-    header		=> 'open62541/client_highlevel_async.h',
-    libpath		=> '/usr/local/lib',
-    incpath		=> '/usr/local/include',
-) and push @have, uc('UA_ClientAsyncOperationCallback');
-check_lib(
-    function		=> "
-	UA_ClientAsyncReadValueAttributeCallback callback;
-	UA_DataValue dataValue;
-	callback(NULL, NULL, 0, 0, &dataValue);",
-    not_execute		=> 1,
-    lib			=> 'open62541',
-    header		=> 'open62541/client_highlevel_async.h',
-    libpath		=> '/usr/local/lib',
-    incpath		=> '/usr/local/include',
-) and push @have, uc('UA_ClientAsyncReadValueAttributeCallback_DataValue');
-check_lib(
-    function		=> "
-	UA_ClientAsyncReadValueAttributeCallback callback;
-	UA_Variant variant;
-	callback(NULL, NULL, 0, &variant);",
-    not_execute		=> 1,
-    lib			=> 'open62541',
-    header		=> 'open62541/client_highlevel_async.h',
-    libpath		=> '/usr/local/lib',
-    incpath		=> '/usr/local/include',
-) and push @have, uc('UA_ClientAsyncReadValueAttributeCallback_Variant');
-check_lib(
-    function		=> "UA_ServerConfig_setCustomHostname(NULL, NULL);",
-    not_execute		=> 1,
-    lib			=> 'open62541',
-    header		=> 'open62541/server.h',
-    libpath		=> '/usr/local/lib',
-    incpath		=> '/usr/local/include',
-) and push @have, uc('UA_ServerConfig_setCustomHostname');
-check_lib(
     function		=> "
 	UA_ServerConfig serverConfig;
 	(void)serverConfig.customHostname;",
@@ -151,24 +55,6 @@ check_lib(
     libpath		=> '/usr/local/lib',
     incpath		=> '/usr/local/include',
 ) and push @have, uc('UA_ProgramDiagnostic2DataType_StatusResult');
-check_lib(
-    function		=> "UA_ClientState clientState;",
-    not_execute		=> 1,
-    lib			=> 'open62541',
-    header		=> 'open62541/client.h',
-    libpath		=> '/usr/local/lib',
-    incpath		=> '/usr/local/include',
-) and push @have, uc('UA_ClientState');
-check_lib(
-    function		=> "
-	UA_SecureChannelState channelState;
-	channelState = UA_SECURECHANNELSTATE_FRESH;",
-    not_execute		=> 1,
-    lib			=> 'open62541',
-    header		=> 'open62541/client.h',
-    libpath		=> '/usr/local/lib',
-    incpath		=> '/usr/local/include',
-) and push @have, uc('UA_SecureChannelState_Fresh');
 my @defines = map { "-DHAVE_$_=1" } @have;
 
 WriteMakefile(
@@ -207,18 +93,20 @@ WriteMakefile(
     #OPTIMIZE		=> '-g -O0 -DDEBUG',
     SIGN		=> 1,
     TEST_REQUIRES	=> {
-	'Test::Deep'		=> 0,
-	'Test::EOL'		=> 0,
-	'Test::Exception'	=> 0,
-	'Test::LeakTrace'	=> 0,
-	'Test::NoWarnings'	=> 0,
-	'Test::TCP'		=> 0,
-	'Test::Perl::Critic'	=> 0,
-	'Test::Pod'		=> '1.00',
-	'Test::Requires'	=> 0,
-	'Test::Strict'		=> 0,
-	'Test::Warn'		=> 0,
-	'YAML::Tiny'		=> 0,
+	'IO::Socket::SSL::Utils'	=> 0,
+	'MIME::Base64'			=> 0,
+	'Test::Deep'			=> 0,
+	'Test::EOL'			=> 0,
+	'Test::Exception'		=> 0,
+	'Test::LeakTrace'		=> 0,
+	'Test::NoWarnings'		=> 0,
+	'Test::TCP'			=> 0,
+	'Test::Perl::Critic'		=> 0,
+	'Test::Pod'			=> '1.00',
+	'Test::Requires'		=> 0,
+	'Test::Strict'			=> 0,
+	'Test::Warn'			=> 0,
+	'YAML::Tiny'			=> 0,
     },
     clean		=> {
 	FILES => [ "*.log", "*.utf8", "*.yaml", "assertlibFPDc52aN.c" ],

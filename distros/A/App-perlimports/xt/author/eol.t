@@ -100,6 +100,7 @@ my @files = (
     't/var-in-hash-key.t',
     't/var-in-regex.t',
     't/variable.t',
+    't/via-sub-exporter-exception.pl',
     't/warning.t',
     't/with-version.t'
 );

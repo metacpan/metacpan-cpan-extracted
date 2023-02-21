@@ -2,17 +2,21 @@ use Test::More;
 use strict;
 use warnings;
 use Data::Dumper;
+
 BEGIN {
-    if (eval"require Cpanel::JSON::XS; 1") {
+    if (eval "require Cpanel::JSON::XS; 1") {
         plan tests => 7;
-    } else {
-        plan skip_all => "No Cpanel::JSON::XS";
-        exit; # not sure if this is needed
     }
-};
-BEGIN { use_ok( 'Data::Dump::Streamer', qw(:undump) ); }
+    else {
+        plan skip_all => "No Cpanel::JSON::XS";
+        exit;    # not sure if this is needed
+    }
+}
+BEGIN { use_ok('Data::Dump::Streamer', qw(:undump)); }
+
 # imports same()
 require "./t/test_helper.pl";
+
 # use this one for simple, non evalable tests. (GLOB)
 #   same ( $got,$expected,$name,$obj )
 #
@@ -20,46 +24,47 @@ require "./t/test_helper.pl";
 # same ( $name,$obj,$expected,@args )
 
 my $dump;
-my $o = Data::Dump::Streamer->new();
+my $o= Data::Dump::Streamer->new();
 
-isa_ok( $o, 'Data::Dump::Streamer' );
+isa_ok($o, 'Data::Dump::Streamer');
 
 {
     local *icky;
-    *icky=\ "icky";
+    *icky= \ "icky";
     our $icky;
-    my $id = 0;
+    my $id= 0;
     my $btree;
-    $btree = sub {
-        my ( $d, $m, $p ) = @_;
+    $btree= sub {
+        my ($d, $m, $p)= @_;
         return $p
-          if $d > $m;
-        return [ $btree->( $d + 1, $m, $p . '0' ), $btree->( $d + 1, $m, $p . '1' ) ];
+            if $d > $m;
+        return [ $btree->($d + 1, $m, $p . '0'),
+            $btree->($d + 1, $m, $p . '1') ];
     };
 
-    my $t = $btree->( 0, 1, '' );
-    my ( $x, $y, $qr );
-    $x = \$y;
-    $y = \$x;
-    $qr = bless qr/this is a test/m, 'foo_bar';
+    my $t= $btree->(0, 1, '');
+    my ($x, $y, $qr);
+    $x= \$y;
+    $y= \$x;
+    $qr= bless qr/this is a test/m, 'foo_bar';
 
-    my $array = [];
-    my $hash = bless {
+    my $array= [];
+    my $hash= bless {
         A      => \$array,
         'B-B'  => ['$array'],
         'CCCD' => [ 'foo', 'bar' ],
-        'E'=>\\1,
-        'F'=>\\undef,
-        'Q'=>sub{\@_}->($icky),
-      },
-      'ThisIsATest';
-    $hash->{G}=\$hash;
-    my $boo = 'boo';
-    @$array = ( \$hash, \$hash, \$hash, \$qr, \$qr, \'foo', \$boo );
-    my $cap = capture( $x, $y, $qr, $x, $y, $qr );
+        'E'    => \\1,
+        'F'    => \\undef,
+        'Q'    => sub { \@_ }
+            ->($icky),
+        },
+        'ThisIsATest';
+    $hash->{G}= \$hash;
+    my $boo= 'boo';
+    @$array= (\$hash, \$hash, \$hash, \$qr, \$qr, \'foo', \$boo);
+    my $cap= capture($x, $y, $qr, $x, $y, $qr);
 
-
-    same( 'Madness cap( $qr,$qr )', $o ,<<'EXPECT', capture( $qr, $qr ) );
+    same('Madness cap( $qr,$qr )', $o, <<'EXPECT', capture($qr, $qr));
 $ARRAY1 = [
             bless( qr/this is a test/m, 'foo_bar' ),
             'A: $ARRAY1->[0]'
@@ -67,9 +72,8 @@ $ARRAY1 = [
 alias_av(@$ARRAY1, 1, $ARRAY1->[0]);
 EXPECT
 
-
     #same( $dump = $o->Data( $cap,$array,$boo,$hash,$qr )->Out, <<'EXPECT', "Total Madness", $o );
-    same( "Total Madness", $o,<<'EXPECT',( $cap,$array,$boo,$hash,$qr ) );
+    same("Total Madness", $o, <<'EXPECT', ($cap, $array, $boo, $hash, $qr));
 $ARRAY1 = [
             'R: $ARRAY1->[1]',
             'R: $ARRAY1->[0]',
@@ -113,35 +117,38 @@ alias_av(@$ARRAY1, 2, $foo_bar1);
 alias_av(@$ARRAY1, 5, $foo_bar1);
 EXPECT
 
-
 }
 {
-    my ($x,$y);
-    $x=\$y;
-    $y=\$x;
+    my ($x, $y);
+    $x= \$y;
+    $y= \$x;
 
-    my $a=[1,2];
-    $a->[0]=\$a->[1];
-    $a->[1]=\$a->[0];
+    my $a= [ 1, 2 ];
+    $a->[0]= \$a->[1];
+    $a->[1]= \$a->[0];
 
     #$cap->[-1]=5;
     my $s;
-    $s=\$s;
-    my $bar='bar';
-    my $foo='foo';
-    my $halias= {foo=>1,bar=>2};
-    alias_hv(%$halias,'foo',$foo);
-    alias_hv(%$halias,'bar',$bar);
-    alias_hv(%$halias,'foo2',$foo);
+    $s= \$s;
+    my $bar= 'bar';
+    my $foo= 'foo';
+    my $halias= { foo => 1, bar => 2 };
+    alias_hv(%$halias, 'foo',  $foo);
+    alias_hv(%$halias, 'bar',  $bar);
+    alias_hv(%$halias, 'foo2', $foo);
 
-    my ($t,$u,$v,$w)=(1,2,3,4);
-    my $cap=sub{ \@_ }->($x,$y);
-    my $q1=qr/foo/;
-    my $q2=bless qr/bar/,'bar';
-    my $q3=\bless qr/baz/,'baz';
+    my ($t, $u, $v, $w)= (1, 2, 3, 4);
+    my $cap= sub { \@_ }
+        ->($x, $y);
+    my $q1= qr/foo/;
+    my $q2= bless qr/bar/, 'bar';
+    my $q3= \bless qr/baz/, 'baz';
+
     #same( $dump = $o->Data( $a,$q1,$q2,$q3,[$x,$y],[$s,$x,$y],$t,$u,$v,$t,[1,2,3],{1..4},$cap,$cap,$t,$u,$v,$halias)->Out, <<'EXPECT', "More Madness", $o );
-    same(  "More Madness", $o ,
-        <<'EXPECT',( $a,$q1,$q2,$q3,[$x,$y],[$s,$x,$y],$t,$u,$v,$t,[1,2,3],{1..4},$cap,$cap,$t,$u,$v,$halias));
+    same(
+        "More Madness",
+        $o,
+        <<'EXPECT', ($a, $q1, $q2, $q3, [ $x, $y ], [ $s, $x, $y ], $t, $u, $v, $t, [ 1, 2, 3 ], { 1 .. 4 }, $cap, $cap, $t, $u, $v, $halias));
 $ARRAY1 = [
             'R: $ARRAY1->[1]',
             'R: $ARRAY1->[0]'
@@ -199,9 +206,10 @@ EXPECT
 {
     #local $Data::Dump::Streamer::DEBUG = 1;
     my $x;
-    $x = sub { \@_ }->( $x, $x );
+    $x= sub { \@_ }
+        ->($x, $x);
     push @$x, $x;
-    same(   "Tye Alias Array", $o, <<'EXPECT',( $x ) );
+    same("Tye Alias Array", $o, <<'EXPECT', ($x));
 $ARRAY1 = [
             'A: $ARRAY1',
             'A: $ARRAY1',
@@ -214,49 +222,51 @@ EXPECT
 }
 {
     undef $!;
-format STDOUT =
+    format STDOUT =
 @<<<<<<   @││││││   @>>>>>>
 "left",   "middle", "right"
 .
 
     my $expected_dot;
-    if ( defined $. && length $. ) {
-        $expected_dot = $.;
+    if (defined $. && length $.) {
+        $expected_dot= $.;
     }
-    elsif ( defined $. ) {
-        $expected_dot = "''";
+    elsif (defined $.) {
+        $expected_dot= "''";
     }
     else {
-        $expected_dot = 'undef';
+        $expected_dot= 'undef';
     }
     my $jstrue= Cpanel::JSON::XS::decode_json("[true]")->[0];
-    my %hash = (
+    my %hash= (
         UND => undef,
         IV  => 1,
         NV  => 3.14159265358979,
         PV  => "string",
         PV8 => "ab\ncd\x{20ac}\t",
         RV  => \$.,
-        AR  => [ 1..2 ],
+        AR  => [ 1 .. 2 ],
         HR  => { key => "value" },
         CR  => sub { "code"; },
         GLB => *STDERR,
-        IO  => *{$::{STDERR}}{IO},
-        FMT => \*{$::{STDOUT}}{FORMAT},
-        OBJ => bless(qr/("[^"]+")/,"Zorp"),
+        IO  => *{ $::{STDERR} }{IO},
+        FMT => \*{ $::{STDOUT} }{FORMAT},
+        OBJ => bless(qr/("[^"]+")/, "Zorp"),
         JSB => $jstrue,
-        );
+    );
 
     my $expect;
-    my $json_bool_class = ref( $jstrue );
+    my $json_bool_class= ref($jstrue);
+
     # Dumping differences per perl version:
     # 5.12.0+:
     #
     #   IO handles are now blessed into IO::File, I guess?
     #
-    if ( $] >= 5.012_000 ) {
+    if ($] >= 5.012_000) {
+
         # This fixes https://github.com/demerphq/Data-Dump-Streamer/issues/8
-        $expect = <<'EXPECT';
+        $expect= <<'EXPECT';
 $HASH1 = {
            AR  => [
                     1,
@@ -289,14 +299,14 @@ _EOF_FORMAT_
 bless( $HASH1->{JSB}, 'Cpanel::JSON::XS::Boolean' );
 EXPECT
         require B::Deparse;
-        if (new B::Deparse -> coderef2text (
-              sub { no strict; 1; use strict; 1; }
-           ) !~ 'refs') {
+        if (new B::Deparse->coderef2text(sub { no strict; 1; use strict; 1; })
+            !~ 'refs')
+        {
             $expect =~ s/strict 'refs'/strict/;
         }
     }
-    elsif ( $] >= 5.008_008 ) {
-        $expect = <<'EXPECT';
+    elsif ($] >= 5.008_008) {
+        $expect= <<'EXPECT';
 $HASH1 = {
            AR  => [
                     1,
@@ -329,8 +339,8 @@ _EOF_FORMAT_
 bless( $HASH1->{JSB}, 'Cpanel::JSON::XS::Boolean' );
 EXPECT
     }
-    elsif ( $] >= 5.008_000 ) {
-        $expect = <<'EXPECT';
+    elsif ($] >= 5.008_000) {
+        $expect= <<'EXPECT';
 $HASH1 = {
            AR  => [
                     1,
@@ -364,7 +374,7 @@ bless( $HASH1->{JSB}, 'Cpanel::JSON::XS::Boolean' );
 EXPECT
     }
     else {
-        $expect = <<'EXPECT';
+        $expect= <<'EXPECT';
 $HASH1 = {
            AR  => [
                     1,
@@ -389,17 +399,22 @@ $HASH1 = {
 bless( $HASH1->{JSB}, 'Cpanel::JSON::XS::Boolean' );
 EXPECT
     }
+
     # In Cpanel::JSON::XS before 3.0201, the boolean class is JSON::XS::Boolean
     # and thereafter it is JSON::PP::Boolean
-    my $json_boolean_class = ref Cpanel::JSON::XS::decode_json("[true]")->[0];
+    my $json_boolean_class= ref Cpanel::JSON::XS::decode_json("[true]")->[0];
     $expect =~ s{Cpanel::JSON::XS::Boolean}{$json_boolean_class}g;
-    same( $dump= $o->Data(\%hash)->Out, template( $expect, expected_dot => $expected_dot ), "", $o);
+    same(
+        $dump= $o->Data(\%hash)->Out,
+        template($expect, expected_dot => $expected_dot),
+        "", $o
+    );
 }
 
 sub template {
-    my ( $pattern, %replacements ) = @_;
+    my ($pattern, %replacements)= @_;
 
-    for ( keys %replacements ) {
+    for (keys %replacements) {
         $pattern =~ s/$_/$replacements{$_}/g;
     }
 

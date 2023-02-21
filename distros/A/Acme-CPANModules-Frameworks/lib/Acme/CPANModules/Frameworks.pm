@@ -1,9 +1,11 @@
 package Acme::CPANModules::Frameworks;
 
+use strict;
+
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-03-25'; # DATE
+our $DATE = '2022-11-29'; # DATE
 our $DIST = 'Acme-CPANModules-Frameworks'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our $LIST = {
     summary => "List of frameworks on CPAN",
@@ -18,6 +20,10 @@ This list is used in building a list of framework classifiers in
 
 _
     entries => [
+        # acme
+        {module=>'Acme::CPANAuthors', tags=>['category:acme']},
+        {module=>'Acme::CPANModules', tags=>['category:acme']},
+
         # app
         {module=>'Jifty', tags=>['category:app']},
 
@@ -26,12 +32,24 @@ _
         {module=>'IO::Async', tags=>['category:async']},
         {module=>'POE', tags=>['category:async']},
 
+        # benchmark
+        {module=>'Bencher', tags=>['category:benchmark']},
+
         # caching
         {module=>'CHI', tags=>['category:caching']},
 
         # cli
         {module=>'App::Cmd', tags=>['category:cli']},
         {module=>'Perinci::CmdLine', tags=>['category:cli']},
+        {module=>'ScriptX', tags=>['category:cli','category:web']},
+
+        # data modules
+        {module=>'ArrayData', tags=>['category:data']},
+        {module=>'HashData', tags=>['category:data']},
+        {module=>'Games::Word::Phraselist', tags=>['category:data']},
+        {module=>'Games::Word::Wordlist', tags=>['category:data']},
+        {module=>'TableData', tags=>['category:data']},
+        {module=>'WordList', tags=>['category:data']},
 
         # database
         {module=>'DBI', tags=>['category:database']},
@@ -67,6 +85,10 @@ _
         # orm
         {module=>'DBIx::Class', tags=>['category:orm']},
 
+        # regexp
+        {module=>'Regexp::Common', tags=>['category:regexp']},
+        {module=>'Regexp::Pattern', tags=>['category:regexp']},
+
         # template
         {module=>'Template::Toolkit', tags=>['category:template']},
 
@@ -78,9 +100,9 @@ _
         {module=>'Type::Tiny', tags=>['category:type', 'category:validation']},
 
         # validation
+        {module=>'Data::Sah', tags=>['category:validation']},
         {module=>'Params::Validate', tags=>['category:validation']},
         # Params::ValidationCompiler?
-        {module=>'Sah', tags=>['category:validation']},
         # Specio*
         # Type::Tiny*
 
@@ -116,7 +138,7 @@ Acme::CPANModules::Frameworks - List of frameworks on CPAN
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::Frameworks (from Perl distribution Acme-CPANModules-Frameworks), released on 2021-03-25.
+This document describes version 0.002 of Acme::CPANModules::Frameworks (from Perl distribution Acme-CPANModules-Frameworks), released on 2022-11-29.
 
 =head1 DESCRIPTION
 
@@ -127,87 +149,211 @@ etc) pertaining to it.
 This list is used in building a list of framework classifiers in
 L<Module::Features::PerlTrove>.
 
-=head1 ACME::MODULES ENTRIES
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
-=item * L<Jifty>
+=item L<Acme::CPANAuthors>
 
-=item * L<AnyEvent>
+Author: L<ISHIGAKI|https://metacpan.org/author/ISHIGAKI>
 
-=item * L<IO::Async>
+=item L<Acme::CPANModules>
 
-=item * L<POE>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<CHI>
+=item L<Jifty>
 
-=item * L<App::Cmd>
+Author: L<ALEXMV|https://metacpan.org/author/ALEXMV>
 
-=item * L<Perinci::CmdLine>
+=item L<AnyEvent>
 
-=item * L<DBI>
+Author: L<MLEHMANN|https://metacpan.org/author/MLEHMANN>
 
-=item * L<Data::Printer>
+=item L<IO::Async>
 
-=item * L<DateTime>
+Author: L<PEVANS|https://metacpan.org/author/PEVANS>
 
-=item * L<Dist::Zilla>
+=item L<POE>
 
-=item * L<Minilla>
+Author: L<BINGOS|https://metacpan.org/author/BINGOS>
 
-=item * L<ShipIt>
+=item L<Bencher>
 
-=item * L<Interchange>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Log::Any>
+=item L<CHI>
 
-=item * L<Log::Contextual>
+Author: L<ASB|https://metacpan.org/author/ASB>
 
-=item * L<Log::Dispatch>
+=item L<App::Cmd>
 
-=item * L<Log::ger>
+Author: L<RJBS|https://metacpan.org/author/RJBS>
 
-=item * L<Log::Log4perl>
+=item L<Perinci::CmdLine>
 
-=item * L<PDL>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Moose>
+=item L<ScriptX>
 
-=item * L<Moo>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<DBIx::Class>
+=item L<ArrayData>
 
-=item * L<Template::Toolkit>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Test2>
+=item L<HashData>
 
-=item * L<Specio>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Type::Tiny>
+=item L<Games::Word::Phraselist>
 
-=item * L<Params::Validate>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Sah>
+=item L<Games::Word::Wordlist>
 
-=item * L<Catalyst>
+Author: L<DOY|https://metacpan.org/author/DOY>
 
-=item * L<CGI::Application>
+=item L<TableData>
 
-=item * L<Dancer>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Dancer2>
+=item L<WordList>
 
-=item * L<Gantry>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Mason>
+=item L<DBI>
 
-=item * L<Maypole>
+Author: L<TIMB|https://metacpan.org/author/TIMB>
 
-=item * L<Mojolicious>
+=item L<Data::Printer>
 
-=item * L<HTML::FormFu>
+Author: L<GARU|https://metacpan.org/author/GARU>
 
-=item * L<HTML::FormHandler>
+=item L<DateTime>
+
+Author: L<DROLSKY|https://metacpan.org/author/DROLSKY>
+
+=item L<Dist::Zilla>
+
+Author: L<RJBS|https://metacpan.org/author/RJBS>
+
+=item L<Minilla>
+
+Author: L<SYOHEX|https://metacpan.org/author/SYOHEX>
+
+=item L<ShipIt>
+
+Author: L<MIYAGAWA|https://metacpan.org/author/MIYAGAWA>
+
+=item L<Interchange>
+
+=item L<Log::Any>
+
+Author: L<PREACTION|https://metacpan.org/author/PREACTION>
+
+=item L<Log::Contextual>
+
+Author: L<FREW|https://metacpan.org/author/FREW>
+
+=item L<Log::Dispatch>
+
+Author: L<DROLSKY|https://metacpan.org/author/DROLSKY>
+
+=item L<Log::ger>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item L<Log::Log4perl>
+
+Author: L<ETJ|https://metacpan.org/author/ETJ>
+
+=item L<PDL>
+
+Author: L<ETJ|https://metacpan.org/author/ETJ>
+
+=item L<Moose>
+
+Author: L<ETHER|https://metacpan.org/author/ETHER>
+
+=item L<Moo>
+
+Author: L<HAARG|https://metacpan.org/author/HAARG>
+
+=item L<DBIx::Class>
+
+Author: L<RIBASUSHI|https://metacpan.org/author/RIBASUSHI>
+
+=item L<Regexp::Common>
+
+Author: L<ABIGAIL|https://metacpan.org/author/ABIGAIL>
+
+=item L<Regexp::Pattern>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item L<Template::Toolkit>
+
+Author: L<ABW|https://metacpan.org/author/ABW>
+
+=item L<Test2>
+
+Author: L<EXODIST|https://metacpan.org/author/EXODIST>
+
+=item L<Specio>
+
+Author: L<DROLSKY|https://metacpan.org/author/DROLSKY>
+
+=item L<Type::Tiny>
+
+Author: L<TOBYINK|https://metacpan.org/author/TOBYINK>
+
+=item L<Data::Sah>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item L<Params::Validate>
+
+Author: L<DROLSKY|https://metacpan.org/author/DROLSKY>
+
+=item L<Catalyst>
+
+Author: L<JJNAPIORK|https://metacpan.org/author/JJNAPIORK>
+
+=item L<CGI::Application>
+
+Author: L<MARTO|https://metacpan.org/author/MARTO>
+
+=item L<Dancer>
+
+Author: L<BIGPRESH|https://metacpan.org/author/BIGPRESH>
+
+=item L<Dancer2>
+
+Author: L<CROMEDOME|https://metacpan.org/author/CROMEDOME>
+
+=item L<Gantry>
+
+Author: L<TKEEFER|https://metacpan.org/author/TKEEFER>
+
+=item L<Mason>
+
+Author: L<JSWARTZ|https://metacpan.org/author/JSWARTZ>
+
+=item L<Maypole>
+
+Author: L<TEEJAY|https://metacpan.org/author/TEEJAY>
+
+=item L<Mojolicious>
+
+Author: L<SRI|https://metacpan.org/author/SRI>
+
+=item L<HTML::FormFu>
+
+Author: L<CFRANKS|https://metacpan.org/author/CFRANKS>
+
+=item L<HTML::FormHandler>
+
+Author: L<GSHANK|https://metacpan.org/author/GSHANK>
 
 =back
 
@@ -222,8 +368,13 @@ document CPAN. See L<Acme::CPANModules> for more details.
 =head2 What are ways to use this Acme::CPANModules module?
 
 Aside from reading this Acme::CPANModules module's POD documentation, you can
-install all the listed modules (entries) using L<cpanmodules> CLI (from
-L<App::cpanmodules> distribution):
+install all the listed modules (entries) using L<cpanm-cpanmodules> script (from
+L<App::cpanm::cpanmodules> distribution):
+
+ % cpanm-cpanmodules -n Frameworks
+
+Alternatively you can use the L<cpanmodules> CLI (from L<App::cpanmodules>
+distribution):
 
     % cpanmodules ls-entries Frameworks | cpanm -n
 
@@ -238,6 +389,8 @@ or directly:
 This Acme::CPANModules module also helps L<lcpan> produce a more meaningful
 result for C<lcpan related-mods> command when it comes to finding related
 modules for the modules listed in this Acme::CPANModules module.
+See L<App::lcpan::Cmd::related_mods> for more details on how "related modules"
+are found.
 
 =head1 HOMEPAGE
 
@@ -246,14 +399,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Acme-CPANM
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-Frameworks>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Acme-CPANModules-Frameworks/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -265,11 +410,37 @@ L<cpanmodules> - CLI tool to let you browse/view the lists
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Frameworks>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

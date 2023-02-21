@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::RS_ZVA;
-$Lab::Moose::Instrument::RS_ZVA::VERSION = '3.842';
+$Lab::Moose::Instrument::RS_ZVA::VERSION = '3.851';
 #ABSTRACT: Rohde & Schwarz ZVA Vector Network Analyzer
 
 use v5.20;
@@ -8,7 +8,7 @@ use Moose;
 use Moose::Util::TypeConstraints;
 use MooseX::Params::Validate;
 use Lab::Moose::Instrument
-    qw/validated_getter validated_channel_getter validated_channel_setter /;
+    qw/validated_getter validated_setter validated_channel_getter validated_channel_setter /;
 use Lab::Moose::Instrument::Cache;
 use Carp;
 use namespace::autoclean;
@@ -91,6 +91,19 @@ sub sparam_sweep_data {
 
 
 
+sub set_power {
+    my ( $self, $value, %args ) = validated_setter( \@_ );
+    $self->source_power_level_immediate_amplitude( value => $value );	
+}
+
+sub get_power {
+	my $self = shift;
+	return $self->source_power_level_immediate_amplitude_query();	
+}
+
+
+
+
 __PACKAGE__->meta->make_immutable();
 
 1;
@@ -107,7 +120,7 @@ Lab::Moose::Instrument::RS_ZVA - Rohde & Schwarz ZVA Vector Network Analyzer
 
 =head1 VERSION
 
-version 3.842
+version 3.851
 
 =head1 SYNOPSIS
 
@@ -125,6 +138,7 @@ This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
             2020       Andreas K. Huettel, Simon Reinhardt
+            2023       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -1,0 +1,12 @@
+name = "App-Greple-tee"
+badges = [ "github-actions/test.yml" ]
+authority = "cpan:UTASHIRO"
+
+module_maker = "ModuleBuildTiny"
+static_install = "auto"
+
+[release]
+branch = "main"
+
+[FileGatherer]
+exclude_match = [ '^images/.*' ]

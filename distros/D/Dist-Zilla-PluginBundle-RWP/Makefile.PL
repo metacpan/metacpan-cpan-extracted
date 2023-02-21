@@ -18,9 +18,11 @@ my %WriteMakefileArgs = (
   "NAME" => "Dist::Zilla::PluginBundle::RWP",
   "PREREQ_PM" => {
     "Dist::Zilla::Role::PluginBundle::Easy" => 0,
-    "Moose" => 0
+    "Moose" => 0,
+    "builtin" => 0,
+    "experimental" => 0
   },
-  "VERSION" => "0.230350",
+  "VERSION" => "0.230470",
   "test" => {
     "TESTS" => ""
   }
@@ -29,7 +31,9 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Dist::Zilla::Role::PluginBundle::Easy" => 0,
-  "Moose" => 0
+  "Moose" => 0,
+  "builtin" => 0,
+  "experimental" => 0
 );
 
 

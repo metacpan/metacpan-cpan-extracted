@@ -16,6 +16,8 @@ lib/Crypt/Passphrase/PassphraseHash.pm
 lib/Crypt/Passphrase/SHA1/Hex.pm
 lib/Crypt/Passphrase/Validator.pm
 t/00-compile.t
+t/encoder.t
+t/lib/Crypt/Passphrase/Reversed.pm
 t/validator.t
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t

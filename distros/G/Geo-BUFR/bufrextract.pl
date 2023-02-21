@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# (C) Copyright 2010-2020 MET Norway
+# (C) Copyright 2010-2023 MET Norway
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,10 +30,10 @@ my %option = ();
 GetOptions(
            \%option,
            'ahl=s',        # Extract BUFR messages with AHL matching <ahl_regexp> only
+           'gts',          # Include full gts message envelope if present
            'help',         # Print help information and exit
            'only_ahl',     # Extract AHLs only
            'outfile=s',    # Print to file instead of STDOUT
-           'reuse_ahl=i',  # Reuse last AHL if current BUFR message has no AHL
            'verbose=i',    # Set verbose level to n, 0<=n<=6 (default 0)
            'without_ahl',  # Print the BUFR messages only, skipping AHLs
        ) or pod2usage(-verbose => 0);
@@ -42,19 +42,18 @@ GetOptions(
 pod2usage(-verbose => 1) if $option{help};
 
 # only_ahl and without_ahl are mutually exclusive
-pod2usage( -message => "Options only_ahl and without_ahl are mutually exclusive",
+pod2usage( -message => "Options only_ahl, without_ahl and gts are mutually exclusive",
            -exitval => 2,
            -verbose => 0)
-    if $option{only_ahl} && $option{without_ahl};
+    if ( ($option{only_ahl} && ($option{without_ahl} || $option{gts}))
+         || ($option{without_ahl} && ($option{only_ahl} || $option{gts}))
+         || ($option{gts} && ($option{only_ahl} || $option{without_ahl})) );
 
 # Make sure there is at least one input file
 pod2usage(-verbose => 0) unless @ARGV;
 
 # Set verbosity level
 Geo::BUFR->set_verbose($option{verbose}) if $option{verbose};
-
-# Set whether last ahl should be reused if current BUFR message has no AHL
-Geo::BUFR->reuse_current_ahl($option{reuse_ahl}) if defined $option{reuse_ahl};
 
 my $ahl_regexp;
 if ($option{ahl}) {
@@ -135,11 +134,17 @@ sub extract {
 
         $current_message_number = $bufr->get_current_message_number();
         $current_ahl = $bufr->get_current_ahl() || '';
+        my $gts_eom = '';
 
-        if ($current_ahl && !$bufr->ahl_is_reused()) {
+        if ($current_ahl) {
             if ($option{only_ahl}) {
                 print $OUT $current_ahl, "\n";
             } elsif (!$option{without_ahl}) {
+                if ($option{gts}) {
+                    my $current_gts_starting_line = $bufr->get_current_gts_starting_line() || '';
+                    print $OUT $current_gts_starting_line;
+                    $gts_eom = $bufr->get_current_gts_eom() || '';
+                }
                 # Use \r\r\n after AHL, since this is the standard
                 # sequence used in GTS bulletins
                 print $OUT $current_ahl . "\r\r\n";
@@ -148,7 +153,7 @@ sub extract {
         next READLOOP if $option{only_ahl};
 
         my $msg = $bufr->get_bufr_message();
-        print $OUT $msg;
+        print $OUT $msg, $gts_eom;
     }
 }
 
@@ -170,9 +175,8 @@ sub filter_on_ahl {
 
   bufrextract.pl <bufr file(s)>
       [--ahl <ahl_regexp>]
-      [--only_ahl] | [--without_ahl]
+      [--only_ahl] | [--without_ahl] | [--gts]
       [--outfile <filename>]
-      [--reuse_ahl n]
       [--help]
       [--verbose n]
 
@@ -181,8 +185,8 @@ sub filter_on_ahl {
 Extract all BUFR messages and/or corresponding AHLs from BUFR file(s),
 possibly filtering on AHL.
 
-The AHL (Abbreviated Header Line) is recognized as the TTAAii CCCC DTG
-[BBB] immediately preceding the BUFR message.
+The AHL (Abbreviated Header Line) is recognized as the TTAAii CCCC
+YYGGgg [BBB] immediately preceding the BUFR message.
 
 Execute without arguments for Usage, with option C<--help> for some
 additional info. See also L<https://wiki.met.no/bufr.pm/start> for
@@ -193,14 +197,11 @@ examples of use.
 
    --ahl <ahl_regexp> Extract BUFR messages and/or AHLs with AHL
                       matching <ahl_regexp> only
+   --gts              Include full gts message envelope if present
    --only_ahl         Extract AHLs only
    --without_ahl      Extract BUFR messages only
    --outfile <filename>
                       Will print to <filename> instead of STDOUT
-   --reuse_ahl n  n=0 (default) AHL is considered belonging to a BUFR message
-                      only if immediately preceding
-                  n=1 When filtering using --ahl: Reuse last AHL found if current
-                      BUFR message has no immediately preceding AHL
    --help             Display Usage and explain the options used. For even
                       more info you might prefer to consult perldoc bufrextract.pl
    --verbose n        Set verbose level to n, 0<=n<=6 (default 0)
@@ -211,12 +212,12 @@ For option C<--ahl> the <ahl_regexp> should be a Perl regular
 expression. E.g. C<--ahl 'ISS... ENMI'> will decode only BUFR SHIP
 (ISS) from CCCC=ENMI.
 
-If the BUFR file(s) are known to consist solely of GTS bulletins, you
-might consider setting C<--reuse 1> when applying C<--ahl>, in order
-to extract all (and not only the first) BUFR messages in multi message
-bulletins. Such bulletins are very rare nowadays, however, and see
-also the L</"CAVEAT"> for more on this option. Note that the
-corresponding AHL is still extracted (and printed) only once.
+Use option C<--gts> if you want the full GTS message envelope (if
+present) to be included in output. There are 2 main variations on this
+envelope: SOH/ETX and ZCZC/NNNN notation, see the Manual on the GTS:
+Attachment II-4 Format of Meteorological Messages. Only SOH/ETX is
+supported in bufrextract.pl, since ZCZC/NNNN is no longer used in
+modern data exchange.
 
 No bufrtables are needed for running bufrextract.pl, since section 4
 in BUFR message will not be decoded (which also speeds up execution
@@ -242,11 +243,7 @@ Or to extract BUFR messages with TM315009 only:
 Sometimes GTS bulletins are erroneously issued with extra characters
 between the GTS AHL and the start of BUFR message (besides the
 standard character sequence CRCRLF), likely leading bufrextract.pl to
-miss the AHL. Also, if applying C<--reuse 1>, the BUFR message of such
-a GTS bulletin will then be wrongly associated with the AHL of the
-previous GTS bulletin when filtering on AHL. If bulletins with this
-kind of error is more of a concern than multi message bulletins, you
-should probably refrain from making use of the C<--reuse 1> option.
+miss the AHL.
 
 =head1 AUTHOR
 
@@ -254,6 +251,6 @@ Pål Sannes E<lt>pal.sannes@met.noE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010-2020 MET Norway
+Copyright (C) 2010-2023 MET Norway
 
 =cut

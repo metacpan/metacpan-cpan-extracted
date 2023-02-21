@@ -104,42 +104,58 @@ subtest "arg:uniq" => sub {
     );
 };
 
+my $remaining1 = sub {
+    my ($seen_elems, $elems) = @_;
+
+    my %seen;
+    for (@$seen_elems) {
+        (my $nodash = $_) =~ s/^-//;
+        $seen{$nodash}++;
+    }
+
+    my @remaining;
+    for (@$elems) {
+        (my $nodash = $_) =~ s/^-//;
+        push @remaining, $_ unless $seen{$nodash};
+    }
+
+    \@remaining;
+};
+
 subtest "arg:remaining" => sub {
-    my $remaining = sub {
-        my ($seen_elems, $elems) = @_;
-
-        my %seen;
-        for (@$seen_elems) {
-            (my $nodash = $_) =~ s/^-//;
-            $seen{$nodash}++;
-        }
-
-        my @remaining;
-        for (@$elems) {
-            (my $nodash = $_) =~ s/^-//;
-            push @remaining, $_ unless $seen{$nodash};
-        }
-
-        \@remaining;
-    };
-
     test_complete(
         word => '',
         elems => [qw/a -a b -b/],
-        remaining => $remaining,
+        remaining => $remaining1,
         result => [qw/-a -b a b/],
     );
     test_complete(
         word => 'a,',
         elems => [qw/a -a b -b/],
-        remaining => $remaining,
+        remaining => $remaining1,
         result => ['a,-b', 'a,b'],
     );
     test_complete(
         word => '-a,',
         elems => [qw/a -a b -b/],
-        remaining => $remaining,
+        remaining => $remaining1,
         result => ['-a,-b', '-a,b'],
+    );
+};
+
+subtest "arg:summaries" => sub {
+    test_complete(
+        word      => 'aa,c,',
+        elems     => [qw(a aa b)],
+        summaries => [qw(Sa Saa Sb)],
+        result    => [{word=>'aa,c,a', summary=>'Sa'}, {word=>'aa,c,aa', summary=>'Saa'}, {word=>'aa,c,b',summary=>'Sb'}],
+    );
+    test_complete(
+        word => '-a,',
+        elems => [qw/a -a b -b/],
+        summaries => [qw/Sa S-a Sb S-b/],
+        remaining => $remaining1,
+        result => [{word=>'-a,-b',summary=>'S-b'}, {word=>'-a,b',summary=>'Sb'}],
     );
 };
 
@@ -167,6 +183,7 @@ sub test_complete {
         uniq=>$args{uniq},
         sep=>$args{sep},
         remaining=>$args{remaining},
+        summaries=>$args{summaries},
     );
     is_deeply($res, $args{result}, "$name (result)")
         or diag explain($res);

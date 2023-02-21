@@ -155,7 +155,7 @@ sub choose_subquery {
             next SUBQUERY;
         }
         unshift @{$sf->{d}{subquery_history}}, { stmt => $stmt, name => $stmt };
-        return "(" . $stmt . ")";
+        return "(" . $stmt . ")"; ##
     }
 }
 

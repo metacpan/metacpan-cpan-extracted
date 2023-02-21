@@ -432,6 +432,11 @@ handle_key_event( Handle self, XKeyEvent *ev, Event *e, KeySym * sym, Bool relea
 	U32 keycode;
 	int str_len;
 
+	if ( !release && guts.use_xim && P_APPLICATION-> wantUnicodeInput) {
+		if ( prima_xim_handle_key_press(self, ev, e, sym))
+			return;
+	}
+
 	str_len = XLookupString( ev, str_buf, 256, &keysym, NULL);
 	*sym = keysym;
 	Edebug( "event: keysym: %08lx/%08lx 0: %08lx, 1: %08lx, 2: %08lx, 3: %08lx\n", keysym,
@@ -824,7 +829,7 @@ process_wm_sync_data( Handle self, WMSyncData * wmsd)
 		if ( PObject( self)-> stage == csDead) return false;
 	}
 
-	if ( size_changed && XX-> flags. want_visible && !guts. net_wm_maximization) {
+	if ( size_changed && XX-> flags. want_visible && !guts. net_wm_maximization && !XX-> flags. fullscreen) {
 		int qx = guts. displaySize.x * 4 / 5, qy = guts. displaySize.y * 4 / 5;
 		bzero( &e, sizeof( Event));
 		if ( !XX-> flags. zoomed) {
@@ -951,7 +956,12 @@ wm_event( Handle self, XEvent *xev, PEvent ev)
 		}
 		break;
 	case PropertyNotify:
-		if ( xev-> xproperty. atom == NET_WM_STATE && xev-> xproperty. state == PropertyNewValue) {
+		if (
+			xev-> xproperty. atom == NET_WM_STATE &&
+			xev-> xproperty. state == PropertyNewValue &&
+			!X(self)-> flags. fullscreen &&
+			X(self)-> flags. mapped
+		) {
 			DEFXX;
 			ev-> cmd = cmWindowState;
 			ev-> gen. source = self;
@@ -965,6 +975,9 @@ wm_event( Handle self, XEvent *xev, PEvent ev)
 				if ( XX-> flags. zoomed) {
 					ev-> gen. i = wsNormal;
 					XX-> flags. zoomed = 0;
+				} else if ( XX-> flags. iconic ) {
+					ev-> gen. i = wsNormal;
+					XX-> flags. iconic = 0;
 				} else
 					ev-> cmd = 0;
 			}
@@ -1291,9 +1304,10 @@ prima_handle_event( XEvent *ev, XEvent *next_event)
 			bev-> button == guts.last_button_event.button &&
 			bev-> button != guts. mouse_wheel_up &&
 			bev-> button != guts. mouse_wheel_down &&
-			bev-> time - guts.last_button_event.time <= guts.click_time_frame) {
-	  		e. cmd = cmMouseClick;
-			e. pos. dblclk = true;
+			bev-> time - guts.last_button_event.time <= guts.click_time_frame
+		) {
+			e. cmd = cmMouseClick;
+			e. pos. nth = ++guts.last_mouseclick_number;
 		}
 
 		if (
@@ -1320,6 +1334,7 @@ prima_handle_event( XEvent *ev, XEvent *next_event)
 			secondary. pos. mod = e. pos. mod;
 			secondary. pos. button = e. pos. button;
 			memcpy( &guts.last_click, bev, sizeof(guts.last_click));
+			guts. last_mouseclick_number = 1;
 			if ( e. pos. button == mbRight) {
 				Event ev;
 				bzero( &ev, sizeof(ev));
@@ -1330,33 +1345,19 @@ prima_handle_event( XEvent *ev, XEvent *next_event)
 				apc_message( self, &ev, true);
 				if ( PObject( self)-> stage == csDead) return;
 			}
-		} else if ( e.cmd == cmMouseUp &&
-			(guts.last_button_event.type == (cmMouseClick | 0x8000)) &&
-			bev-> window == guts.last_button_event.window &&
-			bev-> button == guts.last_button_event.button &&
-			bev-> time - guts.last_button_event.time <= guts.click_time_frame
-		) {
-			e.pos.dblclk = 1;
 		}
 		memcpy( &guts.last_button_event, bev, sizeof(*bev));
 		guts. last_button_event.type = e.cmd;
-		if (e.pos.dblclk)
-			guts.last_button_event.type |= 0x8000;
 
 		if ( e. cmd == cmMouseDown) {
+			Handle x = prima_find_root_parent(self);
+			Handle f = prima_find_root_parent(guts. focused ? guts. focused : prima_guts.application);
 			if ( XX-> flags. first_click) {
 				if ( ! is_opt( optSelectable)) {
-					Handle x = self, f = guts. focused ? guts. focused : prima_guts.application;
-					while ( f && !X(f)-> type. window && ( f != prima_guts.application)) f = (( PWidget) f)-> owner;
-					while ( !X(x)-> type. window && X(x)-> flags. clip_owner &&
-						x != prima_guts.application) x = (( PWidget) x)-> owner;
 					if ( x && x != f && X(x)-> type. window)
 						XSetInputFocus( DISP, PWidget(x)-> handle, RevertToParent, bev-> time);
 				}
 			} else {
-				Handle x = self, f = guts. focused ? guts. focused : prima_guts.application;
-				while ( !X(x)-> type. window && ( x != prima_guts.application)) x = (( PWidget) x)-> owner;
-				while ( !X(f)-> type. window && ( f != prima_guts.application)) f = (( PWidget) f)-> owner;
 				if ( x != f) {
 					e. cmd = 0;
 					if (P_APPLICATION-> hintUnder == self)
@@ -1477,7 +1478,8 @@ prima_handle_event( XEvent *ev, XEvent *next_event)
 		guts. focused = self;
 		prima_update_cursor( guts. focused);
 		e. cmd = cmReceiveFocus;
-
+		if ( guts.use_xim )
+			prima_xim_focus_in(self);
 		break;
 	}
 	case FocusOut: {
@@ -1502,6 +1504,8 @@ prima_handle_event( XEvent *ev, XEvent *next_event)
 		if ( guts. focused) prima_no_cursor( guts. focused);
 		if ( self == guts. focused) guts. focused = NULL_HANDLE;
 		e. cmd = cmReleaseFocus;
+		if ( guts.use_xim )
+			prima_xim_focus_out();
 		break;
 	}
 	case KeymapNotify: {
@@ -2012,9 +2016,11 @@ send_pending_events( void)
 	if ( !prima_guts.application ) return 0;
 
 	for ( pe = TAILQ_FIRST( &guts.peventq); pe != NULL; ) {
-		next = TAILQ_NEXT( pe, peventq_link);
-		if (( stage = PComponent( pe->recipient)-> stage) != csConstructing) {
+		next  = TAILQ_NEXT( pe, peventq_link);
+		stage = PComponent( pe->recipient)-> stage;
+		if ( stage != csConstructing) { /* or not yet there */
 			TAILQ_REMOVE( &guts.peventq, pe, peventq_link);
+			unprotect_object( pe-> recipient );
 		}
 		if ( stage == csNormal) {
 			apc_message( pe-> recipient, &pe-> event, false);
@@ -2044,7 +2050,10 @@ send_queued_x_events(int careOfApplication)
 
 	XNextEvent( DISP, &ev);
 	XCHECKPOINT;
+	if ( guts.use_xim && XFilterEvent(&ev, None))
+		ev.type = 0;
 	queued_events--;
+
 	while ( queued_events > 0) {
 		if (!prima_guts.application && careOfApplication) return false;
 		if ( events % 100 ) {
@@ -2054,7 +2063,8 @@ send_queued_x_events(int careOfApplication)
 		}
 		XNextEvent( DISP, &next_event);
 		XCHECKPOINT;
-		prima_handle_event( &ev, &next_event);
+		if ( !guts.use_xim || !XFilterEvent(&next_event, None))
+			prima_handle_event( &ev, &next_event);
 		events++;
 		queued_events = XEventsQueued( DISP, QueuedAlready);
 		memcpy( &ev, &next_event, sizeof( XEvent));
@@ -2265,6 +2275,7 @@ prima_one_loop_round( int wait, Bool careOfApplication)
 	if ( x_events_pending && ( prima_guts.application || !careOfApplication) )
 		x_flush();
 	handle_queued_events(careOfApplication);
+	exception_dispatch_pending_signals();
 
 	return prima_guts.application != NULL_HANDLE;
 }
@@ -2289,6 +2300,7 @@ apc_message( Handle self, PEvent e, Bool is_post)
 		if (!( pe = alloc1(PendingEvent))) return false;
 		memcpy( &pe->event, e, sizeof(pe->event));
 		pe-> recipient = self;
+		protect_object(self);
 		TAILQ_INSERT_TAIL( &guts.peventq, pe, peventq_link);
 	} else {
 		guts. total_events++;

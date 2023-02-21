@@ -1,0 +1,698 @@
+#!/usr/bin/env perl
+# vim: ts=3 sts=3 sw=3 et ai :
+# pdf-collage - PDF manipulation with scissors and glue
+use 5.024;
+use warnings;
+use experimental qw< postderef signatures >;
+no warnings qw< experimental::postderef experimental::signatures >;
+use autodie;
+use Pod::Usage   qw< pod2usage >;
+use Getopt::Long qw< GetOptionsFromArray :config gnu_getopt >;
+use English      qw< -no_match_vars >;
+my $VERSION = '0.1';
+
+exit main(@ARGV);
+
+use Storable          qw< dclone >;
+use JSON::PP          qw< decode_json >;
+use MIME::Base64      qw< decode_base64 >;
+use PDF::Collage      qw< collage >;
+use Template::Perlish qw< render traverse >;
+use Data::Resolver    qw< :factories >;
+
+sub main (@args) {
+   my $config = get_options(
+      [
+         'data|data-from|d=s@',
+         'list|list-selectors|l',
+         {
+            getopt  => 'output|o=s',
+            default => '-',
+         },
+         'selector|S=s',
+         'source|s=s@',
+      ],
+      \@args,
+   );
+
+   # $config: hash reference with configuration
+   # @args:   residual arguments
+
+   my $pdfc = get_collage($config);
+   return list_selectors($pdfc) if $config->{list};
+
+   for my $record (collect_records($config, \@args)->@*) {
+
+      # get selector for this specific record
+      my $selector = $config->{selector} // undef;
+      $selector = render($selector, $record) if defined $selector;
+
+      # get template from computed selector and render the PDF
+      my $template = get_template($pdfc, $selector);
+      my $pdf      = $template->render($record);
+
+      # get the output channel and send the PDF content to it
+      my $output = render($config->{output}, $record);
+      output_pdf($pdf, $output);
+
+   } ## end for my $record (collect_records...)
+
+   return 0;
+} ## end sub main
+
+sub collect_records ($config, $args) {
+   my $common = {};
+   my @records;
+
+   for my $input (($config->{data} // [])->@*) {
+      my $addon = decode_json(slurp_raw($input));
+      if (ref($addon) eq 'ARRAY') {
+         push @records, $addon->@*;
+      }
+      else {
+         merge_hash_in_place($common, $addon);
+      }
+   } ## end for my $input (($config...))
+
+   for my $additional (($args // [])->@*) {
+      my ($first) = $additional =~ m{(\S)}mxs;
+      $first //= '';
+      if ($first eq '{') {    # JSON hash
+         merge_hash_in_place($common, decode_json($additional));
+      }
+      elsif ($first eq '[') {
+         push @records, decode_json($additional)->@*;
+      }
+      else {
+         my ($key, $sep, $val) = split m{(\#?= | ::?)}mxs, $additional, 2;
+         length($sep // '') > 0
+           or die "invalid input value definition: no separator\n";
+         s{\A\s+|\s+\z}{}gmxs for ($key, $val);
+         $val = decode_base64($val) if length($sep) == 2;
+         ${traverse(\$common, $key)} = $val;
+      } ## end else [ if ($first eq '{') (})]
+   } ## end for my $additional (($args...))
+
+   @records = ({}) unless @records;
+   $_       = merge_hash_in_place(dclone($common), $_) for @records;
+
+   return \@records;
+} ## end sub collect_records
+
+sub get_collage ($config) {
+   my $sources   = $config->{source} // [];
+   my $n_sources = $sources->@*;
+   $n_sources > 0 or die "no input source templates\n";
+
+   my $is_json = qr{(?mxs:\A \s* [\[\{] )};
+   my @res;    # list of sources as resolvers
+   for my $source ($sources->@*) {
+      if ($source =~ $is_json) {    # JSON, immediate stuff
+         die "only one single plain template allowed\n"
+           if $n_sources > 1;
+         return collage(definition => $source);
+      }
+      die "cannot use source '$source'\n" unless -r $source;
+      if (-d $source) {
+         push @res, resolver_from_dir(root => $source, throw => 1);
+      }
+      else {
+         my $first_byte = slurp_raw($source, 10);
+         if ($first_byte =~ $is_json) {
+            die "only one single plain template allowed\n"
+              if $n_sources > 1;
+            return collage(definition => slurp_raw($source));
+         }
+         push @res, resolver_from_tar(archive => $source, throw => 1);
+      } ## end else [ if (-d $source) ]
+   } ## end for my $source ($sources...)
+
+   my $resolver =
+       @res == 1
+     ? $res[0]
+     : resolver_from_alternatives(alternatives => \@res, throw => 1);
+
+   return collage(resolver => $resolver);
+} ## end sub get_collage
+
+sub get_options ($specs, $ARGV) {
+   my (%cmdline, %environment, %default);
+   my @cmdline_options = qw< help! man! usage! version! >;
+   for my $spec ($specs->@*) {
+      my ($optnames, $default, $env_var) =
+        ref $spec
+        ? $spec->@{qw< getopt default environment >}
+        : ($spec, undef, undef);
+      push @cmdline_options, $optnames;
+      (my $name = $optnames) =~ s{[^\w-].*}{}mxs;
+      $default{$name}     = $default if defined $default;
+      $environment{$name} = $ENV{$env_var}
+        if defined $env_var && defined $ENV{$env_var};
+   } ## end for my $spec ($specs->@*)
+
+   GetOptionsFromArray($ARGV, \%cmdline, @cmdline_options)
+     or pod2usage(-verbose => 99, -sections => 'USAGE');
+
+   pod2usage(message => "$0 $VERSION", -verbose => 99, -sections => ' ')
+     if $cmdline{version};
+   pod2usage(-verbose => 99, -sections => 'USAGE') if $cmdline{usage};
+   pod2usage(-verbose => 99, -sections => 'USAGE|EXAMPLES|OPTIONS')
+     if $cmdline{help};
+   pod2usage(-verbose => 2) if $cmdline{man};
+
+   return {%default, %environment, %cmdline};
+} ## end sub get_options
+
+sub get_template ($pdfc, $selector) {
+   return $pdfc->get($selector) if $pdfc->can('get');
+   warn "the provided source is a plain template without selectors\n"
+     if defined($selector);
+   return $pdfc;
+} ## end sub get_template
+
+sub list_selectors ($pdfc) {
+   if ($pdfc->can('selectors')) {
+      say for sort { $a cmp $b } $pdfc->selectors;
+      return 0;
+   }
+
+   # plain template
+   warn "the provided source is a plain template without selectors\n";
+   return 1;
+} ## end sub list_selectors
+
+sub merge_hash_in_place ($data, $addon) {
+   for my $key (keys $addon->%*) {
+      my ($prefix, $skey) = $key =~ m{\A ([-=]?) (.*) \z}mxs;
+      next if ($prefix eq '-') && exists($data->{$skey});
+      $data->{$skey} = $addon->{$key};
+   }
+   return $data;
+} ## end sub merge_hash_in_place
+
+sub output_pdf ($pdf, $output) {
+   return $pdf->saveas($output) if $output ne '-';
+   binmode STDOUT;
+   print {*STDOUT} $pdf->to_string;
+   close STDOUT;
+   return;
+} ## end sub output_pdf
+
+sub slurp_raw ($path, $n = undef) {
+   my $fh =
+     $path eq '-'
+     ? \*STDIN
+     : do {
+      open my $fh, '<:raw', $path or die "open('$path'): $OS_ERROR\n";
+      $fh;
+     };
+   if (($n // 0) > 0) {
+      $path ne '-'
+        or die "no peeking from STANDARD INPUT, sorry!\n";
+      my $buffer = '';
+      defined(my $n_read = read($fh, $buffer, $n))
+        or die "read() from '$path': $OS_ERROR\n";
+      return $buffer;
+   } ## end if (($n // 0) > 0)
+
+   local $/;
+   defined(my $retval = <$fh>)
+     or die "read() from '$path': $OS_ERROR\n";
+   close $fh;    # don't care if has errors
+   return $retval;
+} ## end sub slurp_raw
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+pdf-collage - PDF manipulation with scissors and glue
+
+=head1 VERSION
+
+The version can be retrieved with option C<--version>:
+
+   $ pdf-collage --version
+
+=head1 USAGE
+
+   pdf-collage [--help] [--man] [--usage] [--version]
+
+   pdf-collage [--data|--data-from|-d path [...]]
+               [--list|--list-selectors|-l]
+               [--output|-o output]
+               [--selector|-S string]
+               [--source|-s source [...]]
+
+
+=head1 EXAMPLES
+
+   # expand a plain JSON files with some data, redirect output PDF
+   pdf-collage --source plain.json foo=bar baz=12 > test.pdf
+
+   # use a "proper" bundle instead, containing a single template inside
+   pdf-collage -s bundle.pdfc foo=bar baz=12 > test.pdf
+
+   # output can be controlled with --output|-o
+   pdf-collage -s bundle.pdfc -o test.pdf foo=bar baz=12
+
+   # input stuff can be JSON too
+   pdf-collage -s bundle.pdfc -o test.pdf '{"foo":"bar","baz":12}'
+
+   # there can be more
+   pdf-collage -s bundle.pdfc -o test.pdf '{"foo":"bar"}' '{"baz":12}'
+
+   # data can be loaded from files. "Free" arguments will win though
+   pdf-collage -s bundle.pdfc -o test.pdf -d data.json foo=bar
+
+   # the output filename might be expanded as a Template::Perlish thing
+   pdf-collage -s bundle.pdfc -o '[% name %].pdf' -d record.json
+
+   # if the source contains multiple templates, it's possible to list them
+   pdf-collage -s several.pdfc --list
+
+   # in this case a selector is needed
+   pdf-collage -s several.pdfc -S my-template foo=bar baz=12 > test.pdf
+
+   # complicated things are... doable, like handling the generation of
+   # multiple PDF files each with its own name generated on the fly,
+   # starting from a common base and picking specific customizations
+   pdf-collage -s bundle.pdfc -s other-bundle.pdfc \
+      -o '[% name %]-[% id %].pdf'
+      -d common-data.json foo=bar baz=galook \
+      '[{"name": "you", "id": 1}, {"name": "me", "id": 2}]'
+
+=head1 DESCRIPTION
+
+Generate PDFs much like the I<mail merge> function that is common to at
+least two big office automation suites.
+
+It proceeds from two input types: one or more I<sources> of templates, and
+one or more I<records of data>. They are I<merged> to generate one PDF file
+for each record.
+
+In case the source (or sources) contains multiple templates inside, it's
+possible to list them with command-line option C<--list|-l>, then use one of
+the I<selector> strings that are printed with command-line option
+C<--selector|-S>.
+
+It's possible to use L<Template::Perlish> templates in many places, both
+inside the sources of data, both elsewhere, e.g. when selecting the right
+source to use or naming the output file.
+
+=head2 Collage Sources Gathering
+
+There are two main types of collage sources: plain templates or collections.
+While both are supported, chances are that a collection is a better choice
+for anything but simple one-off needs, as it allows packing together several
+different artifacts and provides a more portable solution.
+
+Sources can be provided with the C<--source> command-line option or its
+alieases. They can represent JSON data, or directories, or file names:
+
+=over
+
+=item *
+
+if a source starts with optional spaces followed by a first non-space
+character that is either C<[> or C<{>, then it is considered JSON data. In
+case of a file that is I<actually> named like that, it's still possible to
+set the full or the relative path.
+
+=item *
+
+otherwise, if it's a directory... it's a directory
+
+=item *
+
+otherwise, it must be a plain file. If the first non-space character within
+the initial 10 bytes is either C<[> or C<{> then it is considered JSON data,
+otherwise it is considered a TAR archive.
+
+=back
+
+A source representing JSON data is considered a single template and treated
+as such; see L</Single template>. If one is present, only that one can be
+present and anything else will be considered an error.
+
+A source that is either a directory or a TAR archive is considered a
+collection of templates. It's possible to have several collections, which
+will be considered collectively, with the ones appearing first in the
+command line taking precedence over the following when looking for stuff
+inside of them while rendering PDF files.
+
+=head2 Record(s) Data Collection
+
+Collectiong data for doing the merge can be done in multiple ways.
+
+On one side, every command-line argument that is not part of the available
+options is considered a source for such record's data, in one of two forms:
+
+=over
+
+=item *
+
+if the first non-space character is a C<{>, then it's considered a JSON
+object, parsed as a hash and merged into a I<common> hash of values
+
+=item *
+
+if the first non-space character is a C<[>, then it's considere a JSON
+array, parsed as an array and its elements added to a list of I<records>
+
+=item *
+
+otherwise, it's considered a key/value pair, separated by the first
+occurrence of a I<separator>. Again, different alternatives are supported:
+
+=over
+
+=item *
+
+if C<#=> or C<::> consider the value part on the right as being encoded with
+Base64, so it's decoded accordingly
+
+=item *
+
+otherwise, if the separator is C<=> or one single C<:>, then the value is
+taken verbatim.
+
+=back
+
+In both cases the I<key> part is considered a trail of segments to navigate
+through the I<common> data and set the value. As an example, a key
+C<foo.bar.baz> would set C<$common{foo}{bar}{baz}>; the rules are the same
+as in L<Template::Perlish>'s C<traverse>.
+
+=back
+
+It's also possible to feed data files with the C<--data> or its aliases.
+These files are always considered JSON files, with either objects (hashes)
+or arrays inside and handled like explained above. Files are always scanned
+first, so the respective values or records are handled before other data.
+
+After the collection is complete, records are assembled. If no record was
+provided (i.e. no non-empty array appeared during collection), then the
+common data is considered a lone record and returned as such.
+
+Otherwise, each collected record is merged with the common data and
+returned. This allows using the common data as providing defaults for all
+records, while still being able to set record-specific data or override some
+defaults.
+
+Merging of hashes is performed onto a base one (the previously collected
+data, or the common data) based on the additional data (the new data or the
+specific record's data), with the following rules for handling each
+key/value pair:
+
+=over
+
+=item *
+
+If the very first character in the key is C<->, then the rest of the key is
+considered the real key and added onto the base only if it does not already
+contain a value. This allows for setting a late default.
+
+=item *
+
+If the very first character in the key is C<=>, then it's stripped from the
+key and the key/value pair is set in the base hash. This allows supporting
+keys that need to begin with a literal C<-> character, without incurring the
+behaviour of the previous bullet (e.g. target key C<-foo> would be provided
+as C<=-foo>).
+
+=item *
+
+Otherwise, the key/value pair is added onto the hash.
+
+=back
+
+There is no attempt at doing a I<deep> merge of hash values, so only the
+top-level will be handled.
+
+
+=head2 Templates Resolution
+
+If a simple/single template is provided as JSON data, there's no resolution
+to be done and it's used directly.
+
+Otherwise, if the source is a collection (or several collections), it makes
+sense to select one of the included templates.
+
+First of all, it's possible to use option C<--list|-> to get a I<list> of
+all available templates inside; the strings printed in standard output
+represent the I<selectors> that can be later used to point out the specific
+template that is needed.
+
+If there is only one selector, it's not necessary to pass it when invoking
+the program, as it will be used automatically. Otherwise, it is necessary to
+use command-line option C<--selector|-S> to pass the selector string.
+
+=head2 Writing Templates
+
+At the basic level, a template is a list of I<commands> inside a
+properly-formatted JSON file.
+
+Many times, though, these commands will refer to specific artifacts, like
+e.g. one or more input PDF files from where pages should be taken; this is
+where a I<templates collection> source is better, as it allows to pack the
+JSON file with the commands together with all artifacts (including fonts, if
+needed) inside a directory or a TAR archive (for best portability).
+
+=head3 Single template
+
+The JSON template is a string (/file) containing the instructions for
+rendering a PDF file. It can have two forms: an I<object> or an I<array>.
+
+In the former case, the I<object> MUST contain a key C<commands> whose
+corresponding value is an array with the list of commands; in the latter,
+the array is directly the container for the list of commands.
+
+The following commands are supported:
+
+=over
+
+=item B<< add-image >>
+
+   {
+      "op": "add-image",
+      "page": 1,
+      "path": "/path/to/image.png",
+      "x": 10,
+      "y": 30,
+      "width": 10,
+      "height": 10
+   }
+
+Add an image. See L<PDF::Build> for the supported formats.
+
+=item B<< add-page >>
+
+   { "op": "add-page" }
+
+Add an empty page at the end.
+
+   { "op": "add-page", "page": 1 }
+
+Add an empty page as page number 1.
+
+   {
+      "op": "add-page",
+      "page": 2,
+      "from-path": "/some/file.pdf",
+      "from-page": 3
+   }
+
+Get page 3 from file C</some/file.pdf> and add it as page 2 in the PDF
+that is built.
+
+Key C<from-path> can also be abbreviated as C<from>.
+
+=item B<< add-text >>
+
+   {
+      "op": "add-text",
+      "page": 1,
+      "font": "DejaVuSans.ttf",
+      "font-size": 12,
+      "text": "whatever",
+      "x": 10,
+      "y": 20
+   }
+
+Place a text label on the PDF.
+
+The C<font> key can be replaced with C<font-family>.
+
+There are three ways of defining the text:
+
+=over
+
+=item C<text>
+
+This text is taken verbatim and has precedence over other alternatives;
+
+=item C<text-template>
+
+This text is expanded using L<Template::Perlish>. It takes precedence over
+L</text-variable>.
+
+=item C<text-variable>
+
+This is meant to be a variable that is expanded using
+L<Template::Perlish> on the data provided.
+
+=back
+
+=item B<< log >>
+
+   {
+      "op": "log",
+      "level": "info",
+      "message": "whatever!"
+   }
+
+Print a log message. If L<Log::Any> is available, it will use it;
+otherwise, C<warn> is used.
+
+=item B<< set-defaults >>
+
+   {
+      "op": "set-default",
+      "font": "DejaVuSans.ttf",
+      "font-size": 12,
+      "level": "info"
+   }
+
+Set some defaults that will be used in following commands. This allows
+e.g. to set the same font once and for all for all L</add-text>
+commands, or the font size.
+
+=back
+
+
+=head3 Templates collection 
+
+A I<templates collection> is a bundle that allows packing together multiple
+templates, as well as artifacts that can be referred from these templates.
+
+In its basic form, it is a directory with the structure that is detailed
+below. This directory can also be packed as a TAR archive, that can be used
+as a collection too for maximum portability.
+
+JSON templates MUST be files with extension C<.json> put inside a
+sub-directory named C<definitions>. Other artifacts can be placed in any
+place.
+
+It's possible to refer to the artifacts bundled in the collection using
+function C<as_file()> that is injected in the L<Template::Perlish> namespace
+and can thus be used in L<Template::Perlish> templates. As an example, if
+the bundle includes a font file in location C<assets/fonts/shiny.ttf>, it's
+possible to use it in a C<add-text> command like this:
+
+   {
+      "op": "add-text",
+      "page": 1,
+      "font": "[%= as_file('assets/fonts/shiny.ttf') %]",
+      "'font-size": 12,
+      "text": "whatever",
+      "x": 10,
+      "y": 20
+   }
+
+Similarly, for taking a page from a bundled PDF file in location
+C<assets/pdf/models.pdf> inside the directory:
+
+   {
+      "op": "add-page",
+      "page": 2,
+      "from-path": "[%= as_file('assets/pdf/models.pdf') %]",
+      "from-page": 3
+   }
+
+=head1 OPTIONS
+
+=over
+
+=item B<< --data|--data-from|-d path >>
+
+load some data from the file at the specific path, assuming it's JSON.
+
+JSON objects (hashes) contribute to a I<common> set of data.
+
+JSON arrays (of hashes) add records.
+
+=item B<--help>
+
+print out some help and exit.
+
+=item B<< --list|--list-selectors|-l >>
+
+print out the list of available selectors from provided sources.
+
+=item B<--man>
+
+show the manual page for pdf-collage.
+
+=item B<< --output|-o output-spec >>
+
+the output filename, defaulting to C<-> which means standard output.
+
+It is treated as a template string expanded with each record's data.
+
+=item B<< --selector|-S string >>
+
+a selector string for templates with multiple definitions inside.
+
+It is treated as a template string expanded with each record's data.
+
+=item B<< --source|-s specification >>
+
+a suitable input for taking I<instructions> for building the PDF. It can be
+either a file holding JSON data, in which case it is treated as a I<simple>
+template; otherwise it's considered a I<collection> of templates bundled
+with artifacts, which usually implies that a C<selector> will be needed
+(unless the bundle contains one single definition only).
+
+=item B<--usage>
+
+show usage instructions.
+
+=item B<--version>
+
+show version.
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+Please report any bugs or feature requests through the repository at
+L<https://codeberg.org/polettix/PDF-Collage>.
+
+=head1 AUTHOR
+
+Flavio Poletti
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2023 by Flavio Poletti (flavio@polettix.it).
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+or look for file C<LICENSE> in this project's root directory.
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+=cut

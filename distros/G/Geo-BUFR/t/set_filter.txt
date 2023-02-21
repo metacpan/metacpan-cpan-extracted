@@ -8,16 +8,6 @@ Filtering CCCC=TEST, data category not 2
   is_filtered 7 ISMD11 OKPR 060600
   8 IUSA11 ENMI 291800
 
-Filtering CCCC=TEST, data category not 2, reusing current_ahl
-  is_filtered 1 ISXD99 SVVS 200300
-  is_filtered 2 ISXD99 SVVS 200300
-  is_filtered 3 ISXD99 SVVS 200300
-  is_filtered 4 ISXD97 SVVS 200300
-  is_filtered 5 ISXD96 SVVS 200300
-  is_filtered 6 IUSA11 TEST 291800
-  is_filtered 7 ISMD11 OKPR 060600
-  8 IUSA11 ENMI 291800
-
 Filtering CCCC=TEST, data category not 0
   1 ISXD99 SVVS 200300
   Error at message 2 with AHL []
@@ -28,30 +18,10 @@ Filtering CCCC=TEST, data category not 0
   7 ISMD11 OKPR 060600
   is_filtered 8 IUSA11 ENMI 291800
 
-Filtering CCCC=TEST, data category not 0, reusing current_ahl
-  1 ISXD99 SVVS 200300
-  Error at message 2 with AHL [ISXD99 SVVS 200300]
-  3 ISXD99 SVVS 200300
-  Error at message 4 with AHL [ISXD97 SVVS 200300]
-  5 ISXD96 SVVS 200300
-  is_filtered 6 IUSA11 TEST 291800
-  7 ISMD11 OKPR 060600
-  is_filtered 8 IUSA11 ENMI 291800
-
 Filtering CCCC=TEST|SVVS, data category not 0
   is_filtered 1 ISXD99 SVVS 200300
   Error at message 2 with AHL []
   3 
-  is_filtered 4 ISXD97 SVVS 200300
-  is_filtered 5 ISXD96 SVVS 200300
-  is_filtered 6 IUSA11 TEST 291800
-  7 ISMD11 OKPR 060600
-  is_filtered 8 IUSA11 ENMI 291800
-
-Filtering CCCC=TEST|SVVS, data category not 0, reusing current_ahl
-  is_filtered 1 ISXD99 SVVS 200300
-  is_filtered 2 ISXD99 SVVS 200300
-  is_filtered 3 ISXD99 SVVS 200300
   is_filtered 4 ISXD97 SVVS 200300
   is_filtered 5 ISXD96 SVVS 200300
   is_filtered 6 IUSA11 TEST 291800

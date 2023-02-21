@@ -2,109 +2,64 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 1.008 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2023-02-03.
+    This document describes version 1.017 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2023-02-18.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
 
-    *   csv-add-fields
-
-    *   csv-avg
-
-    *   csv-check-cell
-
-    *   csv-check-field
-
-    *   csv-check-values
-
-    *   csv-concat
-
-    *   csv-convert-to-hash
-
-    *   csv-csv
-
-    *   csv-delete-fields
-
-    *   csv-dump
-
-    *   csv-each-row
-
-    *   csv-fill-template
-
-    *   csv-find-values
-
-    *   csv-freqtable
-
-    *   csv-gen
-
-    *   csv-get-cells
-
-    *   csv-grep
-
-    *   csv-info
-
-    *   csv-intrange
-
-    *   csv-list-field-names
-
-    *   csv-lookup-fields
-
-    *   csv-map
-
-    *   csv-munge-field
-
-    *   csv-munge-row
-
-    *   csv-pick
-
-    *   csv-pick-fields
-
-    *   csv-pick-rows
-
-    *   csv-replace-newline
-
-    *   csv-select-fields
-
-    *   csv-select-rows
-
-    *   csv-setop
-
-    *   csv-shuf
-
-    *   csv-shuf-fields
-
-    *   csv-shuf-rows
-
-    *   csv-sort
-
-    *   csv-sort-fields
-
-    *   csv-sort-rows
-
-    *   csv-sorted
-
-    *   csv-sorted-fields
-
-    *   csv-sorted-rows
-
-    *   csv-split
-
-    *   csv-sum
-
-    *   csv-transpose
-
-    *   csv-uniq
-
-    *   csv2ltsv
-
-    *   csv2td
-
-    *   csv2tsv
-
-    *   csv2vcf
-
-    *   tsv2csv
+    1. csv-add-fields
+    2. csv-avg
+    3. csv-check-cell-values
+    4. csv-check-field-names
+    5. csv-check-field-values
+    6. csv-check-rows
+    7. csv-concat
+    8. csv-convert-to-hash
+    9. csv-csv
+    10. csv-delete-fields
+    11. csv-dump
+    12. csv-each-row
+    13. csv-fill-template
+    14. csv-find-values
+    15. csv-freqtable
+    16. csv-gen
+    17. csv-get-cells
+    18. csv-grep
+    19. csv-info
+    20. csv-intrange
+    21. csv-list-field-names
+    22. csv-lookup-fields
+    23. csv-map
+    24. csv-munge-field
+    25. csv-munge-row
+    26. csv-pick
+    27. csv-pick-fields
+    28. csv-pick-rows
+    29. csv-replace-newline
+    30. csv-select-fields
+    31. csv-select-rows
+    32. csv-setop
+    33. csv-shuf
+    34. csv-shuf-fields
+    35. csv-shuf-rows
+    36. csv-sort
+    37. csv-sort-fields
+    38. csv-sort-rows
+    39. csv-sorted
+    40. csv-sorted-fields
+    41. csv-sorted-rows
+    42. csv-split
+    43. csv-sum
+    44. csv-transpose
+    45. csv-uniq
+    46. csv2ltsv
+    47. csv2paras
+    48. csv2td
+    49. csv2tsv
+    50. csv2vcf
+    51. paras2csv
+    52. tsv2csv
 
 FUNCTIONS
   gen_csv_util
@@ -119,6 +74,14 @@ FUNCTIONS
     function simply using Perinci::CmdLine::Gen or, if you use Dist::Zilla,
     Dist::Zilla::Plugin::GenPericmdScript or, if on the command-line,
     gen-pericmd-script.
+
+    Using this routine, by providing just one or a few hooks and setting
+    some parameters like a couple of extra arguments, you will get a
+    complete CLI with decent POD/manpage, ability to read one or multiple
+    CSV's and write one or multiple CSV's, some command-line options to
+    customize how the input CSV's should be parsed and how the output CSV's
+    should be formatted and named. Your CLI also has tab completion, usage
+    and help message, and other features.
 
     To create a CSV utility, you specify a "name" (e.g. "csv_dump"; must be
     a valid unqualified Perl identifier/function name) and optionally
@@ -176,6 +139,12 @@ FUNCTIONS
         which case the header row will be the generated "["field1",
         "field2", ...]". You can use this hook e.g. to add/remove/rearrange
         fields.
+
+        You can set "$r->{wants_fill_rows}" to a defined false if you do not
+        want "$r->{input_rows}" to be filled with empty string elements when
+        it contains less than the number of fields (in case of sparse values
+        at the end). Normally you only want to do this when you want to do
+        checking, e.g. in csv-check-rows.
 
     *   on_input_data_row
 

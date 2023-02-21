@@ -74,6 +74,7 @@ sub load_table {
   $log->debug("Looking for table '$name' in the contrib directory '$dir'");
   my $file = Mojo::File->new("$dir/hex-describe-$name-table.txt");
   return decode_utf8($file->slurp) if -e $file;
+  return '';
 }
 
 =item load_map($name, $dir)
@@ -118,7 +119,7 @@ Would be:
 =cut
 
 my $dice_re = qr/^(save )?(?:(\d+)d(\d+)(?:x(\d+))?(?:([+-]\d+))?(?:>=(-?\d+))?(?:<=(-?\d+))?|(\d+))(?: as (.+))?$/;
-my $math_re = qr/^(save )?([-+*\/%()0-9]+)(?: as (.+))?$/;
+my $math_re = qr/^(save )?([-+*\/%<>=()0-9]+)(?: as (.+))?$/;
 
 sub parse_table {
   my $text = shift;
@@ -604,7 +605,7 @@ sub describe {
   $log->error("Recursion level $level exceeds 20 in $coordinates (@$words)!") if $level > 20;
   return '' if $level > 20;
   if ($level == 1) {
-    %locals = (); # reset once per paragraph
+    %locals = (hex => $coordinates); # reset once per paragraph
     for my $word (@$words) {
       if ($word =~ /^([a-z]+)="(.*)"/ or
 	  $word =~ /(.*)-(\d+)$/) {

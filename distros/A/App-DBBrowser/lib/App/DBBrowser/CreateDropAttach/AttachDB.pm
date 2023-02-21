@@ -70,32 +70,13 @@ sub attach_db {
             my $info = join( "\n", @tmp_info );
             $ax->print_sql_info( $info );
             # Readline
-            my $alias = $tr->readline( ##
+            my $alias = $tr->readline(
                 'Alias: ',
                 { info => $info, clear_screen => 1 }
             );
             $ax->print_sql_info( $info );
             if ( ! length $alias ) {
-                #last ALIAS;
                 next ATTACH;
-            }
-            elsif ( $alias =~ /^(?:main|temp)\z/i ) {
-                my $prompt = "Alias '$alias' not allowed.";
-                # Choose
-                my $retry = $tc->choose(
-                    [ undef ],
-                    { prompt => $prompt, info => $info, undef => 'Continue with ENTER', clear_screen => 1 }
-                );
-                next ALIAS;
-            }
-            elsif ( any { $_->[1] eq $alias } @$attached_db ) {
-                my $prompt = "Alias '$alias' already used.";
-                # Choose
-                my $retry = $tc->choose(
-                    [ undef ],
-                    { prompt => $prompt, info => $info, undef => 'Continue with ENTER', clear_screen => 1 }
-                );
-                next ALIAS;
             }
             else {
                 push @$attached_db, [ $db, $alias ];
@@ -111,12 +92,19 @@ sub attach_db {
                 $ax->print_sql_info( $info );
                 if ( ! defined $confirm ) {
                     pop @$attached_db;
-                    next ATTACH;
+                    next ALIAS;
                 }
-                $dbh->do( __attach_stmt( $dbh, $db, $alias ) );
+                if ( ! eval {
+                    $dbh->do( __attach_stmt( $dbh, $db, $alias ) );
+                    1 }
+                ) {
+                    pop @$attached_db;
+                    $ax->print_error_message( $@ );
+                    next ALIAS;
+                }
                 $sf->{d}{db_attached} = 1;
                 my $h_ref = $ax->read_json( $sf->{i}{f_attached_db} ) // {};
-                $h_ref->{$sf->{d}{db}} = [ sort( @$attached_db ) ];
+                $h_ref->{$sf->{d}{db}} = [ sort( @$attached_db ) ]; ## format
                 $ax->write_json( $sf->{i}{f_attached_db}, $h_ref );
                 return 1;
             }

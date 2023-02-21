@@ -1,5 +1,16 @@
 Revision history for Project2-Gantt
 
+0.009     2023-02-16 10:41:11 CET
+    - Depend on Alien::Font::Vera and update doc to reflect that
+
+0.008     2023-02-14 23:57:52 CET
+    - Depend on Perl 5.020
+    - Add File::Find::Rule test dependency
+    - Indent pod code with spaces in Gantt.pm
+
+0.007     2023-02-14 23:11:23 CET
+    - Add Small, Medium and Large skins
+
 0.006     2023-02-02 16:06:40 CET
     - Fix undef warning in debug log in sub project loop
 

@@ -1,5 +1,13 @@
 Revision history for String-Tagged-Markdown
 
+0.04    2023-02-13
+        [CHANGES]
+         * Include a Markdown-to-HTML example script for additional testing
+
+        [BUGFIXES]
+         * Don't attempt the HFM highlight test if Convert::Color is not
+           available (RT146288)
+
 0.03    2023-02-06
         [CHANGES]
          * Handle the multiple-backtick version of fixed-width

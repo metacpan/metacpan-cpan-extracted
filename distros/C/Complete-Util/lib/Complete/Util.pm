@@ -9,9 +9,9 @@ use Complete::Common qw(:all);
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-08'; # DATE
+our $DATE = '2023-01-17'; # DATE
 our $DIST = 'Complete-Util'; # DIST
-our $VERSION = '0.612'; # VERSION
+our $VERSION = '0.614'; # VERSION
 
 our @EXPORT_OK = qw(
                        hashify_answer
@@ -679,13 +679,30 @@ sub complete_comma_sep {
     my $word      = delete $args{word} // "";
     my $sep       = delete $args{sep} // ',';
     my $elems     = delete $args{elems} or die "Please specify elems";
+    my $summaries = delete $args{summaries};
     my $uniq      = delete $args{uniq};
     my $remaining = delete $args{remaining};
 
     my $ci = $Complete::Common::OPT_CI;
 
+    my %summaries_for; # key=elem val=summary
+  GEN_SUMMARIES_HASH:
+    {
+        last unless $summaries;
+        for my $i (0 .. $#{$elems}) {
+            my $elem0 = $elems->[$i];
+            my $summary = $summaries->[$i];
+            my $elem = $ci ? lc($elem0) : $elem0;
+            if (exists $summaries_for{$elem}) {
+                log_warn "Non-unique value '$elem', using only the first summary for it";
+                next;
+            }
+            $summaries_for{$elem} = $summary;
+        }
+    } # GEN_SUMMARIES_HASH
+
     my @mentioned_elems = split /\Q$sep\E/, $word, -1;
-    my $cae_word = @mentioned_elems ? pop(@mentioned_elems) : '';
+    my $cae_word = @mentioned_elems ? pop(@mentioned_elems) : ''; # cae=complete_array_elem
 
     my $remaining_elems;
     if ($remaining) {
@@ -707,17 +724,19 @@ sub complete_comma_sep {
         %args,
         word  => $cae_word,
         array => $remaining_elems,
+        ($summaries ? (summaries=>[map {$summaries_for{ $ci ? lc($_):$_ }} @$remaining_elems]) : ()),
     );
 
     my $prefix = join($sep, @mentioned_elems);
     $prefix .= $sep if @mentioned_elems;
-    $cae_res = [map { "$prefix$_" } @$cae_res];
+    $cae_res = [map { ref $_ eq 'HASH' ? { %$_, word=>"$prefix$_->{word}" } : "$prefix$_" } @$cae_res];
 
     # add trailing comma for convenience, where appropriate
     {
         last unless @$cae_res == 1;
         last if @$remaining_elems <= 1;
-        $cae_res = [{word=>"$cae_res->[0]$sep", is_partial=>1}];
+        $cae_res = [{word=>$cae_res->[0]}] unless ref $cae_res->[0] eq 'HASH';
+        $cae_res = [{word=>"$cae_res->[0]{word}$sep", (defined $cae_res->[0]{summary} ? (summary=>$cae_res->[0]{summary}) : ()), is_partial=>1}];
     }
     $cae_res;
 }
@@ -918,7 +937,7 @@ Complete::Util - General completion routine
 
 =head1 VERSION
 
-This document describes version 0.612 of Complete::Util (from Perl distribution Complete-Util), released on 2022-09-08.
+This document describes version 0.614 of Complete::Util (from Perl distribution Complete-Util), released on 2023-01-17.
 
 =head1 DESCRIPTION
 
@@ -1057,6 +1076,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<$answers>* => I<array[hash|array]>
 
+(No description)
+
 
 =back
 
@@ -1117,7 +1138,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<array>* => I<array[str]>
 
+(No description)
+
 =item * B<exclude> => I<array>
+
+(No description)
 
 =item * B<replace_map> => I<hash>
 
@@ -1131,6 +1156,8 @@ will be regarded the same as C<unmount> and when user types C<um> it can be
 completed unambiguously into C<unmount>.
 
 =item * B<summaries> => I<array[str]>
+
+(No description)
 
 =item * B<word>* => I<str> (default: "")
 
@@ -1159,7 +1186,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<elems>* => I<array[str]>
 
+(No description)
+
 =item * B<exclude> => I<array>
+
+(No description)
 
 =item * B<remaining> => I<code>
 
@@ -1206,7 +1237,11 @@ completed unambiguously into C<unmount>.
 
 =item * B<sep> => I<str> (default: ",")
 
+(No description)
+
 =item * B<summaries> => I<array[str]>
+
+(No description)
 
 =item * B<uniq> => I<bool>
 
@@ -1257,9 +1292,15 @@ Arguments ('*' denotes required arguments):
 
 =item * B<hash>* => I<hash>
 
+(No description)
+
 =item * B<summaries> => I<hash>
 
+(No description)
+
 =item * B<summaries_from_hash_values> => I<true>
+
+(No description)
 
 =item * B<word>* => I<str> (default: "")
 
@@ -1323,9 +1364,15 @@ Arguments ('*' denotes required arguments):
 
 =item * B<answer>* => I<hash|array>
 
+(No description)
+
 =item * B<prefix> => I<str>
 
+(No description)
+
 =item * B<suffix> => I<str>
+
+(No description)
 
 
 =back
@@ -1440,7 +1487,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2017, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019, 2017, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

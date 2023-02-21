@@ -13,7 +13,6 @@ my $requires = {
         'Try::Tiny'             => '0',
         'File::Slurp'           => '0',
         'UNIVERSAL::require'    => '0',
-        'File::Copy::Recursive' => '0',
         'JSON'                  => '0',
         'Getopt::Long'          => '0',
         'Bit::Vector'           => '0',
@@ -63,15 +62,12 @@ my $build = Module::Build::HiPi->new(
     dist_description => 'Manage Raspberry Pi GPIO and peripherals',
     
     script_files    => 'script',
-
+    
+    create_packlist => ( $ENV{'HIPI_BUILD_SKIP_PACKLIST'} ) ? 0 : 1,
 );
 
 { # Get Options
-    
-    #my $doupdate  = _hipi_option_is_yes($build->args('hipi-update'));
-    #
-    #$build->notes( doupdate     => $doupdate );
-    
+        
     if( $ENV{PERL5_CPAN_IS_RUNNING} || $ENV{PERL5_CPANPLUS_IS_RUNNING} || $ENV{PERL5_CPAN_IS_EXECUTING} ) {
         $build->notes( cpanskip  => 1 );
     } else {
@@ -80,9 +76,5 @@ my $build = Module::Build::HiPi->new(
 }
 
 $build->create_build_script();
-
-sub _hipi_option_is_yes {
-    return lc( $_[0] ) eq 'y' || lc( $_[0] ) eq 'yes' || $_[0] eq 1;
-}
 
 1;

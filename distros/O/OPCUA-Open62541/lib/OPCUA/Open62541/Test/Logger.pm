@@ -166,11 +166,11 @@ OPCUA::Open62541::Test::Server
 
 =head1 AUTHORS
 
-Alexander Bluhm E<lt>bluhm@genua.deE<gt>,
+Alexander Bluhm E<lt>bluhm@genua.deE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020 Alexander Bluhm
+Copyright (c) 2020-2023 Alexander Bluhm
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

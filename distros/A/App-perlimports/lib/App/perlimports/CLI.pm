@@ -2,9 +2,8 @@ package App::perlimports::CLI;
 
 use Moo;
 use utf8;
-use feature qw( say );
 
-our $VERSION = '0.000049';
+our $VERSION = '0.000050';
 
 use App::perlimports           ();
 use App::perlimports::Config   ();
@@ -110,7 +109,6 @@ has _usage => (
 with 'App::perlimports::Role::Logger';
 
 sub _build_args {
-    my $self = shift;
     my ( $opt, $usage ) = describe_options(
         'perlimports %o',
         [
@@ -205,6 +203,16 @@ sub _build_args {
         [
             'preserve-unused!',
             'Preserve use statements for modules which appear to be unused. This is the default behaviour. You are encouraged to disable it.',
+        ],
+        [],
+        [
+            'range-begin=i',
+            'Experimental. First line of range to tidy or lint. Mostly useful for editors.',
+        ],
+        [],
+        [
+            'range-end=i',
+            'Experimental. Last line of range to tidy or lint. Mostly useful for editors.',
         ],
         [],
         [
@@ -345,11 +353,27 @@ sub run {
     }
 
     my $input;
+    my $selection;
+    my $tmp_file;
 
     if ( $self->_read_stdin ) {
         ## no critic (Variables::RequireInitializationForLocalVars)
         local $/;
         $input = <>;
+        if ( $opts->range_begin && $opts->range_end ) {
+            $tmp_file = Path::Tiny->tempfile('perlimportsXXXXXXXX');
+            $tmp_file->spew($input);
+            my @lines = split( qr{\n}, $input );
+            my $end   = $opts->range_end;
+            if ( $end > scalar @lines + 1 ) {
+                $end = scalar @lines + 1;
+            }
+            $selection = join "\n",
+                @lines[ $opts->range_begin - 1 .. $end - 1 ];
+        }
+        else {
+            $selection = $input;
+        }
     }
 
     unshift @INC, @{ $self->_config->libs };
@@ -388,7 +412,19 @@ sub run {
         return 1;
     }
 
-    my @files = $self->_filter_paths(
+    if (   ( $opts->range_begin && !$opts->range_end )
+        || ( $opts->range_end && !$opts->range_begin ) ) {
+        $logger->error('You must supply both range_begin and range_end');
+        return 1;
+    }
+
+    if ( $opts->range_begin && !$self->_read_stdin ) {
+        $logger->error(
+            'You must specify --read-stdin if you provide a range');
+        return 1;
+    }
+
+    my @files = $tmp_file ? ("$tmp_file") : _filter_paths(
         $opts->filename ? $opts->filename : (),
         @ARGV
     );
@@ -417,7 +453,7 @@ sub run {
         preserve_duplicates => $self->_config->preserve_duplicates,
         preserve_unused     => $self->_config->preserve_unused,
         tidy_whitespace     => $self->_config->tidy_whitespace,
-        $input ? ( selection => $input ) : (),
+        $selection ? ( selection => $selection ) : (),
     );
 
     my $exit_code = 0;
@@ -480,7 +516,6 @@ FILENAME:
 ## use critic
 
 sub _filter_paths {
-    my $self  = shift;
     my @paths = @_;
     my @files;
     my $rule = Path::Iterator::Rule->new->or(
@@ -515,7 +550,7 @@ App::perlimports::CLI - CLI arg parsing for C<perlimports>
 
 =head1 VERSION
 
-version 0.000049
+version 0.000050
 
 =head1 DESCRIPTION
 

@@ -20,7 +20,8 @@ do { my $x = {
                       'requires' => {
                                       'Alien::Font::Vera' => '0.013',
                                       'Imager' => '1.019',
-                                      'Mojolicious' => '9.31'
+                                      'Mojolicious' => '9.31',
+                                      'perl' => '5.020'
                                     }
                     },
        'test' => {
@@ -29,6 +30,7 @@ do { my $x = {
                                    },
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
+                                   'File::Find::Rule' => '0',
                                    'File::Spec' => '0',
                                    'Test::Directory' => '0',
                                    'Test::More' => '0'

@@ -7,7 +7,7 @@ use base 'Devel::Deprecations::Environmental';
 
 use Devel::CheckOS qw(os_is);
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 =head1 NAME
 
@@ -23,7 +23,7 @@ A plugin for L<Devel::Deprecations::Environmental> to emit warnings when perl ha
 
 =head1 AUTHOR, LICENCE and COPYRIGHT
 
-Copyright 2022 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+Copyright 2023 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
 
 This software is free-as-in-speech software, and may be used, distributed, and
 modified under the terms of either the GNU General Public Licence version 2 or

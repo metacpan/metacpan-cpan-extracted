@@ -17,9 +17,9 @@ use Perinci::Sub::Util qw(err);
 #use String::Trim::More qw(trim_blank_lines);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-02'; # DATE
+our $DATE = '2023-02-12'; # DATE
 our $DIST = 'Perinci-Sub-Gen-AccessTable'; # DIST
-our $VERSION = '0.590'; # VERSION
+our $VERSION = '0.591'; # VERSION
 
 our @EXPORT_OK = qw(gen_read_table_func);
 
@@ -815,7 +815,12 @@ sub _gen_func {
             my $hres = $hooks->{$_}->(%hookargs);
             return $hres if ref($hres);
         }
-        if (__is_aoa($table_data) || __is_aoh($table_data)) {
+        if (ref($table_data) =~ /\ATableData::/) {
+            $data = [];
+            while ($table_data->has_next_item) {
+                push @$data, $table_data->get_next_item;
+            }
+        } elsif (__is_aoa($table_data) || __is_aoh($table_data)) {
             $data = $table_data;
         } elsif (ref($table_data) eq 'CODE') {
             my $res;
@@ -1225,12 +1230,11 @@ _
         %Perinci::Sub::Gen::common_args,
         table_data => {
             req => 1,
-            schema => ['any*' => of => ['array*', 'code*']],
+            schema => ['any*' => of => ['array*', 'code*', 'obj*']],
             summary => 'Data',
             description => <<'_',
 
-Table data is either an AoH or AoA. Or you can also pass a Perl subroutine (see
-below).
+Table data is either an AoH/AoA, or a <pm:TableData> object, or a coderef.
 
 Passing a subroutine lets you fetch data dynamically and from arbitrary source
 (e.g. DBI table or other external sources). The subroutine will be called with
@@ -1254,12 +1258,14 @@ mentioned in filter arguments).
 _
         },
         table_spec => {
-            req => 1,
             schema => 'hash*',
             summary => 'Table specification',
             description => <<'_',
 
-See `TableDef` for more details.
+Required, unless `table_data` argument is a <pm:TableData> object, in which case
+table spec will be retrieved from the object if not supplied.
+
+See <pm:TableDef> for more details.
 
 A hashref with these required keys: 'fields', 'pk'. 'fields' is a hashref of
 field specification with field name as keys, while 'pk' specifies which field is
@@ -1543,10 +1549,28 @@ sub gen_read_table_func {
     my $table_data = $args{table_data}
         or return [400, "Please specify table_data"];
     __is_aoa($table_data) or __is_aoh($table_data) or
+        ref($table_data) =~ /\ATableData::/ or
         ref($table_data) eq 'CODE'
-            or return [400, "Invalid table_data: must be AoA/AoH/function"];
-    my $table_spec = $args{table_spec}
-        or return [400, "Please specify table_spec"];
+            or return [400, "Invalid table_data: must be AoA/AoH/TableData obj/function"];
+    my $table_spec = $args{table_spec};
+    if (!$table_spec && ref($table_data) =~ /\ATableData::/) {
+        if ($table_data->can("get_table_spec")) {
+            $table_spec = $table_data->get_table_spec;
+        } else {
+            $table_spec = {fields => {}};
+            my @fields = $table_data->get_column_names;
+            for my $i (0 .. $#fields) {
+                $table_spec->{fields}{ $fields[$i] } = {
+                    pos => $i,
+                    schema => "str*",
+                    sortable => 1,
+                },
+            };
+            # assume the first field as pk
+            $table_spec->{pk} = $fields[0];
+        }
+    }
+    $table_spec or return [400, "Please specify table_spec"];
     ref($table_spec) eq 'HASH'
         or return [400, "Invalid table_spec: must be a hash"];
     $table_spec->{fields} or
@@ -1657,7 +1681,7 @@ Perinci::Sub::Gen::AccessTable - Generate function (and its metadata) to read ta
 
 =head1 VERSION
 
-This document describes version 0.590 of Perinci::Sub::Gen::AccessTable (from Perl distribution Perinci-Sub-Gen-AccessTable), released on 2022-11-02.
+This document describes version 0.591 of Perinci::Sub::Gen::AccessTable (from Perl distribution Perinci-Sub-Gen-AccessTable), released on 2023-02-12.
 
 =head1 SYNOPSIS
 
@@ -2084,12 +2108,11 @@ If not specified, caller's package will be used by default.
 
 Generated function's summary.
 
-=item * B<table_data>* => I<array|code>
+=item * B<table_data>* => I<array|code|obj>
 
 Data.
 
-Table data is either an AoH or AoA. Or you can also pass a Perl subroutine (see
-below).
+Table data is either an AoH/AoA, or a L<TableData> object, or a coderef.
 
 Passing a subroutine lets you fetch data dynamically and from arbitrary source
 (e.g. DBI table or other external sources). The subroutine will be called with
@@ -2110,11 +2133,14 @@ that are mentioned in either filtering arguments or fields or ordering,
 'sort_fields' (fields mentioned in sort arguments), 'filter_fields' (fields
 mentioned in filter arguments).
 
-=item * B<table_spec>* => I<hash>
+=item * B<table_spec> => I<hash>
 
 Table specification.
 
-See C<TableDef> for more details.
+Required, unless C<table_data> argument is a L<TableData> object, in which case
+table spec will be retrieved from the object if not supplied.
+
+See L<TableDef> for more details.
 
 A hashref with these required keys: 'fields', 'pk'. 'fields' is a hashref of
 field specification with field name as keys, while 'pk' specifies which field is
@@ -2217,7 +2243,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

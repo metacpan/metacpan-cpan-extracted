@@ -9,12 +9,14 @@ use File::Copy qw( copy );
 use Path::Tiny ();
 use FFI::Build::File::Base 1.00 ();
 use Env::ShellWords qw( @PERL_FFI_CARGO_FLAGS );
+use File::Which qw( which );
+use Env qw( @PATH );
 use base qw( FFI::Build::File::Base );
 use constant default_suffix => '.toml';
 use constant default_encoding => ':utf8';
 
 # ABSTRACT
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.15'; # VERSION
 
 
 sub accept_suffix
@@ -50,6 +52,13 @@ sub build_item
   }
 
   return $lib if -f $lib->path && !$lib->needs_rebuild($self->_deps($cargo_toml->parent, 1));
+
+  local $ENV{PATH} = $ENV{PATH};
+  unless(which 'cargo')
+  {
+    require Alien::Rust;
+    unshift @PATH, Alien::Rust->bin_dir;
+  }
 
   {
     my $lib = Path::Tiny->new($lib)->relative($cargo_toml->parent)->stringify;
@@ -128,7 +137,7 @@ FFI::Build::File::Cargo
 
 =head1 VERSION
 
-version 0.12
+version 0.15
 
 =head1 SYNOPSIS
 

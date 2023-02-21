@@ -164,6 +164,7 @@ apc_gp_bars( Handle self, int nr, Rect *rr)
 
 	SelectObject( ps, std_hollow_pen);
 	STYLUS_FREE_PEN;
+	select_world_transform(self, false);
 
 	while ( make_brush(self, &mix)) {
 		Rect *r = rr;
@@ -198,6 +199,7 @@ apc_gp_alpha( Handle self, int alpha, int x1, int y1, int x2, int y2)
 	))
 	return false;
 
+	select_world_transform(self, false);
 	if ( x1 < 0 && y1 < 0 && x2 < 0 && y2 < 0) {
 		x1 = y1 = 0;
 		x2 = sys last_size. x - 1;
@@ -208,7 +210,6 @@ apc_gp_alpha( Handle self, int alpha, int x1, int y1, int x2, int y2)
 	w = x2 - x1 + 1;
 	h = y2 - y1 + 1;
 
-	y1 = y2;
 	SHIFT_XY(x1,y1);
 
 	dc     = GetDC(NULL);
@@ -266,6 +267,7 @@ apc_gp_clear( Handle self, int x1, int y1, int x2, int y2)
 	HDC      ps   = sys ps;
 	HGDIOBJ  o1, o2;
 
+	select_world_transform(self, false);
 	o1 = SelectObject( ps, std_hollow_pen);
 	o2 = SelectObject( ps, stylus_get_solid_brush(sys bg));
 
@@ -294,6 +296,7 @@ apc_gp_draw_poly( Handle self, int numPts, Point * points)
 	POINT *p;
 	Bool ok;
 
+	select_world_transform(self, false);
 	if ((p = malloc( sizeof(POINT) * numPts)) == NULL)
 		return false;
 
@@ -327,6 +330,7 @@ apc_gp_draw_poly2( Handle self, int numPts, Point * points)
 	DWORD * pts;
 	POINT * p;
 
+	select_world_transform(self, false);
 	pts = ( DWORD *) malloc( sizeof( DWORD) * numPts);
 	if ( !pts) return false;
 	p = malloc( sizeof(POINT) * numPts);
@@ -385,6 +389,7 @@ apc_gp_fill_poly( Handle self, int numPts, Point * points)
 	POINT *p;
 	int mix = 0;
 
+	select_world_transform(self, false);
 	if ((p = malloc( sizeof(POINT) * numPts)) == NULL)
 		return false;
 
@@ -518,6 +523,7 @@ apc_gp_flood_fill( Handle self, int x, int y, Color borderColor, Bool singleBord
 	HDC ps = sys ps;
 	STYLUS_USE_BRUSH;
 	SHIFT_XY(x,y);
+	select_world_transform(self, false);
 	if ( !ExtFloodFill( ps, x, y, remap_color( borderColor, true),
 		singleBorder ? FLOODFILLSURFACE : FLOODFILLBORDER)) apiErrRet;
 	return true;
@@ -526,9 +532,81 @@ apc_gp_flood_fill( Handle self, int x, int y, Color borderColor, Bool singleBord
 Color
 apc_gp_get_pixel( Handle self, int x, int y)
 {objCheck clInvalid;{
+	int xx = x, yy = y;
 	COLORREF c;
 	SHIFT_XY(x,y);
-	c = GetPixel( sys ps, x, y);
+	select_world_transform(self, false);
+
+	if (
+		self == prima_guts.application &&
+		guts.get_pixel_needs_emulation == 1
+	) {
+		HPALETTE hp = NULL, hp2 = NULL, hp3 = NULL;
+
+		if ( sys bpp <= 8 ) {
+			XLOGPALETTE lpg;
+			lpg.palNumEntries = GetSystemPaletteEntries( guts.get_pixel_dc_src, 0, 256, lpg. palPalEntry);
+			lpg.palVersion = 0x300;
+			hp  = CreatePalette(( LOGPALETTE*)&lpg);
+			hp2 = SelectPalette( guts.get_pixel_dc_dst, hp, 0);
+			hp3 = SelectPalette( guts.get_pixel_dc_src, hp, 1);
+			RealizePalette(guts.get_pixel_dc_dst);
+		}
+
+		if ( BitBlt(
+			guts.get_pixel_dc_dst, 0, 0, 1, 1,
+			guts.get_pixel_dc_src, x, y, SRCCOPY
+		)) {
+			c = GetPixel( guts.get_pixel_dc_dst, 0, 0);
+		} else {
+			c = CLR_INVALID;
+			apiErr;
+		}
+		if ( sys bpp <= 8 ) {
+			SelectPalette( guts.get_pixel_dc_dst, hp2, 1);
+			SelectPalette( guts.get_pixel_dc_src, hp3, 1);
+			DeleteObject( hp);
+		}
+	} else
+		c = GetPixel( sys ps, x, y);
+
+	if ( c == CLR_INVALID) {
+		if (
+			self == prima_guts.application &&
+			guts.get_pixel_needs_emulation == 0
+		) {
+			c = GetPixel( sys ps, 0, 0);
+			if ( c == CLR_INVALID ) {
+				HDC dc_src, dc_dst;
+				HBITMAP bm;
+
+				if (!( dc_src = dc_alloc()))
+					goto FAIL;
+
+				if ( !( dc_dst = CreateCompatibleDC(dc_src))) {
+					dc_free();
+					goto FAIL;
+				}
+
+				if ( !( bm = CreateCompatibleBitmap(dc_src, 1, 1))) {
+					DeleteDC( dc_dst );
+					dc_free();
+					goto FAIL;
+				}
+
+				SelectObject( dc_dst, bm);
+				guts.get_pixel_dc_src = dc_src;
+				guts.get_pixel_dc_dst = dc_dst;
+
+				guts.get_pixel_needs_emulation = 1;
+				return apc_gp_get_pixel( self, xx, yy);
+			} else {
+			FAIL:
+				guts.get_pixel_needs_emulation = -1;
+			}
+		}
+	}
+
 	if ( c == CLR_INVALID) return clInvalid;
 	return remap_color(( Color) c, false);
 }}
@@ -545,6 +623,7 @@ apc_gp_line( Handle self, int x1, int y1, int x2, int y2)
 {objCheck false;{
 	HDC ps = sys ps;
 
+	select_world_transform(self, false);
 	adjust_line_end_int( x1, y1, &x2, &y2);
 	SHIFT_XY(x1,y1);
 	SHIFT_XY(x2,y2);
@@ -567,7 +646,7 @@ apc_gp_line( Handle self, int x1, int y1, int x2, int y2)
 Bool
 apc_gp_put_image( Handle self, Handle image, int x, int y, int xFrom, int yFrom, int xLen, int yLen, int rop)
 {
-	return apc_gp_stretch_image ( self, image, x, y, xFrom, yFrom, xLen, yLen, xLen, yLen, rop);
+	return apc_gp_stretch_image ( self, image, x, y, xFrom, yFrom, xLen, yLen, xLen, yLen, rop, false);
 }
 
 Bool
@@ -577,6 +656,7 @@ apc_gp_rectangle( Handle self, int x1, int y1, int x2, int y2)
 	HDC     ps = sys ps;
 	HGDIOBJ old;
 
+	select_world_transform(self, false);
 	check_swap( x1, x2);
 	check_swap( y1, y2);
 
@@ -608,6 +688,7 @@ Bool
 apc_gp_set_pixel( Handle self, int x, int y, Color color)
 {
 	objCheck false;
+	select_world_transform(self, false);
 	SHIFT_XY(x,y);
 	SetPixelV( sys ps, x, y, remap_color( color, true));
 	return true;
@@ -1158,8 +1239,12 @@ apc_gp_push(Handle self, GCStorageFunction * destructor, void * user_data, unsig
 		state->paint.font_sin  = sys font_sin;
 		state->paint.font_cos  = sys font_cos;
 
-		state->paint.rq_pen      = sys rq_pen;
-		state->paint.rq_brush    = sys rq_brush;
+		state->paint.rq_pen    = sys rq_pen;
+		state->paint.rq_brush  = sys rq_brush;
+
+		state->paint.wt_want   = is_apt(aptWantWorldTransform);
+		state->paint.wt_used   = is_apt(aptUsedWorldTransform);
+		state->paint.wt_cached = is_apt(aptCachedWorldTransform);
 	} else {
 		state->common.line_pattern_len = sys line_pattern_len;
 		if ( state->common.line_pattern_len > sizeof(sys line_pattern)) {
@@ -1212,6 +1297,9 @@ apc_gp_pop( Handle self, void * user_data)
 		sys font_cos            = state-> paint.font_cos;
 		sys rq_pen              = state-> paint.rq_pen;
 		sys rq_brush            = state-> paint.rq_brush;
+		apt_assign(aptWantWorldTransform  , state->paint.wt_want  );
+		apt_assign(aptUsedWorldTransform  , state->paint.wt_used  );
+		apt_assign(aptCachedWorldTransform, state->paint.wt_cached);
 
 		sys pal                 = GetCurrentObject(sys ps, OBJ_PAL);
 
@@ -1269,6 +1357,39 @@ apc_gp_pop( Handle self, void * user_data)
 
 	return true;
 }
+
+Bool
+select_world_transform(Handle self, Bool want_transform)
+{
+	objCheck 0;
+
+	if (
+		is_apt( aptCachedWorldTransform ) &&
+		( (want_transform ? 1 : 0) == is_apt( aptUsedWorldTransform ))
+	)
+		return true;
+
+	apt_set( aptCachedWorldTransform );
+	apt_assign( aptUsedWorldTransform, want_transform );
+	SetViewportOrgEx( sys ps, 0, 0, NULL );
+
+	if ( !is_apt( aptWantWorldTransform ))
+		return true;
+
+	if ( want_transform ) {
+		Matrix *m = &var current_state.matrix;
+		XFORM xf  = {
+			(*m)[0], -((*m)[1]),
+			-((*m)[2]), (*m)[3],
+			0, 0
+		};
+		return SetWorldTransform( sys ps, &xf );
+	} else {
+		XFORM xf = { 1.0, 0.0, 0.0, 1.0, 0.0, 0.0 };
+		return SetWorldTransform( sys ps, &xf );
+	}
+}
+
 
 #ifdef __cplusplus
 }

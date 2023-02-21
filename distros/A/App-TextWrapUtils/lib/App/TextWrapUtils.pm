@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-24'; # DATE
+our $DATE = '2022-12-13'; # DATE
 our $DIST = 'App-TextWrapUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our %SPEC;
 
@@ -52,7 +52,7 @@ _
         # XXX arg: pass per-backend options
         backend => {
             schema => ['perl::modname*', in=>\@BACKENDS],
-            default => 'Text::Wrap',
+            default => 'Text::ANSI::Util',
         },
     },
 };
@@ -122,7 +122,7 @@ App::TextWrapUtils - Utilities related to text wrapping
 
 =head1 VERSION
 
-This document describes version 0.001 of App::TextWrapUtils (from Perl distribution App-TextWrapUtils), released on 2022-11-24.
+This document describes version 0.002 of App::TextWrapUtils (from Perl distribution App-TextWrapUtils), released on 2022-12-13.
 
 =head1 DESCRIPTION
 
@@ -155,7 +155,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<backend> => I<perl::modname> (default: "Text::Wrap")
+=item * B<backend> => I<perl::modname> (default: "Text::ANSI::Util")
 
 (No description)
 
