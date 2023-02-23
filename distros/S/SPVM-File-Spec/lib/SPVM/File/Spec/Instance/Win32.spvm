@@ -80,14 +80,34 @@ class File::Spec::Instance::Win32 extends File::Spec::Instance::Unix {
     return $is_abs;
   }
 
-  method _same : int ($path1 : string, $path2 : string) {
-    my $same = 0;
-    if (Fn->lc($path1) eq Fn->lc($path2)) {
-      $same = 1;
+  method file_name_is_root : int ($path : string) {
+    
+    my $is_root = 0;
+    my $vol_re = Regex->new("^($VOL_RX_STRING)");
+    if ($vol_re->match($path)) {
+      my $vol = $vol_re->cap1;
+      
+      my $unc_re = Regex->new("^$UNC_RX_STRING([\\\\/])?\z");
+      if ($unc_re->match($vol)) {
+        $is_root = 2;
+      }
+      else {
+        my $drive_re = Regex->new("^$DRIVE_RX_STRING[\\\\/]\z");
+        if ($drive_re->match($path)) {
+          $is_root = 2;
+        }
+      }
     }
-    return $same;
+    else {
+      my $re = Regex->new("^[\\\\/]\z");
+      if ($re->match($path)) {
+        $is_root = 1;
+      }
+    }
+    
+    return $is_root;
   }
-  
+
   method path : string[] () {
     
     my $env_path = Sys->getenv("PATH");

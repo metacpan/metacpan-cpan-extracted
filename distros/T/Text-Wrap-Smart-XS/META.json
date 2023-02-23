@@ -4,7 +4,7 @@
       "Steven Schubiger <schubiger@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -16,8 +16,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::CBuilder" : "0",
-            "Test::More" : "0"
+            "ExtUtils::CBuilder" : "0"
          }
       },
       "configure" : {
@@ -31,12 +30,18 @@
             "Params::Validate" : "0",
             "boolean" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "Test::More" : "0"
+         }
       }
    },
    "provides" : {
       "Text::Wrap::Smart::XS" : {
          "file" : "lib/Text/Wrap/Smart/XS.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -48,6 +53,6 @@
          "url" : "https://github.com/stsc/Text-Wrap-Smart-XS"
       }
    },
-   "version" : "0.07",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

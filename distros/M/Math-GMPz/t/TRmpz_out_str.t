@@ -2,7 +2,21 @@ use strict;
 use warnings;
 use Math::GMPz qw(:mpz);
 
-print "1..8\n";
+my $tests = 8;
+
+# Because of the way I (sisyphus) build this module with MS
+# Visual Studio, XSubs that take a filehandle as an argument
+# do not work. It therefore suits my purposes to be able to
+# avoid calling (and testing) those particular XSubs
+$tests = 1 if $ENV{SISYPHUS_SKIP};
+
+print "1..$tests\n";
+
+if($tests == 1) {
+  warn "\nskipping all tests - \$ENV{SISYPHUS_SKIP} is set\n";
+  print "ok 1\n";
+  exit 0;
+}
 
 print "# Using gmp version ", Math::GMPz::gmp_v(), "\n";
 

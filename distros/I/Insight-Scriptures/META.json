@@ -1,5 +1,5 @@
 {
-   "abstract" : "The great new Insight::Scriptures!",
+   "abstract" : "I'm the next Jah, my inners life is a miracle.",
    "author" : [
       "LNATION <email@lnation.org>"
    ],
@@ -43,6 +43,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

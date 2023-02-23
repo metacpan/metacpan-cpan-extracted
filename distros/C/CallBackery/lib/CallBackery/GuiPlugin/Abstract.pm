@@ -500,7 +500,7 @@ has homeDir => sub {
 sub renderTemplate{
     my $self = shift;
     my $template = shift;
-    my $destination = shift;
+    my $destination = Mojo::File->new(shift);
     $self->log->debug('['.$self->name.'] processing template '.$template);
     my $newData = $self->template->render($self->app->home->rel_file('templates/system/'.$template)->slurp);
     if (-r $destination){
@@ -509,13 +509,15 @@ sub renderTemplate{
             return 0
         }
     }
+    my $dir = $destination->dirname;
+    if (not -d $dir){
+        Mojo::File->new($dir)->make_path({mode => 755});
+    }
 
     $self->log->debug('['.$self->name."] writing $destination\n$newData");
     eval {
         local $SIG{__DIE__};
-        open my $fh, '>',$destination;
-        print $fh $newData;
-        close $fh;
+        $destination->spurt($newData);
     };
     if ($@){
         if (blessed $@ and $@->isa('autodie::exception')){

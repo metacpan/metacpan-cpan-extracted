@@ -4,7 +4,6 @@ use Mojo::Base qw(Mojolicious::Plugin::Qooxdoo::JsonRpcController),
     -signatures,-async_await;
 use CallBackery::Exception qw(mkerror);
 use CallBackery::Translate qw(trm);
-use CallBackery::User;
 use Scalar::Util qw(blessed weaken);
 use Mojo::JSON qw(encode_json decode_json from_json);
 use Syntax::Keyword::Try;

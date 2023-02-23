@@ -40,32 +40,48 @@ if($ok eq 'abcd') {print "ok 1\n"}
 else {print "not ok 1\n"}
 
 $ok = '';
-my $o = open($fh, '>', $file);
-if($o) {
-  Rmpfr_fprintf($fh, "%Pu\n", prec_cast($prec));
-  eval{Rmpfr_fprintf($fh, "%Pu\n", GMP_RNDN, prec_cast($prec));};
-  if($@ =~ /You've provided both a rounding arg and a Math::MPFR::Prec object to Rmpfr_fprintf/) {$ok = 'a'}
-  else {warn "2a: \$\@: $@\n"}
-  close $fh;
-  if(open($RD, '<', $file)) {
-    my $num = <$RD>;
-    chomp $num;
-    if($num == $prec) {$ok .= 'b'}
-    close($RD);
-  }
-  else { warn "Failed to open $file for reading: $!";}
 
-  if($ok eq 'ab') {print "ok 2\n"}
+######################################################
+
+unless($ENV{SISYPHUS_SKIP}) {
+  # Because of the way I (sisyphus) build this module with MS
+  # Visual Studio, XSubs that take a filehandle as an argument
+  # do not work. It therefore suits my purposes to be able to
+  # avoid calling (and testing) those particular XSubs
+
+  my $o = open($fh, '>', $file);
+  if($o) {
+    Rmpfr_fprintf($fh, "%Pu\n", prec_cast($prec));
+    eval{Rmpfr_fprintf($fh, "%Pu\n", GMP_RNDN, prec_cast($prec));};
+    if($@ =~ /You've provided both a rounding arg and a Math::MPFR::Prec object to Rmpfr_fprintf/) {$ok = 'a'}
+    else {warn "2a: \$\@: $@\n"}
+    close $fh;
+    if(open($RD, '<', $file)) {
+      my $num = <$RD>;
+      chomp $num;
+      if($num == $prec) {$ok .= 'b'}
+      close($RD);
+    }
+    else { warn "Failed to open $file for reading: $!";}
+
+    if($ok eq 'ab') {print "ok 2\n"}
+    else {
+      warn "\$ok: $ok\n";
+      print "not ok 2\n";
+    }
+  }
   else {
-    warn "\$ok: $ok\n";
-    print "not ok 2\n";
+    warn "Failed to open $file for writing: $!";
+    warn "\nSkipping test 2 - couldn't open $file\n";
+    print "ok 2\n";
   }
 }
 else {
-  warn "Failed to open $file for writing: $!";
-  warn "\nSkipping test 2 - couldn't open $file\n";
+  warn "\nskipping test 2 - \$ENV{SISYPHUS_SKIP} is set\n";
   print "ok 2\n";
 }
+
+#########################################################
 
 my $buf;
 Rmpfr_sprintf ($buf, "%Pu\n", prec_cast($prec), 200);

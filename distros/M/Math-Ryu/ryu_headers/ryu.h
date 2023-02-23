@@ -23,6 +23,8 @@ extern "C" {
 
 #include <inttypes.h>
 
+int _has_uint128(void); /* added by sisyphus, in d2fixed.c */
+
 int d2s_buffered_n(double f, char* result);
 void d2s_buffered(double f, char* result);
 char* d2s(double f);

@@ -1,0 +1,127 @@
+%# BEGIN BPS TAGGED BLOCK {{{
+%#
+%# COPYRIGHT:
+%#
+%# This software is Copyright (c) 1996-2018 Best Practical Solutions, LLC
+%#                                          <sales@bestpractical.com>
+%#
+%# (Except where explicitly superseded by other copyright notices)
+%#
+%#
+%# LICENSE:
+%#
+%# This work is made available to you under the terms of Version 2 of
+%# the GNU General Public License. A copy of that license should have
+%# been provided with this software, but in any event can be snarfed
+%# from www.gnu.org.
+%#
+%# This work is distributed in the hope that it will be useful, but
+%# WITHOUT ANY WARRANTY; without even the implied warranty of
+%# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+%# General Public License for more details.
+%#
+%# You should have received a copy of the GNU General Public License
+%# along with this program; if not, write to the Free Software
+%# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+%# 02110-1301 or visit their web page on the internet at
+%# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html.
+%#
+%#
+%# CONTRIBUTION SUBMISSION POLICY:
+%#
+%# (The following paragraph is not intended to limit the rights granted
+%# to you to modify and distribute this software under the terms of
+%# the GNU General Public License and is only of importance to you if
+%# you choose to contribute your changes and enhancements to the
+%# community by submitting them to Best Practical Solutions, LLC.)
+%#
+%# By intentionally submitting any modifications, corrections or
+%# derivatives to this work, or any other work intended for use with
+%# Request Tracker, to Best Practical Solutions, LLC, you confirm that
+%# you are the copyright holder for those contributions and you grant
+%# Best Practical Solutions,  LLC a nonexclusive, worldwide, irrevocable,
+%# royalty-free, perpetual, license to use, copy, create derivative
+%# works based on those contributions, and sublicense and distribute
+%# those contributions and any derivatives thereof.
+%#
+%# END BPS TAGGED BLOCK }}}
+<%perl>
+
+use Archive::SevenZip;
+use Unicode::Normalize;
+use Encode qw(decode encode);
+
+my ( $ticket, $trans, $attach, $basename, $extension );
+my $arg = $m->dhandler_arg;    # get rest of path
+
+$arg = decode("utf8", $arg);   # for fsck's sake, this should not be needed!
+if ( $arg =~ m{^(\d+)/(\d+)/([\w .-]+?)(\.[a-z0-9]{1,4})?$}u )  {
+    $trans  = $1;
+    $attach = $2;
+    $basename = $3;
+    $extension = $4;
+}
+else {
+    $RT::Logger->error("7z-download: could not parse $arg (",unpack("H*",$arg),")");
+    Abort("Corrupted attachment URL.", Code => HTTP::Status::HTTP_BAD_REQUEST);
+}
+$RT::Logger->debug("7z-download: Got params $trans / $attach / $basename / $extension from arg $arg"); 
+
+my $AttachmentObj = RT::Attachment->new( $session{'CurrentUser'} );
+$AttachmentObj->Load($attach) || Abort("Attachment '$attach' could not be loaded", Code => HTTP::Status::HTTP_NOT_FOUND);
+
+unless ( $AttachmentObj->id ) {
+    Abort("Bad attachment id. Couldn't find attachment '$attach'\n", Code => HTTP::Status::HTTP_NOT_FOUND);
+}
+unless ( $AttachmentObj->TransactionId() == $trans ) {
+    Abort("Bad transaction number for attachment. $trans should be". $AttachmentObj->TransactionId() . "\n", Code => HTTP::Status::HTTP_NOT_FOUND);
+}
+
+my $content = $AttachmentObj->OriginalContent;
+my $content_type = $AttachmentObj->ContentType || 'text/plain';
+
+my $zipname =  $basename . ".7z";
+# getting special characters right in zipped filenames is tricky.
+# let's get rid of them.
+my $filename = NFKD($basename . $extension);
+$filename =~ s/[^[:ascii:]]//g;
+
+# we're generating a ZIP, always download as attachement
+$r->headers_out->{'Content-Disposition'} = "attachment; filename=\"$zipname\"";
+$r->content_type('application/x-7z-compressed');
+
+my $ar = Archive::SevenZip->new(
+    find => 0,		# if you use find => 1, you get zombie 7z processes
+    type => '7z',
+    default_options => ['-mhe=on', '-pinfected' ],
+);
+
+$RT::Logger->info("7z-download: Adding content as $filename"); 
+$ar->add_scalar($filename, $content);
+
+my $tmpzipfile = $ar->{archivename};
+
+$m->clear_buffer();
+
+
+my $fh = IO::File->new($tmpzipfile, 'r');
+$fh->binmode(1);
+
+while ( my $data = $fh->getline ) {
+    $m->out($data);
+}
+
+$fh->close;
+
+
+# clean up tmp file
+unlink($tmpzipfile);
+$RT::Logger->debug("Cleaning up $tmpzipfile"); 
+
+undef($ar);
+
+$m->abort;
+</%perl>
+<%attr>
+AutoFlush => 0
+</%attr>

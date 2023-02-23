@@ -19,7 +19,7 @@ use Plack::Util::Accessor qw/ default_rate rules cache file _match greylist retr
 use Ref::Util             qw/ is_plain_arrayref /;
 use Time::Seconds         qw/ ONE_MINUTE /;
 
-our $VERSION = 'v0.4.1';
+our $VERSION = 'v0.4.2';
 
 
 sub prepare_app {
@@ -109,11 +109,8 @@ sub call {
 
         my $limit = $rate == 0;
 
-        unless ($limit) {
-            my ($hits) = $self->cache->( $rule->[1] || $ip );
-
-            $limit = $hits > $rate ? $hits : 0;
-        }
+        my ($hits) = $self->cache->( $rule->[1] || $ip );
+        $limit = $hits > $rate ? $hits : 0;
 
         if ($limit) {
 
@@ -165,7 +162,7 @@ Plack::Middleware::Greylist - throttle requests with different rates based on ne
 
 =head1 VERSION
 
-version v0.4.1
+version v0.4.2
 
 =head1 SYNOPSIS
 

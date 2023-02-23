@@ -1,0 +1,14 @@
+Revision history for RT-Extension-7zDownload
+
+1.0 2021-01-19
+ - Initial version
+
+1.1 2021-01-26
+ - no more 7z zombie processes
+ - non-ascii chars stay in the name of the zip-file
+ - non-ascii chars in the filename are converted to ascii inside the zip
+ - Fun with character encodings
+
+1.2 2023-02-21
+ - Packaged as real RTx Extension
+

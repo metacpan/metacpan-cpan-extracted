@@ -53,5 +53,5 @@ Module::Build->new(
         },
     },
     meta_merge =>
-      { resources => { repository => 'https://github.com/thrig/Game-Xomb' } },
+      { resources => { repository => 'https://thrig.me/src/Game-Xomb.git' } },
 )->create_build_script();

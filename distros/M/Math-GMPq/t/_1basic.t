@@ -19,8 +19,8 @@ warn "# LONG_MAX : ", Math::GMPq::_long_max(),  "\n";
 warn "# ULONG_MAX: ", Math::GMPq::_ulong_max(), "\n";
 warn "# REQUIRED_LDBL_MANT_DIG: ", Math::GMPq::_required_ldbl_mant_dig(), "\n";
 
-if($Math::GMPq::VERSION eq '0.52' && $Math::GMPq::Random::VERSION eq '0.52' &&
-   $Math::GMPq::V::VERSION eq '0.52' &&
+if($Math::GMPq::VERSION eq '0.53' && $Math::GMPq::Random::VERSION eq '0.53' &&
+   $Math::GMPq::V::VERSION eq '0.53' &&
    Math::GMPq::_get_xs_version() eq $Math::GMPq::VERSION) {print "ok 1\n"}
 else {print "not ok 1 $Math::GMPq::VERSION $Math::GMPq::Random::VERSION ", Math::GMPq::_get_xs_version(), "\n"}
 

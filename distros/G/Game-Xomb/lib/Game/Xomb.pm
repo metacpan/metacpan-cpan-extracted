@@ -5,7 +5,7 @@
 
 package Game::Xomb;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use 5.24.0;
 use warnings;
@@ -2557,7 +2557,7 @@ coordinates that is within the level map.
 
 'tis but a flesh wound.
 
-L<https://github.com/thrig/Game-Xomb>
+L<https://thrig.me/src/Game-Xomb.git>
 
 =head1 SEE ALSO
 

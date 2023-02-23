@@ -25,7 +25,7 @@ Math::MPC::_have_Complex_h() ?
                              :
  warn "\n# Built without support for 'double _Complex' and 'long double _Complex types'\n";
 
-if($Math::MPC::VERSION eq '1.30') {print "ok 1\n"}
+if($Math::MPC::VERSION eq '1.31') {print "ok 1\n"}
 else {print "not ok 1 $Math::MPC::VERSION\n"}
 
 if(MPC_VERSION_MAJOR > 0 || MPC_VERSION_MINOR > 7) {print "ok 2\n"}

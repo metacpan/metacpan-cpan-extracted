@@ -586,7 +586,7 @@
     Calculate the Jacobi symbol (1st arg/2nd arg) with the
     Kronecker extension (a/2)=(2/a) when a odd, or (a/2)=0
     when a even. When 2nd arg is odd the Jacobi symbol and
-    Kronecker symbol are identical, so `mpz_kronecker_ui'
+    Kronecker symbol are identical, so 'Rmpz_kronecker_ui'
     etc can be used for mixed precision Jacobi symbols too.
 
    $ui = Rmpz_remove($rop, $op1, $op2);
@@ -1266,7 +1266,7 @@
 
     This program is free software; you may redistribute it and/or
     modify it under the same terms as Perl itself.
-    Copyright 2006-20011, 2013-21, Sisyphus
+    Copyright 2006-20011, 2013-23, Sisyphus
 
 =head1 AUTHOR
 

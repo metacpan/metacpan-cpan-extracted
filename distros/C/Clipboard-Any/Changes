@@ -1,3 +1,8 @@
+0.009   2022-12-13  Released-By: PERLANCAR; Urgency: medium
+
+        - Add function: get_clipboard_history_item.
+
+
 0.008   2022-12-08  Released-By: PERLANCAR; Urgency: medium
 
         - Add xclip support.

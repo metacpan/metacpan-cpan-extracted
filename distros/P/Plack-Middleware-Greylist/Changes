@@ -1,5 +1,9 @@
 Revision history for Plack-Middleware-Greylist
 
+v0.4.2    2023-02-22 09:07:28+00:00 Europe/London
+  [Bug Fixes]
+  - Count hits from blocked addresses and log them.
+
 v0.4.1    2023-02-06 15:22:33+00:00 Europe/London
   [Documentation]
   - Fixed typo in Changes.

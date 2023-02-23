@@ -40,16 +40,28 @@ else {
   print "ok 3\n";
 }
 
-RMPFI_ERROR("This is an expected test message ... please ignore\n");
-
-if (Rmpfi_is_error()) {
-  $set = 1;
-  print "ok 4\n";
+if(Math::MPFI::_msc_ver_defined()) {
+  eval{RMPFI_ERROR("This is an expected test message ... please ignore\n");};
+  if($@ =~ /RMPFI_ERROR is not yet available for this architecture/) {
+    print "ok 4\n"
+  }
+  else {
+    warn "\$\@: $@\n";
+    print "not ok 4\n";
+  }
 }
 else {
-  warn "4: Error is not set\n";
-  $set = 0;
-  print "not ok 4\n";
+  RMPFI_ERROR("This is an expected test message ... please ignore\n");
+
+  if (Rmpfi_is_error()) {
+    $set = 1;
+    print "ok 4\n";
+  }
+  else {
+    warn "4: Error is not set\n";
+    $set = 0;
+    print "not ok 4\n";
+  }
 }
 
 if($set) {

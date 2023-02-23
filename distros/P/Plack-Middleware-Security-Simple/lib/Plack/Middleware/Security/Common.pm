@@ -15,6 +15,7 @@ our @EXPORT = qw(
    backup_files
    cgi_bin
    cms_prefixes
+   document_extensions
    dot_files
    fake_extensions
    header_injection
@@ -31,7 +32,7 @@ our @EXPORT = qw(
    wordpress
 );
 
-our $VERSION = 'v0.9.1';
+our $VERSION = 'v0.10.0';
 
 
 
@@ -69,6 +70,16 @@ sub cms_prefixes {
 }
 
 
+sub document_extensions {
+    my $re = qr{\.(?:a[bz]w|csv|docx?|e?pub|od[pst]|pdf|pptx?|one|rtf|vsd|xlsx?)\b};
+    return (
+        PATH_INFO    => $re,
+        QUERY_STRING => $re,
+    );
+}
+
+
+
 sub dot_files {
     return (
         PATH_INFO    => qr{(?:\.\./|/\.(?!well-known/))},
@@ -103,7 +114,7 @@ sub ip_address_referer {
 
 
 sub misc_extensions {
-    my $re = qr{[.](?:backup|bak|bck|bkp|cfg|conf(?:ig)?|dat|ibz|in[ci]|npb|old|ps[bc]|yml)\b};
+    my $re = qr{[.](?:backup|bak|bck|bkp|cfg|conf(?:ig)?|dat|ibz|in[ci]|npb|old|ps[bc]|rdg|to?ml|yml)\b};
     return (
         PATH_INFO    => $re,
         QUERY_STRING => $re,
@@ -145,7 +156,7 @@ sub require_content {
 
 
 sub script_extensions {
-    my $re = qr{[.](?:as[hp]x?|axd|bat|cfm|cgi|com|dll|do|exe|jspa?|lua|mvc?|php5?|p[lm]|ps[dm]?[1h]|sht?|shtml|sql)\b};
+    my $re = qr{[.](?:as[hp]x?|axd|bat|cfm|cgi|com|csc|dll|do|exe|jspa?|lua|mvc?|php5?|p[lm]|ps[dm]?[1h]|sht?|shtml|sql)\b};
     return (
         PATH_INFO    => $re,
         QUERY_STRING => $re,
@@ -197,7 +208,7 @@ Plack::Middleware::Security::Common - A simple security filter for Plack with co
 
 =head1 VERSION
 
-version v0.9.1
+version v0.10.0
 
 =head1 SYNOPSIS
 
@@ -282,6 +293,17 @@ This blocks requests that refer to directories with common CMS
 applications, libraries, or web servers.
 
 Added in v0.8.0.
+
+=head2 document_extensions
+
+This blocks requests for file extensions associated with common document formats, e.g. Office documents or spreadsheets.
+
+This does not include audio, video or image files.
+
+If you provide downloads for specific files, then you may need to add exceptions for this rule based on the file type
+and path.
+
+Added in v0.9.2.
 
 =head2 dot_files
 

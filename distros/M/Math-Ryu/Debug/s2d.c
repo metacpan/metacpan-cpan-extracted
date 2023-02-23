@@ -48,8 +48,16 @@
 #include <intrin.h>
 
 static inline uint32_t floor_log2(const uint64_t value) {
+#if !defined(_WIN64) /* _BitScanReverse64 unavailable */
+  long index = 0;
+  uint64_t v = value;
+  if(!v) return 64;
+  while(v >>= 1) index += 1;
+  return index;
+#else
   long index;
   return _BitScanReverse64(&index, value) ? index : 64;
+#endif
 }
 
 #else

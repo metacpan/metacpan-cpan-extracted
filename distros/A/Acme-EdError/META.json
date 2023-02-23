@@ -1,52 +1,46 @@
 {
    "abstract" : "implements ed(1) error handling",
    "author" : [
-      "Jeremy Mates <jmates@cpan.org>"
+      "Jeremy Mates <jeremy.mates@gmail.com>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.142690",
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
-      "artistic_2"
+      "bsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Acme-EdError",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build" : "0.4004"
          }
       },
-      "runtime" : {
+      "test" : {
          "requires" : {
-            "IPC::Open3" : "1.0106",
-            "Test::More" : "0.86",
-            "perl" : "5"
+            "Test2::Tools::Command" : "0.20",
+            "Test2::V0" : "0.000060"
          }
+      }
+   },
+   "provides" : {
+      "Acme::EdError" : {
+         "file" : "lib/Acme/EdError.pm",
+         "version" : "9.18"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/thrig/Acme-EdError",
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "http://opensource.org/licenses/BSD-3-Clause"
       ],
       "repository" : {
-         "url" : "https://github.com/thrig/Acme-EdError"
+         "url" : "https://thrig.me/src/Acme-EdError.git"
       }
    },
-   "version" : "9.17"
+   "version" : "9.18",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

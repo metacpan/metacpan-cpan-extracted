@@ -1596,7 +1596,8 @@ encode_stringify(pTHX_ enc_t *enc, SV *sv, int isref)
     }
   } else {
     /* manually call all possible magic on AV, HV, FM */
-    if (SvGMAGICAL(sv)) mg_get(sv);
+    if (SvGMAGICAL(sv))
+      mg_get(sv);
     if (MyAMG(sv)) { /* force a RV here */
       SV* rv = newRV(SvREFCNT_inc(sv));
 #if PERL_VERSION <= 8
@@ -1616,7 +1617,7 @@ encode_stringify(pTHX_ enc_t *enc, SV *sv, int isref)
       if (pv && SvPOK(pv)) {
         str = SvPVutf8_force(pv, len);
         encode_ch (aTHX_ enc, '"');
-        encode_str (aTHX_ enc, str, len, 0);
+        encode_str (aTHX_ enc, str, len, 1);
         encode_ch (aTHX_ enc, '"');
         SvREFCNT_dec(rv);
         return;
@@ -1659,7 +1660,7 @@ encode_stringify(pTHX_ enc_t *enc, SV *sv, int isref)
   else {
     if (isref != 1)
       encode_ch (aTHX_ enc, '"');
-    encode_str (aTHX_ enc, str, len, 0);
+    encode_str (aTHX_ enc, str, len, 1);
     if (isref != 1)
       encode_ch (aTHX_ enc, '"');
   }
@@ -3821,13 +3822,14 @@ fail:
 static void
 hv_store_str (pTHX_ HV* hv, char *key, U32 len, SV* value)
 {
+  U32 i;
 #if PERL_VERSION > 8 || (PERL_VERSION == 8 && PERL_SUBVERSION >= 9)
   int utf8 = 0;
 #else
   I32 ulen = (I32)len;
 #endif
   /* check utf8 hash key */
-  for (U32 i=0; i<len; i++) {
+  for (i=0; i<len; i++) {
     if ((signed char)key[i] < 0) {
 #if PERL_VERSION > 8 || (PERL_VERSION == 8 && PERL_SUBVERSION >= 9)
       utf8 = HVhek_UTF8;

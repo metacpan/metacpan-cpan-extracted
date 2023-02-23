@@ -19,7 +19,7 @@ optional_features:
   opt_gnumeric: 
     description: Provides parsing of Gnumeric spreadsheets
     requires: 
-      Spreadsheet::ReadGnumeric: '0.1'
+      Spreadsheet::ReadGnumeric: '0.2'
   opt_ods: 
     description: Provides parsing of OpenOffice spreadsheets
     requires: 
@@ -43,7 +43,7 @@ optional_features:
 provides: 
   Spreadsheet::Read: 
     file: Read.pm
-    version: '0.86'
+    version: '0.87'
 recommends: 
   Data::Peek: '0.52'
   File::Temp: '0.2311'
@@ -65,4 +65,4 @@ resources:
   bugtracker: https://github.com/Tux/Spreadsheet-Read/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Spreadsheet-Read
-version: '0.86'
+version: '0.87'

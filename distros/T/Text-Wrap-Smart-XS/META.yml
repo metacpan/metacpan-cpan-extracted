@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,7 +17,7 @@ name: Text-Wrap-Smart-XS
 provides:
   Text::Wrap::Smart::XS:
     file: lib/Text/Wrap/Smart/XS.pm
-    version: '0.07'
+    version: '0.08'
 requires:
   Carp: '0'
   Params::Validate: '0'
@@ -25,5 +25,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/stsc/Text-Wrap-Smart-XS
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

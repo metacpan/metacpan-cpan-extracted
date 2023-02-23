@@ -10,23 +10,27 @@ App::Greple::tee - module to replace matched text by the external command result
 
 =head1 DESCRIPTION
 
-Greple's B<-Mtee> module sends matched text part to the specified
-command, and replace them by the command result.
+Greple's B<-Mtee> module sends matched text part to the given filter
+command, and replace them by the command result.  The idea is derived
+from the command called B<teip>.  It is like bypassing partial data to
+the external filter command.
 
-External command is specified as following arguments after the module
+Filter command is specified as following arguments after the module
 option ending with C<-->.  For example, next command call command
 C<tr> command with C<a-z A-Z> arguments for the matched word in the
 data.
 
     greple -Mtee tr a-z A-Z -- '\w+' ...
 
-Above command effectively convert all matched words from lower-case to
-upper-case.  Actually this example is not useful because B<greple> can
-do the same thing more effectively with B<--cm> option.
+Above command convert all matched words from lower-case to upper-case.
+Actually this example is not useful because B<greple> can do the same
+thing more effectively with B<--cm> option.
 
-By default, the command is executed only once and all data is sent to
-the same command.  Data are mapped line by line, so the number of
-lines of input and output data must be identical.
+By default, the command is executed as a single process, and all
+matched data is sent to it mixed together.  If the matched text does
+not end with newline, it is added before and removed after.  Data are
+mapped line by line, so the number of lines of input and output data
+must be identical.
 
 Using B<--discrete> option, individual command is called for each
 matched part.  You can notice the difference by following commands.
@@ -34,7 +38,8 @@ matched part.  You can notice the difference by following commands.
     greple -Mtee cat -n -- copyright LICENSE
     greple -Mtee cat -n -- copyright LICENSE --discrete
 
-In this case, lines of input and output data can be differ.
+Lines of input and output data do not have to be identical when used
+with B<--discrete> option.
 
 =head1 OPTIONS
 
@@ -46,10 +51,41 @@ Invoke new command for every matched part.
 
 =back
 
+=head1 WHY DO NOT USE TEIP
+
+First of all, whenever you can do it with the B<teip> command, use
+it. It is an excellent tool and much faster than B<greple>.
+
+Because B<greple> is designed to process document files, it has many
+features that are appropriate for it, such as match area controls. It
+might be worth using B<greple> to take advantage of those features.
+
+Also, B<teip> cannot handle multiple lines of data as a single unit,
+while B<greple> can execute individual commands on a data chunk
+consisting of multiple lines.
+
 =head1 EXAMPLE
 
-First of all, use the B<teip> command for anything that can be done
-with it.
+Next command will find text blocks inside L<perlpod(1)> style document
+included in Perl module file.
+
+    greple --inside '^=(?s:.*?)(^=cut|\z)' --re '^(\w.+\n)+' tee.pm
+
+You can translate them by DeepL service by executing above command
+with B<-Mtee> module calling B<deepl> command like this:
+
+    greple -Mtee deepl text --to JA - -- --discrete ...
+
+Because B<deepl> works better for single line input, you can change
+command part as this:
+
+    sh -c 'perl -00pE "s/\s+/ /g" | deepl text --to JA -'
+
+The dedicated module L<App::Greple::xlate::deepl> is more effective
+for this purpose, though.  In fact, the implementation hint of B<tee>
+module came from B<xlate> module.
+
+=head1 EXAMPLE 2
 
 Next command will find some indented part in LICENSE document.
 
@@ -62,22 +98,10 @@ Next command will find some indented part in LICENSE document.
       b) accompany the distribution with the machine-readable source of the Package
          with your modifications.
     
-=begin comment
-
-      c) accompany any non-standard executables with their corresponding Standard
-         Version executables, giving the non-standard executables non-standard
-         names, and clearly documenting the differences in manual pages (or
-         equivalent), together with instructions on where to get the Standard
-         Version.
-    
-      d) make other distribution arrangements with the Copyright Holder.
-
-=end comment
-
 You can reformat this part by using B<tee> module with B<ansifold>
 command:
 
-    greple -Mtee ansifold -rsw40 --prefix '     ' -- --discrete ...
+    greple -Mtee ansifold -rsw40 --prefix '     ' -- --discrete --re ...
 
       a) distribute a Standard Version of
          the executables and library files,
@@ -89,35 +113,21 @@ command:
          machine-readable source of the
          Package with your modifications.
     
-=begin comment
+=head1 INSTALL
 
-      c) accompany any non-standard
-         executables with their
-         corresponding Standard Version
-         executables, giving the non-
-         standard executables non-standard
-         names, and clearly documenting the
-         differences in manual pages (or
-         equivalent), together with
-         instructions on where to get the
-         Standard Version.
-    
-      d) make other distribution
-         arrangements with the Copyright
-         Holder.
+=head2 CPANMINUS
 
-=end comment
+    $ cpanm App::Greple::tee
 
 =head1 SEE ALSO
 
-=over 7
+L<https://github.com/greymd/teip>
 
-=item L<https://github.com/greymd/teip>
+L<App::Greple>, L<https://github.com/kaz-utashiro/greple>
 
-This module is inspired by the command named B<teip>.  Unlike B<teip>
-command, this module does not have a performace advantage.
+L<https://github.com/tecolicom/Greple>
 
-=back
+L<App::Greple::xlate>
 
 =head1 AUTHOR
 
@@ -125,7 +135,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2023 Kazumasa Utashiro.
+Copyright © 2023 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -134,7 +144,7 @@ it under the same terms as Perl itself.
 
 package App::Greple::tee;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 use v5.14;
 use warnings;
@@ -144,13 +154,12 @@ use Text::ParseWords qw(shellwords);
 use App::cdif::Command;
 use Data::Dumper;
 
-my($mod, $argv);
-
 our $command;
 our $blockmatch;
 our $discrete;
 
-my @converted;
+my @jammed;
+my($mod, $argv);
 
 sub initialize {
     ($mod, $argv) = @_;
@@ -172,25 +181,25 @@ sub call {
     $exec->command($command)->setstdin($data)->update->data;
 }
 
-sub map_lines {
-    my @wonl = grep { $_[$_] !~ /\n\z/ } 0 .. $#_;
+sub jammed_call {
+    my @need_nl = grep { $_[$_] !~ /\n\z/ } 0 .. $#_;
     my @from = @_;
-    $from[$_] =~ s/\z/\n/ for @wonl;
+    $from[$_] .= "\n" for @need_nl;
     my @lines = map { int tr/\n/\n/ } @from;
     my $from = join '', @from;
-    my $to = call $from;
-    my @out = $to =~ /.*\n/g;
+    my $out = call $from;
+    my @out = $out =~ /.*\n/g;
     if (@out < sum @lines) {
-	die "Unexpected response from command:\n\n$to\n";
+	die "Unexpected response from command:\n\n$out\n";
     }
     my @to = map { join '', splice @out, 0, $_ } @lines;
-    $to[$_] =~ s/\n\z// for @wonl;
+    $to[$_] =~ s/\n\z// for @need_nl;
     return @to;
 }
 
 sub postgrep {
     my $grep = shift;
-    @converted = my @block = ();
+    @jammed = my @block = ();
     if ($blockmatch) {
 	$grep->{RESULT} = [
 	    [ [ 0, length ],
@@ -208,7 +217,7 @@ sub postgrep {
 	    push @block, $grep->cut(@$m);
 	}
     }
-    @converted = map_lines(@block) if @block;
+    @jammed = jammed_call @block if @block;
 }
 
 sub callback {
@@ -216,7 +225,7 @@ sub callback {
 	call { @_ }->{match};
     }
     else {
-	shift @converted // die;
+	shift @jammed // die;
     }
 }
 
@@ -233,4 +242,4 @@ option default \
 
 option --tee-each --discrete
 
-#  LocalWords:  greple tee teip
+#  LocalWords:  greple tee teip DeepL deepl perl xlate

@@ -21,6 +21,8 @@ class File::Spec::Instance::Interface : interface_t {
   
   method file_name_is_absolute : int ($path : string);
   
+  method file_name_is_root : int ($path : string);
+  
   method path : string[] ();
   
   method join : string ($dir_parts : string[], $file_base_name : string);
@@ -34,8 +36,6 @@ class File::Spec::Instance::Interface : interface_t {
   method abs2rel : string ($path : string, $base = undef : string);
   
   method rel2abs : string ($path : string, $base = undef : string);
-
-  method _same : int ($path1 : string, $path2 : string);
 
   method _tmpdir : string ($dirlist : string[]);
 }

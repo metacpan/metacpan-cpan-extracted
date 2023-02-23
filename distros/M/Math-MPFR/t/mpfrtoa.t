@@ -35,8 +35,8 @@ for(@in) {
   my $s2 = nvtoa(atonv($_));
 
   cmp_ok($s1, 'eq', $s2, "mpfrtoa() and nvtoa() agree for $_");
-  ok(nvtoa_test($s1, $rop) == 7, "$_");
-  ok(nvtoa_test($s2, $nv ) == 7, "$_");
+  ok(nvtoa_test($s1, $rop) == 15, "$_");
+  ok(nvtoa_test($s2, $nv ) == 15, "$_");
 }
 
 ##############################################################################
@@ -72,8 +72,8 @@ for(1 .. 100) {
   my $s2 = nvtoa($nv);
 
   cmp_ok($s1, 'eq', $s2, "mpfrtoa() and nvtoa() agree for $s");
-  ok(nvtoa_test($s1, $f ) == 7, "$s");
-  ok(nvtoa_test($s2, $nv) == 7, "$s");
+  ok(nvtoa_test($s1, $f ) == 15, "$s");
+  ok(nvtoa_test($s2, $nv) == 15, "$s");
 }
 
 ###########################################################################
@@ -105,7 +105,7 @@ for my $prec( 20000, 2000, 200, 96, 21, 5 ) {
     my $f = Math::MPFR->new( $s );
     my $dec = mpfrtoa( $f );
 
-    ok(nvtoa_test($dec, $f) == 7, "$s");
+    ok(nvtoa_test($dec, $f) == 15, "$s");
   }
 }
 

@@ -1,5 +1,9 @@
 Revision history for Perl module Math::GMPz
 
+0.56
+ - Add new test file t/mpfr_NV_checks.t
+ - Add Random/t/a_v_random.t
+
 0.55
  - Simplify overloading of NVs by utilizing Rmpz_set_NV(). This also seems to fix the
    off-by-one errors that might afflict NV overloading when NV type is doubledouble.

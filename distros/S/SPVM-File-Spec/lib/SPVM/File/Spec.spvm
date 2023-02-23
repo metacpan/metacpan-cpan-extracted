@@ -43,6 +43,10 @@ class File::Spec {
     return File::Spec::Instance->new->file_name_is_absolute($path);
   }
   
+  static method file_name_is_root : int ($path : string) {
+    return File::Spec::Instance->new->file_name_is_root($path);
+  }
+  
   static method path : string[] () {
     return File::Spec::Instance->new->path;
   }

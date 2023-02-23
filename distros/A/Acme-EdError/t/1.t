@@ -1,11 +1,19 @@
 #!perl
-#
-# Initial "does it load and perform basic operations" tests
 
-use warnings;
 use strict;
+use warnings;
 
-use Test::More tests => 2;
+use Test2::V0;
+use Test2::Tools::Command;
 
-BEGIN { use_ok('Acme::EdError') }
-ok( defined $Acme::EdError::VERSION, '$VERSION defined' );
+local @Test2::Tools::Command::command = ( $^X, '-MAcme::EdError', '-e' );
+
+command { args => ['warn "warning"'], stderr => qr/^\?$/ };
+command {
+    args         => ['die "error"'],
+    munge_status => 1,
+    status       => 1,
+    stderr       => qr/^\?$/
+};
+
+done_testing

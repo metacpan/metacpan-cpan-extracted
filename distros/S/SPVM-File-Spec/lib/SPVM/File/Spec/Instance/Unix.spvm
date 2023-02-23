@@ -131,6 +131,15 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
     return $is_abs;
   }
   
+  method file_name_is_root : int ($path : string) {
+    my $re = Regex->new("^/\z", "s");
+    my $is_root = 0;
+    if ($re->match($path)) {
+      $is_root = 1;
+    }
+    return $is_root;
+  }
+  
   method join : string ($dir_parts : string[], $file_base_name : string) {
     my $interface = (File::Spec::Instance::Interface)$self;
     
@@ -321,7 +330,7 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
     my $common_list = StringList->new;
     my $pathchunks_list = StringList->new($pathchunks);
     my $basechunks_list = StringList->new($basechunks);
-    while ($pathchunks_list->length > 0 && $basechunks_list->length > 0 && $interface->_same($pathchunks_list->get(0), $basechunks_list->get(0))) {
+    while ($pathchunks_list->length > 0 && $basechunks_list->length > 0 && $pathchunks_list->get(0) eq $basechunks_list->get(0)) {
       $common_list->push($pathchunks_list->shift);
       $basechunks_list->shift;
     }
@@ -364,14 +373,6 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
     return undef;
   }
   
-  method _same : int ($path1 : string, $path2 : string) {
-    my $same = 0;
-    if ($path1 eq $path2) {
-      $same = 1;
-    }
-    return $same;
-  }
-
   static method compatible_split : string[] ($separator : string, $string : string, $limit = 0 : int) {
     unless ($separator) {
       die "The \$separator must be defined";

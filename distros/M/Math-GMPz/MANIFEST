@@ -11,6 +11,7 @@ V/Makefile.PL
 Random/Random.xs
 Random/Random.pm
 Random/Makefile.PL
+Random/t/a_v_random.t
 Random/t/gmp_random.t
 README
 demos/imp_exp.p
@@ -48,6 +49,7 @@ t/fdiv.t
 t/io_raw.t
 t/IV_UV_NV.t
 t/longdouble.t
+t/mpfr_NV_checks.t
 t/new.t
 t/NOK_and_POK.t
 t/not_zero.t

@@ -23,6 +23,7 @@ my $handler = builder {
             backup_files,
             cgi_bin,
             cms_prefixes,
+            document_extensions,
             dot_files,
             fake_extensions,
             header_injection,
@@ -330,6 +331,13 @@ test_psgi
 
     subtest 'blocked' => sub {
         my $req = GET "/Windows/META-INF/prototype";
+        my $res = $cb->($req);
+        ok is_error( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
+    };
+
+    subtest 'blocked' => sub {
+        my $req = GET "/foo/example.doc";
         my $res = $cb->($req);
         ok is_error( $res->code ), join( " ", $req->method, $req->uri );
         is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";

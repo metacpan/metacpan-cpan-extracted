@@ -3,7 +3,7 @@ use strict;
 
 use Test::More;
 
-use Crypt::Bcrypt qw/bcrypt bcrypt_check bcrypt_check_hashed/;
+use Crypt::Bcrypt qw/bcrypt bcrypt_check/;
 
 use MIME::Base64 'decode_base64';
 
@@ -25,9 +25,6 @@ while(<DATA>) {
 		isnt(bcrypt($wrong_password, $type, $cost, $salt), $settings.$hash)
 	}
 }
-
-ok(bcrypt_check_hashed('password', '$bcrypt-sha256$v=2,t=2b,r=12$n79VH.0Q2TMWmt3Oqt9uku$Kq4Noyk3094Y2QlB8NdRT8SvGiI4ft2'));
-ok(bcrypt_check_hashed('password', '$bcrypt-sha256$v=2,t=2b,r=13$AmytCA45b12VeVg0YdDT3.$IZTbbJKgJlD5IJoCWhuDUqYjnJwNPlO'));
 
 done_testing;
 

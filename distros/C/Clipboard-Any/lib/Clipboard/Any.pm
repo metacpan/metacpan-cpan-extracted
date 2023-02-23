@@ -9,9 +9,9 @@ use Exporter::Rinci qw(import);
 use IPC::System::Options 'system', 'readpipe', 'run', -log=>1;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-08'; # DATE
+our $DATE = '2022-12-13'; # DATE
 our $DIST = 'Clipboard-Any'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 my $known_clipboard_managers = [qw/klipper parcellite clipit xclip/];
 my $sch_clipboard_manager = ['str', in=>$known_clipboard_managers];
@@ -25,6 +25,19 @@ The default, when left undef, is to detect what clipboard manager is running.
 
 _
         cmdline_aliases => {m=>{}},
+    },
+);
+
+our %argspec0_index = (
+    index => {
+        summary => 'Index of item in history (0 means the current/latest, 1 the second latest, and so on)',
+        schema => 'int*',
+        description => <<'_',
+
+If the index exceeds the number of items in history, empty string or undef will
+be returned instead.
+
+_
     },
 );
 
@@ -366,6 +379,63 @@ sub list_clipboard_history {
     [412, "Cannot list clipboard history (clipboard manager=$clipboard_manager)"];
 }
 
+$SPEC{'get_clipboard_history_item'} = {
+    v => 1.1,
+    summary => 'Get a clipboard history item',
+    description => <<'_',
+
+_
+    args => {
+        %argspecopt_clipboard_manager,
+        %argspec0_index,
+    },
+};
+sub get_clipboard_history_item {
+    my %args = @_;
+    my $index = $args{index};
+
+    my $clipboard_manager = $args{clipboard_manager} // detect_clipboard_manager();
+    return [412, "Can't detect any known clipboard manager"]
+        unless $clipboard_manager;
+
+    if ($clipboard_manager eq 'klipper') {
+        my ($stdout, $stderr);
+        system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
+               "qdbus", "org.kde.klipper", "/klipper", "getClipboardHistoryItem", $index);
+        my $exit_code = $? < 0 ? $? : $?>>8;
+        return [500, "/klipper's getClipboardHistoryItem($index) failed: $exit_code"] if $exit_code;
+        chomp $stdout;
+        return [200, "OK", $stdout];
+    } elsif ($clipboard_manager eq 'parcellite') {
+        # parcellite -c usually just prints the same result as -p (primary)
+        return [501, "Not yet implemented"];
+    } elsif ($clipboard_manager eq 'clipit') {
+        # clipit -c usually just prints the same result as -p (primary)
+        return [501, "Not yet implemented"];
+    } elsif ($clipboard_manager eq 'xclip') {
+        my ($stdout, $stderr, $exit_code);
+        my @rows;
+
+        if ($index == 0) {
+            system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
+                   "xclip", "-o", "-selection", "primary");
+            $exit_code = $? < 0 ? $? : $?>>8;
+            return [500, "xclip -o (primary) failed with exit code $exit_code"] if $exit_code;
+            return [200, "OK", $stdout];
+        } elsif ($index == 0) {
+            system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
+                   "xclip", "-o", "-selection", "clipboard");
+            $exit_code = $? < 0 ? $? : $?>>8;
+            return [500, "xclip -o (clipboard) failed with exit code $exit_code"] if $exit_code;
+            return [200, "OK", $stdout];
+        } else {
+            return [200, "OK", undef];
+        }
+    }
+
+    [412, "Cannot get clipboard history item (clipboard manager=$clipboard_manager)"];
+}
+
 $SPEC{'add_clipboard_content'} = {
     v => 1.1,
     summary => 'Add a new content to the clipboard',
@@ -442,7 +512,7 @@ Clipboard::Any - Common interface to clipboard manager functions
 
 =head1 VERSION
 
-This document describes version 0.008 of Clipboard::Any (from Perl distribution Clipboard-Any), released on 2022-12-08.
+This document describes version 0.009 of Clipboard::Any (from Perl distribution Clipboard-Any), released on 2022-12-13.
 
 =head1 DESCRIPTION
 
@@ -653,6 +723,49 @@ Arguments ('*' denotes required arguments):
 Explicitly set clipboard manager to use.
 
 The default, when left undef, is to detect what clipboard manager is running.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 get_clipboard_history_item
+
+Usage:
+
+ get_clipboard_history_item(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Get a clipboard history item.
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<clipboard_manager> => I<str>
+
+Explicitly set clipboard manager to use.
+
+The default, when left undef, is to detect what clipboard manager is running.
+
+=item * B<index> => I<int>
+
+Index of item in history (0 means the currentE<sol>latest, 1 the second latest, and so on).
+
+If the index exceeds the number of items in history, empty string or undef will
+be returned instead.
 
 
 =back

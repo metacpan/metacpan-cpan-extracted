@@ -133,6 +133,10 @@ int _sis_perl_version(void) {
     return SIS_PERL_VERSION;
 }
 
+int M_RYU_D__has_uint128(void) {
+    return _has_uint128();
+}
+
 /* End d2exp */
 
 
@@ -243,5 +247,9 @@ OUTPUT:  RETVAL
 
 int
 _sis_perl_version ()
+
+
+int
+M_RYU_D__has_uint128 ()
 
 

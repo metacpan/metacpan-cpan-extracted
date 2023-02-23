@@ -532,9 +532,16 @@
     and '**' operators, and will work only if Math::MPFR is at
     version 3.13 or later - in which case the operation will
     return a Math::MPFR object.
+    For comparisons (==, !=, <, <=, >, >=, <=>) between Math::MPFR and
+    Math::GMPq objects, you need to invoke the Math::MPFR overloading
+    as the Math::GMPq overloading does not accommodate such comparisons.
+    eg - do ($mpfr_obj > $mpq_obj), not ($mpq_obj < $mpfr_obj).
+
+
     Math::GMPz (or Math::GMP) objects can be used only with the
     comparison operators ( == != < <= > >= <=> ) and with the '+', '+=',
     '-', '-=', '*', '*=', '/', '/=', '**' and '**=' operators.
+
     In those situations where the overload subroutine operates on 2
     perl variables, then obviously one of those perl variables is
     a Math::GMPq object. To determine the value of the other variable
@@ -707,7 +714,7 @@
 
     This program is free software; you may redistribute it and/or
     modify it under the same terms as Perl itself.
-    Copyright 2006-2011, 2013-21, Sisyphus
+    Copyright 2006-2011, 2013-23, Sisyphus
 
 =head1 AUTHOR
 

@@ -2,7 +2,7 @@ package Dist::Zilla::PluginBundle::Author::GSG;
 
 # ABSTRACT: Grant Street Group CPAN dists
 use version;
-our $VERSION = 'v0.3.0'; # VERSION
+our $VERSION = 'v0.4.0'; # VERSION
 
 use Carp;
 use Git::Wrapper;
@@ -284,7 +284,7 @@ Dist::Zilla::PluginBundle::Author::GSG - Grant Street Group CPAN dists
 
 =head1 VERSION
 
-version v0.3.0
+version v0.4.0
 
 =head1 SYNOPSIS
 
@@ -397,8 +397,8 @@ public distributions of modules as well as trying to make it easy for
 other folks to contribute.
 
 The C<share_dir> for this module includes GSG standard files to include
-with open source modules.  Things like a standard Makefile,
-a contributing guide, and a MANIFEST.SKIP that should work with this Plugin.
+with open source modules.  Things like a standard Makefile
+and a contributing guide.
 See the L</update> Makefile target for details.
 
 The expected workflow for a module using this code is that after following
@@ -540,8 +540,10 @@ adding the C<on 'develop'> dependency to your cpanfile as described above.
 
 If you want to override the Makefile included with this Plugin
 but still want to use some of the targets in it,
-you could replace the C<Makefile> target in this example with your own targets,
-and document running the initial C<carton install> manually.
+you can rename it to something such as C<Makefile.inc>
+and include it from your C<Makefile>.
+
+Also see the section on L<Makefile.PL> and XS modules.
 
 The Makefile that comes in this PluginBundle's C<share_dir> has a many
 helpers to make development on a module supported by it easier.
@@ -566,6 +568,11 @@ so you will need to add it to the cpanfile temporarily for this target to work.
 Copies the C<Makefile.inc> included in this PluginBundle's C<share_dir>
 into your distribution.
 
+Actually the C<$(lastword $(MAKEFILE_LIST))>,
+so if you put the Makefile somewhere else,
+for example C<Makefile.inc> or C<ci/Makefile>,
+that will be the target.
+
 This should happen automatically through the magic of C<make>.
 
 =item update
@@ -586,7 +593,7 @@ Requires installing the C<develop> cpanfile dependencies to work.
 
 The files in this variable are copied from this PluginBundle's
 
-Currently includes C<CONTRIBUTING.md> and C<MANIFEST.SKIP>.
+Currently includes C<CONTRIBUTING.md>.
 
 =back
 
@@ -601,6 +608,41 @@ in order to avoid unnecessarily installing the heavy C<Dist::Zilla>
 dependency chain.
 
 =back
+
+=head2 Makefile.PL
+
+There is special support for a C<Makefile.PL> in the root of the repository.
+If using it, you will need to rename the C<Makefile> included with this
+PluginBundle to something else, for example C<ci/Makefile> or C<Makefile.dzil>.
+
+This is normally used for modules that need a build phase before they
+will pass tests, such as modules that use XS.
+
+Generating the initial C<Makefile.PL> can be done with:
+
+    cp Makefile Makefile.dzil
+    touch Makefile.PL dist.ini
+    make Makefile.PL
+    echo Makefile >> .gitignore
+    git rm -f Makefile && git commit -am"Switch to Makefile.PL"
+
+Which should copy the Makefile.PL from the dzil workspace into your
+repostitory.
+
+Because this PluginBundle uses L<Dist::Zilla::Plugin::OurPkgVersion>,
+actually testing XS modules is a bit troublesome because they don't
+have a C<$VERSION> available.
+The above command will generate the C<Makefile.PL> with an embedded
+version of C<v0.0.1> which can be used in your tests to work around this.
+First you need to add C<use vars '$VERSION';> to the C<.pm> files that
+C<bootstrap> the XS module, and then in your tests that load that module,
+before you C<use> the module to be tested,
+you can set a default version that will match the the one in the Makefile.PL.
+This default will be overridden when My::Module is loaded if it has a
+C<VERSION> of its own.
+
+    BEGIN { $My::Module::VERSION = "v0.0.1" }
+    use My::Module;
 
 =head2 Cutting a release
 
@@ -648,7 +690,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 - 2022 by Grant Street Group.
+This software is Copyright (c) 2019 - 2023 by Grant Street Group.
 
 This is free software, licensed under:
 

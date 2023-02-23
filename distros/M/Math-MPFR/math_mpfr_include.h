@@ -424,7 +424,7 @@ typedef _Decimal128 D128;
 
 # endif
 
-#elif defined(USE_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 64
+#elif defined(USE_LONG_DOUBLE)
 #define MATH_MPFR_MAX_DIG 21
 #define NVSIZE_BITS 64
 #define MATH_MPFR_NV_MAX 1.18973149535723176502e4932L
@@ -451,37 +451,6 @@ typedef _Decimal128 D128;
 #define NVSIZE_BITS 2098
 #define MATH_MPFR_NV_MAX 1.797693134862315807937289714053e+308L
 #define MATH_MPFR_NORMAL_MIN 2.2250738585072014e-308
-
-# if defined(MPFR_HAVE_BENDIAN)                /* big endian architecture - defined by Makefile.PL */
-# define DD_CONDITION_1(p) p<=7
-# define DD_CONDITION_2(p) p=2;p<8;p++
-# define MSD_IND_0 0
-# define MSD_IND_1 1
-# define LSD_IND_0 8
-# define LSD_IND_1 9
-# define LSD_IND_2 10
-# define LSD_IND_3 11
-# define LSD_IND_4 12
-# define LSD_IND_5 13
-# define LSD_IND_6 14
-# define LSD_IND_7 15
-
-# else                                        /* little endian architecture */
-
-# define DD_CONDITION_1 i>=0
-# define DD_CONDITION_2 i=13;i>7;i--
-# define MSD_IND_0 15
-# define MSD_IND_1 14
-# define LSD_IND_0 7
-# define LSD_IND_1 6
-# define LSD_IND_2 5
-# define LSD_IND_3 4
-# define LSD_IND_4 3
-# define LSD_IND_5 2
-# define LSD_IND_6 1
-# define LSD_IND_7 0
-
-# endif /* MPFR_HAVE_BENDIAN */
 
 #else
 #define MATH_MPFR_MAX_DIG 36

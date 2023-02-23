@@ -71,6 +71,10 @@ An implementation class of the L<File::Spec::Instance|SPVM::SPVM::File::Spec::In
 
   method file_name_is_absolute : int ($path : string);
 
+=head2 file_name_is_root
+
+  method file_name_is_root : int ($path : string);
+
 =head2 join
 
   method join : string ($dir_parts : string[], $file_base_name : string);

@@ -3,13 +3,13 @@
 use strict;
 use warnings;
 
-my     $tests = 18;
-use     Test::More;
+my $tests = 18;
+use Test::More;
 require Test::NoWarnings;
 
-use     Spreadsheet::Read;
-Spreadsheet::Read::parses ("gnumeric") or
-    plan skip_all => "Cannot use Spreadsheet::ReadGnumeric";
+use Spreadsheet::Read;
+Spreadsheet::Read::parses ("gnumeric")
+    or plan skip_all => "Cannot use Spreadsheet::ReadGnumeric";
 
 BEGIN { delete @ENV{qw( LANG LC_ALL LC_DATE )}; }
 

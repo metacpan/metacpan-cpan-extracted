@@ -1,6 +1,6 @@
 package SPVM::File::Spec;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 1;
 
@@ -61,6 +61,10 @@ This module is designed to support operations commonly performed on file specifi
 =head2 file_name_is_absolute
 
   static method file_name_is_absolute : int ($path : string);
+
+=head2 file_name_is_root
+
+  static method file_name_is_root : int ($path : string);
 
 =head2 path
 

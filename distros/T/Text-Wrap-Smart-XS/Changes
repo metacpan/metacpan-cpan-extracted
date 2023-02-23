@@ -1,5 +1,11 @@
 Revision history for Perl extension Text::Wrap::Smart::XS.
 
+0.08  2023-02-22  <schubiger@cpan.org>
+
+ - Move testing modules to test_requires.
+
+ - Drop generating compat Makefile.PL.
+
 0.07  2021-05-24  <schubiger@cpan.org>
 
  - Merged development version to stable.

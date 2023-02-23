@@ -73,6 +73,7 @@ t/new_in_4.1.0.t
 t/new_pow_log_exp.t
 t/numtoa.t
 t/nvtoa.t
+t/nvtoa_dd.t
 t/nvtoa_subnormal.t
 t/nvtoa2.t
 t/nvtoa3.t

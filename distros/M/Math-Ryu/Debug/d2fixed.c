@@ -829,3 +829,12 @@ char* d2exp(double d, uint32_t precision) {
   buffer[index] = '\0';
   return buffer;
 }
+
+int _has_uint128(void) {  /* added by sisyphus: */
+#if defined(HAS_UINT128)
+  return 1;
+#else
+  return 0;
+#endif
+}
+

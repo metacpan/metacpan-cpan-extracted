@@ -18,7 +18,7 @@
     use constant _MATH_MPC_T 	=> 10;
     use constant GMPF_PV_NV_BUG => Math::GMPf::Random::_has_pv_nv_bug();
 
-    # Inspired by https://github.com/Perl/perl5/issues/19550:
+    # Inspired by https://github.com/Perl/perl5/issues/19550, which affects only perl-5.35.10:
     use constant ISSUE_19550    => Math::GMPf::Random::_issue_19550();
 
 use subs qw( __GNU_MP_VERSION __GNU_MP_VERSION_MINOR __GNU_MP_VERSION_PATCHLEVEL
@@ -51,11 +51,14 @@ use overload
     'int'  => \&overload_int,
     'sqrt' => \&overload_sqrt;
 
-    @Math::GMPf::EXPORT_OK = qw(
+     my @untagged = qw(
 __GNU_MP_VERSION __GNU_MP_VERSION_MINOR __GNU_MP_VERSION_PATCHLEVEL
 __GNU_MP_RELEASE __GMP_CC __GMP_CFLAGS
-GMPF_PV_NV_BUG
 IOK_flag NOK_flag POK_flag
+    );
+
+    my @tagged = qw(
+GMPF_PV_NV_BUG
 Rmpf_abs Rmpf_add Rmpf_add_ui Rmpf_ceil Rmpf_clear Rmpf_clear_mpf Rmpf_clear_ptr
 Rmpf_cmp Rmpf_cmp_d Rmpf_cmp_si Rmpf_cmp_ui Rmpf_cmp_NV Rmpf_cmp_IV
 Rmpf_deref2 Rmpf_div Rmpf_div_2exp Rmpf_div_ui
@@ -86,43 +89,14 @@ fgmp_urandomb_ui fgmp_urandomm_ui
 Rmpf_get_NV Rmpf_set_NV Rmpf_get_NV_rndn Rmpf_get_d_rndn
 Rmpf_get_IV Rmpf_set_IV Rmpf_fits_IV_p
     );
-    our $VERSION = '0.49';
+
+    @Math::GMPf::EXPORT_OK = (@untagged, @tagged);
+    our $VERSION = '0.51';
     #$VERSION = eval $VERSION;
 
     Math::GMPf->DynaLoader::bootstrap($VERSION);
 
-    %Math::GMPf::EXPORT_TAGS =(mpf => [qw(
-GMPF_PV_NV_BUG
-Rmpf_abs Rmpf_add Rmpf_add_ui Rmpf_ceil Rmpf_clear Rmpf_clear_mpf Rmpf_clear_ptr
-Rmpf_cmp Rmpf_cmp_d Rmpf_cmp_si Rmpf_cmp_ui Rmpf_cmp_NV Rmpf_cmp_IV
-Rmpf_deref2 Rmpf_div Rmpf_div_2exp Rmpf_div_ui
-Rmpf_eq Rmpf_fits_sint_p Rmpf_fits_slong_p Rmpf_fits_sshort_p Rmpf_fits_uint_p
-Rmpf_fits_ulong_p Rmpf_fits_ushort_p Rmpf_floor Rmpf_fprintf
-Rmpf_get_d Rmpf_get_d_2exp
-Rmpf_get_default_prec Rmpf_get_prec Rmpf_get_si Rmpf_get_str Rmpf_get_ui
-Rmpf_init Rmpf_init2 Rmpf_init2_nobless Rmpf_init_nobless Rmpf_init_set
-Rmpf_init_set_d Rmpf_init_set_d_nobless Rmpf_init_set_nobless Rmpf_init_set_si
-Rmpf_init_set_si_nobless Rmpf_init_set_str Rmpf_init_set_str_nobless
-Rmpf_init_set_ui Rmpf_init_set_ui_nobless Rmpf_inp_str
-Rmpf_init_set_NV Rmpf_init_set_IV Rmpf_init_set_NV_nobless Rmpf_init_set_IV_nobless
-TRmpf_inp_str
-Rmpf_integer_p Rmpf_mul
-Rmpf_mul_2exp Rmpf_mul_ui Rmpf_neg Rmpf_out_str
-TRmpf_out_str
-Rmpf_pow_ui Rmpf_printf
-Rmpf_random2 Rmpf_reldiff Rmpf_set Rmpf_set_d Rmpf_set_default_prec Rmpf_set_prec
-Rmpf_set_prec_raw Rmpf_set_q Rmpf_set_si Rmpf_set_str Rmpf_set_ui Rmpf_set_z
-Rmpf_sgn Rmpf_sprintf Rmpf_snprintf
-Rmpf_sqrt Rmpf_sqrt_ui Rmpf_sub Rmpf_sub_ui Rmpf_swap Rmpf_trunc
-Rmpf_ui_div Rmpf_ui_sub Rmpf_urandomb
-fgmp_randseed fgmp_randseed_ui fgmp_randclear
-fgmp_randinit_default fgmp_randinit_mt fgmp_randinit_lc_2exp fgmp_randinit_lc_2exp_size
-fgmp_randinit_set fgmp_randinit_default_nobless fgmp_randinit_mt_nobless
-fgmp_randinit_lc_2exp_nobless fgmp_randinit_lc_2exp_size_nobless fgmp_randinit_set_nobless
-fgmp_urandomb_ui fgmp_urandomm_ui
-Rmpf_get_NV Rmpf_set_NV Rmpf_get_NV_rndn Rmpf_get_d_rndn
-Rmpf_get_IV Rmpf_set_IV  Rmpf_fits_IV_p
-)]);
+    %Math::GMPf::EXPORT_TAGS =(mpf => \@tagged);
 
 $Math::GMPf::NOK_POK = 0; # Set to 1 to allow warnings in new() and overloaded operations when
                           # a scalar that has set both NOK (NV) and POK (PV) flags is encountered

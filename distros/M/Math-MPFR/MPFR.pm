@@ -37,8 +37,10 @@
     use constant MPFR_FREE_GLOBAL_CACHE => 2;
     use constant LITTLE_ENDIAN          => $Config{byteorder} =~ /^1/ ? 1 : 0;
     use constant MM_HP                  => LITTLE_ENDIAN ? 'h*' : 'H*';
-    use constant MPFR_3_1_6_OR_LATER    => Math::MPFR::Random::_MPFR_VERSION() > 196869 ? 1 : 0;
+    use constant MPFR_3_1_6_OR_LATER    => Math::MPFR::Random::_MPFR_VERSION() >  196869 ? 1 : 0;
+    use constant MPFR_4_0_2_OR_LATER    => Math::MPFR::Random::_MPFR_VERSION() >= 262146 ? 1 : 0;
     use constant MPFR_PV_NV_BUG         => Math::MPFR::Random::_has_pv_nv_bug();
+    use constant NV_IS_DOUBLEDOUBLE     => 1 + (2 ** -200) > 1 ? 1 : 0;
 
     # Inspired by https://github.com/Perl/perl5/issues/19550, which affects only perl-5.35.10:
     use constant ISSUE_19550    => Math::MPFR::Random::_issue_19550();
@@ -91,7 +93,6 @@
     *import = \&Exporter::import;
     require DynaLoader;
 
-#    @Math::MPFR::EXPORT_OK = qw(
     my @tags = qw(
 GMP_RNDD GMP_RNDN GMP_RNDU GMP_RNDZ
 IOK_flag NOK_flag POK_flag
@@ -189,9 +190,9 @@ fr_cmp_q_rounded mpfr_max_orig_len mpfr_min_inter_prec mpfrtoa numtoa nvtoa nvto
 prec_cast q_add_fr q_cmp_fr q_div_fr q_mul_fr q_sub_fr rndna
 );
 
-    @Math::MPFR::EXPORT_OK = (@tags,'bytes');
+    @Math::MPFR::EXPORT_OK = (@tags, 'bytes');
 
-    our $VERSION = '4.24';
+    our $VERSION = '4.25';
     #$VERSION = eval $VERSION;
 
     Math::MPFR->DynaLoader::bootstrap($VERSION);
@@ -988,7 +989,7 @@ sub nvtoa_test {
    # are the same. No further testing required.
 
    if($check == 0) {
-     return 7 if $n == 0;
+     return 15 if $n == 0;
      return 0;
    }
    return 0 if $n == 0;
@@ -996,20 +997,18 @@ sub nvtoa_test {
    my $new = Math::MPFR->new($check);
 
    if(Rmpfr_nan_p($new)) {
-     return 7 if $n != $n;
+     return 15 if $n != $n;
      return 0;
    }
    return 0 if $n != $n;
 
    if(Rmpfr_inf_p($new)) {
-     return 7 if $new == $n;
+     return 15 if $new == $n;
      return 0;
    }
    return 0 if $n/$n != $n/$n;
 
    $ret++ if $check == $n; # round trip successful
-   ##############
-   ##############
 
   my @r = split /e/i, $s;
 
@@ -1017,6 +1016,17 @@ sub nvtoa_test {
     print "SPLIT:\n$r[0]";
     if(defined($r[1])) { print " $r[1]\n" }
     else { print " no exponent\n" }
+  }
+
+  # Increment $ret by 8 if and only if there are no errant trailing
+  # zeroes in $r[0] .
+
+  if(!defined($r[1])) {
+    $ret += 8 if ($r[0] =~ /\.0$/ || $r[0] !~ /0$/);
+    $r[1] = 0;       # define $r[1] by setting it to zero.
+  }
+  else {
+   $ret += 8 unless $r[0] =~ /0$/;
   }
 
   # We remove from $s any trailing mantissa zeroes, and then
@@ -1027,7 +1037,6 @@ sub nvtoa_test {
 
   chop($r[0]) while $r[0] =~ /0$/;
   $r[0] =~ s/\.$//;
-  $r[1] = defined $r[1] ? $r[1] : 0;
   while($r[0] =~ /0$/) {
     chop $r[0];
     $r[1]++;
@@ -1062,16 +1071,17 @@ sub nvtoa_test {
     my @mantissa = split /\./, $r[0];
     my $point_pos = -(length($mantissa[1]));
     my $t = $mantissa[0] . $mantissa[1];
+    print "Man (if):\n$t\n" if $debug == 2;
     $t++ for 1..10;
+    print "Man++ (if):\n$t\n" if $debug == 2;
     substr($t, $point_pos, 0, '.');
     $r[0] = $t;
   }
   else {
+    print "R0 (else):\n$r[0]\n" if $debug == 2;
     $r[0]++ for 1..10;
+    print "R0++ (else):\n$r[0]\n" if $debug == 2;
   }
-
-  my $substitute = substr($r[0], -1, 1) + 1;
-  substr($r[0], -1, 1, "$substitute");
 
   my $incremented = defined($r[1]) ? $r[0] . 'e' . $r[1]
                                    : $r[0];
@@ -1129,6 +1139,317 @@ sub _get_exp {
 *Rmpfr_randinit_mt           = \&Math::MPFR::Random::Rmpfr_randinit_mt;
 *Rmpfr_randinit_lc_2exp      = \&Math::MPFR::Random::Rmpfr_randinit_lc_2exp;
 *Rmpfr_randinit_lc_2exp_size = \&Math::MPFR::Random::Rmpfr_randinit_lc_2exp_size;
+
+
+sub nvtoa {
+  # Special handling required for DoubleDouble
+  # Unable to get the _nvtoa XSub to work flawlessly with DoubleDoubles,
+  # I've switched to using the _mpfrtoa XSub, as I did with Math::FakeDD
+  # It's an emabrrassingly awful hack, but will have to do until something
+  # better comes along.
+
+  if(NV_IS_DOUBLEDOUBLE) {
+    my $nv = shift;
+
+    my $unpacked = unpack "H*", pack "D>", $nv;
+    my $msd = unpack "d>", pack "H*", substr($unpacked, 0, 16);  # more significant double
+    my $lsd = unpack "d>", pack "H*", substr($unpacked, 16, 16); # less significant double
+
+    my $mpfr = Rmpfr_init2(2098);
+    Rmpfr_set_ld($mpfr, $nv, MPFR_RNDN);
+
+    my($neg, $prec, $different_signs) = (Rmpfr_signbit($mpfr), 0, 0);
+
+    unless(Rmpfr_regular_p($mpfr)) {
+      if(Rmpfr_zero_p($mpfr)) {
+        return "-0.0" if $neg;
+        return "0.0";
+      }
+
+      return "NaN" if Rmpfr_nan_p($mpfr);
+
+      # Must be Inf
+      return "-Inf" if $neg;
+      return "Inf";
+    }
+
+    # set $mpfr to abs($mpfr)
+    # $nv remains unaltered
+    if($mpfr < 0) {
+      Rmpfr_neg($mpfr, $mpfr, MPFR_RNDN);
+      $neg = 1;
+    }
+
+    my $exp = Rmpfr_get_exp($mpfr);
+
+    if($lsd == 0) {
+
+      my $addon = 1074;
+      unless( MPFR_4_0_2_OR_LATER ) { # 4.0.1 or earlier
+        # Prior to mpfr-4.0.2, there are issues with precision < 2,
+        # but DBL_DENORM_MIN calls for a precision of one bit.
+        # We therefore return the hard coded value for this case.
+
+        if($exp == -1073) {
+          # $mpfr is 2 ** -1074
+          my $ret = $neg ? '-5e-324' : '5e-324';
+          return $ret;
+        }
+      }
+
+      $prec = $addon + $exp;
+      Rmpfr_prec_round($mpfr, $prec, MPFR_RNDN);
+      # Provide 2nd arg of 728 to mpfrtoa().
+      # 2 ** -348 (prec = 727) needs this.
+      return '-' . mpfrtoa($mpfr, 728) if $neg;
+      return mpfrtoa($mpfr, 728);
+    } # close $lsd == 0
+
+    my $m_msd = Rmpfr_init2(53);
+    my $m_lsd = Rmpfr_init2(53);
+
+    Rmpfr_set_d($m_msd, $msd, MPFR_RNDN);
+    Rmpfr_set_d($m_lsd, $lsd, MPFR_RNDN);
+
+    if(abs($lsd) >= 2 ** -1022) {
+      # lsd is not subnormal.
+      $prec = Rmpfr_get_exp($m_msd) - Rmpfr_get_exp($m_lsd) + 53;
+      if( ($lsd < 0 && $msd > 0) || ($msd < 0 && $lsd > 0) ) {
+        $prec--;
+        $different_signs = 1; # one double < 0, the other > 0
+      }
+      my $mpfr_copy = Rmpfr_init2(2098);
+      Rmpfr_set($mpfr_copy, $mpfr, MPFR_RNDN);
+      Rmpfr_prec_round($mpfr_copy, $prec, MPFR_RNDN);
+      my $trial_repro = mpfrtoa($mpfr_copy);
+      my $trial_dd = atonv($trial_repro);
+      if($trial_dd == $nv || ($neg == 1 && $trial_dd == abs($nv)) ) {
+        return '-' . $trial_repro if $neg;
+        return $trial_repro;
+      }
+      $prec++;
+      # Might need to be incremented again if the 2 doubles have different sign.
+    }
+    else {
+      $prec = Rmpfr_get_exp($m_msd) + 1073; # $prec should be > 0
+      $prec++ if $prec == 0;
+
+      my $mpfr_copy = Rmpfr_init2(2098);
+      Rmpfr_set($mpfr_copy, $mpfr, MPFR_RNDN);
+      Rmpfr_prec_round($mpfr_copy, $prec, MPFR_RNDN);
+      my $trial_repro = mpfrtoa($mpfr_copy);
+      my $trial_dd = atonv($trial_repro);
+      if($trial_dd == $nv || ($neg == 1 && $trial_dd == abs($nv)) ) {
+        return '-' . $trial_repro if $neg;
+        return $trial_repro;
+      }
+
+      $prec++;
+    }
+
+    my $mpfr_orig = Rmpfr_init2(2098);
+    Rmpfr_set($mpfr_orig, $mpfr, MPFR_RNDN); # copy $mpfr to $mpfr_orig
+
+    Rmpfr_prec_round($mpfr, $prec, MPFR_RNDN);
+
+    if($different_signs) {
+      my $candidate = mpfrtoa($mpfr, 53);
+
+      # Might fail either the "chop" test or
+      # the "round trip" test, but not both.
+
+      if(abs($nv) != atonv($candidate)) {
+        # First check whether decrementing the mantissa
+        # allows the round trip to succeed.
+
+        my $ret = _decrement($candidate);
+
+        if(abs($nv) == atonv($ret)) {
+          return '-' . $ret if $neg;
+          return $ret;
+        }
+
+        # Fails round trip - so we increment $prec. We then
+        # can't use $mpfr again as its precision has already
+        # been altered, so we use $mpfr_orig.
+
+        $prec++;
+        Rmpfr_prec_round($mpfr_orig, $prec, MPFR_RNDN);
+        return '-' . mpfrtoa($mpfr_orig, 53) if $neg;
+        return mpfrtoa($mpfr_orig, 53);
+      }
+
+      my $ret = _chop_test($candidate, $nv, 0);
+
+      if($ret eq 'ok') {
+        return '-' . $candidate if $neg;
+        return $candidate;
+      }
+
+      # The value we now return is the value calculated
+      # for precision $prec, but with the least significant
+      # mantissa digit removed.
+
+      return '-' . $ret if $neg;
+      return $ret;
+
+    } # close different signs
+
+    else {
+      # We need to detect the (rare) case that a chopped and
+      # then incremented mantissa passes the round trip.
+
+      my $can = mpfrtoa($mpfr, 53);
+      my $ret = _chop_test($can, $nv, 1);
+
+      if($ret eq 'ok') {
+        return '-' . $can if $neg;
+        return $can;
+      }
+
+      return '-' . $ret if $neg;
+      return $ret;
+
+    } # close same signs
+
+  }
+  else {
+    # Not a doubledouble - simply use the _nvtoa XSub
+    return _nvtoa(shift);
+  }
+}
+
+sub numtoa { # Special handling required for DoubleDouble
+  if(NV_IS_DOUBLEDOUBLE) {
+    my $arg = shift;
+    return nvtoa($arg) if _SvNOK($arg);
+    return _numtoa($arg);
+  }
+  else {
+    return _numtoa(shift);
+  }
+}
+
+sub _chop_test {
+  my @r = split /e/i, shift;
+  my $op = shift;
+
+  # If $do_increment is set, then all we are not interested
+  # in the result of the chop test. We are interested in the
+  # result of the incrmentation - which we requires that we
+  # first perform the chop.
+
+  my $do_increment = defined($_[0]) ? shift
+                                    : 0;
+
+  # We remove from $r[0] any trailing mantissa zeroes, and then
+  # replace the least significant digit with zero.
+  # IOW, we effectively chop off the least siginificant digit, thereby
+  # rounding it down to the next lowest decimal precision.)
+  # This altered string should assign to a DoubleDouble value that is
+  # less than the given $op.
+
+  chop($r[0]) while $r[0] =~ /0$/;
+  $r[0] =~ s/\.$//;
+  $r[1] = defined $r[1] ? $r[1] : 0;
+  while($r[0] =~ /0$/) {
+    chop $r[0];
+    $r[1]++;
+  }
+
+  return 'ok' if length($r[0]) < 2; # chop test inapplicable.
+
+  substr($r[0], -1, 1, '');
+
+  $r[1]++ unless $r[0] =~ /\./;
+  $r[0] =~ s/\.$/.0/
+    unless $r[1];
+  $r[0] =~ s/\.$//;
+
+  if(!$do_increment) {
+    # We are interested only in the chop test
+
+    my $chopped = $r[1] ? $r[0] . 'e' . $r[1]
+                        : $r[0];
+
+    return 'ok' if atonv($chopped) < abs($op); # chop test ok.
+    return $chopped;
+  }
+
+  # We are not interested in the chop test - the "chop" was
+  # done only as the first step in the incrementation, and
+  # it's the result of the following  incrementation that
+  # interests us. Now we want, in effect, to do:
+  #  ++$r[0];
+  # This value should then assign to a  DoubleDouble value
+  # that is greater than the given $op.
+
+  if($r[0] =~ /\./) {
+    # We must remove the '.', do the string increment,
+    # and then reinsert the '.' in the appropriate place.
+    my @mantissa = split /\./, $r[0];
+    my $point_pos = -(length($mantissa[1]));
+    my $t = $mantissa[0] . $mantissa[1];
+    $t++;
+    substr($t, $point_pos, 0, '.');
+    $r[0] = $t;
+  }
+  else {
+    $r[0]++;
+    $r[1]++ while $r[0] =~ s/0$//;
+  }
+
+
+  my $incremented = $r[1] ? $r[0] . 'e' . $r[1]
+                          : $r[0];
+
+  return $incremented if atonv($incremented) == abs($op);
+  return 'ok';
+}
+
+sub _decrement {
+  my $shift = shift;
+  my @r = split /e/i, $shift;
+
+  # Remove all trailing zeroes from $r[0];
+
+  if($r[0] =~ /\./) {
+    chop($r[0]) while $r[0] =~ /0$/;
+  }
+
+  $r[0] =~ s/\.$//;
+  $r[1] = defined $r[1] ? $r[1] : 0;
+  while($r[0] =~ /0$/) {
+    chop $r[0];
+    $r[1]++;
+  }
+
+  return $shift if length($r[0]) < 2;
+
+  my $substitute = substr($r[0], -1, 1) - 1;
+  substr($r[0], -1, 1, "$substitute");
+
+  my $ret = $r[1] ? $r[0] . 'e' . $r[1]
+                  : $r[0];
+
+  return $ret;
+}
+
+#sub tz_test {
+#  # Detect any unwanted trailing zeroes
+#  # in values returned by nvtoa().
+#
+#  my $s = shift;
+#  my @r = split /e/i, $s;
+#
+#  if(!defined($r[1])) {
+#    return 1 if $r[0] =~ /\.0$/; # pass
+#    return 0 if $r[0] =~ /0$/;   # fail
+#  }
+#
+#  return 0 if $r[0] =~ /0$/;     # fail (for our formatting convention)
+#  return 1;                      # pass
+#}
 
 1;
 

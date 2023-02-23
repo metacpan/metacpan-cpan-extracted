@@ -1,5 +1,8 @@
 Revision history for Game::Xomb
 
+1.05    2023-02-22 23:30 UTC
+	* moved off of github
+
 1.04    2022-07-26 15:20 UTC
 	* use a Real Boolean(TM) to fix bleadperl test failure [RT#143857]
 

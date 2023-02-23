@@ -37,7 +37,7 @@ name: Plack-Middleware-Greylist
 provides:
   Plack::Middleware::Greylist:
     file: lib/Plack/Middleware/Greylist.pm
-    version: v0.4.1
+    version: v0.4.2
 recommends:
   Cache::FastMmap: '0'
   Ref::Util::XS: '0'
@@ -55,7 +55,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/Plack-Middleware-Greylist/issues
   repository: git://github.com/robrwo/Plack-Middleware-Greylist.git
-version: v0.4.1
+version: v0.4.2
 x_authority: cpan:RRWO
 x_contributors:
   - 'Gabor Szabo <gabor@szabgab.com>'

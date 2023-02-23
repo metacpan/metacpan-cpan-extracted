@@ -160,7 +160,9 @@ if(MPC_HEADER_V >= 66304) {
   Rmpcr_get_exp Rmpcr_get_exp_mpfr
   Rmpcr_mul_2ui  Rmpcr_div_2ui  Rmpcr_sqr  Rmpcr_sqrt  Rmpcr_sub_rnd
   Rmpcr_c_abs_rnd  Rmpcr_add_rounding_error
-  Rmpcr_print  Rmpcr_say  Rmpcr_out_str Rmpcr_split
+  Rmpcr_split
+  Rmpcr_print      Rmpcr_say      Rmpcr_out_str
+  Rmpcr_print_win  Rmpcr_say_win  Rmpcr_out_str_win
           );
 
 @ball = qw (
@@ -173,7 +175,7 @@ Rmpcb_can_round Rmpcb_round Rmpcb_retrieve
 }
 
     @Math::MPC::EXPORT_OK = (@tagged, @radius, @ball);
-    our $VERSION = '1.30';
+    our $VERSION = '1.31';
     #$VERSION = eval $VERSION;
 
     Math::MPC->DynaLoader::bootstrap($VERSION);
@@ -232,10 +234,13 @@ if(MPC_HEADER_V >= 66304) { # mpc library is at least version 1.3.0
   *Rmpcr_max = \&Math::MPC::Radius::Rmpcr_max;
   *Rmpcr_get_exp = \&Math::MPC::Radius::Rmpcr_get_exp;
   *Rmpcr_get_exp_mpfr = \&Math::MPC::Radius::Rmpcr_get_exp_mpfr;
-  *Rmpcr_out_str = \&Math::MPC::Radius::Rmpcr_out_str;
   *Rmpcr_split = \&Math::MPC::Radius::Rmpcr_split;
-  *Rmpcr_print = \&Math::MPC::Radius::Rmpcr_print;
-  *Rmpcr_say = \&Math::MPC::Radius::Rmpcr_say;
+  *Rmpcr_out_str     = \&Math::MPC::Radius::Rmpcr_out_str;
+  *Rmpcr_out_str_win = \&Math::MPC::Radius::Rmpcr_out_str_win; # For MS Windows only
+  *Rmpcr_print       = \&Math::MPC::Radius::Rmpcr_print;
+  *Rmpcr_print_win   = \&Math::MPC::Radius::Rmpcr_print_win;   # For MS Windows only
+  *Rmpcr_say         = \&Math::MPC::Radius::Rmpcr_say;
+  *Rmpcr_say_win     = \&Math::MPC::Radius::Rmpcr_say_win;     # For MS Windows only
   *Rmpcr_add = \&Math::MPC::Radius::Rmpcr_add;
   *Rmpcr_sub = \&Math::MPC::Radius::Rmpcr_sub;
   *Rmpcr_mul = \&Math::MPC::Radius::Rmpcr_mul;

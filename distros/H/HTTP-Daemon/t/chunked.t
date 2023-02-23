@@ -1,21 +1,17 @@
 use strict;
 use warnings;
 
-use Config;
-use HTTP::Daemon;
 use Test::More;
 
 # use Time::HiRes qw(sleep);
 our $CRLF;
-use Socket qw($CRLF AF_INET AF_INET6);
-
-our $LOGGING = 0;
+use Socket qw($CRLF);
 
 our @TESTS = (
     {
         expect  => 629,
         comment => "traditional, unchunked POST request",
-        raw     => "POST /cgi-bin/redir-TE.pl HTTP/1.1
+        raw     => "POST /content-length HTTP/1.1
 User-Agent: UNTRUSTED/1.0
 Content-Type: application/x-www-form-urlencoded
 Content-Length: 629
@@ -26,7 +22,7 @@ JSR-205=0;font_small=15;png=1;jpg=1;alpha_channel=256;JSR-82=0;JSR-135=1;mot-wt=
     {
         expect  => 8,
         comment => "chunked with illegal Content-Length header; tiny message",
-        raw     => "POST /cgi-bin/redir-TE.pl HTTP/1.1
+        raw     => "POST /content-length HTTP/1.1
 Host: localhost
 Content-Type: application/x-www-form-urlencoded
 Content-Length: 8
@@ -41,7 +37,7 @@ icm.x=u2
     {
         expect  => 868,
         comment => "chunked with illegal Content-Length header; medium sized",
-        raw     => "POST /cgi-bin/redir-TE.pl HTTP/1.1
+        raw     => "POST /content-length HTTP/1.1
 Host:dev05
 Connection:close
 Content-Type:application/x-www-form-urlencoded
@@ -57,7 +53,7 @@ JSR-205=0;font_small=20;png=1;jpg=1;JSR-82=0;JSR-135=1;mot-wt=0;JSR-75-pim=0;htt
     {
         expect  => 1104,
         comment => "chunked correctly, size ~1k; base for the big next test",
-        raw     => "POST /cgi-bin/redir-TE.pl HTTP/1.1
+        raw     => "POST /content-length HTTP/1.1
 User-Agent: UNTRUSTED/1.0
 Content-Type: application/x-www-form-urlencoded
 Host: localhost:80
@@ -73,7 +69,7 @@ JSR-205=0;font_small=15;png=1;jpg=1;jsr184_dithering=0;CLEAR/DELETE=-8;JSR-82=0;
         expect  => 1104 * 1024,
         comment => "chunked with many chunks",
         raw     => (
-            "POST /cgi-bin/redir-TE.pl HTTP/1.1
+            "POST /content-length HTTP/1.1
 User-Agent: UNTRUSTED/1.0
 Content-Type: application/x-www-form-urlencoded
 Host: localhost:80
@@ -91,103 +87,33 @@ JSR-205=0;font_small=15;png=1;jpg=1;jsr184_dithering=0;CLEAR/DELETE=-8;JSR-82=0;
     },
 );
 
+use lib 't/lib';
+use TestServer::Reflect;
+use IO::Socket::IP;
 
-my $can_fork
-    = $Config{d_fork}
-    || (($^O eq 'MSWin32' || $^O eq 'NetWare')
-    and $Config{useithreads}
-    and $Config{ccflags} =~ /-DPERL_IMPLICIT_SYS/);
+plan tests => scalar @TESTS;
 
-my $tests = @TESTS;
-my $tport = 8334;
+my $daemon = TestServer::Reflect->new;
+my $url = $daemon->start;
 
-my %addresses = (
-    AF_INET6() => {server => '::1',      client => '::1'},
-    AF_INET()  => {server => '127.0.0.1', client => '127.0.0.1'}
-);
-my $family;
-my $tsock = IO::Socket::IP->new(
-    LocalPort => $tport,
-    Listen    => 1,
-    ReuseAddr => 1
-);
-if ($tsock) {
-    $family = $tsock->sockdomain;
-    close $tsock;
-}
+my $addr = $url->host;
+my $port = $url->port;
 
-if (!$can_fork) {
-    plan skip_all => "This system cannot fork";
-}
-elsif (!defined $family) {
-    plan skip_all => "Cannot listen on unspecifed address and port $tport";
-}
-else {
-    plan tests => $tests;
-}
+for my $test (@TESTS) {
+    my $raw  = $test->{raw};
+    $raw =~ s/\r?\n/$CRLF/mg;
 
-sub mywarn ($) {
-    return unless $LOGGING;
-    my ($mess) = @_;
-    open my $fh, ">>", "http-daemon.out" or die $!;
-    my $ts = localtime;
-    print $fh "$ts: $mess\n";
-    close $fh or die $!;
-}
-
-
-my $pid;
-if ($pid = fork) {
-    sleep 4;
-    for my $t (0 .. $#TESTS) {
-        my $test = $TESTS[$t];
-        my $raw  = $test->{raw};
-        $raw =~ s/\r?\n/$CRLF/mg;
-        if (0) {
-            open my $fh, "| socket localhost $tport" or die;
-            print $fh $test;
-        }
-        use IO::Socket::IP;
-        my $sock = IO::Socket::IP->new(
-            PeerAddr => $addresses{$family}->{client},
-            PeerPort => $tport,
-        ) or die;
-        if (0) {
-            for my $pos (0 .. length($raw) - 1) {
-                print $sock substr($raw, $pos, 1);
-                sleep 0.001;
-            }
-        }
-        else {
-            print $sock $raw;
-        }
-        local $/;
-        my $resp = <$sock>;
-        close $sock;
-        my ($got) = $resp =~ /\r?\n\r?\n(\d+)/s;
-        is($got, $test->{expect}, "[$test->{expect}] $test->{comment}",);
-    }
-    wait;
-}
-else {
-    die "cannot fork: $!" unless defined $pid;
-    my $d = HTTP::Daemon->new(
-        LocalAddr => $addresses{$family}->{server},
-        LocalPort => $tport,
-        ReuseAddr => 1,
+    my $sock = IO::Socket::IP->new(
+        PeerAddr => $addr,
+        PeerPort => $port,
     ) or die;
-    mywarn "Starting new daemon as '$$'";
-    my $i;
-LISTEN: while (my $c = $d->accept) {
-        my $r = $c->get_request;
-        mywarn sprintf "headers[%s] content[%s]", $r->headers->as_string,
-            $r->content;
-        my $res = HTTP::Response->new(200, undef, undef,
-            length($r->content) . $CRLF);
-        $c->send_response($res);
-        $c->force_last_request;    # we're just not mature enough
-        $c->close;
-        undef($c);
-        last if ++$i >= $tests;
-    }
+
+    print $sock $raw;
+
+    my $resp = do { local $/; <$sock> };
+    close $sock;
+
+    my ($got) = $resp =~ /\r?\n\r?\n(\d+)/s;
+
+    is($got, $test->{expect}, "[$test->{expect}] $test->{comment}");
 }

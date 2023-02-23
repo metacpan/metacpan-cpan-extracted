@@ -157,4 +157,50 @@ typedef __float128 float128;
          if(SvIV(get_sv("Math::MPFI::NOK_POK", 0))) \
            warn("Scalar passed to %s is both NV and PV. Using PV (string) value"
 
+/******************************************************************************
+My (sisyphus) MS Visual Studio builds are unable to resolve some (comparison)
+routines - eg mpfi_cmp, mpfi_cmp_d, mpfi_cmp_fr, ....
+They can however resolve the "_default" versions - namely mpfi_cmp_default,
+mpfi_cmp_d_default, mpfi_cmp_fr_default, etc.
+So, until a better solution is found, I define (below) the following symbols
+for both compilers (like Visual Studio) that can't find the non-"default"
+forms, and those that can.
+******************************************************************************/
+
+#ifndef _MSC_VER
+/* Unchanged - ie defined to be what was originally used */
+#define MPFI_CMP_UI(x,y) mpfi_cmp_ui(x,y)
+#define MPFI_CMP_SI(x,y) mpfi_cmp_si(x,y)
+#define MPFI_CMP_FR(x,y) mpfi_cmp_fr(x,y)
+#define MPFI_CMP_D(x,y) mpfi_cmp_d(x,y)
+#define MPFI_CMP_Z(x,y) mpfi_cmp_z(x,y)
+#define MPFI_CMP_Q(x,y) mpfi_cmp_q(x,y)
+#define MPFI_CMP(x,y) mpfi_cmp(x,y)
+#define MPFI_IS_STRICTLY_NEG(x) mpfi_is_strictly_neg(x)
+#define MPFI_IS_STRICTLY_POS(x) mpfi_is_strictly_pos(x)
+#define MPFI_IS_NEG(x) mpfi_is_neg(x)
+#define MPFI_IS_POS(x) mpfi_is_pos(x)
+#define MPFI_IS_NONNEG(x) mpfi_is_nonneg(x)
+#define MPFI_IS_NONPOS(x) mpfi_is_nonpos(x)
+#define MPFI_IS_ZERO_PORTABLE(x) mpfi_is_zero(x)
+
+#else
+/* Defined to use the "_default" rendition */
+#define MPFI_CMP_UI(x,y) mpfi_cmp_ui_default(x,y)
+#define MPFI_CMP_SI(x,y) mpfi_cmp_si_default(x,y)
+#define MPFI_CMP_FR(x,y) mpfi_cmp_fr_default(x,y)
+#define MPFI_CMP_D(x,y) mpfi_cmp_d_default(x,y)
+#define MPFI_CMP_Z(x,y) mpfi_cmp_z_default(x,y)
+#define MPFI_CMP_Q(x,y) mpfi_cmp_q_default(x,y)
+#define MPFI_CMP(x,y) mpfi_cmp_default(x,y)
+#define MPFI_IS_STRICTLY_NEG(x) mpfi_is_strictly_neg_default(x)
+#define MPFI_IS_STRICTLY_POS(x) mpfi_is_strictly_pos_default(x)
+#define MPFI_IS_NEG(x) mpfi_is_neg_default(x)
+#define MPFI_IS_POS(x) mpfi_is_pos_default(x)
+#define MPFI_IS_NONNEG(x) mpfi_is_nonneg_default(x)
+#define MPFI_IS_NONPOS(x) mpfi_is_nonpos_default(x)
+#define MPFI_IS_ZERO_PORTABLE(x) mpfi_is_zero_default(x)
+
+#endif
+
 

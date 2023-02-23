@@ -11,6 +11,7 @@ V/Makefile.PL
 Random/Random.xs
 Random/Random.pm
 Random/Makefile.PL
+Random/t/a_v_random.t
 Random/t/gmp_random.t
 README
 t/_1aaa_v.t

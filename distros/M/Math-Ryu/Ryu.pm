@@ -7,22 +7,19 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 #$VERSION = eval $VERSION;
 DynaLoader::bootstrap Math::Ryu $VERSION;
 
-@Math::Ryu::EXPORT = ();
-@Math::Ryu::EXPORT_OK = qw(
+my @tagged = qw(
     d2s s2d
     d2s_buffered_n d2s_buffered d2fixed_buffered_n d2fixed_buffered
     d2fixed d2fixed d2exp_buffered_n d2exp_buffered d2exp
     );
 
-%Math::Ryu::EXPORT_TAGS = (all => [qw(
-    d2s s2d
-    d2s_buffered_n d2s_buffered d2fixed_buffered_n d2fixed_buffered
-    d2fixed d2fixed d2exp_buffered_n d2exp_buffered d2exp
-    )]);
+@Math::Ryu::EXPORT = ();
+@Math::Ryu::EXPORT_OK = @tagged;
+%Math::Ryu::EXPORT_TAGS = (all => \@tagged);
 
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
 

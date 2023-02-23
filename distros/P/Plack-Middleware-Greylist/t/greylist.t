@@ -207,11 +207,17 @@ subtest "greylist (blocked)" => sub {
 
         my $req = HEAD "/", "X-Forwarded-For" => "13.67.224.13";
 
-        my $res = $cb->($req);
-        is $res->code, HTTP_FORBIDDEN, "forbidden";
+        for ( 1 .. 2 ) {
+            my $res = $cb->($req);
+            is $res->code, HTTP_FORBIDDEN, "forbidden";
+        }
 
-
-        is_deeply \@logs, [ { level => "warn", message => "Rate limiting 13.67.224.13 after 1/0 for 13.64.0.0/11" } ], "logs";
+        is_deeply \@logs,
+          [
+            { level => "warn", message => "Rate limiting 13.67.224.13 after 1/0 for 13.64.0.0/11" },
+            { level => "warn", message => "Rate limiting 13.67.224.13 after 2/0 for 13.64.0.0/11" },
+          ],
+          "logs";
 
       };
 

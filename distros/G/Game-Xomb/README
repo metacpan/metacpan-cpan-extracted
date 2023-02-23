@@ -52,12 +52,12 @@ Documentation is available in xomb(1) or by running:
 
 For the source code, see:
 
-https://github.com/thrig/Game-Xomb
+https://thrig.me/src/Game-Xomb.git
 
 
 This can be built and installed (chasing dependencies):
 
-    git clone https://github.com/thrig/Game-Xomb
+    git clone https://thrig.me/src/Game-Xomb.git
     cd Game-Xomb
     cpanm .
 
@@ -70,11 +70,11 @@ or without dependencies the manual old fashioned way:
 
 and new releases may be authored along the lines of:
 
-    git tag -u ... -s v...
-    git push github master
     RELEASE_TESTING=1 TEST_SIGNATURE=1 ./Build disttest
     RELEASE_TESTING=1 TEST_SIGNATURE=1 ./Build dist
+    git tag -u ... -s v...
     cpan-upload ...
+    git push ...
     ./Build realclean
 
 If the same directory is shared between different systems the build tree

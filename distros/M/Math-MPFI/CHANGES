@@ -1,5 +1,11 @@
+0.13
+ - In Makefile.PL, add -lquadmath link for Cygwin -Dusequadmath builds only, as this
+   is apparently often needed by this system/configuration.
+ - Accommodate perls built by MS Visual Studio 2022
+
 0.12
- - Work around perl bug in https://github.com/Perl/perl5/issues/19550
+ - Work around perl bug in https://github.com/Perl/perl5/issues/19550,.
+   (Affected only perl-5.35.10.)
 
 0.11
  - Fix bug re inconsistent settings of POK and NOK flag, which manifests itself as (eg):

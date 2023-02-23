@@ -1,6 +1,6 @@
 package Insight::Scriptures;
 use 5.006; use strict; use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use JSON::Lines;
 use JSON;
 
@@ -227,11 +227,11 @@ __END__
 
 =head1 NAME
 
-Insight::Scriptures - The great new Insight::Scriptures!
+Insight::Scriptures - I'm the next Jah, my inners life is a miracle.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

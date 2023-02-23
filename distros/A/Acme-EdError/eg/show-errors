@@ -1,6 +1,0 @@
-#!/usr/bin/perl
-
-use Acme::EdError;
-
-warn "uh oh\n";
-die "oh well\n";

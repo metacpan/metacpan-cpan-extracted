@@ -51,62 +51,78 @@ my $write = open $wr, '>', 'fpif.txt';
 warn "Couldn't open export file for writing: $!"
   unless $write;
 
-if($write) {
-  binmode($wr);
-  eval {$ret = Rmpfr_fpif_export($wr, $float);};
-  if($@) {
-    if($@ =~ /^Rmpfr_fpif_export not implemented \- need at least mpfr\-4\.0\.0/) {print "ok 2\n"}
+###############################################
+
+unless($ENV{SISYPHUS_SKIP}) {
+  # Because of the way I (sisyphus) build this module with MS
+  # Visual Studio, XSubs that take a filehandle as an argument
+  # do not work. It therefore suits my purposes to be able to
+  # avoid calling (and testing) those particular XSubs
+
+  if($write) {
+    binmode($wr);
+    eval {$ret = Rmpfr_fpif_export($wr, $float);};
+    if($@) {
+      if($@ =~ /^Rmpfr_fpif_export not implemented \- need at least mpfr\-4\.0\.0/) {print "ok 2\n"}
+      else {
+        warn "\n\$\@:\n$@\n";
+        print "not ok 2\n";
+      }
+    }
+  else {
+    if($ret == 0) {print "ok 2\n"}
     else {
-      warn "\n\$\@:\n$@\n";
+      warn "\nRmpfr_fpif_export failed\n";
       print "not ok 2\n";
     }
   }
-else {
-  if($ret == 0) {print "ok 2\n"}
-  else {
-    warn "\nRmpfr_fpif_export failed\n";
-    print "not ok 2\n";
+
+   close $wr or warn "Could not close export file: $!";
   }
-}
+  else {
+    warn "\n Skipping test 2: export file not created\n";
+    print "ok 2\n";
+  }
 
- close $wr or warn "Could not close export file: $!";
-}
-else {
-  warn "\n Skipping test 2: export file not created\n";
-  print "ok 2\n";
-}
+  my $retrieve = Rmpfr_init2(2500);
 
-my $retrieve = Rmpfr_init2(2500);
+  my $read = open $rd, '<', 'fpif.txt';
 
-my $read = open $rd, '<', 'fpif.txt';
+  warn "Couldn't open export file for reading: $!"
+    unless $read;
 
-warn "Couldn't open export file for reading: $!"
-  unless $read;
-
-if($read) {
-  binmode($rd);
-  eval {$ret = Rmpfr_fpif_import($retrieve, $rd);};
-  if($@) {
-    if($@ =~ /^Rmpfr_fpif_import not implemented \- need at least mpfr\-4\.0\.0/) {print "ok 3\n"}
-    else {
-      warn "\n\$\@:\n$@\n";
-      print "not ok 3\n";
+  if($read) {
+    binmode($rd);
+    eval {$ret = Rmpfr_fpif_import($retrieve, $rd);};
+    if($@) {
+      if($@ =~ /^Rmpfr_fpif_import not implemented \- need at least mpfr\-4\.0\.0/) {print "ok 3\n"}
+      else {
+        warn "\n\$\@:\n$@\n";
+        print "not ok 3\n";
+      }
     }
-  }
-else {
-  if($ret == 0 && $retrieve == $float) {print "ok 3\n"}
-  else {
-    warn "\n3: Got $ret and $retrieve\n";
-    print "not ok 3\n";
-  }
-}
+    else {
+      if($ret == 0 && $retrieve == $float) {print "ok 3\n"}
+      else {
+        warn "\n3: Got $ret and $retrieve\n";
+        print "not ok 3\n";
+      }
+    }
 
- close $rd or warn "Could not close export file: $!";
+  close $rd or warn "Could not close export file: $!";
+  }
+  else {
+    warn "\n Skipping test 3: import file not readable\n";
+    print "ok 3\n";
+  }
 }
 else {
-  warn "\n Skipping test 3: import file not readable\n";
+  warn "skipping tests 2 and 3 - \$ENV{SISYPHUS_SKIP} is set\n";
+  print "ok 2\n";
   print "ok 3\n";
 }
+
+#######################################################
 
 if($have_new) {
   Rmpfr_clear_underflow();

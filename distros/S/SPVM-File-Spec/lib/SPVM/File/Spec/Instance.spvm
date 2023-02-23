@@ -64,6 +64,10 @@ class File::Spec::Instance {
     return $self->(File::Spec::Instance::Interface)->file_name_is_absolute($path);
   }
   
+  method file_name_is_root : int ($path : string) {
+    return $self->(File::Spec::Instance::Interface)->file_name_is_root($path);
+  }
+  
   method path : string[] () {
     return $self->(File::Spec::Instance::Interface)->path;
   }
@@ -91,12 +95,4 @@ class File::Spec::Instance {
   method rel2abs : string ($path : string, $base = undef : string) {
     return $self->(File::Spec::Instance::Interface)->rel2abs($path, $base);
   }
-
-=pod NOTE
-  
-  # The following method is not supported because cross compilation is important for SPVM.
-  method case_tolerant : int ();
-
-=cut
-
 }

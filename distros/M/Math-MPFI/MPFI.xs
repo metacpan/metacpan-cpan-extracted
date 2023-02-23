@@ -1208,59 +1208,59 @@ Comparison Functions
 *******************************/
 
 int Rmpfi_cmp (mpfi_t * op1, mpfi_t * op2) {
-    return mpfi_cmp(*op1, *op2);
+    return MPFI_CMP(*op1,*op2);
 }
 
 int Rmpfi_cmp_d (pTHX_ mpfi_t * op1, SV * op2) {
-    return mpfi_cmp_d(*op1, (double)SvNV(op2));
+    return MPFI_CMP_D(*op1, (double)SvNV(op2));
 }
 
 int Rmpfi_cmp_ui (mpfi_t * op1, unsigned long op2) {
-    return mpfi_cmp_ui(*op1, op2);
+    return MPFI_CMP_UI(*op1, op2);
 }
 
 int Rmpfi_cmp_si (mpfi_t * op1, long op2) {
-    return mpfi_cmp_si(*op1, op2);
+    return MPFI_CMP_SI(*op1, op2);
 }
 
 int Rmpfi_cmp_z (mpfi_t * op1, mpz_t * op2) {
-    return mpfi_cmp_z(*op1, *op2);
+    return MPFI_CMP_Z(*op1, *op2);
 }
 
 int Rmpfi_cmp_q (mpfi_t * op1, mpq_t * op2) {
-    return mpfi_cmp_q(*op1, *op2);
+    return MPFI_CMP_Q(*op1, *op2);
 }
 
 int Rmpfi_cmp_fr (mpfi_t * op1, mpfr_t * op2) {
-    return mpfi_cmp_fr(*op1, *op2);
+    return MPFI_CMP_FR(*op1, *op2);
 }
 
 int Rmpfi_is_pos(mpfi_t * op) {
-    return mpfi_is_pos(*op);
+    return MPFI_IS_POS(*op);
 }
 
 int Rmpfi_is_strictly_pos(mpfi_t * op) {
-    return mpfi_is_strictly_pos(*op);
+    return MPFI_IS_STRICTLY_POS(*op);
 }
 
 int Rmpfi_is_nonneg(mpfi_t * op) {
-    return mpfi_is_nonneg(*op);
+    return MPFI_IS_NONNEG(*op);
 }
 
 int Rmpfi_is_neg(mpfi_t * op) {
-    return mpfi_is_neg(*op);
+    return MPFI_IS_NEG(*op);
 }
 
 int Rmpfi_is_strictly_neg(mpfi_t * op) {
-    return mpfi_is_strictly_neg(*op);
+    return MPFI_IS_STRICTLY_NEG(*op);
 }
 
 int Rmpfi_is_nonpos(mpfi_t * op) {
-    return mpfi_is_nonpos(*op);
+    return MPFI_IS_NONPOS(*op);
 }
 
 int Rmpfi_is_zero(mpfi_t * op) {
-    return mpfi_is_zero(*op);
+    return MPFI_IS_ZERO_PORTABLE(*op);
 }
 
 int Rmpfi_has_zero(mpfi_t * op) {
@@ -1471,7 +1471,11 @@ Error Handling
 *******************************/
 
 void RMPFI_ERROR (pTHX_ SV * msg) {
+#ifndef _MSC_VER
      MPFI_ERROR(SvPV_nolen(msg));
+#else
+     croak("RMPFI_ERROR is not yet available for this architecture");
+#endif
 }
 
 int Rmpfi_is_error(void) {
@@ -1539,8 +1543,8 @@ SV * overload_spaceship(pTHX_ mpfi_t * a, SV * b, SV * third) {
 
 #ifndef MATH_MPFI_NEED_LONG_LONG_INT
      if(SV_IS_IOK(b)) {
-       if(SvUOK(b)) ret = mpfi_cmp_ui(*a, SvUVX(b));
-       else ret = mpfi_cmp_si(*a, SvIVX(b));
+       if(SvUOK(b)) ret = MPFI_CMP_UI(*a,SvUVX(b));
+       else ret = MPFI_CMP_SI(*a,SvIVX(b));
 
        if(SWITCH_ARGS) ret *= -1;
        return newSViv(ret);
@@ -1551,7 +1555,7 @@ SV * overload_spaceship(pTHX_ mpfi_t * a, SV * b, SV * third) {
        if(SvUOK(b)) mpfr_set_uj(t, SvUVX(b), __gmpfr_default_rounding_mode);
        else         mpfr_set_sj(t, SvIVX(b), __gmpfr_default_rounding_mode);
 
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        if(SWITCH_ARGS) ret *= -1;
        mpfr_clear(t);
        return newSViv(ret);
@@ -1588,7 +1592,7 @@ SV * overload_spaceship(pTHX_ mpfi_t * a, SV * b, SV * third) {
        if(mpfr_init_set_str(t, (char *)SvPV_nolen(b), 0, __gmpfr_default_rounding_mode))
          croak("%s", "Invalid string supplied to Math::MPFI::overload_spaceship");
 #endif
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        mpfr_clear(t);
        if(SWITCH_ARGS) ret *= -1;
        return newSViv(ret);
@@ -1603,7 +1607,7 @@ SV * overload_spaceship(pTHX_ mpfi_t * a, SV * b, SV * third) {
 
 #ifdef NV_IS_DOUBLE
 
-       ret = mpfi_cmp_d(*a, SvNVX(b));
+       ret = MPFI_CMP_D(*a, SvNVX(b));
        if(SWITCH_ARGS) ret *= -1;
 
 
@@ -1611,7 +1615,7 @@ SV * overload_spaceship(pTHX_ mpfi_t * a, SV * b, SV * third) {
 
        mpfr_init2(t, REQUIRED_LDBL_MANT_DIG);
        mpfr_set_ld(t, SvNVX(b), GMP_RNDN);
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a, t);
        if(SWITCH_ARGS) ret *= -1;
        mpfr_clear(t);
 
@@ -1619,7 +1623,7 @@ SV * overload_spaceship(pTHX_ mpfi_t * a, SV * b, SV * third) {
 
        mpfr_init2(t, FLT128_MANT_DIG);
        mpfr_set_float128(t, SvNVX(b), GMP_RNDN);
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a, t);
        if(SWITCH_ARGS) ret *= -1;
        mpfr_clear(t);
 
@@ -1627,7 +1631,7 @@ SV * overload_spaceship(pTHX_ mpfi_t * a, SV * b, SV * third) {
 /* NV_IS_FLOAT128 */
        mpfr_init2(t, FLT128_MANT_DIG);
        _my_mpfr_set_float128(aTHX_ &t, b, GMP_RNDN);
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a, t);
        if(SWITCH_ARGS) ret *= -1;
        mpfr_clear(t);
 
@@ -1639,7 +1643,7 @@ SV * overload_spaceship(pTHX_ mpfi_t * a, SV * b, SV * third) {
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::MPFI")) {
-         ret = mpfi_cmp(*a, *(INT2PTR(mpfi_t *, SvIVX(SvRV(b)))));
+         ret = MPFI_CMP(*a, *(INT2PTR(mpfi_t *, SvIVX(SvRV(b)))));
          return newSViv(ret);
        }
      }
@@ -1655,8 +1659,8 @@ SV * overload_gte(pTHX_ mpfi_t * a, SV * b, SV * third) {
 
 #ifndef MATH_MPFI_NEED_LONG_LONG_INT
      if(SV_IS_IOK(b)) {
-       if(SvUOK(b)) ret = mpfi_cmp_ui(*a, SvUVX(b));
-       else         ret = mpfi_cmp_si(*a, SvIVX(b));
+       if(SvUOK(b)) ret = MPFI_CMP_UI(*a, SvUVX(b));
+       else         ret = MPFI_CMP_SI(*a, SvIVX(b));
 
        if(SWITCH_ARGS) ret *= -1;
        if(ret >= 0) return newSViv(1);
@@ -1668,7 +1672,7 @@ SV * overload_gte(pTHX_ mpfi_t * a, SV * b, SV * third) {
        if(SvUOK(b)) mpfr_set_uj(t, SvUVX(b), __gmpfr_default_rounding_mode);
        else         mpfr_set_sj(t, SvIVX(b), __gmpfr_default_rounding_mode);
 
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a, t);
        if(SWITCH_ARGS) ret *= -1;
        mpfr_clear(t);
        if(ret >= 0) return newSViv(1);
@@ -1706,7 +1710,7 @@ SV * overload_gte(pTHX_ mpfi_t * a, SV * b, SV * third) {
        if(mpfr_init_set_str(t, (char *)SvPV_nolen(b), 0, __gmpfr_default_rounding_mode))
          croak("%s", "Invalid string supplied to Math::MPFI::overload_gte");
 #endif
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        mpfr_clear(t);
        if(SWITCH_ARGS) ret *= -1;
        if(ret >= 0) return newSViv(1);
@@ -1722,7 +1726,7 @@ SV * overload_gte(pTHX_ mpfi_t * a, SV * b, SV * third) {
 
 #ifdef NV_IS_DOUBLE
 
-       ret = mpfi_cmp_d(*a, SvNVX(b));
+       ret = MPFI_CMP_D(*a,SvNVX(b));
        if(SWITCH_ARGS) ret *= -1;
 
 
@@ -1730,7 +1734,7 @@ SV * overload_gte(pTHX_ mpfi_t * a, SV * b, SV * third) {
 
        mpfr_init2(t, REQUIRED_LDBL_MANT_DIG);
        mpfr_set_ld(t, SvNVX(b), GMP_RNDN);
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        if(SWITCH_ARGS) ret *= -1;
        mpfr_clear(t);
 
@@ -1738,7 +1742,7 @@ SV * overload_gte(pTHX_ mpfi_t * a, SV * b, SV * third) {
 
        mpfr_init2(t, FLT128_MANT_DIG);
        mpfr_set_float128(t, SvNVX(b), GMP_RNDN);
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        if(SWITCH_ARGS) ret *= -1;
        mpfr_clear(t);
 
@@ -1746,7 +1750,7 @@ SV * overload_gte(pTHX_ mpfi_t * a, SV * b, SV * third) {
 /* NV_IS_FLOAT128 */
        mpfr_init2(t, FLT128_MANT_DIG);
        _my_mpfr_set_float128(aTHX_ &t, b, GMP_RNDN);
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        if(SWITCH_ARGS) ret *= -1;
        mpfr_clear(t);
 
@@ -1759,7 +1763,7 @@ SV * overload_gte(pTHX_ mpfi_t * a, SV * b, SV * third) {
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::MPFI")) {
-         ret = mpfi_cmp(*a, *(INT2PTR(mpfi_t *, SvIVX(SvRV(b)))));
+         ret = MPFI_CMP(*a, *(INT2PTR(mpfi_t *,SvIVX(SvRV(b)))));
          if(ret >= 0) return newSViv(1);
          return newSViv(0);
        }
@@ -1776,8 +1780,8 @@ SV * overload_lte(pTHX_ mpfi_t * a, SV * b, SV * third) {
 
 #ifndef MATH_MPFI_NEED_LONG_LONG_INT
      if(SV_IS_IOK(b)) {
-       if(SvUOK(b)) ret = mpfi_cmp_ui(*a, SvUVX(b));
-       else         ret = mpfi_cmp_si(*a, SvIVX(b));
+       if(SvUOK(b)) ret = MPFI_CMP_UI(*a,SvUVX(b));
+       else         ret = MPFI_CMP_SI(*a,SvIVX(b));
 
        if(SWITCH_ARGS) ret *= -1;
        if(ret <= 0) return newSViv(1);
@@ -1789,7 +1793,7 @@ SV * overload_lte(pTHX_ mpfi_t * a, SV * b, SV * third) {
        if(SvUOK(b)) mpfr_set_uj(t, SvUVX(b), __gmpfr_default_rounding_mode);
        else         mpfr_set_sj(t, SvIVX(b), __gmpfr_default_rounding_mode);
 
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        if(SWITCH_ARGS) ret *= -1;
        mpfr_clear(t);
        if(ret <= 0) return newSViv(1);
@@ -1827,7 +1831,7 @@ SV * overload_lte(pTHX_ mpfi_t * a, SV * b, SV * third) {
          croak("%s", "Invalid string supplied to Math::MPFI::overload_lte");
 #endif
 
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        mpfr_clear(t);
        if(SWITCH_ARGS) ret *= -1;
        if(ret <= 0) return newSViv(1);
@@ -1843,14 +1847,14 @@ SV * overload_lte(pTHX_ mpfi_t * a, SV * b, SV * third) {
 
 #ifdef NV_IS_DOUBLE
 
-       ret = mpfi_cmp_d(*a, SvNVX(b));
+       ret = MPFI_CMP_D(*a,SvNVX(b));
        if(SWITCH_ARGS) ret *= -1;
 
 #elif defined(NV_IS_LONG_DOUBLE)
 
        mpfr_init2(t, REQUIRED_LDBL_MANT_DIG);
        mpfr_set_ld(t, SvNVX(b), GMP_RNDN);
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        if(SWITCH_ARGS) ret *= -1;
        mpfr_clear(t);
 
@@ -1858,7 +1862,7 @@ SV * overload_lte(pTHX_ mpfi_t * a, SV * b, SV * third) {
 
        mpfr_init2(t, FLT128_MANT_DIG);
        mpfr_set_float128(t, SvNVX(b), GMP_RNDN);
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        if(SWITCH_ARGS) ret *= -1;
        mpfr_clear(t);
 
@@ -1866,7 +1870,7 @@ SV * overload_lte(pTHX_ mpfi_t * a, SV * b, SV * third) {
 /* NV_IS_FLOAT128 */
        mpfr_init2(t, FLT128_MANT_DIG);
        _my_mpfr_set_float128(aTHX_ &t, b, GMP_RNDN);
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        if(SWITCH_ARGS) ret *= -1;
        mpfr_clear(t);
 
@@ -1879,7 +1883,7 @@ SV * overload_lte(pTHX_ mpfi_t * a, SV * b, SV * third) {
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::MPFI")) {
-         ret = mpfi_cmp(*a, *(INT2PTR(mpfi_t *, SvIVX(SvRV(b)))));
+         ret = MPFI_CMP(*a,*(INT2PTR(mpfi_t *, SvIVX(SvRV(b)))));
          if(ret <= 0) return newSViv(1);
          return newSViv(0);
        }
@@ -1896,8 +1900,8 @@ SV * overload_gt(pTHX_ mpfi_t * a, SV * b, SV * third) {
 
 #ifndef MATH_MPFI_NEED_LONG_LONG_INT
      if(SV_IS_IOK(b)) {
-       if(SvUOK(b)) ret = mpfi_cmp_ui(*a, SvUVX(b));
-       else         ret = mpfi_cmp_si(*a, SvIVX(b));
+       if(SvUOK(b)) ret = MPFI_CMP_UI(*a,SvUVX(b));
+       else         ret = MPFI_CMP_SI(*a,SvIVX(b));
 
        if(SWITCH_ARGS) ret *= -1;
        if(ret > 0) return newSViv(1);
@@ -1909,7 +1913,7 @@ SV * overload_gt(pTHX_ mpfi_t * a, SV * b, SV * third) {
        if(SvUOK(b)) mpfr_set_uj(t, SvUVX(b), __gmpfr_default_rounding_mode);
        else mpfr_set_sj(t, SvIVX(b), __gmpfr_default_rounding_mode);
 
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        if(SWITCH_ARGS) ret *= -1;
        mpfr_clear(t);
        if(ret > 0) return newSViv(1);
@@ -1947,7 +1951,7 @@ SV * overload_gt(pTHX_ mpfi_t * a, SV * b, SV * third) {
          croak("%s", "Invalid string supplied to Math::MPFI::overload_gt");
 #endif
 
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        mpfr_clear(t);
        if(SWITCH_ARGS) ret *= -1;
        if(ret > 0) return newSViv(1);
@@ -1963,14 +1967,14 @@ SV * overload_gt(pTHX_ mpfi_t * a, SV * b, SV * third) {
 
 #ifdef NV_IS_DOUBLE
 
-       ret = mpfi_cmp_d(*a, SvNVX(b));
+       ret = MPFI_CMP_D(*a,SvNVX(b));
        if(SWITCH_ARGS) ret *= -1;
 
 #elif defined(NV_IS_LONG_DOUBLE)
 
        mpfr_init2(t, REQUIRED_LDBL_MANT_DIG);
        mpfr_set_ld(t, SvNVX(b), GMP_RNDN);
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        if(SWITCH_ARGS) ret *= -1;
        mpfr_clear(t);
 
@@ -1978,7 +1982,7 @@ SV * overload_gt(pTHX_ mpfi_t * a, SV * b, SV * third) {
 
        mpfr_init2(t, FLT128_MANT_DIG);
        mpfr_set_float128(t, SvNVX(b), GMP_RNDN);
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        if(SWITCH_ARGS) ret *= -1;
        mpfr_clear(t);
 
@@ -1986,7 +1990,7 @@ SV * overload_gt(pTHX_ mpfi_t * a, SV * b, SV * third) {
 /* NV_IS_FLOAT128 */
        mpfr_init2(t, FLT128_MANT_DIG);
        _my_mpfr_set_float128(aTHX_ &t, b, GMP_RNDN);
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        if(SWITCH_ARGS) ret *= -1;
        mpfr_clear(t);
 
@@ -1999,7 +2003,7 @@ SV * overload_gt(pTHX_ mpfi_t * a, SV * b, SV * third) {
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::MPFI")) {
-         ret = mpfi_cmp(*a, *(INT2PTR(mpfi_t *, SvIVX(SvRV(b)))));
+         ret = MPFI_CMP(*a,*(INT2PTR(mpfi_t *, SvIVX(SvRV(b)))));
          if(ret > 0) return newSViv(1);
          return newSViv(0);
        }
@@ -2016,8 +2020,8 @@ SV * overload_lt(pTHX_ mpfi_t * a, SV * b, SV * third) {
 
 #ifndef MATH_MPFI_NEED_LONG_LONG_INT
      if(SV_IS_IOK(b)) {
-       if(SvUOK(b)) ret = mpfi_cmp_ui(*a, SvUVX(b));
-       else         ret = mpfi_cmp_si(*a, SvIVX(b));
+       if(SvUOK(b)) ret = MPFI_CMP_UI(*a,SvUVX(b));
+       else         ret = MPFI_CMP_SI(*a,SvIVX(b));
 
        if(SWITCH_ARGS) ret *= -1;
        if(ret < 0) return newSViv(1);
@@ -2029,7 +2033,7 @@ SV * overload_lt(pTHX_ mpfi_t * a, SV * b, SV * third) {
        if(SvUOK(b)) mpfr_set_uj(t, SvUVX(b), __gmpfr_default_rounding_mode);
        else  mpfr_set_sj(t, SvIVX(b), __gmpfr_default_rounding_mode);
 
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        if(SWITCH_ARGS) ret *= -1;
        mpfr_clear(t);
        if(ret < 0) return newSViv(1);
@@ -2066,7 +2070,7 @@ SV * overload_lt(pTHX_ mpfi_t * a, SV * b, SV * third) {
        if(mpfr_init_set_str(t, (char *)SvPV_nolen(b), 0, __gmpfr_default_rounding_mode))
          croak("%s", "Invalid string supplied to Math::MPFI::overload_lt");
 #endif
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        mpfr_clear(t);
        if(SWITCH_ARGS) ret *= -1;
        if(ret < 0) return newSViv(1);
@@ -2082,14 +2086,14 @@ SV * overload_lt(pTHX_ mpfi_t * a, SV * b, SV * third) {
 
 #ifdef NV_IS_DOUBLE
 
-       ret = mpfi_cmp_d(*a, SvNVX(b));
+       ret = MPFI_CMP_D(*a,SvNVX(b));
        if(SWITCH_ARGS) ret *= -1;
 
 #elif defined(NV_IS_LONG_DOUBLE)
 
        mpfr_init2(t, REQUIRED_LDBL_MANT_DIG);
        mpfr_set_ld(t, SvNVX(b), GMP_RNDN);
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        if(SWITCH_ARGS) ret *= -1;
        mpfr_clear(t);
 
@@ -2097,7 +2101,7 @@ SV * overload_lt(pTHX_ mpfi_t * a, SV * b, SV * third) {
 
        mpfr_init2(t, FLT128_MANT_DIG);
        mpfr_set_float128(t, SvNVX(b), GMP_RNDN);
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        if(SWITCH_ARGS) ret *= -1;
        mpfr_clear(t);
 
@@ -2105,7 +2109,7 @@ SV * overload_lt(pTHX_ mpfi_t * a, SV * b, SV * third) {
 /* NV_IS_FLOAT128 */
        mpfr_init2(t, FLT128_MANT_DIG);
        _my_mpfr_set_float128(aTHX_ &t, b, GMP_RNDN);
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        if(SWITCH_ARGS) ret *= -1;
        mpfr_clear(t);
 
@@ -2118,7 +2122,7 @@ SV * overload_lt(pTHX_ mpfi_t * a, SV * b, SV * third) {
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::MPFI")) {
-         ret = mpfi_cmp(*a, *(INT2PTR(mpfi_t *, SvIVX(SvRV(b)))));
+         ret = MPFI_CMP(*a,*(INT2PTR(mpfi_t *, SvIVX(SvRV(b)))));
          if(ret < 0) return newSViv(1);
          return newSViv(0);
        }
@@ -2133,8 +2137,8 @@ SV * overload_equiv(pTHX_ mpfi_t * a, SV * b, SV * third) {
 
 #ifndef MATH_MPFI_NEED_LONG_LONG_INT
      if(SV_IS_IOK(b)) {
-       if(SvUOK(b)) ret = mpfi_cmp_ui(*a, SvUVX(b));
-       else         ret = mpfi_cmp_si(*a, SvIVX(b));
+       if(SvUOK(b)) ret = MPFI_CMP_UI(*a,SvUVX(b));
+       else         ret = MPFI_CMP_SI(*a,SvIVX(b));
 
        if(ret == 0) return newSViv(1);
        return newSViv(0);
@@ -2145,7 +2149,7 @@ SV * overload_equiv(pTHX_ mpfi_t * a, SV * b, SV * third) {
        if(SvUOK(b)) mpfr_set_uj(t, SvUVX(b), __gmpfr_default_rounding_mode);
        else         mpfr_set_sj(t, SvIVX(b), __gmpfr_default_rounding_mode);
 
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        mpfr_clear(t);
        if(ret == 0) return newSViv(1);
        return newSViv(0);
@@ -2181,7 +2185,7 @@ SV * overload_equiv(pTHX_ mpfi_t * a, SV * b, SV * third) {
        if(mpfr_init_set_str(t, (char *)SvPV_nolen(b), 0, __gmpfr_default_rounding_mode))
          croak("%s", "Invalid string supplied to Math::MPFI::overload_equiv");
 #endif
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        mpfr_clear(t);
        if(ret == 0) return newSViv(1);
        return newSViv(0);
@@ -2195,27 +2199,27 @@ SV * overload_equiv(pTHX_ mpfi_t * a, SV * b, SV * third) {
 
 #ifdef NV_IS_DOUBLE
 
-       ret = mpfi_cmp_d(*a, SvNVX(b));
+       ret = MPFI_CMP_D(*a,SvNVX(b));
 
 #elif defined(NV_IS_LONG_DOUBLE)
 
        mpfr_init2(t, REQUIRED_LDBL_MANT_DIG);
        mpfr_set_ld(t, SvNVX(b), GMP_RNDN);
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        mpfr_clear(t);
 
 #elif defined(MPFI_CAN_PASS_FLOAT128)
 
        mpfr_init2(t, FLT128_MANT_DIG);
        mpfr_set_float128(t, SvNVX(b), GMP_RNDN);
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        mpfr_clear(t);
 
 #else
 /* NV_IS_FLOAT128 */
        mpfr_init2(t, FLT128_MANT_DIG);
        _my_mpfr_set_float128(aTHX_ &t, b, GMP_RNDN);
-       ret = mpfi_cmp_fr(*a, t);
+       ret = MPFI_CMP_FR(*a,t);
        mpfr_clear(t);
 
 #endif
@@ -2227,7 +2231,7 @@ SV * overload_equiv(pTHX_ mpfi_t * a, SV * b, SV * third) {
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::MPFI")) {
-         ret = mpfi_cmp(*a, *(INT2PTR(mpfi_t *, SvIVX(SvRV(b)))));
+         ret = MPFI_CMP(*a,*(INT2PTR(mpfi_t *, SvIVX(SvRV(b)))));
          if(ret == 0) return newSViv(1);
          return newSViv(0);
        }
@@ -3240,13 +3244,13 @@ void Rmpfi_urandom(mpfr_t * rop, mpfi_t * op, gmp_randstate_t * state) {
 }
 
 SV * overload_true(pTHX_ mpfi_t * op, SV * second, SV * third) {
-     if(mpfi_is_zero(*op)) return newSViv(0);
+     if(MPFI_IS_ZERO_PORTABLE(*op)) return newSViv(0);
      if(mpfi_nan_p(*op)) return newSViv(0);
      return newSViv(1);
 }
 
 SV * overload_not(pTHX_ mpfi_t * op, SV * second, SV * third) {
-     if(mpfi_is_zero(*op)) return newSViv(1);
+     if(MPFI_IS_ZERO_PORTABLE(*op)) return newSViv(1);
      if(mpfi_nan_p(*op)) return newSViv(1);
      return newSViv(0);
 }
@@ -3558,6 +3562,16 @@ int _has_pv_nv_bug(void) {
      return 0;
 #endif
 }
+
+int _msc_ver_defined(void) {
+#ifdef _MSC_VER
+     return 1;
+#else
+     return 0;
+#endif
+}
+
+
 MODULE = Math::MPFI  PACKAGE = Math::MPFI
 
 PROTOTYPES: DISABLE
@@ -5356,5 +5370,9 @@ set_nok_pok (x)
 
 int
 _has_pv_nv_bug ()
+
+
+int
+_msc_ver_defined ()
 
 

@@ -1,21 +1,7 @@
-Acme::EdError - ed(1) compatible error messages for Perl
+Acme::EdError - ed(1) compatible error messages
 
-To install this module, use CPAN, for example:
+this module can be installed using cpanm:
 
   cpan Acme::EdError
 
-This software can be built and installed manually by running:
-
-  perl Makefile.PL
-  make
-  make test
-  make install
-
-Then, run perldoc(1) on Acme::EdError for more documentation.
-
-COPYRIGHT AND LICENCE
-
-Copyright 2009,2012-2013,2015 by Jeremy Mates.
-
-This module is free software; you can redistribute it and/or modify it
-under the Artistic License (2.0).
+run perldoc(1) on Acme::EdError for more documentation

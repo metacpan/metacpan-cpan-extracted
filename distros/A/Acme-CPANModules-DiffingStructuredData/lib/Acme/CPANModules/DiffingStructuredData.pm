@@ -5,13 +5,11 @@ use warnings;
 use Acme::CPANModulesUtil::Misc;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-08'; # DATE
+our $DATE = '2022-12-09'; # DATE
 our $DIST = 'Acme-CPANModules-DiffingStructuredData'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 my $text = <<'_';
-
-**Data structures**
 
 <pm:Data::Comparator>
 
@@ -19,15 +17,11 @@ my $text = <<'_';
 
 <pm:Data::Cmp::Diff>
 
+<pm:Hash::Diff>
 
-**Database schemas**
+<pm:Struct::Diff>
 
-<pm:DBIx::Diff::Schema>
-
-
-**Trees**
-
-TODO
+<pm:Value::Diff>
 
 _
 
@@ -54,11 +48,9 @@ Acme::CPANModules::DiffingStructuredData - List of modules to diff structured da
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::DiffingStructuredData (from Perl distribution Acme-CPANModules-DiffingStructuredData), released on 2022-09-08.
+This document describes version 0.002 of Acme::CPANModules::DiffingStructuredData (from Perl distribution Acme-CPANModules-DiffingStructuredData), released on 2022-12-09.
 
 =head1 DESCRIPTION
-
-B<Data structures>
 
 L<Data::Comparator>
 
@@ -66,31 +58,37 @@ L<Data::Diff>
 
 L<Data::Cmp::Diff>
 
-B<Database schemas>
+L<Hash::Diff>
 
-L<DBIx::Diff::Schema>
+L<Struct::Diff>
 
-B<Trees>
-
-TODO
+L<Value::Diff>
 
 =head1 ACME::CPANMODULES ENTRIES
 
 =over
 
-=item * L<Data::Comparator> - recursively compare Perl datatypes
+=item L<Data::Comparator>
 
 Author: L<CORNELIS|https://metacpan.org/author/CORNELIS>
 
-=item * L<Data::Diff> - data structure comparison module
+=item L<Data::Diff>
 
 Author: L<GCAMPBELL|https://metacpan.org/author/GCAMPBELL>
 
-=item * L<Data::Cmp::Diff>
+=item L<Data::Cmp::Diff>
 
-=item * L<DBIx::Diff::Schema> - Compare schema of two DBI databases
+=item L<Hash::Diff>
 
-Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+Author: L<BOLAV|https://metacpan.org/author/BOLAV>
+
+=item L<Struct::Diff>
+
+Author: L<MIXAS|https://metacpan.org/author/MIXAS>
+
+=item L<Value::Diff>
+
+Author: L<BRTASTIC|https://metacpan.org/author/BRTASTIC>
 
 =back
 

@@ -18,241 +18,250 @@ my $have_decimal128 = undef; # Default value
 my $have_float128   = undef; # Default value
 my $want_float128   = undef; # Default value
 my $checklib        = 1;     # Check for availability of mpfr and gmp libraries.
+my $skip_msvc       = 0;     # Will be reset to 1 for MS compiler builds of perl.
 
-print " Running some (possibly noisy) pre-build checks\n to find out what's available ....\n\n";
+my ($d64_message, $d128_message, $float128_message);
 
-my $SAVE;
-my $save = open $SAVE, '>', 'save_config.txt';
+# The following tests don't work with perls built using MS Visual Studio.
+# We skip them all, as they are not particularly important ... some are
+# even irrelevant.
+# The assumptions (possibly bad) are that, if you're running MS Visual Studio,
+# then you have gmp and mpfr libraries that are compatible with that
+# toolchain, && that those libraries will be found when needed.
+$skip_msvc = 1 if ($Config{'make'} eq 'nmake' && $Config{'cc'} eq 'cl');
 
-warn "Couldn't open save_config.txt for writing: $!" unless $save;
+unless($skip_msvc) {
+  print " Running some (possibly noisy) pre-build checks\n to find out what's available ....\n\n";
 
-my($mycc, $mklib, $mkinc, $mylibpth) = ('', '', '', '') ;
+  my $SAVE;
+  my $save = open $SAVE, '>', 'save_config.txt';
+
+  warn "Couldn't open save_config.txt for writing: $!" unless $save;
+
+  my($mycc, $mklib, $mkinc, $mylibpth) = ('', '', '', '') ;
 
 
-if(@ARGV) {
-  for my $arg(@ARGV) {
-    $mycc   = (split /=/, $arg)[1] if $arg =~ /^cc=/i;
-    $mklib = (split /=/, $arg)[1] if $arg =~ /^libs=/i;
-    $mkinc  = (split /=/, $arg)[1] if $arg =~ /^inc=/i;
-    $checklib = 0 if $arg =~ /^check=0/i;
-  }
-}
-
-unless($mycc) {
-  $mycc = defined($Config{cc}) ? $Config{cc} : 'cc';
-}
-
-my @libpth = split /\s+/, $Config{libpth};
-for(@libpth) { $mylibpth .= " -L$_" }
-$mylibpth .= " -lmpfr -lgmp";
-
-###############################################################
-# Check that -lmpfr and -lgmp can be found. Don't worry about #
-# checking for mpfr.h and gmp.h - if they can't be found when #
-# needed by a smoker then it won't be reported as a FAIL      #
-###############################################################
-
-if($checklib) {
-
-  my $mylibs = $mklib . " " . $mylibpth;
-
-  my $out = `$mycc -o checklib.exe -x c checklib.in $mylibs 2>&1`;
-
-  if($out) {
-    print "$out\n";
-    if($save) {print $SAVE "checklib build: $out\n"}
+  if(@ARGV) {
+    for my $arg(@ARGV) {
+      $mycc   = (split /=/, $arg)[1] if $arg =~ /^cc=/i;
+      $mklib = (split /=/, $arg)[1] if $arg =~ /^libs=/i;
+      $mkinc  = (split /=/, $arg)[1] if $arg =~ /^inc=/i;
+      $checklib = 0 if $arg =~ /^check=0/i;
+    }
   }
 
-  if(-e 'checklib.exe') {
-    $out = $^O =~ /MSWin32/i ? `checklib.exe` : `./checklib.exe`;
-    if($save) {print $SAVE "checklib.exe: $out\n"}
-  }
-  else {
-    warn "\n  Could not resolve '-lmpfr' and/or '-lgmp'\n",
-         "  If this is incorrect please see the 'Checklib' section in the README\n",
-         "  Aborting the build of Math::MPFR\n";
-    exit 0;
-  }
-}
-
-############################################
-# Whether to build with _Decimal64 support #
-############################################
-
-for(@ARGV) {
-  $have_decimal64 = 1 if $_ eq 'D64=1';
-  $have_decimal64 = 0 if $_ eq 'D64=0';
-}
-
-if(!defined($have_decimal64)) { # _Decimal64 support still undetermined
-
-  my $mylibs = $mklib . " " . $mylibpth;
-
-  my $out = `$mycc -o have_d64.exe -x c have_d64.in 2>&1`;
-
-  if($out) {
-    print "$out\n";
-    if($save) {print $SAVE "try_64 build: $out\n"}
+  unless($mycc) {
+    $mycc = defined($Config{cc}) ? $Config{cc} : 'cc';
   }
 
-  unless(-e 'have_d64.exe') {$have_decimal64 = 0}
+  my @libpth = split /\s+/, $Config{libpth};
+  for(@libpth) { $mylibpth .= " -L$_" }
+  $mylibpth .= " -lmpfr -lgmp";
 
-  else { # _Decimal64 support still undetermined
+  ###############################################################
+  # Check that -lmpfr and -lgmp can be found. Don't worry about #
+  # checking for mpfr.h and gmp.h - if they can't be found when #
+  # needed by a smoker then it won't be reported as a FAIL      #
+  ###############################################################
 
-    my $out = `$mycc -o try_dec64.exe -x c try_dec64.in $mkinc $mylibs 2>&1`;
+  if($checklib) {
+
+    my $mylibs = $mklib . " " . $mylibpth;
+
+    my $out = `$mycc -o checklib.exe -x c checklib.in $mylibs 2>&1`;
 
     if($out) {
       print "$out\n";
-      if($save) {print $SAVE "try_dec64 build: $out\n"}
-      }
+      if($save) {print $SAVE "checklib build: $out\n"}
+    }
 
-    if(-e 'try_dec64.exe') {
-      $out = $^O =~ /MSWin32/i ? `try_dec64.exe` : `./try_dec64.exe`;
-      {
-        no warnings 'numeric';
-        if($out == 42) {$have_decimal64 = 1}
-      }
-      if($save) {print $SAVE "try_dec64.exe: $out\n"}
+    if(-e 'checklib.exe') {
+      $out = $^O =~ /MSWin32/i ? `checklib.exe` : `./checklib.exe`;
+      if($save) {print $SAVE "checklib.exe: $out\n"}
+    }
+    else {
+      warn "\n  Could not resolve '-lmpfr' and/or '-lgmp'\n",
+           "  If this is incorrect please see the 'Checklib' section in the README\n",
+           "  Aborting the build of Math::MPFR\n";
+      exit 0;
     }
   }
-}
+
+  ############################################
+  # Whether to build with _Decimal64 support #
+  ############################################
+
+  for(@ARGV) {
+    $have_decimal64 = 1 if $_ eq 'D64=1';
+    $have_decimal64 = 0 if $_ eq 'D64=0';
+  }
+
+  if(!defined($have_decimal64)) { # _Decimal64 support still undetermined
+
+    my $mylibs = $mklib . " " . $mylibpth;
+
+    my $out = `$mycc -o have_d64.exe -x c have_d64.in 2>&1`;
+
+    if($out) {
+      print "$out\n";
+      if($save) {print $SAVE "try_64 build: $out\n"}
+    }
+
+    unless(-e 'have_d64.exe') {$have_decimal64 = 0}
+
+    else { # _Decimal64 support still undetermined
+
+      my $out = `$mycc -o try_dec64.exe -x c try_dec64.in $mkinc $mylibs 2>&1`;
+
+      if($out) {
+        print "$out\n";
+        if($save) {print $SAVE "try_dec64 build: $out\n"}
+      }
+
+      if(-e 'try_dec64.exe') {
+        $out = $^O =~ /MSWin32/i ? `try_dec64.exe` : `./try_dec64.exe`;
+        {
+          no warnings 'numeric';
+          if($out == 42) {$have_decimal64 = 1}
+        }
+        if($save) {print $SAVE "try_dec64.exe: $out\n"}
+      }
+    }
+  }
 
 
-my $d64_message = $have_decimal64 ? "Attempting to build with Math::Decimal64 support\n"
+  $d64_message = $have_decimal64 ? "Attempting to build with Math::Decimal64 support\n"
                                   : "Building without Math::Decimal64 support\n";
 
-#############################################
+  #############################################
 
+  #############################################
+  # Whether to build with _Decimal128 support #
+  #############################################
 
-
-#############################################
-# Whether to build with _Decimal128 support #
-#############################################
-
-for(@ARGV) {
-  $have_decimal128 = 1 if $_ eq 'D128=1';
-  $have_decimal128 = 0 if $_ eq 'D128=0';
-}
-
-if(!defined($have_decimal128)) { # _Decimal128 support still undetermined
-
-  my $mylibs = $mklib . " " . $mylibpth;
-
-  my $out = `$mycc -o have_d128.exe -x c have_d128.in 2>&1`;
-
-  if($out) {
-    print "$out\n";
-    if($save) {print $SAVE "try_128 build: $out\n"}
+  for(@ARGV) {
+    $have_decimal128 = 1 if $_ eq 'D128=1';
+    $have_decimal128 = 0 if $_ eq 'D128=0';
   }
 
-  unless(-e 'have_d128.exe') {$have_decimal128 = 0}
+  if(!defined($have_decimal128)) { # _Decimal128 support still undetermined
 
-  else { # _Decimal128 support still undetermined
+    my $mylibs = $mklib . " " . $mylibpth;
 
-    my $out = `$mycc -o try_dec128.exe -x c try_dec128.in $mkinc $mylibs 2>&1`;
+    my $out = `$mycc -o have_d128.exe -x c have_d128.in 2>&1`;
 
     if($out) {
       print "$out\n";
-      if($save) {print $SAVE "try_dec128 build: $out\n"}
+      if($save) {print $SAVE "try_128 build: $out\n"}
     }
 
-    if(-e 'try_dec128.exe') {
-      $out = $^O =~ /MSWin32/i ? `try_dec128.exe` : `./try_dec128.exe`;
-      {
-        no warnings 'numeric';
-        if($out == 128) {$have_decimal128 = 1}
+    unless(-e 'have_d128.exe') {$have_decimal128 = 0}
+
+    else { # _Decimal128 support still undetermined
+
+      my $out = `$mycc -o try_dec128.exe -x c try_dec128.in $mkinc $mylibs 2>&1`;
+
+      if($out) {
+        print "$out\n";
+        if($save) {print $SAVE "try_dec128 build: $out\n"}
       }
-      if($save) {print $SAVE "try_dec128.exe: $out\n"}
+
+      if(-e 'try_dec128.exe') {
+        $out = $^O =~ /MSWin32/i ? `try_dec128.exe` : `./try_dec128.exe`;
+        {
+          no warnings 'numeric';
+          if($out == 128) {$have_decimal128 = 1}
+        }
+        if($save) {print $SAVE "try_dec128.exe: $out\n"}
+      }
     }
   }
-}
 
-my $d128_message = $have_decimal128 ? "Attempting to build with Math::Decimal128 support\n"
+  $d128_message = $have_decimal128 ? "Attempting to build with Math::Decimal128 support\n"
                                     : "Building without Math::Decimal128 support\n";
 
-###########################################
+  ###########################################
 
+  ###########################################
+  # Whether to build with __foat128 support #
+  ###########################################
 
-
-###########################################
-# Whether to build with __foat128 support #
-###########################################
-
-for(@ARGV) {
-   $have_float128 = 1 if $_ eq 'F128=1';
-   $have_float128 = 0 if $_ eq 'F128=0';
-}
-
-if(!defined($have_float128)) { # __float128 support, having not yet been
-                               # specified by the user, is still undetermined
-
-  print $SAVE "\n\n" if $save;
-
-  my $mylibs = $mklib . " " . $mylibpth . " -lquadmath";
-
-  # First up, build have_f128.exe from have_f128.c.
-  # This simply establishes whether the __float128 type is available.
-  # The gmp and mpfr libraries are not needed for this'
-
-  my $out = `$mycc -o have_f128.exe -x c have_f128.in 2>&1`;
-
-  if($out) {
-    print "$out\n";
-    if($save) {print $SAVE "have_f128 build: $out\n"}
+  for(@ARGV) {
+     $have_float128 = 1 if $_ eq 'F128=1';
+     $have_float128 = 0 if $_ eq 'F128=0';
   }
 
-  # If have_f128.exe does not exist, we assume that the __float128
-  # type is unavailable, and that __float128  supportis therefore
-  # impossible. The messages written to 'save_config.txt' should
-  # confirm the correctness of this assessment.
+  if(!defined($have_float128)) { # __float128 support, having not yet been
+                                 # specified by the user, is still undetermined
 
-  unless(-e 'have_f128.exe') {$have_float128 = 0}
+    print $SAVE "\n\n" if $save;
 
-  # But if have_f128.exe exists then we need to establish whether
-  # the mpfr library has been built with support for the __float128
-  # type. For this we attempt to build try_flt128.exe from
-  # try_flt128.in. This build *does* require the gmp and mpfr headers
-  # and libraries.
-  # If the execution of try_flt128.exe produces output of 42, then
-  # we know that the mpfr library has been built with --enable-float128,
-  # we set $have_float128 to 1, and Math::MPFR will then be built to
-  # utilise that __float128 support.
-  # Otherwise we leave $have_float128 as undef, and no __float128
-  # support will be built into Math::MPFR.
+    my $mylibs = $mklib . " " . $mylibpth . " -lquadmath";
 
-  else {
-    # $Config{ccflags} might include the '-I' switch needed to
-    # locate the gmp and mpfr header files. We therefore include
-    # those ccflags inthe command:
+    # First up, build have_f128.exe from have_f128.c.
+    # This simply establishes whether the __float128 type is available.
+    # The gmp and mpfr libraries are not needed for this'
 
-    my $ccflags = $Config{ccflags};
-
-    my $out = `$mycc $ccflags -o try_flt128.exe -x c try_flt128.in $mkinc $mylibs 2>&1`;
+    my $out = `$mycc -o have_f128.exe -x c have_f128.in 2>&1`;
 
     if($out) {
-      # print "$out\n"; # No need to confuse people by
-                        # displaying contents of $out.
-
-      if($save) {print $SAVE "try_flt128 build: $out\n"}
+      print "$out\n";
+      if($save) {print $SAVE "have_f128 build: $out\n"}
     }
 
-    if(-e 'try_flt128.exe') {
-      $out = $^O =~ /MSWin32/i ? `try_flt128.exe` : `./try_flt128.exe`;
-      {
-        no warnings 'numeric';
-        if($out == 42) {$have_float128 = 1}
+    # If have_f128.exe does not exist, we assume that the __float128
+    # type is unavailable, and that __float128  supportis therefore
+    # impossible. The messages written to 'save_config.txt' should
+    # confirm the correctness of this assessment.
+
+    unless(-e 'have_f128.exe') {$have_float128 = 0}
+
+    # But if have_f128.exe exists then we need to establish whether
+    # the mpfr library has been built with support for the __float128
+    # type. For this we attempt to build try_flt128.exe from
+    # try_flt128.in. This build *does* require the gmp and mpfr headers
+    # and libraries.
+    # If the execution of try_flt128.exe produces output of 42, then
+    # we know that the mpfr library has been built with --enable-float128,
+    # we set $have_float128 to 1, and Math::MPFR will then be built to
+    # utilise that __float128 support.
+    # Otherwise we leave $have_float128 as undef, and no __float128
+    # support will be built into Math::MPFR.
+
+    else {
+      # $Config{ccflags} might include the '-I' switch needed to
+      # locate the gmp and mpfr header files. We therefore include
+      # those ccflags inthe command:
+
+      my $ccflags = $Config{ccflags};
+
+      my $out = `$mycc $ccflags -o try_flt128.exe -x c try_flt128.in $mkinc $mylibs 2>&1`;
+
+      if($out) {
+        # print "$out\n"; # No need to confuse people by
+                          # displaying contents of $out.
+
+        if($save) {print $SAVE "try_flt128 build: $out\n"}
       }
-      if($save) {print $SAVE "try_flt128.exe: $out\n"}
+
+      if(-e 'try_flt128.exe') {
+        $out = $^O =~ /MSWin32/i ? `try_flt128.exe` : `./try_flt128.exe`;
+        {
+          no warnings 'numeric';
+          if($out == 42) {$have_float128 = 1}
+        }
+        if($save) {print $SAVE "try_flt128.exe: $out\n"}
+      }
     }
   }
-}
 
-close $SAVE or warn "Couldn't close save_config.txt";
+  close $SAVE or warn "Couldn't close save_config.txt";
 
-print " .... pre-build checks completed\n\n";
+  print " .... pre-build checks completed\n\n";
 
-my $float128_message = $have_float128 ? "Attempting to build with Math::Float128 support\n"
-                                      : "Building without Math::Float128 support\n";
+  $float128_message = $have_float128 ? "Attempting to build with Math::Float128 support\n"
+                                        : "Building without Math::Float128 support\n";
+} # close 'unless($kip_msvc)
 
 my $defines = $] < 5.008 ? "-DOLDPERL" : "-DNEWPERL";
 
@@ -350,14 +359,16 @@ else {
   print "Building without support for a __float128 NV\n";
 }
 
-print "\n$d64_message";
-print "If this is wrong, see the \"Decimal64 and Decimal128 conversion\" section in the README\n\n";
+unless($skip_msvc) {
+  print "\n$d64_message";
+  print "If this is wrong, see the \"Decimal64 and Decimal128 conversion\" section in the README\n\n";
 
-print "\n$d128_message";
-print "If this is wrong, see the \"Decimal64 and Decimal128 conversion\" section in the README\n\n";
+  print "\n$d128_message";
+  print "If this is wrong, see the \"Decimal64 and Decimal128 conversion\" section in the README\n\n";
 
-print "\n$float128_message";
-print "If this is wrong, see the \"Math::Float128 conversion\" section in the README\n\n";
+  print "\n$float128_message";
+  print "If this is wrong, see the \"Math::Float128 conversion\" section in the README\n\n";
+}
 
 $defines .= $Config::Config{byteorder} =~ /^1234/ ? " -DMPFR_HAVE_LENDIAN" : " -DMPFR_HAVE_BENDIAN";
 

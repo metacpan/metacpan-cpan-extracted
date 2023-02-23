@@ -1,5 +1,15 @@
 Revision history for HTTP-Daemon
 
+6.15      2023-02-22 22:02:46Z
+  - Fix CVE-2022-31081: Inconsistent Interpretation of HTTP Requests
+    Correctly handle multiple Content-Length headers and its variants
+    (Theo van Hoesel)
+    Closes "Discrepancies in the Parsing of Content Length header ..." (GH#56)
+    (blessingcharles)
+  - kill test server with KILL rather than QUIT (GH#63) (Graham Knop)
+  - Create TestServer test lib for running daemon process (GH#62) (Graham Knop)
+  - Clean up tests (GH#61) (Graham Knop)
+
 6.14      2022-03-03 20:47:51Z
   - Test using loopback rather than internet accessible address (GH#52)
     (Michal Josef Špaček)

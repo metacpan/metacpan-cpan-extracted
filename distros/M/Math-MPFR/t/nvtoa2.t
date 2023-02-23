@@ -36,7 +36,7 @@ use Test::More;
 # If $reliable is true, we simply assign the values using perl - otherwise we assign them
 # using Math::MPFR's atonv() function, which is also deemed reliable.
 
-if(MPFR_VERSION_MAJOR < 3 || (MPFR_VERSION_MAJOR() == 3  && MPFR_VERSION_PATCHLEVEL < 6)) {
+unless(Math::MPFR::MPFR_3_1_6_OR_LATER) {
   plan skip_all => "nvtoa2.t utilizes Math::MPFR functionality that requires mpfr-3.1.6\n";
   exit 0;
 }
@@ -138,7 +138,7 @@ while(1) {
 
   my $nvtoa = nvtoa($nv);
 
-  ok(nvtoa_test($nvtoa, $nv) == 7, "$str");
+  ok(nvtoa_test($nvtoa, $nv) == 15, "$str");
 
 }
 

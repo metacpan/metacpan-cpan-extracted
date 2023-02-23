@@ -1,3 +1,9 @@
+0.04
+     - Add _has_uint128() function (in both d2fixed.c files and both .xs files)
+     - Patch s2d.c and Debug/s2d.c so that 32-bit Visual Studio (which does not
+       provide the _BitScanReverse64 function) can build Math::Ryu
+
+
 0.03
      - Expand coverage to include environments that don't provide __uint128_t
      - Add Math::Ryu::Debug.

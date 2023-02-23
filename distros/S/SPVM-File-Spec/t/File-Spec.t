@@ -232,6 +232,130 @@ ok(SPVM::File::Spec->curdir, File::Spec->curdir);
   }
 }
 
+# file_name_is_root
+{
+  
+  # Unix/Windows
+  {
+    {
+      my $path = '/foo';
+      ok(!SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = 'foo';
+      ok(!SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = '/';
+      ok(SPVM::File::Spec->file_name_is_root($path));
+    }
+  }
+  
+  # Windows
+  if ($^O eq 'MSWin32'){
+    {
+      my $path = "\\foo";
+      ok(!SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = "C:";
+      ok(!SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = "C:\\";
+      ok(SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = "C:\\foo";
+      ok(!SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = "a:\\foo";
+      ok(!SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = "z:\\foo";
+      ok(!SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = "A:\\foo";
+      ok(!SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = "Z:\\foo";
+      ok(!SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = "\\\\192.168.201.205";
+      ok(!SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = "\\\\192.168.201.205\\";
+      ok(!SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = "\\\\192.168.201.205\\foo";
+      ok(SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = "\\\\192.168.201.205\\foo/";
+      ok(SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = "\\\\192.168.201.205\\foo\\";
+      ok(SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = "/foo";
+      ok(!SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = "C:";
+      ok(!SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = "C:/";
+      ok(SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = "C:/foo";
+      ok(!SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = "a:/foo";
+      ok(!SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = "z:/foo";
+      ok(!SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = "A:/foo";
+      ok(!SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = "Z:/foo";
+      ok(!SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = "//192.168.201.205";
+      ok(!SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = "//192.168.201.205/";
+      ok(!SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = "//192.168.201.205/foo";
+      ok(SPVM::File::Spec->file_name_is_root($path));
+    }
+    {
+      my $path = "//192.168.201.205/foo/";
+      ok(SPVM::File::Spec->file_name_is_root($path));
+    }
+  }
+}
+
 # splitdir
 {
   {

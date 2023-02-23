@@ -3,41 +3,39 @@ NAME
     structured data
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Acme::CPANModules::DiffingStructuredData (from Perl distribution
-    Acme-CPANModules-DiffingStructuredData), released on 2022-09-08.
+    Acme-CPANModules-DiffingStructuredData), released on 2022-12-09.
 
 DESCRIPTION
-    Data structures
-
     Data::Comparator
 
     Data::Diff
 
     Data::Cmp::Diff
 
-    Database schemas
+    Hash::Diff
 
-    DBIx::Diff::Schema
+    Struct::Diff
 
-    Trees
-
-    TODO
+    Value::Diff
 
 ACME::CPANMODULES ENTRIES
-    *   Data::Comparator - recursively compare Perl datatypes
-
+    Data::Comparator
         Author: CORNELIS <https://metacpan.org/author/CORNELIS>
 
-    *   Data::Diff - data structure comparison module
-
+    Data::Diff
         Author: GCAMPBELL <https://metacpan.org/author/GCAMPBELL>
 
-    *   Data::Cmp::Diff
+    Data::Cmp::Diff
+    Hash::Diff
+        Author: BOLAV <https://metacpan.org/author/BOLAV>
 
-    *   DBIx::Diff::Schema - Compare schema of two DBI databases
+    Struct::Diff
+        Author: MIXAS <https://metacpan.org/author/MIXAS>
 
-        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+    Value::Diff
+        Author: BRTASTIC <https://metacpan.org/author/BRTASTIC>
 
 FAQ
   What is an Acme::CPANModules::* module?

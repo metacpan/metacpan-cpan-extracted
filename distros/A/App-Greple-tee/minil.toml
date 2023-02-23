@@ -1,5 +1,5 @@
 name = "App-Greple-tee"
-badges = [ "github-actions/test.yml" ]
+badges = [ "github-actions/test", "metacpan" ]
 authority = "cpan:UTASHIRO"
 
 module_maker = "ModuleBuildTiny"

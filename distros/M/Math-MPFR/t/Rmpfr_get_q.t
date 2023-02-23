@@ -25,39 +25,39 @@ my $q = Math::GMPq->new();
 
 $ok .= 'a' unless Rmpfr_erangeflag_p();
 
-Rmpfr_get_q($q, $nan);
+eval {Rmpfr_get_q($q, $nan);};
 
-if($q == 0) {print "ok 1\n"}
+if($@ =~ /^In Rmpfr_get_q: Cannot coerce an 'Inf' or 'NaN' to a Math::GMPq object/) {print "ok 1\n"}
 else {
-  warn "\nExpected 0, got $q\n";
+  warn "\n\$\@\n:$@\n";
   print "not ok 1\n";
 }
 
-$ok .= 'b' if Rmpfr_erangeflag_p();
+$ok .= 'b' if !Rmpfr_erangeflag_p();
 Rmpfr_clear_erangeflag();
 $ok .= 'c' unless Rmpfr_erangeflag_p();
 
-Rmpfr_get_q($q, $ninf);
+eval {Rmpfr_get_q($q, $ninf);};
 
-if($q == 0) {print "ok 2\n"}
+if($@ =~ /^In Rmpfr_get_q: Cannot coerce an 'Inf' or 'NaN' to a Math::GMPq object/) {print "ok 2\n"}
 else {
-  warn "\nExpected 0, got $q\n";
+  warn "\n\$\@\n:$@\n";
   print "not ok 2\n";
 }
 
-$ok .= 'd' if Rmpfr_erangeflag_p();
+$ok .= 'd' if !Rmpfr_erangeflag_p();
 Rmpfr_clear_erangeflag();
 $ok .= 'e' unless Rmpfr_erangeflag_p();
 
-Rmpfr_get_q($q, $pinf);
+eval {Rmpfr_get_q($q, $pinf);};
 
-if($q == 0) {print "ok 3\n"}
+if($@ =~ /^In Rmpfr_get_q: Cannot coerce an 'Inf' or 'NaN' to a Math::GMPq object/) {print "ok 3\n"}
 else {
-  warn "\nExpected 0, got $q\n";
-  print "not ok 3\n";
+  warn "\n\$\@\n:$@\n";
+  print "not ok 1\n";
 }
 
-$ok .= 'f' if Rmpfr_erangeflag_p();
+$ok .= 'f' if !Rmpfr_erangeflag_p();
 Rmpfr_clear_erangeflag();
 $ok .= 'g' unless Rmpfr_erangeflag_p();
 

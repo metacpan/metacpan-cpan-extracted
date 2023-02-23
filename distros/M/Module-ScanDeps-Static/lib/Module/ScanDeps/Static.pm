@@ -3,7 +3,7 @@ package Module::ScanDeps::Static;
 use strict;
 use warnings;
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 use 5.010;
 
@@ -128,8 +128,11 @@ sub get_module_version {
 
     $module_version{'path'} = $path;
 
-    $module_version{'version'}
-      = eval { return ExtUtils::MM->parse_version($path) // 0; };
+    $module_version{'version'} = eval {
+      my $v = ExtUtils::MM->parse_version($path);
+
+      return $v eq 'undef' ? 0 : $v || 0;
+    };
 
     last;
   }
@@ -529,6 +532,8 @@ sub add_require {
 ########################################################################
   my ( $self, $module, $newver ) = @_;
 
+  $newver //= $EMPTY;
+
   $module =~ s/\A\s*//xsm;
   $module =~ s/\s*\z//xsm;
 
@@ -551,7 +556,7 @@ sub add_require {
     $require->{$module} = $m->{'version'} // $EMPTY;
   }
   else {
-    $require->{$module} = $newver;
+    $require->{$module} = $newver // $EMPTY;
   }
 
   return $self;
@@ -601,10 +606,10 @@ sub get_dependencies {
 ########################################################################
   my ( $self, %options ) = @_;
 
-  if ( $self->get_json ) {
+  if ( $options{json} || $self->get_json ) {
     return scalar $self->format_json;
   }
-  elsif ( $self->get_text || $self->get_raw ) {
+  elsif ( $options{text} || $self->get_text || $self->get_raw ) {
     return $self->format_text;
   }
   else {
@@ -1046,7 +1051,7 @@ contain the keys "name" and "version" for each dependency.
 
 =head1 VERSION
 
-0.9
+1.002
 
 =head1 AUTHOR
 

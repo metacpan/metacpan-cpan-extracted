@@ -1,12 +1,12 @@
 package Crypt::Passphrase::Bcrypt;
-$Crypt::Passphrase::Bcrypt::VERSION = '0.004';
+$Crypt::Passphrase::Bcrypt::VERSION = '0.005';
 use strict;
 use warnings;
 
 use parent 'Crypt::Passphrase::Encoder';
 
 use Carp 'croak';
-use Crypt::Bcrypt 0.008 qw/bcrypt bcrypt_hashed bcrypt_check_hashed bcrypt_needs_rehash/;
+use Crypt::Bcrypt 0.010 qw/bcrypt bcrypt_prehashed bcrypt_check_prehashed bcrypt_needs_rehash/;
 
 sub new {
 	my ($class, %args) = @_;
@@ -23,7 +23,7 @@ sub new {
 sub hash_password {
 	my ($self, $password) = @_;
 	my $salt = $self->random_bytes(16);
-	return bcrypt_hashed($password, $self->{subtype}, $self->{cost}, $salt, $self->{hash});
+	return bcrypt_prehashed($password, $self->{subtype}, $self->{cost}, $salt, $self->{hash});
 }
 
 sub needs_rehash {
@@ -37,7 +37,7 @@ sub crypt_subtypes {
 
 sub verify_password {
 	my ($class, $password, $hash) = @_;
-	return bcrypt_check_hashed($password, $hash);
+	return bcrypt_check_prehashed($password, $hash);
 }
 
 1;
@@ -56,7 +56,7 @@ Crypt::Passphrase::Bcrypt - A bcrypt encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 

@@ -46,4 +46,4 @@ cmp_ok( numtoa($f), 'eq', $f_correct, 'handles NVs correctly' );
 
 eval { numtoa('hello world'); };
 
-like ( $@, qr/Not a numeric argument given to numtoa function/, 'dies correctly' );
+like ( $@, qr/Not a numeric argument given to _numtoa function/, 'dies correctly' );

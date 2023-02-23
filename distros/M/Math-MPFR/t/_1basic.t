@@ -4,7 +4,9 @@ use Config;
 use Math::MPFR qw(:mpfr);
 use Math::MPFR::V;
 
-print "1..10\n";
+use Test::More;
+
+#print "1..10\n";
 
 warn "\n# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 warn "# MPFR_VERSION is ", MPFR_VERSION, "\n";
@@ -65,81 +67,49 @@ if(!$@) {
             : warn "# mpfr library thresholds file: $evaluate\n";
 }
 
-if($Math::MPFR::VERSION eq '4.24') {print "ok 1\n"}
-else {print "not ok 1 $Math::MPFR::VERSION\n"}
+cmp_ok($Math::MPFR::VERSION, 'eq', '4.25', "Math::MPFR::VERSION ($Math::MPFR::VERSION) is as expected");
 
-if(Math::MPFR::_get_xs_version() eq '4.24') {print "ok 2\n"}
-else {
-  warn "Module version: $Math::MPFR::VERSION\nXS version: ", Math::MPFR::_get_xs_version(), "\n";
-  print "not ok 2\n";
-}
+my $xs_version = Math::MPFR::_get_xs_version();
+cmp_ok($xs_version, 'eq', '4.25', "Math::MPFR::_get_xs_version returns $xs_version as expected");
 
-if(Rmpfr_get_version() eq MPFR_VERSION_STRING) {print "ok 3\n"}
-else {print "not ok 3 - Header and Library do not match\n"}
+my $l_ver = Rmpfr_get_version();
+my $h_ver = MPFR_VERSION_STRING;
+
+cmp_ok($h_ver, 'eq', $l_ver, "Header version ($h_ver) matches Library version ($l_ver)");
 
 my $max_base = Math::MPFR::_max_base();
 
-if($max_base == 62) {
-  if(3 <= MPFR_VERSION_MAJOR) {print "ok 4\n"}
-  else {
-    warn "\n\$max_base: $max_base\n";
-    warn "VERSION_MAJOR ", MPFR_VERSION_MAJOR, "\n";
-    print "not ok 4\n";
-  }
-}
-elsif($max_base == 36) {
-  if(3 > MPFR_VERSION_MAJOR) {print "ok 4\n"}
-  else {
-    warn "\n\$max_base: $max_base\n";
-    warn "VERSION_MAJOR ", MPFR_VERSION_MAJOR, "\n";
-    print "not ok 4\n";
-  }
+if(3 <= MPFR_VERSION_MAJOR) {
+  cmp_ok($max_base, '==', 62, "maximum base ($max_base) == 62");
 }
 else {
-  warn "\n\$max_base: $max_base\n";
-  print "not ok 4\n";
+  cmp_ok($max_base, '==', 36, "maximum base ($max_base) == 36");
 }
 
-if(Math::MPFR::_has_longlong() && Math::MPFR::_ivsize_bits() == (8 * $Config{ivsize})) {print "ok 5\n"}
-elsif(!Math::MPFR::_has_longlong()) {print "ok 5\n"}
-else {
-  warn "\n _has_longlong(): ", Math::MPFR::_has_longlong(), "\n _ivsize_bits: ",
-        Math::MPFR::_ivsize_bits(), "\n";
-  print "not ok 5\n";
+my $iv_bits = 8 * $Config{ivsize};
+
+if(Math::MPFR::_has_longlong()) {
+  cmp_ok(Math::MPFR::_ivsize_bits(), '==', $iv_bits, "IVSIZE_BITS set to expected value of $iv_bits");
 }
 
-if($Math::MPFR::VERSION eq $Math::MPFR::Random::VERSION) {print "ok 6\n"}
-else {
-  warn "\$Math::MPFR::Random::VERSION: $Math::MPFR::Random::VERSION \n";
-  print "not ok 6\n";
-}
+cmp_ok($Math::MPFR::VERSION, 'eq',  $Math::MPFR::Random::VERSION,
+       "Math::MPFR version ($Math::MPFR::VERSION) eq Math::MPFR::Random version ($Math::MPFR::Random::VERSION)");
 
-if($Math::MPFR::VERSION eq $Math::MPFR::Prec::VERSION) {print "ok 7\n"}
-else {
-  warn "\$Math::MPFR::Prec::VERSION: $Math::MPFR::Prec::VERSION \n";
-  print "not ok 7\n";
-}
+cmp_ok($Math::MPFR::VERSION, 'eq',  $Math::MPFR::Prec::VERSION,
+       "Math::MPFR version ($Math::MPFR::VERSION) eq Math::MPFR::Prec version ($Math::MPFR::Prec::VERSION)");
 
-if($Math::MPFR::VERSION eq $Math::MPFR::V::VERSION) {print "ok 8\n"}
-else {
-  warn "\$Math::MPFR::V::VERSION: $Math::MPFR::V::VERSION \n";
-  print "not ok 8\n";
-}
+cmp_ok($Math::MPFR::VERSION, 'eq',  $Math::MPFR::V::VERSION,
+       "Math::MPFR version ($Math::MPFR::VERSION) eq Math::MPFR::V version ($Math::MPFR::V::VERSION)");
 
-if(Math::MPFR::Random::_MPFR_VERSION() == Math::MPFR::_MPFR_VERSION()) {print "ok 9\n"}
-else {
-  warn Math::MPFR::Random::_MPFR_VERSION(), " != ", Math::MPFR::_MPFR_VERSION(), "\n";
-  print "not ok 9\n";
-}
+cmp_ok(Math::MPFR::Random::_MPFR_VERSION(), '==', Math::MPFR::_MPFR_VERSION(),
+       "Math::MPFR::Random::_MPFR_VERSION() == Math::MPFR::_MPFR_VERSION()");
 
 my $v = Math::MPFR::_sis_perl_version;
 my $v_check = $];
 $v_check =~ s/\.//;
 
-if($v eq $v_check) { print "ok 10\n" }
-else {
-   warn "$v ne $v_check\n";
-   print "not ok 10\n";
-}
+cmp_ok($v, '==', $v_check, 'Math::MPFR::_sis_perl_version agrees with $]');
+
+done_testing();
 
 

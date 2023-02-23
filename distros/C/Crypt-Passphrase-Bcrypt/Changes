@@ -1,5 +1,8 @@
 Revision history for Crypt-Passphrase-Bcrypt
 
+0.005     2023-02-21 20:32:33+01:00 Europe/Amsterdam
+          - Adapt to Crypt::Bcrypt's new prehashed function names
+
 0.004     2023-02-07 14:32:38+01:00 Europe/Amsterdam
           - Move prehash support into Crypt::Bcrypt
 

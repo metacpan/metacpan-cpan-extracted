@@ -3,6 +3,9 @@ use warnings;
 use Math::Ryu qw(:all);
 use Test::More;
 
+if(Math::Ryu::_has_uint128()) { warn "RYU HAS_UINT128: 1\n" }
+else { warn "RYU HAS_UINT128: 0\n" }
+
 my @in = (
  0.1,
  -0.1,
@@ -109,8 +112,8 @@ my $v_check = $];
 $v_check =~ s/\.//;
 
 cmp_ok($v, 'eq', $v_check);
-cmp_ok($Math::Ryu::VERSION, 'eq', '0.03', "\$VERSION stringifies as expected");
-cmp_ok($Math::Ryu::VERSION, '==',  0.03,  "\$VERSION numifies as expected");
+cmp_ok($Math::Ryu::VERSION, 'eq', '0.04', "\$VERSION stringifies as expected");
+cmp_ok($Math::Ryu::VERSION, '==',  0.04,  "\$VERSION numifies as expected");
 
 require Math::Ryu::Debug;
 cmp_ok($Math::Ryu::VERSION, 'eq', $Math::Ryu::Debug::VERSION, "Debug and non-Debug version numbers match");

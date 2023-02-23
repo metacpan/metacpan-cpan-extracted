@@ -1,5 +1,10 @@
 Revision history for Perl module Math::MPFR
 
+4.25
+ - work on fixing bugs in nvtoa() for DoubleDoubles. (Use _mpfrtoa instead of _nvtoa.)
+ - Fix typos in pod. Thanks Vincent Lefevre - https://github.com/sisyphus/math-mpfr/pull/6.
+ - Alter the Makefile.PL to accommodate sisyphus' MSVC-built perls.
+
 4.24
  - add nvtoa_test() to facilitate validation of results returned by nvtoa() and mpfrtoa().
  - mpfrtoa() now takes a second optional arg that specifies the minimum normal precision.
@@ -61,7 +66,7 @@ Revision history for Perl module Math::MPFR
  - In Rmpfr_set_default_prec(), Rmpfr_set_prec() and Rmpfr_set_prec_raw(), check
    that the argument is not less than 2 if mpfr version is less than 4.0.0.
    (This change was actually applied to Rmpfr_set_default_prec in Math-MPFR-4.16.)
- - Remove all occurrences of "scalar reverse" demos\doubledouble.p and
+ - Remove all occurrences of "scalar reverse" in demos\doubledouble.p and
    t\subnormal_doubles.t.
  - Add q_add_fr, q_sub_fr, q_mul_fr, q_div_fr and fr_cmp_q_rounded functions.
  - Add Rmpfr_cmp_IV, Rmpfr_cmp_UV, Rmpfr_cmp_sj and Rmpfr_cmp_uj (though the MPFR

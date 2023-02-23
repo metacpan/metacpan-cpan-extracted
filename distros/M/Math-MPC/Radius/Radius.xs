@@ -223,32 +223,80 @@ SV * Rmpcr_get_exp_mpfr (pTHX_ mpcr_ptr op) {
 
 void Rmpcr_out_str (pTHX_ FILE *stream, mpcr_ptr op) {
 #if MPC_VERSION >= 66304
-   mpcr_out_str(stream, op);
-   fflush(stream);
+  mpcr_out_str(stream, op);
+  fflush(stream);
 #else
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
+#endif
+}
+
+void Rmpcr_out_str_win (pTHX_ FILE *stream, mpcr_ptr op) {
+#if MPC_VERSION >= 66304
+#  ifdef _WIN32
+   int cp = GetConsoleOutputCP();
+   SetConsoleOutputCP(65001);
+   mpcr_out_str(stream, op);
+   fflush(stream);
+   SetConsoleOutputCP(cp);
+#  else
+   croak("Rmpcr_out_str_win is for MS Windows only");
+#  endif
+#else
+   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
 
 void Rmpcr_print (pTHX_ mpcr_ptr op) {
 #if MPC_VERSION >= 66304
+ mpcr_out_str(stdout, op);
+ fflush(stdout);
+#else
+ croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
+#endif
+}
+
+void Rmpcr_print_win (pTHX_ mpcr_ptr op) {
+#if MPC_VERSION >= 66304
+#  ifdef _WIN32
+   int cp = GetConsoleOutputCP();
+   SetConsoleOutputCP(65001);
    mpcr_out_str(stdout, op);
    fflush(stdout);
+   SetConsoleOutputCP(cp);
+#  else
+   croak("Rmpcr_print_win is for MS Windows only");
+#  endif
 #else
-  croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
+   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
 
 void Rmpcr_say (pTHX_ mpcr_ptr op) {
 #if MPC_VERSION >= 66304
-   mpcr_out_str(stdout, op);
-   fflush(stdout);
-   printf("\n");
+  mpcr_out_str(stdout, op);
+  printf("\n");
+  fflush(stdout);
 #else
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
 
+void Rmpcr_say_win (pTHX_ mpcr_ptr op) {
+#if MPC_VERSION >= 66304
+#  ifdef _WIN32
+   int cp = GetConsoleOutputCP();
+   SetConsoleOutputCP(65001);
+   mpcr_out_str(stdout, op);
+   printf("\n");
+   fflush(stdout);
+   SetConsoleOutputCP(cp);
+#  else
+   croak("Rmpcr_say_win is for MS Windows only");
+#  endif
+#else
+  croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
+#endif
+}
 
 void Rmpcr_add (mpcr_ptr rop, mpcr_ptr op1, mpcr_ptr op2) {
 #if MPC_VERSION >= 66304
@@ -632,6 +680,23 @@ Rmpcr_out_str (stream, op)
         return; /* assume stack size is correct */
 
 void
+Rmpcr_out_str_win (stream, op)
+	FILE *	stream
+	mpcr_ptr	op
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        Rmpcr_out_str_win(aTHX_ stream, op);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
+
+void
 Rmpcr_print (op)
 	mpcr_ptr	op
         PREINIT:
@@ -648,6 +713,22 @@ Rmpcr_print (op)
         return; /* assume stack size is correct */
 
 void
+Rmpcr_print_win (op)
+	mpcr_ptr	op
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        Rmpcr_print_win(aTHX_ op);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
+
+void
 Rmpcr_say (op)
 	mpcr_ptr	op
         PREINIT:
@@ -655,6 +736,22 @@ Rmpcr_say (op)
         PPCODE:
         temp = PL_markstack_ptr++;
         Rmpcr_say(aTHX_ op);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
+
+void
+Rmpcr_say_win (op)
+	mpcr_ptr	op
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        Rmpcr_say_win(aTHX_ op);
         if (PL_markstack_ptr != temp) {
           /* truly void, because dXSARGS not invoked */
           PL_markstack_ptr = temp;

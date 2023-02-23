@@ -22,5 +22,5 @@ requires:
   SPVM::Regex: '0.18'
   SPVM::Sys: '0.36'
 resources: {}
-version: '0.03'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

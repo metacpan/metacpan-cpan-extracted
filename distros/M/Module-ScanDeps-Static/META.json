@@ -51,10 +51,10 @@
    "provides" : {
       "Module::ScanDeps::Static" : {
          "file" : "lib/Module/ScanDeps/Static.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       }
    },
    "release_status" : "stable",
-   "version" : "1.001",
+   "version" : "1.002",
    "x_serialization_backend" : "JSON::PP version 4.10"
 }

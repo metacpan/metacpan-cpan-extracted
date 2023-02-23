@@ -2,11 +2,6 @@
 #
 # Implements ed(1) error handling. Run perldoc(1) on this module for
 # additional documentation.
-#
-# Copyright 2009,2012-2013,2015 by Jeremy Mates.
-#
-# This module is free software; you can redistribute it and/or modify it
-# under the Artistic license.
 
 package Acme::EdError;
 
@@ -15,22 +10,22 @@ use warnings;
 
 require 5.006;
 
-our $VERSION = '9.17';
+our $VERSION = '9.18';
 
 sub takeover_signals {
-  $SIG{__DIE__} = sub { print STDERR "?\n"; exit 255 };
-  $SIG{__WARN__} = sub { print STDERR "?\n"; };
+    $SIG{__DIE__}  = sub { print STDERR "?\n"; exit 255 };
+    $SIG{__WARN__} = sub { print STDERR "?\n"; };
 }
 
 BEGIN {
-  takeover_signals();
+    takeover_signals();
 }
 
 # And, in the event someone has taken the signals back...
 takeover_signals();
 
 END {
-  takeover_signals();
+    takeover_signals();
 }
 
 1;
@@ -64,17 +59,13 @@ will not be.)
 
 L<ed(1)>
 
-L<http://github.com/thrig/Acme-EdError>
-
-=head1 AUTHOR
-
-thrig - Jeremy Mates (cpan:JMATES) C<< <jmates at cpan.org> >>
+L<https://thrig.me/src/Acme-EdError.git>
 
 =head1 COPYRIGHT
 
-Copyright 2009,2012-2013,2015 by Jeremy Mates.
+Copyright 2009 Jeremy Mates
 
-This module is free software; you can redistribute it and/or modify it
-under the Artistic License (2.0).
+This program is distributed under the (Revised) BSD License:
+L<https://opensource.org/licenses/BSD-3-Clause>
 
 =cut

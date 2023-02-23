@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our $offset = 0.5555555;
 our $precision = 0;
@@ -15,6 +15,8 @@ use overload
 	'-' => \&subt,
 	'/' => \&div,
 	'*' => \&mult,
+	'%' => \&mod,
+	'**' => \&exp,
 	'""' => sub {
 		my $num = $_[0][0];
 		return $num unless $precision;
@@ -26,7 +28,7 @@ use overload
 
 sub new {
 	my $self = bless [ $_[1], [$_[1]] ],  $_[0];
-	$precision = $_[2] if $_[2];
+	$precision = $_[2] if defined $_[2];
 	$offset = $_[3] if $_[3];
 	$self;
 }
@@ -66,6 +68,28 @@ sub div {
 	$_[0];
 }
 
+sub mod {
+	if ($_[2]) {
+		splice @{ $_[0] }, 1, 0, [$_[1], '%'];
+		$_[0][0] = $_[1] % $_[0][0];
+	} else {
+		push @{ $_[0][-1] }, '%', $_[1];
+		$_[0][0] = $_[0][0] % $_[1];
+	}
+	$_[0];
+}
+
+sub exp {
+	if ($_[2]) {
+		splice @{ $_[0] }, 1, 0, [$_[1], '**'];
+		$_[0][0] = $_[1] ** $_[0][0];
+	} else {
+		push @{ $_[0][-1] }, '**', $_[1];
+		$_[0][0] = $_[0][0] ** $_[1];
+	}
+	$_[0];
+}
+
 sub equation {
 	my $query = '';
 	my $closing = 0;
@@ -93,7 +117,7 @@ Number::Equation - Track how a number is calculated progamically.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -115,7 +139,6 @@ Perhaps a little code snippet.
 	my $m = 1 / $n;
 	print $m->equation; # (1 / ((((42 - 2) / 10) * 3) + 1)) = 0.0769230769230769
 
-
 	my $n = Number::Equation->new(42, .01);
 	$n = $n - 2;
 	$n /= 10;
@@ -124,6 +147,11 @@ Perhaps a little code snippet.
 	my $m = 1 / $n;
 	print $m->equation; # (1 / ((((42 - 2) / 10) * 3) + 1)) ≈ 0.08
 
+	my $n = Number::Equation->new(211, 0);
+	$n = $n ** 2;
+	print $n->equation; # (211 ** 2) = 44521
+	$n = $n % 2;
+	print $n->equation; # ((211 ** 2) % 7) = 1
 
 BETA: currently only add, subtract, multiply and divide operations are supported.
 

@@ -37,7 +37,6 @@ ryu_headers/d2s_full_table.h
 ryu_headers/d2s_intrinsics.h
 ryu_headers/d2s_small_table.h
 ryu_headers/digit_table.h
-ryu_headers/generic_128.h
 ryu_headers/ryu.h
 ryu_headers/ryu_parse.h
 

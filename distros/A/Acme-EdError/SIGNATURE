@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.88.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,27 +12,29 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 c93d958878f48e29765c96917f63d5489072cab1 Changes
-SHA1 27cf078faac611b6a6bb94ab8dd9d9b463defb6c LICENSE
-SHA1 5971329410399a092e4c115aad7dbe69526fcdd8 MANIFEST
-SHA1 6475a5065cb20d1e057f9295b12e577997735647 META.json
-SHA1 f73d065e93b4c7b1898f59b6c52f54b843910ef7 META.yml
-SHA1 09ee8f946dac9c6f0c2ccfb3e7167c639e89b43c Makefile.PL
-SHA1 9e3473bc2c3280f0688d44ef7c07d9af2a7ed70f README
-SHA1 4b67b5d684f734a5744921d8d2a3816a3bb9832e eg/show-errors
-SHA1 e6c0cd98d43808a826b8efd83d923d50489f691f lib/Acme/EdError.pm
-SHA1 83d6546227ec983f81372fd54bbf2d983cb55f3e t/1.t
-SHA1 3ef65383d82f059f56f43236663119c01974decb t/pod.t
+SHA256 fffcd356fc235d8eb4baff7fc7d59331d3aee047c4b446aaf46aa4139018a4e2 Build.PL
+SHA256 7ddcfda184b55ee06b0c81e0ad136b1aa4a86daeb1078bcaeccc246eb2c8693b Changes
+SHA256 db739608563af2d9f1763883315451cc38032cb67bdd42a443bfcc7eef1a49b2 LICENSE
+SHA256 70c73510adcd206ddfd24f419d7031b6f276f2e646f2e4e4d511c8e9a4f5cfcb MANIFEST
+SHA256 f521e3e054dccfc02fa3b9744baae743d0c532d1171bd6ec252e51ed31ce53c4 META.json
+SHA256 80a7a665b4faa59abdd76e45503deebc5feef05eeebbcf691216c945d803f46f META.yml
+SHA256 99b9f131d6ec080d37f7473f414ac7c08d1c9b7b2f8de56cf1958a72d823dd02 README
+SHA256 8a4298eb98bcbff28b9f651dfd71897688101c7fe8e9b9bc434dcc7ced2608a2 lib/Acme/EdError.pm
+SHA256 6bc5a8378c3b7b17a43c1c965d8a1a5f5f4f0d1a0316fe5fabfabb7cfc18aa5c t/1.t
+SHA256 26e8eef165b3efeb88516cf0e98ea5ac2455f53e57eabc1259f9cfa6937a51a8 t/pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJU0AZWAAoJEDTEVWqwTuCUrhcH/RqZJqVuWmCAtmW6pVlknS06
-NIuaGU6ilpLRuRdOAPHRRiiDQkEYkjtOorgLOQhJ35l9xD+Fbin3KY6tzTl5vxt+
-fAcOxd28UHPDK8mS63rTCL+RHkXzCFCjpEFuQ2rnWdLvLVEnjUk3LIRrpuhMaEVS
-v/fd12ulcfbxeym/rGlmAO1fbZh69ZRE5Mc+OK3FQFQ0KN+Rj23oJLWOl2OlZyfr
-yhm5PUZYOM9f1ZNQRuB7Ot6Yj2XDi+JaHncm/y0HSTCE5+ahpbFL74OpJ9EyJNIy
-W6H2eZu6/Tf8Cw0jpzI/jNuByGGuZjQcdKbkC18QVmfmVL9c5t+qTFuvOnCcG48=
-=YLPQ
+iQGzBAEBAwAdFiEElPO2YAAs9b/plKLEs1lvXE/ryKcFAmP2nWsACgkQs1lvXE/r
+yKcAUQv+I8t4vN9PZYYbhAdjpCOVgN7Iyu7bC3TnN7mVP/EjYeygzMNxKx5TCrSL
+X7cHohw3AXPAOPuFOMWZtO8TTtFwziYl4Zz6mj3+5X3sYB1lARX85cFNIGc/ct/t
+rABCzOXGgWS6pdN/cJLfGn0KloFFXudNjUkJIE1ldLdxR05zu47k41ePnOWbR9+Z
+SyRza6Y/nqV5VgLIi7lYquZHiR0JqRKCAQahuRBEa9n2ybsEtZKQzskLRiTR/4F1
+ORgNy34GP8IhV9GuGYmrSW8AujSTxdJ+OCfwiwR+G3LpwHsSofCML7D/RZbzaiRA
+tw3XmbjlyKEn085CWGKbDajCN3wJksrJH1Mh7+N015fCL6+/NmXaiYwMW1P7gwKv
+59jYbOXW32eWiCazUaV2xxTlZRx4/RlMMF3oum+eJoPTotBTl+8oLH/qjzsAbK0V
+OHfG1EMb/wv92pe9GiGX8MQnOhBU+qLM9VjN6WlXe1ZsoXpjolu88+dOwe5xFeRt
+1SxhNbWz
+=ldvG
 -----END PGP SIGNATURE-----

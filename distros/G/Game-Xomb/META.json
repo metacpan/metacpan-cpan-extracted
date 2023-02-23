@@ -4,7 +4,7 @@
       "Jeremy Mates <jeremy.mates@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "bsd"
    ],
@@ -54,7 +54,7 @@
    "provides" : {
       "Game::Xomb" : {
          "file" : "lib/Game/Xomb.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       }
    },
    "release_status" : "stable",
@@ -63,9 +63,9 @@
          "http://opensource.org/licenses/BSD-3-Clause"
       ],
       "repository" : {
-         "url" : "https://github.com/thrig/Game-Xomb"
+         "url" : "https://thrig.me/src/Game-Xomb.git"
       }
    },
-   "version" : "1.04",
-   "x_serialization_backend" : "JSON::PP version 4.10"
+   "version" : "1.05",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

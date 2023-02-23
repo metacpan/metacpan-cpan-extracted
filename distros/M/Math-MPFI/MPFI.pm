@@ -8,7 +8,7 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 #$VERSION = eval $VERSION;
 
 Math::MPFI->DynaLoader::bootstrap($VERSION);
@@ -31,7 +31,7 @@ Math::MPFI->DynaLoader::bootstrap($VERSION);
     use constant  _MATH_MPFI_T    => 11;
     use constant  MPFI_PV_NV_BUG => Math::MPFI::Constant::_has_pv_nv_bug();
 
-    # Inspired by https://github.com/Perl/perl5/issues/19550:
+    # Inspired by https://github.com/Perl/perl5/issues/19550, which affects only perl-5.35.10:
     use constant ISSUE_19550    => Math::MPFI::Constant::_issue_19550();
 
     use subs qw(MPFI_VERSION_MAJOR MPFI_VERSION_MINOR
@@ -65,7 +65,7 @@ Math::MPFI->DynaLoader::bootstrap($VERSION);
      '!'        => \&overload_not;
 
 @Math::MPFI::EXPORT = ();
-@Math::MPFI::EXPORT_OK = qw(
+my @tagged = qw(
 MPFI_PV_NV_BUG
 BOTH_ENDPOINTS_EXACT LEFT_ENDPOINT_INEXACT
 RIGHT_ENDPOINT_INEXACT BOTH_ENDPOINTS_INEXACT
@@ -121,61 +121,8 @@ Rmpfi_atan2 Rmpfi_urandom
 Rmpfi_get_NV Rmpfi_set_NV
 );
 
-%Math::MPFI::EXPORT_TAGS =(mpfi => [qw(
-MPFI_PV_NV_BUG
-BOTH_ENDPOINTS_EXACT LEFT_ENDPOINT_INEXACT
-RIGHT_ENDPOINT_INEXACT BOTH_ENDPOINTS_INEXACT
-RMPFI_BOTH_ARE_EXACT RMPFI_LEFT_IS_INEXACT
-RMPFI_RIGHT_IS_INEXACT RMPFI_BOTH_ARE_INEXACT
-RMPFI_ERROR MPFI_VERSION_MAJOR
-MPFI_VERSION_MINOR MPFI_VERSION_PATCHLEVEL MPFI_VERSION_STRING
-Rmpfi_set_default_prec Rmpfi_get_default_prec
-Rmpfi_abs Rmpfi_acos Rmpfi_acosh Rmpfi_add Rmpfi_add_d Rmpfi_add_fr
-Rmpfi_add_q Rmpfi_add_si Rmpfi_add_ui Rmpfi_add_z Rmpfi_alea
-Rmpfi_asin Rmpfi_asinh Rmpfi_atan Rmpfi_atanh Rmpfi_bisect
-Rmpfi_blow Rmpfi_bounded_p Rmpfi_clear Rmpfi_cmp Rmpfi_cmp_d
-Rmpfi_cmp_fr Rmpfi_cmp_q Rmpfi_cmp_si Rmpfi_cmp_ui Rmpfi_cmp_z
-Rmpfi_const_euler Rmpfi_const_log2 Rmpfi_const_pi Rmpfi_cos
-Rmpfi_cosh Rmpfi_d_div Rmpfi_d_sub Rmpfi_diam Rmpfi_diam_abs
-Rmpfi_diam_rel Rmpfi_div Rmpfi_div_2exp Rmpfi_div_2si Rmpfi_div_2ui
-Rmpfi_div_d Rmpfi_div_fr Rmpfi_div_q Rmpfi_div_si Rmpfi_div_ui
-Rmpfi_div_z Rmpfi_exp Rmpfi_exp2 Rmpfi_expm1 Rmpfi_fr_div
-Rmpfi_fr_sub Rmpfi_get_d Rmpfi_get_fr Rmpfi_get_left Rmpfi_get_prec
-Rmpfi_get_right Rmpfi_has_zero Rmpfi_increase Rmpfi_inf_p Rmpfi_init
-Rmpfi_init2 Rmpfi_init_set Rmpfi_init_set_d Rmpfi_init_set_fr
-Rmpfi_init_set_q Rmpfi_init_set_si Rmpfi_init_set_str Rmpfi_init_set_ui
-Rmpfi_init_set_z
-Rmpfi_init_nobless Rmpfi_init2_nobless Rmpfi_init_set_nobless
-Rmpfi_init_set_d_nobless Rmpfi_init_set_fr_nobless
-Rmpfi_init_set_q_nobless Rmpfi_init_set_si_nobless Rmpfi_init_set_str_nobless
-Rmpfi_init_set_ui_nobless Rmpfi_init_set_z_nobless
-Rmpfi_inp_str Rmpfi_intersect Rmpfi_interv_d
-Rmpfi_interv_fr Rmpfi_interv_q Rmpfi_interv_si Rmpfi_interv_ui
-Rmpfi_interv_z Rmpfi_inv Rmpfi_is_empty Rmpfi_is_error
-Rmpfi_is_inside Rmpfi_is_inside_d Rmpfi_is_inside_fr Rmpfi_is_inside_q
-Rmpfi_is_inside_si Rmpfi_is_inside_ui Rmpfi_is_inside_z Rmpfi_is_neg
-Rmpfi_is_nonneg Rmpfi_is_nonpos Rmpfi_is_pos Rmpfi_is_strictly_inside
-Rmpfi_is_strictly_neg Rmpfi_is_strictly_pos Rmpfi_is_zero Rmpfi_log
-Rmpfi_log10 Rmpfi_log1p Rmpfi_log2 Rmpfi_mag Rmpfi_mid Rmpfi_mig
-Rmpfi_mul Rmpfi_mul_2exp Rmpfi_mul_2si Rmpfi_mul_2ui Rmpfi_mul_d
-Rmpfi_mul_fr Rmpfi_mul_q Rmpfi_mul_si Rmpfi_mul_ui Rmpfi_mul_z
-Rmpfi_nan_p Rmpfi_neg Rmpfi_out_str Rmpfi_print_binary Rmpfi_put
-Rmpfi_put_d Rmpfi_put_fr Rmpfi_put_q Rmpfi_put_si Rmpfi_put_ui
-Rmpfi_put_z Rmpfi_q_div Rmpfi_q_sub Rmpfi_reset_error
-Rmpfi_revert_if_needed Rmpfi_round_prec Rmpfi_set Rmpfi_set_d
-Rmpfi_set_error Rmpfi_set_fr Rmpfi_set_prec Rmpfi_set_q
-Rmpfi_set_si Rmpfi_set_str Rmpfi_set_ui Rmpfi_set_z Rmpfi_si_div
-Rmpfi_si_sub Rmpfi_sin Rmpfi_sinh Rmpfi_sqr Rmpfi_sqrt
-Rmpfi_sub Rmpfi_sub_d Rmpfi_sub_fr Rmpfi_sub_q Rmpfi_sub_si
-Rmpfi_sub_ui Rmpfi_sub_z Rmpfi_swap Rmpfi_t Rmpfi_tan
-Rmpfi_tanh Rmpfi_ui_div Rmpfi_ui_sub Rmpfi_union Rmpfi_z_div
-Rmpfi_z_sub
-TRmpfi_out_str TRmpfi_inp_str
-Rmpfi_get_version Rmpfi_const_catalan Rmpfi_cbrt Rmpfi_hypot
-Rmpfi_sec Rmpfi_csc Rmpfi_cot Rmpfi_sech Rmpfi_csch Rmpfi_coth
-Rmpfi_atan2 Rmpfi_urandom
-Rmpfi_get_NV Rmpfi_set_NV
-)]);
+@Math::MPFI::EXPORT_OK = (@tagged);
+%Math::MPFI::EXPORT_TAGS =(mpfi => \@tagged);
 
 *TRmpfi_out_str = \&Rmpfi_out_str;
 *TRmpfi_inp_str = \&Rmpfi_inp_str;

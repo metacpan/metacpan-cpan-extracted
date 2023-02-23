@@ -225,7 +225,14 @@ void Rmpcb_retrieve(mpc_t * rop1, mpcr_ptr rop2, mpcb_t * op) {
 #endif
 }
 
-
+void Rmpcb_out_str(pTHX_ FILE *stream, mpcb_t * op) {
+#if MPC_VERSION > 66305
+  mpcb_out_str(stream, *op);
+  fflush(stream);
+#else
+  croak("Rmpcb_out_str function needs mpc-1.3.2. This is only mpc-%s", MPC_VERSION_STRING);
+#endif
+}
 
 
 
@@ -527,6 +534,23 @@ Rmpcb_retrieve (rop1, rop2, op)
         PPCODE:
         temp = PL_markstack_ptr++;
         Rmpcb_retrieve(rop1, rop2, op);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
+
+void
+Rmpcb_out_str (stream, op)
+	FILE *	stream
+	mpcb_t *	op
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        Rmpcb_out_str(aTHX_ stream, op);
         if (PL_markstack_ptr != temp) {
           /* truly void, because dXSARGS not invoked */
           PL_markstack_ptr = temp;

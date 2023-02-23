@@ -142,6 +142,11 @@ if($] < 5.035010) {
   }
 }
 else { print "Not defining MPFI_PV_NV_BUG as perl version >= 5.035010\n\n" }
+
+my $liblinks = '-lmpfi -lmpfr -lgmp';
+$liblinks .= ' -lquadmath'
+  if($^O =~ /cygwin/i && $Config{nvtype} eq '__float128');
+
 ####################################
 
 
@@ -149,7 +154,7 @@ my %options = (
   NAME => 'Math::MPFI',
   INC => '',
   AUTHOR => 'Sisyphus (sisyphus at (@) cpan dot (.) org)',
-  LIBS => '-lmpfi -lmpfr -lgmp',
+  LIBS => $liblinks,
   VERSION_FROM => 'MPFI.pm',
   PREREQ_PM => {'Math::MPFR' => '3.23', 'Test::More' => '0.88'},
   LICENSE  => 'perl',

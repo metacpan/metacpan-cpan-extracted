@@ -16,7 +16,7 @@ configure_requires:
   CPAN::Meta: '2.142060'
   Module::Build: '0.4004'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,7 +25,7 @@ name: Game-Xomb
 provides:
   Game::Xomb:
     file: lib/Game/Xomb.pm
-    version: '1.04'
+    version: '1.05'
 requires:
   List::Util: '0'
   List::UtilsBy: '0'
@@ -38,6 +38,6 @@ requires:
   strict: '0'
 resources:
   license: http://opensource.org/licenses/BSD-3-Clause
-  repository: https://github.com/thrig/Game-Xomb
-version: '1.04'
+  repository: https://thrig.me/src/Game-Xomb.git
+version: '1.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

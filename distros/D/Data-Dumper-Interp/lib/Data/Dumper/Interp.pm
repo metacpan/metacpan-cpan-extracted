@@ -1,26 +1,26 @@
 # Copyright © Jim Avera 2012-2023.  This software may be distributed,
-# at your option, under the GNU General Public License version 1 or 
+# at your option, under the GNU General Public License version 1 or
 # any later version, or the Perl "Artistic License".
 #
-# The above license restrictions apply solely because this library contains 
+# The above license restrictions apply solely because this library contains
 # code snippets extracted from perl5db.pl and JSON::PP, which are marked
 # as such in adjacent comments in the code.  Those items are distributed
 # under the license terms given above.  The author of this library, Jim Avera,
 # has dedicated the remaining portions of this library to the Public Domain
 # per Creative Commons CC0 (http://creativecommons.org/publicdomain/zero/1.0/).
 # You may use portions other than the above-mentioned extracts without any
-# restriction, but the library as a whole (or any portion containing those 
+# restriction, but the library as a whole (or any portion containing those
 # extracts) may only be distributred under the said software licenses.
 
 ##FIXME: Blessed structures are not formatted because we treat bless(...) as an atom
 
-use strict; use warnings FATAL => 'all'; use utf8; 
+use strict; use warnings FATAL => 'all'; use utf8;
 use 5.010;  # say, state
 use 5.018;  # lexical_subs
 use feature qw(say state lexical_subs);
 use feature 'lexical_subs'; no warnings "experimental::lexical_subs";
 package  Data::Dumper::Interp;
-$Data::Dumper::Interp::VERSION = '5.002';
+$Data::Dumper::Interp::VERSION = '5.004';
 
 package  # newline prevents Dist::Zilla::Plugin::PkgVersion from adding $VERSION
   DB;
@@ -119,7 +119,7 @@ sub __forceqsh(_) {
 }
 sub qsh(_) {
   local $_ = __stringify(shift());
-  defined && !ref && !/[^-=\w_\/:\.,]/ 
+  defined && !ref && !/[^-=\w_\/:\.,]/
     && $_ ne "" && $_ ne "undef" ? $_ : __forceqsh
 }
 sub qshpath(_) {  # like qsh but does not quote initial ~ or ~username
@@ -127,6 +127,28 @@ sub qshpath(_) {  # like qsh but does not quote initial ~ or ~username
   return qsh($_) if !defined or ref;
   my ($tilde_prefix, $rest) = /^( (?:\~[^\/\\]*[\/\\]?+)? )(.*)/xs or die;
   $rest eq "" ? $tilde_prefix : $tilde_prefix.qsh($rest)
+}
+
+my $sane_cW = $^W;
+my $sane_cH = $^H;
+our @save_stack;
+sub _SaveAndResetPunct() {
+  # Save things which will later be restored
+  push @save_stack, [ $@, $!+0, $^E+0, $,, $/, $\, $?, $^W ];
+  # Reset sane values
+  $,  = "";       # output field separator is null string
+  $/  = "\n";     # input record separator is newline
+  $\  = "";       # output record separator is null string
+  $?  = 0;        # child process exit status
+  $^W = $sane_cW; # our load-time warnings
+  #$^H = $sane_cH; # our load-time strictures etc.
+}
+sub _RestorePunct_NoPop() {
+  ( $@, $!, $^E, $,, $/, $\, $?, $^W ) = @{ $save_stack[-1] };
+}
+sub _RestorePunct() {
+  &_RestorePunct_NoPop;
+  pop @save_stack;
 }
 
 #################### Configuration Globals #################
@@ -210,18 +232,12 @@ sub _vistype {
 #
 # Global variabls in Data::Dumper::Interp are provided for all config options
 # which users may change on Data::Dumper::Interp objects.
-our $initialbang = 999; ###TEMP DEBUG
 sub new {
   croak "No args are allowed for ".__PACKAGE__."::new" if @_ > 1;
   my ($class) = @_;
   #(bless $class->SUPER::new([],[]), $class)->_config_defaults()
-  
-  ###TEMP DEBUGGING
-  # Try to catch FreeBSD bug where $! changes somewhere
-  $initialbang = $!+0;
+
   my $r = (bless $class->SUPER::new([],[]), $class)->_config_defaults();
-  Carp::confess blessed($r),"::new(...) changed \$! unexpectedly (was $initialbang, now ",$!+0
-    if $! != $initialbang;
   $r
 }
 
@@ -268,8 +284,8 @@ sub dvisq(_){ @_=(&__getobj->Useqq(0),shift,'d');goto &_Interpolate }
 ############# only internals follow ############
 
 BEGIN {
-  if (! Data::Dumper->can("Maxrecurse")) { 
-    eval q(sub Maxrecurse { # Supply if missing in older Data::Dumper 
+  if (! Data::Dumper->can("Maxrecurse")) {
+    eval q(sub Maxrecurse { # Supply if missing in older Data::Dumper
              my($s, $v) = @_;
              @_ == 2 ? (($s->{Maxrecurse} = $v), return $s) : $s->{Maxrecurse}//0;
            });
@@ -306,7 +322,7 @@ sub __set_default_Foldwidth() {
   } else {
     local *_; # Try to avoid clobbering special filehandle "_"
     # Does not yet work, see https://github.com/Perl/perl5/issues/19142
-    
+
     _SaveAndResetPunct();
     # Suppress hard-coded "didn't work" warning from Term::ReadKey when
     # the terminal size can not be determined via any method
@@ -353,10 +369,10 @@ sub _doedits {
   while (my $class = blessed($item)) {
     # Some kind of object reference
     last unless any { ref() eq "Regexp" ? $class =~ $_
-                                        : ($_ eq "1" || $_ eq $class) 
+                                        : ($_ eq "1" || $_ eq $class)
                     } @$objects;
     if (overload::Overloaded($item)) {
-      # N.B. Overloaded(...) also returns true if it's a NAME of an 
+      # N.B. Overloaded(...) also returns true if it's a NAME of an
       # overloaded package; should not happen in this case.
       warn("Recursive overloads on $item ?\n"),last
         if $overload_depth++ > 10;
@@ -366,7 +382,7 @@ sub _doedits {
         my $prefix = _show_as_number($item) ? $magic_num_prefix : "";
         $item = $item.""; # stringify;
         if ($item !~ /^${class}=REF/) {
-          $item = "${prefix}($class)$item"; 
+          $item = "${prefix}($class)$item";
         } else {
           # The "stringification" looks like Perl's default, so don't prefix it
         }
@@ -403,7 +419,7 @@ sub _doedits {
     unless ($class eq "Regexp") {  # unless Perl will handle it nicely
       return __COPY_NEEDED if $testonly;
       $item = "$item"
-    } 
+    }
     last
   }
   # Prepend a "magic prefix" (later removed) to items which Data::Dumper is
@@ -418,11 +434,11 @@ sub _doedits {
   #     most likely to be what the programmer used to create the datum.
   #
   #  2. Floating point values come out as "strings" to avoid some
-  #     cross-platform issue.  For our purposes we want all numbers 
-  #     to appear as numbers.  
+  #     cross-platform issue.  For our purposes we want all numbers
+  #     to appear as numbers.
   if (!reftype($item) && $item !~ /^0\d/ && looks_like_number($item) ) {
     return __COPY_NEEDED if $testonly;
-    my $prefix = _show_as_number($item) ? $magic_num_prefix 
+    my $prefix = _show_as_number($item) ? $magic_num_prefix
                                         : $magic_numstr_prefix;
     $item = $prefix.$item;
   }
@@ -444,7 +460,7 @@ sub Dump {
 
   # Do desired substitutions in a copy of the data.
   #
-  # (This used to just Clone:clone the whole thing and then walk and modify 
+  # (This used to just Clone:clone the whole thing and then walk and modify
   # the copy; but cloned tied variables could blow up if their handlers
   # got confused by our changes in the copy.  Now our copy never contains
   # tied variables, although it might contain cloned objects (with any
@@ -458,10 +474,10 @@ sub Dump {
     my $truncsuf = $self->{Truncsuffix};
     $objects = [ $objects ] unless ref($objects) eq 'ARRAY';
     $objects = undef unless grep{ $_ } @$objects; # all false?
-    my $callback = sub { 
-      $self->_doedits(@_, $maxstringwidth, $truncsuf, $objects) 
+    my $callback = sub {
+      $self->_doedits(@_, $maxstringwidth, $truncsuf, $objects)
     };
-    eval { 
+    eval {
       $values[0] = __copysubst($values[0], $callback)
     };
     croak "Exception while traversing value:\n----\n$@----\n" if $@;
@@ -491,15 +507,15 @@ sub Dump {
 # is returned).
 #
 # A "testonly" parameter to the callback indicates that the callback
-# may return __COPY_NEEDED as soon as it determines that a substitute 
-# value will probably be provided; the callback may ignore this parameter and 
+# may return __COPY_NEEDED as soon as it determines that a substitute
+# value will probably be provided; the callback may ignore this parameter and
 # always just return the substitute value, if that is easier.
 #
 # Substitute values may not use tied variables or overloads because the
 # copy-and-substitute process may cause tie handlers to encounter unexpected
 # data and misbehave.  The copy machinery re-creates all refs so as to
 # disable any overloads initially present; if the virtual content behind an
-# overload is desired, the callback must perform the overloaded operation(s) 
+# overload is desired, the callback must perform the overloaded operation(s)
 # and return the virtual content as a substition value.
 
 sub _x_same_items($$) {
@@ -508,7 +524,7 @@ sub _x_same_items($$) {
   return 1 if !defined($a) and !defined($b);
   return 0 if !defined($a) or !defined($b);
   # avoid executing any overloads
-  ref($a) ? (refaddr($a)==refaddr($b)) : ($a eq $b)  
+  ref($a) ? (refaddr($a)==refaddr($b)) : ($a eq $b)
 }
 sub _same_items($$) {
   my ($a, $b) = @_;
@@ -539,14 +555,14 @@ sub __copysubst($$;$$) {
   }
 
   my $count;
-  for(;;) { 
+  for(;;) {
     my $nitem = $coderef->($item, $testonly);
     last if _same_items($item, $nitem);
     return __COPY_NEEDED
       if $testonly && u($nitem) eq __COPY_NEEDED;
     $item = $nitem;
     oops "Too many repeated substitutions" if ++$count > 10;
-  } 
+  }
   $rt = reftype($item);
   if ($rt) {
     $seenhash->{ refaddr($item) }++;
@@ -568,7 +584,7 @@ sub __copysubst($$;$$) {
       $item = {
         pairmap { ( __copysubst($a, $coderef, $testonly, $seenhash)
                     =>
-                    __copysubst($b, $coderef, $testonly, $seenhash) ) 
+                    __copysubst($b, $coderef, $testonly, $seenhash) )
                 } %$item
       };
       return __COPY_NEEDED
@@ -584,17 +600,17 @@ sub _show_as_number(_) {
   my $value = shift;
 
   # IMPORTANT: We must not do any numeric ops or comparisions
-  # on $value because that may set some magic which defeats our attempt 
-  # to try bitstring unary & below (after a numeric compare, $value is 
-  # apparently assumed to be numeric or dual-valued even if it 
+  # on $value because that may set some magic which defeats our attempt
+  # to try bitstring unary & below (after a numeric compare, $value is
+  # apparently assumed to be numeric or dual-valued even if it
   # is/was just a "string").
-  
+
   return 0 if !defined $value;
 
   # if the utf8 flag is on, it almost certainly started as a string
   return 0 if !ref($value) && utf8::is_utf8($value);
 
-  # There was a Perl bug where looks_like_number() provoked a warning from 
+  # There was a Perl bug where looks_like_number() provoked a warning from
   # BigRat.pm if it is called under 'use bigrat;' so we must not do that.
   #   https://github.com/Perl/perl5/issues/20685
   #return 0 unless looks_like_number($value);
@@ -605,12 +621,12 @@ sub _show_as_number(_) {
   # number * 0 -> 0 unless number is nan or inf
 
   # Attempt uniary & with "string" and see what happens
-  my $uand_str_result = eval { 
+  my $uand_str_result = eval {
     use warnings "FATAL" => "all"; # Convert warnings into exceptions
     # 'bitwise' is the default only in newer perls. So disable.
     BEGIN {
       eval { # "no feature 'bitwise'" won't compile on Perl 5.20
-        feature->unimport( 'bitwise' ); 
+        feature->unimport( 'bitwise' );
         warnings->unimport("experimental::bitwise");
       };
     }
@@ -627,19 +643,19 @@ sub _show_as_number(_) {
       # is numeric but just doesn't support bitwise operators,
       # for example BigRat.
       return 1 if defined blessed($value);
-    } 
-    warn "### ".__PACKAGE__." : value=",_dbshow($value),
+    }
+    warn "# ".__PACKAGE__." : value=",_dbshow($value),
          "\n    Unhandled warn/exception from unary & :$@\n"
       if $Data::Dumper::Interp::Debug;
     # Unknown problem, treat as a string
     return 0;
-  } 
+  }
   elsif (ref($uand_str_result) && $uand_str_result =~ /NaN|Inf/) {
-    # unary & returned a an object representing Nan or Inf 
+    # unary & returned a an object representing Nan or Inf
     # (e.g. Math::BigFloat) so $value must be numberish.
     return 1;
   }
-  warn "### ".__PACKAGE__." : (value & \"...\") succeeded\n",
+  warn "# ".__PACKAGE__." : (value & \"...\") succeeded\n",
        "    value=", _dbshow($value), "\n",
        "    uand_str_result=", _dbvis($uand_str_result),"\n"
     if $Data::Dumper::Interp::Debug;
@@ -703,11 +719,11 @@ my $anyvname_or_refexpr_re = qr/ ${anyvname_re} | ${curlies_re} /x;
 
 sub __unesc_unicode() {  # edits $_
   if (/^"/) {
-    # Data::Dumper with Useqq(1) outputs wide characters as hex escapes 
-  
+    # Data::Dumper with Useqq(1) outputs wide characters as hex escapes
+
     s/
        \G (?: [^\\]++ | \\[^x] )*+ \K (?<w> \\x\x{7B} (?<hex>[a-fA-F0-9]+) \x{7D} )
-     / 
+     /
        my $orig = $+{w};
        local $_ = hex( length($+{hex}) > 6 ? '0' : $+{hex} );
        $_ = $_ > 0x10FFFF ? "\0" : chr($_); # 10FFFF is Unicode limit
@@ -715,7 +731,7 @@ sub __unesc_unicode() {  # edits $_
        # choice of case when escaping wide characters.
        m<\P{XPosixGraph}|[\0-\177]> ? lc($orig) : $_
      /xesg;
-  } 
+  }
 }
 
 sub __change_quotechars($) {  # edits $_
@@ -725,7 +741,7 @@ sub __change_quotechars($) {  # edits $_
     my ($l, $r) = split //, $_[0]; oops unless $r;
     s/([\Q$l$r\E])/\\$1/g;
     $_ = "qq".$l.$_.$r;
-  } 
+  }
 }
 
 my %qqesc2controlpic = (
@@ -752,7 +768,7 @@ my $linelen;
 my $reserved;
 my $outstr;
 my @stack; # [offset_of_start, flags]
- 
+
 sub BLK_FOLDEDBACK() {    1 } # block start has been folded back to min indent
 sub BLK_CANTSPACE()  {    2 } # blanks may not (any longer) be inserted
 sub BLK_HASCHILD()   {    4 }
@@ -802,9 +818,9 @@ sub _postprocess_DD_result {
   $indent_unit = 2; # make configurable?
   say "##RAW ",_dbrawstr($_) if $debug;
 
-  # Fit everything in a single line if possible.  
+  # Fit everything in a single line if possible.
   #
-  # Otherwise "fold back" block-starters onto their their own line, indented 
+  # Otherwise "fold back" block-starters onto their their own line, indented
   # according to level, beginning at the (second-to-)outer level:
   #
   #    [aaa,bbb,[ccc,ddd,[eee,fff,«not enough space for next item»
@@ -817,7 +833,7 @@ sub _postprocess_DD_result {
   #      [ ccc,ddd,
   #        [eee,fff,«next item goes here»
   #
-  # When a block-starter is folded back, additional space is inserted 
+  # When a block-starter is folded back, additional space is inserted
   # before the first sub-item so it will align with the next indent level,
   # as shown for 'aaa' and 'ccc' above.
   #
@@ -866,7 +882,7 @@ sub _postprocess_DD_result {
       $foldposn += length($spaces);
       foreach (@stack[$bx+1 .. $#stack]) { $_->[0] += length($spaces) }
       ($reserved -= length($spaces)) >= 0 or oops;
-      $stack[$bx]->[1] |= BLK_CANTSPACE; 
+      $stack[$bx]->[1] |= BLK_CANTSPACE;
       say "#***>space inserted b4 first item in bx $bx" if $debug;
     }
     my $indent = ($bx+1) * $indent_unit;
@@ -877,7 +893,7 @@ sub _postprocess_DD_result {
       $foldposn -= $replacelen;
     } else {
       $replacelen = 0;  # did not match immediately preceding the bracket
-    } 
+    }
     pos($outstr) = undef;
     my $delta = 1 + $indent - $replacelen; # \n + spaces
     $linelen = length($outstr) - $replacelen - $foldposn + $indent;
@@ -892,7 +908,7 @@ sub _postprocess_DD_result {
 
   my ($previtem, $prevflags);
   my sub atom($;$) {
-    # Queue each item for one "look ahead" cycle before fully processing.  
+    # Queue each item for one "look ahead" cycle before fully processing.
     (local $_, my $flags) = ($previtem, $prevflags);
     ($previtem, $prevflags) = ($_[0], $_[1]//0);
     __unmagic(\$previtem);
@@ -911,16 +927,16 @@ say "atom ",_dbrawstr($_),_fmt_flags($flags), "  stack:", _fmt_stack(), " os=",_
   if $debug;
 
     return if ($flags & NOOP);
-   
+
     if ( !($flags & CLOSER)
-         && @stack 
+         && @stack
          && ($stack[-1]->[1] & (BLK_HASCHILD|BLK_CANTSPACE))==0 ) {
-      # First child: Reserve space to insert blanks before it 
+      # First child: Reserve space to insert blanks before it
       $reserved += ($indent_unit - 1);
       $stack[-1]->[1] |= BLK_HASCHILD if @stack;
     }
-    if ( ($flags & CLOSER) 
-         && ($stack[-1]->[1] & (BLK_HASCHILD|BLK_CANTSPACE))==BLK_HASCHILD 
+    if ( ($flags & CLOSER)
+         && ($stack[-1]->[1] & (BLK_HASCHILD|BLK_CANTSPACE))==BLK_HASCHILD
          && length() <= ($indent_unit - 1)) {
       # Closing a block which has reserved space but has not been folded yet;
       # If the closer is not larger than the reserved space, release the
@@ -932,7 +948,7 @@ say "atom ",_dbrawstr($_),_fmt_flags($flags), "  stack:", _fmt_stack(), " os=",_
     # Fold back enclosing blocks to try to make room
     while ( $maxlinelen - $linelen < $reserved + length() ) {
       my $bx = first { ($stack[$_]->[1] & BLK_FOLDEDBACK)==0 } 1..$#stack;
-      last 
+      last
         unless defined($bx);
       my $foldposn = $stack[$bx]->[0];
       _fold_block($bx-1, $foldposn, "encl");
@@ -940,24 +956,24 @@ say "atom ",_dbrawstr($_),_fmt_flags($flags), "  stack:", _fmt_stack(), " os=",_
     }
 
     # Fold the innermost block to start a new line if more space is needed.
-    # Ignore $reserved if the item is a closer because reserved space will 
+    # Ignore $reserved if the item is a closer because reserved space will
     # not be needed if the item fits on the same line.
     #
     # But always fold if this is a block-closer and there exist already-folded
     # children; in that case align the closer with opener like this:
-    #     [ aaa, bbb, 
+    #     [ aaa, bbb,
     #       ccc, «wrap instead of putting closer here»
     #     ]
     #
     # If removing trailing spaces makes it fit exactly then remove the spaces.
     #
-    my $deficit = (($flags & CLOSER) ? 0 : $reserved) + length() 
+    my $deficit = (($flags & CLOSER) ? 0 : $reserved) + length()
                     - ($maxlinelen - $linelen) ;
     if ($deficit > 0 && /\s++\z/s && length($&) >= $deficit) {
       s/\s{$deficit}\z// or oops;
       $deficit = 0;  # e.g. if item is " => "
     }
-    if (@stack && 
+    if (@stack &&
          ($deficit > 0
           ||
           (($flags & CLOSER) && (length($outstr) - $stack[-1]->[0] > $linelen)))
@@ -1003,7 +1019,7 @@ say "atom ",_dbrawstr($_),_fmt_flags($flags), "  stack:", _fmt_stack(), " os=",_
   my sub triple($) {
     my $item = shift;
     say "##triple '$item'" if $debug;
-    # Make a "key => value" or "var = value" triple be a block, 
+    # Make a "key => value" or "var = value" triple be a block,
     # to keep together if possible
     oops _fmt_flags($prevflags) if $prevflags != 0;
     $prevflags |= (OPENER | BLK_CANTSPACE);
@@ -1029,12 +1045,12 @@ say "atom ",_dbrawstr($_),_fmt_flags($flags), "  stack:", _fmt_stack(), " os=",_
     elsif (/\G"(?:[^"\\]++|\\.)*+"/gc)           { atom($&) } # "quoted"
     elsif (/\G'(?:[^'\\]++|\\.)*+'/gc)           { atom($&) } # 'quoted'
     elsif (m(\Gqr/(?:[^\\\/]++|\\.)*+/[a-z]*)gc) { atom($&) } # Regexp
-    
+
     # With Deparse(1) the body has arbitrary Perl code, which we can't parse
     elsif (/\Gsub\s*${curlies_re}/gc)            { atom($&) } # sub{...}
 
     # $VAR1->[ix] $VAR1->{key} or just $varname
-    elsif (/\G(?:my\s+)?\$(?:${userident_re}|\s*->\s*|${balanced_re})++/gc) { atom($&) } 
+    elsif (/\G(?:my\s+)?\$(?:${userident_re}|\s*->\s*|${balanced_re})++/gc) { atom($&) }
 
     elsif (/\G\b[A-Za-z_][A-Za-z0-9_]*+\b/gc) { atom($&) } # bareword?
     elsif (/\G\b-?\d[\deE\.]*+\b/gc)          { atom($&) } # number
@@ -1049,7 +1065,7 @@ say "atom ",_dbrawstr($_),_fmt_flags($flags), "  stack:", _fmt_stack(), " os=",_
   }
   atom(""); # push through the lookahead item
 
-  if (($vistype//"s") eq "s") { 
+  if (($vistype//'s') eq 's') {
   }
   elsif ($vistype eq 'a') {
     $outstr =~ s/\A\[/(/ && $outstr =~ s/\]\z/)/s or oops;
@@ -1062,42 +1078,14 @@ say "atom ",_dbrawstr($_),_fmt_flags($flags), "  stack:", _fmt_stack(), " os=",_
   $outstr
 } #_postprocess_DD_result {
 
-my $sane_cW = $^W;
-my $sane_cH = $^H;
-our @save_stack;
-sub _SaveAndResetPunct() {
-  # Save things which will later be restored, and reset to sane values.
-  push @save_stack, [ $@, $!+0, $^E+0, $,, $/, $\, $?, $^W ];
-  $,  = "";       # output field separator is null string
-  $/  = "\n";     # input record separator is newline
-  $\  = "";       # output record separator is null string
-  $?  = 0;        # child process exit status
-  $^W = $sane_cW; # our load-time warnings
-  #$^H = $sane_cH; # our load-time strictures etc.
-}
-sub _RestorePunct() {
-  ( $@, $!, $^E, $,, $/, $\, $?, $^W ) = @{ pop @save_stack };
-}
-
 sub _Interpolate {
   my ($self, $input, $i_or_d) = @_;
   return "<undef arg>" if ! defined $input;
 
-###TEMP DEBUGGING
-# Try to catch FreeBSD bug where $! changes somewhere
-$initialbang = $!+0;
-  
   &_SaveAndResetPunct;
 
-#say "###III1 ",_dbvis($save_stack[-1]);
-#say "###III2 ",_dbvis($initialbang);
-oops unless $save_stack[-1]->[1] == $initialbang;
-oops unless $!+0 == $initialbang;
-
   my $debug = $self->Debug;
-oops unless $!+0 == $initialbang;
   my $useqq = $self->Useqq;
-oops unless $!+0 == $initialbang;
 
   my $q = $useqq ? "" : "q";
   my $funcname = $i_or_d . "vis" .$q;
@@ -1111,7 +1099,7 @@ oops unless $!+0 == $initialbang;
     while (
       /\G (
            # Stuff without variable references (might include \n etc. escapes)
-           
+
            #This gets "recursion limit exceeded"
            #( (?: [^\\\$\@\%] | \\[^\$\@\%] )++ )
            #|
@@ -1126,11 +1114,11 @@ oops unless $!+0 == $initialbang;
            #
            (?: \$\#\$*+\K ${anyvname_or_refexpr_re} )
            |
-           
+
            # $scalarvar $$$...refvarname ${sref expr} $$$...{ref2ref expr}
            #  followed by [] {} ->[] ->{} ->method() ... «zero or more»
            # EXCEPT $$<punctchar> is parsed as $$ followed by <punctchar>
-           
+
            (?:
              (?: \$\$++ ${pkgname_re} \K | \$ ${anyvname_or_refexpr_re} \K )
              (?:
@@ -1170,9 +1158,9 @@ oops unless $!+0 == $initialbang;
         else { confess "BUG:sigl='$sigl'"; }
       } else {
         if (/^.+?(?<!\\)([\$\@\%])/) { confess __PACKAGE__." bug: Missed '$1' in «$_»" }
-        # Due to the need to simplify the big regexp above, \x{abcd} is now 
+        # Due to the need to simplify the big regexp above, \x{abcd} is now
         # split into "\x" and "{abcd}".  Combine consecutive pass-thrus
-        # into a single passthru ('p') and convert later to 'e' if 
+        # into a single passthru ('p') and convert later to 'e' if
         # an eval if needed.
         if (@pieces && $pieces[-1]->[0] eq 'p') {
           $pieces[-1]->[1] .= $_;
@@ -1198,26 +1186,23 @@ oops unless $!+0 == $initialbang;
       $_->[0] = 'e';
     }
   } #local $_
-oops unless $!+0 == $Data::Dumper::Interp::initialbang;
 
   @_ = ($self, $funcname, \@pieces);
   goto &DB::DB_Vis_Interpolate
 }
 
 sub quotekey(_) { # Quote a hash key if not a valid bareword
-  $_[0] =~ /\A${userident_re}\z/s ? $_[0] : 
-            $_[0] =~ /(?!.*')["\$\@]/  ? visq("$_[0]") : 
-            $_[0] =~ /\W/ && !looks_like_number($_[0]) ? vis("$_[0]") : 
+  $_[0] =~ /\A${userident_re}\z/s ? $_[0] :
+            $_[0] =~ /(?!.*')["\$\@]/  ? visq("$_[0]") :
+            $_[0] =~ /\W/ && !looks_like_number($_[0]) ? vis("$_[0]") :
             "\"$_[0]\""
 }
 
-package 
+package
   DB;
 
 sub DB_Vis_Interpolate {
   my ($self, $funcname, $pieces) = @_;
-  #say "###Vis pieces=",Data::Dumper::Interp::_dbvis($pieces);
-Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
   my $result = "";
   foreach my $p (@$pieces) {
     my ($methname, $arg) = @$p;
@@ -1225,9 +1210,7 @@ Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
       $result .= $arg;
     }
     elsif ($methname eq 'e') {
-Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
       $result .= DB::DB_Vis_Eval($funcname, $arg);
-Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
     } else {
       # Reduce indent before first wrap to account for stuff alrady there
       my $leftwid = length($result) - rindex($result,"\n") - 1;
@@ -1236,21 +1219,18 @@ Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
       if ($foldwidth) {
         $self->{Foldwidth1} -= $leftwid if $leftwid < $self->{Foldwidth1}
       }
-Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
       $result .= $self->$methname( DB::DB_Vis_Eval($funcname, $arg) );
-Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
     }
   }
 
-Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
   &Data::Dumper::Interp::_RestorePunct;  # saved in _Interpolate
-Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
   $result
 }# DB_Vis_Interpolate
 
 # eval a string in the user's context and return the result.  The nearest
 # non-DB frame must be the original user's call; this is accomplished by
-# using "goto &_Interpolate" in the entry-point sub.
+# dvis(), and friends using "goto &_Interpolate", which in turn
+# does "goto &DB::DB_Vis_Interpolate" to enter package DB.
 sub DB_Vis_Eval($$) {
   my ($label_for_errmsg, $evalarg) = @_;
   Carp::confess("Data::Dumper::Interp bug:empty evalarg") if $evalarg eq "";
@@ -1259,13 +1239,11 @@ sub DB_Vis_Eval($$) {
   # Find the closest non-DB caller.  The eval will be done in that package.
   # Find the next caller further up which has arguments (i.e. wasn't doing
   # "&subname;"), and make @_ contain those arguments.
-Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
   my ($distance, $pkg, $fname, $lno);
   for ($distance = 0 ; ; $distance++) {
     ($pkg, $fname, $lno) = caller($distance);
     last if $pkg ne "DB";
   }
-Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
   local *_ = [];
   while() {
     $distance++;
@@ -1280,37 +1258,25 @@ Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
     }
   }
 
-Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
-  &Data::Dumper::Interp::_RestorePunct;  # saved in _Interpolate
-Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
-  $Data::Dumper::Interp::user_dollarat = $@; # 'eval' will reset $@
-  $Data::Dumper::Interp::user_bang = $!;     # not sure why this might be changed(!?!)
   my @result = do {
     local @Data::Dumper::Interp::result;
     local $Data::Dumper::Interp::string_to_eval =
       "package $pkg; "
-     .' $@ = $Data::Dumper::Interp::user_dollarat; '
-     .' $! = $Data::Dumper::Interp::user_bang; '
+     .' &Data::Dumper::Interp::_RestorePunct_NoPop;'      # saved in _Interpolate
+                  # N.B. eval first clears $@ but this restores $@ inside the eval
      .' @Data::Dumper::Interp::result = '.$evalarg.';'
-     .' $Data::Dumper::Interp::user_dollarat = $@; '  # possibly changed by a tie handler
+     .' $Data::Dumper::Interp::save_stack[-1]->[0] = $@;' # possibly changed by a tie handler
      ;
-Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
      &DB_Vis_Evalwrapper;
-Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
      @Data::Dumper::Interp::result
   };
   my $errmsg = $@;
-Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
-  &Data::Dumper::Interp::_SaveAndResetPunct;
-Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
-  $Data::Dumper::Interp::save_stack[-1]->[0] = $Data::Dumper::Interp::user_dollarat;
 
   if ($errmsg) {
     $errmsg = Data::Dumper::Interp::__chop_loc($errmsg);
     Carp::croak("${label_for_errmsg}: Error interpolating '$evalarg':\n$errmsg\n");
   }
 
-Carp::confess() unless $!+0 == $Data::Dumper::Interp::initialbang;
   wantarray ? @result : (do{die "bug" if @result>1}, $result[0])
 }# DB_Vis_Eval
 
@@ -1341,13 +1307,13 @@ Data::Dumper::Interp - interpolate Data::Dumper output into strings for human co
     #    That hash is: (abc => [1,2,3,4,5], def => undef)
     #    Args are ("-i","/file/path")
 
-  # Label interpolated values with "expr=" 
-  say dvis '$ref\nand @ARGV'; 
+  # Label interpolated values with "expr="
+  say dvis '$ref\nand @ARGV';
 
-    # -->ref={abc => [1,2,3,4,5], def => undef} 
+    # -->ref={abc => [1,2,3,4,5], def => undef}
     #    and @ARGV=("-i","/file/path")
 
-  # Functions to format one thing 
+  # Functions to format one thing
   say vis $ref;     #-->{abc => [1,2,3,4,5], def => undef}
   say vis \@ARGV;   #-->["-i", "/file/path"]  # any scalar
   say avis @ARGV;   #-->("-i", "/file/path")
@@ -1360,7 +1326,7 @@ Data::Dumper::Interp - interpolate Data::Dumper output into strings for human co
       # --> {debt => (Math::BigFloat)999999999999999999.02}
 
     # But if you do want to see object internals
-    say visnew->Objects(0)->vis($struct); 
+    say visnew->Objects(0)->vis($struct);
     { local $Data::Dumper::Interp::Objects=0; say vis $struct; } #another way
       # --> {debt => bless({...lots of stuff...},'Math::BigInt')}
   }
@@ -1384,16 +1350,16 @@ Data::Dumper::Interp - interpolate Data::Dumper output into strings for human co
   say qsh($string);        # quote if needed for /bin/sh
   say qshpath($pathname);  # shell quote excepting ~ or ~username prefix
 
-    system "ls -ld ".join(" ",map{ qshpath } 
+    system "ls -ld ".join(" ",map{ qshpath }
                               ("/tmp", "~sally/My Documents", "~"));
 
 
 =head1 DESCRIPTION
 
-This Data::Dumper wrapper optimizes output for human consumption 
+This Data::Dumper wrapper optimizes output for human consumption
 and avoids side-effects which interfere with debugging.
 
-The namesake feature is interpolating Data::Dumper output 
+The namesake feature is interpolating Data::Dumper output
 into strings, but simple functions are also provided
 to visualize a scalar, array, or hash.
 
@@ -1548,11 +1514,11 @@ Defaults to the terminal width at the time of first use.
 A I<false> value disables special handling of objects
 and internals are shown as with Data::Dumper.
 
-A "1" (the default) enables for all objects, otherwise only 
+A "1" (the default) enables for all objects, otherwise only
 for the specified class name(s).
 
-When enabled, object internals are never shown.  
-If the stringification ('""') operator, 
+When enabled, object internals are never shown.
+If the stringification ('""') operator,
 or array-, hash-, scalar-, or glob- deref operators are overloaded,
 then the first overloaded operator found will be evaluated and the
 object replaced by the result, and the check repeated; otherwise
@@ -1571,7 +1537,7 @@ value, e.g. "A.20" sorts before "A.100".  See C<Data::Dumper> documentation.
 
 =head2 Useqq
 
-The default is "unicode:controlpic" except for 
+The default is "unicode:controlpic" except for
 functions/methods with 'q' in their name, which force C<Useqq(0)>.
 
 0 means generate 'single quoted' strings when possible.
@@ -1594,13 +1560,13 @@ characters are shown as themselves rather than hex escapes, and
 =item "controlpic"
 
 Show ASCII control characters using single "control picture" characters,
-for example '␤' is shown for newline instead of '\n'.  
+for example '␤' is shown for newline instead of '\n'.
 Similarly for \0 \a \b \e \f \r and \t.
 
-This way every character occupies the same space with a fixed-width font.  
+This way every character occupies the same space with a fixed-width font.
 However the commonly-used "Last Resort" font for these characters
 can be hard to read on modern high-res displays.
-You can set C<Useqq> to just "unicode" to see traditional \n etc. 
+You can set C<Useqq> to just "unicode" to see traditional \n etc.
 backslash escapes while still seeing wide characters as themselves.
 
 =item "qq"
@@ -1652,7 +1618,7 @@ it is returned as-is, without quotes.
 
 If the argument is a ref but is not an object which stringifies,
 then vis() is called and the resulting string quoted.
-An undefined value is shown as C<undef> without quotes; 
+An undefined value is shown as C<undef> without quotes;
 as a special case to avoid ambiguity the string 'undef' is always "quoted".
 
 =head2 qshpath [$might_have_tilde_prefix]
@@ -1707,7 +1673,7 @@ special and simply passes through these annotations.
 
 Data::Dumper::Interp queries the operating
 system to obtain the window size to initialize C<$Foldwidth>, if it
-is not already defined; this may change the "_" filehandle.  
+is not already defined; this may change the "_" filehandle.
 After the first call (or if you pre-set C<$Foldwidth>),
 the "_" filehandle will not change across calls.
 
@@ -1716,7 +1682,7 @@ the "_" filehandle will not change across calls.
 =head1 DIFFERENCES FROM Data::Dumper
 
 Results differ from plain C<Data::Dumper> output in the following ways
-(most substitutions can be disabled via Config options): 
+(most substitutions can be disabled via Config options):
 
 =over 2
 
@@ -1725,7 +1691,7 @@ Results differ from plain C<Data::Dumper> output in the following ways
 A final newline is I<never> included.
 
 Everything is shown on a single line if possible, otherwise wrapped to
-your terminal width (or C<$Foldwidth>) with indentation 
+your terminal width (or C<$Foldwidth>) with indentation
 appropriate to structure levels.
 
 =item *
@@ -1756,7 +1722,7 @@ readable values rather than S<"bless( {...}, 'Math::...')">.
 Stingified objects are prefixed with "(classname)" to make clear what
 happened.
 
-The "virtual" value of objects which overload a dereference operator 
+The "virtual" value of objects which overload a dereference operator
 (C<@{}> or C<%{}>) is displayed instead of the object's internals.
 
 =item *
@@ -1770,7 +1736,7 @@ Punctuation variables, including $@ and $?, are preserved over calls.
 
 =item *
 
-Numbers and strings which look like numbers are kept distinct when displayed, 
+Numbers and strings which look like numbers are kept distinct when displayed,
 i.e. "0" does not become 0 or vice-versa. Floating-point values are shown
 as numbers not 'quoted strings' and similarly for stringified objects.
 
@@ -1787,7 +1753,7 @@ Jim Avera  (jim.avera AT gmail)
 
 =for nobody Foldwidth1 is currently an undocumented experimental method
 =for nobody which sets a different fold width for the first line only.
-=for nobody 
+=for nobody
 =for nobody Terse & Indent methods exist to croak; using them is not allowed.
 =for nobody oops is an internal function (called to die if bug detected).
 =for nobody The Debug method is for author's debugging, and not documented.
